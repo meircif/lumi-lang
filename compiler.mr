@@ -1,0 +1,27 @@
+
+native func print(user String text)
+
+native type File
+native func file-open-read(out File file, user String name)
+native func file-open-write(out File file, user String name)
+native func file-close(owner File file)
+native func file-read(user File file, user String data)
+native func file-write(user File file, user String line)
+
+
+func main(user String arg1, user String arg2)
+  print(user "MR__compiler__start")
+  
+  owner String{131072} file-data("")
+  
+  owner File infile
+  file-open-read(out infile, user arg1)
+  file-read(user infile, user file-data)
+  file-close(user infile)
+  
+  owner File outfile
+  file-open-write(out outfile, user arg2)
+  file-write(user infile, user file-data)
+  file-close(user outfile)
+  
+  print(user "MR__compiler__end")

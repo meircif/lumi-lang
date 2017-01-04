@@ -1,7 +1,7 @@
 # comments
 ###########
 
-(# {-- multi-line comment start
+(# <-- multi-line comment start
 
 This is MR programming language example.
 
