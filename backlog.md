@@ -3,11 +3,11 @@
 ## main tasks
 
 1. initial MR C compiler
-  1. write a complier in MR that can compile itself to C [compiler.mr]
-  1. write a python compiler that can compile the MR compiler to C [compiler.py]
+  1. write a complier in MR that can compile itself to C [compiler.mr](compiler.mr)
+  1. write a python compiler that can compile the MR compiler to C [compiler.py](compiler.py)
   1. publish the generated C code to be used from now on
-1. decide exception handling syntax [example.mr]
-1. decide OOP syntax [example.mr]
+1. decide exception handling syntax [example.mr](example.mr)
+1. decide OOP syntax [example.mr](example.mr)
 1. support more MR features...
 
 ## initial compiler
