@@ -1,0 +1,482 @@
+# comments
+###########
+
+(# {-- multi-line comment start
+
+This is MR programming language example.
+
+
+MR Language Goals (prioritized)
+-------------------------------
+
+1. Enforce safe and reliable code, free from:
+  * illegal memory access
+  * memory corruption
+  * overflows
+  * unexpected crashes
+  * etc...
+  
+2. Allow writing of efficient code, suitable for real-time embedded:
+  Modern programming languages solve goal #1 by making everything dynamically
+  allocated and garbage collected, but this is inefficient and unpredictable.
+  MR will allow as much efficiency and freedom as possible,
+  as long as goal #1 is not harmed.
+  
+3. Modern, practical and convenient syntax.
+
+
+Preferences:
+  * Code generating: MR compiler will initially generate C code.
+      Other "modern machine language" codes may also be generated, such as:
+      Java (for android and other devices), iOS (for apple devices),
+      JavaScript (for web application), and more...
+  * Strong typing
+  * OOP: single inheritance + multiple interfaces (allow multiple inheritance?)
+  * Exception-like error handling implemented with return values
+  * Strict coding conventions - all ML code should look the same
+  * Built-in testing and mocking support
+
+  
+Syntax highlights:
+  * blocks are declared with indentation (as in Python)
+  * strict whitespacing:
+    - tabs are syntax errors
+    - indentation is exactly 2 spaces
+    - exactly one space around operators
+    - file must end with a newline
+    - more as can be seen in the examples...
+  * "Kebab" naming conventions (is possible due to the strict whitespacing):
+    everything is lowercase-only-with-hyphens except types that start with
+    One-uppercase-letter and compile time constants that are FULLY-UPPERCASE
+
+multi-line comment end --> #)
+
+# single line comment, strict exactly one space after #
+
+some-code()  # line end comment, strict 2 spaces before #
+
+some-code( (# mid-code comment (strict whitespacing?) #) )
+
+(#
+(#
+allow nested comments?
+#)
+#)
+
+
+# references
+#############
+
+(# maneging references
+
+References should be maneged correctly to reach goal #1,
+and to reach goal #2 - it should be done as efficiently as possible.
+
+This is done with 3 layers of managing - allowing easy trade-of between
+flexibility and performance by the user:
+1. No performance overhead - compile time only reference maneging
+2. More flexible reference maneging - with a small performance cost
+3. Maximum flexibility - but with performance issues
+
+Below is a first suggestion to implement this, but it will probably be
+developed further over time, and maybe even changed completely.
+
+(# 1. No performance overhead - compile time only reference maneging
+MR will allow performance free reference maneging that will be done only in
+compile time.
+
+Every reference has a single "owner" entity - which is another object
+or a stack block.
+When an owner is destroyed it automatically destroys the referenced object,
+unless the ownership was passed to another entity.
+Owners can give the reference to multiple "user" entities - other entities
+that are deeper in the stack than the owner.
+Users are free to modify the referenced object freely - but cannot destroy it.
+#)
+owner String{32} some-string("")
+user-func(user some-string)  # give reference to a user
+owning-func(owner some-string)  # pass ownership, cannot be used anymore
+
+
+(# 2. More flexible reference maneging - with a small performance cost
+MR will allow more complex and flexible reference maneging that come with a
+small and predictable performance cost
+
+Same as 1. with the addition of weak references.
+To allow this the owner should be declared as "managed". It will work the
+same way as a regular owner, plus the it can now give "weak" references to any
+other entity without limitations. Weak references will automatically test that
+the reference is still valid before accessing it.
+
+There are several ways to implement this - but all need some extra memory to
+manage the weak references, plus the extra check if the weak reference is valid.
+Depends on the implementation of the compiler the extra overhead is small
+and predictable.
+
+* It is also possible to support "strong" reference counting - but this is not
+  added because it can cause memory leaks because of reference loops.
+#)
+managed String{32} some-string("")
+user-func(user some-string)  # give reference to a user
+weak-func(weak some-string)  # give weak reference
+owning-func(managed some-string)  # pass ownership
+
+(# 3. Maximum flexibility - but with performance issues
+MR will allow declaring a reference as garbage-collected, which will allow
+passing references freely without limitation. The memory will only be cleared
+when all "strong" references are destroyed. The garbage-collector must check and
+remove reference loops to avoid memory leaks.
+
+To allow this a reference should be declared as "shared". This reference can
+then be passed to other "shared", "user" or "weak" references.
+
+Implementing a garbage-collector has a significant and unpredicted performance
+cost, but some MR users may be willing to pay it in some sections of their
+project where performance is less important.
+#)
+shared String{32} some-string("")
+shared-func(shared some-string)  # copy strong reference
+user-func(user some-string)  # give reference to a user
+weak-func(weak some-string)  # give weak reference
+
+# primitive types
+##################
+
+
+# integers
+
+# the basic integer type is "Int{min:max}" (inclusive), where max >= min
+owner Int{-12:47} limited-int(34)
+owner Int{0:255} integer(0)
+
+# useful aliases
+owner Uint8b unsigned-8bit(0)  # same as Int{0:255}
+owner Uint16b unsigned-16bit(0)  # same as Int{0:65535}
+owner Uint32b unsigned-32bit(0)  # same as Int{0:4294967295}
+owner Uint64b unsigned-64bit(0)  # same as Int{0:18446744073709551615}
+owner Uint-max unsigned-max(0)  # same as Int{0:MAX-UINT-IN-MACHINE}
+owner Sint8b signed-8bit(0)  # same as Int{0:255}
+owner Sint16b signed-16bit(0)  # same as Int{-32766:32767}
+owner Sint32b signed-32bit(0)  # same as Int{-2147483646:2147483647}
+owner Sint64b signed-64bit(0)
+# same as Int{-9223372036854775806:9223372036854775807}
+owner Sint-max signed-max(0)
+# same as Int{MIN-INT-IN-MACHINE:MAX-INT-IN-MACHINE}
+
+# in C code generation each int will be implemented with the smallest int type
+# that can contain its range,
+# "Uint-max" and "Sint-max" sizes are as size_t and ssize_t respectfully
+
+# compile time constant integer
+const Int BYTE-SIZE(8)  # in this case the type is same as Int{8:8}
+
+# dynamic ranged int - for dynamic array indices
+owner Int{some-array} array_index(0)  # actual range is {0:array-length - 1}
+
+# Dynamically allocated infinite integer (same as Python's "long")
+owner Iint infinite-dynamic-signed-integer(347563948756923876592347856659238659)
+
+# assignment
+owner Int{6:12} int-small(10)
+owner Int{0:100} int-large(0)
+int-large := int-small  # is OK - range is inclusive
+# range cast
+int-small := clamp int-large  # clamp if smaller or larger
+int-small := check int-large  # raise error if smaller or larger
+int-small := min int-large  # clamp if smaller, raise error if larger
+int-small := max int-large  # raise error if smaller, clamp if larger
+
+# integer operators, the return value range depends on the operation
+int-large + int-small  # return type is Int{6:112}
+int-large - int-small  # return type is Int{-12:94}
+int-large * int-small  # return type is Int{0:1200}
+int-large div int-small  # return type is Int{0:16}
+int-large mod int-small  # return type is Int{0:11}
+# range cast
+int-small := int-large + clamp int-small  # cast to assigned type
+int-small := check int-large + clamp{0:100} int-small  # cast to explicit type
+# cast to given variable's type
+int-small := check int-large + clamp{int-large} int-small
+
+# boolean
+owner Bool bool  # has 2 possible values: "true" or "false"
+const Bool MR-IS-GOOD(true)
+const Bool LIFE-IS-EASY(false)
+# cast to other
+owner Int{0:1} flag(1 if bool else 0)
+# cast from other
+bool := integer = 3
+# other operators
+bool := not bool
+bool := integer > 3
+bool := integer < 3
+bool := integer <= 3
+bool := integer >= 3
+bool := integer != 3
+bool := bool and LIFE-IS-EASY
+bool := bool or LIFE-IS-EASY
+bool := bool xor LIFE-IS-EASY
+bool := bool and not LIFE-IS-EASY
+bool := not bool and LIFE-IS-EASY
+bool := not (bool and LIFE-IS-EASY)
+bool := not bool and not LIFE-IS-EASY
+
+# character
+owner Char char  # only accept characters as 'single-letter'
+owner Uchar unicode-char  # only accept characters as u'single-letter'
+const Char ZERO('0')
+const Uchar UNICODE-ZERO(u'0')
+# cast to integer
+number := ord(char)
+# cast from integer
+char := chr(number)
+# allow implicit cast?
+
+# byte
+owner Byte byte  # only accept characters as b'byte-hex'
+const Byte BYTE-ZERO(b'00')
+# decode
+number := decode byte
+number := decode{Int} byte  # explicit decoding
+number := decode{number} byte  # decode to given variable's type
+int-small := clamp decode byte
+bool := decode byte
+char := decode byte
+# encode
+byte := encode number
+byte := encode{Int} number
+byte := encode{number} number
+byte := encode bool
+byte := encode char
+
+
+# built-in complex types
+#######################
+
+
+# arrays
+
+# compile time constant size array is "Array{length:type}", where length >= 0,
+# length is not stored
+owner Array{128:Bool} bit-map(false)  # all items initialized with "false"
+owner Array{4:Int{0,20}} int-array(3, 4, 5, 12)  # unique item initialization
+user Array{4:Bool} partial-bit-map(bit-map[4:8])  # partial reference
+
+# dynamic sized array is "Array{length-int-type:type}",
+# "length-int-type" must be an integer with range minimum >= 0,
+# length is stored alongside the array reference
+user Array{Uint32b:Bool} dynamic-bit-map(bit-map)
+dynamic-bit-map := bit-map[3:8]  # partial reference [start:upper-bound]
+
+# compile time constant array
+const Array{Int} CONST_ARRAY(3, 5, 4, 2, 2, 5)
+# in this case the type is same as Array{6:Int{2:5}}
+
+# assignment
+bit-map[5] := true
+bool := bit-map[12]
+# range casting
+owner Int{10:20} smaller(12)
+owner Int{0:300} larger(12)
+bit-map[smaller] := true  # no casting needed
+bit-map[clamp larger] := true  # casting needed, expects Int{0:127}
+bit-map[check larger] := true
+bit-map[min larger] := true
+bit-map[max larger] := true
+# dynamic array range
+owner Int{dynamic-bit-map} dynamic-index(0)
+dynamic-bit-map[dynamic-index] := true
+
+# copying with slicing (as in python)
+owner Array{128:Bool} another-bit-map(true)
+another-bit-map[:] := bit-map[:]  # copy all
+another-bit-map[0:4] := bit-map[3:7]  # sliced copy
+another-bit-map[1:] := bit-map[:-1]
+another-bit-map[0:4] := bit-map[0:8:2]
+
+# buffers behave like arrays of "Byte" with extra functionality
+owner Buffer{128} const-sized-buffer
+owner Buffer{Uint32b} dynamic-sized-buffer
+# in this case the type is same as Buffer{8}
+const Buffer COMPILER-CONSTANT-BUFFER(b"4500a320-34ff348f")
+# encoding and decoding
+unsigned-32bit := decode const-sized-buffer[4:8]
+const-sized-buffer[8:12] := encode unsigned-32bit
+
+
+# strings
+
+# compile time constant maximum length string is "String{max-length}",
+# where max-length >= 0,
+# actual length is stored as Int{0:max-length},
+# actual array is stored the same as Array{max-length:Char}
+owner String{128} some-string
+
+# dynamic maximum length string is "String{length-int-type}",
+# "length-int-type" must be an integer with range minimum >= 0,
+# actual maximum length is stored as length-int-type,
+# actual array is stored the same as Array{length-int-type:Char}
+user String{Uint32b} dynamic-sized-string(some-string)
+
+# compile time constant string
+const String NAME("MR language")
+# in this case the the type is same as String{11}
+
+# unicode is same as string replacing "String" with "Unicode"
+# and "Char" with "Uchar"
+owner Unicode{128} unicode-string
+owner Unicode{Uint32b} dynamic-sized-unicode-string
+const Unicode UNICODE-NAME(u"משהו בעברית")
+# in this case the the type is same as Unicode{11}
+
+# emoji support?
+
+
+# structures
+#############
+
+# if else
+func if-example()
+  if bool
+    call-some-func()
+  else
+    call-other-func()
+
+
+# loops
+
+(# main loops and functions rules:
+1. limited loop is one that contains at least one "for" statement
+2. all loops must be limited, except main loops
+3. main loops and main functions can only be used inside main functions
+4. main loops and main function cannot be called inside main loops
+#)
+
+# "for" and "while" statements can appear multiple times anywhere in the loop,
+# but not under "if" or "else".
+# The first one to end will break the loop immediately.
+func loop-example()
+  Int{6:12} number
+  do
+    for number  # loop number from 6 to 12
+    for Int{5:8} index  # loop index from 5 to 8 (inclusive)
+    for Int{5:24} index in -2  # loop index from 24 to 5 with step of 2
+    for Int{1:3}  # loop 3 times (another way?)
+    while bool  # loop while bool is true
+    while not bool  # loop until bool is true
+    for Int num in int-array
+    if bool
+      continue
+    else
+      break
+
+# All loops must be limited, except main loops. Limited loops are loops that
+# contain at least one "for" statement.
+# main loop:
+func main-loop-example()
+  do main  # infinite loop
+    call-some-func()
+
+  
+# switch
+func switch-example()
+  switch number  # any primitive type
+  case 34  # compile time constant
+    call-some-func()
+  case 23
+    call-some-func()
+    fallthrough  # this is not the default
+  case 45, 67, 26, 56, 67, 89, 56, 87
+    call-other-func()
+  default  # must be the last only if not all values are taken care of
+    return
+  
+  owner Int{2:4} number(2)
+  switch number
+  case 4
+    call-some-func()
+  case 2
+    call-other-func()
+  case 3
+    return
+  
+
+# functions
+############
+
+# declaring a function
+func func-name(
+    out Uint32b return-value,
+    out String{Uint8b} complex-return-value,  # supports multiple return values
+    copy Uint32b input-by-value,  # only works for primitive types
+    user String user-reference,
+    owner String owner-reference,  # takes ownership of the reference
+    weak String weak-reference,
+    managed String managed-reference,  # takes ownership of the reference
+    shared String shared-reference)
+  # function body
+  return-value(input-by-value)
+  complex-return-value(user-reference)
+  return  # all out parameters must be initialized before return
+
+# calling a function
+owner String{36} simple-string("")
+managed String{36} managed-string("")
+shared String{36} shared-string("")
+owner Uint32b some-int(12)
+owner Uint32b out-int
+owner String{Uint8b} out-string
+func-name(
+  out out-int,
+  out out-string,
+  copy some-int,
+  user simple-string,
+  owner simple-string,  # pass ownership
+  weak managed-string,
+  managed managed-string,  # pass ownership
+  shared shared-string)
+
+  
+# calling native external code
+###############################
+
+# MR allows calling external code from the native language that the code is
+# generated to (C).
+# This should be used with caution because MR cannot enforce its safety
+# standards over other languages. 
+
+# to call a native function it must be declared in MR way using "native",
+# only "out", "copy" and "user" parameters can be used
+native func external-func-name(
+  out Int{0:255} out-param,
+  copy Int{0:255} in-param)
+
+# in C this will call a function declared as:
+#   Returncode external_func_name(Uint* out_param, Uint in_param)
+# "Returncode", "Uint" and others are typedefs declared in "mr-c-api.h"
+
+# Sometimes we wish to receive and store a reference to some native
+# data-structure that can be used in other native functions.
+# Unknown native types declaration:
+native type Some-native-type
+# we can the use this types in MR code as reference:
+native func get-reference(out Some-native-type ref)
+native func work-with-reference(
+  user Some-native-type ref,
+  copy Int{0:255} param)
+native func delete-reference(owner Some-native-type ref)
+# this is the only case an "owner" parameter can be used
+
+# in C, native types are treated as "void*"
+
+  
+# error handling
+#################
+
+# TODO
+
+  
+# OOP
+######
+
+# TODO
