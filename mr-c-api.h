@@ -2,11 +2,23 @@
 #define __MR_C_API__
 
 
+#define not !
+#define or ||
+#define and &&
+
+typedef char Char;
+typedef int Int;
+
 typedef struct {
   int max_length;
   int actual_length;
   char* chars;
 } String;
+
+typedef enum {
+  false = 0,
+  true = 1
+} Bool;
 
 typedef enum {
   OK = 0,

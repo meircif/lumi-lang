@@ -4,7 +4,7 @@
 typedef FILE* File;
 
 Returncode print(String text) {
-  printf("%*s\n", text.actual_length, text.chars);
+  printf("%.*s\n", text.actual_length, text.chars);
   return OK;
 }
 
@@ -32,24 +32,20 @@ Returncode file_close(void* file) {
   return ERR;
 }
 
-Returncode file_read(void* file, String data) {
-  int n = 0;
-  while (1) {
-    char c = fgetc((File)file);
-    if (c == EOF) {
-      data.actual_length = n;
-      return OK;
-    }
-    if (n >= data.max_length) {
-      data.actual_length = data.max_length;
-      return ERR;
-    }
-    data.chars[n] = c;
-    ++n;
+Returncode file_getc(Char* out_char, void* file) {
+  *out_char = getc((File)file);
+  return OK;
+}
+
+Returncode file_putc(void* file, Char in_char) {
+  int res = putc(in_char, (File)file);
+  if (res != in_char) {
+    return ERR;
   }
+  return OK;
 }
 
 Returncode file_write(void* file, String data) {
-  fprintf((File)file, "%*s", data.actual_length, data.chars);
+  fprintf((File)file, "%.*s", data.actual_length, data.chars);
   return OK;
 }

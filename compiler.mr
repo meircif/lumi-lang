@@ -5,23 +5,463 @@ native type File
 native func file-open-read(out File file, user String name)
 native func file-open-write(out File file, user String name)
 native func file-close(owner File file)
-native func file-read(user File file, user String data)
+native func file-getc(out Char ch, user File file)
+native func file-putc(user File file, copy Char ch)
 native func file-write(user File file, user String line)
 
+native func string-clear(out String this)
+native func string-length(out Int length, user String this)
+native func string-equal(out Bool equal, user String this, user String other)
+native func string-get(out Char ch, user String this, copy Int index)
+native func string-append(out String this, copy Char ch)
+native func string-replace(user String this, copy Char old, copy Char new)
+native func int-to-string(out String str, copy Int value)
 
-func main(user String arg1, user String arg2)
-  print(user "MR__compiler__start")
+native func parse-line(out Bool more-lines, user File infile, user File outfile, copy Int spaces)
+
+
+func cname(user String name)
+  string-replace(user name, copy '-', copy '_')
+  return
+
+
+func read-name(out Char end, user File infile, out String name, copy Char end1, copy Char end2)
+  string-clear(user name)
+  var Char ch
+  var Char q = '\0'
+  do
+    file-getc(out ch, user infile)
+    if q != '\0'
+      if ch == '\\'
+        string-append(user name, copy ch)
+        file-getc(out ch, user infile)
+      
+      else
+        if ch == q
+          q := '\0'
+        
+        while ch != EOF
+      
+    
+    else
+      while not (ch == EOF or ch == end1 or ch == end2 or ch == '\n')
+      if ch == '\'' or ch == '"'
+        q := ch
+      
+    
+    string-append(user name, copy ch)
   
-  owner String{131072} file-data("")
+  out end := ch
+  return
+
+
+func real-string-length(out Int length, user String text)
+  var Int index = 1
+  var Int real-length = 0
+  var Int text-length
+  string-length(out text-length, user text)
+  do
+    while index + 1 < text-length
+    var Char ch
+    string-get(out ch, user text, copy index)
+    if ch == '\\'
+      index := index + 1
+    
+    real-length := real-length + 1
+    index := index + 1
+  
+  out length := real-length
+  return
+
+
+func parse-block-body(user File infile, user File outfile, copy Int spaces)
+  do
+    var Int count = 0
+    do
+      var Char ch
+      for count in spaces
+      file-getc(out ch, user infile)
+      if ch != ' '
+        return
+      
+      file-putc(user outfile, copy ch)
+    
+    var Bool more-lines
+    parse-line(out more-lines, user infile, user outfile, copy spaces)
+    while more-lines
+  
+  return
+
+
+func parse-block(user File infile, user File outfile, copy Int spaces)
+  file-write(user outfile, user " {\n")
+  parse-block-body(user infile, user outfile, copy spaces + 2)
+  file-write(user outfile, user "}\n")
+  return
+
+
+func parse-func-header(user File infile, user File outfile)
+  file-write(user outfile, user "Returncode ")
+  var Char end
+  var String{80} name
+  read-name(out end, user infile, out name, copy '(', copy '(')
+  cname(user name)
+  file-write(user outfile, user name)
+  file-putc(user outfile, copy '(')
+  do
+    var String{80} access
+    read-name(out end, user infile, out access, copy ' ', copy ')')
+    while end == ' '
+    var String{80} typename
+    read-name(out end, user infile, out typename, copy ' ', copy ' ')
+    file-write(user outfile, user typename)
+    var Bool equal
+    string-equal(out equal, user access, user "out")
+    if equal
+      file-putc(user outfile, copy '*')
+    
+    file-putc(user outfile, copy ' ')
+    read-name(out end, user infile, out name, copy ',', copy ')')
+    cname(user name)
+    file-write(user outfile, user name)
+    while end == ','
+    file-putc(user outfile, user end)
+    file-getc(out end, user infile)
+    file-putc(user outfile, user end)
+  
+  file-putc(user outfile, copy ')')
+  return
+
+
+func parse-func(user File infile, user File outfile, user String key-word, copy Int spaces)
+  parse-func-header(user infile, user outfile)
+  var Char newline
+  file-getc(out newline, user infile)
+  parse-block(user infile, user outfile, copy spaces)
+  return
+
+
+func parse-main(user File infile, user File outfile, user String key-word, copy Int spaces)
+  parse-func(user infile, user outfile, user key-word, copy spaces)
+  file-write(user outfile, user "\nint main(int argc, char* argv[]) {\n  if (argc < 3) {\n    printf(\"too few arguments\");\n    return ERR;\n  }\n  String arg1, arg2;\n  arg1.chars = argv[1];\n  arg1.max_length = strnlen(arg1.chars, 1024);\n  arg1.actual_length = arg1.max_length;\n  arg2.chars = argv[2];\n  arg2.max_length = strnlen(arg2.chars, 1024);\n  arg2.actual_length = arg2.max_length;\n  func(arg1, arg2);\n  return OK;\n}\n")
+  return
+
+
+func parse-native(user File infile, user File outfile, user String key-word, copy Int spaces)
+  var Char end
+  var String{80} name
+  read-name(out end, user infile, out name, copy ' ', copy ' ')
+  var Bool equal
+  string-equal(out equal, user name, user "func")
+  if equal
+    parse-func-header(user infile, user outfile)
+    file-getc(out end, user infile)
+  
+  else
+    file-write(user outfile, user "typedef void* ")
+    read-name(out end, user infile, out name, copy '\n', copy '\n')
+    cname(user name)
+    file-write(user outfile, user name)
+  
+  file-putc(user outfile, copy ';')
+  file-putc(user outfile, copy end)
+  return
+
+
+func parse-var(user File infile, user File outfile, user String key-word, copy Int spaces)
+  var Char end
+  var String{80} typename
+  var String{80} varname
+  read-name(out end, user infile, out typename, copy ' ', copy '{')
+  var Bool equal
+  string-equal(out equal, user typename, user "String")
+  if equal
+    var String{80} length
+    read-name(out end, user infile, out length, copy '}', copy '}')
+    file-getc(out end, user infile)
+    read-name(out end, user infile, out varname, copy '\n', copy '\n')
+    cname(user varname)
+    file-write(user outfile, user "char _")
+    file-write(user outfile, user varname)
+    file-write(user outfile, user "_buff[")
+    file-write(user outfile, user length)
+    file-write(user outfile, user "]; String ")
+    file-write(user outfile, user varname)
+    file-write(user outfile, user " = {")
+    file-write(user outfile, user length)
+    file-write(user outfile, user ", 0, _")
+    file-write(user outfile, user varname)
+    file-write(user outfile, user "_buff}")
+  
+  else
+    file-write(user outfile, user typename)
+    file-putc(user outfile, copy end)
+    read-name(out end, user infile, out varname, copy '\n', copy '\n')
+    cname(user varname)
+    file-write(user outfile, user varname)
+  
+  file-putc(user outfile, copy ';')
+  file-putc(user outfile, copy end)
+  return
+
+
+func parse-if(user File infile, user File outfile, user String key-word, copy Int spaces)
+  file-write(user outfile, user key-word)
+  file-write(user outfile, user " (")
+  var Char end
+  var String{80} line
+  read-name(out end, user infile, out line, copy '\n', copy '\n')
+  cname(user line)
+  file-write(user outfile, user line)
+  file-putc(user outfile, copy ')')
+  parse-block(user infile, user outfile, copy spaces)
+  return
+
+
+func parse-else(user File infile, user File outfile, user String key-word, copy Int spaces)
+  file-write(user outfile, user key-word)
+  parse-block(user infile, user outfile, copy spaces)
+  return
+
+
+func parse-do(user File infile, user File outfile, user String key-word, copy Int spaces)
+  file-write(user outfile, user "while (true)")
+  parse-block(user infile, user outfile, copy spaces)
+  return
+
+
+func parse-while(user File infile, user File outfile, user String key-word, copy Int spaces)
+  file-write(user outfile, user "if (not(")
+  var Char end
+  var String{80} line
+  read-name(out end, user infile, out line, copy '\n', copy '\n')
+  cname(user line)
+  file-write(user outfile, user line)
+  file-write(user outfile, user ")) break;\n")
+  return
+
+
+func parse-for(user File infile, user File outfile, user String key-word, copy Int spaces)
+  var Char end
+  var String{80} varname
+  var String{80} line
+  read-name(out end, user infile, out varname, copy ' ', copy ' ')
+  cname(user varname)
+  read-name(out end, user infile, out line, copy ' ', copy ' ')
+  read-name(out end, user infile, out line, copy '\n', copy '\n')
+  cname(user line)
+  file-write(user outfile, user "if (")
+  file-write(user outfile, user varname)
+  file-write(user outfile, user " >= ")
+  file-write(user outfile, user line)
+  file-write(user outfile, user ") break; ++")
+  file-write(user outfile, user varname)
+  file-write(user outfile, user ";\n")
+  return
+
+
+func parse-return(user File infile, user File outfile, user String key-word, copy Int spaces)
+  file-write(user outfile, user key-word)
+  file-write(user outfile, user " OK;\n")
+  return
+
+
+func parse-out(user File infile, user File outfile, user String key-word, copy Int spaces)
+  file-putc(user outfile, copy '*')
+  var Char end
+  var String{80} name
+  read-name(out end, user infile, out name, copy ' ', copy ' ')
+  cname(user name)
+  file-write(user outfile, user name)
+  read-name(out end, user infile, out name, copy ' ', copy ' ')
+  file-write(user outfile, user " = ")
+  read-name(out end, user infile, out name, copy '\n', copy '\n')
+  cname(user name)
+  file-write(user outfile, user name)
+  file-write(user outfile, user ";\n")
+  return
+
+
+func parse-call(user File infile, user File outfile, user String key-word, copy Int spaces)
+  cname(user key-word)
+  file-write(user outfile, user key-word)
+  file-putc(user outfile, copy '(')
+  var Char end
+  do
+    var String{80} access
+    read-name(out end, user infile, out access, copy ' ', copy ')')
+    while end == ' '
+    var Bool equal
+    string-equal(out equal, user access, user "out")
+    if equal
+      file-putc(user outfile, copy '&')
+    
+    var String{512} name
+    read-name(out end, user infile, out name, copy ',', copy ')')
+    var Char first
+    string-get(out first, user name, user 0)
+    if first == '"'
+      var Int length
+      real-string-length(out length, user name)
+      var String{80} length-str
+      int-to-string(out length-str, user length)
+      file-write(user outfile, user "(String){")
+      file-write(user outfile, user length-str)
+      file-write(user outfile, user ", ")
+      file-write(user outfile, user length-str)
+      file-write(user outfile, user ", ")
+      file-write(user outfile, user name)
+      file-write(user outfile, user "}")
+    
+    else
+      if first != '\''
+        cname(user name)
+      
+      file-write(user outfile, user name)
+    
+    while end == ','
+    file-putc(user outfile, user end)
+    file-getc(out end, user infile)
+    file-putc(user outfile, user end)
+  
+  file-write(user outfile, user ");")
+  file-getc(out end, user infile)
+  file-putc(user outfile, user end)
+  return
+
+
+func parse-assign(user File infile, user File outfile, user String key-word, copy Int spaces)
+  cname(user key-word)
+  file-write(user outfile, user key-word)
+  var Char end
+  var String{80} line
+  read-name(out end, user infile, out line, copy ' ', copy ' ')
+  file-write(user outfile, user " = ")
+  read-name(out end, user infile, out line, copy '\n', copy '\n')
+  cname(user line)
+  file-write(user outfile, user line)
+  file-write(user outfile, user ";\n")
+  return
+
+
+func parse-line(out Bool more-lines, user File infile, user File outfile, copy Int spaces)
+  var String{80} key-word
+  var Char end
+  read-name(out end, user infile, out key-word, user ' ', user '(')
+  if end == EOF
+    out more-lines := false
+    return
+  
+  var Bool equal
+  
+  string-equal(out equal, user key-word, user "")
+  if equal
+    file-putc(user outfile, user end)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "main")
+  if equal
+    parse-main(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "func")
+  if equal
+    parse-func(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "native")
+  if equal
+    parse-native(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "var")
+  if equal
+    parse-var(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "owner")
+  if equal
+    parse-var(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "if")
+  if equal
+    parse-if(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "else")
+  if equal
+    parse-else(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "do")
+  if equal
+    parse-do(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "while")
+  if equal
+    parse-while(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "for")
+  if equal
+    parse-for(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "return")
+  if equal
+    parse-return(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "out")
+  if equal
+    parse-out(user infile, user outfile, user key-word, copy spaces)
+    out more-lines := true
+    return
+  
+  if end == '('
+    parse-call(user infile, user outfile, user key-word, copy spaces)
+  
+  else
+    parse-assign(user infile, user outfile, user key-word, copy spaces)
+  
+  out more-lines := true
+  return
+
+
+main func(user String arg1, user String arg2)
+  print(user "MR compiler start")
   
   owner File infile
-  file-open-read(out infile, user arg1)
-  file-read(user infile, user file-data)
-  file-close(user infile)
-  
   owner File outfile
+  file-open-read(out infile, user arg1)
   file-open-write(out outfile, user arg2)
-  file-write(user infile, user file-data)
-  file-close(user outfile)
   
-  print(user "MR__compiler__end")
+  file-write(user outfile, user "#include <stdio.h>\n")
+  file-write(user outfile, user "#include <string.h>\n")
+  file-write(user outfile, user "#include \"mr-c-api.h\"\n\n")
+  
+  do
+    var Bool more-lines
+    parse-line(out more-lines, user infile, user outfile, copy 0)
+    while more-lines
+  
+  file-close(owner infile)
+  file-close(owner outfile)
+  
+  print(user "MR compiler end")
+  return
+
