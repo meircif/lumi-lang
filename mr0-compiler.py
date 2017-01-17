@@ -1,4 +1,7 @@
-"""MR initial compiler."""
+"""MR0 compiler. The initial MR compiler.
+
+Is written in MR0 style to mimic the compiler written in MR0.
+"""
 
 import re
 import sys
@@ -36,7 +39,7 @@ class Parser(object):
       with open(outfile_name, 'w') as self.outfile:
         self.write('#include <stdio.h>\n')
         self.write('#include <string.h>\n')
-        self.write('#include "mr-c-api.h"\n\n')
+        self.write('#include "mr0-c-api.h"\n\n')
         while self.parse_line(0):
           pass
   
@@ -102,6 +105,7 @@ class Parser(object):
       self.write(end)
       return True
     parsers = {
+      '#' : self.parse_comment,
       'main' : self.parse_main,
       'func' : self.parse_func,
       'native' : self.parse_native,
@@ -119,6 +123,10 @@ class Parser(object):
                          self.parse_call if end == '(' else self.parse_assign)
     parser(key_word, spaces)
     return True
+  
+  def parse_comment(self, _, __):
+    while self.getc() != '\n':
+      pass
     
   def parse_main(self, key_word, spaces):
     self.parse_func(key_word, spaces)

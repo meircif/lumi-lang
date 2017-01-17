@@ -5,6 +5,7 @@
 #define not !
 #define or ||
 #define and &&
+#define minus -
 
 typedef char Char;
 typedef int Int;

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "mr-c-api.h"
+#include "mr0-c-api.h"
 
 
 Returncode print(String text);
@@ -134,6 +134,15 @@ Returncode parse_func_header(File infile, File outfile) {
     file_putc(outfile, end);
   }
   file_putc(outfile, ')');
+  return OK;
+}
+
+Returncode parse_comment(File infile, File outfile, String key_word, Int spaces) {
+  while (true) {
+    Char ch;
+    file_getc(&ch, infile);
+    if (not(ch != '\n')) break;
+  }
   return OK;
 }
 
@@ -356,84 +365,77 @@ Returncode parse_line(Bool* more_lines, File infile, File outfile, Int spaces) {
     *more_lines = false;
     return OK;
   }
+  *more_lines = true;
   Bool equal;
   
   string_equal(&equal, key_word, (String){0, 0, ""});
   if (equal) {
     file_putc(outfile, end);
-    *more_lines = true;
+    return OK;
+  }
+  string_equal(&equal, key_word, (String){1, 1, "#"});
+  if (equal) {
+    parse_comment(infile, outfile, key_word, spaces);
     return OK;
   }
   string_equal(&equal, key_word, (String){4, 4, "main"});
   if (equal) {
     parse_main(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){4, 4, "func"});
   if (equal) {
     parse_func(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){6, 6, "native"});
   if (equal) {
     parse_native(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){3, 3, "var"});
   if (equal) {
     parse_var(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){5, 5, "owner"});
   if (equal) {
     parse_var(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){2, 2, "if"});
   if (equal) {
     parse_if(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){4, 4, "else"});
   if (equal) {
     parse_else(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){2, 2, "do"});
   if (equal) {
     parse_do(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){5, 5, "while"});
   if (equal) {
     parse_while(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){3, 3, "for"});
   if (equal) {
     parse_for(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){6, 6, "return"});
   if (equal) {
     parse_return(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   string_equal(&equal, key_word, (String){3, 3, "out"});
   if (equal) {
     parse_out(infile, outfile, key_word, spaces);
-    *more_lines = true;
     return OK;
   }
   if (end == '(') {
@@ -442,7 +444,6 @@ Returncode parse_line(Bool* more_lines, File infile, File outfile, Int spaces) {
   else {
     parse_assign(infile, outfile, key_word, spaces);
   }
-  *more_lines = true;
   return OK;
 }
 
@@ -456,7 +457,7 @@ Returncode func(String arg1, String arg2) {
   
   file_write(outfile, (String){19, 19, "#include <stdio.h>\n"});
   file_write(outfile, (String){20, 20, "#include <string.h>\n"});
-  file_write(outfile, (String){23, 23, "#include \"mr-c-api.h\"\n\n"});
+  file_write(outfile, (String){24, 24, "#include \"mr0-c-api.h\"\n\n"});
   
   while (true) {
     Bool more_lines;

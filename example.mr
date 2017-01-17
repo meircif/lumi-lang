@@ -6,49 +6,7 @@ func comment-example()
 
 This is MR programming language example.
 
-
-MR Language Goals (prioritized)
--------------------------------
-
-1. Enforce safe and reliable code, free from:
-  * illegal memory access
-  * memory corruption
-  * overflows
-  * unexpected crashes
-  * etc...
-  
-2. Allow writing of efficient code, suitable for real-time embedded:
-  Modern programming languages solve goal #1 by making everything dynamically
-  allocated and garbage collected, but this is inefficient and unpredictable.
-  MR will allow as much efficiency and freedom as possible,
-  as long as goal #1 is not harmed.
-  
-3. Modern, practical and convenient syntax.
-
-
-Preferences:
-  * Code generating: MR compiler will initially generate C code.
-      Other "modern machine language" codes may also be generated, such as:
-      Java (for android and other devices), iOS (for apple devices),
-      JavaScript (for web application), and more...
-  * Strong typing
-  * OOP: single inheritance + multiple interfaces (allow multiple inheritance?)
-  * Exception-like error handling implemented with return values
-  * Strict coding conventions - all ML code should look the same
-  * Built-in testing and mocking support
-
-  
-Syntax highlights:
-  * blocks are declared with indentation (as in Python)
-  * strict whitespacing:
-    - tabs are syntax errors
-    - indentation is exactly 2 spaces
-    - exactly one space around operators
-    - file must end with a newline
-    - more as can be seen in the examples...
-  * "Kebab" naming conventions (is possible due to the strict whitespacing):
-    everything is lowercase-only-with-hyphens except types that start with
-    One-uppercase-letter and compile time constants that are FULLY-UPPERCASE
+This syntax is temporary and will probably change in the near future.
 
 multi-line comment end --> #)
 

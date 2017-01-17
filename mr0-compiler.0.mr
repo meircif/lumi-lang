@@ -1,3 +1,5 @@
+# MR0 compiler - written in MR0
+# This is the initial MR compiler
 
 native func print(user String text)
 
@@ -130,6 +132,15 @@ func parse-func-header(user File infile, user File outfile)
     file-putc(user outfile, user end)
   
   file-putc(user outfile, copy ')')
+  return
+
+
+func parse-comment(user File infile, user File outfile, user String key-word, copy Int spaces)
+  do
+    var Char ch
+    file-getc(out ch, user infile)
+    while ch != '\n'
+  
   return
 
 
@@ -352,84 +363,77 @@ func parse-line(out Bool more-lines, user File infile, user File outfile, copy I
     out more-lines := false
     return
   
+  out more-lines := true
   var Bool equal
   
   string-equal(out equal, user key-word, user "")
   if equal
     file-putc(user outfile, user end)
-    out more-lines := true
+    return
+  
+  string-equal(out equal, user key-word, user "#")
+  if equal
+    parse-comment(user infile, user outfile, user key-word, copy spaces)
     return
   
   string-equal(out equal, user key-word, user "main")
   if equal
     parse-main(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "func")
   if equal
     parse-func(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "native")
   if equal
     parse-native(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "var")
   if equal
     parse-var(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "owner")
   if equal
     parse-var(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "if")
   if equal
     parse-if(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "else")
   if equal
     parse-else(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "do")
   if equal
     parse-do(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "while")
   if equal
     parse-while(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "for")
   if equal
     parse-for(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "return")
   if equal
     parse-return(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   string-equal(out equal, user key-word, user "out")
   if equal
     parse-out(user infile, user outfile, user key-word, copy spaces)
-    out more-lines := true
     return
   
   if end == '('
@@ -438,7 +442,6 @@ func parse-line(out Bool more-lines, user File infile, user File outfile, copy I
   else
     parse-assign(user infile, user outfile, user key-word, copy spaces)
   
-  out more-lines := true
   return
 
 
@@ -452,7 +455,7 @@ main func(user String arg1, user String arg2)
   
   file-write(user outfile, user "#include <stdio.h>\n")
   file-write(user outfile, user "#include <string.h>\n")
-  file-write(user outfile, user "#include \"mr-c-api.h\"\n\n")
+  file-write(user outfile, user "#include \"mr0-c-api.h\"\n\n")
   
   do
     var Bool more-lines
