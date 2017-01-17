@@ -35,8 +35,7 @@ class TestMR0(unittest.TestCase):
   
   def _generate_and_cmp(self, cmd):
     self._silent_run(cmd)
-    filecmp.cmp(self.GENERATED_C_CODE, self.C_COMPILER)
-    os.remove(self.GENERATED_C_CODE)
+    self.assertTrue(filecmp.cmp(self.GENERATED_C_CODE, self.C_COMPILER))
   
   @staticmethod
   def _silent_run(cmd):
