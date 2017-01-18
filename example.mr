@@ -22,6 +22,15 @@ allow nested comments?
 #)
 
 
+# variables
+############
+func variables-example()
+
+# stack variables are declared using "var"
+  var Int int-var
+  var String{128} string-var
+
+
 # references
 #############
 func references-example()
@@ -51,6 +60,8 @@ unless the ownership was passed to another entity.
 Owners can give the reference to multiple "user" entities - other entities
 that are deeper in the stack than the owner.
 Users are free to modify the referenced object freely - but cannot destroy it.
+
+Variables ca also give references as owners - but cannot pass their ownership.
 #)
   owner String{32} some-string("")
   user-func(user some-string)  # give reference to a user
@@ -435,5 +446,43 @@ native func delete-reference(owner Some-native-type ref)
   
 # OOP
 ######
+
+# Classes deceleration:
+# "Object" is the base class of all classes
+class Class-name: Object  # inherit from Object
+  # members declaration
+  inst var Int{0:99} int-member
+  inst var Char char-member
+  inst var String{60} string-member
+  inst owner String{Uint8b} string-reference-member
+  
+  # methods declaration, use "self" to access members and methods
+  inst func set-int(copy Int{0:99} int-arg)
+    self.int-member := int-arg
+    
+  inst func get-int(out Int{0:99} int-res)
+    int-res(self.int-member)
+    
+  # global definitions under class namespace
+  const Int CLASS-CONST(3)
+  global var Int class-global-variable
+  
+  global func inv(out Int{0:99} int-res, copy Int{0:99} int-arg)
+    int-res(clamp int-arg + class.CLASS-CONST + class.class-global-variable)
+
+
+# Polymorphism:
+abstract class Abstract-polymorphic-class: Object
+  inst var Int{0:255} int-member
+  abstract var Int{0:255} polymorphic-int
+  abstract func polymorphic-meth(copy Int{0:255} int-arg)
+  
+  inst func same-meth(copy Int{0:255} int-arg):
+    self.int-member := int-arg / self.polymorphic-int
+
+diverse class Polymorphic-class: Abstract-polymorphic-class
+  diverse var Int{0:255} polymorphic-int(3)
+  diverse func polymorphic-meth(copy Int{0:255} int-arg)
+    self.int-member := int-arg / 3
 
 # TODO

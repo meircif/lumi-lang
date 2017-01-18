@@ -21,8 +21,38 @@ native func int-to-string(out String str, copy Int value)
 native func parse-line(out Bool more-lines, user File infile, user File outfile, copy Int spaces)
 
 
-func cname(user String name)
-  string-replace(user name, copy '-', copy '_')
+func write-csyle-char(user File outfile, copy Char ch, copy Char prev)
+  if ch == 45 and prev != ' '
+    file-putc(user outfile, copy '_')
+    return
+  
+  if ch == '.'
+    file-write(user outfile, copy "->")
+    return
+  
+  if ch == '=' and prev == ' '
+    file-write(user outfile, copy "==")
+    return
+  
+  if ch != ':'
+    file-putc(user outfile, copy ch)
+  
+  return
+
+
+func write-cstyle(user File outfile, user String text)
+  var Int length
+  string-length(out length, user text)
+  var Int index = 0
+  var Char prev = '\0'
+  
+  do
+    for index in length
+    var Char ch
+    string-get(out ch, user text, copy index minus 1)
+    write-csyle-char(user outfile, copy ch, copy prev)
+    prev := ch
+  
   return
 
 
@@ -53,6 +83,13 @@ func read-name(out Char end, user File infile, out String name, copy Char end1, 
     string-append(user name, copy ch)
   
   out end := ch
+  return
+
+
+func copy-text(out Char end, user File infile, user File outfile, copy Char end1, copy Char end2)
+  var String{80} text
+  read-name(user end, user infile, out text, copy end1, copy end2)
+  write-cstyle(user outfile, user text)
   return
 
 
@@ -104,27 +141,20 @@ func parse-block(user File infile, user File outfile, copy Int spaces)
 func parse-func-header(user File infile, user File outfile)
   file-write(user outfile, user "Returncode ")
   var Char end
-  var String{80} name
-  read-name(out end, user infile, out name, copy '(', copy '(')
-  cname(user name)
-  file-write(user outfile, user name)
+  copy-text(out end, user infile, user outfile, copy '(', copy '(')
   file-putc(user outfile, copy '(')
   do
     var String{80} access
     read-name(out end, user infile, out access, copy ' ', copy ')')
     while end == ' '
-    var String{80} typename
-    read-name(out end, user infile, out typename, copy ' ', copy ' ')
-    file-write(user outfile, user typename)
+    copy-text(out end, user infile, user outfile, copy ' ', copy ' ')
     var Bool equal
     string-equal(out equal, user access, user "copy")
     if not equal
       file-putc(user outfile, copy '*')
     
     file-putc(user outfile, copy ' ')
-    read-name(out end, user infile, out name, copy ',', copy ')')
-    cname(user name)
-    file-write(user outfile, user name)
+    copy-text(out end, user infile, user outfile, copy ',', copy ')')
     while end == ','
     file-putc(user outfile, user end)
     file-getc(out end, user infile)
@@ -169,30 +199,30 @@ func parse-native(user File infile, user File outfile, user String key-word, cop
   
   else
     file-write(user outfile, user "typedef void ")
-    read-name(out end, user infile, out name, copy '\n', copy '\n')
-    cname(user name)
-    file-write(user outfile, user name)
+    copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
   
-  file-putc(user outfile, copy ';')
-  file-putc(user outfile, copy end)
+  file-write(user outfile, user ";\n")
   return
 
 
 func parse-var(user File infile, user File outfile, user String key-word, copy Int spaces)
   var Char end
   var String{80} typename
-  var String{80} varname
   read-name(out end, user infile, out typename, copy ' ', copy '{')
-  var Bool equal
-  string-equal(out equal, user typename, user "String")
-  if equal
+  var Bool is-int
+  var Bool is-char
+  var Bool is-bool
+  var Bool is-string
+  string-equal(out is-int, user typename, user "Int")
+  string-equal(out is-char, user typename, user "Char")
+  string-equal(out is-bool, user typename, user "Bool")
+  string-equal(out is-string, user typename, user "String")
+  if is-string
     var String{80} length
     read-name(out end, user infile, out length, copy '}', copy '}')
     file-getc(out end, user infile)
-    read-name(out end, user infile, out varname, copy '\n', copy '\n')
-    cname(user varname)
     file-write(user outfile, user "String* ")
-    file-write(user outfile, user varname)
+    copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
     file-write(user outfile, user " = &(String){")
     file-write(user outfile, user length)
     file-write(user outfile, user ", 0, (char[")
@@ -200,12 +230,18 @@ func parse-var(user File infile, user File outfile, user String key-word, copy I
     file-write(user outfile, user "]){0}}")
   
   else
-    cname(user typename)
-    file-write(user outfile, user typename)
-    file-putc(user outfile, copy end)
-    read-name(out end, user infile, out varname, copy '\n', copy '\n')
-    cname(user varname)
-    file-write(user outfile, user varname)
+    write-cstyle(user outfile, user typename)
+    if is-int or is-char or is-bool
+      file-putc(user outfile, copy ' ')
+      copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+    
+    else
+      file-write(user outfile, user "* ")
+      copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+      file-write(user outfile, user " = &(")
+      write-cstyle(user outfile, user typename)
+      file-write(user outfile, user "){0}")
+    
   
   file-write(user outfile, user ";\n")
   return
@@ -213,14 +249,9 @@ func parse-var(user File infile, user File outfile, user String key-word, copy I
 
 func parse-ref(user File infile, user File outfile, user String key-word, copy Int spaces)
   var Char end
-  var String{80} name
-  read-name(out end, user infile, out name, copy ' ', copy ' ')
-  cname(user name)
-  file-write(user outfile, user name)
+  copy-text(out end, user infile, user outfile, copy ' ', copy ' ')
   file-write(user outfile, user "* ")
-  read-name(out end, user infile, out name, copy '\n', copy '\n')
-  cname(user name)
-  file-write(user outfile, user name)
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
   file-write(user outfile, user ";\n")
   return
 
@@ -229,10 +260,7 @@ func parse-if(user File infile, user File outfile, user String key-word, copy In
   file-write(user outfile, user key-word)
   file-write(user outfile, user " (")
   var Char end
-  var String{80} line
-  read-name(out end, user infile, out line, copy '\n', copy '\n')
-  cname(user line)
-  file-write(user outfile, user line)
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
   file-putc(user outfile, copy ')')
   parse-block(user infile, user outfile, copy spaces)
   return
@@ -253,10 +281,7 @@ func parse-do(user File infile, user File outfile, user String key-word, copy In
 func parse-while(user File infile, user File outfile, user String key-word, copy Int spaces)
   file-write(user outfile, user "if (not(")
   var Char end
-  var String{80} line
-  read-name(out end, user infile, out line, copy '\n', copy '\n')
-  cname(user line)
-  file-write(user outfile, user line)
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
   file-write(user outfile, user ")) break;\n")
   return
 
@@ -264,18 +289,15 @@ func parse-while(user File infile, user File outfile, user String key-word, copy
 func parse-for(user File infile, user File outfile, user String key-word, copy Int spaces)
   var Char end
   var String{80} varname
-  var String{80} line
+  var String{80} ignore-in
   read-name(out end, user infile, out varname, copy ' ', copy ' ')
-  cname(user varname)
-  read-name(out end, user infile, out line, copy ' ', copy ' ')
-  read-name(out end, user infile, out line, copy '\n', copy '\n')
-  cname(user line)
+  read-name(out end, user infile, out ignore-in, copy ' ', copy ' ')
   file-write(user outfile, user "if (")
-  file-write(user outfile, user varname)
+  write-cstyle(user outfile, user varname)
   file-write(user outfile, user " >= ")
-  file-write(user outfile, user line)
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
   file-write(user outfile, user ") break; ++")
-  file-write(user outfile, user varname)
+  write-cstyle(user outfile, user varname)
   file-write(user outfile, user ";\n")
   return
 
@@ -289,22 +311,29 @@ func parse-return(user File infile, user File outfile, user String key-word, cop
 func parse-out(user File infile, user File outfile, user String key-word, copy Int spaces)
   file-putc(user outfile, copy '*')
   var Char end
-  var String{80} name
-  read-name(out end, user infile, out name, copy ' ', copy ' ')
-  cname(user name)
-  file-write(user outfile, user name)
-  read-name(out end, user infile, out name, copy ' ', copy ' ')
+  var String{80} ignore-assign
+  copy-text(out end, user infile, user outfile, copy ' ', copy ' ')
+  read-name(out end, user infile, out ignore-assign, copy ' ', copy ' ')
   file-write(user outfile, user " = ")
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+  file-write(user outfile, user ";\n")
+  return
+
+
+func parse-class(user File infile, user File outfile, user String key-word, copy Int spaces)
+  var Char end
+  var String{80} name
   read-name(out end, user infile, out name, copy '\n', copy '\n')
-  cname(user name)
-  file-write(user outfile, user name)
+  file-write(user outfile, user "typedef struct {\n")
+  parse-block-body(user infile, user outfile, copy spaces + 2)
+  file-write(user outfile, user "} ")
+  write-cstyle(user outfile, user name)
   file-write(user outfile, user ";\n")
   return
 
 
 func parse-call(user File infile, user File outfile, user String key-word, copy Int spaces)
-  cname(user key-word)
-  file-write(user outfile, user key-word)
+  write-cstyle(user outfile, user key-word)
   file-putc(user outfile, copy '(')
   var Char end
   do
@@ -335,9 +364,11 @@ func parse-call(user File infile, user File outfile, user String key-word, copy 
     
     else
       if first != '\''
-        cname(user name)
+        write-cstyle(user outfile, user name)
       
-      file-write(user outfile, user name)
+      else
+        file-write(user outfile, user name)
+      
     
     while end == ','
     file-putc(user outfile, user end)
@@ -351,15 +382,12 @@ func parse-call(user File infile, user File outfile, user String key-word, copy 
 
 
 func parse-assign(user File infile, user File outfile, user String key-word, copy Int spaces)
-  cname(user key-word)
-  file-write(user outfile, user key-word)
+  write-cstyle(user outfile, user key-word)
   var Char end
-  var String{80} line
-  read-name(out end, user infile, out line, copy ' ', copy ' ')
+  var String{80} ignore-assign
+  read-name(out end, user infile, out ignore-assign, copy ' ', copy ' ')
   file-write(user outfile, user " = ")
-  read-name(out end, user infile, out line, copy '\n', copy '\n')
-  cname(user line)
-  file-write(user outfile, user line)
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
   file-write(user outfile, user ";\n")
   return
 
@@ -448,6 +476,11 @@ func parse-line(out Bool more-lines, user File infile, user File outfile, copy I
   string-equal(out equal, user key-word, user "out")
   if equal
     parse-out(user infile, user outfile, user key-word, copy spaces)
+    return
+  
+  string-equal(out equal, user key-word, user "class")
+  if equal
+    parse-class(user infile, user outfile, user key-word, copy spaces)
     return
   
   if end == '('
