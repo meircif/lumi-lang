@@ -138,6 +138,7 @@ func primitive-types-example()
 # "Uint-max" and "Sint-max" sizes are as size_t and ssize_t respectfully
 
 # compile time constant integer
+  const Int CONTS-INT(42)  # in this case the type is same as Int{42:42}
   const Int BYTE-SIZE(8)  # in this case the type is same as Int{8:8}
 
 # dynamic ranged int - for dynamic array indices
@@ -168,7 +169,9 @@ func primitive-types-example()
 # cast to given variable's type
   int-small := check int-large + clamp{int-large} int-small
 
+
 # boolean
+
   var Bool bool  # has 2 possible values: "true" or "false"
   const Bool MR-IS-GOOD(true)
   const Bool LIFE-IS-EASY(false)
@@ -191,7 +194,9 @@ func primitive-types-example()
   bool := not (bool and LIFE-IS-EASY)
   bool := not bool and not LIFE-IS-EASY
 
+  
 # character
+
   var Char char  # only accept characters as 'single-letter'
   var Uchar unicode-char  # only accept characters as u'single-letter'
   const Char ZERO('0')
@@ -202,7 +207,9 @@ func primitive-types-example()
   char := chr(number)
 # allow implicit cast?
 
+
 # byte
+
   var Byte byte  # only accept characters as b'byte-hex'
   const Byte BYTE-ZERO(b'00')
 # decode
@@ -218,6 +225,13 @@ func primitive-types-example()
   byte := encode{number} number
   byte := encode bool
   byte := encode char
+
+
+# real numbers (floating-point)
+
+Real real-number  # same as "float" in C
+Reald double-real-number  # same as "double" in C
+Realdl large-real-number  # same as "long double" in C
 
 
 # built-in complex types
@@ -372,39 +386,45 @@ func structures-example()
 ############
 
 # declaring a function
-func func-name(
-    out Uint32b return-value,
-    out String{Uint8b} complex-return-value,  # supports multiple return values
-    copy Uint32b input-by-value,  # only works for primitive types
-    user String user-reference,
-    owner String owner-reference,  # takes ownership of the reference
-    weak String weak-reference,
-    managed String managed-reference,  # takes ownership of the reference
-    shared String shared-reference):
-  # function body
-  return-value(input-by-value)
-  complex-return-value(user-reference)
-  return  # all out parameters must be initialized before return
+func func-name(copy Uint32b input-value): copy Int{0:9} return-value
+  # function body...
+  return input-value mod 10  # return value
+
+func no-params-func()
+  # function body...
+
+func complex-func(
+    copy Uint32b input-by-value,  # "copy" only works for primitive types
+    user String{Uint8b} user-reference,
+    owner String{Uint8b} owner-reference,  # takes ownership of the reference
+    weak String{Uint8b} weak-reference,
+    managed String{Uint8b} managed-reference,  # takes ownership
+    shared String{Uint8b} shared-reference)
+  ):  # supports multiple return values
+    copy Uint32b return-value,
+    weak String{Uint8b} weak-reference-return-value,  # or any other type
+    var String{Uint8b} stack-variable  # must be initialized in the func
+  # function body...
+  var stack-variable("init string")
+  return input-by-value div 5, managed-reference, stack-variable
 
 # calling a function
 func calling-example()
   owner String{36} simple-string("")
   managed String{36} managed-string("")
   shared String{36} shared-string("")
-  var Uint32b some-int(12)
-  var Uint32b out-int
-  var String{Uint8b} out-string
-  func-name(
-    out out-int,
-    out out-string,
+  var Uint32b some-int := func-name(345)
+  var Uint32b out-int,
+  weak String{Uint8b} out-string := func-name(
     copy some-int,
     user simple-string,
     owner simple-string,  # pass ownership
     weak managed-string,
     managed managed-string,  # pass ownership
     shared shared-string)
+  no-params-func()
 
-  
+
 # calling native external code
 ###############################
 
@@ -484,5 +504,16 @@ diverse class Polymorphic-class: Abstract-polymorphic-class
   diverse var Int{0:255} polymorphic-int(3)
   diverse func polymorphic-meth(copy Int{0:255} int-arg)
     self.int-member := int-arg / 3
+    
 
-# TODO
+# TODO using classes
+
+# Others
+
+# aliases 
+alias NEW-CONST-INT for CONTS-INT
+alias new-func-name for func-name
+alias New-int-name for Int{20:40}
+alias New-string-name for String{Uint8b}
+alias New-array-name for Array{Int{0:60}:String{Uint8b}}
+alias New-class-name for Class-name

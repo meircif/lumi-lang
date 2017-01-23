@@ -147,8 +147,15 @@ func parse-func-header(user File infile, user File outfile)
     var String{80} access
     read-name(out end, user infile, out access, copy ' ', copy ')')
     while end == ' '
-    copy-text(out end, user infile, user outfile, copy ' ', copy ' ')
+    var String{80} typename
+    read-name(out end, user infile, out typename, copy ' ', copy '{')
     var Bool equal
+    string-equal(out equal, user typename, user "Array")
+    if equal
+      read-name(out end, user infile, out typename, copy '}', copy '}')
+      file-getc(out end, user infile)
+    
+    write-cstyle(user outfile, user typename)
     string-equal(out equal, user access, user "copy")
     if not equal
       file-putc(user outfile, copy '*')
@@ -212,10 +219,12 @@ func parse-var(user File infile, user File outfile, user String key-word, copy I
   var Bool is-int
   var Bool is-char
   var Bool is-bool
+  var Bool is-array
   var Bool is-string
   string-equal(out is-int, user typename, user "Int")
   string-equal(out is-char, user typename, user "Char")
   string-equal(out is-bool, user typename, user "Bool")
+  string-equal(out is-array, user typename, user "Array")
   string-equal(out is-string, user typename, user "String")
   if is-string
     var String{80} length
@@ -227,29 +236,47 @@ func parse-var(user File infile, user File outfile, user String key-word, copy I
     file-write(user outfile, user length)
     file-write(user outfile, user ", 0, (char[")
     file-write(user outfile, user length)
-    file-write(user outfile, user "]){0}}")
+    file-write(user outfile, user "]){0}};\n")
+    return
   
-  else
-    write-cstyle(user outfile, user typename)
-    if is-int or is-char or is-bool
-      file-putc(user outfile, copy ' ')
-      copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
-    
-    else
-      file-write(user outfile, user "* ")
-      copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
-      file-write(user outfile, user " = &(")
-      write-cstyle(user outfile, user typename)
-      file-write(user outfile, user "){0}")
-    
+  if is-array
+    var String{80} length
+    read-name(out end, user infile, out length, copy ':', copy ':')
+    copy-text(out end, user infile, user outfile, copy '}', copy '}')
+    file-getc(out end, user infile)
+    file-putc(user outfile, copy ' ')
+    copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+    file-putc(user outfile, copy '[')
+    file-write(user outfile, user length)
+    file-write(user outfile, user "];\n")
+    return
   
-  file-write(user outfile, user ";\n")
+  write-cstyle(user outfile, user typename)
+  if is-int or is-char or is-bool
+    file-putc(user outfile, copy ' ')
+    copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+    file-write(user outfile, user ";\n")
+    return
+  
+  file-write(user outfile, user "* ")
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+  file-write(user outfile, user " = &(")
+  write-cstyle(user outfile, user typename)
+  file-write(user outfile, user "){0};\n")
   return
 
 
 func parse-ref(user File infile, user File outfile, user String key-word, copy Int spaces)
   var Char end
-  copy-text(out end, user infile, user outfile, copy ' ', copy ' ')
+  var String{80} typename
+  read-name(out end, user infile, out typename, copy ' ', copy '{')
+  var Bool is-array
+  string-equal(out is-array, user typename, user "Array")
+  if is-array
+    read-name(out end, user infile, out typename, copy '}', copy '}')
+    file-getc(out end, user infile)
+  
+  write-cstyle(user outfile, user typename)
   file-write(user outfile, user "* ")
   copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
   file-write(user outfile, user ";\n")

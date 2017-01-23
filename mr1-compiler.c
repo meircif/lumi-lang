@@ -150,8 +150,15 @@ Returncode parse_func_header(File infile, File outfile) {
     char _access_buff[80]; String access = {80, 0, _access_buff};
     read_name(&end, infile, &access, ' ', ')');
     if (not(end == ' ')) break;
-    copy_text(&end, infile, outfile, ' ', ' ');
+    char _typename_buff[80]; String typename = {80, 0, _typename_buff};
+    read_name(&end, infile, &typename, ' ', '{');
     Bool equal;
+    string_equal(&equal, typename, (String){5, 5, "Array"});
+    if (equal) {
+      read_name(&end, infile, &typename, '}', '}');
+      file_getc(&end, infile);
+    }
+    write_cstyle(outfile, typename);
     string_equal(&equal, access, (String){4, 4, "copy"});
     if (not equal) {
       file_putc(outfile, '*');
@@ -215,10 +222,12 @@ Returncode parse_var(File infile, File outfile, String key_word, Int spaces) {
   Bool is_int;
   Bool is_char;
   Bool is_bool;
+  Bool is_array;
   Bool is_string;
   string_equal(&is_int, typename, (String){3, 3, "Int"});
   string_equal(&is_char, typename, (String){4, 4, "Char"});
   string_equal(&is_bool, typename, (String){4, 4, "Bool"});
+  string_equal(&is_array, typename, (String){5, 5, "Array"});
   string_equal(&is_string, typename, (String){6, 6, "String"});
   if (is_string) {
     char _length_buff[80]; String length = {80, 0, _length_buff};
@@ -230,29 +239,47 @@ Returncode parse_var(File infile, File outfile, String key_word, Int spaces) {
     file_write(outfile, length);
     file_write(outfile, (String){11, 11, ", 0, (char["});
     file_write(outfile, length);
-    file_write(outfile, (String){6, 6, "]){0}}"});
+    file_write(outfile, (String){8, 8, "]){0}};\n"});
+    return OK;
   }
-  else {
-    write_cstyle(outfile, typename);
-    if (is_int or is_char or is_bool) {
-      file_putc(outfile, ' ');
-      copy_text(&end, infile, outfile, '\n', '\n');
-    }
-    else {
-      file_write(outfile, (String){2, 2, "* "});
-      copy_text(&end, infile, outfile, '\n', '\n');
-      file_write(outfile, (String){5, 5, " = &("});
-      write_cstyle(outfile, typename);
-      file_write(outfile, (String){4, 4, "){0}"});
-    }
+  if (is_array) {
+    char _length_buff[80]; String length = {80, 0, _length_buff};
+    read_name(&end, infile, &length, ':', ':');
+    copy_text(&end, infile, outfile, '}', '}');
+    file_getc(&end, infile);
+    file_putc(outfile, ' ');
+    copy_text(&end, infile, outfile, '\n', '\n');
+    file_putc(outfile, '[');
+    file_write(outfile, length);
+    file_write(outfile, (String){3, 3, "];\n"});
+    return OK;
   }
-  file_write(outfile, (String){2, 2, ";\n"});
+  write_cstyle(outfile, typename);
+  if (is_int or is_char or is_bool) {
+    file_putc(outfile, ' ');
+    copy_text(&end, infile, outfile, '\n', '\n');
+    file_write(outfile, (String){2, 2, ";\n"});
+    return OK;
+  }
+  file_write(outfile, (String){2, 2, "* "});
+  copy_text(&end, infile, outfile, '\n', '\n');
+  file_write(outfile, (String){5, 5, " = &("});
+  write_cstyle(outfile, typename);
+  file_write(outfile, (String){6, 6, "){0};\n"});
   return OK;
 }
 
 Returncode parse_ref(File infile, File outfile, String key_word, Int spaces) {
   Char end;
-  copy_text(&end, infile, outfile, ' ', ' ');
+  char _typename_buff[80]; String typename = {80, 0, _typename_buff};
+  read_name(&end, infile, &typename, ' ', '{');
+  Bool is_array;
+  string_equal(&is_array, typename, (String){5, 5, "Array"});
+  if (is_array) {
+    read_name(&end, infile, &typename, '}', '}');
+    file_getc(&end, infile);
+  }
+  write_cstyle(outfile, typename);
   file_write(outfile, (String){2, 2, "* "});
   copy_text(&end, infile, outfile, '\n', '\n');
   file_write(outfile, (String){2, 2, ";\n"});
