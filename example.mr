@@ -403,7 +403,7 @@ func complex-func(
   ):  # supports multiple return values
     copy Uint32b return-value,
     weak String{Uint8b} weak-reference-return-value,  # or any other type
-    var String{Uint8b} stack-variable  # must be initialized in the func
+    var String{36} stack-variable  # must be initialized in the func
   # function body...
   var stack-variable("init string")
   return input-by-value div 5, managed-reference, stack-variable
@@ -415,7 +415,8 @@ func calling-example()
   shared String{36} shared-string("")
   var Uint32b some-int := func-name(345)
   var Uint32b out-int,
-  weak String{Uint8b} out-string := func-name(
+  weak String{Uint8b} out-string,
+  var String{36} new-string := complex-func(
     copy some-int,
     user simple-string,
     owner simple-string,  # pass ownership

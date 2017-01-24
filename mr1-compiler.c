@@ -141,6 +141,24 @@ Returncode parse_block(File infile, File outfile, Int spaces) {
   return OK;
 }
 
+Returncode parse_param_type(File infile, File outfile, String access) {
+  Char end;
+  char _typename_buff[80]; String typename = {80, 0, _typename_buff};
+  read_name(&end, infile, &typename, ' ', '{');
+  Bool equal;
+  string_equal(&equal, typename, (String){5, 5, "Array"});
+  if (equal) {
+    read_name(&end, infile, &typename, '}', '}');
+    file_getc(&end, infile);
+  }
+  write_cstyle(outfile, typename);
+  string_equal(&equal, access, (String){4, 4, "copy"});
+  if (not equal) {
+    file_putc(outfile, '*');
+  }
+  return OK;
+}
+
 Returncode parse_func_header(File infile, File outfile) {
   file_write(outfile, (String){11, 11, "Returncode "});
   Char end;
@@ -150,25 +168,29 @@ Returncode parse_func_header(File infile, File outfile) {
     char _access_buff[80]; String access = {80, 0, _access_buff};
     read_name(&end, infile, &access, ' ', ')');
     if (not(end == ' ')) break;
-    char _typename_buff[80]; String typename = {80, 0, _typename_buff};
-    read_name(&end, infile, &typename, ' ', '{');
-    Bool equal;
-    string_equal(&equal, typename, (String){5, 5, "Array"});
-    if (equal) {
-      read_name(&end, infile, &typename, '}', '}');
-      file_getc(&end, infile);
-    }
-    write_cstyle(outfile, typename);
-    string_equal(&equal, access, (String){4, 4, "copy"});
-    if (not equal) {
-      file_putc(outfile, '*');
-    }
+    parse_param_type(infile, outfile, access);
     file_putc(outfile, ' ');
     copy_text(&end, infile, outfile, ',', ')');
     if (not(end == ',')) break;
-    file_putc(outfile, end);
     file_getc(&end, infile);
-    file_putc(outfile, end);
+    file_write(outfile, (String){2, 2, ", "});
+  }
+  file_getc(&end, infile);
+  while (true) {
+    if (not(end != '\n')) break;
+    file_getc(&end, infile);
+    file_write(outfile, (String){2, 2, ", "});
+    char _access_buff[80]; String access = {80, 0, _access_buff};
+    read_name(&end, infile, &access, ' ', ' ');
+    parse_param_type(infile, outfile, access);
+    Bool is_var;
+    string_equal(&is_var, access, (String){3, 3, "var"});
+    if (not is_var) {
+      file_putc(outfile, '*');
+    }
+    file_putc(outfile, ' ');
+    copy_text(&end, infile, outfile, ',', '\n');
+    if (not(end == ',')) break;
   }
   file_putc(outfile, ')');
   return OK;
@@ -185,8 +207,6 @@ Returncode parse_comment(File infile, File outfile, String key_word, Int spaces)
 
 Returncode parse_func(File infile, File outfile, String key_word, Int spaces) {
   parse_func_header(infile, outfile);
-  Char newline;
-  file_getc(&newline, infile);
   parse_block(infile, outfile, spaces);
   return OK;
 }
@@ -205,7 +225,6 @@ Returncode parse_native(File infile, File outfile, String key_word, Int spaces) 
   string_equal(&equal, name, (String){4, 4, "func"});
   if (equal) {
     parse_func_header(infile, outfile);
-    file_getc(&end, infile);
   }
   else {
     file_write(outfile, (String){13, 13, "typedef void "});
@@ -384,7 +403,7 @@ Returncode parse_call(File infile, File outfile, String key_word, Int spaces) {
       real_string_length(&length, name);
       char _length_str_buff[80]; String length_str = {80, 0, _length_str_buff};
       int_to_string(&length_str, length);
-      file_write(outfile, (String){9, 9, "(String){"});
+      file_write(outfile, (String){10, 10, "&(String){"});
       file_write(outfile, length_str);
       file_write(outfile, (String){2, 2, ", "});
       file_write(outfile, length_str);

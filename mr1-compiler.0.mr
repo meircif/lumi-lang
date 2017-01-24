@@ -138,6 +138,24 @@ func parse-block(user File infile, user File outfile, copy Int spaces)
   return
 
 
+func parse-param-type(user File infile, user File outfile, user String access)
+  var Char end
+  var String{80} typename
+  read-name(out end, user infile, out typename, copy ' ', copy '{')
+  var Bool equal
+  string-equal(out equal, user typename, user "Array")
+  if equal
+    read-name(out end, user infile, out typename, copy '}', copy '}')
+    file-getc(out end, user infile)
+  
+  write-cstyle(user outfile, user typename)
+  string-equal(out equal, user access, user "copy")
+  if not equal
+    file-putc(user outfile, copy '*')
+  
+  return
+
+
 func parse-func-header(user File infile, user File outfile)
   file-write(user outfile, user "Returncode ")
   var Char end
@@ -147,25 +165,29 @@ func parse-func-header(user File infile, user File outfile)
     var String{80} access
     read-name(out end, user infile, out access, copy ' ', copy ')')
     while end == ' '
-    var String{80} typename
-    read-name(out end, user infile, out typename, copy ' ', copy '{')
-    var Bool equal
-    string-equal(out equal, user typename, user "Array")
-    if equal
-      read-name(out end, user infile, out typename, copy '}', copy '}')
-      file-getc(out end, user infile)
-    
-    write-cstyle(user outfile, user typename)
-    string-equal(out equal, user access, user "copy")
-    if not equal
-      file-putc(user outfile, copy '*')
-    
+    parse-param-type(user infile, user outfile, user access)
     file-putc(user outfile, copy ' ')
     copy-text(out end, user infile, user outfile, copy ',', copy ')')
     while end == ','
-    file-putc(user outfile, user end)
     file-getc(out end, user infile)
-    file-putc(user outfile, user end)
+    file-write(user outfile, user ", ")
+  
+  file-getc(out end, user infile)
+  do
+    while end != '\n'
+    file-getc(out end, user infile)
+    file-write(user outfile, user ", ")
+    var String{80} access
+    read-name(out end, user infile, out access, copy ' ', copy ' ')
+    parse-param-type(user infile, user outfile, user access)
+    var Bool is-var
+    string-equal(out is-var, user access, user "var")
+    if not is-var
+      file-putc(user outfile, copy '*')
+    
+    file-putc(user outfile, copy ' ')
+    copy-text(out end, user infile, user outfile, copy ',', copy '\n')
+    while end == ','
   
   file-putc(user outfile, copy ')')
   return
@@ -182,8 +204,6 @@ func parse-comment(user File infile, user File outfile, user String key-word, co
 
 func parse-func(user File infile, user File outfile, user String key-word, copy Int spaces)
   parse-func-header(user infile, user outfile)
-  var Char newline
-  file-getc(out newline, user infile)
   parse-block(user infile, user outfile, copy spaces)
   return
 
@@ -202,7 +222,6 @@ func parse-native(user File infile, user File outfile, user String key-word, cop
   string-equal(out equal, user name, user "func")
   if equal
     parse-func-header(user infile, user outfile)
-    file-getc(out end, user infile)
   
   else
     file-write(user outfile, user "typedef void ")
@@ -381,7 +400,7 @@ func parse-call(user File infile, user File outfile, user String key-word, copy 
       real-string-length(out length, user name)
       var String{80} length-str
       int-to-string(out length-str, user length)
-      file-write(user outfile, user "(String){")
+      file-write(user outfile, user "&(String){")
       file-write(user outfile, user length-str)
       file-write(user outfile, user ", ")
       file-write(user outfile, user length-str)
