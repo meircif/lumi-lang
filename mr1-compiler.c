@@ -47,7 +47,7 @@ Returncode write_cstyle(File outfile, String text) {
   Int length;
   string_length(&length, text);
   Int index = 0;
-  Char prev = '\0';
+  Char prev = ' ';
   
   while (true) {
     if (index >= length) break; ++index;
@@ -116,15 +116,19 @@ Returncode real_string_length(Int* length, String text) {
 }
 
 Returncode is_primitive(Bool* res, String typename) {
-  string_equal(res, typename, (String){3, 3, "Int"});
-  if (res) {
+  Bool equal;
+  string_equal(&equal, typename, (String){3, 3, "Int"});
+  if (equal) {
+    *res = true;
     return OK;
   }
-  string_equal(res, typename, (String){4, 4, "Char"});
-  if (res) {
+  string_equal(&equal, typename, (String){4, 4, "Char"});
+  if (equal) {
+    *res = true;
     return OK;
   }
-  string_equal(res, typename, (String){4, 4, "Bool"});
+  string_equal(&equal, typename, (String){4, 4, "Bool"});
+  *res = equal;
   return OK;
 }
 
@@ -338,11 +342,86 @@ Returncode parse_ref(File infile, File outfile, String key_word, Int spaces) {
   return OK;
 }
 
-Returncode parse_if(File infile, File outfile, String key_word, Int spaces) {
-  file_write(outfile, key_word);
-  file_write(outfile, (String){2, 2, " ("});
+
+Returncode parse_call_args(File infile, File outfile, String* out_name, Bool* line_end) {
+  file_putc(outfile, '(');
   Char end;
-  copy_text(&end, infile, outfile, '\n', '\n');
+  Bool equal;
+  char _name_buff[512]; String name = {512, 0, _name_buff};
+  while (true) {
+    read_name(&end, infile, &name, ' ', ')');
+    if (not(end == ' ')) break;
+    read_name(&end, infile, &name, ',', ')');
+    Char first;
+    string_get(&first, name, 0);
+    if (first == '"') {
+      Int length;
+      real_string_length(&length, name);
+      char _length_str_buff[80]; String length_str = {80, 0, _length_str_buff};
+      int_to_string(&length_str, length);
+      file_write(outfile, (String){10, 10, "&(String){"});
+      file_write(outfile, length_str);
+      file_write(outfile, (String){2, 2, ", "});
+      file_write(outfile, length_str);
+      file_write(outfile, (String){2, 2, ", "});
+      file_write(outfile, name);
+      file_write(outfile, (String){1, 1, "}"});
+    }
+    else {
+      if (first != '\'') {
+        write_cstyle(outfile, name);
+      }
+      else {
+        file_write(outfile, name);
+      }
+    }
+    if (not(end == ',')) break;
+    file_getc(&end, infile);
+    file_write(outfile, (String){2, 2, ", "});
+  }
+  file_getc(&end, infile);
+  while (true) {
+    if (not(end != '\n')) break;
+    file_getc(&end, infile);
+    file_write(outfile, (String){2, 2, ", "});
+    read_name(&end, infile, &name, ' ', ' ');
+    string_equal(&equal, name, (String){3, 3, "var"});
+    if (not equal) {
+      file_putc(outfile, '&');
+    }
+    read_name(&end, infile, out_name, ',', ' ');
+    write_cstyle(outfile, out_name[0]);
+    if (not(end == ',')) break;
+  }
+  file_write(outfile, (String){2, 2, ");"});
+  *line_end = end == '\n';
+  return OK;
+}
+
+
+Returncode parse_call_in_exp(File infile, File outfile, String key_word, String prefix) {
+  Char end;
+  char _name_buff[80]; String name = {80, 0, _name_buff};
+  read_name(&end, infile, &name, ' ', '(');
+  Bool line_end = end == '\n';
+  if (end == '(') {
+    write_cstyle(outfile, name);
+    parse_call_args(infile, outfile, &name, &line_end);
+    file_putc(outfile, ' ');
+  }
+  write_cstyle(outfile, key_word);
+  file_write(outfile, prefix);
+  write_cstyle(outfile, name);
+  
+  if (not line_end) {
+    file_putc(outfile, ' ');
+    copy_text(&end, infile, outfile, '\n', '\n');
+  }
+  return OK;
+}
+
+Returncode parse_if(File infile, File outfile, String key_word, Int spaces) {
+  parse_call_in_exp(infile, outfile, key_word, (String){2, 2, " ("});
   file_putc(outfile, ')');
   parse_block(infile, outfile, spaces);
   return OK;
@@ -416,60 +495,18 @@ Returncode parse_class(File infile, File outfile, String key_word, Int spaces) {
 
 Returncode parse_call(File infile, File outfile, String key_word, Int spaces) {
   write_cstyle(outfile, key_word);
-  file_putc(outfile, '(');
-  Char end;
-  while (true) {
-    char _access_buff[80]; String access = {80, 0, _access_buff};
-    read_name(&end, infile, &access, ' ', ')');
-    if (not(end == ' ')) break;
-    Bool equal;
-    string_equal(&equal, access, (String){3, 3, "out"});
-    if (equal) {
-      file_putc(outfile, '&');
-    }
-    char _name_buff[512]; String name = {512, 0, _name_buff};
-    read_name(&end, infile, &name, ',', ')');
-    Char first;
-    string_get(&first, name, 0);
-    if (first == '"') {
-      Int length;
-      real_string_length(&length, name);
-      char _length_str_buff[80]; String length_str = {80, 0, _length_str_buff};
-      int_to_string(&length_str, length);
-      file_write(outfile, (String){10, 10, "&(String){"});
-      file_write(outfile, length_str);
-      file_write(outfile, (String){2, 2, ", "});
-      file_write(outfile, length_str);
-      file_write(outfile, (String){2, 2, ", "});
-      file_write(outfile, name);
-      file_write(outfile, (String){1, 1, "}"});
-    }
-    else {
-      if (first != '\'') {
-        write_cstyle(outfile, name);
-      }
-      else {
-        file_write(outfile, name);
-      }
-    }
-    if (not(end == ',')) break;
-    file_putc(outfile, end);
-    file_getc(&end, infile);
-    file_putc(outfile, end);
-  }
-  file_write(outfile, (String){2, 2, ");"});
-  file_getc(&end, infile);
-  file_putc(outfile, end);
+  Bool line_end;
+  char _out_arg_buff[80]; String out_arg = {80, 0, _out_arg_buff};
+  parse_call_args(infile, outfile, &out_arg, &line_end);
+  file_putc(outfile, '\n');
   return OK;
 }
 
 Returncode parse_assign(File infile, File outfile, String key_word, Int spaces) {
-  write_cstyle(outfile, key_word);
   Char end;
   char _ignore_assign_buff[80]; String ignore_assign = {80, 0, _ignore_assign_buff};
   read_name(&end, infile, &ignore_assign, ' ', ' ');
-  file_write(outfile, (String){3, 3, " = "});
-  copy_text(&end, infile, outfile, '\n', '\n');
+  parse_call_in_exp(infile, outfile, key_word, (String){3, 3, " = "});
   file_write(outfile, (String){2, 2, ";\n"});
   return OK;
 }
