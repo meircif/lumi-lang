@@ -194,11 +194,10 @@ func parse-func-header(user File infile, user File outfile)
 
 
 func parse-comment(user File infile, user File outfile, user String key-word, copy Int spaces)
-  do
-    var Char ch
-    file-getc(out ch, user infile)
-    while ch != '\n'
-  
+  file-write(user outfile, user "/* ")
+  var Char end
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+  file-write(user outfile, user " */\n")
   return
 
 

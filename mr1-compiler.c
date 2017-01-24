@@ -197,11 +197,10 @@ Returncode parse_func_header(File infile, File outfile) {
 }
 
 Returncode parse_comment(File infile, File outfile, String key_word, Int spaces) {
-  while (true) {
-    Char ch;
-    file_getc(&ch, infile);
-    if (not(ch != '\n')) break;
-  }
+  file_write(outfile, (String){3, 3, "/* "});
+  Char end;
+  copy_text(&end, infile, outfile, '\n', '\n');
+  file_write(outfile, (String){4, 4, " */\n"});
   return OK;
 }
 
