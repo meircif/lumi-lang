@@ -13,8 +13,8 @@
             <Keywords name="Numbers, suffix1"></Keywords>
             <Keywords name="Numbers, suffix2"></Keywords>
             <Keywords name="Numbers, range"></Keywords>
-            <Keywords name="Operators1">( ) , { } [ ] :</Keywords>
-            <Keywords name="Operators2">= + - * / &lt; &gt; &lt;= &gt;= != div mod clamp check min max encode decode</Keywords>
+            <Keywords name="Operators1">( ) , { } [ ] : .</Keywords>
+            <Keywords name="Operators2">= + - * / &lt; &gt; &lt;= &gt;= != div mod clamp check min max encode decode minus</Keywords>
             <Keywords name="Folders in code1, open"></Keywords>
             <Keywords name="Folders in code1, middle"></Keywords>
             <Keywords name="Folders in code1, close"></Keywords>
@@ -24,8 +24,8 @@
             <Keywords name="Folders in comment, open"></Keywords>
             <Keywords name="Folders in comment, middle"></Keywords>
             <Keywords name="Folders in comment, close"></Keywords>
-            <Keywords name="Keywords1">const&#x000D;&#x000A;var&#x000D;&#x000A;owner&#x000D;&#x000A;user&#x000D;&#x000A;managed&#x000D;&#x000A;weak&#x000D;&#x000A;shared&#x000D;&#x000A;func&#x000D;&#x000A;if&#x000D;&#x000A;else&#x000D;&#x000A;do&#x000D;&#x000A;while&#x000D;&#x000A;for&#x000D;&#x000A;in&#x000D;&#x000A;break&#x000D;&#x000A;continue&#x000D;&#x000A;switch&#x000D;&#x000A;case&#x000D;&#x000A;default&#x000D;&#x000A;fallthrough&#x000D;&#x000A;main&#x000D;&#x000A;out&#x000D;&#x000A;copy&#x000D;&#x000A;not&#x000D;&#x000A;and&#x000D;&#x000A;or&#x000D;&#x000A;native&#x000D;&#x000A;type&#x000D;&#x000A;inline&#x000D;&#x000A;return&#x000D;&#x000A;true&#x000D;&#x000A;false</Keywords>
-            <Keywords name="Keywords2">A&#x000D;&#x000A;B&#x000D;&#x000A;C&#x000D;&#x000A;D&#x000D;&#x000A;E&#x000D;&#x000A;F&#x000D;&#x000A;J&#x000D;&#x000A;H&#x000D;&#x000A;I&#x000D;&#x000A;J&#x000D;&#x000A;K&#x000D;&#x000A;L&#x000D;&#x000A;M&#x000D;&#x000A;N&#x000D;&#x000A;O&#x000D;&#x000A;P&#x000D;&#x000A;Q&#x000D;&#x000A;R&#x000D;&#x000A;S&#x000D;&#x000A;T&#x000D;&#x000A;U&#x000D;&#x000A;V&#x000D;&#x000A;X&#x000D;&#x000A;Y&#x000D;&#x000A;Z</Keywords>
+            <Keywords name="Keywords1">const&#x000D;&#x000A;var&#x000D;&#x000A;owner&#x000D;&#x000A;user&#x000D;&#x000A;managed&#x000D;&#x000A;weak&#x000D;&#x000A;shared&#x000D;&#x000A;func&#x000D;&#x000A;if&#x000D;&#x000A;else&#x000D;&#x000A;do&#x000D;&#x000A;while&#x000D;&#x000A;for&#x000D;&#x000A;in&#x000D;&#x000A;break&#x000D;&#x000A;continue&#x000D;&#x000A;switch&#x000D;&#x000A;case&#x000D;&#x000A;default&#x000D;&#x000A;fallthrough&#x000D;&#x000A;main&#x000D;&#x000A;out&#x000D;&#x000A;copy&#x000D;&#x000A;not&#x000D;&#x000A;and&#x000D;&#x000A;or&#x000D;&#x000A;native&#x000D;&#x000A;type&#x000D;&#x000A;inline&#x000D;&#x000A;return&#x000D;&#x000A;true&#x000D;&#x000A;false&#x000D;&#x000A;class&#x000D;&#x000A;self&#x000D;&#x000A;inst&#x000D;&#x000A;global&#x000D;&#x000A;abstract&#x000D;&#x000A;dispach&#x000D;&#x000A;diverse&#x000D;&#x000A;alias</Keywords>
+            <Keywords name="Keywords2">A&#x000D;&#x000A;B&#x000D;&#x000A;C&#x000D;&#x000A;D&#x000D;&#x000A;E&#x000D;&#x000A;F&#x000D;&#x000A;G&#x000D;&#x000A;H&#x000D;&#x000A;I&#x000D;&#x000A;J&#x000D;&#x000A;K&#x000D;&#x000A;L&#x000D;&#x000A;M&#x000D;&#x000A;N&#x000D;&#x000A;O&#x000D;&#x000A;P&#x000D;&#x000A;Q&#x000D;&#x000A;R&#x000D;&#x000A;S&#x000D;&#x000A;T&#x000D;&#x000A;U&#x000D;&#x000A;V&#x000D;&#x000A;W&#x000D;&#x000A;X&#x000D;&#x000A;Y&#x000D;&#x000A;Z</Keywords>
             <Keywords name="Keywords3"></Keywords>
             <Keywords name="Keywords4"></Keywords>
             <Keywords name="Keywords5"></Keywords>

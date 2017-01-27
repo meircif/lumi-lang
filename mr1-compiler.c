@@ -139,16 +139,11 @@ Returncode copy_type(File infile, File outfile) {
   Bool equal;
   string_equal(&equal, typename, (String){5, 5, "Array"});
   if (equal) {
-    read_name(&end, infile, &typename, '}', '}');
+    char _subtypename_buff[80]; String subtypename = {80, 0, _subtypename_buff};
+    read_name(&end, infile, &subtypename, '}', '}');
     file_getc(&end, infile);
   }
   write_cstyle(outfile, typename);
-  if (equal) {
-    is_primitive(&equal, typename);
-    if (not equal) {
-      file_putc(outfile, '*');
-    }
-  }
   return OK;
 }
 
@@ -241,7 +236,7 @@ Returncode parse_func(File infile, File outfile, String key_word, Int spaces) {
 
 Returncode parse_main(File infile, File outfile, String key_word, Int spaces) {
   parse_func(infile, outfile, key_word, spaces);
-  file_write(outfile, (String){385, 385, "\nint main(int argc, char* argv[]) {\n  if (argc < 3) {\n    printf(\"too few arguments\");\n    return ERR;\n  }\n  String arg1, arg2;\n  arg1.chars = argv[1];\n  arg1.max_length = strnlen(arg1.chars, 1024);\n  arg1.actual_length = arg1.max_length;\n  arg2.chars = argv[2];\n  arg2.max_length = strnlen(arg2.chars, 1024);\n  arg2.actual_length = arg2.max_length;\n  func(arg1, arg2);\n  return OK;\n}\n"});
+  file_write(outfile, (String){393, 393, "\nint main(int argc, char* argv[]) {\n  if (argc < 3) {\n    printf(\"too few arguments\");\n    return ERR;\n  }\n  String arg1, arg2;\n  arg1.chars = argv[1];\n  arg1.max_length = strnlen(arg1.chars, 1024);\n  arg1.actual_length = arg1.max_length;\n  arg2.chars = argv[2];\n  arg2.max_length = strnlen(arg2.chars, 1024);\n  arg2.actual_length = arg2.max_length;\n  CHECK(func(&arg1, &arg2))\n  return OK;\n}\n"});
   return OK;
 }
 
@@ -283,36 +278,43 @@ Returncode parse_var(File infile, File outfile, String key_word, Int spaces) {
   }
   string_equal(&equal, typename, (String){5, 5, "Array"});
   if (equal) {
+    char _name_buff[80]; String name = {80, 0, _name_buff};
     char _length_buff[80]; String length = {80, 0, _length_buff};
+    char _string_length_buff[80]; String string_length = {80, 0, _string_length_buff};
     read_name(&end, infile, &length, ':', ':');
-    read_name(&end, infile, &typename, '}', '}');
-    write_cstyle(outfile, typename);
-    is_primitive(&equal, typename);
-    if (not equal) {
-      file_putc(outfile, '*');
+    read_name(&end, infile, &typename, '{', '}');
+    string_equal(&equal, typename, (String){6, 6, "String"});
+    if (equal) {
+      read_name(&end, infile, &string_length, '}', '}');
+      file_getc(&end, infile);
     }
     file_getc(&end, infile);
-    file_putc(outfile, ' ');
-    char _name_buff[80]; String name = {80, 0, _name_buff};
     read_name(&end, infile, &name, '\n', '\n');
+    file_write(outfile, (String){7, 7, "Array* "});
     write_cstyle(outfile, name);
+    file_write(outfile, (String){12, 12, " = &(Array){"});
+    file_write(outfile, length);
+    file_write(outfile, (String){3, 3, ", ("});
+    write_cstyle(outfile, typename);
     file_putc(outfile, '[');
     file_write(outfile, length);
-    file_write(outfile, (String){2, 2, "];"});
-    if (not equal) {
-      file_putc(outfile, ' ');
-      write_cstyle(outfile, typename);
-      file_write(outfile, (String){2, 2, " _"});
+    file_write(outfile, (String){7, 7, "]){0}};"});
+    if (equal) {
+      file_write(outfile, (String){7, 7, " char _"});
       write_cstyle(outfile, name);
-      file_putc(outfile, '[');
+      file_write(outfile, (String){7, 7, "_chars["});
+      file_write(outfile, string_length);
+      file_write(outfile, (String){2, 2, "]["});
       file_write(outfile, length);
-      file_write(outfile, (String){22, 22, "]; {Int n; for(n=0; n<"});
+      file_write(outfile, (String){22, 22, "]; {int n; for(n=0; n<"});
       file_write(outfile, length);
-      file_write(outfile, (String){7, 7, "; ++n) "});
+      file_write(outfile, (String){18, 18, "; ++n) ((String*)("});
       write_cstyle(outfile, name);
-      file_write(outfile, (String){7, 7, "[n] = _"});
+      file_write(outfile, (String){25, 25, "->values))[n] = (String){"});
+      file_write(outfile, string_length);
+      file_write(outfile, (String){6, 6, ", 0, _"});
       write_cstyle(outfile, name);
-      file_write(outfile, (String){6, 6, " + n;}"});
+      file_write(outfile, (String){12, 12, "_chars[n]};}"});
     }
     file_putc(outfile, '\n');
     return OK;
@@ -342,8 +344,9 @@ Returncode parse_ref(File infile, File outfile, String key_word, Int spaces) {
   return OK;
 }
 
-
-Returncode parse_call_args(File infile, File outfile, String* out_name, Bool* line_end) {
+Returncode parse_call_args(File infile, File outfile, String* inout_name, Bool* line_end) {
+  file_write(outfile, (String){6, 6, "CHECK("});
+  write_cstyle(outfile, inout_name[0]);
   file_putc(outfile, '(');
   Char end;
   Bool equal;
@@ -389,15 +392,14 @@ Returncode parse_call_args(File infile, File outfile, String* out_name, Bool* li
     if (not equal) {
       file_putc(outfile, '&');
     }
-    read_name(&end, infile, out_name, ',', ' ');
-    write_cstyle(outfile, out_name[0]);
+    read_name(&end, infile, inout_name, ',', ' ');
+    write_cstyle(outfile, inout_name[0]);
     if (not(end == ',')) break;
   }
-  file_write(outfile, (String){2, 2, ");"});
+  file_write(outfile, (String){2, 2, "))"});
   *line_end = end == '\n';
   return OK;
 }
-
 
 Returncode parse_call_in_exp(File infile, File outfile, String key_word, String prefix) {
   Char end;
@@ -405,7 +407,6 @@ Returncode parse_call_in_exp(File infile, File outfile, String key_word, String 
   read_name(&end, infile, &name, ' ', '(');
   Bool line_end = end == '\n';
   if (end == '(') {
-    write_cstyle(outfile, name);
     parse_call_args(infile, outfile, &name, &line_end);
     file_putc(outfile, ' ');
   }
@@ -493,11 +494,75 @@ Returncode parse_class(File infile, File outfile, String key_word, Int spaces) {
   return OK;
 }
 
+Returncode parse_array(File infile, File outfile, String key_word, Int spaces) {
+  Char end;
+  char _index_buff[80]; String index = {80, 0, _index_buff};
+  char _source_buff[80]; String source = {80, 0, _source_buff};
+  char _target_buff[80]; String target = {80, 0, _target_buff};
+  char _typename_buff[80]; String typename = {80, 0, _typename_buff};
+  read_name(&end, infile, &typename, ' ', ' ');
+  read_name(&end, infile, &target, ' ', '[');
+  Bool is_get = end != '[';
+  if (is_get) {
+    read_name(&end, infile, &source, ' ', ' ');
+    read_name(&end, infile, &source, '[', '[');
+    read_name(&end, infile, &index, ']', ']');
+    file_getc(&end, infile);
+  }
+  else {
+    read_name(&end, infile, &index, ']', ']');
+    file_getc(&end, infile);
+    read_name(&end, infile, &source, ' ', ' ');
+  }
+  file_write(outfile, (String){4, 4, "if ("});
+  write_cstyle(outfile, index);
+  file_write(outfile, (String){8, 8, " < 0 || "});
+  write_cstyle(outfile, index);
+  file_write(outfile, (String){4, 4, " >= "});
+  if (is_get) {
+    write_cstyle(outfile, source);
+  }
+  else {
+    write_cstyle(outfile, target);
+  }
+  file_write(outfile, (String){22, 22, "->length) return ERR; "});
+  if (is_get) {
+    write_cstyle(outfile, target);
+    file_write(outfile, (String){3, 3, " = "});
+  }
+  file_write(outfile, (String){2, 2, "(("});
+  write_cstyle(outfile, typename);
+  file_write(outfile, (String){3, 3, "*)("});
+  if (is_get) {
+    write_cstyle(outfile, source);
+  }
+  else {
+    write_cstyle(outfile, target);
+  }
+  file_write(outfile, (String){10, 10, "->values))"});
+  
+  Bool primitive;
+  is_primitive(&primitive, typename);
+  if (not is_get or primitive) {
+    file_putc(outfile, '[');
+    write_cstyle(outfile, index);
+    file_putc(outfile, ']');
+  }
+  else {
+    file_write(outfile, (String){3, 3, " + "});
+    write_cstyle(outfile, index);
+  }
+  if (not is_get) {
+    file_write(outfile, (String){3, 3, " = "});
+    copy_text(&end, infile, outfile, '\n', '\n');
+  }
+  file_write(outfile, (String){2, 2, ";\n"});
+  return OK;
+}
+
 Returncode parse_call(File infile, File outfile, String key_word, Int spaces) {
-  write_cstyle(outfile, key_word);
   Bool line_end;
-  char _out_arg_buff[80]; String out_arg = {80, 0, _out_arg_buff};
-  parse_call_args(infile, outfile, &out_arg, &line_end);
+  parse_call_args(infile, outfile, &key_word, &line_end);
   file_putc(outfile, '\n');
   return OK;
 }
@@ -602,6 +667,11 @@ Returncode parse_line(Bool* more_lines, File infile, File outfile, Int spaces) {
     parse_class(infile, outfile, key_word, spaces);
     return OK;
   }
+  string_equal(&equal, key_word, (String){2, 2, "[]"});
+  if (equal) {
+    parse_array(infile, outfile, key_word, spaces);
+    return OK;
+  }
   if (end == '(') {
     parse_call(infile, outfile, key_word, spaces);
   }
@@ -621,7 +691,7 @@ Returncode func(String arg1, String arg2) {
   
   file_write(outfile, (String){19, 19, "#include <stdio.h>\n"});
   file_write(outfile, (String){20, 20, "#include <string.h>\n"});
-  file_write(outfile, (String){24, 24, "#include \"mr0-c-api.h\"\n\n"});
+  file_write(outfile, (String){24, 24, "#include \"mr1-c-api.h\"\n\n"});
   
   while (true) {
     Bool more_lines;
