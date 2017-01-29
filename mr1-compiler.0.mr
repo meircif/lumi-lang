@@ -686,9 +686,7 @@ main func(user String arg1, user String arg2)
   file-open-read(out infile, user arg1)
   file-open-write(out outfile, user arg2)
   
-  file-write(user outfile, user "#include <stdio.h>\n")
-  file-write(user outfile, user "#include <string.h>\n")
-  file-write(user outfile, user "#include \"mr1-c-api.h\"\n\n")
+  file-write(user outfile, user "#include \"mr.1.h\"\n\n")
   
   do
     var Bool more-lines

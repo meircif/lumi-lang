@@ -1,6 +1,9 @@
 #ifndef __MR_C_API__
 #define __MR_C_API__
 
+#include <stdio.h>
+#include <string.h>
+
 
 #define not !
 #define or ||

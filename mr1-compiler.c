@@ -689,9 +689,7 @@ Returncode func(String arg1, String arg2) {
   file_open_read(&infile, arg1);
   file_open_write(&outfile, arg2);
   
-  file_write(outfile, (String){19, 19, "#include <stdio.h>\n"});
-  file_write(outfile, (String){20, 20, "#include <string.h>\n"});
-  file_write(outfile, (String){24, 24, "#include \"mr1-c-api.h\"\n\n"});
+  file_write(outfile, (String){19, 19, "#include \"mr.1.h\"\n\n"});
   
   while (true) {
     Bool more_lines;
