@@ -2,6 +2,7 @@
 #define __MR_C_API__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -34,6 +35,23 @@ typedef struct {
 } Array;
 
 #define CHECK(err) { Returncode _err = err; if (_err != OK) return _err; }
+
+#define MAIN_FUNC int main(int argc, char* argv[]) { \
+  String* args_strings = malloc(argc * sizeof(String)); \
+  if (args_strings == 0) { \
+    fprintf(stderr, "insufficient memory\n"); \
+    return ERR; \
+  } \
+  Array* args_array = &(Array){argc, args_strings}; \
+  int arg; \
+  for (arg = 0; arg < argc; ++arg) { \
+    args_strings[arg].chars = argv[arg]; \
+    args_strings[arg].max_length = strnlen(args_strings[arg].chars, 1024); \
+    args_strings[arg].actual_length = args_strings[arg].max_length; \
+  } \
+  CHECK(func(args_array)) \
+  return OK; \
+}
 
 
 #endif  /*__MR_C_API__*/

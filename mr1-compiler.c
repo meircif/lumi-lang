@@ -236,7 +236,7 @@ Returncode parse_func(File infile, File outfile, String key_word, Int spaces) {
 
 Returncode parse_main(File infile, File outfile, String key_word, Int spaces) {
   parse_func(infile, outfile, key_word, spaces);
-  file_write(outfile, (String){393, 393, "\nint main(int argc, char* argv[]) {\n  if (argc < 3) {\n    printf(\"too few arguments\");\n    return ERR;\n  }\n  String arg1, arg2;\n  arg1.chars = argv[1];\n  arg1.max_length = strnlen(arg1.chars, 1024);\n  arg1.actual_length = arg1.max_length;\n  arg2.chars = argv[2];\n  arg2.max_length = strnlen(arg2.chars, 1024);\n  arg2.actual_length = arg2.max_length;\n  CHECK(func(&arg1, &arg2))\n  return OK;\n}\n"});
+  file_write(outfile, (String){11, 11, "\nMAIN_FUNC\n"});
   return OK;
 }
 
@@ -350,7 +350,7 @@ Returncode parse_call_args(File infile, File outfile, String* inout_name, Bool* 
   file_putc(outfile, '(');
   Char end;
   Bool equal;
-  char _name_buff[512]; String name = {512, 0, _name_buff};
+  char _name_buff[80]; String name = {80, 0, _name_buff};
   while (true) {
     read_name(&end, infile, &name, ' ', ')');
     if (not(end == ' ')) break;
