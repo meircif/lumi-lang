@@ -515,6 +515,15 @@ func parse-else(user File infile, user File outfile, user String key-word, copy 
   return
 
 
+func parse-else-if(user File infile, user File outfile, user String key-word, copy Int spaces)
+  var Char end
+  file-write(user outfile, user "else if (")
+  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+  file-putc(user outfile, copy ')')
+  parse-block(user infile, user outfile, copy spaces)
+  return
+
+
 func parse-do(user File infile, user File outfile, user String key-word, copy Int spaces)
   file-write(user outfile, user "while (true)")
   parse-block(user infile, user outfile, copy spaces)
@@ -731,6 +740,11 @@ func parse-line(out Bool more-lines, user File infile, user File outfile, copy I
   string-equal(out equal, user key-word, user "else")
   if equal
     parse-else(user infile, user outfile, user key-word, copy spaces)
+    return
+  
+  string-equal(out equal, user key-word, user "else-if")
+  if equal
+    parse-else-if(user infile, user outfile, user key-word, copy spaces)
     return
   
   string-equal(out equal, user key-word, user "do")

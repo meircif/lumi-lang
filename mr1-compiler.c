@@ -518,6 +518,15 @@ Returncode parse_else(File infile, File outfile, String key_word, Int spaces) {
   return OK;
 }
 
+Returncode parse_else_if(File infile, File outfile, String key_word, Int spaces) {
+  Char end;
+  file_write(outfile, (String){9, 9, "else if ("});
+  copy_text(&end, infile, outfile, '\n', '\n');
+  file_putc(outfile, ')');
+  parse_block(infile, outfile, spaces);
+  return OK;
+}
+
 Returncode parse_do(File infile, File outfile, String key_word, Int spaces) {
   file_write(outfile, (String){12, 12, "while (true)"});
   parse_block(infile, outfile, spaces);
@@ -734,6 +743,11 @@ Returncode parse_line(Bool* more_lines, File infile, File outfile, Int spaces) {
   string_equal(&equal, key_word, (String){4, 4, "else"});
   if (equal) {
     parse_else(infile, outfile, key_word, spaces);
+    return OK;
+  }
+  string_equal(&equal, key_word, (String){7, 7, "else-if"});
+  if (equal) {
+    parse_else_if(infile, outfile, key_word, spaces);
     return OK;
   }
   string_equal(&equal, key_word, (String){2, 2, "do"});
