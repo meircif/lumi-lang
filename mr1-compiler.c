@@ -553,13 +553,18 @@ Returncode parse_for(File infile, File outfile, String key_word, Int spaces) {
   char _ignore_in_buff[80]; String ignore_in = {80, 0, _ignore_in_buff};
   read_name(&end, infile, &varname, ' ', ' ');
   read_name(&end, infile, &ignore_in, ' ', ' ');
-  file_write(outfile, (String){4, 4, "if ("});
+  file_write(outfile, (String){4, 4, "Int "});
   write_cstyle(outfile, varname);
-  file_write(outfile, (String){4, 4, " >= "});
+  file_write(outfile, (String){7, 7, "; for ("});
+  write_cstyle(outfile, varname);
+  file_write(outfile, (String){6, 6, " = 0; "});
+  write_cstyle(outfile, varname);
+  file_write(outfile, (String){3, 3, " < "});
   copy_text(&end, infile, outfile, '\n', '\n');
-  file_write(outfile, (String){11, 11, ") break; ++"});
+  file_write(outfile, (String){4, 4, "; ++"});
   write_cstyle(outfile, varname);
-  file_write(outfile, (String){2, 2, ";\n"});
+  file_write(outfile, (String){1, 1, ")"});
+  parse_block(infile, outfile, spaces);
   return OK;
 }
 

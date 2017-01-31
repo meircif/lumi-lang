@@ -550,13 +550,18 @@ func parse-for(user File infile, user File outfile, user String key-word, copy I
   var String{80} ignore-in
   read-name(out end, user infile, out varname, copy ' ', copy ' ')
   read-name(out end, user infile, out ignore-in, copy ' ', copy ' ')
-  file-write(user outfile, user "if (")
+  file-write(user outfile, user "Int ")
   write-cstyle(user outfile, user varname)
-  file-write(user outfile, user " >= ")
+  file-write(user outfile, user "; for (")
+  write-cstyle(user outfile, user varname)
+  file-write(user outfile, user " = 0; ")
+  write-cstyle(user outfile, user varname)
+  file-write(user outfile, user " < ")
   copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
-  file-write(user outfile, user ") break; ++")
+  file-write(user outfile, user "; ++")
   write-cstyle(user outfile, user varname)
-  file-write(user outfile, user ";\n")
+  file-write(user outfile, user ")")
+  parse-block(user infile, user outfile, copy spaces)
   return
 
 
