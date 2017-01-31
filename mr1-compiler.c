@@ -98,7 +98,7 @@ Returncode copy_text(Char* end, File infile, File outfile, Char end1, Char end2)
 
 Returncode real_string_length(Int* length, String text) {
   Int index = 1;
-  Int real_length = 0;
+  Int real_length = 1;
   Int text_length;
   string_length(&text_length, text);
   while (true) {
@@ -451,10 +451,12 @@ Returncode parse_call_args(File infile, File outfile, String* inout_name, Bool* 
       Int length;
       real_string_length(&length, name);
       char _length_str_buff[80]; String length_str = {80, 0, _length_str_buff};
-      int_to_string(&length_str, length);
       file_write(outfile, (String){10, 10, "&(String){"});
+      int_to_string(&length_str, length);
       file_write(outfile, length_str);
       file_write(outfile, (String){2, 2, ", "});
+      length = length minus 1;
+      int_to_string(&length_str, length);
       file_write(outfile, length_str);
       file_write(outfile, (String){2, 2, ", "});
       file_write(outfile, name);

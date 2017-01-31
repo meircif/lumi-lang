@@ -45,7 +45,7 @@ Returncode open_file(void** file, String* name, char* mode) {
   *file = NULL;
   *file = fopen(name->chars, mode);
   if (*file == NULL) {
-    return ERR;
+    RAISE
   }
   return OK;
 }
@@ -54,7 +54,7 @@ Returncode file_close(void* file) {
   if (fclose((File)file) == 0) {
     return OK;
   }
-  return ERR;
+  RAISE
 }
 
 Returncode file_getc(void* file, Char* out_char) {
@@ -65,7 +65,7 @@ Returncode file_getc(void* file, Char* out_char) {
 Returncode file_putc(void* file, Char in_char) {
   int res = putc(in_char, (File)file);
   if (res != in_char) {
-    return ERR;
+    RAISE
   }
   return OK;
 }
@@ -101,7 +101,7 @@ Returncode string_equal(String* this, String* other, Bool* out_equal) {
 
 Returncode string_get(String* this, Int index, Char* out_char) {
   if (index < 0 or index >= this->actual_length) {
-    return ERR;
+    RAISE
   }
   *out_char = this->chars[index];
   return OK;
@@ -109,7 +109,7 @@ Returncode string_get(String* this, Int index, Char* out_char) {
 
 Returncode string_append(String* this, Char in_char) {
   if (this->actual_length == this->max_length) {
-    return ERR;
+    RAISE
   }
   this->chars[this->actual_length] = in_char;
   ++this->actual_length;
@@ -129,7 +129,7 @@ Returncode int_to_string(Int value, String* out_str) {
   int res = snprintf(out_str->chars, out_str->max_length ,"%d", value);
   if (res <= 0 or res >= out_str->max_length) {
     out_str->actual_length = 0;
-    return ERR;
+    RAISE
   }
   out_str->actual_length = res;
   return OK;
@@ -138,5 +138,46 @@ Returncode int_to_string(Int value, String* out_str) {
 /*Arrays*/
 Returncode array_length(Array* this, Int* out_length) {
   *out_length = this->length;
+  return OK;
+}
+
+/*System*/
+Returncode sys_exit(Int status) {
+  exit(status);
+  RAISE
+}
+
+Returncode set_cstring(String* str) {
+  if (str->actual_length >= str->max_length) {
+    if (strnlen(str->chars, str->max_length) >= str->max_length) {
+      RAISE
+    }
+  }
+  else if (strnlen(str->chars, str->actual_length + 1) > str->actual_length) {
+    str->chars[str->actual_length] = '\0';
+  }
+  return OK;
+}
+
+Returncode sys_system(String* command, Int* status) {
+  CHECK(set_cstring(command));
+  int res = system(command->chars);
+  if (res == -1) {
+    RAISE
+  }
+  *status = res;
+  return OK;
+}
+
+Returncode sys_getenv(String* name, Bool* exists, String* value) {
+  CHECK(set_cstring(name));
+  char* ret = getenv(name->chars);
+  if (ret == NULL) {
+    *exists = false;
+    return OK;
+  }
+  value->actual_length = strnlen(ret, value->max_length);
+  strncpy(value->chars, ret, value->actual_length);
+  *exists = true;
   return OK;
 }

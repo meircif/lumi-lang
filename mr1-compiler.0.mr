@@ -95,7 +95,7 @@ func copy-text(out Char end, user File infile, user File outfile, copy Char end1
 
 func real-string-length(out Int length, user String text)
   var Int index = 1
-  var Int real-length = 0
+  var Int real-length = 1
   var Int text-length
   string-length(out text-length, user text)
   do
@@ -448,10 +448,12 @@ func parse-call-args(user File infile, user File outfile, out String inout-name,
       var Int length
       real-string-length(out length, user name)
       var String{80} length-str
-      int-to-string(out length-str, user length)
       file-write(user outfile, user "&(String){")
+      int-to-string(out length-str, user length)
       file-write(user outfile, user length-str)
       file-write(user outfile, user ", ")
+      length := length minus 1
+      int-to-string(out length-str, user length)
       file-write(user outfile, user length-str)
       file-write(user outfile, user ", ")
       file-write(user outfile, user name)
