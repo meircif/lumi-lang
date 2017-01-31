@@ -132,21 +132,6 @@ Returncode is_primitive(Bool* res, String typename) {
   return OK;
 }
 
-Returncode copy_type(File infile, File outfile) {
-  Char end;
-  char _typename_buff[80]; String typename = {80, 0, _typename_buff};
-  read_name(&end, infile, &typename, ' ', '{');
-  Bool equal;
-  string_equal(&equal, typename, (String){5, 5, "Array"});
-  if (equal) {
-    char _subtypename_buff[80]; String subtypename = {80, 0, _subtypename_buff};
-    read_name(&end, infile, &subtypename, '}', '}');
-    file_getc(&end, infile);
-  }
-  write_cstyle(outfile, typename);
-  return OK;
-}
-
 Returncode parse_block_body(File infile, File outfile, Int spaces) {
   while (true) {
     Int count = 0;
@@ -174,10 +159,19 @@ Returncode parse_block(File infile, File outfile, Int spaces) {
 }
 
 Returncode parse_param_type(File infile, File outfile, String access) {
-  copy_type(infile, outfile);
-  Bool is_copy;
-  string_equal(&is_copy, access, (String){4, 4, "copy"});
-  if (not is_copy) {
+  Char end;
+  char _typename_buff[80]; String typename = {80, 0, _typename_buff};
+  read_name(&end, infile, &typename, ' ', '{');
+  Bool equal;
+  string_equal(&equal, typename, (String){5, 5, "Array"});
+  if (equal) {
+    char _subtypename_buff[80]; String subtypename = {80, 0, _subtypename_buff};
+    read_name(&end, infile, &subtypename, '}', '}');
+    file_getc(&end, infile);
+  }
+  write_cstyle(outfile, typename);
+  string_equal(&equal, access, (String){4, 4, "copy"});
+  if (not equal) {
     file_putc(outfile, '*');
   }
   return OK;
@@ -327,7 +321,12 @@ Returncode parse_var(File infile, File outfile, String key_word, Int spaces) {
   is_primitive(&equal, typename);
   if (equal) {
     file_putc(outfile, ' ');
-    copy_text(&end, infile, outfile, '\n', '\n');
+    copy_text(&end, infile, outfile, '(', '\n');
+    if (end == '(') {
+      file_write(outfile, (String){3, 3, " = "});
+      copy_text(&end, infile, outfile, ')', ')');
+      file_getc(&end, infile);
+    }
     file_write(outfile, (String){2, 2, ";\n"});
     return OK;
   }
@@ -340,10 +339,79 @@ Returncode parse_var(File infile, File outfile, String key_word, Int spaces) {
 }
 
 Returncode parse_ref(File infile, File outfile, String key_word, Int spaces) {
-  copy_type(infile, outfile);
-  file_write(outfile, (String){2, 2, "* "});
   Char end;
-  copy_text(&end, infile, outfile, '\n', '\n');
+  Bool is_init;
+  Bool is_array;
+  Bool is_split;
+  char _name_buff[80]; String name = {80, 0, _name_buff};
+  char _start_buff[80]; String start = {80, 0, _start_buff};
+  char _length_buff[80]; String length = {80, 0, _length_buff};
+  char _refname_buff[80]; String refname = {80, 0, _refname_buff};
+  char _typename_buff[80]; String typename = {80, 0, _typename_buff};
+  char _subtypename_buff[80]; String subtypename = {80, 0, _subtypename_buff};
+  read_name(&end, infile, &typename, ' ', '{');
+  string_equal(&is_array, typename, (String){5, 5, "Array"});
+  if (is_array) {
+    read_name(&end, infile, &subtypename, '}', '}');
+    file_getc(&end, infile);
+  }
+  read_name(&end, infile, &refname, '(', '\n');
+  is_init = end == '(';
+  if (is_init) {
+    read_name(&end, infile, &name, ')', '[');
+    is_split = end == '[';
+    if (is_split) {
+      read_name(&end, infile, &start, ':', ':');
+      read_name(&end, infile, &length, ']', ']');
+      file_getc(&end, infile);
+      file_write(outfile, (String){5, 5, "if (("});
+      write_cstyle(outfile, start);
+      file_write(outfile, (String){5, 5, ") + ("});
+      write_cstyle(outfile, length);
+      file_write(outfile, (String){4, 4, ") > "});
+      write_cstyle(outfile, name);
+      file_write(outfile, (String){2, 2, "->"});
+      if (not is_array) {
+        file_write(outfile, (String){7, 7, "actual_"});
+      }
+      file_write(outfile, (String){14, 14, "length) RAISE "});
+    }
+    file_getc(&end, infile);
+  }
+  write_cstyle(outfile, typename);
+  file_write(outfile, (String){2, 2, "* "});
+  write_cstyle(outfile, refname);
+  
+  if (is_init) {
+    file_write(outfile, (String){3, 3, " = "});
+    if (is_split) {
+      if (is_array) {
+        file_write(outfile, (String){9, 9, "&(Array){"});
+        write_cstyle(outfile, length);
+        file_write(outfile, (String){10, 10, ", (Byte*)("});
+        write_cstyle(outfile, name);
+        file_write(outfile, (String){13, 13, "->values) + ("});
+        write_cstyle(outfile, start);
+        file_write(outfile, (String){11, 11, ") * sizeof("});
+        write_cstyle(outfile, subtypename);
+        file_write(outfile, (String){2, 2, ")}"});
+      }
+      else {
+        file_write(outfile, (String){10, 10, "&(String){"});
+        write_cstyle(outfile, length);
+        file_write(outfile, (String){2, 2, ", "});
+        write_cstyle(outfile, length);
+        file_write(outfile, (String){2, 2, ", "});
+        write_cstyle(outfile, name);
+        file_write(outfile, (String){10, 10, "->chars + "});
+        write_cstyle(outfile, start);
+        file_putc(outfile, '}');
+      }
+    }
+    else {
+      write_cstyle(outfile, name);
+    }
+  }
   file_write(outfile, (String){2, 2, ";\n"});
   return OK;
 }
@@ -404,7 +472,7 @@ Returncode parse_new(File infile, File outfile, String key_word, Int spaces) {
   }
   file_write(outfile, (String){7, 7, "); if ("});
   write_cstyle(outfile, name);
-  file_write(outfile, (String){21, 21, " == NULL) return ERR;"});
+  file_write(outfile, (String){15, 15, " == NULL) RAISE"});
   if (is_array and is_string) {
     file_write(outfile, (String){21, 21, " {int n; for(n=0; n<("});
     write_cstyle(outfile, array_length);
@@ -636,7 +704,7 @@ Returncode parse_array(File infile, File outfile, String key_word, Int spaces) {
   else {
     write_cstyle(outfile, target);
   }
-  file_write(outfile, (String){22, 22, "->length) return ERR; "});
+  file_write(outfile, (String){16, 16, "->length) RAISE "});
   if (is_get) {
     write_cstyle(outfile, target);
     file_write(outfile, (String){3, 3, " = "});

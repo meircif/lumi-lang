@@ -87,6 +87,10 @@ Returncode string_length(String* this, Int* out_length) {
 }
 
 Returncode string_equal(String* this, String* other, Bool* out_equal) {
+  if (this == other) {
+    *out_equal = true;
+    return OK;
+  }
   if (this->actual_length != other->actual_length) {
     *out_equal = false;
     return OK;
@@ -117,6 +121,9 @@ Returncode string_append(String* this, Char in_char) {
 }
 
 Returncode string_replace(String* this, Char old, Char new) {
+  if (old == new) {
+    return OK;
+  }
   for (int n = 0; n < this->actual_length; ++n) {
     if (this->chars[n] == old) {
       this->chars[n] = new;
@@ -133,6 +140,38 @@ Returncode int_to_string(Int value, String* out_str) {
   }
   out_str->actual_length = res;
   return OK;
+}
+
+Returncode string_copy(String* this, String* source) {
+  if (this == source) {
+    return OK;
+  }
+  if (source->actual_length > this->max_length) {
+    RAISE
+  }
+  this->actual_length = source->actual_length;
+  memcpy(this->chars, source->chars, this->actual_length);
+  return OK;
+}
+
+Returncode string_concat(String* this, String* ext) {
+  if (this->actual_length + ext->actual_length > this->max_length) {
+    RAISE
+  }
+  memcpy(this->chars + this->actual_length, ext->chars, ext->actual_length);
+  this->actual_length += ext->actual_length;
+  return OK;
+}
+
+Returncode string_find(String* this, String* pattern, Int* out_index) {
+  Int n;
+  for (n = 0; n <= this->actual_length - pattern->actual_length; ++n) {
+    if (strncmp(this->chars + n, pattern->chars, pattern->actual_length) == 0) {
+      *out_index = n;
+      return OK;
+    }
+  }
+  RAISE
 }
 
 /*Arrays*/

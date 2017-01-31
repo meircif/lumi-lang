@@ -129,21 +129,6 @@ func is-primitive(out Bool res, user String typename)
   return
 
 
-func copy-type(user File infile, user File outfile)
-  var Char end
-  var String{80} typename
-  read-name(out end, user infile, out typename, copy ' ', copy '{')
-  var Bool equal
-  string-equal(out equal, user typename, user "Array")
-  if equal
-    var String{80} subtypename
-    read-name(out end, user infile, out subtypename, copy '}', copy '}')
-    file-getc(out end, user infile)
-  
-  write-cstyle(user outfile, user typename)
-  return
-
-
 func parse-block-body(user File infile, user File outfile, copy Int spaces)
   do
     var Int count = 0
@@ -171,10 +156,19 @@ func parse-block(user File infile, user File outfile, copy Int spaces)
 
 
 func parse-param-type(user File infile, user File outfile, user String access)
-  copy-type(user infile, user outfile)
-  var Bool is-copy
-  string-equal(out is-copy, user access, user "copy")
-  if not is-copy
+  var Char end
+  var String{80} typename
+  read-name(out end, user infile, out typename, copy ' ', copy '{')
+  var Bool equal
+  string-equal(out equal, user typename, user "Array")
+  if equal
+    var String{80} subtypename
+    read-name(out end, user infile, out subtypename, copy '}', copy '}')
+    file-getc(out end, user infile)
+  
+  write-cstyle(user outfile, user typename)
+  string-equal(out equal, user access, user "copy")
+  if not equal
     file-putc(user outfile, copy '*')
   
   return
@@ -324,7 +318,12 @@ func parse-var(user File infile, user File outfile, user String key-word, copy I
   is-primitive(out equal, user typename)
   if equal
     file-putc(user outfile, copy ' ')
-    copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+    copy-text(out end, user infile, user outfile, copy '(', copy '\n')
+    if end == '('
+      file-write(user outfile, user " = ")
+      copy-text(out end, user infile, user outfile, copy ')', copy ')')
+      file-getc(out end, user infile)
+    
     file-write(user outfile, user ";\n")
     return
   
@@ -337,10 +336,79 @@ func parse-var(user File infile, user File outfile, user String key-word, copy I
 
 
 func parse-ref(user File infile, user File outfile, user String key-word, copy Int spaces)
-  copy-type(user infile, user outfile)
-  file-write(user outfile, user "* ")
   var Char end
-  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+  var Bool is-init
+  var Bool is-array
+  var Bool is-split
+  var String{80} name
+  var String{80} start
+  var String{80} length
+  var String{80} refname
+  var String{80} typename
+  var String{80} subtypename
+  read-name(out end, user infile, out typename, copy ' ', copy '{')
+  string-equal(out is-array, user typename, user "Array")
+  if is-array
+    read-name(out end, user infile, out subtypename, copy '}', copy '}')
+    file-getc(out end, user infile)
+  
+  read-name(out end, user infile, out refname, copy '(', copy '\n')
+  is-init := end == '('
+  if is-init
+    read-name(out end, user infile, out name, copy ')', copy '[')
+    is-split := end == '['
+    if is-split
+      read-name(out end, user infile, out start, copy ':', copy ':')
+      read-name(out end, user infile, out length, copy ']', copy ']')
+      file-getc(out end, user infile)
+      file-write(user outfile, user "if ((")
+      write-cstyle(user outfile, user start)
+      file-write(user outfile, user ") + (")
+      write-cstyle(user outfile, user length)
+      file-write(user outfile, user ") > ")
+      write-cstyle(user outfile, user name)
+      file-write(user outfile, user "->")
+      if not is-array
+        file-write(user outfile, user "actual_")
+      
+      file-write(user outfile, user "length) RAISE ")
+    
+    file-getc(out end, user infile)
+  
+  write-cstyle(user outfile, user typename)
+  file-write(user outfile, user "* ")
+  write-cstyle(user outfile, user refname)
+  
+  if is-init
+    file-write(user outfile, user " = ")
+    if is-split
+      if is-array
+        file-write(user outfile, user "&(Array){")
+        write-cstyle(user outfile, user length)
+        file-write(user outfile, user ", (Byte*)(")
+        write-cstyle(user outfile, user name)
+        file-write(user outfile, user "->values) + (")
+        write-cstyle(user outfile, user start)
+        file-write(user outfile, user ") * sizeof(")
+        write-cstyle(user outfile, user subtypename)
+        file-write(user outfile, user ")}")
+      
+      else
+        file-write(user outfile, user "&(String){")
+        write-cstyle(user outfile, user length)
+        file-write(user outfile, user ", ")
+        write-cstyle(user outfile, user length)
+        file-write(user outfile, user ", ")
+        write-cstyle(user outfile, user name)
+        file-write(user outfile, user "->chars + ")
+        write-cstyle(user outfile, user start)
+        file-putc(user outfile, copy '}')
+      
+    
+    else
+      write-cstyle(user outfile, user name)
+    
+  
   file-write(user outfile, user ";\n")
   return
 
@@ -401,7 +469,7 @@ func parse-new(user File infile, user File outfile, user String key-word, copy I
   
   file-write(user outfile, user "); if (")
   write-cstyle(user outfile, user name)
-  file-write(user outfile, user " == NULL) return ERR;")
+  file-write(user outfile, user " == NULL) RAISE")
   if is-array and is-string
     file-write(user outfile, user " {int n; for(n=0; n<(")
     write-cstyle(user outfile, user array-length)
@@ -633,7 +701,7 @@ func parse-array(user File infile, user File outfile, user String key-word, copy
   else
     write-cstyle(user outfile, user target)
   
-  file-write(user outfile, user "->length) return ERR; ")
+  file-write(user outfile, user "->length) RAISE ")
   if is-get
     write-cstyle(user outfile, user target)
     file-write(user outfile, user " = ")
