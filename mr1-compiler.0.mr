@@ -397,7 +397,7 @@ func parse-new(user File infile, user File outfile, user String key-word, copy I
   
   file-write(user outfile, user "); if (")
   write-cstyle(user outfile, user name)
-  file-write(user outfile, user " == 0) return ERR;")
+  file-write(user outfile, user " == NULL) return ERR;")
   if is-array and is-string
     file-write(user outfile, user " {int n; for(n=0; n<(")
     write-cstyle(user outfile, user array-length)

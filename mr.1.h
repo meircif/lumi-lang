@@ -39,7 +39,7 @@ typedef struct {
 
 #define MAIN_FUNC int main(int argc, char* argv[]) { \
   String* args_strings = malloc(argc * sizeof(String)); \
-  if (args_strings == 0) { \
+  if (args_strings == NULL) { \
     fprintf(stderr, "insufficient memory\n"); \
     return ERR; \
   } \

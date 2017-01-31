@@ -400,7 +400,7 @@ Returncode parse_new(File infile, File outfile, String key_word, Int spaces) {
   }
   file_write(outfile, (String){7, 7, "); if ("});
   write_cstyle(outfile, name);
-  file_write(outfile, (String){18, 18, " == 0) return ERR;"});
+  file_write(outfile, (String){21, 21, " == NULL) return ERR;"});
   if (is_array and is_string) {
     file_write(outfile, (String){21, 21, " {int n; for(n=0; n<("});
     write_cstyle(outfile, array_length);
