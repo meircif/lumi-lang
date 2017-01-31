@@ -185,10 +185,12 @@ func parse-func-header(user File infile, user File outfile)
   var Char end
   copy-text(out end, user infile, user outfile, copy '(', copy '(')
   file-putc(user outfile, copy '(')
+  var Bool has-in-params = false
   do
     var String{80} access
     read-name(out end, user infile, out access, copy ' ', copy ')')
     while end == ' '
+    has-in-params := true
     parse-param-type(user infile, user outfile, user access)
     file-putc(user outfile, copy ' ')
     copy-text(out end, user infile, user outfile, copy ',', copy ')')
@@ -200,7 +202,9 @@ func parse-func-header(user File infile, user File outfile)
   do
     while end != '\n'
     file-getc(out end, user infile)
-    file-write(user outfile, user ", ")
+    if has-in-params
+      file-write(user outfile, user ", ")
+    
     var String{80} access
     read-name(out end, user infile, out access, copy ' ', copy ' ')
     parse-param-type(user infile, user outfile, user access)
@@ -431,10 +435,12 @@ func parse-call-args(user File infile, user File outfile, out String inout-name,
   file-putc(user outfile, copy '(')
   var Char end
   var Bool equal
+  var Bool has-in-params = false
   var String{80} name
   do
     read-name(out end, user infile, out name, copy ' ', copy ')')
     while end == ' '
+    has-in-params := true
     read-name(out end, user infile, out name, copy ',', copy ')')
     var Char first
     string-get(out first, user name, user 0)
@@ -467,7 +473,9 @@ func parse-call-args(user File infile, user File outfile, out String inout-name,
   do
     while end != '\n'
     file-getc(out end, user infile)
-    file-write(user outfile, user ", ")
+    if has-in-params
+      file-write(user outfile, user ", ")
+    
     read-name(out end, user infile, out name, copy ' ', copy ' ')
     string-equal(out equal, user name, user "var")
     if not equal
@@ -531,9 +539,7 @@ func parse-do(user File infile, user File outfile, user String key-word, copy In
 
 
 func parse-while(user File infile, user File outfile, user String key-word, copy Int spaces)
-  file-write(user outfile, user "if (not(")
-  var Char end
-  copy-text(out end, user infile, user outfile, copy '\n', copy '\n')
+  parse-call-in-exp(user infile, user outfile, user "if (not(", user "")
   file-write(user outfile, user ")) break;\n")
   return
 
@@ -561,7 +567,7 @@ func parse-return(user File infile, user File outfile, user String key-word, cop
 
 
 func parse-raise(user File infile, user File outfile, user String key-word, copy Int spaces)
-  file-write(user outfile, user "return ERR;\n")
+  file-write(user outfile, user "RAISE\n")
   return
 
 

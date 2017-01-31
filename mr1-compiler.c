@@ -188,10 +188,12 @@ Returncode parse_func_header(File infile, File outfile) {
   Char end;
   copy_text(&end, infile, outfile, '(', '(');
   file_putc(outfile, '(');
+  Bool has_in_params = false;
   while (true) {
     char _access_buff[80]; String access = {80, 0, _access_buff};
     read_name(&end, infile, &access, ' ', ')');
     if (not(end == ' ')) break;
+    has_in_params = true;
     parse_param_type(infile, outfile, access);
     file_putc(outfile, ' ');
     copy_text(&end, infile, outfile, ',', ')');
@@ -203,7 +205,9 @@ Returncode parse_func_header(File infile, File outfile) {
   while (true) {
     if (not(end != '\n')) break;
     file_getc(&end, infile);
-    file_write(outfile, (String){2, 2, ", "});
+    if (has_in_params) {
+      file_write(outfile, (String){2, 2, ", "});
+    }
     char _access_buff[80]; String access = {80, 0, _access_buff};
     read_name(&end, infile, &access, ' ', ' ');
     parse_param_type(infile, outfile, access);
@@ -434,10 +438,12 @@ Returncode parse_call_args(File infile, File outfile, String* inout_name, Bool* 
   file_putc(outfile, '(');
   Char end;
   Bool equal;
+  Bool has_in_params = false;
   char _name_buff[80]; String name = {80, 0, _name_buff};
   while (true) {
     read_name(&end, infile, &name, ' ', ')');
     if (not(end == ' ')) break;
+    has_in_params = true;
     read_name(&end, infile, &name, ',', ')');
     Char first;
     string_get(&first, name, 0);
@@ -470,7 +476,9 @@ Returncode parse_call_args(File infile, File outfile, String* inout_name, Bool* 
   while (true) {
     if (not(end != '\n')) break;
     file_getc(&end, infile);
-    file_write(outfile, (String){2, 2, ", "});
+    if (has_in_params) {
+      file_write(outfile, (String){2, 2, ", "});
+    }
     read_name(&end, infile, &name, ' ', ' ');
     string_equal(&equal, name, (String){3, 3, "var"});
     if (not equal) {
@@ -534,9 +542,7 @@ Returncode parse_do(File infile, File outfile, String key_word, Int spaces) {
 }
 
 Returncode parse_while(File infile, File outfile, String key_word, Int spaces) {
-  file_write(outfile, (String){8, 8, "if (not("});
-  Char end;
-  copy_text(&end, infile, outfile, '\n', '\n');
+  parse_call_in_exp(infile, outfile, (String){8, 8, "if (not("}, (String){0, 0, ""});
   file_write(outfile, (String){10, 10, ")) break;\n"});
   return OK;
 }
@@ -564,7 +570,7 @@ Returncode parse_return(File infile, File outfile, String key_word, Int spaces) 
 }
 
 Returncode parse_raise(File infile, File outfile, String key_word, Int spaces) {
-  file_write(outfile, (String){12, 12, "return ERR;\n"});
+  file_write(outfile, (String){6, 6, "RAISE\n"});
   return OK;
 }
 

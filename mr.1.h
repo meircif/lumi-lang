@@ -35,7 +35,12 @@ typedef struct {
   void* values;
 } Array;
 
-#define CHECK(err) { Returncode _err = err; if (_err != OK) return _err; }
+#define RAISE { fprintf(stderr, "Error raised in %s:%d %s()\n", __FILE__, __LINE__, __FUNCTION__); \
+  return ERR; }
+
+#define CHECK(err) { Returncode _err = err; if (_err != OK) { \
+  fprintf(stderr, "  called from %s:%d %s()\n", __FILE__, __LINE__, __FUNCTION__); \
+  return _err; } }
 
 #define MAIN_FUNC int main(int argc, char* argv[]) { \
   String* args_strings = malloc(argc * sizeof(String)); \

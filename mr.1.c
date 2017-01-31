@@ -3,8 +3,8 @@
 typedef FILE* File;
 
 /*Print*/
-Returncode print(String text) {
-  printf("%.*s\n", text.actual_length, text.chars);
+Returncode print(String* text) {
+  printf("%.*s\n", text->actual_length, text->chars);
   return OK;
 }
 
