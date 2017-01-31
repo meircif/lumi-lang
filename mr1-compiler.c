@@ -470,6 +470,11 @@ Returncode parse_return(File infile, File outfile, String key_word, Int spaces) 
   return OK;
 }
 
+Returncode parse_raise(File infile, File outfile, String key_word, Int spaces) {
+  file_write(outfile, (String){12, 12, "return ERR;\n"});
+  return OK;
+}
+
 Returncode parse_out(File infile, File outfile, String key_word, Int spaces) {
   file_putc(outfile, '*');
   Char end;
@@ -655,6 +660,11 @@ Returncode parse_line(Bool* more_lines, File infile, File outfile, Int spaces) {
   string_equal(&equal, key_word, (String){6, 6, "return"});
   if (equal) {
     parse_return(infile, outfile, key_word, spaces);
+    return OK;
+  }
+  string_equal(&equal, key_word, (String){5, 5, "raise"});
+  if (equal) {
+    parse_raise(infile, outfile, key_word, spaces);
     return OK;
   }
   string_equal(&equal, key_word, (String){3, 3, "out"});

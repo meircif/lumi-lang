@@ -462,6 +462,9 @@ native func delete-reference(owner Some-native-type ref)
 # error handling
 #################
 
+func error-raising()
+  raise
+
 # TODO
 
   

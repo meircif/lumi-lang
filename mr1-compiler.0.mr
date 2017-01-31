@@ -467,6 +467,11 @@ func parse-return(user File infile, user File outfile, user String key-word, cop
   return
 
 
+func parse-raise(user File infile, user File outfile, user String key-word, copy Int spaces)
+  file-write(user outfile, user "return ERR;\n")
+  return
+
+
 func parse-out(user File infile, user File outfile, user String key-word, copy Int spaces)
   file-putc(user outfile, copy '*')
   var Char end
@@ -652,6 +657,11 @@ func parse-line(out Bool more-lines, user File infile, user File outfile, copy I
   string-equal(out equal, user key-word, user "return")
   if equal
     parse-return(user infile, user outfile, user key-word, copy spaces)
+    return
+  
+  string-equal(out equal, user key-word, user "raise")
+  if equal
+    parse-raise(user infile, user outfile, user key-word, copy spaces)
     return
   
   string-equal(out equal, user key-word, user "out")
