@@ -8,6 +8,30 @@ Returncode print(String text) {
   return OK;
 }
 
+/*dynamic allocation*/
+String* new_string(int length) {
+  void* buff = malloc(sizeof(String) + length);
+  if (buff == 0) {
+    return 0;
+  }
+  String* str = buff;
+  str->max_length = length;
+  str->actual_length = 0;
+  str->chars = (Byte*)buff + sizeof(String);
+  return str;
+}
+
+Array* new_array(int length, int value_size) {
+  void* buff = malloc(sizeof(Array) + length * value_size);
+  if (buff == 0) {
+    return 0;
+  }
+  Array* arr = buff;
+  arr->length = length;
+  arr->values = (Byte*)buff + sizeof(Array);
+  return arr;
+}
+
 /*Files*/
 Returncode file_open_read(void** file, String name) {
   return open_file(file, name, "r");

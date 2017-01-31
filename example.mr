@@ -22,13 +22,16 @@ allow nested comments?
 #)
 
 
-# variables
+# object creation
 ############
 func variables-example()
 
-# stack variables are declared using "var"
+# stack variable objects are created using "var"
   var Int int-var
   var String{128} string-var
+
+# dynamically allocated object are created using "new"
+  owner String{Uint8b} some-string(new{String{32}}(""))
 
 
 # references
@@ -63,7 +66,7 @@ Users are free to modify the referenced object freely - but cannot destroy it.
 
 Variables ca also give references as owners - but cannot pass their ownership.
 #)
-  owner String{32} some-string("")
+  owner String{32} some-string(new{String{32}}(""))
   user-func(user some-string)  # give reference to a user
   owning-func(owner some-string)  # pass ownership, cannot be used anymore
 
@@ -86,7 +89,7 @@ and predictable.
 * It is also possible to support "strong" reference counting - but this is not
   added because it can cause memory leaks because of reference loops.
 #)
-  managed String{32} some-string("")
+  managed String{32} some-string(new{String{32}}(""))
   user-func(user some-string)  # give reference to a user
   weak-func(weak some-string)  # give weak reference
   owning-func(managed some-string)  # pass ownership
@@ -104,7 +107,7 @@ Implementing a garbage-collector has a significant and unpredicted performance
 cost, but some MR users may be willing to pay it in some sections of their
 project where performance is less important.
 #)
-  shared String{32} some-string("")
+  shared String{32} some-string(new{String{32}}(""))
   shared-func(shared some-string)  # copy strong reference
   user-func(user some-string)  # give reference to a user
   weak-func(weak some-string)  # give weak reference
@@ -410,9 +413,9 @@ func complex-func(
 
 # calling a function
 func calling-example()
-  owner String{36} simple-string("")
-  managed String{36} managed-string("")
-  shared String{36} shared-string("")
+  owner String{36} simple-string(new{String{36}}(""))
+  managed String{36} managed-string(new{String{36}}(""))
+  shared String{36} shared-string(new{String{36}}(""))
   var Uint32b some-int := func-name(345)
   var Uint32b out-int,
   weak String{Uint8b} out-string,

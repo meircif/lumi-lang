@@ -12,6 +12,7 @@
 
 typedef int Int;
 typedef char Char;
+typedef unsigned char Byte;
 
 typedef struct {
   int max_length;
@@ -52,6 +53,9 @@ typedef struct {
   CHECK(func(args_array)) \
   return OK; \
 }
+
+String* new_string(int length);
+Array* new_array(int length, int value_size);
 
 
 #endif  /*__MR_C_API__*/

@@ -344,6 +344,90 @@ Returncode parse_ref(File infile, File outfile, String key_word, Int spaces) {
   return OK;
 }
 
+Returncode parse_new(File infile, File outfile, String key_word, Int spaces) {
+  Char end;
+  char _name_buff[80]; String name = {80, 0, _name_buff};
+  char _typename_buff[80]; String typename = {80, 0, _typename_buff};
+  char _array_length_buff[80]; String array_length = {80, 0, _array_length_buff};
+  char _string_length_buff[80]; String string_length = {80, 0, _string_length_buff};
+  read_name(&end, infile, &typename, ' ', '{');
+  Bool is_array;
+  Bool is_string;
+  string_equal(&is_array, typename, (String){5, 5, "Array"});
+  string_equal(&is_string, typename, (String){6, 6, "String"});
+  write_cstyle(outfile, typename);
+  if (is_string) {
+    read_name(&end, infile, &string_length, '}', '}');
+    file_getc(&end, infile);
+  }
+  if (is_array) {
+    read_name(&end, infile, &array_length, ':', ':');
+    read_name(&end, infile, &typename, '{', '}');
+    string_equal(&is_string, typename, (String){6, 6, "String"});
+    if (is_string) {
+      read_name(&end, infile, &string_length, '}', '}');
+      file_getc(&end, infile);
+    }
+    file_getc(&end, infile);
+  }
+  read_name(&end, infile, &name, '\n', '\n');
+  file_write(outfile, (String){2, 2, "* "});
+  write_cstyle(outfile, name);
+  file_write(outfile, (String){3, 3, " = "});
+  
+  if (is_array) {
+    file_write(outfile, (String){10, 10, "new_array("});
+    write_cstyle(outfile, array_length);
+    file_write(outfile, (String){9, 9, ", sizeof("});
+    write_cstyle(outfile, typename);
+    file_putc(outfile, ')');
+    if (is_string) {
+      file_write(outfile, (String){4, 4, " + ("});
+      write_cstyle(outfile, string_length);
+      file_putc(outfile, ')');
+    }
+  }
+  else {
+    if (is_string) {
+      file_write(outfile, (String){11, 11, "new_string("});
+      write_cstyle(outfile, string_length);
+    }
+    else {
+      file_write(outfile, (String){14, 14, "malloc(sizeof("});
+      write_cstyle(outfile, typename);
+      file_putc(outfile, ')');
+    }
+  }
+  file_write(outfile, (String){7, 7, "); if ("});
+  write_cstyle(outfile, name);
+  file_write(outfile, (String){18, 18, " == 0) return ERR;"});
+  if (is_array and is_string) {
+    file_write(outfile, (String){21, 21, " {int n; for(n=0; n<("});
+    write_cstyle(outfile, array_length);
+    file_write(outfile, (String){19, 19, "); ++n) ((String*)("});
+    write_cstyle(outfile, name);
+    file_write(outfile, (String){25, 25, "->values))[n] = (String){"});
+    write_cstyle(outfile, string_length);
+    file_write(outfile, (String){13, 13, ", 0, (Byte*)("});
+    write_cstyle(outfile, name);
+    file_write(outfile, (String){13, 13, "->values) + ("});
+    write_cstyle(outfile, array_length);
+    file_write(outfile, (String){22, 22, ") * sizeof(String) + ("});
+    write_cstyle(outfile, string_length);
+    file_write(outfile, (String){8, 8, ") * n};}"});
+  }
+  file_putc(outfile, '\n');
+  return OK;
+}
+
+Returncode parse_delete(File infile, File outfile, String key_word, Int spaces) {
+  Char end;
+  file_write(outfile, (String){5, 5, "free("});
+  copy_text(&end, infile, outfile, '\n', '\n');
+  file_write(outfile, (String){3, 3, ");\n"});
+  return OK;
+}
+
 Returncode parse_call_args(File infile, File outfile, String* inout_name, Bool* line_end) {
   file_write(outfile, (String){6, 6, "CHECK("});
   write_cstyle(outfile, inout_name[0]);
@@ -630,6 +714,16 @@ Returncode parse_line(Bool* more_lines, File infile, File outfile, Int spaces) {
   string_equal(&equal, key_word, (String){4, 4, "user"});
   if (equal) {
     parse_ref(infile, outfile, key_word, spaces);
+    return OK;
+  }
+  string_equal(&equal, key_word, (String){3, 3, "new"});
+  if (equal) {
+    parse_new(infile, outfile, key_word, spaces);
+    return OK;
+  }
+  string_equal(&equal, key_word, (String){6, 6, "delete"});
+  if (equal) {
+    parse_delete(infile, outfile, key_word, spaces);
     return OK;
   }
   string_equal(&equal, key_word, (String){2, 2, "if"});
