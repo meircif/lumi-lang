@@ -221,7 +221,9 @@ Returncode parse_func_header(File infile, File outfile) {
 Returncode parse_comment(File infile, File outfile, String key_word, Int spaces) {
   file_write(outfile, (String){3, 3, "/* "});
   Char end;
-  copy_text(&end, infile, outfile, '\n', '\n');
+  char _comment_buff[80]; String comment = {80, 0, _comment_buff};
+  read_name(&end, infile, &comment, '\n', '\n');
+  file_write(outfile, comment);
   file_write(outfile, (String){4, 4, " */\n"});
   return OK;
 }
