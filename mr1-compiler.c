@@ -667,11 +667,15 @@ Returncode parse_class(File infile, File outfile, String key_word, Int spaces) {
   Char end;
   char _name_buff[80]; String name = {80, 0, _name_buff};
   read_name(&end, infile, &name, '\n', '\n');
-  file_write(outfile, (String){17, 17, "typedef struct {\n"});
-  parse_block_body(infile, outfile, spaces + 2);
-  file_write(outfile, (String){2, 2, "} "});
+  file_write(outfile, (String){15, 15, "typedef struct "});
   write_cstyle(outfile, name);
-  file_write(outfile, (String){2, 2, ";\n"});
+  file_putc(outfile, ' ');
+  write_cstyle(outfile, name);
+  file_write(outfile, (String){9, 9, "; struct "});
+  write_cstyle(outfile, name);
+  file_write(outfile, (String){3, 3, " {\n"});
+  parse_block_body(infile, outfile, spaces + 2);
+  file_write(outfile, (String){3, 3, "};\n"});
   return OK;
 }
 

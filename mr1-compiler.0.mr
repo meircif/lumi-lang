@@ -664,11 +664,15 @@ func parse-class(user File infile, user File outfile, user String key-word, copy
   var Char end
   var String{80} name
   read-name(out end, user infile, out name, copy '\n', copy '\n')
-  file-write(user outfile, user "typedef struct {\n")
-  parse-block-body(user infile, user outfile, copy spaces + 2)
-  file-write(user outfile, user "} ")
+  file-write(user outfile, user "typedef struct ")
   write-cstyle(user outfile, user name)
-  file-write(user outfile, user ";\n")
+  file-putc(user outfile, user ' ')
+  write-cstyle(user outfile, user name)
+  file-write(user outfile, user "; struct ")
+  write-cstyle(user outfile, user name)
+  file-write(user outfile, user " {\n")
+  parse-block-body(user infile, user outfile, copy spaces + 2)
+  file-write(user outfile, user "};\n")
   return
 
 
