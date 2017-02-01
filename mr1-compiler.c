@@ -127,6 +127,11 @@ Returncode is_primitive(Bool* res, String typename) {
     *res = true;
     return OK;
   }
+  string_equal(&equal, typename, (String){4, 4, "Func"});
+  if (equal) {
+    *res = true;
+    return OK;
+  }
   string_equal(&equal, typename, (String){4, 4, "Bool"});
   *res = equal;
   return OK;

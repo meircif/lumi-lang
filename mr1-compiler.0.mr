@@ -124,6 +124,11 @@ func is-primitive(out Bool res, user String typename)
     out res := true
     return
   
+  string-equal(out equal, user typename, user "Func")
+  if equal
+    out res := true
+    return
+  
   string-equal(out equal, user typename, user "Bool")
   out res := equal
   return

@@ -174,6 +174,18 @@ Returncode string_find(String* this, String* pattern, Int* out_index) {
   RAISE
 }
 
+Returncode string_has(String* this, Char ch, Bool* found) {
+  int n;
+  for (n = 0; n < this->actual_length; ++n) {
+    if (this->chars[n] == ch) {
+      *found = true;
+      return OK;
+    }
+  }
+  *found = false;
+  return OK;
+}
+
 /*Arrays*/
 Returncode array_length(Array* this, Int* out_length) {
   *out_length = this->length;

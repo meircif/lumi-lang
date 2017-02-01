@@ -35,6 +35,8 @@ typedef struct {
   void* values;
 } Array;
 
+typedef Returncode (*Func)();
+
 #define RAISE { fprintf(stderr, "Error raised in %s:%d %s()\n", __FILE__, __LINE__, __FUNCTION__); \
   return ERR; }
 

@@ -428,6 +428,10 @@ func calling-example()
     shared shared-string)
   no-params-func()
 
+# function reference
+  var Func func-ref(copy Uint32b input-value): copy Int{0:9} return-value
+  func-ref := func-name
+
 
 # calling native external code
 ###############################
