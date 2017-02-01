@@ -1,7 +1,400 @@
 # MR2 compiler - written in MR1
 
+native func print(user String text)
+
+native type File
+native func file-open-read(user String name): owner File file
+native func file-open-write(user String name): owner File file
+native func file-close(owner File this)
+native func file-getc(user File this): copy Char ch
+native func file-putc(user File this, copy Char ch)
+native func file-write(user File this, user String line)
+
+native func string-clear(user String this)
+native func string-length(user String this): copy Int length
+native func string-equal(user String this, user String other): copy Bool equal
+native func string-get(user String this, copy Int index): copy Char ch
+native func string-append(user String this, copy Char ch)
+native func string-copy(user String this, user String source)
+native func string-concat(user String this, user String ext)
+native func string-find(user String this, user String pattern): copy Int index
+native func string-replace(user String this, copy Char old-ch, copy Char new-ch)
+native func string-has(user String this, copy Char ch): copy Bool found
+native func int-to-string(copy Int value): var String str
+
+native func array-length(user Array{} arr): copy Int length
+
+native func sys-exit(copy Int status)
+native func sys-system(user String command): copy Int status
+native func sys-getenv(user String name): copy Bool exists, var String value
+
+
+native type Generic
+
+
+class Key-value
+  owner String key
+  var Func value
+
+func kv-add(user Array{Key-value} map, copy Int index, user String key, copy Func value)
+  var Key-value kv
+  [] Key-value kv := map[index]
+  var Int length(0)
+  string-length(user key): copy length
+  new String{length} new-key
+  string-copy(user new-key, user key)
+  kv.key := new-key
+  kv.value := value
+  return
+
+func kv-find(user Array{Key-value} map, user String key): copy Func value, copy Bool found
+  var Int length
+  array-length(user map): copy length
+  for n in length
+    var Key-value kv
+    [] Key-value kv := map[n]
+    var Bool flag
+    if string-equal(user key, user kv.key): copy flag
+      out found := true
+      out value := kv.value
+      return
+    
+  
+  out found := false
+  return
+
+
+# Syntax Tree
+class St
+  owner St next-brother
+  owner St first-son
+  user St last-son
+  user St father
+  var Func writer
+  owner Generic value
+
+func st-new(copy Func writer, owner Generic value, user St father): owner St res
+  new St self
+  self.next-brother := NULL
+  self.first-son := NULL
+  self.last-son := NULL
+  self.father := father
+  self.writer := writer
+  self.value := value
+  out res := self
+  if father != NULL
+    if father.first-son = NULL
+      father.first-son := self
+    
+    else
+      father.last-son.next-brother := self
+    
+    father.last-son := self
+  
+  return
+
+func st-del(owner St self)
+  if self = NULL
+    return
+  
+  st-del(owner self.first-son)
+  st-del(owner self.next-brother)
+  delete self
+  return
+
+
+class Global-data
+  # data
+  owner File infile
+  owner File outfile
+  user Array{Key-value} key-word-map
+  # state
+  user St curr
+  var Int spaces
+  # vars
+  var Int length
+  var Bool flag
+  var Char end
+
+var Global-data glob
+
+
+func read(user String ends): var String name, copy Char end
+  string-clear(user name)
+  var Char ch(EOF)
+  var Char q('\0')
+  var Bool indent(true)
+  do
+    # ignore indent
+    file-getc(user glob.infile): copy ch
+    if indent
+      do
+        while ch = ' '
+        file-getc(user glob.infile): copy ch
+      
+      indent := false
+    
+    while ch != EOF
+    if q != '\0'
+      if ch = '\\'
+        string-append(user name, copy ch)
+        file-getc(user glob.infile): copy ch
+      
+      else-if ch = q
+        q := '\0'
+      
+    
+    else
+      while ch != '\n'
+      while string-has(user ends, copy ch): copy glob.flag = false
+      if ch = '\'' or ch = '"'
+        q := ch
+      
+    
+    string-append(user name, copy ch)
+  
+  out end := ch
+  return
+
+
+func write(user String text)
+  file-write(user glob.outfile, user text)
+  return
+
+
+func write-sons()
+  user St son(glob.curr.first-son)
+  do
+    while son != NULL
+    glob.curr := son
+    son.writer(user son.value)
+    son := son.next-brother
+  
+  return
+
+
+func write-comment(user String text)
+  write(user "/* ")
+  write(user text)
+  write(user " */\n")
+  return
+
+func add-text(user String text)
+  string-length(user text): copy glob.length
+  new String{glob.length + 1} new-text
+  string-copy(user new-text, user text)
+  user St node
+  st-new(copy write-comment, user new-text, user glob.curr): user node
+  # read rest of line
+  var String{256} ignore-line
+  read(user ""): var ignore-line, copy glob.end
+  return
+
+func parse-comment()
+  add-text(user "comment")
+  return
+
+
+func parse-main()
+  add-text(user "main")
+  return
+
+
+func parse-func()
+  add-text(user "func")
+  return
+
+
+func parse-native()
+  add-text(user "native")
+  return
+
+
+func parse-var()
+  add-text(user "var")
+  return
+
+
+func parse-ref()
+  add-text(user "ref")
+  return
+
+
+func parse-new()
+  add-text(user "new")
+  return
+
+
+func parse-delete()
+  add-text(user "delete")
+  return
+
+
+func parse-if()
+  add-text(user "if")
+  return
+
+
+func parse-else()
+  add-text(user "else")
+  return
+
+
+func parse-else-if()
+  add-text(user "else-if")
+  return
+
+
+func parse-do()
+  add-text(user "do")
+  return
+
+
+func parse-while()
+  add-text(user "while")
+  return
+
+
+func parse-for()
+  add-text(user "for")
+  return
+
+
+func parse-return()
+  add-text(user "return")
+  return
+
+
+func parse-raise()
+  add-text(user "raise")
+  return
+
+
+func parse-out()
+  add-text(user "out")
+  return
+
+
+func parse-class()
+  add-text(user "class")
+  return
+
+
+func parse-array()
+  add-text(user "array")
+  return
+
+
+func parse-call()
+  add-text(user "call")
+  return
+
+
+func parse-assign()
+  add-text(user "assign")
+  return
+
+  
+func parse-line(): copy Bool more-lines
+  var String{80} key-word
+  read(user " ("): var key-word, copy glob.end
+  if glob.end = EOF
+    out more-lines := false
+    return
+  
+  out more-lines := true
+  if string-equal(user key-word, user ""): copy glob.flag
+    add-text(user "")
+    return
+  
+  var Func parser
+  if kv-find(user glob.key-word-map, user key-word): copy parser, copy glob.flag
+    parser()
+  
+  else-if glob.end = '('
+    parse-call()
+  
+  else
+    parse-assign()
+  
+  return
+
+
+func parse-lines()
+  var Bool flag
+  do
+    while parse-line(): copy flag
+  
+  return
+
+
+func create-key-word-map()
+  new Array{20:Key-value} key-word-map
+  kv-add(user key-word-map, copy 0, user "#", copy parse-comment)
+  kv-add(user key-word-map, copy 1, user "main", copy parse-main)
+  kv-add(user key-word-map, copy 2, user "func", copy parse-func)
+  kv-add(user key-word-map, copy 3, user "native", copy parse-native)
+  kv-add(user key-word-map, copy 4, user "var", copy parse-var)
+  kv-add(user key-word-map, copy 5, user "owner", copy parse-ref)
+  kv-add(user key-word-map, copy 6, user "user", copy parse-ref)
+  kv-add(user key-word-map, copy 7, user "new", copy parse-new)
+  kv-add(user key-word-map, copy 8, user "delete", copy parse-delete)
+  kv-add(user key-word-map, copy 9, user "if", copy parse-if)
+  kv-add(user key-word-map, copy 10, user "else", copy parse-else)
+  kv-add(user key-word-map, copy 11, user "else-if", copy parse-else-if)
+  kv-add(user key-word-map, copy 12, user "do", copy parse-do)
+  kv-add(user key-word-map, copy 13, user "while", copy parse-while)
+  kv-add(user key-word-map, copy 14, user "for", copy parse-for)
+  kv-add(user key-word-map, copy 15, user "return", copy parse-return)
+  kv-add(user key-word-map, copy 16, user "raise", copy parse-raise)
+  kv-add(user key-word-map, copy 17, user "out", copy parse-out)
+  kv-add(user key-word-map, copy 18, user "class", copy parse-class)
+  kv-add(user key-word-map, copy 19, user "[]", copy parse-array)
+  glob.key-word-map := key-word-map
+  return
+
+
+func init-glob-state(user St root)
+  glob.curr := root
+  glob.spaces := 0
+  return
+
 
 main func(user Array{String} argv)
-  # todo...
+  print(user "MR compiler start")
+  
+  array-length(user argv): copy glob.length
+  if glob.length != 3
+    print(user "usage: mr2-compiler [input MR file] [output C file]")
+    return
+  
+  # open files
+  user String infile-name
+  [] String infile-name := argv[1]
+  user String outfile-name
+  [] String outfile-name := argv[2]
+  file-open-read(user infile-name): owner glob.infile
+  file-open-write(user outfile-name): owner glob.outfile
+  
+  # init global data
+  owner St root
+  st-new(copy write-sons, user NULL, user NULL): owner root
+  create-key-word-map()
+  
+  # parse
+  print(user "parsing...")
+  init-glob-state(user root)
+  parse-lines()
+  
+  # write
+  print(user "writing...")
+  init-glob-state(user root)
+  root.writer()
+  
+  # close files
+  file-close(owner glob.infile)
+  file-close(owner glob.outfile)
+  
+  print(user "MR compiler end")
   return
 
