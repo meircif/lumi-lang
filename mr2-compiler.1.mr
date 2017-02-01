@@ -1,0 +1,7 @@
+# MR2 compiler - written in MR1
+
+
+main func(user Array{String} argv)
+  # todo...
+  return
+
