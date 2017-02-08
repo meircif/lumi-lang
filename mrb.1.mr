@@ -1,0 +1,76 @@
+# Builds executables from MR files
+# 
+# Gets one input file as "<name>.<MR version>.mr",
+# generates "<name>.c" file using <MR version> compiler,
+# and compiles it to "<name>.exe" executable using "gcc".
+# 
+# Supports MR0, MR1 & MR2.
+
+
+native func print(user String text)
+
+native func string-length(user String this): copy Int length
+native func string-get(user String this, copy Int index): copy Char ch
+native func string-copy(user String this, user String source)
+native func string-append(user String this, copy Char ch)
+native func string-concat(user String this, user String ext)
+
+native func array-length(user Array{} arr): copy Int length
+
+native func sys-system(user String command): copy Int status
+
+
+main func(user Array{String} argv)
+  var Int length(0)
+  array-length(user argv): copy length
+  if length != 2
+    print(user "usage: mrb [MR file name]")
+    return
+  
+  user String mr-file
+  [] String mr-file := argv[1]
+  string-length(user mr-file): copy length
+  if length < 6
+    print(user "MR file name too short")
+    return
+  
+  user String prefix(mr-file[0:length - 4])
+  var Char version
+  string-get(user mr-file, copy length - 4): copy version
+  if version < '0' or version > '2'
+    print(user "Unsupported MR version")
+    return
+  
+  # run MR compiler
+  var String{128} command
+  string-copy(user command, user "mr")
+  string-append(user command, copy version)
+  string-concat(user command, user "-compiler.exe ")
+  string-concat(user command, user mr-file)
+  string-append(user command, copy ' ')
+  string-concat(user command, user prefix)
+  string-append(user command, copy 'c')
+  
+  var Int status(0)
+  sys-system(user command): copy status
+  
+  # run C compiler
+  string-copy(user command, user "gcc ")
+  string-concat(user command, user prefix)
+  string-concat(user command, user "c ")
+  if version = '0'
+    string-concat(user command, user "mr0-file.c mr0-string.c")
+  
+  if version = '1'
+    string-concat(user command, user "mr.1.c")
+  
+  if version = '2'
+    string-concat(user command, user "mr.1.c")
+  
+  string-concat(user command, user " -o ")
+  string-concat(user command, user prefix)
+  string-concat(user command, user "exe")
+  sys-system(user command): copy status
+  
+  return
+
