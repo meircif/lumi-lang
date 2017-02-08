@@ -44,7 +44,8 @@ Returncode string_append(String* this, Char ch) {
 }
 
 Returncode string_replace(String this, Char old, Char new) {
-  for (int n = 0; n < this.actual_length; ++n) {
+  int n;
+  for (n = 0; n < this.actual_length; ++n) {
     if (this.chars[n] == old) {
       this.chars[n] = new;
     }

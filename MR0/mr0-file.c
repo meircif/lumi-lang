@@ -8,14 +8,6 @@ Returncode print(String text) {
   return OK;
 }
 
-Returncode file_open_read(void** file, String name) {
-  return open_file(file, name, "r");
-}
-
-Returncode file_open_write(void** file, String name) {
-  return open_file(file, name, "w");
-}
-
 Returncode open_file(void** file, String name, char* mode) {
   *file = NULL;
   *file = fopen(name.chars, mode);
@@ -23,6 +15,14 @@ Returncode open_file(void** file, String name, char* mode) {
     return ERR;
   }
   return OK;
+}
+
+Returncode file_open_read(void** file, String name) {
+  return open_file(file, name, "r");
+}
+
+Returncode file_open_write(void** file, String name) {
+  return open_file(file, name, "w");
 }
 
 Returncode file_close(void* file) {

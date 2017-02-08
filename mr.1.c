@@ -33,14 +33,6 @@ Array* new_array(int length, int value_size) {
 }
 
 /*Files*/
-Returncode file_open_read(String* name, void** file) {
-  return open_file(file, name, "r");
-}
-
-Returncode file_open_write(String* name, void** file) {
-  return open_file(file, name, "w");
-}
-
 Returncode open_file(void** file, String* name, char* mode) {
   *file = NULL;
   *file = fopen(name->chars, mode);
@@ -48,6 +40,14 @@ Returncode open_file(void** file, String* name, char* mode) {
     RAISE
   }
   return OK;
+}
+
+Returncode file_open_read(String* name, void** file) {
+  return open_file(file, name, "r");
+}
+
+Returncode file_open_write(String* name, void** file) {
+  return open_file(file, name, "w");
 }
 
 Returncode file_close(void* file) {
@@ -124,7 +124,8 @@ Returncode string_replace(String* this, Char old, Char new) {
   if (old == new) {
     return OK;
   }
-  for (int n = 0; n < this->actual_length; ++n) {
+  int n;
+  for (n = 0; n < this->actual_length; ++n) {
     if (this->chars[n] == old) {
       this->chars[n] = new;
     }
