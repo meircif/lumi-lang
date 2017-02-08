@@ -25,6 +25,10 @@ Returncode parse_line(Bool* more_lines, File infile, File outfile, Int spaces);
 
 
 Returncode write_csyle_char(File outfile, Char ch, Char prev) {
+  if (prev == '\'') {
+    file_putc(outfile, ch);
+    return OK;
+  }
   if (ch == 45 and prev != ' ') {
     file_putc(outfile, '_');
     return OK;

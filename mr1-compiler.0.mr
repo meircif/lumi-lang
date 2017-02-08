@@ -22,6 +22,10 @@ native func parse-line(out Bool more-lines, user File infile, user File outfile,
 
 
 func write-csyle-char(user File outfile, copy Char ch, copy Char prev)
+  if prev == '\''
+    file-putc(user outfile, copy ch)
+    return
+  
   if ch == 45 and prev != ' '
     file-putc(user outfile, copy '_')
     return
