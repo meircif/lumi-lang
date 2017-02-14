@@ -33,6 +33,9 @@ native type Generic
 
 
 func new-copy(user String text): owner String out-text
+  if text = NULL
+    raise
+  
   new String{text.actual-length + 1} new-text
   string-copy(user new-text, user text)
   out out-text := new-text
@@ -272,6 +275,9 @@ func write-csyle-char(copy Char ch, copy Char prev)
   return
 
 func write-cstyle(user String text)
+  if text = NULL
+    raise
+  
   var Char prev(' ')
   for index in text.actual-length
     var Char ch
@@ -372,26 +378,6 @@ func add-empty()
   add-node(copy write-empty, owner NULL)
   return
 
-# title
-func write-title(user String title)
-  write(user "/* #title <")
-  write(user title)
-  write(user "> */\n")
-  glob.spaces := glob.spaces + 2
-  write-sons()
-  glob.spaces := glob.spaces - 2
-  return
-
-
-func add-title(user String text)
-  owner String title
-  new-copy(user text): owner title
-  add-node(copy write-title, owner title)
-  # read rest of line
-  var String{256} ignore-line
-  read(user ""): var ignore-line, copy glob.end
-  return
-
 # comment
 func write-comment(user String comment-text)
   write(user "/* ")
@@ -405,10 +391,11 @@ func parse-comment()
   add-node(copy write-comment, owner comment)
   return
 
-# function helpers
+# expression and function
 class St-arg
   owner St-arg next
   owner String name
+  owner Generic value
   owner String typename
   owner String type-param
   owner String access
@@ -417,6 +404,119 @@ class St-func
   owner String name
   owner St-arg params
   owner St-arg outputs
+
+class St-exp
+  owner St-exp next
+  owner String operator
+  owner String item
+  owner St-func call
+  owner St-exp subexp
+
+func real-string-length(user String text): copy Int length
+  var Int index(1)
+  var Int real-length(1)
+  var Int text-length(text.actual-length - 1)
+  do
+    while index < text-length
+    if string-get(user text, copy index): copy glob.end = '\\'
+      index := index + 1
+    
+    real-length := real-length + 1
+    index := index + 1
+  
+  out length := real-length
+  return
+
+func write-exp(user St-exp st-exp)
+  if st-exp = NULL
+    raise
+  
+  if st-exp.call != NULL
+    user St-arg last(st-exp.call.outputs)
+    if last = NULL
+      raise
+    
+    do
+      while last.next != NULL
+      last := last.next
+    
+    write-cstyle(user last.name)
+  
+  else-if st-exp.item = NULL
+    if st-exp.subexp != NULL
+      write(user "(")
+      write-exp(user st-exp.subexp)
+      write(user ")")
+    
+  
+  else
+    if string-get(user st-exp.item, user 0): copy glob.end = '"'
+      real-string-length(user st-exp.item): copy glob.length
+      var String{80} length-str
+      write(user "&(String){")
+      int-to-string(copy glob.length): var length-str
+      write(user length-str)
+      write(user ", ")
+      glob.length := glob.length - 1
+      int-to-string(copy glob.length): var length-str
+      write(user length-str)
+      write(user ", ")
+      write(user st-exp.item)
+      write(user "}")
+    
+    else
+      write-cstyle(user st-exp.item)
+    
+  
+  if st-exp.operator != NULL
+    write(user " ")
+    write-cstyle(user st-exp.operator)
+  
+  if st-exp.next != NULL
+    write(user " ")
+    write-exp(user st-exp.next)
+  
+  return
+
+func write-func-call(user St-func st-func)
+  write(user "CHECK(")
+  write-cstyle(user st-func.name)
+  write(user "(")
+  user St-arg arg(st-func.params)
+  do
+    while arg != NULL
+    write-exp(user arg.value)
+    arg := arg.next
+    if arg != NULL or st-func.outputs != NULL
+      write(user ", ")
+    
+  
+  arg := st-func.outputs
+  do
+    while arg != NULL
+    if string-equal(user arg.access, user "var"): copy glob.flag = false
+      write(copy "&")
+    
+    write-cstyle(user arg.name)
+    arg := arg.next
+    if arg != NULL
+      write(user ", ")
+    
+  
+  write(user "))")
+  return
+
+func write-exp-call(user St-exp st-exp)
+  user St-exp exp(st-exp)
+  do
+    while exp != NULL
+    if exp.call != NULL
+      write-func-call(user exp.call)
+      write(user " ")
+    
+    exp := exp.next
+  
+  return
 
 func write-args(user St-arg first, copy Bool is-out, user St-arg next)
   user St-arg arg(first)
@@ -446,6 +546,8 @@ func write-func-header(user St-func st-func)
   write-args(user st-func.outputs, copy true, user NULL)
   write(user ")")
   return
+
+native func parse-exp(user String exp-ends): owner St-exp new-st-exp, copy Char out-end
 
 func parse-func-header(user String name): owner St-func st-func, copy Char end
   new St-func new-func
@@ -480,7 +582,16 @@ func parse-func-header(user String name): owner St-func st-func, copy Char end
         readc(): copy glob.end
       
     
-    read-new(user ",)"): owner param.name, copy glob.end
+    if name = NULL
+      read-new(user ",)"): owner param.name, copy glob.end
+      param.value := NULL
+    
+    else
+      owner St-exp value 
+      parse-exp(user ",)"): owner value, copy glob.end
+      param.value := value
+      param.name := NULL
+    
     if last = NULL
       new-func.params := param
     
@@ -517,6 +628,39 @@ func parse-func-header(user String name): owner St-func st-func, copy Char end
   
   out st-func := new-func
   out end := glob.end
+  return
+
+func parse-exp(user String exp-ends): owner St-exp new-st-exp, copy Char out-end
+  new St-exp st-exp
+  st-exp.next := NULL
+  st-exp.operator := NULL
+  st-exp.call := NULL
+  st-exp.subexp := NULL
+  var String{16} ends
+  string-copy(user ends, user " ([")
+  string-concat(user ends, user exp-ends)
+  var Char end
+  if read-new(user ends): owner st-exp.item, copy end = '('
+    if st-exp.item.actual-length > 0
+      parse-func-header(user st-exp.item): owner st-exp.call, copy end
+    
+    else
+      parse-exp(user ")"): owner st-exp.subexp, copy end
+      readc(): copy end
+    
+    delete st-exp.item
+    st-exp.item := NULL
+  
+  else-if end  = '['
+    parse-exp(user "]"): owner st-exp.subexp, copy end
+    readc(): copy end
+  
+  if end = ' '
+    read-new(user " "): owner st-exp.operator, copy end
+    parse-exp(user exp-ends): owner st-exp.next, copy end
+  
+  out new-st-exp := st-exp
+  out out-end := end
   return
 
 # func
@@ -871,123 +1015,6 @@ func parse-delete()
   add-node(copy write-delete, owner name)
   return
 
-# expression
-class St-exp
-  owner St-exp next
-  owner String operator
-  owner String item
-  owner St-func call
-
-func real-string-length(user String text): copy Int length
-  var Int index(1)
-  var Int real-length(1)
-  var Int text-length(text.actual-length - 1)
-  do
-    while index < text-length
-    if string-get(user text, copy index): copy glob.end = '\\'
-      index := index + 1
-    
-    real-length := real-length + 1
-    index := index + 1
-  
-  out length := real-length
-  return
-
-func write-func-call(user St-func st-func)
-  write(user "CHECK(")
-  write-cstyle(user st-func.name)
-  write(user "(")
-  user St-arg arg(st-func.params)
-  do
-    while arg != NULL
-    if string-get(user arg.name, user 0): copy glob.end = '"'
-      real-string-length(user arg.name): copy glob.length
-      var String{80} length-str
-      write(user "&(String){")
-      int-to-string(copy glob.length): var length-str
-      write(user length-str)
-      write(user ", ")
-      glob.length := glob.length - 1
-      int-to-string(copy glob.length): var length-str
-      write(user length-str)
-      write(user ", ")
-      write(user arg.name)
-      write(user "}")
-    
-    else
-      write-cstyle(user arg.name)
-    
-    arg := arg.next
-    if arg != NULL or st-func.outputs != NULL
-      write(user ", ")
-    
-  
-  arg := st-func.outputs
-  do
-    while arg != NULL
-    if string-equal(user arg.access, user "var"): copy glob.flag = false
-      write(copy "&")
-    
-    write-cstyle(user arg.name)
-    arg := arg.next
-    if arg != NULL
-      write(user ", ")
-    
-  
-  write(user "))")
-  return
-
-func write-exp-call(user St-exp st-exp)
-  user St-exp exp(st-exp)
-  do
-    while exp != NULL
-    if exp.call != NULL
-      write-func-call(user exp.call)
-      write(user " ")
-    
-    exp := exp.next
-  
-  return
-
-func write-exp(user St-exp st-exp)
-  if st-exp.call != NULL
-    user St-arg last(st-exp.call.outputs)
-    if last = NULL
-      raise
-    
-    do
-      while last.next != NULL
-      last := last.next
-    
-    write-cstyle(user last.name)
-    
-  
-  else
-    write-cstyle(user st-exp.item)
-  
-  if st-exp.operator != NULL
-    write(user " ")
-    write-cstyle(user st-exp.operator)
-  
-  return
-
-func parse-exp(): owner St-exp new-st-exp
-  new St-exp st-exp
-  st-exp.next := NULL
-  st-exp.operator := NULL
-  st-exp.call := NULL
-  var Char end
-  if read-new(user " ("): owner st-exp.item, copy end = '('
-    parse-func-header(user st-exp.item): owner st-exp.call, copy end
-    delete st-exp.item
-    st-exp.item := NULL
-  
-  if end = ' '
-    read-new(user ""): owner st-exp.operator, copy end
-  
-  out new-st-exp := st-exp
-  return
-
 # if
 func write-if(user St-exp st-exp)
   write-exp-call(user st-exp)
@@ -999,7 +1026,7 @@ func write-if(user St-exp st-exp)
 
 func parse-if()
   owner St-exp st-exp
-  parse-exp(): owner st-exp
+  parse-exp(user ""): owner st-exp, copy glob.end
   add-node(copy write-if, owner st-exp)
   start-block()
   return
@@ -1026,7 +1053,7 @@ func write-else-if(user St-exp st-exp)
 
 func parse-else-if()
   owner St-exp st-exp
-  parse-exp(): owner st-exp
+  parse-exp(user ""): owner st-exp, copy glob.end
   add-node(copy write-else-if, owner st-exp)
   start-block()
   return
@@ -1052,7 +1079,7 @@ func write-while(user St-exp st-exp)
 
 func parse-while()
   owner St-exp st-exp
-  parse-exp(): owner st-exp
+  parse-exp(user ""): owner st-exp, copy glob.end
   add-node(copy write-while, owner st-exp)
   return
 
@@ -1082,7 +1109,7 @@ func parse-for()
   read-new(user " "): owner st-for.counter, copy glob.end
   # ignore "in "
   read-ignore(copy 3)
-  parse-exp(): owner st-for.limit
+  parse-exp(user ""): owner st-for.limit, copy glob.end
   add-node(copy write-for, owner st-for)
   start-block()
   return
@@ -1125,23 +1152,23 @@ func parse-class()
   start-block()
   return
 
-# ... array
+# array
 class St-array
   owner String typename
   owner String array
+  owner St-exp index
   owner String variable
-  owner String index
-  var Bool is-set
+  owner St-exp value
 
 func write-array(user St-array st-array)
   write(user "if (")
-  write-cstyle(user st-array.index)
+  write-exp(user st-array.index)
   write(user " < 0 || ")
-  write-cstyle(user st-array.index)
+  write-exp(user st-array.index)
   write(user " >= ")
   write-cstyle(user st-array.array)
   write(user "->length) RAISE ")
-  if not st-array.is-set
+  if st-array.variable != NULL
     write-cstyle(user st-array.variable)
     write(user " = ")
   
@@ -1150,18 +1177,18 @@ func write-array(user St-array st-array)
   write(user "*)(")
   write-cstyle(user st-array.array)
   write(user "->values))")
-  if is-primitive(user st-array.typename): copt glob.flag or st-array.is-set
+  if is-primitive(user st-array.typename): copt glob.flag or st-array.value != NULL
     write(user "[")
-    write-cstyle(user st-array.index)
+    write-exp(user st-array.index)
     write(user "]")
   
   else
     write(user " + ")
-    write-cstyle(user st-array.index)
+    write-exp(user st-array.index)
   
-  if st-array.is-set
+  if st-array.value != NULL
     write(user " = ")
-    write-cstyle(user st-array.variable)
+    write-exp(user st-array.value)
   
   write(user ";\n")
   return
@@ -1170,20 +1197,21 @@ func parse-array()
   new St-array st-array
   read-new(user " "): owner st-array.typename, copy glob.end
   owner String target
-  st-array.is-set := read-new(user " ["): owner target, copy glob.end = '['
-  if st-array.is-set
+  if read-new(user " ["): owner target, copy glob.end = '['
     st-array.array := target
-    read-new(user "]"): owner st-array.index, copy glob.end
-    # ignore ":= "
-    read-ignore(copy 3)
-    read-new(user ""): owner st-array.variable, copy glob.end
+    st-array.variable := NULL
+    parse-exp(user "]"): owner st-array.index, copy glob.end
+    # ignore " := "
+    read-ignore(copy 4)
+    parse-exp(user ""): owner st-array.value, copy glob.end
   
   else
     st-array.variable := target
+    st-array.value := NULL
     # ignore ":= "
     read-ignore(copy 3)
     read-new(user "["): owner st-array.array, copy glob.end
-    read-new(user "]"): owner st-array.index, copy glob.end
+    parse-exp(user "]"): owner st-array.index, copy glob.end
     readc(): copy glob.end
   
   add-node(copy write-array, owner st-array)
@@ -1219,7 +1247,7 @@ func parse-assign-exp(owner String name, copy Func writer)
   st-assign.name := name
   # ignore ":= "
   read-ignore(copy 3)
-  parse-exp(): owner st-assign.value
+  parse-exp(user ""): owner st-assign.value, copy glob.end
   add-node(copy writer, owner st-assign)
   start-block()
   return

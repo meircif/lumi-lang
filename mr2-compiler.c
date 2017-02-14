@@ -35,6 +35,9 @@ typedef void Generic;
 
 
 Returncode new_copy(String* text, String** out_text) {
+  if (text == NULL) {
+    RAISE
+  }
   String* new_text = new_string(text->actual_length + 1); if (new_text == NULL) RAISE
   CHECK(string_copy(new_text, text))
   *out_text = new_text;
@@ -274,6 +277,9 @@ Returncode write_csyle_char(Char ch, Char prev) {
   return OK;
 }
 Returncode write_cstyle(String* text) {
+  if (text == NULL) {
+    RAISE
+  }
   Char prev = ' ';
   Int index; for (index = 0; index < text->actual_length; ++index) {
     Char ch;
@@ -374,26 +380,6 @@ Returncode add_empty() {
   CHECK(add_node(write_empty, NULL))
   return OK;
 }
-/* title */
-Returncode write_title(String* title) {
-  CHECK(write(&(String){12, 11, "/* #title <"}))
-  CHECK(write(title))
-  CHECK(write(&(String){6, 5, "> */\n"}))
-  glob->spaces = glob->spaces + 2;
-  CHECK(write_sons())
-  glob->spaces = glob->spaces - 2;
-  return OK;
-}
-
-Returncode add_title(String* text) {
-  String* title;
-  CHECK(new_copy(text, &title))
-  CHECK(add_node(write_title, title))
-  /* read rest of line */
-  String* ignore_line = &(String){256, 0, (char[256]){0}};
-  CHECK(read(&(String){1, 0, ""}, ignore_line, &glob->end))
-  return OK;
-}
 /* comment */
 Returncode write_comment(String* comment_text) {
   CHECK(write(&(String){4, 3, "/* "}))
@@ -407,10 +393,11 @@ Returncode parse_comment() {
   CHECK(add_node(write_comment, comment))
   return OK;
 }
-/* function helpers */
+/* expression and function */
 typedef struct St_arg St_arg; struct St_arg {
   St_arg* next;
   String* name;
+  Generic* value;
   String* typename;
   String* type_param;
   String* access;
@@ -420,6 +407,119 @@ typedef struct St_func St_func; struct St_func {
   St_arg* params;
   St_arg* outputs;
 };
+typedef struct St_exp St_exp; struct St_exp {
+  St_exp* next;
+  String* operator;
+  String* item;
+  St_func* call;
+  St_exp* subexp;
+};
+Returncode real_string_length(String* text, Int* length) {
+  Int index = 1;
+  Int real_length = 1;
+  Int text_length = text->actual_length - 1;
+  while (true) {
+    if (not(index < text_length)) break;
+    CHECK(string_get(text, index, &glob->end)) if (glob->end == '\\') {
+      index = index + 1;
+    }
+    real_length = real_length + 1;
+    index = index + 1;
+  }
+  *length = real_length;
+  return OK;
+}
+Returncode write_exp(St_exp* st_exp) {
+  if (st_exp == NULL) {
+    RAISE
+  }
+  if (st_exp->call != NULL) {
+    St_arg* last = st_exp->call->outputs;
+    if (last == NULL) {
+      RAISE
+    }
+    while (true) {
+      if (not(last->next != NULL)) break;
+      last = last->next;
+    }
+    CHECK(write_cstyle(last->name))
+  }
+  else if (st_exp->item == NULL) {
+    if (st_exp->subexp != NULL) {
+      CHECK(write(&(String){2, 1, "("}))
+      CHECK(write_exp(st_exp->subexp))
+      CHECK(write(&(String){2, 1, ")"}))
+    }
+  }
+  else {
+    CHECK(string_get(st_exp->item, 0, &glob->end)) if (glob->end == '"') {
+      CHECK(real_string_length(st_exp->item, &glob->length))
+      String* length_str = &(String){80, 0, (char[80]){0}};
+      CHECK(write(&(String){11, 10, "&(String){"}))
+      CHECK(int_to_string(glob->length, length_str))
+      CHECK(write(length_str))
+      CHECK(write(&(String){3, 2, ", "}))
+      glob->length = glob->length - 1;
+      CHECK(int_to_string(glob->length, length_str))
+      CHECK(write(length_str))
+      CHECK(write(&(String){3, 2, ", "}))
+      CHECK(write(st_exp->item))
+      CHECK(write(&(String){2, 1, "}"}))
+    }
+    else {
+      CHECK(write_cstyle(st_exp->item))
+    }
+  }
+  if (st_exp->operator != NULL) {
+    CHECK(write(&(String){2, 1, " "}))
+    CHECK(write_cstyle(st_exp->operator))
+  }
+  if (st_exp->next != NULL) {
+    CHECK(write(&(String){2, 1, " "}))
+    CHECK(write_exp(st_exp->next))
+  }
+  return OK;
+}
+Returncode write_func_call(St_func* st_func) {
+  CHECK(write(&(String){7, 6, "CHECK("}))
+  CHECK(write_cstyle(st_func->name))
+  CHECK(write(&(String){2, 1, "("}))
+  St_arg* arg = st_func->params;
+  while (true) {
+    if (not(arg != NULL)) break;
+    CHECK(write_exp(arg->value))
+    arg = arg->next;
+    if (arg != NULL or st_func->outputs != NULL) {
+      CHECK(write(&(String){3, 2, ", "}))
+    }
+  }
+  arg = st_func->outputs;
+  while (true) {
+    if (not(arg != NULL)) break;
+    CHECK(string_equal(arg->access, &(String){4, 3, "var"}, &glob->flag)) if (glob->flag == false) {
+      CHECK(write(&(String){2, 1, "&"}))
+    }
+    CHECK(write_cstyle(arg->name))
+    arg = arg->next;
+    if (arg != NULL) {
+      CHECK(write(&(String){3, 2, ", "}))
+    }
+  }
+  CHECK(write(&(String){3, 2, "))"}))
+  return OK;
+}
+Returncode write_exp_call(St_exp* st_exp) {
+  St_exp* exp = st_exp;
+  while (true) {
+    if (not(exp != NULL)) break;
+    if (exp->call != NULL) {
+      CHECK(write_func_call(exp->call))
+      CHECK(write(&(String){2, 1, " "}))
+    }
+    exp = exp->next;
+  }
+  return OK;
+}
 Returncode write_args(St_arg* first, Bool is_out, St_arg* next) {
   St_arg* arg = first;
   while (true) {
@@ -449,6 +549,8 @@ Returncode write_func_header(St_func* st_func) {
   CHECK(write(&(String){2, 1, ")"}))
   return OK;
 }
+Returncode parse_exp(String* exp_ends, St_exp** new_st_exp, Char* out_end);
+
 Returncode parse_func_header(String* name, St_func** st_func, Char* end) {
   St_func* new_func = malloc(sizeof(St_func)); if (new_func == NULL) RAISE
   if (name == NULL) {
@@ -482,7 +584,16 @@ Returncode parse_func_header(String* name, St_func** st_func, Char* end) {
         CHECK(readc(&glob->end))
       }
     }
-    CHECK(read_new(&(String){3, 2, ",)"}, &param->name, &glob->end))
+    if (name == NULL) {
+      CHECK(read_new(&(String){3, 2, ",)"}, &param->name, &glob->end))
+      param->value = NULL;
+    }
+    else {
+      St_exp* value ;
+      CHECK(parse_exp(&(String){3, 2, ",)"}, &value, &glob->end))
+      param->value = value;
+      param->name = NULL;
+    }
     if (last == NULL) {
       new_func->params = param;
     }
@@ -519,6 +630,39 @@ Returncode parse_func_header(String* name, St_func** st_func, Char* end) {
   }
   *st_func = new_func;
   *end = glob->end;
+  return OK;
+}
+Returncode parse_exp(String* exp_ends, St_exp** new_st_exp, Char* out_end) {
+  St_exp* st_exp = malloc(sizeof(St_exp)); if (st_exp == NULL) RAISE
+  st_exp->next = NULL;
+  st_exp->operator = NULL;
+  st_exp->call = NULL;
+  st_exp->subexp = NULL;
+  String* ends = &(String){16, 0, (char[16]){0}};
+  CHECK(string_copy(ends, &(String){4, 3, " (["}))
+  CHECK(string_concat(ends, exp_ends))
+  Char end;
+  CHECK(read_new(ends, &st_exp->item, &end)) if (end == '(') {
+    if (st_exp->item->actual_length > 0) {
+      CHECK(parse_func_header(st_exp->item, &st_exp->call, &end))
+    }
+    else {
+      CHECK(parse_exp(&(String){2, 1, ")"}, &st_exp->subexp, &end))
+      CHECK(readc(&end))
+    }
+    free(st_exp->item);
+    st_exp->item = NULL;
+  }
+  else if (end  == '[') {
+    CHECK(parse_exp(&(String){2, 1, "]"}, &st_exp->subexp, &end))
+    CHECK(readc(&end))
+  }
+  if (end == ' ') {
+    CHECK(read_new(&(String){2, 1, " "}, &st_exp->operator, &end))
+    CHECK(parse_exp(exp_ends, &st_exp->next, &end))
+  }
+  *new_st_exp = st_exp;
+  *out_end = end;
   return OK;
 }
 /* func */
@@ -873,123 +1017,6 @@ Returncode parse_delete() {
   CHECK(add_node(write_delete, name))
   return OK;
 }
-/* expression */
-typedef struct St_exp St_exp; struct St_exp {
-  St_exp* next;
-  String* operator;
-  String* item;
-  St_func* call;
-};
-Returncode real_string_length(String* text, Int* length) {
-  Int index = 1;
-  Int real_length = 1;
-  Int text_length = text->actual_length - 1;
-  while (true) {
-    if (not(index < text_length)) break;
-    CHECK(string_get(text, index, &glob->end)) if (glob->end == '\\') {
-      index = index + 1;
-    }
-    real_length = real_length + 1;
-    index = index + 1;
-  }
-  *length = real_length;
-  return OK;
-}
-Returncode write_func_call(St_func* st_func) {
-  CHECK(write(&(String){7, 6, "CHECK("}))
-  CHECK(write_cstyle(st_func->name))
-  CHECK(write(&(String){2, 1, "("}))
-  St_arg* arg = st_func->params;
-  while (true) {
-    if (not(arg != NULL)) break;
-    CHECK(string_get(arg->name, 0, &glob->end)) if (glob->end == '"') {
-      CHECK(real_string_length(arg->name, &glob->length))
-      String* length_str = &(String){80, 0, (char[80]){0}};
-      CHECK(write(&(String){11, 10, "&(String){"}))
-      CHECK(int_to_string(glob->length, length_str))
-      CHECK(write(length_str))
-      CHECK(write(&(String){3, 2, ", "}))
-      glob->length = glob->length - 1;
-      CHECK(int_to_string(glob->length, length_str))
-      CHECK(write(length_str))
-      CHECK(write(&(String){3, 2, ", "}))
-      CHECK(write(arg->name))
-      CHECK(write(&(String){2, 1, "}"}))
-    }
-    else {
-      CHECK(write_cstyle(arg->name))
-    }
-    arg = arg->next;
-    if (arg != NULL or st_func->outputs != NULL) {
-      CHECK(write(&(String){3, 2, ", "}))
-    }
-  }
-  arg = st_func->outputs;
-  while (true) {
-    if (not(arg != NULL)) break;
-    CHECK(string_equal(arg->access, &(String){4, 3, "var"}, &glob->flag)) if (glob->flag == false) {
-      CHECK(write(&(String){2, 1, "&"}))
-    }
-    CHECK(write_cstyle(arg->name))
-    arg = arg->next;
-    if (arg != NULL) {
-      CHECK(write(&(String){3, 2, ", "}))
-    }
-  }
-  CHECK(write(&(String){3, 2, "))"}))
-  return OK;
-}
-Returncode write_exp_call(St_exp* st_exp) {
-  St_exp* exp = st_exp;
-  while (true) {
-    if (not(exp != NULL)) break;
-    if (exp->call != NULL) {
-      CHECK(write_func_call(exp->call))
-      CHECK(write(&(String){2, 1, " "}))
-    }
-    exp = exp->next;
-  }
-  return OK;
-}
-Returncode write_exp(St_exp* st_exp) {
-  if (st_exp->call != NULL) {
-    St_arg* last = st_exp->call->outputs;
-    if (last == NULL) {
-      RAISE
-    }
-    while (true) {
-      if (not(last->next != NULL)) break;
-      last = last->next;
-    }
-    CHECK(write_cstyle(last->name))
-    
-  }
-  else {
-    CHECK(write_cstyle(st_exp->item))
-  }
-  if (st_exp->operator != NULL) {
-    CHECK(write(&(String){2, 1, " "}))
-    CHECK(write_cstyle(st_exp->operator))
-  }
-  return OK;
-}
-Returncode parse_exp(St_exp** new_st_exp) {
-  St_exp* st_exp = malloc(sizeof(St_exp)); if (st_exp == NULL) RAISE
-  st_exp->next = NULL;
-  st_exp->operator = NULL;
-  st_exp->call = NULL;
-  Char end;
-  CHECK(read_new(&(String){3, 2, " ("}, &st_exp->item, &end)) if (end == '(') {
-    CHECK(parse_func_header(st_exp->item, &st_exp->call, &end))
-    free(st_exp->item);
-    st_exp->item = NULL;
-  }
-  if (end == ' ') {
-    CHECK(read_new(&(String){1, 0, ""}, &st_exp->operator, &end))
-  }
-  *new_st_exp = st_exp;
-  return OK;
-}
 /* if */
 Returncode write_if(St_exp* st_exp) {
   CHECK(write_exp_call(st_exp))
@@ -1001,7 +1028,7 @@ Returncode write_if(St_exp* st_exp) {
 }
 Returncode parse_if() {
   St_exp* st_exp;
-  CHECK(parse_exp(&st_exp))
+  CHECK(parse_exp(&(String){1, 0, ""}, &st_exp, &glob->end))
   CHECK(add_node(write_if, st_exp))
   CHECK(start_block())
   return OK;
@@ -1028,7 +1055,7 @@ Returncode write_else_if(St_exp* st_exp) {
 }
 Returncode parse_else_if() {
   St_exp* st_exp;
-  CHECK(parse_exp(&st_exp))
+  CHECK(parse_exp(&(String){1, 0, ""}, &st_exp, &glob->end))
   CHECK(add_node(write_else_if, st_exp))
   CHECK(start_block())
   return OK;
@@ -1054,7 +1081,7 @@ Returncode write_while(St_exp* st_exp) {
 }
 Returncode parse_while() {
   St_exp* st_exp;
-  CHECK(parse_exp(&st_exp))
+  CHECK(parse_exp(&(String){1, 0, ""}, &st_exp, &glob->end))
   CHECK(add_node(write_while, st_exp))
   return OK;
 }
@@ -1084,7 +1111,7 @@ Returncode parse_for() {
   CHECK(read_new(&(String){2, 1, " "}, &st_for->counter, &glob->end))
   /* ignore "in " */
   CHECK(read_ignore(3))
-  CHECK(parse_exp(&st_for->limit))
+  CHECK(parse_exp(&(String){1, 0, ""}, &st_for->limit, &glob->end))
   CHECK(add_node(write_for, st_for))
   CHECK(start_block())
   return OK;
@@ -1127,23 +1154,23 @@ Returncode parse_class() {
   CHECK(start_block())
   return OK;
 }
-/* ... array */
+/* array */
 typedef struct St_array St_array; struct St_array {
   String* typename;
   String* array;
+  St_exp* index;
   String* variable;
-  String* index;
-  Bool is_set;
+  St_exp* value;
 };
 Returncode write_array(St_array* st_array) {
   CHECK(write(&(String){5, 4, "if ("}))
-  CHECK(write_cstyle(st_array->index))
+  CHECK(write_exp(st_array->index))
   CHECK(write(&(String){9, 8, " < 0 || "}))
-  CHECK(write_cstyle(st_array->index))
+  CHECK(write_exp(st_array->index))
   CHECK(write(&(String){5, 4, " >= "}))
   CHECK(write_cstyle(st_array->array))
   CHECK(write(&(String){17, 16, "->length) RAISE "}))
-  if (not st_array->is_set) {
+  if (st_array->variable != NULL) {
     CHECK(write_cstyle(st_array->variable))
     CHECK(write(&(String){4, 3, " = "}))
   }
@@ -1152,18 +1179,18 @@ Returncode write_array(St_array* st_array) {
   CHECK(write(&(String){4, 3, "*)("}))
   CHECK(write_cstyle(st_array->array))
   CHECK(write(&(String){11, 10, "->values))"}))
-  CHECK(is_primitive(st_array->typename, &glob->flag)) if (glob->flag or st_array->is_set) {
+  CHECK(is_primitive(st_array->typename, &glob->flag)) if (glob->flag or st_array->value != NULL) {
     CHECK(write(&(String){2, 1, "["}))
-    CHECK(write_cstyle(st_array->index))
+    CHECK(write_exp(st_array->index))
     CHECK(write(&(String){2, 1, "]"}))
   }
   else {
     CHECK(write(&(String){4, 3, " + "}))
-    CHECK(write_cstyle(st_array->index))
+    CHECK(write_exp(st_array->index))
   }
-  if (st_array->is_set) {
+  if (st_array->value != NULL) {
     CHECK(write(&(String){4, 3, " = "}))
-    CHECK(write_cstyle(st_array->variable))
+    CHECK(write_exp(st_array->value))
   }
   CHECK(write(&(String){3, 2, ";\n"}))
   return OK;
@@ -1172,20 +1199,21 @@ Returncode parse_array() {
   St_array* st_array = malloc(sizeof(St_array)); if (st_array == NULL) RAISE
   CHECK(read_new(&(String){2, 1, " "}, &st_array->typename, &glob->end))
   String* target;
-  CHECK(read_new(&(String){3, 2, " ["}, &target, &glob->end)) st_array->is_set = glob->end == '[';
-  if (st_array->is_set) {
+  CHECK(read_new(&(String){3, 2, " ["}, &target, &glob->end)) if (glob->end == '[') {
     st_array->array = target;
-    CHECK(read_new(&(String){2, 1, "]"}, &st_array->index, &glob->end))
-    /* ignore ":= " */
-    CHECK(read_ignore(3))
-    CHECK(read_new(&(String){1, 0, ""}, &st_array->variable, &glob->end))
+    st_array->variable = NULL;
+    CHECK(parse_exp(&(String){2, 1, "]"}, &st_array->index, &glob->end))
+    /* ignore " := " */
+    CHECK(read_ignore(4))
+    CHECK(parse_exp(&(String){1, 0, ""}, &st_array->value, &glob->end))
   }
   else {
     st_array->variable = target;
+    st_array->value = NULL;
     /* ignore ":= " */
     CHECK(read_ignore(3))
     CHECK(read_new(&(String){2, 1, "["}, &st_array->array, &glob->end))
-    CHECK(read_new(&(String){2, 1, "]"}, &st_array->index, &glob->end))
+    CHECK(parse_exp(&(String){2, 1, "]"}, &st_array->index, &glob->end))
     CHECK(readc(&glob->end))
   }
   CHECK(add_node(write_array, st_array))
@@ -1221,7 +1249,7 @@ Returncode parse_assign_exp(String* name, Func writer) {
   st_assign->name = name;
   /* ignore ":= " */
   CHECK(read_ignore(3))
-  CHECK(parse_exp(&st_assign->value))
+  CHECK(parse_exp(&(String){1, 0, ""}, &st_assign->value, &glob->end))
   CHECK(add_node(writer, st_assign))
   CHECK(start_block())
   return OK;
