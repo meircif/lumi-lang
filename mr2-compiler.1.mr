@@ -31,36 +31,91 @@ native func sys-getenv(user String name): copy Bool exists, var String value
 
 native type Generic
 
+
+func new-copy(user String text): owner String out-text
+  new String{text.actual-length + 1} new-text
+  string-copy(user new-text, user text)
+  out out-text := new-text
+  return
+
+
 # Function Map
-class Key-value
+class Func-map
   owner String key
   var Func value
 
-func kv-add(user Array{Key-value} map, copy Int index, user String key, copy Func value)
-  var Key-value kv
-  [] Key-value kv := map[index]
-  var Int length(0)
-  string-length(user key): copy length
-  new String{length} new-key
-  string-copy(user new-key, user key)
-  kv.key := new-key
-  kv.value := value
+func fm-add(user Array{Func-map} map, copy Int index, user String key, copy Func value)
+  var Func-map fm
+  [] Func-map fm := map[index]
+  new-copy(user key): owner fm.key
+  fm.value := value
   return
 
-func kv-find(user Array{Key-value} map, user String key): copy Func value, copy Bool found
-  var Int length
-  array-length(user map): copy length
-  for n in length
-    var Key-value kv
-    [] Key-value kv := map[n]
+func fm-find(user Array{Func-map} map, user String key): copy Func value, copy Bool found
+  for n in map.length
+    var Func-map fm
+    [] Func-map fm := map[n]
     var Bool flag
-    if string-equal(user key, user kv.key): copy flag
+    if string-equal(user key, user fm.key): copy flag
       out found := true
-      out value := kv.value
+      out value := fm.value
       return
     
   
   out found := false
+  return
+
+# Name Map
+class Name-map
+  owner Name-map next
+  user String name
+  owner Generic value
+
+class Type-attrs
+  owner String name
+  owner Name-map members
+
+class Var-attrs
+  owner String name
+  owner String typename
+  user Type-attrs type-attrs
+  user Type-attrs subtype
+  owner String access
+  var Bool is-out
+
+func nm-init(user String name, owner Generic value): owner Name-map nm-ptr
+  new Name-map nm
+  nm.next := nm-ptr[0]
+  nm.name := name
+  nm.value := value
+  out nm-ptr := nm
+  return
+
+func nm-find(user Name-map self, user String name): user Generic value
+  user Name-map nm(self)
+  do
+    while nm != NULL
+    var Bool equal
+    if string-equal(user nm.name, user name): copy equal
+      out value := nm.value
+      return
+    
+    nm := nm.next
+  
+  var String{256} msg
+  string-copy(user msg, user "Undefined type ")
+  string-concat(user msg, user name)
+  print(user msg)
+  raise
+
+func add-member(user String name, user Type-attrs type-attrs, user Type-attrs subtype): owner Name-map members
+  new Var-attrs new-var
+  new-copy(user name): owner new-var.name
+  new-copy(user type-attrs.name): owner new-var.typename
+  new-var.type-attrs := type-attrs
+  new-var.subtype := subtype
+  new-var.is-out := false
+  nm-init(user new-var.name, owner new-var): var members
   return
 
 # Syntax Tree
@@ -72,7 +127,7 @@ class St
   var Func writer
   owner Generic value
 
-func St-new(copy Func writer, owner Generic value, user St father): owner St res
+func st-new(copy Func writer, owner Generic value, user St father): owner St res
   new St self
   self.next-brother := NULL
   self.firSt-son := NULL
@@ -92,12 +147,12 @@ func St-new(copy Func writer, owner Generic value, user St father): owner St res
   
   return
 
-func St-del(owner St self)
+func st-del(owner St self)
   if self = NULL
     return
   
-  St-del(owner self.firSt-son)
-  St-del(owner self.next-brother)
+  st-del(owner self.firSt-son)
+  st-del(owner self.next-brother)
   delete self
   return
 
@@ -106,16 +161,27 @@ class Global-data
   # data
   owner File infile
   owner File outfile
-  user Array{Key-value} key-word-map
+  user Array{Func-map} key-word-map
+  owner Name-map type-map
+  owner Name-map var-map
   # state
   user St curr
   var Int spaces
+  user Type-attrs class-attrs
   # vars
   var Int length
   var Bool flag
   var Char end
 
 var Global-data glob
+
+func add-type(user String name, owner Name-map members)
+  new Type-attrs new-type
+  new-copy(user name): owner new-type.name
+  new-type.members := members
+  new Name-map nm
+  nm-init(user new-type.name, user new-type): owner glob.type-map
+  return
 
 # read helpers
 func readc(): copy Char ch
@@ -172,13 +238,6 @@ func read(user String ends): var String text, copy Char end
   read-indent(user ends, copy false): var text, var end, copy spaces
   return
 
-func new-copy(user String text): owner String out-text
-  string-length(user text): copy glob.length
-  new String{glob.length + 1} new-text
-  string-copy(user new-text, user text)
-  out out-text := new-text
-  return
-
 func read-new(user String ends): owner String out-text, copy Char end
   var String{256} text
   read(user ends): var text, var end
@@ -211,8 +270,7 @@ func write-csyle-char(copy Char ch, copy Char prev)
 
 func write-cstyle(user String text)
   var Char prev(' ')
-  string-length(user text): copy glob.length
-  for index in glob.length
+  for index in text.actual-length
     var Char ch
     string-get(user text, copy index): copy ch
     write-csyle-char(copy ch, copy prev)
@@ -223,21 +281,20 @@ func write-cstyle(user String text)
 # other helpers
 func add-node(copy Func writer, owner Generic value)
   user St node
-  St-new(copy writer, user value, user glob.curr): user node
+  st-new(copy writer, user value, user glob.curr): user node
   return
 
 func string-split(user String text, copy Char sep): copy Int index, copy Int length
-  string-length(user text): copy glob.length
   if string-has(user text, copy sep): copy glob.flag
     var String{2} sep-str
     string-append(user sep-str, copy sep)
     var Int sep-index
     string-find(user text, user sep-str): copy sep-index
     out index := sep-index
-    out length := glob.length - sep-index - 1
+    out length := text.actual-length - sep-index - 1
   
   else
-    out index := glob.length
+    out index := text.actual-length
     out length := 0
   
   return
@@ -286,6 +343,7 @@ func start-block()
 func end-block()
   glob.curr := glob.curr.father
   glob.spaces := glob.spaces - 2
+  glob.class-attrs := NULL
   return
 
 func write-block-suffix(user String suffix)
@@ -323,9 +381,8 @@ func write-title(user String title)
 
 
 func add-title(user String text)
-  string-length(user text): copy glob.length
-  new String{glob.length + 1} title
-  string-copy(user title, user text)
+  owner String title
+  new-copy(user text): owner title
   add-node(copy write-title, owner title)
   # read rest of line
   var String{256} ignore-line
@@ -487,6 +544,7 @@ func parse-native()
   else
     owner String name
     read-new(user ""): owner name, copy glob.end
+    add-type(user name, user NULL)
     add-node(copy write-native-type, owner name)
   
   return
@@ -545,6 +603,26 @@ func parse-dec(): owner St-dec new-st-dec
       readc(): copy glob.end
     
     readc(): copy glob.end
+  
+  # if false
+  if glob.class-attrs != NULL
+    new Var-attrs new-var
+    user Generic value
+    if nm-find(user glob.type-map, user st-dec.typename): user value = NULL
+      print(user st-dec.typename)
+      raise
+    
+    user Type-attrs type-attrs(value)
+    user Type-attrs subtype(NULL)
+    if st-dec.array-length != NULL
+      subtype := type-attrs
+      if nm-find(user glob.type-map, user "Array"): user value = NULL
+        print(user "Array")
+        raise
+      
+      type-attrs := value
+    
+    add-member(user st-dec.name, user type-attrs, user subtype): owner glob.class-attrs.members
   
   out new-st-dec := st-dec
   return
@@ -764,16 +842,15 @@ func parse-delete()
 
 # expression
 class St-exp
-  owner String prefix
+  owner St-exp next
+  owner String operator
+  owner String item
   owner St-func call
-  owner String suffix
 
 func real-string-length(user String text): copy Int length
   var Int index(1)
   var Int real-length(1)
-  var Int text-length
-  string-length(user text): copy text-length
-  text-length := text-length - 1
+  var Int text-length(text.actual-length - 1)
   do
     while index < text-length
     if string-get(user text, copy index): copy glob.end = '\\'
@@ -830,9 +907,14 @@ func write-func-call(user St-func st-func)
   return
 
 func write-exp-call(user St-exp st-exp)
-  if st-exp.call != NULL
-    write-func-call(user st-exp.call)
-    write(user " ")
+  user St-exp exp(st-exp)
+  do
+    while exp != NULL
+    if exp.call != NULL
+      write-func-call(user exp.call)
+      write(user " ")
+    
+    exp := exp.next
   
   return
 
@@ -850,24 +932,27 @@ func write-exp(user St-exp st-exp)
     
   
   else
-    write-cstyle(user st-exp.prefix)
+    write-cstyle(user st-exp.item)
   
-  if st-exp.suffix != NULL
+  if st-exp.operator != NULL
     write(user " ")
-    write-cstyle(user st-exp.suffix)
+    write-cstyle(user st-exp.operator)
   
   return
 
 func parse-exp(): owner St-exp new-st-exp
   new St-exp st-exp
+  st-exp.next := NULL
+  st-exp.operator := NULL
   st-exp.call := NULL
-  st-exp.suffix := NULL
   var Char end
-  if read-new(user " ("): owner st-exp.prefix, copy end = '('
-    parse-func-header(user st-exp.prefix): owner st-exp.call, copy end
+  if read-new(user " ("): owner st-exp.item, copy end = '('
+    parse-func-header(user st-exp.item): owner st-exp.call, copy end
+    delete st-exp.item
+    st-exp.item := NULL
   
   if end = ' '
-    read-new(user ""): owner st-exp.suffix, copy end
+    read-new(user ""): owner st-exp.operator, copy end
   
   out new-st-exp := st-exp
   return
@@ -1004,6 +1089,8 @@ func parse-class()
   owner String name
   read-new(user ""): owner name, copy glob.end
   add-node(copy write-class, owner name)
+  add-type(user name, owner NULL)
+  glob.class-attrs := glob.type-map.value
   start-block()
   return
 
@@ -1144,7 +1231,7 @@ func parse-line(): copy Bool more-lines
     return
   
   var Func parser
-  if kv-find(user glob.key-word-map, user key-word): copy parser, copy glob.flag
+  if fm-find(user glob.key-word-map, user key-word): copy parser, copy glob.flag
     parser()
   
   else-if glob.end = '('
@@ -1163,28 +1250,63 @@ func parse-lines()
   return
 
 # global init
+func create-name-maps()
+  glob.type-map := NULL
+  glob.var-map := NULL
+  # Func
+  add-type(user "Func", owner NULL)
+  user Type-attrs func-type(glob.type-map.value)
+  # Int
+  owner Name-map int-members(NULL)
+  add-member(user "str", user func-type, user NULL): owner int-members
+  add-type(user "Int", owner int-members)
+  user Type-attrs int-type(glob.type-map.value)
+  # Char
+  add-type(user "Char", owner NULL)
+  # Bool
+  add-type(user "Bool", owner NULL)
+  # String
+  owner Name-map string-members(NULL)
+  add-member(user "actual-length", user int-type, user NULL): owner string-members
+  add-member(user "max-length", user int-type, user NULL): owner string-members
+  add-member(user "clear", user func-type, user NULL): owner string-members
+  add-member(user "equal", user func-type, user NULL): owner string-members
+  add-member(user "get", user func-type, user NULL): owner string-members
+  add-member(user "append", user func-type, user NULL): owner string-members
+  add-member(user "copy", user func-type, user NULL): owner string-members
+  add-member(user "concat", user func-type, user NULL): owner string-members
+  add-member(user "find", user func-type, user NULL): owner string-members
+  add-member(user "replace", user func-type, user NULL): owner string-members
+  add-member(user "has", user func-type, user NULL): owner string-members
+  add-type(user "String", owner string-members)
+  # Array
+  owner Name-map array-members(NULL)
+  add-member(user "length", user int-type, user NULL): owner array-members
+  add-type(user "Array", owner array-members)
+  return
+
 func create-key-word-map()
-  new Array{20:Key-value} key-word-map
-  kv-add(user key-word-map, copy 0, user "#", copy parse-comment)
-  kv-add(user key-word-map, copy 1, user "func", copy parse-func)
-  kv-add(user key-word-map, copy 2, user "native", copy parse-native)
-  kv-add(user key-word-map, copy 3, user "main", copy parse-main)
-  kv-add(user key-word-map, copy 4, user "var", copy parse-var)
-  kv-add(user key-word-map, copy 5, user "owner", copy parse-ref)
-  kv-add(user key-word-map, copy 6, user "user", copy parse-ref)
-  kv-add(user key-word-map, copy 7, user "new", copy parse-new)
-  kv-add(user key-word-map, copy 8, user "delete", copy parse-delete)
-  kv-add(user key-word-map, copy 9, user "if", copy parse-if)
-  kv-add(user key-word-map, copy 10, user "else", copy parse-else)
-  kv-add(user key-word-map, copy 11, user "else-if", copy parse-else-if)
-  kv-add(user key-word-map, copy 12, user "do", copy parse-do)
-  kv-add(user key-word-map, copy 13, user "while", copy parse-while)
-  kv-add(user key-word-map, copy 14, user "for", copy parse-for)
-  kv-add(user key-word-map, copy 15, user "return", copy parse-return)
-  kv-add(user key-word-map, copy 16, user "raise", copy parse-raise)
-  kv-add(user key-word-map, copy 17, user "out", copy parse-out)
-  kv-add(user key-word-map, copy 18, user "class", copy parse-class)
-  kv-add(user key-word-map, copy 19, user "[]", copy parse-array)
+  new Array{20:Func-map} key-word-map
+  fm-add(user key-word-map, copy 0, user "#", copy parse-comment)
+  fm-add(user key-word-map, copy 1, user "func", copy parse-func)
+  fm-add(user key-word-map, copy 2, user "native", copy parse-native)
+  fm-add(user key-word-map, copy 3, user "main", copy parse-main)
+  fm-add(user key-word-map, copy 4, user "var", copy parse-var)
+  fm-add(user key-word-map, copy 5, user "owner", copy parse-ref)
+  fm-add(user key-word-map, copy 6, user "user", copy parse-ref)
+  fm-add(user key-word-map, copy 7, user "new", copy parse-new)
+  fm-add(user key-word-map, copy 8, user "delete", copy parse-delete)
+  fm-add(user key-word-map, copy 9, user "if", copy parse-if)
+  fm-add(user key-word-map, copy 10, user "else", copy parse-else)
+  fm-add(user key-word-map, copy 11, user "else-if", copy parse-else-if)
+  fm-add(user key-word-map, copy 12, user "do", copy parse-do)
+  fm-add(user key-word-map, copy 13, user "while", copy parse-while)
+  fm-add(user key-word-map, copy 14, user "for", copy parse-for)
+  fm-add(user key-word-map, copy 15, user "return", copy parse-return)
+  fm-add(user key-word-map, copy 16, user "raise", copy parse-raise)
+  fm-add(user key-word-map, copy 17, user "out", copy parse-out)
+  fm-add(user key-word-map, copy 18, user "class", copy parse-class)
+  fm-add(user key-word-map, copy 19, user "[]", copy parse-array)
   glob.key-word-map := key-word-map
   return
 
@@ -1192,14 +1314,14 @@ func create-key-word-map()
 func init-glob-state(user St root)
   glob.curr := root
   glob.spaces := 0
+  glob.class-attrs := NULL
   return
 
 # main
 main func(user Array{String} argv)
   print(user "MR compiler start")
   
-  array-length(user argv): copy glob.length
-  if glob.length != 3
+  if argv.length != 3
     print(user "usage: mr2-compiler [input MR file] [output C file]")
     return
   
@@ -1213,8 +1335,9 @@ main func(user Array{String} argv)
   
   # init global data
   owner St root
-  St-new(copy write-sons, user NULL, user NULL): owner root
+  st-new(copy write-sons, user NULL, user NULL): owner root
   create-key-word-map()
+  create-name-maps()
   
   # parse
   print(user "parsing...")
