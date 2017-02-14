@@ -52,7 +52,11 @@ main func(user Array{String} argv)
   string-append(user command, copy 'c')
   
   var Int status(0)
+  print(user command)
   sys-system(user command): copy status
+  if status != 0
+    print(user "MR compiler failed")
+    return
   
   # run C compiler
   string-copy(user command, user "gcc ")
@@ -70,7 +74,10 @@ main func(user Array{String} argv)
   string-concat(user command, user " -o ")
   string-concat(user command, user prefix)
   string-concat(user command, user "exe")
+  print(user command)
   sys-system(user command): copy status
+  if status != 0
+    print(user "C compiler failed")
   
   return
 

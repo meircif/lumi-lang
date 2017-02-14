@@ -26,8 +26,8 @@ typedef enum {
 } Bool;
 
 typedef enum {
-  OK = 0,
-  ERR
+  OK = EXIT_SUCCESS,
+  ERR = EXIT_FAILURE
 } Returncode;
 
 typedef struct {

@@ -54,8 +54,12 @@ Returncode func(Array* argv) {
   CHECK(string_append(command, 'c'))
   
   Int status = 0;
+  CHECK(print(command))
   CHECK(sys_system(command, &status))
-  
+  if (status != 0) {
+    CHECK(print(&(String){19, 18, "MR compiler failed"}))
+    return OK;
+  }
   /* run C compiler */
   CHECK(string_copy(command, &(String){5, 4, "gcc "}))
   CHECK(string_concat(command, prefix))
@@ -72,8 +76,11 @@ Returncode func(Array* argv) {
   CHECK(string_concat(command, &(String){5, 4, " -o "}))
   CHECK(string_concat(command, prefix))
   CHECK(string_concat(command, &(String){4, 3, "exe"}))
+  CHECK(print(command))
   CHECK(sys_system(command, &status))
-  
+  if (status != 0) {
+    CHECK(print(&(String){18, 17, "C compiler failed"}))
+  }
   return OK;
 }
 
