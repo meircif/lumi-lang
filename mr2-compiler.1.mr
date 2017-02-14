@@ -77,7 +77,6 @@ class Type-attrs
 
 class Var-attrs
   owner String name
-  owner String typename
   user Type-attrs type-attrs
   user Type-attrs subtype
   owner String access
@@ -111,7 +110,6 @@ func nm-find(user Name-map self, user String name): user Generic value
 func add-member(user String name, user Type-attrs type-attrs, user Type-attrs subtype): owner Name-map members
   new Var-attrs new-var
   new-copy(user name): owner new-var.name
-  new-copy(user type-attrs.name): owner new-var.typename
   new-var.type-attrs := type-attrs
   new-var.subtype := subtype
   new-var.is-out := false
@@ -121,29 +119,34 @@ func add-member(user String name, user Type-attrs type-attrs, user Type-attrs su
 # Syntax Tree
 class St
   owner St next-brother
-  owner St firSt-son
-  user St laSt-son
+  owner St first-son
+  user St last-son
   user St father
   var Func writer
   owner Generic value
+  owner Name-map var-map
 
 func st-new(copy Func writer, owner Generic value, user St father): owner St res
   new St self
   self.next-brother := NULL
-  self.firSt-son := NULL
-  self.laSt-son := NULL
+  self.first-son := NULL
+  self.last-son := NULL
   self.father := father
   self.writer := writer
   self.value := value
   out res := self
   if father != NULL
-    if father.firSt-son = NULL
-      father.firSt-son := self
+    if father.first-son = NULL
+      father.first-son := self
     
     else
-      father.laSt-son.next-brother := self
+      father.last-son.next-brother := self
     
-    father.laSt-son := self
+    father.last-son := self
+    self.var-map := father.var-map
+  
+  else
+    self.var-map := NULL
   
   return
 
@@ -151,7 +154,7 @@ func st-del(owner St self)
   if self = NULL
     return
   
-  st-del(owner self.firSt-son)
+  st-del(owner self.first-son)
   st-del(owner self.next-brother)
   delete self
   return
@@ -325,7 +328,7 @@ func write-spaces()
   return
 
 func write-sons()
-  user St son(glob.curr.firSt-son)
+  user St son(glob.curr.first-son)
   do
     while son != NULL
     glob.curr := son
@@ -337,7 +340,7 @@ func write-sons()
 
 func start-block()
   glob.spaces := glob.spaces + 2
-  glob.curr := glob.curr.laSt-son
+  glob.curr := glob.curr.last-son
   return
 
 func end-block()
@@ -448,6 +451,14 @@ func parse-func-header(user String name): owner St-func st-func, copy Char end
   new St-func new-func
   if name = NULL
     read-new(user "("): user new-func.name, copy glob.end
+    new Var-attrs new-var
+    new-copy(user new-func.name): owner new-var.name
+    user Generic value
+    nm-find(user glob.type-map, user "Func"): user value
+    new-var.type-attrs := value
+    new-var.subtype := NULL
+    new-var.is-out := false
+    nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
   
   else
     new-copy(user name): owner new-func.name
@@ -514,11 +525,33 @@ func write-func(user St-func st-func)
   write-block()
   return
 
+func add-arg-vars(user St-arg first, copy Bool is-out)
+  user St-arg arg(first)
+  do
+    while arg != NULL
+    new Var-attrs new-var
+    new-copy(user arg.name): owner new-var.name
+    user Generic value
+    nm-find(user glob.type-map, user arg.typename): user value
+    new-var.type-attrs := value
+    new-var.subtype := NULL
+    if arg.type-param != NULL
+      nm-find(user glob.type-map, user arg.type-param): user value
+      new-var.subtype := value
+    
+    new-var.is-out := is-out
+    nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+    arg := arg.next
+  
+  return
+
 func parse-func()
   owner St-func st-func
   parse-func-header(user NULL): owner st-func, copy glob.end
   add-node(copy write-func, owner st-func)
   start-block()
+  add-arg-vars(user st-func.params, copy false)
+  add-arg-vars(user st-func.outputs, copy true)
   return
 
 # native
@@ -604,25 +637,23 @@ func parse-dec(): owner St-dec new-st-dec
     
     readc(): copy glob.end
   
-  # if false
+  new Var-attrs new-var
+  new-copy(user st-dec.name): owner new-var.name
+  user Generic value
+  nm-find(user glob.type-map, user st-dec.typename): user value
+  new-var.subtype := NULL
+  if st-dec.array-length != NULL
+    new-var.subtype := value
+    nm-find(user glob.type-map, user "Array"): user value
+  
+  new-var.type-attrs := value
+  new-var.is-out := false
+  
   if glob.class-attrs != NULL
-    new Var-attrs new-var
-    user Generic value
-    if nm-find(user glob.type-map, user st-dec.typename): user value = NULL
-      print(user st-dec.typename)
-      raise
-    
-    user Type-attrs type-attrs(value)
-    user Type-attrs subtype(NULL)
-    if st-dec.array-length != NULL
-      subtype := type-attrs
-      if nm-find(user glob.type-map, user "Array"): user value = NULL
-        print(user "Array")
-        raise
-      
-      type-attrs := value
-    
-    add-member(user st-dec.name, user type-attrs, user subtype): owner glob.class-attrs.members
+    nm-init(user new-var.name, owner new-var): owner glob.class-attrs.members
+  
+  else
+    nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
   
   out new-st-dec := st-dec
   return
