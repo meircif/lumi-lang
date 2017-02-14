@@ -72,7 +72,7 @@ main func(user Array{String} argv)
     string-concat(user command, user "mr.1.c")
   
   if version = '2'
-    string-concat(user command, user "mr.1.c")
+    string-concat(user command, user "mr.2.c")
   
   string-concat(user command, user " -o \"")
   string-concat(user command, user prefix)

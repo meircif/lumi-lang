@@ -74,7 +74,7 @@ Returncode func(Array* argv) {
     CHECK(string_concat(command, &(String){7, 6, "mr.1.c"}))
   }
   if (version == '2') {
-    CHECK(string_concat(command, &(String){7, 6, "mr.1.c"}))
+    CHECK(string_concat(command, &(String){7, 6, "mr.2.c"}))
   }
   CHECK(string_concat(command, &(String){6, 5, " -o \""}))
   CHECK(string_concat(command, prefix))
