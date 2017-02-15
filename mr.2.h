@@ -41,11 +41,12 @@ typedef FILE File;
 
 typedef struct {} Sys;
 
-#define RAISE { fprintf(stderr, "Error raised in %s:%d %s()\n", __FILE__, __LINE__, __FUNCTION__); \
+#define RAISE(file, line, func) { \
+  fprintf(stderr, "Error raised in %s:%d %s()\n", file, line, func); \
   return ERR; }
 
-#define CHECK(err) { Returncode _err = err; if (_err != OK) { \
-  fprintf(stderr, "  called from %s:%d %s()\n", __FILE__, __LINE__, __FUNCTION__); \
+#define CHECK(file, line, func, err) { Returncode _err = err; if (_err != OK) { \
+  fprintf(stderr, "  called from %s:%d %s()\n", file, line, func); \
   return _err; } }
 
 #define MAIN_FUNC int main(int argc, char* argv[]) { \
@@ -61,8 +62,11 @@ typedef struct {} Sys;
     args_strings[arg].max_length = strnlen(args_strings[arg].chars, 1024); \
     args_strings[arg].length = args_strings[arg].max_length; \
   } \
-  CHECK(func(args_array)) \
-  return OK; \
+  Returncode err =  func(args_array); \
+  if (err != OK) {\
+    fprintf(stderr, "  called from executable start"); \
+  } \
+  return err; \
 }
 
 String* new_string(int length);

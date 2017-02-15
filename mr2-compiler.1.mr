@@ -126,31 +126,10 @@ class St
   owner Generic value
   owner Name-map var-map
   var Bool in-class
-
-func st-new(copy Func writer, owner Generic value, user St father, copy Bool in-class): owner St res
-  new St self
-  self.next-brother := NULL
-  self.first-son := NULL
-  self.last-son := NULL
-  self.father := father
-  self.writer := writer
-  self.value := value
-  self.in-class := in-class
-  out res := self
-  if father != NULL
-    if father.first-son = NULL
-      father.first-son := self
-    
-    else
-      father.last-son.next-brother := self
-    
-    father.last-son := self
-    self.var-map := father.var-map
-  
-  else
-    self.var-map := NULL
-  
-  return
+  # place
+  user String file-name
+  user String func-name
+  var Int line-num
 
 func st-del(owner St self)
   if self = NULL
@@ -169,6 +148,10 @@ class Global-data
   user Array{Func-map} key-word-map
   owner Name-map type-map
   owner Name-map var-map
+  # place
+  user String file-name
+  user String func-name
+  var Int line-num
   # state
   user St curr
   var Int spaces
@@ -179,6 +162,34 @@ class Global-data
   var Char end
 
 var Global-data glob
+
+func st-new(copy Func writer, owner Generic value, user St father, copy Bool in-class): owner St res
+  new St self
+  self.next-brother := NULL
+  self.first-son := NULL
+  self.last-son := NULL
+  self.father := father
+  self.writer := writer
+  self.value := value
+  self.in-class := in-class
+  self.file-name := glob.file-name
+  self.func-name := glob.func-name
+  self.line-num := glob.line-num
+  out res := self
+  if father != NULL
+    if father.first-son = NULL
+      father.first-son := self
+    
+    else
+      father.last-son.next-brother := self
+    
+    father.last-son := self
+    self.var-map := father.var-map
+  
+  else
+    self.var-map := NULL
+  
+  return
 
 func add-type(user String name, owner Name-map members)
   new Type-attrs new-type
@@ -215,8 +226,13 @@ func find-var(user Name-map nm, user String name): user Var-attrs var-attr
   return
 
 # read helpers
-func readc(): copy Char ch
-  file-getc(user glob.infile): var ch
+func readc(): copy Char out-ch
+  var Char ch
+  file-getc(user glob.infile): copy ch
+  if ch = '\n'
+    glob.line-num := glob.line-num + 1
+  
+  out out-ch := ch
   return
 
 func read-ignore(copy Int chars)
@@ -310,6 +326,32 @@ func write-cstyle(user String text)
     write-csyle-char(copy ch, copy prev)
     prev := ch
   
+  return
+
+func write-traceback-args()
+  write(user "\"")
+  write(user glob.curr.file-name)
+  write(user "\", ")
+  var String{64} line-num-str
+  int-to-string(copy glob.curr.line-num): var line-num-str
+  write(user line-num-str)
+  write(user ", \"")
+  if glob.curr.func-name != NULL
+    write(user glob.curr.func-name)
+  
+  write(user "\"")
+  return
+
+func write-tb-raise()
+  write(user "RAISE(")
+  write-traceback-args()
+  write(user ")")
+  return
+
+func write-tb-check()
+  write(user "CHECK(")
+  write-traceback-args()
+  write(user ", ")
   return
 
 # other helpers
@@ -660,7 +702,8 @@ func write-exp-intro(user St-exp st-exp)
       write(user ") > ")
     
     write-mpath(user st-exp.item, copy true)
-    write(user "->length) RAISE")
+    write(user "->length) ")
+    write-tb-raise()
     write-new-indent-line()
   
   return
@@ -715,7 +758,7 @@ func write-func-call(user St-func st-func)
     write-exp-intro(user arg.value)
     arg := arg.next
   
-  write(user "CHECK(")
+  write-tb-check()
   if st-func.path.next != NULL:
     user Var-attrs var-attrs
     find-var(user glob.curr.var-map, user st-func.path.name): user var-attrs
@@ -919,6 +962,7 @@ func add-arg-vars(user St-arg first, copy Bool is-ref)
 func parse-func-body(copy Func writer)
   owner St-func st-func
   parse-func-header(user NULL): owner st-func, copy glob.end
+  glob.func-name := st-func.path.name
   add-node(copy writer, owner st-func)
   start-block()
   # add vars to var-map
@@ -1080,11 +1124,12 @@ func write-var-string(user St-dec st-dec)
   write(user "]){0}};")
   if st-dec.init != NULL
     write-new-indent-line()
+    write-tb-check()
     write(user "String_copy(")
     write-cstyle(user st-dec.name)
     write(user ", ")
     write-exp(user st-dec.init)
-    write(user ");")
+    write(user "));")
   
   write(user "\n")
   return
@@ -1203,7 +1248,8 @@ func write-new(user St-dec st-dec)
   write-new-indent-line()
   write(user "if (")
   write-cstyle(user st-dec.name)
-  write(user " == NULL) RAISE")
+  write(user " == NULL) ")
+  write-tb-raise()
   
   if st-dec.array-length != NULL and st-dec.string-length != NULL
     write-new-indent-line()
@@ -1367,7 +1413,8 @@ func parse-return()
 
 # raise
 func write-raise(user Generic null)
-  write(user "RAISE\n")
+  write-tb-raise()
+  write(user "\n")
   return
 
 func parse-raise()
@@ -1628,8 +1675,6 @@ main func(user Array{String} argv)
   [] String infile-name := argv[1]
   user String outfile-name
   [] String outfile-name := argv[2]
-  file-open-read(user infile-name): owner glob.infile
-  file-open-write(user outfile-name): owner glob.outfile
   
   # init global data
   owner St root
@@ -1638,18 +1683,21 @@ main func(user Array{String} argv)
   create-name-maps()
   
   # parse
+  file-open-read(user infile-name): owner glob.infile
+  glob.file-name := infile-name
+  glob.func-name := NULL
+  glob.line-num := 0
   print(user "parsing...")
   init-glob-state(user root)
   parse-lines()
+  file-close(owner glob.infile)
   
   # write
+  file-open-write(user outfile-name): owner glob.outfile
   print(user "writing...")
   init-glob-state(user root)
   write(user "#include \"mr.2.h\"\n\n")
   root.writer()
-  
-  # close files
-  file-close(owner glob.infile)
   file-close(owner glob.outfile)
   
   print(user "MR compiler end")

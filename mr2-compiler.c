@@ -128,32 +128,11 @@ typedef struct St St; struct St {
   Generic* value;
   Name_map* var_map;
   Bool in_class;
+  /* place */
+  String* file_name;
+  String* func_name;
+  Int line_num;
 };
-Returncode st_new(Func writer, Generic* value, St* father, Bool in_class, St** res) {
-  St* self = malloc(sizeof(St)); if (self == NULL) RAISE
-  self->next_brother = NULL;
-  self->first_son = NULL;
-  self->last_son = NULL;
-  self->father = father;
-  self->writer = writer;
-  self->value = value;
-  self->in_class = in_class;
-  *res = self;
-  if (father != NULL) {
-    if (father->first_son == NULL) {
-      father->first_son = self;
-    }
-    else {
-      father->last_son->next_brother = self;
-    }
-    father->last_son = self;
-    self->var_map = father->var_map;
-  }
-  else {
-    self->var_map = NULL;
-  }
-  return OK;
-}
 Returncode st_del(St* self) {
   if (self == NULL) {
     return OK;
@@ -171,6 +150,10 @@ typedef struct Global_data Global_data; struct Global_data {
   Array* key_word_map;
   Name_map* type_map;
   Name_map* var_map;
+  /* place */
+  String* file_name;
+  String* func_name;
+  Int line_num;
   /* state */
   St* curr;
   Int spaces;
@@ -182,6 +165,34 @@ typedef struct Global_data Global_data; struct Global_data {
 };
 Global_data* glob = &(Global_data){0};
 
+Returncode st_new(Func writer, Generic* value, St* father, Bool in_class, St** res) {
+  St* self = malloc(sizeof(St)); if (self == NULL) RAISE
+  self->next_brother = NULL;
+  self->first_son = NULL;
+  self->last_son = NULL;
+  self->father = father;
+  self->writer = writer;
+  self->value = value;
+  self->in_class = in_class;
+  self->file_name = glob->file_name;
+  self->func_name = glob->func_name;
+  self->line_num = glob->line_num;
+  *res = self;
+  if (father != NULL) {
+    if (father->first_son == NULL) {
+      father->first_son = self;
+    }
+    else {
+      father->last_son->next_brother = self;
+    }
+    father->last_son = self;
+    self->var_map = father->var_map;
+  }
+  else {
+    self->var_map = NULL;
+  }
+  return OK;
+}
 Returncode add_type(String* name, Name_map* members) {
   Type_attrs* new_type = malloc(sizeof(Type_attrs)); if (new_type == NULL) RAISE
   CHECK(new_copy(name, &new_type->name))
@@ -217,8 +228,13 @@ Returncode find_var(Name_map* nm, String* name, Var_attrs** var_attr) {
   return OK;
 }
 /* read helpers */
-Returncode readc(Char* ch) {
-  CHECK(file_getc(glob->infile, ch))
+Returncode readc(Char* out_ch) {
+  Char ch;
+  CHECK(file_getc(glob->infile, &ch))
+  if (ch == '\n') {
+    glob->line_num = glob->line_num + 1;
+  }
+  *out_ch = ch;
   return OK;
 }
 Returncode read_ignore(Int chars) {
@@ -312,6 +328,32 @@ Returncode write_cstyle(String* text) {
     CHECK(write_csyle_char(ch, prev))
     prev = ch;
   }
+  return OK;
+}
+Returncode write_traceback_args() {
+  CHECK(write(&(String){2, 1, "\""}))
+  CHECK(write(glob->curr->file_name))
+  CHECK(write(&(String){4, 3, "\", "}))
+  String* line_num_str = &(String){64, 0, (char[64]){0}};
+  CHECK(int_to_string(glob->curr->line_num, line_num_str))
+  CHECK(write(line_num_str))
+  CHECK(write(&(String){4, 3, ", \""}))
+  if (glob->curr->func_name != NULL) {
+    CHECK(write(glob->curr->func_name))
+  }
+  CHECK(write(&(String){2, 1, "\""}))
+  return OK;
+}
+Returncode write_tb_raise() {
+  CHECK(write(&(String){7, 6, "RAISE("}))
+  CHECK(write_traceback_args())
+  CHECK(write(&(String){2, 1, ")"}))
+  return OK;
+}
+Returncode write_tb_check() {
+  CHECK(write(&(String){7, 6, "CHECK("}))
+  CHECK(write_traceback_args())
+  CHECK(write(&(String){3, 2, ", "}))
   return OK;
 }
 /* other helpers */
@@ -662,7 +704,8 @@ Returncode write_exp_intro(St_exp* st_exp) {
       CHECK(write(&(String){5, 4, ") > "}))
     }
     CHECK(write_mpath(st_exp->item, true))
-    CHECK(write(&(String){16, 15, "->length) RAISE"}))
+    CHECK(write(&(String){11, 10, "->length) "}))
+    CHECK(write_tb_raise())
     CHECK(write_new_indent_line())
   }
   return OK;
@@ -717,7 +760,7 @@ Returncode write_func_call(St_func* st_func) {
     CHECK(write_exp_intro(arg->value))
     arg = arg->next;
   }
-  CHECK(write(&(String){7, 6, "CHECK("}))
+  CHECK(write_tb_check())
   if (st_func->path->next != NULL) {
     Var_attrs* var_attrs;
     CHECK(find_var(glob->curr->var_map, st_func->path->name, &var_attrs))
@@ -921,6 +964,7 @@ Returncode add_arg_vars(St_arg* first, Bool is_ref) {
 Returncode parse_func_body(Func writer) {
   St_func* st_func;
   CHECK(parse_func_header(NULL, &st_func, &glob->end))
+  glob->func_name = st_func->path->name;
   CHECK(add_node(writer, st_func))
   CHECK(start_block())
   /* add vars to var-map */
@@ -1082,11 +1126,12 @@ Returncode write_var_string(St_dec* st_dec) {
   CHECK(write(&(String){8, 7, "]){0}};"}))
   if (st_dec->init != NULL) {
     CHECK(write_new_indent_line())
+    CHECK(write_tb_check())
     CHECK(write(&(String){13, 12, "String_copy("}))
     CHECK(write_cstyle(st_dec->name))
     CHECK(write(&(String){3, 2, ", "}))
     CHECK(write_exp(st_dec->init))
-    CHECK(write(&(String){3, 2, ");"}))
+    CHECK(write(&(String){4, 3, "));"}))
   }
   CHECK(write(&(String){2, 1, "\n"}))
   return OK;
@@ -1205,7 +1250,8 @@ Returncode write_new(St_dec* st_dec) {
   CHECK(write_new_indent_line())
   CHECK(write(&(String){5, 4, "if ("}))
   CHECK(write_cstyle(st_dec->name))
-  CHECK(write(&(String){16, 15, " == NULL) RAISE"}))
+  CHECK(write(&(String){11, 10, " == NULL) "}))
+  CHECK(write_tb_raise())
   
   if (st_dec->array_length != NULL and st_dec->string_length != NULL) {
     CHECK(write_new_indent_line())
@@ -1369,7 +1415,8 @@ Returncode parse_return() {
 }
 /* raise */
 Returncode write_raise(Generic* null) {
-  CHECK(write(&(String){7, 6, "RAISE\n"}))
+  CHECK(write_tb_raise())
+  CHECK(write(&(String){2, 1, "\n"}))
   return OK;
 }
 Returncode parse_raise() {
@@ -1630,8 +1677,6 @@ Returncode func(Array* argv) {
   if (1 < 0 || 1 >= argv->length) RAISE infile_name = ((String*)(argv->values)) + 1;
   String* outfile_name;
   if (2 < 0 || 2 >= argv->length) RAISE outfile_name = ((String*)(argv->values)) + 2;
-  CHECK(file_open_read(infile_name, &glob->infile))
-  CHECK(file_open_write(outfile_name, &glob->outfile))
   
   /* init global data */
   St* root;
@@ -1640,18 +1685,21 @@ Returncode func(Array* argv) {
   CHECK(create_name_maps())
   
   /* parse */
+  CHECK(file_open_read(infile_name, &glob->infile))
+  glob->file_name = infile_name;
+  glob->func_name = NULL;
+  glob->line_num = 0;
   CHECK(print(&(String){11, 10, "parsing..."}))
   CHECK(init_glob_state(root))
   CHECK(parse_lines())
+  CHECK(file_close(glob->infile))
   
   /* write */
+  CHECK(file_open_write(outfile_name, &glob->outfile))
   CHECK(print(&(String){11, 10, "writing..."}))
   CHECK(init_glob_state(root))
   CHECK(write(&(String){20, 19, "#include \"mr.2.h\"\n\n"}))
   CHECK(root->writer())
-  
-  /* close files */
-  CHECK(file_close(glob->infile))
   CHECK(file_close(glob->outfile))
   
   CHECK(print(&(String){16, 15, "MR compiler end"}))

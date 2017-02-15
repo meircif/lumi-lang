@@ -1,5 +1,7 @@
 #include "mr.2.h"
 
+#define CRAISE RAISE(__FILE__, __LINE__, __FUNCTION__)
+#define CCHECK(err) CHECK(__FILE__, __LINE__, __FUNCTION__, err)
 
 /*dynamic allocation*/
 String* new_string(int length) {
@@ -30,7 +32,7 @@ Returncode open_file(File** file, String* name, char* mode) {
   *file = NULL;
   *file = fopen(name->chars, mode);
   if (*file == NULL) {
-    RAISE
+    CRAISE
   }
   return OK;
 }
@@ -47,7 +49,7 @@ Returncode File_close(File* file) {
   if (fclose(file) == 0) {
     return OK;
   }
-  RAISE
+  CRAISE
 }
 
 Returncode File_getc(File* file, Char* out_char) {
@@ -58,7 +60,7 @@ Returncode File_getc(File* file, Char* out_char) {
 Returncode File_putc(File* file, Char in_char) {
   int res = putc(in_char, file);
   if (res != in_char) {
-    RAISE
+    CRAISE
   }
   return OK;
 }
@@ -98,7 +100,7 @@ Returncode String_equal(String* this, String* other, Bool* out_equal) {
 
 Returncode String_get(String* this, Int index, Char* out_char) {
   if (index < 0 or index >= this->length) {
-    RAISE
+    CRAISE
   }
   *out_char = this->chars[index];
   return OK;
@@ -106,7 +108,7 @@ Returncode String_get(String* this, Int index, Char* out_char) {
 
 Returncode String_append(String* this, Char in_char) {
   if (this->length == this->max_length) {
-    RAISE
+    CRAISE
   }
   this->chars[this->length] = in_char;
   ++this->length;
@@ -130,7 +132,7 @@ Returncode Int_str(Int value, String* out_str) {
   int res = snprintf(out_str->chars, out_str->max_length ,"%d", value);
   if (res <= 0 or res >= out_str->max_length) {
     out_str->length = 0;
-    RAISE
+    CRAISE
   }
   out_str->length = res;
   return OK;
@@ -141,7 +143,7 @@ Returncode String_copy(String* this, String* source) {
     return OK;
   }
   if (source->length > this->max_length) {
-    RAISE
+    CRAISE
   }
   this->length = source->length;
   memcpy(this->chars, source->chars, this->length);
@@ -150,7 +152,7 @@ Returncode String_copy(String* this, String* source) {
 
 Returncode String_concat(String* this, String* ext) {
   if (this->length + ext->length > this->max_length) {
-    RAISE
+    CRAISE
   }
   memcpy(this->chars + this->length, ext->chars, ext->length);
   this->length += ext->length;
@@ -165,7 +167,7 @@ Returncode String_find(String* this, String* pattern, Int* out_index) {
       return OK;
     }
   }
-  RAISE
+  CRAISE
 }
 
 Returncode String_has(String* this, Char ch, Bool* found) {
@@ -194,13 +196,13 @@ Returncode Sys_print(Sys* _, String* text) {
 
 Returncode Sys_exit(Sys* _, Int status) {
   exit(status);
-  RAISE
+  CRAISE
 }
 
 Returncode set_cstring(String* str) {
   if (str->length >= str->max_length) {
     if (strnlen(str->chars, str->max_length) >= str->max_length) {
-      RAISE
+      CRAISE
     }
   }
   else if (strnlen(str->chars, str->length + 1) > str->length) {
@@ -210,17 +212,17 @@ Returncode set_cstring(String* str) {
 }
 
 Returncode Sys_system(Sys* _, String* command, Int* status) {
-  CHECK(set_cstring(command));
+  CCHECK(set_cstring(command));
   int res = system(command->chars);
   if (res == -1) {
-    RAISE
+    CRAISE
   }
   *status = res;
   return OK;
 }
 
 Returncode Sys_getenv(Sys* _, String* name, Bool* exists, String* value) {
-  CHECK(set_cstring(name));
+  CCHECK(set_cstring(name));
   char* ret = getenv(name->chars);
   if (ret == NULL) {
     *exists = false;
