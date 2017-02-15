@@ -372,7 +372,8 @@ Returncode write_sons() {
     glob->curr = son;
     CHECK(write_spaces())
     CHECK(son->writer(son->value))
-    son = son->next_brother;
+    son = glob->curr->next_brother;
+    glob->curr = glob->curr->father;
   }
   return OK;
 }
@@ -484,6 +485,7 @@ typedef struct St_exp St_exp; struct St_exp {
   Member_path* item;
   St_func* call;
   St_exp* subexp;
+  St_exp* slice_length;
 };
 Returncode real_string_length(String* text, Int* length) {
   Int index = 1;
@@ -498,6 +500,98 @@ Returncode real_string_length(String* text, Int* length) {
     index = index + 1;
   }
   *length = real_length;
+  return OK;
+}
+Returncode write_exp(St_exp* st_exp);
+
+Returncode write_exp_array(St_exp* st_exp) {
+  Var_attrs* var_attrs;
+  CHECK(find_var(glob->curr->var_map, st_exp->item->name, &var_attrs))
+  Member_path* mpath = st_exp->item;
+  while (true) {
+    if (not(mpath->next != NULL)) break;
+    mpath = mpath->next;
+    CHECK(find_var(var_attrs->type_attrs->members, mpath->name, &var_attrs))
+  }
+  String* typename = var_attrs->type_attrs->name;
+  Bool is_array;
+  CHECK(string_equal(typename, &(String){6, 5, "Array"}, &is_array)) if (is_array) {
+    if (var_attrs->subtype == NULL) {
+      CHECK(print(mpath->name))
+      RAISE
+    }
+    typename = var_attrs->subtype->name;
+  }
+  if (st_exp->slice_length == NULL) {
+    if (is_array) {
+      CHECK(write(&(String){3, 2, "(("}))
+      CHECK(write_cstyle(typename))
+      CHECK(write(&(String){4, 3, "*)("}))
+      CHECK(write_mpath(st_exp->item, true))
+      CHECK(write(&(String){11, 10, "->values))"}))
+      CHECK(is_primitive(typename, &glob->flag)) if (glob->flag) {
+        CHECK(write(&(String){2, 1, "["}))
+        CHECK(write_exp(st_exp->subexp))
+        CHECK(write(&(String){2, 1, "]"}))
+      }
+      else {
+        CHECK(write(&(String){4, 3, " + "}))
+        CHECK(write_exp(st_exp->subexp))
+      }
+    }
+    else {
+      CHECK(write_mpath(st_exp->item, true))
+      CHECK(write(&(String){9, 8, "->chars["}))
+      CHECK(write_exp(st_exp->subexp))
+      CHECK(write(&(String){2, 1, "]"}))
+    }
+  }
+  else if (is_array) {
+    CHECK(write(&(String){10, 9, "&(Array){"}))
+    CHECK(write_exp(st_exp->slice_length))
+    CHECK(write(&(String){5, 4, ", (("}))
+    CHECK(write_cstyle(typename))
+    CHECK(write(&(String){4, 3, "*)("}))
+    CHECK(write_mpath(st_exp->item, true))
+    CHECK(write(&(String){15, 14, "->values)) + ("}))
+    CHECK(write_exp(st_exp->subexp))
+    CHECK(write(&(String){3, 2, ")}"}))
+  }
+  else {
+    CHECK(write(&(String){11, 10, "&(String){"}))
+    CHECK(write_exp(st_exp->slice_length))
+    CHECK(write(&(String){3, 2, ", "}))
+    CHECK(write_exp(st_exp->slice_length))
+    CHECK(write(&(String){3, 2, ", "}))
+    CHECK(write_mpath(st_exp->item, true))
+    CHECK(write(&(String){12, 11, "->chars + ("}))
+    CHECK(write_exp(st_exp->subexp))
+    CHECK(write(&(String){3, 2, ")}"}))
+  }
+  return OK;
+}
+Returncode write_exp_item(Member_path* mpath) {
+  Char first;
+  CHECK(string_get(mpath->name, 0, &first)) if (first == '"') {
+    CHECK(real_string_length(mpath->name, &glob->length))
+    String* length_str = &(String){80, 0, (char[80]){0}};
+    CHECK(write(&(String){11, 10, "&(String){"}))
+    CHECK(int_to_string(glob->length, length_str))
+    CHECK(write(length_str))
+    CHECK(write(&(String){3, 2, ", "}))
+    glob->length = glob->length - 1;
+    CHECK(int_to_string(glob->length, length_str))
+    CHECK(write(length_str))
+    CHECK(write(&(String){3, 2, ", "}))
+    CHECK(write(mpath->name))
+    CHECK(write(&(String){2, 1, "}"}))
+  }
+  else if (first == '\'' or first == '-' or first >= '0' and first <= '9') {
+    CHECK(write(mpath->name))
+  }
+  else {
+    CHECK(write_mpath(mpath, true))
+  }
   return OK;
 }
 Returncode write_exp(St_exp* st_exp) {
@@ -523,55 +617,10 @@ Returncode write_exp(St_exp* st_exp) {
     }
   }
   else if (st_exp->subexp != NULL) {
-    Var_attrs* var_attrs;
-    CHECK(find_var(glob->curr->var_map, st_exp->item->name, &var_attrs))
-    Member_path* mpath = st_exp->item;
-    while (true) {
-      if (not(mpath->next != NULL)) break;
-      mpath = mpath->next;
-      CHECK(find_var(var_attrs->type_attrs->members, mpath->name, &var_attrs))
-    }
-    if (var_attrs->subtype == NULL) {
-      CHECK(print(mpath->name))
-      RAISE
-    }
-    CHECK(write(&(String){3, 2, "(("}))
-    CHECK(write_cstyle(var_attrs->subtype->name))
-    CHECK(write(&(String){4, 3, "*)("}))
-    CHECK(write_mpath(st_exp->item, true))
-    CHECK(write(&(String){11, 10, "->values))"}))
-    CHECK(is_primitive(var_attrs->subtype->name, &glob->flag)) if (glob->flag) {
-      CHECK(write(&(String){2, 1, "["}))
-      CHECK(write_exp(st_exp->subexp))
-      CHECK(write(&(String){2, 1, "]"}))
-    }
-    else {
-      CHECK(write(&(String){4, 3, " + "}))
-      CHECK(write_exp(st_exp->subexp))
-    }
+    CHECK(write_exp_array(st_exp))
   }
   else {
-    Char first;
-    CHECK(string_get(st_exp->item->name, 0, &first)) if (first == '"') {
-      CHECK(real_string_length(st_exp->item->name, &glob->length))
-      String* length_str = &(String){80, 0, (char[80]){0}};
-      CHECK(write(&(String){11, 10, "&(String){"}))
-      CHECK(int_to_string(glob->length, length_str))
-      CHECK(write(length_str))
-      CHECK(write(&(String){3, 2, ", "}))
-      glob->length = glob->length - 1;
-      CHECK(int_to_string(glob->length, length_str))
-      CHECK(write(length_str))
-      CHECK(write(&(String){3, 2, ", "}))
-      CHECK(write(st_exp->item->name))
-      CHECK(write(&(String){2, 1, "}"}))
-    }
-    else if (first == '\'' or first == '-' or first >= '0' and first <= '9') {
-      CHECK(write(st_exp->item->name))
-    }
-    else {
-      CHECK(write_mpath(st_exp->item, true))
-    }
+    CHECK(write_exp_item(st_exp->item))
   }
   if (st_exp->operator != NULL) {
     CHECK(write(&(String){2, 1, " "}))
@@ -596,11 +645,22 @@ Returncode write_exp_intro(St_exp* st_exp) {
     CHECK(write_new_indent_line())
   }
   else if (st_exp->subexp != NULL and st_exp->item != NULL) {
-    CHECK(write(&(String){5, 4, "if ("}))
+    CHECK(write(&(String){6, 5, "if (("}))
     CHECK(write_exp(st_exp->subexp))
-    CHECK(write(&(String){9, 8, " < 0 || "}))
+    CHECK(write(&(String){11, 10, ") < 0 || ("}))
+    if (st_exp->slice_length != NULL) {
+      CHECK(write_exp(st_exp->slice_length))
+      CHECK(write(&(String){11, 10, ") < 0 || ("}))
+    }
     CHECK(write_exp(st_exp->subexp))
-    CHECK(write(&(String){5, 4, " >= "}))
+    if (st_exp->slice_length == NULL) {
+      CHECK(write(&(String){6, 5, ") >= "}))
+    }
+    else {
+      CHECK(write(&(String){6, 5, ") + ("}))
+      CHECK(write_exp(st_exp->slice_length))
+      CHECK(write(&(String){5, 4, ") > "}))
+    }
     CHECK(write_mpath(st_exp->item, true))
     CHECK(write(&(String){16, 15, "->length) RAISE"}))
     CHECK(write_new_indent_line())
@@ -630,9 +690,16 @@ Returncode parse_exp(String* exp_ends, St_exp** new_st_exp, Char* out_end) {
     }
     st_exp->item = NULL;
   }
-  else if (end  == '[') {
-    CHECK(parse_exp(&(String){2, 1, "]"}, &st_exp->subexp, &end))
+  else if (end == '[') {
+    CHECK(parse_exp(&(String){3, 2, ":]"}, &st_exp->subexp, &end))
+    if (end == ':') {
+      CHECK(parse_exp(&(String){2, 1, "]"}, &st_exp->slice_length, &end))
+    }
     CHECK(readc(&end))
+    if (end == '.') {
+      CHECK(new_copy(&(String){3, 2, "->"}, &st_exp->operator))
+      CHECK(parse_exp(exp_ends, &st_exp->next, &end))
+    }
   }
   if (end == ' ') {
     CHECK(read_new(&(String){2, 1, " "}, &st_exp->operator, &end))
@@ -917,17 +984,13 @@ typedef struct St_dec St_dec; struct St_dec {
   String* typename;
   String* array_length;
   String* string_length;
-  String* init;
-  String* slice_start;
-  String* slice_length;
+  St_exp* init;
 };
 Returncode parse_dec(St_dec** new_st_dec) {
   St_dec* st_dec = malloc(sizeof(St_dec)); if (st_dec == NULL) RAISE
   st_dec->array_length = NULL;
   st_dec->string_length = NULL;
   st_dec->init = NULL;
-  st_dec->slice_start = NULL;
-  st_dec->slice_length = NULL;
   
   CHECK(read_new(&(String){3, 2, " {"}, &st_dec->typename, &glob->end))
   Bool is_array = false;
@@ -948,11 +1011,8 @@ Returncode parse_dec(St_dec** new_st_dec) {
     }
   }
   CHECK(read_new(&(String){2, 1, "("}, &st_dec->name, &glob->end)) if (glob->end == '(') {
-    CHECK(read_new(&(String){3, 2, ")["}, &st_dec->init, &glob->end)) if (glob->end == '[') {
-      CHECK(read_new(&(String){2, 1, ":"}, &st_dec->slice_start, &glob->end))
-      CHECK(read_new(&(String){2, 1, "]"}, &st_dec->slice_length, &glob->end))
-      CHECK(readc(&glob->end))
-    }
+    CHECK(parse_exp(&(String){2, 1, ")"}, &st_dec->init, &glob->end))
+    
     CHECK(readc(&glob->end))
   }
   Var_attrs* new_var = malloc(sizeof(Var_attrs)); if (new_var == NULL) RAISE
@@ -981,12 +1041,13 @@ Returncode parse_dec(St_dec** new_st_dec) {
 }
 /* var */
 Returncode write_var_primitive(St_dec* st_dec) {
+  CHECK(write_exp_intro(st_dec->init))
   CHECK(write_cstyle(st_dec->typename))
   CHECK(write(&(String){2, 1, " "}))
   CHECK(write_cstyle(st_dec->name))
   if (st_dec->init != NULL) {
     CHECK(write(&(String){4, 3, " = "}))
-    CHECK(write_cstyle(st_dec->init))
+    CHECK(write_exp(st_dec->init))
   }
   CHECK(write(&(String){3, 2, ";\n"}))
   return OK;
@@ -1001,16 +1062,33 @@ Returncode write_ref_prefix(String* typename, String* name) {
   return OK;
 }
 Returncode write_var_class(St_dec* st_dec) {
+  CHECK(write_exp_intro(st_dec->init))
   CHECK(write_ref_prefix(st_dec->typename, st_dec->name))
-  CHECK(write(&(String){5, 4, "0};\n"}))
+  if (st_dec->init == NULL) {
+    CHECK(write(&(String){2, 1, "0"}))
+  }
+  else {
+    CHECK(write_exp(st_dec->init))
+  }
+  CHECK(write(&(String){4, 3, "};\n"}))
   return OK;
 }
 Returncode write_var_string(St_dec* st_dec) {
+  CHECK(write_exp_intro(st_dec->init))
   CHECK(write_ref_prefix(&(String){7, 6, "String"}, st_dec->name))
   CHECK(write(st_dec->string_length))
   CHECK(write(&(String){12, 11, ", 0, (char["}))
   CHECK(write(st_dec->string_length))
-  CHECK(write(&(String){9, 8, "]){0}};\n"}))
+  CHECK(write(&(String){8, 7, "]){0}};"}))
+  if (st_dec->init != NULL) {
+    CHECK(write_new_indent_line())
+    CHECK(write(&(String){13, 12, "String_copy("}))
+    CHECK(write_cstyle(st_dec->name))
+    CHECK(write(&(String){3, 2, ", "}))
+    CHECK(write_exp(st_dec->init))
+    CHECK(write(&(String){3, 2, ");"}))
+  }
+  CHECK(write(&(String){2, 1, "\n"}))
   return OK;
 }
 Returncode write_var_array(St_dec* st_dec) {
@@ -1073,51 +1151,12 @@ Returncode parse_var() {
 }
 /* ref */
 Returncode write_ref(St_dec* st_dec) {
-  if (st_dec->slice_start != NULL) {
-    CHECK(write(&(String){6, 5, "if (("}))
-    CHECK(write_cstyle(st_dec->slice_start))
-    CHECK(write(&(String){6, 5, ") + ("}))
-    CHECK(write_cstyle(st_dec->slice_length))
-    CHECK(write(&(String){5, 4, ") > "}))
-    CHECK(write_cstyle(st_dec->init))
-    CHECK(write(&(String){3, 2, "->"}))
-    if (st_dec->array_length == NULL) {
-      CHECK(write(&(String){8, 7, "actual_"}))
-    }
-    CHECK(write(&(String){14, 13, "length) RAISE"}))
-    CHECK(write_new_indent_line())
-  }
   CHECK(write_cstyle(st_dec->typename))
   CHECK(write(&(String){3, 2, "* "}))
   CHECK(write_cstyle(st_dec->name))
-  
   if (st_dec->init != NULL) {
     CHECK(write(&(String){4, 3, " = "}))
-    if (st_dec->slice_start == NULL) {
-      CHECK(write_cstyle(st_dec->init))
-    }
-    else if (st_dec->array_length != NULL) {
-      CHECK(write(&(String){10, 9, "&(Array){"}))
-      CHECK(write_cstyle(st_dec->slice_length))
-      CHECK(write(&(String){11, 10, ", (Byte*)("}))
-      CHECK(write_cstyle(st_dec->init))
-      CHECK(write(&(String){14, 13, "->values) + ("}))
-      CHECK(write_cstyle(st_dec->slice_start))
-      CHECK(write(&(String){12, 11, ") * sizeof("}))
-      CHECK(write_cstyle(st_dec->array_length))
-      CHECK(write(&(String){3, 2, ")}"}))
-    }
-    else {
-      CHECK(write(&(String){11, 10, "&(String){"}))
-      CHECK(write_cstyle(st_dec->slice_length))
-      CHECK(write(&(String){3, 2, ", "}))
-      CHECK(write_cstyle(st_dec->slice_length))
-      CHECK(write(&(String){3, 2, ", "}))
-      CHECK(write_cstyle(st_dec->init))
-      CHECK(write(&(String){11, 10, "->chars + "}))
-      CHECK(write_cstyle(st_dec->slice_start))
-      CHECK(write(&(String){2, 1, "}"}))
-    }
+    CHECK(write_exp(st_dec->init))
   }
   CHECK(write(&(String){3, 2, ";\n"}))
   return OK;
@@ -1237,11 +1276,23 @@ Returncode parse_else() {
 }
 /* else-if */
 Returncode write_else_if(St_exp* st_exp) {
+  CHECK(write(&(String){7, 6, "else {"}))
+  glob->spaces = glob->spaces + 2;
+  CHECK(write_new_indent_line())
   CHECK(write_exp_intro(st_exp))
-  CHECK(write(&(String){10, 9, "else if ("}))
+  CHECK(write(&(String){5, 4, "if ("}))
   CHECK(write_exp(st_exp))
   CHECK(write(&(String){2, 1, ")"}))
   CHECK(write_block())
+  St* next = glob->curr->next_brother;
+  if (next != NULL and (next->writer == write_else or next->writer == write_else_if)) {
+    glob->curr = next;
+    CHECK(write_spaces())
+    CHECK(next->writer(next->value))
+  }
+  glob->spaces = glob->spaces - 2;
+  CHECK(write_spaces())
+  CHECK(write(&(String){3, 2, "}\n"}))
   return OK;
 }
 Returncode parse_else_if() {
@@ -1336,6 +1387,7 @@ Returncode write_class_members(St* self_node, Bool in_class) {
       CHECK(son->writer(son->value))
     }
     son = son->next_brother;
+    glob->curr = glob->curr->father;
   }
   return OK;
 }
@@ -1527,7 +1579,7 @@ Returncode create_name_maps() {
   CHECK(add_type(&(String){5, 4, "Bool"}, NULL))
   /* String */
   Name_map* string_members = NULL;
-  CHECK(add_member(&(String){14, 13, "actual-length"}, int_type, NULL, &string_members))
+  CHECK(add_member(&(String){7, 6, "length"}, int_type, NULL, &string_members))
   CHECK(add_member(&(String){11, 10, "max-length"}, int_type, NULL, &string_members))
   CHECK(add_member(&(String){6, 5, "clear"}, func_type, NULL, &string_members))
   CHECK(add_member(&(String){6, 5, "equal"}, func_type, NULL, &string_members))

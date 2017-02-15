@@ -9,7 +9,7 @@ String* new_string(int length) {
   }
   String* str = buff;
   str->max_length = length;
-  str->actual_length = 0;
+  str->length = 0;
   str->chars = (Byte*)buff + sizeof(String);
   return str;
 }
@@ -64,18 +64,18 @@ Returncode File_putc(File* file, Char in_char) {
 }
 
 Returncode File_write(File* file, String* data) {
-  fprintf(file, "%.*s", data->actual_length, data->chars);
+  fprintf(file, "%.*s", data->length, data->chars);
   return OK;
 }
 
 /*Strings*/
 Returncode String_clear(String* this) {
-  this->actual_length = 0;
+  this->length = 0;
   return OK;
 }
 
 Returncode String_length(String* this, Int* out_length) {
-  *out_length = this->actual_length;
+  *out_length = this->length;
   return OK;
 }
 
@@ -84,11 +84,11 @@ Returncode String_equal(String* this, String* other, Bool* out_equal) {
     *out_equal = true;
     return OK;
   }
-  if (this->actual_length != other->actual_length) {
+  if (this->length != other->length) {
     *out_equal = false;
     return OK;
   }
-  if (strncmp(this->chars, other->chars, this->actual_length) == 0) {
+  if (strncmp(this->chars, other->chars, this->length) == 0) {
     *out_equal = true;
     return OK;
   }
@@ -97,7 +97,7 @@ Returncode String_equal(String* this, String* other, Bool* out_equal) {
 }
 
 Returncode String_get(String* this, Int index, Char* out_char) {
-  if (index < 0 or index >= this->actual_length) {
+  if (index < 0 or index >= this->length) {
     RAISE
   }
   *out_char = this->chars[index];
@@ -105,11 +105,11 @@ Returncode String_get(String* this, Int index, Char* out_char) {
 }
 
 Returncode String_append(String* this, Char in_char) {
-  if (this->actual_length == this->max_length) {
+  if (this->length == this->max_length) {
     RAISE
   }
-  this->chars[this->actual_length] = in_char;
-  ++this->actual_length;
+  this->chars[this->length] = in_char;
+  ++this->length;
   return OK;
 }
 
@@ -118,7 +118,7 @@ Returncode String_replace(String* this, Char old, Char new) {
     return OK;
   }
   int n;
-  for (n = 0; n < this->actual_length; ++n) {
+  for (n = 0; n < this->length; ++n) {
     if (this->chars[n] == old) {
       this->chars[n] = new;
     }
@@ -129,10 +129,10 @@ Returncode String_replace(String* this, Char old, Char new) {
 Returncode Int_str(Int value, String* out_str) {
   int res = snprintf(out_str->chars, out_str->max_length ,"%d", value);
   if (res <= 0 or res >= out_str->max_length) {
-    out_str->actual_length = 0;
+    out_str->length = 0;
     RAISE
   }
-  out_str->actual_length = res;
+  out_str->length = res;
   return OK;
 }
 
@@ -140,27 +140,27 @@ Returncode String_copy(String* this, String* source) {
   if (this == source) {
     return OK;
   }
-  if (source->actual_length > this->max_length) {
+  if (source->length > this->max_length) {
     RAISE
   }
-  this->actual_length = source->actual_length;
-  memcpy(this->chars, source->chars, this->actual_length);
+  this->length = source->length;
+  memcpy(this->chars, source->chars, this->length);
   return OK;
 }
 
 Returncode String_concat(String* this, String* ext) {
-  if (this->actual_length + ext->actual_length > this->max_length) {
+  if (this->length + ext->length > this->max_length) {
     RAISE
   }
-  memcpy(this->chars + this->actual_length, ext->chars, ext->actual_length);
-  this->actual_length += ext->actual_length;
+  memcpy(this->chars + this->length, ext->chars, ext->length);
+  this->length += ext->length;
   return OK;
 }
 
 Returncode String_find(String* this, String* pattern, Int* out_index) {
   Int n;
-  for (n = 0; n <= this->actual_length - pattern->actual_length; ++n) {
-    if (strncmp(this->chars + n, pattern->chars, pattern->actual_length) == 0) {
+  for (n = 0; n <= this->length - pattern->length; ++n) {
+    if (strncmp(this->chars + n, pattern->chars, pattern->length) == 0) {
       *out_index = n;
       return OK;
     }
@@ -170,7 +170,7 @@ Returncode String_find(String* this, String* pattern, Int* out_index) {
 
 Returncode String_has(String* this, Char ch, Bool* found) {
   int n;
-  for (n = 0; n < this->actual_length; ++n) {
+  for (n = 0; n < this->length; ++n) {
     if (this->chars[n] == ch) {
       *found = true;
       return OK;
@@ -188,7 +188,7 @@ Returncode array_length(Array* this, Int* out_length) {
 
 /*System*/
 Returncode Sys_print(Sys* _, String* text) {
-  printf("%.*s\n", text->actual_length, text->chars);
+  printf("%.*s\n", text->length, text->chars);
   return OK;
 }
 
@@ -198,13 +198,13 @@ Returncode Sys_exit(Sys* _, Int status) {
 }
 
 Returncode set_cstring(String* str) {
-  if (str->actual_length >= str->max_length) {
+  if (str->length >= str->max_length) {
     if (strnlen(str->chars, str->max_length) >= str->max_length) {
       RAISE
     }
   }
-  else if (strnlen(str->chars, str->actual_length + 1) > str->actual_length) {
-    str->chars[str->actual_length] = '\0';
+  else if (strnlen(str->chars, str->length + 1) > str->length) {
+    str->chars[str->length] = '\0';
   }
   return OK;
 }
@@ -226,8 +226,8 @@ Returncode Sys_getenv(Sys* _, String* name, Bool* exists, String* value) {
     *exists = false;
     return OK;
   }
-  value->actual_length = strnlen(ret, value->max_length);
-  strncpy(value->chars, ret, value->actual_length);
+  value->length = strnlen(ret, value->max_length);
+  strncpy(value->chars, ret, value->length);
   *exists = true;
   return OK;
 }

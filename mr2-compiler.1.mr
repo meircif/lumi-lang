@@ -370,7 +370,8 @@ func write-sons()
     glob.curr := son
     write-spaces()
     son.writer(user son.value)
-    son := son.next-brother
+    son := glob.curr.next-brother
+    glob.curr := glob.curr.father
   
   return
 
@@ -482,6 +483,7 @@ class St-exp
   owner Member-path item
   owner St-func call
   owner St-exp subexp
+  owner St-exp slice-length
 
 func real-string-length(user String text): copy Int length
   var Int index(1)
@@ -496,6 +498,98 @@ func real-string-length(user String text): copy Int length
     index := index + 1
   
   out length := real-length
+  return
+
+native func write-exp(user St-exp st-exp)
+
+func write-exp-array(user St-exp st-exp)
+  user Var-attrs var-attrs
+  find-var(user glob.curr.var-map, user st-exp.item.name): user var-attrs
+  user Member-path mpath(st-exp.item)
+  do
+    while mpath.next != NULL
+    mpath := mpath.next
+    find-var(user var-attrs.type-attrs.members, user mpath.name): user var-attrs
+  
+  user String typename(var-attrs.type-attrs.name)
+  var Bool is-array
+  if string-equal(user typename, user "Array"): copy is-array
+    if var-attrs.subtype = NULL
+      print(user mpath.name)
+      raise
+    
+    typename := var-attrs.subtype.name
+  
+  if st-exp.slice-length = NULL
+    if is-array
+      write(user "((")
+      write-cstyle(user typename)
+      write(user "*)(")
+      write-mpath(user st-exp.item, copy true)
+      write(user "->values))")
+      if is-primitive(user typename): copt glob.flag
+        write(user "[")
+        write-exp(user st-exp.subexp)
+        write(user "]")
+      
+      else
+        write(user " + ")
+        write-exp(user st-exp.subexp)
+      
+    
+    else
+      write-mpath(user st-exp.item, copy true)
+      write(user "->chars[")
+      write-exp(user st-exp.subexp)
+      write(user "]")
+    
+  
+  else-if is-array
+    write(user "&(Array){")
+    write-exp(user st-exp.slice-length)
+    write(user ", ((")
+    write-cstyle(user typename)
+    write(user "*)(")
+    write-mpath(user st-exp.item, copy true)
+    write(user "->values)) + (")
+    write-exp(user st-exp.subexp)
+    write(user ")}")
+  
+  else
+    write(user "&(String){")
+    write-exp(user st-exp.slice-length)
+    write(user ", ")
+    write-exp(user st-exp.slice-length)
+    write(user ", ")
+    write-mpath(user st-exp.item, copy true)
+    write(user "->chars + (")
+    write-exp(user st-exp.subexp)
+    write(copy ")}")
+  
+  return
+
+func write-exp-item(user Member-path mpath)
+  var Char first
+  if string-get(user mpath.name, user 0): copy first = '"'
+    real-string-length(user mpath.name): copy glob.length
+    var String{80} length-str
+    write(user "&(String){")
+    int-to-string(copy glob.length): var length-str
+    write(user length-str)
+    write(user ", ")
+    glob.length := glob.length - 1
+    int-to-string(copy glob.length): var length-str
+    write(user length-str)
+    write(user ", ")
+    write(user mpath.name)
+    write(user "}")
+  
+  else-if first = '\'' or first = '-' or first >= '0' and first <= '9'
+    write(user mpath.name)
+  
+  else
+    write-mpath(user mpath, copy true)
+  
   return
 
 func write-exp(user St-exp st-exp)
@@ -521,55 +615,10 @@ func write-exp(user St-exp st-exp)
     
   
   else-if st-exp.subexp != NULL
-    user Var-attrs var-attrs
-    find-var(user glob.curr.var-map, user st-exp.item.name): user var-attrs
-    user Member-path mpath(st-exp.item)
-    do
-      while mpath.next != NULL
-      mpath := mpath.next
-      find-var(user var-attrs.type-attrs.members, user mpath.name): user var-attrs
-    
-    if var-attrs.subtype = NULL
-      print(user mpath.name)
-      raise
-    
-    write(user "((")
-    write-cstyle(user var-attrs.subtype.name)
-    write(user "*)(")
-    write-mpath(user st-exp.item, copy true)
-    write(user "->values))")
-    if is-primitive(user var-attrs.subtype.name): copt glob.flag
-      write(user "[")
-      write-exp(user st-exp.subexp)
-      write(user "]")
-    
-    else
-      write(user " + ")
-      write-exp(user st-exp.subexp)
-    
+    write-exp-array(user st-exp)
   
   else
-    var Char first
-    if string-get(user st-exp.item.name, user 0): copy first = '"'
-      real-string-length(user st-exp.item.name): copy glob.length
-      var String{80} length-str
-      write(user "&(String){")
-      int-to-string(copy glob.length): var length-str
-      write(user length-str)
-      write(user ", ")
-      glob.length := glob.length - 1
-      int-to-string(copy glob.length): var length-str
-      write(user length-str)
-      write(user ", ")
-      write(user st-exp.item.name)
-      write(user "}")
-    
-    else-if first = '\'' or first = '-' or first >= '0' and first <= '9'
-      write(user st-exp.item.name)
-    
-    else
-      write-mpath(user st-exp.item, copy true)
-    
+    write-exp-item(user st-exp.item)
   
   if st-exp.operator != NULL
     write(user " ")
@@ -594,11 +643,22 @@ func write-exp-intro(user St-exp st-exp)
     write-new-indent-line()
   
   else-if st-exp.subexp != NULL and st-exp.item != NULL
-    write(user "if (")
+    write(user "if ((")
     write-exp(user st-exp.subexp)
-    write(user " < 0 || ")
+    write(user ") < 0 || (")
+    if st-exp.slice-length != NULL
+      write-exp(user st-exp.slice-length)
+      write(user ") < 0 || (")
+    
     write-exp(user st-exp.subexp)
-    write(user " >= ")
+    if st-exp.slice-length = NULL
+      write(user ") >= ")
+    
+    else
+      write(user ") + (")
+      write-exp(user st-exp.slice-length)
+      write(user ") > ")
+    
     write-mpath(user st-exp.item, copy true)
     write(user "->length) RAISE")
     write-new-indent-line()
@@ -628,9 +688,16 @@ func parse-exp(user String exp-ends): owner St-exp new-st-exp, copy Char out-end
     
     st-exp.item := NULL
   
-  else-if end  = '['
-    parse-exp(user "]"): owner st-exp.subexp, copy end
+  else-if end = '['
+    parse-exp(user ":]"): owner st-exp.subexp, copy end
+    if end = ':'
+      parse-exp(user "]"): owner st-exp.slice-length, copy end
+    
     readc(): copy end
+    if end = '.'
+      new-copy(user "->"): owner st-exp.operator
+      parse-exp(user exp-ends): owner st-exp.next, copy end
+    
   
   if end = ' '
     read-new(user " "): owner st-exp.operator, copy end
@@ -915,17 +982,13 @@ class St-dec
   owner String typename
   owner String array-length
   owner String string-length
-  owner String init
-  owner String slice-start
-  owner String slice-length
+  owner St-exp init
 
 func parse-dec(): owner St-dec new-st-dec
   new St-dec st-dec
   st-dec.array-length := NULL
   st-dec.string-length := NULL
   st-dec.init := NULL
-  st-dec.slice-start := NULL
-  st-dec.slice-length := NULL
   
   read-new(user " {"): owner st-dec.typename, copy glob.end
   var Bool is-array(false)
@@ -946,10 +1009,7 @@ func parse-dec(): owner St-dec new-st-dec
     
   
   if read-new(user "("): owner st-dec.name, copy glob.end = '('
-    if read-new(user ")["): owner st-dec.init, copy glob.end = '['
-      read-new(user ":"): owner st-dec.slice-start, copy glob.end
-      read-new(user "]"): owner st-dec.slice-length, copy glob.end
-      readc(): copy glob.end
+    parse-exp(user ")"): owner st-dec.init, copy glob.end
     
     readc(): copy glob.end
   
@@ -979,12 +1039,13 @@ func parse-dec(): owner St-dec new-st-dec
 
 # var
 func write-var-primitive(user St-dec st-dec)
+  write-exp-intro(user st-dec.init)
   write-cstyle(user st-dec.typename)
   write(user " ")
   write-cstyle(user st-dec.name)
   if st-dec.init != NULL
     write(user " = ")
-    write-cstyle(user st-dec.init)
+    write-exp(user st-dec.init)
   
   write(user ";\n")
   return
@@ -999,16 +1060,33 @@ func write-ref-prefix(user String typename, user String name)
   return
 
 func write-var-class(user St-dec st-dec)
+  write-exp-intro(user st-dec.init)
   write-ref-prefix(user st-dec.typename, user st-dec.name)
-  write(user "0};\n")
+  if st-dec.init = NULL
+    write(user "0")
+  
+  else
+    write-exp(user st-dec.init)
+  
+  write(user "};\n")
   return
 
 func write-var-string(user St-dec st-dec)
+  write-exp-intro(user st-dec.init)
   write-ref-prefix(user "String", user st-dec.name)
   write(user st-dec.string-length)
   write(user ", 0, (char[")
   write(user st-dec.string-length)
-  write(user "]){0}};\n")
+  write(user "]){0}};")
+  if st-dec.init != NULL
+    write-new-indent-line()
+    write(user "String_copy(")
+    write-cstyle(user st-dec.name)
+    write(user ", ")
+    write-exp(user st-dec.init)
+    write(user ");")
+  
+  write(user "\n")
   return
 
 func write-var-array(user St-dec st-dec)
@@ -1071,51 +1149,12 @@ func parse-var()
 
 # ref
 func write-ref(user St-dec st-dec)
-  if st-dec.slice-start != NULL
-    write(user "if ((")
-    write-cstyle(user st-dec.slice-start)
-    write(user ") + (")
-    write-cstyle(user st-dec.slice-length)
-    write(user ") > ")
-    write-cstyle(user st-dec.init)
-    write(user "->")
-    if st-dec.array-length = NULL
-      write(user "actual_")
-    
-    write(user "length) RAISE")
-    write-new-indent-line()
-  
   write-cstyle(user st-dec.typename)
   write(user "* ")
   write-cstyle(user st-dec.name)
-  
   if st-dec.init != NULL
     write(user " = ")
-    if st-dec.slice-start = NULL
-      write-cstyle(user st-dec.init)
-    
-    else-if st-dec.array-length != NULL
-      write(user "&(Array){")
-      write-cstyle(user st-dec.slice-length)
-      write(user ", (Byte*)(")
-      write-cstyle(user st-dec.init)
-      write(user "->values) + (")
-      write-cstyle(user st-dec.slice-start)
-      write(user ") * sizeof(")
-      write-cstyle(user st-dec.array-length)
-      write(user ")}")
-    
-    else
-      write(user "&(String){")
-      write-cstyle(user st-dec.slice-length)
-      write(user ", ")
-      write-cstyle(user st-dec.slice-length)
-      write(user ", ")
-      write-cstyle(user st-dec.init)
-      write(user "->chars + ")
-      write-cstyle(user st-dec.slice-start)
-      write(copy "}")
-    
+    write-exp(user st-dec.init)
   
   write(user ";\n")
   return
@@ -1235,11 +1274,23 @@ func parse-else()
 
 # else-if
 func write-else-if(user St-exp st-exp)
+  write(user "else {")
+  glob.spaces := glob.spaces + 2
+  write-new-indent-line()
   write-exp-intro(user st-exp)
-  write(user "else if (")
+  write(user "if (")
   write-exp(user st-exp)
   write(user ")")
   write-block()
+  user St next(glob.curr.next-brother)
+  if next != NULL and (next.writer = write-else or next.writer = write-else-if)
+    glob.curr := next
+    write-spaces()
+    next.writer(user next.value)
+  
+  glob.spaces := glob.spaces - 2
+  write-spaces()
+  write(user "}\n")
   return
 
 func parse-else-if()
@@ -1334,6 +1385,7 @@ func write-class-members(user St self-node, copy Bool in-class)
       son.writer(user son.value)
     
     son := son.next-brother
+    glob.curr := glob.curr.father
   
   return
 
@@ -1525,7 +1577,7 @@ func create-name-maps()
   add-type(user "Bool", owner NULL)
   # String
   owner Name-map string-members(NULL)
-  add-member(user "actual-length", user int-type, user NULL): owner string-members
+  add-member(user "length", user int-type, user NULL): owner string-members
   add-member(user "max-length", user int-type, user NULL): owner string-members
   add-member(user "clear", user func-type, user NULL): owner string-members
   add-member(user "equal", user func-type, user NULL): owner string-members

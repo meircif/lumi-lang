@@ -16,7 +16,7 @@ typedef unsigned char Byte;
 
 typedef struct {
   int max_length;
-  int actual_length;
+  int length;
   char* chars;
 } String;
 
@@ -59,7 +59,7 @@ typedef struct {} Sys;
   for (arg = 0; arg < argc; ++arg) { \
     args_strings[arg].chars = argv[arg]; \
     args_strings[arg].max_length = strnlen(args_strings[arg].chars, 1024); \
-    args_strings[arg].actual_length = args_strings[arg].max_length; \
+    args_strings[arg].length = args_strings[arg].max_length; \
   } \
   CHECK(func(args_array)) \
   return OK; \
