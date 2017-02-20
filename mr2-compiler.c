@@ -44,6 +44,18 @@ Returncode new_copy(String* text, String** out_text) {
   return OK;
 }
 
+Returncode raise_on_null(Generic* ref, String* prefix, String* middle, String* suffix) {
+  if (ref == NULL) {
+    String* msg = &(String){256, 0, (char[256]){0}};
+    CHECK(string_copy(msg, prefix))
+    CHECK(string_concat(msg, middle))
+    CHECK(string_concat(msg, suffix))
+    CHECK(print(msg))
+    RAISE
+  }
+  return OK;
+}
+
 /* Function Map */
 typedef struct Func_map Func_map; struct Func_map {
   String* key;
@@ -83,7 +95,7 @@ typedef struct Type_attrs Type_attrs; struct Type_attrs {
 typedef struct Var_attrs Var_attrs; struct Var_attrs {
   String* name;
   Type_attrs* type_attrs;
-  Type_attrs* subtype;
+  Generic* subtype;
   String* access;
   Bool is_ref;
 };
@@ -109,7 +121,7 @@ Returncode nm_find(Name_map* self, String* name, Generic** value) {
   *value = NULL;
   return OK;
 }
-Returncode add_member(String* name, Type_attrs* type_attrs, Type_attrs* subtype, Name_map** members) {
+Returncode add_member(String* name, Type_attrs* type_attrs, Generic* subtype, Name_map** members) {
   Var_attrs* new_var = malloc(sizeof(Var_attrs)); if (new_var == NULL) RAISE
   CHECK(new_copy(name, &new_var->name))
   new_var->type_attrs = type_attrs;
@@ -149,7 +161,6 @@ typedef struct Global_data Global_data; struct Global_data {
   File* outfile;
   Array* key_word_map;
   Name_map* type_map;
-  Name_map* var_map;
   /* place */
   String* file_name;
   String* func_name;
@@ -158,6 +169,7 @@ typedef struct Global_data Global_data; struct Global_data {
   St* curr;
   Int spaces;
   Type_attrs* class_attrs;
+  Int var_count;
   /* vars */
   Int length;
   Bool flag;
@@ -204,26 +216,14 @@ Returncode add_type(String* name, Name_map* members) {
 Returncode find_type(String* name, Type_attrs** type_attr) {
   Generic* value;
   CHECK(nm_find(glob->type_map, name, &value))
-  if (value == NULL) {
-    String* msg = &(String){256, 0, (char[256]){0}};
-    CHECK(string_copy(msg, &(String){16, 15, "Undefined type "}))
-    CHECK(string_concat(msg, name))
-    CHECK(print(msg))
-    RAISE
-  }
+  CHECK(raise_on_null(value, &(String){17, 16, "Undefined type \""}, name, &(String){2, 1, "\""}))
   *type_attr = value;
   return OK;
 }
 Returncode find_var(Name_map* nm, String* name, Var_attrs** var_attr) {
   Generic* value;
   CHECK(nm_find(nm, name, &value))
-  if (value == NULL) {
-    String* msg = &(String){256, 0, (char[256]){0}};
-    CHECK(string_copy(msg, &(String){20, 19, "Undefined variable "}))
-    CHECK(string_concat(msg, name))
-    CHECK(print(msg))
-    RAISE
-  }
+  CHECK(raise_on_null(value, &(String){21, 20, "Undefined variable \""}, name, &(String){2, 1, "\""}))
   *var_attr = value;
   return OK;
 }
@@ -520,6 +520,7 @@ typedef struct St_func St_func; struct St_func {
   Member_path* path;
   St_arg* params;
   St_arg* outputs;
+  St_arg* last;
 };
 typedef struct St_exp St_exp; struct St_exp {
   St_exp* next;
@@ -558,11 +559,9 @@ Returncode write_exp_array(St_exp* st_exp) {
   String* typename = var_attrs->type_attrs->name;
   Bool is_array;
   CHECK(string_equal(typename, &(String){6, 5, "Array"}, &is_array)) if (is_array) {
-    if (var_attrs->subtype == NULL) {
-      CHECK(print(mpath->name))
-      RAISE
-    }
-    typename = var_attrs->subtype->name;
+    CHECK(raise_on_null(var_attrs->subtype, &(String){22, 21, "No subtype in array \""}, mpath->name, &(String){2, 1, "\""}))
+    Type_attrs* subtype = var_attrs->subtype;
+    typename = subtype->name;
   }
   if (st_exp->slice_length == NULL) {
     if (is_array) {
@@ -641,15 +640,8 @@ Returncode write_exp(St_exp* st_exp) {
     RAISE
   }
   if (st_exp->call != NULL) {
-    St_arg* last = st_exp->call->outputs;
-    if (last == NULL) {
-      RAISE
-    }
-    while (true) {
-      if (not(last->next != NULL)) break;
-      last = last->next;
-    }
-    CHECK(write_mpath(last->value, true))
+    CHECK(raise_on_null(st_exp->call->last, &(String){16, 15, "No output for \""}, st_exp->call->path->name, &(String){2, 1, "\""}))
+    CHECK(write_mpath(st_exp->call->last->value, true))
   }
   else if (st_exp->item == NULL) {
     if (st_exp->subexp != NULL) {
@@ -753,6 +745,69 @@ Returncode parse_exp(String* exp_ends, St_exp** new_st_exp, Char* out_end) {
   return OK;
 }
 /* function */
+Returncode write_func_last(St_func* st_func, Name_map* var_map, String* name) {
+  Var_attrs* var_attrs;
+  CHECK(find_var(var_map, name, &var_attrs))
+  CHECK(raise_on_null(var_attrs->subtype, &(String){2, 1, "\""}, name, &(String){20, 19, "\" is not a function"}))
+  St_func* func_def = var_attrs->subtype;
+  St_arg* dec_out = func_def->outputs;
+  if (dec_out == NULL) {
+    CHECK(write_tb_check())
+    return OK;
+  }
+  St_arg* call_out = st_func->outputs;
+  St_arg* call_prev_out = NULL;
+  while (true) {
+    if (not(dec_out->next != NULL and call_out != NULL)) break;
+    call_prev_out = call_out;
+    dec_out = dec_out->next;
+    call_out = call_out->next;
+  }
+  if (dec_out->next != NULL) {
+    CHECK(raise_on_null(NULL, &(String){21, 20, "too few outputs in \""}, name, &(String){2, 1, "\""}))
+  }
+  if (call_out != NULL and call_out->next != NULL) {
+    CHECK(raise_on_null(NULL, &(String){22, 21, "too many outputs in \""}, name, &(String){2, 1, "\""}))
+  }
+  if (call_out == NULL) {
+    String* counter = &(String){32, 0, (char[32]){0}};
+    CHECK(int_to_string(glob->var_count, counter))
+    glob->var_count = glob->var_count + 1;
+    String* last = new_string(2 + dec_out->typename->actual_length + counter->actual_length); if (last == NULL) RAISE
+    CHECK(string_copy(last, &(String){2, 1, "_"}))
+    CHECK(string_concat(last, dec_out->typename))
+    CHECK(string_concat(last, counter))
+    CHECK(write_cstyle(dec_out->typename))
+    CHECK(is_primitive(dec_out->typename, &glob->flag)) if (glob->flag == false) {
+      CHECK(write(&(String){2, 1, "*"}))
+    }
+    CHECK(write(&(String){2, 1, " "}))
+    CHECK(write_cstyle(last))
+    CHECK(write(&(String){2, 1, ";"}))
+    CHECK(write_new_indent_line())
+    Member_path* mpath = malloc(sizeof(Member_path)); if (mpath == NULL) RAISE
+    mpath->name = last;
+    mpath->next = NULL;
+    St_arg* arg = malloc(sizeof(St_arg)); if (arg == NULL) RAISE
+    arg->value = mpath;
+    arg->next = NULL;
+    arg->type_param = NULL;
+    CHECK(new_copy(dec_out->typename, &arg->typename))
+    CHECK(new_copy(dec_out->access, &arg->access))
+    if (call_prev_out == NULL) {
+      st_func->outputs = arg;
+    }
+    else {
+      call_prev_out->next = arg;
+    }
+    st_func->last = arg;
+  }
+  else {
+    st_func->last = call_out;
+  }
+  CHECK(write_tb_check())
+  return OK;
+}
 Returncode write_func_call(St_func* st_func) {
   St_arg* arg = st_func->params;
   while (true) {
@@ -760,7 +815,6 @@ Returncode write_func_call(St_func* st_func) {
     CHECK(write_exp_intro(arg->value))
     arg = arg->next;
   }
-  CHECK(write_tb_check())
   if (st_func->path->next != NULL) {
     Var_attrs* var_attrs;
     CHECK(find_var(glob->curr->var_map, st_func->path->name, &var_attrs))
@@ -770,6 +824,7 @@ Returncode write_func_call(St_func* st_func) {
       CHECK(find_var(var_attrs->type_attrs->members, mpath->name, &var_attrs))
       mpath = mpath->next;
     }
+    CHECK(write_func_last(st_func, var_attrs->type_attrs->members, mpath->name))
     CHECK(write_cstyle(var_attrs->type_attrs->name))
     CHECK(write(&(String){2, 1, "_"}))
     CHECK(write_cstyle(mpath->name))
@@ -780,6 +835,7 @@ Returncode write_func_call(St_func* st_func) {
     }
   }
   else {
+    CHECK(write_func_last(st_func, glob->curr->var_map, st_func->path->name))
     CHECK(write_mpath(st_func->path, true))
     CHECK(write(&(String){2, 1, "("}))
   }
@@ -857,13 +913,19 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
     CHECK(new_copy(mpath->name, &new_var->name))
     new_func->path = mpath;
     CHECK(find_type(&(String){5, 4, "Func"}, &new_var->type_attrs))
-    new_var->subtype = NULL;
+    new_var->subtype = new_func;
     new_var->is_ref = false;
-    CHECK(nm_init(new_var->name, new_var, &glob->curr->var_map))
+    if (glob->class_attrs == NULL) {
+      CHECK(nm_init(new_var->name, new_var, &glob->curr->var_map))
+    }
+    else {
+      CHECK(nm_init(new_var->name, new_var, &glob->class_attrs->members))
+    }
   }
   else {
     new_func->path = path;
   }
+  new_func->last = NULL;
   new_func->params = NULL;
   new_func->outputs = NULL;
   St_arg* last = NULL;
@@ -903,36 +965,37 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
   }
   CHECK(readc(&glob->end))
   last = NULL;
-  while (true) {
-    if (not(glob->end != '\n')) break;
-    CHECK(readc(&glob->end))
-    St_arg* param = malloc(sizeof(St_arg)); if (param == NULL) RAISE
-    param->next = NULL;
-    CHECK(read_new(&(String){2, 1, " "}, &param->access, &glob->end))
-    if (path == NULL) {
-      CHECK(read_new(&(String){2, 1, " "}, &param->typename, &glob->end))
-    }
-    else {
+  if (glob->end == ':') {
+    while (true) {
+      CHECK(readc(&glob->end))
+      St_arg* param = malloc(sizeof(St_arg)); if (param == NULL) RAISE
+      param->next = NULL;
       param->typename = NULL;
+      param->type_param = NULL;
+      CHECK(read_new(&(String){2, 1, " "}, &param->access, &glob->end))
+      if (path == NULL) {
+        CHECK(read_new(&(String){2, 1, " "}, &param->typename, &glob->end))
+      }
+      if (path == NULL) {
+        String* name;
+        CHECK(read_new(&(String){3, 2, ",)"}, &name, &glob->end))
+        param->value = name;
+      }
+      else {
+        Member_path* mpath;
+        CHECK(read_mpath(&(String){3, 2, ",)"}, &mpath, &glob->end))
+        param->value = mpath;
+      }
+      if (last == NULL) {
+        new_func->outputs = param;
+      }
+      else {
+        last->next = param;
+      }
+      last = param;
+      if (not(glob->end == ',')) break;
     }
-    if (path == NULL) {
-      String* name;
-      CHECK(read_new(&(String){3, 2, ", "}, &name, &glob->end))
-      param->value = name;
-    }
-    else {
-      Member_path* mpath;
-      CHECK(read_mpath(&(String){4, 3, "., "}, &mpath, &glob->end))
-      param->value = mpath;
-    }
-    if (last == NULL) {
-      new_func->outputs = param;
-    }
-    else {
-      last->next = param;
-    }
-    last = param;
-    if (not(glob->end == ',')) break;
+    CHECK(readc(&glob->end))
   }
   *st_func = new_func;
   *end = glob->end;
@@ -953,7 +1016,9 @@ Returncode add_arg_vars(St_arg* first, Bool is_ref) {
     CHECK(find_type(arg->typename, &new_var->type_attrs))
     new_var->subtype = NULL;
     if (arg->type_param != NULL) {
-      CHECK(find_type(arg->type_param, &new_var->subtype))
+      Type_attrs* subtype;
+      CHECK(find_type(arg->type_param, &subtype))
+      new_var->subtype = subtype;
     }
     CHECK(string_equal(arg->access, &(String){4, 3, "var"}, &glob->flag)) new_var->is_ref = glob->flag == false and is_ref;
     CHECK(nm_init(new_var->name, new_var, &glob->curr->var_map))
@@ -967,7 +1032,7 @@ Returncode parse_func_body(Func writer) {
   glob->func_name = st_func->path->name;
   CHECK(add_node(writer, st_func))
   CHECK(start_block())
-  /* add vars to var-map */
+  /* add arguments to var-map */
   if (glob->class_attrs != NULL) {
     Var_attrs* new_var = malloc(sizeof(Var_attrs)); if (new_var == NULL) RAISE
     CHECK(new_copy(&(String){5, 4, "self"}, &new_var->name))
@@ -1069,7 +1134,9 @@ Returncode parse_dec(St_dec** new_st_dec) {
     CHECK(find_type(&(String){6, 5, "Array"}, &type_attr))
   }
   else if (is_array) {
-    CHECK(find_type(st_dec->array_length, &new_var->subtype))
+    Type_attrs* subtype;
+    CHECK(find_type(st_dec->array_length, &subtype))
+    new_var->subtype = subtype;
   }
   new_var->type_attrs = type_attr;
   new_var->is_ref = false;
@@ -1609,15 +1676,78 @@ Returncode create_key_word_map() {
   glob->key_word_map = key_word_map;
   return OK;
 }
+Returncode new_substing(String* text, String* ends, String** substing, Int* end, Char* endch) {
+  Int start = end[0];
+  Int index = start;
+  Char ch;
+  while (true) {
+    ch = EOF;
+    if (not(index < text->actual_length)) break;
+    Bool has_end;
+    CHECK(string_get(text, index, &ch))
+    CHECK(string_has(ends, ch, &has_end)) if (not(has_end == false)) break;
+    index = index + 1;
+  }
+  if ((start) + (index - start) > text->actual_length) RAISE String* sub = &(String){index - start, index - start, text->chars + start};
+  CHECK(new_copy(sub, substing))
+  *end = index + 1;
+  *endch = ch;
+  return OK;
+}
+Returncode add_args(String* header, St_arg** args, Int* index, Char* endch) {
+  Char end;
+  St_arg* prev = NULL;
+  *args = NULL;
+  while (true) {
+    St_arg* param = malloc(sizeof(St_arg)); if (param == NULL) RAISE
+    param->next = NULL;
+    param->type_param = NULL;
+    CHECK(new_substing(header, &(String){2, 1, " "}, &param->access, index, &end))
+    CHECK(new_substing(header, &(String){3, 2, " {"}, &param->typename, index, &end))
+    if (end == '{') {
+      CHECK(new_substing(header, &(String){2, 1, " "}, &param->type_param, index, &end))
+    }
+    String* value;
+    CHECK(new_substing(header, &(String){3, 2, ",)"}, &value, index, &end))
+    param->value = value;
+    if (prev == NULL) {
+      *args = param;
+    }
+    else {
+      prev->next = param;
+    }
+    prev = param;
+    if (not(end == ',')) break;
+  }
+  *endch = end;
+  return OK;
+}
+Returncode add_meth(String* header, Type_attrs* func_type, Name_map** members) {
+  St_func* st_func = malloc(sizeof(St_func)); if (st_func == NULL) RAISE
+  Member_path* mpath = malloc(sizeof(Member_path)); if (mpath == NULL) RAISE
+  mpath->next = NULL;
+  Int index = 0;
+  Char end;
+  CHECK(new_substing(header, &(String){3, 2, "()"}, &mpath->name, &index, &end))
+  st_func->path = mpath;
+  st_func->last = NULL;
+  if (end == '(') {
+    CHECK(add_args(header, &st_func->params, &index, &end))
+  }
+  if (end == ')') {
+    CHECK(add_args(header, &st_func->outputs, &index, &end))
+  }
+  CHECK(add_member(mpath->name, func_type, st_func, members))
+  return OK;
+}
 Returncode create_name_maps() {
   glob->type_map = NULL;
-  glob->var_map = NULL;
   /* Func */
   CHECK(add_type(&(String){5, 4, "Func"}, NULL))
   Type_attrs* func_type = glob->type_map->value;
   /* Int */
   Name_map* int_members = NULL;
-  CHECK(add_member(&(String){4, 3, "str"}, func_type, NULL, &int_members))
+  CHECK(add_meth(&(String){19, 18, "str)var String str"}, func_type, &int_members))
   CHECK(add_type(&(String){4, 3, "Int"}, int_members))
   Type_attrs* int_type = glob->type_map->value;
   /* Char */
@@ -1628,15 +1758,15 @@ Returncode create_name_maps() {
   Name_map* string_members = NULL;
   CHECK(add_member(&(String){7, 6, "length"}, int_type, NULL, &string_members))
   CHECK(add_member(&(String){11, 10, "max-length"}, int_type, NULL, &string_members))
-  CHECK(add_member(&(String){6, 5, "clear"}, func_type, NULL, &string_members))
-  CHECK(add_member(&(String){6, 5, "equal"}, func_type, NULL, &string_members))
-  CHECK(add_member(&(String){4, 3, "get"}, func_type, NULL, &string_members))
-  CHECK(add_member(&(String){7, 6, "append"}, func_type, NULL, &string_members))
-  CHECK(add_member(&(String){5, 4, "copy"}, func_type, NULL, &string_members))
-  CHECK(add_member(&(String){7, 6, "concat"}, func_type, NULL, &string_members))
-  CHECK(add_member(&(String){5, 4, "find"}, func_type, NULL, &string_members))
-  CHECK(add_member(&(String){8, 7, "replace"}, func_type, NULL, &string_members))
-  CHECK(add_member(&(String){4, 3, "has"}, func_type, NULL, &string_members))
+  CHECK(add_meth(&(String){6, 5, "clear"}, func_type, &string_members))
+  CHECK(add_meth(&(String){42, 41, "equal(user String pattern)copy Bool equal"}, func_type, &string_members))
+  CHECK(add_meth(&(String){32, 31, "get(copy Int index)copy Char ch"}, func_type, &string_members))
+  CHECK(add_meth(&(String){20, 19, "append(copy Char ch"}, func_type, &string_members))
+  CHECK(add_meth(&(String){23, 22, "copy(user String other"}, func_type, &string_members))
+  CHECK(add_meth(&(String){25, 24, "concat(user String other"}, func_type, &string_members))
+  CHECK(add_meth(&(String){40, 39, "find(user String pattern)copy Int index"}, func_type, &string_members))
+  CHECK(add_meth(&(String){40, 39, "replace(copy Char oldch,copy Char newch"}, func_type, &string_members))
+  CHECK(add_meth(&(String){31, 30, "has(copy Char ch)copy Bool has"}, func_type, &string_members))
   CHECK(add_type(&(String){7, 6, "String"}, string_members))
   /* Array */
   Name_map* array_members = NULL;
@@ -1644,17 +1774,19 @@ Returncode create_name_maps() {
   CHECK(add_type(&(String){6, 5, "Array"}, array_members))
   /* File */
   Name_map* file_members = NULL;
-  CHECK(add_member(&(String){6, 5, "close"}, func_type, NULL, &file_members))
-  CHECK(add_member(&(String){5, 4, "getc"}, func_type, NULL, &file_members))
-  CHECK(add_member(&(String){5, 4, "putc"}, func_type, NULL, &file_members))
-  CHECK(add_member(&(String){6, 5, "write"}, func_type, NULL, &file_members))
+  CHECK(add_meth(&(String){6, 5, "close"}, func_type, &file_members))
+  CHECK(add_meth(&(String){18, 17, "getc)copy Char ch"}, func_type, &file_members))
+  CHECK(add_meth(&(String){18, 17, "putc(copy Char ch"}, func_type, &file_members))
+  CHECK(add_meth(&(String){23, 22, "write(user String text"}, func_type, &file_members))
   CHECK(add_type(&(String){5, 4, "File"}, file_members))
+  CHECK(add_meth(&(String){48, 47, "file-open-read(user String name)owner File file"}, func_type, &glob->curr->var_map))
+  CHECK(add_meth(&(String){49, 48, "file-open-write(user String name)owner File file"}, func_type, &glob->curr->var_map))
   /* Sys */
   Name_map* sys_members = NULL;
-  CHECK(add_member(&(String){6, 5, "print"}, func_type, NULL, &sys_members))
-  CHECK(add_member(&(String){5, 4, "exit"}, func_type, NULL, &sys_members))
-  CHECK(add_member(&(String){7, 6, "system"}, func_type, NULL, &sys_members))
-  CHECK(add_member(&(String){7, 6, "getenv"}, func_type, NULL, &sys_members))
+  CHECK(add_meth(&(String){23, 22, "print(user String text"}, func_type, &sys_members))
+  CHECK(add_meth(&(String){21, 20, "exit(copy Int status"}, func_type, &sys_members))
+  CHECK(add_meth(&(String){43, 42, "system(user String command)copy Int status"}, func_type, &sys_members))
+  CHECK(add_meth(&(String){58, 57, "getenv(user String name)var String value,copy Bool exists"}, func_type, &sys_members))
   CHECK(add_type(&(String){4, 3, "Sys"}, sys_members))
   return OK;
 }
@@ -1662,6 +1794,7 @@ Returncode init_glob_state(St* root) {
   glob->curr = root;
   glob->spaces = 0;
   glob->class_attrs = NULL;
+  glob->var_count = 0;
   return OK;
 }
 /* main */
@@ -1679,18 +1812,18 @@ Returncode func(Array* argv) {
   if (2 < 0 || 2 >= argv->length) RAISE outfile_name = ((String*)(argv->values)) + 2;
   
   /* init global data */
-  St* root;
-  CHECK(st_new(write_sons, NULL, NULL, false, &root))
+  CHECK(st_new(write_sons, NULL, NULL, false, &glob->curr))
+  St* root = glob->curr;
   CHECK(create_key_word_map())
   CHECK(create_name_maps())
   
   /* parse */
   CHECK(file_open_read(infile_name, &glob->infile))
+  CHECK(print(&(String){11, 10, "parsing..."}))
+  CHECK(init_glob_state(root))
   glob->file_name = infile_name;
   glob->func_name = NULL;
   glob->line_num = 0;
-  CHECK(print(&(String){11, 10, "parsing..."}))
-  CHECK(init_glob_state(root))
   CHECK(parse_lines())
   CHECK(file_close(glob->infile))
   

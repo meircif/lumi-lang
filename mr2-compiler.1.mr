@@ -42,6 +42,18 @@ func new-copy(user String text): owner String out-text
   return
 
 
+func raise-on-null(user Generic ref, user String prefix, user String middle, user String suffix)
+  if ref = NULL
+    var String{256} msg
+    string-copy(user msg, user prefix)
+    string-concat(user msg, user middle)
+    string-concat(user msg, user suffix)
+    print(user msg)
+    raise
+  
+  return
+
+
 # Function Map
 class Func-map
   owner String key
@@ -81,7 +93,7 @@ class Type-attrs
 class Var-attrs
   owner String name
   user Type-attrs type-attrs
-  user Type-attrs subtype
+  user Generic subtype
   owner String access
   var Bool is-ref
 
@@ -107,7 +119,7 @@ func nm-find(user Name-map self, user String name): user Generic value
   out value := NULL
   return
 
-func add-member(user String name, user Type-attrs type-attrs, user Type-attrs subtype): owner Name-map members
+func add-member(user String name, user Type-attrs type-attrs, user Generic subtype): owner Name-map members
   new Var-attrs new-var
   new-copy(user name): owner new-var.name
   new-var.type-attrs := type-attrs
@@ -147,7 +159,6 @@ class Global-data
   owner File outfile
   user Array{Func-map} key-word-map
   owner Name-map type-map
-  owner Name-map var-map
   # place
   user String file-name
   user String func-name
@@ -156,6 +167,7 @@ class Global-data
   user St curr
   var Int spaces
   user Type-attrs class-attrs
+  var Int var-count
   # vars
   var Int length
   var Bool flag
@@ -202,26 +214,14 @@ func add-type(user String name, owner Name-map members)
 func find-type(user String name): user Type-attrs type-attr
   user Generic value
   nm-find(user glob.type-map, user name): user value
-  if value = NULL
-    var String{256} msg
-    string-copy(user msg, user "Undefined type ")
-    string-concat(user msg, user name)
-    print(user msg)
-    raise
-  
+  raise-on-null(user value, user "Undefined type \"", user name, user "\"")
   out type-attr := value
   return
 
 func find-var(user Name-map nm, user String name): user Var-attrs var-attr
   user Generic value
   nm-find(user nm, user name): user value
-  if value = NULL
-    var String{256} msg
-    string-copy(user msg, user "Undefined variable ")
-    string-concat(user msg, user name)
-    print(user msg)
-    raise
-  
+  raise-on-null(user value, user "Undefined variable \"", user name, user "\"")
   out var-attr := value
   return
 
@@ -518,6 +518,7 @@ class St-func
   owner Member-path path
   owner St-arg params
   owner St-arg outputs
+  user St-arg last
 
 class St-exp
   owner St-exp next
@@ -556,11 +557,9 @@ func write-exp-array(user St-exp st-exp)
   user String typename(var-attrs.type-attrs.name)
   var Bool is-array
   if string-equal(user typename, user "Array"): copy is-array
-    if var-attrs.subtype = NULL
-      print(user mpath.name)
-      raise
-    
-    typename := var-attrs.subtype.name
+    raise-on-null(user var-attrs.subtype, user "No subtype in array \"", user mpath.name, user "\"")
+    user Type-attrs subtype(var-attrs.subtype)
+    typename := subtype.name
   
   if st-exp.slice-length = NULL
     if is-array
@@ -639,15 +638,8 @@ func write-exp(user St-exp st-exp)
     raise
   
   if st-exp.call != NULL
-    user St-arg last(st-exp.call.outputs)
-    if last = NULL
-      raise
-    
-    do
-      while last.next != NULL
-      last := last.next
-    
-    write-mpath(user last.value, copy true)
+    raise-on-null(user st-exp.call.last, user "No output for \"", user st-exp.call.path.name, user "\"")
+    write-mpath(user st-exp.call.last.value, copy true)
   
   else-if st-exp.item = NULL
     if st-exp.subexp != NULL
@@ -751,6 +743,69 @@ func parse-exp(user String exp-ends): owner St-exp new-st-exp, copy Char out-end
   return
 
 # function
+func write-func-last(user St-func st-func, user Name-map var-map, user String name)
+  user Var-attrs var-attrs
+  find-var(user var-map, user name): user var-attrs
+  raise-on-null(user var-attrs.subtype, user "\"", user name, user "\" is not a function")
+  user St-func func-def(var-attrs.subtype)
+  user St-arg dec-out(func-def.outputs)
+  if dec-out = NULL
+    write-tb-check()
+    return
+  
+  user St-arg call-out(st-func.outputs)
+  user St-arg call-prev-out(NULL)
+  do
+    while dec-out.next != NULL and call-out != NULL
+    call-prev-out := call-out
+    dec-out := dec-out.next
+    call-out := call-out.next
+  
+  if dec-out.next != NULL
+    raise-on-null(user NULL, user "too few outputs in \"", user name, user "\"")
+  
+  if call-out != NULL and call-out.next != NULL
+    raise-on-null(user NULL, user "too many outputs in \"", user name, user "\"")
+  
+  if call-out = NULL
+    var String{32} counter
+    int-to-string(copy glob.var-count): var counter
+    glob.var-count := glob.var-count + 1
+    new String{2 + dec-out.typename.actual-length + counter.actual-length} last
+    string-copy(user last, user "_")
+    string-concat(user last, user dec-out.typename)
+    string-concat(user last, user counter)
+    write-cstyle(user dec-out.typename)
+    if is-primitive(user dec-out.typename): copy glob.flag = false
+      write(user "*")
+    
+    write(user " ")
+    write-cstyle(user last)
+    write(user ";")
+    write-new-indent-line()
+    new Member-path mpath
+    mpath.name := last
+    mpath.next := NULL
+    new St-arg arg
+    arg.value := mpath
+    arg.next := NULL
+    arg.type-param := NULL
+    new-copy(user dec-out.typename): owner arg.typename
+    new-copy(user dec-out.access): owner arg.access
+    if call-prev-out = NULL
+      st-func.outputs = arg
+    
+    else
+      call-prev-out.next := arg
+    
+    st-func.last := arg
+  
+  else
+    st-func.last := call-out
+  
+  write-tb-check()
+  return
+
 func write-func-call(user St-func st-func)
   user St-arg arg(st-func.params)
   do
@@ -758,7 +813,6 @@ func write-func-call(user St-func st-func)
     write-exp-intro(user arg.value)
     arg := arg.next
   
-  write-tb-check()
   if st-func.path.next != NULL:
     user Var-attrs var-attrs
     find-var(user glob.curr.var-map, user st-func.path.name): user var-attrs
@@ -768,6 +822,7 @@ func write-func-call(user St-func st-func)
       find-var(user var-attrs.type-attrs.members, user mpath.name): user var-attrs
       mpath := mpath.next
     
+    write-func-last(user st-func, user var-attrs.type-attrs.members, user mpath.name)
     write-cstyle(user var-attrs.type-attrs.name)
     write(user "_")
     write-cstyle(user mpath.name)
@@ -778,6 +833,7 @@ func write-func-call(user St-func st-func)
     
   
   else
+    write-func-last(user st-func, user glob.curr.var-map, user st-func.path.name)
     write-mpath(user st-func.path, copy true)
     write(user "(")
   
@@ -855,13 +911,19 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
     new-copy(user mpath.name): owner new-var.name
     new-func.path := mpath
     find-type(user "Func"): user new-var.type-attrs
-    new-var.subtype := NULL
+    new-var.subtype := new-func
     new-var.is-ref := false
-    nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+    if glob.class-attrs = NULL
+      nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+    
+    else
+      nm-init(user new-var.name, owner new-var): owner glob.class-attrs.members
+    
   
   else
     new-func.path := path
   
+  new-func.last := NULL
   new-func.params := NULL
   new-func.outputs := NULL
   user St-arg last(NULL)
@@ -901,36 +963,37 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
   
   readc(): copy glob.end
   last := NULL
-  do
-    while glob.end != '\n'
-    readc(): copy glob.end
-    new St-arg param
-    param.next := NULL
-    read-new(user " "): owner param.access, copy glob.end
-    if path = NULL
-      read-new(user " "): owner param.typename, copy glob.end
-    
-    else
+  if glob.end = ':'
+    do
+      readc(): copy glob.end
+      new St-arg param
+      param.next := NULL
       param.typename := NULL
+      param.type-param := NULL
+      read-new(user " "): owner param.access, copy glob.end
+      if path = NULL
+        read-new(user " "): owner param.typename, copy glob.end
+      
+      if path = NULL
+        owner String name
+        read-new(user ",)"): owner name, copy glob.end
+        param.value := name
+      
+      else
+        owner Member-path mpath
+        read-mpath(user ",)"): owner mpath, copy glob.end
+        param.value := mpath
+      
+      if last = NULL
+        new-func.outputs := param
+      
+      else
+        last.next := param
+      
+      last := param
+      while glob.end = ','
     
-    if path = NULL
-      owner String name
-      read-new(user ", "): owner name, copy glob.end
-      param.value := name
-    
-    else
-      owner Member-path mpath
-      read-mpath(user "., "): owner mpath, copy glob.end
-      param.value := mpath
-    
-    if last = NULL
-      new-func.outputs := param
-    
-    else
-      last.next := param
-    
-    last := param
-    while glob.end = ','
+    readc(): copy glob.end
   
   out st-func := new-func
   out end := glob.end
@@ -951,7 +1014,9 @@ func add-arg-vars(user St-arg first, copy Bool is-ref)
     find-type(user arg.typename): user new-var.type-attrs
     new-var.subtype := NULL
     if arg.type-param != NULL
-      find-type(user arg.type-param): user new-var.subtype
+      user Type-attrs subtype
+      find-type(user arg.type-param): user subtype
+      new-var.subtype := subtype
     
     new-var.is-ref := string-equal(user arg.access, user "var"): copy glob.flag = false and is-ref
     nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
@@ -965,7 +1030,7 @@ func parse-func-body(copy Func writer)
   glob.func-name := st-func.path.name
   add-node(copy writer, owner st-func)
   start-block()
-  # add vars to var-map
+  # add arguments to var-map
   if glob.class-attrs != NULL
     new Var-attrs new-var
     new-copy(user "self"): owner new-var.name
@@ -1067,7 +1132,9 @@ func parse-dec(): owner St-dec new-st-dec
     find-type(user "Array"): user type-attr
   
   else-if is-array
-    find-type(user st-dec.array-length): user new-var.subtype
+    user Type-attrs subtype
+    find-type(user st-dec.array-length): user subtype
+    new-var.subtype := subtype
   
   new-var.type-attrs := type-attr
   new-var.is-ref := false
@@ -1607,15 +1674,78 @@ func create-key-word-map()
   glob.key-word-map := key-word-map
   return
 
+func new-substing(user String text, user String ends): owner String substing, copy Int end, copy Char endch
+  var Int start(end[0])
+  var Int index(start)
+  var Char ch
+  do
+    ch := EOF
+    while index < text.actual-length
+    var Bool has-end
+    string-get(user text, copy index): copy ch
+    while string-has(user ends, copy ch): copy has-end = false
+    index := index + 1
+  
+  user String sub(text[start:index - start])
+  new-copy(user sub): var substing
+  out end := index + 1
+  out endch := ch
+  return
+
+func add-args(user String header): owner St-arg args, copy Int index, copy Char endch
+  var Char end
+  user St-arg prev(NULL)
+  out args := NULL
+  do
+    new St-arg param
+    param.next := NULL
+    param.type-param := NULL
+    new-substing(user header, user " "): owner param.access, var index, copy end
+    new-substing(user header, user " {"): owner param.typename, var index, copy end
+    if end = '{'
+      new-substing(user header, user " "): owner param.type-param, var index, copy end
+    
+    owner String value
+    new-substing(user header, user ",)"): owner value, var index, copy end
+    param.value := value
+    if prev = NULL
+      out args = param
+    
+    else
+      prev.next := param
+    
+    prev := param
+    while end = ','
+  
+  out endch := end
+  return
+
+func add-meth(user String header, user Type-attrs func-type): owner Name-map members
+  new St-func st-func
+  new Member-path mpath
+  mpath.next := NULL
+  var Int index(0)
+  var Char end
+  new-substing(user header, user "()"): owner mpath.name, copy index, copy end
+  st-func.path := mpath
+  st-func.last := NULL
+  if end = '('
+    add-args(user header): owner st-func.params, copy index, copy end
+  
+  if end = ')'
+    add-args(user header): owner st-func.outputs, copy index, copy end
+  
+  add-member(user mpath.name, user func-type, user st-func): var members
+  return
+
 func create-name-maps()
   glob.type-map := NULL
-  glob.var-map := NULL
   # Func
   add-type(user "Func", owner NULL)
   user Type-attrs func-type(glob.type-map.value)
   # Int
   owner Name-map int-members(NULL)
-  add-member(user "str", user func-type, user NULL): owner int-members
+  add-meth(user "str)var String str", user func-type): owner int-members
   add-type(user "Int", owner int-members)
   user Type-attrs int-type(glob.type-map.value)
   # Char
@@ -1626,15 +1756,15 @@ func create-name-maps()
   owner Name-map string-members(NULL)
   add-member(user "length", user int-type, user NULL): owner string-members
   add-member(user "max-length", user int-type, user NULL): owner string-members
-  add-member(user "clear", user func-type, user NULL): owner string-members
-  add-member(user "equal", user func-type, user NULL): owner string-members
-  add-member(user "get", user func-type, user NULL): owner string-members
-  add-member(user "append", user func-type, user NULL): owner string-members
-  add-member(user "copy", user func-type, user NULL): owner string-members
-  add-member(user "concat", user func-type, user NULL): owner string-members
-  add-member(user "find", user func-type, user NULL): owner string-members
-  add-member(user "replace", user func-type, user NULL): owner string-members
-  add-member(user "has", user func-type, user NULL): owner string-members
+  add-meth(user "clear", user func-type): owner string-members
+  add-meth(user "equal(user String pattern)copy Bool equal", user func-type): owner string-members
+  add-meth(user "get(copy Int index)copy Char ch", user func-type): owner string-members
+  add-meth(user "append(copy Char ch", user func-type): owner string-members
+  add-meth(user "copy(user String other", user func-type): owner string-members
+  add-meth(user "concat(user String other", user func-type): owner string-members
+  add-meth(user "find(user String pattern)copy Int index", user func-type): owner string-members
+  add-meth(user "replace(copy Char oldch,copy Char newch", user func-type): owner string-members
+  add-meth(user "has(copy Char ch)copy Bool has", user func-type): owner string-members
   add-type(user "String", owner string-members)
   # Array
   owner Name-map array-members(NULL)
@@ -1642,17 +1772,19 @@ func create-name-maps()
   add-type(user "Array", owner array-members)
   # File
   owner Name-map file-members(NULL)
-  add-member(user "close", user func-type, user NULL): owner file-members
-  add-member(user "getc", user func-type, user NULL): owner file-members
-  add-member(user "putc", user func-type, user NULL): owner file-members
-  add-member(user "write", user func-type, user NULL): owner file-members
+  add-meth(user "close", user func-type): owner file-members
+  add-meth(user "getc)copy Char ch", user func-type): owner file-members
+  add-meth(user "putc(copy Char ch", user func-type): owner file-members
+  add-meth(user "write(user String text", user func-type): owner file-members
   add-type(user "File", owner file-members)
+  add-meth(user "file-open-read(user String name)owner File file", user func-type): owner glob.curr.var-map
+  add-meth(user "file-open-write(user String name)owner File file", user func-type): owner glob.curr.var-map
   # Sys
   owner Name-map sys-members(NULL)
-  add-member(user "print", user func-type, user NULL): owner sys-members
-  add-member(user "exit", user func-type, user NULL): owner sys-members
-  add-member(user "system", user func-type, user NULL): owner sys-members
-  add-member(user "getenv", user func-type, user NULL): owner sys-members
+  add-meth(user "print(user String text", user func-type): owner sys-members
+  add-meth(user "exit(copy Int status", user func-type): owner sys-members
+  add-meth(user "system(user String command)copy Int status", user func-type): owner sys-members
+  add-meth(user "getenv(user String name)var String value,copy Bool exists", user func-type): owner sys-members
   add-type(user "Sys", owner sys-members)
   return
 
@@ -1660,6 +1792,7 @@ func init-glob-state(user St root)
   glob.curr := root
   glob.spaces := 0
   glob.class-attrs := NULL
+  glob.var-count := 0
   return
 
 # main
@@ -1677,18 +1810,18 @@ main func(user Array{String} argv)
   [] String outfile-name := argv[2]
   
   # init global data
-  owner St root
-  st-new(copy write-sons, user NULL, user NULL, copy false): owner root
+  st-new(copy write-sons, user NULL, user NULL, copy false): owner glob.curr
+  owner St root(glob.curr)
   create-key-word-map()
   create-name-maps()
   
   # parse
   file-open-read(user infile-name): owner glob.infile
+  print(user "parsing...")
+  init-glob-state(user root)
   glob.file-name := infile-name
   glob.func-name := NULL
   glob.line-num := 0
-  print(user "parsing...")
-  init-glob-state(user root)
   parse-lines()
   file-close(owner glob.infile)
   

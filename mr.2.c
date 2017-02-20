@@ -76,11 +76,6 @@ Returncode String_clear(String* this) {
   return OK;
 }
 
-Returncode String_length(String* this, Int* out_length) {
-  *out_length = this->length;
-  return OK;
-}
-
 Returncode String_equal(String* this, String* other, Bool* out_equal) {
   if (this == other) {
     *out_equal = true;
@@ -221,7 +216,7 @@ Returncode Sys_system(Sys* _, String* command, Int* status) {
   return OK;
 }
 
-Returncode Sys_getenv(Sys* _, String* name, Bool* exists, String* value) {
+Returncode Sys_getenv(Sys* _, String* name, String* value, Bool* exists) {
   CCHECK(set_cstring(name));
   char* ret = getenv(name->chars);
   if (ret == NULL) {

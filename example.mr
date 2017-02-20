@@ -387,9 +387,18 @@ func structures-example()
 
 # functions
 ############
+(# arg:
+copy  : read-only value copy
+user  : read-only ref
+owner : moved owner ref
+ref   : ref can be changed
+out copy  : must be set a value
+out user  : must be sta a ref
+out owner  : an owner ref must be moved to it
+#)
 
 # declaring a function
-func func-name(copy Uint32b input-value): copy Int{0:9} return-value
+func func-name(copy Uint32b input-value):(copy Int{0:9} return-value)
   # function body...
   return input-value mod 10  # return value
 
@@ -403,10 +412,11 @@ func complex-func(
     weak String{Uint8b} weak-reference,
     managed String{Uint8b} managed-reference,  # takes ownership
     shared String{Uint8b} shared-reference)
-  ):  # supports multiple return values
+  ):(  # supports multiple return values
     copy Uint32b return-value,
     weak String{Uint8b} weak-reference-return-value,  # or any other type
-    var String{36} stack-variable  # must be initialized in the func
+    var String{36} stack-variable)  # must be initialized in the func
+  )
   # function body...
   var stack-variable("init string")
   return input-by-value div 5, managed-reference, stack-variable
@@ -429,7 +439,7 @@ func calling-example()
   no-params-func()
 
 # function reference
-  var Func func-ref(copy Uint32b input-value): copy Int{0:9} return-value
+  var Func func-ref(copy Uint32b input-value):(copy Int{0:9} return-value)
   func-ref := func-name
 
 
@@ -443,9 +453,8 @@ func calling-example()
 
 # to call a native function it must be declared in MR way using "native",
 # only "out", "copy" and "user" parameters can be used
-native func external-func-name(
-  out Int{0:255} out-param,
-  copy Int{0:255} in-param)
+native func external-func-name(copy Int{0:255} in-param):
+  (Int{0:255} out-param,)
 
 # in C this will call a function declared as:
 #   Returncode external_func_name(Uint* out_param, Uint in_param)

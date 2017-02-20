@@ -84,6 +84,8 @@ Returncode String_replace(String* this, Char old_ch, Char new_ch);
 
 Returncode Int_str(Int value, String* str);
 
+Returncode file_open_read(String* name, File** file);
+Returncode file_open_write(String* name, File** file);
 Returncode File_close(File* this);
 Returncode File_getc(File* this, Char* ch);
 Returncode File_putc(File* this, Char ch);
@@ -92,6 +94,6 @@ Returncode File_write(File* this, String* line);
 Returncode Sys_print(Sys*, String* text);
 Returncode Sys_exit(Sys*, Int status);
 Returncode Sys_system(Sys*, String* command, Int* status);
-Returncode Sys_getenv(Sys*, String* name, Bool* exists, String* value);
+Returncode Sys_getenv(Sys*, String* name, String* value, Bool* exists);
 
 #endif  /*__MR_C_API__*/
