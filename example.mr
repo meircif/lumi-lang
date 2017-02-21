@@ -1,6 +1,6 @@
 # comments
 ###########
-func comment-example()
+func f-comment-example()
 
 (# <-- multi-line comment start
 
@@ -11,9 +11,9 @@ This syntax is temporary and will probably change in the near future.
 multi-line comment end --> #)
 
 # single line comment, strict exactly one space after #
-  some-code()  # line end comment, strict 2 spaces before #
+  f-some-code()  # line end comment, strict 2 spaces before #
 
-  some-code( (# mid-code comment (strict whitespacing?) #) )
+  f-some-code( (# mid-code comment (strict whitespacing?) #) )
 
 (#
 (#
@@ -24,7 +24,7 @@ allow nested comments?
 
 # object creation
 ############
-func variables-example()
+func f-variables-example()
 
 # stack variable objects are created using "var"
   var Int int-var
@@ -36,7 +36,7 @@ func variables-example()
 
 # references
 #############
-func references-example()
+func f-references-example()
 
 (# maneging references
 
@@ -67,8 +67,8 @@ Users are free to modify the referenced object freely - but cannot destroy it.
 Variables ca also give references as owners - but cannot pass their ownership.
 #)
   owner String{32} some-string(new{String{32}}(""))
-  user-func(user some-string)  # give reference to a user
-  owning-func(owner some-string)  # pass ownership, cannot be used anymore
+  f-user-func(user some-string)  # give reference to a user
+  f-owning-func(owner some-string)  # pass ownership, cannot be used anymore
 
 
 (# 2. More flexible reference maneging - with a small performance cost
@@ -90,9 +90,9 @@ and predictable.
   added because it can cause memory leaks because of reference loops.
 #)
   managed String{32} some-string(new{String{32}}(""))
-  user-func(user some-string)  # give reference to a user
-  weak-func(weak some-string)  # give weak reference
-  owning-func(managed some-string)  # pass ownership
+  f-user-func(user some-string)  # give reference to a user
+  f-weak-func(weak some-string)  # give weak reference
+  f-owning-func(managed some-string)  # pass ownership
 
 (# 3. Maximum flexibility - but with performance issues
 MR will allow declaring a reference as garbage-collected, which will allow
@@ -108,9 +108,9 @@ cost, but some MR users may be willing to pay it in some sections of their
 project where performance is less important.
 #)
   shared String{32} some-string(new{String{32}}(""))
-  shared-func(shared some-string)  # copy strong reference
-  user-func(user some-string)  # give reference to a user
-  weak-func(weak some-string)  # give weak reference
+  f-shared-func(shared some-string)  # copy strong reference
+  f-user-func(user some-string)  # give reference to a user
+  f-weak-func(weak some-string)  # give weak reference
 
 # primitive types
 ##################
@@ -127,18 +127,18 @@ func primitive-types-example()
   var Uint16b unsigned-16bit(0)  # same as Int{0:65535}
   var Uint32b unsigned-32bit(0)  # same as Int{0:4294967295}
   var Uint64b unsigned-64bit(0)  # same as Int{0:18446744073709551615}
-  var Uint-max unsigned-max(0)  # same as Int{0:MAX-UINT-IN-MACHINE}
+  var Uint-size unsigned-size(0)  # same as Int{0:MAX-UINT-IN-MACHINE}
   var Sint8b signed-8bit(0)  # same as Int{0:255}
   var Sint16b signed-16bit(0)  # same as Int{-32766:32767}
   var Sint32b signed-32bit(0)  # same as Int{-2147483646:2147483647}
   var Sint64b signed-64bit(0)
 # same as Int{-9223372036854775806:9223372036854775807}
-  var Sint-max signed-max(0)
+  var Sint-size signed-size(0)
 # same as Int{MIN-INT-IN-MACHINE:MAX-INT-IN-MACHINE}
 
 # in C code generation each int will be implemented with the smallest int type
 # that can contain its range,
-# "Uint-max" and "Sint-max" sizes are as size_t and ssize_t respectfully
+# "Uint-size" and "Sint-size" sizes are as size_t and ssize_t respectfully
 
 # compile time constant integer
   const Int CONTS-INT(42)  # in this case the type is same as Int{42:42}
@@ -239,7 +239,7 @@ Realdl large-real-number  # same as "long double" in C
 
 # built-in complex types
 #######################
-func complex-types-example()
+func f-complex-types-example()
 
 # arrays
 
@@ -321,13 +321,13 @@ func complex-types-example()
 
 # structures
 #############
-func structures-example()
+func f-structures-example()
 
 # if else
   if bool
-    call-some-func()
+    f-call-some-func()
   else
-    call-other-func()
+    f-call-other-func()
 
 
 # loops
@@ -360,27 +360,27 @@ func structures-example()
 # contain at least one "for" statement.
 # main loop:
   do main  # infinite loop
-    call-some-func()
+    f-call-some-func()
 
   
 # switch
   switch number  # any primitive type
   case 34  # compile time constant
-    call-some-func()
+    f-call-some-func()
   case 23
-    call-some-func()
+    f-call-some-func()
     fallthrough  # this is not the default
   case 45, 67, 26, 56, 67, 89, 56, 87
-    call-other-func()
+    f-call-other-func()
   default  # must be the last only if not all values are taken care of
     return
   
   var Int{2:4} number(2)
   switch number
   case 4
-    call-some-func()
+    f-call-some-func()
   case 2
-    call-other-func()
+    f-call-other-func()
   case 3
     return
   
@@ -398,14 +398,14 @@ out owner  : an owner ref must be moved to it
 #)
 
 # declaring a function
-func func-name(copy Uint32b input-value):(copy Int{0:9} return-value)
+func f-func-name(copy Uint32b input-value):(copy Int{0:9} return-value)
   # function body...
   return input-value mod 10  # return value
 
-func no-params-func()
+func f-no-params-func()
   # function body...
 
-func complex-func(
+func f-complex-func(
     copy Uint32b input-by-value,  # "copy" only works for primitive types
     user String{Uint8b} user-reference,
     owner String{Uint8b} owner-reference,  # takes ownership of the reference
@@ -422,25 +422,25 @@ func complex-func(
   return input-by-value div 5, managed-reference, stack-variable
 
 # calling a function
-func calling-example()
+func f-calling-example()
   owner String{36} simple-string(new{String{36}}(""))
   managed String{36} managed-string(new{String{36}}(""))
   shared String{36} shared-string(new{String{36}}(""))
-  var Uint32b some-int := func-name(345)
+  var Uint32b some-int := f-func-name(345)
   var Uint32b out-int,
   weak String{Uint8b} out-string,
-  var String{36} new-string := complex-func(
+  var String{36} new-string := f-complex-func(
     copy some-int,
     user simple-string,
     owner simple-string,  # pass ownership
     weak managed-string,
     managed managed-string,  # pass ownership
     shared shared-string)
-  no-params-func()
+  f-no-params-func()
 
 # function reference
-  var Func func-ref(copy Uint32b input-value):(copy Int{0:9} return-value)
-  func-ref := func-name
+  var Func f-func-ref(copy Uint32b input-value):(copy Int{0:9} return-value)
+  f-func-ref := f-func-name
 
 
 # calling native external code
@@ -453,7 +453,7 @@ func calling-example()
 
 # to call a native function it must be declared in MR way using "native",
 # only "out", "copy" and "user" parameters can be used
-native func external-func-name(copy Int{0:255} in-param):
+native func n-external-func-name(copy Int{0:255} in-param):
   (Int{0:255} out-param,)
 
 # in C this will call a function declared as:
@@ -465,11 +465,11 @@ native func external-func-name(copy Int{0:255} in-param):
 # Unknown native types declaration:
 native type Some-native-type
 # we can the use this types in MR code as reference:
-native func get-reference(out Some-native-type ref)
-native func work-with-reference(
+native func n-get-reference(out Some-native-type ref)
+native func n-work-with-reference(
   user Some-native-type ref,
   copy Int{0:255} param)
-native func delete-reference(owner Some-native-type ref)
+native func n-delete-reference(owner Some-native-type ref)
 # this is the only case an "owner" parameter can be used
 
 # in C, native types are treated as "void*"
@@ -478,7 +478,7 @@ native func delete-reference(owner Some-native-type ref)
 # error handling
 #################
 
-func error-raising()
+func f-error-raising()
   raise
 
 # TODO
@@ -487,52 +487,130 @@ func error-raising()
 # OOP
 ######
 
-# Classes deceleration:
-# "Object" is the base class of all classes
-class Class-name: Object  # inherit from Object
+(#
+Object type is:
+1. "interface" if has no instance variables, else "class"
+2. "abstract" if has abstract members, else "dynamic" if has dynamic members,
+   else "static"
+
+Full table:
+  \ has or inherit|instance |abstract | dynamic |
+class type \      |variables| members | members |
+------------------+---------+---------+---------+---
+ static interface |    X    |    X    |    X    | "generic"
+------------------+---------+---------+---------+---
+abstract interface|    X    |    V    |   X/V   | "interface"
+------------------+---------+---------+---------+---
+ dynamic interface|    X    |    X    |    V    | "dynamic"
+------------------+---------+---------+---------+---
+   static class   |    V    |    X    |    X    | "structure"
+------------------+---------+---------+---------+---
+  abstract class  |    V    |    V    |   X/V   | "abstract"
+------------------+---------+---------+---------+---
+   dynamic class  |    V    |    X    |    V    | "class"
+
+Everyone can have: instance functions, global members
+#)
+
+# Object type deceleration:
+# "Object" is the base type of all object types
+static interface Object(Object)
+  inst func ref():(copy Uint-size obj-ref)
+  inst func equal(user Object other):(copy Bool is-equal)
+
+# Each object type must have a base type
+static class Class-name(Object)
   # members declaration
   inst var Int{0:99} int-member
   inst var Char char-member
   inst var String{60} string-member
   inst owner String{Uint8b} string-reference-member
   
-  # methods declaration, use "self" to access members and methods
-  inst func set-int(copy Int{0:99} int-arg)
+  # methods declaration, use "self" to access instance members
+  inst func m-get-int():(copy Int{0:99} int-res)
+    int-res := self.int-member
+  
+  inst func m-set-int(copy Int{0:99} int-arg)
+    if self.m-get-int() != int-arg
+      self.int-member := int-arg
+  
+  # class global definitions
+  class const Int CLASS-CONST(3)
+  static class var Int class-global-variable
+  # use "self-class" to access global members
+  static class func m-inv(copy Int{0:99} int-arg):(copy Int{0:99} int-res)
+    int-res := clamp int-arg + self-class.CLASS-CONST +
+        self-class.class-global-variable
+
+# static class inheritance
+static class Deriver-class(Class-name)
+  # additional members
+  inst var Int{0:99} another-int
+  
+  # override function, use "base" for base class instance members
+  inst func m-set-int(copy Int{0:99} int-arg)
+    base.m-set-int(copy int-arg)
     self.int-member := int-arg
-    
-  inst func get-int(out Int{0:99} int-res)
-    int-res(self.int-member)
-    
-  # global definitions under class namespace
-  const Int CLASS-CONST(3)
-  global var Int class-global-variable
   
-  global func inv(out Int{0:99} int-res, copy Int{0:99} int-arg)
-    int-res(clamp int-arg + class.CLASS-CONST + class.class-global-variable)
+  # override class global definitions
+  # use "base-class" for base class global members
+  class const Int CLASS-CONST(base-class.CLASS-CONST + 1)
+  static class var Int class-global-variable
+  static class func m-inv(copy Int{0:99} int-arg):(copy Int{0:99} int-res)
+    int-res := clamp int-arg + self-class.CLASS-CONST +
+        self-class.class-global-variable + base-class.class-global-variable
 
+# declare interfaces
+abstract interface Interface-name(Object)
+  abstract class var Int{0:255} polymorphic-int
+  abstract inst func m-polymorphic-meth(copy Int{0:255} int-arg)
+  abstract class func m-polymorphic-func(copy Int{0:255} int-arg)
 
-# Polymorphism:
-abstract class Abstract-polymorphic-class: Object
+# interface with default implementation
+dynamic interface Implemented-interface(Interface-name)
+  dynamic class var Int{0:255} polymorphic-int(3)
+  dynamic inst func m-polymorphic-meth(copy Int{0:255} int-arg)
+    self.m-polymorphic-func(int-arg)
+  dynamic class func m-polymorphic-func(copy Int{0:255} int-arg)
+    self-class.polymorphic-int := int-arg / 3
+
+# Polymorphic classes:
+abstract class Abstract-class(Interface-name)
   inst var Int{0:255} int-member
-  abstract var Int{0:255} polymorphic-int
-  abstract func polymorphic-meth(copy Int{0:255} int-arg)
   
-  inst func same-meth(copy Int{0:255} int-arg):
+  inst func m-some-meth(copy Int{0:255} int-arg):
     self.int-member := int-arg / self.polymorphic-int
 
-diverse class Polymorphic-class: Abstract-polymorphic-class
-  diverse var Int{0:255} polymorphic-int(3)
-  diverse func polymorphic-meth(copy Int{0:255} int-arg)
+dynamic class Implemented-class(Abstract-polymorphic-class)
+  dynamic class var Int{0:255} polymorphic-int(3)
+  dynamic inst func m-polymorphic-meth(copy Int{0:255} int-arg)
     self.int-member := int-arg / 3
-    
+  dynamic class func m-polymorphic-func(copy Int{0:255} int-arg)
+    self-class.polymorphic-int := int-arg / 3
 
+# single base classs with multiple interfaces
+abstract interface First-interface(Object)
+  abstract inst func m-first-func()
+  
+abstract interface Second-interface(Object)
+  abstract inst func m-second-func()
+
+dynamic class Multiple(Class-name): First-interface, Second-interface
+  dynamic inst func m-first-func()
+    self.m-set-int(self.m-get-int())
+  
+  dynamic inst func m-second-func()
+    self.int-member := self.m-get-int()
+
+# TODO construction
+# TODO destruction
 # TODO using classes
 
 # Others
 
 # aliases 
 alias NEW-CONST-INT for CONTS-INT
-alias new-func-name for func-name
+alias m-new-func-name for m-func-name
 alias New-int-name for Int{20:40}
 alias New-string-name for String{Uint8b}
 alias New-array-name for Array{Int{0:60}:String{Uint8b}}
