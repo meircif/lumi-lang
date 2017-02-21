@@ -14,7 +14,7 @@
             <Keywords name="Numbers, suffix2"></Keywords>
             <Keywords name="Numbers, range"></Keywords>
             <Keywords name="Operators1">( ) , { } [ ] : .</Keywords>
-            <Keywords name="Operators2">= + - * / &lt; &gt; &lt;= &gt;= != div mod clamp check min max encode decode minus</Keywords>
+            <Keywords name="Operators2">= + - * / &lt; &gt; &lt;= &gt;= != div mod clamp check min max encode decode minus up cast</Keywords>
             <Keywords name="Folders in code1, open"></Keywords>
             <Keywords name="Folders in code1, middle"></Keywords>
             <Keywords name="Folders in code1, close"></Keywords>

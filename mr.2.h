@@ -96,4 +96,7 @@ Returncode Sys_exit(Sys*, Int status);
 Returncode Sys_system(Sys*, String* command, Int* status);
 Returncode Sys_getenv(Sys*, String* name, String* value, Bool* exists);
 
+#define up
+#define cast (void*)
+
 #endif  /*__MR_C_API__*/
