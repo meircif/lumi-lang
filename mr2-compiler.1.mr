@@ -90,6 +90,7 @@ class Type-attrs
   owner String name
   owner Name-map members
   user Type-attrs base-type
+  var Bool is-dynamic
 
 class Var-attrs
   owner String name
@@ -138,7 +139,6 @@ class St
   var Func f-writer
   owner Generic value
   owner Name-map var-map
-  var Bool in-class
   # place
   user String infile-name
   user String func-name
@@ -154,6 +154,10 @@ func f-st-del(owner St self)
   return
 
 # Global data
+class St-class
+  user Type-attrs type-attrs
+  var Int dynamic-count
+
 class Global-data
   # data
   owner File infile
@@ -167,7 +171,7 @@ class Global-data
   # state
   user St curr
   var Int spaces
-  user Type-attrs class-attrs
+  user St-class st-class
   var Int var-count
   # vars
   var Int length
@@ -176,7 +180,7 @@ class Global-data
 
 var Global-data glob
 
-func f-st-new(copy Func f-writer, owner Generic value, user St father, copy Bool in-class): owner St res
+func f-st-new(copy Func f-writer, owner Generic value, user St father): owner St res
   new St self
   self.next-brother := NULL
   self.first-son := NULL
@@ -184,7 +188,6 @@ func f-st-new(copy Func f-writer, owner Generic value, user St father, copy Bool
   self.father := father
   self.f-writer := f-writer
   self.value := value
-  self.in-class := in-class
   self.infile-name := glob.infile-name
   self.func-name := glob.func-name
   self.line-num := glob.line-num
@@ -216,6 +219,7 @@ func add-type(user String name, user String base-name, owner Name-map members)
   f-new-copy(user name): owner new-type.name
   new-type.members := members
   new-type.base-type := NULL
+  new-type.is-dynamic := false
   if base-name != NULL
     f-find-type(user base-name): user new-type.base-type
   
@@ -362,7 +366,7 @@ func write-tb-check()
 # other helpers
 func add-node(copy Func f-writer, owner Generic value)
   user St node
-  f-st-new(copy f-writer, user value, user glob.curr, copy false): user node
+  f-st-new(copy f-writer, user value, user glob.curr): user node
   return
 
 func string-split(user String text, copy Char sep): copy Int index, copy Int length
@@ -431,7 +435,7 @@ func f-end-block()
   glob.curr := glob.curr.father
   glob.spaces := glob.spaces - 2
   if glob.spaces = 0
-    glob.class-attrs := NULL
+    glob.st-class := NULL
   
   return
 
@@ -533,6 +537,8 @@ class St-func
   owner St-arg params
   owner St-arg outputs
   user St-arg last
+  var Bool is-dynamic
+  var Int dynamic-index
 
 class St-exp
   owner St-exp next
@@ -846,9 +852,21 @@ func write-func-call(user St-func st-func)
       mpath := mpath.next
     
     write-func-last(user st-func, user var-attrs)
-    write-cstyle(user type-attrs.name)
-    write(user "_")
-    write-cstyle(user mpath.name)
+    user St-func func-def(var-attrs.subtype)
+    if func-def.is-dynamic
+      write(user "(*((Func**)(")
+      write-mpath(user st-func.path, copy false)
+      write(user ")))[")
+      var String{32} dynamic-index
+      int-to-string(copy func-def.dynamic-index): var dynamic-index
+      write(user dynamic-index)
+      write(user "]")
+    
+    else
+      write-cstyle(user type-attrs.name)
+      write(user "_")
+      write-cstyle(user mpath.name)
+    
     write(user "(")
     if bases > 0
       write(user "&(")
@@ -920,14 +938,14 @@ func write-args(user St-arg first, copy Bool is-out, user St-arg next)
 
 func write-func-header(user St-func st-func)
   write(user "Returncode ")
-  if glob.class-attrs != NULL
-    write-cstyle(user glob.class-attrs.name)
+  if glob.st-class != NULL
+    write-cstyle(user glob.st-class.type-attrs.name)
     write(user "_")
   
   write-cstyle(user st-func.path.name)
   write(user "(")
-  if glob.class-attrs != NULL
-    write-cstyle(user glob.class-attrs.name)
+  if glob.st-class != NULL
+    write-cstyle(user glob.st-class.type-attrs.name)
     write(user "* self")
     if st-func.params != NULL or st-func.outputs != NULL
       write(user ", ")
@@ -950,11 +968,11 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
     f-find-type(user "Func"): user new-var.type-attrs
     new-var.subtype := new-func
     new-var.is-ref := false
-    if glob.class-attrs = NULL
+    if glob.st-class = NULL
       f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
     
     else
-      f-nm-init(user new-var.name, owner new-var): owner glob.class-attrs.members
+      f-nm-init(user new-var.name, owner new-var): owner glob.st-class.type-attrs.members
     
   
   else
@@ -963,6 +981,8 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
   new-func.last := NULL
   new-func.params := NULL
   new-func.outputs := NULL
+  new-func.is-dynamic := false
+  new-func.dynamic-index := 0
   user St-arg last(NULL)
   do
     var String{256} access
@@ -1062,16 +1082,27 @@ func add-arg-vars(user St-arg first, copy Bool is-ref)
   return
 
 func parse-func-body(copy Func f-writer)
+  var Bool is-dynamic(false)
+  if glob.st-class != NULL
+    var String{16} subtype
+    read(user " "): var subtype, copy glob.end
+    string-equal(user subtype, user "dynamic"): copy is-dynamic
+  
   owner St-func st-func
   parse-func-header(user NULL): owner st-func, copy glob.end
+  if is-dynamic
+    st-func.is-dynamic := true
+    st-func.dynamic-index := glob.st-class.dynamic-count
+    glob.st-class.dynamic-count := glob.st-class.dynamic-count + 1
+  
   glob.func-name := st-func.path.name
   add-node(copy f-writer, owner st-func)
   f-start-block()
   # add arguments to var-map
-  if glob.class-attrs != NULL
+  if glob.st-class != NULL
     new Var-attrs new-var
     f-new-copy(user "self"): owner new-var.name
-    new-var.type-attrs := glob.class-attrs
+    new-var.type-attrs := glob.st-class.type-attrs
     new-var.subtype := NULL
     new-var.is-ref := false
     f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
@@ -1176,8 +1207,8 @@ func parse-dec(): owner St-dec new-st-dec
   new-var.type-attrs := type-attr
   new-var.is-ref := false
   
-  if glob.class-attrs != NULL
-    f-nm-init(user new-var.name, owner new-var): owner glob.class-attrs.members
+  if glob.st-class != NULL
+    f-nm-init(user new-var.name, owner new-var): owner glob.st-class.type-attrs.members
   
   else
     f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
@@ -1186,6 +1217,19 @@ func parse-dec(): owner St-dec new-st-dec
   return
 
 # var
+func write-dtl(user St-dec st-dec)
+  user Type-attrs type-attrs
+  f-find-type(user st-dec.typename): user type-attrs
+  if type-attrs.is-dynamic
+    write-new-indent-line()
+    write(user "*((Func**)(")
+    write-cstyle(user st-dec.name)
+    write(user ")) = ")
+    write-cstyle(user st-dec.typename)
+    write(user "__dtl;")
+  
+  return
+
 func write-var-primitive(user St-dec st-dec)
   write-exp-intro(user st-dec.init)
   write-cstyle(user st-dec.typename)
@@ -1216,7 +1260,9 @@ func write-var-class(user St-dec st-dec)
   else
     write-exp(user st-dec.init)
   
-  write(user "};\n")
+  write(user "};")
+  write-dtl(user st-dec)
+  write(user "\n")
   return
 
 func write-var-string(user St-dec st-dec)
@@ -1274,7 +1320,7 @@ func write-var-array(user St-dec st-dec)
 
 func add-dec-node(copy Func f-writer, owner Generic value)
   user St node
-  f-st-new(copy f-writer, user value, user glob.curr, copy glob.class-attrs != NULL): user node
+  f-st-new(copy f-writer, user value, user glob.curr): user node
   return
 
 func parse-var()
@@ -1372,6 +1418,9 @@ func write-new(user St-dec st-dec)
     write(user ") * sizeof(String) + (")
     write-cstyle(user st-dec.str-length)
     write(user ") * n};}")
+  
+  if st-dec.arr-length = NULL and st-dec.str-length = NULL
+    write-dtl(user st-dec)
   
   write(copy "\n")
   return
@@ -1526,12 +1575,12 @@ func parse-raise()
   return
 
 # class
-func write-class-members(user St self-node, copy Bool in-class)
+func write-class-members(user St self-node, copy Bool is-func)
   user St son(self-node.first-son)
   do
     while son != NULL
     glob.curr := son
-    if son.in-class = in-class
+    if is-func = (son.f-writer = write-func) and son.f-writer != write-empty
       write-spaces()
       son.f-writer(user son.value)
     
@@ -1540,32 +1589,62 @@ func write-class-members(user St self-node, copy Bool in-class)
   
   return
 
-func write-class(user Type-attrs class-attrs)
+func write-class(user St-class st-class)
+  user String class-name(st-class.type-attrs.name)
   write(user "typedef struct ")
-  write-cstyle(user class-attrs.name)
+  write-cstyle(user class-name)
   write(user " ")
-  write-cstyle(user class-attrs.name)
+  write-cstyle(user class-name)
   write(user "; struct ")
-  write-cstyle(user class-attrs.name)
+  write-cstyle(user class-name)
   write(user " {\n")
   # write members
   glob.spaces := glob.spaces + 2
-  glob.class-attrs := class-attrs
-  if class-attrs.base-type != NULL
+  glob.st-class := st-class
+  if st-class.type-attrs.base-type != NULL
     write-spaces()
-    write-cstyle(user class-attrs.base-type.name)
+    write-cstyle(user st-class.type-attrs.base-type.name)
     write(user " _base;\n")
   
+  else-if st-class.type-attrs.is-dynamic
+    write-spaces()
+    write(user "Func* _dtl;\n")
+  
   user St self-node(glob.curr)
-  write-class-members(user self-node, copy true)
+  write-class-members(user self-node, copy false)
   glob.spaces := glob.spaces - 2
   write-spaces()
   write(user "};\n")
-  write-class-members(user self-node, copy false)
-  glob.class-attrs := NULL
+  write-class-members(user self-node, copy true)
+  glob.st-class := NULL
+  if st-class.type-attrs.is-dynamic
+    write-spaces()
+    write(user "Func ")
+    write-cstyle(user class-name)
+    write(user "__dtl[] = {")
+    user St son(self-node.first-son)
+    var Bool not-first(false)
+    do
+      while son != NULL
+      if son.f-writer = write-func
+        user St-func st-func(son.value)
+        if st-func.is-dynamic
+          if not-first
+            write(user ", ")
+          
+          write-cstyle(user class-name)
+          write(user "_")
+          write-cstyle(user st-func.path.name)
+          not-first := true
+        
+      
+      son := son.next-brother
+    
+    write(user "};\n")
+  
   return
 
-func parse-class()
+func parse-class(copy Bool is-dynamic)
   var String{256} name
   var String{256} base-name
   read(user "("): var name, copy glob.end
@@ -1577,10 +1656,20 @@ func parse-class()
   else
     add-type(user name, user base-name, user NULL)
   
-  user Type-attrs class-attrs(glob.type-map.value)
-  add-node(copy write-class, owner class-attrs)
-  glob.class-attrs := class-attrs
+  new St-class st-class
+  st-class.type-attrs := glob.type-map.value
+  st-class.type-attrs.is-dynamic := is-dynamic
+  glob.st-class := st-class
+  add-node(copy write-class, owner st-class)
   f-start-block()
+  return
+
+func parse-dynamic-class()
+  parse-class(copy true)
+  return
+
+func parse-static-class()
+  parse-class(copy false)
   return
 
 # call
@@ -1702,7 +1791,7 @@ func parse-lines()
 
 # global init
 func f-create-key-word-map()
-  new Array{18:Func-map} key-word-map
+  new Array{19:Func-map} key-word-map
   add-fm(user key-word-map, copy 0, user "#", copy parse-comment)
   add-fm(user key-word-map, copy 1, user "func", copy parse-func)
   add-fm(user key-word-map, copy 2, user "native", copy parse-native)
@@ -1720,7 +1809,8 @@ func f-create-key-word-map()
   add-fm(user key-word-map, copy 14, user "for", copy parse-for)
   add-fm(user key-word-map, copy 15, user "return", copy parse-return)
   add-fm(user key-word-map, copy 16, user "raise", copy parse-raise)
-  add-fm(user key-word-map, copy 17, user "class", copy parse-class)
+  add-fm(user key-word-map, copy 17, user "static", copy parse-static-class)
+  add-fm(user key-word-map, copy 18, user "class", copy parse-dynamic-class)
   glob.key-word-map := key-word-map
   return
 
@@ -1841,7 +1931,7 @@ func f-create-name-maps()
 func f-init-glob-state(user St root)
   glob.curr := root
   glob.spaces := 0
-  glob.class-attrs := NULL
+  glob.st-class := NULL
   glob.var-count := 0
   return
 
@@ -1860,7 +1950,7 @@ main func(user Array{String} argv)
   [] String outfile-name := argv[2]
   
   # init global data
-  f-st-new(copy write-sons, user NULL, user NULL, copy false): owner glob.curr
+  f-st-new(copy write-sons, user NULL, user NULL): owner glob.curr
   owner St root(glob.curr)
   f-create-key-word-map()
   f-create-name-maps()

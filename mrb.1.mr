@@ -62,7 +62,7 @@ main func(user Array{String} argv)
     return
   
   # run C compiler
-  string-copy(user command, user "gcc \"")
+  string-copy(user command, user "gcc -g \"")
   string-concat(user command, user prefix)
   string-concat(user command, user "c\" ")
   if version = '0'

@@ -64,7 +64,7 @@ Returncode func(Array* argv) {
     return OK;
   }
   /* run C compiler */
-  CHECK(string_copy(command, &(String){6, 5, "gcc \""}))
+  CHECK(string_copy(command, &(String){9, 8, "gcc -g \""}))
   CHECK(string_concat(command, prefix))
   CHECK(string_concat(command, &(String){4, 3, "c\" "}))
   if (version == '0') {

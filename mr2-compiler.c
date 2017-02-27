@@ -92,6 +92,7 @@ typedef struct Type_attrs Type_attrs; struct Type_attrs {
   String* name;
   Name_map* members;
   Type_attrs* base_type;
+  Bool is_dynamic;
 };
 typedef struct Var_attrs Var_attrs; struct Var_attrs {
   String* name;
@@ -140,7 +141,6 @@ typedef struct St St; struct St {
   Func f_writer;
   Generic* value;
   Name_map* var_map;
-  Bool in_class;
   /* place */
   String* infile_name;
   String* func_name;
@@ -156,6 +156,10 @@ Returncode f_st_del(St* self) {
   return OK;
 }
 /* Global data */
+typedef struct St_class St_class; struct St_class {
+  Type_attrs* type_attrs;
+  Int dynamic_count;
+};
 typedef struct Global_data Global_data; struct Global_data {
   /* data */
   File* infile;
@@ -169,7 +173,7 @@ typedef struct Global_data Global_data; struct Global_data {
   /* state */
   St* curr;
   Int spaces;
-  Type_attrs* class_attrs;
+  St_class* st_class;
   Int var_count;
   /* vars */
   Int length;
@@ -178,7 +182,7 @@ typedef struct Global_data Global_data; struct Global_data {
 };
 Global_data* glob = &(Global_data){0};
 
-Returncode f_st_new(Func f_writer, Generic* value, St* father, Bool in_class, St** res) {
+Returncode f_st_new(Func f_writer, Generic* value, St* father, St** res) {
   St* self = malloc(sizeof(St)); if (self == NULL) RAISE
   self->next_brother = NULL;
   self->first_son = NULL;
@@ -186,7 +190,6 @@ Returncode f_st_new(Func f_writer, Generic* value, St* father, Bool in_class, St
   self->father = father;
   self->f_writer = f_writer;
   self->value = value;
-  self->in_class = in_class;
   self->infile_name = glob->infile_name;
   self->func_name = glob->func_name;
   self->line_num = glob->line_num;
@@ -218,6 +221,7 @@ Returncode add_type(String* name, String* base_name, Name_map* members) {
   CHECK(f_new_copy(name, &new_type->name))
   new_type->members = members;
   new_type->base_type = NULL;
+  new_type->is_dynamic = false;
   if (base_name != NULL) {
     CHECK(f_find_type(base_name, &new_type->base_type))
   }
@@ -364,7 +368,7 @@ Returncode write_tb_check() {
 /* other helpers */
 Returncode add_node(Func f_writer, Generic* value) {
   St* node;
-  CHECK(f_st_new(f_writer, value, glob->curr, false, &node))
+  CHECK(f_st_new(f_writer, value, glob->curr, &node))
   return OK;
 }
 Returncode string_split(String* text, Char sep, Int* index, Int* length) {
@@ -433,7 +437,7 @@ Returncode f_end_block() {
   glob->curr = glob->curr->father;
   glob->spaces = glob->spaces - 2;
   if (glob->spaces == 0) {
-    glob->class_attrs = NULL;
+    glob->st_class = NULL;
   }
   return OK;
 }
@@ -535,6 +539,8 @@ typedef struct St_func St_func; struct St_func {
   St_arg* params;
   St_arg* outputs;
   St_arg* last;
+  Bool is_dynamic;
+  Int dynamic_index;
 };
 typedef struct St_exp St_exp; struct St_exp {
   St_exp* next;
@@ -848,9 +854,21 @@ Returncode write_func_call(St_func* st_func) {
       mpath = mpath->next;
     }
     CHECK(write_func_last(st_func, var_attrs))
-    CHECK(write_cstyle(type_attrs->name))
-    CHECK(write(&(String){2, 1, "_"}))
-    CHECK(write_cstyle(mpath->name))
+    St_func* func_def = var_attrs->subtype;
+    if (func_def->is_dynamic) {
+      CHECK(write(&(String){13, 12, "(*((Func**)("}))
+      CHECK(write_mpath(st_func->path, false))
+      CHECK(write(&(String){5, 4, ")))["}))
+      String* dynamic_index = &(String){32, 0, (char[32]){0}};
+      CHECK(int_to_string(func_def->dynamic_index, dynamic_index))
+      CHECK(write(dynamic_index))
+      CHECK(write(&(String){2, 1, "]"}))
+    }
+    else {
+      CHECK(write_cstyle(type_attrs->name))
+      CHECK(write(&(String){2, 1, "_"}))
+      CHECK(write_cstyle(mpath->name))
+    }
     CHECK(write(&(String){2, 1, "("}))
     if (bases > 0) {
       CHECK(write(&(String){3, 2, "&("}))
@@ -922,14 +940,14 @@ Returncode write_args(St_arg* first, Bool is_out, St_arg* next) {
 }
 Returncode write_func_header(St_func* st_func) {
   CHECK(write(&(String){12, 11, "Returncode "}))
-  if (glob->class_attrs != NULL) {
-    CHECK(write_cstyle(glob->class_attrs->name))
+  if (glob->st_class != NULL) {
+    CHECK(write_cstyle(glob->st_class->type_attrs->name))
     CHECK(write(&(String){2, 1, "_"}))
   }
   CHECK(write_cstyle(st_func->path->name))
   CHECK(write(&(String){2, 1, "("}))
-  if (glob->class_attrs != NULL) {
-    CHECK(write_cstyle(glob->class_attrs->name))
+  if (glob->st_class != NULL) {
+    CHECK(write_cstyle(glob->st_class->type_attrs->name))
     CHECK(write(&(String){7, 6, "* self"}))
     if (st_func->params != NULL or st_func->outputs != NULL) {
       CHECK(write(&(String){3, 2, ", "}))
@@ -952,11 +970,11 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
     CHECK(f_find_type(&(String){5, 4, "Func"}, &new_var->type_attrs))
     new_var->subtype = new_func;
     new_var->is_ref = false;
-    if (glob->class_attrs == NULL) {
+    if (glob->st_class == NULL) {
       CHECK(f_nm_init(new_var->name, new_var, &glob->curr->var_map))
     }
     else {
-      CHECK(f_nm_init(new_var->name, new_var, &glob->class_attrs->members))
+      CHECK(f_nm_init(new_var->name, new_var, &glob->st_class->type_attrs->members))
     }
   }
   else {
@@ -965,6 +983,8 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
   new_func->last = NULL;
   new_func->params = NULL;
   new_func->outputs = NULL;
+  new_func->is_dynamic = false;
+  new_func->dynamic_index = 0;
   St_arg* last = NULL;
   while (true) {
     String* access = &(String){256, 0, (char[256]){0}};
@@ -1064,16 +1084,27 @@ Returncode add_arg_vars(St_arg* first, Bool is_ref) {
   return OK;
 }
 Returncode parse_func_body(Func f_writer) {
+  Bool is_dynamic = false;
+  if (glob->st_class != NULL) {
+    String* subtype = &(String){16, 0, (char[16]){0}};
+    CHECK(read(&(String){2, 1, " "}, subtype, &glob->end))
+    CHECK(string_equal(subtype, &(String){8, 7, "dynamic"}, &is_dynamic))
+  }
   St_func* st_func;
   CHECK(parse_func_header(NULL, &st_func, &glob->end))
+  if (is_dynamic) {
+    st_func->is_dynamic = true;
+    st_func->dynamic_index = glob->st_class->dynamic_count;
+    glob->st_class->dynamic_count = glob->st_class->dynamic_count + 1;
+  }
   glob->func_name = st_func->path->name;
   CHECK(add_node(f_writer, st_func))
   CHECK(f_start_block())
   /* add arguments to var-map */
-  if (glob->class_attrs != NULL) {
+  if (glob->st_class != NULL) {
     Var_attrs* new_var = malloc(sizeof(Var_attrs)); if (new_var == NULL) RAISE
     CHECK(f_new_copy(&(String){5, 4, "self"}, &new_var->name))
-    new_var->type_attrs = glob->class_attrs;
+    new_var->type_attrs = glob->st_class->type_attrs;
     new_var->subtype = NULL;
     new_var->is_ref = false;
     CHECK(f_nm_init(new_var->name, new_var, &glob->curr->var_map))
@@ -1178,8 +1209,8 @@ Returncode parse_dec(St_dec** new_st_dec) {
   new_var->type_attrs = type_attr;
   new_var->is_ref = false;
   
-  if (glob->class_attrs != NULL) {
-    CHECK(f_nm_init(new_var->name, new_var, &glob->class_attrs->members))
+  if (glob->st_class != NULL) {
+    CHECK(f_nm_init(new_var->name, new_var, &glob->st_class->type_attrs->members))
   }
   else {
     CHECK(f_nm_init(new_var->name, new_var, &glob->curr->var_map))
@@ -1188,6 +1219,19 @@ Returncode parse_dec(St_dec** new_st_dec) {
   return OK;
 }
 /* var */
+Returncode write_dtl(St_dec* st_dec) {
+  Type_attrs* type_attrs;
+  CHECK(f_find_type(st_dec->typename, &type_attrs))
+  if (type_attrs->is_dynamic) {
+    CHECK(write_new_indent_line())
+    CHECK(write(&(String){12, 11, "*((Func**)("}))
+    CHECK(write_cstyle(st_dec->name))
+    CHECK(write(&(String){6, 5, ")) = "}))
+    CHECK(write_cstyle(st_dec->typename))
+    CHECK(write(&(String){7, 6, "__dtl;"}))
+  }
+  return OK;
+}
 Returncode write_var_primitive(St_dec* st_dec) {
   CHECK(write_exp_intro(st_dec->init))
   CHECK(write_cstyle(st_dec->typename))
@@ -1218,7 +1262,9 @@ Returncode write_var_class(St_dec* st_dec) {
   else {
     CHECK(write_exp(st_dec->init))
   }
-  CHECK(write(&(String){4, 3, "};\n"}))
+  CHECK(write(&(String){3, 2, "};"}))
+  CHECK(write_dtl(st_dec))
+  CHECK(write(&(String){2, 1, "\n"}))
   return OK;
 }
 Returncode write_var_string(St_dec* st_dec) {
@@ -1276,7 +1322,7 @@ Returncode write_var_array(St_dec* st_dec) {
 }
 Returncode add_dec_node(Func f_writer, Generic* value) {
   St* node;
-  CHECK(f_st_new(f_writer, value, glob->curr, glob->class_attrs != NULL, &node))
+  CHECK(f_st_new(f_writer, value, glob->curr, &node))
   return OK;
 }
 Returncode parse_var() {
@@ -1374,6 +1420,9 @@ Returncode write_new(St_dec* st_dec) {
     CHECK(write(&(String){23, 22, ") * sizeof(String) + ("}))
     CHECK(write_cstyle(st_dec->str_length))
     CHECK(write(&(String){9, 8, ") * n};}"}))
+  }
+  if (st_dec->arr_length == NULL and st_dec->str_length == NULL) {
+    CHECK(write_dtl(st_dec))
   }
   CHECK(write(&(String){2, 1, "\n"}))
   return OK;
@@ -1528,12 +1577,12 @@ Returncode parse_raise() {
   return OK;
 }
 /* class */
-Returncode write_class_members(St* self_node, Bool in_class) {
+Returncode write_class_members(St* self_node, Bool is_func) {
   St* son = self_node->first_son;
   while (true) {
     if (not(son != NULL)) break;
     glob->curr = son;
-    if (son->in_class == in_class) {
+    if (is_func == (son->f_writer == write_func) and son->f_writer != write_empty) {
       CHECK(write_spaces())
       CHECK(son->f_writer(son->value))
     }
@@ -1542,32 +1591,62 @@ Returncode write_class_members(St* self_node, Bool in_class) {
   }
   return OK;
 }
-Returncode write_class(Type_attrs* class_attrs) {
+Returncode write_class(St_class* st_class) {
+  String* class_name = st_class->type_attrs->name;
   CHECK(write(&(String){16, 15, "typedef struct "}))
-  CHECK(write_cstyle(class_attrs->name))
+  CHECK(write_cstyle(class_name))
   CHECK(write(&(String){2, 1, " "}))
-  CHECK(write_cstyle(class_attrs->name))
+  CHECK(write_cstyle(class_name))
   CHECK(write(&(String){10, 9, "; struct "}))
-  CHECK(write_cstyle(class_attrs->name))
+  CHECK(write_cstyle(class_name))
   CHECK(write(&(String){4, 3, " {\n"}))
   /* write members */
   glob->spaces = glob->spaces + 2;
-  glob->class_attrs = class_attrs;
-  if (class_attrs->base_type != NULL) {
+  glob->st_class = st_class;
+  if (st_class->type_attrs->base_type != NULL) {
     CHECK(write_spaces())
-    CHECK(write_cstyle(class_attrs->base_type->name))
+    CHECK(write_cstyle(st_class->type_attrs->base_type->name))
     CHECK(write(&(String){9, 8, " _base;\n"}))
   }
+  else if (st_class->type_attrs->is_dynamic) {
+    CHECK(write_spaces())
+    CHECK(write(&(String){13, 12, "Func* _dtl;\n"}))
+  }
   St* self_node = glob->curr;
-  CHECK(write_class_members(self_node, true))
+  CHECK(write_class_members(self_node, false))
   glob->spaces = glob->spaces - 2;
   CHECK(write_spaces())
   CHECK(write(&(String){4, 3, "};\n"}))
-  CHECK(write_class_members(self_node, false))
-  glob->class_attrs = NULL;
+  CHECK(write_class_members(self_node, true))
+  glob->st_class = NULL;
+  if (st_class->type_attrs->is_dynamic) {
+    CHECK(write_spaces())
+    CHECK(write(&(String){6, 5, "Func "}))
+    CHECK(write_cstyle(class_name))
+    CHECK(write(&(String){12, 11, "__dtl[] = {"}))
+    St* son = self_node->first_son;
+    Bool not_first = false;
+    while (true) {
+      if (not(son != NULL)) break;
+      if (son->f_writer == write_func) {
+        St_func* st_func = son->value;
+        if (st_func->is_dynamic) {
+          if (not_first) {
+            CHECK(write(&(String){3, 2, ", "}))
+          }
+          CHECK(write_cstyle(class_name))
+          CHECK(write(&(String){2, 1, "_"}))
+          CHECK(write_cstyle(st_func->path->name))
+          not_first = true;
+        }
+      }
+      son = son->next_brother;
+    }
+    CHECK(write(&(String){4, 3, "};\n"}))
+  }
   return OK;
 }
-Returncode parse_class() {
+Returncode parse_class(Bool is_dynamic) {
   String* name = &(String){256, 0, (char[256]){0}};
   String* base_name = &(String){256, 0, (char[256]){0}};
   CHECK(read(&(String){2, 1, "("}, name, &glob->end))
@@ -1579,10 +1658,20 @@ Returncode parse_class() {
   else {
     CHECK(add_type(name, base_name, NULL))
   }
-  Type_attrs* class_attrs = glob->type_map->value;
-  CHECK(add_node(write_class, class_attrs))
-  glob->class_attrs = class_attrs;
+  St_class* st_class = malloc(sizeof(St_class)); if (st_class == NULL) RAISE
+  st_class->type_attrs = glob->type_map->value;
+  st_class->type_attrs->is_dynamic = is_dynamic;
+  glob->st_class = st_class;
+  CHECK(add_node(write_class, st_class))
   CHECK(f_start_block())
+  return OK;
+}
+Returncode parse_dynamic_class() {
+  CHECK(parse_class(true))
+  return OK;
+}
+Returncode parse_static_class() {
+  CHECK(parse_class(false))
   return OK;
 }
 /* call */
@@ -1704,7 +1793,7 @@ Returncode parse_lines() {
 }
 /* global init */
 Returncode f_create_key_word_map() {
-  Array* key_word_map = new_array(18, sizeof(Func_map)); if (key_word_map == NULL) RAISE
+  Array* key_word_map = new_array(19, sizeof(Func_map)); if (key_word_map == NULL) RAISE
   CHECK(add_fm(key_word_map, 0, &(String){2, 1, "#"}, parse_comment))
   CHECK(add_fm(key_word_map, 1, &(String){5, 4, "func"}, parse_func))
   CHECK(add_fm(key_word_map, 2, &(String){7, 6, "native"}, parse_native))
@@ -1722,7 +1811,8 @@ Returncode f_create_key_word_map() {
   CHECK(add_fm(key_word_map, 14, &(String){4, 3, "for"}, parse_for))
   CHECK(add_fm(key_word_map, 15, &(String){7, 6, "return"}, parse_return))
   CHECK(add_fm(key_word_map, 16, &(String){6, 5, "raise"}, parse_raise))
-  CHECK(add_fm(key_word_map, 17, &(String){6, 5, "class"}, parse_class))
+  CHECK(add_fm(key_word_map, 17, &(String){7, 6, "static"}, parse_static_class))
+  CHECK(add_fm(key_word_map, 18, &(String){6, 5, "class"}, parse_dynamic_class))
   glob->key_word_map = key_word_map;
   return OK;
 }
@@ -1843,7 +1933,7 @@ Returncode f_create_name_maps() {
 Returncode f_init_glob_state(St* root) {
   glob->curr = root;
   glob->spaces = 0;
-  glob->class_attrs = NULL;
+  glob->st_class = NULL;
   glob->var_count = 0;
   return OK;
 }
@@ -1862,7 +1952,7 @@ Returncode func(Array* argv) {
   if (2 < 0 || 2 >= argv->length) RAISE outfile_name = ((String*)(argv->values)) + 2;
   
   /* init global data */
-  CHECK(f_st_new(write_sons, NULL, NULL, false, &glob->curr))
+  CHECK(f_st_new(write_sons, NULL, NULL, &glob->curr))
   St* root = glob->curr;
   CHECK(f_create_key_word_map())
   CHECK(f_create_name_maps())
