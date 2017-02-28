@@ -121,6 +121,15 @@ func f-nm-find(user Name-map self, user String name): user Generic value
   out value := NULL
   return
 
+func f-nm-print(user Name-map self)
+  user Name-map nm(self)
+  do
+    while nm != NULL
+    print(user nm.name)
+    nm := nm.next
+  
+  return
+
 func add-member(user String name, user Type-attrs type-attrs, user Generic subtype): owner Name-map members
   new Var-attrs new-var
   f-new-copy(user name): owner new-var.name
@@ -139,9 +148,6 @@ class St
   var Func f-writer
   owner Generic value
   owner Name-map var-map
-  # place
-  user String infile-name
-  user String func-name
   var Int line-num
 
 func f-st-del(owner St self)
@@ -164,15 +170,12 @@ class Global-data
   owner File outfile
   user Array{Func-map} key-word-map
   owner Name-map type-map
-  # place
-  user String infile-name
-  user String func-name
-  var Int line-num
   # state
   user St curr
   var Int spaces
   user St-class st-class
   var Int var-count
+  var Int line-num
   # vars
   var Int length
   var Bool flag
@@ -188,8 +191,6 @@ func f-st-new(copy Func f-writer, owner Generic value, user St father): owner St
   self.father := father
   self.f-writer := f-writer
   self.value := value
-  self.infile-name := glob.infile-name
-  self.func-name := glob.func-name
   self.line-num := glob.line-num
   out res := self
   if father != NULL
@@ -337,29 +338,21 @@ func write-cstyle(user String text)
   
   return
 
-func write-traceback-args()
-  write(user "\"")
-  write(user glob.curr.infile-name)
-  write(user "\", ")
+func write-line-num()
   var String{64} line-num-str
   int-to-string(copy glob.curr.line-num): var line-num-str
   write(user line-num-str)
-  write(user ", \"")
-  if glob.curr.func-name != NULL
-    write(user glob.curr.func-name)
-  
-  write(user "\"")
   return
 
 func write-tb-raise()
   write(user "RAISE(")
-  write-traceback-args()
+  write-line-num()
   write(user ")")
   return
 
 func write-tb-check()
   write(user "CHECK(")
-  write-traceback-args()
+  write-line-num()
   write(user ", ")
   return
 
@@ -936,15 +929,21 @@ func write-args(user St-arg first, copy Bool is-out, user St-arg next)
   
   return
 
-func write-func-header(user St-func st-func)
-  write(user "Returncode ")
-  if glob.st-class != NULL
+native func write-class(user St-class st-class)
+
+func write-func-name(user St-func st-func)
+  if glob.curr.father.f-writer = write-class
     write-cstyle(user glob.st-class.type-attrs.name)
     write(user "_")
   
   write-cstyle(user st-func.path.name)
+  return
+
+func write-func-header(user St-func st-func)
+  write(user "Returncode ")
+  write-func-name(user st-func)
   write(user "(")
-  if glob.st-class != NULL
+  if glob.curr.father.f-writer = write-class
     write-cstyle(user glob.st-class.type-attrs.name)
     write(user "* self")
     if st-func.params != NULL or st-func.outputs != NULL
@@ -968,11 +967,11 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
     f-find-type(user "Func"): user new-var.type-attrs
     new-var.subtype := new-func
     new-var.is-ref := false
-    if glob.st-class = NULL
-      f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+    if glob.curr.f-writer = write-class
+      f-nm-init(user new-var.name, owner new-var): owner glob.st-class.type-attrs.members
     
     else
-      f-nm-init(user new-var.name, owner new-var): owner glob.st-class.type-attrs.members
+      f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
     
   
   else
@@ -1058,8 +1057,22 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
 
 # func
 func write-func(user St-func st-func)
+  write(user "static char* _func_name_")
+  write-func-name(user st-func)
+  write(user " = \"")
+  if glob.curr.father.f-writer = write-class
+    write(user glob.st-class.type-attrs.name)
+    write(user ".")
+  
+  write(user st-func.path.name)
+  write(user "\";")
+  write-new-indent-line()
+  write(user "#define MR_FUNC_NAME _func_name_")
+  write-func-name(user st-func)
+  write-new-indent-line()
   write-func-header(user st-func)
   write-block()
+  write(user "#undef MR_FUNC_NAME\n")
   return
 
 func add-arg-vars(user St-arg first, copy Bool is-ref)
@@ -1083,7 +1096,7 @@ func add-arg-vars(user St-arg first, copy Bool is-ref)
 
 func parse-func-body(copy Func f-writer)
   var Bool is-dynamic(false)
-  if glob.st-class != NULL
+  if glob.curr.f-writer = write-class
     var String{16} subtype
     read(user " "): var subtype, copy glob.end
     string-equal(user subtype, user "dynamic"): copy is-dynamic
@@ -1095,11 +1108,10 @@ func parse-func-body(copy Func f-writer)
     st-func.dynamic-index := glob.st-class.dynamic-count
     glob.st-class.dynamic-count := glob.st-class.dynamic-count + 1
   
-  glob.func-name := st-func.path.name
   add-node(copy f-writer, owner st-func)
   f-start-block()
   # add arguments to var-map
-  if glob.st-class != NULL
+  if glob.curr.father.f-writer = write-class
     new Var-attrs new-var
     f-new-copy(user "self"): owner new-var.name
     new-var.type-attrs := glob.st-class.type-attrs
@@ -1207,7 +1219,7 @@ func parse-dec(): owner St-dec new-st-dec
   new-var.type-attrs := type-attr
   new-var.is-ref := false
   
-  if glob.st-class != NULL
+  if glob.curr.f-writer = write-class
     f-nm-init(user new-var.name, owner new-var): owner glob.st-class.type-attrs.members
   
   else
@@ -1959,8 +1971,6 @@ main func(user Array{String} argv)
   file-open-read(user infile-name): owner glob.infile
   print(user "parsing...")
   f-init-glob-state(user root)
-  glob.infile-name := infile-name
-  glob.func-name := NULL
   glob.line-num := 0
   parse-lines()
   file-close(owner glob.infile)
@@ -1970,6 +1980,9 @@ main func(user Array{String} argv)
   print(user "writing...")
   f-init-glob-state(user root)
   write(user "#include \"mr.2.h\"\n\n")
+  write(user "static char* _mr_file_name = \"")
+  write(user infile-name)
+  write(user "\";\n#define MR_FILE_NAME _mr_file_name\n")
   root.f-writer()
   file-close(owner glob.outfile)
   

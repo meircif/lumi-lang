@@ -1,7 +1,9 @@
 #include "mr.2.h"
 
-#define CRAISE RAISE(__FILE__, __LINE__, __FUNCTION__)
-#define CCHECK(err) CHECK(__FILE__, __LINE__, __FUNCTION__, err)
+#define MR_FILE_NAME __FILE__
+#define MR_FUNC_NAME __FUNCTION__
+#define CRAISE RAISE(__LINE__)
+#define CCHECK(err) CHECK(__LINE__, err)
 
 /*dynamic allocation*/
 String* new_string(int length) {

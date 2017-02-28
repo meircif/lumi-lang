@@ -123,6 +123,15 @@ Returncode f_nm_find(Name_map* self, String* name, Generic** value) {
   *value = NULL;
   return OK;
 }
+Returncode f_nm_print(Name_map* self) {
+  Name_map* nm = self;
+  while (true) {
+    if (not(nm != NULL)) break;
+    CHECK(print(nm->name))
+    nm = nm->next;
+  }
+  return OK;
+}
 Returncode add_member(String* name, Type_attrs* type_attrs, Generic* subtype, Name_map** members) {
   Var_attrs* new_var = malloc(sizeof(Var_attrs)); if (new_var == NULL) RAISE
   CHECK(f_new_copy(name, &new_var->name))
@@ -141,9 +150,6 @@ typedef struct St St; struct St {
   Func f_writer;
   Generic* value;
   Name_map* var_map;
-  /* place */
-  String* infile_name;
-  String* func_name;
   Int line_num;
 };
 Returncode f_st_del(St* self) {
@@ -166,15 +172,12 @@ typedef struct Global_data Global_data; struct Global_data {
   File* outfile;
   Array* key_word_map;
   Name_map* type_map;
-  /* place */
-  String* infile_name;
-  String* func_name;
-  Int line_num;
   /* state */
   St* curr;
   Int spaces;
   St_class* st_class;
   Int var_count;
+  Int line_num;
   /* vars */
   Int length;
   Bool flag;
@@ -190,8 +193,6 @@ Returncode f_st_new(Func f_writer, Generic* value, St* father, St** res) {
   self->father = father;
   self->f_writer = f_writer;
   self->value = value;
-  self->infile_name = glob->infile_name;
-  self->func_name = glob->func_name;
   self->line_num = glob->line_num;
   *res = self;
   if (father != NULL) {
@@ -339,29 +340,21 @@ Returncode write_cstyle(String* text) {
   }
   return OK;
 }
-Returncode write_traceback_args() {
-  CHECK(write(&(String){2, 1, "\""}))
-  CHECK(write(glob->curr->infile_name))
-  CHECK(write(&(String){4, 3, "\", "}))
+Returncode write_line_num() {
   String* line_num_str = &(String){64, 0, (char[64]){0}};
   CHECK(int_to_string(glob->curr->line_num, line_num_str))
   CHECK(write(line_num_str))
-  CHECK(write(&(String){4, 3, ", \""}))
-  if (glob->curr->func_name != NULL) {
-    CHECK(write(glob->curr->func_name))
-  }
-  CHECK(write(&(String){2, 1, "\""}))
   return OK;
 }
 Returncode write_tb_raise() {
   CHECK(write(&(String){7, 6, "RAISE("}))
-  CHECK(write_traceback_args())
+  CHECK(write_line_num())
   CHECK(write(&(String){2, 1, ")"}))
   return OK;
 }
 Returncode write_tb_check() {
   CHECK(write(&(String){7, 6, "CHECK("}))
-  CHECK(write_traceback_args())
+  CHECK(write_line_num())
   CHECK(write(&(String){3, 2, ", "}))
   return OK;
 }
@@ -938,15 +931,21 @@ Returncode write_args(St_arg* first, Bool is_out, St_arg* next) {
   }
   return OK;
 }
-Returncode write_func_header(St_func* st_func) {
-  CHECK(write(&(String){12, 11, "Returncode "}))
-  if (glob->st_class != NULL) {
+Returncode write_class(St_class* st_class);
+
+Returncode write_func_name(St_func* st_func) {
+  if (glob->curr->father->f_writer == write_class) {
     CHECK(write_cstyle(glob->st_class->type_attrs->name))
     CHECK(write(&(String){2, 1, "_"}))
   }
   CHECK(write_cstyle(st_func->path->name))
+  return OK;
+}
+Returncode write_func_header(St_func* st_func) {
+  CHECK(write(&(String){12, 11, "Returncode "}))
+  CHECK(write_func_name(st_func))
   CHECK(write(&(String){2, 1, "("}))
-  if (glob->st_class != NULL) {
+  if (glob->curr->father->f_writer == write_class) {
     CHECK(write_cstyle(glob->st_class->type_attrs->name))
     CHECK(write(&(String){7, 6, "* self"}))
     if (st_func->params != NULL or st_func->outputs != NULL) {
@@ -970,11 +969,11 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
     CHECK(f_find_type(&(String){5, 4, "Func"}, &new_var->type_attrs))
     new_var->subtype = new_func;
     new_var->is_ref = false;
-    if (glob->st_class == NULL) {
-      CHECK(f_nm_init(new_var->name, new_var, &glob->curr->var_map))
+    if (glob->curr->f_writer == write_class) {
+      CHECK(f_nm_init(new_var->name, new_var, &glob->st_class->type_attrs->members))
     }
     else {
-      CHECK(f_nm_init(new_var->name, new_var, &glob->st_class->type_attrs->members))
+      CHECK(f_nm_init(new_var->name, new_var, &glob->curr->var_map))
     }
   }
   else {
@@ -1060,8 +1059,22 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
 }
 /* func */
 Returncode write_func(St_func* st_func) {
+  CHECK(write(&(String){25, 24, "static char* _func_name_"}))
+  CHECK(write_func_name(st_func))
+  CHECK(write(&(String){5, 4, " = \""}))
+  if (glob->curr->father->f_writer == write_class) {
+    CHECK(write(glob->st_class->type_attrs->name))
+    CHECK(write(&(String){2, 1, "."}))
+  }
+  CHECK(write(st_func->path->name))
+  CHECK(write(&(String){3, 2, "\";"}))
+  CHECK(write_new_indent_line())
+  CHECK(write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}))
+  CHECK(write_func_name(st_func))
+  CHECK(write_new_indent_line())
   CHECK(write_func_header(st_func))
   CHECK(write_block())
+  CHECK(write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}))
   return OK;
 }
 Returncode add_arg_vars(St_arg* first, Bool is_ref) {
@@ -1085,7 +1098,7 @@ Returncode add_arg_vars(St_arg* first, Bool is_ref) {
 }
 Returncode parse_func_body(Func f_writer) {
   Bool is_dynamic = false;
-  if (glob->st_class != NULL) {
+  if (glob->curr->f_writer == write_class) {
     String* subtype = &(String){16, 0, (char[16]){0}};
     CHECK(read(&(String){2, 1, " "}, subtype, &glob->end))
     CHECK(string_equal(subtype, &(String){8, 7, "dynamic"}, &is_dynamic))
@@ -1097,11 +1110,10 @@ Returncode parse_func_body(Func f_writer) {
     st_func->dynamic_index = glob->st_class->dynamic_count;
     glob->st_class->dynamic_count = glob->st_class->dynamic_count + 1;
   }
-  glob->func_name = st_func->path->name;
   CHECK(add_node(f_writer, st_func))
   CHECK(f_start_block())
   /* add arguments to var-map */
-  if (glob->st_class != NULL) {
+  if (glob->curr->father->f_writer == write_class) {
     Var_attrs* new_var = malloc(sizeof(Var_attrs)); if (new_var == NULL) RAISE
     CHECK(f_new_copy(&(String){5, 4, "self"}, &new_var->name))
     new_var->type_attrs = glob->st_class->type_attrs;
@@ -1209,7 +1221,7 @@ Returncode parse_dec(St_dec** new_st_dec) {
   new_var->type_attrs = type_attr;
   new_var->is_ref = false;
   
-  if (glob->st_class != NULL) {
+  if (glob->curr->f_writer == write_class) {
     CHECK(f_nm_init(new_var->name, new_var, &glob->st_class->type_attrs->members))
   }
   else {
@@ -1961,8 +1973,6 @@ Returncode func(Array* argv) {
   CHECK(file_open_read(infile_name, &glob->infile))
   CHECK(print(&(String){11, 10, "parsing..."}))
   CHECK(f_init_glob_state(root))
-  glob->infile_name = infile_name;
-  glob->func_name = NULL;
   glob->line_num = 0;
   CHECK(parse_lines())
   CHECK(file_close(glob->infile))
@@ -1972,6 +1982,9 @@ Returncode func(Array* argv) {
   CHECK(print(&(String){11, 10, "writing..."}))
   CHECK(f_init_glob_state(root))
   CHECK(write(&(String){20, 19, "#include \"mr.2.h\"\n\n"}))
+  CHECK(write(&(String){31, 30, "static char* _mr_file_name = \""}))
+  CHECK(write(infile_name))
+  CHECK(write(&(String){39, 38, "\";\n#define MR_FILE_NAME _mr_file_name\n"}))
   CHECK(root->f_writer())
   CHECK(file_close(glob->outfile))
   

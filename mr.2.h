@@ -41,12 +41,14 @@ typedef FILE File;
 
 typedef struct {} Sys;
 
-#define RAISE(file, line, func) { \
-  fprintf(stderr, "Error raised in %s:%d %s()\n", file, line, func); \
+#define RAISE(line) { \
+  fprintf(stderr, "Error raised in %s:%d %s()\n",\
+    MR_FILE_NAME, line, MR_FUNC_NAME); \
   return ERR; }
 
-#define CHECK(file, line, func, err) { Returncode _err = err; if (_err != OK) { \
-  fprintf(stderr, "  called from %s:%d %s()\n", file, line, func); \
+#define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
+  fprintf(stderr, "  called from %s:%d %s()\n",\
+    MR_FILE_NAME, line, MR_FUNC_NAME); \
   return _err; } }
 
 #define MAIN_FUNC int main(int argc, char* argv[]) { \
