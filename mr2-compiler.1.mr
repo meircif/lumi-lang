@@ -41,18 +41,20 @@ func f-new-copy(user String text): owner String out-text
   out out-text := new-text
   return
 
+# raising
+func f-msg-raise(user String prefix, user String middle, user String suffix)
+  var String{256} msg
+  string-copy(user msg, user prefix)
+  string-concat(user msg, user middle)
+  string-concat(user msg, user suffix)
+  print(user msg)
+  raise
 
 func f-raise-on-null(user Generic ref, user String prefix, user String middle, user String suffix)
   if ref = NULL
-    var String{256} msg
-    string-copy(user msg, user prefix)
-    string-concat(user msg, user middle)
-    string-concat(user msg, user suffix)
-    print(user msg)
-    raise
+    f-msg-raise(user prefix, user middle, user suffix)
   
   return
-
 
 # Function Map
 class Func-map
@@ -170,6 +172,7 @@ class Global-data
   owner File outfile
   user Array{Func-map} key-word-map
   owner Name-map type-map
+  owner Name-map var-map
   # state
   user St curr
   var Int spaces
@@ -204,7 +207,7 @@ func f-st-new(copy Func f-writer, owner Generic value, user St father): owner St
     self.var-map := father.var-map
   
   else
-    self.var-map := NULL
+    self.var-map := glob.var-map
   
   return
 
@@ -1935,8 +1938,8 @@ func f-create-name-maps()
   add-meth(user "putc(copy Char ch", user func-type): owner members-file
   add-meth(user "write(user String text", user func-type): owner members-file
   add-type(user "File", user NULL, owner members-file)
-  add-meth(user "file-open-read(user String name)owner File file", user func-type): owner glob.curr.var-map
-  add-meth(user "file-open-write(user String name)owner File file", user func-type): owner glob.curr.var-map
+  add-meth(user "file-open-read(user String name)owner File file", user func-type): owner glob.var-map
+  add-meth(user "file-open-write(user String name)owner File file", user func-type): owner glob.var-map
   # Sys
   owner Name-map members-sys(NULL)
   add-meth(user "print(user String text", user func-type): owner members-sys
@@ -1953,27 +1956,28 @@ func f-init-glob-state(user St root)
   glob.var-count := 0
   return
 
-# main
-main func(user Array{String} argv)
-  print(user "MR compiler start")
-  
-  if argv.length != 3
-    print(user "usage: mr2-compiler [input MR file] [output C file]")
-    return
-  
-  # open files
+# compile
+func f-compile-file(user Array{String} argv, copy Int index)
+  # get file names
   user String infile-name
-  [] String infile-name := argv[1]
-  user String outfile-name
-  [] String outfile-name := argv[2]
+  [] String infile-name := argv[index]
+  if string-has(user infile-name, copy '"'): copy glob.flag
+    f-msg-raise(user "Illegal \" character in argument '", user infile-name, user "'")
   
-  # init global data
+  if infile-name.actual-length < 6
+    f-msg-raise(user "too short argument \"", user infile-name, user "\"")
+  
+  new String{infile-name.actual-length} outfile-name
+  user String prefix(infile-name[0:infile-name.actual-length - 4])
+  string-copy(user outfile-name, user prefix)
+  string-append(user outfile-name, copy 'c')
+  
+  # init root node
   f-st-new(copy write-sons, user NULL, user NULL): owner glob.curr
   owner St root(glob.curr)
-  f-create-key-word-map()
-  f-create-name-maps()
   
   # parse
+  print(user infile-name)
   file-open-read(user infile-name): owner glob.infile
   print(user "parsing...")
   f-init-glob-state(user root)
@@ -1985,12 +1989,56 @@ main func(user Array{String} argv)
   file-open-write(user outfile-name): owner glob.outfile
   print(user "writing...")
   f-init-glob-state(user root)
-  write(user "#include \"mr.2.h\"\n\n")
-  write(user "static char* _mr_file_name = \"")
+  if index = argv.length - 1
+    write(user "#include \"mr.2.h\"\n")
+    var Int index(1)
+    do
+      while index < argv.length - 1
+      user String infile-name
+      [] String infile-name := argv[index]
+      user String prefix(infile-name[0:infile-name.actual-length - 4])
+      write(user "#include \"")
+      write(user prefix)
+      write(user "c\"\n")
+      index := index + 1
+    
+    write(user "\n")
+  
+  var String{64} index-str
+  int-to-string(copy index): var index-str
+  write(user "static char* _mr_file")
+  write(user index-str)
+  write(user "_name = \"")
   write(user infile-name)
-  write(user "\";\n#define MR_FILE_NAME _mr_file_name\n")
+  write(user "\";\n#define MR_FILE_NAME _mr_file")
+  write(user index-str)
+  write(user "_name\n")
   root.f-writer()
+  write(user "\n#undef MR_FILE_NAME\n")
   file-close(owner glob.outfile)
+  
+  # finalize
+  glob.var-map = root.var-map
+  delete outfile-name
+  return
+
+# main
+main func(user Array{String} argv)
+  print(user "MR compiler start")
+  
+  if argv.length < 2
+    print(user "usage: mr2-compiler [input MR files]...")
+    return
+  
+  # init global data
+  f-create-key-word-map()
+  f-create-name-maps()
+  
+  var Int index(1)
+  do
+    while index < argv.length
+    f-compile-file(user argv, copy index)
+    index := index + 1
   
   print(user "MR compiler end")
   return

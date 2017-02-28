@@ -43,19 +43,21 @@ Returncode f_new_copy(String* text, String** out_text) {
   *out_text = new_text;
   return OK;
 }
-
+/* raising */
+Returncode f_msg_raise(String* prefix, String* middle, String* suffix) {
+  String* msg = &(String){256, 0, (char[256]){0}};
+  CHECK(string_copy(msg, prefix))
+  CHECK(string_concat(msg, middle))
+  CHECK(string_concat(msg, suffix))
+  CHECK(print(msg))
+  RAISE
+}
 Returncode f_raise_on_null(Generic* ref, String* prefix, String* middle, String* suffix) {
   if (ref == NULL) {
-    String* msg = &(String){256, 0, (char[256]){0}};
-    CHECK(string_copy(msg, prefix))
-    CHECK(string_concat(msg, middle))
-    CHECK(string_concat(msg, suffix))
-    CHECK(print(msg))
-    RAISE
+    CHECK(f_msg_raise(prefix, middle, suffix))
   }
   return OK;
 }
-
 /* Function Map */
 typedef struct Func_map Func_map; struct Func_map {
   String* key;
@@ -172,6 +174,7 @@ typedef struct Global_data Global_data; struct Global_data {
   File* outfile;
   Array* key_word_map;
   Name_map* type_map;
+  Name_map* var_map;
   /* state */
   St* curr;
   Int spaces;
@@ -206,7 +209,7 @@ Returncode f_st_new(Func f_writer, Generic* value, St* father, St** res) {
     self->var_map = father->var_map;
   }
   else {
-    self->var_map = NULL;
+    self->var_map = glob->var_map;
   }
   return OK;
 }
@@ -1937,8 +1940,8 @@ Returncode f_create_name_maps() {
   CHECK(add_meth(&(String){18, 17, "putc(copy Char ch"}, func_type, &members_file))
   CHECK(add_meth(&(String){23, 22, "write(user String text"}, func_type, &members_file))
   CHECK(add_type(&(String){5, 4, "File"}, NULL, members_file))
-  CHECK(add_meth(&(String){48, 47, "file-open-read(user String name)owner File file"}, func_type, &glob->curr->var_map))
-  CHECK(add_meth(&(String){49, 48, "file-open-write(user String name)owner File file"}, func_type, &glob->curr->var_map))
+  CHECK(add_meth(&(String){48, 47, "file-open-read(user String name)owner File file"}, func_type, &glob->var_map))
+  CHECK(add_meth(&(String){49, 48, "file-open-write(user String name)owner File file"}, func_type, &glob->var_map))
   /* Sys */
   Name_map* members_sys = NULL;
   CHECK(add_meth(&(String){23, 22, "print(user String text"}, func_type, &members_sys))
@@ -1955,27 +1958,28 @@ Returncode f_init_glob_state(St* root) {
   glob->var_count = 0;
   return OK;
 }
-/* main */
-Returncode func(Array* argv) {
-  CHECK(print(&(String){18, 17, "MR compiler start"}))
-  
-  if (argv->length != 3) {
-    CHECK(print(&(String){52, 51, "usage: mr2-compiler [input MR file] [output C file]"}))
-    return OK;
-  }
-  /* open files */
+/* compile */
+Returncode f_compile_file(Array* argv, Int index) {
+  /* get file names */
   String* infile_name;
-  if (1 < 0 || 1 >= argv->length) RAISE infile_name = ((String*)(argv->values)) + 1;
-  String* outfile_name;
-  if (2 < 0 || 2 >= argv->length) RAISE outfile_name = ((String*)(argv->values)) + 2;
+  if (index < 0 || index >= argv->length) RAISE infile_name = ((String*)(argv->values)) + index;
+  CHECK(string_has(infile_name, '"', &glob->flag)) if (glob->flag) {
+    CHECK(f_msg_raise(&(String){34, 33, "Illegal \" character in argument '"}, infile_name, &(String){2, 1, "'"}))
+  }
+  if (infile_name->actual_length < 6) {
+    CHECK(f_msg_raise(&(String){21, 20, "too short argument \""}, infile_name, &(String){2, 1, "\""}))
+  }
+  String* outfile_name = new_string(infile_name->actual_length); if (outfile_name == NULL) RAISE
+  if ((0) + (infile_name->actual_length - 4) > infile_name->actual_length) RAISE String* prefix = &(String){infile_name->actual_length - 4, infile_name->actual_length - 4, infile_name->chars + 0};
+  CHECK(string_copy(outfile_name, prefix))
+  CHECK(string_append(outfile_name, 'c'))
   
-  /* init global data */
+  /* init root node */
   CHECK(f_st_new(write_sons, NULL, NULL, &glob->curr))
   St* root = glob->curr;
-  CHECK(f_create_key_word_map())
-  CHECK(f_create_name_maps())
   
   /* parse */
+  CHECK(print(infile_name))
   CHECK(file_open_read(infile_name, &glob->infile))
   CHECK(print(&(String){11, 10, "parsing..."}))
   CHECK(f_init_glob_state(root))
@@ -1987,13 +1991,57 @@ Returncode func(Array* argv) {
   CHECK(file_open_write(outfile_name, &glob->outfile))
   CHECK(print(&(String){11, 10, "writing..."}))
   CHECK(f_init_glob_state(root))
-  CHECK(write(&(String){20, 19, "#include \"mr.2.h\"\n\n"}))
-  CHECK(write(&(String){31, 30, "static char* _mr_file_name = \""}))
+  if (index == argv->length - 1) {
+    CHECK(write(&(String){19, 18, "#include \"mr.2.h\"\n"}))
+    Int index = 1;
+    while (true) {
+      if (not(index < argv->length - 1)) break;
+      String* infile_name;
+      if (index < 0 || index >= argv->length) RAISE infile_name = ((String*)(argv->values)) + index;
+      if ((0) + (infile_name->actual_length - 4) > infile_name->actual_length) RAISE String* prefix = &(String){infile_name->actual_length - 4, infile_name->actual_length - 4, infile_name->chars + 0};
+      CHECK(write(&(String){11, 10, "#include \""}))
+      CHECK(write(prefix))
+      CHECK(write(&(String){4, 3, "c\"\n"}))
+      index = index + 1;
+    }
+    CHECK(write(&(String){2, 1, "\n"}))
+  }
+  String* index_str = &(String){64, 0, (char[64]){0}};
+  CHECK(int_to_string(index, index_str))
+  CHECK(write(&(String){22, 21, "static char* _mr_file"}))
+  CHECK(write(index_str))
+  CHECK(write(&(String){10, 9, "_name = \""}))
   CHECK(write(infile_name))
-  CHECK(write(&(String){39, 38, "\";\n#define MR_FILE_NAME _mr_file_name\n"}))
+  CHECK(write(&(String){33, 32, "\";\n#define MR_FILE_NAME _mr_file"}))
+  CHECK(write(index_str))
+  CHECK(write(&(String){7, 6, "_name\n"}))
   CHECK(root->f_writer())
+  CHECK(write(&(String){22, 21, "\n#undef MR_FILE_NAME\n"}))
   CHECK(file_close(glob->outfile))
   
+  /* finalize */
+  glob->var_map = root->var_map;
+  free(outfile_name);
+  return OK;
+}
+/* main */
+Returncode func(Array* argv) {
+  CHECK(print(&(String){18, 17, "MR compiler start"}))
+  
+  if (argv->length < 2) {
+    CHECK(print(&(String){40, 39, "usage: mr2-compiler [input MR files]..."}))
+    return OK;
+  }
+  /* init global data */
+  CHECK(f_create_key_word_map())
+  CHECK(f_create_name_maps())
+  
+  Int index = 1;
+  while (true) {
+    if (not(index < argv->length)) break;
+    CHECK(f_compile_file(argv, index))
+    index = index + 1;
+  }
   CHECK(print(&(String){16, 15, "MR compiler end"}))
   return OK;
 }

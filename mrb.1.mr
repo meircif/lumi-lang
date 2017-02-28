@@ -1,8 +1,9 @@
 # Builds executables from MR files
 # 
-# Gets one input file as "<name>.<MR version>.mr",
-# generates "<name>.c" file using <MR version> compiler,
-# and compiles it to "<name>.exe" executable using "gcc".
+# Gets input files as "<name>.<MR version>.mr",
+# generates "<name>.c" files using <MR version> compiler,
+# and compiles the last one to "<name>.exe" executable using "gcc".
+# (MR0 and MR1 only supports one file)
 # 
 # Supports MR0, MR1 & MR2.
 
@@ -22,12 +23,12 @@ native func sys-system(user String command): copy Int status
 
 
 main func(user Array{String} argv)
-  if argv.length != 2
-    print(user "usage: mrb [MR file name]")
+  if argv.length < 2
+    print(user "usage: mrb [MR file name]...")
     return
   
   user String mr-file
-  [] String mr-file := argv[1]
+  [] String mr-file := argv[argv.length - 1]
   if mr-file.actual-length < 6
     print(user "MR file name too short")
     return
@@ -44,15 +45,28 @@ main func(user Array{String} argv)
     print(user "Unsupported MR version")
     return
   
+  if version < '2' and argv.length > 2
+    print(user "Multiple files not supported before MR2")
+    return
+  
   # run MR compiler
-  var String{128} command
+  var String{512} command
   string-copy(user command, user "mr")
   string-append(user command, copy version)
-  string-concat(user command, user "-compiler.exe \"")
-  string-concat(user command, user mr-file)
-  string-concat(user command, copy "\" \"")
-  string-concat(user command, user prefix)
-  string-concat(user command, copy "c\"")
+  string-concat(user command, user "-compiler.exe")
+  var Int index(1)
+  do
+    while index < argv.length
+    [] String mr-file := argv[index]
+    string-concat(user command, copy " \"")
+    string-concat(user command, user mr-file)
+    string-concat(user command, copy "\"")
+    index := index + 1
+  
+  if version < '2'
+    string-concat(user command, copy " \"")
+    string-concat(user command, user prefix)
+    string-concat(user command, copy "c\"")
   
   var Int status(0)
   print(user command)

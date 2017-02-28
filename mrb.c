@@ -2,9 +2,10 @@
 
 /* Builds executables from MR files */
 /*  */
-/* Gets one input file as "<name>.<MR version>.mr", */
-/* generates "<name>.c" file using <MR version> compiler, */
-/* and compiles it to "<name>.exe" executable using "gcc". */
+/* Gets input files as "<name>.<MR version>.mr", */
+/* generates "<name>.c" files using <MR version> compiler, */
+/* and compiles the last one to "<name>.exe" executable using "gcc". */
+/* (MR0 and MR1 only supports one file) */
 /*  */
 /* Supports MR0, MR1 & MR2. */
 
@@ -24,12 +25,12 @@ Returncode sys_system(String* command, Int* status);
 
 
 Returncode func(Array* argv) {
-  if (argv->length != 2) {
-    CHECK(print(&(String){26, 25, "usage: mrb [MR file name]"}))
+  if (argv->length < 2) {
+    CHECK(print(&(String){29, 28, "usage: mrb [MR file name]..."}))
     return OK;
   }
   String* mr_file;
-  if (1 < 0 || 1 >= argv->length) RAISE mr_file = ((String*)(argv->values)) + 1;
+  if (argv->length - 1 < 0 || argv->length - 1 >= argv->length) RAISE mr_file = ((String*)(argv->values)) + argv->length - 1;
   if (mr_file->actual_length < 6) {
     CHECK(print(&(String){23, 22, "MR file name too short"}))
     return OK;
@@ -46,16 +47,29 @@ Returncode func(Array* argv) {
     CHECK(print(&(String){23, 22, "Unsupported MR version"}))
     return OK;
   }
+  if (version < '2' and argv->length > 2) {
+    CHECK(print(&(String){40, 39, "Multiple files not supported before MR2"}))
+    return OK;
+  }
   /* run MR compiler */
-  String* command = &(String){128, 0, (char[128]){0}};
+  String* command = &(String){512, 0, (char[512]){0}};
   CHECK(string_copy(command, &(String){3, 2, "mr"}))
   CHECK(string_append(command, version))
-  CHECK(string_concat(command, &(String){16, 15, "-compiler.exe \""}))
-  CHECK(string_concat(command, mr_file))
-  CHECK(string_concat(command, &(String){4, 3, "\" \""}))
-  CHECK(string_concat(command, prefix))
-  CHECK(string_concat(command, &(String){3, 2, "c\""}))
-  
+  CHECK(string_concat(command, &(String){14, 13, "-compiler.exe"}))
+  Int index = 1;
+  while (true) {
+    if (not(index < argv->length)) break;
+    if (index < 0 || index >= argv->length) RAISE mr_file = ((String*)(argv->values)) + index;
+    CHECK(string_concat(command, &(String){3, 2, " \""}))
+    CHECK(string_concat(command, mr_file))
+    CHECK(string_concat(command, &(String){2, 1, "\""}))
+    index = index + 1;
+  }
+  if (version < '2') {
+    CHECK(string_concat(command, &(String){3, 2, " \""}))
+    CHECK(string_concat(command, prefix))
+    CHECK(string_concat(command, &(String){3, 2, "c\""}))
+  }
   Int status = 0;
   CHECK(print(command))
   CHECK(sys_system(command, &status))
