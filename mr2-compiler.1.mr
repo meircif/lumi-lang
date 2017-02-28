@@ -432,18 +432,18 @@ func f-end-block()
   
   return
 
-func write-block-suffix(user String suffix)
-  write(user " {\n")
-  glob.spaces := glob.spaces + 2
-  write-sons()
+func write-block-close()
   glob.spaces := glob.spaces - 2
   write-spaces()
   write(user "}")
-  write(user suffix)
   return
 
 func write-block()
-  write-block-suffix(user "\n")
+  write(user " {\n")
+  glob.spaces := glob.spaces + 2
+  write-sons()
+  write-block-close()
+  write(user "\n")
   return
 
 # empty
@@ -1055,6 +1055,25 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
   out end := glob.end
   return
 
+# return
+func write-return(user Generic null)
+  write(user "return OK;\n")
+  return
+
+func parse-return()
+  add-node(user write-return, user NULL)
+  return
+
+# raise
+func write-raise(user Generic null)
+  write-tb-raise()
+  write(user "\n")
+  return
+
+func parse-raise()
+  add-node(user write-raise, user NULL)
+  return
+
 # func
 func write-func(user St-func st-func)
   write(user "static char* _func_name_")
@@ -1071,7 +1090,15 @@ func write-func(user St-func st-func)
   write-func-name(user st-func)
   write-new-indent-line()
   write-func-header(user st-func)
-  write-block()
+  write(user " {\n")
+  glob.spaces := glob.spaces + 2
+  write-sons()
+  if glob.curr.last-son.f-writer != write-return and glob.curr.last-son.f-writer != write-raise
+    write-spaces()
+    write-return(user NULL)
+  
+  write-block-close()
+  write-new-indent-line()
   write(user "#undef MR_FUNC_NAME\n")
   return
 
@@ -1499,9 +1526,8 @@ func write-else-if(user St-exp st-exp)
     write-spaces()
     next.f-writer(user next.value)
   
-  glob.spaces := glob.spaces - 2
-  write-spaces()
-  write(user "}\n")
+  write-block-close()
+  write(user "\n")
   return
 
 func parse-else-if()
@@ -1567,25 +1593,6 @@ func parse-for()
   f-start-block()
   return
 
-# return
-func write-return(user Generic null)
-  write(user "return OK;\n")
-  return
-
-func parse-return()
-  add-node(user write-return, user NULL)
-  return
-
-# raise
-func write-raise(user Generic null)
-  write-tb-raise()
-  write(user "\n")
-  return
-
-func parse-raise()
-  add-node(user write-raise, user NULL)
-  return
-
 # class
 func write-class-members(user St self-node, copy Bool is-func)
   user St son(self-node.first-son)
@@ -1624,9 +1631,8 @@ func write-class(user St-class st-class)
   
   user St self-node(glob.curr)
   write-class-members(user self-node, copy false)
-  glob.spaces := glob.spaces - 2
-  write-spaces()
-  write(user "};\n")
+  write-block-close()
+  write(user ";\n")
   write-class-members(user self-node, copy true)
   glob.st-class := NULL
   if st-class.type-attrs.is-dynamic

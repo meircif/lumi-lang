@@ -434,18 +434,18 @@ Returncode f_end_block() {
   }
   return OK;
 }
-Returncode write_block_suffix(String* suffix) {
-  CHECK(write(&(String){4, 3, " {\n"}))
-  glob->spaces = glob->spaces + 2;
-  CHECK(write_sons())
+Returncode write_block_close() {
   glob->spaces = glob->spaces - 2;
   CHECK(write_spaces())
   CHECK(write(&(String){2, 1, "}"}))
-  CHECK(write(suffix))
   return OK;
 }
 Returncode write_block() {
-  CHECK(write_block_suffix(&(String){2, 1, "\n"}))
+  CHECK(write(&(String){4, 3, " {\n"}))
+  glob->spaces = glob->spaces + 2;
+  CHECK(write_sons())
+  CHECK(write_block_close())
+  CHECK(write(&(String){2, 1, "\n"}))
   return OK;
 }
 /* empty */
@@ -1057,6 +1057,25 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
   *end = glob->end;
   return OK;
 }
+/* return */
+Returncode write_return(Generic* null) {
+  CHECK(write(&(String){12, 11, "return OK;\n"}))
+  return OK;
+}
+Returncode parse_return() {
+  CHECK(add_node(write_return, NULL))
+  return OK;
+}
+/* raise */
+Returncode write_raise(Generic* null) {
+  CHECK(write_tb_raise())
+  CHECK(write(&(String){2, 1, "\n"}))
+  return OK;
+}
+Returncode parse_raise() {
+  CHECK(add_node(write_raise, NULL))
+  return OK;
+}
 /* func */
 Returncode write_func(St_func* st_func) {
   CHECK(write(&(String){25, 24, "static char* _func_name_"}))
@@ -1073,7 +1092,15 @@ Returncode write_func(St_func* st_func) {
   CHECK(write_func_name(st_func))
   CHECK(write_new_indent_line())
   CHECK(write_func_header(st_func))
-  CHECK(write_block())
+  CHECK(write(&(String){4, 3, " {\n"}))
+  glob->spaces = glob->spaces + 2;
+  CHECK(write_sons())
+  if (glob->curr->last_son->f_writer != write_return and glob->curr->last_son->f_writer != write_raise) {
+    CHECK(write_spaces())
+    CHECK(write_return(NULL))
+  }
+  CHECK(write_block_close())
+  CHECK(write_new_indent_line())
   CHECK(write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}))
   return OK;
 }
@@ -1501,9 +1528,8 @@ Returncode write_else_if(St_exp* st_exp) {
     CHECK(write_spaces())
     CHECK(next->f_writer(next->value))
   }
-  glob->spaces = glob->spaces - 2;
-  CHECK(write_spaces())
-  CHECK(write(&(String){3, 2, "}\n"}))
+  CHECK(write_block_close())
+  CHECK(write(&(String){2, 1, "\n"}))
   return OK;
 }
 Returncode parse_else_if() {
@@ -1569,25 +1595,6 @@ Returncode parse_for() {
   CHECK(f_start_block())
   return OK;
 }
-/* return */
-Returncode write_return(Generic* null) {
-  CHECK(write(&(String){12, 11, "return OK;\n"}))
-  return OK;
-}
-Returncode parse_return() {
-  CHECK(add_node(write_return, NULL))
-  return OK;
-}
-/* raise */
-Returncode write_raise(Generic* null) {
-  CHECK(write_tb_raise())
-  CHECK(write(&(String){2, 1, "\n"}))
-  return OK;
-}
-Returncode parse_raise() {
-  CHECK(add_node(write_raise, NULL))
-  return OK;
-}
 /* class */
 Returncode write_class_members(St* self_node, Bool is_func) {
   St* son = self_node->first_son;
@@ -1626,9 +1633,8 @@ Returncode write_class(St_class* st_class) {
   }
   St* self_node = glob->curr;
   CHECK(write_class_members(self_node, false))
-  glob->spaces = glob->spaces - 2;
-  CHECK(write_spaces())
-  CHECK(write(&(String){4, 3, "};\n"}))
+  CHECK(write_block_close())
+  CHECK(write(&(String){3, 2, ";\n"}))
   CHECK(write_class_members(self_node, true))
   glob->st_class = NULL;
   if (st_class->type_attrs->is_dynamic) {
