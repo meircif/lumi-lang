@@ -173,6 +173,7 @@ typedef struct Global_data Global_data; struct Global_data {
   File* infile;
   File* outfile;
   Array* key_word_map;
+  Name_map* op_map;
   Name_map* type_map;
   Name_map* var_map;
   /* state */
@@ -315,31 +316,19 @@ Returncode write(String* text) {
   CHECK(file_write(glob->outfile, text))
   return OK;
 }
-Returncode write_csyle_char(Char ch, Char prev) {
-  if (ch == '-' and prev != ' ') {
-    CHECK(write_c('_'))
-  }
-  else if (ch == '.') {
-    CHECK(write(&(String){3, 2, "->"}))
-  }
-  else if (ch == '=' and prev == ' ') {
-    CHECK(write(&(String){3, 2, "=="}))
-  }
-  else if (ch != ':') {
-    CHECK(write_c(ch))
-  }
-  return OK;
-}
 Returncode write_cstyle(String* text) {
   if (text == NULL) {
     RAISE
   }
-  Char prev = ' ';
   Int index; for (index = 0; index < text->actual_length; ++index) {
     Char ch;
     CHECK(string_get(text, index, &ch))
-    CHECK(write_csyle_char(ch, prev))
-    prev = ch;
+    if (ch == '-') {
+      CHECK(write_c('_'))
+    }
+    else {
+      CHECK(write_c(ch))
+    }
   }
   return OK;
 }
@@ -655,12 +644,14 @@ Returncode write_exp(St_exp* st_exp) {
   if (st_exp == NULL) {
     RAISE
   }
+  Bool binary = true;
   if (st_exp->call != NULL) {
     CHECK(f_raise_on_null(st_exp->call->last, &(String){16, 15, "No output for \""}, st_exp->call->path->name, &(String){2, 1, "\""}))
     CHECK(write_mpath(st_exp->call->last->value, true))
   }
   else if (st_exp->item == NULL) {
-    if (st_exp->subexp != NULL) {
+    binary = st_exp->subexp != NULL;
+    if (binary) {
       CHECK(write(&(String){2, 1, "("}))
       CHECK(write_exp(st_exp->subexp))
       CHECK(write(&(String){2, 1, ")"}))
@@ -673,11 +664,15 @@ Returncode write_exp(St_exp* st_exp) {
     CHECK(write_exp_item(st_exp->item))
   }
   if (st_exp->operator != NULL) {
-    CHECK(write(&(String){2, 1, " "}))
-    CHECK(write_cstyle(st_exp->operator))
+    if (binary) {
+      CHECK(write(&(String){2, 1, " "}))
+    }
+    CHECK(write(st_exp->operator))
   }
   if (st_exp->next != NULL) {
-    CHECK(write(&(String){2, 1, " "}))
+    if (binary) {
+      CHECK(write(&(String){2, 1, " "}))
+    }
     CHECK(write_exp(st_exp->next))
   }
   return OK;
@@ -752,8 +747,23 @@ Returncode parse_exp(String* exp_ends, St_exp** new_st_exp, Char* out_end) {
       CHECK(parse_exp(exp_ends, &st_exp->next, &end))
     }
   }
+  else if (end == ' ' and st_exp->item->next == NULL) {
+    Generic* value;
+    CHECK(f_nm_find(glob->op_map, st_exp->item->name, &value))
+    if (value != NULL) {
+      st_exp->operator = value;
+      free(st_exp->item);
+      st_exp->item = NULL;
+      CHECK(parse_exp(exp_ends, &st_exp->next, &end))
+    }
+  }
   if (end == ' ') {
-    CHECK(read_new(&(String){2, 1, " "}, &st_exp->operator, &end))
+    String* operator = &(String){16, 0, (char[16]){0}};
+    CHECK(read(&(String){2, 1, " "}, operator, &end))
+    Generic* value;
+    CHECK(f_nm_find(glob->op_map, operator, &value))
+    CHECK(f_raise_on_null(value, &(String){18, 17, "Unknow operator \""}, operator, &(String){2, 1, "\""}))
+    st_exp->operator = value;
     CHECK(parse_exp(exp_ends, &st_exp->next, &end))
   }
   *new_st_exp = st_exp;
@@ -1556,7 +1566,7 @@ Returncode parse_do() {
 /* while */
 Returncode write_while(St_exp* st_exp) {
   CHECK(write_exp_intro(st_exp))
-  CHECK(write(&(String){9, 8, "if (not("}))
+  CHECK(write(&(String){7, 6, "if (!("}))
   CHECK(write_exp(st_exp))
   CHECK(write(&(String){11, 10, ")) break;\n"}))
   return OK;
@@ -1901,8 +1911,37 @@ Returncode add_meth(String* header, Type_attrs* func_type, Name_map** members) {
   CHECK(add_member(mpath->name, func_type, st_func, members))
   return OK;
 }
+Returncode f_add_op(String* op_name, String* op_c_name) {
+  String* name;
+  CHECK(f_new_copy(op_name, &name))
+  String* c_name;
+  CHECK(f_new_copy(op_c_name, &c_name))
+  CHECK(f_nm_init(name, c_name, &glob->op_map))
+  return OK;
+}
+Returncode f_add_op_copy(String* name) {
+  CHECK(f_add_op(name, name))
+  return OK;
+}
 Returncode f_create_name_maps() {
+  glob->op_map = NULL;
   glob->type_map = NULL;
+  glob->var_map = NULL;
+  /* Operands */
+  CHECK(f_add_op_copy(&(String){2, 1, "+"}))
+  CHECK(f_add_op_copy(&(String){2, 1, "-"}))
+  CHECK(f_add_op_copy(&(String){2, 1, "*"}))
+  CHECK(f_add_op_copy(&(String){2, 1, "/"}))
+  CHECK(f_add_op(&(String){2, 1, "="}, &(String){3, 2, "=="}))
+  CHECK(f_add_op_copy(&(String){3, 2, "!="}))
+  CHECK(f_add_op_copy(&(String){2, 1, ">"}))
+  CHECK(f_add_op_copy(&(String){2, 1, "<"}))
+  CHECK(f_add_op_copy(&(String){3, 2, ">="}))
+  CHECK(f_add_op_copy(&(String){3, 2, "<="}))
+  CHECK(f_add_op(&(String){4, 3, "not"}, &(String){2, 1, "!"}))
+  CHECK(f_add_op(&(String){3, 2, "or"}, &(String){3, 2, "||"}))
+  CHECK(f_add_op(&(String){4, 3, "and"}, &(String){3, 2, "&&"}))
+  CHECK(f_add_op(&(String){5, 4, "cast"}, &(String){8, 7, "(void*)"}))
   /* Func */
   CHECK(add_type(&(String){5, 4, "Func"}, NULL, NULL))
   Type_attrs* func_type = glob->type_map->value;

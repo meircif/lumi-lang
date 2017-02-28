@@ -96,7 +96,7 @@ Returncode String_equal(String* this, String* other, Bool* out_equal) {
 }
 
 Returncode String_get(String* this, Int index, Char* out_char) {
-  if (index < 0 or index >= this->length) {
+  if (index < 0 || index >= this->length) {
     CRAISE
   }
   *out_char = this->chars[index];
@@ -127,7 +127,7 @@ Returncode String_replace(String* this, Char old, Char new) {
 
 Returncode Int_str(Int value, String* out_str) {
   int res = snprintf(out_str->chars, out_str->max_length ,"%d", value);
-  if (res <= 0 or res >= out_str->max_length) {
+  if (res <= 0 || res >= out_str->max_length) {
     out_str->length = 0;
     CRAISE
   }

@@ -171,6 +171,7 @@ class Global-data
   owner File infile
   owner File outfile
   user Array{Func-map} key-word-map
+  owner Name-map op-map
   owner Name-map type-map
   owner Name-map var-map
   # state
@@ -313,31 +314,19 @@ func write(user String text)
   file-write(user glob.outfile, user text)
   return
 
-func write-csyle-char(copy Char ch, copy Char prev)
-  if ch = '-' and prev != ' '
-    write-c(copy '_')
-  
-  else-if ch = '.'
-    write(user "->")
-  
-  else-if ch = '=' and prev = ' '
-    write(user "==")
-  
-  else-if ch != ':'
-    write-c(copy ch)
-  
-  return
-
 func write-cstyle(user String text)
   if text = NULL
     raise
   
-  var Char prev(' ')
   for index in text.actual-length
     var Char ch
     string-get(user text, copy index): copy ch
-    write-csyle-char(copy ch, copy prev)
-    prev := ch
+    if ch = '-'
+      write-c(copy '_')
+    
+    else
+      write-c(copy ch)
+    
   
   return
 
@@ -653,12 +642,14 @@ func write-exp(user St-exp st-exp)
   if st-exp = NULL
     raise
   
+  var Bool binary(true)
   if st-exp.call != NULL
     f-raise-on-null(user st-exp.call.last, user "No output for \"", user st-exp.call.path.name, user "\"")
     write-mpath(user st-exp.call.last.value, copy true)
   
   else-if st-exp.item = NULL
-    if st-exp.subexp != NULL
+    binary := st-exp.subexp != NULL
+    if binary
       write(user "(")
       write-exp(user st-exp.subexp)
       write(user ")")
@@ -671,11 +662,15 @@ func write-exp(user St-exp st-exp)
     write-exp-item(user st-exp.item)
   
   if st-exp.operator != NULL
-    write(user " ")
-    write-cstyle(user st-exp.operator)
+    if binary
+      write(user " ")
+    
+    write(user st-exp.operator)
   
   if st-exp.next != NULL
-    write(user " ")
+    if binary
+      write(user " ")
+    
     write-exp(user st-exp.next)
   
   return
@@ -750,8 +745,23 @@ func parse-exp(user String exp-ends): owner St-exp new-st-exp, copy Char out-end
       parse-exp(user exp-ends): owner st-exp.next, copy end
     
   
+  else-if end = ' ' and st-exp.item.next = NULL
+    user Generic value
+    f-nm-find(user glob.op-map, user st-exp.item.name): user value
+    if value != NULL
+      st-exp.operator := value
+      delete st-exp.item
+      st-exp.item := NULL
+      parse-exp(user exp-ends): owner st-exp.next, copy end
+    
+  
   if end = ' '
-    read-new(user " "): owner st-exp.operator, copy end
+    var String{16} operator
+    read(user " "): var operator, copy end
+    user Generic value
+    f-nm-find(user glob.op-map, user operator): user value
+    f-raise-on-null(user value, user "Unknow operator \"", user operator, user "\"")
+    st-exp.operator := value
     parse-exp(user exp-ends): owner st-exp.next, copy end
   
   out new-st-exp := st-exp
@@ -1554,7 +1564,7 @@ func parse-do()
 # while
 func write-while(user St-exp st-exp)
   write-exp-intro(user st-exp)
-  write(user "if (not(")
+  write(user "if (!(")
   write-exp(user st-exp)
   write(user ")) break;\n")
   return
@@ -1899,8 +1909,37 @@ func add-meth(user String header, user Type-attrs func-type): owner Name-map mem
   add-member(user mpath.name, user func-type, user st-func): var members
   return
 
+func f-add-op(user String op-name, user String op-c-name)
+  owner String name
+  f-new-copy(user op-name): owner name
+  owner String c-name
+  f-new-copy(user op-c-name): owner c-name
+  f-nm-init(owner name, owner c-name): owner glob.op-map
+  return
+
+func f-add-op-copy(user String name)
+  f-add-op(user name, user name)
+  return
+
 func f-create-name-maps()
+  glob.op-map := NULL
   glob.type-map := NULL
+  glob.var-map := NULL
+  # Operands
+  f-add-op-copy(user "+")
+  f-add-op-copy(user "-")
+  f-add-op-copy(user "*")
+  f-add-op-copy(user "/")
+  f-add-op(user "=", user "==")
+  f-add-op-copy(user "!=")
+  f-add-op-copy(user ">")
+  f-add-op-copy(user "<")
+  f-add-op-copy(user ">=")
+  f-add-op-copy(user "<=")
+  f-add-op(user "not", user "!")
+  f-add-op(user "or", user "||")
+  f-add-op(user "and", user "&&")
+  f-add-op(user "cast", user "(void*)")
   # Func
   add-type(user "Func", owner NULL, user NULL)
   user Type-attrs func-type(glob.type-map.value)
