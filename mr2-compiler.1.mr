@@ -1690,15 +1690,24 @@ func parse-while()
 # for
 class St-for
   owner String counter
+  owner St-exp start
   owner St-exp limit
 
 func write-for(user St-for st-for)
+  write-exp-intro(user st-for.start)
   write-exp-intro(user st-for.limit)
   write(user "Int ")
   write-cstyle(user st-for.counter)
   write(user "; for (")
   write-cstyle(user st-for.counter)
-  write(user " = 0; ")
+  write(user " = ")
+  if st-for.start = NULL
+    write(user "0")
+  
+  else
+    write-exp(user st-for.start)
+  
+  write(user "; ")
   write-cstyle(user st-for.counter)
   write(user " < ")
   write-exp(user st-for.limit)
@@ -1713,7 +1722,11 @@ func parse-for()
   read-new(user " "): owner st-for.counter, copy glob.end
   # ignore "in "
   read-ignore(copy 3)
-  parse-exp(user ""): owner st-for.limit, copy glob.end
+  st-for.start := NULL
+  if parse-exp(user ":"): owner st-for.limit, copy glob.end = ':'
+    st-for.start := st-for.limit
+    parse-exp(user ""): owner st-for.limit, copy glob.end
+  
   add-node(copy write-for, owner st-for)
   f-start-block()
   return

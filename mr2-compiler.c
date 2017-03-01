@@ -1692,15 +1692,24 @@ Returncode parse_while() {
 /* for */
 typedef struct St_for St_for; struct St_for {
   String* counter;
+  St_exp* start;
   St_exp* limit;
 };
 Returncode write_for(St_for* st_for) {
+  CHECK(write_exp_intro(st_for->start))
   CHECK(write_exp_intro(st_for->limit))
   CHECK(write(&(String){5, 4, "Int "}))
   CHECK(write_cstyle(st_for->counter))
   CHECK(write(&(String){8, 7, "; for ("}))
   CHECK(write_cstyle(st_for->counter))
-  CHECK(write(&(String){7, 6, " = 0; "}))
+  CHECK(write(&(String){4, 3, " = "}))
+  if (st_for->start == NULL) {
+    CHECK(write(&(String){2, 1, "0"}))
+  }
+  else {
+    CHECK(write_exp(st_for->start))
+  }
+  CHECK(write(&(String){3, 2, "; "}))
   CHECK(write_cstyle(st_for->counter))
   CHECK(write(&(String){4, 3, " < "}))
   CHECK(write_exp(st_for->limit))
@@ -1715,7 +1724,11 @@ Returncode parse_for() {
   CHECK(read_new(&(String){2, 1, " "}, &st_for->counter, &glob->end))
   /* ignore "in " */
   CHECK(read_ignore(3))
-  CHECK(parse_exp(&(String){1, 0, ""}, &st_for->limit, &glob->end))
+  st_for->start = NULL;
+  CHECK(parse_exp(&(String){2, 1, ":"}, &st_for->limit, &glob->end)) if (glob->end == ':') {
+    st_for->start = st_for->limit;
+    CHECK(parse_exp(&(String){1, 0, ""}, &st_for->limit, &glob->end))
+  }
   CHECK(add_node(write_for, st_for))
   CHECK(f_start_block())
   return OK;
