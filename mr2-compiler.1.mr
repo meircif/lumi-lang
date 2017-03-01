@@ -905,6 +905,89 @@ func write-func-last(user St-func st-func, user Var-attrs var-attrs)
   write-tb-check()
   return
 
+func write-call-func-name(user St-func st-func): user St-func ret-func-def
+  user Var-attrs var-attrs
+  if st-func.path.next = NULL
+    f-find-var(user glob.curr.var-map, user st-func.path.name): user var-attrs
+    write-func-last(user st-func, user var-attrs)
+    write-mpath(user st-func.path, copy true)
+    out ret-func-def := var-attrs.subtype
+    return
+  
+  var Char first
+  user Generic value
+  user Type-attrs type-attrs
+  string-get(user st-func.path.name, copy 0): copy first
+  if first >= 'A' and first <= 'Z'
+    if st-func.path.next.next != NULL
+      f-msg-raise(user "Illegal meth call \"", user st-func.path.next.next.name, user "\"")
+    
+    f-find-type(user st-func.path.name): user type-attrs
+    user String meth(st-func.path.next.name)
+    var-attrs := f-nm-find(user type-attrs.members, user meth): user value
+    f-raise-on-null(user var-attrs, user "unknown method \"", user meth, user "\"")
+    out ret-func-def := var-attrs.subtype
+    write-func-last(user st-func, user var-attrs)
+    write-cstyle(user type-attrs.name)
+    write(user "_")
+    write-cstyle(user meth)
+    return
+  
+  new St-arg param
+  param.typename := NULL
+  param.type-param := NULL
+  f-new-copy(user "user"): owner param.access
+  user Member-path mpath(st-func.path)
+  new Member-path param-mpath
+  param-mpath.next := NULL
+  f-new-copy(user mpath.name): owner param-mpath.name
+  new St-exp param-exp
+  param-exp.next := NULL
+  param-exp.operator := NULL
+  param-exp.call := NULL
+  param-exp.subexp := NULL
+  param-exp.slice-length := NULL
+  param-exp.item := param-mpath
+  param.value := param-exp
+  param.next := st-func.params
+  st-func.params := param
+  
+  f-find-var(user glob.curr.var-map, user mpath.name): user var-attrs
+  do
+    mpath := mpath.next
+    type-attrs := var-attrs.type-attrs
+    do
+      var-attrs := f-nm-find(user type-attrs.members, user mpath.name): user value
+      while var-attrs = NULL
+      type-attrs := type-attrs.base-type
+      f-raise-on-null(user type-attrs, user "unknown variable \"", user mpath.name, user "\"")
+    
+    while mpath.next != NULL
+    new Member-path new-mpath
+    param-mpath.next := new-mpath
+    new-mpath.next := NULL
+    f-new-copy(user mpath.name): owner new-mpath.name
+    param-mpath := new-mpath
+  
+  user St-func func-def(var-attrs.subtype)
+  out ret-func-def := func-def
+  write-func-last(user st-func, user var-attrs)
+  if func-def.is-dynamic
+    write(user "(*((Func**)(")
+    write-mpath(user st-func.path, copy false)
+    write(user ")))[")
+    var String{32} dynamic-index
+    int-to-string(copy func-def.dynamic-index): var dynamic-index
+    write(user dynamic-index)
+    write(user "]")
+  
+  else
+    write-cstyle(user type-attrs.name)
+    write(user "_")
+    write-cstyle(user mpath.name)
+  
+  return
+
 func write-func-call(user St-func st-func)
   user St-arg arg(st-func.params)
   user St-func func-def
@@ -913,72 +996,14 @@ func write-func-call(user St-func st-func)
     write-exp-intro(user arg.value)
     arg := arg.next
   
-  if st-func.path.next != NULL:
-    user Var-attrs var-attrs
-    f-find-var(user glob.curr.var-map, user st-func.path.name): user var-attrs
-    user Type-attrs type-attrs(var-attrs.type-attrs)
-    user Member-path mpath(st-func.path.next)
-    var Int bases(0)
-    do
-      do
-        user Generic value
-        var-attrs := f-nm-find(user type-attrs.members, user mpath.name): user value
-        while var-attrs = NULL
-        type-attrs := type-attrs.base-type
-        f-raise-on-null(user type-attrs, user "unknown variable \"", user mpath.name, user "\"")
-        bases := bases + 1
-      
-      while mpath.next != NULL
-      type-attrs := var-attrs.type-attrs
-      bases := 0
-      mpath := mpath.next
-    
-    write-func-last(user st-func, user var-attrs)
-    func-def := var-attrs.subtype
-    if func-def.is-dynamic
-      write(user "(*((Func**)(")
-      write-mpath(user st-func.path, copy false)
-      write(user ")))[")
-      var String{32} dynamic-index
-      int-to-string(copy func-def.dynamic-index): var dynamic-index
-      write(user dynamic-index)
-      write(user "]")
-    
-    else
-      write-cstyle(user type-attrs.name)
-      write(user "_")
-      write-cstyle(user mpath.name)
-    
-    write(user "(")
-    if bases > 0
-      write(user "&(")
-    
-    write-mpath(user st-func.path, copy false)
-    if bases > 0
-      write(user "->_base")
-    
-    for n in bases - 1
-      write(user "._base")
-    
-    if bases > 0
-      write(user ")")
-    
-    if st-func.params != NULL or st-func.outputs != NULL
-      write(user ", ")
-    
-  
-  else
-    user Var-attrs var-attrs
-    f-find-var(user glob.curr.var-map, user st-func.path.name): user var-attrs
-    write-func-last(user st-func, user var-attrs)
-    write-mpath(user st-func.path, copy true)
-    write(user "(")
-    func-def := var-attrs.subtype
-  
+  write-call-func-name(user st-func): user func-def
+  write(user "(")
   arg := st-func.params
   user St-arg arg-def(func-def.params)
   do
     while arg != NULL or arg-def != NULL
+    f-raise-on-null(user arg, user "too few parameters in call to \"", user func-def.path.name, user "\"")
+    f-raise-on-null(user arg-def, user "too much parameters in call to \"", user func-def.path.name, user "\"")
     user Type-attrs dec-type-attrs
     f-find-type(user arg-def.typename): user dec-type-attrs
     write-exp-typed(user arg.value, user dec-type-attrs)
@@ -1037,13 +1062,6 @@ func write-func-header(user St-func st-func)
   write(user "Returncode ")
   write-func-name(user st-func)
   write(user "(")
-  if glob.curr.father.f-writer = write-class
-    write-cstyle(user glob.st-class.type-attrs.name)
-    write(user "* self")
-    if st-func.params != NULL or st-func.outputs != NULL
-      write(user ", ")
-    
-  
   write-args(user st-func.params, copy false, user st-func.outputs)
   write-args(user st-func.outputs, copy true, user NULL)
   write(user ")")
@@ -1231,8 +1249,18 @@ func parse-func-body(copy Func f-writer)
   
   add-node(copy f-writer, owner st-func)
   f-start-block()
-  # add arguments to var-map
+  # add "self"
   if glob.curr.father.f-writer = write-class
+    new St-arg param
+    param.type-param := NULL
+    f-new-copy(user "user"): owner param.access
+    f-new-copy(user glob.st-class.type-attrs.name): owner param.typename
+    owner String param-name
+    f-new-copy(user "self"): owner param-name
+    param.value := param-name
+    param.next := st-func.params
+    st-func.params := param
+    
     new Var-attrs new-var
     f-new-copy(user "self"): owner new-var.name
     new-var.type-attrs := glob.st-class.type-attrs
@@ -2033,7 +2061,7 @@ func f-create-name-maps()
   user Type-attrs func-type(glob.type-map.value)
   # Int
   owner Name-map members-int(NULL)
-  add-meth(user "str)var String str", user func-type): owner members-int
+  add-meth(user "str(user Int self)var String str", user func-type): owner members-int
   add-type(user "Int", user NULL, owner members-int)
   user Type-attrs type-int(glob.type-map.value)
   # Char
@@ -2044,15 +2072,15 @@ func f-create-name-maps()
   owner Name-map members-string(NULL)
   add-member(user "length", user type-int, user NULL): owner members-string
   add-member(user "max-length", user type-int, user NULL): owner members-string
-  add-meth(user "clear", user func-type): owner members-string
-  add-meth(user "equal(user String pattern)copy Bool equal", user func-type): owner members-string
-  add-meth(user "get(copy Int index)copy Char ch", user func-type): owner members-string
-  add-meth(user "append(copy Char ch", user func-type): owner members-string
-  add-meth(user "copy(user String other", user func-type): owner members-string
-  add-meth(user "concat(user String other", user func-type): owner members-string
-  add-meth(user "find(user String pattern)copy Int index", user func-type): owner members-string
-  add-meth(user "replace(copy Char oldch,copy Char newch", user func-type): owner members-string
-  add-meth(user "has(copy Char ch)copy Bool has", user func-type): owner members-string
+  add-meth(user "clear(user String self", user func-type): owner members-string
+  add-meth(user "equal(user String self,user String pattern)copy Bool equal", user func-type): owner members-string
+  add-meth(user "get(user String self,copy Int index)copy Char ch", user func-type): owner members-string
+  add-meth(user "append(user String self,copy Char ch", user func-type): owner members-string
+  add-meth(user "copy(user String self,user String other", user func-type): owner members-string
+  add-meth(user "concat(user String self,user String other", user func-type): owner members-string
+  add-meth(user "find(user String self,user String pattern)copy Int index", user func-type): owner members-string
+  add-meth(user "replace(user String self,copy Char oldch,copy Char newch", user func-type): owner members-string
+  add-meth(user "has(user String self,copy Char ch)copy Bool has", user func-type): owner members-string
   add-type(user "String", user NULL, owner members-string)
   # Array
   owner Name-map members-array(NULL)
@@ -2060,19 +2088,19 @@ func f-create-name-maps()
   add-type(user "Array", user NULL, owner members-array)
   # File
   owner Name-map members-file(NULL)
-  add-meth(user "close", user func-type): owner members-file
-  add-meth(user "getc)copy Char ch", user func-type): owner members-file
-  add-meth(user "putc(copy Char ch", user func-type): owner members-file
-  add-meth(user "write(user String text", user func-type): owner members-file
+  add-meth(user "close(user File self", user func-type): owner members-file
+  add-meth(user "getc(user File self)copy Char ch", user func-type): owner members-file
+  add-meth(user "putc(user File self,copy Char ch", user func-type): owner members-file
+  add-meth(user "write(user File self,user String text", user func-type): owner members-file
   add-type(user "File", user NULL, owner members-file)
   add-meth(user "file-open-read(user String name)owner File file", user func-type): owner glob.var-map
   add-meth(user "file-open-write(user String name)owner File file", user func-type): owner glob.var-map
   # Sys
   owner Name-map members-sys(NULL)
-  add-meth(user "print(user String text", user func-type): owner members-sys
-  add-meth(user "exit(copy Int status", user func-type): owner members-sys
-  add-meth(user "system(user String command)copy Int status", user func-type): owner members-sys
-  add-meth(user "getenv(user String name)var String value,copy Bool exists", user func-type): owner members-sys
+  add-meth(user "print(user Sys self,user String text", user func-type): owner members-sys
+  add-meth(user "exit(user Sys self,copy Int status", user func-type): owner members-sys
+  add-meth(user "system(user Sys self,user String command)copy Int status", user func-type): owner members-sys
+  add-meth(user "getenv(user Sys self,user String name)var String value,copy Bool exists", user func-type): owner members-sys
   add-type(user "Sys", user NULL, owner members-sys)
   return
 
