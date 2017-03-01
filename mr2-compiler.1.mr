@@ -479,6 +479,26 @@ func read-mpath(user String ends): owner Member-path mem-path, copy Char end
   out end := glob.end
   return
 
+func f-mpath-attrs(user Member-path mem-path): user Var-attrs ret-var-attrs
+  out ret-var-attrs := NULL
+  user Member-path mpath(mem-path)
+  user Var-attrs var-attrs
+  f-find-var(user glob.curr.var-map, user mpath.name): user var-attrs
+  do
+    mpath := mpath.next
+    while mpath != NULL
+    user Type-attrs type-attrs(var-attrs.type-attrs)
+    do
+      user Generic value
+      var-attrs := f-nm-find(user type-attrs.members, user mpath.name): user value
+      while var-attrs = NULL
+      type-attrs := type-attrs.base-type
+      f-raise-on-null(user type-attrs, user "Undefined variable \"", user mpath.name, user "\"")
+    
+  
+  out ret-var-attrs := var-attrs
+  return
+
 func write-mpath(user Member-path mem-path, copy Bool write-last)
   user Member-path mpath(mem-path)
   user Generic value
@@ -552,17 +572,11 @@ native func write-exp(user St-exp st-exp)
 
 func write-exp-array(user St-exp st-exp)
   user Var-attrs var-attrs
-  f-find-var(user glob.curr.var-map, user st-exp.item.name): user var-attrs
-  user Member-path mpath(st-exp.item)
-  do
-    while mpath.next != NULL
-    mpath := mpath.next
-    f-find-var(user var-attrs.type-attrs.members, user mpath.name): user var-attrs
-  
+  f-mpath-attrs(user st-exp.item): user var-attrs
   user String typename(var-attrs.type-attrs.name)
   var Bool is-array
   if string-equal(user typename, user "Array"): copy is-array
-    f-raise-on-null(user var-attrs.subtype, user "No subtype in array \"", user mpath.name, user "\"")
+    f-raise-on-null(user var-attrs.subtype, user "No subtype in array \"", user var-attrs.name, user "\"")
     user Type-attrs subtype(var-attrs.subtype)
     typename := subtype.name
   
@@ -711,6 +725,67 @@ func write-exp-intro(user St-exp st-exp)
   
   return
 
+func f-get-mpath-attrs(user St-exp st-exp): user Var-attrs var-attrs
+  out var-attrs := NULL
+  if st-exp.item = NULL or st-exp.call != NULL or st-exp.subexp != NULL
+    return
+  
+  if st-exp.operator != NULL or st-exp.next != NULL
+    return
+  
+  var Char first
+  string-get(user st-exp.item.name, copy 0): copy first
+  if first = '"' or first = '\'' or (first >= '0' and first <= '9')
+    return
+  
+  f-mpath-attrs(user st-exp.item): var var-attrs
+  return
+
+func write-exp-typed(user St-exp st-exp, user Type-attrs wanted-type)
+  user Var-attrs var-attrs
+  f-get-mpath-attrs(user st-exp): user var-attrs
+  
+  if var-attrs != NULL
+    f-mpath-attrs(user st-exp.item): user var-attrs
+    user Type-attrs type-attrs(var-attrs.type-attrs)
+    var Bool first-base(true)
+    do
+      while type-attrs != wanted-type
+      type-attrs := type-attrs.base-type
+      if type-attrs = NULL
+        var String{256} msg
+        string-copy(user msg, user "Parameter \"")
+        string-concat(user msg, user st-exp.item.name)
+        string-concat(user msg, user "\" is of type \"")
+        string-concat(user msg, user var-attrs.type-attrs.name)
+        string-concat(user msg, user "\" instead of \"")
+        string-concat(user msg, user wanted-type.name)
+        string-concat(user msg, user "\"")
+        print(user msg)
+        raise
+      
+      if first-base
+        write(user "&(")
+        write-mpath(user st-exp.item, copy true)
+        write(user "->")
+        first-base := false
+      
+      else
+        write(user ".")
+      
+      write(user "_base")
+    
+    if first-base
+      write-mpath(user st-exp.item, copy true)
+    
+    else
+      write(user ")")
+    
+    return
+  
+  write-exp(user st-exp)
+  return
+
 native func parse-func-header(owner Member-path path): owner St-func st-func, copy Char end
 
 func parse-exp(user String exp-ends): owner St-exp new-st-exp, copy Char out-end
@@ -832,6 +907,7 @@ func write-func-last(user St-func st-func, user Var-attrs var-attrs)
 
 func write-func-call(user St-func st-func)
   user St-arg arg(st-func.params)
+  user St-func func-def
   do
     while arg != NULL
     write-exp-intro(user arg.value)
@@ -858,7 +934,7 @@ func write-func-call(user St-func st-func)
       mpath := mpath.next
     
     write-func-last(user st-func, user var-attrs)
-    user St-func func-def(var-attrs.subtype)
+    func-def := var-attrs.subtype
     if func-def.is-dynamic
       write(user "(*((Func**)(")
       write-mpath(user st-func.path, copy false)
@@ -897,12 +973,17 @@ func write-func-call(user St-func st-func)
     write-func-last(user st-func, user var-attrs)
     write-mpath(user st-func.path, copy true)
     write(user "(")
+    func-def := var-attrs.subtype
   
   arg := st-func.params
+  user St-arg arg-def(func-def.params)
   do
-    while arg != NULL
-    write-exp(user arg.value)
+    while arg != NULL or arg-def != NULL
+    user Type-attrs dec-type-attrs
+    f-find-type(user arg-def.typename): user dec-type-attrs
+    write-exp-typed(user arg.value, user dec-type-attrs)
     arg := arg.next
+    arg-def := arg-def.next
     if arg != NULL or st-func.outputs != NULL
       write(user ", ")
     
@@ -1725,7 +1806,14 @@ func write-assign(user St-assign st-assign)
   write-exp-intro(user st-assign.target)
   write-exp(user st-assign.target)
   write(user " = ")
-  write-exp(user st-assign.value)
+  user Var-attrs var-attrs
+  f-get-mpath-attrs(user st-assign.target): user var-attrs
+  if var-attrs = NULL
+    write-exp(user st-assign.value)
+  
+  else
+    write-exp-typed(user st-assign.value, user var-attrs.type-attrs)
+  
   write(user ";\n")
   return
 
@@ -1939,7 +2027,7 @@ func f-create-name-maps()
   f-add-op(user "not", user "!")
   f-add-op(user "or", user "||")
   f-add-op(user "and", user "&&")
-  f-add-op(user "cast", user "(void*)")
+  f-add-op(user "up-cast", user "(void*)")
   # Func
   add-type(user "Func", owner NULL, user NULL)
   user Type-attrs func-type(glob.type-map.value)

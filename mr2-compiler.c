@@ -481,6 +481,26 @@ Returncode read_mpath(String* ends, Member_path** mem_path, Char* end) {
   *end = glob->end;
   return OK;
 }
+Returncode f_mpath_attrs(Member_path* mem_path, Var_attrs** ret_var_attrs) {
+  *ret_var_attrs = NULL;
+  Member_path* mpath = mem_path;
+  Var_attrs* var_attrs;
+  CHECK(f_find_var(glob->curr->var_map, mpath->name, &var_attrs))
+  while (true) {
+    mpath = mpath->next;
+    if (not(mpath != NULL)) break;
+    Type_attrs* type_attrs = var_attrs->type_attrs;
+    while (true) {
+      Generic* value;
+      CHECK(f_nm_find(type_attrs->members, mpath->name, &value)) var_attrs = value;
+      if (not(var_attrs == NULL)) break;
+      type_attrs = type_attrs->base_type;
+      CHECK(f_raise_on_null(type_attrs, &(String){21, 20, "Undefined variable \""}, mpath->name, &(String){2, 1, "\""}))
+    }
+  }
+  *ret_var_attrs = var_attrs;
+  return OK;
+}
 Returncode write_mpath(Member_path* mem_path, Bool write_last) {
   Member_path* mpath = mem_path;
   Generic* value;
@@ -554,17 +574,11 @@ Returncode write_exp(St_exp* st_exp);
 
 Returncode write_exp_array(St_exp* st_exp) {
   Var_attrs* var_attrs;
-  CHECK(f_find_var(glob->curr->var_map, st_exp->item->name, &var_attrs))
-  Member_path* mpath = st_exp->item;
-  while (true) {
-    if (not(mpath->next != NULL)) break;
-    mpath = mpath->next;
-    CHECK(f_find_var(var_attrs->type_attrs->members, mpath->name, &var_attrs))
-  }
+  CHECK(f_mpath_attrs(st_exp->item, &var_attrs))
   String* typename = var_attrs->type_attrs->name;
   Bool is_array;
   CHECK(string_equal(typename, &(String){6, 5, "Array"}, &is_array)) if (is_array) {
-    CHECK(f_raise_on_null(var_attrs->subtype, &(String){22, 21, "No subtype in array \""}, mpath->name, &(String){2, 1, "\""}))
+    CHECK(f_raise_on_null(var_attrs->subtype, &(String){22, 21, "No subtype in array \""}, var_attrs->name, &(String){2, 1, "\""}))
     Type_attrs* subtype = var_attrs->subtype;
     typename = subtype->name;
   }
@@ -713,6 +727,67 @@ Returncode write_exp_intro(St_exp* st_exp) {
   }
   return OK;
 }
+Returncode f_get_mpath_attrs(St_exp* st_exp, Var_attrs** var_attrs) {
+  *var_attrs = NULL;
+  if (st_exp->item == NULL or st_exp->call != NULL or st_exp->subexp != NULL) {
+    return OK;
+  }
+  if (st_exp->operator != NULL or st_exp->next != NULL) {
+    return OK;
+  }
+  Char first;
+  CHECK(string_get(st_exp->item->name, 0, &first))
+  if (first == '"' or first == '\'' or (first >= '0' and first <= '9')) {
+    return OK;
+  }
+  CHECK(f_mpath_attrs(st_exp->item, var_attrs))
+  return OK;
+}
+Returncode write_exp_typed(St_exp* st_exp, Type_attrs* wanted_type) {
+  Var_attrs* var_attrs;
+  CHECK(f_get_mpath_attrs(st_exp, &var_attrs))
+  
+  if (var_attrs != NULL) {
+    CHECK(f_mpath_attrs(st_exp->item, &var_attrs))
+    Type_attrs* type_attrs = var_attrs->type_attrs;
+    Bool first_base = true;
+    while (true) {
+      if (not(type_attrs != wanted_type)) break;
+      type_attrs = type_attrs->base_type;
+      if (type_attrs == NULL) {
+        String* msg = &(String){256, 0, (char[256]){0}};
+        CHECK(string_copy(msg, &(String){12, 11, "Parameter \""}))
+        CHECK(string_concat(msg, st_exp->item->name))
+        CHECK(string_concat(msg, &(String){15, 14, "\" is of type \""}))
+        CHECK(string_concat(msg, var_attrs->type_attrs->name))
+        CHECK(string_concat(msg, &(String){15, 14, "\" instead of \""}))
+        CHECK(string_concat(msg, wanted_type->name))
+        CHECK(string_concat(msg, &(String){2, 1, "\""}))
+        CHECK(print(msg))
+        RAISE
+      }
+      if (first_base) {
+        CHECK(write(&(String){3, 2, "&("}))
+        CHECK(write_mpath(st_exp->item, true))
+        CHECK(write(&(String){3, 2, "->"}))
+        first_base = false;
+      }
+      else {
+        CHECK(write(&(String){2, 1, "."}))
+      }
+      CHECK(write(&(String){6, 5, "_base"}))
+    }
+    if (first_base) {
+      CHECK(write_mpath(st_exp->item, true))
+    }
+    else {
+      CHECK(write(&(String){2, 1, ")"}))
+    }
+    return OK;
+  }
+  CHECK(write_exp(st_exp))
+  return OK;
+}
 Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end);
 
 Returncode parse_exp(String* exp_ends, St_exp** new_st_exp, Char* out_end) {
@@ -834,6 +909,7 @@ Returncode write_func_last(St_func* st_func, Var_attrs* var_attrs) {
 }
 Returncode write_func_call(St_func* st_func) {
   St_arg* arg = st_func->params;
+  St_func* func_def;
   while (true) {
     if (not(arg != NULL)) break;
     CHECK(write_exp_intro(arg->value))
@@ -860,7 +936,7 @@ Returncode write_func_call(St_func* st_func) {
       mpath = mpath->next;
     }
     CHECK(write_func_last(st_func, var_attrs))
-    St_func* func_def = var_attrs->subtype;
+    func_def = var_attrs->subtype;
     if (func_def->is_dynamic) {
       CHECK(write(&(String){13, 12, "(*((Func**)("}))
       CHECK(write_mpath(st_func->path, false))
@@ -899,12 +975,17 @@ Returncode write_func_call(St_func* st_func) {
     CHECK(write_func_last(st_func, var_attrs))
     CHECK(write_mpath(st_func->path, true))
     CHECK(write(&(String){2, 1, "("}))
+    func_def = var_attrs->subtype;
   }
   arg = st_func->params;
+  St_arg* arg_def = func_def->params;
   while (true) {
-    if (not(arg != NULL)) break;
-    CHECK(write_exp(arg->value))
+    if (not(arg != NULL or arg_def != NULL)) break;
+    Type_attrs* dec_type_attrs;
+    CHECK(f_find_type(arg_def->typename, &dec_type_attrs))
+    CHECK(write_exp_typed(arg->value, dec_type_attrs))
     arg = arg->next;
+    arg_def = arg_def->next;
     if (arg != NULL or st_func->outputs != NULL) {
       CHECK(write(&(String){3, 2, ", "}))
     }
@@ -1727,7 +1808,14 @@ Returncode write_assign(St_assign* st_assign) {
   CHECK(write_exp_intro(st_assign->target))
   CHECK(write_exp(st_assign->target))
   CHECK(write(&(String){4, 3, " = "}))
-  CHECK(write_exp(st_assign->value))
+  Var_attrs* var_attrs;
+  CHECK(f_get_mpath_attrs(st_assign->target, &var_attrs))
+  if (var_attrs == NULL) {
+    CHECK(write_exp(st_assign->value))
+  }
+  else {
+    CHECK(write_exp_typed(st_assign->value, var_attrs->type_attrs))
+  }
   CHECK(write(&(String){3, 2, ";\n"}))
   return OK;
 }
@@ -1941,7 +2029,7 @@ Returncode f_create_name_maps() {
   CHECK(f_add_op(&(String){4, 3, "not"}, &(String){2, 1, "!"}))
   CHECK(f_add_op(&(String){3, 2, "or"}, &(String){3, 2, "||"}))
   CHECK(f_add_op(&(String){4, 3, "and"}, &(String){3, 2, "&&"}))
-  CHECK(f_add_op(&(String){5, 4, "cast"}, &(String){8, 7, "(void*)"}))
+  CHECK(f_add_op(&(String){8, 7, "up-cast"}, &(String){8, 7, "(void*)"}))
   /* Func */
   CHECK(add_type(&(String){5, 4, "Func"}, NULL, NULL))
   Type_attrs* func_type = glob->type_map->value;
