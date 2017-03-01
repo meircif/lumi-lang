@@ -439,12 +439,12 @@ func write-block()
   return
 
 # empty
-func write-empty(user Generic null)
+func write-empty-line(user Generic null)
   write(user "\n")
   return
 
-func add-empty()
-  add-node(copy write-empty, owner NULL)
+func add-empty-line()
+  add-node(copy write-empty-line, owner NULL)
   return
 
 # comment
@@ -647,6 +647,9 @@ func write-exp-item(user Member-path mpath)
   else-if first = '\'' or first = '-' or first >= '0' and first <= '9'
     write(user mpath.name)
   
+  else-if first = '_'
+    write(user "NULL")
+  
   else
     write-mpath(user mpath, copy true)
   
@@ -735,7 +738,7 @@ func f-get-mpath-attrs(user St-exp st-exp): user Var-attrs var-attrs
   
   var Char first
   string-get(user st-exp.item.name, copy 0): copy first
-  if first = '"' or first = '\'' or (first >= '0' and first <= '9')
+  if first = '"' or first = '\'' or first = '_' or (first >= '0' and first <= '9')
     return
   
   f-mpath-attrs(user st-exp.item): var var-attrs
@@ -1721,7 +1724,7 @@ func write-class-members(user St self-node, copy Bool is-func)
   do
     while son != NULL
     glob.curr := son
-    if is-func = (son.f-writer = write-func) and son.f-writer != write-empty
+    if is-func = (son.f-writer = write-func) and son.f-writer != write-empty-line
       write-spaces()
       son.f-writer(user son.value)
     
@@ -1900,7 +1903,7 @@ func parse-line(): copy Bool more-lines
     f-end-block()
   
   if string-equal(user key-word, user ""): copy glob.flag
-    add-node(copy write-empty, owner NULL)
+    add-empty-line()
     return
   
   if end = '('
@@ -2052,10 +2055,10 @@ func f-create-name-maps()
   f-add-op-copy(user "<")
   f-add-op-copy(user ">=")
   f-add-op-copy(user "<=")
+  f-add-op(user "?", user "NULL != ")
   f-add-op(user "not", user "!")
   f-add-op(user "or", user "||")
   f-add-op(user "and", user "&&")
-  f-add-op(user "up-cast", user "(void*)")
   # Func
   add-type(user "Func", owner NULL, user NULL)
   user Type-attrs func-type(glob.type-map.value)

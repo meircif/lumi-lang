@@ -441,12 +441,12 @@ Returncode write_block() {
   return OK;
 }
 /* empty */
-Returncode write_empty(Generic* null) {
+Returncode write_empty_line(Generic* null) {
   CHECK(write(&(String){2, 1, "\n"}))
   return OK;
 }
-Returncode add_empty() {
-  CHECK(add_node(write_empty, NULL))
+Returncode add_empty_line() {
+  CHECK(add_node(write_empty_line, NULL))
   return OK;
 }
 /* comment */
@@ -649,6 +649,9 @@ Returncode write_exp_item(Member_path* mpath) {
   else if (first == '\'' or first == '-' or first >= '0' and first <= '9') {
     CHECK(write(mpath->name))
   }
+  else if (first == '_') {
+    CHECK(write(&(String){5, 4, "NULL"}))
+  }
   else {
     CHECK(write_mpath(mpath, true))
   }
@@ -737,7 +740,7 @@ Returncode f_get_mpath_attrs(St_exp* st_exp, Var_attrs** var_attrs) {
   }
   Char first;
   CHECK(string_get(st_exp->item->name, 0, &first))
-  if (first == '"' or first == '\'' or (first >= '0' and first <= '9')) {
+  if (first == '"' or first == '\'' or first == '_' or (first >= '0' and first <= '9')) {
     return OK;
   }
   CHECK(f_mpath_attrs(st_exp->item, var_attrs))
@@ -1723,7 +1726,7 @@ Returncode write_class_members(St* self_node, Bool is_func) {
   while (true) {
     if (not(son != NULL)) break;
     glob->curr = son;
-    if (is_func == (son->f_writer == write_func) and son->f_writer != write_empty) {
+    if (is_func == (son->f_writer == write_func) and son->f_writer != write_empty_line) {
       CHECK(write_spaces())
       CHECK(son->f_writer(son->value))
     }
@@ -1902,7 +1905,7 @@ Returncode parse_line(Bool* more_lines) {
     CHECK(f_end_block())
   }
   CHECK(string_equal(key_word, &(String){1, 0, ""}, &glob->flag)) if (glob->flag) {
-    CHECK(add_node(write_empty, NULL))
+    CHECK(add_empty_line())
     return OK;
   }
   if (end == '(') {
@@ -2054,10 +2057,10 @@ Returncode f_create_name_maps() {
   CHECK(f_add_op_copy(&(String){2, 1, "<"}))
   CHECK(f_add_op_copy(&(String){3, 2, ">="}))
   CHECK(f_add_op_copy(&(String){3, 2, "<="}))
+  CHECK(f_add_op(&(String){2, 1, "?"}, &(String){9, 8, "NULL != "}))
   CHECK(f_add_op(&(String){4, 3, "not"}, &(String){2, 1, "!"}))
   CHECK(f_add_op(&(String){3, 2, "or"}, &(String){3, 2, "||"}))
   CHECK(f_add_op(&(String){4, 3, "and"}, &(String){3, 2, "&&"}))
-  CHECK(f_add_op(&(String){8, 7, "up-cast"}, &(String){8, 7, "(void*)"}))
   /* Func */
   CHECK(add_type(&(String){5, 4, "Func"}, NULL, NULL))
   Type_attrs* func_type = glob->type_map->value;

@@ -23,7 +23,7 @@ allow nested comments?
 
 
 # object creation
-############
+##################
 func f-variables-example()
 
 # stack variable objects are created using "var"
@@ -111,6 +111,20 @@ project where performance is less important.
   f-shared-func(shared some-string)  # copy strong reference
   f-user-func(user some-string)  # give reference to a user
   f-weak-func(weak some-string)  # give weak reference
+
+# empty references (nil/null/none)
+(#
+As defult, (non-weak) references always point to a legal object.
+To allow empty references a references must be declared as "conditional" using
+the "?" sign. Empty value can be set using "_".
+#)
+  user String{Uint8b}? cond-str  # initialized as empty
+  cond-str := some-string  # now not empty
+  cond-str := _ # now is empty again
+  if cond-str?  # check if empty
+    # ...
+  cond-str?.clear()  # raise error if empty
+  f-with-cond(user _)  # send empty to function
 
 # primitive types
 ##################
