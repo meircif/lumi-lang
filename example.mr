@@ -595,7 +595,7 @@ abstract class Abstract-class(Interface-name)
   inst func m-some-meth(copy Int{0:255} int-arg):
     self.int-member := int-arg / self.polymorphic-int
 
-dynamic class Implemented-class(Abstract-polymorphic-class)
+dynamic class Implemented-class(Abstract-class)
   dynamic class var Int{0:255} polymorphic-int(3)
   dynamic inst func m-polymorphic-meth(copy Int{0:255} int-arg)
     self.int-member := int-arg / 3
@@ -619,6 +619,13 @@ dynamic class Multiple(Class-name): First-interface, Second-interface
 # TODO construction
 # TODO destruction
 # TODO using classes
+
+# Type variable
+func f-type-var-example()
+  var Type{Abstract-class} abstract-type(Implemented-class)
+  abstract-type := Implemented-class
+  var As{abstract-type} abstract-var
+  new As{abstract-type} abstract-ref
 
 # Others
 

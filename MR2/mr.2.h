@@ -37,6 +37,11 @@ typedef FILE File;
 
 typedef struct {} Sys;
 
+typedef struct {
+  int size;
+  Func* dtl;
+} Type;
+
 #define RAISE(line) { \
   fprintf(stderr, "Error raised in %s:%d %s()\n",\
     MR_FILE_NAME, line, MR_FUNC_NAME); \

@@ -744,7 +744,33 @@ func f-get-mpath-attrs(user St-exp st-exp): user Var-attrs var-attrs
   f-mpath-attrs(user st-exp.item): var var-attrs
   return
 
+func write-type-var(user St-exp st-exp)
+  user String typename(st-exp.item.name)
+  write(user "{sizeof(")
+  write-cstyle(user typename)
+  write(user "), ")
+  user Type-attrs type-attrs
+  f-find-type(user typename): user type-attrs
+  if type-attrs.is-dynamic
+    write-cstyle(user typename)
+    write(user "__dtl")
+  
+  else
+    write(user "NULL")
+  
+  write(user "}")
+  return
+
 func write-exp-typed(user St-exp st-exp, user Type-attrs wanted-type)
+  if string-equal(user wanted-type.name, user "Type"): copy glob.flag and st-exp.item != NULL and st-exp.item.next = NULL
+    var Char first
+    string-get(user st-exp.item.name, copy 0): copy first
+    if first >= 'A' and first <= 'Z'
+      write(user "(Type)")
+      write-type-var(user st-exp)
+      return
+    
+  
   user Var-attrs var-attrs
   f-get-mpath-attrs(user st-exp): user var-attrs
   
@@ -878,7 +904,7 @@ func write-func-last(user St-func st-func, user Var-attrs var-attrs)
     string-concat(user last, user dec-out.typename)
     string-concat(user last, user counter)
     write-cstyle(user dec-out.typename)
-    if f-is-primitive(user dec-out.typename): copy glob.flag = false
+    if string-equal(user dec-out.access, user "copy"): copy glob.flag = false
       write(user "*")
     
     write(user " ")
@@ -1070,6 +1096,16 @@ func write-func-header(user St-func st-func)
   write(user ")")
   return
 
+func parse-param-dec(user St-arg param)
+  if read-new(user " {"): owner param.typename, copy glob.end = '{'
+    read-new(user "}"): owner param.type-param, copy glob.end
+    read-c(): copy glob.end
+  
+  owner String name
+  read-new(user ",)"): owner name, copy glob.end
+  param.value := name
+  return
+
 func parse-func-header(owner Member-path path): owner St-func st-func, copy Char end
   new St-func new-func
   if path = NULL
@@ -1107,15 +1143,7 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
     param.type-param := NULL
     f-new-copy(user access): owner param.access
     if path = NULL
-      if read-new(user " {"): owner param.typename, copy glob.end = '{'
-        read-new(user "}"): owner param.type-param, copy glob.end
-        read-c(): copy glob.end
-      
-    
-    if path = NULL
-      owner String name
-      read-new(user ",)"): owner name, copy glob.end
-      param.value := name
+      parse-param-dec(user param)
     
     else
       owner St-exp value 
@@ -1143,12 +1171,7 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
       param.type-param := NULL
       read-new(user " "): owner param.access, copy glob.end
       if path = NULL
-        read-new(user " "): owner param.typename, copy glob.end
-      
-      if path = NULL
-        owner String name
-        read-new(user ",)"): owner name, copy glob.end
-        param.value := name
+        parse-param-dec(user param)
       
       else
         owner Member-path mpath
@@ -1323,12 +1346,16 @@ class St-dec
   owner String typename
   owner String arr-length
   owner String str-length
+  owner String type-base
+  owner String type-var
   owner St-exp init
 
 func parse-dec(): owner St-dec new-st-dec
   new St-dec st-dec
   st-dec.arr-length := NULL
   st-dec.str-length := NULL
+  st-dec.type-base := NULL
+  st-dec.type-var := NULL
   st-dec.init := NULL
   
   read-new(user " {"): owner st-dec.typename, copy glob.end
@@ -1343,11 +1370,23 @@ func parse-dec(): owner St-dec new-st-dec
     
     if string-equal(user st-dec.typename, user "String"): copy glob.flag
       read-new(user "}"): owner st-dec.str-length, copy glob.end
-      read-c(): copy glob.end
+      if is-array
+        read-c(): copy glob.end
+      
     
-    if is-array
-      read-c(): copy glob.end
+    if string-equal(user st-dec.typename, user "Type"): copy glob.flag
+      read-new(user "}"): owner st-dec.type-base, copy glob.end
     
+    if string-equal(user st-dec.typename, user "As"): copy glob.flag
+      read-new(user "}"): owner st-dec.type-var, copy glob.end
+      user Var-attrs var-attrs
+      f-find-var(user glob.curr.var-map, user st-dec.type-var): user var-attrs
+      f-raise-on-null(user var-attrs.subtype, user "Illegal type variable \"", user st-dec.type-var, user "\"")
+      delete st-dec.typename
+      user Type-attrs subtype(var-attrs.subtype)
+      f-new-copy(user subtype.name): owner st-dec.typename
+    
+    read-c(): copy glob.end
   
   if read-new(user "("): owner st-dec.name, copy glob.end = '('
     parse-exp(user ")"): owner st-dec.init, copy glob.end
@@ -1368,6 +1407,11 @@ func parse-dec(): owner St-dec new-st-dec
     f-find-type(user st-dec.arr-length): user subtype
     new-var.subtype := subtype
   
+  else-if st-dec.type-base != NULL
+    user Type-attrs subtype
+    f-find-type(user st-dec.type-base): user subtype
+    new-var.subtype := subtype
+  
   new-var.type-attrs := type-attr
   new-var.is-ref := false
   
@@ -1381,14 +1425,18 @@ func parse-dec(): owner St-dec new-st-dec
   return
 
 # var
+func write-dtl-assign(user String name)
+  write(user "*((Func**)(")
+  write-cstyle(user name)
+  write(user ")) = ")
+  return
+
 func write-dtl(user St-dec st-dec)
   user Type-attrs type-attrs
   f-find-type(user st-dec.typename): user type-attrs
   if type-attrs.is-dynamic
     write-new-indent-line()
-    write(user "*((Func**)(")
-    write-cstyle(user st-dec.name)
-    write(user ")) = ")
+    write-dtl-assign(user st-dec.name)
     write-cstyle(user st-dec.typename)
     write(user "__dtl;")
   
@@ -1482,6 +1530,40 @@ func write-var-array(user St-dec st-dec)
   write(user "\n")
   return
 
+func write-var-typevar(user St-dec st-dec)
+  write(user "Type ")
+  write-cstyle(user st-dec.name)
+  if st-dec.init != NULL
+    f-raise-on-null(user st-dec.init.item, user "Illegal init for type var\"", user st-dec.name, user "\"")
+    write(user " = ")
+    write-type-var(user st-dec.init)
+  
+  write(user ";\n")
+  return
+
+func write-new-as-dtl(user St-dec st-dec)
+  write-new-indent-line()
+  write(user "if (")
+  write-cstyle(user st-dec.type-var)
+  write(user ".dtl != NULL) { ")
+  write-dtl-assign(user st-dec.name)
+  write-cstyle(user st-dec.type-var)
+  write(user ".dtl; }")
+  return
+
+func write-var-as(user St-dec st-dec)
+  write-cstyle(user st-dec.typename)
+  write(user "* ")
+  write-cstyle(user st-dec.name)
+  write(user " = (")
+  write-cstyle(user st-dec.typename)
+  write(user "*)(Byte[")
+  write-cstyle(user st-dec.type-var)
+  write(user ".size]){0};")
+  write-new-as-dtl(user st-dec)
+  write(user "\n")
+  return
+
 func add-dec-node(copy Func f-writer, owner Generic value)
   user St node
   f-st-new(copy f-writer, user value, user glob.curr): user node
@@ -1497,6 +1579,14 @@ func parse-var()
   
   if st-dec.str-length != NULL
     add-dec-node(copy write-var-string, owner st-dec)
+    return
+  
+  if st-dec.type-base != NULL
+    add-dec-node(copy write-var-typevar, owner st-dec)
+    return
+  
+  if st-dec.type-var != NULL
+    add-dec-node(copy write-var-as, owner st-dec)
     return
   
   if f-is-primitive(user st-dec.typename): copy glob.flag
@@ -1552,6 +1642,11 @@ func write-new(user St-dec st-dec)
     write(user "new_string(")
     write-cstyle(user st-dec.str-length)
   
+  else-if st-dec.type-var != NULL
+    write(user "malloc(")
+    write-cstyle(user st-dec.type-var)
+    write(user ".size")
+  
   else
     write(user "malloc(sizeof(")
     write-cstyle(user st-dec.typename)
@@ -1583,7 +1678,10 @@ func write-new(user St-dec st-dec)
     write-cstyle(user st-dec.str-length)
     write(user ") * n};}")
   
-  if st-dec.arr-length = NULL and st-dec.str-length = NULL
+  if st-dec.type-var != NULL
+    write-new-as-dtl(user st-dec)
+  
+  else-if st-dec.arr-length = NULL and st-dec.str-length = NULL
     write-dtl(user st-dec)
   
   write(copy "\n")
@@ -2084,6 +2182,9 @@ func f-create-name-maps()
   add-type(user "Char", owner NULL, user NULL)
   # Bool
   add-type(user "Bool", owner NULL, user NULL)
+  # Type
+  add-type(user "Type", owner NULL, user NULL)
+  add-type(user "As", owner NULL, user NULL)
   # String
   owner Name-map members-string(NULL)
   add-member(user "length", user type-int, user NULL): owner members-string
