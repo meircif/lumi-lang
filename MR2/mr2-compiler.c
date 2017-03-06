@@ -971,7 +971,6 @@ Returncode write_call_func_name(St_func* st_func, St_func** ret_func_def) {
   Member_path* mpath = st_func->path;
   Member_path* param_mpath = malloc(sizeof(Member_path)); if (param_mpath == NULL) RAISE
   param_mpath->next = NULL;
-  CHECK(f_new_copy(mpath->name, &param_mpath->name))
   St_exp* param_exp = malloc(sizeof(St_exp)); if (param_exp == NULL) RAISE
   param_exp->next = NULL;
   param_exp->operator = NULL;
@@ -983,10 +982,20 @@ Returncode write_call_func_name(St_func* st_func, St_func** ret_func_def) {
   param->next = st_func->params;
   st_func->params = param;
   
-  CHECK(f_find_var(glob->curr->var_map, mpath->name, &var_attrs))
+  Bool ignore_dynamic;
+  CHECK(string_equal(mpath->name, &(String){5, 4, "base"}, &ignore_dynamic)) if (ignore_dynamic) {
+    CHECK(f_find_var(glob->curr->var_map, &(String){5, 4, "self"}, &var_attrs))
+    type_attrs = var_attrs->type_attrs->base_type;
+    CHECK(f_raise_on_null(type_attrs, &(String){14, 13, "no base class"}, &(String){1, 0, ""}, &(String){1, 0, ""}))
+    CHECK(f_new_copy(&(String){5, 4, "self"}, &param_mpath->name))
+  }
+  else {
+    CHECK(f_new_copy(mpath->name, &param_mpath->name))
+    CHECK(f_find_var(glob->curr->var_map, mpath->name, &var_attrs))
+    type_attrs = var_attrs->type_attrs;
+  }
   while (true) {
     mpath = mpath->next;
-    type_attrs = var_attrs->type_attrs;
     while (true) {
       CHECK(f_nm_find(type_attrs->members, mpath->name, &value)) var_attrs = value;
       if (not(var_attrs == NULL)) break;
@@ -994,6 +1003,7 @@ Returncode write_call_func_name(St_func* st_func, St_func** ret_func_def) {
       CHECK(f_raise_on_null(type_attrs, &(String){19, 18, "unknown variable \""}, mpath->name, &(String){2, 1, "\""}))
     }
     if (not(mpath->next != NULL)) break;
+    type_attrs = var_attrs->type_attrs;
     Member_path* new_mpath = malloc(sizeof(Member_path)); if (new_mpath == NULL) RAISE
     param_mpath->next = new_mpath;
     new_mpath->next = NULL;
@@ -1003,7 +1013,7 @@ Returncode write_call_func_name(St_func* st_func, St_func** ret_func_def) {
   St_func* func_def = var_attrs->subtype;
   *ret_func_def = func_def;
   CHECK(write_func_last(st_func, var_attrs))
-  if (func_def->is_dynamic) {
+  if (func_def->is_dynamic and not ignore_dynamic) {
     CHECK(write(&(String){13, 12, "(*((Func**)("}))
     CHECK(write_mpath(st_func->path, false))
     CHECK(write(&(String){5, 4, ")))["}))
@@ -1618,6 +1628,13 @@ Returncode parse_ref() {
 }
 /* new */
 Returncode write_new(St_dec* st_dec) {
+  if (st_dec->type_var != NULL) {
+    CHECK(write(&(String){5, 4, "if ("}))
+    CHECK(write_cstyle(st_dec->type_var))
+    CHECK(write(&(String){13, 12, ".size <= 0) "}))
+    CHECK(write_tb_raise())
+    CHECK(write_new_indent_line())
+  }
   if (st_dec->arr_length != NULL) {
     CHECK(write(&(String){6, 5, "Array"}))
   }

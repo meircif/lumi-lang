@@ -969,7 +969,6 @@ func write-call-func-name(user St-func st-func): user St-func ret-func-def
   user Member-path mpath(st-func.path)
   new Member-path param-mpath
   param-mpath.next := NULL
-  f-new-copy(user mpath.name): owner param-mpath.name
   new St-exp param-exp
   param-exp.next := NULL
   param-exp.operator := NULL
@@ -981,10 +980,20 @@ func write-call-func-name(user St-func st-func): user St-func ret-func-def
   param.next := st-func.params
   st-func.params := param
   
-  f-find-var(user glob.curr.var-map, user mpath.name): user var-attrs
+  var Bool ignore-dynamic
+  if string-equal(user mpath.name, user "base"): copy ignore-dynamic
+    f-find-var(user glob.curr.var-map, user "self"): user var-attrs
+    type-attrs := var-attrs.type-attrs.base-type
+    f-raise-on-null(user type-attrs, user "no base class", user "", user "")
+    f-new-copy(user "self"): owner param-mpath.name
+  
+  else
+    f-new-copy(user mpath.name): owner param-mpath.name
+    f-find-var(user glob.curr.var-map, user mpath.name): user var-attrs
+    type-attrs := var-attrs.type-attrs
+  
   do
     mpath := mpath.next
-    type-attrs := var-attrs.type-attrs
     do
       var-attrs := f-nm-find(user type-attrs.members, user mpath.name): user value
       while var-attrs = NULL
@@ -992,6 +1001,7 @@ func write-call-func-name(user St-func st-func): user St-func ret-func-def
       f-raise-on-null(user type-attrs, user "unknown variable \"", user mpath.name, user "\"")
     
     while mpath.next != NULL
+    type-attrs := var-attrs.type-attrs
     new Member-path new-mpath
     param-mpath.next := new-mpath
     new-mpath.next := NULL
@@ -1001,7 +1011,7 @@ func write-call-func-name(user St-func st-func): user St-func ret-func-def
   user St-func func-def(var-attrs.subtype)
   out ret-func-def := func-def
   write-func-last(user st-func, user var-attrs)
-  if func-def.is-dynamic
+  if func-def.is-dynamic and not ignore-dynamic
     write(user "(*((Func**)(")
     write-mpath(user st-func.path, copy false)
     write(user ")))[")
@@ -1616,6 +1626,13 @@ func parse-ref()
 
 # new
 func write-new(user St-dec st-dec)
+  if st-dec.type-var != NULL
+    write(user "if (")
+    write-cstyle(user st-dec.type-var)
+    write(user ".size <= 0) ")
+    write-tb-raise()
+    write-new-indent-line()
+  
   if st-dec.arr-length != NULL
     write(user "Array")
   
