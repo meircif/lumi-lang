@@ -823,6 +823,7 @@ func parse-exp(user String exp-ends): owner St-exp new-st-exp, copy Char out-end
   st-exp.operator := NULL
   st-exp.call := NULL
   st-exp.subexp := NULL
+  st-exp.slice-length := NULL
   var String{16} ends
   string-copy(user ends, user " .([")
   string-concat(user ends, user exp-ends)
@@ -1185,7 +1186,7 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
       
       else
         owner Member-path mpath
-        read-mpath(user ",)"): owner mpath, copy glob.end
+        read-mpath(user ",)."): owner mpath, copy glob.end
         param.value := mpath
       
       if last = NULL
@@ -1354,8 +1355,8 @@ func parse-main()
 class St-dec
   owner String name
   owner String typename
-  owner String arr-length
-  owner String str-length
+  owner St-exp arr-length
+  owner St-exp str-length
   owner String type-base
   owner String type-var
   owner St-exp init
@@ -1373,13 +1374,13 @@ func parse-dec(): owner St-dec new-st-dec
   var Bool is-array-var(false)
   if glob.end = '{'
     if string-equal(user st-dec.typename, user "Array"): copy is-array
-      if read-new(user "}:"): owner st-dec.arr-length, copy glob.end = ':'
+      if parse-exp(user "}:"): owner st-dec.arr-length, copy glob.end = ':'
         is-array-var := true
         read-new(user "}{"): owner st-dec.typename, copy glob.end
       
     
     if string-equal(user st-dec.typename, user "String"): copy glob.flag
-      read-new(user "}"): owner st-dec.str-length, copy glob.end
+      parse-exp(user "}"): owner st-dec.str-length, copy glob.end
       if is-array
         read-c(): copy glob.end
       
@@ -1414,7 +1415,8 @@ func parse-dec(): owner St-dec new-st-dec
   
   else-if is-array
     user Type-attrs subtype
-    f-find-type(user st-dec.arr-length): user subtype
+    f-raise-on-null(user st-dec.arr-length.item, user "Illegal array length for \"", user st-dec.name, user "\"")
+    f-find-type(user st-dec.arr-length.item.name): user subtype
     new-var.subtype := subtype
   
   else-if st-dec.type-base != NULL
@@ -1490,9 +1492,9 @@ func write-var-class(user St-dec st-dec)
 func write-var-string(user St-dec st-dec)
   write-exp-intro(user st-dec.init)
   write-ref-prefix(user "String", user st-dec.name)
-  write(user st-dec.str-length)
+  write-exp(user st-dec.str-length)
   write(user ", 0, (char[")
-  write(user st-dec.str-length)
+  write-exp(user st-dec.str-length)
   write(user "]){0}};")
   if st-dec.init != NULL
     write-new-indent-line()
@@ -1508,11 +1510,11 @@ func write-var-string(user St-dec st-dec)
 
 func write-var-array(user St-dec st-dec)
   write-ref-prefix(user "Array", user st-dec.name)
-  write(user st-dec.arr-length)
+  write-exp(user st-dec.arr-length)
   write(user ", (")
   write-cstyle(user st-dec.typename)
   write(user "[")
-  write(user st-dec.arr-length)
+  write-exp(user st-dec.arr-length)
   write(user "]){0}};")
   
   if st-dec.str-length != NULL
@@ -1520,19 +1522,19 @@ func write-var-array(user St-dec st-dec)
     write(user "char _")
     write-cstyle(user st-dec.name)
     write(user "_chars[")
-    write(user st-dec.str-length)
+    write-exp(user st-dec.str-length)
     write(user "][")
-    write(user st-dec.arr-length)
+    write-exp(user st-dec.arr-length)
     write(user "];")
     write-new-indent-line()
     write(user "{int n; for(n=0; n<")
-    write(user st-dec.arr-length)
+    write-exp(user st-dec.arr-length)
     write(user "; ++n)")
     write-new-indent-line()
     write(user " ((String*)(")
     write-cstyle(user st-dec.name)
     write(user "->values))[n] = (String){")
-    write(user st-dec.str-length)
+    write-exp(user st-dec.str-length)
     write(user ", 0, _")
     write-cstyle(user st-dec.name)
     write(user "_chars[n]};}")
@@ -1608,6 +1610,7 @@ func parse-var()
 
 # ref
 func write-ref(user St-dec st-dec)
+  write-exp-intro(user st-dec.init)
   write-cstyle(user st-dec.typename)
   write(user "* ")
   write-cstyle(user st-dec.name)
@@ -1645,19 +1648,19 @@ func write-new(user St-dec st-dec)
   
   if st-dec.arr-length != NULL
     write(user "new_array(")
-    write-cstyle(user st-dec.arr-length)
+    write-exp(user st-dec.arr-length)
     write(user ", sizeof(")
     write-cstyle(user st-dec.typename)
     write(copy ")")
     if st-dec.str-length != NULL
       write(user " + (")
-      write-cstyle(user st-dec.str-length)
+      write-exp(user st-dec.str-length)
       write-c(copy ')')
     
   
   else-if st-dec.str-length != NULL
     write(user "new_string(")
-    write-cstyle(user st-dec.str-length)
+    write-exp(user st-dec.str-length)
   
   else-if st-dec.type-var != NULL
     write(user "malloc(")
@@ -1680,19 +1683,19 @@ func write-new(user St-dec st-dec)
   if st-dec.arr-length != NULL and st-dec.str-length != NULL
     write-new-indent-line()
     write(user "{int n; for(n=0; n<(")
-    write-cstyle(user st-dec.arr-length)
+    write-exp(user st-dec.arr-length)
     write(user "); ++n)")
     write-new-indent-line()
     write(user " ((String*)(")
     write-cstyle(user st-dec.name)
     write(user "->values))[n] = (String){")
-    write-cstyle(user st-dec.str-length)
+    write-exp(user st-dec.str-length)
     write(user ", 0, (Byte*)(")
     write-cstyle(user st-dec.name)
     write(user "->values) + (")
-    write-cstyle(user st-dec.arr-length)
+    write-exp(user st-dec.arr-length)
     write(user ") * sizeof(String) + (")
-    write-cstyle(user st-dec.str-length)
+    write-exp(user st-dec.str-length)
     write(user ") * n};}")
   
   if st-dec.type-var != NULL
@@ -1841,6 +1844,14 @@ func parse-for()
   if parse-exp(user ":"): owner st-for.limit, copy glob.end = ':'
     st-for.start := st-for.limit
     parse-exp(user ""): owner st-for.limit, copy glob.end
+  
+  # add index to var-map
+  new Var-attrs new-var
+  f-new-copy(user st-for.counter): owner new-var.name
+  f-find-type(user "Int"): user new-var.type-attrs
+  new-var.subtype := NULL
+  new-var.is-ref := false
+  f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
   
   add-node(copy write-for, owner st-for)
   f-start-block()
@@ -2168,6 +2179,10 @@ func f-add-op-copy(user String name)
   f-add-op(user name, user name)
   return
 
+func add-var(user String name, user Type-attrs type-attrs)
+  add-member(user name, user type-attrs, user NULL): owner glob.var-map
+  return
+
 func f-create-name-maps()
   glob.op-map := NULL
   glob.type-map := NULL
@@ -2199,6 +2214,9 @@ func f-create-name-maps()
   add-type(user "Char", owner NULL, user NULL)
   # Bool
   add-type(user "Bool", owner NULL, user NULL)
+  user Type-attrs type-bool(glob.type-map.value)
+  add-var(user "true", user type-bool)
+  add-var(user "false", user type-bool)
   # Type
   add-type(user "Type", owner NULL, user NULL)
   add-type(user "As", owner NULL, user NULL)

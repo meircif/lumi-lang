@@ -83,6 +83,7 @@ Returncode String_append(String* this, Char ch);
 Returncode String_copy(String* this, String* source);
 Returncode String_concat(String* this, String* ext);
 Returncode String_find(String* this, String* pattern, Int* index);
+Returncode String_has(String* this, Char ch, Bool* found);
 Returncode String_replace(String* this, Char old_ch, Char new_ch);
 
 Returncode Int_str(Int value, String* str);

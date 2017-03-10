@@ -825,6 +825,7 @@ Returncode parse_exp(String* exp_ends, St_exp** new_st_exp, Char* out_end) {
   st_exp->operator = NULL;
   st_exp->call = NULL;
   st_exp->subexp = NULL;
+  st_exp->slice_length = NULL;
   String* ends = &(String){16, 0, (char[16]){0}};
   CHECK(string_copy(ends, &(String){5, 4, " .(["}))
   CHECK(string_concat(ends, exp_ends))
@@ -1187,7 +1188,7 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
       }
       else {
         Member_path* mpath;
-        CHECK(read_mpath(&(String){3, 2, ",)"}, &mpath, &glob->end))
+        CHECK(read_mpath(&(String){4, 3, ",)."}, &mpath, &glob->end))
         param->value = mpath;
       }
       if (last == NULL) {
@@ -1356,8 +1357,8 @@ Returncode parse_main() {
 typedef struct St_dec St_dec; struct St_dec {
   String* name;
   String* typename;
-  String* arr_length;
-  String* str_length;
+  St_exp* arr_length;
+  St_exp* str_length;
   String* type_base;
   String* type_var;
   St_exp* init;
@@ -1375,13 +1376,13 @@ Returncode parse_dec(St_dec** new_st_dec) {
   Bool is_array_var = false;
   if (glob->end == '{') {
     CHECK(string_equal(st_dec->typename, &(String){6, 5, "Array"}, &is_array)) if (is_array) {
-      CHECK(read_new(&(String){3, 2, "}:"}, &st_dec->arr_length, &glob->end)) if (glob->end == ':') {
+      CHECK(parse_exp(&(String){3, 2, "}:"}, &st_dec->arr_length, &glob->end)) if (glob->end == ':') {
         is_array_var = true;
         CHECK(read_new(&(String){3, 2, "}{"}, &st_dec->typename, &glob->end))
       }
     }
     CHECK(string_equal(st_dec->typename, &(String){7, 6, "String"}, &glob->flag)) if (glob->flag) {
-      CHECK(read_new(&(String){2, 1, "}"}, &st_dec->str_length, &glob->end))
+      CHECK(parse_exp(&(String){2, 1, "}"}, &st_dec->str_length, &glob->end))
       if (is_array) {
         CHECK(read_c(&glob->end))
       }
@@ -1416,7 +1417,8 @@ Returncode parse_dec(St_dec** new_st_dec) {
   }
   else if (is_array) {
     Type_attrs* subtype;
-    CHECK(f_find_type(st_dec->arr_length, &subtype))
+    CHECK(f_raise_on_null(st_dec->arr_length->item, &(String){27, 26, "Illegal array length for \""}, st_dec->name, &(String){2, 1, "\""}))
+    CHECK(f_find_type(st_dec->arr_length->item->name, &subtype))
     new_var->subtype = subtype;
   }
   else if (st_dec->type_base != NULL) {
@@ -1492,9 +1494,9 @@ Returncode write_var_class(St_dec* st_dec) {
 Returncode write_var_string(St_dec* st_dec) {
   CHECK(write_exp_intro(st_dec->init))
   CHECK(write_ref_prefix(&(String){7, 6, "String"}, st_dec->name))
-  CHECK(write(st_dec->str_length))
+  CHECK(write_exp(st_dec->str_length))
   CHECK(write(&(String){12, 11, ", 0, (char["}))
-  CHECK(write(st_dec->str_length))
+  CHECK(write_exp(st_dec->str_length))
   CHECK(write(&(String){8, 7, "]){0}};"}))
   if (st_dec->init != NULL) {
     CHECK(write_new_indent_line())
@@ -1510,11 +1512,11 @@ Returncode write_var_string(St_dec* st_dec) {
 }
 Returncode write_var_array(St_dec* st_dec) {
   CHECK(write_ref_prefix(&(String){6, 5, "Array"}, st_dec->name))
-  CHECK(write(st_dec->arr_length))
+  CHECK(write_exp(st_dec->arr_length))
   CHECK(write(&(String){4, 3, ", ("}))
   CHECK(write_cstyle(st_dec->typename))
   CHECK(write(&(String){2, 1, "["}))
-  CHECK(write(st_dec->arr_length))
+  CHECK(write_exp(st_dec->arr_length))
   CHECK(write(&(String){8, 7, "]){0}};"}))
   
   if (st_dec->str_length != NULL) {
@@ -1522,19 +1524,19 @@ Returncode write_var_array(St_dec* st_dec) {
     CHECK(write(&(String){7, 6, "char _"}))
     CHECK(write_cstyle(st_dec->name))
     CHECK(write(&(String){8, 7, "_chars["}))
-    CHECK(write(st_dec->str_length))
+    CHECK(write_exp(st_dec->str_length))
     CHECK(write(&(String){3, 2, "]["}))
-    CHECK(write(st_dec->arr_length))
+    CHECK(write_exp(st_dec->arr_length))
     CHECK(write(&(String){3, 2, "];"}))
     CHECK(write_new_indent_line())
     CHECK(write(&(String){20, 19, "{int n; for(n=0; n<"}))
-    CHECK(write(st_dec->arr_length))
+    CHECK(write_exp(st_dec->arr_length))
     CHECK(write(&(String){7, 6, "; ++n)"}))
     CHECK(write_new_indent_line())
     CHECK(write(&(String){13, 12, " ((String*)("}))
     CHECK(write_cstyle(st_dec->name))
     CHECK(write(&(String){26, 25, "->values))[n] = (String){"}))
-    CHECK(write(st_dec->str_length))
+    CHECK(write_exp(st_dec->str_length))
     CHECK(write(&(String){7, 6, ", 0, _"}))
     CHECK(write_cstyle(st_dec->name))
     CHECK(write(&(String){13, 12, "_chars[n]};}"}))
@@ -1610,6 +1612,7 @@ Returncode parse_var() {
 }
 /* ref */
 Returncode write_ref(St_dec* st_dec) {
+  CHECK(write_exp_intro(st_dec->init))
   CHECK(write_cstyle(st_dec->typename))
   CHECK(write(&(String){3, 2, "* "}))
   CHECK(write_cstyle(st_dec->name))
@@ -1647,19 +1650,19 @@ Returncode write_new(St_dec* st_dec) {
   
   if (st_dec->arr_length != NULL) {
     CHECK(write(&(String){11, 10, "new_array("}))
-    CHECK(write_cstyle(st_dec->arr_length))
+    CHECK(write_exp(st_dec->arr_length))
     CHECK(write(&(String){10, 9, ", sizeof("}))
     CHECK(write_cstyle(st_dec->typename))
     CHECK(write(&(String){2, 1, ")"}))
     if (st_dec->str_length != NULL) {
       CHECK(write(&(String){5, 4, " + ("}))
-      CHECK(write_cstyle(st_dec->str_length))
+      CHECK(write_exp(st_dec->str_length))
       CHECK(write_c(')'))
     }
   }
   else if (st_dec->str_length != NULL) {
     CHECK(write(&(String){12, 11, "new_string("}))
-    CHECK(write_cstyle(st_dec->str_length))
+    CHECK(write_exp(st_dec->str_length))
   }
   else if (st_dec->type_var != NULL) {
     CHECK(write(&(String){8, 7, "malloc("}))
@@ -1682,19 +1685,19 @@ Returncode write_new(St_dec* st_dec) {
   if (st_dec->arr_length != NULL and st_dec->str_length != NULL) {
     CHECK(write_new_indent_line())
     CHECK(write(&(String){21, 20, "{int n; for(n=0; n<("}))
-    CHECK(write_cstyle(st_dec->arr_length))
+    CHECK(write_exp(st_dec->arr_length))
     CHECK(write(&(String){8, 7, "); ++n)"}))
     CHECK(write_new_indent_line())
     CHECK(write(&(String){13, 12, " ((String*)("}))
     CHECK(write_cstyle(st_dec->name))
     CHECK(write(&(String){26, 25, "->values))[n] = (String){"}))
-    CHECK(write_cstyle(st_dec->str_length))
+    CHECK(write_exp(st_dec->str_length))
     CHECK(write(&(String){14, 13, ", 0, (Byte*)("}))
     CHECK(write_cstyle(st_dec->name))
     CHECK(write(&(String){14, 13, "->values) + ("}))
-    CHECK(write_cstyle(st_dec->arr_length))
+    CHECK(write_exp(st_dec->arr_length))
     CHECK(write(&(String){23, 22, ") * sizeof(String) + ("}))
-    CHECK(write_cstyle(st_dec->str_length))
+    CHECK(write_exp(st_dec->str_length))
     CHECK(write(&(String){9, 8, ") * n};}"}))
   }
   if (st_dec->type_var != NULL) {
@@ -1844,6 +1847,14 @@ Returncode parse_for() {
     st_for->start = st_for->limit;
     CHECK(parse_exp(&(String){1, 0, ""}, &st_for->limit, &glob->end))
   }
+  /* add index to var-map */
+  Var_attrs* new_var = malloc(sizeof(Var_attrs)); if (new_var == NULL) RAISE
+  CHECK(f_new_copy(st_for->counter, &new_var->name))
+  CHECK(f_find_type(&(String){4, 3, "Int"}, &new_var->type_attrs))
+  new_var->subtype = NULL;
+  new_var->is_ref = false;
+  CHECK(f_nm_init(new_var->name, new_var, &glob->curr->var_map))
+  
   CHECK(add_node(write_for, st_for))
   CHECK(f_start_block())
   return OK;
@@ -2170,6 +2181,10 @@ Returncode f_add_op_copy(String* name) {
   CHECK(f_add_op(name, name))
   return OK;
 }
+Returncode add_var(String* name, Type_attrs* type_attrs) {
+  CHECK(add_member(name, type_attrs, NULL, &glob->var_map))
+  return OK;
+}
 Returncode f_create_name_maps() {
   glob->op_map = NULL;
   glob->type_map = NULL;
@@ -2201,6 +2216,9 @@ Returncode f_create_name_maps() {
   CHECK(add_type(&(String){5, 4, "Char"}, NULL, NULL))
   /* Bool */
   CHECK(add_type(&(String){5, 4, "Bool"}, NULL, NULL))
+  Type_attrs* type_bool = glob->type_map->value;
+  CHECK(add_var(&(String){5, 4, "true"}, type_bool))
+  CHECK(add_var(&(String){6, 5, "false"}, type_bool))
   /* Type */
   CHECK(add_type(&(String){5, 4, "Type"}, NULL, NULL))
   CHECK(add_type(&(String){3, 2, "As"}, NULL, NULL))
