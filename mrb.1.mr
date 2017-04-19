@@ -5,7 +5,7 @@
 # and compiles the last one to "<name>.exe" executable using "gcc".
 # (MR0 and MR1 only supports one file)
 # 
-# Supports MR0, MR1 & MR2.
+# Supports MR0, MR1, MR2 & MR3.
 
 
 native func print(user String text)
@@ -41,7 +41,7 @@ main func(user Array{String} argv)
   user String prefix(mr-file[0:mr-file.actual-length - 4])
   var Char version
   string-get(user mr-file, copy mr-file.actual-length - 4): copy version
-  if version < '0' or version > '2'
+  if version < '0' or version > '3'
     print(user "Unsupported MR version")
     return
   
@@ -85,7 +85,7 @@ main func(user Array{String} argv)
   if version = '1'
     string-concat(user command, user "mr.1.c")
   
-  if version = '2'
+  if version = '2' or version = '3'
     string-concat(user command, user "mr.2.c")
   
   string-concat(user command, user " -o \"")

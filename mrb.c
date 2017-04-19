@@ -7,7 +7,7 @@
 /* and compiles the last one to "<name>.exe" executable using "gcc". */
 /* (MR0 and MR1 only supports one file) */
 /*  */
-/* Supports MR0, MR1 & MR2. */
+/* Supports MR0, MR1, MR2 & MR3. */
 
 
 Returncode print(String* text);
@@ -43,7 +43,7 @@ Returncode func(Array* argv) {
   if ((0) + (mr_file->actual_length - 4) > mr_file->actual_length) RAISE String* prefix = &(String){mr_file->actual_length - 4, mr_file->actual_length - 4, mr_file->chars + 0};
   Char version;
   CHECK(string_get(mr_file, mr_file->actual_length - 4, &version))
-  if (version < '0' or version > '2') {
+  if (version < '0' or version > '3') {
     CHECK(print(&(String){23, 22, "Unsupported MR version"}))
     return OK;
   }
@@ -87,7 +87,7 @@ Returncode func(Array* argv) {
   if (version == '1') {
     CHECK(string_concat(command, &(String){7, 6, "mr.1.c"}))
   }
-  if (version == '2') {
+  if (version == '2' or version == '3') {
     CHECK(string_concat(command, &(String){7, 6, "mr.2.c"}))
   }
   CHECK(string_concat(command, &(String){6, 5, " -o \""}))

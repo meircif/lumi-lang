@@ -1,0 +1,28 @@
+# MR3 compiler - common stuff
+
+
+user Sys sys
+
+native type Object
+
+
+func f-new-copy(user String text):(owner String out-text)
+  if text = NULL
+    raise
+  new String{text.length + 1} new-text
+  new-text.copy(user text)
+  out-text := new-text
+
+# raising
+func f-msg-raise(user String text, user String item)
+  var String{256} msg
+  msg.copy(user text)
+  msg.concat(user " \"")
+  msg.concat(user item)
+  msg.append(copy '\"')
+  sys.print(user msg)
+  raise
+
+func f-raise-on-null(user Object obj, user String text, user String item)
+  if obj = NULL
+    f-msg-raise(user text, user item)

@@ -1,0 +1,226 @@
+# MR3 compiler - global data
+
+# global data object
+var String{80} global-key-word-text
+
+static Parsed-key-word(Object)
+  user String text
+  var Int spaces
+  var Char end
+
+var Parsed-key-word global-key-word
+
+static Global-data(Object)
+  # data
+  owner File infile
+  owner File outfile
+  owner Array{Node-map-item} key-word-map
+  owner Op-map op-map
+  owner Type-map type-map
+  owner Var-map var-map
+  # types
+  user Mtype type-char
+  user Mtype type-bool
+  user Mtype type-int
+  user Mtype type-type
+  user Mtype type-func
+  user Mtype type-string
+  user Mtype type-array
+  user Mtype type-file
+  user Mtype type-sys
+  # dummy Mvar items for constants
+  owner Mvar mvar-int
+  owner Mvar mvar-char
+  owner Mvar mvar-string
+  # state
+  user Parsed-key-word key-word
+  user String infile-name
+  var Int line-num
+  var Int spaces
+  user Mtype mclass
+  user St node
+  
+  func inst init-op-map()
+    new Op-map map
+    self.op-map := map
+    map.init()
+    map.add(user ".", user "->")
+    map.add(user ":=", user "=")
+    map.add-copy(user "+")
+    map.add-copy(user "-")
+    map.add-copy(user "*")
+    map.add-copy(user "/")
+    map.add(user "=", user "==")
+    map.add-copy(user "!=")
+    map.add-copy(user ">")
+    map.add-copy(user "<")
+    map.add-copy(user ">=")
+    map.add-copy(user "<=")
+    map.add(user "not", user "!")
+    map.add(user "or", user "||")
+    map.add(user "and", user "&&")
+    map.add(user "?", user "NULL != ")
+  
+  func inst init-types()
+    new Type-map map
+    self.type-map := map
+    map.init()
+    map.add(user "Char"):(user self.type-char)
+    map.add(user "Bool"):(user self.type-bool)
+    map.add(user "Int"):(user self.type-int)
+    map.add(user "Type"):(user self.type-type)
+    map.add(user "Func"):(user self.type-func)
+    map.add(user "String"):(user self.type-string)
+    map.add(user "Array"):(user self.type-array)
+    map.add(user "File"):(user self.type-file)
+    map.add(user "Sys"):(user self.type-sys)
+    init-new-var(user self.type-int):(owner self.mvar-int)
+    init-new-var(user self.type-char):(owner self.mvar-char)
+    init-new-var(user self.type-string):(owner self.mvar-string)
+  
+  func inst init()
+    self.line-num := 0
+    global-key-word.text := global-key-word-text
+    self.key-word := _
+    self.init-op-map()
+    self.init-types()
+
+var Global-data glob
+
+
+# read helpers
+func read-c():(copy Char ch)
+  glob.infile.getc():(copy ch)
+  if ch = '\n'
+    glob.line-num := glob.line-num + 1
+
+func read-ignore(copy Int chars)
+  for n in chars
+    read-c()
+
+func read-indent(user String ends, copy Bool indent, user String text):(copy Char end, copy Int spaces)
+  text.clear()
+  var Char ch(EOF)
+  var Char q('\0')
+  spaces := 0
+  do
+    # ignore indent
+    read-c():(copy ch)
+    if indent
+      do
+        while ch = ' '
+        spaces := spaces + 1
+        read-c():(copy ch)
+      indent := false
+    while ch != EOF
+    if q = '\0'
+      while ch != '\n'
+      while not ends.has(copy ch)
+      if ch = '\'' or ch = '"'
+        q := ch
+    else-if ch = '\\'
+      text.append(copy ch)
+      read-c():(copy ch)
+    else-if ch = q
+      q := '\0'
+    text.append(copy ch)
+  end := ch
+
+func read(user String ends, user String text):(copy Char end)
+  read-indent(user ends, copy false, user text):(copy end)
+
+func read-new(user String ends):(owner String out-text, copy Char end)
+  var String{256} text
+  read(user ends, user text):(copy end)
+  f-new-copy(user text):(owner out-text)
+
+func read-key-word()
+  if ? glob.key-word
+    return
+  glob.key-word := global-key-word
+  read-indent(user " .[(", copy true, user glob.key-word.text):(copy glob.key-word.end, copy glob.key-word.spaces)
+
+
+# write helpers
+func write-c(copy Char ch)
+  glob.outfile.putc(copy ch)
+  return
+
+func write(user String text)
+  glob.outfile.write(user text)
+  return
+
+func write-cstyle(user String text)
+  if not (? text)
+    raise
+  for index in text.length
+    var Char ch(text.get(copy index))
+    if ch = '-'
+      write-c(copy '_')
+    else
+      write-c(copy ch)
+
+func write-line-num()
+  var String{64} line-num-str
+  glob.line-num.str():(var line-num-str)
+  write(user line-num-str)
+
+func write-tb-raise()
+  write(user "RAISE(")
+  write-line-num()
+  write(user ")")
+
+func write-tb-check()
+  write(user "CHECK(")
+  write-line-num()
+  write(user ", ")
+
+func write-spaces()
+  for n in glob.spaces
+    write-c(copy ' ')
+
+# syntax error
+func f-syntax-error(user String text, user String item)
+  var String{256} msg
+  msg.copy(user "Code error in ")
+  msg.concat(user glob.infile-name)
+  msg.concat(user "[")
+  var String{32} line-num-str
+  glob.line-num.str():(var line-num-str)
+  msg.concat(user line-num-str)
+  msg.concat(user "] ")
+  msg.concat(user text)
+  msg.concat(user " \"")
+  msg.concat(user item)
+  msg.append(copy '\"')
+  sys.print(user msg)
+  raise
+
+func f-syntax-error2(user String text1, user String item1, user String text2, user String item2)
+  var String{256} msg
+  msg.copy(user text1)
+  msg.concat(user " \"")
+  msg.concat(user item1)
+  msg.concat(copy "\" ")
+  msg.concat(user text2)
+  f-syntax-error(user msg, user item2)
+
+func f-syntax-error-c(user String text, copy Char ch)
+  var String{2} char-str
+  char-str.append(copy ch)
+  f-syntax-error(user text, user char-str)
+
+# other helpers
+func get-node-type(user String key):(copy Type node-type, copy Bool found)
+  for n in glob.key-word-map.length
+    user Node-map-item item(glob.key-word-map[n])
+    if item.key.equal(user key)
+      node-type := item.node-type
+      found := true
+      return
+  found := false
+
+
+func m-find-type(user String typename):(user Mtype mtype)
+  if not (? glob.type-map.find(user typename):(user mtype))
+    f-syntax-error(user "unknown type", user typename)

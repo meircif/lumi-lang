@@ -1,0 +1,276 @@
+# MR3 compiler - expression
+
+func read-new-value(user String ends):(owner String out-text, copy Char end)
+  new String{ends.length + 5} all-ends
+  all-ends.copy(user " .[(")
+  all-ends.concat(user ends)
+  read-new(user all-ends):(owner out-text, copy end)
+  delete all-ends
+
+
+native func m-find-var(user String name):(user Mvar mvar)
+
+class Operand(Object)
+  owner Operand next
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    # nothing
+  func dynamic analyze(user Mvar mvar)
+    # nothing
+  func dynamic write-intro()
+    # nothing
+  func dynamic write-final()
+    # nothing
+  
+  func inst write-all-intro()
+    self.write-intro()
+    if ? self.next
+      self.next.write-all-intro()
+  
+  func inst write-all-final()
+    self.write-final()
+    if ? self.next
+      self.next.write-all-final()
+
+class Var-operand(Operand)
+  owner String name
+  user Mvar mvar
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    self.name := text
+    self.mvar := _
+  
+  func inst analyze-next()
+    self.mvar.analyze()
+    if ? self.next
+      self.next.analyze(user self.mvar)
+  
+  func dynamic analyze(user Mvar mvar)
+    if self.name.length < 1
+      f-syntax-error(user "variable with zero length", user self.name)
+    var Char first
+    self.name.get(copy 0):(copy first)
+    
+    if first = '\'' or first = '"'
+      if self.name.get(copy self.name.length - 1) != first
+        f-syntax-error(user "illegal constant", user self.name)
+      if first = '"'
+        self.mvar := glob.mvar-char
+      else
+        self.mvar := glob.mvar-string
+    else-if first >= '0' and first <= '9'
+      for n in self.name.length
+        var Char ch
+        self.name.get(copy n):(copy ch)
+        if ch < '0' or ch > '9'
+          f-syntax-error(user "illegal number", user self.name)
+      self.mvar := glob.mvar-int
+    else-if self.name.length = 1 and first = '_'
+      if ? self.next
+        f-syntax-error(user "no members for", user self.name)
+      return
+    else
+      if not (? m-find-var(user self.name):(user self.mvar))
+        f-syntax-error(user "unknow variable", user self.name)
+    
+    self.analyze-next()
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    write-cstyle(user self.name)
+
+class Block-operand(Operand)
+  owner Mexp exp
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    parse-new-exp(user ")"):(owner self.exp, copy end)
+    if end != ')'
+      f-syntax-error(user "missing", user ")")
+    read-c():(copy end)
+  
+  func dynamic analyze(user Mvar mvar)
+    analyze-exp(user self.exp)
+  
+  func dynamic write-intro()
+    write-exp-intro(user self.exp)
+  
+  func dynamic write-final()
+    write(user "(")
+    write-exp-final(user self.exp)
+    write(user ")")
+
+class Member-operand(Var-operand)
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    read-new-value(user ends):(owner self.name, copy end)
+  
+  func dynamic analyze(user Mvar mvar)
+    if not (? mvar.mtype.members.find(user self.name):(user self.mvar))
+      f-syntax-error2(user "type", user mvar.typename, user "has no member", user self.name)
+    self.analyze-next()
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    write(user "->")
+    base.write-final()
+
+class Array-operand(Operand)
+  owner Mexp index
+  owner Mexp second-index
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    parse-new-exp(user ":]"):(owner self.index, copy end)
+    if end = ':'
+      parse-new-exp(user ":]"):(owner self.second-index, copy end)
+    else
+      self.second-index := _
+    if end != ']'
+      f-syntax-error(user "missing", user "]")
+    read-c():(copy end)
+  
+  func dynamic analyze(user Mvar mvar)
+    if mvar.mtype != glob.type-array
+      f-syntax-error(user "not an array", user mvar.name)
+    analyze-exp(user self.index)
+    if ? self.second-index
+      analyze-exp(user self.second-index)
+  
+  func dynamic write-intro()
+    write-exp-intro(user self.index)
+    if ? self.second-index
+      write-exp-intro(user self.second-index)
+  
+  func dynamic write-final()
+    write(user "[")
+    write-exp-final(user self.index)
+    if ? self.second-index
+      write(user ":")
+      write-exp-final(user self.second-index)
+    write(user "]")
+
+class Call-operand(Operand)
+  owner Arg-list args
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    new Arg-list args
+    self.args := args
+    args.parse(copy false):(copy end)
+  
+  func dynamic analyze(user Mvar mvar)
+    if mvar.mtype != glob.type-func
+      f-syntax-error(user "not a function", user mvar.name)
+    self.args.analyze()
+  
+  func dynamic write-intro()
+    self.args.write-intro()
+  
+  func dynamic write-final()
+    self.args.write-final()
+
+func parse-new-operand(copy Type{Operand} opr-type, owner String text, user String ends):(owner Operand new-opr, copy Char end)
+  new As{opr-type} opr
+  new-opr := opr
+  opr.parse(owner text, user ends):(copy end)
+  var Type{Operand} next-type
+  if end = '.'
+    next-type := Member-operand
+  else-if end = '['
+    next-type := Array-operand
+  else-if end = '('
+    next-type := Call-operand
+  else
+    opr.next := _
+    return
+  parse-new-operand(copy next-type, owner _, user ends):(owner opr.next, copy end)
+
+
+static Mexp(Object)
+  owner Operand operand
+  owner String operator
+  owner Mexp next
+  
+  native func parse(owner String text, user String ends):(copy Char end)
+  
+  func inst parse-new-with-text(owner String text, user String ends):(owner Mexp new-exp, copy Char end)
+    new Mexp exp
+    exp.parse(owner text, user ends):(copy end)
+    new-exp := exp
+  
+  func inst parse-new(user String ends):(owner Mexp new-exp, copy Char end)
+    owner String text
+    read-new-value(user ends):(owner text, copy end)
+    self.parse-new-with-text(user text, user ends):(owner new-exp, copy end)
+  
+  func inst parse-new-with-kw(user String ends):(owner Mexp new-exp, copy Char end)
+    if ? glob.key-word
+      owner String text
+      f-new-copy(user glob.key-word.text):(owner text)
+      end := glob.key-word.end
+      self.parse-new-with-text(user text, user ends):(owner new-exp, copy end)
+    else
+      self.parse-new(user ends):(owner new-exp, copy end)
+  
+  func inst parse(owner String text, user String ends):(copy Char end)
+    if end = ' ' and ? glob.op-map.find(user text)
+      self.operator := text
+      read-new-value(user ends):(owner text, copy end)
+    else
+      self.operator := _
+    
+    var Type{Operand} opr-type
+    if text.length = 0
+      if end = '('
+        opr-type := Block-operand
+      else
+        f-syntax-error-c(user "unexpected", copy end)
+    else
+      opr-type := Var-operand
+    parse-new-operand(copy opr-type, owner text, user ends):(owner self.operand, copy end)
+    if end = ' ' and not ends.has(copy ' ')
+      self.parse-new(user ends):(owner self.next, copy end)
+    else
+      self.next := _
+  
+  func inst analyze()
+    self.operand.analyze(user _)
+  
+  func inst write-all-final(copy Bool is-binary)
+    if ? self.operator
+      user String op
+      if not (? glob.op-map.find(user self.operator):(user op))
+        f-syntax-error(user "unknow operator", user self.operator)
+      if is-binary
+        write(user " ")
+      write(user op)
+      if is-binary
+        write(user " ")
+    self.operand.write-all-final()
+    if ? self.next
+      write(user " ")
+      self.next.write-all-final(copy true)
+  
+  func inst write-intro()
+    self.operand.write-all-intro()
+    if ? self.next
+      self.next.write-intro()
+  
+  func inst write-final()
+    self.write-all-final(copy false)
+
+func parse-new-exp(user String ends):(owner Mexp exp, copy Char end)
+  Mexp.parse-new(user _, user ends):(owner exp, copy end)
+
+func parse-new-exp-with-kw(user String ends):(owner Mexp exp, copy Char end)
+  Mexp.parse-new-with-kw(user _, user ends):(owner exp, copy end)
+
+func analyze-exp(user Mexp exp)
+  exp.analyze()
+
+func write-exp-intro(user Mexp exp)
+  exp.write-intro()
+
+func write-exp-final(user Mexp exp)
+  exp.write-final()
