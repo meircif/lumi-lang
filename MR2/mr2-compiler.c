@@ -222,16 +222,25 @@ Returncode f_find_type(String* name, Type_attrs** type_attr) {
   return OK;
 }
 Returncode add_type(String* name, String* base_name, Name_map* members) {
-  Type_attrs* new_type = malloc(sizeof(Type_attrs)); if (new_type == NULL) RAISE
-  CHECK(f_new_copy(name, &new_type->name))
-  new_type->members = members;
-  new_type->base_type = NULL;
-  new_type->is_dynamic = false;
+  Type_attrs* type_attrs;
+  Generic* value;
+  CHECK(f_nm_find(glob->type_map, name, &value))
+  if (value == NULL) {
+    Type_attrs* new_type = malloc(sizeof(Type_attrs)); if (new_type == NULL) RAISE
+    CHECK(f_new_copy(name, &new_type->name))
+    type_attrs = new_type;
+  }
+  else {
+    type_attrs = value;
+  }
+  type_attrs->members = members;
+  type_attrs->base_type = NULL;
+  type_attrs->is_dynamic = false;
   if (base_name != NULL) {
-    CHECK(f_find_type(base_name, &new_type->base_type))
+    CHECK(f_find_type(base_name, &type_attrs->base_type))
   }
   Name_map* nm = malloc(sizeof(Name_map)); if (nm == NULL) RAISE
-  CHECK(f_nm_init(new_type->name, new_type, &glob->type_map))
+  CHECK(f_nm_init(type_attrs->name, type_attrs, &glob->type_map))
   return OK;
 }
 Returncode f_find_var(Name_map* nm, String* name, Var_attrs** var_attr) {
@@ -1058,10 +1067,14 @@ Returncode write_func_call(St_func* st_func) {
   arg = st_func->outputs;
   while (true) {
     if (not(arg != NULL)) break;
-    CHECK(string_equal(arg->access, &(String){4, 3, "var"}, &glob->flag)) if (glob->flag == false) {
-      CHECK(write(&(String){2, 1, "&"}))
+    Bool is_ref;
+    CHECK(string_equal(arg->access, &(String){4, 3, "var"}, &is_ref)) if (is_ref == false) {
+      CHECK(write(&(String){3, 2, "&("}))
     }
     CHECK(write_mpath(arg->value, true))
+    if (not is_ref) {
+      CHECK(write(&(String){2, 1, ")"}))
+    }
     arg = arg->next;
     if (arg != NULL) {
       CHECK(write(&(String){3, 2, ", "}))
@@ -1272,6 +1285,18 @@ Returncode add_arg_vars(St_arg* first, Bool is_ref) {
   }
   return OK;
 }
+Returncode add_self_param(St_func* st_func) {
+  St_arg* param = malloc(sizeof(St_arg)); if (param == NULL) RAISE
+  param->type_param = NULL;
+  CHECK(f_new_copy(&(String){5, 4, "user"}, &param->access))
+  CHECK(f_new_copy(glob->st_class->type_attrs->name, &param->typename))
+  String* param_name;
+  CHECK(f_new_copy(&(String){5, 4, "self"}, &param_name))
+  param->value = param_name;
+  param->next = st_func->params;
+  st_func->params = param;
+  return OK;
+}
 Returncode parse_func_body(Func f_writer) {
   Bool is_dynamic = false;
   if (glob->curr->f_writer == write_class) {
@@ -1290,15 +1315,7 @@ Returncode parse_func_body(Func f_writer) {
   CHECK(f_start_block())
   /* add "self" */
   if (glob->curr->father->f_writer == write_class) {
-    St_arg* param = malloc(sizeof(St_arg)); if (param == NULL) RAISE
-    param->type_param = NULL;
-    CHECK(f_new_copy(&(String){5, 4, "user"}, &param->access))
-    CHECK(f_new_copy(glob->st_class->type_attrs->name, &param->typename))
-    String* param_name;
-    CHECK(f_new_copy(&(String){5, 4, "self"}, &param_name))
-    param->value = param_name;
-    param->next = st_func->params;
-    st_func->params = param;
+    CHECK(add_self_param(st_func))
     
     Var_attrs* new_var = malloc(sizeof(Var_attrs)); if (new_var == NULL) RAISE
     CHECK(f_new_copy(&(String){5, 4, "self"}, &new_var->name))
@@ -1327,19 +1344,34 @@ Returncode write_native_func(St_func* st_func) {
   CHECK(write(&(String){3, 2, ";\n"}))
   return OK;
 }
+Returncode write_native_class(String* name) {
+  CHECK(write(&(String){16, 15, "typedef struct "}))
+  CHECK(write_cstyle(name))
+  CHECK(write(&(String){2, 1, " "}))
+  CHECK(write_cstyle(name))
+  CHECK(write(&(String){3, 2, ";\n"}))
+  return OK;
+}
 Returncode parse_native() {
   String* kind = &(String){80, 0, (char[80]){0}};
   CHECK(read(&(String){2, 1, " "}, kind, &glob->end))
   CHECK(string_equal(kind, &(String){5, 4, "func"}, &glob->flag)) if (glob->flag) {
     St_func* st_func;
     CHECK(parse_func_header(NULL, &st_func, &glob->end))
+    if (glob->curr->f_writer == write_class) {
+      CHECK(add_self_param(st_func))
+    }
     CHECK(add_node(write_native_func, st_func))
+    return OK;
+  }
+  String* name;
+  CHECK(read_new(&(String){1, 0, ""}, &name, &glob->end))
+  CHECK(add_type(name, NULL, NULL))
+  CHECK(string_equal(kind, &(String){5, 4, "type"}, &glob->flag)) if (glob->flag) {
+    CHECK(add_node(write_native_type, name))
   }
   else {
-    String* name;
-    CHECK(read_new(&(String){1, 0, ""}, &name, &glob->end))
-    CHECK(add_type(name, NULL, NULL))
-    CHECK(add_node(write_native_type, name))
+    CHECK(add_node(write_native_class, name))
   }
   return OK;
 }
@@ -1716,16 +1748,16 @@ Returncode parse_new() {
   return OK;
 }
 /* delete */
-Returncode write_delete(String* name) {
+Returncode write_delete(Member_path* mpath) {
   CHECK(write(&(String){6, 5, "free("}))
-  CHECK(write_cstyle(name))
+  CHECK(write_mpath(mpath, true))
   CHECK(write(&(String){4, 3, ");\n"}))
   return OK;
 }
 Returncode parse_delete() {
-  String* name;
-  CHECK(read_new(&(String){1, 0, ""}, &name, &glob->end))
-  CHECK(add_node(write_delete, name))
+  Member_path* mpath;
+  CHECK(read_mpath(&(String){2, 1, "."}, &mpath, &glob->end))
+  CHECK(add_node(write_delete, mpath))
   return OK;
 }
 /* if */
@@ -1865,7 +1897,8 @@ Returncode write_class_members(St* self_node, Bool is_func) {
   while (true) {
     if (not(son != NULL)) break;
     glob->curr = son;
-    if (is_func == (son->f_writer == write_func) and son->f_writer != write_empty_line) {
+    Bool is_func_writer = son->f_writer == write_func or son->f_writer == write_native_func;
+    if (is_func == is_func_writer and son->f_writer != write_empty_line) {
       CHECK(write_spaces())
       CHECK(son->f_writer(son->value))
     }
@@ -1943,6 +1976,7 @@ Returncode parse_class(Bool is_dynamic) {
   St_class* st_class = malloc(sizeof(St_class)); if (st_class == NULL) RAISE
   st_class->type_attrs = glob->type_map->value;
   st_class->type_attrs->is_dynamic = is_dynamic;
+  st_class->dynamic_count = 0;
   glob->st_class = st_class;
   CHECK(add_node(write_class, st_class))
   CHECK(f_start_block())
@@ -2279,7 +2313,7 @@ Returncode f_compile_file(Array* argv, Int index) {
   String* outfile_name = new_string(infile_name->actual_length); if (outfile_name == NULL) RAISE
   if ((0) + (infile_name->actual_length - 4) > infile_name->actual_length) RAISE String* prefix = &(String){infile_name->actual_length - 4, infile_name->actual_length - 4, infile_name->chars + 0};
   CHECK(string_copy(outfile_name, prefix))
-  CHECK(string_append(outfile_name, 'c'))
+  CHECK(string_concat(outfile_name, &(String){3, 2, "c\0"}))
   
   /* init root node */
   CHECK(f_st_new(write_sons, NULL, NULL, &glob->curr))

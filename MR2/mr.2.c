@@ -5,6 +5,18 @@
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
 
+Returncode set_cstring(String* str) {
+  if (str->length >= str->max_length) {
+    if (strnlen(str->chars, str->max_length) >= str->max_length) {
+      CRAISE
+    }
+  }
+  else if (strnlen(str->chars, str->length + 1) > str->length) {
+    str->chars[str->length] = '\0';
+  }
+  return OK;
+}
+
 /*dynamic allocation*/
 String* new_string(int length) {
   void* buff = malloc(sizeof(String) + length);
@@ -31,6 +43,7 @@ Array* new_array(int length, int value_size) {
 
 /*Files*/
 Returncode open_file(File** file, String* name, char* mode) {
+  CCHECK(set_cstring(name));
   *file = NULL;
   *file = fopen(name->chars, mode);
   if (*file == NULL) {
@@ -194,18 +207,6 @@ Returncode Sys_print(Sys* _, String* text) {
 Returncode Sys_exit(Sys* _, Int status) {
   exit(status);
   CRAISE
-}
-
-Returncode set_cstring(String* str) {
-  if (str->length >= str->max_length) {
-    if (strnlen(str->chars, str->max_length) >= str->max_length) {
-      CRAISE
-    }
-  }
-  else if (strnlen(str->chars, str->length + 1) > str->length) {
-    str->chars[str->length] = '\0';
-  }
-  return OK;
 }
 
 Returncode Sys_system(Sys* _, String* command, Int* status) {

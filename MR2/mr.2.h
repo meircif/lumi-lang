@@ -62,12 +62,12 @@ typedef struct {
   int arg; \
   for (arg = 0; arg < argc; ++arg) { \
     args_strings[arg].chars = argv[arg]; \
-    args_strings[arg].max_length = strnlen(args_strings[arg].chars, 1024); \
-    args_strings[arg].length = args_strings[arg].max_length; \
+    args_strings[arg].length = strnlen(args_strings[arg].chars, 1024); \
+    args_strings[arg].max_length = args_strings[arg].length + 1; \
   } \
   Returncode err =  func(args_array); \
   if (err != OK) {\
-    fprintf(stderr, "  called from executable start"); \
+    fprintf(stderr, "  called from executable start\n"); \
   } \
   return err; \
 }
