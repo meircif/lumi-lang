@@ -84,7 +84,7 @@ var Int ACCESS-VAR(3)
 
 native class Mfunc
 
-native func m-find-type(user String typename):(user Mtype mtype)
+native func f-find-type(user String typename):(user Mtype mtype)
 
 static Mvar(Object)
   owner String name
@@ -108,9 +108,9 @@ static Mvar(Object)
   
   func inst analyze()
     if not (? self.mtype)
-      m-find-type(user self.typename):(user self.mtype)
+      f-find-type(user self.typename):(user self.mtype)
     if ? self.sub-typename and not (? self.sub-mtype)
-      m-find-type(user self.sub-typename):(user self.sub-mtype)
+      f-find-type(user self.sub-typename):(user self.sub-mtype)
 
 func init-new-var(user Mtype mtype):(owner Mvar new-mvar)
   new Mvar mvar

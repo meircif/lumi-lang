@@ -28,10 +28,6 @@ static Global-data(Object)
   user Mtype type-array
   user Mtype type-file
   user Mtype type-sys
-  # dummy Mvar items for constants
-  owner Mvar mvar-int
-  owner Mvar mvar-char
-  owner Mvar mvar-string
   # state
   user Parsed-key-word key-word
   user String infile-name
@@ -74,9 +70,6 @@ static Global-data(Object)
     map.add(user "Array"):(user self.type-array)
     map.add(user "File"):(user self.type-file)
     map.add(user "Sys"):(user self.type-sys)
-    init-new-var(user self.type-int):(owner self.mvar-int)
-    init-new-var(user self.type-char):(owner self.mvar-char)
-    init-new-var(user self.type-string):(owner self.mvar-string)
   
   func inst init()
     self.line-num := 0
@@ -221,6 +214,90 @@ func get-node-type(user String key):(copy Type node-type, copy Bool found)
   found := false
 
 
-func m-find-type(user String typename):(user Mtype mtype)
+func f-find-type(user String typename):(user Mtype mtype)
   if not (? glob.type-map.find(user typename):(user mtype))
     f-syntax-error(user "unknown type", user typename)
+
+
+# basic syntax tree node
+
+class St(Object)
+  owner St next-brother
+  owner St first-son
+  user St last-son
+  user St father
+  var Int line-num
+  owner Var-map var-map
+  owner Var-map sons-var-map
+  
+  func inst init(user St father)
+    self.next-brother := _
+    self.first-son := _
+    self.last-son := _
+    self.father := father
+    self.line-num := glob.line-num
+    f-copy-new-var-map(user _):(owner self.sons-var-map)
+    self.var-map := _
+    if ? father
+      if ? father.last-son
+        father.last-son.next-brother := self
+      father.last-son := self
+      if not (? father.first-son)
+        father.first-son := self
+      if ? father.sons-var-map
+        f-copy-new-var-map(user father.sons-var-map):(owner self.var-map)
+  
+  func dynamic parse()
+    # do nothing
+  
+  # analyze sons
+  func dynamic analyze-first()
+    user St son(self.first-son)
+    do
+      while ? son
+      glob.line-num := son.line-num
+      glob.node := son
+      son.analyze-first()
+      son := son.next-brother
+    glob.node := self
+  
+  # analyze sons
+  func dynamic analyze()
+    user St son(self.first-son)
+    do
+      while ? son
+      glob.line-num := son.line-num
+      glob.node := son
+      son.analyze()
+      son := son.next-brother
+    glob.node := self
+  
+  # write sons
+  func dynamic write()
+    user St son(self.first-son)
+    do
+      while ? son
+      glob.line-num := son.line-num
+      son.write()
+      son := son.next-brother
+  
+  func inst add-var(owner Mvar mvar)
+    if ? glob.mclass
+      add-var(user glob.mclass.members, owner mvar)
+    else-if ? self.father and ? self.father.sons-var-map
+      add-var(user self.father.sons-var-map, owner mvar)
+    else
+      add-var(user glob.var-map, owner mvar)
+  
+  func inst m-find-var(user String name):(user Mvar mvar)
+    if ? self.var-map
+      self.var-map.find(user name):(user mvar)
+      if ? mvar
+        return
+    if ? self.father
+      self.father.m-find-var(user name):(user mvar)
+    else
+      glob.var-map.find(user name):(user mvar)
+
+func m-find-var(user String name):(user Mvar mvar)
+  glob.node.m-find-var(user name):(user mvar)

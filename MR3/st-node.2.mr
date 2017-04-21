@@ -1,78 +1,9 @@
-# MR3 compiler - basic syntax tree node
-
-class St(Object)
-  owner St next-brother
-  owner St first-son
-  user St last-son
-  user St father
-  var Int line-num
-  owner Var-map var-map
-  owner Var-map sons-var-map
-  
-  func inst init(user St father)
-    self.next-brother := _
-    self.first-son := _
-    self.last-son := _
-    self.father := father
-    self.line-num := glob.line-num
-    self.sons-var-map := _
-    self.var-map := _
-    if ? father
-      if ? father.last-son
-        father.last-son.next-brother := self
-      father.last-son := self
-      if not (? father.first-son)
-        father.first-son := self
-      if ? father.sons-var-map
-        f-copy-new-var-map(user father.sons-var-map):(owner self.var-map)
-  
-  func dynamic parse()
-    # do nothing
-  
-  # analyze sons
-  func dynamic analyze()
-    user St son(self.first-son)
-    do
-      while ? son
-      glob.line-num := son.line-num
-      glob.node := son
-      son.analyze()
-      son := son.next-brother
-    glob.node := self
-  
-  # write sons
-  func dynamic write()
-    user St son(self.first-son)
-    do
-      while ? son
-      glob.line-num := son.line-num
-      son.write()
-      son := son.next-brother
-      
-  func inst add-var(owner Mvar mvar)
-    if ? glob.mclass
-      add-var(user glob.mclass.members, owner mvar)
-    else-if ? self.father and ? self.father.sons-var-map
-      add-var(user self.father.sons-var-map, owner mvar)
-    else
-      add-var(user glob.var-map, owner mvar)
-  
-  func inst m-find-var(user String name):(user Mvar mvar)
-    if ? self.var-map
-      self.var-map.find(user name):(user mvar)
-      if ? mvar
-        return
-    if ? self.father
-      self.father.m-find-var(user name):(user mvar)
-    else
-      glob.var-map.find(user name):(user mvar)
-
-func m-find-var(user String name):(user Mvar mvar)
-  glob.node.m-find-var(user name):(user mvar)
-
+# MR3 compiler - complex nodes
 
 class St-empty(St)
   func dynamic parse()
+    # do nothing
+  func dynamic analyze-first()
     # do nothing
   func dynamic analyze()
     # do nothing
@@ -96,6 +27,9 @@ class St-comment(St)
     if has-data
       read-new(user ""):(owner self.line)
   
+  func dynamic analyze-first()
+    # do nothing
+  
   func dynamic analyze()
     # do nothing
   
@@ -106,20 +40,6 @@ class St-comment(St)
         write(user self.kw)
         write-c(copy self.end)
       write(user self.line)
-
-
-class St-exp(St)
-  owner Mexp exp
-  
-  func dynamic parse()
-    parse-new-exp-with-kw(user ""):(owner self.exp)
-  
-  func dynamic analyze()
-    self.exp.analyze()
-  
-  func dynamic write()
-    self.exp.write-intro()
-    self.exp.write-final()
 
 
 func f-parse-new-node(copy Type{St} node-type, user St father)
@@ -158,9 +78,11 @@ class St-node(St)
   func dynamic parse()
     var Int my-spaces(glob.spaces)
     glob.spaces := my-spaces + 2
-    f-copy-new-var-map(user _):(owner self.sons-var-map)
     self.parse-block()
     glob.spaces := my-spaces
+  
+  func dynamic analyze-first()
+    base.analyze-first()
   
   func dynamic analyze()
     base.analyze()
@@ -206,13 +128,18 @@ class St-file(St-node)
     file-open-read(user self.infile-name):(owner glob.infile)
     glob.infile-name := self.infile-name
     glob.key-word := _
-    glob.line-num := 0
+    glob.line-num := 1
     glob.spaces := 0
     glob.mclass := _
     
     self.parse-block()
     
     glob.infile.close()
+  
+  func dynamic analyze-first()
+    glob.infile-name := self.infile-name
+    glob.node := self
+    base.analyze-first()
   
   func dynamic analyze()
     sys.print(user self.infile-name)
@@ -256,299 +183,35 @@ class St-file(St-node)
     delete outfile-name
 
 
-class St-func(St-node)
-  owner Mfunc mfunc
+class St-root(St)
+  user Array{String} argv
   
-  func inst add-args-vars(user Arg-node fisrt-arg)
-    user Arg-node arg(fisrt-arg)
-    do
-      while ? arg
-      user Dec-arg dec-arg
-      arg.get-dec():(user dec-arg)
-      while ? dec-arg
-      self.add-var(user dec-arg.mvar)
-      arg := arg.next
+  func inst init(user Array{String} argv)
+    base.init(user _)
+    self.argv := argv
   
   func dynamic parse()
-    parse-new-mfunc():(owner self.mfunc)
-    base.parse()
-    self.add-var(owner self.mfunc.m-new-var())
-    self.add-args-vars(owner self.mfunc.args.first-param)
-    self.add-args-vars(owner self.mfunc.args.first-out)
+    for index in 1:self.argv.length
+      new St-file st-file
+      st-file.init(user self, user self.argv, copy index)
+      st-file.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
   
   func dynamic analyze()
-    self.mfunc.analyze()
+    self.analyze-first()
     base.analyze()
   
   func dynamic write()
-    self.mfunc.write()
     base.write()
 
 
 class St-native(St-comment)
   func dynamic parse()
     base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-
-
-class St-main(St-node)
-  func dynamic parse()
-    base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-
-
-class St-dec(St)
-  user Mvar mvar
-  owner Mexp value
-  
-  native func parse-array()
-  native func parse-string()
-  
-  func dynamic parse()
-    init-new-var(user _):(owner self.mvar)
-    self.value := _
-    if read-new(user " {"):(owner self.mvar.typename) = '{'
-      if self.mvar.typename.equal(user "Array")
-        self.parse-array()
-      else-if self.mvar.typename.equal(user "String")
-        self.parse-string()
-      else
-        read-new(user "}"):(owner self.mvar.sub-typename)
-      read-c()
-    if read-new(user "("):(owner self.mvar.name) = '('
-      parse-new-exp(user ")"):(owner self.value)
-      read-c()
-    self.add-var(owner self.mvar)
-  
-  func dynamic analyze()
-    self.mvar.analyze()
-    if ? self.value
-      self.value.analyze()
-  
-  func dynamic write()
-    if ? self.value
-      self.value.write-intro()
-    write-cstyle(user self.mvar.typename)
-    if self.mvar.access != ACCESS-VAR
-      write(user "*")
-    write(user " ")
-    write-cstyle(user self.mvar.name)
-    if ? self.value
-      write(user " = ")
-      self.value.write-final()
-    write(user ";")
-  
-  func dynamic parse-array()
-    # nothing
-  
-  func dynamic parse-string()
-    # nothing
-
-
-class St-var(St-dec)
-  owner String arr-length
-  owner String str-length
-  
-  func dynamic parse()
-    self.arr-length := _
-    self.str-length := _
-    base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-  
-  func dynamic parse-array()
-    read-new(user ":"):(owner self.arr-length)
-    if read-new(user "{}"):(owner self.mvar.sub-typename) = '{'
-      read-new(user "}"):(owner self.str-length)
-      read-c()
-  
-  func dynamic parse-string()
-    read-new(user "}"):(owner self.str-length)
-
-
-class St-ref(St-dec)
-  func dynamic parse()
-    base.parse()
-    self.mvar.access := ACCESS-USER
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-  
-  func dynamic parse-array()
-    read-new(user "}"):(owner self.mvar.sub-typename)
-  
-  func dynamic parse-string()
-    f-syntax-error(user "unexpected parameter to String", user "")
-
-
-class St-new(St-var)
-  func dynamic parse()
-    base.parse()
-  
-  func dynamic analyze()
-    base.analyze()
-  
-  func dynamic write()
-    base.write()
-  
-  func dynamic parse-array()
-    base.parse-array()
-  
-  func dynamic parse-string()
-    base.parse-string()
-
-
-class St-delete(St-comment)
-  func dynamic parse()
-    base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-
-
-class St-if(St-node)
-  owner Mexp condition
-  
-  func dynamic parse()
-    parse-new-exp(user ""):(owner self.condition)
-    base.parse()
-  
-  func dynamic analyze()
-    self.condition.analyze()
-    base.analyze()
-  
-  func dynamic write()
-    self.condition.write-intro()
-    write(user "if (")
-    self.condition.write-final()
-    write(user ")")
-    base.write()
-
-
-class St-else(St-node)
-  func dynamic parse()
-    base.parse()
-  
-  func dynamic analyze()
-    base.analyze()
-  
-  func dynamic write()
-    write(user "else")
-    base.write()
-
-
-class St-else-if(St-if)
-  func dynamic parse()
-    base.parse()
-  
-  func dynamic analyze()
-    base.analyze()
-  
-  func dynamic write()
-    write(user "else { ")
-    base.write()
-    write(user "}")
-
-
-class St-do(St-node)
-  func dynamic parse()
-    base.parse()
-  
-  func dynamic analyze()
-    base.analyze()
-  
-  func dynamic write()
-    write(user "while (true)")
-    base.write()
-
-
-class St-while(St-comment)
-  func dynamic parse()
-    base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-
-
-class St-for(St-node)
-  func dynamic parse()
-    base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-
-
-class St-return(St-comment)
-  func dynamic parse()
-    base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-
-
-class St-raise(St-comment)
-  func dynamic parse()
-    base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-
-
-class St-class(St-node)
-  user Mtype mtype
-  
-  func dynamic parse()
-    var String{128} name
-    read(user "(", user name)
-    glob.type-map.add(user name):(owner self.mtype)
-    read-new(user ")"):(owner self.mtype.base-typename)
-    read-c()
-    glob.mclass := self.mtype
-    base.parse()
-    glob.mclass := _
-  
-  func dynamic analyze()
-    base.analyze()
-  
-  func dynamic write()
-    write(user "typedef struct ")
-    write-cstyle(user self.mtype.name)
-    write(user " ")
-    write-cstyle(user self.mtype.name)
-    write(user ";\n")
-    write-spaces()
-    write(user "struct ")
-    write-cstyle(user self.mtype.name)
-    base.write()
-    write(user ";")
-
-
-class St-static-class(St-class)
-  func dynamic parse()
-    base.parse()
-  func dynamic analyze()
-    base.analyze()
-  func dynamic write()
-    base.write()
-
-
-class St-dynamic-class(St-class)
-  func dynamic parse()
-    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
   func dynamic analyze()
     base.analyze()
   func dynamic write()

@@ -1,0 +1,59 @@
+# MR3 compiler - types
+
+class St-class(St-node)
+  user Mtype mtype
+  
+  func dynamic parse()
+    var String{128} name
+    read(user "(", user name)
+    glob.type-map.add(user name):(owner self.mtype)
+    var String{128} base-typename
+    read(user ")", user base-typename)
+    if not base-typename.equal(user "Object")
+      f-new-copy(user base-typename):(owner self.mtype.base-typename)
+    read-c()
+    glob.mclass := self.mtype
+    base.parse()
+    glob.mclass := _
+  
+  func dynamic analyze-first()
+    if ? self.mtype.base-typename
+      f-find-type(user self.mtype.base-typename):(user self.mtype.base-mtype)
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    write(user "typedef struct ")
+    write-cstyle(user self.mtype.name)
+    write(user " ")
+    write-cstyle(user self.mtype.name)
+    write(user ";\n")
+    write-spaces()
+    write(user "struct ")
+    write-cstyle(user self.mtype.name)
+    base.write()
+    write(user ";")
+
+
+class St-static-class(St-class)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()
+
+
+class St-dynamic-class(St-class)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()

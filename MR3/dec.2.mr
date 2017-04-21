@@ -1,0 +1,131 @@
+# MR3 compiler - variable declerations
+
+class St-dec(St)
+  user Mvar mvar
+  owner Mexp value
+  
+  native func parse-array()
+  native func parse-string()
+  
+  func dynamic parse()
+    init-new-var(user _):(owner self.mvar)
+    self.value := _
+    if read-new(user " {"):(owner self.mvar.typename) = '{'
+      if self.mvar.typename.equal(user "Array")
+        self.parse-array()
+      else-if self.mvar.typename.equal(user "String")
+        self.parse-string()
+      else
+        read-new(user "}"):(owner self.mvar.sub-typename)
+      read-c()
+    if read-new(user "("):(owner self.mvar.name) = '('
+      parse-new-exp(user ")"):(owner self.value)
+      read-c()
+    self.add-var(owner self.mvar)
+  
+  func dynamic analyze-first()
+    self.mvar.analyze()
+  
+  func dynamic analyze()
+    if ? self.value
+      self.value.analyze()
+  
+  func dynamic write()
+    if ? self.value
+      self.value.write-intro()
+    write-cstyle(user self.mvar.typename)
+    if self.mvar.access != ACCESS-VAR
+      write(user "*")
+    write(user " ")
+    write-cstyle(user self.mvar.name)
+    if ? self.value
+      write(user " = ")
+      self.value.write-final()
+    write(user ";")
+  
+  func dynamic parse-array()
+    # nothing
+  
+  func dynamic parse-string()
+    # nothing
+
+
+class St-var(St-dec)
+  owner String arr-length
+  owner String str-length
+  
+  func dynamic parse()
+    self.arr-length := _
+    self.str-length := _
+    base.parse()
+    
+  func dynamic analyze-first()
+    base.analyze-first()
+    
+  func dynamic analyze()
+    base.analyze()
+    
+  func dynamic write()
+    base.write()
+  
+  func dynamic parse-array()
+    read-new(user ":"):(owner self.arr-length)
+    if read-new(user "{}"):(owner self.mvar.sub-typename) = '{'
+      read-new(user "}"):(owner self.str-length)
+      read-c()
+  
+  func dynamic parse-string()
+    read-new(user "}"):(owner self.str-length)
+
+
+class St-ref(St-dec)
+  func dynamic parse()
+    base.parse()
+    self.mvar.access := ACCESS-USER
+    
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    base.write()
+  
+  func dynamic parse-array()
+    read-new(user "}"):(owner self.mvar.sub-typename)
+  
+  func dynamic parse-string()
+    f-syntax-error(user "unexpected parameter to String", user "")
+
+
+class St-new(St-var)
+  func dynamic parse()
+    base.parse()
+    self.mvar.access := ACCESS-OWNER
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    base.write()
+  
+  func dynamic parse-array()
+    base.parse-array()
+  
+  func dynamic parse-string()
+    base.parse-string()
+
+
+class St-delete(St-comment)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()

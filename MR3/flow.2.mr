@@ -1,0 +1,120 @@
+# MR3 compiler - flow control
+
+class St-if(St-node)
+  owner Mexp condition
+  
+  func dynamic parse()
+    parse-new-exp(user ""):(owner self.condition)
+    base.parse()
+    
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    self.condition.analyze()
+    base.analyze()
+  
+  func dynamic write()
+    self.condition.write-intro()
+    write(user "if (")
+    self.condition.write-final()
+    write(user ")")
+    base.write()
+
+
+class St-else(St-node)
+  func dynamic parse()
+    base.parse()
+    
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    write(user "else")
+    base.write()
+
+
+class St-else-if(St-if)
+  func dynamic parse()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    write(user "else { ")
+    base.write()
+    write(user "}")
+
+
+class St-do(St-node)
+  func dynamic parse()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    write(user "while (true)")
+    base.write()
+
+
+class St-while(St)
+  owner Mexp condition
+  
+  func dynamic parse()
+    parse-new-exp(user ""):(owner self.condition)
+  
+  func dynamic analyze-first()
+    # nothing
+  
+  func dynamic analyze()
+    self.condition.analyze()
+  
+  func dynamic write()
+    self.condition.write-intro()
+    write(user "if (!(")
+    self.condition.write-final()
+    write(user ")) break;")
+
+
+class St-for(St-node)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()
+
+
+class St-return(St-comment)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()
+
+
+class St-raise(St-comment)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()

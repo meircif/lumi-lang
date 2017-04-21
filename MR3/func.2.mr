@@ -1,12 +1,5 @@
 # MR3 compiler - function
 
-native class Mexp
-native func parse-new-exp(user String ends):(owner Mexp exp, copy Char end)
-native func analyze-exp(user Mexp exp)
-native func write-exp-intro(user Mexp exp)
-native func write-exp-final(user Mexp exp)
-
-
 func f-get-access(user String access-text):(copy Int access)
   if access-text.equal(user "copy")
     access := ACCESS-COPY
@@ -25,13 +18,13 @@ native class Dec-arg
 class Arg-node(Object)
   owner Arg-node next
   
-  func dynamic parse(copy Int access):(copy Char end)
+  func dynamic parse(copy Bool is-out, copy Int access):(copy Char end)
     # nothing
   func dynamic analyze()
     # nothing
   func dynamic write-intro()
     # nothing
-  func dynamic write-final()
+  func dynamic write-final(copy Bool is-out)
     # nothing
   func dynamic get-dec():(user Dec-arg arg)
     # nothing
@@ -44,8 +37,9 @@ class Dec-arg(Arg-node)
     self.mvar.access := access
     f-new-copy(user name):(owner self.mvar.name)
   
-  func dynamic parse(copy Int access):(copy Char end)
+  func dynamic parse(copy Bool is-out, copy Int access):(copy Char end)
     init-new-var(user _):(owner self.mvar)
+    self.mvar.is-ref := is-out
     self.mvar.access := access
     if read-new(user " {"):(owner self.mvar.typename, copy end) = '{'
       read-new(user "}"):(owner self.mvar.sub-typename, copy end)
@@ -58,8 +52,12 @@ class Dec-arg(Arg-node)
   func dynamic write-intro()
     # nothing
   
-  func dynamic write-final()
+  func dynamic write-final(copy Bool is-out)
     write-cstyle(user self.mvar.typename)
+    if is-out
+      write(user "*")
+    if self.mvar.access = ACCESS-USER or self.mvar.access = ACCESS-OWNER
+      write(user "*")
     write(user " ")
     write-cstyle(user self.mvar.name)
   
@@ -70,18 +68,22 @@ class Call-arg(Arg-node)
   var Int access
   owner Mexp value
   
-  func dynamic parse(copy Int access):(copy Char end)
+  func dynamic parse(copy Bool is-out, copy Int access):(copy Char end)
     self.access := access
     parse-new-exp(user ",)"):(owner self.value, copy end)
   
   func dynamic analyze()
-    analyze-exp(user self.value)
+    self.value.analyze()
   
   func dynamic write-intro()
-    write-exp-intro(user self.value)
+    self.value.write-intro()
   
-  func dynamic write-final()
-    write-exp-final(user self.value)
+  func dynamic write-final(copy Bool is-out)
+    if is-out
+      write(user "&(")
+    self.value.write-final()
+    if is-out
+      write(user ")")
   
   func dynamic get-dec():(user Dec-arg arg)
     arg := _
@@ -96,8 +98,7 @@ static Arg-list(Object)
     self.first-out := _
     self.is-dec := true
   
-  func inst parse-args():(owner Arg-node first)
-    first := _
+  func inst parse-args(copy Bool is-out)
     user Arg-node prev(_)
     var Char end
     do
@@ -112,23 +113,25 @@ static Arg-list(Object)
       else
         arg-type := Call-arg
       new As{arg-type} arg
-      arg.parse(copy access):(copy end)
+      arg.parse(copy is-out, copy access):(copy end)
       arg.next := _
       if ? prev
         prev.next := arg
+      else-if is-out
+        self.first-out := arg
       else
-        first := arg
+        self.first-param := arg
       prev := arg
       while end = ','
       read-c():(copy end)
   
   func inst parse(copy Bool is-dec):(copy Char end)
     self.is-dec := is-dec
-    self.parse-args():(owner self.first-param)
+    self.parse-args(copy false)
     if read-c():(copy end) = ':'
       if read-c() != '('
         f-syntax-error-c(user "expeted '(', got", copy end)
-      self.parse-args():(owner self.first-out)
+      self.parse-args(copy true)
       read-c():(copy end)
     else
       self.first-out := _
@@ -151,11 +154,12 @@ static Arg-list(Object)
       node.write-intro()
       node := node.next
   
-  func inst write-args-final(user Arg-node first, copy Bool has-more)
+  func inst write-args-final(copy Bool is-out, user Arg-node first)
     user Arg-node node(first)
+    var Bool has-more(not is-out and ? self.first-out)
     do
       while ? node
-      node.write-final()
+      node.write-final(copy is-out)
       node := node.next
       if has-more or ? node
         write(user ", ")
@@ -166,8 +170,8 @@ static Arg-list(Object)
   
   func inst write-final()
     write(user "(")
-    self.write-args-final(user self.first-param, copy ? self.first-out)
-    self.write-args-final(user self.first-out, copy false)
+    self.write-args-final(copy false, user self.first-param)
+    self.write-args-final(copy true, user self.first-out)
     write(user ")")
   
   func inst add-arg(copy Int access, user Mtype mtype, user String name):(owner Arg-node first)
@@ -181,6 +185,13 @@ static Arg-list(Object)
   
   func inst add-out(copy Int access, user Mtype mtype, user String name)
     self.add-arg(copy access, user mtype, user name):(owner self.first-out)
+  
+  func inst add-self-call(owner Mexp value)
+    new Call-arg arg
+    arg.access := ACCESS-USER
+    arg.value := value
+    arg.next := self.first-param
+    self.first-param := arg
 
 func parse-new-args():(owner Arg-list new-args)
   new Arg-list args
@@ -232,3 +243,120 @@ func parse-new-mfunc():(owner Mfunc new-mfunc)
   new Mfunc mfunc
   mfunc.parse()
   new-mfunc := mfunc
+
+
+class Call-operand(Operand)
+  owner Arg-list args
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    new Arg-list args
+    self.args := args
+    args.parse(copy false):(copy end)
+  
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+    if mtype != glob.type-func
+      f-syntax-error(user "not a function", user mtype.name)
+    self.args.analyze()
+    
+    if ? method
+      # sys.print(user "***")
+      # sys.print(user method.name)
+      member.next := _
+      new Mexp new-exp
+      new-exp.operand := exp.operand
+      new-exp.operator := _
+      new-exp.next := _
+      exp.operand := method
+      self.args.add-self-call(owner new-exp)
+    
+    if ? self.next
+      # todo ...
+      # self.next.analyze(user exp, user return-type, user self, user _)
+  
+  func dynamic write-intro()
+    self.args.write-intro()
+  
+  func dynamic write-final()
+    self.args.write-final()
+
+
+func parse-new-operand(copy Type{Operand} opr-type, owner String text, user String ends):(owner Operand new-opr, copy Char end)
+  new As{opr-type} opr
+  new-opr := opr
+  opr.parse(owner text, user ends):(copy end)
+  var Type{Operand} next-type
+  if end = '.'
+    next-type := Member-operand
+  else-if end = '['
+    next-type := Array-operand
+  else-if end = '('
+    next-type := Call-operand
+  else
+    opr.next := _
+    return
+  parse-new-operand(copy next-type, owner _, user ends):(owner opr.next, copy end)
+
+func parse-new-operands(owner String text, user String ends):(owner Operand new-opr, copy Char end)
+  var Type{Operand} opr-type
+  if text.length = 0
+    if end = '('
+      opr-type := Block-operand
+    else
+      f-syntax-error-c(user "unexpected", copy end)
+  else
+    var Char first
+    text.get(copy 0):(copy first)
+    if first = '\''
+      opr-type := Char-operand
+    else-if first = '"'
+      opr-type := String-operand
+    else-if first >= '0' and first <= '9'
+      opr-type := Int-operand
+    else-if text.length = 1 and first = '_'
+      opr-type := Empty-operand
+    else
+      opr-type := Var-operand
+  parse-new-operand(copy opr-type, owner text, user ends):(owner new-opr, copy end)
+
+
+class St-func(St-node)
+  owner Mfunc mfunc
+  
+  func inst add-args-vars(user Arg-node fisrt-arg)
+    user Arg-node arg(fisrt-arg)
+    do
+      while ? arg
+      user Dec-arg dec-arg
+      arg.get-dec():(user dec-arg)
+      while ? dec-arg
+      add-var(user self.sons-var-map, user dec-arg.mvar)
+      arg := arg.next
+  
+  func dynamic parse()
+    parse-new-mfunc():(owner self.mfunc)
+    self.add-var(owner self.mfunc.m-new-var())
+    self.add-args-vars(owner self.mfunc.args.first-param)
+    self.add-args-vars(owner self.mfunc.args.first-out)
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    self.mfunc.analyze()
+    base.analyze()
+  
+  func dynamic write()
+    self.mfunc.write()
+    base.write()
+
+
+class St-main(St-node)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()

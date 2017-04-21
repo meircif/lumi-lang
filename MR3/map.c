@@ -144,7 +144,7 @@ Int ACCESS_VAR = 3;
 
 typedef struct Mfunc Mfunc;
 
-Returncode m_find_type(String* typename, Mtype** mtype);
+Returncode f_find_type(String* typename, Mtype** mtype);
 
 typedef struct Mvar Mvar; struct Mvar {
   String* name;
@@ -174,10 +174,10 @@ static char* _func_name_Mvar_analyze = "Mvar.analyze";
 #define MR_FUNC_NAME _func_name_Mvar_analyze
 Returncode Mvar_analyze(Mvar* self) {
   if (!(NULL != self->mtype)) {
-    CHECK(111, m_find_type(self->typename, &(self->mtype)));
+    CHECK(111, f_find_type(self->typename, &(self->mtype)));
   }
   if (NULL != self->sub_typename && !(NULL != self->sub_mtype)) {
-    CHECK(113, m_find_type(self->sub_typename, &(self->sub_mtype)));
+    CHECK(113, f_find_type(self->sub_typename, &(self->sub_mtype)));
   }
   return OK;
 }

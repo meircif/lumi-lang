@@ -162,14 +162,11 @@ main func(user Array{String} argv)
     return
   
   init-global-data()
-  var St root
-  root.init(user _)
+  var St-root root
+  root.init(user argv)
   
   sys.print(user "parsing...")
-  for index in 1:argv.length
-    new St-file st-file
-    st-file.init(user root, user argv, copy index)
-    st-file.parse()
+  root.parse()
   
   sys.print(user "analyzing...")
   root.analyze()

@@ -2,12 +2,15 @@
 #include "common.c"
 #include "map.c"
 #include "global.c"
-#include "func.c"
 #include "exp.c"
 #include "st-node.c"
+#include "func.c"
+#include "dec.c"
+#include "flow.c"
+#include "type.c"
 
-static char* _mr_file7_name = "mr3-compiler.2.mr";
-#define MR_FILE_NAME _mr_file7_name
+static char* _mr_file10_name = "mr3-compiler.2.mr";
+#define MR_FILE_NAME _mr_file10_name
 /* MR3 compiler main - written in MR2 */
 
 
@@ -215,26 +218,20 @@ Returncode func(Array* argv) {
   }
   
   CHECK(164, init_global_data());
-  St* root = &(St){0};
-  *((Func**)(root)) = St__dtl;
-  CHECK(166, St_init(root, NULL));
+  St_root* root = &(St_root){0};
+  *((Func**)(root)) = St_root__dtl;
+  CHECK(166, St_root_init(root, argv));
   
   CHECK(168, Sys_print(sys, &(String){11, 10, "parsing..."}));
-  Int index; for (index = 1; index < argv->length; ++index) {
-    St_file* st_file = malloc(sizeof(St_file));
-    if (st_file == NULL) RAISE(170)
-    *((Func**)(st_file)) = St_file__dtl;
-    CHECK(171, St_file_init(st_file, root, argv, index));
-    CHECK(172, (*((Func**)(st_file)))[0](st_file));
-  }
+  CHECK(169, (*((Func**)(root)))[0](root));
   
-  CHECK(174, Sys_print(sys, &(String){13, 12, "analyzing..."}));
-  CHECK(175, (*((Func**)(root)))[1](root));
+  CHECK(171, Sys_print(sys, &(String){13, 12, "analyzing..."}));
+  CHECK(172, (*((Func**)(root)))[2](root));
   
-  CHECK(177, Sys_print(sys, &(String){11, 10, "writing..."}));
-  CHECK(178, (*((Func**)(root)))[2](root));
+  CHECK(174, Sys_print(sys, &(String){11, 10, "writing..."}));
+  CHECK(175, (*((Func**)(root)))[3](root));
   
-  CHECK(180, Sys_print(sys, &(String){16, 15, "MR compiler end"}));
+  CHECK(177, Sys_print(sys, &(String){16, 15, "MR compiler end"}));
   return OK;
 }
 #undef MR_FUNC_NAME
