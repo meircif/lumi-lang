@@ -92,7 +92,8 @@ class St-node(St)
     do
       while ? son
       glob.line-num := son.line-num
-      write-spaces()
+      if not (? glob.mclass)
+        write-spaces()
       son.write()
       if not (? glob.mclass)
         write(user "\n")

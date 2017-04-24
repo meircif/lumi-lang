@@ -672,7 +672,7 @@ Returncode St_func_write(St_func* self) {
     if (!glob->methods) {
       return OK;
     }
-    CHECK(357, write(&(String){2, 1, "\n"}));
+    CHECK(357, write_new_indent_line());
   }
   CHECK(358, write(&(String){25, 24, "static char* _func_name_"}));
   CHECK(359, Mfunc_write_name(self->mfunc));
@@ -688,9 +688,12 @@ Returncode St_func_write(St_func* self) {
   CHECK(368, Mfunc_write_name(self->mfunc));
   CHECK(369, write_new_indent_line());
   CHECK(370, Mfunc_write(self->mfunc));
-  CHECK(371, St_node_write(&(self->_base)));
-  CHECK(372, write_new_indent_line());
-  CHECK(373, write(&(String){20, 19, "#undef MR_FUNC_NAME"}));
+  Mtype* mclass = glob->mclass;
+  glob->mclass = NULL;
+  CHECK(373, St_node_write(&(self->_base)));
+  glob->mclass = mclass;
+  CHECK(375, write_new_indent_line());
+  CHECK(376, write(&(String){20, 19, "#undef MR_FUNC_NAME"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -703,28 +706,28 @@ typedef struct St_main St_main; struct St_main {
 static char* _func_name_St_main_parse = "St-main.parse";
 #define MR_FUNC_NAME _func_name_St_main_parse
 Returncode St_main_parse(St_main* self) {
-  CHECK(378, St_node_parse(&(self->_base)));
+  CHECK(381, St_node_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze_first = "St-main.analyze-first";
 #define MR_FUNC_NAME _func_name_St_main_analyze_first
 Returncode St_main_analyze_first(St_main* self) {
-  CHECK(380, St_node_analyze_first(&(self->_base)));
+  CHECK(383, St_node_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze = "St-main.analyze";
 #define MR_FUNC_NAME _func_name_St_main_analyze
 Returncode St_main_analyze(St_main* self) {
-  CHECK(382, St_node_analyze(&(self->_base)));
+  CHECK(385, St_node_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_write = "St-main.write";
 #define MR_FUNC_NAME _func_name_St_main_write
 Returncode St_main_write(St_main* self) {
-  CHECK(384, St_node_write(&(self->_base)));
+  CHECK(387, St_node_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME

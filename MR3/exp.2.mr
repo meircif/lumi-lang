@@ -133,7 +133,6 @@ class Var-operand(Operand)
   func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
     if not (? m-find-var(user self.name):(user self.mvar))
       f-syntax-error(user "unknow variable", user self.name)
-    self.mvar.analyze()
     if ? self.next
       self.next.analyze(user exp, user self.mvar.mtype, user self, user _)
   

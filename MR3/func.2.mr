@@ -354,7 +354,7 @@ class St-func(St-node)
     if ? glob.mclass
       if not glob.methods
         return
-      write(user "\n")
+      write-new-indent-line()
     write(user "static char* _func_name_")
     self.mfunc.write-name()
     write(user " = \"")
@@ -368,7 +368,10 @@ class St-func(St-node)
     self.mfunc.write-name()
     write-new-indent-line()
     self.mfunc.write()
+    user Mtype mclass(glob.mclass)
+    glob.mclass := _
     base.write()
+    glob.mclass := mclass
     write-new-indent-line()
     write(user "#undef MR_FUNC_NAME")
 
