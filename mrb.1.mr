@@ -82,11 +82,10 @@ main func(user Array{String} argv)
   if version = '0'
     string-concat(user command, user "mr0-file.c mr0-string.c")
   
-  if version = '1'
-    string-concat(user command, user "mr.1.c")
-  
-  if version = '2' or version = '3'
-    string-concat(user command, user "mr.2.c")
+  else
+    string-concat(user command, user "mr.")
+    string-append(user command, copy version)
+    string-concat(user command, user ".c")
   
   string-concat(user command, user " -o \"")
   string-concat(user command, user prefix)

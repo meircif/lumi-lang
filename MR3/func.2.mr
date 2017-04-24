@@ -259,8 +259,6 @@ class Call-operand(Operand)
     self.args.analyze()
     
     if ? method
-      # sys.print(user "***")
-      # sys.print(user method.name)
       member.next := _
       new Mexp new-exp
       new-exp.operand := exp.operand
@@ -288,7 +286,7 @@ func parse-new-operand(copy Type{Operand} opr-type, owner String text, user Stri
   if end = '.'
     next-type := Member-operand
   else-if end = '['
-    next-type := Array-operand
+    next-type := Slice-operand
   else-if end = '('
     next-type := Call-operand
   else
@@ -304,8 +302,7 @@ func parse-new-operands(owner String text, user String ends):(owner Operand new-
     else
       f-syntax-error-c(user "unexpected", copy end)
   else
-    var Char first
-    text.get(copy 0):(copy first)
+    var Char first(text[0])
     if first = '\''
       opr-type := Char-operand
     else-if first = '"'
@@ -335,6 +332,7 @@ class St-func(St-node)
   func dynamic parse()
     parse-new-mfunc():(owner self.mfunc)
     self.add-var(owner self.mfunc.m-new-var())
+    f-copy-new-var-map(user _):(owner self.sons-var-map)
     self.add-args-vars(owner self.mfunc.args.first-param)
     self.add-args-vars(owner self.mfunc.args.first-out)
     base.parse()

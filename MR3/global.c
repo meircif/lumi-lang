@@ -224,9 +224,8 @@ Returncode write_cstyle(String* text) {
     RAISE(148)
   }
   Int index; for (index = 0; index < text->length; ++index) {
-    Char _Char3;
-    CHECK(150, String_get(text, index, &(_Char3)))
-    Char ch = _Char3;
+    if ((index) < 0 || (index) >= text->length) RAISE(150)
+    Char ch = text->chars[index];
     if (ch == '-') {
       CHECK(152, write_c('_'));
     }
@@ -330,9 +329,9 @@ Returncode get_node_type(String* key, Type* node_type, Bool* found) {
   Int n; for (n = 0; n < glob->key_word_map->length; ++n) {
     if ((n) < 0 || (n) >= glob->key_word_map->length) RAISE(209)
     Node_map_item* item = ((Node_map_item*)(glob->key_word_map->values)) + n;
-    Bool _Bool4;
-    CHECK(210, String_equal(item->key, key, &(_Bool4)))
-    if (_Bool4) {
+    Bool _Bool3;
+    CHECK(210, String_equal(item->key, key, &(_Bool3)))
+    if (_Bool3) {
       (*node_type) = item->node_type;
       (*found) = true;
       return OK;
@@ -379,7 +378,7 @@ Returncode St_init(St* self, St* father) {
   self->last_son = NULL;
   self->father = father;
   self->line_num = glob->line_num;
-  CHECK(239, f_copy_new_var_map(NULL, &(self->sons_var_map)));
+  self->sons_var_map = NULL;
   self->var_map = NULL;
   if (NULL != father) {
     if (NULL != father->last_son) {

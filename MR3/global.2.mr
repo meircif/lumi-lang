@@ -147,7 +147,7 @@ func write-cstyle(user String text)
   if not (? text)
     raise
   for index in text.length
-    var Char ch(text.get(copy index))
+    var Char ch(text[index])
     if ch = '-'
       write-c(copy '_')
     else
@@ -236,7 +236,7 @@ class St(Object)
     self.last-son := _
     self.father := father
     self.line-num := glob.line-num
-    f-copy-new-var-map(user _):(owner self.sons-var-map)
+    self.sons-var-map := _
     self.var-map := _
     if ? father
       if ? father.last-son

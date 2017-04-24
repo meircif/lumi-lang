@@ -141,10 +141,7 @@ class Var-operand(Operand)
     # nothing
   
   func dynamic write-final()
-    sys.print(user "Var-operand.write-final")
-    sys.print(user self.name)
     if self.mvar.is-ref
-      sys.print(user " *is-ref")
       write(user "(*")
     write-cstyle(user self.name)
     if self.mvar.is-ref
@@ -157,16 +154,16 @@ class Char-operand(Operand)
   func dynamic parse(owner String text, user String ends):(copy Char end)
     var Char ch
     if text.length = 3
-      text.get(copy 1):(copy ch)
+      ch := text[1]
       if ch = '\'' or ch = '\\'
         f-syntax-error(user "illegal character constant", user text)
     else-if text.length = 4
-      if text.get(copy 1) != '\\'
+      if text[1] != '\\'
         f-syntax-error(user "illegal character constant", user text)
-      text.get(copy 2):(copy ch)
+      ch := text[2]
     else
       f-syntax-error(user "illegal character constant", user text)
-    if text.get(copy text.length - 1) != '\''
+    if text[text.length - 1] != '\''
       f-syntax-error(user "illegal character constant", user text)
     self.text := text
   
@@ -184,7 +181,7 @@ class Char-operand(Operand)
 class String-operand(Operand)
   owner String text
   func dynamic parse(owner String text, user String ends):(copy Char end)
-    if text.get(copy text.length - 1) != '\"'
+    if text[text.length - 1] != '\"'
       f-syntax-error(user "illegal string constant", user text)
     self.text := text
   
@@ -198,7 +195,7 @@ class String-operand(Operand)
   func dynamic write-final()
     var Int real-length(1)
     for index in 1:self.text.length - 1
-      if self.text.get(copy index) = '\\'
+      if self.text[index] = '\\'
         index := index + 1
       real-length := real-length + 1
     var String{80} length-str
@@ -221,8 +218,7 @@ class Int-operand(Operand)
   func dynamic parse(owner String text, user String ends):(copy Char end)
     self.value := 0
     for n in text.length
-      var Char ch
-      text.get(copy n):(copy ch)
+      var Char ch(text[n])
       if ch < '0' or ch > '9'
         f-syntax-error(user "illegal number", user text)
       self.value := self.value * 10 + ch - '0'
@@ -318,7 +314,7 @@ class Member-operand(Var-operand)
     base.write-final()
 
 
-class Array-operand(Operand)
+class Slice-operand(Operand)
   owner Mexp index
   owner Mexp second-index
   
@@ -333,8 +329,8 @@ class Array-operand(Operand)
     read-c():(copy end)
   
   func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
-    if mtype != glob.type-array
-      f-syntax-error(user "not an array", user mtype.name)
+    if mtype != glob.type-array and mtype != glob.type-string
+      f-syntax-error(user "non-sliceable type", user mtype.name)
     self.index.analyze()
     if ? self.second-index
       self.second-index.analyze()

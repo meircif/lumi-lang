@@ -84,11 +84,10 @@ Returncode func(Array* argv) {
   if (version == '0') {
     CHECK(string_concat(command, &(String){24, 23, "mr0-file.c mr0-string.c"}))
   }
-  if (version == '1') {
-    CHECK(string_concat(command, &(String){7, 6, "mr.1.c"}))
-  }
-  if (version == '2' or version == '3') {
-    CHECK(string_concat(command, &(String){7, 6, "mr.2.c"}))
+  else {
+    CHECK(string_concat(command, &(String){4, 3, "mr."}))
+    CHECK(string_append(command, version))
+    CHECK(string_concat(command, &(String){3, 2, ".c"}))
   }
   CHECK(string_concat(command, &(String){6, 5, " -o \""}))
   CHECK(string_concat(command, prefix))

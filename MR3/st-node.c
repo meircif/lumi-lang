@@ -284,7 +284,7 @@ Returncode St_file_write(St_file* self) {
   CHECK(155, file_open_write(outfile_name, &(glob->outfile)));
   
   if (self->index == self->argv->length - 1) {
-    CHECK(158, write(&(String){19, 18, "#include \"mr.2.h\"\n"}));
+    CHECK(158, write(&(String){19, 18, "#include \"mr.3.h\"\n"}));
     Int index; for (index = 1; index < self->argv->length - 1; ++index) {
       if ((index) < 0 || (index) >= self->argv->length) RAISE(160)
       String* infile_name = ((String*)(self->argv->values)) + index;

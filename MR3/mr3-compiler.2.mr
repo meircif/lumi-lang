@@ -39,12 +39,18 @@ func add-global-func(user Mtype mtype, user String name):(owner Mfunc new-meth)
     add-var(user glob.var-map, owner meth.m-new-var())
   new-meth := meth
 
-func add-member(user Mtype mtype, user String name, user Mtype member-type)
+func add-new-var(user Mtype mtype, user String name, user Var-map map)
   owner Mvar mvar
-  init-new-var(user member-type):(owner mvar)
+  init-new-var(user mtype):(owner mvar)
   f-new-copy(user name):(owner mvar.name)
-  f-new-copy(user member-type.name):(owner mvar.typename)
-  add-var(user mtype.members, owner mvar)
+  f-new-copy(user mtype.name):(owner mvar.typename)
+  add-var(user map, owner mvar)
+
+func add-member(user Mtype mtype, user String name, user Mtype member-type)
+  add-new-var(user member-type, user name, user mtype.members)
+
+func add-glob-var(user Mtype mtype, user String name)
+  add-new-var(user mtype, user name, user glob.var-map)
 
 
 func f-create-global-var-map()
@@ -56,6 +62,10 @@ func f-create-global-var-map()
   add-global-func(user glob.type-int, user "str"):(owner meth)
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "str")
   meth.args.add-param(copy ACCESS-COPY, user glob.type-int, user "self")
+  
+  # Bool
+  add-glob-var(user glob.type-bool, user "true")
+  add-glob-var(user glob.type-bool, user "false")
   
   # String
   add-member(user glob.type-string, user "length", user glob.type-int)
@@ -146,6 +156,8 @@ func f-create-global-var-map()
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "value")
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "name")
   meth.args.add-param(copy ACCESS-USER, user glob.type-sys, user "self")
+  
+  add-glob-var(user glob.type-sys, user "sys")
 
 
 func init-global-data()
