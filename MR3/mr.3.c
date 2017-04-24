@@ -45,21 +45,22 @@ void _set_var_string_array(
     int array_length,
     int string_length,
     Array* array,
-    char** chars) {
+    char* chars) {
   int n;
   for (n = 0; n < array_length; ++n) {
-   ((String*)(array->values))[n] = (String){string_length, 0, chars[n]};
+    ((String*)(array->values))[n] =
+      (String){string_length, 0, chars + n * string_length};
   }
 }
 
 void _set_new_string_array(int array_length, int string_length, Array* array) {
   int n;
   for (n = 0; n < array_length; ++n) {
-   ((String*)(array->values))[n] = (String){
-     string_length,
-     0,
-     (Byte*)(array->values) + array_length * sizeof(String) + string_length * n
-   };
+    ((String*)(array->values))[n] = (String){
+      string_length,
+      0,
+      (Byte*)(array->values) + array_length * sizeof(String) + string_length * n
+    };
   }
 }
 

@@ -80,7 +80,7 @@ void _set_var_string_array(
   int array_length,
   int string_length,
   Array* array,
-  char** chars);
+  char* chars);
 void _set_new_string_array(int array_length, int string_length, Array* array);
 
 Returncode String_clear(String* this);

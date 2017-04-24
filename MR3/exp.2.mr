@@ -1,14 +1,14 @@
 # MR3 compiler - expression
 
 native class Mexp
-native class Member-operand
+native class Var-operand
 
 class Operand(Object)
   owner Operand next
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     # nothing
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     # nothing
   func dynamic write-intro()
     # nothing
@@ -42,6 +42,7 @@ static Mexp(Object)
   owner Operand operand
   owner String operator
   owner Mexp next
+  var Bool is-used
   
   native func parse(owner String text, user String ends):(copy Char end)
   
@@ -65,6 +66,7 @@ static Mexp(Object)
       self.parse-new(user ends):(owner new-exp, copy end)
   
   func inst parse(owner String text, user String ends):(copy Char end)
+    self.is-used := true
     if end = ' ' and ? glob.op-map.find(user text)
       self.operator := text
       read-new-value(user ends):(owner text, copy end)
@@ -130,11 +132,14 @@ class Var-operand(Operand)
     self.name := text
     self.mvar := _
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     if not (? m-find-var(user self.name):(user self.mvar))
       f-syntax-error(user "unknow variable", user self.name)
     if ? self.next
-      self.next.analyze(user exp, user self.mvar.mtype, user self, user _)
+      if ? self.mvar.func-dec
+        self.next.analyze(user exp, user self.mvar.mtype, user self, user self)
+      else
+        self.next.analyze(user exp, user self.mvar.mtype, user self, user _)
   
   func dynamic write-intro()
     # nothing
@@ -166,7 +171,7 @@ class Char-operand(Operand)
       f-syntax-error(user "illegal character constant", user text)
     self.text := text
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     if ? self.next
       self.next.analyze(user exp, user glob.type-char, user self, user _)
   
@@ -184,7 +189,7 @@ class String-operand(Operand)
       f-syntax-error(user "illegal string constant", user text)
     self.text := text
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     if ? self.next
       self.next.analyze(user exp, user glob.type-string, user self, user _)
   
@@ -223,7 +228,7 @@ class Int-operand(Operand)
       self.value := self.value * 10 + ch - '0'
     self.text := text
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     if ? self.next
       self.next.analyze(user exp, user glob.type-int, user self, user _)
   
@@ -238,7 +243,7 @@ class Empty-operand(Operand)
   func dynamic parse(owner String text, user String ends):(copy Char end)
     delete text
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     if ? self.next
       f-syntax-error(user "no members for", user "empty")
   
@@ -258,7 +263,7 @@ class Block-operand(Operand)
       f-syntax-error(user "missing", user ")")
     read-c():(copy end)
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     self.exp.analyze()
     if ? self.next
       # todo ...
@@ -316,6 +321,7 @@ class Member-operand(Var-operand)
 class Slice-operand(Operand)
   owner Mexp index
   owner Mexp second-index
+  var Bool is-string
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     parse-new-exp(user ":]"):(owner self.index, copy end)
@@ -327,9 +333,10 @@ class Slice-operand(Operand)
       f-syntax-error(user "missing", user "]")
     read-c():(copy end)
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     if mtype != glob.type-array and mtype != glob.type-string
       f-syntax-error(user "non-sliceable type", user mtype.name)
+    self.is-string := mtype = glob.type-string
     self.index.analyze()
     if ? self.second-index
       self.second-index.analyze()
@@ -343,11 +350,14 @@ class Slice-operand(Operand)
       self.second-index.write-intro()
   
   func dynamic write-final()
+    if ? self.second-index
+      return
+    if self.is-string
+      write(user "->chars")
+    else
+      write(user "->values")
     write(user "[")
     self.index.write-final()
-    if ? self.second-index
-      write(user ":")
-      self.second-index.write-final()
     write(user "]")
 
 
@@ -356,6 +366,7 @@ class St-exp(St)
   
   func dynamic parse()
     parse-new-exp-with-kw(user ""):(owner self.exp)
+    self.exp.is-used := false
   
   func dynamic analyze-first()
     # do nothing
@@ -366,4 +377,5 @@ class St-exp(St)
   func dynamic write()
     self.exp.write-intro()
     self.exp.write-final()
-    write(user ";")
+    if not self.exp.is-used
+      write(user ";")

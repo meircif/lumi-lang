@@ -7,8 +7,9 @@ native type Object
 
 
 func f-new-copy(user String text):(owner String out-text)
-  if text = NULL
-    raise
+  if not (? text)
+    out-text := _
+    return
   new String{text.length + 1} new-text
   new-text.copy(user text)
   out-text := new-text

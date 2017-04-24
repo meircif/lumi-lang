@@ -34,6 +34,7 @@ static Global-data(Object)
   var Int line-num
   var Int spaces
   user St node
+  var Int res-count
   user Mtype mclass
   var Bool methods
   
@@ -80,6 +81,7 @@ static Global-data(Object)
   func inst init()
     self.line-num := 0
     self.methods := false
+    self.res-count := 0
     global-key-word.text := global-key-word-text
     self.key-word := _
     self.init-op-map()

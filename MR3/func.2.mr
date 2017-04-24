@@ -28,6 +28,8 @@ class Arg-node(Object)
     # nothing
   func dynamic get-dec():(user Dec-arg arg)
     # nothing
+  func dynamic get-call-value():(user Mexp exp)
+    # nothing
 
 class Dec-arg(Arg-node)
   user Mvar mvar
@@ -63,6 +65,9 @@ class Dec-arg(Arg-node)
   
   func dynamic get-dec():(user Dec-arg arg)
     arg := self
+  
+  func dynamic get-call-value():(user Mexp exp)
+    raise
 
 class Call-arg(Arg-node)
   var Int access
@@ -86,17 +91,20 @@ class Call-arg(Arg-node)
       write(user ")")
   
   func dynamic get-dec():(user Dec-arg arg)
-    arg := _
+    raise
+  
+  func dynamic get-call-value():(user Mexp exp)
+    exp := self.value
 
 static Arg-list(Object)
   owner Arg-node first-param
   owner Arg-node first-out
   var Bool is-dec
   
-  func inst init()
+  func inst init(copy Bool is-dec)
     self.first-param := _
     self.first-out := _
-    self.is-dec := true
+    self.is-dec := is-dec
   
   func inst parse-args(copy Bool is-out)
     user Arg-node prev(_)
@@ -199,77 +207,6 @@ func parse-new-args():(owner Arg-list new-args)
   new-args := args
 
 
-class Call-operand(Operand)
-  owner Arg-list args
-  
-  func dynamic parse(owner String text, user String ends):(copy Char end)
-    new Arg-list args
-    self.args := args
-    args.parse(copy false):(copy end)
-  
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Member-operand method)
-    if mtype != glob.type-func
-      f-syntax-error(user "not a function", user mtype.name)
-    self.args.analyze()
-    
-    if ? method
-      member.next := _
-      new Mexp new-exp
-      new-exp.operand := exp.operand
-      new-exp.operator := _
-      new-exp.next := _
-      exp.operand := method
-      self.args.add-self-call(owner new-exp)
-    
-    if ? self.next
-      # todo ...
-      # self.next.analyze(user exp, user return-type, user self, user _)
-  
-  func dynamic write-intro()
-    self.args.write-intro()
-  
-  func dynamic write-final()
-    self.args.write-final()
-
-
-func parse-new-operand(copy Type{Operand} opr-type, owner String text, user String ends):(owner Operand new-opr, copy Char end)
-  new As{opr-type} opr
-  new-opr := opr
-  opr.parse(owner text, user ends):(copy end)
-  var Type{Operand} next-type
-  if end = '.'
-    next-type := Member-operand
-  else-if end = '['
-    next-type := Slice-operand
-  else-if end = '('
-    next-type := Call-operand
-  else
-    opr.next := _
-    return
-  parse-new-operand(copy next-type, owner _, user ends):(owner opr.next, copy end)
-
-func parse-new-operands(owner String text, user String ends):(owner Operand new-opr, copy Char end)
-  var Type{Operand} opr-type
-  if text.length = 0
-    if end = '('
-      opr-type := Block-operand
-    else
-      f-syntax-error-c(user "unexpected", copy end)
-  else
-    var Char first(text[0])
-    if first = '\''
-      opr-type := Char-operand
-    else-if first = '"'
-      opr-type := String-operand
-    else-if first >= '0' and first <= '9'
-      opr-type := Int-operand
-    else-if text.length = 1 and first = '_'
-      opr-type := Empty-operand
-    else
-      opr-type := Var-operand
-  parse-new-operand(copy opr-type, owner text, user ends):(owner new-opr, copy end)
-
-
 static Mfunc(Object)
   owner String name
   owner Arg-list args
@@ -280,7 +217,7 @@ static Mfunc(Object)
     f-new-copy(user name):(owner self.name)
     new Arg-list args
     self.args := args
-    self.args.init()
+    self.args.init(copy true)
     self.is-dynamic := false
     self.dynamic-index := 0
   
@@ -320,6 +257,175 @@ func parse-new-mfunc():(owner Mfunc new-mfunc)
   new Mfunc mfunc
   mfunc.parse()
   new-mfunc := mfunc
+
+
+class Call-operand(Operand)
+  owner Arg-list args
+  owner Operand func-opr
+  var Bool is-used
+  user Mvar res-var
+  user Mexp res-exp
+  owner String res-name
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    new Arg-list args
+    self.args := args
+    self.args.init(copy false)
+    args.parse(copy false):(copy end)
+    self.func-opr := _
+    self.res-var := _
+    self.res-name := _
+    self.res-exp := _
+  
+  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
+    if mtype != glob.type-func
+      f-syntax-error(user "not a function", user mtype.name)
+    self.is-used := exp.is-used or ? self.next or ? exp.next or ? exp.operator
+    if not self.is-used
+      exp.is-used := true
+    
+    self.args.analyze()
+    
+    member.next := _
+    user Operand method-opr
+    method-opr := method
+    if ? method and method-opr != member
+      self.func-opr := method
+      new Mexp new-exp
+      new-exp.operand := exp.operand
+      new-exp.operator := _
+      new-exp.next := _
+      self.args.add-self-call(owner new-exp)
+    else
+      self.func-opr := exp.operand
+    exp.operand := self
+    
+    if ? method
+      user Mfunc mfunc(method.mvar.func-dec)
+      if not (? mfunc)
+        raise
+      user Arg-node dec-out(mfunc.args.first-out)
+      if not (? dec-out)
+        if self.is-used
+          f-syntax-error(user "no return value for", user method.mvar.name)
+      else
+        user Arg-node call-out(self.args.first-out)
+        if ? call-out
+          do
+            while ? call-out.next
+            call-out := call-out.next
+            dec-out := dec-out.next
+            if not (? dec-out)
+              f-syntax-error(user "too many outputs for", user method.mvar.name)
+        var Bool fill-out(? dec-out.next or not (? call-out))
+        if ? dec-out.next
+          dec-out := dec-out.next
+          if ? dec-out.next or not (? call-out)
+            f-syntax-error(user "too few outputs for", user method.mvar.name)
+        user Dec-arg dec-res
+        dec-out.get-dec():(user dec-res)
+        self.res-var := dec-res.mvar
+        if fill-out
+          var String{64} res-count
+          glob.res-count.str():(var res-count)
+          glob.res-count := glob.res-count + 1
+          new String{self.res-var.typename.length + res-count.length + 2} res-name
+          self.res-name := res-name
+          self.res-name.append(copy '-')
+          self.res-name.concat(user self.res-var.typename)
+          self.res-name.concat(user res-count)
+          new Var-operand var-opr
+          f-new-copy(user self.res-name):(owner var-opr.name)
+          f-copy-var(user self.res-var, user self.res-name):(owner var-opr.mvar)
+          var-opr.next := _
+          new Mexp exp
+          exp.operand := var-opr
+          exp.operator := _
+          exp.next := _
+          new Call-arg arg
+          arg.access := self.res-var.access
+          arg.value := exp
+          arg.next := _
+          if ? call-out
+            call-out.next := arg
+          else
+            self.args.first-out := arg
+        else
+          call-out.get-call-value():(user self.res-exp)
+    
+    if ? self.next
+      # todo ...
+      # self.next.analyze(user exp, user return-type, user self, user _)
+  
+  func inst write-call()
+    write-tb-check()
+    self.func-opr.write-final()
+    self.args.write-final()
+    write(user ")")
+  
+  func dynamic write-intro()
+    self.func-opr.write-intro()
+    self.args.write-intro()
+    if ? self.res-exp
+      self.res-exp.write-intro()
+    else-if ? self.res-name
+      write-cstyle(user self.res-var.typename)
+      if not self.res-var.mtype.is-primitive
+        write(user "*")
+      write(user " ")
+      write-cstyle(user self.res-name)
+      write(user ";\n")
+      write-spaces()
+    if self.is-used
+      self.write-call()
+      write-new-indent-line()
+  
+  func dynamic write-final()
+    if self.is-used
+      if ? self.res-exp
+        self.res-exp.write-final()
+      else-if self.res-name
+        write-cstyle(user self.res-name)
+    else
+      self.write-call()
+
+
+func parse-new-operand(copy Type{Operand} opr-type, owner String text, user String ends):(owner Operand new-opr, copy Char end)
+  new As{opr-type} opr
+  new-opr := opr
+  opr.parse(owner text, user ends):(copy end)
+  var Type{Operand} next-type
+  if end = '.'
+    next-type := Member-operand
+  else-if end = '['
+    next-type := Slice-operand
+  else-if end = '('
+    next-type := Call-operand
+  else
+    opr.next := _
+    return
+  parse-new-operand(copy next-type, owner _, user ends):(owner opr.next, copy end)
+
+func parse-new-operands(owner String text, user String ends):(owner Operand new-opr, copy Char end)
+  var Type{Operand} opr-type
+  if text.length = 0
+    if end = '('
+      opr-type := Block-operand
+    else
+      f-syntax-error-c(user "unexpected", copy end)
+  else
+    var Char first(text[0])
+    if first = '\''
+      opr-type := Char-operand
+    else-if first = '"'
+      opr-type := String-operand
+    else-if first >= '0' and first <= '9'
+      opr-type := Int-operand
+    else-if text.length = 1 and first = '_'
+      opr-type := Empty-operand
+    else
+      opr-type := Var-operand
+  parse-new-operand(copy opr-type, owner text, user ends):(owner new-opr, copy end)
 
 
 class St-func(St-node)

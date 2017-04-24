@@ -11,12 +11,13 @@ typedef void Object;
 static char* _func_name_f_new_copy = "f-new-copy";
 #define MR_FUNC_NAME _func_name_f_new_copy
 Returncode f_new_copy(String* text, String** out_text) {
-  if (text == NULL) {
-    RAISE(11)
+  if (!(NULL != text)) {
+    (*out_text) = NULL;
+    return OK;
   }
   String* new_text = new_string(text->length + 1);
-  if (new_text == NULL) RAISE(12)
-  CHECK(13, String_copy(new_text, text));
+  if (new_text == NULL) RAISE(13)
+  CHECK(14, String_copy(new_text, text));
   (*out_text) = new_text;
   return OK;
 }
@@ -27,12 +28,12 @@ static char* _func_name_f_msg_raise = "f-msg-raise";
 #define MR_FUNC_NAME _func_name_f_msg_raise
 Returncode f_msg_raise(String* text, String* item) {
   String* msg = &(String){256, 0, (char[256]){0}};
-  CHECK(19, String_copy(msg, text));
-  CHECK(20, String_concat(msg, &(String){3, 2, " \""}));
-  CHECK(21, String_concat(msg, item));
-  CHECK(22, String_append(msg, '\"'));
-  CHECK(23, Sys_print(sys, msg));
-  RAISE(24)
+  CHECK(20, String_copy(msg, text));
+  CHECK(21, String_concat(msg, &(String){3, 2, " \""}));
+  CHECK(22, String_concat(msg, item));
+  CHECK(23, String_append(msg, '\"'));
+  CHECK(24, Sys_print(sys, msg));
+  RAISE(25)
 }
 #undef MR_FUNC_NAME
 
@@ -40,7 +41,7 @@ static char* _func_name_f_raise_on_null = "f-raise-on-null";
 #define MR_FUNC_NAME _func_name_f_raise_on_null
 Returncode f_raise_on_null(Object* obj, String* text, String* item) {
   if (obj == NULL) {
-    CHECK(28, f_msg_raise(text, item));
+    CHECK(29, f_msg_raise(text, item));
   }
   return OK;
 }

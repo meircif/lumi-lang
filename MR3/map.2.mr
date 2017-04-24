@@ -92,7 +92,7 @@ static Mvar(Object)
   owner String name
   owner String typename
   user Mtype mtype
-  user String sub-typename
+  owner String sub-typename
   user Mtype sub-mtype
   user Mfunc func-dec
   var Int access
@@ -121,6 +121,15 @@ func init-new-var(user Mtype mtype):(owner Mvar new-mvar)
   new Mvar mvar
   mvar.init(user mtype)
   new-mvar := mvar
+  
+func f-copy-var(user Mvar mvar, user String name):(owner Mvar new-mvar)
+  init-new-var(user mvar.mtype):(owner new-mvar)
+  f-new-copy(user name):(owner new-mvar.name)
+  f-new-copy(user mvar.sub-typename):(owner new-mvar.sub-typename)
+  new-mvar.sub-mtype := mvar.sub-mtype
+  new-mvar.func-dec := mvar.func-dec
+  new-mvar.access := mvar.access
+  new-mvar.is-ref := false
 
 func add-var(user Var-map map, owner Mvar mvar)
   map.add(user mvar.name, owner mvar)

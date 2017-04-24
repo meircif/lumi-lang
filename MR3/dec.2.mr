@@ -57,10 +57,11 @@ class St-dec(St)
         self.write-primitive()
       else
         self.write-class()
-    else-if ? self.value
-      write(user " = ")
-      self.value.write-final()
-    write(user ";")
+    else
+      if ? self.value
+        write(user " = ")
+        self.value.write-final()
+      write(user ";")
     if ? glob.mclass
       write(user "\n")
   
@@ -115,7 +116,7 @@ class St-var(St-dec)
     is-aloc := not self.mvar.mtype.is-primitive
   
   func dynamic write-primitive()
-    # nothing
+    raise
   
   func dynamic write-class()
     # Class* name = &(Class){0};
@@ -145,8 +146,7 @@ class St-var(St-dec)
   func dynamic write-array()
     # Array* name = &(Array){length, (Class[length]){0}};
     # Array* name = &(Array){length, (String[length]){0}};
-    # char _name_chars[string-length][length];
-    # _set_var_string_array(length, string-length, name, _name_chars);
+    # _set_var_string_array(length, string-length, name, (char[string-length * length]){0});
     if not (? self.arr-length)
       f-syntax-error(user "Array length missing in", user self.mvar.name)
     write(user "&(Array){")
@@ -158,23 +158,17 @@ class St-var(St-dec)
     write(user "]){0}};")
     if ? self.str-length
       write-new-indent-line()
-      write(user "char _")
-      write-cstyle(user self.mvar.name)
-      write(user "_chars[")
-      write(user self.str-length)
-      write(user "][")
-      write(user self.arr-length)
-      write(user "];\n")
-      write-spaces()
       write(user "_set_var_string_array(")
       write(user self.arr-length)
       write(user ", ")
       write(user self.str-length)
       write(user ", ")
       write-cstyle(user self.mvar.name)
-      write(user ", _")
-      write-cstyle(user self.mvar.name)
-      write(user "_chars);")
+      write(user ", (char[")
+      write(user self.str-length)
+      write(user " * ")
+      write(user self.arr-length)
+      write(user "]){0});")
 
 
 class St-ref(St-dec)
@@ -201,16 +195,16 @@ class St-ref(St-dec)
     is-aloc := false
   
   func dynamic write-primitive()
-    # nothing
+    raise
   
   func dynamic write-class()
-    # nothing
+    raise
   
   func dynamic write-string()
-    # nothing
+    raise
   
   func dynamic write-array()
-    # nothing
+    raise
 
 
 class St-new(St-var)
