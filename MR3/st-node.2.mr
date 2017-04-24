@@ -94,7 +94,8 @@ class St-node(St)
       glob.line-num := son.line-num
       write-spaces()
       son.write()
-      write(user "\n")
+      if not (? glob.mclass)
+        write(user "\n")
       son := son.next-brother
   
   # write sons
@@ -204,7 +205,11 @@ class St-root(St)
     base.analyze()
   
   func dynamic write()
-    base.write()
+    user St son(self.first-son)
+    do
+      while ? son
+      son.write()
+      son := son.next-brother
 
 
 class St-native(St-comment)

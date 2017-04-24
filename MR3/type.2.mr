@@ -33,8 +33,14 @@ class St-class(St-node)
     write-spaces()
     write(user "struct ")
     write-cstyle(user self.mtype.name)
+    glob.mclass := self.mtype
+    glob.methods := false
     base.write()
     write(user ";")
+    glob.methods := true
+    self.write-block()
+    glob.methods := false
+    glob.mclass := _
 
 
 class St-static-class(St-class)

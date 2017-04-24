@@ -199,52 +199,6 @@ func parse-new-args():(owner Arg-list new-args)
   new-args := args
 
 
-static Mfunc(Object)
-  owner String name
-  owner Arg-list args
-  var Bool is-dynamic
-  var Int dynamic-index
-  
-  func inst init(user String name)
-    f-new-copy(user name):(owner self.name)
-    new Arg-list args
-    self.args := args
-    self.args.init()
-    self.is-dynamic := false
-    self.dynamic-index := 0
-  
-  func inst parse()
-    if ? glob.mclass
-      var String{64} meth-type
-      read(user " ", user meth-type)
-      self.is-dynamic := meth-type.equal(user "dynamic")
-    else
-      self.is-dynamic := false
-    self.dynamic-index := 0
-    read-new(user "("):(owner self.name)
-    parse-new-args():(owner self.args)
-    if ? glob.mclass
-      self.args.add-param(copy ACCESS-USER, user glob.mclass, user "self")
-  
-  func inst analyze()
-    self.args.analyze()
-  
-  func inst write()
-    write(user "Returncode ")
-    write-cstyle(user self.name)
-    self.args.write-final()
-  
-  func inst m-new-var():(owner Mvar mvar)
-    init-new-var(user glob.type-func):(owner mvar)
-    f-new-copy(user self.name):(owner mvar.name)
-    mvar.func-dec := self
-
-func parse-new-mfunc():(owner Mfunc new-mfunc)
-  new Mfunc mfunc
-  mfunc.parse()
-  new-mfunc := mfunc
-
-
 class Call-operand(Operand)
   owner Arg-list args
   
@@ -316,6 +270,58 @@ func parse-new-operands(owner String text, user String ends):(owner Operand new-
   parse-new-operand(copy opr-type, owner text, user ends):(owner new-opr, copy end)
 
 
+static Mfunc(Object)
+  owner String name
+  owner Arg-list args
+  var Bool is-dynamic
+  var Int dynamic-index
+  
+  func inst init(user String name)
+    f-new-copy(user name):(owner self.name)
+    new Arg-list args
+    self.args := args
+    self.args.init()
+    self.is-dynamic := false
+    self.dynamic-index := 0
+  
+  func inst parse()
+    if ? glob.mclass
+      var String{64} meth-type
+      read(user " ", user meth-type)
+      self.is-dynamic := meth-type.equal(user "dynamic")
+    else
+      self.is-dynamic := false
+    self.dynamic-index := 0
+    read-new(user "("):(owner self.name)
+    parse-new-args():(owner self.args)
+    if ? glob.mclass
+      self.args.add-param(copy ACCESS-USER, user glob.mclass, user "self")
+  
+  func inst analyze()
+    self.args.analyze()
+  
+  func inst write-name()
+    if ? glob.mclass
+      write-cstyle(user glob.mclass.name)
+      write(user "_")
+    write-cstyle(user self.name)
+  
+  func inst write()
+    write(user "Returncode ")
+    self.write-name()
+    self.args.write-final()
+  
+  func inst m-new-var():(owner Mvar mvar)
+    init-new-var(user glob.type-func):(owner mvar)
+    f-new-copy(user self.name):(owner mvar.name)
+    mvar.func-dec := self
+
+func parse-new-mfunc():(owner Mfunc new-mfunc)
+  new Mfunc mfunc
+  mfunc.parse()
+  new-mfunc := mfunc
+
+
 class St-func(St-node)
   owner Mfunc mfunc
   
@@ -345,8 +351,26 @@ class St-func(St-node)
     base.analyze()
   
   func dynamic write()
+    if ? glob.mclass
+      if not glob.methods
+        return
+      write(user "\n")
+    write(user "static char* _func_name_")
+    self.mfunc.write-name()
+    write(user " = \"")
+    if ? glob.mclass
+      write(user glob.mclass.name)
+      write(user ".")
+    write(user self.mfunc.name)
+    write(user "\";\n")
+    write-spaces()
+    write(user "#define MR_FUNC_NAME _func_name_")
+    self.mfunc.write-name()
+    write-new-indent-line()
     self.mfunc.write()
     base.write()
+    write-new-indent-line()
+    write(user "#undef MR_FUNC_NAME")
 
 
 class St-main(St-node)

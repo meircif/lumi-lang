@@ -74,8 +74,14 @@ typedef struct {
 
 #define sys NULL
 
-String* new_string(int length);
-Array* new_array(int length, int value_size);
+String* _new_string(int length);
+Array* _new_array(int length, int value_size);
+void _set_var_string_array(
+  int array_length,
+  int string_length,
+  Array* array,
+  char** chars);
+void _set_new_string_array(int array_length, int string_length, Array* array);
 
 Returncode String_clear(String* this);
 Returncode String_length(String* this, Int* length);

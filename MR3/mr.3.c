@@ -5,7 +5,7 @@
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
 
-Returncode set_cstring(String* str) {
+Returncode _set_cstring(String* str) {
   if (str->length >= str->max_length) {
     if (strnlen(str->chars, str->max_length) >= str->max_length) {
       CRAISE
@@ -17,8 +17,8 @@ Returncode set_cstring(String* str) {
   return OK;
 }
 
-/*dynamic allocation*/
-String* new_string(int length) {
+/*allocations*/
+String* _new_string(int length) {
   void* buff = malloc(sizeof(String) + length);
   if (buff == NULL) {
     return NULL;
@@ -30,7 +30,7 @@ String* new_string(int length) {
   return str;
 }
 
-Array* new_array(int length, int value_size) {
+Array* _new_array(int length, int value_size) {
   void* buff = malloc(sizeof(Array) + length * value_size);
   if (buff == NULL) {
     return NULL;
@@ -41,9 +41,31 @@ Array* new_array(int length, int value_size) {
   return arr;
 }
 
+void _set_var_string_array(
+    int array_length,
+    int string_length,
+    Array* array,
+    char** chars) {
+  int n;
+  for (n = 0; n < array_length; ++n) {
+   ((String*)(array->values))[n] = (String){string_length, 0, chars[n]};
+  }
+}
+
+void _set_new_string_array(int array_length, int string_length, Array* array) {
+  int n;
+  for (n = 0; n < array_length; ++n) {
+   ((String*)(array->values))[n] = (String){
+     string_length,
+     0,
+     (Byte*)(array->values) + array_length * sizeof(String) + string_length * n
+   };
+  }
+}
+
 /*Files*/
-Returncode open_file(File** file, String* name, char* mode) {
-  CCHECK(set_cstring(name));
+Returncode _open_file(File** file, String* name, char* mode) {
+  CCHECK(_set_cstring(name));
   *file = NULL;
   *file = fopen(name->chars, mode);
   if (*file == NULL) {
@@ -53,11 +75,11 @@ Returncode open_file(File** file, String* name, char* mode) {
 }
 
 Returncode file_open_read(String* name, File** file) {
-  return open_file(file, name, "r");
+  return _open_file(file, name, "r");
 }
 
 Returncode file_open_write(String* name, File** file) {
-  return open_file(file, name, "w");
+  return _open_file(file, name, "w");
 }
 
 Returncode File_close(File* file) {
@@ -193,12 +215,12 @@ Returncode String_has(String* this, Char ch, Bool* found) {
 }
 
 /*Arrays*/
-Returncode array_length(Array* this, Int* out_length) {
+/*Returncode _array_length(Array* this, Int* out_length) {
   *out_length = this->length;
   return OK;
-}
+}*/
 
-/*voidtem*/
+/*system*/
 Returncode Sys_print(void* _, String* text) {
   printf("%.*s\n", text->length, text->chars);
   return OK;
@@ -210,7 +232,7 @@ Returncode Sys_exit(void* _, Int status) {
 }
 
 Returncode Sys_system(void* _, String* command, Int* status) {
-  CCHECK(set_cstring(command));
+  CCHECK(_set_cstring(command));
   int res = system(command->chars);
   if (res == -1) {
     CRAISE
@@ -220,7 +242,7 @@ Returncode Sys_system(void* _, String* command, Int* status) {
 }
 
 Returncode Sys_getenv(void* _, String* name, String* value, Bool* exists) {
-  CCHECK(set_cstring(name));
+  CCHECK(_set_cstring(name));
   char* ret = getenv(name->chars);
   if (ret == NULL) {
     *exists = false;

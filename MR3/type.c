@@ -57,8 +57,14 @@ Returncode St_class_write(St_class* self) {
   CHECK(33, write_spaces());
   CHECK(34, write(&(String){8, 7, "struct "}));
   CHECK(35, write_cstyle(self->mtype->name));
-  CHECK(36, St_node_write(&(self->_base)));
-  CHECK(37, write(&(String){2, 1, ";"}));
+  glob->mclass = self->mtype;
+  glob->methods = false;
+  CHECK(38, St_node_write(&(self->_base)));
+  CHECK(39, write(&(String){2, 1, ";"}));
+  glob->methods = true;
+  CHECK(41, St_node_write_block(&(self->_base)));
+  glob->methods = false;
+  glob->mclass = NULL;
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -71,28 +77,28 @@ typedef struct St_static_class St_static_class; struct St_static_class {
 static char* _func_name_St_static_class_parse = "St-static-class.parse";
 #define MR_FUNC_NAME _func_name_St_static_class_parse
 Returncode St_static_class_parse(St_static_class* self) {
-  CHECK(42, St_class_parse(&(self->_base)));
+  CHECK(48, St_class_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_static_class_analyze_first = "St-static-class.analyze-first";
 #define MR_FUNC_NAME _func_name_St_static_class_analyze_first
 Returncode St_static_class_analyze_first(St_static_class* self) {
-  CHECK(44, St_class_analyze_first(&(self->_base)));
+  CHECK(50, St_class_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_static_class_analyze = "St-static-class.analyze";
 #define MR_FUNC_NAME _func_name_St_static_class_analyze
 Returncode St_static_class_analyze(St_static_class* self) {
-  CHECK(46, St_class_analyze(&(self->_base)));
+  CHECK(52, St_class_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_static_class_write = "St-static-class.write";
 #define MR_FUNC_NAME _func_name_St_static_class_write
 Returncode St_static_class_write(St_static_class* self) {
-  CHECK(48, St_class_write(&(self->_base)));
+  CHECK(54, St_class_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -105,28 +111,28 @@ typedef struct St_dynamic_class St_dynamic_class; struct St_dynamic_class {
 static char* _func_name_St_dynamic_class_parse = "St-dynamic-class.parse";
 #define MR_FUNC_NAME _func_name_St_dynamic_class_parse
 Returncode St_dynamic_class_parse(St_dynamic_class* self) {
-  CHECK(53, St_class_parse(&(self->_base)));
+  CHECK(59, St_class_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_dynamic_class_analyze_first = "St-dynamic-class.analyze-first";
 #define MR_FUNC_NAME _func_name_St_dynamic_class_analyze_first
 Returncode St_dynamic_class_analyze_first(St_dynamic_class* self) {
-  CHECK(55, St_class_analyze_first(&(self->_base)));
+  CHECK(61, St_class_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_dynamic_class_analyze = "St-dynamic-class.analyze";
 #define MR_FUNC_NAME _func_name_St_dynamic_class_analyze
 Returncode St_dynamic_class_analyze(St_dynamic_class* self) {
-  CHECK(57, St_class_analyze(&(self->_base)));
+  CHECK(63, St_class_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_dynamic_class_write = "St-dynamic-class.write";
 #define MR_FUNC_NAME _func_name_St_dynamic_class_write
 Returncode St_dynamic_class_write(St_dynamic_class* self) {
-  CHECK(59, St_class_write(&(self->_base)));
+  CHECK(65, St_class_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME

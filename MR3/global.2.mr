@@ -33,8 +33,9 @@ static Global-data(Object)
   user String infile-name
   var Int line-num
   var Int spaces
-  user Mtype mclass
   user St node
+  user Mtype mclass
+  var Bool methods
   
   func inst init-op-map()
     new Op-map map
@@ -70,9 +71,15 @@ static Global-data(Object)
     map.add(user "Array"):(user self.type-array)
     map.add(user "File"):(user self.type-file)
     map.add(user "Sys"):(user self.type-sys)
+    self.type-char.is-primitive := true
+    self.type-bool.is-primitive := true
+    self.type-int.is-primitive := true
+    self.type-type.is-primitive := true
+    self.type-func.is-primitive := true
   
   func inst init()
     self.line-num := 0
+    self.methods := false
     global-key-word.text := global-key-word-text
     self.key-word := _
     self.init-op-map()
@@ -171,6 +178,10 @@ func write-tb-check()
 func write-spaces()
   for n in glob.spaces
     write-c(copy ' ')
+
+func write-new-indent-line()
+  write-c(copy '\n')
+  write-spaces()
 
 # syntax error
 func f-syntax-error(user String text, user String item)
@@ -274,12 +285,7 @@ class St(Object)
   
   # write sons
   func dynamic write()
-    user St son(self.first-son)
-    do
-      while ? son
-      glob.line-num := son.line-num
-      son.write()
-      son := son.next-brother
+    # do nothing
   
   func inst add-var(owner Mvar mvar)
     if ? glob.mclass

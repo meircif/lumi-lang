@@ -68,6 +68,7 @@ static Mtype(Object)
   owner String base-typename
   user Mtype base-mtype
   var Bool is-dynamic
+  var Bool is-primitive
   
   func inst init(owner String name)
     self.name := name
@@ -75,6 +76,7 @@ static Mtype(Object)
     self.base-typename := _
     self.base-mtype := _
     self.is-dynamic := false
+    self.is-primitive := false
 
 
 var Int ACCESS-COPY(0)
@@ -98,7 +100,10 @@ static Mvar(Object)
   
   func inst init(user Mtype mtype)
     self.name := _
-    self.typename := _
+    if ? mtype
+      f-new-copy(user mtype.name):(owner self.typename)
+    else
+      self.typename := _
     self.mtype := mtype
     self.sub-typename := _
     self.sub-mtype := _

@@ -13,6 +13,9 @@ class St-dec(St)
     if read-new(user " {"):(owner self.mvar.typename) = '{'
       if self.mvar.typename.equal(user "Array")
         self.parse-array()
+        if read-new(user "{}"):(owner self.mvar.sub-typename) = '{'
+          self.parse-string()
+          read-c()
       else-if self.mvar.typename.equal(user "String")
         self.parse-string()
       else
@@ -31,22 +34,53 @@ class St-dec(St)
       self.value.analyze()
   
   func dynamic write()
+    if ? glob.mclass and glob.methods
+      return
     if ? self.value
       self.value.write-intro()
     write-cstyle(user self.mvar.typename)
-    if self.mvar.access != ACCESS-VAR
+    if not self.mvar.mtype.is-primitive
       write(user "*")
     write(user " ")
     write-cstyle(user self.mvar.name)
-    if ? self.value
+    if self.m-is-allocation()
+      write(user " = ")
+      if self.mvar.mtype = glob.type-string
+        self.write-string()
+      else-if self.mvar.mtype = glob.type-array
+        if not (? self.mvar.sub-typename)
+          f-syntax-error(user "Array type missing in", user self.mvar.name)
+        self.write-array()
+      else-if self.mvar.mtype.is-primitive
+        self.write-primitive()
+      else
+        self.write-class()
+    else-if ? self.value
       write(user " = ")
       self.value.write-final()
     write(user ";")
+    if ? glob.mclass
+      write(user "\n")
   
   func dynamic parse-array()
     # nothing
   
   func dynamic parse-string()
+    # nothing
+  
+  func dynamic m-is-allocation():(copy Bool is-aloc)
+    # nothing
+  
+  func dynamic write-primitive()
+    # nothing
+  
+  func dynamic write-class()
+    # nothing
+  
+  func dynamic write-string()
+    # nothing
+  
+  func dynamic write-array()
     # nothing
 
 
@@ -64,18 +98,81 @@ class St-var(St-dec)
     
   func dynamic analyze()
     base.analyze()
+    # f-syntax-error(user "cannot initialize variable of type", user self.mvar.typename)
     
   func dynamic write()
     base.write()
   
   func dynamic parse-array()
     read-new(user ":"):(owner self.arr-length)
-    if read-new(user "{}"):(owner self.mvar.sub-typename) = '{'
-      read-new(user "}"):(owner self.str-length)
-      read-c()
   
   func dynamic parse-string()
     read-new(user "}"):(owner self.str-length)
+  
+  func dynamic m-is-allocation():(copy Bool is-aloc)
+    is-aloc := not self.mvar.mtype.is-primitive
+  
+  func dynamic write-primitive()
+    # nothing
+  
+  func dynamic write-class()
+    # Class* name = &(Class){0};
+    write(user "&(")
+    write-cstyle(user self.mvar.typename)
+    write(user "){0};")
+  
+  func dynamic write-string()
+    # String* name = &(String){length, 0, (char[length]){0}};
+    # CHECK(line-num, String_copy(name, init));
+    if not (? self.str-length)
+      f-syntax-error(user "String length missing in", user self.mvar.name)
+    write(user "&(String){")
+    write(user self.str-length)
+    write(user ", 0, (char[")
+    write(user self.str-length)
+    write(user "]){0}};")
+    if ? self.value
+      write-new-indent-line()
+      write-tb-check()
+      write(user "String_copy(")
+      write-cstyle(user self.mvar.name)
+      write(user ", ")
+      self.value.write-final()
+      write(user "))")
+  
+  func dynamic write-array()
+    # Array* name = &(Array){length, (Class[length]){0}};
+    # Array* name = &(Array){length, (String[length]){0}};
+    # char _name_chars[string-length][length];
+    # _set_var_string_array(length, string-length, name, _name_chars);
+    if not (? self.arr-length)
+      f-syntax-error(user "Array length missing in", user self.mvar.name)
+    write(user "&(Array){")
+    write(user self.arr-length)
+    write(user ", (")
+    write-cstyle(user self.mvar.sub-typename)
+    write(user "[")
+    write(user self.arr-length)
+    write(user "]){0}};")
+    if ? self.str-length
+      write-new-indent-line()
+      write(user "char _")
+      write-cstyle(user self.mvar.name)
+      write(user "_chars[")
+      write(user self.str-length)
+      write(user "][")
+      write(user self.arr-length)
+      write(user "];\n")
+      write-spaces()
+      write(user "_set_var_string_array(")
+      write(user self.arr-length)
+      write(user ", ")
+      write(user self.str-length)
+      write(user ", ")
+      write-cstyle(user self.mvar.name)
+      write(user ", _")
+      write-cstyle(user self.mvar.name)
+      write(user "_chars);")
 
 
 class St-ref(St-dec)
@@ -93,13 +190,31 @@ class St-ref(St-dec)
     base.write()
   
   func dynamic parse-array()
-    read-new(user "}"):(owner self.mvar.sub-typename)
+    # nothing
   
   func dynamic parse-string()
     f-syntax-error(user "unexpected parameter to String", user "")
+  
+  func dynamic m-is-allocation():(copy Bool is-aloc)
+    is-aloc := false
+  
+  func dynamic write-primitive()
+    # nothing
+  
+  func dynamic write-class()
+    # nothing
+  
+  func dynamic write-string()
+    # nothing
+  
+  func dynamic write-array()
+    # nothing
 
 
 class St-new(St-var)
+  owner Mexp arr-length
+  owner Mexp str-length
+  
   func dynamic parse()
     base.parse()
     self.mvar.access := ACCESS-OWNER
@@ -108,16 +223,81 @@ class St-new(St-var)
     base.analyze-first()
   
   func dynamic analyze()
+    if ? self.value
+      f-syntax-error(user "cannot initialize in", user "new")
+    if ? self.str-length
+      self.str-length.analyze()
+    if ? self.arr-length
+      self.arr-length.analyze()
     base.analyze()
   
   func dynamic write()
     base.write()
   
   func dynamic parse-array()
-    base.parse-array()
+    parse-new-exp(user ":"):(owner self.arr-length)
   
   func dynamic parse-string()
-    base.parse-string()
+    parse-new-exp(user "}"):(owner self.str-length)
+  
+  func dynamic m-is-allocation():(copy Bool is-aloc)
+    is-aloc := true
+  
+  func inst write-check()
+    # if (name == NULL) RAISE(line-num)
+    write-new-indent-line()
+    write(user "if (")
+    write-cstyle(user self.mvar.name)
+    write(user " == NULL) ")
+    write-tb-raise()
+  
+  func dynamic write-primitive()
+    f-syntax-error(user "new not supported for primitive ", user self.mvar.name)
+  
+  func dynamic write-class()
+    # Class* name = malloc(sizeof(Class));
+    write(user "malloc(sizeof(")
+    write-cstyle(user self.mvar.typename)
+    write(user "));")
+    self.write-check()
+  
+  func dynamic write-string()
+    # String* name = new_string(length);
+    if not (? self.str-length)
+      f-syntax-error(user "String length missing in", user self.mvar.name)
+    self.str-length.write-intro()
+    write(user "_new_string(")
+    self.str-length.write-final()
+    write(user ");")
+    self.write-check()
+  
+  func dynamic write-array()
+    # Array* name = new_array(length, sizeof(Class));
+    # Array* name = new_array(length, sizeof(String) + (string-length));
+    # _set_new_string_array(length, string-length, name);
+    if not (? self.arr-length)
+      f-syntax-error(user "Array length missing in", user self.mvar.name)
+    self.arr-length.write-intro()
+    if ? self.str-length
+      self.str-length.write-intro()
+    write(user "_new_array(")
+    self.arr-length.write-final()
+    write(user ", sizeof(")
+    write-cstyle(user self.mvar.sub-typename)
+    if ? self.str-length
+      write(user ") + (")
+      self.str-length.write-final()
+    write(user "));")
+    self.write-check()
+    if ? self.str-length
+      write-new-indent-line()
+      write(user "_set_new_string_array(")
+      self.arr-length.write-final()
+      write(user ", ")
+      self.str-length.write-final()
+      write(user ", ")
+      write-cstyle(user self.mvar.name)
+      write(user ");")
 
 
 class St-delete(St-comment)
