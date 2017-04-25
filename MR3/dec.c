@@ -66,7 +66,7 @@ static char* _func_name_St_dec_analyze = "St-dec.analyze";
 #define MR_FUNC_NAME _func_name_St_dec_analyze
 Returncode St_dec_analyze(St_dec* self) {
   if (NULL != self->value) {
-    CHECK(34, Mexp_analyze(self->value));
+    CHECK(34, Mexp_analyze_types(self->value, self->mvar->mtype, self->mvar->sub_mtype));
   }
   return OK;
 }
@@ -425,10 +425,10 @@ Returncode St_new_analyze(St_new* self) {
     CHECK(223, f_syntax_error(&(String){21, 20, "cannot initialize in"}, &(String){4, 3, "new"}));
   }
   if (NULL != self->str_length) {
-    CHECK(225, Mexp_analyze(self->str_length));
+    CHECK(225, Mexp_analyze_type(self->str_length, glob->type_int));
   }
   if (NULL != self->arr_length) {
-    CHECK(227, Mexp_analyze(self->arr_length));
+    CHECK(227, Mexp_analyze_type(self->arr_length, glob->type_int));
   }
   CHECK(228, St_var_analyze(&(self->_base)));
   return OK;

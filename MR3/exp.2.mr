@@ -8,15 +8,12 @@ class Operand(Object)
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     # nothing
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
     # nothing
   func dynamic write-intro()
     # nothing
   func dynamic write-final()
     # nothing
-  
-  func inst analyze-all(user Mexp exp)
-    self.analyze(user exp, user _, user _, user _)
   
   func inst write-all-intro()
     self.write-intro()
@@ -42,12 +39,21 @@ static Mexp(Object)
   owner Operand operand
   owner String operator
   owner Mexp next
+  var Int base-count
   var Bool is-used
+  
+  func inst init()
+    self.operand := _
+    self.operator := _
+    self.next := _
+    self.is-used := true
+    self.base-count := 0
   
   native func parse(owner String text, user String ends):(copy Char end)
   
   func inst parse-new-with-text(owner String text, user String ends):(owner Mexp new-exp, copy Char end)
     new Mexp exp
+    exp.init()
     exp.parse(owner text, user ends):(copy end)
     new-exp := exp
   
@@ -66,7 +72,6 @@ static Mexp(Object)
       self.parse-new(user ends):(owner new-exp, copy end)
   
   func inst parse(owner String text, user String ends):(copy Char end)
-    self.is-used := true
     if end = ' ' and ? glob.op-map.find(user text)
       self.operator := text
       read-new-value(user ends):(owner text, copy end)
@@ -75,21 +80,68 @@ static Mexp(Object)
         self.operand := _
         self.parse-new-with-text(user text, user ends):(owner self.next, copy end)
         return
-      
-    else
-      self.operator := _
     
     parse-new-operands(owner text, user ends):(owner self.operand, copy end)
     if end = ' ' and not ends.has(copy ' ')
       self.parse-new(user ends):(owner self.next, copy end)
-    else
-      self.next := _
   
-  func inst analyze()
+  func inst f-count-bases(user Mtype target-mtype):(user Mtype mtype, copy Int base-count)
+    if not (? target-mtype)
+      return
+    if not (? mtype)
+      f-syntax-error(user "got no value, expected", user target-mtype.name)
+    base-count := 0
+    if target-mtype = glob.type-bool and mtype.is-primitive
+      mtype := glob.type-bool
+      return
+    if target-mtype = glob.type-char and mtype = glob.type-int
+      mtype := glob.type-char
+      return
+    if target-mtype = glob.type-int and mtype = glob.type-char
+      mtype := glob.type-int
+      return
+    user Mtype orig-mtype(mtype)
+    do
+      while mtype != target-mtype
+      mtype := mtype.base-mtype
+      if not (? mtype)
+        f-syntax-error2(user "got", user orig-mtype.name, user "expected", user target-mtype.name)
+      base-count := base-count + 1
+  
+  func inst analyze():(user Mtype mtype, user Mtype sub-mtype)
+    # self.is-used := ? mtype or ? self.operator or ? self.next
     if ? self.operand
-      self.operand.analyze(user self, user _, user _, user _)
+      user Mtype target-mtype(mtype)
+      user Mtype target-sub-mtype(sub-mtype)
+      self.operand.analyze(user self, user _, user _):(user mtype, user sub-mtype)
+      if ? self.operator and ? mtype
+        if self.operator.equal(user "?")
+          if mtype.is-primitive
+            f-syntax-error(user "? on primitive type", user mtype.name)
+          mtype := glob.type-bool
+          sub-mtype := _
+      self.f-count-bases(user target-mtype):(user mtype, copy self.base-count)
+      self.f-count-bases(user target-sub-mtype):(user sub-mtype)
+    
     if ? self.next
-      self.next.analyze()
+      self.next.analyze():(user mtype, user sub-mtype)
+  
+  func inst analyze-types(user Mtype target-mtype, user Mtype target-sub-mtype)
+    user Mtype mtype(target-mtype)
+    user Mtype sub-mtype(target-sub-mtype)
+    self.analyze():(user mtype, user sub-mtype)
+    if not (? mtype)
+      f-syntax-error(user "got no value, expected", user target-mtype.name)
+    if mtype != target-mtype
+      f-syntax-error2(user "got", user mtype.name, user "expected", user target-mtype.name)
+    if ? target-sub-mtype
+      if not (? sub-mtype)
+        f-syntax-error(user "got no sub-type, expected", user target-sub-mtype.name)
+      if sub-mtype != target-sub-mtype
+        f-syntax-error2(user "got sub-type", user sub-mtype.name, user "expected", user target-sub-mtype.name)
+  
+  func inst analyze-type(user Mtype target-mtype)
+    self.analyze-types(user target-mtype, user _)
   
   func inst write-all-final(copy Bool is-binary)
     if ? self.operator
@@ -102,7 +154,14 @@ static Mexp(Object)
       if is-binary
         write(user " ")
     if ? self.operand
+      if self.base-count > 0
+        write(user "&(")
       self.operand.write-all-final()
+      if self.base-count > 0
+        write(user "->_base")
+        for n in 1:self.base-count
+          write(user "._base")
+        write(user ")")
     if ? self.next
       self.next.write-all-final(copy true)
   
@@ -127,16 +186,20 @@ native func m-find-var(user String name):(user Mvar mvar)
 class Var-operand(Operand)
   owner String name
   user Mvar mvar
+  var Int base-count
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     self.name := text
     self.mvar := _
+    self.base-count := 0
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
     if not (? m-find-var(user self.name):(user self.mvar))
       f-syntax-error(user "unknow variable", user self.name)
+    mtype := self.mvar.mtype
+    sub-mtype := self.mvar.sub-mtype
     if ? self.next
-      self.next.analyze(user exp, user self.mvar.mtype, user self, user self)
+      self.next.analyze(user exp, user self, user self):(user mtype, user sub-mtype)
   
   func dynamic write-intro()
     # nothing
@@ -168,9 +231,11 @@ class Char-operand(Operand)
       f-syntax-error(user "illegal character constant", user text)
     self.text := text
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    mtype := glob.type-char
+    sub-mtype := _
     if ? self.next
-      self.next.analyze(user exp, user glob.type-char, user self, user _)
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
   
   func dynamic write-intro()
     # nothing
@@ -186,9 +251,11 @@ class String-operand(Operand)
       f-syntax-error(user "illegal string constant", user text)
     self.text := text
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    mtype := glob.type-string
+    sub-mtype := _
     if ? self.next
-      self.next.analyze(user exp, user glob.type-string, user self, user _)
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
   
   func dynamic write-intro()
     # nothing
@@ -225,9 +292,11 @@ class Int-operand(Operand)
       self.value := self.value * 10 + ch - '0'
     self.text := text
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    mtype := glob.type-int
+    sub-mtype := _
     if ? self.next
-      self.next.analyze(user exp, user glob.type-int, user self, user _)
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
   
   func dynamic write-intro()
     # nothing
@@ -240,9 +309,9 @@ class Empty-operand(Operand)
   func dynamic parse(owner String text, user String ends):(copy Char end)
     delete text
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
-    if ? self.next
-      f-syntax-error(user "no members for", user "empty")
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    if not (? mtype) or ? self.next or mtype.is-primitive
+      f-syntax-error-c(user "illegal use of value", user '_')
   
   func dynamic write-intro()
     # nothing
@@ -260,11 +329,10 @@ class Block-operand(Operand)
       f-syntax-error(user "missing", user ")")
     read-c():(copy end)
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
-    self.exp.analyze()
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    self.exp.analyze():(user mtype, user sub-mtype)
     if ? self.next
-      # todo ...
-      # self.next.analyze(user exp, user exp-type, user self, user _)
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
   
   func dynamic write-intro()
     self.exp.write-intro()
@@ -276,43 +344,77 @@ class Block-operand(Operand)
 
 
 class Member-operand(Var-operand)
-  var Int base-count
-  user Mtype mtype
+  user Mtype prev-mtype
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     self.base-count := 0
     read-new-value(user ends):(owner self.name, copy end)
   
-  func dynamic analyze(user Mexp exp, user Mtype var-mtype, user Operand member, user Member-operand method)
-    user Mtype mtype(var-mtype)
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
     do
       while not (? mtype.members.find(user self.name):(user self.mvar))
       mtype := mtype.base-mtype
       if not (? mtype)
-        f-syntax-error2(user "type", user var-mtype.name, user "has no member", user self.name)
+        f-syntax-error2(user "type", user self.prev-mtype.name, user "has no member", user self.name)
       self.base-count := self.base-count + 1
-    self.mtype := var-mtype
+    self.prev-mtype := mtype
+    mtype := self.mvar.mtype
+    sub-mtype := self.mvar.sub-mtype
     if ? self.next
       if ? self.mvar.func-dec
-        self.next.analyze(user exp, user self.mvar.mtype, user member, user self)
+        self.next.analyze(user exp, user member, user self):(user mtype, user sub-mtype)
       else
-        self.next.analyze(user exp, user self.mvar.mtype, user self, user self)
+        self.next.analyze(user exp, user self, user self):(user mtype, user sub-mtype)
   
   func dynamic write-intro()
     # nothing
   
   func dynamic write-final()
     if ? self.mvar.func-dec
-      user Mtype mtype(self.mtype)
-      for n in self.base-count
-        mtype := mtype.base-mtype
-      write-cstyle(user mtype.name)
+      write-cstyle(user self.prev-mtype.name)
       write(user "_")
     else
       write(user "->")
       for n in self.base-count
         write(user "_base.")
     base.write-final()
+
+
+class Base-meth-operand(Operand)
+  owner Member-operand member
+  var Bool first
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    delete text
+    new Member-operand member
+    self.member := member
+    self.member.parse(owner _, user ends):(copy end)
+    self.member.next := _
+    if end != '('
+      f-syntax-error(user "not a method", user self.member.mvar.name)
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    sub-mtype := _
+    self.first := not (? member)
+    if self.first
+      user Mvar mvar
+      if not (? m-find-var(user "self"):(user mvar))
+        f-syntax-error(user "not a method, cannot use", user "base")
+      mtype := mvar.mtype
+    if not (? mtype.base-mtype)
+      f-syntax-error(user "no subtype for type", user mtype.name)
+    mtype := mtype.base-mtype
+    self.member.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+    self.member.base-count := self.member.base-count + 1
+    self.next.analyze(user exp, user self, user self.member):(user mtype, user sub-mtype)
+    self.member := _
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    if self.first
+      write(user "self")
 
 
 class Slice-operand(Operand)
@@ -332,27 +434,30 @@ class Slice-operand(Operand)
       f-syntax-error(user "missing", user "]")
     read-c():(copy end)
   
-  func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
-    if mtype != glob.type-array and mtype != glob.type-string
-      f-syntax-error(user "non-sliceable type", user mtype.name)
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
     self.seq-type := mtype
-    if mtype = glob.type-string
-      self.item-type := _
-    else
-      if not (? method)
-        raise
-      self.item-type := method.mvar.sub-mtype
-      if not (? self.item-type)
-        f-syntax-error(user "missing sub-type for array", user method.mvar.name)
+    self.item-type := sub-mtype
+    if self.seq-type != glob.type-array and self.seq-type != glob.type-string
+      f-syntax-error(user "non-sliceable type", user self.seq-type.name)
+    if not (? self.second-index)
+      sub-mtype := _
+      if self.seq-type = glob.type-string
+        mtype := glob.type-char
+      else-if ? self.item-type
+        mtype := self.item-type
+      else
+        f-syntax-error(user "missing sub-type for array", user "")
+    
     self.seq := exp.operand
     exp.operand := self
     member.next := _
-    self.index.analyze()
+    
+    self.index.analyze-type(user glob.type-int)
     if ? self.second-index
-      self.second-index.analyze()
+      self.second-index.analyze-type(user glob.type-int)
+    
     if ? self.next
-      # todo ...
-      # self.next.analyze(user exp, user array-type, user self, user _)
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
   
   func dynamic write-intro()
     self.index.write-intro()
@@ -424,7 +529,9 @@ class St-exp(St)
     # do nothing
   
   func dynamic analyze()
-    self.exp.analyze()
+    user Mtype mtype(_)
+    user Mtype sub-mtype(_)
+    self.exp.analyze():(user mtype, user sub-mtype)
   
   func dynamic write()
     self.exp.write-intro()

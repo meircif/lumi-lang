@@ -26,7 +26,7 @@ Returncode St_if_analyze_first(St_if* self) {
 static char* _func_name_St_if_analyze = "St-if.analyze";
 #define MR_FUNC_NAME _func_name_St_if_analyze
 Returncode St_if_analyze(St_if* self) {
-  CHECK(14, Mexp_analyze(self->condition));
+  CHECK(14, Mexp_analyze_type(self->condition, glob->type_bool));
   CHECK(15, St_node_analyze(&(self->_base)));
   return OK;
 }
@@ -186,7 +186,7 @@ Returncode St_while_analyze_first(St_while* self) {
 static char* _func_name_St_while_analyze = "St-while.analyze";
 #define MR_FUNC_NAME _func_name_St_while_analyze
 Returncode St_while_analyze(St_while* self) {
-  CHECK(90, Mexp_analyze(self->condition));
+  CHECK(90, Mexp_analyze_type(self->condition, glob->type_bool));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -243,9 +243,9 @@ static char* _func_name_St_for_analyze = "St-for.analyze";
 #define MR_FUNC_NAME _func_name_St_for_analyze
 Returncode St_for_analyze(St_for* self) {
   if (NULL != self->start) {
-    CHECK(123, Mexp_analyze(self->start));
+    CHECK(123, Mexp_analyze_type(self->start, glob->type_int));
   }
-  CHECK(124, Mexp_analyze(self->end));
+  CHECK(124, Mexp_analyze_type(self->end, glob->type_int));
   CHECK(125, St_node_analyze(&(self->_base)));
   return OK;
 }

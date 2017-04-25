@@ -61,7 +61,7 @@ func f-create-global-var-map()
   # Int
   add-global-func(user glob.type-int, user "str"):(owner meth)
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "str")
-  meth.args.add-param(copy ACCESS-COPY, user glob.type-int, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-int, user "self")
   
   # Bool
   add-glob-var(user glob.type-bool, user "true")
@@ -71,63 +71,63 @@ func f-create-global-var-map()
   add-member(user glob.type-string, user "length", user glob.type-int)
   
   add-global-func(user glob.type-string, user "clear"):(owner meth)
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   add-global-func(user glob.type-string, user "equal"):(owner meth)
   meth.args.add-out(copy ACCESS-COPY, user glob.type-bool, user "equal")
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "pattern")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   add-global-func(user glob.type-string, user "get"):(owner meth)
   meth.args.add-out(copy ACCESS-COPY, user glob.type-char, user "ch")
   meth.args.add-param(copy ACCESS-COPY, user glob.type-int, user "index")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   add-global-func(user glob.type-string, user "append"):(owner meth)
   meth.args.add-param(copy ACCESS-COPY, user glob.type-char, user "ch")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   add-global-func(user glob.type-string, user "copy"):(owner meth)
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "other")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   add-global-func(user glob.type-string, user "concat"):(owner meth)
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "other")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   add-global-func(user glob.type-string, user "find"):(owner meth)
   meth.args.add-out(copy ACCESS-COPY, user glob.type-int, user "index")
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "pattern")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   add-global-func(user glob.type-string, user "replace"):(owner meth)
   meth.args.add-param(copy ACCESS-COPY, user glob.type-char, user "newch")
   meth.args.add-param(copy ACCESS-COPY, user glob.type-char, user "oldch")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   add-global-func(user glob.type-string, user "has"):(owner meth)
   meth.args.add-out(copy ACCESS-COPY, user glob.type-bool, user "equal")
   meth.args.add-param(copy ACCESS-COPY, user glob.type-char, user "ch")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
   # Array
   add-member(user glob.type-array, user "length", user glob.type-int)
   
   # File
   add-global-func(user glob.type-file, user "close"):(owner meth)
-  meth.args.add-param(copy ACCESS-USER, user glob.type-file, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-file, user "self")
   
   add-global-func(user glob.type-file, user "getc"):(owner meth)
   meth.args.add-out(copy ACCESS-COPY, user glob.type-char, user "ch")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-file, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-file, user "self")
   
   add-global-func(user glob.type-file, user "putc"):(owner meth)
   meth.args.add-param(copy ACCESS-COPY, user glob.type-char, user "ch")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-file, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-file, user "self")
   
   add-global-func(user glob.type-file, user "write"):(owner meth)
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "text")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-file, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-file, user "self")
   
   add-global-func(user _, user "file-open-read"):(owner meth)
   meth.args.add-out(copy ACCESS-OWNER, user glob.type-file, user "file")
@@ -140,22 +140,22 @@ func f-create-global-var-map()
   # Sys
   add-global-func(user glob.type-sys, user "print"):(owner meth)
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "text")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-sys, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-sys, user "self")
   
   add-global-func(user glob.type-sys, user "exit"):(owner meth)
   meth.args.add-param(copy ACCESS-COPY, user glob.type-int, user "status")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-sys, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-sys, user "self")
   
   add-global-func(user glob.type-sys, user "system"):(owner meth)
   meth.args.add-out(copy ACCESS-COPY, user glob.type-int, user "status")
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "command")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-sys, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-sys, user "self")
   
   add-global-func(user glob.type-sys, user "getenv"):(owner meth)
   meth.args.add-out(copy ACCESS-COPY, user glob.type-bool, user "exists")
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "value")
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "name")
-  meth.args.add-param(copy ACCESS-USER, user glob.type-sys, user "self")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-sys, user "self")
   
   add-glob-var(user glob.type-sys, user "sys")
 

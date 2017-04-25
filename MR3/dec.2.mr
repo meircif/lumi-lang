@@ -31,7 +31,7 @@ class St-dec(St)
   
   func dynamic analyze()
     if ? self.value
-      self.value.analyze()
+      self.value.analyze-types(user self.mvar.mtype, user self.mvar.sub-mtype)
   
   func dynamic write()
     if ? glob.mclass
@@ -222,9 +222,9 @@ class St-new(St-var)
     if ? self.value
       f-syntax-error(user "cannot initialize in", user "new")
     if ? self.str-length
-      self.str-length.analyze()
+      self.str-length.analyze-type(user glob.type-int)
     if ? self.arr-length
-      self.arr-length.analyze()
+      self.arr-length.analyze-type(user glob.type-int)
     base.analyze()
   
   func dynamic write()
