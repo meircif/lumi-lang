@@ -4,9 +4,9 @@
 #include "global.c"
 #include "exp.c"
 #include "st-node.c"
+#include "flow.c"
 #include "func.c"
 #include "dec.c"
-#include "flow.c"
 #include "type.c"
 
 static char* _mr_file10_name = "mr3-compiler.2.mr";

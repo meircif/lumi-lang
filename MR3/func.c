@@ -1,5 +1,5 @@
-static char* _mr_file6_name = "func.2.mr";
-#define MR_FILE_NAME _mr_file6_name
+static char* _mr_file7_name = "func.2.mr";
+#define MR_FILE_NAME _mr_file7_name
 /* MR3 compiler - function */
 
 static char* _func_name_f_get_access = "f-get-access";
@@ -814,7 +814,11 @@ static char* _func_name_St_func_analyze = "St-func.analyze";
 #define MR_FUNC_NAME _func_name_St_func_analyze
 Returncode St_func_analyze(St_func* self) {
   CHECK(455, Mfunc_analyze(self->mfunc));
-  CHECK(456, St_node_analyze(&(self->_base)));
+  St_return* st_return = malloc(sizeof(St_return));
+  if (st_return == NULL) RAISE(456)
+  *((Func**)(st_return)) = St_return__dtl;
+  CHECK(457, St_init(&(st_return->_base), &(self->_base._base)));
+  CHECK(458, St_node_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -825,28 +829,28 @@ Returncode St_func_write(St_func* self) {
     if (!glob->methods) {
       return OK;
     }
-    CHECK(462, write_new_indent_line());
+    CHECK(464, write_new_indent_line());
   }
-  CHECK(463, write(&(String){25, 24, "static char* _func_name_"}));
-  CHECK(464, Mfunc_write_name(self->mfunc));
-  CHECK(465, write(&(String){5, 4, " = \""}));
+  CHECK(465, write(&(String){25, 24, "static char* _func_name_"}));
+  CHECK(466, Mfunc_write_name(self->mfunc));
+  CHECK(467, write(&(String){5, 4, " = \""}));
   if (NULL != glob->mclass) {
-    CHECK(467, write(glob->mclass->name));
-    CHECK(468, write(&(String){2, 1, "."}));
+    CHECK(469, write(glob->mclass->name));
+    CHECK(470, write(&(String){2, 1, "."}));
   }
-  CHECK(469, write(self->mfunc->name));
-  CHECK(470, write(&(String){4, 3, "\";\n"}));
-  CHECK(471, write_spaces());
-  CHECK(472, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
-  CHECK(473, Mfunc_write_name(self->mfunc));
-  CHECK(474, write_new_indent_line());
-  CHECK(475, Mfunc_write(self->mfunc));
+  CHECK(471, write(self->mfunc->name));
+  CHECK(472, write(&(String){4, 3, "\";\n"}));
+  CHECK(473, write_spaces());
+  CHECK(474, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
+  CHECK(475, Mfunc_write_name(self->mfunc));
+  CHECK(476, write_new_indent_line());
+  CHECK(477, Mfunc_write(self->mfunc));
   Mtype* mclass = glob->mclass;
   glob->mclass = NULL;
-  CHECK(478, St_node_write(&(self->_base)));
+  CHECK(480, St_node_write(&(self->_base)));
   glob->mclass = mclass;
-  CHECK(480, write_new_indent_line());
-  CHECK(481, write(&(String){20, 19, "#undef MR_FUNC_NAME"}));
+  CHECK(482, write_new_indent_line());
+  CHECK(483, write(&(String){20, 19, "#undef MR_FUNC_NAME"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -859,29 +863,29 @@ typedef struct St_main St_main; struct St_main {
 static char* _func_name_St_main_parse = "St-main.parse";
 #define MR_FUNC_NAME _func_name_St_main_parse
 Returncode St_main_parse(St_main* self) {
-  CHECK(486, St_func_parse(&(self->_base)));
+  CHECK(488, St_func_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze_first = "St-main.analyze-first";
 #define MR_FUNC_NAME _func_name_St_main_analyze_first
 Returncode St_main_analyze_first(St_main* self) {
-  CHECK(489, St_func_analyze_first(&(self->_base)));
+  CHECK(491, St_func_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze = "St-main.analyze";
 #define MR_FUNC_NAME _func_name_St_main_analyze
 Returncode St_main_analyze(St_main* self) {
-  CHECK(492, St_func_analyze(&(self->_base)));
+  CHECK(494, St_func_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_write = "St-main.write";
 #define MR_FUNC_NAME _func_name_St_main_write
 Returncode St_main_write(St_main* self) {
-  CHECK(495, St_func_write(&(self->_base)));
-  CHECK(496, write(&(String){12, 11, "\n\nMAIN_FUNC"}));
+  CHECK(497, St_func_write(&(self->_base)));
+  CHECK(498, write(&(String){12, 11, "\n\nMAIN_FUNC"}));
   return OK;
 }
 #undef MR_FUNC_NAME

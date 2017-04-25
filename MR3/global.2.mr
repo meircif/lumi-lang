@@ -242,6 +242,7 @@ class St(Object)
   var Int line-num
   owner Var-map var-map
   owner Var-map sons-var-map
+  var Bool is-else
   
   func inst init(user St father)
     self.next-brother := _
@@ -249,8 +250,9 @@ class St(Object)
     self.last-son := _
     self.father := father
     self.line-num := glob.line-num
-    self.sons-var-map := _
     self.var-map := _
+    self.sons-var-map := _
+    self.is-else := false
     if ? father
       if ? father.last-son
         father.last-son.next-brother := self

@@ -384,6 +384,7 @@ typedef struct St St; struct St {
   Int line_num;
   Var_map* var_map;
   Var_map* sons_var_map;
+  Bool is_else;
   /* analyze sons */
   /* analyze sons */
   /* write sons */
@@ -396,8 +397,9 @@ Returncode St_init(St* self, St* father) {
   self->last_son = NULL;
   self->father = father;
   self->line_num = glob->line_num;
-  self->sons_var_map = NULL;
   self->var_map = NULL;
+  self->sons_var_map = NULL;
+  self->is_else = false;
   if (NULL != father) {
     if (NULL != father->last_son) {
       father->last_son->next_brother = self;
@@ -407,7 +409,7 @@ Returncode St_init(St* self, St* father) {
       father->first_son = self;
     }
     if (NULL != father->sons_var_map) {
-      CHECK(261, f_copy_new_var_map(father->sons_var_map, &(self->var_map)));
+      CHECK(263, f_copy_new_var_map(father->sons_var_map, &(self->var_map)));
     }
   }
   return OK;
@@ -428,7 +430,7 @@ Returncode St_analyze_first(St* self) {
     if (!(NULL != son)) break;
     glob->line_num = son->line_num;
     glob->node = son;
-    CHECK(273, (*((Func**)(son)))[1](son));
+    CHECK(275, (*((Func**)(son)))[1](son));
     son = son->next_brother;
   }
   glob->node = self;
@@ -443,7 +445,7 @@ Returncode St_analyze(St* self) {
     if (!(NULL != son)) break;
     glob->line_num = son->line_num;
     glob->node = son;
-    CHECK(284, (*((Func**)(son)))[2](son));
+    CHECK(286, (*((Func**)(son)))[2](son));
     son = son->next_brother;
   }
   glob->node = self;
@@ -461,14 +463,14 @@ static char* _func_name_St_add_var = "St.add-var";
 #define MR_FUNC_NAME _func_name_St_add_var
 Returncode St_add_var(St* self, Mvar* mvar) {
   if (NULL != glob->mclass) {
-    CHECK(294, add_var(glob->mclass->members, mvar));
+    CHECK(296, add_var(glob->mclass->members, mvar));
   }
   else {
     if (NULL != self->father && NULL != self->father->sons_var_map) {
-      CHECK(296, add_var(self->father->sons_var_map, mvar));
+      CHECK(298, add_var(self->father->sons_var_map, mvar));
     }
     else {
-      CHECK(298, add_var(glob->var_map, mvar));
+      CHECK(300, add_var(glob->var_map, mvar));
     }
   }
   return OK;
@@ -478,16 +480,16 @@ static char* _func_name_St_m_find_var = "St.m-find-var";
 #define MR_FUNC_NAME _func_name_St_m_find_var
 Returncode St_m_find_var(St* self, String* name, Mvar** mvar) {
   if (NULL != self->var_map) {
-    CHECK(302, Var_map_find(self->var_map, name, &((*mvar))));
+    CHECK(304, Var_map_find(self->var_map, name, &((*mvar))));
     if (NULL != (*mvar)) {
       return OK;
     }
   }
   if (NULL != self->father) {
-    CHECK(306, St_m_find_var(self->father, name, &((*mvar))));
+    CHECK(308, St_m_find_var(self->father, name, &((*mvar))));
   }
   else {
-    CHECK(308, Var_map_find(glob->var_map, name, &((*mvar))));
+    CHECK(310, Var_map_find(glob->var_map, name, &((*mvar))));
   }
   return OK;
 }
@@ -497,7 +499,7 @@ Func St__dtl[] = {St_parse, St_analyze_first, St_analyze, St_write};
 static char* _func_name_m_find_var = "m-find-var";
 #define MR_FUNC_NAME _func_name_m_find_var
 Returncode m_find_var(String* name, Mvar** mvar) {
-  CHECK(311, St_m_find_var(glob->node, name, &((*mvar))));
+  CHECK(313, St_m_find_var(glob->node, name, &((*mvar))));
   return OK;
 }
 #undef MR_FUNC_NAME
