@@ -100,14 +100,18 @@ class St-node(St)
       son := son.next-brother
   
   # write sons
-  func dynamic write()
-    write(user " {\n")
+  func inst write-indent-block()
     var Int my-spaces(glob.spaces)
     glob.spaces := my-spaces + 2
     self.write-block()
     glob.spaces := my-spaces
     write-spaces()
     write(user "}")
+  
+  # write sons
+  func dynamic write()
+    write(user " {\n")
+    self.write-indent-block()
 
 
 class St-file(St-node)

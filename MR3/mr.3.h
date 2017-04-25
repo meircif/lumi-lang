@@ -13,7 +13,7 @@ typedef unsigned char Byte;
 typedef struct {
   int max_length;
   int length;
-  char* chars;
+  char* values;
 } String;
 
 typedef enum {
@@ -61,8 +61,8 @@ typedef struct {
   Array* args_array = &(Array){argc, args_strings}; \
   int arg; \
   for (arg = 0; arg < argc; ++arg) { \
-    args_strings[arg].chars = argv[arg]; \
-    args_strings[arg].length = strnlen(args_strings[arg].chars, 1024); \
+    args_strings[arg].values = argv[arg]; \
+    args_strings[arg].length = strnlen(args_strings[arg].values, 1024); \
     args_strings[arg].max_length = args_strings[arg].length + 1; \
   } \
   Returncode err =  func(args_array); \

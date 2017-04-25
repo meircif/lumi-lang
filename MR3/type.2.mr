@@ -33,9 +33,15 @@ class St-class(St-node)
     write-spaces()
     write(user "struct ")
     write-cstyle(user self.mtype.name)
+    write(user " {\n")
+    if ? self.mtype.base-typename
+      write-spaces()
+      write(user "  ")
+      write-cstyle(user self.mtype.base-typename)
+      write(user " _base;\n")
     glob.mclass := self.mtype
     glob.methods := false
-    base.write()
+    self.write-indent-block()
     write(user ";")
     glob.methods := true
     self.write-block()

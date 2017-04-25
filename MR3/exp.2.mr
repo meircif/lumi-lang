@@ -136,10 +136,7 @@ class Var-operand(Operand)
     if not (? m-find-var(user self.name):(user self.mvar))
       f-syntax-error(user "unknow variable", user self.name)
     if ? self.next
-      if ? self.mvar.func-dec
-        self.next.analyze(user exp, user self.mvar.mtype, user self, user self)
-      else
-        self.next.analyze(user exp, user self.mvar.mtype, user self, user _)
+      self.next.analyze(user exp, user self.mvar.mtype, user self, user self)
   
   func dynamic write-intro()
     # nothing
@@ -293,13 +290,13 @@ class Member-operand(Var-operand)
       mtype := mtype.base-mtype
       if not (? mtype)
         f-syntax-error2(user "type", user var-mtype.name, user "has no member", user self.name)
-        self.base-count := self.base-count + 1
+      self.base-count := self.base-count + 1
     self.mtype := var-mtype
     if ? self.next
       if ? self.mvar.func-dec
         self.next.analyze(user exp, user self.mvar.mtype, user member, user self)
       else
-        self.next.analyze(user exp, user self.mvar.mtype, user self, user _)
+        self.next.analyze(user exp, user self.mvar.mtype, user self, user self)
   
   func dynamic write-intro()
     # nothing
@@ -309,7 +306,7 @@ class Member-operand(Var-operand)
       user Mtype mtype(self.mtype)
       for n in self.base-count
         mtype := mtype.base-mtype
-      write(user mtype.name)
+      write-cstyle(user mtype.name)
       write(user "_")
     else
       write(user "->")
@@ -321,7 +318,9 @@ class Member-operand(Var-operand)
 class Slice-operand(Operand)
   owner Mexp index
   owner Mexp second-index
-  var Bool is-string
+  user Operand seq
+  user Mtype seq-type
+  user Mtype item-type
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     parse-new-exp(user ":]"):(owner self.index, copy end)
@@ -336,7 +335,18 @@ class Slice-operand(Operand)
   func dynamic analyze(user Mexp exp, user Mtype mtype, user Operand member, user Var-operand method)
     if mtype != glob.type-array and mtype != glob.type-string
       f-syntax-error(user "non-sliceable type", user mtype.name)
-    self.is-string := mtype = glob.type-string
+    self.seq-type := mtype
+    if mtype = glob.type-string
+      self.item-type := _
+    else
+      if not (? method)
+        raise
+      self.item-type := method.mvar.sub-mtype
+      if not (? self.item-type)
+        f-syntax-error(user "missing sub-type for array", user method.mvar.name)
+    self.seq := exp.operand
+    exp.operand := self
+    member.next := _
     self.index.analyze()
     if ? self.second-index
       self.second-index.analyze()
@@ -348,17 +358,59 @@ class Slice-operand(Operand)
     self.index.write-intro()
     if ? self.second-index
       self.second-index.write-intro()
+    self.seq.write-all-intro()
+    # if ((index) < 0 || (index) >= seq->length) RAISE(line-num)
+    # if ((index) < 0 || (second) < 0 || (index) + (second) > seq->length) RAISE(line-num)
+    write(user "if ((")
+    self.index.write-final()
+    write(user ") < 0 || (")
+    if ? self.second-index
+      self.second-index.write-final()
+      write(user ") < 0 || (")
+    self.index.write-final()
+    write(user ") ")
+    if ? self.second-index
+      write(user "+ (")
+      self.second-index.write-final()
+      write(user ") > ")
+    else
+      write(user ">= ")
+    self.seq.write-all-final()
+    write(user "->length) ")
+    write-tb-raise()
+    write-new-indent-line()
   
   func dynamic write-final()
+    # ((Type**)(seq->values))[index]
+    # &(Array){second, ((Type**)(seq->values)) + (index)}
+    # &(String){second, second, seq->values + (index)}
     if ? self.second-index
-      return
-    if self.is-string
-      write(user "->chars")
+      write(user "&(")
+      write-cstyle(user self.seq-type.name)
+      write(user "){")
+      self.second-index.write-final()
+      write(user ", ")
+      if self.seq-type = glob.type-string
+        self.second-index.write-final()
+        write(user ", ")
+    if ? self.item-type
+      write(user "((")
+      write-cstyle(user self.item-type.name)
+      if not self.item-type.is-primitive
+        write(user "*")
+      write(user "*)(")
+    self.seq.write-all-final()
+    write(user "->values")
+    if ? self.item-type
+      write(user "))")
+    if ? self.second-index
+      write(user " + (")
+      self.index.write-final()
+      write(user ")}")
     else
-      write(user "->values")
-    write(user "[")
-    self.index.write-final()
-    write(user "]")
+      write(user "[")
+      self.index.write-final()
+      write(user "]")
 
 
 class St-exp(St)

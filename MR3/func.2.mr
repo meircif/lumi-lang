@@ -290,6 +290,7 @@ class Call-operand(Operand)
     user Operand method-opr
     method-opr := method
     if ? method and method-opr != member
+      method.next := _
       self.func-opr := method
       new Mexp new-exp
       new-exp.operand := exp.operand
@@ -300,10 +301,8 @@ class Call-operand(Operand)
       self.func-opr := exp.operand
     exp.operand := self
     
-    if ? method
+    if ? method and ? method.mvar.func-dec
       user Mfunc mfunc(method.mvar.func-dec)
-      if not (? mfunc)
-        raise
       user Arg-node dec-out(mfunc.args.first-out)
       if not (? dec-out)
         if self.is-used
@@ -359,12 +358,12 @@ class Call-operand(Operand)
   
   func inst write-call()
     write-tb-check()
-    self.func-opr.write-final()
+    self.func-opr.write-all-final()
     self.args.write-final()
     write(user ")")
   
   func dynamic write-intro()
-    self.func-opr.write-intro()
+    self.func-opr.write-all-intro()
     self.args.write-intro()
     if ? self.res-exp
       self.res-exp.write-intro()
@@ -482,12 +481,16 @@ class St-func(St-node)
     write(user "#undef MR_FUNC_NAME")
 
 
-class St-main(St-node)
+class St-main(St-func)
   func dynamic parse()
     base.parse()
+  
   func dynamic analyze-first()
     base.analyze-first()
+  
   func dynamic analyze()
     base.analyze()
+  
   func dynamic write()
     base.write()
+    write(user "\n\nMAIN_FUNC")

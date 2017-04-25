@@ -7,12 +7,12 @@
 
 Returncode _set_cstring(String* str) {
   if (str->length >= str->max_length) {
-    if (strnlen(str->chars, str->max_length) >= str->max_length) {
+    if (strnlen(str->values, str->max_length) >= str->max_length) {
       CRAISE
     }
   }
-  else if (strnlen(str->chars, str->length + 1) > str->length) {
-    str->chars[str->length] = '\0';
+  else if (strnlen(str->values, str->length + 1) > str->length) {
+    str->values[str->length] = '\0';
   }
   return OK;
 }
@@ -26,7 +26,7 @@ String* _new_string(int length) {
   String* str = buff;
   str->max_length = length;
   str->length = 0;
-  str->chars = (Byte*)buff + sizeof(String);
+  str->values = (Byte*)buff + sizeof(String);
   return str;
 }
 
@@ -68,7 +68,7 @@ void _set_new_string_array(int array_length, int string_length, Array* array) {
 Returncode _open_file(File** file, String* name, char* mode) {
   CCHECK(_set_cstring(name));
   *file = NULL;
-  *file = fopen(name->chars, mode);
+  *file = fopen(name->values, mode);
   if (*file == NULL) {
     CRAISE
   }
@@ -104,7 +104,7 @@ Returncode File_putc(File* file, Char in_char) {
 }
 
 Returncode File_write(File* file, String* data) {
-  fprintf(file, "%.*s", data->length, data->chars);
+  fprintf(file, "%.*s", data->length, data->values);
   return OK;
 }
 
@@ -123,7 +123,7 @@ Returncode String_equal(String* this, String* other, Bool* out_equal) {
     *out_equal = false;
     return OK;
   }
-  if (strncmp(this->chars, other->chars, this->length) == 0) {
+  if (strncmp(this->values, other->values, this->length) == 0) {
     *out_equal = true;
     return OK;
   }
@@ -135,7 +135,7 @@ Returncode String_get(String* this, Int index, Char* out_char) {
   if (index < 0 || index >= this->length) {
     CRAISE
   }
-  *out_char = this->chars[index];
+  *out_char = this->values[index];
   return OK;
 }
 
@@ -143,7 +143,7 @@ Returncode String_append(String* this, Char in_char) {
   if (this->length == this->max_length) {
     CRAISE
   }
-  this->chars[this->length] = in_char;
+  this->values[this->length] = in_char;
   ++this->length;
   return OK;
 }
@@ -154,15 +154,15 @@ Returncode String_replace(String* this, Char old, Char new) {
   }
   int n;
   for (n = 0; n < this->length; ++n) {
-    if (this->chars[n] == old) {
-      this->chars[n] = new;
+    if (this->values[n] == old) {
+      this->values[n] = new;
     }
   }
   return OK;
 }
 
 Returncode Int_str(Int value, String* out_str) {
-  int res = snprintf(out_str->chars, out_str->max_length ,"%d", value);
+  int res = snprintf(out_str->values, out_str->max_length ,"%d", value);
   if (res <= 0 || res >= out_str->max_length) {
     out_str->length = 0;
     CRAISE
@@ -179,7 +179,7 @@ Returncode String_copy(String* this, String* source) {
     CRAISE
   }
   this->length = source->length;
-  memcpy(this->chars, source->chars, this->length);
+  memcpy(this->values, source->values, this->length);
   return OK;
 }
 
@@ -187,7 +187,7 @@ Returncode String_concat(String* this, String* ext) {
   if (this->length + ext->length > this->max_length) {
     CRAISE
   }
-  memcpy(this->chars + this->length, ext->chars, ext->length);
+  memcpy(this->values + this->length, ext->values, ext->length);
   this->length += ext->length;
   return OK;
 }
@@ -195,7 +195,7 @@ Returncode String_concat(String* this, String* ext) {
 Returncode String_find(String* this, String* pattern, Int* out_index) {
   Int n;
   for (n = 0; n <= this->length - pattern->length; ++n) {
-    if (strncmp(this->chars + n, pattern->chars, pattern->length) == 0) {
+    if (strncmp(this->values + n, pattern->values, pattern->length) == 0) {
       *out_index = n;
       return OK;
     }
@@ -206,7 +206,7 @@ Returncode String_find(String* this, String* pattern, Int* out_index) {
 Returncode String_has(String* this, Char ch, Bool* found) {
   int n;
   for (n = 0; n < this->length; ++n) {
-    if (this->chars[n] == ch) {
+    if (this->values[n] == ch) {
       *found = true;
       return OK;
     }
@@ -223,7 +223,7 @@ Returncode String_has(String* this, Char ch, Bool* found) {
 
 /*system*/
 Returncode Sys_print(void* _, String* text) {
-  printf("%.*s\n", text->length, text->chars);
+  printf("%.*s\n", text->length, text->values);
   return OK;
 }
 
@@ -234,7 +234,7 @@ Returncode Sys_exit(void* _, Int status) {
 
 Returncode Sys_system(void* _, String* command, Int* status) {
   CCHECK(_set_cstring(command));
-  int res = system(command->chars);
+  int res = system(command->values);
   if (res == -1) {
     CRAISE
   }
@@ -244,13 +244,13 @@ Returncode Sys_system(void* _, String* command, Int* status) {
 
 Returncode Sys_getenv(void* _, String* name, String* value, Bool* exists) {
   CCHECK(_set_cstring(name));
-  char* ret = getenv(name->chars);
+  char* ret = getenv(name->values);
   if (ret == NULL) {
     *exists = false;
     return OK;
   }
   value->length = strnlen(ret, value->max_length);
-  strncpy(value->chars, ret, value->length);
+  strncpy(value->values, ret, value->length);
   *exists = true;
   return OK;
 }
