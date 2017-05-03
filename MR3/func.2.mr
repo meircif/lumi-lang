@@ -476,6 +476,8 @@ func parse-new-operands(owner String text, user String ends):(owner Operand new-
       opr-type := String-operand
     else-if first >= '0' and first <= '9'
       opr-type := Int-operand
+    else-if first >= 'A' and first <= 'Z'
+      opr-type := Type-operand
     else-if text.length = 1 and first = '_'
       opr-type := Empty-operand
     else-if text.equal(user "base")

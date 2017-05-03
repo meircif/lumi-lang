@@ -830,24 +830,29 @@ Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Cha
           opr_type = (Type){sizeof(Int_operand), Int_operand__dtl};
         }
         else {
-          if (text->length == 1 && first == '_') {
-            opr_type = (Type){sizeof(Empty_operand), Empty_operand__dtl};
+          if (first >= 'A' && first <= 'Z') {
+            opr_type = (Type){sizeof(Type_operand), Type_operand__dtl};
           }
           else {
-            Bool _Bool9;
-            CHECK(481, String_equal(text, &(String){5, 4, "base"}, &(_Bool9)))
-            if (_Bool9) {
-              opr_type = (Type){sizeof(Base_meth_operand), Base_meth_operand__dtl};
+            if (text->length == 1 && first == '_') {
+              opr_type = (Type){sizeof(Empty_operand), Empty_operand__dtl};
             }
             else {
-              opr_type = (Type){sizeof(Var_operand), Var_operand__dtl};
+              Bool _Bool9;
+              CHECK(483, String_equal(text, &(String){5, 4, "base"}, &(_Bool9)))
+              if (_Bool9) {
+                opr_type = (Type){sizeof(Base_meth_operand), Base_meth_operand__dtl};
+              }
+              else {
+                opr_type = (Type){sizeof(Var_operand), Var_operand__dtl};
+              }
             }
           }
         }
       }
     }
   }
-  CHECK(485, parse_new_operand(opr_type, text, ends, &((*new_opr)), &((*end))));
+  CHECK(487, parse_new_operand(opr_type, text, ends, &((*new_opr)), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -864,9 +869,9 @@ Returncode St_func_add_args_vars(St_func* self, Arg_node* fisrt_arg) {
   while (true) {
     if (!(NULL != arg)) break;
     Dec_arg* dec_arg;
-    CHECK(496, (*((Func**)(arg)))[4](arg, &(dec_arg)));
+    CHECK(498, (*((Func**)(arg)))[4](arg, &(dec_arg)));
     if (!(NULL != dec_arg)) break;
-    CHECK(498, add_var(self->_base._base.sons_var_map, dec_arg->mvar));
+    CHECK(500, add_var(self->_base._base.sons_var_map, dec_arg->mvar));
     arg = arg->next;
   }
   return OK;
@@ -875,33 +880,33 @@ Returncode St_func_add_args_vars(St_func* self, Arg_node* fisrt_arg) {
 static char* _func_name_St_func_parse = "St-func.parse";
 #define MR_FUNC_NAME _func_name_St_func_parse
 Returncode St_func_parse(St_func* self) {
-  CHECK(502, parse_new_mfunc(&(self->mfunc)));
+  CHECK(504, parse_new_mfunc(&(self->mfunc)));
   Mvar* _Mvar10;
-  CHECK(503, Mfunc_m_new_var(self->mfunc, &(_Mvar10)))
-  CHECK(503, St_add_var(&(self->_base._base), _Mvar10));
-  CHECK(504, f_copy_new_var_map(NULL, &(self->_base._base.sons_var_map)));
-  CHECK(505, St_func_add_args_vars(self, self->mfunc->args->first_param));
-  CHECK(506, St_func_add_args_vars(self, self->mfunc->args->first_out));
-  CHECK(507, St_node_parse(&(self->_base)));
+  CHECK(505, Mfunc_m_new_var(self->mfunc, &(_Mvar10)))
+  CHECK(505, St_add_var(&(self->_base._base), _Mvar10));
+  CHECK(506, f_copy_new_var_map(NULL, &(self->_base._base.sons_var_map)));
+  CHECK(507, St_func_add_args_vars(self, self->mfunc->args->first_param));
+  CHECK(508, St_func_add_args_vars(self, self->mfunc->args->first_out));
+  CHECK(509, St_node_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_func_analyze_first = "St-func.analyze-first";
 #define MR_FUNC_NAME _func_name_St_func_analyze_first
 Returncode St_func_analyze_first(St_func* self) {
-  CHECK(510, St_node_analyze_first(&(self->_base)));
+  CHECK(512, St_node_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_func_analyze = "St-func.analyze";
 #define MR_FUNC_NAME _func_name_St_func_analyze
 Returncode St_func_analyze(St_func* self) {
-  CHECK(513, Mfunc_analyze(self->mfunc));
+  CHECK(515, Mfunc_analyze(self->mfunc));
   St_return* st_return = malloc(sizeof(St_return));
-  if (st_return == NULL) RAISE(514)
+  if (st_return == NULL) RAISE(516)
   *((Func**)(st_return)) = St_return__dtl;
-  CHECK(515, St_init(&(st_return->_base), &(self->_base._base)));
-  CHECK(516, St_node_analyze(&(self->_base)));
+  CHECK(517, St_init(&(st_return->_base), &(self->_base._base)));
+  CHECK(518, St_node_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -912,28 +917,28 @@ Returncode St_func_write(St_func* self) {
     if (!glob->methods) {
       return OK;
     }
-    CHECK(522, write_new_indent_line());
+    CHECK(524, write_new_indent_line());
   }
-  CHECK(523, write(&(String){25, 24, "static char* _func_name_"}));
-  CHECK(524, Mfunc_write_name(self->mfunc));
-  CHECK(525, write(&(String){5, 4, " = \""}));
+  CHECK(525, write(&(String){25, 24, "static char* _func_name_"}));
+  CHECK(526, Mfunc_write_name(self->mfunc));
+  CHECK(527, write(&(String){5, 4, " = \""}));
   if (NULL != glob->mclass) {
-    CHECK(527, write(glob->mclass->name));
-    CHECK(528, write(&(String){2, 1, "."}));
+    CHECK(529, write(glob->mclass->name));
+    CHECK(530, write(&(String){2, 1, "."}));
   }
-  CHECK(529, write(self->mfunc->name));
-  CHECK(530, write(&(String){4, 3, "\";\n"}));
-  CHECK(531, write_spaces());
-  CHECK(532, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
-  CHECK(533, Mfunc_write_name(self->mfunc));
-  CHECK(534, write_new_indent_line());
-  CHECK(535, Mfunc_write(self->mfunc));
+  CHECK(531, write(self->mfunc->name));
+  CHECK(532, write(&(String){4, 3, "\";\n"}));
+  CHECK(533, write_spaces());
+  CHECK(534, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
+  CHECK(535, Mfunc_write_name(self->mfunc));
+  CHECK(536, write_new_indent_line());
+  CHECK(537, Mfunc_write(self->mfunc));
   Mtype* mclass = glob->mclass;
   glob->mclass = NULL;
-  CHECK(538, St_node_write(&(self->_base)));
+  CHECK(540, St_node_write(&(self->_base)));
   glob->mclass = mclass;
-  CHECK(540, write_new_indent_line());
-  CHECK(541, write(&(String){20, 19, "#undef MR_FUNC_NAME"}));
+  CHECK(542, write_new_indent_line());
+  CHECK(543, write(&(String){20, 19, "#undef MR_FUNC_NAME"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -946,29 +951,29 @@ typedef struct St_main St_main; struct St_main {
 static char* _func_name_St_main_parse = "St-main.parse";
 #define MR_FUNC_NAME _func_name_St_main_parse
 Returncode St_main_parse(St_main* self) {
-  CHECK(546, St_func_parse(&(self->_base)));
+  CHECK(548, St_func_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze_first = "St-main.analyze-first";
 #define MR_FUNC_NAME _func_name_St_main_analyze_first
 Returncode St_main_analyze_first(St_main* self) {
-  CHECK(549, St_func_analyze_first(&(self->_base)));
+  CHECK(551, St_func_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze = "St-main.analyze";
 #define MR_FUNC_NAME _func_name_St_main_analyze
 Returncode St_main_analyze(St_main* self) {
-  CHECK(552, St_func_analyze(&(self->_base)));
+  CHECK(554, St_func_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_write = "St-main.write";
 #define MR_FUNC_NAME _func_name_St_main_write
 Returncode St_main_write(St_main* self) {
-  CHECK(555, St_func_write(&(self->_base)));
-  CHECK(556, write(&(String){12, 11, "\n\nMAIN_FUNC"}));
+  CHECK(557, St_func_write(&(self->_base)));
+  CHECK(558, write(&(String){12, 11, "\n\nMAIN_FUNC"}));
   return OK;
 }
 #undef MR_FUNC_NAME

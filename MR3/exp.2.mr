@@ -246,6 +246,7 @@ class Char-operand(Operand)
 
 class String-operand(Operand)
   owner String text
+  
   func dynamic parse(owner String text, user String ends):(copy Char end)
     if text[text.length - 1] != '\"'
       f-syntax-error(user "illegal string constant", user text)
@@ -324,6 +325,7 @@ class Block-operand(Operand)
   owner Mexp exp
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
+    delete text
     parse-new-exp(user ")"):(owner self.exp, copy end)
     if end != ')'
       f-syntax-error(user "missing", user ")")
@@ -361,7 +363,7 @@ class Member-operand(Var-operand)
     mtype := self.mvar.mtype
     sub-mtype := self.mvar.sub-mtype
     if ? self.next
-      if ? self.mvar.func-dec
+      if ? self.mvar.func-dec and ? member
         self.next.analyze(user exp, user member, user self):(user mtype, user sub-mtype)
       else
         self.next.analyze(user exp, user self, user self):(user mtype, user sub-mtype)
@@ -415,6 +417,28 @@ class Base-meth-operand(Operand)
   func dynamic write-final()
     if self.first
       write(user "self")
+
+
+class Type-operand(Operand)
+  owner String name
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    self.name := text
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    f-find-type(user self.name):(user mtype)
+    if not (? self.next)
+      f-syntax-error(user "expected member after type", user self.name)
+    sub-mtype := _
+    exp.operand := self.next
+    self.next.analyze(user exp, user member, user method):(user mtype, user sub-mtype)
+    delete self
+  
+  func dynamic write-intro()
+    raise
+  
+  func dynamic write-final()
+    raise
 
 
 class Slice-operand(Operand)
