@@ -162,10 +162,13 @@ func write-cstyle(user String text)
     else
       write-c(copy ch)
 
+func write-int(copy Int num)
+  var String{64} num-str
+  num.str():(var num-str)
+  write(user num-str)
+
 func write-line-num()
-  var String{64} line-num-str
-  glob.line-num.str():(var line-num-str)
-  write(user line-num-str)
+  write-int(copy glob.line-num)
 
 func write-tb-raise()
   write(user "RAISE(")

@@ -192,6 +192,16 @@ Returncode String_concat(String* this, String* ext) {
   return OK;
 }
 
+Returncode String_concat_int(String* this, Int num) {
+  String remain = {
+    this->max_length - this->length,
+    0,
+    this->values + this->length};
+  CCHECK(Int_str(num, &remain));
+  this->length += remain.length;
+  return OK;
+}
+
 Returncode String_find(String* this, String* pattern, Int* out_index) {
   Int n;
   for (n = 0; n <= this->length - pattern->length; ++n) {

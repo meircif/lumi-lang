@@ -170,14 +170,12 @@ class St-file(St-node)
         write(user "c\"\n")
       write(user "\n")
     
-    var String{64} index-str
-    self.index.str():(var index-str)
     write(user "static char* _mr_file")
-    write(user index-str)
+    write-int(copy self.index)
     write(user "_name = \"")
     write(user self.infile-name)
     write(user "\";\n#define MR_FILE_NAME _mr_file")
-    write(user index-str)
+    write-int(copy self.index)
     write(user "_name\n\n")
     glob.infile-name := self.infile-name
     

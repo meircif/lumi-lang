@@ -95,6 +95,10 @@ func f-create-global-var-map()
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "other")
   meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
   
+  add-global-func(user glob.type-string, user "concat-int"):(owner meth)
+  meth.args.add-param(copy ACCESS-COPY, user glob.type-int, user "number")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-string, user "self")
+  
   add-global-func(user glob.type-string, user "find"):(owner meth)
   meth.args.add-out(copy ACCESS-COPY, user glob.type-int, user "index")
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "pattern")
