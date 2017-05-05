@@ -187,11 +187,13 @@ class Var-operand(Operand)
   owner String name
   user Mvar mvar
   var Int base-count
+  var Bool allow-dynamic
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     self.name := text
     self.mvar := _
     self.base-count := 0
+    self.allow-dynamic := true
   
   func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
     if not (? m-find-var(user self.name):(user self.mvar))
@@ -269,12 +271,9 @@ class String-operand(Operand)
       real-length := real-length + 1
     var String{80} length-str
     write(user "&(String){")
-    real-length.str():(var length-str)
-    write(user length-str)
+    write-int(copy real-length)
     write(user ", ")
-    real-length := real-length - 1
-    real-length.str():(var length-str)
-    write(user length-str)
+    write-int(copy real-length - 1)
     write(user ", ")
     write(user self.text)
     write(user "}")
@@ -350,6 +349,7 @@ class Member-operand(Var-operand)
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     self.base-count := 0
+    self.allow-dynamic := true
     read-new-value(user ends):(owner self.name, copy end)
   
   func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
@@ -392,6 +392,7 @@ class Base-meth-operand(Operand)
     self.member := member
     self.member.parse(owner _, user ends):(copy end)
     self.member.next := _
+    self.member.allow-dynamic := false
     if end != '('
       f-syntax-error(user "not a method", user self.member.mvar.name)
   
@@ -510,8 +511,9 @@ class Slice-operand(Operand)
     write-new-indent-line()
   
   func dynamic write-final()
-    # ((Type**)(seq->values))[index]
-    # &(Array){second, ((Type**)(seq->values)) + (index)}
+    # ((Prmitive*)(seq->values))[index]
+    # ((Complex*)(seq->values)) + index
+    # &(Array){second, ((Type*)(seq->values)) + (index)}
     # &(String){second, second, seq->values + (index)}
     if ? self.second-index
       write(user "&(")
@@ -525,8 +527,6 @@ class Slice-operand(Operand)
     if ? self.item-type
       write(user "((")
       write-cstyle(user self.item-type.name)
-      if not self.item-type.is-primitive
-        write(user "*")
       write(user "*)(")
     self.seq.write-all-final()
     write(user "->values")
@@ -536,6 +536,9 @@ class Slice-operand(Operand)
       write(user " + (")
       self.index.write-final()
       write(user ")}")
+    else-if ? self.item-type and not self.item-type.is-primitive
+      write(user " + ")
+      self.index.write-final()
     else
       write(user "[")
       self.index.write-final()

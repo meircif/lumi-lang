@@ -57,6 +57,14 @@ class St-dec(St)
         self.write-primitive()
       else
         self.write-class()
+        if ? self.mvar.mtype.dynamic-members
+          # *((Func**)(name)) = Class__dtl;
+          write-new-indent-line()
+          write(user "*((Func**)(")
+          write-cstyle(user self.mvar.name)
+          write(user ")) = ")
+          write-cstyle(user self.mvar.mtype.name)
+          write(user "__dtl;")
     else
       if ? self.value
         write(user " = ")

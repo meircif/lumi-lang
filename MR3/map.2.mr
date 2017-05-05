@@ -6,21 +6,27 @@ static Name-map-node(Object)
   user String name
   owner Object value
   
-  func inst init(owner Name-map-node next, user String name, owner Object value)
-    self.next := next
+  func inst init(user String name, owner Object value)
+    self.next := _
     self.name := name
     self.value := value
 
 static Name-map(Object)
   owner Name-map-node first
+  owner Name-map-node last
   
   func inst init()
     self.first := _
+    self.last := _
   
   func inst add(user String name, owner Object value)
     new Name-map-node node
-    node.init(owner self.first, user name, owner value)
-    self.first := node
+    node.init(user name, owner value)
+    if ? self.last
+      self.last.next := node
+    else
+      self.first := node
+    self.last := node
   
   func inst find(user String name):(user Object value)
     user Name-map-node node(self.first)
@@ -53,6 +59,26 @@ static Var-map(Name-map)
   func inst find(user String name):(user Mvar mvar)
     mvar := base.find(user name)
 
+static Var-map-iter(Object)
+  user Name-map-node node
+  
+  func inst init(user Var-map map)
+    self.node := map.first
+  
+  func inst get-name():(user String name)
+    name := self.node.name
+  
+  func inst get-var():(user Mvar mvar)
+    user Mvar value(self.node.value)
+    mvar := value
+  
+  func inst m-has-data():(copy Bool has-data)
+    has-data := ? self.node
+  
+  func inst m-next()
+    self.node := self.node.next
+
+
 func f-copy-new-var-map(user Var-map other):(owner Var-map new-var-map)
   new Var-map var-map
   if ? other
@@ -65,17 +91,17 @@ func f-copy-new-var-map(user Var-map other):(owner Var-map new-var-map)
 static Mtype(Object)
   owner String name
   owner Var-map members
+  owner Var-map dynamic-members
   owner String base-typename
   user Mtype base-mtype
-  var Bool is-dynamic
   var Bool is-primitive
   
   func inst init(owner String name)
     self.name := name
     f-copy-new-var-map(user _):(owner self.members)
+    self.dynamic-members := _
     self.base-typename := _
     self.base-mtype := _
-    self.is-dynamic := false
     self.is-primitive := false
 
 

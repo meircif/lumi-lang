@@ -1,5 +1,42 @@
 # MR3 compiler - types
 
+func analyze-type(user Mtype self, copy Bool is-dynamic)
+  if ? self.base-typename and not (? self.base-mtype)
+    f-find-type(user self.base-typename):(user self.base-mtype)
+  if is-dynamic and not (? self.dynamic-members)
+    f-copy-new-var-map(user _):(owner self.dynamic-members)
+    var Int dynamic-count(0)
+    var Var-map-iter iter
+    user String name
+    user Mvar mvar
+    if ? self.base-mtype
+      analyze-type(user self.base-mtype, copy is-dynamic)
+      iter.init(user self.base-mtype.dynamic-members)
+      do
+        while iter.m-has-data()
+        iter.get-name():(user name)
+        self.members.find(user name):(user mvar)
+        if ? mvar
+          if not (? mvar.func-dec)
+            f-syntax-error2(user "non-function override of", user name, user "in type", user self.name)
+          self.dynamic-members.add(user name, user mvar)
+          mvar.func-dec.dynamic-index := dynamic-count
+        else
+          self.dynamic-members.add(user name, user iter.get-var())
+        dynamic-count := dynamic-count + 1
+        iter.m-next()
+    iter.init(user self.members)
+    do
+      while iter.m-has-data()
+      iter.get-name():(user name)
+      iter.get-var():(user mvar)
+      if ? mvar.func-dec and mvar.func-dec.is-dynamic and not (? self.dynamic-members.find(user name))
+        self.dynamic-members.add(user name, user mvar)
+        mvar.func-dec.dynamic-index := dynamic-count
+        dynamic-count := dynamic-count + 1
+      iter.m-next()
+
+
 class St-class(St-node)
   user Mtype mtype
   
@@ -17,12 +54,14 @@ class St-class(St-node)
     glob.mclass := _
   
   func dynamic analyze-first()
-    if ? self.mtype.base-typename
-      f-find-type(user self.mtype.base-typename):(user self.mtype.base-mtype)
+    analyze-type(user self.mtype, copy false)
     base.analyze-first()
   
   func dynamic analyze()
     base.analyze()
+  
+  native func write-vars()
+  native func write-meths()
   
   func dynamic write()
     write(user "typedef struct ")
@@ -34,6 +73,13 @@ class St-class(St-node)
     write(user "struct ")
     write-cstyle(user self.mtype.name)
     write(user " {\n")
+    self.write-vars()
+    write(user ";")
+    self.write-meths()
+    glob.methods := false
+    glob.mclass := _
+  
+  func dynamic write-vars()
     if ? self.mtype.base-typename
       write-spaces()
       write(user "  ")
@@ -42,11 +88,10 @@ class St-class(St-node)
     glob.mclass := self.mtype
     glob.methods := false
     self.write-indent-block()
-    write(user ";")
+  
+  func dynamic write-meths()
     glob.methods := true
     self.write-block()
-    glob.methods := false
-    glob.mclass := _
 
 
 class St-static-class(St-class)
@@ -58,14 +103,52 @@ class St-static-class(St-class)
     base.analyze()
   func dynamic write()
     base.write()
+  func dynamic write-vars()
+    base.write-vars()
+  func dynamic write-meths()
+    base.write-meths()
 
 
 class St-dynamic-class(St-class)
   func dynamic parse()
     base.parse()
+  
   func dynamic analyze-first()
+    analyze-type(user self.mtype, copy true)
     base.analyze-first()
+  
   func dynamic analyze()
     base.analyze()
+  
   func dynamic write()
     base.write()
+  
+  func dynamic write-vars()
+    if not (? self.mtype.base-typename)
+      write-spaces()
+      write(user "  Func* _dtl;\n")
+    base.write-vars()
+  
+  func dynamic write-meths()
+    base.write-meths()
+    write-new-indent-line()
+    write(user "Func ")
+    write-cstyle(user self.mtype.name)
+    write(user "__dtl[] = {")
+    var Var-map-iter iter
+    iter.init(user self.mtype.dynamic-members)
+    do
+      while iter.m-has-data()
+      user Mvar mvar
+      iter.get-var():(user mvar)
+      if not (? mvar.func-dec)
+        f-syntax-error(user self.mtype.name, user mvar.name)
+      if not (? mvar.func-dec.mclass)
+        f-syntax-error(user self.mtype.name, user mvar.name)
+      write-cstyle(user mvar.func-dec.mclass.name)
+      write(user "_")
+      write-cstyle(user mvar.func-dec.name)
+      iter.m-next()
+      if iter.m-has-data()
+        write(user ", ")
+    write(user "};")

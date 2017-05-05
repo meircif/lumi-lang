@@ -211,6 +211,7 @@ static Arg-list(Object)
 
 func parse-new-args():(owner Arg-list new-args)
   new Arg-list args
+  args.init(copy true)
   args.parse(copy true)
   new-args := args
 
@@ -218,6 +219,7 @@ func parse-new-args():(owner Arg-list new-args)
 static Mfunc(Object)
   owner String name
   owner Arg-list args
+  user Mtype mclass
   var Bool is-dynamic
   var Int dynamic-index
   
@@ -226,11 +228,13 @@ static Mfunc(Object)
     new Arg-list args
     self.args := args
     self.args.init(copy true)
+    self.mclass := _
     self.is-dynamic := false
     self.dynamic-index := 0
   
   func inst parse()
-    if ? glob.mclass
+    self.mclass := glob.mclass
+    if ? self.mclass
       var String{64} meth-type
       read(user " ", user meth-type)
       self.is-dynamic := meth-type.equal(user "dynamic")
@@ -239,15 +243,15 @@ static Mfunc(Object)
     self.dynamic-index := 0
     read-new(user "("):(owner self.name)
     parse-new-args():(owner self.args)
-    if ? glob.mclass
-      self.args.add-param(copy ACCESS-VAR, user glob.mclass, user "self")
+    if ? self.mclass
+      self.args.add-param(copy ACCESS-VAR, user self.mclass, user "self")
   
   func inst analyze()
     self.args.analyze()
   
   func inst write-name()
-    if ? glob.mclass
-      write-cstyle(user glob.mclass.name)
+    if self.mclass
+      write-cstyle(user self.mclass.name)
       write(user "_")
     write-cstyle(user self.name)
   
@@ -270,6 +274,8 @@ func parse-new-mfunc():(owner Mfunc new-mfunc)
 class Call-operand(Operand)
   owner Arg-list args
   owner Operand func-opr
+  user Operand dynamic-opr
+  var Int dynamic-index
   var Bool is-used
   user Mvar res-var
   user Mexp res-exp
@@ -281,6 +287,8 @@ class Call-operand(Operand)
     self.args.init(copy false)
     args.parse(copy false):(copy end)
     self.func-opr := _
+    self.dynamic-opr := _
+    self.dynamic-index := 0
     self.res-var := _
     self.res-name := _
     self.res-exp := _
@@ -395,6 +403,9 @@ class Call-operand(Operand)
     if is-method
       method.next := _
       self.func-opr := method
+      if method.mvar.func-dec.is-dynamic and method.allow-dynamic
+        self.dynamic-opr := exp.operand
+        self.dynamic-index := method.mvar.func-dec.dynamic-index
       new Mexp new-exp
       new-exp.init()
       new-exp.operand := exp.operand
@@ -414,9 +425,16 @@ class Call-operand(Operand)
   
   func inst write-call()
     write-tb-check()
-    self.func-opr.write-all-final()
+    if ? self.dynamic-opr
+      write(user "(*((Func**)(")
+      self.dynamic-opr.write-all-final()
+      write(user ")))[")
+      write-int(copy self.dynamic-index)
+      write(user "]")
+    else
+      self.func-opr.write-all-final()
     self.args.write-final()
-    write(user ")")
+    write(user " )")
   
   func dynamic write-intro()
     self.func-opr.write-all-intro()
@@ -504,8 +522,8 @@ class St-func(St-node)
     parse-new-mfunc():(owner self.mfunc)
     self.add-var(owner self.mfunc.m-new-var())
     f-copy-new-var-map(user _):(owner self.sons-var-map)
-    self.add-args-vars(owner self.mfunc.args.first-param)
-    self.add-args-vars(owner self.mfunc.args.first-out)
+    self.add-args-vars(user self.mfunc.args.first-param)
+    self.add-args-vars(user self.mfunc.args.first-out)
     base.parse()
   
   func dynamic analyze-first()
