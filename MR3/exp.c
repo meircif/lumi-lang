@@ -632,6 +632,8 @@ Returncode Block_operand_write_final(Block_operand* self) {
 Func Block_operand__dtl[] = {Block_operand_parse, Block_operand_analyze, Block_operand_write_intro, Block_operand_write_final};
 
 
+Returncode f_is_func_dynamic(Mfunc* mfunc, Bool* is_dynamic);
+
 typedef struct Member_operand Member_operand; struct Member_operand {
   Var_operand _base;
   Mtype* prev_mtype;
@@ -641,7 +643,7 @@ static char* _func_name_Member_operand_parse = "Member-operand.parse";
 Returncode Member_operand_parse(Member_operand* self, String* text, String* ends, Char* end) {
   self->_base.base_count = 0;
   self->_base.allow_dynamic = true;
-  CHECK(353, read_new_value(ends, &(self->_base.name), &((*end))));
+  CHECK(355, read_new_value(ends, &(self->_base.name), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -649,23 +651,33 @@ static char* _func_name_Member_operand_analyze = "Member-operand.analyze";
 #define MR_FUNC_NAME _func_name_Member_operand_analyze
 Returncode Member_operand_analyze(Member_operand* self, Mexp* exp, Operand* member, Var_operand* method, Mtype** mtype, Mtype** sub_mtype) {
   while (true) {
-    CHECK(357, Var_map_find((*mtype)->members, self->_base.name, &(self->_base.mvar)))
+    CHECK(359, Var_map_find((*mtype)->members, self->_base.name, &(self->_base.mvar)))
     if (!(!(NULL != self->_base.mvar))) break;
     (*mtype) = (*mtype)->base_mtype;
     if (!(NULL != (*mtype))) {
-      CHECK(360, f_syntax_error2(&(String){5, 4, "type"}, self->prev_mtype->name, &(String){14, 13, "has no member"}, self->_base.name));
+      CHECK(362, f_syntax_error2(&(String){5, 4, "type"}, self->prev_mtype->name, &(String){14, 13, "has no member"}, self->_base.name));
     }
     self->_base.base_count = self->_base.base_count + 1;
   }
   self->prev_mtype = (*mtype);
+  Mtype* basetype = (*mtype)->base_mtype;
   (*mtype) = self->_base.mvar->mtype;
   (*sub_mtype) = self->_base.mvar->sub_mtype;
   if (NULL != self->_base._base.next) {
     if (NULL != self->_base.mvar->func_dec && NULL != member) {
-      CHECK(367, (*((Func**)(self->_base._base.next)))[1](self->_base._base.next, exp, member, &(self->_base), &((*mtype)), &((*sub_mtype))));
+      Bool _Bool5;
+      CHECK(370, f_is_func_dynamic(self->_base.mvar->func_dec, &(_Bool5)))
+      if (_Bool5 && self->_base.allow_dynamic) {
+        while (true) {
+          if (!(NULL != basetype)) break;
+          self->_base.base_count = self->_base.base_count + 1;
+          basetype = basetype->base_mtype;
+        }
+      }
+      CHECK(375, (*((Func**)(self->_base._base.next)))[1](self->_base._base.next, exp, member, &(self->_base), &((*mtype)), &((*sub_mtype))));
     }
     else {
-      CHECK(369, (*((Func**)(self->_base._base.next)))[1](self->_base._base.next, exp, &(self->_base._base), &(self->_base), &((*mtype)), &((*sub_mtype))));
+      CHECK(377, (*((Func**)(self->_base._base.next)))[1](self->_base._base.next, exp, &(self->_base._base), &(self->_base), &((*mtype)), &((*sub_mtype))));
     }
   }
   return OK;
@@ -682,16 +694,16 @@ static char* _func_name_Member_operand_write_final = "Member-operand.write-final
 #define MR_FUNC_NAME _func_name_Member_operand_write_final
 Returncode Member_operand_write_final(Member_operand* self) {
   if (NULL != self->_base.mvar->func_dec) {
-    CHECK(376, write_cstyle(self->prev_mtype->name));
-    CHECK(377, write(&(String){2, 1, "_"}));
+    CHECK(384, write_cstyle(self->prev_mtype->name));
+    CHECK(385, write(&(String){2, 1, "_"}));
   }
   else {
-    CHECK(379, write(&(String){3, 2, "->"}));
+    CHECK(387, write(&(String){3, 2, "->"}));
     Int n; for (n = 0; n < self->_base.base_count; ++n) {
-      CHECK(381, write(&(String){7, 6, "_base."}));
+      CHECK(389, write(&(String){7, 6, "_base."}));
     }
   }
-  CHECK(382, Var_operand_write_final(&(self->_base)));
+  CHECK(390, Var_operand_write_final(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -708,14 +720,14 @@ static char* _func_name_Base_meth_operand_parse = "Base-meth-operand.parse";
 Returncode Base_meth_operand_parse(Base_meth_operand* self, String* text, String* ends, Char* end) {
   free(text);
   Member_operand* member = malloc(sizeof(Member_operand));
-  if (member == NULL) RAISE(391)
+  if (member == NULL) RAISE(399)
   *((Func**)(member)) = Member_operand__dtl;
   self->member = member;
-  CHECK(393, (*((Func**)(self->member)))[0](self->member, NULL, ends, &((*end))));
+  CHECK(401, (*((Func**)(self->member)))[0](self->member, NULL, ends, &((*end))));
   self->member->_base._base.next = NULL;
   self->member->_base.allow_dynamic = false;
   if ((*end) != '(') {
-    CHECK(397, f_syntax_error(&(String){13, 12, "not a method"}, self->member->_base.mvar->name));
+    CHECK(405, f_syntax_error(&(String){13, 12, "not a method"}, self->member->_base.mvar->name));
   }
   return OK;
 }
@@ -727,19 +739,19 @@ Returncode Base_meth_operand_analyze(Base_meth_operand* self, Mexp* exp, Operand
   self->first = !(NULL != member);
   if (self->first) {
     Mvar* mvar;
-    CHECK(404, m_find_var(&(String){5, 4, "self"}, &(mvar)))
+    CHECK(412, m_find_var(&(String){5, 4, "self"}, &(mvar)))
     if (!(NULL != mvar)) {
-      CHECK(405, f_syntax_error(&(String){25, 24, "not a method, cannot use"}, &(String){5, 4, "base"}));
+      CHECK(413, f_syntax_error(&(String){25, 24, "not a method, cannot use"}, &(String){5, 4, "base"}));
     }
     (*mtype) = mvar->mtype;
   }
   if (!(NULL != (*mtype)->base_mtype)) {
-    CHECK(408, f_syntax_error(&(String){20, 19, "no subtype for type"}, (*mtype)->name));
+    CHECK(416, f_syntax_error(&(String){20, 19, "no subtype for type"}, (*mtype)->name));
   }
   (*mtype) = (*mtype)->base_mtype;
-  CHECK(410, (*((Func**)(self->member)))[1](self->member, exp, &(self->_base), NULL, &((*mtype)), &((*sub_mtype))));
+  CHECK(418, (*((Func**)(self->member)))[1](self->member, exp, &(self->_base), NULL, &((*mtype)), &((*sub_mtype))));
   self->member->_base.base_count = self->member->_base.base_count + 1;
-  CHECK(412, (*((Func**)(self->_base.next)))[1](self->_base.next, exp, &(self->_base), &(self->member->_base), &((*mtype)), &((*sub_mtype))));
+  CHECK(420, (*((Func**)(self->_base.next)))[1](self->_base.next, exp, &(self->_base), &(self->member->_base), &((*mtype)), &((*sub_mtype))));
   self->member = NULL;
   return OK;
 }
@@ -755,7 +767,7 @@ static char* _func_name_Base_meth_operand_write_final = "Base-meth-operand.write
 #define MR_FUNC_NAME _func_name_Base_meth_operand_write_final
 Returncode Base_meth_operand_write_final(Base_meth_operand* self) {
   if (self->first) {
-    CHECK(420, write(&(String){5, 4, "self"}));
+    CHECK(428, write(&(String){5, 4, "self"}));
   }
   return OK;
 }
@@ -777,13 +789,13 @@ Returncode Type_operand_parse(Type_operand* self, String* text, String* ends, Ch
 static char* _func_name_Type_operand_analyze = "Type-operand.analyze";
 #define MR_FUNC_NAME _func_name_Type_operand_analyze
 Returncode Type_operand_analyze(Type_operand* self, Mexp* exp, Operand* member, Var_operand* method, Mtype** mtype, Mtype** sub_mtype) {
-  CHECK(430, f_find_type(self->name, &((*mtype))));
+  CHECK(438, f_find_type(self->name, &((*mtype))));
   if (!(NULL != self->_base.next)) {
-    CHECK(432, f_syntax_error(&(String){27, 26, "expected member after type"}, self->name));
+    CHECK(440, f_syntax_error(&(String){27, 26, "expected member after type"}, self->name));
   }
   (*sub_mtype) = NULL;
   exp->operand = self->_base.next;
-  CHECK(435, (*((Func**)(self->_base.next)))[1](self->_base.next, exp, member, method, &((*mtype)), &((*sub_mtype))));
+  CHECK(443, (*((Func**)(self->_base.next)))[1](self->_base.next, exp, member, method, &((*mtype)), &((*sub_mtype))));
   free(self);
   return OK;
 }
@@ -791,13 +803,13 @@ Returncode Type_operand_analyze(Type_operand* self, Mexp* exp, Operand* member, 
 static char* _func_name_Type_operand_write_intro = "Type-operand.write-intro";
 #define MR_FUNC_NAME _func_name_Type_operand_write_intro
 Returncode Type_operand_write_intro(Type_operand* self) {
-  RAISE(439)
+  RAISE(447)
 }
 #undef MR_FUNC_NAME
 static char* _func_name_Type_operand_write_final = "Type-operand.write-final";
 #define MR_FUNC_NAME _func_name_Type_operand_write_final
 Returncode Type_operand_write_final(Type_operand* self) {
-  RAISE(442)
+  RAISE(450)
 }
 #undef MR_FUNC_NAME
 Func Type_operand__dtl[] = {Type_operand_parse, Type_operand_analyze, Type_operand_write_intro, Type_operand_write_final};
@@ -814,17 +826,17 @@ typedef struct Slice_operand Slice_operand; struct Slice_operand {
 static char* _func_name_Slice_operand_parse = "Slice-operand.parse";
 #define MR_FUNC_NAME _func_name_Slice_operand_parse
 Returncode Slice_operand_parse(Slice_operand* self, String* text, String* ends, Char* end) {
-  CHECK(453, parse_new_exp(&(String){3, 2, ":]"}, &(self->index), &((*end))));
+  CHECK(461, parse_new_exp(&(String){3, 2, ":]"}, &(self->index), &((*end))));
   if ((*end) == ':') {
-    CHECK(455, parse_new_exp(&(String){3, 2, ":]"}, &(self->second_index), &((*end))));
+    CHECK(463, parse_new_exp(&(String){3, 2, ":]"}, &(self->second_index), &((*end))));
   }
   else {
     self->second_index = NULL;
   }
   if ((*end) != ']') {
-    CHECK(459, f_syntax_error(&(String){8, 7, "missing"}, &(String){2, 1, "]"}));
+    CHECK(467, f_syntax_error(&(String){8, 7, "missing"}, &(String){2, 1, "]"}));
   }
-  CHECK(460, read_c(&((*end))));
+  CHECK(468, read_c(&((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -834,7 +846,7 @@ Returncode Slice_operand_analyze(Slice_operand* self, Mexp* exp, Operand* member
   self->seq_type = (*mtype);
   self->item_type = (*sub_mtype);
   if (self->seq_type != glob->type_array && self->seq_type != glob->type_string) {
-    CHECK(466, f_syntax_error(&(String){19, 18, "non-sliceable type"}, self->seq_type->name));
+    CHECK(474, f_syntax_error(&(String){19, 18, "non-sliceable type"}, self->seq_type->name));
   }
   if (!(NULL != self->second_index)) {
     (*sub_mtype) = NULL;
@@ -846,7 +858,7 @@ Returncode Slice_operand_analyze(Slice_operand* self, Mexp* exp, Operand* member
         (*mtype) = self->item_type;
       }
       else {
-        CHECK(474, f_syntax_error(&(String){27, 26, "missing sub-type for array"}, &(String){1, 0, ""}));
+        CHECK(482, f_syntax_error(&(String){27, 26, "missing sub-type for array"}, &(String){1, 0, ""}));
       }
     }
   }
@@ -855,13 +867,13 @@ Returncode Slice_operand_analyze(Slice_operand* self, Mexp* exp, Operand* member
   exp->operand = &(self->_base);
   member->next = NULL;
   
-  CHECK(480, Mexp_analyze_type(self->index, glob->type_int));
+  CHECK(488, Mexp_analyze_type(self->index, glob->type_int));
   if (NULL != self->second_index) {
-    CHECK(482, Mexp_analyze_type(self->second_index, glob->type_int));
+    CHECK(490, Mexp_analyze_type(self->second_index, glob->type_int));
   }
   
   if (NULL != self->_base.next) {
-    CHECK(485, (*((Func**)(self->_base.next)))[1](self->_base.next, exp, &(self->_base), NULL, &((*mtype)), &((*sub_mtype))));
+    CHECK(493, (*((Func**)(self->_base.next)))[1](self->_base.next, exp, &(self->_base), NULL, &((*mtype)), &((*sub_mtype))));
   }
   return OK;
 }
@@ -869,34 +881,34 @@ Returncode Slice_operand_analyze(Slice_operand* self, Mexp* exp, Operand* member
 static char* _func_name_Slice_operand_write_intro = "Slice-operand.write-intro";
 #define MR_FUNC_NAME _func_name_Slice_operand_write_intro
 Returncode Slice_operand_write_intro(Slice_operand* self) {
-  CHECK(488, Mexp_write_intro(self->index));
+  CHECK(496, Mexp_write_intro(self->index));
   if (NULL != self->second_index) {
-    CHECK(490, Mexp_write_intro(self->second_index));
+    CHECK(498, Mexp_write_intro(self->second_index));
   }
-  CHECK(491, Operand_write_all_intro(self->seq));
+  CHECK(499, Operand_write_all_intro(self->seq));
   /* if ((index) < 0 || (index) >= seq->length) RAISE(line-num) */
   /* if ((index) < 0 || (second) < 0 || (index) + (second) > seq->length) RAISE(line-num) */
-  CHECK(494, write(&(String){6, 5, "if (("}));
-  CHECK(495, Mexp_write_final(self->index));
-  CHECK(496, write(&(String){11, 10, ") < 0 || ("}));
+  CHECK(502, write(&(String){6, 5, "if (("}));
+  CHECK(503, Mexp_write_final(self->index));
+  CHECK(504, write(&(String){11, 10, ") < 0 || ("}));
   if (NULL != self->second_index) {
-    CHECK(498, Mexp_write_final(self->second_index));
-    CHECK(499, write(&(String){11, 10, ") < 0 || ("}));
+    CHECK(506, Mexp_write_final(self->second_index));
+    CHECK(507, write(&(String){11, 10, ") < 0 || ("}));
   }
-  CHECK(500, Mexp_write_final(self->index));
-  CHECK(501, write(&(String){3, 2, ") "}));
+  CHECK(508, Mexp_write_final(self->index));
+  CHECK(509, write(&(String){3, 2, ") "}));
   if (NULL != self->second_index) {
-    CHECK(503, write(&(String){4, 3, "+ ("}));
-    CHECK(504, Mexp_write_final(self->second_index));
-    CHECK(505, write(&(String){5, 4, ") > "}));
+    CHECK(511, write(&(String){4, 3, "+ ("}));
+    CHECK(512, Mexp_write_final(self->second_index));
+    CHECK(513, write(&(String){5, 4, ") > "}));
   }
   else {
-    CHECK(507, write(&(String){4, 3, ">= "}));
+    CHECK(515, write(&(String){4, 3, ">= "}));
   }
-  CHECK(508, Operand_write_all_final(self->seq));
-  CHECK(509, write(&(String){11, 10, "->length) "}));
-  CHECK(510, write_tb_raise());
-  CHECK(511, write_new_indent_line());
+  CHECK(516, Operand_write_all_final(self->seq));
+  CHECK(517, write(&(String){11, 10, "->length) "}));
+  CHECK(518, write_tb_raise());
+  CHECK(519, write_new_indent_line());
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -908,40 +920,40 @@ Returncode Slice_operand_write_final(Slice_operand* self) {
   /* &(Array){second, ((Type*)(seq->values)) + (index)} */
   /* &(String){second, second, seq->values + (index)} */
   if (NULL != self->second_index) {
-    CHECK(519, write(&(String){3, 2, "&("}));
-    CHECK(520, write_cstyle(self->seq_type->name));
-    CHECK(521, write(&(String){3, 2, "){"}));
-    CHECK(522, Mexp_write_final(self->second_index));
-    CHECK(523, write(&(String){3, 2, ", "}));
+    CHECK(527, write(&(String){3, 2, "&("}));
+    CHECK(528, write_cstyle(self->seq_type->name));
+    CHECK(529, write(&(String){3, 2, "){"}));
+    CHECK(530, Mexp_write_final(self->second_index));
+    CHECK(531, write(&(String){3, 2, ", "}));
     if (self->seq_type == glob->type_string) {
-      CHECK(525, Mexp_write_final(self->second_index));
-      CHECK(526, write(&(String){3, 2, ", "}));
+      CHECK(533, Mexp_write_final(self->second_index));
+      CHECK(534, write(&(String){3, 2, ", "}));
     }
   }
   if (NULL != self->item_type) {
-    CHECK(528, write(&(String){3, 2, "(("}));
-    CHECK(529, write_cstyle(self->item_type->name));
-    CHECK(530, write(&(String){4, 3, "*)("}));
+    CHECK(536, write(&(String){3, 2, "(("}));
+    CHECK(537, write_cstyle(self->item_type->name));
+    CHECK(538, write(&(String){4, 3, "*)("}));
   }
-  CHECK(531, Operand_write_all_final(self->seq));
-  CHECK(532, write(&(String){9, 8, "->values"}));
+  CHECK(539, Operand_write_all_final(self->seq));
+  CHECK(540, write(&(String){9, 8, "->values"}));
   if (NULL != self->item_type) {
-    CHECK(534, write(&(String){3, 2, "))"}));
+    CHECK(542, write(&(String){3, 2, "))"}));
   }
   if (NULL != self->second_index) {
-    CHECK(536, write(&(String){5, 4, " + ("}));
-    CHECK(537, Mexp_write_final(self->index));
-    CHECK(538, write(&(String){3, 2, ")}"}));
+    CHECK(544, write(&(String){5, 4, " + ("}));
+    CHECK(545, Mexp_write_final(self->index));
+    CHECK(546, write(&(String){3, 2, ")}"}));
   }
   else {
     if (NULL != self->item_type && !self->item_type->is_primitive) {
-      CHECK(540, write(&(String){4, 3, " + "}));
-      CHECK(541, Mexp_write_final(self->index));
+      CHECK(548, write(&(String){4, 3, " + "}));
+      CHECK(549, Mexp_write_final(self->index));
     }
     else {
-      CHECK(543, write(&(String){2, 1, "["}));
-      CHECK(544, Mexp_write_final(self->index));
-      CHECK(545, write(&(String){2, 1, "]"}));
+      CHECK(551, write(&(String){2, 1, "["}));
+      CHECK(552, Mexp_write_final(self->index));
+      CHECK(553, write(&(String){2, 1, "]"}));
     }
   }
   return OK;
@@ -957,8 +969,8 @@ typedef struct St_exp St_exp; struct St_exp {
 static char* _func_name_St_exp_parse = "St-exp.parse";
 #define MR_FUNC_NAME _func_name_St_exp_parse
 Returncode St_exp_parse(St_exp* self) {
-  Char _Char5;
-  CHECK(552, parse_new_exp_with_kw(&(String){1, 0, ""}, &(self->exp), &(_Char5)));
+  Char _Char6;
+  CHECK(560, parse_new_exp_with_kw(&(String){1, 0, ""}, &(self->exp), &(_Char6)));
   self->exp->is_used = false;
   return OK;
 }
@@ -975,17 +987,17 @@ static char* _func_name_St_exp_analyze = "St-exp.analyze";
 Returncode St_exp_analyze(St_exp* self) {
   Mtype* mtype = NULL;
   Mtype* sub_mtype = NULL;
-  CHECK(561, Mexp_analyze(self->exp, &(mtype), &(sub_mtype)));
+  CHECK(569, Mexp_analyze(self->exp, &(mtype), &(sub_mtype)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_exp_write = "St-exp.write";
 #define MR_FUNC_NAME _func_name_St_exp_write
 Returncode St_exp_write(St_exp* self) {
-  CHECK(564, Mexp_write_intro(self->exp));
-  CHECK(565, Mexp_write_final(self->exp));
+  CHECK(572, Mexp_write_intro(self->exp));
+  CHECK(573, Mexp_write_final(self->exp));
   if (!self->exp->is_used) {
-    CHECK(567, write(&(String){2, 1, ";"}));
+    CHECK(575, write(&(String){2, 1, ";"}));
   }
   return OK;
 }

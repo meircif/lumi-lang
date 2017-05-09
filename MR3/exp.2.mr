@@ -344,6 +344,8 @@ class Block-operand(Operand)
     write(user ")")
 
 
+native func f-is-func-dynamic(user Mfunc mfunc):(copy Bool is-dynamic)
+
 class Member-operand(Var-operand)
   user Mtype prev-mtype
   
@@ -360,10 +362,16 @@ class Member-operand(Var-operand)
         f-syntax-error2(user "type", user self.prev-mtype.name, user "has no member", user self.name)
       self.base-count := self.base-count + 1
     self.prev-mtype := mtype
+    user Mtype basetype(mtype.base-mtype)
     mtype := self.mvar.mtype
     sub-mtype := self.mvar.sub-mtype
     if ? self.next
       if ? self.mvar.func-dec and ? member
+        if f-is-func-dynamic(user self.mvar.func-dec) and self.allow-dynamic
+          do
+            while ? basetype
+            self.base-count := self.base-count + 1
+            basetype := basetype.base-mtype
         self.next.analyze(user exp, user member, user self):(user mtype, user sub-mtype)
       else
         self.next.analyze(user exp, user self, user self):(user mtype, user sub-mtype)

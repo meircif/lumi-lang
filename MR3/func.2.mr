@@ -270,12 +270,16 @@ func parse-new-mfunc():(owner Mfunc new-mfunc)
   mfunc.parse()
   new-mfunc := mfunc
 
+func f-is-func-dynamic(user Mfunc mfunc):(copy Bool is-dynamic)
+  is-dynamic := mfunc.is-dynamic
+
 
 class Call-operand(Operand)
   owner Arg-list args
   owner Operand func-opr
   user Operand dynamic-opr
   var Int dynamic-index
+  var Int dynamic-base-count
   var Bool is-used
   user Mvar res-var
   user Mexp res-exp
@@ -289,6 +293,7 @@ class Call-operand(Operand)
     self.func-opr := _
     self.dynamic-opr := _
     self.dynamic-index := 0
+    self.dynamic-base-count := 0
     self.res-var := _
     self.res-name := _
     self.res-exp := _
@@ -406,6 +411,8 @@ class Call-operand(Operand)
       if method.mvar.func-dec.is-dynamic and method.allow-dynamic
         self.dynamic-opr := exp.operand
         self.dynamic-index := method.mvar.func-dec.dynamic-index
+        self.dynamic-base-count := method.base-count
+        method.base-count := 0
       new Mexp new-exp
       new-exp.init()
       new-exp.operand := exp.operand
@@ -426,9 +433,13 @@ class Call-operand(Operand)
   func inst write-call()
     write-tb-check()
     if ? self.dynamic-opr
-      write(user "(*((Func**)(")
+      # (opr)->[_base.]_dtl[index]
+      write(user "(")
       self.dynamic-opr.write-all-final()
-      write(user ")))[")
+      write(user ")->")
+      for n in self.dynamic-base-count
+        write(user "_base.")
+      write(user "_dtl[")
       write-int(copy self.dynamic-index)
       write(user "]")
     else

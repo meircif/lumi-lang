@@ -58,11 +58,16 @@ class St-dec(St)
       else
         self.write-class()
         if ? self.mvar.mtype.dynamic-members
-          # *((Func**)(name)) = Class__dtl;
+          # name->[_base.]_dtl = Class__dtl;
           write-new-indent-line()
-          write(user "*((Func**)(")
           write-cstyle(user self.mvar.name)
-          write(user ")) = ")
+          write(user "->")
+          user Mtype basetype(self.mvar.mtype.base-mtype)
+          do
+            while ? basetype
+            write(user "_base.")
+            basetype := basetype.base-mtype
+          write(user "_dtl = ")
           write-cstyle(user self.mvar.mtype.name)
           write(user "__dtl;")
     else
