@@ -126,14 +126,17 @@ static Mexp(Object)
     if ? self.next
       self.next.analyze():(user mtype, user sub-mtype)
   
-  func inst analyze-types(user Mtype target-mtype, user Mtype target-sub-mtype)
+  func inst analyze-get-subtype(user Mtype target-mtype):(user Mtype sub-mtype)
     user Mtype mtype(target-mtype)
-    user Mtype sub-mtype(target-sub-mtype)
     self.analyze():(user mtype, user sub-mtype)
     if not (? mtype)
       f-syntax-error(user "got no value, expected", user target-mtype.name)
     if mtype != target-mtype
       f-syntax-error2(user "got", user mtype.name, user "expected", user target-mtype.name)
+  
+  func inst analyze-types(user Mtype target-mtype, user Mtype target-sub-mtype)
+    user Mtype sub-mtype(target-sub-mtype)
+    self.analyze-get-subtype(user target-mtype):(user sub-mtype)
     if ? target-sub-mtype
       if not (? sub-mtype)
         f-syntax-error(user "got no sub-type, expected", user target-sub-mtype.name)
@@ -430,24 +433,38 @@ class Base-meth-operand(Operand)
 
 class Type-operand(Operand)
   owner String name
+  user Mtype mtype
   
   func dynamic parse(owner String text, user String ends):(copy Char end)
     self.name := text
+    self.mtype := _
   
   func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
     f-find-type(user self.name):(user mtype)
-    if not (? self.next)
-      f-syntax-error(user "expected member after type", user self.name)
-    sub-mtype := _
-    exp.operand := self.next
-    self.next.analyze(user exp, user member, user method):(user mtype, user sub-mtype)
-    delete self
+    if ? self.next
+      sub-mtype := _
+      exp.operand := self.next
+      self.next.analyze(user exp, user member, user method):(user mtype, user sub-mtype)
+      delete self
+    else
+      self.mtype := mtype
+      mtype := glob.type-type
+      sub-mtype := self.mtype
   
   func dynamic write-intro()
-    raise
+    # nothing
   
   func dynamic write-final()
-    raise
+    # (Type){sizeof(name), name__dtl}
+    write(user "(Type){sizeof(")
+    write-cstyle(user self.name)
+    write(user "), ")
+    if ? self.mtype.dynamic-members
+      write-cstyle(user self.name)
+      write(user "__dtl")
+    else
+      write(user "NULL")
+    write(user "}")
 
 
 class Slice-operand(Operand)

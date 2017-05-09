@@ -4,9 +4,6 @@ class St-dec(St)
   user Mvar mvar
   owner Mexp value
   
-  native func parse-array()
-  native func parse-string()
-  
   func dynamic parse()
     init-new-var(user _):(owner self.mvar)
     self.value := _
@@ -18,6 +15,8 @@ class St-dec(St)
           read-c()
       else-if self.mvar.typename.equal(user "String")
         self.parse-string()
+      else-if self.mvar.typename.equal(user "As")
+        self.parse-as()
       else
         read-new(user "}"):(owner self.mvar.sub-typename)
       read-c()
@@ -27,11 +26,24 @@ class St-dec(St)
     self.add-var(owner self.mvar)
   
   func dynamic analyze-first()
-    self.mvar.analyze()
+    # nothing
   
   func dynamic analyze()
+    self.mvar.analyze()
     if ? self.value
       self.value.analyze-types(user self.mvar.mtype, user self.mvar.sub-mtype)
+  
+  func inst write-to-dtl()
+    # name->[_base.]_dtl = 
+    write-new-indent-line()
+    write-cstyle(user self.mvar.name)
+    write(user "->")
+    user Mtype basetype(self.mvar.mtype.base-mtype)
+    do
+      while ? basetype
+      write(user "_base.")
+      basetype := basetype.base-mtype
+    write(user "_dtl = ")
   
   func dynamic write()
     if ? glob.mclass
@@ -55,19 +67,10 @@ class St-dec(St)
         self.write-array()
       else-if self.mvar.mtype.is-primitive
         self.write-primitive()
-      else
+      else-if not self.write-as()
         self.write-class()
         if ? self.mvar.mtype.dynamic-members
-          # name->[_base.]_dtl = Class__dtl;
-          write-new-indent-line()
-          write-cstyle(user self.mvar.name)
-          write(user "->")
-          user Mtype basetype(self.mvar.mtype.base-mtype)
-          do
-            while ? basetype
-            write(user "_base.")
-            basetype := basetype.base-mtype
-          write(user "_dtl = ")
+          self.write-to-dtl()
           write-cstyle(user self.mvar.mtype.name)
           write(user "__dtl;")
     else
@@ -84,6 +87,9 @@ class St-dec(St)
   func dynamic parse-string()
     # nothing
   
+  func dynamic parse-as()
+    # nothing
+  
   func dynamic m-is-allocation():(copy Bool is-aloc)
     # nothing
   
@@ -98,6 +104,9 @@ class St-dec(St)
   
   func dynamic write-array()
     # nothing
+  
+  func dynamic write-as():(copy Bool is-as)
+    is-as := false
 
 
 class St-var(St-dec)
@@ -108,14 +117,13 @@ class St-var(St-dec)
     self.arr-length := _
     self.str-length := _
     base.parse()
-    
+  
   func dynamic analyze-first()
     base.analyze-first()
-    
+  
   func dynamic analyze()
     base.analyze()
-    # f-syntax-error(user "cannot initialize variable of type", user self.mvar.typename)
-    
+  
   func dynamic write()
     base.write()
   
@@ -124,6 +132,9 @@ class St-var(St-dec)
   
   func dynamic parse-string()
     read-new(user "}"):(owner self.str-length)
+  
+  func dynamic parse-as()
+    f-syntax-error(user "illegal variable type", user "As")
   
   func dynamic m-is-allocation():(copy Bool is-aloc)
     is-aloc := not self.mvar.mtype.is-primitive
@@ -182,6 +193,9 @@ class St-var(St-dec)
       write(user " * ")
       write(user self.arr-length)
       write(user "]){0});")
+  
+  func dynamic write-as():(copy Bool is-as)
+    base.write-as():(copy is-as)
 
 
 class St-ref(St-dec)
@@ -204,6 +218,9 @@ class St-ref(St-dec)
   func dynamic parse-string()
     f-syntax-error(user "unexpected parameter to String", user "")
   
+  func dynamic parse-as()
+    f-syntax-error(user "illegal reference type", user "As")
+  
   func dynamic m-is-allocation():(copy Bool is-aloc)
     is-aloc := false
   
@@ -218,13 +235,20 @@ class St-ref(St-dec)
   
   func dynamic write-array()
     raise
+  
+  func dynamic write-as():(copy Bool is-as)
+    base.write-as():(copy is-as)
 
 
 class St-new(St-var)
   owner Mexp arr-length
   owner Mexp str-length
+  owner Mexp as-type
   
   func dynamic parse()
+    self.arr-length := _
+    self.str-length := _
+    self.as-type := _
     base.parse()
     self.mvar.access := ACCESS-OWNER
   
@@ -238,6 +262,12 @@ class St-new(St-var)
       self.str-length.analyze-type(user glob.type-int)
     if ? self.arr-length
       self.arr-length.analyze-type(user glob.type-int)
+    if ? self.as-type
+      self.mvar.mtype := _
+      self.as-type.analyze-get-subtype(user glob.type-type):(user self.mvar.mtype)
+      if not (? self.mvar.mtype)
+        f-syntax-error(user "no subtype for type", user self.mvar.name)
+      self.mvar.typename := self.mvar.mtype.name
     base.analyze()
   
   func dynamic write()
@@ -248,6 +278,9 @@ class St-new(St-var)
   
   func dynamic parse-string()
     parse-new-exp(user "}"):(owner self.str-length)
+  
+  func dynamic parse-as()
+    parse-new-exp(user "}"):(owner self.as-type)
   
   func dynamic m-is-allocation():(copy Bool is-aloc)
     is-aloc := true
@@ -271,7 +304,7 @@ class St-new(St-var)
     self.write-check()
   
   func dynamic write-string()
-    # String* name = new_string(length);
+    # String* name = _new_string(length);
     if not (? self.str-length)
       f-syntax-error(user "String length missing in", user self.mvar.name)
     self.str-length.write-intro()
@@ -281,8 +314,8 @@ class St-new(St-var)
     self.write-check()
   
   func dynamic write-array()
-    # Array* name = new_array(length, sizeof(Class));
-    # Array* name = new_array(length, sizeof(String) + (string-length));
+    # Array* name = _new_array(length, sizeof(Class));
+    # Array* name = _new_array(length, sizeof(String) + (string-length));
     # _set_new_string_array(length, string-length, name);
     if not (? self.arr-length)
       f-syntax-error(user "Array length missing in", user self.mvar.name)
@@ -307,6 +340,22 @@ class St-new(St-var)
       write(user ", ")
       write-cstyle(user self.mvar.name)
       write(user ");")
+  
+  func dynamic write-as():(copy Bool is-as)
+    is-as := ? self.as-type
+    if not is-as
+      return
+    # Type* name = malloc((as-type).size);
+    self.as-type.write-intro()
+    write(user "malloc((")
+    self.as-type.write-final()
+    write(user ").size);")
+    self.write-check()
+    if ? self.mvar.mtype.dynamic-members
+      self.write-to-dtl()
+      write(user "(")
+      self.as-type.write-final()
+      write(user ").dtl;")
 
 
 class St-delete(St)
