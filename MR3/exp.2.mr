@@ -517,8 +517,8 @@ class Slice-operand(Operand)
     if ? self.second-index
       self.second-index.write-intro()
     self.seq.write-all-intro()
-    # if ((index) < 0 || (index) >= seq->length) RAISE(line-num)
-    # if ((index) < 0 || (second) < 0 || (index) + (second) > seq->length) RAISE(line-num)
+    # if ((index) < 0 || (index) >= (seq)->length) RAISE(line-num)
+    # if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length) RAISE(line-num)
     write(user "if ((")
     self.index.write-final()
     write(user ") < 0 || (")
@@ -530,19 +530,21 @@ class Slice-operand(Operand)
     if ? self.second-index
       write(user "+ (")
       self.second-index.write-final()
-      write(user ") > ")
+      write(user ") >")
     else
-      write(user ">= ")
+      write(user ">=")
+    write(user " (")
     self.seq.write-all-final()
-    write(user "->length) ")
+    write(user ")->length) ")
     write-tb-raise()
     write-new-indent-line()
   
   func dynamic write-final()
-    # ((Prmitive*)(seq->values))[index]
-    # ((Complex*)(seq->values)) + index
-    # &(Array){second, ((Type*)(seq->values)) + (index)}
-    # &(String){second, second, seq->values + (index)}
+    # ((Prmitive*)((seq)->values))[index]
+    # ((Complex*)((seq)->values)) + index
+    # &(Array){second, ((Type*)((seq)->values)) + (index)}
+    # &(String){second, second, (seq)->values + (index)}
+    write(user "(")
     if ? self.second-index
       write(user "&(")
       write-cstyle(user self.seq-type.name)
@@ -556,8 +558,9 @@ class Slice-operand(Operand)
       write(user "((")
       write-cstyle(user self.item-type.name)
       write(user "*)(")
+    write(user "(")
     self.seq.write-all-final()
-    write(user "->values")
+    write(user ")->values")
     if ? self.item-type
       write(user "))")
     if ? self.second-index
@@ -571,6 +574,7 @@ class Slice-operand(Operand)
       write(user "[")
       self.index.write-final()
       write(user "]")
+    write(user ")")
 
 
 class St-exp(St)

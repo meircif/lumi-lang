@@ -916,8 +916,8 @@ Returncode Slice_operand_write_intro(Slice_operand* self) {
     CHECK(518, Mexp_write_intro(self->second_index));
   }
   CHECK(519, Operand_write_all_intro(self->seq));
-  /* if ((index) < 0 || (index) >= seq->length) RAISE(line-num) */
-  /* if ((index) < 0 || (second) < 0 || (index) + (second) > seq->length) RAISE(line-num) */
+  /* if ((index) < 0 || (index) >= (seq)->length) RAISE(line-num) */
+  /* if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length) RAISE(line-num) */
   CHECK(522, write(&(String){6, 5, "if (("}));
   CHECK(523, Mexp_write_final(self->index));
   CHECK(524, write(&(String){11, 10, ") < 0 || ("}));
@@ -930,62 +930,66 @@ Returncode Slice_operand_write_intro(Slice_operand* self) {
   if (NULL != self->second_index) {
     CHECK(531, write(&(String){4, 3, "+ ("}));
     CHECK(532, Mexp_write_final(self->second_index));
-    CHECK(533, write(&(String){5, 4, ") > "}));
+    CHECK(533, write(&(String){4, 3, ") >"}));
   }
   else {
-    CHECK(535, write(&(String){4, 3, ">= "}));
+    CHECK(535, write(&(String){3, 2, ">="}));
   }
-  CHECK(536, Operand_write_all_final(self->seq));
-  CHECK(537, write(&(String){11, 10, "->length) "}));
-  CHECK(538, write_tb_raise());
-  CHECK(539, write_new_indent_line());
+  CHECK(536, write(&(String){3, 2, " ("}));
+  CHECK(537, Operand_write_all_final(self->seq));
+  CHECK(538, write(&(String){12, 11, ")->length) "}));
+  CHECK(539, write_tb_raise());
+  CHECK(540, write_new_indent_line());
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_Slice_operand_write_final = "Slice-operand.write-final";
 #define MR_FUNC_NAME _func_name_Slice_operand_write_final
 Returncode Slice_operand_write_final(Slice_operand* self) {
-  /* ((Prmitive*)(seq->values))[index] */
-  /* ((Complex*)(seq->values)) + index */
-  /* &(Array){second, ((Type*)(seq->values)) + (index)} */
-  /* &(String){second, second, seq->values + (index)} */
+  /* ((Prmitive*)((seq)->values))[index] */
+  /* ((Complex*)((seq)->values)) + index */
+  /* &(Array){second, ((Type*)((seq)->values)) + (index)} */
+  /* &(String){second, second, (seq)->values + (index)} */
+  CHECK(547, write(&(String){2, 1, "("}));
   if (NULL != self->second_index) {
-    CHECK(547, write(&(String){3, 2, "&("}));
-    CHECK(548, write_cstyle(self->seq_type->name));
-    CHECK(549, write(&(String){3, 2, "){"}));
-    CHECK(550, Mexp_write_final(self->second_index));
-    CHECK(551, write(&(String){3, 2, ", "}));
+    CHECK(549, write(&(String){3, 2, "&("}));
+    CHECK(550, write_cstyle(self->seq_type->name));
+    CHECK(551, write(&(String){3, 2, "){"}));
+    CHECK(552, Mexp_write_final(self->second_index));
+    CHECK(553, write(&(String){3, 2, ", "}));
     if (self->seq_type == glob->type_string) {
-      CHECK(553, Mexp_write_final(self->second_index));
-      CHECK(554, write(&(String){3, 2, ", "}));
+      CHECK(555, Mexp_write_final(self->second_index));
+      CHECK(556, write(&(String){3, 2, ", "}));
     }
   }
   if (NULL != self->item_type) {
-    CHECK(556, write(&(String){3, 2, "(("}));
-    CHECK(557, write_cstyle(self->item_type->name));
-    CHECK(558, write(&(String){4, 3, "*)("}));
+    CHECK(558, write(&(String){3, 2, "(("}));
+    CHECK(559, write_cstyle(self->item_type->name));
+    CHECK(560, write(&(String){4, 3, "*)("}));
   }
-  CHECK(559, Operand_write_all_final(self->seq));
-  CHECK(560, write(&(String){9, 8, "->values"}));
+  CHECK(561, write(&(String){2, 1, "("}));
+  CHECK(562, Operand_write_all_final(self->seq));
+  CHECK(563, write(&(String){10, 9, ")->values"}));
   if (NULL != self->item_type) {
-    CHECK(562, write(&(String){3, 2, "))"}));
+    CHECK(565, write(&(String){3, 2, "))"}));
   }
   if (NULL != self->second_index) {
-    CHECK(564, write(&(String){5, 4, " + ("}));
-    CHECK(565, Mexp_write_final(self->index));
-    CHECK(566, write(&(String){3, 2, ")}"}));
+    CHECK(567, write(&(String){5, 4, " + ("}));
+    CHECK(568, Mexp_write_final(self->index));
+    CHECK(569, write(&(String){3, 2, ")}"}));
   }
   else {
     if (NULL != self->item_type && !self->item_type->is_primitive) {
-      CHECK(568, write(&(String){4, 3, " + "}));
-      CHECK(569, Mexp_write_final(self->index));
+      CHECK(571, write(&(String){4, 3, " + "}));
+      CHECK(572, Mexp_write_final(self->index));
     }
     else {
-      CHECK(571, write(&(String){2, 1, "["}));
-      CHECK(572, Mexp_write_final(self->index));
-      CHECK(573, write(&(String){2, 1, "]"}));
+      CHECK(574, write(&(String){2, 1, "["}));
+      CHECK(575, Mexp_write_final(self->index));
+      CHECK(576, write(&(String){2, 1, "]"}));
     }
   }
+  CHECK(577, write(&(String){2, 1, ")"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -1000,7 +1004,7 @@ static char* _func_name_St_exp_parse = "St-exp.parse";
 #define MR_FUNC_NAME _func_name_St_exp_parse
 Returncode St_exp_parse(St_exp* self) {
   Char _Char6;
-  CHECK(580, parse_new_exp_with_kw(&(String){1, 0, ""}, &(self->exp), &(_Char6)));
+  CHECK(584, parse_new_exp_with_kw(&(String){1, 0, ""}, &(self->exp), &(_Char6)));
   self->exp->is_used = false;
   return OK;
 }
@@ -1017,17 +1021,17 @@ static char* _func_name_St_exp_analyze = "St-exp.analyze";
 Returncode St_exp_analyze(St_exp* self) {
   Mtype* mtype = NULL;
   Mtype* sub_mtype = NULL;
-  CHECK(589, Mexp_analyze(self->exp, &(mtype), &(sub_mtype)));
+  CHECK(593, Mexp_analyze(self->exp, &(mtype), &(sub_mtype)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_exp_write = "St-exp.write";
 #define MR_FUNC_NAME _func_name_St_exp_write
 Returncode St_exp_write(St_exp* self) {
-  CHECK(592, Mexp_write_intro(self->exp));
-  CHECK(593, Mexp_write_final(self->exp));
+  CHECK(596, Mexp_write_intro(self->exp));
+  CHECK(597, Mexp_write_final(self->exp));
   if (!self->exp->is_used) {
-    CHECK(595, write(&(String){2, 1, ";"}));
+    CHECK(599, write(&(String){2, 1, ";"}));
   }
   return OK;
 }
