@@ -932,14 +932,14 @@ Returncode St_func_parse(St_func* self) {
 static char* _func_name_St_func_analyze_first = "St-func.analyze-first";
 #define MR_FUNC_NAME _func_name_St_func_analyze_first
 Returncode St_func_analyze_first(St_func* self) {
-  CHECK(541, St_node_analyze_first(&(self->_base)));
+  CHECK(541, Mfunc_analyze(self->mfunc));
+  CHECK(542, St_node_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_func_analyze = "St-func.analyze";
 #define MR_FUNC_NAME _func_name_St_func_analyze
 Returncode St_func_analyze(St_func* self) {
-  CHECK(544, Mfunc_analyze(self->mfunc));
   St_return* st_return = malloc(sizeof(St_return));
   if (st_return == NULL) RAISE(545)
   *((Func**)(st_return)) = St_return__dtl;

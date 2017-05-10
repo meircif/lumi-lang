@@ -200,21 +200,22 @@ class St-file(St-node)
           write(user "#include")
           self.write-cfile-name(copy n)
       
-      for depth in glob.max-type-depth
-        if depth = 0
-          write(user "#if ")
-        else
-          write(user "#elif ")
-        write(user "MR_STAGE == MR_TYPES(")
-        write-int(copy depth + 1)
-        write(user ")\n")
-        write(user "#undef MR_STAGE\n")
-        write(user "#define MR_STAGE MR_TYPES(")
-        write-int(copy depth + 2)
-        write(user ")\n")
-        if depth = glob.max-type-depth - 1
-          write(user "#endif\n")
+    for depth in glob.max-type-depth
+      if depth = 0
+        write(user "#if ")
+      else
+        write(user "#elif ")
+      write(user "MR_STAGE == MR_TYPES(")
+      write-int(copy depth + 1)
+      write(user ")\n")
+      write(user "#undef MR_STAGE\n")
+      write(user "#define MR_STAGE MR_TYPES(")
+      write-int(copy depth + 2)
+      write(user ")\n")
+      if depth = glob.max-type-depth - 1
+        write(user "#endif\n")
       
+    if self.argv.length > 2
       write(user "#undef MR_INCLUDES\n")
       write(user "#endif\n\n")
     

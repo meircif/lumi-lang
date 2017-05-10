@@ -538,10 +538,10 @@ class St-func(St-node)
     base.parse()
   
   func dynamic analyze-first()
+    self.mfunc.analyze()
     base.analyze-first()
   
   func dynamic analyze()
-    self.mfunc.analyze()
     new St-return st-return
     st-return.init(user self)
     base.analyze()
