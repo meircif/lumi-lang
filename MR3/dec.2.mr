@@ -26,12 +26,21 @@ class St-dec(St)
     self.add-var(owner self.mvar)
   
   func dynamic analyze-first()
-    # nothing
+    self.mvar.analyze()
   
   func dynamic analyze()
-    self.mvar.analyze()
     if ? self.value
       self.value.analyze-types(user self.mvar.mtype, user self.mvar.sub-mtype)
+  
+  func inst m-is-global():(copy Bool is-global)
+    is-global := not (? self.father.father.father)
+  
+  func inst write-dec()
+    write-cstyle(user self.mvar.typename)
+    if not self.mvar.mtype.is-primitive
+      write(user "*")
+    write(user " ")
+    write-cstyle(user self.mvar.name)
   
   func inst write-to-dtl()
     # name->[_base.]_dtl = 
@@ -50,13 +59,18 @@ class St-dec(St)
       if glob.methods
         return
       write-spaces()
+    else-if self.m-is-global()
+      write(user "#if MR_STAGE == MR_DECLARATIONS\n")
+      write-spaces()
+      write(user "extern ")
+      self.write-dec()
+      write(user ";\n")
+      write-spaces()
+      write(user "#elif MR_STAGE == MR_FUNCTIONS\n")
+      write-spaces()
     if ? self.value
       self.value.write-intro()
-    write-cstyle(user self.mvar.typename)
-    if not self.mvar.mtype.is-primitive
-      write(user "*")
-    write(user " ")
-    write-cstyle(user self.mvar.name)
+    self.write-dec()
     if self.m-is-allocation()
       write(user " = ")
       if self.mvar.mtype = glob.type-string
@@ -80,6 +94,9 @@ class St-dec(St)
       write(user ";")
     if ? glob.mclass
       write(user "\n")
+    else-if self.m-is-global()
+      write-new-indent-line()
+      write(user "#endif")
   
   func dynamic parse-array()
     # nothing
@@ -240,7 +257,7 @@ class St-ref(St-dec)
     base.write-as():(copy is-as)
 
 
-class St-new(St-var)
+class St-new(St-dec)
   owner Mexp arr-length
   owner Mexp str-length
   owner Mexp as-type
@@ -253,7 +270,7 @@ class St-new(St-var)
     self.mvar.access := ACCESS-OWNER
   
   func dynamic analyze-first()
-    base.analyze-first()
+    # nothing
   
   func dynamic analyze()
     if ? self.value
@@ -268,6 +285,7 @@ class St-new(St-var)
       if not (? self.mvar.mtype)
         f-syntax-error(user "no subtype for type", user self.mvar.name)
       self.mvar.typename := self.mvar.mtype.name
+    self.mvar.analyze()
     base.analyze()
   
   func dynamic write()

@@ -551,6 +551,13 @@ class St-func(St-node)
       if not glob.methods
         return
       write-new-indent-line()
+    write(user "#if MR_STAGE == MR_DECLARATIONS\n")
+    write-spaces()
+    self.mfunc.write()
+    write(user ";\n")
+    write-spaces()
+    write(user "#elif MR_STAGE == MR_FUNCTIONS\n")
+    write-spaces()
     write(user "static char* _func_name_")
     self.mfunc.write-name()
     write(user " = \"")
@@ -569,7 +576,9 @@ class St-func(St-node)
     base.write()
     glob.mclass := mclass
     write-new-indent-line()
-    write(user "#undef MR_FUNC_NAME")
+    write(user "#undef MR_FUNC_NAME\n")
+    write-spaces()
+    write(user "#endif")
 
 
 class St-main(St-func)
@@ -584,4 +593,6 @@ class St-main(St-func)
   
   func dynamic write()
     base.write()
-    write(user "\n\nMAIN_FUNC")
+    write(user "\n\n#if MR_STAGE == MR_FUNCTIONS\n")
+    write(user "MAIN_FUNC\n")
+    write(user "#endif")

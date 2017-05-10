@@ -5,6 +5,31 @@
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
 
+char* _mr_raise_format = "Error raised in %s:%d %s()\n";
+char* _mr_traceline_format = "  called from %s:%d %s()\n";
+
+Returncode func(Array*);
+
+int _mr_main(int argc, char* argv[]) {
+  String* args_strings = malloc(argc * sizeof(String));
+  if (args_strings == NULL) {
+    fprintf(stderr, "insufficient memory\n");
+    return ERR;
+  }
+  Array* args_array = &(Array){argc, args_strings};
+  int arg;
+  for (arg = 0; arg < argc; ++arg) {
+    args_strings[arg].values = argv[arg];
+    args_strings[arg].length = strnlen(args_strings[arg].values, 1024);
+    args_strings[arg].max_length = args_strings[arg].length + 1;
+  }
+  Returncode err = func(args_array);
+  if (err != OK) {
+    fprintf(stderr, "  called from executable start\n");
+  }
+  return err;
+}
+
 Returncode _set_cstring(String* str) {
   if (str->length >= str->max_length) {
     if (strnlen(str->values, str->max_length) >= str->max_length) {

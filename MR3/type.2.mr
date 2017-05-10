@@ -39,6 +39,7 @@ func analyze-type(user Mtype self, copy Bool is-dynamic)
 
 class St-class(St-node)
   user Mtype mtype
+  var Int depth
   
   func dynamic parse()
     var String{128} name
@@ -49,6 +50,7 @@ class St-class(St-node)
     if not base-typename.equal(user "Object")
       f-new-copy(user base-typename):(owner self.mtype.base-typename)
     read-c()
+    self.depth := 0
     glob.mclass := self.mtype
     base.parse()
     glob.mclass := _
@@ -58,23 +60,46 @@ class St-class(St-node)
     base.analyze-first()
   
   func dynamic analyze()
+    user Mtype basetype(self.mtype.base-mtype)
+    do
+      while ? basetype
+      self.depth := self.depth + 1
+      basetype := basetype.base-mtype
+    if self.depth > glob.max-type-depth
+      glob.max-type-depth := self.depth
     base.analyze()
   
   native func write-vars()
   native func write-meths()
   
   func dynamic write()
+    # #ifdef MR_TYPEDEFS
+    # typedef struct name name;
+    # #elif defined MR_TYPES
+    # struct name {
+    #   members...
+    # };
+    # #endif
+    # methods...
+    write(user "#if MR_STAGE == MR_TYPEDEFS\n")
+    write-spaces()
     write(user "typedef struct ")
     write-cstyle(user self.mtype.name)
     write(user " ")
     write-cstyle(user self.mtype.name)
     write(user ";\n")
     write-spaces()
+    write(user "#elif MR_STAGE == MR_TYPES(")
+    write-int(copy self.depth)
+    write(user ")\n")
+    write-spaces()
     write(user "struct ")
     write-cstyle(user self.mtype.name)
     write(user " {\n")
     self.write-vars()
-    write(user ";")
+    write(user ";\n")
+    write-spaces()
+    write(user "#endif")
     self.write-meths()
     glob.methods := false
     glob.mclass := _
@@ -132,6 +157,8 @@ class St-dynamic-class(St-class)
   func dynamic write-meths()
     base.write-meths()
     write-new-indent-line()
+    write(user "#if MR_STAGE == MR_DECLARATIONS\n")
+    write-spaces()
     write(user "Func ")
     write-cstyle(user self.mtype.name)
     write(user "__dtl[] = {")
@@ -151,4 +178,6 @@ class St-dynamic-class(St-class)
       iter.m-next()
       if iter.m-has-data()
         write(user ", ")
-    write(user "};")
+    write(user "};\n")
+    write-spaces()
+    write(user "#endif")

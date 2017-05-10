@@ -42,34 +42,21 @@ typedef struct {
   Func* dtl;
 } Type;
 
+extern char* _mr_raise_format;
+extern char* _mr_traceline_format;
+
 #define RAISE(line) { \
-  fprintf(stderr, "Error raised in %s:%d %s()\n",\
-    MR_FILE_NAME, line, MR_FUNC_NAME); \
+  fprintf(stderr, _mr_raise_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
   return ERR; }
 
 #define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
-  fprintf(stderr, "  called from %s:%d %s()\n",\
-    MR_FILE_NAME, line, MR_FUNC_NAME); \
+  fprintf(stderr, _mr_traceline_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
   return _err; } }
 
+int _mr_main(int argc, char* argv[]);
+
 #define MAIN_FUNC int main(int argc, char* argv[]) { \
-  String* args_strings = malloc(argc * sizeof(String)); \
-  if (args_strings == NULL) { \
-    fprintf(stderr, "insufficient memory\n"); \
-    return ERR; \
-  } \
-  Array* args_array = &(Array){argc, args_strings}; \
-  int arg; \
-  for (arg = 0; arg < argc; ++arg) { \
-    args_strings[arg].values = argv[arg]; \
-    args_strings[arg].length = strnlen(args_strings[arg].values, 1024); \
-    args_strings[arg].max_length = args_strings[arg].length + 1; \
-  } \
-  Returncode err =  func(args_array); \
-  if (err != OK) {\
-    fprintf(stderr, "  called from executable start\n"); \
-  } \
-  return err; \
+  return _mr_main(argc, argv); \
 }
 
 #define sys NULL
@@ -109,4 +96,40 @@ Returncode Sys_exit(void*, Int status);
 Returncode Sys_system(void*, String* command, Int* status);
 Returncode Sys_getenv(void*, String* name, String* value, Bool* exists);
 
+
+#define MR_TYPEDEFS 0
+#define MR_TYPES(depth) 1 + depth
+#define MR_DECLARATIONS 2 + DEPTH
+#define MR_FUNCTIONS 3 + DEPTH
+#define MR_END 4 + DEPTH
+
+#define MR_STAGE MR_TYPEDEFS
+
+
 #endif  /*__MR_C_API__*/
+
+
+#if defined(MR_MAINFILE) && MR_STAGE < MR_END
+
+#include MR_MAINFILE
+
+#if MR_STAGE == MR_TYPEDEFS
+#undef MR_STAGE
+#define MR_STAGE MR_TYPES(0)
+#elif MR_STAGE == MR_TYPES(0)
+#undef MR_STAGE
+#define MR_STAGE MR_TYPES(1)
+#elif MR_STAGE == MR_TYPES(DEPTH)
+#undef MR_STAGE
+#define MR_STAGE MR_DECLARATIONS
+#elif MR_STAGE == MR_DECLARATIONS
+#undef MR_STAGE
+#define MR_STAGE MR_FUNCTIONS
+#elif MR_STAGE == MR_FUNCTIONS
+#undef MR_STAGE
+#define MR_STAGE MR_END
+#endif
+
+#include __FILE__
+
+#endif

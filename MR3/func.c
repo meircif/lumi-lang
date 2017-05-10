@@ -957,26 +957,35 @@ Returncode St_func_write(St_func* self) {
     }
     CHECK(553, write_new_indent_line());
   }
-  CHECK(554, write(&(String){25, 24, "static char* _func_name_"}));
-  CHECK(555, Mfunc_write_name(self->mfunc));
-  CHECK(556, write(&(String){5, 4, " = \""}));
+  CHECK(554, write(&(String){33, 32, "#if MR_STAGE == MR_DECLARATIONS\n"}));
+  CHECK(555, write_spaces());
+  CHECK(556, Mfunc_write(self->mfunc));
+  CHECK(557, write(&(String){3, 2, ";\n"}));
+  CHECK(558, write_spaces());
+  CHECK(559, write(&(String){32, 31, "#elif MR_STAGE == MR_FUNCTIONS\n"}));
+  CHECK(560, write_spaces());
+  CHECK(561, write(&(String){25, 24, "static char* _func_name_"}));
+  CHECK(562, Mfunc_write_name(self->mfunc));
+  CHECK(563, write(&(String){5, 4, " = \""}));
   if (NULL != glob->mclass) {
-    CHECK(558, write(glob->mclass->name));
-    CHECK(559, write(&(String){2, 1, "."}));
+    CHECK(565, write(glob->mclass->name));
+    CHECK(566, write(&(String){2, 1, "."}));
   }
-  CHECK(560, write(self->mfunc->name));
-  CHECK(561, write(&(String){4, 3, "\";\n"}));
-  CHECK(562, write_spaces());
-  CHECK(563, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
-  CHECK(564, Mfunc_write_name(self->mfunc));
-  CHECK(565, write_new_indent_line());
-  CHECK(566, Mfunc_write(self->mfunc));
+  CHECK(567, write(self->mfunc->name));
+  CHECK(568, write(&(String){4, 3, "\";\n"}));
+  CHECK(569, write_spaces());
+  CHECK(570, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
+  CHECK(571, Mfunc_write_name(self->mfunc));
+  CHECK(572, write_new_indent_line());
+  CHECK(573, Mfunc_write(self->mfunc));
   Mtype* mclass = glob->mclass;
   glob->mclass = NULL;
-  CHECK(569, St_node_write(&(self->_base)));
+  CHECK(576, St_node_write(&(self->_base)));
   glob->mclass = mclass;
-  CHECK(571, write_new_indent_line());
-  CHECK(572, write(&(String){20, 19, "#undef MR_FUNC_NAME"}));
+  CHECK(578, write_new_indent_line());
+  CHECK(579, write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}));
+  CHECK(580, write_spaces());
+  CHECK(581, write(&(String){7, 6, "#endif"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -989,29 +998,31 @@ typedef struct St_main St_main; struct St_main {
 static char* _func_name_St_main_parse = "St-main.parse";
 #define MR_FUNC_NAME _func_name_St_main_parse
 Returncode St_main_parse(St_main* self) {
-  CHECK(577, St_func_parse(&(self->_base)));
+  CHECK(586, St_func_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze_first = "St-main.analyze-first";
 #define MR_FUNC_NAME _func_name_St_main_analyze_first
 Returncode St_main_analyze_first(St_main* self) {
-  CHECK(580, St_func_analyze_first(&(self->_base)));
+  CHECK(589, St_func_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze = "St-main.analyze";
 #define MR_FUNC_NAME _func_name_St_main_analyze
 Returncode St_main_analyze(St_main* self) {
-  CHECK(583, St_func_analyze(&(self->_base)));
+  CHECK(592, St_func_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_write = "St-main.write";
 #define MR_FUNC_NAME _func_name_St_main_write
 Returncode St_main_write(St_main* self) {
-  CHECK(586, St_func_write(&(self->_base)));
-  CHECK(587, write(&(String){12, 11, "\n\nMAIN_FUNC"}));
+  CHECK(595, St_func_write(&(self->_base)));
+  CHECK(596, write(&(String){32, 31, "\n\n#if MR_STAGE == MR_FUNCTIONS\n"}));
+  CHECK(597, write(&(String){11, 10, "MAIN_FUNC\n"}));
+  CHECK(598, write(&(String){7, 6, "#endif"}));
   return OK;
 }
 #undef MR_FUNC_NAME

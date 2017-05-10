@@ -153,6 +153,14 @@ class St-file(St-node)
     glob.node := self
     base.analyze()
   
+  func inst write-cfile-name(copy Int index)
+    user String infile-name(self.argv[index])
+    user String prefix(infile-name[0:infile-name.length - 4])
+    write(user " \"")
+    write(user prefix)
+    write(user "c\"\n")
+    
+  
   func dynamic write()
     new String{self.infile-name.length} outfile-name
     outfile-name.copy(user self.infile-name[0:self.infile-name.length - 4])
@@ -160,28 +168,57 @@ class St-file(St-node)
     sys.print(user outfile-name)
     file-open-write(user outfile-name):(owner glob.outfile)
     
-    if self.index = self.argv.length - 1
-      write(user "#include \"mr.3.h\"\n")
-      for index in 1:self.argv.length - 1
-        user String infile-name(self.argv[index])
-        user String prefix(infile-name[0:infile-name.length - 4])
-        write(user "#include \"")
-        write(user prefix)
-        write(user "c\"\n")
-      write(user "\n")
+    write(user "#ifndef MR_MAINFILE\n")
+    write(user "#define MR_MAINFILE")
+    self.write-cfile-name(copy self.index)
+    write(user "#define DEPTH ")
+    write-int(copy glob.max-type-depth + 1)
+    write(user "\n#include \"mr.3.h\"\n")
+    write(user "#else\n\n")
     
+    write(user "#if MR_STAGE == MR_TYPEDEFS\n")
     write(user "static char* _mr_file")
     write-int(copy self.index)
     write(user "_name = \"")
     write(user self.infile-name)
-    write(user "\";\n#define MR_FILE_NAME _mr_file")
+    write(user "\";\n")
+    write(user "#endif\n")
+    write(user "#define MR_FILE_NAME _mr_file")
     write-int(copy self.index)
     write(user "_name\n\n")
     glob.infile-name := self.infile-name
     
     self.write-block()
     
-    write(user "\n#undef MR_FILE_NAME\n")
+    write(user "\n#undef MR_FILE_NAME\n\n")
+    
+    if self.argv.length > 2
+      write(user "#ifndef MR_INCLUDES\n")
+      write(user "#define MR_INCLUDES\n")
+      for n in 1:self.argv.length
+        if n != self.index
+          write(user "#include")
+          self.write-cfile-name(copy n)
+      
+      for depth in glob.max-type-depth
+        if depth = 0
+          write(user "#if ")
+        else
+          write(user "#elif ")
+        write(user "MR_STAGE == MR_TYPES(")
+        write-int(copy depth + 1)
+        write(user ")\n")
+        write(user "#undef MR_STAGE\n")
+        write(user "#define MR_STAGE MR_TYPES(")
+        write-int(copy depth + 2)
+        write(user ")\n")
+        if depth = glob.max-type-depth - 1
+          write(user "#endif\n")
+      
+      write(user "#undef MR_INCLUDES\n")
+      write(user "#endif\n\n")
+    
+    write(user "#endif\n")
     
     glob.outfile.close()
     delete outfile-name

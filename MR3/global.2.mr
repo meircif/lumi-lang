@@ -18,6 +18,7 @@ static Global-data(Object)
   owner Op-map op-map
   owner Type-map type-map
   owner Var-map var-map
+  var Int max-type-depth
   # types
   user Mtype type-char
   user Mtype type-bool
@@ -79,6 +80,7 @@ static Global-data(Object)
     self.type-func.is-primitive := true
   
   func inst init()
+    self.max-type-depth := 0
     self.line-num := 0
     self.methods := false
     self.res-count := 0

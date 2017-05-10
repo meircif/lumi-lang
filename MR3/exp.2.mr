@@ -358,6 +358,9 @@ class Member-operand(Var-operand)
     read-new-value(user ends):(owner self.name, copy end)
   
   func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    if not (? mtype)
+      f-syntax-error(user "member with no type", user self.name)
+    self.prev-mtype := mtype
     do
       while not (? mtype.members.find(user self.name):(user self.mvar))
       mtype := mtype.base-mtype
