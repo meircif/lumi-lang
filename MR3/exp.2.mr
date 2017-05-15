@@ -459,14 +459,8 @@ class Type-operand(Operand)
   
   func dynamic write-final()
     # (Type){sizeof(name), name__dtl}
-    write(user "(Type){sizeof(")
-    write-cstyle(user self.name)
-    write(user "), ")
-    if ? self.mtype.dynamic-members
-      write-cstyle(user self.name)
-      write(user "__dtl")
-    else
-      write(user "NULL")
+    write(user "(Type){")
+    write-type-type-params(user self.mtype)
     write(user "}")
 
 

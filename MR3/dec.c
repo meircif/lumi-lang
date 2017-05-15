@@ -112,6 +112,23 @@ Returncode St_dec_write_to_dtl(St_dec* self) {
   return OK;
 }
 #undef MR_FUNC_NAME
+static char* _func_name_St_dec_write_struct_init = "St-dec.write-struct-init";
+#define MR_FUNC_NAME _func_name_St_dec_write_struct_init
+Returncode St_dec_write_struct_init(St_dec* self) {
+  /* (Type){init-values...}; */
+  CHECK(59, write(&(String){2, 1, "("}));
+  CHECK(60, write_cstyle(self->mvar->typename));
+  CHECK(61, write(&(String){3, 2, "){"}));
+  Bool is_dynmaic = NULL != self->mvar->mtype->dynamic_members;
+  if (is_dynmaic) {
+    CHECK(64, write_cstyle(self->mvar->mtype->name));
+    CHECK(65, write(&(String){6, 5, "__dtl"}));
+  }
+  CHECK(66, write_type_init(self->mvar->mtype, self->mvar->sub_mtype, !is_dynmaic));
+  CHECK(67, write(&(String){3, 2, "};"}));
+  return OK;
+}
+#undef MR_FUNC_NAME
 static char* _func_name_St_dec_write = "St-dec.write";
 #define MR_FUNC_NAME _func_name_St_dec_write
 Returncode St_dec_write(St_dec* self) {
@@ -119,75 +136,89 @@ Returncode St_dec_write(St_dec* self) {
     if (glob->methods) {
       return OK;
     }
-    CHECK(61, write_spaces());
+    CHECK(73, write_spaces());
   }
   else {
     Bool _Bool11;
-    CHECK(62, St_dec_m_is_global(self, &(_Bool11)))
+    CHECK(74, St_dec_m_is_global(self, &(_Bool11)))
     if (_Bool11) {
-      CHECK(63, write(&(String){33, 32, "#if MR_STAGE == MR_DECLARATIONS\n"}));
-      CHECK(64, write_spaces());
-      CHECK(65, write(&(String){8, 7, "extern "}));
-      CHECK(66, St_dec_write_dec(self));
-      CHECK(67, write(&(String){3, 2, ";\n"}));
-      CHECK(68, write_spaces());
-      CHECK(69, write(&(String){32, 31, "#elif MR_STAGE == MR_FUNCTIONS\n"}));
-      CHECK(70, write_spaces());
+      CHECK(75, write(&(String){33, 32, "#if MR_STAGE == MR_DECLARATIONS\n"}));
+      CHECK(76, write_spaces());
+      CHECK(77, write(&(String){8, 7, "extern "}));
+      CHECK(78, St_dec_write_dec(self));
+      CHECK(79, write(&(String){3, 2, ";\n"}));
+      CHECK(80, write_spaces());
+      CHECK(81, write(&(String){32, 31, "#elif MR_STAGE == MR_FUNCTIONS\n"}));
+      CHECK(82, write_spaces());
     }
   }
   if (NULL != self->value) {
-    CHECK(72, Mexp_write_intro(self->value));
+    CHECK(84, Mexp_write_intro(self->value));
   }
-  CHECK(73, St_dec_write_dec(self));
+  CHECK(85, St_dec_write_dec(self));
   Bool _Bool12;
-  CHECK(74, (*((Func**)(self)))[7](self, &(_Bool12)))
+  CHECK(86, (*((Func**)(self)))[7](self, &(_Bool12)))
   if (_Bool12) {
-    CHECK(75, write(&(String){4, 3, " = "}));
+    CHECK(87, write(&(String){4, 3, " = "}));
     if (self->mvar->mtype == glob->type_string) {
-      CHECK(77, (*((Func**)(self)))[10](self));
+      CHECK(89, (*((Func**)(self)))[10](self));
     }
     else {
       if (self->mvar->mtype == glob->type_array) {
         if (!(NULL != self->mvar->sub_typename)) {
-          CHECK(80, f_syntax_error(&(String){22, 21, "Array type missing in"}, self->mvar->name));
+          CHECK(92, f_syntax_error(&(String){22, 21, "Array type missing in"}, self->mvar->name));
         }
-        CHECK(81, (*((Func**)(self)))[11](self));
+        CHECK(93, (*((Func**)(self)))[11](self));
       }
       else {
         if (self->mvar->mtype->is_primitive) {
-          CHECK(83, (*((Func**)(self)))[8](self));
+          CHECK(95, (*((Func**)(self)))[8](self));
         }
         else {
           Bool _Bool13;
-          CHECK(84, (*((Func**)(self)))[12](self, &(_Bool13)))
+          CHECK(96, (*((Func**)(self)))[12](self, &(_Bool13)))
           if (!_Bool13) {
-            CHECK(85, (*((Func**)(self)))[9](self));
-            if (NULL != self->mvar->mtype->dynamic_members) {
-              CHECK(87, St_dec_write_to_dtl(self));
-              CHECK(88, write_cstyle(self->mvar->mtype->name));
-              CHECK(89, write(&(String){7, 6, "__dtl;"}));
-            }
+            CHECK(97, (*((Func**)(self)))[9](self));
           }
         }
       }
     }
   }
   else {
-    if (NULL != self->value) {
-      CHECK(92, write(&(String){4, 3, " = "}));
-      CHECK(93, Mexp_write_final(self->value));
+    if (!(NULL != glob->mclass)) {
+      CHECK(100, write(&(String){4, 3, " = "}));
+      if (NULL != self->value) {
+        CHECK(102, Mexp_write_final(self->value));
+      }
+      else {
+        if (self->mvar->mtype->is_primitive) {
+          Bool _Bool14;
+          CHECK(104, String_equal(self->mvar->typename, &(String){5, 4, "Type"}, &(_Bool14)))
+          if (_Bool14) {
+            CHECK(105, write(&(String){8, 7, "(Type){"}));
+            CHECK(106, write_type_type_params(self->mvar->sub_mtype));
+            CHECK(107, write(&(String){2, 1, "}"}));
+          }
+          else {
+            CHECK(109, write_type_init(self->mvar->mtype, self->mvar->sub_mtype, true));
+          }
+        }
+        else {
+          CHECK(111, write(&(String){5, 4, "NULL"}));
+        }
+      }
     }
-    CHECK(94, write(&(String){2, 1, ";"}));
+    CHECK(112, write(&(String){2, 1, ";"}));
   }
   if (NULL != glob->mclass) {
-    CHECK(96, write(&(String){2, 1, "\n"}));
+    CHECK(114, write(&(String){2, 1, "\n"}));
   }
   else {
-    Bool _Bool14;
-    CHECK(97, St_dec_m_is_global(self, &(_Bool14)))
-    if (_Bool14) {
-      CHECK(98, write_new_indent_line());
-      CHECK(99, write(&(String){7, 6, "#endif"}));
+    Bool _Bool15;
+    CHECK(115, St_dec_m_is_global(self, &(_Bool15)))
+    if (_Bool15) {
+      CHECK(116, write_new_indent_line());
+      CHECK(117, write(&(String){7, 6, "#endif"}));
     }
   }
   return OK;
@@ -269,51 +300,51 @@ static char* _func_name_St_var_parse = "St-var.parse";
 Returncode St_var_parse(St_var* self) {
   self->arr_length = NULL;
   self->str_length = NULL;
-  CHECK(136, St_dec_parse(&(self->_base)));
+  CHECK(154, St_dec_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_analyze_first = "St-var.analyze-first";
 #define MR_FUNC_NAME _func_name_St_var_analyze_first
 Returncode St_var_analyze_first(St_var* self) {
-  CHECK(139, St_dec_analyze_first(&(self->_base)));
+  CHECK(157, St_dec_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_analyze = "St-var.analyze";
 #define MR_FUNC_NAME _func_name_St_var_analyze
 Returncode St_var_analyze(St_var* self) {
-  CHECK(142, St_dec_analyze(&(self->_base)));
+  CHECK(160, St_dec_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_write = "St-var.write";
 #define MR_FUNC_NAME _func_name_St_var_write
 Returncode St_var_write(St_var* self) {
-  CHECK(145, St_dec_write(&(self->_base)));
+  CHECK(163, St_dec_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_parse_array = "St-var.parse-array";
 #define MR_FUNC_NAME _func_name_St_var_parse_array
 Returncode St_var_parse_array(St_var* self) {
-  Char _Char15;
-  CHECK(148, read_new(&(String){2, 1, ":"}, &(self->arr_length), &(_Char15)));
+  Char _Char16;
+  CHECK(166, read_new(&(String){2, 1, ":"}, &(self->arr_length), &(_Char16)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_parse_string = "St-var.parse-string";
 #define MR_FUNC_NAME _func_name_St_var_parse_string
 Returncode St_var_parse_string(St_var* self) {
-  Char _Char16;
-  CHECK(151, read_new(&(String){2, 1, "}"}, &(self->str_length), &(_Char16)));
+  Char _Char17;
+  CHECK(169, read_new(&(String){2, 1, "}"}, &(self->str_length), &(_Char17)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_parse_as = "St-var.parse-as";
 #define MR_FUNC_NAME _func_name_St_var_parse_as
 Returncode St_var_parse_as(St_var* self) {
-  CHECK(154, f_syntax_error(&(String){22, 21, "illegal variable type"}, &(String){3, 2, "As"}));
+  CHECK(172, f_syntax_error(&(String){22, 21, "illegal variable type"}, &(String){3, 2, "As"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -327,16 +358,14 @@ Returncode St_var_m_is_allocation(St_var* self, Bool* is_aloc) {
 static char* _func_name_St_var_write_primitive = "St-var.write-primitive";
 #define MR_FUNC_NAME _func_name_St_var_write_primitive
 Returncode St_var_write_primitive(St_var* self) {
-  RAISE(160)
+  RAISE(178)
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_write_class = "St-var.write-class";
 #define MR_FUNC_NAME _func_name_St_var_write_class
 Returncode St_var_write_class(St_var* self) {
-  /* Class* name = &(Class){0}; */
-  CHECK(164, write(&(String){3, 2, "&("}));
-  CHECK(165, write_cstyle(self->_base.mvar->typename));
-  CHECK(166, write(&(String){6, 5, "){0};"}));
+  CHECK(181, write(&(String){2, 1, "&"}));
+  CHECK(182, St_dec_write_struct_init(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -346,21 +375,21 @@ Returncode St_var_write_string(St_var* self) {
   /* String* name = &(String){length, 0, (char[length]){0}}; */
   /* CHECK(line-num, String_copy(name, init)); */
   if (!(NULL != self->str_length)) {
-    CHECK(172, f_syntax_error(&(String){25, 24, "String length missing in"}, self->_base.mvar->name));
+    CHECK(188, f_syntax_error(&(String){25, 24, "String length missing in"}, self->_base.mvar->name));
   }
-  CHECK(173, write(&(String){11, 10, "&(String){"}));
-  CHECK(174, write(self->str_length));
-  CHECK(175, write(&(String){12, 11, ", 0, (char["}));
-  CHECK(176, write(self->str_length));
-  CHECK(177, write(&(String){8, 7, "]){0}};"}));
+  CHECK(189, write(&(String){11, 10, "&(String){"}));
+  CHECK(190, write(self->str_length));
+  CHECK(191, write(&(String){12, 11, ", 0, (char["}));
+  CHECK(192, write(self->str_length));
+  CHECK(193, write(&(String){8, 7, "]){0}};"}));
   if (NULL != self->_base.value) {
-    CHECK(179, write_new_indent_line());
-    CHECK(180, write_tb_check());
-    CHECK(181, write(&(String){13, 12, "String_copy("}));
-    CHECK(182, write_cstyle(self->_base.mvar->name));
-    CHECK(183, write(&(String){3, 2, ", "}));
-    CHECK(184, Mexp_write_final(self->_base.value));
-    CHECK(185, write(&(String){3, 2, "))"}));
+    CHECK(195, write_new_indent_line());
+    CHECK(196, write_tb_check());
+    CHECK(197, write(&(String){13, 12, "String_copy("}));
+    CHECK(198, write_cstyle(self->_base.mvar->name));
+    CHECK(199, write(&(String){3, 2, ", "}));
+    CHECK(200, Mexp_write_final(self->_base.value));
+    CHECK(201, write(&(String){3, 2, "))"}));
   }
   return OK;
 }
@@ -372,36 +401,37 @@ Returncode St_var_write_array(St_var* self) {
   /* Array* name = &(Array){length, (String[length]){0}}; */
   /* _set_var_string_array(length, string-length, name, (char[string-length * length]){0}); */
   if (!(NULL != self->arr_length)) {
-    CHECK(192, f_syntax_error(&(String){24, 23, "Array length missing in"}, self->_base.mvar->name));
+    CHECK(208, f_syntax_error(&(String){24, 23, "Array length missing in"}, self->_base.mvar->name));
   }
-  CHECK(193, write(&(String){10, 9, "&(Array){"}));
-  CHECK(194, write(self->arr_length));
-  CHECK(195, write(&(String){4, 3, ", ("}));
-  CHECK(196, write_cstyle(self->_base.mvar->sub_typename));
-  CHECK(197, write(&(String){2, 1, "["}));
-  CHECK(198, write(self->arr_length));
-  CHECK(199, write(&(String){8, 7, "]){0}};"}));
+  CHECK(209, write(&(String){10, 9, "&(Array){"}));
+  CHECK(210, write(self->arr_length));
+  CHECK(211, write(&(String){4, 3, ", ("}));
+  CHECK(212, write_cstyle(self->_base.mvar->sub_typename));
+  CHECK(213, write(&(String){2, 1, "["}));
+  CHECK(214, write(self->arr_length));
+  CHECK(215, write(&(String){8, 7, "]){0}};"}));
   if (NULL != self->str_length) {
-    CHECK(201, write_new_indent_line());
-    CHECK(202, write(&(String){23, 22, "_set_var_string_array("}));
-    CHECK(203, write(self->arr_length));
-    CHECK(204, write(&(String){3, 2, ", "}));
-    CHECK(205, write(self->str_length));
-    CHECK(206, write(&(String){3, 2, ", "}));
-    CHECK(207, write_cstyle(self->_base.mvar->name));
-    CHECK(208, write(&(String){9, 8, ", (char["}));
-    CHECK(209, write(self->str_length));
-    CHECK(210, write(&(String){4, 3, " * "}));
-    CHECK(211, write(self->arr_length));
-    CHECK(212, write(&(String){8, 7, "]){0});"}));
+    CHECK(217, write_new_indent_line());
+    CHECK(218, write(&(String){23, 22, "_set_var_string_array("}));
+    CHECK(219, write(self->arr_length));
+    CHECK(220, write(&(String){3, 2, ", "}));
+    CHECK(221, write(self->str_length));
+    CHECK(222, write(&(String){3, 2, ", "}));
+    CHECK(223, write_cstyle(self->_base.mvar->name));
+    CHECK(224, write(&(String){9, 8, ", (char["}));
+    CHECK(225, write(self->str_length));
+    CHECK(226, write(&(String){4, 3, " * "}));
+    CHECK(227, write(self->arr_length));
+    CHECK(228, write(&(String){8, 7, "]){0});"}));
   }
+  /* todo init... */
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_write_as = "St-var.write-as";
 #define MR_FUNC_NAME _func_name_St_var_write_as
 Returncode St_var_write_as(St_var* self, Bool* is_as) {
-  CHECK(215, St_dec_write_as(&(self->_base), &((*is_as))));
+  CHECK(232, St_dec_write_as(&(self->_base), &((*is_as))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -414,7 +444,7 @@ typedef struct St_ref St_ref; struct St_ref {
 static char* _func_name_St_ref_parse = "St-ref.parse";
 #define MR_FUNC_NAME _func_name_St_ref_parse
 Returncode St_ref_parse(St_ref* self) {
-  CHECK(220, St_dec_parse(&(self->_base)));
+  CHECK(237, St_dec_parse(&(self->_base)));
   self->_base.mvar->access = ACCESS_USER;
   
   return OK;
@@ -423,21 +453,21 @@ Returncode St_ref_parse(St_ref* self) {
 static char* _func_name_St_ref_analyze_first = "St-ref.analyze-first";
 #define MR_FUNC_NAME _func_name_St_ref_analyze_first
 Returncode St_ref_analyze_first(St_ref* self) {
-  CHECK(224, St_dec_analyze_first(&(self->_base)));
+  CHECK(241, St_dec_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_ref_analyze = "St-ref.analyze";
 #define MR_FUNC_NAME _func_name_St_ref_analyze
 Returncode St_ref_analyze(St_ref* self) {
-  CHECK(227, St_dec_analyze(&(self->_base)));
+  CHECK(244, St_dec_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_ref_write = "St-ref.write";
 #define MR_FUNC_NAME _func_name_St_ref_write
 Returncode St_ref_write(St_ref* self) {
-  CHECK(230, St_dec_write(&(self->_base)));
+  CHECK(247, St_dec_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -451,14 +481,14 @@ Returncode St_ref_parse_array(St_ref* self) {
 static char* _func_name_St_ref_parse_string = "St-ref.parse-string";
 #define MR_FUNC_NAME _func_name_St_ref_parse_string
 Returncode St_ref_parse_string(St_ref* self) {
-  CHECK(236, f_syntax_error(&(String){31, 30, "unexpected parameter to String"}, &(String){1, 0, ""}));
+  CHECK(253, f_syntax_error(&(String){31, 30, "unexpected parameter to String"}, &(String){1, 0, ""}));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_ref_parse_as = "St-ref.parse-as";
 #define MR_FUNC_NAME _func_name_St_ref_parse_as
 Returncode St_ref_parse_as(St_ref* self) {
-  CHECK(239, f_syntax_error(&(String){23, 22, "illegal reference type"}, &(String){3, 2, "As"}));
+  CHECK(256, f_syntax_error(&(String){23, 22, "illegal reference type"}, &(String){3, 2, "As"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -472,31 +502,31 @@ Returncode St_ref_m_is_allocation(St_ref* self, Bool* is_aloc) {
 static char* _func_name_St_ref_write_primitive = "St-ref.write-primitive";
 #define MR_FUNC_NAME _func_name_St_ref_write_primitive
 Returncode St_ref_write_primitive(St_ref* self) {
-  RAISE(245)
+  RAISE(262)
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_ref_write_class = "St-ref.write-class";
 #define MR_FUNC_NAME _func_name_St_ref_write_class
 Returncode St_ref_write_class(St_ref* self) {
-  RAISE(248)
+  RAISE(265)
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_ref_write_string = "St-ref.write-string";
 #define MR_FUNC_NAME _func_name_St_ref_write_string
 Returncode St_ref_write_string(St_ref* self) {
-  RAISE(251)
+  RAISE(268)
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_ref_write_array = "St-ref.write-array";
 #define MR_FUNC_NAME _func_name_St_ref_write_array
 Returncode St_ref_write_array(St_ref* self) {
-  RAISE(254)
+  RAISE(271)
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_ref_write_as = "St-ref.write-as";
 #define MR_FUNC_NAME _func_name_St_ref_write_as
 Returncode St_ref_write_as(St_ref* self, Bool* is_as) {
-  CHECK(257, St_dec_write_as(&(self->_base), &((*is_as))));
+  CHECK(274, St_dec_write_as(&(self->_base), &((*is_as))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -515,7 +545,7 @@ Returncode St_new_parse(St_new* self) {
   self->arr_length = NULL;
   self->str_length = NULL;
   self->as_type = NULL;
-  CHECK(269, St_dec_parse(&(self->_base)));
+  CHECK(286, St_dec_parse(&(self->_base)));
   self->_base.mvar->access = ACCESS_OWNER;
   return OK;
 }
@@ -531,55 +561,55 @@ static char* _func_name_St_new_analyze = "St-new.analyze";
 #define MR_FUNC_NAME _func_name_St_new_analyze
 Returncode St_new_analyze(St_new* self) {
   if (NULL != self->_base.value) {
-    CHECK(277, f_syntax_error(&(String){21, 20, "cannot initialize in"}, &(String){4, 3, "new"}));
+    CHECK(294, f_syntax_error(&(String){21, 20, "cannot initialize in"}, &(String){4, 3, "new"}));
   }
   if (NULL != self->str_length) {
-    CHECK(279, Mexp_analyze_type(self->str_length, glob->type_int));
+    CHECK(296, Mexp_analyze_type(self->str_length, glob->type_int));
   }
   if (NULL != self->arr_length) {
-    CHECK(281, Mexp_analyze_type(self->arr_length, glob->type_int));
+    CHECK(298, Mexp_analyze_type(self->arr_length, glob->type_int));
   }
   if (NULL != self->as_type) {
     self->_base.mvar->mtype = NULL;
-    CHECK(284, Mexp_analyze_get_subtype(self->as_type, glob->type_type, &(self->_base.mvar->mtype)));
+    CHECK(301, Mexp_analyze_get_subtype(self->as_type, glob->type_type, &(self->_base.mvar->mtype)));
     if (!(NULL != self->_base.mvar->mtype)) {
-      CHECK(286, f_syntax_error(&(String){20, 19, "no subtype for type"}, self->_base.mvar->name));
+      CHECK(303, f_syntax_error(&(String){20, 19, "no subtype for type"}, self->_base.mvar->name));
     }
     self->_base.mvar->typename = self->_base.mvar->mtype->name;
   }
-  CHECK(288, Mvar_analyze(self->_base.mvar));
-  CHECK(289, St_dec_analyze(&(self->_base)));
+  CHECK(305, Mvar_analyze(self->_base.mvar));
+  CHECK(306, St_dec_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_new_write = "St-new.write";
 #define MR_FUNC_NAME _func_name_St_new_write
 Returncode St_new_write(St_new* self) {
-  CHECK(292, St_dec_write(&(self->_base)));
+  CHECK(309, St_dec_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_new_parse_array = "St-new.parse-array";
 #define MR_FUNC_NAME _func_name_St_new_parse_array
 Returncode St_new_parse_array(St_new* self) {
-  Char _Char17;
-  CHECK(295, parse_new_exp(&(String){2, 1, ":"}, &(self->arr_length), &(_Char17)));
+  Char _Char18;
+  CHECK(312, parse_new_exp(&(String){2, 1, ":"}, &(self->arr_length), &(_Char18)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_new_parse_string = "St-new.parse-string";
 #define MR_FUNC_NAME _func_name_St_new_parse_string
 Returncode St_new_parse_string(St_new* self) {
-  Char _Char18;
-  CHECK(298, parse_new_exp(&(String){2, 1, "}"}, &(self->str_length), &(_Char18)));
+  Char _Char19;
+  CHECK(315, parse_new_exp(&(String){2, 1, "}"}, &(self->str_length), &(_Char19)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_new_parse_as = "St-new.parse-as";
 #define MR_FUNC_NAME _func_name_St_new_parse_as
 Returncode St_new_parse_as(St_new* self) {
-  Char _Char19;
-  CHECK(301, parse_new_exp(&(String){2, 1, "}"}, &(self->as_type), &(_Char19)));
+  Char _Char20;
+  CHECK(318, parse_new_exp(&(String){2, 1, "}"}, &(self->as_type), &(_Char20)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -594,18 +624,18 @@ static char* _func_name_St_new_write_check = "St-new.write-check";
 #define MR_FUNC_NAME _func_name_St_new_write_check
 Returncode St_new_write_check(St_new* self) {
   /* if (name == NULL) RAISE(line-num) */
-  CHECK(308, write_new_indent_line());
-  CHECK(309, write(&(String){5, 4, "if ("}));
-  CHECK(310, write_cstyle(self->_base.mvar->name));
-  CHECK(311, write(&(String){11, 10, " == NULL) "}));
-  CHECK(312, write_tb_raise());
+  CHECK(325, write_new_indent_line());
+  CHECK(326, write(&(String){5, 4, "if ("}));
+  CHECK(327, write_cstyle(self->_base.mvar->name));
+  CHECK(328, write(&(String){11, 10, " == NULL) "}));
+  CHECK(329, write_tb_raise());
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_new_write_primitive = "St-new.write-primitive";
 #define MR_FUNC_NAME _func_name_St_new_write_primitive
 Returncode St_new_write_primitive(St_new* self) {
-  CHECK(315, f_syntax_error(&(String){33, 32, "new not supported for primitive "}, self->_base.mvar->name));
+  CHECK(332, f_syntax_error(&(String){33, 32, "new not supported for primitive "}, self->_base.mvar->name));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -613,10 +643,17 @@ static char* _func_name_St_new_write_class = "St-new.write-class";
 #define MR_FUNC_NAME _func_name_St_new_write_class
 Returncode St_new_write_class(St_new* self) {
   /* Class* name = malloc(sizeof(Class)); */
-  CHECK(319, write(&(String){15, 14, "malloc(sizeof("}));
-  CHECK(320, write_cstyle(self->_base.mvar->typename));
-  CHECK(321, write(&(String){4, 3, "));"}));
-  CHECK(322, St_new_write_check(self));
+  /* if (name == NULL) RAISE(line-num) */
+  /* *name = (Class){init-values...}; */
+  CHECK(338, write(&(String){15, 14, "malloc(sizeof("}));
+  CHECK(339, write_cstyle(self->_base.mvar->typename));
+  CHECK(340, write(&(String){4, 3, "));"}));
+  CHECK(341, St_new_write_check(self));
+  CHECK(342, write_new_indent_line());
+  CHECK(343, write(&(String){2, 1, "*"}));
+  CHECK(344, write_cstyle(self->_base.mvar->name));
+  CHECK(345, write(&(String){4, 3, " = "}));
+  CHECK(346, St_dec_write_struct_init(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -624,14 +661,15 @@ static char* _func_name_St_new_write_string = "St-new.write-string";
 #define MR_FUNC_NAME _func_name_St_new_write_string
 Returncode St_new_write_string(St_new* self) {
   /* String* name = _new_string(length); */
+  /* if (name == NULL) RAISE(line-num) */
   if (!(NULL != self->str_length)) {
-    CHECK(327, f_syntax_error(&(String){25, 24, "String length missing in"}, self->_base.mvar->name));
+    CHECK(352, f_syntax_error(&(String){25, 24, "String length missing in"}, self->_base.mvar->name));
   }
-  CHECK(328, Mexp_write_intro(self->str_length));
-  CHECK(329, write(&(String){13, 12, "_new_string("}));
-  CHECK(330, Mexp_write_final(self->str_length));
-  CHECK(331, write(&(String){3, 2, ");"}));
-  CHECK(332, St_new_write_check(self));
+  CHECK(353, Mexp_write_intro(self->str_length));
+  CHECK(354, write(&(String){13, 12, "_new_string("}));
+  CHECK(355, Mexp_write_final(self->str_length));
+  CHECK(356, write(&(String){3, 2, ");"}));
+  CHECK(357, St_new_write_check(self));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -640,34 +678,36 @@ static char* _func_name_St_new_write_array = "St-new.write-array";
 Returncode St_new_write_array(St_new* self) {
   /* Array* name = _new_array(length, sizeof(Class)); */
   /* Array* name = _new_array(length, sizeof(String) + (string-length)); */
+  /* if (name == NULL) RAISE(line-num) */
   /* _set_new_string_array(length, string-length, name); */
   if (!(NULL != self->arr_length)) {
-    CHECK(339, f_syntax_error(&(String){24, 23, "Array length missing in"}, self->_base.mvar->name));
+    CHECK(365, f_syntax_error(&(String){24, 23, "Array length missing in"}, self->_base.mvar->name));
   }
-  CHECK(340, Mexp_write_intro(self->arr_length));
+  CHECK(366, Mexp_write_intro(self->arr_length));
   if (NULL != self->str_length) {
-    CHECK(342, Mexp_write_intro(self->str_length));
+    CHECK(368, Mexp_write_intro(self->str_length));
   }
-  CHECK(343, write(&(String){12, 11, "_new_array("}));
-  CHECK(344, Mexp_write_final(self->arr_length));
-  CHECK(345, write(&(String){10, 9, ", sizeof("}));
-  CHECK(346, write_cstyle(self->_base.mvar->sub_typename));
+  CHECK(369, write(&(String){12, 11, "_new_array("}));
+  CHECK(370, Mexp_write_final(self->arr_length));
+  CHECK(371, write(&(String){10, 9, ", sizeof("}));
+  CHECK(372, write_cstyle(self->_base.mvar->sub_typename));
   if (NULL != self->str_length) {
-    CHECK(348, write(&(String){6, 5, ") + ("}));
-    CHECK(349, Mexp_write_final(self->str_length));
+    CHECK(374, write(&(String){6, 5, ") + ("}));
+    CHECK(375, Mexp_write_final(self->str_length));
   }
-  CHECK(350, write(&(String){4, 3, "));"}));
-  CHECK(351, St_new_write_check(self));
+  CHECK(376, write(&(String){4, 3, "));"}));
+  CHECK(377, St_new_write_check(self));
   if (NULL != self->str_length) {
-    CHECK(353, write_new_indent_line());
-    CHECK(354, write(&(String){23, 22, "_set_new_string_array("}));
-    CHECK(355, Mexp_write_final(self->arr_length));
-    CHECK(356, write(&(String){3, 2, ", "}));
-    CHECK(357, Mexp_write_final(self->str_length));
-    CHECK(358, write(&(String){3, 2, ", "}));
-    CHECK(359, write_cstyle(self->_base.mvar->name));
-    CHECK(360, write(&(String){3, 2, ");"}));
+    CHECK(379, write_new_indent_line());
+    CHECK(380, write(&(String){23, 22, "_set_new_string_array("}));
+    CHECK(381, Mexp_write_final(self->arr_length));
+    CHECK(382, write(&(String){3, 2, ", "}));
+    CHECK(383, Mexp_write_final(self->str_length));
+    CHECK(384, write(&(String){3, 2, ", "}));
+    CHECK(385, write_cstyle(self->_base.mvar->name));
+    CHECK(386, write(&(String){3, 2, ");"}));
   }
+  /* todo init... */
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -679,17 +719,18 @@ Returncode St_new_write_as(St_new* self, Bool* is_as) {
     return OK;
   }
   /* Type* name = malloc((as-type).size); */
-  CHECK(367, Mexp_write_intro(self->as_type));
-  CHECK(368, write(&(String){9, 8, "malloc(("}));
-  CHECK(369, Mexp_write_final(self->as_type));
-  CHECK(370, write(&(String){9, 8, ").size);"}));
-  CHECK(371, St_new_write_check(self));
+  CHECK(394, Mexp_write_intro(self->as_type));
+  CHECK(395, write(&(String){9, 8, "malloc(("}));
+  CHECK(396, Mexp_write_final(self->as_type));
+  CHECK(397, write(&(String){9, 8, ").size);"}));
+  CHECK(398, St_new_write_check(self));
   if (NULL != self->_base.mvar->mtype->dynamic_members) {
-    CHECK(373, St_dec_write_to_dtl(&(self->_base)));
-    CHECK(374, write(&(String){2, 1, "("}));
-    CHECK(375, Mexp_write_final(self->as_type));
-    CHECK(376, write(&(String){7, 6, ").dtl;"}));
+    CHECK(400, St_dec_write_to_dtl(&(self->_base)));
+    CHECK(401, write(&(String){2, 1, "("}));
+    CHECK(402, Mexp_write_final(self->as_type));
+    CHECK(403, write(&(String){7, 6, ").dtl;"}));
   }
+  /* todo init problem */
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -704,8 +745,8 @@ typedef struct St_delete St_delete; struct St_delete {
 static char* _func_name_St_delete_parse = "St-delete.parse";
 #define MR_FUNC_NAME _func_name_St_delete_parse
 Returncode St_delete_parse(St_delete* self) {
-  Char _Char20;
-  CHECK(384, read_new(&(String){1, 0, ""}, &(self->name), &(_Char20)));
+  Char _Char21;
+  CHECK(412, read_new(&(String){1, 0, ""}, &(self->name), &(_Char21)));
   self->mvar = NULL;
   return OK;
 }
@@ -720,9 +761,9 @@ Returncode St_delete_analyze_first(St_delete* self) {
 static char* _func_name_St_delete_analyze = "St-delete.analyze";
 #define MR_FUNC_NAME _func_name_St_delete_analyze
 Returncode St_delete_analyze(St_delete* self) {
-  CHECK(391, m_find_var(self->name, &(self->mvar)))
+  CHECK(419, m_find_var(self->name, &(self->mvar)))
   if (!(NULL != self->mvar)) {
-    CHECK(392, f_syntax_error(&(String){16, 15, "unknow variable"}, self->name));
+    CHECK(420, f_syntax_error(&(String){16, 15, "unknow variable"}, self->name));
   }
   return OK;
 }
@@ -730,9 +771,9 @@ Returncode St_delete_analyze(St_delete* self) {
 static char* _func_name_St_delete_write = "St-delete.write";
 #define MR_FUNC_NAME _func_name_St_delete_write
 Returncode St_delete_write(St_delete* self) {
-  CHECK(395, write(&(String){6, 5, "free("}));
-  CHECK(396, write_cstyle(self->name));
-  CHECK(397, write(&(String){3, 2, ");"}));
+  CHECK(423, write(&(String){6, 5, "free("}));
+  CHECK(424, write_cstyle(self->name));
+  CHECK(425, write(&(String){3, 2, ");"}));
   return OK;
 }
 #undef MR_FUNC_NAME

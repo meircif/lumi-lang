@@ -54,6 +54,18 @@ class St-dec(St)
       basetype := basetype.base-mtype
     write(user "_dtl = ")
   
+  func inst write-struct-init()
+    # (Type){init-values...};
+    write(user "(")
+    write-cstyle(user self.mvar.typename)
+    write(user "){")
+    var Bool is-dynmaic(? self.mvar.mtype.dynamic-members)
+    if is-dynmaic
+        write-cstyle(user self.mvar.mtype.name)
+        write(user "__dtl")
+    write-type-init(user self.mvar.mtype, user self.mvar.sub-mtype, copy not is-dynmaic)
+    write(user "};")
+  
   func dynamic write()
     if ? glob.mclass
       if glob.methods
@@ -83,14 +95,20 @@ class St-dec(St)
         self.write-primitive()
       else-if not self.write-as()
         self.write-class()
-        if ? self.mvar.mtype.dynamic-members
-          self.write-to-dtl()
-          write-cstyle(user self.mvar.mtype.name)
-          write(user "__dtl;")
     else
-      if ? self.value
-        write(user " = ")
-        self.value.write-final()
+      if not (? glob.mclass)
+          write(user " = ")
+        if ? self.value
+          self.value.write-final()
+        else-if self.mvar.mtype.is-primitive
+          if self.mvar.typename.equal(user "Type")
+            write(user "(Type){")
+            write-type-type-params(user self.mvar.sub-mtype)
+            write(user "}")
+          else
+            write-type-init(user self.mvar.mtype, user self.mvar.sub-mtype, copy true)
+        else
+          write(user "NULL")
       write(user ";")
     if ? glob.mclass
       write(user "\n")
@@ -160,10 +178,8 @@ class St-var(St-dec)
     raise
   
   func dynamic write-class()
-    # Class* name = &(Class){0};
-    write(user "&(")
-    write-cstyle(user self.mvar.typename)
-    write(user "){0};")
+    write(user "&")
+    self.write-struct-init()
   
   func dynamic write-string()
     # String* name = &(String){length, 0, (char[length]){0}};
@@ -210,6 +226,7 @@ class St-var(St-dec)
       write(user " * ")
       write(user self.arr-length)
       write(user "]){0});")
+    # todo init...
   
   func dynamic write-as():(copy Bool is-as)
     base.write-as():(copy is-as)
@@ -316,13 +333,21 @@ class St-new(St-dec)
   
   func dynamic write-class()
     # Class* name = malloc(sizeof(Class));
+    # if (name == NULL) RAISE(line-num)
+    # *name = (Class){init-values...};
     write(user "malloc(sizeof(")
     write-cstyle(user self.mvar.typename)
     write(user "));")
     self.write-check()
+    write-new-indent-line()
+    write(user "*")
+    write-cstyle(user self.mvar.name)
+    write(user " = ")
+    self.write-struct-init()
   
   func dynamic write-string()
     # String* name = _new_string(length);
+    # if (name == NULL) RAISE(line-num)
     if not (? self.str-length)
       f-syntax-error(user "String length missing in", user self.mvar.name)
     self.str-length.write-intro()
@@ -334,6 +359,7 @@ class St-new(St-dec)
   func dynamic write-array()
     # Array* name = _new_array(length, sizeof(Class));
     # Array* name = _new_array(length, sizeof(String) + (string-length));
+    # if (name == NULL) RAISE(line-num)
     # _set_new_string_array(length, string-length, name);
     if not (? self.arr-length)
       f-syntax-error(user "Array length missing in", user self.mvar.name)
@@ -358,6 +384,7 @@ class St-new(St-dec)
       write(user ", ")
       write-cstyle(user self.mvar.name)
       write(user ");")
+    # todo init...
   
   func dynamic write-as():(copy Bool is-as)
     is-as := ? self.as-type
@@ -374,6 +401,7 @@ class St-new(St-dec)
       write(user "(")
       self.as-type.write-final()
       write(user ").dtl;")
+    # todo init problem
 
 
 class St-delete(St)

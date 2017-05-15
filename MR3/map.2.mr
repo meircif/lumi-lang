@@ -94,6 +94,7 @@ static Mtype(Object)
   owner Var-map dynamic-members
   owner String base-typename
   user Mtype base-mtype
+  owner String default-value
   var Bool is-primitive
   
   func inst init(owner String name)
@@ -102,7 +103,12 @@ static Mtype(Object)
     self.dynamic-members := _
     self.base-typename := _
     self.base-mtype := _
+    self.default-value := _
     self.is-primitive := false
+  
+  func inst set-primitive(user String default-value)
+    self.is-primitive := true
+    f-new-copy(user default-value):(owner self.default-value)
 
 
 var Int ACCESS-COPY(0)
@@ -161,6 +167,7 @@ func add-var(user Var-map map, owner Mvar mvar)
   map.add(user mvar.name, owner mvar)
 
 
+# Operator Map
 static Op-map(Name-map)
   func inst add(user String name, user String ctext)
     owner String new-name

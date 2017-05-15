@@ -65,19 +65,19 @@ static Global-data(Object)
     self.type-map := map
     map.init()
     map.add(user "Char"):(user self.type-char)
+    self.type-char.set-primitive(user "'\\0'")
     map.add(user "Bool"):(user self.type-bool)
+    self.type-bool.set-primitive(user "false")
     map.add(user "Int"):(user self.type-int)
+    self.type-int.set-primitive(user "0")
     map.add(user "Type"):(user self.type-type)
+    self.type-type.set-primitive(user "0, NULL")
     map.add(user "Func"):(user self.type-func)
+    self.type-func.set-primitive(user "NULL")
     map.add(user "String"):(user self.type-string)
     map.add(user "Array"):(user self.type-array)
     map.add(user "File"):(user self.type-file)
     map.add(user "Sys"):(user self.type-sys)
-    self.type-char.is-primitive := true
-    self.type-bool.is-primitive := true
-    self.type-int.is-primitive := true
-    self.type-type.is-primitive := true
-    self.type-func.is-primitive := true
   
   func inst init()
     self.max-type-depth := 0
@@ -189,6 +189,47 @@ func write-spaces()
 func write-new-indent-line()
   write-c(copy '\n')
   write-spaces()
+
+func write-type-type-params(user Mtype sub-mtype)
+  # sizeof(name), name__dtl
+  write(user "sizeof(")
+  write-cstyle(user sub-mtype.name)
+  write(user "), ")
+  if ? sub-mtype.dynamic-members
+    write-cstyle(user sub-mtype.name)
+    write(user "__dtl")
+  else
+    write(user "NULL")
+
+func write-type-init(user Mtype mtype, user Mtype sub-mtype, copy Bool first)
+  if ? mtype.base-mtype
+    write-type-init(user mtype.base-mtype, user _, copy first)
+    first := false
+  else-if mtype = glob.type-type
+    if not first
+      write(user ", ")
+    write-type-type-params(user sub-mtype)
+    first := false
+  else-if ? mtype.default-value
+    if not first
+      write(user ", ")
+    write(user mtype.default-value)
+    first := false
+  var Var-map-iter iter
+  iter.init(user mtype.members)
+  do
+    while iter.m-has-data()
+    user Mvar mvar
+    iter.get-var():(user mvar)
+    if not (? mvar.func-dec)
+      if mvar.access = ACCESS-VAR
+        write-type-init(user mvar.mtype, user mvar.sub-mtype, copy first)
+      else
+        if not first
+          write(user ", ")
+        write(user "NULL")
+      first := false
+    iter.m-next()
 
 # syntax error
 func f-syntax-error(user String text, user String item)
