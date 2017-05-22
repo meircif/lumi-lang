@@ -12,20 +12,10 @@ class St-empty(St)
 
 
 class St-comment(St)
-  owner String line
-  owner String kw
-  var Char end
+  owner String text
   
   func dynamic parse()
-    var Bool has-data(true)
-    if ? glob.key-word
-      f-new-copy(user glob.key-word.text):(owner self.kw)
-      self.end := glob.key-word.end
-      has-data := self.end != '\n' and self.end != EOF
-    else
-      self.kw := _
-    if has-data
-      read-new(user ""):(owner self.line)
+    read-new(user ""):(owner self.text)
   
   func dynamic analyze-first()
     # do nothing
@@ -34,12 +24,57 @@ class St-comment(St)
     # do nothing
   
   func dynamic write()
-    if ? self.line
-      write(user "// ")
-      if ? self.kw
-        write(user self.kw)
-        write-c(copy self.end)
-      write(user self.line)
+    write(user "// ")
+    write(user self.text)
+
+
+class St-multi-comment(St-comment)
+  func dynamic parse()
+    var String{64 * 1024} text
+    text.clear()
+    var Char prev('\0')
+    do
+      var Char curr
+      read-c():(copy curr)
+      while curr != EOF and (prev != '#' or curr != ')')
+      if prev != '\0'
+        text.append(copy prev)
+      prev := curr
+    read-c()
+    f-new-copy(user text):(owner self.text)
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    write(user "/* ")
+    write(user self.text)
+    write(user " */")
+
+
+class St-documentation(St-comment)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()
+
+
+class St-multi-documentation(St-multi-comment)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()
 
 
 func f-parse-new-node(copy Type{St} node-type, user St father)
@@ -59,7 +94,18 @@ class St-node(St)
     var Bool erase-kw(true)
     var Type{St} node-type
     if glob.key-word.text.length <= 0
-      node-type := St-empty
+      if glob.key-word.end = '('
+        var Char ch
+        read-c():(copy ch)
+        if ch != '#'
+          f-syntax-error-c(user "unecpeted character after '(':", copy ch)
+        read-c():(copy ch)
+        if ch = '#'
+          node-type := St-multi-documentation
+        else
+          node-type := St-multi-comment
+      else
+        node-type := St-empty
     else-if (glob.key-word.end != ' ' and glob.key-word.end != '\n') or not get-node-type(user glob.key-word.text):(copy node-type)
       node-type := St-exp
     else
