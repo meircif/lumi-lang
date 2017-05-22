@@ -95,6 +95,10 @@ class St-dec(St)
         self.write-primitive()
       else-if not self.write-as()
         self.write-class()
+        if ? self.mvar.mtype.dynamic-members
+          self.write-to-dtl()
+          write-cstyle(user self.mvar.mtype.name)
+          write(user "__dtl;")
     else
       if not (? glob.mclass)
           write(user " = ")
@@ -226,7 +230,6 @@ class St-var(St-dec)
       write(user " * ")
       write(user self.arr-length)
       write(user "]){0});")
-    # todo init...
   
   func dynamic write-as():(copy Bool is-as)
     base.write-as():(copy is-as)
@@ -384,15 +387,15 @@ class St-new(St-dec)
       write(user ", ")
       write-cstyle(user self.mvar.name)
       write(user ");")
-    # todo init...
   
   func dynamic write-as():(copy Bool is-as)
     is-as := ? self.as-type
     if not is-as
       return
-    # Type* name = malloc((as-type).size);
+    # Type* name = calloc(1, (as-type).size);
+    # name->[_base.]_dtl = (as-type).dtl;
     self.as-type.write-intro()
-    write(user "malloc((")
+    write(user "calloc(1, (")
     self.as-type.write-final()
     write(user ").size);")
     self.write-check()
@@ -401,7 +404,6 @@ class St-new(St-dec)
       write(user "(")
       self.as-type.write-final()
       write(user ").dtl;")
-    # todo init problem
 
 
 class St-delete(St)

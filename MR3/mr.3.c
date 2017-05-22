@@ -56,7 +56,7 @@ String* _new_string(int length) {
 }
 
 Array* _new_array(int length, int value_size) {
-  void* buff = malloc(sizeof(Array) + length * value_size);
+  void* buff = calloc(1, sizeof(Array) + length * value_size);
   if (buff == NULL) {
     return NULL;
   }
