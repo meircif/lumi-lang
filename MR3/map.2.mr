@@ -94,6 +94,7 @@ static Mtype(Object)
   owner Var-map dynamic-members
   owner String base-typename
   user Mtype base-mtype
+  owner Mtype generic-mtype
   owner String default-value
   var Bool is-primitive
   
@@ -103,6 +104,7 @@ static Mtype(Object)
     self.dynamic-members := _
     self.base-typename := _
     self.base-mtype := _
+    self.generic-mtype := _
     self.default-value := _
     self.is-primitive := false
   
@@ -132,16 +134,18 @@ static Mvar(Object)
   
   func inst init(user Mtype mtype)
     self.name := _
-    if ? mtype
-      f-new-copy(user mtype.name):(owner self.typename)
-    else
-      self.typename := _
+    self.typename := _
     self.mtype := mtype
     self.sub-typename := _
     self.sub-mtype := _
     self.func-dec := _
     self.access := ACCESS-VAR
     self.is-ref := false
+    if ? mtype
+      f-new-copy(user mtype.name):(owner self.typename)
+      if ? mtype.generic-mtype
+        f-new-copy(user mtype.generic-mtype.name):(owner self.sub-typename)
+        self.sub-mtype := mtype.generic-mtype
   
   func inst analyze()
     if not (? self.mtype)
@@ -153,15 +157,6 @@ func init-new-var(user Mtype mtype):(owner Mvar new-mvar)
   new Mvar mvar
   mvar.init(user mtype)
   new-mvar := mvar
-  
-func f-copy-var(user Mvar mvar, user String name):(owner Mvar new-mvar)
-  init-new-var(user mvar.mtype):(owner new-mvar)
-  f-new-copy(user name):(owner new-mvar.name)
-  f-new-copy(user mvar.sub-typename):(owner new-mvar.sub-typename)
-  new-mvar.sub-mtype := mvar.sub-mtype
-  new-mvar.func-dec := mvar.func-dec
-  new-mvar.access := mvar.access
-  new-mvar.is-ref := false
 
 func add-var(user Var-map map, owner Mvar mvar)
   map.add(user mvar.name, owner mvar)
@@ -183,6 +178,8 @@ static Op-map(Name-map)
   func inst find(user String name):(user String ctext)
     ctext := base.find(user name)
 
+
+# Type Map
 static Type-map(Name-map)
   func inst add(user String name):(user Mtype out-mtype)
     new Mtype mtype

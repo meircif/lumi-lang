@@ -20,7 +20,7 @@ class Arg-node(Object)
   
   func dynamic parse(copy Bool is-out, copy Int access):(copy Char end)
     # nothing
-  func dynamic analyze(user Arg-node arg)
+  func dynamic analyze(user Arg-node arg, user Mtype prev-mtype, user Mtype prev-sub-mtype)
     # nothing
   func dynamic write-intro()
     # nothing
@@ -48,14 +48,14 @@ class Dec-arg(Arg-node)
       read-c():(copy end)
     read-new(user ",)"):(owner self.mvar.name, copy end)
   
-  func dynamic analyze(user Arg-node arg)
+  func dynamic analyze(user Arg-node arg, user Mtype prev-mtype, user Mtype prev-sub-mtype)
     self.mvar.analyze()
   
   func dynamic write-intro()
     # nothing
   
   func dynamic write-final(copy Bool is-out)
-    write-cstyle(user self.mvar.typename)
+    write-cstyle(user self.mvar.mtype.name)
     if is-out
       write(user "*")
     if self.mvar.access = ACCESS-USER or self.mvar.access = ACCESS-OWNER
@@ -73,26 +73,41 @@ class Dec-arg(Arg-node)
 
 class Call-arg(Arg-node)
   var Int access
+  user Mtype generic-mtype
   owner Mexp value
   
   func dynamic parse(copy Bool is-out, copy Int access):(copy Char end)
     self.access := access
+    self.generic-mtype := _
     parse-new-exp(user ",)"):(owner self.value, copy end)
   
-  func dynamic analyze(user Arg-node arg)
+  func dynamic analyze(user Arg-node arg, user Mtype prev-mtype, user Mtype prev-sub-mtype)
     user Dec-arg dec-arg
     arg.get-dec():(user dec-arg)
     if self.access != dec-arg.mvar.access
       f-syntax-error(user "invalid access for param", user dec-arg.mvar.name)
     user Mtype mtype(dec-arg.mvar.mtype)
     user Mtype sub-mtype(dec-arg.mvar.sub-mtype)
+    if mtype = prev-mtype.generic-mtype
+      mtype := prev-sub-mtype
+      sub-mtype := _
+      self.generic-mtype := prev-mtype.generic-mtype
+    else-if sub-mtype = prev-mtype.generic-mtype
+      sub-mtype := prev-sub-mtype
     self.value.analyze():(user mtype, user sub-mtype)
+    if not self.value.is-used
+      self.generic-mtype := mtype
+      self.value.is-used := true
   
   func dynamic write-intro()
     self.value.write-intro()
   
   func dynamic write-final(copy Bool is-out)
     if is-out
+      if ? self.generic-mtype
+        write(user "(")
+        write-cstyle(user self.generic-mtype.name)
+        write(user "**)")
       write(user "&(")
     self.value.write-final()
     if is-out
@@ -156,7 +171,7 @@ static Arg-list(Object)
     user Arg-node node(first)
     do
       while ? node
-      node.analyze(user _)
+      node.analyze(user _, user _, user _)
       node := node.next
   
   func inst analyze()
@@ -281,7 +296,7 @@ class Call-operand(Operand)
   var Int dynamic-index
   var Int dynamic-base-count
   var Bool is-used
-  user Mvar res-var
+  user Mtype res-mtype
   user Mexp res-exp
   owner String res-name
   
@@ -294,7 +309,7 @@ class Call-operand(Operand)
     self.dynamic-opr := _
     self.dynamic-index := 0
     self.dynamic-base-count := 0
-    self.res-var := _
+    self.res-mtype := _
     self.res-name := _
     self.res-exp := _
   
@@ -307,7 +322,7 @@ class Call-operand(Operand)
       if not (? call-param)
         f-syntax-error(user "too few parameters for", user mfunc.name)
       if not-self
-        call-param.analyze(user dec-param)
+        call-param.analyze(user dec-param, user mtype, user sub-mtype)
       else
         not-self := true
       dec-param := dec-param.next
@@ -327,14 +342,14 @@ class Call-operand(Operand)
       return
     
     if ? call-out
-      call-out.analyze(user dec-out)
+      call-out.analyze(user dec-out, user mtype, user sub-mtype)
       do
         while ? call-out.next
         call-out := call-out.next
         dec-out := dec-out.next
         if not (? dec-out)
           f-syntax-error(user "too many outputs for", user mfunc.name)
-        call-out.analyze(user dec-out)
+        call-out.analyze(user dec-out, user mtype, user sub-mtype)
     
     var Bool fill-out(? dec-out.next or not (? call-out))
     if ? dec-out.next
@@ -343,27 +358,43 @@ class Call-operand(Operand)
         f-syntax-error(user "too few outputs for", user mfunc.name)
     user Dec-arg dec-res
     dec-out.get-dec():(user dec-res)
-    self.res-var := dec-res.mvar
-    mtype := self.res-var.mtype
-    sub-mtype := self.res-var.sub-mtype
+    user Mtype generic-mtype(_)
+    if dec-res.mvar.mtype = mtype.generic-mtype
+      generic-mtype := mtype.generic-mtype
+      mtype := sub-mtype
+      sub-mtype := _
+    else-if dec-res.mvar.sub-mtype = mtype.generic-mtype
+      mtype := dec-res.mvar.mtype
+      # sub-mtype is the same
+    else
+      mtype := dec-res.mvar.mtype
+      sub-mtype := dec-res.mvar.sub-mtype
+    self.res-mtype := mtype
     if fill-out
       var String{64} res-count
       glob.res-count.str():(var res-count)
       glob.res-count := glob.res-count + 1
-      new String{self.res-var.typename.length + res-count.length + 2} res-name
+      new String{self.res-mtype.name.length + res-count.length + 2} res-name
       self.res-name := res-name
       self.res-name.append(copy '-')
-      self.res-name.concat(user self.res-var.typename)
+      self.res-name.concat(user self.res-mtype.name)
       self.res-name.concat(user res-count)
       new Var-operand var-opr
       f-new-copy(user self.res-name):(owner var-opr.name)
-      f-copy-var(user self.res-var, user self.res-name):(owner var-opr.mvar)
+      init-new-var(user mtype):(owner var-opr.mvar)
+      f-new-copy(user self.res-name):(owner var-opr.mvar.name)
+      if ? sub-mtype
+        f-new-copy(user sub-mtype.name):(owner var-opr.mvar.sub-typename)
+      var-opr.mvar.sub-mtype := sub-mtype
+      var-opr.mvar.func-dec := dec-res.mvar.func-dec
+      var-opr.mvar.access := dec-res.mvar.access
       var-opr.next := _
       new Mexp exp
       exp.init()
       exp.operand := var-opr
       new Call-arg arg
-      arg.access := self.res-var.access
+      arg.access := dec-res.mvar.access
+      arg.generic-mtype := generic-mtype
       arg.value := exp
       arg.next := _
       if ? call-out
@@ -395,8 +426,6 @@ class Call-operand(Operand)
       exp.analyze():(user mtype, user sub-mtype)
   
   func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
-    if mtype != glob.type-func
-      f-syntax-error(user "not a function", user mtype.name)
     self.is-used := exp.is-used or ? self.next or ? exp.next or ? exp.operator
     if not self.is-used
       exp.is-used := true
@@ -453,8 +482,8 @@ class Call-operand(Operand)
     if ? self.res-exp
       self.res-exp.write-intro()
     else-if ? self.res-name
-      write-cstyle(user self.res-var.typename)
-      if not self.res-var.mtype.is-primitive
+      write-cstyle(user self.res-mtype.name)
+      if not self.res-mtype.is-primitive
         write(user "*")
       write(user " ")
       write-cstyle(user self.res-name)

@@ -1,12 +1,33 @@
+(## Module documentation - must be first line of the file
+
+This is MR programming language example.
+
+This syntax is temporary and will probably change in the near future.
+#)
+
+# Documentation
+################
+
+(##  <-- multi-line documentation start
+
+Can use markup language in the documentation.
+
+Must be directly above the documented item - without empty lines.
+
+multi-line documentation end --> #)
+func f-documented-function()
+  return
+
+## single line documentation, strict exactly one space after ##
+## can be more then one line...
+func f-documented-function()
+  return
+
 # comments
 ###########
 func f-comment-example()
 
 (# <-- multi-line comment start
-
-This is MR programming language example.
-
-This syntax is temporary and will probably change in the near future.
 
 multi-line comment end --> #)
 
@@ -488,7 +509,7 @@ native func n-delete-reference(owner Some-native-type ref)
 
 # in C, native types are treated as "void*"
 
-  
+
 # error handling
 #################
 
@@ -497,9 +518,58 @@ func f-error-raising()
 
 # TODO
 
-  
+
 # OOP
 ######
+
+(#
+Interface
+Structure
+Interface + Structure = Class
+
+* Var:          var structure
+* Ref:          ref structure
+* Interface:    ref interface
+* Generic Duck: ref interface, ref object
+* Class Duck:   ref interface, ref structure
+* Embed:        ref interface, var structure
+* Embed Ref:    ref (ref interface, var structure)
+
+Class Example
+
+var Example example-
+
+#)
+
+static Struct(Object)
+  # ...
+
+interface Interface(Object)
+  # ...
+
+class Class(Object)
+  # ...
+
+func f-oop-example()
+  # structure
+  var Struct structure-only
+  var Class class-structure-only
+  # reference
+  user Struct structure-reference
+  user Class.static class-structure-reference
+  # interface
+  user Interface interface-and-object-refernece
+  user Class.interface class-interface-and-object-refernece
+  user Interface.dynamic interface-only
+  user Class.dynamic class-interface-only
+  # binding
+  user Bind{Struct:Interface} interface-and-structure-reference
+  user Class class-interface-and-structure-reference
+  # embed
+  var Embed{Struct:Interface} interface-and-structure
+  var Embed{Example} class-interface-and-structure
+  user Embed{Struct:Interface} reference-to-interface-and-structure
+  user Embed{Example} class-reference-to-interface-and-structure
 
 (#
 Object type is:
@@ -619,6 +689,34 @@ dynamic class Multiple(Class-name): First-interface, Second-interface
 # TODO construction
 # TODO destruction
 # TODO using classes
+
+
+# generics
+
+static class My-generic{Any-type}(Object)
+  inst var Int count
+  inst user My-generic{Generic} next
+  inst owner Any-type item
+  
+  inst func m-set(owner Any-type item)
+    self.item := item
+  
+  inst func m-get():(user Any-type item)
+    item := self.item
+
+func f-generic-example()
+  new Class-name item
+  var My-generic{Class-name} generic
+  generic.m-set(owner item)
+  item := generic.m-get()
+
+func f-generic{Any-type}(user Any-type param):(user Any-type output)
+  output := param
+
+static class My-generic{Class-name-type{Class-name}:Abstract-class-type{Abstract-class}}(Object)
+  owner Class-name-type class-name-item
+  owner Abstract-class-type abstract-class-item
+
 
 # Type variable
 func f-type-var-example()

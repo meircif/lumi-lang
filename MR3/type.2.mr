@@ -43,13 +43,18 @@ class St-class(St-node)
   
   func dynamic parse()
     var String{128} name
-    read(user "(", user name)
+    var Char end
+    read(user "({", user name):(copy end)
     glob.type-map.add(user name):(owner self.mtype)
-    var String{128} base-typename
-    read(user ")", user base-typename)
-    if not base-typename.equal(user "Object")
-      f-new-copy(user base-typename):(owner self.mtype.base-typename)
-    read-c()
+    if end = '{'
+      new Mtype generic-mtype
+      generic-mtype.init(owner f-new-copy(user "void"))
+      read-new(user "}"):(owner generic-mtype.base-typename)
+      self.mtype.generic-mtype := generic-mtype
+      read-c():(copy end)
+    if end = '('
+      read-new(user ")"):(owner self.mtype.base-typename)
+      read-c()
     self.depth := 0
     glob.mclass := self.mtype
     base.parse()
@@ -57,7 +62,9 @@ class St-class(St-node)
   
   func dynamic analyze-first()
     analyze-type(user self.mtype, copy false)
+    glob.mclass := self.mtype
     base.analyze-first()
+    glob.mclass := _
   
   func dynamic analyze()
     user Mtype basetype(self.mtype.base-mtype)
@@ -67,7 +74,9 @@ class St-class(St-node)
       basetype := basetype.base-mtype
     if self.depth > glob.max-type-depth
       glob.max-type-depth := self.depth
+    glob.mclass := self.mtype
     base.analyze()
+    glob.mclass := _
   
   native func write-vars()
   native func write-meths()

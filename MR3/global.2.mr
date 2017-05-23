@@ -274,8 +274,13 @@ func get-node-type(user String key):(copy Type node-type, copy Bool found)
 
 
 func f-find-type(user String typename):(user Mtype mtype)
-  if not (? glob.type-map.find(user typename):(user mtype))
-    f-syntax-error(user "unknown type", user typename)
+  if ? glob.type-map.find(user typename):(user mtype)
+    return
+  if ? glob.mclass and ? glob.mclass.generic-mtype
+    if typename.equal(user glob.mclass.generic-mtype.base-typename)
+      mtype := glob.mclass.generic-mtype
+      return
+  f-syntax-error(user "unknown type", user typename)
 
 
 # basic syntax tree node

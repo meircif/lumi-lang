@@ -36,7 +36,7 @@ class St-dec(St)
     is-global := not (? self.father.father.father)
   
   func inst write-dec()
-    write-cstyle(user self.mvar.typename)
+    write-cstyle(user self.mvar.mtype.name)
     if not self.mvar.mtype.is-primitive
       write(user "*")
     write(user " ")
@@ -57,7 +57,7 @@ class St-dec(St)
   func inst write-struct-init()
     # (Type){init-values...};
     write(user "(")
-    write-cstyle(user self.mvar.typename)
+    write-cstyle(user self.mvar.mtype.name)
     write(user "){")
     var Bool is-dynmaic(? self.mvar.mtype.dynamic-members)
     if is-dynmaic
@@ -105,7 +105,7 @@ class St-dec(St)
         if ? self.value
           self.value.write-final()
         else-if self.mvar.mtype.is-primitive
-          if self.mvar.typename.equal(user "Type")
+          if self.mvar.mtype = glob.type-type
             write(user "(Type){")
             write-type-type-params(user self.mvar.sub-mtype)
             write(user "}")
@@ -339,7 +339,7 @@ class St-new(St-dec)
     # if (name == NULL) RAISE(line-num)
     # *name = (Class){init-values...};
     write(user "malloc(sizeof(")
-    write-cstyle(user self.mvar.typename)
+    write-cstyle(user self.mvar.mtype.name)
     write(user "));")
     self.write-check()
     write-new-indent-line()

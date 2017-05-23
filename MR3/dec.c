@@ -86,7 +86,7 @@ Returncode St_dec_m_is_global(St_dec* self, Bool* is_global) {
 static char* _func_name_St_dec_write_dec = "St-dec.write-dec";
 #define MR_FUNC_NAME _func_name_St_dec_write_dec
 Returncode St_dec_write_dec(St_dec* self) {
-  CHECK(39, write_cstyle(self->mvar->typename));
+  CHECK(39, write_cstyle(self->mvar->mtype->name));
   if (!self->mvar->mtype->is_primitive) {
     CHECK(41, write(&(String){2, 1, "*"}));
   }
@@ -117,7 +117,7 @@ static char* _func_name_St_dec_write_struct_init = "St-dec.write-struct-init";
 Returncode St_dec_write_struct_init(St_dec* self) {
   /* (Type){init-values...}; */
   CHECK(59, write(&(String){2, 1, "("}));
-  CHECK(60, write_cstyle(self->mvar->typename));
+  CHECK(60, write_cstyle(self->mvar->mtype->name));
   CHECK(61, write(&(String){3, 2, "){"}));
   Bool is_dynmaic = NULL != self->mvar->mtype->dynamic_members;
   if (is_dynmaic) {
@@ -197,9 +197,7 @@ Returncode St_dec_write(St_dec* self) {
       }
       else {
         if (self->mvar->mtype->is_primitive) {
-          Bool _Bool14;
-          CHECK(108, String_equal(self->mvar->typename, &(String){5, 4, "Type"}, &(_Bool14)))
-          if (_Bool14) {
+          if (self->mvar->mtype == glob->type_type) {
             CHECK(109, write(&(String){8, 7, "(Type){"}));
             CHECK(110, write_type_type_params(self->mvar->sub_mtype));
             CHECK(111, write(&(String){2, 1, "}"}));
@@ -219,9 +217,9 @@ Returncode St_dec_write(St_dec* self) {
     CHECK(118, write(&(String){2, 1, "\n"}));
   }
   else {
-    Bool _Bool15;
-    CHECK(119, St_dec_m_is_global(self, &(_Bool15)))
-    if (_Bool15) {
+    Bool _Bool14;
+    CHECK(119, St_dec_m_is_global(self, &(_Bool14)))
+    if (_Bool14) {
       CHECK(120, write_new_indent_line());
       CHECK(121, write(&(String){7, 6, "#endif"}));
     }
@@ -333,16 +331,16 @@ Returncode St_var_write(St_var* self) {
 static char* _func_name_St_var_parse_array = "St-var.parse-array";
 #define MR_FUNC_NAME _func_name_St_var_parse_array
 Returncode St_var_parse_array(St_var* self) {
-  Char _Char16;
-  CHECK(170, read_new(&(String){2, 1, ":"}, &(self->arr_length), &(_Char16)));
+  Char _Char15;
+  CHECK(170, read_new(&(String){2, 1, ":"}, &(self->arr_length), &(_Char15)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_var_parse_string = "St-var.parse-string";
 #define MR_FUNC_NAME _func_name_St_var_parse_string
 Returncode St_var_parse_string(St_var* self) {
-  Char _Char17;
-  CHECK(173, read_new(&(String){2, 1, "}"}, &(self->str_length), &(_Char17)));
+  Char _Char16;
+  CHECK(173, read_new(&(String){2, 1, "}"}, &(self->str_length), &(_Char16)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -596,24 +594,24 @@ Returncode St_new_write(St_new* self) {
 static char* _func_name_St_new_parse_array = "St-new.parse-array";
 #define MR_FUNC_NAME _func_name_St_new_parse_array
 Returncode St_new_parse_array(St_new* self) {
-  Char _Char18;
-  CHECK(315, parse_new_exp(&(String){2, 1, ":"}, &(self->arr_length), &(_Char18)));
+  Char _Char17;
+  CHECK(315, parse_new_exp(&(String){2, 1, ":"}, &(self->arr_length), &(_Char17)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_new_parse_string = "St-new.parse-string";
 #define MR_FUNC_NAME _func_name_St_new_parse_string
 Returncode St_new_parse_string(St_new* self) {
-  Char _Char19;
-  CHECK(318, parse_new_exp(&(String){2, 1, "}"}, &(self->str_length), &(_Char19)));
+  Char _Char18;
+  CHECK(318, parse_new_exp(&(String){2, 1, "}"}, &(self->str_length), &(_Char18)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_new_parse_as = "St-new.parse-as";
 #define MR_FUNC_NAME _func_name_St_new_parse_as
 Returncode St_new_parse_as(St_new* self) {
-  Char _Char20;
-  CHECK(321, parse_new_exp(&(String){2, 1, "}"}, &(self->as_type), &(_Char20)));
+  Char _Char19;
+  CHECK(321, parse_new_exp(&(String){2, 1, "}"}, &(self->as_type), &(_Char19)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -650,7 +648,7 @@ Returncode St_new_write_class(St_new* self) {
   /* if (name == NULL) RAISE(line-num) */
   /* *name = (Class){init-values...}; */
   CHECK(341, write(&(String){15, 14, "malloc(sizeof("}));
-  CHECK(342, write_cstyle(self->_base.mvar->typename));
+  CHECK(342, write_cstyle(self->_base.mvar->mtype->name));
   CHECK(343, write(&(String){4, 3, "));"}));
   CHECK(344, St_new_write_check(self));
   CHECK(345, write_new_indent_line());
@@ -748,8 +746,8 @@ typedef struct St_delete St_delete; struct St_delete {
 static char* _func_name_St_delete_parse = "St-delete.parse";
 #define MR_FUNC_NAME _func_name_St_delete_parse
 Returncode St_delete_parse(St_delete* self) {
-  Char _Char21;
-  CHECK(414, read_new(&(String){1, 0, ""}, &(self->name), &(_Char21)));
+  Char _Char20;
+  CHECK(414, read_new(&(String){1, 0, ""}, &(self->name), &(_Char20)));
   self->mvar = NULL;
   return OK;
 }

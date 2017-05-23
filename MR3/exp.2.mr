@@ -109,7 +109,6 @@ static Mexp(Object)
       base-count := base-count + 1
   
   func inst analyze():(user Mtype mtype, user Mtype sub-mtype)
-    # self.is-used := ? mtype or ? self.operator or ? self.next
     if ? self.operand
       user Mtype target-mtype(mtype)
       user Mtype target-sub-mtype(sub-mtype)
@@ -349,6 +348,32 @@ class Block-operand(Operand)
 
 native func f-is-func-dynamic(user Mfunc mfunc):(copy Bool is-dynamic)
 
+class Cast-operand(Operand)
+  user Mtype mtype
+  owner Operand operand
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    raise
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    self.mtype := mtype
+    self.operand := exp.operand
+    exp.operand := self
+    if ? self.next
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    self.operand.write-all-intro()
+  
+  func dynamic write-final()
+    # ((Type*)(operand...))
+    write(user "((")
+    write-cstyle(user self.mtype.name)
+    write(user "*)(")
+    self.operand.write-all-final()
+    write(user "))")
+
+
 class Member-operand(Var-operand)
   user Mtype prev-mtype
   
@@ -368,9 +393,24 @@ class Member-operand(Var-operand)
         f-syntax-error2(user "type", user self.prev-mtype.name, user "has no member", user self.name)
       self.base-count := self.base-count + 1
     self.prev-mtype := mtype
+    user Mtype prev-sub-mtype(sub-mtype)
     user Mtype basetype(mtype.base-mtype)
-    mtype := self.mvar.mtype
-    sub-mtype := self.mvar.sub-mtype
+    if mtype.generic-mtype = self.mvar.mtype
+      mtype := sub-mtype
+      sub-mtype := _
+      if (? exp.operator or ? self.next) and mtype != self.mvar.mtype
+        new Cast-operand cast
+        cast.next := self.next
+        self.next := _
+        cast.analyze(user exp, user _, user _):(user mtype, user sub-mtype)
+      else-if mtype != self.mvar.mtype and not (? self.next)
+        exp.is-used := false
+    else-if mtype.generic-mtype = self.mvar.sub-mtype
+      mtype := self.mvar.mtype
+      # sub-mtype is the same
+    else
+      mtype := self.mvar.mtype
+      sub-mtype := self.mvar.sub-mtype
     if ? self.next
       if ? self.mvar.func-dec and ? member
         if f-is-func-dynamic(user self.mvar.func-dec) and self.allow-dynamic
@@ -378,6 +418,8 @@ class Member-operand(Var-operand)
             while ? basetype
             self.base-count := self.base-count + 1
             basetype := basetype.base-mtype
+        mtype := self.prev-mtype
+        sub-mtype := prev-sub-mtype
         self.next.analyze(user exp, user member, user self):(user mtype, user sub-mtype)
       else
         self.next.analyze(user exp, user self, user self):(user mtype, user sub-mtype)
