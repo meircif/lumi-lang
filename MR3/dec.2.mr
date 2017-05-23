@@ -3,6 +3,7 @@
 class St-dec(St)
   user Mvar mvar
   owner Mexp value
+  var Bool is-in
   
   func dynamic parse()
     init-new-var(user _):(owner self.mvar)
@@ -20,10 +21,17 @@ class St-dec(St)
       else
         read-new(user "}"):(owner self.mvar.sub-typename)
       read-c()
-    if read-new(user "("):(owner self.mvar.name) = '('
+    var Char end
+    if read-new(user " ("):(owner self.mvar.name, copy end) = '('
       parse-new-exp(user ")"):(owner self.value)
       read-c()
-    self.add-var(owner self.mvar)
+    self.is-in := end = ' '
+    if self.is-in
+      if not self.mvar.name.equal(user "in")
+        f-syntax-error(user "expected 'in', got", user self.mvar.name)
+      parse-new-exp(user ""):(owner self.value)
+    else
+      self.add-var(owner self.mvar)
   
   func dynamic analyze-first()
     self.mvar.analyze()
@@ -35,17 +43,26 @@ class St-dec(St)
   func inst m-is-global():(copy Bool is-global)
     is-global := not (? self.father.father.father)
   
+  func inst write-name()
+    if self.is-in
+      self.value.write-final()
+    else
+      write-cstyle(user self.mvar.name)
+  
   func inst write-dec()
-    write-cstyle(user self.mvar.mtype.name)
-    if not self.mvar.mtype.is-primitive
-      write(user "*")
-    write(user " ")
-    write-cstyle(user self.mvar.name)
+    if self.is-in
+      self.value.write-final()
+    else
+      write-cstyle(user self.mvar.mtype.name)
+      if not self.mvar.mtype.is-primitive
+        write(user "*")
+      write(user " ")
+      write-cstyle(user self.mvar.name)
   
   func inst write-to-dtl()
     # name->[_base.]_dtl = 
     write-new-indent-line()
-    write-cstyle(user self.mvar.name)
+    self.write-name()
     write(user "->")
     user Mtype basetype(self.mvar.mtype.base-mtype)
     do
@@ -293,7 +310,7 @@ class St-new(St-dec)
     # nothing
   
   func dynamic analyze()
-    if ? self.value
+    if ? self.value and not self.is-in
       f-syntax-error(user "cannot initialize in", user "new")
     if ? self.str-length
       self.str-length.analyze-type(user glob.type-int)
@@ -327,7 +344,7 @@ class St-new(St-dec)
     # if (name == NULL) RAISE(line-num)
     write-new-indent-line()
     write(user "if (")
-    write-cstyle(user self.mvar.name)
+    self.write-name()
     write(user " == NULL) ")
     write-tb-raise()
   
@@ -344,7 +361,7 @@ class St-new(St-dec)
     self.write-check()
     write-new-indent-line()
     write(user "*")
-    write-cstyle(user self.mvar.name)
+    self.write-name()
     write(user " = ")
     self.write-struct-init()
   
@@ -385,7 +402,7 @@ class St-new(St-dec)
       write(user ", ")
       self.str-length.write-final()
       write(user ", ")
-      write-cstyle(user self.mvar.name)
+      self.write-name()
       write(user ");")
   
   func dynamic write-as():(copy Bool is-as)
