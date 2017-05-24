@@ -134,24 +134,27 @@ static char* _func_name_Mexp_parse = "Mexp.parse";
 Returncode Mexp_parse(Mexp* self, String* text, String* ends, Char* end) {
   String* _String0;
   CHECK(75, Op_map_find(glob->op_map, text, &(_String0)))
-  if ((*end) == ' ' && NULL != _String0) {
+  if (((*end) == ' ' || (*end) == '\n') && NULL != _String0) {
     self->operator = text;
-    CHECK(77, read_new_value(ends, &(text), &((*end))));
+    if ((*end) == '\n') {
+      CHECK(78, read_cont_spaces());
+    }
+    CHECK(79, read_new_value(ends, &(text), &((*end))));
     
     String* _String1;
-    CHECK(79, Op_map_find(glob->op_map, text, &(_String1)))
+    CHECK(81, Op_map_find(glob->op_map, text, &(_String1)))
     if ((*end) == ' ' && NULL != _String1) {
       self->operand = NULL;
-      CHECK(81, Mexp_parse_new_with_text(self, text, ends, &(self->next), &((*end))));
+      CHECK(83, Mexp_parse_new_with_text(self, text, ends, &(self->next), &((*end))));
       return OK;
     }
   }
   
-  CHECK(84, parse_new_operands(text, ends, &(self->operand), &((*end))));
+  CHECK(86, parse_new_operands(text, ends, &(self->operand), &((*end))));
   Bool _Bool2;
-  CHECK(85, String_has(ends, ' ', &(_Bool2)))
+  CHECK(87, String_has(ends, ' ', &(_Bool2)))
   if ((*end) == ' ' && !_Bool2) {
-    CHECK(86, Mexp_parse_new(self, ends, &(self->next), &((*end))));
+    CHECK(88, Mexp_parse_new(self, ends, &(self->next), &((*end))));
   }
   return OK;
 }
@@ -163,7 +166,7 @@ Returncode Mexp_f_count_bases(Mexp* self, Mtype* target_mtype, Mtype** mtype, In
     return OK;
   }
   if (!(NULL != (*mtype))) {
-    CHECK(92, f_syntax_error(&(String){23, 22, "got no value, expected"}, target_mtype->name));
+    CHECK(94, f_syntax_error(&(String){23, 22, "got no value, expected"}, target_mtype->name));
   }
   (*base_count) = 0;
   if (target_mtype == glob->type_bool && (*mtype)->is_primitive) {
@@ -183,7 +186,7 @@ Returncode Mexp_f_count_bases(Mexp* self, Mtype* target_mtype, Mtype** mtype, In
     if (!((*mtype) != target_mtype)) break;
     (*mtype) = (*mtype)->base_mtype;
     if (!(NULL != (*mtype))) {
-      CHECK(108, f_syntax_error2(&(String){4, 3, "got"}, orig_mtype->name, &(String){9, 8, "expected"}, target_mtype->name));
+      CHECK(110, f_syntax_error2(&(String){4, 3, "got"}, orig_mtype->name, &(String){9, 8, "expected"}, target_mtype->name));
     }
     (*base_count) = (*base_count) + 1;
   }
@@ -196,25 +199,25 @@ Returncode Mexp_analyze(Mexp* self, Mtype** mtype, Mtype** sub_mtype) {
   if (NULL != self->operand) {
     Mtype* target_mtype = (*mtype);
     Mtype* target_sub_mtype = (*sub_mtype);
-    CHECK(115, (*((Func**)(self->operand)))[1](self->operand, self, NULL, NULL, &((*mtype)), &((*sub_mtype))));
+    CHECK(117, (*((Func**)(self->operand)))[1](self->operand, self, NULL, NULL, &((*mtype)), &((*sub_mtype))));
     if (NULL != self->operator && NULL != (*mtype)) {
       Bool _Bool3;
-      CHECK(117, String_equal(self->operator, &(String){2, 1, "?"}, &(_Bool3)))
+      CHECK(119, String_equal(self->operator, &(String){2, 1, "?"}, &(_Bool3)))
       if (_Bool3) {
         if ((*mtype)->is_primitive) {
-          CHECK(119, f_syntax_error(&(String){20, 19, "? on primitive type"}, (*mtype)->name));
+          CHECK(121, f_syntax_error(&(String){20, 19, "? on primitive type"}, (*mtype)->name));
         }
         (*mtype) = glob->type_bool;
         (*sub_mtype) = NULL;
       }
     }
-    CHECK(122, Mexp_f_count_bases(self, target_mtype, &((*mtype)), &(self->base_count)));
+    CHECK(124, Mexp_f_count_bases(self, target_mtype, &((*mtype)), &(self->base_count)));
     Int _Int4;
-    CHECK(123, Mexp_f_count_bases(self, target_sub_mtype, &((*sub_mtype)), &(_Int4)));
+    CHECK(125, Mexp_f_count_bases(self, target_sub_mtype, &((*sub_mtype)), &(_Int4)));
   }
   
   if (NULL != self->next) {
-    CHECK(126, Mexp_analyze(self->next, &((*mtype)), &((*sub_mtype))));
+    CHECK(128, Mexp_analyze(self->next, &((*mtype)), &((*sub_mtype))));
   }
   return OK;
 }
@@ -223,12 +226,12 @@ static char* _func_name_Mexp_analyze_get_subtype = "Mexp.analyze-get-subtype";
 #define MR_FUNC_NAME _func_name_Mexp_analyze_get_subtype
 Returncode Mexp_analyze_get_subtype(Mexp* self, Mtype* target_mtype, Mtype** sub_mtype) {
   Mtype* mtype = target_mtype;
-  CHECK(130, Mexp_analyze(self, &(mtype), &((*sub_mtype))));
+  CHECK(132, Mexp_analyze(self, &(mtype), &((*sub_mtype))));
   if (!(NULL != mtype)) {
-    CHECK(132, f_syntax_error(&(String){23, 22, "got no value, expected"}, target_mtype->name));
+    CHECK(134, f_syntax_error(&(String){23, 22, "got no value, expected"}, target_mtype->name));
   }
   if (mtype != target_mtype) {
-    CHECK(134, f_syntax_error2(&(String){4, 3, "got"}, mtype->name, &(String){9, 8, "expected"}, target_mtype->name));
+    CHECK(136, f_syntax_error2(&(String){4, 3, "got"}, mtype->name, &(String){9, 8, "expected"}, target_mtype->name));
   }
   return OK;
 }
@@ -237,13 +240,13 @@ static char* _func_name_Mexp_analyze_types = "Mexp.analyze-types";
 #define MR_FUNC_NAME _func_name_Mexp_analyze_types
 Returncode Mexp_analyze_types(Mexp* self, Mtype* target_mtype, Mtype* target_sub_mtype) {
   Mtype* sub_mtype = target_sub_mtype;
-  CHECK(138, Mexp_analyze_get_subtype(self, target_mtype, &(sub_mtype)));
+  CHECK(140, Mexp_analyze_get_subtype(self, target_mtype, &(sub_mtype)));
   if (NULL != target_sub_mtype) {
     if (!(NULL != sub_mtype)) {
-      CHECK(141, f_syntax_error(&(String){26, 25, "got no sub-type, expected"}, target_sub_mtype->name));
+      CHECK(143, f_syntax_error(&(String){26, 25, "got no sub-type, expected"}, target_sub_mtype->name));
     }
     if (sub_mtype != target_sub_mtype) {
-      CHECK(143, f_syntax_error2(&(String){13, 12, "got sub-type"}, sub_mtype->name, &(String){9, 8, "expected"}, target_sub_mtype->name));
+      CHECK(145, f_syntax_error2(&(String){13, 12, "got sub-type"}, sub_mtype->name, &(String){9, 8, "expected"}, target_sub_mtype->name));
     }
   }
   return OK;
@@ -252,7 +255,7 @@ Returncode Mexp_analyze_types(Mexp* self, Mtype* target_mtype, Mtype* target_sub
 static char* _func_name_Mexp_analyze_type = "Mexp.analyze-type";
 #define MR_FUNC_NAME _func_name_Mexp_analyze_type
 Returncode Mexp_analyze_type(Mexp* self, Mtype* target_mtype) {
-  CHECK(146, Mexp_analyze_types(self, target_mtype, NULL));
+  CHECK(148, Mexp_analyze_types(self, target_mtype, NULL));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -261,33 +264,33 @@ static char* _func_name_Mexp_write_all_final = "Mexp.write-all-final";
 Returncode Mexp_write_all_final(Mexp* self, Bool is_binary) {
   if (NULL != self->operator) {
     String* op;
-    CHECK(151, Op_map_find(glob->op_map, self->operator, &(op)))
+    CHECK(153, Op_map_find(glob->op_map, self->operator, &(op)))
     if (!(NULL != op)) {
-      CHECK(152, f_syntax_error(&(String){16, 15, "unknow operator"}, self->operator));
+      CHECK(154, f_syntax_error(&(String){16, 15, "unknow operator"}, self->operator));
     }
     if (is_binary) {
-      CHECK(154, write(&(String){2, 1, " "}));
+      CHECK(156, write(&(String){2, 1, " "}));
     }
-    CHECK(155, write(op));
+    CHECK(157, write(op));
     if (is_binary) {
-      CHECK(157, write(&(String){2, 1, " "}));
+      CHECK(159, write(&(String){2, 1, " "}));
     }
   }
   if (NULL != self->operand) {
     if (self->base_count > 0) {
-      CHECK(160, write(&(String){3, 2, "&("}));
+      CHECK(162, write(&(String){3, 2, "&("}));
     }
-    CHECK(161, Operand_write_all_final(self->operand));
+    CHECK(163, Operand_write_all_final(self->operand));
     if (self->base_count > 0) {
-      CHECK(163, write(&(String){8, 7, "->_base"}));
+      CHECK(165, write(&(String){8, 7, "->_base"}));
       Int n; for (n = 1; n < self->base_count; ++n) {
-        CHECK(165, write(&(String){7, 6, "._base"}));
+        CHECK(167, write(&(String){7, 6, "._base"}));
       }
-      CHECK(166, write(&(String){2, 1, ")"}));
+      CHECK(168, write(&(String){2, 1, ")"}));
     }
   }
   if (NULL != self->next) {
-    CHECK(168, Mexp_write_all_final(self->next, true));
+    CHECK(170, Mexp_write_all_final(self->next, true));
   }
   return OK;
 }
@@ -296,10 +299,10 @@ static char* _func_name_Mexp_write_intro = "Mexp.write-intro";
 #define MR_FUNC_NAME _func_name_Mexp_write_intro
 Returncode Mexp_write_intro(Mexp* self) {
   if (NULL != self->operand) {
-    CHECK(172, Operand_write_all_intro(self->operand));
+    CHECK(174, Operand_write_all_intro(self->operand));
   }
   if (NULL != self->next) {
-    CHECK(174, Mexp_write_intro(self->next));
+    CHECK(176, Mexp_write_intro(self->next));
   }
   return OK;
 }
@@ -307,7 +310,7 @@ Returncode Mexp_write_intro(Mexp* self) {
 static char* _func_name_Mexp_write_final = "Mexp.write-final";
 #define MR_FUNC_NAME _func_name_Mexp_write_final
 Returncode Mexp_write_final(Mexp* self) {
-  CHECK(177, Mexp_write_all_final(self, false));
+  CHECK(179, Mexp_write_all_final(self, false));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -315,7 +318,7 @@ Returncode Mexp_write_final(Mexp* self) {
 static char* _func_name_parse_new_exp = "parse-new-exp";
 #define MR_FUNC_NAME _func_name_parse_new_exp
 Returncode parse_new_exp(String* ends, Mexp** exp, Char* end) {
-  CHECK(180, Mexp_parse_new(NULL, ends, &((*exp)), &((*end))));
+  CHECK(182, Mexp_parse_new(NULL, ends, &((*exp)), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -323,7 +326,7 @@ Returncode parse_new_exp(String* ends, Mexp** exp, Char* end) {
 static char* _func_name_parse_new_exp_with_kw = "parse-new-exp-with-kw";
 #define MR_FUNC_NAME _func_name_parse_new_exp_with_kw
 Returncode parse_new_exp_with_kw(String* ends, Mexp** exp, Char* end) {
-  CHECK(183, Mexp_parse_new_with_kw(NULL, ends, &((*exp)), &((*end))));
+  CHECK(185, Mexp_parse_new_with_kw(NULL, ends, &((*exp)), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -337,7 +340,7 @@ static char* _func_name_St_exp_parse = "St-exp.parse";
 #define MR_FUNC_NAME _func_name_St_exp_parse
 Returncode St_exp_parse(St_exp* self) {
   Char _Char5;
-  CHECK(190, parse_new_exp_with_kw(&(String){1, 0, ""}, &(self->exp), &(_Char5)));
+  CHECK(192, parse_new_exp_with_kw(&(String){1, 0, ""}, &(self->exp), &(_Char5)));
   self->exp->is_used = false;
   return OK;
 }
@@ -354,17 +357,17 @@ static char* _func_name_St_exp_analyze = "St-exp.analyze";
 Returncode St_exp_analyze(St_exp* self) {
   Mtype* mtype = NULL;
   Mtype* sub_mtype = NULL;
-  CHECK(199, Mexp_analyze(self->exp, &(mtype), &(sub_mtype)));
+  CHECK(201, Mexp_analyze(self->exp, &(mtype), &(sub_mtype)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_exp_write = "St-exp.write";
 #define MR_FUNC_NAME _func_name_St_exp_write
 Returncode St_exp_write(St_exp* self) {
-  CHECK(202, Mexp_write_intro(self->exp));
-  CHECK(203, Mexp_write_final(self->exp));
+  CHECK(204, Mexp_write_intro(self->exp));
+  CHECK(205, Mexp_write_final(self->exp));
   if (!self->exp->is_used) {
-    CHECK(205, write(&(String){2, 1, ";"}));
+    CHECK(207, write(&(String){2, 1, ";"}));
   }
   return OK;
 }

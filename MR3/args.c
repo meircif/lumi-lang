@@ -234,9 +234,13 @@ Returncode Arg_list_parse_args(Arg_list* self, Bool is_out) {
   while (true) {
     String* access_text = &(String){128, 0, (char[128]){0}};
     CHECK(124, read(&(String){3, 2, " )"}, access_text, &(end)));
+    if (access_text->length == 0 && end == '\n') {
+      CHECK(126, read_cont_spaces());
+      CHECK(127, read(&(String){2, 1, " "}, access_text, &(end)));
+    }
     if (!(end == ' ')) break;
     Int access;
-    CHECK(127, f_get_access(access_text, &(access)));
+    CHECK(130, f_get_access(access_text, &(access)));
     Type arg_type;
     if (self->is_dec) {
       arg_type = (Type){sizeof(Dec_arg), Dec_arg__dtl};
@@ -244,11 +248,11 @@ Returncode Arg_list_parse_args(Arg_list* self, Bool is_out) {
     else {
       arg_type = (Type){sizeof(Call_arg), Call_arg__dtl};
     }
-    if (arg_type.size <= 0) RAISE(133)
+    if (arg_type.size <= 0) RAISE(136)
     Arg_node* arg = malloc(arg_type.size);
-    if (arg == NULL) RAISE(133)
+    if (arg == NULL) RAISE(136)
     if (arg_type.dtl != NULL) { *((Func**)(arg)) = arg_type.dtl; }
-    CHECK(134, (*((Func**)(arg)))[0](arg, is_out, access, &(end)));
+    CHECK(137, (*((Func**)(arg)))[0](arg, is_out, access, &(end)));
     arg->next = NULL;
     if (NULL != prev) {
       prev->next = arg;
@@ -262,8 +266,15 @@ Returncode Arg_list_parse_args(Arg_list* self, Bool is_out) {
       }
     }
     prev = arg;
+    if (end == '\n') {
+      CHECK(147, read_cont_spaces());
+      CHECK(148, read_c(&(end)));
+    }
     if (!(end == ',')) break;
-    CHECK(144, read_c(&(end)));
+    CHECK(150, read_c(&(end)));
+    if (end == '\n') {
+      CHECK(152, read_cont_spaces());
+    }
   }
   return OK;
 }
@@ -272,16 +283,16 @@ static char* _func_name_Arg_list_parse = "Arg-list.parse";
 #define MR_FUNC_NAME _func_name_Arg_list_parse
 Returncode Arg_list_parse(Arg_list* self, Bool is_dec, Char* end) {
   self->is_dec = is_dec;
-  CHECK(148, Arg_list_parse_args(self, false));
-  CHECK(149, read_c(&((*end))))
+  CHECK(156, Arg_list_parse_args(self, false));
+  CHECK(157, read_c(&((*end))))
   if ((*end) == ':') {
     Char _Char0;
-    CHECK(150, read_c(&(_Char0)))
+    CHECK(158, read_c(&(_Char0)))
     if (_Char0 != '(') {
-      CHECK(151, f_syntax_error_c(&(String){17, 16, "expeted '(', got"}, (*end)));
+      CHECK(159, f_syntax_error_c(&(String){17, 16, "expeted '(', got"}, (*end)));
     }
-    CHECK(152, Arg_list_parse_args(self, true));
-    CHECK(153, read_c(&((*end))));
+    CHECK(160, Arg_list_parse_args(self, true));
+    CHECK(161, read_c(&((*end))));
   }
   else {
     self->first_out = NULL;
@@ -295,7 +306,7 @@ Returncode Arg_list_analyze_args(Arg_list* self, Arg_node* first) {
   Arg_node* node = first;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(161, (*((Func**)(node)))[1](node, NULL, NULL, NULL));
+    CHECK(169, (*((Func**)(node)))[1](node, NULL, NULL, NULL));
     node = node->next;
   }
   return OK;
@@ -304,8 +315,8 @@ Returncode Arg_list_analyze_args(Arg_list* self, Arg_node* first) {
 static char* _func_name_Arg_list_analyze = "Arg-list.analyze";
 #define MR_FUNC_NAME _func_name_Arg_list_analyze
 Returncode Arg_list_analyze(Arg_list* self) {
-  CHECK(165, Arg_list_analyze_args(self, self->first_param));
-  CHECK(166, Arg_list_analyze_args(self, self->first_out));
+  CHECK(173, Arg_list_analyze_args(self, self->first_param));
+  CHECK(174, Arg_list_analyze_args(self, self->first_out));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -315,7 +326,7 @@ Returncode Arg_list_write_args_intro(Arg_list* self, Arg_node* first) {
   Arg_node* node = first;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(172, (*((Func**)(node)))[2](node));
+    CHECK(180, (*((Func**)(node)))[2](node));
     node = node->next;
   }
   return OK;
@@ -328,10 +339,10 @@ Returncode Arg_list_write_args_final(Arg_list* self, Bool is_out, Arg_node* firs
   Bool has_more = !is_out && NULL != self->first_out;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(180, (*((Func**)(node)))[3](node, is_out));
+    CHECK(188, (*((Func**)(node)))[3](node, is_out));
     node = node->next;
     if (has_more || NULL != node) {
-      CHECK(183, write(&(String){3, 2, ", "}));
+      CHECK(191, write(&(String){3, 2, ", "}));
     }
   }
   return OK;
@@ -340,18 +351,18 @@ Returncode Arg_list_write_args_final(Arg_list* self, Bool is_out, Arg_node* firs
 static char* _func_name_Arg_list_write_intro = "Arg-list.write-intro";
 #define MR_FUNC_NAME _func_name_Arg_list_write_intro
 Returncode Arg_list_write_intro(Arg_list* self) {
-  CHECK(186, Arg_list_write_args_intro(self, self->first_param));
-  CHECK(187, Arg_list_write_args_intro(self, self->first_out));
+  CHECK(194, Arg_list_write_args_intro(self, self->first_param));
+  CHECK(195, Arg_list_write_args_intro(self, self->first_out));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_Arg_list_write_final = "Arg-list.write-final";
 #define MR_FUNC_NAME _func_name_Arg_list_write_final
 Returncode Arg_list_write_final(Arg_list* self) {
-  CHECK(190, write(&(String){2, 1, "("}));
-  CHECK(191, Arg_list_write_args_final(self, false, self->first_param));
-  CHECK(192, Arg_list_write_args_final(self, true, self->first_out));
-  CHECK(193, write(&(String){2, 1, ")"}));
+  CHECK(198, write(&(String){2, 1, "("}));
+  CHECK(199, Arg_list_write_args_final(self, false, self->first_param));
+  CHECK(200, Arg_list_write_args_final(self, true, self->first_out));
+  CHECK(201, write(&(String){2, 1, ")"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -359,9 +370,9 @@ static char* _func_name_Arg_list_add_arg = "Arg-list.add-arg";
 #define MR_FUNC_NAME _func_name_Arg_list_add_arg
 Returncode Arg_list_add_arg(Arg_list* self, Int access, Mtype* mtype, String* name, Arg_node** first) {
   Dec_arg* arg = malloc(sizeof(Dec_arg));
-  if (arg == NULL) RAISE(196)
+  if (arg == NULL) RAISE(204)
   *((Func**)(arg)) = Dec_arg__dtl;
-  CHECK(197, Dec_arg_init(arg, access, mtype, name));
+  CHECK(205, Dec_arg_init(arg, access, mtype, name));
   arg->_base.next = (*first);
   (*first) = &(arg->_base);
   return OK;
@@ -370,14 +381,14 @@ Returncode Arg_list_add_arg(Arg_list* self, Int access, Mtype* mtype, String* na
 static char* _func_name_Arg_list_add_param = "Arg-list.add-param";
 #define MR_FUNC_NAME _func_name_Arg_list_add_param
 Returncode Arg_list_add_param(Arg_list* self, Int access, Mtype* mtype, String* name) {
-  CHECK(202, Arg_list_add_arg(self, access, mtype, name, &(self->first_param)));
+  CHECK(210, Arg_list_add_arg(self, access, mtype, name, &(self->first_param)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_Arg_list_add_out = "Arg-list.add-out";
 #define MR_FUNC_NAME _func_name_Arg_list_add_out
 Returncode Arg_list_add_out(Arg_list* self, Int access, Mtype* mtype, String* name) {
-  CHECK(205, Arg_list_add_arg(self, access, mtype, name, &(self->first_out)));
+  CHECK(213, Arg_list_add_arg(self, access, mtype, name, &(self->first_out)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -385,7 +396,7 @@ static char* _func_name_Arg_list_add_self_call = "Arg-list.add-self-call";
 #define MR_FUNC_NAME _func_name_Arg_list_add_self_call
 Returncode Arg_list_add_self_call(Arg_list* self, Mexp* value) {
   Call_arg* arg = malloc(sizeof(Call_arg));
-  if (arg == NULL) RAISE(208)
+  if (arg == NULL) RAISE(216)
   *((Func**)(arg)) = Call_arg__dtl;
   arg->access = ACCESS_VAR;
   arg->value = value;
@@ -399,10 +410,10 @@ static char* _func_name_parse_new_args = "parse-new-args";
 #define MR_FUNC_NAME _func_name_parse_new_args
 Returncode parse_new_args(Arg_list** new_args) {
   Arg_list* args = malloc(sizeof(Arg_list));
-  if (args == NULL) RAISE(215)
-  CHECK(216, Arg_list_init(args, true));
+  if (args == NULL) RAISE(223)
+  CHECK(224, Arg_list_init(args, true));
   Char _Char1;
-  CHECK(217, Arg_list_parse(args, true, &(_Char1)));
+  CHECK(225, Arg_list_parse(args, true, &(_Char1)));
   (*new_args) = args;
   return OK;
 }

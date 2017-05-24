@@ -122,6 +122,9 @@ static Arg-list(Object)
     do
       var String{128} access-text
       read(user " )", user access-text):(copy end)
+      if access-text.length = 0 and end = '\n'
+        read-cont-spaces()
+        read(user " ", user access-text):(copy end)
       while end = ' '
       var Int access
       f-get-access(user access-text):(copy access)
@@ -140,8 +143,13 @@ static Arg-list(Object)
       else
         self.first-param := arg
       prev := arg
+      if end = '\n'
+        read-cont-spaces()
+        read-c():(copy end)
       while end = ','
       read-c():(copy end)
+      if end = '\n'
+        read-cont-spaces()
   
   func inst parse(copy Bool is-dec):(copy Char end)
     self.is-dec := is-dec

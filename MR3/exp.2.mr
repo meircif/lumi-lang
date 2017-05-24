@@ -72,8 +72,10 @@ static Mexp(Object)
       self.parse-new(user ends):(owner new-exp, copy end)
   
   func inst parse(owner String text, user String ends):(copy Char end)
-    if end = ' ' and ? glob.op-map.find(user text)
+    if (end = ' ' or end = '\n') and ? glob.op-map.find(user text)
       self.operator := text
+      if end = '\n'
+        read-cont-spaces()
       read-new-value(user ends):(owner text, copy end)
       
       if end = ' ' and ? glob.op-map.find(user text)

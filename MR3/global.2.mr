@@ -102,6 +102,9 @@ func read-ignore(copy Int chars)
   for n in chars
     read-c()
 
+func read-cont-spaces()
+  read-ignore(copy glob.spaces + 4)
+
 func read-indent(user String ends, copy Bool indent, user String text):(copy Char end, copy Int spaces)
   text.clear()
   var Char ch(EOF)
