@@ -172,7 +172,6 @@ class St-file(St-node)
     self.index := index
   
   func dynamic parse()
-    sys.print(user self.infile-name)
     if self.infile-name.has(copy '"')
       f-msg-raise(user "Illegal \" character in argument", user self.infile-name)
     if self.infile-name.length < 6
@@ -194,7 +193,6 @@ class St-file(St-node)
     base.analyze-first()
   
   func dynamic analyze()
-    sys.print(user self.infile-name)
     glob.infile-name := self.infile-name
     glob.node := self
     base.analyze()
@@ -211,7 +209,6 @@ class St-file(St-node)
     new String{self.infile-name.length} outfile-name
     outfile-name.copy(user self.infile-name[0:self.infile-name.length - 4])
     outfile-name.append(copy 'c')
-    sys.print(user outfile-name)
     file-open-write(user outfile-name):(owner glob.outfile)
     
     write(user "#ifndef MR_MAINFILE\n")

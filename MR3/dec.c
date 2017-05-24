@@ -1,5 +1,5 @@
-static char* _mr_file8_name = "dec.2.mr";
-#define MR_FILE_NAME _mr_file8_name
+static char* _mr_file12_name = "dec.2.mr";
+#define MR_FILE_NAME _mr_file12_name
 /* MR3 compiler - variable declerations */
 
 typedef struct St_dec St_dec; struct St_dec {

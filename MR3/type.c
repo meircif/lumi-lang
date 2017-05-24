@@ -1,5 +1,5 @@
-static char* _mr_file9_name = "type.2.mr";
-#define MR_FILE_NAME _mr_file9_name
+static char* _mr_file13_name = "type.2.mr";
+#define MR_FILE_NAME _mr_file13_name
 /* MR3 compiler - types */
 
 static char* _func_name_analyze_type = "analyze-type";

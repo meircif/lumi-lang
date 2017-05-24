@@ -183,13 +183,8 @@ main func(user Array{String} argv)
   var St-root root
   root.init(user argv)
   
-  sys.print(user "parsing...")
   root.parse()
-  
-  sys.print(user "analyzing...")
   root.analyze()
-  
-  sys.print(user "writing...")
   root.write()
   
   sys.print(user "MR compiler end")

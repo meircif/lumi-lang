@@ -358,25 +358,24 @@ Returncode St_file_init(St_file* self, St* root, Array* argv, Int index) {
 static char* _func_name_St_file_parse = "St-file.parse";
 #define MR_FUNC_NAME _func_name_St_file_parse
 Returncode St_file_parse(St_file* self) {
-  CHECK(175, Sys_print(sys, self->infile_name));
   Bool _Bool4;
-  CHECK(176, String_has(self->infile_name, '"', &(_Bool4)))
+  CHECK(175, String_has(self->infile_name, '"', &(_Bool4)))
   if (_Bool4) {
-    CHECK(177, f_msg_raise(&(String){32, 31, "Illegal \" character in argument"}, self->infile_name));
+    CHECK(176, f_msg_raise(&(String){32, 31, "Illegal \" character in argument"}, self->infile_name));
   }
   if (self->infile_name->length < 6) {
-    CHECK(179, f_msg_raise(&(String){19, 18, "too short argument"}, self->infile_name));
+    CHECK(178, f_msg_raise(&(String){19, 18, "too short argument"}, self->infile_name));
   }
-  CHECK(180, file_open_read(self->infile_name, &(glob->infile)));
+  CHECK(179, file_open_read(self->infile_name, &(glob->infile)));
   glob->infile_name = self->infile_name;
   glob->key_word = NULL;
   glob->line_num = 1;
   glob->spaces = 0;
   glob->mclass = NULL;
   
-  CHECK(187, St_node_parse_block(&(self->_base)));
+  CHECK(186, St_node_parse_block(&(self->_base)));
   
-  CHECK(189, File_close(glob->infile));
+  CHECK(188, File_close(glob->infile));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -385,30 +384,29 @@ static char* _func_name_St_file_analyze_first = "St-file.analyze-first";
 Returncode St_file_analyze_first(St_file* self) {
   glob->infile_name = self->infile_name;
   glob->node = &(self->_base._base);
-  CHECK(194, St_node_analyze_first(&(self->_base)));
+  CHECK(193, St_node_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_file_analyze = "St-file.analyze";
 #define MR_FUNC_NAME _func_name_St_file_analyze
 Returncode St_file_analyze(St_file* self) {
-  CHECK(197, Sys_print(sys, self->infile_name));
   glob->infile_name = self->infile_name;
   glob->node = &(self->_base._base);
-  CHECK(200, St_node_analyze(&(self->_base)));
+  CHECK(198, St_node_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_file_write_cfile_name = "St-file.write-cfile-name";
 #define MR_FUNC_NAME _func_name_St_file_write_cfile_name
 Returncode St_file_write_cfile_name(St_file* self, Int index) {
-  if ((index) < 0 || (index) >= self->argv->length) RAISE(203)
+  if ((index) < 0 || (index) >= self->argv->length) RAISE(201)
   String* infile_name = ((String*)(self->argv->values)) + index;
-  if ((0) < 0 || (infile_name->length - 4) < 0 || (0) + (infile_name->length - 4) > infile_name->length) RAISE(204)
+  if ((0) < 0 || (infile_name->length - 4) < 0 || (0) + (infile_name->length - 4) > infile_name->length) RAISE(202)
   String* prefix = &(String){infile_name->length - 4, infile_name->length - 4, infile_name->chars + (0)};
-  CHECK(205, write(&(String){3, 2, " \""}));
-  CHECK(206, write(prefix));
-  CHECK(207, write(&(String){4, 3, "c\"\n"}));
+  CHECK(203, write(&(String){3, 2, " \""}));
+  CHECK(204, write(prefix));
+  CHECK(205, write(&(String){4, 3, "c\"\n"}));
   
   return OK;
 }
@@ -417,75 +415,74 @@ static char* _func_name_St_file_write = "St-file.write";
 #define MR_FUNC_NAME _func_name_St_file_write
 Returncode St_file_write(St_file* self) {
   String* outfile_name = new_string(self->infile_name->length);
-  if (outfile_name == NULL) RAISE(211)
-  if ((0) < 0 || (self->infile_name->length - 4) < 0 || (0) + (self->infile_name->length - 4) > self->infile_name->length) RAISE(212)
-  CHECK(212, String_copy(outfile_name, &(String){self->infile_name->length - 4, self->infile_name->length - 4, self->infile_name->chars + (0)}));
-  CHECK(213, String_append(outfile_name, 'c'));
-  CHECK(214, Sys_print(sys, outfile_name));
-  CHECK(215, file_open_write(outfile_name, &(glob->outfile)));
+  if (outfile_name == NULL) RAISE(209)
+  if ((0) < 0 || (self->infile_name->length - 4) < 0 || (0) + (self->infile_name->length - 4) > self->infile_name->length) RAISE(210)
+  CHECK(210, String_copy(outfile_name, &(String){self->infile_name->length - 4, self->infile_name->length - 4, self->infile_name->chars + (0)}));
+  CHECK(211, String_append(outfile_name, 'c'));
+  CHECK(212, file_open_write(outfile_name, &(glob->outfile)));
   
-  CHECK(217, write(&(String){21, 20, "#ifndef MR_MAINFILE\n"}));
-  CHECK(218, write(&(String){20, 19, "#define MR_MAINFILE"}));
-  CHECK(219, St_file_write_cfile_name(self, self->index));
-  CHECK(220, write(&(String){15, 14, "#define DEPTH "}));
-  CHECK(221, write_int(glob->max_type_depth + 1));
-  CHECK(222, write(&(String){20, 19, "\n#include \"mr.3.h\"\n"}));
-  CHECK(223, write(&(String){8, 7, "#else\n\n"}));
+  CHECK(214, write(&(String){21, 20, "#ifndef MR_MAINFILE\n"}));
+  CHECK(215, write(&(String){20, 19, "#define MR_MAINFILE"}));
+  CHECK(216, St_file_write_cfile_name(self, self->index));
+  CHECK(217, write(&(String){15, 14, "#define DEPTH "}));
+  CHECK(218, write_int(glob->max_type_depth + 1));
+  CHECK(219, write(&(String){20, 19, "\n#include \"mr.3.h\"\n"}));
+  CHECK(220, write(&(String){8, 7, "#else\n\n"}));
   
-  CHECK(225, write(&(String){29, 28, "#if MR_STAGE == MR_TYPEDEFS\n"}));
-  CHECK(226, write(&(String){22, 21, "static char* _mr_file"}));
-  CHECK(227, write_int(self->index));
-  CHECK(228, write(&(String){10, 9, "_name = \""}));
-  CHECK(229, write(self->infile_name));
-  CHECK(230, write(&(String){4, 3, "\";\n"}));
-  CHECK(231, write(&(String){8, 7, "#endif\n"}));
-  CHECK(232, write(&(String){30, 29, "#define MR_FILE_NAME _mr_file"}));
-  CHECK(233, write_int(self->index));
-  CHECK(234, write(&(String){8, 7, "_name\n\n"}));
+  CHECK(222, write(&(String){29, 28, "#if MR_STAGE == MR_TYPEDEFS\n"}));
+  CHECK(223, write(&(String){22, 21, "static char* _mr_file"}));
+  CHECK(224, write_int(self->index));
+  CHECK(225, write(&(String){10, 9, "_name = \""}));
+  CHECK(226, write(self->infile_name));
+  CHECK(227, write(&(String){4, 3, "\";\n"}));
+  CHECK(228, write(&(String){8, 7, "#endif\n"}));
+  CHECK(229, write(&(String){30, 29, "#define MR_FILE_NAME _mr_file"}));
+  CHECK(230, write_int(self->index));
+  CHECK(231, write(&(String){8, 7, "_name\n\n"}));
   glob->infile_name = self->infile_name;
   
-  CHECK(237, St_node_write_block(&(self->_base)));
+  CHECK(234, St_node_write_block(&(self->_base)));
   
-  CHECK(239, write(&(String){23, 22, "\n#undef MR_FILE_NAME\n\n"}));
+  CHECK(236, write(&(String){23, 22, "\n#undef MR_FILE_NAME\n\n"}));
   
   if (self->argv->length > 2) {
-    CHECK(242, write(&(String){21, 20, "#ifndef MR_INCLUDES\n"}));
-    CHECK(243, write(&(String){21, 20, "#define MR_INCLUDES\n"}));
+    CHECK(239, write(&(String){21, 20, "#ifndef MR_INCLUDES\n"}));
+    CHECK(240, write(&(String){21, 20, "#define MR_INCLUDES\n"}));
     Int n; for (n = 1; n < self->argv->length; ++n) {
       if (n != self->index) {
-        CHECK(246, write(&(String){9, 8, "#include"}));
-        CHECK(247, St_file_write_cfile_name(self, n));
+        CHECK(243, write(&(String){9, 8, "#include"}));
+        CHECK(244, St_file_write_cfile_name(self, n));
       }
     }
     
   }
   Int depth; for (depth = 0; depth < glob->max_type_depth; ++depth) {
     if (depth == 0) {
-      CHECK(251, write(&(String){5, 4, "#if "}));
+      CHECK(248, write(&(String){5, 4, "#if "}));
     }
     else {
-      CHECK(253, write(&(String){7, 6, "#elif "}));
+      CHECK(250, write(&(String){7, 6, "#elif "}));
     }
-    CHECK(254, write(&(String){22, 21, "MR_STAGE == MR_TYPES("}));
-    CHECK(255, write_int(depth + 1));
-    CHECK(256, write(&(String){3, 2, ")\n"}));
-    CHECK(257, write(&(String){17, 16, "#undef MR_STAGE\n"}));
-    CHECK(258, write(&(String){27, 26, "#define MR_STAGE MR_TYPES("}));
-    CHECK(259, write_int(depth + 2));
-    CHECK(260, write(&(String){3, 2, ")\n"}));
+    CHECK(251, write(&(String){22, 21, "MR_STAGE == MR_TYPES("}));
+    CHECK(252, write_int(depth + 1));
+    CHECK(253, write(&(String){3, 2, ")\n"}));
+    CHECK(254, write(&(String){17, 16, "#undef MR_STAGE\n"}));
+    CHECK(255, write(&(String){27, 26, "#define MR_STAGE MR_TYPES("}));
+    CHECK(256, write_int(depth + 2));
+    CHECK(257, write(&(String){3, 2, ")\n"}));
     if (depth == glob->max_type_depth - 1) {
-      CHECK(262, write(&(String){8, 7, "#endif\n"}));
+      CHECK(259, write(&(String){8, 7, "#endif\n"}));
     }
     
   }
   if (self->argv->length > 2) {
-    CHECK(265, write(&(String){20, 19, "#undef MR_INCLUDES\n"}));
-    CHECK(266, write(&(String){9, 8, "#endif\n\n"}));
+    CHECK(262, write(&(String){20, 19, "#undef MR_INCLUDES\n"}));
+    CHECK(263, write(&(String){9, 8, "#endif\n\n"}));
   }
   
-  CHECK(268, write(&(String){8, 7, "#endif\n"}));
+  CHECK(265, write(&(String){8, 7, "#endif\n"}));
   
-  CHECK(270, File_close(glob->outfile));
+  CHECK(267, File_close(glob->outfile));
   free(outfile_name);
   return OK;
 }
@@ -500,7 +497,7 @@ typedef struct St_root St_root; struct St_root {
 static char* _func_name_St_root_init = "St-root.init";
 #define MR_FUNC_NAME _func_name_St_root_init
 Returncode St_root_init(St_root* self, Array* argv) {
-  CHECK(278, St_init(&(self->_base), NULL));
+  CHECK(275, St_init(&(self->_base), NULL));
   self->argv = argv;
   return OK;
 }
@@ -510,10 +507,10 @@ static char* _func_name_St_root_parse = "St-root.parse";
 Returncode St_root_parse(St_root* self) {
   Int index; for (index = 1; index < self->argv->length; ++index) {
     St_file* st_file = malloc(sizeof(St_file));
-    if (st_file == NULL) RAISE(283)
+    if (st_file == NULL) RAISE(280)
     *((Func**)(st_file)) = St_file__dtl;
-    CHECK(284, St_file_init(st_file, &(self->_base), self->argv, index));
-    CHECK(285, (*((Func**)(st_file)))[0](st_file));
+    CHECK(281, St_file_init(st_file, &(self->_base), self->argv, index));
+    CHECK(282, (*((Func**)(st_file)))[0](st_file));
   }
   return OK;
 }
@@ -521,15 +518,15 @@ Returncode St_root_parse(St_root* self) {
 static char* _func_name_St_root_analyze_first = "St-root.analyze-first";
 #define MR_FUNC_NAME _func_name_St_root_analyze_first
 Returncode St_root_analyze_first(St_root* self) {
-  CHECK(288, St_analyze_first(&(self->_base)));
+  CHECK(285, St_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_root_analyze = "St-root.analyze";
 #define MR_FUNC_NAME _func_name_St_root_analyze
 Returncode St_root_analyze(St_root* self) {
-  CHECK(291, (*((Func**)(self)))[1](self));
-  CHECK(292, St_analyze(&(self->_base)));
+  CHECK(288, (*((Func**)(self)))[1](self));
+  CHECK(289, St_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -539,7 +536,7 @@ Returncode St_root_write(St_root* self) {
   St* son = self->_base.first_son;
   while (true) {
     if (!(NULL != son)) break;
-    CHECK(298, (*((Func**)(son)))[3](son));
+    CHECK(295, (*((Func**)(son)))[3](son));
     son = son->next_brother;
   }
   return OK;
@@ -554,28 +551,28 @@ typedef struct St_native St_native; struct St_native {
 static char* _func_name_St_native_parse = "St-native.parse";
 #define MR_FUNC_NAME _func_name_St_native_parse
 Returncode St_native_parse(St_native* self) {
-  CHECK(304, St_comment_parse(&(self->_base)));
+  CHECK(301, St_comment_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_native_analyze_first = "St-native.analyze-first";
 #define MR_FUNC_NAME _func_name_St_native_analyze_first
 Returncode St_native_analyze_first(St_native* self) {
-  CHECK(306, St_comment_analyze_first(&(self->_base)));
+  CHECK(303, St_comment_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_native_analyze = "St-native.analyze";
 #define MR_FUNC_NAME _func_name_St_native_analyze
 Returncode St_native_analyze(St_native* self) {
-  CHECK(308, St_comment_analyze(&(self->_base)));
+  CHECK(305, St_comment_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_native_write = "St-native.write";
 #define MR_FUNC_NAME _func_name_St_native_write
 Returncode St_native_write(St_native* self) {
-  CHECK(310, St_comment_write(&(self->_base)));
+  CHECK(307, St_comment_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME

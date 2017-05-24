@@ -1,0 +1,277 @@
+# MR3 compiler - operands
+
+class Char-operand(Operand)
+  owner String text
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    var Char ch
+    if text.length = 3
+      ch := text[1]
+      if ch = '\'' or ch = '\\'
+        f-syntax-error(user "illegal character constant", user text)
+    else-if text.length = 4
+      if text[1] != '\\'
+        f-syntax-error(user "illegal character constant", user text)
+      ch := text[2]
+    else
+      f-syntax-error(user "illegal character constant", user text)
+    if text[text.length - 1] != '\''
+      f-syntax-error(user "illegal character constant", user text)
+    self.text := text
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    mtype := glob.type-char
+    sub-mtype := _
+    if ? self.next
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    write(user self.text)
+
+
+class String-operand(Operand)
+  owner String text
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    if text[text.length - 1] != '\"'
+      f-syntax-error(user "illegal string constant", user text)
+    self.text := text
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    mtype := glob.type-string
+    sub-mtype := _
+    if ? self.next
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    var Int real-length(1)
+    for index in 1:self.text.length - 1
+      if self.text[index] = '\\'
+        index := index + 1
+      real-length := real-length + 1
+    write(user "&(String){")
+    write-int(copy real-length)
+    write(user ", ")
+    write-int(copy real-length - 1)
+    write(user ", ")
+    write(user self.text)
+    write(user "}")
+
+
+class Int-operand(Operand)
+  owner String text
+  var Int value
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    self.value := 0
+    for n in text.length
+      var Char ch(text[n])
+      if ch < '0' or ch > '9'
+        f-syntax-error(user "illegal number", user text)
+      self.value := self.value * 10 + ch - '0'
+    self.text := text
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    mtype := glob.type-int
+    sub-mtype := _
+    if ? self.next
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    write(user self.text)
+
+
+class Empty-operand(Operand)
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    delete text
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    if not (? mtype) or ? self.next or mtype.is-primitive
+      f-syntax-error-c(user "illegal use of value", user '_')
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    write(user "NULL")
+
+
+class Block-operand(Operand)
+  owner Mexp exp
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    delete text
+    parse-new-exp(user ")"):(owner self.exp, copy end)
+    if end != ')'
+      f-syntax-error(user "missing", user ")")
+    read-c():(copy end)
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    self.exp.analyze():(user mtype, user sub-mtype)
+    if ? self.next
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    self.exp.write-intro()
+  
+  func dynamic write-final()
+    write(user "(")
+    self.exp.write-final()
+    write(user ")")
+
+class Slice-operand(Operand)
+  owner Mexp index
+  owner Mexp second-index
+  user Operand seq
+  user Mtype seq-type
+  user Mtype item-type
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    parse-new-exp(user ":]"):(owner self.index, copy end)
+    if end = ':'
+      parse-new-exp(user ":]"):(owner self.second-index, copy end)
+    else
+      self.second-index := _
+    if end != ']'
+      f-syntax-error(user "missing", user "]")
+    read-c():(copy end)
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    self.seq-type := mtype
+    self.item-type := sub-mtype
+    if self.seq-type != glob.type-array and self.seq-type != glob.type-string
+      f-syntax-error(user "non-sliceable type", user self.seq-type.name)
+    if not (? self.second-index)
+      sub-mtype := _
+      if self.seq-type = glob.type-string
+        mtype := glob.type-char
+      else-if ? self.item-type
+        mtype := self.item-type
+      else
+        f-syntax-error(user "missing sub-type for array", user "")
+    
+    self.seq := exp.operand
+    exp.operand := self
+    member.next := _
+    
+    self.index.analyze-type(user glob.type-int)
+    if ? self.second-index
+      self.second-index.analyze-type(user glob.type-int)
+    
+    if ? self.next
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    self.index.write-intro()
+    if ? self.second-index
+      self.second-index.write-intro()
+    self.seq.write-all-intro()
+    # if ((index) < 0 || (index) >= (seq)->length) RAISE(line-num)
+    # if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length) RAISE(line-num)
+    write(user "if ((")
+    self.index.write-final()
+    write(user ") < 0 || (")
+    if ? self.second-index
+      self.second-index.write-final()
+      write(user ") < 0 || (")
+    self.index.write-final()
+    write(user ") ")
+    if ? self.second-index
+      write(user "+ (")
+      self.second-index.write-final()
+      write(user ") >")
+    else
+      write(user ">=")
+    write(user " (")
+    self.seq.write-all-final()
+    write(user ")->length) ")
+    write-tb-raise()
+    write-new-indent-line()
+  
+  func dynamic write-final()
+    # ((Prmitive*)((seq)->values))[index]
+    # ((Complex*)((seq)->values)) + index
+    # &(Array){second, ((Type*)((seq)->values)) + (index)}
+    # &(String){second, second, (seq)->values + (index)}
+    write(user "(")
+    if ? self.second-index
+      write(user "&(")
+      write-cstyle(user self.seq-type.name)
+      write(user "){")
+      self.second-index.write-final()
+      write(user ", ")
+      if self.seq-type = glob.type-string
+        self.second-index.write-final()
+        write(user ", ")
+    if ? self.item-type
+      write(user "((")
+      write-cstyle(user self.item-type.name)
+      write(user "*)(")
+    write(user "(")
+    self.seq.write-all-final()
+    write(user ")->values")
+    if ? self.item-type
+      write(user "))")
+    if ? self.second-index
+      write(user " + (")
+      self.index.write-final()
+      write(user ")}")
+    else-if ? self.item-type and not self.item-type.is-primitive
+      write(user " + ")
+      self.index.write-final()
+    else
+      write(user "[")
+      self.index.write-final()
+      write(user "]")
+    write(user ")")
+
+
+func parse-new-operand(copy Type{Operand} opr-type, owner String text, user String ends):(owner Operand new-opr, copy Char end)
+  new As{opr-type} opr
+  new-opr := opr
+  opr.parse(owner text, user ends):(copy end)
+  var Type{Operand} next-type
+  if end = '.'
+    next-type := Member-operand
+  else-if end = '['
+    next-type := Slice-operand
+  else-if end = '('
+    next-type := Call-operand
+  else
+    opr.next := _
+    return
+  parse-new-operand(copy next-type, owner _, user ends):(owner opr.next, copy end)
+
+func parse-new-operands(owner String text, user String ends):(owner Operand new-opr, copy Char end)
+  var Type{Operand} opr-type
+  if text.length = 0
+    if end = '('
+      opr-type := Block-operand
+    else
+      f-syntax-error-c(user "unexpected", copy end)
+  else
+    var Char first(text[0])
+    if first = '\''
+      opr-type := Char-operand
+    else-if first = '"'
+      opr-type := String-operand
+    else-if first >= '0' and first <= '9'
+      opr-type := Int-operand
+    else-if first >= 'A' and first <= 'Z'
+      opr-type := Type-operand
+    else-if text.length = 1 and first = '_'
+      opr-type := Empty-operand
+    else-if text.equal(user "base")
+      opr-type := Base-meth-operand
+    else
+      opr-type := Var-operand
+  parse-new-operand(copy opr-type, owner text, user ends):(owner new-opr, copy end)

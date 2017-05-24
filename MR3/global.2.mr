@@ -263,6 +263,19 @@ func f-syntax-error-c(user String text, copy Char ch)
   f-syntax-error(user text, user char-str)
 
 # other helpers
+func f-get-access(user String access-text):(copy Int access)
+  if access-text.equal(user "copy")
+    access := ACCESS-COPY
+  else-if access-text.equal(user "user")
+    access := ACCESS-USER
+  else-if access-text.equal(user "owner")
+    access := ACCESS-OWNER
+  else-if access-text.equal(user "var")
+    access := ACCESS-VAR
+  else
+    f-syntax-error(user "unknown access", user access-text)
+
+
 func get-node-type(user String key):(copy Type node-type, copy Bool found)
   for n in glob.key-word-map.length
     user Node-map-item item(glob.key-word-map[n])

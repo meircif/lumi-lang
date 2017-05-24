@@ -420,15 +420,52 @@ Returncode f_syntax_error_c(String* text, Char ch) {
 #undef MR_FUNC_NAME
 
 /* other helpers */
+static char* _func_name_f_get_access = "f-get-access";
+#define MR_FUNC_NAME _func_name_f_get_access
+Returncode f_get_access(String* access_text, Int* access) {
+  Bool _Bool4;
+  CHECK(267, String_equal(access_text, &(String){5, 4, "copy"}, &(_Bool4)))
+  if (_Bool4) {
+    (*access) = ACCESS_COPY;
+  }
+  else {
+    Bool _Bool5;
+    CHECK(269, String_equal(access_text, &(String){5, 4, "user"}, &(_Bool5)))
+    if (_Bool5) {
+      (*access) = ACCESS_USER;
+    }
+    else {
+      Bool _Bool6;
+      CHECK(271, String_equal(access_text, &(String){6, 5, "owner"}, &(_Bool6)))
+      if (_Bool6) {
+        (*access) = ACCESS_OWNER;
+      }
+      else {
+        Bool _Bool7;
+        CHECK(273, String_equal(access_text, &(String){4, 3, "var"}, &(_Bool7)))
+        if (_Bool7) {
+          (*access) = ACCESS_VAR;
+        }
+        else {
+          CHECK(276, f_syntax_error(&(String){15, 14, "unknown access"}, access_text));
+        }
+      }
+    }
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+
+
 static char* _func_name_get_node_type = "get-node-type";
 #define MR_FUNC_NAME _func_name_get_node_type
 Returncode get_node_type(String* key, Type* node_type, Bool* found) {
   Int n; for (n = 0; n < glob->key_word_map->length; ++n) {
-    if ((n) < 0 || (n) >= glob->key_word_map->length) RAISE(268)
+    if ((n) < 0 || (n) >= glob->key_word_map->length) RAISE(281)
     Node_map_item* item = ((Node_map_item*)(glob->key_word_map->values)) + n;
-    Bool _Bool4;
-    CHECK(269, String_equal(item->key, key, &(_Bool4)))
-    if (_Bool4) {
+    Bool _Bool8;
+    CHECK(282, String_equal(item->key, key, &(_Bool8)))
+    if (_Bool8) {
       (*node_type) = item->node_type;
       (*found) = true;
       return OK;
@@ -443,19 +480,19 @@ Returncode get_node_type(String* key, Type* node_type, Bool* found) {
 static char* _func_name_f_find_type = "f-find-type";
 #define MR_FUNC_NAME _func_name_f_find_type
 Returncode f_find_type(String* typename, Mtype** mtype) {
-  CHECK(277, Type_map_find(glob->type_map, typename, &((*mtype))))
+  CHECK(290, Type_map_find(glob->type_map, typename, &((*mtype))))
   if (NULL != (*mtype)) {
     return OK;
   }
   if (NULL != glob->mclass && NULL != glob->mclass->generic_mtype) {
-    Bool _Bool5;
-    CHECK(280, String_equal(typename, glob->mclass->generic_mtype->base_typename, &(_Bool5)))
-    if (_Bool5) {
+    Bool _Bool9;
+    CHECK(293, String_equal(typename, glob->mclass->generic_mtype->base_typename, &(_Bool9)))
+    if (_Bool9) {
       (*mtype) = glob->mclass->generic_mtype;
       return OK;
     }
   }
-  CHECK(283, f_syntax_error(&(String){13, 12, "unknown type"}, typename));
+  CHECK(296, f_syntax_error(&(String){13, 12, "unknown type"}, typename));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -497,7 +534,7 @@ Returncode St_init(St* self, St* father) {
       father->first_son = self;
     }
     if (NULL != father->sons_var_map) {
-      CHECK(314, f_copy_new_var_map(father->sons_var_map, &(self->var_map)));
+      CHECK(327, f_copy_new_var_map(father->sons_var_map, &(self->var_map)));
     }
   }
   return OK;
@@ -518,7 +555,7 @@ Returncode St_analyze_first(St* self) {
     if (!(NULL != son)) break;
     glob->line_num = son->line_num;
     glob->node = son;
-    CHECK(326, (*((Func**)(son)))[1](son));
+    CHECK(339, (*((Func**)(son)))[1](son));
     son = son->next_brother;
   }
   glob->node = self;
@@ -533,7 +570,7 @@ Returncode St_analyze(St* self) {
     if (!(NULL != son)) break;
     glob->line_num = son->line_num;
     glob->node = son;
-    CHECK(337, (*((Func**)(son)))[2](son));
+    CHECK(350, (*((Func**)(son)))[2](son));
     son = son->next_brother;
   }
   glob->node = self;
@@ -551,14 +588,14 @@ static char* _func_name_St_add_var = "St.add-var";
 #define MR_FUNC_NAME _func_name_St_add_var
 Returncode St_add_var(St* self, Mvar* mvar) {
   if (NULL != glob->mclass) {
-    CHECK(347, add_var(glob->mclass->members, mvar));
+    CHECK(360, add_var(glob->mclass->members, mvar));
   }
   else {
     if (NULL != self->father && NULL != self->father->sons_var_map) {
-      CHECK(349, add_var(self->father->sons_var_map, mvar));
+      CHECK(362, add_var(self->father->sons_var_map, mvar));
     }
     else {
-      CHECK(351, add_var(glob->var_map, mvar));
+      CHECK(364, add_var(glob->var_map, mvar));
     }
   }
   return OK;
@@ -568,16 +605,16 @@ static char* _func_name_St_m_find_var = "St.m-find-var";
 #define MR_FUNC_NAME _func_name_St_m_find_var
 Returncode St_m_find_var(St* self, String* name, Mvar** mvar) {
   if (NULL != self->var_map) {
-    CHECK(355, Var_map_find(self->var_map, name, &((*mvar))));
+    CHECK(368, Var_map_find(self->var_map, name, &((*mvar))));
     if (NULL != (*mvar)) {
       return OK;
     }
   }
   if (NULL != self->father) {
-    CHECK(359, St_m_find_var(self->father, name, &((*mvar))));
+    CHECK(372, St_m_find_var(self->father, name, &((*mvar))));
   }
   else {
-    CHECK(361, Var_map_find(glob->var_map, name, &((*mvar))));
+    CHECK(374, Var_map_find(glob->var_map, name, &((*mvar))));
   }
   return OK;
 }
@@ -587,7 +624,7 @@ Func St__dtl[] = {St_parse, St_analyze_first, St_analyze, St_write};
 static char* _func_name_f_find_var = "f-find-var";
 #define MR_FUNC_NAME _func_name_f_find_var
 Returncode f_find_var(String* name, Mvar** mvar) {
-  CHECK(364, St_m_find_var(glob->node, name, &((*mvar))));
+  CHECK(377, St_m_find_var(glob->node, name, &((*mvar))));
   return OK;
 }
 #undef MR_FUNC_NAME
