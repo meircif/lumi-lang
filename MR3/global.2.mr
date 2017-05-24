@@ -360,5 +360,5 @@ class St(Object)
     else
       glob.var-map.find(user name):(user mvar)
 
-func m-find-var(user String name):(user Mvar mvar)
+func f-find-var(user String name):(user Mvar mvar)
   glob.node.m-find-var(user name):(user mvar)

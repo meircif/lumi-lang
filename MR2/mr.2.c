@@ -177,7 +177,8 @@ Returncode String_find(String* this, String* pattern, Int* out_index) {
       return OK;
     }
   }
-  CRAISE
+  *out_index = this->length;
+  return OK;
 }
 
 Returncode String_has(String* this, Char ch, Bool* found) {

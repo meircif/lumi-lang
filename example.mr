@@ -718,6 +718,25 @@ static class My-generic{Class-name-type{Class-name}:Abstract-class-type{Abstract
   owner Abstract-class-type abstract-class-item
 
 
+# String formatting
+func f-str-getter(copy Int x, user String text, copy Int y)
+  # ...
+
+func f-format-example()
+  var String{256} s1("")
+  user String sa("AAA")
+  user String sb("BBB")
+  user String sc("CCC")
+  s1.concat(* ("a={}, b={}, c={}", sa, sb, sc))
+  f-str-getter(copy 3, * ("a={}, b={}, c={}", sa, sb, sc), copy 7)
+  do
+    for part in "a={}, b={}, c={}", sa, sb, sc
+    for n in 6
+    sys.print(user part)
+    s1.concat(user part)
+    f-str-getter(copy 0, user part, copy n)
+
+
 # Type variable
 func f-type-var-example()
   var Type{Abstract-class} abstract-type(Implemented-class)

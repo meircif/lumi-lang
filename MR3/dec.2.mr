@@ -435,7 +435,7 @@ class St-delete(St)
     # nothing
   
   func dynamic analyze()
-    if not (? m-find-var(user self.name):(user self.mvar))
+    if not (? self.m-find-var(user self.name):(user self.mvar))
       f-syntax-error(user "unknow variable", user self.name)
   
   func dynamic write()

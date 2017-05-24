@@ -584,9 +584,9 @@ Returncode St_m_find_var(St* self, String* name, Mvar** mvar) {
 #undef MR_FUNC_NAME
 Func St__dtl[] = {St_parse, St_analyze_first, St_analyze, St_write};
 
-static char* _func_name_m_find_var = "m-find-var";
-#define MR_FUNC_NAME _func_name_m_find_var
-Returncode m_find_var(String* name, Mvar** mvar) {
+static char* _func_name_f_find_var = "f-find-var";
+#define MR_FUNC_NAME _func_name_f_find_var
+Returncode f_find_var(String* name, Mvar** mvar) {
   CHECK(364, St_m_find_var(glob->node, name, &((*mvar))));
   return OK;
 }

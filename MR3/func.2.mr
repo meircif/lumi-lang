@@ -625,3 +625,99 @@ class St-main(St-func)
     write(user "\n\n#if MR_STAGE == MR_FUNCTIONS\n")
     write(user "MAIN_FUNC\n")
     write(user "#endif")
+
+
+class St-format(St-node)
+  owner String item-name
+  user Mvar item-mvar
+  owner String func-name
+  owner String format
+  
+  func dynamic parse()
+    self.item-name := _
+    self.item-mvar := _
+    if read-new(user ".("):(owner self.func-name) = '.'
+      self.item-name := self.func-name
+      read-new(user "("):(owner self.func-name)
+    var String{256} format
+    read(user ")", user format)
+    if format.length < 2 or format[0] != '"' or format[format.length - 1] != '"'
+      f-syntax-error(user "illegal format string", user format)
+    f-new-copy(user format[1:format.length - 2]):(owner self.format)
+    read-c()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    user Mvar mvar
+    if ? self.item-name
+      if not (? f-find-var(user self.item-name):(user self.item-mvar))
+        f-syntax-error(user "unknow variable", user self.item-name)
+      if not (? self.item-mvar.mtype.members.find(user self.func-name):(user mvar))
+        f-syntax-error2(user "type", user self.item-mvar.typename, user "has no method", user self.func-name)
+    else
+      if not (? f-find-var(user self.func-name):(user mvar))
+        f-syntax-error(user "unknow function", user self.func-name)
+    if not (? mvar.func-dec)
+      f-syntax-error(user "non function variable", user self.func-name)
+    if not (? mvar.func-dec.args.first-param)
+      f-syntax-error(user "no parameter for function", user self.func-name)
+    if ? mvar.func-dec.args.first-out
+      f-syntax-error(user "outputs exists in function", user self.func-name)
+    user Dec-arg param-dec
+    if ? self.item-name
+      if not (? mvar.func-dec.args.first-param.next)
+        f-syntax-error(user "no parameter for method", user self.func-name)
+      mvar.func-dec.args.first-param.next.get-dec():(user param-dec)
+    else
+      mvar.func-dec.args.first-param.get-dec():(user param-dec)
+    if ? param-dec.next
+      f-syntax-error(user "too many parameter for function", user self.func-name)
+    if param-dec.mvar.mtype != glob.type-string
+      f-syntax-error2(user "expected a string parameter in function", user self.func-name, user " instead of", user param-dec.mvar.typename)
+    if param-dec.mvar.access != ACCESS-USER
+      f-syntax-error(user "expected parameter with user access in function", user self.func-name)
+    base.analyze()
+  
+  func dynamic write()
+    var Int index(0)
+    var Int len(self.format.length)
+    user St node(self.first-son)
+    do
+      while len > 0
+      if index > 0
+        write-new-indent-line()
+      
+      user String format(self.format[index:len])
+      var Int next(format.find(user "{}"))
+      if next > 0
+        write-tb-check()
+        if ? self.item-mvar
+          write-cstyle(user self.item-mvar.mtype.name)
+          write(user "_")
+        write-cstyle(user self.func-name)
+        write(user "(")
+        if ? self.item-mvar
+          if self.item-mvar.is-ref
+            write(user "*")
+          write-cstyle(user self.item-mvar.name)
+          write(user ", ")
+        write(user "&(String){")
+        write-int(copy next + 1)
+        write(user ", ")
+        write-int(copy next)
+        write(user ", \"")
+        write(user format[0:next])
+        write(user "\"}) )")
+      else
+        if not (? node)
+          f-syntax-error(user "too few lines to format", user self.func-name)
+        glob.line-num := node.line-num
+        node.write()
+        glob.line-num := self.line-num
+        node := node.next-brother
+        next := 2
+      index := index + next
+      len := len - next

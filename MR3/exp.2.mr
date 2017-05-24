@@ -183,7 +183,7 @@ func parse-new-exp-with-kw(user String ends):(owner Mexp exp, copy Char end)
   Mexp.parse-new-with-kw(user _, user ends):(owner exp, copy end)
 
 
-native func m-find-var(user String name):(user Mvar mvar)
+native func f-find-var(user String name):(user Mvar mvar)
 
 class Var-operand(Operand)
   owner String name
@@ -198,7 +198,7 @@ class Var-operand(Operand)
     self.allow-dynamic := true
   
   func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
-    if not (? m-find-var(user self.name):(user self.mvar))
+    if not (? f-find-var(user self.name):(user self.mvar))
       f-syntax-error(user "unknow variable", user self.name)
     mtype := self.mvar.mtype
     sub-mtype := self.mvar.sub-mtype
@@ -271,7 +271,6 @@ class String-operand(Operand)
       if self.text[index] = '\\'
         index := index + 1
       real-length := real-length + 1
-    var String{80} length-str
     write(user "&(String){")
     write-int(copy real-length)
     write(user ", ")
@@ -457,7 +456,7 @@ class Base-meth-operand(Operand)
     self.first := not (? member)
     if self.first
       user Mvar mvar
-      if not (? m-find-var(user "self"):(user mvar))
+      if not (? f-find-var(user "self"):(user mvar))
         f-syntax-error(user "not a method, cannot use", user "base")
       mtype := mvar.mtype
     if not (? mtype.base-mtype)

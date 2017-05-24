@@ -1068,4 +1068,158 @@ Returncode St_main_write(St_main* self) {
 #undef MR_FUNC_NAME
 Func St_main__dtl[] = {St_main_parse, St_main_analyze_first, St_main_analyze, St_main_write};
 
+
+typedef struct St_format St_format; struct St_format {
+  St_node _base;
+  String* item_name;
+  Mvar* item_mvar;
+  String* func_name;
+  String* format;
+};
+static char* _func_name_St_format_parse = "St-format.parse";
+#define MR_FUNC_NAME _func_name_St_format_parse
+Returncode St_format_parse(St_format* self) {
+  self->item_name = NULL;
+  self->item_mvar = NULL;
+  Char _Char11;
+  CHECK(639, read_new(&(String){3, 2, ".("}, &(self->func_name), &(_Char11)))
+  if (_Char11 == '.') {
+    self->item_name = self->func_name;
+    Char _Char12;
+    CHECK(641, read_new(&(String){2, 1, "("}, &(self->func_name), &(_Char12)));
+  }
+  String* format = &(String){256, 0, (char[256]){0}};
+  Char _Char13;
+  CHECK(643, read(&(String){2, 1, ")"}, format, &(_Char13)));
+  if ((format->length - 1) < 0 || (format->length - 1) >= format->length) RAISE(644)
+  if ((0) < 0 || (0) >= format->length) RAISE(644)
+  if (format->length < 2 || format->chars[0] != '"' || format->chars[format->length - 1] != '"') {
+    CHECK(645, f_syntax_error(&(String){22, 21, "illegal format string"}, format));
+  }
+  if ((1) < 0 || (format->length - 2) < 0 || (1) + (format->length - 2) > format->length) RAISE(646)
+  CHECK(646, f_new_copy(&(String){format->length - 2, format->length - 2, format->chars + (1)}, &(self->format)));
+  Char _Char14;
+  CHECK(647, read_c(&(_Char14)));
+  CHECK(648, St_node_parse(&(self->_base)));
+  return OK;
+}
+#undef MR_FUNC_NAME
+static char* _func_name_St_format_analyze_first = "St-format.analyze-first";
+#define MR_FUNC_NAME _func_name_St_format_analyze_first
+Returncode St_format_analyze_first(St_format* self) {
+  CHECK(651, St_node_analyze_first(&(self->_base)));
+  return OK;
+}
+#undef MR_FUNC_NAME
+static char* _func_name_St_format_analyze = "St-format.analyze";
+#define MR_FUNC_NAME _func_name_St_format_analyze
+Returncode St_format_analyze(St_format* self) {
+  Mvar* mvar;
+  if (NULL != self->item_name) {
+    CHECK(656, f_find_var(self->item_name, &(self->item_mvar)))
+    if (!(NULL != self->item_mvar)) {
+      CHECK(657, f_syntax_error(&(String){16, 15, "unknow variable"}, self->item_name));
+    }
+    CHECK(658, Var_map_find(self->item_mvar->mtype->members, self->func_name, &(mvar)))
+    if (!(NULL != mvar)) {
+      CHECK(659, f_syntax_error2(&(String){5, 4, "type"}, self->item_mvar->typename, &(String){14, 13, "has no method"}, self->func_name));
+    }
+  }
+  else {
+    CHECK(661, f_find_var(self->func_name, &(mvar)))
+    if (!(NULL != mvar)) {
+      CHECK(662, f_syntax_error(&(String){16, 15, "unknow function"}, self->func_name));
+    }
+  }
+  if (!(NULL != mvar->func_dec)) {
+    CHECK(664, f_syntax_error(&(String){22, 21, "non function variable"}, self->func_name));
+  }
+  if (!(NULL != mvar->func_dec->args->first_param)) {
+    CHECK(666, f_syntax_error(&(String){26, 25, "no parameter for function"}, self->func_name));
+  }
+  if (NULL != mvar->func_dec->args->first_out) {
+    CHECK(668, f_syntax_error(&(String){27, 26, "outputs exists in function"}, self->func_name));
+  }
+  Dec_arg* param_dec;
+  if (NULL != self->item_name) {
+    if (!(NULL != mvar->func_dec->args->first_param->next)) {
+      CHECK(672, f_syntax_error(&(String){24, 23, "no parameter for method"}, self->func_name));
+    }
+    CHECK(673, (*((Func**)(mvar->func_dec->args->first_param->next)))[4](mvar->func_dec->args->first_param->next, &(param_dec)));
+  }
+  else {
+    CHECK(675, (*((Func**)(mvar->func_dec->args->first_param)))[4](mvar->func_dec->args->first_param, &(param_dec)));
+  }
+  if (NULL != param_dec->_base.next) {
+    CHECK(677, f_syntax_error(&(String){32, 31, "too many parameter for function"}, self->func_name));
+  }
+  if (param_dec->mvar->mtype != glob->type_string) {
+    CHECK(679, f_syntax_error2(&(String){40, 39, "expected a string parameter in function"}, self->func_name, &(String){12, 11, " instead of"}, param_dec->mvar->typename));
+  }
+  if (param_dec->mvar->access != ACCESS_USER) {
+    CHECK(681, f_syntax_error(&(String){48, 47, "expected parameter with user access in function"}, self->func_name));
+  }
+  CHECK(682, St_node_analyze(&(self->_base)));
+  return OK;
+}
+#undef MR_FUNC_NAME
+static char* _func_name_St_format_write = "St-format.write";
+#define MR_FUNC_NAME _func_name_St_format_write
+Returncode St_format_write(St_format* self) {
+  Int index = 0;
+  Int len = self->format->length;
+  St* node = self->_base._base.first_son;
+  while (true) {
+    if (!(len > 0)) break;
+    if (index > 0) {
+      CHECK(691, write_new_indent_line());
+    }
+    
+    if ((index) < 0 || (len) < 0 || (index) + (len) > self->format->length) RAISE(693)
+    String* format = &(String){len, len, self->format->chars + (index)};
+    Int _Int15;
+    CHECK(694, String_find(format, &(String){3, 2, "{}"}, &(_Int15)))
+    Int next = _Int15;
+    if (next > 0) {
+      CHECK(696, write_tb_check());
+      if (NULL != self->item_mvar) {
+        CHECK(698, write_cstyle(self->item_mvar->mtype->name));
+        CHECK(699, write(&(String){2, 1, "_"}));
+      }
+      CHECK(700, write_cstyle(self->func_name));
+      CHECK(701, write(&(String){2, 1, "("}));
+      if (NULL != self->item_mvar) {
+        if (self->item_mvar->is_ref) {
+          CHECK(704, write(&(String){2, 1, "*"}));
+        }
+        CHECK(705, write_cstyle(self->item_mvar->name));
+        CHECK(706, write(&(String){3, 2, ", "}));
+      }
+      CHECK(707, write(&(String){11, 10, "&(String){"}));
+      CHECK(708, write_int(next + 1));
+      CHECK(709, write(&(String){3, 2, ", "}));
+      CHECK(710, write_int(next));
+      CHECK(711, write(&(String){4, 3, ", \""}));
+      if ((0) < 0 || (next) < 0 || (0) + (next) > format->length) RAISE(712)
+      CHECK(712, write(&(String){next, next, format->chars + (0)}));
+      CHECK(713, write(&(String){6, 5, "\"}) )"}));
+    }
+    else {
+      if (!(NULL != node)) {
+        CHECK(716, f_syntax_error(&(String){24, 23, "too few lines to format"}, self->func_name));
+      }
+      glob->line_num = node->line_num;
+      CHECK(718, (*((Func**)(node)))[3](node));
+      glob->line_num = self->_base._base.line_num;
+      node = node->next_brother;
+      next = 2;
+    }
+    index = index + next;
+    len = len - next;
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+Func St_format__dtl[] = {St_format_parse, St_format_analyze_first, St_format_analyze, St_format_write};
+
 #undef MR_FILE_NAME

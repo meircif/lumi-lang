@@ -792,7 +792,7 @@ Returncode St_delete_analyze_first(St_delete* self) {
 static char* _func_name_St_delete_analyze = "St-delete.analyze";
 #define MR_FUNC_NAME _func_name_St_delete_analyze
 Returncode St_delete_analyze(St_delete* self) {
-  CHECK(438, m_find_var(self->name, &(self->mvar)))
+  CHECK(438, St_m_find_var(&(self->_base), self->name, &(self->mvar)))
   if (!(NULL != self->mvar)) {
     CHECK(439, f_syntax_error(&(String){16, 15, "unknow variable"}, self->name));
   }
