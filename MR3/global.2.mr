@@ -18,6 +18,7 @@ static Global-data(Object)
   owner Op-map op-map
   owner Type-map type-map
   owner Var-map var-map
+  owner String-list test-funcs
   var Int max-type-depth
   # types
   user Mtype type-char
@@ -88,6 +89,7 @@ static Global-data(Object)
     self.key-word := _
     self.init-op-map()
     self.init-types()
+    self.test-funcs := _
 
 var Global-data glob
 

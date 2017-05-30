@@ -5,6 +5,7 @@ static Mfunc(Object)
   owner Arg-list args
   user Mtype mclass
   var Bool is-dynamic
+  var Bool is-mocked
   var Int dynamic-index
   
   func inst init(user String name)
@@ -14,6 +15,7 @@ static Mfunc(Object)
     self.args.init(copy true)
     self.mclass := _
     self.is-dynamic := false
+    self.is-mocked := false
     self.dynamic-index := 0
   
   func inst parse()
@@ -25,6 +27,7 @@ static Mfunc(Object)
     else
       self.is-dynamic := false
     self.dynamic-index := 0
+    self.is-mocked := false
     read-new(user "("):(owner self.name)
     parse-new-args():(owner self.args)
     if ? self.mclass
@@ -70,7 +73,7 @@ class St-func(St-node)
   
   func dynamic parse()
     parse-new-mfunc():(owner self.mfunc)
-    self.add-var(owner self.mfunc.m-new-var())
+    self.m-register()
     f-copy-new-var-map(user _):(owner self.sons-var-map)
     self.add-args-vars(user self.mfunc.args.first-param)
     self.add-args-vars(user self.mfunc.args.first-out)
@@ -86,6 +89,8 @@ class St-func(St-node)
     base.analyze()
   
   func dynamic write()
+    if self.mfunc.is-mocked
+      return
     if ? glob.mclass
       if not glob.methods
         return
@@ -118,6 +123,9 @@ class St-func(St-node)
     write(user "#undef MR_FUNC_NAME\n")
     write-spaces()
     write(user "#endif")
+  
+  func dynamic m-register()
+    self.add-var(owner self.mfunc.m-new-var())
 
 
 class St-main(St-func)
@@ -131,10 +139,29 @@ class St-main(St-func)
     base.analyze()
   
   func dynamic write()
-    base.write()
-    write(user "\n\n#if MR_STAGE == MR_FUNCTIONS\n")
-    write(user "MAIN_FUNC\n")
-    write(user "#endif")
+    if ? glob.test-funcs
+      write(user "#if MR_STAGE == MR_FUNCTIONS\n")
+      write(user "Returncode func(Array* _) {\n")
+      write(user "  Bool success = true;\n")
+      user String-list test-func(glob.test-funcs)
+      do
+        write(user "  RUN_TEST(")
+        write-cstyle(user test-func.value)
+        write(user ");\n")
+        test-func := test-func.next
+        while ? test-func
+      write(user "  return success? OK : FAIL;\n")
+      write(user "}\n")
+      write(user "\nMAIN_TEST_FUNC\n")
+      write(user "#endif")
+    else
+      base.write()
+      write(user "\n\n#if MR_STAGE == MR_FUNCTIONS\n")
+      write(user "MAIN_FUNC\n")
+      write(user "#endif")
+  
+  func dynamic m-register()
+    base.m-register()
 
 
 class St-format(St-node)

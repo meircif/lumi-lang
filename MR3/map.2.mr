@@ -1,5 +1,11 @@
 # MR3 compiler - attribute mappings
 
+# String List
+static String-list(Object)
+  owner String-list next
+  user String value
+
+
 # Name Map
 static Name-map-node(Object)
   owner Name-map-node next

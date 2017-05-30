@@ -147,9 +147,10 @@ the "?" sign. Empty value can be set using "_".
   cond-str?.clear()  # raise error if empty
   f-with-cond(user _)  # send empty to function
 
+
 # primitive types
 ##################
-func primitive-types-example()
+func f-primitive-types-example()
 
 # integers
 
@@ -232,7 +233,7 @@ func primitive-types-example()
   bool := not (bool and LIFE-IS-EASY)
   bool := not bool and not LIFE-IS-EASY
 
-  
+
 # character
 
   var Char char  # only accept characters as 'single-letter'
@@ -519,8 +520,8 @@ func f-error-raising()
 # TODO
 
 
-# OOP
-######
+# Type system
+##############
 
 (#
 Interface
@@ -713,10 +714,14 @@ func f-generic-example()
 func f-generic{Any-type}(user Any-type param):(user Any-type output)
   output := param
 
-static class My-generic{Class-name-type{Class-name}:Abstract-class-type{Abstract-class}}(Object)
+static class My-generic{Class-name-type{Class-name}:
+    Abstract-class-type{Abstract-class}}(Object)
   owner Class-name-type class-name-item
   owner Abstract-class-type abstract-class-item
 
+
+# Others
+#########
 
 # String formatting
 func f-str-getter(copy Int x, user String text, copy Int y)
@@ -744,7 +749,7 @@ func f-type-var-example()
   var As{abstract-type} abstract-var
   new As{abstract-type} abstract-ref
 
-# Others
+
 
 # aliases 
 alias NEW-CONST-INT for CONTS-INT
@@ -753,3 +758,17 @@ alias New-int-name for Int{20:40}
 alias New-string-name for String{Uint8b}
 alias New-array-name for Array{Int{0:60}:String{Uint8b}}
 alias New-class-name for Class-name
+
+
+# unit tests
+#############
+
+mock f-mocked-function(copy Uint8b x):(copy Uint8b y)
+  assert x > 3
+  y := 3
+
+mock Sys.write(user String{Uint16b} text)
+  return
+
+test f-test-func()
+  assert f-tested-func(copy 12) = 13

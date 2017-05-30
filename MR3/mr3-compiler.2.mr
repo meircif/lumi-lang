@@ -7,7 +7,7 @@ func add-kwn(copy Int index, user String key, copy Type{St} node-type)
   item.node-type := node-type
 
 func f-create-key-word-map()
-  new Array{21:Node-map-item} key-word-map
+  new Array{24:Node-map-item} key-word-map
   glob.key-word-map := key-word-map
   add-kwn(copy 0, user "#", copy St-comment)
   add-kwn(copy 1, user "func", copy St-func)
@@ -30,6 +30,9 @@ func f-create-key-word-map()
   add-kwn(copy 18, user "class", copy St-dynamic-class)
   add-kwn(copy 19, user "##", copy St-documentation)
   add-kwn(copy 20, user "*", copy St-format)
+  add-kwn(copy 21, user "assert", copy St-assert)
+  add-kwn(copy 22, user "test", copy St-test)
+  add-kwn(copy 23, user "mock", copy St-mock)
 
 
 func add-global-func(user Mtype mtype, user String name):(owner Mfunc new-meth)

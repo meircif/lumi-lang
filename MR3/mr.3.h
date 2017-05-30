@@ -23,7 +23,8 @@ typedef enum {
 
 typedef enum {
   OK = EXIT_SUCCESS,
-  ERR = EXIT_FAILURE
+  ERR = EXIT_FAILURE,
+  FAIL = EXIT_FAILURE > EXIT_SUCCESS? EXIT_FAILURE + 1 : EXIT_SUCCESS + 1
 } Returncode;
 
 typedef struct {
@@ -35,7 +36,7 @@ typedef Returncode (*Func)();
 
 typedef FILE File;
 
-//typedef struct {} Sys;
+typedef void Sys;
 
 typedef struct {
   int size;
@@ -43,21 +44,34 @@ typedef struct {
 } Type;
 
 extern char* _mr_raise_format;
+extern char* _mr_assert_format;
 extern char* _mr_traceline_format;
+extern FILE* _trace_stream;
 
-#define RAISE(line) { \
-  fprintf(stderr, _mr_raise_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
-  return ERR; }
+#define START_TRACE(line, value, format) { \
+  fprintf(_trace_stream, format, MR_FILE_NAME, line, MR_FUNC_NAME); \
+  return value; }
+
+#define RAISE(line) START_TRACE(line, ERR, _mr_raise_format)
 
 #define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
-  fprintf(stderr, _mr_traceline_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
+  fprintf(_trace_stream, _mr_traceline_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
   return _err; } }
 
-int _mr_main(int argc, char* argv[]);
+#define TEST_ASSERT(line, condition) if (!(condition)) { \
+  START_TRACE(line, FAIL, _mr_assert_format) }
 
-#define MAIN_FUNC int main(int argc, char* argv[]) { \
-  return _mr_main(argc, argv); \
+#define RUN_TEST(test_func) success &= _run_test(#test_func, test_func)
+
+int _mr_main(int argc, char* argv[]);
+int _mr_test_main(int argc, char* argv[]);
+
+#define MAIN_PROXY(func) int main(int argc, char* argv[]) { \
+  return func(argc, argv); \
 }
+
+#define MAIN_FUNC MAIN_PROXY(_mr_main)
+#define MAIN_TEST_FUNC MAIN_PROXY(_mr_test_main)
 
 #define sys NULL
 
@@ -69,6 +83,7 @@ void _set_var_string_array(
   Array* array,
   char* chars);
 void _set_new_string_array(int array_length, int string_length, Array* array);
+Bool _run_test(char* test_name, Func test_func);
 
 Returncode String_clear(String* this);
 Returncode String_length(String* this, Int* length);

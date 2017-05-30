@@ -2,6 +2,13 @@ static char* _mr_file2_name = "map.2.mr";
 #define MR_FILE_NAME _mr_file2_name
 /* MR3 compiler - attribute mappings */
 
+/* String List */
+typedef struct String_list String_list; struct String_list {
+  String_list* next;
+  String* value;
+};
+
+
 /* Name Map */
 typedef struct Name_map_node Name_map_node; struct Name_map_node {
   Name_map_node* next;
@@ -34,8 +41,8 @@ static char* _func_name_Name_map_add = "Name-map.add";
 #define MR_FUNC_NAME _func_name_Name_map_add
 Returncode Name_map_add(Name_map* self, String* name, Object* value) {
   Name_map_node* node = malloc(sizeof(Name_map_node));
-  if (node == NULL) RAISE(23)
-  CHECK(24, Name_map_node_init(node, name, value));
+  if (node == NULL) RAISE(29)
+  CHECK(30, Name_map_node_init(node, name, value));
   if (NULL != self->last) {
     self->last->next = node;
   }
@@ -53,7 +60,7 @@ Returncode Name_map_find(Name_map* self, String* name, Object** value) {
   while (true) {
     if (!(NULL != node)) break;
     Bool _Bool0;
-    CHECK(35, String_equal(node->name, name, &(_Bool0)))
+    CHECK(41, String_equal(node->name, name, &(_Bool0)))
     if (_Bool0) {
       (*value) = node->value;
       return OK;
@@ -70,7 +77,7 @@ Returncode Name_map_print(Name_map* self) {
   Name_map_node* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(45, Sys_print(sys, node->name));
+    CHECK(51, Sys_print(sys, node->name));
     node = node->next;
   }
   return OK;
@@ -94,7 +101,7 @@ static char* _func_name_Var_map_add = "Var-map.add";
 #define MR_FUNC_NAME _func_name_Var_map_add
 Returncode Var_map_add(Var_map* self, String* name, Mvar* mvar) {
   Object* value = mvar;
-  CHECK(57, Name_map_add(&(self->_base), name, value));
+  CHECK(63, Name_map_add(&(self->_base), name, value));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -102,7 +109,7 @@ static char* _func_name_Var_map_find = "Var-map.find";
 #define MR_FUNC_NAME _func_name_Var_map_find
 Returncode Var_map_find(Var_map* self, String* name, Mvar** mvar) {
   Object* _Object1;
-  CHECK(60, Name_map_find(&(self->_base), name, &(_Object1)))
+  CHECK(66, Name_map_find(&(self->_base), name, &(_Object1)))
   (*mvar) = _Object1;
   return OK;
 }
@@ -153,12 +160,12 @@ static char* _func_name_f_copy_new_var_map = "f-copy-new-var-map";
 #define MR_FUNC_NAME _func_name_f_copy_new_var_map
 Returncode f_copy_new_var_map(Var_map* other, Var_map** new_var_map) {
   Var_map* var_map = malloc(sizeof(Var_map));
-  if (var_map == NULL) RAISE(83)
+  if (var_map == NULL) RAISE(89)
   if (NULL != other) {
-    CHECK(85, Var_map_m_copy_from(var_map, other));
+    CHECK(91, Var_map_m_copy_from(var_map, other));
   }
   else {
-    CHECK(87, Name_map_init(&(var_map->_base)));
+    CHECK(93, Name_map_init(&(var_map->_base)));
   }
   (*new_var_map) = var_map;
   return OK;
@@ -180,7 +187,7 @@ static char* _func_name_Mtype_init = "Mtype.init";
 #define MR_FUNC_NAME _func_name_Mtype_init
 Returncode Mtype_init(Mtype* self, String* name) {
   self->name = name;
-  CHECK(103, f_copy_new_var_map(NULL, &(self->members)));
+  CHECK(109, f_copy_new_var_map(NULL, &(self->members)));
   self->dynamic_members = NULL;
   self->base_typename = NULL;
   self->base_mtype = NULL;
@@ -194,7 +201,7 @@ static char* _func_name_Mtype_set_primitive = "Mtype.set-primitive";
 #define MR_FUNC_NAME _func_name_Mtype_set_primitive
 Returncode Mtype_set_primitive(Mtype* self, String* default_value) {
   self->is_primitive = true;
-  CHECK(113, f_new_copy(default_value, &(self->default_value)));
+  CHECK(119, f_new_copy(default_value, &(self->default_value)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -231,9 +238,9 @@ Returncode Mvar_init(Mvar* self, Mtype* mtype) {
   self->access = ACCESS_VAR;
   self->is_ref = false;
   if (NULL != mtype) {
-    CHECK(145, f_new_copy(mtype->name, &(self->typename)));
+    CHECK(151, f_new_copy(mtype->name, &(self->typename)));
     if (NULL != mtype->generic_mtype) {
-      CHECK(147, f_new_copy(mtype->generic_mtype->name, &(self->sub_typename)));
+      CHECK(153, f_new_copy(mtype->generic_mtype->name, &(self->sub_typename)));
       self->sub_mtype = mtype->generic_mtype;
     }
   }
@@ -244,10 +251,10 @@ static char* _func_name_Mvar_analyze = "Mvar.analyze";
 #define MR_FUNC_NAME _func_name_Mvar_analyze
 Returncode Mvar_analyze(Mvar* self) {
   if (!(NULL != self->mtype)) {
-    CHECK(152, f_find_type(self->typename, &(self->mtype)));
+    CHECK(158, f_find_type(self->typename, &(self->mtype)));
   }
   if (NULL != self->sub_typename && !(NULL != self->sub_mtype)) {
-    CHECK(154, f_find_type(self->sub_typename, &(self->sub_mtype)));
+    CHECK(160, f_find_type(self->sub_typename, &(self->sub_mtype)));
   }
   return OK;
 }
@@ -257,8 +264,8 @@ static char* _func_name_init_new_var = "init-new-var";
 #define MR_FUNC_NAME _func_name_init_new_var
 Returncode init_new_var(Mtype* mtype, Mvar** new_mvar) {
   Mvar* mvar = malloc(sizeof(Mvar));
-  if (mvar == NULL) RAISE(157)
-  CHECK(158, Mvar_init(mvar, mtype));
+  if (mvar == NULL) RAISE(163)
+  CHECK(164, Mvar_init(mvar, mtype));
   (*new_mvar) = mvar;
   return OK;
 }
@@ -267,7 +274,7 @@ Returncode init_new_var(Mtype* mtype, Mvar** new_mvar) {
 static char* _func_name_add_var = "add-var";
 #define MR_FUNC_NAME _func_name_add_var
 Returncode add_var(Var_map* map, Mvar* mvar) {
-  CHECK(162, Var_map_add(map, mvar->name, mvar));
+  CHECK(168, Var_map_add(map, mvar->name, mvar));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -281,18 +288,18 @@ static char* _func_name_Op_map_add = "Op-map.add";
 #define MR_FUNC_NAME _func_name_Op_map_add
 Returncode Op_map_add(Op_map* self, String* name, String* ctext) {
   String* new_name;
-  CHECK(169, f_new_copy(name, &(new_name)));
+  CHECK(175, f_new_copy(name, &(new_name)));
   String* new_text;
-  CHECK(171, f_new_copy(ctext, &(new_text)));
+  CHECK(177, f_new_copy(ctext, &(new_text)));
   Object* value = new_text;
-  CHECK(173, Name_map_add(&(self->_base), new_name, value));
+  CHECK(179, Name_map_add(&(self->_base), new_name, value));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_Op_map_add_copy = "Op-map.add-copy";
 #define MR_FUNC_NAME _func_name_Op_map_add_copy
 Returncode Op_map_add_copy(Op_map* self, String* name) {
-  CHECK(176, Op_map_add(self, name, name));
+  CHECK(182, Op_map_add(self, name, name));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -300,7 +307,7 @@ static char* _func_name_Op_map_find = "Op-map.find";
 #define MR_FUNC_NAME _func_name_Op_map_find
 Returncode Op_map_find(Op_map* self, String* name, String** ctext) {
   Object* _Object2;
-  CHECK(179, Name_map_find(&(self->_base), name, &(_Object2)))
+  CHECK(185, Name_map_find(&(self->_base), name, &(_Object2)))
   (*ctext) = _Object2;
   return OK;
 }
@@ -315,12 +322,12 @@ static char* _func_name_Type_map_add = "Type-map.add";
 #define MR_FUNC_NAME _func_name_Type_map_add
 Returncode Type_map_add(Type_map* self, String* name, Mtype** out_mtype) {
   Mtype* mtype = malloc(sizeof(Mtype));
-  if (mtype == NULL) RAISE(185)
+  if (mtype == NULL) RAISE(191)
   String* new_name;
-  CHECK(187, f_new_copy(name, &(new_name)));
-  CHECK(188, Mtype_init(mtype, new_name));
+  CHECK(193, f_new_copy(name, &(new_name)));
+  CHECK(194, Mtype_init(mtype, new_name));
   Object* value = mtype;
-  CHECK(190, Name_map_add(&(self->_base), new_name, value));
+  CHECK(196, Name_map_add(&(self->_base), new_name, value));
   (*out_mtype) = mtype;
   return OK;
 }
@@ -329,7 +336,7 @@ static char* _func_name_Type_map_find = "Type-map.find";
 #define MR_FUNC_NAME _func_name_Type_map_find
 Returncode Type_map_find(Type_map* self, String* name, Mtype** mtype) {
   Object* _Object3;
-  CHECK(194, Name_map_find(&(self->_base), name, &(_Object3)))
+  CHECK(200, Name_map_find(&(self->_base), name, &(_Object3)))
   (*mtype) = _Object3;
   return OK;
 }

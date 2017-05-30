@@ -6,11 +6,15 @@
 #define CCHECK(err) CHECK(__LINE__, err)
 
 char* _mr_raise_format = "Error raised in %s:%d %s()\n";
+char* _mr_assert_format = "Assert failed in %s:%d %s()\n";
 char* _mr_traceline_format = "  called from %s:%d %s()\n";
+FILE* _trace_stream = NULL;
 
+/*main*/
 Returncode func(Array*);
 
 int _mr_main(int argc, char* argv[]) {
+  _trace_stream = stderr;
   String* args_strings = malloc(argc * sizeof(String));
   if (args_strings == NULL) {
     fprintf(stderr, "insufficient memory\n");
@@ -30,6 +34,33 @@ int _mr_main(int argc, char* argv[]) {
   return err;
 }
 
+/*tests*/
+int _mr_test_main(int argc, char* argv[]) {
+  _trace_stream = stderr;
+  printf("Running tests:\n");
+  Returncode err = func(NULL);
+  if (err == OK) {
+    printf("Tests passed\n");
+  }
+  else {
+    printf("Tests failed\n");
+  }
+}
+
+Bool _run_test(char* test_name, Func test_func) {
+  printf("testing %s... ", test_name);
+  fflush(stdout);
+  _trace_stream = stdout;
+  Returncode err = test_func();
+  _trace_stream = stderr;
+  if (err == OK) {
+    printf("OK\n");
+    return true;
+  }
+  return false;
+}
+
+/*helpers*/
 Returncode _set_cstring(String* str) {
   if (str->length >= str->max_length) {
     if (strnlen(str->values, str->max_length) >= str->max_length) {

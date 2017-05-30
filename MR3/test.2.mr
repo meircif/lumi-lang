@@ -1,0 +1,76 @@
+# MR3 compiler - testing
+
+class St-assert(St)
+  owner Mexp condition
+  
+  func dynamic parse()
+    parse-new-exp(user ""):(owner self.condition)
+  
+  func dynamic analyze-first()
+    # nothing
+  
+  func dynamic analyze()
+    self.condition.analyze-type(user glob.type-bool)
+  
+  func dynamic write()
+    self.condition.write-intro()
+    write(user "TEST_ASSERT(")
+    write-line-num()
+    write(user ", ")
+    self.condition.write-final()
+    write(user ")")
+
+
+class St-test(St-func)
+  func dynamic parse()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    base.write()
+  
+  func dynamic m-register()
+    new String-list test-func
+    test-func.value := self.mfunc.name
+    test-func.next := glob.test-funcs
+    glob.test-funcs := test-func
+
+
+class St-mock(St-func)
+  func dynamic parse()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+    user Mvar mvar
+    var Int index
+    self.mfunc.name.find(user "."):(copy index)
+    if index < self.mfunc.name.length
+      # self.mfunc.name[index] = '_'
+      self.mfunc.name.replace(copy '.', copy '_')
+      user String type-name(self.mfunc.name[0:index])
+      user String meth-name(self.mfunc.name[index + 1:self.mfunc.name.length - index - 1])
+      user Mtype mtype
+      if not (? f-find-type(user type-name):(user mtype))
+        f-syntax-error(user "mocking method of unknown type", user type-name)
+      if not (? mtype.members.find(user meth-name):(user mvar))
+        f-syntax-error2(user "type", user type-name, user "has no member", user meth-name)
+    else-if not (? self.m-find-var(user self.mfunc.name):(user mvar))
+      f-syntax-error(user "mocking unknown function", user self.mfunc.name)
+    if not (? mvar.func-dec)
+      f-syntax-error(user "cannot mock non-function", user self.mfunc.name)
+    mvar.func-dec.is-mocked := true
+  
+  func dynamic write()
+    base.write()
+  
+  func dynamic m-register()
+    # nothing
