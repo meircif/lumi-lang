@@ -1,9 +1,38 @@
 # MR3 compiler - attribute mappings
 
 # String List
-static String-list(Object)
-  owner String-list next
+static String-list-node(Object)
+  owner String-list-node next
   user String value
+  
+  func inst init(user String value)
+    self.next := _
+    self.value := value
+
+static String-list(Object)
+  owner String-list-node first
+  owner String-list-node last
+  
+  func inst init()
+    self.first := _
+    self.last := _
+  
+  func inst has():(copy Bool res)
+    res := ? self.first
+  
+  func inst add(user String value)
+    new String-list-node node
+    node.init(user value)
+    if ? self.last
+      self.last.next := node
+    else
+      self.first := node
+    self.last := node
+
+func f-init-new-string-list():(owner String-list new-list)
+  new String-list list
+  list.init()
+  new-list := list
 
 
 # Name Map

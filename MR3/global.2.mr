@@ -89,7 +89,7 @@ static Global-data(Object)
     self.key-word := _
     self.init-op-map()
     self.init-types()
-    self.test-funcs := _
+    f-init-new-string-list():(owner self.test-funcs)
 
 var Global-data glob
 

@@ -89,8 +89,6 @@ class St-func(St-node)
     base.analyze()
   
   func dynamic write()
-    if self.mfunc.is-mocked
-      return
     if ? glob.mclass
       if not glob.methods
         return
@@ -100,13 +98,16 @@ class St-func(St-node)
     self.mfunc.write()
     write(user ";\n")
     write-spaces()
+    if self.mfunc.is-mocked
+      write(user "#endif")
+      return
     write(user "#elif MR_STAGE == MR_FUNCTIONS\n")
     write-spaces()
     write(user "static char* _func_name_")
     self.mfunc.write-name()
     write(user " = \"")
-    if ? glob.mclass
-      write(user glob.mclass.name)
+    if ? self.mfunc.mclass
+      write(user self.mfunc.mclass.name)
       write(user ".")
     write(user self.mfunc.name)
     write(user "\";\n")
@@ -139,11 +140,11 @@ class St-main(St-func)
     base.analyze()
   
   func dynamic write()
-    if ? glob.test-funcs
+    if glob.test-funcs.has()
       write(user "#if MR_STAGE == MR_FUNCTIONS\n")
       write(user "Returncode func(Array* _) {\n")
       write(user "  Bool success = true;\n")
-      user String-list test-func(glob.test-funcs)
+      user String-list-node test-func(glob.test-funcs.first)
       do
         write(user "  RUN_TEST(")
         write-cstyle(user test-func.value)

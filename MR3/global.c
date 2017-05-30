@@ -104,7 +104,7 @@ Returncode Global_data_init(Global_data* self) {
   self->key_word = NULL;
   CHECK(90, Global_data_init_op_map(self));
   CHECK(91, Global_data_init_types(self));
-  self->test_funcs = NULL;
+  CHECK(92, f_init_new_string_list(&(self->test_funcs)));
   return OK;
 }
 #undef MR_FUNC_NAME
