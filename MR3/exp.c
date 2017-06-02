@@ -303,8 +303,20 @@ Returncode Mexp_write_intro(Mexp* self) {
   if (NULL != self->operand) {
     CHECK(175, Operand_write_all_intro(self->operand));
   }
+  if (NULL != self->operator) {
+    Bool _Bool5;
+    CHECK(177, String_equal(self->operator, &(String){2, 1, "/"}, &(_Bool5)))
+    if (_Bool5) {
+      /* if (operand == 0) RAISE */
+      CHECK(179, write(&(String){5, 4, "if ("}));
+      CHECK(180, Operand_write_all_final(self->operand));
+      CHECK(181, write(&(String){8, 7, " == 0) "}));
+      CHECK(182, write_tb_raise());
+      CHECK(183, write_new_indent_line());
+    }
+  }
   if (NULL != self->next) {
-    CHECK(177, Mexp_write_intro(self->next));
+    CHECK(185, Mexp_write_intro(self->next));
   }
   return OK;
 }
@@ -312,7 +324,7 @@ Returncode Mexp_write_intro(Mexp* self) {
 static char* _func_name_Mexp_write_final = "Mexp.write-final";
 #define MR_FUNC_NAME _func_name_Mexp_write_final
 Returncode Mexp_write_final(Mexp* self) {
-  CHECK(180, Mexp_write_all_final(self, false));
+  CHECK(188, Mexp_write_all_final(self, false));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -320,7 +332,7 @@ Returncode Mexp_write_final(Mexp* self) {
 static char* _func_name_parse_new_exp = "parse-new-exp";
 #define MR_FUNC_NAME _func_name_parse_new_exp
 Returncode parse_new_exp(String* ends, Mexp** exp, Char* end) {
-  CHECK(183, Mexp_parse_new(NULL, ends, &((*exp)), &((*end))));
+  CHECK(191, Mexp_parse_new(NULL, ends, &((*exp)), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -328,7 +340,7 @@ Returncode parse_new_exp(String* ends, Mexp** exp, Char* end) {
 static char* _func_name_parse_new_exp_with_kw = "parse-new-exp-with-kw";
 #define MR_FUNC_NAME _func_name_parse_new_exp_with_kw
 Returncode parse_new_exp_with_kw(String* ends, Mexp** exp, Char* end) {
-  CHECK(186, Mexp_parse_new_with_kw(NULL, ends, &((*exp)), &((*end))));
+  CHECK(194, Mexp_parse_new_with_kw(NULL, ends, &((*exp)), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -341,8 +353,8 @@ typedef struct St_exp St_exp; struct St_exp {
 static char* _func_name_St_exp_parse = "St-exp.parse";
 #define MR_FUNC_NAME _func_name_St_exp_parse
 Returncode St_exp_parse(St_exp* self) {
-  Char _Char5;
-  CHECK(193, parse_new_exp_with_kw(&(String){1, 0, ""}, &(self->exp), &(_Char5)));
+  Char _Char6;
+  CHECK(201, parse_new_exp_with_kw(&(String){1, 0, ""}, &(self->exp), &(_Char6)));
   self->exp->is_used = false;
   return OK;
 }
@@ -359,17 +371,17 @@ static char* _func_name_St_exp_analyze = "St-exp.analyze";
 Returncode St_exp_analyze(St_exp* self) {
   Mtype* mtype = NULL;
   Mtype* sub_mtype = NULL;
-  CHECK(202, Mexp_analyze(self->exp, &(mtype), &(sub_mtype)));
+  CHECK(210, Mexp_analyze(self->exp, &(mtype), &(sub_mtype)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_exp_write = "St-exp.write";
 #define MR_FUNC_NAME _func_name_St_exp_write
 Returncode St_exp_write(St_exp* self) {
-  CHECK(205, Mexp_write_intro(self->exp));
-  CHECK(206, Mexp_write_final(self->exp));
+  CHECK(213, Mexp_write_intro(self->exp));
+  CHECK(214, Mexp_write_final(self->exp));
   if (!self->exp->is_used) {
-    CHECK(208, write(&(String){2, 1, ";"}));
+    CHECK(216, write(&(String){2, 1, ";"}));
   }
   return OK;
 }

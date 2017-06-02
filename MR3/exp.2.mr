@@ -173,6 +173,14 @@ static Mexp(Object)
   func inst write-intro()
     if ? self.operand
       self.operand.write-all-intro()
+    if ? self.operator
+      if self.operator.equal(user "/")
+        # if (operand == 0) RAISE
+        write(user "if (")
+        self.operand.write-all-final()
+        write(user " == 0) ")
+        write-tb-raise()
+        write-new-indent-line()
     if ? self.next
       self.next.write-intro()
   
