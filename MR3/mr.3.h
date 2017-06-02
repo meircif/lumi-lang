@@ -47,19 +47,27 @@ extern char* _mr_raise_format;
 extern char* _mr_assert_format;
 extern char* _mr_traceline_format;
 extern FILE* _trace_stream;
+void _trace_print(
+  char const* format,
+  char const* filename,
+  int line,
+  char const* funcname);
+
+#define RETURN_ERROR(value) return value
 
 #define START_TRACE(line, value, format) { \
-  fprintf(_trace_stream, format, MR_FILE_NAME, line, MR_FUNC_NAME); \
-  return value; }
+  _trace_print(format, MR_FILE_NAME, line, MR_FUNC_NAME); \
+  RETURN_ERROR(value); }
 
 #define RAISE(line) START_TRACE(line, ERR, _mr_raise_format)
 
 #define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
-  fprintf(_trace_stream, _mr_traceline_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
-  return _err; } }
+  _trace_print(_mr_traceline_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
+  RETURN_ERROR(_err); } }
 
-#define TEST_ASSERT(line, condition) if (!(condition)) { \
-  START_TRACE(line, FAIL, _mr_assert_format) }
+#define TEST_FAIL(line) START_TRACE(line, FAIL, _mr_assert_format)
+
+#define TEST_ASSERT(line, condition) if (!(condition)) TEST_FAIL(line)
 
 #define RUN_TEST(test_func) success &= _run_test(#test_func, test_func)
 

@@ -1,5 +1,6 @@
 #include "mr.3.h"
 
+/*traceback*/
 #define MR_FILE_NAME __FILE__
 #define MR_FUNC_NAME __FUNCTION__
 #define CRAISE RAISE(__LINE__)
@@ -9,6 +10,16 @@ char* _mr_raise_format = "Error raised in %s:%d %s()\n";
 char* _mr_assert_format = "Assert failed in %s:%d %s()\n";
 char* _mr_traceline_format = "  called from %s:%d %s()\n";
 FILE* _trace_stream = NULL;
+
+void _trace_print(
+    char const* format,
+    char const* filename,
+    int line,
+    char const* funcname) {
+  if (_trace_stream != NULL) {
+    fprintf(_trace_stream, format, filename, line, funcname);
+  }
+}
 
 /*main*/
 Returncode func(Array*);

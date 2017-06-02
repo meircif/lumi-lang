@@ -21,6 +21,43 @@ class St-assert(St)
     write(user ")")
 
 
+class St-assert-error(St)
+  owner Mexp exp
+  
+  func dynamic parse()
+    parse-new-exp(user ""):(owner self.exp)
+    self.exp.is-used := false
+  
+  func dynamic analyze-first()
+    # nothing
+  
+  func dynamic analyze()
+    self.exp.analyze-type(user _)
+  
+  func dynamic write()
+    write(user "do {\n")
+    glob.spaces := glob.spaces + 2
+    write-spaces()
+    write(user "_trace_stream = NULL;\n")
+    write(user "#undef RETURN_ERROR\n")
+    write(user "#define RETURN_ERROR(value) break\n")
+    write-spaces()
+    self.exp.write-intro()
+    self.exp.write-final()
+    write(user ";\n")
+    write(user "#undef RETURN_ERROR\n")
+    write(user "#define RETURN_ERROR(value) return value\n")
+    write-spaces()
+    write(user "_trace_stream = stdout;\n")
+    write-spaces()
+    write(user "TEST_FAIL(")
+    write-line-num()
+    write(user ")\n")
+    glob.spaces := glob.spaces - 2
+    write-spaces()
+    write(user "} while (false);")
+
+
 class St-test(St-func)
   func dynamic parse()
     base.parse()

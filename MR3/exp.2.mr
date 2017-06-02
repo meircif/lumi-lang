@@ -130,10 +130,11 @@ static Mexp(Object)
   func inst analyze-get-subtype(user Mtype target-mtype):(user Mtype sub-mtype)
     user Mtype mtype(target-mtype)
     self.analyze():(user mtype, user sub-mtype)
-    if not (? mtype)
-      f-syntax-error(user "got no value, expected", user target-mtype.name)
-    if mtype != target-mtype
-      f-syntax-error2(user "got", user mtype.name, user "expected", user target-mtype.name)
+    if ? target-mtype
+      if not (? mtype)
+        f-syntax-error(user "got no value, expected", user target-mtype.name)
+      if mtype != target-mtype
+        f-syntax-error2(user "got", user mtype.name, user "expected", user target-mtype.name)
   
   func inst analyze-types(user Mtype target-mtype, user Mtype target-sub-mtype)
     user Mtype sub-mtype(target-sub-mtype)
