@@ -59,22 +59,22 @@ func f-variables-example()
 #############
 func f-references-example()
 
-(# maneging references
+(# managing references
 
-References should be maneged correctly to reach goal #1,
+References should be managed correctly to reach goal #1,
 and to reach goal #2 - it should be done as efficiently as possible.
 
 This is done with 3 layers of managing - allowing easy trade-of between
 flexibility and performance by the user:
-1. No performance overhead - compile time only reference maneging
-2. More flexible reference maneging - with a small performance cost
+1. No performance overhead - compile time only reference managing
+2. More flexible reference managing - with a small performance cost
 3. Maximum flexibility - but with performance issues
 
 Below is a first suggestion to implement this, but it will probably be
 developed further over time, and maybe even changed completely.
 
-(# 1. No performance overhead - compile time only reference maneging
-MR will allow performance free reference maneging that will be done only in
+(# 1. No performance overhead - compile time only reference managing
+MR will allow performance free reference managing that will be done only in
 compile time.
 
 Every reference has a single "owner" entity - which is another object
@@ -92,8 +92,8 @@ Variables ca also give references as owners - but cannot pass their ownership.
   f-owning-func(owner some-string)  # pass ownership, cannot be used anymore
 
 
-(# 2. More flexible reference maneging - with a small performance cost
-MR will allow more complex and flexible reference maneging that come with a
+(# 2. More flexible reference managing - with a small performance cost
+MR will allow more complex and flexible reference managing that come with a
 small and predictable performance cost
 
 Same as 1. with the addition of weak references.
@@ -135,7 +135,7 @@ project where performance is less important.
 
 # empty references (nil/null/none)
 (#
-As defult, (non-weak) references always point to a legal object.
+As default, (non-weak) references always point to a legal object.
 To allow empty references a references must be declared as "conditional" using
 the "?" sign. Empty value can be set using "_".
 #)
@@ -524,8 +524,8 @@ func f-error-raising()
 ##############
 
 (#
-Interface
-Structure
+Dynamic Interface
+Static Structure
 Interface + Structure = Class
 
 * Var:          var structure
@@ -538,14 +538,14 @@ Interface + Structure = Class
 
 Class Example
 
-var Example example-
+var Example example
 
 #)
 
 static Struct(Object)
   # ...
 
-interface Interface(Object)
+dynamic Interface(Object)
   # ...
 
 class Class(Object)

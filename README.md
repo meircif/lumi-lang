@@ -3,10 +3,10 @@ MR programming language development
 
 See [wiki](https://github.com/meircif/mr-dev/wiki) for more information on MR and its development.
 
-See [issues](https://github.com/meircif/mr-dev/issues) for current isssues been worked at.
+See [issues](https://github.com/meircif/mr-dev/issues) for current issues been worked at.
 
-See [example.mr](example.mr) for some (temprary) MR code examples.
+See [example.mr](example.mr) for some (temporary) MR code examples.
 
-[MR for notepad++.xml](MR for notepad++.xml) can be used in Notepad++ for basic MR file markup.
+[MR-for-notepadpp.xml](MR-for-notepadpp.xml) can be used in Notepad++ for basic MR file markup.
 
 Suggestions, comments and questions are welcome!
