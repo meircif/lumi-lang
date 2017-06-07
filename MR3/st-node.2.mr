@@ -299,8 +299,8 @@ class St-native(St-comment)
   func dynamic parse()
     base.parse()
   func dynamic analyze-first()
-    base.analyze-first()
+    # do nothing
   func dynamic analyze()
-    base.analyze()
+    # do nothing
   func dynamic write()
-    base.write()
+    # do nothing
