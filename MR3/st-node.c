@@ -557,21 +557,21 @@ Returncode St_native_parse(St_native* self) {
 static char* _func_name_St_native_analyze_first = "St-native.analyze-first";
 #define MR_FUNC_NAME _func_name_St_native_analyze_first
 Returncode St_native_analyze_first(St_native* self) {
-  CHECK(302, St_comment_analyze_first(&(self->_base)));
+  /* do nothing */
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_native_analyze = "St-native.analyze";
 #define MR_FUNC_NAME _func_name_St_native_analyze
 Returncode St_native_analyze(St_native* self) {
-  CHECK(304, St_comment_analyze(&(self->_base)));
+  /* do nothing */
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_native_write = "St-native.write";
 #define MR_FUNC_NAME _func_name_St_native_write
 Returncode St_native_write(St_native* self) {
-  CHECK(306, St_comment_write(&(self->_base)));
+  /* do nothing */
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -1,0 +1,11 @@
+language: c
+
+compiler: 
+  - gcc
+  - clang
+
+os:
+  - linux
+  - osx
+
+script: ./test.sh
