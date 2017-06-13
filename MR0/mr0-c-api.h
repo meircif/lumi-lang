@@ -26,5 +26,7 @@ typedef enum {
   ERR
 } Returncode;
 
+int cstring_length(char* cstring, int max_length);
+
 
 #endif  /*__MR_C_API__*/

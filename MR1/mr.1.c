@@ -2,6 +2,15 @@
 
 typedef FILE* File;
 
+/*like strnlen*/
+int cstring_length(char* cstring, int max_length) {
+  int length = 0;
+  while (cstring[length] != '\0' && length < max_length) {
+    ++length;
+  }
+  return length;
+}
+
 /*Print*/
 Returncode print(String* text) {
   printf("%.*s\n", text->actual_length, text->chars);
@@ -17,7 +26,7 @@ String* new_string(int length) {
   String* str = buff;
   str->max_length = length;
   str->actual_length = 0;
-  str->chars = (Byte*)buff + sizeof(String);
+  str->chars = (char*)buff + sizeof(String);
   return str;
 }
 
@@ -134,12 +143,34 @@ Returncode string_replace(String* this, Char old, Char new) {
 }
 
 Returncode int_to_string(Int value, String* out_str) {
-  int res = snprintf(out_str->chars, out_str->max_length ,"%d", value);
-  if (res <= 0 or res >= out_str->max_length) {
-    out_str->actual_length = 0;
-    RAISE
+  Bool is_neg = value < 0;
+  int abs = value;
+  if (is_neg) {
+    abs = -value;
   }
-  out_str->actual_length = res;
+  int swap = 0;
+  out_str->actual_length = is_neg;
+  do {
+    swap *= 10;
+    swap += abs % 10;
+    abs /= 10;
+    if (out_str->max_length <= out_str->actual_length) {
+      out_str->actual_length = 0;
+      RAISE
+    }
+    ++out_str->actual_length;
+  } while (abs > 0);
+  char* next = out_str->chars;
+  if (is_neg) {
+    *next = '-';
+    ++next;
+  }
+  char* last = out_str->chars + out_str->actual_length;
+  while (next < last) {
+    *next = '0' + swap % 10;
+    ++next;
+    swap /= 10;
+  }
   return OK;
 }
 
@@ -201,11 +232,11 @@ Returncode sys_exit(Int status) {
 
 Returncode set_cstring(String* str) {
   if (str->actual_length >= str->max_length) {
-    if (strnlen(str->chars, str->max_length) >= str->max_length) {
+    if (cstring_length(str->chars, str->max_length) >= str->max_length) {
       RAISE
     }
   }
-  else if (strnlen(str->chars, str->actual_length + 1) > str->actual_length) {
+  else if (cstring_length(str->chars, str->actual_length + 1) > str->actual_length) {
     str->chars[str->actual_length] = '\0';
   }
   return OK;
@@ -228,7 +259,7 @@ Returncode sys_getenv(String* name, Bool* exists, String* value) {
     *exists = false;
     return OK;
   }
-  value->actual_length = strnlen(ret, value->max_length);
+  value->actual_length = cstring_length(ret, value->max_length);
   strncpy(value->chars, ret, value->actual_length);
   *exists = true;
   return OK;

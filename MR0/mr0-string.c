@@ -3,6 +3,15 @@
 
 #include "mr0-c-api.h"
 
+/*like strnlen*/
+int cstring_length(char* cstring, int max_length) {
+  int length = 0;
+  while (cstring[length] != '\0' && length < max_length) {
+    ++length;
+  }
+  return length;
+}
+
 Returncode string_clear(String* this) {
   this->actual_length = 0;
   return OK;
@@ -54,11 +63,33 @@ Returncode string_replace(String this, Char old, Char new) {
 }
 
 Returncode int_to_string(String* str, Int value) {
-  int res = snprintf(str->chars, str->max_length ,"%d", value);
-  if (res <= 0 or res >= str->max_length) {
-    str->actual_length = 0;
-    return ERR;
+  Bool is_neg = value < 0;
+  int abs = value;
+  if (is_neg) {
+    abs = -value;
   }
-  str->actual_length = res;
+  int swap = 0;
+  str->actual_length = is_neg;
+  do {
+    swap *= 10;
+    swap += abs % 10;
+    abs /= 10;
+    if (str->max_length <= str->actual_length) {
+      str->actual_length = 0;
+      return ERR;
+    }
+    ++str->actual_length;
+  } while (abs > 0);
+  char* next = str->chars;
+  if (is_neg) {
+    *next = '-';
+    ++next;
+  }
+  char* last = str->chars + str->actual_length;
+  while (next < last) {
+    *next = '0' + swap % 10;
+    ++next;
+    swap /= 10;
+  }
   return OK;
 }

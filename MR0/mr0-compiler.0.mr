@@ -154,7 +154,7 @@ func parse-func(user File infile, user File outfile, user String key-word, copy 
 
 func parse-main(user File infile, user File outfile, user String key-word, copy Int spaces)
   parse-func(user infile, user outfile, user key-word, copy spaces)
-  file-write(user outfile, user "\nint main(int argc, char* argv[]) {\n  if (argc < 3) {\n    printf(\"too few arguments\");\n    return ERR;\n  }\n  String arg1, arg2;\n  arg1.chars = argv[1];\n  arg1.max_length = strnlen(arg1.chars, 1024);\n  arg1.actual_length = arg1.max_length;\n  arg2.chars = argv[2];\n  arg2.max_length = strnlen(arg2.chars, 1024);\n  arg2.actual_length = arg2.max_length;\n  func(arg1, arg2);\n  return OK;\n}\n")
+  file-write(user outfile, user "\nint main(int argc, char* argv[]) {\n  if (argc < 3) {\n    printf(\"too few arguments\");\n    return ERR;\n  }\n  String arg1, arg2;\n  arg1.chars = argv[1];\n  arg1.max_length = cstring_length(arg1.chars, 1024);\n  arg1.actual_length = arg1.max_length;\n  arg2.chars = argv[2];\n  arg2.max_length = cstring_length(arg2.chars, 1024);\n  arg2.actual_length = arg2.max_length;\n  func(arg1, arg2);\n  return OK;\n}\n")
   return
 
 
@@ -307,7 +307,7 @@ func parse-call(user File infile, user File outfile, user String key-word, copy 
     if equal
       file-putc(user outfile, copy '&')
     
-    var String{512} name
+    var String{1024} name
     read-name(out end, user infile, out name, copy ',', copy ')')
     var Char first
     string-get(out first, user name, user 0)

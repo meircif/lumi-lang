@@ -54,7 +54,7 @@ typedef Returncode (*Func)();
   int arg; \
   for (arg = 0; arg < argc; ++arg) { \
     args_strings[arg].chars = argv[arg]; \
-    args_strings[arg].max_length = strnlen(args_strings[arg].chars, 1024); \
+    args_strings[arg].max_length = cstring_length(args_strings[arg].chars, 1024); \
     args_strings[arg].actual_length = args_strings[arg].max_length; \
   } \
   CHECK(func(args_array)) \
@@ -63,6 +63,7 @@ typedef Returncode (*Func)();
 
 String* new_string(int length);
 Array* new_array(int length, int value_size);
+int cstring_length(char* cstring, int max_length);
 
 
 #endif  /*__MR_C_API__*/

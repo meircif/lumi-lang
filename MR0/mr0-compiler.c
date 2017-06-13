@@ -156,7 +156,7 @@ Returncode parse_func(File infile, File outfile, String key_word, Int spaces) {
 
 Returncode parse_main(File infile, File outfile, String key_word, Int spaces) {
   parse_func(infile, outfile, key_word, spaces);
-  file_write(outfile, (String){385, 385, "\nint main(int argc, char* argv[]) {\n  if (argc < 3) {\n    printf(\"too few arguments\");\n    return ERR;\n  }\n  String arg1, arg2;\n  arg1.chars = argv[1];\n  arg1.max_length = strnlen(arg1.chars, 1024);\n  arg1.actual_length = arg1.max_length;\n  arg2.chars = argv[2];\n  arg2.max_length = strnlen(arg2.chars, 1024);\n  arg2.actual_length = arg2.max_length;\n  func(arg1, arg2);\n  return OK;\n}\n"});
+  file_write(outfile, (String){399, 399, "\nint main(int argc, char* argv[]) {\n  if (argc < 3) {\n    printf(\"too few arguments\");\n    return ERR;\n  }\n  String arg1, arg2;\n  arg1.chars = argv[1];\n  arg1.max_length = cstring_length(arg1.chars, 1024);\n  arg1.actual_length = arg1.max_length;\n  arg2.chars = argv[2];\n  arg2.max_length = cstring_length(arg2.chars, 1024);\n  arg2.actual_length = arg2.max_length;\n  func(arg1, arg2);\n  return OK;\n}\n"});
   return OK;
 }
 
@@ -309,7 +309,7 @@ Returncode parse_call(File infile, File outfile, String key_word, Int spaces) {
     if (equal) {
       file_putc(outfile, '&');
     }
-    char _name_buff[512]; String name = {512, 0, _name_buff};
+    char _name_buff[1024]; String name = {1024, 0, _name_buff};
     read_name(&end, infile, &name, ',', ')');
     Char first;
     string_get(&first, name, 0);
@@ -478,10 +478,10 @@ int main(int argc, char* argv[]) {
   }
   String arg1, arg2;
   arg1.chars = argv[1];
-  arg1.max_length = strnlen(arg1.chars, 1024);
+  arg1.max_length = cstring_length(arg1.chars, 1024);
   arg1.actual_length = arg1.max_length;
   arg2.chars = argv[2];
-  arg2.max_length = strnlen(arg2.chars, 1024);
+  arg2.max_length = cstring_length(arg2.chars, 1024);
   arg2.actual_length = arg2.max_length;
   func(arg1, arg2);
   return OK;

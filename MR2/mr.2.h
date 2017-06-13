@@ -62,7 +62,7 @@ typedef struct {
   int arg; \
   for (arg = 0; arg < argc; ++arg) { \
     args_strings[arg].chars = argv[arg]; \
-    args_strings[arg].length = strnlen(args_strings[arg].chars, 1024); \
+    args_strings[arg].length = cstring_length(args_strings[arg].chars, 1024); \
     args_strings[arg].max_length = args_strings[arg].length + 1; \
   } \
   Returncode err =  func(args_array); \
@@ -74,6 +74,7 @@ typedef struct {
 
 String* new_string(int length);
 Array* new_array(int length, int value_size);
+int cstring_length(char* cstring, int max_length);
 
 Returncode String_clear(String* this);
 Returncode String_length(String* this, Int* length);

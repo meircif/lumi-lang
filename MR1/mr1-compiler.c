@@ -924,10 +924,10 @@ int main(int argc, char* argv[]) {
   }
   String arg1, arg2;
   arg1.chars = argv[1];
-  arg1.max_length = strnlen(arg1.chars, 1024);
+  arg1.max_length = cstring_length(arg1.chars, 1024);
   arg1.actual_length = arg1.max_length;
   arg2.chars = argv[2];
-  arg2.max_length = strnlen(arg2.chars, 1024);
+  arg2.max_length = cstring_length(arg2.chars, 1024);
   arg2.actual_length = arg2.max_length;
   func(arg1, arg2);
   return OK;

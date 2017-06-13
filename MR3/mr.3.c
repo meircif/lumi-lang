@@ -21,6 +21,15 @@ void _trace_print(
   }
 }
 
+/*like strnlen*/
+int cstring_length(char* cstring, int max_length) {
+  int length = 0;
+  while (cstring[length] != '\0' && length < max_length) {
+    ++length;
+  }
+  return length;
+}
+
 /*main*/
 Returncode func(Array*);
 
@@ -35,7 +44,7 @@ int _mr_main(int argc, char* argv[]) {
   int arg;
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
-    args_strings[arg].length = strnlen(args_strings[arg].values, 1024);
+    args_strings[arg].length = cstring_length(argv[arg], 1024);
     args_strings[arg].max_length = args_strings[arg].length + 1;
   }
   Returncode err = func(args_array);
@@ -55,7 +64,9 @@ int _mr_test_main(int argc, char* argv[]) {
   }
   else {
     printf("Tests failed\n");
+    return ERR;
   }
+  return OK;
 }
 
 Bool _run_test(char* test_name, Func test_func) {
@@ -74,11 +85,11 @@ Bool _run_test(char* test_name, Func test_func) {
 /*helpers*/
 Returncode _set_cstring(String* str) {
   if (str->length >= str->max_length) {
-    if (strnlen(str->values, str->max_length) >= str->max_length) {
+    if (cstring_length(str->values, str->max_length) >= str->max_length) {
       CRAISE
     }
   }
-  else if (strnlen(str->values, str->length + 1) > str->length) {
+  else if (cstring_length(str->values, str->length + 1) > str->length) {
     str->values[str->length] = '\0';
   }
   return OK;
@@ -93,7 +104,7 @@ String* _new_string(int length) {
   String* str = buff;
   str->max_length = length;
   str->length = 0;
-  str->values = (Byte*)buff + sizeof(String);
+  str->values = (char*)buff + sizeof(String);
   return str;
 }
 
@@ -126,7 +137,7 @@ void _set_new_string_array(int array_length, int string_length, Array* array) {
     ((String*)(array->values))[n] = (String){
       string_length,
       0,
-      (Byte*)(array->values) + array_length * sizeof(String) + string_length * n
+      (char*)(array->values) + array_length * sizeof(String) + string_length * n
     };
   }
 }
@@ -229,12 +240,34 @@ Returncode String_replace(String* this, Char old, Char new) {
 }
 
 Returncode Int_str(Int value, String* out_str) {
-  int res = snprintf(out_str->values, out_str->max_length ,"%d", value);
-  if (res <= 0 || res >= out_str->max_length) {
-    out_str->length = 0;
-    CRAISE
+  Bool is_neg = value < 0;
+  int abs = value;
+  if (is_neg) {
+    abs = -value;
   }
-  out_str->length = res;
+  int swap = 0;
+  out_str->length = is_neg;
+  do {
+    swap *= 10;
+    swap += abs % 10;
+    abs /= 10;
+    if (out_str->max_length <= out_str->length) {
+      out_str->length = 0;
+      CRAISE
+    }
+    ++out_str->length;
+  } while (abs > 0);
+  char* next = out_str->values;
+  if (is_neg) {
+    *next = '-';
+    ++next;
+  }
+  char* last = out_str->values + out_str->length;
+  while (next < last) {
+    *next = '0' + swap % 10;
+    ++next;
+    swap /= 10;
+  }
   return OK;
 }
 
@@ -327,7 +360,7 @@ Returncode Sys_getenv(void* _, String* name, String* value, Bool* exists) {
     *exists = false;
     return OK;
   }
-  value->length = strnlen(ret, value->max_length);
+  value->length = cstring_length(ret, value->max_length);
   strncpy(value->values, ret, value->length);
   *exists = true;
   return OK;
