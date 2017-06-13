@@ -438,7 +438,7 @@ Returncode parse_new_operand(Type opr_type, String* text, String* ends, Operand*
 static char* _func_name_parse_new_operands = "parse-new-operands";
 #define MR_FUNC_NAME _func_name_parse_new_operands
 Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Char* end) {
-  Type opr_type;
+  Type opr_type = {sizeof(Operand), Operand__dtl};
   if (text->length == 0) {
     if ((*end) == '(') {
       opr_type = (Type){sizeof(Block_operand), Block_operand__dtl};
