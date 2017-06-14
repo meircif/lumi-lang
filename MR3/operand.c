@@ -354,8 +354,8 @@ static char* _func_name_Slice_operand_write_final = "Slice-operand.write-final";
 #define MR_FUNC_NAME _func_name_Slice_operand_write_final
 Returncode Slice_operand_write_final(Slice_operand* self) {
   /* ((Prmitive*)((seq)->values))[index] */
-  /* ((Complex*)((seq)->values)) + index */
-  /* &(Array){second, ((Type*)((seq)->values)) + (index)} */
+  /* ((Complex**)((seq)->values))[index] */
+  /* &(Array){second, ((Type**)((seq)->values)) + (index)} */
   /* &(String){second, second, (seq)->values + (index)} */
   CHECK(205, write(&(String){2, 1, "("}));
   if (NULL != self->second_index) {
@@ -372,31 +372,28 @@ Returncode Slice_operand_write_final(Slice_operand* self) {
   if (NULL != self->item_type) {
     CHECK(216, write(&(String){3, 2, "(("}));
     CHECK(217, write_cstyle(self->item_type->name));
-    CHECK(218, write(&(String){4, 3, "*)("}));
+    if (!self->item_type->is_primitive) {
+      CHECK(219, write(&(String){2, 1, "*"}));
+    }
+    CHECK(220, write(&(String){4, 3, "*)("}));
   }
-  CHECK(219, write(&(String){2, 1, "("}));
-  CHECK(220, Operand_write_all_final(self->seq));
-  CHECK(221, write(&(String){10, 9, ")->values"}));
+  CHECK(221, write(&(String){2, 1, "("}));
+  CHECK(222, Operand_write_all_final(self->seq));
+  CHECK(223, write(&(String){10, 9, ")->values"}));
   if (NULL != self->item_type) {
-    CHECK(223, write(&(String){3, 2, "))"}));
+    CHECK(225, write(&(String){3, 2, "))"}));
   }
   if (NULL != self->second_index) {
-    CHECK(225, write(&(String){5, 4, " + ("}));
-    CHECK(226, Mexp_write_final(self->index));
-    CHECK(227, write(&(String){3, 2, ")}"}));
+    CHECK(227, write(&(String){5, 4, " + ("}));
+    CHECK(228, Mexp_write_final(self->index));
+    CHECK(229, write(&(String){3, 2, ")}"}));
   }
   else {
-    if (NULL != self->item_type && !self->item_type->is_primitive) {
-      CHECK(229, write(&(String){4, 3, " + "}));
-      CHECK(230, Mexp_write_final(self->index));
-    }
-    else {
-      CHECK(232, write(&(String){2, 1, "["}));
-      CHECK(233, Mexp_write_final(self->index));
-      CHECK(234, write(&(String){2, 1, "]"}));
-    }
+    CHECK(231, write(&(String){2, 1, "["}));
+    CHECK(232, Mexp_write_final(self->index));
+    CHECK(233, write(&(String){2, 1, "]"}));
   }
-  CHECK(235, write(&(String){2, 1, ")"}));
+  CHECK(234, write(&(String){2, 1, ")"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -406,12 +403,12 @@ Func Slice_operand__dtl[] = {Slice_operand_parse, Slice_operand_analyze, Slice_o
 static char* _func_name_parse_new_operand = "parse-new-operand";
 #define MR_FUNC_NAME _func_name_parse_new_operand
 Returncode parse_new_operand(Type opr_type, String* text, String* ends, Operand** new_opr, Char* end) {
-  if (opr_type.size <= 0) RAISE(239)
+  if (opr_type.size <= 0) RAISE(238)
   Operand* opr = malloc(opr_type.size);
-  if (opr == NULL) RAISE(239)
+  if (opr == NULL) RAISE(238)
   if (opr_type.dtl != NULL) { *((Func**)(opr)) = opr_type.dtl; }
   (*new_opr) = opr;
-  CHECK(241, (*((Func**)(opr)))[0](opr, text, ends, &((*end))));
+  CHECK(240, (*((Func**)(opr)))[0](opr, text, ends, &((*end))));
   Type next_type;
   if ((*end) == '.') {
     next_type = (Type){sizeof(Member_operand), Member_operand__dtl};
@@ -430,7 +427,7 @@ Returncode parse_new_operand(Type opr_type, String* text, String* ends, Operand*
       }
     }
   }
-  CHECK(252, parse_new_operand(next_type, NULL, ends, &(opr->next), &((*end))));
+  CHECK(251, parse_new_operand(next_type, NULL, ends, &(opr->next), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -444,11 +441,11 @@ Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Cha
       opr_type = (Type){sizeof(Block_operand), Block_operand__dtl};
     }
     else {
-      CHECK(260, f_syntax_error_c(&(String){11, 10, "unexpected"}, (*end)));
+      CHECK(259, f_syntax_error_c(&(String){11, 10, "unexpected"}, (*end)));
     }
   }
   else {
-    if ((0) < 0 || (0) >= text->length) RAISE(262)
+    if ((0) < 0 || (0) >= text->length) RAISE(261)
     Char first = text->chars[0];
     if (first == '\'') {
       opr_type = (Type){sizeof(Char_operand), Char_operand__dtl};
@@ -471,7 +468,7 @@ Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Cha
             }
             else {
               Bool _Bool0;
-              CHECK(273, String_equal(text, &(String){5, 4, "base"}, &(_Bool0)))
+              CHECK(272, String_equal(text, &(String){5, 4, "base"}, &(_Bool0)))
               if (_Bool0) {
                 opr_type = (Type){sizeof(Base_meth_operand), Base_meth_operand__dtl};
               }
@@ -484,7 +481,7 @@ Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Cha
       }
     }
   }
-  CHECK(277, parse_new_operand(opr_type, text, ends, &((*new_opr)), &((*end))));
+  CHECK(276, parse_new_operand(opr_type, text, ends, &((*new_opr)), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -5,8 +5,7 @@ set -ev
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCW="$CC --std=c89 -Wall -Werror -Wno-unused-variable -Wno-missing-braces
- -Wno-parentheses"
+CCW="$CC --std=c89 -Wall -Werror"
 rm -rf .test
 mkdir .test
 cp MR*/*.mr .test
@@ -26,7 +25,7 @@ $CCW ../MR1/mr1-compiler.c ../MR0/mr0-file.c ../MR0/mr0-string.c -I../MR0 \
 diff ../MR2/mr2-compiler.c mr2-compiler.c
 
 #MR2
-$CCW ../MR2/mr2-compiler.c ../MR1/mr.1.c -I../MR1 -o mr2.compiler
+$CCW -Wno-parentheses ../MR2/mr2-compiler.c ../MR1/mr.1.c -I../MR1 -o mr2.compiler
 ./mr2.compiler common.2.mr map.2.mr global.2.mr exp.2.mr st-node.2.mr \
   flow.2.mr args.2.mr func.2.mr member.2.mr call.2.mr operand.2.mr dec.2.mr \
   type.2.mr test.2.mr mr3-compiler.2.mr
@@ -47,8 +46,8 @@ diff ../MR3/test.c test.c
 diff ../MR3/mr3-compiler.c mr3-compiler.c
 
 #MR3
-$CCW -Wno-typedef-redefinition ../MR3/mr3-compiler.c ../MR2/mr.2.c -I../MR2 \
-  -o mr3.compiler
+$CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
+  ../MR3/mr3-compiler.c ../MR2/mr.2.c -I../MR2 -o mr3.compiler
 
 # teardown
 cd ..
