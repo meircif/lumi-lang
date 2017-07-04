@@ -199,7 +199,7 @@ class Slice-operand(Operand)
   
   func dynamic write-final()
     # ((Prmitive*)((seq)->values))[index]
-    # ((Complex**)((seq)->values))[index]
+    # &(((Complex*)((seq)->values))[index])
     # &(Array){second, ((Type**)((seq)->values)) + (index)}
     # &(String){second, second, (seq)->values + (index)}
     write(user "(")
@@ -213,10 +213,10 @@ class Slice-operand(Operand)
         self.second-index.write-final()
         write(user ", ")
     if ? self.item-type
+      if not self.item-type.is-primitive
+        write(user "&(")
       write(user "((")
       write-cstyle(user self.item-type.name)
-      if not self.item-type.is-primitive
-        write(user "*")
       write(user "*)(")
     write(user "(")
     self.seq.write-all-final()
@@ -231,6 +231,8 @@ class Slice-operand(Operand)
       write(user "[")
       self.index.write-final()
       write(user "]")
+      if ? self.item-type and not self.item-type.is-primitive
+        write(user ")")
     write(user ")")
 
 
