@@ -51,8 +51,8 @@ func f-variables-example()
   var Int int-var
   var String{128} string-var
 
-# dynamically allocated object are created using "new"
-  owner String{Uint8b} some-string(new{String{32}}(""))
+# dynamically allocated object are created using "Type-name.new()" 
+  owner String{Uint8b} some-string(String{32}.new(""))
 
 
 # references
@@ -87,9 +87,9 @@ Users are free to modify the referenced object freely - but cannot destroy it.
 
 Variables ca also give references as owners - but cannot pass their ownership.
 #)
-  owner String{32} some-string(new{String{32}}(""))
+  owner String{32} some-string(String{32}.new(""))
   f-user-func(user some-string)  # give reference to a user
-  f-owning-func(owner some-string)  # pass ownership, cannot be used anymore
+  f-owning-func(owner some-string)  # move ownership, cannot be used anymore
 
 
 (# 2. More flexible reference managing - with a small performance cost
@@ -110,10 +110,10 @@ and predictable.
 * It is also possible to support "strong" reference counting - but this is not
   added because it can cause memory leaks because of reference loops.
 #)
-  managed String{32} some-string(new{String{32}}(""))
+  managed String{32} some-string(String{32}.new(""))
   f-user-func(user some-string)  # give reference to a user
   f-weak-func(weak some-string)  # give weak reference
-  f-owning-func(managed some-string)  # pass ownership
+  f-owning-func(managed some-string)  # move ownership
 
 (# 3. Maximum flexibility - but with performance issues
 MR will allow declaring a reference as garbage-collected, which will allow
@@ -128,7 +128,7 @@ Implementing a garbage-collector has a significant and unpredicted performance
 cost, but some MR users may be willing to pay it in some sections of their
 project where performance is less important.
 #)
-  shared String{32} some-string(new{String{32}}(""))
+  shared String{32} some-string(String{32}.new(""))
   f-shared-func(shared some-string)  # copy strong reference
   f-user-func(user some-string)  # give reference to a user
   f-weak-func(weak some-string)  # give weak reference
@@ -459,9 +459,9 @@ func f-complex-func(
 
 # calling a function
 func f-calling-example()
-  owner String{36} simple-string(new{String{36}}(""))
-  managed String{36} managed-string(new{String{36}}(""))
-  shared String{36} shared-string(new{String{36}}(""))
+  owner String{36} simple-string(String{32}.new(""))
+  managed String{36} managed-string(String{32}.new(""))
+  shared String{36} shared-string(String{32}.new(""))
   var Uint32b some-int := f-func-name(345)
   var Uint32b out-int,
   weak String{Uint8b} out-string,
@@ -515,7 +515,7 @@ native func n-delete-reference(owner Some-native-type ref)
 #################
 
 func f-error-raising()
-  raise
+  raise  # raising an error
 
 # TODO
 
@@ -526,8 +526,57 @@ func f-error-raising()
 (#
 Dynamic Interface
 Static Structure
-Interface + Structure = Class
+#)
+struct Struct
+  var Int num
+  func meth1()
+  func meth2()
 
+dynamic Dynamic
+  var Int num
+  func meth1()
+  func meth2()
+  
+  static func meth-both()
+    meth1()
+    meth2()
+
+
+type Mixed
+  static
+    var Int num
+    func meth1()
+    func meth2()
+  
+  dynamic
+    var Int dnum
+    func dmeth1()
+    func dmeth2()
+
+func f-type-example()
+  # structure
+  var Struct structure-only
+  var Mixed.struct mixed-structure-only
+  # reference
+  user Struct structure-reference
+  user Mixed.struct mixed-structure-reference
+  # dynamic
+  user Dynamic dynamic-and-object-refernece
+  user Mixed.dynamic mixed-dynamic-and-object-refernece
+  user Dynamic.dynamic.struct dynamic-only
+  user Mixed.dynamic.struct mixed-interface-only
+  # binding
+  user Bind{Struct:Dynamic} dynamic-and-structure-reference
+  user Mixed mixed-dynamic-and-structure-reference
+  # embed
+  var Embed{Struct:Dynamic} dynamic-in-structure
+  var Embed{Mixed} mixed-dynamic-in-structure
+  user Embed{Struct:Interface} reference-to-dynamic-in-structure
+  user Embed{Mixed} reference-to-mixed-dynamic-in-structure
+
+
+(# Deprecated!
+Interface + Structure = Class
 * Var:          var structure
 * Ref:          ref structure
 * Interface:    ref interface
@@ -535,44 +584,9 @@ Interface + Structure = Class
 * Class Duck:   ref interface, ref structure
 * Embed:        ref interface, var structure
 * Embed Ref:    ref (ref interface, var structure)
-
-Class Example
-
-var Example example
-
 #)
 
-static Struct(Object)
-  # ...
-
-dynamic Interface(Object)
-  # ...
-
-class Class(Object)
-  # ...
-
-func f-oop-example()
-  # structure
-  var Struct structure-only
-  var Class class-structure-only
-  # reference
-  user Struct structure-reference
-  user Class.static class-structure-reference
-  # interface
-  user Interface interface-and-object-refernece
-  user Class.interface class-interface-and-object-refernece
-  user Interface.dynamic interface-only
-  user Class.dynamic class-interface-only
-  # binding
-  user Bind{Struct:Interface} interface-and-structure-reference
-  user Class class-interface-and-structure-reference
-  # embed
-  var Embed{Struct:Interface} interface-and-structure
-  var Embed{Example} class-interface-and-structure
-  user Embed{Struct:Interface} reference-to-interface-and-structure
-  user Embed{Example} class-reference-to-interface-and-structure
-
-(#
+(# Deprecated!
 Object type is:
 1. "interface" if has no instance variables, else "class"
 2. "abstract" if has abstract members, else "dynamic" if has dynamic members,
@@ -706,7 +720,7 @@ static class My-generic{Any-type}(Object)
     item := self.item
 
 func f-generic-example()
-  new Class-name item
+  owner Class-name item(Class-name.new())
   var My-generic{Class-name} generic
   generic.m-set(owner item)
   item := generic.m-get()
@@ -740,14 +754,6 @@ func f-format-example()
     sys.print(user part)
     s1.concat(user part)
     f-str-getter(copy 0, user part, copy n)
-
-
-# Type variable
-func f-type-var-example()
-  var Type{Abstract-class} abstract-type(Implemented-class)
-  abstract-type := Implemented-class
-  var As{abstract-type} abstract-var
-  new As{abstract-type} abstract-ref
 
 
 
