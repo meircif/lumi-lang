@@ -155,11 +155,9 @@ func read-key-word()
 # write helpers
 func write-c(copy Char ch)
   glob.outfile.putc(copy ch)
-  return
 
 func write(user String text)
   glob.outfile.write(user text)
-  return
 
 func write-cstyle(user String text)
   if not (? text)
@@ -369,7 +367,6 @@ class St(Object)
       son := son.next-brother
     glob.node := self
   
-  # write sons
   func dynamic write()
     # do nothing
   

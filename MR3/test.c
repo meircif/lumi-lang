@@ -217,31 +217,38 @@ Func St_mock__dtl[] = {St_mock_parse, St_mock_analyze_first, St_mock_analyze, St
 typedef struct St_debug St_debug; struct St_debug {
   St _base;
 };
+static char* _func_name_St_debug_m_swich_debug = "St-debug.m-swich-debug";
+#define MR_FUNC_NAME _func_name_St_debug_m_swich_debug
+Returncode St_debug_m_swich_debug(St_debug* self) {
+  glob->debug = !glob->debug;
+  return OK;
+}
+#undef MR_FUNC_NAME
 static char* _func_name_St_debug_parse = "St-debug.parse";
 #define MR_FUNC_NAME _func_name_St_debug_parse
 Returncode St_debug_parse(St_debug* self) {
-  glob->debug = !glob->debug;
+  CHECK(119, St_debug_m_swich_debug(self));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_debug_analyze_first = "St-debug.analyze-first";
 #define MR_FUNC_NAME _func_name_St_debug_analyze_first
 Returncode St_debug_analyze_first(St_debug* self) {
-  glob->debug = !glob->debug;
+  CHECK(122, St_debug_m_swich_debug(self));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_debug_analyze = "St-debug.analyze";
 #define MR_FUNC_NAME _func_name_St_debug_analyze
 Returncode St_debug_analyze(St_debug* self) {
-  glob->debug = !glob->debug;
+  CHECK(125, St_debug_m_swich_debug(self));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_debug_write = "St-debug.write";
 #define MR_FUNC_NAME _func_name_St_debug_write
 Returncode St_debug_write(St_debug* self) {
-  glob->debug = !glob->debug;
+  CHECK(128, St_debug_m_swich_debug(self));
   return OK;
 }
 #undef MR_FUNC_NAME

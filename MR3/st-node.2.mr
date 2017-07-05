@@ -204,7 +204,6 @@ class St-file(St-node)
     write(user " \"")
     write(user prefix)
     write(user "c\"\n")
-    
   
   func dynamic write()
     new String{self.infile-name.length} outfile-name

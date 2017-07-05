@@ -235,7 +235,7 @@ Returncode write_c(Char ch) {
 static char* _func_name_write = "write";
 #define MR_FUNC_NAME _func_name_write
 Returncode write(String* text) {
-  CHECK(161, File_write(glob->outfile, text));
+  CHECK(160, File_write(glob->outfile, text));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -244,16 +244,16 @@ static char* _func_name_write_cstyle = "write-cstyle";
 #define MR_FUNC_NAME _func_name_write_cstyle
 Returncode write_cstyle(String* text) {
   if (!(NULL != text)) {
-    RAISE(166)
+    RAISE(164)
   }
   Int index; for (index = 0; index < text->length; ++index) {
-    if ((index) < 0 || (index) >= text->length) RAISE(168)
+    if ((index) < 0 || (index) >= text->length) RAISE(166)
     Char ch = text->chars[index];
     if (ch == '-') {
-      CHECK(170, write_c('_'));
+      CHECK(168, write_c('_'));
     }
     else {
-      CHECK(172, write_c(ch));
+      CHECK(170, write_c(ch));
     }
   }
   return OK;
@@ -264,8 +264,8 @@ static char* _func_name_write_int = "write-int";
 #define MR_FUNC_NAME _func_name_write_int
 Returncode write_int(Int num) {
   String* num_str = &(String){64, 0, (char[64]){0}};
-  CHECK(176, Int_str(num, num_str));
-  CHECK(177, write(num_str));
+  CHECK(174, Int_str(num, num_str));
+  CHECK(175, write(num_str));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -273,7 +273,7 @@ Returncode write_int(Int num) {
 static char* _func_name_write_line_num = "write-line-num";
 #define MR_FUNC_NAME _func_name_write_line_num
 Returncode write_line_num() {
-  CHECK(180, write_int(glob->line_num));
+  CHECK(178, write_int(glob->line_num));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -281,9 +281,9 @@ Returncode write_line_num() {
 static char* _func_name_write_tb_raise = "write-tb-raise";
 #define MR_FUNC_NAME _func_name_write_tb_raise
 Returncode write_tb_raise() {
-  CHECK(183, write(&(String){7, 6, "RAISE("}));
-  CHECK(184, write_line_num());
-  CHECK(185, write(&(String){2, 1, ")"}));
+  CHECK(181, write(&(String){7, 6, "RAISE("}));
+  CHECK(182, write_line_num());
+  CHECK(183, write(&(String){2, 1, ")"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -291,9 +291,9 @@ Returncode write_tb_raise() {
 static char* _func_name_write_tb_check = "write-tb-check";
 #define MR_FUNC_NAME _func_name_write_tb_check
 Returncode write_tb_check() {
-  CHECK(188, write(&(String){7, 6, "CHECK("}));
-  CHECK(189, write_line_num());
-  CHECK(190, write(&(String){3, 2, ", "}));
+  CHECK(186, write(&(String){7, 6, "CHECK("}));
+  CHECK(187, write_line_num());
+  CHECK(188, write(&(String){3, 2, ", "}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -302,7 +302,7 @@ static char* _func_name_write_spaces = "write-spaces";
 #define MR_FUNC_NAME _func_name_write_spaces
 Returncode write_spaces() {
   Int n; for (n = 0; n < glob->spaces; ++n) {
-    CHECK(194, write_c(' '));
+    CHECK(192, write_c(' '));
   }
   return OK;
 }
@@ -311,8 +311,8 @@ Returncode write_spaces() {
 static char* _func_name_write_new_indent_line = "write-new-indent-line";
 #define MR_FUNC_NAME _func_name_write_new_indent_line
 Returncode write_new_indent_line() {
-  CHECK(197, write_c('\n'));
-  CHECK(198, write_spaces());
+  CHECK(195, write_c('\n'));
+  CHECK(196, write_spaces());
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -321,15 +321,15 @@ static char* _func_name_write_type_type_params = "write-type-type-params";
 #define MR_FUNC_NAME _func_name_write_type_type_params
 Returncode write_type_type_params(Mtype* sub_mtype) {
   /* sizeof(name), name__dtl */
-  CHECK(202, write(&(String){8, 7, "sizeof("}));
-  CHECK(203, write_cstyle(sub_mtype->name));
-  CHECK(204, write(&(String){4, 3, "), "}));
+  CHECK(200, write(&(String){8, 7, "sizeof("}));
+  CHECK(201, write_cstyle(sub_mtype->name));
+  CHECK(202, write(&(String){4, 3, "), "}));
   if (NULL != sub_mtype->dynamic_members) {
-    CHECK(206, write_cstyle(sub_mtype->name));
-    CHECK(207, write(&(String){6, 5, "__dtl"}));
+    CHECK(204, write_cstyle(sub_mtype->name));
+    CHECK(205, write(&(String){6, 5, "__dtl"}));
   }
   else {
-    CHECK(209, write(&(String){5, 4, "NULL"}));
+    CHECK(207, write(&(String){5, 4, "NULL"}));
   }
   return OK;
 }
@@ -339,48 +339,48 @@ static char* _func_name_write_type_init = "write-type-init";
 #define MR_FUNC_NAME _func_name_write_type_init
 Returncode write_type_init(Mtype* mtype, Mtype* sub_mtype, Bool first) {
   if (NULL != mtype->base_mtype) {
-    CHECK(213, write_type_init(mtype->base_mtype, NULL, first));
+    CHECK(211, write_type_init(mtype->base_mtype, NULL, first));
     first = false;
   }
   else {
     if (mtype == glob->type_type) {
       if (!first) {
-        CHECK(217, write(&(String){3, 2, ", "}));
+        CHECK(215, write(&(String){3, 2, ", "}));
       }
-      CHECK(218, write_type_type_params(sub_mtype));
+      CHECK(216, write_type_type_params(sub_mtype));
       first = false;
     }
     else {
       if (NULL != mtype->default_value) {
         if (!first) {
-          CHECK(222, write(&(String){3, 2, ", "}));
+          CHECK(220, write(&(String){3, 2, ", "}));
         }
-        CHECK(223, write(mtype->default_value));
+        CHECK(221, write(mtype->default_value));
         first = false;
       }
     }
   }
   Var_map_iter* iter = &(Var_map_iter){0};
-  CHECK(226, Var_map_iter_init(iter, mtype->members));
+  CHECK(224, Var_map_iter_init(iter, mtype->members));
   while (true) {
     Bool _Bool3;
-    CHECK(228, Var_map_iter_m_has_data(iter, &(_Bool3)))
+    CHECK(226, Var_map_iter_m_has_data(iter, &(_Bool3)))
     if (!(_Bool3)) break;
     Mvar* mvar;
-    CHECK(230, Var_map_iter_get_var(iter, &(mvar)));
+    CHECK(228, Var_map_iter_get_var(iter, &(mvar)));
     if (!(NULL != mvar->func_dec)) {
       if (mvar->access == ACCESS_VAR) {
-        CHECK(233, write_type_init(mvar->mtype, mvar->sub_mtype, first));
+        CHECK(231, write_type_init(mvar->mtype, mvar->sub_mtype, first));
       }
       else {
         if (!first) {
-          CHECK(236, write(&(String){3, 2, ", "}));
+          CHECK(234, write(&(String){3, 2, ", "}));
         }
-        CHECK(237, write(&(String){5, 4, "NULL"}));
+        CHECK(235, write(&(String){5, 4, "NULL"}));
       }
       first = false;
     }
-    CHECK(239, Var_map_iter_m_next(iter));
+    CHECK(237, Var_map_iter_m_next(iter));
   }
   return OK;
 }
@@ -391,19 +391,19 @@ static char* _func_name_f_syntax_error = "f-syntax-error";
 #define MR_FUNC_NAME _func_name_f_syntax_error
 Returncode f_syntax_error(String* text, String* item) {
   String* msg = &(String){256, 0, (char[256]){0}};
-  CHECK(244, String_copy(msg, &(String){15, 14, "Code error in "}));
-  CHECK(245, String_concat(msg, glob->infile_name));
-  CHECK(246, String_concat(msg, &(String){2, 1, "["}));
+  CHECK(242, String_copy(msg, &(String){15, 14, "Code error in "}));
+  CHECK(243, String_concat(msg, glob->infile_name));
+  CHECK(244, String_concat(msg, &(String){2, 1, "["}));
   String* line_num_str = &(String){32, 0, (char[32]){0}};
-  CHECK(248, Int_str(glob->line_num, line_num_str));
-  CHECK(249, String_concat(msg, line_num_str));
-  CHECK(250, String_concat(msg, &(String){3, 2, "] "}));
-  CHECK(251, String_concat(msg, text));
-  CHECK(252, String_concat(msg, &(String){3, 2, " \""}));
-  CHECK(253, String_concat(msg, item));
-  CHECK(254, String_append(msg, '\"'));
-  CHECK(255, Sys_print(sys, msg));
-  RAISE(256)
+  CHECK(246, Int_str(glob->line_num, line_num_str));
+  CHECK(247, String_concat(msg, line_num_str));
+  CHECK(248, String_concat(msg, &(String){3, 2, "] "}));
+  CHECK(249, String_concat(msg, text));
+  CHECK(250, String_concat(msg, &(String){3, 2, " \""}));
+  CHECK(251, String_concat(msg, item));
+  CHECK(252, String_append(msg, '\"'));
+  CHECK(253, Sys_print(sys, msg));
+  RAISE(254)
 }
 #undef MR_FUNC_NAME
 
@@ -411,12 +411,12 @@ static char* _func_name_f_syntax_error2 = "f-syntax-error2";
 #define MR_FUNC_NAME _func_name_f_syntax_error2
 Returncode f_syntax_error2(String* text1, String* item1, String* text2, String* item2) {
   String* msg = &(String){256, 0, (char[256]){0}};
-  CHECK(260, String_copy(msg, text1));
-  CHECK(261, String_concat(msg, &(String){3, 2, " \""}));
-  CHECK(262, String_concat(msg, item1));
-  CHECK(263, String_concat(msg, &(String){3, 2, "\" "}));
-  CHECK(264, String_concat(msg, text2));
-  CHECK(265, f_syntax_error(msg, item2));
+  CHECK(258, String_copy(msg, text1));
+  CHECK(259, String_concat(msg, &(String){3, 2, " \""}));
+  CHECK(260, String_concat(msg, item1));
+  CHECK(261, String_concat(msg, &(String){3, 2, "\" "}));
+  CHECK(262, String_concat(msg, text2));
+  CHECK(263, f_syntax_error(msg, item2));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -425,8 +425,8 @@ static char* _func_name_f_syntax_error_c = "f-syntax-error-c";
 #define MR_FUNC_NAME _func_name_f_syntax_error_c
 Returncode f_syntax_error_c(String* text, Char ch) {
   String* char_str = &(String){2, 0, (char[2]){0}};
-  CHECK(269, String_append(char_str, ch));
-  CHECK(270, f_syntax_error(text, char_str));
+  CHECK(267, String_append(char_str, ch));
+  CHECK(268, f_syntax_error(text, char_str));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -436,30 +436,30 @@ static char* _func_name_f_get_access = "f-get-access";
 #define MR_FUNC_NAME _func_name_f_get_access
 Returncode f_get_access(String* access_text, Int* access) {
   Bool _Bool4;
-  CHECK(274, String_equal(access_text, &(String){5, 4, "copy"}, &(_Bool4)))
+  CHECK(272, String_equal(access_text, &(String){5, 4, "copy"}, &(_Bool4)))
   if (_Bool4) {
     (*access) = ACCESS_COPY;
   }
   else {
     Bool _Bool5;
-    CHECK(276, String_equal(access_text, &(String){5, 4, "user"}, &(_Bool5)))
+    CHECK(274, String_equal(access_text, &(String){5, 4, "user"}, &(_Bool5)))
     if (_Bool5) {
       (*access) = ACCESS_USER;
     }
     else {
       Bool _Bool6;
-      CHECK(278, String_equal(access_text, &(String){6, 5, "owner"}, &(_Bool6)))
+      CHECK(276, String_equal(access_text, &(String){6, 5, "owner"}, &(_Bool6)))
       if (_Bool6) {
         (*access) = ACCESS_OWNER;
       }
       else {
         Bool _Bool7;
-        CHECK(280, String_equal(access_text, &(String){4, 3, "var"}, &(_Bool7)))
+        CHECK(278, String_equal(access_text, &(String){4, 3, "var"}, &(_Bool7)))
         if (_Bool7) {
           (*access) = ACCESS_VAR;
         }
         else {
-          CHECK(283, f_syntax_error(&(String){15, 14, "unknown access"}, access_text));
+          CHECK(281, f_syntax_error(&(String){15, 14, "unknown access"}, access_text));
         }
       }
     }
@@ -473,10 +473,10 @@ static char* _func_name_get_node_type = "get-node-type";
 #define MR_FUNC_NAME _func_name_get_node_type
 Returncode get_node_type(String* key, Type* node_type, Bool* found) {
   Int n; for (n = 0; n < glob->key_word_map->length; ++n) {
-    if ((n) < 0 || (n) >= glob->key_word_map->length) RAISE(288)
+    if ((n) < 0 || (n) >= glob->key_word_map->length) RAISE(286)
     Node_map_item* item = ((Node_map_item*)(glob->key_word_map->values)) + n;
     Bool _Bool8;
-    CHECK(289, String_equal(item->key, key, &(_Bool8)))
+    CHECK(287, String_equal(item->key, key, &(_Bool8)))
     if (_Bool8) {
       (*node_type) = item->node_type;
       (*found) = true;
@@ -492,19 +492,19 @@ Returncode get_node_type(String* key, Type* node_type, Bool* found) {
 static char* _func_name_f_find_type = "f-find-type";
 #define MR_FUNC_NAME _func_name_f_find_type
 Returncode f_find_type(String* typename, Mtype** mtype) {
-  CHECK(297, Type_map_find(glob->type_map, typename, &((*mtype))))
+  CHECK(295, Type_map_find(glob->type_map, typename, &((*mtype))))
   if (NULL != (*mtype)) {
     return OK;
   }
   if (NULL != glob->mclass && NULL != glob->mclass->generic_mtype) {
     Bool _Bool9;
-    CHECK(300, String_equal(typename, glob->mclass->generic_mtype->base_typename, &(_Bool9)))
+    CHECK(298, String_equal(typename, glob->mclass->generic_mtype->base_typename, &(_Bool9)))
     if (_Bool9) {
       (*mtype) = glob->mclass->generic_mtype;
       return OK;
     }
   }
-  CHECK(303, f_syntax_error(&(String){13, 12, "unknown type"}, typename));
+  CHECK(301, f_syntax_error(&(String){13, 12, "unknown type"}, typename));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -514,13 +514,13 @@ static char* _func_name_f_new_temp_name = "f-new-temp-name";
 #define MR_FUNC_NAME _func_name_f_new_temp_name
 Returncode f_new_temp_name(Mtype* mtype, String** new_name) {
   String* res_count = &(String){64, 0, (char[64]){0}};
-  CHECK(308, Int_str(glob->res_count, res_count));
+  CHECK(306, Int_str(glob->res_count, res_count));
   glob->res_count = glob->res_count + 1;
   String* name = new_string(mtype->name->length + res_count->length + 2);
-  if (name == NULL) RAISE(310)
-  CHECK(311, String_append(name, '-'));
-  CHECK(312, String_concat(name, mtype->name));
-  CHECK(313, String_concat(name, res_count));
+  if (name == NULL) RAISE(308)
+  CHECK(309, String_append(name, '-'));
+  CHECK(310, String_concat(name, mtype->name));
+  CHECK(311, String_concat(name, res_count));
   (*new_name) = name;
   return OK;
 }
@@ -541,7 +541,6 @@ typedef struct St St; struct St {
   Bool is_else;
   /* analyze sons */
   /* analyze sons */
-  /* write sons */
 };
 static char* _func_name_St_init = "St.init";
 #define MR_FUNC_NAME _func_name_St_init
@@ -563,7 +562,7 @@ Returncode St_init(St* self, St* father) {
       father->first_son = self;
     }
     if (NULL != father->sons_var_map) {
-      CHECK(345, f_copy_new_var_map(father->sons_var_map, &(self->var_map)));
+      CHECK(343, f_copy_new_var_map(father->sons_var_map, &(self->var_map)));
     }
   }
   return OK;
@@ -584,7 +583,7 @@ Returncode St_analyze_first(St* self) {
     if (!(NULL != son)) break;
     glob->line_num = son->line_num;
     glob->node = son;
-    CHECK(357, (*((Func**)(son)))[1](son));
+    CHECK(355, (*((Func**)(son)))[1](son));
     son = son->next_brother;
   }
   glob->node = self;
@@ -599,7 +598,7 @@ Returncode St_analyze(St* self) {
     if (!(NULL != son)) break;
     glob->line_num = son->line_num;
     glob->node = son;
-    CHECK(368, (*((Func**)(son)))[2](son));
+    CHECK(366, (*((Func**)(son)))[2](son));
     son = son->next_brother;
   }
   glob->node = self;
@@ -617,14 +616,14 @@ static char* _func_name_St_add_var = "St.add-var";
 #define MR_FUNC_NAME _func_name_St_add_var
 Returncode St_add_var(St* self, Mvar* mvar) {
   if (NULL != glob->mclass) {
-    CHECK(378, add_var(glob->mclass->members, mvar));
+    CHECK(375, add_var(glob->mclass->members, mvar));
   }
   else {
     if (NULL != self->father && NULL != self->father->sons_var_map) {
-      CHECK(380, add_var(self->father->sons_var_map, mvar));
+      CHECK(377, add_var(self->father->sons_var_map, mvar));
     }
     else {
-      CHECK(382, add_var(glob->var_map, mvar));
+      CHECK(379, add_var(glob->var_map, mvar));
     }
   }
   return OK;
@@ -634,16 +633,16 @@ static char* _func_name_St_m_find_var = "St.m-find-var";
 #define MR_FUNC_NAME _func_name_St_m_find_var
 Returncode St_m_find_var(St* self, String* name, Mvar** mvar) {
   if (NULL != self->var_map) {
-    CHECK(386, Var_map_find(self->var_map, name, &((*mvar))));
+    CHECK(383, Var_map_find(self->var_map, name, &((*mvar))));
     if (NULL != (*mvar)) {
       return OK;
     }
   }
   if (NULL != self->father) {
-    CHECK(390, St_m_find_var(self->father, name, &((*mvar))));
+    CHECK(387, St_m_find_var(self->father, name, &((*mvar))));
   }
   else {
-    CHECK(392, Var_map_find(glob->var_map, name, &((*mvar))));
+    CHECK(389, Var_map_find(glob->var_map, name, &((*mvar))));
   }
   return OK;
 }
@@ -653,7 +652,7 @@ Func St__dtl[] = {St_parse, St_analyze_first, St_analyze, St_write};
 static char* _func_name_f_find_var = "f-find-var";
 #define MR_FUNC_NAME _func_name_f_find_var
 Returncode f_find_var(String* name, Mvar** mvar) {
-  CHECK(395, St_m_find_var(glob->node, name, &((*mvar))));
+  CHECK(392, St_m_find_var(glob->node, name, &((*mvar))));
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -112,14 +112,17 @@ class St-mock(St-func)
 
 
 class St-debug(St)
-  func dynamic parse()
+  func inst m-swich-debug()
     glob.debug := not glob.debug
+  
+  func dynamic parse()
+    self.m-swich-debug()
   
   func dynamic analyze-first()
-    glob.debug := not glob.debug
+    self.m-swich-debug()
   
   func dynamic analyze()
-    glob.debug := not glob.debug
+    self.m-swich-debug()
   
   func dynamic write()
-    glob.debug := not glob.debug
+    self.m-swich-debug()
