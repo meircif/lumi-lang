@@ -303,6 +303,17 @@ func f-find-type(user String typename):(user Mtype mtype)
   f-syntax-error(user "unknown type", user typename)
 
 
+func f-new-temp-name(user Mtype mtype):(owner String new-name)
+  var String{64} res-count
+  glob.res-count.str():(var res-count)
+  glob.res-count := glob.res-count + 1
+  new String{mtype.name.length + res-count.length + 2} name
+  name.append(copy '-')
+  name.concat(user mtype.name)
+  name.concat(user res-count)
+  new-name := name
+
+
 # basic syntax tree node
 
 class St(Object)

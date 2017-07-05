@@ -4,6 +4,8 @@ class St-dec(St)
   user Mvar mvar
   owner Mexp value
   var Bool is-in
+  owner String temp-name
+  var Int base-count
   
   func dynamic parse()
     init-new-var(user _):(owner self.mvar)
@@ -26,6 +28,8 @@ class St-dec(St)
       parse-new-exp(user ")"):(owner self.value)
       read-c()
     self.is-in := end = ' '
+    self.temp-name := _
+    self.base-count := 0
     if self.is-in
       if not self.mvar.name.equal(user "in")
         f-syntax-error(user "expected 'in', got", user self.mvar.name)
@@ -38,26 +42,42 @@ class St-dec(St)
   
   func dynamic analyze()
     if ? self.value
-      self.value.analyze-types(user self.mvar.mtype, user self.mvar.sub-mtype)
+      if self.is-in
+        user Mtype mtype(_)
+        user Mtype sub-mtype(self.mvar.sub-mtype)
+        self.value.analyze():(user mtype, user sub-mtype)
+        user Mtype new-mtype(self.mvar.mtype)
+        if not (? mtype)
+          f-syntax-error(user "illegal varibale to assign", user "new")
+        do
+          while new-mtype != mtype
+          new-mtype := new-mtype.base-mtype
+          if not (? new-mtype)
+            f-syntax-error2(user "cannot assign", user self.mvar.mtype.name, user "in", user mtype.name)
+          self.base-count := self.base-count + 1
+        if self.base-count > 0
+          f-new-temp-name(user self.mvar.mtype):(owner self.temp-name)
+      else
+        self.value.analyze-types(user self.mvar.mtype, user self.mvar.sub-mtype)
   
   func inst m-is-global():(copy Bool is-global)
     is-global := not (? self.father.father.father)
   
   func inst write-name()
-    if self.is-in
+    if ? self.temp-name
+      write-cstyle(user self.temp-name)
+    else-if self.is-in
       self.value.write-final()
     else
       write-cstyle(user self.mvar.name)
   
   func inst write-dec()
-    if self.is-in
-      self.value.write-final()
-    else
+    if not self.is-in or ? self.temp-name
       write-cstyle(user self.mvar.mtype.name)
       if not self.mvar.mtype.is-primitive
         write(user "*")
       write(user " ")
-      write-cstyle(user self.mvar.name)
+    self.write-name()
   
   func inst write-to-dtl()
     # name->[_base.]_dtl = 
@@ -116,6 +136,15 @@ class St-dec(St)
           self.write-to-dtl()
           write-cstyle(user self.mvar.mtype.name)
           write(user "__dtl;")
+      if ? self.temp-name
+        write-new-indent-line()
+        self.value.write-final()
+        write(user " = &(")
+        self.write-name()
+        write(user "->_base")
+        for i in self.base-count - 1
+          write(user "._base")
+        write(user ");")
     else
       if not (? glob.mclass)
           write(user " = ")

@@ -110,34 +110,26 @@ Returncode Call_operand_analyze_args(Call_operand* self, Mfunc* mfunc, Bool is_m
   }
   self->res_mtype = (*mtype);
   if (fill_out) {
-    String* res_count = &(String){64, 0, (char[64]){0}};
-    CHECK(86, Int_str(glob->res_count, res_count));
-    glob->res_count = glob->res_count + 1;
-    String* res_name = new_string(self->res_mtype->name->length + res_count->length + 2);
-    if (res_name == NULL) RAISE(88)
-    self->res_name = res_name;
-    CHECK(90, String_append(self->res_name, '-'));
-    CHECK(91, String_concat(self->res_name, self->res_mtype->name));
-    CHECK(92, String_concat(self->res_name, res_count));
+    CHECK(85, f_new_temp_name(self->res_mtype, &(self->res_name)));
     Var_operand* var_opr = malloc(sizeof(Var_operand));
-    if (var_opr == NULL) RAISE(93)
+    if (var_opr == NULL) RAISE(86)
     *((Func**)(var_opr)) = Var_operand__dtl;
-    CHECK(94, f_new_copy(self->res_name, &(var_opr->name)));
-    CHECK(95, init_new_var((*mtype), &(var_opr->mvar)));
-    CHECK(96, f_new_copy(self->res_name, &(var_opr->mvar->name)));
+    CHECK(87, f_new_copy(self->res_name, &(var_opr->name)));
+    CHECK(88, init_new_var((*mtype), &(var_opr->mvar)));
+    CHECK(89, f_new_copy(self->res_name, &(var_opr->mvar->name)));
     if (NULL != (*sub_mtype)) {
-      CHECK(98, f_new_copy((*sub_mtype)->name, &(var_opr->mvar->sub_typename)));
+      CHECK(91, f_new_copy((*sub_mtype)->name, &(var_opr->mvar->sub_typename)));
     }
     var_opr->mvar->sub_mtype = (*sub_mtype);
     var_opr->mvar->func_dec = dec_res->mvar->func_dec;
     var_opr->mvar->access = dec_res->mvar->access;
     var_opr->_base.next = NULL;
     Mexp* exp = malloc(sizeof(Mexp));
-    if (exp == NULL) RAISE(103)
-    CHECK(104, Mexp_init(exp));
+    if (exp == NULL) RAISE(96)
+    CHECK(97, Mexp_init(exp));
     exp->operand = &(var_opr->_base);
     Call_arg* arg = malloc(sizeof(Call_arg));
-    if (arg == NULL) RAISE(106)
+    if (arg == NULL) RAISE(99)
     *((Func**)(arg)) = Call_arg__dtl;
     arg->access = dec_res->mvar->access;
     arg->generic_mtype = generic_mtype;
@@ -151,7 +143,7 @@ Returncode Call_operand_analyze_args(Call_operand* self, Mfunc* mfunc, Bool is_m
     }
   }
   else {
-    CHECK(116, (*((Func**)(call_out)))[5](call_out, &(self->res_exp)));
+    CHECK(109, (*((Func**)(call_out)))[5](call_out, &(self->res_exp)));
   }
   return OK;
 }
@@ -164,10 +156,10 @@ Returncode Call_operand_analyze_func_pointer(Call_operand* self, Mtype** mtype, 
   while (true) {
     if (!(NULL != arg)) break;
     Mexp* exp;
-    CHECK(124, (*((Func**)(arg)))[5](arg, &(exp)));
+    CHECK(117, (*((Func**)(arg)))[5](arg, &(exp)));
     Mtype* param_mtype = NULL;
     Mtype* param_sub_mtype = NULL;
-    CHECK(127, Mexp_analyze(exp, &(param_mtype), &(param_sub_mtype)));
+    CHECK(120, Mexp_analyze(exp, &(param_mtype), &(param_sub_mtype)));
   }
   arg = self->args->first_out;
   (*mtype) = NULL;
@@ -175,10 +167,10 @@ Returncode Call_operand_analyze_func_pointer(Call_operand* self, Mtype** mtype, 
   while (true) {
     if (!(NULL != arg)) break;
     Mexp* exp;
-    CHECK(134, (*((Func**)(arg)))[5](arg, &(exp)));
+    CHECK(127, (*((Func**)(arg)))[5](arg, &(exp)));
     (*mtype) = NULL;
     (*sub_mtype) = NULL;
-    CHECK(137, Mexp_analyze(exp, &((*mtype)), &((*sub_mtype))));
+    CHECK(130, Mexp_analyze(exp, &((*mtype)), &((*sub_mtype))));
   }
   return OK;
 }
@@ -205,11 +197,11 @@ Returncode Call_operand_analyze(Call_operand* self, Mexp* exp, Operand* member, 
       method->base_count = 0;
     }
     Mexp* new_exp = malloc(sizeof(Mexp));
-    if (new_exp == NULL) RAISE(156)
-    CHECK(157, Mexp_init(new_exp));
+    if (new_exp == NULL) RAISE(149)
+    CHECK(150, Mexp_init(new_exp));
     new_exp->operand = exp->operand;
     new_exp->base_count = method->base_count;
-    CHECK(160, Arg_list_add_self_call(self->args, new_exp));
+    CHECK(153, Arg_list_add_self_call(self->args, new_exp));
   }
   else {
     self->func_opr = exp->operand;
@@ -217,14 +209,14 @@ Returncode Call_operand_analyze(Call_operand* self, Mexp* exp, Operand* member, 
   exp->operand = &(self->_base);
   
   if (NULL != method && NULL != method->mvar->func_dec) {
-    CHECK(166, Call_operand_analyze_args(self, method->mvar->func_dec, is_method, &((*mtype)), &((*sub_mtype))));
+    CHECK(159, Call_operand_analyze_args(self, method->mvar->func_dec, is_method, &((*mtype)), &((*sub_mtype))));
   }
   else {
-    CHECK(168, Call_operand_analyze_func_pointer(self, &((*mtype)), &((*sub_mtype))));
+    CHECK(161, Call_operand_analyze_func_pointer(self, &((*mtype)), &((*sub_mtype))));
   }
   
   if (NULL != self->_base.next) {
-    CHECK(171, (*((Func**)(self->_base.next)))[1](self->_base.next, exp, &(self->_base), NULL, &((*mtype)), &((*sub_mtype))));
+    CHECK(164, (*((Func**)(self->_base.next)))[1](self->_base.next, exp, &(self->_base), NULL, &((*mtype)), &((*sub_mtype))));
   }
   return OK;
 }
@@ -232,50 +224,50 @@ Returncode Call_operand_analyze(Call_operand* self, Mexp* exp, Operand* member, 
 static char* _func_name_Call_operand_write_call = "Call-operand.write-call";
 #define MR_FUNC_NAME _func_name_Call_operand_write_call
 Returncode Call_operand_write_call(Call_operand* self) {
-  CHECK(174, write_tb_check());
+  CHECK(167, write_tb_check());
   if (NULL != self->dynamic_opr) {
     /* (opr)->[_base.]_dtl[index] */
-    CHECK(177, write(&(String){2, 1, "("}));
-    CHECK(178, Operand_write_all_final(self->dynamic_opr));
-    CHECK(179, write(&(String){4, 3, ")->"}));
+    CHECK(170, write(&(String){2, 1, "("}));
+    CHECK(171, Operand_write_all_final(self->dynamic_opr));
+    CHECK(172, write(&(String){4, 3, ")->"}));
     Int n; for (n = 0; n < self->dynamic_base_count; ++n) {
-      CHECK(181, write(&(String){7, 6, "_base."}));
+      CHECK(174, write(&(String){7, 6, "_base."}));
     }
-    CHECK(182, write(&(String){6, 5, "_dtl["}));
-    CHECK(183, write_int(self->dynamic_index));
-    CHECK(184, write(&(String){2, 1, "]"}));
+    CHECK(175, write(&(String){6, 5, "_dtl["}));
+    CHECK(176, write_int(self->dynamic_index));
+    CHECK(177, write(&(String){2, 1, "]"}));
   }
   else {
-    CHECK(186, Operand_write_all_final(self->func_opr));
+    CHECK(179, Operand_write_all_final(self->func_opr));
   }
-  CHECK(187, Arg_list_write_final(self->args));
-  CHECK(188, write(&(String){3, 2, " )"}));
+  CHECK(180, Arg_list_write_final(self->args));
+  CHECK(181, write(&(String){3, 2, " )"}));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_Call_operand_write_intro = "Call-operand.write-intro";
 #define MR_FUNC_NAME _func_name_Call_operand_write_intro
 Returncode Call_operand_write_intro(Call_operand* self) {
-  CHECK(191, Operand_write_all_intro(self->func_opr));
-  CHECK(192, Arg_list_write_intro(self->args));
+  CHECK(184, Operand_write_all_intro(self->func_opr));
+  CHECK(185, Arg_list_write_intro(self->args));
   if (NULL != self->res_exp) {
-    CHECK(194, Mexp_write_intro(self->res_exp));
+    CHECK(187, Mexp_write_intro(self->res_exp));
   }
   else {
     if (NULL != self->res_name) {
-      CHECK(196, write_cstyle(self->res_mtype->name));
+      CHECK(189, write_cstyle(self->res_mtype->name));
       if (!self->res_mtype->is_primitive) {
-        CHECK(198, write(&(String){2, 1, "*"}));
+        CHECK(191, write(&(String){2, 1, "*"}));
       }
-      CHECK(199, write(&(String){2, 1, " "}));
-      CHECK(200, write_cstyle(self->res_name));
-      CHECK(201, write(&(String){3, 2, ";\n"}));
-      CHECK(202, write_spaces());
+      CHECK(192, write(&(String){2, 1, " "}));
+      CHECK(193, write_cstyle(self->res_name));
+      CHECK(194, write(&(String){3, 2, ";\n"}));
+      CHECK(195, write_spaces());
     }
   }
   if (self->is_used) {
-    CHECK(204, Call_operand_write_call(self));
-    CHECK(205, write_new_indent_line());
+    CHECK(197, Call_operand_write_call(self));
+    CHECK(198, write_new_indent_line());
   }
   return OK;
 }
@@ -285,16 +277,16 @@ static char* _func_name_Call_operand_write_final = "Call-operand.write-final";
 Returncode Call_operand_write_final(Call_operand* self) {
   if (self->is_used) {
     if (NULL != self->res_exp) {
-      CHECK(210, Mexp_write_final(self->res_exp));
+      CHECK(203, Mexp_write_final(self->res_exp));
     }
     else {
       if (NULL != self->res_name) {
-        CHECK(212, write_cstyle(self->res_name));
+        CHECK(205, write_cstyle(self->res_name));
       }
     }
   }
   else {
-    CHECK(214, Call_operand_write_call(self));
+    CHECK(207, Call_operand_write_call(self));
   }
   return OK;
 }

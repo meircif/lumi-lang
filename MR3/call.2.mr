@@ -82,14 +82,7 @@ class Call-operand(Operand)
       sub-mtype := dec-res.mvar.sub-mtype
     self.res-mtype := mtype
     if fill-out
-      var String{64} res-count
-      glob.res-count.str():(var res-count)
-      glob.res-count := glob.res-count + 1
-      new String{self.res-mtype.name.length + res-count.length + 2} res-name
-      self.res-name := res-name
-      self.res-name.append(copy '-')
-      self.res-name.concat(user self.res-mtype.name)
-      self.res-name.concat(user res-count)
+      f-new-temp-name(user self.res-mtype):(owner self.res-name)
       new Var-operand var-opr
       f-new-copy(user self.res-name):(owner var-opr.name)
       init-new-var(user mtype):(owner var-opr.mvar)
