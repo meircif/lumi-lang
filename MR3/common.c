@@ -40,7 +40,7 @@ Returncode f_msg_raise(String* text, String* item) {
 static char* _func_name_f_raise_on_null = "f-raise-on-null";
 #define MR_FUNC_NAME _func_name_f_raise_on_null
 Returncode f_raise_on_null(Object* obj, String* text, String* item) {
-  if (obj == NULL) {
+  if (!(NULL != obj)) {
     CHECK(29, f_msg_raise(text, item));
   }
   return OK;

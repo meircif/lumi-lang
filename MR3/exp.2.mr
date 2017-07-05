@@ -35,6 +35,25 @@ func read-new-value(user String ends):(owner String out-text, copy Char end)
 
 native func parse-new-operands(owner String text, user String ends):(owner Operand new-opr, copy Char end)
 
+func f-is-bool-op(user String operator):(copy Bool is)
+  if not (? operator)
+    is := false
+    return
+  is := true
+  if operator.equal(user "<")
+    return
+  if operator.equal(user ">")
+    return
+  if operator.equal(user "<=")
+    return
+  if operator.equal(user ">=")
+    return
+  if operator.equal(user "=")
+    return
+  if operator.equal(user "!=")
+    return
+  is := false
+
 static Mexp(Object)
   owner Operand operand
   owner String operator
@@ -60,14 +79,14 @@ static Mexp(Object)
   func inst parse-new(user String ends):(owner Mexp new-exp, copy Char end)
     owner String text
     read-new-value(user ends):(owner text, copy end)
-    self.parse-new-with-text(user text, user ends):(owner new-exp, copy end)
+    self.parse-new-with-text(owner text, user ends):(owner new-exp, copy end)
   
   func inst parse-new-with-kw(user String ends):(owner Mexp new-exp, copy Char end)
     if ? glob.key-word
       owner String text
       f-new-copy(user glob.key-word.text):(owner text)
       end := glob.key-word.end
-      self.parse-new-with-text(user text, user ends):(owner new-exp, copy end)
+      self.parse-new-with-text(owner text, user ends):(owner new-exp, copy end)
     else
       self.parse-new(user ends):(owner new-exp, copy end)
   
@@ -80,7 +99,7 @@ static Mexp(Object)
       
       if end = ' ' and ? glob.op-map.find(user text)
         self.operand := _
-        self.parse-new-with-text(user text, user ends):(owner self.next, copy end)
+        self.parse-new-with-text(owner text, user ends):(owner self.next, copy end)
         return
     
     parse-new-operands(owner text, user ends):(owner self.operand, copy end)
@@ -121,8 +140,19 @@ static Mexp(Object)
             f-syntax-error(user "? on primitive type", user mtype.name)
           mtype := glob.type-bool
           sub-mtype := _
+      user Mtype next-mtype(mtype)
+      user Mtype next-sub-mtype(sub-mtype)
+      if ? self.next
+        if f-is-bool-op(user self.next.operator)
+          mtype := glob.type-bool
+          sub-mtype := _
       self.f-count-bases(user target-mtype):(user mtype, copy self.base-count)
       self.f-count-bases(user target-sub-mtype):(user sub-mtype)
+      mtype := next-mtype
+      sub-mtype := next-sub-mtype
+      if f-is-bool-op(user self.operator)
+        mtype := glob.type-bool
+        sub-mtype := _
     
     if ? self.next
       self.next.analyze():(user mtype, user sub-mtype)
@@ -130,20 +160,10 @@ static Mexp(Object)
   func inst analyze-get-subtype(user Mtype target-mtype):(user Mtype sub-mtype)
     user Mtype mtype(target-mtype)
     self.analyze():(user mtype, user sub-mtype)
-    if ? target-mtype
-      if not (? mtype)
-        f-syntax-error(user "got no value, expected", user target-mtype.name)
-      if mtype != target-mtype
-        f-syntax-error2(user "got", user mtype.name, user "expected", user target-mtype.name)
   
   func inst analyze-types(user Mtype target-mtype, user Mtype target-sub-mtype)
     user Mtype sub-mtype(target-sub-mtype)
     self.analyze-get-subtype(user target-mtype):(user sub-mtype)
-    if ? target-sub-mtype
-      if not (? sub-mtype)
-        f-syntax-error(user "got no sub-type, expected", user target-sub-mtype.name)
-      if sub-mtype != target-sub-mtype
-        f-syntax-error2(user "got sub-type", user sub-mtype.name, user "expected", user target-sub-mtype.name)
   
   func inst analyze-type(user Mtype target-mtype)
     self.analyze-types(user target-mtype, user _)

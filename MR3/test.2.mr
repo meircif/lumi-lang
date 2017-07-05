@@ -109,3 +109,17 @@ class St-mock(St-func)
   
   func dynamic m-register()
     # nothing
+
+
+class St-debug(St)
+  func dynamic parse()
+    glob.debug := not glob.debug
+  
+  func dynamic analyze-first()
+    glob.debug := not glob.debug
+  
+  func dynamic analyze()
+    glob.debug := not glob.debug
+  
+  func dynamic write()
+    glob.debug := not glob.debug

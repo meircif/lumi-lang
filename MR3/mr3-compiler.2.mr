@@ -7,7 +7,7 @@ func add-kwn(copy Int index, user String key, copy Type{St} node-type)
   item.node-type := node-type
 
 func f-create-key-word-map()
-  new Array{25:Node-map-item} key-word-map
+  new Array{26:Node-map-item} key-word-map
   glob.key-word-map := key-word-map
   add-kwn(copy 0, user "#", copy St-comment)
   add-kwn(copy 1, user "func", copy St-func)
@@ -34,6 +34,7 @@ func f-create-key-word-map()
   add-kwn(copy 22, user "assert-error", copy St-assert-error)
   add-kwn(copy 23, user "test", copy St-test)
   add-kwn(copy 24, user "mock", copy St-mock)
+  add-kwn(copy 25, user "debug", copy St-debug)
 
 
 func add-global-func(user Mtype mtype, user String name):(owner Mfunc new-meth)
@@ -72,6 +73,9 @@ func f-create-global-var-map()
   # Bool
   add-glob-var(user glob.type-bool, user "true")
   add-glob-var(user glob.type-bool, user "false")
+  
+  # Char
+  add-glob-var(user glob.type-char, user "EOF")
   
   # String
   add-member(user glob.type-string, user "length", user glob.type-int)
@@ -177,7 +181,7 @@ func init-global-data()
 
 
 main func(user Array{String} argv)
-  sys.print(user "MR compiler start")
+  sys.print(user "MR3 compiler start")
   
   if argv.length < 2
     sys.print(user "usage: mr3-compiler [input MR files]...")
@@ -191,4 +195,4 @@ main func(user Array{String} argv)
   root.analyze()
   root.write()
   
-  sys.print(user "MR compiler end")
+  sys.print(user "MR3 compiler end")

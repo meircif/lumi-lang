@@ -221,12 +221,12 @@ Returncode St_for_parse(St_for* self) {
   if (_Char3 == ':') {
     self->start = self->end;
     Char _Char4;
-    CHECK(110, parse_new_exp(&(String){2, 1, " "}, &(self->end), &(_Char4)));
+    CHECK(110, parse_new_exp(&(String){1, 0, ""}, &(self->end), &(_Char4)));
   }
-  CHECK(111, f_copy_new_var_map(NULL, &(self->_base._base.sons_var_map)));
   Mvar* mvar;
-  CHECK(113, init_new_var(glob->type_int, &(mvar)));
-  CHECK(114, f_new_copy(self->index_name, &(mvar->name)));
+  CHECK(112, init_new_var(glob->type_int, &(mvar)));
+  CHECK(113, f_new_copy(self->index_name, &(mvar->name)));
+  CHECK(114, f_copy_new_var_map(self->_base._base.var_map, &(self->_base._base.sons_var_map)));
   CHECK(115, add_var(self->_base._base.sons_var_map, mvar));
   CHECK(116, St_node_parse(&(self->_base)));
   return OK;

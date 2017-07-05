@@ -25,5 +25,5 @@ func f-msg-raise(user String text, user String item)
   raise
 
 func f-raise-on-null(user Object obj, user String text, user String item)
-  if obj = NULL
+  if not (? obj)
     f-msg-raise(user text, user item)

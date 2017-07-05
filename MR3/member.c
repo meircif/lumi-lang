@@ -134,7 +134,7 @@ Returncode Member_operand_analyze(Member_operand* self, Mexp* exp, Operand* memb
   self->prev_mtype = (*mtype);
   Mtype* prev_sub_mtype = (*sub_mtype);
   Mtype* basetype = (*mtype)->base_mtype;
-  if ((*mtype)->generic_mtype == self->_base.mvar->mtype) {
+  if (NULL != (*mtype)->generic_mtype && (*mtype)->generic_mtype == self->_base.mvar->mtype) {
     (*mtype) = (*sub_mtype);
     (*sub_mtype) = NULL;
     if ((NULL != exp->operator || NULL != self->_base._base.next) && (*mtype) != self->_base.mvar->mtype) {
@@ -152,7 +152,7 @@ Returncode Member_operand_analyze(Member_operand* self, Mexp* exp, Operand* memb
     }
   }
   else {
-    if ((*mtype)->generic_mtype == self->_base.mvar->sub_mtype) {
+    if (NULL != (*mtype)->generic_mtype && (*mtype)->generic_mtype == self->_base.mvar->sub_mtype) {
       (*mtype) = self->_base.mvar->mtype;
       /* sub-mtype is the same */
     }

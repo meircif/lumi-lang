@@ -770,15 +770,13 @@ Func St_new__dtl[] = {St_new_parse, St_new_analyze_first, St_new_analyze, St_new
 
 typedef struct St_delete St_delete; struct St_delete {
   St _base;
-  String* name;
-  Mvar* mvar;
+  Mexp* mexp;
 };
 static char* _func_name_St_delete_parse = "St-delete.parse";
 #define MR_FUNC_NAME _func_name_St_delete_parse
 Returncode St_delete_parse(St_delete* self) {
   Char _Char21;
-  CHECK(431, read_new(&(String){1, 0, ""}, &(self->name), &(_Char21)));
-  self->mvar = NULL;
+  CHECK(430, parse_new_exp(&(String){1, 0, ""}, &(self->mexp), &(_Char21)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -792,9 +790,14 @@ Returncode St_delete_analyze_first(St_delete* self) {
 static char* _func_name_St_delete_analyze = "St-delete.analyze";
 #define MR_FUNC_NAME _func_name_St_delete_analyze
 Returncode St_delete_analyze(St_delete* self) {
-  CHECK(438, St_m_find_var(&(self->_base), self->name, &(self->mvar)))
-  if (!(NULL != self->mvar)) {
-    CHECK(439, f_syntax_error(&(String){16, 15, "unknow variable"}, self->name));
+  Mtype* mtype = NULL;
+  Mtype* sub_mtype = NULL;
+  CHECK(438, Mexp_analyze(self->mexp, &(mtype), &(sub_mtype)));
+  if (!(NULL != mtype)) {
+    CHECK(440, f_syntax_error(&(String){29, 28, "illegal expression given for"}, &(String){7, 6, "delete"}));
+  }
+  if (mtype->is_primitive) {
+    CHECK(442, f_syntax_error(&(String){19, 18, "cannot delete type"}, mtype->name));
   }
   return OK;
 }
@@ -802,9 +805,10 @@ Returncode St_delete_analyze(St_delete* self) {
 static char* _func_name_St_delete_write = "St-delete.write";
 #define MR_FUNC_NAME _func_name_St_delete_write
 Returncode St_delete_write(St_delete* self) {
-  CHECK(442, write(&(String){6, 5, "free("}));
-  CHECK(443, write_cstyle(self->name));
-  CHECK(444, write(&(String){3, 2, ");"}));
+  CHECK(445, Mexp_write_intro(self->mexp));
+  CHECK(446, write(&(String){6, 5, "free("}));
+  CHECK(447, Mexp_write_final(self->mexp));
+  CHECK(448, write(&(String){3, 2, ");"}));
   return OK;
 }
 #undef MR_FUNC_NAME

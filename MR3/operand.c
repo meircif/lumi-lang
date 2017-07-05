@@ -450,6 +450,11 @@ Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Cha
   else {
     if ((0) < 0 || (0) >= text->length) RAISE(263)
     Char first = text->chars[0];
+    Char second = '\0';
+    if (text->length > 1) {
+      if ((1) < 0 || (1) >= text->length) RAISE(266)
+      second = text->chars[1];
+    }
     if (first == '\'') {
       opr_type = (Type){sizeof(Char_operand), Char_operand__dtl};
     }
@@ -462,7 +467,7 @@ Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Cha
           opr_type = (Type){sizeof(Int_operand), Int_operand__dtl};
         }
         else {
-          if (first >= 'A' && first <= 'Z') {
+          if (first >= 'A' && first <= 'Z' && second >= 'a' && second <= 'z') {
             opr_type = (Type){sizeof(Type_operand), Type_operand__dtl};
           }
           else {
@@ -471,7 +476,7 @@ Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Cha
             }
             else {
               Bool _Bool0;
-              CHECK(274, String_equal(text, &(String){5, 4, "base"}, &(_Bool0)))
+              CHECK(277, String_equal(text, &(String){5, 4, "base"}, &(_Bool0)))
               if (_Bool0) {
                 opr_type = (Type){sizeof(Base_meth_operand), Base_meth_operand__dtl};
               }
@@ -484,7 +489,7 @@ Returncode parse_new_operands(String* text, String* ends, Operand** new_opr, Cha
       }
     }
   }
-  CHECK(278, parse_new_operand(opr_type, text, ends, &((*new_opr)), &((*end))));
+  CHECK(281, parse_new_operand(opr_type, text, ends, &((*new_opr)), &((*end))));
   return OK;
 }
 #undef MR_FUNC_NAME

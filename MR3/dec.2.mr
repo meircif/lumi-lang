@@ -424,21 +424,25 @@ class St-new(St-dec)
 
 
 class St-delete(St)
-  owner String name
-  user Mvar mvar
+  user Mexp mexp
   
   func dynamic parse()
-    read-new(user ""):(owner self.name)
-    self.mvar := _
+    parse-new-exp(user ""):(owner self.mexp)
   
   func dynamic analyze-first()
     # nothing
   
   func dynamic analyze()
-    if not (? self.m-find-var(user self.name):(user self.mvar))
-      f-syntax-error(user "unknow variable", user self.name)
+    user Mtype mtype(_)
+    user Mtype sub-mtype(_)
+    self.mexp.analyze():(user mtype, user sub-mtype)
+    if not (? mtype)
+      f-syntax-error(user "illegal expression given for", user "delete")
+    if mtype.is-primitive
+      f-syntax-error(user "cannot delete type", user mtype.name)
   
   func dynamic write()
+    self.mexp.write-intro()
     write(user "free(")
-    write-cstyle(user self.name)
+    self.mexp.write-final()
     write(user ");")

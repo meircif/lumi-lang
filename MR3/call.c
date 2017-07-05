@@ -62,7 +62,7 @@ Returncode Call_operand_analyze_args(Call_operand* self, Mfunc* mfunc, Bool is_m
     if (self->is_used) {
       CHECK(48, f_syntax_error(&(String){20, 19, "no return value for"}, mfunc->name));
     }
-    if (call_out) {
+    if (NULL != call_out) {
       CHECK(50, f_syntax_error(&(String){21, 20, "too many outputs for"}, mfunc->name));
     }
     (*mtype) = NULL;
@@ -288,7 +288,7 @@ Returncode Call_operand_write_final(Call_operand* self) {
       CHECK(210, Mexp_write_final(self->res_exp));
     }
     else {
-      if (self->res_name) {
+      if (NULL != self->res_name) {
         CHECK(212, write_cstyle(self->res_name));
       }
     }

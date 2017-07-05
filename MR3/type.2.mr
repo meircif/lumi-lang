@@ -19,10 +19,10 @@ func analyze-type(user Mtype self, copy Bool is-dynamic)
         if ? mvar
           if not (? mvar.func-dec)
             f-syntax-error2(user "non-function override of", user name, user "in type", user self.name)
-          self.dynamic-members.add(user name, user mvar)
+          self.dynamic-members.add(user name, owner mvar)
           mvar.func-dec.dynamic-index := dynamic-count
         else
-          self.dynamic-members.add(user name, user iter.get-var())
+          self.dynamic-members.add(user name, owner iter.get-var())
         dynamic-count := dynamic-count + 1
         iter.m-next()
     iter.init(user self.members)
@@ -31,7 +31,7 @@ func analyze-type(user Mtype self, copy Bool is-dynamic)
       iter.get-name():(user name)
       iter.get-var():(user mvar)
       if ? mvar.func-dec and mvar.func-dec.is-dynamic and not (? self.dynamic-members.find(user name))
-        self.dynamic-members.add(user name, user mvar)
+        self.dynamic-members.add(user name, owner mvar)
         mvar.func-dec.dynamic-index := dynamic-count
         dynamic-count := dynamic-count + 1
       iter.m-next()
@@ -45,7 +45,7 @@ class St-class(St-node)
     var String{128} name
     var Char end
     read(user "({", user name):(copy end)
-    glob.type-map.add(user name):(owner self.mtype)
+    glob.type-map.add(user name):(user self.mtype)
     if end = '{'
       new Mtype generic-mtype
       generic-mtype.init(owner f-new-copy(user "void"))

@@ -107,12 +107,12 @@ class St-for(St-node)
     self.start := _
     if parse-new-exp(user ":"):(owner self.end) = ':'
       self.start := self.end
-      parse-new-exp(user " "):(owner self.end)
-    f-copy-new-var-map(user _):(owner self.sons-var-map)
+      parse-new-exp(user ""):(owner self.end)
     owner Mvar mvar
     init-new-var(user glob.type-int):(owner mvar)
     f-new-copy(user self.index-name):(owner mvar.name)
-    add-var(user self.sons-var-map, user mvar)
+    f-copy-new-var-map(user self.var-map):(owner self.sons-var-map)
+    add-var(user self.sons-var-map, owner mvar)
     base.parse()
   
   func dynamic analyze-first()

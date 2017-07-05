@@ -37,7 +37,7 @@ static Mfunc(Object)
     self.args.analyze()
   
   func inst write-name()
-    if self.mclass
+    if ? self.mclass
       write-cstyle(user self.mclass.name)
       write(user "_")
     write-cstyle(user self.name)
@@ -68,7 +68,7 @@ class St-func(St-node)
       user Dec-arg dec-arg
       arg.get-dec():(user dec-arg)
       while ? dec-arg
-      add-var(user self.sons-var-map, user dec-arg.mvar)
+      add-var(user self.sons-var-map, owner dec-arg.mvar)
       arg := arg.next
   
   func dynamic parse()
@@ -77,16 +77,22 @@ class St-func(St-node)
     f-copy-new-var-map(user _):(owner self.sons-var-map)
     self.add-args-vars(user self.mfunc.args.first-param)
     self.add-args-vars(user self.mfunc.args.first-out)
+    glob.mclass := _
     base.parse()
+    glob.mclass := self.mfunc.mclass
   
   func dynamic analyze-first()
     self.mfunc.analyze()
+    glob.mclass := _
     base.analyze-first()
+    glob.mclass := self.mfunc.mclass
   
   func dynamic analyze()
     new St-return st-return
     st-return.init(user self)
+    glob.mclass := _
     base.analyze()
+    glob.mclass := self.mfunc.mclass
   
   func dynamic write()
     if ? glob.mclass
@@ -116,10 +122,9 @@ class St-func(St-node)
     self.mfunc.write-name()
     write-new-indent-line()
     self.mfunc.write()
-    user Mtype mclass(glob.mclass)
     glob.mclass := _
     base.write()
-    glob.mclass := mclass
+    glob.mclass := self.mfunc.mclass
     write-new-indent-line()
     write(user "#undef MR_FUNC_NAME\n")
     write-spaces()

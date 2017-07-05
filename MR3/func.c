@@ -61,7 +61,7 @@ Returncode Mfunc_analyze(Mfunc* self) {
 static char* _func_name_Mfunc_write_name = "Mfunc.write-name";
 #define MR_FUNC_NAME _func_name_Mfunc_write_name
 Returncode Mfunc_write_name(Mfunc* self) {
-  if (self->mclass) {
+  if (NULL != self->mclass) {
     CHECK(41, write_cstyle(self->mclass->name));
     CHECK(42, write(&(String){2, 1, "_"}));
   }
@@ -127,15 +127,19 @@ Returncode St_func_parse(St_func* self) {
   CHECK(77, f_copy_new_var_map(NULL, &(self->_base._base.sons_var_map)));
   CHECK(78, St_func_add_args_vars(self, self->mfunc->args->first_param));
   CHECK(79, St_func_add_args_vars(self, self->mfunc->args->first_out));
-  CHECK(80, St_node_parse(&(self->_base)));
+  glob->mclass = NULL;
+  CHECK(81, St_node_parse(&(self->_base)));
+  glob->mclass = self->mfunc->mclass;
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_func_analyze_first = "St-func.analyze-first";
 #define MR_FUNC_NAME _func_name_St_func_analyze_first
 Returncode St_func_analyze_first(St_func* self) {
-  CHECK(83, Mfunc_analyze(self->mfunc));
-  CHECK(84, St_node_analyze_first(&(self->_base)));
+  CHECK(85, Mfunc_analyze(self->mfunc));
+  glob->mclass = NULL;
+  CHECK(87, St_node_analyze_first(&(self->_base)));
+  glob->mclass = self->mfunc->mclass;
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -143,10 +147,12 @@ static char* _func_name_St_func_analyze = "St-func.analyze";
 #define MR_FUNC_NAME _func_name_St_func_analyze
 Returncode St_func_analyze(St_func* self) {
   St_return* st_return = malloc(sizeof(St_return));
-  if (st_return == NULL) RAISE(87)
+  if (st_return == NULL) RAISE(91)
   *((Func**)(st_return)) = St_return__dtl;
-  CHECK(88, St_init(&(st_return->_base), &(self->_base._base)));
-  CHECK(89, St_node_analyze(&(self->_base)));
+  CHECK(92, St_init(&(st_return->_base), &(self->_base._base)));
+  glob->mclass = NULL;
+  CHECK(94, St_node_analyze(&(self->_base)));
+  glob->mclass = self->mfunc->mclass;
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -157,41 +163,40 @@ Returncode St_func_write(St_func* self) {
     if (!glob->methods) {
       return OK;
     }
-    CHECK(95, write_new_indent_line());
+    CHECK(101, write_new_indent_line());
   }
-  CHECK(96, write(&(String){33, 32, "#if MR_STAGE == MR_DECLARATIONS\n"}));
-  CHECK(97, write_spaces());
-  CHECK(98, Mfunc_write(self->mfunc));
-  CHECK(99, write(&(String){3, 2, ";\n"}));
-  CHECK(100, write_spaces());
+  CHECK(102, write(&(String){33, 32, "#if MR_STAGE == MR_DECLARATIONS\n"}));
+  CHECK(103, write_spaces());
+  CHECK(104, Mfunc_write(self->mfunc));
+  CHECK(105, write(&(String){3, 2, ";\n"}));
+  CHECK(106, write_spaces());
   if (self->mfunc->is_mocked) {
-    CHECK(102, write(&(String){7, 6, "#endif"}));
+    CHECK(108, write(&(String){7, 6, "#endif"}));
     return OK;
   }
-  CHECK(104, write(&(String){32, 31, "#elif MR_STAGE == MR_FUNCTIONS\n"}));
-  CHECK(105, write_spaces());
-  CHECK(106, write(&(String){25, 24, "static char* _func_name_"}));
-  CHECK(107, Mfunc_write_name(self->mfunc));
-  CHECK(108, write(&(String){5, 4, " = \""}));
+  CHECK(110, write(&(String){32, 31, "#elif MR_STAGE == MR_FUNCTIONS\n"}));
+  CHECK(111, write_spaces());
+  CHECK(112, write(&(String){25, 24, "static char* _func_name_"}));
+  CHECK(113, Mfunc_write_name(self->mfunc));
+  CHECK(114, write(&(String){5, 4, " = \""}));
   if (NULL != self->mfunc->mclass) {
-    CHECK(110, write(self->mfunc->mclass->name));
-    CHECK(111, write(&(String){2, 1, "."}));
+    CHECK(116, write(self->mfunc->mclass->name));
+    CHECK(117, write(&(String){2, 1, "."}));
   }
-  CHECK(112, write(self->mfunc->name));
-  CHECK(113, write(&(String){4, 3, "\";\n"}));
-  CHECK(114, write_spaces());
-  CHECK(115, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
-  CHECK(116, Mfunc_write_name(self->mfunc));
-  CHECK(117, write_new_indent_line());
-  CHECK(118, Mfunc_write(self->mfunc));
-  Mtype* mclass = glob->mclass;
-  glob->mclass = NULL;
-  CHECK(121, St_node_write(&(self->_base)));
-  glob->mclass = mclass;
+  CHECK(118, write(self->mfunc->name));
+  CHECK(119, write(&(String){4, 3, "\";\n"}));
+  CHECK(120, write_spaces());
+  CHECK(121, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
+  CHECK(122, Mfunc_write_name(self->mfunc));
   CHECK(123, write_new_indent_line());
-  CHECK(124, write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}));
-  CHECK(125, write_spaces());
-  CHECK(126, write(&(String){7, 6, "#endif"}));
+  CHECK(124, Mfunc_write(self->mfunc));
+  glob->mclass = NULL;
+  CHECK(126, St_node_write(&(self->_base)));
+  glob->mclass = self->mfunc->mclass;
+  CHECK(128, write_new_indent_line());
+  CHECK(129, write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}));
+  CHECK(130, write_spaces());
+  CHECK(131, write(&(String){7, 6, "#endif"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -199,8 +204,8 @@ static char* _func_name_St_func_m_register = "St-func.m-register";
 #define MR_FUNC_NAME _func_name_St_func_m_register
 Returncode St_func_m_register(St_func* self) {
   Mvar* _Mvar3;
-  CHECK(129, Mfunc_m_new_var(self->mfunc, &(_Mvar3)))
-  CHECK(129, St_add_var(&(self->_base._base), _Mvar3));
+  CHECK(134, Mfunc_m_new_var(self->mfunc, &(_Mvar3)))
+  CHECK(134, St_add_var(&(self->_base._base), _Mvar3));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -213,21 +218,21 @@ typedef struct St_main St_main; struct St_main {
 static char* _func_name_St_main_parse = "St-main.parse";
 #define MR_FUNC_NAME _func_name_St_main_parse
 Returncode St_main_parse(St_main* self) {
-  CHECK(134, St_func_parse(&(self->_base)));
+  CHECK(139, St_func_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze_first = "St-main.analyze-first";
 #define MR_FUNC_NAME _func_name_St_main_analyze_first
 Returncode St_main_analyze_first(St_main* self) {
-  CHECK(137, St_func_analyze_first(&(self->_base)));
+  CHECK(142, St_func_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_main_analyze = "St-main.analyze";
 #define MR_FUNC_NAME _func_name_St_main_analyze
 Returncode St_main_analyze(St_main* self) {
-  CHECK(140, St_func_analyze(&(self->_base)));
+  CHECK(145, St_func_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -235,29 +240,29 @@ static char* _func_name_St_main_write = "St-main.write";
 #define MR_FUNC_NAME _func_name_St_main_write
 Returncode St_main_write(St_main* self) {
   Bool _Bool4;
-  CHECK(143, String_list_has(glob->test_funcs, &(_Bool4)))
+  CHECK(148, String_list_has(glob->test_funcs, &(_Bool4)))
   if (_Bool4) {
-    CHECK(144, write(&(String){30, 29, "#if MR_STAGE == MR_FUNCTIONS\n"}));
-    CHECK(145, write(&(String){29, 28, "Returncode func(Array* _) {\n"}));
-    CHECK(146, write(&(String){24, 23, "  Bool success = true;\n"}));
+    CHECK(149, write(&(String){30, 29, "#if MR_STAGE == MR_FUNCTIONS\n"}));
+    CHECK(150, write(&(String){29, 28, "Returncode func(Array* _) {\n"}));
+    CHECK(151, write(&(String){24, 23, "  Bool success = true;\n"}));
     String_list_node* test_func = glob->test_funcs->first;
     while (true) {
-      CHECK(149, write(&(String){12, 11, "  RUN_TEST("}));
-      CHECK(150, write_cstyle(test_func->value));
-      CHECK(151, write(&(String){4, 3, ");\n"}));
+      CHECK(154, write(&(String){12, 11, "  RUN_TEST("}));
+      CHECK(155, write_cstyle(test_func->value));
+      CHECK(156, write(&(String){4, 3, ");\n"}));
       test_func = test_func->next;
       if (!(NULL != test_func)) break;
     }
-    CHECK(154, write(&(String){30, 29, "  return success? OK : FAIL;\n"}));
-    CHECK(155, write(&(String){3, 2, "}\n"}));
-    CHECK(156, write(&(String){17, 16, "\nMAIN_TEST_FUNC\n"}));
-    CHECK(157, write(&(String){7, 6, "#endif"}));
+    CHECK(159, write(&(String){30, 29, "  return success? OK : FAIL;\n"}));
+    CHECK(160, write(&(String){3, 2, "}\n"}));
+    CHECK(161, write(&(String){17, 16, "\nMAIN_TEST_FUNC\n"}));
+    CHECK(162, write(&(String){7, 6, "#endif"}));
   }
   else {
-    CHECK(159, St_func_write(&(self->_base)));
-    CHECK(160, write(&(String){32, 31, "\n\n#if MR_STAGE == MR_FUNCTIONS\n"}));
-    CHECK(161, write(&(String){11, 10, "MAIN_FUNC\n"}));
-    CHECK(162, write(&(String){7, 6, "#endif"}));
+    CHECK(164, St_func_write(&(self->_base)));
+    CHECK(165, write(&(String){32, 31, "\n\n#if MR_STAGE == MR_FUNCTIONS\n"}));
+    CHECK(166, write(&(String){11, 10, "MAIN_FUNC\n"}));
+    CHECK(167, write(&(String){7, 6, "#endif"}));
   }
   return OK;
 }
@@ -265,7 +270,7 @@ Returncode St_main_write(St_main* self) {
 static char* _func_name_St_main_m_register = "St-main.m-register";
 #define MR_FUNC_NAME _func_name_St_main_m_register
 Returncode St_main_m_register(St_main* self) {
-  CHECK(165, St_func_m_register(&(self->_base)));
+  CHECK(170, St_func_m_register(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -285,32 +290,32 @@ Returncode St_format_parse(St_format* self) {
   self->item_name = NULL;
   self->item_mvar = NULL;
   Char _Char5;
-  CHECK(177, read_new(&(String){3, 2, ".("}, &(self->func_name), &(_Char5)))
+  CHECK(182, read_new(&(String){3, 2, ".("}, &(self->func_name), &(_Char5)))
   if (_Char5 == '.') {
     self->item_name = self->func_name;
     Char _Char6;
-    CHECK(179, read_new(&(String){2, 1, "("}, &(self->func_name), &(_Char6)));
+    CHECK(184, read_new(&(String){2, 1, "("}, &(self->func_name), &(_Char6)));
   }
   String* format = &(String){256, 0, (char[256]){0}};
   Char _Char7;
-  CHECK(181, read(&(String){2, 1, ")"}, format, &(_Char7)));
-  if ((format->length - 1) < 0 || (format->length - 1) >= format->length) RAISE(182)
-  if ((0) < 0 || (0) >= format->length) RAISE(182)
+  CHECK(186, read(&(String){2, 1, ")"}, format, &(_Char7)));
+  if ((format->length - 1) < 0 || (format->length - 1) >= format->length) RAISE(187)
+  if ((0) < 0 || (0) >= format->length) RAISE(187)
   if (format->length < 2 || format->chars[0] != '"' || format->chars[format->length - 1] != '"') {
-    CHECK(183, f_syntax_error(&(String){22, 21, "illegal format string"}, format));
+    CHECK(188, f_syntax_error(&(String){22, 21, "illegal format string"}, format));
   }
-  if ((1) < 0 || (format->length - 2) < 0 || (1) + (format->length - 2) > format->length) RAISE(184)
-  CHECK(184, f_new_copy(&(String){format->length - 2, format->length - 2, format->chars + (1)}, &(self->format)));
+  if ((1) < 0 || (format->length - 2) < 0 || (1) + (format->length - 2) > format->length) RAISE(189)
+  CHECK(189, f_new_copy(&(String){format->length - 2, format->length - 2, format->chars + (1)}, &(self->format)));
   Char _Char8;
-  CHECK(185, read_c(&(_Char8)));
-  CHECK(186, St_node_parse(&(self->_base)));
+  CHECK(190, read_c(&(_Char8)));
+  CHECK(191, St_node_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_format_analyze_first = "St-format.analyze-first";
 #define MR_FUNC_NAME _func_name_St_format_analyze_first
 Returncode St_format_analyze_first(St_format* self) {
-  CHECK(189, St_node_analyze_first(&(self->_base)));
+  CHECK(194, St_node_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -319,50 +324,50 @@ static char* _func_name_St_format_analyze = "St-format.analyze";
 Returncode St_format_analyze(St_format* self) {
   Mvar* mvar;
   if (NULL != self->item_name) {
-    CHECK(194, f_find_var(self->item_name, &(self->item_mvar)))
+    CHECK(199, f_find_var(self->item_name, &(self->item_mvar)))
     if (!(NULL != self->item_mvar)) {
-      CHECK(195, f_syntax_error(&(String){16, 15, "unknow variable"}, self->item_name));
+      CHECK(200, f_syntax_error(&(String){16, 15, "unknow variable"}, self->item_name));
     }
-    CHECK(196, Var_map_find(self->item_mvar->mtype->members, self->func_name, &(mvar)))
+    CHECK(201, Var_map_find(self->item_mvar->mtype->members, self->func_name, &(mvar)))
     if (!(NULL != mvar)) {
-      CHECK(197, f_syntax_error2(&(String){5, 4, "type"}, self->item_mvar->typename, &(String){14, 13, "has no method"}, self->func_name));
+      CHECK(202, f_syntax_error2(&(String){5, 4, "type"}, self->item_mvar->typename, &(String){14, 13, "has no method"}, self->func_name));
     }
   }
   else {
-    CHECK(199, f_find_var(self->func_name, &(mvar)))
+    CHECK(204, f_find_var(self->func_name, &(mvar)))
     if (!(NULL != mvar)) {
-      CHECK(200, f_syntax_error(&(String){16, 15, "unknow function"}, self->func_name));
+      CHECK(205, f_syntax_error(&(String){16, 15, "unknow function"}, self->func_name));
     }
   }
   if (!(NULL != mvar->func_dec)) {
-    CHECK(202, f_syntax_error(&(String){22, 21, "non function variable"}, self->func_name));
+    CHECK(207, f_syntax_error(&(String){22, 21, "non function variable"}, self->func_name));
   }
   if (!(NULL != mvar->func_dec->args->first_param)) {
-    CHECK(204, f_syntax_error(&(String){26, 25, "no parameter for function"}, self->func_name));
+    CHECK(209, f_syntax_error(&(String){26, 25, "no parameter for function"}, self->func_name));
   }
   if (NULL != mvar->func_dec->args->first_out) {
-    CHECK(206, f_syntax_error(&(String){27, 26, "outputs exists in function"}, self->func_name));
+    CHECK(211, f_syntax_error(&(String){27, 26, "outputs exists in function"}, self->func_name));
   }
   Dec_arg* param_dec;
   if (NULL != self->item_name) {
     if (!(NULL != mvar->func_dec->args->first_param->next)) {
-      CHECK(210, f_syntax_error(&(String){24, 23, "no parameter for method"}, self->func_name));
+      CHECK(215, f_syntax_error(&(String){24, 23, "no parameter for method"}, self->func_name));
     }
-    CHECK(211, (*((Func**)(mvar->func_dec->args->first_param->next)))[4](mvar->func_dec->args->first_param->next, &(param_dec)));
+    CHECK(216, (*((Func**)(mvar->func_dec->args->first_param->next)))[4](mvar->func_dec->args->first_param->next, &(param_dec)));
   }
   else {
-    CHECK(213, (*((Func**)(mvar->func_dec->args->first_param)))[4](mvar->func_dec->args->first_param, &(param_dec)));
+    CHECK(218, (*((Func**)(mvar->func_dec->args->first_param)))[4](mvar->func_dec->args->first_param, &(param_dec)));
   }
   if (NULL != param_dec->_base.next) {
-    CHECK(215, f_syntax_error(&(String){32, 31, "too many parameter for function"}, self->func_name));
+    CHECK(220, f_syntax_error(&(String){32, 31, "too many parameter for function"}, self->func_name));
   }
   if (param_dec->mvar->mtype != glob->type_string) {
-    CHECK(217, f_syntax_error2(&(String){40, 39, "expected a string parameter in function"}, self->func_name, &(String){12, 11, " instead of"}, param_dec->mvar->typename));
+    CHECK(222, f_syntax_error2(&(String){40, 39, "expected a string parameter in function"}, self->func_name, &(String){12, 11, " instead of"}, param_dec->mvar->typename));
   }
   if (param_dec->mvar->access != ACCESS_USER) {
-    CHECK(219, f_syntax_error(&(String){48, 47, "expected parameter with user access in function"}, self->func_name));
+    CHECK(224, f_syntax_error(&(String){48, 47, "expected parameter with user access in function"}, self->func_name));
   }
-  CHECK(220, St_node_analyze(&(self->_base)));
+  CHECK(225, St_node_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -375,43 +380,43 @@ Returncode St_format_write(St_format* self) {
   while (true) {
     if (!(len > 0)) break;
     if (index > 0) {
-      CHECK(229, write_new_indent_line());
+      CHECK(234, write_new_indent_line());
     }
-    if ((index) < 0 || (len) < 0 || (index) + (len) > self->format->length) RAISE(230)
+    if ((index) < 0 || (len) < 0 || (index) + (len) > self->format->length) RAISE(235)
     String* format = &(String){len, len, self->format->chars + (index)};
     Int _Int9;
-    CHECK(231, String_find(format, &(String){3, 2, "{}"}, &(_Int9)))
+    CHECK(236, String_find(format, &(String){3, 2, "{}"}, &(_Int9)))
     Int next = _Int9;
     if (next > 0) {
-      CHECK(233, write_tb_check());
+      CHECK(238, write_tb_check());
       if (NULL != self->item_mvar) {
-        CHECK(235, write_cstyle(self->item_mvar->mtype->name));
-        CHECK(236, write(&(String){2, 1, "_"}));
+        CHECK(240, write_cstyle(self->item_mvar->mtype->name));
+        CHECK(241, write(&(String){2, 1, "_"}));
       }
-      CHECK(237, write_cstyle(self->func_name));
-      CHECK(238, write(&(String){2, 1, "("}));
+      CHECK(242, write_cstyle(self->func_name));
+      CHECK(243, write(&(String){2, 1, "("}));
       if (NULL != self->item_mvar) {
         if (self->item_mvar->is_ref) {
-          CHECK(241, write(&(String){2, 1, "*"}));
+          CHECK(246, write(&(String){2, 1, "*"}));
         }
-        CHECK(242, write_cstyle(self->item_mvar->name));
-        CHECK(243, write(&(String){3, 2, ", "}));
+        CHECK(247, write_cstyle(self->item_mvar->name));
+        CHECK(248, write(&(String){3, 2, ", "}));
       }
-      CHECK(244, write(&(String){11, 10, "&(String){"}));
-      CHECK(245, write_int(next + 1));
-      CHECK(246, write(&(String){3, 2, ", "}));
-      CHECK(247, write_int(next));
-      CHECK(248, write(&(String){4, 3, ", \""}));
-      if ((0) < 0 || (next) < 0 || (0) + (next) > format->length) RAISE(249)
-      CHECK(249, write(&(String){next, next, format->chars + (0)}));
-      CHECK(250, write(&(String){6, 5, "\"}) )"}));
+      CHECK(249, write(&(String){11, 10, "&(String){"}));
+      CHECK(250, write_int(next + 1));
+      CHECK(251, write(&(String){3, 2, ", "}));
+      CHECK(252, write_int(next));
+      CHECK(253, write(&(String){4, 3, ", \""}));
+      if ((0) < 0 || (next) < 0 || (0) + (next) > format->length) RAISE(254)
+      CHECK(254, write(&(String){next, next, format->chars + (0)}));
+      CHECK(255, write(&(String){6, 5, "\"}) )"}));
     }
     else {
       if (!(NULL != node)) {
-        CHECK(253, f_syntax_error(&(String){24, 23, "too few lines to format"}, self->func_name));
+        CHECK(258, f_syntax_error(&(String){24, 23, "too few lines to format"}, self->func_name));
       }
       glob->line_num = node->line_num;
-      CHECK(255, (*((Func**)(node)))[3](node));
+      CHECK(260, (*((Func**)(node)))[3](node));
       glob->line_num = self->_base._base.line_num;
       node = node->next_brother;
       next = 2;

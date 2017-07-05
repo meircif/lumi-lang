@@ -46,7 +46,7 @@ class Call-operand(Operand)
     if not (? dec-out)
       if self.is-used
         f-syntax-error(user "no return value for", user mfunc.name)
-      if call-out
+      if ? call-out
         f-syntax-error(user "too many outputs for", user mfunc.name)
       mtype := _
       sub-mtype := _
@@ -208,7 +208,7 @@ class Call-operand(Operand)
     if self.is-used
       if ? self.res-exp
         self.res-exp.write-final()
-      else-if self.res-name
+      else-if ? self.res-name
         write-cstyle(user self.res-name)
     else
       self.write-call()

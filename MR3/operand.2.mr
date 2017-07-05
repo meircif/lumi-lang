@@ -96,7 +96,7 @@ class Empty-operand(Operand)
   
   func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
     if not (? mtype) or ? self.next or mtype.is-primitive
-      f-syntax-error-c(user "illegal use of value", user '_')
+      f-syntax-error-c(user "illegal use of value", copy '_')
   
   func dynamic write-intro()
     # nothing
@@ -261,13 +261,16 @@ func parse-new-operands(owner String text, user String ends):(owner Operand new-
       f-syntax-error-c(user "unexpected", copy end)
   else
     var Char first(text[0])
+    var Char second('\0')
+    if text.length > 1
+      second := text[1]
     if first = '\''
       opr-type := Char-operand
     else-if first = '"'
       opr-type := String-operand
     else-if first >= '0' and first <= '9'
       opr-type := Int-operand
-    else-if first >= 'A' and first <= 'Z'
+    else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
       opr-type := Type-operand
     else-if text.length = 1 and first = '_'
       opr-type := Empty-operand

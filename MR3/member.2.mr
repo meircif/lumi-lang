@@ -78,7 +78,7 @@ class Member-operand(Var-operand)
     self.prev-mtype := mtype
     user Mtype prev-sub-mtype(sub-mtype)
     user Mtype basetype(mtype.base-mtype)
-    if mtype.generic-mtype = self.mvar.mtype
+    if ? mtype.generic-mtype and mtype.generic-mtype = self.mvar.mtype
       mtype := sub-mtype
       sub-mtype := _
       if (? exp.operator or ? self.next) and mtype != self.mvar.mtype
@@ -88,7 +88,7 @@ class Member-operand(Var-operand)
         cast.analyze(user exp, user _, user _):(user mtype, user sub-mtype)
       else-if mtype != self.mvar.mtype and not (? self.next)
         exp.is-used := false
-    else-if mtype.generic-mtype = self.mvar.sub-mtype
+    else-if ? mtype.generic-mtype and mtype.generic-mtype = self.mvar.sub-mtype
       mtype := self.mvar.mtype
       # sub-mtype is the same
     else

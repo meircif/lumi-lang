@@ -39,6 +39,7 @@ static Global-data(Object)
   var Int res-count
   user Mtype mclass
   var Bool methods
+  var Bool debug
   
   func inst init-op-map()
     new Op-map map
@@ -87,6 +88,7 @@ static Global-data(Object)
     self.res-count := 0
     global-key-word.text := global-key-word-text
     self.key-word := _
+    self.debug := false
     self.init-op-map()
     self.init-types()
     f-init-new-string-list():(owner self.test-funcs)
@@ -258,7 +260,7 @@ func f-syntax-error2(user String text1, user String item1, user String text2, us
   msg.copy(user text1)
   msg.concat(user " \"")
   msg.concat(user item1)
-  msg.concat(copy "\" ")
+  msg.concat(user "\" ")
   msg.concat(user text2)
   f-syntax-error(user msg, user item2)
 

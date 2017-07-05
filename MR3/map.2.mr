@@ -41,22 +41,24 @@ static Name-map-node(Object)
   user String name
   owner Object value
   
-  func inst init(user String name, owner Object value)
-    self.next := _
+  func inst init(user String name, owner Object value, user Name-map-node next)
+    self.next := next
     self.name := name
     self.value := value
 
 static Name-map(Object)
   owner Name-map-node first
   owner Name-map-node last
+  owner Name-map-node extension
   
   func inst init()
     self.first := _
     self.last := _
+    self.extension := _
   
   func inst add(user String name, owner Object value)
     new Name-map-node node
-    node.init(user name, owner value)
+    node.init(user name, owner value, user self.extension)
     if ? self.last
       self.last.next := node
     else
@@ -86,6 +88,7 @@ native class Mvar
 static Var-map(Name-map)
   func inst m-copy-from(user Var-map other)
     self.first := other.first
+    self.extension := other.first
   
   func inst add(user String name, owner Mvar mvar)
     owner Object value(mvar)
@@ -116,10 +119,9 @@ static Var-map-iter(Object)
 
 func f-copy-new-var-map(user Var-map other):(owner Var-map new-var-map)
   new Var-map var-map
+  var-map.init()
   if ? other
     var-map.m-copy-from(user other)
-  else
-    var-map.init()
   new-var-map := var-map
 
 

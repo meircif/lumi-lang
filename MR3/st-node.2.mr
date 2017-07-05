@@ -115,6 +115,8 @@ class St-node(St)
       glob.key-word := _
   
   func inst parse-block()
+    if ? self.var-map and not (? self.sons-var-map)
+      f-copy-new-var-map(user self.var-map):(owner self.sons-var-map)
     var Int spaces(glob.spaces)
     do
       while self.parse-line(copy spaces)
