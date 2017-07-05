@@ -165,8 +165,21 @@ class St-dynamic-class(St-class)
   
   func dynamic write-meths()
     base.write-meths()
+    # #if MR_STAGE == MR_DECLARATIONS
+    # extern Func {name}__dtl[];
+    # #endif
+    # #if MR_STAGE == MR_FUNCTIONS
+    # Func {name}__dtl[] = {funcs...};
+    # #endif
     write-new-indent-line()
     write(user "#if MR_STAGE == MR_DECLARATIONS\n")
+    write(user "extern Func ")
+    write-cstyle(user self.mtype.name)
+    write(user "__dtl[];\n")
+    write-spaces()
+    write(user "#endif\n")
+    write-spaces()
+    write(user "#if MR_STAGE == MR_FUNCTIONS\n")
     write-spaces()
     write(user "Func ")
     write-cstyle(user self.mtype.name)
