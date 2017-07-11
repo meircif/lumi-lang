@@ -159,40 +159,40 @@ Returncode St_func_analyze(St_func* self) {
 static char* _func_name_St_func_write = "St-func.write";
 #define MR_FUNC_NAME _func_name_St_func_write
 Returncode St_func_write(St_func* self) {
+  if (self->mfunc->is_mocked) {
+    return OK;
+  }
   if (NULL != glob->mclass) {
     if (!glob->methods) {
       return OK;
     }
-    CHECK(101, write_new_indent_line());
+    CHECK(103, write_new_indent_line());
   }
-  CHECK(102, write(&(String){33, 32, "#if MR_STAGE == MR_DECLARATIONS\n"}));
-  CHECK(103, write_spaces());
-  CHECK(104, Mfunc_write(self->mfunc));
-  CHECK(105, write(&(String){3, 2, ";\n"}));
-  CHECK(106, write_spaces());
-  if (self->mfunc->is_mocked) {
-    CHECK(108, write(&(String){7, 6, "#endif"}));
-    return OK;
-  }
-  CHECK(110, write(&(String){32, 31, "#elif MR_STAGE == MR_FUNCTIONS\n"}));
-  CHECK(111, write_spaces());
-  CHECK(112, write(&(String){25, 24, "static char* _func_name_"}));
-  CHECK(113, Mfunc_write_name(self->mfunc));
-  CHECK(114, write(&(String){5, 4, " = \""}));
+  CHECK(104, write(&(String){33, 32, "#if MR_STAGE == MR_DECLARATIONS\n"}));
+  CHECK(105, write_spaces());
+  CHECK(106, Mfunc_write(self->mfunc));
+  CHECK(107, write(&(String){3, 2, ";\n"}));
+  CHECK(108, write_spaces());
+  CHECK(109, write(&(String){32, 31, "#elif MR_STAGE == MR_FUNCTIONS\n"}));
+  CHECK(110, write_spaces());
+  CHECK(111, write(&(String){25, 24, "static char* _func_name_"}));
+  CHECK(112, Mfunc_write_name(self->mfunc));
+  CHECK(113, write(&(String){5, 4, " = \""}));
   if (NULL != self->mfunc->mclass) {
-    CHECK(116, write(self->mfunc->mclass->name));
-    CHECK(117, write(&(String){2, 1, "."}));
+    CHECK(115, write(self->mfunc->mclass->name));
+    CHECK(116, write(&(String){2, 1, "."}));
   }
-  CHECK(118, write(self->mfunc->name));
-  CHECK(119, write(&(String){4, 3, "\";\n"}));
-  CHECK(120, write_spaces());
-  CHECK(121, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
-  CHECK(122, Mfunc_write_name(self->mfunc));
-  CHECK(123, write_new_indent_line());
-  CHECK(124, Mfunc_write(self->mfunc));
+  CHECK(117, write(self->mfunc->name));
+  CHECK(118, write(&(String){4, 3, "\";\n"}));
+  CHECK(119, write_spaces());
+  CHECK(120, write(&(String){33, 32, "#define MR_FUNC_NAME _func_name_"}));
+  CHECK(121, Mfunc_write_name(self->mfunc));
+  CHECK(122, write_new_indent_line());
+  CHECK(123, Mfunc_write(self->mfunc));
+  Mtype* mclass = glob->mclass;
   glob->mclass = NULL;
   CHECK(126, St_node_write(&(self->_base)));
-  glob->mclass = self->mfunc->mclass;
+  glob->mclass = mclass;
   CHECK(128, write_new_indent_line());
   CHECK(129, write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}));
   CHECK(130, write_spaces());

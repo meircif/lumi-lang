@@ -370,7 +370,7 @@ Returncode Slice_operand_write_final(Slice_operand* self) {
     }
   }
   if (NULL != self->item_type) {
-    if (!self->item_type->is_primitive) {
+    if (!self->item_type->is_primitive && !(NULL != self->second_index)) {
       CHECK(217, write(&(String){3, 2, "&("}));
     }
     CHECK(218, write(&(String){3, 2, "(("}));

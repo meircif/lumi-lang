@@ -213,7 +213,7 @@ class Slice-operand(Operand)
         self.second-index.write-final()
         write(user ", ")
     if ? self.item-type
-      if not self.item-type.is-primitive
+      if not self.item-type.is-primitive and not (? self.second-index)
         write(user "&(")
       write(user "((")
       write-cstyle(user self.item-type.name)
