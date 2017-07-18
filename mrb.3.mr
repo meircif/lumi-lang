@@ -1,0 +1,68 @@
+(## Builds executables from MR files
+
+Gets input files as "<name>.<MR version>.mr",
+generates "<name>.c" files using <MR version> compiler.
+Then compiles the last one to "<name>" executable using "CC" environment
+variable, or "gcc" if not specified.
+(MR0 and MR1 only supports one file)
+
+Supports MR0, MR1, MR2 & MR3.
+#)
+
+func f-error-if(copy Bool is-error, user String error-msg)
+  if is-error
+    sys.print(user error-msg)
+    raise
+
+func f-run-command(user String command, user String error-msg)
+  sys.print(user command)
+  if sys.system(user command) != 0
+    sys.print(user error-msg)
+    raise
+
+main func(user Array{String} argv)
+  # parse input
+  f-error-if(copy argv.length < 2, user "usage: mrb [MR file name]...")
+  user String mr-file(argv[argv.length - 1])
+  f-error-if(copy mr-file.length < 6, user "MR file name too short")
+  f-error-if(
+      copy mr-file.has(copy '"'),
+      user "Illegal \" character in file name")
+  user String prefix(mr-file[0:mr-file.length - 5])
+  var Char version(mr-file[mr-file.length - 4])
+  f-error-if(copy version < '0' or version > '3', user "Unsupported MR version")
+  f-error-if(
+      copy version < '2' and argv.length > 2,
+      user "Multiple files not supported before MR2")
+  
+  # run MR compiler
+  var String{1024} command
+  command.copy(user "mr")
+  command.append(copy version)
+  command.concat(user "-compiler")
+  for index in 1:argv.length
+    command.concat(user " \"")
+    command.concat(user argv[index])
+    command.concat(user "\"")
+  if version < '2'
+    command.concat(user " \"")
+    command.concat(user prefix)
+    command.concat(user ".c\"")
+  f-run-command(user command, user "MR compiler failed")
+  
+  # run C compiler
+  if not sys.getenv(user "CC", user command)
+    command.copy(user "gcc")
+  command.concat(user " -g \"")
+  command.concat(user prefix)
+  command.concat(user ".c\" ")
+  if version = '0'
+    command.concat(user "mr0-file.c mr0-string.c")
+  else
+    command.concat(user "mr.")
+    command.append(copy version)
+    command.concat(user ".c")
+  command.concat(user " -o \"")
+  command.concat(user prefix)
+  command.concat(user "\"")
+  f-run-command(user command, user "C compiler failed")

@@ -8,25 +8,28 @@ fi
 CCW="$CC --std=c89 -Wall -Werror"
 rm -rf .test
 mkdir .test
+cp *.mr .test
 cp MR*/*.mr .test
+cp MR3/mr.3.* .test
 cd .test
 
 # MR0
-$CCW ../MR0/mr0-compiler.c ../MR0/mr0-file.c ../MR0/mr0-string.c -o mr0.compiler
-./mr0.compiler mr0-compiler.0.mr mr0-compiler.c
+$CCW ../MR0/mr0-compiler.c ../MR0/mr0-file.c ../MR0/mr0-string.c -o mr0-compiler
+./mr0-compiler mr0-compiler.0.mr mr0-compiler.c
 diff ../MR0/mr0-compiler.c mr0-compiler.c
-./mr0.compiler mr1-compiler.0.mr mr1-compiler.c
+./mr0-compiler mr1-compiler.0.mr mr1-compiler.c
 diff ../MR1/mr1-compiler.c mr1-compiler.c
 
-#MR1
+# MR1
 $CCW ../MR1/mr1-compiler.c ../MR0/mr0-file.c ../MR0/mr0-string.c -I../MR0 \
-  -o mr1.compiler
-./mr1.compiler mr2-compiler.1.mr mr2-compiler.c
+  -o mr1-compiler
+./mr1-compiler mr2-compiler.1.mr mr2-compiler.c
 diff ../MR2/mr2-compiler.c mr2-compiler.c
 
-#MR2
-$CCW -Wno-parentheses ../MR2/mr2-compiler.c ../MR1/mr.1.c -I../MR1 -o mr2.compiler
-./mr2.compiler common.2.mr map.2.mr global.2.mr exp.2.mr st-node.2.mr \
+# MR2
+$CCW -Wno-parentheses ../MR2/mr2-compiler.c ../MR1/mr.1.c -I../MR1 \
+  -o mr2-compiler
+./mr2-compiler common.2.mr map.2.mr global.2.mr exp.2.mr st-node.2.mr \
   flow.2.mr args.2.mr func.2.mr member.2.mr call.2.mr operand.2.mr dec.2.mr \
   type.2.mr test.2.mr mr3-compiler.2.mr
 diff ../MR3/common.c common.c
@@ -45,9 +48,14 @@ diff ../MR3/type.c type.c
 diff ../MR3/test.c test.c
 diff ../MR3/mr3-compiler.c mr3-compiler.c
 
-#MR3
+# MR3
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
-  ../MR3/mr3-compiler.c ../MR2/mr.2.c -I../MR2 -o mr3.compiler
+  ../MR3/mr3-compiler.c ../MR2/mr.2.c -I../MR2 -o mr3-compiler
+
+# MRB
+./mr3-compiler mrb.3.mr
+diff ../mrb.c mrb.c
+$CCW ../mrb.c mr.3.c -I. -o mrb
 
 # teardown
 cd ..
