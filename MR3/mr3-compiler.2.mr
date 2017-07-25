@@ -156,6 +156,10 @@ func f-create-global-var-map()
   meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "text")
   meth.args.add-param(copy ACCESS-VAR, user glob.type-sys, user "self")
   
+  add-global-func(user glob.type-sys, user "print-raw"):(owner meth)
+  meth.args.add-param(copy ACCESS-USER, user glob.type-string, user "text")
+  meth.args.add-param(copy ACCESS-VAR, user glob.type-sys, user "self")
+  
   add-global-func(user glob.type-sys, user "exit"):(owner meth)
   meth.args.add-param(copy ACCESS-COPY, user glob.type-int, user "status")
   meth.args.add-param(copy ACCESS-VAR, user glob.type-sys, user "self")

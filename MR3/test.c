@@ -73,10 +73,10 @@ Returncode St_assert_error_analyze(St_assert_error* self) {
 static char* _func_name_St_assert_error_write = "St-assert-error.write";
 #define MR_FUNC_NAME _func_name_St_assert_error_write
 Returncode St_assert_error_write(St_assert_error* self) {
-  CHECK(38, write(&(String){6, 5, "do {\n"}));
+  CHECK(38, write(&(String){23, 22, "_trace_stream = NULL;\n"}));
+  CHECK(39, write_spaces());
+  CHECK(40, write(&(String){6, 5, "do {\n"}));
   glob->spaces = glob->spaces + 2;
-  CHECK(40, write_spaces());
-  CHECK(41, write(&(String){23, 22, "_trace_stream = NULL;\n"}));
   CHECK(42, write(&(String){21, 20, "#undef RETURN_ERROR\n"}));
   CHECK(43, write(&(String){35, 34, "#define RETURN_ERROR(value) break\n"}));
   CHECK(44, write_spaces());
@@ -93,7 +93,9 @@ Returncode St_assert_error_write(St_assert_error* self) {
   CHECK(55, write(&(String){3, 2, ")\n"}));
   glob->spaces = glob->spaces - 2;
   CHECK(57, write_spaces());
-  CHECK(58, write(&(String){17, 16, "} while (false);"}));
+  CHECK(58, write(&(String){18, 17, "} while (false);\n"}));
+  CHECK(59, write_spaces());
+  CHECK(60, write(&(String){24, 23, "_trace_stream = stdout;"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -106,35 +108,35 @@ typedef struct St_test St_test; struct St_test {
 static char* _func_name_St_test_parse = "St-test.parse";
 #define MR_FUNC_NAME _func_name_St_test_parse
 Returncode St_test_parse(St_test* self) {
-  CHECK(63, St_func_parse(&(self->_base)));
+  CHECK(65, St_func_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_test_analyze_first = "St-test.analyze-first";
 #define MR_FUNC_NAME _func_name_St_test_analyze_first
 Returncode St_test_analyze_first(St_test* self) {
-  CHECK(66, St_func_analyze_first(&(self->_base)));
+  CHECK(68, St_func_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_test_analyze = "St-test.analyze";
 #define MR_FUNC_NAME _func_name_St_test_analyze
 Returncode St_test_analyze(St_test* self) {
-  CHECK(69, St_func_analyze(&(self->_base)));
+  CHECK(71, St_func_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_test_write = "St-test.write";
 #define MR_FUNC_NAME _func_name_St_test_write
 Returncode St_test_write(St_test* self) {
-  CHECK(72, St_func_write(&(self->_base)));
+  CHECK(74, St_func_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_test_m_register = "St-test.m-register";
 #define MR_FUNC_NAME _func_name_St_test_m_register
 Returncode St_test_m_register(St_test* self) {
-  CHECK(75, String_list_add(glob->test_funcs, self->_base.mfunc->name));
+  CHECK(77, String_list_add(glob->test_funcs, self->_base.mfunc->name));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -147,14 +149,14 @@ typedef struct St_mock St_mock; struct St_mock {
 static char* _func_name_St_mock_parse = "St-mock.parse";
 #define MR_FUNC_NAME _func_name_St_mock_parse
 Returncode St_mock_parse(St_mock* self) {
-  CHECK(80, St_func_parse(&(self->_base)));
+  CHECK(82, St_func_parse(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_mock_analyze_first = "St-mock.analyze-first";
 #define MR_FUNC_NAME _func_name_St_mock_analyze_first
 Returncode St_mock_analyze_first(St_mock* self) {
-  CHECK(83, St_func_analyze_first(&(self->_base)));
+  CHECK(85, St_func_analyze_first(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -163,44 +165,44 @@ static char* _func_name_St_mock_analyze = "St-mock.analyze";
 Returncode St_mock_analyze(St_mock* self) {
   Mvar* mvar;
   Int index;
-  CHECK(88, String_find(self->_base.mfunc->name, &(String){2, 1, "."}, &(index)));
+  CHECK(90, String_find(self->_base.mfunc->name, &(String){2, 1, "."}, &(index)));
   if (index < self->_base.mfunc->name->length) {
-    if ((0) < 0 || (index) < 0 || (0) + (index) > self->_base.mfunc->name->length) RAISE(90)
+    if ((0) < 0 || (index) < 0 || (0) + (index) > self->_base.mfunc->name->length) RAISE(92)
     String* type_name = &(String){index, index, self->_base.mfunc->name->chars + (0)};
     String* meth_name = new_string(self->_base.mfunc->name->length - index);
-    if (meth_name == NULL) RAISE(91)
-    if ((index + 1) < 0 || (self->_base.mfunc->name->length - index - 1) < 0 || (index + 1) + (self->_base.mfunc->name->length - index - 1) > self->_base.mfunc->name->length) RAISE(92)
-    CHECK(92, String_copy(meth_name, &(String){self->_base.mfunc->name->length - index - 1, self->_base.mfunc->name->length - index - 1, self->_base.mfunc->name->chars + (index + 1)}));
-    CHECK(93, f_find_type(type_name, &(self->_base.mfunc->mclass)))
+    if (meth_name == NULL) RAISE(93)
+    if ((index + 1) < 0 || (self->_base.mfunc->name->length - index - 1) < 0 || (index + 1) + (self->_base.mfunc->name->length - index - 1) > self->_base.mfunc->name->length) RAISE(94)
+    CHECK(94, String_copy(meth_name, &(String){self->_base.mfunc->name->length - index - 1, self->_base.mfunc->name->length - index - 1, self->_base.mfunc->name->chars + (index + 1)}));
+    CHECK(95, f_find_type(type_name, &(self->_base.mfunc->mclass)))
     if (!(NULL != self->_base.mfunc->mclass)) {
-      CHECK(94, f_syntax_error(&(String){31, 30, "mocking method of unknown type"}, type_name));
+      CHECK(96, f_syntax_error(&(String){31, 30, "mocking method of unknown type"}, type_name));
     }
-    CHECK(95, Var_map_find(self->_base.mfunc->mclass->members, meth_name, &(mvar)))
+    CHECK(97, Var_map_find(self->_base.mfunc->mclass->members, meth_name, &(mvar)))
     if (!(NULL != mvar)) {
-      CHECK(96, f_syntax_error2(&(String){5, 4, "type"}, type_name, &(String){14, 13, "has no member"}, meth_name));
+      CHECK(98, f_syntax_error2(&(String){5, 4, "type"}, type_name, &(String){14, 13, "has no member"}, meth_name));
     }
     free(self->_base.mfunc->name);
     self->_base.mfunc->name = meth_name;
-    CHECK(99, Arg_list_add_param(self->_base.mfunc->args, ACCESS_VAR, self->_base.mfunc->mclass, &(String){5, 4, "self"}));
+    CHECK(101, Arg_list_add_param(self->_base.mfunc->args, ACCESS_VAR, self->_base.mfunc->mclass, &(String){5, 4, "self"}));
   }
   else {
-    CHECK(100, St_m_find_var(&(self->_base._base._base), self->_base.mfunc->name, &(mvar)))
+    CHECK(102, St_m_find_var(&(self->_base._base._base), self->_base.mfunc->name, &(mvar)))
     if (!(NULL != mvar)) {
-      CHECK(101, f_syntax_error(&(String){25, 24, "mocking unknown function"}, self->_base.mfunc->name));
+      CHECK(103, f_syntax_error(&(String){25, 24, "mocking unknown function"}, self->_base.mfunc->name));
     }
   }
   if (!(NULL != mvar->func_dec)) {
-    CHECK(103, f_syntax_error(&(String){25, 24, "cannot mock non-function"}, self->_base.mfunc->name));
+    CHECK(105, f_syntax_error(&(String){25, 24, "cannot mock non-function"}, self->_base.mfunc->name));
   }
   mvar->func_dec->is_mocked = true;
-  CHECK(105, St_func_analyze(&(self->_base)));
+  CHECK(107, St_func_analyze(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_mock_write = "St-mock.write";
 #define MR_FUNC_NAME _func_name_St_mock_write
 Returncode St_mock_write(St_mock* self) {
-  CHECK(108, St_func_write(&(self->_base)));
+  CHECK(110, St_func_write(&(self->_base)));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -227,28 +229,28 @@ Returncode St_debug_m_swich_debug(St_debug* self) {
 static char* _func_name_St_debug_parse = "St-debug.parse";
 #define MR_FUNC_NAME _func_name_St_debug_parse
 Returncode St_debug_parse(St_debug* self) {
-  CHECK(119, St_debug_m_swich_debug(self));
+  CHECK(121, St_debug_m_swich_debug(self));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_debug_analyze_first = "St-debug.analyze-first";
 #define MR_FUNC_NAME _func_name_St_debug_analyze_first
 Returncode St_debug_analyze_first(St_debug* self) {
-  CHECK(122, St_debug_m_swich_debug(self));
+  CHECK(124, St_debug_m_swich_debug(self));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_debug_analyze = "St-debug.analyze";
 #define MR_FUNC_NAME _func_name_St_debug_analyze
 Returncode St_debug_analyze(St_debug* self) {
-  CHECK(125, St_debug_m_swich_debug(self));
+  CHECK(127, St_debug_m_swich_debug(self));
   return OK;
 }
 #undef MR_FUNC_NAME
 static char* _func_name_St_debug_write = "St-debug.write";
 #define MR_FUNC_NAME _func_name_St_debug_write
 Returncode St_debug_write(St_debug* self) {
-  CHECK(128, St_debug_m_swich_debug(self));
+  CHECK(130, St_debug_m_swich_debug(self));
   return OK;
 }
 #undef MR_FUNC_NAME

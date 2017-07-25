@@ -216,22 +216,26 @@ Returncode f_create_global_var_map() {
   CHECK(156, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}));
   CHECK(157, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(159, add_global_func(glob->type_sys, &(String){5, 4, "exit"}, &(meth)));
-  CHECK(160, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}));
+  CHECK(159, add_global_func(glob->type_sys, &(String){10, 9, "print-raw"}, &(meth)));
+  CHECK(160, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}));
   CHECK(161, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(163, add_global_func(glob->type_sys, &(String){7, 6, "system"}, &(meth)));
-  CHECK(164, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}));
-  CHECK(165, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){8, 7, "command"}));
-  CHECK(166, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
+  CHECK(163, add_global_func(glob->type_sys, &(String){5, 4, "exit"}, &(meth)));
+  CHECK(164, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}));
+  CHECK(165, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(168, add_global_func(glob->type_sys, &(String){7, 6, "getenv"}, &(meth)));
-  CHECK(169, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_bool, &(String){7, 6, "exists"}));
-  CHECK(170, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){6, 5, "value"}));
-  CHECK(171, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}));
-  CHECK(172, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
+  CHECK(167, add_global_func(glob->type_sys, &(String){7, 6, "system"}, &(meth)));
+  CHECK(168, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}));
+  CHECK(169, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){8, 7, "command"}));
+  CHECK(170, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(174, add_glob_var(glob->type_sys, &(String){4, 3, "sys"}));
+  CHECK(172, add_global_func(glob->type_sys, &(String){7, 6, "getenv"}, &(meth)));
+  CHECK(173, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_bool, &(String){7, 6, "exists"}));
+  CHECK(174, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){6, 5, "value"}));
+  CHECK(175, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}));
+  CHECK(176, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
+  
+  CHECK(178, add_glob_var(glob->type_sys, &(String){4, 3, "sys"}));
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -240,9 +244,9 @@ Returncode f_create_global_var_map() {
 static char* _func_name_init_global_data = "init-global-data";
 #define MR_FUNC_NAME _func_name_init_global_data
 Returncode init_global_data() {
-  CHECK(178, Global_data_init(glob));
-  CHECK(179, f_create_key_word_map());
-  CHECK(180, f_create_global_var_map());
+  CHECK(182, Global_data_init(glob));
+  CHECK(183, f_create_key_word_map());
+  CHECK(184, f_create_global_var_map());
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -251,23 +255,23 @@ Returncode init_global_data() {
 static char* _func_name_func = "func";
 #define MR_FUNC_NAME _func_name_func
 Returncode func(Array* argv) {
-  CHECK(184, Sys_print(sys, &(String){19, 18, "MR3 compiler start"}));
+  CHECK(188, Sys_print(sys, &(String){19, 18, "MR3 compiler start"}));
   
   if (argv->length < 2) {
-    CHECK(187, Sys_print(sys, &(String){40, 39, "usage: mr3-compiler [input MR files]..."}));
+    CHECK(191, Sys_print(sys, &(String){40, 39, "usage: mr3-compiler [input MR files]..."}));
     return OK;
   }
   
-  CHECK(190, init_global_data());
+  CHECK(194, init_global_data());
   St_root* root = &(St_root){0};
   *((Func**)(root)) = St_root__dtl;
-  CHECK(192, St_root_init(root, argv));
+  CHECK(196, St_root_init(root, argv));
   
-  CHECK(194, (*((Func**)(root)))[0](root));
-  CHECK(195, (*((Func**)(root)))[2](root));
-  CHECK(196, (*((Func**)(root)))[3](root));
+  CHECK(198, (*((Func**)(root)))[0](root));
+  CHECK(199, (*((Func**)(root)))[2](root));
+  CHECK(200, (*((Func**)(root)))[3](root));
   
-  CHECK(198, Sys_print(sys, &(String){17, 16, "MR3 compiler end"}));
+  CHECK(202, Sys_print(sys, &(String){17, 16, "MR3 compiler end"}));
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -10,7 +10,6 @@ rm -rf .test
 mkdir .test
 cp *.mr .test
 cp MR*/*.mr .test
-cp MR3/mr.3.* .test
 cd .test
 
 # MR0
@@ -55,7 +54,7 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
 # MRB
 ./mr3-compiler mrb.3.mr
 diff ../mrb.c mrb.c
-$CCW ../mrb.c mr.3.c -I. -o mrb
+$CCW ../mrb.c ../MR3/mr.3.c -I. -I../MR3 -o mrb
 
 # teardown
 cd ..

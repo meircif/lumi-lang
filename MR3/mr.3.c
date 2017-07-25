@@ -338,6 +338,11 @@ Returncode Sys_print(void* _, String* text) {
   return OK;
 }
 
+Returncode Sys_print_raw(void* _, String* text) {
+  printf("%.*s", text->length, text->values);
+  return OK;
+}
+
 Returncode Sys_exit(void* _, Int status) {
   exit(status);
   CRAISE

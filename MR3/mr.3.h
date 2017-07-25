@@ -115,6 +115,7 @@ Returncode File_putc(File* this, Char ch);
 Returncode File_write(File* this, String* line);
 
 Returncode Sys_print(void*, String* text);
+Returncode Sys_print_raw(void*, String* text);
 Returncode Sys_exit(void*, Int status);
 Returncode Sys_system(void*, String* command, Int* status);
 Returncode Sys_getenv(void*, String* name, String* value, Bool* exists);

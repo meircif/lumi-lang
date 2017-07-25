@@ -35,10 +35,10 @@ class St-assert-error(St)
     self.exp.analyze-type(user _)
   
   func dynamic write()
+    write(user "_trace_stream = NULL;\n")
+    write-spaces()
     write(user "do {\n")
     glob.spaces := glob.spaces + 2
-    write-spaces()
-    write(user "_trace_stream = NULL;\n")
     write(user "#undef RETURN_ERROR\n")
     write(user "#define RETURN_ERROR(value) break\n")
     write-spaces()
@@ -55,7 +55,9 @@ class St-assert-error(St)
     write(user ")\n")
     glob.spaces := glob.spaces - 2
     write-spaces()
-    write(user "} while (false);")
+    write(user "} while (false);\n")
+    write-spaces()
+    write(user "_trace_stream = stdout;")
 
 
 class St-test(St-func)
