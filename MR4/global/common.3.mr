@@ -1,7 +1,7 @@
 ## MR4 compiler - Common stuff
 
 ## Create a new copy of given string
-func f-new-copy(user String text):(owner String new-text)
+func string-new-copy(user String text):(owner String new-text)
   if not (? text)
     new-text := _
     return
@@ -10,7 +10,8 @@ func f-new-copy(user String text):(owner String new-text)
 
 
 ## Create a new string that is a concatenation of the 2 given strings
-func f-new-concat(user String first, user String second):(owner String new-text)
+func string-new-concat(user String first, user String second):(
+    owner String new-text)
   owner String text
   new String{first.length + second.length + 1} in new-text
   new-text.copy(user first)
@@ -42,8 +43,11 @@ func f-syntax-error2(
 
 ## Same as `f-syntax-error` but with a character item
 func f-syntax-error-c(user String text, copy Char item)
-  var String{2} char-str
-  char-str.append(copy item)
+  var String{4} char-str
+  if item = EOF
+    char-str.copy(user "EOF")
+  else
+    char-str.append(copy item)
   f-syntax-error(user text, user char-str)
 
 

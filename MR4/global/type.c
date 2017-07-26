@@ -75,8 +75,8 @@ Returncode Operator_init(Operator* self, String* name, String* c_name);
 static char* _func_name_Operator_init = "Operator.init";
 #define MR_FUNC_NAME _func_name_Operator_init
 Returncode Operator_init(Operator* self, String* name, String* c_name) {
-  CHECK(30, f_new_copy(name, &(self->name)) )
-  CHECK(31, f_new_copy(c_name, &(self->c_name)) )
+  CHECK(30, string_new_copy(name, &(self->name)) )
+  CHECK(31, string_new_copy(c_name, &(self->c_name)) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -129,9 +129,9 @@ Returncode Global_add_type(Global* self, String* name, Type_data** type_data) {
   (*type_data) = malloc(sizeof(Type_data));
   if ((*type_data) == NULL) RAISE(77)
   *(*type_data) = (Type_data){NULL};
-  String* _String5;
-  CHECK(78, f_new_copy(name, &(_String5)) )
-  CHECK(78, Type_data_init((*type_data), _String5) )
+  String* _String9;
+  CHECK(78, string_new_copy(name, &(_String9)) )
+  CHECK(78, Type_data_init((*type_data), _String9) )
   CHECK(79, Name_map_add(self->type_map, (*type_data)->name, (*type_data)) )
   return OK;
 }

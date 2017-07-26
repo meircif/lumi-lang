@@ -33,6 +33,11 @@ extern Int mock_input_file_index;
 #elif MR_STAGE == MR_FUNCTIONS
 Int mock_input_file_index = 0;
 #endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Bool mock_print_active;
+#elif MR_STAGE == MR_FUNCTIONS
+Bool mock_print_active = false;
+#endif
 
 #if MR_STAGE == MR_DECLARATIONS
 Returncode print(String* text);
@@ -40,7 +45,12 @@ Returncode print(String* text);
 static char* _func_name_print = "print";
 #define MR_FUNC_NAME _func_name_print
 Returncode print(String* text) {
-  CHECK(11, String_concat(mock_print_text, text) )
+  if (mock_print_active) {
+    CHECK(13, String_concat(mock_print_text, text) )
+  }
+  else {
+    CHECK(15, Sys_print_raw(sys, text) )
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -52,7 +62,7 @@ Returncode set_mock_file_text(String* text);
 static char* _func_name_set_mock_file_text = "set-mock-file-text";
 #define MR_FUNC_NAME _func_name_set_mock_file_text
 Returncode set_mock_file_text(String* text) {
-  CHECK(14, String_copy(mock_input_file_text, text) )
+  CHECK(18, String_copy(mock_input_file_text, text) )
   mock_input_file_index = 0;
   return OK;
 }
@@ -65,13 +75,13 @@ Returncode file_getc(File* file, Char* ch);
 static char* _func_name_file_getc = "file-getc";
 #define MR_FUNC_NAME _func_name_file_getc
 Returncode file_getc(File* file, Char* ch) {
-  TEST_ASSERT(18, file == glob->input_file)
-  TEST_ASSERT(19, NULL != mock_input_file_text)
+  TEST_ASSERT(22, file == glob->input_file)
+  TEST_ASSERT(23, NULL != mock_input_file_text)
   if (mock_input_file_index >= mock_input_file_text->length) {
     (*ch) = EOF;
     return OK;
   }
-  if ((mock_input_file_index) < 0 || (mock_input_file_index) >= (mock_input_file_text)->length) RAISE(23)
+  if ((mock_input_file_index) < 0 || (mock_input_file_index) >= (mock_input_file_text)->length) RAISE(27)
   (*ch) = ((mock_input_file_text)->values[mock_input_file_index]);
   mock_input_file_index += 1;
   return OK;
@@ -85,8 +95,8 @@ Returncode file_write(File* file, String* text);
 static char* _func_name_file_write = "file-write";
 #define MR_FUNC_NAME _func_name_file_write
 Returncode file_write(File* file, String* text) {
-  TEST_ASSERT(27, file == glob->output_file)
-  CHECK(28, String_concat(mock_output_file_text, text) )
+  TEST_ASSERT(31, file == glob->output_file)
+  CHECK(32, String_concat(mock_output_file_text, text) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -107,14 +117,15 @@ static char* _func_name_f_setup_test = "f-setup-test";
 Returncode f_setup_test() {
   free(glob->operator_map);
   free(glob->type_map);
-  CHECK(36, Global_init(glob) )
+  CHECK(40, Global_init(glob) )
   glob->input_file_name = mock_input_file_name;
-  CHECK(38, String_copy(glob->input_file_name, &(String){8, 7, "in.3.mr"}) )
+  CHECK(42, String_copy(glob->input_file_name, &(String){10, 9, "mock.3.mr"}) )
   glob->line_number = 0;
-  CHECK(40, String_clear(mock_print_text) )
-  CHECK(41, String_clear(mock_input_file_text) )
-  CHECK(42, String_clear(mock_output_file_text) )
+  CHECK(44, String_clear(mock_print_text) )
+  CHECK(45, String_clear(mock_input_file_text) )
+  CHECK(46, String_clear(mock_output_file_text) )
   mock_input_file_index = 0;
+  mock_print_active = false;
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -131,26 +142,26 @@ static char* _func_name_f_assert_string_slice = "f-assert-string-slice";
 Returncode f_assert_string_slice(String* expected, String* actual, Int start, Int length) {
   String* actual_slice = &(String){1, 0, ""};
   if (actual->length >= start + length) {
-    if ((start) < 0 || (length) < 0 || (start) + (length) > (actual)->length) RAISE(52)
+    if ((start) < 0 || (length) < 0 || (start) + (length) > (actual)->length) RAISE(57)
     actual_slice = (&(String){length, length, (actual)->values + (start)});
-    Bool _Bool23;
-    CHECK(53, String_equal(actual_slice, expected, &(_Bool23)) )
-    if (_Bool23) {
+    Bool _Bool28;
+    CHECK(58, String_equal(actual_slice, expected, &(_Bool28)) )
+    if (_Bool28) {
       return OK;
     }
   }
   else {
     if (actual->length > start) {
-      if ((start) < 0 || (actual->length - start) < 0 || (start) + (actual->length - start) > (actual)->length) RAISE(56)
+      if ((start) < 0 || (actual->length - start) < 0 || (start) + (actual->length - start) > (actual)->length) RAISE(61)
       actual_slice = (&(String){actual->length - start, actual->length - start, (actual)->values + (start)});
     }
   }
-  CHECK(57, Sys_print_raw(sys, &(String){12, 11, "[expected `"}) )
-  CHECK(58, Sys_print_raw(sys, expected) )
-  CHECK(59, Sys_print_raw(sys, &(String){9, 8, "`, got `"}) )
-  CHECK(60, Sys_print_raw(sys, actual_slice) )
-  CHECK(61, Sys_print_raw(sys, &(String){4, 3, "`] "}) )
-  TEST_ASSERT(62, false)
+  CHECK(62, Sys_print_raw(sys, &(String){12, 11, "[expected `"}) )
+  CHECK(63, Sys_print_raw(sys, expected) )
+  CHECK(64, Sys_print_raw(sys, &(String){9, 8, "`, got `"}) )
+  CHECK(65, Sys_print_raw(sys, actual_slice) )
+  CHECK(66, Sys_print_raw(sys, &(String){4, 3, "`] "}) )
+  TEST_ASSERT(67, false)
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -162,7 +173,7 @@ Returncode f_assert_string(String* expected, String* actual);
 static char* _func_name_f_assert_string = "f-assert-string";
 #define MR_FUNC_NAME _func_name_f_assert_string
 Returncode f_assert_string(String* expected, String* actual) {
-  CHECK(65, f_assert_string_slice(expected, actual, 0, actual->length) )
+  CHECK(70, f_assert_string_slice(expected, actual, 0, actual->length) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -178,27 +189,27 @@ static char* _func_name_test_name_map = "test-name-map";
 #define MR_FUNC_NAME _func_name_test_name_map
 Returncode test_name_map() {
   Name_map* map = &(Name_map){NULL, NULL};
-  String* _String24;
-  CHECK(72, Name_map_find(map, &(String){6, 5, "name1"}, (void**)&(_String24)) )
-  TEST_ASSERT(72, !(NULL != _String24))
-  String* _String25;
-  CHECK(73, f_new_copy(&(String){7, 6, "value1"}, &(_String25)) )
-  CHECK(73, Name_map_add(map, &(String){6, 5, "name1"}, _String25) )
-  String* _String26;
-  CHECK(74, Name_map_find(map, &(String){6, 5, "name1"}, (void**)&(_String26)) )
-  CHECK(74, f_assert_string(_String26, &(String){7, 6, "value1"}) )
-  String* _String27;
-  CHECK(75, Name_map_find(map, &(String){6, 5, "name2"}, (void**)&(_String27)) )
-  TEST_ASSERT(75, !(NULL != _String27))
-  String* _String28;
-  CHECK(76, f_new_copy(&(String){7, 6, "value2"}, &(_String28)) )
-  CHECK(76, Name_map_add(map, &(String){6, 5, "name2"}, _String28) )
   String* _String29;
   CHECK(77, Name_map_find(map, &(String){6, 5, "name1"}, (void**)&(_String29)) )
-  CHECK(77, f_assert_string(_String29, &(String){7, 6, "value1"}) )
+  TEST_ASSERT(77, !(NULL != _String29))
   String* _String30;
-  CHECK(78, Name_map_find(map, &(String){6, 5, "name2"}, (void**)&(_String30)) )
-  CHECK(78, f_assert_string(_String30, &(String){7, 6, "value2"}) )
+  CHECK(78, string_new_copy(&(String){7, 6, "value1"}, &(_String30)) )
+  CHECK(78, Name_map_add(map, &(String){6, 5, "name1"}, _String30) )
+  String* _String31;
+  CHECK(79, Name_map_find(map, &(String){6, 5, "name1"}, (void**)&(_String31)) )
+  CHECK(79, f_assert_string(_String31, &(String){7, 6, "value1"}) )
+  String* _String32;
+  CHECK(80, Name_map_find(map, &(String){6, 5, "name2"}, (void**)&(_String32)) )
+  TEST_ASSERT(80, !(NULL != _String32))
+  String* _String33;
+  CHECK(81, string_new_copy(&(String){7, 6, "value2"}, &(_String33)) )
+  CHECK(81, Name_map_add(map, &(String){6, 5, "name2"}, _String33) )
+  String* _String34;
+  CHECK(82, Name_map_find(map, &(String){6, 5, "name1"}, (void**)&(_String34)) )
+  CHECK(82, f_assert_string(_String34, &(String){7, 6, "value1"}) )
+  String* _String35;
+  CHECK(83, Name_map_find(map, &(String){6, 5, "name2"}, (void**)&(_String35)) )
+  CHECK(83, f_assert_string(_String35, &(String){7, 6, "value2"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -208,17 +219,17 @@ Returncode test_name_map() {
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/common.c"
+#include "global/file-io.c"
+#include "global/global.c"
+#include "global/map.c"
+#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
-#include "global/common.c"
-#include "global/file-io.c"
-#include "global/global.c"
-#include "global/map.c"
-#include "global/type.c"
 #include "tests/expression-tests.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)

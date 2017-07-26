@@ -79,11 +79,11 @@ Returncode Base_meth_expression_parse_new(Base_meth_expression* self, String* te
 static char* _func_name_Base_meth_expression_parse_new = "Base-meth-expression.parse-new";
 #define MR_FUNC_NAME _func_name_Base_meth_expression_parse_new
 Returncode Base_meth_expression_parse_new(Base_meth_expression* self, String* text, Expression** expression) {
-  Base_meth_expression* _Base_meth_expression21 = malloc(sizeof(Base_meth_expression));
-  if (_Base_meth_expression21 == NULL) RAISE(22)
-  *_Base_meth_expression21 = (Base_meth_expression){Base_meth_expression__dtl, NULL};
-  _Base_meth_expression21->_base._dtl = Base_meth_expression__dtl;
-  (*expression) = &(_Base_meth_expression21->_base);
+  Base_meth_expression* _Base_meth_expression26 = malloc(sizeof(Base_meth_expression));
+  if (_Base_meth_expression26 == NULL) RAISE(22)
+  *_Base_meth_expression26 = (Base_meth_expression){Base_meth_expression__dtl, NULL};
+  _Base_meth_expression26->_base._dtl = Base_meth_expression__dtl;
+  (*expression) = &(_Base_meth_expression26->_base);
   free(text);
   return OK;
 }

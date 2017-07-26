@@ -3,7 +3,7 @@
 ## Function call expression
 class Call-expression(Expression)
   owner Expression function
-  owner Function-arguments arguments
+  owner Call-arguments arguments
   
   func inst parse-new(user String ends):(
       owner Expression expression, copy Char end)
@@ -13,7 +13,7 @@ class Call-expression(Expression)
   
   func inst parse(owner Expression function):(copy Char end)
     self.function := function
-    new Function-arguments in self.arguments
+    new Call-arguments in self.arguments
     self.arguments.parse():(copy end)
   
   func dynamic write()
@@ -21,24 +21,79 @@ class Call-expression(Expression)
     self.arguments.write()
 
 
-static Function-arguments
-  owner String parameters
-  owner String outputs
+static Call-arguments
+  owner Call-argument parameters
+  owner Call-argument outputs
   
-  ## parsing `(parameters):(outputs)`
+  ## parsing `(access value, ...):(access value, ...)`
   func inst parse():(copy Char end)
-    read-new(user ")"):(owner self.parameters)
-    read-c():(copy end)
+    self.parse-args():(owner self.parameters, copy end)
     if end = ':'
       read-expect(user "(")
-      read-new(user ")"):(owner self.outputs)
-      read-c():(copy end)
+      self.parse-args():(owner self.outputs, copy end)
+  
+  ## parsing single argument list `(access value, ...)`
+  func inst parse-args():(owner Call-argument first, copy Char end)
+    user Call-argument arg
+    var String{128} access-str
+    read-until(user access-str, user " )", copy false):(copy end)
+    if end = '\n' and access-str.length = 0
+      read-line-break-spaces()
+      read-until(user access-str, user " ", copy false):(copy end)
+    if end != ')' or access-str.length > 0
+      do
+        if access-str.length = 0
+          f-syntax-error-c(user "expected access, got", copy end)
+        if end != ' '
+          f-syntax-error-c(user "expected space, got", copy end)
+        if ? arg
+          new Call-argument in arg.next
+          arg := arg.next
+        else
+          new Call-argument in first
+          arg := first
+        arg.parse(user access-str):(copy end)
+        while end = ','
+        read-c():(copy end)
+        if end = '\n'
+          read-line-break-spaces()
+        else-if end != ' '
+          f-syntax-error-c(user "expected space or new-line, got", copy end)
+        read-until(user access-str, user " ", copy false):(copy end)
+    read-c():(copy end)
   
   func inst write()
     write(user "(")
-    write(user self.parameters)
-    write(user ")")
+    if ? self.parameters
+      self.write-args(user self.parameters)
     if ? self.outputs
-      write(user ":(")
-      write(user self.outputs)
-      write(user ")")
+      write(user "):(")
+      self.write-args(user self.outputs)
+    write(user ")")
+  
+  ## write arguments starting from `first`
+  func inst write-args(user Call-argument first)
+    user Call-argument arg(first)
+    do
+      arg.write()
+      arg := arg.next
+      while ? arg
+      write(user ", ")
+
+
+static Call-argument
+  var Int access
+  owner Expression value
+  owner Call-argument next
+  
+  func inst parse(user String access-str):(copy Char end)
+    get-access(user access-str):(copy self.access)
+    parse-new-expression(user ",)"):(owner self.value, copy end)
+    if end != ',' and end != ')'
+      f-syntax-error-c(user "expected \",\" or \")\", got", copy end)
+  
+  func inst write()
+    write(user "Access(")
+    write-int(copy self.access)
+    write(user ") ")
+    self.value.write()

@@ -27,8 +27,8 @@ static Operator
   owner String c-name
   
   func inst init(user String name, user String c-name)
-    f-new-copy(user name):(owner self.name)
-    f-new-copy(user c-name):(owner self.c-name)
+    string-new-copy(user name):(owner self.name)
+    string-new-copy(user c-name):(owner self.c-name)
 
 
 ## Meta type for a variable in the language

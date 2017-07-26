@@ -30,7 +30,7 @@ class Operator-expression(Expression)
     if end = '\n'
       read-line-break-spaces()
     owner String new-ends
-    f-new-concat(user " ", user ends):(owner new-ends)
+    string-new-concat(user " ", user ends):(owner new-ends)
     parse-new-expression(user new-ends):(owner expression, copy end)
     delete new-ends
   

@@ -75,7 +75,7 @@ static Global
   
   func inst add-type(user String name):(user Type-data type-data)
     new Type-data in type-data
-    type-data.init(owner f-new-copy(user name))
+    type-data.init(owner string-new-copy(user name))
     self.type-map.add(user type-data.name, owner type-data)
 
 

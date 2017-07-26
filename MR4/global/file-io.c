@@ -113,23 +113,24 @@ Returncode read_until(String* text, String* ends, Bool indent, Char* end, Int* s
 static char* _func_name_read_until = "read-until";
 #define MR_FUNC_NAME _func_name_read_until
 Returncode read_until(String* text, String* ends, Bool indent, Char* end, Int* spaces) {
+  CHECK(49, String_clear(text) )
   Char ch = EOF;
   Char quote = '\0';
   (*spaces) = 0;
-  CHECK(52, read_c(&(ch)) )
+  CHECK(53, read_c(&(ch)) )
   if (indent) {
     /* ignore and count indent */
     while (true) {
       if (!(ch == ' ')) break;
       (*spaces) += 1;
-      CHECK(58, read_c(&(ch)) )
+      CHECK(59, read_c(&(ch)) )
     }
   }
   while (true) {
     if (!(ch != EOF && ch != '\n')) break;
     if (quote == '\0') {
       Bool _Bool3;
-      CHECK(62, String_has(ends, ch, &(_Bool3)) )
+      CHECK(63, String_has(ends, ch, &(_Bool3)) )
       if (!(!_Bool3)) break;
       if (ch == '\'' || ch == '"') {
         quote = ch;
@@ -137,8 +138,8 @@ Returncode read_until(String* text, String* ends, Bool indent, Char* end, Int* s
     }
     else {
       if (ch == '\\') {
-        CHECK(66, String_append(text, ch) )
-        CHECK(67, read_c(&(ch)) )
+        CHECK(67, String_append(text, ch) )
+        CHECK(68, read_c(&(ch)) )
       }
       else {
         if (ch == quote) {
@@ -146,8 +147,8 @@ Returncode read_until(String* text, String* ends, Bool indent, Char* end, Int* s
         }
       }
     }
-    CHECK(70, String_append(text, ch) )
-    CHECK(71, read_c(&(ch)) )
+    CHECK(71, String_append(text, ch) )
+    CHECK(72, read_c(&(ch)) )
   }
   (*end) = ch;
   return OK;
@@ -165,21 +166,101 @@ static char* _func_name_read_new = "read-new";
 Returncode read_new(String* ends, String** new_text, Char* end) {
   String* text = &(String){256, 0, (char[256]){0}};
   Int _Int4;
-  CHECK(78, read_until(text, ends, false, &((*end)), &(_Int4)) )
-  CHECK(79, f_new_copy(text, &((*new_text))) )
+  CHECK(79, read_until(text, ends, false, &((*end)), &(_Int4)) )
+  CHECK(80, string_new_copy(text, &((*new_text))) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 
 
+/* Access values */
+#if MR_STAGE == MR_DECLARATIONS
+extern Int ACCESS_COPY;
+#elif MR_STAGE == MR_FUNCTIONS
+Int ACCESS_COPY = 0;
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Int ACCESS_USER;
+#elif MR_STAGE == MR_FUNCTIONS
+Int ACCESS_USER = 1;
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Int ACCESS_OWNER;
+#elif MR_STAGE == MR_FUNCTIONS
+Int ACCESS_OWNER = 2;
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Int ACCESS_VAR;
+#elif MR_STAGE == MR_FUNCTIONS
+Int ACCESS_VAR = 3;
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode get_access(String* access_str, Int* access);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_get_access = "get-access";
+#define MR_FUNC_NAME _func_name_get_access
+Returncode get_access(String* access_str, Int* access) {
+  Bool _Bool5;
+  CHECK(90, String_equal(access_str, &(String){5, 4, "copy"}, &(_Bool5)) )
+  if (_Bool5) {
+    (*access) = 0;
+  }
+  else {
+    Bool _Bool6;
+    CHECK(92, String_equal(access_str, &(String){5, 4, "user"}, &(_Bool6)) )
+    if (_Bool6) {
+      (*access) = 1;
+    }
+    else {
+      Bool _Bool7;
+      CHECK(94, String_equal(access_str, &(String){6, 5, "owner"}, &(_Bool7)) )
+      if (_Bool7) {
+        (*access) = 2;
+      }
+      else {
+        Bool _Bool8;
+        CHECK(96, String_equal(access_str, &(String){4, 3, "var"}, &(_Bool8)) )
+        if (_Bool8) {
+          (*access) = 3;
+        }
+        else {
+          CHECK(99, f_syntax_error(&(String){15, 14, "illegal access"}, access_str) )
+        }
+      }
+    }
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+/* write `text` to the output file */
 #if MR_STAGE == MR_DECLARATIONS
 Returncode write(String* text);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_write = "write";
 #define MR_FUNC_NAME _func_name_write
 Returncode write(String* text) {
-  CHECK(83, file_write(glob->output_file, text) )
+  CHECK(104, file_write(glob->output_file, text) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+/* write `num` to the output file as text */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode write_int(Int num);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_write_int = "write-int";
+#define MR_FUNC_NAME _func_name_write_int
+Returncode write_int(Int num) {
+  String* num_str = &(String){64, 0, (char[64]){0}};
+  CHECK(110, Int_str(num, num_str) )
+  CHECK(111, write(num_str) )
   return OK;
 }
 #undef MR_FUNC_NAME

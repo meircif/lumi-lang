@@ -13,11 +13,11 @@ static char* _mr_file1_name = "global/common.3.mr";
 
 /* Create a new copy of given string */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode f_new_copy(String* text, String** new_text);
+Returncode string_new_copy(String* text, String** new_text);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_f_new_copy = "f-new-copy";
-#define MR_FUNC_NAME _func_name_f_new_copy
-Returncode f_new_copy(String* text, String** new_text) {
+static char* _func_name_string_new_copy = "string-new-copy";
+#define MR_FUNC_NAME _func_name_string_new_copy
+Returncode string_new_copy(String* text, String** new_text) {
   if (!(NULL != text)) {
     (*new_text) = NULL;
     return OK;
@@ -33,16 +33,16 @@ Returncode f_new_copy(String* text, String** new_text) {
 
 /* Create a new string that is a concatenation of the 2 given strings */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode f_new_concat(String* first, String* second, String** new_text);
+Returncode string_new_concat(String* first, String* second, String** new_text);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_f_new_concat = "f-new-concat";
-#define MR_FUNC_NAME _func_name_f_new_concat
-Returncode f_new_concat(String* first, String* second, String** new_text) {
+static char* _func_name_string_new_concat = "string-new-concat";
+#define MR_FUNC_NAME _func_name_string_new_concat
+Returncode string_new_concat(String* first, String* second, String** new_text) {
   String* text = NULL;
   (*new_text) = _new_string(first->length + second->length + 1);
-  if ((*new_text) == NULL) RAISE(15)
-  CHECK(16, String_copy((*new_text), first) )
-  CHECK(17, String_concat((*new_text), second) )
+  if ((*new_text) == NULL) RAISE(16)
+  CHECK(17, String_copy((*new_text), first) )
+  CHECK(18, String_concat((*new_text), second) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -56,7 +56,7 @@ Returncode print(String* text);
 static char* _func_name_print = "print";
 #define MR_FUNC_NAME _func_name_print
 Returncode print(String* text) {
-  CHECK(22, Sys_print_raw(sys, text) )
+  CHECK(23, Sys_print_raw(sys, text) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -71,9 +71,9 @@ Returncode f_syntax_error(String* text, String* item);
 static char* _func_name_f_syntax_error = "f-syntax-error";
 #define MR_FUNC_NAME _func_name_f_syntax_error
 Returncode f_syntax_error(String* text, String* item) {
-  CHECK(28, print_syntax_error_msg_with_item(text, item) )
-  CHECK(29, print(&(String){2, 1, "\n"}) )
-  RAISE(30)
+  CHECK(29, print_syntax_error_msg_with_item(text, item) )
+  CHECK(30, print(&(String){2, 1, "\n"}) )
+  RAISE(31)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -86,11 +86,11 @@ Returncode f_syntax_error2(String* text1, String* item1, String* text2, String* 
 static char* _func_name_f_syntax_error2 = "f-syntax-error2";
 #define MR_FUNC_NAME _func_name_f_syntax_error2
 Returncode f_syntax_error2(String* text1, String* item1, String* text2, String* item2) {
-  CHECK(36, print_syntax_error_msg_with_item(text1, item1) )
-  CHECK(37, print(&(String){2, 1, " "}) )
-  CHECK(38, print_msg_with_item(text2, item2) )
-  CHECK(39, print(&(String){2, 1, "\n"}) )
-  RAISE(40)
+  CHECK(37, print_syntax_error_msg_with_item(text1, item1) )
+  CHECK(38, print(&(String){2, 1, " "}) )
+  CHECK(39, print_msg_with_item(text2, item2) )
+  CHECK(40, print(&(String){2, 1, "\n"}) )
+  RAISE(41)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -103,9 +103,14 @@ Returncode f_syntax_error_c(String* text, Char item);
 static char* _func_name_f_syntax_error_c = "f-syntax-error-c";
 #define MR_FUNC_NAME _func_name_f_syntax_error_c
 Returncode f_syntax_error_c(String* text, Char item) {
-  String* char_str = &(String){2, 0, (char[2]){0}};
-  CHECK(46, String_append(char_str, item) )
-  CHECK(47, f_syntax_error(text, char_str) )
+  String* char_str = &(String){4, 0, (char[4]){0}};
+  if (item == EOF) {
+    CHECK(48, String_copy(char_str, &(String){4, 3, "EOF"}) )
+  }
+  else {
+    CHECK(50, String_append(char_str, item) )
+  }
+  CHECK(51, f_syntax_error(text, char_str) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -118,14 +123,14 @@ Returncode print_syntax_error_msg_with_item(String* text, String* item);
 static char* _func_name_print_syntax_error_msg_with_item = "print-syntax-error-msg-with-item";
 #define MR_FUNC_NAME _func_name_print_syntax_error_msg_with_item
 Returncode print_syntax_error_msg_with_item(String* text, String* item) {
-  CHECK(51, print(&(String){15, 14, "Code error in "}) )
-  CHECK(52, print(glob->input_file_name) )
-  CHECK(53, print(&(String){2, 1, "["}) )
+  CHECK(55, print(&(String){15, 14, "Code error in "}) )
+  CHECK(56, print(glob->input_file_name) )
+  CHECK(57, print(&(String){2, 1, "["}) )
   String* line_num_str = &(String){32, 0, (char[32]){0}};
-  CHECK(55, Int_str(glob->line_number, line_num_str) )
-  CHECK(56, print(line_num_str) )
-  CHECK(57, print(&(String){3, 2, "] "}) )
-  CHECK(58, print_msg_with_item(text, item) )
+  CHECK(59, Int_str(glob->line_number, line_num_str) )
+  CHECK(60, print(line_num_str) )
+  CHECK(61, print(&(String){3, 2, "] "}) )
+  CHECK(62, print_msg_with_item(text, item) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -138,10 +143,10 @@ Returncode print_msg_with_item(String* text, String* item);
 static char* _func_name_print_msg_with_item = "print-msg-with-item";
 #define MR_FUNC_NAME _func_name_print_msg_with_item
 Returncode print_msg_with_item(String* text, String* item) {
-  CHECK(62, print(text) )
-  CHECK(63, print(&(String){3, 2, " \""}) )
-  CHECK(64, print(item) )
-  CHECK(65, print(&(String){2, 1, "\""}) )
+  CHECK(66, print(text) )
+  CHECK(67, print(&(String){3, 2, " \""}) )
+  CHECK(68, print(item) )
+  CHECK(69, print(&(String){2, 1, "\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME

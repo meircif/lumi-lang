@@ -23,8 +23,10 @@ func test-expression-error-ends(
   f-setup-test()
   set-mock-file-text(user input-text)
   owner Expression expression
+  mock-print-active := true
   assert-error parse-new-expression(user ends):(owner expression)
-  user String expected-header("Code error in in.3.mr[0] ")
+  mock-print-active := false
+  user String expected-header("Code error in mock.3.mr[0] ")
   f-assert-string-slice(
       user expected-header,
       user mock-print-text,
@@ -43,6 +45,7 @@ func test-expression-error(user String input-text, user String expected-error)
 
 
 test test-int-expression()
+  test-expression(user "0", user "Int(0)")
   test-expression(user "9630", user "Int(9630)")
   test-expression(user "-9630", user "Int(-9630)")
   test-expression(user "07520", user "Int(07520)")
@@ -120,12 +123,32 @@ test test-slice-expression()
 
 test test-call-expression()
   test-expression(user "function()", user "Variable(function)()")
-  test-expression(user "function(params)", user "Variable(function)(params)")
   test-expression(
-      user "function():(outputs)", user "Variable(function)():(outputs)")
+      user "function(copy 3, user arg, var _)",
+      user "Variable(function)(Access(0) Int(3), Access(1) Variable(arg), Access(3) Empty)")
   test-expression(
-      user "function(params):(outputs)",
-      user "Variable(function)(params):(outputs)")
+      user "function():(owner arg, copy num)",
+      user "Variable(function)():(Access(2) Variable(arg), Access(0) Variable(num))")
+  test-expression(
+      user "function(copy 0):(owner arg)",
+      user "Variable(function)(Access(0) Int(0)):(Access(2) Variable(arg))")
+  test-expression(
+      user "function(copy calc(copy 3))",
+      user "Variable(function)(Access(0) Variable(calc)(Access(0) Int(3)))")
+  test-expression(
+      user "function(\n    copy 2,\n    copy 3):(\n    copy x,\n    copy y)",
+      user "Variable(function)(Access(0) Int(2), Access(0) Int(3)):(Access(0) Variable(x), Access(0) Variable(y))")
+  test-expression-error(
+      user "function( copy 1)", user "expected access, got \" \"")
+  test-expression-error(
+      user "function(user)", user "expected space, got \")\"")
+  test-expression-error(
+      user "function(copy 4,copy 3)",
+      user "expected space or new-line, got \"c\"")
+  test-expression-error(
+      user "function(copy 2", user "expected \",\" or \")\", got \"EOF\"")
+  test-expression-error(
+      user "function(error 4)", user "illegal access \"error\"")
 
 
 test test-block-expression()
@@ -164,11 +187,15 @@ test test-single-operand-expression()
 
 test test-comlex-operand()
   test-expression(
-      user "array[3].func().seq[4][70]()()[23]",
-      user "Variable(array)[Int(3)].Member(func)().Member(seq)[Int(4)][Int(70)]()()[Int(23)]")
+      user "base.func().array[3].seq[4][70]()()[23]",
+      user "Base.Member(func)().Member(array)[Int(3)].Member(seq)[Int(4)][Int(70)]()()[Int(23)]")
 
 
 test test-comlex-expression()
   test-expression(
-      user "4 + (array[5] - 23) > 2 + func(params).val or (var.arr[1]? and num < 5)",
-      user "Int(4) + Block(Variable(array)[Int(5)] - Int(23)) > Int(2) + Variable(func)(params).Member(val) || Block(Question(Variable(var).Member(arr)[Int(1)]) && Variable(num) < Int(5))")
+      user "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth()):(owner item).val or (var.arr[1]? and num < 5)",
+      user "Int(4) + Block(Variable(array)[Int(5)] - Int(23)) > Int(2) + Variable(func)(Access(0) Int(2) + Base.Member(meth)()):(Access(2) Variable(item)).Member(val) || Block(Question(Variable(var).Member(arr)[Int(1)]) && Variable(num) < Int(5))")
+
+
+test test-no-expression()
+  test-expression-error(user "", user "unexpected \"EOF\"")

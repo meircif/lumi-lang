@@ -42,8 +42,8 @@ Returncode Block_expression_parse(Block_expression* self, Char* end);
 static char* _func_name_Block_expression_parse = "Block-expression.parse";
 #define MR_FUNC_NAME _func_name_Block_expression_parse
 Returncode Block_expression_parse(Block_expression* self, Char* end) {
-  Char _Char17;
-  CHECK(14, parse_new_expression(&(String){2, 1, ")"}, &(self->expression), &(_Char17)) )
+  Char _Char22;
+  CHECK(14, parse_new_expression(&(String){2, 1, ")"}, &(self->expression), &(_Char22)) )
   CHECK(15, read_c(&((*end))) )
   return OK;
 }
@@ -90,7 +90,7 @@ Returncode Operator_expression_parse_sub_expression(Operator_expression* self, O
     CHECK(31, read_line_break_spaces() )
   }
   String* new_ends = NULL;
-  CHECK(33, f_new_concat(&(String){2, 1, " "}, ends, &(new_ends)) )
+  CHECK(33, string_new_concat(&(String){2, 1, " "}, ends, &(new_ends)) )
   CHECK(34, parse_new_expression(new_ends, &((*expression)), &((*end))) )
   free(new_ends);
   return OK;

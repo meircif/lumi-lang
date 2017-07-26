@@ -60,9 +60,9 @@ static char* _func_name_Expression_parse_new = "Expression.parse-new";
 #define MR_FUNC_NAME _func_name_Expression_parse_new
 Returncode Expression_parse_new(Expression* self, String* ends, Expression** expression, Char* end) {
   (*expression) = NULL;
-  Bool _Bool18;
-  CHECK(36, String_has(ends, ' ', &(_Bool18)) )
-  Bool multi_operands = !_Bool18;
+  Bool _Bool23;
+  CHECK(36, String_has(ends, ' ', &(_Bool23)) )
+  Bool multi_operands = !_Bool23;
   while (true) {
     String* text = NULL;
     CHECK(39, Expression_read_new_value(self, ends, &(text), &((*end))) )
@@ -95,7 +95,7 @@ static char* _func_name_Expression_read_new_value = "Expression.read-new-value";
 #define MR_FUNC_NAME _func_name_Expression_read_new_value
 Returncode Expression_read_new_value(Expression* self, String* ends, String** text, Char* end) {
   String* all_ends = NULL;
-  CHECK(59, f_new_concat(&(String){6, 5, " .[(?"}, ends, &(all_ends)) )
+  CHECK(59, string_new_concat(&(String){6, 5, " .[(?"}, ends, &(all_ends)) )
   CHECK(60, read_new(all_ends, &((*text)), &((*end))) )
   free(all_ends);
   return OK;
@@ -144,9 +144,9 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     if ((*end) == '?') {
       CHECK(90, Question_expression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool19;
-    CHECK(91, Expression_parse_new_follow_operand(self, ends, &((*expression)), &((*end)), &(_Bool19)) )
-    if (!(_Bool19)) break;
+    Bool _Bool24;
+    CHECK(91, Expression_parse_new_follow_operand(self, ends, &((*expression)), &((*end)), &(_Bool24)) )
+    if (!(_Bool24)) break;
   }
   return OK;
 }
@@ -185,9 +185,9 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Exp
             CHECK(111, Empty_expression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool20;
-            CHECK(112, String_equal(text, &(String){5, 4, "base"}, &(_Bool20)) )
-            if (_Bool20) {
+            Bool _Bool25;
+            CHECK(112, String_equal(text, &(String){5, 4, "base"}, &(_Bool25)) )
+            if (_Bool25) {
               CHECK(113, Base_meth_expression_parse_new(NULL, text, &((*expression))) )
             }
             else {

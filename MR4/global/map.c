@@ -50,9 +50,9 @@ Returncode Name_map_find(Name_map* self, String* name, void** value) {
   Name_map_node* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool6;
-    CHECK(23, String_equal(node->name, name, &(_Bool6)) )
-    if (_Bool6) {
+    Bool _Bool10;
+    CHECK(23, String_equal(node->name, name, &(_Bool10)) )
+    if (_Bool10) {
       (*value) = ((void*)(node->value));
       return OK;
     }

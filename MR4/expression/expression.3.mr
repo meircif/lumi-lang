@@ -56,7 +56,7 @@ class Expression
   ## Read a single expression value as new string
   func inst read-new-value(user String ends):(owner String text, copy Char end)
     owner String all-ends
-    f-new-concat(user " .[(?", user ends):(owner all-ends)
+    string-new-concat(user " .[(?", user ends):(owner all-ends)
     read-new(user all-ends):(owner text, copy end)
     delete all-ends
   

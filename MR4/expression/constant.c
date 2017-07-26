@@ -134,9 +134,9 @@ Returncode Int_expression_parse(Int_expression* self, String* text) {
     if ((1) < 0 || (1) >= (number)->length) RAISE(48)
     Char second = ((number)->values[1]);
     if (second >= '0' && second <= '7') {
-      Bool _Bool9;
-      CHECK(50, f_is_octal(number, &(_Bool9)) )
-      if (!_Bool9) {
+      Bool _Bool14;
+      CHECK(50, f_is_octal(number, &(_Bool14)) )
+      if (!_Bool14) {
         CHECK(51, f_syntax_error(&(String){21, 20, "illegal octal number"}, text) )
       }
     }
@@ -144,17 +144,17 @@ Returncode Int_expression_parse(Int_expression* self, String* text) {
       if ((2) < 0 || (number->length - 2) < 0 || (2) + (number->length - 2) > (number)->length) RAISE(53)
       number = (&(String){number->length - 2, number->length - 2, (number)->values + (2)});
       if (second == 'b' || second == 'B') {
-        Bool _Bool10;
-        CHECK(55, f_is_binary(number, &(_Bool10)) )
-        if (!_Bool10) {
+        Bool _Bool15;
+        CHECK(55, f_is_binary(number, &(_Bool15)) )
+        if (!_Bool15) {
           CHECK(56, f_syntax_error(&(String){22, 21, "illegal binary number"}, text) )
         }
       }
       else {
         if (second == 'x' || second == 'X') {
-          Bool _Bool11;
-          CHECK(58, f_is_hex(number, &(_Bool11)) )
-          if (!_Bool11) {
+          Bool _Bool16;
+          CHECK(58, f_is_hex(number, &(_Bool16)) )
+          if (!_Bool16) {
             CHECK(59, f_syntax_error(&(String){27, 26, "illegal hexadecimal number"}, text) )
           }
         }
@@ -165,9 +165,9 @@ Returncode Int_expression_parse(Int_expression* self, String* text) {
     }
   }
   else {
-    Bool _Bool12;
-    CHECK(62, f_is_decimal(number, &(_Bool12)) )
-    if (!_Bool12) {
+    Bool _Bool17;
+    CHECK(62, f_is_decimal(number, &(_Bool17)) )
+    if (!_Bool17) {
       CHECK(63, f_syntax_error(&(String){15, 14, "illegal number"}, text) )
     }
   }
@@ -230,9 +230,9 @@ Returncode Char_expression_parse(Char_expression* self, String* text) {
         CHECK(84, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
       }
       if ((2) < 0 || (2) >= (text)->length) RAISE(85)
-      Bool _Bool13;
-      CHECK(85, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool13)) )
-      if (!_Bool13) {
+      Bool _Bool18;
+      CHECK(85, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool18)) )
+      if (!_Bool18) {
         CHECK(86, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
       }
     }
@@ -246,17 +246,17 @@ Returncode Char_expression_parse(Char_expression* self, String* text) {
         ch = ((text)->values[2]);
         if (ch == 'x') {
           if ((3) < 0 || (2) < 0 || (3) + (2) > (text)->length) RAISE(92)
-          Bool _Bool14;
-          CHECK(92, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool14)) )
-          if (!_Bool14) {
+          Bool _Bool19;
+          CHECK(92, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool19)) )
+          if (!_Bool19) {
             CHECK(93, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
           }
         }
         else {
           if ((2) < 0 || (3) < 0 || (2) + (3) > (text)->length) RAISE(95)
-          Bool _Bool15;
-          CHECK(95, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool15)) )
-          if (!_Bool15) {
+          Bool _Bool20;
+          CHECK(95, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool20)) )
+          if (!_Bool20) {
             CHECK(96, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
           }
         }
@@ -346,11 +346,11 @@ Returncode Empty_expression_parse_new(Empty_expression* self, String* text, Expr
 static char* _func_name_Empty_expression_parse_new = "Empty-expression.parse-new";
 #define MR_FUNC_NAME _func_name_Empty_expression_parse_new
 Returncode Empty_expression_parse_new(Empty_expression* self, String* text, Expression** expression) {
-  Empty_expression* _Empty_expression16 = malloc(sizeof(Empty_expression));
-  if (_Empty_expression16 == NULL) RAISE(123)
-  *_Empty_expression16 = (Empty_expression){Empty_expression__dtl, NULL};
-  _Empty_expression16->_base._dtl = Empty_expression__dtl;
-  (*expression) = &(_Empty_expression16->_base);
+  Empty_expression* _Empty_expression21 = malloc(sizeof(Empty_expression));
+  if (_Empty_expression21 == NULL) RAISE(123)
+  *_Empty_expression21 = (Empty_expression){Empty_expression__dtl, NULL};
+  _Empty_expression21->_base._dtl = Empty_expression__dtl;
+  (*expression) = &(_Empty_expression21->_base);
   free(text);
   return OK;
 }
