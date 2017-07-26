@@ -1,0 +1,65 @@
+## MR4 compiler - Common stuff
+
+## Create a new copy of given string
+func f-new-copy(user String text):(owner String new-text)
+  if not (? text)
+    new-text := _
+    return
+  new String{text.length + 1} in new-text
+  new-text.copy(user text)
+
+
+## Create a new string that is a concatenation of the 2 given strings
+func f-new-concat(user String first, user String second):(owner String new-text)
+  owner String text
+  new String{first.length + second.length + 1} in new-text
+  new-text.copy(user first)
+  new-text.concat(user second)
+
+
+## Proxy function to be mocked in tests
+func print(user String text)
+  sys.print-raw(user text)
+
+
+## Raise a syntax error with message:
+## `Code error in {file-name}[{line-number}] {text} "{item}"`
+func f-syntax-error(user String text, user String item)
+  print-syntax-error-msg-with-item(user text, user item)
+  print(user "\n")
+  raise
+
+
+## Same as `f-syntax-error` but but with another `{text} "{item}" pair
+func f-syntax-error2(
+    user String text1, user String item1, user String text2, user String item2)
+  print-syntax-error-msg-with-item(user text1, user item1)
+  print(user " ")
+  print-msg-with-item(user text2, user item2)
+  print(user "\n")
+  raise
+
+
+## Same as `f-syntax-error` but with a character item
+func f-syntax-error-c(user String text, copy Char item)
+  var String{2} char-str
+  char-str.append(copy item)
+  f-syntax-error(user text, user char-str)
+
+
+func print-syntax-error-msg-with-item(user String text, user String item)
+  print(user "Code error in ")
+  print(user glob.input-file-name)
+  print(user "[")
+  var String{32} line-num-str
+  glob.line-number.str(user line-num-str)
+  print(user line-num-str)
+  print(user "] ")
+  print-msg-with-item(user text, user item)
+
+
+func print-msg-with-item(user String text, user String item)
+  print(user text)
+  print(user " \"")
+  print(user item)
+  print(user "\"")

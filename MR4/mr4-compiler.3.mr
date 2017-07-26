@@ -1,0 +1,16 @@
+(## MR4 compiler main - written in MR3
+
+A work in progres...
+
+Currently only expression parsing is fully implemented, along with some global
+functionality that supports it.
+
+Global notes:
+  * Because MR3 not supports constructors or class-methods, they are replaced
+    by calling instance methods directly with `_` as the self instance.
+#)
+
+## compiler main function!
+main func(user Array{String} argv)
+  glob.init()
+  # work in progres...

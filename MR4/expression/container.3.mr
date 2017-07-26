@@ -1,0 +1,109 @@
+## MR4 compiler - Container expressions
+
+## An expression surrounded by brackets
+class Block-expression(Expression)
+  owner Expression expression
+  
+  func inst parse-new():(owner Expression expression, copy Char end)
+    new Block-expression block-expression
+    block-expression.parse():(copy end)
+    expression := block-expression
+  
+  ## parsing `(expression)`
+  func inst parse():(copy Char end)
+    parse-new-expression(user ")"):(owner self.expression)
+    read-c():(copy end)
+  
+  func dynamic write()
+    write(user "Block(")
+    self.expression.write()
+    write(user ")")
+
+
+## A basic expression with an operator
+class Operator-expression(Expression)
+  user Operator operator
+  
+  func inst parse-sub-expression(user Operator operator, user String ends):(
+      owner Expression expression, copy Char end)
+    self.operator := operator
+    if end = '\n'
+      read-line-break-spaces()
+    owner String new-ends
+    f-new-concat(user " ", user ends):(owner new-ends)
+    parse-new-expression(user new-ends):(owner expression, copy end)
+    delete new-ends
+  
+  func inst write-operator-and-expresssion(user Expression expression)
+    write(user self.operator.c-name)
+    write(user " ")
+    expression.write()
+
+
+## An expression with an unary operator
+class Unary-expression(Operator-expression)
+  owner Expression expression
+  
+  func inst parse-new(user String ends, user Operator operator):(
+      owner Expression expression, copy Char end)
+    new Unary-expression unary-expression
+    unary-expression.parse(user operator, user ends):(copy end)
+    expression := unary-expression
+  
+  ## parsing `operator expression` or `operator\n    expression`
+  func inst parse(user Operator operator, user String ends):(copy Char end)
+    self.parse-sub-expression(user operator, user ends):(
+        owner self.expression, copy end)
+  
+  func dynamic write()
+    self.write-operator-and-expresssion(user self.expression)
+
+
+## An expression with a binary operator
+class Binary-expression(Operator-expression)
+  owner Expression left-expression
+  user Operator operator
+  owner Expression right-expression
+  
+  func inst parse-new(user String ends, user Operator operator):(
+      owner Expression expression, copy Char end)
+    new Binary-expression binary-expression
+    binary-expression.parse(owner expression, user operator, user ends):(
+        copy end)
+    expression := binary-expression
+  
+  ## parsing `left-expression operator right-expression`
+  ## or `left-expression operator\n    right-expression`
+  func inst parse(
+      owner Expression left-expression,
+      user Operator operator,
+      user String ends):(
+      copy Char end)
+    self.left-expression := left-expression
+    self.parse-sub-expression(user operator, user ends):(
+        owner self.right-expression, copy end)
+  
+  func dynamic write()
+    self.left-expression.write()
+    write(user " ")
+    self.write-operator-and-expresssion(user self.right-expression)
+
+
+## An expression with the "?" operator
+class Question-expression(Expression)
+  owner Expression tested
+  
+  func inst parse-new():(owner Expression expression, copy Char end)
+    new Question-expression question-expression
+    question-expression.parse(owner expression):(copy end)
+    expression := question-expression
+  
+  ## parsing `tested?`
+  func inst parse(owner Expression tested):(copy Char end)
+    self.tested := tested
+    read-c():(copy end)
+  
+  func dynamic write()
+    write(user "Question(")
+    self.tested.write()
+    write(user ")")

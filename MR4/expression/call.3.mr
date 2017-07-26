@@ -1,0 +1,44 @@
+## MR4 compiler - Call expression
+
+## Function call expression
+class Call-expression(Expression)
+  owner Expression function
+  owner Function-arguments arguments
+  
+  func inst parse-new(user String ends):(
+      owner Expression expression, copy Char end)
+    new Call-expression call-expression
+    call-expression.parse(owner expression):(copy end)
+    expression := call-expression
+  
+  func inst parse(owner Expression function):(copy Char end)
+    self.function := function
+    new Function-arguments in self.arguments
+    self.arguments.parse():(copy end)
+  
+  func dynamic write()
+    self.function.write()
+    self.arguments.write()
+
+
+static Function-arguments
+  owner String parameters
+  owner String outputs
+  
+  ## parsing `(parameters):(outputs)`
+  func inst parse():(copy Char end)
+    read-new(user ")"):(owner self.parameters)
+    read-c():(copy end)
+    if end = ':'
+      read-expect(user "(")
+      read-new(user ")"):(owner self.outputs)
+      read-c():(copy end)
+  
+  func inst write()
+    write(user "(")
+    write(user self.parameters)
+    write(user ")")
+    if ? self.outputs
+      write(user ":(")
+      write(user self.outputs)
+      write(user ")")

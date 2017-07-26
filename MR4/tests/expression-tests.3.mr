@@ -1,0 +1,174 @@
+## MR4 compiler tests - Expression
+
+func test-expression-ends(
+    user String input-text,
+    user String expected-output,
+    user String ends,
+    copy Char expected-end)
+  f-setup-test()
+  set-mock-file-text(user input-text)
+  owner Expression expression
+  var Char end
+  parse-new-expression(user ends):(owner expression, copy end)
+  assert end = expected-end
+  expression.write()
+  f-assert-string(user expected-output, user mock-output-file-text)
+
+func test-expression(user String input-text, user String expected-output)
+  test-expression-ends(user input-text, user expected-output, user "", copy EOF)
+
+
+func test-expression-error-ends(
+    user String input-text, user String expected-error, user String ends)
+  f-setup-test()
+  set-mock-file-text(user input-text)
+  owner Expression expression
+  assert-error parse-new-expression(user ends):(owner expression)
+  user String expected-header("Code error in in.3.mr[0] ")
+  f-assert-string-slice(
+      user expected-header,
+      user mock-print-text,
+      copy 0,
+      copy expected-header.length)
+  f-assert-string-slice(
+      user expected-error,
+      user mock-print-text,
+      copy expected-header.length,
+      copy mock-print-text.length - expected-header.length - 1)
+  assert mock-print-text[mock-print-text.length - 1] = '\n'
+
+
+func test-expression-error(user String input-text, user String expected-error)
+  test-expression-error-ends(user input-text, user expected-error, user "")
+
+
+test test-int-expression()
+  test-expression(user "9630", user "Int(9630)")
+  test-expression(user "-9630", user "Int(-9630)")
+  test-expression(user "07520", user "Int(07520)")
+  test-expression(user "0b1011", user "Int(0b1011)")
+  test-expression(user "0xfda940", user "Int(0xfda940)")
+  test-expression(user "0xFDA940", user "Int(0xFDA940)")
+  test-expression-error(user "2a", user "illegal number \"2a\"")
+  test-expression-error(user "0a", user "illegal number \"0a\"")
+  test-expression-error(user "038", user "illegal octal number \"038\"")
+  test-expression-error(user "0b021", user "illegal binary number \"0b021\"")
+  test-expression-error(
+      user "0xadg", user "illegal hexadecimal number \"0xadg\"")
+
+
+test test-char-expression()
+  test-expression(user "'a'", user "Char('a')")
+  test-expression(user "'\\''", user "Char('\\'')")
+  test-expression(user "'\\n'", user "Char('\\n')")
+  test-expression(user "'\\x0f'", user "Char('\\x0f')")
+  test-expression(user "'\\xA9'", user "Char('\\xA9')")
+  test-expression(user "'\\270'", user "Char('\\270')")
+  test-expression-error(user "'''", user "illegal character constant \"'''\"")
+  test-expression-error(
+      user "'\\'", user "illegal character constant \"'\\'\"")
+  test-expression-error(user "'aa'", user "illegal character constant \"'aa'\"")
+  test-expression-error(
+      user "'\\c'", user "illegal character constant \"'\\c'\"")
+  test-expression-error(
+      user "'aaaa'", user "illegal character constant \"'aaaa'\"")
+  test-expression-error(
+      user "'\\x6fg'", user "illegal character constant \"'\\x6fg'\"")
+  test-expression-error(
+      user "'\\058'", user "illegal character constant \"'\\058'\"")
+  test-expression-error(user "''", user "illegal character constant \"''\"")
+  test-expression-error(
+      user "'aaa'", user "illegal character constant \"'aaa'\"")
+  test-expression-error(
+      user "'aaaaa'", user "illegal character constant \"'aaaaa'\"")
+  test-expression-error(
+      user "'aa", user "illegal character constant \"'aa\"")
+
+
+test test-string-expression()
+  test-expression(user "\"some string\"", user "String(\"some string\")")
+  test-expression-error(user "\"aaa", user "illegal string constant \"\"aaa\"")
+
+
+test test-empty-expression()
+  test-expression(user "_", user "Empty")
+
+
+test test-variable-expression()
+  test-expression(user "var-name", user "Variable(var-name)")
+
+
+test test-base-expression()
+  test-expression(user "base", user "Base")
+
+
+test test-type-expression()
+  test-expression(user "Type-name", user "Type(Type-name)")
+
+
+test test-member-expression()
+  var String{256} expected("Variable(var-name).Member(member-name)")
+  test-expression(user "var-name.member-name", user expected)
+  expected.concat(user ".Member(another).Member(member)")
+  test-expression(user "var-name.member-name.another.member", user expected)
+
+
+test test-slice-expression()
+  test-expression(user "array[13]", user "Variable(array)[Int(13)]")
+  test-expression(user "array[2:6]", user "Variable(array)[Int(2):Int(6)]")
+
+
+test test-call-expression()
+  test-expression(user "function()", user "Variable(function)()")
+  test-expression(user "function(params)", user "Variable(function)(params)")
+  test-expression(
+      user "function():(outputs)", user "Variable(function)():(outputs)")
+  test-expression(
+      user "function(params):(outputs)",
+      user "Variable(function)(params):(outputs)")
+
+
+test test-block-expression()
+  test-expression(user "(123)", user "Block(Int(123))")
+
+
+test test-unary-expression()
+  test-expression(user "- variable-name", user "- Variable(variable-name)")
+  test-expression(user "-\n    variable-name", user "- Variable(variable-name)")
+  test-expression-error(
+      user "- - variable-name", user "unexpected operator \"-\"")
+  test-expression-error(user "[45]", user "unexpected \"[\"")
+
+
+test test-binary-expression()
+  test-expression(user "23 + 54", user "Int(23) + Int(54)")
+  test-expression(user "100 * 2 - 37", user "Int(100) * Int(2) - Int(37)")
+  test-expression(user "12 *\n    13", user "Int(12) * Int(13)")
+  test-expression(
+      user "3 < 5 and 23 < 37", user "Int(3) < Int(5) && Int(23) < Int(37)")
+  test-expression-error(user "345 @ 2", user "unknown operator \"@\"")
+  test-expression-error(user "80 +(", user "unexpected \"(\"")
+  test-expression-error-ends(
+      user "- variable-name", user "unexpected operator \"-\"", user " ")
+
+
+test test-question-expression()
+  test-expression(
+      user "variable-name?", user "Question(Variable(variable-name))")
+
+
+test test-single-operand-expression()
+  test-expression-ends(
+      user "23 after expression", user "Int(23)", user " ", copy ' ')
+
+
+test test-comlex-operand()
+  test-expression(
+      user "array[3].func().seq[4][70]()()[23]",
+      user "Variable(array)[Int(3)].Member(func)().Member(seq)[Int(4)][Int(70)]()()[Int(23)]")
+
+
+test test-comlex-expression()
+  test-expression(
+      user "4 + (array[5] - 23) > 2 + func(params).val or (var.arr[1]? and num < 5)",
+      user "Int(4) + Block(Variable(array)[Int(5)] - Int(23)) > Int(2) + Variable(func)(params).Member(val) || Block(Question(Variable(var).Member(arr)[Int(1)]) && Variable(num) < Int(5))")

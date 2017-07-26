@@ -1,0 +1,30 @@
+## MR4 compiler - Slice expression
+
+## A slice expression
+class Slice-expression(Expression)
+  owner Expression sequence
+  owner Expression index
+  owner Expression second-index
+  
+  func inst parse-new(user String ends):(
+      owner Expression expression, copy Char end)
+    new Slice-expression slice-expression
+    slice-expression.parse(owner expression):(copy end)
+    expression := slice-expression
+  
+  ## parsing `sequence[index]` or `sequence[index:second-index]`
+  func inst parse(owner Expression sequence):(copy Char end)
+    self.sequence := sequence
+    parse-new-expression(user ":]"):(owner self.index, copy end)
+    if end = ':'
+      parse-new-expression(user "]"):(owner self.second-index, copy end)
+    read-c():(copy end)
+  
+  func dynamic write()
+    self.sequence.write()
+    write(user "[")
+    self.index.write()
+    if ? self.second-index
+      write(user ":")
+      self.second-index.write()
+    write(user "]")
