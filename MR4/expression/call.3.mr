@@ -28,8 +28,8 @@ static CallArguments
   ## parsing `(access value, ...):(access value, ...)`
   func inst parse():(copy Char end)
     self.parse-args():(owner self.parameters, copy end)
-    if end = ':'
-      read-expect(user "(")
+    if end = '-'
+      read-expect(user ">(")
       self.parse-args():(owner self.outputs, copy end)
   
   ## parsing single argument list `(access value, ...)`
@@ -67,7 +67,7 @@ static CallArguments
     if ? self.parameters
       self.write-args(user self.parameters)
     if ? self.outputs
-      write(user "):(")
+      write(user ")->(")
       self.write-args(user self.outputs)
     write(user ")")
   

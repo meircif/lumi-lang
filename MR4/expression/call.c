@@ -87,8 +87,8 @@ static char* _func_name_CallArguments_parse = "CallArguments.parse";
 #define MR_FUNC_NAME _func_name_CallArguments_parse
 Returncode CallArguments_parse(CallArguments* self, Char* end) {
   CHECK(30, CallArguments_parse_args(self, &(self->parameters), &((*end))) )
-  if ((*end) == ':') {
-    CHECK(32, read_expect(&(String){2, 1, "("}) )
+  if ((*end) == '-') {
+    CHECK(32, read_expect(&(String){3, 2, ">("}) )
     CHECK(33, CallArguments_parse_args(self, &(self->outputs), &((*end))) )
   }
   return OK;
@@ -161,7 +161,7 @@ Returncode CallArguments_write(CallArguments* self) {
     CHECK(68, CallArguments_write_args(self, self->parameters) )
   }
   if (NULL != self->outputs) {
-    CHECK(70, write(&(String){4, 3, "):("}) )
+    CHECK(70, write(&(String){5, 4, ")->("}) )
     CHECK(71, CallArguments_write_args(self, self->outputs) )
   }
   CHECK(72, write(&(String){2, 1, ")"}) )

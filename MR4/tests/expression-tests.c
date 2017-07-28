@@ -248,10 +248,10 @@ static char* _func_name_test_call_expression = "test-call-expression";
 Returncode test_call_expression() {
   CHECK(125, test_expression(&(String){11, 10, "function()"}, &(String){21, 20, "Variable(function)()"}) )
   CHECK(126, test_expression(&(String){34, 33, "function(copy 3, user arg, var _)"}, &(String){79, 78, "Variable(function)(Access(0) Int(3), Access(1) Variable(arg), Access(3) Empty)"}) )
-  CHECK(129, test_expression(&(String){33, 32, "function():(owner arg, copy num)"}, &(String){72, 71, "Variable(function)():(Access(2) Variable(arg), Access(0) Variable(num))"}) )
-  CHECK(132, test_expression(&(String){29, 28, "function(copy 0):(owner arg)"}, &(String){63, 62, "Variable(function)(Access(0) Int(0)):(Access(2) Variable(arg))"}) )
+  CHECK(129, test_expression(&(String){34, 33, "function()->(owner arg, copy num)"}, &(String){73, 72, "Variable(function)()->(Access(2) Variable(arg), Access(0) Variable(num))"}) )
+  CHECK(132, test_expression(&(String){30, 29, "function(copy 0)->(owner arg)"}, &(String){64, 63, "Variable(function)(Access(0) Int(0))->(Access(2) Variable(arg))"}) )
   CHECK(135, test_expression(&(String){28, 27, "function(copy calc(copy 3))"}, &(String){63, 62, "Variable(function)(Access(0) Variable(calc)(Access(0) Int(3)))"}) )
-  CHECK(138, test_expression(&(String){60, 59, "function(\n    copy 2,\n    copy 3):(\n    copy x,\n    copy y)"}, &(String){102, 101, "Variable(function)(Access(0) Int(2), Access(0) Int(3)):(Access(0) Variable(x), Access(0) Variable(y))"}) )
+  CHECK(138, test_expression(&(String){61, 60, "function(\n    copy 2,\n    copy 3)->(\n    copy x,\n    copy y)"}, &(String){103, 102, "Variable(function)(Access(0) Int(2), Access(0) Int(3))->(Access(0) Variable(x), Access(0) Variable(y))"}) )
   CHECK(141, test_expression_error(&(String){18, 17, "function( copy 1)"}, &(String){25, 24, "expected access, got \" \""}) )
   CHECK(143, test_expression_error(&(String){15, 14, "function(user)"}, &(String){24, 23, "expected space, got \")\""}) )
   CHECK(145, test_expression_error(&(String){24, 23, "function(copy 4,copy 3)"}, &(String){36, 35, "expected space or new-line, got \"c\""}) )
@@ -356,7 +356,7 @@ Returncode test_comlex_expression();
 static char* _func_name_test_comlex_expression = "test-comlex-expression";
 #define MR_FUNC_NAME _func_name_test_comlex_expression
 Returncode test_comlex_expression() {
-  CHECK(195, test_expression(&(String){99, 98, "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth()):(owner item).val or (var.arr[1]? and num < 5)"}, &(String){235, 234, "Int(4) + Block(Variable(array)[Int(5)] - Int(23)) > Int(2) + Variable(func)(Access(0) Int(2) + Base.Member(meth)()):(Access(2) Variable(item)).Member(val) || Block(Question(Variable(var).Member(arr)[Int(1)]) && Variable(num) < Int(5))"}) )
+  CHECK(195, test_expression(&(String){100, 99, "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)"}, &(String){236, 235, "Int(4) + Block(Variable(array)[Int(5)] - Int(23)) > Int(2) + Variable(func)(Access(0) Int(2) + Base.Member(meth)())->(Access(2) Variable(item)).Member(val) || Block(Question(Variable(var).Member(arr)[Int(1)]) && Variable(num) < Int(5))"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

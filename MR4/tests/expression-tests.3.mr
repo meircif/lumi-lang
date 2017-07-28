@@ -127,17 +127,17 @@ test test-call-expression()
       user "function(copy 3, user arg, var _)",
       user "Variable(function)(Access(0) Int(3), Access(1) Variable(arg), Access(3) Empty)")
   test-expression(
-      user "function():(owner arg, copy num)",
-      user "Variable(function)():(Access(2) Variable(arg), Access(0) Variable(num))")
+      user "function()->(owner arg, copy num)",
+      user "Variable(function)()->(Access(2) Variable(arg), Access(0) Variable(num))")
   test-expression(
-      user "function(copy 0):(owner arg)",
-      user "Variable(function)(Access(0) Int(0)):(Access(2) Variable(arg))")
+      user "function(copy 0)->(owner arg)",
+      user "Variable(function)(Access(0) Int(0))->(Access(2) Variable(arg))")
   test-expression(
       user "function(copy calc(copy 3))",
       user "Variable(function)(Access(0) Variable(calc)(Access(0) Int(3)))")
   test-expression(
-      user "function(\n    copy 2,\n    copy 3):(\n    copy x,\n    copy y)",
-      user "Variable(function)(Access(0) Int(2), Access(0) Int(3)):(Access(0) Variable(x), Access(0) Variable(y))")
+      user "function(\n    copy 2,\n    copy 3)->(\n    copy x,\n    copy y)",
+      user "Variable(function)(Access(0) Int(2), Access(0) Int(3))->(Access(0) Variable(x), Access(0) Variable(y))")
   test-expression-error(
       user "function( copy 1)", user "expected access, got \" \"")
   test-expression-error(
@@ -193,8 +193,8 @@ test test-comlex-operand()
 
 test test-comlex-expression()
   test-expression(
-      user "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth()):(owner item).val or (var.arr[1]? and num < 5)",
-      user "Int(4) + Block(Variable(array)[Int(5)] - Int(23)) > Int(2) + Variable(func)(Access(0) Int(2) + Base.Member(meth)()):(Access(2) Variable(item)).Member(val) || Block(Question(Variable(var).Member(arr)[Int(1)]) && Variable(num) < Int(5))")
+      user "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)",
+      user "Int(4) + Block(Variable(array)[Int(5)] - Int(23)) > Int(2) + Variable(func)(Access(0) Int(2) + Base.Member(meth)())->(Access(2) Variable(item)).Member(val) || Block(Question(Variable(var).Member(arr)[Int(1)]) && Variable(num) < Int(5))")
 
 
 test test-no-expression()
