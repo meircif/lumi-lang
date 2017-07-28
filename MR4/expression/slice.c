@@ -13,9 +13,9 @@ static char* _mr_file10_name = "expression/slice.3.mr";
 
 /* A slice expression */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Slice_expression Slice_expression;
+typedef struct SliceExpression SliceExpression;
 #elif MR_STAGE == MR_TYPES(1)
-struct Slice_expression {
+struct SliceExpression {
   Expression _base;
   Expression* sequence;
   Expression* index;
@@ -23,27 +23,27 @@ struct Slice_expression {
 /* parsing `sequence[index]` or `sequence[index:second-index]` */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Slice_expression_parse_new(Slice_expression* self, String* ends, Expression** expression, Char* end);
+Returncode SliceExpression_parse_new(SliceExpression* self, String* ends, Expression** expression, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Slice_expression_parse_new = "Slice-expression.parse-new";
-#define MR_FUNC_NAME _func_name_Slice_expression_parse_new
-Returncode Slice_expression_parse_new(Slice_expression* self, String* ends, Expression** expression, Char* end) {
-  Slice_expression* slice_expression = malloc(sizeof(Slice_expression));
+static char* _func_name_SliceExpression_parse_new = "SliceExpression.parse-new";
+#define MR_FUNC_NAME _func_name_SliceExpression_parse_new
+Returncode SliceExpression_parse_new(SliceExpression* self, String* ends, Expression** expression, Char* end) {
+  SliceExpression* slice_expression = malloc(sizeof(SliceExpression));
   if (slice_expression == NULL) RAISE(11)
-  *slice_expression = (Slice_expression){Slice_expression__dtl, NULL, NULL, NULL, NULL};
-  slice_expression->_base._dtl = Slice_expression__dtl;
-  CHECK(12, Slice_expression_parse(slice_expression, (*expression), &((*end))) )
+  *slice_expression = (SliceExpression){SliceExpression__dtl, NULL, NULL, NULL, NULL};
+  slice_expression->_base._dtl = SliceExpression__dtl;
+  CHECK(12, SliceExpression_parse(slice_expression, (*expression), &((*end))) )
   (*expression) = &(slice_expression->_base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* parsing `sequence[index]` or `sequence[index:second-index]` */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Slice_expression_parse(Slice_expression* self, Expression* sequence, Char* end);
+Returncode SliceExpression_parse(SliceExpression* self, Expression* sequence, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Slice_expression_parse = "Slice-expression.parse";
-#define MR_FUNC_NAME _func_name_Slice_expression_parse
-Returncode Slice_expression_parse(Slice_expression* self, Expression* sequence, Char* end) {
+static char* _func_name_SliceExpression_parse = "SliceExpression.parse";
+#define MR_FUNC_NAME _func_name_SliceExpression_parse
+Returncode SliceExpression_parse(SliceExpression* self, Expression* sequence, Char* end) {
   self->sequence = sequence;
   CHECK(18, parse_new_expression(&(String){3, 2, ":]"}, &(self->index), &((*end))) )
   if ((*end) == ':') {
@@ -55,11 +55,11 @@ Returncode Slice_expression_parse(Slice_expression* self, Expression* sequence, 
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Slice_expression_write(Slice_expression* self);
+Returncode SliceExpression_write(SliceExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Slice_expression_write = "Slice-expression.write";
-#define MR_FUNC_NAME _func_name_Slice_expression_write
-Returncode Slice_expression_write(Slice_expression* self) {
+static char* _func_name_SliceExpression_write = "SliceExpression.write";
+#define MR_FUNC_NAME _func_name_SliceExpression_write
+Returncode SliceExpression_write(SliceExpression* self) {
   CHECK(24, (self->sequence)->_dtl[0](self->sequence) )
   CHECK(25, write(&(String){2, 1, "["}) )
   CHECK(26, (self->index)->_dtl[0](self->index) )
@@ -73,10 +73,10 @@ Returncode Slice_expression_write(Slice_expression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Slice_expression__dtl[];
+extern Func SliceExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Slice_expression__dtl[] = {Slice_expression_write};
+Func SliceExpression__dtl[] = {SliceExpression_write};
 #endif
 
 #undef MR_FILE_NAME

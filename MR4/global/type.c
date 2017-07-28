@@ -13,18 +13,18 @@ static char* _mr_file5_name = "global/type.3.mr";
 
 /* Meta type for a type in the language */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Type_data Type_data;
+typedef struct TypeData TypeData;
 #elif MR_STAGE == MR_TYPES(0)
-struct Type_data {
+struct TypeData {
   String* name;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Type_data_init(Type_data* self, String* name);
+Returncode TypeData_init(TypeData* self, String* name);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Type_data_init = "Type-data.init";
-#define MR_FUNC_NAME _func_name_Type_data_init
-Returncode Type_data_init(Type_data* self, String* name) {
+static char* _func_name_TypeData_init = "TypeData.init";
+#define MR_FUNC_NAME _func_name_TypeData_init
+Returncode TypeData_init(TypeData* self, String* name) {
   self->name = name;
   return OK;
 }
@@ -34,25 +34,25 @@ Returncode Type_data_init(Type_data* self, String* name) {
 
 /* Specific usage of a type including the assigned subtype */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Type_instance Type_instance;
+typedef struct TypeInstance TypeInstance;
 #elif MR_STAGE == MR_TYPES(0)
-struct Type_instance {
-  Type_data* type_data;
-  Type_instance* sub_type;
+struct TypeInstance {
+  TypeData* type_data;
+  TypeInstance* sub_type;
 /* Return a new deep-copy of self */};
 #endif/* Return a new deep-copy of self */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Type_instance_m_copy_new(Type_instance* self, Type_instance** type_instance);
+Returncode TypeInstance_m_copy_new(TypeInstance* self, TypeInstance** type_instance);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Type_instance_m_copy_new = "Type-instance.m-copy-new";
-#define MR_FUNC_NAME _func_name_Type_instance_m_copy_new
-Returncode Type_instance_m_copy_new(Type_instance* self, Type_instance** type_instance) {
-  (*type_instance) = malloc(sizeof(Type_instance));
+static char* _func_name_TypeInstance_m_copy_new = "TypeInstance.m-copy-new";
+#define MR_FUNC_NAME _func_name_TypeInstance_m_copy_new
+Returncode TypeInstance_m_copy_new(TypeInstance* self, TypeInstance** type_instance) {
+  (*type_instance) = malloc(sizeof(TypeInstance));
   if ((*type_instance) == NULL) RAISE(18)
-  *(*type_instance) = (Type_instance){NULL, NULL};
+  *(*type_instance) = (TypeInstance){NULL, NULL};
   (*type_instance)->type_data = self->type_data;
   if (NULL != self->sub_type) {
-    CHECK(21, Type_instance_m_copy_new(self->sub_type, &((*type_instance)->sub_type)) )
+    CHECK(21, TypeInstance_m_copy_new(self->sub_type, &((*type_instance)->sub_type)) )
   }
   return OK;
 }

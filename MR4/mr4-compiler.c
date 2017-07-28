@@ -16,6 +16,8 @@ A work in progres...
 Currently only expression parsing is fully implemented, along with some global
 functionality that supports it.
 
+Expression design is documented in expression/expression.3.mr.
+
 Global notes:
   * Because MR3 not supports constructors or class-methods, they are replaced
     by calling instance methods directly with `_` as the self instance.
@@ -28,7 +30,7 @@ Returncode func(Array* argv);
 static char* _func_name_func = "func";
 #define MR_FUNC_NAME _func_name_func
 Returncode func(Array* argv) {
-  CHECK(15, Global_init(glob) )
+  CHECK(17, Global_init(glob) )
   /* work in progres... */
   return OK;
 }

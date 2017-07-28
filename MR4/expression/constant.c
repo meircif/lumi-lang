@@ -95,34 +95,34 @@ Returncode f_is_hex(String* text, Bool* is_hex) {
 
 /* Constant integer expression */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Int_expression Int_expression;
+typedef struct IntExpression IntExpression;
 #elif MR_STAGE == MR_TYPES(2)
-struct Int_expression {
-  Text_expression _base;
+struct IntExpression {
+  TextExpression _base;
 /* parsing `123` or `-123` or `0b0012` or `0x3d4f` */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Int_expression_parse_new(Int_expression* self, String* text, Expression** expression);
+Returncode IntExpression_parse_new(IntExpression* self, String* text, Expression** expression);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Int_expression_parse_new = "Int-expression.parse-new";
-#define MR_FUNC_NAME _func_name_Int_expression_parse_new
-Returncode Int_expression_parse_new(Int_expression* self, String* text, Expression** expression) {
-  Int_expression* int_expression = malloc(sizeof(Int_expression));
+static char* _func_name_IntExpression_parse_new = "IntExpression.parse-new";
+#define MR_FUNC_NAME _func_name_IntExpression_parse_new
+Returncode IntExpression_parse_new(IntExpression* self, String* text, Expression** expression) {
+  IntExpression* int_expression = malloc(sizeof(IntExpression));
   if (int_expression == NULL) RAISE(38)
-  *int_expression = (Int_expression){Int_expression__dtl, NULL, NULL};
-  int_expression->_base._base._dtl = Int_expression__dtl;
-  CHECK(39, Int_expression_parse(int_expression, text) )
+  *int_expression = (IntExpression){IntExpression__dtl, NULL, NULL};
+  int_expression->_base._base._dtl = IntExpression__dtl;
+  CHECK(39, IntExpression_parse(int_expression, text) )
   (*expression) = &(int_expression->_base._base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* parsing `123` or `-123` or `0b0012` or `0x3d4f` */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Int_expression_parse(Int_expression* self, String* text);
+Returncode IntExpression_parse(IntExpression* self, String* text);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Int_expression_parse = "Int-expression.parse";
-#define MR_FUNC_NAME _func_name_Int_expression_parse
-Returncode Int_expression_parse(Int_expression* self, String* text) {
+static char* _func_name_IntExpression_parse = "IntExpression.parse";
+#define MR_FUNC_NAME _func_name_IntExpression_parse
+Returncode IntExpression_parse(IntExpression* self, String* text) {
   String* number = text;
   if ((0) < 0 || (0) >= (number)->length) RAISE(45)
   if (((number)->values[0]) == '-') {
@@ -178,43 +178,43 @@ Returncode Int_expression_parse(Int_expression* self, String* text) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Int_expression__dtl[];
+extern Func IntExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Int_expression__dtl[] = {Text_expression_write};
+Func IntExpression__dtl[] = {TextExpression_write};
 #endif
 
 
 /* Constant character expression */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Char_expression Char_expression;
+typedef struct CharExpression CharExpression;
 #elif MR_STAGE == MR_TYPES(2)
-struct Char_expression {
-  Text_expression _base;
+struct CharExpression {
+  TextExpression _base;
 /* parsing `'a'` or `'\n'` or `'\xf5'` or `'\270'` */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Char_expression_parse_new(Char_expression* self, String* text, Expression** expression);
+Returncode CharExpression_parse_new(CharExpression* self, String* text, Expression** expression);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Char_expression_parse_new = "Char-expression.parse-new";
-#define MR_FUNC_NAME _func_name_Char_expression_parse_new
-Returncode Char_expression_parse_new(Char_expression* self, String* text, Expression** expression) {
-  Char_expression* char_expression = malloc(sizeof(Char_expression));
+static char* _func_name_CharExpression_parse_new = "CharExpression.parse-new";
+#define MR_FUNC_NAME _func_name_CharExpression_parse_new
+Returncode CharExpression_parse_new(CharExpression* self, String* text, Expression** expression) {
+  CharExpression* char_expression = malloc(sizeof(CharExpression));
   if (char_expression == NULL) RAISE(71)
-  *char_expression = (Char_expression){Char_expression__dtl, NULL, NULL};
-  char_expression->_base._base._dtl = Char_expression__dtl;
-  CHECK(72, Char_expression_parse(char_expression, text) )
+  *char_expression = (CharExpression){CharExpression__dtl, NULL, NULL};
+  char_expression->_base._base._dtl = CharExpression__dtl;
+  CHECK(72, CharExpression_parse(char_expression, text) )
   (*expression) = &(char_expression->_base._base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* parsing `'a'` or `'\n'` or `'\xf5'` or `'\270'` */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Char_expression_parse(Char_expression* self, String* text);
+Returncode CharExpression_parse(CharExpression* self, String* text);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Char_expression_parse = "Char-expression.parse";
-#define MR_FUNC_NAME _func_name_Char_expression_parse
-Returncode Char_expression_parse(Char_expression* self, String* text) {
+static char* _func_name_CharExpression_parse = "CharExpression.parse";
+#define MR_FUNC_NAME _func_name_CharExpression_parse
+Returncode CharExpression_parse(CharExpression* self, String* text) {
   Char ch = '\0';
   if (text->length == 3) {
     if ((1) < 0 || (1) >= (text)->length) RAISE(79)
@@ -277,43 +277,43 @@ Returncode Char_expression_parse(Char_expression* self, String* text) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Char_expression__dtl[];
+extern Func CharExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Char_expression__dtl[] = {Text_expression_write};
+Func CharExpression__dtl[] = {TextExpression_write};
 #endif
 
 
 /* Constant string expression */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct String_expression String_expression;
+typedef struct StringExpression StringExpression;
 #elif MR_STAGE == MR_TYPES(2)
-struct String_expression {
-  Text_expression _base;
+struct StringExpression {
+  TextExpression _base;
 /* parsing `"some string"` */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode String_expression_parse_new(String_expression* self, String* text, Expression** expression);
+Returncode StringExpression_parse_new(StringExpression* self, String* text, Expression** expression);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_String_expression_parse_new = "String-expression.parse-new";
-#define MR_FUNC_NAME _func_name_String_expression_parse_new
-Returncode String_expression_parse_new(String_expression* self, String* text, Expression** expression) {
-  String_expression* string_expression = malloc(sizeof(String_expression));
+static char* _func_name_StringExpression_parse_new = "StringExpression.parse-new";
+#define MR_FUNC_NAME _func_name_StringExpression_parse_new
+Returncode StringExpression_parse_new(StringExpression* self, String* text, Expression** expression) {
+  StringExpression* string_expression = malloc(sizeof(StringExpression));
   if (string_expression == NULL) RAISE(108)
-  *string_expression = (String_expression){String_expression__dtl, NULL, NULL};
-  string_expression->_base._base._dtl = String_expression__dtl;
-  CHECK(109, String_expression_parse(string_expression, text) )
+  *string_expression = (StringExpression){StringExpression__dtl, NULL, NULL};
+  string_expression->_base._base._dtl = StringExpression__dtl;
+  CHECK(109, StringExpression_parse(string_expression, text) )
   (*expression) = &(string_expression->_base._base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* parsing `"some string"` */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode String_expression_parse(String_expression* self, String* text);
+Returncode StringExpression_parse(StringExpression* self, String* text);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_String_expression_parse = "String-expression.parse";
-#define MR_FUNC_NAME _func_name_String_expression_parse
-Returncode String_expression_parse(String_expression* self, String* text) {
+static char* _func_name_StringExpression_parse = "StringExpression.parse";
+#define MR_FUNC_NAME _func_name_StringExpression_parse
+Returncode StringExpression_parse(StringExpression* self, String* text) {
   if ((text->length - 1) < 0 || (text->length - 1) >= (text)->length) RAISE(114)
   if (((text)->values[text->length - 1]) != '\"') {
     CHECK(115, f_syntax_error(&(String){24, 23, "illegal string constant"}, text) )
@@ -325,53 +325,53 @@ Returncode String_expression_parse(String_expression* self, String* text) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func String_expression__dtl[];
+extern Func StringExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func String_expression__dtl[] = {Text_expression_write};
+Func StringExpression__dtl[] = {TextExpression_write};
 #endif
 
 
 /* Constant empty expression `_` */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Empty_expression Empty_expression;
+typedef struct EmptyExpression EmptyExpression;
 #elif MR_STAGE == MR_TYPES(1)
-struct Empty_expression {
+struct EmptyExpression {
   Expression _base;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Empty_expression_parse_new(Empty_expression* self, String* text, Expression** expression);
+Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Empty_expression_parse_new = "Empty-expression.parse-new";
-#define MR_FUNC_NAME _func_name_Empty_expression_parse_new
-Returncode Empty_expression_parse_new(Empty_expression* self, String* text, Expression** expression) {
-  Empty_expression* _Empty_expression21 = malloc(sizeof(Empty_expression));
-  if (_Empty_expression21 == NULL) RAISE(123)
-  *_Empty_expression21 = (Empty_expression){Empty_expression__dtl, NULL};
-  _Empty_expression21->_base._dtl = Empty_expression__dtl;
-  (*expression) = &(_Empty_expression21->_base);
+static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
+#define MR_FUNC_NAME _func_name_EmptyExpression_parse_new
+Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
+  EmptyExpression* _EmptyExpression21 = malloc(sizeof(EmptyExpression));
+  if (_EmptyExpression21 == NULL) RAISE(123)
+  *_EmptyExpression21 = (EmptyExpression){EmptyExpression__dtl, NULL};
+  _EmptyExpression21->_base._dtl = EmptyExpression__dtl;
+  (*expression) = &(_EmptyExpression21->_base);
   free(text);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Empty_expression_write(Empty_expression* self);
+Returncode EmptyExpression_write(EmptyExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Empty_expression_write = "Empty-expression.write";
-#define MR_FUNC_NAME _func_name_Empty_expression_write
-Returncode Empty_expression_write(Empty_expression* self) {
+static char* _func_name_EmptyExpression_write = "EmptyExpression.write";
+#define MR_FUNC_NAME _func_name_EmptyExpression_write
+Returncode EmptyExpression_write(EmptyExpression* self) {
   CHECK(127, write(&(String){6, 5, "Empty"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Empty_expression__dtl[];
+extern Func EmptyExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Empty_expression__dtl[] = {Empty_expression_write};
+Func EmptyExpression__dtl[] = {EmptyExpression_write};
 #endif
 
 #undef MR_FILE_NAME

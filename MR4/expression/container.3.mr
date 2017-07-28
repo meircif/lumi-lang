@@ -1,11 +1,11 @@
 ## MR4 compiler - Container expressions
 
 ## An expression surrounded by brackets
-class Block-expression(Expression)
+class BlockExpression(Expression)
   owner Expression expression
   
   func inst parse-new():(owner Expression expression, copy Char end)
-    new Block-expression block-expression
+    new BlockExpression block-expression
     block-expression.parse():(copy end)
     expression := block-expression
   
@@ -21,7 +21,7 @@ class Block-expression(Expression)
 
 
 ## A basic expression with an operator
-class Operator-expression(Expression)
+class OperatorExpression(Expression)
   user Operator operator
   
   func inst parse-sub-expression(user Operator operator, user String ends):(
@@ -41,12 +41,12 @@ class Operator-expression(Expression)
 
 
 ## An expression with an unary operator
-class Unary-expression(Operator-expression)
+class UnaryExpression(OperatorExpression)
   owner Expression expression
   
   func inst parse-new(user String ends, user Operator operator):(
       owner Expression expression, copy Char end)
-    new Unary-expression unary-expression
+    new UnaryExpression unary-expression
     unary-expression.parse(user operator, user ends):(copy end)
     expression := unary-expression
   
@@ -60,14 +60,14 @@ class Unary-expression(Operator-expression)
 
 
 ## An expression with a binary operator
-class Binary-expression(Operator-expression)
+class BinaryExpression(OperatorExpression)
   owner Expression left-expression
   user Operator operator
   owner Expression right-expression
   
   func inst parse-new(user String ends, user Operator operator):(
       owner Expression expression, copy Char end)
-    new Binary-expression binary-expression
+    new BinaryExpression binary-expression
     binary-expression.parse(owner expression, user operator, user ends):(
         copy end)
     expression := binary-expression
@@ -90,11 +90,11 @@ class Binary-expression(Operator-expression)
 
 
 ## An expression with the "?" operator
-class Question-expression(Expression)
+class QuestionExpression(Expression)
   owner Expression tested
   
   func inst parse-new():(owner Expression expression, copy Char end)
-    new Question-expression question-expression
+    new QuestionExpression question-expression
     question-expression.parse(owner expression):(copy end)
     expression := question-expression
   

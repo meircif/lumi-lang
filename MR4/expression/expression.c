@@ -18,12 +18,12 @@ From a complex expression an expression tree is generated, with types such
 operators and slices that contain sub-expression inside.
 
 For example, `array[4] + 3` expression is parsed as:
-Binary-expression:
+BinaryExpression:
   operator: +
-  left: Slice-expression:
-    sequence: Variable-expression(array)
-    index: Int-expression(4)
-  right: Int-expression(3)
+  left: SliceExpression:
+    sequence: VariableExpression(array)
+    index: IntExpression(4)
+  right: IntExpression(3)
  */
 
 /* Return in `expression` a new allocated expression parsed from the input */
@@ -50,7 +50,7 @@ typedef struct Expression Expression;
 #elif MR_STAGE == MR_TYPES(0)
 struct Expression {
   Func* _dtl;
-  Type_instance* result_type;
+  TypeInstance* result_type;
 /* Parse any expression *//* Read a single expression value as new string *//* Parse an expression with an operator *//* Parse an expression that is an operand *//* Parse the initialize part of an operand expression *//* Parse one following part of an operand *//* Set type instance to be a type that has no sub-type *//* write to C - currently inly used in testing */};
 #endif/* Parse any expression */
 #if MR_STAGE == MR_DECLARATIONS
@@ -68,7 +68,7 @@ Returncode Expression_parse_new(Expression* self, String* ends, Expression** exp
     CHECK(39, Expression_read_new_value(self, ends, &(text), &((*end))) )
     
     Operator* operator = NULL;
-    CHECK(42, Name_map_find(glob->operator_map, text, (void**)&(operator)) )
+    CHECK(42, NameMap_find(glob->operator_map, text, (void**)&(operator)) )
     if (NULL != operator) {
       if (!multi_operands) {
         CHECK(45, f_syntax_error(&(String){20, 19, "unexpected operator"}, operator->name) )
@@ -112,10 +112,10 @@ Returncode Expression_parse_new_operator(Expression* self, Operator* operator, B
     CHECK(68, f_syntax_error_c(&(String){11, 10, "unexpected"}, (*end)) )
   }
   if (NULL != (*expression)) {
-    CHECK(70, Binary_expression_parse_new(NULL, ends, operator, &((*expression)), &((*end))) )
+    CHECK(70, BinaryExpression_parse_new(NULL, ends, operator, &((*expression)), &((*end))) )
   }
   else {
-    CHECK(73, Unary_expression_parse_new(NULL, ends, operator, &((*expression)), &((*end))) )
+    CHECK(73, UnaryExpression_parse_new(NULL, ends, operator, &((*expression)), &((*end))) )
   }
   return OK;
 }
@@ -129,7 +129,7 @@ static char* _func_name_Expression_parse_new_operand = "Expression.parse-new-ope
 Returncode Expression_parse_new_operand(Expression* self, String* text, String* ends, Expression** expression, Char* end) {
   if (text->length == 0) {
     if ((*end) == '(') {
-      CHECK(81, Block_expression_parse_new(NULL, &((*expression)), &((*end))) )
+      CHECK(81, BlockExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
     else {
       CHECK(83, f_syntax_error_c(&(String){11, 10, "unexpected"}, (*end)) )
@@ -142,7 +142,7 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
   
   while (true) {
     if ((*end) == '?') {
-      CHECK(90, Question_expression_parse_new(NULL, &((*expression)), &((*end))) )
+      CHECK(90, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
     Bool _Bool24;
     CHECK(91, Expression_parse_new_follow_operand(self, ends, &((*expression)), &((*end)), &(_Bool24)) )
@@ -166,32 +166,32 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Exp
     second = ((text)->values[1]);
   }
   if (first == '\'') {
-    CHECK(102, Char_expression_parse_new(NULL, text, &((*expression))) )
+    CHECK(102, CharExpression_parse_new(NULL, text, &((*expression))) )
   }
   else {
     if (first == '"') {
-      CHECK(104, String_expression_parse_new(NULL, text, &((*expression))) )
+      CHECK(104, StringExpression_parse_new(NULL, text, &((*expression))) )
     }
     else {
       if ((first >= '0' && first <= '9') || (first == '-' && second >= '0' && second <= '9')) {
-        CHECK(107, Int_expression_parse_new(NULL, text, &((*expression))) )
+        CHECK(107, IntExpression_parse_new(NULL, text, &((*expression))) )
       }
       else {
         if (first >= 'A' && first <= 'Z' && second >= 'a' && second <= 'z') {
-          CHECK(109, Type_expression_parse_new(NULL, text, &((*expression))) )
+          CHECK(109, TypeExpression_parse_new(NULL, text, &((*expression))) )
         }
         else {
           if (text->length == 1 && first == '_') {
-            CHECK(111, Empty_expression_parse_new(NULL, text, &((*expression))) )
+            CHECK(111, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
             Bool _Bool25;
             CHECK(112, String_equal(text, &(String){5, 4, "base"}, &(_Bool25)) )
             if (_Bool25) {
-              CHECK(113, Base_meth_expression_parse_new(NULL, text, &((*expression))) )
+              CHECK(113, BaseMethExpression_parse_new(NULL, text, &((*expression))) )
             }
             else {
-              CHECK(115, Variable_expression_parse_new(NULL, text, &((*expression))) )
+              CHECK(115, VariableExpression_parse_new(NULL, text, &((*expression))) )
             }
           }
         }
@@ -210,15 +210,15 @@ static char* _func_name_Expression_parse_new_follow_operand = "Expression.parse-
 Returncode Expression_parse_new_follow_operand(Expression* self, String* ends, Expression** expression, Char* end, Bool* has_more) {
   (*has_more) = true;
   if ((*end) == '.') {
-    CHECK(122, Member_expression_parse_new(NULL, ends, &((*expression)), &((*end))) )
+    CHECK(122, MemberExpression_parse_new(NULL, ends, &((*expression)), &((*end))) )
   }
   else {
     if ((*end) == '[') {
-      CHECK(124, Slice_expression_parse_new(NULL, ends, &((*expression)), &((*end))) )
+      CHECK(124, SliceExpression_parse_new(NULL, ends, &((*expression)), &((*end))) )
     }
     else {
       if ((*end) == '(') {
-        CHECK(126, Call_expression_parse_new(NULL, ends, &((*expression)), &((*end))) )
+        CHECK(126, CallExpression_parse_new(NULL, ends, &((*expression)), &((*end))) )
       }
       else {
         (*has_more) = false;
@@ -230,14 +230,14 @@ Returncode Expression_parse_new_follow_operand(Expression* self, String* ends, E
 #undef MR_FUNC_NAME
 #endif/* Set type instance to be a type that has no sub-type */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_set_simple_type(Expression* self, Type_data* type_data);
+Returncode Expression_set_simple_type(Expression* self, TypeData* type_data);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_set_simple_type = "Expression.set-simple-type";
 #define MR_FUNC_NAME _func_name_Expression_set_simple_type
-Returncode Expression_set_simple_type(Expression* self, Type_data* type_data) {
-  self->result_type = malloc(sizeof(Type_instance));
+Returncode Expression_set_simple_type(Expression* self, TypeData* type_data) {
+  self->result_type = malloc(sizeof(TypeInstance));
   if (self->result_type == NULL) RAISE(132)
-  *self->result_type = (Type_instance){NULL, NULL};
+  *self->result_type = (TypeInstance){NULL, NULL};
   self->result_type->type_data = type_data;
   return OK;
 }
@@ -264,30 +264,30 @@ Func Expression__dtl[] = {Expression_write};
 
 /* A basic expression that has a single textual value */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Text_expression Text_expression;
+typedef struct TextExpression TextExpression;
 #elif MR_STAGE == MR_TYPES(1)
-struct Text_expression {
+struct TextExpression {
   Expression _base;
   String* text;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Text_expression_write(Text_expression* self);
+Returncode TextExpression_write(TextExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Text_expression_write = "Text-expression.write";
-#define MR_FUNC_NAME _func_name_Text_expression_write
-Returncode Text_expression_write(Text_expression* self) {
-  CHECK(146, Text_expression_write_text(self, self->_base.result_type->type_data->name) )
+static char* _func_name_TextExpression_write = "TextExpression.write";
+#define MR_FUNC_NAME _func_name_TextExpression_write
+Returncode TextExpression_write(TextExpression* self) {
+  CHECK(146, TextExpression_write_text(self, self->_base.result_type->type_data->name) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Text_expression_write_text(Text_expression* self, String* type_name);
+Returncode TextExpression_write_text(TextExpression* self, String* type_name);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Text_expression_write_text = "Text-expression.write-text";
-#define MR_FUNC_NAME _func_name_Text_expression_write_text
-Returncode Text_expression_write_text(Text_expression* self, String* type_name) {
+static char* _func_name_TextExpression_write_text = "TextExpression.write-text";
+#define MR_FUNC_NAME _func_name_TextExpression_write_text
+Returncode TextExpression_write_text(TextExpression* self, String* type_name) {
   CHECK(149, write(type_name) )
   CHECK(150, write(&(String){2, 1, "("}) )
   CHECK(151, write(self->text) )
@@ -297,10 +297,10 @@ Returncode Text_expression_write_text(Text_expression* self, String* type_name) 
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Text_expression__dtl[];
+extern Func TextExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Text_expression__dtl[] = {Text_expression_write};
+Func TextExpression__dtl[] = {TextExpression_write};
 #endif
 
 #undef MR_FILE_NAME

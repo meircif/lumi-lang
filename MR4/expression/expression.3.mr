@@ -7,12 +7,12 @@ From a complex expression an expression tree is generated, with types such
 operators and slices that contain sub-expression inside.
 
 For example, `array[4] + 3` expression is parsed as:
-Binary-expression:
+BinaryExpression:
   operator: +
-  left: Slice-expression:
-    sequence: Variable-expression(array)
-    index: Int-expression(4)
-  right: Int-expression(3)
+  left: SliceExpression:
+    sequence: VariableExpression(array)
+    index: IntExpression(4)
+  right: IntExpression(3)
 #)
 
 ## Return in `expression` a new allocated expression parsed from the input
@@ -27,7 +27,7 @@ func parse-new-expression(user String ends):(
 ## Currently only the parsing is fully implemented, `write` is implemented only
 ## for testing.
 class Expression
-  owner Type-instance result-type
+  owner TypeInstance result-type
   
   ## Parse any expression
   func inst parse-new(user String ends):(
@@ -67,10 +67,10 @@ class Expression
     if (end != ' ' and end != '\n')
       f-syntax-error-c(user "unexpected", copy end)
     if ? expression
-      Binary-expression.parse-new(var _, user ends, user operator):(
+      BinaryExpression.parse-new(var _, user ends, user operator):(
           owner expression, copy end)
     else
-      Unary-expression.parse-new(var _, user ends, user operator):(
+      UnaryExpression.parse-new(var _, user ends, user operator):(
           owner expression, copy end)
   
   ## Parse an expression that is an operand
@@ -78,7 +78,7 @@ class Expression
       owner Expression expression, copy Char end)
     if text.length = 0
       if end = '('
-        Block-expression.parse-new(var _):(owner expression, copy end)
+        BlockExpression.parse-new(var _):(owner expression, copy end)
       else
         f-syntax-error-c(user "unexpected", copy end)
       delete text
@@ -87,7 +87,7 @@ class Expression
     
     do
       if end = '?'
-        Question-expression.parse-new(var _):(owner expression, copy end)
+        QuestionExpression.parse-new(var _):(owner expression, copy end)
       while self.parse-new-follow-operand(user ends):(
           owner expression, copy end)
   
@@ -99,37 +99,37 @@ class Expression
     if text.length > 1
       second := text[1]
     if first = '\''
-      Char-expression.parse-new(var _, owner text):(owner expression)
+      CharExpression.parse-new(var _, owner text):(owner expression)
     else-if first = '"'
-      String-expression.parse-new(var _, owner text):(owner expression)
+      StringExpression.parse-new(var _, owner text):(owner expression)
     else-if (first >= '0' and first <= '9') or
         (first = '-' and second >= '0' and second <= '9')
-      Int-expression.parse-new(var _, owner text):(owner expression)
+      IntExpression.parse-new(var _, owner text):(owner expression)
     else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-      Type-expression.parse-new(var _, owner text):(owner expression)
+      TypeExpression.parse-new(var _, owner text):(owner expression)
     else-if text.length = 1 and first = '_'
-      Empty-expression.parse-new(var _, owner text):(owner expression)
+      EmptyExpression.parse-new(var _, owner text):(owner expression)
     else-if text.equal(user "base")
-      Base-meth-expression.parse-new(var _, owner text):(owner expression)
+      BaseMethExpression.parse-new(var _, owner text):(owner expression)
     else
-      Variable-expression.parse-new(var _, owner text):(owner expression)
+      VariableExpression.parse-new(var _, owner text):(owner expression)
   
   ## Parse one following part of an operand
   func inst parse-new-follow-operand(user String ends):(
       owner Expression expression, copy Char end, copy Bool has-more)
     has-more := true
     if end = '.'
-      Member-expression.parse-new(var _, user ends):(owner expression, copy end)
+      MemberExpression.parse-new(var _, user ends):(owner expression, copy end)
     else-if end = '['
-      Slice-expression.parse-new(var _, user ends):(owner expression, copy end)
+      SliceExpression.parse-new(var _, user ends):(owner expression, copy end)
     else-if end = '('
-      Call-expression.parse-new(var _, user ends):(owner expression, copy end)
+      CallExpression.parse-new(var _, user ends):(owner expression, copy end)
     else
       has-more := false
   
   ## Set type instance to be a type that has no sub-type
-  func inst set-simple-type(user Type-data type-data)
-    new Type-instance in self.result-type
+  func inst set-simple-type(user TypeData type-data)
+    new TypeInstance in self.result-type
     self.result-type.type-data := type-data
   
   ## write to C - currently inly used in testing
@@ -139,7 +139,7 @@ class Expression
 
 
 ## A basic expression that has a single textual value
-class Text-expression(Expression)
+class TextExpression(Expression)
   owner String text
   
   func dynamic write()

@@ -13,23 +13,23 @@ static char* _mr_file4_name = "global/map.3.mr";
 
 /* Maps from a string name to a generic object */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Name_map Name_map;
+typedef struct NameMap NameMap;
 #elif MR_STAGE == MR_TYPES(0)
-struct Name_map {
-  Name_map_node* first;
-  Name_map_node* last;
+struct NameMap {
+  NameMapNode* first;
+  NameMapNode* last;
 /* Add `name` -> `value` mapping *//* Find a value mapped from `name`, return empty if not exists */};
 #endif/* Add `name` -> `value` mapping */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Name_map_add(Name_map* self, String* name, void* value);
+Returncode NameMap_add(NameMap* self, String* name, void* value);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Name_map_add = "Name-map.add";
-#define MR_FUNC_NAME _func_name_Name_map_add
-Returncode Name_map_add(Name_map* self, String* name, void* value) {
-  Name_map_node* node = malloc(sizeof(Name_map_node));
+static char* _func_name_NameMap_add = "NameMap.add";
+#define MR_FUNC_NAME _func_name_NameMap_add
+Returncode NameMap_add(NameMap* self, String* name, void* value) {
+  NameMapNode* node = malloc(sizeof(NameMapNode));
   if (node == NULL) RAISE(10)
-  *node = (Name_map_node){NULL, NULL, NULL};
-  CHECK(11, Name_map_node_init(node, name, value) )
+  *node = (NameMapNode){NULL, NULL, NULL};
+  CHECK(11, NameMapNode_init(node, name, value) )
   if (NULL != self->last) {
     self->last->next = node;
   }
@@ -42,12 +42,12 @@ Returncode Name_map_add(Name_map* self, String* name, void* value) {
 #undef MR_FUNC_NAME
 #endif/* Find a value mapped from `name`, return empty if not exists */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Name_map_find(Name_map* self, String* name, void** value);
+Returncode NameMap_find(NameMap* self, String* name, void** value);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Name_map_find = "Name-map.find";
-#define MR_FUNC_NAME _func_name_Name_map_find
-Returncode Name_map_find(Name_map* self, String* name, void** value) {
-  Name_map_node* node = self->first;
+static char* _func_name_NameMap_find = "NameMap.find";
+#define MR_FUNC_NAME _func_name_NameMap_find
+Returncode NameMap_find(NameMap* self, String* name, void** value) {
+  NameMapNode* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
     Bool _Bool10;
@@ -66,20 +66,20 @@ Returncode Name_map_find(Name_map* self, String* name, void** value) {
 
 
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Name_map_node Name_map_node;
+typedef struct NameMapNode NameMapNode;
 #elif MR_STAGE == MR_TYPES(0)
-struct Name_map_node {
-  Name_map_node* next;
+struct NameMapNode {
+  NameMapNode* next;
   String* name;
   void* value;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Name_map_node_init(Name_map_node* self, String* name, void* value);
+Returncode NameMapNode_init(NameMapNode* self, String* name, void* value);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Name_map_node_init = "Name-map-node.init";
-#define MR_FUNC_NAME _func_name_Name_map_node_init
-Returncode Name_map_node_init(Name_map_node* self, String* name, void* value) {
+static char* _func_name_NameMapNode_init = "NameMapNode.init";
+#define MR_FUNC_NAME _func_name_NameMapNode_init
+Returncode NameMapNode_init(NameMapNode* self, String* name, void* value) {
   self->name = name;
   self->value = value;
   return OK;

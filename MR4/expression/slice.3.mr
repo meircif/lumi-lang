@@ -1,14 +1,14 @@
 ## MR4 compiler - Slice expression
 
 ## A slice expression
-class Slice-expression(Expression)
+class SliceExpression(Expression)
   owner Expression sequence
   owner Expression index
   owner Expression second-index
   
   func inst parse-new(user String ends):(
       owner Expression expression, copy Char end)
-    new Slice-expression slice-expression
+    new SliceExpression slice-expression
     slice-expression.parse(owner expression):(copy end)
     expression := slice-expression
   

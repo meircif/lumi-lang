@@ -33,9 +33,9 @@ func f-is-hex(user String text):(copy Bool is-hex)
 
 
 ## Constant integer expression
-class Int-expression(Text-expression)
+class IntExpression(TextExpression)
   func inst parse-new(owner String text):(owner Expression expression)
-    new Int-expression int-expression
+    new IntExpression int-expression
     int-expression.parse(owner text)
     expression := int-expression
   
@@ -66,9 +66,9 @@ class Int-expression(Text-expression)
 
 
 ## Constant character expression
-class Char-expression(Text-expression)
+class CharExpression(TextExpression)
   func inst parse-new(owner String text):(owner Expression expression)
-    new Char-expression char-expression
+    new CharExpression char-expression
     char-expression.parse(owner text)
     expression := char-expression
   
@@ -103,9 +103,9 @@ class Char-expression(Text-expression)
 
 
 ## Constant string expression
-class String-expression(Text-expression)
+class StringExpression(TextExpression)
   func inst parse-new(owner String text):(owner Expression expression)
-    new String-expression string-expression
+    new StringExpression string-expression
     string-expression.parse(owner text)
     expression := string-expression
   
@@ -118,9 +118,9 @@ class String-expression(Text-expression)
 
 
 ## Constant empty expression `_`
-class Empty-expression(Expression)
+class EmptyExpression(Expression)
   func inst parse-new(owner String text):(owner Expression expression)
-    new Empty-expression in expression
+    new EmptyExpression in expression
     delete text
   
   func dynamic write()

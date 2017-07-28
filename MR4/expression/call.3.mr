@@ -1,19 +1,19 @@
 ## MR4 compiler - Call expression
 
 ## Function call expression
-class Call-expression(Expression)
+class CallExpression(Expression)
   owner Expression function
-  owner Call-arguments arguments
+  owner CallArguments arguments
   
   func inst parse-new(user String ends):(
       owner Expression expression, copy Char end)
-    new Call-expression call-expression
+    new CallExpression call-expression
     call-expression.parse(owner expression):(copy end)
     expression := call-expression
   
   func inst parse(owner Expression function):(copy Char end)
     self.function := function
-    new Call-arguments in self.arguments
+    new CallArguments in self.arguments
     self.arguments.parse():(copy end)
   
   func dynamic write()
@@ -21,9 +21,9 @@ class Call-expression(Expression)
     self.arguments.write()
 
 
-static Call-arguments
-  owner Call-argument parameters
-  owner Call-argument outputs
+static CallArguments
+  owner CallArgument parameters
+  owner CallArgument outputs
   
   ## parsing `(access value, ...):(access value, ...)`
   func inst parse():(copy Char end)
@@ -33,9 +33,9 @@ static Call-arguments
       self.parse-args():(owner self.outputs, copy end)
   
   ## parsing single argument list `(access value, ...)`
-  func inst parse-args():(owner Call-argument first, copy Char end)
-    user Call-argument arg
-    var String{128} access-str
+  func inst parse-args():(owner CallArgument first, copy Char end)
+    user CallArgument arg
+    var String{16} access-str
     read-until(user access-str, user " )", copy false):(copy end)
     if end = '\n' and access-str.length = 0
       read-line-break-spaces()
@@ -47,10 +47,10 @@ static Call-arguments
         if end != ' '
           f-syntax-error-c(user "expected space, got", copy end)
         if ? arg
-          new Call-argument in arg.next
+          new CallArgument in arg.next
           arg := arg.next
         else
-          new Call-argument in first
+          new CallArgument in first
           arg := first
         arg.parse(user access-str):(copy end)
         while end = ','
@@ -72,8 +72,8 @@ static Call-arguments
     write(user ")")
   
   ## write arguments starting from `first`
-  func inst write-args(user Call-argument first)
-    user Call-argument arg(first)
+  func inst write-args(user CallArgument first)
+    user CallArgument arg(first)
     do
       arg.write()
       arg := arg.next
@@ -81,10 +81,10 @@ static Call-arguments
       write(user ", ")
 
 
-static Call-argument
+static CallArgument
   var Int access
   owner Expression value
-  owner Call-argument next
+  owner CallArgument next
   
   func inst parse(user String access-str):(copy Char end)
     get-access(user access-str):(copy self.access)

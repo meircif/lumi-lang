@@ -180,7 +180,7 @@ Returncode f_assert_string(String* expected, String* actual) {
 #endif
 
 
-/* Name-map tests */
+/* NameMap tests */
 
 #if MR_STAGE == MR_DECLARATIONS
 Returncode test_name_map();
@@ -188,27 +188,27 @@ Returncode test_name_map();
 static char* _func_name_test_name_map = "test-name-map";
 #define MR_FUNC_NAME _func_name_test_name_map
 Returncode test_name_map() {
-  Name_map* map = &(Name_map){NULL, NULL};
+  NameMap* map = &(NameMap){NULL, NULL};
   String* _String29;
-  CHECK(77, Name_map_find(map, &(String){6, 5, "name1"}, (void**)&(_String29)) )
+  CHECK(77, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String29)) )
   TEST_ASSERT(77, !(NULL != _String29))
   String* _String30;
   CHECK(78, string_new_copy(&(String){7, 6, "value1"}, &(_String30)) )
-  CHECK(78, Name_map_add(map, &(String){6, 5, "name1"}, _String30) )
+  CHECK(78, NameMap_add(map, &(String){6, 5, "name1"}, _String30) )
   String* _String31;
-  CHECK(79, Name_map_find(map, &(String){6, 5, "name1"}, (void**)&(_String31)) )
+  CHECK(79, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String31)) )
   CHECK(79, f_assert_string(_String31, &(String){7, 6, "value1"}) )
   String* _String32;
-  CHECK(80, Name_map_find(map, &(String){6, 5, "name2"}, (void**)&(_String32)) )
+  CHECK(80, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String32)) )
   TEST_ASSERT(80, !(NULL != _String32))
   String* _String33;
   CHECK(81, string_new_copy(&(String){7, 6, "value2"}, &(_String33)) )
-  CHECK(81, Name_map_add(map, &(String){6, 5, "name2"}, _String33) )
+  CHECK(81, NameMap_add(map, &(String){6, 5, "name2"}, _String33) )
   String* _String34;
-  CHECK(82, Name_map_find(map, &(String){6, 5, "name1"}, (void**)&(_String34)) )
+  CHECK(82, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String34)) )
   CHECK(82, f_assert_string(_String34, &(String){7, 6, "value1"}) )
   String* _String35;
-  CHECK(83, Name_map_find(map, &(String){6, 5, "name2"}, (void**)&(_String35)) )
+  CHECK(83, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String35)) )
   CHECK(83, f_assert_string(_String35, &(String){7, 6, "value2"}) )
   return OK;
 }

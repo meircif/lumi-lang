@@ -15,21 +15,21 @@ static char* _mr_file3_name = "global/global.3.mr";
 typedef struct Global Global;
 #elif MR_STAGE == MR_TYPES(0)
 struct Global {
-/* stores all language operators */  Name_map* operator_map;
-/* stores all types - language built-ins and user defined */  Name_map* type_map;
+/* stores all language operators */  NameMap* operator_map;
+/* stores all types - language built-ins and user defined */  NameMap* type_map;
 /* the currently parsed input file object */  File* input_file;
 /* the currently written output file object */  File* output_file;
 /* holds the name of the input-file and the line number of the code currently *//* been worked with */  String* input_file_name;
   Int line_number;
 /* current indentation */  Int spaces;
-/* built-in types */  Type_data* type_char;
-  Type_data* type_bool;
-  Type_data* type_int;
-  Type_data* type_func;
-  Type_data* type_string;
-  Type_data* type_array;
-  Type_data* type_file;
-  Type_data* type_sys;
+/* built-in types */  TypeData* type_char;
+  TypeData* type_bool;
+  TypeData* type_int;
+  TypeData* type_func;
+  TypeData* type_string;
+  TypeData* type_array;
+  TypeData* type_file;
+  TypeData* type_sys;
 };
 #endif/* stores all language operators *//* stores all types - language built-ins and user defined *//* the currently parsed input file object *//* the currently written output file object *//* holds the name of the input-file and the line number of the code currently *//* been worked with *//* current indentation *//* built-in types */
 #if MR_STAGE == MR_DECLARATIONS
@@ -50,9 +50,9 @@ Returncode Global_init_operator_map(Global* self);
 static char* _func_name_Global_init_operator_map = "Global.init-operator-map";
 #define MR_FUNC_NAME _func_name_Global_init_operator_map
 Returncode Global_init_operator_map(Global* self) {
-  self->operator_map = malloc(sizeof(Name_map));
+  self->operator_map = malloc(sizeof(NameMap));
   if (self->operator_map == NULL) RAISE(39)
-  *self->operator_map = (Name_map){NULL, NULL};
+  *self->operator_map = (NameMap){NULL, NULL};
   CHECK(40, Global_add_operator(self, &(String){3, 2, ":="}, &(String){2, 1, "="}) )
   CHECK(41, Global_add_operator_copy(self, &(String){2, 1, "+"}) )
   CHECK(42, Global_add_operator_copy(self, &(String){2, 1, "-"}) )
@@ -83,7 +83,7 @@ Returncode Global_add_operator(Global* self, String* name, String* c_name) {
   if (operator == NULL) RAISE(58)
   *operator = (Operator){NULL, NULL};
   CHECK(59, Operator_init(operator, name, c_name) )
-  CHECK(60, Name_map_add(self->operator_map, operator->name, operator) )
+  CHECK(60, NameMap_add(self->operator_map, operator->name, operator) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -105,9 +105,9 @@ Returncode Global_init_builtin_types(Global* self);
 static char* _func_name_Global_init_builtin_types = "Global.init-builtin-types";
 #define MR_FUNC_NAME _func_name_Global_init_builtin_types
 Returncode Global_init_builtin_types(Global* self) {
-  self->type_map = malloc(sizeof(Name_map));
+  self->type_map = malloc(sizeof(NameMap));
   if (self->type_map == NULL) RAISE(66)
-  *self->type_map = (Name_map){NULL, NULL};
+  *self->type_map = (NameMap){NULL, NULL};
   CHECK(67, Global_add_type(self, &(String){5, 4, "Char"}, &(self->type_char)) )
   CHECK(68, Global_add_type(self, &(String){5, 4, "Bool"}, &(self->type_bool)) )
   CHECK(69, Global_add_type(self, &(String){4, 3, "Int"}, &(self->type_int)) )
@@ -121,18 +121,18 @@ Returncode Global_init_builtin_types(Global* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Global_add_type(Global* self, String* name, Type_data** type_data);
+Returncode Global_add_type(Global* self, String* name, TypeData** type_data);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Global_add_type = "Global.add-type";
 #define MR_FUNC_NAME _func_name_Global_add_type
-Returncode Global_add_type(Global* self, String* name, Type_data** type_data) {
-  (*type_data) = malloc(sizeof(Type_data));
+Returncode Global_add_type(Global* self, String* name, TypeData** type_data) {
+  (*type_data) = malloc(sizeof(TypeData));
   if ((*type_data) == NULL) RAISE(77)
-  *(*type_data) = (Type_data){NULL};
+  *(*type_data) = (TypeData){NULL};
   String* _String9;
   CHECK(78, string_new_copy(name, &(_String9)) )
-  CHECK(78, Type_data_init((*type_data), _String9) )
-  CHECK(79, Name_map_add(self->type_map, (*type_data)->name, (*type_data)) )
+  CHECK(78, TypeData_init((*type_data), _String9) )
+  CHECK(79, NameMap_add(self->type_map, (*type_data)->name, (*type_data)) )
   return OK;
 }
 #undef MR_FUNC_NAME

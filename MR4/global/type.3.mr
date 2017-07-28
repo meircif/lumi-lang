@@ -1,7 +1,7 @@
 ## MR4 compiler - Meta types
 
 ## Meta type for a type in the language
-static Type-data
+static TypeData
   owner String name
   
   func inst init(owner String name)
@@ -9,13 +9,13 @@ static Type-data
 
 
 ## Specific usage of a type including the assigned subtype
-static Type-instance
-  user Type-data type-data
-  owner Type-instance sub-type
+static TypeInstance
+  user TypeData type-data
+  owner TypeInstance sub-type
   
   ## Return a new deep-copy of self
-  func inst m-copy-new():(owner Type-instance type-instance)
-    new Type-instance in type-instance
+  func inst m-copy-new():(owner TypeInstance type-instance)
+    new TypeInstance in type-instance
     type-instance.type-data := self.type-data
     if ? self.sub-type
       self.sub-type.m-copy-new():(owner type-instance.sub-type)

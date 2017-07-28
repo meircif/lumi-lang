@@ -1,13 +1,13 @@
 ## MR4 compiler - Generic mappings
 
 ## Maps from a string name to a generic object
-static Name-map{Generic}
-  owner Name-map-node{Generic} first
-  owner Name-map-node{Generic} last
+static NameMap{Generic}
+  owner NameMapNode{Generic} first
+  owner NameMapNode{Generic} last
   
   ## Add `name` -> `value` mapping
   func inst add(user String name, owner Generic value)
-    new Name-map-node{Generic} node
+    new NameMapNode{Generic} node
     node.init(user name, owner value)
     if ? self.last
       self.last.next := node
@@ -17,7 +17,7 @@ static Name-map{Generic}
   
   ## Find a value mapped from `name`, return empty if not exists
   func inst find(user String name):(user Generic value)
-    user Name-map-node{Generic} node(self.first)
+    user NameMapNode{Generic} node(self.first)
     do
       while ? node
       if node.name.equal(user name)
@@ -27,8 +27,8 @@ static Name-map{Generic}
     value := _
 
 
-static Name-map-node{Generic}
-  owner Name-map-node{Generic} next
+static NameMapNode{Generic}
+  owner NameMapNode{Generic} next
   user String name
   owner Generic value
   

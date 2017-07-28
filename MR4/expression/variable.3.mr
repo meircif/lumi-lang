@@ -1,11 +1,11 @@
 ## MR4 compiler - Variable expression
 
 ## A single variable expression
-class Variable-expression(Text-expression)
+class VariableExpression(TextExpression)
   user Variable variable
   
   func inst parse-new(owner String text):(owner Expression expression)
-    new Variable-expression variable-expression
+    new VariableExpression variable-expression
     variable-expression.parse(owner text)
     expression := variable-expression
   
@@ -17,9 +17,9 @@ class Variable-expression(Text-expression)
     self.write-text(user "Variable")
 
 ## The `base` method expression
-class Base-meth-expression(Expression)
+class BaseMethExpression(Expression)
   func inst parse-new(owner String text):(owner Expression expression)
-    new Base-meth-expression in expression
+    new BaseMethExpression in expression
     delete text
   
   func dynamic write()
@@ -27,11 +27,11 @@ class Base-meth-expression(Expression)
 
 
 ## Type name expression
-class Type-expression(Text-expression)
-  owner Type-instance type-value
+class TypeExpression(TextExpression)
+  owner TypeInstance type-value
   
   func inst parse-new(owner String text):(owner Expression expression)
-    new Type-expression type-expression
+    new TypeExpression type-expression
     type-expression.parse(owner text)
     expression := type-expression
   
@@ -44,12 +44,12 @@ class Type-expression(Text-expression)
 
 
 ## An instance member expression
-class Member-expression(Variable-expression)
+class MemberExpression(VariableExpression)
   owner Expression instance
   
   func inst parse-new(user String ends):(
       owner Expression expression, copy Char end)
-    new Member-expression member-expression
+    new MemberExpression member-expression
     member-expression.parse(owner expression, user ends):(copy end)
     expression := member-expression
   

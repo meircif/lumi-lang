@@ -2,10 +2,10 @@
 
 static Global
   ## stores all language operators
-  owner Name-map{Operator} operator-map
+  owner NameMap{Operator} operator-map
   
   ## stores all types - language built-ins and user defined
-  owner Name-map{Type-data} type-map
+  owner NameMap{TypeData} type-map
   
   ## the currently parsed input file object
   owner File input-file
@@ -22,21 +22,21 @@ static Global
   var Int spaces
   
   ## built-in types
-  user Type-data type-char
-  user Type-data type-bool
-  user Type-data type-int
-  user Type-data type-func
-  user Type-data type-string
-  user Type-data type-array
-  user Type-data type-file
-  user Type-data type-sys
+  user TypeData type-char
+  user TypeData type-bool
+  user TypeData type-int
+  user TypeData type-func
+  user TypeData type-string
+  user TypeData type-array
+  user TypeData type-file
+  user TypeData type-sys
   
   func inst init()
     self.init-operator-map()
     self.init-builtin-types()
   
   func inst init-operator-map()
-    new Name-map{Operator} in self.operator-map
+    new NameMap{Operator} in self.operator-map
     self.add-operator(user ":=", user "=")
     self.add-operator-copy(user "+")
     self.add-operator-copy(user "-")
@@ -63,7 +63,7 @@ static Global
     self.add-operator(user name, user name)
   
   func inst init-builtin-types()
-    new Name-map{Type-data} in self.type-map
+    new NameMap{TypeData} in self.type-map
     self.add-type(user "Char"):(user self.type-char)
     self.add-type(user "Bool"):(user self.type-bool)
     self.add-type(user "Int"):(user self.type-int)
@@ -73,8 +73,8 @@ static Global
     self.add-type(user "File"):(user self.type-file)
     self.add-type(user "Sys"):(user self.type-sys)
   
-  func inst add-type(user String name):(user Type-data type-data)
-    new Type-data in type-data
+  func inst add-type(user String name):(user TypeData type-data)
+    new TypeData in type-data
     type-data.init(owner string-new-copy(user name))
     self.type-map.add(user type-data.name, owner type-data)
 

@@ -13,187 +13,187 @@ static char* _mr_file11_name = "expression/variable.3.mr";
 
 /* A single variable expression */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Variable_expression Variable_expression;
+typedef struct VariableExpression VariableExpression;
 #elif MR_STAGE == MR_TYPES(2)
-struct Variable_expression {
-  Text_expression _base;
+struct VariableExpression {
+  TextExpression _base;
   Variable* variable;
 /* parsing `variable` */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Variable_expression_parse_new(Variable_expression* self, String* text, Expression** expression);
+Returncode VariableExpression_parse_new(VariableExpression* self, String* text, Expression** expression);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Variable_expression_parse_new = "Variable-expression.parse-new";
-#define MR_FUNC_NAME _func_name_Variable_expression_parse_new
-Returncode Variable_expression_parse_new(Variable_expression* self, String* text, Expression** expression) {
-  Variable_expression* variable_expression = malloc(sizeof(Variable_expression));
+static char* _func_name_VariableExpression_parse_new = "VariableExpression.parse-new";
+#define MR_FUNC_NAME _func_name_VariableExpression_parse_new
+Returncode VariableExpression_parse_new(VariableExpression* self, String* text, Expression** expression) {
+  VariableExpression* variable_expression = malloc(sizeof(VariableExpression));
   if (variable_expression == NULL) RAISE(8)
-  *variable_expression = (Variable_expression){Variable_expression__dtl, NULL, NULL, NULL};
-  variable_expression->_base._base._dtl = Variable_expression__dtl;
-  CHECK(9, Variable_expression_parse(variable_expression, text) )
+  *variable_expression = (VariableExpression){VariableExpression__dtl, NULL, NULL, NULL};
+  variable_expression->_base._base._dtl = VariableExpression__dtl;
+  CHECK(9, VariableExpression_parse(variable_expression, text) )
   (*expression) = &(variable_expression->_base._base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* parsing `variable` */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Variable_expression_parse(Variable_expression* self, String* text);
+Returncode VariableExpression_parse(VariableExpression* self, String* text);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Variable_expression_parse = "Variable-expression.parse";
-#define MR_FUNC_NAME _func_name_Variable_expression_parse
-Returncode Variable_expression_parse(Variable_expression* self, String* text) {
+static char* _func_name_VariableExpression_parse = "VariableExpression.parse";
+#define MR_FUNC_NAME _func_name_VariableExpression_parse
+Returncode VariableExpression_parse(VariableExpression* self, String* text) {
   self->_base.text = text;
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Variable_expression_write(Variable_expression* self);
+Returncode VariableExpression_write(VariableExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Variable_expression_write = "Variable-expression.write";
-#define MR_FUNC_NAME _func_name_Variable_expression_write
-Returncode Variable_expression_write(Variable_expression* self) {
-  CHECK(17, Text_expression_write_text(&(self->_base), &(String){9, 8, "Variable"}) )
+static char* _func_name_VariableExpression_write = "VariableExpression.write";
+#define MR_FUNC_NAME _func_name_VariableExpression_write
+Returncode VariableExpression_write(VariableExpression* self) {
+  CHECK(17, TextExpression_write_text(&(self->_base), &(String){9, 8, "Variable"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Variable_expression__dtl[];
+extern Func VariableExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Variable_expression__dtl[] = {Variable_expression_write};
+Func VariableExpression__dtl[] = {VariableExpression_write};
 #endif
 
 /* The `base` method expression */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Base_meth_expression Base_meth_expression;
+typedef struct BaseMethExpression BaseMethExpression;
 #elif MR_STAGE == MR_TYPES(1)
-struct Base_meth_expression {
+struct BaseMethExpression {
   Expression _base;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Base_meth_expression_parse_new(Base_meth_expression* self, String* text, Expression** expression);
+Returncode BaseMethExpression_parse_new(BaseMethExpression* self, String* text, Expression** expression);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Base_meth_expression_parse_new = "Base-meth-expression.parse-new";
-#define MR_FUNC_NAME _func_name_Base_meth_expression_parse_new
-Returncode Base_meth_expression_parse_new(Base_meth_expression* self, String* text, Expression** expression) {
-  Base_meth_expression* _Base_meth_expression26 = malloc(sizeof(Base_meth_expression));
-  if (_Base_meth_expression26 == NULL) RAISE(22)
-  *_Base_meth_expression26 = (Base_meth_expression){Base_meth_expression__dtl, NULL};
-  _Base_meth_expression26->_base._dtl = Base_meth_expression__dtl;
-  (*expression) = &(_Base_meth_expression26->_base);
+static char* _func_name_BaseMethExpression_parse_new = "BaseMethExpression.parse-new";
+#define MR_FUNC_NAME _func_name_BaseMethExpression_parse_new
+Returncode BaseMethExpression_parse_new(BaseMethExpression* self, String* text, Expression** expression) {
+  BaseMethExpression* _BaseMethExpression26 = malloc(sizeof(BaseMethExpression));
+  if (_BaseMethExpression26 == NULL) RAISE(22)
+  *_BaseMethExpression26 = (BaseMethExpression){BaseMethExpression__dtl, NULL};
+  _BaseMethExpression26->_base._dtl = BaseMethExpression__dtl;
+  (*expression) = &(_BaseMethExpression26->_base);
   free(text);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Base_meth_expression_write(Base_meth_expression* self);
+Returncode BaseMethExpression_write(BaseMethExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Base_meth_expression_write = "Base-meth-expression.write";
-#define MR_FUNC_NAME _func_name_Base_meth_expression_write
-Returncode Base_meth_expression_write(Base_meth_expression* self) {
+static char* _func_name_BaseMethExpression_write = "BaseMethExpression.write";
+#define MR_FUNC_NAME _func_name_BaseMethExpression_write
+Returncode BaseMethExpression_write(BaseMethExpression* self) {
   CHECK(26, write(&(String){5, 4, "Base"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Base_meth_expression__dtl[];
+extern Func BaseMethExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Base_meth_expression__dtl[] = {Base_meth_expression_write};
+Func BaseMethExpression__dtl[] = {BaseMethExpression_write};
 #endif
 
 
 /* Type name expression */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Type_expression Type_expression;
+typedef struct TypeExpression TypeExpression;
 #elif MR_STAGE == MR_TYPES(2)
-struct Type_expression {
-  Text_expression _base;
-  Type_instance* type_value;
+struct TypeExpression {
+  TextExpression _base;
+  TypeInstance* type_value;
 /* parsing `Type-name` */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Type_expression_parse_new(Type_expression* self, String* text, Expression** expression);
+Returncode TypeExpression_parse_new(TypeExpression* self, String* text, Expression** expression);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Type_expression_parse_new = "Type-expression.parse-new";
-#define MR_FUNC_NAME _func_name_Type_expression_parse_new
-Returncode Type_expression_parse_new(Type_expression* self, String* text, Expression** expression) {
-  Type_expression* type_expression = malloc(sizeof(Type_expression));
+static char* _func_name_TypeExpression_parse_new = "TypeExpression.parse-new";
+#define MR_FUNC_NAME _func_name_TypeExpression_parse_new
+Returncode TypeExpression_parse_new(TypeExpression* self, String* text, Expression** expression) {
+  TypeExpression* type_expression = malloc(sizeof(TypeExpression));
   if (type_expression == NULL) RAISE(34)
-  *type_expression = (Type_expression){Type_expression__dtl, NULL, NULL, NULL};
-  type_expression->_base._base._dtl = Type_expression__dtl;
-  CHECK(35, Type_expression_parse(type_expression, text) )
+  *type_expression = (TypeExpression){TypeExpression__dtl, NULL, NULL, NULL};
+  type_expression->_base._base._dtl = TypeExpression__dtl;
+  CHECK(35, TypeExpression_parse(type_expression, text) )
   (*expression) = &(type_expression->_base._base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* parsing `Type-name` */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Type_expression_parse(Type_expression* self, String* text);
+Returncode TypeExpression_parse(TypeExpression* self, String* text);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Type_expression_parse = "Type-expression.parse";
-#define MR_FUNC_NAME _func_name_Type_expression_parse
-Returncode Type_expression_parse(Type_expression* self, String* text) {
+static char* _func_name_TypeExpression_parse = "TypeExpression.parse";
+#define MR_FUNC_NAME _func_name_TypeExpression_parse
+Returncode TypeExpression_parse(TypeExpression* self, String* text) {
   self->_base.text = text;
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Type_expression_write(Type_expression* self);
+Returncode TypeExpression_write(TypeExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Type_expression_write = "Type-expression.write";
-#define MR_FUNC_NAME _func_name_Type_expression_write
-Returncode Type_expression_write(Type_expression* self) {
-  CHECK(43, Text_expression_write_text(&(self->_base), &(String){5, 4, "Type"}) )
+static char* _func_name_TypeExpression_write = "TypeExpression.write";
+#define MR_FUNC_NAME _func_name_TypeExpression_write
+Returncode TypeExpression_write(TypeExpression* self) {
+  CHECK(43, TextExpression_write_text(&(self->_base), &(String){5, 4, "Type"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Type_expression__dtl[];
+extern Func TypeExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Type_expression__dtl[] = {Type_expression_write};
+Func TypeExpression__dtl[] = {TypeExpression_write};
 #endif
 
 
 /* An instance member expression */
 #if MR_STAGE == MR_TYPEDEFS
-typedef struct Member_expression Member_expression;
+typedef struct MemberExpression MemberExpression;
 #elif MR_STAGE == MR_TYPES(3)
-struct Member_expression {
-  Variable_expression _base;
+struct MemberExpression {
+  VariableExpression _base;
   Expression* instance;
 /* parsing `instance.variable` */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Member_expression_parse_new(Member_expression* self, String* ends, Expression** expression, Char* end);
+Returncode MemberExpression_parse_new(MemberExpression* self, String* ends, Expression** expression, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Member_expression_parse_new = "Member-expression.parse-new";
-#define MR_FUNC_NAME _func_name_Member_expression_parse_new
-Returncode Member_expression_parse_new(Member_expression* self, String* ends, Expression** expression, Char* end) {
-  Member_expression* member_expression = malloc(sizeof(Member_expression));
+static char* _func_name_MemberExpression_parse_new = "MemberExpression.parse-new";
+#define MR_FUNC_NAME _func_name_MemberExpression_parse_new
+Returncode MemberExpression_parse_new(MemberExpression* self, String* ends, Expression** expression, Char* end) {
+  MemberExpression* member_expression = malloc(sizeof(MemberExpression));
   if (member_expression == NULL) RAISE(52)
-  *member_expression = (Member_expression){Member_expression__dtl, NULL, NULL, NULL, NULL};
-  member_expression->_base._base._base._dtl = Member_expression__dtl;
-  CHECK(53, Member_expression_parse(member_expression, (*expression), ends, &((*end))) )
+  *member_expression = (MemberExpression){MemberExpression__dtl, NULL, NULL, NULL, NULL};
+  member_expression->_base._base._base._dtl = MemberExpression__dtl;
+  CHECK(53, MemberExpression_parse(member_expression, (*expression), ends, &((*end))) )
   (*expression) = &(member_expression->_base._base._base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* parsing `instance.variable` */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Member_expression_parse(Member_expression* self, Expression* instance, String* ends, Char* end);
+Returncode MemberExpression_parse(MemberExpression* self, Expression* instance, String* ends, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Member_expression_parse = "Member-expression.parse";
-#define MR_FUNC_NAME _func_name_Member_expression_parse
-Returncode Member_expression_parse(Member_expression* self, Expression* instance, String* ends, Char* end) {
+static char* _func_name_MemberExpression_parse = "MemberExpression.parse";
+#define MR_FUNC_NAME _func_name_MemberExpression_parse
+Returncode MemberExpression_parse(MemberExpression* self, Expression* instance, String* ends, Char* end) {
   self->instance = instance;
   CHECK(59, Expression_read_new_value(&(self->_base._base._base), ends, &(self->_base._base.text), &((*end))) )
   return OK;
@@ -201,22 +201,22 @@ Returncode Member_expression_parse(Member_expression* self, Expression* instance
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Member_expression_write(Member_expression* self);
+Returncode MemberExpression_write(MemberExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Member_expression_write = "Member-expression.write";
-#define MR_FUNC_NAME _func_name_Member_expression_write
-Returncode Member_expression_write(Member_expression* self) {
+static char* _func_name_MemberExpression_write = "MemberExpression.write";
+#define MR_FUNC_NAME _func_name_MemberExpression_write
+Returncode MemberExpression_write(MemberExpression* self) {
   CHECK(62, (self->instance)->_dtl[0](self->instance) )
-  CHECK(63, Text_expression_write_text(&(self->_base._base), &(String){8, 7, ".Member"}) )
+  CHECK(63, TextExpression_write_text(&(self->_base._base), &(String){8, 7, ".Member"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-extern Func Member_expression__dtl[];
+extern Func MemberExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Member_expression__dtl[] = {Member_expression_write};
+Func MemberExpression__dtl[] = {MemberExpression_write};
 #endif
 
 #undef MR_FILE_NAME

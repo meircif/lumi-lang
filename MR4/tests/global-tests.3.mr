@@ -70,10 +70,10 @@ func f-assert-string(user String expected, user String actual)
   f-assert-string-slice(user expected, user actual, copy 0, copy actual.length)
 
 
-# Name-map tests
+# NameMap tests
 
 test test-name-map()
-  var Name-map{String} map
+  var NameMap{String} map
   assert not (? map.find(user "name1"))
   map.add(user "name1", owner string-new-copy(user "value1"))
   f-assert-string(user map.find(user "name1"), user "value1")
