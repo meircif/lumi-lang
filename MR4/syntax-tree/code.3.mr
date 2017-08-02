@@ -1,0 +1,15 @@
+## MR4 compiler - Syntax tree code nodes
+
+## Expression node in the syntax tree
+class SyntaxTreeExpression(SyntaxTreeCode)
+  owner Expression expression
+  
+  func inst parse-new():(owner SyntaxTreeExpression new-node)
+    new SyntaxTreeExpression in new-node
+    new-node.parse()
+  
+  func inst parse()
+    Expression.parse-new(var _, user ""):(owner self.expression)
+  
+  func dynamic write()
+    self.expression.write()

@@ -1,0 +1,138 @@
+## MR4 compiler - Syntax tree function
+
+## Function node in the syntax tree 
+class SyntaxTreeFunction(SyntaxTreeBlock)
+  user SyntaxTreeType type-node
+  owner String name
+  owner FunctionArguments arguemnts
+  
+  func inst parse-new(user SyntaxTreeType type-node):(
+      owner SyntaxTreeFunction new-node)
+    new SyntaxTreeFunction in new-node
+    new-node.parse(user type-node)
+  
+  func inst parse(user SyntaxTreeType type-node)
+    self.type-node := type-node
+    if ? self.type-node
+      self.indentation-spaces := 4
+    else
+      self.indentation-spaces := 2
+    var Char end
+    read-new(user "("):(owner self.name, copy end)
+    if end != '('
+      f-syntax-error-c(user "expected \"(\", got ", copy end)
+    new FunctionArguments in self.arguemnts
+    var ArgumentFactory argument-factory
+    self.arguemnts.parse(user argument-factory):(copy end)
+    if end != '\n'
+      f-syntax-error-c(user "expected line-end, got ", copy end)
+    self.parse-block()
+  
+  func dynamic write()
+    write(user "Function(")
+    write(user self.name)
+    write(user ")")
+    self.arguemnts.write()
+    self.write-block()
+
+
+## Basic function argument
+class Argument
+  var Int access
+  
+  func inst parse(user String access-str):(copy Char end)
+    get-access(user access-str):(copy self.access)
+    self.parse-value():(copy end)
+  
+  func dynamic parse-value():(copy Char end)
+    raise
+  
+  func inst write()
+    write(user "Access(")
+    write-int(copy self.access)
+    write(user ") ")
+    self.write-value()
+  
+  func dynamic write-value()
+    raise
+
+
+## Function declaration argument
+class DeclarationArgument(Argument)
+  owner TypeInstance type-instance
+  owner String name
+  
+  func dynamic parse-value():(copy Char end)
+    new TypeInstance in self.type-instance
+    self.type-instance.parse(user " "):(copy end)
+    if end != ' '
+      f-syntax-error-c(user "expected space, got ", copy end)
+    read-new(user ",)"):(owner self.name, copy end)
+  
+  func dynamic write-value()
+    self.type-instance.write()
+    write(user " ")
+    write(user self.name)
+
+
+class ArgumentFactory
+  func dynamic m-new-argument():(owner Argument new-argument)
+    new DeclarationArgument in new-argument
+
+
+## All function parameters and outputs
+static FunctionArguments
+  owner List{Argument} parameters
+  owner List{Argument} outputs
+  
+  func inst parse(user ArgumentFactory argument-factory):(copy Char end)
+    new List{Argument} in self.parameters
+    new List{Argument} in self.outputs
+    self.parse-args(user self.parameters, user argument-factory):(copy end)
+    if end = '-'
+      read-expect(user ">(")
+      self.parse-args(user self.outputs, user argument-factory):(copy end)
+  
+  func inst parse-args(
+      user List{Argument} arguments, user ArgumentFactory argument-factory):(
+      copy Char end)
+    owner Argument argument
+    user String access-str
+    read-until(user " )", copy false):(user access-str, copy end)
+    if end = '\n' and access-str.length = 0
+      read-line-break-spaces()
+      read-until(user " ", copy false):(user access-str, copy end)
+    if end != ')' or access-str.length > 0
+      do
+        if access-str.length = 0
+          f-syntax-error-c(user "expected access, got", copy end)
+        if end != ' '
+          f-syntax-error-c(user "expected space, got", copy end)
+        argument-factory.m-new-argument():(owner argument)
+        arguments.add(owner argument)
+        argument.parse(user access-str):(copy end)
+        while end = ','
+        read-c():(copy end)
+        if end = '\n'
+          read-line-break-spaces()
+        else-if end != ' '
+          f-syntax-error-c(user "expected space or new-line, got", copy end)
+        read-until(user " ", copy false):(user access-str, copy end)
+    read-c():(copy end)
+  
+  func inst write()
+    write(user "(")
+    if ? self.parameters.first
+      self.write-args(user self.parameters)
+    if ? self.outputs.first
+      write(user ")->(")
+      self.write-args(user self.outputs)
+    write(user ")")
+  
+  func inst write-args(user List{Argument} arguments)
+    user ListNode{Argument} node(arguments.first)
+    do
+      node.item.write()
+      node := node.next
+      while ? node
+      write(user ", ")

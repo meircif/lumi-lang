@@ -19,6 +19,24 @@ static TypeInstance
     type-instance.type-data := self.type-data
     if ? self.sub-type
       self.sub-type.m-copy-new():(owner type-instance.sub-type)
+  
+  func inst parse(user String ends):(copy Char end)
+    new TypeData in self.type-data
+    read-new(user string-new-concat(user ends, user "{")):(
+        owner self.type-data.name, copy end)
+    if end = '{'
+      new TypeInstance in self.sub-type
+      self.sub-type.parse(user "}"):(copy end)
+      if end != '}'
+        f-syntax-error-c(user "expected \"}\", got ", copy end)
+      read-c():(copy end)
+  
+  func inst write()
+    write(user self.type-data.name)
+    if ? self.sub-type
+      write(user "{")
+      self.sub-type.write()
+      write(user "}")
 
 
 ## Meta type of an operator

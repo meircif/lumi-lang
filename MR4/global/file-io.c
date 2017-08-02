@@ -25,12 +25,24 @@ Returncode file_getc(File* file, Char* ch) {
 #endif
 
 #if MR_STAGE == MR_DECLARATIONS
+Returncode file_putc(File* file, Char ch);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_file_putc = "file-putc";
+#define MR_FUNC_NAME _func_name_file_putc
+Returncode file_putc(File* file, Char ch) {
+  CHECK(8, File_putc(file, ch) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
 Returncode file_write(File* file, String* text);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_file_write = "file-write";
 #define MR_FUNC_NAME _func_name_file_write
 Returncode file_write(File* file, String* text) {
-  CHECK(8, File_write(file, text) )
+  CHECK(11, File_write(file, text) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -44,10 +56,11 @@ Returncode read_c(Char* ch);
 static char* _func_name_read_c = "read-c";
 #define MR_FUNC_NAME _func_name_read_c
 Returncode read_c(Char* ch) {
-  CHECK(13, file_getc(glob->input_file, &((*ch))) )
-  if ((*ch) == '\n') {
+  if (glob->got_new_line) {
     glob->line_number += 1;
   }
+  CHECK(18, file_getc(glob->input_file, &((*ch))) )
+  glob->got_new_line = (*ch) == '\n';
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -62,16 +75,16 @@ static char* _func_name_read_expect = "read-expect";
 #define MR_FUNC_NAME _func_name_read_expect
 Returncode read_expect(String* expected_text) {
   String* actual_text = _new_string(expected_text->length + 1);
-  if (actual_text == NULL) RAISE(20)
+  if (actual_text == NULL) RAISE(24)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
     Char _Char0;
-    CHECK(22, read_c(&(_Char0)) )
-    CHECK(22, String_append(actual_text, _Char0) )
+    CHECK(26, read_c(&(_Char0)) )
+    CHECK(26, String_append(actual_text, _Char0) )
   }}
   Bool _Bool1;
-  CHECK(23, String_equal(actual_text, expected_text, &(_Bool1)) )
+  CHECK(27, String_equal(actual_text, expected_text, &(_Bool1)) )
   if (!_Bool1) {
-    CHECK(24, f_syntax_error2(&(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
+    CHECK(28, f_syntax_error2(&(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);
   return OK;
@@ -89,13 +102,13 @@ static char* _func_name_read_line_break_spaces = "read-line-break-spaces";
 Returncode read_line_break_spaces() {
   {int n; for (n = (0); n < (glob->spaces + 4); ++n) {
     Char _Char2;
-    CHECK(32, read_c(&(_Char2)) )
+    CHECK(36, read_c(&(_Char2)) )
     if (_Char2 != ' ') {
       String* expected_spaces = &(String){128, 0, (char[128]){0}};
       String* actual_spaces = &(String){128, 0, (char[128]){0}};
-      CHECK(35, Int_str(glob->spaces + 4, expected_spaces) )
-      CHECK(36, Int_str(n - 1, actual_spaces) )
-      CHECK(37, f_syntax_error2(&(String){32, 31, "too short indentation, expected"}, expected_spaces, &(String){4, 3, "got"}, actual_spaces) )
+      CHECK(39, Int_str(glob->spaces + 4, expected_spaces) )
+      CHECK(40, Int_str(n - 1, actual_spaces) )
+      CHECK(41, f_syntax_error2(&(String){32, 31, "too short indentation, expected"}, expected_spaces, &(String){4, 3, "got"}, actual_spaces) )
     }
   }}
   return OK;
@@ -104,42 +117,52 @@ Returncode read_line_break_spaces() {
 #endif
 
 
-/* Read from the input file to `text` until a new-line, EOF, or one of the */
-/* characters in `ends` is reached, and return the end character in `end`. */
-/* If `indent` is true, ignore and count trailing spaces. */
+/*  Read from the input file to `text` until a new-line, EOF, or one of the
+characters in `ends` is reached, and return the end character in `end`.
+If `indent` is true, ignore and count trailing spaces.
+It is possible to "save" previous read result by setting "glob.save-input" to
+true. Next time this function will be colled it will return the saved values.
+ */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode read_until(String* text, String* ends, Bool indent, Char* end, Int* spaces);
+Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* spaces);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_read_until = "read-until";
 #define MR_FUNC_NAME _func_name_read_until
-Returncode read_until(String* text, String* ends, Bool indent, Char* end, Int* spaces) {
-  CHECK(49, String_clear(text) )
-  Char ch = EOF;
-  Char quote = '\0';
-  (*spaces) = 0;
-  CHECK(53, read_c(&(ch)) )
-  if (indent) {
-    /* ignore and count indent */
-    while (true) {
-      if (!(ch == ' ')) break;
-      (*spaces) += 1;
-      CHECK(59, read_c(&(ch)) )
+Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* spaces) {
+  Char ch = '\0';
+  if (glob->save_input) {
+    ch = glob->input_end;
+    (*spaces) = glob->input_spaces;
+  }
+  else {
+    CHECK(61, String_clear(glob->input_buffer) )
+    (*spaces) = 0;
+    CHECK(63, read_c(&(ch)) )
+    if (indent) {
+      /* ignore and count indent */
+      while (true) {
+        if (!(ch == ' ')) break;
+        (*spaces) += 1;
+        CHECK(69, read_c(&(ch)) )
+      }
     }
   }
+  
+  Char quote = '\0';
   while (true) {
     if (!(ch != EOF && ch != '\n')) break;
     if (quote == '\0') {
       Bool _Bool3;
-      CHECK(63, String_has(ends, ch, &(_Bool3)) )
+      CHECK(75, String_has(ends, ch, &(_Bool3)) )
       if (!(!_Bool3)) break;
-      if (ch == '\'' || ch == '"') {
+      if (ch == '\'' || ch == '"' || ch == '`') {
         quote = ch;
       }
     }
     else {
       if (ch == '\\') {
-        CHECK(67, String_append(text, ch) )
-        CHECK(68, read_c(&(ch)) )
+        CHECK(79, String_append(glob->input_buffer, ch) )
+        CHECK(80, read_c(&(ch)) )
       }
       else {
         if (ch == quote) {
@@ -147,9 +170,14 @@ Returncode read_until(String* text, String* ends, Bool indent, Char* end, Int* s
         }
       }
     }
-    CHECK(71, String_append(text, ch) )
-    CHECK(72, read_c(&(ch)) )
+    CHECK(83, String_append(glob->input_buffer, ch) )
+    CHECK(84, read_c(&(ch)) )
   }
+  
+  glob->input_end = ch;
+  glob->input_spaces = (*spaces);
+  glob->save_input = false;
+  (*text) = glob->input_buffer;
   (*end) = ch;
   return OK;
 }
@@ -164,10 +192,10 @@ Returncode read_new(String* ends, String** new_text, Char* end);
 static char* _func_name_read_new = "read-new";
 #define MR_FUNC_NAME _func_name_read_new
 Returncode read_new(String* ends, String** new_text, Char* end) {
-  String* text = &(String){256, 0, (char[256]){0}};
+  String* text = NULL;
   Int _Int4;
-  CHECK(79, read_until(text, ends, false, &((*end)), &(_Int4)) )
-  CHECK(80, string_new_copy(text, &((*new_text))) )
+  CHECK(96, read_until(ends, false, &(text), &((*end)), &(_Int4)) )
+  CHECK(97, string_new_copy(text, &((*new_text))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -203,30 +231,30 @@ static char* _func_name_get_access = "get-access";
 #define MR_FUNC_NAME _func_name_get_access
 Returncode get_access(String* access_str, Int* access) {
   Bool _Bool5;
-  CHECK(90, String_equal(access_str, &(String){5, 4, "copy"}, &(_Bool5)) )
+  CHECK(107, String_equal(access_str, &(String){5, 4, "copy"}, &(_Bool5)) )
   if (_Bool5) {
     (*access) = 0;
   }
   else {
     Bool _Bool6;
-    CHECK(92, String_equal(access_str, &(String){5, 4, "user"}, &(_Bool6)) )
+    CHECK(109, String_equal(access_str, &(String){5, 4, "user"}, &(_Bool6)) )
     if (_Bool6) {
       (*access) = 1;
     }
     else {
       Bool _Bool7;
-      CHECK(94, String_equal(access_str, &(String){6, 5, "owner"}, &(_Bool7)) )
+      CHECK(111, String_equal(access_str, &(String){6, 5, "owner"}, &(_Bool7)) )
       if (_Bool7) {
         (*access) = 2;
       }
       else {
         Bool _Bool8;
-        CHECK(96, String_equal(access_str, &(String){4, 3, "var"}, &(_Bool8)) )
+        CHECK(113, String_equal(access_str, &(String){4, 3, "var"}, &(_Bool8)) )
         if (_Bool8) {
           (*access) = 3;
         }
         else {
-          CHECK(99, f_syntax_error(&(String){15, 14, "illegal access"}, access_str) )
+          CHECK(116, f_syntax_error(&(String){15, 14, "illegal access"}, access_str) )
         }
       }
     }
@@ -244,7 +272,7 @@ Returncode write(String* text);
 static char* _func_name_write = "write";
 #define MR_FUNC_NAME _func_name_write
 Returncode write(String* text) {
-  CHECK(104, file_write(glob->output_file, text) )
+  CHECK(121, file_write(glob->output_file, text) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -259,8 +287,24 @@ static char* _func_name_write_int = "write-int";
 #define MR_FUNC_NAME _func_name_write_int
 Returncode write_int(Int num) {
   String* num_str = &(String){64, 0, (char[64]){0}};
-  CHECK(110, Int_str(num, num_str) )
-  CHECK(111, write(num_str) )
+  CHECK(127, Int_str(num, num_str) )
+  CHECK(128, write(num_str) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+/* write `num` spaces - usefull for writing indentation */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode write_spaces(Int num);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_write_spaces = "write-spaces";
+#define MR_FUNC_NAME _func_name_write_spaces
+Returncode write_spaces(Int num) {
+  {int n; for (n = (0); n < (num); ++n) {
+    CHECK(134, file_putc(glob->output_file, ' ') )
+  }}
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -272,6 +316,7 @@ Returncode write_int(Int num) {
 #define MR_INCLUDES
 #include "global/common.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/map.c"
 #include "global/type.c"
 #include "expression/call.c"
@@ -280,6 +325,14 @@ Returncode write_int(Int num) {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

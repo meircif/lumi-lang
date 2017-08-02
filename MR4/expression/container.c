@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file8_name = "expression/container.3.mr";
+static char* _mr_file9_name = "expression/container.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file8_name
+#define MR_FILE_NAME _mr_file9_name
 
 /* MR4 compiler - Container expressions */
 
@@ -42,8 +42,8 @@ Returncode BlockExpression_parse(BlockExpression* self, Char* end);
 static char* _func_name_BlockExpression_parse = "BlockExpression.parse";
 #define MR_FUNC_NAME _func_name_BlockExpression_parse
 Returncode BlockExpression_parse(BlockExpression* self, Char* end) {
-  Char _Char22;
-  CHECK(14, parse_new_expression(&(String){2, 1, ")"}, &(self->expression), &(_Char22)) )
+  Char _Char21;
+  CHECK(14, parse_new_expression(&(String){2, 1, ")"}, &(self->expression), &(_Char21)) )
   CHECK(15, read_c(&((*end))) )
   return OK;
 }
@@ -66,7 +66,7 @@ Returncode BlockExpression_write(BlockExpression* self) {
 extern Func BlockExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BlockExpression__dtl[] = {BlockExpression_write};
+Func BlockExpression__dtl[] = {(void*)BlockExpression_write};
 #endif
 
 
@@ -114,7 +114,7 @@ Returncode OperatorExpression_write_operator_and_expresssion(OperatorExpression*
 extern Func OperatorExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func OperatorExpression__dtl[] = {Expression_write};
+Func OperatorExpression__dtl[] = {(void*)Expression_write};
 #endif
 
 
@@ -169,7 +169,7 @@ Returncode UnaryExpression_write(UnaryExpression* self) {
 extern Func UnaryExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func UnaryExpression__dtl[] = {UnaryExpression_write};
+Func UnaryExpression__dtl[] = {(void*)UnaryExpression_write};
 #endif
 
 
@@ -229,7 +229,7 @@ Returncode BinaryExpression_write(BinaryExpression* self) {
 extern Func BinaryExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BinaryExpression__dtl[] = {BinaryExpression_write};
+Func BinaryExpression__dtl[] = {(void*)BinaryExpression_write};
 #endif
 
 
@@ -287,7 +287,7 @@ Returncode QuestionExpression_write(QuestionExpression* self) {
 extern Func QuestionExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func QuestionExpression__dtl[] = {QuestionExpression_write};
+Func QuestionExpression__dtl[] = {(void*)QuestionExpression_write};
 #endif
 
 #undef MR_FILE_NAME
@@ -297,6 +297,7 @@ Func QuestionExpression__dtl[] = {QuestionExpression_write};
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/map.c"
 #include "global/type.c"
 #include "expression/call.c"
@@ -304,6 +305,14 @@ Func QuestionExpression__dtl[] = {QuestionExpression_write};
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

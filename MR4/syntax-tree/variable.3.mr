@@ -1,0 +1,17 @@
+## MR4 compiler - Syntax tree variable
+
+## Variable node in the syntax tree 
+class SyntaxTreeVariable(SyntaxTreeCode)
+  user SyntaxTreeType type-node
+  
+  func inst parse-new(user SyntaxTreeType type-node):(
+      owner SyntaxTreeVariable new-node)
+    new SyntaxTreeVariable in new-node
+    new-node.parse(user type-node)
+  
+  func inst parse(user SyntaxTreeType type-node)
+    self.type-node := type-node
+    # todo ...
+  
+  func dynamic write()
+    # ...

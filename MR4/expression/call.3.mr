@@ -3,7 +3,7 @@
 ## Function call expression
 class CallExpression(Expression)
   owner Expression function
-  owner CallArguments arguments
+  owner FunctionArguments arguments
   
   func inst parse-new(user String ends):(
       owner Expression expression, copy Char end)
@@ -13,87 +13,28 @@ class CallExpression(Expression)
   
   func inst parse(owner Expression function):(copy Char end)
     self.function := function
-    new CallArguments in self.arguments
-    self.arguments.parse():(copy end)
+    new FunctionArguments in self.arguments
+    var CallArgumentFactory argument-factory
+    self.arguments.parse(user argument-factory):(copy end)
   
   func dynamic write()
     self.function.write()
     self.arguments.write()
 
 
-static CallArguments
-  owner CallArgument parameters
-  owner CallArgument outputs
-  
-  ## parsing `(access value, ...):(access value, ...)`
-  func inst parse():(copy Char end)
-    self.parse-args():(owner self.parameters, copy end)
-    if end = '-'
-      read-expect(user ">(")
-      self.parse-args():(owner self.outputs, copy end)
-  
-  ## parsing single argument list `(access value, ...)`
-  func inst parse-args():(owner CallArgument first, copy Char end)
-    user CallArgument arg
-    var String{16} access-str
-    read-until(user access-str, user " )", copy false):(copy end)
-    if end = '\n' and access-str.length = 0
-      read-line-break-spaces()
-      read-until(user access-str, user " ", copy false):(copy end)
-    if end != ')' or access-str.length > 0
-      do
-        if access-str.length = 0
-          f-syntax-error-c(user "expected access, got", copy end)
-        if end != ' '
-          f-syntax-error-c(user "expected space, got", copy end)
-        if ? arg
-          new CallArgument in arg.next
-          arg := arg.next
-        else
-          new CallArgument in first
-          arg := first
-        arg.parse(user access-str):(copy end)
-        while end = ','
-        read-c():(copy end)
-        if end = '\n'
-          read-line-break-spaces()
-        else-if end != ' '
-          f-syntax-error-c(user "expected space or new-line, got", copy end)
-        read-until(user access-str, user " ", copy false):(copy end)
-    read-c():(copy end)
-  
-  func inst write()
-    write(user "(")
-    if ? self.parameters
-      self.write-args(user self.parameters)
-    if ? self.outputs
-      write(user ")->(")
-      self.write-args(user self.outputs)
-    write(user ")")
-  
-  ## write arguments starting from `first`
-  func inst write-args(user CallArgument first)
-    user CallArgument arg(first)
-    do
-      arg.write()
-      arg := arg.next
-      while ? arg
-      write(user ", ")
-
-
-static CallArgument
-  var Int access
+## Function argument call
+class CallArgument(Argument)
   owner Expression value
-  owner CallArgument next
   
-  func inst parse(user String access-str):(copy Char end)
-    get-access(user access-str):(copy self.access)
+  func dynamic parse-value():(copy Char end)
     parse-new-expression(user ",)"):(owner self.value, copy end)
     if end != ',' and end != ')'
       f-syntax-error-c(user "expected \",\" or \")\", got", copy end)
   
-  func inst write()
-    write(user "Access(")
-    write-int(copy self.access)
-    write(user ") ")
+  func dynamic write-value()
     self.value.write()
+
+
+class CallArgumentFactory(ArgumentFactory)
+  func dynamic m-new-argument():(owner Argument new-argument)
+    new CallArgument in new-argument

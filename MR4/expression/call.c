@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file6_name = "expression/call.3.mr";
+static char* _mr_file7_name = "expression/call.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file6_name
+#define MR_FILE_NAME _mr_file7_name
 
 /* MR4 compiler - Call expression */
 
@@ -18,7 +18,7 @@ typedef struct CallExpression CallExpression;
 struct CallExpression {
   Expression _base;
   Expression* function;
-  CallArguments* arguments;
+  FunctionArguments* arguments;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
@@ -44,10 +44,12 @@ static char* _func_name_CallExpression_parse = "CallExpression.parse";
 #define MR_FUNC_NAME _func_name_CallExpression_parse
 Returncode CallExpression_parse(CallExpression* self, Expression* function, Char* end) {
   self->function = function;
-  self->arguments = malloc(sizeof(CallArguments));
+  self->arguments = malloc(sizeof(FunctionArguments));
   if (self->arguments == NULL) RAISE(16)
-  *self->arguments = (CallArguments){NULL, NULL};
-  CHECK(17, CallArguments_parse(self->arguments, &((*end))) )
+  *self->arguments = (FunctionArguments){NULL, NULL};
+  CallArgumentFactory* argument_factory = &(CallArgumentFactory){CallArgumentFactory__dtl};
+  argument_factory->_base._dtl = CallArgumentFactory__dtl;
+  CHECK(18, FunctionArguments_parse(self->arguments, &(argument_factory->_base), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -58,8 +60,8 @@ Returncode CallExpression_write(CallExpression* self);
 static char* _func_name_CallExpression_write = "CallExpression.write";
 #define MR_FUNC_NAME _func_name_CallExpression_write
 Returncode CallExpression_write(CallExpression* self) {
-  CHECK(20, (self->function)->_dtl[0](self->function) )
-  CHECK(21, CallArguments_write(self->arguments) )
+  CHECK(21, (self->function)->_dtl[0](self->function) )
+  CHECK(22, FunctionArguments_write(self->arguments) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -68,163 +70,79 @@ Returncode CallExpression_write(CallExpression* self) {
 extern Func CallExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallExpression__dtl[] = {CallExpression_write};
+Func CallExpression__dtl[] = {(void*)CallExpression_write};
 #endif
 
 
-#if MR_STAGE == MR_TYPEDEFS
-typedef struct CallArguments CallArguments;
-#elif MR_STAGE == MR_TYPES(0)
-struct CallArguments {
-  CallArgument* parameters;
-  CallArgument* outputs;
-/* parsing `(access value, ...):(access value, ...)` *//* parsing single argument list `(access value, ...)` *//* write arguments starting from `first` */};
-#endif/* parsing `(access value, ...):(access value, ...)` */
-#if MR_STAGE == MR_DECLARATIONS
-Returncode CallArguments_parse(CallArguments* self, Char* end);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallArguments_parse = "CallArguments.parse";
-#define MR_FUNC_NAME _func_name_CallArguments_parse
-Returncode CallArguments_parse(CallArguments* self, Char* end) {
-  CHECK(30, CallArguments_parse_args(self, &(self->parameters), &((*end))) )
-  if ((*end) == '-') {
-    CHECK(32, read_expect(&(String){3, 2, ">("}) )
-    CHECK(33, CallArguments_parse_args(self, &(self->outputs), &((*end))) )
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif/* parsing single argument list `(access value, ...)` */
-#if MR_STAGE == MR_DECLARATIONS
-Returncode CallArguments_parse_args(CallArguments* self, CallArgument** first, Char* end);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallArguments_parse_args = "CallArguments.parse-args";
-#define MR_FUNC_NAME _func_name_CallArguments_parse_args
-Returncode CallArguments_parse_args(CallArguments* self, CallArgument** first, Char* end) {
-  CallArgument* arg = NULL;
-  String* access_str = &(String){16, 0, (char[16]){0}};
-  Int _Int11;
-  CHECK(39, read_until(access_str, &(String){3, 2, " )"}, false, &((*end)), &(_Int11)) )
-  if ((*end) == '\n' && access_str->length == 0) {
-    CHECK(41, read_line_break_spaces() )
-    Int _Int12;
-    CHECK(42, read_until(access_str, &(String){2, 1, " "}, false, &((*end)), &(_Int12)) )
-  }
-  if ((*end) != ')' || access_str->length > 0) {
-    while (true) {
-      if (access_str->length == 0) {
-        CHECK(46, f_syntax_error_c(&(String){21, 20, "expected access, got"}, (*end)) )
-      }
-      if ((*end) != ' ') {
-        CHECK(48, f_syntax_error_c(&(String){20, 19, "expected space, got"}, (*end)) )
-      }
-      if (NULL != arg) {
-        arg->next = malloc(sizeof(CallArgument));
-        if (arg->next == NULL) RAISE(50)
-        *arg->next = (CallArgument){0, NULL, NULL};
-        arg = arg->next;
-      }
-      else {
-        (*first) = malloc(sizeof(CallArgument));
-        if ((*first) == NULL) RAISE(53)
-        *(*first) = (CallArgument){0, NULL, NULL};
-        arg = (*first);
-      }
-      CHECK(55, CallArgument_parse(arg, access_str, &((*end))) )
-      if (!((*end) == ',')) break;
-      CHECK(57, read_c(&((*end))) )
-      if ((*end) == '\n') {
-        CHECK(59, read_line_break_spaces() )
-      }
-      else {
-        if ((*end) != ' ') {
-          CHECK(61, f_syntax_error_c(&(String){32, 31, "expected space or new-line, got"}, (*end)) )
-        }
-      }
-      Int _Int13;
-      CHECK(62, read_until(access_str, &(String){2, 1, " "}, false, &((*end)), &(_Int13)) )
-    }
-  }
-  CHECK(63, read_c(&((*end))) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode CallArguments_write(CallArguments* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallArguments_write = "CallArguments.write";
-#define MR_FUNC_NAME _func_name_CallArguments_write
-Returncode CallArguments_write(CallArguments* self) {
-  CHECK(66, write(&(String){2, 1, "("}) )
-  if (NULL != self->parameters) {
-    CHECK(68, CallArguments_write_args(self, self->parameters) )
-  }
-  if (NULL != self->outputs) {
-    CHECK(70, write(&(String){5, 4, ")->("}) )
-    CHECK(71, CallArguments_write_args(self, self->outputs) )
-  }
-  CHECK(72, write(&(String){2, 1, ")"}) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif/* write arguments starting from `first` */
-#if MR_STAGE == MR_DECLARATIONS
-Returncode CallArguments_write_args(CallArguments* self, CallArgument* first);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallArguments_write_args = "CallArguments.write-args";
-#define MR_FUNC_NAME _func_name_CallArguments_write_args
-Returncode CallArguments_write_args(CallArguments* self, CallArgument* first) {
-  CallArgument* arg = first;
-  while (true) {
-    CHECK(78, CallArgument_write(arg) )
-    arg = arg->next;
-    if (!(NULL != arg)) break;
-    CHECK(81, write(&(String){3, 2, ", "}) )
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-
-
+/* Function argument call */
 #if MR_STAGE == MR_TYPEDEFS
 typedef struct CallArgument CallArgument;
-#elif MR_STAGE == MR_TYPES(0)
+#elif MR_STAGE == MR_TYPES(1)
 struct CallArgument {
-  Int access;
+  Argument _base;
   Expression* value;
-  CallArgument* next;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode CallArgument_parse(CallArgument* self, String* access_str, Char* end);
+Returncode CallArgument_parse_value(CallArgument* self, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallArgument_parse = "CallArgument.parse";
-#define MR_FUNC_NAME _func_name_CallArgument_parse
-Returncode CallArgument_parse(CallArgument* self, String* access_str, Char* end) {
-  CHECK(90, get_access(access_str, &(self->access)) )
-  CHECK(91, parse_new_expression(&(String){3, 2, ",)"}, &(self->value), &((*end))) )
+static char* _func_name_CallArgument_parse_value = "CallArgument.parse-value";
+#define MR_FUNC_NAME _func_name_CallArgument_parse_value
+Returncode CallArgument_parse_value(CallArgument* self, Char* end) {
+  CHECK(30, parse_new_expression(&(String){3, 2, ",)"}, &(self->value), &((*end))) )
   if ((*end) != ',' && (*end) != ')') {
-    CHECK(93, f_syntax_error_c(&(String){25, 24, "expected \",\" or \")\", got"}, (*end)) )
+    CHECK(32, f_syntax_error_c(&(String){25, 24, "expected \",\" or \")\", got"}, (*end)) )
   }
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode CallArgument_write(CallArgument* self);
+Returncode CallArgument_write_value(CallArgument* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallArgument_write = "CallArgument.write";
-#define MR_FUNC_NAME _func_name_CallArgument_write
-Returncode CallArgument_write(CallArgument* self) {
-  CHECK(96, write(&(String){8, 7, "Access("}) )
-  CHECK(97, write_int(self->access) )
-  CHECK(98, write(&(String){3, 2, ") "}) )
-  CHECK(99, (self->value)->_dtl[0](self->value) )
+static char* _func_name_CallArgument_write_value = "CallArgument.write-value";
+#define MR_FUNC_NAME _func_name_CallArgument_write_value
+Returncode CallArgument_write_value(CallArgument* self) {
+  CHECK(35, (self->value)->_dtl[0](self->value) )
   return OK;
 }
 #undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func CallArgument__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func CallArgument__dtl[] = {(void*)CallArgument_parse_value, (void*)CallArgument_write_value};
+#endif
+
+
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct CallArgumentFactory CallArgumentFactory;
+#elif MR_STAGE == MR_TYPES(1)
+struct CallArgumentFactory {
+  ArgumentFactory _base;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactory.m-new-argument";
+#define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
+Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
+  CallArgument* _CallArgument12 = malloc(sizeof(CallArgument));
+  if (_CallArgument12 == NULL) RAISE(40)
+  *_CallArgument12 = (CallArgument){CallArgument__dtl, 0, NULL};
+  _CallArgument12->_base._dtl = CallArgument__dtl;
+  (*new_argument) = &(_CallArgument12->_base);
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func CallArgumentFactory__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 #endif
 
 #undef MR_FILE_NAME
@@ -234,6 +152,7 @@ Returncode CallArgument_write(CallArgument* self) {
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/map.c"
 #include "global/type.c"
 #include "expression/constant.c"
@@ -241,6 +160,14 @@ Returncode CallArgument_write(CallArgument* self) {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

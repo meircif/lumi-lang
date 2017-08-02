@@ -71,9 +71,10 @@ Returncode f_syntax_error(String* text, String* item);
 static char* _func_name_f_syntax_error = "f-syntax-error";
 #define MR_FUNC_NAME _func_name_f_syntax_error
 Returncode f_syntax_error(String* text, String* item) {
-  CHECK(29, print_syntax_error_msg_with_item(text, item) )
-  CHECK(30, print(&(String){2, 1, "\n"}) )
-  RAISE(31)
+  CHECK(29, print_syntax_error_header() )
+  CHECK(30, print_msg_with_item(text, item) )
+  CHECK(31, print(&(String){2, 1, "\n"}) )
+  RAISE(32)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -86,11 +87,12 @@ Returncode f_syntax_error2(String* text1, String* item1, String* text2, String* 
 static char* _func_name_f_syntax_error2 = "f-syntax-error2";
 #define MR_FUNC_NAME _func_name_f_syntax_error2
 Returncode f_syntax_error2(String* text1, String* item1, String* text2, String* item2) {
-  CHECK(37, print_syntax_error_msg_with_item(text1, item1) )
-  CHECK(38, print(&(String){2, 1, " "}) )
-  CHECK(39, print_msg_with_item(text2, item2) )
-  CHECK(40, print(&(String){2, 1, "\n"}) )
-  RAISE(41)
+  CHECK(38, print_syntax_error_header() )
+  CHECK(39, print_msg_with_item(text1, item1) )
+  CHECK(40, print(&(String){2, 1, " "}) )
+  CHECK(41, print_msg_with_item(text2, item2) )
+  CHECK(42, print(&(String){2, 1, "\n"}) )
+  RAISE(43)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -105,12 +107,12 @@ static char* _func_name_f_syntax_error_c = "f-syntax-error-c";
 Returncode f_syntax_error_c(String* text, Char item) {
   String* char_str = &(String){4, 0, (char[4]){0}};
   if (item == EOF) {
-    CHECK(48, String_copy(char_str, &(String){4, 3, "EOF"}) )
+    CHECK(50, String_copy(char_str, &(String){4, 3, "EOF"}) )
   }
   else {
-    CHECK(50, String_append(char_str, item) )
+    CHECK(52, String_append(char_str, item) )
   }
-  CHECK(51, f_syntax_error(text, char_str) )
+  CHECK(53, f_syntax_error(text, char_str) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -118,19 +120,33 @@ Returncode f_syntax_error_c(String* text, Char item) {
 
 
 #if MR_STAGE == MR_DECLARATIONS
-Returncode print_syntax_error_msg_with_item(String* text, String* item);
+Returncode f_syntax_error_msg(String* text);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_print_syntax_error_msg_with_item = "print-syntax-error-msg-with-item";
-#define MR_FUNC_NAME _func_name_print_syntax_error_msg_with_item
-Returncode print_syntax_error_msg_with_item(String* text, String* item) {
-  CHECK(55, print(&(String){15, 14, "Code error in "}) )
-  CHECK(56, print(glob->input_file_name) )
-  CHECK(57, print(&(String){2, 1, "["}) )
+static char* _func_name_f_syntax_error_msg = "f-syntax-error-msg";
+#define MR_FUNC_NAME _func_name_f_syntax_error_msg
+Returncode f_syntax_error_msg(String* text) {
+  CHECK(57, print_syntax_error_header() )
+  CHECK(58, print(text) )
+  CHECK(59, print(&(String){2, 1, "\n"}) )
+  RAISE(60)
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode print_syntax_error_header();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_print_syntax_error_header = "print-syntax-error-header";
+#define MR_FUNC_NAME _func_name_print_syntax_error_header
+Returncode print_syntax_error_header() {
+  CHECK(64, print(&(String){15, 14, "Code error in "}) )
+  CHECK(65, print(glob->input_file_name) )
+  CHECK(66, print(&(String){2, 1, "["}) )
   String* line_num_str = &(String){32, 0, (char[32]){0}};
-  CHECK(59, Int_str(glob->line_number, line_num_str) )
-  CHECK(60, print(line_num_str) )
-  CHECK(61, print(&(String){3, 2, "] "}) )
-  CHECK(62, print_msg_with_item(text, item) )
+  CHECK(68, Int_str(glob->line_number, line_num_str) )
+  CHECK(69, print(line_num_str) )
+  CHECK(70, print(&(String){3, 2, "] "}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -143,10 +159,10 @@ Returncode print_msg_with_item(String* text, String* item);
 static char* _func_name_print_msg_with_item = "print-msg-with-item";
 #define MR_FUNC_NAME _func_name_print_msg_with_item
 Returncode print_msg_with_item(String* text, String* item) {
-  CHECK(66, print(text) )
-  CHECK(67, print(&(String){3, 2, " \""}) )
-  CHECK(68, print(item) )
-  CHECK(69, print(&(String){2, 1, "\""}) )
+  CHECK(74, print(text) )
+  CHECK(75, print(&(String){3, 2, " \""}) )
+  CHECK(76, print(item) )
+  CHECK(77, print(&(String){2, 1, "\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -158,6 +174,7 @@ Returncode print_msg_with_item(String* text, String* item) {
 #define MR_INCLUDES
 #include "global/file-io.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/map.c"
 #include "global/type.c"
 #include "expression/call.c"
@@ -166,6 +183,14 @@ Returncode print_msg_with_item(String* text, String* item) {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

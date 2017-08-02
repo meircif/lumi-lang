@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file12_name = "tests/expression-tests.3.mr";
+static char* _mr_file21_name = "tests/expression-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file12_name
+#define MR_FILE_NAME _mr_file21_name
 
 /* MR4 compiler tests - Expression */
 
@@ -57,8 +57,8 @@ Returncode test_expression_error_ends(String* input_text, String* expected_error
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char27;
-    CHECK(27, parse_new_expression(ends, &(expression), &(_Char27)) );
+    Char _Char49;
+    CHECK(27, parse_new_expression(ends, &(expression), &(_Char49)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
@@ -382,6 +382,7 @@ Returncode test_no_expression() {
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/map.c"
 #include "global/type.c"
 #include "expression/call.c"
@@ -390,7 +391,16 @@ Returncode test_no_expression() {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "tests/global-tests.c"
+#include "tests/syntax-tree-tests.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

@@ -1,0 +1,39 @@
+## MR4 compiler - Syntax tree root
+
+## The syntax tree root
+class SyntaxTreeRoot(SyntaxTreeNamespace)
+  owner List{SyntaxTreeType} types
+  
+  func inst parse(user Array{String} argv)
+    self.init()
+    new List{SyntaxTreeType} in self.types
+    for n in 2:argv.length
+      glob.input-file-name := argv[n]
+      glob.line-number := 0
+      
+      self.parse-children(user _)
+      
+      if glob.input-buffer.length > 0 or glob.input-spaces > 0
+        f-syntax-error-msg(user "no new-line before file end")
+  
+  ## todo...
+  func dynamic parse-child(user String keyword, copy Char end)
+    if self.parse-if-function(user keyword, copy end, user _)
+      return
+    if keyword.equal(user "struct")
+      self.types.add(owner SyntaxTreeType.parse-new(var _))
+    else-if keyword.equal(user "class")
+      self.types.add(owner SyntaxTreeType.parse-new(var _))
+    else
+      f-syntax-error(user "unknown keyword", user keyword)
+  
+  (## write C file in this order:
+  1. type typedefs
+  2. type structs (ordered by depth)
+  3. function headers
+  4. global variables
+  5. function bodies
+  #)
+  func dynamic write()
+    self.write-children(user self.types)
+    base.write()

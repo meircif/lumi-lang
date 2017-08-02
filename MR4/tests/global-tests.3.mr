@@ -20,12 +20,15 @@ func set-mock-file-text(user String text)
 
 mock file-getc(user File file):(copy Char ch)
   assert file = glob.input-file
-  assert ? mock-input-file-text
   if mock-input-file-index >= mock-input-file-text.length
     ch := EOF
     return
   ch := mock-input-file-text[mock-input-file-index]
   mock-input-file-index += 1
+
+mock file-putc(user File file, copy Char ch)
+  assert file = glob.output-file
+  mock-output-file-text.append(copy ch)
 
 mock file-write(user File file, user String text)
   assert file = glob.output-file
@@ -41,6 +44,7 @@ func f-setup-test()
   glob.input-file-name := mock-input-file-name
   glob.input-file-name.copy(user "mock.3.mr")
   glob.line-number := 0
+  glob.save-input := false
   mock-print-text.clear()
   mock-input-file-text.clear()
   mock-output-file-text.clear()

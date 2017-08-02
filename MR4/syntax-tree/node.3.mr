@@ -1,0 +1,132 @@
+(## MR4 compiler - Syntax tree basic node types
+
+
+#)
+
+## Basic node type for all syntax tree nodes
+class SyntaxTreeNode
+  func dynamic write()
+    raise
+
+
+## A basic branch node in the syntax tree - a node with chldren nodes
+class SyntaxTreeBranch(SyntaxTreeNode)
+  var Int indentation-spaces
+  owner List{SyntaxTreeVariable} variables
+  
+  func inst parse-children(user SyntaxTreeType type-node)
+    new List{SyntaxTreeVariable} in self.variables
+    do
+      user String keyword
+      var Char end
+      var Int spaces
+      read-until(user " .([?", copy true):(user keyword, copy end, copy spaces)
+      # ignore empty lines
+      if keyword.length > 0 or end != '\n'
+        
+        while spaces = self.indentation-spaces and end != EOF
+        
+        if spaces > self.indentation-spaces
+          var String{32} expecte-num
+          self.indentation-spaces.str(user expecte-num)
+          var String{32} actual-num
+          spaces.str(user actual-num)
+          f-syntax-error2(
+              user "indentation too big, expected",
+              user expecte-num,
+              user "got",
+              user actual-num)
+        
+        if not self.parse-if-variable(user keyword, copy end, user type-node)
+          self.parse-child(user keyword, copy end)
+    
+    glob.save-input := true
+  
+  func inst parse-if-variable(
+      user String keyword, copy Char end, user SyntaxTreeType type-node):(
+      copy Bool is-variable)
+    is-variable := end = ' '
+    if not is-variable
+      return
+    if keyword.equal(user "var")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, user type-node))
+    else-if keyword.equal(user "user")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, user type-node))
+    else-if keyword.equal(user "owner")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, user type-node))
+    else
+      is-variable := false
+  
+  func dynamic parse-child(user String keyword, copy Char end)
+    raise
+  
+  func dynamic write()
+    self.write-children(user self.variables)
+  
+  func inst write-children(user List{SyntaxTreeNode} child-list)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      if self.indentation-spaces > 0
+        write-spaces(copy self.indentation-spaces)
+      else
+        write(user "\n")
+      child.item.write()
+      write(user "\n")
+      child := child.next
+
+
+## A basic namespace node in the syntax tree
+class SyntaxTreeNamespace(SyntaxTreeBranch)
+  owner List{SyntaxTreeFunction} functions
+  
+  func inst init()
+    new List{SyntaxTreeFunction} in self.functions
+  
+  func inst parse-if-function(
+      user String keyword, copy Char end, user SyntaxTreeType type-node):(
+      copy Bool is-func)
+    if end != ' '
+      f-syntax-error-c(user "expected space, got", copy end)
+     keyword.equal(user "func"):(copy is-func)
+    if is-func
+      self.functions.add(owner SyntaxTreeFunction.parse-new(
+          var _, user type-node))
+  
+  func dynamic write()
+    base.write()
+    self.write-children(user self.functions)
+
+
+## A basic code node in the syntax tree
+class SyntaxTreeCode(SyntaxTreeNode)
+  user SyntaxTreeBlock parent
+
+
+## A basic code block node in the syntax tree
+class SyntaxTreeBlock(SyntaxTreeBranch)
+  owner List{SyntaxTreeCode} nodes
+  
+  func inst parse-block()
+    new List{SyntaxTreeCode} in self.nodes
+    self.parse-children(user _)
+  
+  func dynamic parse-child(user String keyword, copy Char end)
+    owner SyntaxTreeCode node
+    if keyword.equal(user "do")
+      if end != '\n'
+        f-syntax-error-c(user "expected new-line, got", copy end)
+      self.nodes.add(owner SyntaxTreeDoLoop.parse-new(var _))
+    else
+      glob.save-input := true
+      self.nodes.add(owner SyntaxTreeExpression.parse-new(var _))
+    self.nodes.last.item.parent := self
+  
+  func inst write-block()
+    write(user " {\n")
+    self.write-children(user self.nodes)
+    write-spaces(copy self.indentation-spaces - 2)
+    write(user "}")

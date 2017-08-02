@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file4_name = "global/map.3.mr";
+static char* _mr_file5_name = "global/map.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file4_name
+#define MR_FILE_NAME _mr_file5_name
 
 /* MR4 compiler - Generic mappings */
 
@@ -94,6 +94,7 @@ Returncode NameMapNode_init(NameMapNode* self, String* name, void* value) {
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -101,6 +102,14 @@ Returncode NameMapNode_init(NameMapNode* self, String* name, void* value) {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

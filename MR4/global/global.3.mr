@@ -21,6 +21,13 @@ static Global
   ## current indentation
   var Int spaces
   
+  ## input reading state
+  owner String input-buffer
+  var Char input-end
+  var Int input-spaces
+  var Bool got-new-line
+  var Bool save-input
+  
   ## built-in types
   user TypeData type-char
   user TypeData type-bool
@@ -32,6 +39,7 @@ static Global
   user TypeData type-sys
   
   func inst init()
+    new String{1024} in self.input-buffer
     self.init-operator-map()
     self.init-builtin-types()
   
@@ -74,8 +82,11 @@ static Global
     self.add-type(user "Sys"):(user self.type-sys)
   
   func inst add-type(user String name):(user TypeData type-data)
+    self.add-user-type(owner string-new-copy(user name)):(user type-data)
+  
+  func inst add-user-type(owner String name):(user TypeData type-data)
     new TypeData in type-data
-    type-data.init(owner string-new-copy(user name))
+    type-data.init(owner name)
     self.type-map.add(user type-data.name, owner type-data)
 
 

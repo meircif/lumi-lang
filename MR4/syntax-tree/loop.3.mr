@@ -1,0 +1,18 @@
+## MR4 compiler - Syntax tree loops
+
+## Basic loop node in the syntax tree
+class SyntaxTreeLoop(SyntaxTreeCode)
+  owner SyntaxTreeBlock block
+  
+  func inst parse-block()
+    new SyntaxTreeBlock in self.block
+    self.block.parse-block()
+
+
+## Do loop node in the syntax tree
+class SyntaxTreeDoLoop(SyntaxTreeLoop)
+  owner SyntaxTreeBlock block
+  
+  func inst parse-new():(owner SyntaxTreeDoLoop new-node)
+    new SyntaxTreeDoLoop in new-node
+    new-node.parse-block()

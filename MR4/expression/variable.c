@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file11_name = "expression/variable.3.mr";
+static char* _mr_file12_name = "expression/variable.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file11_name
+#define MR_FILE_NAME _mr_file12_name
 
 /* MR4 compiler - Variable expression */
 
@@ -62,7 +62,7 @@ Returncode VariableExpression_write(VariableExpression* self) {
 extern Func VariableExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func VariableExpression__dtl[] = {VariableExpression_write};
+Func VariableExpression__dtl[] = {(void*)VariableExpression_write};
 #endif
 
 /* The `base` method expression */
@@ -79,11 +79,11 @@ Returncode BaseMethExpression_parse_new(BaseMethExpression* self, String* text, 
 static char* _func_name_BaseMethExpression_parse_new = "BaseMethExpression.parse-new";
 #define MR_FUNC_NAME _func_name_BaseMethExpression_parse_new
 Returncode BaseMethExpression_parse_new(BaseMethExpression* self, String* text, Expression** expression) {
-  BaseMethExpression* _BaseMethExpression26 = malloc(sizeof(BaseMethExpression));
-  if (_BaseMethExpression26 == NULL) RAISE(22)
-  *_BaseMethExpression26 = (BaseMethExpression){BaseMethExpression__dtl, NULL};
-  _BaseMethExpression26->_base._dtl = BaseMethExpression__dtl;
-  (*expression) = &(_BaseMethExpression26->_base);
+  BaseMethExpression* _BaseMethExpression25 = malloc(sizeof(BaseMethExpression));
+  if (_BaseMethExpression25 == NULL) RAISE(22)
+  *_BaseMethExpression25 = (BaseMethExpression){BaseMethExpression__dtl, NULL};
+  _BaseMethExpression25->_base._dtl = BaseMethExpression__dtl;
+  (*expression) = &(_BaseMethExpression25->_base);
   free(text);
   return OK;
 }
@@ -104,7 +104,7 @@ Returncode BaseMethExpression_write(BaseMethExpression* self) {
 extern Func BaseMethExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BaseMethExpression__dtl[] = {BaseMethExpression_write};
+Func BaseMethExpression__dtl[] = {(void*)BaseMethExpression_write};
 #endif
 
 
@@ -159,7 +159,7 @@ Returncode TypeExpression_write(TypeExpression* self) {
 extern Func TypeExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func TypeExpression__dtl[] = {TypeExpression_write};
+Func TypeExpression__dtl[] = {(void*)TypeExpression_write};
 #endif
 
 
@@ -216,7 +216,7 @@ Returncode MemberExpression_write(MemberExpression* self) {
 extern Func MemberExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func MemberExpression__dtl[] = {MemberExpression_write};
+Func MemberExpression__dtl[] = {(void*)MemberExpression_write};
 #endif
 
 #undef MR_FILE_NAME
@@ -226,6 +226,7 @@ Func MemberExpression__dtl[] = {MemberExpression_write};
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/map.c"
 #include "global/type.c"
 #include "expression/call.c"
@@ -233,6 +234,14 @@ Func MemberExpression__dtl[] = {MemberExpression_write};
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

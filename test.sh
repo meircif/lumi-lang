@@ -50,12 +50,15 @@ diff ../MR3/mr3-compiler.c mr3-compiler.c
 # MR3
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../MR3/mr3-compiler.c ../MR2/mr.2.c -I../MR2 -o mr3-compiler
-mkdir global expression
+mkdir global expression syntax-tree
 cp ../MR4/global/*.3.mr global
 cp ../MR4/expression/*.3.mr expression
-./mr3-compiler global/*.3.mr expression/*.3.mr mr4-compiler.3.mr
+cp ../MR4/syntax-tree/*.3.mr syntax-tree
+./mr3-compiler global/*.3.mr expression/*.3.mr syntax-tree/*.3.mr \
+  mr4-compiler.3.mr
 diff ../MR4/global global
 diff ../MR4/expression expression
+diff ../MR4/syntax-tree syntax-tree
 diff ../MR4/mr4-compiler.c mr4-compiler.c
 
 # MR4
@@ -63,7 +66,8 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../MR4/mr4-compiler.c ../MR3/mr.3.c -I../MR3 -I../MR4 -o mr4-compiler
 mkdir tests
 cp ../MR4/tests/*.3.mr tests
-./mr3-compiler global/*.3.mr expression/*.3.mr tests/*.3.mr mr4-compiler.3.mr
+./mr3-compiler global/*.3.mr expression/*.3.mr syntax-tree/*.3.mr \
+  tests/*.3.mr mr4-compiler.3.mr
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   mr4-compiler.c ../MR3/mr.3.c -I. -I../MR3 -o mr4-compiler-tests
 ./mr4-compiler-tests

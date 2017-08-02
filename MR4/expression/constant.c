@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file7_name = "expression/constant.3.mr";
+static char* _mr_file8_name = "expression/constant.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file7_name
+#define MR_FILE_NAME _mr_file8_name
 
 /* MR4 compiler - Constant expressions */
 
@@ -134,9 +134,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     if ((1) < 0 || (1) >= (number)->length) RAISE(48)
     Char second = ((number)->values[1]);
     if (second >= '0' && second <= '7') {
-      Bool _Bool14;
-      CHECK(50, f_is_octal(number, &(_Bool14)) )
-      if (!_Bool14) {
+      Bool _Bool13;
+      CHECK(50, f_is_octal(number, &(_Bool13)) )
+      if (!_Bool13) {
         CHECK(51, f_syntax_error(&(String){21, 20, "illegal octal number"}, text) )
       }
     }
@@ -144,17 +144,17 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
       if ((2) < 0 || (number->length - 2) < 0 || (2) + (number->length - 2) > (number)->length) RAISE(53)
       number = (&(String){number->length - 2, number->length - 2, (number)->values + (2)});
       if (second == 'b' || second == 'B') {
-        Bool _Bool15;
-        CHECK(55, f_is_binary(number, &(_Bool15)) )
-        if (!_Bool15) {
+        Bool _Bool14;
+        CHECK(55, f_is_binary(number, &(_Bool14)) )
+        if (!_Bool14) {
           CHECK(56, f_syntax_error(&(String){22, 21, "illegal binary number"}, text) )
         }
       }
       else {
         if (second == 'x' || second == 'X') {
-          Bool _Bool16;
-          CHECK(58, f_is_hex(number, &(_Bool16)) )
-          if (!_Bool16) {
+          Bool _Bool15;
+          CHECK(58, f_is_hex(number, &(_Bool15)) )
+          if (!_Bool15) {
             CHECK(59, f_syntax_error(&(String){27, 26, "illegal hexadecimal number"}, text) )
           }
         }
@@ -165,9 +165,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     }
   }
   else {
-    Bool _Bool17;
-    CHECK(62, f_is_decimal(number, &(_Bool17)) )
-    if (!_Bool17) {
+    Bool _Bool16;
+    CHECK(62, f_is_decimal(number, &(_Bool16)) )
+    if (!_Bool16) {
       CHECK(63, f_syntax_error(&(String){15, 14, "illegal number"}, text) )
     }
   }
@@ -181,7 +181,7 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
 extern Func IntExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func IntExpression__dtl[] = {TextExpression_write};
+Func IntExpression__dtl[] = {(void*)TextExpression_write};
 #endif
 
 
@@ -230,9 +230,9 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         CHECK(84, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
       }
       if ((2) < 0 || (2) >= (text)->length) RAISE(85)
-      Bool _Bool18;
-      CHECK(85, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool18)) )
-      if (!_Bool18) {
+      Bool _Bool17;
+      CHECK(85, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool17)) )
+      if (!_Bool17) {
         CHECK(86, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
       }
     }
@@ -246,17 +246,17 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         ch = ((text)->values[2]);
         if (ch == 'x') {
           if ((3) < 0 || (2) < 0 || (3) + (2) > (text)->length) RAISE(92)
-          Bool _Bool19;
-          CHECK(92, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool19)) )
-          if (!_Bool19) {
+          Bool _Bool18;
+          CHECK(92, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool18)) )
+          if (!_Bool18) {
             CHECK(93, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
           }
         }
         else {
           if ((2) < 0 || (3) < 0 || (2) + (3) > (text)->length) RAISE(95)
-          Bool _Bool20;
-          CHECK(95, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool20)) )
-          if (!_Bool20) {
+          Bool _Bool19;
+          CHECK(95, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool19)) )
+          if (!_Bool19) {
             CHECK(96, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
           }
         }
@@ -280,7 +280,7 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
 extern Func CharExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CharExpression__dtl[] = {TextExpression_write};
+Func CharExpression__dtl[] = {(void*)TextExpression_write};
 #endif
 
 
@@ -328,7 +328,7 @@ Returncode StringExpression_parse(StringExpression* self, String* text) {
 extern Func StringExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func StringExpression__dtl[] = {TextExpression_write};
+Func StringExpression__dtl[] = {(void*)TextExpression_write};
 #endif
 
 
@@ -346,11 +346,11 @@ Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expres
 static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 #define MR_FUNC_NAME _func_name_EmptyExpression_parse_new
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
-  EmptyExpression* _EmptyExpression21 = malloc(sizeof(EmptyExpression));
-  if (_EmptyExpression21 == NULL) RAISE(123)
-  *_EmptyExpression21 = (EmptyExpression){EmptyExpression__dtl, NULL};
-  _EmptyExpression21->_base._dtl = EmptyExpression__dtl;
-  (*expression) = &(_EmptyExpression21->_base);
+  EmptyExpression* _EmptyExpression20 = malloc(sizeof(EmptyExpression));
+  if (_EmptyExpression20 == NULL) RAISE(123)
+  *_EmptyExpression20 = (EmptyExpression){EmptyExpression__dtl, NULL};
+  _EmptyExpression20->_base._dtl = EmptyExpression__dtl;
+  (*expression) = &(_EmptyExpression20->_base);
   free(text);
   return OK;
 }
@@ -371,7 +371,7 @@ Returncode EmptyExpression_write(EmptyExpression* self) {
 extern Func EmptyExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func EmptyExpression__dtl[] = {EmptyExpression_write};
+Func EmptyExpression__dtl[] = {(void*)EmptyExpression_write};
 #endif
 
 #undef MR_FILE_NAME
@@ -381,6 +381,7 @@ Func EmptyExpression__dtl[] = {EmptyExpression_write};
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/map.c"
 #include "global/type.c"
 #include "expression/call.c"
@@ -388,6 +389,14 @@ Func EmptyExpression__dtl[] = {EmptyExpression_write};
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

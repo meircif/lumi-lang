@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file9_name = "expression/expression.3.mr";
+static char* _mr_file10_name = "expression/expression.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file9_name
+#define MR_FILE_NAME _mr_file10_name
 
 /*  MR4 compiler - Expression
 
@@ -60,9 +60,9 @@ static char* _func_name_Expression_parse_new = "Expression.parse-new";
 #define MR_FUNC_NAME _func_name_Expression_parse_new
 Returncode Expression_parse_new(Expression* self, String* ends, Expression** expression, Char* end) {
   (*expression) = NULL;
-  Bool _Bool23;
-  CHECK(36, String_has(ends, ' ', &(_Bool23)) )
-  Bool multi_operands = !_Bool23;
+  Bool _Bool22;
+  CHECK(36, String_has(ends, ' ', &(_Bool22)) )
+  Bool multi_operands = !_Bool22;
   while (true) {
     String* text = NULL;
     CHECK(39, Expression_read_new_value(self, ends, &(text), &((*end))) )
@@ -144,9 +144,9 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     if ((*end) == '?') {
       CHECK(90, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool24;
-    CHECK(91, Expression_parse_new_follow_operand(self, ends, &((*expression)), &((*end)), &(_Bool24)) )
-    if (!(_Bool24)) break;
+    Bool _Bool23;
+    CHECK(91, Expression_parse_new_follow_operand(self, ends, &((*expression)), &((*end)), &(_Bool23)) )
+    if (!(_Bool23)) break;
   }
   return OK;
 }
@@ -185,9 +185,9 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Exp
             CHECK(111, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool25;
-            CHECK(112, String_equal(text, &(String){5, 4, "base"}, &(_Bool25)) )
-            if (_Bool25) {
+            Bool _Bool24;
+            CHECK(112, String_equal(text, &(String){5, 4, "base"}, &(_Bool24)) )
+            if (_Bool24) {
               CHECK(113, BaseMethExpression_parse_new(NULL, text, &((*expression))) )
             }
             else {
@@ -258,7 +258,7 @@ Returncode Expression_write(Expression* self) {
 extern Func Expression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Expression__dtl[] = {Expression_write};
+Func Expression__dtl[] = {(void*)Expression_write};
 #endif
 
 
@@ -300,7 +300,7 @@ Returncode TextExpression_write_text(TextExpression* self, String* type_name) {
 extern Func TextExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func TextExpression__dtl[] = {TextExpression_write};
+Func TextExpression__dtl[] = {(void*)TextExpression_write};
 #endif
 
 #undef MR_FILE_NAME
@@ -310,6 +310,7 @@ Func TextExpression__dtl[] = {TextExpression_write};
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
+#include "global/list.c"
 #include "global/map.c"
 #include "global/type.c"
 #include "expression/call.c"
@@ -317,6 +318,14 @@ Func TextExpression__dtl[] = {TextExpression_write};
 #include "expression/container.c"
 #include "expression/slice.c"
 #include "expression/variable.c"
+#include "syntax-tree/code.c"
+#include "syntax-tree/function.c"
+#include "syntax-tree/loop.c"
+#include "syntax-tree/node.c"
+#include "syntax-tree/root.c"
+#include "syntax-tree/test.c"
+#include "syntax-tree/type.c"
+#include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

@@ -1,0 +1,20 @@
+## MR4 compiler - Generic mappings
+
+## A generic single link list
+static List{Generic}
+  owner ListNode{Generic} first
+  user ListNode{Generic} last
+  
+  func inst add(owner Generic item)
+    new ListNode{Generic} node
+    node.item := item
+    if ? self.last
+      self.last.next := node
+    else
+      self.first := node
+    self.last := node
+
+
+static ListNode{Generic}
+  owner ListNode{Generic} next
+  owner Generic item

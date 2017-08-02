@@ -1,0 +1,79 @@
+## MR4 compiler tests - Syntax tree
+
+func write-syntax-tree()
+  var Array{3:String{256}} mock-argv
+  mock-argv[2].copy(user "mock.3.mr")
+  var SyntaxTreeRoot root
+  root.parse(user mock-argv)
+  root.write()
+
+
+func test-global-scope(user String input-text, user String expected-output)
+  f-setup-test()
+  set-mock-file-text(user input-text)
+  mock-input-file-text.append(copy '\n')
+  write-syntax-tree()
+  assert mock-output-file-text[0] = '\n'
+  f-assert-string-slice(
+      user expected-output,
+      user mock-output-file-text,
+      copy 1,
+      copy mock-output-file-text.length - 2)
+  assert mock-output-file-text[mock-output-file-text.length - 1] = '\n'
+
+
+func test-code(user String input-text, user String expected-output)
+  f-setup-test()
+  set-mock-file-text(user "func mock()\n  ")
+  mock-input-file-text.concat(user input-text)
+  mock-input-file-text.append(copy '\n')
+  write-syntax-tree()
+  user String expected-header("\nFunction(mock)() {\n  ")
+  user String expected-futter("\n}\n")
+  f-assert-string-slice(
+      user expected-header,
+      user mock-output-file-text,
+      copy 0,
+      copy expected-header.length)
+  f-assert-string-slice(
+      user expected-output,
+      user mock-output-file-text,
+      copy expected-header.length,
+      copy mock-output-file-text.length - expected-header.length -
+      expected-futter.length)
+  f-assert-string-slice(
+      user expected-futter,
+      user mock-output-file-text,
+      copy mock-output-file-text.length - expected-futter.length,
+      copy expected-futter.length)
+
+
+test test-type()
+  test-global-scope(user "struct Test", user "Type(Test)")
+  test-global-scope(user "class Test", user "Type(Test)")
+  test-global-scope(
+      user "struct Test1\nclass Test2\n\n\nstruct Test3",
+      user "Type(Test1)\n\nType(Test2)\n\nType(Test3)")
+
+
+test test-function()
+  test-global-scope(user "func name()", user "Function(name)() {\n}")
+  test-global-scope(
+      user "func name(var String self, user String text, copy Int num)",
+      user "Function(name)(Access(3) String self, Access(1) String text, Access(0) Int num) {\n}")
+  test-global-scope(
+      user "func name()->(owner String text, copy Int num)",
+      user "Function(name)()->(Access(2) String text, Access(0) Int num) {\n}")
+  test-global-scope(
+      user "func name(copy Char param)->(owner String out)",
+      user "Function(name)(Access(0) Char param)->(Access(2) String out) {\n}")
+  test-global-scope(
+      user "func name(user Array{Int} array)",
+      user "Function(name)(Access(1) Array{Int} array) {\n}")
+  test-global-scope(
+      user "func name(user Array{List{Array{Int}}} array)",
+      user "Function(name)(Access(1) Array{List{Array{Int}}} array) {\n}")
+
+
+test test-expression-in-func()
+  test-code(user "x := 3", user "Variable(x) = Int(3)")

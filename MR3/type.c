@@ -323,19 +323,20 @@ Returncode St_dynamic_class_write_meths(St_dynamic_class* self) {
     if (!(NULL != mvar->func_dec->mclass)) {
       CHECK(202, f_syntax_error(self->_base.mtype->name, mvar->name));
     }
-    CHECK(203, write_cstyle(mvar->func_dec->mclass->name));
-    CHECK(204, write(&(String){2, 1, "_"}));
-    CHECK(205, write_cstyle(mvar->func_dec->name));
-    CHECK(206, Var_map_iter_m_next(iter));
+    CHECK(203, write(&(String){8, 7, "(void*)"}));
+    CHECK(204, write_cstyle(mvar->func_dec->mclass->name));
+    CHECK(205, write(&(String){2, 1, "_"}));
+    CHECK(206, write_cstyle(mvar->func_dec->name));
+    CHECK(207, Var_map_iter_m_next(iter));
     Bool _Bool9;
-    CHECK(207, Var_map_iter_m_has_data(iter, &(_Bool9)))
+    CHECK(208, Var_map_iter_m_has_data(iter, &(_Bool9)))
     if (_Bool9) {
-      CHECK(208, write(&(String){3, 2, ", "}));
+      CHECK(209, write(&(String){3, 2, ", "}));
     }
   }
-  CHECK(209, write(&(String){4, 3, "};\n"}));
-  CHECK(210, write_spaces());
-  CHECK(211, write(&(String){7, 6, "#endif"}));
+  CHECK(210, write(&(String){4, 3, "};\n"}));
+  CHECK(211, write_spaces());
+  CHECK(212, write(&(String){7, 6, "#endif"}));
   return OK;
 }
 #undef MR_FUNC_NAME
