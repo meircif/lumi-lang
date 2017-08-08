@@ -2,16 +2,43 @@
 
 ## Variable node in the syntax tree 
 class SyntaxTreeVariable(SyntaxTreeCode)
-  user SyntaxTreeType type-node
+  owner Variable variable
+  owner Expression init-value
+  user SyntaxTreeType parent-type
   
-  func inst parse-new(user SyntaxTreeType type-node):(
+  func inst parse-new(copy Int access, user SyntaxTreeType parent-type):(
       owner SyntaxTreeVariable new-node)
     new SyntaxTreeVariable in new-node
-    new-node.parse(user type-node)
+    new-node.parse(copy access, user parent-type)
   
-  func inst parse(user SyntaxTreeType type-node)
-    self.type-node := type-node
-    # todo ...
+  func inst parse(copy Int access, user SyntaxTreeType parent-type)
+    self.parent-type := parent-type
+    new Variable in self.variable
+    self.variable.access := access
+    new TypeInstance in self.variable.type-instance
+    var Char end
+    self.variable.type-instance.parse(user " "):(copy end)
+    if end != ' '
+      f-syntax-error-c(user "expected space after type, got", copy end)
+    read-new(user "("):(owner self.variable.name, copy end)
+    if end = '('
+      parse-new-expression(user ")"):(owner self.init-value, copy end)
+      if end != ')'
+        f-syntax-error-c(
+            user "expected \")\" after initialization, got",
+            copy end)
+      read-c():(copy end)
+    if end != '\n'
+      f-syntax-error-c(user "expected new-line, got", copy end)
   
   func dynamic write()
-    # ...
+    write(user "Access(")
+    write-int(copy self.variable.access)
+    write(user ") ")
+    self.variable.type-instance.write()
+    write(user " ")
+    write(user self.variable.name)
+    if ? self.init-value
+      write(user " (")
+      self.init-value.write()
+      write(user ")")

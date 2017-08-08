@@ -14,7 +14,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   var Int indentation-spaces
   owner List{SyntaxTreeVariable} variables
   
-  func inst parse-children(user SyntaxTreeType type-node)
+  func inst parse-children(user SyntaxTreeType parent-type)
     new List{SyntaxTreeVariable} in self.variables
     do
       user String keyword
@@ -37,26 +37,26 @@ class SyntaxTreeBranch(SyntaxTreeNode)
               user "got",
               user actual-num)
         
-        if not self.parse-if-variable(user keyword, copy end, user type-node)
+        if not self.parse-if-variable(user keyword, copy end, user parent-type)
           self.parse-child(user keyword, copy end)
     
     glob.save-input := true
   
   func inst parse-if-variable(
-      user String keyword, copy Char end, user SyntaxTreeType type-node):(
+      user String keyword, copy Char end, user SyntaxTreeType parent-type):(
       copy Bool is-variable)
     is-variable := end = ' '
     if not is-variable
       return
     if keyword.equal(user "var")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, user type-node))
+          var _, copy ACCESS-VAR, user parent-type))
     else-if keyword.equal(user "user")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, user type-node))
+          var _, copy ACCESS-USER, user parent-type))
     else-if keyword.equal(user "owner")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, user type-node))
+          var _, copy ACCESS-OWNER, user parent-type))
     else
       is-variable := false
   
@@ -87,14 +87,14 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
     new List{SyntaxTreeFunction} in self.functions
   
   func inst parse-if-function(
-      user String keyword, copy Char end, user SyntaxTreeType type-node):(
+      user String keyword, copy Char end, user SyntaxTreeType parent-type):(
       copy Bool is-func)
     if end != ' '
       f-syntax-error-c(user "expected space, got", copy end)
      keyword.equal(user "func"):(copy is-func)
     if is-func
       self.functions.add(owner SyntaxTreeFunction.parse-new(
-          var _, user type-node))
+          var _, user parent-type))
   
   func dynamic write()
     base.write()
@@ -127,6 +127,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   
   func inst write-block()
     write(user " {\n")
+    base.write()
     self.write-children(user self.nodes)
     write-spaces(copy self.indentation-spaces - 2)
     write(user "}")

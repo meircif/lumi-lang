@@ -17,34 +17,34 @@ typedef struct SyntaxTreeFunction SyntaxTreeFunction;
 #elif MR_STAGE == MR_TYPES(3)
 struct SyntaxTreeFunction {
   SyntaxTreeBlock _base;
-  SyntaxTreeType* type_node;
+  SyntaxTreeType* parent_type;
   String* name;
   FunctionArguments* arguemnts;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeFunction_parse_new(SyntaxTreeFunction* self, SyntaxTreeType* type_node, SyntaxTreeFunction** new_node);
+Returncode SyntaxTreeFunction_parse_new(SyntaxTreeFunction* self, SyntaxTreeType* parent_type, SyntaxTreeFunction** new_node);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeFunction_parse_new = "SyntaxTreeFunction.parse-new";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_parse_new
-Returncode SyntaxTreeFunction_parse_new(SyntaxTreeFunction* self, SyntaxTreeType* type_node, SyntaxTreeFunction** new_node) {
+Returncode SyntaxTreeFunction_parse_new(SyntaxTreeFunction* self, SyntaxTreeType* parent_type, SyntaxTreeFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeFunction));
   if ((*new_node) == NULL) RAISE(11)
   *(*new_node) = (SyntaxTreeFunction){SyntaxTreeFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeFunction__dtl;
-  CHECK(12, SyntaxTreeFunction_parse((*new_node), type_node) )
+  CHECK(12, SyntaxTreeFunction_parse((*new_node), parent_type) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, SyntaxTreeType* type_node);
+Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, SyntaxTreeType* parent_type);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeFunction_parse = "SyntaxTreeFunction.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_parse
-Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, SyntaxTreeType* type_node) {
-  self->type_node = type_node;
-  if (NULL != self->type_node) {
+Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, SyntaxTreeType* parent_type) {
+  self->parent_type = parent_type;
+  if (NULL != self->parent_type) {
     self->_base._base.indentation_spaces = 4;
   }
   else {

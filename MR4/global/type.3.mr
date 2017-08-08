@@ -52,3 +52,5 @@ static Operator
 ## Meta type for a variable in the language
 static Variable
   owner String name
+  var Int access
+  owner TypeInstance type-instance

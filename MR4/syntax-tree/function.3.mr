@@ -2,18 +2,18 @@
 
 ## Function node in the syntax tree 
 class SyntaxTreeFunction(SyntaxTreeBlock)
-  user SyntaxTreeType type-node
+  user SyntaxTreeType parent-type
   owner String name
   owner FunctionArguments arguemnts
   
-  func inst parse-new(user SyntaxTreeType type-node):(
+  func inst parse-new(user SyntaxTreeType parent-type):(
       owner SyntaxTreeFunction new-node)
     new SyntaxTreeFunction in new-node
-    new-node.parse(user type-node)
+    new-node.parse(user parent-type)
   
-  func inst parse(user SyntaxTreeType type-node)
-    self.type-node := type-node
-    if ? self.type-node
+  func inst parse(user SyntaxTreeType parent-type)
+    self.parent-type := parent-type
+    if ? self.parent-type
       self.indentation-spaces := 4
     else
       self.indentation-spaces := 2

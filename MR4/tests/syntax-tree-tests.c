@@ -114,6 +114,8 @@ static char* _func_name_test_expression_in_func = "test-expression-in-func";
 #define MR_FUNC_NAME _func_name_test_expression_in_func
 Returncode test_expression_in_func() {
   CHECK(79, test_code(&(String){7, 6, "x := 3"}, &(String){21, 20, "Variable(x) = Int(3)"}) )
+  CHECK(80, test_code(&(String){16, 15, "user String str"}, &(String){21, 20, "Access(1) String str"}) )
+  CHECK(81, test_code(&(String){17, 16, "var Int x(y + 5)"}, &(String){39, 38, "Access(3) Int x (Variable(y) + Int(5))"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

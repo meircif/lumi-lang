@@ -131,6 +131,8 @@ typedef struct Variable Variable;
 #elif MR_STAGE == MR_TYPES(0)
 struct Variable {
   String* name;
+  Int access;
+  TypeInstance* type_instance;
 };
 #endif
 

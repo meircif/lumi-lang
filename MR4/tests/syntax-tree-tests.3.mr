@@ -77,3 +77,6 @@ test test-function()
 
 test test-expression-in-func()
   test-code(user "x := 3", user "Variable(x) = Int(3)")
+  test-code(user "user String str", user "Access(1) String str")
+  test-code(
+      user "var Int x(y + 5)", user "Access(3) Int x (Variable(y) + Int(5))")
