@@ -1,0 +1,15 @@
+## Generic iterator dynamic interface
+
+
+class Iterator{Generic}
+  ## Return whether current item exist
+  func dynamic has-item():(copy Bool exist)
+    raise
+  
+  ## Get current item, fail if not exist
+  func dynamic get-item():(user Generic item)
+    raise
+  
+  ## Move to next item
+  func dynamic next()
+    raise

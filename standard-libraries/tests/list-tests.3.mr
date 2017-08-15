@@ -1,0 +1,86 @@
+## Tests for generic lists
+
+test list-append-test()
+  var List{String} list
+  list.append(owner "first")
+  list.append(owner "second")
+  list.append(owner "third")
+  var ListIterator{String} iter
+  iter.init(user list)
+  assert iter.has-item()
+  assert iter.get-item().equal(user "first")
+  iter.next()
+  assert iter.has-item()
+  assert iter.get-item().equal(user "second")
+  iter.next()
+  assert iter.has-item()
+  assert iter.get-item().equal(user "third")
+  iter.next()
+  assert not iter.has-item()
+
+
+test list-prepend-test()
+  var List{String} list
+  list.prepend(owner "third")
+  list.prepend(owner "second")
+  list.prepend(owner "first")
+  var ListIterator{String} iter
+  iter.init(user list)
+  assert iter.has-item()
+  assert iter.get-item().equal(user "first")
+  iter.next()
+  assert iter.has-item()
+  assert iter.get-item().equal(user "second")
+  iter.next()
+  assert iter.has-item()
+  assert iter.get-item().equal(user "third")
+  iter.next()
+  assert not iter.has-item()
+
+
+test list-pop-test()
+  var List{String} list
+  list.append(owner "first")
+  list.append(owner "second")
+  list.append(owner "third")
+  assert list.pop().equal(user "first")
+  assert list.pop().equal(user "second")
+  assert list.pop().equal(user "third")
+  assert-error list.pop()
+
+
+test list-is-empty-test()
+  var List{String} list
+  assert list.is-empty()
+  list.append(owner "first")
+  assert not list.is-empty()
+  list.pop()
+  assert list.is-empty()
+
+
+test list-generic-iter-test()
+  var List{String} list
+  list.append(owner "first")
+  list.append(owner "second")
+  list.append(owner "third")
+  var ListIterator{String} list-iter
+  list-iter.init(user list)
+  user Iterator{String} iter(list-iter)
+  assert iter.has-item()
+  assert iter.get-item().equal(user "first")
+  iter.next()
+  assert iter.has-item()
+  assert iter.get-item().equal(user "second")
+  iter.next()
+  assert iter.has-item()
+  assert iter.get-item().equal(user "third")
+  iter.next()
+  assert not iter.has-item()
+
+
+test list-empty-iter-test()
+  var ListIterator{String} iter
+  assert not iter.has-item()
+  assert-error iter.get-item()
+  iter.next()
+  assert not iter.has-item()
