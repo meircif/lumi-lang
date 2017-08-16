@@ -21,16 +21,28 @@ struct SyntaxTreeLoop {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeLoop_parse_block(SyntaxTreeLoop* self);
+Returncode SyntaxTreeLoop_parse_block(SyntaxTreeLoop* self, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeLoop_parse_block = "SyntaxTreeLoop.parse-block";
 #define MR_FUNC_NAME _func_name_SyntaxTreeLoop_parse_block
-Returncode SyntaxTreeLoop_parse_block(SyntaxTreeLoop* self) {
+Returncode SyntaxTreeLoop_parse_block(SyntaxTreeLoop* self, Char* end) {
   self->block = malloc(sizeof(SyntaxTreeBlock));
   if (self->block == NULL) RAISE(8)
   *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, 0, NULL, NULL};
   self->block->_base._base._dtl = SyntaxTreeBlock__dtl;
-  CHECK(9, SyntaxTreeBlock_parse_block(self->block) )
+  self->block->_base.indentation_spaces = self->_base.parent->_base.indentation_spaces + 2;
+  CHECK(10, SyntaxTreeBlock_parse_block(self->block, &((*end))) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeLoop_write_block(SyntaxTreeLoop* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeLoop_write_block = "SyntaxTreeLoop.write-block";
+#define MR_FUNC_NAME _func_name_SyntaxTreeLoop_write_block
+Returncode SyntaxTreeLoop_write_block(SyntaxTreeLoop* self) {
+  CHECK(13, SyntaxTreeBlock_write_block(self->block) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -53,16 +65,40 @@ struct SyntaxTreeDoLoop {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeDoLoop_parse_new(SyntaxTreeDoLoop* self, SyntaxTreeDoLoop** new_node);
+Returncode SyntaxTreeDoLoop_parse_new(SyntaxTreeDoLoop* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeDoLoop** new_node);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeDoLoop_parse_new = "SyntaxTreeDoLoop.parse-new";
 #define MR_FUNC_NAME _func_name_SyntaxTreeDoLoop_parse_new
-Returncode SyntaxTreeDoLoop_parse_new(SyntaxTreeDoLoop* self, SyntaxTreeDoLoop** new_node) {
+Returncode SyntaxTreeDoLoop_parse_new(SyntaxTreeDoLoop* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeDoLoop** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeDoLoop));
-  if ((*new_node) == NULL) RAISE(17)
+  if ((*new_node) == NULL) RAISE(22)
   *(*new_node) = (SyntaxTreeDoLoop){SyntaxTreeDoLoop__dtl, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeDoLoop__dtl;
-  CHECK(18, SyntaxTreeLoop_parse_block(&((*new_node)->_base)) )
+  CHECK(23, SyntaxTreeDoLoop_parse((*new_node), parent, &((*end))) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeDoLoop_parse(SyntaxTreeDoLoop* self, SyntaxTreeBlock* parent, Char* end);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeDoLoop_parse = "SyntaxTreeDoLoop.parse";
+#define MR_FUNC_NAME _func_name_SyntaxTreeDoLoop_parse
+Returncode SyntaxTreeDoLoop_parse(SyntaxTreeDoLoop* self, SyntaxTreeBlock* parent, Char* end) {
+  self->_base._base.parent = parent;
+  CHECK(27, SyntaxTreeLoop_parse_block(&(self->_base), &((*end))) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeDoLoop_write(SyntaxTreeDoLoop* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeDoLoop_write = "SyntaxTreeDoLoop.write";
+#define MR_FUNC_NAME _func_name_SyntaxTreeDoLoop_write
+Returncode SyntaxTreeDoLoop_write(SyntaxTreeDoLoop* self) {
+  CHECK(30, write(&(String){3, 2, "do"}) )
+  CHECK(31, SyntaxTreeLoop_write_block(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -71,7 +107,7 @@ Returncode SyntaxTreeDoLoop_parse_new(SyntaxTreeDoLoop* self, SyntaxTreeDoLoop**
 extern Func SyntaxTreeDoLoop__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeNode_write};
+Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeDoLoop_write};
 #endif
 
 #undef MR_FILE_NAME

@@ -22,6 +22,26 @@ func test-global-scope(user String input-text, user String expected-output)
   assert mock-output-file-text[mock-output-file-text.length - 1] = '\n'
 
 
+func test-global-scope-error(user String input-text, user String expected-error)
+  f-setup-test()
+  set-mock-file-text(user input-text)
+  mock-print-active := true
+  assert-error write-syntax-tree()
+  mock-print-active := false
+  user String expected-header("Code error in mock.3.mr[")
+  f-assert-string-slice(
+      user expected-header,
+      user mock-print-text,
+      copy 0,
+      copy expected-header.length)
+  f-assert-string-slice(
+      user expected-error,
+      user mock-print-text,
+      copy expected-header.length + 3,
+      copy mock-print-text.length - expected-header.length - 4)
+  assert mock-print-text[mock-print-text.length - 1] = '\n'
+
+
 func test-code(user String input-text, user String expected-output)
   f-setup-test()
   set-mock-file-text(user "func mock()\n  ")
@@ -29,7 +49,7 @@ func test-code(user String input-text, user String expected-output)
   mock-input-file-text.append(copy '\n')
   write-syntax-tree()
   user String expected-header("\nFunction(mock)() {\n  ")
-  user String expected-futter("\n}\n")
+  user String expected-footer("\n}\n")
   f-assert-string-slice(
       user expected-header,
       user mock-output-file-text,
@@ -40,12 +60,27 @@ func test-code(user String input-text, user String expected-output)
       user mock-output-file-text,
       copy expected-header.length,
       copy mock-output-file-text.length - expected-header.length -
-      expected-futter.length)
+      expected-footer.length)
   f-assert-string-slice(
-      user expected-futter,
+      user expected-footer,
       user mock-output-file-text,
-      copy mock-output-file-text.length - expected-futter.length,
-      copy expected-futter.length)
+      copy mock-output-file-text.length - expected-footer.length,
+      copy expected-footer.length)
+
+
+test test-global()
+  test-global-scope(user "user String str", user "Access(1) String str")
+  test-global-scope(user "\n  \n\nvar Int x", user "Access(3) Int x")
+  test-global-scope-error(user "error ", user "unknown keyword \"error\"")
+  test-global-scope-error(
+      user "error\n",
+      user "expected space after key-word, got \"new-line\"")
+  test-global-scope-error(
+      user "  struct Test",
+      user "indentation too big, expected \"0\" got \"2\"")
+  test-global-scope-error(
+      user "var Int x",
+      user "no new-line before file end")
 
 
 test test-type()
@@ -54,6 +89,15 @@ test test-type()
   test-global-scope(
       user "struct Test1\nclass Test2\n\n\nstruct Test3",
       user "Type(Test1)\n\nType(Test2)\n\nType(Test3)")
+  test-global-scope-error(
+      user "struct Test\n  error ",
+      user "unknown keyword \"error\"")
+  test-global-scope-error(
+      user "struct Test\n  error\n",
+      user "expected space after key-word, got \"new-line\"")
+  test-global-scope-error(
+      user "struct Test",
+      user "expected block in a new line, got \"EOF\"")
 
 
 test test-function()
@@ -73,6 +117,42 @@ test test-function()
   test-global-scope(
       user "func name(user Array{List{Array{Int}}} array)",
       user "Function(name)(Access(1) Array{List{Array{Int}}} array) {\n}")
+  test-global-scope-error(
+      user "func name\n",
+      user "expected \"(\" after function name, got \"new-line\"")
+  test-global-scope-error(
+      user "func name( )\n",
+      user "expected access, got \" \"")
+  test-global-scope-error(
+      user "func name(user)\n",
+      user "expected space after access, got \")\"")
+  test-global-scope-error(
+      user "func name(var String\n",
+      user "expected space after type, got \"new-line\"")
+  test-global-scope-error(
+      user "func name(error Int x)\n",
+      user "illegal access \"error\"")
+  test-global-scope-error(
+      user "func name(var String str,user Int x)\n",
+      user "expected space or new-line after \",\", got \"u\"")
+  test-global-scope-error(
+      user "func name()-()\n",
+      user "expected \">(\" got \"()\"")
+  test-global-scope-error(
+      user "func name()",
+      user "expected block in a new line, got \"EOF\"")
+  test-global-scope-error(
+      user "func name()\n    var Int x",
+      user "indentation too big, expected \"2\" got \"4\"")
+
+
+# test test-members()
+  # test-global-scope(
+      # user "struct Test\n  func name()",
+      # user "Type(Test)\n  Function(name)() {\n}")
+  # test-global-scope(
+      # user "struct Test\n  var Int x\n  user String str",
+      # user "Type(Test)\n  Access(3) Int x\n  Access(1) String str")
 
 
 test test-expression-in-func()
@@ -80,3 +160,5 @@ test test-expression-in-func()
   test-code(user "user String str", user "Access(1) String str")
   test-code(
       user "var Int x(y + 5)", user "Access(3) Int x (Variable(y) + Int(5))")
+  test-code(user "do\n    var Int x", user "do {\n    Access(3) Int x\n  }")
+  test-code(user "\n  \n    \n\n  var Int x", user "Access(3) Int x")

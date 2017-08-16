@@ -4,15 +4,28 @@
 class SyntaxTreeLoop(SyntaxTreeCode)
   owner SyntaxTreeBlock block
   
-  func inst parse-block()
+  func inst parse-block():(copy Char end)
     new SyntaxTreeBlock in self.block
-    self.block.parse-block()
+    self.block.indentation-spaces := self.parent.indentation-spaces + 2
+    self.block.parse-block():(copy end)
+  
+  func inst write-block()
+    self.block.write-block()
 
 
 ## Do loop node in the syntax tree
 class SyntaxTreeDoLoop(SyntaxTreeLoop)
   owner SyntaxTreeBlock block
   
-  func inst parse-new():(owner SyntaxTreeDoLoop new-node)
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeDoLoop new-node)
     new SyntaxTreeDoLoop in new-node
-    new-node.parse-block()
+    new-node.parse(user parent):(copy end)
+  
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.parent := parent
+    self.parse-block():(copy end)
+  
+  func dynamic write()
+    write(user "do")
+    self.write-block()

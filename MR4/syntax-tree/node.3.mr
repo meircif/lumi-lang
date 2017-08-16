@@ -14,17 +14,16 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   var Int indentation-spaces
   owner List{SyntaxTreeVariable} variables
   
-  func inst parse-children(user SyntaxTreeType parent-type)
+  func inst parse-children(user SyntaxTreeType parent-type):(copy Char end)
+    if end != '\n'
+      f-syntax-error-c(user "expected block in a new line, got", copy end)
     new List{SyntaxTreeVariable} in self.variables
     do
       user String keyword
-      var Char end
       var Int spaces
       read-until(user " .([?", copy true):(user keyword, copy end, copy spaces)
       # ignore empty lines
       if keyword.length > 0 or end != '\n'
-        
-        while spaces = self.indentation-spaces and end != EOF
         
         if spaces > self.indentation-spaces
           var String{32} expecte-num
@@ -37,30 +36,37 @@ class SyntaxTreeBranch(SyntaxTreeNode)
               user "got",
               user actual-num)
         
-        if not self.parse-if-variable(user keyword, copy end, user parent-type)
-          self.parse-child(user keyword, copy end)
+        while spaces = self.indentation-spaces and end != EOF
+        
+        if not self.parse-if-variable(user keyword, user parent-type):(copy end)
+          self.parse-child(user keyword):(copy end)
+        
+        while end != EOF
+        if not glob.save-input and end != '\n'
+          # TODO: is possible?
+          f-syntax-error-c(user "expected new-line in line end, got", copy end)
     
     glob.save-input := true
   
   func inst parse-if-variable(
-      user String keyword, copy Char end, user SyntaxTreeType parent-type):(
-      copy Bool is-variable)
+      user String keyword, user SyntaxTreeType parent-type):(
+      copy Char end, copy Bool is-variable)
     is-variable := end = ' '
     if not is-variable
       return
     if keyword.equal(user "var")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-VAR, user parent-type))
+          var _, copy ACCESS-VAR, user parent-type):(copy end))
     else-if keyword.equal(user "user")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-USER, user parent-type))
+          var _, copy ACCESS-USER, user parent-type):(copy end))
     else-if keyword.equal(user "owner")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-OWNER, user parent-type))
+          var _, copy ACCESS-OWNER, user parent-type):(copy end))
     else
       is-variable := false
   
-  func dynamic parse-child(user String keyword, copy Char end)
+  func dynamic parse-child(user String keyword):(copy Char end)
     raise
   
   func dynamic write()
@@ -87,14 +93,14 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
     new List{SyntaxTreeFunction} in self.functions
   
   func inst parse-if-function(
-      user String keyword, copy Char end, user SyntaxTreeType parent-type):(
-      copy Bool is-func)
+      user String keyword, user SyntaxTreeType parent-type):(
+      copy Char end, copy Bool is-func)
     if end != ' '
-      f-syntax-error-c(user "expected space, got", copy end)
-     keyword.equal(user "func"):(copy is-func)
+      f-syntax-error-c(user "expected space after key-word, got", copy end)
+    keyword.equal(user "func"):(copy is-func)
     if is-func
       self.functions.add(owner SyntaxTreeFunction.parse-new(
-          var _, user parent-type))
+          var _, user parent-type):(copy end))
   
   func dynamic write()
     base.write()
@@ -110,20 +116,21 @@ class SyntaxTreeCode(SyntaxTreeNode)
 class SyntaxTreeBlock(SyntaxTreeBranch)
   owner List{SyntaxTreeCode} nodes
   
-  func inst parse-block()
+  func inst parse-block():(copy Char end)
     new List{SyntaxTreeCode} in self.nodes
-    self.parse-children(user _)
+    self.parse-children(user _):(copy end)
   
-  func dynamic parse-child(user String keyword, copy Char end)
+  func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node
     if keyword.equal(user "do")
       if end != '\n'
         f-syntax-error-c(user "expected new-line, got", copy end)
-      self.nodes.add(owner SyntaxTreeDoLoop.parse-new(var _))
+      self.nodes.add(
+          owner SyntaxTreeDoLoop.parse-new(var _, user self):(copy end))
     else
       glob.save-input := true
-      self.nodes.add(owner SyntaxTreeExpression.parse-new(var _))
-    self.nodes.last.item.parent := self
+      self.nodes.add(
+          owner SyntaxTreeExpression.parse-new(var _, user self):(copy end))
   
   func inst write-block()
     write(user " {\n")

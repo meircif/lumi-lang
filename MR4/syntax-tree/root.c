@@ -41,10 +41,11 @@ Returncode SyntaxTreeRoot_parse(SyntaxTreeRoot* self, Array* argv) {
     glob->input_file_name = (&(((String*)((argv)->values))[n]));
     glob->line_number = 0;
     
-    CHECK(14, SyntaxTreeBranch_parse_children(&(self->_base._base), NULL) )
+    Char end = '\n';
+    CHECK(15, SyntaxTreeBranch_parse_children(&(self->_base._base), NULL, &(end)) )
     
     if (glob->input_buffer->length > 0 || glob->input_spaces > 0) {
-      CHECK(17, f_syntax_error_msg(&(String){28, 27, "no new-line before file end"}) )
+      CHECK(18, f_syntax_error_msg(&(String){28, 27, "no new-line before file end"}) )
     }
   }}
   return OK;
@@ -52,33 +53,33 @@ Returncode SyntaxTreeRoot_parse(SyntaxTreeRoot* self, Array* argv) {
 #undef MR_FUNC_NAME
 #endif/* todo... */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Char end);
+Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeRoot_parse_child = "SyntaxTreeRoot.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_parse_child
-Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Char end) {
-  Bool _Bool42;
-  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, end, NULL, &(_Bool42)) )
-  if (_Bool42) {
+Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Char* end) {
+  Bool _Bool41;
+  CHECK(22, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, NULL, &((*end)), &(_Bool41)) )
+  if (_Bool41) {
     return OK;
   }
-  Bool _Bool43;
-  CHECK(23, String_equal(keyword, &(String){7, 6, "struct"}, &(_Bool43)) )
-  if (_Bool43) {
-    SyntaxTreeType* _SyntaxTreeType44;
-    CHECK(24, SyntaxTreeType_parse_new(NULL, &(_SyntaxTreeType44)) )
-    CHECK(24, List_add(self->types, _SyntaxTreeType44) )
+  Bool _Bool42;
+  CHECK(24, String_equal(keyword, &(String){7, 6, "struct"}, &(_Bool42)) )
+  if (_Bool42) {
+    SyntaxTreeType* _SyntaxTreeType43;
+    CHECK(25, SyntaxTreeType_parse_new(NULL, &((*end)), &(_SyntaxTreeType43)) )
+    CHECK(25, List_add(self->types, _SyntaxTreeType43) )
   }
   else {
-    Bool _Bool45;
-    CHECK(25, String_equal(keyword, &(String){6, 5, "class"}, &(_Bool45)) )
-    if (_Bool45) {
-      SyntaxTreeType* _SyntaxTreeType46;
-      CHECK(26, SyntaxTreeType_parse_new(NULL, &(_SyntaxTreeType46)) )
-      CHECK(26, List_add(self->types, _SyntaxTreeType46) )
+    Bool _Bool44;
+    CHECK(26, String_equal(keyword, &(String){6, 5, "class"}, &(_Bool44)) )
+    if (_Bool44) {
+      SyntaxTreeType* _SyntaxTreeType45;
+      CHECK(27, SyntaxTreeType_parse_new(NULL, &((*end)), &(_SyntaxTreeType45)) )
+      CHECK(27, List_add(self->types, _SyntaxTreeType45) )
     }
     else {
-      CHECK(28, f_syntax_error(&(String){16, 15, "unknown keyword"}, keyword) )
+      CHECK(29, f_syntax_error(&(String){16, 15, "unknown keyword"}, keyword) )
     }
   }
   return OK;
@@ -97,8 +98,8 @@ Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_write = "SyntaxTreeRoot.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write
 Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self) {
-  CHECK(38, SyntaxTreeBranch_write_children(&(self->_base._base), self->types) )
-  CHECK(39, SyntaxTreeNamespace_write(&(self->_base)) )
+  CHECK(39, SyntaxTreeBranch_write_children(&(self->_base._base), self->types) )
+  CHECK(40, SyntaxTreeNamespace_write(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME

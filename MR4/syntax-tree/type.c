@@ -21,46 +21,45 @@ struct SyntaxTreeType {
 /* todo... */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeType_parse_new(SyntaxTreeType* self, SyntaxTreeType** new_node);
+Returncode SyntaxTreeType_parse_new(SyntaxTreeType* self, Char* end, SyntaxTreeType** new_node);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeType_parse_new = "SyntaxTreeType.parse-new";
 #define MR_FUNC_NAME _func_name_SyntaxTreeType_parse_new
-Returncode SyntaxTreeType_parse_new(SyntaxTreeType* self, SyntaxTreeType** new_node) {
+Returncode SyntaxTreeType_parse_new(SyntaxTreeType* self, Char* end, SyntaxTreeType** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeType));
   if ((*new_node) == NULL) RAISE(8)
   *(*new_node) = (SyntaxTreeType){SyntaxTreeType__dtl, 0, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeType__dtl;
-  CHECK(9, SyntaxTreeType_parse((*new_node)) )
+  CHECK(9, SyntaxTreeType_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeType_parse(SyntaxTreeType* self);
+Returncode SyntaxTreeType_parse(SyntaxTreeType* self, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeType_parse = "SyntaxTreeType.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeType_parse
-Returncode SyntaxTreeType_parse(SyntaxTreeType* self) {
+Returncode SyntaxTreeType_parse(SyntaxTreeType* self, Char* end) {
   CHECK(12, SyntaxTreeNamespace_init(&(self->_base)) )
   self->_base._base.indentation_spaces = 2;
   String* name = NULL;
-  Char _Char47;
-  CHECK(15, read_new(&(String){1, 0, ""}, &(name), &(_Char47)) )
+  CHECK(15, read_new(&(String){1, 0, ""}, &(name), &((*end))) )
   CHECK(16, Global_add_user_type(glob, name, &(self->type_data)) )
-  CHECK(17, SyntaxTreeBranch_parse_children(&(self->_base._base), self) )
+  CHECK(17, SyntaxTreeBranch_parse_children(&(self->_base._base), self, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* todo... */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Char end);
+Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeType_parse_child = "SyntaxTreeType.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeType_parse_child
-Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Char end) {
-  Bool _Bool48;
-  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, end, self, &(_Bool48)) )
-  if (!_Bool48) {
+Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Char* end) {
+  Bool _Bool46;
+  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool46)) )
+  if (!_Bool46) {
     CHECK(22, f_syntax_error(&(String){16, 15, "unknown keyword"}, keyword) )
   }
   return OK;

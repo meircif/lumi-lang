@@ -4,12 +4,14 @@
 class SyntaxTreeExpression(SyntaxTreeCode)
   owner Expression expression
   
-  func inst parse-new():(owner SyntaxTreeExpression new-node)
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeExpression new-node)
     new SyntaxTreeExpression in new-node
-    new-node.parse()
+    new-node.parse(user parent):(copy end)
   
-  func inst parse()
-    Expression.parse-new(var _, user ""):(owner self.expression)
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.parent := parent
+    parse-new-expression(user ""):(owner self.expression, copy end)
   
   func dynamic write()
     self.expression.write()

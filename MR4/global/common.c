@@ -105,14 +105,19 @@ Returncode f_syntax_error_c(String* text, Char item);
 static char* _func_name_f_syntax_error_c = "f-syntax-error-c";
 #define MR_FUNC_NAME _func_name_f_syntax_error_c
 Returncode f_syntax_error_c(String* text, Char item) {
-  String* char_str = &(String){4, 0, (char[4]){0}};
+  String* char_str = &(String){16, 0, (char[16]){0}};
   if (item == EOF) {
     CHECK(50, String_copy(char_str, &(String){4, 3, "EOF"}) )
   }
   else {
-    CHECK(52, String_append(char_str, item) )
+    if (item == '\n') {
+      CHECK(52, String_copy(char_str, &(String){9, 8, "new-line"}) )
+    }
+    else {
+      CHECK(54, String_append(char_str, item) )
+    }
   }
-  CHECK(53, f_syntax_error(text, char_str) )
+  CHECK(55, f_syntax_error(text, char_str) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -125,10 +130,10 @@ Returncode f_syntax_error_msg(String* text);
 static char* _func_name_f_syntax_error_msg = "f-syntax-error-msg";
 #define MR_FUNC_NAME _func_name_f_syntax_error_msg
 Returncode f_syntax_error_msg(String* text) {
-  CHECK(57, print_syntax_error_header() )
-  CHECK(58, print(text) )
-  CHECK(59, print(&(String){2, 1, "\n"}) )
-  RAISE(60)
+  CHECK(59, print_syntax_error_header() )
+  CHECK(60, print(text) )
+  CHECK(61, print(&(String){2, 1, "\n"}) )
+  RAISE(62)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -140,13 +145,13 @@ Returncode print_syntax_error_header();
 static char* _func_name_print_syntax_error_header = "print-syntax-error-header";
 #define MR_FUNC_NAME _func_name_print_syntax_error_header
 Returncode print_syntax_error_header() {
-  CHECK(64, print(&(String){15, 14, "Code error in "}) )
-  CHECK(65, print(glob->input_file_name) )
-  CHECK(66, print(&(String){2, 1, "["}) )
+  CHECK(66, print(&(String){15, 14, "Code error in "}) )
+  CHECK(67, print(glob->input_file_name) )
+  CHECK(68, print(&(String){2, 1, "["}) )
   String* line_num_str = &(String){32, 0, (char[32]){0}};
-  CHECK(68, Int_str(glob->line_number, line_num_str) )
-  CHECK(69, print(line_num_str) )
-  CHECK(70, print(&(String){3, 2, "] "}) )
+  CHECK(70, Int_str(glob->line_number, line_num_str) )
+  CHECK(71, print(line_num_str) )
+  CHECK(72, print(&(String){3, 2, "] "}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -159,10 +164,10 @@ Returncode print_msg_with_item(String* text, String* item);
 static char* _func_name_print_msg_with_item = "print-msg-with-item";
 #define MR_FUNC_NAME _func_name_print_msg_with_item
 Returncode print_msg_with_item(String* text, String* item) {
-  CHECK(74, print(text) )
-  CHECK(75, print(&(String){3, 2, " \""}) )
-  CHECK(76, print(item) )
-  CHECK(77, print(&(String){2, 1, "\""}) )
+  CHECK(76, print(text) )
+  CHECK(77, print(&(String){3, 2, " \""}) )
+  CHECK(78, print(item) )
+  CHECK(79, print(&(String){2, 1, "\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -21,28 +21,28 @@ struct SyntaxTreeExpression {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeExpression_parse_new(SyntaxTreeExpression* self, SyntaxTreeExpression** new_node);
+Returncode SyntaxTreeExpression_parse_new(SyntaxTreeExpression* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeExpression** new_node);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeExpression_parse_new = "SyntaxTreeExpression.parse-new";
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_parse_new
-Returncode SyntaxTreeExpression_parse_new(SyntaxTreeExpression* self, SyntaxTreeExpression** new_node) {
+Returncode SyntaxTreeExpression_parse_new(SyntaxTreeExpression* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeExpression** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeExpression));
-  if ((*new_node) == NULL) RAISE(8)
+  if ((*new_node) == NULL) RAISE(9)
   *(*new_node) = (SyntaxTreeExpression){SyntaxTreeExpression__dtl, NULL, NULL};
   (*new_node)->_base._base._dtl = SyntaxTreeExpression__dtl;
-  CHECK(9, SyntaxTreeExpression_parse((*new_node)) )
+  CHECK(10, SyntaxTreeExpression_parse((*new_node), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeExpression_parse(SyntaxTreeExpression* self);
+Returncode SyntaxTreeExpression_parse(SyntaxTreeExpression* self, SyntaxTreeBlock* parent, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeExpression_parse = "SyntaxTreeExpression.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_parse
-Returncode SyntaxTreeExpression_parse(SyntaxTreeExpression* self) {
-  Char _Char26;
-  CHECK(12, Expression_parse_new(NULL, &(String){1, 0, ""}, &(self->expression), &(_Char26)) )
+Returncode SyntaxTreeExpression_parse(SyntaxTreeExpression* self, SyntaxTreeBlock* parent, Char* end) {
+  self->_base.parent = parent;
+  CHECK(14, parse_new_expression(&(String){1, 0, ""}, &(self->expression), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -53,7 +53,7 @@ Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self);
 static char* _func_name_SyntaxTreeExpression_write = "SyntaxTreeExpression.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_write
 Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
-  CHECK(15, (self->expression)->_dtl[0](self->expression) )
+  CHECK(17, (self->expression)->_dtl[0](self->expression) )
   return OK;
 }
 #undef MR_FUNC_NAME

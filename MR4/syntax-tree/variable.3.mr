@@ -7,16 +7,16 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   user SyntaxTreeType parent-type
   
   func inst parse-new(copy Int access, user SyntaxTreeType parent-type):(
-      owner SyntaxTreeVariable new-node)
+      copy Char end, owner SyntaxTreeVariable new-node)
     new SyntaxTreeVariable in new-node
-    new-node.parse(copy access, user parent-type)
+    new-node.parse(copy access, user parent-type):(copy end)
   
-  func inst parse(copy Int access, user SyntaxTreeType parent-type)
+  func inst parse(copy Int access, user SyntaxTreeType parent-type):(
+      copy Char end)
     self.parent-type := parent-type
     new Variable in self.variable
     self.variable.access := access
     new TypeInstance in self.variable.type-instance
-    var Char end
     self.variable.type-instance.parse(user " "):(copy end)
     if end != ' '
       f-syntax-error-c(user "expected space after type, got", copy end)
@@ -28,8 +28,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             user "expected \")\" after initialization, got",
             copy end)
       read-c():(copy end)
-    if end != '\n'
-      f-syntax-error-c(user "expected new-line, got", copy end)
   
   func dynamic write()
     write(user "Access(")

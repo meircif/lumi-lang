@@ -57,8 +57,8 @@ Returncode test_expression_error_ends(String* input_text, String* expected_error
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char49;
-    CHECK(27, parse_new_expression(ends, &(expression), &(_Char49)) );
+    Char _Char47;
+    CHECK(27, parse_new_expression(ends, &(expression), &(_Char47)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
@@ -253,8 +253,8 @@ Returncode test_call_expression() {
   CHECK(135, test_expression(&(String){28, 27, "function(copy calc(copy 3))"}, &(String){63, 62, "Variable(function)(Access(0) Variable(calc)(Access(0) Int(3)))"}) )
   CHECK(138, test_expression(&(String){61, 60, "function(\n    copy 2,\n    copy 3)->(\n    copy x,\n    copy y)"}, &(String){103, 102, "Variable(function)(Access(0) Int(2), Access(0) Int(3))->(Access(0) Variable(x), Access(0) Variable(y))"}) )
   CHECK(141, test_expression_error(&(String){18, 17, "function( copy 1)"}, &(String){25, 24, "expected access, got \" \""}) )
-  CHECK(143, test_expression_error(&(String){15, 14, "function(user)"}, &(String){24, 23, "expected space, got \")\""}) )
-  CHECK(145, test_expression_error(&(String){24, 23, "function(copy 4,copy 3)"}, &(String){36, 35, "expected space or new-line, got \"c\""}) )
+  CHECK(143, test_expression_error(&(String){15, 14, "function(user)"}, &(String){37, 36, "expected space after access, got \")\""}) )
+  CHECK(145, test_expression_error(&(String){24, 23, "function(copy 4,copy 3)"}, &(String){46, 45, "expected space or new-line after \",\", got \"c\""}) )
   CHECK(148, test_expression_error(&(String){16, 15, "function(copy 2"}, &(String){31, 30, "expected \",\" or \")\", got \"EOF\""}) )
   CHECK(150, test_expression_error(&(String){18, 17, "function(error 4)"}, &(String){23, 22, "illegal access \"error\""}) )
   return OK;

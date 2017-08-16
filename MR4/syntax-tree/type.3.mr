@@ -4,21 +4,21 @@
 class SyntaxTreeType(SyntaxTreeNamespace)
   user TypeData type-data
   
-  func inst parse-new():(owner SyntaxTreeType new-node)
+  func inst parse-new():(copy Char end, owner SyntaxTreeType new-node)
     new SyntaxTreeType in new-node
-    new-node.parse()
+    new-node.parse():(copy end)
   
-  func inst parse()
+  func inst parse():(copy Char end)
     self.init()
     self.indentation-spaces := 2
     owner String name
-    read-new(user ""):(owner name)
+    read-new(user ""):(owner name, copy end)
     glob.add-user-type(owner name):(user self.type-data)
-    self.parse-children(user self)
+    self.parse-children(user self):(copy end)
   
   ## todo...
-  func dynamic parse-child(user String keyword, copy Char end)
-    if not self.parse-if-function(user keyword, copy end, user self)
+  func dynamic parse-child(user String keyword):(copy Char end)
+    if not self.parse-if-function(user keyword, user self):(copy end)
       f-syntax-error(user "unknown keyword", user keyword)
   
   func dynamic write()

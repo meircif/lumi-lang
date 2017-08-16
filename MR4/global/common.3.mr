@@ -45,9 +45,11 @@ func f-syntax-error2(
 
 ## Same as `f-syntax-error` but with a character item
 func f-syntax-error-c(user String text, copy Char item)
-  var String{4} char-str
+  var String{16} char-str
   if item = EOF
     char-str.copy(user "EOF")
+  else-if item = '\n'
+    char-str.copy(user "new-line")
   else
     char-str.append(copy item)
   f-syntax-error(user text, user char-str)

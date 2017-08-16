@@ -11,19 +11,20 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       glob.input-file-name := argv[n]
       glob.line-number := 0
       
-      self.parse-children(user _)
+      var Char end('\n')
+      self.parse-children(user _):(copy end)
       
       if glob.input-buffer.length > 0 or glob.input-spaces > 0
         f-syntax-error-msg(user "no new-line before file end")
   
   ## todo...
-  func dynamic parse-child(user String keyword, copy Char end)
-    if self.parse-if-function(user keyword, copy end, user _)
+  func dynamic parse-child(user String keyword):(copy Char end)
+    if self.parse-if-function(user keyword, user _):(copy end)
       return
     if keyword.equal(user "struct")
-      self.types.add(owner SyntaxTreeType.parse-new(var _))
+      self.types.add(owner SyntaxTreeType.parse-new(var _):(copy end))
     else-if keyword.equal(user "class")
-      self.types.add(owner SyntaxTreeType.parse-new(var _))
+      self.types.add(owner SyntaxTreeType.parse-new(var _):(copy end))
     else
       f-syntax-error(user "unknown keyword", user keyword)
   

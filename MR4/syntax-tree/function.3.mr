@@ -7,26 +7,23 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   owner FunctionArguments arguemnts
   
   func inst parse-new(user SyntaxTreeType parent-type):(
-      owner SyntaxTreeFunction new-node)
+      copy Char end, owner SyntaxTreeFunction new-node)
     new SyntaxTreeFunction in new-node
-    new-node.parse(user parent-type)
+    new-node.parse(user parent-type):(copy end)
   
-  func inst parse(user SyntaxTreeType parent-type)
+  func inst parse(user SyntaxTreeType parent-type):(copy Char end)
     self.parent-type := parent-type
     if ? self.parent-type
       self.indentation-spaces := 4
     else
       self.indentation-spaces := 2
-    var Char end
     read-new(user "("):(owner self.name, copy end)
     if end != '('
-      f-syntax-error-c(user "expected \"(\", got ", copy end)
+      f-syntax-error-c(user "expected \"(\" after function name, got", copy end)
     new FunctionArguments in self.arguemnts
     var ArgumentFactory argument-factory
     self.arguemnts.parse(user argument-factory):(copy end)
-    if end != '\n'
-      f-syntax-error-c(user "expected line-end, got ", copy end)
-    self.parse-block()
+    self.parse-block():(copy end)
   
   func dynamic write()
     write(user "Function(")
@@ -66,7 +63,7 @@ class DeclarationArgument(Argument)
     new TypeInstance in self.type-instance
     self.type-instance.parse(user " "):(copy end)
     if end != ' '
-      f-syntax-error-c(user "expected space, got ", copy end)
+      f-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user ",)"):(owner self.name, copy end)
   
   func dynamic write-value()
@@ -107,7 +104,7 @@ static FunctionArguments
         if access-str.length = 0
           f-syntax-error-c(user "expected access, got", copy end)
         if end != ' '
-          f-syntax-error-c(user "expected space, got", copy end)
+          f-syntax-error-c(user "expected space after access, got", copy end)
         argument-factory.m-new-argument():(owner argument)
         arguments.add(owner argument)
         argument.parse(user access-str):(copy end)
@@ -116,7 +113,9 @@ static FunctionArguments
         if end = '\n'
           read-line-break-spaces()
         else-if end != ' '
-          f-syntax-error-c(user "expected space or new-line, got", copy end)
+          f-syntax-error-c(
+              user "expected space or new-line after \",\", got",
+              copy end)
         read-until(user " ", copy false):(user access-str, copy end)
     read-c():(copy end)
   
