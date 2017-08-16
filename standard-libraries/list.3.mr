@@ -37,21 +37,20 @@ static List{Generic}
     delete first
     if not (? self.first)
       self.last := _
+  
+  func inst get-iterator(user ListIterator{Generic} iter)
+    iter.curr := self.first
 
 
 ## Iterate over the list
 class ListIterator{Generic}(Iterator)
   user ListNode{Generic} curr
   
-  ## Start iterating over given list
-  func inst init(user List{Generic} list)
-    self.curr := list.first
+  ## Return whether iteration has ended
+  func dynamic is-end():(copy Bool ended)
+    ended := not (? self.curr)
   
-  ## Return whether current item exist
-  func dynamic has-item():(copy Bool exist)
-    exist := ? self.curr
-  
-  ## Get current item, fail if not exist
+  ## Get current item, fail if not exists
   func dynamic get-item():(user Generic item)
     if not (? self.curr)
       raise

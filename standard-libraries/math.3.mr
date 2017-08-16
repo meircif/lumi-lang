@@ -40,6 +40,6 @@ func math-factorial(copy Int x):(copy Int res)
 func math-sum(user Iterator{Int} iter):(copy Int res)
   res := 0
   do
-    while iter.has-item()
+    while not iter.is-end()
     res += iter.get-item()
     iter.next()

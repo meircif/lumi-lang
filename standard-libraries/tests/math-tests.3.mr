@@ -65,8 +65,8 @@ class MockIntIterator(Iterator)
     self.array := array
     self.index := 0
   
-  func dynamic has-item():(copy Bool exist)
-    exist := self.index < self.array.length
+  func dynamic is-end():(copy Bool exist)
+    exist := self.index >= self.array.length
   
   func dynamic get-item():(copy Int item)
     if self.index >= self.array.length
