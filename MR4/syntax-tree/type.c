@@ -80,7 +80,17 @@ Returncode SyntaxTreeType_write(SyntaxTreeType* self) {
     RAISE(29)
   }
   CHECK(30, write(self->type_data->name) )
-  CHECK(31, write(&(String){2, 1, ")"}) )
+  CHECK(31, write(&(String){5, 4, ") {\n"}) )
+  CHECK(32, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base._base.variables) )
+  CHECK(33, write(&(String){2, 1, "}"}) )
+  Bool _Bool47;
+  CHECK(34, List_m_is_empty(self->_base.functions, &(_Bool47)) )
+  if (!_Bool47) {
+    CHECK(35, write(&(String){2, 1, "\n"}) )
+    self->_base._base.indentation_spaces = 0;
+    CHECK(37, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )
+    self->_base._base.indentation_spaces = 2;
+  }
   return OK;
 }
 #undef MR_FUNC_NAME

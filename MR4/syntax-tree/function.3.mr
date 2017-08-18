@@ -24,8 +24,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     var ArgumentFactory argument-factory
     self.arguemnts.parse(user argument-factory):(copy end)
     self.parse-block():(copy end)
+    self.indentation-spaces := 2
   
   func dynamic write()
+    if ? self.parent-type
+      write(user self.parent-type.type-data.name)
+      write(user ".")
     write(user "Function(")
     write(user self.name)
     write(user ")")

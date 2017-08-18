@@ -61,6 +61,7 @@ Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, SyntaxTreeType* pa
   argument_factory->_dtl = ArgumentFactory__dtl;
   CHECK(25, FunctionArguments_parse(self->arguemnts, argument_factory, &((*end))) )
   CHECK(26, SyntaxTreeBlock_parse_block(&(self->_base), &((*end))) )
+  self->_base._base.indentation_spaces = 2;
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -71,11 +72,15 @@ Returncode SyntaxTreeFunction_write(SyntaxTreeFunction* self);
 static char* _func_name_SyntaxTreeFunction_write = "SyntaxTreeFunction.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_write
 Returncode SyntaxTreeFunction_write(SyntaxTreeFunction* self) {
-  CHECK(29, write(&(String){10, 9, "Function("}) )
-  CHECK(30, write(self->name) )
-  CHECK(31, write(&(String){2, 1, ")"}) )
-  CHECK(32, FunctionArguments_write(self->arguemnts) )
-  CHECK(33, SyntaxTreeBlock_write_block(&(self->_base)) )
+  if (NULL != self->parent_type) {
+    CHECK(31, write(self->parent_type->type_data->name) )
+    CHECK(32, write(&(String){2, 1, "."}) )
+  }
+  CHECK(33, write(&(String){10, 9, "Function("}) )
+  CHECK(34, write(self->name) )
+  CHECK(35, write(&(String){2, 1, ")"}) )
+  CHECK(36, FunctionArguments_write(self->arguemnts) )
+  CHECK(37, SyntaxTreeBlock_write_block(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -103,8 +108,8 @@ Returncode Argument_parse(Argument* self, String* access_str, Char* end);
 static char* _func_name_Argument_parse = "Argument.parse";
 #define MR_FUNC_NAME _func_name_Argument_parse
 Returncode Argument_parse(Argument* self, String* access_str, Char* end) {
-  CHECK(41, get_access(access_str, &(self->access)) )
-  CHECK(42, (self)->_dtl[0](self, &((*end))) )
+  CHECK(45, get_access(access_str, &(self->access)) )
+  CHECK(46, (self)->_dtl[0](self, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -115,7 +120,7 @@ Returncode Argument_parse_value(Argument* self, Char* end);
 static char* _func_name_Argument_parse_value = "Argument.parse-value";
 #define MR_FUNC_NAME _func_name_Argument_parse_value
 Returncode Argument_parse_value(Argument* self, Char* end) {
-  RAISE(45)
+  RAISE(49)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -125,10 +130,10 @@ Returncode Argument_write(Argument* self);
 static char* _func_name_Argument_write = "Argument.write";
 #define MR_FUNC_NAME _func_name_Argument_write
 Returncode Argument_write(Argument* self) {
-  CHECK(48, write(&(String){8, 7, "Access("}) )
-  CHECK(49, write_int(self->access) )
-  CHECK(50, write(&(String){3, 2, ") "}) )
-  CHECK(51, (self)->_dtl[1](self) )
+  CHECK(52, write(&(String){8, 7, "Access("}) )
+  CHECK(53, write_int(self->access) )
+  CHECK(54, write(&(String){3, 2, ") "}) )
+  CHECK(55, (self)->_dtl[1](self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -139,7 +144,7 @@ Returncode Argument_write_value(Argument* self);
 static char* _func_name_Argument_write_value = "Argument.write-value";
 #define MR_FUNC_NAME _func_name_Argument_write_value
 Returncode Argument_write_value(Argument* self) {
-  RAISE(54)
+  RAISE(58)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -168,13 +173,13 @@ static char* _func_name_DeclarationArgument_parse_value = "DeclarationArgument.p
 #define MR_FUNC_NAME _func_name_DeclarationArgument_parse_value
 Returncode DeclarationArgument_parse_value(DeclarationArgument* self, Char* end) {
   self->type_instance = malloc(sizeof(TypeInstance));
-  if (self->type_instance == NULL) RAISE(63)
+  if (self->type_instance == NULL) RAISE(67)
   *self->type_instance = (TypeInstance){NULL, NULL};
-  CHECK(64, TypeInstance_parse(self->type_instance, &(String){2, 1, " "}, &((*end))) )
+  CHECK(68, TypeInstance_parse(self->type_instance, &(String){2, 1, " "}, &((*end))) )
   if ((*end) != ' ') {
-    CHECK(66, f_syntax_error_c(&(String){31, 30, "expected space after type, got"}, (*end)) )
+    CHECK(70, f_syntax_error_c(&(String){31, 30, "expected space after type, got"}, (*end)) )
   }
-  CHECK(67, read_new(&(String){3, 2, ",)"}, &(self->name), &((*end))) )
+  CHECK(71, read_new(&(String){3, 2, ",)"}, &(self->name), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -185,9 +190,9 @@ Returncode DeclarationArgument_write_value(DeclarationArgument* self);
 static char* _func_name_DeclarationArgument_write_value = "DeclarationArgument.write-value";
 #define MR_FUNC_NAME _func_name_DeclarationArgument_write_value
 Returncode DeclarationArgument_write_value(DeclarationArgument* self) {
-  CHECK(70, TypeInstance_write(self->type_instance) )
-  CHECK(71, write(&(String){2, 1, " "}) )
-  CHECK(72, write(self->name) )
+  CHECK(74, TypeInstance_write(self->type_instance) )
+  CHECK(75, write(&(String){2, 1, " "}) )
+  CHECK(76, write(self->name) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -214,7 +219,7 @@ static char* _func_name_ArgumentFactory_m_new_argument = "ArgumentFactory.m-new-
 #define MR_FUNC_NAME _func_name_ArgumentFactory_m_new_argument
 Returncode ArgumentFactory_m_new_argument(ArgumentFactory* self, Argument** new_argument) {
   DeclarationArgument* _DeclarationArgument26 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument26 == NULL) RAISE(77)
+  if (_DeclarationArgument26 == NULL) RAISE(81)
   *_DeclarationArgument26 = (DeclarationArgument){DeclarationArgument__dtl, 0, NULL, NULL};
   _DeclarationArgument26->_base._dtl = DeclarationArgument__dtl;
   (*new_argument) = &(_DeclarationArgument26->_base);
@@ -246,15 +251,15 @@ static char* _func_name_FunctionArguments_parse = "FunctionArguments.parse";
 #define MR_FUNC_NAME _func_name_FunctionArguments_parse
 Returncode FunctionArguments_parse(FunctionArguments* self, ArgumentFactory* argument_factory, Char* end) {
   self->parameters = malloc(sizeof(List));
-  if (self->parameters == NULL) RAISE(86)
+  if (self->parameters == NULL) RAISE(90)
   *self->parameters = (List){NULL, NULL};
   self->outputs = malloc(sizeof(List));
-  if (self->outputs == NULL) RAISE(87)
+  if (self->outputs == NULL) RAISE(91)
   *self->outputs = (List){NULL, NULL};
-  CHECK(88, FunctionArguments_parse_args(self, self->parameters, argument_factory, &((*end))) )
+  CHECK(92, FunctionArguments_parse_args(self, self->parameters, argument_factory, &((*end))) )
   if ((*end) == '-') {
-    CHECK(90, read_expect(&(String){3, 2, ">("}) )
-    CHECK(91, FunctionArguments_parse_args(self, self->outputs, argument_factory, &((*end))) )
+    CHECK(94, read_expect(&(String){3, 2, ">("}) )
+    CHECK(95, FunctionArguments_parse_args(self, self->outputs, argument_factory, &((*end))) )
   }
   return OK;
 }
@@ -269,38 +274,38 @@ Returncode FunctionArguments_parse_args(FunctionArguments* self, List* arguments
   Argument* argument = NULL;
   String* access_str = NULL;
   Int _Int27;
-  CHECK(98, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int27)) )
+  CHECK(102, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int27)) )
   if ((*end) == '\n' && access_str->length == 0) {
-    CHECK(100, read_line_break_spaces() )
+    CHECK(104, read_line_break_spaces() )
     Int _Int28;
-    CHECK(101, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int28)) )
+    CHECK(105, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int28)) )
   }
   if ((*end) != ')' || access_str->length > 0) {
     while (true) {
       if (access_str->length == 0) {
-        CHECK(105, f_syntax_error_c(&(String){21, 20, "expected access, got"}, (*end)) )
+        CHECK(109, f_syntax_error_c(&(String){21, 20, "expected access, got"}, (*end)) )
       }
       if ((*end) != ' ') {
-        CHECK(107, f_syntax_error_c(&(String){33, 32, "expected space after access, got"}, (*end)) )
+        CHECK(111, f_syntax_error_c(&(String){33, 32, "expected space after access, got"}, (*end)) )
       }
-      CHECK(108, (argument_factory)->_dtl[0](argument_factory, &(argument)) )
-      CHECK(109, List_add(arguments, argument) )
-      CHECK(110, Argument_parse(argument, access_str, &((*end))) )
+      CHECK(112, (argument_factory)->_dtl[0](argument_factory, &(argument)) )
+      CHECK(113, List_add(arguments, argument) )
+      CHECK(114, Argument_parse(argument, access_str, &((*end))) )
       if (!((*end) == ',')) break;
-      CHECK(112, read_c(&((*end))) )
+      CHECK(116, read_c(&((*end))) )
       if ((*end) == '\n') {
-        CHECK(114, read_line_break_spaces() )
+        CHECK(118, read_line_break_spaces() )
       }
       else {
         if ((*end) != ' ') {
-          CHECK(116, f_syntax_error_c(&(String){42, 41, "expected space or new-line after \",\", got"}, (*end)) )
+          CHECK(120, f_syntax_error_c(&(String){42, 41, "expected space or new-line after \",\", got"}, (*end)) )
         }
       }
       Int _Int29;
-      CHECK(119, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int29)) )
+      CHECK(123, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int29)) )
     }
   }
-  CHECK(120, read_c(&((*end))) )
+  CHECK(124, read_c(&((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -311,15 +316,15 @@ Returncode FunctionArguments_write(FunctionArguments* self);
 static char* _func_name_FunctionArguments_write = "FunctionArguments.write";
 #define MR_FUNC_NAME _func_name_FunctionArguments_write
 Returncode FunctionArguments_write(FunctionArguments* self) {
-  CHECK(123, write(&(String){2, 1, "("}) )
+  CHECK(127, write(&(String){2, 1, "("}) )
   if (NULL != self->parameters->first) {
-    CHECK(125, FunctionArguments_write_args(self, self->parameters) )
+    CHECK(129, FunctionArguments_write_args(self, self->parameters) )
   }
   if (NULL != self->outputs->first) {
-    CHECK(127, write(&(String){5, 4, ")->("}) )
-    CHECK(128, FunctionArguments_write_args(self, self->outputs) )
+    CHECK(131, write(&(String){5, 4, ")->("}) )
+    CHECK(132, FunctionArguments_write_args(self, self->outputs) )
   }
-  CHECK(129, write(&(String){2, 1, ")"}) )
+  CHECK(133, write(&(String){2, 1, ")"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -332,10 +337,10 @@ static char* _func_name_FunctionArguments_write_args = "FunctionArguments.write-
 Returncode FunctionArguments_write_args(FunctionArguments* self, List* arguments) {
   ListNode* node = arguments->first;
   while (true) {
-    CHECK(134, Argument_write(((Argument*)(node->item))) )
+    CHECK(138, Argument_write(((Argument*)(node->item))) )
     node = node->next;
     if (!(NULL != node)) break;
-    CHECK(137, write(&(String){3, 2, ", "}) )
+    CHECK(141, write(&(String){3, 2, ", "}) )
   }
   return OK;
 }

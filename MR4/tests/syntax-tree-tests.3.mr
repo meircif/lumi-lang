@@ -84,11 +84,15 @@ test test-global()
 
 
 test test-type()
-  test-global-scope(user "struct Test", user "Type(Test)")
-  test-global-scope(user "class Test", user "Type(Test)")
   test-global-scope(
-      user "struct Test1\nclass Test2\n\n\nstruct Test3",
-      user "Type(Test1)\n\nType(Test2)\n\nType(Test3)")
+      user "struct Test\n  var Int x",
+      user "Type(Test) {\n  Access(3) Int x\n}")
+  test-global-scope(
+      user "class Test\n  var Int x",
+      user "Type(Test) {\n  Access(3) Int x\n}")
+  test-global-scope(
+      user "struct Test1\n  var Int x\nclass Test2\n  var Int x\n\n\nstruct Test3\n  var Int x",
+      user "Type(Test1) {\n  Access(3) Int x\n}\n\nType(Test2) {\n  Access(3) Int x\n}\n\nType(Test3) {\n  Access(3) Int x\n}")
   test-global-scope-error(
       user "struct Test\n  error ",
       user "unknown keyword \"error\"")
@@ -117,6 +121,9 @@ test test-function()
   test-global-scope(
       user "func name(user Array{List{Array{Int}}} array)",
       user "Function(name)(Access(1) Array{List{Array{Int}}} array) {\n}")
+  test-global-scope(
+      user "func name()\n  var Int x",
+      user "Function(name)() {\n  Access(3) Int x\n}")
   test-global-scope-error(
       user "func name\n",
       user "expected \"(\" after function name, got \"new-line\"")
@@ -146,13 +153,16 @@ test test-function()
       user "indentation too big, expected \"2\" got \"4\"")
 
 
-# test test-members()
-  # test-global-scope(
-      # user "struct Test\n  func name()",
-      # user "Type(Test)\n  Function(name)() {\n}")
-  # test-global-scope(
-      # user "struct Test\n  var Int x\n  user String str",
-      # user "Type(Test)\n  Access(3) Int x\n  Access(1) String str")
+test test-members()
+  test-global-scope(
+      user "struct Test\n  var Int x\n  user String str",
+      user "Type(Test) {\n  Access(3) Int x\n  Access(1) String str\n}")
+  test-global-scope(
+      user "struct Test\n  var Int x\n  func name()",
+      user "Type(Test) {\n  Access(3) Int x\n}\n\nTest.Function(name)() {\n}\n")
+  test-global-scope(
+      user "struct Test\n  var Int x\n  func name()\n    var Int x",
+      user "Type(Test) {\n  Access(3) Int x\n}\n\nTest.Function(name)() {\n  Access(3) Int x\n}\n")
 
 
 test test-expression-in-func()

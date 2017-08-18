@@ -5,6 +5,9 @@ static List{Generic}
   owner ListNode{Generic} first
   user ListNode{Generic} last
   
+  func inst m-is-empty():(copy Bool is-empty)
+    is-empty := not (? self.first)
+  
   func inst add(owner Generic item)
     new ListNode{Generic} node
     node.item := item

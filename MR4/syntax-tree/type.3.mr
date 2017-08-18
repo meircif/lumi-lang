@@ -28,4 +28,11 @@ class SyntaxTreeType(SyntaxTreeNamespace)
     if not (? self.type-data.name)
       raise
     write(user self.type-data.name)
-    write(user ")")
+    write(user ") {\n")
+    self.write-children(user self.variables)
+    write(user "}")
+    if not self.functions.m-is-empty()
+      write(user "\n")
+      self.indentation-spaces := 0
+      self.write-children(user self.functions)
+      self.indentation-spaces := 2

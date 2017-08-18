@@ -21,13 +21,24 @@ struct List {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode List_m_is_empty(List* self, Bool* is_empty);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_List_m_is_empty = "List.m-is-empty";
+#define MR_FUNC_NAME _func_name_List_m_is_empty
+Returncode List_m_is_empty(List* self, Bool* is_empty) {
+  (*is_empty) =  ! (NULL != self->first);
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode List_add(List* self, void* item);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_List_add = "List.add";
 #define MR_FUNC_NAME _func_name_List_add
 Returncode List_add(List* self, void* item) {
   ListNode* node = malloc(sizeof(ListNode));
-  if (node == NULL) RAISE(9)
+  if (node == NULL) RAISE(12)
   *node = (ListNode){NULL, NULL};
   node->item = item;
   if (NULL != self->last) {
