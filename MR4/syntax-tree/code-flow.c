@@ -1,13 +1,13 @@
 #ifndef MR_MAINFILE
-#define MR_MAINFILE "syntax-tree/loop.c"
+#define MR_MAINFILE "syntax-tree/code-flow.c"
 #define DEPTH 4
 #include "mr.3.h"
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file15_name = "syntax-tree/loop.3.mr";
+static char* _mr_file14_name = "syntax-tree/code-flow.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file15_name
+#define MR_FILE_NAME _mr_file14_name
 
 /* MR4 compiler - Syntax tree code flow elements */
 

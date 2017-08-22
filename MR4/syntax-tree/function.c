@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file14_name = "syntax-tree/function.3.mr";
+static char* _mr_file15_name = "syntax-tree/function.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file14_name
+#define MR_FILE_NAME _mr_file15_name
 
 /* MR4 compiler - Syntax tree function */
 
@@ -364,7 +364,7 @@ Returncode FunctionArguments_write_args(FunctionArguments* self, List* arguments
 #include "expression/slice.c"
 #include "expression/variable.c"
 #include "syntax-tree/code.c"
-#include "syntax-tree/loop.c"
+#include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
