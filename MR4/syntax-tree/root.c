@@ -58,25 +58,25 @@ Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Cha
 static char* _func_name_SyntaxTreeRoot_parse_child = "SyntaxTreeRoot.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_parse_child
 Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Char* end) {
-  Bool _Bool41;
-  CHECK(22, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, NULL, &((*end)), &(_Bool41)) )
-  if (_Bool41) {
+  Bool _Bool45;
+  CHECK(22, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, NULL, &((*end)), &(_Bool45)) )
+  if (_Bool45) {
     return OK;
   }
-  Bool _Bool42;
-  CHECK(24, String_equal(keyword, &(String){7, 6, "struct"}, &(_Bool42)) )
-  if (_Bool42) {
-    SyntaxTreeType* _SyntaxTreeType43;
-    CHECK(25, SyntaxTreeType_parse_new(NULL, &((*end)), &(_SyntaxTreeType43)) )
-    CHECK(25, List_add(self->types, _SyntaxTreeType43) )
+  Bool _Bool46;
+  CHECK(24, String_equal(keyword, &(String){7, 6, "struct"}, &(_Bool46)) )
+  if (_Bool46) {
+    SyntaxTreeType* _SyntaxTreeType47;
+    CHECK(25, SyntaxTreeType_parse_new(NULL, &((*end)), &(_SyntaxTreeType47)) )
+    CHECK(25, List_add(self->types, _SyntaxTreeType47) )
   }
   else {
-    Bool _Bool44;
-    CHECK(26, String_equal(keyword, &(String){6, 5, "class"}, &(_Bool44)) )
-    if (_Bool44) {
-      SyntaxTreeType* _SyntaxTreeType45;
-      CHECK(27, SyntaxTreeType_parse_new(NULL, &((*end)), &(_SyntaxTreeType45)) )
-      CHECK(27, List_add(self->types, _SyntaxTreeType45) )
+    Bool _Bool48;
+    CHECK(26, String_equal(keyword, &(String){6, 5, "class"}, &(_Bool48)) )
+    if (_Bool48) {
+      SyntaxTreeType* _SyntaxTreeType49;
+      CHECK(27, SyntaxTreeType_parse_new(NULL, &((*end)), &(_SyntaxTreeType49)) )
+      CHECK(27, List_add(self->types, _SyntaxTreeType49) )
     }
     else {
       CHECK(29, f_syntax_error(&(String){16, 15, "unknown keyword"}, keyword) )

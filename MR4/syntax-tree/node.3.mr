@@ -115,6 +115,7 @@ class SyntaxTreeCode(SyntaxTreeNode)
 ## A basic code block node in the syntax tree
 class SyntaxTreeBlock(SyntaxTreeBranch)
   owner List{SyntaxTreeCode} nodes
+  user SyntaxTreeIf previous-if
   
   func inst parse-block():(copy Char end)
     new List{SyntaxTreeCode} in self.nodes
@@ -122,15 +123,42 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node
-    if keyword.equal(user "do")
+    user SyntaxTreeIf new-if
+    
+    if keyword.equal(user "if")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"if\", got", copy end)
+      SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
+      self.nodes.add(owner new-if)
+      
+    else-if keyword.equal(user "else")
+      if not (? self.previous-if)
+        f-syntax-error-msg(user "\"else\" without a previous \"if\"")
       if end != '\n'
-        f-syntax-error-c(user "expected new-line, got", copy end)
+        f-syntax-error-c(user "expected new-line after \"else\", got", copy end)
+      self.previous-if.add-else(
+          owner SyntaxTreeElse.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "else-if")
+      if not (? self.previous-if)
+        f-syntax-error-msg(user "\"else-if\" without a previous \"if\"")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"else-if\", got", copy end)
+      SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
+      self.previous-if.add-else-if(owner new-if)
+      
+    else-if keyword.equal(user "do")
+      if end != '\n'
+        f-syntax-error-c(user "expected new-line after \"do\", got", copy end)
       self.nodes.add(
           owner SyntaxTreeDoLoop.parse-new(var _, user self):(copy end))
+      
     else
       glob.save-input := true
       self.nodes.add(
           owner SyntaxTreeExpression.parse-new(var _, user self):(copy end))
+    
+    self.previous-if := new-if
   
   func inst write-block()
     write(user " {\n")

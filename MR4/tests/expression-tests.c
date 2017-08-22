@@ -57,8 +57,8 @@ Returncode test_expression_error_ends(String* input_text, String* expected_error
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char48;
-    CHECK(27, parse_new_expression(ends, &(expression), &(_Char48)) );
+    Char _Char52;
+    CHECK(27, parse_new_expression(ends, &(expression), &(_Char52)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
