@@ -15,3 +15,58 @@ class SyntaxTreeExpression(SyntaxTreeCode)
   
   func dynamic write()
     self.expression.write()
+
+
+## Return statement in the syntax tree
+class SyntaxTreeReturn(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeReturn new-node)
+    new SyntaxTreeReturn in new-node
+    new-node.parent := parent
+  
+  func dynamic write()
+    write(user "return OK")
+
+
+## Raise statement in the syntax tree
+class SyntaxTreeRaise(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeRaise new-node)
+    new SyntaxTreeRaise in new-node
+    new-node.parent := parent
+  
+  func dynamic write()
+    write(user "return ERR")
+
+
+## While statement in the syntax tree
+class SyntaxTreeWhile(SyntaxTreeCode)
+  owner Expression condition
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeWhile new-node)
+    new SyntaxTreeWhile in new-node
+    new-node.parse(user parent):(copy end)
+  
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.parent := parent
+    parse-new-expression(user ""):(owner self.condition, copy end)
+  
+  func dynamic write()
+    write(user "while (")
+    self.condition.write()
+    write(user ")")
+
+
+## Continue statement in the syntax tree
+class SyntaxTreeContinue(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeContinue new-node)
+    new SyntaxTreeContinue in new-node
+    new-node.parent := parent
+  
+  func dynamic write()
+    write(user "continue")

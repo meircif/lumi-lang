@@ -187,11 +187,16 @@ test test-members()
       user "Type(Test) {\n  Access(3) Int x\n}\n\nTest.Function(name)() {\n  Access(3) Int x\n}\n")
 
 
-test test-expression-in-func()
+test test-simple-code()
+  test-code(user "return", user "return OK")
+  test-code(user "raise", user "return ERR")
   test-code(user "x := 3", user "Variable(x) = Int(3)")
   test-code(user "user String str", user "Access(1) String str")
   test-code(
       user "var Int x(y + 5)", user "Access(3) Int x (Variable(y) + Int(5))")
+
+
+test test-if-else()
   test-code(
       user "if x > 3\n    x -= 2",
       user "if (Variable(x) > Int(3)) {\n    Variable(x) -= Int(2)\n  }")
@@ -218,6 +223,27 @@ test test-expression-in-func()
   test-code(
       user "if x > 3\n    x -= 3\n  else-if x > 2\n    x -= 2\n  else-if x > 1\n    x -= 1\n  else\n    x += 1",
       user expected)
+
+
+test test-do-loop()
   test-code(user "do\n    var Int x", user "do {\n    Access(3) Int x\n  }")
   test-code(user "\n  \n    \n\n  var Int x", user "Access(3) Int x")
+  test-code(
+      user "do\n    while x > 3",
+      user "do {\n    while (Variable(x) > Int(3))\n  }")
+  test-code(user "do\n    continue", user "do {\n    continue\n  }")
   test-code-error(user "do(", user "expected new-line after \"do\", got \"(\"")
+
+
+test test-for-loop()
+  test-code(
+      user "for n in 5\n    x += n",
+      user "for (n; 0; Int(5)) {\n    Variable(x) += Variable(n)\n  }")
+  test-code(
+      user "for n in x:x + 2\n    x += n",
+      user "for (n; Variable(x); Variable(x) + Int(2)) {\n    Variable(x) += Variable(n)\n  }")
+  test-code-error(user "for(", user "expected space after \"for\", got \"(\"")
+  test-code-error(
+      user "for n", user "expected space after index name, got \"new-line\"")
+  test-code-error(
+      user "for n error", user "expected \"in \" got \"err\"")

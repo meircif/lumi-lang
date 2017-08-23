@@ -220,37 +220,82 @@ Returncode test_members() {
 
 
 #if MR_STAGE == MR_DECLARATIONS
-Returncode test_expression_in_func();
+Returncode test_simple_code();
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_test_expression_in_func = "test-expression-in-func";
-#define MR_FUNC_NAME _func_name_test_expression_in_func
-Returncode test_expression_in_func() {
-  CHECK(191, test_code(&(String){7, 6, "x := 3"}, &(String){21, 20, "Variable(x) = Int(3)"}) )
-  CHECK(192, test_code(&(String){16, 15, "user String str"}, &(String){21, 20, "Access(1) String str"}) )
-  CHECK(193, test_code(&(String){17, 16, "var Int x(y + 5)"}, &(String){39, 38, "Access(3) Int x (Variable(y) + Int(5))"}) )
-  CHECK(195, test_code(&(String){20, 19, "if x > 3\n    x -= 2"}, &(String){58, 57, "if (Variable(x) > Int(3)) {\n    Variable(x) -= Int(2)\n  }"}) )
-  CHECK(198, test_code(&(String){38, 37, "if x > 3\n    x -= 2\n  else\n    x += 1"}, &(String){97, 96, "if (Variable(x) > Int(3)) {\n    Variable(x) -= Int(2)\n  }\n  else {\n    Variable(x) += Int(1)\n  }"}) )
+static char* _func_name_test_simple_code = "test-simple-code";
+#define MR_FUNC_NAME _func_name_test_simple_code
+Returncode test_simple_code() {
+  CHECK(191, test_code(&(String){7, 6, "return"}, &(String){10, 9, "return OK"}) )
+  CHECK(192, test_code(&(String){6, 5, "raise"}, &(String){11, 10, "return ERR"}) )
+  CHECK(193, test_code(&(String){7, 6, "x := 3"}, &(String){21, 20, "Variable(x) = Int(3)"}) )
+  CHECK(194, test_code(&(String){16, 15, "user String str"}, &(String){21, 20, "Access(1) String str"}) )
+  CHECK(195, test_code(&(String){17, 16, "var Int x(y + 5)"}, &(String){39, 38, "Access(3) Int x (Variable(y) + Int(5))"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_if_else();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_if_else = "test-if-else";
+#define MR_FUNC_NAME _func_name_test_if_else
+Returncode test_if_else() {
+  CHECK(200, test_code(&(String){20, 19, "if x > 3\n    x -= 2"}, &(String){58, 57, "if (Variable(x) > Int(3)) {\n    Variable(x) -= Int(2)\n  }"}) )
+  CHECK(203, test_code(&(String){38, 37, "if x > 3\n    x -= 2\n  else\n    x += 1"}, &(String){97, 96, "if (Variable(x) > Int(3)) {\n    Variable(x) -= Int(2)\n  }\n  else {\n    Variable(x) += Int(1)\n  }"}) )
   String* expected = &(String){1024, 0, (char[1024]){0}};
-  CHECK(202, String_copy(expected, &(String){29, 28, "if (Variable(x) > Int(3)) {\n"}) )
-  CHECK(203, String_concat(expected, &(String){27, 26, "    Variable(x) -= Int(3)\n"}) )
-  CHECK(204, String_concat(expected, &(String){5, 4, "  }\n"}) )
-  CHECK(205, String_concat(expected, &(String){10, 9, "  else {\n"}) )
-  CHECK(206, String_concat(expected, &(String){33, 32, "    if (Variable(x) > Int(2)) {\n"}) )
-  CHECK(207, String_concat(expected, &(String){29, 28, "      Variable(x) -= Int(2)\n"}) )
-  CHECK(208, String_concat(expected, &(String){7, 6, "    }\n"}) )
-  CHECK(209, String_concat(expected, &(String){12, 11, "    else {\n"}) )
-  CHECK(210, String_concat(expected, &(String){35, 34, "      if (Variable(x) > Int(1)) {\n"}) )
-  CHECK(211, String_concat(expected, &(String){31, 30, "        Variable(x) -= Int(1)\n"}) )
-  CHECK(212, String_concat(expected, &(String){9, 8, "      }\n"}) )
-  CHECK(213, String_concat(expected, &(String){14, 13, "      else {\n"}) )
-  CHECK(214, String_concat(expected, &(String){31, 30, "        Variable(x) += Int(1)\n"}) )
-  CHECK(215, String_concat(expected, &(String){9, 8, "      }\n"}) )
-  CHECK(216, String_concat(expected, &(String){7, 6, "    }\n"}) )
-  CHECK(217, String_concat(expected, &(String){4, 3, "  }"}) )
-  CHECK(218, test_code(&(String){92, 91, "if x > 3\n    x -= 3\n  else-if x > 2\n    x -= 2\n  else-if x > 1\n    x -= 1\n  else\n    x += 1"}, expected) )
-  CHECK(221, test_code(&(String){17, 16, "do\n    var Int x"}, &(String){29, 28, "do {\n    Access(3) Int x\n  }"}) )
-  CHECK(222, test_code(&(String){22, 21, "\n  \n    \n\n  var Int x"}, &(String){16, 15, "Access(3) Int x"}) )
-  CHECK(223, test_code_error(&(String){4, 3, "do("}, &(String){38, 37, "expected new-line after \"do\", got \"(\""}) )
+  CHECK(207, String_copy(expected, &(String){29, 28, "if (Variable(x) > Int(3)) {\n"}) )
+  CHECK(208, String_concat(expected, &(String){27, 26, "    Variable(x) -= Int(3)\n"}) )
+  CHECK(209, String_concat(expected, &(String){5, 4, "  }\n"}) )
+  CHECK(210, String_concat(expected, &(String){10, 9, "  else {\n"}) )
+  CHECK(211, String_concat(expected, &(String){33, 32, "    if (Variable(x) > Int(2)) {\n"}) )
+  CHECK(212, String_concat(expected, &(String){29, 28, "      Variable(x) -= Int(2)\n"}) )
+  CHECK(213, String_concat(expected, &(String){7, 6, "    }\n"}) )
+  CHECK(214, String_concat(expected, &(String){12, 11, "    else {\n"}) )
+  CHECK(215, String_concat(expected, &(String){35, 34, "      if (Variable(x) > Int(1)) {\n"}) )
+  CHECK(216, String_concat(expected, &(String){31, 30, "        Variable(x) -= Int(1)\n"}) )
+  CHECK(217, String_concat(expected, &(String){9, 8, "      }\n"}) )
+  CHECK(218, String_concat(expected, &(String){14, 13, "      else {\n"}) )
+  CHECK(219, String_concat(expected, &(String){31, 30, "        Variable(x) += Int(1)\n"}) )
+  CHECK(220, String_concat(expected, &(String){9, 8, "      }\n"}) )
+  CHECK(221, String_concat(expected, &(String){7, 6, "    }\n"}) )
+  CHECK(222, String_concat(expected, &(String){4, 3, "  }"}) )
+  CHECK(223, test_code(&(String){92, 91, "if x > 3\n    x -= 3\n  else-if x > 2\n    x -= 2\n  else-if x > 1\n    x -= 1\n  else\n    x += 1"}, expected) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_do_loop();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_do_loop = "test-do-loop";
+#define MR_FUNC_NAME _func_name_test_do_loop
+Returncode test_do_loop() {
+  CHECK(229, test_code(&(String){17, 16, "do\n    var Int x"}, &(String){29, 28, "do {\n    Access(3) Int x\n  }"}) )
+  CHECK(230, test_code(&(String){22, 21, "\n  \n    \n\n  var Int x"}, &(String){16, 15, "Access(3) Int x"}) )
+  CHECK(231, test_code(&(String){19, 18, "do\n    while x > 3"}, &(String){42, 41, "do {\n    while (Variable(x) > Int(3))\n  }"}) )
+  CHECK(234, test_code(&(String){16, 15, "do\n    continue"}, &(String){22, 21, "do {\n    continue\n  }"}) )
+  CHECK(235, test_code_error(&(String){4, 3, "do("}, &(String){38, 37, "expected new-line after \"do\", got \"(\""}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_for_loop();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_for_loop = "test-for-loop";
+#define MR_FUNC_NAME _func_name_test_for_loop
+Returncode test_for_loop() {
+  CHECK(239, test_code(&(String){22, 21, "for n in 5\n    x += n"}, &(String){56, 55, "for (n; 0; Int(5)) {\n    Variable(x) += Variable(n)\n  }"}) )
+  CHECK(242, test_code(&(String){28, 27, "for n in x:x + 2\n    x += n"}, &(String){80, 79, "for (n; Variable(x); Variable(x) + Int(2)) {\n    Variable(x) += Variable(n)\n  }"}) )
+  CHECK(245, test_code_error(&(String){5, 4, "for("}, &(String){36, 35, "expected space after \"for\", got \"(\""}) )
+  CHECK(246, test_code_error(&(String){6, 5, "for n"}, &(String){48, 47, "expected space after index name, got \"new-line\""}) )
+  CHECK(248, test_code_error(&(String){12, 11, "for n error"}, &(String){25, 24, "expected \"in \" got \"err\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -273,8 +318,8 @@ Returncode test_expression_in_func() {
 #include "expression/slice.c"
 #include "expression/variable.c"
 #include "syntax-tree/code.c"
+#include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
-#include "syntax-tree/loop.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"

@@ -57,8 +57,8 @@ Returncode test_expression_error_ends(String* input_text, String* expected_error
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char52;
-    CHECK(27, parse_new_expression(ends, &(expression), &(_Char52)) );
+    Char _Char62;
+    CHECK(27, parse_new_expression(ends, &(expression), &(_Char62)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
@@ -392,8 +392,8 @@ Returncode test_no_expression() {
 #include "expression/slice.c"
 #include "expression/variable.c"
 #include "syntax-tree/code.c"
+#include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
-#include "syntax-tree/loop.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"

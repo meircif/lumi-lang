@@ -153,6 +153,39 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.nodes.add(
           owner SyntaxTreeDoLoop.parse-new(var _, user self):(copy end))
       
+    else-if keyword.equal(user "for")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"for\", got", copy end)
+      self.nodes.add(
+          owner SyntaxTreeForLoop.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "while")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"while\", got", copy end)
+      self.nodes.add(
+          owner SyntaxTreeWhile.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "continue")
+      if end != '\n'
+        f-syntax-error-c(
+            user "expected new-line after \"continue\", got", copy end)
+      self.nodes.add(
+          owner SyntaxTreeContinue.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "return")
+      if end != '\n'
+        f-syntax-error-c(
+            user "expected new-line after \"return\", got", copy end)
+      self.nodes.add(
+          owner SyntaxTreeReturn.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "raise")
+      if end != '\n'
+        f-syntax-error-c(
+            user "expected new-line after \"raise\", got", copy end)
+      self.nodes.add(
+          owner SyntaxTreeRaise.parse-new(var _, user self):(copy end))
+      
     else
       glob.save-input := true
       self.nodes.add(

@@ -79,3 +79,39 @@ class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
   func dynamic write()
     write(user "do")
     self.write-block()
+
+
+## For loop node in the syntax tree
+class SyntaxTreeForLoop(SyntaxTreeFlowElement)
+  owner String index-name
+  owner Expression start
+  owner Expression upper-bound
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeForLoop new-node)
+    new SyntaxTreeForLoop in new-node
+    new-node.parse(user parent):(copy end)
+  
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    read-new(user " "):(owner self.index-name, copy end)
+    if end != ' '
+      f-syntax-error-c(user "expected space after index name, got", copy end)
+    read-expect(user "in ")
+    parse-new-expression(user ":"):(owner self.upper-bound, copy end)
+    if end = ':'
+      self.start := self.upper-bound
+      parse-new-expression(user ""):(owner self.upper-bound, copy end)
+    self.parse-block(user parent):(copy end)
+  
+  func dynamic write()
+    write(user "for (")
+    write(user self.index-name)
+    write(user "; ")
+    if ? self.start
+      self.start.write()
+    else
+      write(user "0")
+    write(user "; ")
+    self.upper-bound.write()
+    write(user ")")
+    self.write-block()

@@ -65,6 +65,189 @@ extern Func SyntaxTreeExpression__dtl[];
 Func SyntaxTreeExpression__dtl[] = {(void*)SyntaxTreeExpression_write};
 #endif
 
+
+/* Return statement in the syntax tree */
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct SyntaxTreeReturn SyntaxTreeReturn;
+#elif MR_STAGE == MR_TYPES(2)
+struct SyntaxTreeReturn {
+  SyntaxTreeCode _base;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeReturn_parse_new(SyntaxTreeReturn* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeReturn** new_node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeReturn_parse_new = "SyntaxTreeReturn.parse-new";
+#define MR_FUNC_NAME _func_name_SyntaxTreeReturn_parse_new
+Returncode SyntaxTreeReturn_parse_new(SyntaxTreeReturn* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeReturn** new_node) {
+  (*new_node) = malloc(sizeof(SyntaxTreeReturn));
+  if ((*new_node) == NULL) RAISE(25)
+  *(*new_node) = (SyntaxTreeReturn){SyntaxTreeReturn__dtl, NULL};
+  (*new_node)->_base._base._dtl = SyntaxTreeReturn__dtl;
+  (*new_node)->_base.parent = parent;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeReturn_write = "SyntaxTreeReturn.write";
+#define MR_FUNC_NAME _func_name_SyntaxTreeReturn_write
+Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self) {
+  CHECK(29, write(&(String){10, 9, "return OK"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func SyntaxTreeReturn__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func SyntaxTreeReturn__dtl[] = {(void*)SyntaxTreeReturn_write};
+#endif
+
+
+/* Raise statement in the syntax tree */
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct SyntaxTreeRaise SyntaxTreeRaise;
+#elif MR_STAGE == MR_TYPES(2)
+struct SyntaxTreeRaise {
+  SyntaxTreeCode _base;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeRaise_parse_new(SyntaxTreeRaise* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeRaise** new_node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeRaise_parse_new = "SyntaxTreeRaise.parse-new";
+#define MR_FUNC_NAME _func_name_SyntaxTreeRaise_parse_new
+Returncode SyntaxTreeRaise_parse_new(SyntaxTreeRaise* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeRaise** new_node) {
+  (*new_node) = malloc(sizeof(SyntaxTreeRaise));
+  if ((*new_node) == NULL) RAISE(37)
+  *(*new_node) = (SyntaxTreeRaise){SyntaxTreeRaise__dtl, NULL};
+  (*new_node)->_base._base._dtl = SyntaxTreeRaise__dtl;
+  (*new_node)->_base.parent = parent;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeRaise_write(SyntaxTreeRaise* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeRaise_write = "SyntaxTreeRaise.write";
+#define MR_FUNC_NAME _func_name_SyntaxTreeRaise_write
+Returncode SyntaxTreeRaise_write(SyntaxTreeRaise* self) {
+  CHECK(41, write(&(String){11, 10, "return ERR"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func SyntaxTreeRaise__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func SyntaxTreeRaise__dtl[] = {(void*)SyntaxTreeRaise_write};
+#endif
+
+
+/* While statement in the syntax tree */
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct SyntaxTreeWhile SyntaxTreeWhile;
+#elif MR_STAGE == MR_TYPES(2)
+struct SyntaxTreeWhile {
+  SyntaxTreeCode _base;
+  Expression* condition;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeWhile_parse_new(SyntaxTreeWhile* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeWhile** new_node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeWhile_parse_new = "SyntaxTreeWhile.parse-new";
+#define MR_FUNC_NAME _func_name_SyntaxTreeWhile_parse_new
+Returncode SyntaxTreeWhile_parse_new(SyntaxTreeWhile* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeWhile** new_node) {
+  (*new_node) = malloc(sizeof(SyntaxTreeWhile));
+  if ((*new_node) == NULL) RAISE(50)
+  *(*new_node) = (SyntaxTreeWhile){SyntaxTreeWhile__dtl, NULL, NULL};
+  (*new_node)->_base._base._dtl = SyntaxTreeWhile__dtl;
+  CHECK(51, SyntaxTreeWhile_parse((*new_node), parent, &((*end))) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeWhile_parse(SyntaxTreeWhile* self, SyntaxTreeBlock* parent, Char* end);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeWhile_parse = "SyntaxTreeWhile.parse";
+#define MR_FUNC_NAME _func_name_SyntaxTreeWhile_parse
+Returncode SyntaxTreeWhile_parse(SyntaxTreeWhile* self, SyntaxTreeBlock* parent, Char* end) {
+  self->_base.parent = parent;
+  CHECK(55, parse_new_expression(&(String){1, 0, ""}, &(self->condition), &((*end))) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeWhile_write = "SyntaxTreeWhile.write";
+#define MR_FUNC_NAME _func_name_SyntaxTreeWhile_write
+Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
+  CHECK(58, write(&(String){8, 7, "while ("}) )
+  CHECK(59, (self->condition)->_dtl[0](self->condition) )
+  CHECK(60, write(&(String){2, 1, ")"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func SyntaxTreeWhile__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func SyntaxTreeWhile__dtl[] = {(void*)SyntaxTreeWhile_write};
+#endif
+
+
+/* Continue statement in the syntax tree */
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct SyntaxTreeContinue SyntaxTreeContinue;
+#elif MR_STAGE == MR_TYPES(2)
+struct SyntaxTreeContinue {
+  SyntaxTreeCode _base;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeContinue_parse_new(SyntaxTreeContinue* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeContinue** new_node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeContinue_parse_new = "SyntaxTreeContinue.parse-new";
+#define MR_FUNC_NAME _func_name_SyntaxTreeContinue_parse_new
+Returncode SyntaxTreeContinue_parse_new(SyntaxTreeContinue* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeContinue** new_node) {
+  (*new_node) = malloc(sizeof(SyntaxTreeContinue));
+  if ((*new_node) == NULL) RAISE(68)
+  *(*new_node) = (SyntaxTreeContinue){SyntaxTreeContinue__dtl, NULL};
+  (*new_node)->_base._base._dtl = SyntaxTreeContinue__dtl;
+  (*new_node)->_base.parent = parent;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeContinue_write = "SyntaxTreeContinue.write";
+#define MR_FUNC_NAME _func_name_SyntaxTreeContinue_write
+Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self) {
+  CHECK(72, write(&(String){9, 8, "continue"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func SyntaxTreeContinue__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeContinue_write};
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES

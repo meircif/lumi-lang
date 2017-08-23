@@ -262,6 +262,84 @@ extern Func SyntaxTreeDoLoop__dtl[];
 Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeDoLoop_write};
 #endif
 
+
+/* For loop node in the syntax tree */
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct SyntaxTreeForLoop SyntaxTreeForLoop;
+#elif MR_STAGE == MR_TYPES(3)
+struct SyntaxTreeForLoop {
+  SyntaxTreeFlowElement _base;
+  String* index_name;
+  Expression* start;
+  Expression* upper_bound;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeForLoop_parse_new(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeForLoop** new_node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeForLoop_parse_new = "SyntaxTreeForLoop.parse-new";
+#define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_parse_new
+Returncode SyntaxTreeForLoop_parse_new(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeForLoop** new_node) {
+  (*new_node) = malloc(sizeof(SyntaxTreeForLoop));
+  if ((*new_node) == NULL) RAISE(92)
+  *(*new_node) = (SyntaxTreeForLoop){SyntaxTreeForLoop__dtl, NULL, NULL, NULL, NULL, NULL};
+  (*new_node)->_base._base._base._dtl = SyntaxTreeForLoop__dtl;
+  CHECK(93, SyntaxTreeForLoop_parse((*new_node), parent, &((*end))) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeForLoop_parse = "SyntaxTreeForLoop.parse";
+#define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_parse
+Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end) {
+  CHECK(96, read_new(&(String){2, 1, " "}, &(self->index_name), &((*end))) )
+  if ((*end) != ' ') {
+    CHECK(98, f_syntax_error_c(&(String){37, 36, "expected space after index name, got"}, (*end)) )
+  }
+  CHECK(99, read_expect(&(String){4, 3, "in "}) )
+  CHECK(100, parse_new_expression(&(String){2, 1, ":"}, &(self->upper_bound), &((*end))) )
+  if ((*end) == ':') {
+    self->start = self->upper_bound;
+    CHECK(103, parse_new_expression(&(String){1, 0, ""}, &(self->upper_bound), &((*end))) )
+  }
+  CHECK(104, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, &((*end))) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeForLoop_write = "SyntaxTreeForLoop.write";
+#define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_write
+Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
+  CHECK(107, write(&(String){6, 5, "for ("}) )
+  CHECK(108, write(self->index_name) )
+  CHECK(109, write(&(String){3, 2, "; "}) )
+  if (NULL != self->start) {
+    CHECK(111, (self->start)->_dtl[0](self->start) )
+  }
+  else {
+    CHECK(113, write(&(String){2, 1, "0"}) )
+  }
+  CHECK(114, write(&(String){3, 2, "; "}) )
+  CHECK(115, (self->upper_bound)->_dtl[0](self->upper_bound) )
+  CHECK(116, write(&(String){2, 1, ")"}) )
+  CHECK(117, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func SyntaxTreeForLoop__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeForLoop_write};
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES
