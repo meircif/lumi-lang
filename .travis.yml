@@ -6,6 +6,5 @@ compiler:
 
 os:
   - linux
-  - osx
 
 script: ./test.sh
