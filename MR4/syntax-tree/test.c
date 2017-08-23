@@ -64,7 +64,7 @@ Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self) {
 extern Func SyntaxTreeAssert__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeAssert__dtl[] = {(void*)SyntaxTreeAssert_write};
+Func SyntaxTreeAssert__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeAssert_write};
 #endif
 
 
@@ -121,7 +121,7 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
 extern Func SyntaxTreeAssertError__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeAssertError__dtl[] = {(void*)SyntaxTreeAssertError_write};
+Func SyntaxTreeAssertError__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeAssertError_write};
 #endif
 
 
@@ -152,7 +152,7 @@ Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* 
 extern Func SyntaxTreeTestFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
 #endif
 
 
@@ -183,7 +183,7 @@ Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* 
 extern Func SyntaxTreeMockFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
 #endif
 
 

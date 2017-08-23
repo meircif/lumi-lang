@@ -74,7 +74,7 @@ Returncode SyntaxTreeFlowElement_write_block(SyntaxTreeFlowElement* self) {
 extern Func SyntaxTreeFlowElement__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeFlowElement__dtl[] = {(void*)SyntaxTreeNode_write};
+Func SyntaxTreeFlowElement__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write};
 #endif
 
 
@@ -163,7 +163,7 @@ Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
   if (NULL != self->else_node) {
     CHECK(55, write(&(String){2, 1, "\n"}) )
     CHECK(56, write_spaces(self->_base._base.parent->_base.indentation_spaces) )
-    CHECK(57, (self->else_node)->_base._base._base._dtl[0](self->else_node) )
+    CHECK(57, (self->else_node)->_base._base._base._dtl[1](self->else_node) )
   }
   return OK;
 }
@@ -173,7 +173,7 @@ Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
 extern Func SyntaxTreeIf__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeIf__dtl[] = {(void*)SyntaxTreeIf_write};
+Func SyntaxTreeIf__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeIf_write};
 #endif
 
 
@@ -216,7 +216,7 @@ Returncode SyntaxTreeElse_write(SyntaxTreeElse* self) {
 extern Func SyntaxTreeElse__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeElse__dtl[] = {(void*)SyntaxTreeElse_write};
+Func SyntaxTreeElse__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeElse_write};
 #endif
 
 
@@ -259,7 +259,7 @@ Returncode SyntaxTreeDoLoop_write(SyntaxTreeDoLoop* self) {
 extern Func SyntaxTreeDoLoop__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeDoLoop_write};
+Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeDoLoop_write};
 #endif
 
 
@@ -337,7 +337,7 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
 extern Func SyntaxTreeForLoop__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeForLoop_write};
+Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeForLoop_write};
 #endif
 
 #undef MR_FILE_NAME

@@ -71,6 +71,10 @@ cp ../MR4/tests/*.3.mr tests
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   mr4-compiler.c ../MR3/mr.3.c -I. -I../MR3 -o mr4-compiler-tests
 ./mr4-compiler-tests
+./mr4-compiler tests/integration-actual-single.c \
+  ../MR4/tests/integration-test1.4.mr
+diff ../MR4/tests/integration-expected-single.c \
+  tests/integration-actual-single.c
 
 # MRB
 ./mr3-compiler mrb.3.mr

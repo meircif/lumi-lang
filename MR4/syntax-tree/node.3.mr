@@ -5,6 +5,9 @@
 
 ## Basic node type for all syntax tree nodes
 class SyntaxTreeNode
+  func dynamic analyze()
+    # do nothing as default
+  
   func dynamic write()
     raise
 

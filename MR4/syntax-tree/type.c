@@ -99,7 +99,7 @@ Returncode SyntaxTreeType_write(SyntaxTreeType* self) {
 extern Func SyntaxTreeType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeType__dtl[] = {(void*)SyntaxTreeType_write, (void*)SyntaxTreeType_parse_child};
+Func SyntaxTreeType__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeType_write, (void*)SyntaxTreeType_parse_child};
 #endif
 
 #undef MR_FILE_NAME

@@ -112,7 +112,7 @@ Returncode SyntaxTreeFunction_write_header(SyntaxTreeFunction* self) {
 extern Func SyntaxTreeFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeFunction__dtl[] = {(void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
 #endif
 
 
@@ -170,7 +170,7 @@ Returncode SyntaxTreeMainFunction_write(SyntaxTreeMainFunction* self) {
 extern Func SyntaxTreeMainFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeMainFunction__dtl[] = {(void*)SyntaxTreeMainFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeMainFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeMainFunction_write, (void*)SyntaxTreeBlock_parse_child};
 #endif
 
 
@@ -228,7 +228,7 @@ Returncode SyntaxTreeNativeFunction_write(SyntaxTreeNativeFunction* self) {
 extern Func SyntaxTreeNativeFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeNativeFunction__dtl[] = {(void*)SyntaxTreeNativeFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeNativeFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNativeFunction_write, (void*)SyntaxTreeBlock_parse_child};
 #endif
 
 

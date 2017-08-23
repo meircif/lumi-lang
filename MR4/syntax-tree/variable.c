@@ -92,7 +92,7 @@ Returncode SyntaxTreeVariable_write(SyntaxTreeVariable* self) {
 extern Func SyntaxTreeVariable__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeVariable__dtl[] = {(void*)SyntaxTreeVariable_write};
+Func SyntaxTreeVariable__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeVariable_write};
 #endif
 
 #undef MR_FILE_NAME

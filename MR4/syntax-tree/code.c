@@ -62,7 +62,7 @@ Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
 extern Func SyntaxTreeExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeExpression__dtl[] = {(void*)SyntaxTreeExpression_write};
+Func SyntaxTreeExpression__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeExpression_write};
 #endif
 
 
@@ -104,7 +104,7 @@ Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self) {
 extern Func SyntaxTreeReturn__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeReturn__dtl[] = {(void*)SyntaxTreeReturn_write};
+Func SyntaxTreeReturn__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeReturn_write};
 #endif
 
 
@@ -146,7 +146,7 @@ Returncode SyntaxTreeRaise_write(SyntaxTreeRaise* self) {
 extern Func SyntaxTreeRaise__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeRaise__dtl[] = {(void*)SyntaxTreeRaise_write};
+Func SyntaxTreeRaise__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeRaise_write};
 #endif
 
 
@@ -203,7 +203,7 @@ Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
 extern Func SyntaxTreeWhile__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeWhile__dtl[] = {(void*)SyntaxTreeWhile_write};
+Func SyntaxTreeWhile__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeWhile_write};
 #endif
 
 
@@ -245,7 +245,7 @@ Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self) {
 extern Func SyntaxTreeContinue__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeContinue_write};
+Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeContinue_write};
 #endif
 
 #undef MR_FILE_NAME

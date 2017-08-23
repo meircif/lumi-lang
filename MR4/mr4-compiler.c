@@ -31,7 +31,11 @@ static char* _func_name_func = "func";
 #define MR_FUNC_NAME _func_name_func
 Returncode func(Array* argv) {
   CHECK(17, Global_init(glob) )
-  /* work in progres... */
+  SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, 0, NULL, NULL, NULL, NULL};
+  root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
+  CHECK(19, SyntaxTreeRoot_parse(root, argv) )
+  CHECK(20, (root)->_base._base._base._dtl[0](root) )
+  CHECK(21, (root)->_base._base._base._dtl[1](root) )
   return OK;
 }
 #undef MR_FUNC_NAME

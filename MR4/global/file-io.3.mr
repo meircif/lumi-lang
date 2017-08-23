@@ -1,6 +1,15 @@
 ## MR4 compiler - File read and write functions
 
 ## Proxy functions to be mocked in tests
+func file-open(user String name, copy Bool is-read):(owner File file)
+  if is-read
+    file-open-read(user name):(owner file)
+  else
+    file-open-write(user name):(owner file)
+
+func file-close(owner File file)
+  file.close()
+
 func file-getc(user File file):(copy Char ch)
   file.getc():(copy ch)
 
