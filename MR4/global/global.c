@@ -1,6 +1,6 @@
 #ifndef MR_MAINFILE
 #define MR_MAINFILE "global/global.c"
-#define DEPTH 4
+#define DEPTH 5
 #include "mr.3.h"
 #else
 
@@ -196,6 +196,9 @@ Global* glob = &(Global){NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, '\0', 0, fals
 #elif MR_STAGE == MR_TYPES(3)
 #undef MR_STAGE
 #define MR_STAGE MR_TYPES(4)
+#elif MR_STAGE == MR_TYPES(4)
+#undef MR_STAGE
+#define MR_STAGE MR_TYPES(5)
 #endif
 #undef MR_INCLUDES
 #endif

@@ -1,6 +1,6 @@
 #ifndef MR_MAINFILE
 #define MR_MAINFILE "syntax-tree/type.c"
-#define DEPTH 4
+#define DEPTH 5
 #include "mr.3.h"
 #else
 
@@ -57,9 +57,9 @@ Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Cha
 static char* _func_name_SyntaxTreeType_parse_child = "SyntaxTreeType.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeType_parse_child
 Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Char* end) {
-  Bool _Bool60;
-  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool60)) )
-  if (!_Bool60) {
+  Bool _Bool74;
+  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool74)) )
+  if (!_Bool74) {
     CHECK(22, f_syntax_error(&(String){16, 15, "unknown keyword"}, keyword) )
   }
   return OK;
@@ -83,9 +83,9 @@ Returncode SyntaxTreeType_write(SyntaxTreeType* self) {
   CHECK(31, write(&(String){5, 4, ") {\n"}) )
   CHECK(32, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base._base.variables) )
   CHECK(33, write(&(String){2, 1, "}"}) )
-  Bool _Bool61;
-  CHECK(34, List_m_is_empty(self->_base.functions, &(_Bool61)) )
-  if (!_Bool61) {
+  Bool _Bool75;
+  CHECK(34, List_m_is_empty(self->_base.functions, &(_Bool75)) )
+  if (!_Bool75) {
     CHECK(35, write(&(String){2, 1, "\n"}) )
     self->_base._base.indentation_spaces = 0;
     CHECK(37, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )
@@ -135,6 +135,9 @@ Func SyntaxTreeType__dtl[] = {(void*)SyntaxTreeType_write, (void*)SyntaxTreeType
 #elif MR_STAGE == MR_TYPES(3)
 #undef MR_STAGE
 #define MR_STAGE MR_TYPES(4)
+#elif MR_STAGE == MR_TYPES(4)
+#undef MR_STAGE
+#define MR_STAGE MR_TYPES(5)
 #endif
 #undef MR_INCLUDES
 #endif

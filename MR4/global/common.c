@@ -1,6 +1,6 @@
 #ifndef MR_MAINFILE
 #define MR_MAINFILE "global/common.c"
-#define DEPTH 4
+#define DEPTH 5
 #include "mr.3.h"
 #else
 
@@ -206,6 +206,9 @@ Returncode print_msg_with_item(String* text, String* item) {
 #elif MR_STAGE == MR_TYPES(3)
 #undef MR_STAGE
 #define MR_STAGE MR_TYPES(4)
+#elif MR_STAGE == MR_TYPES(4)
+#undef MR_STAGE
+#define MR_STAGE MR_TYPES(5)
 #endif
 #undef MR_INCLUDES
 #endif

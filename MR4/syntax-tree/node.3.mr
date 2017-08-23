@@ -54,7 +54,20 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     is-variable := end = ' '
     if not is-variable
       return
-    if keyword.equal(user "var")
+    
+    if keyword.equal(user "#") or keyword.equal(user "##")
+      user String text
+      read-until(user "", copy false):(user text, copy end)
+    else-if keyword.equal(user "{#") or keyword.equal(user "{##")
+      var Char prev('\0')
+      do
+        var Char curr
+        read-c():(copy curr)
+        while curr != EOF and (curr != '}' or prev != '#')
+        prev := curr
+      read-c():(copy end)
+      
+    else-if keyword.equal(user "var")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
           var _, copy ACCESS-VAR, user parent-type):(copy end))
     else-if keyword.equal(user "user")
@@ -63,6 +76,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     else-if keyword.equal(user "owner")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
           var _, copy ACCESS-OWNER, user parent-type):(copy end))
+      
     else
       is-variable := false
   
@@ -95,10 +109,10 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
   func inst parse-if-function(
       user String keyword, user SyntaxTreeType parent-type):(
       copy Char end, copy Bool is-func)
-    if end != ' '
-      f-syntax-error-c(user "expected space after key-word, got", copy end)
     keyword.equal(user "func"):(copy is-func)
     if is-func
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"func\", got", copy end)
       self.functions.add(owner SyntaxTreeFunction.parse-new(
           var _, user parent-type):(copy end))
   

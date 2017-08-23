@@ -92,11 +92,17 @@ func test-code-error(user String input-text, user String expected-error)
 
 test test-global()
   test-global-scope(user "user String str", user "Access(1) String str")
-  test-global-scope(user "\n  \n\nvar Int x", user "Access(3) Int x")
+  user String expected("Access(3) Int x")
+  test-global-scope(user "\n  \n\nvar Int x", user expected)
+  test-global-scope(user "# comment\n\nvar Int x", user expected)
+  test-global-scope(user "## documemtation\n\nvar Int x", user expected)
+  test-global-scope(
+      user "{# multi \n line \n comment #}\n\nvar Int x", user expected)
+  test-global-scope(
+      user "{## multi \n line \n documemtation #}\n\nvar Int x", user expected)
   test-global-scope-error(user "error ", user "unknown keyword \"error\"")
   test-global-scope-error(
-      user "error(\n",
-      user "expected space after key-word, got \"(\"")
+      user "main(\n", user "expected new-line after \"main\", got \"(\"")
   test-global-scope-error(
       user "  struct Test",
       user "indentation too big, expected \"0\" got \"2\"")
@@ -116,11 +122,12 @@ test test-type()
       user "struct Test1\n  var Int x\nclass Test2\n  var Int x\n\n\nstruct Test3\n  var Int x",
       user "Type(Test1) {\n  Access(3) Int x\n}\n\nType(Test2) {\n  Access(3) Int x\n}\n\nType(Test3) {\n  Access(3) Int x\n}")
   test-global-scope-error(
+      user "struct(\n", user "expected space after \"struct\", got \"(\"")
+  test-global-scope-error(
+      user "class(\n", user "expected space after \"class\", got \"(\"")
+  test-global-scope-error(
       user "struct Test\n  error ",
       user "unknown keyword \"error\"")
-  test-global-scope-error(
-      user "struct Test\n  error(\n",
-      user "expected space after key-word, got \"(\"")
   test-global-scope-error(
       user "struct Test",
       user "expected block in a new line, got \"EOF\"")
@@ -146,6 +153,10 @@ test test-function()
   test-global-scope(
       user "func name()\n  var Int x",
       user "Function(name)() {\n  Access(3) Int x\n}")
+  test-global-scope(
+      user "main\n  var Int x", user "Main {\n  Access(3) Int x\n}")
+  test-global-scope-error(
+      user "func(\n", user "expected space after \"func\", got \"(\"")
   test-global-scope-error(
       user "func name\n",
       user "expected \"(\" after function name, got \"new-line\"")
@@ -185,6 +196,16 @@ test test-members()
   test-global-scope(
       user "struct Test\n  var Int x\n  func name()\n    var Int x",
       user "Type(Test) {\n  Access(3) Int x\n}\n\nTest.Function(name)() {\n  Access(3) Int x\n}\n")
+  user String expected("Type(Test) {\n  Access(3) Int x\n}")
+  test-global-scope(user "struct Test\n  # comment\n  var Int x", user expected)
+  test-global-scope(
+      user "struct Test\n  ## documemtation\n  var Int x", user expected)
+  test-global-scope(
+      user "struct Test\n  {# multi \n line \n comment #}\n  var Int x",
+      user expected)
+  test-global-scope(
+      user "struct Test\n  {## multi \n line \n documemtation #}\n  var Int x",
+      user expected)
 
 
 test test-simple-code()
@@ -194,6 +215,13 @@ test test-simple-code()
   test-code(user "user String str", user "Access(1) String str")
   test-code(
       user "var Int x(y + 5)", user "Access(3) Int x (Variable(y) + Int(5))")
+  user String expected("Access(3) Int x")
+  test-code(user "# comment\n\n  var Int x", user expected)
+  test-code(user "## documemtation\n\n  var Int x", user expected)
+  test-code(user "{# multi \n line \n comment #}\n\n  var Int x", user expected)
+  test-code(
+      user "{## multi \n line \n documemtation #}\n\n  var Int x",
+      user expected)
 
 
 test test-if-else()

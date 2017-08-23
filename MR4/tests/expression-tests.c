@@ -1,6 +1,6 @@
 #ifndef MR_MAINFILE
 #define MR_MAINFILE "tests/expression-tests.c"
-#define DEPTH 4
+#define DEPTH 5
 #include "mr.3.h"
 #else
 
@@ -57,8 +57,8 @@ Returncode test_expression_error_ends(String* input_text, String* expected_error
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char62;
-    CHECK(27, parse_new_expression(ends, &(expression), &(_Char62)) );
+    Char _Char76;
+    CHECK(27, parse_new_expression(ends, &(expression), &(_Char76)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
@@ -411,6 +411,9 @@ Returncode test_no_expression() {
 #elif MR_STAGE == MR_TYPES(3)
 #undef MR_STAGE
 #define MR_STAGE MR_TYPES(4)
+#elif MR_STAGE == MR_TYPES(4)
+#undef MR_STAGE
+#define MR_STAGE MR_TYPES(5)
 #endif
 #undef MR_INCLUDES
 #endif

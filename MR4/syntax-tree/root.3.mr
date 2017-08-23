@@ -17,14 +17,44 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       if glob.input-buffer.length > 0 or glob.input-spaces > 0
         f-syntax-error-msg(user "no new-line before file end")
   
-  ## todo...
   func dynamic parse-child(user String keyword):(copy Char end)
     if self.parse-if-function(user keyword, user _):(copy end)
       return
+    
     if keyword.equal(user "struct")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"struct\", got", copy end)
       self.types.add(owner SyntaxTreeType.parse-new(var _):(copy end))
+      
     else-if keyword.equal(user "class")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"class\", got", copy end)
       self.types.add(owner SyntaxTreeType.parse-new(var _):(copy end))
+      
+    else-if keyword.equal(user "main")
+      if end != '\n'
+        f-syntax-error-c(user "expected new-line after \"main\", got", copy end)
+      self.functions.add(owner SyntaxTreeMainFunction.parse-new(var _):(
+          copy end))
+      
+    else-if keyword.equal(user "native")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"native\", got", copy end)
+      self.functions.add(owner SyntaxTreeNativeFunction.parse-new(var _):(
+          copy end))
+      
+    else-if keyword.equal(user "test")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"test\", got", copy end)
+      self.functions.add(owner SyntaxTreeTestFunction.parse-new(var _):(
+          copy end))
+      
+    else-if keyword.equal(user "mock")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"mock\", got", copy end)
+      self.functions.add(owner SyntaxTreeMockFunction.parse-new(var _):(
+          copy end))
+      
     else
       f-syntax-error(user "unknown keyword", user keyword)
   

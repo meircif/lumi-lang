@@ -1,6 +1,6 @@
 ## MR4 compiler - Syntax tree function
 
-## Function node in the syntax tree 
+## Function node in the syntax tree
 class SyntaxTreeFunction(SyntaxTreeBlock)
   user SyntaxTreeType parent-type
   owner String name
@@ -17,24 +17,63 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       self.indentation-spaces := 4
     else
       self.indentation-spaces := 2
+    self.parse-header():(copy end)
+    self.parse-block():(copy end)
+    self.indentation-spaces := 2
+  
+  func inst parse-header():(copy Char end)
     read-new(user "("):(owner self.name, copy end)
     if end != '('
       f-syntax-error-c(user "expected \"(\" after function name, got", copy end)
     new FunctionArguments in self.arguemnts
     var ArgumentFactory argument-factory
     self.arguemnts.parse(user argument-factory):(copy end)
-    self.parse-block():(copy end)
-    self.indentation-spaces := 2
   
   func dynamic write()
     if ? self.parent-type
       write(user self.parent-type.type-data.name)
       write(user ".")
-    write(user "Function(")
+    write(user "Function")
+    self.write-header()
+    self.write-block()
+  
+  func inst write-header()
+    write(user "(")
     write(user self.name)
     write(user ")")
     self.arguemnts.write()
+
+
+## Main function node in the syntax tree
+class SyntaxTreeMainFunction(SyntaxTreeFunction)
+  func inst parse-new():(copy Char end, owner SyntaxTreeMainFunction new-node)
+    new SyntaxTreeMainFunction in new-node
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.indentation-spaces := 2
+    self.name := string-new-copy(user "main")
+    self.parse-block():(copy end)
+  
+  func dynamic write()
+    write(user "Main")
     self.write-block()
+
+
+## Native function declaration in the syntax tree
+class SyntaxTreeNativeFunction(SyntaxTreeFunction)
+  func inst parse-new():(copy Char end, owner SyntaxTreeNativeFunction new-node)
+    new SyntaxTreeNativeFunction in new-node
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.indentation-spaces := 2
+    self.parse-header():(copy end)
+    new List{SyntaxTreeCode} in self.nodes
+  
+  func dynamic write()
+    write(user "Native")
+    self.write-header()
 
 
 ## Basic function argument
