@@ -1,0 +1,78 @@
+## Tests for math functions
+
+test math-abs-test()
+  assert math-abs(copy 234) = 234
+  assert math-abs(copy 0) = 0
+  assert math-abs(copy - 1) = 1
+  assert math-abs(copy - 573) = 573
+
+
+test math-copysign-test()
+  assert math-copysign(copy 234, copy 480) = 234
+  assert math-copysign(copy 234, copy - 34) = - 234
+  assert math-copysign(copy - 234, copy 657) = 234
+  assert math-copysign(copy - 234, copy - 6) = - 234
+  assert math-copysign(copy 0, copy 12) = 0
+  assert math-copysign(copy 0, copy - 34) = 0
+  assert math-copysign(copy 234, copy 0) = 234
+  assert math-copysign(copy - 234, copy 0) = - 234
+  assert math-copysign(copy 0, copy 0) = 0
+
+
+test math-power-test()
+  assert math-power(copy 2, copy 6) = 64
+  assert math-power(copy - 2, copy 6) = 64
+  assert math-power(copy - 2, copy 5) = - 32
+  assert math-power(copy 5, copy 3) = 125
+  assert math-power(copy 5, copy 0) = 1
+  assert math-power(copy - 5, copy 0) = 1
+  assert math-power(copy 0, copy 0) = 1
+  assert math-power(copy 0, copy 1) = 0
+  assert math-power(copy 0, copy 3) = 0
+  assert-error math-power(copy 3, copy - 2)
+
+
+test math-factorial-test()
+  assert math-factorial(copy 0) = 1
+  assert math-factorial(copy 1) = 1
+  assert math-factorial(copy 2) = 2
+  assert math-factorial(copy 3) = 6
+  assert math-factorial(copy 4) = 24
+  assert math-factorial(copy 6) = 720
+  assert-error math-factorial(copy - 4)
+
+
+test math-sum-test()
+  var Array{4:Int} array
+  var MockIntIterator{Int} iter
+  iter.init(user array)
+  array[0] := 3
+  array[1] := 0
+  array[2] := - 1
+  array[3] := 34
+  assert math-sum(user iter) = 36
+  iter.init(user array)
+  iter.next()
+  iter.next()
+  assert math-sum(user iter) = 33
+  assert math-sum(user iter) = 0
+
+class MockIntIterator(Iterator)
+  user Array{Int} array
+  var Int index
+  
+  func inst init(user Array{Int} array)
+    self.array := array
+    self.index := 0
+  
+  func dynamic is-end():(copy Bool exist)
+    exist := self.index >= self.array.length
+  
+  func dynamic get-item():(copy Int item)
+    if self.index >= self.array.length
+      raise
+    item := self.array[self.index]
+  
+  func dynamic next()
+    if self.index < self.array.length
+      self.index += 1

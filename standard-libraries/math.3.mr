@@ -1,0 +1,45 @@
+## Math functions for integers
+
+## Return the absulute value of `x`
+func math-abs(copy Int x):(copy Int res)
+  if x >= 0
+    res := x
+  else
+    res := - x
+
+
+## Return `x` with the sign of `sign`,
+## if sign is `0` no sign change is made to `x`
+func math-copysign(copy Int x, copy Int sign):(copy Int res)
+  if (x >= 0 and sign >= 0) or (x < 0 and sign <= 0)
+    res := x
+  else
+    res := - x
+
+
+## Return `x` raised to power `exp`, fail if `exp` is negative,
+## if `x` and `exp` are zero the result is `1`
+func math-power(copy Int x, copy Int exp):(copy Int res)
+  if exp < 0
+    raise
+  res := 1
+  for n in exp
+    res := res * x
+
+
+## Return `x`!, fail if `x` is negative
+func math-factorial(copy Int x):(copy Int res)
+  if x < 0
+    raise
+  res := 1
+  for n in 2:x + 1
+    res := res * n
+
+
+## Return the sum of all integers in `iter`
+func math-sum(user Iterator{Int} iter):(copy Int res)
+  res := 0
+  do
+    while not iter.is-end()
+    res += iter.get-item()
+    iter.next()
