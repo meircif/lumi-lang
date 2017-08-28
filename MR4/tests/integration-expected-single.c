@@ -1,33 +1,33 @@
 
-Type(TestStruct) {
-  Access(3) Int num
-  Access(1) String text
+struct TestStruct {
+  Int num;
+  String* text;
+};
+
+Returncode TestStruct_set(Int x, String* s) {
+  self.num = x;
+  self.text = s;
 }
 
-TestStruct.Function(set)(Access(0) Int x, Access(1) String s) {
-  Variable(self).Member(num) = Variable(x)
-  Variable(self).Member(text) = Variable(s)
-}
-
-TestStruct.Function(get)()->(Access(0) Int x, Access(1) String s) {
-  Variable(x) = Variable(self).Member(num)
-  Variable(s) = Variable(self).Member(text)
+Returncode TestStruct_get(Int* x, String** s) {
+  x = self.num;
+  s = self.text;
 }
 
 
-Access(3) Int global-int
+Int global_int;
 
-Access(3) Int CONSTANT-INT (Int(23))
+Int CONSTANT_INT;
 
-Access(1) String global-string
+String* global_string;
 
-Access(1) String CONSTANT-STRING (String("a constant string"))
+String* CONSTANT_STRING;
 
-Function(test-func)() {
-  Variable(sys).Member(print)(Access(1) String("I am test func"))
+Returncode test_func() {
+  sys.print("I am test func");
 }
 
-Function(test-func)(Access(0) Int num, Access(1) String text)->(Access(0) Int out-num, Access(1) String out-text) {
-  Variable(out-num) = Variable(num)
-  Variable(out-text) = Variable(text)
+Returncode test_func(Int num, String* text, Int* out_num, String** out_text) {
+  out_num = num;
+  out_text = text;
 }

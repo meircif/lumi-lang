@@ -15,7 +15,7 @@ class BlockExpression(Expression)
     read-c():(copy end)
   
   func dynamic write()
-    write(user "Block(")
+    write(user "(")
     self.expression.write()
     write(user ")")
 
@@ -104,6 +104,5 @@ class QuestionExpression(Expression)
     read-c():(copy end)
   
   func dynamic write()
-    write(user "Question(")
     self.tested.write()
-    write(user ")")
+    write(user " != NULL")

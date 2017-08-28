@@ -14,7 +14,8 @@ class VariableExpression(TextExpression)
     self.text := text
   
   func dynamic write()
-    self.write-text(user "Variable")
+    write-cname(user self.text)
+
 
 ## The `base` method expression
 class BaseMethExpression(Expression)
@@ -38,9 +39,6 @@ class TypeExpression(TextExpression)
   ## parsing `Type-name`
   func inst parse(owner String text)
     self.text := text
-  
-  func dynamic write()
-    self.write-text(user "Type")
 
 
 ## An instance member expression
@@ -60,4 +58,5 @@ class MemberExpression(VariableExpression)
   
   func dynamic write()
     self.instance.write()
-    self.write-text(user ".Member")
+    write(user ".")
+    base.write()

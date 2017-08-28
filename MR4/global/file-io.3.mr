@@ -125,9 +125,26 @@ func get-access(user String access-str):(copy Int access)
     f-syntax-error(user "illegal access", user access-str)
 
 
+## write a single character to the output file
+func write-c(copy Char ch)
+  file-putc(user glob.output-file, copy ch)
+
+
 ## write `text` to the output file
 func write(user String text)
   file-write(user glob.output-file, user text)
+
+
+## write `name` with `-` replaced by `_`
+func write-cname(user String name)
+  if not (? name)
+    raise
+  for index in name.length
+    var Char ch(name[index])
+    if ch = '-'
+      write-c(copy '_')
+    else
+      write-c(copy ch)
 
 
 ## write `num` to the output file as text
@@ -140,4 +157,4 @@ func write-int(copy Int num)
 ## write `num` spaces - usefull for writing indentation
 func write-spaces(copy Int num)
   for n in num
-    file-putc(user glob.output-file, copy ' ')
+    write-c(copy ' ')

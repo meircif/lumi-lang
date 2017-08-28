@@ -22,15 +22,23 @@ class SyntaxTreeType(SyntaxTreeNamespace)
       f-syntax-error(user "unknown keyword", user keyword)
   
   func dynamic write()
-    write(user "Type(")
+    # typedef struct `name` `name`;
+    # struct `name` {
+    #   `variables...`
+    # };
+    # `functions...`
     if not (? self.type-data)
       raise
-    if not (? self.type-data.name)
-      raise
-    write(user self.type-data.name)
-    write(user ") {\n")
+    # write(user "typedef struct ")
+    # write-cname(user self.type-data.name)
+    # write(user " ")
+    # write-cname(user self.type-data.name)
+    # write(user ";\n")
+    write(user "struct ")
+    write-cname(user self.type-data.name)
+    write(user " {\n")
     self.write-children(user self.variables)
-    write(user "}")
+    write(user "};")
     if not self.functions.m-is-empty()
       write(user "\n")
       self.indentation-spaces := 0

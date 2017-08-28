@@ -15,6 +15,7 @@ class SyntaxTreeExpression(SyntaxTreeCode)
   
   func dynamic write()
     self.expression.write()
+    write(user ";")
 
 
 ## Return statement in the syntax tree
@@ -26,7 +27,7 @@ class SyntaxTreeReturn(SyntaxTreeCode)
     new-node.parent := parent
   
   func dynamic write()
-    write(user "return OK")
+    write(user "return OK;")
 
 
 ## Raise statement in the syntax tree
@@ -38,7 +39,7 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     new-node.parent := parent
   
   func dynamic write()
-    write(user "return ERR")
+    write(user "return ERR;")
 
 
 ## While statement in the syntax tree
@@ -55,9 +56,10 @@ class SyntaxTreeWhile(SyntaxTreeCode)
     parse-new-expression(user ""):(owner self.condition, copy end)
   
   func dynamic write()
-    write(user "while (")
+    # if (!(`condition`) break;
+    write(user "if (!(")
     self.condition.write()
-    write(user ")")
+    write(user ")) break;")
 
 
 ## Continue statement in the syntax tree
@@ -69,4 +71,4 @@ class SyntaxTreeContinue(SyntaxTreeCode)
     new-node.parent := parent
   
   func dynamic write()
-    write(user "continue")
+    write(user "continue;")

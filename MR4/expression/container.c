@@ -55,7 +55,7 @@ Returncode BlockExpression_write(BlockExpression* self);
 static char* _func_name_BlockExpression_write = "BlockExpression.write";
 #define MR_FUNC_NAME _func_name_BlockExpression_write
 Returncode BlockExpression_write(BlockExpression* self) {
-  CHECK(18, write(&(String){7, 6, "Block("}) )
+  CHECK(18, write(&(String){2, 1, "("}) )
   CHECK(19, (self->expression)->_dtl[0](self->expression) )
   CHECK(20, write(&(String){2, 1, ")"}) )
   return OK;
@@ -276,9 +276,8 @@ Returncode QuestionExpression_write(QuestionExpression* self);
 static char* _func_name_QuestionExpression_write = "QuestionExpression.write";
 #define MR_FUNC_NAME _func_name_QuestionExpression_write
 Returncode QuestionExpression_write(QuestionExpression* self) {
-  CHECK(107, write(&(String){10, 9, "Question("}) )
-  CHECK(108, (self->tested)->_dtl[0](self->tested) )
-  CHECK(109, write(&(String){2, 1, ")"}) )
+  CHECK(107, (self->tested)->_dtl[0](self->tested) )
+  CHECK(108, write(&(String){9, 8, " != NULL"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

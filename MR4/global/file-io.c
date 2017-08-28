@@ -294,6 +294,20 @@ Returncode get_access(String* access_str, Int* access) {
 #endif
 
 
+/* write a single character to the output file */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode write_c(Char ch);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_write_c = "write-c";
+#define MR_FUNC_NAME _func_name_write_c
+Returncode write_c(Char ch) {
+  CHECK(130, file_putc(glob->output_file, ch) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
 /* write `text` to the output file */
 #if MR_STAGE == MR_DECLARATIONS
 Returncode write(String* text);
@@ -301,7 +315,33 @@ Returncode write(String* text);
 static char* _func_name_write = "write";
 #define MR_FUNC_NAME _func_name_write
 Returncode write(String* text) {
-  CHECK(130, file_write(glob->output_file, text) )
+  CHECK(135, file_write(glob->output_file, text) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+/* write `name` with `-` replaced by `_` */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode write_cname(String* name);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_write_cname = "write-cname";
+#define MR_FUNC_NAME _func_name_write_cname
+Returncode write_cname(String* name) {
+  if (!(NULL != name)) {
+    RAISE(141)
+  }
+  {int index; for (index = (0); index < (name->length); ++index) {
+    if ((index) < 0 || (index) >= (name)->length) RAISE(143)
+    Char ch = ((name)->values[index]);
+    if (ch == '-') {
+      CHECK(145, write_c('_') )
+    }
+    else {
+      CHECK(147, write_c(ch) )
+    }
+  }}
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -316,8 +356,8 @@ static char* _func_name_write_int = "write-int";
 #define MR_FUNC_NAME _func_name_write_int
 Returncode write_int(Int num) {
   String* num_str = &(String){64, 0, (char[64]){0}};
-  CHECK(136, Int_str(num, num_str) )
-  CHECK(137, write(num_str) )
+  CHECK(153, Int_str(num, num_str) )
+  CHECK(154, write(num_str) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -332,7 +372,7 @@ static char* _func_name_write_spaces = "write-spaces";
 #define MR_FUNC_NAME _func_name_write_spaces
 Returncode write_spaces(Int num) {
   {int n; for (n = (0); n < (num); ++n) {
-    CHECK(143, file_putc(glob->output_file, ' ') )
+    CHECK(160, write_c(' ') )
   }}
   return OK;
 }

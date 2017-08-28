@@ -43,19 +43,7 @@ static char* _func_name_SyntaxTreeAssert_parse = "SyntaxTreeAssert.parse";
 Returncode SyntaxTreeAssert_parse(SyntaxTreeAssert* self, SyntaxTreeBlock* parent, Char* end) {
   self->_base.parent = parent;
   CHECK(14, parse_new_expression(&(String){1, 0, ""}, &(self->tested), &((*end))) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeAssert_write = "SyntaxTreeAssert.write";
-#define MR_FUNC_NAME _func_name_SyntaxTreeAssert_write
-Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self) {
-  CHECK(17, write(&(String){8, 7, "Assert("}) )
-  CHECK(18, (self->tested)->_dtl[0](self->tested) )
-  CHECK(19, write(&(String){2, 1, ")"}) )
+  CHECK(15, f_syntax_error_msg(&(String){28, 27, "assert not supported yet..."}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -64,9 +52,8 @@ Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self) {
 extern Func SyntaxTreeAssert__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeAssert__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeAssert_write};
+Func SyntaxTreeAssert__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write};
 #endif
-
 
 /* Assert-error statement in the syntax tree */
 #if MR_STAGE == MR_TYPEDEFS
@@ -84,10 +71,10 @@ static char* _func_name_SyntaxTreeAssertError_parse_new = "SyntaxTreeAssertError
 #define MR_FUNC_NAME _func_name_SyntaxTreeAssertError_parse_new
 Returncode SyntaxTreeAssertError_parse_new(SyntaxTreeAssertError* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeAssertError** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeAssertError));
-  if ((*new_node) == NULL) RAISE(28)
+  if ((*new_node) == NULL) RAISE(23)
   *(*new_node) = (SyntaxTreeAssertError){SyntaxTreeAssertError__dtl, NULL, NULL};
   (*new_node)->_base._base._dtl = SyntaxTreeAssertError__dtl;
-  CHECK(29, SyntaxTreeAssertError_parse((*new_node), parent, &((*end))) )
+  CHECK(24, SyntaxTreeAssertError_parse((*new_node), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -99,20 +86,8 @@ static char* _func_name_SyntaxTreeAssertError_parse = "SyntaxTreeAssertError.par
 #define MR_FUNC_NAME _func_name_SyntaxTreeAssertError_parse
 Returncode SyntaxTreeAssertError_parse(SyntaxTreeAssertError* self, SyntaxTreeBlock* parent, Char* end) {
   self->_base.parent = parent;
-  CHECK(33, parse_new_expression(&(String){1, 0, ""}, &(self->tested), &((*end))) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeAssertError_write = "SyntaxTreeAssertError.write";
-#define MR_FUNC_NAME _func_name_SyntaxTreeAssertError_write
-Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
-  CHECK(36, write(&(String){13, 12, "AssertError("}) )
-  CHECK(37, (self->tested)->_dtl[0](self->tested) )
-  CHECK(38, write(&(String){2, 1, ")"}) )
+  CHECK(28, parse_new_expression(&(String){1, 0, ""}, &(self->tested), &((*end))) )
+  CHECK(29, f_syntax_error_msg(&(String){34, 33, "assert-error not supported yet..."}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -121,7 +96,7 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
 extern Func SyntaxTreeAssertError__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeAssertError__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeAssertError_write};
+Func SyntaxTreeAssertError__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write};
 #endif
 
 
@@ -140,10 +115,11 @@ static char* _func_name_SyntaxTreeTestFunction_parse_new = "SyntaxTreeTestFuncti
 #define MR_FUNC_NAME _func_name_SyntaxTreeTestFunction_parse_new
 Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* end, SyntaxTreeTestFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeTestFunction));
-  if ((*new_node) == NULL) RAISE(44)
-  *(*new_node) = (SyntaxTreeTestFunction){SyntaxTreeTestFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL};
+  if ((*new_node) == NULL) RAISE(35)
+  *(*new_node) = (SyntaxTreeTestFunction){SyntaxTreeTestFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeTestFunction__dtl;
-  CHECK(45, SyntaxTreeFunction_parse(&((*new_node)->_base), NULL, &((*end))) )
+  CHECK(36, SyntaxTreeFunction_parse(&((*new_node)->_base), NULL, &((*end))) )
+  CHECK(37, f_syntax_error_msg(&(String){35, 34, "test-function not supported yet..."}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -171,10 +147,11 @@ static char* _func_name_SyntaxTreeMockFunction_parse_new = "SyntaxTreeMockFuncti
 #define MR_FUNC_NAME _func_name_SyntaxTreeMockFunction_parse_new
 Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* end, SyntaxTreeMockFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMockFunction));
-  if ((*new_node) == NULL) RAISE(51)
-  *(*new_node) = (SyntaxTreeMockFunction){SyntaxTreeMockFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL};
+  if ((*new_node) == NULL) RAISE(43)
+  *(*new_node) = (SyntaxTreeMockFunction){SyntaxTreeMockFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMockFunction__dtl;
-  CHECK(52, SyntaxTreeFunction_parse(&((*new_node)->_base), NULL, &((*end))) )
+  CHECK(44, SyntaxTreeFunction_parse(&((*new_node)->_base), NULL, &((*end))) )
+  CHECK(45, f_syntax_error_msg(&(String){26, 25, "mock not supported yet..."}) )
   return OK;
 }
 #undef MR_FUNC_NAME

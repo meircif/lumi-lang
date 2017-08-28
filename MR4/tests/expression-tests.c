@@ -57,8 +57,8 @@ Returncode test_expression_error_ends(String* input_text, String* expected_error
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char76;
-    CHECK(27, parse_new_expression(ends, &(expression), &(_Char76)) );
+    Char _Char75;
+    CHECK(27, parse_new_expression(ends, &(expression), &(_Char75)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
@@ -96,13 +96,13 @@ Returncode test_int_expression();
 static char* _func_name_test_int_expression = "test-int-expression";
 #define MR_FUNC_NAME _func_name_test_int_expression
 Returncode test_int_expression() {
-  CHECK(48, test_expression(&(String){2, 1, "0"}, &(String){7, 6, "Int(0)"}) )
-  CHECK(49, test_expression(&(String){5, 4, "9630"}, &(String){10, 9, "Int(9630)"}) )
-  CHECK(50, test_expression(&(String){6, 5, "-9630"}, &(String){11, 10, "Int(-9630)"}) )
-  CHECK(51, test_expression(&(String){6, 5, "07520"}, &(String){11, 10, "Int(07520)"}) )
-  CHECK(52, test_expression(&(String){7, 6, "0b1011"}, &(String){12, 11, "Int(0b1011)"}) )
-  CHECK(53, test_expression(&(String){9, 8, "0xfda940"}, &(String){14, 13, "Int(0xfda940)"}) )
-  CHECK(54, test_expression(&(String){9, 8, "0xFDA940"}, &(String){14, 13, "Int(0xFDA940)"}) )
+  CHECK(48, test_expression(&(String){2, 1, "0"}, &(String){2, 1, "0"}) )
+  CHECK(49, test_expression(&(String){5, 4, "9630"}, &(String){5, 4, "9630"}) )
+  CHECK(50, test_expression(&(String){6, 5, "-9630"}, &(String){6, 5, "-9630"}) )
+  CHECK(51, test_expression(&(String){6, 5, "07520"}, &(String){6, 5, "07520"}) )
+  CHECK(52, test_expression(&(String){7, 6, "0b1011"}, &(String){7, 6, "0b1011"}) )
+  CHECK(53, test_expression(&(String){9, 8, "0xfda940"}, &(String){9, 8, "0xfda940"}) )
+  CHECK(54, test_expression(&(String){9, 8, "0xFDA940"}, &(String){9, 8, "0xFDA940"}) )
   CHECK(55, test_expression_error(&(String){3, 2, "2a"}, &(String){20, 19, "illegal number \"2a\""}) )
   CHECK(56, test_expression_error(&(String){3, 2, "0a"}, &(String){20, 19, "illegal number \"0a\""}) )
   CHECK(57, test_expression_error(&(String){4, 3, "038"}, &(String){27, 26, "illegal octal number \"038\""}) )
@@ -120,12 +120,12 @@ Returncode test_char_expression();
 static char* _func_name_test_char_expression = "test-char-expression";
 #define MR_FUNC_NAME _func_name_test_char_expression
 Returncode test_char_expression() {
-  CHECK(64, test_expression(&(String){4, 3, "'a'"}, &(String){10, 9, "Char('a')"}) )
-  CHECK(65, test_expression(&(String){5, 4, "'\\''"}, &(String){11, 10, "Char('\\'')"}) )
-  CHECK(66, test_expression(&(String){5, 4, "'\\n'"}, &(String){11, 10, "Char('\\n')"}) )
-  CHECK(67, test_expression(&(String){7, 6, "'\\x0f'"}, &(String){13, 12, "Char('\\x0f')"}) )
-  CHECK(68, test_expression(&(String){7, 6, "'\\xA9'"}, &(String){13, 12, "Char('\\xA9')"}) )
-  CHECK(69, test_expression(&(String){7, 6, "'\\270'"}, &(String){13, 12, "Char('\\270')"}) )
+  CHECK(64, test_expression(&(String){4, 3, "'a'"}, &(String){4, 3, "'a'"}) )
+  CHECK(65, test_expression(&(String){5, 4, "'\\''"}, &(String){5, 4, "'\\''"}) )
+  CHECK(66, test_expression(&(String){5, 4, "'\\n'"}, &(String){5, 4, "'\\n'"}) )
+  CHECK(67, test_expression(&(String){7, 6, "'\\x0f'"}, &(String){7, 6, "'\\x0f'"}) )
+  CHECK(68, test_expression(&(String){7, 6, "'\\xA9'"}, &(String){7, 6, "'\\xA9'"}) )
+  CHECK(69, test_expression(&(String){7, 6, "'\\270'"}, &(String){7, 6, "'\\270'"}) )
   CHECK(70, test_expression_error(&(String){4, 3, "'''"}, &(String){33, 32, "illegal character constant \"'''\""}) )
   CHECK(71, test_expression_error(&(String){4, 3, "'\\'"}, &(String){33, 32, "illegal character constant \"'\\'\""}) )
   CHECK(73, test_expression_error(&(String){5, 4, "'aa'"}, &(String){34, 33, "illegal character constant \"'aa'\""}) )
@@ -149,7 +149,7 @@ Returncode test_string_expression();
 static char* _func_name_test_string_expression = "test-string-expression";
 #define MR_FUNC_NAME _func_name_test_string_expression
 Returncode test_string_expression() {
-  CHECK(92, test_expression(&(String){14, 13, "\"some string\""}, &(String){22, 21, "String(\"some string\")"}) )
+  CHECK(92, test_expression(&(String){14, 13, "\"some string\""}, &(String){14, 13, "\"some string\""}) )
   CHECK(93, test_expression_error(&(String){5, 4, "\"aaa"}, &(String){31, 30, "illegal string constant \"\"aaa\""}) )
   return OK;
 }
@@ -163,7 +163,7 @@ Returncode test_empty_expression();
 static char* _func_name_test_empty_expression = "test-empty-expression";
 #define MR_FUNC_NAME _func_name_test_empty_expression
 Returncode test_empty_expression() {
-  CHECK(97, test_expression(&(String){2, 1, "_"}, &(String){6, 5, "Empty"}) )
+  CHECK(97, test_expression(&(String){2, 1, "_"}, &(String){5, 4, "NULL"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -176,7 +176,7 @@ Returncode test_variable_expression();
 static char* _func_name_test_variable_expression = "test-variable-expression";
 #define MR_FUNC_NAME _func_name_test_variable_expression
 Returncode test_variable_expression() {
-  CHECK(101, test_expression(&(String){9, 8, "var-name"}, &(String){19, 18, "Variable(var-name)"}) )
+  CHECK(101, test_expression(&(String){9, 8, "var-name"}, &(String){9, 8, "var_name"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -202,7 +202,7 @@ Returncode test_type_expression();
 static char* _func_name_test_type_expression = "test-type-expression";
 #define MR_FUNC_NAME _func_name_test_type_expression
 Returncode test_type_expression() {
-  CHECK(109, test_expression(&(String){10, 9, "Type-name"}, &(String){16, 15, "Type(Type-name)"}) )
+  CHECK(109, test_expression(&(String){9, 8, "TypeName"}, &(String){9, 8, "TypeName"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -216,10 +216,10 @@ static char* _func_name_test_member_expression = "test-member-expression";
 #define MR_FUNC_NAME _func_name_test_member_expression
 Returncode test_member_expression() {
   String* expected = &(String){256, 0, (char[256]){0}};
-  CHECK(113, String_copy(expected, &(String){39, 38, "Variable(var-name).Member(member-name)"}))
+  CHECK(113, String_copy(expected, &(String){21, 20, "var_name.member_name"}))
   CHECK(114, test_expression(&(String){21, 20, "var-name.member-name"}, expected) )
-  CHECK(115, String_concat(expected, &(String){32, 31, ".Member(another).Member(member)"}) )
-  CHECK(116, test_expression(&(String){36, 35, "var-name.member-name.another.member"}, expected) )
+  CHECK(115, String_concat(expected, &(String){16, 15, ".another.member"}) )
+  CHECK(116, test_expression(&(String){36, 35, "var_name.member_name.another.member"}, expected) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -232,8 +232,8 @@ Returncode test_slice_expression();
 static char* _func_name_test_slice_expression = "test-slice-expression";
 #define MR_FUNC_NAME _func_name_test_slice_expression
 Returncode test_slice_expression() {
-  CHECK(120, test_expression(&(String){10, 9, "array[13]"}, &(String){25, 24, "Variable(array)[Int(13)]"}) )
-  CHECK(121, test_expression(&(String){11, 10, "array[2:6]"}, &(String){31, 30, "Variable(array)[Int(2):Int(6)]"}) )
+  CHECK(120, test_expression(&(String){10, 9, "array[13]"}, &(String){10, 9, "array[13]"}) )
+  CHECK(121, test_expression(&(String){11, 10, "array[2:6]"}, &(String){11, 10, "array[2:6]"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -246,12 +246,12 @@ Returncode test_call_expression();
 static char* _func_name_test_call_expression = "test-call-expression";
 #define MR_FUNC_NAME _func_name_test_call_expression
 Returncode test_call_expression() {
-  CHECK(125, test_expression(&(String){11, 10, "function()"}, &(String){21, 20, "Variable(function)()"}) )
-  CHECK(126, test_expression(&(String){34, 33, "function(copy 3, user arg, var _)"}, &(String){79, 78, "Variable(function)(Access(0) Int(3), Access(1) Variable(arg), Access(3) Empty)"}) )
-  CHECK(129, test_expression(&(String){34, 33, "function()->(owner arg, copy num)"}, &(String){73, 72, "Variable(function)()->(Access(2) Variable(arg), Access(0) Variable(num))"}) )
-  CHECK(132, test_expression(&(String){30, 29, "function(copy 0)->(owner arg)"}, &(String){64, 63, "Variable(function)(Access(0) Int(0))->(Access(2) Variable(arg))"}) )
-  CHECK(135, test_expression(&(String){28, 27, "function(copy calc(copy 3))"}, &(String){63, 62, "Variable(function)(Access(0) Variable(calc)(Access(0) Int(3)))"}) )
-  CHECK(138, test_expression(&(String){61, 60, "function(\n    copy 2,\n    copy 3)->(\n    copy x,\n    copy y)"}, &(String){103, 102, "Variable(function)(Access(0) Int(2), Access(0) Int(3))->(Access(0) Variable(x), Access(0) Variable(y))"}) )
+  CHECK(125, test_expression(&(String){11, 10, "function()"}, &(String){11, 10, "function()"}) )
+  CHECK(126, test_expression(&(String){34, 33, "function(copy 3, user arg, var _)"}, &(String){23, 22, "function(3, arg, NULL)"}) )
+  CHECK(129, test_expression(&(String){34, 33, "function()->(owner arg, copy num)"}, &(String){25, 24, "function(&(arg), &(num))"}) )
+  CHECK(132, test_expression(&(String){30, 29, "function(copy 0)->(owner arg)"}, &(String){20, 19, "function(0, &(arg))"}) )
+  CHECK(135, test_expression(&(String){28, 27, "function(copy calc(copy 3))"}, &(String){18, 17, "function(calc(3))"}) )
+  CHECK(138, test_expression(&(String){61, 60, "function(\n    copy 2,\n    copy 3)->(\n    copy x,\n    copy y)"}, &(String){27, 26, "function(2, 3, &(x), &(y))"}) )
   CHECK(141, test_expression_error(&(String){18, 17, "function( copy 1)"}, &(String){25, 24, "expected access, got \" \""}) )
   CHECK(143, test_expression_error(&(String){15, 14, "function(user)"}, &(String){37, 36, "expected space after access, got \")\""}) )
   CHECK(145, test_expression_error(&(String){24, 23, "function(copy 4,copy 3)"}, &(String){46, 45, "expected space or new-line after \",\", got \"c\""}) )
@@ -269,7 +269,7 @@ Returncode test_block_expression();
 static char* _func_name_test_block_expression = "test-block-expression";
 #define MR_FUNC_NAME _func_name_test_block_expression
 Returncode test_block_expression() {
-  CHECK(155, test_expression(&(String){6, 5, "(123)"}, &(String){16, 15, "Block(Int(123))"}) )
+  CHECK(155, test_expression(&(String){6, 5, "(123)"}, &(String){6, 5, "(123)"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -282,8 +282,8 @@ Returncode test_unary_expression();
 static char* _func_name_test_unary_expression = "test-unary-expression";
 #define MR_FUNC_NAME _func_name_test_unary_expression
 Returncode test_unary_expression() {
-  CHECK(159, test_expression(&(String){16, 15, "- variable-name"}, &(String){26, 25, "- Variable(variable-name)"}) )
-  CHECK(160, test_expression(&(String){20, 19, "-\n    variable-name"}, &(String){26, 25, "- Variable(variable-name)"}) )
+  CHECK(159, test_expression(&(String){16, 15, "- variable-name"}, &(String){16, 15, "- variable_name"}) )
+  CHECK(160, test_expression(&(String){20, 19, "-\n    variable-name"}, &(String){16, 15, "- variable_name"}) )
   CHECK(161, test_expression_error(&(String){18, 17, "- - variable-name"}, &(String){24, 23, "unexpected operator \"-\""}) )
   CHECK(163, test_expression_error(&(String){5, 4, "[45]"}, &(String){15, 14, "unexpected \"[\""}) )
   return OK;
@@ -298,13 +298,13 @@ Returncode test_binary_expression();
 static char* _func_name_test_binary_expression = "test-binary-expression";
 #define MR_FUNC_NAME _func_name_test_binary_expression
 Returncode test_binary_expression() {
-  CHECK(167, test_expression(&(String){8, 7, "23 + 54"}, &(String){18, 17, "Int(23) + Int(54)"}) )
-  CHECK(168, test_expression(&(String){13, 12, "100 * 2 - 37"}, &(String){28, 27, "Int(100) * Int(2) - Int(37)"}) )
-  CHECK(169, test_expression(&(String){12, 11, "12 *\n    13"}, &(String){18, 17, "Int(12) * Int(13)"}) )
-  CHECK(170, test_expression(&(String){18, 17, "3 < 5 and 23 < 37"}, &(String){37, 36, "Int(3) < Int(5) && Int(23) < Int(37)"}) )
-  CHECK(172, test_expression_error(&(String){8, 7, "345 @ 2"}, &(String){21, 20, "unknown operator \"@\""}) )
-  CHECK(173, test_expression_error(&(String){6, 5, "80 +("}, &(String){15, 14, "unexpected \"(\""}) )
-  CHECK(174, test_expression_error_ends(&(String){16, 15, "- variable-name"}, &(String){24, 23, "unexpected operator \"-\""}, &(String){2, 1, " "}) )
+  CHECK(167, test_expression(&(String){8, 7, "23 + 54"}, &(String){8, 7, "23 + 54"}) )
+  CHECK(168, test_expression(&(String){13, 12, "100 * 2 - 37"}, &(String){13, 12, "100 * 2 - 37"}) )
+  CHECK(169, test_expression(&(String){12, 11, "12 *\n    13"}, &(String){8, 7, "12 * 13"}) )
+  CHECK(170, test_expression(&(String){18, 17, "3 < 5 and 23 < 37"}, &(String){17, 16, "3 < 5 && 23 < 37"}) )
+  CHECK(171, test_expression_error(&(String){8, 7, "345 @ 2"}, &(String){21, 20, "unknown operator \"@\""}) )
+  CHECK(172, test_expression_error(&(String){6, 5, "80 +("}, &(String){15, 14, "unexpected \"(\""}) )
+  CHECK(173, test_expression_error_ends(&(String){16, 15, "- variable-name"}, &(String){24, 23, "unexpected operator \"-\""}, &(String){2, 1, " "}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -317,7 +317,7 @@ Returncode test_question_expression();
 static char* _func_name_test_question_expression = "test-question-expression";
 #define MR_FUNC_NAME _func_name_test_question_expression
 Returncode test_question_expression() {
-  CHECK(179, test_expression(&(String){15, 14, "variable-name?"}, &(String){34, 33, "Question(Variable(variable-name))"}) )
+  CHECK(178, test_expression(&(String){15, 14, "variable-name?"}, &(String){22, 21, "variable_name != NULL"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -330,7 +330,7 @@ Returncode test_single_operand_expression();
 static char* _func_name_test_single_operand_expression = "test-single-operand-expression";
 #define MR_FUNC_NAME _func_name_test_single_operand_expression
 Returncode test_single_operand_expression() {
-  CHECK(184, test_expression_ends(&(String){20, 19, "23 after expression"}, &(String){8, 7, "Int(23)"}, &(String){2, 1, " "}, ' ') )
+  CHECK(182, test_expression_ends(&(String){20, 19, "23 after expression"}, &(String){3, 2, "23"}, &(String){2, 1, " "}, ' ') )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -338,12 +338,12 @@ Returncode test_single_operand_expression() {
 
 
 #if MR_STAGE == MR_DECLARATIONS
-Returncode test_comlex_operand();
+Returncode test_complex_operand();
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_test_comlex_operand = "test-comlex-operand";
-#define MR_FUNC_NAME _func_name_test_comlex_operand
-Returncode test_comlex_operand() {
-  CHECK(189, test_expression(&(String){40, 39, "base.func().array[3].seq[4][70]()()[23]"}, &(String){84, 83, "Base.Member(func)().Member(array)[Int(3)].Member(seq)[Int(4)][Int(70)]()()[Int(23)]"}) )
+static char* _func_name_test_complex_operand = "test-complex-operand";
+#define MR_FUNC_NAME _func_name_test_complex_operand
+Returncode test_complex_operand() {
+  CHECK(187, test_expression(&(String){40, 39, "base.func().array[3].seq[4][70]()()[23]"}, &(String){40, 39, "Base.func().array[3].seq[4][70]()()[23]"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -351,12 +351,12 @@ Returncode test_comlex_operand() {
 
 
 #if MR_STAGE == MR_DECLARATIONS
-Returncode test_comlex_expression();
+Returncode test_complex_expression();
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_test_comlex_expression = "test-comlex-expression";
-#define MR_FUNC_NAME _func_name_test_comlex_expression
-Returncode test_comlex_expression() {
-  CHECK(195, test_expression(&(String){100, 99, "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)"}, &(String){236, 235, "Int(4) + Block(Variable(array)[Int(5)] - Int(23)) > Int(2) + Variable(func)(Access(0) Int(2) + Base.Member(meth)())->(Access(2) Variable(item)).Member(val) || Block(Question(Variable(var).Member(arr)[Int(1)]) && Variable(num) < Int(5))"}) )
+static char* _func_name_test_complex_expression = "test-complex-expression";
+#define MR_FUNC_NAME _func_name_test_complex_expression
+Returncode test_complex_expression() {
+  CHECK(193, test_expression(&(String){100, 99, "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)"}, &(String){96, 95, "4 + (array[5] - 23) > 2 + func(2 + Base.meth(), &(item)).val || (var.arr[1] != NULL && num < 5)"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -369,7 +369,7 @@ Returncode test_no_expression();
 static char* _func_name_test_no_expression = "test-no-expression";
 #define MR_FUNC_NAME _func_name_test_no_expression
 Returncode test_no_expression() {
-  CHECK(201, test_expression_error(&(String){1, 0, ""}, &(String){17, 16, "unexpected \"EOF\""}) )
+  CHECK(199, test_expression_error(&(String){1, 0, ""}, &(String){17, 16, "unexpected \"EOF\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -31,8 +31,13 @@ class CallArgument(Argument)
     if end != ',' and end != ')'
       f-syntax-error-c(user "expected \",\" or \")\", got", copy end)
   
-  func dynamic write-value()
+  func dynamic write(copy Bool is-output)
+    # &(`value`)
+    if is-output
+      write(user "&(")
     self.value.write()
+    if is-output
+      write(user ")")
 
 
 class CallArgumentFactory(ArgumentFactory)

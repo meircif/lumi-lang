@@ -28,7 +28,7 @@ static char* _func_name_SyntaxTreeFlowElement_init = "SyntaxTreeFlowElement.init
 Returncode SyntaxTreeFlowElement_init(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent) {
   self->block = malloc(sizeof(SyntaxTreeBlock));
   if (self->block == NULL) RAISE(8)
-  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, 0, NULL, NULL, NULL};
+  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, 0, NULL, NULL, NULL, NULL};
   self->block->_base._base._dtl = SyntaxTreeBlock__dtl;
   CHECK(9, SyntaxTreeFlowElement_set_parent(self, parent) )
   return OK;
@@ -43,6 +43,7 @@ static char* _func_name_SyntaxTreeFlowElement_set_parent = "SyntaxTreeFlowElemen
 Returncode SyntaxTreeFlowElement_set_parent(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent) {
   self->_base.parent = parent;
   self->block->_base.indentation_spaces = parent->_base.indentation_spaces + 2;
+  self->block->aux_variables = parent->aux_variables;
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -53,8 +54,8 @@ Returncode SyntaxTreeFlowElement_parse_block(SyntaxTreeFlowElement* self, Syntax
 static char* _func_name_SyntaxTreeFlowElement_parse_block = "SyntaxTreeFlowElement.parse-block";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFlowElement_parse_block
 Returncode SyntaxTreeFlowElement_parse_block(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent, Char* end) {
-  CHECK(16, SyntaxTreeFlowElement_init(self, parent) )
-  CHECK(17, SyntaxTreeBlock_parse_block(self->block, &((*end))) )
+  CHECK(17, SyntaxTreeFlowElement_init(self, parent) )
+  CHECK(18, SyntaxTreeBlock_parse_block(self->block, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -65,7 +66,7 @@ Returncode SyntaxTreeFlowElement_write_block(SyntaxTreeFlowElement* self);
 static char* _func_name_SyntaxTreeFlowElement_write_block = "SyntaxTreeFlowElement.write-block";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFlowElement_write_block
 Returncode SyntaxTreeFlowElement_write_block(SyntaxTreeFlowElement* self) {
-  CHECK(20, SyntaxTreeBlock_write_block(self->block) )
+  CHECK(21, SyntaxTreeBlock_write_block(self->block) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -86,7 +87,7 @@ struct SyntaxTreeIf {
   SyntaxTreeFlowElement _base;
   Expression* condition;
   SyntaxTreeElse* else_node;
-};
+/* if (`condition`) { *//*   `block...` *//* } *//* `else-block` */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeIf_parse_new(SyntaxTreeIf* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeIf** new_node);
@@ -95,10 +96,10 @@ static char* _func_name_SyntaxTreeIf_parse_new = "SyntaxTreeIf.parse-new";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_parse_new
 Returncode SyntaxTreeIf_parse_new(SyntaxTreeIf* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeIf** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeIf));
-  if ((*new_node) == NULL) RAISE(30)
+  if ((*new_node) == NULL) RAISE(31)
   *(*new_node) = (SyntaxTreeIf){SyntaxTreeIf__dtl, NULL, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeIf__dtl;
-  CHECK(31, SyntaxTreeIf_parse((*new_node), parent, &((*end))) )
+  CHECK(32, SyntaxTreeIf_parse((*new_node), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -109,8 +110,8 @@ Returncode SyntaxTreeIf_parse(SyntaxTreeIf* self, SyntaxTreeBlock* parent, Char*
 static char* _func_name_SyntaxTreeIf_parse = "SyntaxTreeIf.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_parse
 Returncode SyntaxTreeIf_parse(SyntaxTreeIf* self, SyntaxTreeBlock* parent, Char* end) {
-  CHECK(34, parse_new_expression(&(String){1, 0, ""}, &(self->condition), &((*end))) )
-  CHECK(35, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, &((*end))) )
+  CHECK(35, parse_new_expression(&(String){1, 0, ""}, &(self->condition), &((*end))) )
+  CHECK(36, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -121,7 +122,7 @@ Returncode SyntaxTreeIf_add_else(SyntaxTreeIf* self, SyntaxTreeElse* else_node);
 static char* _func_name_SyntaxTreeIf_add_else = "SyntaxTreeIf.add-else";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_add_else
 Returncode SyntaxTreeIf_add_else(SyntaxTreeIf* self, SyntaxTreeElse* else_node) {
-  CHECK(38, SyntaxTreeFlowElement_set_parent(&(else_node->_base), self->_base._base.parent) )
+  CHECK(39, SyntaxTreeFlowElement_set_parent(&(else_node->_base), self->_base._base.parent) )
   self->else_node = else_node;
   return OK;
 }
@@ -134,36 +135,36 @@ static char* _func_name_SyntaxTreeIf_add_else_if = "SyntaxTreeIf.add-else-if";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_add_else_if
 Returncode SyntaxTreeIf_add_else_if(SyntaxTreeIf* self, SyntaxTreeIf* new_if) {
   self->else_node = malloc(sizeof(SyntaxTreeElse));
-  if (self->else_node == NULL) RAISE(42)
+  if (self->else_node == NULL) RAISE(43)
   *self->else_node = (SyntaxTreeElse){SyntaxTreeElse__dtl, NULL, NULL};
   self->else_node->_base._base._base._dtl = SyntaxTreeElse__dtl;
-  CHECK(43, SyntaxTreeFlowElement_init(&(self->else_node->_base), self->_base._base.parent) )
+  CHECK(44, SyntaxTreeFlowElement_init(&(self->else_node->_base), self->_base._base.parent) )
   self->else_node->_base.block->_base.variables = malloc(sizeof(List));
-  if (self->else_node->_base.block->_base.variables == NULL) RAISE(44)
+  if (self->else_node->_base.block->_base.variables == NULL) RAISE(45)
   *self->else_node->_base.block->_base.variables = (List){NULL, NULL};
-  self->else_node->_base.block->nodes = malloc(sizeof(List));
-  if (self->else_node->_base.block->nodes == NULL) RAISE(45)
-  *self->else_node->_base.block->nodes = (List){NULL, NULL};
-  CHECK(46, List_add(self->else_node->_base.block->nodes, &(new_if->_base._base)) )
-  CHECK(47, SyntaxTreeFlowElement_set_parent(&(new_if->_base), self->else_node->_base.block) )
+  self->else_node->_base.block->_base.code_nodes = malloc(sizeof(List));
+  if (self->else_node->_base.block->_base.code_nodes == NULL) RAISE(46)
+  *self->else_node->_base.block->_base.code_nodes = (List){NULL, NULL};
+  CHECK(47, List_add(self->else_node->_base.block->_base.code_nodes, &(new_if->_base._base)) )
+  CHECK(48, SyntaxTreeFlowElement_set_parent(&(new_if->_base), self->else_node->_base.block) )
   return OK;
 }
 #undef MR_FUNC_NAME
-#endif
+#endif/* if (`condition`) { *//*   `block...` *//* } *//* `else-block` */
 #if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeIf_write(SyntaxTreeIf* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeIf_write = "SyntaxTreeIf.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_write
 Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
-  CHECK(50, write(&(String){5, 4, "if ("}) )
-  CHECK(51, (self->condition)->_dtl[0](self->condition) )
-  CHECK(52, write(&(String){2, 1, ")"}) )
-  CHECK(53, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  CHECK(55, write(&(String){5, 4, "if ("}) )
+  CHECK(56, (self->condition)->_dtl[0](self->condition) )
+  CHECK(57, write(&(String){2, 1, ")"}) )
+  CHECK(58, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   if (NULL != self->else_node) {
-    CHECK(55, write(&(String){2, 1, "\n"}) )
-    CHECK(56, write_spaces(self->_base._base.parent->_base.indentation_spaces) )
-    CHECK(57, (self->else_node)->_base._base._base._dtl[1](self->else_node) )
+    CHECK(60, write(&(String){2, 1, "\n"}) )
+    CHECK(61, write_spaces(self->_base._base.parent->_base.indentation_spaces) )
+    CHECK(62, (self->else_node)->_base._base._base._dtl[1](self->else_node) )
   }
   return OK;
 }
@@ -192,10 +193,10 @@ static char* _func_name_SyntaxTreeElse_parse_new = "SyntaxTreeElse.parse-new";
 #define MR_FUNC_NAME _func_name_SyntaxTreeElse_parse_new
 Returncode SyntaxTreeElse_parse_new(SyntaxTreeElse* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeElse** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeElse));
-  if ((*new_node) == NULL) RAISE(64)
+  if ((*new_node) == NULL) RAISE(69)
   *(*new_node) = (SyntaxTreeElse){SyntaxTreeElse__dtl, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeElse__dtl;
-  CHECK(65, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), parent, &((*end))) )
+  CHECK(70, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -206,8 +207,11 @@ Returncode SyntaxTreeElse_write(SyntaxTreeElse* self);
 static char* _func_name_SyntaxTreeElse_write = "SyntaxTreeElse.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeElse_write
 Returncode SyntaxTreeElse_write(SyntaxTreeElse* self) {
-  CHECK(68, write(&(String){5, 4, "else"}) )
-  CHECK(69, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  /* else { */
+  /*   `block...` */
+  /* } */
+  CHECK(76, write(&(String){5, 4, "else"}) )
+  CHECK(77, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -235,10 +239,10 @@ static char* _func_name_SyntaxTreeDoLoop_parse_new = "SyntaxTreeDoLoop.parse-new
 #define MR_FUNC_NAME _func_name_SyntaxTreeDoLoop_parse_new
 Returncode SyntaxTreeDoLoop_parse_new(SyntaxTreeDoLoop* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeDoLoop** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeDoLoop));
-  if ((*new_node) == NULL) RAISE(76)
+  if ((*new_node) == NULL) RAISE(84)
   *(*new_node) = (SyntaxTreeDoLoop){SyntaxTreeDoLoop__dtl, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeDoLoop__dtl;
-  CHECK(77, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), parent, &((*end))) )
+  CHECK(85, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -249,8 +253,11 @@ Returncode SyntaxTreeDoLoop_write(SyntaxTreeDoLoop* self);
 static char* _func_name_SyntaxTreeDoLoop_write = "SyntaxTreeDoLoop.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeDoLoop_write
 Returncode SyntaxTreeDoLoop_write(SyntaxTreeDoLoop* self) {
-  CHECK(80, write(&(String){3, 2, "do"}) )
-  CHECK(81, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  /* while (true) { */
+  /*   `block...` */
+  /* } */
+  CHECK(91, write(&(String){13, 12, "while (true)"}) )
+  CHECK(92, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -281,10 +288,10 @@ static char* _func_name_SyntaxTreeForLoop_parse_new = "SyntaxTreeForLoop.parse-n
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_parse_new
 Returncode SyntaxTreeForLoop_parse_new(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeForLoop** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeForLoop));
-  if ((*new_node) == NULL) RAISE(92)
+  if ((*new_node) == NULL) RAISE(103)
   *(*new_node) = (SyntaxTreeForLoop){SyntaxTreeForLoop__dtl, NULL, NULL, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeForLoop__dtl;
-  CHECK(93, SyntaxTreeForLoop_parse((*new_node), parent, &((*end))) )
+  CHECK(104, SyntaxTreeForLoop_parse((*new_node), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -295,17 +302,17 @@ Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* par
 static char* _func_name_SyntaxTreeForLoop_parse = "SyntaxTreeForLoop.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_parse
 Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end) {
-  CHECK(96, read_new(&(String){2, 1, " "}, &(self->index_name), &((*end))) )
+  CHECK(107, read_new(&(String){2, 1, " "}, &(self->index_name), &((*end))) )
   if ((*end) != ' ') {
-    CHECK(98, f_syntax_error_c(&(String){37, 36, "expected space after index name, got"}, (*end)) )
+    CHECK(109, f_syntax_error_c(&(String){37, 36, "expected space after index name, got"}, (*end)) )
   }
-  CHECK(99, read_expect(&(String){4, 3, "in "}) )
-  CHECK(100, parse_new_expression(&(String){2, 1, ":"}, &(self->upper_bound), &((*end))) )
+  CHECK(110, read_expect(&(String){4, 3, "in "}) )
+  CHECK(111, parse_new_expression(&(String){2, 1, ":"}, &(self->upper_bound), &((*end))) )
   if ((*end) == ':') {
     self->start = self->upper_bound;
-    CHECK(103, parse_new_expression(&(String){1, 0, ""}, &(self->upper_bound), &((*end))) )
+    CHECK(114, parse_new_expression(&(String){1, 0, ""}, &(self->upper_bound), &((*end))) )
   }
-  CHECK(104, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, &((*end))) )
+  CHECK(115, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -316,19 +323,29 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self);
 static char* _func_name_SyntaxTreeForLoop_write = "SyntaxTreeForLoop.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_write
 Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
-  CHECK(107, write(&(String){6, 5, "for ("}) )
-  CHECK(108, write(self->index_name) )
-  CHECK(109, write(&(String){3, 2, "; "}) )
+  /* {int `index`; for(`index`=`start`; `index`<`upper-bound`; ++`index`) { */
+  /*    `block...` */
+  /* }} */
+  CHECK(121, write(&(String){6, 5, "{int "}) )
+  CHECK(122, write_cname(self->index_name) )
+  CHECK(123, write(&(String){7, 6, "; for("}) )
+  CHECK(124, write_cname(self->index_name) )
+  CHECK(125, write(&(String){2, 1, "="}) )
   if (NULL != self->start) {
-    CHECK(111, (self->start)->_dtl[0](self->start) )
+    CHECK(127, (self->start)->_dtl[0](self->start) )
   }
   else {
-    CHECK(113, write(&(String){2, 1, "0"}) )
+    CHECK(129, write(&(String){2, 1, "0"}) )
   }
-  CHECK(114, write(&(String){3, 2, "; "}) )
-  CHECK(115, (self->upper_bound)->_dtl[0](self->upper_bound) )
-  CHECK(116, write(&(String){2, 1, ")"}) )
-  CHECK(117, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  CHECK(130, write(&(String){3, 2, "; "}) )
+  CHECK(131, write_cname(self->index_name) )
+  CHECK(132, write(&(String){2, 1, "<"}) )
+  CHECK(133, (self->upper_bound)->_dtl[0](self->upper_bound) )
+  CHECK(134, write(&(String){5, 4, "; ++"}) )
+  CHECK(135, write_cname(self->index_name) )
+  CHECK(136, write(&(String){2, 1, ")"}) )
+  CHECK(137, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  CHECK(138, write(&(String){2, 1, "}"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

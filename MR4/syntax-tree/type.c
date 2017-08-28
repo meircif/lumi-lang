@@ -28,7 +28,7 @@ static char* _func_name_SyntaxTreeType_parse_new = "SyntaxTreeType.parse-new";
 Returncode SyntaxTreeType_parse_new(SyntaxTreeType* self, Char* end, SyntaxTreeType** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeType));
   if ((*new_node) == NULL) RAISE(8)
-  *(*new_node) = (SyntaxTreeType){SyntaxTreeType__dtl, 0, NULL, NULL, NULL};
+  *(*new_node) = (SyntaxTreeType){SyntaxTreeType__dtl, 0, NULL, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeType__dtl;
   CHECK(9, SyntaxTreeType_parse((*new_node), &((*end))) )
   return OK;
@@ -57,9 +57,9 @@ Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Cha
 static char* _func_name_SyntaxTreeType_parse_child = "SyntaxTreeType.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeType_parse_child
 Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Char* end) {
-  Bool _Bool74;
-  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool74)) )
-  if (!_Bool74) {
+  Bool _Bool73;
+  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool73)) )
+  if (!_Bool73) {
     CHECK(22, f_syntax_error(&(String){16, 15, "unknown keyword"}, keyword) )
   }
   return OK;
@@ -72,23 +72,30 @@ Returncode SyntaxTreeType_write(SyntaxTreeType* self);
 static char* _func_name_SyntaxTreeType_write = "SyntaxTreeType.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeType_write
 Returncode SyntaxTreeType_write(SyntaxTreeType* self) {
-  CHECK(25, write(&(String){6, 5, "Type("}) )
+  /* typedef struct `name` `name`; */
+  /* struct `name` { */
+  /*   `variables...` */
+  /* }; */
+  /* `functions...` */
   if (!(NULL != self->type_data)) {
-    RAISE(27)
+    RAISE(31)
   }
-  if (!(NULL != self->type_data->name)) {
-    RAISE(29)
-  }
-  CHECK(30, write(self->type_data->name) )
-  CHECK(31, write(&(String){5, 4, ") {\n"}) )
-  CHECK(32, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base._base.variables) )
-  CHECK(33, write(&(String){2, 1, "}"}) )
-  Bool _Bool75;
-  CHECK(34, List_m_is_empty(self->_base.functions, &(_Bool75)) )
-  if (!_Bool75) {
-    CHECK(35, write(&(String){2, 1, "\n"}) )
+  /* write(user "typedef struct ") */
+  /* write-cname(user self.type-data.name) */
+  /* write(user " ") */
+  /* write-cname(user self.type-data.name) */
+  /* write(user ";\n") */
+  CHECK(37, write(&(String){8, 7, "struct "}) )
+  CHECK(38, write_cname(self->type_data->name) )
+  CHECK(39, write(&(String){4, 3, " {\n"}) )
+  CHECK(40, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base._base.variables) )
+  CHECK(41, write(&(String){3, 2, "};"}) )
+  Bool _Bool74;
+  CHECK(42, List_m_is_empty(self->_base.functions, &(_Bool74)) )
+  if (!_Bool74) {
+    CHECK(43, write(&(String){2, 1, "\n"}) )
     self->_base._base.indentation_spaces = 0;
-    CHECK(37, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )
+    CHECK(45, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )
     self->_base._base.indentation_spaces = 2;
   }
   return OK;

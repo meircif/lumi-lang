@@ -98,12 +98,19 @@ Returncode CallArgument_parse_value(CallArgument* self, Char* end) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode CallArgument_write_value(CallArgument* self);
+Returncode CallArgument_write(CallArgument* self, Bool is_output);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallArgument_write_value = "CallArgument.write-value";
-#define MR_FUNC_NAME _func_name_CallArgument_write_value
-Returncode CallArgument_write_value(CallArgument* self) {
-  CHECK(35, (self->value)->_dtl[0](self->value) )
+static char* _func_name_CallArgument_write = "CallArgument.write";
+#define MR_FUNC_NAME _func_name_CallArgument_write
+Returncode CallArgument_write(CallArgument* self, Bool is_output) {
+  /* &(`value`) */
+  if (is_output) {
+    CHECK(37, write(&(String){3, 2, "&("}) )
+  }
+  CHECK(38, (self->value)->_dtl[0](self->value) )
+  if (is_output) {
+    CHECK(40, write(&(String){2, 1, ")"}) )
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -112,7 +119,7 @@ Returncode CallArgument_write_value(CallArgument* self) {
 extern Func CallArgument__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallArgument__dtl[] = {(void*)CallArgument_parse_value, (void*)CallArgument_write_value};
+Func CallArgument__dtl[] = {(void*)CallArgument_parse_value, (void*)CallArgument_write};
 #endif
 
 
@@ -130,7 +137,7 @@ static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactor
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
   CallArgument* _CallArgument12 = malloc(sizeof(CallArgument));
-  if (_CallArgument12 == NULL) RAISE(40)
+  if (_CallArgument12 == NULL) RAISE(45)
   *_CallArgument12 = (CallArgument){CallArgument__dtl, 0, NULL};
   _CallArgument12->_base._dtl = CallArgument__dtl;
   (*new_argument) = &(_CallArgument12->_base);

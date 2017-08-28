@@ -143,10 +143,4 @@ class TextExpression(Expression)
   owner String text
   
   func dynamic write()
-    self.write-text(user self.result-type.type-data.name)
-  
-  func inst write-text(user String type-name)
-    write(user type-name)
-    write(user "(")
     write(user self.text)
-    write(user ")")

@@ -11,6 +11,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
   func inst set-parent(user SyntaxTreeBlock parent)
     self.parent := parent
     self.block.indentation-spaces := parent.indentation-spaces + 2
+    self.block.aux-variables := parent.aux-variables
   
   func inst parse-block(user SyntaxTreeBlock parent):(copy Char end)
     self.init(user parent)
@@ -42,10 +43,14 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     new SyntaxTreeElse in self.else-node
     self.else-node.init(user self.parent)
     new List{SyntaxTreeVariable} in self.else-node.block.variables
-    new List{SyntaxTreeCode} in self.else-node.block.nodes
-    self.else-node.block.nodes.add(owner new-if)
+    new List{SyntaxTreeCode} in self.else-node.block.code-nodes
+    self.else-node.block.code-nodes.add(owner new-if)
     new-if.set-parent(user self.else-node.block)
   
+    # if (`condition`) {
+    #   `block...`
+    # }
+    # `else-block`
   func dynamic write()
     write(user "if (")
     self.condition.write()
@@ -65,6 +70,9 @@ class SyntaxTreeElse(SyntaxTreeFlowElement)
     new-node.parse-block(user parent):(copy end)
   
   func dynamic write()
+    # else {
+    #   `block...`
+    # }
     write(user "else")
     self.write-block()
 
@@ -77,7 +85,10 @@ class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
     new-node.parse-block(user parent):(copy end)
   
   func dynamic write()
-    write(user "do")
+    # while (true) {
+    #   `block...`
+    # }
+    write(user "while (true)")
     self.write-block()
 
 
@@ -104,14 +115,24 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.parse-block(user parent):(copy end)
   
   func dynamic write()
-    write(user "for (")
-    write(user self.index-name)
-    write(user "; ")
+    # {int `index`; for(`index`=`start`; `index`<`upper-bound`; ++`index`) {
+    #    `block...`
+    # }}
+    write(user "{int ")
+    write-cname(user self.index-name)
+    write(user "; for(")
+    write-cname(user self.index-name)
+    write(user "=")
     if ? self.start
       self.start.write()
     else
       write(user "0")
     write(user "; ")
+    write-cname(user self.index-name)
+    write(user "<")
     self.upper-bound.write()
+    write(user "; ++")
+    write-cname(user self.index-name)
     write(user ")")
     self.write-block()
+    write(user "}")

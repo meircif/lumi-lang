@@ -277,21 +277,7 @@ Returncode TextExpression_write(TextExpression* self);
 static char* _func_name_TextExpression_write = "TextExpression.write";
 #define MR_FUNC_NAME _func_name_TextExpression_write
 Returncode TextExpression_write(TextExpression* self) {
-  CHECK(146, TextExpression_write_text(self, self->_base.result_type->type_data->name) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode TextExpression_write_text(TextExpression* self, String* type_name);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_TextExpression_write_text = "TextExpression.write-text";
-#define MR_FUNC_NAME _func_name_TextExpression_write_text
-Returncode TextExpression_write_text(TextExpression* self, String* type_name) {
-  CHECK(149, write(type_name) )
-  CHECK(150, write(&(String){2, 1, "("}) )
-  CHECK(151, write(self->text) )
-  CHECK(152, write(&(String){2, 1, ")"}) )
+  CHECK(146, write(self->text) )
   return OK;
 }
 #undef MR_FUNC_NAME

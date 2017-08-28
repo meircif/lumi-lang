@@ -2,6 +2,7 @@
 
 ## Function node in the syntax tree
 class SyntaxTreeFunction(SyntaxTreeBlock)
+  owner List{TypeCount} aux-variables-owner
   user SyntaxTreeType parent-type
   owner String name
   owner FunctionArguments arguemnts
@@ -12,6 +13,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     new-node.parse(user parent-type):(copy end)
   
   func inst parse(user SyntaxTreeType parent-type):(copy Char end)
+    new List{TypeCount} in self.aux-variables-owner
+    self.aux-variables := self.aux-variables-owner
     self.parent-type := parent-type
     if ? self.parent-type
       self.indentation-spaces := 4
@@ -30,17 +33,18 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.arguemnts.parse(user argument-factory):(copy end)
   
   func dynamic write()
-    if ? self.parent-type
-      write(user self.parent-type.type-data.name)
-      write(user ".")
-    write(user "Function")
+    # Returncode `Type`_`name`(`args`) {
+    #   `block...`
+    # }
     self.write-header()
     self.write-block()
   
   func inst write-header()
-    write(user "(")
-    write(user self.name)
-    write(user ")")
+    write(user "Returncode ")
+    if ? self.parent-type
+      write-cname(user self.parent-type.type-data.name)
+      write(user "_")
+    write-cname(user self.name)
     self.arguemnts.write()
 
 
@@ -56,8 +60,13 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     self.parse-block():(copy end)
   
   func dynamic write()
-    write(user "Main")
+    # USER_MAIN_HEADER {
+    #   `block...`
+    # }
+    # MAIN_FUNC
+    write(user "USER_MAIN_HEADER")
     self.write-block()
+    write(user "\nMAIN_FUNC")
 
 
 ## Native function declaration in the syntax tree
@@ -69,11 +78,12 @@ class SyntaxTreeNativeFunction(SyntaxTreeFunction)
   func inst parse():(copy Char end)
     self.indentation-spaces := 2
     self.parse-header():(copy end)
-    new List{SyntaxTreeCode} in self.nodes
+    new List{SyntaxTreeCode} in self.code-nodes
   
   func dynamic write()
-    write(user "Native")
+    # Returncode `name`(`args`);
     self.write-header()
+    write(user ";")
 
 
 ## Basic function argument
@@ -87,13 +97,7 @@ class Argument
   func dynamic parse-value():(copy Char end)
     raise
   
-  func inst write()
-    write(user "Access(")
-    write-int(copy self.access)
-    write(user ") ")
-    self.write-value()
-  
-  func dynamic write-value()
+  func dynamic write(copy Bool is-output)
     raise
 
 
@@ -109,10 +113,15 @@ class DeclarationArgument(Argument)
       f-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user ",)"):(owner self.name, copy end)
   
-  func dynamic write-value()
-    self.type-instance.write()
+  func dynamic write(copy Bool is-output)
+    # `type`** `name`
+    write-cname(user self.type-instance.type-data.name)
+    if self.access != ACCESS-COPY
+      write(user "*")
+    if is-output
+      write(user "*")
     write(user " ")
-    write(user self.name)
+    write-cname(user self.name)
 
 
 class ArgumentFactory
@@ -163,18 +172,21 @@ static FunctionArguments
     read-c():(copy end)
   
   func inst write()
+    # (`params...`, `outputs...`)
     write(user "(")
     if ? self.parameters.first
       self.write-args(user self.parameters)
     if ? self.outputs.first
-      write(user ")->(")
+      if ? self.parameters.first
+        write(user ", ")
       self.write-args(user self.outputs)
     write(user ")")
   
   func inst write-args(user List{Argument} arguments)
     user ListNode{Argument} node(arguments.first)
+    var Bool is-output(arguments = self.outputs)
     do
-      node.item.write()
+      node.item.write(copy is-output)
       node := node.next
       while ? node
       write(user ", ")
