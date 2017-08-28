@@ -81,6 +81,16 @@ diff ../MR4/tests/integration-expected-single.c \
 diff ../mrb.c mrb.c
 $CCW ../mrb.c ../MR3/mr.3.c -I. -I../MR3 -o mrb
 
+# Standard Libraries
+mkdir standard-libraries
+cp ../standard-libraries/*.3.mr standard-libraries
+cp ../standard-libraries/tests/*.3.mr standard-libraries
+./mr3-compiler standard-libraries/*.3.mr
+$CCW -Wno-unused-variable -Wno-missing-braces \
+  standard-libraries/standard-libraries-tests.c ../MR3/mr.3.c -I. -I../MR3 \
+  -o standard-libraries-tests
+./standard-libraries-tests
+
 # teardown
 cd ..
 rm -rf .test
