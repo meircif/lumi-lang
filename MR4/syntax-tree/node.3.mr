@@ -18,11 +18,20 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   owner List{SyntaxTreeVariable} variables
   owner List{SyntaxTreeCode} code-nodes
   
-  func inst parse-children(user SyntaxTreeType parent-type):(copy Char end)
-    if end != '\n'
-      f-syntax-error-c(user "expected block in a new line, got", copy end)
+  func inst init()
     new List{SyntaxTreeVariable} in self.variables
     new List{SyntaxTreeCode} in self.code-nodes
+  
+  func inst parse-block-children(user SyntaxTreeType parent-type):(
+      copy Char end)
+    if end != '\n'
+      f-syntax-error-c(user "expected block in a new line, got", copy end)
+    self.init()
+    self.parse-children(user parent-type):(copy end)
+    if end != EOF
+      glob.save-input := true
+  
+  func inst parse-children(user SyntaxTreeType parent-type):(copy Char end)
     do
       user String keyword
       var Int spaces
@@ -50,8 +59,6 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         if not glob.save-input and end != '\n'
           # TODO: is possible?
           f-syntax-error-c(user "expected new-line in line end, got", copy end)
-    
-    glob.save-input := true
   
   func inst parse-if-common(
       user String keyword, user SyntaxTreeType parent-type):(
@@ -115,6 +122,7 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
   owner List{SyntaxTreeFunction} functions
   
   func inst init()
+    base.init()
     new List{SyntaxTreeFunction} in self.functions
   
   func inst parse-if-function(
@@ -149,7 +157,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeIf previous-if
   
   func inst parse-block():(copy Char end)
-    self.parse-children(user _):(copy end)
+    self.parse-block-children(user _):(copy end)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node

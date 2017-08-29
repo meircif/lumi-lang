@@ -15,6 +15,21 @@ Returncode TestStruct_get(Int* x, String** s) {
 }
 
 
+struct TopType {
+  BaseType* top_base_ref;
+  MiddleType* top_mid_ref;
+};
+
+struct BaseType {
+  MiddleType* base_mid_ref;
+  TopType* base_top_ref;
+};
+
+struct MiddleType {
+  BaseType* mid_base_ref;
+  TopType* mid_top_ref;
+};
+
 Int global_int;
 
 Int CONSTANT_INT;

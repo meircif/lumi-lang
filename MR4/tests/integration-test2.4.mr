@@ -1,0 +1,9 @@
+{## MR4 compiler integration test file #2
+
+This file should onlw work together with test file #1.
+#}
+
+
+struct MiddleType
+  user BaseType mid-base-ref
+  user TopType mid-top-ref

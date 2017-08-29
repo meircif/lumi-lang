@@ -46,7 +46,7 @@ Returncode SyntaxTreeType_parse(SyntaxTreeType* self, Char* end) {
   String* name = NULL;
   CHECK(15, read_new(&(String){1, 0, ""}, &(name), &((*end))) )
   CHECK(16, Global_add_user_type(glob, name, &(self->type_data)) )
-  CHECK(17, SyntaxTreeBranch_parse_children(&(self->_base._base), self, &((*end))) )
+  CHECK(17, SyntaxTreeBranch_parse_block_children(&(self->_base._base), self, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -57,9 +57,9 @@ Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Cha
 static char* _func_name_SyntaxTreeType_parse_child = "SyntaxTreeType.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeType_parse_child
 Returncode SyntaxTreeType_parse_child(SyntaxTreeType* self, String* keyword, Char* end) {
-  Bool _Bool73;
-  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool73)) )
-  if (!_Bool73) {
+  Bool _Bool74;
+  CHECK(21, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool74)) )
+  if (!_Bool74) {
     CHECK(22, f_syntax_error(&(String){16, 15, "unknown keyword"}, keyword) )
   }
   return OK;
@@ -90,9 +90,9 @@ Returncode SyntaxTreeType_write(SyntaxTreeType* self) {
   CHECK(39, write(&(String){4, 3, " {\n"}) )
   CHECK(40, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base._base.variables) )
   CHECK(41, write(&(String){3, 2, "};"}) )
-  Bool _Bool74;
-  CHECK(42, List_m_is_empty(self->_base.functions, &(_Bool74)) )
-  if (!_Bool74) {
+  Bool _Bool75;
+  CHECK(42, List_m_is_empty(self->_base.functions, &(_Bool75)) )
+  if (!_Bool75) {
     CHECK(43, write(&(String){2, 1, "\n"}) )
     self->_base._base.indentation_spaces = 0;
     CHECK(45, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )

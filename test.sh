@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ev
 
-# setup
+# --< Setup >--
 if [ -z $CC ]; then
   CC=gcc
 fi
@@ -12,22 +12,39 @@ cp *.mr .test
 cp MR*/*.mr .test
 cd .test
 
-# MR0
+
+# --< MR0 >--
+
+# compile mr0-compiler
 $CCW ../MR0/mr0-compiler.c ../MR0/mr0-file.c ../MR0/mr0-string.c -o mr0-compiler
+
+# test mr0-compiler on mr0-compiler
 ./mr0-compiler mr0-compiler.0.mr mr0-compiler.c
 diff ../MR0/mr0-compiler.c mr0-compiler.c
+
+# test mr0-compiler on mr1-compiler files
 ./mr0-compiler mr1-compiler.0.mr mr1-compiler.c
 diff ../MR1/mr1-compiler.c mr1-compiler.c
 
-# MR1
+
+# --< MR1 >--
+
+# compile mr1-compiler
 $CCW ../MR1/mr1-compiler.c ../MR0/mr0-file.c ../MR0/mr0-string.c -I../MR0 \
   -o mr1-compiler
+  
+# test mr1-compiler on mr2-compiler files
 ./mr1-compiler mr2-compiler.1.mr mr2-compiler.c
 diff ../MR2/mr2-compiler.c mr2-compiler.c
 
-# MR2
+
+# --< MR2 >--
+
+# compile mr2-compiler
 $CCW -Wno-parentheses ../MR2/mr2-compiler.c ../MR1/mr.1.c -I../MR1 \
   -o mr2-compiler
+  
+# test mr2-compiler on mr3-compiler files
 ./mr2-compiler common.2.mr map.2.mr global.2.mr exp.2.mr st-node.2.mr \
   flow.2.mr args.2.mr func.2.mr member.2.mr call.2.mr operand.2.mr dec.2.mr \
   type.2.mr test.2.mr mr3-compiler.2.mr
@@ -47,9 +64,14 @@ diff ../MR3/type.c type.c
 diff ../MR3/test.c test.c
 diff ../MR3/mr3-compiler.c mr3-compiler.c
 
-# MR3
+
+# --< MR3 >--
+
+# compile mr3-compiler
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../MR3/mr3-compiler.c ../MR2/mr.2.c -I../MR2 -o mr3-compiler
+
+# test mr3-compiler on mr4-compiler files
 mkdir global expression syntax-tree
 cp ../MR4/global/*.3.mr global
 cp ../MR4/expression/*.3.mr expression
@@ -61,9 +83,14 @@ diff ../MR4/expression expression
 diff ../MR4/syntax-tree syntax-tree
 diff ../MR4/mr4-compiler.c mr4-compiler.c
 
-# MR4
+
+# --< MR4 >--
+
+# compile mr4-compiler
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../MR4/mr4-compiler.c ../MR3/mr.3.c -I../MR3 -I../MR4 -o mr4-compiler
+
+# run mr4-compiler unit-tests
 mkdir tests
 cp ../MR4/tests/*.3.mr tests
 ./mr3-compiler global/*.3.mr expression/*.3.mr syntax-tree/*.3.mr \
@@ -71,17 +98,34 @@ cp ../MR4/tests/*.3.mr tests
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   mr4-compiler.c ../MR3/mr.3.c -I. -I../MR3 -o mr4-compiler-tests
 ./mr4-compiler-tests
+
+# run mr4-compiler single-file integration test
 ./mr4-compiler tests/integration-actual-single.c \
-  ../MR4/tests/integration-test1.4.mr
+  ../MR4/tests/integration-test0.4.mr
 diff ../MR4/tests/integration-expected-single.c \
   tests/integration-actual-single.c
 
-# MRB
+# run mr4-compiler multiple-file integration test
+./mr4-compiler tests/integration-actual-multiple.c \
+  ../MR4/tests/integration-test0.4.mr ../MR4/tests/integration-test1.4.mr \
+  ../MR4/tests/integration-test2.4.mr
+diff ../MR4/tests/integration-expected-multiple.c \
+  tests/integration-actual-multiple.c
+
+
+# --< MRB >--
+
+# test mr3-compiler on mrb files
 ./mr3-compiler mrb.3.mr
 diff ../mrb.c mrb.c
+
+# compile mrb
 $CCW ../mrb.c ../MR3/mr.3.c -I. -I../MR3 -o mrb
 
-# Standard Libraries
+
+# --< Standard Libraries >--
+
+# run standard-libraries unit-tests
 mkdir standard-libraries
 cp ../standard-libraries/*.3.mr standard-libraries
 cp ../standard-libraries/tests/*.3.mr standard-libraries
@@ -91,6 +135,10 @@ $CCW -Wno-unused-variable -Wno-missing-braces \
   -o standard-libraries-tests
 ./standard-libraries-tests
 
-# teardown
+
+# --< Teardown >--
 cd ..
 rm -rf .test
+
+
+# All tests passed

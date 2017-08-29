@@ -1,4 +1,4 @@
-{## MR4 compiler integration test file #1
+{## MR4 compiler integration main test file
 
 This file should be stand-alone.
 
@@ -22,10 +22,10 @@ user String CONSTANT-STRING("a constant string")
 
 
 # Test functions
-func test-func()
+func test-simple-function()
   sys.print(user "I am test func")
 
-func test-func(
+func test-complex-function(
     copy Int num, user String text)->(copy Int out-num, user String out-text)
   {# Test
   multiline
@@ -62,3 +62,7 @@ struct TestStruct
   func get()->(copy Int x, user String s)
     x := self.num
     s := self.text
+
+
+main
+  test-simple-function()

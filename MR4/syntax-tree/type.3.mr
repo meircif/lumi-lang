@@ -14,7 +14,7 @@ class SyntaxTreeType(SyntaxTreeNamespace)
     owner String name
     read-new(user ""):(owner name, copy end)
     glob.add-user-type(owner name):(user self.type-data)
-    self.parse-children(user self):(copy end)
+    self.parse-block-children(user self):(copy end)
   
   ## todo...
   func dynamic parse-child(user String keyword):(copy Char end)
