@@ -1,0 +1,68 @@
+{## MR4 compiler integration main test file
+
+This file should be stand-alone.
+
+Testing multiline documentation
+confused by # or } or }# or # } ?
+#}
+
+{# Test
+multiline
+comment
+#}
+
+## Test Single line documentation
+# Test Single line comment
+
+# Test global variables
+var Int global-int
+var Int CONSTANT-INT(23)
+user String global-string
+user String CONSTANT-STRING("a constant string")
+
+
+# Test functions
+func test-simple-function()
+  sys.print(user "I am test func")
+
+func test-complex-function(
+    copy Int num, user String text)->(copy Int out-num, user String out-text)
+  {# Test
+  multiline
+  comment #}
+
+  # Test Single line comment
+
+  ## Test Single line documentation
+  # Test Single line comment
+  out-num := num
+  out-text := text
+
+
+# Test types
+struct TestStruct
+  ## dosumentation test
+  var Int num
+  
+  {## Test
+  multiline
+  documentation #}
+  user String text
+  
+  # comment test
+  
+  func set(copy Int x, user String s)
+    self.num := x
+    self.text := s
+  
+  {# Test
+  multiline
+  comment #}
+  
+  func get()->(copy Int x, user String s)
+    x := self.num
+    s := self.text
+
+
+main
+  test-simple-function()

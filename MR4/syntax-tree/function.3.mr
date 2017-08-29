@@ -1,0 +1,192 @@
+## MR4 compiler - Syntax tree function
+
+## Function node in the syntax tree
+class SyntaxTreeFunction(SyntaxTreeBlock)
+  owner List{TypeCount} aux-variables-owner
+  user SyntaxTreeType parent-type
+  owner String name
+  owner FunctionArguments arguemnts
+  
+  func inst parse-new(user SyntaxTreeType parent-type):(
+      copy Char end, owner SyntaxTreeFunction new-node)
+    new SyntaxTreeFunction in new-node
+    new-node.parse(user parent-type):(copy end)
+  
+  func inst parse(user SyntaxTreeType parent-type):(copy Char end)
+    new List{TypeCount} in self.aux-variables-owner
+    self.aux-variables := self.aux-variables-owner
+    self.parent-type := parent-type
+    if ? self.parent-type
+      self.indentation-spaces := 4
+    else
+      self.indentation-spaces := 2
+    self.parse-header():(copy end)
+    self.parse-block():(copy end)
+    self.indentation-spaces := 2
+  
+  func inst parse-header():(copy Char end)
+    read-new(user "("):(owner self.name, copy end)
+    if end != '('
+      f-syntax-error-c(user "expected \"(\" after function name, got", copy end)
+    new FunctionArguments in self.arguemnts
+    var ArgumentFactory argument-factory
+    self.arguemnts.parse(user argument-factory):(copy end)
+  
+  func dynamic write()
+    # Returncode `Type`_`name`(`args`) {
+    #   `block...`
+    # }
+    self.write-header()
+    self.write-block()
+  
+  func inst write-header()
+    write(user "Returncode ")
+    if ? self.parent-type
+      write-cname(user self.parent-type.type-data.name)
+      write(user "_")
+    write-cname(user self.name)
+    self.arguemnts.write()
+
+
+## Main function node in the syntax tree
+class SyntaxTreeMainFunction(SyntaxTreeFunction)
+  func inst parse-new():(copy Char end, owner SyntaxTreeMainFunction new-node)
+    new SyntaxTreeMainFunction in new-node
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.indentation-spaces := 2
+    self.name := string-new-copy(user "main")
+    self.parse-block():(copy end)
+  
+  func dynamic write()
+    # USER_MAIN_HEADER {
+    #   `block...`
+    # }
+    # MAIN_FUNC
+    write(user "USER_MAIN_HEADER")
+    self.write-block()
+    write(user "\nMAIN_FUNC")
+
+
+## Native function declaration in the syntax tree
+class SyntaxTreeNativeFunction(SyntaxTreeFunction)
+  func inst parse-new():(copy Char end, owner SyntaxTreeNativeFunction new-node)
+    new SyntaxTreeNativeFunction in new-node
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.indentation-spaces := 2
+    self.parse-header():(copy end)
+    new List{SyntaxTreeCode} in self.code-nodes
+  
+  func dynamic write()
+    # Returncode `name`(`args`);
+    self.write-header()
+    write(user ";")
+
+
+## Basic function argument
+class Argument
+  var Int access
+  
+  func inst parse(user String access-str):(copy Char end)
+    get-access(user access-str):(copy self.access)
+    self.parse-value():(copy end)
+  
+  func dynamic parse-value():(copy Char end)
+    raise
+  
+  func dynamic write(copy Bool is-output)
+    raise
+
+
+## Function declaration argument
+class DeclarationArgument(Argument)
+  owner TypeInstance type-instance
+  owner String name
+  
+  func dynamic parse-value():(copy Char end)
+    new TypeInstance in self.type-instance
+    self.type-instance.parse(user " "):(copy end)
+    if end != ' '
+      f-syntax-error-c(user "expected space after type, got", copy end)
+    read-new(user ",)"):(owner self.name, copy end)
+  
+  func dynamic write(copy Bool is-output)
+    # `type`** `name`
+    write-cname(user self.type-instance.type-data.name)
+    if self.access != ACCESS-COPY
+      write(user "*")
+    if is-output
+      write(user "*")
+    write(user " ")
+    write-cname(user self.name)
+
+
+class ArgumentFactory
+  func dynamic m-new-argument():(owner Argument new-argument)
+    new DeclarationArgument in new-argument
+
+
+## All function parameters and outputs
+static FunctionArguments
+  owner List{Argument} parameters
+  owner List{Argument} outputs
+  
+  func inst parse(user ArgumentFactory argument-factory):(copy Char end)
+    new List{Argument} in self.parameters
+    new List{Argument} in self.outputs
+    self.parse-args(user self.parameters, user argument-factory):(copy end)
+    if end = '-'
+      read-expect(user ">(")
+      self.parse-args(user self.outputs, user argument-factory):(copy end)
+  
+  func inst parse-args(
+      user List{Argument} arguments, user ArgumentFactory argument-factory):(
+      copy Char end)
+    owner Argument argument
+    user String access-str
+    read-until(user " )", copy false):(user access-str, copy end)
+    if end = '\n' and access-str.length = 0
+      read-line-break-spaces()
+      read-until(user " ", copy false):(user access-str, copy end)
+    if end != ')' or access-str.length > 0
+      do
+        if access-str.length = 0
+          f-syntax-error-c(user "expected access, got", copy end)
+        if end != ' '
+          f-syntax-error-c(user "expected space after access, got", copy end)
+        argument-factory.m-new-argument():(owner argument)
+        arguments.add(owner argument)
+        argument.parse(user access-str):(copy end)
+        while end = ','
+        read-c():(copy end)
+        if end = '\n'
+          read-line-break-spaces()
+        else-if end != ' '
+          f-syntax-error-c(
+              user "expected space or new-line after \",\", got",
+              copy end)
+        read-until(user " ", copy false):(user access-str, copy end)
+    read-c():(copy end)
+  
+  func inst write()
+    # (`params...`, `outputs...`)
+    write(user "(")
+    if ? self.parameters.first
+      self.write-args(user self.parameters)
+    if ? self.outputs.first
+      if ? self.parameters.first
+        write(user ", ")
+      self.write-args(user self.outputs)
+    write(user ")")
+  
+  func inst write-args(user List{Argument} arguments)
+    user ListNode{Argument} node(arguments.first)
+    var Bool is-output(arguments = self.outputs)
+    do
+      node.item.write(copy is-output)
+      node := node.next
+      while ? node
+      write(user ", ")

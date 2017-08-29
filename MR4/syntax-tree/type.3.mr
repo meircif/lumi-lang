@@ -1,0 +1,46 @@
+## MR4 compiler - Syntax tree type
+
+## Type node in the syntax tree 
+class SyntaxTreeType(SyntaxTreeNamespace)
+  user TypeData type-data
+  
+  func inst parse-new():(copy Char end, owner SyntaxTreeType new-node)
+    new SyntaxTreeType in new-node
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.init()
+    self.indentation-spaces := 2
+    owner String name
+    read-new(user ""):(owner name, copy end)
+    glob.add-user-type(owner name):(user self.type-data)
+    self.parse-block-children(user self):(copy end)
+  
+  ## todo...
+  func dynamic parse-child(user String keyword):(copy Char end)
+    if not self.parse-if-function(user keyword, user self):(copy end)
+      f-syntax-error(user "unknown keyword", user keyword)
+  
+  func dynamic write()
+    # typedef struct `name` `name`;
+    # struct `name` {
+    #   `variables...`
+    # };
+    # `functions...`
+    if not (? self.type-data)
+      raise
+    # write(user "typedef struct ")
+    # write-cname(user self.type-data.name)
+    # write(user " ")
+    # write-cname(user self.type-data.name)
+    # write(user ";\n")
+    write(user "struct ")
+    write-cname(user self.type-data.name)
+    write(user " {\n")
+    self.write-children(user self.variables)
+    write(user "};")
+    if not self.functions.m-is-empty()
+      write(user "\n")
+      self.indentation-spaces := 0
+      self.write-children(user self.functions)
+      self.indentation-spaces := 2

@@ -1,0 +1,93 @@
+## MR4 compiler - Global compiler data
+
+static Global
+  ## stores all language operators
+  owner NameMap{Operator} operator-map
+  
+  ## stores all types - language built-ins and user defined
+  owner NameMap{TypeData} type-map
+  
+  ## the currently parsed input file object
+  owner File input-file
+  
+  ## the currently written output file object
+  owner File output-file
+  
+  ## holds the name of the input-file and the line number of the code currently
+  ## been worked with
+  user String input-file-name
+  var Int line-number
+  
+  ## current indentation
+  var Int spaces
+  
+  ## input reading state
+  owner String input-buffer
+  var Char input-end
+  var Int input-spaces
+  var Bool got-new-line
+  var Bool save-input
+  
+  ## built-in types
+  user TypeData type-char
+  user TypeData type-bool
+  user TypeData type-int
+  user TypeData type-func
+  user TypeData type-string
+  user TypeData type-array
+  user TypeData type-file
+  user TypeData type-sys
+  
+  func inst init()
+    new String{1024} in self.input-buffer
+    self.init-operator-map()
+    self.init-builtin-types()
+  
+  func inst init-operator-map()
+    new NameMap{Operator} in self.operator-map
+    self.add-operator(user ":=", user "=")
+    self.add-operator-copy(user "+")
+    self.add-operator-copy(user "-")
+    self.add-operator-copy(user "*")
+    self.add-operator-copy(user "/")
+    self.add-operator-copy(user "+=")
+    self.add-operator-copy(user "-=")
+    self.add-operator(user "=", user "==")
+    self.add-operator-copy(user "!=")
+    self.add-operator-copy(user ">")
+    self.add-operator-copy(user "<")
+    self.add-operator-copy(user ">=")
+    self.add-operator-copy(user "<=")
+    self.add-operator(user "not", user "!")
+    self.add-operator(user "or", user "||")
+    self.add-operator(user "and", user "&&")
+  
+  func inst add-operator(user String name, user String c-name)
+    new Operator operator
+    operator.init(user name, user c-name)
+    self.operator-map.add(user operator.name, owner operator)
+  
+  func inst add-operator-copy(user String name)
+    self.add-operator(user name, user name)
+  
+  func inst init-builtin-types()
+    new NameMap{TypeData} in self.type-map
+    self.add-type(user "Char"):(user self.type-char)
+    self.add-type(user "Bool"):(user self.type-bool)
+    self.add-type(user "Int"):(user self.type-int)
+    self.add-type(user "Func"):(user self.type-func)
+    self.add-type(user "String"):(user self.type-string)
+    self.add-type(user "Array"):(user self.type-array)
+    self.add-type(user "File"):(user self.type-file)
+    self.add-type(user "Sys"):(user self.type-sys)
+  
+  func inst add-type(user String name):(user TypeData type-data)
+    self.add-user-type(owner string-new-copy(user name)):(user type-data)
+  
+  func inst add-user-type(owner String name):(user TypeData type-data)
+    new TypeData in type-data
+    type-data.init(owner name)
+    self.type-map.add(user type-data.name, owner type-data)
+
+
+var Global glob

@@ -1,0 +1,127 @@
+## MR4 compiler - Constant expressions
+
+## Return whether `text` is a number of base with given `top-digit`
+func f-is-number(user String text, copy Char top-digit):(copy Bool is-number)
+  is-number := true
+  for n in text.length
+    var Char ch(text[n])
+    if ch < '0' or ch > top-digit
+      is-number := false
+      return
+
+## Return whether `text` is a binary number
+func f-is-binary(user String text):(copy Bool is-octal)
+  f-is-number(user text, copy '1'):(copy is-octal)
+
+## Return whether `text` is an octal number
+func f-is-octal(user String text):(copy Bool is-octal)
+  f-is-number(user text, copy '7'):(copy is-octal)
+
+## Return whether `text` is a decimal number
+func f-is-decimal(user String text):(copy Bool is-octal)
+  f-is-number(user text, copy '9'):(copy is-octal)
+
+## Return whether `text` is a hexadecimal number
+func f-is-hex(user String text):(copy Bool is-hex)
+  is-hex := true
+  for n in text.length
+    var Char ch(text[n])
+    if (ch < '0' or ch > '9') and (ch < 'a' or ch > 'f') and
+        (ch < 'A' or ch > 'F')
+      is-hex := false
+      return
+
+
+## Constant integer expression
+class IntExpression(TextExpression)
+  func inst parse-new(owner String text):(owner Expression expression)
+    new IntExpression int-expression
+    int-expression.parse(owner text)
+    expression := int-expression
+  
+  ## parsing `123` or `-123` or `0b0012` or `0x3d4f`
+  func inst parse(owner String text)
+    user String number(text)
+    if number[0] = '-'
+      number := number[1:number.length - 1]
+    if number[0] = '0' and number.length > 1
+      var Char second(number[1])
+      if second >= '0' and second <= '7'
+        if not f-is-octal(user number)
+          f-syntax-error(user "illegal octal number", user text)
+      else
+        number := number[2:number.length - 2]
+        if second = 'b' or second = 'B'
+          if not f-is-binary(user number)
+            f-syntax-error(user "illegal binary number", user text)
+        else-if second = 'x' or second = 'X'
+          if not f-is-hex(user number)
+            f-syntax-error(user "illegal hexadecimal number", user text)
+        else
+          f-syntax-error(user "illegal number", user text)
+    else-if not f-is-decimal(user number)
+      f-syntax-error(user "illegal number", user text)
+    self.set-simple-type(user glob.type-int)
+    self.text := text
+
+
+## Constant character expression
+class CharExpression(TextExpression)
+  func inst parse-new(owner String text):(owner Expression expression)
+    new CharExpression char-expression
+    char-expression.parse(owner text)
+    expression := char-expression
+  
+  ## parsing `'a'` or `'\n'` or `'\xf5'` or `'\270'`
+  func inst parse(owner String text)
+    var Char ch
+    if text.length = 3
+      ch := text[1]
+      if ch = '\'' or ch = '\\'
+        f-syntax-error(user "illegal character constant", user text)
+    else-if text.length = 4
+      if text[1] != '\\'
+        f-syntax-error(user "illegal character constant", user text)
+      if not "'\"?\\abfnrtv".has(copy text[2])
+        f-syntax-error(user "illegal character constant", user text)
+    else-if text.length = 6
+      if text[1] != '\\'
+        f-syntax-error(user "illegal character constant", user text)
+      ch := text[2]
+      if ch = 'x'
+        if not f-is-hex(user text[3:2])
+          f-syntax-error(user "illegal character constant", user text)
+      else
+        if not f-is-octal(user text[2:3])
+          f-syntax-error(user "illegal character constant", user text)
+    else
+      f-syntax-error(user "illegal character constant", user text)
+    if text[text.length - 1] != '\''
+      f-syntax-error(user "illegal character constant", user text)
+    self.set-simple-type(user glob.type-char)
+    self.text := text
+
+
+## Constant string expression
+class StringExpression(TextExpression)
+  func inst parse-new(owner String text):(owner Expression expression)
+    new StringExpression string-expression
+    string-expression.parse(owner text)
+    expression := string-expression
+  
+  ## parsing `"some string"`
+  func inst parse(owner String text)
+    if text[text.length - 1] != '\"'
+      f-syntax-error(user "illegal string constant", user text)
+    self.set-simple-type(user glob.type-string)
+    self.text := text
+
+
+## Constant empty expression `_`
+class EmptyExpression(Expression)
+  func inst parse-new(owner String text):(owner Expression expression)
+    new EmptyExpression in expression
+    delete text
+  
+  func dynamic write()
+    write(user "NULL")

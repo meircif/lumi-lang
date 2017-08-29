@@ -1,0 +1,46 @@
+## MR4 compiler - Syntax tree testing nodes
+
+## Assert statement in the syntax tree
+class SyntaxTreeAssert(SyntaxTreeCode)
+  owner Expression tested
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeAssert new-node)
+    new SyntaxTreeAssert in new-node
+    new-node.parse(user parent):(copy end)
+  
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.parent := parent
+    parse-new-expression(user ""):(owner self.tested, copy end)
+    f-syntax-error-msg(user "assert not supported yet...")
+
+## Assert-error statement in the syntax tree
+class SyntaxTreeAssertError(SyntaxTreeCode)
+  owner Expression tested
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeAssertError new-node)
+    new SyntaxTreeAssertError in new-node
+    new-node.parse(user parent):(copy end)
+  
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.parent := parent
+    parse-new-expression(user ""):(owner self.tested, copy end)
+    f-syntax-error-msg(user "assert-error not supported yet...")
+
+
+## Test function in the syntax tree
+class SyntaxTreeTestFunction(SyntaxTreeFunction)
+  func inst parse-new():(copy Char end, owner SyntaxTreeTestFunction new-node)
+    new SyntaxTreeTestFunction in new-node
+    new-node.parse(user _):(copy end)
+    f-syntax-error-msg(user "test-function not supported yet...")
+
+
+## Mock function in the syntax tree
+class SyntaxTreeMockFunction(SyntaxTreeFunction)
+  func inst parse-new():(copy Char end, owner SyntaxTreeMockFunction new-node)
+    new SyntaxTreeMockFunction in new-node
+    new-node.parse(user _):(copy end)
+    f-syntax-error-msg(user "mock not supported yet...")
+

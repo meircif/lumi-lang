@@ -1,0 +1,45 @@
+## MR4 compiler - Call expression
+
+## Function call expression
+class CallExpression(Expression)
+  owner Expression function
+  owner FunctionArguments arguments
+  
+  func inst parse-new(user String ends):(
+      owner Expression expression, copy Char end)
+    new CallExpression call-expression
+    call-expression.parse(owner expression):(copy end)
+    expression := call-expression
+  
+  func inst parse(owner Expression function):(copy Char end)
+    self.function := function
+    new FunctionArguments in self.arguments
+    var CallArgumentFactory argument-factory
+    self.arguments.parse(user argument-factory):(copy end)
+  
+  func dynamic write()
+    self.function.write()
+    self.arguments.write()
+
+
+## Function argument call
+class CallArgument(Argument)
+  owner Expression value
+  
+  func dynamic parse-value():(copy Char end)
+    parse-new-expression(user ",)"):(owner self.value, copy end)
+    if end != ',' and end != ')'
+      f-syntax-error-c(user "expected \",\" or \")\", got", copy end)
+  
+  func dynamic write(copy Bool is-output)
+    # &(`value`)
+    if is-output
+      write(user "&(")
+    self.value.write()
+    if is-output
+      write(user ")")
+
+
+class CallArgumentFactory(ArgumentFactory)
+  func dynamic m-new-argument():(owner Argument new-argument)
+    new CallArgument in new-argument

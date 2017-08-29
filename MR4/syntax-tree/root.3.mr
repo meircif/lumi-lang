@@ -1,0 +1,81 @@
+## MR4 compiler - Syntax tree root
+
+## The syntax tree root
+class SyntaxTreeRoot(SyntaxTreeNamespace)
+  owner List{SyntaxTreeType} types
+  user String output-file-name
+  
+  func inst parse(user Array{String} argv)
+    if argv.length < 3
+      sys.print(
+          user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...")
+      raise
+    
+    self.init()
+    self.output-file-name := argv[1]
+    new List{SyntaxTreeType} in self.types
+    for n in 2:argv.length
+      glob.input-file-name := argv[n]
+      glob.line-number := 0
+      file-open(user glob.input-file-name, copy true):(owner glob.input-file)
+      
+      self.parse-children(user _)
+      
+      if glob.input-buffer.length > 0 or glob.input-spaces > 0
+        f-syntax-error-msg(user "no new-line before file end")
+      
+      file-close(owner glob.input-file)
+  
+  func dynamic parse-child(user String keyword):(copy Char end)
+    if self.parse-if-function(user keyword, user _):(copy end)
+      return
+    
+    if keyword.equal(user "struct")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"struct\", got", copy end)
+      self.types.add(owner SyntaxTreeType.parse-new(var _):(copy end))
+      
+    else-if keyword.equal(user "class")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"class\", got", copy end)
+      self.types.add(owner SyntaxTreeType.parse-new(var _):(copy end))
+      
+    else-if keyword.equal(user "main")
+      if end != '\n'
+        f-syntax-error-c(user "expected new-line after \"main\", got", copy end)
+      self.functions.add(owner SyntaxTreeMainFunction.parse-new(var _):(
+          copy end))
+      
+    else-if keyword.equal(user "native")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"native\", got", copy end)
+      self.functions.add(owner SyntaxTreeNativeFunction.parse-new(var _):(
+          copy end))
+      
+    else-if keyword.equal(user "test")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"test\", got", copy end)
+      self.functions.add(owner SyntaxTreeTestFunction.parse-new(var _):(
+          copy end))
+      
+    else-if keyword.equal(user "mock")
+      if end != ' '
+        f-syntax-error-c(user "expected space after \"mock\", got", copy end)
+      self.functions.add(owner SyntaxTreeMockFunction.parse-new(var _):(
+          copy end))
+      
+    else
+      f-syntax-error(user "unknown keyword", user keyword)
+  
+  (## write C file in this order:
+  1. type typedefs
+  2. type structs (ordered by depth)
+  3. function headers
+  4. global variables
+  5. function bodies
+  #)
+  func dynamic write()
+    file-open(user self.output-file-name, copy false):(owner glob.output-file)
+    self.write-children(user self.types)
+    base.write()
+    file-close(owner glob.output-file)

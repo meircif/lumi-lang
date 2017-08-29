@@ -1,0 +1,93 @@
+## MR4 compiler tests - Global
+
+# IO mocks
+
+var String{1024} mock-print-text
+var String{1024} mock-input-file-text
+var String{1024} mock-output-file-text
+var Int mock-input-file-index
+var Bool mock-print-active
+
+mock print(user String text)
+  if mock-print-active
+    mock-print-text.concat(user text)
+  else
+    sys.print-raw(user text)
+
+func set-mock-file-text(user String text)
+  mock-input-file-text.copy(user text)
+  mock-input-file-index := 0
+
+mock file-open(user String name, copy Bool is-read):(owner File file)
+  # do nothing
+
+mock file-close(owner File file)
+  # do nothing
+
+mock file-getc(user File file):(copy Char ch)
+  assert file = glob.input-file
+  if mock-input-file-index >= mock-input-file-text.length
+    ch := EOF
+    return
+  ch := mock-input-file-text[mock-input-file-index]
+  mock-input-file-index += 1
+
+mock file-putc(user File file, copy Char ch)
+  assert file = glob.output-file
+  mock-output-file-text.append(copy ch)
+
+mock file-write(user File file, user String text)
+  assert file = glob.output-file
+  mock-output-file-text.concat(user text)
+
+
+var String{16} mock-input-file-name
+
+func f-setup-test()
+  delete glob.operator-map
+  delete glob.type-map
+  glob.init()
+  glob.input-file-name := mock-input-file-name
+  glob.input-file-name.copy(user "mock.3.mr")
+  glob.line-number := 0
+  glob.save-input := false
+  mock-print-text.clear()
+  mock-input-file-text.clear()
+  mock-output-file-text.clear()
+  mock-input-file-index := 0
+  mock-print-active := false
+
+
+# string assertion
+
+func f-assert-string-slice(
+    user String expected, user String actual, copy Int start, copy Int length)
+  user String actual-slice("")
+  if actual.length >= start + length
+    actual-slice := actual[start:length]
+    if actual-slice.equal(user expected)
+      return
+  else-if actual.length > start
+    actual-slice := actual[start:actual.length - start]
+  sys.print-raw(user "[expected `")
+  sys.print-raw(user expected)
+  sys.print-raw(user "`, got `")
+  sys.print-raw(user actual-slice)
+  sys.print-raw(user "`] ")
+  assert false
+
+func f-assert-string(user String expected, user String actual)
+  f-assert-string-slice(user expected, user actual, copy 0, copy actual.length)
+
+
+# NameMap tests
+
+test test-name-map()
+  var NameMap{String} map
+  assert not (? map.find(user "name1"))
+  map.add(user "name1", owner string-new-copy(user "value1"))
+  f-assert-string(user map.find(user "name1"), user "value1")
+  assert not (? map.find(user "name2"))
+  map.add(user "name2", owner string-new-copy(user "value2"))
+  f-assert-string(user map.find(user "name1"), user "value1")
+  f-assert-string(user map.find(user "name2"), user "value2")

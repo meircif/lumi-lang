@@ -1,0 +1,74 @@
+## MR4 compiler - Syntax tree code nodes
+
+## Expression node in the syntax tree
+class SyntaxTreeExpression(SyntaxTreeCode)
+  owner Expression expression
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeExpression new-node)
+    new SyntaxTreeExpression in new-node
+    new-node.parse(user parent):(copy end)
+  
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.parent := parent
+    parse-new-expression(user ""):(owner self.expression, copy end)
+  
+  func dynamic write()
+    self.expression.write()
+    write(user ";")
+
+
+## Return statement in the syntax tree
+class SyntaxTreeReturn(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeReturn new-node)
+    new SyntaxTreeReturn in new-node
+    new-node.parent := parent
+  
+  func dynamic write()
+    write(user "return OK;")
+
+
+## Raise statement in the syntax tree
+class SyntaxTreeRaise(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeRaise new-node)
+    new SyntaxTreeRaise in new-node
+    new-node.parent := parent
+  
+  func dynamic write()
+    write(user "return ERR;")
+
+
+## While statement in the syntax tree
+class SyntaxTreeWhile(SyntaxTreeCode)
+  owner Expression condition
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeWhile new-node)
+    new SyntaxTreeWhile in new-node
+    new-node.parse(user parent):(copy end)
+  
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.parent := parent
+    parse-new-expression(user ""):(owner self.condition, copy end)
+  
+  func dynamic write()
+    # if (!(`condition`) break;
+    write(user "if (!(")
+    self.condition.write()
+    write(user ")) break;")
+
+
+## Continue statement in the syntax tree
+class SyntaxTreeContinue(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent):(
+      copy Char end, owner SyntaxTreeContinue new-node)
+    new SyntaxTreeContinue in new-node
+    new-node.parent := parent
+  
+  func dynamic write()
+    write(user "continue;")

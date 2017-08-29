@@ -1,0 +1,64 @@
+## MR4 compiler - Syntax tree variable
+
+## Variable node in the syntax tree
+class SyntaxTreeVariable(SyntaxTreeCode)
+  owner Variable variable
+  user SyntaxTreeType parent-type
+  
+  func inst parse-new(copy Int access, user SyntaxTreeType parent-type):(
+      copy Char end,
+      owner SyntaxTreeVariableInit new-init-node,
+      owner SyntaxTreeVariable new-node)
+    new SyntaxTreeVariable in new-node
+    new-node.parse(copy access, user parent-type):(
+        owner new-init-node, copy end)
+  
+  func inst parse(copy Int access, user SyntaxTreeType parent-type):(
+      owner SyntaxTreeVariableInit new-init-node, copy Char end)
+    self.parent-type := parent-type
+    new Variable in self.variable
+    self.variable.access := access
+    new TypeInstance in self.variable.type-instance
+    self.variable.type-instance.parse(user " "):(copy end)
+    if end != ' '
+      f-syntax-error-c(user "expected space after type, got", copy end)
+    read-new(user "("):(owner self.variable.name, copy end)
+    if end = '('
+      SyntaxTreeVariableInit.parse-new(var _, user self.variable):(
+          copy end, owner new-init-node)
+  
+  func dynamic write()
+    # `type`* `name`;
+    self.variable.type-instance.write()
+    if self.variable.access != ACCESS-VAR
+      write(user "*")
+    write(user " ")
+    write-cname(user self.variable.name)
+    write(user ";")
+
+
+## Variable initialization node in the syntax tree
+class SyntaxTreeVariableInit(SyntaxTreeCode)
+  user Variable variable
+  owner Expression value
+  
+  func inst parse-new(user Variable variable):(
+      copy Char end, owner SyntaxTreeVariableInit new-node)
+    new SyntaxTreeVariableInit in new-node
+    new-node.parse(user variable):(copy end)
+  
+  func inst parse(user Variable variable):(copy Char end)
+    self.variable := variable
+    parse-new-expression(user ")"):(owner self.value, copy end)
+    if end != ')'
+      f-syntax-error-c(
+          user "expected \")\" after initialization, got",
+          copy end)
+    read-c():(copy end)
+  
+  func dynamic write()
+    # `name` = `value`;
+    write-cname(user self.variable.name)
+    write(user " = ")
+    self.value.write()
+    write(user ";")
