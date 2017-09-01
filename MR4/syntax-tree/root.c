@@ -20,9 +20,9 @@ struct SyntaxTreeRoot {
   List* types;
   String* output_file_name;
 /*  write C file in this order:
-  1. type typedefs
+  1. type declarations
   2. type structs (ordered by depth)
-  3. function headers
+  3. function declarations
   4. global variables
   5. function bodies
    */};
@@ -158,9 +158,9 @@ Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Cha
 }
 #undef MR_FUNC_NAME
 #endif/*  write C file in this order:
-  1. type typedefs
+  1. type declarations
   2. type structs (ordered by depth)
-  3. function headers
+  3. function declarations
   4. global variables
   5. function bodies
    */
@@ -171,9 +171,63 @@ static char* _func_name_SyntaxTreeRoot_write = "SyntaxTreeRoot.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write
 Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self) {
   CHECK(78, file_open(self->output_file_name, false, &(glob->output_file)) )
-  CHECK(79, SyntaxTreeBranch_write_children(&(self->_base._base), self->types) )
-  CHECK(80, SyntaxTreeNamespace_write(&(self->_base)) )
-  CHECK(81, file_close(glob->output_file) )
+  
+  CHECK(80, write_global(&(String){19, 18, "#include \"mr.4.h\"\n"}) )
+  
+  CHECK(82, write_global(&(String){27, 26, "\n\n/* types declaration */\n"}) )
+  SyntaxTreeTypeDeclarationWriter* type_declaration_writer = &(SyntaxTreeTypeDeclarationWriter){SyntaxTreeTypeDeclarationWriter__dtl};
+  type_declaration_writer->_base._dtl = SyntaxTreeTypeDeclarationWriter__dtl;
+  CHECK(84, SyntaxTreeRoot_write_for_type(self, &(type_declaration_writer->_base)) )
+  
+  /* will write type structs */
+  CHECK(87, write_global(&(String){22, 21, "\n\n/* types struct */\n"}) )
+  CHECK(88, SyntaxTreeBranch_write_children(&(self->_base._base), self->types) )
+  
+  CHECK(90, write_global(&(String){35, 34, "\n\n/* types methods declaration */\n"}) )
+  SyntaxTreeTypeMethodsDeclarationWriter* type_methods_declaration_writer = &(SyntaxTreeTypeMethodsDeclarationWriter){SyntaxTreeTypeMethodsDeclarationWriter__dtl};
+  type_methods_declaration_writer->_base._dtl = SyntaxTreeTypeMethodsDeclarationWriter__dtl;
+  CHECK(92, SyntaxTreeRoot_write_for_type(self, &(type_methods_declaration_writer->_base)) )
+  
+  CHECK(94, write_global(&(String){19, 18, "\n\n/* types DTL */\n"}) )
+  SyntaxTreeTypeDtlWriter* type_dtl_writer = &(SyntaxTreeTypeDtlWriter){SyntaxTreeTypeDtlWriter__dtl};
+  type_dtl_writer->_base._dtl = SyntaxTreeTypeDtlWriter__dtl;
+  CHECK(96, SyntaxTreeRoot_write_for_type(self, &(type_dtl_writer->_base)) )
+  
+  /* will write global variables */
+  CHECK(99, write_global(&(String){26, 25, "\n\n/* global variables */\n"}) )
+  CHECK(100, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base._base.variables) )
+  
+  CHECK(102, write_global(&(String){31, 30, "\n\n/* functions declaration */\n"}) )
+  CHECK(103, SyntaxTreeNamespace_write_functions_declaration(&(self->_base)) )
+  
+  CHECK(105, write_global(&(String){28, 27, "\n\n/* types methods body */\n"}) )
+  SyntaxTreeTypeMethodsBodyWriter* type_methods_body_writer = &(SyntaxTreeTypeMethodsBodyWriter){SyntaxTreeTypeMethodsBodyWriter__dtl};
+  type_methods_body_writer->_base._dtl = SyntaxTreeTypeMethodsBodyWriter__dtl;
+  CHECK(107, SyntaxTreeRoot_write_for_type(self, &(type_methods_body_writer->_base)) )
+  
+  /* will write global functions bodies */
+  CHECK(110, write_global(&(String){31, 30, "\n\n/* global functions body */\n"}) )
+  CHECK(111, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )
+  
+  CHECK(113, file_close(glob->output_file) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, SyntaxTreeTypeWriter* type_writer);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeRoot_write_for_type = "SyntaxTreeRoot.write-for-type";
+#define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write_for_type
+Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, SyntaxTreeTypeWriter* type_writer) {
+  ListNode* child = self->types->first;
+  while (true) {
+    if (!(NULL != child)) break;
+    CHECK(119, write(&(String){2, 1, "\n"}) )
+    CHECK(120, (type_writer)->_dtl[0](type_writer, child->item) )
+    CHECK(121, write(&(String){2, 1, "\n"}) )
+    child = child->next;
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -183,6 +237,20 @@ extern Func SyntaxTreeRoot__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
 Func SyntaxTreeRoot__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeRoot_write, (void*)SyntaxTreeRoot_parse_child};
+#endif
+
+
+/* proxy write function to be mocked on unit-tests */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode write_global(String* text);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_write_global = "write-global";
+#define MR_FUNC_NAME _func_name_write_global
+Returncode write_global(String* text) {
+  CHECK(127, write(text) )
+  return OK;
+}
+#undef MR_FUNC_NAME
 #endif
 
 #undef MR_FILE_NAME

@@ -7,6 +7,7 @@ var String{1024} mock-input-file-text
 var String{1024} mock-output-file-text
 var Int mock-input-file-index
 var Bool mock-print-active
+var Char mock-output-file-last
 
 mock print(user String text)
   if mock-print-active
@@ -38,7 +39,14 @@ mock file-putc(user File file, copy Char ch)
 
 mock file-write(user File file, user String text)
   assert file = glob.output-file
-  mock-output-file-text.concat(user text)
+  for n in text.length
+    var Char ch(text[n])
+    if ch != '\n' or ch != mock-output-file-last
+      mock-output-file-text.append(copy ch)
+    mock-output-file-last := ch
+
+mock write-global(user String text)
+  # do nothing
 
 
 var String{16} mock-input-file-name
@@ -54,6 +62,7 @@ func f-setup-test()
   mock-print-text.clear()
   mock-input-file-text.clear()
   mock-output-file-text.clear()
+  mock-output-file-last := '\0'
   mock-input-file-index := 0
   mock-print-active := false
 

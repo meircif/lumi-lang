@@ -32,6 +32,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     var ArgumentFactory argument-factory
     self.arguemnts.parse(user argument-factory):(copy end)
   
+  ## write function body
   func dynamic write()
     # Returncode `Type`_`name`(`args`) {
     #   `block...`
@@ -46,6 +47,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       write(user "_")
     write-cname(user self.name)
     self.arguemnts.write()
+  
+  func dynamic write-declaration()
+    # Returncode `Type`_`name`(`args`);
+    self.write-header()
+    write(user ";")
 
 
 ## Main function node in the syntax tree
@@ -58,6 +64,9 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     self.indentation-spaces := 2
     self.name := string-new-copy(user "main")
     self.parse-block():(copy end)
+  
+  func dynamic write-declaration()
+    # do nothing
   
   func dynamic write()
     # USER_MAIN_HEADER {
@@ -81,9 +90,7 @@ class SyntaxTreeNativeFunction(SyntaxTreeFunction)
     new List{SyntaxTreeCode} in self.code-nodes
   
   func dynamic write()
-    # Returncode `name`(`args`);
-    self.write-header()
-    write(user ";")
+    # do nothing
 
 
 ## Basic function argument

@@ -128,7 +128,7 @@ Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* 
 extern Func SyntaxTreeTestFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_write_declaration};
 #endif
 
 
@@ -160,7 +160,7 @@ Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* 
 extern Func SyntaxTreeMockFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_write_declaration};
 #endif
 
 

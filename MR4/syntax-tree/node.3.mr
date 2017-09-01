@@ -138,6 +138,15 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
   func dynamic write()
     base.write()
     self.write-children(user self.functions)
+  
+  func inst write-functions-declaration()
+    user ListNode{SyntaxTreeFunction} child(self.functions.first)
+    do
+      while ? child
+      write(user "\n")
+      child.item.write-declaration()
+      write(user "\n")
+      child := child.next
 
 
 ## A basic code node in the syntax tree

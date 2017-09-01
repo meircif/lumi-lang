@@ -13,6 +13,8 @@ func test-global-scope(user String input-text, user String expected-output)
   set-mock-file-text(user input-text)
   mock-input-file-text.append(copy '\n')
   write-syntax-tree()
+  # if mock-output-file-text[0] != '\n'
+  #  print(user mock-output-file-text)
   assert mock-output-file-text[0] = '\n'
   f-assert-string-slice(
       user expected-output,
@@ -48,7 +50,7 @@ func test-code(user String input-text, user String expected-output)
   mock-input-file-text.concat(user input-text)
   mock-input-file-text.append(copy '\n')
   write-syntax-tree()
-  user String expected-header("\nReturncode mock() {\n  ")
+  user String expected-header("\nReturncode mock();\nReturncode mock() {\n  ")
   user String expected-footer("\n}\n")
   f-assert-string-slice(
       user expected-header,
@@ -114,13 +116,13 @@ test test-global()
 test test-type()
   test-global-scope(
       user "struct Test\n  var Int x",
-      user "struct Test {\n  Int x;\n};")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
   test-global-scope(
       user "class Test\n  var Int x",
-      user "struct Test {\n  Int x;\n};")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
   test-global-scope(
       user "struct Test1\n  var Int x\nclass Test2\n  var Int x\n\n\nstruct Test3\n  var Int x",
-      user "struct Test1 {\n  Int x;\n};\n\nstruct Test2 {\n  Int x;\n};\n\nstruct Test3 {\n  Int x;\n};")
+      user "typedef struct Test1 Test1;\ntypedef struct Test2 Test2;\ntypedef struct Test3 Test3;\nstruct Test1 {\n  Int x;\n};\nstruct Test2 {\n  Int x;\n};\nstruct Test3 {\n  Int x;\n};")
   test-global-scope-error(
       user "struct(\n", user "expected space after \"struct\", got \"(\"")
   test-global-scope-error(
@@ -134,25 +136,26 @@ test test-type()
 
 
 test test-function()
-  test-global-scope(user "func name()", user "Returncode name() {\n}")
+  test-global-scope(
+      user "func name()", user "Returncode name();\nReturncode name() {\n}")
   test-global-scope(
       user "func name(var String self, user String text, copy Int num)",
-      user "Returncode name(String* self, String* text, Int num) {\n}")
+      user "Returncode name(String* self, String* text, Int num);\nReturncode name(String* self, String* text, Int num) {\n}")
   test-global-scope(
       user "func name()->(owner String text, copy Int num)",
-      user "Returncode name(String** text, Int* num) {\n}")
+      user "Returncode name(String** text, Int* num);\nReturncode name(String** text, Int* num) {\n}")
   test-global-scope(
       user "func name(copy Char param)->(owner String out)",
-      user "Returncode name(Char param, String** out) {\n}")
+      user "Returncode name(Char param, String** out);\nReturncode name(Char param, String** out) {\n}")
   test-global-scope(
       user "func name(user Array{Int} array)",
-      user "Returncode name(Array* array) {\n}")
+      user "Returncode name(Array* array);\nReturncode name(Array* array) {\n}")
   test-global-scope(
       user "func name(user Array{List{Array{Int}}} array)",
-      user "Returncode name(Array* array) {\n}")
+      user "Returncode name(Array* array);\nReturncode name(Array* array) {\n}")
   test-global-scope(
       user "func name()\n  var Int x",
-      user "Returncode name() {\n  Int x;\n}")
+      user "Returncode name();\nReturncode name() {\n  Int x;\n}")
   test-global-scope(
       user "main\n  var Int x",
       user "USER_MAIN_HEADER {\n  Int x;\n}\nMAIN_FUNC")
@@ -190,14 +193,14 @@ test test-function()
 test test-members()
   test-global-scope(
       user "struct Test\n  var Int x\n  user String str",
-      user "struct Test {\n  Int x;\n  String* str;\n};")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n  String* str;\n};")
   test-global-scope(
       user "struct Test\n  var Int x\n  func name()",
-      user "struct Test {\n  Int x;\n};\n\nReturncode Test_name() {\n}\n")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_name();\nReturncode Test_name() {\n}")
   test-global-scope(
       user "struct Test\n  var Int x\n  func name()\n    var Int x",
-      user "struct Test {\n  Int x;\n};\n\nReturncode Test_name() {\n  Int x;\n}\n")
-  user String expected("struct Test {\n  Int x;\n};")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_name();\nReturncode Test_name() {\n  Int x;\n}")
+  user String expected("typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
   test-global-scope(user "struct Test\n  # comment\n  var Int x", user expected)
   test-global-scope(
       user "struct Test\n  ## documemtation\n  var Int x", user expected)

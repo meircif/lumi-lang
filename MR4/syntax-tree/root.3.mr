@@ -68,14 +68,60 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       f-syntax-error(user "unknown keyword", user keyword)
   
   (## write C file in this order:
-  1. type typedefs
+  1. type declarations
   2. type structs (ordered by depth)
-  3. function headers
+  3. function declarations
   4. global variables
   5. function bodies
   #)
   func dynamic write()
     file-open(user self.output-file-name, copy false):(owner glob.output-file)
+    
+    write-global(user "#include \"mr.4.h\"\n")
+    
+    write-global(user "\n\n/* types declaration */\n")
+    var SyntaxTreeTypeDeclarationWriter type-declaration-writer
+    self.write-for-type(user type-declaration-writer)
+    
+    # will write type structs
+    write-global(user "\n\n/* types struct */\n")
     self.write-children(user self.types)
-    base.write()
+    
+    write-global(user "\n\n/* types methods declaration */\n")
+    var SyntaxTreeTypeMethodsDeclarationWriter type-methods-declaration-writer
+    self.write-for-type(user type-methods-declaration-writer)
+    
+    write-global(user "\n\n/* types DTL */\n")
+    var SyntaxTreeTypeDtlWriter type-dtl-writer
+    self.write-for-type(user type-dtl-writer)
+    
+    # will write global variables
+    write-global(user "\n\n/* global variables */\n")
+    self.write-children(user self.variables)
+    
+    write-global(user "\n\n/* functions declaration */\n")
+    self.write-functions-declaration()
+    
+    write-global(user "\n\n/* types methods body */\n")
+    var SyntaxTreeTypeMethodsBodyWriter type-methods-body-writer
+    self.write-for-type(user type-methods-body-writer)
+    
+    # will write global functions bodies
+    write-global(user "\n\n/* global functions body */\n")
+    self.write-children(user self.functions)
+    
     file-close(owner glob.output-file)
+  
+  func inst write-for-type(user SyntaxTreeTypeWriter type-writer)
+    user ListNode{SyntaxTreeType} child(self.types.first)
+    do
+      while ? child
+      write(user "\n")
+      type-writer.write(user child.item)
+      write(user "\n")
+      child := child.next
+
+
+## proxy write function to be mocked on unit-tests
+func write-global(user String text)
+  write(user text)

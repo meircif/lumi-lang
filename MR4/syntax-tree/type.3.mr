@@ -10,37 +10,66 @@ class SyntaxTreeType(SyntaxTreeNamespace)
   
   func inst parse():(copy Char end)
     self.init()
-    self.indentation-spaces := 2
     owner String name
     read-new(user ""):(owner name, copy end)
     glob.add-user-type(owner name):(user self.type-data)
+    self.indentation-spaces := 2
     self.parse-block-children(user self):(copy end)
+    self.indentation-spaces := 0
   
-  ## todo...
   func dynamic parse-child(user String keyword):(copy Char end)
     if not self.parse-if-function(user keyword, user self):(copy end)
       f-syntax-error(user "unknown keyword", user keyword)
   
-  func dynamic write()
+  func inst write-declaration()
     # typedef struct `name` `name`;
+    if not (? self.type-data)
+      raise
+    write(user "typedef struct ")
+    write-cname(user self.type-data.name)
+    write(user " ")
+    write-cname(user self.type-data.name)
+    write(user ";\n")
+  
+  func dynamic write()
     # struct `name` {
     #   `variables...`
     # };
     # `functions...`
-    if not (? self.type-data)
-      raise
-    # write(user "typedef struct ")
-    # write-cname(user self.type-data.name)
-    # write(user " ")
-    # write-cname(user self.type-data.name)
-    # write(user ";\n")
     write(user "struct ")
     write-cname(user self.type-data.name)
     write(user " {\n")
+    self.indentation-spaces := 2
     self.write-children(user self.variables)
+    self.indentation-spaces := 0
     write(user "};")
-    if not self.functions.m-is-empty()
-      write(user "\n")
-      self.indentation-spaces := 0
-      self.write-children(user self.functions)
-      self.indentation-spaces := 2
+  
+  func inst write-methods-declaration()
+    self.write-functions-declaration()
+  
+  func inst write-dtl()
+    # pass
+  
+  func inst write-methods-body()
+    self.write-children(user self.functions)
+
+
+class SyntaxTreeTypeWriter
+  func dynamic write(user SyntaxTreeType type-node)
+    raise
+
+class SyntaxTreeTypeDeclarationWriter(SyntaxTreeTypeWriter)
+  func dynamic write(user SyntaxTreeType type-node)
+    type-node.write-declaration()
+
+class SyntaxTreeTypeMethodsDeclarationWriter(SyntaxTreeTypeWriter)
+  func dynamic write(user SyntaxTreeType type-node)
+    type-node.write-methods-declaration()
+
+class SyntaxTreeTypeDtlWriter(SyntaxTreeTypeWriter)
+  func dynamic write(user SyntaxTreeType type-node)
+    type-node.write-dtl()
+
+class SyntaxTreeTypeMethodsBodyWriter(SyntaxTreeTypeWriter)
+  func dynamic write(user SyntaxTreeType type-node)
+    type-node.write-methods-body()
