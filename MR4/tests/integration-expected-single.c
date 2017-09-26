@@ -6,7 +6,6 @@
 typedef struct TestStruct TestStruct;
 
 
-
 /* types struct */
 
 struct TestStruct {
@@ -17,16 +16,12 @@ struct TestStruct {
 
 /* types methods declaration */
 
+Returncode TestStruct_set(TestStruct* self, Int x, String* s);
 
-Returncode TestStruct_set(Int x, String* s);
-
-Returncode TestStruct_get(Int* x, String** s);
-
+Returncode TestStruct_get(TestStruct* self, Int* x, String** s);
 
 
-/* types DTL */
-
-
+/* types global variables */
 
 
 /* global variables */
@@ -40,33 +35,29 @@ String* global_string;
 String* CONSTANT_STRING;
 
 
-/* functions declaration */
+/* global functions declaration */
 
-Returncode test_simple_function();
+Returncode test_simple_function(void);
 
 Returncode test_complex_function(Int num, String* text, Int* out_num, String** out_text);
 
 
-
-
 /* types methods body */
 
-
-Returncode TestStruct_set(Int x, String* s) {
+Returncode TestStruct_set(TestStruct* self, Int x, String* s) {
   self.num = x;
   self.text = s;
 }
 
-Returncode TestStruct_get(Int* x, String** s) {
+Returncode TestStruct_get(TestStruct* self, Int* x, String** s) {
   x = self.num;
   s = self.text;
 }
 
 
-
 /* global functions body */
 
-Returncode test_simple_function() {
+Returncode test_simple_function(void) {
   sys.print("I am test func");
 }
 
@@ -74,6 +65,9 @@ Returncode test_complex_function(Int num, String* text, Int* out_num, String** o
   out_num = num;
   out_text = text;
 }
+
+
+/* main function */
 
 USER_MAIN_HEADER {
   test_simple_function();

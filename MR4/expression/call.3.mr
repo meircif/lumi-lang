@@ -15,11 +15,11 @@ class CallExpression(Expression)
     self.function := function
     new FunctionArguments in self.arguments
     var CallArgumentFactory argument-factory
-    self.arguments.parse(user argument-factory):(copy end)
+    self.arguments.parse(user argument-factory, user _):(copy end)
   
   func dynamic write()
     self.function.write()
-    self.arguments.write()
+    self.arguments.write(copy false)
 
 
 ## Function argument call
@@ -30,6 +30,9 @@ class CallArgument(Argument)
     parse-new-expression(user ",)"):(owner self.value, copy end)
     if end != ',' and end != ')'
       f-syntax-error-c(user "expected \",\" or \")\", got", copy end)
+  
+  func dynamic analyze()
+    self.value.analyze()
   
   func dynamic write(copy Bool is-output)
     # &(`value`)

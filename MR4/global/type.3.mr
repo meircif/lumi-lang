@@ -1,42 +1,4 @@
-## MR4 compiler - Meta types
-
-## Meta type for a type in the language
-static TypeData
-  owner String name
-  
-  func inst init(owner String name)
-    self.name := name
-
-
-## Specific usage of a type including the assigned subtype
-static TypeInstance
-  user TypeData type-data
-  owner TypeInstance sub-type
-  
-  ## Return a new deep-copy of self
-  func inst m-copy-new():(owner TypeInstance type-instance)
-    new TypeInstance in type-instance
-    type-instance.type-data := self.type-data
-    if ? self.sub-type
-      self.sub-type.m-copy-new():(owner type-instance.sub-type)
-  
-  func inst parse(user String ends):(copy Char end)
-    new TypeData in self.type-data
-    read-new(user string-new-concat(user ends, user "{")):(
-        owner self.type-data.name, copy end)
-    if end = '{'
-      new TypeInstance in self.sub-type
-      self.sub-type.parse(user "}"):(copy end)
-      if end != '}'
-        f-syntax-error-c(user "expected \"}\", got ", copy end)
-      read-c():(copy end)
-  
-  func inst write()
-    write(user self.type-data.name)
-    if ? self.sub-type
-      write(user "{")
-      self.sub-type.write()
-      write(user "}")
+## MR4 compiler - Meta types - should be moved from here...
 
 
 ## Meta type of an operator
@@ -47,10 +9,3 @@ static Operator
   func inst init(user String name, user String c-name)
     string-new-copy(user name):(owner self.name)
     string-new-copy(user c-name):(owner self.c-name)
-
-
-## Meta type for a variable in the language
-static Variable
-  owner String name
-  var Int access
-  owner TypeInstance type-instance

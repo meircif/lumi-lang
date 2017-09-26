@@ -23,7 +23,7 @@ Returncode test_expression_ends(String* input_text, String* expected_output, Str
   Char end = '\0';
   CHECK(12, parse_new_expression(ends, &(expression), &(end)) )
   TEST_ASSERT(13, end == expected_end)
-  CHECK(14, (expression)->_dtl[0](expression) )
+  CHECK(14, (expression)->_dtl[1](expression) )
   CHECK(15, f_assert_string(expected_output, mock_output_file_text) )
   return OK;
 }
@@ -57,8 +57,8 @@ Returncode test_expression_error_ends(String* input_text, String* expected_error
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char75;
-    CHECK(27, parse_new_expression(ends, &(expression), &(_Char75)) );
+    Char _Char80;
+    CHECK(27, parse_new_expression(ends, &(expression), &(_Char80)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
@@ -390,7 +390,7 @@ Returncode test_no_expression() {
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

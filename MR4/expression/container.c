@@ -28,7 +28,7 @@ static char* _func_name_BlockExpression_parse_new = "BlockExpression.parse-new";
 Returncode BlockExpression_parse_new(BlockExpression* self, Expression** expression, Char* end) {
   BlockExpression* block_expression = malloc(sizeof(BlockExpression));
   if (block_expression == NULL) RAISE(8)
-  *block_expression = (BlockExpression){BlockExpression__dtl, NULL, NULL};
+  *block_expression = (BlockExpression){BlockExpression__dtl, NULL, NULL, NULL};
   block_expression->_base._dtl = BlockExpression__dtl;
   CHECK(9, BlockExpression_parse(block_expression, &((*end))) )
   (*expression) = &(block_expression->_base);
@@ -42,8 +42,8 @@ Returncode BlockExpression_parse(BlockExpression* self, Char* end);
 static char* _func_name_BlockExpression_parse = "BlockExpression.parse";
 #define MR_FUNC_NAME _func_name_BlockExpression_parse
 Returncode BlockExpression_parse(BlockExpression* self, Char* end) {
-  Char _Char21;
-  CHECK(14, parse_new_expression(&(String){2, 1, ")"}, &(self->expression), &(_Char21)) )
+  Char _Char20;
+  CHECK(14, parse_new_expression(&(String){2, 1, ")"}, &(self->expression), &(_Char20)) )
   CHECK(15, read_c(&((*end))) )
   return OK;
 }
@@ -56,7 +56,7 @@ static char* _func_name_BlockExpression_write = "BlockExpression.write";
 #define MR_FUNC_NAME _func_name_BlockExpression_write
 Returncode BlockExpression_write(BlockExpression* self) {
   CHECK(18, write(&(String){2, 1, "("}) )
-  CHECK(19, (self->expression)->_dtl[0](self->expression) )
+  CHECK(19, (self->expression)->_dtl[1](self->expression) )
   CHECK(20, write(&(String){2, 1, ")"}) )
   return OK;
 }
@@ -66,7 +66,7 @@ Returncode BlockExpression_write(BlockExpression* self) {
 extern Func BlockExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BlockExpression__dtl[] = {(void*)BlockExpression_write};
+Func BlockExpression__dtl[] = {(void*)Expression_analyze, (void*)BlockExpression_write};
 #endif
 
 
@@ -105,7 +105,7 @@ static char* _func_name_OperatorExpression_write_operator_and_expresssion = "Ope
 Returncode OperatorExpression_write_operator_and_expresssion(OperatorExpression* self, Expression* expression) {
   CHECK(38, write(self->operator->c_name) )
   CHECK(39, write(&(String){2, 1, " "}) )
-  CHECK(40, (expression)->_dtl[0](expression) )
+  CHECK(40, (expression)->_dtl[1](expression) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -114,7 +114,7 @@ Returncode OperatorExpression_write_operator_and_expresssion(OperatorExpression*
 extern Func OperatorExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func OperatorExpression__dtl[] = {(void*)Expression_write};
+Func OperatorExpression__dtl[] = {(void*)Expression_analyze, (void*)Expression_write};
 #endif
 
 
@@ -135,7 +135,7 @@ static char* _func_name_UnaryExpression_parse_new = "UnaryExpression.parse-new";
 Returncode UnaryExpression_parse_new(UnaryExpression* self, String* ends, Operator* operator, Expression** expression, Char* end) {
   UnaryExpression* unary_expression = malloc(sizeof(UnaryExpression));
   if (unary_expression == NULL) RAISE(49)
-  *unary_expression = (UnaryExpression){UnaryExpression__dtl, NULL, NULL, NULL};
+  *unary_expression = (UnaryExpression){UnaryExpression__dtl, NULL, NULL, NULL, NULL};
   unary_expression->_base._base._dtl = UnaryExpression__dtl;
   CHECK(50, UnaryExpression_parse(unary_expression, operator, ends, &((*end))) )
   (*expression) = &(unary_expression->_base._base);
@@ -169,7 +169,7 @@ Returncode UnaryExpression_write(UnaryExpression* self) {
 extern Func UnaryExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func UnaryExpression__dtl[] = {(void*)UnaryExpression_write};
+Func UnaryExpression__dtl[] = {(void*)Expression_analyze, (void*)UnaryExpression_write};
 #endif
 
 
@@ -192,7 +192,7 @@ static char* _func_name_BinaryExpression_parse_new = "BinaryExpression.parse-new
 Returncode BinaryExpression_parse_new(BinaryExpression* self, String* ends, Operator* operator, Expression** expression, Char* end) {
   BinaryExpression* binary_expression = malloc(sizeof(BinaryExpression));
   if (binary_expression == NULL) RAISE(70)
-  *binary_expression = (BinaryExpression){BinaryExpression__dtl, NULL, NULL, NULL, NULL, NULL};
+  *binary_expression = (BinaryExpression){BinaryExpression__dtl, NULL, NULL, NULL, NULL, NULL, NULL};
   binary_expression->_base._base._dtl = BinaryExpression__dtl;
   CHECK(71, BinaryExpression_parse(binary_expression, (*expression), operator, ends, &((*end))) )
   (*expression) = &(binary_expression->_base._base);
@@ -218,7 +218,7 @@ Returncode BinaryExpression_write(BinaryExpression* self);
 static char* _func_name_BinaryExpression_write = "BinaryExpression.write";
 #define MR_FUNC_NAME _func_name_BinaryExpression_write
 Returncode BinaryExpression_write(BinaryExpression* self) {
-  CHECK(87, (self->left_expression)->_dtl[0](self->left_expression) )
+  CHECK(87, (self->left_expression)->_dtl[1](self->left_expression) )
   CHECK(88, write(&(String){2, 1, " "}) )
   CHECK(89, OperatorExpression_write_operator_and_expresssion(&(self->_base), self->right_expression) )
   return OK;
@@ -229,7 +229,7 @@ Returncode BinaryExpression_write(BinaryExpression* self) {
 extern Func BinaryExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BinaryExpression__dtl[] = {(void*)BinaryExpression_write};
+Func BinaryExpression__dtl[] = {(void*)Expression_analyze, (void*)BinaryExpression_write};
 #endif
 
 
@@ -250,7 +250,7 @@ static char* _func_name_QuestionExpression_parse_new = "QuestionExpression.parse
 Returncode QuestionExpression_parse_new(QuestionExpression* self, Expression** expression, Char* end) {
   QuestionExpression* question_expression = malloc(sizeof(QuestionExpression));
   if (question_expression == NULL) RAISE(97)
-  *question_expression = (QuestionExpression){QuestionExpression__dtl, NULL, NULL};
+  *question_expression = (QuestionExpression){QuestionExpression__dtl, NULL, NULL, NULL};
   question_expression->_base._dtl = QuestionExpression__dtl;
   CHECK(98, QuestionExpression_parse(question_expression, (*expression), &((*end))) )
   (*expression) = &(question_expression->_base);
@@ -276,7 +276,7 @@ Returncode QuestionExpression_write(QuestionExpression* self);
 static char* _func_name_QuestionExpression_write = "QuestionExpression.write";
 #define MR_FUNC_NAME _func_name_QuestionExpression_write
 Returncode QuestionExpression_write(QuestionExpression* self) {
-  CHECK(107, (self->tested)->_dtl[0](self->tested) )
+  CHECK(107, (self->tested)->_dtl[1](self->tested) )
   CHECK(108, write(&(String){9, 8, " != NULL"}) )
   return OK;
 }
@@ -286,7 +286,7 @@ Returncode QuestionExpression_write(QuestionExpression* self) {
 extern Func QuestionExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func QuestionExpression__dtl[] = {(void*)QuestionExpression_write};
+Func QuestionExpression__dtl[] = {(void*)Expression_analyze, (void*)QuestionExpression_write};
 #endif
 
 #undef MR_FILE_NAME
@@ -303,7 +303,7 @@ Func QuestionExpression__dtl[] = {(void*)QuestionExpression_write};
 #include "expression/constant.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

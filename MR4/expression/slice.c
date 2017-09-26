@@ -30,7 +30,7 @@ static char* _func_name_SliceExpression_parse_new = "SliceExpression.parse-new";
 Returncode SliceExpression_parse_new(SliceExpression* self, String* ends, Expression** expression, Char* end) {
   SliceExpression* slice_expression = malloc(sizeof(SliceExpression));
   if (slice_expression == NULL) RAISE(11)
-  *slice_expression = (SliceExpression){SliceExpression__dtl, NULL, NULL, NULL, NULL};
+  *slice_expression = (SliceExpression){SliceExpression__dtl, NULL, NULL, NULL, NULL, NULL};
   slice_expression->_base._dtl = SliceExpression__dtl;
   CHECK(12, SliceExpression_parse(slice_expression, (*expression), &((*end))) )
   (*expression) = &(slice_expression->_base);
@@ -60,12 +60,12 @@ Returncode SliceExpression_write(SliceExpression* self);
 static char* _func_name_SliceExpression_write = "SliceExpression.write";
 #define MR_FUNC_NAME _func_name_SliceExpression_write
 Returncode SliceExpression_write(SliceExpression* self) {
-  CHECK(24, (self->sequence)->_dtl[0](self->sequence) )
+  CHECK(24, (self->sequence)->_dtl[1](self->sequence) )
   CHECK(25, write(&(String){2, 1, "["}) )
-  CHECK(26, (self->index)->_dtl[0](self->index) )
+  CHECK(26, (self->index)->_dtl[1](self->index) )
   if (NULL != self->second_index) {
     CHECK(28, write(&(String){2, 1, ":"}) )
-    CHECK(29, (self->second_index)->_dtl[0](self->second_index) )
+    CHECK(29, (self->second_index)->_dtl[1](self->second_index) )
   }
   CHECK(30, write(&(String){2, 1, "]"}) )
   return OK;
@@ -76,7 +76,7 @@ Returncode SliceExpression_write(SliceExpression* self) {
 extern Func SliceExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SliceExpression__dtl[] = {(void*)SliceExpression_write};
+Func SliceExpression__dtl[] = {(void*)Expression_analyze, (void*)SliceExpression_write};
 #endif
 
 #undef MR_FILE_NAME
@@ -93,7 +93,7 @@ Func SliceExpression__dtl[] = {(void*)SliceExpression_write};
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

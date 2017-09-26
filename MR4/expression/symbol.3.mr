@@ -1,17 +1,23 @@
-## MR4 compiler - Variable expression
+## MR4 compiler - Symbol expression
 
-## A single variable expression
-class VariableExpression(TextExpression)
-  user Variable variable
+## A single symbol expression (variable or global-function)
+class SymbolExpression(TextExpression)
+  user SyntaxTreeVariable variable
+  user SyntaxTreeFunction function
   
   func inst parse-new(owner String text):(owner Expression expression)
-    new VariableExpression variable-expression
-    variable-expression.parse(owner text)
-    expression := variable-expression
+    new SymbolExpression symbol-expression
+    symbol-expression.parse(owner text)
+    expression := symbol-expression
   
-  ## parsing `variable`
+  ## parsing `symbol`
   func inst parse(owner String text)
     self.text := text
+  
+  func dynamic analyze()
+    self.code-node.m-find-variable(user self.text):(user self.variable)
+    if not (? self.variable)
+      glob.root.m-find-function(user self.text):(user self.function)
   
   func dynamic write()
     write-cname(user self.text)
@@ -42,7 +48,7 @@ class TypeExpression(TextExpression)
 
 
 ## An instance member expression
-class MemberExpression(VariableExpression)
+class MemberExpression(SymbolExpression)
   owner Expression instance
   
   func inst parse-new(user String ends):(
@@ -51,7 +57,7 @@ class MemberExpression(VariableExpression)
     member-expression.parse(owner expression, user ends):(copy end)
     expression := member-expression
   
-  ## parsing `instance.variable`
+  ## parsing `instance.symbol`
   func inst parse(owner Expression instance, user String ends):(copy Char end)
     self.instance := instance
     self.read-new-value(user ends):(owner self.text, copy end)

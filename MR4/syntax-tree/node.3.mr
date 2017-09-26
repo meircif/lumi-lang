@@ -22,7 +22,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     new List{SyntaxTreeVariable} in self.variables
     new List{SyntaxTreeCode} in self.code-nodes
   
-  func inst parse-block-children(user SyntaxTreeType parent-type):(
+  func inst parse-block-children(user TypeData parent-type):(
       copy Char end)
     if end != '\n'
       f-syntax-error-c(user "expected block in a new line, got", copy end)
@@ -31,7 +31,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     if end != EOF
       glob.save-input := true
   
-  func inst parse-children(user SyntaxTreeType parent-type):(copy Char end)
+  func inst parse-children(user TypeData parent-type):(copy Char end)
     do
       user String keyword
       var Int spaces
@@ -61,7 +61,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           f-syntax-error-c(user "expected new-line in line end, got", copy end)
   
   func inst parse-if-common(
-      user String keyword, user SyntaxTreeType parent-type):(
+      user String keyword, user TypeData parent-type):(
       copy Char end, copy Bool is-parsed)
     is-parsed := end = ' '
     if not is-parsed
@@ -89,17 +89,37 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     else
       is-parsed := false
   
-  func inst add-variable(user SyntaxTreeType parent-type, copy Int access):(
+  func inst add-variable(user TypeData parent-type, copy Int access):(
       copy Char end)
     owner SyntaxTreeVariableInit var-init
     self.variables.add(owner SyntaxTreeVariable.parse-new(
         var _, copy access, user parent-type):(copy end, owner var-init))
     if ? var-init
       self.code-nodes.add(owner var-init)
-    
   
   func dynamic parse-child(user String keyword):(copy Char end)
     raise
+  
+  func inst m-find-variable(user String name):(user SyntaxTreeVariable variable)
+    user ListNode{SyntaxTreeVariable} child(self.variables.first)
+    do
+      while ? child
+      if child.item.name.equal(user name)
+        variable := child.item
+        return
+      child := child.next
+    variable := _
+  
+  func dynamic analyze()
+    self.analyze-children(user self.variables)
+    self.analyze-children(user self.code-nodes)
+  
+  func inst analyze-children(user List{SyntaxTreeNode} child-list)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      child.item.analyze()
+      child := child.next
   
   func dynamic write()
     self.write-children(user self.variables)
@@ -109,12 +129,15 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     do
       while ? child
       if self.indentation-spaces > 0
-        write-spaces(copy self.indentation-spaces)
+        self.write-spaces()
       else
         write(user "\n")
       child.item.write()
       write(user "\n")
       child := child.next
+  
+  func inst write-spaces()
+    write-spaces(copy self.indentation-spaces)
 
 
 ## A basic namespace node in the syntax tree
@@ -126,7 +149,7 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
     new List{SyntaxTreeFunction} in self.functions
   
   func inst parse-if-function(
-      user String keyword, user SyntaxTreeType parent-type):(
+      user String keyword, user TypeData parent-type):(
       copy Char end, copy Bool is-func)
     keyword.equal(user "func"):(copy is-func)
     if is-func
@@ -134,6 +157,20 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
         f-syntax-error-c(user "expected space after \"func\", got", copy end)
       self.functions.add(owner SyntaxTreeFunction.parse-new(
           var _, user parent-type):(copy end))
+  
+  func inst m-find-function(user String name):(user SyntaxTreeFunction function)
+    user ListNode{SyntaxTreeFunction} child(self.functions.first)
+    do
+      while ? child
+      if child.item.name.equal(user name)
+        function := child.item
+        return
+      child := child.next
+    function := _
+  
+  func dynamic analyze()
+    base.analyze()
+    self.analyze-children(user self.functions)
   
   func dynamic write()
     base.write()
@@ -143,15 +180,21 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
     user ListNode{SyntaxTreeFunction} child(self.functions.first)
     do
       while ? child
-      write(user "\n")
       child.item.write-declaration()
-      write(user "\n")
       child := child.next
 
 
 ## A basic code node in the syntax tree
 class SyntaxTreeCode(SyntaxTreeNode)
   user SyntaxTreeBlock parent
+  
+  func inst m-find-variable(user String name):(user SyntaxTreeVariable variable)
+    self.parent.m-find-variable(user name):(user variable)
+    if not (? variable)
+      glob.root.m-find-variable(user name):(user variable)
+  
+  func inst write-spaces()
+    self.parent.write-spaces()
 
 
 ## Count occurrences of a specific type
@@ -162,6 +205,7 @@ static TypeCount
 
 ## A basic code block node in the syntax tree
 class SyntaxTreeBlock(SyntaxTreeBranch)
+  user SyntaxTreeBlock parent
   user List{TypeCount} aux-variables
   user SyntaxTreeIf previous-if
   
@@ -244,6 +288,11 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
           owner SyntaxTreeExpression.parse-new(var _, user self):(copy end))
     
     self.previous-if := new-if
+  
+  func inst m-find-variable(user String name):(user SyntaxTreeVariable variable)
+    base.m-find-variable(user name):(user variable)
+    if not (? variable) and ? self.parent
+      self.parent.m-find-variable(user name):(user variable)
   
   func inst write-block()
     # `previous-text` {

@@ -2,8 +2,9 @@
 
 ## The syntax tree root
 class SyntaxTreeRoot(SyntaxTreeNamespace)
-  owner List{SyntaxTreeType} types
+  owner List{TypeData} types
   user String output-file-name
+  owner SyntaxTreeMainFunction main-function
   
   func inst parse(user Array{String} argv)
     if argv.length < 3
@@ -13,7 +14,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     
     self.init()
     self.output-file-name := argv[1]
-    new List{SyntaxTreeType} in self.types
+    new List{TypeData} in self.types
     for n in 2:argv.length
       glob.input-file-name := argv[n]
       glob.line-number := 0
@@ -33,18 +34,20 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     if keyword.equal(user "struct")
       if end != ' '
         f-syntax-error-c(user "expected space after \"struct\", got", copy end)
-      self.types.add(owner SyntaxTreeType.parse-new(var _):(copy end))
+      self.types.add(owner TypeData.parse-new(var _, copy false):(
+          copy end))
       
     else-if keyword.equal(user "class")
       if end != ' '
         f-syntax-error-c(user "expected space after \"class\", got", copy end)
-      self.types.add(owner SyntaxTreeType.parse-new(var _):(copy end))
+      self.types.add(owner TypeData.parse-new(var _, copy true):(
+          copy end))
       
     else-if keyword.equal(user "main")
       if end != '\n'
         f-syntax-error-c(user "expected new-line after \"main\", got", copy end)
-      self.functions.add(owner SyntaxTreeMainFunction.parse-new(var _):(
-          copy end))
+      SyntaxTreeMainFunction.parse-new(var _):(
+          copy end, owner self.main-function)
       
     else-if keyword.equal(user "native")
       if end != ' '
@@ -67,6 +70,23 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     else
       f-syntax-error(user "unknown keyword", user keyword)
   
+  func dynamic analyze()
+    self.m-order-types()
+    base.analyze()
+    self.analyze-children(user self.types)
+    if ? self.main-function
+      self.main-function.analyze()
+  
+  func inst m-order-types()
+    new List{TypeData} ordered-list
+    do
+      owner TypeData type-data
+      self.types.m-pop():(owner type-data)
+      while ? type-data
+      type-data.m-order-bases(user ordered-list)
+    delete self.types
+    self.types := ordered-list
+  
   (## write C file in this order:
   1. type declarations
   2. type structs (ordered by depth)
@@ -80,7 +100,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     write-global(user "#include \"mr.4.h\"\n")
     
     write-global(user "\n\n/* types declaration */\n")
-    var SyntaxTreeTypeDeclarationWriter type-declaration-writer
+    var TypeDeclarationWriter type-declaration-writer
     self.write-for-type(user type-declaration-writer)
     
     # will write type structs
@@ -88,37 +108,39 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     self.write-children(user self.types)
     
     write-global(user "\n\n/* types methods declaration */\n")
-    var SyntaxTreeTypeMethodsDeclarationWriter type-methods-declaration-writer
+    var TypeMethodsDeclarationWriter type-methods-declaration-writer
     self.write-for-type(user type-methods-declaration-writer)
     
-    write-global(user "\n\n/* types DTL */\n")
-    var SyntaxTreeTypeDtlWriter type-dtl-writer
-    self.write-for-type(user type-dtl-writer)
+    write-global(user "\n\n/* types global variables */\n")
+    var TypeGlobalWriter type-global-writer
+    self.write-for-type(user type-global-writer)
     
     # will write global variables
     write-global(user "\n\n/* global variables */\n")
     self.write-children(user self.variables)
     
-    write-global(user "\n\n/* functions declaration */\n")
+    write-global(user "\n\n/* global functions declaration */\n")
     self.write-functions-declaration()
     
     write-global(user "\n\n/* types methods body */\n")
-    var SyntaxTreeTypeMethodsBodyWriter type-methods-body-writer
+    var TypeMethodsBodyWriter type-methods-body-writer
     self.write-for-type(user type-methods-body-writer)
     
     # will write global functions bodies
     write-global(user "\n\n/* global functions body */\n")
     self.write-children(user self.functions)
     
+    if ? self.main-function
+      write-global(user "\n\n/* main function */\n")
+      self.main-function.write()
+    
     file-close(owner glob.output-file)
   
-  func inst write-for-type(user SyntaxTreeTypeWriter type-writer)
-    user ListNode{SyntaxTreeType} child(self.types.first)
+  func inst write-for-type(user TypeWriter type-writer)
+    user ListNode{TypeData} child(self.types.first)
     do
       while ? child
-      write(user "\n")
       type-writer.write(user child.item)
-      write(user "\n")
       child := child.next
 
 

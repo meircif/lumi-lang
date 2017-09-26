@@ -52,6 +52,28 @@ Returncode List_add(List* self, void* item) {
 }
 #undef MR_FUNC_NAME
 #endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode List_m_pop(List* self, void** item);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_List_m_pop = "List.m-pop";
+#define MR_FUNC_NAME _func_name_List_m_pop
+Returncode List_m_pop(List* self, void** item) {
+  if (NULL != self->first) {
+    (*item) = ((void*)(self->first->item));
+    ListNode* first = self->first;
+    self->first = first->next;
+    free(first);
+    if (!(NULL != self->first)) {
+      self->last = NULL;
+    }
+  }
+  else {
+    (*item) = NULL;
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
 
 
 #if MR_STAGE == MR_TYPEDEFS
@@ -77,7 +99,7 @@ struct ListNode {
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

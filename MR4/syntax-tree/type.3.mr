@@ -1,18 +1,28 @@
 ## MR4 compiler - Syntax tree type
 
 ## Type node in the syntax tree 
-class SyntaxTreeType(SyntaxTreeNamespace)
-  user TypeData type-data
+class TypeData(SyntaxTreeNamespace)
+  owner String name
+  owner String base-type-name
+  user TypeData base-type
+  owner NameMap{SyntaxTreeFunction} dynamic-base-methods
+  var Bool is-dynamic
+  var Bool is-ordered
   
-  func inst parse-new():(copy Char end, owner SyntaxTreeType new-node)
-    new SyntaxTreeType in new-node
-    new-node.parse():(copy end)
+  func inst parse-new(copy Bool is-dynamic):(
+      copy Char end, owner TypeData new-node)
+    new TypeData in new-node
+    new-node.parse(copy is-dynamic):(copy end)
   
-  func inst parse():(copy Char end)
-    self.init()
-    owner String name
-    read-new(user ""):(owner name, copy end)
-    glob.add-user-type(owner name):(user self.type-data)
+  func inst parse(copy Bool is-dynamic):(copy Char end)
+    read-new(user "("):(owner self.name, copy end)
+    self.is-dynamic := is-dynamic
+    glob.add-type(user self)
+    if end = '('
+      read-new(user ")"):(owner self.base-type-name, copy end)
+      if end != ')'
+        f-syntax-error-c(user "expected ) after base class, got", copy end)
+      read-c():(copy end)
     self.indentation-spaces := 2
     self.parse-block-children(user self):(copy end)
     self.indentation-spaces := 0
@@ -21,55 +31,186 @@ class SyntaxTreeType(SyntaxTreeNamespace)
     if not self.parse-if-function(user keyword, user self):(copy end)
       f-syntax-error(user "unknown keyword", user keyword)
   
+  func inst m-find-meth(user String name):(user SyntaxTreeFunction method)
+    user TypeData type-data(self)
+    do
+      while ? type-data
+      user ListNode{SyntaxTreeFunction} child(type-data.functions.first)
+      do
+        while ? child
+        if child.item.name.equal(user name)
+          method := child.item
+          return
+        child := child.next
+      type-data := type-data.base-type
+    method := _
+  
+  func inst m-order-bases(user List{TypeData} ordered-list)
+    if self.is-ordered
+      return
+    # init `self.base-type`
+    if ? self.base-type-name
+      glob.m-find-type(user self.base-type-name):(user self.base-type)
+      self.base-type.m-order-bases(user ordered-list)
+    ordered-list.add(owner self)
+    # init `self.dynamic-base-methods` and test override methods
+    if self.is-dynamic
+      new NameMap{SyntaxTreeFunction} in self.dynamic-base-methods
+    user ListNode{SyntaxTreeFunction} child(self.functions.first)
+    do
+      while ? child
+      user SyntaxTreeFunction method
+      self.base-type.m-find-meth(user child.item.name):(user method)
+      if ? method
+        child.item.m-compare(user method)
+      else-if child.item.is-dynamic
+        self.dynamic-base-methods.add(user child.item.name, user child.item)
+      child := child.next
+    self.is-ordered := true
+  
   func inst write-declaration()
     # typedef struct `name` `name`;
-    if not (? self.type-data)
-      raise
-    write(user "typedef struct ")
-    write-cname(user self.type-data.name)
+    # typedef struct `name`_Dynamic `name`_Dynamic;
+    write(user "\ntypedef struct ")
+    write-cname(user self.name)
     write(user " ")
-    write-cname(user self.type-data.name)
+    write-cname(user self.name)
     write(user ";\n")
+    if self.is-dynamic
+      write(user "\ntypedef struct ")
+      write-cname(user self.name)
+      write(user "_Dynamic ")
+      write-cname(user self.name)
+      write(user "_Dynamic;\n")
   
   func dynamic write()
     # struct `name` {
     #   `variables...`
     # };
-    # `functions...`
+    # struct `name`_Dynamic {
+    #   `dynamic-function-pointers...`
+    # };
     write(user "struct ")
-    write-cname(user self.type-data.name)
+    write-cname(user self.name)
     write(user " {\n")
     self.indentation-spaces := 2
+    if ? self.base-type
+      self.write-spaces()
+      write-cname(user self.base-type.name)
+      write(user " _base;\n")
     self.write-children(user self.variables)
-    self.indentation-spaces := 0
     write(user "};")
+    if self.is-dynamic
+      write(user "\n\nstruct ")
+      write-cname(user self.name)
+      write(user "_Dynamic {\n")
+      if ? self.base-type and self.base-type.is-dynamic
+        self.write-spaces()
+        write-cname(user self.base-type.name)
+        write(user "_Dynamic _base;\n")
+      user NameMapNode{SyntaxTreeFunction} child(self.dynamic-base-methods.first)
+      do
+        while ? child
+        self.write-spaces()
+        child.value.write-pointer()
+        write(user ";\n")
+        child := child.next
+      write(user "};")
+    self.indentation-spaces := 0
   
   func inst write-methods-declaration()
     self.write-functions-declaration()
   
-  func inst write-dtl()
-    # pass
+  func inst write-global()
+    # `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
+    if self.is-dynamic
+      write(user "\n")
+      write-cname(user self.name)
+      write(user "_Dynamic ")
+      write-cname(user self.name)
+      write(user "_dynamic = ")
+      self.write-dynamic-init(user self)
+      write(user ";\n")
+  
+  func inst write-dynamic-init(user TypeData type-data)
+    write(user "{")
+    var Bool not-first(? type-data.base-type)
+    if not-first
+      self.write-dynamic-init(user type-data.base-type)
+    user NameMapNode{SyntaxTreeFunction} child(type-data.dynamic-base-methods.first)
+    do
+      while ? child
+      user SyntaxTreeFunction method
+      self.m-find-meth(user child.value.name):(user method)
+      if not-first
+        write(user ", ")
+      if method != child.value
+        write(user "(Func)")
+      write-cname(user method.parent-type.name)
+      write(user "_")
+      write-cname(user method.name)
+      not-first := true
+      child := child.next
+    write(user "}")
   
   func inst write-methods-body()
     self.write-children(user self.functions)
 
 
-class SyntaxTreeTypeWriter
-  func dynamic write(user SyntaxTreeType type-node)
+class TypeWriter
+  func dynamic write(user TypeData type-data)
     raise
 
-class SyntaxTreeTypeDeclarationWriter(SyntaxTreeTypeWriter)
-  func dynamic write(user SyntaxTreeType type-node)
-    type-node.write-declaration()
+class TypeDeclarationWriter(TypeWriter)
+  func dynamic write(user TypeData type-data)
+    type-data.write-declaration()
 
-class SyntaxTreeTypeMethodsDeclarationWriter(SyntaxTreeTypeWriter)
-  func dynamic write(user SyntaxTreeType type-node)
-    type-node.write-methods-declaration()
+class TypeMethodsDeclarationWriter(TypeWriter)
+  func dynamic write(user TypeData type-data)
+    type-data.write-methods-declaration()
 
-class SyntaxTreeTypeDtlWriter(SyntaxTreeTypeWriter)
-  func dynamic write(user SyntaxTreeType type-node)
-    type-node.write-dtl()
+class TypeGlobalWriter(TypeWriter)
+  func dynamic write(user TypeData type-data)
+    type-data.write-global()
 
-class SyntaxTreeTypeMethodsBodyWriter(SyntaxTreeTypeWriter)
-  func dynamic write(user SyntaxTreeType type-node)
-    type-node.write-methods-body()
+class TypeMethodsBodyWriter(TypeWriter)
+  func dynamic write(user TypeData type-data)
+    type-data.write-methods-body()
+
+
+## Specific usage of a type including the assigned subtype
+static TypeInstance
+  owner String name
+  user TypeData type-data
+  owner TypeInstance sub-type
+  
+  ## Return a new deep-copy of self
+  func inst m-copy-new():(owner TypeInstance type-instance)
+    new TypeInstance in type-instance
+    string-new-copy(user self.name):(owner type-instance.name)
+    type-instance.type-data := self.type-data
+    if ? self.sub-type
+      self.sub-type.m-copy-new():(owner type-instance.sub-type)
+  
+  func inst parse(user String ends):(copy Char end)
+    read-new(
+        user string-new-concat(user ends, user "{")):(owner self.name, copy end)
+    if end = '{'
+      new TypeInstance in self.sub-type
+      self.sub-type.parse(user "}"):(copy end)
+      if end != '}'
+        f-syntax-error-c(user "expected \"}\", got ", copy end)
+      read-c():(copy end)
+  
+  func inst analyze()
+    if not (? self.type-data)
+      f-find-type(user self.name):(user self.type-data)
+    if ? self.sub-type
+      self.sub-type.analyze()
+  
+  func inst write()
+    write(user self.name)
+    if ? self.sub-type
+      write(user "{")
+      self.sub-type.write()
+      write(user "}")

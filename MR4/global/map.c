@@ -50,15 +50,37 @@ Returncode NameMap_find(NameMap* self, String* name, void** value) {
   NameMapNode* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool10;
-    CHECK(23, String_equal(node->name, name, &(_Bool10)) )
-    if (_Bool10) {
+    Bool _Bool9;
+    CHECK(23, String_equal(node->name, name, &(_Bool9)) )
+    if (_Bool9) {
       (*value) = ((void*)(node->value));
       return OK;
     }
     node = node->next;
   }
   (*value) = NULL;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode NameMap_m_update_or_add(NameMap* self, String* name, void* value);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_NameMap_m_update_or_add = "NameMap.m-update-or-add";
+#define MR_FUNC_NAME _func_name_NameMap_m_update_or_add
+Returncode NameMap_m_update_or_add(NameMap* self, String* name, void* value) {
+  NameMapNode* node = self->first;
+  while (true) {
+    if (!(NULL != node)) break;
+    Bool _Bool10;
+    CHECK(33, String_equal(node->name, name, &(_Bool10)) )
+    if (_Bool10) {
+      node->value = value;
+      return OK;
+    }
+    node = node->next;
+  }
+  CHECK(37, NameMap_add(self, name, value) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -101,7 +123,7 @@ Returncode NameMapNode_init(NameMapNode* self, String* name, void* value) {
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

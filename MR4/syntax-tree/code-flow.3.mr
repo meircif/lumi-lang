@@ -10,6 +10,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
   
   func inst set-parent(user SyntaxTreeBlock parent)
     self.parent := parent
+    self.block.parent := parent
     self.block.indentation-spaces := parent.indentation-spaces + 2
     self.block.aux-variables := parent.aux-variables
   
@@ -58,7 +59,7 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     self.write-block()
     if ? self.else-node
       write(user "\n")
-      write-spaces(copy self.parent.indentation-spaces)
+      self.write-spaces()
       self.else-node.write()
 
 

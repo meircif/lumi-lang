@@ -86,7 +86,21 @@ func f-assert-string-slice(
   assert false
 
 func f-assert-string(user String expected, user String actual)
+  assert ? actual
   f-assert-string-slice(user expected, user actual, copy 0, copy actual.length)
+
+
+# List tests
+test test-list()
+  var List{String} list
+  assert not (? list.m-pop())
+  list.add(owner string-new-copy(user "value1"))
+  list.add(owner string-new-copy(user "value2"))
+  list.add(owner string-new-copy(user "value3"))
+  f-assert-string(user "value1", user list.m-pop())
+  f-assert-string(user "value2", user list.m-pop())
+  f-assert-string(user "value3", user list.m-pop())
+  assert not (? list.m-pop())
 
 
 # NameMap tests
@@ -94,9 +108,9 @@ func f-assert-string(user String expected, user String actual)
 test test-name-map()
   var NameMap{String} map
   assert not (? map.find(user "name1"))
-  map.add(user "name1", owner string-new-copy(user "value1"))
-  f-assert-string(user map.find(user "name1"), user "value1")
+  map.add(user "name1", user "value1")
+  f-assert-string(user "value1", user map.find(user "name1"), )
   assert not (? map.find(user "name2"))
-  map.add(user "name2", owner string-new-copy(user "value2"))
-  f-assert-string(user map.find(user "name1"), user "value1")
-  f-assert-string(user map.find(user "name2"), user "value2")
+  map.add(user "name2", user "value2")
+  f-assert-string(user "value1", user map.find(user "name1"))
+  f-assert-string(user "value2", user map.find(user "name2"))

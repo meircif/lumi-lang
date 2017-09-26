@@ -10,7 +10,7 @@ For example, `array[4] + 3` expression is parsed as:
 BinaryExpression:
   operator: +
   left: SliceExpression:
-    sequence: VariableExpression(array)
+    sequence: SymbolExpression(array)
     index: IntExpression(4)
   right: IntExpression(3)
 #)
@@ -27,6 +27,7 @@ func parse-new-expression(user String ends):(
 ## Currently only the parsing is fully implemented, `write` is implemented only
 ## for testing.
 class Expression
+  user SyntaxTreeCode code-node
   owner TypeInstance result-type
   
   ## Parse any expression
@@ -112,7 +113,7 @@ class Expression
     else-if text.equal(user "base")
       BaseMethExpression.parse-new(var _, owner text):(owner expression)
     else
-      VariableExpression.parse-new(var _, owner text):(owner expression)
+      SymbolExpression.parse-new(var _, owner text):(owner expression)
   
   ## Parse one following part of an operand
   func inst parse-new-follow-operand(user String ends):(
@@ -132,7 +133,10 @@ class Expression
     new TypeInstance in self.result-type
     self.result-type.type-data := type-data
   
-  ## write to C - currently inly used in testing
+  func dynamic analyze()
+    # raise
+  
+  ## write to C
   func dynamic write()
     # should be implemented by each specific expression type
     raise

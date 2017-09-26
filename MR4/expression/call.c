@@ -29,7 +29,7 @@ static char* _func_name_CallExpression_parse_new = "CallExpression.parse-new";
 Returncode CallExpression_parse_new(CallExpression* self, String* ends, Expression** expression, Char* end) {
   CallExpression* call_expression = malloc(sizeof(CallExpression));
   if (call_expression == NULL) RAISE(10)
-  *call_expression = (CallExpression){CallExpression__dtl, NULL, NULL, NULL};
+  *call_expression = (CallExpression){CallExpression__dtl, NULL, NULL, NULL, NULL};
   call_expression->_base._dtl = CallExpression__dtl;
   CHECK(11, CallExpression_parse(call_expression, (*expression), &((*end))) )
   (*expression) = &(call_expression->_base);
@@ -49,7 +49,7 @@ Returncode CallExpression_parse(CallExpression* self, Expression* function, Char
   *self->arguments = (FunctionArguments){NULL, NULL};
   CallArgumentFactory* argument_factory = &(CallArgumentFactory){CallArgumentFactory__dtl};
   argument_factory->_base._dtl = CallArgumentFactory__dtl;
-  CHECK(18, FunctionArguments_parse(self->arguments, &(argument_factory->_base), &((*end))) )
+  CHECK(18, FunctionArguments_parse(self->arguments, &(argument_factory->_base), NULL, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -60,8 +60,8 @@ Returncode CallExpression_write(CallExpression* self);
 static char* _func_name_CallExpression_write = "CallExpression.write";
 #define MR_FUNC_NAME _func_name_CallExpression_write
 Returncode CallExpression_write(CallExpression* self) {
-  CHECK(21, (self->function)->_dtl[0](self->function) )
-  CHECK(22, FunctionArguments_write(self->arguments) )
+  CHECK(21, (self->function)->_dtl[1](self->function) )
+  CHECK(22, FunctionArguments_write(self->arguments, false) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -70,7 +70,7 @@ Returncode CallExpression_write(CallExpression* self) {
 extern Func CallExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallExpression__dtl[] = {(void*)CallExpression_write};
+Func CallExpression__dtl[] = {(void*)Expression_analyze, (void*)CallExpression_write};
 #endif
 
 
@@ -98,6 +98,17 @@ Returncode CallArgument_parse_value(CallArgument* self, Char* end) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode CallArgument_analyze(CallArgument* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_CallArgument_analyze = "CallArgument.analyze";
+#define MR_FUNC_NAME _func_name_CallArgument_analyze
+Returncode CallArgument_analyze(CallArgument* self) {
+  CHECK(35, (self->value)->_dtl[0](self->value) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode CallArgument_write(CallArgument* self, Bool is_output);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_CallArgument_write = "CallArgument.write";
@@ -105,11 +116,11 @@ static char* _func_name_CallArgument_write = "CallArgument.write";
 Returncode CallArgument_write(CallArgument* self, Bool is_output) {
   /* &(`value`) */
   if (is_output) {
-    CHECK(37, write(&(String){3, 2, "&("}) )
+    CHECK(40, write(&(String){3, 2, "&("}) )
   }
-  CHECK(38, (self->value)->_dtl[0](self->value) )
+  CHECK(41, (self->value)->_dtl[1](self->value) )
   if (is_output) {
-    CHECK(40, write(&(String){2, 1, ")"}) )
+    CHECK(43, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }
@@ -119,7 +130,7 @@ Returncode CallArgument_write(CallArgument* self, Bool is_output) {
 extern Func CallArgument__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallArgument__dtl[] = {(void*)CallArgument_parse_value, (void*)CallArgument_write};
+Func CallArgument__dtl[] = {(void*)CallArgument_parse_value, (void*)CallArgument_analyze, (void*)CallArgument_write};
 #endif
 
 
@@ -136,11 +147,11 @@ Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argumen
 static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactory.m-new-argument";
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
-  CallArgument* _CallArgument12 = malloc(sizeof(CallArgument));
-  if (_CallArgument12 == NULL) RAISE(45)
-  *_CallArgument12 = (CallArgument){CallArgument__dtl, 0, NULL};
-  _CallArgument12->_base._dtl = CallArgument__dtl;
-  (*new_argument) = &(_CallArgument12->_base);
+  CallArgument* _CallArgument11 = malloc(sizeof(CallArgument));
+  if (_CallArgument11 == NULL) RAISE(48)
+  *_CallArgument11 = (CallArgument){CallArgument__dtl, 0, NULL};
+  _CallArgument11->_base._dtl = CallArgument__dtl;
+  (*new_argument) = &(_CallArgument11->_base);
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -166,7 +177,7 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

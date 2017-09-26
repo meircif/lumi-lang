@@ -16,6 +16,17 @@ static List{Generic}
     else
       self.first := node
     self.last := node
+  
+  func inst m-pop():(owner Generic item)
+    if ? self.first
+      item := self.first.item
+      owner ListNode{Generic} first(self.first)
+      self.first := first.next
+      delete first
+      if not (? self.first)
+        self.last := _
+    else
+      item := _
 
 
 static ListNode{Generic}

@@ -53,7 +53,7 @@ Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self);
 static char* _func_name_SyntaxTreeExpression_write = "SyntaxTreeExpression.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_write
 Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
-  CHECK(17, (self->expression)->_dtl[0](self->expression) )
+  CHECK(17, (self->expression)->_dtl[1](self->expression) )
   CHECK(18, write(&(String){2, 1, ";"}) )
   return OK;
 }
@@ -195,7 +195,7 @@ static char* _func_name_SyntaxTreeWhile_write = "SyntaxTreeWhile.write";
 Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
   /* if (!(`condition`) break; */
   CHECK(60, write(&(String){7, 6, "if (!("}) )
-  CHECK(61, (self->condition)->_dtl[0](self->condition) )
+  CHECK(61, (self->condition)->_dtl[1](self->condition) )
   CHECK(62, write(&(String){10, 9, ")) break;"}) )
   return OK;
 }
@@ -265,7 +265,7 @@ Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTr
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
 #include "syntax-tree/node.c"

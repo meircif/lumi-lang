@@ -116,7 +116,7 @@ static char* _func_name_SyntaxTreeTestFunction_parse_new = "SyntaxTreeTestFuncti
 Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* end, SyntaxTreeTestFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeTestFunction));
   if ((*new_node) == NULL) RAISE(35)
-  *(*new_node) = (SyntaxTreeTestFunction){SyntaxTreeTestFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  *(*new_node) = (SyntaxTreeTestFunction){SyntaxTreeTestFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeTestFunction__dtl;
   CHECK(36, SyntaxTreeFunction_parse(&((*new_node)->_base), NULL, &((*end))) )
   CHECK(37, f_syntax_error_msg(&(String){35, 34, "test-function not supported yet..."}) )
@@ -128,7 +128,7 @@ Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* 
 extern Func SyntaxTreeTestFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_write_declaration};
+Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
 #endif
 
 
@@ -148,7 +148,7 @@ static char* _func_name_SyntaxTreeMockFunction_parse_new = "SyntaxTreeMockFuncti
 Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* end, SyntaxTreeMockFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMockFunction));
   if ((*new_node) == NULL) RAISE(43)
-  *(*new_node) = (SyntaxTreeMockFunction){SyntaxTreeMockFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  *(*new_node) = (SyntaxTreeMockFunction){SyntaxTreeMockFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMockFunction__dtl;
   CHECK(44, SyntaxTreeFunction_parse(&((*new_node)->_base), NULL, &((*end))) )
   CHECK(45, f_syntax_error_msg(&(String){26, 25, "mock not supported yet..."}) )
@@ -160,7 +160,7 @@ Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* 
 extern Func SyntaxTreeMockFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_write_declaration};
+Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
 #endif
 
 
@@ -179,7 +179,7 @@ Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)Synt
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
