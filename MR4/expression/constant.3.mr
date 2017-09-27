@@ -121,6 +121,7 @@ class StringExpression(TextExpression)
 class EmptyExpression(Expression)
   func inst parse-new(owner String text):(owner Expression expression)
     new EmptyExpression in expression
+    expression.set-simple-type(user glob.type-empty)
     delete text
   
   func dynamic write()

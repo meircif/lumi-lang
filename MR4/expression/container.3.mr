@@ -11,7 +11,7 @@ class BlockExpression(Expression)
   
   ## parsing `(expression)`
   func inst parse():(copy Char end)
-    parse-new-expression(user ")"):(owner self.expression)
+    self.parse-sub-expression(user ")"):(owner self.expression)
     read-c():(copy end)
   
   func dynamic write()
@@ -24,14 +24,14 @@ class BlockExpression(Expression)
 class OperatorExpression(Expression)
   user Operator operator
   
-  func inst parse-sub-expression(user Operator operator, user String ends):(
+  func inst parse-operand-expression(user Operator operator, user String ends):(
       owner Expression expression, copy Char end)
     self.operator := operator
     if end = '\n'
       read-line-break-spaces()
     owner String new-ends
     string-new-concat(user " ", user ends):(owner new-ends)
-    parse-new-expression(user new-ends):(owner expression, copy end)
+    self.parse-sub-expression(user new-ends):(owner expression, copy end)
     delete new-ends
   
   func inst write-operator-and-expresssion(user Expression expression)
@@ -52,7 +52,7 @@ class UnaryExpression(OperatorExpression)
   
   ## parsing `operator expression` or `operator\n    expression`
   func inst parse(user Operator operator, user String ends):(copy Char end)
-    self.parse-sub-expression(user operator, user ends):(
+    self.parse-operand-expression(user operator, user ends):(
         owner self.expression, copy end)
   
   func dynamic write()
@@ -80,7 +80,7 @@ class BinaryExpression(OperatorExpression)
       user String ends):(
       copy Char end)
     self.left-expression := left-expression
-    self.parse-sub-expression(user operator, user ends):(
+    self.parse-operand-expression(user operator, user ends):(
         owner self.right-expression, copy end)
   
   func dynamic write()

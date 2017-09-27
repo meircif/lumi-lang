@@ -42,7 +42,7 @@ static char* _func_name_SyntaxTreeExpression_parse = "SyntaxTreeExpression.parse
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_parse
 Returncode SyntaxTreeExpression_parse(SyntaxTreeExpression* self, SyntaxTreeBlock* parent, Char* end) {
   self->_base.parent = parent;
-  CHECK(14, parse_new_expression(&(String){1, 0, ""}, &(self->expression), &((*end))) )
+  CHECK(14, parse_new_expression(&(String){1, 0, ""}, &(self->_base), &(self->expression), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -182,7 +182,7 @@ static char* _func_name_SyntaxTreeWhile_parse = "SyntaxTreeWhile.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeWhile_parse
 Returncode SyntaxTreeWhile_parse(SyntaxTreeWhile* self, SyntaxTreeBlock* parent, Char* end) {
   self->_base.parent = parent;
-  CHECK(56, parse_new_expression(&(String){1, 0, ""}, &(self->condition), &((*end))) )
+  CHECK(56, parse_new_expression(&(String){1, 0, ""}, &(self->_base), &(self->condition), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME

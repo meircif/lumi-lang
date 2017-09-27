@@ -11,7 +11,7 @@ class SyntaxTreeExpression(SyntaxTreeCode)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
     self.parent := parent
-    parse-new-expression(user ""):(owner self.expression, copy end)
+    parse-new-expression(user "", user self):(owner self.expression, copy end)
   
   func dynamic write()
     self.expression.write()
@@ -53,7 +53,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
     self.parent := parent
-    parse-new-expression(user ""):(owner self.condition, copy end)
+    parse-new-expression(user "", user self):(owner self.condition, copy end)
   
   func dynamic write()
     # if (!(`condition`) break;

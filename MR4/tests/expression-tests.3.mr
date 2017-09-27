@@ -9,7 +9,7 @@ func test-expression-ends(
   set-mock-file-text(user input-text)
   owner Expression expression
   var Char end
-  parse-new-expression(user ends):(owner expression, copy end)
+  parse-new-expression(user ends, user _):(owner expression, copy end)
   assert end = expected-end
   expression.write()
   f-assert-string(user expected-output, user mock-output-file-text)
@@ -24,7 +24,7 @@ func test-expression-error-ends(
   set-mock-file-text(user input-text)
   owner Expression expression
   mock-print-active := true
-  assert-error parse-new-expression(user ends):(owner expression)
+  assert-error parse-new-expression(user ends, user _):(owner expression)
   mock-print-active := false
   user String expected-header("Code error in mock.3.mr[0] ")
   f-assert-string-slice(

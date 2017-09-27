@@ -18,9 +18,10 @@ BinaryExpression:
 ## Return in `expression` a new allocated expression parsed from the input
 ## file until one of the characters in `ends` is reached.
 ## Return the end character in `end`
-func parse-new-expression(user String ends):(
+func parse-new-expression(user String ends, user SyntaxTreeCode code-node):(
     owner Expression expression, copy Char end)
-  Expression.parse-new(var _, user ends):(owner expression, copy end)
+  Expression.parse-new(
+      var _, user ends, user code-node):(owner expression, copy end)
 
 
 ## Meta type for an expression in the language.
@@ -29,9 +30,14 @@ func parse-new-expression(user String ends):(
 class Expression
   user SyntaxTreeCode code-node
   owner TypeInstance result-type
+  var Bool assignable
+  
+  func inst parse-sub-expression(
+      user String ends):(owner Expression expression, copy Char end)
+    self.parse-new(user ends, user self.code-node):(owner expression, copy end)
   
   ## Parse any expression
-  func inst parse-new(user String ends):(
+  func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
     expression := _
     var Bool multi-operands(not ends.has(copy ' '))
@@ -51,6 +57,7 @@ class Expression
           f-syntax-error(user "unknown operator", user text)
         self.parse-new-operand(owner text, user ends):(
             owner expression, copy end)
+      expression.code-node := code-node
        
       while multi-operands and end = ' '
   
@@ -134,7 +141,7 @@ class Expression
     self.result-type.type-data := type-data
   
   func dynamic analyze()
-    # raise
+    # do noting
   
   ## write to C
   func dynamic write()

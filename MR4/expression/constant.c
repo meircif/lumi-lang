@@ -109,7 +109,7 @@ static char* _func_name_IntExpression_parse_new = "IntExpression.parse-new";
 Returncode IntExpression_parse_new(IntExpression* self, String* text, Expression** expression) {
   IntExpression* int_expression = malloc(sizeof(IntExpression));
   if (int_expression == NULL) RAISE(38)
-  *int_expression = (IntExpression){IntExpression__dtl, NULL, NULL, NULL};
+  *int_expression = (IntExpression){IntExpression__dtl, NULL, NULL, false, NULL};
   int_expression->_base._base._dtl = IntExpression__dtl;
   CHECK(39, IntExpression_parse(int_expression, text) )
   (*expression) = &(int_expression->_base._base);
@@ -134,9 +134,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     if ((1) < 0 || (1) >= (number)->length) RAISE(48)
     Char second = ((number)->values[1]);
     if (second >= '0' && second <= '7') {
-      Bool _Bool12;
-      CHECK(50, f_is_octal(number, &(_Bool12)) )
-      if (!_Bool12) {
+      Bool _Bool14;
+      CHECK(50, f_is_octal(number, &(_Bool14)) )
+      if (!_Bool14) {
         CHECK(51, f_syntax_error(&(String){21, 20, "illegal octal number"}, text) )
       }
     }
@@ -144,17 +144,17 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
       if ((2) < 0 || (number->length - 2) < 0 || (2) + (number->length - 2) > (number)->length) RAISE(53)
       number = (&(String){number->length - 2, number->length - 2, (number)->values + (2)});
       if (second == 'b' || second == 'B') {
-        Bool _Bool13;
-        CHECK(55, f_is_binary(number, &(_Bool13)) )
-        if (!_Bool13) {
+        Bool _Bool15;
+        CHECK(55, f_is_binary(number, &(_Bool15)) )
+        if (!_Bool15) {
           CHECK(56, f_syntax_error(&(String){22, 21, "illegal binary number"}, text) )
         }
       }
       else {
         if (second == 'x' || second == 'X') {
-          Bool _Bool14;
-          CHECK(58, f_is_hex(number, &(_Bool14)) )
-          if (!_Bool14) {
+          Bool _Bool16;
+          CHECK(58, f_is_hex(number, &(_Bool16)) )
+          if (!_Bool16) {
             CHECK(59, f_syntax_error(&(String){27, 26, "illegal hexadecimal number"}, text) )
           }
         }
@@ -165,9 +165,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     }
   }
   else {
-    Bool _Bool15;
-    CHECK(62, f_is_decimal(number, &(_Bool15)) )
-    if (!_Bool15) {
+    Bool _Bool17;
+    CHECK(62, f_is_decimal(number, &(_Bool17)) )
+    if (!_Bool17) {
       CHECK(63, f_syntax_error(&(String){15, 14, "illegal number"}, text) )
     }
   }
@@ -201,7 +201,7 @@ static char* _func_name_CharExpression_parse_new = "CharExpression.parse-new";
 Returncode CharExpression_parse_new(CharExpression* self, String* text, Expression** expression) {
   CharExpression* char_expression = malloc(sizeof(CharExpression));
   if (char_expression == NULL) RAISE(71)
-  *char_expression = (CharExpression){CharExpression__dtl, NULL, NULL, NULL};
+  *char_expression = (CharExpression){CharExpression__dtl, NULL, NULL, false, NULL};
   char_expression->_base._base._dtl = CharExpression__dtl;
   CHECK(72, CharExpression_parse(char_expression, text) )
   (*expression) = &(char_expression->_base._base);
@@ -230,9 +230,9 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         CHECK(84, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
       }
       if ((2) < 0 || (2) >= (text)->length) RAISE(85)
-      Bool _Bool16;
-      CHECK(85, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool16)) )
-      if (!_Bool16) {
+      Bool _Bool18;
+      CHECK(85, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool18)) )
+      if (!_Bool18) {
         CHECK(86, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
       }
     }
@@ -246,17 +246,17 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         ch = ((text)->values[2]);
         if (ch == 'x') {
           if ((3) < 0 || (2) < 0 || (3) + (2) > (text)->length) RAISE(92)
-          Bool _Bool17;
-          CHECK(92, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool17)) )
-          if (!_Bool17) {
+          Bool _Bool19;
+          CHECK(92, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool19)) )
+          if (!_Bool19) {
             CHECK(93, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
           }
         }
         else {
           if ((2) < 0 || (3) < 0 || (2) + (3) > (text)->length) RAISE(95)
-          Bool _Bool18;
-          CHECK(95, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool18)) )
-          if (!_Bool18) {
+          Bool _Bool20;
+          CHECK(95, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool20)) )
+          if (!_Bool20) {
             CHECK(96, f_syntax_error(&(String){27, 26, "illegal character constant"}, text) )
           }
         }
@@ -300,7 +300,7 @@ static char* _func_name_StringExpression_parse_new = "StringExpression.parse-new
 Returncode StringExpression_parse_new(StringExpression* self, String* text, Expression** expression) {
   StringExpression* string_expression = malloc(sizeof(StringExpression));
   if (string_expression == NULL) RAISE(108)
-  *string_expression = (StringExpression){StringExpression__dtl, NULL, NULL, NULL};
+  *string_expression = (StringExpression){StringExpression__dtl, NULL, NULL, false, NULL};
   string_expression->_base._base._dtl = StringExpression__dtl;
   CHECK(109, StringExpression_parse(string_expression, text) )
   (*expression) = &(string_expression->_base._base);
@@ -346,11 +346,12 @@ Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expres
 static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 #define MR_FUNC_NAME _func_name_EmptyExpression_parse_new
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
-  EmptyExpression* _EmptyExpression19 = malloc(sizeof(EmptyExpression));
-  if (_EmptyExpression19 == NULL) RAISE(123)
-  *_EmptyExpression19 = (EmptyExpression){EmptyExpression__dtl, NULL, NULL};
-  _EmptyExpression19->_base._dtl = EmptyExpression__dtl;
-  (*expression) = &(_EmptyExpression19->_base);
+  EmptyExpression* _EmptyExpression21 = malloc(sizeof(EmptyExpression));
+  if (_EmptyExpression21 == NULL) RAISE(123)
+  *_EmptyExpression21 = (EmptyExpression){EmptyExpression__dtl, NULL, NULL, false};
+  _EmptyExpression21->_base._dtl = EmptyExpression__dtl;
+  (*expression) = &(_EmptyExpression21->_base);
+  CHECK(124, Expression_set_simple_type((*expression), glob->type_empty) )
   free(text);
   return OK;
 }
@@ -362,7 +363,7 @@ Returncode EmptyExpression_write(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write = "EmptyExpression.write";
 #define MR_FUNC_NAME _func_name_EmptyExpression_write
 Returncode EmptyExpression_write(EmptyExpression* self) {
-  CHECK(127, write(&(String){5, 4, "NULL"}) )
+  CHECK(128, write(&(String){5, 4, "NULL"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

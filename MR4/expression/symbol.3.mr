@@ -16,8 +16,15 @@ class SymbolExpression(TextExpression)
   
   func dynamic analyze()
     self.code-node.m-find-variable(user self.text):(user self.variable)
-    if not (? self.variable)
+    if ? self.variable
+      self.variable.type-instance.m-copy-new():(owner self.result-type)
+      self.assignable := true
+    else
       glob.root.m-find-function(user self.text):(user self.function)
+      if not (? self.function)
+        f-syntax-error(user "unknown symbol", user self.text)
+      self.set-simple-type(user glob.type-func)
+      self.function.arguments.m-copy-new():(self.result-type.arguments)
   
   func dynamic write()
     write-cname(user self.text)
@@ -28,6 +35,15 @@ class BaseMethExpression(Expression)
   func inst parse-new(owner String text):(owner Expression expression)
     new BaseMethExpression in expression
     delete text
+  
+  func dynamic analyze()
+    user TypeData parent-type
+    self.code-node.m-get-parent-type():(user parent-type)
+    if not (? parent-type)
+      f-syntax-error-msg(user "\"base\" used not in method")
+    if not (? parent-type.base-type)
+      f-syntax-error(user "no base type for type", user parent-type.name)
+    self.set-simple-type(user parent-type.base-type)
   
   func dynamic write()
     write(user "Base")
@@ -41,6 +57,11 @@ class TypeExpression(TextExpression)
     new TypeExpression type-expression
     type-expression.parse(owner text)
     expression := type-expression
+  
+  func dynamic analyze()
+    self.type-value.analyze()
+    glob.type-type.m-new-type-instance():(owner self.result-type)
+    self.type-value.m-copy-new():(owner self.result-type.sub-type)
   
   ## parsing `Type-name`
   func inst parse(owner String text)
@@ -61,6 +82,16 @@ class MemberExpression(SymbolExpression)
   func inst parse(owner Expression instance, user String ends):(copy Char end)
     self.instance := instance
     self.read-new-value(user ends):(owner self.text, copy end)
+  
+  func dynamic analyze()
+    self.instance.analyze()
+    self.assignable := self.instance.assignable
+    if not (? self.instance.result-type)
+      f-syntax-error(user "void expression cannot have member", user self.text)
+    if self.instance.result-type.type-data = glob.type-type
+      # TODO...
+    else
+      # TODO...
   
   func dynamic write()
     self.instance.write()

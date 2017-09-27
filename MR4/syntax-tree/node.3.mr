@@ -193,6 +193,9 @@ class SyntaxTreeCode(SyntaxTreeNode)
     if not (? variable)
       glob.root.m-find-variable(user name):(user variable)
   
+  func inst m-get-parent-type():(user TypeData parent-type)
+    self.parent.m-get-parent-type():(user parent-type)
+  
   func inst write-spaces()
     self.parent.write-spaces()
 
@@ -293,6 +296,42 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     base.m-find-variable(user name):(user variable)
     if not (? variable) and ? self.parent
       self.parent.m-find-variable(user name):(user variable)
+  
+  func dynamic m-get-parent-type():(user TypeData parent-type)
+    self.parent.m-get-parent-type():(user parent-type)
+  
+  func inst add-aux-variable(copy Int access, user TypeInstance type-instance):(
+      user SyntaxTreeVariable new-variable)
+    var Int index(0)
+    user ListNode{TypeCount} node(self.aux-variables.first)
+    do
+      while ? node
+      while node.item.type-data != type-instance.type-data
+      node := node.next
+    if ? node
+      node.item.count += 1
+      index := node.item.count
+    else
+      new TypeCount type-count
+      type-count.type-data := type-instance.type-data
+      self.aux-variables.add(owner type-count)
+    new SyntaxTreeVariable variable
+    new String{type-instance.type-data.name.length +
+        21} in variable.name
+    variable.name.copy(user "aux_")
+    variable.name.concat(user type-instance.type-data.name)
+    variable.name.append(copy '_')
+    var String{16} index-str
+    index.str(user index-str)
+    variable.name.concat(user index-str)
+    variable.parent := self
+    if access = ACCESS-COPY
+      variable.access := ACCESS-VAR
+    else
+      variable.access := access
+    type-instance.m-copy-new():(owner variable.type-instance)
+    new-variable := variable
+    self.variables.add(owner variable)
   
   func inst write-block()
     # `previous-text` {

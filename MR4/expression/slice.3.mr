@@ -15,10 +15,43 @@ class SliceExpression(Expression)
   ## parsing `sequence[index]` or `sequence[index:second-index]`
   func inst parse(owner Expression sequence):(copy Char end)
     self.sequence := sequence
-    parse-new-expression(user ":]"):(owner self.index, copy end)
+    self.parse-sub-expression(user ":]"):(owner self.index, copy end)
     if end = ':'
-      parse-new-expression(user "]"):(owner self.second-index, copy end)
+      self.parse-sub-expression(user "]"):(owner self.second-index, copy end)
     read-c():(copy end)
+  
+  func dynamic analyze()
+    self.sequence.analyze()
+    self.assignable := self.sequence.assignable
+    if not (? self.sequence.result-type.type-data)
+      f-syntax-error-msg(user "cannot slice a void expression")
+    if self.sequence.result-type.type-data = glob.type-string
+      self.set-simple-type(user glob.type-char)
+    else-if self.sequence.result-type.type-data = glob.type-array
+      self.sequence.result-type.sub-type.m-copy-new():(
+          owner self.result-type)
+    else
+      f-syntax-error(
+          user "cannot slice type",
+          user self.sequence.result-type.type-data.name)
+    
+    self.index.analyze()
+    self.m-check-index(user self.index)
+    
+    if ? self.second-index
+      self.second-index.analyze()
+      self.m-check-index(user self.second-index)
+  
+  func inst m-check-index(user Expression index)
+    if ? index.result-type.type-data
+      if index.result-type.type-data != glob.type-int
+        f-syntax-error(
+            user "expected integer index for slice, got",
+            user index.result-type.type-data.name)
+    else
+      f-syntax-error-msg(
+          user "expected integer index for slice, got void expression")
+    
   
   func dynamic write()
     self.sequence.write()

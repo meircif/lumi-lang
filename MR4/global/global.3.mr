@@ -35,9 +35,11 @@ static Global
   owner TypeData type-char
   owner TypeData type-bool
   owner TypeData type-int
+  owner TypeData type-empty
   owner TypeData type-func
   owner TypeData type-string
   owner TypeData type-array
+  owner TypeData type-type
   owner TypeData type-file
   owner TypeData type-sys
   
@@ -79,9 +81,11 @@ static Global
     self.add-builtin-type(user "Char"):(owner self.type-char)
     self.add-builtin-type(user "Bool"):(owner self.type-bool)
     self.add-builtin-type(user "Int"):(owner self.type-int)
+    self.add-builtin-type(user "Empty"):(owner self.type-empty)
     self.add-builtin-type(user "Func"):(owner self.type-func)
     self.add-builtin-type(user "String"):(owner self.type-string)
     self.add-builtin-type(user "Array"):(owner self.type-array)
+    self.add-builtin-type(user "Type"):(owner self.type-type)
     self.add-builtin-type(user "File"):(owner self.type-file)
     self.add-builtin-type(user "Sys"):(owner self.type-sys)
   

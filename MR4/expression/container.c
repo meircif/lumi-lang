@@ -28,7 +28,7 @@ static char* _func_name_BlockExpression_parse_new = "BlockExpression.parse-new";
 Returncode BlockExpression_parse_new(BlockExpression* self, Expression** expression, Char* end) {
   BlockExpression* block_expression = malloc(sizeof(BlockExpression));
   if (block_expression == NULL) RAISE(8)
-  *block_expression = (BlockExpression){BlockExpression__dtl, NULL, NULL, NULL};
+  *block_expression = (BlockExpression){BlockExpression__dtl, NULL, NULL, false, NULL};
   block_expression->_base._dtl = BlockExpression__dtl;
   CHECK(9, BlockExpression_parse(block_expression, &((*end))) )
   (*expression) = &(block_expression->_base);
@@ -42,8 +42,8 @@ Returncode BlockExpression_parse(BlockExpression* self, Char* end);
 static char* _func_name_BlockExpression_parse = "BlockExpression.parse";
 #define MR_FUNC_NAME _func_name_BlockExpression_parse
 Returncode BlockExpression_parse(BlockExpression* self, Char* end) {
-  Char _Char20;
-  CHECK(14, parse_new_expression(&(String){2, 1, ")"}, &(self->expression), &(_Char20)) )
+  Char _Char22;
+  CHECK(14, Expression_parse_sub_expression(&(self->_base), &(String){2, 1, ")"}, &(self->expression), &(_Char22)) )
   CHECK(15, read_c(&((*end))) )
   return OK;
 }
@@ -80,18 +80,18 @@ struct OperatorExpression {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode OperatorExpression_parse_sub_expression(OperatorExpression* self, Operator* operator, String* ends, Expression** expression, Char* end);
+Returncode OperatorExpression_parse_operand_expression(OperatorExpression* self, Operator* operator, String* ends, Expression** expression, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_OperatorExpression_parse_sub_expression = "OperatorExpression.parse-sub-expression";
-#define MR_FUNC_NAME _func_name_OperatorExpression_parse_sub_expression
-Returncode OperatorExpression_parse_sub_expression(OperatorExpression* self, Operator* operator, String* ends, Expression** expression, Char* end) {
+static char* _func_name_OperatorExpression_parse_operand_expression = "OperatorExpression.parse-operand-expression";
+#define MR_FUNC_NAME _func_name_OperatorExpression_parse_operand_expression
+Returncode OperatorExpression_parse_operand_expression(OperatorExpression* self, Operator* operator, String* ends, Expression** expression, Char* end) {
   self->operator = operator;
   if ((*end) == '\n') {
     CHECK(31, read_line_break_spaces() )
   }
   String* new_ends = NULL;
   CHECK(33, string_new_concat(&(String){2, 1, " "}, ends, &(new_ends)) )
-  CHECK(34, parse_new_expression(new_ends, &((*expression)), &((*end))) )
+  CHECK(34, Expression_parse_sub_expression(&(self->_base), new_ends, &((*expression)), &((*end))) )
   free(new_ends);
   return OK;
 }
@@ -135,7 +135,7 @@ static char* _func_name_UnaryExpression_parse_new = "UnaryExpression.parse-new";
 Returncode UnaryExpression_parse_new(UnaryExpression* self, String* ends, Operator* operator, Expression** expression, Char* end) {
   UnaryExpression* unary_expression = malloc(sizeof(UnaryExpression));
   if (unary_expression == NULL) RAISE(49)
-  *unary_expression = (UnaryExpression){UnaryExpression__dtl, NULL, NULL, NULL, NULL};
+  *unary_expression = (UnaryExpression){UnaryExpression__dtl, NULL, NULL, false, NULL, NULL};
   unary_expression->_base._base._dtl = UnaryExpression__dtl;
   CHECK(50, UnaryExpression_parse(unary_expression, operator, ends, &((*end))) )
   (*expression) = &(unary_expression->_base._base);
@@ -149,7 +149,7 @@ Returncode UnaryExpression_parse(UnaryExpression* self, Operator* operator, Stri
 static char* _func_name_UnaryExpression_parse = "UnaryExpression.parse";
 #define MR_FUNC_NAME _func_name_UnaryExpression_parse
 Returncode UnaryExpression_parse(UnaryExpression* self, Operator* operator, String* ends, Char* end) {
-  CHECK(55, OperatorExpression_parse_sub_expression(&(self->_base), operator, ends, &(self->expression), &((*end))) )
+  CHECK(55, OperatorExpression_parse_operand_expression(&(self->_base), operator, ends, &(self->expression), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -192,7 +192,7 @@ static char* _func_name_BinaryExpression_parse_new = "BinaryExpression.parse-new
 Returncode BinaryExpression_parse_new(BinaryExpression* self, String* ends, Operator* operator, Expression** expression, Char* end) {
   BinaryExpression* binary_expression = malloc(sizeof(BinaryExpression));
   if (binary_expression == NULL) RAISE(70)
-  *binary_expression = (BinaryExpression){BinaryExpression__dtl, NULL, NULL, NULL, NULL, NULL, NULL};
+  *binary_expression = (BinaryExpression){BinaryExpression__dtl, NULL, NULL, false, NULL, NULL, NULL, NULL};
   binary_expression->_base._base._dtl = BinaryExpression__dtl;
   CHECK(71, BinaryExpression_parse(binary_expression, (*expression), operator, ends, &((*end))) )
   (*expression) = &(binary_expression->_base._base);
@@ -207,7 +207,7 @@ static char* _func_name_BinaryExpression_parse = "BinaryExpression.parse";
 #define MR_FUNC_NAME _func_name_BinaryExpression_parse
 Returncode BinaryExpression_parse(BinaryExpression* self, Expression* left_expression, Operator* operator, String* ends, Char* end) {
   self->left_expression = left_expression;
-  CHECK(83, OperatorExpression_parse_sub_expression(&(self->_base), operator, ends, &(self->right_expression), &((*end))) )
+  CHECK(83, OperatorExpression_parse_operand_expression(&(self->_base), operator, ends, &(self->right_expression), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -250,7 +250,7 @@ static char* _func_name_QuestionExpression_parse_new = "QuestionExpression.parse
 Returncode QuestionExpression_parse_new(QuestionExpression* self, Expression** expression, Char* end) {
   QuestionExpression* question_expression = malloc(sizeof(QuestionExpression));
   if (question_expression == NULL) RAISE(97)
-  *question_expression = (QuestionExpression){QuestionExpression__dtl, NULL, NULL, NULL};
+  *question_expression = (QuestionExpression){QuestionExpression__dtl, NULL, NULL, false, NULL};
   question_expression->_base._dtl = QuestionExpression__dtl;
   CHECK(98, QuestionExpression_parse(question_expression, (*expression), &((*end))) )
   (*expression) = &(question_expression->_base);

@@ -42,7 +42,7 @@ static char* _func_name_SyntaxTreeAssert_parse = "SyntaxTreeAssert.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeAssert_parse
 Returncode SyntaxTreeAssert_parse(SyntaxTreeAssert* self, SyntaxTreeBlock* parent, Char* end) {
   self->_base.parent = parent;
-  CHECK(14, parse_new_expression(&(String){1, 0, ""}, &(self->tested), &((*end))) )
+  CHECK(14, parse_new_expression(&(String){1, 0, ""}, &(self->_base), &(self->tested), &((*end))) )
   CHECK(15, f_syntax_error_msg(&(String){28, 27, "assert not supported yet..."}) )
   return OK;
 }
@@ -86,7 +86,7 @@ static char* _func_name_SyntaxTreeAssertError_parse = "SyntaxTreeAssertError.par
 #define MR_FUNC_NAME _func_name_SyntaxTreeAssertError_parse
 Returncode SyntaxTreeAssertError_parse(SyntaxTreeAssertError* self, SyntaxTreeBlock* parent, Char* end) {
   self->_base.parent = parent;
-  CHECK(28, parse_new_expression(&(String){1, 0, ""}, &(self->tested), &((*end))) )
+  CHECK(28, parse_new_expression(&(String){1, 0, ""}, &(self->_base), &(self->tested), &((*end))) )
   CHECK(29, f_syntax_error_msg(&(String){34, 33, "assert-error not supported yet..."}) )
   return OK;
 }
@@ -128,7 +128,7 @@ Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* 
 extern Func SyntaxTreeTestFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_get_parent_type};
 #endif
 
 
@@ -160,7 +160,7 @@ Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* 
 extern Func SyntaxTreeMockFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child};
+Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_get_parent_type};
 #endif
 
 

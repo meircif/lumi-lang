@@ -28,6 +28,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       SyntaxTreeVariableInit.parse-new(var _, user self):(
           copy end, owner new-init-node)
   
+  func dynamic analyze()
+    self.type-instance.analyze()
+  
   func dynamic write()
     # `type`* `name`;
     self.type-instance.write()
@@ -50,7 +53,7 @@ class SyntaxTreeVariableInit(SyntaxTreeCode)
   
   func inst parse(user SyntaxTreeVariable variable):(copy Char end)
     self.variable := variable
-    parse-new-expression(user ")"):(owner self.value, copy end)
+    parse-new-expression(user ")", user self):(owner self.value, copy end)
     if end != ')'
       f-syntax-error-c(
           user "expected \")\" after initialization, got",
