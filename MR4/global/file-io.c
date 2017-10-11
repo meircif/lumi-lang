@@ -387,7 +387,6 @@ Returncode write_spaces(Int num) {
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"

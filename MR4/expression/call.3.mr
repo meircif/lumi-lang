@@ -6,23 +6,24 @@ class CallExpression(Expression)
   owner FunctionArguments arguments
   user Expression output
   
-  func inst parse-new(user String ends):(
+  func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
     new CallExpression call-expression
-    call-expression.parse(owner expression):(copy end)
+    call-expression.parse(owner expression, user code-node):(copy end)
     expression := call-expression
   
-  func inst parse(owner Expression function):(copy Char end)
+  func inst parse(owner Expression function, user SyntaxTreeCode code-node):(
+      copy Char end)
     self.function := function
+    self.code-node := code-node
     new FunctionArguments in self.arguments
     var CallArgumentFactory argument-factory
     self.arguments.parse(
-        user argument-factory, user self.code-node, user _):(copy end)
+        user argument-factory, user code-node, user _):(copy end)
   
   func dynamic analyze()
     self.function.analyze()
     self.arguments.analyze()
-    # TODO add self...
     user FunctionArguments declaration(self.function.result-type.arguments)
     if not (? self.function.result-type.type-data)
       f-syntax-error-msg(user "void expression is not callable")
@@ -32,6 +33,7 @@ class CallExpression(Expression)
           user "non callable type",
           user self.function.result-type.type-data.name)
     declaration.get-result-type().m-copy-new():(owner self.result-type)
+    self.function.analyze-call(user self.arguments)
     if self.arguments.m-check-calling(user declaration)
       # add omitted output
       new SymbolExpression symbol

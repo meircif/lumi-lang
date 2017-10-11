@@ -67,48 +67,48 @@ Returncode Global_init_operator_map(Global* self) {
   self->operator_map = malloc(sizeof(NameMap));
   if (self->operator_map == NULL) RAISE(53)
   *self->operator_map = (NameMap){NULL, NULL};
-  CHECK(54, Global_add_operator(self, &(String){3, 2, ":="}, &(String){2, 1, "="}) )
-  CHECK(55, Global_add_operator_copy(self, &(String){2, 1, "+"}) )
-  CHECK(56, Global_add_operator_copy(self, &(String){2, 1, "-"}) )
-  CHECK(57, Global_add_operator_copy(self, &(String){2, 1, "*"}) )
-  CHECK(58, Global_add_operator_copy(self, &(String){2, 1, "/"}) )
-  CHECK(59, Global_add_operator_copy(self, &(String){3, 2, "+="}) )
-  CHECK(60, Global_add_operator_copy(self, &(String){3, 2, "-="}) )
-  CHECK(61, Global_add_operator(self, &(String){2, 1, "="}, &(String){3, 2, "=="}) )
-  CHECK(62, Global_add_operator_copy(self, &(String){3, 2, "!="}) )
-  CHECK(63, Global_add_operator_copy(self, &(String){2, 1, ">"}) )
-  CHECK(64, Global_add_operator_copy(self, &(String){2, 1, "<"}) )
-  CHECK(65, Global_add_operator_copy(self, &(String){3, 2, ">="}) )
-  CHECK(66, Global_add_operator_copy(self, &(String){3, 2, "<="}) )
-  CHECK(67, Global_add_operator(self, &(String){4, 3, "not"}, &(String){2, 1, "!"}) )
-  CHECK(68, Global_add_operator(self, &(String){3, 2, "or"}, &(String){3, 2, "||"}) )
-  CHECK(69, Global_add_operator(self, &(String){4, 3, "and"}, &(String){3, 2, "&&"}) )
+  CHECK(54, Global_add_operator_copy(self, &(String){2, 1, "+"}, 0, 0) )
+  CHECK(55, Global_add_operator_copy(self, &(String){2, 1, "-"}, 0, 0) )
+  CHECK(56, Global_add_operator_copy(self, &(String){2, 1, "*"}, 0, 1) )
+  CHECK(57, Global_add_operator_copy(self, &(String){2, 1, "/"}, 0, 1) )
+  CHECK(58, Global_add_operator(self, &(String){2, 1, "="}, &(String){3, 2, "=="}, 1, 0) )
+  CHECK(59, Global_add_operator_copy(self, &(String){3, 2, "!="}, 1, 0) )
+  CHECK(60, Global_add_operator_copy(self, &(String){2, 1, ">"}, 1, 0) )
+  CHECK(61, Global_add_operator_copy(self, &(String){2, 1, "<"}, 1, 0) )
+  CHECK(62, Global_add_operator_copy(self, &(String){3, 2, ">="}, 1, 0) )
+  CHECK(63, Global_add_operator_copy(self, &(String){3, 2, "<="}, 1, 0) )
+  CHECK(64, Global_add_operator(self, &(String){4, 3, "not"}, &(String){2, 1, "!"}, 2, 0) )
+  CHECK(65, Global_add_operator(self, &(String){3, 2, "or"}, &(String){3, 2, "||"}, 3, 0) )
+  CHECK(66, Global_add_operator(self, &(String){4, 3, "and"}, &(String){3, 2, "&&"}, 3, 1) )
+  CHECK(67, Global_add_operator(self, &(String){3, 2, ":="}, &(String){2, 1, "="}, 4, 0) )
+  CHECK(68, Global_add_operator_copy(self, &(String){3, 2, "+="}, 4, 0) )
+  CHECK(69, Global_add_operator_copy(self, &(String){3, 2, "-="}, 4, 0) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Global_add_operator(Global* self, String* name, String* c_name);
+Returncode Global_add_operator(Global* self, String* name, String* c_name, Int order, Int group_index);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Global_add_operator = "Global.add-operator";
 #define MR_FUNC_NAME _func_name_Global_add_operator
-Returncode Global_add_operator(Global* self, String* name, String* c_name) {
+Returncode Global_add_operator(Global* self, String* name, String* c_name, Int order, Int group_index) {
   Operator* operator = malloc(sizeof(Operator));
-  if (operator == NULL) RAISE(72)
-  *operator = (Operator){NULL, NULL};
-  CHECK(73, Operator_init(operator, name, c_name) )
-  CHECK(74, NameMap_add(self->operator_map, operator->name, operator) )
+  if (operator == NULL) RAISE(76)
+  *operator = (Operator){NULL, NULL, 0, 0};
+  CHECK(77, Operator_init(operator, name, c_name, order, group_index) )
+  CHECK(78, NameMap_add(self->operator_map, operator->name, operator) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Global_add_operator_copy(Global* self, String* name);
+Returncode Global_add_operator_copy(Global* self, String* name, Int order, Int group_index);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Global_add_operator_copy = "Global.add-operator-copy";
 #define MR_FUNC_NAME _func_name_Global_add_operator_copy
-Returncode Global_add_operator_copy(Global* self, String* name) {
-  CHECK(77, Global_add_operator(self, name, name) )
+Returncode Global_add_operator_copy(Global* self, String* name, Int order, Int group_index) {
+  CHECK(84, Global_add_operator(self, name, name, order, group_index) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -120,18 +120,18 @@ static char* _func_name_Global_init_builtin_types = "Global.init-builtin-types";
 #define MR_FUNC_NAME _func_name_Global_init_builtin_types
 Returncode Global_init_builtin_types(Global* self) {
   self->type_map = malloc(sizeof(NameMap));
-  if (self->type_map == NULL) RAISE(80)
+  if (self->type_map == NULL) RAISE(87)
   *self->type_map = (NameMap){NULL, NULL};
-  CHECK(81, Global_add_builtin_type(self, &(String){5, 4, "Char"}, &(self->type_char)) )
-  CHECK(82, Global_add_builtin_type(self, &(String){5, 4, "Bool"}, &(self->type_bool)) )
-  CHECK(83, Global_add_builtin_type(self, &(String){4, 3, "Int"}, &(self->type_int)) )
-  CHECK(84, Global_add_builtin_type(self, &(String){6, 5, "Empty"}, &(self->type_empty)) )
-  CHECK(85, Global_add_builtin_type(self, &(String){5, 4, "Func"}, &(self->type_func)) )
-  CHECK(86, Global_add_builtin_type(self, &(String){7, 6, "String"}, &(self->type_string)) )
-  CHECK(87, Global_add_builtin_type(self, &(String){6, 5, "Array"}, &(self->type_array)) )
-  CHECK(88, Global_add_builtin_type(self, &(String){5, 4, "Type"}, &(self->type_type)) )
-  CHECK(89, Global_add_builtin_type(self, &(String){5, 4, "File"}, &(self->type_file)) )
-  CHECK(90, Global_add_builtin_type(self, &(String){4, 3, "Sys"}, &(self->type_sys)) )
+  CHECK(88, Global_add_builtin_type(self, &(String){5, 4, "Char"}, &(self->type_char)) )
+  CHECK(89, Global_add_builtin_type(self, &(String){5, 4, "Bool"}, &(self->type_bool)) )
+  CHECK(90, Global_add_builtin_type(self, &(String){4, 3, "Int"}, &(self->type_int)) )
+  CHECK(91, Global_add_builtin_type(self, &(String){6, 5, "Empty"}, &(self->type_empty)) )
+  CHECK(92, Global_add_builtin_type(self, &(String){5, 4, "Func"}, &(self->type_func)) )
+  CHECK(93, Global_add_builtin_type(self, &(String){7, 6, "String"}, &(self->type_string)) )
+  CHECK(94, Global_add_builtin_type(self, &(String){6, 5, "Array"}, &(self->type_array)) )
+  CHECK(95, Global_add_builtin_type(self, &(String){5, 4, "Type"}, &(self->type_type)) )
+  CHECK(96, Global_add_builtin_type(self, &(String){5, 4, "File"}, &(self->type_file)) )
+  CHECK(97, Global_add_builtin_type(self, &(String){4, 3, "Sys"}, &(self->type_sys)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -143,11 +143,11 @@ static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_type
 Returncode Global_add_builtin_type(Global* self, String* name, TypeData** type_data) {
   (*type_data) = malloc(sizeof(TypeData));
-  if ((*type_data) == NULL) RAISE(93)
+  if ((*type_data) == NULL) RAISE(100)
   *(*type_data) = (TypeData){TypeData__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false};
   (*type_data)->_base._base._base._dtl = TypeData__dtl;
-  CHECK(94, string_new_copy(name, &((*type_data)->name)) )
-  CHECK(95, Global_add_type(self, (*type_data)) )
+  CHECK(101, string_new_copy(name, &((*type_data)->name)) )
+  CHECK(102, Global_add_type(self, (*type_data)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -158,8 +158,8 @@ Returncode Global_add_type(Global* self, TypeData* type_data);
 static char* _func_name_Global_add_type = "Global.add-type";
 #define MR_FUNC_NAME _func_name_Global_add_type
 Returncode Global_add_type(Global* self, TypeData* type_data) {
-  CHECK(98, SyntaxTreeNamespace_init(&(type_data->_base)) )
-  CHECK(99, NameMap_add(self->type_map, type_data->name, type_data) )
+  CHECK(105, SyntaxTreeNamespace_init(&(type_data->_base)) )
+  CHECK(106, NameMap_add(self->type_map, type_data->name, type_data) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -170,9 +170,9 @@ Returncode Global_m_find_type(Global* self, String* name, TypeData** type_data);
 static char* _func_name_Global_m_find_type = "Global.m-find-type";
 #define MR_FUNC_NAME _func_name_Global_m_find_type
 Returncode Global_m_find_type(Global* self, String* name, TypeData** type_data) {
-  CHECK(102, NameMap_find(self->type_map, name, (void**)&((*type_data))) )
+  CHECK(109, NameMap_find(self->type_map, name, (void**)&((*type_data))) )
   if (!(NULL != (*type_data))) {
-    CHECK(103, f_syntax_error(&(String){13, 12, "unknown type"}, name) )
+    CHECK(110, f_syntax_error(&(String){13, 12, "unknown type"}, name) )
   }
   return OK;
 }
@@ -193,9 +193,9 @@ Returncode f_find_type(String* name, TypeData** type_data);
 static char* _func_name_f_find_type = "f-find-type";
 #define MR_FUNC_NAME _func_name_f_find_type
 Returncode f_find_type(String* name, TypeData** type_data) {
-  CHECK(110, NameMap_find(glob->type_map, name, (void**)&((*type_data))) )
+  CHECK(117, NameMap_find(glob->type_map, name, (void**)&((*type_data))) )
   if (!(NULL != (*type_data))) {
-    CHECK(112, f_syntax_error(&(String){13, 12, "unknown type"}, name) )
+    CHECK(119, f_syntax_error(&(String){13, 12, "unknown type"}, name) )
   }
   return OK;
 }
@@ -210,7 +210,6 @@ Returncode f_find_type(String* name, TypeData** type_data) {
 #include "global/file-io.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"

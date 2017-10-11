@@ -51,30 +51,37 @@ static Global
   
   func inst init-operator-map()
     new NameMap{Operator} in self.operator-map
-    self.add-operator(user ":=", user "=")
-    self.add-operator-copy(user "+")
-    self.add-operator-copy(user "-")
-    self.add-operator-copy(user "*")
-    self.add-operator-copy(user "/")
-    self.add-operator-copy(user "+=")
-    self.add-operator-copy(user "-=")
-    self.add-operator(user "=", user "==")
-    self.add-operator-copy(user "!=")
-    self.add-operator-copy(user ">")
-    self.add-operator-copy(user "<")
-    self.add-operator-copy(user ">=")
-    self.add-operator-copy(user "<=")
-    self.add-operator(user "not", user "!")
-    self.add-operator(user "or", user "||")
-    self.add-operator(user "and", user "&&")
+    self.add-operator-copy(user "+", copy 0, copy 0)
+    self.add-operator-copy(user "-", copy 0, copy 0)
+    self.add-operator-copy(user "*", copy 0, copy 1)
+    self.add-operator-copy(user "/", copy 0, copy 1)
+    self.add-operator(user "=", user "==", copy 1, copy 0)
+    self.add-operator-copy(user "!=", copy 1, copy 0)
+    self.add-operator-copy(user ">", copy 1, copy 0)
+    self.add-operator-copy(user "<", copy 1, copy 0)
+    self.add-operator-copy(user ">=", copy 1, copy 0)
+    self.add-operator-copy(user "<=", copy 1, copy 0)
+    self.add-operator(user "not", user "!", copy 2, copy 0)
+    self.add-operator(user "or", user "||", copy 3, copy 0)
+    self.add-operator(user "and", user "&&", copy 3, copy 1)
+    self.add-operator(user ":=", user "=", copy 4, copy 0)
+    self.add-operator-copy(user "+=", copy 4, copy 0)
+    self.add-operator-copy(user "-=", copy 4, copy 0)
   
-  func inst add-operator(user String name, user String c-name)
+  func inst add-operator(
+      user String name,
+      user String c-name,
+      copy Int order,
+      copy Int group-index)
     new Operator operator
-    operator.init(user name, user c-name)
+    operator.init(user name, user c-name, copy order, copy group-index)
     self.operator-map.add(user operator.name, user operator)
   
-  func inst add-operator-copy(user String name)
-    self.add-operator(user name, user name)
+  func inst add-operator-copy(
+      user String name,
+      copy Int order,
+      copy Int group-index)
+    self.add-operator(user name, user name, copy order, copy group-index)
   
   func inst init-builtin-types()
     new NameMap{TypeData} in self.type-map

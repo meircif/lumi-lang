@@ -53,6 +53,25 @@ Returncode List_add(List* self, void* item) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode List_m_prepend(List* self, void* item);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_List_m_prepend = "List.m-prepend";
+#define MR_FUNC_NAME _func_name_List_m_prepend
+Returncode List_m_prepend(List* self, void* item) {
+  ListNode* node = malloc(sizeof(ListNode));
+  if (node == NULL) RAISE(21)
+  *node = (ListNode){NULL, NULL};
+  node->item = item;
+  node->next = self->first;
+  self->first = node;
+  if (!(NULL != self->last)) {
+    self->last = node;
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode List_m_pop(List* self, void** item);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_List_m_pop = "List.m-pop";
@@ -93,7 +112,6 @@ struct ListNode {
 #include "global/file-io.c"
 #include "global/global.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"

@@ -6,18 +6,20 @@ class SliceExpression(Expression)
   owner Expression index
   owner Expression second-index
   
-  func inst parse-new(user String ends):(
+  func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
     new SliceExpression slice-expression
-    slice-expression.parse(owner expression):(copy end)
+    slice-expression.parse(owner expression, user code-node):(copy end)
     expression := slice-expression
   
   ## parsing `sequence[index]` or `sequence[index:second-index]`
-  func inst parse(owner Expression sequence):(copy Char end)
+  func inst parse(owner Expression sequence, user SyntaxTreeCode code-node):(
+      copy Char end)
     self.sequence := sequence
-    self.parse-sub-expression(user ":]"):(owner self.index, copy end)
+    parse-new-expression(user ":]", user code-node):(owner self.index, copy end)
     if end = ':'
-      self.parse-sub-expression(user "]"):(owner self.second-index, copy end)
+      parse-new-expression(user "]", user code-node):(
+          owner self.second-index, copy end)
     read-c():(copy end)
   
   func dynamic analyze()

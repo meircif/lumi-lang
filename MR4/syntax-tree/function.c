@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file15_name = "syntax-tree/function.3.mr";
+static char* _mr_file14_name = "syntax-tree/function.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file15_name
+#define MR_FILE_NAME _mr_file14_name
 
 /* MR4 compiler - Syntax tree function */
 
@@ -54,17 +54,17 @@ Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, TypeData* parent_t
     self->_base._base.indentation_spaces = 4;
     if (self->parent_type->is_dynamic) {
       String* meth_type = NULL;
-      Int _Int28;
-      CHECK(24, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int28)) )
-      Bool _Bool29;
-      CHECK(25, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool29)) )
-      if (_Bool29) {
+      Int _Int30;
+      CHECK(24, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int30)) )
+      Bool _Bool31;
+      CHECK(25, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool31)) )
+      if (_Bool31) {
         self->is_dynamic = true;
       }
       else {
-        Bool _Bool30;
-        CHECK(27, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool30)) )
-        if (!_Bool30) {
+        Bool _Bool32;
+        CHECK(27, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool32)) )
+        if (!_Bool32) {
           CHECK(28, f_syntax_error(&(String){46, 45, "expected \"dynamic\" or \"inst\" method type, got"}, meth_type) )
         }
       }
@@ -234,9 +234,9 @@ static char* _func_name_SyntaxTreeMainFunction_parse = "SyntaxTreeMainFunction.p
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse
 Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end) {
   self->_base._base._base.indentation_spaces = 2;
-  String* _String31;
-  CHECK(94, string_new_copy(&(String){5, 4, "main"}, &(_String31)) )
-  self->_base.name = _String31;
+  String* _String33;
+  CHECK(94, string_new_copy(&(String){5, 4, "main"}, &(_String33)) )
+  self->_base.name = _String33;
   CHECK(95, SyntaxTreeBlock_parse_block(&(self->_base._base), &((*end))) )
   return OK;
 }
@@ -445,8 +445,8 @@ Returncode DeclarationArgument_m_copy_new(DeclarationArgument* self, Declaration
   *(*new_argument) = (DeclarationArgument){DeclarationArgument__dtl, 0, NULL, NULL};
   (*new_argument)->_base._dtl = DeclarationArgument__dtl;
   (*new_argument)->_base.access = self->_base.access;
-  TypeInstance* _TypeInstance32;
-  CHECK(161, TypeInstance_m_copy_new(self->type_instance, &(_TypeInstance32)) )
+  TypeInstance* _TypeInstance34;
+  CHECK(161, TypeInstance_m_copy_new(self->type_instance, &(_TypeInstance34)) )
   CHECK(162, string_new_copy(self->name, &((*new_argument)->name)) )
   return OK;
 }
@@ -533,11 +533,11 @@ Returncode ArgumentFactory_m_new_argument(ArgumentFactory* self, Argument** new_
 static char* _func_name_ArgumentFactory_m_new_argument = "ArgumentFactory.m-new-argument";
 #define MR_FUNC_NAME _func_name_ArgumentFactory_m_new_argument
 Returncode ArgumentFactory_m_new_argument(ArgumentFactory* self, Argument** new_argument) {
-  DeclarationArgument* _DeclarationArgument33 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument33 == NULL) RAISE(190)
-  *_DeclarationArgument33 = (DeclarationArgument){DeclarationArgument__dtl, 0, NULL, NULL};
-  _DeclarationArgument33->_base._dtl = DeclarationArgument__dtl;
-  (*new_argument) = &(_DeclarationArgument33->_base);
+  DeclarationArgument* _DeclarationArgument35 = malloc(sizeof(DeclarationArgument));
+  if (_DeclarationArgument35 == NULL) RAISE(190)
+  *_DeclarationArgument35 = (DeclarationArgument){DeclarationArgument__dtl, 0, NULL, NULL};
+  _DeclarationArgument35->_base._dtl = DeclarationArgument__dtl;
+  (*new_argument) = &(_DeclarationArgument35->_base);
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -580,9 +580,9 @@ Returncode FunctionArguments_m_copy_new_args(FunctionArguments* self, List* argu
   ListNode* node = arguments->first;
   while (true) {
     if (!(NULL != node)) break;
-    DeclarationArgument* _DeclarationArgument34;
-    CHECK(207, (((Argument*)(node->item)))->_dtl[0](((Argument*)(node->item)), &(_DeclarationArgument34)) )
-    CHECK(207, List_add(new_arguments, &(_DeclarationArgument34->_base)) )
+    DeclarationArgument* _DeclarationArgument36;
+    CHECK(207, (((Argument*)(node->item)))->_dtl[0](((Argument*)(node->item)), &(_DeclarationArgument36)) )
+    CHECK(207, List_add(new_arguments, &(_DeclarationArgument36->_base)) )
     node = node->next;
   }
   return OK;
@@ -628,12 +628,12 @@ static char* _func_name_FunctionArguments_parse_args = "FunctionArguments.parse-
 Returncode FunctionArguments_parse_args(FunctionArguments* self, List* arguments, ArgumentFactory* argument_factory, SyntaxTreeCode* code_node, Char* end) {
   Argument* argument = NULL;
   String* access_str = NULL;
-  Int _Int35;
-  CHECK(237, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int35)) )
+  Int _Int37;
+  CHECK(237, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int37)) )
   if ((*end) == '\n' && access_str->length == 0) {
     CHECK(239, read_line_break_spaces() )
-    Int _Int36;
-    CHECK(240, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int36)) )
+    Int _Int38;
+    CHECK(240, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int38)) )
   }
   if ((*end) != ')' || access_str->length > 0) {
     while (true) {
@@ -656,8 +656,8 @@ Returncode FunctionArguments_parse_args(FunctionArguments* self, List* arguments
           CHECK(255, f_syntax_error_c(&(String){42, 41, "expected space or new-line after \",\", got"}, (*end)) )
         }
       }
-      Int _Int37;
-      CHECK(258, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int37)) )
+      Int _Int39;
+      CHECK(258, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int39)) )
     }
   }
   CHECK(259, read_c(&((*end))) )
@@ -735,11 +735,11 @@ Returncode FunctionArguments_m_check_calling(FunctionArguments* self, FunctionAr
   ListNode* other_node = other->parameters->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    TypeInstance* _TypeInstance38;
-    CHECK(290, (((Argument*)(my_node->item)))->_dtl[3](((Argument*)(my_node->item)), &(_TypeInstance38)) )
-    TypeInstance* _TypeInstance39;
-    CHECK(290, (((Argument*)(other_node->item)))->_dtl[3](((Argument*)(other_node->item)), &(_TypeInstance39)) )
-    CHECK(290, TypeInstance_m_check_assign_to(_TypeInstance38, _TypeInstance39) )
+    TypeInstance* _TypeInstance40;
+    CHECK(290, (((Argument*)(my_node->item)))->_dtl[3](((Argument*)(my_node->item)), &(_TypeInstance40)) )
+    TypeInstance* _TypeInstance41;
+    CHECK(290, (((Argument*)(other_node->item)))->_dtl[3](((Argument*)(other_node->item)), &(_TypeInstance41)) )
+    CHECK(290, TypeInstance_m_check_assign_to(_TypeInstance40, _TypeInstance41) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
@@ -754,11 +754,11 @@ Returncode FunctionArguments_m_check_calling(FunctionArguments* self, FunctionAr
   other_node = other->outputs->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    TypeInstance* _TypeInstance40;
-    CHECK(303, (((Argument*)(other_node->item)))->_dtl[3](((Argument*)(other_node->item)), &(_TypeInstance40)) )
-    TypeInstance* _TypeInstance41;
-    CHECK(303, (((Argument*)(my_node->item)))->_dtl[3](((Argument*)(my_node->item)), &(_TypeInstance41)) )
-    CHECK(303, TypeInstance_m_check_assign_to(_TypeInstance40, _TypeInstance41) )
+    TypeInstance* _TypeInstance42;
+    CHECK(303, (((Argument*)(other_node->item)))->_dtl[3](((Argument*)(other_node->item)), &(_TypeInstance42)) )
+    TypeInstance* _TypeInstance43;
+    CHECK(303, (((Argument*)(my_node->item)))->_dtl[3](((Argument*)(my_node->item)), &(_TypeInstance43)) )
+    CHECK(303, TypeInstance_m_check_assign_to(_TypeInstance42, _TypeInstance43) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
@@ -828,7 +828,6 @@ Returncode FunctionArguments_write_args(FunctionArguments* self, List* arguments
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"

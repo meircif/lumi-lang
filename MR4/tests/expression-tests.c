@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file21_name = "tests/expression-tests.3.mr";
+static char* _mr_file20_name = "tests/expression-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file21_name
+#define MR_FILE_NAME _mr_file20_name
 
 /* MR4 compiler tests - Expression */
 
@@ -23,7 +23,7 @@ Returncode test_expression_ends(String* input_text, String* expected_output, Str
   Char end = '\0';
   CHECK(12, parse_new_expression(ends, NULL, &(expression), &(end)) )
   TEST_ASSERT(13, end == expected_end)
-  CHECK(14, (expression)->_dtl[1](expression) )
+  CHECK(14, (expression)->_dtl[2](expression) )
   CHECK(15, f_assert_string(expected_output, mock_output_file_text) )
   return OK;
 }
@@ -57,8 +57,8 @@ Returncode test_expression_error_ends(String* input_text, String* expected_error
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char91;
-    CHECK(27, parse_new_expression(ends, NULL, &(expression), &(_Char91)) );
+    Char _Char94;
+    CHECK(27, parse_new_expression(ends, NULL, &(expression), &(_Char94)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
@@ -284,8 +284,8 @@ static char* _func_name_test_unary_expression = "test-unary-expression";
 Returncode test_unary_expression() {
   CHECK(159, test_expression(&(String){16, 15, "- variable-name"}, &(String){16, 15, "- variable_name"}) )
   CHECK(160, test_expression(&(String){20, 19, "-\n    variable-name"}, &(String){16, 15, "- variable_name"}) )
-  CHECK(161, test_expression_error(&(String){18, 17, "- - variable-name"}, &(String){24, 23, "unexpected operator \"-\""}) )
-  CHECK(163, test_expression_error(&(String){5, 4, "[45]"}, &(String){15, 14, "unexpected \"[\""}) )
+  CHECK(161, test_expression(&(String){18, 17, "- - variable-name"}, &(String){20, 19, "- (- variable_name)"}) )
+  CHECK(162, test_expression_error(&(String){5, 4, "[45]"}, &(String){15, 14, "unexpected \"[\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -298,13 +298,13 @@ Returncode test_binary_expression();
 static char* _func_name_test_binary_expression = "test-binary-expression";
 #define MR_FUNC_NAME _func_name_test_binary_expression
 Returncode test_binary_expression() {
-  CHECK(167, test_expression(&(String){8, 7, "23 + 54"}, &(String){8, 7, "23 + 54"}) )
-  CHECK(168, test_expression(&(String){13, 12, "100 * 2 - 37"}, &(String){13, 12, "100 * 2 - 37"}) )
-  CHECK(169, test_expression(&(String){12, 11, "12 *\n    13"}, &(String){8, 7, "12 * 13"}) )
-  CHECK(170, test_expression(&(String){18, 17, "3 < 5 and 23 < 37"}, &(String){17, 16, "3 < 5 && 23 < 37"}) )
-  CHECK(171, test_expression_error(&(String){8, 7, "345 @ 2"}, &(String){21, 20, "unknown operator \"@\""}) )
-  CHECK(172, test_expression_error(&(String){6, 5, "80 +("}, &(String){15, 14, "unexpected \"(\""}) )
-  CHECK(173, test_expression_error_ends(&(String){16, 15, "- variable-name"}, &(String){24, 23, "unexpected operator \"-\""}, &(String){2, 1, " "}) )
+  CHECK(166, test_expression(&(String){8, 7, "23 + 54"}, &(String){8, 7, "23 + 54"}) )
+  CHECK(167, test_expression(&(String){13, 12, "100 * 2 - 37"}, &(String){15, 14, "(100 * 2) - 37"}) )
+  CHECK(168, test_expression(&(String){12, 11, "12 *\n    13"}, &(String){8, 7, "12 * 13"}) )
+  CHECK(169, test_expression(&(String){18, 17, "3 < 5 and 23 < 37"}, &(String){21, 20, "(3 < 5) && (23 < 37)"}) )
+  CHECK(170, test_expression_error(&(String){8, 7, "345 @ 2"}, &(String){21, 20, "unknown operator \"@\""}) )
+  CHECK(171, test_expression_error(&(String){6, 5, "80 +("}, &(String){15, 14, "unexpected \"(\""}) )
+  CHECK(172, test_expression_error_ends(&(String){16, 15, "- variable-name"}, &(String){24, 23, "unexpected operator \"-\""}, &(String){2, 1, " "}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -317,7 +317,7 @@ Returncode test_question_expression();
 static char* _func_name_test_question_expression = "test-question-expression";
 #define MR_FUNC_NAME _func_name_test_question_expression
 Returncode test_question_expression() {
-  CHECK(178, test_expression(&(String){15, 14, "variable-name?"}, &(String){22, 21, "variable_name != NULL"}) )
+  CHECK(177, test_expression(&(String){15, 14, "variable-name?"}, &(String){22, 21, "variable_name != NULL"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -330,7 +330,7 @@ Returncode test_single_operand_expression();
 static char* _func_name_test_single_operand_expression = "test-single-operand-expression";
 #define MR_FUNC_NAME _func_name_test_single_operand_expression
 Returncode test_single_operand_expression() {
-  CHECK(182, test_expression_ends(&(String){20, 19, "23 after expression"}, &(String){3, 2, "23"}, &(String){2, 1, " "}, ' ') )
+  CHECK(181, test_expression_ends(&(String){20, 19, "23 after expression"}, &(String){3, 2, "23"}, &(String){2, 1, " "}, ' ') )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -343,7 +343,7 @@ Returncode test_complex_operand();
 static char* _func_name_test_complex_operand = "test-complex-operand";
 #define MR_FUNC_NAME _func_name_test_complex_operand
 Returncode test_complex_operand() {
-  CHECK(187, test_expression(&(String){40, 39, "base.func().array[3].seq[4][70]()()[23]"}, &(String){40, 39, "Base.func().array[3].seq[4][70]()()[23]"}) )
+  CHECK(186, test_expression(&(String){40, 39, "base.func().array[3].seq[4][70]()()[23]"}, &(String){40, 39, "Base.func().array[3].seq[4][70]()()[23]"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -356,7 +356,7 @@ Returncode test_complex_expression();
 static char* _func_name_test_complex_expression = "test-complex-expression";
 #define MR_FUNC_NAME _func_name_test_complex_expression
 Returncode test_complex_expression() {
-  CHECK(193, test_expression(&(String){100, 99, "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)"}, &(String){96, 95, "4 + (array[5] - 23) > 2 + func(2 + Base.meth(), &(item)).val || (var.arr[1] != NULL && num < 5)"}) )
+  CHECK(192, test_expression(&(String){100, 99, "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)"}, &(String){106, 105, "((4 + (array[5] - 23)) > (2 + func(2 + Base.meth(), &(item)).val)) || ((var.arr[1] != NULL) && (num < 5))"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -369,7 +369,7 @@ Returncode test_no_expression();
 static char* _func_name_test_no_expression = "test-no-expression";
 #define MR_FUNC_NAME _func_name_test_no_expression
 Returncode test_no_expression() {
-  CHECK(199, test_expression_error(&(String){1, 0, ""}, &(String){17, 16, "unexpected \"EOF\""}) )
+  CHECK(198, test_expression_error(&(String){1, 0, ""}, &(String){17, 16, "unexpected \"EOF\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -384,7 +384,6 @@ Returncode test_no_expression() {
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"

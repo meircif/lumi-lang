@@ -5,13 +5,15 @@ class SymbolExpression(TextExpression)
   user SyntaxTreeVariable variable
   user SyntaxTreeFunction function
   
-  func inst parse-new(owner String text):(owner Expression expression)
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
+      owner Expression expression)
     new SymbolExpression symbol-expression
-    symbol-expression.parse(owner text)
+    symbol-expression.parse(owner text, user code-node)
     expression := symbol-expression
   
   ## parsing `symbol`
-  func inst parse(owner String text)
+  func inst parse(owner String text, user SyntaxTreeCode code-node)
+    self.code-node := code-node
     self.text := text
   
   func dynamic analyze()
@@ -32,8 +34,10 @@ class SymbolExpression(TextExpression)
 
 ## The `base` method expression
 class BaseMethExpression(Expression)
-  func inst parse-new(owner String text):(owner Expression expression)
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
+      owner Expression expression)
     new BaseMethExpression in expression
+    expression.code-node := code-node
     delete text
   
   func dynamic analyze()
@@ -86,12 +90,40 @@ class MemberExpression(SymbolExpression)
   func dynamic analyze()
     self.instance.analyze()
     self.assignable := self.instance.assignable
-    if not (? self.instance.result-type)
-      f-syntax-error(user "void expression cannot have member", user self.text)
+    if not (? self.instance.result-type) or
+        not (? self.instance.result-type.type-data)
+      f-syntax-error(user "void expression has no member", user self.text)
+    user TypeData type-data(self.instance.result-type.type-data)
     if self.instance.result-type.type-data = glob.type-type
-      # TODO...
+      if not (? self.instance.result-type.sub-type) or
+          not (? self.instance.result-type.sub-type.type-data)
+        f-syntax-error(
+            user "unspecified type has no member", user self.text)
+      type-data := self.instance.result-type.sub-type.type-data
+    
+    type-data.m-find-field(user self.text):(user self.variable)
+    if ? self.variable
+      self.variable.type-instance.m-copy-new():(owner self.result-type)
+      self.assignable := true
     else
-      # TODO...
+      type-data.m-find-meth(user self.text):(user self.function)
+      if not (? self.function)
+        f-syntax-error2(
+            user "type",
+            user type-data.name,
+            user "has no member",
+            user self.text)
+      self.set-simple-type(user glob.type-func)
+      self.function.arguments.m-copy-new():(self.result-type.arguments)
+  
+  func dynamic analyze-call(user FunctionArguments arguments)
+    if self.instance.result-type.type-data = glob.type-type
+      return
+    new CallArgument self-param
+    self-param.access := self.function.arguments.parameters.first.item.access
+    self-param.value := self.instance
+    self.instance := _
+    arguments.parameters.m-prepend(owner self-param)
   
   func dynamic write()
     self.instance.write()

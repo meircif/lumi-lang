@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file13_name = "syntax-tree/code.3.mr";
+static char* _mr_file12_name = "syntax-tree/code.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file13_name
+#define MR_FILE_NAME _mr_file12_name
 
 /* MR4 compiler - Syntax tree code nodes */
 
@@ -53,7 +53,7 @@ Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self);
 static char* _func_name_SyntaxTreeExpression_write = "SyntaxTreeExpression.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_write
 Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
-  CHECK(17, (self->expression)->_dtl[1](self->expression) )
+  CHECK(17, (self->expression)->_dtl[2](self->expression) )
   CHECK(18, write(&(String){2, 1, ";"}) )
   return OK;
 }
@@ -195,7 +195,7 @@ static char* _func_name_SyntaxTreeWhile_write = "SyntaxTreeWhile.write";
 Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
   /* if (!(`condition`) break; */
   CHECK(60, write(&(String){7, 6, "if (!("}) )
-  CHECK(61, (self->condition)->_dtl[1](self->condition) )
+  CHECK(61, (self->condition)->_dtl[2](self->condition) )
   CHECK(62, write(&(String){10, 9, ")) break;"}) )
   return OK;
 }
@@ -259,7 +259,6 @@ Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTr
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"

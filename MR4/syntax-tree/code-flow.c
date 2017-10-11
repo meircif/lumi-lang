@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file14_name = "syntax-tree/code-flow.3.mr";
+static char* _mr_file13_name = "syntax-tree/code-flow.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file14_name
+#define MR_FILE_NAME _mr_file13_name
 
 /* MR4 compiler - Syntax tree code flow elements */
 
@@ -159,7 +159,7 @@ static char* _func_name_SyntaxTreeIf_write = "SyntaxTreeIf.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_write
 Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
   CHECK(56, write(&(String){5, 4, "if ("}) )
-  CHECK(57, (self->condition)->_dtl[1](self->condition) )
+  CHECK(57, (self->condition)->_dtl[2](self->condition) )
   CHECK(58, write(&(String){2, 1, ")"}) )
   CHECK(59, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   if (NULL != self->else_node) {
@@ -333,7 +333,7 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
   CHECK(126, write_cname(self->index_name) )
   CHECK(127, write(&(String){2, 1, "="}) )
   if (NULL != self->start) {
-    CHECK(129, (self->start)->_dtl[1](self->start) )
+    CHECK(129, (self->start)->_dtl[2](self->start) )
   }
   else {
     CHECK(131, write(&(String){2, 1, "0"}) )
@@ -341,7 +341,7 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
   CHECK(132, write(&(String){3, 2, "; "}) )
   CHECK(133, write_cname(self->index_name) )
   CHECK(134, write(&(String){2, 1, "<"}) )
-  CHECK(135, (self->upper_bound)->_dtl[1](self->upper_bound) )
+  CHECK(135, (self->upper_bound)->_dtl[2](self->upper_bound) )
   CHECK(136, write(&(String){5, 4, "; ++"}) )
   CHECK(137, write_cname(self->index_name) )
   CHECK(138, write(&(String){2, 1, ")"}) )
@@ -367,7 +367,6 @@ Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTre
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"

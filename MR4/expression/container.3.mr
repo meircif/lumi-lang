@@ -4,14 +4,15 @@
 class BlockExpression(Expression)
   owner Expression expression
   
-  func inst parse-new():(owner Expression expression, copy Char end)
+  func inst parse-new(user SyntaxTreeCode code-node):(
+      owner Expression expression, copy Char end)
     new BlockExpression block-expression
-    block-expression.parse():(copy end)
+    block-expression.parse(user code-node):(copy end)
     expression := block-expression
   
   ## parsing `(expression)`
-  func inst parse():(copy Char end)
-    self.parse-sub-expression(user ")"):(owner self.expression)
+  func inst parse(user SyntaxTreeCode code-node):(copy Char end)
+    parse-new-expression(user ")", user code-node):(owner self.expression)
     read-c():(copy end)
   
   func dynamic write()
@@ -20,73 +21,83 @@ class BlockExpression(Expression)
     write(user ")")
 
 
-## A basic expression with an operator
-class OperatorExpression(Expression)
-  user Operator operator
+static Operator
+  owner String name
+  owner String c-name
+  var Int order
+  var Int group-index
   
-  func inst parse-operand-expression(user Operator operator, user String ends):(
-      owner Expression expression, copy Char end)
-    self.operator := operator
-    if end = '\n'
-      read-line-break-spaces()
-    owner String new-ends
-    string-new-concat(user " ", user ends):(owner new-ends)
-    self.parse-sub-expression(user new-ends):(owner expression, copy end)
-    delete new-ends
-  
-  func inst write-operator-and-expresssion(user Expression expression)
-    write(user self.operator.c-name)
-    write(user " ")
-    expression.write()
+  func inst init(
+      user String name,
+      user String c-name,
+      copy Int order,
+      copy Int group-index)
+    string-new-copy(user name):(owner self.name)
+    string-new-copy(user c-name):(owner self.c-name)
+    self.order := order
+    self.group-index := group-index
 
 
 ## An expression with an unary operator
-class UnaryExpression(OperatorExpression)
-  owner Expression expression
-  
-  func inst parse-new(user String ends, user Operator operator):(
-      owner Expression expression, copy Char end)
-    new UnaryExpression unary-expression
-    unary-expression.parse(user operator, user ends):(copy end)
-    expression := unary-expression
-  
-  ## parsing `operator expression` or `operator\n    expression`
-  func inst parse(user Operator operator, user String ends):(copy Char end)
-    self.parse-operand-expression(user operator, user ends):(
-        owner self.expression, copy end)
-  
-  func dynamic write()
-    self.write-operator-and-expresssion(user self.expression)
-
-
-## An expression with a binary operator
-class BinaryExpression(OperatorExpression)
-  owner Expression left-expression
+class UnaryExpression(Expression)
   user Operator operator
   owner Expression right-expression
   
-  func inst parse-new(user String ends, user Operator operator):(
-      owner Expression expression, copy Char end)
-    new BinaryExpression binary-expression
-    binary-expression.parse(owner expression, user operator, user ends):(
-        copy end)
-    expression := binary-expression
+  func inst parse-new(
+      user String ends, user Operator operator, user SyntaxTreeCode code-node):(
+      owner Expression expression, copy Char end, user Operator next-operator)
+    new UnaryExpression unary-expression
+    unary-expression.parse(user operator, user ends, user code-node):(
+        copy end, user next-operator)
+    expression := unary-expression
   
-  ## parsing `left-expression operator right-expression`
-  ## or `left-expression operator\n    right-expression`
   func inst parse(
-      owner Expression left-expression,
       user Operator operator,
-      user String ends):(
-      copy Char end)
-    self.left-expression := left-expression
-    self.parse-operand-expression(user operator, user ends):(
-        owner self.right-expression, copy end)
+      user String ends,
+      user SyntaxTreeCode code-node):(
+      copy Char end, user Operator next-operator)
+    self.operator := operator
+    if end = '\n'
+      read-line-break-spaces()
+    else-if end != ' '
+      f-syntax-error-c(user "unexpected", copy end)
+    Expression.parse-new(var _, user ends, user code-node, user operator):(
+        owner self.right-expression, copy end, user next-operator)
   
   func dynamic write()
+    self.write-start()
+    self.write-end()
+  
+  func inst write-start()
+    if not self.top
+      write(user "(")
+  
+  func inst write-end()
+    write(user self.operator.c-name)
+    write(user " ")
+    self.right-expression.write()
+    if not self.top
+      write(user ")")
+
+
+## An expression with a binary operator
+class BinaryExpression(UnaryExpression)
+  owner Expression left-expression
+  
+  func inst parse-new(
+      user String ends, user Operator operator, user SyntaxTreeCode code-node):(
+      owner Expression expression, copy Char end, user Operator next-operator)
+    new BinaryExpression binary-expression
+    binary-expression.left-expression := expression
+    binary-expression.parse(user operator, user ends, user code-node):(
+        copy end, user next-operator)
+    expression := binary-expression
+  
+  func dynamic write()
+    self.write-start()
     self.left-expression.write()
     write(user " ")
-    self.write-operator-and-expresssion(user self.right-expression)
+    self.write-end()
 
 
 ## An expression with the "?" operator
@@ -104,5 +115,9 @@ class QuestionExpression(Expression)
     read-c():(copy end)
   
   func dynamic write()
+    if not self.top
+      write(user "(")
     self.tested.write()
     write(user " != NULL")
+    if not self.top
+      write(user ")")

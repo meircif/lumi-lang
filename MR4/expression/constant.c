@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file8_name = "expression/constant.3.mr";
+static char* _mr_file7_name = "expression/constant.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file8_name
+#define MR_FILE_NAME _mr_file7_name
 
 /* MR4 compiler - Constant expressions */
 
@@ -109,7 +109,7 @@ static char* _func_name_IntExpression_parse_new = "IntExpression.parse-new";
 Returncode IntExpression_parse_new(IntExpression* self, String* text, Expression** expression) {
   IntExpression* int_expression = malloc(sizeof(IntExpression));
   if (int_expression == NULL) RAISE(38)
-  *int_expression = (IntExpression){IntExpression__dtl, NULL, NULL, false, NULL};
+  *int_expression = (IntExpression){IntExpression__dtl, NULL, NULL, false, false, NULL};
   int_expression->_base._base._dtl = IntExpression__dtl;
   CHECK(39, IntExpression_parse(int_expression, text) )
   (*expression) = &(int_expression->_base._base);
@@ -181,7 +181,7 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
 extern Func IntExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func IntExpression__dtl[] = {(void*)Expression_analyze, (void*)TextExpression_write};
+Func IntExpression__dtl[] = {(void*)Expression_analyze, (void*)Expression_analyze_call, (void*)TextExpression_write};
 #endif
 
 
@@ -201,7 +201,7 @@ static char* _func_name_CharExpression_parse_new = "CharExpression.parse-new";
 Returncode CharExpression_parse_new(CharExpression* self, String* text, Expression** expression) {
   CharExpression* char_expression = malloc(sizeof(CharExpression));
   if (char_expression == NULL) RAISE(71)
-  *char_expression = (CharExpression){CharExpression__dtl, NULL, NULL, false, NULL};
+  *char_expression = (CharExpression){CharExpression__dtl, NULL, NULL, false, false, NULL};
   char_expression->_base._base._dtl = CharExpression__dtl;
   CHECK(72, CharExpression_parse(char_expression, text) )
   (*expression) = &(char_expression->_base._base);
@@ -280,7 +280,7 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
 extern Func CharExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CharExpression__dtl[] = {(void*)Expression_analyze, (void*)TextExpression_write};
+Func CharExpression__dtl[] = {(void*)Expression_analyze, (void*)Expression_analyze_call, (void*)TextExpression_write};
 #endif
 
 
@@ -300,7 +300,7 @@ static char* _func_name_StringExpression_parse_new = "StringExpression.parse-new
 Returncode StringExpression_parse_new(StringExpression* self, String* text, Expression** expression) {
   StringExpression* string_expression = malloc(sizeof(StringExpression));
   if (string_expression == NULL) RAISE(108)
-  *string_expression = (StringExpression){StringExpression__dtl, NULL, NULL, false, NULL};
+  *string_expression = (StringExpression){StringExpression__dtl, NULL, NULL, false, false, NULL};
   string_expression->_base._base._dtl = StringExpression__dtl;
   CHECK(109, StringExpression_parse(string_expression, text) )
   (*expression) = &(string_expression->_base._base);
@@ -328,7 +328,7 @@ Returncode StringExpression_parse(StringExpression* self, String* text) {
 extern Func StringExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func StringExpression__dtl[] = {(void*)Expression_analyze, (void*)TextExpression_write};
+Func StringExpression__dtl[] = {(void*)Expression_analyze, (void*)Expression_analyze_call, (void*)TextExpression_write};
 #endif
 
 
@@ -348,7 +348,7 @@ static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
   EmptyExpression* _EmptyExpression21 = malloc(sizeof(EmptyExpression));
   if (_EmptyExpression21 == NULL) RAISE(123)
-  *_EmptyExpression21 = (EmptyExpression){EmptyExpression__dtl, NULL, NULL, false};
+  *_EmptyExpression21 = (EmptyExpression){EmptyExpression__dtl, NULL, NULL, false, false};
   _EmptyExpression21->_base._dtl = EmptyExpression__dtl;
   (*expression) = &(_EmptyExpression21->_base);
   CHECK(124, Expression_set_simple_type((*expression), glob->type_empty) )
@@ -372,7 +372,7 @@ Returncode EmptyExpression_write(EmptyExpression* self) {
 extern Func EmptyExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func EmptyExpression__dtl[] = {(void*)Expression_analyze, (void*)EmptyExpression_write};
+Func EmptyExpression__dtl[] = {(void*)Expression_analyze, (void*)Expression_analyze_call, (void*)EmptyExpression_write};
 #endif
 
 #undef MR_FILE_NAME
@@ -384,7 +384,6 @@ Func EmptyExpression__dtl[] = {(void*)Expression_analyze, (void*)EmptyExpression
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/container.c"
 #include "expression/expression.c"

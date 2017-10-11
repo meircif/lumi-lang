@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file7_name = "expression/call.3.mr";
+static char* _mr_file6_name = "expression/call.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file7_name
+#define MR_FILE_NAME _mr_file6_name
 
 /* MR4 compiler - Call expression */
 
@@ -23,34 +23,35 @@ struct CallExpression {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode CallExpression_parse_new(CallExpression* self, String* ends, Expression** expression, Char* end);
+Returncode CallExpression_parse_new(CallExpression* self, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_CallExpression_parse_new = "CallExpression.parse-new";
 #define MR_FUNC_NAME _func_name_CallExpression_parse_new
-Returncode CallExpression_parse_new(CallExpression* self, String* ends, Expression** expression, Char* end) {
+Returncode CallExpression_parse_new(CallExpression* self, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
   CallExpression* call_expression = malloc(sizeof(CallExpression));
   if (call_expression == NULL) RAISE(11)
-  *call_expression = (CallExpression){CallExpression__dtl, NULL, NULL, false, NULL, NULL, NULL};
+  *call_expression = (CallExpression){CallExpression__dtl, NULL, NULL, false, false, NULL, NULL, NULL};
   call_expression->_base._dtl = CallExpression__dtl;
-  CHECK(12, CallExpression_parse(call_expression, (*expression), &((*end))) )
+  CHECK(12, CallExpression_parse(call_expression, (*expression), code_node, &((*end))) )
   (*expression) = &(call_expression->_base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode CallExpression_parse(CallExpression* self, Expression* function, Char* end);
+Returncode CallExpression_parse(CallExpression* self, Expression* function, SyntaxTreeCode* code_node, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_CallExpression_parse = "CallExpression.parse";
 #define MR_FUNC_NAME _func_name_CallExpression_parse
-Returncode CallExpression_parse(CallExpression* self, Expression* function, Char* end) {
+Returncode CallExpression_parse(CallExpression* self, Expression* function, SyntaxTreeCode* code_node, Char* end) {
   self->function = function;
+  self->_base.code_node = code_node;
   self->arguments = malloc(sizeof(FunctionArguments));
-  if (self->arguments == NULL) RAISE(17)
+  if (self->arguments == NULL) RAISE(19)
   *self->arguments = (FunctionArguments){NULL, NULL};
   CallArgumentFactory* argument_factory = &(CallArgumentFactory){CallArgumentFactory__dtl};
   argument_factory->_base._dtl = CallArgumentFactory__dtl;
-  CHECK(19, FunctionArguments_parse(self->arguments, &(argument_factory->_base), self->_base.code_node, NULL, &((*end))) )
+  CHECK(21, FunctionArguments_parse(self->arguments, &(argument_factory->_base), code_node, NULL, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -61,44 +62,44 @@ Returncode CallExpression_analyze(CallExpression* self);
 static char* _func_name_CallExpression_analyze = "CallExpression.analyze";
 #define MR_FUNC_NAME _func_name_CallExpression_analyze
 Returncode CallExpression_analyze(CallExpression* self) {
-  CHECK(23, (self->function)->_dtl[0](self->function) )
-  CHECK(24, FunctionArguments_analyze(self->arguments) )
-  /* TODO add self... */
+  CHECK(25, (self->function)->_dtl[0](self->function) )
+  CHECK(26, FunctionArguments_analyze(self->arguments) )
   FunctionArguments* declaration = self->function->result_type->arguments;
   if (!(NULL != self->function->result_type->type_data)) {
-    CHECK(28, f_syntax_error_msg(&(String){32, 31, "void expression is not callable"}) )
+    CHECK(29, f_syntax_error_msg(&(String){32, 31, "void expression is not callable"}) )
   }
   if (self->function->result_type->type_data != glob->type_func ||  ! (NULL != declaration)) {
-    CHECK(31, f_syntax_error(&(String){18, 17, "non callable type"}, self->function->result_type->type_data->name) )
+    CHECK(32, f_syntax_error(&(String){18, 17, "non callable type"}, self->function->result_type->type_data->name) )
   }
   TypeInstance* _TypeInstance11;
-  CHECK(34, FunctionArguments_get_result_type(declaration, &(_TypeInstance11)) )
-  CHECK(34, TypeInstance_m_copy_new(_TypeInstance11, &(self->_base.result_type)) )
+  CHECK(35, FunctionArguments_get_result_type(declaration, &(_TypeInstance11)) )
+  CHECK(35, TypeInstance_m_copy_new(_TypeInstance11, &(self->_base.result_type)) )
+  CHECK(36, (self->function)->_dtl[1](self->function, self->arguments) )
   Bool _Bool12;
-  CHECK(35, FunctionArguments_m_check_calling(self->arguments, declaration, &(_Bool12)) )
+  CHECK(37, FunctionArguments_m_check_calling(self->arguments, declaration, &(_Bool12)) )
   if (_Bool12) {
     /* add omitted output */
     SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
-    if (symbol == NULL) RAISE(37)
-    *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, NULL, false, NULL, NULL, NULL};
+    if (symbol == NULL) RAISE(39)
+    *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, NULL, false, false, NULL, NULL, NULL};
     symbol->_base._base._dtl = SymbolExpression__dtl;
     symbol->_base._base.code_node = self->_base.code_node;
-    CHECK(39, TypeInstance_m_copy_new(self->_base.result_type, &(symbol->_base._base.result_type)) )
+    CHECK(41, TypeInstance_m_copy_new(self->_base.result_type, &(symbol->_base._base.result_type)) )
     symbol->_base._base.assignable = true;
-    CHECK(41, SyntaxTreeBlock_add_aux_variable(self->_base.code_node->parent, ((Argument*)(declaration->outputs->last->item))->access, self->_base.result_type, &(symbol->variable)) )
-    CHECK(45, string_new_copy(symbol->variable->name, &(symbol->_base.text)) )
+    CHECK(43, SyntaxTreeBlock_add_aux_variable(self->_base.code_node->parent, ((Argument*)(declaration->outputs->last->item))->access, self->_base.result_type, &(symbol->variable)) )
+    CHECK(47, string_new_copy(symbol->variable->name, &(symbol->_base.text)) )
     self->output = &(symbol->_base._base);
     CallArgument* output = malloc(sizeof(CallArgument));
-    if (output == NULL) RAISE(47)
+    if (output == NULL) RAISE(49)
     *output = (CallArgument){CallArgument__dtl, 0, NULL};
     output->_base._dtl = CallArgument__dtl;
     output->_base.access = ((Argument*)(declaration->outputs->last->item))->access;
     output->value = &(symbol->_base._base);
-    CHECK(50, List_add(self->arguments->outputs, &(output->_base)) )
+    CHECK(52, List_add(self->arguments->outputs, &(output->_base)) )
   }
   else {
     if (NULL != self->_base.result_type->type_data) {
-      CHECK(52, FunctionArguments_get_output(declaration, &(self->output)) )
+      CHECK(54, FunctionArguments_get_output(declaration, &(self->output)) )
     }
   }
   self->_base.assignable =  NULL !=  self->_base.result_type->type_data;
@@ -112,8 +113,8 @@ Returncode CallExpression_write(CallExpression* self);
 static char* _func_name_CallExpression_write = "CallExpression.write";
 #define MR_FUNC_NAME _func_name_CallExpression_write
 Returncode CallExpression_write(CallExpression* self) {
-  CHECK(56, (self->function)->_dtl[1](self->function) )
-  CHECK(57, FunctionArguments_write(self->arguments, false) )
+  CHECK(58, (self->function)->_dtl[2](self->function) )
+  CHECK(59, FunctionArguments_write(self->arguments, false) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -122,7 +123,7 @@ Returncode CallExpression_write(CallExpression* self) {
 extern Func CallExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallExpression__dtl[] = {(void*)CallExpression_analyze, (void*)CallExpression_write};
+Func CallExpression__dtl[] = {(void*)CallExpression_analyze, (void*)Expression_analyze_call, (void*)CallExpression_write};
 #endif
 
 
@@ -141,9 +142,9 @@ Returncode CallArgument_parse_value(CallArgument* self, SyntaxTreeCode* code_nod
 static char* _func_name_CallArgument_parse_value = "CallArgument.parse-value";
 #define MR_FUNC_NAME _func_name_CallArgument_parse_value
 Returncode CallArgument_parse_value(CallArgument* self, SyntaxTreeCode* code_node, Char* end) {
-  CHECK(65, parse_new_expression(&(String){3, 2, ",)"}, code_node, &(self->value), &((*end))) )
+  CHECK(67, parse_new_expression(&(String){3, 2, ",)"}, code_node, &(self->value), &((*end))) )
   if ((*end) != ',' && (*end) != ')') {
-    CHECK(68, f_syntax_error_c(&(String){25, 24, "expected \",\" or \")\", got"}, (*end)) )
+    CHECK(70, f_syntax_error_c(&(String){25, 24, "expected \",\" or \")\", got"}, (*end)) )
   }
   return OK;
 }
@@ -155,9 +156,9 @@ Returncode CallArgument_analyze(CallArgument* self, Bool is_output);
 static char* _func_name_CallArgument_analyze = "CallArgument.analyze";
 #define MR_FUNC_NAME _func_name_CallArgument_analyze
 Returncode CallArgument_analyze(CallArgument* self, Bool is_output) {
-  CHECK(71, (self->value)->_dtl[0](self->value) )
+  CHECK(73, (self->value)->_dtl[0](self->value) )
   if (is_output &&  ! self->value->assignable) {
-    CHECK(73, f_syntax_error_msg(&(String){27, 26, "non assignable call output"}) )
+    CHECK(75, f_syntax_error_msg(&(String){27, 26, "non assignable call output"}) )
   }
   return OK;
 }
@@ -193,11 +194,11 @@ static char* _func_name_CallArgument_write = "CallArgument.write";
 Returncode CallArgument_write(CallArgument* self, Bool is_output) {
   /* &(`value`) */
   if (is_output) {
-    CHECK(84, write(&(String){3, 2, "&("}) )
+    CHECK(86, write(&(String){3, 2, "&("}) )
   }
-  CHECK(85, (self->value)->_dtl[1](self->value) )
+  CHECK(87, (self->value)->_dtl[2](self->value) )
   if (is_output) {
-    CHECK(87, write(&(String){2, 1, ")"}) )
+    CHECK(89, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }
@@ -225,7 +226,7 @@ static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactor
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
   CallArgument* _CallArgument13 = malloc(sizeof(CallArgument));
-  if (_CallArgument13 == NULL) RAISE(92)
+  if (_CallArgument13 == NULL) RAISE(94)
   *_CallArgument13 = (CallArgument){CallArgument__dtl, 0, NULL};
   _CallArgument13->_base._dtl = CallArgument__dtl;
   (*new_argument) = &(_CallArgument13->_base);
@@ -249,7 +250,6 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"

@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file20_name = "syntax-tree/variable.3.mr";
+static char* _mr_file19_name = "syntax-tree/variable.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file20_name
+#define MR_FILE_NAME _mr_file19_name
 
 /* MR4 compiler - Syntax tree variable */
 
@@ -148,7 +148,7 @@ Returncode SyntaxTreeVariableInit_write(SyntaxTreeVariableInit* self) {
   /* `name` = `value`; */
   CHECK(65, write_cname(self->variable->name) )
   CHECK(66, write(&(String){4, 3, " = "}) )
-  CHECK(67, (self->value)->_dtl[1](self->value) )
+  CHECK(67, (self->value)->_dtl[2](self->value) )
   CHECK(68, write(&(String){2, 1, ";"}) )
   return OK;
 }
@@ -170,7 +170,6 @@ Func SyntaxTreeVariableInit__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)Synt
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"

@@ -21,7 +21,7 @@ BinaryExpression:
 func parse-new-expression(user String ends, user SyntaxTreeCode code-node):(
     owner Expression expression, copy Char end)
   Expression.parse-new(
-      var _, user ends, user code-node):(owner expression, copy end)
+      var _, user ends, user code-node, user _):(owner expression, copy end)
 
 
 ## Meta type for an expression in the language.
@@ -31,35 +31,43 @@ class Expression
   user SyntaxTreeCode code-node
   owner TypeInstance result-type
   var Bool assignable
-  
-  func inst parse-sub-expression(
-      user String ends):(owner Expression expression, copy Char end)
-    self.parse-new(user ends, user self.code-node):(owner expression, copy end)
+  var Bool top
   
   ## Parse any expression
-  func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
-      owner Expression expression, copy Char end)
+  func inst parse-new(
+      user String ends,
+      user SyntaxTreeCode code-node,
+      user Operator curr-operator):(
+      owner Expression expression,
+      copy Char end,
+      user Operator operator)
     expression := _
     var Bool multi-operands(not ends.has(copy ' '))
-    do
-      owner String text
-      self.read-new-value(user ends):(owner text, copy end)
-      
-      user Operator operator
-      glob.operator-map.find(user text):(user operator)
-      if ? operator
-        if not multi-operands
-          f-syntax-error(user "unexpected operator", user operator.name)
-        self.parse-new-operator(user operator, copy multi-operands, user ends):(
-            owner expression, copy end)
-      else
-        if ? expression
+    owner String text
+    self.read-new-value(user ends):(owner text, copy end)
+    glob.operator-map.find(user text):(user operator)
+    if ? operator
+      if not multi-operands
+        f-syntax-error(user "unexpected operator", user operator.name)
+      UnaryExpression.parse-new(
+          var _, user ends, user operator, user code-node):(
+          owner expression, copy end, user operator)
+    else
+      self.parse-new-operand(owner text, user ends, user code-node):(
+          owner expression, copy end)
+      if multi-operands and end = ' '
+        self.read-new-value(user ends):(owner text, copy end)
+        glob.operator-map.find(user text):(user operator)
+        if not (? operator)
           f-syntax-error(user "unknown operator", user text)
-        self.parse-new-operand(owner text, user ends):(
-            owner expression, copy end)
-      expression.code-node := code-node
-       
-      while multi-operands and end = ' '
+    do
+      while ? operator and
+          (not (? curr-operator) or operator.order < curr-operator.order)
+      BinaryExpression.parse-new(
+          var _, user ends, user operator, user code-node):(
+          owner expression, copy end, user operator)
+    if not (? curr-operator)
+      expression.top := true
   
   ## Read a single expression value as new string
   func inst read-new-value(user String ends):(owner String text, copy Char end)
@@ -68,40 +76,30 @@ class Expression
     read-new(user all-ends):(owner text, copy end)
     delete all-ends
   
-  ## Parse an expression with an operator
-  func inst parse-new-operator(
-      user Operator operator, copy Bool multi-operands, user String ends):(
-      owner Expression expression, copy Char end)
-    if (end != ' ' and end != '\n')
-      f-syntax-error-c(user "unexpected", copy end)
-    if ? expression
-      BinaryExpression.parse-new(var _, user ends, user operator):(
-          owner expression, copy end)
-    else
-      UnaryExpression.parse-new(var _, user ends, user operator):(
-          owner expression, copy end)
-  
   ## Parse an expression that is an operand
-  func inst parse-new-operand(owner String text, user String ends):(
+  func inst parse-new-operand(
+      owner String text, user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
     if text.length = 0
       if end = '('
-        BlockExpression.parse-new(var _):(owner expression, copy end)
+        BlockExpression.parse-new(var _, user code-node):(
+            owner expression, copy end)
       else
         f-syntax-error-c(user "unexpected", copy end)
       delete text
     else
-      self.parse-new-init-operand(owner text):(owner expression)
+      self.parse-new-init-operand(owner text, user code-node):(owner expression)
     
     do
       if end = '?'
         QuestionExpression.parse-new(var _):(owner expression, copy end)
-      while self.parse-new-follow-operand(user ends):(
+      while self.parse-new-follow-operand(user ends, user code-node):(
           owner expression, copy end)
   
   ## Parse the initialize part of an operand expression
   func inst parse-new-init-operand(
-      owner String text):(owner Expression expression)
+      owner String text, user SyntaxTreeCode code-node):(
+      owner Expression expression)
     var Char first(text[0])
     var Char second('\0')
     if text.length > 1
@@ -118,20 +116,25 @@ class Expression
     else-if text.length = 1 and first = '_'
       EmptyExpression.parse-new(var _, owner text):(owner expression)
     else-if text.equal(user "base")
-      BaseMethExpression.parse-new(var _, owner text):(owner expression)
+      BaseMethExpression.parse-new(var _, owner text, user code-node):(
+          owner expression)
     else
-      SymbolExpression.parse-new(var _, owner text):(owner expression)
+      SymbolExpression.parse-new(var _, owner text, user code-node):(
+          owner expression)
   
   ## Parse one following part of an operand
-  func inst parse-new-follow-operand(user String ends):(
+  func inst parse-new-follow-operand(
+      user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end, copy Bool has-more)
     has-more := true
     if end = '.'
       MemberExpression.parse-new(var _, user ends):(owner expression, copy end)
     else-if end = '['
-      SliceExpression.parse-new(var _, user ends):(owner expression, copy end)
+      SliceExpression.parse-new(var _, user ends, user code-node):(
+          owner expression, copy end)
     else-if end = '('
-      CallExpression.parse-new(var _, user ends):(owner expression, copy end)
+      CallExpression.parse-new(var _, user ends, user code-node):(
+          owner expression, copy end)
     else
       has-more := false
   
@@ -141,6 +144,9 @@ class Expression
     self.result-type.type-data := type-data
   
   func dynamic analyze()
+    # do noting
+  
+  func dynamic analyze-call(user FunctionArguments arguments)
     # do noting
   
   ## write to C
