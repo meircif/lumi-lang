@@ -27,11 +27,12 @@ func parse-new-expression(user String ends, user SyntaxTreeCode code-node):(
 ## Meta type for an expression in the language.
 ## Currently only the parsing is fully implemented, `write` is implemented only
 ## for testing.
-class Expression
+class Expression(SyntaxTreeNode)
   user SyntaxTreeCode code-node
   owner TypeInstance result-type
   var Bool assignable
   var Bool top
+  var Bool is-statement
   
   ## Parse any expression
   func inst parse-new(
@@ -48,7 +49,7 @@ class Expression
     glob.operator-map.find(user text):(user operator)
     if ? operator
       if not multi-operands
-        f-syntax-error(user "unexpected operator", user operator.name)
+        code-node.m-syntax-error(user "unexpected operator", user operator.name)
       UnaryExpression.parse-new(
           var _, user ends, user operator, user code-node):(
           owner expression, copy end, user operator)
@@ -59,7 +60,7 @@ class Expression
         self.read-new-value(user ends):(owner text, copy end)
         glob.operator-map.find(user text):(user operator)
         if not (? operator)
-          f-syntax-error(user "unknown operator", user text)
+          code-node.m-syntax-error(user "unknown operator", user text)
     do
       while ? operator and
           (not (? curr-operator) or operator.order < curr-operator.order)
@@ -85,7 +86,7 @@ class Expression
         BlockExpression.parse-new(var _, user code-node):(
             owner expression, copy end)
       else
-        f-syntax-error-c(user "unexpected", copy end)
+        code-node.m-syntax-error-c(user "unexpected", copy end)
       delete text
     else
       self.parse-new-init-operand(owner text, user code-node):(owner expression)
@@ -107,7 +108,8 @@ class Expression
     if first = '\''
       CharExpression.parse-new(var _, owner text):(owner expression)
     else-if first = '"'
-      StringExpression.parse-new(var _, owner text):(owner expression)
+      StringExpression.parse-new(var _, owner text, user code-node):(
+          owner expression)
     else-if (first >= '0' and first <= '9') or
         (first = '-' and second >= '0' and second <= '9')
       IntExpression.parse-new(var _, owner text):(owner expression)
@@ -140,19 +142,23 @@ class Expression
   
   ## Set type instance to be a type that has no sub-type
   func inst set-simple-type(user TypeData type-data)
-    new TypeInstance in self.result-type
-    self.result-type.type-data := type-data
+    type-data.m-new-type-instance():(owner self.result-type)
   
-  func dynamic analyze()
-    # do noting
+  func inst add-aux-variable(copy Int access):(owner Expression expression)
+    new SymbolExpression symbol
+    symbol.code-node := self.code-node
+    self.result-type.m-copy-new():(owner symbol.result-type)
+    symbol.assignable := true
+    self.code-node.parent.add-aux-variable(
+        copy access, user self.result-type):(user symbol.variable)
+    string-new-copy(user symbol.variable.name):(owner symbol.text)
+    expression := symbol
   
   func dynamic analyze-call(user FunctionArguments arguments)
     # do noting
   
-  ## write to C
-  func dynamic write()
-    # should be implemented by each specific expression type
-    raise
+  func dynamic write-preactions()
+    # do noting
 
 
 ## A basic expression that has a single textual value

@@ -6,6 +6,7 @@ class TypeData(SyntaxTreeNamespace)
   owner String base-type-name
   user TypeData base-type
   owner NameMap{SyntaxTreeFunction} dynamic-base-methods
+  var Bool is-primitive
   var Bool is-dynamic
   var Bool is-ordered
   
@@ -15,13 +16,14 @@ class TypeData(SyntaxTreeNamespace)
     new-node.parse(copy is-dynamic):(copy end)
   
   func inst parse(copy Bool is-dynamic):(copy Char end)
+    self.set-location()
     read-new(user "("):(owner self.name, copy end)
     self.is-dynamic := is-dynamic
     glob.add-type(user self)
     if end = '('
       read-new(user ")"):(owner self.base-type-name, copy end)
       if end != ')'
-        f-syntax-error-c(user "expected ) after base class, got", copy end)
+        self.m-syntax-error-c(user "expected ) after base class, got", copy end)
       read-c():(copy end)
     self.indentation-spaces := 2
     self.parse-block-children(user self):(copy end)
@@ -29,7 +31,7 @@ class TypeData(SyntaxTreeNamespace)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     if not self.parse-if-function(user keyword, user self):(copy end)
-      f-syntax-error(user "unknown keyword", user keyword)
+      self.m-syntax-error(user "unknown keyword", user keyword)
   
   func inst m-new-type-instance():(owner TypeInstance type-instance)
     new TypeInstance in type-instance
@@ -68,7 +70,7 @@ class TypeData(SyntaxTreeNamespace)
       return
     # init `self.base-type`
     if ? self.base-type-name
-      glob.m-find-type(user self.base-type-name):(user self.base-type)
+      self.m-find-type(user self.base-type-name):(user self.base-type)
       self.base-type.m-order-bases(user ordered-list)
     ordered-list.add(owner self)
     # init `self.dynamic-base-methods` and test override methods
@@ -215,7 +217,7 @@ static TypeInstance
     if ? self.arguments
       self.arguments.m-copy-new():(type-instance.arguments)
   
-  func inst parse(user String ends):(copy Char end)
+  func inst parse(user String ends, user SyntaxTreeNode node):(copy Char end)
     read-new(
         user string-new-concat(user ends, user "{")):(owner self.name, copy end)
     if end = '{'
@@ -225,60 +227,63 @@ static TypeInstance
         self.arguments.parse(user argument-factory, user _, user _):(copy end)
       else
         new TypeInstance in self.sub-type
-        self.sub-type.parse(user "}"):(copy end)
+        self.sub-type.parse(user "}", user node):(copy end)
       if end != '}'
-        f-syntax-error-c(user "expected \"}\", got ", copy end)
+        node.m-syntax-error-c(user "expected \"}\", got ", copy end)
       read-c():(copy end)
   
-  func inst analyze()
+  func inst analyze(user SyntaxTreeNode node)
     if not (? self.type-data)
-      f-find-type(user self.name):(user self.type-data)
+      node.m-find-type(user self.name):(user self.type-data)
     if ? self.sub-type
-      self.sub-type.analyze()
+      self.sub-type.analyze(user node)
   
-  func inst m-check-assign-to(user TypeInstance target)
+  func inst m-check-assign-to(
+      user TypeInstance target, user SyntaxTreeNode node)
     if not (? self.type-data)
-      f-syntax-error-msg(user "cannot assign void expression")
+      node.m-syntax-error-msg(user "cannot assign void expression")
     if not (? target.type-data)
-      f-syntax-error-msg(user "cannot assign into void expression")
+      node.m-syntax-error-msg(user "cannot assign into void expression")
+    if self.type-data = glob.type-empty and not target.type-data.is-primitive
+      return
     user TypeData base-type(self.type-data)
     do
       while base-type != target.type-data
       if not (? base-type.base-type)
-        f-syntax-error2(
+        node.m-syntax-error2(
             user "cannot assign",
             user self.type-data.name,
             user "into",
             user target.type-data.name)
       base-type := base-type.base-type
     
-    self.m-check-sub-equal(user target)
+    self.m-check-sub-equal(user target, user node)
   
-  func inst m-check-sub-equal(user TypeInstance other)
+  func inst m-check-sub-equal(user TypeInstance other, user SyntaxTreeNode node)
     if ? self.sub-type and ? self.sub-type.type-data
       if ? other.sub-type and ? other.sub-type.type-data
         if self.type-data != other.type-data
-          f-syntax-error2(
+          node.m-syntax-error2(
               user "cannot assign subtype",
               user self.sub-type.type-data.name,
               user "into subtype",
               user other.sub-type.type-data.name)
-        self.m-check-sub-equal(user other)
+        self.sub-type.m-check-sub-equal(user other.sub-type, user node)
       else
-        f-syntax-error2(
+        node.m-syntax-error2(
             user "cannot assign subtype",
             user self.sub-type.type-data.name,
             user "into type with no subtype",
             user other.type-data.name)
     else-if ? other.sub-type and ? other.sub-type.type-data
-      f-syntax-error2(
+      node.m-syntax-error2(
           user "cannot assign type with no subtype",
           user self.type-data.name,
           user "into subtype",
           user other.sub-type.type-data.name)
   
   func inst write()
-    write(user self.name)
+    write(user self.type-data.name)
     if ? self.sub-type
       write(user "{")
       self.sub-type.write()

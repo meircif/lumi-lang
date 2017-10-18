@@ -32,7 +32,7 @@ static char* _func_name_SyntaxTreeFunction_parse_new = "SyntaxTreeFunction.parse
 Returncode SyntaxTreeFunction_parse_new(SyntaxTreeFunction* self, TypeData* parent_type, Char* end, SyntaxTreeFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeFunction));
   if ((*new_node) == NULL) RAISE(13)
-  *(*new_node) = (SyntaxTreeFunction){SyntaxTreeFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false};
+  *(*new_node) = (SyntaxTreeFunction){SyntaxTreeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, false};
   (*new_node)->_base._base._base._dtl = SyntaxTreeFunction__dtl;
   CHECK(14, SyntaxTreeFunction_parse((*new_node), parent_type, &((*end))) )
   return OK;
@@ -45,37 +45,65 @@ Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, TypeData* parent_t
 static char* _func_name_SyntaxTreeFunction_parse = "SyntaxTreeFunction.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_parse
 Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, TypeData* parent_type, Char* end) {
-  self->aux_variables_owner = malloc(sizeof(List));
-  if (self->aux_variables_owner == NULL) RAISE(17)
-  *self->aux_variables_owner = (List){NULL, NULL};
-  self->_base.aux_variables = self->aux_variables_owner;
+  CHECK(17, SyntaxTreeFunction_init(self) )
   self->parent_type = parent_type;
   if (NULL != self->parent_type) {
     self->_base._base.indentation_spaces = 4;
     if (self->parent_type->is_dynamic) {
       String* meth_type = NULL;
-      Int _Int30;
-      CHECK(24, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int30)) )
-      Bool _Bool31;
-      CHECK(25, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool31)) )
-      if (_Bool31) {
+      Int _Int26;
+      CHECK(23, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int26)) )
+      Bool _Bool27;
+      CHECK(24, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool27)) )
+      if (_Bool27) {
         self->is_dynamic = true;
       }
       else {
-        Bool _Bool32;
-        CHECK(27, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool32)) )
-        if (!_Bool32) {
-          CHECK(28, f_syntax_error(&(String){46, 45, "expected \"dynamic\" or \"inst\" method type, got"}, meth_type) )
+        Bool _Bool28;
+        CHECK(26, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool28)) )
+        if (!_Bool28) {
+          CHECK(27, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){46, 45, "expected \"dynamic\" or \"inst\" method type, got"}, meth_type) )
         }
       }
     }
   }
-  else {
-    self->_base._base.indentation_spaces = 2;
-  }
-  CHECK(33, SyntaxTreeFunction_parse_header(self, &((*end))) )
-  CHECK(34, SyntaxTreeBlock_parse_block(&(self->_base), &((*end))) )
+  CHECK(30, SyntaxTreeFunction_parse_header(self, &((*end))) )
+  CHECK(31, SyntaxTreeFunction_parse_body(self, &((*end))) )
   self->_base._base.indentation_spaces = 2;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeFunction_init(SyntaxTreeFunction* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeFunction_init = "SyntaxTreeFunction.init";
+#define MR_FUNC_NAME _func_name_SyntaxTreeFunction_init
+Returncode SyntaxTreeFunction_init(SyntaxTreeFunction* self) {
+  CHECK(35, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
+  self->aux_variables_owner = malloc(sizeof(List));
+  if (self->aux_variables_owner == NULL) RAISE(36)
+  *self->aux_variables_owner = (List){NULL, NULL};
+  self->_base.aux_variables = self->aux_variables_owner;
+  self->_base._base.indentation_spaces = 2;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeFunction_parse_body(SyntaxTreeFunction* self, Char* end);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeFunction_parse_body = "SyntaxTreeFunction.parse-body";
+#define MR_FUNC_NAME _func_name_SyntaxTreeFunction_parse_body
+Returncode SyntaxTreeFunction_parse_body(SyntaxTreeFunction* self, Char* end) {
+  CHECK(41, SyntaxTreeBlock_parse_block(&(self->_base), &((*end))) )
+  Bool _Bool29;
+  CHECK(42, SyntaxTreeBlock_m_has_end_point(&(self->_base), &(_Bool29)) )
+  if (!_Bool29) {
+    SyntaxTreeReturn* _SyntaxTreeReturn30;
+    CHECK(43, SyntaxTreeReturn_parse_new(NULL, &(self->_base), &((*end)), &(_SyntaxTreeReturn30)) )
+    CHECK(43, List_add(self->_base._base.code_nodes, &(_SyntaxTreeReturn30->_base)) )
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -86,16 +114,17 @@ Returncode SyntaxTreeFunction_parse_header(SyntaxTreeFunction* self, Char* end);
 static char* _func_name_SyntaxTreeFunction_parse_header = "SyntaxTreeFunction.parse-header";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_parse_header
 Returncode SyntaxTreeFunction_parse_header(SyntaxTreeFunction* self, Char* end) {
-  CHECK(38, read_new(&(String){2, 1, "("}, &(self->name), &((*end))) )
+  CHECK(47, read_new(&(String){2, 1, "("}, &(self->name), &((*end))) )
   if ((*end) != '(') {
-    CHECK(40, f_syntax_error_c(&(String){38, 37, "expected \"(\" after function name, got"}, (*end)) )
+    CHECK(49, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){38, 37, "expected \"(\" after function name, got"}, (*end)) )
   }
   self->arguments = malloc(sizeof(FunctionArguments));
-  if (self->arguments == NULL) RAISE(41)
-  *self->arguments = (FunctionArguments){NULL, NULL};
+  if (self->arguments == NULL) RAISE(51)
+  *self->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
+  self->arguments->_base._dtl = FunctionArguments__dtl;
   ArgumentFactory* argument_factory = &(ArgumentFactory){ArgumentFactory__dtl};
   argument_factory->_dtl = ArgumentFactory__dtl;
-  CHECK(43, FunctionArguments_parse(self->arguments, argument_factory, NULL, self->parent_type, &((*end))) )
+  CHECK(53, FunctionArguments_parse(self->arguments, argument_factory, NULL, self->parent_type, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -112,13 +141,30 @@ Returncode SyntaxTreeFunction_m_get_parent_type(SyntaxTreeFunction* self, TypeDa
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeFunction_m_find_variable(SyntaxTreeFunction* self, String* name, SyntaxTreeVariable** variable);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeFunction_m_find_variable = "SyntaxTreeFunction.m-find-variable";
+#define MR_FUNC_NAME _func_name_SyntaxTreeFunction_m_find_variable
+Returncode SyntaxTreeFunction_m_find_variable(SyntaxTreeFunction* self, String* name, SyntaxTreeVariable** variable) {
+  CHECK(61, SyntaxTreeBlock_m_find_variable(&(self->_base), name, &((*variable))) )
+  if (!(NULL != (*variable))) {
+    CHECK(63, FunctionArguments_m_find_variable(self->arguments, name, &((*variable))) )
+  }
+  if (!(NULL != (*variable))) {
+    CHECK(65, (glob->root)->_base._base._base._dtl[3](glob->root, name, &((*variable))) )
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeFunction_analyze(SyntaxTreeFunction* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeFunction_analyze = "SyntaxTreeFunction.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_analyze
 Returncode SyntaxTreeFunction_analyze(SyntaxTreeFunction* self) {
-  CHECK(50, FunctionArguments_analyze(self->arguments) )
-  CHECK(51, SyntaxTreeBranch_analyze(&(self->_base._base)) )
+  CHECK(68, FunctionArguments_analyze(self->arguments) )
+  CHECK(69, SyntaxTreeBranch_analyze(&(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -130,7 +176,7 @@ static char* _func_name_SyntaxTreeFunction_m_compare = "SyntaxTreeFunction.m-com
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_m_compare
 Returncode SyntaxTreeFunction_m_compare(SyntaxTreeFunction* self, SyntaxTreeFunction* other) {
   if (self->is_dynamic != other->is_dynamic) {
-    CHECK(55, f_syntax_error(&(String){28, 27, "illegal dynamic in function"}, self->name) )
+    CHECK(73, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "illegal dynamic in function"}, self->name) )
   }
   return OK;
 }
@@ -145,8 +191,8 @@ Returncode SyntaxTreeFunction_write(SyntaxTreeFunction* self) {
   /* Returncode `Type`_`name`(`args`) { */
   /*   `block...` */
   /* } */
-  CHECK(62, SyntaxTreeFunction_write_header(self) )
-  CHECK(63, SyntaxTreeBlock_write_block(&(self->_base)) )
+  CHECK(80, SyntaxTreeFunction_write_header(self) )
+  CHECK(81, SyntaxTreeBlock_write_block(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -157,13 +203,13 @@ Returncode SyntaxTreeFunction_write_header(SyntaxTreeFunction* self);
 static char* _func_name_SyntaxTreeFunction_write_header = "SyntaxTreeFunction.write-header";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_write_header
 Returncode SyntaxTreeFunction_write_header(SyntaxTreeFunction* self) {
-  CHECK(66, write(&(String){12, 11, "Returncode "}) )
+  CHECK(84, write(&(String){12, 11, "Returncode "}) )
   if (NULL != self->parent_type) {
-    CHECK(68, write_cname(self->parent_type->name) )
-    CHECK(69, write(&(String){2, 1, "_"}) )
+    CHECK(86, write_cname(self->parent_type->name) )
+    CHECK(87, write(&(String){2, 1, "_"}) )
   }
-  CHECK(70, write_cname(self->name) )
-  CHECK(71, FunctionArguments_write(self->arguments, true) )
+  CHECK(88, write_cname(self->name) )
+  CHECK(89, FunctionArguments_write(self->arguments, true) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -174,10 +220,10 @@ Returncode SyntaxTreeFunction_write_pointer(SyntaxTreeFunction* self);
 static char* _func_name_SyntaxTreeFunction_write_pointer = "SyntaxTreeFunction.write-pointer";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_write_pointer
 Returncode SyntaxTreeFunction_write_pointer(SyntaxTreeFunction* self) {
-  CHECK(74, write(&(String){14, 13, "Returncode (*"}) )
-  CHECK(75, write_cname(self->name) )
-  CHECK(76, write(&(String){2, 1, ")"}) )
-  CHECK(77, FunctionArguments_write(self->arguments, true) )
+  CHECK(92, write(&(String){14, 13, "Returncode (*"}) )
+  CHECK(93, write_cname(self->name) )
+  CHECK(94, write(&(String){2, 1, ")"}) )
+  CHECK(95, FunctionArguments_write(self->arguments, true) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -189,9 +235,9 @@ static char* _func_name_SyntaxTreeFunction_write_declaration = "SyntaxTreeFuncti
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_write_declaration
 Returncode SyntaxTreeFunction_write_declaration(SyntaxTreeFunction* self) {
   /* Returncode `Type`_`name`(`args`); */
-  CHECK(81, write(&(String){2, 1, "\n"}) )
-  CHECK(82, SyntaxTreeFunction_write_header(self) )
-  CHECK(83, write(&(String){3, 2, ";\n"}) )
+  CHECK(99, write(&(String){2, 1, "\n"}) )
+  CHECK(100, SyntaxTreeFunction_write_header(self) )
+  CHECK(101, write(&(String){3, 2, ";\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -200,7 +246,7 @@ Returncode SyntaxTreeFunction_write_declaration(SyntaxTreeFunction* self) {
 extern Func SyntaxTreeFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_get_parent_type};
+Func SyntaxTreeFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type};
 #endif
 
 
@@ -219,10 +265,10 @@ static char* _func_name_SyntaxTreeMainFunction_parse_new = "SyntaxTreeMainFuncti
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse_new
 Returncode SyntaxTreeMainFunction_parse_new(SyntaxTreeMainFunction* self, Char* end, SyntaxTreeMainFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMainFunction));
-  if ((*new_node) == NULL) RAISE(89)
-  *(*new_node) = (SyntaxTreeMainFunction){SyntaxTreeMainFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false};
+  if ((*new_node) == NULL) RAISE(107)
+  *(*new_node) = (SyntaxTreeMainFunction){SyntaxTreeMainFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMainFunction__dtl;
-  CHECK(90, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
+  CHECK(108, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -233,22 +279,14 @@ Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end)
 static char* _func_name_SyntaxTreeMainFunction_parse = "SyntaxTreeMainFunction.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse
 Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end) {
-  self->_base._base._base.indentation_spaces = 2;
-  String* _String33;
-  CHECK(94, string_new_copy(&(String){5, 4, "main"}, &(_String33)) )
-  self->_base.name = _String33;
-  CHECK(95, SyntaxTreeBlock_parse_block(&(self->_base._base), &((*end))) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeMainFunction_analyze(SyntaxTreeMainFunction* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeMainFunction_analyze = "SyntaxTreeMainFunction.analyze";
-#define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_analyze
-Returncode SyntaxTreeMainFunction_analyze(SyntaxTreeMainFunction* self) {
-  /* TODO... */
+  CHECK(111, SyntaxTreeFunction_init(&(self->_base)) )
+  CHECK(112, string_new_copy(&(String){5, 4, "main"}, &(self->_base.name)) )
+  self->_base.arguments = malloc(sizeof(FunctionArguments));
+  if (self->_base.arguments == NULL) RAISE(113)
+  *self->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
+  self->_base.arguments->_base._dtl = FunctionArguments__dtl;
+  CHECK(114, FunctionArguments_init(self->_base.arguments) )
+  CHECK(115, SyntaxTreeFunction_parse_body(&(self->_base), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -263,9 +301,9 @@ Returncode SyntaxTreeMainFunction_write(SyntaxTreeMainFunction* self) {
   /*   `block...` */
   /* } */
   /* MAIN_FUNC */
-  CHECK(105, write(&(String){18, 17, "\nUSER_MAIN_HEADER"}) )
-  CHECK(106, SyntaxTreeBlock_write_block(&(self->_base._base)) )
-  CHECK(107, write(&(String){12, 11, "\nMAIN_FUNC\n"}) )
+  CHECK(122, write(&(String){18, 17, "\nUSER_MAIN_HEADER"}) )
+  CHECK(123, SyntaxTreeBlock_write_block(&(self->_base._base)) )
+  CHECK(124, write(&(String){12, 11, "\nMAIN_FUNC\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -274,7 +312,7 @@ Returncode SyntaxTreeMainFunction_write(SyntaxTreeMainFunction* self) {
 extern Func SyntaxTreeMainFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeMainFunction__dtl[] = {(void*)SyntaxTreeMainFunction_analyze, (void*)SyntaxTreeMainFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_get_parent_type};
+Func SyntaxTreeMainFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeMainFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type};
 #endif
 
 
@@ -293,10 +331,10 @@ static char* _func_name_SyntaxTreeNativeFunction_parse_new = "SyntaxTreeNativeFu
 #define MR_FUNC_NAME _func_name_SyntaxTreeNativeFunction_parse_new
 Returncode SyntaxTreeNativeFunction_parse_new(SyntaxTreeNativeFunction* self, Char* end, SyntaxTreeNativeFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeNativeFunction));
-  if ((*new_node) == NULL) RAISE(113)
-  *(*new_node) = (SyntaxTreeNativeFunction){SyntaxTreeNativeFunction__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false};
+  if ((*new_node) == NULL) RAISE(130)
+  *(*new_node) = (SyntaxTreeNativeFunction){SyntaxTreeNativeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeNativeFunction__dtl;
-  CHECK(114, SyntaxTreeNativeFunction_parse((*new_node), &((*end))) )
+  CHECK(131, SyntaxTreeNativeFunction_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -307,10 +345,11 @@ Returncode SyntaxTreeNativeFunction_parse(SyntaxTreeNativeFunction* self, Char* 
 static char* _func_name_SyntaxTreeNativeFunction_parse = "SyntaxTreeNativeFunction.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNativeFunction_parse
 Returncode SyntaxTreeNativeFunction_parse(SyntaxTreeNativeFunction* self, Char* end) {
+  CHECK(134, SyntaxTreeNode_set_location(&(self->_base._base._base._base)) )
   self->_base._base._base.indentation_spaces = 2;
-  CHECK(118, SyntaxTreeFunction_parse_header(&(self->_base), &((*end))) )
+  CHECK(136, SyntaxTreeFunction_parse_header(&(self->_base), &((*end))) )
   self->_base._base._base.code_nodes = malloc(sizeof(List));
-  if (self->_base._base._base.code_nodes == NULL) RAISE(119)
+  if (self->_base._base._base.code_nodes == NULL) RAISE(137)
   *self->_base._base._base.code_nodes = (List){NULL, NULL};
   return OK;
 }
@@ -331,17 +370,18 @@ Returncode SyntaxTreeNativeFunction_write(SyntaxTreeNativeFunction* self) {
 extern Func SyntaxTreeNativeFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeNativeFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeNativeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_get_parent_type};
+Func SyntaxTreeNativeFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeNativeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type};
 #endif
 
 
 /* Basic function argument */
 #if MR_STAGE == MR_TYPEDEFS
 typedef struct Argument Argument;
-#elif MR_STAGE == MR_TYPES(0)
+#elif MR_STAGE == MR_TYPES(1)
 struct Argument {
-  Func* _dtl;
+  SyntaxTreeNode _base;
   Int access;
+  Bool is_output;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
@@ -350,18 +390,20 @@ Returncode Argument_m_copy_new(Argument* self, DeclarationArgument** new_argumen
 static char* _func_name_Argument_m_copy_new = "Argument.m-copy-new";
 #define MR_FUNC_NAME _func_name_Argument_m_copy_new
 Returncode Argument_m_copy_new(Argument* self, DeclarationArgument** new_argument) {
-  RAISE(130)
+  RAISE(149)
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Argument_parse(Argument* self, String* access_str, SyntaxTreeCode* code_node, Char* end);
+Returncode Argument_parse(Argument* self, String* access_str, Bool is_output, SyntaxTreeCode* code_node, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Argument_parse = "Argument.parse";
 #define MR_FUNC_NAME _func_name_Argument_parse
-Returncode Argument_parse(Argument* self, String* access_str, SyntaxTreeCode* code_node, Char* end) {
-  CHECK(134, get_access(access_str, &(self->access)) )
-  CHECK(135, (self)->_dtl[1](self, code_node, &((*end))) )
+Returncode Argument_parse(Argument* self, String* access_str, Bool is_output, SyntaxTreeCode* code_node, Char* end) {
+  self->is_output = is_output;
+  CHECK(157, SyntaxTreeNode_set_location(&(self->_base)) )
+  CHECK(158, SyntaxTreeNode_get_access(&(self->_base), access_str, &(self->access)) )
+  CHECK(159, (self)->_base._dtl[3](self, code_node, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -372,17 +414,7 @@ Returncode Argument_parse_value(Argument* self, SyntaxTreeCode* code_node, Char*
 static char* _func_name_Argument_parse_value = "Argument.parse-value";
 #define MR_FUNC_NAME _func_name_Argument_parse_value
 Returncode Argument_parse_value(Argument* self, SyntaxTreeCode* code_node, Char* end) {
-  RAISE(138)
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode Argument_analyze(Argument* self, Bool is_output);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Argument_analyze = "Argument.analyze";
-#define MR_FUNC_NAME _func_name_Argument_analyze
-Returncode Argument_analyze(Argument* self, Bool is_output) {
-  RAISE(141)
+  RAISE(162)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -392,7 +424,17 @@ Returncode Argument_get_type_instance(Argument* self, TypeInstance** type_instan
 static char* _func_name_Argument_get_type_instance = "Argument.get-type-instance";
 #define MR_FUNC_NAME _func_name_Argument_get_type_instance
 Returncode Argument_get_type_instance(Argument* self, TypeInstance** type_instance) {
-  RAISE(144)
+  RAISE(165)
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode Argument_get_variable(Argument* self, SyntaxTreeVariable** variable);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_Argument_get_variable = "Argument.get-variable";
+#define MR_FUNC_NAME _func_name_Argument_get_variable
+Returncode Argument_get_variable(Argument* self, SyntaxTreeVariable** variable) {
+  RAISE(168)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -402,17 +444,17 @@ Returncode Argument_get_output(Argument* self, Expression** output);
 static char* _func_name_Argument_get_output = "Argument.get-output";
 #define MR_FUNC_NAME _func_name_Argument_get_output
 Returncode Argument_get_output(Argument* self, Expression** output) {
-  RAISE(147)
+  RAISE(171)
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Argument_write(Argument* self, Bool is_output);
+Returncode Argument_write_preactions(Argument* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Argument_write = "Argument.write";
-#define MR_FUNC_NAME _func_name_Argument_write
-Returncode Argument_write(Argument* self, Bool is_output) {
-  RAISE(150)
+static char* _func_name_Argument_write_preactions = "Argument.write-preactions";
+#define MR_FUNC_NAME _func_name_Argument_write_preactions
+Returncode Argument_write_preactions(Argument* self) {
+  RAISE(174)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -420,18 +462,17 @@ Returncode Argument_write(Argument* self, Bool is_output) {
 extern Func Argument__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Argument__dtl[] = {(void*)Argument_m_copy_new, (void*)Argument_parse_value, (void*)Argument_analyze, (void*)Argument_get_type_instance, (void*)Argument_get_output, (void*)Argument_write};
+Func Argument__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Argument_m_copy_new, (void*)Argument_parse_value, (void*)Argument_get_type_instance, (void*)Argument_get_variable, (void*)Argument_get_output, (void*)Argument_write_preactions};
 #endif
 
 
 /* Function declaration argument */
 #if MR_STAGE == MR_TYPEDEFS
 typedef struct DeclarationArgument DeclarationArgument;
-#elif MR_STAGE == MR_TYPES(1)
+#elif MR_STAGE == MR_TYPES(2)
 struct DeclarationArgument {
   Argument _base;
-  TypeInstance* type_instance;
-  String* name;
+  SyntaxTreeVariable* variable;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
@@ -441,13 +482,17 @@ static char* _func_name_DeclarationArgument_m_copy_new = "DeclarationArgument.m-
 #define MR_FUNC_NAME _func_name_DeclarationArgument_m_copy_new
 Returncode DeclarationArgument_m_copy_new(DeclarationArgument* self, DeclarationArgument** new_argument) {
   (*new_argument) = malloc(sizeof(DeclarationArgument));
-  if ((*new_argument) == NULL) RAISE(159)
-  *(*new_argument) = (DeclarationArgument){DeclarationArgument__dtl, 0, NULL, NULL};
-  (*new_argument)->_base._dtl = DeclarationArgument__dtl;
+  if ((*new_argument) == NULL) RAISE(182)
+  *(*new_argument) = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
+  (*new_argument)->_base._base._dtl = DeclarationArgument__dtl;
   (*new_argument)->_base.access = self->_base.access;
-  TypeInstance* _TypeInstance34;
-  CHECK(161, TypeInstance_m_copy_new(self->type_instance, &(_TypeInstance34)) )
-  CHECK(162, string_new_copy(self->name, &((*new_argument)->name)) )
+  (*new_argument)->variable = malloc(sizeof(SyntaxTreeVariable));
+  if ((*new_argument)->variable == NULL) RAISE(184)
+  *(*new_argument)->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL};
+  (*new_argument)->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
+  (*new_argument)->variable->access = self->variable->access;
+  CHECK(186, TypeInstance_m_copy_new(self->variable->type_instance, &((*new_argument)->variable->type_instance)) )
+  CHECK(188, string_new_copy(self->variable->name, &((*new_argument)->variable->name)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -458,25 +503,30 @@ Returncode DeclarationArgument_parse_value(DeclarationArgument* self, SyntaxTree
 static char* _func_name_DeclarationArgument_parse_value = "DeclarationArgument.parse-value";
 #define MR_FUNC_NAME _func_name_DeclarationArgument_parse_value
 Returncode DeclarationArgument_parse_value(DeclarationArgument* self, SyntaxTreeCode* code_node, Char* end) {
-  self->type_instance = malloc(sizeof(TypeInstance));
-  if (self->type_instance == NULL) RAISE(165)
-  *self->type_instance = (TypeInstance){NULL, NULL, NULL, NULL};
-  CHECK(166, TypeInstance_parse(self->type_instance, &(String){2, 1, " "}, &((*end))) )
+  self->variable = malloc(sizeof(SyntaxTreeVariable));
+  if (self->variable == NULL) RAISE(191)
+  *self->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL};
+  self->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
+  self->variable->access = self->_base.access;
+  self->variable->type_instance = malloc(sizeof(TypeInstance));
+  if (self->variable->type_instance == NULL) RAISE(193)
+  *self->variable->type_instance = (TypeInstance){NULL, NULL, NULL, NULL};
+  CHECK(194, TypeInstance_parse(self->variable->type_instance, &(String){2, 1, " "}, &(self->_base._base), &((*end))) )
   if ((*end) != ' ') {
-    CHECK(168, f_syntax_error_c(&(String){31, 30, "expected space after type, got"}, (*end)) )
+    CHECK(196, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){31, 30, "expected space after type, got"}, (*end)) )
   }
-  CHECK(169, read_new(&(String){3, 2, ",)"}, &(self->name), &((*end))) )
+  CHECK(197, read_new(&(String){3, 2, ",)"}, &(self->variable->name), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode DeclarationArgument_analyze(DeclarationArgument* self, Bool is_output);
+Returncode DeclarationArgument_analyze(DeclarationArgument* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_DeclarationArgument_analyze = "DeclarationArgument.analyze";
 #define MR_FUNC_NAME _func_name_DeclarationArgument_analyze
-Returncode DeclarationArgument_analyze(DeclarationArgument* self, Bool is_output) {
-  CHECK(172, TypeInstance_analyze(self->type_instance) )
+Returncode DeclarationArgument_analyze(DeclarationArgument* self) {
+  CHECK(200, TypeInstance_analyze(self->variable->type_instance, &(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -487,27 +537,38 @@ Returncode DeclarationArgument_get_type_instance(DeclarationArgument* self, Type
 static char* _func_name_DeclarationArgument_get_type_instance = "DeclarationArgument.get-type-instance";
 #define MR_FUNC_NAME _func_name_DeclarationArgument_get_type_instance
 Returncode DeclarationArgument_get_type_instance(DeclarationArgument* self, TypeInstance** type_instance) {
-  (*type_instance) = self->type_instance;
+  (*type_instance) = self->variable->type_instance;
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode DeclarationArgument_write(DeclarationArgument* self, Bool is_output);
+Returncode DeclarationArgument_get_variable(DeclarationArgument* self, SyntaxTreeVariable** variable);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_DeclarationArgument_get_variable = "DeclarationArgument.get-variable";
+#define MR_FUNC_NAME _func_name_DeclarationArgument_get_variable
+Returncode DeclarationArgument_get_variable(DeclarationArgument* self, SyntaxTreeVariable** variable) {
+  (*variable) = self->variable;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode DeclarationArgument_write(DeclarationArgument* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_DeclarationArgument_write = "DeclarationArgument.write";
 #define MR_FUNC_NAME _func_name_DeclarationArgument_write
-Returncode DeclarationArgument_write(DeclarationArgument* self, Bool is_output) {
+Returncode DeclarationArgument_write(DeclarationArgument* self) {
   /* `type`** `name` */
-  CHECK(179, write_cname(self->type_instance->type_data->name) )
+  CHECK(210, write_cname(self->variable->type_instance->type_data->name) )
   if (self->_base.access != ACCESS_COPY) {
-    CHECK(181, write(&(String){2, 1, "*"}) )
+    CHECK(212, write(&(String){2, 1, "*"}) )
   }
-  if (is_output) {
-    CHECK(183, write(&(String){2, 1, "*"}) )
+  if (self->_base.is_output) {
+    CHECK(214, write(&(String){2, 1, "*"}) )
   }
-  CHECK(184, write(&(String){2, 1, " "}) )
-  CHECK(185, write_cname(self->name) )
+  CHECK(215, write(&(String){2, 1, " "}) )
+  CHECK(216, write_cname(self->variable->name) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -516,7 +577,7 @@ Returncode DeclarationArgument_write(DeclarationArgument* self, Bool is_output) 
 extern Func DeclarationArgument__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func DeclarationArgument__dtl[] = {(void*)DeclarationArgument_m_copy_new, (void*)DeclarationArgument_parse_value, (void*)DeclarationArgument_analyze, (void*)DeclarationArgument_get_type_instance, (void*)Argument_get_output, (void*)DeclarationArgument_write};
+Func DeclarationArgument__dtl[] = {(void*)DeclarationArgument_analyze, (void*)DeclarationArgument_write, (void*)DeclarationArgument_m_copy_new, (void*)DeclarationArgument_parse_value, (void*)DeclarationArgument_get_type_instance, (void*)DeclarationArgument_get_variable, (void*)Argument_get_output, (void*)Argument_write_preactions};
 #endif
 
 
@@ -533,11 +594,11 @@ Returncode ArgumentFactory_m_new_argument(ArgumentFactory* self, Argument** new_
 static char* _func_name_ArgumentFactory_m_new_argument = "ArgumentFactory.m-new-argument";
 #define MR_FUNC_NAME _func_name_ArgumentFactory_m_new_argument
 Returncode ArgumentFactory_m_new_argument(ArgumentFactory* self, Argument** new_argument) {
-  DeclarationArgument* _DeclarationArgument35 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument35 == NULL) RAISE(190)
-  *_DeclarationArgument35 = (DeclarationArgument){DeclarationArgument__dtl, 0, NULL, NULL};
-  _DeclarationArgument35->_base._dtl = DeclarationArgument__dtl;
-  (*new_argument) = &(_DeclarationArgument35->_base);
+  DeclarationArgument* _DeclarationArgument31 = malloc(sizeof(DeclarationArgument));
+  if (_DeclarationArgument31 == NULL) RAISE(221)
+  *_DeclarationArgument31 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
+  _DeclarationArgument31->_base._base._dtl = DeclarationArgument__dtl;
+  (*new_argument) = &(_DeclarationArgument31->_base);
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -553,8 +614,9 @@ Func ArgumentFactory__dtl[] = {(void*)ArgumentFactory_m_new_argument};
 /* All function parameters and outputs */
 #if MR_STAGE == MR_TYPEDEFS
 typedef struct FunctionArguments FunctionArguments;
-#elif MR_STAGE == MR_TYPES(0)
+#elif MR_STAGE == MR_TYPES(1)
 struct FunctionArguments {
+  SyntaxTreeNode _base;
   List* parameters;
   List* outputs;
 };
@@ -565,8 +627,8 @@ Returncode FunctionArguments_m_copy_new(FunctionArguments* self, FunctionArgumen
 static char* _func_name_FunctionArguments_m_copy_new = "FunctionArguments.m-copy-new";
 #define MR_FUNC_NAME _func_name_FunctionArguments_m_copy_new
 Returncode FunctionArguments_m_copy_new(FunctionArguments* self, FunctionArguments** new_arguments) {
-  CHECK(199, FunctionArguments_m_copy_new_args(self, self->parameters, (*new_arguments)->parameters) )
-  CHECK(200, FunctionArguments_m_copy_new_args(self, self->outputs, (*new_arguments)->outputs) )
+  CHECK(230, FunctionArguments_m_copy_new_args(self, self->parameters, (*new_arguments)->parameters) )
+  CHECK(231, FunctionArguments_m_copy_new_args(self, self->outputs, (*new_arguments)->outputs) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -580,11 +642,28 @@ Returncode FunctionArguments_m_copy_new_args(FunctionArguments* self, List* argu
   ListNode* node = arguments->first;
   while (true) {
     if (!(NULL != node)) break;
-    DeclarationArgument* _DeclarationArgument36;
-    CHECK(207, (((Argument*)(node->item)))->_dtl[0](((Argument*)(node->item)), &(_DeclarationArgument36)) )
-    CHECK(207, List_add(new_arguments, &(_DeclarationArgument36->_base)) )
+    DeclarationArgument* _DeclarationArgument32;
+    CHECK(238, (((Argument*)(node->item)))->_base._dtl[2](((Argument*)(node->item)), &(_DeclarationArgument32)) )
+    CHECK(238, List_add(new_arguments, &(_DeclarationArgument32->_base)) )
     node = node->next;
   }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode FunctionArguments_init(FunctionArguments* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_FunctionArguments_init = "FunctionArguments.init";
+#define MR_FUNC_NAME _func_name_FunctionArguments_init
+Returncode FunctionArguments_init(FunctionArguments* self) {
+  CHECK(242, SyntaxTreeNode_set_location(&(self->_base)) )
+  self->parameters = malloc(sizeof(List));
+  if (self->parameters == NULL) RAISE(243)
+  *self->parameters = (List){NULL, NULL};
+  self->outputs = malloc(sizeof(List));
+  if (self->outputs == NULL) RAISE(244)
+  *self->outputs = (List){NULL, NULL};
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -595,26 +674,25 @@ Returncode FunctionArguments_parse(FunctionArguments* self, ArgumentFactory* arg
 static char* _func_name_FunctionArguments_parse = "FunctionArguments.parse";
 #define MR_FUNC_NAME _func_name_FunctionArguments_parse
 Returncode FunctionArguments_parse(FunctionArguments* self, ArgumentFactory* argument_factory, SyntaxTreeCode* code_node, TypeData* parent_type, Char* end) {
-  self->parameters = malloc(sizeof(List));
-  if (self->parameters == NULL) RAISE(215)
-  *self->parameters = (List){NULL, NULL};
-  self->outputs = malloc(sizeof(List));
-  if (self->outputs == NULL) RAISE(216)
-  *self->outputs = (List){NULL, NULL};
+  CHECK(251, FunctionArguments_init(self) )
   if (NULL != parent_type) {
     DeclarationArgument* self_args = malloc(sizeof(DeclarationArgument));
-    if (self_args == NULL) RAISE(218)
-    *self_args = (DeclarationArgument){DeclarationArgument__dtl, 0, NULL, NULL};
-    self_args->_base._dtl = DeclarationArgument__dtl;
+    if (self_args == NULL) RAISE(253)
+    *self_args = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
+    self_args->_base._base._dtl = DeclarationArgument__dtl;
     self_args->_base.access = ACCESS_VAR;
-    CHECK(220, string_new_copy(&(String){5, 4, "self"}, &(self_args->name)) )
-    CHECK(221, TypeData_m_new_type_instance(parent_type, &(self_args->type_instance)) )
-    CHECK(222, List_add(self->parameters, &(self_args->_base)) )
+    self_args->variable = malloc(sizeof(SyntaxTreeVariable));
+    if (self_args->variable == NULL) RAISE(255)
+    *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL};
+    self_args->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
+    CHECK(256, string_new_copy(&(String){5, 4, "self"}, &(self_args->variable->name)) )
+    CHECK(257, TypeData_m_new_type_instance(parent_type, &(self_args->variable->type_instance)) )
+    CHECK(258, List_add(self->parameters, &(self_args->_base)) )
   }
-  CHECK(223, FunctionArguments_parse_args(self, self->parameters, argument_factory, code_node, &((*end))) )
+  CHECK(259, FunctionArguments_parse_args(self, self->parameters, argument_factory, code_node, &((*end))) )
   if ((*end) == '-') {
-    CHECK(226, read_expect(&(String){3, 2, ">("}) )
-    CHECK(227, FunctionArguments_parse_args(self, self->outputs, argument_factory, code_node, &((*end))) )
+    CHECK(262, SyntaxTreeNode_read_expect(&(self->_base), &(String){3, 2, ">("}) )
+    CHECK(263, FunctionArguments_parse_args(self, self->outputs, argument_factory, code_node, &((*end))) )
   }
   return OK;
 }
@@ -628,39 +706,40 @@ static char* _func_name_FunctionArguments_parse_args = "FunctionArguments.parse-
 Returncode FunctionArguments_parse_args(FunctionArguments* self, List* arguments, ArgumentFactory* argument_factory, SyntaxTreeCode* code_node, Char* end) {
   Argument* argument = NULL;
   String* access_str = NULL;
-  Int _Int37;
-  CHECK(237, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int37)) )
+  Bool is_output = arguments == self->outputs;
+  Int _Int33;
+  CHECK(274, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int33)) )
   if ((*end) == '\n' && access_str->length == 0) {
-    CHECK(239, read_line_break_spaces() )
-    Int _Int38;
-    CHECK(240, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int38)) )
+    CHECK(276, SyntaxTreeNode_read_line_break_spaces(&(self->_base)) )
+    Int _Int34;
+    CHECK(277, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int34)) )
   }
   if ((*end) != ')' || access_str->length > 0) {
     while (true) {
       if (access_str->length == 0) {
-        CHECK(244, f_syntax_error_c(&(String){21, 20, "expected access, got"}, (*end)) )
+        CHECK(281, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){21, 20, "expected access, got"}, (*end)) )
       }
       if ((*end) != ' ') {
-        CHECK(246, f_syntax_error_c(&(String){33, 32, "expected space after access, got"}, (*end)) )
+        CHECK(283, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){33, 32, "expected space after access, got"}, (*end)) )
       }
-      CHECK(247, (argument_factory)->_dtl[0](argument_factory, &(argument)) )
-      CHECK(248, List_add(arguments, argument) )
-      CHECK(249, Argument_parse(argument, access_str, code_node, &((*end))) )
+      CHECK(285, (argument_factory)->_dtl[0](argument_factory, &(argument)) )
+      CHECK(286, List_add(arguments, argument) )
+      CHECK(287, Argument_parse(argument, access_str, is_output, code_node, &((*end))) )
       if (!((*end) == ',')) break;
-      CHECK(251, read_c(&((*end))) )
+      CHECK(290, read_c(&((*end))) )
       if ((*end) == '\n') {
-        CHECK(253, read_line_break_spaces() )
+        CHECK(292, SyntaxTreeNode_read_line_break_spaces(&(self->_base)) )
       }
       else {
         if ((*end) != ' ') {
-          CHECK(255, f_syntax_error_c(&(String){42, 41, "expected space or new-line after \",\", got"}, (*end)) )
+          CHECK(294, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){42, 41, "expected space or new-line after \",\", got"}, (*end)) )
         }
       }
-      Int _Int39;
-      CHECK(258, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int39)) )
+      Int _Int35;
+      CHECK(297, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int35)) )
     }
   }
-  CHECK(259, read_c(&((*end))) )
+  CHECK(298, read_c(&((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -671,22 +750,22 @@ Returncode FunctionArguments_analyze(FunctionArguments* self);
 static char* _func_name_FunctionArguments_analyze = "FunctionArguments.analyze";
 #define MR_FUNC_NAME _func_name_FunctionArguments_analyze
 Returncode FunctionArguments_analyze(FunctionArguments* self) {
-  CHECK(262, FunctionArguments_analyze_args(self, self->parameters, false) )
-  CHECK(263, FunctionArguments_analyze_args(self, self->outputs, true) )
+  CHECK(301, FunctionArguments_analyze_args(self, self->parameters) )
+  CHECK(302, FunctionArguments_analyze_args(self, self->outputs) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_analyze_args(FunctionArguments* self, List* arguments, Bool is_output);
+Returncode FunctionArguments_analyze_args(FunctionArguments* self, List* arguments);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_FunctionArguments_analyze_args = "FunctionArguments.analyze-args";
 #define MR_FUNC_NAME _func_name_FunctionArguments_analyze_args
-Returncode FunctionArguments_analyze_args(FunctionArguments* self, List* arguments, Bool is_output) {
+Returncode FunctionArguments_analyze_args(FunctionArguments* self, List* arguments) {
   ListNode* node = arguments->first;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(269, (((Argument*)(node->item)))->_dtl[2](((Argument*)(node->item)), is_output) )
+    CHECK(308, (((Argument*)(node->item)))->_base._dtl[0](((Argument*)(node->item))) )
     node = node->next;
   }
   return OK;
@@ -700,7 +779,7 @@ static char* _func_name_FunctionArguments_get_result_type = "FunctionArguments.g
 #define MR_FUNC_NAME _func_name_FunctionArguments_get_result_type
 Returncode FunctionArguments_get_result_type(FunctionArguments* self, TypeInstance** result_type) {
   if (NULL != self->outputs->last) {
-    CHECK(274, (((Argument*)(self->outputs->last->item)))->_dtl[3](((Argument*)(self->outputs->last->item)), &((*result_type))) )
+    CHECK(313, (((Argument*)(self->outputs->last->item)))->_base._dtl[4](((Argument*)(self->outputs->last->item)), &((*result_type))) )
   }
   else {
     (*result_type) = NULL;
@@ -716,10 +795,44 @@ static char* _func_name_FunctionArguments_get_output = "FunctionArguments.get-ou
 #define MR_FUNC_NAME _func_name_FunctionArguments_get_output
 Returncode FunctionArguments_get_output(FunctionArguments* self, Expression** output) {
   if (NULL != self->outputs->last) {
-    CHECK(280, (((Argument*)(self->outputs->last->item)))->_dtl[4](((Argument*)(self->outputs->last->item)), &((*output))) )
+    CHECK(319, (((Argument*)(self->outputs->last->item)))->_base._dtl[6](((Argument*)(self->outputs->last->item)), &((*output))) )
   }
   else {
     (*output) = NULL;
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode FunctionArguments_m_find_variable(FunctionArguments* self, String* name, SyntaxTreeVariable** variable);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_FunctionArguments_m_find_variable = "FunctionArguments.m-find-variable";
+#define MR_FUNC_NAME _func_name_FunctionArguments_m_find_variable
+Returncode FunctionArguments_m_find_variable(FunctionArguments* self, String* name, SyntaxTreeVariable** variable) {
+  CHECK(325, FunctionArguments_m_find_variable_args(self, self->parameters, name, &((*variable))) )
+  if (!(NULL != (*variable))) {
+    CHECK(327, FunctionArguments_m_find_variable_args(self, self->outputs, name, &((*variable))) )
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode FunctionArguments_m_find_variable_args(FunctionArguments* self, List* arguments, String* name, SyntaxTreeVariable** variable);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_FunctionArguments_m_find_variable_args = "FunctionArguments.m-find-variable-args";
+#define MR_FUNC_NAME _func_name_FunctionArguments_m_find_variable_args
+Returncode FunctionArguments_m_find_variable_args(FunctionArguments* self, List* arguments, String* name, SyntaxTreeVariable** variable) {
+  ListNode* node = arguments->first;
+  while (true) {
+    if (!(NULL != node)) break;
+    SyntaxTreeVariable* _SyntaxTreeVariable36;
+    CHECK(335, (((Argument*)(node->item)))->_base._dtl[5](((Argument*)(node->item)), &(_SyntaxTreeVariable36)) )
+    Bool _Bool37;
+    CHECK(335, SyntaxTreeVariable_m_find_variable(_SyntaxTreeVariable36, name, &((*variable)), &(_Bool37)) )
+    if (!(!_Bool37)) break;
+    node = node->next;
   }
   return OK;
 }
@@ -735,40 +848,68 @@ Returncode FunctionArguments_m_check_calling(FunctionArguments* self, FunctionAr
   ListNode* other_node = other->parameters->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    TypeInstance* _TypeInstance40;
-    CHECK(290, (((Argument*)(my_node->item)))->_dtl[3](((Argument*)(my_node->item)), &(_TypeInstance40)) )
-    TypeInstance* _TypeInstance41;
-    CHECK(290, (((Argument*)(other_node->item)))->_dtl[3](((Argument*)(other_node->item)), &(_TypeInstance41)) )
-    CHECK(290, TypeInstance_m_check_assign_to(_TypeInstance40, _TypeInstance41) )
+    TypeInstance* _TypeInstance38;
+    CHECK(345, (((Argument*)(my_node->item)))->_base._dtl[4](((Argument*)(my_node->item)), &(_TypeInstance38)) )
+    TypeInstance* _TypeInstance39;
+    CHECK(345, (((Argument*)(other_node->item)))->_base._dtl[4](((Argument*)(other_node->item)), &(_TypeInstance39)) )
+    CHECK(345, TypeInstance_m_check_assign_to(_TypeInstance38, _TypeInstance39, &(self->_base)) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
   if (NULL != my_node) {
-    CHECK(295, f_syntax_error_msg(&(String){20, 19, "too many parameters"}) )
+    CHECK(350, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){20, 19, "too many parameters"}) )
   }
   if (NULL != other_node) {
-    CHECK(297, f_syntax_error_msg(&(String){19, 18, "too few parameters"}) )
+    CHECK(352, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){19, 18, "too few parameters"}) )
   }
   
   my_node = self->outputs->first;
   other_node = other->outputs->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    TypeInstance* _TypeInstance42;
-    CHECK(303, (((Argument*)(other_node->item)))->_dtl[3](((Argument*)(other_node->item)), &(_TypeInstance42)) )
-    TypeInstance* _TypeInstance43;
-    CHECK(303, (((Argument*)(my_node->item)))->_dtl[3](((Argument*)(my_node->item)), &(_TypeInstance43)) )
-    CHECK(303, TypeInstance_m_check_assign_to(_TypeInstance42, _TypeInstance43) )
+    TypeInstance* _TypeInstance40;
+    CHECK(358, (((Argument*)(other_node->item)))->_base._dtl[4](((Argument*)(other_node->item)), &(_TypeInstance40)) )
+    TypeInstance* _TypeInstance41;
+    CHECK(358, (((Argument*)(my_node->item)))->_base._dtl[4](((Argument*)(my_node->item)), &(_TypeInstance41)) )
+    CHECK(358, TypeInstance_m_check_assign_to(_TypeInstance40, _TypeInstance41, &(self->_base)) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
   if (NULL != my_node) {
-    CHECK(308, f_syntax_error_msg(&(String){17, 16, "too many outputs"}) )
+    CHECK(363, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){17, 16, "too many outputs"}) )
   }
   if (NULL != other_node &&  NULL !=  other_node->next) {
-    CHECK(310, f_syntax_error_msg(&(String){16, 15, "too few outputs"}) )
+    CHECK(365, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){16, 15, "too few outputs"}) )
   }
   (*output_ommited) =  NULL !=  other_node;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode FunctionArguments_write_preactions(FunctionArguments* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_FunctionArguments_write_preactions = "FunctionArguments.write-preactions";
+#define MR_FUNC_NAME _func_name_FunctionArguments_write_preactions
+Returncode FunctionArguments_write_preactions(FunctionArguments* self) {
+  CHECK(369, FunctionArguments_write_args_preactions(self, self->parameters) )
+  CHECK(370, FunctionArguments_write_args_preactions(self, self->outputs) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode FunctionArguments_write_args_preactions(FunctionArguments* self, List* arguments);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_FunctionArguments_write_args_preactions = "FunctionArguments.write-args-preactions";
+#define MR_FUNC_NAME _func_name_FunctionArguments_write_args_preactions
+Returncode FunctionArguments_write_args_preactions(FunctionArguments* self, List* arguments) {
+  ListNode* node = arguments->first;
+  while (true) {
+    if (!(NULL != node)) break;
+    CHECK(376, (((Argument*)(node->item)))->_base._dtl[7](((Argument*)(node->item))) )
+    node = node->next;
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -780,22 +921,22 @@ static char* _func_name_FunctionArguments_write = "FunctionArguments.write";
 #define MR_FUNC_NAME _func_name_FunctionArguments_write
 Returncode FunctionArguments_write(FunctionArguments* self, Bool is_decleration) {
   /* (`params...`, `outputs...`) */
-  CHECK(315, write(&(String){2, 1, "("}) )
+  CHECK(381, write(&(String){2, 1, "("}) )
   if (NULL != self->parameters->first) {
-    CHECK(317, FunctionArguments_write_args(self, self->parameters) )
+    CHECK(383, FunctionArguments_write_args(self, self->parameters) )
   }
   if (NULL != self->outputs->first) {
     if (NULL != self->parameters->first) {
-      CHECK(320, write(&(String){3, 2, ", "}) )
+      CHECK(386, write(&(String){3, 2, ", "}) )
     }
-    CHECK(321, FunctionArguments_write_args(self, self->outputs) )
+    CHECK(387, FunctionArguments_write_args(self, self->outputs) )
   }
   else {
     if (!(NULL != self->parameters->first) && is_decleration) {
-      CHECK(323, write(&(String){5, 4, "void"}) )
+      CHECK(389, write(&(String){5, 4, "void"}) )
     }
   }
-  CHECK(324, write(&(String){2, 1, ")"}) )
+  CHECK(390, write(&(String){2, 1, ")"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -807,16 +948,21 @@ static char* _func_name_FunctionArguments_write_args = "FunctionArguments.write-
 #define MR_FUNC_NAME _func_name_FunctionArguments_write_args
 Returncode FunctionArguments_write_args(FunctionArguments* self, List* arguments) {
   ListNode* node = arguments->first;
-  Bool is_output = arguments == self->outputs;
   while (true) {
-    CHECK(330, (((Argument*)(node->item)))->_dtl[5](((Argument*)(node->item)), is_output) )
+    CHECK(395, (((Argument*)(node->item)))->_base._dtl[1](((Argument*)(node->item))) )
     node = node->next;
     if (!(NULL != node)) break;
-    CHECK(333, write(&(String){3, 2, ", "}) )
+    CHECK(398, write(&(String){3, 2, ", "}) )
   }
   return OK;
 }
 #undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func FunctionArguments__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func FunctionArguments__dtl[] = {(void*)FunctionArguments_analyze, (void*)FunctionArguments_write};
 #endif
 
 #undef MR_FILE_NAME

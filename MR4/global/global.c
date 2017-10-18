@@ -48,7 +48,7 @@ static char* _func_name_Global_init = "Global.init";
 Returncode Global_init(Global* self) {
   self->root = malloc(sizeof(SyntaxTreeRoot));
   if (self->root == NULL) RAISE(47)
-  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL};
+  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL};
   self->root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
   self->input_buffer = _new_string(1024);
   if (self->input_buffer == NULL) RAISE(48)
@@ -122,32 +122,33 @@ Returncode Global_init_builtin_types(Global* self) {
   self->type_map = malloc(sizeof(NameMap));
   if (self->type_map == NULL) RAISE(87)
   *self->type_map = (NameMap){NULL, NULL};
-  CHECK(88, Global_add_builtin_type(self, &(String){5, 4, "Char"}, &(self->type_char)) )
-  CHECK(89, Global_add_builtin_type(self, &(String){5, 4, "Bool"}, &(self->type_bool)) )
-  CHECK(90, Global_add_builtin_type(self, &(String){4, 3, "Int"}, &(self->type_int)) )
-  CHECK(91, Global_add_builtin_type(self, &(String){6, 5, "Empty"}, &(self->type_empty)) )
-  CHECK(92, Global_add_builtin_type(self, &(String){5, 4, "Func"}, &(self->type_func)) )
-  CHECK(93, Global_add_builtin_type(self, &(String){7, 6, "String"}, &(self->type_string)) )
-  CHECK(94, Global_add_builtin_type(self, &(String){6, 5, "Array"}, &(self->type_array)) )
-  CHECK(95, Global_add_builtin_type(self, &(String){5, 4, "Type"}, &(self->type_type)) )
-  CHECK(96, Global_add_builtin_type(self, &(String){5, 4, "File"}, &(self->type_file)) )
-  CHECK(97, Global_add_builtin_type(self, &(String){4, 3, "Sys"}, &(self->type_sys)) )
+  CHECK(88, Global_add_builtin_type(self, &(String){5, 4, "Char"}, true, &(self->type_char)) )
+  CHECK(89, Global_add_builtin_type(self, &(String){5, 4, "Bool"}, true, &(self->type_bool)) )
+  CHECK(90, Global_add_builtin_type(self, &(String){4, 3, "Int"}, true, &(self->type_int)) )
+  CHECK(91, Global_add_builtin_type(self, &(String){6, 5, "Empty"}, false, &(self->type_empty)) )
+  CHECK(92, Global_add_builtin_type(self, &(String){5, 4, "Func"}, true, &(self->type_func)) )
+  CHECK(93, Global_add_builtin_type(self, &(String){7, 6, "String"}, false, &(self->type_string)) )
+  CHECK(94, Global_add_builtin_type(self, &(String){6, 5, "Array"}, false, &(self->type_array)) )
+  CHECK(95, Global_add_builtin_type(self, &(String){5, 4, "Type"}, false, &(self->type_type)) )
+  CHECK(96, Global_add_builtin_type(self, &(String){5, 4, "File"}, false, &(self->type_file)) )
+  CHECK(97, Global_add_builtin_type(self, &(String){4, 3, "Sys"}, false, &(self->type_sys)) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Global_add_builtin_type(Global* self, String* name, TypeData** type_data);
+Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, TypeData** type_data);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_type
-Returncode Global_add_builtin_type(Global* self, String* name, TypeData** type_data) {
+Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, TypeData** type_data) {
   (*type_data) = malloc(sizeof(TypeData));
-  if ((*type_data) == NULL) RAISE(100)
-  *(*type_data) = (TypeData){TypeData__dtl, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false};
+  if ((*type_data) == NULL) RAISE(101)
+  *(*type_data) = (TypeData){TypeData__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
   (*type_data)->_base._base._base._dtl = TypeData__dtl;
-  CHECK(101, string_new_copy(name, &((*type_data)->name)) )
-  CHECK(102, Global_add_type(self, (*type_data)) )
+  CHECK(102, string_new_copy(name, &((*type_data)->name)) )
+  (*type_data)->is_primitive = is_primitive;
+  CHECK(104, Global_add_type(self, (*type_data)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -158,48 +159,17 @@ Returncode Global_add_type(Global* self, TypeData* type_data);
 static char* _func_name_Global_add_type = "Global.add-type";
 #define MR_FUNC_NAME _func_name_Global_add_type
 Returncode Global_add_type(Global* self, TypeData* type_data) {
-  CHECK(105, SyntaxTreeNamespace_init(&(type_data->_base)) )
-  CHECK(106, NameMap_add(self->type_map, type_data->name, type_data) )
+  CHECK(107, SyntaxTreeNamespace_init(&(type_data->_base)) )
+  CHECK(108, NameMap_add(self->type_map, type_data->name, type_data) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode Global_m_find_type(Global* self, String* name, TypeData** type_data);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Global_m_find_type = "Global.m-find-type";
-#define MR_FUNC_NAME _func_name_Global_m_find_type
-Returncode Global_m_find_type(Global* self, String* name, TypeData** type_data) {
-  CHECK(109, NameMap_find(self->type_map, name, (void**)&((*type_data))) )
-  if (!(NULL != (*type_data))) {
-    CHECK(110, f_syntax_error(&(String){13, 12, "unknown type"}, name) )
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-
 
 #if MR_STAGE == MR_DECLARATIONS
 extern Global* glob;
 #elif MR_STAGE == MR_FUNCTIONS
 Global* glob = &(Global){NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, '\0', 0, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-#endif
-
-
-#if MR_STAGE == MR_DECLARATIONS
-Returncode f_find_type(String* name, TypeData** type_data);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_f_find_type = "f-find-type";
-#define MR_FUNC_NAME _func_name_f_find_type
-Returncode f_find_type(String* name, TypeData** type_data) {
-  CHECK(117, NameMap_find(glob->type_map, name, (void**)&((*type_data))) )
-  if (!(NULL != (*type_data))) {
-    CHECK(119, f_syntax_error(&(String){13, 12, "unknown type"}, name) )
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
 #endif
 
 #undef MR_FILE_NAME

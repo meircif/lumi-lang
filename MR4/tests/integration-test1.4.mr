@@ -9,16 +9,16 @@ class TopType(MiddleType)
   user MiddleType top-mid-ref
   
   func dynamic meth2()
-    sys.print(user "TopType.meth2")
+    # sys.print(user "TopType.meth2")
   
   func dynamic meth3(copy Int n, user String s)
-    sys.print(user "TopType.meth3")
+    # sys.print(user "TopType.meth3")
   
   func dynamic meth5(copy Int n, user String s)
-    sys.print(user "TopType.meth5")
+    # sys.print(user "TopType.meth5")
   
   func dynamic meth6()
-    sys.print(user "TopType.meth6")
+    # sys.print(user "TopType.meth6")
 
 
 class BaseType
@@ -26,13 +26,13 @@ class BaseType
   user TopType base-top-ref
   
   func dynamic meth0()
-    sys.print(user "BaseType.meth0")
+    # sys.print(user "BaseType.meth0")
   
   func dynamic meth1(copy Int n, user String s)
-    sys.print(user "BaseType.meth1")
+    # sys.print(user "BaseType.meth1")
   
   func dynamic meth2()
-    sys.print(user "BaseType.meth2")
+    # sys.print(user "BaseType.meth2")
   
   func dynamic meth3(copy Int n, user String s)
-    sys.print(user "BaseType.meth3")
+    # sys.print(user "BaseType.meth3")

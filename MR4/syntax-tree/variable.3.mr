@@ -17,19 +17,26 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func inst parse(copy Int access, user TypeData parent-type):(
       owner SyntaxTreeVariableInit new-init-node, copy Char end)
+    self.set-location()
     self.parent-type := parent-type
     self.access := access
     new TypeInstance in self.type-instance
-    self.type-instance.parse(user " "):(copy end)
+    self.type-instance.parse(user " ", user self):(copy end)
     if end != ' '
-      f-syntax-error-c(user "expected space after type, got", copy end)
+      self.m-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user "("):(owner self.name, copy end)
     if end = '('
       SyntaxTreeVariableInit.parse-new(var _, user self):(
           copy end, owner new-init-node)
   
+  func inst m-find-variable(user String name):(
+      user SyntaxTreeVariable variable, copy Bool found)
+    self.name.equal(user name):(copy found)
+    if found
+      variable := self
+  
   func dynamic analyze()
-    self.type-instance.analyze()
+    self.type-instance.analyze(user self)
   
   func dynamic write()
     # `type`* `name`;
@@ -55,10 +62,15 @@ class SyntaxTreeVariableInit(SyntaxTreeCode)
     self.variable := variable
     parse-new-expression(user ")", user self):(owner self.value, copy end)
     if end != ')'
-      f-syntax-error-c(
+      self.m-syntax-error-c(
           user "expected \")\" after initialization, got",
           copy end)
     read-c():(copy end)
+  
+  func dynamic analyze()
+    self.value.analyze()
+    self.value.result-type.m-check-assign-to(
+        user self.variable.type-instance, user self)
   
   func dynamic write()
     # `name` = `value`;

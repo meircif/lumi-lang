@@ -13,10 +13,17 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.block.parent := parent
     self.block.indentation-spaces := parent.indentation-spaces + 2
     self.block.aux-variables := parent.aux-variables
+    self.block.is-in-loop := parent.is-in-loop
   
-  func inst parse-block(user SyntaxTreeBlock parent):(copy Char end)
+  func inst parse-block(user SyntaxTreeBlock parent, copy Bool is-loop):(
+      copy Char end)
     self.init(user parent)
+    if is-loop
+      self.block.is-in-loop := true
     self.block.parse-block():(copy end)
+  
+  func dynamic analyze()
+    self.block.analyze()
   
   func inst write-block()
     self.block.write-block()
@@ -33,8 +40,9 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     new-node.parse(user parent):(copy end)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.set-location()
     parse-new-expression(user "", user self):(owner self.condition, copy end)
-    self.parse-block(user parent):(copy end)
+    self.parse-block(user parent, copy false):(copy end)
   
   func inst add-else(owner SyntaxTreeElse else-node)
     else-node.set-parent(user self.parent)
@@ -47,6 +55,12 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     new List{SyntaxTreeCode} in self.else-node.block.code-nodes
     self.else-node.block.code-nodes.add(owner new-if)
     new-if.set-parent(user self.else-node.block)
+  
+  func dynamic analyze()
+    self.analyze-expression(user self.condition, user glob.type-bool)
+    base.analyze()
+    if ? self.else-node
+      self.else-node.analyze()
   
     # if (`condition`) {
     #   `block...`
@@ -68,7 +82,8 @@ class SyntaxTreeElse(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeElse new-node)
     new SyntaxTreeElse in new-node
-    new-node.parse-block(user parent):(copy end)
+    new-node.set-location()
+    new-node.parse-block(user parent, copy false):(copy end)
   
   func dynamic write()
     # else {
@@ -83,7 +98,8 @@ class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeDoLoop new-node)
     new SyntaxTreeDoLoop in new-node
-    new-node.parse-block(user parent):(copy end)
+    new-node.set-location()
+    new-node.parse-block(user parent, copy true):(copy end)
   
   func dynamic write()
     # while (true) {
@@ -105,16 +121,32 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     new-node.parse(user parent):(copy end)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.set-location()
     read-new(user " "):(owner self.index-name, copy end)
     if end != ' '
-      f-syntax-error-c(user "expected space after index name, got", copy end)
-    read-expect(user "in ")
+      self.m-syntax-error-c(
+          user "expected space after index name, got", copy end)
+    self.read-expect(user "in ")
     parse-new-expression(user ":", user self):(owner self.upper-bound, copy end)
     if end = ':'
       self.start := self.upper-bound
       parse-new-expression(
           user "", user self):(owner self.upper-bound, copy end)
-    self.parse-block(user parent):(copy end)
+    self.parse-block(user parent, copy true):(copy end)
+    new SyntaxTreeVariable in self.block.ref-variable
+    string-new-copy(user self.index-name):(owner self.block.ref-variable.name)
+    self.block.ref-variable.access := ACCESS-VAR
+    glob.type-int.m-new-type-instance():(
+        owner self.block.ref-variable.type-instance)
+  
+  func dynamic analyze()
+    if ? self.start
+      self.analyze-expression(user self.start, user glob.type-int)
+    self.analyze-expression(user self.upper-bound, user glob.type-int)
+    base.analyze()
+  
+  func dynamic m-is-in-loop():(copy Bool is-in-loop)
+    is-in-loop := true
   
   func dynamic write()
     # {int `index`; for(`index`=`start`; `index`<`upper-bound`; ++`index`) {

@@ -41,6 +41,7 @@ class IntExpression(TextExpression)
   
   ## parsing `123` or `-123` or `0b0012` or `0x3d4f`
   func inst parse(owner String text)
+    self.set-location()
     user String number(text)
     if number[0] = '-'
       number := number[1:number.length - 1]
@@ -48,19 +49,19 @@ class IntExpression(TextExpression)
       var Char second(number[1])
       if second >= '0' and second <= '7'
         if not f-is-octal(user number)
-          f-syntax-error(user "illegal octal number", user text)
+          self.m-syntax-error(user "illegal octal number", user text)
       else
         number := number[2:number.length - 2]
         if second = 'b' or second = 'B'
           if not f-is-binary(user number)
-            f-syntax-error(user "illegal binary number", user text)
+            self.m-syntax-error(user "illegal binary number", user text)
         else-if second = 'x' or second = 'X'
           if not f-is-hex(user number)
-            f-syntax-error(user "illegal hexadecimal number", user text)
+            self.m-syntax-error(user "illegal hexadecimal number", user text)
         else
-          f-syntax-error(user "illegal number", user text)
+          self.m-syntax-error(user "illegal number", user text)
     else-if not f-is-decimal(user number)
-      f-syntax-error(user "illegal number", user text)
+      self.m-syntax-error(user "illegal number", user text)
     self.set-simple-type(user glob.type-int)
     self.text := text
 
@@ -74,53 +75,65 @@ class CharExpression(TextExpression)
   
   ## parsing `'a'` or `'\n'` or `'\xf5'` or `'\270'`
   func inst parse(owner String text)
+    self.set-location()
     var Char ch
     if text.length = 3
       ch := text[1]
       if ch = '\'' or ch = '\\'
-        f-syntax-error(user "illegal character constant", user text)
+        self.m-syntax-error(user "illegal character constant", user text)
     else-if text.length = 4
       if text[1] != '\\'
-        f-syntax-error(user "illegal character constant", user text)
+        self.m-syntax-error(user "illegal character constant", user text)
       if not "'\"?\\abfnrtv".has(copy text[2])
-        f-syntax-error(user "illegal character constant", user text)
+        self.m-syntax-error(user "illegal character constant", user text)
     else-if text.length = 6
       if text[1] != '\\'
-        f-syntax-error(user "illegal character constant", user text)
+        self.m-syntax-error(user "illegal character constant", user text)
       ch := text[2]
       if ch = 'x'
         if not f-is-hex(user text[3:2])
-          f-syntax-error(user "illegal character constant", user text)
+          self.m-syntax-error(user "illegal character constant", user text)
       else
         if not f-is-octal(user text[2:3])
-          f-syntax-error(user "illegal character constant", user text)
+          self.m-syntax-error(user "illegal character constant", user text)
     else
-      f-syntax-error(user "illegal character constant", user text)
+      self.m-syntax-error(user "illegal character constant", user text)
     if text[text.length - 1] != '\''
-      f-syntax-error(user "illegal character constant", user text)
+      self.m-syntax-error(user "illegal character constant", user text)
     self.set-simple-type(user glob.type-char)
     self.text := text
 
 
 ## Constant string expression
 class StringExpression(TextExpression)
-  func inst parse-new(owner String text):(owner Expression expression)
+  owner Expression symbol
+  
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
+      owner Expression expression)
     new StringExpression string-expression
-    string-expression.parse(owner text)
+    string-expression.parse(owner text, user code-node)
     expression := string-expression
   
   ## parsing `"some string"`
-  func inst parse(owner String text)
+  func inst parse(owner String text, user SyntaxTreeCode code-node)
+    self.code-node := code-node
+    self.set-location()
     if text[text.length - 1] != '\"'
-      f-syntax-error(user "illegal string constant", user text)
+      self.m-syntax-error(user "illegal string constant", user text)
     self.set-simple-type(user glob.type-string)
     self.text := text
+    self.add-aux-variable(copy ACCESS-VAR):(owner self.symbol)
+    # TODO variable init
+  
+  func dynamic write()
+    self.symbol.write()
 
 
 ## Constant empty expression `_`
 class EmptyExpression(Expression)
   func inst parse-new(owner String text):(owner Expression expression)
     new EmptyExpression in expression
+    expression.set-location()
     expression.set-simple-type(user glob.type-empty)
     delete text
   

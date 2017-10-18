@@ -85,35 +85,26 @@ static Global
   
   func inst init-builtin-types()
     new NameMap{TypeData} in self.type-map
-    self.add-builtin-type(user "Char"):(owner self.type-char)
-    self.add-builtin-type(user "Bool"):(owner self.type-bool)
-    self.add-builtin-type(user "Int"):(owner self.type-int)
-    self.add-builtin-type(user "Empty"):(owner self.type-empty)
-    self.add-builtin-type(user "Func"):(owner self.type-func)
-    self.add-builtin-type(user "String"):(owner self.type-string)
-    self.add-builtin-type(user "Array"):(owner self.type-array)
-    self.add-builtin-type(user "Type"):(owner self.type-type)
-    self.add-builtin-type(user "File"):(owner self.type-file)
-    self.add-builtin-type(user "Sys"):(owner self.type-sys)
+    self.add-builtin-type(user "Char", copy true):(owner self.type-char)
+    self.add-builtin-type(user "Bool", copy true):(owner self.type-bool)
+    self.add-builtin-type(user "Int", copy true):(owner self.type-int)
+    self.add-builtin-type(user "Empty", copy false):(owner self.type-empty)
+    self.add-builtin-type(user "Func", copy true):(owner self.type-func)
+    self.add-builtin-type(user "String", copy false):(owner self.type-string)
+    self.add-builtin-type(user "Array", copy false):(owner self.type-array)
+    self.add-builtin-type(user "Type", copy false):(owner self.type-type)
+    self.add-builtin-type(user "File", copy false):(owner self.type-file)
+    self.add-builtin-type(user "Sys", copy false):(owner self.type-sys)
   
-  func inst add-builtin-type(user String name):(owner TypeData type-data)
+  func inst add-builtin-type(user String name, copy Bool is-primitive):(
+      owner TypeData type-data)
     new TypeData in type-data
     string-new-copy(user name):(owner type-data.name)
+    type-data.is-primitive := is-primitive
     self.add-type(user type-data)
   
   func inst add-type(user TypeData type-data)
     type-data.init()
     self.type-map.add(user type-data.name, user type-data)
-  
-  func inst m-find-type(user String name):(user TypeData type-data)
-    if not (? self.type-map.find(user name):(user type-data))
-      f-syntax-error(user "unknown type", user name)
-
 
 var Global glob
-
-
-func f-find-type(user String name):(user TypeData type-data)
-  glob.type-map.find(user name):(user type-data)
-  if not (? type-data)
-    f-syntax-error(user "unknown type", user name)

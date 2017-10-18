@@ -16,6 +16,7 @@ class CallExpression(Expression)
       copy Char end)
     self.function := function
     self.code-node := code-node
+    self.set-location()
     new FunctionArguments in self.arguments
     var CallArgumentFactory argument-factory
     self.arguments.parse(
@@ -26,37 +27,52 @@ class CallExpression(Expression)
     self.arguments.analyze()
     user FunctionArguments declaration(self.function.result-type.arguments)
     if not (? self.function.result-type.type-data)
-      f-syntax-error-msg(user "void expression is not callable")
-    if self.function.result-type.type-data != glob.type-func or
-        not (? declaration)
-      f-syntax-error(
+      self.m-syntax-error-msg(user "void expression is not callable")
+    if self.function.result-type.type-data != glob.type-func
+      self.m-syntax-error(
           user "non callable type",
           user self.function.result-type.type-data.name)
-    declaration.get-result-type().m-copy-new():(owner self.result-type)
+    if not (? declaration)
+        self.m-syntax-error-msg(user "pointer-to-function not supported")
+    if not self.is-statement
+      declaration.get-result-type().m-copy-new():(owner self.result-type)
     self.function.analyze-call(user self.arguments)
     if self.arguments.m-check-calling(user declaration)
       # add omitted output
-      new SymbolExpression symbol
-      symbol.code-node := self.code-node
-      self.result-type.m-copy-new():(owner symbol.result-type)
-      symbol.assignable := true
-      self.code-node.parent.add-aux-variable(
-          copy declaration.outputs.last.item.access,
-          user self.result-type):(
-          user symbol.variable)
-      string-new-copy(user symbol.variable.name):(owner symbol.text)
-      self.output := symbol
       new CallArgument output
       output.access := declaration.outputs.last.item.access
-      output.value := symbol
+      self.add-aux-variable(copy declaration.outputs.last.item.access):(
+          owner output.value)
+      self.output := output.value
       self.arguments.outputs.add(owner output)
-    else-if ? self.result-type.type-data
+    else-if ? self.result-type
       declaration.get-output():(user self.output)
-    self.assignable := ? self.result-type.type-data
+    self.assignable := ? self.result-type
+  
+  func dynamic write-preactions()
+    self.function.write-preactions()
+    self.arguments.write-preactions()
+    if not self.is-statement
+      self.write-call()
+      write(user "\n")
+      self.code-node.write-spaces()
   
   func dynamic write()
+    if self.is-statement
+      self.write-call()
+    else-if ? self.output
+      self.output.write()
+    else
+      raise
+  
+  func inst write-call()
+    write(user "CHECK(")
+    self.write-line-num()
+    write(user ", ")
     self.function.write()
     self.arguments.write(copy false)
+    write(user " )")
+  
 
 
 ## Function argument call
@@ -67,12 +83,12 @@ class CallArgument(Argument)
     parse-new-expression(
         user ",)", user code-node):(owner self.value, copy end)
     if end != ',' and end != ')'
-      f-syntax-error-c(user "expected \",\" or \")\", got", copy end)
+      self.m-syntax-error-c(user "expected \",\" or \")\", got", copy end)
   
-  func dynamic analyze(copy Bool is-output)
+  func dynamic analyze()
     self.value.analyze()
-    if is-output and not self.value.assignable
-      f-syntax-error-msg(user "non assignable call output")
+    if self.is-output and not self.value.assignable
+      self.m-syntax-error-msg(user "non assignable call output")
   
   func dynamic get-type-instance():(user TypeInstance type-instance)
     type-instance := self.value.result-type
@@ -80,12 +96,15 @@ class CallArgument(Argument)
   func dynamic get-output():(user Expression output)
     output := self.value
   
-  func dynamic write(copy Bool is-output)
+  func dynamic write-preactions()
+    self.value.write-preactions()
+  
+  func dynamic write()
     # &(`value`)
-    if is-output
+    if self.is-output
       write(user "&(")
     self.value.write()
-    if is-output
+    if self.is-output
       write(user ")")
 
 

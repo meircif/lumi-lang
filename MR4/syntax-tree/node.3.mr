@@ -3,8 +3,131 @@
 
 #)
 
+## Access values
+var Int ACCESS-COPY(0)
+var Int ACCESS-USER(1)
+var Int ACCESS-OWNER(2)
+var Int ACCESS-VAR(3)
+
+
 ## Basic node type for all syntax tree nodes
 class SyntaxTreeNode
+  user String input-file-name
+  var Int line-number
+  
+  func inst set-location()
+    self.input-file-name := glob.input-file-name
+    self.line-number := glob.line-number
+  
+  func inst get-access(user String access-str):(copy Int access)
+    if access-str.equal(user "copy")
+      access := ACCESS-COPY
+    else-if access-str.equal(user "user")
+      access := ACCESS-USER
+    else-if access-str.equal(user "owner")
+      access := ACCESS-OWNER
+    else-if access-str.equal(user "var")
+      access := ACCESS-VAR
+    else
+      self.m-syntax-error(user "illegal access", user access-str)
+  
+  func inst m-find-type(user String name):(user TypeData type-data)
+    if not (? glob.type-map.find(user name):(user type-data))
+      self.m-syntax-error(user "unknown type", user name)
+  
+  ## Expect `expected-text` to be read exaclty from the input file
+  func inst read-expect(user String expected-text)
+    new String{expected-text.length + 1} actual-text
+    for n in expected-text.length
+      actual-text.append(copy read-c())
+    if not actual-text.equal(user expected-text)
+      self.m-syntax-error2(
+          user "expected", user expected-text, user "got", user actual-text)
+    delete actual-text
+  
+  ## Read and check indentation spaces for a line break from the input file
+  func inst read-line-break-spaces(u)
+    for n in glob.spaces + 4
+      if read-c() != ' '
+        var String{128} expected-spaces
+        var String{128} actual-spaces
+        Int.str(var glob.spaces + 4, user expected-spaces)
+        Int.str(var n - 1, user actual-spaces)
+        self.m-syntax-error2(
+            user "too short indentation, expected",
+            user expected-spaces,
+            user "got",
+            user actual-spaces)
+  
+  func inst write-line-num()
+    write-int(copy self.line-number)
+  
+  func inst write-raise()
+    write(user "RAISE(")
+    self.write-line-num()
+    write(user ")")
+  
+  ## Raise a syntax error with message:
+  ## `Code error in {file-name}[{line-number}] {text} "{item}"`
+  func inst m-syntax-error(user String text, user String item)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text, user item)
+    print(user "\n")
+    raise
+  
+  ## Same as `m-syntax-error` but but with another `{text} "{item}" pair
+  func inst m-syntax-error2(
+      user String text1, user String item1, user String text2, user String item2)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text1, user item1)
+    print(user " ")
+    print-msg-with-item(user text2, user item2)
+    print(user "\n")
+    raise
+  
+  ## Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair
+  func inst m-syntax-error3(
+      user String text1,
+      user String item1,
+      user String text2,
+      user String item2,
+      user String text3,
+      user String item3)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text1, user item1)
+    print(user " ")
+    print-msg-with-item(user text2, user item2)
+    print(user " ")
+    print-msg-with-item(user text3, user item3)
+    print(user "\n")
+    raise
+  
+  ## Same as `m-syntax-error` but with a character item
+  func inst m-syntax-error-c(user String text, copy Char item)
+    var String{16} char-str
+    if item = EOF
+      char-str.copy(user "EOF")
+    else-if item = '\n'
+      char-str.copy(user "new-line")
+    else
+      char-str.append(copy item)
+    self.m-syntax-error(user text, user char-str)
+  
+  func inst m-syntax-error-msg(user String text)
+    self.print-syntax-error-header()
+    print(user text)
+    print(user "\n")
+    raise
+  
+  func inst print-syntax-error-header()
+    print(user "Code error in ")
+    print(user self.input-file-name)
+    print(user "[")
+    var String{32} line-num-str
+    self.line-number.str(user line-num-str)
+    print(user line-num-str)
+    print(user "] ")
+  
   func dynamic analyze()
     # do nothing as default
   
@@ -25,26 +148,28 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   func inst parse-block-children(user TypeData parent-type):(
       copy Char end)
     if end != '\n'
-      f-syntax-error-c(user "expected block in a new line, got", copy end)
+      self.m-syntax-error-c(user "expected block in a new line, got", copy end)
     self.init()
     self.parse-children(user parent-type):(copy end)
     if end != EOF
       glob.save-input := true
   
   func inst parse-children(user TypeData parent-type):(copy Char end)
+    var Int my-line-number(self.line-number)
     do
       user String keyword
       var Int spaces
       read-until(user " .([?", copy true):(user keyword, copy end, copy spaces)
       # ignore empty lines
       if keyword.length > 0 or end != '\n'
+        self.set-location()
         
         if spaces > self.indentation-spaces
           var String{32} expecte-num
           self.indentation-spaces.str(user expecte-num)
           var String{32} actual-num
           spaces.str(user actual-num)
-          f-syntax-error2(
+          self.m-syntax-error2(
               user "indentation too big, expected",
               user expecte-num,
               user "got",
@@ -58,7 +183,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         while end != EOF
         if not glob.save-input and end != '\n'
           # TODO: is possible?
-          f-syntax-error-c(user "expected new-line in line end, got", copy end)
+          self.m-syntax-error-c(
+              user "expected new-line in line end, got", copy end)
+    
+    self.line-number := my-line-number
   
   func inst parse-if-common(
       user String keyword, user TypeData parent-type):(
@@ -100,13 +228,12 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   func dynamic parse-child(user String keyword):(copy Char end)
     raise
   
-  func inst m-find-variable(user String name):(user SyntaxTreeVariable variable)
+  func dynamic m-find-variable(user String name):(
+      user SyntaxTreeVariable variable)
     user ListNode{SyntaxTreeVariable} child(self.variables.first)
     do
       while ? child
-      if child.item.name.equal(user name)
-        variable := child.item
-        return
+      while not child.item.m-find-variable(user name):(user variable)
       child := child.next
     variable := _
   
@@ -154,7 +281,8 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
     keyword.equal(user "func"):(copy is-func)
     if is-func
       if end != ' '
-        f-syntax-error-c(user "expected space after \"func\", got", copy end)
+        self.m-syntax-error-c(
+            user "expected space after \"func\", got", copy end)
       self.functions.add(owner SyntaxTreeFunction.parse-new(
           var _, user parent-type):(copy end))
   
@@ -190,14 +318,28 @@ class SyntaxTreeCode(SyntaxTreeNode)
   
   func inst m-find-variable(user String name):(user SyntaxTreeVariable variable)
     self.parent.m-find-variable(user name):(user variable)
-    if not (? variable)
-      glob.root.m-find-variable(user name):(user variable)
   
   func inst m-get-parent-type():(user TypeData parent-type)
     self.parent.m-get-parent-type():(user parent-type)
   
+  func inst analyze-expression(
+      user Expression expression, user TypeData expected-type)
+    expression.analyze()
+    if not (? expression.result-type)
+      self.m-syntax-error(
+          user "got void expression, expected", user expected-type.name)
+    if expression.result-type.type-data != expected-type
+      self.m-syntax-error2(
+          user "got",
+          user expression.result-type.type-data.name,
+          user "expression, expected",
+          user expected-type.name)
+  
   func inst write-spaces()
     self.parent.write-spaces()
+  
+  func dynamic m-is-end-point():(copy Bool is-end)
+    is-end := false
 
 
 ## Count occurrences of a specific type
@@ -211,6 +353,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeBlock parent
   user List{TypeCount} aux-variables
   user SyntaxTreeIf previous-if
+  owner SyntaxTreeVariable ref-variable
+  var Bool is-in-loop
   
   func inst parse-block():(copy Char end)
     self.parse-block-children(user _):(copy end)
@@ -219,70 +363,79 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     owner SyntaxTreeCode node
     user SyntaxTreeIf new-if
     
+    if self.m-has-end-point()
+      self.m-syntax-error-msg(user "unreachable code")
+    
     if keyword.equal(user "if")
       if end != ' '
-        f-syntax-error-c(user "expected space after \"if\", got", copy end)
+        self.m-syntax-error-c(user "expected space after \"if\", got", copy end)
       SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
       self.code-nodes.add(owner new-if)
       
     else-if keyword.equal(user "else")
       if not (? self.previous-if)
-        f-syntax-error-msg(user "\"else\" without a previous \"if\"")
+        self.m-syntax-error-msg(user "\"else\" without a previous \"if\"")
       if end != '\n'
-        f-syntax-error-c(user "expected new-line after \"else\", got", copy end)
+        self.m-syntax-error-c(
+            user "expected new-line after \"else\", got", copy end)
       self.previous-if.add-else(
           owner SyntaxTreeElse.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "else-if")
       if not (? self.previous-if)
-        f-syntax-error-msg(user "\"else-if\" without a previous \"if\"")
+        self.m-syntax-error-msg(user "\"else-if\" without a previous \"if\"")
       if end != ' '
-        f-syntax-error-c(user "expected space after \"else-if\", got", copy end)
+        self.m-syntax-error-c(
+            user "expected space after \"else-if\", got", copy end)
       SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
       self.previous-if.add-else-if(owner new-if)
       
     else-if keyword.equal(user "do")
       if end != '\n'
-        f-syntax-error-c(user "expected new-line after \"do\", got", copy end)
+        self.m-syntax-error-c(
+            user "expected new-line after \"do\", got", copy end)
       self.code-nodes.add(
           owner SyntaxTreeDoLoop.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "for")
       if end != ' '
-        f-syntax-error-c(user "expected space after \"for\", got", copy end)
+        self.m-syntax-error-c(
+            user "expected space after \"for\", got", copy end)
       self.code-nodes.add(
           owner SyntaxTreeForLoop.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "while")
       if end != ' '
-        f-syntax-error-c(user "expected space after \"while\", got", copy end)
+        self.m-syntax-error-c(
+            user "expected space after \"while\", got", copy end)
       self.code-nodes.add(
           owner SyntaxTreeWhile.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "continue")
       if end != '\n'
-        f-syntax-error-c(
+        self.m-syntax-error-c(
             user "expected new-line after \"continue\", got", copy end)
       self.code-nodes.add(
           owner SyntaxTreeContinue.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "return")
       if end != '\n'
-        f-syntax-error-c(
+        self.m-syntax-error-c(
             user "expected new-line after \"return\", got", copy end)
       self.code-nodes.add(
           owner SyntaxTreeReturn.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "raise")
       if end != '\n'
-        f-syntax-error-c(
+        self.m-syntax-error-c(
             user "expected new-line after \"raise\", got", copy end)
       self.code-nodes.add(
           owner SyntaxTreeRaise.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "new")
       if end != ' '
-        f-syntax-error-c(user "expected space after \"new\", got", copy end)
+        self.m-syntax-error-c(
+            user "expected space after \"new\", got", copy end)
       self.add-variable(user _, copy ACCESS-OWNER):(copy end)
       
     else
@@ -292,8 +445,17 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     
     self.previous-if := new-if
   
-  func inst m-find-variable(user String name):(user SyntaxTreeVariable variable)
+  func inst m-has-end-point():(copy Bool has-end)
+    if ? self.code-nodes.last
+      self.code-nodes.last.item.m-is-end-point():(copy has-end)
+    else
+      has-end := false
+  
+  func dynamic m-find-variable(user String name):(
+      user SyntaxTreeVariable variable)
     base.m-find-variable(user name):(user variable)
+    if not (? variable) and ? self.ref-variable
+      self.ref-variable.m-find-variable(user name):(user variable)
     if not (? variable) and ? self.parent
       self.parent.m-find-variable(user name):(user variable)
   
