@@ -34,7 +34,7 @@ static char* _func_name_TypeData_parse_new = "TypeData.parse-new";
 Returncode TypeData_parse_new(TypeData* self, Bool is_dynamic, Char* end, TypeData** new_node) {
   (*new_node) = malloc(sizeof(TypeData));
   if ((*new_node) == NULL) RAISE(15)
-  *(*new_node) = (TypeData){TypeData__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
+  *(*new_node) = (TypeData){TypeData__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
   (*new_node)->_base._base._base._dtl = TypeData__dtl;
   CHECK(16, TypeData_parse((*new_node), is_dynamic, &((*end))) )
   return OK;
@@ -59,7 +59,7 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
     CHECK(27, read_c(&((*end))) )
   }
   self->_base._base.indentation_spaces = 2;
-  CHECK(29, SyntaxTreeBranch_parse_block_children(&(self->_base._base), self, &((*end))) )
+  CHECK(29, SyntaxTreeBranch_parse_block_children(&(self->_base._base), self, NULL, &((*end))) )
   self->_base._base.indentation_spaces = 0;
   return OK;
 }
@@ -71,9 +71,9 @@ Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end);
 static char* _func_name_TypeData_parse_child = "TypeData.parse-child";
 #define MR_FUNC_NAME _func_name_TypeData_parse_child
 Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end) {
-  Bool _Bool95;
-  CHECK(33, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool95)) )
-  if (!_Bool95) {
+  Bool _Bool98;
+  CHECK(33, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool98)) )
+  if (!_Bool98) {
     CHECK(34, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){16, 15, "unknown keyword"}, keyword) )
   }
   return OK;
@@ -106,9 +106,9 @@ Returncode TypeData_m_find_field(TypeData* self, String* name, SyntaxTreeVariabl
     ListNode* child = type_data->_base._base.variables->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool96;
-      CHECK(47, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool96)) )
-      if (_Bool96) {
+      Bool _Bool99;
+      CHECK(47, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool99)) )
+      if (_Bool99) {
         (*field) = ((SyntaxTreeVariable*)(child->item));
         return OK;
       }
@@ -133,9 +133,9 @@ Returncode TypeData_m_find_meth(TypeData* self, String* name, SyntaxTreeFunction
     ListNode* child = type_data->_base.functions->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool97;
-      CHECK(61, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool97)) )
-      if (_Bool97) {
+      Bool _Bool100;
+      CHECK(61, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool100)) )
+      if (_Bool100) {
         (*method) = ((SyntaxTreeFunction*)(child->item));
         return OK;
       }
@@ -495,8 +495,8 @@ Returncode TypeInstance_m_copy_new(TypeInstance* self, TypeInstance** type_insta
     CHECK(216, TypeInstance_m_copy_new(self->sub_type, &((*type_instance)->sub_type)) )
   }
   if (NULL != self->arguments) {
-    FunctionArguments* _FunctionArguments98;
-    CHECK(218, FunctionArguments_m_copy_new(self->arguments, &(_FunctionArguments98)) )
+    FunctionArguments* _FunctionArguments101;
+    CHECK(218, FunctionArguments_m_copy_new(self->arguments, &(_FunctionArguments101)) )
   }
   return OK;
 }
@@ -508,13 +508,13 @@ Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* 
 static char* _func_name_TypeInstance_parse = "TypeInstance.parse";
 #define MR_FUNC_NAME _func_name_TypeInstance_parse
 Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* node, Char* end) {
-  String* _String99;
-  CHECK(221, string_new_concat(ends, &(String){2, 1, "{"}, &(_String99)) )
-  CHECK(221, read_new(_String99, &(self->name), &((*end))) )
+  String* _String102;
+  CHECK(221, string_new_concat(ends, &(String){2, 1, "{"}, &(_String102)) )
+  CHECK(221, read_new(_String102, &(self->name), &((*end))) )
   if ((*end) == '{') {
-    Bool _Bool100;
-    CHECK(224, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool100)) )
-    if (_Bool100) {
+    Bool _Bool103;
+    CHECK(224, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool103)) )
+    if (_Bool103) {
       self->arguments = malloc(sizeof(FunctionArguments));
       if (self->arguments == NULL) RAISE(225)
       *self->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};

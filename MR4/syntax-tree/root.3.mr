@@ -20,7 +20,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       glob.line-number := 0
       file-open(user glob.input-file-name, copy true):(owner glob.input-file)
       
-      self.parse-children(user _)
+      self.parse-children(user _, user _)
       
       if glob.input-buffer.length > 0 or glob.input-spaces > 0
         self.set-location()

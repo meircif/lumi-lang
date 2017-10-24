@@ -102,7 +102,7 @@ Returncode SyntaxTreeFunction_parse_body(SyntaxTreeFunction* self, Char* end) {
   if (!_Bool29) {
     SyntaxTreeReturn* _SyntaxTreeReturn30;
     CHECK(43, SyntaxTreeReturn_parse_new(NULL, &(self->_base), &((*end)), &(_SyntaxTreeReturn30)) )
-    CHECK(43, List_add(self->_base._base.code_nodes, &(_SyntaxTreeReturn30->_base)) )
+    CHECK(43, List_add(self->_base.code_nodes, &(_SyntaxTreeReturn30->_base)) )
   }
   return OK;
 }
@@ -164,7 +164,7 @@ static char* _func_name_SyntaxTreeFunction_analyze = "SyntaxTreeFunction.analyze
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_analyze
 Returncode SyntaxTreeFunction_analyze(SyntaxTreeFunction* self) {
   CHECK(68, FunctionArguments_analyze(self->arguments) )
-  CHECK(69, SyntaxTreeBranch_analyze(&(self->_base._base)) )
+  CHECK(69, SyntaxTreeBlock_analyze(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -348,9 +348,9 @@ Returncode SyntaxTreeNativeFunction_parse(SyntaxTreeNativeFunction* self, Char* 
   CHECK(134, SyntaxTreeNode_set_location(&(self->_base._base._base._base)) )
   self->_base._base._base.indentation_spaces = 2;
   CHECK(136, SyntaxTreeFunction_parse_header(&(self->_base), &((*end))) )
-  self->_base._base._base.code_nodes = malloc(sizeof(List));
-  if (self->_base._base._base.code_nodes == NULL) RAISE(137)
-  *self->_base._base._base.code_nodes = (List){NULL, NULL};
+  self->_base._base.code_nodes = malloc(sizeof(List));
+  if (self->_base._base.code_nodes == NULL) RAISE(137)
+  *self->_base._base.code_nodes = (List){NULL, NULL};
   return OK;
 }
 #undef MR_FUNC_NAME

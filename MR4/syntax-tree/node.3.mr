@@ -139,22 +139,23 @@ class SyntaxTreeNode
 class SyntaxTreeBranch(SyntaxTreeNode)
   var Int indentation-spaces
   owner List{SyntaxTreeVariable} variables
-  owner List{SyntaxTreeCode} code-nodes
   
   func inst init()
     new List{SyntaxTreeVariable} in self.variables
-    new List{SyntaxTreeCode} in self.code-nodes
   
-  func inst parse-block-children(user TypeData parent-type):(
+  func inst parse-block-children(
+      user TypeData parent-type, user SyntaxTreeBlock parent-block):(
       copy Char end)
     if end != '\n'
       self.m-syntax-error-c(user "expected block in a new line, got", copy end)
     self.init()
-    self.parse-children(user parent-type):(copy end)
+    self.parse-children(user parent-type, user parent-block):(copy end)
     if end != EOF
       glob.save-input := true
   
-  func inst parse-children(user TypeData parent-type):(copy Char end)
+  func inst parse-children(
+      user TypeData parent-type, user SyntaxTreeBlock parent-block):(
+      copy Char end)
     var Int my-line-number(self.line-number)
     do
       user String keyword
@@ -177,7 +178,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         
         while spaces = self.indentation-spaces and end != EOF
         
-        if not self.parse-if-common(user keyword, user parent-type):(copy end)
+        if not self.parse-if-common(
+            user keyword, user parent-type, user parent-block):(copy end)
           self.parse-child(user keyword):(copy end)
         
         while end != EOF
@@ -189,8 +191,11 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     self.line-number := my-line-number
   
   func inst parse-if-common(
-      user String keyword, user TypeData parent-type):(
-      copy Char end, copy Bool is-parsed)
+      user String keyword,
+      user TypeData parent-type,
+      user SyntaxTreeBlock parent-block):(
+      copy Char end,
+      copy Bool is-parsed)
     is-parsed := end = ' '
     if not is-parsed
       return
@@ -208,22 +213,20 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       read-c():(copy end)
       
     else-if keyword.equal(user "var")
-      self.add-variable(user parent-type, copy ACCESS-VAR):(copy end)
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-VAR, user parent-type, user parent-block):(
+          copy end))
     else-if keyword.equal(user "user")
-      self.add-variable(user parent-type, copy ACCESS-USER):(copy end)
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-USER, user parent-type, user parent-block):(
+          copy end))
     else-if keyword.equal(user "owner")
-      self.add-variable(user parent-type, copy ACCESS-OWNER):(copy end)
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-OWNER, user parent-type, user parent-block):(
+          copy end))
       
     else
       is-parsed := false
-  
-  func inst add-variable(user TypeData parent-type, copy Int access):(
-      copy Char end)
-    owner SyntaxTreeVariableInit var-init
-    self.variables.add(owner SyntaxTreeVariable.parse-new(
-        var _, copy access, user parent-type):(copy end, owner var-init))
-    if ? var-init
-      self.code-nodes.add(owner var-init)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     raise
@@ -239,7 +242,6 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   
   func dynamic analyze()
     self.analyze-children(user self.variables)
-    self.analyze-children(user self.code-nodes)
   
   func inst analyze-children(user List{SyntaxTreeNode} child-list)
     user ListNode{SyntaxTreeNode} child(child-list.first)
@@ -351,13 +353,15 @@ static TypeCount
 ## A basic code block node in the syntax tree
 class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeBlock parent
+  owner List{SyntaxTreeCode} code-nodes
   user List{TypeCount} aux-variables
   user SyntaxTreeIf previous-if
   owner SyntaxTreeVariable ref-variable
   var Bool is-in-loop
   
   func inst parse-block():(copy Char end)
-    self.parse-block-children(user _):(copy end)
+    new List{SyntaxTreeCode} in self.code-nodes
+    self.parse-block-children(user _, user self):(copy end)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node
@@ -436,7 +440,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"new\", got", copy end)
-      self.add-variable(user _, copy ACCESS-OWNER):(copy end)
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-OWNER, user _, user self):(copy end))
       
     else
       glob.save-input := true
@@ -494,6 +499,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     type-instance.m-copy-new():(owner variable.type-instance)
     new-variable := variable
     self.variables.add(owner variable)
+  
+  func dynamic analyze()
+    base.analyze()
+    self.analyze-children(user self.code-nodes)
   
   func inst write-block()
     # `previous-text` {

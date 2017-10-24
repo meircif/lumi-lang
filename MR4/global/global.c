@@ -48,7 +48,7 @@ static char* _func_name_Global_init = "Global.init";
 Returncode Global_init(Global* self) {
   self->root = malloc(sizeof(SyntaxTreeRoot));
   if (self->root == NULL) RAISE(47)
-  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL};
+  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL};
   self->root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
   self->input_buffer = _new_string(1024);
   if (self->input_buffer == NULL) RAISE(48)
@@ -144,7 +144,7 @@ static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, TypeData** type_data) {
   (*type_data) = malloc(sizeof(TypeData));
   if ((*type_data) == NULL) RAISE(101)
-  *(*type_data) = (TypeData){TypeData__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
+  *(*type_data) = (TypeData){TypeData__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
   (*type_data)->_base._base._base._dtl = TypeData__dtl;
   CHECK(102, string_new_copy(name, &((*type_data)->name)) )
   (*type_data)->is_primitive = is_primitive;

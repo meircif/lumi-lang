@@ -26,7 +26,7 @@ class TypeData(SyntaxTreeNamespace)
         self.m-syntax-error-c(user "expected ) after base class, got", copy end)
       read-c():(copy end)
     self.indentation-spaces := 2
-    self.parse-block-children(user self):(copy end)
+    self.parse-block-children(user self, user _):(copy end)
     self.indentation-spaces := 0
   
   func dynamic parse-child(user String keyword):(copy Char end)

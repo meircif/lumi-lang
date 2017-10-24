@@ -21,7 +21,7 @@ Returncode write_syntax_tree() {
   _set_var_string_array(3, 256, mock_argv, (char[256 * 3]){0});
   if ((2) < 0 || (2) >= (mock_argv)->length) RAISE(5)
   CHECK(5, String_copy((&(((String*)((mock_argv)->values))[2])), &(String){10, 9, "mock.3.mr"}) )
-  SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL};
+  SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL};
   root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
   CHECK(7, SyntaxTreeRoot_parse(glob->root, mock_argv) )
   CHECK(8, (glob->root)->_base._base._base._dtl[0](glob->root) )

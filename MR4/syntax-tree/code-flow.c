@@ -159,10 +159,10 @@ Returncode SyntaxTreeIf_add_else_if(SyntaxTreeIf* self, SyntaxTreeIf* new_if) {
   self->else_node->_base.block->_base.variables = malloc(sizeof(List));
   if (self->else_node->_base.block->_base.variables == NULL) RAISE(54)
   *self->else_node->_base.block->_base.variables = (List){NULL, NULL};
-  self->else_node->_base.block->_base.code_nodes = malloc(sizeof(List));
-  if (self->else_node->_base.block->_base.code_nodes == NULL) RAISE(55)
-  *self->else_node->_base.block->_base.code_nodes = (List){NULL, NULL};
-  CHECK(56, List_add(self->else_node->_base.block->_base.code_nodes, &(new_if->_base._base)) )
+  self->else_node->_base.block->code_nodes = malloc(sizeof(List));
+  if (self->else_node->_base.block->code_nodes == NULL) RAISE(55)
+  *self->else_node->_base.block->code_nodes = (List){NULL, NULL};
+  CHECK(56, List_add(self->else_node->_base.block->code_nodes, &(new_if->_base._base)) )
   CHECK(57, SyntaxTreeFlowElement_set_parent(&(new_if->_base), self->else_node->_base.block) )
   return OK;
 }

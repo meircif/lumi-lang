@@ -326,7 +326,42 @@ Returncode StringExpression_parse(StringExpression* self, String* text, SyntaxTr
   CHECK(123, Expression_set_simple_type(&(self->_base._base), glob->type_string) )
   self->_base.text = text;
   CHECK(125, Expression_add_aux_variable(&(self->_base._base), ACCESS_VAR, &(self->symbol)) )
-  /* TODO variable init */
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode StringExpression_write_preactions(StringExpression* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_StringExpression_write_preactions = "StringExpression.write-preactions";
+#define MR_FUNC_NAME _func_name_StringExpression_write_preactions
+Returncode StringExpression_write_preactions(StringExpression* self) {
+  /* `symbol`.max_length = `string-length + 1`; */
+  /* `symbol`.length = `string-length`; */
+  /* `symbol`.values = "`text`"; */
+  Int real_length = 1;
+  {int index; for (index = (1); index < (self->_base.text->length - 1); ++index) {
+    if ((index) < 0 || (index) >= (self->_base.text)->length) RAISE(133)
+    if (((self->_base.text)->values[index]) == '\\') {
+      index += 1;
+    }
+    real_length = real_length + 1;
+  }}
+  CHECK(136, (self->symbol)->_base._dtl[1](self->symbol) )
+  CHECK(137, write(&(String){16, 15, "->max_length = "}) )
+  CHECK(138, write_int(real_length) )
+  CHECK(139, write(&(String){3, 2, ";\n"}) )
+  CHECK(140, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(141, (self->symbol)->_base._dtl[1](self->symbol) )
+  CHECK(142, write(&(String){12, 11, "->length = "}) )
+  CHECK(143, write_int(real_length - 1) )
+  CHECK(144, write(&(String){3, 2, ";\n"}) )
+  CHECK(145, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(146, (self->symbol)->_base._dtl[1](self->symbol) )
+  CHECK(147, write(&(String){12, 11, "->values = "}) )
+  CHECK(148, write(self->_base.text) )
+  CHECK(149, write(&(String){3, 2, ";\n"}) )
+  CHECK(150, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -337,7 +372,7 @@ Returncode StringExpression_write(StringExpression* self);
 static char* _func_name_StringExpression_write = "StringExpression.write";
 #define MR_FUNC_NAME _func_name_StringExpression_write
 Returncode StringExpression_write(StringExpression* self) {
-  CHECK(129, (self->symbol)->_base._dtl[1](self->symbol) )
+  CHECK(153, (self->symbol)->_base._dtl[1](self->symbol) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -346,7 +381,7 @@ Returncode StringExpression_write(StringExpression* self) {
 extern Func StringExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func StringExpression__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)StringExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func StringExpression__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)StringExpression_write, (void*)Expression_analyze_call, (void*)StringExpression_write_preactions};
 #endif
 
 
@@ -365,12 +400,12 @@ static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 #define MR_FUNC_NAME _func_name_EmptyExpression_parse_new
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
   EmptyExpression* _EmptyExpression14 = malloc(sizeof(EmptyExpression));
-  if (_EmptyExpression14 == NULL) RAISE(135)
+  if (_EmptyExpression14 == NULL) RAISE(159)
   *_EmptyExpression14 = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, false, false, false};
   _EmptyExpression14->_base._base._dtl = EmptyExpression__dtl;
   (*expression) = &(_EmptyExpression14->_base);
-  CHECK(136, SyntaxTreeNode_set_location(&((*expression)->_base)) )
-  CHECK(137, Expression_set_simple_type((*expression), glob->type_empty) )
+  CHECK(160, SyntaxTreeNode_set_location(&((*expression)->_base)) )
+  CHECK(161, Expression_set_simple_type((*expression), glob->type_empty) )
   free(text);
   return OK;
 }
@@ -382,7 +417,7 @@ Returncode EmptyExpression_write(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write = "EmptyExpression.write";
 #define MR_FUNC_NAME _func_name_EmptyExpression_write
 Returncode EmptyExpression_write(EmptyExpression* self) {
-  CHECK(141, write(&(String){5, 4, "NULL"}) )
+  CHECK(165, write(&(String){5, 4, "NULL"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
