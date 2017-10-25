@@ -151,7 +151,7 @@ class Expression(SyntaxTreeNode)
     symbol.assignable := true
     self.code-node.parent.add-aux-variable(
         copy access, user self.result-type):(user symbol.variable)
-    string-new-copy(user symbol.variable.name):(owner symbol.text)
+    string-new-copy(user symbol.variable.name):(owner symbol.name)
     expression := symbol
   
   func dynamic analyze-call(user FunctionArguments arguments)
@@ -159,11 +159,3 @@ class Expression(SyntaxTreeNode)
   
   func dynamic write-preactions()
     # do noting
-
-
-## A basic expression that has a single textual value
-class TextExpression(Expression)
-  owner String text
-  
-  func dynamic write()
-    write(user self.text)

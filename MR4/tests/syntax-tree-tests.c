@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file22_name = "tests/syntax-tree-tests.3.mr";
+static char* _mr_file25_name = "tests/syntax-tree-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file22_name
+#define MR_FILE_NAME _mr_file25_name
 
 /* MR4 compiler tests - Syntax tree */
 
@@ -284,6 +284,7 @@ Returncode test_for_loop() {
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
@@ -295,6 +296,8 @@ Returncode test_for_loop() {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

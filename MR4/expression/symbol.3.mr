@@ -1,7 +1,8 @@
 ## MR4 compiler - Symbol expression
 
 ## A single symbol expression (variable or global-function)
-class SymbolExpression(TextExpression)
+class SymbolExpression(Expression)
+  owner String name
   user SyntaxTreeVariable variable
   user SyntaxTreeFunction function
   
@@ -14,23 +15,23 @@ class SymbolExpression(TextExpression)
   ## parsing `symbol`
   func inst parse(owner String text, user SyntaxTreeCode code-node)
     self.code-node := code-node
-    self.text := text
+    self.name := text
     self.set-location()
   
   func dynamic analyze()
-    self.code-node.m-find-variable(user self.text):(user self.variable)
+    self.code-node.m-find-variable(user self.name):(user self.variable)
     if ? self.variable
       self.variable.type-instance.m-copy-new():(owner self.result-type)
       self.assignable := true
     else
-      glob.root.m-find-function(user self.text):(user self.function)
+      glob.root.m-find-function(user self.name):(user self.function)
       if not (? self.function)
-        self.m-syntax-error(user "unknown symbol", user self.text)
+        self.m-syntax-error(user "unknown symbol", user self.name)
       self.set-simple-type(user glob.type-func)
       self.function.arguments.m-copy-new():(self.result-type.arguments)
   
   func dynamic write()
-    write-cname(user self.text)
+    write-cname(user self.name)
 
 
 ## The `base` method expression
@@ -53,7 +54,9 @@ class BaseMethExpression(Expression)
 
 
 ## Type name expression
-class TypeExpression(TextExpression)
+class TypeExpression(Expression)
+  owner String type-name
+  
   func inst parse-new(owner String text):(owner Expression expression)
     new TypeExpression type-expression
     type-expression.parse(owner text)
@@ -61,12 +64,12 @@ class TypeExpression(TextExpression)
   
   ## parsing `Type-name`
   func inst parse(owner String text)
-    self.text := text
+    self.type-name := text
     self.set-location()
   
   func dynamic analyze()
     self.set-simple-type(user glob.type-type)
-    self.m-find-type(user self.text).m-new-type-instance():(
+    self.m-find-type(user self.type-name).m-new-type-instance():(
         owner self.result-type.sub-type)
 
 
@@ -84,34 +87,34 @@ class MemberExpression(SymbolExpression)
   func inst parse(owner Expression instance, user String ends):(copy Char end)
     self.instance := instance
     self.set-location()
-    self.read-new-value(user ends):(owner self.text, copy end)
+    self.read-new-value(user ends):(owner self.name, copy end)
   
   func dynamic analyze()
     self.instance.analyze()
     self.assignable := self.instance.assignable
     if not (? self.instance.result-type) or
         not (? self.instance.result-type.type-data)
-      self.m-syntax-error(user "void expression has no member", user self.text)
+      self.m-syntax-error(user "void expression has no member", user self.name)
     user TypeData type-data(self.instance.result-type.type-data)
     if self.instance.result-type.type-data = glob.type-type
       if not (? self.instance.result-type.sub-type) or
           not (? self.instance.result-type.sub-type.type-data)
         self.m-syntax-error(
-            user "unspecified type has no member", user self.text)
+            user "unspecified type has no member", user self.name)
       type-data := self.instance.result-type.sub-type.type-data
     
-    type-data.m-find-field(user self.text):(user self.variable)
+    type-data.m-find-field(user self.name):(user self.variable)
     if ? self.variable
       self.variable.type-instance.m-copy-new():(owner self.result-type)
       self.assignable := true
     else
-      type-data.m-find-meth(user self.text):(user self.function)
+      type-data.m-find-meth(user self.name):(user self.function)
       if not (? self.function)
         self.m-syntax-error2(
             user "type",
             user type-data.name,
             user "has no member",
-            user self.text)
+            user self.name)
       self.set-simple-type(user glob.type-func)
       self.function.arguments.m-copy-new():(self.result-type.arguments)
   

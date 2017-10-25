@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file5_name = "global/map.3.mr";
+static char* _mr_file6_name = "global/map.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file5_name
+#define MR_FILE_NAME _mr_file6_name
 
 /* MR4 compiler - Generic mappings */
 
@@ -50,9 +50,9 @@ Returncode NameMap_find(NameMap* self, String* name, void** value) {
   NameMapNode* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool2;
-    CHECK(23, String_equal(node->name, name, &(_Bool2)) )
-    if (_Bool2) {
+    Bool _Bool12;
+    CHECK(23, String_equal(node->name, name, &(_Bool12)) )
+    if (_Bool12) {
       (*value) = ((void*)(node->value));
       return OK;
     }
@@ -72,9 +72,9 @@ Returncode NameMap_m_update_or_add(NameMap* self, String* name, void* value) {
   NameMapNode* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool3;
-    CHECK(33, String_equal(node->name, name, &(_Bool3)) )
-    if (_Bool3) {
+    Bool _Bool13;
+    CHECK(33, String_equal(node->name, name, &(_Bool13)) )
+    if (_Bool13) {
       node->value = value;
       return OK;
     }
@@ -113,6 +113,7 @@ Returncode NameMapNode_init(NameMapNode* self, String* name, void* value) {
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
@@ -123,6 +124,8 @@ Returncode NameMapNode_init(NameMapNode* self, String* name, void* value) {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

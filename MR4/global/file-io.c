@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file2_name = "global/file-io.3.mr";
+static char* _mr_file3_name = "global/file-io.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file2_name
+#define MR_FILE_NAME _mr_file3_name
 
 /* MR4 compiler - File read and write functions */
 
@@ -131,9 +131,9 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
   while (true) {
     if (!(ch != EOF && ch != '\n')) break;
     if (quote == '\0') {
-      Bool _Bool0;
-      CHECK(58, String_has(ends, ch, &(_Bool0)) )
-      if (!(!_Bool0)) break;
+      Bool _Bool10;
+      CHECK(58, String_has(ends, ch, &(_Bool10)) )
+      if (!(!_Bool10)) break;
       if (ch == '\'' || ch == '"' || ch == '`') {
         quote = ch;
       }
@@ -172,8 +172,8 @@ static char* _func_name_read_new = "read-new";
 #define MR_FUNC_NAME _func_name_read_new
 Returncode read_new(String* ends, String** new_text, Char* end) {
   String* text = NULL;
-  Int _Int1;
-  CHECK(79, read_until(ends, false, &(text), &((*end)), &(_Int1)) )
+  Int _Int11;
+  CHECK(79, read_until(ends, false, &(text), &((*end)), &(_Int11)) )
   CHECK(80, string_new_copy(text, &((*new_text))) )
   return OK;
 }
@@ -270,6 +270,7 @@ Returncode write_spaces(Int num) {
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/global.c"
 #include "global/list.c"
@@ -280,6 +281,8 @@ Returncode write_spaces(Int num) {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

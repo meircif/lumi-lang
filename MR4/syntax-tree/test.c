@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file17_name = "syntax-tree/test.3.mr";
+static char* _mr_file20_name = "syntax-tree/test.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file17_name
+#define MR_FILE_NAME _mr_file20_name
 
 /* MR4 compiler - Syntax tree testing nodes */
 
@@ -193,6 +193,7 @@ Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
@@ -204,6 +205,8 @@ Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

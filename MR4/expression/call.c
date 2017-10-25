@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file6_name = "expression/call.3.mr";
+static char* _mr_file7_name = "expression/call.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file6_name
+#define MR_FILE_NAME _mr_file7_name
 
 /* MR4 compiler - Call expression */
 
@@ -77,14 +77,14 @@ Returncode CallExpression_analyze(CallExpression* self) {
     CHECK(36, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "pointer-to-function not supported"}) )
   }
   if (!self->_base.is_statement) {
-    TypeInstance* _TypeInstance4;
-    CHECK(38, FunctionArguments_get_result_type(declaration, &(_TypeInstance4)) )
-    CHECK(38, TypeInstance_m_copy_new(_TypeInstance4, &(self->_base.result_type)) )
+    TypeInstance* _TypeInstance14;
+    CHECK(38, FunctionArguments_get_result_type(declaration, &(_TypeInstance14)) )
+    CHECK(38, TypeInstance_m_copy_new(_TypeInstance14, &(self->_base.result_type)) )
   }
   CHECK(39, (self->function)->_base._dtl[2](self->function, self->arguments) )
-  Bool _Bool5;
-  CHECK(40, FunctionArguments_m_check_calling(self->arguments, declaration, &(_Bool5)) )
-  if (_Bool5) {
+  Bool _Bool15;
+  CHECK(40, FunctionArguments_m_check_calling(self->arguments, declaration, &(_Bool15)) )
+  if (_Bool15) {
     /* add omitted output */
     CallArgument* output = malloc(sizeof(CallArgument));
     if (output == NULL) RAISE(42)
@@ -276,11 +276,11 @@ Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argumen
 static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactory.m-new-argument";
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
-  CallArgument* _CallArgument6 = malloc(sizeof(CallArgument));
-  if (_CallArgument6 == NULL) RAISE(113)
-  *_CallArgument6 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, NULL};
-  _CallArgument6->_base._base._dtl = CallArgument__dtl;
-  (*new_argument) = &(_CallArgument6->_base);
+  CallArgument* _CallArgument16 = malloc(sizeof(CallArgument));
+  if (_CallArgument16 == NULL) RAISE(113)
+  *_CallArgument16 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, NULL};
+  _CallArgument16->_base._base._dtl = CallArgument__dtl;
+  (*new_argument) = &(_CallArgument16->_base);
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -296,6 +296,7 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
@@ -306,6 +307,8 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

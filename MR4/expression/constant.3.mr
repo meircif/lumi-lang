@@ -32,6 +32,14 @@ func f-is-hex(user String text):(copy Bool is-hex)
       return
 
 
+## A basic expression that has a single textual value
+class TextExpression(Expression)
+  owner String text
+  
+  func dynamic write()
+    write(user self.text)
+
+
 ## Constant integer expression
 class IntExpression(TextExpression)
   func inst parse-new(owner String text):(owner Expression expression)

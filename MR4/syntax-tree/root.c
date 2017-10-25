@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file16_name = "syntax-tree/root.3.mr";
+static char* _mr_file19_name = "syntax-tree/root.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file16_name
+#define MR_FILE_NAME _mr_file19_name
 
 /* MR4 compiler - Syntax tree root */
 
@@ -301,6 +301,7 @@ Returncode write_global(String* text) {
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
@@ -312,6 +313,8 @@ Returncode write_global(String* text) {
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

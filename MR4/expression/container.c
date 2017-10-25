@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file8_name = "expression/container.3.mr";
+static char* _mr_file9_name = "expression/container.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file8_name
+#define MR_FILE_NAME _mr_file9_name
 
 /* MR4 compiler - Container expressions */
 
@@ -43,8 +43,8 @@ static char* _func_name_BlockExpression_parse = "BlockExpression.parse";
 #define MR_FUNC_NAME _func_name_BlockExpression_parse
 Returncode BlockExpression_parse(BlockExpression* self, SyntaxTreeCode* code_node, Char* end) {
   CHECK(15, SyntaxTreeNode_set_location(&(self->_base._base)) )
-  Char _Char15;
-  CHECK(16, parse_new_expression(&(String){2, 1, ")"}, code_node, &(self->expression), &(_Char15)) )
+  Char _Char25;
+  CHECK(16, parse_new_expression(&(String){2, 1, ")"}, code_node, &(self->expression), &(_Char25)) )
   CHECK(17, read_c(&((*end))) )
   return OK;
 }
@@ -180,9 +180,9 @@ Returncode UnaryExpression_analyze(UnaryExpression* self) {
     CHECK(81, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   }
   else {
-    Bool _Bool16;
-    CHECK(82, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool16)) )
-    if (_Bool16) {
+    Bool _Bool26;
+    CHECK(82, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool26)) )
+    if (_Bool26) {
       CHECK(83, UnaryExpression_test_operand_type(self, self->right_expression, glob->type_int) )
       CHECK(84, Expression_set_simple_type(&(self->_base), glob->type_int) )
     }
@@ -328,9 +328,9 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
     CHECK(150, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
   }
   else {
-    Bool _Bool17;
-    CHECK(151, String_equal(self->_base.operator->name, &(String){3, 2, ":="}, &(_Bool17)) )
-    if (_Bool17) {
+    Bool _Bool27;
+    CHECK(151, String_equal(self->_base.operator->name, &(String){3, 2, ":="}, &(_Bool27)) )
+    if (_Bool27) {
       CHECK(152, TypeInstance_m_check_assign_to(self->_base.right_expression->result_type, self->left_expression->result_type, &(self->_base._base._base)) )
       if (!self->left_expression->assignable) {
         CHECK(155, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){41, 40, "assigning into non assignable expression"}) )
@@ -499,6 +499,7 @@ Func QuestionExpression__dtl[] = {(void*)QuestionExpression_analyze, (void*)Ques
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
@@ -509,6 +510,8 @@ Func QuestionExpression__dtl[] = {(void*)QuestionExpression_analyze, (void*)Ques
 #include "expression/expression.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

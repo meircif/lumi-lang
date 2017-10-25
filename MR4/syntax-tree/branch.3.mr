@@ -1,0 +1,179 @@
+## MR4 compiler - Syntax tree node branch
+
+## A basic branch node in the syntax tree - a node with chldren nodes
+class SyntaxTreeBranch(SyntaxTreeNode)
+  var Int indentation-spaces
+  owner List{SyntaxTreeVariable} variables
+  
+  func inst init()
+    new List{SyntaxTreeVariable} in self.variables
+  
+  func inst parse-block-children(
+      user TypeData parent-type, user SyntaxTreeBlock parent-block):(
+      copy Char end)
+    if end != '\n'
+      self.m-syntax-error-c(user "expected block in a new line, got", copy end)
+    self.init()
+    self.parse-children(user parent-type, user parent-block):(copy end)
+    if end != EOF
+      glob.save-input := true
+  
+  func inst parse-children(
+      user TypeData parent-type, user SyntaxTreeBlock parent-block):(
+      copy Char end)
+    var Int my-line-number(self.line-number)
+    do
+      user String keyword
+      var Int spaces
+      read-until(user " .([?", copy true):(user keyword, copy end, copy spaces)
+      # ignore empty lines
+      if keyword.length > 0 or end != '\n'
+        self.set-location()
+        
+        if spaces > self.indentation-spaces
+          var String{32} expecte-num
+          self.indentation-spaces.str(user expecte-num)
+          var String{32} actual-num
+          spaces.str(user actual-num)
+          self.m-syntax-error2(
+              user "indentation too big, expected",
+              user expecte-num,
+              user "got",
+              user actual-num)
+        
+        while spaces = self.indentation-spaces and end != EOF
+        
+        if not self.parse-if-common(
+            user keyword, user parent-type, user parent-block):(copy end)
+          self.parse-child(user keyword):(copy end)
+        
+        while end != EOF
+        if not glob.save-input and end != '\n'
+          # TODO: is possible?
+          self.m-syntax-error-c(
+              user "expected new-line in line end, got", copy end)
+    
+    self.line-number := my-line-number
+  
+  func inst parse-if-common(
+      user String keyword,
+      user TypeData parent-type,
+      user SyntaxTreeBlock parent-block):(
+      copy Char end,
+      copy Bool is-parsed)
+    is-parsed := end = ' '
+    if not is-parsed
+      return
+    
+    if keyword.equal(user "#") or keyword.equal(user "##")
+      user String text
+      read-until(user "", copy false):(user text, copy end)
+    else-if keyword.equal(user "{#") or keyword.equal(user "{##")
+      var Char prev('\0')
+      do
+        var Char curr
+        read-c():(copy curr)
+        while curr != EOF and (curr != '}' or prev != '#')
+        prev := curr
+      read-c():(copy end)
+      
+    else-if keyword.equal(user "var")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-VAR, user parent-type, user parent-block):(
+          copy end))
+    else-if keyword.equal(user "user")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-USER, user parent-type, user parent-block):(
+          copy end))
+    else-if keyword.equal(user "owner")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-OWNER, user parent-type, user parent-block):(
+          copy end))
+      
+    else
+      is-parsed := false
+  
+  func dynamic parse-child(user String keyword):(copy Char end)
+    raise
+  
+  func dynamic m-find-variable(user String name):(
+      user SyntaxTreeVariable variable)
+    user ListNode{SyntaxTreeVariable} child(self.variables.first)
+    do
+      while ? child
+      while not child.item.m-find-variable(user name):(user variable)
+      child := child.next
+    variable := _
+  
+  func dynamic analyze()
+    self.analyze-children(user self.variables)
+  
+  func inst analyze-children(user List{SyntaxTreeNode} child-list)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      child.item.analyze()
+      child := child.next
+  
+  func dynamic write()
+    self.write-children(user self.variables)
+  
+  func inst write-children(user List{SyntaxTreeNode} child-list)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      if self.indentation-spaces > 0
+        self.write-spaces()
+      else
+        write(user "\n")
+      child.item.write()
+      write(user "\n")
+      child := child.next
+  
+  func inst write-spaces()
+    write-spaces(copy self.indentation-spaces)
+
+
+## A basic namespace node in the syntax tree
+class SyntaxTreeNamespace(SyntaxTreeBranch)
+  owner List{SyntaxTreeFunction} functions
+  
+  func inst init()
+    base.init()
+    new List{SyntaxTreeFunction} in self.functions
+  
+  func inst parse-if-function(
+      user String keyword, user TypeData parent-type):(
+      copy Char end, copy Bool is-func)
+    keyword.equal(user "func"):(copy is-func)
+    if is-func
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"func\", got", copy end)
+      self.functions.add(owner SyntaxTreeFunction.parse-new(
+          var _, user parent-type):(copy end))
+  
+  func inst m-find-function(user String name):(user SyntaxTreeFunction function)
+    user ListNode{SyntaxTreeFunction} child(self.functions.first)
+    do
+      while ? child
+      if child.item.name.equal(user name)
+        function := child.item
+        return
+      child := child.next
+    function := _
+  
+  func dynamic analyze()
+    base.analyze()
+    self.analyze-children(user self.functions)
+  
+  func dynamic write()
+    base.write()
+    self.write-children(user self.functions)
+  
+  func inst write-functions-declaration()
+    user ListNode{SyntaxTreeFunction} child(self.functions.first)
+    do
+      while ? child
+      child.item.write-declaration()
+      child := child.next
