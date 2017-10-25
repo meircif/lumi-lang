@@ -127,8 +127,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"new\", got", copy end)
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-OWNER, user _, user self):(copy end))
+      self.variables.add(owner SyntaxTreeInitNew.parse-new(
+          var _, user self):(copy end))
       
     else
       glob.save-input := true

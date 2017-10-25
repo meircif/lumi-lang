@@ -12,10 +12,7 @@ char* _mr_traceline_format = "  called from %s:%d %s()\n";
 FILE* _trace_stream = NULL;
 
 void _trace_print(
-    char const* format,
-    char const* filename,
-    int line,
-    char const* funcname) {
+    char const* format, char const* filename, int line, char const* funcname) {
   if (_trace_stream != NULL) {
     fprintf(_trace_stream, format, filename, line, funcname);
   }
@@ -31,24 +28,29 @@ int cstring_length(char* cstring, int max_length) {
 }
 
 /*main*/
-Returncode func(Array*);
+Returncode _mr_user_main();
 
 int _mr_main(int argc, char* argv[]) {
+  String* args_strings;
+  Array sys_argv;
+  int arg;
+  Returncode err;
   _trace_stream = stderr;
-  String* args_strings = malloc(argc * sizeof(String));
+  args_strings = malloc(argc * sizeof(String));
   if (args_strings == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
-  sys.argv = &(Array){argc, args_strings};
-  int arg;
+  sys_argv.length = argc;
+  sys_argv.values = args_strings;
+  sys.argv = &sys_argv;
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
     args_strings[arg].length = cstring_length(argv[arg], 1024);
     args_strings[arg].max_length = args_strings[arg].length;
     args_strings[arg].values[args_strings[arg].length] = '\0';
   }
-  Returncode err = _mr_user_main();
+  err = _mr_user_main();
   if (err != OK) {
     fprintf(stderr, "  called from executable start\n");
   }
@@ -57,9 +59,10 @@ int _mr_main(int argc, char* argv[]) {
 
 /*tests*/
 int _mr_test_main(int argc, char* argv[]) {
+  Returncode err;
   _trace_stream = stderr;
   printf("Running tests:\n");
-  Returncode err = func(NULL);
+  err = _mr_user_main();
   if (err == OK) {
     printf("Tests passed\n");
   }
@@ -71,10 +74,11 @@ int _mr_test_main(int argc, char* argv[]) {
 }
 
 Bool _run_test(char* test_name, Func test_func) {
+  Returncode err;
   printf("testing %s... ", test_name);
   fflush(stdout);
   _trace_stream = stdout;
-  Returncode err = test_func();
+  err = test_func();
   _trace_stream = stderr;
   if (err == OK) {
     printf("OK\n");
@@ -98,48 +102,63 @@ Returncode _set_cstring(String* str) {
 
 /*allocations*/
 String* _new_string(int length) {
-  void* buff = malloc(sizeof(String) + length);
+  void* buff;
+  String* str;
+  buff = malloc(sizeof(String) + length);
   if (buff == NULL) {
     return NULL;
   }
-  String* str = buff;
+  str = buff;
   str->max_length = length;
   str->length = 0;
-  str->values = (char*)buff + sizeof(String);
+  str->values = ((char*)buff) + sizeof(String);
   return str;
 }
 
 Array* _new_array(int length, int value_size) {
-  void* buff = calloc(1, sizeof(Array) + length * value_size);
+  void* buff;
+  Array* arr;
+  buff = calloc(1, sizeof(Array) + length * value_size);
   if (buff == NULL) {
     return NULL;
   }
-  Array* arr = buff;
+  arr = buff;
   arr->length = length;
-  arr->values = (Byte*)buff + sizeof(Array);
+  arr->values = ((Byte*)buff) + sizeof(Array);
   return arr;
 }
 
 void _set_var_string_array(
-    int array_length,
-    int string_length,
-    Array* array,
-    char* chars) {
+    int array_length, int string_length, Array* array, char* chars) {
   int n;
   for (n = 0; n < array_length; ++n) {
-    ((String*)(array->values))[n] =
-      (String){string_length, 0, chars + n * string_length};
+    String* str;
+    str = ((String*)(array->values)) + n;
+    str->max_length = string_length;
+    str->length = 0;
+    str->values = chars + n * string_length;
   }
+}
+
+Array* _get_recursive_array(
+    Array* parent, int parent_index, int length, int value_size) {
+  Array* arr;
+  arr = (Array*)(((Byte*)(parent->values)) + parent_index *
+      (sizeof(Array) + length * (value_size)));
+  arr->length = length;
+  arr->values = ((Byte*)arr) + sizeof(Array);
+  return arr;
 }
 
 void _set_new_string_array(int array_length, int string_length, Array* array) {
   int n;
   for (n = 0; n < array_length; ++n) {
-    ((String*)(array->values))[n] = (String){
-      string_length,
-      0,
-      (char*)(array->values) + array_length * sizeof(String) + string_length * n
-    };
+    String* str;
+    str = ((String*)(array->values)) + n;
+    str->max_length = string_length;
+    str->length = 0;
+    str->values = ((char*)(array->values)) + array_length * sizeof(String) +
+        string_length * n;
   }
 }
 
@@ -175,7 +194,8 @@ Returncode File_getc(File* file, Char* out_char) {
 }
 
 Returncode File_putc(File* file, Char in_char) {
-  int res = putc(in_char, file);
+  int res;
+  res = putc(in_char, file);
   if (res != in_char) {
     CRAISE
   }
@@ -228,10 +248,10 @@ Returncode String_append(String* this, Char in_char) {
 }
 
 Returncode String_replace(String* this, Char old, Char new) {
+  int n;
   if (old == new) {
     return OK;
   }
-  int n;
   for (n = 0; n < this->length; ++n) {
     if (this->values[n] == old) {
       this->values[n] = new;
@@ -241,12 +261,17 @@ Returncode String_replace(String* this, Char old, Char new) {
 }
 
 Returncode Int_str(Int value, String* out_str) {
-  Bool is_neg = value < 0;
-  int abs = value;
+  Bool is_neg;
+  int abs;
+  int swap;
+  char* next;
+  char* last;
+  is_neg = value < 0;
+  abs = value;
   if (is_neg) {
     abs = -value;
   }
-  int swap = 0;
+  swap = 0;
   out_str->length = is_neg;
   do {
     swap *= 10;
@@ -258,12 +283,12 @@ Returncode Int_str(Int value, String* out_str) {
     }
     ++out_str->length;
   } while (abs > 0);
-  char* next = out_str->values;
+  next = out_str->values;
   if (is_neg) {
     *next = '-';
     ++next;
   }
-  char* last = out_str->values + out_str->length;
+  last = out_str->values + out_str->length;
   while (next < last) {
     *next = '0' + swap % 10;
     ++next;
@@ -294,17 +319,17 @@ Returncode String_concat(String* this, String* ext) {
 }
 
 Returncode String_concat_int(String* this, Int num) {
-  String remain = {
-    this->max_length - this->length,
-    0,
-    this->values + this->length};
+  String remain;
+  remain.max_length = this->max_length - this->length;
+  remain.length = 0;
+  remain.values = this->values + this->length;
   CCHECK(Int_str(num, &remain));
   this->length += remain.length;
   return OK;
 }
 
 Returncode String_find(String* this, String* pattern, Int* out_index) {
-  Int n;
+  int n;
   for (n = 0; n <= this->length - pattern->length; ++n) {
     if (strncmp(this->values + n, pattern->values, pattern->length) == 0) {
       *out_index = n;
@@ -327,33 +352,28 @@ Returncode String_has(String* this, Char ch, Bool* found) {
   return OK;
 }
 
-/*Arrays*/
-/*Returncode _array_length(Array* this, Int* out_length) {
-  *out_length = this->length;
-  return OK;
-}*/
-
 /*system*/
 Sys sys;
 
-Returncode Sys_print(void* _, String* text) {
+Returncode Sys_print(Sys* _, String* text) {
   printf("%.*s\n", text->length, text->values);
   return OK;
 }
 
-Returncode Sys_print_raw(void* _, String* text) {
+Returncode Sys_print_raw(Sys* _, String* text) {
   printf("%.*s", text->length, text->values);
   return OK;
 }
 
-Returncode Sys_exit(void* _, Int status) {
+Returncode Sys_exit(Sys* _, Int status) {
   exit(status);
   CRAISE
 }
 
-Returncode Sys_system(void* _, String* command, Int* status) {
+Returncode Sys_system(Sys* _, String* command, Int* status) {
+  int res;
   CCHECK(_set_cstring(command));
-  int res = system(command->values);
+  res = system(command->values);
   if (res == -1) {
     CRAISE
   }
@@ -361,9 +381,10 @@ Returncode Sys_system(void* _, String* command, Int* status) {
   return OK;
 }
 
-Returncode Sys_getenv(void* _, String* name, String* value, Bool* exists) {
+Returncode Sys_getenv(Sys* _, String* name, String* value, Bool* exists) {
+  char* ret;
   CCHECK(_set_cstring(name));
-  char* ret = getenv(name->values);
+  ret = getenv(name->values);
   if (ret == NULL) {
     *exists = false;
     return OK;

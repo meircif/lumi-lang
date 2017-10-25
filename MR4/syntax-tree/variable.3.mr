@@ -74,6 +74,45 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     write(user ";")
 
 
+## Initialize dynamically allocated variable node in the syntax tree
+class SyntaxTreeInitNew(SyntaxTreeCode)
+  user SyntaxTreeVariable variable
+  
+  func inst parse-new(user SyntaxTreeBlock parent-block):(
+      copy Char end, owner SyntaxTreeVariable new-var-node)
+    new SyntaxTreeInitNew node-init-new
+    node-init-new.init(user parent-block)
+    SyntaxTreeVariable.parse-new(
+        var _, copy ACCESS-OWNER, user _, user parent-block):(
+        copy end, owner new-var-node)
+    node-init-new.variable := new-var-node
+  
+  func inst init(user SyntaxTreeBlock parent-block)
+    self.parent := parent-block
+    self.set-location()
+    self.parent.code-nodes.add(owner self)
+  
+  func dynamic write()
+    # `name` = `...`
+    write-cname(user self.variable.name)
+    write(user " = ")
+    if self.variable.type-instance.type-data = glob.type-array
+      # TODO array...
+    else-if ? self.variable.type-instance.sub-type
+      self.m-syntax-error2(
+          user "unexpected subtype",
+          user self.variable.type-instance.sub-type.name,
+          user "for type",
+          user self.variable.type-instance.type-data.name)
+    else-if self.variable.type-instance.type-data = glob.type-string
+      # TODO string...
+    else
+      # malloc(`type`);
+      write(user " = malloc(")
+      write-cname(user self.variable.type-instance.type-data.name)
+      write(user ");")
+
+
 ## Variable initialization node in the syntax tree
 class SyntaxTreeVariableInit(SyntaxTreeCode)
   user SyntaxTreeVariable variable

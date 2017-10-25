@@ -98,10 +98,9 @@ int _mr_test_main(int argc, char* argv[]);
 String* _new_string(int length);
 Array* _new_array(int length, int value_size);
 void _set_var_string_array(
-  int array_length,
-  int string_length,
-  Array* array,
-  char* chars);
+  int array_length, int string_length, Array* array, char* chars);
+Array* _get_recursive_array(
+  Array* parent, int parent_index, int length, int value_size);
 void _set_new_string_array(int array_length, int string_length, Array* array);
 Bool _run_test(char* test_name, Func test_func);
 

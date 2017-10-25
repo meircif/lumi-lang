@@ -263,7 +263,7 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
                         CHECK(128, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){32, 31, "expected space after \"new\", got"}, (*end)) )
                       }
                       SyntaxTreeVariable* _SyntaxTreeVariable54;
-                      CHECK(130, SyntaxTreeVariable_parse_new(NULL, ACCESS_OWNER, NULL, self, &((*end)), &(_SyntaxTreeVariable54)) )
+                      CHECK(130, SyntaxTreeInitNew_parse_new(NULL, self, &((*end)), &(_SyntaxTreeVariable54)) )
                       CHECK(130, List_add(self->_base.variables, _SyntaxTreeVariable54) )
                       
                     }
