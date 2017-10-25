@@ -23,55 +23,6 @@ func print(user String text)
   sys.print-raw(user text)
 
 
-## Raise a syntax error with message:
-## `Code error in {file-name}[{line-number}] {text} "{item}"`
-func f-syntax-error(user String text, user String item)
-  print-syntax-error-header()
-  print-msg-with-item(user text, user item)
-  print(user "\n")
-  raise
-
-
-## Same as `f-syntax-error` but but with another `{text} "{item}" pair
-func f-syntax-error2(
-    user String text1, user String item1, user String text2, user String item2)
-  print-syntax-error-header()
-  print-msg-with-item(user text1, user item1)
-  print(user " ")
-  print-msg-with-item(user text2, user item2)
-  print(user "\n")
-  raise
-
-
-## Same as `f-syntax-error` but with a character item
-func f-syntax-error-c(user String text, copy Char item)
-  var String{16} char-str
-  if item = EOF
-    char-str.copy(user "EOF")
-  else-if item = '\n'
-    char-str.copy(user "new-line")
-  else
-    char-str.append(copy item)
-  f-syntax-error(user text, user char-str)
-
-
-func f-syntax-error-msg(user String text)
-  print-syntax-error-header()
-  print(user text)
-  print(user "\n")
-  raise
-
-
-func print-syntax-error-header()
-  print(user "Code error in ")
-  print(user glob.input-file-name)
-  print(user "[")
-  var String{32} line-num-str
-  glob.line-number.str(user line-num-str)
-  print(user line-num-str)
-  print(user "] ")
-
-
 func print-msg-with-item(user String text, user String item)
   print(user text)
   print(user " \"")

@@ -4,11 +4,35 @@ This file should onlw work together with test file #2.
 #}
 
 
-struct TopType
+class TopType(MiddleType)
   user BaseType top-base-ref
   user MiddleType top-mid-ref
+  
+  func dynamic meth2()
+    # sys.print(user "TopType.meth2")
+  
+  func dynamic meth3(copy Int n, user String s)
+    # sys.print(user "TopType.meth3")
+  
+  func dynamic meth5(copy Int n, user String s)
+    # sys.print(user "TopType.meth5")
+  
+  func dynamic meth6()
+    # sys.print(user "TopType.meth6")
 
 
-struct BaseType
+class BaseType
   user MiddleType base-mid-ref
   user TopType base-top-ref
+  
+  func dynamic meth0()
+    # sys.print(user "BaseType.meth0")
+  
+  func dynamic meth1(copy Int n, user String s)
+    # sys.print(user "BaseType.meth1")
+  
+  func dynamic meth2()
+    # sys.print(user "BaseType.meth2")
+  
+  func dynamic meth3(copy Int n, user String s)
+    # sys.print(user "BaseType.meth3")

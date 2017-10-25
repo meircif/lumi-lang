@@ -11,11 +11,18 @@ class SyntaxTreeExpression(SyntaxTreeCode)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
     self.parent := parent
-    parse-new-expression(user ""):(owner self.expression, copy end)
+    self.set-location()
+    parse-new-expression(user "", user self):(owner self.expression, copy end)
+    self.expression.is-statement := true
+  
+  func dynamic analyze()
+    self.expression.analyze()
+    if ? self.expression.result-type
+      self.m-syntax-error-msg(user "statememnt has no effect")
   
   func dynamic write()
+    self.expression.write-preactions()
     self.expression.write()
-    write(user ";")
 
 
 ## Return statement in the syntax tree
@@ -24,7 +31,11 @@ class SyntaxTreeReturn(SyntaxTreeCode)
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeReturn new-node)
     new SyntaxTreeReturn in new-node
+    new-node.set-location()
     new-node.parent := parent
+  
+  func dynamic m-is-end-point():(copy Bool is-end)
+    is-end := true
   
   func dynamic write()
     write(user "return OK;")
@@ -36,10 +47,14 @@ class SyntaxTreeRaise(SyntaxTreeCode)
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeRaise new-node)
     new SyntaxTreeRaise in new-node
+    new-node.set-location()
     new-node.parent := parent
   
+  func dynamic m-is-end-point():(copy Bool is-end)
+    is-end := true
+  
   func dynamic write()
-    write(user "return ERR;")
+    self.write-raise()
 
 
 ## While statement in the syntax tree
@@ -53,7 +68,13 @@ class SyntaxTreeWhile(SyntaxTreeCode)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
     self.parent := parent
-    parse-new-expression(user ""):(owner self.condition, copy end)
+    self.set-location()
+    if not parent.is-in-loop
+      self.m-syntax-error-msg(user "\"while\" used not inside loop")
+    parse-new-expression(user "", user self):(owner self.condition, copy end)
+  
+  func dynamic analyze()
+    self.analyze-expression(user self.condition, user glob.type-bool)
   
   func dynamic write()
     # if (!(`condition`) break;
@@ -68,7 +89,13 @@ class SyntaxTreeContinue(SyntaxTreeCode)
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeContinue new-node)
     new SyntaxTreeContinue in new-node
-    new-node.parent := parent
+    new-node.parse(user parent)
+  
+  func inst parse(user SyntaxTreeBlock parent)
+    self.set-location()
+    self.parent := parent
+    if not parent.is-in-loop
+      self.m-syntax-error-msg(user "\"continue\" used not inside loop")
   
   func dynamic write()
     write(user "continue;")

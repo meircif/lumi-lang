@@ -15,7 +15,6 @@ Global notes:
 ## compiler main function!
 main func(user Array{String} argv)
   glob.init()
-  var SyntaxTreeRoot root
-  root.parse(user argv)
-  root.analyze()
-  root.write()
+  glob.root.parse(user argv)
+  glob.root.analyze()
+  glob.root.write()

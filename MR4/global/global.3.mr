@@ -2,6 +2,9 @@
 
 static Global
   ## stores all language operators
+  owner SyntaxTreeRoot root
+  
+  ## stores all language operators
   owner NameMap{Operator} operator-map
   
   ## stores all types - language built-ins and user defined
@@ -29,65 +32,79 @@ static Global
   var Bool save-input
   
   ## built-in types
-  user TypeData type-char
-  user TypeData type-bool
-  user TypeData type-int
-  user TypeData type-func
-  user TypeData type-string
-  user TypeData type-array
-  user TypeData type-file
-  user TypeData type-sys
+  owner TypeData type-char
+  owner TypeData type-bool
+  owner TypeData type-int
+  owner TypeData type-empty
+  owner TypeData type-func
+  owner TypeData type-string
+  owner TypeData type-array
+  owner TypeData type-type
+  owner TypeData type-file
+  owner TypeData type-sys
   
   func inst init()
+    new SyntaxTreeRoot in self.root
     new String{1024} in self.input-buffer
     self.init-operator-map()
     self.init-builtin-types()
   
   func inst init-operator-map()
     new NameMap{Operator} in self.operator-map
-    self.add-operator(user ":=", user "=")
-    self.add-operator-copy(user "+")
-    self.add-operator-copy(user "-")
-    self.add-operator-copy(user "*")
-    self.add-operator-copy(user "/")
-    self.add-operator-copy(user "+=")
-    self.add-operator-copy(user "-=")
-    self.add-operator(user "=", user "==")
-    self.add-operator-copy(user "!=")
-    self.add-operator-copy(user ">")
-    self.add-operator-copy(user "<")
-    self.add-operator-copy(user ">=")
-    self.add-operator-copy(user "<=")
-    self.add-operator(user "not", user "!")
-    self.add-operator(user "or", user "||")
-    self.add-operator(user "and", user "&&")
+    self.add-operator-copy(user "+", copy 0, copy 0)
+    self.add-operator-copy(user "-", copy 0, copy 0)
+    self.add-operator-copy(user "*", copy 0, copy 1)
+    self.add-operator-copy(user "/", copy 0, copy 1)
+    self.add-operator(user "=", user "==", copy 1, copy 0)
+    self.add-operator-copy(user "!=", copy 1, copy 0)
+    self.add-operator-copy(user ">", copy 1, copy 0)
+    self.add-operator-copy(user "<", copy 1, copy 0)
+    self.add-operator-copy(user ">=", copy 1, copy 0)
+    self.add-operator-copy(user "<=", copy 1, copy 0)
+    self.add-operator(user "not", user "!", copy 2, copy 0)
+    self.add-operator(user "or", user "||", copy 3, copy 0)
+    self.add-operator(user "and", user "&&", copy 3, copy 1)
+    self.add-operator(user ":=", user "=", copy 4, copy 0)
+    self.add-operator-copy(user "+=", copy 4, copy 0)
+    self.add-operator-copy(user "-=", copy 4, copy 0)
   
-  func inst add-operator(user String name, user String c-name)
+  func inst add-operator(
+      user String name,
+      user String c-name,
+      copy Int order,
+      copy Int group-index)
     new Operator operator
-    operator.init(user name, user c-name)
-    self.operator-map.add(user operator.name, owner operator)
+    operator.init(user name, user c-name, copy order, copy group-index)
+    self.operator-map.add(user operator.name, user operator)
   
-  func inst add-operator-copy(user String name)
-    self.add-operator(user name, user name)
+  func inst add-operator-copy(
+      user String name,
+      copy Int order,
+      copy Int group-index)
+    self.add-operator(user name, user name, copy order, copy group-index)
   
   func inst init-builtin-types()
     new NameMap{TypeData} in self.type-map
-    self.add-type(user "Char"):(user self.type-char)
-    self.add-type(user "Bool"):(user self.type-bool)
-    self.add-type(user "Int"):(user self.type-int)
-    self.add-type(user "Func"):(user self.type-func)
-    self.add-type(user "String"):(user self.type-string)
-    self.add-type(user "Array"):(user self.type-array)
-    self.add-type(user "File"):(user self.type-file)
-    self.add-type(user "Sys"):(user self.type-sys)
+    self.add-builtin-type(user "Char", copy true):(owner self.type-char)
+    self.add-builtin-type(user "Bool", copy true):(owner self.type-bool)
+    self.add-builtin-type(user "Int", copy true):(owner self.type-int)
+    self.add-builtin-type(user "Empty", copy false):(owner self.type-empty)
+    self.add-builtin-type(user "Func", copy true):(owner self.type-func)
+    self.add-builtin-type(user "String", copy false):(owner self.type-string)
+    self.add-builtin-type(user "Array", copy false):(owner self.type-array)
+    self.add-builtin-type(user "Type", copy false):(owner self.type-type)
+    self.add-builtin-type(user "File", copy false):(owner self.type-file)
+    self.add-builtin-type(user "Sys", copy false):(owner self.type-sys)
   
-  func inst add-type(user String name):(user TypeData type-data)
-    self.add-user-type(owner string-new-copy(user name)):(user type-data)
-  
-  func inst add-user-type(owner String name):(user TypeData type-data)
+  func inst add-builtin-type(user String name, copy Bool is-primitive):(
+      owner TypeData type-data)
     new TypeData in type-data
-    type-data.init(owner name)
-    self.type-map.add(user type-data.name, owner type-data)
-
+    string-new-copy(user name):(owner type-data.name)
+    type-data.is-primitive := is-primitive
+    self.add-type(user type-data)
+  
+  func inst add-type(user TypeData type-data)
+    type-data.init()
+    self.type-map.add(user type-data.name, user type-data)
 
 var Global glob

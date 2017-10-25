@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file4_name = "global/list.3.mr";
+static char* _mr_file5_name = "global/list.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file4_name
+#define MR_FILE_NAME _mr_file5_name
 
 /* MR4 compiler - Generic mappings */
 
@@ -52,6 +52,47 @@ Returncode List_add(List* self, void* item) {
 }
 #undef MR_FUNC_NAME
 #endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode List_m_prepend(List* self, void* item);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_List_m_prepend = "List.m-prepend";
+#define MR_FUNC_NAME _func_name_List_m_prepend
+Returncode List_m_prepend(List* self, void* item) {
+  ListNode* node = malloc(sizeof(ListNode));
+  if (node == NULL) RAISE(21)
+  *node = (ListNode){NULL, NULL};
+  node->item = item;
+  node->next = self->first;
+  self->first = node;
+  if (!(NULL != self->last)) {
+    self->last = node;
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode List_m_pop(List* self, void** item);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_List_m_pop = "List.m-pop";
+#define MR_FUNC_NAME _func_name_List_m_pop
+Returncode List_m_pop(List* self, void** item) {
+  if (NULL != self->first) {
+    (*item) = ((void*)(self->first->item));
+    ListNode* first = self->first;
+    self->first = first->next;
+    free(first);
+    if (!(NULL != self->first)) {
+      self->last = NULL;
+    }
+  }
+  else {
+    (*item) = NULL;
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
 
 
 #if MR_STAGE == MR_TYPEDEFS
@@ -67,17 +108,19 @@ struct ListNode {
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

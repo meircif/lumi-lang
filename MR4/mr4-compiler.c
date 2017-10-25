@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file21_name = "mr4-compiler.3.mr";
+static char* _mr_file23_name = "mr4-compiler.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file21_name
+#define MR_FILE_NAME _mr_file23_name
 
 /*  MR4 compiler main - written in MR3
 
@@ -31,11 +31,9 @@ static char* _func_name_func = "func";
 #define MR_FUNC_NAME _func_name_func
 Returncode func(Array* argv) {
   CHECK(17, Global_init(glob) )
-  SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, 0, NULL, NULL, NULL, NULL, NULL};
-  root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
-  CHECK(19, SyntaxTreeRoot_parse(root, argv) )
-  CHECK(20, (root)->_base._base._base._dtl[0](root) )
-  CHECK(21, (root)->_base._base._base._dtl[1](root) )
+  CHECK(18, SyntaxTreeRoot_parse(glob->root, argv) )
+  CHECK(19, (glob->root)->_base._base._base._dtl[0](glob->root) )
+  CHECK(20, (glob->root)->_base._base._base._dtl[1](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -49,18 +47,20 @@ MAIN_FUNC
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

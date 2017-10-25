@@ -4,8 +4,9 @@ func write-syntax-tree()
   var Array{3:String{256}} mock-argv
   mock-argv[2].copy(user "mock.3.mr")
   var SyntaxTreeRoot root
-  root.parse(user mock-argv)
-  root.write()
+  glob.root.parse(user mock-argv)
+  glob.root.analyze()
+  glob.root.write()
 
 
 func test-global-scope(user String input-text, user String expected-output)
@@ -13,6 +14,8 @@ func test-global-scope(user String input-text, user String expected-output)
   set-mock-file-text(user input-text)
   mock-input-file-text.append(copy '\n')
   write-syntax-tree()
+  if mock-output-file-text[0] != '\n'
+    print(user mock-output-file-text)
   assert mock-output-file-text[0] = '\n'
   f-assert-string-slice(
       user expected-output,
@@ -25,54 +28,6 @@ func test-global-scope(user String input-text, user String expected-output)
 func test-global-scope-error(user String input-text, user String expected-error)
   f-setup-test()
   set-mock-file-text(user input-text)
-  mock-print-active := true
-  assert-error write-syntax-tree()
-  mock-print-active := false
-  user String expected-header("Code error in mock.3.mr[")
-  f-assert-string-slice(
-      user expected-header,
-      user mock-print-text,
-      copy 0,
-      copy expected-header.length)
-  f-assert-string-slice(
-      user expected-error,
-      user mock-print-text,
-      copy expected-header.length + 3,
-      copy mock-print-text.length - expected-header.length - 4)
-  assert mock-print-text[mock-print-text.length - 1] = '\n'
-
-
-func test-code(user String input-text, user String expected-output)
-  f-setup-test()
-  set-mock-file-text(user "func mock()\n  ")
-  mock-input-file-text.concat(user input-text)
-  mock-input-file-text.append(copy '\n')
-  write-syntax-tree()
-  user String expected-header("\nReturncode mock() {\n  ")
-  user String expected-footer("\n}\n")
-  f-assert-string-slice(
-      user expected-header,
-      user mock-output-file-text,
-      copy 0,
-      copy expected-header.length)
-  f-assert-string-slice(
-      user expected-output,
-      user mock-output-file-text,
-      copy expected-header.length,
-      copy mock-output-file-text.length - expected-header.length -
-      expected-footer.length)
-  f-assert-string-slice(
-      user expected-footer,
-      user mock-output-file-text,
-      copy mock-output-file-text.length - expected-footer.length,
-      copy expected-footer.length)
-
-
-func test-code-error(user String input-text, user String expected-error)
-  f-setup-test()
-  set-mock-file-text(user "func mock()\n  ")
-  mock-input-file-text.concat(user input-text)
-  mock-input-file-text.append(copy '\n')
   mock-print-active := true
   assert-error write-syntax-tree()
   mock-print-active := false
@@ -114,13 +69,16 @@ test test-global()
 test test-type()
   test-global-scope(
       user "struct Test\n  var Int x",
-      user "struct Test {\n  Int x;\n};")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
   test-global-scope(
-      user "class Test\n  var Int x",
-      user "struct Test {\n  Int x;\n};")
+      user "struct Test\n  var Int x",
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
   test-global-scope(
-      user "struct Test1\n  var Int x\nclass Test2\n  var Int x\n\n\nstruct Test3\n  var Int x",
-      user "struct Test1 {\n  Int x;\n};\n\nstruct Test2 {\n  Int x;\n};\n\nstruct Test3 {\n  Int x;\n};")
+      user "struct Test1\n  var Int x\nstruct Test2\n  var Int x\n\n\nstruct Test3\n  var Int x",
+      user "typedef struct Test1 Test1;\ntypedef struct Test2 Test2;\ntypedef struct Test3 Test3;\nstruct Test1 {\n  Int x;\n};\nstruct Test2 {\n  Int x;\n};\nstruct Test3 {\n  Int x;\n};")
+  test-global-scope(
+      user "struct Test2(Test1)\n  var Int y\nstruct Test1\n  var Int x",
+      user "typedef struct Test1 Test1;\ntypedef struct Test2 Test2;\nstruct Test1 {\n  Int x;\n};\nstruct Test2 {\n  Test1 _base;\n  Int y;\n};")
   test-global-scope-error(
       user "struct(\n", user "expected space after \"struct\", got \"(\"")
   test-global-scope-error(
@@ -134,28 +92,30 @@ test test-type()
 
 
 test test-function()
-  test-global-scope(user "func name()", user "Returncode name() {\n}")
+  test-global-scope(
+      user "func name()",
+      user "Returncode name(void);\nReturncode name(void) {\n  return OK;\n}")
   test-global-scope(
       user "func name(var String self, user String text, copy Int num)",
-      user "Returncode name(String* self, String* text, Int num) {\n}")
+      user "Returncode name(String* self, String* text, Int num);\nReturncode name(String* self, String* text, Int num) {\n  return OK;\n}")
   test-global-scope(
       user "func name()->(owner String text, copy Int num)",
-      user "Returncode name(String** text, Int* num) {\n}")
+      user "Returncode name(String** text, Int* num);\nReturncode name(String** text, Int* num) {\n  return OK;\n}")
   test-global-scope(
       user "func name(copy Char param)->(owner String out)",
-      user "Returncode name(Char param, String** out) {\n}")
+      user "Returncode name(Char param, String** out);\nReturncode name(Char param, String** out) {\n  return OK;\n}")
   test-global-scope(
       user "func name(user Array{Int} array)",
-      user "Returncode name(Array* array) {\n}")
+      user "Returncode name(Array* array);\nReturncode name(Array* array) {\n  return OK;\n}")
   test-global-scope(
-      user "func name(user Array{List{Array{Int}}} array)",
-      user "Returncode name(Array* array) {\n}")
+      user "func name(user Array{Array{Array{Int}}} array)",
+      user "Returncode name(Array* array);\nReturncode name(Array* array) {\n  return OK;\n}")
   test-global-scope(
       user "func name()\n  var Int x",
-      user "Returncode name() {\n  Int x;\n}")
+      user "Returncode name(void);\nReturncode name(void) {\n  Int x;\n  return OK;\n}")
   test-global-scope(
       user "main\n  var Int x",
-      user "USER_MAIN_HEADER {\n  Int x;\n}\nMAIN_FUNC")
+      user "USER_MAIN_HEADER {\n  Int x;\n  return OK;\n}\nMAIN_FUNC")
   test-global-scope-error(
       user "func(\n", user "expected space after \"func\", got \"(\"")
   test-global-scope-error(
@@ -190,14 +150,14 @@ test test-function()
 test test-members()
   test-global-scope(
       user "struct Test\n  var Int x\n  user String str",
-      user "struct Test {\n  Int x;\n  String* str;\n};")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n  String* str;\n};")
   test-global-scope(
       user "struct Test\n  var Int x\n  func name()",
-      user "struct Test {\n  Int x;\n};\n\nReturncode Test_name() {\n}\n")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_name(Test* self);\nReturncode Test_name(Test* self) {\n  return OK;\n}")
   test-global-scope(
       user "struct Test\n  var Int x\n  func name()\n    var Int x",
-      user "struct Test {\n  Int x;\n};\n\nReturncode Test_name() {\n  Int x;\n}\n")
-  user String expected("struct Test {\n  Int x;\n};")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_name(Test* self);\nReturncode Test_name(Test* self) {\n  Int x;\n  return OK;\n}")
+  user String expected("typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
   test-global-scope(user "struct Test\n  # comment\n  var Int x", user expected)
   test-global-scope(
       user "struct Test\n  ## documemtation\n  var Int x", user expected)
@@ -209,12 +169,18 @@ test test-members()
       user expected)
 
 
+test test-return()
+  test-global-scope(
+      user "func name()\n  return",
+      user "Returncode name(void);\nReturncode name(void) {\n  return OK;\n}")
+  test-global-scope(
+      user "func name()\n  raise",
+      user "Returncode name(void);\nReturncode name(void) {\n  RAISE(1)\n}")
+
+
 test test-simple-code()
-  test-code(user "return", user "return OK;")
-  test-code(user "raise", user "return ERR;")
-  test-code(user "x := 3", user "x = 3;")
   test-code(user "user String str", user "String* str;")
-  test-code(user "var Int x(y + 5)", user "Int x;\n  x = y + 5;")
+  # test-code(user "var Int x(i + 5)", user "Int x;\n  x = i + 5;")
   user String expected("Int x;")
   test-code(user "# comment\n\n  var Int x", user expected)
   test-code(user "## documemtation\n\n  var Int x", user expected)
@@ -225,29 +191,29 @@ test test-simple-code()
 
 
 test test-if-else()
-  test-code(user "if x > 3\n    x -= 2", user "if (x > 3) {\n    x -= 2;\n  }")
+  test-code(user "if i > 3\n    i -= 2", user "if (i > 3) {\n    i -= 2;\n  }")
   test-code(
-      user "if x > 3\n    x -= 2\n  else\n    x += 1",
-      user "if (x > 3) {\n    x -= 2;\n  }\n  else {\n    x += 1;\n  }")
+      user "if i > 3\n    i -= 2\n  else\n    i += 1",
+      user "if (i > 3) {\n    i -= 2;\n  }\n  else {\n    i += 1;\n  }")
   var String{1024} expected
-  expected.copy(user "if (x > 3) {\n")
-  expected.concat(user "    x -= 3;\n")
+  expected.copy(user "if (i > 3) {\n")
+  expected.concat(user "    i -= 3;\n")
   expected.concat(user "  }\n")
   expected.concat(user "  else {\n")
-  expected.concat(user "    if (x > 2) {\n")
-  expected.concat(user "      x -= 2;\n")
+  expected.concat(user "    if (i > 2) {\n")
+  expected.concat(user "      i -= 2;\n")
   expected.concat(user "    }\n")
   expected.concat(user "    else {\n")
-  expected.concat(user "      if (x > 1) {\n")
-  expected.concat(user "        x -= 1;\n")
+  expected.concat(user "      if (i > 1) {\n")
+  expected.concat(user "        i -= 1;\n")
   expected.concat(user "      }\n")
   expected.concat(user "      else {\n")
-  expected.concat(user "        x += 1;\n")
+  expected.concat(user "        i += 1;\n")
   expected.concat(user "      }\n")
   expected.concat(user "    }\n")
   expected.concat(user "  }")
   test-code(
-      user "if x > 3\n    x -= 3\n  else-if x > 2\n    x -= 2\n  else-if x > 1\n    x -= 1\n  else\n    x += 1",
+      user "if i > 3\n    i -= 3\n  else-if i > 2\n    i -= 2\n  else-if i > 1\n    i -= 1\n  else\n    i += 1",
       user expected)
 
 
@@ -255,19 +221,19 @@ test test-do-loop()
   test-code(user "do\n    var Int x", user "while (true) {\n    Int x;\n  }")
   test-code(user "\n  \n    \n\n  var Int x", user "Int x;")
   test-code(
-      user "do\n    while x > 3",
-      user "while (true) {\n    if (!(x > 3)) break;\n  }")
+      user "do\n    while i > 3",
+      user "while (true) {\n    if (!(i > 3)) break;\n  }")
   test-code(user "do\n    continue", user "while (true) {\n    continue;\n  }")
   test-code-error(user "do(", user "expected new-line after \"do\", got \"(\"")
 
 
 test test-for-loop()
   test-code(
-      user "for n in 5\n    x += n",
-      user "{int n; for(n=0; n<5; ++n) {\n    x += n;\n  }}")
+      user "for n in 5\n    i += n",
+      user "{int n; for(n=0; n<5; ++n) {\n    i += n;\n  }}")
   test-code(
-      user "for n in x:x + 2\n    x += n",
-      user "{int n; for(n=x; n<x + 2; ++n) {\n    x += n;\n  }}")
+      user "for n in i:i + 2\n    i += n",
+      user "{int n; for(n=i; n<i + 2; ++n) {\n    i += n;\n  }}")
   test-code-error(user "for(", user "expected space after \"for\", got \"(\"")
   test-code-error(
       user "for n", user "expected space after index name, got \"new-line\"")

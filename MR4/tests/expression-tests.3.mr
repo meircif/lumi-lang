@@ -1,32 +1,41 @@
 ## MR4 compiler tests - Expression
 
-func test-expression-ends(
-    user String input-text,
-    user String expected-output,
-    user String ends,
-    copy Char expected-end)
+func test-code(user String input-text, user String expected-output)
   f-setup-test()
-  set-mock-file-text(user input-text)
-  owner Expression expression
-  var Char end
-  parse-new-expression(user ends):(owner expression, copy end)
-  assert end = expected-end
-  expression.write()
-  f-assert-string(user expected-output, user mock-output-file-text)
+  set-mock-file-text(
+      user "func mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr)\n  ")
+  mock-input-file-text.concat(user input-text)
+  mock-input-file-text.append(copy '\n')
+  write-syntax-tree()
+  user String expected-header("\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr) {\n  ")
+  user String expected-footer("\n  return OK;\n}\n")
+  f-assert-string-slice(
+      user expected-header,
+      user mock-output-file-text,
+      copy 0,
+      copy expected-header.length)
+  f-assert-string-slice(
+      user expected-output,
+      user mock-output-file-text,
+      copy expected-header.length,
+      copy mock-output-file-text.length - expected-header.length -
+      expected-footer.length)
+  f-assert-string-slice(
+      user expected-footer,
+      user mock-output-file-text,
+      copy mock-output-file-text.length - expected-footer.length,
+      copy expected-footer.length)
 
-func test-expression(user String input-text, user String expected-output)
-  test-expression-ends(user input-text, user expected-output, user "", copy EOF)
 
-
-func test-expression-error-ends(
-    user String input-text, user String expected-error, user String ends)
+func test-code-error(user String input-text, user String expected-error)
   f-setup-test()
-  set-mock-file-text(user input-text)
-  owner Expression expression
+  set-mock-file-text(user "func mock()\n  ")
+  mock-input-file-text.concat(user input-text)
+  mock-input-file-text.append(copy '\n')
   mock-print-active := true
-  assert-error parse-new-expression(user ends):(owner expression)
+  assert-error write-syntax-tree()
   mock-print-active := false
-  user String expected-header("Code error in mock.3.mr[0] ")
+  user String expected-header("Code error in mock.3.mr[")
   f-assert-string-slice(
       user expected-header,
       user mock-print-text,
@@ -35,165 +44,148 @@ func test-expression-error-ends(
   f-assert-string-slice(
       user expected-error,
       user mock-print-text,
-      copy expected-header.length,
-      copy mock-print-text.length - expected-header.length - 1)
+      copy expected-header.length + 3,
+      copy mock-print-text.length - expected-header.length - 4)
   assert mock-print-text[mock-print-text.length - 1] = '\n'
 
 
-func test-expression-error(user String input-text, user String expected-error)
-  test-expression-error-ends(user input-text, user expected-error, user "")
-
-
 test test-int-expression()
-  test-expression(user "0", user "0")
-  test-expression(user "9630", user "9630")
-  test-expression(user "-9630", user "-9630")
-  test-expression(user "07520", user "07520")
-  test-expression(user "0b1011", user "0b1011")
-  test-expression(user "0xfda940", user "0xfda940")
-  test-expression(user "0xFDA940", user "0xFDA940")
-  test-expression-error(user "2a", user "illegal number \"2a\"")
-  test-expression-error(user "0a", user "illegal number \"0a\"")
-  test-expression-error(user "038", user "illegal octal number \"038\"")
-  test-expression-error(user "0b021", user "illegal binary number \"0b021\"")
-  test-expression-error(
-      user "0xadg", user "illegal hexadecimal number \"0xadg\"")
+  test-code(user "i := 0", user "i = 0;")
+  test-code(user "i := 9630", user "i = 9630;")
+  test-code(user "i := -9630", user "i = -9630;")
+  test-code(user "i := 07520", user "i = 07520;")
+  test-code(user "i := 0b1011", user "i = 0b1011;")
+  test-code(user "i := 0xfda940", user "i = 0xfda940;")
+  test-code(user "i := 0xFDA940", user "i = 0xFDA940;")
+  test-code-error(user "2a", user "illegal number \"2a\"")
+  test-code-error(user "0a", user "illegal number \"0a\"")
+  test-code-error(user "038", user "illegal octal number \"038\"")
+  test-code-error(user "0b021", user "illegal binary number \"0b021\"")
+  test-code-error(user "0xadg", user "illegal hexadecimal number \"0xadg\"")
 
 
 test test-char-expression()
-  test-expression(user "'a'", user "'a'")
-  test-expression(user "'\\''", user "'\\''")
-  test-expression(user "'\\n'", user "'\\n'")
-  test-expression(user "'\\x0f'", user "'\\x0f'")
-  test-expression(user "'\\xA9'", user "'\\xA9'")
-  test-expression(user "'\\270'", user "'\\270'")
-  test-expression-error(user "'''", user "illegal character constant \"'''\"")
-  test-expression-error(
+  test-code(user "c := 'a'", user "c = 'a';")
+  test-code(user "c := '\\''", user "c = '\\'';")
+  test-code(user "c := '\\n'", user "c = '\\n';")
+  test-code(user "c := '\\x0f'", user "c = '\\x0f';")
+  test-code(user "c := '\\xA9'", user "c = '\\xA9';")
+  test-code(user "c := '\\270'", user "c = '\\270';")
+  test-code-error(user "'''", user "illegal character constant \"'''\"")
+  test-code-error(
       user "'\\'", user "illegal character constant \"'\\'\"")
-  test-expression-error(user "'aa'", user "illegal character constant \"'aa'\"")
-  test-expression-error(
+  test-code-error(user "'aa'", user "illegal character constant \"'aa'\"")
+  test-code-error(
       user "'\\c'", user "illegal character constant \"'\\c'\"")
-  test-expression-error(
+  test-code-error(
       user "'aaaa'", user "illegal character constant \"'aaaa'\"")
-  test-expression-error(
+  test-code-error(
       user "'\\x6fg'", user "illegal character constant \"'\\x6fg'\"")
-  test-expression-error(
+  test-code-error(
       user "'\\058'", user "illegal character constant \"'\\058'\"")
-  test-expression-error(user "''", user "illegal character constant \"''\"")
-  test-expression-error(
+  test-code-error(user "''", user "illegal character constant \"''\"")
+  test-code-error(
       user "'aaa'", user "illegal character constant \"'aaa'\"")
-  test-expression-error(
+  test-code-error(
       user "'aaaaa'", user "illegal character constant \"'aaaaa'\"")
-  test-expression-error(
+  test-code-error(
       user "'aa", user "illegal character constant \"'aa\"")
 
 
 test test-string-expression()
-  test-expression(user "\"some string\"", user "\"some string\"")
-  test-expression-error(user "\"aaa", user "illegal string constant \"\"aaa\"")
+  test-code(
+      user "str := \"some string\"",
+      user "String aux_String_0_Var;\n  String* aux_String_0 = &aux_String_0_Var;\n  aux_String_0->max_length = 12;\n  aux_String_0->length = 11;\n  aux_String_0->values = \"some string\";\n  str = aux_String_0;")
+  test-code-error(user "\"aaa", user "illegal string constant \"\"aaa\"")
 
 
 test test-empty-expression()
-  test-expression(user "_", user "NULL")
+  test-code(user "str := _", user "str = NULL;")
 
 
-test test-variable-expression()
-  test-expression(user "var-name", user "var_name")
+# test test-base-expression()
+  # test-code(user "base", user "Base")
 
 
-test test-base-expression()
-  test-expression(user "base", user "Base")
+# test test-type-expression()
+  # test-code(user "TypeName", user "TypeName")
 
 
-test test-type-expression()
-  test-expression(user "TypeName", user "TypeName")
-
-
-test test-member-expression()
-  var String{256} expected("var_name.member_name")
-  test-expression(user "var-name.member-name", user expected)
-  expected.concat(user ".another.member")
-  test-expression(user "var_name.member_name.another.member", user expected)
+# test test-member-expression()
+  # test-code(user "str.length", user "str->length;")
+  # test-code(user "str.length.str", user "str->length->str;")
 
 
 test test-slice-expression()
-  test-expression(user "array[13]", user "array[13]")
-  test-expression(user "array[2:6]", user "array[2:6]")
+  test-code(
+      user "i := arr[13]",
+      user "if ((13) < 0 || (13) >= (arr)->length) RAISE(1)\n  i = (((Int*)((arr)->values))[13]);")
+  test-code(
+      user "arr := arr[2:6]",
+      user "Array aux_Array_0_Var;\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0.length = 6;\n  aux_Array_0.values = (arr)->values + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)\n  arr = aux_Array_0;")
 
 
-test test-call-expression()
-  test-expression(user "function()", user "function()")
-  test-expression(
-      user "function(copy 3, user arg, var _)",
-      user "function(3, arg, NULL)")
-  test-expression(
-      user "function()->(owner arg, copy num)",
-      user "function(&(arg), &(num))")
-  test-expression(
-      user "function(copy 0)->(owner arg)",
-      user "function(0, &(arg))")
-  test-expression(
-      user "function(copy calc(copy 3))",
-      user "function(calc(3))")
-  test-expression(
-      user "function(\n    copy 2,\n    copy 3)->(\n    copy x,\n    copy y)",
-      user "function(2, 3, &(x), &(y))")
-  test-expression-error(
-      user "function( copy 1)", user "expected access, got \" \"")
-  test-expression-error(
-      user "function(user)", user "expected space after access, got \")\"")
-  test-expression-error(
-      user "function(copy 4,copy 3)",
-      user "expected space or new-line after \",\", got \"c\"")
-  test-expression-error(
-      user "function(copy 2", user "expected \",\" or \")\", got \"EOF\"")
-  test-expression-error(
-      user "function(error 4)", user "illegal access \"error\"")
+# test test-call-expression()
+  # test-code(user "function()", user "function()")
+  # test-code(
+      # user "function(copy 3, user arg, var _)",
+      # user "function(3, arg, NULL)")
+  # test-code(
+      # user "function()->(owner arg, copy num)",
+      # user "function(&(arg), &(num))")
+  # test-code(
+      # user "function(copy 0)->(owner arg)",
+      # user "function(0, &(arg))")
+  # test-code(
+      # user "function(copy calc(copy 3))",
+      # user "function(calc(3))")
+  # test-code(
+      # user "function(\n    copy 2,\n    copy 3)->(\n    copy x,\n    copy y)",
+      # user "function(2, 3, &(x), &(y))")
+  # test-code-error(
+      # user "function( copy 1)", user "expected access, got \" \"")
+  # test-code-error(
+      # user "function(user)", user "expected space after access, got \")\"")
+  # test-code-error(
+      # user "function(copy 4,copy 3)",
+      # user "expected space or new-line after \",\", got \"c\"")
+  # test-code-error(
+      # user "function(copy 2", user "expected \",\" or \")\", got \"EOF\"")
+  # test-code-error(
+      # user "function(error 4)", user "illegal access \"error\"")
 
 
 test test-block-expression()
-  test-expression(user "(123)", user "(123)")
+  test-code(user "i := (123)", user "i = (123);")
 
 
 test test-unary-expression()
-  test-expression(user "- variable-name", user "- variable_name")
-  test-expression(user "-\n    variable-name", user "- variable_name")
-  test-expression-error(
-      user "- - variable-name", user "unexpected operator \"-\"")
-  test-expression-error(user "[45]", user "unexpected \"[\"")
+  test-code(user "i := - i", user "i = - i;")
+  test-code(user "i := -\n    i", user "i = - i;")
+  test-code(user "i := - - i", user "i = - (- i);")
+  test-code-error(user "[45]", user "unexpected \"[\"")
 
 
 test test-binary-expression()
-  test-expression(user "23 + 54", user "23 + 54")
-  test-expression(user "100 * 2 - 37", user "100 * 2 - 37")
-  test-expression(user "12 *\n    13", user "12 * 13")
-  test-expression(user "3 < 5 and 23 < 37", user "3 < 5 && 23 < 37")
-  test-expression-error(user "345 @ 2", user "unknown operator \"@\"")
-  test-expression-error(user "80 +(", user "unexpected \"(\"")
-  test-expression-error-ends(
-      user "- variable-name", user "unexpected operator \"-\"", user " ")
+  test-code(user "i := 23 + 54", user "i = 23 + 54;")
+  test-code(user "i := 100 * 2 - 37", user "i = (100 * 2) - 37;")
+  test-code(user "i := 12 *\n    13", user "i = 12 * 13;")
+  test-code(user "b := 3 < 5 and 23 < 37", user "b = (3 < 5) && (23 < 37);")
+  test-code-error(user "345 @ 2", user "unknown operator \"@\"")
+  test-code-error(user "80 +(", user "unexpected \"(\"")
 
 
 test test-question-expression()
-  test-expression(user "variable-name?", user "variable_name != NULL")
+  test-code(user "b := str?", user "b = str != NULL;")
 
 
-test test-single-operand-expression()
-  test-expression-ends(
-      user "23 after expression", user "23", user " ", copy ' ')
+# test test-complex-operand()
+  # test-code(
+      # user "base.func().array[3].seq[4][70]()()[23]",
+      # user "Base.func().array[3].seq[4][70]()()[23]")
 
 
-test test-complex-operand()
-  test-expression(
-      user "base.func().array[3].seq[4][70]()()[23]",
-      user "Base.func().array[3].seq[4][70]()()[23]")
-
-
-test test-complex-expression()
-  test-expression(
-      user "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)",
-      user "4 + (array[5] - 23) > 2 + func(2 + Base.meth(), &(item)).val || (var.arr[1] != NULL && num < 5)")
-
-
-test test-no-expression()
-  test-expression-error(user "", user "unexpected \"EOF\"")
+# test test-complex-expression()
+  # test-code(
+      # user "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)",
+      # user "((4 + (array[5] - 23)) > (2 + func(2 + Base.meth(), &(item)).val)) || ((var.arr[1] != NULL) && (num < 5))")

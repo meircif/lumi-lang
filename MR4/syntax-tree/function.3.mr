@@ -3,35 +3,76 @@
 ## Function node in the syntax tree
 class SyntaxTreeFunction(SyntaxTreeBlock)
   owner List{TypeCount} aux-variables-owner
-  user SyntaxTreeType parent-type
+  user TypeData parent-type
   owner String name
-  owner FunctionArguments arguemnts
+  owner FunctionArguments arguments
+  var Bool is-dynamic
   
-  func inst parse-new(user SyntaxTreeType parent-type):(
+  func inst parse-new(user TypeData parent-type):(
       copy Char end, owner SyntaxTreeFunction new-node)
     new SyntaxTreeFunction in new-node
     new-node.parse(user parent-type):(copy end)
   
-  func inst parse(user SyntaxTreeType parent-type):(copy Char end)
-    new List{TypeCount} in self.aux-variables-owner
-    self.aux-variables := self.aux-variables-owner
+  func inst parse(user TypeData parent-type):(copy Char end)
+    self.init()
     self.parent-type := parent-type
     if ? self.parent-type
       self.indentation-spaces := 4
-    else
-      self.indentation-spaces := 2
+      if self.parent-type.is-dynamic
+        user String meth-type
+        read-until(user " ", copy false):(user meth-type, copy end)
+        if meth-type.equal(user "dynamic")
+          self.is-dynamic := true
+        else-if not meth-type.equal(user "inst")
+          self.m-syntax-error(
+              user "expected \"dynamic\" or \"inst\" method type, got",
+              user meth-type)
     self.parse-header():(copy end)
-    self.parse-block():(copy end)
+    self.parse-body():(copy end)
     self.indentation-spaces := 2
+  
+  func inst init()
+    self.set-location()
+    new List{TypeCount} in self.aux-variables-owner
+    self.aux-variables := self.aux-variables-owner
+    self.indentation-spaces := 2
+  
+  func inst parse-body():(copy Char end)
+    self.parse-block():(copy end)
+    if not self.m-has-end-point()
+      self.code-nodes.add(
+          owner SyntaxTreeReturn.parse-new(var _, user self):(copy end))
   
   func inst parse-header():(copy Char end)
     read-new(user "("):(owner self.name, copy end)
     if end != '('
-      f-syntax-error-c(user "expected \"(\" after function name, got", copy end)
-    new FunctionArguments in self.arguemnts
-    var ArgumentFactory argument-factory
-    self.arguemnts.parse(user argument-factory):(copy end)
+      self.m-syntax-error-c(
+          user "expected \"(\" after function name, got", copy end)
+    new FunctionArguments in self.arguments
+    var DeclarationArgumentFactory argument-factory
+    self.arguments.parse(
+        user argument-factory, user _, user self.parent-type):(copy end)
   
+  func dynamic m-get-parent-type():(user TypeData parent-type)
+    parent-type := self.parent-type
+  
+  func dynamic m-find-variable(user String name):(
+      user SyntaxTreeVariable variable)
+    base.m-find-variable(user name):(user variable)
+    if not (? variable)
+      self.arguments.m-find-variable(user name):(user variable)
+    if not (? variable)
+      glob.root.m-find-variable(user name):(user variable)
+  
+  func dynamic analyze()
+    self.arguments.analyze()
+    base.analyze()
+  
+  func inst m-compare(user SyntaxTreeFunction other)
+    if self.is-dynamic != other.is-dynamic
+      self.m-syntax-error(user "illegal dynamic in function", user self.name)
+  
+  ## write function body
   func dynamic write()
     # Returncode `Type`_`name`(`args`) {
     #   `block...`
@@ -42,10 +83,22 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst write-header()
     write(user "Returncode ")
     if ? self.parent-type
-      write-cname(user self.parent-type.type-data.name)
+      write-cname(user self.parent-type.name)
       write(user "_")
     write-cname(user self.name)
-    self.arguemnts.write()
+    self.arguments.write(copy true)
+  
+  func inst write-pointer()
+    write(user "Returncode (*")
+    write-cname(user self.name)
+    write(user ")")
+    self.arguments.write(copy true)
+  
+  func inst write-declaration()
+    # Returncode `Type`_`name`(`args`);
+    write(user "\n")
+    self.write-header()
+    write(user ";\n")
 
 
 ## Main function node in the syntax tree
@@ -55,18 +108,20 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     new-node.parse():(copy end)
   
   func inst parse():(copy Char end)
-    self.indentation-spaces := 2
-    self.name := string-new-copy(user "main")
-    self.parse-block():(copy end)
+    self.init()
+    string-new-copy(user "main"):(owner self.name)
+    new FunctionArguments in self.arguments
+    self.arguments.init()
+    self.parse-body():(copy end)
   
   func dynamic write()
     # USER_MAIN_HEADER {
     #   `block...`
     # }
     # MAIN_FUNC
-    write(user "USER_MAIN_HEADER")
+    write(user "\nUSER_MAIN_HEADER")
     self.write-block()
-    write(user "\nMAIN_FUNC")
+    write(user "\nMAIN_FUNC\n")
 
 
 ## Native function declaration in the syntax tree
@@ -76,117 +131,57 @@ class SyntaxTreeNativeFunction(SyntaxTreeFunction)
     new-node.parse():(copy end)
   
   func inst parse():(copy Char end)
+    self.set-location()
     self.indentation-spaces := 2
     self.parse-header():(copy end)
     new List{SyntaxTreeCode} in self.code-nodes
   
   func dynamic write()
-    # Returncode `name`(`args`);
-    self.write-header()
-    write(user ";")
-
-
-## Basic function argument
-class Argument
-  var Int access
-  
-  func inst parse(user String access-str):(copy Char end)
-    get-access(user access-str):(copy self.access)
-    self.parse-value():(copy end)
-  
-  func dynamic parse-value():(copy Char end)
-    raise
-  
-  func dynamic write(copy Bool is-output)
-    raise
+    # do nothing
 
 
 ## Function declaration argument
 class DeclarationArgument(Argument)
-  owner TypeInstance type-instance
-  owner String name
+  owner SyntaxTreeVariable variable
   
-  func dynamic parse-value():(copy Char end)
-    new TypeInstance in self.type-instance
-    self.type-instance.parse(user " "):(copy end)
+  func dynamic m-copy-new():(owner DeclarationArgument new-argument)
+    new DeclarationArgument in new-argument
+    new-argument.access := self.access
+    new SyntaxTreeVariable in new-argument.variable
+    new-argument.variable.access := self.variable.access
+    self.variable.type-instance.m-copy-new():(
+        owner new-argument.variable.type-instance)
+    string-new-copy(user self.variable.name):(owner new-argument.variable.name)
+  
+  func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
+    new SyntaxTreeVariable in self.variable
+    self.variable.access := self.access
+    new TypeInstance in self.variable.type-instance
+    self.variable.type-instance.parse(user " ", user self):(copy end)
     if end != ' '
-      f-syntax-error-c(user "expected space after type, got", copy end)
-    read-new(user ",)"):(owner self.name, copy end)
+      self.m-syntax-error-c(user "expected space after type, got", copy end)
+    read-new(user ",)"):(owner self.variable.name, copy end)
   
-  func dynamic write(copy Bool is-output)
+  func dynamic analyze()
+    self.variable.type-instance.analyze(user self)
+  
+  func dynamic get-type-instance():(user TypeInstance type-instance)
+    type-instance := self.variable.type-instance
+  
+  func dynamic get-variable():(user SyntaxTreeVariable variable)
+    variable := self.variable
+  
+  func dynamic write()
     # `type`** `name`
-    write-cname(user self.type-instance.type-data.name)
+    write-cname(user self.variable.type-instance.type-data.name)
     if self.access != ACCESS-COPY
       write(user "*")
-    if is-output
+    if self.is-output
       write(user "*")
     write(user " ")
-    write-cname(user self.name)
+    write-cname(user self.variable.name)
 
 
-class ArgumentFactory
+class DeclarationArgumentFactory(ArgumentFactory)
   func dynamic m-new-argument():(owner Argument new-argument)
     new DeclarationArgument in new-argument
-
-
-## All function parameters and outputs
-static FunctionArguments
-  owner List{Argument} parameters
-  owner List{Argument} outputs
-  
-  func inst parse(user ArgumentFactory argument-factory):(copy Char end)
-    new List{Argument} in self.parameters
-    new List{Argument} in self.outputs
-    self.parse-args(user self.parameters, user argument-factory):(copy end)
-    if end = '-'
-      read-expect(user ">(")
-      self.parse-args(user self.outputs, user argument-factory):(copy end)
-  
-  func inst parse-args(
-      user List{Argument} arguments, user ArgumentFactory argument-factory):(
-      copy Char end)
-    owner Argument argument
-    user String access-str
-    read-until(user " )", copy false):(user access-str, copy end)
-    if end = '\n' and access-str.length = 0
-      read-line-break-spaces()
-      read-until(user " ", copy false):(user access-str, copy end)
-    if end != ')' or access-str.length > 0
-      do
-        if access-str.length = 0
-          f-syntax-error-c(user "expected access, got", copy end)
-        if end != ' '
-          f-syntax-error-c(user "expected space after access, got", copy end)
-        argument-factory.m-new-argument():(owner argument)
-        arguments.add(owner argument)
-        argument.parse(user access-str):(copy end)
-        while end = ','
-        read-c():(copy end)
-        if end = '\n'
-          read-line-break-spaces()
-        else-if end != ' '
-          f-syntax-error-c(
-              user "expected space or new-line after \",\", got",
-              copy end)
-        read-until(user " ", copy false):(user access-str, copy end)
-    read-c():(copy end)
-  
-  func inst write()
-    # (`params...`, `outputs...`)
-    write(user "(")
-    if ? self.parameters.first
-      self.write-args(user self.parameters)
-    if ? self.outputs.first
-      if ? self.parameters.first
-        write(user ", ")
-      self.write-args(user self.outputs)
-    write(user ")")
-  
-  func inst write-args(user List{Argument} arguments)
-    user ListNode{Argument} node(arguments.first)
-    var Bool is-output(arguments = self.outputs)
-    do
-      node.item.write(copy is-output)
-      node := node.next
-      while ? node
-      write(user ", ")

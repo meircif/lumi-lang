@@ -3,245 +3,133 @@
 
 #)
 
+## Access values
+var Int ACCESS-COPY(0)
+var Int ACCESS-USER(1)
+var Int ACCESS-OWNER(2)
+var Int ACCESS-VAR(3)
+
+
 ## Basic node type for all syntax tree nodes
 class SyntaxTreeNode
+  user String input-file-name
+  var Int line-number
+  
+  func inst set-location()
+    self.input-file-name := glob.input-file-name
+    self.line-number := glob.line-number
+  
+  func inst get-access(user String access-str):(copy Int access)
+    if access-str.equal(user "copy")
+      access := ACCESS-COPY
+    else-if access-str.equal(user "user")
+      access := ACCESS-USER
+    else-if access-str.equal(user "owner")
+      access := ACCESS-OWNER
+    else-if access-str.equal(user "var")
+      access := ACCESS-VAR
+    else
+      self.m-syntax-error(user "illegal access", user access-str)
+  
+  func inst m-find-type(user String name):(user TypeData type-data)
+    if not (? glob.type-map.find(user name):(user type-data))
+      self.m-syntax-error(user "unknown type", user name)
+  
+  ## Expect `expected-text` to be read exaclty from the input file
+  func inst read-expect(user String expected-text)
+    new String{expected-text.length + 1} actual-text
+    for n in expected-text.length
+      actual-text.append(copy read-c())
+    if not actual-text.equal(user expected-text)
+      self.m-syntax-error2(
+          user "expected", user expected-text, user "got", user actual-text)
+    delete actual-text
+  
+  ## Read and check indentation spaces for a line break from the input file
+  func inst read-line-break-spaces(u)
+    for n in glob.spaces + 4
+      if read-c() != ' '
+        var String{128} expected-spaces
+        var String{128} actual-spaces
+        Int.str(var glob.spaces + 4, user expected-spaces)
+        Int.str(var n - 1, user actual-spaces)
+        self.m-syntax-error2(
+            user "too short indentation, expected",
+            user expected-spaces,
+            user "got",
+            user actual-spaces)
+  
+  func inst write-line-num()
+    write-int(copy self.line-number)
+  
+  func inst write-raise()
+    write(user "RAISE(")
+    self.write-line-num()
+    write(user ")")
+  
+  ## Raise a syntax error with message:
+  ## `Code error in {file-name}[{line-number}] {text} "{item}"`
+  func inst m-syntax-error(user String text, user String item)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text, user item)
+    print(user "\n")
+    raise
+  
+  ## Same as `m-syntax-error` but but with another `{text} "{item}" pair
+  func inst m-syntax-error2(
+      user String text1, user String item1, user String text2, user String item2)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text1, user item1)
+    print(user " ")
+    print-msg-with-item(user text2, user item2)
+    print(user "\n")
+    raise
+  
+  ## Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair
+  func inst m-syntax-error3(
+      user String text1,
+      user String item1,
+      user String text2,
+      user String item2,
+      user String text3,
+      user String item3)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text1, user item1)
+    print(user " ")
+    print-msg-with-item(user text2, user item2)
+    print(user " ")
+    print-msg-with-item(user text3, user item3)
+    print(user "\n")
+    raise
+  
+  ## Same as `m-syntax-error` but with a character item
+  func inst m-syntax-error-c(user String text, copy Char item)
+    var String{16} char-str
+    if item = EOF
+      char-str.copy(user "EOF")
+    else-if item = '\n'
+      char-str.copy(user "new-line")
+    else
+      char-str.append(copy item)
+    self.m-syntax-error(user text, user char-str)
+  
+  func inst m-syntax-error-msg(user String text)
+    self.print-syntax-error-header()
+    print(user text)
+    print(user "\n")
+    raise
+  
+  func inst print-syntax-error-header()
+    print(user "Code error in ")
+    print(user self.input-file-name)
+    print(user "[")
+    var String{32} line-num-str
+    self.line-number.str(user line-num-str)
+    print(user line-num-str)
+    print(user "] ")
+  
   func dynamic analyze()
     # do nothing as default
   
   func dynamic write()
     raise
-
-
-## A basic branch node in the syntax tree - a node with chldren nodes
-class SyntaxTreeBranch(SyntaxTreeNode)
-  var Int indentation-spaces
-  owner List{SyntaxTreeVariable} variables
-  owner List{SyntaxTreeCode} code-nodes
-  
-  func inst init()
-    new List{SyntaxTreeVariable} in self.variables
-    new List{SyntaxTreeCode} in self.code-nodes
-  
-  func inst parse-block-children(user SyntaxTreeType parent-type):(
-      copy Char end)
-    if end != '\n'
-      f-syntax-error-c(user "expected block in a new line, got", copy end)
-    self.init()
-    self.parse-children(user parent-type):(copy end)
-    if end != EOF
-      glob.save-input := true
-  
-  func inst parse-children(user SyntaxTreeType parent-type):(copy Char end)
-    do
-      user String keyword
-      var Int spaces
-      read-until(user " .([?", copy true):(user keyword, copy end, copy spaces)
-      # ignore empty lines
-      if keyword.length > 0 or end != '\n'
-        
-        if spaces > self.indentation-spaces
-          var String{32} expecte-num
-          self.indentation-spaces.str(user expecte-num)
-          var String{32} actual-num
-          spaces.str(user actual-num)
-          f-syntax-error2(
-              user "indentation too big, expected",
-              user expecte-num,
-              user "got",
-              user actual-num)
-        
-        while spaces = self.indentation-spaces and end != EOF
-        
-        if not self.parse-if-common(user keyword, user parent-type):(copy end)
-          self.parse-child(user keyword):(copy end)
-        
-        while end != EOF
-        if not glob.save-input and end != '\n'
-          # TODO: is possible?
-          f-syntax-error-c(user "expected new-line in line end, got", copy end)
-  
-  func inst parse-if-common(
-      user String keyword, user SyntaxTreeType parent-type):(
-      copy Char end, copy Bool is-parsed)
-    is-parsed := end = ' '
-    if not is-parsed
-      return
-    
-    if keyword.equal(user "#") or keyword.equal(user "##")
-      user String text
-      read-until(user "", copy false):(user text, copy end)
-    else-if keyword.equal(user "{#") or keyword.equal(user "{##")
-      var Char prev('\0')
-      do
-        var Char curr
-        read-c():(copy curr)
-        while curr != EOF and (curr != '}' or prev != '#')
-        prev := curr
-      read-c():(copy end)
-      
-    else-if keyword.equal(user "var")
-      self.add-variable(user parent-type, copy ACCESS-VAR):(copy end)
-    else-if keyword.equal(user "user")
-      self.add-variable(user parent-type, copy ACCESS-USER):(copy end)
-    else-if keyword.equal(user "owner")
-      self.add-variable(user parent-type, copy ACCESS-OWNER):(copy end)
-      
-    else
-      is-parsed := false
-  
-  func inst add-variable(user SyntaxTreeType parent-type, copy Int access):(
-      copy Char end)
-    owner SyntaxTreeVariableInit var-init
-    self.variables.add(owner SyntaxTreeVariable.parse-new(
-        var _, copy access, user parent-type):(copy end, owner var-init))
-    if ? var-init
-      self.code-nodes.add(owner var-init)
-    
-  
-  func dynamic parse-child(user String keyword):(copy Char end)
-    raise
-  
-  func dynamic write()
-    self.write-children(user self.variables)
-  
-  func inst write-children(user List{SyntaxTreeNode} child-list)
-    user ListNode{SyntaxTreeNode} child(child-list.first)
-    do
-      while ? child
-      if self.indentation-spaces > 0
-        write-spaces(copy self.indentation-spaces)
-      else
-        write(user "\n")
-      child.item.write()
-      write(user "\n")
-      child := child.next
-
-
-## A basic namespace node in the syntax tree
-class SyntaxTreeNamespace(SyntaxTreeBranch)
-  owner List{SyntaxTreeFunction} functions
-  
-  func inst init()
-    base.init()
-    new List{SyntaxTreeFunction} in self.functions
-  
-  func inst parse-if-function(
-      user String keyword, user SyntaxTreeType parent-type):(
-      copy Char end, copy Bool is-func)
-    keyword.equal(user "func"):(copy is-func)
-    if is-func
-      if end != ' '
-        f-syntax-error-c(user "expected space after \"func\", got", copy end)
-      self.functions.add(owner SyntaxTreeFunction.parse-new(
-          var _, user parent-type):(copy end))
-  
-  func dynamic write()
-    base.write()
-    self.write-children(user self.functions)
-
-
-## A basic code node in the syntax tree
-class SyntaxTreeCode(SyntaxTreeNode)
-  user SyntaxTreeBlock parent
-
-
-## Count occurrences of a specific type
-static TypeCount
-  user TypeData type-data
-  var Int count
-
-
-## A basic code block node in the syntax tree
-class SyntaxTreeBlock(SyntaxTreeBranch)
-  user List{TypeCount} aux-variables
-  user SyntaxTreeIf previous-if
-  
-  func inst parse-block():(copy Char end)
-    self.parse-block-children(user _):(copy end)
-  
-  func dynamic parse-child(user String keyword):(copy Char end)
-    owner SyntaxTreeCode node
-    user SyntaxTreeIf new-if
-    
-    if keyword.equal(user "if")
-      if end != ' '
-        f-syntax-error-c(user "expected space after \"if\", got", copy end)
-      SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
-      self.code-nodes.add(owner new-if)
-      
-    else-if keyword.equal(user "else")
-      if not (? self.previous-if)
-        f-syntax-error-msg(user "\"else\" without a previous \"if\"")
-      if end != '\n'
-        f-syntax-error-c(user "expected new-line after \"else\", got", copy end)
-      self.previous-if.add-else(
-          owner SyntaxTreeElse.parse-new(var _, user self):(copy end))
-      
-    else-if keyword.equal(user "else-if")
-      if not (? self.previous-if)
-        f-syntax-error-msg(user "\"else-if\" without a previous \"if\"")
-      if end != ' '
-        f-syntax-error-c(user "expected space after \"else-if\", got", copy end)
-      SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
-      self.previous-if.add-else-if(owner new-if)
-      
-    else-if keyword.equal(user "do")
-      if end != '\n'
-        f-syntax-error-c(user "expected new-line after \"do\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeDoLoop.parse-new(var _, user self):(copy end))
-      
-    else-if keyword.equal(user "for")
-      if end != ' '
-        f-syntax-error-c(user "expected space after \"for\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeForLoop.parse-new(var _, user self):(copy end))
-      
-    else-if keyword.equal(user "while")
-      if end != ' '
-        f-syntax-error-c(user "expected space after \"while\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeWhile.parse-new(var _, user self):(copy end))
-      
-    else-if keyword.equal(user "continue")
-      if end != '\n'
-        f-syntax-error-c(
-            user "expected new-line after \"continue\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeContinue.parse-new(var _, user self):(copy end))
-      
-    else-if keyword.equal(user "return")
-      if end != '\n'
-        f-syntax-error-c(
-            user "expected new-line after \"return\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeReturn.parse-new(var _, user self):(copy end))
-      
-    else-if keyword.equal(user "raise")
-      if end != '\n'
-        f-syntax-error-c(
-            user "expected new-line after \"raise\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeRaise.parse-new(var _, user self):(copy end))
-      
-    else-if keyword.equal(user "new")
-      if end != ' '
-        f-syntax-error-c(user "expected space after \"new\", got", copy end)
-      self.add-variable(user _, copy ACCESS-OWNER):(copy end)
-      
-    else
-      glob.save-input := true
-      self.code-nodes.add(
-          owner SyntaxTreeExpression.parse-new(var _, user self):(copy end))
-    
-    self.previous-if := new-if
-  
-  func inst write-block()
-    # `previous-text` {
-    #   `block...`
-    # }
-    write(user " {\n")
-    base.write()
-    self.write-children(user self.code-nodes)
-    write-spaces(copy self.indentation-spaces - 2)
-    write(user "}")

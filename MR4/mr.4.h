@@ -40,6 +40,22 @@ typedef struct {
   Array* argv;
 } Sys;
 
+#define MANAGER_TYPEDEF(type) \
+typedef struct { int ref_count; type* ref; } type##_Manager;
+
+#define STATIC_REF_TYPEDEF(type) \
+MANAGER_TYPEDEF(type) \
+typedef struct { type##_Manager* manager; } type##_ManagerRef; \
+typedef struct { type##_Manager* manager; type* ref; } type##_WeakRef;
+
+#define DYNAMIC_REF_TYPEDEF(type) \
+MANAGER_TYPEDEF(type) \
+typedef struct { type##_Manager* manager; type##_Dtl* dtl; } \
+type##_ManagerRef; \
+typedef struct { type##_Manager* manager; type* ref; type##_Dtl* dtl; } \
+type##_WeakRef;
+
+
 extern char* _mr_raise_format;
 extern char* _mr_assert_format;
 extern char* _mr_traceline_format;

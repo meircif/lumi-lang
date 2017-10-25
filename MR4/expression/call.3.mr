@@ -4,39 +4,107 @@
 class CallExpression(Expression)
   owner Expression function
   owner FunctionArguments arguments
+  user Expression output
   
-  func inst parse-new(user String ends):(
+  func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
     new CallExpression call-expression
-    call-expression.parse(owner expression):(copy end)
+    call-expression.parse(owner expression, user code-node):(copy end)
     expression := call-expression
   
-  func inst parse(owner Expression function):(copy Char end)
+  func inst parse(owner Expression function, user SyntaxTreeCode code-node):(
+      copy Char end)
     self.function := function
+    self.code-node := code-node
+    self.set-location()
     new FunctionArguments in self.arguments
     var CallArgumentFactory argument-factory
-    self.arguments.parse(user argument-factory):(copy end)
+    self.arguments.parse(
+        user argument-factory, user code-node, user _):(copy end)
+  
+  func dynamic analyze()
+    self.function.analyze()
+    self.arguments.analyze()
+    user FunctionArguments declaration(self.function.result-type.arguments)
+    if not (? self.function.result-type.type-data)
+      self.m-syntax-error-msg(user "void expression is not callable")
+    if self.function.result-type.type-data != glob.type-func
+      self.m-syntax-error(
+          user "non callable type",
+          user self.function.result-type.type-data.name)
+    if not (? declaration)
+        self.m-syntax-error-msg(user "pointer-to-function not supported")
+    if not self.is-statement
+      declaration.get-result-type().m-copy-new():(owner self.result-type)
+    self.function.analyze-call(user self.arguments)
+    if self.arguments.m-check-calling(user declaration)
+      # add omitted output
+      new CallArgument output
+      output.access := declaration.outputs.last.item.access
+      self.add-aux-variable(copy declaration.outputs.last.item.access):(
+          owner output.value)
+      self.output := output.value
+      self.arguments.outputs.add(owner output)
+    else-if ? self.result-type
+      declaration.get-output():(user self.output)
+    self.assignable := ? self.result-type
+  
+  func dynamic write-preactions()
+    self.function.write-preactions()
+    self.arguments.write-preactions()
+    if not self.is-statement
+      self.write-call()
+      write(user "\n")
+      self.code-node.write-spaces()
   
   func dynamic write()
+    if self.is-statement
+      self.write-call()
+    else-if ? self.output
+      self.output.write()
+    else
+      raise
+  
+  func inst write-call()
+    write(user "CHECK(")
+    self.write-line-num()
+    write(user ", ")
     self.function.write()
-    self.arguments.write()
+    self.arguments.write(copy false)
+    write(user " )")
+  
 
 
 ## Function argument call
 class CallArgument(Argument)
   owner Expression value
   
-  func dynamic parse-value():(copy Char end)
-    parse-new-expression(user ",)"):(owner self.value, copy end)
+  func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
+    parse-new-expression(
+        user ",)", user code-node):(owner self.value, copy end)
     if end != ',' and end != ')'
-      f-syntax-error-c(user "expected \",\" or \")\", got", copy end)
+      self.m-syntax-error-c(user "expected \",\" or \")\", got", copy end)
   
-  func dynamic write(copy Bool is-output)
+  func dynamic analyze()
+    self.value.analyze()
+    if self.is-output and not self.value.assignable
+      self.m-syntax-error-msg(user "non assignable call output")
+  
+  func dynamic get-type-instance():(user TypeInstance type-instance)
+    type-instance := self.value.result-type
+  
+  func dynamic get-output():(user Expression output)
+    output := self.value
+  
+  func dynamic write-preactions()
+    self.value.write-preactions()
+  
+  func dynamic write()
     # &(`value`)
-    if is-output
+    if self.is-output
       write(user "&(")
     self.value.write()
-    if is-output
+    if self.is-output
       write(user ")")
 
 

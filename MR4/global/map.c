@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file5_name = "global/map.3.mr";
+static char* _mr_file6_name = "global/map.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file5_name
+#define MR_FILE_NAME _mr_file6_name
 
 /* MR4 compiler - Generic mappings */
 
@@ -50,15 +50,37 @@ Returncode NameMap_find(NameMap* self, String* name, void** value) {
   NameMapNode* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool10;
-    CHECK(23, String_equal(node->name, name, &(_Bool10)) )
-    if (_Bool10) {
+    Bool _Bool12;
+    CHECK(23, String_equal(node->name, name, &(_Bool12)) )
+    if (_Bool12) {
       (*value) = ((void*)(node->value));
       return OK;
     }
     node = node->next;
   }
   (*value) = NULL;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode NameMap_m_update_or_add(NameMap* self, String* name, void* value);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_NameMap_m_update_or_add = "NameMap.m-update-or-add";
+#define MR_FUNC_NAME _func_name_NameMap_m_update_or_add
+Returncode NameMap_m_update_or_add(NameMap* self, String* name, void* value) {
+  NameMapNode* node = self->first;
+  while (true) {
+    if (!(NULL != node)) break;
+    Bool _Bool13;
+    CHECK(33, String_equal(node->name, name, &(_Bool13)) )
+    if (_Bool13) {
+      node->value = value;
+      return OK;
+    }
+    node = node->next;
+  }
+  CHECK(37, NameMap_add(self, name, value) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -91,17 +113,19 @@ Returncode NameMapNode_init(NameMapNode* self, String* name, void* value) {
 
 #ifndef MR_INCLUDES
 #define MR_INCLUDES
+#include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
 #include "global/list.c"
-#include "global/type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
 #include "expression/slice.c"
-#include "expression/variable.c"
+#include "expression/symbol.c"
+#include "syntax-tree/block.c"
+#include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"

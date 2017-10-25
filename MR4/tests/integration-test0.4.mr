@@ -16,14 +16,14 @@ comment
 
 # Test global variables
 var Int global-int
-var Int CONSTANT-INT(23)
+# var Int CONSTANT-INT(23)
 user String global-string
-user String CONSTANT-STRING("a constant string")
+# user String CONSTANT-STRING("a constant string")
 
 
 # Test functions
 func test-simple-function()
-  sys.print(user "I am test func")
+  # sys.print(user "I am test func")
 
 func test-complex-function(
     copy Int num, user String text)->(copy Int out-num, user String out-text)
@@ -65,4 +65,4 @@ struct TestStruct
 
 
 main
-  test-simple-function()
+  # test-simple-function()

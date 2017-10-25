@@ -6,9 +6,9 @@ static NameMap{Generic}
   owner NameMapNode{Generic} last
   
   ## Add `name` -> `value` mapping
-  func inst add(user String name, owner Generic value)
+  func inst add(user String name, user Generic value)
     new NameMapNode{Generic} node
-    node.init(user name, owner value)
+    node.init(user name, user value)
     if ? self.last
       self.last.next := node
     else
@@ -25,13 +25,23 @@ static NameMap{Generic}
         return
       node := node.next
     value := _
+  
+  func inst m-update-or-add(user String name, user Generic value)
+    user NameMapNode{Generic} node(self.first)
+    do
+      while ? node
+      if node.name.equal(user name)
+        node.value := value
+        return
+      node := node.next
+    self.add(user name, user value)
 
 
 static NameMapNode{Generic}
   owner NameMapNode{Generic} next
   user String name
-  owner Generic value
+  user Generic value
   
-  func inst init(user String name, owner Generic value)
+  func inst init(user String name, user Generic value)
     self.name := name
     self.value := value

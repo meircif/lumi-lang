@@ -1,0 +1,202 @@
+## MR4 compiler - Syntax tree code block
+
+
+## A basic code node in the syntax tree
+class SyntaxTreeCode(SyntaxTreeNode)
+  user SyntaxTreeBlock parent
+  
+  func inst m-find-variable(user String name):(user SyntaxTreeVariable variable)
+    self.parent.m-find-variable(user name):(user variable)
+  
+  func inst m-get-parent-type():(user TypeData parent-type)
+    self.parent.m-get-parent-type():(user parent-type)
+  
+  func inst analyze-expression(
+      user Expression expression, user TypeData expected-type)
+    expression.analyze()
+    if not (? expression.result-type)
+      self.m-syntax-error(
+          user "got void expression, expected", user expected-type.name)
+    if expression.result-type.type-data != expected-type
+      self.m-syntax-error2(
+          user "got",
+          user expression.result-type.type-data.name,
+          user "expression, expected",
+          user expected-type.name)
+  
+  func inst write-spaces()
+    self.parent.write-spaces()
+  
+  func dynamic m-is-end-point():(copy Bool is-end)
+    is-end := false
+
+
+## Count occurrences of a specific type
+static TypeCount
+  user TypeData type-data
+  var Int count
+
+
+## A basic code block node in the syntax tree
+class SyntaxTreeBlock(SyntaxTreeBranch)
+  user SyntaxTreeBlock parent
+  owner List{SyntaxTreeCode} code-nodes
+  user List{TypeCount} aux-variables
+  user SyntaxTreeIf previous-if
+  owner SyntaxTreeVariable ref-variable
+  var Bool is-in-loop
+  
+  func inst parse-block():(copy Char end)
+    new List{SyntaxTreeCode} in self.code-nodes
+    self.parse-block-children(user _, user self):(copy end)
+  
+  func dynamic parse-child(user String keyword):(copy Char end)
+    owner SyntaxTreeCode node
+    user SyntaxTreeIf new-if
+    
+    if self.m-has-end-point()
+      self.m-syntax-error-msg(user "unreachable code")
+    
+    if keyword.equal(user "if")
+      if end != ' '
+        self.m-syntax-error-c(user "expected space after \"if\", got", copy end)
+      SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
+      self.code-nodes.add(owner new-if)
+      
+    else-if keyword.equal(user "else")
+      if not (? self.previous-if)
+        self.m-syntax-error-msg(user "\"else\" without a previous \"if\"")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"else\", got", copy end)
+      self.previous-if.add-else(
+          owner SyntaxTreeElse.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "else-if")
+      if not (? self.previous-if)
+        self.m-syntax-error-msg(user "\"else-if\" without a previous \"if\"")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"else-if\", got", copy end)
+      SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
+      self.previous-if.add-else-if(owner new-if)
+      
+    else-if keyword.equal(user "do")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"do\", got", copy end)
+      self.code-nodes.add(
+          owner SyntaxTreeDoLoop.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "for")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"for\", got", copy end)
+      self.code-nodes.add(
+          owner SyntaxTreeForLoop.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "while")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"while\", got", copy end)
+      self.code-nodes.add(
+          owner SyntaxTreeWhile.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "continue")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"continue\", got", copy end)
+      self.code-nodes.add(
+          owner SyntaxTreeContinue.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "return")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"return\", got", copy end)
+      self.code-nodes.add(
+          owner SyntaxTreeReturn.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "raise")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"raise\", got", copy end)
+      self.code-nodes.add(
+          owner SyntaxTreeRaise.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "new")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"new\", got", copy end)
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-OWNER, user _, user self):(copy end))
+      
+    else
+      glob.save-input := true
+      self.code-nodes.add(
+          owner SyntaxTreeExpression.parse-new(var _, user self):(copy end))
+    
+    self.previous-if := new-if
+  
+  func inst m-has-end-point():(copy Bool has-end)
+    if ? self.code-nodes.last
+      self.code-nodes.last.item.m-is-end-point():(copy has-end)
+    else
+      has-end := false
+  
+  func dynamic m-find-variable(user String name):(
+      user SyntaxTreeVariable variable)
+    base.m-find-variable(user name):(user variable)
+    if not (? variable) and ? self.ref-variable
+      self.ref-variable.m-find-variable(user name):(user variable)
+    if not (? variable) and ? self.parent
+      self.parent.m-find-variable(user name):(user variable)
+  
+  func dynamic m-get-parent-type():(user TypeData parent-type)
+    self.parent.m-get-parent-type():(user parent-type)
+  
+  func inst add-aux-variable(copy Int access, user TypeInstance type-instance):(
+      user SyntaxTreeVariable new-variable)
+    var Int index(0)
+    user ListNode{TypeCount} node(self.aux-variables.first)
+    do
+      while ? node
+      while node.item.type-data != type-instance.type-data
+      node := node.next
+    if ? node
+      node.item.count += 1
+      index := node.item.count
+    else
+      new TypeCount type-count
+      type-count.type-data := type-instance.type-data
+      self.aux-variables.add(owner type-count)
+    new SyntaxTreeVariable variable
+    new String{type-instance.type-data.name.length +
+        21} in variable.name
+    variable.name.copy(user "aux_")
+    variable.name.concat(user type-instance.type-data.name)
+    variable.name.append(copy '_')
+    var String{16} index-str
+    index.str(user index-str)
+    variable.name.concat(user index-str)
+    variable.parent := self
+    if access = ACCESS-COPY
+      variable.access := ACCESS-VAR
+    else
+      variable.access := access
+    type-instance.m-copy-new():(owner variable.type-instance)
+    new-variable := variable
+    self.variables.add(owner variable)
+  
+  func dynamic analyze()
+    base.analyze()
+    self.analyze-children(user self.code-nodes)
+  
+  func inst write-block()
+    # `previous-text` {
+    #   `block...`
+    # }
+    write(user " {\n")
+    base.write()
+    self.write-children(user self.code-nodes)
+    write-spaces(copy self.indentation-spaces - 2)
+    write(user "}")

@@ -11,8 +11,12 @@ class SyntaxTreeAssert(SyntaxTreeCode)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
     self.parent := parent
-    parse-new-expression(user ""):(owner self.tested, copy end)
-    f-syntax-error-msg(user "assert not supported yet...")
+    self.set-location()
+    parse-new-expression(user "", user self):(owner self.tested, copy end)
+    self.m-syntax-error-msg(user "assert not supported yet...")
+  
+  func dynamic analyze()
+    self.analyze-expression(user self.tested, user glob.type-bool)
 
 ## Assert-error statement in the syntax tree
 class SyntaxTreeAssertError(SyntaxTreeCode)
@@ -25,8 +29,13 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
     self.parent := parent
-    parse-new-expression(user ""):(owner self.tested, copy end)
-    f-syntax-error-msg(user "assert-error not supported yet...")
+    self.set-location()
+    parse-new-expression(user "", user self):(owner self.tested, copy end)
+    self.tested.is-statement := true
+    self.m-syntax-error-msg(user "assert-error not supported yet...")
+  
+  func dynamic analyze()
+    self.tested.analyze()
 
 
 ## Test function in the syntax tree
@@ -34,7 +43,7 @@ class SyntaxTreeTestFunction(SyntaxTreeFunction)
   func inst parse-new():(copy Char end, owner SyntaxTreeTestFunction new-node)
     new SyntaxTreeTestFunction in new-node
     new-node.parse(user _):(copy end)
-    f-syntax-error-msg(user "test-function not supported yet...")
+    self.m-syntax-error-msg(user "test-function not supported yet...")
 
 
 ## Mock function in the syntax tree
@@ -42,5 +51,5 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
   func inst parse-new():(copy Char end, owner SyntaxTreeMockFunction new-node)
     new SyntaxTreeMockFunction in new-node
     new-node.parse(user _):(copy end)
-    f-syntax-error-msg(user "mock not supported yet...")
+    self.m-syntax-error-msg(user "mock not supported yet...")
 
