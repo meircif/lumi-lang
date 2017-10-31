@@ -51,17 +51,17 @@ Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, TypeData* parent_t
     self->_base._base.indentation_spaces = 4;
     if (self->parent_type->is_dynamic) {
       String* meth_type = NULL;
-      Int _Int73;
-      CHECK(23, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int73)) )
-      Bool _Bool74;
-      CHECK(24, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool74)) )
-      if (_Bool74) {
+      Int _Int75;
+      CHECK(23, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int75)) )
+      Bool _Bool76;
+      CHECK(24, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool76)) )
+      if (_Bool76) {
         self->is_dynamic = true;
       }
       else {
-        Bool _Bool75;
-        CHECK(26, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool75)) )
-        if (!_Bool75) {
+        Bool _Bool77;
+        CHECK(26, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool77)) )
+        if (!_Bool77) {
           CHECK(27, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){46, 45, "expected \"dynamic\" or \"inst\" method type, got"}, meth_type) )
         }
       }
@@ -97,12 +97,12 @@ static char* _func_name_SyntaxTreeFunction_parse_body = "SyntaxTreeFunction.pars
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_parse_body
 Returncode SyntaxTreeFunction_parse_body(SyntaxTreeFunction* self, Char* end) {
   CHECK(41, SyntaxTreeBlock_parse_block(&(self->_base), &((*end))) )
-  Bool _Bool76;
-  CHECK(42, SyntaxTreeBlock_m_has_end_point(&(self->_base), &(_Bool76)) )
-  if (!_Bool76) {
-    SyntaxTreeReturn* _SyntaxTreeReturn77;
-    CHECK(43, SyntaxTreeReturn_parse_new(NULL, &(self->_base), &((*end)), &(_SyntaxTreeReturn77)) )
-    CHECK(43, List_add(self->_base.code_nodes, &(_SyntaxTreeReturn77->_base)) )
+  Bool _Bool78;
+  CHECK(42, SyntaxTreeBlock_m_has_end_point(&(self->_base), &(_Bool78)) )
+  if (!_Bool78) {
+    SyntaxTreeReturn* _SyntaxTreeReturn79;
+    CHECK(43, SyntaxTreeReturn_parse_new(NULL, &(self->_base), &((*end)), &(_SyntaxTreeReturn79)) )
+    CHECK(43, List_add(self->_base.code_nodes, &(_SyntaxTreeReturn79->_base)) )
   }
   return OK;
 }
@@ -503,11 +503,11 @@ Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory*
 static char* _func_name_DeclarationArgumentFactory_m_new_argument = "DeclarationArgumentFactory.m-new-argument";
 #define MR_FUNC_NAME _func_name_DeclarationArgumentFactory_m_new_argument
 Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory* self, Argument** new_argument) {
-  DeclarationArgument* _DeclarationArgument78 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument78 == NULL) RAISE(188)
-  *_DeclarationArgument78 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
-  _DeclarationArgument78->_base._base._dtl = DeclarationArgument__dtl;
-  (*new_argument) = &(_DeclarationArgument78->_base);
+  DeclarationArgument* _DeclarationArgument80 = malloc(sizeof(DeclarationArgument));
+  if (_DeclarationArgument80 == NULL) RAISE(188)
+  *_DeclarationArgument80 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
+  _DeclarationArgument80->_base._base._dtl = DeclarationArgument__dtl;
+  (*new_argument) = &(_DeclarationArgument80->_base);
   return OK;
 }
 #undef MR_FUNC_NAME

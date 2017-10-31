@@ -120,6 +120,24 @@ Returncode test_variable(Int i, String* text, Array* arr) {
   CHECK(45, String_copy(isv, aux_String_0) )
   isn = MR_new_string(i);
   CHECK(46, String_copy(isn, text) )
+  TEST_ASSERT(47, x == 0)
+  TEST_ASSERT(48, s != NULL)
+  TEST_ASSERT(49, a != NULL)
+  TEST_ASSERT(50, t != NULL)
+  TEST_ASSERT(51, tv != NULL)
+  TEST_ASSERT(52, sv != NULL)
+  TEST_ASSERT(53, ia != NULL)
+  TEST_ASSERT(54, ta != NULL)
+  TEST_ASSERT(55, sa != NULL)
+  TEST_ASSERT(56, tn != NULL)
+  TEST_ASSERT(57, sn != NULL)
+  TEST_ASSERT(58, ian != NULL)
+  TEST_ASSERT(59, tan != NULL)
+  TEST_ASSERT(60, san != NULL)
+  TEST_ASSERT(61, ix == 0)
+  TEST_ASSERT(62, is != NULL)
+  TEST_ASSERT(63, isv != NULL)
+  TEST_ASSERT(64, isn != NULL)
   return OK;
 }
 

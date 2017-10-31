@@ -117,6 +117,13 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.variables.add(owner SyntaxTreeInitNew.parse-new(
           var _, user self):(copy end))
       
+    else-if keyword.equal(user "assert")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"assert\", got", copy end)
+      self.code-nodes.add(owner SyntaxTreeAssert.parse-new(
+          var _, user self):(copy end))
+      
     else
       glob.save-input := true
       self.code-nodes.add(

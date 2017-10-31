@@ -71,9 +71,9 @@ Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end);
 static char* _func_name_TypeData_parse_child = "TypeData.parse-child";
 #define MR_FUNC_NAME _func_name_TypeData_parse_child
 Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end) {
-  Bool _Bool99;
-  CHECK(33, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool99)) )
-  if (!_Bool99) {
+  Bool _Bool101;
+  CHECK(33, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool101)) )
+  if (!_Bool101) {
     CHECK(34, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){16, 15, "unknown keyword"}, keyword) )
   }
   return OK;
@@ -106,9 +106,9 @@ Returncode TypeData_m_find_field(TypeData* self, String* name, SyntaxTreeVariabl
     ListNode* child = type_data->_base._base.variables->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool100;
-      CHECK(47, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool100)) )
-      if (_Bool100) {
+      Bool _Bool102;
+      CHECK(47, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool102)) )
+      if (_Bool102) {
         (*field) = ((SyntaxTreeVariable*)(child->item));
         return OK;
       }
@@ -133,9 +133,9 @@ Returncode TypeData_m_find_meth(TypeData* self, String* name, SyntaxTreeFunction
     ListNode* child = type_data->_base.functions->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool101;
-      CHECK(61, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool101)) )
-      if (_Bool101) {
+      Bool _Bool103;
+      CHECK(61, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool103)) )
+      if (_Bool103) {
         (*method) = ((SyntaxTreeFunction*)(child->item));
         return OK;
       }
@@ -496,8 +496,8 @@ Returncode TypeInstance_m_copy_new(TypeInstance* self, TypeInstance** type_insta
     CHECK(217, TypeInstance_m_copy_new(self->sub_type, &((*type_instance)->sub_type)) )
   }
   if (NULL != self->arguments) {
-    FunctionArguments* _FunctionArguments102;
-    CHECK(219, FunctionArguments_m_copy_new(self->arguments, &(_FunctionArguments102)) )
+    FunctionArguments* _FunctionArguments104;
+    CHECK(219, FunctionArguments_m_copy_new(self->arguments, &(_FunctionArguments104)) )
   }
   return OK;
 }
@@ -509,13 +509,13 @@ Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* 
 static char* _func_name_TypeInstance_parse = "TypeInstance.parse";
 #define MR_FUNC_NAME _func_name_TypeInstance_parse
 Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* node, SyntaxTreeVariable* var_node, Char* end) {
-  String* _String103;
-  CHECK(226, string_new_concat(ends, &(String){2, 1, "{"}, &(_String103)) )
-  CHECK(226, read_new(_String103, &(self->name), &((*end))) )
+  String* _String105;
+  CHECK(226, string_new_concat(ends, &(String){2, 1, "{"}, &(_String105)) )
+  CHECK(226, read_new(_String105, &(self->name), &((*end))) )
   if ((*end) == '{') {
-    Bool _Bool104;
-    CHECK(229, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool104)) )
-    if (_Bool104) {
+    Bool _Bool106;
+    CHECK(229, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool106)) )
+    if (_Bool106) {
       self->arguments = malloc(sizeof(FunctionArguments));
       if (self->arguments == NULL) RAISE(230)
       *self->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
@@ -525,16 +525,16 @@ Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* 
       CHECK(232, FunctionArguments_parse(self->arguments, argument_factory, NULL, NULL, &((*end))) )
     }
     else {
-      Bool _Bool105;
-      CHECK(233, String_equal(self->name, &(String){7, 6, "String"}, &(_Bool105)) )
-      if (NULL != var_node && _Bool105) {
+      Bool _Bool107;
+      CHECK(233, String_equal(self->name, &(String){7, 6, "String"}, &(_Bool107)) )
+      if (NULL != var_node && _Bool107) {
         CHECK(234, parse_new_expression(&(String){2, 1, "}"}, &(var_node->_base), &(self->length), &((*end))) )
       }
       else {
         Bool has_sub_type = true;
-        Bool _Bool106;
-        CHECK(238, String_equal(self->name, &(String){6, 5, "Array"}, &(_Bool106)) )
-        if (NULL != var_node && _Bool106) {
+        Bool _Bool108;
+        CHECK(238, String_equal(self->name, &(String){6, 5, "Array"}, &(_Bool108)) )
+        if (NULL != var_node && _Bool108) {
           CHECK(239, parse_new_expression(&(String){3, 2, ":}"}, &(var_node->_base), &(self->length), &((*end))) )
           if ((*end) != ':' && (*end) != '}') {
             CHECK(242, SyntaxTreeNode_m_syntax_error_c(node, &(String){18, 17, "expected \":\", got"}, (*end)) )

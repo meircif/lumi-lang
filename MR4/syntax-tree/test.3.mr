@@ -13,10 +13,18 @@ class SyntaxTreeAssert(SyntaxTreeCode)
     self.parent := parent
     self.set-location()
     parse-new-expression(user "", user self):(owner self.tested, copy end)
-    self.m-syntax-error-msg(user "assert not supported yet...")
   
   func dynamic analyze()
     self.analyze-expression(user self.tested, user glob.type-bool)
+  
+  func dynamic write()
+    # TEST_ASSERT(`line`, `tested`)
+    self.tested.write-preactions()
+    write(user "TEST_ASSERT(")
+    self.write-line-num()
+    write(user ", ")
+    self.tested.write()
+    write(user ")")
 
 ## Assert-error statement in the syntax tree
 class SyntaxTreeAssertError(SyntaxTreeCode)

@@ -251,10 +251,23 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
                       
                     }
                     else {
-                      glob->save_input = true;
-                      SyntaxTreeExpression* _SyntaxTreeExpression55;
-                      CHECK(122, SyntaxTreeExpression_parse_new(NULL, self, &((*end)), &(_SyntaxTreeExpression55)) )
-                      CHECK(122, List_add(self->code_nodes, &(_SyntaxTreeExpression55->_base)) )
+                      Bool _Bool55;
+                      CHECK(120, String_equal(keyword, &(String){7, 6, "assert"}, &(_Bool55)) )
+                      if (_Bool55) {
+                        if ((*end) != ' ') {
+                          CHECK(122, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){35, 34, "expected space after \"assert\", got"}, (*end)) )
+                        }
+                        SyntaxTreeAssert* _SyntaxTreeAssert56;
+                        CHECK(124, SyntaxTreeAssert_parse_new(NULL, self, &((*end)), &(_SyntaxTreeAssert56)) )
+                        CHECK(124, List_add(self->code_nodes, &(_SyntaxTreeAssert56->_base)) )
+                        
+                      }
+                      else {
+                        glob->save_input = true;
+                        SyntaxTreeExpression* _SyntaxTreeExpression57;
+                        CHECK(129, SyntaxTreeExpression_parse_new(NULL, self, &((*end)), &(_SyntaxTreeExpression57)) )
+                        CHECK(129, List_add(self->code_nodes, &(_SyntaxTreeExpression57->_base)) )
+                      }
                     }
                   }
                 }
@@ -278,7 +291,7 @@ static char* _func_name_SyntaxTreeBlock_m_has_end_point = "SyntaxTreeBlock.m-has
 #define MR_FUNC_NAME _func_name_SyntaxTreeBlock_m_has_end_point
 Returncode SyntaxTreeBlock_m_has_end_point(SyntaxTreeBlock* self, Bool* has_end) {
   if (NULL != self->code_nodes->last) {
-    CHECK(129, (((SyntaxTreeCode*)(self->code_nodes->last->item)))->_base._dtl[2](((SyntaxTreeCode*)(self->code_nodes->last->item)), &((*has_end))) )
+    CHECK(136, (((SyntaxTreeCode*)(self->code_nodes->last->item)))->_base._dtl[2](((SyntaxTreeCode*)(self->code_nodes->last->item)), &((*has_end))) )
   }
   else {
     (*has_end) = false;
@@ -293,13 +306,13 @@ Returncode SyntaxTreeBlock_m_find_variable(SyntaxTreeBlock* self, String* name, 
 static char* _func_name_SyntaxTreeBlock_m_find_variable = "SyntaxTreeBlock.m-find-variable";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBlock_m_find_variable
 Returncode SyntaxTreeBlock_m_find_variable(SyntaxTreeBlock* self, String* name, SyntaxTreeVariable** variable) {
-  CHECK(135, SyntaxTreeBranch_m_find_variable(&(self->_base), name, &((*variable))) )
+  CHECK(142, SyntaxTreeBranch_m_find_variable(&(self->_base), name, &((*variable))) )
   if (!(NULL != (*variable)) &&  NULL !=  self->ref_variable) {
-    Bool _Bool56;
-    CHECK(137, SyntaxTreeVariable_m_find_variable(self->ref_variable, name, &((*variable)), &(_Bool56)) )
+    Bool _Bool58;
+    CHECK(144, SyntaxTreeVariable_m_find_variable(self->ref_variable, name, &((*variable)), &(_Bool58)) )
   }
   if (!(NULL != (*variable)) &&  NULL !=  self->parent) {
-    CHECK(139, (self->parent)->_base._base._dtl[3](self->parent, name, &((*variable))) )
+    CHECK(146, (self->parent)->_base._base._dtl[3](self->parent, name, &((*variable))) )
   }
   return OK;
 }
@@ -311,7 +324,7 @@ Returncode SyntaxTreeBlock_m_get_parent_type(SyntaxTreeBlock* self, TypeData** p
 static char* _func_name_SyntaxTreeBlock_m_get_parent_type = "SyntaxTreeBlock.m-get-parent-type";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBlock_m_get_parent_type
 Returncode SyntaxTreeBlock_m_get_parent_type(SyntaxTreeBlock* self, TypeData** parent_type) {
-  CHECK(142, (self->parent)->_base._base._dtl[4](self->parent, &((*parent_type))) )
+  CHECK(149, (self->parent)->_base._base._dtl[4](self->parent, &((*parent_type))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -335,23 +348,23 @@ Returncode SyntaxTreeBlock_add_aux_variable(SyntaxTreeBlock* self, Int access, T
   }
   else {
     TypeCount* type_count = malloc(sizeof(TypeCount));
-    if (type_count == NULL) RAISE(156)
+    if (type_count == NULL) RAISE(163)
     *type_count = (TypeCount){NULL, 0};
     type_count->type_data = type_instance->type_data;
-    CHECK(158, List_add(self->aux_variables, type_count) )
+    CHECK(165, List_add(self->aux_variables, type_count) )
   }
   SyntaxTreeVariable* variable = malloc(sizeof(SyntaxTreeVariable));
-  if (variable == NULL) RAISE(159)
+  if (variable == NULL) RAISE(166)
   *variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false};
   variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   variable->name = _new_string(type_instance->type_data->name->length + 21);
-  if (variable->name == NULL) RAISE(160)
-  CHECK(162, String_copy(variable->name, &(String){5, 4, "aux_"}) )
-  CHECK(163, String_concat(variable->name, type_instance->type_data->name) )
-  CHECK(164, String_append(variable->name, '_') )
+  if (variable->name == NULL) RAISE(167)
+  CHECK(169, String_copy(variable->name, &(String){5, 4, "aux_"}) )
+  CHECK(170, String_concat(variable->name, type_instance->type_data->name) )
+  CHECK(171, String_append(variable->name, '_') )
   String* index_str = &(String){16, 0, (char[16]){0}};
-  CHECK(166, Int_str(index, index_str) )
-  CHECK(167, String_concat(variable->name, index_str) )
+  CHECK(173, Int_str(index, index_str) )
+  CHECK(174, String_concat(variable->name, index_str) )
   variable->_base.parent = self;
   if (access == ACCESS_COPY) {
     variable->access = ACCESS_VAR;
@@ -359,9 +372,9 @@ Returncode SyntaxTreeBlock_add_aux_variable(SyntaxTreeBlock* self, Int access, T
   else {
     variable->access = access;
   }
-  CHECK(173, TypeInstance_m_copy_new(type_instance, &(variable->type_instance)) )
+  CHECK(180, TypeInstance_m_copy_new(type_instance, &(variable->type_instance)) )
   (*new_variable) = variable;
-  CHECK(175, List_add(self->_base.variables, variable) )
+  CHECK(182, List_add(self->_base.variables, variable) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -372,8 +385,8 @@ Returncode SyntaxTreeBlock_analyze(SyntaxTreeBlock* self);
 static char* _func_name_SyntaxTreeBlock_analyze = "SyntaxTreeBlock.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBlock_analyze
 Returncode SyntaxTreeBlock_analyze(SyntaxTreeBlock* self) {
-  CHECK(178, SyntaxTreeBranch_analyze(&(self->_base)) )
-  CHECK(179, SyntaxTreeBranch_analyze_children(&(self->_base), self->code_nodes) )
+  CHECK(185, SyntaxTreeBranch_analyze(&(self->_base)) )
+  CHECK(186, SyntaxTreeBranch_analyze_children(&(self->_base), self->code_nodes) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -387,11 +400,11 @@ Returncode SyntaxTreeBlock_write_block(SyntaxTreeBlock* self) {
   /* `previous-text` { */
   /*   `block...` */
   /* } */
-  CHECK(185, write(&(String){4, 3, " {\n"}) )
-  CHECK(186, SyntaxTreeBranch_write(&(self->_base)) )
-  CHECK(187, SyntaxTreeBranch_write_children(&(self->_base), self->code_nodes) )
-  CHECK(188, write_spaces(self->_base.indentation_spaces - 2) )
-  CHECK(189, write(&(String){2, 1, "}"}) )
+  CHECK(192, write(&(String){4, 3, " {\n"}) )
+  CHECK(193, SyntaxTreeBranch_write(&(self->_base)) )
+  CHECK(194, SyntaxTreeBranch_write_children(&(self->_base), self->code_nodes) )
+  CHECK(195, write_spaces(self->_base.indentation_spaces - 2) )
+  CHECK(196, write(&(String){2, 1, "}"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

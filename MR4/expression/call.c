@@ -114,7 +114,7 @@ Returncode CallExpression_write_preactions(CallExpression* self) {
   CHECK(53, (self->function)->_base._dtl[3](self->function) )
   CHECK(54, FunctionArguments_write_preactions(self->arguments) )
   if (!self->_base.is_statement) {
-    CHECK(56, CallExpression_write_call(self) )
+    CHECK(56, CallExpression_write_func_call(self) )
     CHECK(57, write(&(String){2, 1, "\n"}) )
     CHECK(58, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   }
@@ -129,7 +129,7 @@ static char* _func_name_CallExpression_write = "CallExpression.write";
 #define MR_FUNC_NAME _func_name_CallExpression_write
 Returncode CallExpression_write(CallExpression* self) {
   if (self->_base.is_statement) {
-    CHECK(62, CallExpression_write_call(self) )
+    CHECK(62, CallExpression_write_func_call(self) )
   }
   else {
     if (NULL != self->output) {
@@ -144,12 +144,12 @@ Returncode CallExpression_write(CallExpression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode CallExpression_write_call(CallExpression* self);
+Returncode CallExpression_write_func_call(CallExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallExpression_write_call = "CallExpression.write-call";
-#define MR_FUNC_NAME _func_name_CallExpression_write_call
-Returncode CallExpression_write_call(CallExpression* self) {
-  CHECK(69, CallExpression_write_call(self) )
+static char* _func_name_CallExpression_write_func_call = "CallExpression.write-func-call";
+#define MR_FUNC_NAME _func_name_CallExpression_write_func_call
+Returncode CallExpression_write_func_call(CallExpression* self) {
+  CHECK(69, SyntaxTreeNode_write_call(&(self->_base._base)) )
   CHECK(70, (self->function)->_base._dtl[1](self->function) )
   CHECK(71, FunctionArguments_write(self->arguments, false) )
   CHECK(72, write(&(String){3, 2, " )"}) )

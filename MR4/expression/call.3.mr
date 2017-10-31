@@ -53,19 +53,19 @@ class CallExpression(Expression)
     self.function.write-preactions()
     self.arguments.write-preactions()
     if not self.is-statement
-      self.write-call()
+      self.write-func-call()
       write(user "\n")
       self.code-node.write-spaces()
   
   func dynamic write()
     if self.is-statement
-      self.write-call()
+      self.write-func-call()
     else-if ? self.output
       self.output.write()
     else
       raise
   
-  func inst write-call()
+  func inst write-func-call()
     self.write-call()
     self.function.write()
     self.arguments.write(copy false)

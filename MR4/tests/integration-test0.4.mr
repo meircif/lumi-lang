@@ -45,6 +45,24 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
   user String is(text)
   var String{12} isv("some string")
   new String{i} isn(text)
+  assert x = 0
+  assert s?
+  assert a?
+  assert t?
+  assert tv?
+  assert sv?
+  assert ia?
+  assert ta?
+  assert sa?
+  assert tn?
+  assert sn?
+  assert ian?
+  assert tan?
+  assert san?
+  assert ix = 0
+  assert is?
+  assert isv?
+  assert isn?
 
 
 func test-complex-function(

@@ -105,12 +105,12 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   
   func dynamic m-find-variable(user String name):(
       user SyntaxTreeVariable variable)
+    variable := _
     user ListNode{SyntaxTreeVariable} child(self.variables.first)
     do
       while ? child
       while not child.item.m-find-variable(user name):(user variable)
       child := child.next
-    variable := _
   
   func dynamic analyze()
     self.analyze-children(user self.variables)

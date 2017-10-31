@@ -75,27 +75,27 @@ Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, I
 static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_get_access
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
-  Bool _Bool79;
-  CHECK(25, String_equal(access_str, &(String){5, 4, "copy"}, &(_Bool79)) )
-  if (_Bool79) {
+  Bool _Bool81;
+  CHECK(25, String_equal(access_str, &(String){5, 4, "copy"}, &(_Bool81)) )
+  if (_Bool81) {
     (*access) = ACCESS_COPY;
   }
   else {
-    Bool _Bool80;
-    CHECK(27, String_equal(access_str, &(String){5, 4, "user"}, &(_Bool80)) )
-    if (_Bool80) {
+    Bool _Bool82;
+    CHECK(27, String_equal(access_str, &(String){5, 4, "user"}, &(_Bool82)) )
+    if (_Bool82) {
       (*access) = ACCESS_USER;
     }
     else {
-      Bool _Bool81;
-      CHECK(29, String_equal(access_str, &(String){6, 5, "owner"}, &(_Bool81)) )
-      if (_Bool81) {
+      Bool _Bool83;
+      CHECK(29, String_equal(access_str, &(String){6, 5, "owner"}, &(_Bool83)) )
+      if (_Bool83) {
         (*access) = ACCESS_OWNER;
       }
       else {
-        Bool _Bool82;
-        CHECK(31, String_equal(access_str, &(String){4, 3, "var"}, &(_Bool82)) )
-        if (_Bool82) {
+        Bool _Bool84;
+        CHECK(31, String_equal(access_str, &(String){4, 3, "var"}, &(_Bool84)) )
+        if (_Bool84) {
           (*access) = ACCESS_VAR;
         }
         else {
@@ -131,13 +131,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(42)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char83;
-    CHECK(44, read_c(&(_Char83)) )
-    CHECK(44, String_append(actual_text, _Char83) )
+    Char _Char85;
+    CHECK(44, read_c(&(_Char85)) )
+    CHECK(44, String_append(actual_text, _Char85) )
   }}
-  Bool _Bool84;
-  CHECK(45, String_equal(actual_text, expected_text, &(_Bool84)) )
-  if (!_Bool84) {
+  Bool _Bool86;
+  CHECK(45, String_equal(actual_text, expected_text, &(_Bool86)) )
+  if (!_Bool86) {
     CHECK(46, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);
@@ -152,9 +152,9 @@ static char* _func_name_SyntaxTreeNode_read_line_break_spaces = "SyntaxTreeNode.
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_read_line_break_spaces
 Returncode SyntaxTreeNode_read_line_break_spaces(SyntaxTreeNode* self) {
   {int n; for (n = (0); n < (glob->spaces + 4); ++n) {
-    Char _Char85;
-    CHECK(53, read_c(&(_Char85)) )
-    if (_Char85 != ' ') {
+    Char _Char87;
+    CHECK(53, read_c(&(_Char87)) )
+    if (_Char87 != ' ') {
       String* expected_spaces = &(String){128, 0, (char[128]){0}};
       String* actual_spaces = &(String){128, 0, (char[128]){0}};
       CHECK(56, Int_str(glob->spaces + 4, expected_spaces) )
