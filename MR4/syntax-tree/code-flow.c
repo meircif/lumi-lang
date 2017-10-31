@@ -350,7 +350,7 @@ Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* par
   CHECK(135, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, true, &((*end))) )
   self->_base.block->ref_variable = malloc(sizeof(SyntaxTreeVariable));
   if (self->_base.block->ref_variable == NULL) RAISE(136)
-  *self->_base.block->ref_variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL};
+  *self->_base.block->ref_variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false};
   self->_base.block->ref_variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   CHECK(137, string_new_copy(self->index_name, &(self->_base.block->ref_variable->name)) )
   self->_base.block->ref_variable->access = ACCESS_VAR;

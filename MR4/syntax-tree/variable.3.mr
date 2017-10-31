@@ -6,6 +6,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   var Int access
   owner TypeInstance type-instance
   user TypeData parent-type
+  var Bool is-output
   
   func inst parse-new(
       copy Int access,

@@ -396,7 +396,7 @@ Returncode DeclarationArgument_m_copy_new(DeclarationArgument* self, Declaration
   (*new_argument)->_base.access = self->_base.access;
   (*new_argument)->variable = malloc(sizeof(SyntaxTreeVariable));
   if ((*new_argument)->variable == NULL) RAISE(150)
-  *(*new_argument)->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL};
+  *(*new_argument)->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false};
   (*new_argument)->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   (*new_argument)->variable->access = self->variable->access;
   CHECK(152, TypeInstance_m_copy_new(self->variable->type_instance, &((*new_argument)->variable->type_instance)) )
@@ -413,17 +413,18 @@ static char* _func_name_DeclarationArgument_parse_value = "DeclarationArgument.p
 Returncode DeclarationArgument_parse_value(DeclarationArgument* self, SyntaxTreeCode* code_node, Char* end) {
   self->variable = malloc(sizeof(SyntaxTreeVariable));
   if (self->variable == NULL) RAISE(157)
-  *self->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL};
+  *self->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false};
   self->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   self->variable->access = self->_base.access;
+  self->variable->is_output = self->_base.is_output;
   self->variable->type_instance = malloc(sizeof(TypeInstance));
-  if (self->variable->type_instance == NULL) RAISE(159)
+  if (self->variable->type_instance == NULL) RAISE(160)
   *self->variable->type_instance = (TypeInstance){NULL, NULL, NULL, NULL, NULL};
-  CHECK(160, TypeInstance_parse(self->variable->type_instance, &(String){2, 1, " "}, &(self->_base._base), NULL, &((*end))) )
+  CHECK(161, TypeInstance_parse(self->variable->type_instance, &(String){2, 1, " "}, &(self->_base._base), NULL, &((*end))) )
   if ((*end) != ' ') {
-    CHECK(162, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){31, 30, "expected space after type, got"}, (*end)) )
+    CHECK(163, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){31, 30, "expected space after type, got"}, (*end)) )
   }
-  CHECK(163, read_new(&(String){3, 2, ",)"}, &(self->variable->name), &((*end))) )
+  CHECK(164, read_new(&(String){3, 2, ",)"}, &(self->variable->name), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -434,7 +435,7 @@ Returncode DeclarationArgument_analyze(DeclarationArgument* self);
 static char* _func_name_DeclarationArgument_analyze = "DeclarationArgument.analyze";
 #define MR_FUNC_NAME _func_name_DeclarationArgument_analyze
 Returncode DeclarationArgument_analyze(DeclarationArgument* self) {
-  CHECK(166, TypeInstance_analyze(self->variable->type_instance, &(self->_base._base)) )
+  CHECK(167, TypeInstance_analyze(self->variable->type_instance, &(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -468,15 +469,15 @@ static char* _func_name_DeclarationArgument_write = "DeclarationArgument.write";
 #define MR_FUNC_NAME _func_name_DeclarationArgument_write
 Returncode DeclarationArgument_write(DeclarationArgument* self) {
   /* `type`** `name` */
-  CHECK(176, write_cname(self->variable->type_instance->type_data->name) )
+  CHECK(177, write_cname(self->variable->type_instance->type_data->name) )
   if (self->_base.access != ACCESS_COPY) {
-    CHECK(178, write(&(String){2, 1, "*"}) )
+    CHECK(179, write(&(String){2, 1, "*"}) )
   }
   if (self->_base.is_output) {
-    CHECK(180, write(&(String){2, 1, "*"}) )
+    CHECK(181, write(&(String){2, 1, "*"}) )
   }
-  CHECK(181, write(&(String){2, 1, " "}) )
-  CHECK(182, write_cname(self->variable->name) )
+  CHECK(182, write(&(String){2, 1, " "}) )
+  CHECK(183, write_cname(self->variable->name) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -503,7 +504,7 @@ static char* _func_name_DeclarationArgumentFactory_m_new_argument = "Declaration
 #define MR_FUNC_NAME _func_name_DeclarationArgumentFactory_m_new_argument
 Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory* self, Argument** new_argument) {
   DeclarationArgument* _DeclarationArgument78 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument78 == NULL) RAISE(187)
+  if (_DeclarationArgument78 == NULL) RAISE(188)
   *_DeclarationArgument78 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
   _DeclarationArgument78->_base._base._dtl = DeclarationArgument__dtl;
   (*new_argument) = &(_DeclarationArgument78->_base);

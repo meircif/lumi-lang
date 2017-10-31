@@ -1,8 +1,8 @@
 #include "mr.4.h"
 
 /*traceback*/
+#undef MR_FILE_NAME
 #define MR_FILE_NAME __FILE__
-#define MR_FUNC_NAME __FUNCTION__
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
 

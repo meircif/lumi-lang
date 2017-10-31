@@ -201,7 +201,7 @@ Returncode FunctionArguments_parse(FunctionArguments* self, ArgumentFactory* arg
     self_args->_base.access = ACCESS_VAR;
     self_args->variable = malloc(sizeof(SyntaxTreeVariable));
     if (self_args->variable == NULL) RAISE(74)
-    *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL};
+    *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false};
     self_args->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
     CHECK(75, string_new_copy(&(String){5, 4, "self"}, &(self_args->variable->name)) )
     CHECK(76, TypeData_m_new_type_instance(parent_type, &(self_args->variable->type_instance)) )

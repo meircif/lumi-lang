@@ -43,14 +43,14 @@ Returncode test_complex_function(Int num, String* text, Int* out_num, String** o
 /* types methods body */
 
 Returncode TestStruct_set(TestStruct* self, Int x, String* s) {
-  self.num = x;
-  self.text = s;
+  self->num = x;
+  self->text = s;
   return OK;
 }
 
 Returncode TestStruct_get(TestStruct* self, Int* x, String** s) {
-  x = self.num;
-  s = self.text;
+  (*x) = self->num;
+  (*s) = self->text;
   return OK;
 }
 
@@ -124,8 +124,8 @@ Returncode test_variable(Int i, String* text, Array* arr) {
 }
 
 Returncode test_complex_function(Int num, String* text, Int* out_num, String** out_text) {
-  out_num = num;
-  out_text = text;
+  (*out_num) = num;
+  (*out_text) = text;
   return OK;
 }
 

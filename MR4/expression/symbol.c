@@ -81,7 +81,13 @@ Returncode SymbolExpression_write(SymbolExpression* self);
 static char* _func_name_SymbolExpression_write = "SymbolExpression.write";
 #define MR_FUNC_NAME _func_name_SymbolExpression_write
 Returncode SymbolExpression_write(SymbolExpression* self) {
-  CHECK(34, write_cname(self->name) )
+  if (NULL != self->variable && self->variable->is_output) {
+    CHECK(35, write(&(String){3, 2, "(*"}) )
+  }
+  CHECK(36, write_cname(self->name) )
+  if (NULL != self->variable && self->variable->is_output) {
+    CHECK(38, write(&(String){2, 1, ")"}) )
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -109,12 +115,12 @@ static char* _func_name_BaseMethExpression_parse_new = "BaseMethExpression.parse
 #define MR_FUNC_NAME _func_name_BaseMethExpression_parse_new
 Returncode BaseMethExpression_parse_new(BaseMethExpression* self, String* text, SyntaxTreeCode* code_node, Expression** expression) {
   BaseMethExpression* _BaseMethExpression33 = malloc(sizeof(BaseMethExpression));
-  if (_BaseMethExpression33 == NULL) RAISE(41)
+  if (_BaseMethExpression33 == NULL) RAISE(45)
   *_BaseMethExpression33 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, false, false, false};
   _BaseMethExpression33->_base._base._dtl = BaseMethExpression__dtl;
   (*expression) = &(_BaseMethExpression33->_base);
   (*expression)->code_node = code_node;
-  CHECK(43, SyntaxTreeNode_set_location(&((*expression)->_base)) )
+  CHECK(47, SyntaxTreeNode_set_location(&((*expression)->_base)) )
   free(text);
   return OK;
 }
@@ -127,14 +133,14 @@ static char* _func_name_BaseMethExpression_analyze = "BaseMethExpression.analyze
 #define MR_FUNC_NAME _func_name_BaseMethExpression_analyze
 Returncode BaseMethExpression_analyze(BaseMethExpression* self) {
   TypeData* parent_type = NULL;
-  CHECK(48, SyntaxTreeCode_m_get_parent_type(self->_base.code_node, &(parent_type)) )
+  CHECK(52, SyntaxTreeCode_m_get_parent_type(self->_base.code_node, &(parent_type)) )
   if (!(NULL != parent_type)) {
-    CHECK(50, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){26, 25, "\"base\" used not in method"}) )
+    CHECK(54, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){26, 25, "\"base\" used not in method"}) )
   }
   if (!(NULL != parent_type->base_type)) {
-    CHECK(52, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "no base type for type"}, parent_type->name) )
+    CHECK(56, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "no base type for type"}, parent_type->name) )
   }
-  CHECK(53, Expression_set_simple_type(&(self->_base), parent_type->base_type) )
+  CHECK(57, Expression_set_simple_type(&(self->_base), parent_type->base_type) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -163,10 +169,10 @@ static char* _func_name_TypeExpression_parse_new = "TypeExpression.parse-new";
 #define MR_FUNC_NAME _func_name_TypeExpression_parse_new
 Returncode TypeExpression_parse_new(TypeExpression* self, String* text, Expression** expression) {
   TypeExpression* type_expression = malloc(sizeof(TypeExpression));
-  if (type_expression == NULL) RAISE(61)
+  if (type_expression == NULL) RAISE(65)
   *type_expression = (TypeExpression){TypeExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL};
   type_expression->_base._base._dtl = TypeExpression__dtl;
-  CHECK(62, TypeExpression_parse(type_expression, text) )
+  CHECK(66, TypeExpression_parse(type_expression, text) )
   (*expression) = &(type_expression->_base);
   return OK;
 }
@@ -179,7 +185,7 @@ static char* _func_name_TypeExpression_parse = "TypeExpression.parse";
 #define MR_FUNC_NAME _func_name_TypeExpression_parse
 Returncode TypeExpression_parse(TypeExpression* self, String* text) {
   self->type_name = text;
-  CHECK(68, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(72, SyntaxTreeNode_set_location(&(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -190,10 +196,10 @@ Returncode TypeExpression_analyze(TypeExpression* self);
 static char* _func_name_TypeExpression_analyze = "TypeExpression.analyze";
 #define MR_FUNC_NAME _func_name_TypeExpression_analyze
 Returncode TypeExpression_analyze(TypeExpression* self) {
-  CHECK(71, Expression_set_simple_type(&(self->_base), glob->type_type) )
+  CHECK(75, Expression_set_simple_type(&(self->_base), glob->type_type) )
   TypeData* _TypeData34;
-  CHECK(72, SyntaxTreeNode_m_find_type(&(self->_base._base), self->type_name, &(_TypeData34)) )
-  CHECK(72, TypeData_m_new_type_instance(_TypeData34, &(self->_base.result_type->sub_type)) )
+  CHECK(76, SyntaxTreeNode_m_find_type(&(self->_base._base), self->type_name, &(_TypeData34)) )
+  CHECK(76, TypeData_m_new_type_instance(_TypeData34, &(self->_base.result_type->sub_type)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -222,10 +228,10 @@ static char* _func_name_MemberExpression_parse_new = "MemberExpression.parse-new
 #define MR_FUNC_NAME _func_name_MemberExpression_parse_new
 Returncode MemberExpression_parse_new(MemberExpression* self, String* ends, Expression** expression, Char* end) {
   MemberExpression* member_expression = malloc(sizeof(MemberExpression));
-  if (member_expression == NULL) RAISE(82)
+  if (member_expression == NULL) RAISE(86)
   *member_expression = (MemberExpression){MemberExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL, NULL, NULL, NULL};
   member_expression->_base._base._base._dtl = MemberExpression__dtl;
-  CHECK(83, MemberExpression_parse(member_expression, (*expression), ends, &((*end))) )
+  CHECK(87, MemberExpression_parse(member_expression, (*expression), ends, &((*end))) )
   (*expression) = &(member_expression->_base._base);
   return OK;
 }
@@ -238,8 +244,8 @@ static char* _func_name_MemberExpression_parse = "MemberExpression.parse";
 #define MR_FUNC_NAME _func_name_MemberExpression_parse
 Returncode MemberExpression_parse(MemberExpression* self, Expression* instance, String* ends, Char* end) {
   self->instance = instance;
-  CHECK(89, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
-  CHECK(90, Expression_read_new_value(&(self->_base._base), ends, &(self->_base.name), &((*end))) )
+  CHECK(93, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
+  CHECK(94, Expression_read_new_value(&(self->_base._base), ends, &(self->_base.name), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -250,32 +256,32 @@ Returncode MemberExpression_analyze(MemberExpression* self);
 static char* _func_name_MemberExpression_analyze = "MemberExpression.analyze";
 #define MR_FUNC_NAME _func_name_MemberExpression_analyze
 Returncode MemberExpression_analyze(MemberExpression* self) {
-  CHECK(93, (self->instance)->_base._dtl[0](self->instance) )
+  CHECK(97, (self->instance)->_base._dtl[0](self->instance) )
   self->_base._base.assignable = self->instance->assignable;
   if (!(NULL != self->instance->result_type) ||  ! (NULL != self->instance->result_type->type_data)) {
-    CHECK(97, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){30, 29, "void expression has no member"}, self->_base.name) )
+    CHECK(101, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){30, 29, "void expression has no member"}, self->_base.name) )
   }
   TypeData* type_data = self->instance->result_type->type_data;
   if (self->instance->result_type->type_data == glob->type_type) {
     if (!(NULL != self->instance->result_type->sub_type) ||  ! (NULL != self->instance->result_type->sub_type->type_data)) {
-      CHECK(102, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){31, 30, "unspecified type has no member"}, self->_base.name) )
+      CHECK(106, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){31, 30, "unspecified type has no member"}, self->_base.name) )
     }
     type_data = self->instance->result_type->sub_type->type_data;
   }
   
-  CHECK(106, TypeData_m_find_field(type_data, self->_base.name, &(self->_base.variable)) )
+  CHECK(110, TypeData_m_find_field(type_data, self->_base.name, &(self->_base.variable)) )
   if (NULL != self->_base.variable) {
-    CHECK(108, TypeInstance_m_copy_new(self->_base.variable->type_instance, &(self->_base._base.result_type)) )
+    CHECK(112, TypeInstance_m_copy_new(self->_base.variable->type_instance, &(self->_base._base.result_type)) )
     self->_base._base.assignable = true;
   }
   else {
-    CHECK(111, TypeData_m_find_meth(type_data, self->_base.name, &(self->_base.function)) )
+    CHECK(115, TypeData_m_find_meth(type_data, self->_base.name, &(self->_base.function)) )
     if (!(NULL != self->_base.function)) {
-      CHECK(113, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){5, 4, "type"}, type_data->name, &(String){14, 13, "has no member"}, self->_base.name) )
+      CHECK(117, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){5, 4, "type"}, type_data->name, &(String){14, 13, "has no member"}, self->_base.name) )
     }
-    CHECK(118, Expression_set_simple_type(&(self->_base._base), glob->type_func) )
+    CHECK(122, Expression_set_simple_type(&(self->_base._base), glob->type_func) )
     FunctionArguments* _FunctionArguments35;
-    CHECK(119, FunctionArguments_m_copy_new(self->_base.function->arguments, &(_FunctionArguments35)) )
+    CHECK(123, FunctionArguments_m_copy_new(self->_base.function->arguments, &(_FunctionArguments35)) )
   }
   return OK;
 }
@@ -291,13 +297,13 @@ Returncode MemberExpression_analyze_call(MemberExpression* self, FunctionArgumen
     return OK;
   }
   CallArgument* self_param = malloc(sizeof(CallArgument));
-  if (self_param == NULL) RAISE(124)
+  if (self_param == NULL) RAISE(128)
   *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, NULL};
   self_param->_base._base._dtl = CallArgument__dtl;
   self_param->_base.access = ((Argument*)(self->_base.function->arguments->parameters->first->item))->access;
   self_param->value = self->instance;
   self->instance = NULL;
-  CHECK(128, List_m_prepend(arguments->parameters, &(self_param->_base)) )
+  CHECK(132, List_m_prepend(arguments->parameters, &(self_param->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -308,7 +314,7 @@ Returncode MemberExpression_write_preactions(MemberExpression* self);
 static char* _func_name_MemberExpression_write_preactions = "MemberExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_MemberExpression_write_preactions
 Returncode MemberExpression_write_preactions(MemberExpression* self) {
-  CHECK(131, (self->instance)->_base._dtl[3](self->instance) )
+  CHECK(135, (self->instance)->_base._dtl[3](self->instance) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -319,9 +325,9 @@ Returncode MemberExpression_write(MemberExpression* self);
 static char* _func_name_MemberExpression_write = "MemberExpression.write";
 #define MR_FUNC_NAME _func_name_MemberExpression_write
 Returncode MemberExpression_write(MemberExpression* self) {
-  CHECK(134, (self->instance)->_base._dtl[1](self->instance) )
-  CHECK(135, write(&(String){2, 1, "."}) )
-  CHECK(136, SymbolExpression_write(&(self->_base)) )
+  CHECK(138, (self->instance)->_base._dtl[1](self->instance) )
+  CHECK(139, write(&(String){3, 2, "->"}) )
+  CHECK(140, SymbolExpression_write(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -31,7 +31,11 @@ class SymbolExpression(Expression)
       self.function.arguments.m-copy-new():(self.result-type.arguments)
   
   func dynamic write()
+    if ? self.variable and self.variable.is-output
+      write(user "(*")
     write-cname(user self.name)
+    if ? self.variable and self.variable.is-output
+      write(user ")")
 
 
 ## The `base` method expression
@@ -132,5 +136,5 @@ class MemberExpression(SymbolExpression)
   
   func dynamic write()
     self.instance.write()
-    write(user ".")
+    write(user "->")
     base.write()

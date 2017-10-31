@@ -342,7 +342,7 @@ Returncode SyntaxTreeBlock_add_aux_variable(SyntaxTreeBlock* self, Int access, T
   }
   SyntaxTreeVariable* variable = malloc(sizeof(SyntaxTreeVariable));
   if (variable == NULL) RAISE(159)
-  *variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL};
+  *variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false};
   variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   variable->name = _new_string(type_instance->type_data->name->length + 21);
   if (variable->name == NULL) RAISE(160)

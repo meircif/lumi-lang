@@ -156,6 +156,7 @@ class DeclarationArgument(Argument)
   func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
     new SyntaxTreeVariable in self.variable
     self.variable.access := self.access
+    self.variable.is-output := self.is-output
     new TypeInstance in self.variable.type-instance
     self.variable.type-instance.parse(user " ", user self, user _):(copy end)
     if end != ' '

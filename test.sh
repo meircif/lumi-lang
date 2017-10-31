@@ -104,6 +104,8 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../MR4/tests/integration-test0.4.mr
 diff ../MR4/tests/integration-expected-single.c \
   tests/integration-actual-single.c
+$CCW --pedantic -Wno-unused-variable -Wno-unused-but-set-variable \
+  tests/integration-actual-single.c ../MR4/mr.4.c -I../MR4 -o test-mr4-single
 
 # run mr4-compiler multiple-file integration test
 ./mr4-compiler tests/integration-actual-multiple.c \
@@ -111,6 +113,9 @@ diff ../MR4/tests/integration-expected-single.c \
   ../MR4/tests/integration-test2.4.mr
 diff ../MR4/tests/integration-expected-multiple.c \
   tests/integration-actual-multiple.c
+$CCW --pedantic -Wno-unused-variable -Wno-unused-but-set-variable \
+  tests/integration-actual-multiple.c ../MR4/mr.4.c -I../MR4 -o \
+  test-mr4-multiple
 
 
 # --< MRB >--
