@@ -8,6 +8,8 @@ var Int ACCESS-COPY(0)
 var Int ACCESS-USER(1)
 var Int ACCESS-OWNER(2)
 var Int ACCESS-VAR(3)
+var Int ACCESS-NEW(4)
+var Int ACCESS-AUX(5)
 
 
 ## Basic node type for all syntax tree nodes
@@ -59,6 +61,19 @@ class SyntaxTreeNode
             user "got",
             user actual-spaces)
   
+  func inst analyze-expression(
+      user Expression expression, user TypeData expected-type)
+    expression.analyze()
+    if not (? expression.result-type)
+      self.m-syntax-error(
+          user "got void expression, expected", user expected-type.name)
+    if expression.result-type.type-data != expected-type
+      self.m-syntax-error2(
+          user "got",
+          user expression.result-type.type-data.name,
+          user "expression, expected",
+          user expected-type.name)
+  
   func inst write-line-num()
     write-int(copy self.line-number)
   
@@ -66,6 +81,11 @@ class SyntaxTreeNode
     write(user "RAISE(")
     self.write-line-num()
     write(user ")")
+  
+  func inst write-call()
+    write(user "CHECK(")
+    self.write-line-num()
+    write(user ", ")
   
   ## Raise a syntax error with message:
   ## `Code error in {file-name}[{line-number}] {text} "{item}"`

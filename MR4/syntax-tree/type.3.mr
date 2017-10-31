@@ -203,6 +203,7 @@ static TypeInstance
   owner String name
   user TypeData type-data
   owner TypeInstance sub-type
+  owner Expression length
   owner FunctionArguments arguments
   
   ## Return a new deep-copy of self
@@ -217,7 +218,11 @@ static TypeInstance
     if ? self.arguments
       self.arguments.m-copy-new():(type-instance.arguments)
   
-  func inst parse(user String ends, user SyntaxTreeNode node):(copy Char end)
+  func inst parse(
+      user String ends,
+      user SyntaxTreeNode node,
+      user SyntaxTreeVariable var-node):(
+      copy Char end)
     read-new(
         user string-new-concat(user ends, user "{")):(owner self.name, copy end)
     if end = '{'
@@ -225,16 +230,29 @@ static TypeInstance
         new FunctionArguments in self.arguments
         var ArgumentFactory argument-factory
         self.arguments.parse(user argument-factory, user _, user _):(copy end)
+      else-if ? var-node and self.name.equal(user "String")
+        parse-new-expression(user "}", user var-node):(
+            owner self.length, copy end)
       else
-        new TypeInstance in self.sub-type
-        self.sub-type.parse(user "}", user node):(copy end)
+        var Bool has-sub-type(true)
+        if ? var-node and self.name.equal(user "Array")
+          parse-new-expression(user ":}", user var-node):(
+              owner self.length, copy end)
+          if end != ':' and end != '}'
+            node.m-syntax-error-c(user "expected \":\", got", copy end)
+          has-sub-type := end = ':'
+        if has-sub-type
+          new TypeInstance in self.sub-type
+          self.sub-type.parse(user "}", user node, user var-node):(copy end)
       if end != '}'
-        node.m-syntax-error-c(user "expected \"}\", got ", copy end)
+        node.m-syntax-error-c(user "expected \"}\", got", copy end)
       read-c():(copy end)
   
   func inst analyze(user SyntaxTreeNode node)
     if not (? self.type-data)
       node.m-find-type(user self.name):(user self.type-data)
+    if ? self.length
+      node.analyze-expression(user self.length, user glob.type-int)
     if ? self.sub-type
       self.sub-type.analyze(user node)
   

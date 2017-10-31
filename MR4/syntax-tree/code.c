@@ -237,7 +237,7 @@ Returncode SyntaxTreeWhile_analyze(SyntaxTreeWhile* self);
 static char* _func_name_SyntaxTreeWhile_analyze = "SyntaxTreeWhile.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeWhile_analyze
 Returncode SyntaxTreeWhile_analyze(SyntaxTreeWhile* self) {
-  CHECK(77, SyntaxTreeCode_analyze_expression(&(self->_base), self->condition, glob->type_bool) )
+  CHECK(77, SyntaxTreeNode_analyze_expression(&(self->_base._base), self->condition, glob->type_bool) )
   return OK;
 }
 #undef MR_FUNC_NAME

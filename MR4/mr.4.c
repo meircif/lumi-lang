@@ -6,15 +6,15 @@
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
 
-char* _mr_raise_format = "Error raised in %s:%d %s()\n";
-char* _mr_assert_format = "Assert failed in %s:%d %s()\n";
-char* _mr_traceline_format = "  called from %s:%d %s()\n";
-FILE* _trace_stream = NULL;
+char* MR_raise_format = "Error raised in %s:%d %s()\n";
+char* MR_assert_format = "Assert failed in %s:%d %s()\n";
+char* MR_traceline_format = "  called from %s:%d %s()\n";
+FILE* MR_trace_stream = NULL;
 
-void _trace_print(
+void MR_trace_print(
     char const* format, char const* filename, int line, char const* funcname) {
-  if (_trace_stream != NULL) {
-    fprintf(_trace_stream, format, filename, line, funcname);
+  if (MR_trace_stream != NULL) {
+    fprintf(MR_trace_stream, format, filename, line, funcname);
   }
 }
 
@@ -28,14 +28,14 @@ int cstring_length(char* cstring, int max_length) {
 }
 
 /*main*/
-Returncode _mr_user_main();
+Returncode MR_user_main();
 
-int _mr_main(int argc, char* argv[]) {
+int MR_main(int argc, char* argv[]) {
   String* args_strings;
   Array sys_argv;
   int arg;
   Returncode err;
-  _trace_stream = stderr;
+  MR_trace_stream = stderr;
   args_strings = malloc(argc * sizeof(String));
   if (args_strings == NULL) {
     fprintf(stderr, "insufficient memory\n");
@@ -50,7 +50,7 @@ int _mr_main(int argc, char* argv[]) {
     args_strings[arg].max_length = args_strings[arg].length;
     args_strings[arg].values[args_strings[arg].length] = '\0';
   }
-  err = _mr_user_main();
+  err = MR_user_main();
   if (err != OK) {
     fprintf(stderr, "  called from executable start\n");
   }
@@ -58,11 +58,11 @@ int _mr_main(int argc, char* argv[]) {
 }
 
 /*tests*/
-int _mr_test_main(int argc, char* argv[]) {
+int MR_test_main(int argc, char* argv[]) {
   Returncode err;
-  _trace_stream = stderr;
+  MR_trace_stream = stderr;
   printf("Running tests:\n");
-  err = _mr_user_main();
+  err = MR_user_main();
   if (err == OK) {
     printf("Tests passed\n");
   }
@@ -73,13 +73,13 @@ int _mr_test_main(int argc, char* argv[]) {
   return OK;
 }
 
-Bool _run_test(char* test_name, Func test_func) {
+Bool MR_run_test(char* test_name, Func test_func) {
   Returncode err;
   printf("testing %s... ", test_name);
   fflush(stdout);
-  _trace_stream = stdout;
+  MR_trace_stream = stdout;
   err = test_func();
-  _trace_stream = stderr;
+  MR_trace_stream = stderr;
   if (err == OK) {
     printf("OK\n");
     return true;
@@ -88,7 +88,7 @@ Bool _run_test(char* test_name, Func test_func) {
 }
 
 /*helpers*/
-Returncode _set_cstring(String* str) {
+Returncode set_cstring(String* str) {
   if (str->length >= str->max_length) {
     if (cstring_length(str->values, str->max_length) >= str->max_length) {
       CRAISE
@@ -101,7 +101,7 @@ Returncode _set_cstring(String* str) {
 }
 
 /*allocations*/
-String* _new_string(int length) {
+String* MR_new_string(int length) {
   void* buff;
   String* str;
   buff = malloc(sizeof(String) + length);
@@ -115,7 +115,7 @@ String* _new_string(int length) {
   return str;
 }
 
-Array* _new_array(int length, int value_size) {
+Array* MR_new_array(int length, int value_size) {
   void* buff;
   Array* arr;
   buff = calloc(1, sizeof(Array) + length * value_size);
@@ -128,7 +128,7 @@ Array* _new_array(int length, int value_size) {
   return arr;
 }
 
-void _set_var_string_array(
+void MR_set_var_string_array(
     int array_length, int string_length, Array* array, char* chars) {
   int n;
   for (n = 0; n < array_length; ++n) {
@@ -140,17 +140,7 @@ void _set_var_string_array(
   }
 }
 
-Array* _get_recursive_array(
-    Array* parent, int parent_index, int length, int value_size) {
-  Array* arr;
-  arr = (Array*)(((Byte*)(parent->values)) + parent_index *
-      (sizeof(Array) + length * (value_size)));
-  arr->length = length;
-  arr->values = ((Byte*)arr) + sizeof(Array);
-  return arr;
-}
-
-void _set_new_string_array(int array_length, int string_length, Array* array) {
+void MR_set_new_string_array(int array_length, int string_length, Array* array) {
   int n;
   for (n = 0; n < array_length; ++n) {
     String* str;
@@ -163,8 +153,8 @@ void _set_new_string_array(int array_length, int string_length, Array* array) {
 }
 
 /*Files*/
-Returncode _open_file(File** file, String* name, char* mode) {
-  CCHECK(_set_cstring(name));
+Returncode open_file(File** file, String* name, char* mode) {
+  CCHECK(set_cstring(name));
   *file = NULL;
   *file = fopen(name->values, mode);
   if (*file == NULL) {
@@ -174,11 +164,11 @@ Returncode _open_file(File** file, String* name, char* mode) {
 }
 
 Returncode file_open_read(String* name, File** file) {
-  return _open_file(file, name, "r");
+  return open_file(file, name, "r");
 }
 
 Returncode file_open_write(String* name, File** file) {
-  return _open_file(file, name, "w");
+  return open_file(file, name, "w");
 }
 
 Returncode File_close(File* file) {
@@ -372,7 +362,7 @@ Returncode Sys_exit(Sys* _, Int status) {
 
 Returncode Sys_system(Sys* _, String* command, Int* status) {
   int res;
-  CCHECK(_set_cstring(command));
+  CCHECK(set_cstring(command));
   res = system(command->values);
   if (res == -1) {
     CRAISE
@@ -383,7 +373,7 @@ Returncode Sys_system(Sys* _, String* command, Int* status) {
 
 Returncode Sys_getenv(Sys* _, String* name, String* value, Bool* exists) {
   char* ret;
-  CCHECK(_set_cstring(name));
+  CCHECK(set_cstring(name));
   ret = getenv(name->values);
   if (ret == NULL) {
     *exists = false;

@@ -130,7 +130,9 @@ class StringExpression(TextExpression)
       self.m-syntax-error(user "illegal string constant", user text)
     self.set-simple-type(user glob.type-string)
     self.text := text
-    self.add-aux-variable(copy ACCESS-VAR):(owner self.symbol)
+  
+  func dynamic analyze()
+    self.add-aux-variable(copy ACCESS-AUX):(owner self.symbol)
   
   func dynamic write-preactions()
     # `symbol`.max_length = `string-length + 1`;

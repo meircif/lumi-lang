@@ -48,7 +48,7 @@ class SliceExpression(Expression)
       self.second-index.analyze()
       self.m-check-index(user self.second-index)
       self.sequence.result-type.m-copy-new():(owner self.result-type)
-      self.add-aux-variable(copy ACCESS-VAR):(owner self.slice-symbol)
+      self.add-aux-variable(copy ACCESS-AUX):(owner self.slice-symbol)
   
   func inst m-check-index(user Expression index)
     if ? index.result-type.type-data

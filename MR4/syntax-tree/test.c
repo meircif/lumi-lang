@@ -55,7 +55,7 @@ Returncode SyntaxTreeAssert_analyze(SyntaxTreeAssert* self);
 static char* _func_name_SyntaxTreeAssert_analyze = "SyntaxTreeAssert.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeAssert_analyze
 Returncode SyntaxTreeAssert_analyze(SyntaxTreeAssert* self) {
-  CHECK(19, SyntaxTreeCode_analyze_expression(&(self->_base), self->tested, glob->type_bool) )
+  CHECK(19, SyntaxTreeNode_analyze_expression(&(self->_base._base), self->tested, glob->type_bool) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -25,6 +25,28 @@ user String global-string
 func test-simple-function()
   # sys.print(user "I am test func")
 
+
+func test-variable(copy Int i, user String text, user Array{Int} arr)
+  var Int x
+  user String s
+  owner Array{Int} a
+  user TestStruct t
+  var TestStruct tv
+  var String{12} sv
+  var Array{12:Int} ia
+  var Array{12:TestStruct} ta
+  var Array{12:String{7}} sa
+  new TestStruct tn
+  new String{arr[0]} sn
+  new Array{arr[0]:Int} ian
+  new Array{arr[0]:TestStruct} tan
+  new Array{arr[0]:String{arr[1]}} san
+  var Int ix(arr[0])
+  user String is(text)
+  var String{12} isv("some string")
+  new String{i} isn(text)
+
+
 func test-complex-function(
     copy Int num, user String text)->(copy Int out-num, user String out-text)
   {# Test

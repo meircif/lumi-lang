@@ -91,7 +91,7 @@ Returncode SliceExpression_analyze(SliceExpression* self) {
     CHECK(48, (self->second_index)->_base._dtl[0](self->second_index) )
     CHECK(49, SliceExpression_m_check_index(self, self->second_index) )
     CHECK(50, TypeInstance_m_copy_new(self->sequence->result_type, &(self->_base.result_type)) )
-    CHECK(51, Expression_add_aux_variable(&(self->_base), ACCESS_VAR, &(self->slice_symbol)) )
+    CHECK(51, Expression_add_aux_variable(&(self->_base), ACCESS_AUX, &(self->slice_symbol)) )
   }
   return OK;
 }

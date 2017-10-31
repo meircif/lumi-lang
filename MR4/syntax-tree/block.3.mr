@@ -11,19 +11,6 @@ class SyntaxTreeCode(SyntaxTreeNode)
   func inst m-get-parent-type():(user TypeData parent-type)
     self.parent.m-get-parent-type():(user parent-type)
   
-  func inst analyze-expression(
-      user Expression expression, user TypeData expected-type)
-    expression.analyze()
-    if not (? expression.result-type)
-      self.m-syntax-error(
-          user "got void expression, expected", user expected-type.name)
-    if expression.result-type.type-data != expected-type
-      self.m-syntax-error2(
-          user "got",
-          user expression.result-type.type-data.name,
-          user "expression, expected",
-          user expected-type.name)
-  
   func inst write-spaces()
     self.parent.write-spaces()
   

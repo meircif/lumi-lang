@@ -112,6 +112,8 @@ String* global_string;
 
 Returncode test_simple_function(void);
 
+Returncode test_variable(Int i, String* text, Array* arr);
+
 Returncode test_complex_function(Int num, String* text, Int* out_num, String** out_text);
 
 
@@ -181,6 +183,68 @@ Returncode TopType_meth6(TopType* self) {
 /* global functions body */
 
 Returncode test_simple_function(void) {
+  return OK;
+}
+
+Returncode test_variable(Int i, String* text, Array* arr) {
+  Int x = 0;
+  String* s = NULL;
+  Array* a = NULL;
+  TestStruct* t = NULL;
+  TestStruct tv_Var = {0};
+  TestStruct* tv = &tv_Var;
+  char sv_Values[12];
+  String sv_Var = {12, 0, NULL};
+  String* sv = &sv_Var;
+  Int ia_Values[12];
+  Array ia_Var = {12, NULL};
+  Array* ia = &ia_Var;
+  TestStruct ta_Values[12];
+  Array ta_Var = {12, NULL};
+  Array* ta = &ta_Var;
+  char sa_Chars[12 * 7];
+  String sa_Values[12];
+  Array sa_Var = {12, NULL};
+  Array* sa = &sa_Var;
+  TestStruct* tn = NULL;
+  String* sn = NULL;
+  Array* ian = NULL;
+  Array* tan = NULL;
+  Array* san = NULL;
+  Int ix = 0;
+  String* is = NULL;
+  char isv_Values[12];
+  String isv_Var = {12, 0, NULL};
+  String* isv = &isv_Var;
+  String* isn = NULL;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  sv_Var.values = sv_Values;
+  ia_Var.values = ia_Values;
+  ta_Var.values = ta_Values;
+  sa_Var.values = sa_Values;
+  MR_set_var_string_array(12, 7, sa, sa_Chars);
+  tn = calloc(1, sizeof(TestStruct));
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(39)
+  sn = MR_new_string((((Int*)((arr)->values))[0]));
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(40)
+  ian = MR_new_array((((Int*)((arr)->values))[0]), sizeof(Int));
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(41)
+  tan = MR_new_array((((Int*)((arr)->values))[0]), sizeof(TestStruct));
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(42)
+  if ((1) < 0 || (1) >= (arr)->length) RAISE(42)
+  san = MR_new_array((((Int*)((arr)->values))[0]), sizeof(String) + ((((Int*)((arr)->values))[1])));
+  MR_set_new_string_array((((Int*)((arr)->values))[0]), (((Int*)((arr)->values))[1]), san);
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(43)
+  ix = (((Int*)((arr)->values))[0]);
+  is = text;
+  isv_Var.values = isv_Values;
+  aux_String_0->max_length = 12;
+  aux_String_0->length = 11;
+  aux_String_0->values = "some string";
+  CHECK(45, String_copy(isv, aux_String_0) )
+  isn = MR_new_string(i);
+  CHECK(46, String_copy(isn, text) )
   return OK;
 }
 

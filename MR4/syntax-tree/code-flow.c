@@ -174,7 +174,7 @@ Returncode SyntaxTreeIf_analyze(SyntaxTreeIf* self);
 static char* _func_name_SyntaxTreeIf_analyze = "SyntaxTreeIf.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_analyze
 Returncode SyntaxTreeIf_analyze(SyntaxTreeIf* self) {
-  CHECK(60, SyntaxTreeCode_analyze_expression(&(self->_base._base), self->condition, glob->type_bool) )
+  CHECK(60, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->condition, glob->type_bool) )
   CHECK(61, SyntaxTreeFlowElement_analyze(&(self->_base)) )
   if (NULL != self->else_node) {
     CHECK(63, (self->else_node)->_base._base._base._dtl[0](self->else_node) )
@@ -366,9 +366,9 @@ static char* _func_name_SyntaxTreeForLoop_analyze = "SyntaxTreeForLoop.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_analyze
 Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self) {
   if (NULL != self->start) {
-    CHECK(144, SyntaxTreeCode_analyze_expression(&(self->_base._base), self->start, glob->type_int) )
+    CHECK(144, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->start, glob->type_int) )
   }
-  CHECK(145, SyntaxTreeCode_analyze_expression(&(self->_base._base), self->upper_bound, glob->type_int) )
+  CHECK(145, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->upper_bound, glob->type_int) )
   CHECK(146, SyntaxTreeFlowElement_analyze(&(self->_base)) )
   return OK;
 }

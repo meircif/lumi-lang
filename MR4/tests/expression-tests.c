@@ -18,11 +18,11 @@ static char* _func_name_test_code = "test-code";
 #define MR_FUNC_NAME _func_name_test_code
 Returncode test_code(String* input_text, String* expected_output) {
   CHECK(4, f_setup_test() )
-  CHECK(5, set_mock_file_text(&(String){89, 88, "func mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr)\n  "}) )
+  CHECK(5, set_mock_file_text(&(String){115, 114, "struct Test\n  var Int num\nfunc mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr)\n  "}) )
   CHECK(7, String_concat(mock_input_file_text, input_text) )
   CHECK(8, String_append(mock_input_file_text, '\n') )
   CHECK(9, write_syntax_tree() )
-  String* expected_header = &(String){135, 134, "\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr) {\n  "};
+  String* expected_header = &(String){189, 188, "\ntypedef struct Test Test;\nstruct Test {\n  Int num;\n};\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr) {\n  "};
   String* expected_footer = &(String){17, 16, "\n  return OK;\n}\n"};
   CHECK(12, f_assert_string_slice(expected_header, mock_output_file_text, 0, expected_header->length) )
   CHECK(17, f_assert_string_slice(expected_output, mock_output_file_text, expected_header->length, mock_output_file_text->length - expected_header->length - expected_footer->length) )
@@ -126,7 +126,7 @@ Returncode test_string_expression();
 static char* _func_name_test_string_expression = "test-string-expression";
 #define MR_FUNC_NAME _func_name_test_string_expression
 Returncode test_string_expression() {
-  CHECK(96, test_code(&(String){21, 20, "str := \"some string\""}, &(String){193, 192, "String aux_String_0_Var;\n  String* aux_String_0 = &aux_String_0_Var;\n  aux_String_0->max_length = 12;\n  aux_String_0->length = 11;\n  aux_String_0->values = \"some string\";\n  str = aux_String_0;"}) )
+  CHECK(96, test_code(&(String){21, 20, "str := \"some string\""}, &(String){199, 198, "String aux_String_0_Var = {0};\n  String* aux_String_0 = &aux_String_0_Var;\n  aux_String_0->max_length = 12;\n  aux_String_0->length = 11;\n  aux_String_0->values = \"some string\";\n  str = aux_String_0;"}) )
   CHECK(99, test_code_error(&(String){5, 4, "\"aaa"}, &(String){31, 30, "illegal string constant \"\"aaa\""}) )
   return OK;
 }
@@ -166,8 +166,8 @@ Returncode test_slice_expression();
 static char* _func_name_test_slice_expression = "test-slice-expression";
 #define MR_FUNC_NAME _func_name_test_slice_expression
 Returncode test_slice_expression() {
-  CHECK(120, test_code(&(String){13, 12, "i := arr[13]"}, &(String){85, 84, "if ((13) < 0 || (13) >= (arr)->length) RAISE(1)\n  i = (((Int*)((arr)->values))[13]);"}) )
-  CHECK(123, test_code(&(String){16, 15, "arr := arr[2:6]"}, &(String){219, 218, "Array aux_Array_0_Var;\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0.length = 6;\n  aux_Array_0.values = (arr)->values + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)\n  arr = aux_Array_0;"}) )
+  CHECK(120, test_code(&(String){13, 12, "i := arr[13]"}, &(String){85, 84, "if ((13) < 0 || (13) >= (arr)->length) RAISE(3)\n  i = (((Int*)((arr)->values))[13]);"}) )
+  CHECK(123, test_code(&(String){16, 15, "arr := arr[2:6]"}, &(String){225, 224, "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0.length = 6;\n  aux_Array_0.values = (arr)->values + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(3)\n  arr = aux_Array_0;"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

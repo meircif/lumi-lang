@@ -71,9 +71,9 @@ Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end);
 static char* _func_name_TypeData_parse_child = "TypeData.parse-child";
 #define MR_FUNC_NAME _func_name_TypeData_parse_child
 Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end) {
-  Bool _Bool98;
-  CHECK(33, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool98)) )
-  if (!_Bool98) {
+  Bool _Bool99;
+  CHECK(33, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool99)) )
+  if (!_Bool99) {
     CHECK(34, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){16, 15, "unknown keyword"}, keyword) )
   }
   return OK;
@@ -88,7 +88,7 @@ static char* _func_name_TypeData_m_new_type_instance = "TypeData.m-new-type-inst
 Returncode TypeData_m_new_type_instance(TypeData* self, TypeInstance** type_instance) {
   (*type_instance) = malloc(sizeof(TypeInstance));
   if ((*type_instance) == NULL) RAISE(37)
-  *(*type_instance) = (TypeInstance){NULL, NULL, NULL, NULL};
+  *(*type_instance) = (TypeInstance){NULL, NULL, NULL, NULL, NULL};
   (*type_instance)->type_data = self;
   return OK;
 }
@@ -106,9 +106,9 @@ Returncode TypeData_m_find_field(TypeData* self, String* name, SyntaxTreeVariabl
     ListNode* child = type_data->_base._base.variables->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool99;
-      CHECK(47, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool99)) )
-      if (_Bool99) {
+      Bool _Bool100;
+      CHECK(47, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool100)) )
+      if (_Bool100) {
         (*field) = ((SyntaxTreeVariable*)(child->item));
         return OK;
       }
@@ -133,9 +133,9 @@ Returncode TypeData_m_find_meth(TypeData* self, String* name, SyntaxTreeFunction
     ListNode* child = type_data->_base.functions->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool100;
-      CHECK(61, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool100)) )
-      if (_Bool100) {
+      Bool _Bool101;
+      CHECK(61, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool101)) )
+      if (_Bool101) {
         (*method) = ((SyntaxTreeFunction*)(child->item));
         return OK;
       }
@@ -476,6 +476,7 @@ struct TypeInstance {
   String* name;
   TypeData* type_data;
   TypeInstance* sub_type;
+  Expression* length;
   FunctionArguments* arguments;
 /* Return a new deep-copy of self */};
 #endif/* Return a new deep-copy of self */
@@ -489,50 +490,69 @@ Returncode TypeInstance_m_copy_new(TypeInstance* self, TypeInstance** type_insta
     (*type_instance) = NULL;
     return OK;
   }
-  CHECK(213, TypeData_m_new_type_instance(self->type_data, &((*type_instance))) )
-  CHECK(214, string_new_copy(self->name, &((*type_instance)->name)) )
+  CHECK(214, TypeData_m_new_type_instance(self->type_data, &((*type_instance))) )
+  CHECK(215, string_new_copy(self->name, &((*type_instance)->name)) )
   if (NULL != self->sub_type) {
-    CHECK(216, TypeInstance_m_copy_new(self->sub_type, &((*type_instance)->sub_type)) )
+    CHECK(217, TypeInstance_m_copy_new(self->sub_type, &((*type_instance)->sub_type)) )
   }
   if (NULL != self->arguments) {
-    FunctionArguments* _FunctionArguments101;
-    CHECK(218, FunctionArguments_m_copy_new(self->arguments, &(_FunctionArguments101)) )
+    FunctionArguments* _FunctionArguments102;
+    CHECK(219, FunctionArguments_m_copy_new(self->arguments, &(_FunctionArguments102)) )
   }
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* node, Char* end);
+Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* node, SyntaxTreeVariable* var_node, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_TypeInstance_parse = "TypeInstance.parse";
 #define MR_FUNC_NAME _func_name_TypeInstance_parse
-Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* node, Char* end) {
-  String* _String102;
-  CHECK(221, string_new_concat(ends, &(String){2, 1, "{"}, &(_String102)) )
-  CHECK(221, read_new(_String102, &(self->name), &((*end))) )
+Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* node, SyntaxTreeVariable* var_node, Char* end) {
+  String* _String103;
+  CHECK(226, string_new_concat(ends, &(String){2, 1, "{"}, &(_String103)) )
+  CHECK(226, read_new(_String103, &(self->name), &((*end))) )
   if ((*end) == '{') {
-    Bool _Bool103;
-    CHECK(224, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool103)) )
-    if (_Bool103) {
+    Bool _Bool104;
+    CHECK(229, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool104)) )
+    if (_Bool104) {
       self->arguments = malloc(sizeof(FunctionArguments));
-      if (self->arguments == NULL) RAISE(225)
+      if (self->arguments == NULL) RAISE(230)
       *self->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
       self->arguments->_base._dtl = FunctionArguments__dtl;
       ArgumentFactory* argument_factory = &(ArgumentFactory){ArgumentFactory__dtl};
       argument_factory->_dtl = ArgumentFactory__dtl;
-      CHECK(227, FunctionArguments_parse(self->arguments, argument_factory, NULL, NULL, &((*end))) )
+      CHECK(232, FunctionArguments_parse(self->arguments, argument_factory, NULL, NULL, &((*end))) )
     }
     else {
-      self->sub_type = malloc(sizeof(TypeInstance));
-      if (self->sub_type == NULL) RAISE(229)
-      *self->sub_type = (TypeInstance){NULL, NULL, NULL, NULL};
-      CHECK(230, TypeInstance_parse(self->sub_type, &(String){2, 1, "}"}, node, &((*end))) )
+      Bool _Bool105;
+      CHECK(233, String_equal(self->name, &(String){7, 6, "String"}, &(_Bool105)) )
+      if (NULL != var_node && _Bool105) {
+        CHECK(234, parse_new_expression(&(String){2, 1, "}"}, &(var_node->_base), &(self->length), &((*end))) )
+      }
+      else {
+        Bool has_sub_type = true;
+        Bool _Bool106;
+        CHECK(238, String_equal(self->name, &(String){6, 5, "Array"}, &(_Bool106)) )
+        if (NULL != var_node && _Bool106) {
+          CHECK(239, parse_new_expression(&(String){3, 2, ":}"}, &(var_node->_base), &(self->length), &((*end))) )
+          if ((*end) != ':' && (*end) != '}') {
+            CHECK(242, SyntaxTreeNode_m_syntax_error_c(node, &(String){18, 17, "expected \":\", got"}, (*end)) )
+          }
+          has_sub_type = (*end) == ':';
+        }
+        if (has_sub_type) {
+          self->sub_type = malloc(sizeof(TypeInstance));
+          if (self->sub_type == NULL) RAISE(245)
+          *self->sub_type = (TypeInstance){NULL, NULL, NULL, NULL, NULL};
+          CHECK(246, TypeInstance_parse(self->sub_type, &(String){2, 1, "}"}, node, var_node, &((*end))) )
+        }
+      }
     }
     if ((*end) != '}') {
-      CHECK(232, SyntaxTreeNode_m_syntax_error_c(node, &(String){19, 18, "expected \"}\", got "}, (*end)) )
+      CHECK(248, SyntaxTreeNode_m_syntax_error_c(node, &(String){18, 17, "expected \"}\", got"}, (*end)) )
     }
-    CHECK(233, read_c(&((*end))) )
+    CHECK(249, read_c(&((*end))) )
   }
   return OK;
 }
@@ -545,10 +565,13 @@ static char* _func_name_TypeInstance_analyze = "TypeInstance.analyze";
 #define MR_FUNC_NAME _func_name_TypeInstance_analyze
 Returncode TypeInstance_analyze(TypeInstance* self, SyntaxTreeNode* node) {
   if (!(NULL != self->type_data)) {
-    CHECK(237, SyntaxTreeNode_m_find_type(node, self->name, &(self->type_data)) )
+    CHECK(253, SyntaxTreeNode_m_find_type(node, self->name, &(self->type_data)) )
+  }
+  if (NULL != self->length) {
+    CHECK(255, SyntaxTreeNode_analyze_expression(node, self->length, glob->type_int) )
   }
   if (NULL != self->sub_type) {
-    CHECK(239, TypeInstance_analyze(self->sub_type, node) )
+    CHECK(257, TypeInstance_analyze(self->sub_type, node) )
   }
   return OK;
 }
@@ -561,10 +584,10 @@ static char* _func_name_TypeInstance_m_check_assign_to = "TypeInstance.m-check-a
 #define MR_FUNC_NAME _func_name_TypeInstance_m_check_assign_to
 Returncode TypeInstance_m_check_assign_to(TypeInstance* self, TypeInstance* target, SyntaxTreeNode* node) {
   if (!(NULL != self->type_data)) {
-    CHECK(244, SyntaxTreeNode_m_syntax_error_msg(node, &(String){30, 29, "cannot assign void expression"}) )
+    CHECK(262, SyntaxTreeNode_m_syntax_error_msg(node, &(String){30, 29, "cannot assign void expression"}) )
   }
   if (!(NULL != target->type_data)) {
-    CHECK(246, SyntaxTreeNode_m_syntax_error_msg(node, &(String){35, 34, "cannot assign into void expression"}) )
+    CHECK(264, SyntaxTreeNode_m_syntax_error_msg(node, &(String){35, 34, "cannot assign into void expression"}) )
   }
   if (self->type_data == glob->type_empty &&  ! target->type_data->is_primitive) {
     return OK;
@@ -573,12 +596,12 @@ Returncode TypeInstance_m_check_assign_to(TypeInstance* self, TypeInstance* targ
   while (true) {
     if (!(base_type != target->type_data)) break;
     if (!(NULL != base_type->base_type)) {
-      CHECK(253, SyntaxTreeNode_m_syntax_error2(node, &(String){14, 13, "cannot assign"}, self->type_data->name, &(String){5, 4, "into"}, target->type_data->name) )
+      CHECK(271, SyntaxTreeNode_m_syntax_error2(node, &(String){14, 13, "cannot assign"}, self->type_data->name, &(String){5, 4, "into"}, target->type_data->name) )
     }
     base_type = base_type->base_type;
   }
   
-  CHECK(260, TypeInstance_m_check_sub_equal(self, target, node) )
+  CHECK(278, TypeInstance_m_check_sub_equal(self, target, node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -592,17 +615,17 @@ Returncode TypeInstance_m_check_sub_equal(TypeInstance* self, TypeInstance* othe
   if (NULL != self->sub_type &&  NULL !=  self->sub_type->type_data) {
     if (NULL != other->sub_type &&  NULL !=  other->sub_type->type_data) {
       if (self->type_data != other->type_data) {
-        CHECK(266, SyntaxTreeNode_m_syntax_error2(node, &(String){22, 21, "cannot assign subtype"}, self->sub_type->type_data->name, &(String){13, 12, "into subtype"}, other->sub_type->type_data->name) )
+        CHECK(284, SyntaxTreeNode_m_syntax_error2(node, &(String){22, 21, "cannot assign subtype"}, self->sub_type->type_data->name, &(String){13, 12, "into subtype"}, other->sub_type->type_data->name) )
       }
-      CHECK(271, TypeInstance_m_check_sub_equal(self->sub_type, other->sub_type, node) )
+      CHECK(289, TypeInstance_m_check_sub_equal(self->sub_type, other->sub_type, node) )
     }
     else {
-      CHECK(273, SyntaxTreeNode_m_syntax_error2(node, &(String){22, 21, "cannot assign subtype"}, self->sub_type->type_data->name, &(String){26, 25, "into type with no subtype"}, other->type_data->name) )
+      CHECK(291, SyntaxTreeNode_m_syntax_error2(node, &(String){22, 21, "cannot assign subtype"}, self->sub_type->type_data->name, &(String){26, 25, "into type with no subtype"}, other->type_data->name) )
     }
   }
   else {
     if (NULL != other->sub_type &&  NULL !=  other->sub_type->type_data) {
-      CHECK(279, SyntaxTreeNode_m_syntax_error2(node, &(String){35, 34, "cannot assign type with no subtype"}, self->type_data->name, &(String){13, 12, "into subtype"}, other->sub_type->type_data->name) )
+      CHECK(297, SyntaxTreeNode_m_syntax_error2(node, &(String){35, 34, "cannot assign type with no subtype"}, self->type_data->name, &(String){13, 12, "into subtype"}, other->sub_type->type_data->name) )
     }
   }
   return OK;
@@ -615,11 +638,11 @@ Returncode TypeInstance_write(TypeInstance* self);
 static char* _func_name_TypeInstance_write = "TypeInstance.write";
 #define MR_FUNC_NAME _func_name_TypeInstance_write
 Returncode TypeInstance_write(TypeInstance* self) {
-  CHECK(286, write(self->type_data->name) )
+  CHECK(304, write(self->type_data->name) )
   if (NULL != self->sub_type) {
-    CHECK(288, write(&(String){2, 1, "{"}) )
-    CHECK(289, TypeInstance_write(self->sub_type) )
-    CHECK(290, write(&(String){2, 1, "}"}) )
+    CHECK(306, write(&(String){2, 1, "{"}) )
+    CHECK(307, TypeInstance_write(self->sub_type) )
+    CHECK(308, write(&(String){2, 1, "}"}) )
   }
   return OK;
 }

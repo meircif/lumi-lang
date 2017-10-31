@@ -66,9 +66,7 @@ class CallExpression(Expression)
       raise
   
   func inst write-call()
-    write(user "CHECK(")
-    self.write-line-num()
-    write(user ", ")
+    self.write-call()
     self.function.write()
     self.arguments.write(copy false)
     write(user " )")

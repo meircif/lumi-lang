@@ -3,11 +3,11 @@
 func test-code(user String input-text, user String expected-output)
   f-setup-test()
   set-mock-file-text(
-      user "func mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr)\n  ")
+      user "struct Test\n  var Int num\nfunc mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr)\n  ")
   mock-input-file-text.concat(user input-text)
   mock-input-file-text.append(copy '\n')
   write-syntax-tree()
-  user String expected-header("\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr) {\n  ")
+  user String expected-header("\ntypedef struct Test Test;\nstruct Test {\n  Int num;\n};\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr) {\n  ")
   user String expected-footer("\n  return OK;\n}\n")
   f-assert-string-slice(
       user expected-header,
@@ -95,7 +95,7 @@ test test-char-expression()
 test test-string-expression()
   test-code(
       user "str := \"some string\"",
-      user "String aux_String_0_Var;\n  String* aux_String_0 = &aux_String_0_Var;\n  aux_String_0->max_length = 12;\n  aux_String_0->length = 11;\n  aux_String_0->values = \"some string\";\n  str = aux_String_0;")
+      user "String aux_String_0_Var = {0};\n  String* aux_String_0 = &aux_String_0_Var;\n  aux_String_0->max_length = 12;\n  aux_String_0->length = 11;\n  aux_String_0->values = \"some string\";\n  str = aux_String_0;")
   test-code-error(user "\"aaa", user "illegal string constant \"\"aaa\"")
 
 
@@ -119,10 +119,10 @@ test test-empty-expression()
 test test-slice-expression()
   test-code(
       user "i := arr[13]",
-      user "if ((13) < 0 || (13) >= (arr)->length) RAISE(1)\n  i = (((Int*)((arr)->values))[13]);")
+      user "if ((13) < 0 || (13) >= (arr)->length) RAISE(3)\n  i = (((Int*)((arr)->values))[13]);")
   test-code(
       user "arr := arr[2:6]",
-      user "Array aux_Array_0_Var;\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0.length = 6;\n  aux_Array_0.values = (arr)->values + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)\n  arr = aux_Array_0;")
+      user "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0.length = 6;\n  aux_Array_0.values = (arr)->values + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(3)\n  arr = aux_Array_0;")
 
 
 # test test-call-expression()
