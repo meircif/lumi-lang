@@ -3,11 +3,11 @@
 func test-code(user String input-text, user String expected-output)
   f-setup-test()
   set-mock-file-text(
-      user "struct Test\n  var Int num\nfunc mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr)\n  ")
+      user "struct Test\n  var Int num\nfunc mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr, user Test t)\n  ")
   mock-input-file-text.concat(user input-text)
   mock-input-file-text.append(copy '\n')
   write-syntax-tree()
-  user String expected-header("\ntypedef struct Test Test;\nstruct Test {\n  Int num;\n};\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr) {\n  ")
+  user String expected-header("\ntypedef struct Test Test;\nstruct Test {\n  Int num;\n};\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr, Test* t);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr, Test* t) {\n  ")
   user String expected-footer("\n  return OK;\n}\n")
   f-assert-string-slice(
       user expected-header,
@@ -29,7 +29,7 @@ func test-code(user String input-text, user String expected-output)
 
 func test-code-error(user String input-text, user String expected-error)
   f-setup-test()
-  set-mock-file-text(user "func mock()\n  ")
+  set-mock-file-text(user "func mock(copy Int i)\n  ")
   mock-input-file-text.concat(user input-text)
   mock-input-file-text.append(copy '\n')
   mock-print-active := true
@@ -101,19 +101,12 @@ test test-string-expression()
 
 test test-empty-expression()
   test-code(user "str := _", user "str = NULL;")
+  test-code(user "t := _", user "t = NULL;")
+  test-code-error(user "i := _", user "cannot assign \"Empty\" into \"Int\"")
 
 
-# test test-base-expression()
-  # test-code(user "base", user "Base")
-
-
-# test test-type-expression()
-  # test-code(user "TypeName", user "TypeName")
-
-
-# test test-member-expression()
-  # test-code(user "str.length", user "str->length;")
-  # test-code(user "str.length.str", user "str->length->str;")
+test test-member-expression()
+  test-code(user "i := t.num", user "i = t->num;")
 
 
 test test-slice-expression()
@@ -153,6 +146,36 @@ test test-slice-expression()
       # user "function(copy 2", user "expected \",\" or \")\", got \"EOF\"")
   # test-code-error(
       # user "function(error 4)", user "illegal access \"error\"")
+
+
+test test-type-expression()
+  test-global-scope(
+      user "struct Test\n  var Int x\n  func meth()\nfunc mock(user Test t)\n  Test.meth(var t)",
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_meth(Test* self);\nReturncode mock(Test* t);\nReturncode Test_meth(Test* self) {\n  return OK;\n}\nReturncode mock(Test* t) {\n  CHECK(4, Test_meth(t) )\n  return OK;\n}")
+
+
+test test-base-expression()
+  var String{1024} expected
+  expected.copy(user "typedef struct Base Base;\n")
+  expected.concat(user "typedef struct Test Test;\n")
+  expected.concat(user "struct Base {\n")
+  expected.concat(user "  Int x;\n")
+  expected.concat(user "};\n")
+  expected.concat(user "struct Test {\n")
+  expected.concat(user "  Base _base;\n")
+  expected.concat(user "};\n")
+  expected.concat(user "Returncode Base_meth(Base* self);\n")
+  expected.concat(user "Returncode Test_meth(Test* self);\n")
+  expected.concat(user "Returncode Base_meth(Base* self) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode Test_meth(Test* self) {\n")
+  expected.concat(user "  CHECK(5, Base_meth((&(self->_base))) )\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}")
+  test-global-scope(
+      user "struct Base\n  var Int x\n  func meth()\nstruct Test(Base)\n  func meth()\n    base.meth()",
+      user expected)
 
 
 test test-block-expression()

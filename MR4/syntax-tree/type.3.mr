@@ -216,7 +216,7 @@ static TypeInstance
     if ? self.sub-type
       self.sub-type.m-copy-new():(owner type-instance.sub-type)
     if ? self.arguments
-      self.arguments.m-copy-new():(type-instance.arguments)
+      self.arguments.m-copy-new():(owner type-instance.arguments)
   
   func inst parse(
       user String ends,
@@ -249,12 +249,22 @@ static TypeInstance
       read-c():(copy end)
   
   func inst analyze(user SyntaxTreeNode node)
-    if not (? self.type-data)
+    self.analyze-part(user node, copy true, copy true)
+  
+  func inst m-link-types(user SyntaxTreeNode node)
+    self.analyze-part(user node, copy true, copy false)
+  
+  func inst analyze-lengths(user SyntaxTreeNode node)
+    self.analyze-part(user node, copy false, copy true)
+  
+  func inst analyze-part(
+      user SyntaxTreeNode node, copy Bool check-types, copy Bool check-length)
+    if check-types and not (? self.type-data)
       node.m-find-type(user self.name):(user self.type-data)
-    if ? self.length
+    if check-length and ? self.length
       node.analyze-expression(user self.length, user glob.type-int)
     if ? self.sub-type
-      self.sub-type.analyze(user node)
+      self.sub-type.analyze-part(user node, copy check-types, copy check-length)
   
   func inst m-check-assign-to(
       user TypeInstance target, user SyntaxTreeNode node)

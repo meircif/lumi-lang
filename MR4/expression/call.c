@@ -64,15 +64,15 @@ Returncode CallExpression_analyze(CallExpression* self);
 static char* _func_name_CallExpression_analyze = "CallExpression.analyze";
 #define MR_FUNC_NAME _func_name_CallExpression_analyze
 Returncode CallExpression_analyze(CallExpression* self) {
-  CHECK(26, (self->function)->_base._dtl[0](self->function) )
-  CHECK(27, FunctionArguments_analyze(self->arguments) )
-  FunctionArguments* declaration = self->function->result_type->arguments;
+  CHECK(26, (self->function)->_base._dtl[1](self->function) )
+  CHECK(27, (self->arguments)->_base._dtl[1](self->arguments) )
   if (!(NULL != self->function->result_type->type_data)) {
-    CHECK(30, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "void expression is not callable"}) )
+    CHECK(29, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "void expression is not callable"}) )
   }
   if (self->function->result_type->type_data != glob->type_func) {
-    CHECK(32, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){18, 17, "non callable type"}, self->function->result_type->type_data->name) )
+    CHECK(31, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){18, 17, "non callable type"}, self->function->result_type->type_data->name) )
   }
+  FunctionArguments* declaration = self->function->result_type->arguments;
   if (!(NULL != declaration)) {
     CHECK(36, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "pointer-to-function not supported"}) )
   }
@@ -81,7 +81,7 @@ Returncode CallExpression_analyze(CallExpression* self) {
     CHECK(38, FunctionArguments_get_result_type(declaration, &(_TypeInstance14)) )
     CHECK(38, TypeInstance_m_copy_new(_TypeInstance14, &(self->_base.result_type)) )
   }
-  CHECK(39, (self->function)->_base._dtl[2](self->function, self->arguments) )
+  CHECK(39, (self->function)->_base._dtl[3](self->function, self->arguments) )
   Bool _Bool15;
   CHECK(40, FunctionArguments_m_check_calling(self->arguments, declaration, &(_Bool15)) )
   if (_Bool15) {
@@ -111,7 +111,7 @@ Returncode CallExpression_write_preactions(CallExpression* self);
 static char* _func_name_CallExpression_write_preactions = "CallExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_CallExpression_write_preactions
 Returncode CallExpression_write_preactions(CallExpression* self) {
-  CHECK(53, (self->function)->_base._dtl[3](self->function) )
+  CHECK(53, (self->function)->_base._dtl[4](self->function) )
   CHECK(54, FunctionArguments_write_preactions(self->arguments) )
   if (!self->_base.is_statement) {
     CHECK(56, CallExpression_write_func_call(self) )
@@ -133,7 +133,7 @@ Returncode CallExpression_write(CallExpression* self) {
   }
   else {
     if (NULL != self->output) {
-      CHECK(64, (self->output)->_base._dtl[1](self->output) )
+      CHECK(64, (self->output)->_base._dtl[2](self->output) )
     }
     else {
       RAISE(66)
@@ -150,7 +150,7 @@ static char* _func_name_CallExpression_write_func_call = "CallExpression.write-f
 #define MR_FUNC_NAME _func_name_CallExpression_write_func_call
 Returncode CallExpression_write_func_call(CallExpression* self) {
   CHECK(69, SyntaxTreeNode_write_call(&(self->_base._base)) )
-  CHECK(70, (self->function)->_base._dtl[1](self->function) )
+  CHECK(70, (self->function)->_base._dtl[2](self->function) )
   CHECK(71, FunctionArguments_write(self->arguments, false) )
   CHECK(72, write(&(String){3, 2, " )"}) )
   return OK;
@@ -161,7 +161,7 @@ Returncode CallExpression_write_func_call(CallExpression* self) {
 extern Func CallExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallExpression__dtl[] = {(void*)CallExpression_analyze, (void*)CallExpression_write, (void*)Expression_analyze_call, (void*)CallExpression_write_preactions};
+Func CallExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)CallExpression_analyze, (void*)CallExpression_write, (void*)Expression_analyze_call, (void*)CallExpression_write_preactions};
 #endif
 
 
@@ -194,7 +194,7 @@ Returncode CallArgument_analyze(CallArgument* self);
 static char* _func_name_CallArgument_analyze = "CallArgument.analyze";
 #define MR_FUNC_NAME _func_name_CallArgument_analyze
 Returncode CallArgument_analyze(CallArgument* self) {
-  CHECK(87, (self->value)->_base._dtl[0](self->value) )
+  CHECK(87, (self->value)->_base._dtl[1](self->value) )
   if (self->_base.is_output &&  ! self->value->assignable) {
     CHECK(89, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){27, 26, "non assignable call output"}) )
   }
@@ -230,7 +230,7 @@ Returncode CallArgument_write_preactions(CallArgument* self);
 static char* _func_name_CallArgument_write_preactions = "CallArgument.write-preactions";
 #define MR_FUNC_NAME _func_name_CallArgument_write_preactions
 Returncode CallArgument_write_preactions(CallArgument* self) {
-  CHECK(98, (self->value)->_base._dtl[3](self->value) )
+  CHECK(98, (self->value)->_base._dtl[4](self->value) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -245,7 +245,7 @@ Returncode CallArgument_write(CallArgument* self) {
   if (self->_base.is_output) {
     CHECK(103, write(&(String){3, 2, "&("}) )
   }
-  CHECK(104, (self->value)->_base._dtl[1](self->value) )
+  CHECK(104, (self->value)->_base._dtl[2](self->value) )
   if (self->_base.is_output) {
     CHECK(106, write(&(String){2, 1, ")"}) )
   }
@@ -257,7 +257,7 @@ Returncode CallArgument_write(CallArgument* self) {
 extern Func CallArgument__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallArgument__dtl[] = {(void*)CallArgument_analyze, (void*)CallArgument_write, (void*)Argument_m_copy_new, (void*)CallArgument_parse_value, (void*)CallArgument_get_type_instance, (void*)Argument_get_variable, (void*)CallArgument_get_output, (void*)CallArgument_write_preactions};
+Func CallArgument__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)CallArgument_analyze, (void*)CallArgument_write, (void*)Argument_m_copy_new, (void*)CallArgument_parse_value, (void*)CallArgument_get_type_instance, (void*)Argument_get_variable, (void*)CallArgument_get_output, (void*)CallArgument_write_preactions};
 #endif
 
 

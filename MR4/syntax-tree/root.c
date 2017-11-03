@@ -163,16 +163,31 @@ Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Cha
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeRoot_m_link_types(SyntaxTreeRoot* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeRoot_m_link_types = "SyntaxTreeRoot.m-link-types";
+#define MR_FUNC_NAME _func_name_SyntaxTreeRoot_m_link_types
+Returncode SyntaxTreeRoot_m_link_types(SyntaxTreeRoot* self) {
+  RAISE(84)
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeRoot_analyze(SyntaxTreeRoot* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeRoot_analyze = "SyntaxTreeRoot.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_analyze
 Returncode SyntaxTreeRoot_analyze(SyntaxTreeRoot* self) {
-  CHECK(84, SyntaxTreeRoot_m_order_types(self) )
-  CHECK(85, SyntaxTreeNamespace_analyze(&(self->_base)) )
-  CHECK(86, SyntaxTreeBranch_analyze_children(&(self->_base._base), self->types) )
+  CHECK(87, SyntaxTreeRoot_m_order_types(self) )
+  CHECK(88, SyntaxTreeNamespace_m_link_types(&(self->_base)) )
+  CHECK(89, SyntaxTreeNode_m_link_children_types(&(self->_base._base._base), self->types) )
   if (NULL != self->main_function) {
-    CHECK(88, (self->main_function)->_base._base._base._base._dtl[0](self->main_function) )
+    CHECK(91, (self->main_function)->_base._base._base._base._dtl[0](self->main_function) )
+  }
+  CHECK(92, SyntaxTreeNamespace_analyze(&(self->_base)) )
+  CHECK(93, SyntaxTreeNode_analyze_children(&(self->_base._base._base), self->types) )
+  if (NULL != self->main_function) {
+    CHECK(95, (self->main_function)->_base._base._base._base._dtl[1](self->main_function) )
   }
   return OK;
 }
@@ -185,13 +200,13 @@ static char* _func_name_SyntaxTreeRoot_m_order_types = "SyntaxTreeRoot.m-order-t
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_m_order_types
 Returncode SyntaxTreeRoot_m_order_types(SyntaxTreeRoot* self) {
   List* ordered_list = malloc(sizeof(List));
-  if (ordered_list == NULL) RAISE(91)
+  if (ordered_list == NULL) RAISE(98)
   *ordered_list = (List){NULL, NULL};
   while (true) {
     TypeData* type_data = NULL;
-    CHECK(94, List_m_pop(self->types, (void**)&(type_data)) )
+    CHECK(101, List_m_pop(self->types, (void**)&(type_data)) )
     if (!(NULL != type_data)) break;
-    CHECK(96, TypeData_m_order_bases(type_data, ordered_list) )
+    CHECK(103, TypeData_m_order_bases(type_data, ordered_list) )
   }
   free(self->types);
   self->types = ordered_list;
@@ -211,51 +226,51 @@ Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_write = "SyntaxTreeRoot.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write
 Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self) {
-  CHECK(108, file_open(self->output_file_name, false, &(glob->output_file)) )
+  CHECK(115, file_open(self->output_file_name, false, &(glob->output_file)) )
   
-  CHECK(110, write_global(&(String){19, 18, "#include \"mr.4.h\"\n"}) )
+  CHECK(117, write_global(&(String){19, 18, "#include \"mr.4.h\"\n"}) )
   
-  CHECK(112, write_global(&(String){27, 26, "\n\n/* types declaration */\n"}) )
+  CHECK(119, write_global(&(String){27, 26, "\n\n/* types declaration */\n"}) )
   TypeDeclarationWriter* type_declaration_writer = &(TypeDeclarationWriter){TypeDeclarationWriter__dtl};
   type_declaration_writer->_base._dtl = TypeDeclarationWriter__dtl;
-  CHECK(114, SyntaxTreeRoot_write_for_type(self, &(type_declaration_writer->_base)) )
+  CHECK(121, SyntaxTreeRoot_write_for_type(self, &(type_declaration_writer->_base)) )
   
   /* will write type structs */
-  CHECK(117, write_global(&(String){22, 21, "\n\n/* types struct */\n"}) )
-  CHECK(118, SyntaxTreeBranch_write_children(&(self->_base._base), self->types) )
+  CHECK(124, write_global(&(String){22, 21, "\n\n/* types struct */\n"}) )
+  CHECK(125, SyntaxTreeBranch_write_children(&(self->_base._base), self->types) )
   
-  CHECK(120, write_global(&(String){35, 34, "\n\n/* types methods declaration */\n"}) )
+  CHECK(127, write_global(&(String){35, 34, "\n\n/* types methods declaration */\n"}) )
   TypeMethodsDeclarationWriter* type_methods_declaration_writer = &(TypeMethodsDeclarationWriter){TypeMethodsDeclarationWriter__dtl};
   type_methods_declaration_writer->_base._dtl = TypeMethodsDeclarationWriter__dtl;
-  CHECK(122, SyntaxTreeRoot_write_for_type(self, &(type_methods_declaration_writer->_base)) )
+  CHECK(129, SyntaxTreeRoot_write_for_type(self, &(type_methods_declaration_writer->_base)) )
   
-  CHECK(124, write_global(&(String){32, 31, "\n\n/* types global variables */\n"}) )
+  CHECK(131, write_global(&(String){32, 31, "\n\n/* types global variables */\n"}) )
   TypeGlobalWriter* type_global_writer = &(TypeGlobalWriter){TypeGlobalWriter__dtl};
   type_global_writer->_base._dtl = TypeGlobalWriter__dtl;
-  CHECK(126, SyntaxTreeRoot_write_for_type(self, &(type_global_writer->_base)) )
+  CHECK(133, SyntaxTreeRoot_write_for_type(self, &(type_global_writer->_base)) )
   
   /* will write global variables */
-  CHECK(129, write_global(&(String){26, 25, "\n\n/* global variables */\n"}) )
-  CHECK(130, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base._base.variables) )
+  CHECK(136, write_global(&(String){26, 25, "\n\n/* global variables */\n"}) )
+  CHECK(137, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base._base.variables) )
   
-  CHECK(132, write_global(&(String){38, 37, "\n\n/* global functions declaration */\n"}) )
-  CHECK(133, SyntaxTreeNamespace_write_functions_declaration(&(self->_base)) )
+  CHECK(139, write_global(&(String){38, 37, "\n\n/* global functions declaration */\n"}) )
+  CHECK(140, SyntaxTreeNamespace_write_functions_declaration(&(self->_base)) )
   
-  CHECK(135, write_global(&(String){28, 27, "\n\n/* types methods body */\n"}) )
+  CHECK(142, write_global(&(String){28, 27, "\n\n/* types methods body */\n"}) )
   TypeMethodsBodyWriter* type_methods_body_writer = &(TypeMethodsBodyWriter){TypeMethodsBodyWriter__dtl};
   type_methods_body_writer->_base._dtl = TypeMethodsBodyWriter__dtl;
-  CHECK(137, SyntaxTreeRoot_write_for_type(self, &(type_methods_body_writer->_base)) )
+  CHECK(144, SyntaxTreeRoot_write_for_type(self, &(type_methods_body_writer->_base)) )
   
   /* will write global functions bodies */
-  CHECK(140, write_global(&(String){31, 30, "\n\n/* global functions body */\n"}) )
-  CHECK(141, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )
+  CHECK(147, write_global(&(String){31, 30, "\n\n/* global functions body */\n"}) )
+  CHECK(148, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )
   
   if (NULL != self->main_function) {
-    CHECK(144, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
-    CHECK(145, (self->main_function)->_base._base._base._base._dtl[1](self->main_function) )
+    CHECK(151, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
+    CHECK(152, (self->main_function)->_base._base._base._base._dtl[2](self->main_function) )
   }
   
-  CHECK(147, file_close(glob->output_file) )
+  CHECK(154, file_close(glob->output_file) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -269,7 +284,7 @@ Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, TypeWriter* type_
   ListNode* child = self->types->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(153, (type_writer)->_dtl[0](type_writer, child->item) )
+    CHECK(160, (type_writer)->_dtl[0](type_writer, child->item) )
     child = child->next;
   }
   return OK;
@@ -280,7 +295,7 @@ Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, TypeWriter* type_
 extern Func SyntaxTreeRoot__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeRoot__dtl[] = {(void*)SyntaxTreeRoot_analyze, (void*)SyntaxTreeRoot_write, (void*)SyntaxTreeRoot_parse_child, (void*)SyntaxTreeBranch_m_find_variable};
+Func SyntaxTreeRoot__dtl[] = {(void*)SyntaxTreeRoot_m_link_types, (void*)SyntaxTreeRoot_analyze, (void*)SyntaxTreeRoot_write, (void*)SyntaxTreeRoot_parse_child, (void*)SyntaxTreeBranch_m_find_variable};
 #endif
 
 
@@ -291,7 +306,7 @@ Returncode write_global(String* text);
 static char* _func_name_write_global = "write-global";
 #define MR_FUNC_NAME _func_name_write_global
 Returncode write_global(String* text) {
-  CHECK(159, write(text) )
+  CHECK(166, write(text) )
   return OK;
 }
 #undef MR_FUNC_NAME

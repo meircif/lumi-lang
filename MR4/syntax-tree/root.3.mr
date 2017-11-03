@@ -80,8 +80,15 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     else
       self.m-syntax-error(user "unknown keyword", user keyword)
   
+  func dynamic m-link-types()
+    raise
+  
   func dynamic analyze()
     self.m-order-types()
+    base.m-link-types()
+    self.m-link-children-types(user self.types)
+    if ? self.main-function
+      self.main-function.m-link-types()
     base.analyze()
     self.analyze-children(user self.types)
     if ? self.main-function

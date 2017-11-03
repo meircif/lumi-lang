@@ -27,7 +27,7 @@ Returncode SyntaxTreeCode_m_find_variable(SyntaxTreeCode* self, String* name, Sy
 static char* _func_name_SyntaxTreeCode_m_find_variable = "SyntaxTreeCode.m-find-variable";
 #define MR_FUNC_NAME _func_name_SyntaxTreeCode_m_find_variable
 Returncode SyntaxTreeCode_m_find_variable(SyntaxTreeCode* self, String* name, SyntaxTreeVariable** variable) {
-  CHECK(9, (self->parent)->_base._base._dtl[3](self->parent, name, &((*variable))) )
+  CHECK(9, (self->parent)->_base._base._dtl[4](self->parent, name, &((*variable))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -38,7 +38,7 @@ Returncode SyntaxTreeCode_m_get_parent_type(SyntaxTreeCode* self, TypeData** par
 static char* _func_name_SyntaxTreeCode_m_get_parent_type = "SyntaxTreeCode.m-get-parent-type";
 #define MR_FUNC_NAME _func_name_SyntaxTreeCode_m_get_parent_type
 Returncode SyntaxTreeCode_m_get_parent_type(SyntaxTreeCode* self, TypeData** parent_type) {
-  CHECK(12, (self->parent)->_base._base._dtl[4](self->parent, &((*parent_type))) )
+  CHECK(12, (self->parent)->_base._base._dtl[5](self->parent, &((*parent_type))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -69,7 +69,7 @@ Returncode SyntaxTreeCode_m_is_end_point(SyntaxTreeCode* self, Bool* is_end) {
 extern Func SyntaxTreeCode__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeCode__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeCode__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -291,7 +291,7 @@ static char* _func_name_SyntaxTreeBlock_m_has_end_point = "SyntaxTreeBlock.m-has
 #define MR_FUNC_NAME _func_name_SyntaxTreeBlock_m_has_end_point
 Returncode SyntaxTreeBlock_m_has_end_point(SyntaxTreeBlock* self, Bool* has_end) {
   if (NULL != self->code_nodes->last) {
-    CHECK(136, (((SyntaxTreeCode*)(self->code_nodes->last->item)))->_base._dtl[2](((SyntaxTreeCode*)(self->code_nodes->last->item)), &((*has_end))) )
+    CHECK(136, (((SyntaxTreeCode*)(self->code_nodes->last->item)))->_base._dtl[3](((SyntaxTreeCode*)(self->code_nodes->last->item)), &((*has_end))) )
   }
   else {
     (*has_end) = false;
@@ -312,7 +312,7 @@ Returncode SyntaxTreeBlock_m_find_variable(SyntaxTreeBlock* self, String* name, 
     CHECK(144, SyntaxTreeVariable_m_find_variable(self->ref_variable, name, &((*variable)), &(_Bool58)) )
   }
   if (!(NULL != (*variable)) &&  NULL !=  self->parent) {
-    CHECK(146, (self->parent)->_base._base._dtl[3](self->parent, name, &((*variable))) )
+    CHECK(146, (self->parent)->_base._base._dtl[4](self->parent, name, &((*variable))) )
   }
   return OK;
 }
@@ -324,7 +324,7 @@ Returncode SyntaxTreeBlock_m_get_parent_type(SyntaxTreeBlock* self, TypeData** p
 static char* _func_name_SyntaxTreeBlock_m_get_parent_type = "SyntaxTreeBlock.m-get-parent-type";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBlock_m_get_parent_type
 Returncode SyntaxTreeBlock_m_get_parent_type(SyntaxTreeBlock* self, TypeData** parent_type) {
-  CHECK(149, (self->parent)->_base._base._dtl[4](self->parent, &((*parent_type))) )
+  CHECK(149, (self->parent)->_base._base._dtl[5](self->parent, &((*parent_type))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -380,13 +380,25 @@ Returncode SyntaxTreeBlock_add_aux_variable(SyntaxTreeBlock* self, Int access, T
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeBlock_m_link_types(SyntaxTreeBlock* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeBlock_m_link_types = "SyntaxTreeBlock.m-link-types";
+#define MR_FUNC_NAME _func_name_SyntaxTreeBlock_m_link_types
+Returncode SyntaxTreeBlock_m_link_types(SyntaxTreeBlock* self) {
+  CHECK(185, SyntaxTreeBranch_m_link_types(&(self->_base)) )
+  CHECK(186, SyntaxTreeNode_m_link_children_types(&(self->_base._base), self->code_nodes) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeBlock_analyze(SyntaxTreeBlock* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeBlock_analyze = "SyntaxTreeBlock.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBlock_analyze
 Returncode SyntaxTreeBlock_analyze(SyntaxTreeBlock* self) {
-  CHECK(185, SyntaxTreeBranch_analyze(&(self->_base)) )
-  CHECK(186, SyntaxTreeBranch_analyze_children(&(self->_base), self->code_nodes) )
+  CHECK(189, SyntaxTreeBranch_analyze(&(self->_base)) )
+  CHECK(190, SyntaxTreeNode_analyze_children(&(self->_base._base), self->code_nodes) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -400,11 +412,11 @@ Returncode SyntaxTreeBlock_write_block(SyntaxTreeBlock* self) {
   /* `previous-text` { */
   /*   `block...` */
   /* } */
-  CHECK(192, write(&(String){4, 3, " {\n"}) )
-  CHECK(193, SyntaxTreeBranch_write(&(self->_base)) )
-  CHECK(194, SyntaxTreeBranch_write_children(&(self->_base), self->code_nodes) )
-  CHECK(195, write_spaces(self->_base.indentation_spaces - 2) )
-  CHECK(196, write(&(String){2, 1, "}"}) )
+  CHECK(196, write(&(String){4, 3, " {\n"}) )
+  CHECK(197, SyntaxTreeBranch_write(&(self->_base)) )
+  CHECK(198, SyntaxTreeBranch_write_children(&(self->_base), self->code_nodes) )
+  CHECK(199, write_spaces(self->_base.indentation_spaces - 2) )
+  CHECK(200, write(&(String){2, 1, "}"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -413,7 +425,7 @@ Returncode SyntaxTreeBlock_write_block(SyntaxTreeBlock* self) {
 extern Func SyntaxTreeBlock__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeBlock__dtl[] = {(void*)SyntaxTreeBlock_analyze, (void*)SyntaxTreeBranch_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeBlock_m_find_variable, (void*)SyntaxTreeBlock_m_get_parent_type};
+Func SyntaxTreeBlock__dtl[] = {(void*)SyntaxTreeBlock_m_link_types, (void*)SyntaxTreeBlock_analyze, (void*)SyntaxTreeBranch_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeBlock_m_find_variable, (void*)SyntaxTreeBlock_m_get_parent_type};
 #endif
 
 #undef MR_FILE_NAME

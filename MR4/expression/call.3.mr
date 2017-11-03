@@ -25,13 +25,13 @@ class CallExpression(Expression)
   func dynamic analyze()
     self.function.analyze()
     self.arguments.analyze()
-    user FunctionArguments declaration(self.function.result-type.arguments)
     if not (? self.function.result-type.type-data)
       self.m-syntax-error-msg(user "void expression is not callable")
     if self.function.result-type.type-data != glob.type-func
       self.m-syntax-error(
           user "non callable type",
           user self.function.result-type.type-data.name)
+    user FunctionArguments declaration(self.function.result-type.arguments)
     if not (? declaration)
         self.m-syntax-error-msg(user "pointer-to-function not supported")
     if not self.is-statement

@@ -181,6 +181,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     new-variable := variable
     self.variables.add(owner variable)
   
+  func dynamic m-link-types()
+    base.m-link-types()
+    self.m-link-children-types(user self.code-nodes)
+  
   func dynamic analyze()
     base.analyze()
     self.analyze-children(user self.code-nodes)

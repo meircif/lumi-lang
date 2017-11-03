@@ -22,6 +22,9 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
       self.block.is-in-loop := true
     self.block.parse-block():(copy end)
   
+  func dynamic m-link-types()
+    self.block.m-link-types()
+  
   func dynamic analyze()
     self.block.analyze()
   

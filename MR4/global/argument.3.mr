@@ -46,6 +46,8 @@ class FunctionArguments(SyntaxTreeNode)
   owner List{Argument} outputs
   
   func inst m-copy-new():(owner FunctionArguments new-arguments)
+    new FunctionArguments in new-arguments
+    new-arguments.init()
     self.m-copy-new-args(user self.parameters, user new-arguments.parameters)
     self.m-copy-new-args(user self.outputs, user new-arguments.outputs)
   
@@ -116,16 +118,13 @@ class FunctionArguments(SyntaxTreeNode)
         read-until(user " ", copy false):(user access-str, copy end)
     read-c():(copy end)
   
-  func inst analyze()
-    self.analyze-args(user self.parameters)
-    self.analyze-args(user self.outputs)
+  func dynamic m-link-types()
+    self.m-link-children-types(user self.parameters)
+    self.m-link-children-types(user self.outputs)
   
-  func inst analyze-args(user List{Argument} arguments)
-    user ListNode{Argument} node(arguments.first)
-    do
-      while ? node
-      node.item.analyze()
-      node := node.next
+  func dynamic analyze()
+    self.analyze-children(user self.parameters)
+    self.analyze-children(user self.outputs)
   
   func inst get-result-type():(user TypeInstance result-type)
     if ? self.outputs.last

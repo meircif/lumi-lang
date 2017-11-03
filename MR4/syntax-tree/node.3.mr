@@ -148,6 +148,23 @@ class SyntaxTreeNode
     print(user line-num-str)
     print(user "] ")
   
+  func inst m-link-children-types(user List{SyntaxTreeNode} child-list)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      child.item.m-link-types()
+      child := child.next
+  
+  func inst analyze-children(user List{SyntaxTreeNode} child-list)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      child.item.analyze()
+      child := child.next
+  
+  func dynamic m-link-types()
+    # do nothing as default
+  
   func dynamic analyze()
     # do nothing as default
   

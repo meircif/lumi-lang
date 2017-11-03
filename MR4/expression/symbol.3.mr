@@ -38,25 +38,6 @@ class SymbolExpression(Expression)
       write(user ")")
 
 
-## The `base` method expression
-class BaseMethExpression(Expression)
-  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
-      owner Expression expression)
-    new BaseMethExpression in expression
-    expression.code-node := code-node
-    expression.set-location()
-    delete text
-  
-  func dynamic analyze()
-    user TypeData parent-type
-    self.code-node.m-get-parent-type():(user parent-type)
-    if not (? parent-type)
-      self.m-syntax-error-msg(user "\"base\" used not in method")
-    if not (? parent-type.base-type)
-      self.m-syntax-error(user "no base type for type", user parent-type.name)
-    self.set-simple-type(user parent-type.base-type)
-
-
 ## Type name expression
 class TypeExpression(Expression)
   owner String type-name
@@ -75,6 +56,31 @@ class TypeExpression(Expression)
     self.set-simple-type(user glob.type-type)
     self.m-find-type(user self.type-name).m-new-type-instance():(
         owner self.result-type.sub-type)
+  
+  func dynamic write()
+    write-cname(user self.result-type.sub-type.type-data.name)
+
+
+## The `base` method expression
+class BaseMethExpression(Expression)
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
+      owner Expression expression)
+    new BaseMethExpression in expression
+    expression.code-node := code-node
+    expression.set-location()
+    delete text
+  
+  func dynamic analyze()
+    user TypeData parent-type
+    self.code-node.m-get-parent-type():(user parent-type)
+    if not (? parent-type)
+      self.m-syntax-error-msg(user "\"base\" used not in method")
+    if not (? parent-type.base-type)
+      self.m-syntax-error(user "no base type for type", user parent-type.name)
+    self.set-simple-type(user parent-type.base-type)
+  
+  func dynamic write()
+    write(user "(&(self->_base))")
 
 
 ## An instance member expression
@@ -120,7 +126,7 @@ class MemberExpression(SymbolExpression)
             user "has no member",
             user self.name)
       self.set-simple-type(user glob.type-func)
-      self.function.arguments.m-copy-new():(self.result-type.arguments)
+      self.function.arguments.m-copy-new():(owner self.result-type.arguments)
   
   func dynamic analyze-call(user FunctionArguments arguments)
     if self.instance.result-type.type-data = glob.type-type
@@ -128,13 +134,19 @@ class MemberExpression(SymbolExpression)
     new CallArgument self-param
     self-param.access := self.function.arguments.parameters.first.item.access
     self-param.value := self.instance
-    self.instance := _
     arguments.parameters.m-prepend(owner self-param)
+    new TypeExpression in self.instance
+    self.instance.set-simple-type(user glob.type-type)
+    self-param.value.result-type.type-data.m-new-type-instance():(
+        owner self.instance.result-type.sub-type)
   
   func dynamic write-preactions()
     self.instance.write-preactions()
   
   func dynamic write()
     self.instance.write()
-    write(user "->")
+    if self.instance.result-type.type-data = glob.type-type
+      write(user "_")
+    else
+      write(user "->")
     base.write()

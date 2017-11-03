@@ -172,7 +172,7 @@ Returncode SyntaxTreeNode_analyze_expression(SyntaxTreeNode* self, Expression* e
 static char* _func_name_SyntaxTreeNode_analyze_expression = "SyntaxTreeNode.analyze-expression";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_analyze_expression
 Returncode SyntaxTreeNode_analyze_expression(SyntaxTreeNode* self, Expression* expression, TypeData* expected_type) {
-  CHECK(66, (expression)->_base._dtl[0](expression) )
+  CHECK(66, (expression)->_base._dtl[1](expression) )
   if (!(NULL != expression->result_type)) {
     CHECK(68, SyntaxTreeNode_m_syntax_error(self, &(String){30, 29, "got void expression, expected"}, expected_type->name) )
   }
@@ -319,6 +319,49 @@ Returncode SyntaxTreeNode_print_syntax_error_header(SyntaxTreeNode* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_m_link_children_types(SyntaxTreeNode* self, List* child_list);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_m_link_children_types = "SyntaxTreeNode.m-link-children-types";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_link_children_types
+Returncode SyntaxTreeNode_m_link_children_types(SyntaxTreeNode* self, List* child_list) {
+  ListNode* child = child_list->first;
+  while (true) {
+    if (!(NULL != child)) break;
+    CHECK(155, (((SyntaxTreeNode*)(child->item)))->_dtl[0](((SyntaxTreeNode*)(child->item))) )
+    child = child->next;
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_analyze_children = "SyntaxTreeNode.analyze-children";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_analyze_children
+Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list) {
+  ListNode* child = child_list->first;
+  while (true) {
+    if (!(NULL != child)) break;
+    CHECK(162, (((SyntaxTreeNode*)(child->item)))->_dtl[1](((SyntaxTreeNode*)(child->item))) )
+    child = child->next;
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_m_link_types(SyntaxTreeNode* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_m_link_types = "SyntaxTreeNode.m-link-types";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_link_types
+Returncode SyntaxTreeNode_m_link_types(SyntaxTreeNode* self) {
+  /* do nothing as default */
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeNode_analyze(SyntaxTreeNode* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeNode_analyze = "SyntaxTreeNode.analyze";
@@ -335,7 +378,7 @@ Returncode SyntaxTreeNode_write(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_write = "SyntaxTreeNode.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_write
 Returncode SyntaxTreeNode_write(SyntaxTreeNode* self) {
-  RAISE(155)
+  RAISE(172)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -343,7 +386,7 @@ Returncode SyntaxTreeNode_write(SyntaxTreeNode* self) {
 extern Func SyntaxTreeNode__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeNode__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write};
+Func SyntaxTreeNode__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write};
 #endif
 
 #undef MR_FILE_NAME

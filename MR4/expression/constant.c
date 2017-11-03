@@ -117,7 +117,7 @@ Returncode TextExpression_write(TextExpression* self) {
 extern Func TextExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func TextExpression__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func TextExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -210,7 +210,7 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
 extern Func IntExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func IntExpression__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func IntExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -310,7 +310,7 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
 extern Func CharExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CharExpression__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func CharExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -385,17 +385,17 @@ Returncode StringExpression_write_preactions(StringExpression* self) {
     }
     real_length = real_length + 1;
   }}
-  CHECK(146, (self->symbol)->_base._dtl[1](self->symbol) )
+  CHECK(146, (self->symbol)->_base._dtl[2](self->symbol) )
   CHECK(147, write(&(String){16, 15, "->max_length = "}) )
   CHECK(148, write_int(real_length) )
   CHECK(149, write(&(String){3, 2, ";\n"}) )
   CHECK(150, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(151, (self->symbol)->_base._dtl[1](self->symbol) )
+  CHECK(151, (self->symbol)->_base._dtl[2](self->symbol) )
   CHECK(152, write(&(String){12, 11, "->length = "}) )
   CHECK(153, write_int(real_length - 1) )
   CHECK(154, write(&(String){3, 2, ";\n"}) )
   CHECK(155, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(156, (self->symbol)->_base._dtl[1](self->symbol) )
+  CHECK(156, (self->symbol)->_base._dtl[2](self->symbol) )
   CHECK(157, write(&(String){12, 11, "->values = "}) )
   CHECK(158, write(self->_base.text) )
   CHECK(159, write(&(String){3, 2, ";\n"}) )
@@ -410,7 +410,7 @@ Returncode StringExpression_write(StringExpression* self);
 static char* _func_name_StringExpression_write = "StringExpression.write";
 #define MR_FUNC_NAME _func_name_StringExpression_write
 Returncode StringExpression_write(StringExpression* self) {
-  CHECK(163, (self->symbol)->_base._dtl[1](self->symbol) )
+  CHECK(163, (self->symbol)->_base._dtl[2](self->symbol) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -419,7 +419,7 @@ Returncode StringExpression_write(StringExpression* self) {
 extern Func StringExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func StringExpression__dtl[] = {(void*)StringExpression_analyze, (void*)StringExpression_write, (void*)Expression_analyze_call, (void*)StringExpression_write_preactions};
+Func StringExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)StringExpression_analyze, (void*)StringExpression_write, (void*)Expression_analyze_call, (void*)StringExpression_write_preactions};
 #endif
 
 
@@ -464,7 +464,7 @@ Returncode EmptyExpression_write(EmptyExpression* self) {
 extern Func EmptyExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func EmptyExpression__dtl[] = {(void*)SyntaxTreeNode_analyze, (void*)EmptyExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func EmptyExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)EmptyExpression_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

@@ -66,11 +66,11 @@ static char* _func_name_SyntaxTreeAssert_write = "SyntaxTreeAssert.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeAssert_write
 Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self) {
   /* TEST_ASSERT(`line`, `tested`) */
-  CHECK(22, (self->tested)->_base._dtl[3](self->tested) )
+  CHECK(22, (self->tested)->_base._dtl[4](self->tested) )
   CHECK(23, write(&(String){13, 12, "TEST_ASSERT("}) )
   CHECK(24, SyntaxTreeNode_write_line_num(&(self->_base._base)) )
   CHECK(25, write(&(String){3, 2, ", "}) )
-  CHECK(26, (self->tested)->_base._dtl[1](self->tested) )
+  CHECK(26, (self->tested)->_base._dtl[2](self->tested) )
   CHECK(27, write(&(String){2, 1, ")"}) )
   return OK;
 }
@@ -80,7 +80,7 @@ Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self) {
 extern Func SyntaxTreeAssert__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeAssert__dtl[] = {(void*)SyntaxTreeAssert_analyze, (void*)SyntaxTreeAssert_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeAssert__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeAssert_analyze, (void*)SyntaxTreeAssert_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 /* Assert-error statement in the syntax tree */
@@ -128,7 +128,7 @@ Returncode SyntaxTreeAssertError_analyze(SyntaxTreeAssertError* self);
 static char* _func_name_SyntaxTreeAssertError_analyze = "SyntaxTreeAssertError.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeAssertError_analyze
 Returncode SyntaxTreeAssertError_analyze(SyntaxTreeAssertError* self) {
-  CHECK(46, (self->tested)->_base._dtl[0](self->tested) )
+  CHECK(46, (self->tested)->_base._dtl[1](self->tested) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -137,7 +137,7 @@ Returncode SyntaxTreeAssertError_analyze(SyntaxTreeAssertError* self) {
 extern Func SyntaxTreeAssertError__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeAssertError__dtl[] = {(void*)SyntaxTreeAssertError_analyze, (void*)SyntaxTreeNode_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeAssertError__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeAssertError_analyze, (void*)SyntaxTreeNode_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -169,7 +169,7 @@ Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* 
 extern Func SyntaxTreeTestFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type};
+Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeFunction_m_link_types, (void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type};
 #endif
 
 
@@ -201,7 +201,7 @@ Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* 
 extern Func SyntaxTreeMockFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type};
+Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_m_link_types, (void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type};
 #endif
 
 

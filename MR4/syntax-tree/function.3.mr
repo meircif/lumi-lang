@@ -64,6 +64,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if not (? variable)
       glob.root.m-find-variable(user name):(user variable)
   
+  func dynamic m-link-types()
+    self.arguments.m-link-types()
+    base.m-link-types()
+  
   func dynamic analyze()
     self.arguments.analyze()
     base.analyze()
@@ -163,8 +167,11 @@ class DeclarationArgument(Argument)
       self.m-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user ",)"):(owner self.variable.name, copy end)
   
+  func dynamic m-link-types()
+    self.variable.type-instance.m-link-types(user self)
+  
   func dynamic analyze()
-    self.variable.type-instance.analyze(user self)
+    self.variable.type-instance.analyze-lengths(user self)
   
   func dynamic get-type-instance():(user TypeInstance type-instance)
     type-instance := self.variable.type-instance

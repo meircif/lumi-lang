@@ -18,11 +18,11 @@ static char* _func_name_test_code = "test-code";
 #define MR_FUNC_NAME _func_name_test_code
 Returncode test_code(String* input_text, String* expected_output) {
   CHECK(4, f_setup_test() )
-  CHECK(5, set_mock_file_text(&(String){115, 114, "struct Test\n  var Int num\nfunc mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr)\n  "}) )
+  CHECK(5, set_mock_file_text(&(String){128, 127, "struct Test\n  var Int num\nfunc mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr, user Test t)\n  "}) )
   CHECK(7, String_concat(mock_input_file_text, input_text) )
   CHECK(8, String_append(mock_input_file_text, '\n') )
   CHECK(9, write_syntax_tree() )
-  String* expected_header = &(String){189, 188, "\ntypedef struct Test Test;\nstruct Test {\n  Int num;\n};\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr) {\n  "};
+  String* expected_header = &(String){207, 206, "\ntypedef struct Test Test;\nstruct Test {\n  Int num;\n};\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr, Test* t);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr, Test* t) {\n  "};
   String* expected_footer = &(String){17, 16, "\n  return OK;\n}\n"};
   CHECK(12, f_assert_string_slice(expected_header, mock_output_file_text, 0, expected_header->length) )
   CHECK(17, f_assert_string_slice(expected_output, mock_output_file_text, expected_header->length, mock_output_file_text->length - expected_header->length - expected_footer->length) )
@@ -40,7 +40,7 @@ static char* _func_name_test_code_error = "test-code-error";
 #define MR_FUNC_NAME _func_name_test_code_error
 Returncode test_code_error(String* input_text, String* expected_error) {
   CHECK(31, f_setup_test() )
-  CHECK(32, set_mock_file_text(&(String){15, 14, "func mock()\n  "}) )
+  CHECK(32, set_mock_file_text(&(String){25, 24, "func mock(copy Int i)\n  "}) )
   CHECK(33, String_concat(mock_input_file_text, input_text) )
   CHECK(34, String_append(mock_input_file_text, '\n') )
   mock_print_active = true;
@@ -141,23 +141,25 @@ static char* _func_name_test_empty_expression = "test-empty-expression";
 #define MR_FUNC_NAME _func_name_test_empty_expression
 Returncode test_empty_expression() {
   CHECK(103, test_code(&(String){9, 8, "str := _"}, &(String){12, 11, "str = NULL;"}) )
+  CHECK(104, test_code(&(String){7, 6, "t := _"}, &(String){10, 9, "t = NULL;"}) )
+  CHECK(105, test_code_error(&(String){7, 6, "i := _"}, &(String){33, 32, "cannot assign \"Empty\" into \"Int\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 
 
-/* test test-base-expression() */
-/* test-code(user "base", user "Base") */
-
-
-/* test test-type-expression() */
-/* test-code(user "TypeName", user "TypeName") */
-
-
-/* test test-member-expression() */
-/* test-code(user "str.length", user "str->length;") */
-/* test-code(user "str.length.str", user "str->length->str;") */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_member_expression();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_member_expression = "test-member-expression";
+#define MR_FUNC_NAME _func_name_test_member_expression
+Returncode test_member_expression() {
+  CHECK(109, test_code(&(String){11, 10, "i := t.num"}, &(String){12, 11, "i = t->num;"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
 
 
 #if MR_STAGE == MR_DECLARATIONS
@@ -166,8 +168,8 @@ Returncode test_slice_expression();
 static char* _func_name_test_slice_expression = "test-slice-expression";
 #define MR_FUNC_NAME _func_name_test_slice_expression
 Returncode test_slice_expression() {
-  CHECK(120, test_code(&(String){13, 12, "i := arr[13]"}, &(String){85, 84, "if ((13) < 0 || (13) >= (arr)->length) RAISE(3)\n  i = (((Int*)((arr)->values))[13]);"}) )
-  CHECK(123, test_code(&(String){16, 15, "arr := arr[2:6]"}, &(String){225, 224, "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0.length = 6;\n  aux_Array_0.values = (arr)->values + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(3)\n  arr = aux_Array_0;"}) )
+  CHECK(113, test_code(&(String){13, 12, "i := arr[13]"}, &(String){85, 84, "if ((13) < 0 || (13) >= (arr)->length) RAISE(3)\n  i = (((Int*)((arr)->values))[13]);"}) )
+  CHECK(116, test_code(&(String){16, 15, "arr := arr[2:6]"}, &(String){225, 224, "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0.length = 6;\n  aux_Array_0.values = (arr)->values + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(3)\n  arr = aux_Array_0;"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -205,12 +207,56 @@ Returncode test_slice_expression() {
 
 
 #if MR_STAGE == MR_DECLARATIONS
+Returncode test_type_expression();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_type_expression = "test-type-expression";
+#define MR_FUNC_NAME _func_name_test_type_expression
+Returncode test_type_expression() {
+  CHECK(152, test_global_scope(&(String){80, 79, "struct Test\n  var Int x\n  func meth()\nfunc mock(user Test t)\n  Test.meth(var t)"}, &(String){230, 229, "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_meth(Test* self);\nReturncode mock(Test* t);\nReturncode Test_meth(Test* self) {\n  return OK;\n}\nReturncode mock(Test* t) {\n  CHECK(4, Test_meth(t) )\n  return OK;\n}"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_base_expression();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_base_expression = "test-base-expression";
+#define MR_FUNC_NAME _func_name_test_base_expression
+Returncode test_base_expression() {
+  String* expected = &(String){1024, 0, (char[1024]){0}};
+  CHECK(159, String_copy(expected, &(String){27, 26, "typedef struct Base Base;\n"}) )
+  CHECK(160, String_concat(expected, &(String){27, 26, "typedef struct Test Test;\n"}) )
+  CHECK(161, String_concat(expected, &(String){15, 14, "struct Base {\n"}) )
+  CHECK(162, String_concat(expected, &(String){10, 9, "  Int x;\n"}) )
+  CHECK(163, String_concat(expected, &(String){4, 3, "};\n"}) )
+  CHECK(164, String_concat(expected, &(String){15, 14, "struct Test {\n"}) )
+  CHECK(165, String_concat(expected, &(String){15, 14, "  Base _base;\n"}) )
+  CHECK(166, String_concat(expected, &(String){4, 3, "};\n"}) )
+  CHECK(167, String_concat(expected, &(String){35, 34, "Returncode Base_meth(Base* self);\n"}) )
+  CHECK(168, String_concat(expected, &(String){35, 34, "Returncode Test_meth(Test* self);\n"}) )
+  CHECK(169, String_concat(expected, &(String){36, 35, "Returncode Base_meth(Base* self) {\n"}) )
+  CHECK(170, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
+  CHECK(171, String_concat(expected, &(String){3, 2, "}\n"}) )
+  CHECK(172, String_concat(expected, &(String){36, 35, "Returncode Test_meth(Test* self) {\n"}) )
+  CHECK(173, String_concat(expected, &(String){42, 41, "  CHECK(5, Base_meth((&(self->_base))) )\n"}) )
+  CHECK(174, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
+  CHECK(175, String_concat(expected, &(String){2, 1, "}"}) )
+  CHECK(176, test_global_scope(&(String){86, 85, "struct Base\n  var Int x\n  func meth()\nstruct Test(Base)\n  func meth()\n    base.meth()"}, expected) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
 Returncode test_block_expression();
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_test_block_expression = "test-block-expression";
 #define MR_FUNC_NAME _func_name_test_block_expression
 Returncode test_block_expression() {
-  CHECK(159, test_code(&(String){11, 10, "i := (123)"}, &(String){11, 10, "i = (123);"}) )
+  CHECK(182, test_code(&(String){11, 10, "i := (123)"}, &(String){11, 10, "i = (123);"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -223,10 +269,10 @@ Returncode test_unary_expression();
 static char* _func_name_test_unary_expression = "test-unary-expression";
 #define MR_FUNC_NAME _func_name_test_unary_expression
 Returncode test_unary_expression() {
-  CHECK(163, test_code(&(String){9, 8, "i := - i"}, &(String){9, 8, "i = - i;"}) )
-  CHECK(164, test_code(&(String){13, 12, "i := -\n    i"}, &(String){9, 8, "i = - i;"}) )
-  CHECK(165, test_code(&(String){11, 10, "i := - - i"}, &(String){13, 12, "i = - (- i);"}) )
-  CHECK(166, test_code_error(&(String){5, 4, "[45]"}, &(String){15, 14, "unexpected \"[\""}) )
+  CHECK(186, test_code(&(String){9, 8, "i := - i"}, &(String){9, 8, "i = - i;"}) )
+  CHECK(187, test_code(&(String){13, 12, "i := -\n    i"}, &(String){9, 8, "i = - i;"}) )
+  CHECK(188, test_code(&(String){11, 10, "i := - - i"}, &(String){13, 12, "i = - (- i);"}) )
+  CHECK(189, test_code_error(&(String){5, 4, "[45]"}, &(String){15, 14, "unexpected \"[\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -239,12 +285,12 @@ Returncode test_binary_expression();
 static char* _func_name_test_binary_expression = "test-binary-expression";
 #define MR_FUNC_NAME _func_name_test_binary_expression
 Returncode test_binary_expression() {
-  CHECK(170, test_code(&(String){13, 12, "i := 23 + 54"}, &(String){13, 12, "i = 23 + 54;"}) )
-  CHECK(171, test_code(&(String){18, 17, "i := 100 * 2 - 37"}, &(String){20, 19, "i = (100 * 2) - 37;"}) )
-  CHECK(172, test_code(&(String){17, 16, "i := 12 *\n    13"}, &(String){13, 12, "i = 12 * 13;"}) )
-  CHECK(173, test_code(&(String){23, 22, "b := 3 < 5 and 23 < 37"}, &(String){26, 25, "b = (3 < 5) && (23 < 37);"}) )
-  CHECK(174, test_code_error(&(String){8, 7, "345 @ 2"}, &(String){21, 20, "unknown operator \"@\""}) )
-  CHECK(175, test_code_error(&(String){6, 5, "80 +("}, &(String){15, 14, "unexpected \"(\""}) )
+  CHECK(193, test_code(&(String){13, 12, "i := 23 + 54"}, &(String){13, 12, "i = 23 + 54;"}) )
+  CHECK(194, test_code(&(String){18, 17, "i := 100 * 2 - 37"}, &(String){20, 19, "i = (100 * 2) - 37;"}) )
+  CHECK(195, test_code(&(String){17, 16, "i := 12 *\n    13"}, &(String){13, 12, "i = 12 * 13;"}) )
+  CHECK(196, test_code(&(String){23, 22, "b := 3 < 5 and 23 < 37"}, &(String){26, 25, "b = (3 < 5) && (23 < 37);"}) )
+  CHECK(197, test_code_error(&(String){8, 7, "345 @ 2"}, &(String){21, 20, "unknown operator \"@\""}) )
+  CHECK(198, test_code_error(&(String){6, 5, "80 +("}, &(String){15, 14, "unexpected \"(\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -257,7 +303,7 @@ Returncode test_question_expression();
 static char* _func_name_test_question_expression = "test-question-expression";
 #define MR_FUNC_NAME _func_name_test_question_expression
 Returncode test_question_expression() {
-  CHECK(179, test_code(&(String){10, 9, "b := str?"}, &(String){17, 16, "b = str != NULL;"}) )
+  CHECK(202, test_code(&(String){10, 9, "b := str?"}, &(String){17, 16, "b = str != NULL;"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

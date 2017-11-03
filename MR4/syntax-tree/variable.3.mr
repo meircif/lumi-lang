@@ -51,8 +51,13 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if found
       variable := self
   
+  func dynamic m-link-types()
+    # sys.print-raw(user "m-link-type var ")
+    # sys.print(user self.name)
+    self.type-instance.m-link-types(user self)
+  
   func dynamic analyze()
-    self.type-instance.analyze(user self)
+    self.type-instance.analyze-lengths(user self)
     if self.type-instance.type-data = glob.type-array
       if not (? self.type-instance.sub-type)
         self.m-syntax-error-msg(user "missing subtype for array")
