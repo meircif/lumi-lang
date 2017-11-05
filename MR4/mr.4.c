@@ -1,7 +1,6 @@
 #include "mr.4.h"
 
 /*traceback*/
-#undef MR_FILE_NAME
 #define MR_FILE_NAME __FILE__
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
@@ -88,6 +87,7 @@ Bool MR_run_test(char* test_name, Func test_func) {
 }
 
 /*helpers*/
+#define MR_FUNC_NAME "set_cstring"
 Returncode set_cstring(String* str) {
   if (str->length >= str->max_length) {
     if (cstring_length(str->values, str->max_length) >= str->max_length) {
@@ -99,6 +99,7 @@ Returncode set_cstring(String* str) {
   }
   return OK;
 }
+#undef MR_FUNC_NAME
 
 /*allocations*/
 String* MR_new_string(int length) {
@@ -153,6 +154,7 @@ void MR_set_new_string_array(int array_length, int string_length, Array* array) 
 }
 
 /*Files*/
+#define MR_FUNC_NAME "open_file"
 Returncode open_file(File** file, String* name, char* mode) {
   CCHECK(set_cstring(name));
   *file = NULL;
@@ -162,6 +164,7 @@ Returncode open_file(File** file, String* name, char* mode) {
   }
   return OK;
 }
+#undef MR_FUNC_NAME
 
 Returncode file_open_read(String* name, File** file) {
   return open_file(file, name, "r");
@@ -171,18 +174,21 @@ Returncode file_open_write(String* name, File** file) {
   return open_file(file, name, "w");
 }
 
+#define MR_FUNC_NAME "File.close"
 Returncode File_close(File* file) {
   if (fclose(file) == 0) {
     return OK;
   }
   CRAISE
 }
+#undef MR_FUNC_NAME
 
 Returncode File_getc(File* file, Char* out_char) {
   *out_char = getc(file);
   return OK;
 }
 
+#define MR_FUNC_NAME "File.putc"
 Returncode File_putc(File* file, Char in_char) {
   int res;
   res = putc(in_char, file);
@@ -191,6 +197,7 @@ Returncode File_putc(File* file, Char in_char) {
   }
   return OK;
 }
+#undef MR_FUNC_NAME
 
 Returncode File_write(File* file, String* data) {
   fprintf(file, "%.*s", data->length, data->values);
@@ -220,6 +227,7 @@ Returncode String_equal(String* this, String* other, Bool* out_equal) {
   return OK;
 }
 
+#define MR_FUNC_NAME "String.get"
 Returncode String_get(String* this, Int index, Char* out_char) {
   if (index < 0 || index >= this->length) {
     CRAISE
@@ -227,7 +235,9 @@ Returncode String_get(String* this, Int index, Char* out_char) {
   *out_char = this->values[index];
   return OK;
 }
+#undef MR_FUNC_NAME
 
+#define MR_FUNC_NAME "String.append"
 Returncode String_append(String* this, Char in_char) {
   if (this->length == this->max_length) {
     CRAISE
@@ -236,6 +246,7 @@ Returncode String_append(String* this, Char in_char) {
   ++this->length;
   return OK;
 }
+#undef MR_FUNC_NAME
 
 Returncode String_replace(String* this, Char old, Char new) {
   int n;
@@ -250,6 +261,7 @@ Returncode String_replace(String* this, Char old, Char new) {
   return OK;
 }
 
+#define MR_FUNC_NAME "Int.str"
 Returncode Int_str(Int value, String* out_str) {
   Bool is_neg;
   int abs;
@@ -286,7 +298,9 @@ Returncode Int_str(Int value, String* out_str) {
   }
   return OK;
 }
+#undef MR_FUNC_NAME
 
+#define MR_FUNC_NAME "String.copy"
 Returncode String_copy(String* this, String* source) {
   if (this == source) {
     return OK;
@@ -298,7 +312,9 @@ Returncode String_copy(String* this, String* source) {
   memcpy(this->values, source->values, this->length);
   return OK;
 }
+#undef MR_FUNC_NAME
 
+#define MR_FUNC_NAME "String.concat"
 Returncode String_concat(String* this, String* ext) {
   if (this->length + ext->length > this->max_length) {
     CRAISE
@@ -307,7 +323,9 @@ Returncode String_concat(String* this, String* ext) {
   this->length += ext->length;
   return OK;
 }
+#undef MR_FUNC_NAME
 
+#define MR_FUNC_NAME "String.concat-int"
 Returncode String_concat_int(String* this, Int num) {
   String remain;
   remain.max_length = this->max_length - this->length;
@@ -317,6 +335,7 @@ Returncode String_concat_int(String* this, Int num) {
   this->length += remain.length;
   return OK;
 }
+#undef MR_FUNC_NAME
 
 Returncode String_find(String* this, String* pattern, Int* out_index) {
   int n;
@@ -355,11 +374,14 @@ Returncode Sys_print_raw(Sys* _, String* text) {
   return OK;
 }
 
+#define MR_FUNC_NAME "Sys.exit"
 Returncode Sys_exit(Sys* _, Int status) {
   exit(status);
   CRAISE
 }
+#undef MR_FUNC_NAME
 
+#define MR_FUNC_NAME "Sys.system"
 Returncode Sys_system(Sys* _, String* command, Int* status) {
   int res;
   CCHECK(set_cstring(command));
@@ -370,7 +392,9 @@ Returncode Sys_system(Sys* _, String* command, Int* status) {
   *status = res;
   return OK;
 }
+#undef MR_FUNC_NAME
 
+#define MR_FUNC_NAME "Sys.getenv"
 Returncode Sys_getenv(Sys* _, String* name, String* value, Bool* exists) {
   char* ret;
   CCHECK(set_cstring(name));
@@ -384,3 +408,4 @@ Returncode Sys_getenv(Sys* _, String* name, String* value, Bool* exists) {
   *exists = true;
   return OK;
 }
+#undef MR_FUNC_NAME

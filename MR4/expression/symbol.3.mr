@@ -28,13 +28,15 @@ class SymbolExpression(Expression)
       if not (? self.function)
         self.m-syntax-error(user "unknown symbol", user self.name)
       self.set-simple-type(user glob.type-func)
-      self.function.arguments.m-copy-new():(self.result-type.arguments)
+      self.function.arguments.m-copy-new():(owner self.result-type.arguments)
   
   func dynamic write()
     if ? self.variable and self.variable.is-output
-      write(user "(*")
+      if not self.top
+        write(user "(")
+      write(user "*")
     write-cname(user self.name)
-    if ? self.variable and self.variable.is-output
+    if ? self.variable and self.variable.is-output and not self.top
       write(user ")")
 
 
@@ -80,7 +82,11 @@ class BaseMethExpression(Expression)
     self.set-simple-type(user parent-type.base-type)
   
   func dynamic write()
-    write(user "(&(self->_base))")
+    if not self.top
+      write(user "(")
+    write(user "&(self->_base)")
+    if not self.top
+      write(user ")")
 
 
 ## An instance member expression
@@ -107,10 +113,6 @@ class MemberExpression(SymbolExpression)
       self.m-syntax-error(user "void expression has no member", user self.name)
     user TypeData type-data(self.instance.result-type.type-data)
     if self.instance.result-type.type-data = glob.type-type
-      if not (? self.instance.result-type.sub-type) or
-          not (? self.instance.result-type.sub-type.type-data)
-        self.m-syntax-error(
-            user "unspecified type has no member", user self.name)
       type-data := self.instance.result-type.sub-type.type-data
     
     type-data.m-find-field(user self.name):(user self.variable)
@@ -134,6 +136,7 @@ class MemberExpression(SymbolExpression)
     new CallArgument self-param
     self-param.access := self.function.arguments.parameters.first.item.access
     self-param.value := self.instance
+    self-param.value.top := true
     arguments.parameters.m-prepend(owner self-param)
     new TypeExpression in self.instance
     self.instance.set-simple-type(user glob.type-type)

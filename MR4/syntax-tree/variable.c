@@ -62,11 +62,11 @@ Returncode SyntaxTreeVariable_parse(SyntaxTreeVariable* self, Int access, TypeDa
     CHECK(35, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){31, 30, "expected space after type, got"}, (*end)) )
   }
   if (self->access == ACCESS_VAR) {
+    Bool _Bool107;
+    CHECK(37, String_equal(self->type_instance->name, &(String){6, 5, "Array"}, &(_Bool107)) )
     Bool _Bool108;
-    CHECK(37, String_equal(self->type_instance->name, &(String){6, 5, "Array"}, &(_Bool108)) )
-    Bool _Bool109;
-    CHECK(37, String_equal(self->type_instance->name, &(String){7, 6, "String"}, &(_Bool109)) )
-    if (_Bool108 || _Bool109) {
+    CHECK(37, String_equal(self->type_instance->name, &(String){7, 6, "String"}, &(_Bool108)) )
+    if (_Bool107 || _Bool108) {
       CHECK(39, SyntaxTreeInitVarSequence_init_new(NULL, self) )
     }
   }

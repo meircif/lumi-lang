@@ -13,7 +13,10 @@ class BlockExpression(Expression)
   ## parsing `(expression)`
   func inst parse(user SyntaxTreeCode code-node):(copy Char end)
     self.set-location()
-    parse-new-expression(user ")", user code-node):(owner self.expression)
+    parse-new-expression(user ")", user code-node):(
+        owner self.expression, copy end)
+    if end != ')'
+      self.m-syntax-error-c(user "expected \")\", got", copy end)
     read-c():(copy end)
   
   func dynamic analyze()
@@ -24,9 +27,11 @@ class BlockExpression(Expression)
     self.expression.write-preactions()
   
   func dynamic write()
-    write(user "(")
+    if not self.top
+      write(user "(")
     self.expression.write()
-    write(user ")")
+    if not self.top
+      write(user ")")
 
 
 static Operator
@@ -67,7 +72,7 @@ class UnaryExpression(Expression)
     self.operator := operator
     self.set-location()
     if end = '\n'
-      self.read-line-break-spaces()
+      code-node.read-line-break-spaces()
     else-if end != ' '
       self.m-syntax-error-c(user "unexpected", copy end)
     Expression.parse-new(var _, user ends, user code-node, user operator):(
@@ -95,7 +100,7 @@ class UnaryExpression(Expression)
   func inst test-operand-type(
       user Expression operand,
       user TypeData expected-type)
-    if operand.result-type.type-data != expected-type
+    if not expected-type.m-is-same(user operand.result-type.type-data)
       self.m-syntax-error3(
           user "operator",
           user self.operator.name,
@@ -128,12 +133,20 @@ class UnaryExpression(Expression)
 ## An expression with a binary operator
 class BinaryExpression(UnaryExpression)
   owner Expression left-expression
+  user BinaryExpression binary-left-expression
   
   func inst parse-new(
-      user String ends, user Operator operator, user SyntaxTreeCode code-node):(
-      owner Expression expression, copy Char end, user Operator next-operator)
+      user String ends,
+      user Operator operator,
+      user SyntaxTreeCode code-node,
+      owner Expression left-expression,
+      user BinaryExpression binary-left-expression):(
+      owner BinaryExpression expression,
+      copy Char end,
+      user Operator next-operator)
     new BinaryExpression binary-expression
-    binary-expression.left-expression := expression
+    binary-expression.left-expression := left-expression
+    binary-expression.binary-left-expression := binary-left-expression
     binary-expression.parse(user operator, user ends, user code-node):(
         copy end, user next-operator)
     expression := binary-expression
@@ -141,6 +154,15 @@ class BinaryExpression(UnaryExpression)
   func dynamic analyze()
     self.analyze-operand(user self.right-expression)
     self.analyze-operand(user self.left-expression)
+    if ? self.binary-left-expression and
+        self.operator.order = self.binary-left-expression.operator.order and
+        self.operator.group-index !=
+        self.binary-left-expression.operator.group-index
+      self.m-syntax-error2(
+          user "ambiguous precedence between operators",
+          user self.binary-left-expression.operator.name,
+          user "and",
+          user self.operator.name)
     if self.operator.order = 2
       # `not` operator
       self.m-syntax-error-msg(user "cannot use \"not\" as binary operand")
@@ -148,22 +170,31 @@ class BinaryExpression(UnaryExpression)
       # `or`\`and` operator
       self.test-operands-type(user glob.type-bool)
       self.set-simple-type(user glob.type-bool)
-    else-if self.operator.name.equal(user ":=")
+    else-if self.operator.order = 4 and self.operator.group-index = 0
+      # := operator
       self.right-expression.result-type.m-check-assign-to(
           user self.left-expression.result-type, user self)
-      if not self.left-expression.assignable
-        self.m-syntax-error-msg(user "assigning into non assignable expression")
-      self.left-expression.top := true
-      self.right-expression.top := true
     else
       # any other Int operator
-      self.test-operands-type(user glob.type-int)
+      if self.operator.order = 1 and ? self.binary-left-expression and
+          self.binary-left-expression.operator.order = 1
+        # (a > b) > c
+        self.test-operand-type(user self.right-expression, user glob.type-int)
+      else
+        self.test-operands-type(user glob.type-int)
       if self.operator.order = 0
         # aritmetic operator
         self.set-simple-type(user glob.type-int)
       else-if self.operator.order = 1
         # compare operator
         self.set-simple-type(user glob.type-bool)
+      # else, assign operator
+    if self.operator.order = 4
+      # assign operator
+      if not self.left-expression.assignable
+        self.m-syntax-error-msg(user "assigning into non assignable expression")
+      self.left-expression.top := true
+      self.right-expression.top := true
   
   func inst test-operands-type(user TypeData expected-type)
     self.test-operand-type(user self.right-expression, user expected-type)
@@ -176,8 +207,17 @@ class BinaryExpression(UnaryExpression)
   func dynamic write()
     self.write-start()
     self.left-expression.write()
+    var Bool expand-and(self.operator.order = 1 and
+        ? self.binary-left-expression and
+        self.binary-left-expression.operator.order = 1)
+    if expand-and
+      # (a > b) > c --> (a > b) && (b > c)
+      write(user " && (")
+      self.binary-left-expression.right-expression.write()
     write(user " ")
     self.write-end()
+    if expand-and
+      write(user ")")
 
 
 ## An expression with the "?" operator

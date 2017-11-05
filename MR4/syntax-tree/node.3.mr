@@ -47,20 +47,6 @@ class SyntaxTreeNode
           user "expected", user expected-text, user "got", user actual-text)
     delete actual-text
   
-  ## Read and check indentation spaces for a line break from the input file
-  func inst read-line-break-spaces(u)
-    for n in glob.spaces + 4
-      if read-c() != ' '
-        var String{128} expected-spaces
-        var String{128} actual-spaces
-        Int.str(var glob.spaces + 4, user expected-spaces)
-        Int.str(var n - 1, user actual-spaces)
-        self.m-syntax-error2(
-            user "too short indentation, expected",
-            user expected-spaces,
-            user "got",
-            user actual-spaces)
-  
   func inst analyze-expression(
       user Expression expression, user TypeData expected-type)
     expression.analyze()

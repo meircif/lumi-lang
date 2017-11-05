@@ -233,7 +233,7 @@ Returncode FunctionArguments_parse_args(FunctionArguments* self, List* arguments
   Int _Int1;
   CHECK(95, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int1)) )
   if ((*end) == '\n' && access_str->length == 0) {
-    CHECK(97, SyntaxTreeNode_read_line_break_spaces(&(self->_base)) )
+    CHECK(97, SyntaxTreeCode_read_line_break_spaces(code_node) )
     Int _Int2;
     CHECK(98, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int2)) )
   }
@@ -251,7 +251,7 @@ Returncode FunctionArguments_parse_args(FunctionArguments* self, List* arguments
       if (!((*end) == ',')) break;
       CHECK(111, read_c(&((*end))) )
       if ((*end) == '\n') {
-        CHECK(113, SyntaxTreeNode_read_line_break_spaces(&(self->_base)) )
+        CHECK(113, SyntaxTreeCode_read_line_break_spaces(code_node) )
       }
       else {
         if ((*end) != ' ') {

@@ -48,6 +48,12 @@ mock file-write(user File file, user String text)
 mock write-global(user String text)
   # do nothing
 
+mock write-pre-func(user SyntaxTreeFunction self)
+  # do nothing
+
+mock write-post-func()
+  # do nothing
+
 
 var String{16} mock-input-file-name
 

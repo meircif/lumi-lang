@@ -178,29 +178,30 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
         if (!_Bool18) {
           CHECK(65, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){22, 21, "illegal binary number"}, text) )
         }
+        CHECK(66, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){36, 35, "binary numbers not supported yet..."}, text) )
       }
       else {
         if (second == 'x' || second == 'X') {
           Bool _Bool19;
-          CHECK(67, f_is_hex(number, &(_Bool19)) )
+          CHECK(69, f_is_hex(number, &(_Bool19)) )
           if (!_Bool19) {
-            CHECK(68, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal hexadecimal number"}, text) )
+            CHECK(70, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal hexadecimal number"}, text) )
           }
         }
         else {
-          CHECK(70, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){15, 14, "illegal number"}, text) )
+          CHECK(72, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){15, 14, "illegal number"}, text) )
         }
       }
     }
   }
   else {
     Bool _Bool20;
-    CHECK(71, f_is_decimal(number, &(_Bool20)) )
+    CHECK(73, f_is_decimal(number, &(_Bool20)) )
     if (!_Bool20) {
-      CHECK(72, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){15, 14, "illegal number"}, text) )
+      CHECK(74, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){15, 14, "illegal number"}, text) )
     }
   }
-  CHECK(73, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
+  CHECK(75, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
   self->_base.text = text;
   return OK;
 }
@@ -229,10 +230,10 @@ static char* _func_name_CharExpression_parse_new = "CharExpression.parse-new";
 #define MR_FUNC_NAME _func_name_CharExpression_parse_new
 Returncode CharExpression_parse_new(CharExpression* self, String* text, Expression** expression) {
   CharExpression* char_expression = malloc(sizeof(CharExpression));
-  if (char_expression == NULL) RAISE(80)
+  if (char_expression == NULL) RAISE(82)
   *char_expression = (CharExpression){CharExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL};
   char_expression->_base._base._base._dtl = CharExpression__dtl;
-  CHECK(81, CharExpression_parse(char_expression, text) )
+  CHECK(83, CharExpression_parse(char_expression, text) )
   (*expression) = &(char_expression->_base._base);
   return OK;
 }
@@ -244,63 +245,63 @@ Returncode CharExpression_parse(CharExpression* self, String* text);
 static char* _func_name_CharExpression_parse = "CharExpression.parse";
 #define MR_FUNC_NAME _func_name_CharExpression_parse
 Returncode CharExpression_parse(CharExpression* self, String* text) {
-  CHECK(86, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
+  CHECK(88, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
   Char ch = '\0';
   if (text->length == 3) {
-    if ((1) < 0 || (1) >= (text)->length) RAISE(89)
+    if ((1) < 0 || (1) >= (text)->length) RAISE(91)
     ch = ((text)->values[1]);
     if (ch == '\'' || ch == '\\') {
-      CHECK(91, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
+      CHECK(93, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
     }
   }
   else {
     if (text->length == 4) {
-      if ((1) < 0 || (1) >= (text)->length) RAISE(93)
+      if ((1) < 0 || (1) >= (text)->length) RAISE(95)
       if (((text)->values[1]) != '\\') {
-        CHECK(94, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
-      }
-      if ((2) < 0 || (2) >= (text)->length) RAISE(95)
-      Bool _Bool21;
-      CHECK(95, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool21)) )
-      if (!_Bool21) {
         CHECK(96, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
+      }
+      if ((2) < 0 || (2) >= (text)->length) RAISE(97)
+      Bool _Bool21;
+      CHECK(97, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool21)) )
+      if (!_Bool21) {
+        CHECK(98, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }
     }
     else {
       if (text->length == 6) {
-        if ((1) < 0 || (1) >= (text)->length) RAISE(98)
+        if ((1) < 0 || (1) >= (text)->length) RAISE(100)
         if (((text)->values[1]) != '\\') {
-          CHECK(99, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
+          CHECK(101, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
         }
-        if ((2) < 0 || (2) >= (text)->length) RAISE(100)
+        if ((2) < 0 || (2) >= (text)->length) RAISE(102)
         ch = ((text)->values[2]);
         if (ch == 'x') {
-          if ((3) < 0 || (2) < 0 || (3) + (2) > (text)->length) RAISE(102)
+          if ((3) < 0 || (2) < 0 || (3) + (2) > (text)->length) RAISE(104)
           Bool _Bool22;
-          CHECK(102, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool22)) )
+          CHECK(104, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool22)) )
           if (!_Bool22) {
-            CHECK(103, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
+            CHECK(105, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
           }
         }
         else {
-          if ((2) < 0 || (3) < 0 || (2) + (3) > (text)->length) RAISE(105)
+          if ((2) < 0 || (3) < 0 || (2) + (3) > (text)->length) RAISE(107)
           Bool _Bool23;
-          CHECK(105, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool23)) )
+          CHECK(107, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool23)) )
           if (!_Bool23) {
-            CHECK(106, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
+            CHECK(108, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
           }
         }
       }
       else {
-        CHECK(108, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
+        CHECK(110, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }
     }
   }
-  if ((text->length - 1) < 0 || (text->length - 1) >= (text)->length) RAISE(109)
+  if ((text->length - 1) < 0 || (text->length - 1) >= (text)->length) RAISE(111)
   if (((text)->values[text->length - 1]) != '\'') {
-    CHECK(110, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
+    CHECK(112, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
   }
-  CHECK(111, Expression_set_simple_type(&(self->_base._base), glob->type_char) )
+  CHECK(113, Expression_set_simple_type(&(self->_base._base), glob->type_char) )
   self->_base.text = text;
   return OK;
 }
@@ -330,10 +331,10 @@ static char* _func_name_StringExpression_parse_new = "StringExpression.parse-new
 #define MR_FUNC_NAME _func_name_StringExpression_parse_new
 Returncode StringExpression_parse_new(StringExpression* self, String* text, SyntaxTreeCode* code_node, Expression** expression) {
   StringExpression* string_expression = malloc(sizeof(StringExpression));
-  if (string_expression == NULL) RAISE(121)
+  if (string_expression == NULL) RAISE(123)
   *string_expression = (StringExpression){StringExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL, NULL};
   string_expression->_base._base._base._dtl = StringExpression__dtl;
-  CHECK(122, StringExpression_parse(string_expression, text, code_node) )
+  CHECK(124, StringExpression_parse(string_expression, text, code_node) )
   (*expression) = &(string_expression->_base._base);
   return OK;
 }
@@ -346,12 +347,12 @@ static char* _func_name_StringExpression_parse = "StringExpression.parse";
 #define MR_FUNC_NAME _func_name_StringExpression_parse
 Returncode StringExpression_parse(StringExpression* self, String* text, SyntaxTreeCode* code_node) {
   self->_base._base.code_node = code_node;
-  CHECK(128, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
-  if ((text->length - 1) < 0 || (text->length - 1) >= (text)->length) RAISE(129)
+  CHECK(130, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
+  if ((text->length - 1) < 0 || (text->length - 1) >= (text)->length) RAISE(131)
   if (((text)->values[text->length - 1]) != '\"') {
-    CHECK(130, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){24, 23, "illegal string constant"}, text) )
+    CHECK(132, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){24, 23, "illegal string constant"}, text) )
   }
-  CHECK(131, Expression_set_simple_type(&(self->_base._base), glob->type_string) )
+  CHECK(133, Expression_set_simple_type(&(self->_base._base), glob->type_string) )
   self->_base.text = text;
   return OK;
 }
@@ -363,7 +364,7 @@ Returncode StringExpression_analyze(StringExpression* self);
 static char* _func_name_StringExpression_analyze = "StringExpression.analyze";
 #define MR_FUNC_NAME _func_name_StringExpression_analyze
 Returncode StringExpression_analyze(StringExpression* self) {
-  CHECK(135, Expression_add_aux_variable(&(self->_base._base), ACCESS_AUX, &(self->symbol)) )
+  CHECK(137, Expression_add_aux_variable(&(self->_base._base), ACCESS_AUX, &(self->symbol)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -379,27 +380,27 @@ Returncode StringExpression_write_preactions(StringExpression* self) {
   /* `symbol`.values = "`text`"; */
   Int real_length = 1;
   {int index; for (index = (1); index < (self->_base.text->length - 1); ++index) {
-    if ((index) < 0 || (index) >= (self->_base.text)->length) RAISE(143)
+    if ((index) < 0 || (index) >= (self->_base.text)->length) RAISE(145)
     if (((self->_base.text)->values[index]) == '\\') {
       index += 1;
     }
     real_length = real_length + 1;
   }}
-  CHECK(146, (self->symbol)->_base._dtl[2](self->symbol) )
-  CHECK(147, write(&(String){16, 15, "->max_length = "}) )
-  CHECK(148, write_int(real_length) )
-  CHECK(149, write(&(String){3, 2, ";\n"}) )
-  CHECK(150, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(151, (self->symbol)->_base._dtl[2](self->symbol) )
-  CHECK(152, write(&(String){12, 11, "->length = "}) )
-  CHECK(153, write_int(real_length - 1) )
-  CHECK(154, write(&(String){3, 2, ";\n"}) )
-  CHECK(155, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(156, (self->symbol)->_base._dtl[2](self->symbol) )
-  CHECK(157, write(&(String){12, 11, "->values = "}) )
-  CHECK(158, write(self->_base.text) )
-  CHECK(159, write(&(String){3, 2, ";\n"}) )
-  CHECK(160, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(148, (self->symbol)->_base._dtl[2](self->symbol) )
+  CHECK(149, write(&(String){16, 15, "->max_length = "}) )
+  CHECK(150, write_int(real_length) )
+  CHECK(151, write(&(String){3, 2, ";\n"}) )
+  CHECK(152, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(153, (self->symbol)->_base._dtl[2](self->symbol) )
+  CHECK(154, write(&(String){12, 11, "->length = "}) )
+  CHECK(155, write_int(real_length - 1) )
+  CHECK(156, write(&(String){3, 2, ";\n"}) )
+  CHECK(157, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(158, (self->symbol)->_base._dtl[2](self->symbol) )
+  CHECK(159, write(&(String){12, 11, "->values = "}) )
+  CHECK(160, write(self->_base.text) )
+  CHECK(161, write(&(String){3, 2, ";\n"}) )
+  CHECK(162, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -410,7 +411,7 @@ Returncode StringExpression_write(StringExpression* self);
 static char* _func_name_StringExpression_write = "StringExpression.write";
 #define MR_FUNC_NAME _func_name_StringExpression_write
 Returncode StringExpression_write(StringExpression* self) {
-  CHECK(163, (self->symbol)->_base._dtl[2](self->symbol) )
+  CHECK(165, (self->symbol)->_base._dtl[2](self->symbol) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -438,12 +439,12 @@ static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 #define MR_FUNC_NAME _func_name_EmptyExpression_parse_new
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
   EmptyExpression* _EmptyExpression24 = malloc(sizeof(EmptyExpression));
-  if (_EmptyExpression24 == NULL) RAISE(169)
+  if (_EmptyExpression24 == NULL) RAISE(171)
   *_EmptyExpression24 = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, false, false, false};
   _EmptyExpression24->_base._base._dtl = EmptyExpression__dtl;
   (*expression) = &(_EmptyExpression24->_base);
-  CHECK(170, SyntaxTreeNode_set_location(&((*expression)->_base)) )
-  CHECK(171, Expression_set_simple_type((*expression), glob->type_empty) )
+  CHECK(172, SyntaxTreeNode_set_location(&((*expression)->_base)) )
+  CHECK(173, Expression_set_simple_type((*expression), glob->type_empty) )
   free(text);
   return OK;
 }
@@ -455,7 +456,7 @@ Returncode EmptyExpression_write(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write = "EmptyExpression.write";
 #define MR_FUNC_NAME _func_name_EmptyExpression_write
 Returncode EmptyExpression_write(EmptyExpression* self) {
-  CHECK(175, write(&(String){5, 4, "NULL"}) )
+  CHECK(177, write(&(String){5, 4, "NULL"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

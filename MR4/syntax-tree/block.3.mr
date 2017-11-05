@@ -14,6 +14,21 @@ class SyntaxTreeCode(SyntaxTreeNode)
   func inst write-spaces()
     self.parent.write-spaces()
   
+  ## Read and check indentation spaces for a line break from the input file
+  func inst read-line-break-spaces()
+    var Int expected-spaces(self.parent.indentation-spaces + 4)
+    for n in expected-spaces
+      if read-c() != ' '
+        var String{16} expected-spaces-str
+        var String{16} actual-spaces-str
+        expected-spaces.str(user expected-spaces-str)
+        Int.str(var n - 1, user actual-spaces-str)
+        self.m-syntax-error2(
+            user "too short indentation, expected",
+            user expected-spaces-str,
+            user "got",
+            user actual-spaces-str)
+  
   func dynamic m-is-end-point():(copy Bool is-end)
     is-end := false
 

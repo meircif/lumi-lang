@@ -25,7 +25,7 @@ class CallExpression(Expression)
   func dynamic analyze()
     self.function.analyze()
     self.arguments.analyze()
-    if not (? self.function.result-type.type-data)
+    if not (? self.function.result-type)
       self.m-syntax-error-msg(user "void expression is not callable")
     if self.function.result-type.type-data != glob.type-func
       self.m-syntax-error(
@@ -33,20 +33,21 @@ class CallExpression(Expression)
           user self.function.result-type.type-data.name)
     user FunctionArguments declaration(self.function.result-type.arguments)
     if not (? declaration)
-        self.m-syntax-error-msg(user "pointer-to-function not supported")
+      self.m-syntax-error-msg(user "pointer-to-function not supported")
     if not self.is-statement
       declaration.get-result-type().m-copy-new():(owner self.result-type)
     self.function.analyze-call(user self.arguments)
     if self.arguments.m-check-calling(user declaration)
       # add omitted output
       new CallArgument output
+      output.is-output := true
       output.access := declaration.outputs.last.item.access
       self.add-aux-variable(copy declaration.outputs.last.item.access):(
           owner output.value)
       self.output := output.value
       self.arguments.outputs.add(owner output)
     else-if ? self.result-type
-      declaration.get-output():(user self.output)
+      self.arguments.get-output():(user self.output)
     self.assignable := ? self.result-type
   
   func dynamic write-preactions()

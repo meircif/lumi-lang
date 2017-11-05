@@ -190,7 +190,7 @@ static char* _func_name_test_return = "test-return";
 #define MR_FUNC_NAME _func_name_test_return
 Returncode test_return() {
   CHECK(175, test_global_scope(&(String){21, 20, "func name()\n  return"}, &(String){62, 61, "Returncode name(void);\nReturncode name(void) {\n  return OK;\n}"}) )
-  CHECK(178, test_global_scope(&(String){20, 19, "func name()\n  raise"}, &(String){60, 59, "Returncode name(void);\nReturncode name(void) {\n  RAISE(1)\n}"}) )
+  CHECK(178, test_global_scope(&(String){20, 19, "func name()\n  raise"}, &(String){60, 59, "Returncode name(void);\nReturncode name(void) {\n  RAISE(2)\n}"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -213,20 +213,20 @@ Returncode test_code_variables() {
   CHECK(195, test_code(&(String){21, 20, "var Array{12:Test} a"}, &(String){95, 94, "Test a_Values[12];\n  Array a_Var = {12, NULL};\n  Array* a = &a_Var;\n  a_Var.values = a_Values;"}) )
   CHECK(198, test_code(&(String){27, 26, "var Array{12:String{7}} sa"}, &(String){176, 175, "char sa_Chars[12 * 7];\n  String sa_Values[12];\n  Array sa_Var = {12, NULL};\n  Array* sa = &sa_Var;\n  sa_Var.values = sa_Values;\n  MR_set_var_string_array(12, 7, sa, sa_Chars);"}) )
   CHECK(201, test_code(&(String){11, 10, "new Test t"}, &(String){47, 46, "Test* t = NULL;\n  t = calloc(1, sizeof(Test));"}) )
-  CHECK(203, test_code(&(String){21, 20, "new String{arr[0]} s"}, &(String){117, 116, "String* s = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(3)\n  s = MR_new_string((((Int*)((arr)->values))[0]));"}) )
-  CHECK(206, test_code(&(String){24, 23, "new Array{arr[0]:Int} a"}, &(String){128, 127, "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(3)\n  a = MR_new_array((((Int*)((arr)->values))[0]), sizeof(Int));"}) )
-  CHECK(209, test_code(&(String){25, 24, "new Array{arr[0]:Test} a"}, &(String){129, 128, "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(3)\n  a = MR_new_array((((Int*)((arr)->values))[0]), sizeof(Test));"}) )
+  CHECK(203, test_code(&(String){21, 20, "new String{arr[0]} s"}, &(String){115, 114, "String* s = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n  s = MR_new_string(((Int*)((arr)->values))[0]);"}) )
+  CHECK(206, test_code(&(String){24, 23, "new Array{arr[0]:Int} a"}, &(String){126, 125, "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n  a = MR_new_array(((Int*)((arr)->values))[0], sizeof(Int));"}) )
+  CHECK(209, test_code(&(String){25, 24, "new Array{arr[0]:Test} a"}, &(String){127, 126, "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n  a = MR_new_array(((Int*)((arr)->values))[0], sizeof(Test));"}) )
   String* expected = &(String){1024, 0, (char[1024]){0}};
   CHECK(213, String_copy(expected, &(String){19, 18, "Array* sa = NULL;\n"}) )
-  CHECK(214, String_concat(expected, &(String){49, 48, "  if ((0) < 0 || (0) >= (arr)->length) RAISE(3)\n"}) )
-  CHECK(215, String_concat(expected, &(String){49, 48, "  if ((1) < 0 || (1) >= (arr)->length) RAISE(3)\n"}) )
-  CHECK(216, String_concat(expected, &(String){51, 50, "  sa = MR_new_array((((Int*)((arr)->values))[0]), "}) )
-  CHECK(217, String_concat(expected, &(String){51, 50, "sizeof(String) + ((((Int*)((arr)->values))[1])));\n"}) )
+  CHECK(214, String_concat(expected, &(String){49, 48, "  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n"}) )
+  CHECK(215, String_concat(expected, &(String){49, 48, "  if ((1) < 0 || (1) >= (arr)->length) RAISE(4)\n"}) )
+  CHECK(216, String_concat(expected, &(String){49, 48, "  sa = MR_new_array(((Int*)((arr)->values))[0], "}) )
+  CHECK(217, String_concat(expected, &(String){49, 48, "sizeof(String) + (((Int*)((arr)->values))[1]));\n"}) )
   CHECK(218, String_concat(expected, &(String){27, 26, "  MR_set_new_string_array("}) )
-  CHECK(219, String_concat(expected, &(String){31, 30, "(((Int*)((arr)->values))[0]), "}) )
-  CHECK(220, String_concat(expected, &(String){35, 34, "(((Int*)((arr)->values))[1]), sa);"}) )
+  CHECK(219, String_concat(expected, &(String){29, 28, "((Int*)((arr)->values))[0], "}) )
+  CHECK(220, String_concat(expected, &(String){33, 32, "((Int*)((arr)->values))[1], sa);"}) )
   CHECK(221, test_code(&(String){36, 35, "new Array{arr[0]:String{arr[1]}} sa"}, expected) )
-  CHECK(222, test_code(&(String){18, 17, "var Int x(arr[0])"}, &(String){95, 94, "Int x = 0;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(3)\n  x = (((Int*)((arr)->values))[0]);"}) )
+  CHECK(222, test_code(&(String){18, 17, "var Int x(arr[0])"}, &(String){93, 92, "Int x = 0;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n  x = ((Int*)((arr)->values))[0];"}) )
   CHECK(225, test_code(&(String){19, 18, "user String s(str)"}, &(String){29, 28, "String* s = NULL;\n  s = str;"}) )
   CHECK(226, String_copy(expected, &(String){20, 19, "char s_Values[12];\n"}) )
   CHECK(227, String_concat(expected, &(String){33, 32, "  String s_Var = {12, 0, NULL};\n"}) )
@@ -237,9 +237,9 @@ Returncode test_code_variables() {
   CHECK(232, String_concat(expected, &(String){34, 33, "  aux_String_0->max_length = 12;\n"}) )
   CHECK(233, String_concat(expected, &(String){30, 29, "  aux_String_0->length = 11;\n"}) )
   CHECK(234, String_concat(expected, &(String){41, 40, "  aux_String_0->values = \"some string\";\n"}) )
-  CHECK(235, String_concat(expected, &(String){42, 41, "  CHECK(3, String_copy(s, aux_String_0) )"}) )
+  CHECK(235, String_concat(expected, &(String){42, 41, "  CHECK(4, String_copy(s, aux_String_0) )"}) )
   CHECK(236, test_code(&(String){32, 31, "var String{12} s(\"some string\")"}, expected) )
-  CHECK(237, test_code(&(String){21, 20, "new String{i} s(str)"}, &(String){75, 74, "String* s = NULL;\n  s = MR_new_string(i);\n  CHECK(3, String_copy(s, str) )"}) )
+  CHECK(237, test_code(&(String){21, 20, "new String{i} s(str)"}, &(String){75, 74, "String* s = NULL;\n  s = MR_new_string(i);\n  CHECK(4, String_copy(s, str) )"}) )
   CHECK(240, test_code_error(&(String){8, 7, "var Int"}, &(String){42, 41, "expected space after type, got \"new-line\""}) )
   CHECK(242, test_global_scope_error(&(String){27, 26, "struct Test\n  var Int x(1)"}, &(String){35, 34, "type members cannot be initialized"}) )
   CHECK(245, test_global_scope_error(&(String){13, 12, "var Int x(1)"}, &(String){39, 38, "global variables cannot be initialized"}) )
@@ -256,7 +256,7 @@ Returncode test_code_variables() {
   CHECK(265, test_code_error(&(String){10, 9, "new Int x"}, &(String){43, 42, "cannot use \"new\" with primitive type \"Int\""}) )
   CHECK(267, test_code_error(&(String){12, 11, "var Int x(1"}, &(String){50, 49, "expected \")\" after initialization, got \"new-line\""}) )
   CHECK(270, test_code_error(&(String){14, 13, "var File f(1)"}, &(String){44, 43, "cannot initialize non-primitive type \"File\""}) )
-  CHECK(273, test_code_error(&(String){14, 13, "var Char x(1)"}, &(String){32, 31, "cannot assign \"Int\" into \"Char\""}) )
+  CHECK(273, test_code_error(&(String){14, 13, "var Bool x(1)"}, &(String){32, 31, "cannot assign \"Int\" into \"Bool\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME

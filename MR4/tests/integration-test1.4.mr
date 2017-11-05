@@ -10,12 +10,19 @@ class TopType(MiddleType)
   
   func dynamic meth2()
     # sys.print(user "TopType.meth2")
+    base.meth2()
+    MiddleType.meth2(var _)
+    BaseType.meth2(var _)
   
   func dynamic meth3(copy Int n, user String s)
     # sys.print(user "TopType.meth3")
+    # base.meth3(copy n, user s)
   
   func dynamic meth5(copy Int n, user String s)
     # sys.print(user "TopType.meth5")
+    base.meth5(copy n, user s)
+    MiddleType.meth1(var _, copy n, user s)
+    BaseType.meth1(var _, copy n, user s)
   
   func dynamic meth6()
     # sys.print(user "TopType.meth6")

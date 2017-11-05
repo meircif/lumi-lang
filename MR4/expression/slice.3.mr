@@ -66,24 +66,30 @@ class SliceExpression(Expression)
     
     if ? self.second-index
       self.second-index.write-preactions()
-      # symbol.length = second;
-      # symbol.max_length = symbol.length + 1;
-      # symbol.values = (seq)->values + (index);
+      # symbol_Var.length = second;
+      # symbol_Var.max_length = symbol.length + 1;
+      # symbol_Var.values = (seq)->values + (index);
+      # symbol_Var.values = (Byte*)((seq)->values) + (index);
       self.slice-symbol.write()
-      write(user ".length = ")
+      write(user "_Var.length = ")
       self.second-index.write()
       write(user ";\n")
       self.code-node.write-spaces()
       if self.sequence.result-type.type-data = glob.type-string
         self.slice-symbol.write()
-        write(user ".max_length = ")
+        write(user "_Var.max_length = ")
         self.slice-symbol.write()
-        write(user ".length + 1;\n")
+        write(user "_Var.length + 1;\n")
         self.code-node.write-spaces()
       self.slice-symbol.write()
-      write(user ".values = (")
+      write(user "_Var.values = (")
+      if self.sequence.result-type.type-data != glob.type-string
+        write(user "Byte*)((")
       self.sequence.write()
-      write(user ")->values + (")
+      write(user ")->values")
+      if self.sequence.result-type.type-data != glob.type-string
+        write(user ")")
+      write(user " + (")
       self.index.write()
       write(user ");\n")
       self.code-node.write-spaces()
@@ -117,14 +123,23 @@ class SliceExpression(Expression)
       self.slice-symbol.write()
       return
     
+    # (((seq)->values)[index])
     # (((Prmitive*)((seq)->values))[index])
     # (((Complex**)((seq)->values))[index])
-    write(user "(((")
-    write-cname(user self.result-type.type-data.name)
-    if not self.result-type.type-data.is-primitive
-      write(user "*")
-    write(user "*)((")
+    if not self.top
+      write(user "(")
+    write(user "((")
+    if self.sequence.result-type.type-data != glob.type-string
+      write-cname(user self.result-type.type-data.name)
+      if not self.result-type.type-data.is-primitive
+        write(user "*")
+      write(user "*)((")
     self.sequence.write()
-    write(user ")->values))[")
+    write(user ")->values)")
+    if self.sequence.result-type.type-data != glob.type-string
+      write(user ")")
+    write(user "[")
     self.index.write()
-    write(user "])")
+    write(user "]")
+    if not self.top
+      write(user ")")

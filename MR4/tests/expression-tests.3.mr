@@ -54,9 +54,11 @@ test test-int-expression()
   test-code(user "i := 9630", user "i = 9630;")
   test-code(user "i := -9630", user "i = -9630;")
   test-code(user "i := 07520", user "i = 07520;")
-  test-code(user "i := 0b1011", user "i = 0b1011;")
+  test-code(user "i := -07520", user "i = -07520;")
   test-code(user "i := 0xfda940", user "i = 0xfda940;")
+  test-code(user "i := -0xfda940", user "i = -0xfda940;")
   test-code(user "i := 0xFDA940", user "i = 0xFDA940;")
+  test-code(user "i := -0xFDA940", user "i = -0xFDA940;")
   test-code-error(user "2a", user "illegal number \"2a\"")
   test-code-error(user "0a", user "illegal number \"0a\"")
   test-code-error(user "038", user "illegal octal number \"038\"")
@@ -107,51 +109,114 @@ test test-empty-expression()
 
 test test-member-expression()
   test-code(user "i := t.num", user "i = t->num;")
+  test-code-error(user "error", user "unknown symbol \"error\"")
+  test-code-error(
+      user "(i := 1).error", user "void expression has no member \"error\"")
+  test-global-scope-error(
+      user "struct Test\n  var Int x\nfunc mock(user Test t)\n  t.error\n",
+      user "type \"Test\" has no member \"error\"")
 
 
 test test-slice-expression()
   test-code(
+      user "c := str[13]",
+      user "if ((13) < 0 || (13) >= (str)->length) RAISE(4)\n  c = ((str)->values)[13];")
+  var String{1024} expected
+  expected.copy(user "String aux_String_0_Var = {0};\n")
+  expected.concat(user "  String* aux_String_0 = &aux_String_0_Var;\n")
+  expected.concat(user "  aux_String_0_Var.length = 6;\n")
+  expected.concat(
+      user "  aux_String_0_Var.max_length = aux_String_0_Var.length + 1;\n")
+  expected.concat(user "  aux_String_0_Var.values = (str)->values + (2);\n")
+  expected.concat(
+      user "  if ((2) < 0 || (6) < 0 || (2) + (6) > (str)->length) RAISE(4)\n")
+  expected.concat(user "  str = aux_String_0;")
+  test-code(user "str := str[2:6]", user expected)
+  test-code(
       user "i := arr[13]",
-      user "if ((13) < 0 || (13) >= (arr)->length) RAISE(3)\n  i = (((Int*)((arr)->values))[13]);")
+      user "if ((13) < 0 || (13) >= (arr)->length) RAISE(4)\n  i = ((Int*)((arr)->values))[13];")
   test-code(
       user "arr := arr[2:6]",
-      user "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0.length = 6;\n  aux_Array_0.values = (arr)->values + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(3)\n  arr = aux_Array_0;")
+      user "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0_Var.length = 6;\n  aux_Array_0_Var.values = (Byte*)((arr)->values) + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(4)\n  arr = aux_Array_0;")
 
-
-# test test-call-expression()
-  # test-code(user "function()", user "function()")
-  # test-code(
-      # user "function(copy 3, user arg, var _)",
-      # user "function(3, arg, NULL)")
-  # test-code(
-      # user "function()->(owner arg, copy num)",
-      # user "function(&(arg), &(num))")
-  # test-code(
-      # user "function(copy 0)->(owner arg)",
-      # user "function(0, &(arg))")
-  # test-code(
-      # user "function(copy calc(copy 3))",
-      # user "function(calc(3))")
-  # test-code(
-      # user "function(\n    copy 2,\n    copy 3)->(\n    copy x,\n    copy y)",
-      # user "function(2, 3, &(x), &(y))")
-  # test-code-error(
-      # user "function( copy 1)", user "expected access, got \" \"")
-  # test-code-error(
-      # user "function(user)", user "expected space after access, got \")\"")
-  # test-code-error(
-      # user "function(copy 4,copy 3)",
-      # user "expected space or new-line after \",\", got \"c\"")
-  # test-code-error(
-      # user "function(copy 2", user "expected \",\" or \")\", got \"EOF\"")
-  # test-code-error(
-      # user "function(error 4)", user "illegal access \"error\"")
+test test-call-expression()
+  test-global-scope(
+      user "func fun()\nfunc mock()\n  fun()",
+      user "Returncode fun(void);\nReturncode mock(void);\nReturncode fun(void) {\n  return OK;\n}\nReturncode mock(void) {\n  CHECK(3, fun() )\n  return OK;\n}")
+  test-global-scope(
+      user "func fun(copy Int x, user String s, owner String o)\nfunc mock(user String s)\n  fun(copy 3, user s, owner _)",
+      user "Returncode fun(Int x, String* s, String* o);\nReturncode mock(String* s);\nReturncode fun(Int x, String* s, String* o) {\n  return OK;\n}\nReturncode mock(String* s) {\n  CHECK(3, fun(3, s, NULL) )\n  return OK;\n}")
+  var String{1024} expected
+  expected.copy(user "Returncode fun(String** s, Int* x);\n")
+  expected.concat(user "Returncode mock(String** s, Int* x);\n")
+  expected.concat(user "Returncode fun(String** s, Int* x) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode mock(String** s, Int* x) {\n")
+  expected.concat(user "  Int n = 0;\n")
+  expected.concat(user "  String* t = NULL;\n")
+  expected.concat(user "  CHECK(3, fun(&(*s), &(*x)) )\n")
+  expected.concat(user "  CHECK(6, fun(&(t), &(n)) )\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}")
+  test-global-scope(
+      user "func fun()->(owner String s, copy Int x)\nfunc mock()->(owner String s, copy Int x)\n  fun()->(owner s, copy x)\n  var Int n\n  owner String t\n  fun()->(owner t, copy n)",
+      user expected)
+  test-global-scope(
+      user "func fun(copy Int x)->(owner String s)\nfunc mock()->(owner String s)\n  fun(copy 0)->(owner s)",
+      user "Returncode fun(Int x, String** s);\nReturncode mock(String** s);\nReturncode fun(Int x, String** s) {\n  return OK;\n}\nReturncode mock(String** s) {\n  CHECK(3, fun(0, &(*s)) )\n  return OK;\n}")
+  expected.copy(user "Returncode fun(Int x);\n")
+  expected.concat(user "Returncode joy(Int x, Int* r);\n")
+  expected.concat(user "Returncode mock(void);\n")
+  expected.concat(user "Returncode fun(Int x) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode joy(Int x, Int* r) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode mock(void) {\n")
+  expected.concat(user "  Int x = 0;\n")
+  expected.concat(user "  CHECK(5, joy(3, &(x)) )\n")
+  expected.concat(user "  CHECK(5, fun(x) )\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}")
+  test-global-scope(
+      user "func fun(copy Int x)\nfunc joy(copy Int x)->(copy Int r)\nfunc mock()\n  var Int x\n  fun(copy joy(copy 3)->(copy x))",
+      user expected)
+  test-global-scope(
+      user "func fun(copy Int x, copy Int y)->(copy Int n, copy Int m)\nfunc mock()->(copy Int n, copy Int m)\n  fun(\n      copy 2,\n      copy 3)->(\n      copy n,\n      copy m)",
+      user "Returncode fun(Int x, Int y, Int* n, Int* m);\nReturncode mock(Int* n, Int* m);\nReturncode fun(Int x, Int y, Int* n, Int* m) {\n  return OK;\n}\nReturncode mock(Int* n, Int* m) {\n  CHECK(3, fun(2, 3, &(*n), &(*m)) )\n  return OK;\n}")
+  test-global-scope(
+      user "func fun()->(copy Int x)\nfunc mock()->(copy Int x)\n  x := fun()",
+      user "Returncode fun(Int* x);\nReturncode mock(Int* x);\nReturncode fun(Int* x) {\n  return OK;\n}\nReturncode mock(Int* x) {\n  Int aux_Int_0 = 0;\n  CHECK(3, fun(&(aux_Int_0)) )\n  *x = aux_Int_0;\n  return OK;\n}")
+  test-global-scope(
+      user "func fun()->(user String s)\nfunc mock()->(user String s)\n  s := fun()",
+      user "Returncode fun(String** s);\nReturncode mock(String** s);\nReturncode fun(String** s) {\n  return OK;\n}\nReturncode mock(String** s) {\n  String* aux_String_0 = NULL;\n  CHECK(3, fun(&(aux_String_0)) )\n  *s = aux_String_0;\n  return OK;\n}")
+  test-code-error(
+      user "function( copy 1)", user "expected access, got \" \"")
+  test-code-error(
+      user "function(user)", user "expected space after access, got \")\"")
+  test-code-error(
+      user "function(copy 4,copy 3)",
+      user "expected space or new-line after \",\", got \"c\"")
+  test-code-error(
+      user "function(copy 2", user "expected \",\" or \")\", got \"new-line\"")
+  test-code-error(
+      user "function(error 4)", user "illegal access \"error\"")
+  test-code-error(
+      user "(i := 0)()", user "void expression is not callable")
+  test-code-error(
+      user "i()", user "non callable type \"Int\"")
+  test-global-scope-error(
+      user "func fun()->(copy Int x)\nfunc mock()\n  fun()->(copy 4)\n",
+      user "non assignable call output")
 
 
 test test-type-expression()
   test-global-scope(
       user "struct Test\n  var Int x\n  func meth()\nfunc mock(user Test t)\n  Test.meth(var t)",
-      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_meth(Test* self);\nReturncode mock(Test* t);\nReturncode Test_meth(Test* self) {\n  return OK;\n}\nReturncode mock(Test* t) {\n  CHECK(4, Test_meth(t) )\n  return OK;\n}")
+      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_meth(Test* self);\nReturncode mock(Test* t);\nReturncode Test_meth(Test* self) {\n  return OK;\n}\nReturncode mock(Test* t) {\n  CHECK(5, Test_meth(t) )\n  return OK;\n}")
+  test-code-error(user "Error", user "unknown type \"Error\"")
 
 
 test test-base-expression()
@@ -170,45 +235,118 @@ test test-base-expression()
   expected.concat(user "  return OK;\n")
   expected.concat(user "}\n")
   expected.concat(user "Returncode Test_meth(Test* self) {\n")
-  expected.concat(user "  CHECK(5, Base_meth((&(self->_base))) )\n")
+  expected.concat(user "  CHECK(6, Base_meth(&(self->_base)) )\n")
   expected.concat(user "  return OK;\n")
   expected.concat(user "}")
   test-global-scope(
       user "struct Base\n  var Int x\n  func meth()\nstruct Test(Base)\n  func meth()\n    base.meth()",
       user expected)
+  test-code-error(user "base", user "\"base\" used not in method")
+  test-global-scope-error(
+      user "struct Test\n  var Int x\n  func mock()\n    base\n",
+      user "no base type for type \"Test\"")
 
 
 test test-block-expression()
-  test-code(user "i := (123)", user "i = (123);")
+  test-code(user "i := 2 + (123)", user "i = 2 + (123);")
+  test-code(user "i := (123)", user "i = 123;")
+  test-code(user "i := (123 * (i - 4)) + 2", user "i = (123 * (i - 4)) + 2;")
+  test-code-error(user "(error", user "expected \")\", got \"new-line\"")
 
 
 test test-unary-expression()
   test-code(user "i := - i", user "i = - i;")
-  test-code(user "i := -\n    i", user "i = - i;")
+  test-code(user "i := -\n      i", user "i = - i;")
   test-code(user "i := - - i", user "i = - (- i);")
+  test-code(user "b := not b", user "b = ! b;")
+  test-code(user "b := not i > 3", user "b = ! (i > 3);")
   test-code-error(user "[45]", user "unexpected \"[\"")
+  test-code-error(user "-[", user "unexpected \"[\"")
+  test-code-error(user "+ 2", user "not unary operator \"+\"")
+  test-code-error(
+      user "- (i := 2)",
+      user "void expression given as operand to operator \"-\"")
+  test-code-error(
+      user "- (i > 4)",
+      user "operator \"-\" expected \"Int\" operand, got \"Bool\"")
+  test-code-error(
+      user "not i",
+      user "operator \"not\" expected \"Bool\" operand, got \"Int\"")
 
 
 test test-binary-expression()
   test-code(user "i := 23 + 54", user "i = 23 + 54;")
-  test-code(user "i := 100 * 2 - 37", user "i = (100 * 2) - 37;")
-  test-code(user "i := 12 *\n    13", user "i = 12 * 13;")
-  test-code(user "b := 3 < 5 and 23 < 37", user "b = (3 < 5) && (23 < 37);")
+  test-code(
+      user "i += (100 * 2) - (37 div 5 mod 2)",
+      user "i += (100 * 2) - ((37 / 5) % 2);")
+  test-code(user "i -= 12 *\n      13", user "i -= 12 * 13;")
+  test-code(user "b := 3 < 5 or 23 > 37", user "b = (3 < 5) || (23 > 37);")
+  test-code(user "b := 3 <= 5 and 23 >= 37", user "b = (3 <= 5) && (23 >= 37);")
+  test-code(user "b := i = 5 or i != 37", user "b = (i == 5) || (i != 37);")
+  test-code(
+      user "b := 2 < i < 12 < 2 * i",
+      user "b = ((2 < i) && (i < 12)) && (12 < (2 * i));")
   test-code-error(user "345 @ 2", user "unknown operator \"@\"")
   test-code-error(user "80 +(", user "unexpected \"(\"")
+  test-code-error(
+      user "1 + 2 * 3",
+      user "ambiguous precedence between operators \"+\" and \"*\"")
+  test-code-error(
+      user "1 < i or 2 < i and 3 < i",
+      user "ambiguous precedence between operators \"or\" and \"and\"")
+  test-code-error(
+      user "1 not 2", user "cannot use \"not\" as binary operand")
+  test-code-error(
+      user "1 := 2", user "assigning into non assignable expression")
+  test-code-error(
+      user "1 += 2", user "assigning into non assignable expression")
+  test-code-error(
+      user "1 -= 2", user "assigning into non assignable expression")
+  test-int-operator-error(user "+")
+  test-int-operator-error(user "-")
+  test-int-operator-error(user "*")
+  test-int-operator-error(user "div")
+  test-int-operator-error(user "mod")
+  test-int-operator-error(user "=")
+  test-int-operator-error(user "!=")
+  test-int-operator-error(user ">")
+  test-int-operator-error(user "<")
+  test-int-operator-error(user ">=")
+  test-int-operator-error(user "<=")
+  test-int-operator-error(user "+=")
+  test-int-operator-error(user "-=")
+  test-bool-operator-error(user "or")
+  test-bool-operator-error(user "and")
+
+func test-int-operator-error(user String operator)
+  test-operator-error(user operator, user "Int", user "Bool")
+
+func test-bool-operator-error(user String operator)
+  test-operator-error(user operator, user "Bool", user "Int")
+
+func test-operator-error(
+    user String operator, user String expected-type, user String actual-type)
+  var String{128} input-text
+  input-text.copy(user "2 ")
+  input-text.concat(user operator)
+  input-text.concat(user " (i > 4)")
+  var String{128} expected-error
+  expected-error.copy(user "operator \"")
+  expected-error.concat(user operator)
+  expected-error.concat(user "\" expected \"")
+  expected-error.concat(user expected-type)
+  expected-error.concat(user "\" operand, got \"")
+  expected-error.concat(user actual-type)
+  expected-error.concat(user "\"")
+  test-code-error(user input-text, user expected-error)
+  input-text.copy(user "(i > 4) ")
+  input-text.concat(user operator)
+  input-text.concat(user " 2")
+  test-code-error(user input-text, user expected-error)
 
 
 test test-question-expression()
   test-code(user "b := str?", user "b = str != NULL;")
-
-
-# test test-complex-operand()
-  # test-code(
-      # user "base.func().array[3].seq[4][70]()()[23]",
-      # user "Base.func().array[3].seq[4][70]()()[23]")
-
-
-# test test-complex-expression()
-  # test-code(
-      # user "4 + (array[5] - 23) > 2 + func(copy 2 + base.meth())->(owner item).val or (var.arr[1]? and num < 5)",
-      # user "((4 + (array[5] - 23)) > (2 + func(2 + Base.meth(), &(item)).val)) || ((var.arr[1] != NULL) && (num < 5))")
+  test-code(user "b := not str?", user "b = ! (str != NULL);")
+  test-code-error(user "(i := 2)?", user "cannot use \"?\" on void expression")
+  test-code-error(user "i?", user "cannot use \"?\" on type \"Int\"")

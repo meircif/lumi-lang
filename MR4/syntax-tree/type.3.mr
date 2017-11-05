@@ -33,6 +33,11 @@ class TypeData(SyntaxTreeNamespace)
     if not self.parse-if-function(user keyword, user self):(copy end)
       self.m-syntax-error(user "unknown keyword", user keyword)
   
+  func inst m-is-same(user TypeData other):(copy Bool is-same)
+    is-same := self = other or
+        ((self = glob.type-int or self = glob.type-char) and
+        (other = glob.type-int or other = glob.type-char))
+  
   func inst m-new-type-instance():(owner TypeInstance type-instance)
     new TypeInstance in type-instance
     type-instance.type-data := self
@@ -276,7 +281,7 @@ static TypeInstance
       return
     user TypeData base-type(self.type-data)
     do
-      while base-type != target.type-data
+      while not target.type-data.m-is-same(user base-type)
       if not (? base-type.base-type)
         node.m-syntax-error2(
             user "cannot assign",

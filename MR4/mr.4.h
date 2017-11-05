@@ -66,9 +66,6 @@ void MR_trace_print(
   int line,
   char const* funcname);
 
-# define MR_FILE_NAME ""
-# define MR_FUNC_NAME ""
-
 #define RETURN_ERROR(value) return value
 
 #define START_TRACE(line, value, format) { \

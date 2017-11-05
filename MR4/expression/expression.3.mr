@@ -61,12 +61,23 @@ class Expression(SyntaxTreeNode)
         glob.operator-map.find(user text):(user operator)
         if not (? operator)
           code-node.m-syntax-error(user "unknown operator", user text)
+    user BinaryExpression binary-left-expression
     do
       while ? operator and
           (not (? curr-operator) or operator.order < curr-operator.order)
+      owner BinaryExpression new-binary-expression
       BinaryExpression.parse-new(
-          var _, user ends, user operator, user code-node):(
-          owner expression, copy end, user operator)
+          var _,
+          user ends,
+          user operator,
+          user code-node,
+          owner expression,
+          user binary-left-expression):(
+          owner new-binary-expression,
+          copy end,
+          user operator)
+      binary-left-expression := new-binary-expression
+      expression := new-binary-expression
     if not (? curr-operator)
       expression.top := true
   

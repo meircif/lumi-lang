@@ -50,8 +50,13 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           user "expected \"(\" after function name, got", copy end)
     new FunctionArguments in self.arguments
     var DeclarationArgumentFactory argument-factory
+    var SyntaxTreeCode dummy-node
+    dummy-node.parent := self
+    self.indentation-spaces -= 2
     self.arguments.parse(
-        user argument-factory, user _, user self.parent-type):(copy end)
+        user argument-factory, user dummy-node, user self.parent-type):(
+        copy end)
+    self.indentation-spaces += 2
   
   func dynamic m-get-parent-type():(user TypeData parent-type)
     parent-type := self.parent-type
@@ -78,11 +83,17 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   ## write function body
   func dynamic write()
+    # #define MR_FILE_NAME "`file-name`"
+    # #define MR_FUNC_NAME "`parent-type`.`function-name`"
     # Returncode `Type`_`name`(`args`) {
     #   `block...`
     # }
+    # #undef MR_FILE_NAME
+    # #undef MR_FUNC_NAME
+    write-pre-func(user self)
     self.write-header()
     self.write-block()
+    write-post-func()
   
   func inst write-header()
     write(user "Returncode ")
@@ -104,6 +115,22 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-header()
     write(user ";\n")
 
+# to be mocked in unit-tests
+func write-pre-func(user SyntaxTreeFunction self)
+  write(user "#define MR_FILE_NAME \"")
+  write(user self.input-file-name)
+  write(user "\"\n#define MR_FUNC_NAME \"")
+  if ? self.parent-type
+    write(user self.parent-type.name)
+    write(user ".")
+  write(user self.name)
+  write(user "\"\n")
+
+# to be mocked in unit-tests
+func write-post-func()
+    write(user "\n#undef MR_FILE_NAME\n")
+    write(user "#undef MR_FUNC_NAME")
+
 
 ## Main function node in the syntax tree
 class SyntaxTreeMainFunction(SyntaxTreeFunction)
@@ -123,9 +150,12 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     #   `block...`
     # }
     # MAIN_FUNC
-    write(user "\nUSER_MAIN_HEADER")
+    write(user "\n")
+    write-pre-func(user self)
+    write(user "USER_MAIN_HEADER")
     self.write-block()
-    write(user "\nMAIN_FUNC\n")
+    write-post-func()
+    write(user "\n\nMAIN_FUNC\n")
 
 
 ## Native function declaration in the syntax tree

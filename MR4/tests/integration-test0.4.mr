@@ -26,6 +26,45 @@ func test-simple-function()
   # sys.print(user "I am test func")
 
 
+func test-const-expression()->(
+    copy Int i, copy Char c, user String s, user TestStruct t)
+  i := 0 + 9630 + -9630 + 07520 + -07520 + 0xfda940 + -0xfda940 + 0xFDA940 +
+      -0xFDA940
+  c := 'a' + '\'' + '\n' + '\x0f' + '\xA9' + '\270'
+  s := "some string"
+  t := _
+
+
+func test-member-expression(user TestStruct t)->(user TestStruct to, copy Int i)
+  t.num := to.num + t.ts.num + t.ts.ts.num
+  to.num := t.num
+  t.ts.ts.num := 4
+
+
+func test-slice-expression(
+    user String s,
+    user Array{Int} arri,
+    user Array{String} arrs,
+    user Array{TestStruct} arrt)->(
+    copy Char c, copy Int i, user TestStruct t)
+  c := s[2] + s[4:7][2] + arrs[3][2] + arrs[4:2][4][1:3][0]
+  i := arri[i + 3 - arri[2]] + arrt[4].num + arrt[2:4][1].num +
+      arri[2:4][1:2][1]
+  arri := arri[2 - i + arri[2:4][1]:5 * (i - 1)]
+  s := arrs[4]
+  arrs := arrs[2:7]
+  t := arrt[4]
+  arrt := arrt[2:7]
+
+
+func test-container-expression(copy Int x, copy Int y, user String s)->(
+    copy Int i, copy Bool b)
+  i := - x + - - - y
+  b := not ((not (x * 3) - 5 > 6 * y = 234 and not 5 - x < y) or not
+      (x = -2 - (-4 * y) and -6 > y >= 12 = x)) and (- (2 + x) > y or s? or
+      not s?)
+
+
 func test-variable(copy Int i, user String text, user Array{Int} arr)
   var Int x
   user String s
@@ -91,6 +130,8 @@ struct TestStruct
   
   # comment test
   
+  user TestStruct ts
+  
   func set(copy Int x, user String s)
     self.num := x
     self.text := s
@@ -104,5 +145,38 @@ struct TestStruct
     s := self.text
 
 
+func f-test-void()
+func f-test-params(copy Int x, user String s, owner String o)
+func f-test-outs()->(owner String s, copy Int x)
+func f-test-int2str(copy Int x)->(owner String s)
+func f-test-int(copy Int x)
+func f-test-int2int(copy Int x)->(copy Int r)
+func f-test-many(
+    copy Int x,
+    copy Int y)->(
+    copy Int n,
+    copy Int m)
+
+func test-call-expression()
+  owner String s
+  var Int x
+  f-test-void()
+  f-test-params(copy 3, user "text", owner _)
+  f-test-outs()->(owner s, copy x)
+  f-test-int2str(copy 4)->(owner s)
+  f-test-int(copy 5)
+  f-test-int2int(copy 6)->(copy x)
+  f-test-many(
+      copy 7,
+      copy 8)->(
+      copy x,
+      copy x)
+  var Int tmp
+  f-test-int(copy f-test-int2int(copy 9)->(copy tmp))
+  x := f-test-int2int(copy 10) + f-test-many(copy 11, copy 12)->(copy x)
+  s := f-test-int2str(copy 13)
+
+
 main
-  # test-simple-function()
+  test-simple-function()
+  test-call-expression()

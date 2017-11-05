@@ -17,7 +17,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     new List{TypeData} in self.types
     for n in 2:argv.length
       glob.input-file-name := argv[n]
-      glob.line-number := 0
+      glob.line-number := 1
       file-open(user glob.input-file-name, copy true):(owner glob.input-file)
       
       self.parse-children(user _, user _)

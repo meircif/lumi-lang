@@ -94,7 +94,7 @@ class FunctionArguments(SyntaxTreeNode)
     var Bool is-output(arguments = self.outputs)
     read-until(user " )", copy false):(user access-str, copy end)
     if end = '\n' and access-str.length = 0
-      self.read-line-break-spaces()
+      code-node.read-line-break-spaces()
       read-until(user " ", copy false):(user access-str, copy end)
     if end != ')' or access-str.length > 0
       do
@@ -110,7 +110,7 @@ class FunctionArguments(SyntaxTreeNode)
         while end = ','
         read-c():(copy end)
         if end = '\n'
-          self.read-line-break-spaces()
+          code-node.read-line-break-spaces()
         else-if end != ' '
           self.m-syntax-error-c(
               user "expected space or new-line after \",\", got",

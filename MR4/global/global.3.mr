@@ -21,9 +21,6 @@ static Global
   user String input-file-name
   var Int line-number
   
-  ## current indentation
-  var Int spaces
-  
   ## input reading state
   owner String input-buffer
   var Char input-end
@@ -54,7 +51,8 @@ static Global
     self.add-operator-copy(user "+", copy 0, copy 0)
     self.add-operator-copy(user "-", copy 0, copy 0)
     self.add-operator-copy(user "*", copy 0, copy 1)
-    self.add-operator-copy(user "/", copy 0, copy 1)
+    self.add-operator(user "div", user "/", copy 0, copy 1)
+    self.add-operator(user "mod", user "%", copy 0, copy 1)
     self.add-operator(user "=", user "==", copy 1, copy 0)
     self.add-operator-copy(user "!=", copy 1, copy 0)
     self.add-operator-copy(user ">", copy 1, copy 0)
@@ -65,8 +63,8 @@ static Global
     self.add-operator(user "or", user "||", copy 3, copy 0)
     self.add-operator(user "and", user "&&", copy 3, copy 1)
     self.add-operator(user ":=", user "=", copy 4, copy 0)
-    self.add-operator-copy(user "+=", copy 4, copy 0)
-    self.add-operator-copy(user "-=", copy 4, copy 0)
+    self.add-operator-copy(user "+=", copy 4, copy 1)
+    self.add-operator-copy(user "-=", copy 4, copy 2)
   
   func inst add-operator(
       user String name,
