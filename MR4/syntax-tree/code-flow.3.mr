@@ -22,6 +22,9 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
       self.block.is-in-loop := true
     self.block.parse-block():(copy end)
   
+  func dynamic m-link-types()
+    self.block.m-link-types()
+  
   func dynamic analyze()
     self.block.analyze()
   
@@ -67,6 +70,7 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     # }
     # `else-block`
   func dynamic write()
+    self.condition.write-preactions()
     write(user "if (")
     self.condition.write()
     write(user ")")
@@ -135,6 +139,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.parse-block(user parent, copy true):(copy end)
     new SyntaxTreeVariable in self.block.ref-variable
     string-new-copy(user self.index-name):(owner self.block.ref-variable.name)
+    self.block.ref-variable.m-check-name()
     self.block.ref-variable.access := ACCESS-VAR
     glob.type-int.m-new-type-instance():(
         owner self.block.ref-variable.type-instance)
@@ -152,6 +157,9 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     # {int `index`; for(`index`=`start`; `index`<`upper-bound`; ++`index`) {
     #    `block...`
     # }}
+    if ? self.start
+      self.start.write-preactions()
+    self.upper-bound.write-preactions()
     write(user "{int ")
     write-cname(user self.index-name)
     write(user "; for(")

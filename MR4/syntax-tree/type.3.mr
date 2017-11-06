@@ -16,14 +16,19 @@ class TypeData(SyntaxTreeNamespace)
     new-node.parse(copy is-dynamic):(copy end)
   
   func inst parse(copy Bool is-dynamic):(copy Char end)
+    self.is-dynamic := is-dynamic
     self.set-location()
     read-new(user "("):(owner self.name, copy end)
-    self.is-dynamic := is-dynamic
+    if not f-is-legal-name(user self.name, copy true)
+      self.m-syntax-error(user "illegal type name", user self.name)
+    if ? glob.type-map.find(user self.name)
+      self.m-syntax-error(user "redefinition of type", user self.name)
     glob.add-type(user self)
     if end = '('
       read-new(user ")"):(owner self.base-type-name, copy end)
       if end != ')'
-        self.m-syntax-error-c(user "expected ) after base class, got", copy end)
+        self.m-syntax-error-c(
+            user "expected \")\" after base class, got", copy end)
       read-c():(copy end)
     self.indentation-spaces := 2
     self.parse-block-children(user self, user _):(copy end)
@@ -33,12 +38,19 @@ class TypeData(SyntaxTreeNamespace)
     if not self.parse-if-function(user keyword, user self):(copy end)
       self.m-syntax-error(user "unknown keyword", user keyword)
   
+  func inst m-is-same(user TypeData other):(copy Bool is-same)
+    is-same := self = other or
+        ((self = glob.type-int or self = glob.type-char) and
+        (other = glob.type-int or other = glob.type-char))
+  
   func inst m-new-type-instance():(owner TypeInstance type-instance)
     new TypeInstance in type-instance
     type-instance.type-data := self
   
-  func inst m-find-field(user String name):(user SyntaxTreeVariable field)
+  func inst m-find-field(user String name):(
+      user SyntaxTreeVariable field, copy Int bases)
     user TypeData type-data(self)
+    bases := 0
     do
       while ? type-data
       user ListNode{SyntaxTreeVariable} child(type-data.variables.first)
@@ -49,10 +61,13 @@ class TypeData(SyntaxTreeNamespace)
           return
         child := child.next
       type-data := type-data.base-type
+      bases += 1
     field := _
   
-  func inst m-find-meth(user String name):(user SyntaxTreeFunction method)
+  func inst m-find-meth(user String name):(
+      user SyntaxTreeFunction method, copy Int bases)
     user TypeData type-data(self)
+    bases := 0
     do
       while ? type-data
       user ListNode{SyntaxTreeFunction} child(type-data.functions.first)
@@ -63,6 +78,7 @@ class TypeData(SyntaxTreeNamespace)
           return
         child := child.next
       type-data := type-data.base-type
+      bases += 1
     method := _
   
   func inst m-order-bases(user List{TypeData} ordered-list)
@@ -203,6 +219,7 @@ static TypeInstance
   owner String name
   user TypeData type-data
   owner TypeInstance sub-type
+  owner Expression length
   owner FunctionArguments arguments
   
   ## Return a new deep-copy of self
@@ -215,9 +232,13 @@ static TypeInstance
     if ? self.sub-type
       self.sub-type.m-copy-new():(owner type-instance.sub-type)
     if ? self.arguments
-      self.arguments.m-copy-new():(type-instance.arguments)
+      self.arguments.m-copy-new():(owner type-instance.arguments)
   
-  func inst parse(user String ends, user SyntaxTreeNode node):(copy Char end)
+  func inst parse(
+      user String ends,
+      user SyntaxTreeNode node,
+      user SyntaxTreeVariable var-node):(
+      copy Char end)
     read-new(
         user string-new-concat(user ends, user "{")):(owner self.name, copy end)
     if end = '{'
@@ -225,21 +246,52 @@ static TypeInstance
         new FunctionArguments in self.arguments
         var ArgumentFactory argument-factory
         self.arguments.parse(user argument-factory, user _, user _):(copy end)
+      else-if ? var-node and self.name.equal(user "String")
+        parse-new-expression(user "}", user var-node):(
+            owner self.length, copy end)
       else
-        new TypeInstance in self.sub-type
-        self.sub-type.parse(user "}", user node):(copy end)
+        var Bool has-sub-type(true)
+        if ? var-node and self.name.equal(user "Array")
+          parse-new-expression(user ":}", user var-node):(
+              owner self.length, copy end)
+          if end != ':' and end != '}'
+            node.m-syntax-error-c(user "expected \":\", got", copy end)
+          has-sub-type := end = ':'
+        if has-sub-type
+          new TypeInstance in self.sub-type
+          self.sub-type.parse(user "}", user node, user var-node):(copy end)
       if end != '}'
-        node.m-syntax-error-c(user "expected \"}\", got ", copy end)
+        node.m-syntax-error-c(user "expected \"}\", got", copy end)
       read-c():(copy end)
   
   func inst analyze(user SyntaxTreeNode node)
-    if not (? self.type-data)
+    self.analyze-part(user node, copy true, copy true)
+  
+  func inst m-link-types(user SyntaxTreeNode node)
+    self.analyze-part(user node, copy true, copy false)
+  
+  func inst analyze-lengths(user SyntaxTreeNode node)
+    self.analyze-part(user node, copy false, copy true)
+  
+  func inst analyze-part(
+      user SyntaxTreeNode node, copy Bool check-types, copy Bool check-length)
+    if check-types and not (? self.type-data)
       node.m-find-type(user self.name):(user self.type-data)
+    if check-length and ? self.length
+      node.analyze-expression(user self.length, user glob.type-int)
     if ? self.sub-type
-      self.sub-type.analyze(user node)
+      self.sub-type.analyze-part(user node, copy check-types, copy check-length)
+  
+  func inst m-check-assign-from(user SyntaxTreeNode node):(
+      owner Expression value)
+    var Int bases
+    value.result-type.m-check-assign-to(user self, user node):(copy bases)
+    if bases > 0
+      UpCastExpression.init-new(var _, copy bases):(owner value)
   
   func inst m-check-assign-to(
-      user TypeInstance target, user SyntaxTreeNode node)
+      user TypeInstance target, user SyntaxTreeNode node):(copy Int bases)
+    bases := 0
     if not (? self.type-data)
       node.m-syntax-error-msg(user "cannot assign void expression")
     if not (? target.type-data)
@@ -248,7 +300,7 @@ static TypeInstance
       return
     user TypeData base-type(self.type-data)
     do
-      while base-type != target.type-data
+      while not target.type-data.m-is-same(user base-type)
       if not (? base-type.base-type)
         node.m-syntax-error2(
             user "cannot assign",
@@ -256,6 +308,7 @@ static TypeInstance
             user "into",
             user target.type-data.name)
       base-type := base-type.base-type
+      bases += 1
     
     self.m-check-sub-equal(user target, user node)
   

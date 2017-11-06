@@ -28,29 +28,16 @@ class SymbolExpression(Expression)
       if not (? self.function)
         self.m-syntax-error(user "unknown symbol", user self.name)
       self.set-simple-type(user glob.type-func)
-      self.function.arguments.m-copy-new():(self.result-type.arguments)
+      self.function.arguments.m-copy-new():(owner self.result-type.arguments)
   
   func dynamic write()
+    if ? self.variable and self.variable.is-output
+      if not self.top
+        write(user "(")
+      write(user "*")
     write-cname(user self.name)
-
-
-## The `base` method expression
-class BaseMethExpression(Expression)
-  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
-      owner Expression expression)
-    new BaseMethExpression in expression
-    expression.code-node := code-node
-    expression.set-location()
-    delete text
-  
-  func dynamic analyze()
-    user TypeData parent-type
-    self.code-node.m-get-parent-type():(user parent-type)
-    if not (? parent-type)
-      self.m-syntax-error-msg(user "\"base\" used not in method")
-    if not (? parent-type.base-type)
-      self.m-syntax-error(user "no base type for type", user parent-type.name)
-    self.set-simple-type(user parent-type.base-type)
+    if ? self.variable and self.variable.is-output and not self.top
+      write(user ")")
 
 
 ## Type name expression
@@ -71,20 +58,53 @@ class TypeExpression(Expression)
     self.set-simple-type(user glob.type-type)
     self.m-find-type(user self.type-name).m-new-type-instance():(
         owner self.result-type.sub-type)
+  
+  func dynamic write()
+    write-cname(user self.result-type.sub-type.type-data.name)
+
+
+## The `base` method expression
+class BaseMethExpression(Expression)
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
+      owner Expression expression)
+    new BaseMethExpression in expression
+    expression.code-node := code-node
+    expression.set-location()
+    delete text
+  
+  func dynamic analyze()
+    user TypeData parent-type
+    self.code-node.m-get-parent-type():(user parent-type)
+    if not (? parent-type)
+      self.m-syntax-error-msg(user "\"base\" used not in method")
+    if not (? parent-type.base-type)
+      self.m-syntax-error(user "no base type for type", user parent-type.name)
+    self.set-simple-type(user glob.type-base)
+    parent-type.m-new-type-instance():(owner self.result-type.sub-type)
+  
+  func dynamic write()
+    write(user "self")
 
 
 ## An instance member expression
 class MemberExpression(SymbolExpression)
   owner Expression instance
+  var Int bases
   
-  func inst parse-new(user String ends):(
+  func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
     new MemberExpression member-expression
-    member-expression.parse(owner expression, user ends):(copy end)
+    member-expression.parse(owner expression, user ends, user code-node):(
+        copy end)
     expression := member-expression
   
   ## parsing `instance.symbol`
-  func inst parse(owner Expression instance, user String ends):(copy Char end)
+  func inst parse(
+      owner Expression instance,
+      user String ends,
+      user SyntaxTreeCode code-node):(
+      copy Char end)
+    self.code-node := code-node
     self.instance := instance
     self.set-location()
     self.read-new-value(user ends):(owner self.name, copy end)
@@ -96,19 +116,18 @@ class MemberExpression(SymbolExpression)
         not (? self.instance.result-type.type-data)
       self.m-syntax-error(user "void expression has no member", user self.name)
     user TypeData type-data(self.instance.result-type.type-data)
-    if self.instance.result-type.type-data = glob.type-type
-      if not (? self.instance.result-type.sub-type) or
-          not (? self.instance.result-type.sub-type.type-data)
-        self.m-syntax-error(
-            user "unspecified type has no member", user self.name)
+    if type-data = glob.type-type
       type-data := self.instance.result-type.sub-type.type-data
+    else-if type-data = glob.type-base
+      type-data := self.instance.result-type.sub-type.type-data.base-type
     
-    type-data.m-find-field(user self.name):(user self.variable)
+    type-data.m-find-field(user self.name):(user self.variable, copy self.bases)
     if ? self.variable
       self.variable.type-instance.m-copy-new():(owner self.result-type)
       self.assignable := true
     else
-      type-data.m-find-meth(user self.name):(user self.function)
+      type-data.m-find-meth(user self.name):(
+          user self.function, copy self.bases)
       if not (? self.function)
         self.m-syntax-error2(
             user "type",
@@ -116,21 +135,74 @@ class MemberExpression(SymbolExpression)
             user "has no member",
             user self.name)
       self.set-simple-type(user glob.type-func)
-      self.function.arguments.m-copy-new():(self.result-type.arguments)
+      self.function.arguments.m-copy-new():(owner self.result-type.arguments)
+    if self.instance.result-type.type-data = glob.type-base
+      if not (? self.function)
+        self.m-syntax-error(
+            user "calling \"base\" with non-method", user self.name)
+      owner TypeInstance base-result-type(self.instance.result-type)
+      self.instance.result-type := base-result-type.sub-type
+      delete base-result-type
   
   func dynamic analyze-call(user FunctionArguments arguments)
     if self.instance.result-type.type-data = glob.type-type
-      return
-    new CallArgument self-param
-    self-param.access := self.function.arguments.parameters.first.item.access
-    self-param.value := self.instance
+      delete self.instance
+    else
+      new CallArgument self-param
+      self-param.access := self.function.arguments.parameters.first.item.access
+      self-param.value := self.instance
+      self-param.value.top := true
+      arguments.parameters.m-prepend(owner self-param)
+    self.bases := 0
     self.instance := _
-    arguments.parameters.m-prepend(owner self-param)
   
   func dynamic write-preactions()
+    if not (? self.instance)
+      return
     self.instance.write-preactions()
+    if self.instance.result-type.type-data != glob.type-type
+      # if (`instance` == NULL) RAISE(`line-num`)
+      write(user "if (")
+      self.instance.write()
+      write(user " == NULL) ")
+      self.write-raise()
+      write(user "\n")
+      self.code-node.write-spaces()
   
   func dynamic write()
+    if ? self.function
+      self.function.write-cname()
+      return
     self.instance.write()
-    write(user ".")
+    write(user "->")
+    for n in self.bases
+      write(user "_base.")
     base.write()
+
+
+## An instance member expression
+class UpCastExpression(Expression)
+  owner Expression expression
+  var Int bases
+  
+  func inst init-new(copy Int bases):(owner Expression expression)
+    new UpCastExpression up-cast
+    up-cast.init(copy bases, owner expression)
+    expression := up-cast
+  
+  func inst init(copy Int bases, owner Expression expression)
+    self.expression := expression
+    self.bases := bases
+    self.expression.result-type.m-copy-new():(owner self.result-type)
+  
+  func dynamic write-preactions()
+    self.expression.write-preactions()
+  
+  func dynamic write()
+    # &(`expression`->_base[._base]...)
+    write(user "&(")
+    self.expression.write()
+    write(user "->_base")
+    for n in 1:self.bases
+      write(user "._base")
+    write(user ")")

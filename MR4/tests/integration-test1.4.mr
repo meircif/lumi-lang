@@ -5,23 +5,38 @@ This file should onlw work together with test file #2.
 
 
 class TopType(MiddleType)
+  var Int num-top
   user BaseType top-base-ref
   user MiddleType top-mid-ref
   
   func dynamic meth2()
     # sys.print(user "TopType.meth2")
+    base.meth2()
+    MiddleType.meth2(var self)
+    BaseType.meth2(var self)
   
   func dynamic meth3(copy Int n, user String s)
     # sys.print(user "TopType.meth3")
+    base.meth3(copy n, user s)
   
   func dynamic meth5(copy Int n, user String s)
     # sys.print(user "TopType.meth5")
+    base.meth5(copy n, user s)
+    MiddleType.meth1(var _, copy n, user s)
+    BaseType.meth1(var _, copy n, user s)
   
   func dynamic meth6()
     # sys.print(user "TopType.meth6")
+    self.num-mid := self.num-base
+    self.top-base-ref := self.top-mid-ref
+    self.top-base-ref := self
+    user MiddleType mt(self)
+    user BaseType bt(mt)
+    test-mid-out()->(user bt)
 
 
 class BaseType
+  var Int num-base
   user MiddleType base-mid-ref
   user TopType base-top-ref
   
@@ -36,3 +51,8 @@ class BaseType
   
   func dynamic meth3(copy Int n, user String s)
     # sys.print(user "BaseType.meth3")
+
+
+func test-mid-out()->(user MiddleType mt)
+  new MiddleType new-mt
+  mt := new-mt

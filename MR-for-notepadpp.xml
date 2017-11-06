@@ -6,15 +6,15 @@
         </Settings>
         <KeywordLists>
             <Keywords name="Comments">00# 01 02 03(# 03{# 04#) 04#}</Keywords>
-            <Keywords name="Numbers, prefix1"></Keywords>
-            <Keywords name="Numbers, prefix2"></Keywords>
-            <Keywords name="Numbers, extras1"></Keywords>
+            <Keywords name="Numbers, prefix1">0b</Keywords>
+            <Keywords name="Numbers, prefix2">0x</Keywords>
+            <Keywords name="Numbers, extras1">a b c d e f A B C D E F</Keywords>
             <Keywords name="Numbers, extras2"></Keywords>
             <Keywords name="Numbers, suffix1"></Keywords>
             <Keywords name="Numbers, suffix2"></Keywords>
             <Keywords name="Numbers, range"></Keywords>
             <Keywords name="Operators1">( ) , { } [ ] : . ?</Keywords>
-            <Keywords name="Operators2">-= = + - * / += -= &lt; &gt; &lt;= &gt;= != div mod clamp check min max encode decode</Keywords>
+            <Keywords name="Operators2">-= = + - * / += -= &lt; &gt; &lt;= &gt;= != -&gt; div mod clampcheck min max encode decode</Keywords>
             <Keywords name="Folders in code1, open"></Keywords>
             <Keywords name="Folders in code1, middle"></Keywords>
             <Keywords name="Folders in code1, close"></Keywords>
@@ -32,7 +32,7 @@
             <Keywords name="Keywords6"></Keywords>
             <Keywords name="Keywords7"></Keywords>
             <Keywords name="Keywords8"></Keywords>
-            <Keywords name="Delimiters">00&quot; 01\ 02&quot; 03&apos; 04\ 05&apos; 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23</Keywords>
+            <Keywords name="Delimiters">00&quot; 01\ 02&quot; 03&apos; 04\ 05&apos; 06` 07 08` 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23</Keywords>
         </KeywordLists>
         <Styles>
             <WordsStyle name="DEFAULT" fgColor="E0E2E4" bgColor="293134" colorStyle="0" fontName="" fontStyle="0" nesting="0" />

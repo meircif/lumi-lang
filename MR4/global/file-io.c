@@ -131,9 +131,9 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
   while (true) {
     if (!(ch != EOF && ch != '\n')) break;
     if (quote == '\0') {
-      Bool _Bool10;
-      CHECK(58, String_has(ends, ch, &(_Bool10)) )
-      if (!(!_Bool10)) break;
+      Bool _Bool8;
+      CHECK(58, String_has(ends, ch, &(_Bool8)) )
+      if (!(!_Bool8)) break;
       if (ch == '\'' || ch == '"' || ch == '`') {
         quote = ch;
       }
@@ -172,8 +172,8 @@ static char* _func_name_read_new = "read-new";
 #define MR_FUNC_NAME _func_name_read_new
 Returncode read_new(String* ends, String** new_text, Char* end) {
   String* text = NULL;
-  Int _Int11;
-  CHECK(79, read_until(ends, false, &(text), &((*end)), &(_Int11)) )
+  Int _Int9;
+  CHECK(79, read_until(ends, false, &(text), &((*end)), &(_Int9)) )
   CHECK(80, string_new_copy(text, &((*new_text))) )
   return OK;
 }

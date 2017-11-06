@@ -8,6 +8,8 @@ var Int ACCESS-COPY(0)
 var Int ACCESS-USER(1)
 var Int ACCESS-OWNER(2)
 var Int ACCESS-VAR(3)
+var Int ACCESS-NEW(4)
+var Int ACCESS-AUX(5)
 
 
 ## Basic node type for all syntax tree nodes
@@ -45,19 +47,18 @@ class SyntaxTreeNode
           user "expected", user expected-text, user "got", user actual-text)
     delete actual-text
   
-  ## Read and check indentation spaces for a line break from the input file
-  func inst read-line-break-spaces(u)
-    for n in glob.spaces + 4
-      if read-c() != ' '
-        var String{128} expected-spaces
-        var String{128} actual-spaces
-        Int.str(var glob.spaces + 4, user expected-spaces)
-        Int.str(var n - 1, user actual-spaces)
-        self.m-syntax-error2(
-            user "too short indentation, expected",
-            user expected-spaces,
-            user "got",
-            user actual-spaces)
+  func inst analyze-expression(
+      user Expression expression, user TypeData expected-type)
+    expression.analyze()
+    if not (? expression.result-type)
+      self.m-syntax-error(
+          user "got void expression, expected", user expected-type.name)
+    if expression.result-type.type-data != expected-type
+      self.m-syntax-error2(
+          user "got",
+          user expression.result-type.type-data.name,
+          user "expression, expected",
+          user expected-type.name)
   
   func inst write-line-num()
     write-int(copy self.line-number)
@@ -66,6 +67,11 @@ class SyntaxTreeNode
     write(user "RAISE(")
     self.write-line-num()
     write(user ")")
+  
+  func inst write-call()
+    write(user "CHECK(")
+    self.write-line-num()
+    write(user ", ")
   
   ## Raise a syntax error with message:
   ## `Code error in {file-name}[{line-number}] {text} "{item}"`
@@ -127,6 +133,23 @@ class SyntaxTreeNode
     self.line-number.str(user line-num-str)
     print(user line-num-str)
     print(user "] ")
+  
+  func inst m-link-children-types(user List{SyntaxTreeNode} child-list)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      child.item.m-link-types()
+      child := child.next
+  
+  func inst analyze-children(user List{SyntaxTreeNode} child-list)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      child.item.analyze()
+      child := child.next
+  
+  func dynamic m-link-types()
+    # do nothing as default
   
   func dynamic analyze()
     # do nothing as default

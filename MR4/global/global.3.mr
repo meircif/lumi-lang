@@ -21,9 +21,6 @@ static Global
   user String input-file-name
   var Int line-number
   
-  ## current indentation
-  var Int spaces
-  
   ## input reading state
   owner String input-buffer
   var Char input-end
@@ -40,6 +37,7 @@ static Global
   owner TypeData type-string
   owner TypeData type-array
   owner TypeData type-type
+  owner TypeData type-base
   owner TypeData type-file
   owner TypeData type-sys
   
@@ -54,7 +52,8 @@ static Global
     self.add-operator-copy(user "+", copy 0, copy 0)
     self.add-operator-copy(user "-", copy 0, copy 0)
     self.add-operator-copy(user "*", copy 0, copy 1)
-    self.add-operator-copy(user "/", copy 0, copy 1)
+    self.add-operator(user "div", user "/", copy 0, copy 1)
+    self.add-operator(user "mod", user "%", copy 0, copy 1)
     self.add-operator(user "=", user "==", copy 1, copy 0)
     self.add-operator-copy(user "!=", copy 1, copy 0)
     self.add-operator-copy(user ">", copy 1, copy 0)
@@ -65,8 +64,8 @@ static Global
     self.add-operator(user "or", user "||", copy 3, copy 0)
     self.add-operator(user "and", user "&&", copy 3, copy 1)
     self.add-operator(user ":=", user "=", copy 4, copy 0)
-    self.add-operator-copy(user "+=", copy 4, copy 0)
-    self.add-operator-copy(user "-=", copy 4, copy 0)
+    self.add-operator-copy(user "+=", copy 4, copy 1)
+    self.add-operator-copy(user "-=", copy 4, copy 2)
   
   func inst add-operator(
       user String name,
@@ -88,11 +87,13 @@ static Global
     self.add-builtin-type(user "Char", copy true):(owner self.type-char)
     self.add-builtin-type(user "Bool", copy true):(owner self.type-bool)
     self.add-builtin-type(user "Int", copy true):(owner self.type-int)
-    self.add-builtin-type(user "Empty", copy false):(owner self.type-empty)
+    self.add-builtin-type(user "Empty Symbol", copy false):(
+        owner self.type-empty)
     self.add-builtin-type(user "Func", copy true):(owner self.type-func)
     self.add-builtin-type(user "String", copy false):(owner self.type-string)
     self.add-builtin-type(user "Array", copy false):(owner self.type-array)
     self.add-builtin-type(user "Type", copy false):(owner self.type-type)
+    self.add-builtin-type(user "Base Symbol", copy false):(owner self.type-base)
     self.add-builtin-type(user "File", copy false):(owner self.type-file)
     self.add-builtin-type(user "Sys", copy false):(owner self.type-sys)
   

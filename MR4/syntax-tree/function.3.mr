@@ -45,13 +45,39 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst parse-header():(copy Char end)
     read-new(user "("):(owner self.name, copy end)
+    self.m-check-name()
     if end != '('
       self.m-syntax-error-c(
           user "expected \"(\" after function name, got", copy end)
     new FunctionArguments in self.arguments
     var DeclarationArgumentFactory argument-factory
+    var SyntaxTreeCode dummy-node
+    dummy-node.parent := self
+    self.indentation-spaces -= 2
     self.arguments.parse(
-        user argument-factory, user _, user self.parent-type):(copy end)
+        user argument-factory, user dummy-node, user self.parent-type):(
+        copy end)
+    self.indentation-spaces += 2
+  
+  func inst m-check-name()
+    if not f-is-legal-name(user self.name, copy false)
+      self.m-syntax-error(user "illegal function name", user self.name)
+    if ? self.parent-type
+      user SyntaxTreeFunction meth
+      self.parent-type.m-find-meth(user self.name):(user meth)
+      if ? meth
+        self.m-syntax-error(user "redefinition of method", user self.name)
+      user SyntaxTreeVariable field
+      self.parent-type.m-find-field(user self.name):(user field)
+      if ? field
+        self.m-syntax-error(
+            user "method name overrides field", user self.name)
+    else
+      if ? glob.root.m-find-function(user self.name)
+        self.m-syntax-error(user "redefinition of function", user self.name)
+      if ? glob.root.m-find-variable(user self.name)
+        self.m-syntax-error(
+            user "function name overrides global variable", user self.name)
   
   func dynamic m-get-parent-type():(user TypeData parent-type)
     parent-type := self.parent-type
@@ -64,6 +90,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if not (? variable)
       glob.root.m-find-variable(user name):(user variable)
   
+  func dynamic m-link-types()
+    self.arguments.m-link-types()
+    base.m-link-types()
+  
   func dynamic analyze()
     self.arguments.analyze()
     base.analyze()
@@ -74,19 +104,28 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   ## write function body
   func dynamic write()
+    # #define MR_FILE_NAME "`file-name`"
+    # #define MR_FUNC_NAME "`parent-type`.`function-name`"
     # Returncode `Type`_`name`(`args`) {
     #   `block...`
     # }
+    # #undef MR_FILE_NAME
+    # #undef MR_FUNC_NAME
+    write-pre-func(user self)
     self.write-header()
     self.write-block()
+    write-post-func()
   
   func inst write-header()
     write(user "Returncode ")
+    self.write-cname()
+    self.arguments.write(copy true)
+  
+  func inst write-cname()
     if ? self.parent-type
       write-cname(user self.parent-type.name)
       write(user "_")
     write-cname(user self.name)
-    self.arguments.write(copy true)
   
   func inst write-pointer()
     write(user "Returncode (*")
@@ -99,6 +138,22 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     write(user "\n")
     self.write-header()
     write(user ";\n")
+
+# to be mocked in unit-tests
+func write-pre-func(user SyntaxTreeFunction self)
+  write(user "#define MR_FILE_NAME \"")
+  write(user self.input-file-name)
+  write(user "\"\n#define MR_FUNC_NAME \"")
+  if ? self.parent-type
+    write(user self.parent-type.name)
+    write(user ".")
+  write(user self.name)
+  write(user "\"\n")
+
+# to be mocked in unit-tests
+func write-post-func()
+    write(user "\n#undef MR_FILE_NAME\n")
+    write(user "#undef MR_FUNC_NAME")
 
 
 ## Main function node in the syntax tree
@@ -119,9 +174,12 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     #   `block...`
     # }
     # MAIN_FUNC
-    write(user "\nUSER_MAIN_HEADER")
+    write(user "\n")
+    write-pre-func(user self)
+    write(user "USER_MAIN_HEADER")
     self.write-block()
-    write(user "\nMAIN_FUNC\n")
+    write-post-func()
+    write(user "\n\nMAIN_FUNC\n")
 
 
 ## Native function declaration in the syntax tree
@@ -156,14 +214,18 @@ class DeclarationArgument(Argument)
   func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
     new SyntaxTreeVariable in self.variable
     self.variable.access := self.access
+    self.variable.is-output := self.is-output
     new TypeInstance in self.variable.type-instance
-    self.variable.type-instance.parse(user " ", user self):(copy end)
+    self.variable.type-instance.parse(user " ", user self, user _):(copy end)
     if end != ' '
       self.m-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user ",)"):(owner self.variable.name, copy end)
   
+  func dynamic m-link-types()
+    self.variable.type-instance.m-link-types(user self)
+  
   func dynamic analyze()
-    self.variable.type-instance.analyze(user self)
+    self.variable.type-instance.analyze-lengths(user self)
   
   func dynamic get-type-instance():(user TypeInstance type-instance)
     type-instance := self.variable.type-instance

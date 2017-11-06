@@ -5,6 +5,7 @@ This file should onlw work together with test file #1.
 
 
 class MiddleType(BaseType)
+  var Int num-mid
   user BaseType mid-base-ref
   user TopType mid-top-ref
   
@@ -13,6 +14,7 @@ class MiddleType(BaseType)
   
   func dynamic meth2()
     # sys.print(user "MiddleType.meth2")
+    base.meth2()
   
   func dynamic meth4()
     # sys.print(user "MiddleType.meth4")

@@ -1,2 +1,17 @@
 build
 .test
+MR4/mr3
+wip
+.gitattributes
+
+# Visual-Studio files
+*.sln
+*.VC.db
+*.VC.VC.opendb
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+.vs/
+
+# Eclipse files
+/.project

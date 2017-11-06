@@ -63,6 +63,8 @@ class IntExpression(TextExpression)
         if second = 'b' or second = 'B'
           if not f-is-binary(user number)
             self.m-syntax-error(user "illegal binary number", user text)
+          self.m-syntax-error(
+              user "binary numbers not supported yet...", user text)
         else-if second = 'x' or second = 'X'
           if not f-is-hex(user number)
             self.m-syntax-error(user "illegal hexadecimal number", user text)
@@ -130,7 +132,9 @@ class StringExpression(TextExpression)
       self.m-syntax-error(user "illegal string constant", user text)
     self.set-simple-type(user glob.type-string)
     self.text := text
-    self.add-aux-variable(copy ACCESS-VAR):(owner self.symbol)
+  
+  func dynamic analyze()
+    self.add-aux-variable(copy ACCESS-AUX):(owner self.symbol)
   
   func dynamic write-preactions()
     # `symbol`.max_length = `string-length + 1`;

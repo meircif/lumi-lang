@@ -78,6 +78,47 @@ Returncode print_msg_with_item(String* text, String* item) {
 #undef MR_FUNC_NAME
 #endif
 
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode f_is_legal_name(String* name, Bool is_type, Bool* is_legal);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_f_is_legal_name = "f-is-legal-name";
+#define MR_FUNC_NAME _func_name_f_is_legal_name
+Returncode f_is_legal_name(String* name, Bool is_type, Bool* is_legal) {
+  if (name->length <= 0 || (is_type && name->length <= 1)) {
+    (*is_legal) = false;
+    return OK;
+  }
+  if ((0) < 0 || (0) >= (name)->length) RAISE(37)
+  Char ch = ((name)->values[0]);
+  Int first = 1;
+  if (is_type) {
+    if (ch < 'A' || ch > 'Z') {
+      (*is_legal) = false;
+      return OK;
+    }
+    if ((1) < 0 || (1) >= (name)->length) RAISE(43)
+    ch = ((name)->values[1]);
+    first = 2;
+  }
+  if (ch < 'a' || ch > 'z') {
+    (*is_legal) = false;
+    return OK;
+  }
+  {int n; for (n = (first); n < (name->length); ++n) {
+    if ((n) < 0 || (n) >= (name)->length) RAISE(49)
+    ch = ((name)->values[n]);
+    if (!((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || (!is_type && ch == '-') || (is_type && (ch >= 'A' && ch <= 'Z')))) {
+      (*is_legal) = false;
+      return OK;
+    }
+  }}
+  (*is_legal) = true;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES

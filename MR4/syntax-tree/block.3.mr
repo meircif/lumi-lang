@@ -11,21 +11,23 @@ class SyntaxTreeCode(SyntaxTreeNode)
   func inst m-get-parent-type():(user TypeData parent-type)
     self.parent.m-get-parent-type():(user parent-type)
   
-  func inst analyze-expression(
-      user Expression expression, user TypeData expected-type)
-    expression.analyze()
-    if not (? expression.result-type)
-      self.m-syntax-error(
-          user "got void expression, expected", user expected-type.name)
-    if expression.result-type.type-data != expected-type
-      self.m-syntax-error2(
-          user "got",
-          user expression.result-type.type-data.name,
-          user "expression, expected",
-          user expected-type.name)
-  
   func inst write-spaces()
     self.parent.write-spaces()
+  
+  ## Read and check indentation spaces for a line break from the input file
+  func inst read-line-break-spaces()
+    var Int expected-spaces(self.parent.indentation-spaces + 4)
+    for n in expected-spaces
+      if read-c() != ' '
+        var String{16} expected-spaces-str
+        var String{16} actual-spaces-str
+        expected-spaces.str(user expected-spaces-str)
+        Int.str(var n - 1, user actual-spaces-str)
+        self.m-syntax-error2(
+            user "too short indentation, expected",
+            user expected-spaces-str,
+            user "got",
+            user actual-spaces-str)
   
   func dynamic m-is-end-point():(copy Bool is-end)
     is-end := false
@@ -127,8 +129,15 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"new\", got", copy end)
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-OWNER, user _, user self):(copy end))
+      self.variables.add(owner SyntaxTreeInitNew.parse-new(
+          var _, user self):(copy end))
+      
+    else-if keyword.equal(user "assert")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"assert\", got", copy end)
+      self.code-nodes.add(owner SyntaxTreeAssert.parse-new(
+          var _, user self):(copy end))
       
     else
       glob.save-input := true
@@ -186,6 +195,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     type-instance.m-copy-new():(owner variable.type-instance)
     new-variable := variable
     self.variables.add(owner variable)
+  
+  func dynamic m-link-types()
+    base.m-link-types()
+    self.m-link-children-types(user self.code-nodes)
   
   func dynamic analyze()
     base.analyze()
