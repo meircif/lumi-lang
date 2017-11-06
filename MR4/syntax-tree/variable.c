@@ -62,23 +62,72 @@ Returncode SyntaxTreeVariable_parse(SyntaxTreeVariable* self, Int access, TypeDa
     CHECK(35, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){31, 30, "expected space after type, got"}, (*end)) )
   }
   if (self->access == ACCESS_VAR) {
-    Bool _Bool107;
-    CHECK(37, String_equal(self->type_instance->name, &(String){6, 5, "Array"}, &(_Bool107)) )
-    Bool _Bool108;
-    CHECK(37, String_equal(self->type_instance->name, &(String){7, 6, "String"}, &(_Bool108)) )
-    if (_Bool107 || _Bool108) {
+    Bool _Bool114;
+    CHECK(37, String_equal(self->type_instance->name, &(String){6, 5, "Array"}, &(_Bool114)) )
+    Bool _Bool115;
+    CHECK(37, String_equal(self->type_instance->name, &(String){7, 6, "String"}, &(_Bool115)) )
+    if (_Bool114 || _Bool115) {
       CHECK(39, SyntaxTreeInitVarSequence_init_new(NULL, self) )
     }
   }
   CHECK(40, read_new(&(String){2, 1, "("}, &(self->name), &((*end))) )
+  CHECK(41, SyntaxTreeVariable_m_check_name(self) )
   if ((*end) == '(') {
     if (NULL != self->parent_type) {
-      CHECK(43, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){35, 34, "type members cannot be initialized"}) )
+      CHECK(44, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){35, 34, "type members cannot be initialized"}) )
     }
     if (!(NULL != self->_base.parent)) {
-      CHECK(45, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){39, 38, "global variables cannot be initialized"}) )
+      CHECK(46, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){39, 38, "global variables cannot be initialized"}) )
     }
-    CHECK(46, SyntaxTreeVariableInit_parse_new(NULL, self, &((*end))) )
+    CHECK(47, SyntaxTreeVariableInit_parse_new(NULL, self, &((*end))) )
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeVariable_m_check_name(SyntaxTreeVariable* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeVariable_m_check_name = "SyntaxTreeVariable.m-check-name";
+#define MR_FUNC_NAME _func_name_SyntaxTreeVariable_m_check_name
+Returncode SyntaxTreeVariable_m_check_name(SyntaxTreeVariable* self) {
+  Bool _Bool116;
+  CHECK(50, f_is_legal_name(self->name, false, &(_Bool116)) )
+  if (!_Bool116) {
+    CHECK(51, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "illegal variable name"}, self->name) )
+  }
+  if (NULL != self->parent_type) {
+    SyntaxTreeVariable* field = NULL;
+    Int _Int117;
+    CHECK(54, TypeData_m_find_field(self->parent_type, self->name, &(field), &(_Int117)) )
+    if (NULL != field) {
+      CHECK(56, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "redefinition of field"}, self->name) )
+    }
+    SyntaxTreeFunction* meth = NULL;
+    Int _Int118;
+    CHECK(58, TypeData_m_find_meth(self->parent_type, self->name, &(meth), &(_Int118)) )
+    if (NULL != meth) {
+      CHECK(60, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){28, 27, "field name overrides method"}, self->name) )
+    }
+  }
+  else {
+    SyntaxTreeVariable* _SyntaxTreeVariable119;
+    CHECK(63, (glob->root)->_base._base._base._dtl[4](glob->root, self->name, &(_SyntaxTreeVariable119)) )
+    if (NULL != _SyntaxTreeVariable119) {
+      CHECK(64, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){32, 31, "redefinition of global variable"}, self->name) )
+    }
+    SyntaxTreeFunction* _SyntaxTreeFunction120;
+    CHECK(66, SyntaxTreeNamespace_m_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction120)) )
+    if (NULL != _SyntaxTreeFunction120) {
+      CHECK(67, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){33, 32, "variable name overrides function"}, self->name) )
+    }
+    if (NULL != self->_base.parent) {
+      SyntaxTreeVariable* _SyntaxTreeVariable121;
+      CHECK(70, (self->_base.parent)->_base._base._dtl[4](self->_base.parent, self->name, &(_SyntaxTreeVariable121)) )
+      if (NULL != _SyntaxTreeVariable121) {
+        CHECK(71, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){25, 24, "redefinition of variable"}, self->name) )
+      }
+    }
   }
   return OK;
 }
@@ -90,7 +139,7 @@ Returncode SyntaxTreeVariable_m_find_variable(SyntaxTreeVariable* self, String* 
 static char* _func_name_SyntaxTreeVariable_m_find_variable = "SyntaxTreeVariable.m-find-variable";
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariable_m_find_variable
 Returncode SyntaxTreeVariable_m_find_variable(SyntaxTreeVariable* self, String* name, SyntaxTreeVariable** variable, Bool* found) {
-  CHECK(50, String_equal(self->name, name, &((*found))) )
+  CHECK(76, String_equal(self->name, name, &((*found))) )
   if ((*found)) {
     (*variable) = self;
   }
@@ -106,7 +155,7 @@ static char* _func_name_SyntaxTreeVariable_m_link_types = "SyntaxTreeVariable.m-
 Returncode SyntaxTreeVariable_m_link_types(SyntaxTreeVariable* self) {
   /* sys.print-raw(user "m-link-type var ") */
   /* sys.print(user self.name) */
-  CHECK(57, TypeInstance_m_link_types(self->type_instance, &(self->_base._base)) )
+  CHECK(83, TypeInstance_m_link_types(self->type_instance, &(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -117,26 +166,26 @@ Returncode SyntaxTreeVariable_analyze(SyntaxTreeVariable* self);
 static char* _func_name_SyntaxTreeVariable_analyze = "SyntaxTreeVariable.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariable_analyze
 Returncode SyntaxTreeVariable_analyze(SyntaxTreeVariable* self) {
-  CHECK(60, TypeInstance_analyze_lengths(self->type_instance, &(self->_base._base)) )
+  CHECK(86, TypeInstance_analyze_lengths(self->type_instance, &(self->_base._base)) )
   if (self->type_instance->type_data == glob->type_array) {
     if (!(NULL != self->type_instance->sub_type)) {
-      CHECK(63, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){26, 25, "missing subtype for array"}) )
+      CHECK(89, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){26, 25, "missing subtype for array"}) )
     }
     if (self->type_instance->sub_type->type_data == glob->type_array) {
-      CHECK(65, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){44, 43, "multidimensional array not supported yet..."}) )
+      CHECK(91, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){44, 43, "multidimensional array not supported yet..."}) )
     }
   }
   if (self->access == ACCESS_VAR || self->access == ACCESS_NEW) {
     if (!self->type_instance->type_data->is_primitive &&  ! (NULL != self->_base.parent)) {
-      CHECK(69, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){52, 51, "non-primitives cannot be declared \"var\" here yet..."}) )
+      CHECK(95, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){52, 51, "non-primitives cannot be declared \"var\" here yet..."}) )
     }
     if (self->type_instance->type_data == glob->type_array || self->type_instance->type_data == glob->type_string) {
       if (!(NULL != self->type_instance->length)) {
-        CHECK(74, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){28, 27, "missing length for sequence"}) )
+        CHECK(100, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){28, 27, "missing length for sequence"}) )
       }
     }
     if (self->type_instance->type_data == glob->type_array && self->type_instance->sub_type->type_data == glob->type_string &&  ! (NULL != self->type_instance->sub_type->length)) {
-      CHECK(78, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){28, 27, "missing length for sequence"}) )
+      CHECK(104, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){28, 27, "missing length for sequence"}) )
     }
   }
   return OK;
@@ -152,75 +201,75 @@ Returncode SyntaxTreeVariable_write(SyntaxTreeVariable* self) {
   if (self->access == ACCESS_VAR && (self->type_instance->type_data == glob->type_array || self->type_instance->type_data == glob->type_string)) {
     if (self->type_instance->type_data == glob->type_array && self->type_instance->sub_type->type_data == glob->type_string) {
       /* char `name`_Chars[`length` * `string-legth`]; */
-      CHECK(87, write(&(String){6, 5, "char "}) )
-      CHECK(88, write_cname(self->name) )
-      CHECK(89, write(&(String){8, 7, "_Chars["}) )
-      CHECK(90, (self->type_instance->length)->_base._dtl[2](self->type_instance->length) )
-      CHECK(91, write(&(String){4, 3, " * "}) )
-      CHECK(92, (self->type_instance->sub_type->length)->_base._dtl[2](self->type_instance->sub_type->length) )
-      CHECK(93, write(&(String){4, 3, "];\n"}) )
-      CHECK(94, SyntaxTreeCode_write_spaces(&(self->_base)) )
+      CHECK(113, write(&(String){6, 5, "char "}) )
+      CHECK(114, write_cname(self->name) )
+      CHECK(115, write(&(String){8, 7, "_Chars["}) )
+      CHECK(116, (self->type_instance->length)->_base._dtl[2](self->type_instance->length) )
+      CHECK(117, write(&(String){4, 3, " * "}) )
+      CHECK(118, (self->type_instance->sub_type->length)->_base._dtl[2](self->type_instance->sub_type->length) )
+      CHECK(119, write(&(String){4, 3, "];\n"}) )
+      CHECK(120, SyntaxTreeCode_write_spaces(&(self->_base)) )
     }
     /* `sub-type` `name`_Values[`length`]; */
     if (self->type_instance->type_data == glob->type_string) {
-      CHECK(97, write(&(String){5, 4, "char"}) )
+      CHECK(123, write(&(String){5, 4, "char"}) )
     }
     else {
-      CHECK(99, write_cname(self->type_instance->sub_type->type_data->name) )
+      CHECK(125, write_cname(self->type_instance->sub_type->type_data->name) )
     }
-    CHECK(100, write(&(String){2, 1, " "}) )
-    CHECK(101, write_cname(self->name) )
-    CHECK(102, write(&(String){9, 8, "_Values["}) )
-    CHECK(103, (self->type_instance->length)->_base._dtl[2](self->type_instance->length) )
-    CHECK(104, write(&(String){4, 3, "];\n"}) )
-    CHECK(105, SyntaxTreeCode_write_spaces(&(self->_base)) )
+    CHECK(126, write(&(String){2, 1, " "}) )
+    CHECK(127, write_cname(self->name) )
+    CHECK(128, write(&(String){9, 8, "_Values["}) )
+    CHECK(129, (self->type_instance->length)->_base._dtl[2](self->type_instance->length) )
+    CHECK(130, write(&(String){4, 3, "];\n"}) )
+    CHECK(131, SyntaxTreeCode_write_spaces(&(self->_base)) )
   }
   
-  CHECK(107, write_cname(self->type_instance->type_data->name) )
+  CHECK(133, write_cname(self->type_instance->type_data->name) )
   if (self->access != ACCESS_VAR && self->access != ACCESS_AUX) {
-    CHECK(109, write(&(String){2, 1, "*"}) )
+    CHECK(135, write(&(String){2, 1, "*"}) )
   }
-  CHECK(110, write(&(String){2, 1, " "}) )
-  CHECK(111, write_cname(self->name) )
+  CHECK(136, write(&(String){2, 1, " "}) )
+  CHECK(137, write_cname(self->name) )
   
   if (!self->type_instance->type_data->is_primitive && (self->access == ACCESS_VAR || self->access == ACCESS_AUX)) {
     /* `type` `name`_Var = {...}; */
     /* `type`* `name` = &`name`_Var; */
-    CHECK(117, write(&(String){9, 8, "_Var = {"}) )
+    CHECK(143, write(&(String){9, 8, "_Var = {"}) )
     if ((self->type_instance->type_data == glob->type_array || self->type_instance->type_data == glob->type_string) && self->access == ACCESS_VAR) {
       /* {`length`, 0, NULL} */
-      CHECK(122, (self->type_instance->length)->_base._dtl[2](self->type_instance->length) )
+      CHECK(148, (self->type_instance->length)->_base._dtl[2](self->type_instance->length) )
       if (self->type_instance->type_data == glob->type_string) {
-        CHECK(124, write(&(String){4, 3, ", 0"}) )
+        CHECK(150, write(&(String){4, 3, ", 0"}) )
       }
-      CHECK(125, write(&(String){7, 6, ", NULL"}) )
+      CHECK(151, write(&(String){7, 6, ", NULL"}) )
     }
     else {
-      CHECK(127, write(&(String){2, 1, "0"}) )
+      CHECK(153, write(&(String){2, 1, "0"}) )
     }
-    CHECK(128, write(&(String){4, 3, "};\n"}) )
-    CHECK(129, SyntaxTreeCode_write_spaces(&(self->_base)) )
-    CHECK(130, write_cname(self->type_instance->type_data->name) )
-    CHECK(131, write(&(String){3, 2, "* "}) )
-    CHECK(132, write_cname(self->name) )
-    CHECK(133, write(&(String){5, 4, " = &"}) )
-    CHECK(134, write_cname(self->name) )
-    CHECK(135, write(&(String){5, 4, "_Var"}) )
+    CHECK(154, write(&(String){4, 3, "};\n"}) )
+    CHECK(155, SyntaxTreeCode_write_spaces(&(self->_base)) )
+    CHECK(156, write_cname(self->type_instance->type_data->name) )
+    CHECK(157, write(&(String){3, 2, "* "}) )
+    CHECK(158, write_cname(self->name) )
+    CHECK(159, write(&(String){5, 4, " = &"}) )
+    CHECK(160, write_cname(self->name) )
+    CHECK(161, write(&(String){5, 4, "_Var"}) )
   }
   else {
     if (NULL != self->_base.parent) {
       /* `type` `name` = 0; */
       /* `type`* `name` = NULL; */
       if (self->access == ACCESS_VAR) {
-        CHECK(140, write(&(String){5, 4, " = 0"}) )
+        CHECK(166, write(&(String){5, 4, " = 0"}) )
       }
       else {
-        CHECK(142, write(&(String){8, 7, " = NULL"}) )
+        CHECK(168, write(&(String){8, 7, " = NULL"}) )
       }
     }
   }
   
-  CHECK(144, write(&(String){2, 1, ";"}) )
+  CHECK(170, write(&(String){2, 1, ";"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -248,7 +297,7 @@ static char* _func_name_BaseVariableInit_init = "BaseVariableInit.init";
 #define MR_FUNC_NAME _func_name_BaseVariableInit_init
 Returncode BaseVariableInit_init(BaseVariableInit* self, SyntaxTreeVariable* variable) {
   self->variable = variable;
-  CHECK(152, BaseVariableInit_init_parent(self, variable->_base.parent) )
+  CHECK(178, BaseVariableInit_init_parent(self, variable->_base.parent) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -260,8 +309,8 @@ static char* _func_name_BaseVariableInit_init_parent = "BaseVariableInit.init-pa
 #define MR_FUNC_NAME _func_name_BaseVariableInit_init_parent
 Returncode BaseVariableInit_init_parent(BaseVariableInit* self, SyntaxTreeBlock* parent) {
   self->_base.parent = parent;
-  CHECK(156, SyntaxTreeNode_set_location(&(self->_base._base)) )
-  CHECK(157, List_add(self->_base.parent->code_nodes, &(self->_base)) )
+  CHECK(182, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(183, List_add(self->_base.parent->code_nodes, &(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -289,10 +338,10 @@ static char* _func_name_SyntaxTreeInitVarSequence_init_new = "SyntaxTreeInitVarS
 #define MR_FUNC_NAME _func_name_SyntaxTreeInitVarSequence_init_new
 Returncode SyntaxTreeInitVarSequence_init_new(SyntaxTreeInitVarSequence* self, SyntaxTreeVariable* variable) {
   SyntaxTreeInitVarSequence* new_node = malloc(sizeof(SyntaxTreeInitVarSequence));
-  if (new_node == NULL) RAISE(163)
+  if (new_node == NULL) RAISE(189)
   *new_node = (SyntaxTreeInitVarSequence){SyntaxTreeInitVarSequence__dtl, NULL, 0, NULL, NULL};
   new_node->_base._base._base._dtl = SyntaxTreeInitVarSequence__dtl;
-  CHECK(164, BaseVariableInit_init(&(new_node->_base), variable) )
+  CHECK(190, BaseVariableInit_init(&(new_node->_base), variable) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -304,24 +353,24 @@ static char* _func_name_SyntaxTreeInitVarSequence_write = "SyntaxTreeInitVarSequ
 #define MR_FUNC_NAME _func_name_SyntaxTreeInitVarSequence_write
 Returncode SyntaxTreeInitVarSequence_write(SyntaxTreeInitVarSequence* self) {
   /* `name`_Var.values = `name`_Values; */
-  CHECK(168, write_cname(self->_base.variable->name) )
-  CHECK(169, write(&(String){15, 14, "_Var.values = "}) )
-  CHECK(170, write_cname(self->_base.variable->name) )
-  CHECK(171, write(&(String){9, 8, "_Values;"}) )
+  CHECK(194, write_cname(self->_base.variable->name) )
+  CHECK(195, write(&(String){15, 14, "_Var.values = "}) )
+  CHECK(196, write_cname(self->_base.variable->name) )
+  CHECK(197, write(&(String){9, 8, "_Values;"}) )
   if (self->_base.variable->type_instance->type_data == glob->type_array && self->_base.variable->type_instance->sub_type->type_data == glob->type_string) {
     /* MR_set_var_string_array( */
     /*    `array-length`, `string-length`, `name`, `name`_Chars); */
-    CHECK(176, write(&(String){2, 1, "\n"}) )
-    CHECK(177, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-    CHECK(178, write(&(String){25, 24, "MR_set_var_string_array("}) )
-    CHECK(179, (self->_base.variable->type_instance->length)->_base._dtl[2](self->_base.variable->type_instance->length) )
-    CHECK(180, write(&(String){3, 2, ", "}) )
-    CHECK(181, (self->_base.variable->type_instance->sub_type->length)->_base._dtl[2](self->_base.variable->type_instance->sub_type->length) )
-    CHECK(182, write(&(String){3, 2, ", "}) )
-    CHECK(183, write_cname(self->_base.variable->name) )
-    CHECK(184, write(&(String){3, 2, ", "}) )
-    CHECK(185, write_cname(self->_base.variable->name) )
-    CHECK(186, write(&(String){9, 8, "_Chars);"}) )
+    CHECK(202, write(&(String){2, 1, "\n"}) )
+    CHECK(203, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+    CHECK(204, write(&(String){25, 24, "MR_set_var_string_array("}) )
+    CHECK(205, (self->_base.variable->type_instance->length)->_base._dtl[2](self->_base.variable->type_instance->length) )
+    CHECK(206, write(&(String){3, 2, ", "}) )
+    CHECK(207, (self->_base.variable->type_instance->sub_type->length)->_base._dtl[2](self->_base.variable->type_instance->sub_type->length) )
+    CHECK(208, write(&(String){3, 2, ", "}) )
+    CHECK(209, write_cname(self->_base.variable->name) )
+    CHECK(210, write(&(String){3, 2, ", "}) )
+    CHECK(211, write_cname(self->_base.variable->name) )
+    CHECK(212, write(&(String){9, 8, "_Chars);"}) )
   }
   return OK;
 }
@@ -350,11 +399,11 @@ static char* _func_name_SyntaxTreeInitNew_parse_new = "SyntaxTreeInitNew.parse-n
 #define MR_FUNC_NAME _func_name_SyntaxTreeInitNew_parse_new
 Returncode SyntaxTreeInitNew_parse_new(SyntaxTreeInitNew* self, SyntaxTreeBlock* parent_block, Char* end, SyntaxTreeVariable** new_var_node) {
   SyntaxTreeInitNew* node_init_new = malloc(sizeof(SyntaxTreeInitNew));
-  if (node_init_new == NULL) RAISE(193)
+  if (node_init_new == NULL) RAISE(219)
   *node_init_new = (SyntaxTreeInitNew){SyntaxTreeInitNew__dtl, NULL, 0, NULL, NULL};
   node_init_new->_base._base._base._dtl = SyntaxTreeInitNew__dtl;
-  CHECK(194, BaseVariableInit_init_parent(&(node_init_new->_base), parent_block) )
-  CHECK(195, SyntaxTreeVariable_parse_new(NULL, ACCESS_NEW, NULL, parent_block, &((*end)), &((*new_var_node))) )
+  CHECK(220, BaseVariableInit_init_parent(&(node_init_new->_base), parent_block) )
+  CHECK(221, SyntaxTreeVariable_parse_new(NULL, ACCESS_NEW, NULL, parent_block, &((*end)), &((*new_var_node))) )
   node_init_new->_base.variable = (*new_var_node);
   return OK;
 }
@@ -367,7 +416,7 @@ static char* _func_name_SyntaxTreeInitNew_analyze = "SyntaxTreeInitNew.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeInitNew_analyze
 Returncode SyntaxTreeInitNew_analyze(SyntaxTreeInitNew* self) {
   if (self->_base.variable->type_instance->type_data->is_primitive) {
-    CHECK(202, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){37, 36, "cannot use \"new\" with primitive type"}, self->_base.variable->type_instance->type_data->name) )
+    CHECK(228, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){37, 36, "cannot use \"new\" with primitive type"}, self->_base.variable->type_instance->type_data->name) )
   }
   return OK;
 }
@@ -381,52 +430,52 @@ static char* _func_name_SyntaxTreeInitNew_write = "SyntaxTreeInitNew.write";
 Returncode SyntaxTreeInitNew_write(SyntaxTreeInitNew* self) {
   /* `name` = `...` */
   if (self->_base.variable->type_instance->type_data == glob->type_array || self->_base.variable->type_instance->type_data == glob->type_string) {
-    CHECK(210, (self->_base.variable->type_instance->length)->_base._dtl[4](self->_base.variable->type_instance->length) )
+    CHECK(236, (self->_base.variable->type_instance->length)->_base._dtl[4](self->_base.variable->type_instance->length) )
   }
   if (self->_base.variable->type_instance->type_data == glob->type_array && self->_base.variable->type_instance->sub_type->type_data == glob->type_string) {
-    CHECK(213, (self->_base.variable->type_instance->sub_type->length)->_base._dtl[4](self->_base.variable->type_instance->sub_type->length) )
+    CHECK(239, (self->_base.variable->type_instance->sub_type->length)->_base._dtl[4](self->_base.variable->type_instance->sub_type->length) )
   }
-  CHECK(214, write_cname(self->_base.variable->name) )
-  CHECK(215, write(&(String){4, 3, " = "}) )
+  CHECK(240, write_cname(self->_base.variable->name) )
+  CHECK(241, write(&(String){4, 3, " = "}) )
   if (self->_base.variable->type_instance->type_data == glob->type_array) {
     /* MR_new_array(length, sizeof(SubType)); */
     /* MR_new_array(length, sizeof(String) + (string-length)); */
     /* MR_set_new_string_array(length, string-length, `name`); */
-    CHECK(220, write(&(String){14, 13, "MR_new_array("}) )
-    CHECK(221, (self->_base.variable->type_instance->length)->_base._dtl[2](self->_base.variable->type_instance->length) )
-    CHECK(222, write(&(String){10, 9, ", sizeof("}) )
-    CHECK(223, write_cname(self->_base.variable->type_instance->sub_type->type_data->name) )
+    CHECK(246, write(&(String){14, 13, "MR_new_array("}) )
+    CHECK(247, (self->_base.variable->type_instance->length)->_base._dtl[2](self->_base.variable->type_instance->length) )
+    CHECK(248, write(&(String){10, 9, ", sizeof("}) )
+    CHECK(249, write_cname(self->_base.variable->type_instance->sub_type->type_data->name) )
     if (self->_base.variable->type_instance->sub_type->type_data == glob->type_string) {
-      CHECK(225, write(&(String){6, 5, ") + ("}) )
-      CHECK(226, (self->_base.variable->type_instance->sub_type->length)->_base._dtl[2](self->_base.variable->type_instance->sub_type->length) )
-      CHECK(227, write(&(String){5, 4, "));\n"}) )
-      CHECK(228, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-      CHECK(229, write(&(String){25, 24, "MR_set_new_string_array("}) )
-      CHECK(230, (self->_base.variable->type_instance->length)->_base._dtl[2](self->_base.variable->type_instance->length) )
-      CHECK(231, write(&(String){3, 2, ", "}) )
-      CHECK(232, (self->_base.variable->type_instance->sub_type->length)->_base._dtl[2](self->_base.variable->type_instance->sub_type->length) )
-      CHECK(233, write(&(String){3, 2, ", "}) )
-      CHECK(234, write_cname(self->_base.variable->name) )
+      CHECK(251, write(&(String){6, 5, ") + ("}) )
+      CHECK(252, (self->_base.variable->type_instance->sub_type->length)->_base._dtl[2](self->_base.variable->type_instance->sub_type->length) )
+      CHECK(253, write(&(String){5, 4, "));\n"}) )
+      CHECK(254, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+      CHECK(255, write(&(String){25, 24, "MR_set_new_string_array("}) )
+      CHECK(256, (self->_base.variable->type_instance->length)->_base._dtl[2](self->_base.variable->type_instance->length) )
+      CHECK(257, write(&(String){3, 2, ", "}) )
+      CHECK(258, (self->_base.variable->type_instance->sub_type->length)->_base._dtl[2](self->_base.variable->type_instance->sub_type->length) )
+      CHECK(259, write(&(String){3, 2, ", "}) )
+      CHECK(260, write_cname(self->_base.variable->name) )
     }
     else {
-      CHECK(236, write(&(String){2, 1, ")"}) )
+      CHECK(262, write(&(String){2, 1, ")"}) )
       
     }
   }
   else {
     if (self->_base.variable->type_instance->type_data == glob->type_string) {
       /* MR_new_string(length); */
-      CHECK(240, write(&(String){15, 14, "MR_new_string("}) )
-      CHECK(241, (self->_base.variable->type_instance->length)->_base._dtl[2](self->_base.variable->type_instance->length) )
+      CHECK(266, write(&(String){15, 14, "MR_new_string("}) )
+      CHECK(267, (self->_base.variable->type_instance->length)->_base._dtl[2](self->_base.variable->type_instance->length) )
     }
     else {
       /* calloc(1, sizeof(`type`)); */
-      CHECK(244, write(&(String){18, 17, "calloc(1, sizeof("}) )
-      CHECK(245, write_cname(self->_base.variable->type_instance->type_data->name) )
-      CHECK(246, write(&(String){2, 1, ")"}) )
+      CHECK(270, write(&(String){18, 17, "calloc(1, sizeof("}) )
+      CHECK(271, write_cname(self->_base.variable->type_instance->type_data->name) )
+      CHECK(272, write(&(String){2, 1, ")"}) )
     }
   }
-  CHECK(247, write(&(String){3, 2, ");"}) )
+  CHECK(273, write(&(String){3, 2, ");"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -455,10 +504,10 @@ static char* _func_name_SyntaxTreeVariableInit_parse_new = "SyntaxTreeVariableIn
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariableInit_parse_new
 Returncode SyntaxTreeVariableInit_parse_new(SyntaxTreeVariableInit* self, SyntaxTreeVariable* variable, Char* end) {
   SyntaxTreeVariableInit* new_node = malloc(sizeof(SyntaxTreeVariableInit));
-  if (new_node == NULL) RAISE(255)
+  if (new_node == NULL) RAISE(281)
   *new_node = (SyntaxTreeVariableInit){SyntaxTreeVariableInit__dtl, NULL, 0, NULL, NULL, NULL};
   new_node->_base._base._base._dtl = SyntaxTreeVariableInit__dtl;
-  CHECK(256, SyntaxTreeVariableInit_parse(new_node, variable, &((*end))) )
+  CHECK(282, SyntaxTreeVariableInit_parse(new_node, variable, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -469,12 +518,12 @@ Returncode SyntaxTreeVariableInit_parse(SyntaxTreeVariableInit* self, SyntaxTree
 static char* _func_name_SyntaxTreeVariableInit_parse = "SyntaxTreeVariableInit.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariableInit_parse
 Returncode SyntaxTreeVariableInit_parse(SyntaxTreeVariableInit* self, SyntaxTreeVariable* variable, Char* end) {
-  CHECK(259, BaseVariableInit_init(&(self->_base), variable) )
-  CHECK(260, parse_new_expression(&(String){2, 1, ")"}, &(self->_base._base), &(self->value), &((*end))) )
+  CHECK(285, BaseVariableInit_init(&(self->_base), variable) )
+  CHECK(286, parse_new_expression(&(String){2, 1, ")"}, &(self->_base._base), &(self->value), &((*end))) )
   if ((*end) != ')') {
-    CHECK(262, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){39, 38, "expected \")\" after initialization, got"}, (*end)) )
+    CHECK(288, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){39, 38, "expected \")\" after initialization, got"}, (*end)) )
   }
-  CHECK(265, read_c(&((*end))) )
+  CHECK(291, read_c(&((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -486,10 +535,10 @@ static char* _func_name_SyntaxTreeVariableInit_analyze = "SyntaxTreeVariableInit
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariableInit_analyze
 Returncode SyntaxTreeVariableInit_analyze(SyntaxTreeVariableInit* self) {
   if ((self->_base.variable->access == ACCESS_VAR || self->_base.variable->access == ACCESS_NEW) &&  ! self->_base.variable->type_instance->type_data->is_primitive &&  ! (self->_base.variable->type_instance->type_data == glob->type_string)) {
-    CHECK(272, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){37, 36, "cannot initialize non-primitive type"}, self->_base.variable->type_instance->type_data->name) )
+    CHECK(298, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){37, 36, "cannot initialize non-primitive type"}, self->_base.variable->type_instance->type_data->name) )
   }
-  CHECK(275, (self->value)->_base._dtl[1](self->value) )
-  CHECK(276, TypeInstance_m_check_assign_from(self->_base.variable->type_instance, &(self->_base._base._base), &(self->value)) )
+  CHECK(301, (self->value)->_base._dtl[1](self->value) )
+  CHECK(302, TypeInstance_m_check_assign_from(self->_base.variable->type_instance, &(self->_base._base._base), &(self->value)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -500,22 +549,22 @@ Returncode SyntaxTreeVariableInit_write(SyntaxTreeVariableInit* self);
 static char* _func_name_SyntaxTreeVariableInit_write = "SyntaxTreeVariableInit.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariableInit_write
 Returncode SyntaxTreeVariableInit_write(SyntaxTreeVariableInit* self) {
-  CHECK(280, (self->value)->_base._dtl[4](self->value) )
+  CHECK(306, (self->value)->_base._dtl[4](self->value) )
   if ((self->_base.variable->access == ACCESS_VAR || self->_base.variable->access == ACCESS_NEW) && self->_base.variable->type_instance->type_data == glob->type_string) {
     /* CHECK(`line-num`, String_copy(`name`, `value`) ) */
-    CHECK(285, SyntaxTreeNode_write_call(&(self->_base._base._base)) )
-    CHECK(286, write(&(String){13, 12, "String_copy("}) )
-    CHECK(287, write_cname(self->_base.variable->name) )
-    CHECK(288, write(&(String){3, 2, ", "}) )
-    CHECK(289, (self->value)->_base._dtl[2](self->value) )
-    CHECK(290, write(&(String){4, 3, ") )"}) )
+    CHECK(311, SyntaxTreeNode_write_call(&(self->_base._base._base)) )
+    CHECK(312, write(&(String){13, 12, "String_copy("}) )
+    CHECK(313, write_cname(self->_base.variable->name) )
+    CHECK(314, write(&(String){3, 2, ", "}) )
+    CHECK(315, (self->value)->_base._dtl[2](self->value) )
+    CHECK(316, write(&(String){4, 3, ") )"}) )
   }
   else {
     /* `name` = `value`; */
-    CHECK(293, write_cname(self->_base.variable->name) )
-    CHECK(294, write(&(String){4, 3, " = "}) )
-    CHECK(295, (self->value)->_base._dtl[2](self->value) )
-    CHECK(296, write(&(String){2, 1, ";"}) )
+    CHECK(319, write_cname(self->_base.variable->name) )
+    CHECK(320, write(&(String){4, 3, " = "}) )
+    CHECK(321, (self->value)->_base._dtl[2](self->value) )
+    CHECK(322, write(&(String){2, 1, ";"}) )
   }
   return OK;
 }

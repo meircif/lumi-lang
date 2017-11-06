@@ -78,6 +78,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
   
   func dynamic write()
     # if (!(`condition`) break;
+    self.condition.write-preactions()
     write(user "if (!(")
     self.condition.write()
     write(user ")) break;")

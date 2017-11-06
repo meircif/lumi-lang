@@ -146,7 +146,9 @@ struct TestStruct
 
 
 func f-test-void()
+  return
 func f-test-params(copy Int x, user String s, owner String o)
+  raise
 func f-test-outs()->(owner String s, copy Int x)
 func f-test-int2str(copy Int x)->(owner String s)
 func f-test-int(copy Int x)
@@ -175,6 +177,35 @@ func test-call-expression()
   f-test-int(copy f-test-int2int(copy 9)->(copy tmp))
   x := f-test-int2int(copy 10) + f-test-many(copy 11, copy 12)->(copy x)
   s := f-test-int2str(copy 13)
+
+func test-code-flow(user Array{Int} arr)->(copy Int res)
+  if arr[4] > 6
+    res := 6
+  else-if arr?
+    res := 6
+  else-if arr[4] != arr[4]
+    res := 6
+  else-if 0 = arr[0]
+    res := 6
+  else
+    res := 0
+  do
+    arr[6] := 6
+    var Int x(arr[2])
+    while x > 3
+    var Int y(x - 1)
+    do
+      arr[4] := arr[8]
+      if y > arr[4]
+        continue
+      var Int z(0)
+      if z <= arr[4]
+        while z > 0
+  for n in arr[2]:2 - (3 * arr[2])
+    arr[0] := arr[2]
+    var Int x(arr[0])
+    if x > 4
+      arr[1] := x
 
 
 main

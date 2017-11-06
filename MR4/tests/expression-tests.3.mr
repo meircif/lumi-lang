@@ -253,6 +253,29 @@ test test-slice-expression()
   test-code(
       user "arr := arr[2:6]",
       user "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0_Var.length = 6;\n  aux_Array_0_Var.values = (Byte*)((arr)->values) + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)\n  arr = aux_Array_0;")
+  test-code(
+      user "str[4] := c",
+      user "if ((4) < 0 || (4) >= (str)->length) RAISE(1)\n  ((str)->values)[4] = c;")
+  test-code(
+      user "arr[4] := i",
+      user "if ((4) < 0 || (4) >= (arr)->length) RAISE(1)\n  ((Int*)((arr)->values))[4] = i;")
+  test-code-error(user "arr[2", user "expected \"]\", got \"new-line\"")
+  test-code-error(user "arr[2:3", user "expected \"]\", got \"new-line\"")
+  test-code-error(user "(i := 3)[2]", user "cannot slice a void expression")
+  test-code-error(user "i[2]", user "cannot slice type \"Int\"")
+  test-code-error(
+      user "arr[str]", user "expected integer index for slice, got \"String\"")
+  test-code-error(
+      user "arr[3:str]",
+      user "expected integer index for slice, got \"String\"")
+  test-code-error(
+      user "arr[i += 3]",
+      user "expected integer index for slice, got void expression")
+  test-code-error(
+      user "str[2:5] := str", user "assigning into non assignable expression")
+  test-code-error(
+      user "arr[7:2] := arr", user "assigning into non assignable expression")
+
 
 test test-call-expression()
   test-code(user "fun0()", user "CHECK(1, fun0() )")

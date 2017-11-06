@@ -38,12 +38,38 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           self.type-instance.name.equal(user "String")
         SyntaxTreeInitVarSequence.init-new(var _, user self)
     read-new(user "("):(owner self.name, copy end)
+    self.m-check-name()
     if end = '('
       if ? self.parent-type
         self.m-syntax-error-msg(user "type members cannot be initialized")
       if not (? self.parent)
         self.m-syntax-error-msg(user "global variables cannot be initialized")
       SyntaxTreeVariableInit.parse-new(var _, user self):(copy end)
+  
+  func inst m-check-name()
+    if not f-is-legal-name(user self.name, copy false)
+      self.m-syntax-error(user "illegal variable name", user self.name)
+    if ? self.parent-type
+      user SyntaxTreeVariable field
+      self.parent-type.m-find-field(user self.name):(user field)
+      if ? field
+        self.m-syntax-error(user "redefinition of field", user self.name)
+      user SyntaxTreeFunction meth
+      self.parent-type.m-find-meth(user self.name):(user meth)
+      if ? meth
+        self.m-syntax-error(
+            user "field name overrides method", user self.name)
+    else
+      if ? glob.root.m-find-variable(user self.name)
+        self.m-syntax-error(
+            user "redefinition of global variable", user self.name)
+      if ? glob.root.m-find-function(user self.name)
+        self.m-syntax-error(
+            user "variable name overrides function", user self.name)
+      if ? self.parent
+        if ? self.parent.m-find-variable(user self.name)
+          self.m-syntax-error(
+              user "redefinition of variable", user self.name)
   
   func inst m-find-variable(user String name):(
       user SyntaxTreeVariable variable, copy Bool found)

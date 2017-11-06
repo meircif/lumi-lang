@@ -23,12 +23,14 @@ class SliceExpression(Expression)
     if end = ':'
       parse-new-expression(user "]", user code-node):(
           owner self.second-index, copy end)
+    if end != ']'
+      self.m-syntax-error-c(user "expected \"]\", got", copy end)
     read-c():(copy end)
   
   func dynamic analyze()
     self.sequence.analyze()
-    self.assignable := self.sequence.assignable
-    if not (? self.sequence.result-type.type-data)
+    self.assignable := self.sequence.assignable and not (? self.second-index)
+    if not (? self.sequence.result-type)
       self.m-syntax-error-msg(user "cannot slice a void expression")
     if self.sequence.result-type.type-data = glob.type-string
       if not (? self.second-index)
@@ -51,7 +53,7 @@ class SliceExpression(Expression)
       self.add-aux-variable(copy ACCESS-AUX):(owner self.slice-symbol)
   
   func inst m-check-index(user Expression index)
-    if ? index.result-type.type-data
+    if ? index.result-type
       if index.result-type.type-data != glob.type-int
         self.m-syntax-error(
             user "expected integer index for slice, got",

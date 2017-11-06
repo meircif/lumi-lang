@@ -249,9 +249,10 @@ static char* _func_name_SyntaxTreeWhile_write = "SyntaxTreeWhile.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeWhile_write
 Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
   /* if (!(`condition`) break; */
-  CHECK(81, write(&(String){7, 6, "if (!("}) )
-  CHECK(82, (self->condition)->_base._dtl[2](self->condition) )
-  CHECK(83, write(&(String){10, 9, ")) break;"}) )
+  CHECK(81, (self->condition)->_base._dtl[4](self->condition) )
+  CHECK(82, write(&(String){7, 6, "if (!("}) )
+  CHECK(83, (self->condition)->_base._dtl[2](self->condition) )
+  CHECK(84, write(&(String){10, 9, ")) break;"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -279,10 +280,10 @@ static char* _func_name_SyntaxTreeContinue_parse_new = "SyntaxTreeContinue.parse
 #define MR_FUNC_NAME _func_name_SyntaxTreeContinue_parse_new
 Returncode SyntaxTreeContinue_parse_new(SyntaxTreeContinue* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeContinue** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeContinue));
-  if ((*new_node) == NULL) RAISE(91)
+  if ((*new_node) == NULL) RAISE(92)
   *(*new_node) = (SyntaxTreeContinue){SyntaxTreeContinue__dtl, NULL, 0, NULL};
   (*new_node)->_base._base._dtl = SyntaxTreeContinue__dtl;
-  CHECK(92, SyntaxTreeContinue_parse((*new_node), parent) )
+  CHECK(93, SyntaxTreeContinue_parse((*new_node), parent) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -293,10 +294,10 @@ Returncode SyntaxTreeContinue_parse(SyntaxTreeContinue* self, SyntaxTreeBlock* p
 static char* _func_name_SyntaxTreeContinue_parse = "SyntaxTreeContinue.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeContinue_parse
 Returncode SyntaxTreeContinue_parse(SyntaxTreeContinue* self, SyntaxTreeBlock* parent) {
-  CHECK(95, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(96, SyntaxTreeNode_set_location(&(self->_base._base)) )
   self->_base.parent = parent;
   if (!parent->is_in_loop) {
-    CHECK(98, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "\"continue\" used not inside loop"}) )
+    CHECK(99, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "\"continue\" used not inside loop"}) )
   }
   return OK;
 }
@@ -308,7 +309,7 @@ Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self);
 static char* _func_name_SyntaxTreeContinue_write = "SyntaxTreeContinue.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeContinue_write
 Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self) {
-  CHECK(101, write(&(String){10, 9, "continue;"}) )
+  CHECK(102, write(&(String){10, 9, "continue;"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

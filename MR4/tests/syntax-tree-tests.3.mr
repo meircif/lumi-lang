@@ -45,7 +45,7 @@ func test-global-scope-error(user String input-text, user String expected-error)
   assert mock-print-text[mock-print-text.length - 1] = '\n'
 
 
-test test-global()
+test test-general()
   test-global-scope(user "user String str", user "String* str;")
   user String expected("Int x;")
   test-global-scope(user "\n  \n\nvar Int x", user expected)
@@ -56,6 +56,7 @@ test test-global()
   test-global-scope(
       user "{## multi \n line \n documemtation #}\n\nvar Int x", user expected)
   test-global-scope-error(user "error ", user "unknown keyword \"error\"")
+  test-code-error(user "1 + 2", user "statememnt has no effect")
   test-global-scope-error(
       user "{# comment #}?", user "expected new-line in line end, got \"?\"")
   test-global-scope-error(
@@ -66,6 +67,12 @@ test test-global()
   test-global-scope-error(
       user "var Int x",
       user "no new-line before file end")
+  test-global-scope-error(
+      user "var Int name\nvar Int name\n",
+      user "redefinition of global variable \"name\"")
+  test-global-scope-error(
+      user "func name()\nvar Int name",
+      user "variable name overrides function \"name\"")
 
 
 test test-type()
@@ -86,11 +93,22 @@ test test-type()
   test-global-scope-error(
       user "class(\n", user "expected space after \"class\", got \"(\"")
   test-global-scope-error(
-      user "struct Test\n  error ",
-      user "unknown keyword \"error\"")
+      user "struct error\n", user "illegal type name \"error\"")
   test-global-scope-error(
-      user "struct Test",
-      user "expected block in a new line, got \"EOF\"")
+      user "struct ERrror\n", user "illegal type name \"ERrror\"")
+  test-global-scope-error(
+      user "struct Error-name\n", user "illegal type name \"Error-name\"")
+  test-global-scope-error(
+      user "struct Int\n", user "redefinition of type \"Int\"")
+  test-global-scope-error(
+      user "struct Test\nstruct Test\n", user "redefinition of type \"Test\"")
+  test-global-scope-error(
+      user "struct Test(Base\n",
+      user "expected \")\" after base class, got \"new-line\"")
+  test-global-scope-error(
+      user "struct Test\n  error ", user "unknown keyword \"error\"")
+  test-global-scope-error(
+      user "struct Test", user "expected block in a new line, got \"EOF\"")
 
 
 test test-function()
@@ -124,26 +142,31 @@ test test-function()
       user "func name\n",
       user "expected \"(\" after function name, got \"new-line\"")
   test-global-scope-error(
-      user "func name( )\n",
-      user "expected access, got \" \"")
+      user "func Error()\n", user "illegal function name \"Error\"")
   test-global-scope-error(
-      user "func name(user)\n",
-      user "expected space after access, got \")\"")
+      user "func error_name()\n", user "illegal function name \"error_name\"")
+  test-global-scope-error(
+      user "func name()\nfunc name()\n",
+      user "redefinition of function \"name\"")
+  test-global-scope-error(
+      user "var Int name\nfunc name()\n",
+      user "function name overrides global variable \"name\"")
+  test-global-scope-error(
+      user "func name( )\n", user "expected access, got \" \"")
+  test-global-scope-error(
+      user "func name(user)\n", user "expected space after access, got \")\"")
   test-global-scope-error(
       user "func name(var String\n",
       user "expected space after type, got \"new-line\"")
   test-global-scope-error(
-      user "func name(error Int x)\n",
-      user "illegal access \"error\"")
+      user "func name(error Int x)\n", user "illegal access \"error\"")
   test-global-scope-error(
       user "func name(var String str,user Int x)\n",
       user "expected space or new-line after \",\", got \"u\"")
   test-global-scope-error(
-      user "func name()-()\n",
-      user "expected \">(\" got \"()\"")
+      user "func name()-()\n", user "expected \">(\" got \"()\"")
   test-global-scope-error(
-      user "func name()",
-      user "expected block in a new line, got \"EOF\"")
+      user "func name()", user "expected block in a new line, got \"EOF\"")
   test-global-scope-error(
       user "func name()\n    var Int x",
       user "indentation too big, expected \"2\" got \"4\"")
@@ -169,6 +192,43 @@ test test-members()
   test-global-scope(
       user "struct Test\n  {## multi \n line \n documemtation #}\n  var Int x",
       user expected)
+  var String{1024} output
+  output.copy(user "typedef struct Test1 Test1;\n")
+  output.concat(user "typedef struct Test2 Test2;\n")
+  output.concat(user "struct Test1 {\n")
+  output.concat(user "  Int name;\n")
+  output.concat(user "};\n")
+  output.concat(user "struct Test2 {\n")
+  output.concat(user "  Int fun;\n")
+  output.concat(user "};\n")
+  output.concat(user "Returncode Test1_fun(Test1* self);\n")
+  output.concat(user "Returncode Test2_name(Test2* self);\n")
+  output.concat(user "Int name;\n")
+  output.concat(user "Returncode fun(void);\n")
+  output.concat(user "Returncode Test1_fun(Test1* self) {\n")
+  output.concat(user "  return OK;\n")
+  output.concat(user "}\n")
+  output.concat(user "Returncode Test2_name(Test2* self) {\n")
+  output.concat(user "  return OK;\n")
+  output.concat(user "}\n")
+  output.concat(user "Returncode fun(void) {\n")
+  output.concat(user "  return OK;\n")
+  output.concat(user "}")
+  test-global-scope(
+      user "var Int name\nfunc fun()\nstruct Test1\n  var Int name\n  func fun()\nstruct Test2\n  var Int fun\n  func name()\n",
+      user output)
+  test-global-scope-error(
+      user "struct Test\n  var Int name\n  var Int name\n",
+      user "redefinition of field \"name\"")
+  test-global-scope-error(
+      user "struct Test\n  func name()\n  var Int name\n",
+      user "field name overrides method \"name\"")
+  test-global-scope-error(
+      user "struct Test\n  func name()\n  func name()\n",
+      user "redefinition of method \"name\"")
+  test-global-scope-error(
+      user "struct Test\n  var Int name\n  func name()\n",
+      user "method name overrides field \"name\"")
 
 
 test test-return()
@@ -184,8 +244,8 @@ test test-code-variables()
   test-code(user "var Int x", user "Int x = 0;")
   test-code(user "user String s", user "String* s = NULL;")
   test-code(user "owner Array{Int} a", user "Array* a = NULL;")
-  test-code(user "user Test t", user "Test* t = NULL;")
-  test-code(user "var Test t", user "Test t_Var = {0};\n  Test* t = &t_Var;")
+  test-code(user "user Test tt", user "Test* tt = NULL;")
+  test-code(user "var Test tt", user "Test tt_Var = {0};\n  Test* tt = &tt_Var;")
   test-code(
       user "var String{12} s",
       user "char s_Values[12];\n  String s_Var = {12, 0, NULL};\n  String* s = &s_Var;\n  s_Var.values = s_Values;")
@@ -199,7 +259,8 @@ test test-code-variables()
       user "var Array{12:String{7}} sa",
       user "char sa_Chars[12 * 7];\n  String sa_Values[12];\n  Array sa_Var = {12, NULL};\n  Array* sa = &sa_Var;\n  sa_Var.values = sa_Values;\n  MR_set_var_string_array(12, 7, sa, sa_Chars);")
   test-code(
-      user "new Test t", user "Test* t = NULL;\n  t = calloc(1, sizeof(Test));")
+      user "new Test tt",
+      user "Test* tt = NULL;\n  tt = calloc(1, sizeof(Test));")
   test-code(
       user "new String{arr[0]} s",
       user "String* s = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  s = MR_new_string(((Int*)((arr)->values))[0]);")
@@ -243,6 +304,22 @@ test test-code-variables()
       user "Test* tt = NULL;\n  tt = &(tc->_base._base._base);")
   test-code-error(
       user "var Int", user "expected space after type, got \"new-line\"")
+  test-code-error(
+      user "var Int Error", user "illegal variable name \"Error\"")
+  test-code-error(
+      user "var Int errorName", user "illegal variable name \"errorName\"")
+  test-code-error(
+      user "var Int name\n  var Int name\n",
+      user "redefinition of variable \"name\"")
+  test-code-error(
+      user "var Int name\n  do\n    var Int x\n    do\n      var Int name\n",
+      user "redefinition of variable \"name\"")
+  test-global-scope-error(
+      user "var Int name\nfunc mock()\n  var Int name",
+      user "redefinition of global variable \"name\"")
+  test-global-scope-error(
+      user "func name()\nfunc mock()\n  var Int name",
+      user "variable name overrides function \"name\"")
   test-global-scope-error(
       user "struct Test\n  var Int x(1)",
       user "type members cannot be initialized")
@@ -278,7 +355,7 @@ test test-code-variables()
       user "var Bool x(1)", user "cannot assign \"Int\" into \"Bool\"")
 
 
-test test-simple-code()
+test test-comment()
   user String expected("Int x = 0;")
   test-code(user "# comment\n\n  var Int x", user expected)
   test-code(user "## documemtation\n\n  var Int x", user expected)
@@ -289,7 +366,9 @@ test test-simple-code()
 
 
 test test-if-else()
-  test-code(user "if i > 3\n    i -= 2", user "if (i > 3) {\n    i -= 2;\n  }")
+  test-code(
+      user "if t.num > 3\n    i -= 2",
+      user "if (t == NULL) RAISE(1)\n  if (t->num > 3) {\n    i -= 2;\n  }")
   test-code(
       user "if i > 3\n    i -= 2\n  else\n    i += 1",
       user "if (i > 3) {\n    i -= 2;\n  }\n  else {\n    i += 1;\n  }")
@@ -298,11 +377,13 @@ test test-if-else()
   expected.concat(user "    i -= 3;\n")
   expected.concat(user "  }\n")
   expected.concat(user "  else {\n")
-  expected.concat(user "    if (i > 2) {\n")
+  expected.concat(user "    if (t == NULL) RAISE(3)\n")
+  expected.concat(user "    if (t->num > 2) {\n")
   expected.concat(user "      i -= 2;\n")
   expected.concat(user "    }\n")
   expected.concat(user "    else {\n")
-  expected.concat(user "      if (i > 1) {\n")
+  expected.concat(user "      if (t == NULL) RAISE(5)\n")
+  expected.concat(user "      if (t->num > 1) {\n")
   expected.concat(user "        i -= 1;\n")
   expected.concat(user "      }\n")
   expected.concat(user "      else {\n")
@@ -311,18 +392,32 @@ test test-if-else()
   expected.concat(user "    }\n")
   expected.concat(user "  }")
   test-code(
-      user "if i > 3\n    i -= 3\n  else-if i > 2\n    i -= 2\n  else-if i > 1\n    i -= 1\n  else\n    i += 1",
+      user "if i > 3\n    i -= 3\n  else-if t.num > 2\n    i -= 2\n  else-if t.num > 1\n    i -= 1\n  else\n    i += 1",
       user expected)
+  test-code-error(
+      user "if 3", user "got \"Int\" expression, expected \"Bool\"")
+  test-code-error(user "if b\n    error", user "unknown symbol \"error\"")
+  test-code-error(
+      user "if b\n    i := 0\n  else\n    error",
+      user "unknown symbol \"error\"")
+  test-code-error(
+      user "if b\n    i := 0\n  else-if b\n    error",
+      user "unknown symbol \"error\"")
 
 
 test test-do-loop()
   test-code(user "do\n    var Int x", user "while (true) {\n    Int x = 0;\n  }")
   test-code(user "\n  \n    \n\n  var Int x", user "Int x = 0;")
   test-code(
-      user "do\n    while i > 3",
-      user "while (true) {\n    if (!(i > 3)) break;\n  }")
+      user "do\n    while t.num > 3",
+      user "while (true) {\n    if (t == NULL) RAISE(2)\n    if (!(t->num > 3)) break;\n  }")
   test-code(user "do\n    continue", user "while (true) {\n    continue;\n  }")
   test-code-error(user "do(", user "expected new-line after \"do\", got \"(\"")
+  test-code-error(user "while true", user "\"while\" used not inside loop")
+  test-code-error(user "continue", user "\"continue\" used not inside loop")
+  test-code-error(
+      user "do\n    while 2", user "got \"Int\" expression, expected \"Bool\"")
+  test-code-error(user "do\n    error", user "unknown symbol \"error\"")
 
 
 test test-for-loop()
@@ -330,10 +425,15 @@ test test-for-loop()
       user "for n in 5\n    i += n",
       user "{int n; for(n=0; n<5; ++n) {\n    i += n;\n  }}")
   test-code(
-      user "for n in i:i + 2\n    i += n",
-      user "{int n; for(n=i; n<i + 2; ++n) {\n    i += n;\n  }}")
+      user "for n in t.num:t.num + 2\n    i += n",
+      user "if (t == NULL) RAISE(1)\n  if (t == NULL) RAISE(1)\n  {int n; for(n=t->num; n<t->num + 2; ++n) {\n    i += n;\n  }}")
   test-code-error(user "for(", user "expected space after \"for\", got \"(\"")
   test-code-error(
       user "for n", user "expected space after index name, got \"new-line\"")
   test-code-error(
       user "for n error", user "expected \"in \" got \"err\"")
+  test-code-error(
+      user "for n in str", user "got \"String\" expression, expected \"Int\"")
+  test-code-error(
+      user "for n in str:8", user "got \"String\" expression, expected \"Int\"")
+  test-code-error(user "for n in 5\n    error", user "unknown symbol \"error\"")

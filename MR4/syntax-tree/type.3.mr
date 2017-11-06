@@ -16,14 +16,19 @@ class TypeData(SyntaxTreeNamespace)
     new-node.parse(copy is-dynamic):(copy end)
   
   func inst parse(copy Bool is-dynamic):(copy Char end)
+    self.is-dynamic := is-dynamic
     self.set-location()
     read-new(user "("):(owner self.name, copy end)
-    self.is-dynamic := is-dynamic
+    if not f-is-legal-name(user self.name, copy true)
+      self.m-syntax-error(user "illegal type name", user self.name)
+    if ? glob.type-map.find(user self.name)
+      self.m-syntax-error(user "redefinition of type", user self.name)
     glob.add-type(user self)
     if end = '('
       read-new(user ")"):(owner self.base-type-name, copy end)
       if end != ')'
-        self.m-syntax-error-c(user "expected ) after base class, got", copy end)
+        self.m-syntax-error-c(
+            user "expected \")\" after base class, got", copy end)
       read-c():(copy end)
     self.indentation-spaces := 2
     self.parse-block-children(user self, user _):(copy end)

@@ -31,7 +31,7 @@ class TopType(MiddleType)
     self.top-base-ref := self.top-mid-ref
     self.top-base-ref := self
     user MiddleType mt(self)
-    user BaseType bt(self)
+    user BaseType bt(mt)
     test-mid-out()->(user bt)
 
 

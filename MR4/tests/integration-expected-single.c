@@ -64,6 +64,8 @@ Returncode f_test_many(Int x, Int y, Int* n, Int* m);
 
 Returncode test_call_expression(void);
 
+Returncode test_code_flow(Array* arr, Int* res);
+
 
 /* types methods body */
 
@@ -340,7 +342,7 @@ Returncode f_test_void(void) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-params"
 Returncode f_test_params(Int x, String* s, String* o) {
-  return OK;
+  RAISE(151)
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -396,23 +398,95 @@ Returncode test_call_expression(void) {
   Int aux_Int_0 = 0;
   Int aux_Int_1 = 0;
   String* aux_String_1 = NULL;
-  CHECK(163, f_test_void() )
+  CHECK(165, f_test_void() )
   aux_String_0->max_length = 5;
   aux_String_0->length = 4;
   aux_String_0->values = "text";
-  CHECK(164, f_test_params(3, aux_String_0, NULL) )
-  CHECK(165, f_test_outs(&(s), &(x)) )
-  CHECK(166, f_test_int2str(4, &(s)) )
-  CHECK(167, f_test_int(5) )
-  CHECK(168, f_test_int2int(6, &(x)) )
-  CHECK(169, f_test_many(7, 8, &(x), &(x)) )
-  CHECK(175, f_test_int2int(9, &(tmp)) )
-  CHECK(175, f_test_int(tmp) )
-  CHECK(176, f_test_many(11, 12, &(x), &(aux_Int_0)) )
-  CHECK(176, f_test_int2int(10, &(aux_Int_1)) )
+  CHECK(166, f_test_params(3, aux_String_0, NULL) )
+  CHECK(167, f_test_outs(&(s), &(x)) )
+  CHECK(168, f_test_int2str(4, &(s)) )
+  CHECK(169, f_test_int(5) )
+  CHECK(170, f_test_int2int(6, &(x)) )
+  CHECK(171, f_test_many(7, 8, &(x), &(x)) )
+  CHECK(177, f_test_int2int(9, &(tmp)) )
+  CHECK(177, f_test_int(tmp) )
+  CHECK(178, f_test_many(11, 12, &(x), &(aux_Int_0)) )
+  CHECK(178, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
-  CHECK(177, f_test_int2str(13, &(aux_String_1)) )
+  CHECK(179, f_test_int2str(13, &(aux_String_1)) )
   s = aux_String_1;
+  return OK;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-code-flow"
+Returncode test_code_flow(Array* arr, Int* res) {
+  if ((4) < 0 || (4) >= (arr)->length) RAISE(182)
+  if ((((Int*)((arr)->values))[4]) > 6) {
+    *res = 6;
+  }
+  else {
+    if (arr != NULL) {
+      *res = 6;
+    }
+    else {
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(186)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(186)
+      if ((((Int*)((arr)->values))[4]) != (((Int*)((arr)->values))[4])) {
+        *res = 6;
+      }
+      else {
+        if ((0) < 0 || (0) >= (arr)->length) RAISE(188)
+        if (0 == (((Int*)((arr)->values))[0])) {
+          *res = 6;
+        }
+        else {
+          *res = 0;
+        }
+      }
+    }
+  }
+  while (true) {
+    Int x = 0;
+    Int y = 0;
+    if ((6) < 0 || (6) >= (arr)->length) RAISE(193)
+    ((Int*)((arr)->values))[6] = 6;
+    if ((2) < 0 || (2) >= (arr)->length) RAISE(194)
+    x = ((Int*)((arr)->values))[2];
+    if (!(x > 3)) break;
+    y = x - 1;
+    while (true) {
+      Int z = 0;
+      if ((8) < 0 || (8) >= (arr)->length) RAISE(198)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(198)
+      ((Int*)((arr)->values))[4] = ((Int*)((arr)->values))[8];
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(199)
+      if (y > (((Int*)((arr)->values))[4])) {
+        continue;
+      }
+      z = 0;
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(202)
+      if (z <= (((Int*)((arr)->values))[4])) {
+        if (!(z > 0)) break;
+      }
+    }
+  }
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(204)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(204)
+  {int n; for(n=((Int*)((arr)->values))[2]; n<2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
+    Int x = 0;
+    if ((2) < 0 || (2) >= (arr)->length) RAISE(205)
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(205)
+    ((Int*)((arr)->values))[0] = ((Int*)((arr)->values))[2];
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(206)
+    x = ((Int*)((arr)->values))[0];
+    if (x > 4) {
+      if ((1) < 0 || (1) >= (arr)->length) RAISE(208)
+      ((Int*)((arr)->values))[1] = x;
+    }
+  }}
   return OK;
 }
 #undef MR_FILE_NAME
@@ -424,8 +498,8 @@ Returncode test_call_expression(void) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
-  CHECK(181, test_simple_function() )
-  CHECK(182, test_call_expression() )
+  CHECK(212, test_simple_function() )
+  CHECK(213, test_call_expression() )
   return OK;
 }
 #undef MR_FILE_NAME

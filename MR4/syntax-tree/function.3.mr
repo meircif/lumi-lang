@@ -45,6 +45,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst parse-header():(copy Char end)
     read-new(user "("):(owner self.name, copy end)
+    self.m-check-name()
     if end != '('
       self.m-syntax-error-c(
           user "expected \"(\" after function name, got", copy end)
@@ -57,6 +58,26 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         user argument-factory, user dummy-node, user self.parent-type):(
         copy end)
     self.indentation-spaces += 2
+  
+  func inst m-check-name()
+    if not f-is-legal-name(user self.name, copy false)
+      self.m-syntax-error(user "illegal function name", user self.name)
+    if ? self.parent-type
+      user SyntaxTreeFunction meth
+      self.parent-type.m-find-meth(user self.name):(user meth)
+      if ? meth
+        self.m-syntax-error(user "redefinition of method", user self.name)
+      user SyntaxTreeVariable field
+      self.parent-type.m-find-field(user self.name):(user field)
+      if ? field
+        self.m-syntax-error(
+            user "method name overrides field", user self.name)
+    else
+      if ? glob.root.m-find-function(user self.name)
+        self.m-syntax-error(user "redefinition of function", user self.name)
+      if ? glob.root.m-find-variable(user self.name)
+        self.m-syntax-error(
+            user "function name overrides global variable", user self.name)
   
   func dynamic m-get-parent-type():(user TypeData parent-type)
     parent-type := self.parent-type

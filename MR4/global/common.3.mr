@@ -28,3 +28,27 @@ func print-msg-with-item(user String text, user String item)
   print(user " \"")
   print(user item)
   print(user "\"")
+
+
+func f-is-legal-name(user String name, copy Bool is-type):(copy Bool is-legal)
+  if name.length <= 0 or (is-type and name.length <= 1)
+    is-legal := false
+    return
+  var Char ch(name[0])
+  var Int first(1)
+  if is-type
+    if ch < 'A' or ch > 'Z'
+      is-legal := false
+      return
+    ch := name[1]
+    first := 2
+  if ch < 'a' or ch > 'z'
+    is-legal := false
+    return
+  for n in first:name.length
+    ch := name[n]
+    if not ((ch >= 'a' and ch <= 'z') or (ch >= '0' and ch <= '9') or
+        (not is-type and ch = '-') or (is-type and (ch >= 'A' and ch <= 'Z')))
+      is-legal := false
+      return
+  is-legal := true
