@@ -77,8 +77,11 @@ class CallExpression(Expression)
 ## Function argument call
 class CallArgument(Argument)
   owner Expression value
+  user SyntaxTreeCode code-node
+  var Bool is-down-cast
   
   func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
+    self.code-node := code-node
     parse-new-expression(
         user ",)", user code-node):(owner self.value, copy end)
     if end != ',' and end != ')'
@@ -89,18 +92,32 @@ class CallArgument(Argument)
     if self.is-output and not self.value.assignable
       self.m-syntax-error-msg(user "non assignable call output")
   
-  func dynamic get-type-instance():(user TypeInstance type-instance)
-    type-instance := self.value.result-type
+  func dynamic m-check-calling(user TypeInstance type-instance)
+    if self.is-output
+      self.is-down-cast := type-instance.m-check-assign-to(
+          user self.value.result-type, user self) > 0
+    else
+      type-instance.m-check-assign-from(user self):(owner self.value)
   
   func dynamic get-output():(user Expression output)
     output := self.value
   
   func dynamic write-preactions()
     self.value.write-preactions()
+    if self.is-down-cast
+      # if (`value` != NULL) RAISE(`line-num`)
+      write(user "if (")
+      self.value.write()
+      write(user " != NULL) ")
+      self.write-raise()
+      write(user "\n")
+      self.code-node.write-spaces()
   
   func dynamic write()
     # &(`value`)
     if self.is-output
+      if self.is-down-cast
+        write(user "(void*)")
       write(user "&(")
     self.value.write()
     if self.is-output

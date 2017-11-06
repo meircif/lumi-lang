@@ -172,8 +172,8 @@ class BinaryExpression(UnaryExpression)
       self.set-simple-type(user glob.type-bool)
     else-if self.operator.order = 4 and self.operator.group-index = 0
       # := operator
-      self.right-expression.result-type.m-check-assign-to(
-          user self.left-expression.result-type, user self)
+      self.left-expression.result-type.m-check-assign-from(user self):(
+          owner self.right-expression)
     else
       # any other Int operator
       if self.operator.order = 1 and ? self.binary-left-expression and

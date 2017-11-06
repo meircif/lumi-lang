@@ -27,6 +27,7 @@ struct TestStruct {
 };
 
 struct BaseType {
+  Int num_base;
   MiddleType* base_mid_ref;
   TopType* base_top_ref;
 };
@@ -40,6 +41,7 @@ struct BaseType_Dynamic {
 
 struct MiddleType {
   BaseType _base;
+  Int num_mid;
   BaseType* mid_base_ref;
   TopType* mid_top_ref;
 };
@@ -52,6 +54,7 @@ struct MiddleType_Dynamic {
 
 struct TopType {
   MiddleType _base;
+  Int num_top;
   BaseType* top_base_ref;
   MiddleType* top_mid_ref;
 };
@@ -141,13 +144,17 @@ Returncode f_test_many(Int x, Int y, Int* n, Int* m);
 
 Returncode test_call_expression(void);
 
+Returncode test_mid_out(MiddleType** mt);
+
 
 /* types methods body */
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.set"
 Returncode TestStruct_set(TestStruct* self, Int x, String* s) {
+  if (self == NULL) RAISE(136)
   self->num = x;
+  if (self == NULL) RAISE(137)
   self->text = s;
   return OK;
 }
@@ -157,7 +164,9 @@ Returncode TestStruct_set(TestStruct* self, Int x, String* s) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.get"
 Returncode TestStruct_get(TestStruct* self, Int* x, String** s) {
+  if (self == NULL) RAISE(144)
   *x = self->num;
+  if (self == NULL) RAISE(145)
   *s = self->text;
   return OK;
 }
@@ -207,7 +216,7 @@ Returncode MiddleType_meth1(MiddleType* self, Int n, String* s) {
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth2"
 Returncode MiddleType_meth2(MiddleType* self) {
-  CHECK(16, BaseType_meth2(&(self->_base)) )
+  CHECK(17, BaseType_meth2(&(self->_base)) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -232,9 +241,9 @@ Returncode MiddleType_meth5(MiddleType* self, Int n, String* s) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth2"
 Returncode TopType_meth2(TopType* self) {
-  CHECK(13, MiddleType_meth2(&(self->_base)) )
-  CHECK(14, MiddleType_meth2(NULL) )
-  CHECK(15, BaseType_meth2(NULL) )
+  CHECK(14, MiddleType_meth2(&(self->_base)) )
+  CHECK(15, MiddleType_meth2(&(self->_base)) )
+  CHECK(16, BaseType_meth2(&(self->_base._base)) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -243,6 +252,7 @@ Returncode TopType_meth2(TopType* self) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth3"
 Returncode TopType_meth3(TopType* self, Int n, String* s) {
+  CHECK(20, BaseType_meth3(&(self->_base._base), n, s) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -251,9 +261,9 @@ Returncode TopType_meth3(TopType* self, Int n, String* s) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth5"
 Returncode TopType_meth5(TopType* self, Int n, String* s) {
-  CHECK(23, MiddleType_meth5(&(self->_base), n, s) )
-  CHECK(24, MiddleType_meth1(NULL, n, s) )
-  CHECK(25, BaseType_meth1(NULL, n, s) )
+  CHECK(24, MiddleType_meth5(&(self->_base), n, s) )
+  CHECK(25, MiddleType_meth1(NULL, n, s) )
+  CHECK(26, BaseType_meth1(NULL, n, s) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -262,6 +272,20 @@ Returncode TopType_meth5(TopType* self, Int n, String* s) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth6"
 Returncode TopType_meth6(TopType* self) {
+  MiddleType* mt = NULL;
+  BaseType* bt = NULL;
+  if (self == NULL) RAISE(30)
+  if (self == NULL) RAISE(30)
+  self->_base.num_mid = self->_base._base.num_base;
+  if (self == NULL) RAISE(31)
+  if (self == NULL) RAISE(31)
+  self->top_base_ref = &(self->top_mid_ref->_base);
+  if (self == NULL) RAISE(32)
+  self->top_base_ref = &(self->_base._base);
+  mt = &(self->_base);
+  bt = &(self->_base._base);
+  if (bt != NULL) RAISE(35)
+  CHECK(35, test_mid_out((void*)&(bt)) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -298,8 +322,20 @@ Returncode test_const_expression(Int* i, Char* c, String** s, TestStruct** t) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-member-expression"
 Returncode test_member_expression(TestStruct* t, TestStruct** to, Int* i) {
+  if (t == NULL) RAISE(39)
+  if (t->ts == NULL) RAISE(39)
+  if (t->ts->ts == NULL) RAISE(39)
+  if (t == NULL) RAISE(39)
+  if (t->ts == NULL) RAISE(39)
+  if ((*to) == NULL) RAISE(39)
+  if (t == NULL) RAISE(39)
   t->num = ((*to)->num + t->ts->num) + t->ts->ts->num;
+  if (t == NULL) RAISE(40)
+  if ((*to) == NULL) RAISE(40)
   (*to)->num = t->num;
+  if (t == NULL) RAISE(41)
+  if (t->ts == NULL) RAISE(41)
+  if (t->ts->ts == NULL) RAISE(41)
   t->ts->ts->num = 4;
   return OK;
 }
@@ -358,7 +394,9 @@ Returncode test_slice_expression(String* s, Array* arri, Array* arrs, Array* arr
   aux_Array_3_Var.values = (Byte*)((arrt)->values) + (2);
   if ((2) < 0 || (4) < 0 || (2) + (4) > (arrt)->length) RAISE(51)
   if ((1) < 0 || (1) >= (aux_Array_3)->length) RAISE(51)
+  if ((((TestStruct**)((aux_Array_3)->values))[1]) == NULL) RAISE(51)
   if ((4) < 0 || (4) >= (arrt)->length) RAISE(51)
+  if ((((TestStruct**)((arrt)->values))[4]) == NULL) RAISE(51)
   if ((2) < 0 || (2) >= (arri)->length) RAISE(51)
   if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (((*i) + 3) - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(51)
   *i = (((((Int*)((arri)->values))[((*i) + 3) - (((Int*)((arri)->values))[2])]) + (((TestStruct**)((arrt)->values))[4])->num) + (((TestStruct**)((aux_Array_3)->values))[1])->num) + (((Int*)((aux_Array_2)->values))[1]);
@@ -575,6 +613,17 @@ Returncode test_call_expression(void) {
   x = aux_Int_1 + aux_Int_0;
   CHECK(177, f_test_int2str(13, &(aux_String_1)) )
   s = aux_String_1;
+  return OK;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "test-mid-out"
+Returncode test_mid_out(MiddleType** mt) {
+  MiddleType* new_mt = NULL;
+  new_mt = calloc(1, sizeof(MiddleType));
+  *mt = new_mt;
   return OK;
 }
 #undef MR_FILE_NAME

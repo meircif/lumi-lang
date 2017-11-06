@@ -273,8 +273,8 @@ class SyntaxTreeVariableInit(BaseVariableInit)
           user "cannot initialize non-primitive type",
           user self.variable.type-instance.type-data.name)
     self.value.analyze()
-    self.value.result-type.m-check-assign-to(
-        user self.variable.type-instance, user self)
+    self.variable.type-instance.m-check-assign-from(user self):(
+        owner self.value)
   
   func dynamic write()
     self.value.write-preactions()

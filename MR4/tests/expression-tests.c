@@ -12,21 +12,140 @@ static char* _mr_file23_name = "tests/expression-tests.3.mr";
 /* MR4 compiler tests - Expression */
 
 #if MR_STAGE == MR_DECLARATIONS
+Returncode test_code_setup(String* input_text);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_code_setup = "test-code-setup";
+#define MR_FUNC_NAME _func_name_test_code_setup
+Returncode test_code_setup(String* input_text) {
+  CHECK(4, f_setup_test() )
+  CHECK(5, set_mock_file_text(&(String){1, 0, ""}) )
+  CHECK(6, String_concat(mock_input_file_text, &(String){13, 12, "struct Test\n"}) )
+  CHECK(7, String_concat(mock_input_file_text, &(String){15, 14, "  var Int num\n"}) )
+  CHECK(8, String_concat(mock_input_file_text, &(String){15, 14, "  func meth()\n"}) )
+  CHECK(9, String_concat(mock_input_file_text, &(String){17, 16, "struct Ta(Test)\n"}) )
+  CHECK(10, String_concat(mock_input_file_text, &(String){16, 15, "  var Int numa\n"}) )
+  CHECK(11, String_concat(mock_input_file_text, &(String){16, 15, "  func metha()\n"}) )
+  CHECK(12, String_concat(mock_input_file_text, &(String){15, 14, "struct Tb(Ta)\n"}) )
+  CHECK(13, String_concat(mock_input_file_text, &(String){16, 15, "  var Int numb\n"}) )
+  CHECK(14, String_concat(mock_input_file_text, &(String){16, 15, "  func methb()\n"}) )
+  CHECK(15, String_concat(mock_input_file_text, &(String){15, 14, "struct Tc(Tb)\n"}) )
+  CHECK(16, String_concat(mock_input_file_text, &(String){16, 15, "  var Int numc\n"}) )
+  CHECK(17, String_concat(mock_input_file_text, &(String){16, 15, "  func methc()\n"}) )
+  CHECK(18, String_concat(mock_input_file_text, &(String){1, 0, ""}) )
+  CHECK(19, String_concat(mock_input_file_text, &(String){13, 12, "func fun0()\n"}) )
+  CHECK(20, String_concat(mock_input_file_text, &(String){54, 53, "func fun1(copy Int x, user String s, owner String o)\n"}) )
+  CHECK(22, String_concat(mock_input_file_text, &(String){43, 42, "func fun2()->(owner String s, copy Int x)\n"}) )
+  CHECK(24, String_concat(mock_input_file_text, &(String){41, 40, "func fun3(copy Int x)->(owner String s)\n"}) )
+  CHECK(25, String_concat(mock_input_file_text, &(String){23, 22, "func fun4(copy Int x)\n"}) )
+  CHECK(26, String_concat(mock_input_file_text, &(String){37, 36, "func fun5(copy Int x)->(copy Int y)\n"}) )
+  CHECK(27, String_concat(mock_input_file_text, &(String){61, 60, "func fun6(copy Int x, copy Int y)->(copy Int n, copy Int m)\n"}) )
+  CHECK(29, String_concat(mock_input_file_text, &(String){27, 26, "func fun7()->(user Tb tb)\n"}) )
+  CHECK(30, String_concat(mock_input_file_text, &(String){21, 20, "func mock(copy Int i"}) )
+  CHECK(31, String_concat(mock_input_file_text, &(String){14, 13, ", copy Char c"}) )
+  CHECK(32, String_concat(mock_input_file_text, &(String){14, 13, ", copy Bool b"}) )
+  CHECK(33, String_concat(mock_input_file_text, &(String){18, 17, ", user String str"}) )
+  CHECK(34, String_concat(mock_input_file_text, &(String){22, 21, ", user Array{Int} arr"}) )
+  CHECK(35, String_concat(mock_input_file_text, &(String){14, 13, ", user Test t"}) )
+  CHECK(36, String_concat(mock_input_file_text, &(String){13, 12, ", user Tc tc"}) )
+  CHECK(37, String_concat(mock_input_file_text, &(String){20, 19, ")->(owner String so"}) )
+  CHECK(38, String_concat(mock_input_file_text, &(String){14, 13, ", copy Int io"}) )
+  CHECK(39, String_concat(mock_input_file_text, &(String){5, 4, ")\n  "}) )
+  mock_input_line_reset_index = mock_input_file_text->length;
+  CHECK(41, String_concat(mock_input_file_text, input_text) )
+  CHECK(42, String_append(mock_input_file_text, '\n') )
+  
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
 Returncode test_code(String* input_text, String* expected_output);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_test_code = "test-code";
 #define MR_FUNC_NAME _func_name_test_code
 Returncode test_code(String* input_text, String* expected_output) {
-  CHECK(4, f_setup_test() )
-  CHECK(5, set_mock_file_text(&(String){128, 127, "struct Test\n  var Int num\nfunc mock(copy Int i, copy Char c, copy Bool b, user String str, user Array{Int} arr, user Test t)\n  "}) )
-  CHECK(7, String_concat(mock_input_file_text, input_text) )
-  CHECK(8, String_append(mock_input_file_text, '\n') )
-  CHECK(9, write_syntax_tree() )
-  String* expected_header = &(String){207, 206, "\ntypedef struct Test Test;\nstruct Test {\n  Int num;\n};\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr, Test* t);\nReturncode mock(Int i, Char c, Bool b, String* str, Array* arr, Test* t) {\n  "};
+  CHECK(46, test_code_setup(input_text) )
+  CHECK(47, write_syntax_tree() )
+  String* mock_func_header = &(String){1024, 0, (char[1024]){0}};
+  CHECK(49, String_copy(mock_func_header, &(String){17, 16, "Returncode mock("}) )
+  CHECK(50, String_concat(mock_func_header, &(String){6, 5, "Int i"}) )
+  CHECK(51, String_concat(mock_func_header, &(String){9, 8, ", Char c"}) )
+  CHECK(52, String_concat(mock_func_header, &(String){9, 8, ", Bool b"}) )
+  CHECK(53, String_concat(mock_func_header, &(String){14, 13, ", String* str"}) )
+  CHECK(54, String_concat(mock_func_header, &(String){13, 12, ", Array* arr"}) )
+  CHECK(55, String_concat(mock_func_header, &(String){10, 9, ", Test* t"}) )
+  CHECK(56, String_concat(mock_func_header, &(String){9, 8, ", Tc* tc"}) )
+  CHECK(57, String_concat(mock_func_header, &(String){14, 13, ", String** so"}) )
+  CHECK(58, String_concat(mock_func_header, &(String){10, 9, ", Int* io"}) )
+  CHECK(59, String_concat(mock_func_header, &(String){2, 1, ")"}) )
+  String* empty_func_body = &(String){19, 18, " {\n  return OK;\n}\n"};
+  String* expected_header = &(String){2048, 0, (char[2048]){0}};
+  CHECK(62, String_copy(expected_header, &(String){28, 27, "\ntypedef struct Test Test;\n"}) )
+  CHECK(63, String_concat(expected_header, &(String){23, 22, "typedef struct Ta Ta;\n"}) )
+  CHECK(64, String_concat(expected_header, &(String){23, 22, "typedef struct Tb Tb;\n"}) )
+  CHECK(65, String_concat(expected_header, &(String){23, 22, "typedef struct Tc Tc;\n"}) )
+  CHECK(66, String_concat(expected_header, &(String){15, 14, "struct Test {\n"}) )
+  CHECK(67, String_concat(expected_header, &(String){12, 11, "  Int num;\n"}) )
+  CHECK(68, String_concat(expected_header, &(String){4, 3, "};\n"}) )
+  CHECK(69, String_concat(expected_header, &(String){13, 12, "struct Ta {\n"}) )
+  CHECK(70, String_concat(expected_header, &(String){15, 14, "  Test _base;\n"}) )
+  CHECK(71, String_concat(expected_header, &(String){13, 12, "  Int numa;\n"}) )
+  CHECK(72, String_concat(expected_header, &(String){4, 3, "};\n"}) )
+  CHECK(73, String_concat(expected_header, &(String){13, 12, "struct Tb {\n"}) )
+  CHECK(74, String_concat(expected_header, &(String){13, 12, "  Ta _base;\n"}) )
+  CHECK(75, String_concat(expected_header, &(String){13, 12, "  Int numb;\n"}) )
+  CHECK(76, String_concat(expected_header, &(String){4, 3, "};\n"}) )
+  CHECK(77, String_concat(expected_header, &(String){13, 12, "struct Tc {\n"}) )
+  CHECK(78, String_concat(expected_header, &(String){13, 12, "  Tb _base;\n"}) )
+  CHECK(79, String_concat(expected_header, &(String){13, 12, "  Int numc;\n"}) )
+  CHECK(80, String_concat(expected_header, &(String){4, 3, "};\n"}) )
+  CHECK(81, String_concat(expected_header, &(String){35, 34, "Returncode Test_meth(Test* self);\n"}) )
+  CHECK(82, String_concat(expected_header, &(String){32, 31, "Returncode Ta_metha(Ta* self);\n"}) )
+  CHECK(83, String_concat(expected_header, &(String){32, 31, "Returncode Tb_methb(Tb* self);\n"}) )
+  CHECK(84, String_concat(expected_header, &(String){32, 31, "Returncode Tc_methc(Tc* self);\n"}) )
+  CHECK(85, String_concat(expected_header, &(String){1, 0, ""}) )
+  CHECK(86, String_concat(expected_header, &(String){24, 23, "Returncode fun0(void);\n"}) )
+  CHECK(87, String_concat(expected_header, &(String){47, 46, "Returncode fun1(Int x, String* s, String* o);\n"}) )
+  CHECK(88, String_concat(expected_header, &(String){38, 37, "Returncode fun2(String** s, Int* x);\n"}) )
+  CHECK(89, String_concat(expected_header, &(String){37, 36, "Returncode fun3(Int x, String** s);\n"}) )
+  CHECK(90, String_concat(expected_header, &(String){25, 24, "Returncode fun4(Int x);\n"}) )
+  CHECK(91, String_concat(expected_header, &(String){33, 32, "Returncode fun5(Int x, Int* y);\n"}) )
+  CHECK(92, String_concat(expected_header, &(String){48, 47, "Returncode fun6(Int x, Int y, Int* n, Int* m);\n"}) )
+  CHECK(94, String_concat(expected_header, &(String){27, 26, "Returncode fun7(Tb** tb);\n"}) )
+  CHECK(95, String_concat(expected_header, mock_func_header) )
+  CHECK(96, String_concat(expected_header, &(String){3, 2, ";\n"}) )
+  CHECK(97, String_concat(expected_header, &(String){33, 32, "Returncode Test_meth(Test* self)"}) )
+  CHECK(98, String_concat(expected_header, empty_func_body) )
+  CHECK(99, String_concat(expected_header, &(String){30, 29, "Returncode Ta_metha(Ta* self)"}) )
+  CHECK(100, String_concat(expected_header, empty_func_body) )
+  CHECK(101, String_concat(expected_header, &(String){30, 29, "Returncode Tb_methb(Tb* self)"}) )
+  CHECK(102, String_concat(expected_header, empty_func_body) )
+  CHECK(103, String_concat(expected_header, &(String){30, 29, "Returncode Tc_methc(Tc* self)"}) )
+  CHECK(104, String_concat(expected_header, empty_func_body) )
+  CHECK(105, String_concat(expected_header, &(String){1, 0, ""}) )
+  CHECK(106, String_concat(expected_header, &(String){22, 21, "Returncode fun0(void)"}) )
+  CHECK(107, String_concat(expected_header, empty_func_body) )
+  CHECK(108, String_concat(expected_header, &(String){45, 44, "Returncode fun1(Int x, String* s, String* o)"}) )
+  CHECK(109, String_concat(expected_header, empty_func_body) )
+  CHECK(110, String_concat(expected_header, &(String){36, 35, "Returncode fun2(String** s, Int* x)"}) )
+  CHECK(111, String_concat(expected_header, empty_func_body) )
+  CHECK(112, String_concat(expected_header, &(String){35, 34, "Returncode fun3(Int x, String** s)"}) )
+  CHECK(113, String_concat(expected_header, empty_func_body) )
+  CHECK(114, String_concat(expected_header, &(String){23, 22, "Returncode fun4(Int x)"}) )
+  CHECK(115, String_concat(expected_header, empty_func_body) )
+  CHECK(116, String_concat(expected_header, &(String){31, 30, "Returncode fun5(Int x, Int* y)"}) )
+  CHECK(117, String_concat(expected_header, empty_func_body) )
+  CHECK(118, String_concat(expected_header, &(String){46, 45, "Returncode fun6(Int x, Int y, Int* n, Int* m)"}) )
+  CHECK(119, String_concat(expected_header, empty_func_body) )
+  CHECK(120, String_concat(expected_header, &(String){25, 24, "Returncode fun7(Tb** tb)"}) )
+  CHECK(121, String_concat(expected_header, empty_func_body) )
+  CHECK(122, String_concat(expected_header, mock_func_header) )
+  CHECK(123, String_concat(expected_header, &(String){6, 5, " {\n  "}) )
   String* expected_footer = &(String){17, 16, "\n  return OK;\n}\n"};
-  CHECK(12, f_assert_string_slice(expected_header, mock_output_file_text, 0, expected_header->length) )
-  CHECK(17, f_assert_string_slice(expected_output, mock_output_file_text, expected_header->length, mock_output_file_text->length - expected_header->length - expected_footer->length) )
-  CHECK(23, f_assert_string_slice(expected_footer, mock_output_file_text, mock_output_file_text->length - expected_footer->length, expected_footer->length) )
+  CHECK(125, f_assert_string_slice(expected_header, mock_output_file_text, 0, expected_header->length) )
+  CHECK(130, f_assert_string_slice(expected_output, mock_output_file_text, expected_header->length, mock_output_file_text->length - expected_header->length - expected_footer->length) )
+  CHECK(136, f_assert_string_slice(expected_footer, mock_output_file_text, mock_output_file_text->length - expected_footer->length, expected_footer->length) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -39,28 +158,25 @@ Returncode test_code_error(String* input_text, String* expected_error);
 static char* _func_name_test_code_error = "test-code-error";
 #define MR_FUNC_NAME _func_name_test_code_error
 Returncode test_code_error(String* input_text, String* expected_error) {
-  CHECK(31, f_setup_test() )
-  CHECK(32, set_mock_file_text(&(String){25, 24, "func mock(copy Int i)\n  "}) )
-  CHECK(33, String_concat(mock_input_file_text, input_text) )
-  CHECK(34, String_append(mock_input_file_text, '\n') )
+  CHECK(144, test_code_setup(input_text) )
   mock_print_active = true;
   _trace_stream = NULL;
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(36, write_syntax_tree() );
+    CHECK(146, write_syntax_tree() );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(36)
+    TEST_FAIL(146)
   } while (false);
   _trace_stream = stdout;
   mock_print_active = false;
   String* expected_header = &(String){25, 24, "Code error in mock.3.mr["};
-  CHECK(39, f_assert_string_slice(expected_header, mock_print_text, 0, expected_header->length) )
-  CHECK(44, f_assert_string_slice(expected_error, mock_print_text, expected_header->length + 3, mock_print_text->length - expected_header->length - 4) )
-  if ((mock_print_text->length - 1) < 0 || (mock_print_text->length - 1) >= (mock_print_text)->length) RAISE(49)
-  TEST_ASSERT(49, ((mock_print_text)->values[mock_print_text->length - 1]) == '\n')
+  CHECK(149, f_assert_string_slice(expected_header, mock_print_text, 0, expected_header->length) )
+  CHECK(154, f_assert_string_slice(expected_error, mock_print_text, expected_header->length + 3, mock_print_text->length - expected_header->length - 4) )
+  if ((mock_print_text->length - 1) < 0 || (mock_print_text->length - 1) >= (mock_print_text)->length) RAISE(159)
+  TEST_ASSERT(159, ((mock_print_text)->values[mock_print_text->length - 1]) == '\n')
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -73,20 +189,20 @@ Returncode test_int_expression();
 static char* _func_name_test_int_expression = "test-int-expression";
 #define MR_FUNC_NAME _func_name_test_int_expression
 Returncode test_int_expression() {
-  CHECK(53, test_code(&(String){7, 6, "i := 0"}, &(String){7, 6, "i = 0;"}) )
-  CHECK(54, test_code(&(String){10, 9, "i := 9630"}, &(String){10, 9, "i = 9630;"}) )
-  CHECK(55, test_code(&(String){11, 10, "i := -9630"}, &(String){11, 10, "i = -9630;"}) )
-  CHECK(56, test_code(&(String){11, 10, "i := 07520"}, &(String){11, 10, "i = 07520;"}) )
-  CHECK(57, test_code(&(String){12, 11, "i := -07520"}, &(String){12, 11, "i = -07520;"}) )
-  CHECK(58, test_code(&(String){14, 13, "i := 0xfda940"}, &(String){14, 13, "i = 0xfda940;"}) )
-  CHECK(59, test_code(&(String){15, 14, "i := -0xfda940"}, &(String){15, 14, "i = -0xfda940;"}) )
-  CHECK(60, test_code(&(String){14, 13, "i := 0xFDA940"}, &(String){14, 13, "i = 0xFDA940;"}) )
-  CHECK(61, test_code(&(String){15, 14, "i := -0xFDA940"}, &(String){15, 14, "i = -0xFDA940;"}) )
-  CHECK(62, test_code_error(&(String){3, 2, "2a"}, &(String){20, 19, "illegal number \"2a\""}) )
-  CHECK(63, test_code_error(&(String){3, 2, "0a"}, &(String){20, 19, "illegal number \"0a\""}) )
-  CHECK(64, test_code_error(&(String){4, 3, "038"}, &(String){27, 26, "illegal octal number \"038\""}) )
-  CHECK(65, test_code_error(&(String){6, 5, "0b021"}, &(String){30, 29, "illegal binary number \"0b021\""}) )
-  CHECK(66, test_code_error(&(String){6, 5, "0xadg"}, &(String){35, 34, "illegal hexadecimal number \"0xadg\""}) )
+  CHECK(163, test_code(&(String){7, 6, "i := 0"}, &(String){7, 6, "i = 0;"}) )
+  CHECK(164, test_code(&(String){10, 9, "i := 9630"}, &(String){10, 9, "i = 9630;"}) )
+  CHECK(165, test_code(&(String){11, 10, "i := -9630"}, &(String){11, 10, "i = -9630;"}) )
+  CHECK(166, test_code(&(String){11, 10, "i := 07520"}, &(String){11, 10, "i = 07520;"}) )
+  CHECK(167, test_code(&(String){12, 11, "i := -07520"}, &(String){12, 11, "i = -07520;"}) )
+  CHECK(168, test_code(&(String){14, 13, "i := 0xfda940"}, &(String){14, 13, "i = 0xfda940;"}) )
+  CHECK(169, test_code(&(String){15, 14, "i := -0xfda940"}, &(String){15, 14, "i = -0xfda940;"}) )
+  CHECK(170, test_code(&(String){14, 13, "i := 0xFDA940"}, &(String){14, 13, "i = 0xFDA940;"}) )
+  CHECK(171, test_code(&(String){15, 14, "i := -0xFDA940"}, &(String){15, 14, "i = -0xFDA940;"}) )
+  CHECK(172, test_code_error(&(String){3, 2, "2a"}, &(String){20, 19, "illegal number \"2a\""}) )
+  CHECK(173, test_code_error(&(String){3, 2, "0a"}, &(String){20, 19, "illegal number \"0a\""}) )
+  CHECK(174, test_code_error(&(String){4, 3, "038"}, &(String){27, 26, "illegal octal number \"038\""}) )
+  CHECK(175, test_code_error(&(String){6, 5, "0b021"}, &(String){30, 29, "illegal binary number \"0b021\""}) )
+  CHECK(176, test_code_error(&(String){6, 5, "0xadg"}, &(String){35, 34, "illegal hexadecimal number \"0xadg\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -99,23 +215,23 @@ Returncode test_char_expression();
 static char* _func_name_test_char_expression = "test-char-expression";
 #define MR_FUNC_NAME _func_name_test_char_expression
 Returncode test_char_expression() {
-  CHECK(70, test_code(&(String){9, 8, "c := 'a'"}, &(String){9, 8, "c = 'a';"}) )
-  CHECK(71, test_code(&(String){10, 9, "c := '\\''"}, &(String){10, 9, "c = '\\'';"}) )
-  CHECK(72, test_code(&(String){10, 9, "c := '\\n'"}, &(String){10, 9, "c = '\\n';"}) )
-  CHECK(73, test_code(&(String){12, 11, "c := '\\x0f'"}, &(String){12, 11, "c = '\\x0f';"}) )
-  CHECK(74, test_code(&(String){12, 11, "c := '\\xA9'"}, &(String){12, 11, "c = '\\xA9';"}) )
-  CHECK(75, test_code(&(String){12, 11, "c := '\\270'"}, &(String){12, 11, "c = '\\270';"}) )
-  CHECK(76, test_code_error(&(String){4, 3, "'''"}, &(String){33, 32, "illegal character constant \"'''\""}) )
-  CHECK(77, test_code_error(&(String){4, 3, "'\\'"}, &(String){33, 32, "illegal character constant \"'\\'\""}) )
-  CHECK(79, test_code_error(&(String){5, 4, "'aa'"}, &(String){34, 33, "illegal character constant \"'aa'\""}) )
-  CHECK(80, test_code_error(&(String){5, 4, "'\\c'"}, &(String){34, 33, "illegal character constant \"'\\c'\""}) )
-  CHECK(82, test_code_error(&(String){7, 6, "'aaaa'"}, &(String){36, 35, "illegal character constant \"'aaaa'\""}) )
-  CHECK(84, test_code_error(&(String){8, 7, "'\\x6fg'"}, &(String){37, 36, "illegal character constant \"'\\x6fg'\""}) )
-  CHECK(86, test_code_error(&(String){7, 6, "'\\058'"}, &(String){36, 35, "illegal character constant \"'\\058'\""}) )
-  CHECK(88, test_code_error(&(String){3, 2, "''"}, &(String){32, 31, "illegal character constant \"''\""}) )
-  CHECK(89, test_code_error(&(String){6, 5, "'aaa'"}, &(String){35, 34, "illegal character constant \"'aaa'\""}) )
-  CHECK(91, test_code_error(&(String){8, 7, "'aaaaa'"}, &(String){37, 36, "illegal character constant \"'aaaaa'\""}) )
-  CHECK(93, test_code_error(&(String){4, 3, "'aa"}, &(String){33, 32, "illegal character constant \"'aa\""}) )
+  CHECK(180, test_code(&(String){9, 8, "c := 'a'"}, &(String){9, 8, "c = 'a';"}) )
+  CHECK(181, test_code(&(String){10, 9, "c := '\\''"}, &(String){10, 9, "c = '\\'';"}) )
+  CHECK(182, test_code(&(String){10, 9, "c := '\\n'"}, &(String){10, 9, "c = '\\n';"}) )
+  CHECK(183, test_code(&(String){12, 11, "c := '\\x0f'"}, &(String){12, 11, "c = '\\x0f';"}) )
+  CHECK(184, test_code(&(String){12, 11, "c := '\\xA9'"}, &(String){12, 11, "c = '\\xA9';"}) )
+  CHECK(185, test_code(&(String){12, 11, "c := '\\270'"}, &(String){12, 11, "c = '\\270';"}) )
+  CHECK(186, test_code_error(&(String){4, 3, "'''"}, &(String){33, 32, "illegal character constant \"'''\""}) )
+  CHECK(187, test_code_error(&(String){4, 3, "'\\'"}, &(String){33, 32, "illegal character constant \"'\\'\""}) )
+  CHECK(189, test_code_error(&(String){5, 4, "'aa'"}, &(String){34, 33, "illegal character constant \"'aa'\""}) )
+  CHECK(190, test_code_error(&(String){5, 4, "'\\c'"}, &(String){34, 33, "illegal character constant \"'\\c'\""}) )
+  CHECK(192, test_code_error(&(String){7, 6, "'aaaa'"}, &(String){36, 35, "illegal character constant \"'aaaa'\""}) )
+  CHECK(194, test_code_error(&(String){8, 7, "'\\x6fg'"}, &(String){37, 36, "illegal character constant \"'\\x6fg'\""}) )
+  CHECK(196, test_code_error(&(String){7, 6, "'\\058'"}, &(String){36, 35, "illegal character constant \"'\\058'\""}) )
+  CHECK(198, test_code_error(&(String){3, 2, "''"}, &(String){32, 31, "illegal character constant \"''\""}) )
+  CHECK(199, test_code_error(&(String){6, 5, "'aaa'"}, &(String){35, 34, "illegal character constant \"'aaa'\""}) )
+  CHECK(201, test_code_error(&(String){8, 7, "'aaaaa'"}, &(String){37, 36, "illegal character constant \"'aaaaa'\""}) )
+  CHECK(203, test_code_error(&(String){4, 3, "'aa"}, &(String){33, 32, "illegal character constant \"'aa\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -128,8 +244,8 @@ Returncode test_string_expression();
 static char* _func_name_test_string_expression = "test-string-expression";
 #define MR_FUNC_NAME _func_name_test_string_expression
 Returncode test_string_expression() {
-  CHECK(98, test_code(&(String){21, 20, "str := \"some string\""}, &(String){199, 198, "String aux_String_0_Var = {0};\n  String* aux_String_0 = &aux_String_0_Var;\n  aux_String_0->max_length = 12;\n  aux_String_0->length = 11;\n  aux_String_0->values = \"some string\";\n  str = aux_String_0;"}) )
-  CHECK(101, test_code_error(&(String){5, 4, "\"aaa"}, &(String){31, 30, "illegal string constant \"\"aaa\""}) )
+  CHECK(208, test_code(&(String){21, 20, "str := \"some string\""}, &(String){199, 198, "String aux_String_0_Var = {0};\n  String* aux_String_0 = &aux_String_0_Var;\n  aux_String_0->max_length = 12;\n  aux_String_0->length = 11;\n  aux_String_0->values = \"some string\";\n  str = aux_String_0;"}) )
+  CHECK(211, test_code_error(&(String){5, 4, "\"aaa"}, &(String){31, 30, "illegal string constant \"\"aaa\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -142,9 +258,9 @@ Returncode test_empty_expression();
 static char* _func_name_test_empty_expression = "test-empty-expression";
 #define MR_FUNC_NAME _func_name_test_empty_expression
 Returncode test_empty_expression() {
-  CHECK(105, test_code(&(String){9, 8, "str := _"}, &(String){12, 11, "str = NULL;"}) )
-  CHECK(106, test_code(&(String){7, 6, "t := _"}, &(String){10, 9, "t = NULL;"}) )
-  CHECK(107, test_code_error(&(String){7, 6, "i := _"}, &(String){33, 32, "cannot assign \"Empty\" into \"Int\""}) )
+  CHECK(215, test_code(&(String){9, 8, "str := _"}, &(String){12, 11, "str = NULL;"}) )
+  CHECK(216, test_code(&(String){7, 6, "t := _"}, &(String){10, 9, "t = NULL;"}) )
+  CHECK(217, test_code_error(&(String){7, 6, "i := _"}, &(String){40, 39, "cannot assign \"Empty Symbol\" into \"Int\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -157,10 +273,12 @@ Returncode test_member_expression();
 static char* _func_name_test_member_expression = "test-member-expression";
 #define MR_FUNC_NAME _func_name_test_member_expression
 Returncode test_member_expression() {
-  CHECK(111, test_code(&(String){11, 10, "i := t.num"}, &(String){12, 11, "i = t->num;"}) )
-  CHECK(112, test_code_error(&(String){6, 5, "error"}, &(String){23, 22, "unknown symbol \"error\""}) )
-  CHECK(113, test_code_error(&(String){15, 14, "(i := 1).error"}, &(String){38, 37, "void expression has no member \"error\""}) )
-  CHECK(115, test_global_scope_error(&(String){58, 57, "struct Test\n  var Int x\nfunc mock(user Test t)\n  t.error\n"}, &(String){34, 33, "type \"Test\" has no member \"error\""}) )
+  CHECK(222, test_code(&(String){11, 10, "i := t.num"}, &(String){38, 37, "if (t == NULL) RAISE(1)\n  i = t->num;"}) )
+  CHECK(223, test_code(&(String){13, 12, "i := tc.numb"}, &(String){47, 46, "if (tc == NULL) RAISE(1)\n  i = tc->_base.numb;"}) )
+  CHECK(226, test_code(&(String){12, 11, "i := tc.num"}, &(String){58, 57, "if (tc == NULL) RAISE(1)\n  i = tc->_base._base._base.num;"}) )
+  CHECK(229, test_code_error(&(String){6, 5, "error"}, &(String){23, 22, "unknown symbol \"error\""}) )
+  CHECK(230, test_code_error(&(String){15, 14, "(i := 1).error"}, &(String){38, 37, "void expression has no member \"error\""}) )
+  CHECK(232, test_code_error(&(String){8, 7, "t.error"}, &(String){34, 33, "type \"Test\" has no member \"error\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -173,18 +291,18 @@ Returncode test_slice_expression();
 static char* _func_name_test_slice_expression = "test-slice-expression";
 #define MR_FUNC_NAME _func_name_test_slice_expression
 Returncode test_slice_expression() {
-  CHECK(121, test_code(&(String){13, 12, "c := str[13]"}, &(String){75, 74, "if ((13) < 0 || (13) >= (str)->length) RAISE(4)\n  c = ((str)->values)[13];"}) )
+  CHECK(236, test_code(&(String){13, 12, "c := str[13]"}, &(String){75, 74, "if ((13) < 0 || (13) >= (str)->length) RAISE(1)\n  c = ((str)->values)[13];"}) )
   String* expected = &(String){1024, 0, (char[1024]){0}};
-  CHECK(125, String_copy(expected, &(String){32, 31, "String aux_String_0_Var = {0};\n"}) )
-  CHECK(126, String_concat(expected, &(String){45, 44, "  String* aux_String_0 = &aux_String_0_Var;\n"}) )
-  CHECK(127, String_concat(expected, &(String){32, 31, "  aux_String_0_Var.length = 6;\n"}) )
-  CHECK(128, String_concat(expected, &(String){62, 61, "  aux_String_0_Var.max_length = aux_String_0_Var.length + 1;\n"}) )
-  CHECK(130, String_concat(expected, &(String){50, 49, "  aux_String_0_Var.values = (str)->values + (2);\n"}) )
-  CHECK(131, String_concat(expected, &(String){65, 64, "  if ((2) < 0 || (6) < 0 || (2) + (6) > (str)->length) RAISE(4)\n"}) )
-  CHECK(133, String_concat(expected, &(String){22, 21, "  str = aux_String_0;"}) )
-  CHECK(134, test_code(&(String){16, 15, "str := str[2:6]"}, expected) )
-  CHECK(135, test_code(&(String){13, 12, "i := arr[13]"}, &(String){83, 82, "if ((13) < 0 || (13) >= (arr)->length) RAISE(4)\n  i = ((Int*)((arr)->values))[13];"}) )
-  CHECK(138, test_code(&(String){16, 15, "arr := arr[2:6]"}, &(String){242, 241, "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0_Var.length = 6;\n  aux_Array_0_Var.values = (Byte*)((arr)->values) + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(4)\n  arr = aux_Array_0;"}) )
+  CHECK(240, String_copy(expected, &(String){32, 31, "String aux_String_0_Var = {0};\n"}) )
+  CHECK(241, String_concat(expected, &(String){45, 44, "  String* aux_String_0 = &aux_String_0_Var;\n"}) )
+  CHECK(242, String_concat(expected, &(String){32, 31, "  aux_String_0_Var.length = 6;\n"}) )
+  CHECK(243, String_concat(expected, &(String){62, 61, "  aux_String_0_Var.max_length = aux_String_0_Var.length + 1;\n"}) )
+  CHECK(245, String_concat(expected, &(String){50, 49, "  aux_String_0_Var.values = (str)->values + (2);\n"}) )
+  CHECK(246, String_concat(expected, &(String){65, 64, "  if ((2) < 0 || (6) < 0 || (2) + (6) > (str)->length) RAISE(1)\n"}) )
+  CHECK(248, String_concat(expected, &(String){22, 21, "  str = aux_String_0;"}) )
+  CHECK(249, test_code(&(String){16, 15, "str := str[2:6]"}, expected) )
+  CHECK(250, test_code(&(String){13, 12, "i := arr[13]"}, &(String){83, 82, "if ((13) < 0 || (13) >= (arr)->length) RAISE(1)\n  i = ((Int*)((arr)->values))[13];"}) )
+  CHECK(253, test_code(&(String){16, 15, "arr := arr[2:6]"}, &(String){242, 241, "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0_Var.length = 6;\n  aux_Array_0_Var.values = (Byte*)((arr)->values) + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)\n  arr = aux_Array_0;"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -196,50 +314,28 @@ Returncode test_call_expression();
 static char* _func_name_test_call_expression = "test-call-expression";
 #define MR_FUNC_NAME _func_name_test_call_expression
 Returncode test_call_expression() {
-  CHECK(143, test_global_scope(&(String){31, 30, "func fun()\nfunc mock()\n  fun()"}, &(String){141, 140, "Returncode fun(void);\nReturncode mock(void);\nReturncode fun(void) {\n  return OK;\n}\nReturncode mock(void) {\n  CHECK(3, fun() )\n  return OK;\n}"}) )
-  CHECK(146, test_global_scope(&(String){108, 107, "func fun(copy Int x, user String s, owner String o)\nfunc mock(user String s)\n  fun(copy 3, user s, owner _)"}, &(String){207, 206, "Returncode fun(Int x, String* s, String* o);\nReturncode mock(String* s);\nReturncode fun(Int x, String* s, String* o) {\n  return OK;\n}\nReturncode mock(String* s) {\n  CHECK(3, fun(3, s, NULL) )\n  return OK;\n}"}) )
-  String* expected = &(String){1024, 0, (char[1024]){0}};
-  CHECK(150, String_copy(expected, &(String){37, 36, "Returncode fun(String** s, Int* x);\n"}) )
-  CHECK(151, String_concat(expected, &(String){38, 37, "Returncode mock(String** s, Int* x);\n"}) )
-  CHECK(152, String_concat(expected, &(String){38, 37, "Returncode fun(String** s, Int* x) {\n"}) )
-  CHECK(153, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
-  CHECK(154, String_concat(expected, &(String){3, 2, "}\n"}) )
-  CHECK(155, String_concat(expected, &(String){39, 38, "Returncode mock(String** s, Int* x) {\n"}) )
-  CHECK(156, String_concat(expected, &(String){14, 13, "  Int n = 0;\n"}) )
-  CHECK(157, String_concat(expected, &(String){21, 20, "  String* t = NULL;\n"}) )
-  CHECK(158, String_concat(expected, &(String){32, 31, "  CHECK(3, fun(&(*s), &(*x)) )\n"}) )
-  CHECK(159, String_concat(expected, &(String){30, 29, "  CHECK(6, fun(&(t), &(n)) )\n"}) )
-  CHECK(160, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
-  CHECK(161, String_concat(expected, &(String){2, 1, "}"}) )
-  CHECK(162, test_global_scope(&(String){166, 165, "func fun()->(owner String s, copy Int x)\nfunc mock()->(owner String s, copy Int x)\n  fun()->(owner s, copy x)\n  var Int n\n  owner String t\n  fun()->(owner t, copy n)"}, expected) )
-  CHECK(165, test_global_scope(&(String){94, 93, "func fun(copy Int x)->(owner String s)\nfunc mock()->(owner String s)\n  fun(copy 0)->(owner s)"}, &(String){187, 186, "Returncode fun(Int x, String** s);\nReturncode mock(String** s);\nReturncode fun(Int x, String** s) {\n  return OK;\n}\nReturncode mock(String** s) {\n  CHECK(3, fun(0, &(*s)) )\n  return OK;\n}"}) )
-  CHECK(168, String_copy(expected, &(String){24, 23, "Returncode fun(Int x);\n"}) )
-  CHECK(169, String_concat(expected, &(String){32, 31, "Returncode joy(Int x, Int* r);\n"}) )
-  CHECK(170, String_concat(expected, &(String){24, 23, "Returncode mock(void);\n"}) )
-  CHECK(171, String_concat(expected, &(String){25, 24, "Returncode fun(Int x) {\n"}) )
-  CHECK(172, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
-  CHECK(173, String_concat(expected, &(String){3, 2, "}\n"}) )
-  CHECK(174, String_concat(expected, &(String){33, 32, "Returncode joy(Int x, Int* r) {\n"}) )
-  CHECK(175, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
-  CHECK(176, String_concat(expected, &(String){3, 2, "}\n"}) )
-  CHECK(177, String_concat(expected, &(String){25, 24, "Returncode mock(void) {\n"}) )
-  CHECK(178, String_concat(expected, &(String){14, 13, "  Int x = 0;\n"}) )
-  CHECK(179, String_concat(expected, &(String){27, 26, "  CHECK(5, joy(3, &(x)) )\n"}) )
-  CHECK(180, String_concat(expected, &(String){21, 20, "  CHECK(5, fun(x) )\n"}) )
-  CHECK(181, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
-  CHECK(182, String_concat(expected, &(String){2, 1, "}"}) )
-  CHECK(183, test_global_scope(&(String){114, 113, "func fun(copy Int x)\nfunc joy(copy Int x)->(copy Int r)\nfunc mock()\n  var Int x\n  fun(copy joy(copy 3)->(copy x))"}, expected) )
-  CHECK(186, test_global_scope(&(String){163, 162, "func fun(copy Int x, copy Int y)->(copy Int n, copy Int m)\nfunc mock()->(copy Int n, copy Int m)\n  fun(\n      copy 2,\n      copy 3)->(\n      copy n,\n      copy m)"}, &(String){227, 226, "Returncode fun(Int x, Int y, Int* n, Int* m);\nReturncode mock(Int* n, Int* m);\nReturncode fun(Int x, Int y, Int* n, Int* m) {\n  return OK;\n}\nReturncode mock(Int* n, Int* m) {\n  CHECK(3, fun(2, 3, &(*n), &(*m)) )\n  return OK;\n}"}) )
-  CHECK(189, test_global_scope(&(String){64, 63, "func fun()->(copy Int x)\nfunc mock()->(copy Int x)\n  x := fun()"}, &(String){200, 199, "Returncode fun(Int* x);\nReturncode mock(Int* x);\nReturncode fun(Int* x) {\n  return OK;\n}\nReturncode mock(Int* x) {\n  Int aux_Int_0 = 0;\n  CHECK(3, fun(&(aux_Int_0)) )\n  *x = aux_Int_0;\n  return OK;\n}"}) )
-  CHECK(192, test_global_scope(&(String){70, 69, "func fun()->(user String s)\nfunc mock()->(user String s)\n  s := fun()"}, &(String){232, 231, "Returncode fun(String** s);\nReturncode mock(String** s);\nReturncode fun(String** s) {\n  return OK;\n}\nReturncode mock(String** s) {\n  String* aux_String_0 = NULL;\n  CHECK(3, fun(&(aux_String_0)) )\n  *s = aux_String_0;\n  return OK;\n}"}) )
-  CHECK(195, test_code_error(&(String){18, 17, "function( copy 1)"}, &(String){25, 24, "expected access, got \" \""}) )
-  CHECK(197, test_code_error(&(String){15, 14, "function(user)"}, &(String){37, 36, "expected space after access, got \")\""}) )
-  CHECK(199, test_code_error(&(String){24, 23, "function(copy 4,copy 3)"}, &(String){46, 45, "expected space or new-line after \",\", got \"c\""}) )
-  CHECK(202, test_code_error(&(String){16, 15, "function(copy 2"}, &(String){36, 35, "expected \",\" or \")\", got \"new-line\""}) )
-  CHECK(204, test_code_error(&(String){18, 17, "function(error 4)"}, &(String){23, 22, "illegal access \"error\""}) )
-  CHECK(206, test_code_error(&(String){11, 10, "(i := 0)()"}, &(String){32, 31, "void expression is not callable"}) )
-  CHECK(208, test_code_error(&(String){4, 3, "i()"}, &(String){24, 23, "non callable type \"Int\""}) )
-  CHECK(210, test_global_scope_error(&(String){56, 55, "func fun()->(copy Int x)\nfunc mock()\n  fun()->(copy 4)\n"}, &(String){27, 26, "non assignable call output"}) )
+  CHECK(258, test_code(&(String){7, 6, "fun0()"}, &(String){18, 17, "CHECK(1, fun0() )"}) )
+  CHECK(259, test_code(&(String){32, 31, "fun1(copy 3, user str, owner _)"}, &(String){30, 29, "CHECK(1, fun1(3, str, NULL) )"}) )
+  CHECK(262, test_code(&(String){28, 27, "fun2()->(owner so, copy io)"}, &(String){32, 31, "CHECK(1, fun2(&(*so), &(*io)) )"}) )
+  CHECK(265, test_code(&(String){55, 54, "var Int x\n  owner String s\n  fun2()->(owner s, copy x)"}, &(String){61, 60, "Int x = 0;\n  String* s = NULL;\n  CHECK(3, fun2(&(s), &(x)) )"}) )
+  CHECK(268, test_code(&(String){25, 24, "fun3(copy 0)->(owner so)"}, &(String){27, 26, "CHECK(1, fun3(0, &(*so)) )"}) )
+  CHECK(269, test_code(&(String){46, 45, "var Int x\n  fun4(copy fun5(copy 3)->(copy x))"}, &(String){59, 58, "Int x = 0;\n  CHECK(2, fun5(3, &(x)) )\n  CHECK(2, fun4(x) )"}) )
+  CHECK(272, test_code(&(String){67, 66, "fun6(\n      copy 2,\n      copy 3)->(\n      copy io,\n      copy io)"}, &(String){38, 37, "CHECK(1, fun6(2, 3, &(*io), &(*io)) )"}) )
+  CHECK(275, test_code(&(String){19, 18, "io := fun5(copy 4)"}, &(String){73, 72, "Int aux_Int_0 = 0;\n  CHECK(1, fun5(4, &(aux_Int_0)) )\n  *io = aux_Int_0;"}) )
+  CHECK(278, test_code(&(String){19, 18, "so := fun3(copy 7)"}, &(String){89, 88, "String* aux_String_0 = NULL;\n  CHECK(1, fun3(7, &(aux_String_0)) )\n  *so = aux_String_0;"}) )
+  CHECK(281, test_code(&(String){11, 10, "tc.methc()"}, &(String){24, 23, "CHECK(1, Tc_methc(tc) )"}) )
+  CHECK(282, test_code(&(String){11, 10, "tc.methb()"}, &(String){34, 33, "CHECK(1, Tb_methb(&(tc->_base)) )"}) )
+  CHECK(283, test_code(&(String){10, 9, "tc.meth()"}, &(String){47, 46, "CHECK(1, Test_meth(&(tc->_base._base._base)) )"}) )
+  CHECK(285, test_code(&(String){17, 16, "fun7()->(user t)"}, &(String){55, 54, "if (t != NULL) RAISE(1)\n  CHECK(1, fun7((void*)&(t)) )"}) )
+  CHECK(288, test_code_error(&(String){18, 17, "function( copy 1)"}, &(String){25, 24, "expected access, got \" \""}) )
+  CHECK(290, test_code_error(&(String){15, 14, "function(user)"}, &(String){37, 36, "expected space after access, got \")\""}) )
+  CHECK(292, test_code_error(&(String){24, 23, "function(copy 4,copy 3)"}, &(String){46, 45, "expected space or new-line after \",\", got \"c\""}) )
+  CHECK(295, test_code_error(&(String){16, 15, "function(copy 2"}, &(String){36, 35, "expected \",\" or \")\", got \"new-line\""}) )
+  CHECK(297, test_code_error(&(String){18, 17, "function(error 4)"}, &(String){23, 22, "illegal access \"error\""}) )
+  CHECK(299, test_code_error(&(String){11, 10, "(i := 0)()"}, &(String){32, 31, "void expression is not callable"}) )
+  CHECK(301, test_code_error(&(String){4, 3, "i()"}, &(String){24, 23, "non callable type \"Int\""}) )
+  CHECK(303, test_code_error(&(String){23, 22, "fun5(copy 0)->(copy 4)"}, &(String){27, 26, "non assignable call output"}) )
+  CHECK(305, test_code_error(&(String){18, 17, "fun7()->(user tc)"}, &(String){29, 28, "cannot assign \"Tb\" into \"Tc\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -252,8 +348,10 @@ Returncode test_type_expression();
 static char* _func_name_test_type_expression = "test-type-expression";
 #define MR_FUNC_NAME _func_name_test_type_expression
 Returncode test_type_expression() {
-  CHECK(216, test_global_scope(&(String){80, 79, "struct Test\n  var Int x\n  func meth()\nfunc mock(user Test t)\n  Test.meth(var t)"}, &(String){230, 229, "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_meth(Test* self);\nReturncode mock(Test* t);\nReturncode Test_meth(Test* self) {\n  return OK;\n}\nReturncode mock(Test* t) {\n  CHECK(5, Test_meth(t) )\n  return OK;\n}"}) )
-  CHECK(219, test_code_error(&(String){6, 5, "Error"}, &(String){21, 20, "unknown type \"Error\""}) )
+  CHECK(310, test_code(&(String){17, 16, "Test.meth(var t)"}, &(String){24, 23, "CHECK(1, Test_meth(t) )"}) )
+  CHECK(311, test_code(&(String){17, 16, "Tb.methb(var tc)"}, &(String){34, 33, "CHECK(1, Tb_methb(&(tc->_base)) )"}) )
+  CHECK(312, test_code(&(String){16, 15, "Tc.meth(var tc)"}, &(String){47, 46, "CHECK(1, Test_meth(&(tc->_base._base._base)) )"}) )
+  CHECK(315, test_code_error(&(String){6, 5, "Error"}, &(String){21, 20, "unknown type \"Error\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -266,27 +364,65 @@ Returncode test_base_expression();
 static char* _func_name_test_base_expression = "test-base-expression";
 #define MR_FUNC_NAME _func_name_test_base_expression
 Returncode test_base_expression() {
+  CHECK(319, test_meth_code(&(String){13, 12, "base.methm()"}, &(String){37, 36, "CHECK(9, Mid_methm(&(self->_base)) )"}) )
+  CHECK(321, test_meth_code(&(String){13, 12, "base.methb()"}, &(String){44, 43, "CHECK(9, Base_methb(&(self->_base._base)) )"}) )
+  CHECK(323, test_code_error(&(String){5, 4, "base"}, &(String){26, 25, "\"base\" used not in method"}) )
+  CHECK(324, test_global_scope_error(&(String){48, 47, "struct Test\n  var Int x\n  func mock()\n    base\n"}, &(String){29, 28, "no base type for type \"Test\""}) )
+  CHECK(327, test_global_scope_error(&(String){74, 73, "struct Base\n  var Int x\nstruct Test(Base)\n  func mock()\n    base := self\n"}, &(String){40, 39, "cannot assign \"Test\" into \"Base Symbol\""}) )
+  CHECK(330, test_global_scope_error(&(String){87, 86, "struct Base\n  var Int x\nstruct Test(Base)\n  func mock()->(copy Int x)\n    x := base.x\n"}, &(String){35, 34, "calling \"base\" with non-method \"x\""}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_meth_code(String* input_text, String* expected_output);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_meth_code = "test-meth-code";
+#define MR_FUNC_NAME _func_name_test_meth_code
+Returncode test_meth_code(String* input_text, String* expected_output) {
+  String* input = &(String){1024, 0, (char[1024]){0}};
+  CHECK(336, String_copy(input, &(String){13, 12, "struct Base\n"}) )
+  CHECK(337, String_concat(input, &(String){13, 12, "  var Int x\n"}) )
+  CHECK(338, String_concat(input, &(String){16, 15, "  func methb()\n"}) )
+  CHECK(339, String_concat(input, &(String){18, 17, "struct Mid(Base)\n"}) )
+  CHECK(340, String_concat(input, &(String){16, 15, "  func methm()\n"}) )
+  CHECK(341, String_concat(input, &(String){17, 16, "struct Top(Mid)\n"}) )
+  CHECK(342, String_concat(input, &(String){16, 15, "  func methb()\n"}) )
+  CHECK(343, String_concat(input, &(String){20, 19, "  func methm()\n    "}) )
+  CHECK(344, String_concat(input, input_text) )
+  CHECK(345, String_concat(input, &(String){2, 1, "\n"}) )
   String* expected = &(String){1024, 0, (char[1024]){0}};
-  CHECK(224, String_copy(expected, &(String){27, 26, "typedef struct Base Base;\n"}) )
-  CHECK(225, String_concat(expected, &(String){27, 26, "typedef struct Test Test;\n"}) )
-  CHECK(226, String_concat(expected, &(String){15, 14, "struct Base {\n"}) )
-  CHECK(227, String_concat(expected, &(String){10, 9, "  Int x;\n"}) )
-  CHECK(228, String_concat(expected, &(String){4, 3, "};\n"}) )
-  CHECK(229, String_concat(expected, &(String){15, 14, "struct Test {\n"}) )
-  CHECK(230, String_concat(expected, &(String){15, 14, "  Base _base;\n"}) )
-  CHECK(231, String_concat(expected, &(String){4, 3, "};\n"}) )
-  CHECK(232, String_concat(expected, &(String){35, 34, "Returncode Base_meth(Base* self);\n"}) )
-  CHECK(233, String_concat(expected, &(String){35, 34, "Returncode Test_meth(Test* self);\n"}) )
-  CHECK(234, String_concat(expected, &(String){36, 35, "Returncode Base_meth(Base* self) {\n"}) )
-  CHECK(235, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
-  CHECK(236, String_concat(expected, &(String){3, 2, "}\n"}) )
-  CHECK(237, String_concat(expected, &(String){36, 35, "Returncode Test_meth(Test* self) {\n"}) )
-  CHECK(238, String_concat(expected, &(String){40, 39, "  CHECK(6, Base_meth(&(self->_base)) )\n"}) )
-  CHECK(239, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
-  CHECK(240, String_concat(expected, &(String){2, 1, "}"}) )
-  CHECK(241, test_global_scope(&(String){86, 85, "struct Base\n  var Int x\n  func meth()\nstruct Test(Base)\n  func meth()\n    base.meth()"}, expected) )
-  CHECK(244, test_code_error(&(String){5, 4, "base"}, &(String){26, 25, "\"base\" used not in method"}) )
-  CHECK(245, test_global_scope_error(&(String){48, 47, "struct Test\n  var Int x\n  func mock()\n    base\n"}, &(String){29, 28, "no base type for type \"Test\""}) )
+  CHECK(347, String_copy(expected, &(String){27, 26, "typedef struct Base Base;\n"}) )
+  CHECK(348, String_concat(expected, &(String){25, 24, "typedef struct Mid Mid;\n"}) )
+  CHECK(349, String_concat(expected, &(String){25, 24, "typedef struct Top Top;\n"}) )
+  CHECK(350, String_concat(expected, &(String){15, 14, "struct Base {\n"}) )
+  CHECK(351, String_concat(expected, &(String){10, 9, "  Int x;\n"}) )
+  CHECK(352, String_concat(expected, &(String){4, 3, "};\n"}) )
+  CHECK(353, String_concat(expected, &(String){14, 13, "struct Mid {\n"}) )
+  CHECK(354, String_concat(expected, &(String){15, 14, "  Base _base;\n"}) )
+  CHECK(355, String_concat(expected, &(String){4, 3, "};\n"}) )
+  CHECK(356, String_concat(expected, &(String){14, 13, "struct Top {\n"}) )
+  CHECK(357, String_concat(expected, &(String){14, 13, "  Mid _base;\n"}) )
+  CHECK(358, String_concat(expected, &(String){4, 3, "};\n"}) )
+  CHECK(359, String_concat(expected, &(String){36, 35, "Returncode Base_methb(Base* self);\n"}) )
+  CHECK(360, String_concat(expected, &(String){34, 33, "Returncode Mid_methm(Mid* self);\n"}) )
+  CHECK(361, String_concat(expected, &(String){34, 33, "Returncode Top_methb(Top* self);\n"}) )
+  CHECK(362, String_concat(expected, &(String){34, 33, "Returncode Top_methm(Top* self);\n"}) )
+  CHECK(363, String_concat(expected, &(String){37, 36, "Returncode Base_methb(Base* self) {\n"}) )
+  CHECK(364, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
+  CHECK(365, String_concat(expected, &(String){3, 2, "}\n"}) )
+  CHECK(366, String_concat(expected, &(String){35, 34, "Returncode Mid_methm(Mid* self) {\n"}) )
+  CHECK(367, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
+  CHECK(368, String_concat(expected, &(String){3, 2, "}\n"}) )
+  CHECK(369, String_concat(expected, &(String){35, 34, "Returncode Top_methb(Top* self) {\n"}) )
+  CHECK(370, String_concat(expected, &(String){14, 13, "  return OK;\n"}) )
+  CHECK(371, String_concat(expected, &(String){3, 2, "}\n"}) )
+  CHECK(372, String_concat(expected, &(String){37, 36, "Returncode Top_methm(Top* self) {\n  "}) )
+  CHECK(373, String_concat(expected, expected_output) )
+  CHECK(374, String_concat(expected, &(String){15, 14, "\n  return OK;\n"}) )
+  CHECK(375, String_concat(expected, &(String){2, 1, "}"}) )
+  CHECK(376, test_global_scope(input, expected) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -299,10 +435,10 @@ Returncode test_block_expression();
 static char* _func_name_test_block_expression = "test-block-expression";
 #define MR_FUNC_NAME _func_name_test_block_expression
 Returncode test_block_expression() {
-  CHECK(251, test_code(&(String){15, 14, "i := 2 + (123)"}, &(String){15, 14, "i = 2 + (123);"}) )
-  CHECK(252, test_code(&(String){11, 10, "i := (123)"}, &(String){9, 8, "i = 123;"}) )
-  CHECK(253, test_code(&(String){25, 24, "i := (123 * (i - 4)) + 2"}, &(String){25, 24, "i = (123 * (i - 4)) + 2;"}) )
-  CHECK(254, test_code_error(&(String){7, 6, "(error"}, &(String){29, 28, "expected \")\", got \"new-line\""}) )
+  CHECK(380, test_code(&(String){15, 14, "i := 2 + (123)"}, &(String){15, 14, "i = 2 + (123);"}) )
+  CHECK(381, test_code(&(String){11, 10, "i := (123)"}, &(String){9, 8, "i = 123;"}) )
+  CHECK(382, test_code(&(String){25, 24, "i := (123 * (i - 4)) + 2"}, &(String){25, 24, "i = (123 * (i - 4)) + 2;"}) )
+  CHECK(383, test_code_error(&(String){7, 6, "(error"}, &(String){29, 28, "expected \")\", got \"new-line\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -315,17 +451,17 @@ Returncode test_unary_expression();
 static char* _func_name_test_unary_expression = "test-unary-expression";
 #define MR_FUNC_NAME _func_name_test_unary_expression
 Returncode test_unary_expression() {
-  CHECK(258, test_code(&(String){9, 8, "i := - i"}, &(String){9, 8, "i = - i;"}) )
-  CHECK(259, test_code(&(String){15, 14, "i := -\n      i"}, &(String){9, 8, "i = - i;"}) )
-  CHECK(260, test_code(&(String){11, 10, "i := - - i"}, &(String){13, 12, "i = - (- i);"}) )
-  CHECK(261, test_code(&(String){11, 10, "b := not b"}, &(String){9, 8, "b = ! b;"}) )
-  CHECK(262, test_code(&(String){15, 14, "b := not i > 3"}, &(String){15, 14, "b = ! (i > 3);"}) )
-  CHECK(263, test_code_error(&(String){5, 4, "[45]"}, &(String){15, 14, "unexpected \"[\""}) )
-  CHECK(264, test_code_error(&(String){3, 2, "-["}, &(String){15, 14, "unexpected \"[\""}) )
-  CHECK(265, test_code_error(&(String){4, 3, "+ 2"}, &(String){23, 22, "not unary operator \"+\""}) )
-  CHECK(266, test_code_error(&(String){11, 10, "- (i := 2)"}, &(String){49, 48, "void expression given as operand to operator \"-\""}) )
-  CHECK(269, test_code_error(&(String){10, 9, "- (i > 4)"}, &(String){48, 47, "operator \"-\" expected \"Int\" operand, got \"Bool\""}) )
-  CHECK(272, test_code_error(&(String){6, 5, "not i"}, &(String){50, 49, "operator \"not\" expected \"Bool\" operand, got \"Int\""}) )
+  CHECK(387, test_code(&(String){9, 8, "i := - i"}, &(String){9, 8, "i = - i;"}) )
+  CHECK(388, test_code(&(String){15, 14, "i := -\n      i"}, &(String){9, 8, "i = - i;"}) )
+  CHECK(389, test_code(&(String){11, 10, "i := - - i"}, &(String){13, 12, "i = - (- i);"}) )
+  CHECK(390, test_code(&(String){11, 10, "b := not b"}, &(String){9, 8, "b = ! b;"}) )
+  CHECK(391, test_code(&(String){15, 14, "b := not i > 3"}, &(String){15, 14, "b = ! (i > 3);"}) )
+  CHECK(392, test_code_error(&(String){5, 4, "[45]"}, &(String){15, 14, "unexpected \"[\""}) )
+  CHECK(393, test_code_error(&(String){3, 2, "-["}, &(String){15, 14, "unexpected \"[\""}) )
+  CHECK(394, test_code_error(&(String){4, 3, "+ 2"}, &(String){23, 22, "not unary operator \"+\""}) )
+  CHECK(395, test_code_error(&(String){11, 10, "- (i := 2)"}, &(String){49, 48, "void expression given as operand to operator \"-\""}) )
+  CHECK(398, test_code_error(&(String){10, 9, "- (i > 4)"}, &(String){48, 47, "operator \"-\" expected \"Int\" operand, got \"Bool\""}) )
+  CHECK(401, test_code_error(&(String){6, 5, "not i"}, &(String){50, 49, "operator \"not\" expected \"Bool\" operand, got \"Int\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -338,36 +474,38 @@ Returncode test_binary_expression();
 static char* _func_name_test_binary_expression = "test-binary-expression";
 #define MR_FUNC_NAME _func_name_test_binary_expression
 Returncode test_binary_expression() {
-  CHECK(278, test_code(&(String){13, 12, "i := 23 + 54"}, &(String){13, 12, "i = 23 + 54;"}) )
-  CHECK(279, test_code(&(String){34, 33, "i += (100 * 2) - (37 div 5 mod 2)"}, &(String){33, 32, "i += (100 * 2) - ((37 / 5) % 2);"}) )
-  CHECK(282, test_code(&(String){19, 18, "i -= 12 *\n      13"}, &(String){14, 13, "i -= 12 * 13;"}) )
-  CHECK(283, test_code(&(String){22, 21, "b := 3 < 5 or 23 > 37"}, &(String){26, 25, "b = (3 < 5) || (23 > 37);"}) )
-  CHECK(284, test_code(&(String){25, 24, "b := 3 <= 5 and 23 >= 37"}, &(String){28, 27, "b = (3 <= 5) && (23 >= 37);"}) )
-  CHECK(285, test_code(&(String){22, 21, "b := i = 5 or i != 37"}, &(String){27, 26, "b = (i == 5) || (i != 37);"}) )
-  CHECK(286, test_code(&(String){24, 23, "b := 2 < i < 12 < 2 * i"}, &(String){45, 44, "b = ((2 < i) && (i < 12)) && (12 < (2 * i));"}) )
-  CHECK(289, test_code_error(&(String){8, 7, "345 @ 2"}, &(String){21, 20, "unknown operator \"@\""}) )
-  CHECK(290, test_code_error(&(String){6, 5, "80 +("}, &(String){15, 14, "unexpected \"(\""}) )
-  CHECK(291, test_code_error(&(String){10, 9, "1 + 2 * 3"}, &(String){51, 50, "ambiguous precedence between operators \"+\" and \"*\""}) )
-  CHECK(294, test_code_error(&(String){25, 24, "1 < i or 2 < i and 3 < i"}, &(String){54, 53, "ambiguous precedence between operators \"or\" and \"and\""}) )
-  CHECK(297, test_code_error(&(String){8, 7, "1 not 2"}, &(String){35, 34, "cannot use \"not\" as binary operand"}) )
-  CHECK(299, test_code_error(&(String){7, 6, "1 := 2"}, &(String){41, 40, "assigning into non assignable expression"}) )
-  CHECK(301, test_code_error(&(String){7, 6, "1 += 2"}, &(String){41, 40, "assigning into non assignable expression"}) )
-  CHECK(303, test_code_error(&(String){7, 6, "1 -= 2"}, &(String){41, 40, "assigning into non assignable expression"}) )
-  CHECK(305, test_int_operator_error(&(String){2, 1, "+"}) )
-  CHECK(306, test_int_operator_error(&(String){2, 1, "-"}) )
-  CHECK(307, test_int_operator_error(&(String){2, 1, "*"}) )
-  CHECK(308, test_int_operator_error(&(String){4, 3, "div"}) )
-  CHECK(309, test_int_operator_error(&(String){4, 3, "mod"}) )
-  CHECK(310, test_int_operator_error(&(String){2, 1, "="}) )
-  CHECK(311, test_int_operator_error(&(String){3, 2, "!="}) )
-  CHECK(312, test_int_operator_error(&(String){2, 1, ">"}) )
-  CHECK(313, test_int_operator_error(&(String){2, 1, "<"}) )
-  CHECK(314, test_int_operator_error(&(String){3, 2, ">="}) )
-  CHECK(315, test_int_operator_error(&(String){3, 2, "<="}) )
-  CHECK(316, test_int_operator_error(&(String){3, 2, "+="}) )
-  CHECK(317, test_int_operator_error(&(String){3, 2, "-="}) )
-  CHECK(318, test_bool_operator_error(&(String){3, 2, "or"}) )
-  CHECK(319, test_bool_operator_error(&(String){4, 3, "and"}) )
+  CHECK(407, test_code(&(String){13, 12, "i := 23 + 54"}, &(String){13, 12, "i = 23 + 54;"}) )
+  CHECK(408, test_code(&(String){34, 33, "i += (100 * 2) - (37 div 5 mod 2)"}, &(String){33, 32, "i += (100 * 2) - ((37 / 5) % 2);"}) )
+  CHECK(411, test_code(&(String){19, 18, "i -= 12 *\n      13"}, &(String){14, 13, "i -= 12 * 13;"}) )
+  CHECK(412, test_code(&(String){22, 21, "b := 3 < 5 or 23 > 37"}, &(String){26, 25, "b = (3 < 5) || (23 > 37);"}) )
+  CHECK(413, test_code(&(String){25, 24, "b := 3 <= 5 and 23 >= 37"}, &(String){28, 27, "b = (3 <= 5) && (23 >= 37);"}) )
+  CHECK(414, test_code(&(String){22, 21, "b := i = 5 or i != 37"}, &(String){27, 26, "b = (i == 5) || (i != 37);"}) )
+  CHECK(415, test_code(&(String){24, 23, "b := 2 < i < 12 < 2 * i"}, &(String){45, 44, "b = ((2 < i) && (i < 12)) && (12 < (2 * i));"}) )
+  CHECK(418, test_code(&(String){22, 21, "user Tb tb\n  tb := tc"}, &(String){36, 35, "Tb* tb = NULL;\n  tb = &(tc->_base);"}) )
+  CHECK(421, test_code(&(String){8, 7, "t := tc"}, &(String){30, 29, "t = &(tc->_base._base._base);"}) )
+  CHECK(422, test_code_error(&(String){8, 7, "345 @ 2"}, &(String){21, 20, "unknown operator \"@\""}) )
+  CHECK(423, test_code_error(&(String){6, 5, "80 +("}, &(String){15, 14, "unexpected \"(\""}) )
+  CHECK(424, test_code_error(&(String){10, 9, "1 + 2 * 3"}, &(String){51, 50, "ambiguous precedence between operators \"+\" and \"*\""}) )
+  CHECK(427, test_code_error(&(String){25, 24, "1 < i or 2 < i and 3 < i"}, &(String){54, 53, "ambiguous precedence between operators \"or\" and \"and\""}) )
+  CHECK(430, test_code_error(&(String){8, 7, "1 not 2"}, &(String){35, 34, "cannot use \"not\" as binary operand"}) )
+  CHECK(432, test_code_error(&(String){7, 6, "1 := 2"}, &(String){41, 40, "assigning into non assignable expression"}) )
+  CHECK(434, test_code_error(&(String){7, 6, "1 += 2"}, &(String){41, 40, "assigning into non assignable expression"}) )
+  CHECK(436, test_code_error(&(String){7, 6, "1 -= 2"}, &(String){41, 40, "assigning into non assignable expression"}) )
+  CHECK(438, test_int_operator_error(&(String){2, 1, "+"}) )
+  CHECK(439, test_int_operator_error(&(String){2, 1, "-"}) )
+  CHECK(440, test_int_operator_error(&(String){2, 1, "*"}) )
+  CHECK(441, test_int_operator_error(&(String){4, 3, "div"}) )
+  CHECK(442, test_int_operator_error(&(String){4, 3, "mod"}) )
+  CHECK(443, test_int_operator_error(&(String){2, 1, "="}) )
+  CHECK(444, test_int_operator_error(&(String){3, 2, "!="}) )
+  CHECK(445, test_int_operator_error(&(String){2, 1, ">"}) )
+  CHECK(446, test_int_operator_error(&(String){2, 1, "<"}) )
+  CHECK(447, test_int_operator_error(&(String){3, 2, ">="}) )
+  CHECK(448, test_int_operator_error(&(String){3, 2, "<="}) )
+  CHECK(449, test_int_operator_error(&(String){3, 2, "+="}) )
+  CHECK(450, test_int_operator_error(&(String){3, 2, "-="}) )
+  CHECK(451, test_bool_operator_error(&(String){3, 2, "or"}) )
+  CHECK(452, test_bool_operator_error(&(String){4, 3, "and"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -379,7 +517,7 @@ Returncode test_int_operator_error(String* operator);
 static char* _func_name_test_int_operator_error = "test-int-operator-error";
 #define MR_FUNC_NAME _func_name_test_int_operator_error
 Returncode test_int_operator_error(String* operator) {
-  CHECK(322, test_operator_error(operator, &(String){4, 3, "Int"}, &(String){5, 4, "Bool"}) )
+  CHECK(455, test_operator_error(operator, &(String){4, 3, "Int"}, &(String){5, 4, "Bool"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -391,7 +529,7 @@ Returncode test_bool_operator_error(String* operator);
 static char* _func_name_test_bool_operator_error = "test-bool-operator-error";
 #define MR_FUNC_NAME _func_name_test_bool_operator_error
 Returncode test_bool_operator_error(String* operator) {
-  CHECK(325, test_operator_error(operator, &(String){5, 4, "Bool"}, &(String){4, 3, "Int"}) )
+  CHECK(458, test_operator_error(operator, &(String){5, 4, "Bool"}, &(String){4, 3, "Int"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -404,22 +542,22 @@ static char* _func_name_test_operator_error = "test-operator-error";
 #define MR_FUNC_NAME _func_name_test_operator_error
 Returncode test_operator_error(String* operator, String* expected_type, String* actual_type) {
   String* input_text = &(String){128, 0, (char[128]){0}};
-  CHECK(330, String_copy(input_text, &(String){3, 2, "2 "}) )
-  CHECK(331, String_concat(input_text, operator) )
-  CHECK(332, String_concat(input_text, &(String){9, 8, " (i > 4)"}) )
+  CHECK(463, String_copy(input_text, &(String){3, 2, "2 "}) )
+  CHECK(464, String_concat(input_text, operator) )
+  CHECK(465, String_concat(input_text, &(String){9, 8, " (i > 4)"}) )
   String* expected_error = &(String){128, 0, (char[128]){0}};
-  CHECK(334, String_copy(expected_error, &(String){11, 10, "operator \""}) )
-  CHECK(335, String_concat(expected_error, operator) )
-  CHECK(336, String_concat(expected_error, &(String){13, 12, "\" expected \""}) )
-  CHECK(337, String_concat(expected_error, expected_type) )
-  CHECK(338, String_concat(expected_error, &(String){17, 16, "\" operand, got \""}) )
-  CHECK(339, String_concat(expected_error, actual_type) )
-  CHECK(340, String_concat(expected_error, &(String){2, 1, "\""}) )
-  CHECK(341, test_code_error(input_text, expected_error) )
-  CHECK(342, String_copy(input_text, &(String){9, 8, "(i > 4) "}) )
-  CHECK(343, String_concat(input_text, operator) )
-  CHECK(344, String_concat(input_text, &(String){3, 2, " 2"}) )
-  CHECK(345, test_code_error(input_text, expected_error) )
+  CHECK(467, String_copy(expected_error, &(String){11, 10, "operator \""}) )
+  CHECK(468, String_concat(expected_error, operator) )
+  CHECK(469, String_concat(expected_error, &(String){13, 12, "\" expected \""}) )
+  CHECK(470, String_concat(expected_error, expected_type) )
+  CHECK(471, String_concat(expected_error, &(String){17, 16, "\" operand, got \""}) )
+  CHECK(472, String_concat(expected_error, actual_type) )
+  CHECK(473, String_concat(expected_error, &(String){2, 1, "\""}) )
+  CHECK(474, test_code_error(input_text, expected_error) )
+  CHECK(475, String_copy(input_text, &(String){9, 8, "(i > 4) "}) )
+  CHECK(476, String_concat(input_text, operator) )
+  CHECK(477, String_concat(input_text, &(String){3, 2, " 2"}) )
+  CHECK(478, test_code_error(input_text, expected_error) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -432,10 +570,10 @@ Returncode test_question_expression();
 static char* _func_name_test_question_expression = "test-question-expression";
 #define MR_FUNC_NAME _func_name_test_question_expression
 Returncode test_question_expression() {
-  CHECK(349, test_code(&(String){10, 9, "b := str?"}, &(String){17, 16, "b = str != NULL;"}) )
-  CHECK(350, test_code(&(String){14, 13, "b := not str?"}, &(String){21, 20, "b = ! (str != NULL);"}) )
-  CHECK(351, test_code_error(&(String){10, 9, "(i := 2)?"}, &(String){34, 33, "cannot use \"?\" on void expression"}) )
-  CHECK(352, test_code_error(&(String){3, 2, "i?"}, &(String){29, 28, "cannot use \"?\" on type \"Int\""}) )
+  CHECK(482, test_code(&(String){10, 9, "b := str?"}, &(String){17, 16, "b = str != NULL;"}) )
+  CHECK(483, test_code(&(String){14, 13, "b := not str?"}, &(String){21, 20, "b = ! (str != NULL);"}) )
+  CHECK(484, test_code_error(&(String){10, 9, "(i := 2)?"}, &(String){34, 33, "cannot use \"?\" on void expression"}) )
+  CHECK(485, test_code_error(&(String){3, 2, "i?"}, &(String){29, 28, "cannot use \"?\" on type \"Int\""}) )
   return OK;
 }
 #undef MR_FUNC_NAME

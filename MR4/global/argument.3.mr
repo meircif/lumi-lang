@@ -25,6 +25,9 @@ class Argument(SyntaxTreeNode)
   func dynamic get-type-instance():(user TypeInstance type-instance)
     raise
   
+  func dynamic m-check-calling(user TypeInstance type-instance)
+    raise
+  
   func dynamic get-variable():(user SyntaxTreeVariable variable)
     raise
   
@@ -160,8 +163,7 @@ class FunctionArguments(SyntaxTreeNode)
     user ListNode{Argument} other-node(other.parameters.first)
     do
       while ? my-node and ? other-node
-      my-node.item.get-type-instance().m-check-assign-to(
-          user other-node.item.get-type-instance(), user self)
+      my-node.item.m-check-calling(user other-node.item.get-type-instance())
       my-node := my-node.next
       other-node := other-node.next
     if ? my-node
@@ -173,8 +175,7 @@ class FunctionArguments(SyntaxTreeNode)
     other-node := other.outputs.first
     do
       while ? my-node and ? other-node
-      other-node.item.get-type-instance().m-check-assign-to(
-          user my-node.item.get-type-instance(), user self)
+      my-node.item.m-check-calling(user other-node.item.get-type-instance())
       my-node := my-node.next
       other-node := other-node.next
     if ? my-node

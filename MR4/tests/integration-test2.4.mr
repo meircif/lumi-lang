@@ -5,6 +5,7 @@ This file should onlw work together with test file #1.
 
 
 class MiddleType(BaseType)
+  var Int num-mid
   user BaseType mid-base-ref
   user TopType mid-top-ref
   

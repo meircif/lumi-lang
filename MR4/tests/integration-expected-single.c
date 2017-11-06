@@ -70,7 +70,9 @@ Returncode test_call_expression(void);
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.set"
 Returncode TestStruct_set(TestStruct* self, Int x, String* s) {
+  if (self == NULL) RAISE(136)
   self->num = x;
+  if (self == NULL) RAISE(137)
   self->text = s;
   return OK;
 }
@@ -80,7 +82,9 @@ Returncode TestStruct_set(TestStruct* self, Int x, String* s) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.get"
 Returncode TestStruct_get(TestStruct* self, Int* x, String** s) {
+  if (self == NULL) RAISE(144)
   *x = self->num;
+  if (self == NULL) RAISE(145)
   *s = self->text;
   return OK;
 }
@@ -118,8 +122,20 @@ Returncode test_const_expression(Int* i, Char* c, String** s, TestStruct** t) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-member-expression"
 Returncode test_member_expression(TestStruct* t, TestStruct** to, Int* i) {
+  if (t == NULL) RAISE(39)
+  if (t->ts == NULL) RAISE(39)
+  if (t->ts->ts == NULL) RAISE(39)
+  if (t == NULL) RAISE(39)
+  if (t->ts == NULL) RAISE(39)
+  if ((*to) == NULL) RAISE(39)
+  if (t == NULL) RAISE(39)
   t->num = ((*to)->num + t->ts->num) + t->ts->ts->num;
+  if (t == NULL) RAISE(40)
+  if ((*to) == NULL) RAISE(40)
   (*to)->num = t->num;
+  if (t == NULL) RAISE(41)
+  if (t->ts == NULL) RAISE(41)
+  if (t->ts->ts == NULL) RAISE(41)
   t->ts->ts->num = 4;
   return OK;
 }
@@ -178,7 +194,9 @@ Returncode test_slice_expression(String* s, Array* arri, Array* arrs, Array* arr
   aux_Array_3_Var.values = (Byte*)((arrt)->values) + (2);
   if ((2) < 0 || (4) < 0 || (2) + (4) > (arrt)->length) RAISE(51)
   if ((1) < 0 || (1) >= (aux_Array_3)->length) RAISE(51)
+  if ((((TestStruct**)((aux_Array_3)->values))[1]) == NULL) RAISE(51)
   if ((4) < 0 || (4) >= (arrt)->length) RAISE(51)
+  if ((((TestStruct**)((arrt)->values))[4]) == NULL) RAISE(51)
   if ((2) < 0 || (2) >= (arri)->length) RAISE(51)
   if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (((*i) + 3) - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(51)
   *i = (((((Int*)((arri)->values))[((*i) + 3) - (((Int*)((arri)->values))[2])]) + (((TestStruct**)((arrt)->values))[4])->num) + (((TestStruct**)((aux_Array_3)->values))[1])->num) + (((Int*)((aux_Array_2)->values))[1]);

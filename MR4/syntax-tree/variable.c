@@ -489,7 +489,7 @@ Returncode SyntaxTreeVariableInit_analyze(SyntaxTreeVariableInit* self) {
     CHECK(272, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){37, 36, "cannot initialize non-primitive type"}, self->_base.variable->type_instance->type_data->name) )
   }
   CHECK(275, (self->value)->_base._dtl[1](self->value) )
-  CHECK(276, TypeInstance_m_check_assign_to(self->value->result_type, self->_base.variable->type_instance, &(self->_base._base._base)) )
+  CHECK(276, TypeInstance_m_check_assign_from(self->_base.variable->type_instance, &(self->_base._base._base), &(self->value)) )
   return OK;
 }
 #undef MR_FUNC_NAME

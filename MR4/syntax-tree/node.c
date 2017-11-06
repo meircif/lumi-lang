@@ -75,27 +75,27 @@ Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, I
 static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_get_access
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
-  Bool _Bool80;
-  CHECK(25, String_equal(access_str, &(String){5, 4, "copy"}, &(_Bool80)) )
-  if (_Bool80) {
+  Bool _Bool78;
+  CHECK(25, String_equal(access_str, &(String){5, 4, "copy"}, &(_Bool78)) )
+  if (_Bool78) {
     (*access) = ACCESS_COPY;
   }
   else {
-    Bool _Bool81;
-    CHECK(27, String_equal(access_str, &(String){5, 4, "user"}, &(_Bool81)) )
-    if (_Bool81) {
+    Bool _Bool79;
+    CHECK(27, String_equal(access_str, &(String){5, 4, "user"}, &(_Bool79)) )
+    if (_Bool79) {
       (*access) = ACCESS_USER;
     }
     else {
-      Bool _Bool82;
-      CHECK(29, String_equal(access_str, &(String){6, 5, "owner"}, &(_Bool82)) )
-      if (_Bool82) {
+      Bool _Bool80;
+      CHECK(29, String_equal(access_str, &(String){6, 5, "owner"}, &(_Bool80)) )
+      if (_Bool80) {
         (*access) = ACCESS_OWNER;
       }
       else {
-        Bool _Bool83;
-        CHECK(31, String_equal(access_str, &(String){4, 3, "var"}, &(_Bool83)) )
-        if (_Bool83) {
+        Bool _Bool81;
+        CHECK(31, String_equal(access_str, &(String){4, 3, "var"}, &(_Bool81)) )
+        if (_Bool81) {
           (*access) = ACCESS_VAR;
         }
         else {
@@ -131,13 +131,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(42)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char84;
-    CHECK(44, read_c(&(_Char84)) )
-    CHECK(44, String_append(actual_text, _Char84) )
+    Char _Char82;
+    CHECK(44, read_c(&(_Char82)) )
+    CHECK(44, String_append(actual_text, _Char82) )
   }}
-  Bool _Bool85;
-  CHECK(45, String_equal(actual_text, expected_text, &(_Bool85)) )
-  if (!_Bool85) {
+  Bool _Bool83;
+  CHECK(45, String_equal(actual_text, expected_text, &(_Bool83)) )
+  if (!_Bool83) {
     CHECK(46, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);

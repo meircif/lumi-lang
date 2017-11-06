@@ -4,8 +4,9 @@
 
 var String{1024} mock-print-text
 var String{1024} mock-input-file-text
-var String{1024} mock-output-file-text
+var String{2048} mock-output-file-text
 var Int mock-input-file-index
+var Int mock-input-line-reset-index
 var Bool mock-print-active
 var Char mock-output-file-last
 
@@ -31,6 +32,8 @@ mock file-getc(user File file):(copy Char ch)
     ch := EOF
     return
   ch := mock-input-file-text[mock-input-file-index]
+  if mock-input-file-index = mock-input-line-reset-index
+    glob.line-number := 1
   mock-input-file-index += 1
 
 mock file-putc(user File file, copy Char ch)

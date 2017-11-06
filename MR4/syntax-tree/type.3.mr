@@ -42,8 +42,10 @@ class TypeData(SyntaxTreeNamespace)
     new TypeInstance in type-instance
     type-instance.type-data := self
   
-  func inst m-find-field(user String name):(user SyntaxTreeVariable field)
+  func inst m-find-field(user String name):(
+      user SyntaxTreeVariable field, copy Int bases)
     user TypeData type-data(self)
+    bases := 0
     do
       while ? type-data
       user ListNode{SyntaxTreeVariable} child(type-data.variables.first)
@@ -54,10 +56,13 @@ class TypeData(SyntaxTreeNamespace)
           return
         child := child.next
       type-data := type-data.base-type
+      bases += 1
     field := _
   
-  func inst m-find-meth(user String name):(user SyntaxTreeFunction method)
+  func inst m-find-meth(user String name):(
+      user SyntaxTreeFunction method, copy Int bases)
     user TypeData type-data(self)
+    bases := 0
     do
       while ? type-data
       user ListNode{SyntaxTreeFunction} child(type-data.functions.first)
@@ -68,6 +73,7 @@ class TypeData(SyntaxTreeNamespace)
           return
         child := child.next
       type-data := type-data.base-type
+      bases += 1
     method := _
   
   func inst m-order-bases(user List{TypeData} ordered-list)
@@ -271,8 +277,16 @@ static TypeInstance
     if ? self.sub-type
       self.sub-type.analyze-part(user node, copy check-types, copy check-length)
   
+  func inst m-check-assign-from(user SyntaxTreeNode node):(
+      owner Expression value)
+    var Int bases
+    value.result-type.m-check-assign-to(user self, user node):(copy bases)
+    if bases > 0
+      UpCastExpression.init-new(var _, copy bases):(owner value)
+  
   func inst m-check-assign-to(
-      user TypeInstance target, user SyntaxTreeNode node)
+      user TypeInstance target, user SyntaxTreeNode node):(copy Int bases)
+    bases := 0
     if not (? self.type-data)
       node.m-syntax-error-msg(user "cannot assign void expression")
     if not (? target.type-data)
@@ -289,6 +303,7 @@ static TypeInstance
             user "into",
             user target.type-data.name)
       base-type := base-type.base-type
+      bases += 1
     
     self.m-check-sub-equal(user target, user node)
   

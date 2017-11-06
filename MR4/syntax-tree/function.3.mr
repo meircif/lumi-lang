@@ -97,11 +97,14 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst write-header()
     write(user "Returncode ")
+    self.write-cname()
+    self.arguments.write(copy true)
+  
+  func inst write-cname()
     if ? self.parent-type
       write-cname(user self.parent-type.name)
       write(user "_")
     write-cname(user self.name)
-    self.arguments.write(copy true)
   
   func inst write-pointer()
     write(user "Returncode (*")

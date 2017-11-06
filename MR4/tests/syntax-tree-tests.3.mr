@@ -202,17 +202,17 @@ test test-code-variables()
       user "new Test t", user "Test* t = NULL;\n  t = calloc(1, sizeof(Test));")
   test-code(
       user "new String{arr[0]} s",
-      user "String* s = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n  s = MR_new_string(((Int*)((arr)->values))[0]);")
+      user "String* s = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  s = MR_new_string(((Int*)((arr)->values))[0]);")
   test-code(
       user "new Array{arr[0]:Int} a",
-      user "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n  a = MR_new_array(((Int*)((arr)->values))[0], sizeof(Int));")
+      user "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  a = MR_new_array(((Int*)((arr)->values))[0], sizeof(Int));")
   test-code(
       user "new Array{arr[0]:Test} a",
-      user "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n  a = MR_new_array(((Int*)((arr)->values))[0], sizeof(Test));")
+      user "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  a = MR_new_array(((Int*)((arr)->values))[0], sizeof(Test));")
   var String{1024} expected
   expected.copy(user "Array* sa = NULL;\n")
-  expected.concat(user "  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n")
-  expected.concat(user "  if ((1) < 0 || (1) >= (arr)->length) RAISE(4)\n")
+  expected.concat(user "  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n")
+  expected.concat(user "  if ((1) < 0 || (1) >= (arr)->length) RAISE(1)\n")
   expected.concat(user "  sa = MR_new_array(((Int*)((arr)->values))[0], ")
   expected.concat(user "sizeof(String) + (((Int*)((arr)->values))[1]));\n")
   expected.concat(user "  MR_set_new_string_array(")
@@ -221,7 +221,7 @@ test test-code-variables()
   test-code(user "new Array{arr[0]:String{arr[1]}} sa", user expected)
   test-code(
       user "var Int x(arr[0])",
-      user "Int x = 0;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(4)\n  x = ((Int*)((arr)->values))[0];")
+      user "Int x = 0;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  x = ((Int*)((arr)->values))[0];")
   test-code(user "user String s(str)", user "String* s = NULL;\n  s = str;")
   expected.copy(user "char s_Values[12];\n")
   expected.concat(user "  String s_Var = {12, 0, NULL};\n")
@@ -232,11 +232,15 @@ test test-code-variables()
   expected.concat(user "  aux_String_0->max_length = 12;\n")
   expected.concat(user "  aux_String_0->length = 11;\n")
   expected.concat(user "  aux_String_0->values = \"some string\";\n")
-  expected.concat(user "  CHECK(4, String_copy(s, aux_String_0) )")
+  expected.concat(user "  CHECK(1, String_copy(s, aux_String_0) )")
   test-code(user "var String{12} s(\"some string\")", user expected)
   test-code(
       user "new String{i} s(str)",
-      user "String* s = NULL;\n  s = MR_new_string(i);\n  CHECK(4, String_copy(s, str) )")
+      user "String* s = NULL;\n  s = MR_new_string(i);\n  CHECK(1, String_copy(s, str) )")
+  test-code(user "user Tb tb(tc)", user "Tb* tb = NULL;\n  tb = &(tc->_base);")
+  test-code(
+      user "user Test tt(tc)",
+      user "Test* tt = NULL;\n  tt = &(tc->_base._base._base);")
   test-code-error(
       user "var Int", user "expected space after type, got \"new-line\"")
   test-global-scope-error(
