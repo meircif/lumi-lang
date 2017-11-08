@@ -66,7 +66,7 @@ static char* _func_name_SyntaxTreeAssert_write = "SyntaxTreeAssert.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeAssert_write
 Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self) {
   /* TEST_ASSERT(`line`, `tested`) */
-  CHECK(22, (self->tested)->_base._dtl[4](self->tested) )
+  CHECK(22, (self->tested)->_base._dtl[5](self->tested) )
   CHECK(23, write(&(String){13, 12, "TEST_ASSERT("}) )
   CHECK(24, SyntaxTreeNode_write_line_num(&(self->_base._base)) )
   CHECK(25, write(&(String){3, 2, ", "}) )
@@ -144,7 +144,7 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
   CHECK(51, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
   CHECK(52, write(&(String){35, 34, "#define RETURN_ERROR(value) break\n"}) )
   CHECK(53, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(54, (self->tested)->_base._dtl[4](self->tested) )
+  CHECK(54, (self->tested)->_base._dtl[5](self->tested) )
   CHECK(55, write(&(String){22, 21, "\n#undef RETURN_ERROR\n"}) )
   CHECK(56, write(&(String){42, 41, "#define RETURN_ERROR(value) return value\n"}) )
   CHECK(57, SyntaxTreeCode_write_spaces(&(self->_base)) )

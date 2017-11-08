@@ -28,7 +28,7 @@ class TypeData(SyntaxTreeNamespace)
       read-new(user ")"):(owner self.base-type-name, copy end)
       if end != ')'
         self.m-syntax-error-c(
-            user "expected \")\" after base class, got", copy end)
+            user "expected \")\" after base type, got", copy end)
       read-c():(copy end)
     self.indentation-spaces := 2
     self.parse-block-children(user self, user _):(copy end)
@@ -170,7 +170,7 @@ class TypeData(SyntaxTreeNamespace)
   
   func inst write-dynamic-init(user TypeData type-data)
     write(user "{")
-    var Bool not-first(? type-data.base-type)
+    var Bool not-first(? type-data.base-type and type-data.base-type.is-dynamic)
     if not-first
       self.write-dynamic-init(user type-data.base-type)
     user NameMapNode{SyntaxTreeFunction} child(type-data.dynamic-base-methods.first)

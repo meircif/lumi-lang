@@ -80,6 +80,7 @@ class CallArgument(Argument)
   owner Expression value
   user SyntaxTreeCode code-node
   var Bool is-down-cast
+  var Bool is-dynamic
   
   func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
     self.code-node := code-node
@@ -99,6 +100,7 @@ class CallArgument(Argument)
           user self.value.result-type, user self) > 0
     else
       type-instance.m-check-assign-from(user self):(owner self.value)
+    self.is-dynamic := type-instance.type-data.is-dynamic
   
   func dynamic get-output():(user Expression output)
     output := self.value
@@ -115,7 +117,7 @@ class CallArgument(Argument)
       self.code-node.write-spaces()
   
   func dynamic write()
-    # &(`value`)
+    # [&(]`value`[)][, [&(]`value`_Dynamic[)]]
     if self.is-output
       if self.is-down-cast
         write(user "(void*)")
@@ -123,6 +125,16 @@ class CallArgument(Argument)
     self.value.write()
     if self.is-output
       write(user ")")
+    if self.is-dynamic
+      write(user ", ")
+      if self.is-output
+        if self.is-down-cast
+          write(user "(void*)")
+        write(user "&(")
+      self.value.write-dynamic()
+      if self.is-output
+        write(user ")")
+      
 
 
 class CallArgumentFactory(ArgumentFactory)

@@ -167,6 +167,10 @@ class Expression(SyntaxTreeNode)
     string-new-copy(user symbol.variable.name):(owner symbol.name)
     expression := symbol
   
+  func dynamic write-dynamic()
+    self.write()
+    write(user "_Dynamic")
+  
   func dynamic analyze-call(user FunctionArguments arguments)
     # do noting
   

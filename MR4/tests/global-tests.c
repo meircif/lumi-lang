@@ -26,7 +26,7 @@ String* mock_input_file_text = &(String){1024, 0, (char[1024]){0}};
 #if MR_STAGE == MR_DECLARATIONS
 extern String* mock_output_file_text;
 #elif MR_STAGE == MR_FUNCTIONS
-String* mock_output_file_text = &(String){2048, 0, (char[2048]){0}};
+String* mock_output_file_text = &(String){4096, 0, (char[4096]){0}};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
 extern Int mock_input_file_index;

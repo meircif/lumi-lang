@@ -176,3 +176,6 @@ class EmptyExpression(Expression)
   
   func dynamic write()
     write(user "NULL")
+  
+  func dynamic write-dynamic()
+    self.write()

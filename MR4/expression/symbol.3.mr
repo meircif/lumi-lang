@@ -95,6 +95,7 @@ class BaseMethExpression(Expression)
 ## An instance member expression
 class MemberExpression(SymbolExpression)
   owner Expression instance
+  user Expression self-instance
   var Int bases
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
@@ -159,29 +160,42 @@ class MemberExpression(SymbolExpression)
       self-param.value := self.instance
       self-param.value.top := true
       arguments.parameters.m-prepend(owner self-param)
-    self.bases := 0
+      self.self-instance := self.instance
     self.instance := _
   
   func dynamic write-preactions()
-    if not (? self.instance)
+    if not ((? self.instance and
+        self.instance.result-type.type-data != glob.type-type) or
+        (? self.function and ? self.self-instance and self.function.is-dynamic))
       return
-    self.instance.write-preactions()
-    if self.instance.result-type.type-data != glob.type-type
-      # if (`instance` == NULL) RAISE(`line-num`)
-      write(user "if (")
-      self.instance.write()
-      write(user " == NULL) ")
-      self.write-raise()
-      write(user "\n")
-      self.code-node.write-spaces()
-  
-  func dynamic write()
+    if ? self.instance
+      self.instance.write-preactions()
+    # if (`instance` == NULL) RAISE(`line-num`)
+    write(user "if (")
     if ? self.instance
       self.instance.write()
-      write(user "->")
-      for n in self.bases
-        write(user "_base.")
+    else-if ? self.self-instance
+      self.self-instance.write-dynamic()
+    write(user " == NULL) ")
+    self.write-raise()
+    write(user "\n")
+    self.code-node.write-spaces()
+  
+  func dynamic write()
+    if ? self.function and ? self.self-instance and self.function.is-dynamic
+      self.self-instance.write-dynamic()
+      self.write-bases()
+      write-cname(user self.function.name)
+      return
+    if ? self.instance and self.instance.result-type.type-data != glob.type-type
+      self.instance.write()
+      self.write-bases()
     base.write()
+  
+  func inst write-bases()
+    write(user "->")
+    for n in self.bases
+      write(user "_base.")
 
 
 ## An instance member expression
@@ -204,8 +218,19 @@ class UpCastExpression(Expression)
   
   func dynamic write()
     # &(`expression`->_base[._base]...)
-    write(user "&(")
+    self.write-pre()
     self.expression.write()
+    self.write-post()
+  
+  func dynamic write-dynamic()
+    self.write-pre()
+    self.expression.write-dynamic()
+    self.write-post()
+  
+  func inst write-pre()
+    write(user "&(")
+  
+  func inst write-post()
     write(user "->_base")
     for n in 1:self.bases
       write(user "._base")

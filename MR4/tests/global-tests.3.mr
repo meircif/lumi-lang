@@ -4,7 +4,7 @@
 
 var String{1024} mock-print-text
 var String{1024} mock-input-file-text
-var String{2048} mock-output-file-text
+var String{4096} mock-output-file-text
 var Int mock-input-file-index
 var Int mock-input-line-reset-index
 var Bool mock-print-active

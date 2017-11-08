@@ -64,7 +64,7 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
   if ((*end) == '(') {
     CHECK(28, read_new(&(String){2, 1, ")"}, &(self->base_type_name), &((*end))) )
     if ((*end) != ')') {
-      CHECK(30, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){35, 34, "expected \")\" after base class, got"}, (*end)) )
+      CHECK(30, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){34, 33, "expected \")\" after base type, got"}, (*end)) )
     }
     CHECK(32, read_c(&((*end))) )
   }
@@ -324,7 +324,7 @@ static char* _func_name_TypeData_write_dynamic_init = "TypeData.write-dynamic-in
 #define MR_FUNC_NAME _func_name_TypeData_write_dynamic_init
 Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data) {
   CHECK(172, write(&(String){2, 1, "{"}) )
-  Bool not_first = NULL != type_data->base_type;
+  Bool not_first = NULL != type_data->base_type && type_data->base_type->is_dynamic;
   if (not_first) {
     CHECK(175, TypeData_write_dynamic_init(self, type_data->base_type) )
   }

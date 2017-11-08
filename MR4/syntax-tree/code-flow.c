@@ -200,7 +200,7 @@ Returncode SyntaxTreeIf_write(SyntaxTreeIf* self);
 static char* _func_name_SyntaxTreeIf_write = "SyntaxTreeIf.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_write
 Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
-  CHECK(73, (self->condition)->_base._dtl[4](self->condition) )
+  CHECK(73, (self->condition)->_base._dtl[5](self->condition) )
   CHECK(74, write(&(String){5, 4, "if ("}) )
   CHECK(75, (self->condition)->_base._dtl[2](self->condition) )
   CHECK(76, write(&(String){2, 1, ")"}) )
@@ -408,9 +408,9 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
   /*    `block...` */
   /* }} */
   if (NULL != self->start) {
-    CHECK(161, (self->start)->_base._dtl[4](self->start) )
+    CHECK(161, (self->start)->_base._dtl[5](self->start) )
   }
-  CHECK(162, (self->upper_bound)->_base._dtl[4](self->upper_bound) )
+  CHECK(162, (self->upper_bound)->_base._dtl[5](self->upper_bound) )
   CHECK(163, write(&(String){6, 5, "{int "}) )
   CHECK(164, write_cname(self->index_name) )
   CHECK(165, write(&(String){7, 6, "; for("}) )

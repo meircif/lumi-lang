@@ -256,6 +256,18 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstanc
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode Expression_write_dynamic(Expression* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
+#define MR_FUNC_NAME _func_name_Expression_write_dynamic
+Returncode Expression_write_dynamic(Expression* self) {
+  CHECK(171, (self)->_base._dtl[2](self) )
+  CHECK(172, write(&(String){9, 8, "_Dynamic"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_analyze_call = "Expression.analyze-call";
@@ -281,7 +293,7 @@ Returncode Expression_write_preactions(Expression* self) {
 extern Func Expression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Expression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func Expression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

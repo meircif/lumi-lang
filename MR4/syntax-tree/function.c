@@ -607,7 +607,7 @@ Returncode DeclarationArgument_write(DeclarationArgument* self);
 static char* _func_name_DeclarationArgument_write = "DeclarationArgument.write";
 #define MR_FUNC_NAME _func_name_DeclarationArgument_write
 Returncode DeclarationArgument_write(DeclarationArgument* self) {
-  /* `type`** `name` */
+  /* `type`[*][*] `name`[, `type`_Dynamic*[*] `name`_Dynamic] */
   CHECK(251, write_cname(self->variable->type_instance->type_data->name) )
   if (self->_base.access != ACCESS_COPY) {
     CHECK(253, write(&(String){2, 1, "*"}) )
@@ -617,6 +617,17 @@ Returncode DeclarationArgument_write(DeclarationArgument* self) {
   }
   CHECK(256, write(&(String){2, 1, " "}) )
   CHECK(257, write_cname(self->variable->name) )
+  if (self->variable->type_instance->type_data->is_dynamic) {
+    CHECK(259, write(&(String){3, 2, ", "}) )
+    CHECK(260, write_cname(self->variable->type_instance->type_data->name) )
+    CHECK(261, write(&(String){10, 9, "_Dynamic*"}) )
+    if (self->_base.is_output) {
+      CHECK(263, write(&(String){2, 1, "*"}) )
+    }
+    CHECK(264, write(&(String){2, 1, " "}) )
+    CHECK(265, write_cname(self->variable->name) )
+    CHECK(266, write(&(String){9, 8, "_Dynamic"}) )
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -643,7 +654,7 @@ static char* _func_name_DeclarationArgumentFactory_m_new_argument = "Declaration
 #define MR_FUNC_NAME _func_name_DeclarationArgumentFactory_m_new_argument
 Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory* self, Argument** new_argument) {
   DeclarationArgument* _DeclarationArgument85 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument85 == NULL) RAISE(262)
+  if (_DeclarationArgument85 == NULL) RAISE(271)
   *_DeclarationArgument85 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
   _DeclarationArgument85->_base._base._dtl = DeclarationArgument__dtl;
   (*new_argument) = &(_DeclarationArgument85->_base);

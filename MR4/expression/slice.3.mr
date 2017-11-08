@@ -29,7 +29,6 @@ class SliceExpression(Expression)
   
   func dynamic analyze()
     self.sequence.analyze()
-    self.assignable := self.sequence.assignable and not (? self.second-index)
     if not (? self.sequence.result-type)
       self.m-syntax-error-msg(user "cannot slice a void expression")
     if self.sequence.result-type.type-data = glob.type-string
@@ -42,6 +41,8 @@ class SliceExpression(Expression)
       self.m-syntax-error(
           user "cannot slice type",
           user self.sequence.result-type.type-data.name)
+    self.assignable := self.sequence.assignable and
+        not (? self.second-index) and self.result-type.type-data.is-primitive
     
     self.index.analyze()
     self.m-check-index(user self.index)
@@ -146,3 +147,8 @@ class SliceExpression(Expression)
     write(user "]")
     if not self.top
       write(user ")")
+  
+  func dynamic write-dynamic()
+    write(user "&")
+    write-cname(user self.result-type.type-data.name)
+    write(user "_dynamic")

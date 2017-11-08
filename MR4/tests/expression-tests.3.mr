@@ -6,36 +6,42 @@ func test-code-setup(user String input-text)
   mock-input-file-text.concat(user "struct Test\n")
   mock-input-file-text.concat(user "  var Int num\n")
   mock-input-file-text.concat(user "  func meth()\n")
-  mock-input-file-text.concat(user "struct Ta(Test)\n")
+  mock-input-file-text.concat(user "class Ta(Test)\n")
   mock-input-file-text.concat(user "  var Int numa\n")
-  mock-input-file-text.concat(user "  func metha()\n")
-  mock-input-file-text.concat(user "struct Tb(Ta)\n")
+  mock-input-file-text.concat(user "  func inst metha()\n")
+  mock-input-file-text.concat(user "  func dynamic dyna()\n")
+  mock-input-file-text.concat(user "class Tb(Ta)\n")
   mock-input-file-text.concat(user "  var Int numb\n")
-  mock-input-file-text.concat(user "  func methb()\n")
-  mock-input-file-text.concat(user "struct Tc(Tb)\n")
+  mock-input-file-text.concat(user "  func inst methb()\n")
+  mock-input-file-text.concat(user "  func dynamic dynb()\n")
+  mock-input-file-text.concat(user "class Tc(Tb)\n")
   mock-input-file-text.concat(user "  var Int numc\n")
-  mock-input-file-text.concat(user "  func methc()\n")
+  mock-input-file-text.concat(user "  func inst methc()\n")
+  mock-input-file-text.concat(user "  func dynamic dync()\n")
   mock-input-file-text.concat(user "")
   mock-input-file-text.concat(user "func fun0()\n")
-  mock-input-file-text.concat(
-      user "func fun1(copy Int x, user String s, owner String o)\n")
-  mock-input-file-text.concat(
-      user "func fun2()->(owner String s, copy Int x)\n")
+  mock-input-file-text.concat(user "func fun1(copy Int x, user String s")
+  mock-input-file-text.concat(user ", owner String o)\n")
+  mock-input-file-text.concat(user "func fun2()->(owner String s")
+  mock-input-file-text.concat(user ", copy Int x)\n")
   mock-input-file-text.concat(user "func fun3(copy Int x)->(owner String s)\n")
   mock-input-file-text.concat(user "func fun4(copy Int x)\n")
   mock-input-file-text.concat(user "func fun5(copy Int x)->(copy Int y)\n")
-  mock-input-file-text.concat(
-      user "func fun6(copy Int x, copy Int y)->(copy Int n, copy Int m)\n")
+  mock-input-file-text.concat(user "func fun6(copy Int x")
+  mock-input-file-text.concat(user ", copy Int y)->(copy Int n, copy Int m)\n")
   mock-input-file-text.concat(user "func fun7()->(user Tb tb)\n")
-  mock-input-file-text.concat(user "func mock(copy Int i")
-  mock-input-file-text.concat(user ", copy Char c")
-  mock-input-file-text.concat(user ", copy Bool b")
-  mock-input-file-text.concat(user ", user String str")
-  mock-input-file-text.concat(user ", user Array{Int} arr")
-  mock-input-file-text.concat(user ", user Test t")
-  mock-input-file-text.concat(user ", user Tc tc")
-  mock-input-file-text.concat(user ")->(owner String so")
-  mock-input-file-text.concat(user ", copy Int io")
+  mock-input-file-text.concat(user "func mock(\n")
+  mock-input-file-text.concat(user "    copy Int i,\n")
+  mock-input-file-text.concat(user "    copy Char c,\n")
+  mock-input-file-text.concat(user "    copy Bool b,\n")
+  mock-input-file-text.concat(user "    user String str,\n")
+  mock-input-file-text.concat(user "    user Array{Int} arr,\n")
+  mock-input-file-text.concat(user "    user Test t,\n")
+  mock-input-file-text.concat(user "    user Ta ta,\n")
+  mock-input-file-text.concat(user "    user Tb tb,\n")
+  mock-input-file-text.concat(user "    user Tc tc)->(\n")
+  mock-input-file-text.concat(user "    owner String so,\n")
+  mock-input-file-text.concat(user "    copy Int io")
   mock-input-file-text.concat(user ")\n  ")
   mock-input-line-reset-index := mock-input-file-text.length
   mock-input-file-text.concat(user input-text)
@@ -53,16 +59,22 @@ func test-code(user String input-text, user String expected-output)
   mock-func-header.concat(user ", String* str")
   mock-func-header.concat(user ", Array* arr")
   mock-func-header.concat(user ", Test* t")
-  mock-func-header.concat(user ", Tc* tc")
+  mock-func-header.concat(user ", Ta* ta, Ta_Dynamic* ta_Dynamic")
+  mock-func-header.concat(user ", Tb* tb, Tb_Dynamic* tb_Dynamic")
+  mock-func-header.concat(user ", Tc* tc, Tc_Dynamic* tc_Dynamic")
   mock-func-header.concat(user ", String** so")
   mock-func-header.concat(user ", Int* io")
   mock-func-header.concat(user ")")
   user String empty-func-body(" {\n  return OK;\n}\n")
-  var String{2048} expected-header
+  var String{4096} expected-header
   expected-header.copy(user "\ntypedef struct Test Test;\n")
   expected-header.concat(user "typedef struct Ta Ta;\n")
+  expected-header.concat(user "typedef struct Ta_Dynamic Ta_Dynamic;\n")
   expected-header.concat(user "typedef struct Tb Tb;\n")
+  expected-header.concat(user "typedef struct Tb_Dynamic Tb_Dynamic;\n")
   expected-header.concat(user "typedef struct Tc Tc;\n")
+  expected-header.concat(user "typedef struct Tc_Dynamic Tc_Dynamic;\n")
+  
   expected-header.concat(user "struct Test {\n")
   expected-header.concat(user "  Int num;\n")
   expected-header.concat(user "};\n")
@@ -70,39 +82,83 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user "  Test _base;\n")
   expected-header.concat(user "  Int numa;\n")
   expected-header.concat(user "};\n")
+  expected-header.concat(user "struct Ta_Dynamic {\n")
+  expected-header.concat(user "  Returncode (*dyna)(Ta* self")
+  expected-header.concat(user ", Ta_Dynamic* self_Dynamic);\n")
+  expected-header.concat(user "};\n")
   expected-header.concat(user "struct Tb {\n")
   expected-header.concat(user "  Ta _base;\n")
   expected-header.concat(user "  Int numb;\n")
+  expected-header.concat(user "};\n")
+  expected-header.concat(user "struct Tb_Dynamic {\n")
+  expected-header.concat(user "  Ta_Dynamic _base;\n")
+  expected-header.concat(user "  Returncode (*dynb)(Tb* self")
+  expected-header.concat(user ", Tb_Dynamic* self_Dynamic);\n")
   expected-header.concat(user "};\n")
   expected-header.concat(user "struct Tc {\n")
   expected-header.concat(user "  Tb _base;\n")
   expected-header.concat(user "  Int numc;\n")
   expected-header.concat(user "};\n")
+  expected-header.concat(user "struct Tc_Dynamic {\n")
+  expected-header.concat(user "  Tb_Dynamic _base;\n")
+  expected-header.concat(user "  Returncode (*dync)(Tc* self")
+  expected-header.concat(user ", Tc_Dynamic* self_Dynamic);\n")
+  expected-header.concat(user "};\n")
+  
   expected-header.concat(user "Returncode Test_meth(Test* self);\n")
-  expected-header.concat(user "Returncode Ta_metha(Ta* self);\n")
-  expected-header.concat(user "Returncode Tb_methb(Tb* self);\n")
-  expected-header.concat(user "Returncode Tc_methc(Tc* self);\n")
-  expected-header.concat(user "")
+  expected-header.concat(user "Returncode Ta_metha(Ta* self")
+  expected-header.concat(user ", Ta_Dynamic* self_Dynamic);\n")
+  expected-header.concat(user "Returncode Ta_dyna(Ta* self")
+  expected-header.concat(user ", Ta_Dynamic* self_Dynamic);\n")
+  expected-header.concat(user "Returncode Tb_methb(Tb* self")
+  expected-header.concat(user ", Tb_Dynamic* self_Dynamic);\n")
+  expected-header.concat(user "Returncode Tb_dynb(Tb* self")
+  expected-header.concat(user ", Tb_Dynamic* self_Dynamic);\n")
+  expected-header.concat(user "Returncode Tc_methc(Tc* self")
+  expected-header.concat(user ", Tc_Dynamic* self_Dynamic);\n")
+  expected-header.concat(user "Returncode Tc_dync(Tc* self")
+  expected-header.concat(user ", Tc_Dynamic* self_Dynamic);\n")
+  
+  expected-header.concat(user "Ta_Dynamic Ta_dynamic = {Ta_dyna};\n")
+  expected-header.concat(user "Tb_Dynamic Tb_dynamic = {{Ta_dyna}")
+  expected-header.concat(user ", Tb_dynb};\n")
+  expected-header.concat(user "Tc_Dynamic Tc_dynamic = {{{Ta_dyna}, Tb_dynb}")
+  expected-header.concat(user ", Tc_dync};\n")
+  
   expected-header.concat(user "Returncode fun0(void);\n")
   expected-header.concat(user "Returncode fun1(Int x, String* s, String* o);\n")
   expected-header.concat(user "Returncode fun2(String** s, Int* x);\n")
   expected-header.concat(user "Returncode fun3(Int x, String** s);\n")
   expected-header.concat(user "Returncode fun4(Int x);\n")
   expected-header.concat(user "Returncode fun5(Int x, Int* y);\n")
-  expected-header.concat(
-      user "Returncode fun6(Int x, Int y, Int* n, Int* m);\n")
-  expected-header.concat(user "Returncode fun7(Tb** tb);\n")
+  expected-header.concat(user "Returncode fun6(Int x, Int y, Int* n")
+  expected-header.concat(user ", Int* m);\n")
+  expected-header.concat(user "Returncode fun7(Tb** tb")
+  expected-header.concat(user ", Tb_Dynamic** tb_Dynamic);\n")
   expected-header.concat(user mock-func-header)
   expected-header.concat(user ";\n")
+  
   expected-header.concat(user "Returncode Test_meth(Test* self)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Ta_metha(Ta* self)")
+  expected-header.concat(user "Returncode Ta_metha(Ta* self")
+  expected-header.concat(user ", Ta_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Tb_methb(Tb* self)")
+  expected-header.concat(user "Returncode Ta_dyna(Ta* self")
+  expected-header.concat(user ", Ta_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Tc_methc(Tc* self)")
+  expected-header.concat(user "Returncode Tb_methb(Tb* self")
+  expected-header.concat(user ", Tb_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "")
+  expected-header.concat(user "Returncode Tb_dynb(Tb* self")
+  expected-header.concat(user ", Tb_Dynamic* self_Dynamic)")
+  expected-header.concat(user empty-func-body)
+  expected-header.concat(user "Returncode Tc_methc(Tc* self")
+  expected-header.concat(user ", Tc_Dynamic* self_Dynamic)")
+  expected-header.concat(user empty-func-body)
+  expected-header.concat(user "Returncode Tc_dync(Tc* self")
+  expected-header.concat(user ", Tc_Dynamic* self_Dynamic)")
+  expected-header.concat(user empty-func-body)
+  
   expected-header.concat(user "Returncode fun0(void)")
   expected-header.concat(user empty-func-body)
   expected-header.concat(user "Returncode fun1(Int x, String* s, String* o)")
@@ -117,10 +173,12 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user empty-func-body)
   expected-header.concat(user "Returncode fun6(Int x, Int y, Int* n, Int* m)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode fun7(Tb** tb)")
+  expected-header.concat(user "Returncode fun7(Tb** tb")
+  expected-header.concat(user ", Tb_Dynamic** tb_Dynamic)")
   expected-header.concat(user empty-func-body)
   expected-header.concat(user mock-func-header)
   expected-header.concat(user " {\n  ")
+  
   user String expected-footer("\n  return OK;\n}\n")
   f-assert-string-slice(
       user expected-header,
@@ -275,6 +333,9 @@ test test-slice-expression()
       user "str[2:5] := str", user "assigning into non assignable expression")
   test-code-error(
       user "arr[7:2] := arr", user "assigning into non assignable expression")
+  test-code-error(
+      user "user Array{Test} at\n  at[0] := t",
+      user "assigning into non assignable expression")
 
 
 test test-call-expression()
@@ -304,13 +365,12 @@ test test-call-expression()
   test-code(
       user "so := fun3(copy 7)",
       user "String* aux_String_0 = NULL;\n  CHECK(1, fun3(7, &(aux_String_0)) )\n  *so = aux_String_0;")
-  test-code(user "tc.methc()", user "CHECK(1, Tc_methc(tc) )")
-  test-code(user "tc.methb()", user "CHECK(1, Tb_methb(&(tc->_base)) )")
+  test-code(user "tc.methc()", user "CHECK(1, Tc_methc(tc, tc_Dynamic) )")
+  test-code(
+      user "tc.methb()",
+      user "CHECK(1, Tb_methb(&(tc->_base), &(tc_Dynamic->_base)) )")
   test-code(
       user "tc.meth()", user "CHECK(1, Test_meth(&(tc->_base._base._base)) )")
-  test-code(
-      user "fun7()->(user t)",
-      user "if (t != NULL) RAISE(1)\n  CHECK(1, fun7((void*)&(t)) )")
   test-code-error(
       user "function( copy 1)", user "expected access, got \" \"")
   test-code-error(
@@ -338,7 +398,9 @@ test test-call-expression()
 
 test test-type-expression()
   test-code(user "Test.meth(var t)", user "CHECK(1, Test_meth(t) )")
-  test-code(user "Tb.methb(var tc)", user "CHECK(1, Tb_methb(&(tc->_base)) )")
+  test-code(
+      user "Tb.methb(var tc)",
+      user "CHECK(1, Tb_methb(&(tc->_base), &(tc_Dynamic->_base)) )")
   test-code(
       user "Tc.meth(var tc)",
       user "CHECK(1, Test_meth(&(tc->_base._base._base)) )")
@@ -445,9 +507,6 @@ test test-binary-expression()
   test-code(
       user "b := 2 < i < 12 < 2 * i",
       user "b = ((2 < i) && (i < 12)) && (12 < (2 * i));")
-  test-code(
-      user "user Tb tb\n  tb := tc",
-      user "Tb* tb = NULL;\n  tb = &(tc->_base);")
   test-code(user "t := tc", user "t = &(tc->_base._base._base);")
   test-code-error(user "345 @ 2", user "unknown operator \"@\"")
   test-code-error(user "80 +(", user "unexpected \"(\"")
@@ -513,3 +572,52 @@ test test-question-expression()
   test-code(user "b := not str?", user "b = ! (str != NULL);")
   test-code-error(user "(i := 2)?", user "cannot use \"?\" on void expression")
   test-code-error(user "i?", user "cannot use \"?\" on type \"Int\"")
+
+
+test test-dynamic()
+  test-code(
+      user "var Ta a",
+      user "Ta a_Var = {0};\n  Ta* a = &a_Var;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;")
+  test-code(
+      user "user Ta a", user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;")
+  test-code(
+      user "new Ta a",
+      user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;\n  a = calloc(1, sizeof(Ta));")
+  test-code(
+      user "user Ta a(ta)",
+      user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;\n  a = ta;\n  a_Dynamic = ta_Dynamic;")
+  test-code(user "ta := ta", user "ta_Dynamic = ta_Dynamic;\n  ta = ta;")
+  test-code(
+      user "ta := tb",
+      user "ta_Dynamic = &(tb_Dynamic->_base);\n  ta = &(tb->_base);")
+  test-code(
+      user "ta := tc",
+      user "ta_Dynamic = &(tc_Dynamic->_base._base);\n  ta = &(tc->_base._base);")
+  test-code(user "ta := _", user "ta_Dynamic = NULL;\n  ta = NULL;")
+  test-code(
+      user "user Array{Ta} aa\n  ta := aa[4]",
+      user "Array* aa = NULL;\n  if ((4) < 0 || (4) >= (aa)->length) RAISE(2)\n  ta_Dynamic = &Ta_dynamic;\n  ta = ((Ta**)((aa)->values))[4];")
+  test-code(
+      user "user Array{Tc} ca\n  ta := ca[4]",
+      user "Array* ca = NULL;\n  if ((4) < 0 || (4) >= (ca)->length) RAISE(2)\n  ta_Dynamic = &(&Tc_dynamic->_base._base);\n  ta = &((((Tc**)((ca)->values))[4])->_base._base);")
+  test-code(
+      user "ta.dyna()",
+      user "if (ta_Dynamic == NULL) RAISE(1)\n  CHECK(1, ta_Dynamic->dyna(ta, ta_Dynamic) )")
+  test-code(
+      user "tb.dyna()",
+      user "if (tb_Dynamic == NULL) RAISE(1)\n  CHECK(1, tb_Dynamic->_base.dyna(&(tb->_base), &(tb_Dynamic->_base)) )")
+  test-code(
+      user "tb.dynb()",
+      user "if (tb_Dynamic == NULL) RAISE(1)\n  CHECK(1, tb_Dynamic->dynb(tb, tb_Dynamic) )")
+  test-code(
+      user "tc.dyna()",
+      user "if (tc_Dynamic == NULL) RAISE(1)\n  CHECK(1, tc_Dynamic->_base._base.dyna(&(tc->_base._base), &(tc_Dynamic->_base._base)) )")
+  test-code(
+      user "tc.dynb()",
+      user "if (tc_Dynamic == NULL) RAISE(1)\n  CHECK(1, tc_Dynamic->_base.dynb(&(tc->_base), &(tc_Dynamic->_base)) )")
+  test-code(
+      user "tc.dync()",
+      user "if (tc_Dynamic == NULL) RAISE(1)\n  CHECK(1, tc_Dynamic->dync(tc, tc_Dynamic) )")
+  test-code(
+      user "fun7()->(user ta)",
+      user "if (ta != NULL) RAISE(1)\n  CHECK(1, fun7((void*)&(ta), (void*)&(ta_Dynamic)) )")

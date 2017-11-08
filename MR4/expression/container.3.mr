@@ -70,6 +70,7 @@ class UnaryExpression(Expression)
       user SyntaxTreeCode code-node):(
       copy Char end, user Operator next-operator)
     self.operator := operator
+    self.code-node := code-node
     self.set-location()
     if end = '\n'
       code-node.read-line-break-spaces()
@@ -203,6 +204,14 @@ class BinaryExpression(UnaryExpression)
   func dynamic write-preactions()
     base.write-preactions()
     self.left-expression.write-preactions()
+    if self.operator.order = 4 and self.operator.group-index = 0 and
+        self.left-expression.result-type.type-data.is-dynamic
+      # := operator to dynamic variable
+      self.left-expression.write-dynamic()
+      write(user " = ")
+      self.right-expression.write-dynamic()
+      write(user ";\n")
+      self.code-node.write-spaces()
   
   func dynamic write()
     self.write-start()

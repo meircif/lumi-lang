@@ -171,8 +171,28 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         write(user " = 0")
       else
         write(user " = NULL")
-    
     write(user ";")
+    
+    if self.type-instance.type-data.is-dynamic
+      # `type`_Dynamic* `name`_Dynamic[ = `type`_dynamic];
+      write(user "\n")
+      if ? self.parent
+        self.write-spaces()
+      else-if ? self.parent-type
+        write(user "  ")
+      write-cname(user self.type-instance.type-data.name)
+      write(user "_Dynamic* ")
+      write-cname(user self.name)
+      write(user "_Dynamic")
+      if ? self.parent
+        write(user " = ")
+        if self.access = ACCESS-VAR or self.access = ACCESS-NEW
+          write(user "&")
+          write-cname(user self.type-instance.type-data.name)
+          write(user "_dynamic")
+        else
+          write(user "NULL")
+      write(user ";")
 
 
 class BaseVariableInit(SyntaxTreeCode)
@@ -188,7 +208,7 @@ class BaseVariableInit(SyntaxTreeCode)
     self.parent.code-nodes.add(owner self)
 
 
-## Initialize dynamically allocated variable node in the syntax tree
+## Initialize sequence variable node in the syntax tree
 class SyntaxTreeInitVarSequence(BaseVariableInit)
   func inst init-new(user SyntaxTreeVariable variable)
     new SyntaxTreeInitVarSequence new-node
@@ -319,3 +339,11 @@ class SyntaxTreeVariableInit(BaseVariableInit)
       write(user " = ")
       self.value.write()
       write(user ";")
+      if self.variable.type-instance.type-data.is-dynamic
+        # `name`_Dynamic = `Type`_Dynamic;
+        write(user "\n")
+        self.write-spaces()
+        write-cname(user self.variable.name)
+        write(user "_Dynamic = ")
+        self.value.write-dynamic()
+        write(user ";")

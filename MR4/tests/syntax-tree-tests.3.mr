@@ -75,7 +75,7 @@ test test-general()
       user "variable name overrides function \"name\"")
 
 
-test test-type()
+test test-struct()
   test-global-scope(
       user "struct Test\n  var Int x",
       user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
@@ -91,8 +91,6 @@ test test-type()
   test-global-scope-error(
       user "struct(\n", user "expected space after \"struct\", got \"(\"")
   test-global-scope-error(
-      user "class(\n", user "expected space after \"class\", got \"(\"")
-  test-global-scope-error(
       user "struct error\n", user "illegal type name \"error\"")
   test-global-scope-error(
       user "struct ERrror\n", user "illegal type name \"ERrror\"")
@@ -104,11 +102,105 @@ test test-type()
       user "struct Test\nstruct Test\n", user "redefinition of type \"Test\"")
   test-global-scope-error(
       user "struct Test(Base\n",
-      user "expected \")\" after base class, got \"new-line\"")
+      user "expected \")\" after base type, got \"new-line\"")
   test-global-scope-error(
       user "struct Test\n  error ", user "unknown keyword \"error\"")
   test-global-scope-error(
       user "struct Test", user "expected block in a new line, got \"EOF\"")
+
+
+test test-class()
+  var String{2048} expected
+  expected.copy(user "typedef struct Base Base;\n")
+  expected.concat(user "typedef struct Base_Dynamic Base_Dynamic;\n")
+  expected.concat(user "typedef struct Mid Mid;\n")
+  expected.concat(user "typedef struct Mid_Dynamic Mid_Dynamic;\n")
+  expected.concat(user "typedef struct Top Top;\n")
+  expected.concat(user "typedef struct Top_Dynamic Top_Dynamic;\n")
+  
+  expected.concat(user "struct Base {\n")
+  expected.concat(user "  Int x;\n")
+  expected.concat(user "};\n")
+  expected.concat(user "struct Base_Dynamic {\n")
+  expected.concat(user "  Returncode (*dyn0)(Base* self")
+  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
+  expected.concat(user "  Returncode (*dyn1)(Base* self")
+  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
+  expected.concat(user "};\n")
+  expected.concat(user "struct Mid {\n")
+  expected.concat(user "  Base _base;\n")
+  expected.concat(user "  Int y;\n")
+  expected.concat(user "};\n")
+  expected.concat(user "struct Mid_Dynamic {\n")
+  expected.concat(user "  Base_Dynamic _base;\n")
+  expected.concat(user "  Returncode (*dyn2)(Mid* self")
+  expected.concat(user ", Mid_Dynamic* self_Dynamic);\n")
+  expected.concat(user "};\n")
+  expected.concat(user "struct Top {\n")
+  expected.concat(user "  Mid _base;\n")
+  expected.concat(user "  Int z;\n")
+  expected.concat(user "};\n")
+  expected.concat(user "struct Top_Dynamic {\n")
+  expected.concat(user "  Mid_Dynamic _base;\n")
+  expected.concat(user "  Returncode (*dyn3)(Top* self")
+  expected.concat(user ", Top_Dynamic* self_Dynamic);\n")
+  expected.concat(user "};\n")
+  
+  expected.concat(user "Returncode Base_stat(Base* self")
+  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
+  expected.concat(user "Returncode Base_dyn0(Base* self")
+  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
+  expected.concat(user "Returncode Base_dyn1(Base* self")
+  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
+  expected.concat(user "Returncode Mid_dyn0(Mid* self")
+  expected.concat(user ", Mid_Dynamic* self_Dynamic);\n")
+  expected.concat(user "Returncode Mid_dyn2(Mid* self")
+  expected.concat(user ", Mid_Dynamic* self_Dynamic);\n")
+  expected.concat(user "Returncode Top_dyn0(Top* self")
+  expected.concat(user ", Top_Dynamic* self_Dynamic);\n")
+  expected.concat(user "Returncode Top_dyn3(Top* self")
+  expected.concat(user ", Top_Dynamic* self_Dynamic);\n")
+  
+  expected.concat(user "Base_Dynamic Base_dynamic = {Base_dyn0, Base_dyn1};\n")
+  expected.concat(user "Mid_Dynamic Mid_dynamic = {{(Func)Mid_dyn0, Base_dyn1}")
+  expected.concat(user ", Mid_dyn2};\n")
+  expected.concat(user "Top_Dynamic Top_dynamic = {{{(Func)Top_dyn0")
+  expected.concat(user ", Base_dyn1}, Mid_dyn2}, Top_dyn3};\n")
+  
+  expected.concat(user "Returncode Base_stat(Base* self")
+  expected.concat(user ", Base_Dynamic* self_Dynamic) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode Base_dyn0(Base* self")
+  expected.concat(user ", Base_Dynamic* self_Dynamic) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode Base_dyn1(Base* self")
+  expected.concat(user ", Base_Dynamic* self_Dynamic) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode Mid_dyn0(Mid* self")
+  expected.concat(user ", Mid_Dynamic* self_Dynamic) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode Mid_dyn2(Mid* self")
+  expected.concat(user ", Mid_Dynamic* self_Dynamic) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode Top_dyn0(Top* self")
+  expected.concat(user ", Top_Dynamic* self_Dynamic) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}\n")
+  expected.concat(user "Returncode Top_dyn3(Top* self")
+  expected.concat(user ", Top_Dynamic* self_Dynamic) {\n")
+  expected.concat(user "  return OK;\n")
+  expected.concat(user "}")
+  
+  test-global-scope(
+      user "class Base\n  var Int x\n  func inst stat()\n  func dynamic dyn0()\n  func dynamic dyn1()\nclass Mid(Base)\n  var Int y\n  func dynamic dyn0()\n  func dynamic dyn2()\nclass Top(Mid)\n  var Int z\n  func dynamic dyn0()\n  func dynamic dyn3()\n",
+      user expected)
+  test-global-scope-error(
+      user "class(\n", user "expected space after \"class\", got \"(\"")
 
 
 test test-function()
@@ -304,7 +396,6 @@ test test-code-variables()
   test-code(
       user "new String{i} s(str)",
       user "String* s = NULL;\n  s = MR_new_string(i);\n  CHECK(1, String_copy(s, str) )")
-  test-code(user "user Tb tb(tc)", user "Tb* tb = NULL;\n  tb = &(tc->_base);")
   test-code(
       user "user Test tt(tc)",
       user "Test* tt = NULL;\n  tt = &(tc->_base._base._base);")
