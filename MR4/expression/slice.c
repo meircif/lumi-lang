@@ -94,7 +94,7 @@ Returncode SliceExpression_analyze(SliceExpression* self) {
     CHECK(50, (self->second_index)->_base._dtl[1](self->second_index) )
     CHECK(51, SliceExpression_m_check_index(self, self->second_index) )
     CHECK(52, TypeInstance_m_copy_new(self->sequence->result_type, &(self->_base.result_type)) )
-    CHECK(53, Expression_add_aux_variable(&(self->_base), ACCESS_AUX, &(self->slice_symbol)) )
+    CHECK(53, Expression_add_aux_variable(&(self->_base), ACCESS_AUX, self->_base.result_type, &(self->slice_symbol)) )
   }
   return OK;
 }
@@ -108,11 +108,11 @@ static char* _func_name_SliceExpression_m_check_index = "SliceExpression.m-check
 Returncode SliceExpression_m_check_index(SliceExpression* self, Expression* index) {
   if (NULL != index->result_type) {
     if (index->result_type->type_data != glob->type_int) {
-      CHECK(58, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){38, 37, "expected integer index for slice, got"}, index->result_type->type_data->name) )
+      CHECK(59, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){38, 37, "expected integer index for slice, got"}, index->result_type->type_data->name) )
     }
   }
   else {
-    CHECK(62, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){54, 53, "expected integer index for slice, got void expression"}) )
+    CHECK(63, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){54, 53, "expected integer index for slice, got void expression"}) )
   }
   return OK;
 }
@@ -124,69 +124,69 @@ Returncode SliceExpression_write_preactions(SliceExpression* self);
 static char* _func_name_SliceExpression_write_preactions = "SliceExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_SliceExpression_write_preactions
 Returncode SliceExpression_write_preactions(SliceExpression* self) {
-  CHECK(66, (self->sequence)->_base._dtl[4](self->sequence) )
-  CHECK(67, (self->index)->_base._dtl[4](self->index) )
+  CHECK(67, (self->sequence)->_base._dtl[4](self->sequence) )
+  CHECK(68, (self->index)->_base._dtl[4](self->index) )
   
   if (NULL != self->second_index) {
-    CHECK(70, (self->second_index)->_base._dtl[4](self->second_index) )
+    CHECK(71, (self->second_index)->_base._dtl[4](self->second_index) )
     /* symbol_Var.length = second; */
     /* symbol_Var.max_length = symbol.length + 1; */
     /* symbol_Var.values = (seq)->values + (index); */
     /* symbol_Var.values = (Byte*)((seq)->values) + (index); */
-    CHECK(75, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
-    CHECK(76, write(&(String){15, 14, "_Var.length = "}) )
-    CHECK(77, (self->second_index)->_base._dtl[2](self->second_index) )
-    CHECK(78, write(&(String){3, 2, ";\n"}) )
-    CHECK(79, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(76, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
+    CHECK(77, write(&(String){15, 14, "_Var.length = "}) )
+    CHECK(78, (self->second_index)->_base._dtl[2](self->second_index) )
+    CHECK(79, write(&(String){3, 2, ";\n"}) )
+    CHECK(80, SyntaxTreeCode_write_spaces(self->_base.code_node) )
     if (self->sequence->result_type->type_data == glob->type_string) {
-      CHECK(81, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
-      CHECK(82, write(&(String){19, 18, "_Var.max_length = "}) )
-      CHECK(83, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
-      CHECK(84, write(&(String){18, 17, "_Var.length + 1;\n"}) )
-      CHECK(85, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+      CHECK(82, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
+      CHECK(83, write(&(String){19, 18, "_Var.max_length = "}) )
+      CHECK(84, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
+      CHECK(85, write(&(String){18, 17, "_Var.length + 1;\n"}) )
+      CHECK(86, SyntaxTreeCode_write_spaces(self->_base.code_node) )
     }
-    CHECK(86, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
-    CHECK(87, write(&(String){16, 15, "_Var.values = ("}) )
+    CHECK(87, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
+    CHECK(88, write(&(String){16, 15, "_Var.values = ("}) )
     if (self->sequence->result_type->type_data != glob->type_string) {
-      CHECK(89, write(&(String){9, 8, "Byte*)(("}) )
+      CHECK(90, write(&(String){9, 8, "Byte*)(("}) )
     }
-    CHECK(90, (self->sequence)->_base._dtl[2](self->sequence) )
-    CHECK(91, write(&(String){10, 9, ")->values"}) )
+    CHECK(91, (self->sequence)->_base._dtl[2](self->sequence) )
+    CHECK(92, write(&(String){10, 9, ")->values"}) )
     if (self->sequence->result_type->type_data != glob->type_string) {
-      CHECK(93, write(&(String){2, 1, ")"}) )
+      CHECK(94, write(&(String){2, 1, ")"}) )
     }
-    CHECK(94, write(&(String){5, 4, " + ("}) )
-    CHECK(95, (self->index)->_base._dtl[2](self->index) )
-    CHECK(96, write(&(String){4, 3, ");\n"}) )
-    CHECK(97, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(95, write(&(String){5, 4, " + ("}) )
+    CHECK(96, (self->index)->_base._dtl[2](self->index) )
+    CHECK(97, write(&(String){4, 3, ");\n"}) )
+    CHECK(98, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   }
   
   /* if ((index) < 0 || (index) >= (seq)->length) RAISE(line-num) */
   /* if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length) */
   /*     RAISE(line-num) */
-  CHECK(102, write(&(String){6, 5, "if (("}) )
-  CHECK(103, (self->index)->_base._dtl[2](self->index) )
-  CHECK(104, write(&(String){11, 10, ") < 0 || ("}) )
+  CHECK(103, write(&(String){6, 5, "if (("}) )
+  CHECK(104, (self->index)->_base._dtl[2](self->index) )
+  CHECK(105, write(&(String){11, 10, ") < 0 || ("}) )
   if (NULL != self->second_index) {
-    CHECK(106, (self->second_index)->_base._dtl[2](self->second_index) )
-    CHECK(107, write(&(String){11, 10, ") < 0 || ("}) )
+    CHECK(107, (self->second_index)->_base._dtl[2](self->second_index) )
+    CHECK(108, write(&(String){11, 10, ") < 0 || ("}) )
   }
-  CHECK(108, (self->index)->_base._dtl[2](self->index) )
-  CHECK(109, write(&(String){3, 2, ") "}) )
+  CHECK(109, (self->index)->_base._dtl[2](self->index) )
+  CHECK(110, write(&(String){3, 2, ") "}) )
   if (NULL != self->second_index) {
-    CHECK(111, write(&(String){4, 3, "+ ("}) )
-    CHECK(112, (self->second_index)->_base._dtl[2](self->second_index) )
-    CHECK(113, write(&(String){4, 3, ") >"}) )
+    CHECK(112, write(&(String){4, 3, "+ ("}) )
+    CHECK(113, (self->second_index)->_base._dtl[2](self->second_index) )
+    CHECK(114, write(&(String){4, 3, ") >"}) )
   }
   else {
-    CHECK(115, write(&(String){3, 2, ">="}) )
+    CHECK(116, write(&(String){3, 2, ">="}) )
   }
-  CHECK(116, write(&(String){3, 2, " ("}) )
-  CHECK(117, (self->sequence)->_base._dtl[2](self->sequence) )
-  CHECK(118, write(&(String){12, 11, ")->length) "}) )
-  CHECK(119, SyntaxTreeNode_write_raise(&(self->_base._base)) )
-  CHECK(120, write(&(String){2, 1, "\n"}) )
-  CHECK(121, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+  CHECK(117, write(&(String){3, 2, " ("}) )
+  CHECK(118, (self->sequence)->_base._dtl[2](self->sequence) )
+  CHECK(119, write(&(String){12, 11, ")->length) "}) )
+  CHECK(120, SyntaxTreeNode_write_raise(&(self->_base._base)) )
+  CHECK(121, write(&(String){2, 1, "\n"}) )
+  CHECK(122, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -198,7 +198,7 @@ static char* _func_name_SliceExpression_write = "SliceExpression.write";
 #define MR_FUNC_NAME _func_name_SliceExpression_write
 Returncode SliceExpression_write(SliceExpression* self) {
   if (NULL != self->second_index) {
-    CHECK(125, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
+    CHECK(126, (self->slice_symbol)->_base._dtl[2](self->slice_symbol) )
     return OK;
   }
   
@@ -206,26 +206,26 @@ Returncode SliceExpression_write(SliceExpression* self) {
   /* (((Prmitive*)((seq)->values))[index]) */
   /* (((Complex**)((seq)->values))[index]) */
   if (!self->_base.top) {
-    CHECK(132, write(&(String){2, 1, "("}) )
+    CHECK(133, write(&(String){2, 1, "("}) )
   }
-  CHECK(133, write(&(String){3, 2, "(("}) )
+  CHECK(134, write(&(String){3, 2, "(("}) )
   if (self->sequence->result_type->type_data != glob->type_string) {
-    CHECK(135, write_cname(self->_base.result_type->type_data->name) )
+    CHECK(136, write_cname(self->_base.result_type->type_data->name) )
     if (!self->_base.result_type->type_data->is_primitive) {
-      CHECK(137, write(&(String){2, 1, "*"}) )
+      CHECK(138, write(&(String){2, 1, "*"}) )
     }
-    CHECK(138, write(&(String){5, 4, "*)(("}) )
+    CHECK(139, write(&(String){5, 4, "*)(("}) )
   }
-  CHECK(139, (self->sequence)->_base._dtl[2](self->sequence) )
-  CHECK(140, write(&(String){11, 10, ")->values)"}) )
+  CHECK(140, (self->sequence)->_base._dtl[2](self->sequence) )
+  CHECK(141, write(&(String){11, 10, ")->values)"}) )
   if (self->sequence->result_type->type_data != glob->type_string) {
-    CHECK(142, write(&(String){2, 1, ")"}) )
+    CHECK(143, write(&(String){2, 1, ")"}) )
   }
-  CHECK(143, write(&(String){2, 1, "["}) )
-  CHECK(144, (self->index)->_base._dtl[2](self->index) )
-  CHECK(145, write(&(String){2, 1, "]"}) )
+  CHECK(144, write(&(String){2, 1, "["}) )
+  CHECK(145, (self->index)->_base._dtl[2](self->index) )
+  CHECK(146, write(&(String){2, 1, "]"}) )
   if (!self->_base.top) {
-    CHECK(147, write(&(String){2, 1, ")"}) )
+    CHECK(148, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }

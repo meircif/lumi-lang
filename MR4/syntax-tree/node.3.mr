@@ -3,15 +3,6 @@
 
 #)
 
-## Access values
-var Int ACCESS-COPY(0)
-var Int ACCESS-USER(1)
-var Int ACCESS-OWNER(2)
-var Int ACCESS-VAR(3)
-var Int ACCESS-NEW(4)
-var Int ACCESS-AUX(5)
-
-
 ## Basic node type for all syntax tree nodes
 class SyntaxTreeNode
   user String input-file-name
@@ -22,16 +13,11 @@ class SyntaxTreeNode
     self.line-number := glob.line-number
   
   func inst get-access(user String access-str):(copy Int access)
-    if access-str.equal(user "copy")
-      access := ACCESS-COPY
-    else-if access-str.equal(user "user")
-      access := ACCESS-USER
-    else-if access-str.equal(user "owner")
-      access := ACCESS-OWNER
-    else-if access-str.equal(user "var")
-      access := ACCESS-VAR
-    else
-      self.m-syntax-error(user "illegal access", user access-str)
+    for n in 4
+      if glob.access-names[n].equal(user access-str)
+        access := n
+        return
+    self.m-syntax-error(user "illegal access", user access-str)
   
   func inst m-find-type(user String name):(user TypeData type-data)
     if not (? glob.type-map.find(user name):(user type-data))

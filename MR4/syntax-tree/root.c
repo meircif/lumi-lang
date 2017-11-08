@@ -265,12 +265,17 @@ Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self) {
   CHECK(147, write_global(&(String){31, 30, "\n\n/* global functions body */\n"}) )
   CHECK(148, SyntaxTreeBranch_write_children(&(self->_base._base), self->_base.functions) )
   
-  if (NULL != self->main_function) {
-    CHECK(151, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
-    CHECK(152, (self->main_function)->_base._base._base._base._dtl[2](self->main_function) )
+  if (NULL != glob->test_functions->first) {
+    CHECK(151, SyntaxTreeRoot_write_test_main(self) )
+  }
+  else {
+    if (NULL != self->main_function) {
+      CHECK(153, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
+      CHECK(154, (self->main_function)->_base._base._base._base._dtl[2](self->main_function) )
+    }
   }
   
-  CHECK(154, file_close(glob->output_file) )
+  CHECK(156, file_close(glob->output_file) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -284,9 +289,32 @@ Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, TypeWriter* type_
   ListNode* child = self->types->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(160, (type_writer)->_dtl[0](type_writer, child->item) )
+    CHECK(162, (type_writer)->_dtl[0](type_writer, child->item) )
     child = child->next;
   }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeRoot_write_test_main = "SyntaxTreeRoot.write-test-main";
+#define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write_test_main
+Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self) {
+  CHECK(166, write(&(String){21, 20, "\nUSER_MAIN_HEADER {\n"}) )
+  CHECK(167, write(&(String){24, 23, "  Bool success = true;\n"}) )
+  NameMapNode* node = glob->test_functions->first;
+  while (true) {
+    CHECK(170, write(&(String){12, 11, "  RUN_TEST("}) )
+    CHECK(171, SyntaxTreeFunction_write_cname(&(((SyntaxTreeTestFunction*)(node->value))->_base)) )
+    CHECK(172, write(&(String){4, 3, ");\n"}) )
+    node = node->next;
+    if (!(NULL != node)) break;
+  }
+  CHECK(175, write(&(String){30, 29, "  return success? OK : FAIL;\n"}) )
+  CHECK(176, write(&(String){3, 2, "}\n"}) )
+  CHECK(177, write(&(String){17, 16, "\nTEST_MAIN_FUNC\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -306,7 +334,7 @@ Returncode write_global(String* text);
 static char* _func_name_write_global = "write-global";
 #define MR_FUNC_NAME _func_name_write_global
 Returncode write_global(String* text) {
-  CHECK(166, write(text) )
+  CHECK(182, write(text) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -147,7 +147,9 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     write-global(user "\n\n/* global functions body */\n")
     self.write-children(user self.functions)
     
-    if ? self.main-function
+    if ? glob.test-functions.first
+      self.write-test-main()
+    else-if ? self.main-function
       write-global(user "\n\n/* main function */\n")
       self.main-function.write()
     
@@ -159,6 +161,20 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       while ? child
       type-writer.write(user child.item)
       child := child.next
+  
+  func inst write-test-main()
+    write(user "\nUSER_MAIN_HEADER {\n")
+    write(user "  Bool success = true;\n")
+    user NameMapNode{SyntaxTreeTestFunction} node(glob.test-functions.first)
+    do
+      write(user "  RUN_TEST(")
+      node.value.write-cname()
+      write(user ");\n")
+      node := node.next
+      while ? node
+    write(user "  return success? OK : FAIL;\n")
+    write(user "}\n")
+    write(user "\nTEST_MAIN_FUNC\n")
 
 
 ## proxy write function to be mocked on unit-tests

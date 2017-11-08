@@ -19,8 +19,7 @@ class CallExpression(Expression)
     self.set-location()
     new FunctionArguments in self.arguments
     var CallArgumentFactory argument-factory
-    self.arguments.parse(
-        user argument-factory, user code-node, user _):(copy end)
+    self.arguments.parse(user argument-factory, user code-node):(copy end)
   
   func dynamic analyze()
     self.function.analyze()
@@ -37,12 +36,14 @@ class CallExpression(Expression)
     if not self.is-statement
       declaration.get-result-type().m-copy-new():(owner self.result-type)
     self.function.analyze-call(user self.arguments)
-    if self.arguments.m-check-calling(user declaration)
+    if self.arguments.m-check-same-as(user declaration)
       # add omitted output
       new CallArgument output
       output.is-output := true
       output.access := declaration.outputs.last.item.access
-      self.add-aux-variable(copy declaration.outputs.last.item.access):(
+      self.add-aux-variable(
+          copy declaration.outputs.last.item.access,
+          user declaration.get-result-type()):(
           owner output.value)
       self.output := output.value
       self.arguments.outputs.add(owner output)
@@ -92,7 +93,7 @@ class CallArgument(Argument)
     if self.is-output and not self.value.assignable
       self.m-syntax-error-msg(user "non assignable call output")
   
-  func dynamic m-check-calling(user TypeInstance type-instance)
+  func dynamic m-check-same-type-as(user TypeInstance type-instance)
     if self.is-output
       self.is-down-cast := type-instance.m-check-assign-to(
           user self.value.result-type, user self) > 0

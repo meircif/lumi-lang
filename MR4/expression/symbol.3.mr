@@ -31,6 +31,12 @@ class SymbolExpression(Expression)
       self.function.arguments.m-copy-new():(owner self.result-type.arguments)
   
   func dynamic write()
+    if ? self.function
+      if ? self.function.mocker-function
+        self.function.mocker-function.write-cname()
+      else
+        self.function.write-cname()
+      return
     if ? self.variable and self.variable.is-output
       if not self.top
         write(user "(")
@@ -170,13 +176,11 @@ class MemberExpression(SymbolExpression)
       self.code-node.write-spaces()
   
   func dynamic write()
-    if ? self.function
-      self.function.write-cname()
-      return
-    self.instance.write()
-    write(user "->")
-    for n in self.bases
-      write(user "_base.")
+    if ? self.instance
+      self.instance.write()
+      write(user "->")
+      for n in self.bases
+        write(user "_base.")
     base.write()
 
 

@@ -56,3 +56,25 @@ class BaseType
 func test-mid-out()->(user MiddleType mt)
   new MiddleType new-mt
   mt := new-mt
+
+
+mock TestStruct.get()->(copy Int x, user String s)
+  x := 12
+  s := ""
+
+
+mock f-test-int2str(copy Int x)->(owner String s)
+  raise
+
+
+test test-func()
+  var TestStruct t
+  var Int x
+  t.get()->(copy x)
+  assert x = 12
+  assert-error f-test-int2str(copy 3)
+
+
+test test-another()
+  var Int x
+  assert x = 0

@@ -186,9 +186,9 @@ Returncode UnaryExpression_analyze(UnaryExpression* self) {
     CHECK(86, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   }
   else {
-    Bool _Bool24;
-    CHECK(87, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool24)) )
-    if (_Bool24) {
+    Bool _Bool25;
+    CHECK(87, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool25)) )
+    if (_Bool25) {
       CHECK(88, UnaryExpression_test_operand_type(self, self->right_expression, glob->type_int) )
       CHECK(89, Expression_set_simple_type(&(self->_base), glob->type_int) )
     }
@@ -220,9 +220,9 @@ Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* 
 static char* _func_name_UnaryExpression_test_operand_type = "UnaryExpression.test-operand-type";
 #define MR_FUNC_NAME _func_name_UnaryExpression_test_operand_type
 Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* operand, TypeData* expected_type) {
-  Bool _Bool25;
-  CHECK(103, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool25)) )
-  if (!_Bool25) {
+  Bool _Bool26;
+  CHECK(103, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool26)) )
+  if (!_Bool26) {
     CHECK(104, SyntaxTreeNode_m_syntax_error3(&(self->_base._base), &(String){9, 8, "operator"}, self->operator->name, &(String){9, 8, "expected"}, expected_type->name, &(String){13, 12, "operand, got"}, operand->result_type->type_data->name) )
   }
   return OK;

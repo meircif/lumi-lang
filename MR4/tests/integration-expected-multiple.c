@@ -148,6 +148,14 @@ Returncode test_code_flow(Array* arr, Int* res);
 
 Returncode test_mid_out(MiddleType** mt);
 
+Returncode TestStruct_Mock_get(TestStruct* self, Int* x, String** s);
+
+Returncode Mock_f_test_int2str(Int x, String** s);
+
+Returncode test_func(void);
+
+Returncode test_another(void);
+
 
 /* types methods body */
 
@@ -604,7 +612,7 @@ Returncode test_call_expression(void) {
   aux_String_0->values = "text";
   CHECK(166, f_test_params(3, aux_String_0, NULL) )
   CHECK(167, f_test_outs(&(s), &(x)) )
-  CHECK(168, f_test_int2str(4, &(s)) )
+  CHECK(168, Mock_f_test_int2str(4, &(s)) )
   CHECK(169, f_test_int(5) )
   CHECK(170, f_test_int2int(6, &(x)) )
   CHECK(171, f_test_many(7, 8, &(x), &(x)) )
@@ -613,7 +621,7 @@ Returncode test_call_expression(void) {
   CHECK(178, f_test_many(11, 12, &(x), &(aux_Int_0)) )
   CHECK(178, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
-  CHECK(179, f_test_int2str(13, &(aux_String_1)) )
+  CHECK(179, Mock_f_test_int2str(13, &(aux_String_1)) )
   s = aux_String_1;
   return OK;
 }
@@ -703,17 +711,70 @@ Returncode test_mid_out(MiddleType** mt) {
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
-
-/* main function */
-
-#define MR_FILE_NAME "tests/integration-test0.4.mr"
-#define MR_FUNC_NAME "main"
-USER_MAIN_HEADER {
-  CHECK(212, test_simple_function() )
-  CHECK(213, test_call_expression() )
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "TestStruct.Mock get"
+Returncode TestStruct_Mock_get(TestStruct* self, Int* x, String** s) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  *x = 12;
+  aux_String_0->max_length = 1;
+  aux_String_0->length = 0;
+  aux_String_0->values = "";
+  *s = aux_String_0;
   return OK;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
-MAIN_FUNC
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "Mock f-test-int2str"
+Returncode Mock_f_test_int2str(Int x, String** s) {
+  RAISE(67)
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "test-func"
+Returncode test_func(void) {
+  TestStruct t_Var = {0};
+  TestStruct* t = &t_Var;
+  Int x = 0;
+  String* aux_String_0 = NULL;
+  String* aux_String_1 = NULL;
+  CHECK(73, TestStruct_Mock_get(t, &(x), &(aux_String_0)) )
+  TEST_ASSERT(74, x == 12)
+  do {
+    MR_trace_stream = NULL;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(75, Mock_f_test_int2str(3, &(aux_String_1)) )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    MR_trace_stream = stdout;
+    TEST_FAIL(75)
+  } while (false);
+  return OK;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "test-another"
+Returncode test_another(void) {
+  Int x = 0;
+  TEST_ASSERT(80, x == 0)
+  return OK;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+USER_MAIN_HEADER {
+  Bool success = true;
+  RUN_TEST(test_func);
+  RUN_TEST(test_another);
+  return success? OK : FAIL;
+}
+
+TEST_MAIN_FUNC

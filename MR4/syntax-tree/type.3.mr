@@ -245,7 +245,7 @@ static TypeInstance
       if self.name.equal(user "Func")
         new FunctionArguments in self.arguments
         var ArgumentFactory argument-factory
-        self.arguments.parse(user argument-factory, user _, user _):(copy end)
+        self.arguments.parse(user argument-factory, user _):(copy end)
       else-if ? var-node and self.name.equal(user "String")
         parse-new-expression(user "}", user var-node):(
             owner self.length, copy end)
@@ -292,9 +292,9 @@ static TypeInstance
   func inst m-check-assign-to(
       user TypeInstance target, user SyntaxTreeNode node):(copy Int bases)
     bases := 0
-    if not (? self.type-data)
+    if not (? self)
       node.m-syntax-error-msg(user "cannot assign void expression")
-    if not (? target.type-data)
+    if not (? target)
       node.m-syntax-error-msg(user "cannot assign into void expression")
     if self.type-data = glob.type-empty and not target.type-data.is-primitive
       return
@@ -312,27 +312,36 @@ static TypeInstance
     
     self.m-check-sub-equal(user target, user node)
   
+  func inst m-check-equal(user TypeInstance other, user SyntaxTreeNode node)
+    if self.type-data != other.type-data
+      node.m-syntax-error2(
+          user "non matching types",
+          user self.type-data.name,
+          user "and",
+          user other.type-data.name)
+    self.m-check-sub-equal(user other, user node)
+  
   func inst m-check-sub-equal(user TypeInstance other, user SyntaxTreeNode node)
-    if ? self.sub-type and ? self.sub-type.type-data
-      if ? other.sub-type and ? other.sub-type.type-data
-        if self.type-data != other.type-data
+    if ? self.sub-type
+      if ? other.sub-type
+        if self.sub-type.type-data != other.sub-type.type-data
           node.m-syntax-error2(
-              user "cannot assign subtype",
+              user "non matching subtypes",
               user self.sub-type.type-data.name,
-              user "into subtype",
+              user "and",
               user other.sub-type.type-data.name)
         self.sub-type.m-check-sub-equal(user other.sub-type, user node)
       else
         node.m-syntax-error2(
-            user "cannot assign subtype",
+            user "non matching subtypes",
             user self.sub-type.type-data.name,
-            user "into type with no subtype",
+            user "and type with no subtype",
             user other.type-data.name)
-    else-if ? other.sub-type and ? other.sub-type.type-data
+    else-if ? other.sub-type
       node.m-syntax-error2(
-          user "cannot assign type with no subtype",
+          user "non matching type with no subtype",
           user self.type-data.name,
-          user "into subtype",
+          user "and subtype",
           user other.sub-type.type-data.name)
   
   func inst write()

@@ -83,6 +83,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     self.type-instance.m-link-types(user self)
   
   func dynamic analyze()
+    if self.type-instance.type-data.is-primitive and
+        self.access != ACCESS-VAR
+      self.m-syntax-error(
+          user "only \"var\" access is supported for primitive types, got",
+          user glob.access-names[self.access])
     self.type-instance.analyze-lengths(user self)
     if self.type-instance.type-data = glob.type-array
       if not (? self.type-instance.sub-type)
@@ -222,12 +227,6 @@ class SyntaxTreeInitNew(BaseVariableInit)
         var _, copy ACCESS-NEW, user _, user parent-block):(
         copy end, owner new-var-node)
     node-init-new.variable := new-var-node
-  
-  func dynamic analyze()
-    if self.variable.type-instance.type-data.is-primitive
-      self.m-syntax-error(
-          user "cannot use \"new\" with primitive type",
-          user self.variable.type-instance.type-data.name)
   
   func dynamic write()
     # `name` = `...`

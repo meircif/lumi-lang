@@ -296,6 +296,9 @@ test test-call-expression()
       user "fun6(\n      copy 2,\n      copy 3)->(\n      copy io,\n      copy io)",
       user "CHECK(1, fun6(2, 3, &(*io), &(*io)) )")
   test-code(
+      user "fun5(copy 4)",
+      user "Int aux_Int_0 = 0;\n  CHECK(1, fun5(4, &(aux_Int_0)) )")
+  test-code(
       user "io := fun5(copy 4)",
       user "Int aux_Int_0 = 0;\n  CHECK(1, fun5(4, &(aux_Int_0)) )\n  *io = aux_Int_0;")
   test-code(
@@ -327,6 +330,10 @@ test test-call-expression()
       user "fun5(copy 0)->(copy 4)", user "non assignable call output")
   test-code-error(
       user "fun7()->(user tc)", user "cannot assign \"Tb\" into \"Tc\"")
+  test-code-error(
+      user "fun5(copy i := 1)", user "cannot assign void expression")
+  test-code-error(
+      user "fun5(user 8)", user "expected access \"copy\" , got \"user\"")
 
 
 test test-type-expression()

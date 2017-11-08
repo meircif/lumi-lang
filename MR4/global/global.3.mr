@@ -1,5 +1,14 @@
 ## MR4 compiler - Global compiler data
 
+## Access values
+var Int ACCESS-COPY(0)
+var Int ACCESS-USER(1)
+var Int ACCESS-OWNER(2)
+var Int ACCESS-VAR(3)
+var Int ACCESS-NEW(4)
+var Int ACCESS-AUX(5)
+
+
 static Global
   ## stores all language operators
   owner SyntaxTreeRoot root
@@ -9,6 +18,9 @@ static Global
   
   ## stores all types - language built-ins and user defined
   owner NameMap{TypeData} type-map
+  
+  ## map access number to its name
+  owner Array{String} access-names
   
   ## the currently parsed input file object
   owner File input-file
@@ -20,6 +32,9 @@ static Global
   ## been worked with
   user String input-file-name
   var Int line-number
+  
+  ## test functions list
+  owner NameMap{SyntaxTreeTestFunction} test-functions
   
   ## input reading state
   owner String input-buffer
@@ -44,8 +59,16 @@ static Global
   func inst init()
     new SyntaxTreeRoot in self.root
     new String{1024} in self.input-buffer
+    new NameMap{SyntaxTreeTestFunction} in self.test-functions
     self.init-operator-map()
     self.init-builtin-types()
+    new Array{6:String{8}} in self.access-names
+    self.access-names[ACCESS-COPY].copy(user "copy")
+    self.access-names[ACCESS-USER].copy(user "user")
+    self.access-names[ACCESS-OWNER].copy(user "owner")
+    self.access-names[ACCESS-VAR].copy(user "var")
+    self.access-names[ACCESS-NEW].copy(user "new")
+    self.access-names[ACCESS-AUX].copy(user "aux")
   
   func inst init-operator-map()
     new NameMap{Operator} in self.operator-map

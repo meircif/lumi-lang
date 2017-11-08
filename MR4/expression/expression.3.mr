@@ -156,13 +156,14 @@ class Expression(SyntaxTreeNode)
   func inst set-simple-type(user TypeData type-data)
     type-data.m-new-type-instance():(owner self.result-type)
   
-  func inst add-aux-variable(copy Int access):(owner Expression expression)
+  func inst add-aux-variable(copy Int access, user TypeInstance type-instance):(
+      owner Expression expression)
     new SymbolExpression symbol
     symbol.code-node := self.code-node
-    self.result-type.m-copy-new():(owner symbol.result-type)
+    type-instance.m-copy-new():(owner symbol.result-type)
     symbol.assignable := true
-    self.code-node.parent.add-aux-variable(
-        copy access, user self.result-type):(user symbol.variable)
+    self.code-node.parent.add-aux-variable(copy access, user type-instance):(
+        user symbol.variable)
     string-new-copy(user symbol.variable.name):(owner symbol.name)
     expression := symbol
   

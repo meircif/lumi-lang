@@ -96,7 +96,7 @@ func write-cname(user String name)
     raise
   for index in name.length
     var Char ch(name[index])
-    if ch = '-'
+    if ch = '-' or ch = ' '
       write-c(copy '_')
     else
       write-c(copy ch)

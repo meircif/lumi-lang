@@ -92,7 +92,7 @@ int MR_test_main(int argc, char* argv[]);
 }
 
 #define MAIN_FUNC MAIN_PROXY(MR_main)
-#define MAIN_TEST_FUNC MAIN_PROXY(MR_test_main)
+#define TEST_MAIN_FUNC MAIN_PROXY(MR_test_main)
 #define USER_MAIN_HEADER Returncode MR_user_main()
 
 String* MR_new_string(int length);
