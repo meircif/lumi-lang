@@ -96,10 +96,15 @@ class TypeData(SyntaxTreeNamespace)
     do
       while ? child
       user SyntaxTreeFunction method
-      self.base-type.m-find-meth(user child.item.name):(user method)
+      var Int bases
+      self.base-type.m-find-meth(user child.item.name):(user method, copy bases)
       if ? method
         child.item.m-compare(user method)
+        if child.item.is-dynamic
+          child.item.dynamic-base-method := method.dynamic-base-method
+          child.item.dynamic-base-count := method.dynamic-base-count + bases + 1
       else-if child.item.is-dynamic
+        child.item.dynamic-base-method := child.item
         self.dynamic-base-methods.add(user child.item.name, user child.item)
       child := child.next
     self.is-ordered := true

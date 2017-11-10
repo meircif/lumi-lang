@@ -141,6 +141,11 @@ class MemberExpression(SymbolExpression)
             user type-data.name,
             user "has no member",
             user self.name)
+      if self.function.is-dynamic and
+          self.instance.result-type.type-data != glob.type-type and
+          self.instance.result-type.type-data != glob.type-base
+        self.bases := self.function.dynamic-base-count
+        self.function := self.function.dynamic-base-method
       self.set-simple-type(user glob.type-func)
       self.function.arguments.m-copy-new():(owner self.result-type.arguments)
     if self.instance.result-type.type-data = glob.type-base
@@ -184,17 +189,17 @@ class MemberExpression(SymbolExpression)
   func dynamic write()
     if ? self.function and ? self.self-instance and self.function.is-dynamic
       self.self-instance.write-dynamic()
-      self.write-bases()
+      self.write-bases(copy self.bases)
       write-cname(user self.function.name)
       return
     if ? self.instance and self.instance.result-type.type-data != glob.type-type
       self.instance.write()
-      self.write-bases()
+      self.write-bases(copy self.bases)
     base.write()
   
-  func inst write-bases()
+  func inst write-bases(copy Int bases)
     write(user "->")
-    for n in self.bases
+    for n in bases
       write(user "_base.")
 
 

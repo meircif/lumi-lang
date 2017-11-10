@@ -318,12 +318,16 @@ Returncode MemberExpression_analyze(MemberExpression* self) {
     if (!(NULL != self->_base.function)) {
       CHECK(139, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){5, 4, "type"}, type_data->name, &(String){14, 13, "has no member"}, self->_base.name) )
     }
-    CHECK(144, Expression_set_simple_type(&(self->_base._base), glob->type_func) )
-    CHECK(145, FunctionArguments_m_copy_new(self->_base.function->arguments, &(self->_base._base.result_type->arguments)) )
+    if (self->_base.function->is_dynamic && self->instance->result_type->type_data != glob->type_type && self->instance->result_type->type_data != glob->type_base) {
+      self->bases = self->_base.function->dynamic_base_count;
+      self->_base.function = self->_base.function->dynamic_base_method;
+    }
+    CHECK(149, Expression_set_simple_type(&(self->_base._base), glob->type_func) )
+    CHECK(150, FunctionArguments_m_copy_new(self->_base.function->arguments, &(self->_base._base.result_type->arguments)) )
   }
   if (self->instance->result_type->type_data == glob->type_base) {
     if (!(NULL != self->_base.function)) {
-      CHECK(148, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){31, 30, "calling \"base\" with non-method"}, self->_base.name) )
+      CHECK(153, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){31, 30, "calling \"base\" with non-method"}, self->_base.name) )
     }
     TypeInstance* base_result_type = self->instance->result_type;
     self->instance->result_type = base_result_type->sub_type;
@@ -344,13 +348,13 @@ Returncode MemberExpression_analyze_call(MemberExpression* self, FunctionArgumen
   }
   else {
     CallArgument* self_param = malloc(sizeof(CallArgument));
-    if (self_param == NULL) RAISE(158)
+    if (self_param == NULL) RAISE(163)
     *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, NULL, NULL, false, false};
     self_param->_base._base._dtl = CallArgument__dtl;
     self_param->_base.access = ((Argument*)(self->_base.function->arguments->parameters->first->item))->access;
     self_param->value = self->instance;
     self_param->value->top = true;
-    CHECK(162, List_m_prepend(arguments->parameters, &(self_param->_base)) )
+    CHECK(167, List_m_prepend(arguments->parameters, &(self_param->_base)) )
     self->self_instance = self->instance;
   }
   self->instance = NULL;
@@ -368,22 +372,22 @@ Returncode MemberExpression_write_preactions(MemberExpression* self) {
     return OK;
   }
   if (NULL != self->instance) {
-    CHECK(172, (self->instance)->_base._dtl[5](self->instance) )
+    CHECK(177, (self->instance)->_base._dtl[5](self->instance) )
   }
   /* if (`instance` == NULL) RAISE(`line-num`) */
-  CHECK(174, write(&(String){5, 4, "if ("}) )
+  CHECK(179, write(&(String){5, 4, "if ("}) )
   if (NULL != self->instance) {
-    CHECK(176, (self->instance)->_base._dtl[2](self->instance) )
+    CHECK(181, (self->instance)->_base._dtl[2](self->instance) )
   }
   else {
     if (NULL != self->self_instance) {
-      CHECK(178, (self->self_instance)->_base._dtl[3](self->self_instance) )
+      CHECK(183, (self->self_instance)->_base._dtl[3](self->self_instance) )
     }
   }
-  CHECK(179, write(&(String){11, 10, " == NULL) "}) )
-  CHECK(180, SyntaxTreeNode_write_raise(&(self->_base._base._base)) )
-  CHECK(181, write(&(String){2, 1, "\n"}) )
-  CHECK(182, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(184, write(&(String){11, 10, " == NULL) "}) )
+  CHECK(185, SyntaxTreeNode_write_raise(&(self->_base._base._base)) )
+  CHECK(186, write(&(String){2, 1, "\n"}) )
+  CHECK(187, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -395,29 +399,29 @@ static char* _func_name_MemberExpression_write = "MemberExpression.write";
 #define MR_FUNC_NAME _func_name_MemberExpression_write
 Returncode MemberExpression_write(MemberExpression* self) {
   if (NULL != self->_base.function &&  NULL !=  self->self_instance && self->_base.function->is_dynamic) {
-    CHECK(186, (self->self_instance)->_base._dtl[3](self->self_instance) )
-    CHECK(187, MemberExpression_write_bases(self) )
-    CHECK(188, write_cname(self->_base.function->name) )
+    CHECK(191, (self->self_instance)->_base._dtl[3](self->self_instance) )
+    CHECK(192, MemberExpression_write_bases(self, self->bases) )
+    CHECK(193, write_cname(self->_base.function->name) )
     return OK;
   }
   if (NULL != self->instance && self->instance->result_type->type_data != glob->type_type) {
-    CHECK(191, (self->instance)->_base._dtl[2](self->instance) )
-    CHECK(192, MemberExpression_write_bases(self) )
+    CHECK(196, (self->instance)->_base._dtl[2](self->instance) )
+    CHECK(197, MemberExpression_write_bases(self, self->bases) )
   }
-  CHECK(193, SymbolExpression_write(&(self->_base)) )
+  CHECK(198, SymbolExpression_write(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode MemberExpression_write_bases(MemberExpression* self);
+Returncode MemberExpression_write_bases(MemberExpression* self, Int bases);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_MemberExpression_write_bases = "MemberExpression.write-bases";
 #define MR_FUNC_NAME _func_name_MemberExpression_write_bases
-Returncode MemberExpression_write_bases(MemberExpression* self) {
-  CHECK(196, write(&(String){3, 2, "->"}) )
-  {int n; for (n = (0); n < (self->bases); ++n) {
-    CHECK(198, write(&(String){7, 6, "_base."}) )
+Returncode MemberExpression_write_bases(MemberExpression* self, Int bases) {
+  CHECK(201, write(&(String){3, 2, "->"}) )
+  {int n; for (n = (0); n < (bases); ++n) {
+    CHECK(203, write(&(String){7, 6, "_base."}) )
   }}
   return OK;
 }
@@ -448,10 +452,10 @@ static char* _func_name_UpCastExpression_init_new = "UpCastExpression.init-new";
 #define MR_FUNC_NAME _func_name_UpCastExpression_init_new
 Returncode UpCastExpression_init_new(UpCastExpression* self, Int bases, Expression** expression) {
   UpCastExpression* up_cast = malloc(sizeof(UpCastExpression));
-  if (up_cast == NULL) RAISE(207)
+  if (up_cast == NULL) RAISE(212)
   *up_cast = (UpCastExpression){UpCastExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL, 0};
   up_cast->_base._base._dtl = UpCastExpression__dtl;
-  CHECK(208, UpCastExpression_init(up_cast, bases, (*expression)) )
+  CHECK(213, UpCastExpression_init(up_cast, bases, (*expression)) )
   (*expression) = &(up_cast->_base);
   return OK;
 }
@@ -465,7 +469,7 @@ static char* _func_name_UpCastExpression_init = "UpCastExpression.init";
 Returncode UpCastExpression_init(UpCastExpression* self, Int bases, Expression* expression) {
   self->expression = expression;
   self->bases = bases;
-  CHECK(214, TypeInstance_m_copy_new(self->expression->result_type, &(self->_base.result_type)) )
+  CHECK(219, TypeInstance_m_copy_new(self->expression->result_type, &(self->_base.result_type)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -476,7 +480,7 @@ Returncode UpCastExpression_write_preactions(UpCastExpression* self);
 static char* _func_name_UpCastExpression_write_preactions = "UpCastExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_UpCastExpression_write_preactions
 Returncode UpCastExpression_write_preactions(UpCastExpression* self) {
-  CHECK(217, (self->expression)->_base._dtl[5](self->expression) )
+  CHECK(222, (self->expression)->_base._dtl[5](self->expression) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -488,9 +492,9 @@ static char* _func_name_UpCastExpression_write = "UpCastExpression.write";
 #define MR_FUNC_NAME _func_name_UpCastExpression_write
 Returncode UpCastExpression_write(UpCastExpression* self) {
   /* &(`expression`->_base[._base]...) */
-  CHECK(221, UpCastExpression_write_pre(self) )
-  CHECK(222, (self->expression)->_base._dtl[2](self->expression) )
-  CHECK(223, UpCastExpression_write_post(self) )
+  CHECK(226, UpCastExpression_write_pre(self) )
+  CHECK(227, (self->expression)->_base._dtl[2](self->expression) )
+  CHECK(228, UpCastExpression_write_post(self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -501,9 +505,9 @@ Returncode UpCastExpression_write_dynamic(UpCastExpression* self);
 static char* _func_name_UpCastExpression_write_dynamic = "UpCastExpression.write-dynamic";
 #define MR_FUNC_NAME _func_name_UpCastExpression_write_dynamic
 Returncode UpCastExpression_write_dynamic(UpCastExpression* self) {
-  CHECK(226, UpCastExpression_write_pre(self) )
-  CHECK(227, (self->expression)->_base._dtl[3](self->expression) )
-  CHECK(228, UpCastExpression_write_post(self) )
+  CHECK(231, UpCastExpression_write_pre(self) )
+  CHECK(232, (self->expression)->_base._dtl[3](self->expression) )
+  CHECK(233, UpCastExpression_write_post(self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -514,7 +518,7 @@ Returncode UpCastExpression_write_pre(UpCastExpression* self);
 static char* _func_name_UpCastExpression_write_pre = "UpCastExpression.write-pre";
 #define MR_FUNC_NAME _func_name_UpCastExpression_write_pre
 Returncode UpCastExpression_write_pre(UpCastExpression* self) {
-  CHECK(231, write(&(String){3, 2, "&("}) )
+  CHECK(236, write(&(String){3, 2, "&("}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -525,11 +529,11 @@ Returncode UpCastExpression_write_post(UpCastExpression* self);
 static char* _func_name_UpCastExpression_write_post = "UpCastExpression.write-post";
 #define MR_FUNC_NAME _func_name_UpCastExpression_write_post
 Returncode UpCastExpression_write_post(UpCastExpression* self) {
-  CHECK(234, write(&(String){8, 7, "->_base"}) )
+  CHECK(239, write(&(String){8, 7, "->_base"}) )
   {int n; for (n = (1); n < (self->bases); ++n) {
-    CHECK(236, write(&(String){7, 6, "._base"}) )
+    CHECK(241, write(&(String){7, 6, "._base"}) )
   }}
-  CHECK(237, write(&(String){2, 1, ")"}) )
+  CHECK(242, write(&(String){2, 1, ")"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -7,6 +7,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   owner String name
   owner FunctionArguments arguments
   user SyntaxTreeMockFunction mocker-function
+  user SyntaxTreeFunction dynamic-base-method
+  var Int dynamic-base-count
   var Bool is-dynamic
   
   func inst parse-new(user TypeData parent-type):(
