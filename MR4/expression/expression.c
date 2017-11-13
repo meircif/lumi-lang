@@ -268,12 +268,12 @@ Returncode Expression_write_dynamic(Expression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments);
+Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments, Bool* is_function_object);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_analyze_call = "Expression.analyze-call";
 #define MR_FUNC_NAME _func_name_Expression_analyze_call
-Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments) {
-  /* do noting */
+Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments, Bool* is_function_object) {
+  (*is_function_object) = true;
   return OK;
 }
 #undef MR_FUNC_NAME

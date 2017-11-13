@@ -202,30 +202,36 @@ Returncode SliceExpression_write(SliceExpression* self) {
     return OK;
   }
   
-  /* (((seq)->values)[index]) */
-  /* (((Prmitive*)((seq)->values))[index]) */
-  /* (((Complex**)((seq)->values))[index]) */
+  /* ((seq)->values)[index] */
+  /* ((Prmitive*)((seq)->values))[index] */
+  /* ((Complex**)((seq)->values))[index] */
   if (!self->_base.top) {
     CHECK(134, write(&(String){2, 1, "("}) )
   }
   CHECK(135, write(&(String){3, 2, "(("}) )
   if (self->sequence->result_type->type_data != glob->type_string) {
-    CHECK(137, write_cname(self->_base.result_type->type_data->name) )
-    if (!self->_base.result_type->type_data->is_primitive) {
-      CHECK(139, write(&(String){2, 1, "*"}) )
+    if (self->_base.result_type->type_data == glob->type_func &&  NULL !=  self->_base.result_type->arguments) {
+      CHECK(139, FunctionArguments_write_pointer(self->_base.result_type->arguments, &(String){2, 1, "*"}) )
     }
-    CHECK(140, write(&(String){5, 4, "*)(("}) )
+    else {
+      CHECK(141, write_cname(self->_base.result_type->type_data->name) )
+      if (!self->_base.result_type->type_data->is_primitive) {
+        CHECK(143, write(&(String){2, 1, "*"}) )
+      }
+      CHECK(144, write(&(String){2, 1, "*"}) )
+    }
+    CHECK(145, write(&(String){4, 3, ")(("}) )
   }
-  CHECK(141, (self->sequence)->_base._dtl[2](self->sequence) )
-  CHECK(142, write(&(String){11, 10, ")->values)"}) )
+  CHECK(146, (self->sequence)->_base._dtl[2](self->sequence) )
+  CHECK(147, write(&(String){11, 10, ")->values)"}) )
   if (self->sequence->result_type->type_data != glob->type_string) {
-    CHECK(144, write(&(String){2, 1, ")"}) )
-  }
-  CHECK(145, write(&(String){2, 1, "["}) )
-  CHECK(146, (self->index)->_base._dtl[2](self->index) )
-  CHECK(147, write(&(String){2, 1, "]"}) )
-  if (!self->_base.top) {
     CHECK(149, write(&(String){2, 1, ")"}) )
+  }
+  CHECK(150, write(&(String){2, 1, "["}) )
+  CHECK(151, (self->index)->_base._dtl[2](self->index) )
+  CHECK(152, write(&(String){2, 1, "]"}) )
+  if (!self->_base.top) {
+    CHECK(154, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }
@@ -237,9 +243,9 @@ Returncode SliceExpression_write_dynamic(SliceExpression* self);
 static char* _func_name_SliceExpression_write_dynamic = "SliceExpression.write-dynamic";
 #define MR_FUNC_NAME _func_name_SliceExpression_write_dynamic
 Returncode SliceExpression_write_dynamic(SliceExpression* self) {
-  CHECK(152, write(&(String){2, 1, "&"}) )
-  CHECK(153, write_cname(self->_base.result_type->type_data->name) )
-  CHECK(154, write(&(String){9, 8, "_dynamic"}) )
+  CHECK(157, write(&(String){2, 1, "&"}) )
+  CHECK(158, write_cname(self->_base.result_type->type_data->name) )
+  CHECK(159, write(&(String){9, 8, "_dynamic"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

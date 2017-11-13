@@ -127,17 +127,22 @@ class SliceExpression(Expression)
       self.slice-symbol.write()
       return
     
-    # (((seq)->values)[index])
-    # (((Prmitive*)((seq)->values))[index])
-    # (((Complex**)((seq)->values))[index])
+    # ((seq)->values)[index]
+    # ((Prmitive*)((seq)->values))[index]
+    # ((Complex**)((seq)->values))[index]
     if not self.top
       write(user "(")
     write(user "((")
     if self.sequence.result-type.type-data != glob.type-string
-      write-cname(user self.result-type.type-data.name)
-      if not self.result-type.type-data.is-primitive
+      if self.result-type.type-data = glob.type-func and
+          ? self.result-type.arguments
+        self.result-type.arguments.write-pointer(user "*")
+      else
+        write-cname(user self.result-type.type-data.name)
+        if not self.result-type.type-data.is-primitive
+          write(user "*")
         write(user "*")
-      write(user "*)((")
+      write(user ")((")
     self.sequence.write()
     write(user ")->values)")
     if self.sequence.result-type.type-data != glob.type-string

@@ -248,8 +248,12 @@ static TypeInstance
         user string-new-concat(user ends, user "{")):(owner self.name, copy end)
     if end = '{'
       if self.name.equal(user "Func")
+        read-c():(copy end)
+        if end != '('
+          node.m-syntax-error-c(
+              user "expected \"(\" inside Function type, got", copy end)
         new FunctionArguments in self.arguments
-        var ArgumentFactory argument-factory
+        var DeclarationArgumentFactory argument-factory
         self.arguments.parse(user argument-factory, user _):(copy end)
       else-if ? var-node and self.name.equal(user "String")
         parse-new-expression(user "}", user var-node):(
@@ -280,10 +284,16 @@ static TypeInstance
   
   func inst analyze-part(
       user SyntaxTreeNode node, copy Bool check-types, copy Bool check-length)
-    if check-types and not (? self.type-data)
-      node.m-find-type(user self.name):(user self.type-data)
-    if check-length and ? self.length
-      node.analyze-expression(user self.length, user glob.type-int)
+    if check-types
+      if not (? self.type-data)
+        node.m-find-type(user self.name):(user self.type-data)
+      if ? self.arguments
+        self.arguments.m-link-types()
+    if check-length
+      if ? self.length
+        node.analyze-expression(user self.length, user glob.type-int)
+      if ? self.arguments
+        self.arguments.analyze()
     if ? self.sub-type
       self.sub-type.analyze-part(user node, copy check-types, copy check-length)
   
@@ -301,7 +311,8 @@ static TypeInstance
       node.m-syntax-error-msg(user "cannot assign void expression")
     if not (? target)
       node.m-syntax-error-msg(user "cannot assign into void expression")
-    if self.type-data = glob.type-empty and not target.type-data.is-primitive
+    if self.type-data = glob.type-empty and
+        (not target.type-data.is-primitive or target.type-data = glob.type-func)
       return
     user TypeData base-type(self.type-data)
     do
@@ -314,6 +325,10 @@ static TypeInstance
             user target.type-data.name)
       base-type := base-type.base-type
       bases += 1
+    
+    if ? self.arguments
+      if self.arguments.m-check-same-as(user target.arguments)
+        node.m-syntax-error-msg(user "too few outputs")
     
     self.m-check-sub-equal(user target, user node)
   

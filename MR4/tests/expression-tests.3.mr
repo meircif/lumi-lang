@@ -5,6 +5,7 @@ func test-code-setup(user String input-text)
   set-mock-file-text(user "")
   mock-input-file-text.concat(user "struct Test\n")
   mock-input-file-text.concat(user "  var Int num\n")
+  mock-input-file-text.concat(user "  var Func{()} fun\n")
   mock-input-file-text.concat(user "  func meth()\n")
   mock-input-file-text.concat(user "class Ta(Test)\n")
   mock-input-file-text.concat(user "  var Int numa\n")
@@ -77,6 +78,7 @@ func test-code(user String input-text, user String expected-output)
   
   expected-header.concat(user "struct Test {\n")
   expected-header.concat(user "  Int num;\n")
+  expected-header.concat(user "  Returncode (*fun)(void);\n")
   expected-header.concat(user "};\n")
   expected-header.concat(user "struct Ta {\n")
   expected-header.concat(user "  Test _base;\n")
@@ -606,3 +608,50 @@ test test-dynamic()
   test-code(
       user "fun7()->(user ta)",
       user "if (ta != NULL) RAISE(1)\n  CHECK(1, fun7((void*)&(ta), (void*)&(ta_Dynamic)) )")
+
+
+test test-function-object()
+  test-code(
+      user "var Func{()} fun\n  fun := fun0\n  fun()",
+      user "Returncode (*fun)(void) = NULL;\n  fun = fun0;\n  if (fun == NULL) RAISE(3)\n  CHECK(3, fun() )")
+  test-code(
+      user "var Func{(copy Int x)->(copy Int y)} fun(fun5)\n  var Int x\n  fun(copy 9)->(copy x)",
+      user "Returncode (*fun)(Int x, Int* y) = NULL;\n  Int x = 0;\n  fun = fun5;\n  if (fun == NULL) RAISE(3)\n  CHECK(3, fun(9, &(x)) )")
+  test-code(
+      user "var Func{(var Test self)} fun(Test.meth)\n  fun(var t)",
+      user "Returncode (*fun)(Test* self) = NULL;\n  fun = Test_meth;\n  if (fun == NULL) RAISE(2)\n  CHECK(2, fun(t) )")
+  test-code(
+      user "var Func{()} fun\n  fun := _\n  b := fun?",
+      user "Returncode (*fun)(void) = NULL;\n  fun = NULL;\n  b = fun != NULL;")
+  test-code(
+      user "t.fun := fun0\n  t.fun()",
+      user "if (t == NULL) RAISE(1)\n  t->fun = fun0;\n  if (t == NULL) RAISE(2)\n  if (t->fun == NULL) RAISE(2)\n  CHECK(2, t->fun() )")
+  var String{1024} expected
+  expected.copy(user "Returncode (*farr_Values[38])(void);\n")
+  expected.concat(user "  Array farr_Var = {38, NULL};\n")
+  expected.concat(user "  Array* farr = &farr_Var;\n")
+  expected.concat(user "  farr_Var.values = farr_Values;\n")
+  expected.concat(user "  if ((3) < 0 || (3) >= (farr)->length) RAISE(2)\n")
+  expected.concat(user "  ((Returncode (**)(void))((farr)->values))[3]")
+  expected.concat(user " = fun0;\n")
+  expected.concat(user "  if ((3) < 0 || (3) >= (farr)->length) RAISE(3)\n")
+  expected.concat(user "  if (((Returncode (**)(void))((farr)->values))[3]")
+  expected.concat(user " == NULL) RAISE(3)\n")
+  expected.concat(user "  CHECK(3")
+  expected.concat(user ", (((Returncode (**)(void))((farr)->values))[3])() )")
+  test-code(
+      user "var Array{38:Func{()}} farr\n  farr[3] := fun0\n  farr[3]()",
+      user expected)
+  test-code-error(
+      user "var Func error", user "missing arguments in function type")
+  test-code-error(
+      user "var Array{3:Func} error", user "missing arguments in function type")
+  test-code-error(
+      user "var Func{} error",
+      user "expected \"(\" inside Function type, got \"}\"")
+  test-code-error(user "var Func{() } error", user "expected \"}\", got \" \"")
+  test-code-error(
+      user "var Func{()} fun(fun1)", user "too many parameters")
+  test-code-error(
+      user "var Func{()->(copy Int x)} fun\n  fun := fun0",
+      user "too few outputs")

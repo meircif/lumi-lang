@@ -223,3 +223,9 @@ class FunctionArguments(SyntaxTreeNode)
       node := node.next
       while ? node
       write(user ", ")
+  
+  func inst write-pointer(user String name)
+    write(user "Returncode (*")
+    write-cname(user name)
+    write(user ")")
+    self.write(copy true)

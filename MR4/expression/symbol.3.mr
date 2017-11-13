@@ -30,6 +30,10 @@ class SymbolExpression(Expression)
       self.set-simple-type(user glob.type-func)
       self.function.arguments.m-copy-new():(owner self.result-type.arguments)
   
+  func dynamic analyze-call(user FunctionArguments arguments):(
+      copy Bool is-function-object)
+    is-function-object := ? self.variable
+  
   func dynamic write()
     if ? self.function
       if ? self.function.mocker-function
@@ -158,7 +162,10 @@ class MemberExpression(SymbolExpression)
       self.instance.result-type := base-result-type.sub-type
       delete base-result-type
   
-  func dynamic analyze-call(user FunctionArguments arguments)
+  func dynamic analyze-call(user FunctionArguments arguments):(
+      copy Bool is-function-object)
+    if base.analyze-call(user arguments):(copy is-function-object)
+      return
     if self.instance.result-type.type-data = glob.type-type
       delete self.instance
     else

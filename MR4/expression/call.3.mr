@@ -5,6 +5,7 @@ class CallExpression(Expression)
   owner Expression function
   owner FunctionArguments arguments
   user Expression output
+  var Bool is-function-object
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -31,11 +32,10 @@ class CallExpression(Expression)
           user "non callable type",
           user self.function.result-type.type-data.name)
     user FunctionArguments declaration(self.function.result-type.arguments)
-    if not (? declaration)
-      self.m-syntax-error-msg(user "pointer-to-function not supported")
     if not self.is-statement
       declaration.get-result-type().m-copy-new():(owner self.result-type)
-    self.function.analyze-call(user self.arguments)
+    self.function.analyze-call(user self.arguments):(
+        copy self.is-function-object)
     if self.arguments.m-check-same-as(user declaration)
       # add omitted output
       new CallArgument output
@@ -53,6 +53,15 @@ class CallExpression(Expression)
   
   func dynamic write-preactions()
     self.function.write-preactions()
+    if self.is-function-object
+      write(user "if (")
+      self.function.top := true
+      self.function.write()
+      self.function.top := false
+      write(user " == NULL) ")
+      self.write-raise()
+      write(user "\n")
+      self.code-node.write-spaces()
     self.arguments.write-preactions()
     if not self.is-statement
       self.write-func-call()

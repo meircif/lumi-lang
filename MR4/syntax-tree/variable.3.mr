@@ -92,6 +92,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.type-instance.type-data = glob.type-array
       if not (? self.type-instance.sub-type)
         self.m-syntax-error-msg(user "missing subtype for array")
+      if self.type-instance.sub-type.type-data = glob.type-func and
+          not (? self.type-instance.sub-type.arguments)
+        self.m-syntax-error-msg(user "missing arguments in function type")
       if self.type-instance.sub-type.type-data = glob.type-array
         self.m-syntax-error-msg(
             user "multidimensional array not supported yet...")
@@ -107,6 +110,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           self.type-instance.sub-type.type-data = glob.type-string and
           not (? self.type-instance.sub-type.length)
         self.m-syntax-error-msg(user "missing length for sequence")
+    if self.type-instance.type-data = glob.type-func and
+        not (? self.type-instance.arguments)
+      self.m-syntax-error-msg(user "missing arguments in function type")
   
   func dynamic write()
     if self.access = ACCESS-VAR and
@@ -125,21 +131,31 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.write-spaces()
       # `sub-type` `name`_Values[`length`];
       if self.type-instance.type-data = glob.type-string
-        write(user "char")
+        write(user "char ")
+      else-if self.type-instance.sub-type.type-data = glob.type-func
+        write(user "Returncode (*")
       else
         write-cname(user self.type-instance.sub-type.type-data.name)
-      write(user " ")
+        write(user " ")
       write-cname(user self.name)
       write(user "_Values[")
       self.type-instance.length.write()
-      write(user "];\n")
+      write(user "]")
+      if self.type-instance.type-data = glob.type-array and
+          self.type-instance.sub-type.type-data = glob.type-func
+        write(user ")")
+        self.type-instance.sub-type.arguments.write(copy true)
+      write(user ";\n")
       self.write-spaces()
     
-    write-cname(user self.type-instance.type-data.name)
-    if self.access != ACCESS-VAR and self.access != ACCESS-AUX
-      write(user "*")
-    write(user " ")
-    write-cname(user self.name)
+    if self.type-instance.type-data = glob.type-func
+      self.type-instance.arguments.write-pointer(user self.name)
+    else
+      write-cname(user self.type-instance.type-data.name)
+      if self.access != ACCESS-VAR and self.access != ACCESS-AUX
+        write(user "*")
+      write(user " ")
+      write-cname(user self.name)
     
     if not self.type-instance.type-data.is-primitive and
         (self.access = ACCESS-VAR or self.access = ACCESS-AUX)
@@ -167,7 +183,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else-if ? self.parent
       # `type` `name` = 0;
       # `type`* `name` = NULL;
-      if self.access = ACCESS-VAR
+      if self.access = ACCESS-VAR and
+          self.type-instance.type-data != glob.type-func
         write(user " = 0")
       else
         write(user " = NULL")

@@ -238,9 +238,9 @@ Returncode f_assert_string_slice(String* expected, String* actual, Int start, In
   if (actual->length >= start + length) {
     if ((start) < 0 || (length) < 0 || (start) + (length) > (actual)->length) RAISE(85)
     actual_slice = (&(String){length, length, (actual)->values + (start)});
-    Bool _Bool123;
-    CHECK(86, String_equal(actual_slice, expected, &(_Bool123)) )
-    if (_Bool123) {
+    Bool _Bool124;
+    CHECK(86, String_equal(actual_slice, expected, &(_Bool124)) )
+    if (_Bool124) {
       return OK;
     }
   }
@@ -300,30 +300,30 @@ static char* _func_name_test_list = "test-list";
 #define MR_FUNC_NAME _func_name_test_list
 Returncode test_list() {
   List* list = &(List){NULL, NULL};
-  String* _String124;
-  CHECK(113, List_m_pop(list, (void**)&(_String124)) )
-  TEST_ASSERT(113, !(NULL != _String124))
   String* _String125;
-  CHECK(114, string_new_copy(&(String){7, 6, "value1"}, &(_String125)) )
-  CHECK(114, List_add(list, _String125) )
+  CHECK(113, List_m_pop(list, (void**)&(_String125)) )
+  TEST_ASSERT(113, !(NULL != _String125))
   String* _String126;
-  CHECK(115, string_new_copy(&(String){7, 6, "value2"}, &(_String126)) )
-  CHECK(115, List_add(list, _String126) )
+  CHECK(114, string_new_copy(&(String){7, 6, "value1"}, &(_String126)) )
+  CHECK(114, List_add(list, _String126) )
   String* _String127;
-  CHECK(116, string_new_copy(&(String){7, 6, "value3"}, &(_String127)) )
-  CHECK(116, List_add(list, _String127) )
+  CHECK(115, string_new_copy(&(String){7, 6, "value2"}, &(_String127)) )
+  CHECK(115, List_add(list, _String127) )
   String* _String128;
-  CHECK(117, List_m_pop(list, (void**)&(_String128)) )
-  CHECK(117, f_assert_string(&(String){7, 6, "value1"}, _String128) )
+  CHECK(116, string_new_copy(&(String){7, 6, "value3"}, &(_String128)) )
+  CHECK(116, List_add(list, _String128) )
   String* _String129;
-  CHECK(118, List_m_pop(list, (void**)&(_String129)) )
-  CHECK(118, f_assert_string(&(String){7, 6, "value2"}, _String129) )
+  CHECK(117, List_m_pop(list, (void**)&(_String129)) )
+  CHECK(117, f_assert_string(&(String){7, 6, "value1"}, _String129) )
   String* _String130;
-  CHECK(119, List_m_pop(list, (void**)&(_String130)) )
-  CHECK(119, f_assert_string(&(String){7, 6, "value3"}, _String130) )
+  CHECK(118, List_m_pop(list, (void**)&(_String130)) )
+  CHECK(118, f_assert_string(&(String){7, 6, "value2"}, _String130) )
   String* _String131;
-  CHECK(120, List_m_pop(list, (void**)&(_String131)) )
-  TEST_ASSERT(120, !(NULL != _String131))
+  CHECK(119, List_m_pop(list, (void**)&(_String131)) )
+  CHECK(119, f_assert_string(&(String){7, 6, "value3"}, _String131) )
+  String* _String132;
+  CHECK(120, List_m_pop(list, (void**)&(_String132)) )
+  TEST_ASSERT(120, !(NULL != _String132))
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -339,23 +339,23 @@ static char* _func_name_test_name_map = "test-name-map";
 #define MR_FUNC_NAME _func_name_test_name_map
 Returncode test_name_map() {
   NameMap* map = &(NameMap){NULL, NULL};
-  String* _String132;
-  CHECK(127, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String132)) )
-  TEST_ASSERT(127, !(NULL != _String132))
-  CHECK(128, NameMap_add(map, &(String){6, 5, "name1"}, &(String){7, 6, "value1"}) )
   String* _String133;
-  CHECK(129, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String133)) )
-  CHECK(129, f_assert_string(&(String){7, 6, "value1"}, _String133) )
+  CHECK(127, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String133)) )
+  TEST_ASSERT(127, !(NULL != _String133))
+  CHECK(128, NameMap_add(map, &(String){6, 5, "name1"}, &(String){7, 6, "value1"}) )
   String* _String134;
-  CHECK(130, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String134)) )
-  TEST_ASSERT(130, !(NULL != _String134))
-  CHECK(131, NameMap_add(map, &(String){6, 5, "name2"}, &(String){7, 6, "value2"}) )
+  CHECK(129, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String134)) )
+  CHECK(129, f_assert_string(&(String){7, 6, "value1"}, _String134) )
   String* _String135;
-  CHECK(132, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String135)) )
-  CHECK(132, f_assert_string(&(String){7, 6, "value1"}, _String135) )
+  CHECK(130, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String135)) )
+  TEST_ASSERT(130, !(NULL != _String135))
+  CHECK(131, NameMap_add(map, &(String){6, 5, "name2"}, &(String){7, 6, "value2"}) )
   String* _String136;
-  CHECK(133, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String136)) )
-  CHECK(133, f_assert_string(&(String){7, 6, "value2"}, _String136) )
+  CHECK(132, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String136)) )
+  CHECK(132, f_assert_string(&(String){7, 6, "value1"}, _String136) )
+  String* _String137;
+  CHECK(133, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String137)) )
+  CHECK(133, f_assert_string(&(String){7, 6, "value2"}, _String137) )
   return OK;
 }
 #undef MR_FUNC_NAME

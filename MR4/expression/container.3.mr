@@ -248,7 +248,8 @@ class QuestionExpression(Expression)
     self.tested.analyze()
     if not (? self.tested.result-type)
       self.m-syntax-error-msg(user "cannot use \"?\" on void expression")
-    if self.tested.result-type.type-data.is-primitive
+    if self.tested.result-type.type-data.is-primitive and
+        not (self.tested.result-type.type-data = glob.type-func)
       self.m-syntax-error(
           user "cannot use \"?\" on type",
           user self.tested.result-type.type-data.name)

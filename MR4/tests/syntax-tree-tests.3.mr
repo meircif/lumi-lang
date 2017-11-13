@@ -239,6 +239,9 @@ test test-function()
       user "func name(user Array{Array{Array{Int}}} array)",
       user "Returncode name(Array* array);\nReturncode name(Array* array) {\n  return OK;\n}")
   test-global-scope(
+      user "func name(copy Func{(copy Int x)->(copy Int y)} fun)->(copy Func{()} joy)",
+      user "Returncode name(Returncode (*fun)(Int x, Int* y), Returncode (**joy)(void));\nReturncode name(Returncode (*fun)(Int x, Int* y), Returncode (**joy)(void)) {\n  return OK;\n}")
+  test-global-scope(
       user "func name()\n  var Int x",
       user "Returncode name(void);\nReturncode name(void) {\n  Int x = 0;\n  return OK;\n}")
   test-global-scope(

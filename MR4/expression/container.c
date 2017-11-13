@@ -491,10 +491,10 @@ Returncode QuestionExpression_analyze(QuestionExpression* self) {
   if (!(NULL != self->tested->result_type)) {
     CHECK(250, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
   }
-  if (self->tested->result_type->type_data->is_primitive) {
-    CHECK(252, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
+  if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == glob->type_func)) {
+    CHECK(253, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
   }
-  CHECK(255, Expression_set_simple_type(&(self->_base), glob->type_bool) )
+  CHECK(256, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -505,7 +505,7 @@ Returncode QuestionExpression_write_preactions(QuestionExpression* self);
 static char* _func_name_QuestionExpression_write_preactions = "QuestionExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_QuestionExpression_write_preactions
 Returncode QuestionExpression_write_preactions(QuestionExpression* self) {
-  CHECK(258, (self->tested)->_base._dtl[5](self->tested) )
+  CHECK(259, (self->tested)->_base._dtl[5](self->tested) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -517,12 +517,12 @@ static char* _func_name_QuestionExpression_write = "QuestionExpression.write";
 #define MR_FUNC_NAME _func_name_QuestionExpression_write
 Returncode QuestionExpression_write(QuestionExpression* self) {
   if (!self->_base.top) {
-    CHECK(262, write(&(String){2, 1, "("}) )
+    CHECK(263, write(&(String){2, 1, "("}) )
   }
-  CHECK(263, (self->tested)->_base._dtl[2](self->tested) )
-  CHECK(264, write(&(String){9, 8, " != NULL"}) )
+  CHECK(264, (self->tested)->_base._dtl[2](self->tested) )
+  CHECK(265, write(&(String){9, 8, " != NULL"}) )
   if (!self->_base.top) {
-    CHECK(266, write(&(String){2, 1, ")"}) )
+    CHECK(267, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }

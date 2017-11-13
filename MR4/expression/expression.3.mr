@@ -171,8 +171,9 @@ class Expression(SyntaxTreeNode)
     self.write()
     write(user "_Dynamic")
   
-  func dynamic analyze-call(user FunctionArguments arguments)
-    # do noting
+  func dynamic analyze-call(user FunctionArguments arguments):(
+      copy Bool is-function-object)
+    is-function-object := true
   
   func dynamic write-preactions()
     # do noting

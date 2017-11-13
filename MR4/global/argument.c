@@ -509,6 +509,20 @@ Returncode FunctionArguments_write_args(FunctionArguments* self, List* arguments
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_FunctionArguments_write_pointer = "FunctionArguments.write-pointer";
+#define MR_FUNC_NAME _func_name_FunctionArguments_write_pointer
+Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name) {
+  CHECK(228, write(&(String){14, 13, "Returncode (*"}) )
+  CHECK(229, write_cname(name) )
+  CHECK(230, write(&(String){2, 1, ")"}) )
+  CHECK(231, FunctionArguments_write(self, true) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 extern Func FunctionArguments__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS

@@ -129,10 +129,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     write-cname(user self.name)
   
   func inst write-pointer()
-    write(user "Returncode (*")
-    write-cname(user self.name)
-    write(user ")")
-    self.arguments.write(copy true)
+    self.arguments.write-pointer(user self.name)
   
   func inst write-declaration()
     # Returncode `Type`_`name`(`args`);
@@ -249,6 +246,14 @@ class DeclarationArgument(Argument)
     variable := self.variable
   
   func dynamic write()
+    if self.variable.type-instance.type-data = glob.type-func
+      write(user "Returncode (*")
+      if self.is-output
+        write(user "*")
+      write-cname(user self.variable.name)
+      write(user ")")
+      self.variable.type-instance.arguments.write(copy true)
+      return
     # `type`[*][*] `name`[, `type`_Dynamic*[*] `name`_Dynamic]
     write-cname(user self.variable.type-instance.type-data.name)
     if self.access != ACCESS-COPY
