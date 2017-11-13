@@ -236,9 +236,6 @@ test test-function()
       user "func name(user Array{Int} array)",
       user "Returncode name(Array* array);\nReturncode name(Array* array) {\n  return OK;\n}")
   test-global-scope(
-      user "func name(user Array{Array{Array{Int}}} array)",
-      user "Returncode name(Array* array);\nReturncode name(Array* array) {\n  return OK;\n}")
-  test-global-scope(
       user "func name(copy Func{(copy Int x)->(copy Int y)} fun)->(copy Func{()} joy)",
       user "Returncode name(Returncode (*fun)(Int x, Int* y), Returncode (**joy)(void));\nReturncode name(Returncode (*fun)(Int x, Int* y), Returncode (**joy)(void)) {\n  return OK;\n}")
   test-global-scope(
@@ -287,6 +284,14 @@ test test-function()
   test-global-scope-error(
       user "func name(copy String s)\n",
       user "argument \"s\" access should not be \"copy\" for non-primitive type \"String\"")
+  test-global-scope-error(
+      user "func name(user Array error)\n", user "missing subtype for array")
+  test-global-scope-error(
+      user "func name(copy Func error)\n",
+      user "missing arguments in function type")
+  test-global-scope-error(
+      user "func name(user Array{Array{Int}} error)\n",
+      user "multidimensional array not supported yet...")
 
 
 test test-members()

@@ -89,15 +89,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "only \"var\" access is supported for primitive types, got",
           user glob.access-names[self.access])
     self.type-instance.analyze-lengths(user self)
-    if self.type-instance.type-data = glob.type-array
-      if not (? self.type-instance.sub-type)
-        self.m-syntax-error-msg(user "missing subtype for array")
-      if self.type-instance.sub-type.type-data = glob.type-func and
-          not (? self.type-instance.sub-type.arguments)
-        self.m-syntax-error-msg(user "missing arguments in function type")
-      if self.type-instance.sub-type.type-data = glob.type-array
-        self.m-syntax-error-msg(
-            user "multidimensional array not supported yet...")
     if self.access = ACCESS-VAR or self.access = ACCESS-NEW
       if not self.type-instance.type-data.is-primitive and not (? self.parent)
         self.m-syntax-error-msg(
@@ -110,9 +101,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           self.type-instance.sub-type.type-data = glob.type-string and
           not (? self.type-instance.sub-type.length)
         self.m-syntax-error-msg(user "missing length for sequence")
-    if self.type-instance.type-data = glob.type-func and
-        not (? self.type-instance.arguments)
-      self.m-syntax-error-msg(user "missing arguments in function type")
   
   func dynamic write()
     if self.access = ACCESS-VAR and

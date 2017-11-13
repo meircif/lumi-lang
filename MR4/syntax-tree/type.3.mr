@@ -296,6 +296,15 @@ static TypeInstance
         self.arguments.analyze()
     if ? self.sub-type
       self.sub-type.analyze-part(user node, copy check-types, copy check-length)
+    if check-types
+      if self.type-data = glob.type-array
+        if not (? self.sub-type)
+          node.m-syntax-error-msg(user "missing subtype for array")
+        if self.sub-type.type-data = glob.type-array
+          node.m-syntax-error-msg(
+              user "multidimensional array not supported yet...")
+      else-if self.type-data = glob.type-func and not (? self.arguments)
+        node.m-syntax-error-msg(user "missing arguments in function type")
   
   func inst m-check-assign-from(user SyntaxTreeNode node):(
       owner Expression value)
