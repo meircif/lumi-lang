@@ -110,6 +110,22 @@ test test-struct()
 
 
 test test-class()
+  var String{1024} input
+  input.copy(user "class Base\n")
+  input.concat(user "  var Int x\n")
+  input.concat(user "  func inst stat()\n")
+  input.concat(user "  func dynamic dyn0()\n")
+  input.concat(user "  func dynamic dyn1()\n")
+  input.concat(user "class Mid(Base)\n")
+  input.concat(user "  var Int y\n")
+  input.concat(user "  func dynamic dyn0()\n")
+  input.concat(user "  func dynamic dyn2()\n")
+  input.concat(user "class Top(Mid)\n")
+  input.concat(user "  var Int z\n")
+  input.concat(user "  func dynamic dyn0()\n")
+  input.concat(user "  func dynamic dyn3()\n")
+  input.concat(user "    base.dyn0()\n")
+  
   var String{2048} expected
   expected.copy(user "typedef struct Base Base;\n")
   expected.concat(user "typedef struct Base_Dynamic Base_Dynamic;\n")
@@ -193,12 +209,12 @@ test test-class()
   expected.concat(user "}\n")
   expected.concat(user "Returncode Top_dyn3(Top* self")
   expected.concat(user ", Top_Dynamic* self_Dynamic) {\n")
+  expected.concat(user "  CHECK(14, Mid_dyn0(&(self->_base)")
+  expected.concat(user ", &(self_Dynamic->_base)) )\n")
   expected.concat(user "  return OK;\n")
   expected.concat(user "}")
   
-  test-global-scope(
-      user "class Base\n  var Int x\n  func inst stat()\n  func dynamic dyn0()\n  func dynamic dyn1()\nclass Mid(Base)\n  var Int y\n  func dynamic dyn0()\n  func dynamic dyn2()\nclass Top(Mid)\n  var Int z\n  func dynamic dyn0()\n  func dynamic dyn3()\n",
-      user expected)
+  test-global-scope(user input, user expected)
   test-global-scope-error(
       user "class(\n", user "expected space after \"class\", got \"(\"")
 

@@ -232,6 +232,7 @@ Returncode MiddleType_meth1(MiddleType* self, MiddleType_Dynamic* self_Dynamic, 
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth2"
 Returncode MiddleType_meth2(MiddleType* self, MiddleType_Dynamic* self_Dynamic) {
+  CHECK(17, BaseType_meth2(&(self->_base), &(self_Dynamic->_base)) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -256,6 +257,7 @@ Returncode MiddleType_meth5(MiddleType* self, MiddleType_Dynamic* self_Dynamic, 
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth2"
 Returncode TopType_meth2(TopType* self, TopType_Dynamic* self_Dynamic) {
+  CHECK(14, MiddleType_meth2(&(self->_base), &(self_Dynamic->_base)) )
   CHECK(15, MiddleType_meth2(&(self->_base), &(self_Dynamic->_base)) )
   CHECK(16, BaseType_meth2(&(self->_base._base), &(self_Dynamic->_base._base)) )
   return OK;
@@ -266,6 +268,7 @@ Returncode TopType_meth2(TopType* self, TopType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth3"
 Returncode TopType_meth3(TopType* self, TopType_Dynamic* self_Dynamic, Int n, String* s) {
+  CHECK(20, BaseType_meth3(&(self->_base._base), &(self_Dynamic->_base._base), n, s) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -274,6 +277,7 @@ Returncode TopType_meth3(TopType* self, TopType_Dynamic* self_Dynamic, Int n, St
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth5"
 Returncode TopType_meth5(TopType* self, TopType_Dynamic* self_Dynamic, Int n, String* s) {
+  CHECK(24, MiddleType_meth5(&(self->_base), &(self_Dynamic->_base), n, s) )
   CHECK(25, MiddleType_meth1(NULL, NULL, n, s) )
   CHECK(26, BaseType_meth1(NULL, NULL, n, s) )
   return OK;

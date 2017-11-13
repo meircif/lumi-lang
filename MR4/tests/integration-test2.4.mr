@@ -14,7 +14,7 @@ class MiddleType(BaseType)
   
   func dynamic meth2()
     # sys.print(user "MiddleType.meth2")
-    # base.meth2()
+    base.meth2()
   
   func dynamic meth4()
     # sys.print(user "MiddleType.meth4")
