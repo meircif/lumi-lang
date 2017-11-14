@@ -25,8 +25,17 @@ class Argument(SyntaxTreeNode)
   func dynamic get-type-instance():(user TypeInstance type-instance)
     raise
   
-  func dynamic m-check-calling(user TypeInstance type-instance)
-    raise
+  func inst m-check-same-as(user Argument other)
+    if self.access != other.access
+      self.m-syntax-error2(
+          user "expected access",
+          user glob.access-names[other.access],
+          user ", got",
+          user glob.access-names[self.access])
+    self.m-check-same-type-as(user other.get-type-instance())
+  
+  func dynamic m-check-same-type-as(user TypeInstance type-instance)
+    self.get-type-instance().m-check-equal(user type-instance, user self)
   
   func dynamic get-variable():(user SyntaxTreeVariable variable)
     raise
@@ -68,24 +77,23 @@ class FunctionArguments(SyntaxTreeNode)
     new List{Argument} in self.outputs
   
   func inst parse(
-      user ArgumentFactory argument-factory,
-      user SyntaxTreeCode code-node,
-      user TypeData parent-type):(
+      user ArgumentFactory argument-factory, user SyntaxTreeCode code-node):(
       copy Char end)
     self.init()
-    if ? parent-type
-      new DeclarationArgument self-args
-      self-args.access := ACCESS-VAR
-      new SyntaxTreeVariable in self-args.variable
-      string-new-copy(user "self"):(owner self-args.variable.name)
-      parent-type.m-new-type-instance():(owner self-args.variable.type-instance)
-      self.parameters.add(owner self-args)
     self.parse-args(
         user self.parameters, user argument-factory, user code-node):(copy end)
     if end = '-'
       self.read-expect(user ">(")
       self.parse-args(
           user self.outputs, user argument-factory, user code-node):(copy end)
+  
+  func inst add-self-parameter(user TypeData parent-type)
+    new DeclarationArgument self-args
+    self-args.access := ACCESS-VAR
+    new SyntaxTreeVariable in self-args.variable
+    string-new-copy(user "self"):(owner self-args.variable.name)
+    parent-type.m-new-type-instance():(owner self-args.variable.type-instance)
+    self.parameters.m-prepend(owner self-args)
   
   func inst parse-args(
       user List{Argument} arguments,
@@ -157,13 +165,13 @@ class FunctionArguments(SyntaxTreeNode)
           node.item.get-variable().m-find-variable(user name):(user variable)
       node := node.next
   
-  func inst m-check-calling(
+  func inst m-check-same-as(
       user FunctionArguments other):(copy Bool output-ommited)
     user ListNode{Argument} my-node(self.parameters.first)
     user ListNode{Argument} other-node(other.parameters.first)
     do
       while ? my-node and ? other-node
-      my-node.item.m-check-calling(user other-node.item.get-type-instance())
+      my-node.item.m-check-same-as(user other-node.item)
       my-node := my-node.next
       other-node := other-node.next
     if ? my-node
@@ -175,7 +183,7 @@ class FunctionArguments(SyntaxTreeNode)
     other-node := other.outputs.first
     do
       while ? my-node and ? other-node
-      my-node.item.m-check-calling(user other-node.item.get-type-instance())
+      my-node.item.m-check-same-as(user other-node.item)
       my-node := my-node.next
       other-node := other-node.next
     if ? my-node
@@ -215,3 +223,9 @@ class FunctionArguments(SyntaxTreeNode)
       node := node.next
       while ? node
       write(user ", ")
+  
+  func inst write-pointer(user String name)
+    write(user "Returncode (*")
+    write-cname(user name)
+    write(user ")")
+    self.write(copy true)

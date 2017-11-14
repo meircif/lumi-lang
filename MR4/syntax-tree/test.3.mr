@@ -19,12 +19,13 @@ class SyntaxTreeAssert(SyntaxTreeCode)
   
   func dynamic write()
     # TEST_ASSERT(`line`, `tested`)
+    self.write-spaces()
     self.tested.write-preactions()
     write(user "TEST_ASSERT(")
     self.write-line-num()
     write(user ", ")
     self.tested.write()
-    write(user ")")
+    write(user ")\n")
 
 ## Assert-error statement in the syntax tree
 class SyntaxTreeAssertError(SyntaxTreeCode)
@@ -39,25 +40,88 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     self.parent := parent
     self.set-location()
     parse-new-expression(user "", user self):(owner self.tested, copy end)
-    self.tested.is-statement := true
-    self.m-syntax-error-msg(user "assert-error not supported yet...")
   
   func dynamic analyze()
     self.tested.analyze()
+  
+  func dynamic write()
+    self.write-spaces()
+    write(user "do {\n")
+    self.parent.indentation-spaces += 2
+    self.write-spaces()
+    write(user "MR_trace_stream = NULL;\n")
+    write(user "#undef RETURN_ERROR\n")
+    write(user "#define RETURN_ERROR(value) break\n")
+    self.write-spaces()
+    self.tested.write-preactions()
+    write(user "\n#undef RETURN_ERROR\n")
+    write(user "#define RETURN_ERROR(value) return value\n")
+    self.write-spaces()
+    write(user "MR_trace_stream = stdout;\n")
+    self.write-spaces()
+    write(user "TEST_FAIL(")
+    self.write-line-num()
+    write(user ")\n")
+    self.parent.indentation-spaces -= 2
+    self.write-spaces()
+    write(user "} while (false);\n")
 
 
 ## Test function in the syntax tree
 class SyntaxTreeTestFunction(SyntaxTreeFunction)
   func inst parse-new():(copy Char end, owner SyntaxTreeTestFunction new-node)
     new SyntaxTreeTestFunction in new-node
-    new-node.parse(user _):(copy end)
-    self.m-syntax-error-msg(user "test-function not supported yet...")
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    base.parse(user _):(copy end)
+    if (? self.arguments.parameters.first) or (? self.arguments.outputs.first)
+      self.m-syntax-error-msg(user "test function cannot have arguments")
+    glob.test-functions.add(user self.name, user self)
 
 
 ## Mock function in the syntax tree
 class SyntaxTreeMockFunction(SyntaxTreeFunction)
+  owner String mocked-name
+  owner String type-name
+  
   func inst parse-new():(copy Char end, owner SyntaxTreeMockFunction new-node)
     new SyntaxTreeMockFunction in new-node
-    new-node.parse(user _):(copy end)
-    self.m-syntax-error-msg(user "mock not supported yet...")
-
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    base.parse(user _):(copy end)
+    var Int index
+    self.name.find(user "."):(copy index)
+    if index < self.name.length
+      string-new-copy(user self.name[0:index]):(owner self.type-name)
+      string-new-copy(user self.name[index + 1:self.name.length - index - 1]):(
+          owner self.mocked-name)
+      delete self.name
+    else
+      self.mocked-name := self.name
+    string-new-concat(user "Mock ", user self.mocked-name):(owner self.name)
+  
+  func dynamic m-check-name()
+    # do not check
+  
+  func dynamic analyze()
+    user SyntaxTreeFunction mocked-func
+    if ? self.type-name
+      self.m-find-type(user self.type-name):(user self.parent-type)
+      self.parent-type.m-find-meth(user self.mocked-name):(user mocked-func)
+      if not (? mocked-func)
+        self.m-syntax-error2(
+            user "mocking unknown method",
+            user self.mocked-name,
+            user "of type",
+            user self.type-name)
+      self.arguments.add-self-parameter(user self.parent-type)
+    else
+      glob.root.m-find-function(user self.mocked-name):(user mocked-func)
+      if not (? mocked-func)
+        self.m-syntax-error(
+            user "mocking unknown function", user self.mocked-name)
+    self.arguments.m-check-same-as(user mocked-func.arguments)
+    mocked-func.mocker-function := self
+    base.analyze()

@@ -134,7 +134,8 @@ class StringExpression(TextExpression)
     self.text := text
   
   func dynamic analyze()
-    self.add-aux-variable(copy ACCESS-AUX):(owner self.symbol)
+    self.add-aux-variable(copy ACCESS-AUX, user self.result-type):(
+        owner self.symbol)
   
   func dynamic write-preactions()
     # `symbol`.max_length = `string-length + 1`;
@@ -175,3 +176,6 @@ class EmptyExpression(Expression)
   
   func dynamic write()
     write(user "NULL")
+  
+  func dynamic write-dynamic()
+    self.write()

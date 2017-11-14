@@ -39,14 +39,17 @@ func test-member-expression(user TestStruct t)->(user TestStruct to, copy Int i)
   t.num := to.num + t.ts.num + t.ts.ts.num
   to.num := t.num
   t.ts.ts.num := 4
+  t.fun := f-test-void
+  t.fun()
 
 
 func test-slice-expression(
     user String s,
     user Array{Int} arri,
     user Array{String} arrs,
-    user Array{TestStruct} arrt)->(
-    copy Char c, copy Int i, user TestStruct t)
+    user Array{TestStruct} arrt,
+    user Array{Func{()}} arrf)->(
+    copy Char c, copy Int i, user TestStruct t, copy Func{()} f)
   c := s[2] + s[4:7][2] + arrs[3][2] + arrs[4:2][4][1:3][0]
   i := arri[i + 3 - arri[2]] + arrt[4].num + arrt[2:4][1].num +
       arri[2:4][1:2][1]
@@ -55,6 +58,11 @@ func test-slice-expression(
   arrs := arrs[2:7]
   t := arrt[4]
   arrt := arrt[2:7]
+  f := _
+  f := arrf[4]
+  f()
+  arrf[4]()
+  arrf := arrf[2:7]
 
 
 func test-container-expression(copy Int x, copy Int y, user String s)->(
@@ -72,34 +80,42 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
   user TestStruct t
   var TestStruct tv
   var String{12} sv
+  var Func{(copy Int xi, user String si)->(copy Int xo, user String so)} f
   var Array{12:Int} ia
   var Array{12:TestStruct} ta
   var Array{12:String{7}} sa
+  var Array{12:Func{()}} fa
   new TestStruct tn
   new String{arr[0]} sn
   new Array{arr[0]:Int} ian
   new Array{arr[0]:TestStruct} tan
   new Array{arr[0]:String{arr[1]}} san
+  new Array{arr[0]:Func{()}} sfn
   var Int ix(arr[0])
   user String is(text)
   var String{12} isv("some string")
   new String{i} isn(text)
+  var Func{(copy Int x)->(owner String s)} fi(f-test-int2str)
   assert x = 0
   assert s?
   assert a?
   assert t?
+  assert f?
   assert tv?
   assert sv?
   assert ia?
   assert ta?
   assert sa?
+  assert fa?
   assert tn?
   assert sn?
   assert ian?
   assert tan?
   assert san?
+  assert sfn?
   assert ix = 0
   assert is?
+  assert fi?
   assert isv?
   assert isn?
 
@@ -131,6 +147,7 @@ struct TestStruct
   # comment test
   
   user TestStruct ts
+  var Func{()} fun
   
   func set(copy Int x, user String s)
     self.num := x
@@ -159,6 +176,7 @@ func f-test-many(
     copy Int n,
     copy Int m)
 
+
 func test-call-expression()
   owner String s
   var Int x
@@ -177,6 +195,7 @@ func test-call-expression()
   f-test-int(copy f-test-int2int(copy 9)->(copy tmp))
   x := f-test-int2int(copy 10) + f-test-many(copy 11, copy 12)->(copy x)
   s := f-test-int2str(copy 13)
+
 
 func test-code-flow(user Array{Int} arr)->(copy Int res)
   if arr[4] > 6
@@ -206,6 +225,37 @@ func test-code-flow(user Array{Int} arr)->(copy Int res)
     var Int x(arr[0])
     if x > 4
       arr[1] := x
+
+
+func test-builtins(
+    copy Int i, copy Char c, copy Bool b, user String s, user Array{Int} a)
+  i.str(user s)
+  b := true or false
+  c := EOF
+  i := a.length
+  i := s.length
+  s.clear()
+  s.equal(user s)->(copy b)
+  s.get(copy i)->(copy c)
+  s.append(copy c)
+  s.copy(user s)
+  s.concat(user s)
+  s.concat-int(copy i)
+  s.find(user s)->(copy i)
+  s.has(copy c)->(copy b)
+  owner File f
+  file-open-read(user s)->(owner f)
+  file-open-write(user s)->(owner f)
+  f.getc()->(copy c)
+  f.putc(copy c)
+  f.write(user s)
+  f.close()
+  s := sys.argv[1]
+  sys.print(user s)
+  sys.println(user s)
+  sys.getenv(user s, user s)->(copy b)
+  sys.system(user s)->(copy i)
+  sys.exit(copy i)
 
 
 main

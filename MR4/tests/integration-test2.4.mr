@@ -10,14 +10,14 @@ class MiddleType(BaseType)
   user TopType mid-top-ref
   
   func dynamic meth1(copy Int n, user String s)
-    # sys.print(user "MiddleType.meth1")
+    sys.println(user "MiddleType.meth1")
   
   func dynamic meth2()
-    # sys.print(user "MiddleType.meth2")
+    sys.println(user "MiddleType.meth2")
     base.meth2()
   
   func dynamic meth4()
-    # sys.print(user "MiddleType.meth4")
+    sys.println(user "MiddleType.meth4")
   
   func dynamic meth5(copy Int n, user String s)
-    # sys.print(user "MiddleType.meth5")
+    sys.println(user "MiddleType.meth5")

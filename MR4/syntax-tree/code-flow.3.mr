@@ -70,14 +70,13 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     # }
     # `else-block`
   func dynamic write()
+    self.write-spaces()
     self.condition.write-preactions()
     write(user "if (")
     self.condition.write()
     write(user ")")
     self.write-block()
     if ? self.else-node
-      write(user "\n")
-      self.write-spaces()
       self.else-node.write()
 
 
@@ -93,6 +92,7 @@ class SyntaxTreeElse(SyntaxTreeFlowElement)
     # else {
     #   `block...`
     # }
+    self.write-spaces()
     write(user "else")
     self.write-block()
 
@@ -109,6 +109,7 @@ class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
     # while (true) {
     #   `block...`
     # }
+    self.write-spaces()
     write(user "while (true)")
     self.write-block()
 
@@ -157,6 +158,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     # {int `index`; for(`index`=`start`; `index`<`upper-bound`; ++`index`) {
     #    `block...`
     # }}
+    self.write-spaces()
     if ? self.start
       self.start.write-preactions()
     self.upper-bound.write-preactions()
@@ -177,4 +179,5 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     write-cname(user self.index-name)
     write(user ")")
     self.write-block()
-    write(user "}")
+    self.write-spaces()
+    write(user "}\n")

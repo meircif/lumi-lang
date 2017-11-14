@@ -32,6 +32,7 @@ Returncode MR_user_main();
 int MR_main(int argc, char* argv[]) {
   String* args_strings;
   Array sys_argv;
+  Sys sys_Value;
   int arg;
   Returncode err;
   MR_trace_stream = stderr;
@@ -42,7 +43,8 @@ int MR_main(int argc, char* argv[]) {
   }
   sys_argv.length = argc;
   sys_argv.values = args_strings;
-  sys.argv = &sys_argv;
+  sys_Value.argv = &sys_argv;
+  sys = &sys_Value;
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
     args_strings[arg].length = cstring_length(argv[arg], 1024);
@@ -248,19 +250,6 @@ Returncode String_append(String* this, Char in_char) {
 }
 #undef MR_FUNC_NAME
 
-Returncode String_replace(String* this, Char old, Char new) {
-  int n;
-  if (old == new) {
-    return OK;
-  }
-  for (n = 0; n < this->length; ++n) {
-    if (this->values[n] == old) {
-      this->values[n] = new;
-    }
-  }
-  return OK;
-}
-
 #define MR_FUNC_NAME "Int.str"
 Returncode Int_str(Int value, String* out_str) {
   Bool is_neg;
@@ -362,15 +351,15 @@ Returncode String_has(String* this, Char ch, Bool* found) {
 }
 
 /*system*/
-Sys sys;
+Sys* sys;
 
 Returncode Sys_print(Sys* _, String* text) {
-  printf("%.*s\n", text->length, text->values);
+  printf("%.*s", text->length, text->values);
   return OK;
 }
 
-Returncode Sys_print_raw(Sys* _, String* text) {
-  printf("%.*s", text->length, text->values);
+Returncode Sys_println(Sys* _, String* text) {
+  printf("%.*s\n", text->length, text->values);
   return OK;
 }
 

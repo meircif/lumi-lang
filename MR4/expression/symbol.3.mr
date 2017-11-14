@@ -30,7 +30,17 @@ class SymbolExpression(Expression)
       self.set-simple-type(user glob.type-func)
       self.function.arguments.m-copy-new():(owner self.result-type.arguments)
   
+  func dynamic analyze-call(user FunctionArguments arguments):(
+      copy Bool is-function-object)
+    is-function-object := ? self.variable
+  
   func dynamic write()
+    if ? self.function
+      if ? self.function.mocker-function
+        self.function.mocker-function.write-cname()
+      else
+        self.function.write-cname()
+      return
     if ? self.variable and self.variable.is-output
       if not self.top
         write(user "(")
@@ -89,7 +99,9 @@ class BaseMethExpression(Expression)
 ## An instance member expression
 class MemberExpression(SymbolExpression)
   owner Expression instance
+  user Expression dynamic-call-self-instance
   var Int bases
+  var Bool is-dynamic-call
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -134,6 +146,12 @@ class MemberExpression(SymbolExpression)
             user type-data.name,
             user "has no member",
             user self.name)
+      if self.function.is-dynamic and
+          self.instance.result-type.type-data != glob.type-type and
+          self.instance.result-type.type-data != glob.type-base
+        self.bases := self.function.dynamic-base-count
+        self.function := self.function.dynamic-base-method
+        self.is-dynamic-call := true
       self.set-simple-type(user glob.type-func)
       self.function.arguments.m-copy-new():(owner self.result-type.arguments)
     if self.instance.result-type.type-data = glob.type-base
@@ -144,7 +162,10 @@ class MemberExpression(SymbolExpression)
       self.instance.result-type := base-result-type.sub-type
       delete base-result-type
   
-  func dynamic analyze-call(user FunctionArguments arguments)
+  func dynamic analyze-call(user FunctionArguments arguments):(
+      copy Bool is-function-object)
+    if base.analyze-call(user arguments):(copy is-function-object)
+      return
     if self.instance.result-type.type-data = glob.type-type
       delete self.instance
     else
@@ -153,31 +174,43 @@ class MemberExpression(SymbolExpression)
       self-param.value := self.instance
       self-param.value.top := true
       arguments.parameters.m-prepend(owner self-param)
-    self.bases := 0
+      if self.is-dynamic-call
+        self.dynamic-call-self-instance := self.instance
     self.instance := _
   
   func dynamic write-preactions()
-    if not (? self.instance)
+    if not (? self.dynamic-call-self-instance or
+        (? self.instance and not (? self.function) and
+        self.instance.result-type.type-data != glob.type-type))
       return
-    self.instance.write-preactions()
-    if self.instance.result-type.type-data != glob.type-type
-      # if (`instance` == NULL) RAISE(`line-num`)
-      write(user "if (")
+    if ? self.instance
+      self.instance.write-preactions()
+    # if (`instance` == NULL) RAISE(`line-num`)
+    write(user "if (")
+    if ? self.instance
       self.instance.write()
-      write(user " == NULL) ")
-      self.write-raise()
-      write(user "\n")
-      self.code-node.write-spaces()
+    else-if ? self.dynamic-call-self-instance
+      self.dynamic-call-self-instance.write-dynamic()
+    write(user " == NULL) ")
+    self.write-raise()
+    self.code-node.write-spaces()
   
   func dynamic write()
-    if ? self.function
-      self.function.write-cname()
+    if ? self.dynamic-call-self-instance
+      self.dynamic-call-self-instance.write-dynamic()
+      self.write-bases()
+      write-cname(user self.function.name)
       return
-    self.instance.write()
+    if ? self.instance and not (? self.function) and
+        self.instance.result-type.type-data != glob.type-type
+      self.instance.write()
+      self.write-bases()
+    base.write()
+  
+  func inst write-bases()
     write(user "->")
     for n in self.bases
       write(user "_base.")
-    base.write()
 
 
 ## An instance member expression
@@ -200,8 +233,19 @@ class UpCastExpression(Expression)
   
   func dynamic write()
     # &(`expression`->_base[._base]...)
-    write(user "&(")
+    self.write-pre()
     self.expression.write()
+    self.write-post()
+  
+  func dynamic write-dynamic()
+    self.write-pre()
+    self.expression.write-dynamic()
+    self.write-post()
+  
+  func inst write-pre()
+    write(user "&(")
+  
+  func inst write-post()
     write(user "->_base")
     for n in 1:self.bases
       write(user "._base")

@@ -5,6 +5,7 @@ class CallExpression(Expression)
   owner Expression function
   owner FunctionArguments arguments
   user Expression output
+  var Bool is-function-object
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -19,8 +20,7 @@ class CallExpression(Expression)
     self.set-location()
     new FunctionArguments in self.arguments
     var CallArgumentFactory argument-factory
-    self.arguments.parse(
-        user argument-factory, user code-node, user _):(copy end)
+    self.arguments.parse(user argument-factory, user code-node):(copy end)
   
   func dynamic analyze()
     self.function.analyze()
@@ -32,17 +32,18 @@ class CallExpression(Expression)
           user "non callable type",
           user self.function.result-type.type-data.name)
     user FunctionArguments declaration(self.function.result-type.arguments)
-    if not (? declaration)
-      self.m-syntax-error-msg(user "pointer-to-function not supported")
     if not self.is-statement
       declaration.get-result-type().m-copy-new():(owner self.result-type)
-    self.function.analyze-call(user self.arguments)
-    if self.arguments.m-check-calling(user declaration)
+    self.function.analyze-call(user self.arguments):(
+        copy self.is-function-object)
+    if self.arguments.m-check-same-as(user declaration)
       # add omitted output
       new CallArgument output
       output.is-output := true
       output.access := declaration.outputs.last.item.access
-      self.add-aux-variable(copy declaration.outputs.last.item.access):(
+      self.add-aux-variable(
+          copy declaration.outputs.last.item.access,
+          user declaration.get-result-type()):(
           owner output.value)
       self.output := output.value
       self.arguments.outputs.add(owner output)
@@ -52,10 +53,17 @@ class CallExpression(Expression)
   
   func dynamic write-preactions()
     self.function.write-preactions()
+    if self.is-function-object
+      write(user "if (")
+      self.function.top := true
+      self.function.write()
+      self.function.top := false
+      write(user " == NULL) ")
+      self.write-raise()
+      self.code-node.write-spaces()
     self.arguments.write-preactions()
     if not self.is-statement
       self.write-func-call()
-      write(user "\n")
       self.code-node.write-spaces()
   
   func dynamic write()
@@ -70,7 +78,7 @@ class CallExpression(Expression)
     self.write-call()
     self.function.write()
     self.arguments.write(copy false)
-    write(user " )")
+    write(user " )\n")
   
 
 
@@ -79,6 +87,7 @@ class CallArgument(Argument)
   owner Expression value
   user SyntaxTreeCode code-node
   var Bool is-down-cast
+  var Bool is-dynamic
   
   func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
     self.code-node := code-node
@@ -92,12 +101,13 @@ class CallArgument(Argument)
     if self.is-output and not self.value.assignable
       self.m-syntax-error-msg(user "non assignable call output")
   
-  func dynamic m-check-calling(user TypeInstance type-instance)
+  func dynamic m-check-same-type-as(user TypeInstance type-instance)
     if self.is-output
       self.is-down-cast := type-instance.m-check-assign-to(
           user self.value.result-type, user self) > 0
     else
       type-instance.m-check-assign-from(user self):(owner self.value)
+    self.is-dynamic := type-instance.type-data.is-dynamic
   
   func dynamic get-output():(user Expression output)
     output := self.value
@@ -110,11 +120,10 @@ class CallArgument(Argument)
       self.value.write()
       write(user " != NULL) ")
       self.write-raise()
-      write(user "\n")
       self.code-node.write-spaces()
   
   func dynamic write()
-    # &(`value`)
+    # [&(]`value`[)][, [&(]`value`_Dynamic[)]]
     if self.is-output
       if self.is-down-cast
         write(user "(void*)")
@@ -122,6 +131,16 @@ class CallArgument(Argument)
     self.value.write()
     if self.is-output
       write(user ")")
+    if self.is-dynamic
+      write(user ", ")
+      if self.is-output
+        if self.is-down-cast
+          write(user "(void*)")
+        write(user "&(")
+      self.value.write-dynamic()
+      if self.is-output
+        write(user ")")
+      
 
 
 class CallArgumentFactory(ArgumentFactory)

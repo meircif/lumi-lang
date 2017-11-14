@@ -29,7 +29,6 @@ class SliceExpression(Expression)
   
   func dynamic analyze()
     self.sequence.analyze()
-    self.assignable := self.sequence.assignable and not (? self.second-index)
     if not (? self.sequence.result-type)
       self.m-syntax-error-msg(user "cannot slice a void expression")
     if self.sequence.result-type.type-data = glob.type-string
@@ -42,6 +41,8 @@ class SliceExpression(Expression)
       self.m-syntax-error(
           user "cannot slice type",
           user self.sequence.result-type.type-data.name)
+    self.assignable := self.sequence.assignable and
+        not (? self.second-index) and self.result-type.type-data.is-primitive
     
     self.index.analyze()
     self.m-check-index(user self.index)
@@ -50,7 +51,8 @@ class SliceExpression(Expression)
       self.second-index.analyze()
       self.m-check-index(user self.second-index)
       self.sequence.result-type.m-copy-new():(owner self.result-type)
-      self.add-aux-variable(copy ACCESS-AUX):(owner self.slice-symbol)
+      self.add-aux-variable(copy ACCESS-AUX, user self.result-type):(
+          owner self.slice-symbol)
   
   func inst m-check-index(user Expression index)
     if ? index.result-type
@@ -117,7 +119,6 @@ class SliceExpression(Expression)
     self.sequence.write()
     write(user ")->length) ")
     self.write-raise()
-    write(user "\n")
     self.code-node.write-spaces()
   
   func dynamic write()
@@ -125,17 +126,22 @@ class SliceExpression(Expression)
       self.slice-symbol.write()
       return
     
-    # (((seq)->values)[index])
-    # (((Prmitive*)((seq)->values))[index])
-    # (((Complex**)((seq)->values))[index])
+    # ((seq)->values)[index]
+    # ((Prmitive*)((seq)->values))[index]
+    # ((Complex**)((seq)->values))[index]
     if not self.top
       write(user "(")
     write(user "((")
     if self.sequence.result-type.type-data != glob.type-string
-      write-cname(user self.result-type.type-data.name)
-      if not self.result-type.type-data.is-primitive
+      if self.result-type.type-data = glob.type-func and
+          ? self.result-type.arguments
+        self.result-type.arguments.write-pointer(user "*")
+      else
+        write-cname(user self.result-type.type-data.name)
+        if not self.result-type.type-data.is-primitive
+          write(user "*")
         write(user "*")
-      write(user "*)((")
+      write(user ")((")
     self.sequence.write()
     write(user ")->values)")
     if self.sequence.result-type.type-data != glob.type-string
@@ -145,3 +151,8 @@ class SliceExpression(Expression)
     write(user "]")
     if not self.top
       write(user ")")
+  
+  func dynamic write-dynamic()
+    write(user "&")
+    write-cname(user self.result-type.type-data.name)
+    write(user "_dynamic")

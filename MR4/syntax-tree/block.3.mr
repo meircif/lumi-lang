@@ -139,6 +139,13 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.code-nodes.add(owner SyntaxTreeAssert.parse-new(
           var _, user self):(copy end))
       
+    else-if keyword.equal(user "assert-error")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"assert-error\", got", copy end)
+      self.code-nodes.add(owner SyntaxTreeAssertError.parse-new(
+          var _, user self):(copy end))
+      
     else
       glob.save-input := true
       self.code-nodes.add(
@@ -212,4 +219,4 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     base.write()
     self.write-children(user self.code-nodes)
     write-spaces(copy self.indentation-spaces - 2)
-    write(user "}")
+    write(user "}\n")

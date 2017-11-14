@@ -3,15 +3,6 @@
 
 #)
 
-## Access values
-var Int ACCESS-COPY(0)
-var Int ACCESS-USER(1)
-var Int ACCESS-OWNER(2)
-var Int ACCESS-VAR(3)
-var Int ACCESS-NEW(4)
-var Int ACCESS-AUX(5)
-
-
 ## Basic node type for all syntax tree nodes
 class SyntaxTreeNode
   user String input-file-name
@@ -22,16 +13,11 @@ class SyntaxTreeNode
     self.line-number := glob.line-number
   
   func inst get-access(user String access-str):(copy Int access)
-    if access-str.equal(user "copy")
-      access := ACCESS-COPY
-    else-if access-str.equal(user "user")
-      access := ACCESS-USER
-    else-if access-str.equal(user "owner")
-      access := ACCESS-OWNER
-    else-if access-str.equal(user "var")
-      access := ACCESS-VAR
-    else
-      self.m-syntax-error(user "illegal access", user access-str)
+    for n in 4
+      if glob.access-names[n].equal(user access-str)
+        access := n
+        return
+    self.m-syntax-error(user "illegal access", user access-str)
   
   func inst m-find-type(user String name):(user TypeData type-data)
     if not (? glob.type-map.find(user name):(user type-data))
@@ -66,7 +52,7 @@ class SyntaxTreeNode
   func inst write-raise()
     write(user "RAISE(")
     self.write-line-num()
-    write(user ")")
+    write(user ")\n")
   
   func inst write-call()
     write(user "CHECK(")
@@ -134,20 +120,6 @@ class SyntaxTreeNode
     print(user line-num-str)
     print(user "] ")
   
-  func inst m-link-children-types(user List{SyntaxTreeNode} child-list)
-    user ListNode{SyntaxTreeNode} child(child-list.first)
-    do
-      while ? child
-      child.item.m-link-types()
-      child := child.next
-  
-  func inst analyze-children(user List{SyntaxTreeNode} child-list)
-    user ListNode{SyntaxTreeNode} child(child-list.first)
-    do
-      while ? child
-      child.item.analyze()
-      child := child.next
-  
   func dynamic m-link-types()
     # do nothing as default
   
@@ -156,3 +128,40 @@ class SyntaxTreeNode
   
   func dynamic write()
     raise
+  
+  func inst m-link-children-types(user List{SyntaxTreeNode} child-list)
+    var NodeLinkTypesAction action-link-types
+    self.m-do-on-children(user child-list, user action-link-types)
+  
+  func inst analyze-children(user List{SyntaxTreeNode} child-list)
+    var NodeAnalyzeAction action-analyze
+    self.m-do-on-children(user child-list, user action-analyze)
+  
+  func inst write-children(user List{SyntaxTreeNode} child-list)
+    var NodeWriteAction action-write
+    self.m-do-on-children(user child-list, user action-write)
+  
+  func inst m-do-on-children(
+      user List{SyntaxTreeNode} child-list, user NodeAction action)
+    user ListNode{SyntaxTreeNode} child(child-list.first)
+    do
+      while ? child
+      action.m-action(user child.item)
+      child := child.next
+
+
+class NodeAction
+  func dynamic m-action(user SyntaxTreeNode node)
+    raise
+
+class NodeLinkTypesAction(NodeAction)
+  func dynamic m-action(user SyntaxTreeNode node)
+    node.m-link-types()
+
+class NodeAnalyzeAction(NodeAction)
+  func dynamic m-action(user SyntaxTreeNode node)
+    node.analyze()
+
+class NodeWriteAction(NodeAction)
+  func dynamic m-action(user SyntaxTreeNode node)
+    node.write()

@@ -83,13 +83,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     self.type-instance.m-link-types(user self)
   
   func dynamic analyze()
+    if self.type-instance.type-data.is-primitive and self.access != ACCESS-VAR
+      self.m-syntax-error(
+          user "only \"var\" access is supported for primitive types, got",
+          user glob.access-names[self.access])
     self.type-instance.analyze-lengths(user self)
-    if self.type-instance.type-data = glob.type-array
-      if not (? self.type-instance.sub-type)
-        self.m-syntax-error-msg(user "missing subtype for array")
-      if self.type-instance.sub-type.type-data = glob.type-array
-        self.m-syntax-error-msg(
-            user "multidimensional array not supported yet...")
     if self.access = ACCESS-VAR or self.access = ACCESS-NEW
       if not self.type-instance.type-data.is-primitive and not (? self.parent)
         self.m-syntax-error-msg(
@@ -104,6 +102,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.m-syntax-error-msg(user "missing length for sequence")
   
   func dynamic write()
+    if ? self.parent or ? self.parent-type
+      self.write-spaces()
+    else
+      write(user "\n")
     if self.access = ACCESS-VAR and
         (self.type-instance.type-data = glob.type-array or
         self.type-instance.type-data = glob.type-string)
@@ -120,21 +122,31 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.write-spaces()
       # `sub-type` `name`_Values[`length`];
       if self.type-instance.type-data = glob.type-string
-        write(user "char")
+        write(user "char ")
+      else-if self.type-instance.sub-type.type-data = glob.type-func
+        write(user "Returncode (*")
       else
         write-cname(user self.type-instance.sub-type.type-data.name)
-      write(user " ")
+        write(user " ")
       write-cname(user self.name)
       write(user "_Values[")
       self.type-instance.length.write()
-      write(user "];\n")
+      write(user "]")
+      if self.type-instance.type-data = glob.type-array and
+          self.type-instance.sub-type.type-data = glob.type-func
+        write(user ")")
+        self.type-instance.sub-type.arguments.write(copy true)
+      write(user ";\n")
       self.write-spaces()
     
-    write-cname(user self.type-instance.type-data.name)
-    if self.access != ACCESS-VAR and self.access != ACCESS-AUX
-      write(user "*")
-    write(user " ")
-    write-cname(user self.name)
+    if self.type-instance.type-data = glob.type-func
+      self.type-instance.arguments.write-pointer(user self.name)
+    else
+      write-cname(user self.type-instance.type-data.name)
+      if self.access != ACCESS-VAR and self.access != ACCESS-AUX
+        write(user "*")
+      write(user " ")
+      write-cname(user self.name)
     
     if not self.type-instance.type-data.is-primitive and
         (self.access = ACCESS-VAR or self.access = ACCESS-AUX)
@@ -162,12 +174,38 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else-if ? self.parent
       # `type` `name` = 0;
       # `type`* `name` = NULL;
-      if self.access = ACCESS-VAR
+      if self.access = ACCESS-VAR and
+          self.type-instance.type-data != glob.type-func
         write(user " = 0")
       else
         write(user " = NULL")
+    write(user ";\n")
     
-    write(user ";")
+    if self.type-instance.type-data.is-dynamic
+      # `type`_Dynamic* `name`_Dynamic[ = `type`_dynamic];
+      if ? self.parent
+        self.write-spaces()
+      else-if ? self.parent-type
+        write(user "  ")
+      write-cname(user self.type-instance.type-data.name)
+      write(user "_Dynamic* ")
+      write-cname(user self.name)
+      write(user "_Dynamic")
+      if ? self.parent
+        write(user " = ")
+        if self.access = ACCESS-VAR or self.access = ACCESS-NEW
+          write(user "&")
+          write-cname(user self.type-instance.type-data.name)
+          write(user "_dynamic")
+        else
+          write(user "NULL")
+      write(user ";\n")
+  
+  func inst write-spaces()
+    if ? self.parent
+      self.parent.write-spaces()
+    else-if ? self.parent-type
+      self.parent-type.write-spaces()
 
 
 class BaseVariableInit(SyntaxTreeCode)
@@ -183,7 +221,7 @@ class BaseVariableInit(SyntaxTreeCode)
     self.parent.code-nodes.add(owner self)
 
 
-## Initialize dynamically allocated variable node in the syntax tree
+## Initialize sequence variable node in the syntax tree
 class SyntaxTreeInitVarSequence(BaseVariableInit)
   func inst init-new(user SyntaxTreeVariable variable)
     new SyntaxTreeInitVarSequence new-node
@@ -191,15 +229,15 @@ class SyntaxTreeInitVarSequence(BaseVariableInit)
   
   func dynamic write()
     # `name`_Var.values = `name`_Values;
+    self.write-spaces()
     write-cname(user self.variable.name)
     write(user "_Var.values = ")
     write-cname(user self.variable.name)
-    write(user "_Values;")
+    write(user "_Values;\n")
     if self.variable.type-instance.type-data = glob.type-array and
         self.variable.type-instance.sub-type.type-data = glob.type-string
       # MR_set_var_string_array(
       #    `array-length`, `string-length`, `name`, `name`_Chars);
-      write(user "\n")
       self.write-spaces()
       write(user "MR_set_var_string_array(")
       self.variable.type-instance.length.write()
@@ -209,7 +247,7 @@ class SyntaxTreeInitVarSequence(BaseVariableInit)
       write-cname(user self.variable.name)
       write(user ", ")
       write-cname(user self.variable.name)
-      write(user "_Chars);")
+      write(user "_Chars);\n")
 
 
 ## Initialize dynamically allocated variable node in the syntax tree
@@ -223,14 +261,9 @@ class SyntaxTreeInitNew(BaseVariableInit)
         copy end, owner new-var-node)
     node-init-new.variable := new-var-node
   
-  func dynamic analyze()
-    if self.variable.type-instance.type-data.is-primitive
-      self.m-syntax-error(
-          user "cannot use \"new\" with primitive type",
-          user self.variable.type-instance.type-data.name)
-  
   func dynamic write()
     # `name` = `...`
+    self.write-spaces()
     if self.variable.type-instance.type-data = glob.type-array or
         self.variable.type-instance.type-data = glob.type-string
       self.variable.type-instance.length.write-preactions()
@@ -270,7 +303,7 @@ class SyntaxTreeInitNew(BaseVariableInit)
       write(user "calloc(1, sizeof(")
       write-cname(user self.variable.type-instance.type-data.name)
       write(user ")")
-    write(user ");")
+    write(user ");\n")
 
 
 ## Variable initialization node in the syntax tree
@@ -303,6 +336,7 @@ class SyntaxTreeVariableInit(BaseVariableInit)
         owner self.value)
   
   func dynamic write()
+    self.write-spaces()
     self.value.write-preactions()
     if (self.variable.access = ACCESS-VAR or
         self.variable.access = ACCESS-NEW) and
@@ -313,10 +347,17 @@ class SyntaxTreeVariableInit(BaseVariableInit)
       write-cname(user self.variable.name)
       write(user ", ")
       self.value.write()
-      write(user ") )")
+      write(user ") )\n")
     else
       # `name` = `value`;
       write-cname(user self.variable.name)
       write(user " = ")
       self.value.write()
-      write(user ";")
+      write(user ";\n")
+      if self.variable.type-instance.type-data.is-dynamic
+        # `name`_Dynamic = `Type`_Dynamic;
+        self.write-spaces()
+        write-cname(user self.variable.name)
+        write(user "_Dynamic = ")
+        self.value.write-dynamic()
+        write(user ";\n")

@@ -6,6 +6,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   user TypeData parent-type
   owner String name
   owner FunctionArguments arguments
+  user SyntaxTreeMockFunction mocker-function
+  user SyntaxTreeFunction dynamic-base-method
+  var Int dynamic-base-count
   var Bool is-dynamic
   
   func inst parse-new(user TypeData parent-type):(
@@ -17,7 +20,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.init()
     self.parent-type := parent-type
     if ? self.parent-type
-      self.indentation-spaces := 4
+      self.indentation-spaces := 2
       if self.parent-type.is-dynamic
         user String meth-type
         read-until(user " ", copy false):(user meth-type, copy end)
@@ -28,6 +31,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
               user "expected \"dynamic\" or \"inst\" method type, got",
               user meth-type)
     self.parse-header():(copy end)
+    self.indentation-spaces += 2
     self.parse-body():(copy end)
     self.indentation-spaces := 2
   
@@ -35,7 +39,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.set-location()
     new List{TypeCount} in self.aux-variables-owner
     self.aux-variables := self.aux-variables-owner
-    self.indentation-spaces := 2
   
   func inst parse-body():(copy Char end)
     self.parse-block():(copy end)
@@ -53,13 +56,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     var DeclarationArgumentFactory argument-factory
     var SyntaxTreeCode dummy-node
     dummy-node.parent := self
-    self.indentation-spaces -= 2
-    self.arguments.parse(
-        user argument-factory, user dummy-node, user self.parent-type):(
-        copy end)
-    self.indentation-spaces += 2
+    self.arguments.parse(user argument-factory, user dummy-node):(copy end)
+    if ? self.parent-type
+      self.arguments.add-self-parameter(user self.parent-type)
   
-  func inst m-check-name()
+  func dynamic m-check-name()
     if not f-is-legal-name(user self.name, copy false)
       self.m-syntax-error(user "illegal function name", user self.name)
     if ? self.parent-type
@@ -117,7 +118,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     write-post-func()
   
   func inst write-header()
-    write(user "Returncode ")
+    write(user "\nReturncode ")
     self.write-cname()
     self.arguments.write(copy true)
   
@@ -128,32 +129,28 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     write-cname(user self.name)
   
   func inst write-pointer()
-    write(user "Returncode (*")
-    write-cname(user self.name)
-    write(user ")")
-    self.arguments.write(copy true)
+    self.arguments.write-pointer(user self.name)
   
-  func inst write-declaration()
+  func dynamic write-declaration()
     # Returncode `Type`_`name`(`args`);
-    write(user "\n")
     self.write-header()
     write(user ";\n")
 
 # to be mocked in unit-tests
 func write-pre-func(user SyntaxTreeFunction self)
-  write(user "#define MR_FILE_NAME \"")
+  write(user "\n#define MR_FILE_NAME \"")
   write(user self.input-file-name)
   write(user "\"\n#define MR_FUNC_NAME \"")
   if ? self.parent-type
     write(user self.parent-type.name)
     write(user ".")
   write(user self.name)
-  write(user "\"\n")
+  write(user "\"")
 
 # to be mocked in unit-tests
 func write-post-func()
-    write(user "\n#undef MR_FILE_NAME\n")
-    write(user "#undef MR_FUNC_NAME")
+    write(user "#undef MR_FILE_NAME\n")
+    write(user "#undef MR_FUNC_NAME\n")
 
 
 ## Main function node in the syntax tree
@@ -164,6 +161,7 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
   
   func inst parse():(copy Char end)
     self.init()
+    self.indentation-spaces := 2
     string-new-copy(user "main"):(owner self.name)
     new FunctionArguments in self.arguments
     self.arguments.init()
@@ -174,12 +172,11 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     #   `block...`
     # }
     # MAIN_FUNC
-    write(user "\n")
     write-pre-func(user self)
-    write(user "USER_MAIN_HEADER")
+    write(user "\nUSER_MAIN_HEADER")
     self.write-block()
     write-post-func()
-    write(user "\n\nMAIN_FUNC\n")
+    write(user "\nMAIN_FUNC\n")
 
 
 ## Native function declaration in the syntax tree
@@ -225,6 +222,19 @@ class DeclarationArgument(Argument)
     self.variable.type-instance.m-link-types(user self)
   
   func dynamic analyze()
+    if self.variable.type-instance.type-data.is-primitive
+      if self.access != ACCESS-COPY
+        self.m-syntax-error2(
+            user "argument",
+            user self.variable.name,
+            user "access should be \"copy\" for primitive types, got",
+            user glob.access-names[self.access])
+    else-if self.access = ACCESS-COPY
+      self.m-syntax-error2(
+          user "argument",
+          user self.variable.name,
+          user "access should not be \"copy\" for non-primitive type",
+          user self.variable.type-instance.type-data.name)
     self.variable.type-instance.analyze-lengths(user self)
   
   func dynamic get-type-instance():(user TypeInstance type-instance)
@@ -234,7 +244,15 @@ class DeclarationArgument(Argument)
     variable := self.variable
   
   func dynamic write()
-    # `type`** `name`
+    if self.variable.type-instance.type-data = glob.type-func
+      write(user "Returncode (*")
+      if self.is-output
+        write(user "*")
+      write-cname(user self.variable.name)
+      write(user ")")
+      self.variable.type-instance.arguments.write(copy true)
+      return
+    # `type`[*][*] `name`[, `type`_Dynamic*[*] `name`_Dynamic]
     write-cname(user self.variable.type-instance.type-data.name)
     if self.access != ACCESS-COPY
       write(user "*")
@@ -242,6 +260,15 @@ class DeclarationArgument(Argument)
       write(user "*")
     write(user " ")
     write-cname(user self.variable.name)
+    if self.variable.type-instance.type-data.is-dynamic
+      write(user ", ")
+      write-cname(user self.variable.type-instance.type-data.name)
+      write(user "_Dynamic*")
+      if self.is-output
+        write(user "*")
+      write(user " ")
+      write-cname(user self.variable.name)
+      write(user "_Dynamic")
 
 
 class DeclarationArgumentFactory(ArgumentFactory)

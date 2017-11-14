@@ -35,8 +35,8 @@ Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Express
 static char* _func_name_parse_new_expression = "parse-new-expression";
 #define MR_FUNC_NAME _func_name_parse_new_expression
 Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  Operator* _Operator26;
-  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator26)) )
+  Operator* _Operator27;
+  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator27)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -65,9 +65,9 @@ static char* _func_name_Expression_parse_new = "Expression.parse-new";
 #define MR_FUNC_NAME _func_name_Expression_parse_new
 Returncode Expression_parse_new(Expression* self, String* ends, SyntaxTreeCode* code_node, Operator* curr_operator, Expression** expression, Char* end, Operator** operator) {
   (*expression) = NULL;
-  Bool _Bool27;
-  CHECK(46, String_has(ends, ' ', &(_Bool27)) )
-  Bool multi_operands = !_Bool27;
+  Bool _Bool28;
+  CHECK(46, String_has(ends, ' ', &(_Bool28)) )
+  Bool multi_operands = !_Bool28;
   String* text = NULL;
   CHECK(48, Expression_read_new_value(self, ends, &(text), &((*end))) )
   CHECK(49, NameMap_find(glob->operator_map, text, (void**)&((*operator))) )
@@ -139,9 +139,9 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     if ((*end) == '?') {
       CHECK(107, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool28;
-    CHECK(108, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool28)) )
-    if (!(_Bool28)) break;
+    Bool _Bool29;
+    CHECK(108, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool29)) )
+    if (!(_Bool29)) break;
   }
   return OK;
 }
@@ -180,9 +180,9 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Syn
             CHECK(130, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool29;
-            CHECK(131, String_equal(text, &(String){5, 4, "base"}, &(_Bool29)) )
-            if (_Bool29) {
+            Bool _Bool30;
+            CHECK(131, String_equal(text, &(String){5, 4, "base"}, &(_Bool30)) )
+            if (_Bool30) {
               CHECK(132, BaseMethExpression_parse_new(NULL, text, code_node, &((*expression))) )
             }
             else {
@@ -236,32 +236,44 @@ Returncode Expression_set_simple_type(Expression* self, TypeData* type_data) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_add_aux_variable(Expression* self, Int access, Expression** expression);
+Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstance* type_instance, Expression** expression);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_add_aux_variable = "Expression.add-aux-variable";
 #define MR_FUNC_NAME _func_name_Expression_add_aux_variable
-Returncode Expression_add_aux_variable(Expression* self, Int access, Expression** expression) {
+Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstance* type_instance, Expression** expression) {
   SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
-  if (symbol == NULL) RAISE(160)
+  if (symbol == NULL) RAISE(161)
   *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL, NULL, NULL};
   symbol->_base._base._dtl = SymbolExpression__dtl;
   symbol->_base.code_node = self->code_node;
-  CHECK(162, TypeInstance_m_copy_new(self->result_type, &(symbol->_base.result_type)) )
+  CHECK(163, TypeInstance_m_copy_new(type_instance, &(symbol->_base.result_type)) )
   symbol->_base.assignable = true;
-  CHECK(164, SyntaxTreeBlock_add_aux_variable(self->code_node->parent, access, self->result_type, &(symbol->variable)) )
-  CHECK(166, string_new_copy(symbol->variable->name, &(symbol->name)) )
+  CHECK(165, SyntaxTreeBlock_add_aux_variable(self->code_node->parent, access, type_instance, &(symbol->variable)) )
+  CHECK(167, string_new_copy(symbol->variable->name, &(symbol->name)) )
   (*expression) = &(symbol->_base);
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments);
+Returncode Expression_write_dynamic(Expression* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
+#define MR_FUNC_NAME _func_name_Expression_write_dynamic
+Returncode Expression_write_dynamic(Expression* self) {
+  CHECK(171, (self)->_base._dtl[2](self) )
+  CHECK(172, write(&(String){9, 8, "_Dynamic"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments, Bool* is_function_object);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_analyze_call = "Expression.analyze-call";
 #define MR_FUNC_NAME _func_name_Expression_analyze_call
-Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments) {
-  /* do noting */
+Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments, Bool* is_function_object) {
+  (*is_function_object) = true;
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -281,7 +293,7 @@ Returncode Expression_write_preactions(Expression* self) {
 extern Func Expression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Expression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func Expression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

@@ -222,7 +222,7 @@ Returncode write_cname(String* name) {
   {int index; for (index = (0); index < (name->length); ++index) {
     if ((index) < 0 || (index) >= (name)->length) RAISE(98)
     Char ch = ((name)->values[index]);
-    if (ch == '-') {
+    if (ch == '-' || ch == ' ') {
       CHECK(100, write_c('_') )
     }
     else {
