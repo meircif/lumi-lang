@@ -70,7 +70,7 @@ Returncode CallExpression_analyze(CallExpression* self) {
   if (!(NULL != self->function->result_type)) {
     CHECK(29, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "void expression is not callable"}) )
   }
-  if (self->function->result_type->type_data != glob->type_func) {
+  if (self->function->result_type->type_data != &(glob->type_func->_base)) {
     CHECK(31, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){18, 17, "non callable type"}, self->function->result_type->type_data->name) )
   }
   FunctionArguments* declaration = self->function->result_type->arguments;
@@ -120,14 +120,12 @@ Returncode CallExpression_write_preactions(CallExpression* self) {
     self->function->top = false;
     CHECK(61, write(&(String){11, 10, " == NULL) "}) )
     CHECK(62, SyntaxTreeNode_write_raise(&(self->_base._base)) )
-    CHECK(63, write(&(String){2, 1, "\n"}) )
-    CHECK(64, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(63, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   }
-  CHECK(65, FunctionArguments_write_preactions(self->arguments) )
+  CHECK(64, FunctionArguments_write_preactions(self->arguments) )
   if (!self->_base.is_statement) {
-    CHECK(67, CallExpression_write_func_call(self) )
-    CHECK(68, write(&(String){2, 1, "\n"}) )
-    CHECK(69, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(66, CallExpression_write_func_call(self) )
+    CHECK(67, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   }
   return OK;
 }
@@ -140,14 +138,14 @@ static char* _func_name_CallExpression_write = "CallExpression.write";
 #define MR_FUNC_NAME _func_name_CallExpression_write
 Returncode CallExpression_write(CallExpression* self) {
   if (self->_base.is_statement) {
-    CHECK(73, CallExpression_write_func_call(self) )
+    CHECK(71, CallExpression_write_func_call(self) )
   }
   else {
     if (NULL != self->output) {
-      CHECK(75, (self->output)->_base._dtl[2](self->output) )
+      CHECK(73, (self->output)->_base._dtl[2](self->output) )
     }
     else {
-      RAISE(77)
+      RAISE(75)
     }
   }
   return OK;
@@ -160,10 +158,10 @@ Returncode CallExpression_write_func_call(CallExpression* self);
 static char* _func_name_CallExpression_write_func_call = "CallExpression.write-func-call";
 #define MR_FUNC_NAME _func_name_CallExpression_write_func_call
 Returncode CallExpression_write_func_call(CallExpression* self) {
-  CHECK(80, SyntaxTreeNode_write_call(&(self->_base._base)) )
-  CHECK(81, (self->function)->_base._dtl[2](self->function) )
-  CHECK(82, FunctionArguments_write(self->arguments, false) )
-  CHECK(83, write(&(String){3, 2, " )"}) )
+  CHECK(78, SyntaxTreeNode_write_call(&(self->_base._base)) )
+  CHECK(79, (self->function)->_base._dtl[2](self->function) )
+  CHECK(80, FunctionArguments_write(self->arguments, false) )
+  CHECK(81, write(&(String){4, 3, " )\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -195,9 +193,9 @@ static char* _func_name_CallArgument_parse_value = "CallArgument.parse-value";
 #define MR_FUNC_NAME _func_name_CallArgument_parse_value
 Returncode CallArgument_parse_value(CallArgument* self, SyntaxTreeCode* code_node, Char* end) {
   self->code_node = code_node;
-  CHECK(96, parse_new_expression(&(String){3, 2, ",)"}, code_node, &(self->value), &((*end))) )
+  CHECK(94, parse_new_expression(&(String){3, 2, ",)"}, code_node, &(self->value), &((*end))) )
   if ((*end) != ',' && (*end) != ')') {
-    CHECK(99, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){25, 24, "expected \",\" or \")\", got"}, (*end)) )
+    CHECK(97, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){25, 24, "expected \",\" or \")\", got"}, (*end)) )
   }
   return OK;
 }
@@ -209,9 +207,9 @@ Returncode CallArgument_analyze(CallArgument* self);
 static char* _func_name_CallArgument_analyze = "CallArgument.analyze";
 #define MR_FUNC_NAME _func_name_CallArgument_analyze
 Returncode CallArgument_analyze(CallArgument* self) {
-  CHECK(102, (self->value)->_base._dtl[1](self->value) )
+  CHECK(100, (self->value)->_base._dtl[1](self->value) )
   if (self->_base.is_output &&  ! self->value->assignable) {
-    CHECK(104, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){27, 26, "non assignable call output"}) )
+    CHECK(102, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){27, 26, "non assignable call output"}) )
   }
   return OK;
 }
@@ -225,11 +223,11 @@ static char* _func_name_CallArgument_m_check_same_type_as = "CallArgument.m-chec
 Returncode CallArgument_m_check_same_type_as(CallArgument* self, TypeInstance* type_instance) {
   if (self->_base.is_output) {
     Int _Int15;
-    CHECK(108, TypeInstance_m_check_assign_to(type_instance, self->value->result_type, &(self->_base._base), &(_Int15)) )
+    CHECK(106, TypeInstance_m_check_assign_to(type_instance, self->value->result_type, &(self->_base._base), &(_Int15)) )
     self->is_down_cast = _Int15 > 0;
   }
   else {
-    CHECK(111, TypeInstance_m_check_assign_from(type_instance, &(self->_base._base), &(self->value)) )
+    CHECK(109, TypeInstance_m_check_assign_from(type_instance, &(self->_base._base), &(self->value)) )
   }
   self->is_dynamic = type_instance->type_data->is_dynamic;
   return OK;
@@ -253,15 +251,14 @@ Returncode CallArgument_write_preactions(CallArgument* self);
 static char* _func_name_CallArgument_write_preactions = "CallArgument.write-preactions";
 #define MR_FUNC_NAME _func_name_CallArgument_write_preactions
 Returncode CallArgument_write_preactions(CallArgument* self) {
-  CHECK(118, (self->value)->_base._dtl[5](self->value) )
+  CHECK(116, (self->value)->_base._dtl[5](self->value) )
   if (self->is_down_cast) {
     /* if (`value` != NULL) RAISE(`line-num`) */
-    CHECK(121, write(&(String){5, 4, "if ("}) )
-    CHECK(122, (self->value)->_base._dtl[2](self->value) )
-    CHECK(123, write(&(String){11, 10, " != NULL) "}) )
-    CHECK(124, SyntaxTreeNode_write_raise(&(self->_base._base)) )
-    CHECK(125, write(&(String){2, 1, "\n"}) )
-    CHECK(126, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(119, write(&(String){5, 4, "if ("}) )
+    CHECK(120, (self->value)->_base._dtl[2](self->value) )
+    CHECK(121, write(&(String){11, 10, " != NULL) "}) )
+    CHECK(122, SyntaxTreeNode_write_raise(&(self->_base._base)) )
+    CHECK(123, SyntaxTreeCode_write_spaces(self->code_node) )
   }
   return OK;
 }
@@ -276,25 +273,25 @@ Returncode CallArgument_write(CallArgument* self) {
   /* [&(]`value`[)][, [&(]`value`_Dynamic[)]] */
   if (self->_base.is_output) {
     if (self->is_down_cast) {
-      CHECK(132, write(&(String){8, 7, "(void*)"}) )
+      CHECK(129, write(&(String){8, 7, "(void*)"}) )
     }
-    CHECK(133, write(&(String){3, 2, "&("}) )
+    CHECK(130, write(&(String){3, 2, "&("}) )
   }
-  CHECK(134, (self->value)->_base._dtl[2](self->value) )
+  CHECK(131, (self->value)->_base._dtl[2](self->value) )
   if (self->_base.is_output) {
-    CHECK(136, write(&(String){2, 1, ")"}) )
+    CHECK(133, write(&(String){2, 1, ")"}) )
   }
   if (self->is_dynamic) {
-    CHECK(138, write(&(String){3, 2, ", "}) )
+    CHECK(135, write(&(String){3, 2, ", "}) )
     if (self->_base.is_output) {
       if (self->is_down_cast) {
-        CHECK(141, write(&(String){8, 7, "(void*)"}) )
+        CHECK(138, write(&(String){8, 7, "(void*)"}) )
       }
-      CHECK(142, write(&(String){3, 2, "&("}) )
+      CHECK(139, write(&(String){3, 2, "&("}) )
     }
-    CHECK(143, (self->value)->_base._dtl[3](self->value) )
+    CHECK(140, (self->value)->_base._dtl[3](self->value) )
     if (self->_base.is_output) {
-      CHECK(145, write(&(String){2, 1, ")"}) )
+      CHECK(142, write(&(String){2, 1, ")"}) )
     }
     
   }
@@ -324,7 +321,7 @@ static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactor
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
   CallArgument* _CallArgument16 = malloc(sizeof(CallArgument));
-  if (_CallArgument16 == NULL) RAISE(151)
+  if (_CallArgument16 == NULL) RAISE(148)
   *_CallArgument16 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, NULL, NULL, false, false};
   _CallArgument16->_base._base._dtl = CallArgument__dtl;
   (*new_argument) = &(_CallArgument16->_base);

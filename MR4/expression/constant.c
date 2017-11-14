@@ -201,7 +201,7 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
       CHECK(74, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){15, 14, "illegal number"}, text) )
     }
   }
-  CHECK(75, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
+  CHECK(75, Expression_set_simple_type(&(self->_base._base), &(glob->type_int->_base)) )
   self->_base.text = text;
   return OK;
 }
@@ -301,7 +301,7 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
   if (((text)->values[text->length - 1]) != '\'') {
     CHECK(112, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
   }
-  CHECK(113, Expression_set_simple_type(&(self->_base._base), glob->type_char) )
+  CHECK(113, Expression_set_simple_type(&(self->_base._base), &(glob->type_char->_base)) )
   self->_base.text = text;
   return OK;
 }
@@ -352,7 +352,7 @@ Returncode StringExpression_parse(StringExpression* self, String* text, SyntaxTr
   if (((text)->values[text->length - 1]) != '\"') {
     CHECK(132, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){24, 23, "illegal string constant"}, text) )
   }
-  CHECK(133, Expression_set_simple_type(&(self->_base._base), glob->type_string) )
+  CHECK(133, Expression_set_simple_type(&(self->_base._base), &(glob->type_string->_base)) )
   self->_base.text = text;
   return OK;
 }
@@ -444,7 +444,7 @@ Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expres
   _EmptyExpression24->_base._base._dtl = EmptyExpression__dtl;
   (*expression) = &(_EmptyExpression24->_base);
   CHECK(173, SyntaxTreeNode_set_location(&((*expression)->_base)) )
-  CHECK(174, Expression_set_simple_type((*expression), glob->type_empty) )
+  CHECK(174, Expression_set_simple_type((*expression), &(glob->type_empty->_base)) )
   free(text);
   return OK;
 }

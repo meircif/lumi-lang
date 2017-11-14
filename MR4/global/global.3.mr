@@ -44,20 +44,21 @@ static Global
   var Bool save-input
   
   ## built-in types
-  owner TypeData type-char
-  owner TypeData type-bool
-  owner TypeData type-int
-  owner TypeData type-empty
-  owner TypeData type-func
-  owner TypeData type-string
-  owner TypeData type-array
-  owner TypeData type-type
-  owner TypeData type-base
-  owner TypeData type-file
-  owner TypeData type-sys
+  owner BuiltinType type-char
+  owner BuiltinType type-bool
+  owner BuiltinType type-int
+  owner BuiltinType type-empty
+  owner BuiltinType type-func
+  owner BuiltinType type-string
+  owner BuiltinType type-array
+  owner BuiltinType type-type
+  owner BuiltinType type-base
+  owner BuiltinType type-file
+  owner BuiltinType type-sys
   
   func inst init()
     new SyntaxTreeRoot in self.root
+    self.root.init()
     new String{1024} in self.input-buffer
     new NameMap{SyntaxTreeTestFunction} in self.test-functions
     self.init-operator-map()
@@ -119,16 +120,280 @@ static Global
     self.add-builtin-type(user "Base Symbol", copy false):(owner self.type-base)
     self.add-builtin-type(user "File", copy false):(owner self.type-file)
     self.add-builtin-type(user "Sys", copy false):(owner self.type-sys)
+    
+    user FunctionArguments arguments
+    
+    # Int
+    self.add-builtin-method(user glob.type-int, user "str"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "str")
+    
+    # Bool
+    self.add-builtin-global-variable(user glob.type-bool, user "true")
+    self.add-builtin-global-variable(user glob.type-bool, user "false")
+    
+    # Char
+    self.add-builtin-global-variable(user glob.type-char, user "EOF")
+    
+    # String
+    self.add-builtin-field(
+        user glob.type-string, user "length", user glob.type-int, user _)
+    
+    self.add-builtin-method(user glob.type-string, user "clear"):(
+        user arguments)
+    
+    self.add-builtin-method(user glob.type-string, user "equal"):(
+        user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "pattern")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-COPY, user glob.type-bool, user "equal")
+    
+    self.add-builtin-method(user glob.type-string, user "get"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "index")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
+    
+    self.add-builtin-method(user glob.type-string, user "append"):(
+        user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
+    
+    self.add-builtin-method(user glob.type-string, user "copy"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "other")
+    
+    self.add-builtin-method(user glob.type-string, user "concat"):(
+        user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "other")
+    
+    self.add-builtin-method(user glob.type-string, user "concat-int"):(
+        user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "number")
+    
+    self.add-builtin-method(user glob.type-string, user "find"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "pattern")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "index")
+    
+    self.add-builtin-method(user glob.type-string, user "has"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-COPY, user glob.type-bool, user "equal")
+    
+    # Array
+    self.add-builtin-field(
+        user glob.type-array, user "length", user glob.type-int, user _)
+    
+    # File
+    self.add-builtin-global-function(user "file-open-read"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "name")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-file, user "file")
+    
+    self.add-builtin-global-function(user "file-open-write"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "name")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-file, user "file")
+    
+    self.add-builtin-method(user glob.type-file, user "close"):(user arguments)
+    
+    self.add-builtin-method(user glob.type-file, user "getc"):(user arguments)
+    self.add-builtin-output(
+        user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
+    
+    self.add-builtin-method(user glob.type-file, user "putc"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
+    
+    self.add-builtin-method(user glob.type-file, user "write"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "text")
+    
+    # Sys
+    self.add-builtin-field(
+        user glob.type-sys,
+        user "argv",
+        user glob.type-array,
+        user glob.type-string)
+    
+    self.add-builtin-method(user glob.type-sys, user "print"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "text")
+        
+    self.add-builtin-method(user glob.type-sys, user "println"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "text")
+    
+    self.add-builtin-method(user glob.type-sys, user "exit"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "status")
+    
+    self.add-builtin-method(user glob.type-sys, user "system"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "command")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "status")
+    
+    self.add-builtin-method(user glob.type-sys, user "getenv"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "name")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "value")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-COPY, user glob.type-bool, user "exists")
+    
+    self.add-builtin-global-variable(user glob.type-sys, user "sys")
   
   func inst add-builtin-type(user String name, copy Bool is-primitive):(
-      owner TypeData type-data)
-    new TypeData in type-data
+      owner BuiltinType type-data)
+    new BuiltinType in type-data
     string-new-copy(user name):(owner type-data.name)
     type-data.is-primitive := is-primitive
     self.add-type(user type-data)
+    self.root.types.add(owner type-data)
   
   func inst add-type(user TypeData type-data)
     type-data.init()
     self.type-map.add(user type-data.name, user type-data)
+  
+  func inst add-builtin-global-variable(
+      user TypeData variable-type, user String name)
+    self.add-builtin-variable(
+        user name, user variable-type, user _, user _, user self.root)
+  
+  func inst add-builtin-field(
+      user TypeData builtin-type,
+      user String name,
+      user TypeData field-type,
+      user TypeData field-subtype)
+    self.add-builtin-variable(
+        user name,
+        user field-type,
+        user field-subtype,
+        user builtin-type,
+        user builtin-type)
+  
+  func inst add-builtin-variable(
+      user String name,
+      user TypeData variable-type,
+      user TypeData variable-subtype,
+      user TypeData parent-type,
+      user SyntaxTreeBranch branch)
+    new BuiltinVariable variable
+    string-new-copy(user name):(owner variable.name)
+    if variable-type.is-primitive
+      variable.access := ACCESS-VAR
+    else
+      variable.access := ACCESS-OWNER
+    variable-type.m-new-type-instance():(owner variable.type-instance)
+    if ? variable-subtype
+      variable-subtype.m-new-type-instance():(
+          owner variable.type-instance.sub-type)
+    variable.parent-type := parent-type
+    branch.variables.add(owner variable)
+  
+  func inst add-builtin-global-function(user String name):(
+      user FunctionArguments arguments)
+    self.add-builtin-function(user name, user _, user glob.root):(
+        user arguments)
+  
+  func inst add-builtin-method(user TypeData builtin-type, user String name):(
+      user FunctionArguments arguments)
+    self.add-builtin-function(user name, user builtin-type, user builtin-type):(
+        user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-VAR, user builtin-type, user "self")
+  
+  func inst add-builtin-function(
+      user String name,
+      user TypeData parent-type,
+      user SyntaxTreeNamespace namespace):(
+      user FunctionArguments arguments)
+    new BuiltinFunction function
+    function.init()
+    string-new-copy(user name):(owner function.name)
+    function.parent-type := parent-type
+    new FunctionArguments in function.arguments
+    function.arguments.init()
+    arguments := function.arguments
+    namespace.functions.add(owner function)
+  
+  func inst add-builtin-parameter(
+      user FunctionArguments arguments,
+      copy Int access,
+      user TypeData parameter-type,
+      user String name)
+    self.add-builtin-argument(
+        user arguments.parameters,
+        copy false,
+        copy access,
+        user parameter-type,
+        user name)
+  
+  func inst add-builtin-output(
+      user FunctionArguments arguments,
+      copy Int access,
+      user TypeData output-type,
+      user String name)
+    self.add-builtin-argument(
+        user arguments.outputs,
+        copy true,
+        copy access,
+        user output-type,
+        user name)
+  
+  func inst add-builtin-argument(
+      user List{Argument} argument-list,
+      copy Bool is-output,
+      copy Int access,
+      user TypeData argument-type,
+      user String name)
+    new DeclarationArgument argument
+    argument.access := access
+    argument.is-output := is-output
+    new SyntaxTreeVariable in argument.variable
+    string-new-copy(user name):(owner argument.variable.name)
+    argument.variable.access := access
+    argument-type.m-new-type-instance():(
+        owner argument.variable.type-instance)
+    argument-list.add(owner argument)
 
 var Global glob
+
+
+class BuiltinType(TypeData)
+  func dynamic m-link-types()
+    # do nothing
+  func dynamic analyze()
+    # do nothing
+  func dynamic write()
+    # do nothing
+  func dynamic write-me(user TypeWriter type-writer)
+    # do nothing
+
+class BuiltinVariable(SyntaxTreeVariable)
+  func dynamic m-link-types()
+    # do nothing
+  func dynamic analyze()
+    # do nothing
+  func dynamic write()
+    # do nothing
+
+class BuiltinFunction(SyntaxTreeFunction)
+  func dynamic m-link-types()
+    # do nothing
+  func dynamic analyze()
+    # do nothing
+  func dynamic write()
+    # do nothing
+  func dynamic write-declaration()
+    # do nothing
+  

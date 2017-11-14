@@ -515,8 +515,8 @@ Returncode test_for_loop();
 static char* _func_name_test_for_loop = "test-for-loop";
 #define MR_FUNC_NAME _func_name_test_for_loop
 Returncode test_for_loop() {
-  CHECK(549, test_code(&(String){22, 21, "for n in 5\n    i += n"}, &(String){46, 45, "{int n; for(n=0; n<5; ++n) {\n    i += n;\n  }}"}) )
-  CHECK(552, test_code(&(String){36, 35, "for n in t.num:t.num + 2\n    i += n"}, &(String){112, 111, "if (t == NULL) RAISE(1)\n  if (t == NULL) RAISE(1)\n  {int n; for(n=t->num; n<t->num + 2; ++n) {\n    i += n;\n  }}"}) )
+  CHECK(549, test_code(&(String){22, 21, "for n in 5\n    i += n"}, &(String){49, 48, "{int n; for(n=0; n<5; ++n) {\n    i += n;\n  }\n  }"}) )
+  CHECK(552, test_code(&(String){36, 35, "for n in t.num:t.num + 2\n    i += n"}, &(String){115, 114, "if (t == NULL) RAISE(1)\n  if (t == NULL) RAISE(1)\n  {int n; for(n=t->num; n<t->num + 2; ++n) {\n    i += n;\n  }\n  }"}) )
   CHECK(555, test_code_error(&(String){5, 4, "for("}, &(String){36, 35, "expected space after \"for\", got \"(\""}) )
   CHECK(556, test_code_error(&(String){6, 5, "for n"}, &(String){48, 47, "expected space after index name, got \"new-line\""}) )
   CHECK(558, test_code_error(&(String){12, 11, "for n error"}, &(String){25, 24, "expected \"in \" got \"err\""}) )

@@ -176,6 +176,7 @@ func f-test-many(
     copy Int n,
     copy Int m)
 
+
 func test-call-expression()
   owner String s
   var Int x
@@ -194,6 +195,7 @@ func test-call-expression()
   f-test-int(copy f-test-int2int(copy 9)->(copy tmp))
   x := f-test-int2int(copy 10) + f-test-many(copy 11, copy 12)->(copy x)
   s := f-test-int2str(copy 13)
+
 
 func test-code-flow(user Array{Int} arr)->(copy Int res)
   if arr[4] > 6
@@ -223,6 +225,37 @@ func test-code-flow(user Array{Int} arr)->(copy Int res)
     var Int x(arr[0])
     if x > 4
       arr[1] := x
+
+
+func test-builtins(
+    copy Int i, copy Char c, copy Bool b, user String s, user Array{Int} a)
+  i.str(user s)
+  b := true or false
+  c := EOF
+  i := a.length
+  i := s.length
+  s.clear()
+  s.equal(user s)->(copy b)
+  s.get(copy i)->(copy c)
+  s.append(copy c)
+  s.copy(user s)
+  s.concat(user s)
+  s.concat-int(copy i)
+  s.find(user s)->(copy i)
+  s.has(copy c)->(copy b)
+  owner File f
+  file-open-read(user s)->(owner f)
+  file-open-write(user s)->(owner f)
+  f.getc()->(copy c)
+  f.putc(copy c)
+  f.write(user s)
+  f.close()
+  s := sys.argv[1]
+  sys.print(user s)
+  sys.println(user s)
+  sys.getenv(user s, user s)->(copy b)
+  sys.system(user s)->(copy i)
+  sys.exit(copy i)
 
 
 main

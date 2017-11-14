@@ -19,12 +19,13 @@ class SyntaxTreeAssert(SyntaxTreeCode)
   
   func dynamic write()
     # TEST_ASSERT(`line`, `tested`)
+    self.write-spaces()
     self.tested.write-preactions()
     write(user "TEST_ASSERT(")
     self.write-line-num()
     write(user ", ")
     self.tested.write()
-    write(user ")")
+    write(user ")\n")
 
 ## Assert-error statement in the syntax tree
 class SyntaxTreeAssertError(SyntaxTreeCode)
@@ -44,6 +45,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     self.tested.analyze()
   
   func dynamic write()
+    self.write-spaces()
     write(user "do {\n")
     self.parent.indentation-spaces += 2
     self.write-spaces()
@@ -62,7 +64,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     write(user ")\n")
     self.parent.indentation-spaces -= 2
     self.write-spaces()
-    write(user "} while (false);")
+    write(user "} while (false);\n")
 
 
 ## Test function in the syntax tree

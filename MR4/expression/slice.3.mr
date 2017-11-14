@@ -119,7 +119,6 @@ class SliceExpression(Expression)
     self.sequence.write()
     write(user ")->length) ")
     self.write-raise()
-    write(user "\n")
     self.code-node.write-spaces()
   
   func dynamic write()

@@ -183,15 +183,15 @@ Returncode UnaryExpression_analyze(UnaryExpression* self) {
   CHECK(83, UnaryExpression_analyze_operand(self, self->right_expression) )
   if (self->operator->order == 2) {
     /* `not` operator */
-    CHECK(86, UnaryExpression_test_operand_type(self, self->right_expression, glob->type_bool) )
-    CHECK(87, Expression_set_simple_type(&(self->_base), glob->type_bool) )
+    CHECK(86, UnaryExpression_test_operand_type(self, self->right_expression, &(glob->type_bool->_base)) )
+    CHECK(87, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
   }
   else {
     Bool _Bool25;
     CHECK(88, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool25)) )
     if (_Bool25) {
-      CHECK(89, UnaryExpression_test_operand_type(self, self->right_expression, glob->type_int) )
-      CHECK(90, Expression_set_simple_type(&(self->_base), glob->type_int) )
+      CHECK(89, UnaryExpression_test_operand_type(self, self->right_expression, &(glob->type_int->_base)) )
+      CHECK(90, Expression_set_simple_type(&(self->_base), &(glob->type_int->_base)) )
     }
     else {
       CHECK(92, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){19, 18, "not unary operator"}, self->operator->name) )
@@ -279,7 +279,7 @@ Returncode UnaryExpression_write_end(UnaryExpression* self) {
     CHECK(129, write(&(String){2, 1, ")"}) )
   }
   if (self->_base.is_statement) {
-    CHECK(131, write(&(String){2, 1, ";"}) )
+    CHECK(131, write(&(String){3, 2, ";\n"}) )
   }
   return OK;
 }
@@ -338,8 +338,8 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
   }
   if (self->_base.operator->order == 3) {
     /* `or`\`and` operator */
-    CHECK(172, BinaryExpression_test_operands_type(self, glob->type_bool) )
-    CHECK(173, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
+    CHECK(172, BinaryExpression_test_operands_type(self, &(glob->type_bool->_base)) )
+    CHECK(173, Expression_set_simple_type(&(self->_base._base), &(glob->type_bool->_base)) )
   }
   else {
     if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0) {
@@ -350,19 +350,19 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
       /* any other Int operator */
       if (self->_base.operator->order == 1 &&  NULL !=  self->binary_left_expression && self->binary_left_expression->_base.operator->order == 1) {
         /* (a > b) > c */
-        CHECK(183, UnaryExpression_test_operand_type(&(self->_base), self->_base.right_expression, glob->type_int) )
+        CHECK(183, UnaryExpression_test_operand_type(&(self->_base), self->_base.right_expression, &(glob->type_int->_base)) )
       }
       else {
-        CHECK(185, BinaryExpression_test_operands_type(self, glob->type_int) )
+        CHECK(185, BinaryExpression_test_operands_type(self, &(glob->type_int->_base)) )
       }
       if (self->_base.operator->order == 0) {
         /* aritmetic operator */
-        CHECK(188, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
+        CHECK(188, Expression_set_simple_type(&(self->_base._base), &(glob->type_int->_base)) )
       }
       else {
         if (self->_base.operator->order == 1) {
           /* compare operator */
-          CHECK(191, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
+          CHECK(191, Expression_set_simple_type(&(self->_base._base), &(glob->type_bool->_base)) )
         }
       }
       /* else, assign operator */
@@ -491,10 +491,10 @@ Returncode QuestionExpression_analyze(QuestionExpression* self) {
   if (!(NULL != self->tested->result_type)) {
     CHECK(250, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
   }
-  if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == glob->type_func)) {
+  if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == &(glob->type_func->_base))) {
     CHECK(253, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
   }
-  CHECK(256, Expression_set_simple_type(&(self->_base), glob->type_bool) )
+  CHECK(256, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME

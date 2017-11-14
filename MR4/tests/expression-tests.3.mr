@@ -37,6 +37,7 @@ func test-code-setup(user String input-text)
   mock-input-file-text.concat(user "    copy Bool b,\n")
   mock-input-file-text.concat(user "    user String str,\n")
   mock-input-file-text.concat(user "    user Array{Int} arr,\n")
+  mock-input-file-text.concat(user "    user File fobj,\n")
   mock-input-file-text.concat(user "    user Test t,\n")
   mock-input-file-text.concat(user "    user Ta ta,\n")
   mock-input-file-text.concat(user "    user Tb tb,\n")
@@ -59,6 +60,7 @@ func test-code(user String input-text, user String expected-output)
   mock-func-header.concat(user ", Bool b")
   mock-func-header.concat(user ", String* str")
   mock-func-header.concat(user ", Array* arr")
+  mock-func-header.concat(user ", File* fobj")
   mock-func-header.concat(user ", Test* t")
   mock-func-header.concat(user ", Ta* ta, Ta_Dynamic* ta_Dynamic")
   mock-func-header.concat(user ", Tb* tb, Tb_Dynamic* tb_Dynamic")
@@ -655,3 +657,61 @@ test test-function-object()
   test-code-error(
       user "var Func{()->(copy Int x)} fun\n  fun := fun0",
       user "too few outputs")
+
+
+test test-builtin()
+  test-code(user "i.str(user str)", user "CHECK(1, Int_str(i, str) )")
+  test-code(user "b := true", user "b = true;")
+  test-code(user "b := false", user "b = false;")
+  test-code(user "c := EOF", user "c = EOF;")
+  test-code(
+      user "i := arr.length",
+      user "if (arr == NULL) RAISE(1)\n  i = arr->length;")
+  test-code(
+      user "i := str.length",
+      user "if (str == NULL) RAISE(1)\n  i = str->length;")
+  test-code(user "str.clear()", user "CHECK(1, String_clear(str) )")
+  test-code(
+      user "str.equal(user str)->(copy b)",
+      user "CHECK(1, String_equal(str, str, &(b)) )")
+  test-code(
+      user "str.get(copy i)->(copy c)",
+      user "CHECK(1, String_get(str, i, &(c)) )")
+  test-code(user "str.append(copy c)", user "CHECK(1, String_append(str, c) )")
+  test-code(user "str.copy(user str)", user "CHECK(1, String_copy(str, str) )")
+  test-code(
+      user "str.concat(user str)", user "CHECK(1, String_concat(str, str) )")
+  test-code(
+      user "str.concat-int(copy i)",
+      user "CHECK(1, String_concat_int(str, i) )")
+  test-code(
+      user "str.find(user str)->(copy i)",
+      user "CHECK(1, String_find(str, str, &(i)) )")
+  test-code(
+      user "str.has(copy c)->(copy b)",
+      user "CHECK(1, String_has(str, c, &(b)) )")
+  test-code(
+      user "file-open-read(user str)->(owner fobj)",
+      user "CHECK(1, file_open_read(str, &(fobj)) )")
+  test-code(
+      user "file-open-write(user str)->(owner fobj)",
+      user "CHECK(1, file_open_write(str, &(fobj)) )")
+  test-code(user "fobj.close()", user "CHECK(1, File_close(fobj) )")
+  test-code(
+      user "fobj.getc()->(copy c)", user "CHECK(1, File_getc(fobj, &(c)) )")
+  test-code(user "fobj.putc(copy c)", user "CHECK(1, File_putc(fobj, c) )")
+  test-code(
+      user "fobj.write(user str)", user "CHECK(1, File_write(fobj, str) )")
+  test-code(
+      user "user Array{String} argv(sys.argv)",
+      user "Array* argv = NULL;\n  if (sys == NULL) RAISE(1)\n  argv = sys->argv;")
+  test-code(user "sys.print(user str)", user "CHECK(1, Sys_print(sys, str) )")
+  test-code(
+      user "sys.println(user str)", user "CHECK(1, Sys_println(sys, str) )")
+  test-code(user "sys.exit(copy i)", user "CHECK(1, Sys_exit(sys, i) )")
+  test-code(
+      user "sys.system(user str)->(copy i)",
+      user "CHECK(1, Sys_system(sys, str, &(i)) )")
+  test-code(
+      user "sys.getenv(user str, user str)->(copy b)",
+      user "CHECK(1, Sys_getenv(sys, str, str, &(b)) )")

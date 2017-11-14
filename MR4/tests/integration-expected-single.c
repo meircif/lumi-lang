@@ -67,6 +67,8 @@ Returncode test_call_expression(void);
 
 Returncode test_code_flow(Array* arr, Int* res);
 
+Returncode test_builtins(Int i, Char c, Bool b, String* s, Array* a);
+
 
 /* types methods body */
 
@@ -432,22 +434,22 @@ Returncode test_call_expression(void) {
   Int aux_Int_0 = 0;
   Int aux_Int_1 = 0;
   String* aux_String_1 = NULL;
-  CHECK(182, f_test_void() )
+  CHECK(183, f_test_void() )
   aux_String_0->max_length = 5;
   aux_String_0->length = 4;
   aux_String_0->values = "text";
-  CHECK(183, f_test_params(3, aux_String_0, NULL) )
-  CHECK(184, f_test_outs(&(s), &(x)) )
-  CHECK(185, f_test_int2str(4, &(s)) )
-  CHECK(186, f_test_int(5) )
-  CHECK(187, f_test_int2int(6, &(x)) )
-  CHECK(188, f_test_many(7, 8, &(x), &(x)) )
-  CHECK(194, f_test_int2int(9, &(tmp)) )
-  CHECK(194, f_test_int(tmp) )
-  CHECK(195, f_test_many(11, 12, &(x), &(aux_Int_0)) )
-  CHECK(195, f_test_int2int(10, &(aux_Int_1)) )
+  CHECK(184, f_test_params(3, aux_String_0, NULL) )
+  CHECK(185, f_test_outs(&(s), &(x)) )
+  CHECK(186, f_test_int2str(4, &(s)) )
+  CHECK(187, f_test_int(5) )
+  CHECK(188, f_test_int2int(6, &(x)) )
+  CHECK(189, f_test_many(7, 8, &(x), &(x)) )
+  CHECK(195, f_test_int2int(9, &(tmp)) )
+  CHECK(195, f_test_int(tmp) )
+  CHECK(196, f_test_many(11, 12, &(x), &(aux_Int_0)) )
+  CHECK(196, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
-  CHECK(196, f_test_int2str(13, &(aux_String_1)) )
+  CHECK(197, f_test_int2str(13, &(aux_String_1)) )
   s = aux_String_1;
   return OK;
 }
@@ -457,7 +459,7 @@ Returncode test_call_expression(void) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-code-flow"
 Returncode test_code_flow(Array* arr, Int* res) {
-  if ((4) < 0 || (4) >= (arr)->length) RAISE(199)
+  if ((4) < 0 || (4) >= (arr)->length) RAISE(201)
   if ((((Int*)((arr)->values))[4]) > 6) {
     *res = 6;
   }
@@ -466,13 +468,13 @@ Returncode test_code_flow(Array* arr, Int* res) {
       *res = 6;
     }
     else {
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(203)
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(203)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(205)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(205)
       if ((((Int*)((arr)->values))[4]) != (((Int*)((arr)->values))[4])) {
         *res = 6;
       }
       else {
-        if ((0) < 0 || (0) >= (arr)->length) RAISE(205)
+        if ((0) < 0 || (0) >= (arr)->length) RAISE(207)
         if (0 == (((Int*)((arr)->values))[0])) {
           *res = 6;
         }
@@ -485,42 +487,82 @@ Returncode test_code_flow(Array* arr, Int* res) {
   while (true) {
     Int x = 0;
     Int y = 0;
-    if ((6) < 0 || (6) >= (arr)->length) RAISE(210)
+    if ((6) < 0 || (6) >= (arr)->length) RAISE(212)
     ((Int*)((arr)->values))[6] = 6;
-    if ((2) < 0 || (2) >= (arr)->length) RAISE(211)
+    if ((2) < 0 || (2) >= (arr)->length) RAISE(213)
     x = ((Int*)((arr)->values))[2];
     if (!(x > 3)) break;
     y = x - 1;
     while (true) {
       Int z = 0;
-      if ((8) < 0 || (8) >= (arr)->length) RAISE(215)
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(215)
+      if ((8) < 0 || (8) >= (arr)->length) RAISE(217)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(217)
       ((Int*)((arr)->values))[4] = ((Int*)((arr)->values))[8];
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(216)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(218)
       if (y > (((Int*)((arr)->values))[4])) {
         continue;
       }
       z = 0;
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(219)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(221)
       if (z <= (((Int*)((arr)->values))[4])) {
         if (!(z > 0)) break;
       }
     }
   }
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(221)
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(221)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(223)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(223)
   {int n; for(n=((Int*)((arr)->values))[2]; n<2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
     Int x = 0;
-    if ((2) < 0 || (2) >= (arr)->length) RAISE(222)
-    if ((0) < 0 || (0) >= (arr)->length) RAISE(222)
+    if ((2) < 0 || (2) >= (arr)->length) RAISE(224)
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(224)
     ((Int*)((arr)->values))[0] = ((Int*)((arr)->values))[2];
-    if ((0) < 0 || (0) >= (arr)->length) RAISE(223)
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(225)
     x = ((Int*)((arr)->values))[0];
     if (x > 4) {
-      if ((1) < 0 || (1) >= (arr)->length) RAISE(225)
+      if ((1) < 0 || (1) >= (arr)->length) RAISE(227)
       ((Int*)((arr)->values))[1] = x;
     }
-  }}
+  }
+  }
+  return OK;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-builtins"
+Returncode test_builtins(Int i, Char c, Bool b, String* s, Array* a) {
+  File* f = NULL;
+  CHECK(232, Int_str(i, s) )
+  b = true || false;
+  c = EOF;
+  if (a == NULL) RAISE(235)
+  i = a->length;
+  if (s == NULL) RAISE(236)
+  i = s->length;
+  CHECK(237, String_clear(s) )
+  CHECK(238, String_equal(s, s, &(b)) )
+  CHECK(239, String_get(s, i, &(c)) )
+  CHECK(240, String_append(s, c) )
+  CHECK(241, String_copy(s, s) )
+  CHECK(242, String_concat(s, s) )
+  CHECK(243, String_concat_int(s, i) )
+  CHECK(244, String_find(s, s, &(i)) )
+  CHECK(245, String_has(s, c, &(b)) )
+  CHECK(247, file_open_read(s, &(f)) )
+  CHECK(248, file_open_write(s, &(f)) )
+  CHECK(249, File_getc(f, &(c)) )
+  CHECK(250, File_putc(f, c) )
+  CHECK(251, File_write(f, s) )
+  CHECK(252, File_close(f) )
+  if (sys == NULL) RAISE(253)
+  if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(253)
+  s = ((String**)((sys->argv)->values))[1];
+  CHECK(254, Sys_print(sys, s) )
+  CHECK(255, Sys_println(sys, s) )
+  CHECK(256, Sys_getenv(sys, s, s, &(b)) )
+  CHECK(257, Sys_system(sys, s, &(i)) )
+  CHECK(258, Sys_exit(sys, i) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -532,8 +574,8 @@ Returncode test_code_flow(Array* arr, Int* res) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
-  CHECK(229, test_simple_function() )
-  CHECK(230, test_call_expression() )
+  CHECK(262, test_simple_function() )
+  CHECK(263, test_call_expression() )
   return OK;
 }
 #undef MR_FILE_NAME

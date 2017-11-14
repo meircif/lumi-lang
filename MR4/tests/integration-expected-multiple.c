@@ -153,6 +153,8 @@ Returncode test_call_expression(void);
 
 Returncode test_code_flow(Array* arr, Int* res);
 
+Returncode test_builtins(Int i, Char c, Bool b, String* s, Array* a);
+
 Returncode test_mid_out(MiddleType** mt, MiddleType_Dynamic** mt_Dynamic);
 
 Returncode TestStruct_Mock_get(TestStruct* self, Int* x, String** s);
@@ -193,6 +195,12 @@ Returncode TestStruct_get(TestStruct* self, Int* x, String** s) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.meth0"
 Returncode BaseType_meth0(BaseType* self, BaseType_Dynamic* self_Dynamic) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 15;
+  aux_String_0->length = 14;
+  aux_String_0->values = "BaseType.meth0";
+  CHECK(44, Sys_println(sys, aux_String_0) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -201,6 +209,12 @@ Returncode BaseType_meth0(BaseType* self, BaseType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.meth1"
 Returncode BaseType_meth1(BaseType* self, BaseType_Dynamic* self_Dynamic, Int n, String* s) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 15;
+  aux_String_0->length = 14;
+  aux_String_0->values = "BaseType.meth1";
+  CHECK(47, Sys_println(sys, aux_String_0) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -209,6 +223,12 @@ Returncode BaseType_meth1(BaseType* self, BaseType_Dynamic* self_Dynamic, Int n,
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.meth2"
 Returncode BaseType_meth2(BaseType* self, BaseType_Dynamic* self_Dynamic) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 15;
+  aux_String_0->length = 14;
+  aux_String_0->values = "BaseType.meth2";
+  CHECK(50, Sys_println(sys, aux_String_0) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -217,6 +237,12 @@ Returncode BaseType_meth2(BaseType* self, BaseType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.meth3"
 Returncode BaseType_meth3(BaseType* self, BaseType_Dynamic* self_Dynamic, Int n, String* s) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 15;
+  aux_String_0->length = 14;
+  aux_String_0->values = "BaseType.meth3";
+  CHECK(53, Sys_println(sys, aux_String_0) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -225,6 +251,12 @@ Returncode BaseType_meth3(BaseType* self, BaseType_Dynamic* self_Dynamic, Int n,
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth1"
 Returncode MiddleType_meth1(MiddleType* self, MiddleType_Dynamic* self_Dynamic, Int n, String* s) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 17;
+  aux_String_0->length = 16;
+  aux_String_0->values = "MiddleType.meth1";
+  CHECK(13, Sys_println(sys, aux_String_0) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -233,6 +265,12 @@ Returncode MiddleType_meth1(MiddleType* self, MiddleType_Dynamic* self_Dynamic, 
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth2"
 Returncode MiddleType_meth2(MiddleType* self, MiddleType_Dynamic* self_Dynamic) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 17;
+  aux_String_0->length = 16;
+  aux_String_0->values = "MiddleType.meth2";
+  CHECK(16, Sys_println(sys, aux_String_0) )
   CHECK(17, BaseType_meth2(&(self->_base), &(self_Dynamic->_base)) )
   return OK;
 }
@@ -242,6 +280,12 @@ Returncode MiddleType_meth2(MiddleType* self, MiddleType_Dynamic* self_Dynamic) 
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth4"
 Returncode MiddleType_meth4(MiddleType* self, MiddleType_Dynamic* self_Dynamic) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 17;
+  aux_String_0->length = 16;
+  aux_String_0->values = "MiddleType.meth4";
+  CHECK(20, Sys_println(sys, aux_String_0) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -250,6 +294,12 @@ Returncode MiddleType_meth4(MiddleType* self, MiddleType_Dynamic* self_Dynamic) 
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth5"
 Returncode MiddleType_meth5(MiddleType* self, MiddleType_Dynamic* self_Dynamic, Int n, String* s) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 17;
+  aux_String_0->length = 16;
+  aux_String_0->values = "MiddleType.meth5";
+  CHECK(23, Sys_println(sys, aux_String_0) )
   return OK;
 }
 #undef MR_FILE_NAME
@@ -258,6 +308,12 @@ Returncode MiddleType_meth5(MiddleType* self, MiddleType_Dynamic* self_Dynamic, 
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth2"
 Returncode TopType_meth2(TopType* self, TopType_Dynamic* self_Dynamic) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 14;
+  aux_String_0->length = 13;
+  aux_String_0->values = "TopType.meth2";
+  CHECK(13, Sys_println(sys, aux_String_0) )
   CHECK(14, MiddleType_meth2(&(self->_base), &(self_Dynamic->_base)) )
   CHECK(15, MiddleType_meth2(&(self->_base), &(self_Dynamic->_base)) )
   CHECK(16, BaseType_meth2(&(self->_base._base), &(self_Dynamic->_base._base)) )
@@ -269,6 +325,12 @@ Returncode TopType_meth2(TopType* self, TopType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth3"
 Returncode TopType_meth3(TopType* self, TopType_Dynamic* self_Dynamic, Int n, String* s) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 14;
+  aux_String_0->length = 13;
+  aux_String_0->values = "TopType.meth3";
+  CHECK(19, Sys_println(sys, aux_String_0) )
   CHECK(20, BaseType_meth3(&(self->_base._base), &(self_Dynamic->_base._base), n, s) )
   return OK;
 }
@@ -278,6 +340,12 @@ Returncode TopType_meth3(TopType* self, TopType_Dynamic* self_Dynamic, Int n, St
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth5"
 Returncode TopType_meth5(TopType* self, TopType_Dynamic* self_Dynamic, Int n, String* s) {
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 14;
+  aux_String_0->length = 13;
+  aux_String_0->values = "TopType.meth5";
+  CHECK(23, Sys_println(sys, aux_String_0) )
   CHECK(24, MiddleType_meth5(&(self->_base), &(self_Dynamic->_base), n, s) )
   CHECK(25, MiddleType_meth1(NULL, NULL, n, s) )
   CHECK(26, BaseType_meth1(NULL, NULL, n, s) )
@@ -293,6 +361,12 @@ Returncode TopType_meth6(TopType* self, TopType_Dynamic* self_Dynamic) {
   MiddleType_Dynamic* mt_Dynamic = NULL;
   BaseType* bt = NULL;
   BaseType_Dynamic* bt_Dynamic = NULL;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = &aux_String_0_Var;
+  aux_String_0->max_length = 14;
+  aux_String_0->length = 13;
+  aux_String_0->values = "TopType.meth6";
+  CHECK(29, Sys_println(sys, aux_String_0) )
   if (self == NULL) RAISE(30)
   if (self == NULL) RAISE(30)
   self->_base.num_mid = self->_base._base.num_base;
@@ -652,22 +726,22 @@ Returncode test_call_expression(void) {
   Int aux_Int_0 = 0;
   Int aux_Int_1 = 0;
   String* aux_String_1 = NULL;
-  CHECK(182, f_test_void() )
+  CHECK(183, f_test_void() )
   aux_String_0->max_length = 5;
   aux_String_0->length = 4;
   aux_String_0->values = "text";
-  CHECK(183, f_test_params(3, aux_String_0, NULL) )
-  CHECK(184, f_test_outs(&(s), &(x)) )
-  CHECK(185, Mock_f_test_int2str(4, &(s)) )
-  CHECK(186, f_test_int(5) )
-  CHECK(187, f_test_int2int(6, &(x)) )
-  CHECK(188, f_test_many(7, 8, &(x), &(x)) )
-  CHECK(194, f_test_int2int(9, &(tmp)) )
-  CHECK(194, f_test_int(tmp) )
-  CHECK(195, f_test_many(11, 12, &(x), &(aux_Int_0)) )
-  CHECK(195, f_test_int2int(10, &(aux_Int_1)) )
+  CHECK(184, f_test_params(3, aux_String_0, NULL) )
+  CHECK(185, f_test_outs(&(s), &(x)) )
+  CHECK(186, Mock_f_test_int2str(4, &(s)) )
+  CHECK(187, f_test_int(5) )
+  CHECK(188, f_test_int2int(6, &(x)) )
+  CHECK(189, f_test_many(7, 8, &(x), &(x)) )
+  CHECK(195, f_test_int2int(9, &(tmp)) )
+  CHECK(195, f_test_int(tmp) )
+  CHECK(196, f_test_many(11, 12, &(x), &(aux_Int_0)) )
+  CHECK(196, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
-  CHECK(196, Mock_f_test_int2str(13, &(aux_String_1)) )
+  CHECK(197, Mock_f_test_int2str(13, &(aux_String_1)) )
   s = aux_String_1;
   return OK;
 }
@@ -677,7 +751,7 @@ Returncode test_call_expression(void) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-code-flow"
 Returncode test_code_flow(Array* arr, Int* res) {
-  if ((4) < 0 || (4) >= (arr)->length) RAISE(199)
+  if ((4) < 0 || (4) >= (arr)->length) RAISE(201)
   if ((((Int*)((arr)->values))[4]) > 6) {
     *res = 6;
   }
@@ -686,13 +760,13 @@ Returncode test_code_flow(Array* arr, Int* res) {
       *res = 6;
     }
     else {
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(203)
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(203)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(205)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(205)
       if ((((Int*)((arr)->values))[4]) != (((Int*)((arr)->values))[4])) {
         *res = 6;
       }
       else {
-        if ((0) < 0 || (0) >= (arr)->length) RAISE(205)
+        if ((0) < 0 || (0) >= (arr)->length) RAISE(207)
         if (0 == (((Int*)((arr)->values))[0])) {
           *res = 6;
         }
@@ -705,42 +779,82 @@ Returncode test_code_flow(Array* arr, Int* res) {
   while (true) {
     Int x = 0;
     Int y = 0;
-    if ((6) < 0 || (6) >= (arr)->length) RAISE(210)
+    if ((6) < 0 || (6) >= (arr)->length) RAISE(212)
     ((Int*)((arr)->values))[6] = 6;
-    if ((2) < 0 || (2) >= (arr)->length) RAISE(211)
+    if ((2) < 0 || (2) >= (arr)->length) RAISE(213)
     x = ((Int*)((arr)->values))[2];
     if (!(x > 3)) break;
     y = x - 1;
     while (true) {
       Int z = 0;
-      if ((8) < 0 || (8) >= (arr)->length) RAISE(215)
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(215)
+      if ((8) < 0 || (8) >= (arr)->length) RAISE(217)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(217)
       ((Int*)((arr)->values))[4] = ((Int*)((arr)->values))[8];
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(216)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(218)
       if (y > (((Int*)((arr)->values))[4])) {
         continue;
       }
       z = 0;
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(219)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(221)
       if (z <= (((Int*)((arr)->values))[4])) {
         if (!(z > 0)) break;
       }
     }
   }
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(221)
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(221)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(223)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(223)
   {int n; for(n=((Int*)((arr)->values))[2]; n<2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
     Int x = 0;
-    if ((2) < 0 || (2) >= (arr)->length) RAISE(222)
-    if ((0) < 0 || (0) >= (arr)->length) RAISE(222)
+    if ((2) < 0 || (2) >= (arr)->length) RAISE(224)
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(224)
     ((Int*)((arr)->values))[0] = ((Int*)((arr)->values))[2];
-    if ((0) < 0 || (0) >= (arr)->length) RAISE(223)
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(225)
     x = ((Int*)((arr)->values))[0];
     if (x > 4) {
-      if ((1) < 0 || (1) >= (arr)->length) RAISE(225)
+      if ((1) < 0 || (1) >= (arr)->length) RAISE(227)
       ((Int*)((arr)->values))[1] = x;
     }
-  }}
+  }
+  }
+  return OK;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-builtins"
+Returncode test_builtins(Int i, Char c, Bool b, String* s, Array* a) {
+  File* f = NULL;
+  CHECK(232, Int_str(i, s) )
+  b = true || false;
+  c = EOF;
+  if (a == NULL) RAISE(235)
+  i = a->length;
+  if (s == NULL) RAISE(236)
+  i = s->length;
+  CHECK(237, String_clear(s) )
+  CHECK(238, String_equal(s, s, &(b)) )
+  CHECK(239, String_get(s, i, &(c)) )
+  CHECK(240, String_append(s, c) )
+  CHECK(241, String_copy(s, s) )
+  CHECK(242, String_concat(s, s) )
+  CHECK(243, String_concat_int(s, i) )
+  CHECK(244, String_find(s, s, &(i)) )
+  CHECK(245, String_has(s, c, &(b)) )
+  CHECK(247, file_open_read(s, &(f)) )
+  CHECK(248, file_open_write(s, &(f)) )
+  CHECK(249, File_getc(f, &(c)) )
+  CHECK(250, File_putc(f, c) )
+  CHECK(251, File_write(f, s) )
+  CHECK(252, File_close(f) )
+  if (sys == NULL) RAISE(253)
+  if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(253)
+  s = ((String**)((sys->argv)->values))[1];
+  CHECK(254, Sys_print(sys, s) )
+  CHECK(255, Sys_println(sys, s) )
+  CHECK(256, Sys_getenv(sys, s, s, &(b)) )
+  CHECK(257, Sys_system(sys, s, &(i)) )
+  CHECK(258, Sys_exit(sys, i) )
   return OK;
 }
 #undef MR_FILE_NAME

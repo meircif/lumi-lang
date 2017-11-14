@@ -6,15 +6,17 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
   user String output-file-name
   owner SyntaxTreeMainFunction main-function
   
+  func inst init()
+    base.init()
+    new List{TypeData} in self.types
+  
   func inst parse(user Array{String} argv)
     if argv.length < 3
       sys.print(
           user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...")
       raise
     
-    self.init()
     self.output-file-name := argv[1]
-    new List{TypeData} in self.types
     for n in 2:argv.length
       glob.input-file-name := argv[n]
       glob.line-number := 1
@@ -159,7 +161,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     user ListNode{TypeData} child(self.types.first)
     do
       while ? child
-      type-writer.write(user child.item)
+      child.item.write-me(user type-writer)
       child := child.next
   
   func inst write-test-main()

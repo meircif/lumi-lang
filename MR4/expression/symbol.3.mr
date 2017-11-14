@@ -193,7 +193,6 @@ class MemberExpression(SymbolExpression)
       self.dynamic-call-self-instance.write-dynamic()
     write(user " == NULL) ")
     self.write-raise()
-    write(user "\n")
     self.code-node.write-spaces()
   
   func dynamic write()

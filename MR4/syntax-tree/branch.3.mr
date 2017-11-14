@@ -121,18 +121,6 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   func dynamic write()
     self.write-children(user self.variables)
   
-  func inst write-children(user List{SyntaxTreeNode} child-list)
-    user ListNode{SyntaxTreeNode} child(child-list.first)
-    do
-      while ? child
-      if self.indentation-spaces > 0
-        self.write-spaces()
-      else
-        write(user "\n")
-      child.item.write()
-      write(user "\n")
-      child := child.next
-  
   func inst write-spaces()
     write-spaces(copy self.indentation-spaces)
 

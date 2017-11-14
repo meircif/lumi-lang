@@ -128,7 +128,7 @@ class UnaryExpression(Expression)
     if not self.top
       write(user ")")
     if self.is-statement
-      write(user ";")
+      write(user ";\n")
 
 
 ## An expression with a binary operator

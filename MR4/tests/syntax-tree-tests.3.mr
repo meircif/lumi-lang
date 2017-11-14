@@ -548,10 +548,10 @@ test test-do-loop()
 test test-for-loop()
   test-code(
       user "for n in 5\n    i += n",
-      user "{int n; for(n=0; n<5; ++n) {\n    i += n;\n  }}")
+      user "{int n; for(n=0; n<5; ++n) {\n    i += n;\n  }\n  }")
   test-code(
       user "for n in t.num:t.num + 2\n    i += n",
-      user "if (t == NULL) RAISE(1)\n  if (t == NULL) RAISE(1)\n  {int n; for(n=t->num; n<t->num + 2; ++n) {\n    i += n;\n  }}")
+      user "if (t == NULL) RAISE(1)\n  if (t == NULL) RAISE(1)\n  {int n; for(n=t->num; n<t->num + 2; ++n) {\n    i += n;\n  }\n  }")
   test-code-error(user "for(", user "expected space after \"for\", got \"(\"")
   test-code-error(
       user "for n", user "expected space after index name, got \"new-line\"")

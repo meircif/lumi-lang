@@ -118,7 +118,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     write-post-func()
   
   func inst write-header()
-    write(user "Returncode ")
+    write(user "\nReturncode ")
     self.write-cname()
     self.arguments.write(copy true)
   
@@ -131,27 +131,26 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst write-pointer()
     self.arguments.write-pointer(user self.name)
   
-  func inst write-declaration()
+  func dynamic write-declaration()
     # Returncode `Type`_`name`(`args`);
-    write(user "\n")
     self.write-header()
     write(user ";\n")
 
 # to be mocked in unit-tests
 func write-pre-func(user SyntaxTreeFunction self)
-  write(user "#define MR_FILE_NAME \"")
+  write(user "\n#define MR_FILE_NAME \"")
   write(user self.input-file-name)
   write(user "\"\n#define MR_FUNC_NAME \"")
   if ? self.parent-type
     write(user self.parent-type.name)
     write(user ".")
   write(user self.name)
-  write(user "\"\n")
+  write(user "\"")
 
 # to be mocked in unit-tests
 func write-post-func()
-    write(user "\n#undef MR_FILE_NAME\n")
-    write(user "#undef MR_FUNC_NAME")
+    write(user "#undef MR_FILE_NAME\n")
+    write(user "#undef MR_FUNC_NAME\n")
 
 
 ## Main function node in the syntax tree
@@ -173,12 +172,11 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     #   `block...`
     # }
     # MAIN_FUNC
-    write(user "\n")
     write-pre-func(user self)
-    write(user "USER_MAIN_HEADER")
+    write(user "\nUSER_MAIN_HEADER")
     self.write-block()
     write-post-func()
-    write(user "\n\nMAIN_FUNC\n")
+    write(user "\nMAIN_FUNC\n")
 
 
 ## Native function declaration in the syntax tree

@@ -114,7 +114,6 @@ Returncode String_concat(String* this, String* ext);
 Returncode String_concat_int(String* this, Int num);
 Returncode String_find(String* this, String* pattern, Int* index);
 Returncode String_has(String* this, Char ch, Bool* found);
-Returncode String_replace(String* this, Char old_ch, Char new_ch);
 
 Returncode Int_str(Int value, String* str);
 
@@ -125,9 +124,9 @@ Returncode File_getc(File* this, Char* ch);
 Returncode File_putc(File* this, Char ch);
 Returncode File_write(File* this, String* line);
 
-extern Sys sys;
+extern Sys* sys;
 Returncode Sys_print(Sys*, String* text);
-Returncode Sys_print_raw(Sys*, String* text);
+Returncode Sys_println(Sys*, String* text);
 Returncode Sys_exit(Sys*, Int status);
 Returncode Sys_system(Sys*, String* command, Int* status);
 Returncode Sys_getenv(Sys*, String* name, String* value, Bool* exists);

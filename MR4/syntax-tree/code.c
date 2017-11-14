@@ -69,8 +69,9 @@ Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self);
 static char* _func_name_SyntaxTreeExpression_write = "SyntaxTreeExpression.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_write
 Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
-  CHECK(24, (self->expression)->_base._dtl[5](self->expression) )
-  CHECK(25, (self->expression)->_base._dtl[2](self->expression) )
+  CHECK(24, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(25, (self->expression)->_base._dtl[5](self->expression) )
+  CHECK(26, (self->expression)->_base._dtl[2](self->expression) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -98,10 +99,10 @@ static char* _func_name_SyntaxTreeReturn_parse_new = "SyntaxTreeReturn.parse-new
 #define MR_FUNC_NAME _func_name_SyntaxTreeReturn_parse_new
 Returncode SyntaxTreeReturn_parse_new(SyntaxTreeReturn* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeReturn** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeReturn));
-  if ((*new_node) == NULL) RAISE(33)
+  if ((*new_node) == NULL) RAISE(34)
   *(*new_node) = (SyntaxTreeReturn){SyntaxTreeReturn__dtl, NULL, 0, NULL};
   (*new_node)->_base._base._dtl = SyntaxTreeReturn__dtl;
-  CHECK(34, SyntaxTreeNode_set_location(&((*new_node)->_base._base)) )
+  CHECK(35, SyntaxTreeNode_set_location(&((*new_node)->_base._base)) )
   (*new_node)->_base.parent = parent;
   return OK;
 }
@@ -124,7 +125,8 @@ Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self);
 static char* _func_name_SyntaxTreeReturn_write = "SyntaxTreeReturn.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeReturn_write
 Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self) {
-  CHECK(41, write(&(String){11, 10, "return OK;"}) )
+  CHECK(42, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(43, write(&(String){12, 11, "return OK;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -152,10 +154,10 @@ static char* _func_name_SyntaxTreeRaise_parse_new = "SyntaxTreeRaise.parse-new";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRaise_parse_new
 Returncode SyntaxTreeRaise_parse_new(SyntaxTreeRaise* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeRaise** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeRaise));
-  if ((*new_node) == NULL) RAISE(49)
+  if ((*new_node) == NULL) RAISE(51)
   *(*new_node) = (SyntaxTreeRaise){SyntaxTreeRaise__dtl, NULL, 0, NULL};
   (*new_node)->_base._base._dtl = SyntaxTreeRaise__dtl;
-  CHECK(50, SyntaxTreeNode_set_location(&((*new_node)->_base._base)) )
+  CHECK(52, SyntaxTreeNode_set_location(&((*new_node)->_base._base)) )
   (*new_node)->_base.parent = parent;
   return OK;
 }
@@ -178,7 +180,8 @@ Returncode SyntaxTreeRaise_write(SyntaxTreeRaise* self);
 static char* _func_name_SyntaxTreeRaise_write = "SyntaxTreeRaise.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRaise_write
 Returncode SyntaxTreeRaise_write(SyntaxTreeRaise* self) {
-  CHECK(57, SyntaxTreeNode_write_raise(&(self->_base._base)) )
+  CHECK(59, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(60, SyntaxTreeNode_write_raise(&(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -207,10 +210,10 @@ static char* _func_name_SyntaxTreeWhile_parse_new = "SyntaxTreeWhile.parse-new";
 #define MR_FUNC_NAME _func_name_SyntaxTreeWhile_parse_new
 Returncode SyntaxTreeWhile_parse_new(SyntaxTreeWhile* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeWhile** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeWhile));
-  if ((*new_node) == NULL) RAISE(66)
+  if ((*new_node) == NULL) RAISE(69)
   *(*new_node) = (SyntaxTreeWhile){SyntaxTreeWhile__dtl, NULL, 0, NULL, NULL};
   (*new_node)->_base._base._dtl = SyntaxTreeWhile__dtl;
-  CHECK(67, SyntaxTreeWhile_parse((*new_node), parent, &((*end))) )
+  CHECK(70, SyntaxTreeWhile_parse((*new_node), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -222,11 +225,11 @@ static char* _func_name_SyntaxTreeWhile_parse = "SyntaxTreeWhile.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeWhile_parse
 Returncode SyntaxTreeWhile_parse(SyntaxTreeWhile* self, SyntaxTreeBlock* parent, Char* end) {
   self->_base.parent = parent;
-  CHECK(71, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(74, SyntaxTreeNode_set_location(&(self->_base._base)) )
   if (!parent->is_in_loop) {
-    CHECK(73, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){29, 28, "\"while\" used not inside loop"}) )
+    CHECK(76, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){29, 28, "\"while\" used not inside loop"}) )
   }
-  CHECK(74, parse_new_expression(&(String){1, 0, ""}, &(self->_base), &(self->condition), &((*end))) )
+  CHECK(77, parse_new_expression(&(String){1, 0, ""}, &(self->_base), &(self->condition), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -237,7 +240,7 @@ Returncode SyntaxTreeWhile_analyze(SyntaxTreeWhile* self);
 static char* _func_name_SyntaxTreeWhile_analyze = "SyntaxTreeWhile.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeWhile_analyze
 Returncode SyntaxTreeWhile_analyze(SyntaxTreeWhile* self) {
-  CHECK(77, SyntaxTreeNode_analyze_expression(&(self->_base._base), self->condition, glob->type_bool) )
+  CHECK(80, SyntaxTreeNode_analyze_expression(&(self->_base._base), self->condition, &(glob->type_bool->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -249,10 +252,11 @@ static char* _func_name_SyntaxTreeWhile_write = "SyntaxTreeWhile.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeWhile_write
 Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
   /* if (!(`condition`) break; */
-  CHECK(81, (self->condition)->_base._dtl[5](self->condition) )
-  CHECK(82, write(&(String){7, 6, "if (!("}) )
-  CHECK(83, (self->condition)->_base._dtl[2](self->condition) )
-  CHECK(84, write(&(String){10, 9, ")) break;"}) )
+  CHECK(84, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(85, (self->condition)->_base._dtl[5](self->condition) )
+  CHECK(86, write(&(String){7, 6, "if (!("}) )
+  CHECK(87, (self->condition)->_base._dtl[2](self->condition) )
+  CHECK(88, write(&(String){11, 10, ")) break;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -280,10 +284,10 @@ static char* _func_name_SyntaxTreeContinue_parse_new = "SyntaxTreeContinue.parse
 #define MR_FUNC_NAME _func_name_SyntaxTreeContinue_parse_new
 Returncode SyntaxTreeContinue_parse_new(SyntaxTreeContinue* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeContinue** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeContinue));
-  if ((*new_node) == NULL) RAISE(92)
+  if ((*new_node) == NULL) RAISE(96)
   *(*new_node) = (SyntaxTreeContinue){SyntaxTreeContinue__dtl, NULL, 0, NULL};
   (*new_node)->_base._base._dtl = SyntaxTreeContinue__dtl;
-  CHECK(93, SyntaxTreeContinue_parse((*new_node), parent) )
+  CHECK(97, SyntaxTreeContinue_parse((*new_node), parent) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -294,10 +298,10 @@ Returncode SyntaxTreeContinue_parse(SyntaxTreeContinue* self, SyntaxTreeBlock* p
 static char* _func_name_SyntaxTreeContinue_parse = "SyntaxTreeContinue.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeContinue_parse
 Returncode SyntaxTreeContinue_parse(SyntaxTreeContinue* self, SyntaxTreeBlock* parent) {
-  CHECK(96, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(100, SyntaxTreeNode_set_location(&(self->_base._base)) )
   self->_base.parent = parent;
   if (!parent->is_in_loop) {
-    CHECK(99, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "\"continue\" used not inside loop"}) )
+    CHECK(103, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "\"continue\" used not inside loop"}) )
   }
   return OK;
 }
@@ -309,7 +313,8 @@ Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self);
 static char* _func_name_SyntaxTreeContinue_write = "SyntaxTreeContinue.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeContinue_write
 Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self) {
-  CHECK(102, write(&(String){10, 9, "continue;"}) )
+  CHECK(106, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(107, write(&(String){11, 10, "continue;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

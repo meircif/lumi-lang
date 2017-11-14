@@ -131,7 +131,7 @@ class TypeData(SyntaxTreeNamespace)
     # struct `name`_Dynamic {
     #   `dynamic-function-pointers...`
     # };
-    write(user "struct ")
+    write(user "\nstruct ")
     write-cname(user self.name)
     write(user " {\n")
     self.indentation-spaces := 2
@@ -140,9 +140,9 @@ class TypeData(SyntaxTreeNamespace)
       write-cname(user self.base-type.name)
       write(user " _base;\n")
     self.write-children(user self.variables)
-    write(user "};")
+    write(user "};\n")
     if self.is-dynamic
-      write(user "\n\nstruct ")
+      write(user "\nstruct ")
       write-cname(user self.name)
       write(user "_Dynamic {\n")
       if ? self.base-type and self.base-type.is-dynamic
@@ -156,7 +156,7 @@ class TypeData(SyntaxTreeNamespace)
         child.value.write-pointer()
         write(user ";\n")
         child := child.next
-      write(user "};")
+      write(user "};\n")
     self.indentation-spaces := 0
   
   func inst write-methods-declaration()
@@ -196,6 +196,9 @@ class TypeData(SyntaxTreeNamespace)
   
   func inst write-methods-body()
     self.write-children(user self.functions)
+  
+  func dynamic write-me(user TypeWriter type-writer)
+    type-writer.write(user self)
 
 
 class TypeWriter

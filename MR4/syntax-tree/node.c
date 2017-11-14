@@ -129,7 +129,7 @@ static char* _func_name_SyntaxTreeNode_write_raise = "SyntaxTreeNode.write-raise
 Returncode SyntaxTreeNode_write_raise(SyntaxTreeNode* self) {
   CHECK(53, write(&(String){7, 6, "RAISE("}) )
   CHECK(54, SyntaxTreeNode_write_line_num(self) )
-  CHECK(55, write(&(String){2, 1, ")"}) )
+  CHECK(55, write(&(String){3, 2, ")\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -246,38 +246,6 @@ Returncode SyntaxTreeNode_print_syntax_error_header(SyntaxTreeNode* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeNode_m_link_children_types(SyntaxTreeNode* self, List* child_list);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeNode_m_link_children_types = "SyntaxTreeNode.m-link-children-types";
-#define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_link_children_types
-Returncode SyntaxTreeNode_m_link_children_types(SyntaxTreeNode* self, List* child_list) {
-  ListNode* child = child_list->first;
-  while (true) {
-    if (!(NULL != child)) break;
-    CHECK(127, (((SyntaxTreeNode*)(child->item)))->_dtl[0](((SyntaxTreeNode*)(child->item))) )
-    child = child->next;
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeNode_analyze_children = "SyntaxTreeNode.analyze-children";
-#define MR_FUNC_NAME _func_name_SyntaxTreeNode_analyze_children
-Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list) {
-  ListNode* child = child_list->first;
-  while (true) {
-    if (!(NULL != child)) break;
-    CHECK(134, (((SyntaxTreeNode*)(child->item)))->_dtl[1](((SyntaxTreeNode*)(child->item))) )
-    child = child->next;
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeNode_m_link_types(SyntaxTreeNode* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeNode_m_link_types = "SyntaxTreeNode.m-link-types";
@@ -305,7 +273,62 @@ Returncode SyntaxTreeNode_write(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_write = "SyntaxTreeNode.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_write
 Returncode SyntaxTreeNode_write(SyntaxTreeNode* self) {
-  RAISE(144)
+  RAISE(130)
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_m_link_children_types(SyntaxTreeNode* self, List* child_list);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_m_link_children_types = "SyntaxTreeNode.m-link-children-types";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_link_children_types
+Returncode SyntaxTreeNode_m_link_children_types(SyntaxTreeNode* self, List* child_list) {
+  NodeLinkTypesAction* action_link_types = &(NodeLinkTypesAction){NodeLinkTypesAction__dtl};
+  action_link_types->_base._dtl = NodeLinkTypesAction__dtl;
+  CHECK(134, SyntaxTreeNode_m_do_on_children(self, child_list, &(action_link_types->_base)) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_analyze_children = "SyntaxTreeNode.analyze-children";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_analyze_children
+Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list) {
+  NodeAnalyzeAction* action_analyze = &(NodeAnalyzeAction){NodeAnalyzeAction__dtl};
+  action_analyze->_base._dtl = NodeAnalyzeAction__dtl;
+  CHECK(138, SyntaxTreeNode_m_do_on_children(self, child_list, &(action_analyze->_base)) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_write_children(SyntaxTreeNode* self, List* child_list);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_write_children = "SyntaxTreeNode.write-children";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_write_children
+Returncode SyntaxTreeNode_write_children(SyntaxTreeNode* self, List* child_list) {
+  NodeWriteAction* action_write = &(NodeWriteAction){NodeWriteAction__dtl};
+  action_write->_base._dtl = NodeWriteAction__dtl;
+  CHECK(142, SyntaxTreeNode_m_do_on_children(self, child_list, &(action_write->_base)) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_m_do_on_children(SyntaxTreeNode* self, List* child_list, NodeAction* action);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_m_do_on_children = "SyntaxTreeNode.m-do-on-children";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_do_on_children
+Returncode SyntaxTreeNode_m_do_on_children(SyntaxTreeNode* self, List* child_list, NodeAction* action) {
+  ListNode* child = child_list->first;
+  while (true) {
+    if (!(NULL != child)) break;
+    CHECK(149, (action)->_dtl[0](action, child->item) )
+    child = child->next;
+  }
+  return OK;
 }
 #undef MR_FUNC_NAME
 #endif
@@ -314,6 +337,106 @@ extern Func SyntaxTreeNode__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
 Func SyntaxTreeNode__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write};
+#endif
+
+
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct NodeAction NodeAction;
+#elif MR_STAGE == MR_TYPES(0)
+struct NodeAction {
+  Func* _dtl;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_NodeAction_m_action = "NodeAction.m-action";
+#define MR_FUNC_NAME _func_name_NodeAction_m_action
+Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node) {
+  RAISE(155)
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func NodeAction__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func NodeAction__dtl[] = {(void*)NodeAction_m_action};
+#endif
+
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct NodeLinkTypesAction NodeLinkTypesAction;
+#elif MR_STAGE == MR_TYPES(1)
+struct NodeLinkTypesAction {
+  NodeAction _base;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNode* node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_NodeLinkTypesAction_m_action = "NodeLinkTypesAction.m-action";
+#define MR_FUNC_NAME _func_name_NodeLinkTypesAction_m_action
+Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNode* node) {
+  CHECK(159, (node)->_dtl[0](node) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func NodeLinkTypesAction__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func NodeLinkTypesAction__dtl[] = {(void*)NodeLinkTypesAction_m_action};
+#endif
+
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct NodeAnalyzeAction NodeAnalyzeAction;
+#elif MR_STAGE == MR_TYPES(1)
+struct NodeAnalyzeAction {
+  NodeAction _base;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_NodeAnalyzeAction_m_action = "NodeAnalyzeAction.m-action";
+#define MR_FUNC_NAME _func_name_NodeAnalyzeAction_m_action
+Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* node) {
+  CHECK(163, (node)->_dtl[1](node) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func NodeAnalyzeAction__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func NodeAnalyzeAction__dtl[] = {(void*)NodeAnalyzeAction_m_action};
+#endif
+
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct NodeWriteAction NodeWriteAction;
+#elif MR_STAGE == MR_TYPES(1)
+struct NodeWriteAction {
+  NodeAction _base;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_NodeWriteAction_m_action = "NodeWriteAction.m-action";
+#define MR_FUNC_NAME _func_name_NodeWriteAction_m_action
+Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node) {
+  CHECK(167, (node)->_dtl[2](node) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func NodeWriteAction__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func NodeWriteAction__dtl[] = {(void*)NodeWriteAction_m_action};
 #endif
 
 #undef MR_FILE_NAME

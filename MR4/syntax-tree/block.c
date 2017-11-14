@@ -449,9 +449,9 @@ Returncode SyntaxTreeBlock_write_block(SyntaxTreeBlock* self) {
   /* } */
   CHECK(218, write(&(String){4, 3, " {\n"}) )
   CHECK(219, SyntaxTreeBranch_write(&(self->_base)) )
-  CHECK(220, SyntaxTreeBranch_write_children(&(self->_base), self->code_nodes) )
+  CHECK(220, SyntaxTreeNode_write_children(&(self->_base._base), self->code_nodes) )
   CHECK(221, write_spaces(self->_base.indentation_spaces - 2) )
-  CHECK(222, write(&(String){2, 1, "}"}) )
+  CHECK(222, write(&(String){3, 2, "}\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
