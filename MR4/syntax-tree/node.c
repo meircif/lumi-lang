@@ -44,9 +44,9 @@ static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
   {int n; for (n = (0); n < (4); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool86;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool86)) )
-    if (_Bool86) {
+    Bool _Bool85;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool85)) )
+    if (_Bool85) {
       (*access) = n;
       return OK;
     }
@@ -79,13 +79,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(28)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char87;
-    CHECK(30, read_c(&(_Char87)) )
-    CHECK(30, String_append(actual_text, _Char87) )
+    Char _Char86;
+    CHECK(30, read_c(&(_Char86)) )
+    CHECK(30, String_append(actual_text, _Char86) )
   }}
-  Bool _Bool88;
-  CHECK(31, String_equal(actual_text, expected_text, &(_Bool88)) )
-  if (!_Bool88) {
+  Bool _Bool87;
+  CHECK(31, String_equal(actual_text, expected_text, &(_Bool87)) )
+  if (!_Bool87) {
     CHECK(32, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);

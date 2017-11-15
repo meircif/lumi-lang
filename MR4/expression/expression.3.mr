@@ -84,7 +84,7 @@ class Expression(SyntaxTreeNode)
   ## Read a single expression value as new string
   func inst read-new-value(user String ends):(owner String text, copy Char end)
     owner String all-ends
-    string-new-concat(user " .[(?", user ends):(owner all-ends)
+    string-new-concat(user " .[({?", user ends):(owner all-ends)
     read-new(user all-ends):(owner text, copy end)
     delete all-ends
   
@@ -100,7 +100,8 @@ class Expression(SyntaxTreeNode)
         code-node.m-syntax-error-c(user "unexpected", copy end)
       delete text
     else
-      self.parse-new-init-operand(owner text, user code-node):(owner expression)
+      self.parse-new-init-operand(owner text, user code-node):(
+          owner expression, copy end)
     
     do
       if end = '?'
@@ -111,7 +112,7 @@ class Expression(SyntaxTreeNode)
   ## Parse the initialize part of an operand expression
   func inst parse-new-init-operand(
       owner String text, user SyntaxTreeCode code-node):(
-      owner Expression expression)
+      owner Expression expression, copy Char end)
     var Char first(text[0])
     var Char second('\0')
     if text.length > 1
@@ -125,7 +126,8 @@ class Expression(SyntaxTreeNode)
         (first = '-' and second >= '0' and second <= '9')
       IntExpression.parse-new(var _, owner text):(owner expression)
     else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-      TypeExpression.parse-new(var _, owner text):(owner expression)
+      TypeExpression.parse-new(var _, owner text, user code-node):(
+          owner expression, copy end)
     else-if text.length = 1 and first = '_'
       EmptyExpression.parse-new(var _, owner text):(owner expression)
     else-if text.equal(user "base")

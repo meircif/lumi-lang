@@ -579,8 +579,11 @@ test test-dynamic()
   test-code(
       user "user Ta a", user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;")
   test-code(
+      user "ta := Ta()",
+      user "Ta* aux_Ta_0 = NULL;\n  Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;\n  aux_Ta_0 = calloc(1, sizeof(Ta));\n  if (aux_Ta_0 == NULL) RAISE(1)\n  ta_Dynamic = aux_Ta_0_Dynamic;\n  ta = aux_Ta_0;")
+  test-code(
       user "new Ta a",
-      user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;\n  a = calloc(1, sizeof(Ta));")
+      user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;\n  a = calloc(1, sizeof(Ta));\n  if (a == NULL) RAISE(1)")
   test-code(
       user "user Ta a(ta)",
       user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;\n  a = ta;\n  a_Dynamic = ta_Dynamic;")

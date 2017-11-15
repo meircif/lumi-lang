@@ -381,27 +381,30 @@ test test-code-variables()
       user "var Array{12:String{7}} sa",
       user "char sa_Chars[12 * 7];\n  String sa_Values[12];\n  Array sa_Var = {12, NULL};\n  Array* sa = &sa_Var;\n  sa_Var.values = sa_Values;\n  MR_set_var_string_array(12, 7, sa, sa_Chars);")
   test-code(
-      user "new Test tt",
-      user "Test* tt = NULL;\n  tt = calloc(1, sizeof(Test));")
+      user "t := Test()",
+      user "Test* aux_Test_0 = NULL;\n  aux_Test_0 = calloc(1, sizeof(Test));\n  if (aux_Test_0 == NULL) RAISE(1)\n  t = aux_Test_0;")
   test-code(
-      user "new String{arr[0]} s",
-      user "String* s = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  s = MR_new_string(((Int*)((arr)->values))[0]);")
+      user "str := String{arr[0]}()",
+      user "String* aux_String_0 = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  aux_String_0 = MR_new_string(((Int*)((arr)->values))[0]);\n  if (aux_String_0 == NULL) RAISE(1)\n  str = aux_String_0;")
   test-code(
-      user "new Array{arr[0]:Int} a",
-      user "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  a = MR_new_array(((Int*)((arr)->values))[0], sizeof(Int));")
+      user "arr := Array{arr[0]:Int}()",
+      user "Array* aux_Array_0 = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  aux_Array_0 = MR_new_array(((Int*)((arr)->values))[0], sizeof(Int));\n  if (aux_Array_0 == NULL) RAISE(1)\n  arr = aux_Array_0;")
   test-code(
-      user "new Array{arr[0]:Test} a",
-      user "Array* a = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  a = MR_new_array(((Int*)((arr)->values))[0], sizeof(Test));")
+      user "owner Array{Test} a(Array{arr[0]:Test}())",
+      user "Array* a = NULL;\n  Array* aux_Array_0 = NULL;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  aux_Array_0 = MR_new_array(((Int*)((arr)->values))[0], sizeof(Test));\n  if (aux_Array_0 == NULL) RAISE(1)\n  a = aux_Array_0;")
   var String{1024} expected
   expected.copy(user "Array* sa = NULL;\n")
+  expected.concat(user "  Array* aux_Array_0 = NULL;\n")
   expected.concat(user "  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n")
   expected.concat(user "  if ((1) < 0 || (1) >= (arr)->length) RAISE(1)\n")
-  expected.concat(user "  sa = MR_new_array(((Int*)((arr)->values))[0], ")
-  expected.concat(user "sizeof(String) + (((Int*)((arr)->values))[1]));\n")
-  expected.concat(user "  MR_set_new_string_array(")
-  expected.concat(user "((Int*)((arr)->values))[0], ")
-  expected.concat(user "((Int*)((arr)->values))[1], sa);")
-  test-code(user "new Array{arr[0]:String{arr[1]}} sa", user expected)
+  expected.concat(user "  aux_Array_0")
+  expected.concat(user " = MR_new_string_array(((Int*)((arr)->values))[0]")
+  expected.concat(user ", ((Int*)((arr)->values))[1]);\n")
+  expected.concat(user "  if (aux_Array_0 == NULL) RAISE(1)\n")
+  expected.concat(user "  sa = aux_Array_0;")
+  test-code(
+      user "owner Array{String} sa(Array{arr[0]:String{arr[1]}}())",
+      user expected)
   test-code(
       user "var Int x(arr[0])",
       user "Int x = 0;\n  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)\n  x = ((Int*)((arr)->values))[0];")
@@ -419,7 +422,7 @@ test test-code-variables()
   test-code(user "var String{12} s(\"some string\")", user expected)
   test-code(
       user "new String{i} s(str)",
-      user "String* s = NULL;\n  s = MR_new_string(i);\n  CHECK(1, String_copy(s, str) )")
+      user "String* s = NULL;\n  s = MR_new_string(i);\n  if (s == NULL) RAISE(1)\n  CHECK(1, String_copy(s, str) )")
   test-code(
       user "user Test tt(tc)",
       user "Test* tt = NULL;\n  tt = &(tc->_base._base._base);")
@@ -449,10 +452,16 @@ test test-code-variables()
   test-global-scope-error(
       user "struct Test\n  var Test t\n",
       user "non-primitives cannot be declared \"var\" here yet...")
+  test-code-error(
+      user "Int()", user "dynamic allocation of primitive type \"Int\"")
   test-code-error(user "var String s", user "missing length for sequence")
   test-code-error(
       user "var Array{4:String} sa", user "missing length for sequence")
+  test-code-error(user "new String s", user "missing length for sequence")
+  test-code-error(user "String()", user "missing length for sequence")
   test-code-error(user "user Array a", user "missing subtype for array")
+  test-code-error(user "new Array a", user "missing subtype for array")
+  test-code-error(user "Array()", user "missing subtype for array")
   test-code-error(user "var Array{23} a", user "missing subtype for array")
   test-code-error(
       user "var Array{1:Array{2:Int}} a",

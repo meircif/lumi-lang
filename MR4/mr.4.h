@@ -97,11 +97,9 @@ int MR_test_main(int argc, char* argv[]);
 
 String* MR_new_string(int length);
 Array* MR_new_array(int length, int value_size);
+Array* MR_new_string_array(int array_length, int string_length);
 void MR_set_var_string_array(
   int array_length, int string_length, Array* array, char* chars);
-Array* MR_get_recursive_array(
-  Array* parent, int parent_index, int length, int value_size);
-void MR_set_new_string_array(int array_length, int string_length, Array* array);
 Bool MR_run_test(char* test_name, Func test_func);
 
 Returncode String_clear(String* this);

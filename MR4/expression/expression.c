@@ -109,7 +109,7 @@ static char* _func_name_Expression_read_new_value = "Expression.read-new-value";
 #define MR_FUNC_NAME _func_name_Expression_read_new_value
 Returncode Expression_read_new_value(Expression* self, String* ends, String** text, Char* end) {
   String* all_ends = NULL;
-  CHECK(87, string_new_concat(&(String){6, 5, " .[(?"}, ends, &(all_ends)) )
+  CHECK(87, string_new_concat(&(String){7, 6, " .[({?"}, ends, &(all_ends)) )
   CHECK(88, read_new(all_ends, &((*text)), &((*end))) )
   free(all_ends);
   return OK;
@@ -132,15 +132,15 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     free(text);
   }
   else {
-    CHECK(103, Expression_parse_new_init_operand(self, text, code_node, &((*expression))) )
+    CHECK(103, Expression_parse_new_init_operand(self, text, code_node, &((*expression)), &((*end))) )
   }
   
   while (true) {
     if ((*end) == '?') {
-      CHECK(107, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
+      CHECK(108, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
     Bool _Bool29;
-    CHECK(108, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool29)) )
+    CHECK(109, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool29)) )
     if (!(_Bool29)) break;
   }
   return OK;
@@ -148,45 +148,45 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
 #undef MR_FUNC_NAME
 #endif/* Parse the initialize part of an operand expression */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_parse_new_init_operand(Expression* self, String* text, SyntaxTreeCode* code_node, Expression** expression);
+Returncode Expression_parse_new_init_operand(Expression* self, String* text, SyntaxTreeCode* code_node, Expression** expression, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_parse_new_init_operand = "Expression.parse-new-init-operand";
 #define MR_FUNC_NAME _func_name_Expression_parse_new_init_operand
-Returncode Expression_parse_new_init_operand(Expression* self, String* text, SyntaxTreeCode* code_node, Expression** expression) {
-  if ((0) < 0 || (0) >= (text)->length) RAISE(115)
+Returncode Expression_parse_new_init_operand(Expression* self, String* text, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
+  if ((0) < 0 || (0) >= (text)->length) RAISE(116)
   Char first = ((text)->values[0]);
   Char second = '\0';
   if (text->length > 1) {
-    if ((1) < 0 || (1) >= (text)->length) RAISE(118)
+    if ((1) < 0 || (1) >= (text)->length) RAISE(119)
     second = ((text)->values[1]);
   }
   if (first == '\'') {
-    CHECK(120, CharExpression_parse_new(NULL, text, &((*expression))) )
+    CHECK(121, CharExpression_parse_new(NULL, text, &((*expression))) )
   }
   else {
     if (first == '"') {
-      CHECK(122, StringExpression_parse_new(NULL, text, code_node, &((*expression))) )
+      CHECK(123, StringExpression_parse_new(NULL, text, code_node, &((*expression))) )
     }
     else {
       if ((first >= '0' && first <= '9') || (first == '-' && second >= '0' && second <= '9')) {
-        CHECK(126, IntExpression_parse_new(NULL, text, &((*expression))) )
+        CHECK(127, IntExpression_parse_new(NULL, text, &((*expression))) )
       }
       else {
         if (first >= 'A' && first <= 'Z' && second >= 'a' && second <= 'z') {
-          CHECK(128, TypeExpression_parse_new(NULL, text, &((*expression))) )
+          CHECK(129, TypeExpression_parse_new(NULL, text, code_node, &((*expression)), &((*end))) )
         }
         else {
           if (text->length == 1 && first == '_') {
-            CHECK(130, EmptyExpression_parse_new(NULL, text, &((*expression))) )
+            CHECK(132, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
             Bool _Bool30;
-            CHECK(131, String_equal(text, &(String){5, 4, "base"}, &(_Bool30)) )
+            CHECK(133, String_equal(text, &(String){5, 4, "base"}, &(_Bool30)) )
             if (_Bool30) {
-              CHECK(132, BaseMethExpression_parse_new(NULL, text, code_node, &((*expression))) )
+              CHECK(134, BaseMethExpression_parse_new(NULL, text, code_node, &((*expression))) )
             }
             else {
-              CHECK(135, SymbolExpression_parse_new(NULL, text, code_node, &((*expression))) )
+              CHECK(137, SymbolExpression_parse_new(NULL, text, code_node, &((*expression))) )
             }
           }
         }
@@ -205,15 +205,15 @@ static char* _func_name_Expression_parse_new_follow_operand = "Expression.parse-
 Returncode Expression_parse_new_follow_operand(Expression* self, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end, Bool* has_more) {
   (*has_more) = true;
   if ((*end) == '.') {
-    CHECK(144, MemberExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
+    CHECK(146, MemberExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
   }
   else {
     if ((*end) == '[') {
-      CHECK(147, SliceExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
+      CHECK(149, SliceExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
     }
     else {
       if ((*end) == '(') {
-        CHECK(150, CallExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
+        CHECK(152, CallExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
       }
       else {
         (*has_more) = false;
@@ -230,7 +230,7 @@ Returncode Expression_set_simple_type(Expression* self, TypeData* type_data);
 static char* _func_name_Expression_set_simple_type = "Expression.set-simple-type";
 #define MR_FUNC_NAME _func_name_Expression_set_simple_type
 Returncode Expression_set_simple_type(Expression* self, TypeData* type_data) {
-  CHECK(157, TypeData_m_new_type_instance(type_data, &(self->result_type)) )
+  CHECK(159, TypeData_m_new_type_instance(type_data, &(self->result_type)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -242,14 +242,14 @@ static char* _func_name_Expression_add_aux_variable = "Expression.add-aux-variab
 #define MR_FUNC_NAME _func_name_Expression_add_aux_variable
 Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstance* type_instance, Expression** expression) {
   SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
-  if (symbol == NULL) RAISE(161)
+  if (symbol == NULL) RAISE(163)
   *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL, NULL, NULL};
   symbol->_base._base._dtl = SymbolExpression__dtl;
   symbol->_base.code_node = self->code_node;
-  CHECK(163, TypeInstance_m_copy_new(type_instance, &(symbol->_base.result_type)) )
+  CHECK(165, TypeInstance_m_copy_new(type_instance, &(symbol->_base.result_type)) )
   symbol->_base.assignable = true;
-  CHECK(165, SyntaxTreeBlock_add_aux_variable(self->code_node->parent, access, type_instance, &(symbol->variable)) )
-  CHECK(167, string_new_copy(symbol->variable->name, &(symbol->name)) )
+  CHECK(167, SyntaxTreeBlock_add_aux_variable(self->code_node->parent, access, type_instance, &(symbol->variable)) )
+  CHECK(169, string_new_copy(symbol->variable->name, &(symbol->name)) )
   (*expression) = &(symbol->_base);
   return OK;
 }
@@ -261,8 +261,8 @@ Returncode Expression_write_dynamic(Expression* self);
 static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
 #define MR_FUNC_NAME _func_name_Expression_write_dynamic
 Returncode Expression_write_dynamic(Expression* self) {
-  CHECK(171, (self)->_base._dtl[2](self) )
-  CHECK(172, write(&(String){9, 8, "_Dynamic"}) )
+  CHECK(173, (self)->_base._dtl[2](self) )
+  CHECK(174, write(&(String){9, 8, "_Dynamic"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

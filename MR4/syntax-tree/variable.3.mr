@@ -88,18 +88,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "only \"var\" access is supported for primitive types, got",
           user glob.access-names[self.access])
     self.type-instance.analyze-lengths(user self)
-    if self.access = ACCESS-VAR or self.access = ACCESS-NEW
-      if not self.type-instance.type-data.is-primitive and not (? self.parent)
-        self.m-syntax-error-msg(
-            user "non-primitives cannot be declared \"var\" here yet...")
-      if self.type-instance.type-data = glob.type-array or
-          self.type-instance.type-data = glob.type-string
-        if not (? self.type-instance.length)
-          self.m-syntax-error-msg(user "missing length for sequence")
-      if self.type-instance.type-data = glob.type-array and
-          self.type-instance.sub-type.type-data = glob.type-string and
-          not (? self.type-instance.sub-type.length)
-        self.m-syntax-error-msg(user "missing length for sequence")
+    if (self.access = ACCESS-VAR or self.access = ACCESS-NEW) and
+        not self.type-instance.type-data.is-primitive and not (? self.parent)
+      self.m-syntax-error-msg(
+          user "non-primitives cannot be declared \"var\" here yet...")
+    if self.access = ACCESS-VAR
+      self.type-instance.m-check-sequence(user self)
   
   func dynamic write()
     if ? self.parent or ? self.parent-type
@@ -252,58 +246,37 @@ class SyntaxTreeInitVarSequence(BaseVariableInit)
 
 ## Initialize dynamically allocated variable node in the syntax tree
 class SyntaxTreeInitNew(BaseVariableInit)
+  owner NewExpression new-expression
+  
   func inst parse-new(user SyntaxTreeBlock parent-block):(
       copy Char end, owner SyntaxTreeVariable new-var-node)
     new SyntaxTreeInitNew node-init-new
-    node-init-new.init-parent(user parent-block)
+    node-init-new.parse(user parent-block):(copy end, owner new-var-node)
+  
+  func dynamic parse(user SyntaxTreeBlock parent-block):(
+      copy Char end, owner SyntaxTreeVariable new-var-node)
+    self.init-parent(user parent-block)
     SyntaxTreeVariable.parse-new(
         var _, copy ACCESS-NEW, user _, user parent-block):(
         copy end, owner new-var-node)
-    node-init-new.variable := new-var-node
+    self.variable := new-var-node
+    new NewExpression in self.new-expression
+    self.new-expression.init(owner self.variable.type-instance, user self)
+    self.new-expression.result-type.m-copy-new():(
+        owner self.variable.type-instance)
+    self.new-expression.is-statement := true
+  
+  func dynamic analyze()
+    new SymbolExpression symbol
+    string-new-copy(user self.variable.name):(owner symbol.name)
+    symbol.variable := self.variable
+    self.new-expression.symbol := symbol
+    self.new-expression.analyze()
   
   func dynamic write()
-    # `name` = `...`
+    # `variable.name` = `new-expression`
     self.write-spaces()
-    if self.variable.type-instance.type-data = glob.type-array or
-        self.variable.type-instance.type-data = glob.type-string
-      self.variable.type-instance.length.write-preactions()
-    if self.variable.type-instance.type-data = glob.type-array and
-        self.variable.type-instance.sub-type.type-data = glob.type-string
-      self.variable.type-instance.sub-type.length.write-preactions()
-    write-cname(user self.variable.name)
-    write(user " = ")
-    if self.variable.type-instance.type-data = glob.type-array
-      # MR_new_array(length, sizeof(SubType));
-      # MR_new_array(length, sizeof(String) + (string-length));
-      # MR_set_new_string_array(length, string-length, `name`);
-      write(user "MR_new_array(")
-      self.variable.type-instance.length.write()
-      write(user ", sizeof(")
-      write-cname(user self.variable.type-instance.sub-type.type-data.name)
-      if self.variable.type-instance.sub-type.type-data = glob.type-string
-        write(user ") + (")
-        self.variable.type-instance.sub-type.length.write()
-        write(user "));\n")
-        self.write-spaces()
-        write(user "MR_set_new_string_array(")
-        self.variable.type-instance.length.write()
-        write(user ", ")
-        self.variable.type-instance.sub-type.length.write()
-        write(user ", ")
-        write-cname(user self.variable.name)
-      else
-        write(user ")")
-        
-    else-if self.variable.type-instance.type-data = glob.type-string
-      # MR_new_string(length);
-      write(user "MR_new_string(")
-      self.variable.type-instance.length.write()
-    else
-      # calloc(1, sizeof(`type`));
-      write(user "calloc(1, sizeof(")
-      write-cname(user self.variable.type-instance.type-data.name)
-      write(user ")")
-    write(user ");\n")
+    self.new-expression.write()
 
 
 ## Variable initialization node in the syntax tree

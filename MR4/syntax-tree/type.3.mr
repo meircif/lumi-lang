@@ -245,10 +245,19 @@ static TypeInstance
   func inst parse(
       user String ends,
       user SyntaxTreeNode node,
-      user SyntaxTreeVariable var-node):(
+      user SyntaxTreeCode code-node):(
       copy Char end)
-    read-new(
-        user string-new-concat(user ends, user "{")):(owner self.name, copy end)
+    user String name
+    read-until(user string-new-concat(user ends, user "{"), copy false):(
+        user name, copy end)
+    self.parse-name(user name, user node, user code-node):(copy end)
+  
+  func inst parse-name(
+      user String name,
+      user SyntaxTreeNode node,
+      user SyntaxTreeCode code-node):(
+      copy Char end)
+    string-new-copy(user name):(owner self.name)
     if end = '{'
       if self.name.equal(user "Func")
         read-c():(copy end)
@@ -258,20 +267,20 @@ static TypeInstance
         new FunctionArguments in self.arguments
         var DeclarationArgumentFactory argument-factory
         self.arguments.parse(user argument-factory, user _):(copy end)
-      else-if ? var-node and self.name.equal(user "String")
-        parse-new-expression(user "}", user var-node):(
+      else-if ? code-node and self.name.equal(user "String")
+        parse-new-expression(user "}", user code-node):(
             owner self.length, copy end)
       else
         var Bool has-sub-type(true)
-        if ? var-node and self.name.equal(user "Array")
-          parse-new-expression(user ":}", user var-node):(
+        if ? code-node and self.name.equal(user "Array")
+          parse-new-expression(user ":}", user code-node):(
               owner self.length, copy end)
           if end != ':' and end != '}'
             node.m-syntax-error-c(user "expected \":\", got", copy end)
           has-sub-type := end = ':'
         if has-sub-type
           new TypeInstance in self.sub-type
-          self.sub-type.parse(user "}", user node, user var-node):(copy end)
+          self.sub-type.parse(user "}", user node, user code-node):(copy end)
       if end != '}'
         node.m-syntax-error-c(user "expected \"}\", got", copy end)
       read-c():(copy end)
@@ -375,6 +384,15 @@ static TypeInstance
           user self.type-data.name,
           user "and subtype",
           user other.sub-type.type-data.name)
+    
+  func inst m-check-sequence(user SyntaxTreeNode node)
+    if (self.type-data = glob.type-array or
+        self.type-data = glob.type-string) and not (? self.length)
+      node.m-syntax-error-msg(user "missing length for sequence")
+    if self.type-data = glob.type-array and
+        self.sub-type.type-data = glob.type-string and
+        not (? self.sub-type.length)
+      node.m-syntax-error-msg(user "missing length for sequence")
   
   func inst write()
     write(user self.type-data.name)
