@@ -62,11 +62,11 @@ Returncode SyntaxTreeVariable_parse(SyntaxTreeVariable* self, Int access, TypeDa
     CHECK(35, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){31, 30, "expected space after type, got"}, (*end)) )
   }
   if (self->access == ACCESS_VAR) {
-    Bool _Bool116;
-    CHECK(37, String_equal(self->type_instance->name, &(String){6, 5, "Array"}, &(_Bool116)) )
     Bool _Bool117;
-    CHECK(37, String_equal(self->type_instance->name, &(String){7, 6, "String"}, &(_Bool117)) )
-    if (_Bool116 || _Bool117) {
+    CHECK(37, String_equal(self->type_instance->name, &(String){6, 5, "Array"}, &(_Bool117)) )
+    Bool _Bool118;
+    CHECK(37, String_equal(self->type_instance->name, &(String){7, 6, "String"}, &(_Bool118)) )
+    if (_Bool117 || _Bool118) {
       CHECK(39, SyntaxTreeInitVarSequence_init_new(NULL, self) )
     }
   }
@@ -91,40 +91,40 @@ Returncode SyntaxTreeVariable_m_check_name(SyntaxTreeVariable* self);
 static char* _func_name_SyntaxTreeVariable_m_check_name = "SyntaxTreeVariable.m-check-name";
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariable_m_check_name
 Returncode SyntaxTreeVariable_m_check_name(SyntaxTreeVariable* self) {
-  Bool _Bool118;
-  CHECK(50, f_is_legal_name(self->name, false, &(_Bool118)) )
-  if (!_Bool118) {
+  Bool _Bool119;
+  CHECK(50, f_is_legal_name(self->name, false, &(_Bool119)) )
+  if (!_Bool119) {
     CHECK(51, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "illegal variable name"}, self->name) )
   }
   if (NULL != self->parent_type) {
     SyntaxTreeVariable* field = NULL;
-    Int _Int119;
-    CHECK(54, TypeData_m_find_field(self->parent_type, self->name, &(field), &(_Int119)) )
+    Int _Int120;
+    CHECK(54, TypeData_m_find_field(self->parent_type, self->name, &(field), &(_Int120)) )
     if (NULL != field) {
       CHECK(56, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "redefinition of field"}, self->name) )
     }
     SyntaxTreeFunction* meth = NULL;
-    Int _Int120;
-    CHECK(58, TypeData_m_find_meth(self->parent_type, self->name, &(meth), &(_Int120)) )
+    Int _Int121;
+    CHECK(58, TypeData_m_find_meth(self->parent_type, self->name, &(meth), &(_Int121)) )
     if (NULL != meth) {
       CHECK(60, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){28, 27, "field name overrides method"}, self->name) )
     }
   }
   else {
-    SyntaxTreeVariable* _SyntaxTreeVariable121;
-    CHECK(63, (glob->root)->_base._base._base._dtl[4](glob->root, self->name, &(_SyntaxTreeVariable121)) )
-    if (NULL != _SyntaxTreeVariable121) {
+    SyntaxTreeVariable* _SyntaxTreeVariable122;
+    CHECK(63, (glob->root)->_base._base._base._dtl[4](glob->root, self->name, &(_SyntaxTreeVariable122)) )
+    if (NULL != _SyntaxTreeVariable122) {
       CHECK(64, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){32, 31, "redefinition of global variable"}, self->name) )
     }
-    SyntaxTreeFunction* _SyntaxTreeFunction122;
-    CHECK(66, SyntaxTreeNamespace_m_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction122)) )
-    if (NULL != _SyntaxTreeFunction122) {
+    SyntaxTreeFunction* _SyntaxTreeFunction123;
+    CHECK(66, SyntaxTreeNamespace_m_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction123)) )
+    if (NULL != _SyntaxTreeFunction123) {
       CHECK(67, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){33, 32, "variable name overrides function"}, self->name) )
     }
     if (NULL != self->_base.parent) {
-      SyntaxTreeVariable* _SyntaxTreeVariable123;
-      CHECK(70, (self->_base.parent)->_base._base._dtl[4](self->_base.parent, self->name, &(_SyntaxTreeVariable123)) )
-      if (NULL != _SyntaxTreeVariable123) {
+      SyntaxTreeVariable* _SyntaxTreeVariable124;
+      CHECK(70, (self->_base.parent)->_base._base._dtl[4](self->_base.parent, self->name, &(_SyntaxTreeVariable124)) )
+      if (NULL != _SyntaxTreeVariable124) {
         CHECK(71, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){25, 24, "redefinition of variable"}, self->name) )
       }
     }

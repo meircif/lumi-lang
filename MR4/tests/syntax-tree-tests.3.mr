@@ -107,6 +107,8 @@ test test-struct()
       user "struct Test\n  error ", user "unknown keyword \"error\"")
   test-global-scope-error(
       user "struct Test", user "expected block in a new line, got \"EOF\"")
+  test-global-scope-error(
+      user "struct Error\n", user "type with no fields \"Error\"")
 
 
 test test-class()
@@ -217,6 +219,9 @@ test test-class()
   test-global-scope(user input, user expected)
   test-global-scope-error(
       user "class(\n", user "expected space after \"class\", got \"(\"")
+  test-global-scope-error(
+      user "class Error\n  var Int x\n",
+      user "class with no dynamic methods \"Error\"")
 
 
 test test-function()

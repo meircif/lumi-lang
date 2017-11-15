@@ -109,6 +109,19 @@ class TypeData(SyntaxTreeNamespace)
       child := child.next
     self.is-ordered := true
   
+  func inst analyze()
+    if not (? self.base-type) and self.variables.m-is-empty()
+      self.m-syntax-error(user "type with no fields", user self.name)
+    if self.is-dynamic and not (? self.base-type and self.base-type.is-dynamic)
+      user ListNode{SyntaxTreeFunction} node(self.functions.first)
+      do
+        if not (? node)
+          self.m-syntax-error(
+              user "class with no dynamic methods", user self.name)
+        while not node.item.is-dynamic
+        node := node.next
+    base.analyze()
+  
   func inst write-declaration()
     # typedef struct `name` `name`;
     # typedef struct `name`_Dynamic `name`_Dynamic;
