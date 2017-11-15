@@ -110,14 +110,14 @@ func f-assert-string(user String expected, user String actual)
 # List tests
 test test-list()
   var List{String} list
-  assert not (? list.m-pop())
+  assert not (? list.pop())
   list.add(owner string-new-copy(user "value1"))
   list.add(owner string-new-copy(user "value2"))
   list.add(owner string-new-copy(user "value3"))
-  f-assert-string(user "value1", user list.m-pop())
-  f-assert-string(user "value2", user list.m-pop())
-  f-assert-string(user "value3", user list.m-pop())
-  assert not (? list.m-pop())
+  f-assert-string(user "value1", user list.pop())
+  f-assert-string(user "value2", user list.pop())
+  f-assert-string(user "value3", user list.pop())
+  assert not (? list.pop())
 
 
 # NameMap tests

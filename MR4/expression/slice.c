@@ -78,7 +78,7 @@ Returncode SliceExpression_analyze(SliceExpression* self) {
   else {
     if (self->sequence->result_type->type_data == &(glob->type_array->_base)) {
       if (!(NULL != self->second_index)) {
-        CHECK(39, TypeInstance_m_copy_new(self->sequence->result_type->sub_type, &(self->_base.result_type)) )
+        CHECK(39, TypeInstance_copy_new(self->sequence->result_type->sub_type, &(self->_base.result_type)) )
       }
     }
     else {
@@ -88,12 +88,12 @@ Returncode SliceExpression_analyze(SliceExpression* self) {
   self->_base.assignable = self->sequence->assignable &&  ! (NULL != self->second_index) && self->_base.result_type->type_data->is_primitive;
   
   CHECK(47, (self->index)->_base._dtl[1](self->index) )
-  CHECK(48, SliceExpression_m_check_index(self, self->index) )
+  CHECK(48, SliceExpression_check_index(self, self->index) )
   
   if (NULL != self->second_index) {
     CHECK(51, (self->second_index)->_base._dtl[1](self->second_index) )
-    CHECK(52, SliceExpression_m_check_index(self, self->second_index) )
-    CHECK(53, TypeInstance_m_copy_new(self->sequence->result_type, &(self->_base.result_type)) )
+    CHECK(52, SliceExpression_check_index(self, self->second_index) )
+    CHECK(53, TypeInstance_copy_new(self->sequence->result_type, &(self->_base.result_type)) )
     CHECK(54, Expression_add_aux_variable(&(self->_base), ACCESS_AUX, self->_base.result_type, &(self->slice_symbol)) )
   }
   return OK;
@@ -101,11 +101,11 @@ Returncode SliceExpression_analyze(SliceExpression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SliceExpression_m_check_index(SliceExpression* self, Expression* index);
+Returncode SliceExpression_check_index(SliceExpression* self, Expression* index);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SliceExpression_m_check_index = "SliceExpression.m-check-index";
-#define MR_FUNC_NAME _func_name_SliceExpression_m_check_index
-Returncode SliceExpression_m_check_index(SliceExpression* self, Expression* index) {
+static char* _func_name_SliceExpression_check_index = "SliceExpression.check-index";
+#define MR_FUNC_NAME _func_name_SliceExpression_check_index
+Returncode SliceExpression_check_index(SliceExpression* self, Expression* index) {
   if (NULL != index->result_type) {
     if (index->result_type->type_data != &(glob->type_int->_base)) {
       CHECK(60, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){38, 37, "expected integer index for slice, got"}, index->result_type->type_data->name) )
@@ -253,7 +253,7 @@ Returncode SliceExpression_write_dynamic(SliceExpression* self) {
 extern Func SliceExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SliceExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SliceExpression_analyze, (void*)SliceExpression_write, (void*)SliceExpression_write_dynamic, (void*)Expression_analyze_call, (void*)SliceExpression_write_preactions};
+Func SliceExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SliceExpression_analyze, (void*)SliceExpression_write, (void*)SliceExpression_write_dynamic, (void*)Expression_analyze_call, (void*)SliceExpression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

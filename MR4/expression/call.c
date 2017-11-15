@@ -77,11 +77,11 @@ Returncode CallExpression_analyze(CallExpression* self) {
   if (!self->_base.is_statement) {
     TypeInstance* _TypeInstance12;
     CHECK(36, FunctionArguments_get_result_type(declaration, &(_TypeInstance12)) )
-    CHECK(36, TypeInstance_m_copy_new(_TypeInstance12, &(self->_base.result_type)) )
+    CHECK(36, TypeInstance_copy_new(_TypeInstance12, &(self->_base.result_type)) )
   }
   CHECK(37, (self->function)->_base._dtl[4](self->function, self->arguments, &(self->is_function_object)) )
   Bool _Bool13;
-  CHECK(39, FunctionArguments_m_check_same_as(self->arguments, declaration, &(_Bool13)) )
+  CHECK(39, FunctionArguments_check_same_as(self->arguments, declaration, &(_Bool13)) )
   if (_Bool13) {
     /* add omitted output */
     CallArgument* output = malloc(sizeof(CallArgument));
@@ -160,7 +160,7 @@ static char* _func_name_CallExpression_write_func_call = "CallExpression.write-f
 Returncode CallExpression_write_func_call(CallExpression* self) {
   CHECK(78, SyntaxTreeNode_write_call(&(self->_base._base)) )
   CHECK(79, (self->function)->_base._dtl[2](self->function) )
-  CHECK(80, FunctionArguments_write(self->arguments, false) )
+  CHECK(80, (self->arguments)->_base._dtl[3](self->arguments) )
   CHECK(81, write(&(String){4, 3, " )\n"}) )
   return OK;
 }
@@ -170,7 +170,7 @@ Returncode CallExpression_write_func_call(CallExpression* self) {
 extern Func CallExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)CallExpression_analyze, (void*)CallExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)CallExpression_write_preactions};
+Func CallExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)CallExpression_analyze, (void*)CallExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)CallExpression_write_preactions};
 #endif
 
 
@@ -216,18 +216,18 @@ Returncode CallArgument_analyze(CallArgument* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode CallArgument_m_check_same_type_as(CallArgument* self, TypeInstance* type_instance);
+Returncode CallArgument_check_same_type_as(CallArgument* self, TypeInstance* type_instance);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_CallArgument_m_check_same_type_as = "CallArgument.m-check-same-type-as";
-#define MR_FUNC_NAME _func_name_CallArgument_m_check_same_type_as
-Returncode CallArgument_m_check_same_type_as(CallArgument* self, TypeInstance* type_instance) {
+static char* _func_name_CallArgument_check_same_type_as = "CallArgument.check-same-type-as";
+#define MR_FUNC_NAME _func_name_CallArgument_check_same_type_as
+Returncode CallArgument_check_same_type_as(CallArgument* self, TypeInstance* type_instance) {
   if (self->_base.is_output) {
     Int _Int15;
-    CHECK(106, TypeInstance_m_check_assign_to(type_instance, self->value->result_type, &(self->_base._base), &(_Int15)) )
+    CHECK(106, TypeInstance_check_assign_to(type_instance, self->value->result_type, &(self->_base._base), &(_Int15)) )
     self->is_down_cast = _Int15 > 0;
   }
   else {
-    CHECK(109, TypeInstance_m_check_assign_from(type_instance, &(self->_base._base), &(self->value)) )
+    CHECK(109, TypeInstance_check_assign_from(type_instance, &(self->_base._base), &(self->value)) )
   }
   self->is_dynamic = type_instance->type_data->is_dynamic;
   return OK;
@@ -303,7 +303,7 @@ Returncode CallArgument_write(CallArgument* self) {
 extern Func CallArgument__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallArgument__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)CallArgument_analyze, (void*)CallArgument_write, (void*)Argument_m_copy_new, (void*)CallArgument_parse_value, (void*)Argument_get_type_instance, (void*)CallArgument_m_check_same_type_as, (void*)Argument_get_variable, (void*)CallArgument_get_output, (void*)CallArgument_write_preactions};
+Func CallArgument__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)CallArgument_analyze, (void*)CallArgument_write, (void*)Argument_copy_new, (void*)CallArgument_parse_value, (void*)Argument_get_type_instance, (void*)CallArgument_check_same_type_as, (void*)Argument_get_variable, (void*)CallArgument_get_output, (void*)CallArgument_write_preactions};
 #endif
 
 

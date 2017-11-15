@@ -6,6 +6,7 @@ class TypeData(SyntaxTreeNamespace)
   owner String base-type-name
   user TypeData base-type
   owner NameMap{SyntaxTreeFunction} dynamic-base-methods
+  user SyntaxTreeConstructor constructor
   var Bool is-primitive
   var Bool is-dynamic
   var Bool is-ordered
@@ -35,7 +36,22 @@ class TypeData(SyntaxTreeNamespace)
     self.indentation-spaces := 0
   
   func dynamic parse-child(user String keyword):(copy Char end)
-    if not self.parse-if-function(user keyword, user self):(copy end)
+    if self.parse-if-function(user keyword, user self):(copy end)
+      return
+    
+    if keyword.equal(user "new")
+      if end != '('
+        self.m-syntax-error-c(
+            user "expected \"(\" after \"new\", got", copy end)
+      if ? self.constructor
+        self.m-syntax-error(
+            user "constructor already defined for type", user self.name)
+      owner SyntaxTreeConstructor constructor
+      self.constructor := SyntaxTreeConstructor.parse-new(
+          var _, user self):(copy end, owner constructor)
+      self.functions.add(owner constructor)
+      
+    else
       self.m-syntax-error(user "unknown keyword", user keyword)
   
   func inst m-is-same(user TypeData other):(copy Bool is-same)
@@ -47,7 +63,7 @@ class TypeData(SyntaxTreeNamespace)
     new TypeInstance in type-instance
     type-instance.type-data := self
   
-  func inst m-find-field(user String name):(
+  func inst find-field(user String name):(
       user SyntaxTreeVariable field, copy Int bases)
     user TypeData type-data(self)
     bases := 0
@@ -64,7 +80,7 @@ class TypeData(SyntaxTreeNamespace)
       bases += 1
     field := _
   
-  func inst m-find-meth(user String name):(
+  func inst find-meth(user String name):(
       user SyntaxTreeFunction method, copy Int bases)
     user TypeData type-data(self)
     bases := 0
@@ -86,7 +102,7 @@ class TypeData(SyntaxTreeNamespace)
       return
     # init `self.base-type`
     if ? self.base-type-name
-      self.m-find-type(user self.base-type-name):(user self.base-type)
+      self.find-type(user self.base-type-name):(user self.base-type)
       self.base-type.m-order-bases(user ordered-list)
     ordered-list.add(owner self)
     # init `self.dynamic-base-methods` and test override methods
@@ -97,7 +113,7 @@ class TypeData(SyntaxTreeNamespace)
       while ? child
       user SyntaxTreeFunction method
       var Int bases
-      self.base-type.m-find-meth(user child.item.name):(user method, copy bases)
+      self.base-type.find-meth(user child.item.name):(user method, copy bases)
       if ? method
         child.item.m-compare(user method)
         if child.item.is-dynamic
@@ -195,7 +211,7 @@ class TypeData(SyntaxTreeNamespace)
     do
       while ? child
       user SyntaxTreeFunction method
-      self.m-find-meth(user child.value.name):(user method)
+      self.find-meth(user child.value.name):(user method)
       if not-first
         write(user ", ")
       if method != child.value
@@ -244,16 +260,16 @@ static TypeInstance
   owner FunctionArguments arguments
   
   ## Return a new deep-copy of self
-  func inst m-copy-new():(owner TypeInstance type-instance)
+  func inst copy-new():(owner TypeInstance type-instance)
     if not (? self)
       type-instance := _
       return
     self.type-data.m-new-type-instance():(owner type-instance)
     string-new-copy(user self.name):(owner type-instance.name)
     if ? self.sub-type
-      self.sub-type.m-copy-new():(owner type-instance.sub-type)
+      self.sub-type.copy-new():(owner type-instance.sub-type)
     if ? self.arguments
-      self.arguments.m-copy-new():(owner type-instance.arguments)
+      self.arguments.copy-new():(owner type-instance.arguments)
   
   func inst parse(
       user String ends,
@@ -301,7 +317,7 @@ static TypeInstance
   func inst analyze(user SyntaxTreeNode node)
     self.analyze-part(user node, copy true, copy true)
   
-  func inst m-link-types(user SyntaxTreeNode node)
+  func inst link-types(user SyntaxTreeNode node)
     self.analyze-part(user node, copy true, copy false)
   
   func inst analyze-lengths(user SyntaxTreeNode node)
@@ -311,9 +327,9 @@ static TypeInstance
       user SyntaxTreeNode node, copy Bool check-types, copy Bool check-length)
     if check-types
       if not (? self.type-data)
-        node.m-find-type(user self.name):(user self.type-data)
+        node.find-type(user self.name):(user self.type-data)
       if ? self.arguments
-        self.arguments.m-link-types()
+        self.arguments.link-types()
     if check-length
       if ? self.length
         node.analyze-expression(user self.length, user glob.type-int)
@@ -331,14 +347,14 @@ static TypeInstance
       else-if self.type-data = glob.type-func and not (? self.arguments)
         node.m-syntax-error-msg(user "missing arguments in function type")
   
-  func inst m-check-assign-from(user SyntaxTreeNode node):(
+  func inst check-assign-from(user SyntaxTreeNode node):(
       owner Expression value)
     var Int bases
-    value.result-type.m-check-assign-to(user self, user node):(copy bases)
+    value.result-type.check-assign-to(user self, user node):(copy bases)
     if bases > 0
       UpCastExpression.init-new(var _, copy bases):(owner value)
   
-  func inst m-check-assign-to(
+  func inst check-assign-to(
       user TypeInstance target, user SyntaxTreeNode node):(copy Int bases)
     bases := 0
     if not (? self)
@@ -361,21 +377,21 @@ static TypeInstance
       bases += 1
     
     if ? self.arguments
-      if self.arguments.m-check-same-as(user target.arguments)
+      if self.arguments.check-same-as(user target.arguments)
         node.m-syntax-error-msg(user "too few outputs")
     
-    self.m-check-sub-equal(user target, user node)
+    self.check-sub-equal(user target, user node)
   
-  func inst m-check-equal(user TypeInstance other, user SyntaxTreeNode node)
+  func inst check-equal(user TypeInstance other, user SyntaxTreeNode node)
     if self.type-data != other.type-data
       node.m-syntax-error2(
           user "non matching types",
           user self.type-data.name,
           user "and",
           user other.type-data.name)
-    self.m-check-sub-equal(user other, user node)
+    self.check-sub-equal(user other, user node)
   
-  func inst m-check-sub-equal(user TypeInstance other, user SyntaxTreeNode node)
+  func inst check-sub-equal(user TypeInstance other, user SyntaxTreeNode node)
     if ? self.sub-type
       if ? other.sub-type
         if self.sub-type.type-data != other.sub-type.type-data
@@ -384,7 +400,7 @@ static TypeInstance
               user self.sub-type.type-data.name,
               user "and",
               user other.sub-type.type-data.name)
-        self.sub-type.m-check-sub-equal(user other.sub-type, user node)
+        self.sub-type.check-sub-equal(user other.sub-type, user node)
       else
         node.m-syntax-error2(
             user "non matching subtypes",
@@ -398,7 +414,7 @@ static TypeInstance
           user "and subtype",
           user other.sub-type.type-data.name)
     
-  func inst m-check-sequence(user SyntaxTreeNode node)
+  func inst check-sequence(user SyntaxTreeNode node)
     if (self.type-data = glob.type-array or
         self.type-data = glob.type-string) and not (? self.length)
       node.m-syntax-error-msg(user "missing length for sequence")

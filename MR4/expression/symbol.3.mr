@@ -19,16 +19,16 @@ class SymbolExpression(Expression)
     self.set-location()
   
   func dynamic analyze()
-    self.code-node.m-find-variable(user self.name):(user self.variable)
+    self.code-node.find-variable(user self.name):(user self.variable)
     if ? self.variable
-      self.variable.type-instance.m-copy-new():(owner self.result-type)
+      self.variable.type-instance.copy-new():(owner self.result-type)
       self.assignable := true
     else
-      glob.root.m-find-function(user self.name):(user self.function)
+      glob.root.find-function(user self.name):(user self.function)
       if not (? self.function)
         self.m-syntax-error(user "unknown symbol", user self.name)
       self.set-simple-type(user glob.type-func)
-      self.function.arguments.m-copy-new():(owner self.result-type.arguments)
+      self.function.arguments.copy-new():(owner self.result-type.arguments)
   
   func dynamic analyze-call(user FunctionArguments arguments):(
       copy Bool is-function-object)
@@ -87,12 +87,12 @@ class MemberExpression(SymbolExpression)
     else-if type-data = glob.type-base
       type-data := self.instance.result-type.sub-type.type-data.base-type
     
-    type-data.m-find-field(user self.name):(user self.variable, copy self.bases)
+    type-data.find-field(user self.name):(user self.variable, copy self.bases)
     if ? self.variable
-      self.variable.type-instance.m-copy-new():(owner self.result-type)
+      self.variable.type-instance.copy-new():(owner self.result-type)
       self.assignable := true
     else
-      type-data.m-find-meth(user self.name):(
+      type-data.find-meth(user self.name):(
           user self.function, copy self.bases)
       if not (? self.function)
         self.m-syntax-error2(
@@ -107,7 +107,7 @@ class MemberExpression(SymbolExpression)
         self.function := self.function.dynamic-base-method
         self.is-dynamic-call := true
       self.set-simple-type(user glob.type-func)
-      self.function.arguments.m-copy-new():(owner self.result-type.arguments)
+      self.function.arguments.copy-new():(owner self.result-type.arguments)
     if self.instance.result-type.type-data = glob.type-base
       if not (? self.function)
         self.m-syntax-error(
@@ -127,7 +127,7 @@ class MemberExpression(SymbolExpression)
       self-param.access := self.function.arguments.parameters.first.item.access
       self-param.value := self.instance
       self-param.value.top := true
-      arguments.parameters.m-prepend(owner self-param)
+      arguments.parameters.prepend(owner self-param)
       if self.is-dynamic-call
         self.dynamic-call-self-instance := self.instance
     self.instance := _
@@ -169,25 +169,58 @@ class MemberExpression(SymbolExpression)
 
 ## The `base` method expression
 class BaseMethExpression(Expression)
-  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
+  var Bool is-call
+  user SyntaxTreeFunction function
+  user TypeData parent-type
+  
+  func inst parse-new(
+      owner String text, user SyntaxTreeCode code-node, copy Char end):(
       owner Expression expression)
-    new BaseMethExpression in expression
-    expression.code-node := code-node
-    expression.set-location()
     delete text
+    new BaseMethExpression base-expression
+    base-expression.init(user code-node, copy end = '(')
+    expression := base-expression
+  
+  func inst init(user SyntaxTreeCode code-node, copy Bool is-call)
+    self.code-node := code-node
+    self.is-call := is-call
+    self.set-location()
   
   func dynamic analyze()
-    user TypeData parent-type
-    self.code-node.m-get-parent-type():(user parent-type)
-    if not (? parent-type)
+    user SyntaxTreeFunction function
+    self.code-node.get-function():(user function)
+    self.parent-type := function.parent-type
+    if not (? self.parent-type)
       self.m-syntax-error-msg(user "\"base\" used not in method")
-    if not (? parent-type.base-type)
-      self.m-syntax-error(user "no base type for type", user parent-type.name)
-    self.set-simple-type(user glob.type-base)
-    parent-type.m-new-type-instance():(owner self.result-type.sub-type)
+    if not (? self.parent-type.base-type)
+      self.m-syntax-error(
+          user "no base type for type", user function.parent-type.name)
+    if self.is-call
+      self.parent-type.base-type.find-meth(user function.name):(
+          user self.function)
+      if not (? function)
+        self.m-syntax-error(
+            user "no base method for method", user function.name)
+      self.set-simple-type(user glob.type-func)
+      self.result-type.arguments := self.function.arguments
+    else
+      self.set-simple-type(user glob.type-base)
+      self.parent-type.m-new-type-instance():(owner self.result-type.sub-type)
+  
+  func dynamic analyze-call(user FunctionArguments arguments):(
+      copy Bool is-function-object)
+    is-function-object := false
+    new CallArgument self-param
+    self-param.access := self.function.arguments.parameters.first.item.access
+    new BaseMethExpression in self-param.value
+    self.parent-type.m-new-type-instance():(owner self-param.value.result-type)
+    arguments.parameters.prepend(owner self-param)
   
   func dynamic write()
-    write(user "self")
+    if self.is-call
+      self.function.write-cname()
+    else
+      write(user "self")
 
 
 ## An instance member expression
@@ -203,7 +236,7 @@ class UpCastExpression(Expression)
   func inst init(copy Int bases, owner Expression expression)
     self.expression := expression
     self.bases := bases
-    self.expression.result-type.m-copy-new():(owner self.result-type)
+    self.expression.result-type.copy-new():(owner self.result-type)
   
   func dynamic write-preactions()
     self.expression.write-preactions()
@@ -259,14 +292,17 @@ class TypeExpression(Expression)
 
 ## Dynamic allocation expression
 class NewExpression(Expression)
-  user Expression symbol
+  owner FunctionArguments arguments
+  owner Expression symbol
+  user SyntaxTreeFunction constructor
   
   func inst parse(
       owner TypeInstance result-type, user SyntaxTreeCode code-node):(
       copy Char end)
-    self.read-expect(user ")")
-    read-c():(copy end)
     self.init(owner result-type, user code-node)
+    new FunctionArguments in self.arguments
+    var CallArgumentFactory argument-factory
+    self.arguments.parse(user argument-factory, user code-node):(copy end)
   
   func inst init(owner TypeInstance result-type, user SyntaxTreeCode code-node)
     self.code-node := code-node
@@ -279,10 +315,27 @@ class NewExpression(Expression)
       self.m-syntax-error(
           user "dynamic allocation of primitive type",
           user self.result-type.type-data.name)
-    self.result-type.m-check-sequence(user self)
+    self.result-type.check-sequence(user self)
     if not (? self.symbol)
+      self.arguments.analyze()
       self.add-aux-variable(copy ACCESS-NEW, user self.result-type):(
           owner self.symbol)
+      self.result-type.type-data.find-meth(user "new"):(user self.constructor)
+      if not (? self.arguments.parameters.first) and
+          not (? self.arguments.outputs.first) and (not (? self.constructor) or
+          self.result-type.type-data = glob.type-string)
+        self.constructor := _
+        return
+      if not (? self.constructor)
+        self.m-syntax-error(
+            user "no contructor for type", user self.result-type.type-data.name)
+      new CallArgument self-param
+      self-param.access :=
+          self.constructor.arguments.parameters.first.item.access
+      self-param.code-node := self.code-node
+      self-param.value := self.symbol
+      self.arguments.parameters.prepend(owner self-param)
+      self.arguments.check-same-as(user self.constructor.arguments)
   
   func inst write-allocation()
     # `symbol` = `...`
@@ -333,6 +386,12 @@ class NewExpression(Expression)
     self.symbol.write()
     write(user " == NULL) ")
     self.write-raise()
+    if ? self.constructor
+      self.code-node.write-spaces()
+      self.write-call()
+      self.constructor.write-cname()
+      self.arguments.write-call()
+      write(user " )\n")
   
   func dynamic write-preactions()
     self.write-allocation()

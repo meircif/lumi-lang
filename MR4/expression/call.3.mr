@@ -33,10 +33,10 @@ class CallExpression(Expression)
           user self.function.result-type.type-data.name)
     user FunctionArguments declaration(self.function.result-type.arguments)
     if not self.is-statement
-      declaration.get-result-type().m-copy-new():(owner self.result-type)
+      declaration.get-result-type().copy-new():(owner self.result-type)
     self.function.analyze-call(user self.arguments):(
         copy self.is-function-object)
-    if self.arguments.m-check-same-as(user declaration)
+    if self.arguments.check-same-as(user declaration)
       # add omitted output
       new CallArgument output
       output.is-output := true
@@ -77,7 +77,7 @@ class CallExpression(Expression)
   func inst write-func-call()
     self.write-call()
     self.function.write()
-    self.arguments.write(copy false)
+    self.arguments.write-call()
     write(user " )\n")
   
 
@@ -101,12 +101,12 @@ class CallArgument(Argument)
     if self.is-output and not self.value.assignable
       self.m-syntax-error-msg(user "non assignable call output")
   
-  func dynamic m-check-same-type-as(user TypeInstance type-instance)
+  func dynamic check-same-type-as(user TypeInstance type-instance)
     if self.is-output
-      self.is-down-cast := type-instance.m-check-assign-to(
+      self.is-down-cast := type-instance.check-assign-to(
           user self.value.result-type, user self) > 0
     else
-      type-instance.m-check-assign-from(user self):(owner self.value)
+      type-instance.check-assign-from(user self):(owner self.value)
     self.is-dynamic := type-instance.type-data.is-dynamic
   
   func dynamic get-output():(user Expression output)

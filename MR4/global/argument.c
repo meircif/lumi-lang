@@ -23,11 +23,11 @@ struct Argument {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Argument_m_copy_new(Argument* self, DeclarationArgument** new_argument);
+Returncode Argument_copy_new(Argument* self, DeclarationArgument** new_argument);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Argument_m_copy_new = "Argument.m-copy-new";
-#define MR_FUNC_NAME _func_name_Argument_m_copy_new
-Returncode Argument_m_copy_new(Argument* self, DeclarationArgument** new_argument) {
+static char* _func_name_Argument_copy_new = "Argument.copy-new";
+#define MR_FUNC_NAME _func_name_Argument_copy_new
+Returncode Argument_copy_new(Argument* self, DeclarationArgument** new_argument) {
   RAISE(10)
 }
 #undef MR_FUNC_NAME
@@ -67,11 +67,11 @@ Returncode Argument_get_type_instance(Argument* self, TypeInstance** type_instan
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Argument_m_check_same_as(Argument* self, Argument* other);
+Returncode Argument_check_same_as(Argument* self, Argument* other);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Argument_m_check_same_as = "Argument.m-check-same-as";
-#define MR_FUNC_NAME _func_name_Argument_m_check_same_as
-Returncode Argument_m_check_same_as(Argument* self, Argument* other) {
+static char* _func_name_Argument_check_same_as = "Argument.check-same-as";
+#define MR_FUNC_NAME _func_name_Argument_check_same_as
+Returncode Argument_check_same_as(Argument* self, Argument* other) {
   if (self->access != other->access) {
     if ((other->access) < 0 || (other->access) >= (glob->access_names)->length) RAISE(30)
     if ((self->access) < 0 || (self->access) >= (glob->access_names)->length) RAISE(30)
@@ -85,14 +85,14 @@ Returncode Argument_m_check_same_as(Argument* self, Argument* other) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Argument_m_check_same_type_as(Argument* self, TypeInstance* type_instance);
+Returncode Argument_check_same_type_as(Argument* self, TypeInstance* type_instance);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Argument_m_check_same_type_as = "Argument.m-check-same-type-as";
-#define MR_FUNC_NAME _func_name_Argument_m_check_same_type_as
-Returncode Argument_m_check_same_type_as(Argument* self, TypeInstance* type_instance) {
+static char* _func_name_Argument_check_same_type_as = "Argument.check-same-type-as";
+#define MR_FUNC_NAME _func_name_Argument_check_same_type_as
+Returncode Argument_check_same_type_as(Argument* self, TypeInstance* type_instance) {
   TypeInstance* _TypeInstance1;
   CHECK(38, (self)->_base._dtl[5](self, &(_TypeInstance1)) )
-  CHECK(38, TypeInstance_m_check_equal(_TypeInstance1, type_instance, &(self->_base)) )
+  CHECK(38, TypeInstance_check_equal(_TypeInstance1, type_instance, &(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -131,7 +131,7 @@ Returncode Argument_write_preactions(Argument* self) {
 extern Func Argument__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Argument__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Argument_m_copy_new, (void*)Argument_parse_value, (void*)Argument_get_type_instance, (void*)Argument_m_check_same_type_as, (void*)Argument_get_variable, (void*)Argument_get_output, (void*)Argument_write_preactions};
+Func Argument__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Argument_copy_new, (void*)Argument_parse_value, (void*)Argument_get_type_instance, (void*)Argument_check_same_type_as, (void*)Argument_get_variable, (void*)Argument_get_output, (void*)Argument_write_preactions};
 #endif
 
 
@@ -171,28 +171,28 @@ struct FunctionArguments {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_m_copy_new(FunctionArguments* self, FunctionArguments** new_arguments);
+Returncode FunctionArguments_copy_new(FunctionArguments* self, FunctionArguments** new_arguments);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_FunctionArguments_m_copy_new = "FunctionArguments.m-copy-new";
-#define MR_FUNC_NAME _func_name_FunctionArguments_m_copy_new
-Returncode FunctionArguments_m_copy_new(FunctionArguments* self, FunctionArguments** new_arguments) {
+static char* _func_name_FunctionArguments_copy_new = "FunctionArguments.copy-new";
+#define MR_FUNC_NAME _func_name_FunctionArguments_copy_new
+Returncode FunctionArguments_copy_new(FunctionArguments* self, FunctionArguments** new_arguments) {
   (*new_arguments) = malloc(sizeof(FunctionArguments));
   if ((*new_arguments) == NULL) RAISE(61)
   *(*new_arguments) = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   (*new_arguments)->_base._dtl = FunctionArguments__dtl;
   CHECK(62, FunctionArguments_init((*new_arguments)) )
-  CHECK(63, FunctionArguments_m_copy_new_args(self, self->parameters, (*new_arguments)->parameters) )
-  CHECK(64, FunctionArguments_m_copy_new_args(self, self->outputs, (*new_arguments)->outputs) )
+  CHECK(63, FunctionArguments_copy_new_args(self, self->parameters, (*new_arguments)->parameters) )
+  CHECK(64, FunctionArguments_copy_new_args(self, self->outputs, (*new_arguments)->outputs) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_m_copy_new_args(FunctionArguments* self, List* arguments, List* new_arguments);
+Returncode FunctionArguments_copy_new_args(FunctionArguments* self, List* arguments, List* new_arguments);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_FunctionArguments_m_copy_new_args = "FunctionArguments.m-copy-new-args";
-#define MR_FUNC_NAME _func_name_FunctionArguments_m_copy_new_args
-Returncode FunctionArguments_m_copy_new_args(FunctionArguments* self, List* arguments, List* new_arguments) {
+static char* _func_name_FunctionArguments_copy_new_args = "FunctionArguments.copy-new-args";
+#define MR_FUNC_NAME _func_name_FunctionArguments_copy_new_args
+Returncode FunctionArguments_copy_new_args(FunctionArguments* self, List* arguments, List* new_arguments) {
   ListNode* node = arguments->first;
   while (true) {
     if (!(NULL != node)) break;
@@ -239,11 +239,11 @@ Returncode FunctionArguments_parse(FunctionArguments* self, ArgumentFactory* arg
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_add_self_parameter(FunctionArguments* self, TypeData* parent_type);
+Returncode FunctionArguments_add_self_parameter(FunctionArguments* self, TypeInstance* type_instance);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_FunctionArguments_add_self_parameter = "FunctionArguments.add-self-parameter";
 #define MR_FUNC_NAME _func_name_FunctionArguments_add_self_parameter
-Returncode FunctionArguments_add_self_parameter(FunctionArguments* self, TypeData* parent_type) {
+Returncode FunctionArguments_add_self_parameter(FunctionArguments* self, TypeInstance* type_instance) {
   DeclarationArgument* self_args = malloc(sizeof(DeclarationArgument));
   if (self_args == NULL) RAISE(91)
   *self_args = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
@@ -254,8 +254,8 @@ Returncode FunctionArguments_add_self_parameter(FunctionArguments* self, TypeDat
   *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false};
   self_args->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   CHECK(94, string_new_copy(&(String){5, 4, "self"}, &(self_args->variable->name)) )
-  CHECK(95, TypeData_m_new_type_instance(parent_type, &(self_args->variable->type_instance)) )
-  CHECK(96, List_m_prepend(self->parameters, &(self_args->_base)) )
+  self_args->variable->type_instance = type_instance;
+  CHECK(96, List_prepend(self->parameters, &(self_args->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -307,13 +307,13 @@ Returncode FunctionArguments_parse_args(FunctionArguments* self, List* arguments
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_m_link_types(FunctionArguments* self);
+Returncode FunctionArguments_link_types(FunctionArguments* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_FunctionArguments_m_link_types = "FunctionArguments.m-link-types";
-#define MR_FUNC_NAME _func_name_FunctionArguments_m_link_types
-Returncode FunctionArguments_m_link_types(FunctionArguments* self) {
-  CHECK(133, SyntaxTreeNode_m_link_children_types(&(self->_base), self->parameters) )
-  CHECK(134, SyntaxTreeNode_m_link_children_types(&(self->_base), self->outputs) )
+static char* _func_name_FunctionArguments_link_types = "FunctionArguments.link-types";
+#define MR_FUNC_NAME _func_name_FunctionArguments_link_types
+Returncode FunctionArguments_link_types(FunctionArguments* self) {
+  CHECK(133, SyntaxTreeNode_link_children_types(&(self->_base), self->parameters) )
+  CHECK(134, SyntaxTreeNode_link_children_types(&(self->_base), self->outputs) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -363,32 +363,32 @@ Returncode FunctionArguments_get_output(FunctionArguments* self, Expression** ou
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_m_find_variable(FunctionArguments* self, String* name, SyntaxTreeVariable** variable);
+Returncode FunctionArguments_find_variable(FunctionArguments* self, String* name, SyntaxTreeVariable** variable);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_FunctionArguments_m_find_variable = "FunctionArguments.m-find-variable";
-#define MR_FUNC_NAME _func_name_FunctionArguments_m_find_variable
-Returncode FunctionArguments_m_find_variable(FunctionArguments* self, String* name, SyntaxTreeVariable** variable) {
-  CHECK(154, FunctionArguments_m_find_variable_args(self, self->parameters, name, &((*variable))) )
+static char* _func_name_FunctionArguments_find_variable = "FunctionArguments.find-variable";
+#define MR_FUNC_NAME _func_name_FunctionArguments_find_variable
+Returncode FunctionArguments_find_variable(FunctionArguments* self, String* name, SyntaxTreeVariable** variable) {
+  CHECK(154, FunctionArguments_find_variable_args(self, self->parameters, name, &((*variable))) )
   if (!(NULL != (*variable))) {
-    CHECK(156, FunctionArguments_m_find_variable_args(self, self->outputs, name, &((*variable))) )
+    CHECK(156, FunctionArguments_find_variable_args(self, self->outputs, name, &((*variable))) )
   }
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_m_find_variable_args(FunctionArguments* self, List* arguments, String* name, SyntaxTreeVariable** variable);
+Returncode FunctionArguments_find_variable_args(FunctionArguments* self, List* arguments, String* name, SyntaxTreeVariable** variable);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_FunctionArguments_m_find_variable_args = "FunctionArguments.m-find-variable-args";
-#define MR_FUNC_NAME _func_name_FunctionArguments_m_find_variable_args
-Returncode FunctionArguments_m_find_variable_args(FunctionArguments* self, List* arguments, String* name, SyntaxTreeVariable** variable) {
+static char* _func_name_FunctionArguments_find_variable_args = "FunctionArguments.find-variable-args";
+#define MR_FUNC_NAME _func_name_FunctionArguments_find_variable_args
+Returncode FunctionArguments_find_variable_args(FunctionArguments* self, List* arguments, String* name, SyntaxTreeVariable** variable) {
   ListNode* node = arguments->first;
   while (true) {
     if (!(NULL != node)) break;
     SyntaxTreeVariable* _SyntaxTreeVariable6;
     CHECK(164, (((Argument*)(node->item)))->_base._dtl[7](((Argument*)(node->item)), &(_SyntaxTreeVariable6)) )
     Bool _Bool7;
-    CHECK(164, SyntaxTreeVariable_m_find_variable(_SyntaxTreeVariable6, name, &((*variable)), &(_Bool7)) )
+    CHECK(164, SyntaxTreeVariable_find_variable(_SyntaxTreeVariable6, name, &((*variable)), &(_Bool7)) )
     if (!(!_Bool7)) break;
     node = node->next;
   }
@@ -397,16 +397,16 @@ Returncode FunctionArguments_m_find_variable_args(FunctionArguments* self, List*
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_m_check_same_as(FunctionArguments* self, FunctionArguments* other, Bool* output_ommited);
+Returncode FunctionArguments_check_same_as(FunctionArguments* self, FunctionArguments* other, Bool* output_ommited);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_FunctionArguments_m_check_same_as = "FunctionArguments.m-check-same-as";
-#define MR_FUNC_NAME _func_name_FunctionArguments_m_check_same_as
-Returncode FunctionArguments_m_check_same_as(FunctionArguments* self, FunctionArguments* other, Bool* output_ommited) {
+static char* _func_name_FunctionArguments_check_same_as = "FunctionArguments.check-same-as";
+#define MR_FUNC_NAME _func_name_FunctionArguments_check_same_as
+Returncode FunctionArguments_check_same_as(FunctionArguments* self, FunctionArguments* other, Bool* output_ommited) {
   ListNode* my_node = self->parameters->first;
   ListNode* other_node = other->parameters->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    CHECK(174, Argument_m_check_same_as(((Argument*)(my_node->item)), other_node->item) )
+    CHECK(174, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
@@ -421,7 +421,7 @@ Returncode FunctionArguments_m_check_same_as(FunctionArguments* self, FunctionAr
   other_node = other->outputs->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    CHECK(186, Argument_m_check_same_as(((Argument*)(my_node->item)), other_node->item) )
+    CHECK(186, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
@@ -465,28 +465,50 @@ Returncode FunctionArguments_write_args_preactions(FunctionArguments* self, List
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode FunctionArguments_write(FunctionArguments* self, Bool is_decleration);
+Returncode FunctionArguments_write(FunctionArguments* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_FunctionArguments_write = "FunctionArguments.write";
 #define MR_FUNC_NAME _func_name_FunctionArguments_write
-Returncode FunctionArguments_write(FunctionArguments* self, Bool is_decleration) {
+Returncode FunctionArguments_write(FunctionArguments* self) {
+  CHECK(207, FunctionArguments_write_if_decleration(self, true) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode FunctionArguments_write_call(FunctionArguments* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_FunctionArguments_write_call = "FunctionArguments.write-call";
+#define MR_FUNC_NAME _func_name_FunctionArguments_write_call
+Returncode FunctionArguments_write_call(FunctionArguments* self) {
+  CHECK(210, FunctionArguments_write_if_decleration(self, false) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode FunctionArguments_write_if_decleration(FunctionArguments* self, Bool is_decleration);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_FunctionArguments_write_if_decleration = "FunctionArguments.write-if-decleration";
+#define MR_FUNC_NAME _func_name_FunctionArguments_write_if_decleration
+Returncode FunctionArguments_write_if_decleration(FunctionArguments* self, Bool is_decleration) {
   /* (`params...`, `outputs...`) */
-  CHECK(208, write(&(String){2, 1, "("}) )
+  CHECK(214, write(&(String){2, 1, "("}) )
   if (NULL != self->parameters->first) {
-    CHECK(210, FunctionArguments_write_args(self, self->parameters) )
+    CHECK(216, FunctionArguments_write_args(self, self->parameters) )
   }
   if (NULL != self->outputs->first) {
     if (NULL != self->parameters->first) {
-      CHECK(213, write(&(String){3, 2, ", "}) )
+      CHECK(219, write(&(String){3, 2, ", "}) )
     }
-    CHECK(214, FunctionArguments_write_args(self, self->outputs) )
+    CHECK(220, FunctionArguments_write_args(self, self->outputs) )
   }
   else {
     if (!(NULL != self->parameters->first) && is_decleration) {
-      CHECK(216, write(&(String){5, 4, "void"}) )
+      CHECK(222, write(&(String){5, 4, "void"}) )
     }
   }
-  CHECK(217, write(&(String){2, 1, ")"}) )
+  CHECK(223, write(&(String){2, 1, ")"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -499,10 +521,10 @@ static char* _func_name_FunctionArguments_write_args = "FunctionArguments.write-
 Returncode FunctionArguments_write_args(FunctionArguments* self, List* arguments) {
   ListNode* node = arguments->first;
   while (true) {
-    CHECK(222, (((Argument*)(node->item)))->_base._dtl[2](((Argument*)(node->item))) )
+    CHECK(228, (((Argument*)(node->item)))->_base._dtl[2](((Argument*)(node->item))) )
     node = node->next;
     if (!(NULL != node)) break;
-    CHECK(225, write(&(String){3, 2, ", "}) )
+    CHECK(231, write(&(String){3, 2, ", "}) )
   }
   return OK;
 }
@@ -514,10 +536,10 @@ Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name
 static char* _func_name_FunctionArguments_write_pointer = "FunctionArguments.write-pointer";
 #define MR_FUNC_NAME _func_name_FunctionArguments_write_pointer
 Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name) {
-  CHECK(228, write(&(String){14, 13, "Returncode (*"}) )
-  CHECK(229, write_cname(name) )
-  CHECK(230, write(&(String){2, 1, ")"}) )
-  CHECK(231, FunctionArguments_write(self, true) )
+  CHECK(234, write(&(String){14, 13, "Returncode (*"}) )
+  CHECK(235, write_cname(name) )
+  CHECK(236, write(&(String){2, 1, ")"}) )
+  CHECK(237, (self)->_base._dtl[2](self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -526,7 +548,7 @@ Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name
 extern Func FunctionArguments__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func FunctionArguments__dtl[] = {(void*)FunctionArguments_m_link_types, (void*)FunctionArguments_analyze, (void*)FunctionArguments_write};
+Func FunctionArguments__dtl[] = {(void*)FunctionArguments_link_types, (void*)FunctionArguments_analyze, (void*)FunctionArguments_write, (void*)FunctionArguments_write_call};
 #endif
 
 #undef MR_FILE_NAME

@@ -139,6 +139,10 @@ static Global
     self.add-builtin-field(
         user glob.type-string, user "length", user glob.type-int, user _)
     
+    self.add-builtin-method(user glob.type-string, user "new"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "other")
+    
     self.add-builtin-method(user glob.type-string, user "clear"):(
         user arguments)
     
@@ -159,10 +163,6 @@ static Global
         user arguments)
     self.add-builtin-parameter(
         user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
-    
-    self.add-builtin-method(user glob.type-string, user "copy"):(user arguments)
-    self.add-builtin-parameter(
-        user arguments, copy ACCESS-USER, user glob.type-string, user "other")
     
     self.add-builtin-method(user glob.type-string, user "concat"):(
         user arguments)
@@ -370,7 +370,7 @@ var Global glob
 
 
 class BuiltinType(TypeData)
-  func dynamic m-link-types()
+  func dynamic link-types()
     # do nothing
   func dynamic analyze()
     # do nothing
@@ -380,7 +380,7 @@ class BuiltinType(TypeData)
     # do nothing
 
 class BuiltinVariable(SyntaxTreeVariable)
-  func dynamic m-link-types()
+  func dynamic link-types()
     # do nothing
   func dynamic analyze()
     # do nothing
@@ -388,7 +388,7 @@ class BuiltinVariable(SyntaxTreeVariable)
     # do nothing
 
 class BuiltinFunction(SyntaxTreeFunction)
-  func dynamic m-link-types()
+  func dynamic link-types()
     # do nothing
   func dynamic analyze()
     # do nothing

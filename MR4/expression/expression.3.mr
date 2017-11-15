@@ -131,8 +131,8 @@ class Expression(SyntaxTreeNode)
     else-if text.length = 1 and first = '_'
       EmptyExpression.parse-new(var _, owner text):(owner expression)
     else-if text.equal(user "base")
-      BaseMethExpression.parse-new(var _, owner text, user code-node):(
-          owner expression)
+      BaseMethExpression.parse-new(
+          var _, owner text, user code-node, copy end):(owner expression)
     else
       SymbolExpression.parse-new(var _, owner text, user code-node):(
           owner expression)
@@ -162,7 +162,7 @@ class Expression(SyntaxTreeNode)
       owner Expression expression)
     new SymbolExpression symbol
     symbol.code-node := self.code-node
-    type-instance.m-copy-new():(owner symbol.result-type)
+    type-instance.copy-new():(owner symbol.result-type)
     symbol.assignable := true
     self.code-node.parent.add-aux-variable(copy access, user type-instance):(
         user symbol.variable)

@@ -183,7 +183,7 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Syn
             Bool _Bool30;
             CHECK(133, String_equal(text, &(String){5, 4, "base"}, &(_Bool30)) )
             if (_Bool30) {
-              CHECK(134, BaseMethExpression_parse_new(NULL, text, code_node, &((*expression))) )
+              CHECK(134, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
             }
             else {
               CHECK(137, SymbolExpression_parse_new(NULL, text, code_node, &((*expression))) )
@@ -246,7 +246,7 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstanc
   *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL, NULL, NULL};
   symbol->_base._base._dtl = SymbolExpression__dtl;
   symbol->_base.code_node = self->code_node;
-  CHECK(165, TypeInstance_m_copy_new(type_instance, &(symbol->_base.result_type)) )
+  CHECK(165, TypeInstance_copy_new(type_instance, &(symbol->_base.result_type)) )
   symbol->_base.assignable = true;
   CHECK(167, SyntaxTreeBlock_add_aux_variable(self->code_node->parent, access, type_instance, &(symbol->variable)) )
   CHECK(169, string_new_copy(symbol->variable->name, &(symbol->name)) )
@@ -293,7 +293,7 @@ Returncode Expression_write_preactions(Expression* self) {
 extern Func Expression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Expression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func Expression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

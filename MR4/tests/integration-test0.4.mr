@@ -49,6 +49,7 @@ func test-member-expression(user TestStruct t)->(user TestStruct to, copy Int i)
   t.ts.ts.num := 4
   t.fun := f-test-void
   t.fun()
+  t.new(copy 0, user "")
 
 
 func test-slice-expression(
@@ -109,12 +110,16 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
   new Array{arr[0]:TestClass} dan
   new Array{arr[0]:String{arr[1]}} san
   new Array{arr[0]:Func{()}} sfn
-  var Int ix(arr[0])
-  user String is(text)
-  var String{12} isv("some string")
-  new String{i} isn(text)
-  var Func{(copy Int x)->(owner String s)} fi(f-test-int2str)
-  TestStruct().print()
+  var Int ix(var arr[0])
+  user String is(var text)
+  var String{12} isv(user "some string")
+  new String{i} isn(user text)
+  var Func{(copy Int x)->(owner String s)} fi(var f-test-int2str)
+  var TestStruct itv(copy i, user text)
+  new TestStruct itn(copy i, user text)
+  var TestClass idv()
+  new TestClass idn()
+  TestStruct(copy i, user text).print()
   TestClass().print()
   assert String{arr[0]}()?
   assert Array{arr[0]:Int}()?
@@ -180,9 +185,10 @@ struct TestStruct
   user TestStruct ts
   var Func{()} fun
   
-  func set(copy Int x, user String s)
+  new(copy Int x, user String s)
     self.num := x
     self.text := s
+    self.ts := TestStruct(copy x + 1, user s)
   
   {# Test
   multiline
@@ -199,6 +205,9 @@ struct TestStruct
 class TestClass
   var Int num
   user String text
+  
+  new()
+    self.num := 1
   
   func inst static-meth()
     self.num := 3
@@ -258,19 +267,19 @@ func test-code-flow(user Array{Int} arr)->(copy Int res)
     res := 0
   do
     arr[6] := 6
-    var Int x(arr[2])
+    var Int x(var arr[2])
     while x > 3
-    var Int y(x - 1)
+    var Int y(var x - 1)
     do
       arr[4] := arr[8]
       if y > arr[4]
         continue
-      var Int z(0)
+      var Int z(var 7)
       if z <= arr[4]
         while z > 0
   for n in arr[2]:2 - (3 * arr[2])
     arr[0] := arr[2]
-    var Int x(arr[0])
+    var Int x(var arr[0])
     if x > 4
       arr[1] := x
 
@@ -286,7 +295,7 @@ func test-builtins(
   s.equal(user s)->(copy b)
   s.get(copy i)->(copy c)
   s.append(copy c)
-  s.copy(user s)
+  s.new(user s)
   s.concat(user s)
   s.concat-int(copy i)
   s.find(user s)->(copy i)

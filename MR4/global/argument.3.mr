@@ -6,7 +6,7 @@ class Argument(SyntaxTreeNode)
   var Int access
   var Bool is-output
   
-  func dynamic m-copy-new():(owner DeclarationArgument new-argument)
+  func dynamic copy-new():(owner DeclarationArgument new-argument)
     raise
   
   func inst parse(
@@ -25,17 +25,17 @@ class Argument(SyntaxTreeNode)
   func dynamic get-type-instance():(user TypeInstance type-instance)
     raise
   
-  func inst m-check-same-as(user Argument other)
+  func inst check-same-as(user Argument other)
     if self.access != other.access
       self.m-syntax-error2(
           user "expected access",
           user glob.access-names[other.access],
           user ", got",
           user glob.access-names[self.access])
-    self.m-check-same-type-as(user other.get-type-instance())
+    self.check-same-type-as(user other.get-type-instance())
   
-  func dynamic m-check-same-type-as(user TypeInstance type-instance)
-    self.get-type-instance().m-check-equal(user type-instance, user self)
+  func dynamic check-same-type-as(user TypeInstance type-instance)
+    self.get-type-instance().check-equal(user type-instance, user self)
   
   func dynamic get-variable():(user SyntaxTreeVariable variable)
     raise
@@ -57,18 +57,18 @@ class FunctionArguments(SyntaxTreeNode)
   owner List{Argument} parameters
   owner List{Argument} outputs
   
-  func inst m-copy-new():(owner FunctionArguments new-arguments)
+  func inst copy-new():(owner FunctionArguments new-arguments)
     new FunctionArguments in new-arguments
     new-arguments.init()
-    self.m-copy-new-args(user self.parameters, user new-arguments.parameters)
-    self.m-copy-new-args(user self.outputs, user new-arguments.outputs)
+    self.copy-new-args(user self.parameters, user new-arguments.parameters)
+    self.copy-new-args(user self.outputs, user new-arguments.outputs)
   
-  func inst m-copy-new-args(
+  func inst copy-new-args(
       user List{Argument} arguments, user List{Argument} new-arguments)
     user ListNode{Argument} node(arguments.first)
     do
       while ? node
-      new-arguments.add(owner node.item.m-copy-new())
+      new-arguments.add(owner node.item.copy-new())
       node := node.next
   
   func inst init()
@@ -87,13 +87,13 @@ class FunctionArguments(SyntaxTreeNode)
       self.parse-args(
           user self.outputs, user argument-factory, user code-node):(copy end)
   
-  func inst add-self-parameter(user TypeData parent-type)
+  func inst add-self-parameter(owner TypeInstance type-instance)
     new DeclarationArgument self-args
     self-args.access := ACCESS-VAR
     new SyntaxTreeVariable in self-args.variable
     string-new-copy(user "self"):(owner self-args.variable.name)
-    parent-type.m-new-type-instance():(owner self-args.variable.type-instance)
-    self.parameters.m-prepend(owner self-args)
+    self-args.variable.type-instance := type-instance
+    self.parameters.prepend(owner self-args)
   
   func inst parse-args(
       user List{Argument} arguments,
@@ -129,9 +129,9 @@ class FunctionArguments(SyntaxTreeNode)
         read-until(user " ", copy false):(user access-str, copy end)
     read-c():(copy end)
   
-  func dynamic m-link-types()
-    self.m-link-children-types(user self.parameters)
-    self.m-link-children-types(user self.outputs)
+  func dynamic link-types()
+    self.link-children-types(user self.parameters)
+    self.link-children-types(user self.outputs)
   
   func dynamic analyze()
     self.analyze-children(user self.parameters)
@@ -149,29 +149,29 @@ class FunctionArguments(SyntaxTreeNode)
     else
       output := _
   
-  func inst m-find-variable(user String name):(
+  func inst find-variable(user String name):(
       user SyntaxTreeVariable variable)
-    self.m-find-variable-args(user self.parameters, user name):(user variable)
+    self.find-variable-args(user self.parameters, user name):(user variable)
     if not (? variable)
-      self.m-find-variable-args(user self.outputs, user name):(user variable)
+      self.find-variable-args(user self.outputs, user name):(user variable)
   
-  func inst m-find-variable-args(
+  func inst find-variable-args(
       user List{Argument} arguments, user String name):(
       user SyntaxTreeVariable variable)
     user ListNode{Argument} node(arguments.first)
     do
       while ? node
       while not
-          node.item.get-variable().m-find-variable(user name):(user variable)
+          node.item.get-variable().find-variable(user name):(user variable)
       node := node.next
   
-  func inst m-check-same-as(
+  func inst check-same-as(
       user FunctionArguments other):(copy Bool output-ommited)
     user ListNode{Argument} my-node(self.parameters.first)
     user ListNode{Argument} other-node(other.parameters.first)
     do
       while ? my-node and ? other-node
-      my-node.item.m-check-same-as(user other-node.item)
+      my-node.item.check-same-as(user other-node.item)
       my-node := my-node.next
       other-node := other-node.next
     if ? my-node
@@ -183,7 +183,7 @@ class FunctionArguments(SyntaxTreeNode)
     other-node := other.outputs.first
     do
       while ? my-node and ? other-node
-      my-node.item.m-check-same-as(user other-node.item)
+      my-node.item.check-same-as(user other-node.item)
       my-node := my-node.next
       other-node := other-node.next
     if ? my-node
@@ -203,7 +203,13 @@ class FunctionArguments(SyntaxTreeNode)
       node.item.write-preactions()
       node := node.next
   
-  func inst write(copy Bool is-decleration)
+  func dynamic write()
+    self.write-if-decleration(copy true)
+  
+  func dynamic write-call()
+    self.write-if-decleration(copy false)
+  
+  func inst write-if-decleration(copy Bool is-decleration)
     # (`params...`, `outputs...`)
     write(user "(")
     if ? self.parameters.first
@@ -228,4 +234,4 @@ class FunctionArguments(SyntaxTreeNode)
     write(user "Returncode (*")
     write-cname(user name)
     write(user ")")
-    self.write(copy true)
+    self.write()

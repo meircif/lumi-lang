@@ -107,7 +107,7 @@ Returncode String_length(String* this, Int* length);
 Returncode String_equal(String* this, String* other, Bool* equal);
 Returncode String_get(String* this, Int index, Char* ch);
 Returncode String_append(String* this, Char ch);
-Returncode String_copy(String* this, String* source);
+Returncode String_new(String* this, String* source);
 Returncode String_concat(String* this, String* ext);
 Returncode String_concat_int(String* this, Int num);
 Returncode String_find(String* this, String* pattern, Int* index);

@@ -19,7 +19,7 @@ class SyntaxTreeNode
         return
     self.m-syntax-error(user "illegal access", user access-str)
   
-  func inst m-find-type(user String name):(user TypeData type-data)
+  func inst find-type(user String name):(user TypeData type-data)
     if not (? glob.type-map.find(user name):(user type-data))
       self.m-syntax-error(user "unknown type", user name)
   
@@ -120,7 +120,7 @@ class SyntaxTreeNode
     print(user line-num-str)
     print(user "] ")
   
-  func dynamic m-link-types()
+  func dynamic link-types()
     # do nothing as default
   
   func dynamic analyze()
@@ -129,19 +129,19 @@ class SyntaxTreeNode
   func dynamic write()
     raise
   
-  func inst m-link-children-types(user List{SyntaxTreeNode} child-list)
+  func inst link-children-types(user List{SyntaxTreeNode} child-list)
     var NodeLinkTypesAction action-link-types
-    self.m-do-on-children(user child-list, user action-link-types)
+    self.do-on-children(user child-list, user action-link-types)
   
   func inst analyze-children(user List{SyntaxTreeNode} child-list)
     var NodeAnalyzeAction action-analyze
-    self.m-do-on-children(user child-list, user action-analyze)
+    self.do-on-children(user child-list, user action-analyze)
   
   func inst write-children(user List{SyntaxTreeNode} child-list)
     var NodeWriteAction action-write
-    self.m-do-on-children(user child-list, user action-write)
+    self.do-on-children(user child-list, user action-write)
   
-  func inst m-do-on-children(
+  func inst do-on-children(
       user List{SyntaxTreeNode} child-list, user NodeAction action)
     user ListNode{SyntaxTreeNode} child(child-list.first)
     do
@@ -156,7 +156,7 @@ class NodeAction
 
 class NodeLinkTypesAction(NodeAction)
   func dynamic m-action(user SyntaxTreeNode node)
-    node.m-link-types()
+    node.link-types()
 
 class NodeAnalyzeAction(NodeAction)
   func dynamic m-action(user SyntaxTreeNode node)

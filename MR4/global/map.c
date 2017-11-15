@@ -64,11 +64,11 @@ Returncode NameMap_find(NameMap* self, String* name, void** value) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode NameMap_m_update_or_add(NameMap* self, String* name, void* value);
+Returncode NameMap_update_or_add(NameMap* self, String* name, void* value);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_NameMap_m_update_or_add = "NameMap.m-update-or-add";
-#define MR_FUNC_NAME _func_name_NameMap_m_update_or_add
-Returncode NameMap_m_update_or_add(NameMap* self, String* name, void* value) {
+static char* _func_name_NameMap_update_or_add = "NameMap.update-or-add";
+#define MR_FUNC_NAME _func_name_NameMap_update_or_add
+Returncode NameMap_update_or_add(NameMap* self, String* name, void* value) {
   NameMapNode* node = self->first;
   while (true) {
     if (!(NULL != node)) break;

@@ -9,9 +9,14 @@ class TopType(MiddleType)
   user BaseType top-base-ref
   user MiddleType top-mid-ref
   
+  new()
+    base()
+    self.num-top := 3
+  
+  
   func dynamic meth2()
     sys.println(user "TopType.meth2")
-    base.meth2()
+    base()
     MiddleType.meth2(var self)
     BaseType.meth2(var self)
   
@@ -21,7 +26,7 @@ class TopType(MiddleType)
   
   func dynamic meth5(copy Int n, user String s)
     sys.println(user "TopType.meth5")
-    base.meth5(copy n, user s)
+    base(copy n, user s)
     MiddleType.meth1(var _, copy n, user s)
     BaseType.meth1(var _, copy n, user s)
   
@@ -30,8 +35,8 @@ class TopType(MiddleType)
     self.num-mid := self.num-base
     self.top-base-ref := self.top-mid-ref
     self.top-base-ref := self
-    user MiddleType mt(self)
-    user BaseType bt(mt)
+    user MiddleType mt(var self)
+    user BaseType bt(var mt)
     test-mid-out()->(user bt)
 
 
@@ -39,6 +44,9 @@ class BaseType
   var Int num-base
   user MiddleType base-mid-ref
   user TopType base-top-ref
+  
+  new()
+    self.num-base := 1
   
   func dynamic meth0()
     sys.println(user "BaseType.meth0")

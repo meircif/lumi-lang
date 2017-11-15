@@ -297,8 +297,8 @@ Returncode Int_str(Int value, String* out_str) {
 }
 #undef MR_FUNC_NAME
 
-#define MR_FUNC_NAME "String.copy"
-Returncode String_copy(String* this, String* source) {
+#define MR_FUNC_NAME "String.new"
+Returncode String_new(String* this, String* source) {
   if (this == source) {
     return OK;
   }
