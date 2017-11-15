@@ -6,6 +6,7 @@ func test-code-setup(user String input-text)
   mock-input-file-text.concat(user "struct Test\n")
   mock-input-file-text.concat(user "  var Int num\n")
   mock-input-file-text.concat(user "  var Func{()} fun\n")
+  mock-input-file-text.concat(user "  new(copy Int num)\n")
   mock-input-file-text.concat(user "  func meth()\n")
   mock-input-file-text.concat(user "class Ta(Test)\n")
   mock-input-file-text.concat(user "  var Int numa\n")
@@ -105,6 +106,7 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user "  Tb_Dynamic _base;\n")
   expected-header.concat(user "};\n")
   
+  expected-header.concat(user "Returncode Test_new(Test* self, Int num);\n")
   expected-header.concat(user "Returncode Test_meth(Test* self);\n")
   expected-header.concat(user "Returncode Ta_metha(Ta* self")
   expected-header.concat(user ", Ta_Dynamic* self_Dynamic);\n")
@@ -136,6 +138,8 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user mock-func-header)
   expected-header.concat(user ";\n")
   
+  expected-header.concat(user "Returncode Test_new(Test* self, Int num)")
+  expected-header.concat(user empty-func-body)
   expected-header.concat(user "Returncode Test_meth(Test* self)")
   expected-header.concat(user empty-func-body)
   expected-header.concat(user "Returncode Ta_metha(Ta* self")
@@ -579,10 +583,13 @@ test test-dynamic()
   test-code(
       user "user Ta a", user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;")
   test-code(
-      user "new Ta a",
-      user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;\n  a = calloc(1, sizeof(Ta));")
+      user "ta := Ta(copy 7)",
+      user "Ta* aux_Ta_0 = NULL;\n  Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;\n  aux_Ta_0 = calloc(1, sizeof(Ta));\n  if (aux_Ta_0 == NULL) RAISE(1)\n  CHECK(1, Test_new(&(aux_Ta_0->_base), 7) )\n  ta_Dynamic = aux_Ta_0_Dynamic;\n  ta = aux_Ta_0;")
   test-code(
-      user "user Ta a(ta)",
+      user "new Ta a",
+      user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;\n  a = calloc(1, sizeof(Ta));\n  if (a == NULL) RAISE(1)")
+  test-code(
+      user "user Ta a(var ta)",
       user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;\n  a = ta;\n  a_Dynamic = ta_Dynamic;")
   test-code(user "ta := ta", user "ta_Dynamic = ta_Dynamic;\n  ta = ta;")
   test-code(
@@ -617,10 +624,10 @@ test test-function-object()
       user "var Func{()} fun\n  fun := fun0\n  fun()",
       user "Returncode (*fun)(void) = NULL;\n  fun = fun0;\n  if (fun == NULL) RAISE(3)\n  CHECK(3, fun() )")
   test-code(
-      user "var Func{(copy Int x)->(copy Int y)} fun(fun5)\n  var Int x\n  fun(copy 9)->(copy x)",
+      user "var Func{(copy Int x)->(copy Int y)} fun(var fun5)\n  var Int x\n  fun(copy 9)->(copy x)",
       user "Returncode (*fun)(Int x, Int* y) = NULL;\n  Int x = 0;\n  fun = fun5;\n  if (fun == NULL) RAISE(3)\n  CHECK(3, fun(9, &(x)) )")
   test-code(
-      user "var Func{(var Test self)} fun(Test.meth)\n  fun(var t)",
+      user "var Func{(var Test self)} fun(var Test.meth)\n  fun(var t)",
       user "Returncode (*fun)(Test* self) = NULL;\n  fun = Test_meth;\n  if (fun == NULL) RAISE(2)\n  CHECK(2, fun(t) )")
   test-code(
       user "var Func{()} fun\n  fun := _\n  b := fun?",
@@ -653,7 +660,7 @@ test test-function-object()
       user "expected \"(\" inside Function type, got \"}\"")
   test-code-error(user "var Func{() } error", user "expected \"}\", got \" \"")
   test-code-error(
-      user "var Func{()} fun(fun1)", user "too many parameters")
+      user "var Func{()} fun(var fun1)", user "too many parameters")
   test-code-error(
       user "var Func{()->(copy Int x)} fun\n  fun := fun0",
       user "too few outputs")
@@ -678,7 +685,7 @@ test test-builtin()
       user "str.get(copy i)->(copy c)",
       user "CHECK(1, String_get(str, i, &(c)) )")
   test-code(user "str.append(copy c)", user "CHECK(1, String_append(str, c) )")
-  test-code(user "str.copy(user str)", user "CHECK(1, String_copy(str, str) )")
+  test-code(user "str.new(user str)", user "CHECK(1, String_new(str, str) )")
   test-code(
       user "str.concat(user str)", user "CHECK(1, String_concat(str, str) )")
   test-code(
@@ -703,7 +710,7 @@ test test-builtin()
   test-code(
       user "fobj.write(user str)", user "CHECK(1, File_write(fobj, str) )")
   test-code(
-      user "user Array{String} argv(sys.argv)",
+      user "user Array{String} argv(var sys.argv)",
       user "Array* argv = NULL;\n  if (sys == NULL) RAISE(1)\n  argv = sys->argv;")
   test-code(user "sys.print(user str)", user "CHECK(1, Sys_print(sys, str) )")
   test-code(

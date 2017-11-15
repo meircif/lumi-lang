@@ -38,7 +38,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           self.type-instance.name.equal(user "String")
         SyntaxTreeInitVarSequence.init-new(var _, user self)
     read-new(user "("):(owner self.name, copy end)
-    self.m-check-name()
+    self.check-name()
     if end = '('
       if ? self.parent-type
         self.m-syntax-error-msg(user "type members cannot be initialized")
@@ -46,41 +46,41 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.m-syntax-error-msg(user "global variables cannot be initialized")
       SyntaxTreeVariableInit.parse-new(var _, user self):(copy end)
   
-  func inst m-check-name()
+  func inst check-name()
     if not f-is-legal-name(user self.name, copy false)
       self.m-syntax-error(user "illegal variable name", user self.name)
     if ? self.parent-type
       user SyntaxTreeVariable field
-      self.parent-type.m-find-field(user self.name):(user field)
+      self.parent-type.find-field(user self.name):(user field)
       if ? field
         self.m-syntax-error(user "redefinition of field", user self.name)
       user SyntaxTreeFunction meth
-      self.parent-type.m-find-meth(user self.name):(user meth)
+      self.parent-type.find-meth(user self.name):(user meth)
       if ? meth
         self.m-syntax-error(
             user "field name overrides method", user self.name)
     else
-      if ? glob.root.m-find-variable(user self.name)
+      if ? glob.root.find-variable(user self.name)
         self.m-syntax-error(
             user "redefinition of global variable", user self.name)
-      if ? glob.root.m-find-function(user self.name)
+      if ? glob.root.find-function(user self.name)
         self.m-syntax-error(
             user "variable name overrides function", user self.name)
       if ? self.parent
-        if ? self.parent.m-find-variable(user self.name)
+        if ? self.parent.find-variable(user self.name)
           self.m-syntax-error(
               user "redefinition of variable", user self.name)
   
-  func inst m-find-variable(user String name):(
+  func inst find-variable(user String name):(
       user SyntaxTreeVariable variable, copy Bool found)
     self.name.equal(user name):(copy found)
     if found
       variable := self
   
-  func dynamic m-link-types()
+  func dynamic link-types()
     # sys.print-raw(user "m-link-type var ")
     # sys.print(user self.name)
-    self.type-instance.m-link-types(user self)
+    self.type-instance.link-types(user self)
   
   func dynamic analyze()
     if self.type-instance.type-data.is-primitive and self.access != ACCESS-VAR
@@ -88,18 +88,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "only \"var\" access is supported for primitive types, got",
           user glob.access-names[self.access])
     self.type-instance.analyze-lengths(user self)
-    if self.access = ACCESS-VAR or self.access = ACCESS-NEW
-      if not self.type-instance.type-data.is-primitive and not (? self.parent)
-        self.m-syntax-error-msg(
-            user "non-primitives cannot be declared \"var\" here yet...")
-      if self.type-instance.type-data = glob.type-array or
-          self.type-instance.type-data = glob.type-string
-        if not (? self.type-instance.length)
-          self.m-syntax-error-msg(user "missing length for sequence")
-      if self.type-instance.type-data = glob.type-array and
-          self.type-instance.sub-type.type-data = glob.type-string and
-          not (? self.type-instance.sub-type.length)
-        self.m-syntax-error-msg(user "missing length for sequence")
+    if (self.access = ACCESS-VAR or self.access = ACCESS-NEW) and
+        not self.type-instance.type-data.is-primitive and not (? self.parent)
+      self.m-syntax-error-msg(
+          user "non-primitives cannot be declared \"var\" here yet...")
+    if self.access = ACCESS-VAR
+      self.type-instance.check-sequence(user self)
   
   func dynamic write()
     if ? self.parent or ? self.parent-type
@@ -135,7 +129,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       if self.type-instance.type-data = glob.type-array and
           self.type-instance.sub-type.type-data = glob.type-func
         write(user ")")
-        self.type-instance.sub-type.arguments.write(copy true)
+        self.type-instance.sub-type.arguments.write()
       write(user ";\n")
       self.write-spaces()
     
@@ -252,63 +246,44 @@ class SyntaxTreeInitVarSequence(BaseVariableInit)
 
 ## Initialize dynamically allocated variable node in the syntax tree
 class SyntaxTreeInitNew(BaseVariableInit)
+  owner NewExpression new-expression
+  
   func inst parse-new(user SyntaxTreeBlock parent-block):(
       copy Char end, owner SyntaxTreeVariable new-var-node)
     new SyntaxTreeInitNew node-init-new
-    node-init-new.init-parent(user parent-block)
+    node-init-new.parse(user parent-block):(copy end, owner new-var-node)
+  
+  func dynamic parse(user SyntaxTreeBlock parent-block):(
+      copy Char end, owner SyntaxTreeVariable new-var-node)
+    self.init-parent(user parent-block)
     SyntaxTreeVariable.parse-new(
         var _, copy ACCESS-NEW, user _, user parent-block):(
         copy end, owner new-var-node)
-    node-init-new.variable := new-var-node
+    self.variable := new-var-node
+    new NewExpression in self.new-expression
+    self.new-expression.init(owner self.variable.type-instance, user self)
+    self.new-expression.result-type.copy-new():(
+        owner self.variable.type-instance)
+    self.new-expression.is-statement := true
+  
+  func dynamic analyze()
+    new SymbolExpression symbol
+    string-new-copy(user self.variable.name):(owner symbol.name)
+    symbol.variable := self.variable
+    self.new-expression.symbol := symbol
+    self.new-expression.analyze()
   
   func dynamic write()
-    # `name` = `...`
+    # `variable.name` = `new-expression`
     self.write-spaces()
-    if self.variable.type-instance.type-data = glob.type-array or
-        self.variable.type-instance.type-data = glob.type-string
-      self.variable.type-instance.length.write-preactions()
-    if self.variable.type-instance.type-data = glob.type-array and
-        self.variable.type-instance.sub-type.type-data = glob.type-string
-      self.variable.type-instance.sub-type.length.write-preactions()
-    write-cname(user self.variable.name)
-    write(user " = ")
-    if self.variable.type-instance.type-data = glob.type-array
-      # MR_new_array(length, sizeof(SubType));
-      # MR_new_array(length, sizeof(String) + (string-length));
-      # MR_set_new_string_array(length, string-length, `name`);
-      write(user "MR_new_array(")
-      self.variable.type-instance.length.write()
-      write(user ", sizeof(")
-      write-cname(user self.variable.type-instance.sub-type.type-data.name)
-      if self.variable.type-instance.sub-type.type-data = glob.type-string
-        write(user ") + (")
-        self.variable.type-instance.sub-type.length.write()
-        write(user "));\n")
-        self.write-spaces()
-        write(user "MR_set_new_string_array(")
-        self.variable.type-instance.length.write()
-        write(user ", ")
-        self.variable.type-instance.sub-type.length.write()
-        write(user ", ")
-        write-cname(user self.variable.name)
-      else
-        write(user ")")
-        
-    else-if self.variable.type-instance.type-data = glob.type-string
-      # MR_new_string(length);
-      write(user "MR_new_string(")
-      self.variable.type-instance.length.write()
-    else
-      # calloc(1, sizeof(`type`));
-      write(user "calloc(1, sizeof(")
-      write-cname(user self.variable.type-instance.type-data.name)
-      write(user ")")
-    write(user ");\n")
+    self.new-expression.write()
 
 
 ## Variable initialization node in the syntax tree
 class SyntaxTreeVariableInit(BaseVariableInit)
-  owner Expression value
+  owner FunctionArguments arguments
+  user SyntaxTreeFunction constructor
+  owner FunctionArguments expected-arguments
   
   func inst parse-new(user SyntaxTreeVariable variable):(copy Char end)
     new SyntaxTreeVariableInit new-node
@@ -316,48 +291,60 @@ class SyntaxTreeVariableInit(BaseVariableInit)
   
   func inst parse(user SyntaxTreeVariable variable):(copy Char end)
     self.init(user variable)
-    parse-new-expression(user ")", user self):(owner self.value, copy end)
-    if end != ')'
-      self.m-syntax-error-c(
-          user "expected \")\" after initialization, got",
-          copy end)
-    read-c():(copy end)
+    new FunctionArguments in self.arguments
+    var CallArgumentFactory argument-factory
+    self.arguments.parse(user argument-factory, user self):(copy end)
   
   func dynamic analyze()
+    self.arguments.analyze()
     if (self.variable.access = ACCESS-VAR or
         self.variable.access = ACCESS-NEW) and
-        not self.variable.type-instance.type-data.is-primitive and
-        not (self.variable.type-instance.type-data = glob.type-string)
-      self.m-syntax-error(
-          user "cannot initialize non-primitive type",
-          user self.variable.type-instance.type-data.name)
-    self.value.analyze()
-    self.variable.type-instance.m-check-assign-from(user self):(
-        owner self.value)
+        not self.variable.type-instance.type-data.is-primitive
+      self.variable.type-instance.type-data.find-meth(user "new"):(
+          user self.constructor)
+      if not (? self.constructor)
+        self.m-syntax-error(
+            user "no contructor for type",
+            user self.variable.type-instance.type-data.name)
+      new CallArgument self-param
+      self-param.access :=
+          self.constructor.arguments.parameters.first.item.access
+      self-param.code-node := self
+      new SymbolExpression symbol
+      string-new-copy(user self.variable.name):(owner symbol.name)
+      symbol.variable := self.variable
+      self.variable.type-instance.copy-new():(owner symbol.result-type)
+      self-param.value := symbol
+      self.arguments.parameters.prepend(owner self-param)
+      self.arguments.check-same-as(user self.constructor.arguments)
+      
+    else
+      new FunctionArguments in self.expected-arguments
+      self.expected-arguments.init()
+      self.expected-arguments.add-self-parameter(
+          owner self.variable.type-instance.copy-new())
+      self.arguments.check-same-as(user self.expected-arguments)
   
   func dynamic write()
     self.write-spaces()
-    self.value.write-preactions()
-    if (self.variable.access = ACCESS-VAR or
-        self.variable.access = ACCESS-NEW) and
-        self.variable.type-instance.type-data = glob.type-string
-      # CHECK(`line-num`, String_copy(`name`, `value`) )
+    self.arguments.write-preactions()
+    if ? self.constructor
       self.write-call()
-      write(user "String_copy(")
-      write-cname(user self.variable.name)
-      write(user ", ")
-      self.value.write()
-      write(user ") )\n")
+      self.constructor.write-cname()
+      self.arguments.write-call()
+      write(user " )\n")
     else
       # `name` = `value`;
+      user Expression value
+      self.arguments.parameters.first.item.get-output():(user value)
       write-cname(user self.variable.name)
       write(user " = ")
-      self.value.write()
+      value.write()
       write(user ";\n")
       if self.variable.type-instance.type-data.is-dynamic
         # `name`_Dynamic = `Type`_Dynamic;
         self.write-spaces()
         write-cname(user self.variable.name)
         write(user "_Dynamic = ")
-        self.value.write-dynamic()
+        value.write-dynamic()
         write(user ";\n")

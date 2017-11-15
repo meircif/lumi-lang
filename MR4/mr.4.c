@@ -32,7 +32,7 @@ Returncode MR_user_main();
 int MR_main(int argc, char* argv[]) {
   String* args_strings;
   Array sys_argv;
-  Sys sys_Value;
+  Sys sys_Var;
   int arg;
   Returncode err;
   MR_trace_stream = stderr;
@@ -43,8 +43,8 @@ int MR_main(int argc, char* argv[]) {
   }
   sys_argv.length = argc;
   sys_argv.values = args_strings;
-  sys_Value.argv = &sys_argv;
-  sys = &sys_Value;
+  sys_Var.argv = &sys_argv;
+  sys = &sys_Var;
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
     args_strings[arg].length = cstring_length(argv[arg], 1024);
@@ -120,31 +120,26 @@ String* MR_new_string(int length) {
 
 Array* MR_new_array(int length, int value_size) {
   void* buff;
-  Array* arr;
+  Array* array;
   buff = calloc(1, sizeof(Array) + length * value_size);
   if (buff == NULL) {
     return NULL;
   }
-  arr = buff;
-  arr->length = length;
-  arr->values = ((Byte*)buff) + sizeof(Array);
-  return arr;
+  array = buff;
+  array->length = length;
+  array->values = ((Byte*)buff) + sizeof(Array);
+  return array;
 }
 
-void MR_set_var_string_array(
-    int array_length, int string_length, Array* array, char* chars) {
+Array* MR_new_string_array(int array_length, int string_length) {
+  void* buff;
+  Array* array;
   int n;
-  for (n = 0; n < array_length; ++n) {
-    String* str;
-    str = ((String*)(array->values)) + n;
-    str->max_length = string_length;
-    str->length = 0;
-    str->values = chars + n * string_length;
+  buff = MR_new_array(array_length, sizeof(String) + (string_length));
+  if (buff == NULL) {
+    return NULL;
   }
-}
-
-void MR_set_new_string_array(int array_length, int string_length, Array* array) {
-  int n;
+  array = buff;
   for (n = 0; n < array_length; ++n) {
     String* str;
     str = ((String*)(array->values)) + n;
@@ -152,6 +147,19 @@ void MR_set_new_string_array(int array_length, int string_length, Array* array) 
     str->length = 0;
     str->values = ((char*)(array->values)) + array_length * sizeof(String) +
         string_length * n;
+  }
+  return array;
+}
+
+void MR_set_var_string_array(
+  int array_length, int string_length, Array* array, char* chars) {
+  int n;
+  for (n = 0; n < array_length; ++n) {
+    String* str;
+    str = ((String*)(array->values)) + n;
+    str->max_length = string_length;
+    str->length = 0;
+    str->values = chars + n * string_length;
   }
 }
 
@@ -289,8 +297,8 @@ Returncode Int_str(Int value, String* out_str) {
 }
 #undef MR_FUNC_NAME
 
-#define MR_FUNC_NAME "String.copy"
-Returncode String_copy(String* this, String* source) {
+#define MR_FUNC_NAME "String.new"
+Returncode String_new(String* this, String* source) {
   if (this == source) {
     return OK;
   }

@@ -17,7 +17,7 @@ static List{Generic}
       self.first := node
     self.last := node
   
-  func inst m-prepend(owner Generic item)
+  func inst prepend(owner Generic item)
     new ListNode{Generic} node
     node.item := item
     node.next := self.first
@@ -25,7 +25,7 @@ static List{Generic}
     if not (? self.last)
       self.last := node
   
-  func inst m-pop():(owner Generic item)
+  func inst pop():(owner Generic item)
     if ? self.first
       item := self.first.item
       owner ListNode{Generic} first(self.first)

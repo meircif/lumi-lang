@@ -80,7 +80,7 @@ Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
 extern Func SyntaxTreeExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeExpression_analyze, (void*)SyntaxTreeExpression_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeExpression_analyze, (void*)SyntaxTreeExpression_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -135,7 +135,7 @@ Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self) {
 extern Func SyntaxTreeReturn__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeReturn__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeReturn_write, (void*)SyntaxTreeReturn_m_is_end_point};
+Func SyntaxTreeReturn__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeReturn_write, (void*)SyntaxTreeReturn_m_is_end_point};
 #endif
 
 
@@ -190,7 +190,7 @@ Returncode SyntaxTreeRaise_write(SyntaxTreeRaise* self) {
 extern Func SyntaxTreeRaise__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeRaise__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeRaise_write, (void*)SyntaxTreeRaise_m_is_end_point};
+Func SyntaxTreeRaise__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeRaise_write, (void*)SyntaxTreeRaise_m_is_end_point};
 #endif
 
 
@@ -265,7 +265,7 @@ Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
 extern Func SyntaxTreeWhile__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeWhile__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeWhile_analyze, (void*)SyntaxTreeWhile_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeWhile__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeWhile_analyze, (void*)SyntaxTreeWhile_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -323,7 +323,7 @@ Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self) {
 extern Func SyntaxTreeContinue__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeContinue_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeContinue_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 #undef MR_FILE_NAME

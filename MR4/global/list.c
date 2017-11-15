@@ -53,11 +53,11 @@ Returncode List_add(List* self, void* item) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode List_m_prepend(List* self, void* item);
+Returncode List_prepend(List* self, void* item);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_List_m_prepend = "List.m-prepend";
-#define MR_FUNC_NAME _func_name_List_m_prepend
-Returncode List_m_prepend(List* self, void* item) {
+static char* _func_name_List_prepend = "List.prepend";
+#define MR_FUNC_NAME _func_name_List_prepend
+Returncode List_prepend(List* self, void* item) {
   ListNode* node = malloc(sizeof(ListNode));
   if (node == NULL) RAISE(21)
   *node = (ListNode){NULL, NULL};
@@ -72,11 +72,11 @@ Returncode List_m_prepend(List* self, void* item) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode List_m_pop(List* self, void** item);
+Returncode List_pop(List* self, void** item);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_List_m_pop = "List.m-pop";
-#define MR_FUNC_NAME _func_name_List_m_pop
-Returncode List_m_pop(List* self, void** item) {
+static char* _func_name_List_pop = "List.pop";
+#define MR_FUNC_NAME _func_name_List_pop
+Returncode List_pop(List* self, void** item) {
   if (NULL != self->first) {
     (*item) = ((void*)(self->first->item));
     ListNode* first = self->first;

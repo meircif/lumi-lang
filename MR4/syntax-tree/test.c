@@ -81,7 +81,7 @@ Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self) {
 extern Func SyntaxTreeAssert__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeAssert__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeAssert_analyze, (void*)SyntaxTreeAssert_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeAssert__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeAssert_analyze, (void*)SyntaxTreeAssert_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 /* Assert-error statement in the syntax tree */
@@ -166,7 +166,7 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
 extern Func SyntaxTreeAssertError__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeAssertError__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)SyntaxTreeAssertError_analyze, (void*)SyntaxTreeAssertError_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeAssertError__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeAssertError_analyze, (void*)SyntaxTreeAssertError_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -212,7 +212,7 @@ Returncode SyntaxTreeTestFunction_parse(SyntaxTreeTestFunction* self, Char* end)
 extern Func SyntaxTreeTestFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeFunction_m_link_types, (void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type, (void*)SyntaxTreeFunction_m_check_name, (void*)SyntaxTreeFunction_write_declaration};
+Func SyntaxTreeTestFunction__dtl[] = {(void*)SyntaxTreeFunction_link_types, (void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeFunction_check_name, (void*)SyntaxTreeFunction_write_declaration};
 #endif
 
 
@@ -266,11 +266,11 @@ Returncode SyntaxTreeMockFunction_parse(SyntaxTreeMockFunction* self, Char* end)
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeMockFunction_m_check_name(SyntaxTreeMockFunction* self);
+Returncode SyntaxTreeMockFunction_check_name(SyntaxTreeMockFunction* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeMockFunction_m_check_name = "SyntaxTreeMockFunction.m-check-name";
-#define MR_FUNC_NAME _func_name_SyntaxTreeMockFunction_m_check_name
-Returncode SyntaxTreeMockFunction_m_check_name(SyntaxTreeMockFunction* self) {
+static char* _func_name_SyntaxTreeMockFunction_check_name = "SyntaxTreeMockFunction.check-name";
+#define MR_FUNC_NAME _func_name_SyntaxTreeMockFunction_check_name
+Returncode SyntaxTreeMockFunction_check_name(SyntaxTreeMockFunction* self) {
   /* do not check */
   return OK;
 }
@@ -284,24 +284,26 @@ static char* _func_name_SyntaxTreeMockFunction_analyze = "SyntaxTreeMockFunction
 Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
   SyntaxTreeFunction* mocked_func = NULL;
   if (NULL != self->type_name) {
-    CHECK(111, SyntaxTreeNode_m_find_type(&(self->_base._base._base._base), self->type_name, &(self->_base.parent_type)) )
-    Int _Int102;
-    CHECK(112, TypeData_m_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int102)) )
+    CHECK(111, SyntaxTreeNode_find_type(&(self->_base._base._base._base), self->type_name, &(self->_base.parent_type)) )
+    Int _Int105;
+    CHECK(112, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int105)) )
     if (!(NULL != mocked_func)) {
       CHECK(114, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base._base), &(String){23, 22, "mocking unknown method"}, self->mocked_name, &(String){8, 7, "of type"}, self->type_name) )
     }
-    CHECK(119, FunctionArguments_add_self_parameter(self->_base.arguments, self->_base.parent_type) )
+    TypeInstance* _TypeInstance106;
+    CHECK(119, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance106)) )
+    CHECK(119, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance106) )
   }
   else {
-    CHECK(121, SyntaxTreeNamespace_m_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
+    CHECK(122, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
     if (!(NULL != mocked_func)) {
-      CHECK(123, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
+      CHECK(124, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
     }
   }
-  Bool _Bool103;
-  CHECK(125, FunctionArguments_m_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool103)) )
+  Bool _Bool107;
+  CHECK(126, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool107)) )
   mocked_func->mocker_function = self;
-  CHECK(127, SyntaxTreeFunction_analyze(&(self->_base)) )
+  CHECK(128, SyntaxTreeFunction_analyze(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -310,7 +312,7 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
 extern Func SyntaxTreeMockFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_m_link_types, (void*)SyntaxTreeMockFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type, (void*)SyntaxTreeMockFunction_m_check_name, (void*)SyntaxTreeFunction_write_declaration};
+Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_link_types, (void*)SyntaxTreeMockFunction_analyze, (void*)SyntaxTreeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeMockFunction_check_name, (void*)SyntaxTreeFunction_write_declaration};
 #endif
 
 #undef MR_FILE_NAME

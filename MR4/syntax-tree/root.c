@@ -61,8 +61,8 @@ Returncode SyntaxTreeRoot_parse(SyntaxTreeRoot* self, Array* argv) {
     glob->line_number = 1;
     CHECK(23, file_open(glob->input_file_name, true, &(glob->input_file)) )
     
-    Char _Char89;
-    CHECK(25, SyntaxTreeBranch_parse_children(&(self->_base._base), NULL, NULL, &(_Char89)) )
+    Char _Char92;
+    CHECK(25, SyntaxTreeBranch_parse_children(&(self->_base._base), NULL, NULL, &(_Char92)) )
     
     if (glob->input_buffer->length > 0 || glob->input_spaces > 0) {
       CHECK(28, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
@@ -85,39 +85,39 @@ Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Cha
 static char* _func_name_SyntaxTreeRoot_parse_child = "SyntaxTreeRoot.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_parse_child
 Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Char* end) {
-  Bool _Bool90;
-  CHECK(37, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, NULL, &((*end)), &(_Bool90)) )
-  if (_Bool90) {
+  Bool _Bool93;
+  CHECK(37, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, NULL, &((*end)), &(_Bool93)) )
+  if (_Bool93) {
     return OK;
   }
   
-  Bool _Bool91;
-  CHECK(40, String_equal(keyword, &(String){7, 6, "struct"}, &(_Bool91)) )
-  if (_Bool91) {
+  Bool _Bool94;
+  CHECK(40, String_equal(keyword, &(String){7, 6, "struct"}, &(_Bool94)) )
+  if (_Bool94) {
     if ((*end) != ' ') {
       CHECK(42, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){35, 34, "expected space after \"struct\", got"}, (*end)) )
     }
-    TypeData* _TypeData92;
-    CHECK(44, TypeData_parse_new(NULL, false, &((*end)), &(_TypeData92)) )
-    CHECK(44, List_add(self->types, _TypeData92) )
+    TypeData* _TypeData95;
+    CHECK(44, TypeData_parse_new(NULL, false, &((*end)), &(_TypeData95)) )
+    CHECK(44, List_add(self->types, _TypeData95) )
     
   }
   else {
-    Bool _Bool93;
-    CHECK(47, String_equal(keyword, &(String){6, 5, "class"}, &(_Bool93)) )
-    if (_Bool93) {
+    Bool _Bool96;
+    CHECK(47, String_equal(keyword, &(String){6, 5, "class"}, &(_Bool96)) )
+    if (_Bool96) {
       if ((*end) != ' ') {
         CHECK(49, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){34, 33, "expected space after \"class\", got"}, (*end)) )
       }
-      TypeData* _TypeData94;
-      CHECK(51, TypeData_parse_new(NULL, true, &((*end)), &(_TypeData94)) )
-      CHECK(51, List_add(self->types, _TypeData94) )
+      TypeData* _TypeData97;
+      CHECK(51, TypeData_parse_new(NULL, true, &((*end)), &(_TypeData97)) )
+      CHECK(51, List_add(self->types, _TypeData97) )
       
     }
     else {
-      Bool _Bool95;
-      CHECK(54, String_equal(keyword, &(String){5, 4, "main"}, &(_Bool95)) )
-      if (_Bool95) {
+      Bool _Bool98;
+      CHECK(54, String_equal(keyword, &(String){5, 4, "main"}, &(_Bool98)) )
+      if (_Bool98) {
         if ((*end) != '\n') {
           CHECK(56, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){36, 35, "expected new-line after \"main\", got"}, (*end)) )
         }
@@ -125,39 +125,39 @@ Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Cha
         
       }
       else {
-        Bool _Bool96;
-        CHECK(61, String_equal(keyword, &(String){7, 6, "native"}, &(_Bool96)) )
-        if (_Bool96) {
+        Bool _Bool99;
+        CHECK(61, String_equal(keyword, &(String){7, 6, "native"}, &(_Bool99)) )
+        if (_Bool99) {
           if ((*end) != ' ') {
             CHECK(63, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){35, 34, "expected space after \"native\", got"}, (*end)) )
           }
-          SyntaxTreeNativeFunction* _SyntaxTreeNativeFunction97;
-          CHECK(65, SyntaxTreeNativeFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeNativeFunction97)) )
-          CHECK(65, List_add(self->_base.functions, &(_SyntaxTreeNativeFunction97->_base)) )
+          SyntaxTreeNativeFunction* _SyntaxTreeNativeFunction100;
+          CHECK(65, SyntaxTreeNativeFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeNativeFunction100)) )
+          CHECK(65, List_add(self->_base.functions, &(_SyntaxTreeNativeFunction100->_base)) )
           
         }
         else {
-          Bool _Bool98;
-          CHECK(68, String_equal(keyword, &(String){5, 4, "test"}, &(_Bool98)) )
-          if (_Bool98) {
+          Bool _Bool101;
+          CHECK(68, String_equal(keyword, &(String){5, 4, "test"}, &(_Bool101)) )
+          if (_Bool101) {
             if ((*end) != ' ') {
               CHECK(70, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){33, 32, "expected space after \"test\", got"}, (*end)) )
             }
-            SyntaxTreeTestFunction* _SyntaxTreeTestFunction99;
-            CHECK(72, SyntaxTreeTestFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeTestFunction99)) )
-            CHECK(72, List_add(self->_base.functions, &(_SyntaxTreeTestFunction99->_base)) )
+            SyntaxTreeTestFunction* _SyntaxTreeTestFunction102;
+            CHECK(72, SyntaxTreeTestFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeTestFunction102)) )
+            CHECK(72, List_add(self->_base.functions, &(_SyntaxTreeTestFunction102->_base)) )
             
           }
           else {
-            Bool _Bool100;
-            CHECK(75, String_equal(keyword, &(String){5, 4, "mock"}, &(_Bool100)) )
-            if (_Bool100) {
+            Bool _Bool103;
+            CHECK(75, String_equal(keyword, &(String){5, 4, "mock"}, &(_Bool103)) )
+            if (_Bool103) {
               if ((*end) != ' ') {
                 CHECK(77, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){33, 32, "expected space after \"mock\", got"}, (*end)) )
               }
-              SyntaxTreeMockFunction* _SyntaxTreeMockFunction101;
-              CHECK(79, SyntaxTreeMockFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeMockFunction101)) )
-              CHECK(79, List_add(self->_base.functions, &(_SyntaxTreeMockFunction101->_base)) )
+              SyntaxTreeMockFunction* _SyntaxTreeMockFunction104;
+              CHECK(79, SyntaxTreeMockFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeMockFunction104)) )
+              CHECK(79, List_add(self->_base.functions, &(_SyntaxTreeMockFunction104->_base)) )
               
             }
             else {
@@ -173,11 +173,11 @@ Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Cha
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeRoot_m_link_types(SyntaxTreeRoot* self);
+Returncode SyntaxTreeRoot_link_types(SyntaxTreeRoot* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeRoot_m_link_types = "SyntaxTreeRoot.m-link-types";
-#define MR_FUNC_NAME _func_name_SyntaxTreeRoot_m_link_types
-Returncode SyntaxTreeRoot_m_link_types(SyntaxTreeRoot* self) {
+static char* _func_name_SyntaxTreeRoot_link_types = "SyntaxTreeRoot.link-types";
+#define MR_FUNC_NAME _func_name_SyntaxTreeRoot_link_types
+Returncode SyntaxTreeRoot_link_types(SyntaxTreeRoot* self) {
   RAISE(86)
 }
 #undef MR_FUNC_NAME
@@ -189,8 +189,8 @@ static char* _func_name_SyntaxTreeRoot_analyze = "SyntaxTreeRoot.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_analyze
 Returncode SyntaxTreeRoot_analyze(SyntaxTreeRoot* self) {
   CHECK(89, SyntaxTreeRoot_m_order_types(self) )
-  CHECK(90, SyntaxTreeNamespace_m_link_types(&(self->_base)) )
-  CHECK(91, SyntaxTreeNode_m_link_children_types(&(self->_base._base._base), self->types) )
+  CHECK(90, SyntaxTreeNamespace_link_types(&(self->_base)) )
+  CHECK(91, SyntaxTreeNode_link_children_types(&(self->_base._base._base), self->types) )
   if (NULL != self->main_function) {
     CHECK(93, (self->main_function)->_base._base._base._base._dtl[0](self->main_function) )
   }
@@ -214,7 +214,7 @@ Returncode SyntaxTreeRoot_m_order_types(SyntaxTreeRoot* self) {
   *ordered_list = (List){NULL, NULL};
   while (true) {
     TypeData* type_data = NULL;
-    CHECK(103, List_m_pop(self->types, (void**)&(type_data)) )
+    CHECK(103, List_pop(self->types, (void**)&(type_data)) )
     if (!(NULL != type_data)) break;
     CHECK(105, TypeData_m_order_bases(type_data, ordered_list) )
   }
@@ -333,7 +333,7 @@ Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self) {
 extern Func SyntaxTreeRoot__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeRoot__dtl[] = {(void*)SyntaxTreeRoot_m_link_types, (void*)SyntaxTreeRoot_analyze, (void*)SyntaxTreeRoot_write, (void*)SyntaxTreeRoot_parse_child, (void*)SyntaxTreeBranch_m_find_variable};
+Func SyntaxTreeRoot__dtl[] = {(void*)SyntaxTreeRoot_link_types, (void*)SyntaxTreeRoot_analyze, (void*)SyntaxTreeRoot_write, (void*)SyntaxTreeRoot_parse_child, (void*)SyntaxTreeBranch_find_variable};
 #endif
 
 

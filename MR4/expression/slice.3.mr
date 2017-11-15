@@ -36,7 +36,7 @@ class SliceExpression(Expression)
         self.set-simple-type(user glob.type-char)
     else-if self.sequence.result-type.type-data = glob.type-array
       if not (? self.second-index)
-        self.sequence.result-type.sub-type.m-copy-new():(owner self.result-type)
+        self.sequence.result-type.sub-type.copy-new():(owner self.result-type)
     else
       self.m-syntax-error(
           user "cannot slice type",
@@ -45,16 +45,16 @@ class SliceExpression(Expression)
         not (? self.second-index) and self.result-type.type-data.is-primitive
     
     self.index.analyze()
-    self.m-check-index(user self.index)
+    self.check-index(user self.index)
     
     if ? self.second-index
       self.second-index.analyze()
-      self.m-check-index(user self.second-index)
-      self.sequence.result-type.m-copy-new():(owner self.result-type)
+      self.check-index(user self.second-index)
+      self.sequence.result-type.copy-new():(owner self.result-type)
       self.add-aux-variable(copy ACCESS-AUX, user self.result-type):(
           owner self.slice-symbol)
   
-  func inst m-check-index(user Expression index)
+  func inst check-index(user Expression index)
     if ? index.result-type
       if index.result-type.type-data != glob.type-int
         self.m-syntax-error(

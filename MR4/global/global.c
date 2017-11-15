@@ -205,21 +205,21 @@ Returncode Global_init_builtin_types(Global* self) {
   /* String */
   CHECK(139, Global_add_builtin_field(self, &(glob->type_string->_base), &(String){7, 6, "length"}, &(glob->type_int->_base), NULL) )
   
-  CHECK(142, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){6, 5, "clear"}, &(arguments)) )
+  CHECK(142, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "new"}, &(arguments)) )
+  CHECK(143, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "other"}) )
   
-  CHECK(145, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){6, 5, "equal"}, &(arguments)) )
-  CHECK(147, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){8, 7, "pattern"}) )
-  CHECK(149, Global_add_builtin_output(self, arguments, ACCESS_COPY, &(glob->type_bool->_base), &(String){6, 5, "equal"}) )
+  CHECK(146, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){6, 5, "clear"}, &(arguments)) )
   
-  CHECK(152, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "get"}, &(arguments)) )
-  CHECK(153, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_int->_base), &(String){6, 5, "index"}) )
-  CHECK(155, Global_add_builtin_output(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
+  CHECK(149, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){6, 5, "equal"}, &(arguments)) )
+  CHECK(151, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){8, 7, "pattern"}) )
+  CHECK(153, Global_add_builtin_output(self, arguments, ACCESS_COPY, &(glob->type_bool->_base), &(String){6, 5, "equal"}) )
   
-  CHECK(158, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){7, 6, "append"}, &(arguments)) )
-  CHECK(160, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
+  CHECK(156, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "get"}, &(arguments)) )
+  CHECK(157, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_int->_base), &(String){6, 5, "index"}) )
+  CHECK(159, Global_add_builtin_output(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
   
-  CHECK(163, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){5, 4, "copy"}, &(arguments)) )
-  CHECK(164, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "other"}) )
+  CHECK(162, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){7, 6, "append"}, &(arguments)) )
+  CHECK(164, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
   
   CHECK(167, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){7, 6, "concat"}, &(arguments)) )
   CHECK(169, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "other"}) )
@@ -292,7 +292,7 @@ static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, BuiltinType** type_data) {
   (*type_data) = malloc(sizeof(BuiltinType));
   if ((*type_data) == NULL) RAISE(257)
-  *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
+  *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
   (*type_data)->_base._base._base._base._dtl = BuiltinType__dtl;
   CHECK(258, string_new_copy(name, &((*type_data)->_base.name)) )
   (*type_data)->_base.is_primitive = is_primitive;
@@ -472,11 +472,11 @@ struct BuiltinType {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode BuiltinType_m_link_types(BuiltinType* self);
+Returncode BuiltinType_link_types(BuiltinType* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_BuiltinType_m_link_types = "BuiltinType.m-link-types";
-#define MR_FUNC_NAME _func_name_BuiltinType_m_link_types
-Returncode BuiltinType_m_link_types(BuiltinType* self) {
+static char* _func_name_BuiltinType_link_types = "BuiltinType.link-types";
+#define MR_FUNC_NAME _func_name_BuiltinType_link_types
+Returncode BuiltinType_link_types(BuiltinType* self) {
   /* do nothing */
   return OK;
 }
@@ -519,7 +519,7 @@ Returncode BuiltinType_write_me(BuiltinType* self, TypeWriter* type_writer) {
 extern Func BuiltinType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinType__dtl[] = {(void*)BuiltinType_m_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_m_find_variable, (void*)BuiltinType_write_me};
+Func BuiltinType__dtl[] = {(void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)BuiltinType_write_me};
 #endif
 
 #if MR_STAGE == MR_TYPEDEFS
@@ -530,11 +530,11 @@ struct BuiltinVariable {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode BuiltinVariable_m_link_types(BuiltinVariable* self);
+Returncode BuiltinVariable_link_types(BuiltinVariable* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_BuiltinVariable_m_link_types = "BuiltinVariable.m-link-types";
-#define MR_FUNC_NAME _func_name_BuiltinVariable_m_link_types
-Returncode BuiltinVariable_m_link_types(BuiltinVariable* self) {
+static char* _func_name_BuiltinVariable_link_types = "BuiltinVariable.link-types";
+#define MR_FUNC_NAME _func_name_BuiltinVariable_link_types
+Returncode BuiltinVariable_link_types(BuiltinVariable* self) {
   /* do nothing */
   return OK;
 }
@@ -566,7 +566,7 @@ Returncode BuiltinVariable_write(BuiltinVariable* self) {
 extern Func BuiltinVariable__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinVariable__dtl[] = {(void*)BuiltinVariable_m_link_types, (void*)BuiltinVariable_analyze, (void*)BuiltinVariable_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func BuiltinVariable__dtl[] = {(void*)BuiltinVariable_link_types, (void*)BuiltinVariable_analyze, (void*)BuiltinVariable_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 #if MR_STAGE == MR_TYPEDEFS
@@ -577,11 +577,11 @@ struct BuiltinFunction {
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode BuiltinFunction_m_link_types(BuiltinFunction* self);
+Returncode BuiltinFunction_link_types(BuiltinFunction* self);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_BuiltinFunction_m_link_types = "BuiltinFunction.m-link-types";
-#define MR_FUNC_NAME _func_name_BuiltinFunction_m_link_types
-Returncode BuiltinFunction_m_link_types(BuiltinFunction* self) {
+static char* _func_name_BuiltinFunction_link_types = "BuiltinFunction.link-types";
+#define MR_FUNC_NAME _func_name_BuiltinFunction_link_types
+Returncode BuiltinFunction_link_types(BuiltinFunction* self) {
   /* do nothing */
   return OK;
 }
@@ -624,7 +624,7 @@ Returncode BuiltinFunction_write_declaration(BuiltinFunction* self) {
 extern Func BuiltinFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinFunction__dtl[] = {(void*)BuiltinFunction_m_link_types, (void*)BuiltinFunction_analyze, (void*)BuiltinFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_m_find_variable, (void*)SyntaxTreeFunction_m_get_parent_type, (void*)SyntaxTreeFunction_m_check_name, (void*)BuiltinFunction_write_declaration};
+Func BuiltinFunction__dtl[] = {(void*)BuiltinFunction_link_types, (void*)BuiltinFunction_analyze, (void*)BuiltinFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeFunction_check_name, (void*)BuiltinFunction_write_declaration};
 #endif
 
 #undef MR_FILE_NAME

@@ -5,11 +5,11 @@
 class SyntaxTreeCode(SyntaxTreeNode)
   user SyntaxTreeBlock parent
   
-  func inst m-find-variable(user String name):(user SyntaxTreeVariable variable)
-    self.parent.m-find-variable(user name):(user variable)
+  func inst find-variable(user String name):(user SyntaxTreeVariable variable)
+    self.parent.find-variable(user name):(user variable)
   
-  func inst m-get-parent-type():(user TypeData parent-type)
-    self.parent.m-get-parent-type():(user parent-type)
+  func inst get-function():(user SyntaxTreeFunction function)
+    self.parent.get-function():(user function)
   
   func inst write-spaces()
     self.parent.write-spaces()
@@ -159,16 +159,16 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     else
       has-end := false
   
-  func dynamic m-find-variable(user String name):(
+  func dynamic find-variable(user String name):(
       user SyntaxTreeVariable variable)
-    base.m-find-variable(user name):(user variable)
+    base.find-variable(user name):(user variable)
     if not (? variable) and ? self.ref-variable
-      self.ref-variable.m-find-variable(user name):(user variable)
+      self.ref-variable.find-variable(user name):(user variable)
     if not (? variable) and ? self.parent
-      self.parent.m-find-variable(user name):(user variable)
+      self.parent.find-variable(user name):(user variable)
   
-  func dynamic m-get-parent-type():(user TypeData parent-type)
-    self.parent.m-get-parent-type():(user parent-type)
+  func dynamic get-function():(user SyntaxTreeFunction function)
+    self.parent.get-function():(user function)
   
   func inst add-aux-variable(copy Int access, user TypeInstance type-instance):(
       user SyntaxTreeVariable new-variable)
@@ -199,13 +199,13 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       variable.access := ACCESS-VAR
     else
       variable.access := access
-    type-instance.m-copy-new():(owner variable.type-instance)
+    type-instance.copy-new():(owner variable.type-instance)
     new-variable := variable
     self.variables.add(owner variable)
   
-  func dynamic m-link-types()
-    base.m-link-types()
-    self.m-link-children-types(user self.code-nodes)
+  func dynamic link-types()
+    base.link-types()
+    self.link-children-types(user self.code-nodes)
   
   func dynamic analyze()
     base.analyze()

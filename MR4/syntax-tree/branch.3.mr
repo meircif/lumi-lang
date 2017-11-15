@@ -103,17 +103,17 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   func dynamic parse-child(user String keyword):(copy Char end)
     raise
   
-  func dynamic m-find-variable(user String name):(
+  func dynamic find-variable(user String name):(
       user SyntaxTreeVariable variable)
     variable := _
     user ListNode{SyntaxTreeVariable} child(self.variables.first)
     do
       while ? child
-      while not child.item.m-find-variable(user name):(user variable)
+      while not child.item.find-variable(user name):(user variable)
       child := child.next
   
-  func dynamic m-link-types()
-    self.m-link-children-types(user self.variables)
+  func dynamic link-types()
+    self.link-children-types(user self.variables)
   
   func dynamic analyze()
     self.analyze-children(user self.variables)
@@ -144,7 +144,7 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
       self.functions.add(owner SyntaxTreeFunction.parse-new(
           var _, user parent-type):(copy end))
   
-  func inst m-find-function(user String name):(user SyntaxTreeFunction function)
+  func inst find-function(user String name):(user SyntaxTreeFunction function)
     user ListNode{SyntaxTreeFunction} child(self.functions.first)
     do
       while ? child
@@ -154,9 +154,9 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
       child := child.next
     function := _
   
-  func dynamic m-link-types()
-    base.m-link-types()
-    self.m-link-children-types(user self.functions)
+  func dynamic link-types()
+    base.link-types()
+    self.link-children-types(user self.functions)
   
   func dynamic analyze()
     base.analyze()

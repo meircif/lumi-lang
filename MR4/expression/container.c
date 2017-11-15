@@ -59,7 +59,7 @@ static char* _func_name_BlockExpression_analyze = "BlockExpression.analyze";
 #define MR_FUNC_NAME _func_name_BlockExpression_analyze
 Returncode BlockExpression_analyze(BlockExpression* self) {
   CHECK(23, (self->expression)->_base._dtl[1](self->expression) )
-  CHECK(24, TypeInstance_m_copy_new(self->expression->result_type, &(self->_base.result_type)) )
+  CHECK(24, TypeInstance_copy_new(self->expression->result_type, &(self->_base.result_type)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -96,7 +96,7 @@ Returncode BlockExpression_write(BlockExpression* self) {
 extern Func BlockExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BlockExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)BlockExpression_analyze, (void*)BlockExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)BlockExpression_write_preactions};
+Func BlockExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)BlockExpression_analyze, (void*)BlockExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)BlockExpression_write_preactions};
 #endif
 
 
@@ -289,7 +289,7 @@ Returncode UnaryExpression_write_end(UnaryExpression* self) {
 extern Func UnaryExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func UnaryExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)UnaryExpression_analyze, (void*)UnaryExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)UnaryExpression_write_preactions};
+Func UnaryExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)UnaryExpression_analyze, (void*)UnaryExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)UnaryExpression_write_preactions};
 #endif
 
 
@@ -344,7 +344,7 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
   else {
     if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0) {
       /* := operator */
-      CHECK(176, TypeInstance_m_check_assign_from(self->left_expression->result_type, &(self->_base._base._base), &(self->_base.right_expression)) )
+      CHECK(176, TypeInstance_check_assign_from(self->left_expression->result_type, &(self->_base._base._base), &(self->_base.right_expression)) )
     }
     else {
       /* any other Int operator */
@@ -439,7 +439,7 @@ Returncode BinaryExpression_write(BinaryExpression* self) {
 extern Func BinaryExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BinaryExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)BinaryExpression_analyze, (void*)BinaryExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)BinaryExpression_write_preactions};
+Func BinaryExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)BinaryExpression_analyze, (void*)BinaryExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)BinaryExpression_write_preactions};
 #endif
 
 
@@ -532,7 +532,7 @@ Returncode QuestionExpression_write(QuestionExpression* self) {
 extern Func QuestionExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func QuestionExpression__dtl[] = {(void*)SyntaxTreeNode_m_link_types, (void*)QuestionExpression_analyze, (void*)QuestionExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)QuestionExpression_write_preactions};
+Func QuestionExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)QuestionExpression_analyze, (void*)QuestionExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)QuestionExpression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME
