@@ -81,19 +81,23 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       copy Char end,
       copy Bool is-parsed)
     is-parsed := end = ' '
+    user List{SyntaxTreeVariable} variables(self.variables)
+    if ? parent-block
+      variables := parent-block.variables
+    
     if not is-parsed
       return
       
     else-if keyword.equal(user "var")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
+      variables.add(owner SyntaxTreeVariable.parse-new(
           var _, copy ACCESS-VAR, user parent-type, user parent-block):(
           copy end))
     else-if keyword.equal(user "user")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
+      variables.add(owner SyntaxTreeVariable.parse-new(
           var _, copy ACCESS-USER, user parent-type, user parent-block):(
           copy end))
     else-if keyword.equal(user "owner")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
+      variables.add(owner SyntaxTreeVariable.parse-new(
           var _, copy ACCESS-OWNER, user parent-type, user parent-block):(
           copy end))
       

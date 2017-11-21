@@ -2,6 +2,8 @@
 
 /*traceback*/
 #define MR_FILE_NAME __FILE__
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
 
@@ -160,6 +162,45 @@ void MR_set_var_string_array(
     str->max_length = string_length;
     str->length = 0;
     str->values = chars + n * string_length;
+  }
+}
+
+/*reference counting*/
+void* MR_new_ref(void) {
+  RefManager* ref = malloc(sizeof(RefManager));
+  if (ref != NULL) {
+    ref->count = 1;
+  }
+  return ref;
+}
+
+void MR_inc_ref(void* _ref) {
+  RefManager* ref = _ref;
+  if (ref != NULL && ref->value != NULL) {
+    ++ref->count;
+  }
+}
+
+void dec_ref(RefManager* ref) {
+  --ref->count;
+  if (ref->count == 0) {
+    free(ref);
+  }
+}
+
+void MR_dec_ref(void* _ref) {
+  RefManager* ref = _ref;
+  if (ref != NULL) {
+    dec_ref(ref);
+  }
+}
+
+void MR_clean_owner(void* _ref) {
+  RefManager* ref = _ref;
+  if (ref != NULL) {
+    free(ref->value);
+    ref->value = NULL;
+    dec_ref(ref);
   }
 }
 

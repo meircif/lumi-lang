@@ -126,7 +126,7 @@ static char* _func_name_SyntaxTreeReturn_write = "SyntaxTreeReturn.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeReturn_write
 Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self) {
   CHECK(42, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(43, write(&(String){12, 11, "return OK;\n"}) )
+  CHECK(43, write(&(String){18, 17, "goto MR_cleanup;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

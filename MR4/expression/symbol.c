@@ -375,8 +375,8 @@ Returncode BaseMethExpression_analyze(BaseMethExpression* self) {
     CHECK(196, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "no base type for type"}, function->parent_type->name) )
   }
   if (self->is_call) {
-    Int _Int31;
-    CHECK(199, TypeData_find_meth(self->parent_type->base_type, function->name, &(self->function), &(_Int31)) )
+    Int _Int32;
+    CHECK(199, TypeData_find_meth(self->parent_type->base_type, function->name, &(self->function), &(_Int32)) )
     if (!(NULL != function)) {
       CHECK(202, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){26, 25, "no base method for method"}, function->name) )
     }
@@ -403,11 +403,11 @@ Returncode BaseMethExpression_analyze_call(BaseMethExpression* self, FunctionArg
   *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, NULL, NULL, false, false};
   self_param->_base._base._dtl = CallArgument__dtl;
   self_param->_base.access = ((Argument*)(self->function->arguments->parameters->first->item))->access;
-  BaseMethExpression* _BaseMethExpression32 = malloc(sizeof(BaseMethExpression));
-  if (_BaseMethExpression32 == NULL) RAISE(215)
-  *_BaseMethExpression32 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, false, false, false, false, NULL, NULL};
-  _BaseMethExpression32->_base._base._dtl = BaseMethExpression__dtl;
-  self_param->value = &(_BaseMethExpression32->_base);
+  BaseMethExpression* _BaseMethExpression33 = malloc(sizeof(BaseMethExpression));
+  if (_BaseMethExpression33 == NULL) RAISE(215)
+  *_BaseMethExpression33 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, false, false, false, false, NULL, NULL};
+  _BaseMethExpression33->_base._base._dtl = BaseMethExpression__dtl;
+  self_param->value = &(_BaseMethExpression33->_base);
   CHECK(216, TypeData_m_new_type_instance(self->parent_type, &(self_param->value->result_type)) )
   CHECK(217, List_prepend(arguments->parameters, &(self_param->_base)) )
   return OK;
@@ -686,8 +686,8 @@ Returncode NewExpression_analyze(NewExpression* self) {
   if (!(NULL != self->symbol)) {
     CHECK(320, (self->arguments)->_base._dtl[1](self->arguments) )
     CHECK(321, Expression_add_aux_variable(&(self->_base), ACCESS_NEW, self->_base.result_type, &(self->symbol)) )
-    Int _Int33;
-    CHECK(323, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int33)) )
+    Int _Int34;
+    CHECK(323, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int34)) )
     if (!(NULL != self->arguments->parameters->first) &&  ! (NULL != self->arguments->outputs->first) && (!(NULL != self->constructor) || self->_base.result_type->type_data == &(glob->type_string->_base))) {
       self->constructor = NULL;
       return OK;
@@ -703,8 +703,8 @@ Returncode NewExpression_analyze(NewExpression* self) {
     self_param->code_node = self->_base.code_node;
     self_param->value = self->symbol;
     CHECK(337, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-    Bool _Bool34;
-    CHECK(338, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, &(_Bool34)) )
+    Bool _Bool35;
+    CHECK(338, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, &(_Bool35)) )
   }
   return OK;
 }

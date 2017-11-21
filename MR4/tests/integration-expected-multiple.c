@@ -202,6 +202,7 @@ Returncode test_another(void);
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.new"
 Returncode TestStruct_new(TestStruct* self, Int x, String* s) {
+  Returncode MR_err = OK;
   TestStruct* aux_TestStruct_0 = NULL;
   if (self == NULL) RAISE(189)
   self->num = x;
@@ -212,7 +213,8 @@ Returncode TestStruct_new(TestStruct* self, Int x, String* s) {
   CHECK(191, TestStruct_new(aux_TestStruct_0, x + 1, s) )
   if (self == NULL) RAISE(191)
   self->ts = aux_TestStruct_0;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -220,11 +222,13 @@ Returncode TestStruct_new(TestStruct* self, Int x, String* s) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.get"
 Returncode TestStruct_get(TestStruct* self, Int* x, String** s) {
+  Returncode MR_err = OK;
   if (self == NULL) RAISE(198)
   *x = self->num;
   if (self == NULL) RAISE(199)
   *s = self->text;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -232,9 +236,11 @@ Returncode TestStruct_get(TestStruct* self, Int* x, String** s) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.print"
 Returncode TestStruct_print(TestStruct* self) {
+  Returncode MR_err = OK;
   if (self == NULL) RAISE(202)
   CHECK(202, Sys_println(sys, self->text) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -242,9 +248,11 @@ Returncode TestStruct_print(TestStruct* self) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestClass.new"
 Returncode TestClass_new(TestClass* self, TestClass_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   if (self == NULL) RAISE(210)
   self->num = 1;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -252,9 +260,11 @@ Returncode TestClass_new(TestClass* self, TestClass_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestClass.static-meth"
 Returncode TestClass_static_meth(TestClass* self, TestClass_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   if (self == NULL) RAISE(213)
   self->num = 3;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -262,9 +272,11 @@ Returncode TestClass_static_meth(TestClass* self, TestClass_Dynamic* self_Dynami
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestClass.dynamic-meth"
 Returncode TestClass_dynamic_meth(TestClass* self, TestClass_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   if (self == NULL) RAISE(216)
   self->num = 6;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -272,9 +284,11 @@ Returncode TestClass_dynamic_meth(TestClass* self, TestClass_Dynamic* self_Dynam
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestClass.print"
 Returncode TestClass_print(TestClass* self, TestClass_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   if (self == NULL) RAISE(219)
   CHECK(219, Sys_println(sys, self->text) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -282,9 +296,11 @@ Returncode TestClass_print(TestClass* self, TestClass_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.new"
 Returncode BaseType_new(BaseType* self, BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   if (self == NULL) RAISE(49)
   self->num_base = 1;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -292,13 +308,15 @@ Returncode BaseType_new(BaseType* self, BaseType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.meth0"
 Returncode BaseType_meth0(BaseType* self, BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 15;
   aux_String_0->length = 14;
   aux_String_0->values = "BaseType.meth0";
   CHECK(52, Sys_println(sys, aux_String_0) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -306,13 +324,15 @@ Returncode BaseType_meth0(BaseType* self, BaseType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.meth1"
 Returncode BaseType_meth1(BaseType* self, BaseType_Dynamic* self_Dynamic, Int n, String* s) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 15;
   aux_String_0->length = 14;
   aux_String_0->values = "BaseType.meth1";
   CHECK(55, Sys_println(sys, aux_String_0) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -320,13 +340,15 @@ Returncode BaseType_meth1(BaseType* self, BaseType_Dynamic* self_Dynamic, Int n,
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.meth2"
 Returncode BaseType_meth2(BaseType* self, BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 15;
   aux_String_0->length = 14;
   aux_String_0->values = "BaseType.meth2";
   CHECK(58, Sys_println(sys, aux_String_0) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -334,13 +356,15 @@ Returncode BaseType_meth2(BaseType* self, BaseType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "BaseType.meth3"
 Returncode BaseType_meth3(BaseType* self, BaseType_Dynamic* self_Dynamic, Int n, String* s) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 15;
   aux_String_0->length = 14;
   aux_String_0->values = "BaseType.meth3";
   CHECK(61, Sys_println(sys, aux_String_0) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -348,10 +372,12 @@ Returncode BaseType_meth3(BaseType* self, BaseType_Dynamic* self_Dynamic, Int n,
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.new"
 Returncode MiddleType_new(MiddleType* self, MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   CHECK(13, BaseType_new(&(self->_base), &(self_Dynamic->_base)) )
   if (self == NULL) RAISE(14)
   self->num_mid = 2;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -359,6 +385,7 @@ Returncode MiddleType_new(MiddleType* self, MiddleType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth1"
 Returncode MiddleType_meth1(MiddleType* self, MiddleType_Dynamic* self_Dynamic, Int n, String* s) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 17;
@@ -366,7 +393,8 @@ Returncode MiddleType_meth1(MiddleType* self, MiddleType_Dynamic* self_Dynamic, 
   aux_String_0->values = "MiddleType.meth1";
   CHECK(17, Sys_println(sys, aux_String_0) )
   CHECK(18, BaseType_meth1(&(self->_base), &(self_Dynamic->_base), n, s) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -374,6 +402,7 @@ Returncode MiddleType_meth1(MiddleType* self, MiddleType_Dynamic* self_Dynamic, 
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth2"
 Returncode MiddleType_meth2(MiddleType* self, MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 17;
@@ -381,7 +410,8 @@ Returncode MiddleType_meth2(MiddleType* self, MiddleType_Dynamic* self_Dynamic) 
   aux_String_0->values = "MiddleType.meth2";
   CHECK(21, Sys_println(sys, aux_String_0) )
   CHECK(22, BaseType_meth2(&(self->_base), &(self_Dynamic->_base)) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -389,13 +419,15 @@ Returncode MiddleType_meth2(MiddleType* self, MiddleType_Dynamic* self_Dynamic) 
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth4"
 Returncode MiddleType_meth4(MiddleType* self, MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 17;
   aux_String_0->length = 16;
   aux_String_0->values = "MiddleType.meth4";
   CHECK(25, Sys_println(sys, aux_String_0) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -403,13 +435,15 @@ Returncode MiddleType_meth4(MiddleType* self, MiddleType_Dynamic* self_Dynamic) 
 #define MR_FILE_NAME "tests/integration-test2.4.mr"
 #define MR_FUNC_NAME "MiddleType.meth5"
 Returncode MiddleType_meth5(MiddleType* self, MiddleType_Dynamic* self_Dynamic, Int n, String* s) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 17;
   aux_String_0->length = 16;
   aux_String_0->values = "MiddleType.meth5";
   CHECK(28, Sys_println(sys, aux_String_0) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -417,10 +451,12 @@ Returncode MiddleType_meth5(MiddleType* self, MiddleType_Dynamic* self_Dynamic, 
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.new"
 Returncode TopType_new(TopType* self, TopType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   CHECK(13, MiddleType_new(&(self->_base), &(self_Dynamic->_base)) )
   if (self == NULL) RAISE(14)
   self->num_top = 3;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -428,6 +464,7 @@ Returncode TopType_new(TopType* self, TopType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth2"
 Returncode TopType_meth2(TopType* self, TopType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 14;
@@ -437,7 +474,8 @@ Returncode TopType_meth2(TopType* self, TopType_Dynamic* self_Dynamic) {
   CHECK(19, MiddleType_meth2(&(self->_base), &(self_Dynamic->_base)) )
   CHECK(20, MiddleType_meth2(&(self->_base), &(self_Dynamic->_base)) )
   CHECK(21, BaseType_meth2(&(self->_base._base), &(self_Dynamic->_base._base)) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -445,6 +483,7 @@ Returncode TopType_meth2(TopType* self, TopType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth3"
 Returncode TopType_meth3(TopType* self, TopType_Dynamic* self_Dynamic, Int n, String* s) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 14;
@@ -452,7 +491,8 @@ Returncode TopType_meth3(TopType* self, TopType_Dynamic* self_Dynamic, Int n, St
   aux_String_0->values = "TopType.meth3";
   CHECK(24, Sys_println(sys, aux_String_0) )
   CHECK(25, BaseType_meth3(&(self->_base._base), &(self_Dynamic->_base._base), n, s) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -460,6 +500,7 @@ Returncode TopType_meth3(TopType* self, TopType_Dynamic* self_Dynamic, Int n, St
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth5"
 Returncode TopType_meth5(TopType* self, TopType_Dynamic* self_Dynamic, Int n, String* s) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   aux_String_0->max_length = 14;
@@ -469,7 +510,8 @@ Returncode TopType_meth5(TopType* self, TopType_Dynamic* self_Dynamic, Int n, St
   CHECK(29, MiddleType_meth5(&(self->_base), &(self_Dynamic->_base), n, s) )
   CHECK(30, MiddleType_meth1(NULL, NULL, n, s) )
   CHECK(31, BaseType_meth1(NULL, NULL, n, s) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -477,6 +519,7 @@ Returncode TopType_meth5(TopType* self, TopType_Dynamic* self_Dynamic, Int n, St
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.meth6"
 Returncode TopType_meth6(TopType* self, TopType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
   MiddleType* mt = NULL;
   MiddleType_Dynamic* mt_Dynamic = NULL;
   BaseType* bt = NULL;
@@ -503,7 +546,8 @@ Returncode TopType_meth6(TopType* self, TopType_Dynamic* self_Dynamic) {
   bt_Dynamic = &(mt_Dynamic->_base);
   if (bt != NULL) RAISE(40)
   CHECK(40, test_mid_out((void*)&(bt), (void*)&(bt_Dynamic)) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -514,7 +558,9 @@ Returncode TopType_meth6(TopType* self, TopType_Dynamic* self_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-simple-function"
 Returncode test_simple_function(void) {
-  return OK;
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -522,6 +568,7 @@ Returncode test_simple_function(void) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-const-expression"
 Returncode test_const_expression(Int* i, Char* c, String** s, TestStruct** t, TestClass** d, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void)) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   *i = (((((((0 + 9630) + -9630) + 07520) + -07520) + 0xfda940) + -0xfda940) + 0xFDA940) + -0xFDA940;
@@ -536,7 +583,8 @@ Returncode test_const_expression(Int* i, Char* c, String** s, TestStruct** t, Te
   *f = NULL;
   if (*f == NULL) RAISE(43)
   CHECK(43, (*f)() )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -544,6 +592,7 @@ Returncode test_const_expression(Int* i, Char* c, String** s, TestStruct** t, Te
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-member-expression"
 Returncode test_member_expression(TestStruct* t, TestStruct** to, Int* i) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   if (t == NULL) RAISE(47)
@@ -570,7 +619,8 @@ Returncode test_member_expression(TestStruct* t, TestStruct** to, Int* i) {
   aux_String_0->length = 0;
   aux_String_0->values = "";
   CHECK(52, TestStruct_new(t, 0, aux_String_0) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -578,6 +628,7 @@ Returncode test_member_expression(TestStruct* t, TestStruct** to, Int* i) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-slice-expression"
 Returncode test_slice_expression(String* s, Array* arri, Array* arrs, Array* arrt, Array* arrd, Array* arrf, Char* c, Int* i, TestStruct** t, TestClass** d, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void)) {
+  Returncode MR_err = OK;
   Array aux_Array_0_Var = {0};
   Array* aux_Array_0 = &aux_Array_0_Var;
   String aux_String_0_Var = {0};
@@ -673,7 +724,8 @@ Returncode test_slice_expression(String* s, Array* arri, Array* arrs, Array* arr
   if ((4) < 0 || (4) >= (arrf)->length) RAISE(79)
   if (((Returncode (**)(void))((arrf)->values))[4] == NULL) RAISE(79)
   CHECK(79, (((Returncode (**)(void))((arrf)->values))[4])() )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -681,9 +733,11 @@ Returncode test_slice_expression(String* s, Array* arri, Array* arrs, Array* arr
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-container-expression"
 Returncode test_container_expression(Int x, Int y, String* s, Int* i, Bool* b) {
+  Returncode MR_err = OK;
   *i = (- x) + (- (- (- y)));
   *b = (! (((! ((((x * 3) - 5) > (6 * y)) && ((6 * y) == 234))) && (! ((5 - x) < y))) || (! ((x == (-2 - (-4 * y))) && (((-6 > y) && (y >= 12)) && (12 == x)))))) && ((((- (2 + x)) > y) || (s != NULL)) || (! (s != NULL)));
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -691,6 +745,7 @@ Returncode test_container_expression(Int x, Int y, String* s, Int* i, Bool* b) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-variable"
 Returncode test_variable(Int i, String* text, Array* arr) {
+  Returncode MR_err = OK;
   Int x = 0;
   String* s = NULL;
   Array* a = NULL;
@@ -869,7 +924,8 @@ Returncode test_variable(Int i, String* text, Array* arr) {
   CHECK(154, fi(7, &(aux_String_2)) )
   TEST_ASSERT(155, isv != NULL)
   TEST_ASSERT(156, isn != NULL)
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -877,9 +933,11 @@ Returncode test_variable(Int i, String* text, Array* arr) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-complex-function"
 Returncode test_complex_function(Int num, String* text, Int* out_num, String** out_text) {
+  Returncode MR_err = OK;
   *out_num = num;
   *out_text = text;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -887,7 +945,10 @@ Returncode test_complex_function(Int num, String* text, Int* out_num, String** o
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-void"
 Returncode f_test_void(void) {
-  return OK;
+  Returncode MR_err = OK;
+  goto MR_cleanup;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -895,7 +956,10 @@ Returncode f_test_void(void) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-params"
 Returncode f_test_params(Int x, String* s, String* o) {
+  Returncode MR_err = OK;
   RAISE(225)
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -903,7 +967,9 @@ Returncode f_test_params(Int x, String* s, String* o) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-outs"
 Returncode f_test_outs(String** s, Int* x) {
-  return OK;
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -911,7 +977,9 @@ Returncode f_test_outs(String** s, Int* x) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-int2str"
 Returncode f_test_int2str(Int x, String** s) {
-  return OK;
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -919,7 +987,9 @@ Returncode f_test_int2str(Int x, String** s) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-int"
 Returncode f_test_int(Int x) {
-  return OK;
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -927,7 +997,9 @@ Returncode f_test_int(Int x) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-int2int"
 Returncode f_test_int2int(Int x, Int* r) {
-  return OK;
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -935,7 +1007,9 @@ Returncode f_test_int2int(Int x, Int* r) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-many"
 Returncode f_test_many(Int x, Int y, Int* n, Int* m) {
-  return OK;
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -943,6 +1017,7 @@ Returncode f_test_many(Int x, Int y, Int* n, Int* m) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-call-expression"
 Returncode test_call_expression(void) {
+  Returncode MR_err = OK;
   String* s = NULL;
   Int x = 0;
   Int tmp = 0;
@@ -968,7 +1043,8 @@ Returncode test_call_expression(void) {
   x = aux_Int_1 + aux_Int_0;
   CHECK(254, Mock_f_test_int2str(13, &(aux_String_1)) )
   s = aux_String_1;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -976,6 +1052,11 @@ Returncode test_call_expression(void) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-code-flow"
 Returncode test_code_flow(Array* arr, Int* res) {
+  Returncode MR_err = OK;
+  Int x = 0;
+  Int y = 0;
+  Int z = 0;
+  Int w = 0;
   if ((4) < 0 || (4) >= (arr)->length) RAISE(258)
   if ((((Int*)((arr)->values))[4]) > 6) {
     *res = 6;
@@ -1001,17 +1082,15 @@ Returncode test_code_flow(Array* arr, Int* res) {
       }
     }
   }
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(270)
+  x = ((Int*)((arr)->values))[2];
+  y = x - 1;
+  z = 7;
   while (true) {
-    Int x = 0;
-    Int y = 0;
     if ((6) < 0 || (6) >= (arr)->length) RAISE(269)
     ((Int*)((arr)->values))[6] = 6;
-    if ((2) < 0 || (2) >= (arr)->length) RAISE(270)
-    x = ((Int*)((arr)->values))[2];
     if (!(x > 3)) break;
-    y = x - 1;
     while (true) {
-      Int z = 0;
       if ((8) < 0 || (8) >= (arr)->length) RAISE(274)
       if ((4) < 0 || (4) >= (arr)->length) RAISE(274)
       ((Int*)((arr)->values))[4] = ((Int*)((arr)->values))[8];
@@ -1019,29 +1098,28 @@ Returncode test_code_flow(Array* arr, Int* res) {
       if (y > (((Int*)((arr)->values))[4])) {
         continue;
       }
-      z = 7;
       if ((4) < 0 || (4) >= (arr)->length) RAISE(278)
       if (z <= (((Int*)((arr)->values))[4])) {
         if (!(z > 0)) break;
       }
     }
   }
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(282)
+  w = ((Int*)((arr)->values))[0];
   if ((2) < 0 || (2) >= (arr)->length) RAISE(280)
   if ((2) < 0 || (2) >= (arr)->length) RAISE(280)
   {int n; for(n=((Int*)((arr)->values))[2]; n<2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
-    Int x = 0;
     if ((2) < 0 || (2) >= (arr)->length) RAISE(281)
     if ((0) < 0 || (0) >= (arr)->length) RAISE(281)
     ((Int*)((arr)->values))[0] = ((Int*)((arr)->values))[2];
-    if ((0) < 0 || (0) >= (arr)->length) RAISE(282)
-    x = ((Int*)((arr)->values))[0];
-    if (x > 4) {
+    if (w > 4) {
       if ((1) < 0 || (1) >= (arr)->length) RAISE(284)
-      ((Int*)((arr)->values))[1] = x;
+      ((Int*)((arr)->values))[1] = w;
     }
   }
   }
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -1049,6 +1127,7 @@ Returncode test_code_flow(Array* arr, Int* res) {
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-builtins"
 Returncode test_builtins(Int i, Char c, Bool b, String* s, Array* a) {
+  Returncode MR_err = OK;
   File* f = NULL;
   CHECK(289, Int_str(i, s) )
   b = true || false;
@@ -1080,7 +1159,8 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, Array* a) {
   CHECK(313, Sys_getenv(sys, s, s, &(b)) )
   CHECK(314, Sys_system(sys, s, &(i)) )
   CHECK(315, Sys_exit(sys, i) )
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -1088,13 +1168,15 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, Array* a) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "test-mid-out"
 Returncode test_mid_out(MiddleType** mt, MiddleType_Dynamic** mt_Dynamic) {
+  Returncode MR_err = OK;
   MiddleType* new_mt = NULL;
   MiddleType_Dynamic* new_mt_Dynamic = &MiddleType_dynamic;
   new_mt = calloc(1, sizeof(MiddleType));
   if (new_mt == NULL) RAISE(65)
   *mt_Dynamic = new_mt_Dynamic;
   *mt = new_mt;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -1102,6 +1184,7 @@ Returncode test_mid_out(MiddleType** mt, MiddleType_Dynamic** mt_Dynamic) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TestStruct.Mock get"
 Returncode TestStruct_Mock_get(TestStruct* self, Int* x, String** s) {
+  Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = &aux_String_0_Var;
   *x = 12;
@@ -1109,7 +1192,8 @@ Returncode TestStruct_Mock_get(TestStruct* self, Int* x, String** s) {
   aux_String_0->length = 0;
   aux_String_0->values = "";
   *s = aux_String_0;
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -1117,7 +1201,10 @@ Returncode TestStruct_Mock_get(TestStruct* self, Int* x, String** s) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "Mock f-test-int2str"
 Returncode Mock_f_test_int2str(Int x, String** s) {
+  Returncode MR_err = OK;
   RAISE(75)
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -1125,6 +1212,7 @@ Returncode Mock_f_test_int2str(Int x, String** s) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "test-func"
 Returncode test_func(void) {
+  Returncode MR_err = OK;
   TestStruct t_Var = {0};
   TestStruct* t = &t_Var;
   Int x = 0;
@@ -1143,7 +1231,8 @@ Returncode test_func(void) {
     MR_trace_stream = stdout;
     TEST_FAIL(83)
   } while (false);
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
@@ -1151,18 +1240,20 @@ Returncode test_func(void) {
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "test-another"
 Returncode test_another(void) {
+  Returncode MR_err = OK;
   Int x = 0;
   TEST_ASSERT(88, x == 0)
-  return OK;
+MR_cleanup:
+  return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
 USER_MAIN_HEADER {
-  Bool success = true;
+  Bool MR_success = true;
   RUN_TEST(test_func);
   RUN_TEST(test_another);
-  return success? OK : FAIL;
+  return MR_success? OK : FAIL;
 }
 
 TEST_MAIN_FUNC

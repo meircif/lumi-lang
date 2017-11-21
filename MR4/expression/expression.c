@@ -248,7 +248,9 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstanc
   symbol->_base.code_node = self->code_node;
   CHECK(165, TypeInstance_copy_new(type_instance, &(symbol->_base.result_type)) )
   symbol->_base.assignable = true;
-  CHECK(167, SyntaxTreeBlock_add_aux_variable(self->code_node->parent, access, type_instance, &(symbol->variable)) )
+  SyntaxTreeFunction* _SyntaxTreeFunction31;
+  CHECK(167, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction31)) )
+  CHECK(167, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction31, access, type_instance, &(symbol->variable)) )
   CHECK(169, string_new_copy(symbol->variable->name, &(symbol->name)) )
   (*expression) = &(symbol->_base);
   return OK;

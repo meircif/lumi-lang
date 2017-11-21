@@ -33,24 +33,17 @@ class SyntaxTreeCode(SyntaxTreeNode)
     is-end := false
 
 
-## Count occurrences of a specific type
-static TypeCount
-  user TypeData type-data
-  var Int count
-
-
 ## A basic code block node in the syntax tree
 class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeBlock parent
   owner List{SyntaxTreeCode} code-nodes
-  user List{TypeCount} aux-variables
   user SyntaxTreeIf previous-if
   owner SyntaxTreeVariable ref-variable
   var Bool is-in-loop
   
   func inst parse-block():(copy Char end)
     new List{SyntaxTreeCode} in self.code-nodes
-    self.parse-block-children(user _, user self):(copy end)
+    self.parse-block-children(user _, user self.get-function()):(copy end)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node
@@ -129,7 +122,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"new\", got", copy end)
-      self.variables.add(owner SyntaxTreeInitNew.parse-new(
+      self.get-function().variables.add(owner SyntaxTreeInitNew.parse-new(
           var _, user self):(copy end))
       
     else-if keyword.equal(user "assert")
@@ -170,39 +163,6 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   func dynamic get-function():(user SyntaxTreeFunction function)
     self.parent.get-function():(user function)
   
-  func inst add-aux-variable(copy Int access, user TypeInstance type-instance):(
-      user SyntaxTreeVariable new-variable)
-    var Int index(0)
-    user ListNode{TypeCount} node(self.aux-variables.first)
-    do
-      while ? node
-      while node.item.type-data != type-instance.type-data
-      node := node.next
-    if ? node
-      node.item.count += 1
-      index := node.item.count
-    else
-      new TypeCount type-count
-      type-count.type-data := type-instance.type-data
-      self.aux-variables.add(owner type-count)
-    new SyntaxTreeVariable variable
-    new String{type-instance.type-data.name.length +
-        21} in variable.name
-    variable.name.copy(user "aux_")
-    variable.name.concat(user type-instance.type-data.name)
-    variable.name.append(copy '_')
-    var String{16} index-str
-    index.str(user index-str)
-    variable.name.concat(user index-str)
-    variable.parent := self
-    if access = ACCESS-COPY
-      variable.access := ACCESS-VAR
-    else
-      variable.access := access
-    type-instance.copy-new():(owner variable.type-instance)
-    new-variable := variable
-    self.variables.add(owner variable)
-  
   func dynamic link-types()
     base.link-types()
     self.link-children-types(user self.code-nodes)
@@ -215,8 +175,13 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     # `previous-text` {
     #   `block...`
     # }
-    write(user " {\n")
-    base.write()
+    self.write-block-start()
     self.write-children(user self.code-nodes)
+    self.write-block-end()
+  
+  func inst write-block-start()
+    write(user " {\n")
+  
+  func inst write-block-end()
     write-spaces(copy self.indentation-spaces - 2)
     write(user "}\n")

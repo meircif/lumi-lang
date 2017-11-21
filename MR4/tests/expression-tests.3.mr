@@ -1,5 +1,8 @@
 ## MR4 compiler tests - Expression
 
+user String empty-func-body(" {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}\n")
+
+
 func test-code-setup(user String input-text)
   f-setup-test()
   set-mock-file-text(user "")
@@ -69,7 +72,6 @@ func test-code(user String input-text, user String expected-output)
   mock-func-header.concat(user ", String** so")
   mock-func-header.concat(user ", Int* io")
   mock-func-header.concat(user ")")
-  user String empty-func-body(" {\n  return OK;\n}\n")
   var String{4096} expected-header
   expected-header.copy(user "\ntypedef struct Test Test;\n")
   expected-header.concat(user "typedef struct Ta Ta;\n")
@@ -179,9 +181,9 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user ", Tb_Dynamic** tb_Dynamic)")
   expected-header.concat(user empty-func-body)
   expected-header.concat(user mock-func-header)
-  expected-header.concat(user " {\n  ")
+  expected-header.concat(user " {\n  Returncode MR_err = OK;\n  ")
   
-  user String expected-footer("\n  return OK;\n}\n")
+  user String expected-footer("\nMR_cleanup:\n  return MR_err;\n}\n")
   f-assert-string-slice(
       user expected-header,
       user mock-output-file-text,
@@ -454,18 +456,16 @@ func test-meth-code(user String input-text, user String expected-output)
   expected.concat(user "Returncode Mid_methm(Mid* self);\n")
   expected.concat(user "Returncode Top_methb(Top* self);\n")
   expected.concat(user "Returncode Top_methm(Top* self);\n")
-  expected.concat(user "Returncode Base_methb(Base* self) {\n")
-  expected.concat(user "  return OK;\n")
-  expected.concat(user "}\n")
-  expected.concat(user "Returncode Mid_methm(Mid* self) {\n")
-  expected.concat(user "  return OK;\n")
-  expected.concat(user "}\n")
-  expected.concat(user "Returncode Top_methb(Top* self) {\n")
-  expected.concat(user "  return OK;\n")
-  expected.concat(user "}\n")
-  expected.concat(user "Returncode Top_methm(Top* self) {\n  ")
+  expected.concat(user "Returncode Base_methb(Base* self)")
+  expected.concat(user empty-func-body)
+  expected.concat(user "Returncode Mid_methm(Mid* self)")
+  expected.concat(user empty-func-body)
+  expected.concat(user "Returncode Top_methb(Top* self)")
+  expected.concat(user empty-func-body)
+  expected.concat(user "Returncode Top_methm(Top* self) {\n")
+  expected.concat(user "  Returncode MR_err = OK;\n  ")
   expected.concat(user expected-output)
-  expected.concat(user "\n  return OK;\n")
+  expected.concat(user "\nMR_cleanup:\n  return MR_err;\n")
   expected.concat(user "}")
   test-global-scope(user input, user expected)
 

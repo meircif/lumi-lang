@@ -40,21 +40,6 @@ typedef struct {
   Array* argv;
 } Sys;
 
-#define MANAGER_TYPEDEF(type) \
-typedef struct { int ref_count; type* ref; } type##_Manager;
-
-#define STATIC_REF_TYPEDEF(type) \
-MANAGER_TYPEDEF(type) \
-typedef struct { type##_Manager* manager; } type##_ManagerRef; \
-typedef struct { type##_Manager* manager; type* ref; } type##_WeakRef;
-
-#define DYNAMIC_REF_TYPEDEF(type) \
-MANAGER_TYPEDEF(type) \
-typedef struct { type##_Manager* manager; type##_Dtl* dtl; } \
-type##_ManagerRef; \
-typedef struct { type##_Manager* manager; type* ref; type##_Dtl* dtl; } \
-type##_WeakRef;
-
 
 extern char* MR_raise_format;
 extern char* MR_assert_format;
@@ -66,7 +51,7 @@ void MR_trace_print(
   int line,
   char const* funcname);
 
-#define RETURN_ERROR(value) return value
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
 
 #define START_TRACE(line, value, format) { \
   MR_trace_print(format, MR_FILE_NAME, line, MR_FUNC_NAME); \
@@ -82,7 +67,7 @@ void MR_trace_print(
 
 #define TEST_ASSERT(line, condition) if (!(condition)) TEST_FAIL(line)
 
-#define RUN_TEST(test_func) success &= MR_run_test(#test_func, test_func)
+#define RUN_TEST(test_func) MR_success &= MR_run_test(#test_func, test_func)
 
 int MR_main(int argc, char* argv[]);
 int MR_test_main(int argc, char* argv[]);
@@ -94,6 +79,16 @@ int MR_test_main(int argc, char* argv[]);
 #define MAIN_FUNC MAIN_PROXY(MR_main)
 #define TEST_MAIN_FUNC MAIN_PROXY(MR_test_main)
 #define USER_MAIN_HEADER Returncode MR_user_main()
+
+typedef struct {
+  void* value;
+  int count;
+} RefManager;
+
+void* MR_new_ref(void);
+void MR_inc_ref(void* ref);
+void MR_dec_ref(void* ref);
+void MR_clean_owner(void* ref);
 
 String* MR_new_string(int length);
 Array* MR_new_array(int length, int value_size);

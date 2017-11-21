@@ -186,7 +186,7 @@ static char* _func_name_SyntaxTreeTestFunction_parse_new = "SyntaxTreeTestFuncti
 Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* end, SyntaxTreeTestFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeTestFunction));
   if ((*new_node) == NULL) RAISE(73)
-  *(*new_node) = (SyntaxTreeTestFunction){SyntaxTreeTestFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
+  *(*new_node) = (SyntaxTreeTestFunction){SyntaxTreeTestFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeTestFunction__dtl;
   CHECK(74, SyntaxTreeTestFunction_parse((*new_node), &((*end))) )
   return OK;
@@ -234,7 +234,7 @@ static char* _func_name_SyntaxTreeMockFunction_parse_new = "SyntaxTreeMockFuncti
 Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* end, SyntaxTreeMockFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMockFunction));
   if ((*new_node) == NULL) RAISE(89)
-  *(*new_node) = (SyntaxTreeMockFunction){SyntaxTreeMockFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, NULL};
+  *(*new_node) = (SyntaxTreeMockFunction){SyntaxTreeMockFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, NULL};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMockFunction__dtl;
   CHECK(90, SyntaxTreeMockFunction_parse((*new_node), &((*end))) )
   return OK;
@@ -285,14 +285,14 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
   SyntaxTreeFunction* mocked_func = NULL;
   if (NULL != self->type_name) {
     CHECK(111, SyntaxTreeNode_find_type(&(self->_base._base._base._base), self->type_name, &(self->_base.parent_type)) )
-    Int _Int105;
-    CHECK(112, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int105)) )
+    Int _Int106;
+    CHECK(112, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int106)) )
     if (!(NULL != mocked_func)) {
       CHECK(114, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base._base), &(String){23, 22, "mocking unknown method"}, self->mocked_name, &(String){8, 7, "of type"}, self->type_name) )
     }
-    TypeInstance* _TypeInstance106;
-    CHECK(119, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance106)) )
-    CHECK(119, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance106) )
+    TypeInstance* _TypeInstance107;
+    CHECK(119, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance107)) )
+    CHECK(119, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance107) )
   }
   else {
     CHECK(122, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
@@ -300,8 +300,8 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
       CHECK(124, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
     }
   }
-  Bool _Bool107;
-  CHECK(126, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool107)) )
+  Bool _Bool108;
+  CHECK(126, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool108)) )
   mocked_func->mocker_function = self;
   CHECK(128, SyntaxTreeFunction_analyze(&(self->_base)) )
   return OK;

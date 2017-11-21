@@ -164,8 +164,8 @@ class Expression(SyntaxTreeNode)
     symbol.code-node := self.code-node
     type-instance.copy-new():(owner symbol.result-type)
     symbol.assignable := true
-    self.code-node.parent.add-aux-variable(copy access, user type-instance):(
-        user symbol.variable)
+    self.code-node.get-function().add-aux-variable(
+        copy access, user type-instance):(user symbol.variable)
     string-new-copy(user symbol.variable.name):(owner symbol.name)
     expression := symbol
   

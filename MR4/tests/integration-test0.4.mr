@@ -279,9 +279,9 @@ func test-code-flow(user Array{Int} arr)->(copy Int res)
         while z > 0
   for n in arr[2]:2 - (3 * arr[2])
     arr[0] := arr[2]
-    var Int x(var arr[0])
-    if x > 4
-      arr[1] := x
+    var Int w(var arr[0])
+    if w > 4
+      arr[1] := w
 
 
 func test-builtins(

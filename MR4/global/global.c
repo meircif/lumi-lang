@@ -394,7 +394,7 @@ static char* _func_name_Global_add_builtin_function = "Global.add-builtin-functi
 Returncode Global_add_builtin_function(Global* self, String* name, TypeData* parent_type, SyntaxTreeNamespace* namespace, FunctionArguments** arguments) {
   BuiltinFunction* function = malloc(sizeof(BuiltinFunction));
   if (function == NULL) RAISE(320)
-  *function = (BuiltinFunction){BuiltinFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
+  *function = (BuiltinFunction){BuiltinFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   function->_base._base._base._base._dtl = BuiltinFunction__dtl;
   CHECK(321, SyntaxTreeFunction_init(&(function->_base)) )
   CHECK(322, string_new_copy(name, &(function->_base.name)) )

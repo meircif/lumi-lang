@@ -62,11 +62,11 @@ Returncode SyntaxTreeVariable_parse(SyntaxTreeVariable* self, Int access, TypeDa
     CHECK(35, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){31, 30, "expected space after type, got"}, (*end)) )
   }
   if (self->access == ACCESS_VAR) {
-    Bool _Bool123;
-    CHECK(37, String_equal(self->type_instance->name, &(String){6, 5, "Array"}, &(_Bool123)) )
     Bool _Bool124;
-    CHECK(37, String_equal(self->type_instance->name, &(String){7, 6, "String"}, &(_Bool124)) )
-    if (_Bool123 || _Bool124) {
+    CHECK(37, String_equal(self->type_instance->name, &(String){6, 5, "Array"}, &(_Bool124)) )
+    Bool _Bool125;
+    CHECK(37, String_equal(self->type_instance->name, &(String){7, 6, "String"}, &(_Bool125)) )
+    if (_Bool124 || _Bool125) {
       CHECK(39, SyntaxTreeInitVarSequence_init_new(NULL, self) )
     }
   }
@@ -91,40 +91,40 @@ Returncode SyntaxTreeVariable_check_name(SyntaxTreeVariable* self);
 static char* _func_name_SyntaxTreeVariable_check_name = "SyntaxTreeVariable.check-name";
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariable_check_name
 Returncode SyntaxTreeVariable_check_name(SyntaxTreeVariable* self) {
-  Bool _Bool125;
-  CHECK(50, f_is_legal_name(self->name, false, &(_Bool125)) )
-  if (!_Bool125) {
+  Bool _Bool126;
+  CHECK(50, f_is_legal_name(self->name, false, &(_Bool126)) )
+  if (!_Bool126) {
     CHECK(51, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "illegal variable name"}, self->name) )
   }
   if (NULL != self->parent_type) {
     SyntaxTreeVariable* field = NULL;
-    Int _Int126;
-    CHECK(54, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int126)) )
+    Int _Int127;
+    CHECK(54, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int127)) )
     if (NULL != field) {
       CHECK(56, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "redefinition of field"}, self->name) )
     }
     SyntaxTreeFunction* meth = NULL;
-    Int _Int127;
-    CHECK(58, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int127)) )
+    Int _Int128;
+    CHECK(58, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int128)) )
     if (NULL != meth) {
       CHECK(60, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){28, 27, "field name overrides method"}, self->name) )
     }
   }
   else {
-    SyntaxTreeVariable* _SyntaxTreeVariable128;
-    CHECK(63, (glob->root)->_base._base._base._dtl[4](glob->root, self->name, &(_SyntaxTreeVariable128)) )
-    if (NULL != _SyntaxTreeVariable128) {
+    SyntaxTreeVariable* _SyntaxTreeVariable129;
+    CHECK(63, (glob->root)->_base._base._base._dtl[4](glob->root, self->name, &(_SyntaxTreeVariable129)) )
+    if (NULL != _SyntaxTreeVariable129) {
       CHECK(64, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){32, 31, "redefinition of global variable"}, self->name) )
     }
-    SyntaxTreeFunction* _SyntaxTreeFunction129;
-    CHECK(66, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction129)) )
-    if (NULL != _SyntaxTreeFunction129) {
+    SyntaxTreeFunction* _SyntaxTreeFunction130;
+    CHECK(66, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction130)) )
+    if (NULL != _SyntaxTreeFunction130) {
       CHECK(67, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){33, 32, "variable name overrides function"}, self->name) )
     }
     if (NULL != self->_base.parent) {
-      SyntaxTreeVariable* _SyntaxTreeVariable130;
-      CHECK(70, (self->_base.parent)->_base._base._dtl[4](self->_base.parent, self->name, &(_SyntaxTreeVariable130)) )
-      if (NULL != _SyntaxTreeVariable130) {
+      SyntaxTreeVariable* _SyntaxTreeVariable131;
+      CHECK(70, (self->_base.parent)->_base._base._dtl[4](self->_base.parent, self->name, &(_SyntaxTreeVariable131)) )
+      if (NULL != _SyntaxTreeVariable131) {
         CHECK(71, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){25, 24, "redefinition of variable"}, self->name) )
       }
     }
@@ -574,8 +574,8 @@ static char* _func_name_SyntaxTreeVariableInit_analyze = "SyntaxTreeVariableInit
 Returncode SyntaxTreeVariableInit_analyze(SyntaxTreeVariableInit* self) {
   CHECK(299, (self->arguments)->_base._dtl[1](self->arguments) )
   if ((self->_base.variable->access == ACCESS_VAR || self->_base.variable->access == ACCESS_NEW) &&  ! self->_base.variable->type_instance->type_data->is_primitive) {
-    Int _Int131;
-    CHECK(303, TypeData_find_meth(self->_base.variable->type_instance->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int131)) )
+    Int _Int132;
+    CHECK(303, TypeData_find_meth(self->_base.variable->type_instance->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int132)) )
     if (!(NULL != self->constructor)) {
       CHECK(306, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){23, 22, "no contructor for type"}, self->_base.variable->type_instance->type_data->name) )
     }
@@ -594,8 +594,8 @@ Returncode SyntaxTreeVariableInit_analyze(SyntaxTreeVariableInit* self) {
     CHECK(316, TypeInstance_copy_new(self->_base.variable->type_instance, &(symbol->_base.result_type)) )
     self_param->value = &(symbol->_base);
     CHECK(318, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-    Bool _Bool132;
-    CHECK(319, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, &(_Bool132)) )
+    Bool _Bool133;
+    CHECK(319, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, &(_Bool133)) )
     
   }
   else {
@@ -604,11 +604,11 @@ Returncode SyntaxTreeVariableInit_analyze(SyntaxTreeVariableInit* self) {
     *self->expected_arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
     self->expected_arguments->_base._dtl = FunctionArguments__dtl;
     CHECK(323, FunctionArguments_init(self->expected_arguments) )
-    TypeInstance* _TypeInstance133;
-    CHECK(324, TypeInstance_copy_new(self->_base.variable->type_instance, &(_TypeInstance133)) )
-    CHECK(324, FunctionArguments_add_self_parameter(self->expected_arguments, _TypeInstance133) )
-    Bool _Bool134;
-    CHECK(326, FunctionArguments_check_same_as(self->arguments, self->expected_arguments, &(_Bool134)) )
+    TypeInstance* _TypeInstance134;
+    CHECK(324, TypeInstance_copy_new(self->_base.variable->type_instance, &(_TypeInstance134)) )
+    CHECK(324, FunctionArguments_add_self_parameter(self->expected_arguments, _TypeInstance134) )
+    Bool _Bool135;
+    CHECK(326, FunctionArguments_check_same_as(self->arguments, self->expected_arguments, &(_Bool135)) )
   }
   return OK;
 }
