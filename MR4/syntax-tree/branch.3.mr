@@ -83,7 +83,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     is-parsed := end = ' '
     user List{SyntaxTreeVariable} variables(self.variables)
     if ? parent-block
-      variables := parent-block.variables
+      variables := parent-block.get-function().variables
     
     if not is-parsed
       return

@@ -41,10 +41,9 @@ class CallExpression(Expression)
       new CallArgument output
       output.is-output := true
       output.access := declaration.outputs.last.item.access
-      self.add-aux-variable(
+      output.value := self.add-aux-variable(
           copy declaration.outputs.last.item.access,
-          user declaration.get-result-type()):(
-          owner output.value)
+          user declaration.get-result-type())
       self.output := output.value
       self.arguments.outputs.add(owner output)
     else-if ? self.result-type
@@ -140,7 +139,6 @@ class CallArgument(Argument)
       self.value.write-dynamic()
       if self.is-output
         write(user ")")
-      
 
 
 class CallArgumentFactory(ArgumentFactory)

@@ -139,10 +139,13 @@ class MemberExpression(SymbolExpression)
       return
     if ? self.instance
       self.instance.write-preactions()
-    # if (`instance` == NULL) RAISE(`line-num`)
+    # if (`instance` == NULL[ || *`instance` == NULL]) RAISE(`line-num`)
     write(user "if (")
     if ? self.instance
       self.instance.write()
+      if not self.instance.result-type.type-data.is-primitive
+        write(user " == NULL || *")
+        self.instance.write()
     else-if ? self.dynamic-call-self-instance
       self.dynamic-call-self-instance.write-dynamic()
     write(user " == NULL) ")
@@ -157,7 +160,12 @@ class MemberExpression(SymbolExpression)
       return
     if ? self.instance and not (? self.function) and
         self.instance.result-type.type-data != glob.type-type
+      if not self.instance.result-type.type-data.is-primitive
+        write(user "(*")
+        self.instance.top := true
       self.instance.write()
+      if not self.instance.result-type.type-data.is-primitive
+        write(user ")")
       self.write-bases()
     base.write()
   
@@ -243,9 +251,10 @@ class UpCastExpression(Expression)
   
   func dynamic write()
     # &(`expression`->_base[._base]...)
-    self.write-pre()
+    # self.write-pre()
+    write(user "(void*)")
     self.expression.write()
-    self.write-post()
+    # self.write-post()
   
   func dynamic write-dynamic()
     self.write-pre()
@@ -270,9 +279,9 @@ class TypeExpression(Expression)
     type-instance.parse-name(user text, user code-node, user code-node):(
         copy end)
     if end = '('
-      new NewExpression new-expression
-      new-expression.parse(owner type-instance, user code-node):(copy end)
-      expression := new-expression
+      new InitExpression expression-init
+      expression-init.parse(owner type-instance, user code-node):(copy end)
+      expression := expression-init
     else
       new TypeExpression type-expression
       type-expression.parse(owner type-instance)
@@ -290,79 +299,136 @@ class TypeExpression(Expression)
     write-cname(user self.result-type.sub-type.type-data.name)
 
 
-## Dynamic allocation expression
-class NewExpression(Expression)
+## Initialization expression
+class InitExpression(Expression)
   owner FunctionArguments arguments
-  owner Expression symbol
+  owner SymbolExpression symbol
   user SyntaxTreeFunction constructor
+  owner Expression value
   
   func inst parse(
       owner TypeInstance result-type, user SyntaxTreeCode code-node):(
       copy Char end)
-    self.init(owner result-type, user code-node)
-    new FunctionArguments in self.arguments
-    var CallArgumentFactory argument-factory
-    self.arguments.parse(user argument-factory, user code-node):(copy end)
-  
-  func inst init(owner TypeInstance result-type, user SyntaxTreeCode code-node)
     self.code-node := code-node
     self.result-type := result-type
     self.set-location()
+    new FunctionArguments in self.arguments
+    if end = '('
+      var CallArgumentFactory argument-factory
+      self.arguments.parse(user argument-factory, user code-node):(copy end)
+    else
+      self.arguments.init()
   
   func dynamic analyze()
     self.result-type.analyze(user self)
-    if self.result-type.type-data.is-primitive
+    
+    self.arguments.analyze()
+    if ? self.symbol
+      self.symbol.result-type.analyze(user self)
+    else
+      self.add-aux-variable(copy ACCESS-NEW, user self.result-type):(
+          owner self.symbol)
+    
+    if self.symbol.variable.access = ACCESS-NEW and
+        self.result-type.type-data.is-primitive
       self.m-syntax-error(
           user "dynamic allocation of primitive type",
           user self.result-type.type-data.name)
-    self.result-type.check-sequence(user self)
-    if not (? self.symbol)
-      self.arguments.analyze()
-      self.add-aux-variable(copy ACCESS-NEW, user self.result-type):(
-          owner self.symbol)
+    
+    if not self.result-type.type-data.is-primitive and
+        (self.symbol.variable.access = ACCESS-VAR or
+        self.symbol.variable.access = ACCESS-NEW)
+      self.result-type.check-sequence(user self)
       self.result-type.type-data.find-meth(user "new"):(user self.constructor)
       if not (? self.arguments.parameters.first) and
           not (? self.arguments.outputs.first) and (not (? self.constructor) or
           self.result-type.type-data = glob.type-string)
         self.constructor := _
-        return
-      if not (? self.constructor)
+      else-if not (? self.constructor)
         self.m-syntax-error(
             user "no contructor for type", user self.result-type.type-data.name)
-      new CallArgument self-param
-      self-param.access :=
-          self.constructor.arguments.parameters.first.item.access
-      self-param.code-node := self.code-node
-      self-param.value := self.symbol
-      self.arguments.parameters.prepend(owner self-param)
-      self.arguments.check-same-as(user self.constructor.arguments)
+      else
+        new CallArgument self-param
+        self-param.access :=
+            self.constructor.arguments.parameters.first.item.access
+        self-param.code-node := self.code-node
+        self-param.value := self.symbol
+        self.arguments.parameters.prepend(owner self-param)
+        self.arguments.check-same-as(user self.constructor.arguments)
+      
+    else-if ? self.arguments.parameters.first
+      if ? self.arguments.parameters.first.next or
+          ? self.arguments.outputs.first
+        self.m-syntax-error-msg(
+            user "only one initialization parameter expected")
+      user Argument param(self.arguments.parameters.first.item)
+      param.check-same-type-as(user self.result-type)
   
   func inst write-allocation()
-    # `symbol` = `...`
-    # if (`symbol` == NULL) raise(`line-num`)
+    self.arguments.write-preactions()
     if self.result-type.type-data = glob.type-array or
         self.result-type.type-data = glob.type-string
-      if not (? self.result-type.length)
-        raise
       self.result-type.length.write-preactions()
     if self.result-type.type-data = glob.type-array and
         self.result-type.sub-type.type-data = glob.type-string
-      if not (? self.result-type.sub-type.length)
-        raise
       self.result-type.sub-type.length.write-preactions()
+    
+    self.write-ref-init(user self.symbol)
+    
+    if self.symbol.variable.access = ACCESS-VAR
+      self.write-var-init()
+    else
+      self.write-new-init()
+    
+    if ? self.constructor
+      self.code-node.write-spaces()
+      self.write-call()
+      self.constructor.write-cname()
+      self.arguments.write-call()
+      write(user " )\n")
+  
+  func inst write-var-init()
+    self.write-init-var-ref(user self.symbol)
+    
+    if self.result-type.type-data = glob.type-array or
+        self.result-type.type-data = glob.type-string
+      # `symbol`_Var.values = `symbol`_Values;
+      self.code-node.write-spaces()
+      self.symbol.write()
+      write(user "_Var.values = ")
+      self.symbol.write()
+      write(user "_Values;\n")
+      if self.result-type.type-data = glob.type-array and
+          self.result-type.sub-type.type-data = glob.type-string
+        # MR_set_var_string_array(
+        #    `array-length`, `string-length`, `name`, `name`_Chars);
+        self.code-node.write-spaces()
+        write(user "MR_set_var_string_array(")
+        self.result-type.length.write()
+        write(user ", ")
+        self.result-type.sub-type.length.write()
+        write(user ", ")
+        self.symbol.write()
+        write(user ", ")
+        self.symbol.write()
+        write(user "_Chars);\n")
+  
+  func inst write-new-init()
+    self.code-node.write-spaces()
+    write(user "*")
     self.symbol.write()
     write(user " = ")
     
     if self.result-type.type-data = glob.type-array
       if self.result-type.sub-type.type-data = glob.type-string
-        # MR_new_string_array(length, string-length);
+        # MR_new_string_array(`length`, `string-length`);
         write(user "MR_new_string_array(")
         self.result-type.length.write()
         write(user ", ")
         self.result-type.sub-type.length.write()
         
       else
-        # MR_new_array(length, sizeof(SubType));
+        # MR_new_array(`length`, sizeof(`SubType`));
         write(user "MR_new_array(")
         self.result-type.length.write()
         write(user ", sizeof(")
@@ -370,7 +436,7 @@ class NewExpression(Expression)
         write(user ")")
         
     else-if self.result-type.type-data = glob.type-string
-      # MR_new_string(length);
+      # MR_new_string(`length`);
       write(user "MR_new_string(")
       self.result-type.length.write()
       
@@ -381,17 +447,31 @@ class NewExpression(Expression)
       write(user ")")
     
     write(user ");\n")
+    
+    # if (*`symbol` == NULL) raise(`line-num`)
     self.code-node.write-spaces()
-    write(user "if (")
+    write(user "if (*")
     self.symbol.write()
     write(user " == NULL) ")
     self.write-raise()
-    if ? self.constructor
+  
+  func inst write-assign()
+    # `name` = `value`;
+    user Expression value
+    self.arguments.parameters.first.item.get-output():(user value)
+    self.code-node.write-spaces()
+    value.write-preactions()
+    self.symbol.write()
+    write(user " = ")
+    value.write()
+    write(user ";\n")
+    if self.result-type.type-data.is-dynamic
+      # `name`_Dynamic = `Type`_Dynamic;
       self.code-node.write-spaces()
-      self.write-call()
-      self.constructor.write-cname()
-      self.arguments.write-call()
-      write(user " )\n")
+      self.symbol.write()
+      write(user "_Dynamic = ")
+      value.write-dynamic()
+      write(user ";\n")
   
   func dynamic write-preactions()
     self.write-allocation()
@@ -399,6 +479,12 @@ class NewExpression(Expression)
   
   func dynamic write()
     if self.is-statement
-      self.write-allocation()
+      if not self.result-type.type-data.is-primitive and
+          (self.symbol.variable.access = ACCESS-VAR or
+          self.symbol.variable.access = ACCESS-NEW)
+        self.code-node.write-spaces()
+        self.write-allocation()
+      else-if ? self.arguments.parameters.first
+        self.write-assign()
     else
       self.symbol.write()

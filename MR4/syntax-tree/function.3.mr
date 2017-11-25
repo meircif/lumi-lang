@@ -332,7 +332,7 @@ class DeclarationArgument(Argument)
     # `type`[*][*] `name`[, `type`_Dynamic*[*] `name`_Dynamic]
     write-cname(user self.variable.type-instance.type-data.name)
     if self.access != ACCESS-COPY
-      write(user "*")
+      write(user "**")
     if self.is-output
       write(user "*")
     write(user " ")

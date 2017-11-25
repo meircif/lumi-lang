@@ -132,7 +132,12 @@ static char* _func_name_file_putc = "file-putc";
 #define MR_FUNC_NAME _func_name_file_putc
 Returncode file_putc(File* file, Char ch) {
   TEST_ASSERT(40, file == glob->output_file)
-  CHECK(41, String_append(mock_output_file_text, ch) )
+  if (mock_output_file_text->length == 4096) {
+    CHECK(42, Sys_print_raw(sys, &(String){14, 13, "full output ["}) )
+    CHECK(43, Sys_print_raw(sys, mock_output_file_text) )
+    CHECK(44, Sys_print(sys, &(String){2, 1, "]"}) )
+  }
+  CHECK(45, String_append(mock_output_file_text, ch) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -144,12 +149,12 @@ Returncode file_write(File* file, String* text);
 static char* _func_name_file_write = "file-write";
 #define MR_FUNC_NAME _func_name_file_write
 Returncode file_write(File* file, String* text) {
-  TEST_ASSERT(44, file == glob->output_file)
+  TEST_ASSERT(48, file == glob->output_file)
   {int n; for (n = (0); n < (text->length); ++n) {
-    if ((n) < 0 || (n) >= (text)->length) RAISE(46)
+    if ((n) < 0 || (n) >= (text)->length) RAISE(50)
     Char ch = ((text)->values[n]);
     if (ch != '\n' || ch != mock_output_file_last) {
-      CHECK(48, String_append(mock_output_file_text, ch) )
+      CHECK(52, String_append(mock_output_file_text, ch) )
     }
     mock_output_file_last = ch;
   }}
@@ -209,14 +214,14 @@ static char* _func_name_f_setup_test = "f-setup-test";
 Returncode f_setup_test() {
   free(glob->operator_map);
   free(glob->type_map);
-  CHECK(66, Global_init(glob) )
+  CHECK(70, Global_init(glob) )
   glob->input_file_name = mock_input_file_name;
-  CHECK(68, String_copy(glob->input_file_name, &(String){10, 9, "mock.3.mr"}) )
+  CHECK(72, String_copy(glob->input_file_name, &(String){10, 9, "mock.3.mr"}) )
   glob->line_number = 0;
   glob->save_input = false;
-  CHECK(71, String_clear(mock_print_text) )
-  CHECK(72, String_clear(mock_input_file_text) )
-  CHECK(73, String_clear(mock_output_file_text) )
+  CHECK(75, String_clear(mock_print_text) )
+  CHECK(76, String_clear(mock_input_file_text) )
+  CHECK(77, String_clear(mock_output_file_text) )
   mock_output_file_last = '\0';
   mock_input_file_index = 0;
   mock_print_active = false;
@@ -236,28 +241,28 @@ static char* _func_name_f_assert_string_slice = "f-assert-string-slice";
 Returncode f_assert_string_slice(String* expected, String* actual, Int start, Int length) {
   String* actual_slice = &(String){1, 0, ""};
   if (actual->length >= start + length) {
-    if ((start) < 0 || (length) < 0 || (start) + (length) > (actual)->length) RAISE(85)
+    if ((start) < 0 || (length) < 0 || (start) + (length) > (actual)->length) RAISE(89)
     actual_slice = (&(String){length, length, (actual)->values + (start)});
-    Bool _Bool136;
-    CHECK(86, String_equal(actual_slice, expected, &(_Bool136)) )
-    if (_Bool136) {
+    Bool _Bool133;
+    CHECK(90, String_equal(actual_slice, expected, &(_Bool133)) )
+    if (_Bool133) {
       return OK;
     }
   }
   else {
     if (actual->length > start) {
-      if ((start) < 0 || (actual->length - start) < 0 || (start) + (actual->length - start) > (actual)->length) RAISE(89)
+      if ((start) < 0 || (actual->length - start) < 0 || (start) + (actual->length - start) > (actual)->length) RAISE(93)
       actual_slice = (&(String){actual->length - start, actual->length - start, (actual)->values + (start)});
     }
   }
-  CHECK(90, Sys_print_raw(sys, &(String){12, 11, "[expected `"}) )
-  CHECK(91, Sys_print_raw(sys, expected) )
-  CHECK(92, Sys_print_raw(sys, &(String){9, 8, "`, got `"}) )
-  CHECK(93, Sys_print_raw(sys, actual_slice) )
-  CHECK(94, Sys_print_raw(sys, &(String){4, 3, "`] "}) )
-  CHECK(95, write_new_file(&(String){13, 12, "expected.txt"}, expected) )
-  CHECK(96, write_new_file(&(String){11, 10, "actual.txt"}, actual_slice) )
-  TEST_ASSERT(97, false)
+  CHECK(94, Sys_print_raw(sys, &(String){12, 11, "[expected `"}) )
+  CHECK(95, Sys_print_raw(sys, expected) )
+  CHECK(96, Sys_print_raw(sys, &(String){9, 8, "`, got `"}) )
+  CHECK(97, Sys_print_raw(sys, actual_slice) )
+  CHECK(98, Sys_print_raw(sys, &(String){4, 3, "`] "}) )
+  CHECK(99, write_new_file(&(String){13, 12, "expected.txt"}, expected) )
+  CHECK(100, write_new_file(&(String){11, 10, "actual.txt"}, actual_slice) )
+  TEST_ASSERT(101, false)
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -270,9 +275,9 @@ static char* _func_name_write_new_file = "write-new-file";
 #define MR_FUNC_NAME _func_name_write_new_file
 Returncode write_new_file(String* filename, String* data) {
   File* file = NULL;
-  CHECK(101, file_open_write(filename, &(file)) )
-  CHECK(102, File_write(file, data) )
-  CHECK(103, File_close(file) )
+  CHECK(105, file_open_write(filename, &(file)) )
+  CHECK(106, File_write(file, data) )
+  CHECK(107, File_close(file) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -284,8 +289,8 @@ Returncode f_assert_string(String* expected, String* actual);
 static char* _func_name_f_assert_string = "f-assert-string";
 #define MR_FUNC_NAME _func_name_f_assert_string
 Returncode f_assert_string(String* expected, String* actual) {
-  TEST_ASSERT(106, NULL != actual)
-  CHECK(107, f_assert_string_slice(expected, actual, 0, actual->length) )
+  TEST_ASSERT(110, NULL != actual)
+  CHECK(111, f_assert_string_slice(expected, actual, 0, actual->length) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -300,30 +305,30 @@ static char* _func_name_test_list = "test-list";
 #define MR_FUNC_NAME _func_name_test_list
 Returncode test_list() {
   List* list = &(List){NULL, NULL};
+  String* _String134;
+  CHECK(117, List_pop(list, (void**)&(_String134)) )
+  TEST_ASSERT(117, !(NULL != _String134))
+  String* _String135;
+  CHECK(118, string_new_copy(&(String){7, 6, "value1"}, &(_String135)) )
+  CHECK(118, List_add(list, _String135) )
+  String* _String136;
+  CHECK(119, string_new_copy(&(String){7, 6, "value2"}, &(_String136)) )
+  CHECK(119, List_add(list, _String136) )
   String* _String137;
-  CHECK(113, List_pop(list, (void**)&(_String137)) )
-  TEST_ASSERT(113, !(NULL != _String137))
+  CHECK(120, string_new_copy(&(String){7, 6, "value3"}, &(_String137)) )
+  CHECK(120, List_add(list, _String137) )
   String* _String138;
-  CHECK(114, string_new_copy(&(String){7, 6, "value1"}, &(_String138)) )
-  CHECK(114, List_add(list, _String138) )
+  CHECK(121, List_pop(list, (void**)&(_String138)) )
+  CHECK(121, f_assert_string(&(String){7, 6, "value1"}, _String138) )
   String* _String139;
-  CHECK(115, string_new_copy(&(String){7, 6, "value2"}, &(_String139)) )
-  CHECK(115, List_add(list, _String139) )
+  CHECK(122, List_pop(list, (void**)&(_String139)) )
+  CHECK(122, f_assert_string(&(String){7, 6, "value2"}, _String139) )
   String* _String140;
-  CHECK(116, string_new_copy(&(String){7, 6, "value3"}, &(_String140)) )
-  CHECK(116, List_add(list, _String140) )
+  CHECK(123, List_pop(list, (void**)&(_String140)) )
+  CHECK(123, f_assert_string(&(String){7, 6, "value3"}, _String140) )
   String* _String141;
-  CHECK(117, List_pop(list, (void**)&(_String141)) )
-  CHECK(117, f_assert_string(&(String){7, 6, "value1"}, _String141) )
-  String* _String142;
-  CHECK(118, List_pop(list, (void**)&(_String142)) )
-  CHECK(118, f_assert_string(&(String){7, 6, "value2"}, _String142) )
-  String* _String143;
-  CHECK(119, List_pop(list, (void**)&(_String143)) )
-  CHECK(119, f_assert_string(&(String){7, 6, "value3"}, _String143) )
-  String* _String144;
-  CHECK(120, List_pop(list, (void**)&(_String144)) )
-  TEST_ASSERT(120, !(NULL != _String144))
+  CHECK(124, List_pop(list, (void**)&(_String141)) )
+  TEST_ASSERT(124, !(NULL != _String141))
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -339,23 +344,23 @@ static char* _func_name_test_name_map = "test-name-map";
 #define MR_FUNC_NAME _func_name_test_name_map
 Returncode test_name_map() {
   NameMap* map = &(NameMap){NULL, NULL};
+  String* _String142;
+  CHECK(131, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String142)) )
+  TEST_ASSERT(131, !(NULL != _String142))
+  CHECK(132, NameMap_add(map, &(String){6, 5, "name1"}, &(String){7, 6, "value1"}) )
+  String* _String143;
+  CHECK(133, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String143)) )
+  CHECK(133, f_assert_string(&(String){7, 6, "value1"}, _String143) )
+  String* _String144;
+  CHECK(134, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String144)) )
+  TEST_ASSERT(134, !(NULL != _String144))
+  CHECK(135, NameMap_add(map, &(String){6, 5, "name2"}, &(String){7, 6, "value2"}) )
   String* _String145;
-  CHECK(127, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String145)) )
-  TEST_ASSERT(127, !(NULL != _String145))
-  CHECK(128, NameMap_add(map, &(String){6, 5, "name1"}, &(String){7, 6, "value1"}) )
+  CHECK(136, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String145)) )
+  CHECK(136, f_assert_string(&(String){7, 6, "value1"}, _String145) )
   String* _String146;
-  CHECK(129, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String146)) )
-  CHECK(129, f_assert_string(&(String){7, 6, "value1"}, _String146) )
-  String* _String147;
-  CHECK(130, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String147)) )
-  TEST_ASSERT(130, !(NULL != _String147))
-  CHECK(131, NameMap_add(map, &(String){6, 5, "name2"}, &(String){7, 6, "value2"}) )
-  String* _String148;
-  CHECK(132, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String148)) )
-  CHECK(132, f_assert_string(&(String){7, 6, "value1"}, _String148) )
-  String* _String149;
-  CHECK(133, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String149)) )
-  CHECK(133, f_assert_string(&(String){7, 6, "value2"}, _String149) )
+  CHECK(137, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String146)) )
+  CHECK(137, f_assert_string(&(String){7, 6, "value2"}, _String146) )
   return OK;
 }
 #undef MR_FUNC_NAME

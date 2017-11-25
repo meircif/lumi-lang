@@ -6,6 +6,7 @@
 #define RETURN_ERROR(value) return value
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
+#define CHECK_NOT_NULL(ref) if (ref == NULL || *ref == NULL) { CRAISE }
 
 char* MR_raise_format = "Error raised in %s:%d %s()\n";
 char* MR_assert_format = "Assert failed in %s:%d %s()\n";
@@ -39,14 +40,16 @@ int MR_main(int argc, char* argv[]) {
   Returncode err;
   MR_trace_stream = stderr;
   args_strings = malloc(argc * sizeof(String));
-  if (args_strings == NULL) {
+  sys_Var.argv = MR_new_ref();
+  sys = MR_new_ref();
+  if (args_strings == NULL || sys_Var.argv == NULL || sys == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
   sys_argv.length = argc;
   sys_argv.values = args_strings;
-  sys_Var.argv = &sys_argv;
-  sys = &sys_Var;
+  *(sys_Var.argv) = &sys_argv;
+  *sys = &sys_Var;
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
     args_strings[arg].length = cstring_length(argv[arg], 1024);
@@ -92,7 +95,10 @@ Bool MR_run_test(char* test_name, Func test_func) {
 
 /*helpers*/
 #define MR_FUNC_NAME "set_cstring"
-Returncode set_cstring(String* str) {
+Returncode set_cstring(String** _str) {
+  String* str;
+  CHECK_NOT_NULL(_str)
+  str = *_str;
   if (str->length >= str->max_length) {
     if (cstring_length(str->values, str->max_length) >= str->max_length) {
       CRAISE
@@ -154,11 +160,11 @@ Array* MR_new_string_array(int array_length, int string_length) {
 }
 
 void MR_set_var_string_array(
-  int array_length, int string_length, Array* array, char* chars) {
+  int array_length, int string_length, Array** array, char* chars) {
   int n;
   for (n = 0; n < array_length; ++n) {
     String* str;
-    str = ((String*)(array->values)) + n;
+    str = ((String*)((*array)->values)) + n;
     str->max_length = string_length;
     str->length = 0;
     str->values = chars + n * string_length;
@@ -175,8 +181,8 @@ void* MR_new_ref(void) {
 }
 
 void MR_inc_ref(void* _ref) {
-  RefManager* ref = _ref;
-  if (ref != NULL && ref->value != NULL) {
+  if (_ref != NULL) {
+    RefManager* ref = _ref;
     ++ref->count;
   }
 }
@@ -188,16 +194,15 @@ void dec_ref(RefManager* ref) {
   }
 }
 
-void MR_dec_ref(void* _ref) {
-  RefManager* ref = _ref;
+void MR_dec_ref(void* ref) {
   if (ref != NULL) {
     dec_ref(ref);
   }
 }
 
 void MR_clean_owner(void* _ref) {
-  RefManager* ref = _ref;
-  if (ref != NULL) {
+  if (_ref != NULL) {
+    RefManager* ref = _ref;
     free(ref->value);
     ref->value = NULL;
     dec_ref(ref);
@@ -205,44 +210,52 @@ void MR_clean_owner(void* _ref) {
 }
 
 /*Files*/
-#define MR_FUNC_NAME "open_file"
-Returncode open_file(File** file, String* name, char* mode) {
+#define MR_FUNC_NAME "open-file"
+Returncode open_file(File*** file, String** name, char* mode) {
   CCHECK(set_cstring(name));
-  *file = NULL;
-  *file = fopen(name->values, mode);
+  *file = MR_new_ref();
   if (*file == NULL) {
+    CRAISE
+  }
+  **file = fopen((*name)->values, mode);
+  if (**file == NULL) {
     CRAISE
   }
   return OK;
 }
 #undef MR_FUNC_NAME
 
-Returncode file_open_read(String* name, File** file) {
+Returncode file_open_read(String** name, File*** file) {
   return open_file(file, name, "r");
 }
 
-Returncode file_open_write(String* name, File** file) {
+Returncode file_open_write(String** name, File*** file) {
   return open_file(file, name, "w");
 }
 
 #define MR_FUNC_NAME "File.close"
-Returncode File_close(File* file) {
-  if (fclose(file) == 0) {
+Returncode File_close(File** file) {
+  CHECK_NOT_NULL(file)
+  if (fclose(*file) == 0) {
     return OK;
   }
   CRAISE
 }
 #undef MR_FUNC_NAME
 
-Returncode File_getc(File* file, Char* out_char) {
-  *out_char = getc(file);
+#define MR_FUNC_NAME "File.getc"
+Returncode File_getc(File** file, Char* out_char) {
+  CHECK_NOT_NULL(file)
+  *out_char = getc(*file);
   return OK;
 }
+#undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "File.putc"
-Returncode File_putc(File* file, Char in_char) {
+Returncode File_putc(File** file, Char in_char) {
   int res;
-  res = putc(in_char, file);
+  CHECK_NOT_NULL(file)
+  res = putc(in_char, *file);
   if (res != in_char) {
     CRAISE
   }
@@ -250,27 +263,46 @@ Returncode File_putc(File* file, Char in_char) {
 }
 #undef MR_FUNC_NAME
 
-Returncode File_write(File* file, String* data) {
-  fprintf(file, "%.*s", data->length, data->values);
+#define MR_FUNC_NAME "File.write"
+Returncode File_write(File** file, String** data) {
+  CHECK_NOT_NULL(file)
+  CHECK_NOT_NULL(data)
+  fprintf(*file, "%.*s", (*data)->length, (*data)->values);
   return OK;
 }
+#undef MR_FUNC_NAME
 
 /*Strings*/
-Returncode String_clear(String* this) {
-  this->length = 0;
+#define MR_FUNC_NAME "String.clear"
+Returncode String_clear(String** self) {
+  CHECK_NOT_NULL(self)
+  (*self)->length = 0;
   return OK;
 }
+#undef MR_FUNC_NAME
 
-Returncode String_equal(String* this, String* other, Bool* out_equal) {
-  if (this == other) {
+Returncode String_equal(String** self, String** other, Bool* out_equal) {
+  if (self == other) {
     *out_equal = true;
     return OK;
   }
-  if (this->length != other->length) {
+  if (self == NULL || other == NULL) {
     *out_equal = false;
     return OK;
   }
-  if (strncmp(this->values, other->values, this->length) == 0) {
+  if (*self == *other) {
+    *out_equal = true;
+    return OK;
+  }
+  if (*self == NULL || *other == NULL) {
+    *out_equal = false;
+    return OK;
+  }
+  if ((*self)->length != (*other)->length) {
+    *out_equal = false;
+    return OK;
+  }
+  if (strncmp((*self)->values, (*other)->values, (*self)->length) == 0) {
     *out_equal = true;
     return OK;
   }
@@ -279,56 +311,59 @@ Returncode String_equal(String* this, String* other, Bool* out_equal) {
 }
 
 #define MR_FUNC_NAME "String.get"
-Returncode String_get(String* this, Int index, Char* out_char) {
-  if (index < 0 || index >= this->length) {
+Returncode String_get(String** self, Int index, Char* out_char) {
+  CHECK_NOT_NULL(self)
+  if (index < 0 || index >= (*self)->length) {
     CRAISE
   }
-  *out_char = this->values[index];
+  *out_char = (*self)->values[index];
   return OK;
 }
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "String.append"
-Returncode String_append(String* this, Char in_char) {
-  if (this->length == this->max_length) {
+Returncode String_append(String** self, Char in_char) {
+  CHECK_NOT_NULL(self)
+  if ((*self)->length == (*self)->max_length) {
     CRAISE
   }
-  this->values[this->length] = in_char;
-  ++this->length;
+  (*self)->values[(*self)->length] = in_char;
+  ++(*self)->length;
   return OK;
 }
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "Int.str"
-Returncode Int_str(Int value, String* out_str) {
+Returncode Int_str(Int value, String** out_str) {
   Bool is_neg;
   int abs;
   int swap;
   char* next;
   char* last;
+  CHECK_NOT_NULL(out_str)
   is_neg = value < 0;
   abs = value;
   if (is_neg) {
     abs = -value;
   }
   swap = 0;
-  out_str->length = is_neg;
+  (*out_str)->length = is_neg;
   do {
     swap *= 10;
     swap += abs % 10;
     abs /= 10;
-    if (out_str->max_length <= out_str->length) {
-      out_str->length = 0;
+    if ((*out_str)->max_length <= (*out_str)->length) {
+      (*out_str)->length = 0;
       CRAISE
     }
-    ++out_str->length;
+    ++(*out_str)->length;
   } while (abs > 0);
-  next = out_str->values;
+  next = (*out_str)->values;
   if (is_neg) {
     *next = '-';
     ++next;
   }
-  last = out_str->values + out_str->length;
+  last = (*out_str)->values + (*out_str)->length;
   while (next < last) {
     *next = '0' + swap % 10;
     ++next;
@@ -339,58 +374,79 @@ Returncode Int_str(Int value, String* out_str) {
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "String.new"
-Returncode String_new(String* this, String* source) {
-  if (this == source) {
+Returncode String_new(String** self, String** source) {
+  CHECK_NOT_NULL(self)
+  if (source == NULL || *source == NULL) {
     return OK;
   }
-  if (source->length > this->max_length) {
+  if (self == source) {
+    return OK;
+  }
+  if ((*source)->length > (*self)->max_length) {
     CRAISE
   }
-  this->length = source->length;
-  memcpy(this->values, source->values, this->length);
+  (*self)->length = (*source)->length;
+  memcpy((*self)->values, (*source)->values, (*self)->length);
   return OK;
 }
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "String.concat"
-Returncode String_concat(String* this, String* ext) {
-  if (this->length + ext->length > this->max_length) {
+Returncode String_concat(String** self, String** ext) {
+  CHECK_NOT_NULL(self)
+  if (ext == NULL || *ext == NULL) {
+    return OK;
+  }
+  if ((*self)->length + (*ext)->length > (*self)->max_length) {
     CRAISE
   }
-  memcpy(this->values + this->length, ext->values, ext->length);
-  this->length += ext->length;
+  memcpy((*self)->values + (*self)->length, (*ext)->values, (*ext)->length);
+  (*self)->length += (*ext)->length;
   return OK;
 }
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "String.concat-int"
-Returncode String_concat_int(String* this, Int num) {
+Returncode String_concat_int(String** self, Int num) {
   String remain;
-  remain.max_length = this->max_length - this->length;
+  String* remain_ref = &remain;
+  remain.max_length = (*self)->max_length - (*self)->length;
   remain.length = 0;
-  remain.values = this->values + this->length;
-  CCHECK(Int_str(num, &remain));
-  this->length += remain.length;
+  remain.values = (*self)->values + (*self)->length;
+  CCHECK(Int_str(num, &remain_ref));
+  (*self)->length += remain.length;
   return OK;
 }
 #undef MR_FUNC_NAME
 
-Returncode String_find(String* this, String* pattern, Int* out_index) {
+#define MR_FUNC_NAME "String.find"
+Returncode String_find(String** self, String** pattern, Int* out_index) {
   int n;
-  for (n = 0; n <= this->length - pattern->length; ++n) {
-    if (strncmp(this->values + n, pattern->values, pattern->length) == 0) {
+  CHECK_NOT_NULL(self)
+  if (pattern == NULL || *pattern == NULL) {
+    *out_index = 0;
+    return OK;
+  }
+  for (n = 0; n <= (*self)->length - (*pattern)->length; ++n) {
+    if (strncmp((*self)->values + n, (*pattern)->values, (*pattern)->length)
+        == 0) {
       *out_index = n;
       return OK;
     }
   }
-  *out_index = this->length;
+  *out_index = (*self)->length;
   return OK;
 }
+#undef MR_FUNC_NAME
 
-Returncode String_has(String* this, Char ch, Bool* found) {
+Returncode String_has(String** self, Char ch, Bool* found) {
   int n;
-  for (n = 0; n < this->length; ++n) {
-    if (this->values[n] == ch) {
+  if (self == NULL || *self == NULL) {
+    *found = false;
+    return OK;
+  }
+  for (n = 0; n < (*self)->length; ++n) {
+    if ((*self)->values[n] == ch) {
       *found = true;
       return OK;
     }
@@ -400,30 +456,34 @@ Returncode String_has(String* this, Char ch, Bool* found) {
 }
 
 /*system*/
-Sys* sys;
+Sys** sys;
 
-Returncode Sys_print(Sys* _, String* text) {
-  printf("%.*s", text->length, text->values);
+Returncode Sys_print(Sys** _, String** text) {
+  if (text != NULL && *text != NULL) {
+    printf("%.*s", (*text)->length, (*text)->values);
+  }
   return OK;
 }
 
-Returncode Sys_println(Sys* _, String* text) {
-  printf("%.*s\n", text->length, text->values);
+Returncode Sys_println(Sys** _, String** text) {
+  if (text != NULL && *text != NULL) {
+    printf("%.*s\n", (*text)->length, (*text)->values);
+  }
   return OK;
 }
 
 #define MR_FUNC_NAME "Sys.exit"
-Returncode Sys_exit(Sys* _, Int status) {
+Returncode Sys_exit(Sys** _, Int status) {
   exit(status);
   CRAISE
 }
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "Sys.system"
-Returncode Sys_system(Sys* _, String* command, Int* status) {
+Returncode Sys_system(Sys** _, String** command, Int* status) {
   int res;
   CCHECK(set_cstring(command));
-  res = system(command->values);
+  res = system((*command)->values);
   if (res == -1) {
     CRAISE
   }
@@ -433,16 +493,17 @@ Returncode Sys_system(Sys* _, String* command, Int* status) {
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "Sys.getenv"
-Returncode Sys_getenv(Sys* _, String* name, String* value, Bool* exists) {
+Returncode Sys_getenv(Sys** _, String** name, String** value, Bool* exists) {
   char* ret;
   CCHECK(set_cstring(name));
-  ret = getenv(name->values);
+  CHECK_NOT_NULL(value)
+  ret = getenv((*name)->values);
   if (ret == NULL) {
     *exists = false;
     return OK;
   }
-  value->length = cstring_length(ret, value->max_length);
-  strncpy(value->values, ret, value->length);
+  (*value)->length = cstring_length(ret, (*value)->max_length);
+  strncpy((*value)->values, ret, (*value)->length);
   *exists = true;
   return OK;
 }

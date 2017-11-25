@@ -5,7 +5,7 @@ class SliceExpression(Expression)
   owner Expression sequence
   owner Expression index
   owner Expression second-index
-  owner Expression slice-symbol
+  owner SymbolExpression slice-symbol
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -70,10 +70,13 @@ class SliceExpression(Expression)
     
     if ? self.second-index
       self.second-index.write-preactions()
+      self.write-ref-init(user self.slice-symbol)
+      self.write-init-var-ref(user self.slice-symbol)
       # symbol_Var.length = second;
       # symbol_Var.max_length = symbol.length + 1;
-      # symbol_Var.values = (seq)->values + (index);
-      # symbol_Var.values = (Byte*)((seq)->values) + (index);
+      # symbol_Var.values = (*seq)->values + (index);
+      # symbol_Var.values = (Byte*)((*seq)->values) + (index);
+      self.code-node.write-spaces()
       self.slice-symbol.write()
       write(user "_Var.length = ")
       self.second-index.write()
@@ -89,6 +92,7 @@ class SliceExpression(Expression)
       write(user "_Var.values = (")
       if self.sequence.result-type.type-data != glob.type-string
         write(user "Byte*)((")
+      write(user "*")
       self.sequence.write()
       write(user ")->values")
       if self.sequence.result-type.type-data != glob.type-string
@@ -98,8 +102,8 @@ class SliceExpression(Expression)
       write(user ");\n")
       self.code-node.write-spaces()
     
-    # if ((index) < 0 || (index) >= (seq)->length) RAISE(line-num)
-    # if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length)
+    # if ((index) < 0 || (index) >= (*seq)->length) RAISE(line-num)
+    # if ((index) < 0 || (second) < 0 || (index) + (second) > (*seq)->length)
     #     RAISE(line-num)
     write(user "if ((")
     self.index.write()
@@ -115,7 +119,7 @@ class SliceExpression(Expression)
       write(user ") >")
     else
       write(user ">=")
-    write(user " (")
+    write(user " (*")
     self.sequence.write()
     write(user ")->length) ")
     self.write-raise()
@@ -126,9 +130,9 @@ class SliceExpression(Expression)
       self.slice-symbol.write()
       return
     
-    # ((seq)->values)[index]
-    # ((Prmitive*)((seq)->values))[index]
-    # ((Complex**)((seq)->values))[index]
+    # ((*seq)->values)[index]
+    # ((Prmitive*)((*seq)->values))[index]
+    # ((Complex***)((*seq)->values))[index]
     if not self.top
       write(user "(")
     write(user "((")
@@ -139,9 +143,10 @@ class SliceExpression(Expression)
       else
         write-cname(user self.result-type.type-data.name)
         if not self.result-type.type-data.is-primitive
-          write(user "*")
+          write(user "**")
         write(user "*")
       write(user ")((")
+    write(user "*")
     self.sequence.write()
     write(user ")->values)")
     if self.sequence.result-type.type-data != glob.type-string

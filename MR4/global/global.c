@@ -566,7 +566,7 @@ Returncode BuiltinVariable_write(BuiltinVariable* self) {
 extern Func BuiltinVariable__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinVariable__dtl[] = {(void*)BuiltinVariable_link_types, (void*)BuiltinVariable_analyze, (void*)BuiltinVariable_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func BuiltinVariable__dtl[] = {(void*)BuiltinVariable_link_types, (void*)BuiltinVariable_analyze, (void*)BuiltinVariable_write, (void*)SyntaxTreeCode_m_is_end_point, (void*)SyntaxTreeVariable_write_sequence};
 #endif
 
 #if MR_STAGE == MR_TYPEDEFS

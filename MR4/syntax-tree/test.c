@@ -148,7 +148,7 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
   CHECK(55, SyntaxTreeCode_write_spaces(&(self->_base)) )
   CHECK(56, (self->tested)->_base._dtl[5](self->tested) )
   CHECK(57, write(&(String){22, 21, "\n#undef RETURN_ERROR\n"}) )
-  CHECK(58, write(&(String){42, 41, "#define RETURN_ERROR(value) return value\n"}) )
+  CHECK(58, write(&(String){61, 60, "#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup\n"}) )
   CHECK(59, SyntaxTreeCode_write_spaces(&(self->_base)) )
   CHECK(60, write(&(String){27, 26, "MR_trace_stream = stdout;\n"}) )
   CHECK(61, SyntaxTreeCode_write_spaces(&(self->_base)) )
@@ -285,14 +285,14 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
   SyntaxTreeFunction* mocked_func = NULL;
   if (NULL != self->type_name) {
     CHECK(111, SyntaxTreeNode_find_type(&(self->_base._base._base._base), self->type_name, &(self->_base.parent_type)) )
-    Int _Int106;
-    CHECK(112, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int106)) )
+    Int _Int107;
+    CHECK(112, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int107)) )
     if (!(NULL != mocked_func)) {
       CHECK(114, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base._base), &(String){23, 22, "mocking unknown method"}, self->mocked_name, &(String){8, 7, "of type"}, self->type_name) )
     }
-    TypeInstance* _TypeInstance107;
-    CHECK(119, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance107)) )
-    CHECK(119, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance107) )
+    TypeInstance* _TypeInstance108;
+    CHECK(119, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance108)) )
+    CHECK(119, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance108) )
   }
   else {
     CHECK(122, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
@@ -300,8 +300,8 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
       CHECK(124, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
     }
   }
-  Bool _Bool108;
-  CHECK(126, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool108)) )
+  Bool _Bool109;
+  CHECK(126, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool109)) )
   mocked_func->mocker_function = self;
   CHECK(128, SyntaxTreeFunction_analyze(&(self->_base)) )
   return OK;

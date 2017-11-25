@@ -43,7 +43,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   
   func inst parse-block():(copy Char end)
     new List{SyntaxTreeCode} in self.code-nodes
-    self.parse-block-children(user _, user self.get-function()):(copy end)
+    self.parse-block-children(user _, user self):(copy end)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node
@@ -122,8 +122,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"new\", got", copy end)
-      self.get-function().variables.add(owner SyntaxTreeInitNew.parse-new(
-          var _, user self):(copy end))
+      self.get-function().variables.add(owner SyntaxTreeVariable.parse-new(
+          var _, copy ACCESS-NEW, user _, user self):(copy end))
       
     else-if keyword.equal(user "assert")
       if end != ' '

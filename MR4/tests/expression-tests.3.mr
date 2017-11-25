@@ -62,14 +62,14 @@ func test-code(user String input-text, user String expected-output)
   mock-func-header.concat(user "Int i")
   mock-func-header.concat(user ", Char c")
   mock-func-header.concat(user ", Bool b")
-  mock-func-header.concat(user ", String* str")
-  mock-func-header.concat(user ", Array* arr")
-  mock-func-header.concat(user ", File* fobj")
-  mock-func-header.concat(user ", Test* t")
-  mock-func-header.concat(user ", Ta* ta, Ta_Dynamic* ta_Dynamic")
-  mock-func-header.concat(user ", Tb* tb, Tb_Dynamic* tb_Dynamic")
-  mock-func-header.concat(user ", Tc* tc, Tc_Dynamic* tc_Dynamic")
-  mock-func-header.concat(user ", String** so")
+  mock-func-header.concat(user ", String** str")
+  mock-func-header.concat(user ", Array** arr")
+  mock-func-header.concat(user ", File** fobj")
+  mock-func-header.concat(user ", Test** t")
+  mock-func-header.concat(user ", Ta** ta, Ta_Dynamic* ta_Dynamic")
+  mock-func-header.concat(user ", Tb** tb, Tb_Dynamic* tb_Dynamic")
+  mock-func-header.concat(user ", Tc** tc, Tc_Dynamic* tc_Dynamic")
+  mock-func-header.concat(user ", String*** so")
   mock-func-header.concat(user ", Int* io")
   mock-func-header.concat(user ")")
   var String{4096} expected-header
@@ -90,7 +90,7 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user "  Int numa;\n")
   expected-header.concat(user "};\n")
   expected-header.concat(user "struct Ta_Dynamic {\n")
-  expected-header.concat(user "  Returncode (*dyn)(Ta* self")
+  expected-header.concat(user "  Returncode (*dyn)(Ta** self")
   expected-header.concat(user ", Ta_Dynamic* self_Dynamic);\n")
   expected-header.concat(user "};\n")
   expected-header.concat(user "struct Tb {\n")
@@ -108,19 +108,19 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user "  Tb_Dynamic _base;\n")
   expected-header.concat(user "};\n")
   
-  expected-header.concat(user "Returncode Test_new(Test* self, Int num);\n")
-  expected-header.concat(user "Returncode Test_meth(Test* self);\n")
-  expected-header.concat(user "Returncode Ta_metha(Ta* self")
+  expected-header.concat(user "Returncode Test_new(Test** self, Int num);\n")
+  expected-header.concat(user "Returncode Test_meth(Test** self);\n")
+  expected-header.concat(user "Returncode Ta_metha(Ta** self")
   expected-header.concat(user ", Ta_Dynamic* self_Dynamic);\n")
-  expected-header.concat(user "Returncode Ta_dyn(Ta* self")
+  expected-header.concat(user "Returncode Ta_dyn(Ta** self")
   expected-header.concat(user ", Ta_Dynamic* self_Dynamic);\n")
-  expected-header.concat(user "Returncode Tb_methb(Tb* self")
+  expected-header.concat(user "Returncode Tb_methb(Tb** self")
   expected-header.concat(user ", Tb_Dynamic* self_Dynamic);\n")
-  expected-header.concat(user "Returncode Tb_dyn(Tb* self")
+  expected-header.concat(user "Returncode Tb_dyn(Tb** self")
   expected-header.concat(user ", Tb_Dynamic* self_Dynamic);\n")
-  expected-header.concat(user "Returncode Tc_methc(Tc* self")
+  expected-header.concat(user "Returncode Tc_methc(Tc** self")
   expected-header.concat(user ", Tc_Dynamic* self_Dynamic);\n")
-  expected-header.concat(user "Returncode Tc_dyn(Tc* self")
+  expected-header.concat(user "Returncode Tc_dyn(Tc** self")
   expected-header.concat(user ", Tc_Dynamic* self_Dynamic);\n")
   
   expected-header.concat(user "Ta_Dynamic Ta_dynamic = {Ta_dyn};\n")
@@ -128,48 +128,48 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user "Tc_Dynamic Tc_dynamic = {{{(Func)Tc_dyn}}};\n")
   
   expected-header.concat(user "Returncode fun0(void);\n")
-  expected-header.concat(user "Returncode fun1(Int x, String* s, String* o);\n")
-  expected-header.concat(user "Returncode fun2(String** s, Int* x);\n")
-  expected-header.concat(user "Returncode fun3(Int x, String** s);\n")
+  expected-header.concat(user "Returncode fun1(Int x, String** s, String** o);\n")
+  expected-header.concat(user "Returncode fun2(String*** s, Int* x);\n")
+  expected-header.concat(user "Returncode fun3(Int x, String*** s);\n")
   expected-header.concat(user "Returncode fun4(Int x);\n")
   expected-header.concat(user "Returncode fun5(Int x, Int* y);\n")
   expected-header.concat(user "Returncode fun6(Int x, Int y, Int* n")
   expected-header.concat(user ", Int* m);\n")
-  expected-header.concat(user "Returncode fun7(Tb** tb")
+  expected-header.concat(user "Returncode fun7(Tb*** tb")
   expected-header.concat(user ", Tb_Dynamic** tb_Dynamic);\n")
   expected-header.concat(user mock-func-header)
   expected-header.concat(user ";\n")
   
-  expected-header.concat(user "Returncode Test_new(Test* self, Int num)")
+  expected-header.concat(user "Returncode Test_new(Test** self, Int num)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Test_meth(Test* self)")
+  expected-header.concat(user "Returncode Test_meth(Test** self)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Ta_metha(Ta* self")
+  expected-header.concat(user "Returncode Ta_metha(Ta** self")
   expected-header.concat(user ", Ta_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Ta_dyn(Ta* self")
+  expected-header.concat(user "Returncode Ta_dyn(Ta** self")
   expected-header.concat(user ", Ta_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Tb_methb(Tb* self")
+  expected-header.concat(user "Returncode Tb_methb(Tb** self")
   expected-header.concat(user ", Tb_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Tb_dyn(Tb* self")
+  expected-header.concat(user "Returncode Tb_dyn(Tb** self")
   expected-header.concat(user ", Tb_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Tc_methc(Tc* self")
+  expected-header.concat(user "Returncode Tc_methc(Tc** self")
   expected-header.concat(user ", Tc_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode Tc_dyn(Tc* self")
+  expected-header.concat(user "Returncode Tc_dyn(Tc** self")
   expected-header.concat(user ", Tc_Dynamic* self_Dynamic)")
   expected-header.concat(user empty-func-body)
   
   expected-header.concat(user "Returncode fun0(void)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode fun1(Int x, String* s, String* o)")
+  expected-header.concat(user "Returncode fun1(Int x, String** s, String** o)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode fun2(String** s, Int* x)")
+  expected-header.concat(user "Returncode fun2(String*** s, Int* x)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode fun3(Int x, String** s)")
+  expected-header.concat(user "Returncode fun3(Int x, String*** s)")
   expected-header.concat(user empty-func-body)
   expected-header.concat(user "Returncode fun4(Int x)")
   expected-header.concat(user empty-func-body)
@@ -177,7 +177,7 @@ func test-code(user String input-text, user String expected-output)
   expected-header.concat(user empty-func-body)
   expected-header.concat(user "Returncode fun6(Int x, Int y, Int* n, Int* m)")
   expected-header.concat(user empty-func-body)
-  expected-header.concat(user "Returncode fun7(Tb** tb")
+  expected-header.concat(user "Returncode fun7(Tb*** tb")
   expected-header.concat(user ", Tb_Dynamic** tb_Dynamic)")
   expected-header.concat(user empty-func-body)
   expected-header.concat(user mock-func-header)
@@ -267,9 +267,17 @@ test test-char-expression()
 
 
 test test-string-expression()
-  test-code(
-      user "str := \"some string\"",
-      user "String aux_String_0_Var = {0};\n  String* aux_String_0 = &aux_String_0_Var;\n  aux_String_0->max_length = 12;\n  aux_String_0->length = 11;\n  aux_String_0->values = \"some string\";\n  str = aux_String_0;")
+  var String{1024} expected
+  expected.copy(user "String aux_String_0_Var = {0};\n")
+  expected.concat(user "  String** aux_String_0 = NULL;\n")
+  expected.concat(user "  aux_String_0 = MR_new_ref();\n")
+  expected.concat(user "  if (aux_String_0 == NULL) RAISE(1)\n")
+  expected.concat(user "  *aux_String_0 = &aux_String_0_Var;\n")
+  expected.concat(user "  aux_String_0_Var.max_length = 12;\n")
+  expected.concat(user "  aux_String_0_Var.length = 11;\n")
+  expected.concat(user "  aux_String_0_Var.values = \"some string\";\n")
+  expected.concat(user "  str = aux_String_0;")
+  test-code(user "str := \"some string\"", user expected)
   test-code-error(user "\"aaa", user "illegal string constant \"\"aaa\"")
 
 
@@ -281,13 +289,15 @@ test test-empty-expression()
 
 
 test test-member-expression()
-  test-code(user "i := t.num", user "if (t == NULL) RAISE(1)\n  i = t->num;")
+  test-code(
+      user "i := t.num",
+      user "if (t == NULL || *t == NULL) RAISE(1)\n  i = (*t)->num;")
   test-code(
       user "i := tc.numb",
-      user "if (tc == NULL) RAISE(1)\n  i = tc->_base.numb;")
+      user "if (tc == NULL || *tc == NULL) RAISE(1)\n  i = (*tc)->_base.numb;")
   test-code(
       user "i := tc.num",
-      user "if (tc == NULL) RAISE(1)\n  i = tc->_base._base._base.num;")
+      user "if (tc == NULL || *tc == NULL) RAISE(1)\n  i = (*tc)->_base._base._base.num;")
   test-code-error(user "error", user "unknown symbol \"error\"")
   test-code-error(
       user "(i := 1).error", user "void expression has no member \"error\"")
@@ -297,30 +307,43 @@ test test-member-expression()
 test test-slice-expression()
   test-code(
       user "c := str[13]",
-      user "if ((13) < 0 || (13) >= (str)->length) RAISE(1)\n  c = ((str)->values)[13];")
+      user "if ((13) < 0 || (13) >= (*str)->length) RAISE(1)\n  c = ((*str)->values)[13];")
   var String{1024} expected
   expected.copy(user "String aux_String_0_Var = {0};\n")
-  expected.concat(user "  String* aux_String_0 = &aux_String_0_Var;\n")
+  expected.concat(user "  String** aux_String_0 = NULL;\n")
+  expected.concat(user "  aux_String_0 = MR_new_ref();\n")
+  expected.concat(user "  if (aux_String_0 == NULL) RAISE(1)\n")
+  expected.concat(user "  *aux_String_0 = &aux_String_0_Var;\n")
   expected.concat(user "  aux_String_0_Var.length = 6;\n")
-  expected.concat(
-      user "  aux_String_0_Var.max_length = aux_String_0_Var.length + 1;\n")
-  expected.concat(user "  aux_String_0_Var.values = (str)->values + (2);\n")
-  expected.concat(
-      user "  if ((2) < 0 || (6) < 0 || (2) + (6) > (str)->length) RAISE(1)\n")
+  expected.concat(user "  aux_String_0_Var.max_length")
+  expected.concat(user " = aux_String_0_Var.length + 1;\n")
+  expected.concat(user "  aux_String_0_Var.values = (*str)->values + (2);\n")
+  expected.concat(user "  if ((2) < 0 || (6) < 0 || (2) + (6) > (*str)->length)")
+  expected.concat(user " RAISE(1)\n")
   expected.concat(user "  str = aux_String_0;")
   test-code(user "str := str[2:6]", user expected)
   test-code(
       user "i := arr[13]",
-      user "if ((13) < 0 || (13) >= (arr)->length) RAISE(1)\n  i = ((Int*)((arr)->values))[13];")
-  test-code(
-      user "arr := arr[2:6]",
-      user "Array aux_Array_0_Var = {0};\n  Array* aux_Array_0 = &aux_Array_0_Var;\n  aux_Array_0_Var.length = 6;\n  aux_Array_0_Var.values = (Byte*)((arr)->values) + (2);\n  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)\n  arr = aux_Array_0;")
+      user "if ((13) < 0 || (13) >= (*arr)->length) RAISE(1)\n  i = ((Int*)((*arr)->values))[13];")
+  expected.copy(user "")
+  expected.concat(user "Array aux_Array_0_Var = {0};\n")
+  expected.concat(user "  Array** aux_Array_0 = NULL;\n")
+  expected.concat(user "  aux_Array_0 = MR_new_ref();\n")
+  expected.concat(user "  if (aux_Array_0 == NULL) RAISE(1)\n")
+  expected.concat(user "  *aux_Array_0 = &aux_Array_0_Var;\n")
+  expected.concat(user "  aux_Array_0_Var.length = 6;\n")
+  expected.concat(user "  aux_Array_0_Var.values")
+  expected.concat(user " = (Byte*)((*arr)->values) + (2);\n")
+  expected.concat(user "  if ((2) < 0 || (6) < 0 || (2) + (6) > (*arr)->length)")
+  expected.concat(user " RAISE(1)\n")
+  expected.concat(user "  arr = aux_Array_0;")
+  test-code(user "arr := arr[2:6]", user expected)
   test-code(
       user "str[4] := c",
-      user "if ((4) < 0 || (4) >= (str)->length) RAISE(1)\n  ((str)->values)[4] = c;")
+      user "if ((4) < 0 || (4) >= (*str)->length) RAISE(1)\n  ((*str)->values)[4] = c;")
   test-code(
       user "arr[4] := i",
-      user "if ((4) < 0 || (4) >= (arr)->length) RAISE(1)\n  ((Int*)((arr)->values))[4] = i;")
+      user "if ((4) < 0 || (4) >= (*arr)->length) RAISE(1)\n  ((Int*)((*arr)->values))[4] = i;")
   test-code-error(user "arr[2", user "expected \"]\", got \"new-line\"")
   test-code-error(user "arr[2:3", user "expected \"]\", got \"new-line\"")
   test-code-error(user "(i := 3)[2]", user "cannot slice a void expression")
@@ -352,7 +375,7 @@ test test-call-expression()
       user "CHECK(1, fun2(&(*so), &(*io)) )")
   test-code(
       user "var Int x\n  owner String s\n  fun2()->(owner s, copy x)",
-      user "Int x = 0;\n  String* s = NULL;\n  CHECK(3, fun2(&(s), &(x)) )")
+      user "Int x = 0;\n  String** s = NULL;\n  CHECK(3, fun2(&(s), &(x)) )")
   test-code(user "fun3(copy 0)->(owner so)", user "CHECK(1, fun3(0, &(*so)) )")
   test-code(
       user "var Int x\n  fun4(copy fun5(copy 3)->(copy x))",
@@ -368,13 +391,13 @@ test test-call-expression()
       user "Int aux_Int_0 = 0;\n  CHECK(1, fun5(4, &(aux_Int_0)) )\n  *io = aux_Int_0;")
   test-code(
       user "so := fun3(copy 7)",
-      user "String* aux_String_0 = NULL;\n  CHECK(1, fun3(7, &(aux_String_0)) )\n  *so = aux_String_0;")
+      user "String** aux_String_0 = NULL;\n  CHECK(1, fun3(7, &(aux_String_0)) )\n  *so = aux_String_0;")
   test-code(user "tc.methc()", user "CHECK(1, Tc_methc(tc, tc_Dynamic) )")
   test-code(
       user "tc.methb()",
-      user "CHECK(1, Tb_methb(&(tc->_base), &(tc_Dynamic->_base)) )")
+      user "CHECK(1, Tb_methb((void*)tc, &(tc_Dynamic->_base)) )")
   test-code(
-      user "tc.meth()", user "CHECK(1, Test_meth(&(tc->_base._base._base)) )")
+      user "tc.meth()", user "CHECK(1, Test_meth((void*)tc) )")
   test-code-error(
       user "function( copy 1)", user "expected access, got \" \"")
   test-code-error(
@@ -404,18 +427,18 @@ test test-type-expression()
   test-code(user "Test.meth(var t)", user "CHECK(1, Test_meth(t) )")
   test-code(
       user "Tb.methb(var tc)",
-      user "CHECK(1, Tb_methb(&(tc->_base), &(tc_Dynamic->_base)) )")
+      user "CHECK(1, Tb_methb((void*)tc, &(tc_Dynamic->_base)) )")
   test-code(
       user "Tc.meth(var tc)",
-      user "CHECK(1, Test_meth(&(tc->_base._base._base)) )")
+      user "CHECK(1, Test_meth((void*)tc) )")
   test-code-error(user "Error", user "unknown type \"Error\"")
 
 
 test test-base-expression()
   test-meth-code(
-      user "base.methm()", user "CHECK(9, Mid_methm(&(self->_base)) )")
+      user "base.methm()", user "CHECK(9, Mid_methm((void*)self) )")
   test-meth-code(
-      user "base.methb()", user "CHECK(9, Base_methb(&(self->_base._base)) )")
+      user "base.methb()", user "CHECK(9, Base_methb((void*)self) )")
   test-code-error(user "base", user "\"base\" used not in method")
   test-global-scope-error(
       user "struct Test\n  var Int x\n  func mock()\n    base\n",
@@ -452,17 +475,17 @@ func test-meth-code(user String input-text, user String expected-output)
   expected.concat(user "struct Top {\n")
   expected.concat(user "  Mid _base;\n")
   expected.concat(user "};\n")
-  expected.concat(user "Returncode Base_methb(Base* self);\n")
-  expected.concat(user "Returncode Mid_methm(Mid* self);\n")
-  expected.concat(user "Returncode Top_methb(Top* self);\n")
-  expected.concat(user "Returncode Top_methm(Top* self);\n")
-  expected.concat(user "Returncode Base_methb(Base* self)")
+  expected.concat(user "Returncode Base_methb(Base** self);\n")
+  expected.concat(user "Returncode Mid_methm(Mid** self);\n")
+  expected.concat(user "Returncode Top_methb(Top** self);\n")
+  expected.concat(user "Returncode Top_methm(Top** self);\n")
+  expected.concat(user "Returncode Base_methb(Base** self)")
   expected.concat(user empty-func-body)
-  expected.concat(user "Returncode Mid_methm(Mid* self)")
+  expected.concat(user "Returncode Mid_methm(Mid** self)")
   expected.concat(user empty-func-body)
-  expected.concat(user "Returncode Top_methb(Top* self)")
+  expected.concat(user "Returncode Top_methb(Top** self)")
   expected.concat(user empty-func-body)
-  expected.concat(user "Returncode Top_methm(Top* self) {\n")
+  expected.concat(user "Returncode Top_methm(Top** self) {\n")
   expected.concat(user "  Returncode MR_err = OK;\n  ")
   expected.concat(user expected-output)
   expected.concat(user "\nMR_cleanup:\n  return MR_err;\n")
@@ -509,7 +532,7 @@ test test-binary-expression()
   test-code(
       user "b := 2 < i < 12 < 2 * i",
       user "b = ((2 < i) && (i < 12)) && (12 < (2 * i));")
-  test-code(user "t := tc", user "t = &(tc->_base._base._base);")
+  test-code(user "t := tc", user "t = (void*)tc;")
   test-code-error(user "345 @ 2", user "unknown operator \"@\"")
   test-code-error(user "80 +(", user "unexpected \"(\"")
   test-code-error(
@@ -578,42 +601,52 @@ test test-question-expression()
 
 test test-dynamic()
   test-code(
-      user "var Ta a",
-      user "Ta a_Var = {0};\n  Ta* a = &a_Var;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;")
+      user "var Ta a(copy 1)",
+      user "Ta a_Var = {{0}};\n  Ta** a = NULL;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;\n  a = MR_new_ref();\n  if (a == NULL) RAISE(1)\n  *a = &a_Var;\n  CHECK(1, Test_new((void*)a, 1) )")
   test-code(
-      user "user Ta a", user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;")
+      user "user Ta a", user "Ta** a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;")
+  
+  var String{1024} expected
+  expected.copy(user "Ta** aux_Ta_0 = NULL;\n")
+  expected.concat(user "  Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;\n")
+  expected.concat(user "  aux_Ta_0 = MR_new_ref();\n")
+  expected.concat(user "  if (aux_Ta_0 == NULL) RAISE(1)\n")
+  expected.concat(user "  *aux_Ta_0 = calloc(1, sizeof(Ta));\n")
+  expected.concat(user "  if (*aux_Ta_0 == NULL) RAISE(1)\n")
+  expected.concat(user "  CHECK(1, Test_new((void*)aux_Ta_0, 7) )\n")
+  expected.concat(user "  ta_Dynamic = aux_Ta_0_Dynamic;\n")
+  expected.concat(user "  ta = aux_Ta_0;")
+  test-code(user "ta := Ta(copy 7)", user expected)
+  
   test-code(
-      user "ta := Ta(copy 7)",
-      user "Ta* aux_Ta_0 = NULL;\n  Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;\n  aux_Ta_0 = calloc(1, sizeof(Ta));\n  if (aux_Ta_0 == NULL) RAISE(1)\n  CHECK(1, Test_new(&(aux_Ta_0->_base), 7) )\n  ta_Dynamic = aux_Ta_0_Dynamic;\n  ta = aux_Ta_0;")
-  test-code(
-      user "new Ta a",
-      user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;\n  a = calloc(1, sizeof(Ta));\n  if (a == NULL) RAISE(1)")
+      user "new Ta a(copy 1)",
+      user "Ta** a = NULL;\n  Ta_Dynamic* a_Dynamic = &Ta_dynamic;\n  a = MR_new_ref();\n  if (a == NULL) RAISE(1)\n  *a = calloc(1, sizeof(Ta));\n  if (*a == NULL) RAISE(1)\n  CHECK(1, Test_new((void*)a, 1) )")
   test-code(
       user "user Ta a(var ta)",
-      user "Ta* a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;\n  a = ta;\n  a_Dynamic = ta_Dynamic;")
+      user "Ta** a = NULL;\n  Ta_Dynamic* a_Dynamic = NULL;\n  a = ta;\n  a_Dynamic = ta_Dynamic;")
   test-code(user "ta := ta", user "ta_Dynamic = ta_Dynamic;\n  ta = ta;")
   test-code(
       user "ta := tb",
-      user "ta_Dynamic = &(tb_Dynamic->_base);\n  ta = &(tb->_base);")
+      user "ta_Dynamic = &(tb_Dynamic->_base);\n  ta = (void*)tb;")
   test-code(
       user "ta := tc",
-      user "ta_Dynamic = &(tc_Dynamic->_base._base);\n  ta = &(tc->_base._base);")
+      user "ta_Dynamic = &(tc_Dynamic->_base._base);\n  ta = (void*)tc;")
   test-code(user "ta := _", user "ta_Dynamic = NULL;\n  ta = NULL;")
   test-code(
       user "user Array{Ta} aa\n  ta := aa[4]",
-      user "Array* aa = NULL;\n  if ((4) < 0 || (4) >= (aa)->length) RAISE(2)\n  ta_Dynamic = &Ta_dynamic;\n  ta = ((Ta**)((aa)->values))[4];")
+      user "Array** aa = NULL;\n  if ((4) < 0 || (4) >= (*aa)->length) RAISE(2)\n  ta_Dynamic = &Ta_dynamic;\n  ta = ((Ta***)((*aa)->values))[4];")
   test-code(
       user "user Array{Tc} ca\n  ta := ca[4]",
-      user "Array* ca = NULL;\n  if ((4) < 0 || (4) >= (ca)->length) RAISE(2)\n  ta_Dynamic = &(&Tc_dynamic->_base._base);\n  ta = &((((Tc**)((ca)->values))[4])->_base._base);")
+      user "Array** ca = NULL;\n  if ((4) < 0 || (4) >= (*ca)->length) RAISE(2)\n  ta_Dynamic = &(&Tc_dynamic->_base._base);\n  ta = (void*)(((Tc***)((*ca)->values))[4]);")
   test-code(
       user "ta.dyn()",
       user "if (ta_Dynamic == NULL) RAISE(1)\n  CHECK(1, ta_Dynamic->dyn(ta, ta_Dynamic) )")
   test-code(
       user "tb.dyn()",
-      user "if (tb_Dynamic == NULL) RAISE(1)\n  CHECK(1, tb_Dynamic->_base.dyn(&(tb->_base), &(tb_Dynamic->_base)) )")
+      user "if (tb_Dynamic == NULL) RAISE(1)\n  CHECK(1, tb_Dynamic->_base.dyn((void*)tb, &(tb_Dynamic->_base)) )")
   test-code(
       user "tc.dyn()",
-      user "if (tc_Dynamic == NULL) RAISE(1)\n  CHECK(1, tc_Dynamic->_base._base.dyn(&(tc->_base._base), &(tc_Dynamic->_base._base)) )")
+      user "if (tc_Dynamic == NULL) RAISE(1)\n  CHECK(1, tc_Dynamic->_base._base.dyn((void*)tc, &(tc_Dynamic->_base._base)) )")
   test-code(
       user "fun7()->(user ta)",
       user "if (ta != NULL) RAISE(1)\n  CHECK(1, fun7((void*)&(ta), (void*)&(ta_Dynamic)) )")
@@ -628,29 +661,34 @@ test test-function-object()
       user "Returncode (*fun)(Int x, Int* y) = NULL;\n  Int x = 0;\n  fun = fun5;\n  if (fun == NULL) RAISE(3)\n  CHECK(3, fun(9, &(x)) )")
   test-code(
       user "var Func{(var Test self)} fun(var Test.meth)\n  fun(var t)",
-      user "Returncode (*fun)(Test* self) = NULL;\n  fun = Test_meth;\n  if (fun == NULL) RAISE(2)\n  CHECK(2, fun(t) )")
+      user "Returncode (*fun)(Test** self) = NULL;\n  fun = Test_meth;\n  if (fun == NULL) RAISE(2)\n  CHECK(2, fun(t) )")
   test-code(
       user "var Func{()} fun\n  fun := _\n  b := fun?",
       user "Returncode (*fun)(void) = NULL;\n  fun = NULL;\n  b = fun != NULL;")
   test-code(
       user "t.fun := fun0\n  t.fun()",
-      user "if (t == NULL) RAISE(1)\n  t->fun = fun0;\n  if (t == NULL) RAISE(2)\n  if (t->fun == NULL) RAISE(2)\n  CHECK(2, t->fun() )")
+      user "if (t == NULL || *t == NULL) RAISE(1)\n  (*t)->fun = fun0;\n  if (t == NULL || *t == NULL) RAISE(2)\n  if ((*t)->fun == NULL) RAISE(2)\n  CHECK(2, (*t)->fun() )")
+  
   var String{1024} expected
   expected.copy(user "Returncode (*farr_Values[38])(void);\n")
   expected.concat(user "  Array farr_Var = {38, NULL};\n")
-  expected.concat(user "  Array* farr = &farr_Var;\n")
+  expected.concat(user "  Array** farr = NULL;\n")
+  expected.concat(user "  farr = MR_new_ref();\n")
+  expected.concat(user "  if (farr == NULL) RAISE(1)\n")
+  expected.concat(user "  *farr = &farr_Var;\n")
   expected.concat(user "  farr_Var.values = farr_Values;\n")
-  expected.concat(user "  if ((3) < 0 || (3) >= (farr)->length) RAISE(2)\n")
-  expected.concat(user "  ((Returncode (**)(void))((farr)->values))[3]")
+  expected.concat(user "  if ((3) < 0 || (3) >= (*farr)->length) RAISE(2)\n")
+  expected.concat(user "  ((Returncode (**)(void))((*farr)->values))[3]")
   expected.concat(user " = fun0;\n")
-  expected.concat(user "  if ((3) < 0 || (3) >= (farr)->length) RAISE(3)\n")
-  expected.concat(user "  if (((Returncode (**)(void))((farr)->values))[3]")
+  expected.concat(user "  if ((3) < 0 || (3) >= (*farr)->length) RAISE(3)\n")
+  expected.concat(user "  if (((Returncode (**)(void))((*farr)->values))[3]")
   expected.concat(user " == NULL) RAISE(3)\n")
   expected.concat(user "  CHECK(3")
-  expected.concat(user ", (((Returncode (**)(void))((farr)->values))[3])() )")
+  expected.concat(user ", (((Returncode (**)(void))((*farr)->values))[3])() )")
   test-code(
       user "var Array{38:Func{()}} farr\n  farr[3] := fun0\n  farr[3]()",
       user expected)
+  
   test-code-error(
       user "var Func error", user "missing arguments in function type")
   test-code-error(
@@ -673,10 +711,10 @@ test test-builtin()
   test-code(user "c := EOF", user "c = EOF;")
   test-code(
       user "i := arr.length",
-      user "if (arr == NULL) RAISE(1)\n  i = arr->length;")
+      user "if (arr == NULL || *arr == NULL) RAISE(1)\n  i = (*arr)->length;")
   test-code(
       user "i := str.length",
-      user "if (str == NULL) RAISE(1)\n  i = str->length;")
+      user "if (str == NULL || *str == NULL) RAISE(1)\n  i = (*str)->length;")
   test-code(user "str.clear()", user "CHECK(1, String_clear(str) )")
   test-code(
       user "str.equal(user str)->(copy b)",
@@ -711,7 +749,7 @@ test test-builtin()
       user "fobj.write(user str)", user "CHECK(1, File_write(fobj, str) )")
   test-code(
       user "user Array{String} argv(var sys.argv)",
-      user "Array* argv = NULL;\n  if (sys == NULL) RAISE(1)\n  argv = sys->argv;")
+      user "Array** argv = NULL;\n  if (sys == NULL || *sys == NULL) RAISE(1)\n  argv = (*sys)->argv;")
   test-code(user "sys.print(user str)", user "CHECK(1, Sys_print(sys, str) )")
   test-code(
       user "sys.println(user str)", user "CHECK(1, Sys_println(sys, str) )")

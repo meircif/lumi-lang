@@ -38,6 +38,10 @@ mock file-getc(user File file):(copy Char ch)
 
 mock file-putc(user File file, copy Char ch)
   assert file = glob.output-file
+  if mock-output-file-text.length = 4096
+    sys.print-raw(user "full output [")
+    sys.print-raw(user mock-output-file-text)
+    sys.print(user "]")
   mock-output-file-text.append(copy ch)
 
 mock file-write(user File file, user String text)

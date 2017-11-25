@@ -62,9 +62,9 @@ static char* _func_name_SyntaxTreeCode_read_line_break_spaces = "SyntaxTreeCode.
 Returncode SyntaxTreeCode_read_line_break_spaces(SyntaxTreeCode* self) {
   Int expected_spaces = self->parent->_base.indentation_spaces + 4;
   {int n; for (n = (0); n < (expected_spaces); ++n) {
-    Char _Char36;
-    CHECK(21, read_c(&(_Char36)) )
-    if (_Char36 != ' ') {
+    Char _Char37;
+    CHECK(21, read_c(&(_Char37)) )
+    if (_Char37 != ' ') {
       String* expected_spaces_str = &(String){16, 0, (char[16]){0}};
       String* actual_spaces_str = &(String){16, 0, (char[16]){0}};
       CHECK(24, Int_str(expected_spaces, expected_spaces_str) )
@@ -117,9 +117,7 @@ Returncode SyntaxTreeBlock_parse_block(SyntaxTreeBlock* self, Char* end) {
   self->code_nodes = malloc(sizeof(List));
   if (self->code_nodes == NULL) RAISE(45)
   *self->code_nodes = (List){NULL, NULL};
-  SyntaxTreeFunction* _SyntaxTreeFunction37;
-  CHECK(46, (self)->_base._base._dtl[5](self, &(_SyntaxTreeFunction37)) )
-  CHECK(46, SyntaxTreeBranch_parse_block_children(&(self->_base), NULL, &(_SyntaxTreeFunction37->_base), &((*end))) )
+  CHECK(46, SyntaxTreeBranch_parse_block_children(&(self->_base), NULL, self, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -260,7 +258,7 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
                       SyntaxTreeFunction* _SyntaxTreeFunction56;
                       CHECK(125, (self)->_base._base._dtl[5](self, &(_SyntaxTreeFunction56)) )
                       SyntaxTreeVariable* _SyntaxTreeVariable57;
-                      CHECK(125, SyntaxTreeInitNew_parse_new(NULL, self, &((*end)), &(_SyntaxTreeVariable57)) )
+                      CHECK(125, SyntaxTreeVariable_parse_new(NULL, ACCESS_NEW, NULL, self, &((*end)), &(_SyntaxTreeVariable57)) )
                       CHECK(125, List_add(_SyntaxTreeFunction56->_base._base.variables, _SyntaxTreeVariable57) )
                       
                     }

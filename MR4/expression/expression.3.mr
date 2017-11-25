@@ -159,15 +159,34 @@ class Expression(SyntaxTreeNode)
     type-data.m-new-type-instance():(owner self.result-type)
   
   func inst add-aux-variable(copy Int access, user TypeInstance type-instance):(
-      owner Expression expression)
-    new SymbolExpression symbol
+      owner SymbolExpression symbol)
+    new SymbolExpression in symbol
     symbol.code-node := self.code-node
     type-instance.copy-new():(owner symbol.result-type)
     symbol.assignable := true
     self.code-node.get-function().add-aux-variable(
         copy access, user type-instance):(user symbol.variable)
     string-new-copy(user symbol.variable.name):(owner symbol.name)
-    expression := symbol
+  
+  func inst write-ref-init(user SymbolExpression symbol)
+    # `symbol` = MR_new_ref();
+    # if (`symbol` == NULL) raise(`line-num`)
+    symbol.write()
+    write(user " = MR_new_ref();\n")
+    self.code-node.write-spaces()
+    write(user "if (")
+    symbol.write()
+    write(user " == NULL) ")
+    self.write-raise()
+  
+  func inst write-init-var-ref(user SymbolExpression symbol)
+    # &`symbol`_Var;
+    self.code-node.write-spaces()
+    write(user "*")
+    symbol.write()
+    write(user " = &")
+    symbol.write()
+    write(user "_Var;\n")
   
   func dynamic write-dynamic()
     self.write()

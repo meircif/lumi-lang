@@ -76,7 +76,7 @@ mock f-test-int2str(copy Int x)->(owner String s)
 
 
 test test-func()
-  var TestStruct t
+  var TestStruct t(copy 0, user _)
   var Int x
   t.get()->(copy x)
   assert x = 12

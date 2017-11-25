@@ -93,7 +93,7 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
   owner Array{Int} a
   user TestStruct t
   user TestClass d
-  var TestStruct tv
+  var TestStruct tv(copy 0, user _)
   var TestClass dv
   var String{12} sv
   var Func{(copy Int xi, user String si)->(copy Int xo, user String so)} f
@@ -102,7 +102,7 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
   var Array{12:TestClass} da
   var Array{12:String{7}} sa
   var Array{12:Func{()}} fa
-  new TestStruct tn
+  new TestStruct tn(copy 0, user _)
   new TestClass dn
   new String{arr[0]} sn
   new Array{arr[0]:Int} ian

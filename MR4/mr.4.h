@@ -37,7 +37,7 @@ typedef Returncode (*Func)();
 typedef FILE File;
 
 typedef struct {
-  Array* argv;
+  Array** argv;
 } Sys;
 
 
@@ -94,35 +94,35 @@ String* MR_new_string(int length);
 Array* MR_new_array(int length, int value_size);
 Array* MR_new_string_array(int array_length, int string_length);
 void MR_set_var_string_array(
-  int array_length, int string_length, Array* array, char* chars);
+  int array_length, int string_length, Array** array, char* chars);
 Bool MR_run_test(char* test_name, Func test_func);
 
-Returncode String_clear(String* this);
-Returncode String_length(String* this, Int* length);
-Returncode String_equal(String* this, String* other, Bool* equal);
-Returncode String_get(String* this, Int index, Char* ch);
-Returncode String_append(String* this, Char ch);
-Returncode String_new(String* this, String* source);
-Returncode String_concat(String* this, String* ext);
-Returncode String_concat_int(String* this, Int num);
-Returncode String_find(String* this, String* pattern, Int* index);
-Returncode String_has(String* this, Char ch, Bool* found);
+Returncode String_clear(String**);
+Returncode String_length(String**, Int* length);
+Returncode String_equal(String**, String** other, Bool* equal);
+Returncode String_get(String**, Int index, Char* ch);
+Returncode String_append(String**, Char ch);
+Returncode String_new(String**, String** source);
+Returncode String_concat(String**, String** ext);
+Returncode String_concat_int(String**, Int num);
+Returncode String_find(String**, String** pattern, Int* index);
+Returncode String_has(String**, Char ch, Bool* found);
 
-Returncode Int_str(Int value, String* str);
+Returncode Int_str(Int value, String** str);
 
-Returncode file_open_read(String* name, File** file);
-Returncode file_open_write(String* name, File** file);
-Returncode File_close(File* this);
-Returncode File_getc(File* this, Char* ch);
-Returncode File_putc(File* this, Char ch);
-Returncode File_write(File* this, String* line);
+Returncode file_open_read(String** name, File*** file);
+Returncode file_open_write(String** name, File*** file);
+Returncode File_close(File**);
+Returncode File_getc(File**, Char* ch);
+Returncode File_putc(File**, Char ch);
+Returncode File_write(File**, String** line);
 
-extern Sys* sys;
-Returncode Sys_print(Sys*, String* text);
-Returncode Sys_println(Sys*, String* text);
-Returncode Sys_exit(Sys*, Int status);
-Returncode Sys_system(Sys*, String* command, Int* status);
-Returncode Sys_getenv(Sys*, String* name, String* value, Bool* exists);
+extern Sys** sys;
+Returncode Sys_print(Sys**, String** text);
+Returncode Sys_println(Sys**, String** text);
+Returncode Sys_exit(Sys**, Int status);
+Returncode Sys_system(Sys**, String** command, Int* status);
+Returncode Sys_getenv(Sys**, String** name, String** value, Bool* exists);
 
 
 #endif  /*MR_MR4_MR_4_H_INCLUDED_*/
