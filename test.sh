@@ -6,6 +6,7 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Wall -Werror"
+TEST_DIR="tests/"
 rm -rf .test
 mkdir .test
 cp *.mr .test
@@ -93,14 +94,17 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
 # run mr4-compiler unit-tests
 mkdir tests
 cp ../MR4/tests/*.3.mr tests
+cp ../MR4/tests/*.4.mr tests
+cp ../MR4/tests/*.expected.c tests
 ./mr3-compiler global/*.3.mr expression/*.3.mr syntax-tree/*.3.mr \
   tests/*.3.mr mr4-compiler.3.mr
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   mr4-compiler.c ../MR3/mr.3.c -I. -I../MR3 -o mr4-compiler-tests
 ./mr4-compiler-tests
+diff tests/expression-tests.actual.c tests/expression-tests.expected.c
+diff tests/syntax-tree-tests.actual.c tests/syntax-tree-tests.expected.c
 
 # run mr4-compiler single-file integration test
-cp ../MR4/tests/integration-test*.4.mr tests
 ./mr4-compiler tests/integration-actual-single.c tests/integration-test0.4.mr
 diff ../MR4/tests/integration-expected-single.c \
   tests/integration-actual-single.c

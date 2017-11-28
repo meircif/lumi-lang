@@ -1,0 +1,581 @@
+## @@ test-general
+## @ g t0
+user String str
+## @ g t1
+
+  
+
+var Int x
+## @ g t2
+# comment
+
+var Int x
+## @ g t3
+## documemtation
+
+var Int x
+## @ g t4
+{# multi 
+ line 
+ comment #}
+
+var Int x
+## @ g t5
+{## multi 
+ line 
+ documemtation #}
+
+var Int x
+## @ eg t6
+error 
+## @ ec t7
+1 + 2
+## @ ec t8
+return
+  i := 3
+## @ ec t9
+raise
+  i := 3
+## @ eg t10
+{# comment #}?
+## @ eg t11
+main(
+
+## @ eg t12
+  struct Test
+## @ eg t13
+var Int x
+## @ eg t14
+var Int name
+var Int name
+
+## @ eg t15
+func name()
+var Int name
+## @@ test-struct
+## @ g t0
+struct Test
+  var Int x
+## @ g t1
+struct Test
+  var Int x
+## @ g t2
+struct Test1
+  var Int x
+struct Test2
+  var Int x
+
+
+struct Test3
+  var Int x
+## @ g t3
+struct Test2(Test1)
+  var Int y
+struct Test1
+  var Int x
+## @ eg t4
+struct(
+
+## @ eg t5
+struct error
+
+## @ eg t6
+struct ERrror
+
+## @ eg t7
+struct Error-name
+
+## @ eg t8
+struct Int
+
+## @ eg t9
+struct Test
+struct Test
+
+## @ eg t10
+struct Test(Base
+
+## @ eg t11
+struct Test
+  error 
+## @ eg t12
+struct Test
+## @ eg t13
+struct Error
+
+## @@ test-class
+## @ g t0
+class Base
+  var Int x
+  func inst stat()
+  func dynamic dyn0()
+  func dynamic dyn1()
+class Mid(Base)
+  var Int y
+  func dynamic dyn0()
+  func dynamic dyn2()
+class Top(Mid)
+  var Int z
+  func dynamic dyn0()
+    base()
+  func dynamic dyn3()
+    base.dyn0()
+## @ eg t1
+class(
+
+## @ eg t2
+class Error
+  var Int x
+
+## @@ test-function
+## @ g t0
+func name()
+## @ g t1
+func name(var String self, user String text, copy Int num)
+## @ g t2
+func name()->(owner String text, copy Int num)
+## @ g t3
+func name(copy Char param)->(owner String out)
+## @ g t4
+func name(user Array{Int} array)
+## @ g t5
+func name(copy Func{(copy Int x)->(copy Int y)} fun)->(copy Func{()} joy)
+## @ g t6
+func name()
+  var Int x
+## @ g t7
+main
+  var Int x
+## @ eg t8
+func(
+
+## @ eg t9
+func name
+
+## @ eg t10
+func Error()
+
+## @ eg t11
+func error_name()
+
+## @ eg t12
+func name()
+func name()
+
+## @ eg t13
+var Int name
+func name()
+
+## @ eg t14
+func name( )
+
+## @ eg t15
+func name(user)
+
+## @ eg t16
+func name(var String
+
+## @ eg t17
+func name(error Int x)
+
+## @ eg t18
+func name(var String str,user Int x)
+
+## @ eg t19
+func name()-()
+
+## @ eg t20
+func name()
+## @ eg t21
+func name()
+    var Int x
+## @ eg t22
+func name(user Int x)
+
+## @ eg t23
+func name(copy String s)
+
+## @ eg t24
+func name(user Array error)
+
+## @ eg t25
+func name(copy Func error)
+
+## @ eg t26
+func name(user Array{Array{Int}} error)
+
+## @@ test-members
+## @ g t0
+struct Test
+  var Int x
+  user String str
+## @ g t1
+struct Test
+  var Int x
+  func name()
+## @ g t2
+struct Test
+  var Int x
+  func name()
+    var Int x
+## @ g t3
+struct Test
+  # comment
+  var Int x
+## @ g t4
+struct Test
+  ## documemtation
+  var Int x
+## @ g t5
+struct Test
+  {# multi 
+ line 
+ comment #}
+  var Int x
+## @ g t6
+struct Test
+  {## multi 
+ line 
+ documemtation #}
+  var Int x
+## @ g t7
+var Int name
+func fun()
+struct Test1
+  var Int name
+  func fun()
+struct Test2
+  var Int fun
+  func name()
+
+## @ eg t8
+struct Test
+  var Int name
+  var Int name
+
+## @ eg t9
+struct Test
+  func name()
+  var Int name
+
+## @ eg t10
+struct Test
+  func name()
+  func name()
+
+## @ eg t11
+struct Test
+  var Int name
+  func name()
+
+## @@ test-return
+## @ g t0
+func name()
+  return
+## @ g t1
+func name()
+  raise
+## @@ test-code-variables
+## @ c t0
+var Int x
+## @ c t1
+user String s
+## @ c t2
+owner Array{Int} a
+## @ c t3
+user Test tt
+## @ c t4
+var String{12} s
+## @ c t5
+var Array{12:Int} a
+## @ c t6
+var Array{12:Test} a
+## @ c t7
+var Array{12:String{7}} sa
+## @ c t8
+t := Test(copy i)
+## @ c t9
+str := String{arr[0]}()
+## @ c t10
+arr := Array{arr[0]:Int}()
+## @ c t11
+owner Array{Test} a(var Array{arr[0]:Test}())
+## @ c t12
+owner Array{String} sa(var Array{arr[0]:String{arr[1]}}())
+## @ c t13
+var Int x(var arr[0])
+## @ c t14
+user String s(var str)
+## @ c t15
+var String{12} s(user "some string")
+## @ c t16
+new String{i} s(user str)
+## @ c t17
+user Test tt(var tc)
+## @ c t18
+var Test tt(copy 3)
+## @ c t19
+new Test tt(copy 3)
+## @ c t20
+t := Test(copy 3)
+## @ ec t21
+var Int
+## @ ec t22
+var Int Error
+## @ ec t23
+var Int errorName
+## @ ec t24
+var Int name
+  var Int name
+
+## @ ec t25
+var Int name
+  do
+    var Int x
+    do
+      var Int name
+
+## @ eg t26
+var Int name
+func mock()
+  var Int name
+## @ eg t27
+func name()
+func mock()
+  var Int name
+## @ eg t28
+struct Test
+  var Int x(1)
+## @ eg t29
+var Int x(1)
+## @ eg t30
+struct Test
+  var Test t
+
+## @ ec t31
+Int()
+## @ ec t32
+var String s
+## @ ec t33
+var Array{4:String} sa
+## @ ec t34
+new String s
+## @ ec t35
+String()
+## @ ec t36
+user Array a
+## @ ec t37
+new Array a
+## @ ec t38
+Array()
+## @ ec t39
+var Array{23} a
+## @ ec t40
+var Array{1:Array{2:Int}} a
+## @ ec t41
+var Array{1
+## @ ec t42
+var String{12
+## @ ec t43
+var Array{error:Int} a
+## @ ec t44
+var Array{"12":Int} a
+## @ ec t45
+user Int x
+## @ ec t46
+new Int x
+## @ ec t47
+var File f(copy 1)
+## @ ec t48
+var Bool x(var 1)
+## @ ec t49
+var Int x(var 1, var 2)
+## @ eg t50
+struct Test
+  var Int x
+func mock()
+  Test(copy 1)
+
+## @@ test-comment
+## @ c t0
+# comment
+
+  var Int x
+## @ c t1
+## documemtation
+
+  var Int x
+## @ c t2
+{# multi 
+ line 
+ comment #}
+
+  var Int x
+## @ c t3
+{## multi 
+ line 
+ documemtation #}
+
+  var Int x
+## @@ test-if-else
+## @ c t0
+if t.num > 3
+    i -= 2
+## @ c t1
+if i > 3
+    i -= 2
+  else
+    i += 1
+## @ c t2
+if i > 3
+    i -= 3
+  else-if t.num > 2
+    i -= 2
+  else-if t.num > 1
+    i -= 1
+  else
+    i += 1
+## @ c t3
+if b
+    return
+  i := 3
+## @ ec t4
+if 3
+## @ ec t5
+if b
+    error
+## @ ec t6
+if b
+    i := 0
+  else
+    error
+## @ ec t7
+if b
+    i := 0
+  else-if b
+    error
+## @ ec t8
+if b
+    return
+    i := 3
+## @@ test-do-loop
+## @ c t0
+do
+    var Int x
+## @ c t1
+
+  
+    
+
+  var Int x
+## @ c t2
+do
+    while t.num > 3
+## @ c t3
+do
+    continue
+## @ ec t4
+do(
+## @ ec t5
+while true
+## @ ec t6
+continue
+## @ ec t7
+do
+    while 2
+## @ ec t8
+do
+    error
+## @ ec t9
+do
+    var Int error
+  do
+    var Int error
+## @@ test-for-loop
+## @ c t0
+for n in 5
+    i += n
+## @ c t1
+for n in t.num:t.num + 2
+    i += n
+## @ ec t2
+for(
+## @ ec t3
+for n
+## @ ec t4
+for n error
+## @ ec t5
+for n in str
+## @ ec t6
+for n in str:8
+## @ ec t7
+for n in 5
+    error
+## @@ test-testing
+## @ c t0
+assert t.num = 2
+## @ c t1
+assert-error t.num
+## @ c t2
+assert-error fun0()
+## @ g t3
+func fun()
+  fun()
+mock fun()
+  raise
+## @ g t4
+mock fun()
+func fun()
+  fun()
+
+## @ g t5
+mock Test.meth(copy Int x)
+struct Test
+  var Int x
+  func meth(copy Int x)
+    self.meth(copy x)
+## @ g t6
+test fun0()
+test fun1()
+
+## @ g t7
+test fun0()
+test fun1()
+main
+
+## @ ec t8
+assert 3
+## @ ec t9
+assert error
+## @ ec t10
+assert-error error
+## @ eg t11
+test fun(copy Int x)
+
+## @ eg t12
+test fun()->(copy Int x)
+
+## @ eg t13
+mock error()
+
+## @ eg t14
+mock Error.fun()
+
+## @ eg t15
+struct Test
+  var Int x
+mock Test.error()
+
+## @ eg t16
+mock fun(owner String s)
+func fun(user String s)
+
+## @ eg t17
+mock fun(user Int s)
+func fun(user String s)
+
+## @ eg t18
+mock fun(user Array{Char} a)
+func fun(user Array{Int} a)
+
+## @

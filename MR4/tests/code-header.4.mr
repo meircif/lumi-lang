@@ -1,0 +1,40 @@
+struct Test
+  var Int num
+  var Func{()} fun
+  new(copy Int num)
+  func meth()
+class Ta(Test)
+  var Int numa
+  func inst metha()
+  func dynamic dyn()
+class Tb(Ta)
+  var Int numb
+  func inst methb()
+  func dynamic dyn()
+class Tc(Tb)
+  var Int numc
+  func inst methc()
+  func dynamic dyn()
+
+func fun0()
+func fun1(copy Int x, user String s, owner String o)
+func fun2()->(owner String s, copy Int x)
+func fun3(copy Int x)->(owner String s)
+func fun4(copy Int x)
+func fun5(copy Int x)->(copy Int y)
+func fun6(copy Int x, copy Int y)->(copy Int n, copy Int m)
+func fun7()->(user Tb tb)
+func mock(
+    copy Int i,
+    copy Char c,
+    copy Bool b,
+    user String str,
+    user Array{Int} arr,
+    user File fobj,
+    user Test t,
+    user Ta ta,
+    user Tb tb,
+    user Tc tc)->(
+    owner String so,
+    copy Int io)
+  

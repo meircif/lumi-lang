@@ -17,12 +17,13 @@ func test-global-scope(user String input-text, user String expected-output)
   if mock-output-file-text[0] != '\n'
     print(user mock-output-file-text)
   assert mock-output-file-text[0] = '\n'
+  assert mock-output-file-text[mock-output-file-text.length - 1] = '\n'
   f-assert-string-slice(
       user expected-output,
       user mock-output-file-text,
       copy 1,
-      copy mock-output-file-text.length - 2)
-  assert mock-output-file-text[mock-output-file-text.length - 1] = '\n'
+      copy mock-output-file-text.length - 2,
+      copy true)
 
 
 func test-global-scope-error(user String input-text, user String expected-error)
@@ -36,714 +37,60 @@ func test-global-scope-error(user String input-text, user String expected-error)
       user expected-header,
       user mock-print-text,
       copy 0,
-      copy expected-header.length)
+      copy expected-header.length,
+      copy false)
+  assert mock-print-text[mock-print-text.length - 1] = '\n'
   f-assert-string-slice(
       user expected-error,
       user mock-print-text,
       copy expected-header.length + 3,
-      copy mock-print-text.length - expected-header.length - 4)
-  assert mock-print-text[mock-print-text.length - 1] = '\n'
+      copy mock-print-text.length - expected-header.length - 4,
+      copy true)
 
 
 test test-general()
-  test-global-scope(user "user String str", user "String** str;")
-  user String expected("Int x;")
-  test-global-scope(user "\n  \n\nvar Int x", user expected)
-  test-global-scope(user "# comment\n\nvar Int x", user expected)
-  test-global-scope(user "## documemtation\n\nvar Int x", user expected)
-  test-global-scope(
-      user "{# multi \n line \n comment #}\n\nvar Int x", user expected)
-  test-global-scope(
-      user "{## multi \n line \n documemtation #}\n\nvar Int x", user expected)
-  test-global-scope-error(user "error ", user "unknown keyword \"error\"")
-  test-code-error(user "1 + 2", user "statememnt has no effect")
-  test-code-error(user "return\n  i := 3", user "unreachable code")
-  test-code-error(user "raise\n  i := 3", user "unreachable code")
-  test-global-scope-error(
-      user "{# comment #}?", user "expected new-line in line end, got \"?\"")
-  test-global-scope-error(
-      user "main(\n", user "expected new-line after \"main\", got \"(\"")
-  test-global-scope-error(
-      user "  struct Test",
-      user "indentation too big, expected \"0\" got \"2\"")
-  test-global-scope-error(
-      user "var Int x",
-      user "no new-line before file end")
-  test-global-scope-error(
-      user "var Int name\nvar Int name\n",
-      user "redefinition of global variable \"name\"")
-  test-global-scope-error(
-      user "func name()\nvar Int name",
-      user "variable name overrides function \"name\"")
+  test-new-file(user "syntax-tree-tests", user "test-general")
 
 
 test test-struct()
-  test-global-scope(
-      user "struct Test\n  var Int x",
-      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
-  test-global-scope(
-      user "struct Test\n  var Int x",
-      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
-  test-global-scope(
-      user "struct Test1\n  var Int x\nstruct Test2\n  var Int x\n\n\nstruct Test3\n  var Int x",
-      user "typedef struct Test1 Test1;\ntypedef struct Test2 Test2;\ntypedef struct Test3 Test3;\nstruct Test1 {\n  Int x;\n};\nstruct Test2 {\n  Int x;\n};\nstruct Test3 {\n  Int x;\n};")
-  test-global-scope(
-      user "struct Test2(Test1)\n  var Int y\nstruct Test1\n  var Int x",
-      user "typedef struct Test1 Test1;\ntypedef struct Test2 Test2;\nstruct Test1 {\n  Int x;\n};\nstruct Test2 {\n  Test1 _base;\n  Int y;\n};")
-  test-global-scope-error(
-      user "struct(\n", user "expected space after \"struct\", got \"(\"")
-  test-global-scope-error(
-      user "struct error\n", user "illegal type name \"error\"")
-  test-global-scope-error(
-      user "struct ERrror\n", user "illegal type name \"ERrror\"")
-  test-global-scope-error(
-      user "struct Error-name\n", user "illegal type name \"Error-name\"")
-  test-global-scope-error(
-      user "struct Int\n", user "redefinition of type \"Int\"")
-  test-global-scope-error(
-      user "struct Test\nstruct Test\n", user "redefinition of type \"Test\"")
-  test-global-scope-error(
-      user "struct Test(Base\n",
-      user "expected \")\" after base type, got \"new-line\"")
-  test-global-scope-error(
-      user "struct Test\n  error ", user "unknown keyword \"error\"")
-  test-global-scope-error(
-      user "struct Test", user "expected block in a new line, got \"EOF\"")
-  test-global-scope-error(
-      user "struct Error\n", user "type with no fields \"Error\"")
+  test-from-file(user "test-struct")
 
 
 test test-class()
-  var String{1024} input
-  input.copy(user "class Base\n")
-  input.concat(user "  var Int x\n")
-  input.concat(user "  func inst stat()\n")
-  input.concat(user "  func dynamic dyn0()\n")
-  input.concat(user "  func dynamic dyn1()\n")
-  input.concat(user "class Mid(Base)\n")
-  input.concat(user "  var Int y\n")
-  input.concat(user "  func dynamic dyn0()\n")
-  input.concat(user "  func dynamic dyn2()\n")
-  input.concat(user "class Top(Mid)\n")
-  input.concat(user "  var Int z\n")
-  input.concat(user "  func dynamic dyn0()\n")
-  input.concat(user "    base()\n")
-  input.concat(user "  func dynamic dyn3()\n")
-  input.concat(user "    base.dyn0()\n")
-  
-  var String{4096} expected
-  expected.copy(user "typedef struct Base Base;\n")
-  expected.concat(user "typedef struct Base_Dynamic Base_Dynamic;\n")
-  expected.concat(user "typedef struct Mid Mid;\n")
-  expected.concat(user "typedef struct Mid_Dynamic Mid_Dynamic;\n")
-  expected.concat(user "typedef struct Top Top;\n")
-  expected.concat(user "typedef struct Top_Dynamic Top_Dynamic;\n")
-  
-  expected.concat(user "struct Base {\n")
-  expected.concat(user "  Int x;\n")
-  expected.concat(user "};\n")
-  expected.concat(user "struct Base_Dynamic {\n")
-  expected.concat(user "  Returncode (*dyn0)(Base** self")
-  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
-  expected.concat(user "  Returncode (*dyn1)(Base** self")
-  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
-  expected.concat(user "};\n")
-  expected.concat(user "struct Mid {\n")
-  expected.concat(user "  Base _base;\n")
-  expected.concat(user "  Int y;\n")
-  expected.concat(user "};\n")
-  expected.concat(user "struct Mid_Dynamic {\n")
-  expected.concat(user "  Base_Dynamic _base;\n")
-  expected.concat(user "  Returncode (*dyn2)(Mid** self")
-  expected.concat(user ", Mid_Dynamic* self_Dynamic);\n")
-  expected.concat(user "};\n")
-  expected.concat(user "struct Top {\n")
-  expected.concat(user "  Mid _base;\n")
-  expected.concat(user "  Int z;\n")
-  expected.concat(user "};\n")
-  expected.concat(user "struct Top_Dynamic {\n")
-  expected.concat(user "  Mid_Dynamic _base;\n")
-  expected.concat(user "  Returncode (*dyn3)(Top** self")
-  expected.concat(user ", Top_Dynamic* self_Dynamic);\n")
-  expected.concat(user "};\n")
-  
-  expected.concat(user "Returncode Base_stat(Base** self")
-  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
-  expected.concat(user "Returncode Base_dyn0(Base** self")
-  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
-  expected.concat(user "Returncode Base_dyn1(Base** self")
-  expected.concat(user ", Base_Dynamic* self_Dynamic);\n")
-  expected.concat(user "Returncode Mid_dyn0(Mid** self")
-  expected.concat(user ", Mid_Dynamic* self_Dynamic);\n")
-  expected.concat(user "Returncode Mid_dyn2(Mid** self")
-  expected.concat(user ", Mid_Dynamic* self_Dynamic);\n")
-  expected.concat(user "Returncode Top_dyn0(Top** self")
-  expected.concat(user ", Top_Dynamic* self_Dynamic);\n")
-  expected.concat(user "Returncode Top_dyn3(Top** self")
-  expected.concat(user ", Top_Dynamic* self_Dynamic);\n")
-  
-  expected.concat(user "Base_Dynamic Base_dynamic = {Base_dyn0, Base_dyn1};\n")
-  expected.concat(user "Mid_Dynamic Mid_dynamic = {{(Func)Mid_dyn0, Base_dyn1}")
-  expected.concat(user ", Mid_dyn2};\n")
-  expected.concat(user "Top_Dynamic Top_dynamic = {{{(Func)Top_dyn0")
-  expected.concat(user ", Base_dyn1}, Mid_dyn2}, Top_dyn3};\n")
-  
-  expected.concat(user "Returncode Base_stat(Base** self")
-  expected.concat(user ", Base_Dynamic* self_Dynamic)")
-  expected.concat(user empty-func-body)
-  expected.concat(user "Returncode Base_dyn0(Base** self")
-  expected.concat(user ", Base_Dynamic* self_Dynamic)")
-  expected.concat(user empty-func-body)
-  expected.concat(user "Returncode Base_dyn1(Base** self")
-  expected.concat(user ", Base_Dynamic* self_Dynamic)")
-  expected.concat(user empty-func-body)
-  expected.concat(user "Returncode Mid_dyn0(Mid** self")
-  expected.concat(user ", Mid_Dynamic* self_Dynamic)")
-  expected.concat(user empty-func-body)
-  expected.concat(user "Returncode Mid_dyn2(Mid** self")
-  expected.concat(user ", Mid_Dynamic* self_Dynamic)")
-  expected.concat(user empty-func-body)
-  expected.concat(user "Returncode Top_dyn0(Top** self")
-  expected.concat(user ", Top_Dynamic* self_Dynamic) {\n")
-  expected.concat(user "  Returncode MR_err = OK;\n")
-  expected.concat(user "  CHECK(13, Mid_dyn0((void*)self")
-  expected.concat(user ", &(self_Dynamic->_base)) )\n")
-  expected.concat(user "MR_cleanup:\n")
-  expected.concat(user "  return MR_err;\n")
-  expected.concat(user "}\n")
-  expected.concat(user "Returncode Top_dyn3(Top** self")
-  expected.concat(user ", Top_Dynamic* self_Dynamic) {\n")
-  expected.concat(user "  Returncode MR_err = OK;\n")
-  expected.concat(user "  CHECK(15, Mid_dyn0((void*)self")
-  expected.concat(user ", &(self_Dynamic->_base)) )\n")
-  expected.concat(user "MR_cleanup:\n")
-  expected.concat(user "  return MR_err;\n")
-  expected.concat(user "}")
-  
-  test-global-scope(user input, user expected)
-  test-global-scope-error(
-      user "class(\n", user "expected space after \"class\", got \"(\"")
-  test-global-scope-error(
-      user "class Error\n  var Int x\n",
-      user "class with no dynamic methods \"Error\"")
+  test-from-file(user "test-class")
 
 
 test test-function()
-  test-global-scope(
-      user "func name()",
-      user "Returncode name(void);\nReturncode name(void) {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "func name(var String self, user String text, copy Int num)",
-      user "Returncode name(String** self, String** text, Int num);\nReturncode name(String** self, String** text, Int num) {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "func name()->(owner String text, copy Int num)",
-      user "Returncode name(String*** text, Int* num);\nReturncode name(String*** text, Int* num) {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "func name(copy Char param)->(owner String out)",
-      user "Returncode name(Char param, String*** out);\nReturncode name(Char param, String*** out) {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "func name(user Array{Int} array)",
-      user "Returncode name(Array** array);\nReturncode name(Array** array) {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "func name(copy Func{(copy Int x)->(copy Int y)} fun)->(copy Func{()} joy)",
-      user "Returncode name(Returncode (*fun)(Int x, Int* y), Returncode (**joy)(void));\nReturncode name(Returncode (*fun)(Int x, Int* y), Returncode (**joy)(void)) {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "func name()\n  var Int x",
-      user "Returncode name(void);\nReturncode name(void) {\n  Returncode MR_err = OK;\n  Int x = 0;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "main\n  var Int x",
-      user "USER_MAIN_HEADER {\n  Returncode MR_err = OK;\n  Int x = 0;\nMR_cleanup:\n  return MR_err;\n}\nMAIN_FUNC")
-  test-global-scope-error(
-      user "func(\n", user "expected space after \"func\", got \"(\"")
-  test-global-scope-error(
-      user "func name\n",
-      user "expected \"(\" after function name, got \"new-line\"")
-  test-global-scope-error(
-      user "func Error()\n", user "illegal function name \"Error\"")
-  test-global-scope-error(
-      user "func error_name()\n", user "illegal function name \"error_name\"")
-  test-global-scope-error(
-      user "func name()\nfunc name()\n",
-      user "redefinition of function \"name\"")
-  test-global-scope-error(
-      user "var Int name\nfunc name()\n",
-      user "function name overrides global variable \"name\"")
-  test-global-scope-error(
-      user "func name( )\n", user "expected access, got \" \"")
-  test-global-scope-error(
-      user "func name(user)\n", user "expected space after access, got \")\"")
-  test-global-scope-error(
-      user "func name(var String\n",
-      user "expected space after type, got \"new-line\"")
-  test-global-scope-error(
-      user "func name(error Int x)\n", user "illegal access \"error\"")
-  test-global-scope-error(
-      user "func name(var String str,user Int x)\n",
-      user "expected space or new-line after \",\", got \"u\"")
-  test-global-scope-error(
-      user "func name()-()\n", user "expected \">(\" got \"()\"")
-  test-global-scope-error(
-      user "func name()", user "expected block in a new line, got \"EOF\"")
-  test-global-scope-error(
-      user "func name()\n    var Int x",
-      user "indentation too big, expected \"2\" got \"4\"")
-  test-global-scope-error(
-      user "func name(user Int x)\n",
-      user "argument \"x\" access should be \"copy\" for primitive types, got \"user\"")
-  test-global-scope-error(
-      user "func name(copy String s)\n",
-      user "argument \"s\" access should not be \"copy\" for non-primitive type \"String\"")
-  test-global-scope-error(
-      user "func name(user Array error)\n", user "missing subtype for array")
-  test-global-scope-error(
-      user "func name(copy Func error)\n",
-      user "missing arguments in function type")
-  test-global-scope-error(
-      user "func name(user Array{Array{Int}} error)\n",
-      user "multidimensional array not supported yet...")
+  test-from-file(user "test-function")
 
 
 test test-members()
-  test-global-scope(
-      user "struct Test\n  var Int x\n  user String str",
-      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n  String** str;\n};")
-  test-global-scope(
-      user "struct Test\n  var Int x\n  func name()",
-      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_name(Test** self);\nReturncode Test_name(Test** self) {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "struct Test\n  var Int x\n  func name()\n    var Int x",
-      user "typedef struct Test Test;\nstruct Test {\n  Int x;\n};\nReturncode Test_name(Test** self);\nReturncode Test_name(Test** self) {\n  Returncode MR_err = OK;\n  Int x = 0;\nMR_cleanup:\n  return MR_err;\n}")
-  user String expected("typedef struct Test Test;\nstruct Test {\n  Int x;\n};")
-  test-global-scope(user "struct Test\n  # comment\n  var Int x", user expected)
-  test-global-scope(
-      user "struct Test\n  ## documemtation\n  var Int x", user expected)
-  test-global-scope(
-      user "struct Test\n  {# multi \n line \n comment #}\n  var Int x",
-      user expected)
-  test-global-scope(
-      user "struct Test\n  {## multi \n line \n documemtation #}\n  var Int x",
-      user expected)
-  var String{1024} output
-  output.copy(user "typedef struct Test1 Test1;\n")
-  output.concat(user "typedef struct Test2 Test2;\n")
-  output.concat(user "struct Test1 {\n")
-  output.concat(user "  Int name;\n")
-  output.concat(user "};\n")
-  output.concat(user "struct Test2 {\n")
-  output.concat(user "  Int fun;\n")
-  output.concat(user "};\n")
-  output.concat(user "Returncode Test1_fun(Test1** self);\n")
-  output.concat(user "Returncode Test2_name(Test2** self);\n")
-  output.concat(user "Int name;\n")
-  output.concat(user "Returncode fun(void);\n")
-  output.concat(user "Returncode Test1_fun(Test1** self)")
-  output.concat(user empty-func-body)
-  output.concat(user "Returncode Test2_name(Test2** self)")
-  output.concat(user empty-func-body)
-  output.concat(user "Returncode fun(void)")
-  output.concat(user empty-func-body)
-  output.length -= 1
-  test-global-scope(
-      user "var Int name\nfunc fun()\nstruct Test1\n  var Int name\n  func fun()\nstruct Test2\n  var Int fun\n  func name()\n",
-      user output)
-  test-global-scope-error(
-      user "struct Test\n  var Int name\n  var Int name\n",
-      user "redefinition of field \"name\"")
-  test-global-scope-error(
-      user "struct Test\n  func name()\n  var Int name\n",
-      user "field name overrides method \"name\"")
-  test-global-scope-error(
-      user "struct Test\n  func name()\n  func name()\n",
-      user "redefinition of method \"name\"")
-  test-global-scope-error(
-      user "struct Test\n  var Int name\n  func name()\n",
-      user "method name overrides field \"name\"")
+  test-from-file(user "test-members")
 
 
 test test-return()
-  test-global-scope(
-      user "func name()\n  return",
-      user "Returncode name(void);\nReturncode name(void) {\n  Returncode MR_err = OK;\n  goto MR_cleanup;\nMR_cleanup:\n  return MR_err;\n}")
-  test-global-scope(
-      user "func name()\n  raise",
-      user "Returncode name(void);\nReturncode name(void) {\n  Returncode MR_err = OK;\n  RAISE(2)\nMR_cleanup:\n  return MR_err;\n}")
+  test-from-file(user "test-return")
 
 
 test test-code-variables()
-  test-code(user "var Int x", user "Int x = 0;")
-  test-code(user "user String s", user "String** s = NULL;")
-  test-code(user "owner Array{Int} a", user "Array** a = NULL;")
-  test-code(user "user Test tt", user "Test** tt = NULL;")
-  test-code(
-      user "var String{12} s",
-      user "char s_Values[12];\n  String s_Var = {12, 0, NULL};\n  String** s = NULL;\n  s = MR_new_ref();\n  if (s == NULL) RAISE(1)\n  *s = &s_Var;\n  s_Var.values = s_Values;")
-  test-code(
-      user "var Array{12:Int} a",
-      user "Int a_Values[12];\n  Array a_Var = {12, NULL};\n  Array** a = NULL;\n  a = MR_new_ref();\n  if (a == NULL) RAISE(1)\n  *a = &a_Var;\n  a_Var.values = a_Values;")
-  test-code(
-      user "var Array{12:Test} a",
-      user "Test a_Values[12];\n  Array a_Var = {12, NULL};\n  Array** a = NULL;\n  a = MR_new_ref();\n  if (a == NULL) RAISE(1)\n  *a = &a_Var;\n  a_Var.values = a_Values;")
-  test-code(
-      user "var Array{12:String{7}} sa",
-      user "char sa_Chars[12 * 7];\n  String sa_Values[12];\n  Array sa_Var = {12, NULL};\n  Array** sa = NULL;\n  sa = MR_new_ref();\n  if (sa == NULL) RAISE(1)\n  *sa = &sa_Var;\n  sa_Var.values = sa_Values;\n  MR_set_var_string_array(12, 7, sa, sa_Chars);")
-  test-code(
-      user "t := Test(copy i)",
-      user "Test** aux_Test_0 = NULL;\n  aux_Test_0 = MR_new_ref();\n  if (aux_Test_0 == NULL) RAISE(1)\n  *aux_Test_0 = calloc(1, sizeof(Test));\n  if (*aux_Test_0 == NULL) RAISE(1)\n  CHECK(1, Test_new(aux_Test_0, i) )\n  t = aux_Test_0;")
-  
-  var String{1024} expected
-  expected.copy(user "String** aux_String_0 = NULL;\n")
-  expected.concat(user "  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)\n")
-  expected.concat(user "  aux_String_0 = MR_new_ref();\n")
-  expected.concat(user "  if (aux_String_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  *aux_String_0")
-  expected.concat(user " = MR_new_string(((Int*)((*arr)->values))[0]);\n")
-  expected.concat(user "  if (*aux_String_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  str = aux_String_0;")
-  test-code(user "str := String{arr[0]}()", user expected)
-  
-  expected.copy(user "Array** aux_Array_0 = NULL;\n")
-  expected.concat(user "  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)\n")
-  expected.concat(user "  aux_Array_0 = MR_new_ref();\n")
-  expected.concat(user "  if (aux_Array_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  *aux_Array_0 = MR_new_array(")
-  expected.concat(user "((Int*)((*arr)->values))[0], sizeof(Int));\n")
-  expected.concat(user "  if (*aux_Array_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  arr = aux_Array_0;")
-  test-code(user "arr := Array{arr[0]:Int}()", user expected)
-  
-  expected.copy(user "Array** a = NULL;\n")
-  expected.concat(user "  Array** aux_Array_0 = NULL;\n")
-  expected.concat(user "  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)\n")
-  expected.concat(user "  aux_Array_0 = MR_new_ref();\n")
-  expected.concat(user "  if (aux_Array_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  *aux_Array_0 = MR_new_array(")
-  expected.concat(user "((Int*)((*arr)->values))[0], sizeof(Test));\n")
-  expected.concat(user "  if (*aux_Array_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  a = aux_Array_0;")
-  test-code(user "owner Array{Test} a(var Array{arr[0]:Test}())", user expected)
-  
-  expected.copy(user "Array** sa = NULL;\n")
-  expected.concat(user "  Array** aux_Array_0 = NULL;\n")
-  expected.concat(user "  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)\n")
-  expected.concat(user "  if ((1) < 0 || (1) >= (*arr)->length) RAISE(1)\n")
-  expected.concat(user "  aux_Array_0 = MR_new_ref();\n")
-  expected.concat(user "  if (aux_Array_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  *aux_Array_0")
-  expected.concat(user " = MR_new_string_array(((Int*)((*arr)->values))[0]")
-  expected.concat(user ", ((Int*)((*arr)->values))[1]);\n")
-  expected.concat(user "  if (*aux_Array_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  sa = aux_Array_0;")
-  test-code(
-      user "owner Array{String} sa(var Array{arr[0]:String{arr[1]}}())",
-      user expected)
-  
-  test-code(
-      user "var Int x(var arr[0])",
-      user "Int x = 0;\n  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)\n  x = ((Int*)((*arr)->values))[0];")
-  test-code(user "user String s(var str)", user "String** s = NULL;\n  s = str;")
-  
-  expected.copy(user "char s_Values[12];\n")
-  expected.concat(user "  String s_Var = {12, 0, NULL};\n")
-  expected.concat(user "  String** s = NULL;\n")
-  expected.concat(user "  String aux_String_0_Var = {0};\n")
-  expected.concat(user "  String** aux_String_0 = NULL;\n")
-  expected.concat(user "  aux_String_0 = MR_new_ref();\n")
-  expected.concat(user "  if (aux_String_0 == NULL) RAISE(1)\n")
-  expected.concat(user "  *aux_String_0 = &aux_String_0_Var;\n")
-  expected.concat(user "  aux_String_0_Var.max_length = 12;\n")
-  expected.concat(user "  aux_String_0_Var.length = 11;\n")
-  expected.concat(user "  aux_String_0_Var.values = \"some string\";\n")
-  expected.concat(user "  s = MR_new_ref();\n")
-  expected.concat(user "  if (s == NULL) RAISE(1)\n")
-  expected.concat(user "  *s = &s_Var;\n")
-  expected.concat(user "  s_Var.values = s_Values;\n")
-  expected.concat(user "  CHECK(1, String_new(s, aux_String_0) )")
-  test-code(user "var String{12} s(user \"some string\")", user expected)
-  
-  test-code(
-      user "new String{i} s(user str)",
-      user "String** s = NULL;\n  s = MR_new_ref();\n  if (s == NULL) RAISE(1)\n  *s = MR_new_string(i);\n  if (*s == NULL) RAISE(1)\n  CHECK(1, String_new(s, str) )")
-  test-code(
-      user "user Test tt(var tc)",
-      user "Test** tt = NULL;\n  tt = (void*)tc;")
-  test-code(
-      user "var Test tt(copy 3)",
-      user "Test tt_Var = {0};\n  Test** tt = NULL;\n  tt = MR_new_ref();\n  if (tt == NULL) RAISE(1)\n  *tt = &tt_Var;\n  CHECK(1, Test_new(tt, 3) )")
-  test-code(
-      user "new Test tt(copy 3)",
-      user "Test** tt = NULL;\n  tt = MR_new_ref();\n  if (tt == NULL) RAISE(1)\n  *tt = calloc(1, sizeof(Test));\n  if (*tt == NULL) RAISE(1)\n  CHECK(1, Test_new(tt, 3) )")
-  test-code(
-      user "t := Test(copy 3)",
-      user "Test** aux_Test_0 = NULL;\n  aux_Test_0 = MR_new_ref();\n  if (aux_Test_0 == NULL) RAISE(1)\n  *aux_Test_0 = calloc(1, sizeof(Test));\n  if (*aux_Test_0 == NULL) RAISE(1)\n  CHECK(1, Test_new(aux_Test_0, 3) )\n  t = aux_Test_0;")
-  test-code-error(
-      user "var Int", user "expected space after type, got \"new-line\"")
-  test-code-error(
-      user "var Int Error", user "illegal variable name \"Error\"")
-  test-code-error(
-      user "var Int errorName", user "illegal variable name \"errorName\"")
-  test-code-error(
-      user "var Int name\n  var Int name\n",
-      user "redefinition of variable \"name\"")
-  test-code-error(
-      user "var Int name\n  do\n    var Int x\n    do\n      var Int name\n",
-      user "redefinition of variable \"name\"")
-  test-global-scope-error(
-      user "var Int name\nfunc mock()\n  var Int name",
-      user "redefinition of global variable \"name\"")
-  test-global-scope-error(
-      user "func name()\nfunc mock()\n  var Int name",
-      user "variable name overrides function \"name\"")
-  test-global-scope-error(
-      user "struct Test\n  var Int x(1)",
-      user "type members cannot be initialized")
-  test-global-scope-error(
-      user "var Int x(1)", user "global variables cannot be initialized")
-  test-global-scope-error(
-      user "struct Test\n  var Test t\n",
-      user "non-primitives cannot be declared \"var\" here yet...")
-  test-code-error(
-      user "Int()", user "dynamic allocation of primitive type \"Int\"")
-  test-code-error(user "var String s", user "missing length for sequence")
-  test-code-error(
-      user "var Array{4:String} sa", user "missing length for sequence")
-  test-code-error(user "new String s", user "missing length for sequence")
-  test-code-error(user "String()", user "missing length for sequence")
-  test-code-error(user "user Array a", user "missing subtype for array")
-  test-code-error(user "new Array a", user "missing subtype for array")
-  test-code-error(user "Array()", user "missing subtype for array")
-  test-code-error(user "var Array{23} a", user "missing subtype for array")
-  test-code-error(
-      user "var Array{1:Array{2:Int}} a",
-      user "multidimensional array not supported yet...")
-  test-code-error(user "var Array{1", user "expected \":\", got \"new-line\"")
-  test-code-error(user "var String{12", user "expected \"}\", got \"new-line\"")
-  test-code-error(
-      user "var Array{error:Int} a", user "unknown symbol \"error\"")
-  test-code-error(
-      user "var Array{\"12\":Int} a",
-      user "got \"String\" expression, expected \"Int\"")
-  test-code-error(
-      user "user Int x",
-      user "only \"var\" access is supported for primitive types, got \"user\"")
-  test-code-error(
-      user "new Int x",
-      user "only \"var\" access is supported for primitive types, got \"new\"")
-  test-code-error(
-      user "var File f(copy 1)", user "no contructor for type \"File\"")
-  test-code-error(
-      user "var Bool x(var 1)", user "cannot assign \"Int\" into \"Bool\"")
-  test-code-error(
-      user "var Int x(var 1, var 2)",
-      user "only one initialization parameter expected")
-  test-global-scope-error(
-      user "struct Test\n  var Int x\nfunc mock()\n  Test(copy 1)\n",
-      user "no contructor for type \"Test\"")
+  test-from-file(user "test-code-variables")
 
 
 test test-comment()
-  user String expected("Int x = 0;")
-  test-code(user "# comment\n\n  var Int x", user expected)
-  test-code(user "## documemtation\n\n  var Int x", user expected)
-  test-code(user "{# multi \n line \n comment #}\n\n  var Int x", user expected)
-  test-code(
-      user "{## multi \n line \n documemtation #}\n\n  var Int x",
-      user expected)
+  test-from-file(user "test-comment")
 
 
 test test-if-else()
-  test-code(
-      user "if t.num > 3\n    i -= 2",
-      user "if (t == NULL || *t == NULL) RAISE(1)\n  if ((*t)->num > 3) {\n    i -= 2;\n  }")
-  test-code(
-      user "if i > 3\n    i -= 2\n  else\n    i += 1",
-      user "if (i > 3) {\n    i -= 2;\n  }\n  else {\n    i += 1;\n  }")
-  
-  var String{1024} expected
-  expected.copy(user "if (i > 3) {\n")
-  expected.concat(user "    i -= 3;\n")
-  expected.concat(user "  }\n")
-  expected.concat(user "  else {\n")
-  expected.concat(user "    if (t == NULL || *t == NULL) RAISE(3)\n")
-  expected.concat(user "    if ((*t)->num > 2) {\n")
-  expected.concat(user "      i -= 2;\n")
-  expected.concat(user "    }\n")
-  expected.concat(user "    else {\n")
-  expected.concat(user "      if (t == NULL || *t == NULL) RAISE(5)\n")
-  expected.concat(user "      if ((*t)->num > 1) {\n")
-  expected.concat(user "        i -= 1;\n")
-  expected.concat(user "      }\n")
-  expected.concat(user "      else {\n")
-  expected.concat(user "        i += 1;\n")
-  expected.concat(user "      }\n")
-  expected.concat(user "    }\n")
-  expected.concat(user "  }")
-  test-code(
-      user "if i > 3\n    i -= 3\n  else-if t.num > 2\n    i -= 2\n  else-if t.num > 1\n    i -= 1\n  else\n    i += 1",
-      user expected)
-  
-  test-code(
-      user "if b\n    return\n  i := 3",
-      user "if (b) {\n    goto MR_cleanup;\n  }\n  i = 3;")
-  test-code-error(
-      user "if 3", user "got \"Int\" expression, expected \"Bool\"")
-  test-code-error(user "if b\n    error", user "unknown symbol \"error\"")
-  test-code-error(
-      user "if b\n    i := 0\n  else\n    error",
-      user "unknown symbol \"error\"")
-  test-code-error(
-      user "if b\n    i := 0\n  else-if b\n    error",
-      user "unknown symbol \"error\"")
-  test-code-error(
-      user "if b\n    return\n    i := 3", user "unreachable code")
+  test-from-file(user "test-if-else")
 
 
 test test-do-loop()
-  test-code(user "do\n    var Int x", user "Int x = 0;\n  while (true) {\n  }")
-  test-code(user "\n  \n    \n\n  var Int x", user "Int x = 0;")
-  test-code(
-      user "do\n    while t.num > 3",
-      user "while (true) {\n    if (t == NULL || *t == NULL) RAISE(2)\n    if (!((*t)->num > 3)) break;\n  }")
-  test-code(user "do\n    continue", user "while (true) {\n    continue;\n  }")
-  test-code-error(user "do(", user "expected new-line after \"do\", got \"(\"")
-  test-code-error(user "while true", user "\"while\" used not inside loop")
-  test-code-error(user "continue", user "\"continue\" used not inside loop")
-  test-code-error(
-      user "do\n    while 2", user "got \"Int\" expression, expected \"Bool\"")
-  test-code-error(user "do\n    error", user "unknown symbol \"error\"")
-  test-code-error(
-      user "do\n    var Int error\n  do\n    var Int error",
-      user "redefinition of variable \"error\"")
+  test-from-file(user "test-do-loop")
 
 
 test test-for-loop()
-  test-code(
-      user "for n in 5\n    i += n",
-      user "{int n; for(n=0; n<5; ++n) {\n    i += n;\n  }\n  }")
-  test-code(
-      user "for n in t.num:t.num + 2\n    i += n",
-      user "if (t == NULL || *t == NULL) RAISE(1)\n  if (t == NULL || *t == NULL) RAISE(1)\n  {int n; for(n=(*t)->num; n<(*t)->num + 2; ++n) {\n    i += n;\n  }\n  }")
-  test-code-error(user "for(", user "expected space after \"for\", got \"(\"")
-  test-code-error(
-      user "for n", user "expected space after index name, got \"new-line\"")
-  test-code-error(
-      user "for n error", user "expected \"in \" got \"err\"")
-  test-code-error(
-      user "for n in str", user "got \"String\" expression, expected \"Int\"")
-  test-code-error(
-      user "for n in str:8", user "got \"String\" expression, expected \"Int\"")
-  test-code-error(user "for n in 5\n    error", user "unknown symbol \"error\"")
+  test-from-file(user "test-for-loop")
 
 
 test test-testing()
-  test-code(
-      user "assert t.num = 2",
-      user "if (t == NULL || *t == NULL) RAISE(1)\n  TEST_ASSERT(1, (*t)->num == 2)")
-  
-  var String{1024} expected
-  expected.copy(user "do {\n")
-  expected.concat(user "    MR_trace_stream = NULL;\n")
-  expected.concat(user "#undef RETURN_ERROR\n")
-  expected.concat(user "#define RETURN_ERROR(value) break\n")
-  expected.concat(user "    if (t == NULL || *t == NULL) RAISE(1)\n")
-  expected.concat(user "    #undef RETURN_ERROR\n")
-  expected.concat(user "#define RETURN_ERROR(value)")
-  expected.concat(user " MR_err = value; goto MR_cleanup\n")
-  expected.concat(user "    MR_trace_stream = stdout;\n")
-  expected.concat(user "    TEST_FAIL(1)\n")
-  expected.concat(user "  } while (false);")
-  test-code(user "assert-error t.num", user expected)
-  
-  expected.copy(user "do {\n")
-  expected.concat(user "    MR_trace_stream = NULL;\n")
-  expected.concat(user "#undef RETURN_ERROR\n")
-  expected.concat(user "#define RETURN_ERROR(value) break\n")
-  expected.concat(user "    CHECK(1, fun0() )\n")
-  expected.concat(user "    #undef RETURN_ERROR\n")
-  expected.concat(user "#define RETURN_ERROR(value)")
-  expected.concat(user " MR_err = value; goto MR_cleanup\n")
-  expected.concat(user "    MR_trace_stream = stdout;\n")
-  expected.concat(user "    TEST_FAIL(1)\n")
-  expected.concat(user "  } while (false);")
-  test-code(user "assert-error fun0()", user expected)
-  
-  expected.copy(user "Returncode fun(void);\n")
-  expected.concat(user "Returncode Mock_fun(void);\n")
-  expected.concat(user "Returncode fun(void) {\n")
-  expected.concat(user "  Returncode MR_err = OK;\n")
-  expected.concat(user "  CHECK(2, Mock_fun() )\n")
-  expected.concat(user "MR_cleanup:\n")
-  expected.concat(user "  return MR_err;\n")
-  expected.concat(user "}\n")
-  expected.concat(user "Returncode Mock_fun(void) {\n")
-  expected.concat(user "  Returncode MR_err = OK;\n")
-  expected.concat(user "  RAISE(4)\n")
-  expected.concat(user "MR_cleanup:\n")
-  expected.concat(user "  return MR_err;\n")
-  expected.concat(user "}")
-  test-global-scope(
-      user "func fun()\n  fun()\nmock fun()\n  raise", user expected)
-  
-  test-global-scope(
-      user "mock fun()\nfunc fun()\n  fun()\n",
-      user "Returncode Mock_fun(void);\nReturncode fun(void);\nReturncode Mock_fun(void) {\n  Returncode MR_err = OK;\nMR_cleanup:\n  return MR_err;\n}\nReturncode fun(void) {\n  Returncode MR_err = OK;\n  CHECK(3, Mock_fun() )\nMR_cleanup:\n  return MR_err;\n}")
-  
-  expected.copy(user "typedef struct Test Test;\n")
-  expected.concat(user "struct Test {\n")
-  expected.concat(user "  Int x;\n")
-  expected.concat(user "};\n")
-  expected.concat(user "Returncode Test_meth(Test** self, Int x);\n")
-  expected.concat(user "Returncode Test_Mock_meth(Test** self, Int x);\n")
-  expected.concat(user "Returncode Test_meth(Test** self, Int x) {\n")
-  expected.concat(user "  Returncode MR_err = OK;\n")
-  expected.concat(user "  CHECK(5, Test_Mock_meth(self, x) )\n")
-  expected.concat(user "MR_cleanup:\n")
-  expected.concat(user "  return MR_err;\n")
-  expected.concat(user "}\n")
-  expected.concat(user "Returncode Test_Mock_meth(Test** self, Int x)")
-  expected.concat(user empty-func-body)
-  expected.length -= 1
-  test-global-scope(
-      user "mock Test.meth(copy Int x)\nstruct Test\n  var Int x\n  func meth(copy Int x)\n    self.meth(copy x)",
-      user expected)
-  
-  expected.copy(user "Returncode fun0(void);\n")
-  expected.concat(user "Returncode fun1(void);\n")
-  expected.concat(user "Returncode fun0(void)")
-  expected.concat(user empty-func-body)
-  expected.concat(user "Returncode fun1(void)")
-  expected.concat(user empty-func-body)
-  expected.concat(user "USER_MAIN_HEADER {\n")
-  expected.concat(user "  Bool MR_success = true;\n")
-  expected.concat(user "  RUN_TEST(fun0);\n")
-  expected.concat(user "  RUN_TEST(fun1);\n")
-  expected.concat(user "  return MR_success? OK : FAIL;\n")
-  expected.concat(user "}\n")
-  expected.concat(user "TEST_MAIN_FUNC")
-  test-global-scope(user "test fun0()\ntest fun1()\n", user expected)
-  test-global-scope(user "test fun0()\ntest fun1()\nmain\n", user expected)
-  
-  test-code-error(
-      user "assert 3", user "got \"Int\" expression, expected \"Bool\"")
-  test-code-error(user "assert error", user "unknown symbol \"error\"")
-  test-code-error(user "assert-error error", user "unknown symbol \"error\"")
-  test-global-scope-error(
-      user "test fun(copy Int x)\n", user "test function cannot have arguments")
-  test-global-scope-error(
-      user "test fun()->(copy Int x)\n",
-      user "test function cannot have arguments")
-  test-global-scope-error(
-      user "mock error()\n", user "mocking unknown function \"error\"")
-  test-global-scope-error(
-      user "mock Error.fun()\n", user "unknown type \"Error\"")
-  test-global-scope-error(
-      user "struct Test\n  var Int x\nmock Test.error()\n",
-      user "mocking unknown method \"error\" of type \"Test\"")
-  test-global-scope-error(
-      user "mock fun(owner String s)\nfunc fun(user String s)\n",
-      user "expected access \"user\" , got \"owner\"")
-  test-global-scope-error(
-      user "mock fun(user Int s)\nfunc fun(user String s)\n",
-      user "non matching types \"Int\" and \"String\"")
-  test-global-scope-error(
-      user "mock fun(user Array{Char} a)\nfunc fun(user Array{Int} a)\n",
-      user "non matching subtypes \"Char\" and \"Int\"")
+  test-from-file(user "test-testing")
