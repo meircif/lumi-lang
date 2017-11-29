@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file24_name = "tests/global-tests.3.mr";
+static char* _mr_file27_name = "tests/global-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file24_name
+#define MR_FILE_NAME _mr_file27_name
 
 /* MR4 compiler tests - Global */
 
@@ -659,10 +659,12 @@ Returncode test_name_map() {
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -674,6 +676,7 @@ Returncode test_name_map() {
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "tests/expression-tests.c"
 #include "tests/syntax-tree-tests.c"

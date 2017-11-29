@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file25_name = "tests/syntax-tree-tests.3.mr";
+static char* _mr_file28_name = "tests/syntax-tree-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file25_name
+#define MR_FILE_NAME _mr_file28_name
 
 /* MR4 compiler tests - Syntax tree */
 
@@ -254,10 +254,12 @@ Returncode test_testing() {
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -269,6 +271,7 @@ Returncode test_testing() {
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "tests/expression-tests.c"
 #include "tests/global-tests.c"

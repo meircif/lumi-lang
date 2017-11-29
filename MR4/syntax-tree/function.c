@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file17_name = "syntax-tree/function.3.mr";
+static char* _mr_file19_name = "syntax-tree/function.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file17_name
+#define MR_FILE_NAME _mr_file19_name
 
 /* MR4 compiler - Syntax tree function */
 
@@ -851,10 +851,12 @@ Func DeclarationArgumentFactory__dtl[] = {(void*)DeclarationArgumentFactory_m_ne
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -865,6 +867,7 @@ Func DeclarationArgumentFactory__dtl[] = {(void*)DeclarationArgumentFactory_m_ne
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)

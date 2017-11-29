@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file10_name = "expression/expression.3.mr";
+static char* _mr_file11_name = "expression/expression.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file10_name
+#define MR_FILE_NAME _mr_file11_name
 
 /*  MR4 compiler - Expression
 
@@ -35,8 +35,8 @@ Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Express
 static char* _func_name_parse_new_expression = "parse-new-expression";
 #define MR_FUNC_NAME _func_name_parse_new_expression
 Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  Operator* _Operator28;
-  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator28)) )
+  Operator* _Operator30;
+  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator30)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -65,9 +65,9 @@ static char* _func_name_Expression_parse_new = "Expression.parse-new";
 #define MR_FUNC_NAME _func_name_Expression_parse_new
 Returncode Expression_parse_new(Expression* self, String* ends, SyntaxTreeCode* code_node, Operator* curr_operator, Expression** expression, Char* end, Operator** operator) {
   (*expression) = NULL;
-  Bool _Bool29;
-  CHECK(46, String_has(ends, ' ', &(_Bool29)) )
-  Bool multi_operands = !_Bool29;
+  Bool _Bool31;
+  CHECK(46, String_has(ends, ' ', &(_Bool31)) )
+  Bool multi_operands = !_Bool31;
   String* text = NULL;
   CHECK(48, Expression_read_new_value(self, ends, &(text), &((*end))) )
   CHECK(49, NameMap_find(glob->operator_map, text, (void**)&((*operator))) )
@@ -139,9 +139,9 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     if ((*end) == '?') {
       CHECK(108, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool30;
-    CHECK(109, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool30)) )
-    if (!(_Bool30)) break;
+    Bool _Bool32;
+    CHECK(109, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool32)) )
+    if (!(_Bool32)) break;
   }
   return OK;
 }
@@ -180,9 +180,9 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Syn
             CHECK(132, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool31;
-            CHECK(133, String_equal(text, &(String){5, 4, "base"}, &(_Bool31)) )
-            if (_Bool31) {
+            Bool _Bool33;
+            CHECK(133, String_equal(text, &(String){5, 4, "base"}, &(_Bool33)) )
+            if (_Bool33) {
               CHECK(134, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
             }
             else {
@@ -248,9 +248,9 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstanc
   (*symbol)->_base.code_node = self->code_node;
   CHECK(165, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
   (*symbol)->_base.assignable = true;
-  SyntaxTreeFunction* _SyntaxTreeFunction32;
-  CHECK(167, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction32)) )
-  CHECK(167, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction32, access, type_instance, &((*symbol)->variable)) )
+  SyntaxTreeFunction* _SyntaxTreeFunction34;
+  CHECK(167, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction34)) )
+  CHECK(167, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction34, access, type_instance, &((*symbol)->variable)) )
   CHECK(169, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
   return OK;
 }
@@ -388,9 +388,11 @@ Func Expression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNod
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -402,6 +404,7 @@ Func Expression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNod
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)

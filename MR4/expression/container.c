@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file9_name = "expression/container.3.mr";
+static char* _mr_file10_name = "expression/container.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file9_name
+#define MR_FILE_NAME _mr_file10_name
 
 /* MR4 compiler - Container expressions */
 
@@ -187,9 +187,9 @@ Returncode UnaryExpression_analyze(UnaryExpression* self) {
     CHECK(87, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
   }
   else {
-    Bool _Bool26;
-    CHECK(88, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool26)) )
-    if (_Bool26) {
+    Bool _Bool28;
+    CHECK(88, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool28)) )
+    if (_Bool28) {
       CHECK(89, UnaryExpression_test_operand_type(self, self->right_expression, &(glob->type_int->_base)) )
       CHECK(90, Expression_set_simple_type(&(self->_base), &(glob->type_int->_base)) )
     }
@@ -221,9 +221,9 @@ Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* 
 static char* _func_name_UnaryExpression_test_operand_type = "UnaryExpression.test-operand-type";
 #define MR_FUNC_NAME _func_name_UnaryExpression_test_operand_type
 Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* operand, TypeData* expected_type) {
-  Bool _Bool27;
-  CHECK(104, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool27)) )
-  if (!_Bool27) {
+  Bool _Bool29;
+  CHECK(104, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool29)) )
+  if (!_Bool29) {
     CHECK(105, SyntaxTreeNode_m_syntax_error3(&(self->_base._base), &(String){9, 8, "operator"}, self->operator->name, &(String){9, 8, "expected"}, expected_type->name, &(String){13, 12, "operand, got"}, operand->result_type->type_data->name) )
   }
   return OK;
@@ -559,9 +559,11 @@ Func QuestionExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)Quest
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -573,6 +575,7 @@ Func QuestionExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)Quest
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
