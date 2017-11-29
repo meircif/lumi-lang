@@ -6,7 +6,6 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Wall -Werror"
-TEST_DIR="tests/"
 rm -rf .test
 mkdir .test
 cp *.mr .test
@@ -100,7 +99,7 @@ cp ../MR4/tests/*.expected.c tests
   tests/*.3.mr mr4-compiler.3.mr
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   mr4-compiler.c ../MR3/mr.3.c -I. -I../MR3 -o mr4-compiler-tests
-./mr4-compiler-tests
+TEST_DIR=tests/ ./mr4-compiler-tests
 diff tests/expression-tests.actual.c tests/expression-tests.expected.c
 diff tests/syntax-tree-tests.actual.c tests/syntax-tree-tests.expected.c
 
