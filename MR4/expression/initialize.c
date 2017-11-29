@@ -248,20 +248,25 @@ Returncode InitExpression_write_assign(InitExpression* self) {
   
   if (!self->_base.result_type->type_data->is_primitive) {
     /* `name`_Refman = `value`_Refman; */
-    CHECK(170, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-    CHECK(171, (self->symbol)->_base._base._dtl[2](self->symbol) )
-    CHECK(172, write(&(String){11, 10, "_Refman = "}) )
-    CHECK(173, (value)->_base._dtl[4](value) )
-    CHECK(174, write(&(String){3, 2, ";\n"}) )
+    /* MR_inc_ref(`name`_Refman); */
+    CHECK(171, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(172, (self->symbol)->_base._base._dtl[2](self->symbol) )
+    CHECK(173, write(&(String){11, 10, "_Refman = "}) )
+    CHECK(174, (value)->_base._dtl[4](value) )
+    CHECK(175, write(&(String){3, 2, ";\n"}) )
+    CHECK(176, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(177, write(&(String){12, 11, "MR_inc_ref("}) )
+    CHECK(178, (self->symbol)->_base._base._dtl[2](self->symbol) )
+    CHECK(179, write(&(String){11, 10, "_Refman);\n"}) )
   }
   
   if (self->_base.result_type->type_data->is_dynamic) {
     /* `name`_Dynamic = `Type`_Dynamic; */
-    CHECK(178, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-    CHECK(179, (self->symbol)->_base._base._dtl[2](self->symbol) )
-    CHECK(180, write(&(String){12, 11, "_Dynamic = "}) )
-    CHECK(181, (value)->_base._dtl[3](value) )
-    CHECK(182, write(&(String){3, 2, ";\n"}) )
+    CHECK(183, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(184, (self->symbol)->_base._base._dtl[2](self->symbol) )
+    CHECK(185, write(&(String){12, 11, "_Dynamic = "}) )
+    CHECK(186, (value)->_base._dtl[3](value) )
+    CHECK(187, write(&(String){3, 2, ";\n"}) )
   }
   return OK;
 }
@@ -273,8 +278,8 @@ Returncode InitExpression_write_preactions(InitExpression* self);
 static char* _func_name_InitExpression_write_preactions = "InitExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_InitExpression_write_preactions
 Returncode InitExpression_write_preactions(InitExpression* self) {
-  CHECK(185, InitExpression_write_allocation(self) )
-  CHECK(186, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+  CHECK(190, InitExpression_write_allocation(self) )
+  CHECK(191, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -287,17 +292,17 @@ static char* _func_name_InitExpression_write = "InitExpression.write";
 Returncode InitExpression_write(InitExpression* self) {
   if (self->_base.is_statement) {
     if (!self->_base.result_type->type_data->is_primitive && (self->symbol->variable->access == ACCESS_VAR || self->symbol->variable->access == ACCESS_NEW)) {
-      CHECK(193, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-      CHECK(194, InitExpression_write_allocation(self) )
+      CHECK(198, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+      CHECK(199, InitExpression_write_allocation(self) )
     }
     else {
       if (NULL != self->arguments->parameters->first) {
-        CHECK(196, InitExpression_write_assign(self) )
+        CHECK(201, InitExpression_write_assign(self) )
       }
     }
   }
   else {
-    CHECK(198, (self->symbol)->_base._base._dtl[2](self->symbol) )
+    CHECK(203, (self->symbol)->_base._base._dtl[2](self->symbol) )
   }
   return OK;
 }

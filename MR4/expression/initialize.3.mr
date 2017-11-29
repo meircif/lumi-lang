@@ -167,11 +167,16 @@ class InitExpression(Expression)
     
     if not self.result-type.type-data.is-primitive
       # `name`_Refman = `value`_Refman;
+      # MR_inc_ref(`name`_Refman);
       self.code-node.write-spaces()
       self.symbol.write()
       write(user "_Refman = ")
       value.write-refman()
       write(user ";\n")
+      self.code-node.write-spaces()
+      write(user "MR_inc_ref(")
+      self.symbol.write()
+      write(user "_Refman);\n")
     
     if self.result-type.type-data.is-dynamic
       # `name`_Dynamic = `Type`_Dynamic;

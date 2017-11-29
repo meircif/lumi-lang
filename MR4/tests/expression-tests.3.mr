@@ -39,7 +39,6 @@ func test-code(user String input-text, user String expected-output)
     while ch != EOF
     expected-header.append(copy ch)
   
-  user String expected-footer("\nMR_cleanup:\n  return MR_err;\n}\n")
   f-assert-string-slice(
       user expected-header,
       user mock-output-file-text,
@@ -60,18 +59,18 @@ func test-code(user String input-text, user String expected-output)
     if not tests-passed
       return
   
-  f-assert-string-slice(
-      user expected-footer,
-      user mock-output-file-text,
-      copy mock-output-file-text.length - expected-footer.length,
-      copy expected-footer.length,
-      copy false)
+  var Int footer-start
+  user String mock-output-no-header(mock-output-file-text[expected-header.length:mock-output-file-text.length - expected-header.length])
+  mock-output-no-header.find(user "\nMR_cleanup:\n  "):(copy footer-start)
+  if footer-start >= mock-output-no-header.length
+    sys.print(user mock-output-no-header)
+    code-header-valid := false
+    raise
   f-assert-string-slice(
       user expected-output,
-      user mock-output-file-text,
-      copy expected-header.length,
-      copy mock-output-file-text.length - expected-header.length -
-      expected-footer.length,
+      user mock-output-no-header,
+      copy 0,
+      copy footer-start,
       copy true)
 
 

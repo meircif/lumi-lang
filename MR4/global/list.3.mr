@@ -13,6 +13,7 @@ static List{Generic}
     node.item := item
     if ? self.last
       self.last.next := node
+      node.prev := self.last
     else
       self.first := node
     self.last := node
@@ -31,7 +32,9 @@ static List{Generic}
       owner ListNode{Generic} first(self.first)
       self.first := first.next
       delete first
-      if not (? self.first)
+      if ? self.first
+        self.first.prev := _
+      else
         self.last := _
     else
       item := _
@@ -39,4 +42,5 @@ static List{Generic}
 
 static ListNode{Generic}
   owner ListNode{Generic} next
+  owner ListNode{Generic} prev
   owner Generic item

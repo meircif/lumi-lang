@@ -215,20 +215,27 @@ Returncode TestStruct_new(TestStruct* self, RefManager* self_Refman, Int x, Stri
   Returncode MR_err = OK;
   TestStruct* aux_TestStruct_0 = NULL;
   RefManager* aux_TestStruct_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
   if (self == NULL || self_Refman->value == NULL) RAISE(195)
   self->num = x;
   if (self == NULL || self_Refman->value == NULL) RAISE(196)
+  MR_dec_ref(self->text_Refman);
   self->text_Refman = s_Refman;
+  MR_inc_ref(self->text_Refman);
   self->text = s;
   aux_TestStruct_0 = calloc(1, sizeof(TestStruct));
   if (aux_TestStruct_0 == NULL) RAISE(197)
-  aux_TestStruct_0_Refman = MR_new_ref();
+  aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
   if (aux_TestStruct_0_Refman == NULL) RAISE(197)
   CHECK(197, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman) )
   if (self == NULL || self_Refman->value == NULL) RAISE(197)
+  MR_dec_ref(self->ts_Refman);
   self->ts_Refman = aux_TestStruct_0_Refman;
+  MR_inc_ref(self->ts_Refman);
   self->ts = aux_TestStruct_0;
 MR_cleanup:
+  MR_owner_dec_ref(aux_TestStruct_0_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -241,7 +248,9 @@ Returncode TestStruct_get(TestStruct* self, RefManager* self_Refman, Int* x, Str
   if (self == NULL || self_Refman->value == NULL) RAISE(204)
   *x = self->num;
   if (self == NULL || self_Refman->value == NULL) RAISE(205)
+  MR_dec_ref(*s_Refman);
   *s_Refman = self->text_Refman;
+  MR_inc_ref(*s_Refman);
   *s = self->text;
 MR_cleanup:
   return MR_err;
@@ -329,13 +338,14 @@ Returncode BaseType_meth0(BaseType* self, RefManager* self_Refman, BaseType_Dyna
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(52)
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "BaseType.meth0";
   CHECK(52, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -348,14 +358,17 @@ Returncode BaseType_meth1(BaseType* self, RefManager* self_Refman, BaseType_Dyna
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(55)
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "BaseType.meth1";
   CHECK(55, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -369,13 +382,14 @@ Returncode BaseType_meth2(BaseType* self, RefManager* self_Refman, BaseType_Dyna
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(58)
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "BaseType.meth2";
   CHECK(58, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -388,14 +402,17 @@ Returncode BaseType_meth3(BaseType* self, RefManager* self_Refman, BaseType_Dyna
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(61)
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "BaseType.meth3";
   CHECK(61, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -421,8 +438,9 @@ Returncode MiddleType_meth1(MiddleType* self, RefManager* self_Refman, MiddleTyp
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(17)
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -430,6 +448,8 @@ Returncode MiddleType_meth1(MiddleType* self, RefManager* self_Refman, MiddleTyp
   CHECK(17, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   CHECK(18, BaseType_meth1(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -443,7 +463,7 @@ Returncode MiddleType_meth2(MiddleType* self, RefManager* self_Refman, MiddleTyp
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(21)
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -451,6 +471,7 @@ Returncode MiddleType_meth2(MiddleType* self, RefManager* self_Refman, MiddleTyp
   CHECK(21, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   CHECK(22, BaseType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -464,13 +485,14 @@ Returncode MiddleType_meth4(MiddleType* self, RefManager* self_Refman, MiddleTyp
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(25)
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "MiddleType.meth4";
   CHECK(25, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -483,14 +505,17 @@ Returncode MiddleType_meth5(MiddleType* self, RefManager* self_Refman, MiddleTyp
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(28)
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "MiddleType.meth5";
   CHECK(28, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -517,7 +542,7 @@ Returncode TopType_meth2(TopType* self, RefManager* self_Refman, TopType_Dynamic
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(18)
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -527,6 +552,7 @@ Returncode TopType_meth2(TopType* self, RefManager* self_Refman, TopType_Dynamic
   CHECK(20, MiddleType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   CHECK(21, BaseType_meth2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -539,8 +565,9 @@ Returncode TopType_meth3(TopType* self, RefManager* self_Refman, TopType_Dynamic
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(24)
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -548,6 +575,8 @@ Returncode TopType_meth3(TopType* self, RefManager* self_Refman, TopType_Dynamic
   CHECK(24, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   CHECK(25, BaseType_meth3(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), n, s, s_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -560,8 +589,9 @@ Returncode TopType_meth5(TopType* self, RefManager* self_Refman, TopType_Dynamic
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(28)
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -571,6 +601,8 @@ Returncode TopType_meth5(TopType* self, RefManager* self_Refman, TopType_Dynamic
   CHECK(30, MiddleType_meth1(NULL, NULL, NULL, n, s, s_Refman) )
   CHECK(31, BaseType_meth1(NULL, NULL, NULL, n, s, s_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -590,7 +622,7 @@ Returncode TopType_meth6(TopType* self, RefManager* self_Refman, TopType_Dynamic
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(34)
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -601,22 +633,31 @@ Returncode TopType_meth6(TopType* self, RefManager* self_Refman, TopType_Dynamic
   self->_base.num_mid = self->_base._base.num_base;
   if (self == NULL || self_Refman->value == NULL) RAISE(36)
   if (self == NULL || self_Refman->value == NULL) RAISE(36)
+  MR_dec_ref(self->top_base_ref_Refman);
   self->top_base_ref_Refman = self->top_mid_ref_Refman;
+  MR_inc_ref(self->top_base_ref_Refman);
   self->top_base_ref_Dynamic = &(self->top_mid_ref_Dynamic->_base);
   self->top_base_ref = &(self->top_mid_ref->_base);
   if (self == NULL || self_Refman->value == NULL) RAISE(37)
+  MR_dec_ref(self->top_base_ref_Refman);
   self->top_base_ref_Refman = self_Refman;
+  MR_inc_ref(self->top_base_ref_Refman);
   self->top_base_ref_Dynamic = &(self_Dynamic->_base._base);
   self->top_base_ref = &(self->_base._base);
   mt = &(self->_base);
   mt_Refman = self_Refman;
+  MR_inc_ref(mt_Refman);
   mt_Dynamic = &(self_Dynamic->_base);
   bt = &(mt->_base);
   bt_Refman = mt_Refman;
+  MR_inc_ref(bt_Refman);
   bt_Dynamic = &(mt_Dynamic->_base);
   if (bt != NULL) RAISE(40)
   CHECK(40, test_mid_out((void*)&(bt), &(bt_Refman), (void*)&(bt_Dynamic)) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(bt_Refman);
+  MR_dec_ref(mt_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -645,22 +686,29 @@ Returncode test_const_expression(Int* i, Char* c, String** s, RefManager** s_Ref
   *i = (((((((0 + 9630) + -9630) + 07520) + -07520) + 0xfda940) + -0xfda940) + 0xFDA940) + -0xFDA940;
   *c = (((('a' + '\'') + '\n') + '\x0f') + '\xA9') + '\270';
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(39)
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "some string";
+  MR_dec_ref(*s_Refman);
   *s_Refman = aux_String_0_Refman;
+  MR_inc_ref(*s_Refman);
   *s = aux_String_0;
+  MR_dec_ref(*t_Refman);
   *t_Refman = NULL;
+  MR_inc_ref(*t_Refman);
   *t = NULL;
+  MR_dec_ref(*d_Refman);
   *d_Refman = NULL;
+  MR_inc_ref(*d_Refman);
   *d_Dynamic = NULL;
   *d = NULL;
   *f = NULL;
   if (*f == NULL) RAISE(43)
   CHECK(43, (*f)() )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -673,6 +721,7 @@ Returncode test_member_expression(TestStruct* t, RefManager* t_Refman, TestStruc
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
+  MR_inc_ref(t_Refman);
   if (t == NULL || t_Refman->value == NULL) RAISE(47)
   if (t->ts == NULL || t->ts_Refman->value == NULL) RAISE(47)
   if (t->ts->ts == NULL || t->ts->ts_Refman->value == NULL) RAISE(47)
@@ -694,13 +743,15 @@ Returncode test_member_expression(TestStruct* t, RefManager* t_Refman, TestStruc
   if (t->fun == NULL) RAISE(51)
   CHECK(51, t->fun() )
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(52)
   aux_String_0_Var.max_length = 1;
   aux_String_0_Var.length = 0;
   aux_String_0_Var.values = "";
   CHECK(52, TestStruct_new(t, t_Refman, 0, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(t_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -746,8 +797,14 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   Array aux_Array_9_Var = {0};
   Array* aux_Array_9 = NULL;
   RefManager* aux_Array_9_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  MR_inc_ref(arri_Refman);
+  MR_inc_ref(arrs_Refman);
+  MR_inc_ref(arrt_Refman);
+  MR_inc_ref(arrd_Refman);
+  MR_inc_ref(arrf_Refman);
   aux_Array_0 = &aux_Array_0_Var;
-  aux_Array_0_Refman = MR_new_ref();
+  aux_Array_0_Refman = MR_new_ref(aux_Array_0);
   if (aux_Array_0_Refman == NULL) RAISE(72)
   aux_Array_0_Var.length = 2;
   aux_Array_0_Var.values = (Byte*)((arrs)->values) + (4);
@@ -756,7 +813,7 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if (aux_Array_0 == NULL || arrs_Refman->value == NULL) RAISE(72)
   if ((4) < 0 || (4) >= (aux_Array_0)->length) RAISE(72)
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(72)
   aux_String_0_Var.length = 3;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
@@ -770,7 +827,7 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if (((String**)((arrs)->values))[3] == NULL || arrs_Refman->value == NULL) RAISE(72)
   if ((2) < 0 || (2) >= ((((String**)((arrs)->values))[3]))->length) RAISE(72)
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = MR_new_ref();
+  aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(72)
   aux_String_1_Var.length = 7;
   aux_String_1_Var.max_length = aux_String_1_Var.length + 1;
@@ -783,14 +840,14 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if ((2) < 0 || (2) >= (s)->length) RAISE(72)
   *c = (((((s)->values)[2]) + (((aux_String_1)->values)[2])) + ((((((String**)((arrs)->values))[3]))->values)[2])) + (((aux_String_0)->values)[0]);
   aux_Array_1 = &aux_Array_1_Var;
-  aux_Array_1_Refman = MR_new_ref();
+  aux_Array_1_Refman = MR_new_ref(aux_Array_1);
   if (aux_Array_1_Refman == NULL) RAISE(74)
   aux_Array_1_Var.length = 3;
   aux_Array_1_Var.values = (Byte*)((arri)->values) + (3);
   if (arri == NULL || arri_Refman->value == NULL) RAISE(74)
   if ((3) < 0 || (3) < 0 || (3) + (3) > (arri)->length) RAISE(74)
   aux_Array_2 = &aux_Array_2_Var;
-  aux_Array_2_Refman = MR_new_ref();
+  aux_Array_2_Refman = MR_new_ref(aux_Array_2);
   if (aux_Array_2_Refman == NULL) RAISE(74)
   aux_Array_2_Var.length = 2;
   aux_Array_2_Var.values = (Byte*)((aux_Array_1)->values) + (1);
@@ -799,7 +856,7 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if (aux_Array_2 == NULL || arri_Refman->value == NULL) RAISE(74)
   if ((1) < 0 || (1) >= (aux_Array_2)->length) RAISE(74)
   aux_Array_3 = &aux_Array_3_Var;
-  aux_Array_3_Refman = MR_new_ref();
+  aux_Array_3_Refman = MR_new_ref(aux_Array_3);
   if (aux_Array_3_Refman == NULL) RAISE(73)
   aux_Array_3_Var.length = 4;
   aux_Array_3_Var.values = (Byte*)((arrt)->values) + (2);
@@ -817,7 +874,7 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (((*i) + 3) - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(73)
   *i = (((((Int*)((arri)->values))[((*i) + 3) - (((Int*)((arri)->values))[2])]) + (((TestStruct**)((arrt)->values))[4])->num) + (((TestStruct**)((aux_Array_3)->values))[1])->num) + (((Int*)((aux_Array_2)->values))[1]);
   aux_Array_4 = &aux_Array_4_Var;
-  aux_Array_4_Refman = MR_new_ref();
+  aux_Array_4_Refman = MR_new_ref(aux_Array_4);
   if (aux_Array_4_Refman == NULL) RAISE(75)
   aux_Array_4_Var.length = 4;
   aux_Array_4_Var.values = (Byte*)((arri)->values) + (2);
@@ -826,65 +883,81 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if (aux_Array_4 == NULL || arri_Refman->value == NULL) RAISE(75)
   if ((1) < 0 || (1) >= (aux_Array_4)->length) RAISE(75)
   aux_Array_5 = &aux_Array_5_Var;
-  aux_Array_5_Refman = MR_new_ref();
+  aux_Array_5_Refman = MR_new_ref(aux_Array_5);
   if (aux_Array_5_Refman == NULL) RAISE(75)
   aux_Array_5_Var.length = 5 * ((*i) - 1);
   aux_Array_5_Var.values = (Byte*)((arri)->values) + ((2 - (*i)) + (((Int*)((aux_Array_4)->values))[1]));
   if (arri == NULL || arri_Refman->value == NULL) RAISE(75)
   if (((2 - (*i)) + (((Int*)((aux_Array_4)->values))[1])) < 0 || (5 * ((*i) - 1)) < 0 || ((2 - (*i)) + (((Int*)((aux_Array_4)->values))[1])) + (5 * ((*i) - 1)) > (arri)->length) RAISE(75)
+  MR_dec_ref(*arrio_Refman);
   *arrio_Refman = arri_Refman;
+  MR_inc_ref(*arrio_Refman);
   *arrio = aux_Array_5;
   if (arrs == NULL || arrs_Refman->value == NULL) RAISE(76)
   if ((4) < 0 || (4) >= (arrs)->length) RAISE(76)
+  MR_dec_ref(s_Refman);
   s_Refman = arrs_Refman;
+  MR_inc_ref(s_Refman);
   s = ((String**)((arrs)->values))[4];
   aux_Array_6 = &aux_Array_6_Var;
-  aux_Array_6_Refman = MR_new_ref();
+  aux_Array_6_Refman = MR_new_ref(aux_Array_6);
   if (aux_Array_6_Refman == NULL) RAISE(77)
   aux_Array_6_Var.length = 7;
   aux_Array_6_Var.values = (Byte*)((arrs)->values) + (2);
   if (arrs == NULL || arrs_Refman->value == NULL) RAISE(77)
   if ((2) < 0 || (7) < 0 || (2) + (7) > (arrs)->length) RAISE(77)
+  MR_dec_ref(*arrso_Refman);
   *arrso_Refman = arrs_Refman;
+  MR_inc_ref(*arrso_Refman);
   *arrso = aux_Array_6;
   if (arrt == NULL || arrt_Refman->value == NULL) RAISE(78)
   if ((4) < 0 || (4) >= (arrt)->length) RAISE(78)
+  MR_dec_ref(*t_Refman);
   *t_Refman = arrt_Refman;
+  MR_inc_ref(*t_Refman);
   *t = ((TestStruct**)((arrt)->values))[4];
   aux_Array_7 = &aux_Array_7_Var;
-  aux_Array_7_Refman = MR_new_ref();
+  aux_Array_7_Refman = MR_new_ref(aux_Array_7);
   if (aux_Array_7_Refman == NULL) RAISE(79)
   aux_Array_7_Var.length = 7;
   aux_Array_7_Var.values = (Byte*)((arrt)->values) + (2);
   if (arrt == NULL || arrt_Refman->value == NULL) RAISE(79)
   if ((2) < 0 || (7) < 0 || (2) + (7) > (arrt)->length) RAISE(79)
+  MR_dec_ref(*arrto_Refman);
   *arrto_Refman = arrt_Refman;
+  MR_inc_ref(*arrto_Refman);
   *arrto = aux_Array_7;
   if (arrd == NULL || arrd_Refman->value == NULL) RAISE(80)
   if ((4) < 0 || (4) >= (arrd)->length) RAISE(80)
+  MR_dec_ref(*d_Refman);
   *d_Refman = arrd_Refman;
+  MR_inc_ref(*d_Refman);
   *d_Dynamic = &TestClass_dynamic;
   *d = ((TestClass**)((arrd)->values))[4];
   aux_Array_8 = &aux_Array_8_Var;
-  aux_Array_8_Refman = MR_new_ref();
+  aux_Array_8_Refman = MR_new_ref(aux_Array_8);
   if (aux_Array_8_Refman == NULL) RAISE(81)
   aux_Array_8_Var.length = 7;
   aux_Array_8_Var.values = (Byte*)((arrd)->values) + (2);
   if (arrd == NULL || arrd_Refman->value == NULL) RAISE(81)
   if ((2) < 0 || (7) < 0 || (2) + (7) > (arrd)->length) RAISE(81)
+  MR_dec_ref(*arrdo_Refman);
   *arrdo_Refman = arrd_Refman;
+  MR_inc_ref(*arrdo_Refman);
   *arrdo = aux_Array_8;
   if (arrf == NULL || arrf_Refman->value == NULL) RAISE(82)
   if ((4) < 0 || (4) >= (arrf)->length) RAISE(82)
   *f = ((Returncode (**)(void))((arrf)->values))[4];
   aux_Array_9 = &aux_Array_9_Var;
-  aux_Array_9_Refman = MR_new_ref();
+  aux_Array_9_Refman = MR_new_ref(aux_Array_9);
   if (aux_Array_9_Refman == NULL) RAISE(83)
   aux_Array_9_Var.length = 7;
   aux_Array_9_Var.values = (Byte*)((arrf)->values) + (2);
   if (arrf == NULL || arrf_Refman->value == NULL) RAISE(83)
   if ((2) < 0 || (7) < 0 || (2) + (7) > (arrf)->length) RAISE(83)
+  MR_dec_ref(*arrfo_Refman);
   *arrfo_Refman = arrf_Refman;
+  MR_inc_ref(*arrfo_Refman);
   *arrfo = aux_Array_9;
   if (arrf == NULL || arrf_Refman->value == NULL) RAISE(84)
   if ((4) < 0 || (4) >= (arrf)->length) RAISE(84)
@@ -895,6 +968,24 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if (((Returncode (**)(void))(((*arrfo))->values))[4] == NULL) RAISE(85)
   CHECK(85, (((Returncode (**)(void))(((*arrfo))->values))[4])() )
 MR_cleanup:
+  MR_dec_ref(aux_Array_9_Refman);
+  MR_dec_ref(aux_Array_8_Refman);
+  MR_dec_ref(aux_Array_7_Refman);
+  MR_dec_ref(aux_Array_6_Refman);
+  MR_dec_ref(aux_Array_5_Refman);
+  MR_dec_ref(aux_Array_4_Refman);
+  MR_dec_ref(aux_Array_3_Refman);
+  MR_dec_ref(aux_Array_2_Refman);
+  MR_dec_ref(aux_Array_1_Refman);
+  MR_dec_ref(aux_String_1_Refman);
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(aux_Array_0_Refman);
+  MR_dec_ref(arrf_Refman);
+  MR_dec_ref(arrd_Refman);
+  MR_dec_ref(arrt_Refman);
+  MR_dec_ref(arrs_Refman);
+  MR_dec_ref(arri_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -904,9 +995,11 @@ MR_cleanup:
 #define MR_FUNC_NAME "test-container-expression"
 Returncode test_container_expression(Int x, Int y, String* s, RefManager* s_Refman, Int* i, Bool* b) {
   Returncode MR_err = OK;
+  MR_inc_ref(s_Refman);
   *i = (- x) + (- (- (- y)));
   *b = (! (((! ((((x * 3) - 5) > (6 * y)) && ((6 * y) == 234))) && (! ((5 - x) < y))) || (! ((x == (-2 - (-4 * y))) && (((-6 > y) && (y >= 12)) && (12 == x)))))) && ((((- (2 + x)) > y) || (!(s == NULL || s_Refman->value == NULL))) || (! (!(s == NULL || s_Refman->value == NULL))));
 MR_cleanup:
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1020,72 +1113,74 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   RefManager* aux_Array_4_Refman = NULL;
   String* aux_String_2 = NULL;
   RefManager* aux_String_2_Refman = NULL;
+  MR_inc_ref(text_Refman);
+  MR_inc_ref(arr_Refman);
   tv = &tv_Var;
-  tv_Refman = MR_new_ref();
+  tv_Refman = MR_new_ref(tv);
   if (tv_Refman == NULL) RAISE(102)
   CHECK(102, TestStruct_new(tv, tv_Refman, 0, NULL, NULL) )
   dv = &dv_Var;
-  dv_Refman = MR_new_ref();
+  dv_Refman = MR_new_ref(dv);
   if (dv_Refman == NULL) RAISE(103)
   CHECK(103, TestClass_new(dv, dv_Refman, dv_Dynamic) )
   sv = &sv_Var;
   sv_Var.values = sv_Values;
-  sv_Refman = MR_new_ref();
+  sv_Refman = MR_new_ref(sv);
   if (sv_Refman == NULL) RAISE(104)
   ia = &ia_Var;
   ia_Var.values = ia_Values;
-  ia_Refman = MR_new_ref();
+  ia_Refman = MR_new_ref(ia);
   if (ia_Refman == NULL) RAISE(106)
   ta = &ta_Var;
   ta_Var.values = ta_Values;
-  ta_Refman = MR_new_ref();
+  ta_Refman = MR_new_ref(ta);
   if (ta_Refman == NULL) RAISE(107)
   da = &da_Var;
   da_Var.values = da_Values;
-  da_Refman = MR_new_ref();
+  da_Refman = MR_new_ref(da);
   if (da_Refman == NULL) RAISE(108)
   sa = &sa_Var;
   sa_Var.values = sa_Values;
   MR_set_var_string_array(12, 7, sa, sa_Chars);
-  sa_Refman = MR_new_ref();
+  sa_Refman = MR_new_ref(sa);
   if (sa_Refman == NULL) RAISE(109)
   fa = &fa_Var;
   fa_Var.values = fa_Values;
-  fa_Refman = MR_new_ref();
+  fa_Refman = MR_new_ref(fa);
   if (fa_Refman == NULL) RAISE(110)
   tn = calloc(1, sizeof(TestStruct));
   if (tn == NULL) RAISE(111)
-  tn_Refman = MR_new_ref();
+  tn_Refman = MR_new_ref(tn);
   if (tn_Refman == NULL) RAISE(111)
   CHECK(111, TestStruct_new(tn, tn_Refman, 0, NULL, NULL) )
   dn = calloc(1, sizeof(TestClass));
   if (dn == NULL) RAISE(112)
-  dn_Refman = MR_new_ref();
+  dn_Refman = MR_new_ref(dn);
   if (dn_Refman == NULL) RAISE(112)
   CHECK(112, TestClass_new(dn, dn_Refman, dn_Dynamic) )
   if (arr == NULL || arr_Refman->value == NULL) RAISE(113)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(113)
   sn = MR_new_string(((Int*)((arr)->values))[0]);
   if (sn == NULL) RAISE(113)
-  sn_Refman = MR_new_ref();
+  sn_Refman = MR_new_ref(sn);
   if (sn_Refman == NULL) RAISE(113)
   if (arr == NULL || arr_Refman->value == NULL) RAISE(114)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(114)
   ian = MR_new_array(((Int*)((arr)->values))[0], sizeof(Int));
   if (ian == NULL) RAISE(114)
-  ian_Refman = MR_new_ref();
+  ian_Refman = MR_new_ref(ian);
   if (ian_Refman == NULL) RAISE(114)
   if (arr == NULL || arr_Refman->value == NULL) RAISE(115)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(115)
   tan = MR_new_array(((Int*)((arr)->values))[0], sizeof(TestStruct));
   if (tan == NULL) RAISE(115)
-  tan_Refman = MR_new_ref();
+  tan_Refman = MR_new_ref(tan);
   if (tan_Refman == NULL) RAISE(115)
   if (arr == NULL || arr_Refman->value == NULL) RAISE(116)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(116)
   dan = MR_new_array(((Int*)((arr)->values))[0], sizeof(TestClass));
   if (dan == NULL) RAISE(116)
-  dan_Refman = MR_new_ref();
+  dan_Refman = MR_new_ref(dan);
   if (dan_Refman == NULL) RAISE(116)
   if (arr == NULL || arr_Refman->value == NULL) RAISE(117)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(117)
@@ -1093,63 +1188,64 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   if ((1) < 0 || (1) >= (arr)->length) RAISE(117)
   san = MR_new_string_array(((Int*)((arr)->values))[0], ((Int*)((arr)->values))[1]);
   if (san == NULL) RAISE(117)
-  san_Refman = MR_new_ref();
+  san_Refman = MR_new_ref(san);
   if (san_Refman == NULL) RAISE(117)
   if (arr == NULL || arr_Refman->value == NULL) RAISE(118)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(118)
   sfn = MR_new_array(((Int*)((arr)->values))[0], sizeof(Func));
   if (sfn == NULL) RAISE(118)
-  sfn_Refman = MR_new_ref();
+  sfn_Refman = MR_new_ref(sfn);
   if (sfn_Refman == NULL) RAISE(118)
   if (arr == NULL || arr_Refman->value == NULL) RAISE(119)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(119)
   ix = ((Int*)((arr)->values))[0];
   is = text;
   is_Refman = text_Refman;
+  MR_inc_ref(is_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(121)
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "some string";
   isv = &isv_Var;
   isv_Var.values = isv_Values;
-  isv_Refman = MR_new_ref();
+  isv_Refman = MR_new_ref(isv);
   if (isv_Refman == NULL) RAISE(121)
   CHECK(121, String_new(isv, isv_Refman, aux_String_0, aux_String_0_Refman) )
   isn = MR_new_string(i);
   if (isn == NULL) RAISE(122)
-  isn_Refman = MR_new_ref();
+  isn_Refman = MR_new_ref(isn);
   if (isn_Refman == NULL) RAISE(122)
   CHECK(122, String_new(isn, isn_Refman, text, text_Refman) )
   fi = Mock_f_test_int2str;
   itv = &itv_Var;
-  itv_Refman = MR_new_ref();
+  itv_Refman = MR_new_ref(itv);
   if (itv_Refman == NULL) RAISE(124)
   CHECK(124, TestStruct_new(itv, itv_Refman, i, text, text_Refman) )
   itn = calloc(1, sizeof(TestStruct));
   if (itn == NULL) RAISE(125)
-  itn_Refman = MR_new_ref();
+  itn_Refman = MR_new_ref(itn);
   if (itn_Refman == NULL) RAISE(125)
   CHECK(125, TestStruct_new(itn, itn_Refman, i, text, text_Refman) )
   idv = &idv_Var;
-  idv_Refman = MR_new_ref();
+  idv_Refman = MR_new_ref(idv);
   if (idv_Refman == NULL) RAISE(126)
   CHECK(126, TestClass_new(idv, idv_Refman, idv_Dynamic) )
   idn = calloc(1, sizeof(TestClass));
   if (idn == NULL) RAISE(127)
-  idn_Refman = MR_new_ref();
+  idn_Refman = MR_new_ref(idn);
   if (idn_Refman == NULL) RAISE(127)
   CHECK(127, TestClass_new(idn, idn_Refman, idn_Dynamic) )
   aux_TestStruct_0 = calloc(1, sizeof(TestStruct));
   if (aux_TestStruct_0 == NULL) RAISE(128)
-  aux_TestStruct_0_Refman = MR_new_ref();
+  aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
   if (aux_TestStruct_0_Refman == NULL) RAISE(128)
   CHECK(128, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, i, text, text_Refman) )
   CHECK(128, TestStruct_print(aux_TestStruct_0, aux_TestStruct_0_Refman) )
   aux_TestClass_0 = calloc(1, sizeof(TestClass));
   if (aux_TestClass_0 == NULL) RAISE(129)
-  aux_TestClass_0_Refman = MR_new_ref();
+  aux_TestClass_0_Refman = MR_new_ref(aux_TestClass_0);
   if (aux_TestClass_0_Refman == NULL) RAISE(129)
   CHECK(129, TestClass_new(aux_TestClass_0, aux_TestClass_0_Refman, aux_TestClass_0_Dynamic) )
   CHECK(129, TestClass_print(aux_TestClass_0, aux_TestClass_0_Refman, aux_TestClass_0_Dynamic) )
@@ -1157,28 +1253,28 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   if ((0) < 0 || (0) >= (arr)->length) RAISE(130)
   aux_String_1 = MR_new_string(((Int*)((arr)->values))[0]);
   if (aux_String_1 == NULL) RAISE(130)
-  aux_String_1_Refman = MR_new_ref();
+  aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(130)
   TEST_ASSERT(130, !(aux_String_1 == NULL || aux_String_1_Refman->value == NULL))
   if (arr == NULL || arr_Refman->value == NULL) RAISE(131)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(131)
   aux_Array_0 = MR_new_array(((Int*)((arr)->values))[0], sizeof(Int));
   if (aux_Array_0 == NULL) RAISE(131)
-  aux_Array_0_Refman = MR_new_ref();
+  aux_Array_0_Refman = MR_new_ref(aux_Array_0);
   if (aux_Array_0_Refman == NULL) RAISE(131)
   TEST_ASSERT(131, !(aux_Array_0 == NULL || aux_Array_0_Refman->value == NULL))
   if (arr == NULL || arr_Refman->value == NULL) RAISE(132)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(132)
   aux_Array_1 = MR_new_array(((Int*)((arr)->values))[0], sizeof(TestStruct));
   if (aux_Array_1 == NULL) RAISE(132)
-  aux_Array_1_Refman = MR_new_ref();
+  aux_Array_1_Refman = MR_new_ref(aux_Array_1);
   if (aux_Array_1_Refman == NULL) RAISE(132)
   TEST_ASSERT(132, !(aux_Array_1 == NULL || aux_Array_1_Refman->value == NULL))
   if (arr == NULL || arr_Refman->value == NULL) RAISE(133)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(133)
   aux_Array_2 = MR_new_array(((Int*)((arr)->values))[0], sizeof(TestClass));
   if (aux_Array_2 == NULL) RAISE(133)
-  aux_Array_2_Refman = MR_new_ref();
+  aux_Array_2_Refman = MR_new_ref(aux_Array_2);
   if (aux_Array_2_Refman == NULL) RAISE(133)
   TEST_ASSERT(133, !(aux_Array_2 == NULL || aux_Array_2_Refman->value == NULL))
   if (arr == NULL || arr_Refman->value == NULL) RAISE(134)
@@ -1187,14 +1283,14 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   if ((1) < 0 || (1) >= (arr)->length) RAISE(134)
   aux_Array_3 = MR_new_string_array(((Int*)((arr)->values))[0], ((Int*)((arr)->values))[1]);
   if (aux_Array_3 == NULL) RAISE(134)
-  aux_Array_3_Refman = MR_new_ref();
+  aux_Array_3_Refman = MR_new_ref(aux_Array_3);
   if (aux_Array_3_Refman == NULL) RAISE(134)
   TEST_ASSERT(134, !(aux_Array_3 == NULL || aux_Array_3_Refman->value == NULL))
   if (arr == NULL || arr_Refman->value == NULL) RAISE(135)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(135)
   aux_Array_4 = MR_new_array(((Int*)((arr)->values))[0], sizeof(Func));
   if (aux_Array_4 == NULL) RAISE(135)
-  aux_Array_4_Refman = MR_new_ref();
+  aux_Array_4_Refman = MR_new_ref(aux_Array_4);
   if (aux_Array_4_Refman == NULL) RAISE(135)
   TEST_ASSERT(135, !(aux_Array_4 == NULL || aux_Array_4_Refman->value == NULL))
   TEST_ASSERT(136, x == 0)
@@ -1226,6 +1322,45 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   TEST_ASSERT(161, !(isv == NULL || isv_Refman->value == NULL))
   TEST_ASSERT(162, !(isn == NULL || isn_Refman->value == NULL))
 MR_cleanup:
+  MR_owner_dec_ref(aux_String_2_Refman);
+  MR_owner_dec_ref(aux_Array_4_Refman);
+  MR_owner_dec_ref(aux_Array_3_Refman);
+  MR_owner_dec_ref(aux_Array_2_Refman);
+  MR_owner_dec_ref(aux_Array_1_Refman);
+  MR_owner_dec_ref(aux_Array_0_Refman);
+  MR_owner_dec_ref(aux_String_1_Refman);
+  MR_owner_dec_ref(aux_TestClass_0_Refman);
+  MR_owner_dec_ref(aux_TestStruct_0_Refman);
+  MR_dec_ref(aux_String_0_Refman);
+  MR_owner_dec_ref(idn_Refman);
+  MR_dec_ref(idv_Refman);
+  MR_owner_dec_ref(itn_Refman);
+  MR_dec_ref(itv_Refman);
+  MR_owner_dec_ref(isn_Refman);
+  MR_dec_ref(isv_Refman);
+  MR_dec_ref(is_Refman);
+  MR_owner_dec_ref(sfn_Refman);
+  MR_owner_dec_ref(san_Refman);
+  MR_owner_dec_ref(dan_Refman);
+  MR_owner_dec_ref(tan_Refman);
+  MR_owner_dec_ref(ian_Refman);
+  MR_owner_dec_ref(sn_Refman);
+  MR_owner_dec_ref(dn_Refman);
+  MR_owner_dec_ref(tn_Refman);
+  MR_dec_ref(fa_Refman);
+  MR_dec_ref(sa_Refman);
+  MR_dec_ref(da_Refman);
+  MR_dec_ref(ta_Refman);
+  MR_dec_ref(ia_Refman);
+  MR_dec_ref(sv_Refman);
+  MR_dec_ref(dv_Refman);
+  MR_dec_ref(tv_Refman);
+  MR_dec_ref(d_Refman);
+  MR_dec_ref(t_Refman);
+  MR_owner_dec_ref(a_Refman);
+  MR_dec_ref(s_Refman);
+  MR_dec_ref(arr_Refman);
+  MR_dec_ref(text_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1235,10 +1370,14 @@ MR_cleanup:
 #define MR_FUNC_NAME "test-complex-function"
 Returncode test_complex_function(Int num, String* text, RefManager* text_Refman, Int* out_num, String** out_text, RefManager** out_text_Refman) {
   Returncode MR_err = OK;
+  MR_inc_ref(text_Refman);
   *out_num = num;
+  MR_dec_ref(*out_text_Refman);
   *out_text_Refman = text_Refman;
+  MR_inc_ref(*out_text_Refman);
   *out_text = text;
 MR_cleanup:
+  MR_dec_ref(text_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1259,8 +1398,12 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-test-params"
 Returncode f_test_params(Int x, String* s, RefManager* s_Refman, String* o, RefManager* o_Refman) {
   Returncode MR_err = OK;
+  MR_inc_ref(s_Refman);
+  MR_inc_ref(o_Refman);
   RAISE(231)
 MR_cleanup:
+  MR_owner_dec_ref(o_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1333,7 +1476,7 @@ Returncode test_call_expression(void) {
   RefManager* aux_String_1_Refman = NULL;
   CHECK(246, f_test_void() )
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(247)
   aux_String_0_Var.max_length = 5;
   aux_String_0_Var.length = 4;
@@ -1350,9 +1493,14 @@ Returncode test_call_expression(void) {
   CHECK(259, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
   CHECK(260, Mock_f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
+  MR_dec_ref(s_Refman);
   s_Refman = aux_String_1_Refman;
+  MR_inc_ref(s_Refman);
   s = aux_String_1;
 MR_cleanup:
+  MR_owner_dec_ref(aux_String_1_Refman);
+  MR_dec_ref(aux_String_0_Refman);
+  MR_owner_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1366,6 +1514,7 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
   Int y = 0;
   Int z = 0;
   Int w = 0;
+  MR_inc_ref(arr_Refman);
   if (arr == NULL || arr_Refman->value == NULL) RAISE(264)
   if ((4) < 0 || (4) >= (arr)->length) RAISE(264)
   if ((((Int*)((arr)->values))[4]) > 6) {
@@ -1444,6 +1593,7 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
   }
   }
 MR_cleanup:
+  MR_dec_ref(arr_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1455,6 +1605,8 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman,
   Returncode MR_err = OK;
   File* f = NULL;
   RefManager* f_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  MR_inc_ref(a_Refman);
   CHECK(295, Int_str(i, s, s_Refman) )
   b = true || false;
   c = EOF;
@@ -1480,7 +1632,9 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman,
   if (sys == NULL || sys_Refman->value == NULL) RAISE(316)
   if (sys->argv == NULL || sys->argv_Refman->value == NULL) RAISE(316)
   if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(316)
+  MR_dec_ref(s_Refman);
   s_Refman = sys->argv_Refman;
+  MR_inc_ref(s_Refman);
   s = ((String**)((sys->argv)->values))[1];
   CHECK(317, Sys_print(sys, sys_Refman, s, s_Refman) )
   CHECK(318, Sys_println(sys, sys_Refman, s, s_Refman) )
@@ -1488,6 +1642,9 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman,
   CHECK(320, Sys_system(sys, sys_Refman, s, s_Refman, &(i)) )
   CHECK(321, Sys_exit(sys, sys_Refman, i) )
 MR_cleanup:
+  MR_owner_dec_ref(f_Refman);
+  MR_dec_ref(a_Refman);
+  MR_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1502,13 +1659,16 @@ Returncode test_mid_out(MiddleType** mt, RefManager** mt_Refman, MiddleType_Dyna
   MiddleType_Dynamic* new_mt_Dynamic = &MiddleType_dynamic;
   new_mt = calloc(1, sizeof(MiddleType));
   if (new_mt == NULL) RAISE(65)
-  new_mt_Refman = MR_new_ref();
+  new_mt_Refman = MR_new_ref(new_mt);
   if (new_mt_Refman == NULL) RAISE(65)
   CHECK(65, MiddleType_new(new_mt, new_mt_Refman, new_mt_Dynamic) )
+  MR_dec_ref(*mt_Refman);
   *mt_Refman = new_mt_Refman;
+  MR_inc_ref(*mt_Refman);
   *mt_Dynamic = new_mt_Dynamic;
   *mt = new_mt;
 MR_cleanup:
+  MR_owner_dec_ref(new_mt_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1523,14 +1683,17 @@ Returncode TestStruct_Mock_get(TestStruct* self, RefManager* self_Refman, Int* x
   RefManager* aux_String_0_Refman = NULL;
   *x = 12;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(71)
   aux_String_0_Var.max_length = 1;
   aux_String_0_Var.length = 0;
   aux_String_0_Var.values = "";
+  MR_dec_ref(*s_Refman);
   *s_Refman = aux_String_0_Refman;
+  MR_inc_ref(*s_Refman);
   *s = aux_String_0;
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1560,7 +1723,7 @@ Returncode test_func(void) {
   String* aux_String_1 = NULL;
   RefManager* aux_String_1_Refman = NULL;
   t = &t_Var;
-  t_Refman = MR_new_ref();
+  t_Refman = MR_new_ref(t);
   if (t_Refman == NULL) RAISE(79)
   CHECK(79, TestStruct_new(t, t_Refman, 0, NULL, NULL) )
   CHECK(81, TestStruct_Mock_get(t, t_Refman, &(x), &(aux_String_0), &(aux_String_0_Refman)) )
@@ -1577,6 +1740,9 @@ Returncode test_func(void) {
     TEST_FAIL(83)
   } while (false);
 MR_cleanup:
+  MR_owner_dec_ref(aux_String_1_Refman);
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(t_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME

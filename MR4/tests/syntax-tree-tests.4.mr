@@ -144,64 +144,75 @@ func name(copy Func{(copy Int x)->(copy Int y)} fun)->(copy Func{()} joy)
 func name()
   var Int x
 ## @ g t7
+func name(var String self, copy Int px, user String pu, owner String po)->(
+    var String oself, copy Int ox, user String ou, owner String oo)
+  var Int x
+  user String u
+  owner String o
+  var String{12} v
+  new String{12} n
+  o := String{12}()
+  u := "constant string"
+  pu := po[2:6]
+## @ g tm0
 main
   var Int x
-## @ eg t8
+## @ eg te0
 func(
 
-## @ eg t9
+## @ eg te1
 func name
 
-## @ eg t10
+## @ eg te2
 func Error()
 
-## @ eg t11
+## @ eg te3
 func error_name()
 
-## @ eg t12
+## @ eg te4
 func name()
 func name()
 
-## @ eg t13
+## @ eg te5
 var Int name
 func name()
 
-## @ eg t14
+## @ eg te6
 func name( )
 
-## @ eg t15
+## @ eg te7
 func name(user)
 
-## @ eg t16
+## @ eg te8
 func name(var String
 
-## @ eg t17
+## @ eg te9
 func name(error Int x)
 
-## @ eg t18
+## @ eg te10
 func name(var String str,user Int x)
 
-## @ eg t19
+## @ eg te11
 func name()-()
 
-## @ eg t20
+## @ eg te12
 func name()
-## @ eg t21
+## @ eg te13
 func name()
     var Int x
-## @ eg t22
+## @ eg te14
 func name(user Int x)
 
-## @ eg t23
+## @ eg te15
 func name(copy String s)
 
-## @ eg t24
+## @ eg te16
 func name(user Array error)
 
-## @ eg t25
+## @ eg te17
 func name(copy Func error)
 
-## @ eg t26
+## @ eg te18
 func name(user Array{Array{Int}} error)
 
 ## @@ test-members

@@ -209,10 +209,20 @@ class BinaryExpression(UnaryExpression)
       # := operator
       if not self.left-expression.result-type.type-data.is-primitive
         # also assign Refman
+        write(user "MR_dec_ref(")
+        self.left-expression.write-refman()
+        write(user ");\n")
+        self.code-node.write-spaces()
+        
         self.left-expression.write-refman()
         write(user " = ")
         self.right-expression.write-refman()
         write(user ";\n")
+        self.code-node.write-spaces()
+        
+        write(user "MR_inc_ref(")
+        self.left-expression.write-refman()
+        write(user ");\n")
         self.code-node.write-spaces()
       if self.left-expression.result-type.type-data.is-dynamic
         # also assign Dynamic

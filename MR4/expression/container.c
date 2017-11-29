@@ -405,19 +405,29 @@ Returncode BinaryExpression_write_preactions(BinaryExpression* self) {
     /* := operator */
     if (!self->left_expression->result_type->type_data->is_primitive) {
       /* also assign Refman */
-      CHECK(212, (self->left_expression)->_base._dtl[4](self->left_expression) )
-      CHECK(213, write(&(String){4, 3, " = "}) )
-      CHECK(214, (self->_base.right_expression)->_base._dtl[4](self->_base.right_expression) )
-      CHECK(215, write(&(String){3, 2, ";\n"}) )
-      CHECK(216, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+      CHECK(212, write(&(String){12, 11, "MR_dec_ref("}) )
+      CHECK(213, (self->left_expression)->_base._dtl[4](self->left_expression) )
+      CHECK(214, write(&(String){4, 3, ");\n"}) )
+      CHECK(215, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+      
+      CHECK(217, (self->left_expression)->_base._dtl[4](self->left_expression) )
+      CHECK(218, write(&(String){4, 3, " = "}) )
+      CHECK(219, (self->_base.right_expression)->_base._dtl[4](self->_base.right_expression) )
+      CHECK(220, write(&(String){3, 2, ";\n"}) )
+      CHECK(221, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+      
+      CHECK(223, write(&(String){12, 11, "MR_inc_ref("}) )
+      CHECK(224, (self->left_expression)->_base._dtl[4](self->left_expression) )
+      CHECK(225, write(&(String){4, 3, ");\n"}) )
+      CHECK(226, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
     }
     if (self->left_expression->result_type->type_data->is_dynamic) {
       /* also assign Dynamic */
-      CHECK(219, (self->left_expression)->_base._dtl[3](self->left_expression) )
-      CHECK(220, write(&(String){4, 3, " = "}) )
-      CHECK(221, (self->_base.right_expression)->_base._dtl[3](self->_base.right_expression) )
-      CHECK(222, write(&(String){3, 2, ";\n"}) )
-      CHECK(223, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+      CHECK(229, (self->left_expression)->_base._dtl[3](self->left_expression) )
+      CHECK(230, write(&(String){4, 3, " = "}) )
+      CHECK(231, (self->_base.right_expression)->_base._dtl[3](self->_base.right_expression) )
+      CHECK(232, write(&(String){3, 2, ";\n"}) )
+      CHECK(233, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
     }
   }
   return OK;
@@ -430,18 +440,18 @@ Returncode BinaryExpression_write(BinaryExpression* self);
 static char* _func_name_BinaryExpression_write = "BinaryExpression.write";
 #define MR_FUNC_NAME _func_name_BinaryExpression_write
 Returncode BinaryExpression_write(BinaryExpression* self) {
-  CHECK(226, UnaryExpression_write_start(&(self->_base)) )
-  CHECK(227, (self->left_expression)->_base._dtl[2](self->left_expression) )
+  CHECK(236, UnaryExpression_write_start(&(self->_base)) )
+  CHECK(237, (self->left_expression)->_base._dtl[2](self->left_expression) )
   Bool expand_and = self->_base.operator->order == 1 &&  NULL !=  self->binary_left_expression && self->binary_left_expression->_base.operator->order == 1;
   if (expand_and) {
     /* (a > b) > c --> (a > b) && (b > c) */
-    CHECK(233, write(&(String){6, 5, " && ("}) )
-    CHECK(234, (self->binary_left_expression->_base.right_expression)->_base._dtl[2](self->binary_left_expression->_base.right_expression) )
+    CHECK(243, write(&(String){6, 5, " && ("}) )
+    CHECK(244, (self->binary_left_expression->_base.right_expression)->_base._dtl[2](self->binary_left_expression->_base.right_expression) )
   }
-  CHECK(235, write(&(String){2, 1, " "}) )
-  CHECK(236, UnaryExpression_write_end(&(self->_base)) )
+  CHECK(245, write(&(String){2, 1, " "}) )
+  CHECK(246, UnaryExpression_write_end(&(self->_base)) )
   if (expand_and) {
-    CHECK(238, write(&(String){2, 1, ")"}) )
+    CHECK(248, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }
@@ -471,10 +481,10 @@ static char* _func_name_QuestionExpression_parse_new = "QuestionExpression.parse
 #define MR_FUNC_NAME _func_name_QuestionExpression_parse_new
 Returncode QuestionExpression_parse_new(QuestionExpression* self, Expression** expression, Char* end) {
   QuestionExpression* question_expression = malloc(sizeof(QuestionExpression));
-  if (question_expression == NULL) RAISE(246)
+  if (question_expression == NULL) RAISE(256)
   *question_expression = (QuestionExpression){QuestionExpression__dtl, NULL, 0, NULL, NULL, false, false, false, NULL};
   question_expression->_base._base._dtl = QuestionExpression__dtl;
-  CHECK(247, QuestionExpression_parse(question_expression, (*expression), &((*end))) )
+  CHECK(257, QuestionExpression_parse(question_expression, (*expression), &((*end))) )
   (*expression) = &(question_expression->_base);
   return OK;
 }
@@ -487,8 +497,8 @@ static char* _func_name_QuestionExpression_parse = "QuestionExpression.parse";
 #define MR_FUNC_NAME _func_name_QuestionExpression_parse
 Returncode QuestionExpression_parse(QuestionExpression* self, Expression* tested, Char* end) {
   self->tested = tested;
-  CHECK(253, SyntaxTreeNode_set_location(&(self->_base._base)) )
-  CHECK(254, read_c(&((*end))) )
+  CHECK(263, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(264, read_c(&((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -499,14 +509,14 @@ Returncode QuestionExpression_analyze(QuestionExpression* self);
 static char* _func_name_QuestionExpression_analyze = "QuestionExpression.analyze";
 #define MR_FUNC_NAME _func_name_QuestionExpression_analyze
 Returncode QuestionExpression_analyze(QuestionExpression* self) {
-  CHECK(257, (self->tested)->_base._dtl[1](self->tested) )
+  CHECK(267, (self->tested)->_base._dtl[1](self->tested) )
   if (!(NULL != self->tested->result_type)) {
-    CHECK(259, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
+    CHECK(269, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
   }
   if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == &(glob->type_func->_base))) {
-    CHECK(262, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
+    CHECK(272, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
   }
-  CHECK(265, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
+  CHECK(275, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -517,7 +527,7 @@ Returncode QuestionExpression_write_preactions(QuestionExpression* self);
 static char* _func_name_QuestionExpression_write_preactions = "QuestionExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_QuestionExpression_write_preactions
 Returncode QuestionExpression_write_preactions(QuestionExpression* self) {
-  CHECK(268, (self->tested)->_base._dtl[6](self->tested) )
+  CHECK(278, (self->tested)->_base._dtl[6](self->tested) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -530,13 +540,13 @@ static char* _func_name_QuestionExpression_write = "QuestionExpression.write";
 Returncode QuestionExpression_write(QuestionExpression* self) {
   /* `tested` != NULL && `tested`_Refman->value != NULL */
   if (!self->_base.top) {
-    CHECK(273, write(&(String){2, 1, "("}) )
+    CHECK(283, write(&(String){2, 1, "("}) )
   }
-  CHECK(274, write(&(String){3, 2, "!("}) )
-  CHECK(275, Expression_write_validate_ref(self->tested) )
-  CHECK(276, write(&(String){2, 1, ")"}) )
+  CHECK(284, write(&(String){3, 2, "!("}) )
+  CHECK(285, Expression_write_validate_ref(self->tested) )
+  CHECK(286, write(&(String){2, 1, ")"}) )
   if (!self->_base.top) {
-    CHECK(278, write(&(String){2, 1, ")"}) )
+    CHECK(288, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }

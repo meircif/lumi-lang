@@ -77,14 +77,14 @@ int MR_test_main(int argc, char* argv[]);
 #define USER_MAIN_HEADER Returncode MR_user_main()
 
 typedef struct {
-  void* value;
   int count;
+  void* value;
 } RefManager;
 
-RefManager* MR_new_ref(void);
+RefManager* MR_new_ref(void* value);
 void MR_inc_ref(RefManager* ref);
 void MR_dec_ref(RefManager* ref);
-void MR_clean_owner(RefManager* ref);
+void MR_owner_dec_ref(RefManager* ref);
 
 String* MR_new_string(int length);
 Array* MR_new_array(int length, int value_size);

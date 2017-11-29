@@ -68,12 +68,14 @@ String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(1)
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "some string";
+  MR_dec_ref(str_Refman);
   str_Refman = aux_String_0_Refman;
+  MR_inc_ref(str_Refman);
   str = aux_String_0;
 /// @ t1
 illegal string constant ""aaa"
@@ -81,10 +83,14 @@ illegal string constant ""aaa"
 statememnt has no effect
 /// @@ test-empty-expression
 /// @ t0
-str_Refman = NULL;
+MR_dec_ref(str_Refman);
+  str_Refman = NULL;
+  MR_inc_ref(str_Refman);
   str = NULL;
 /// @ t1
-t_Refman = NULL;
+MR_dec_ref(t_Refman);
+  t_Refman = NULL;
+  MR_inc_ref(t_Refman);
   t = NULL;
 /// @ t2
 cannot assign "Empty Symbol" into "Int"
@@ -129,14 +135,16 @@ String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref();
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(1)
   aux_String_0_Var.length = 6;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
   aux_String_0_Var.values = (str)->values + (2);
   if (str == NULL || str_Refman->value == NULL) RAISE(1)
   if ((2) < 0 || (6) < 0 || (2) + (6) > (str)->length) RAISE(1)
+  MR_dec_ref(str_Refman);
   str_Refman = str_Refman;
+  MR_inc_ref(str_Refman);
   str = aux_String_0;
 /// @ t2
 if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
@@ -147,13 +155,15 @@ Array aux_Array_0_Var = {0};
   Array* aux_Array_0 = NULL;
   RefManager* aux_Array_0_Refman = NULL;
   aux_Array_0 = &aux_Array_0_Var;
-  aux_Array_0_Refman = MR_new_ref();
+  aux_Array_0_Refman = MR_new_ref(aux_Array_0);
   if (aux_Array_0_Refman == NULL) RAISE(1)
   aux_Array_0_Var.length = 6;
   aux_Array_0_Var.values = (Byte*)((arr)->values) + (2);
   if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
   if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)
+  MR_dec_ref(arr_Refman);
   arr_Refman = arr_Refman;
+  MR_inc_ref(arr_Refman);
   arr = aux_Array_0;
 /// @ t4
 if (str == NULL || str_Refman->value == NULL) RAISE(1)
@@ -214,7 +224,9 @@ Int aux_Int_0 = 0;
 String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   CHECK(1, fun3(7, &(aux_String_0), &(aux_String_0_Refman)) )
+  MR_dec_ref(*so_Refman);
   *so_Refman = aux_String_0_Refman;
+  MR_inc_ref(*so_Refman);
   *so = aux_String_0;
 /// @ t10
 CHECK(1, Test_meth(t, t_Refman) )
@@ -395,7 +407,9 @@ b = (i == 5) || (i != 37);
 /// @ t6
 b = ((2 < i) && (i < 12)) && (12 < (2 * i));
 /// @ t7
-t_Refman = tc_Refman;
+MR_dec_ref(t_Refman);
+  t_Refman = tc_Refman;
+  MR_inc_ref(t_Refman);
   t = &(tc->_base._base._base);
 /// @ t8
 unknown operator "@"
@@ -434,7 +448,7 @@ Ta a_Var = {{0}};
   RefManager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
   a = &a_Var;
-  a_Refman = MR_new_ref();
+  a_Refman = MR_new_ref(a);
   if (a_Refman == NULL) RAISE(1)
   CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t1
@@ -447,10 +461,12 @@ Ta* aux_Ta_0 = NULL;
   Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;
   aux_Ta_0 = calloc(1, sizeof(Ta));
   if (aux_Ta_0 == NULL) RAISE(1)
-  aux_Ta_0_Refman = MR_new_ref();
+  aux_Ta_0_Refman = MR_new_ref(aux_Ta_0);
   if (aux_Ta_0_Refman == NULL) RAISE(1)
   CHECK(1, Test_new(&(aux_Ta_0->_base), aux_Ta_0_Refman, 7) )
+  MR_dec_ref(ta_Refman);
   ta_Refman = aux_Ta_0_Refman;
+  MR_inc_ref(ta_Refman);
   ta_Dynamic = aux_Ta_0_Dynamic;
   ta = aux_Ta_0;
 /// @ t3
@@ -459,7 +475,7 @@ Ta* a = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
   a = calloc(1, sizeof(Ta));
   if (a == NULL) RAISE(1)
-  a_Refman = MR_new_ref();
+  a_Refman = MR_new_ref(a);
   if (a_Refman == NULL) RAISE(1)
   CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t4
@@ -468,21 +484,30 @@ Ta* a = NULL;
   Ta_Dynamic* a_Dynamic = NULL;
   a = ta;
   a_Refman = ta_Refman;
+  MR_inc_ref(a_Refman);
   a_Dynamic = ta_Dynamic;
 /// @ t5
-ta_Refman = ta_Refman;
+MR_dec_ref(ta_Refman);
+  ta_Refman = ta_Refman;
+  MR_inc_ref(ta_Refman);
   ta_Dynamic = ta_Dynamic;
   ta = ta;
 /// @ t6
-ta_Refman = tb_Refman;
+MR_dec_ref(ta_Refman);
+  ta_Refman = tb_Refman;
+  MR_inc_ref(ta_Refman);
   ta_Dynamic = &(tb_Dynamic->_base);
   ta = &(tb->_base);
 /// @ t7
-ta_Refman = tc_Refman;
+MR_dec_ref(ta_Refman);
+  ta_Refman = tc_Refman;
+  MR_inc_ref(ta_Refman);
   ta_Dynamic = &(tc_Dynamic->_base._base);
   ta = &(tc->_base._base);
 /// @ t8
-ta_Refman = NULL;
+MR_dec_ref(ta_Refman);
+  ta_Refman = NULL;
+  MR_inc_ref(ta_Refman);
   ta_Dynamic = NULL;
   ta = NULL;
 /// @ t9
@@ -490,7 +515,9 @@ Array* aa = NULL;
   RefManager* aa_Refman = NULL;
   if (aa == NULL || aa_Refman->value == NULL) RAISE(2)
   if ((4) < 0 || (4) >= (aa)->length) RAISE(2)
+  MR_dec_ref(ta_Refman);
   ta_Refman = aa_Refman;
+  MR_inc_ref(ta_Refman);
   ta_Dynamic = &Ta_dynamic;
   ta = ((Ta**)((aa)->values))[4];
 /// @ t10
@@ -498,7 +525,9 @@ Array* ca = NULL;
   RefManager* ca_Refman = NULL;
   if (ca == NULL || ca_Refman->value == NULL) RAISE(2)
   if ((4) < 0 || (4) >= (ca)->length) RAISE(2)
+  MR_dec_ref(ta_Refman);
   ta_Refman = ca_Refman;
+  MR_inc_ref(ta_Refman);
   ta_Dynamic = &(&Tc_dynamic->_base._base);
   ta = &((((Tc**)((ca)->values))[4])->_base._base);
 /// @ t11
@@ -550,7 +579,7 @@ Returncode (*farr_Values[38])(void);
   RefManager* farr_Refman = NULL;
   farr = &farr_Var;
   farr_Var.values = farr_Values;
-  farr_Refman = MR_new_ref();
+  farr_Refman = MR_new_ref(farr);
   if (farr_Refman == NULL) RAISE(1)
   if (farr == NULL || farr_Refman->value == NULL) RAISE(2)
   if ((3) < 0 || (3) >= (farr)->length) RAISE(2)
@@ -622,6 +651,7 @@ Array* argv = NULL;
   if (sys == NULL || sys_Refman->value == NULL) RAISE(1)
   argv = sys->argv;
   argv_Refman = sys->argv_Refman;
+  MR_inc_ref(argv_Refman);
 /// @ t22
 CHECK(1, Sys_print(sys, sys_Refman, str, str_Refman) )
 /// @ t23

@@ -40,8 +40,8 @@ int MR_main(int argc, char* argv[]) {
   Returncode err;
   MR_trace_stream = stderr;
   args_strings = malloc(argc * sizeof(String));
-  sys_Var.argv_Refman = MR_new_ref();
-  sys_Refman = MR_new_ref();
+  sys_Var.argv_Refman = MR_new_ref(&sys_argv);
+  sys_Refman = MR_new_ref(&sys_Var);
   if (args_strings == NULL || sys_Var.argv_Refman == NULL ||
       sys_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
@@ -111,10 +111,11 @@ Returncode set_cstring(String* str, RefManager* str_Refman) {
 #undef MR_FUNC_NAME
 
 /*reference counting*/
-RefManager* MR_new_ref(void) {
+RefManager* MR_new_ref(void* value) {
   RefManager* ref = malloc(sizeof(RefManager));
   if (ref != NULL) {
     ref->count = 1;
+    ref->value = value;
   }
   return ref;
 }
@@ -138,7 +139,7 @@ void MR_dec_ref(RefManager* ref) {
   }
 }
 
-void MR_clean_owner(RefManager* ref) {
+void MR_owner_dec_ref(RefManager* ref) {
   if (ref != NULL) {
     free(ref->value);
     ref->value = NULL;
@@ -216,11 +217,11 @@ Returncode open_file(
     String* name, RefManager* name_Refman,
     char* mode) {
   CCHECK(set_cstring(name, name_Refman));
-  *file_Refman = MR_new_ref();
+  *file = fopen(name->values, mode);
   if (*file == NULL) {
     CRAISE
   }
-  *file = fopen(name->values, mode);
+  *file_Refman = MR_new_ref(*file);
   if (*file == NULL) {
     CRAISE
   }
@@ -423,7 +424,7 @@ Returncode String_concat(
 Returncode String_concat_int(String* self, RefManager* self_Refman, Int num) {
   String remain;
   String* remain_ref = &remain;
-  RefManager remain_Refman = { NULL , 1 };
+  RefManager remain_Refman = { 1 , NULL };
   remain_Refman.value = remain_ref;
   remain.max_length = self->max_length - self->length;
   remain.length = 0;

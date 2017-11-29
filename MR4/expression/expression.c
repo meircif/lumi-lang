@@ -262,16 +262,18 @@ Returncode Expression_write_refman_init(Expression* self, SymbolExpression* symb
 static char* _func_name_Expression_write_refman_init = "Expression.write-refman-init";
 #define MR_FUNC_NAME _func_name_Expression_write_refman_init
 Returncode Expression_write_refman_init(Expression* self, SymbolExpression* symbol) {
-  /* `symbol`_Refman = MR_new_ref(); */
+  /* `symbol`_Refman = MR_new_ref(`symbol`); */
   /* if (`symbol`_Refman == NULL) raise(`line-num`) */
   CHECK(174, SyntaxTreeCode_write_spaces(self->code_node) )
   CHECK(175, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(176, write(&(String){25, 24, "_Refman = MR_new_ref();\n"}) )
-  CHECK(177, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(178, write(&(String){5, 4, "if ("}) )
-  CHECK(179, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(180, write(&(String){18, 17, "_Refman == NULL) "}) )
-  CHECK(181, SyntaxTreeNode_write_raise(&(self->_base)) )
+  CHECK(176, write(&(String){22, 21, "_Refman = MR_new_ref("}) )
+  CHECK(177, (symbol)->_base._base._dtl[2](symbol) )
+  CHECK(178, write(&(String){4, 3, ");\n"}) )
+  CHECK(179, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(180, write(&(String){5, 4, "if ("}) )
+  CHECK(181, (symbol)->_base._base._dtl[2](symbol) )
+  CHECK(182, write(&(String){18, 17, "_Refman == NULL) "}) )
+  CHECK(183, SyntaxTreeNode_write_raise(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -283,10 +285,10 @@ static char* _func_name_Expression_write_init_var_ref = "Expression.write-init-v
 #define MR_FUNC_NAME _func_name_Expression_write_init_var_ref
 Returncode Expression_write_init_var_ref(Expression* self, SymbolExpression* symbol) {
   /* `symbol` = &`symbol`_Var; */
-  CHECK(185, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(186, write(&(String){5, 4, " = &"}) )
   CHECK(187, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(188, write(&(String){7, 6, "_Var;\n"}) )
+  CHECK(188, write(&(String){5, 4, " = &"}) )
+  CHECK(189, (symbol)->_base._base._dtl[2](symbol) )
+  CHECK(190, write(&(String){7, 6, "_Var;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -297,15 +299,15 @@ Returncode Expression_write_validate_ref(Expression* self);
 static char* _func_name_Expression_write_validate_ref = "Expression.write-validate-ref";
 #define MR_FUNC_NAME _func_name_Expression_write_validate_ref
 Returncode Expression_write_validate_ref(Expression* self) {
-  CHECK(191, Expression_write_as_top(self) )
-  CHECK(192, write(&(String){9, 8, " == NULL"}) )
+  CHECK(193, Expression_write_as_top(self) )
+  CHECK(194, write(&(String){9, 8, " == NULL"}) )
   if (!self->result_type->type_data->is_primitive) {
-    CHECK(194, write(&(String){5, 4, " || "}) )
+    CHECK(196, write(&(String){5, 4, " || "}) )
     Bool top = self->top;
     self->top = false;
-    CHECK(197, (self)->_base._dtl[4](self) )
+    CHECK(199, (self)->_base._dtl[4](self) )
     self->top = top;
-    CHECK(199, write(&(String){16, 15, "->value == NULL"}) )
+    CHECK(201, write(&(String){16, 15, "->value == NULL"}) )
   }
   return OK;
 }
@@ -317,8 +319,8 @@ Returncode Expression_write_dynamic(Expression* self);
 static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
 #define MR_FUNC_NAME _func_name_Expression_write_dynamic
 Returncode Expression_write_dynamic(Expression* self) {
-  CHECK(202, (self)->_base._dtl[2](self) )
-  CHECK(203, write(&(String){9, 8, "_Dynamic"}) )
+  CHECK(204, (self)->_base._dtl[2](self) )
+  CHECK(205, write(&(String){9, 8, "_Dynamic"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -329,8 +331,8 @@ Returncode Expression_write_refman(Expression* self);
 static char* _func_name_Expression_write_refman = "Expression.write-refman";
 #define MR_FUNC_NAME _func_name_Expression_write_refman
 Returncode Expression_write_refman(Expression* self) {
-  CHECK(206, (self)->_base._dtl[2](self) )
-  CHECK(207, write(&(String){8, 7, "_Refman"}) )
+  CHECK(208, (self)->_base._dtl[2](self) )
+  CHECK(209, write(&(String){8, 7, "_Refman"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -343,7 +345,7 @@ static char* _func_name_Expression_write_as_top = "Expression.write-as-top";
 Returncode Expression_write_as_top(Expression* self) {
   Bool top = self->top;
   self->top = true;
-  CHECK(212, (self)->_base._dtl[2](self) )
+  CHECK(214, (self)->_base._dtl[2](self) )
   self->top = top;
   return OK;
 }

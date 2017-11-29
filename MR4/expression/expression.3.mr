@@ -169,11 +169,13 @@ class Expression(SyntaxTreeNode)
     string-new-copy(user symbol.variable.name):(owner symbol.name)
   
   func inst write-refman-init(user SymbolExpression symbol)
-    # `symbol`_Refman = MR_new_ref();
+    # `symbol`_Refman = MR_new_ref(`symbol`);
     # if (`symbol`_Refman == NULL) raise(`line-num`)
     self.code-node.write-spaces()
     symbol.write()
-    write(user "_Refman = MR_new_ref();\n")
+    write(user "_Refman = MR_new_ref(")
+    symbol.write()
+    write(user ");\n")
     self.code-node.write-spaces()
     write(user "if (")
     symbol.write()

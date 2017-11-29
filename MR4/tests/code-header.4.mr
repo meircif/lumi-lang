@@ -25,19 +25,17 @@ func fun4(copy Int x)
 func fun5(copy Int x)->(copy Int y)
 func fun6(copy Int x, copy Int y)->(copy Int n, copy Int m)
 func fun7()->(user Tb tb)
-func mock(
-    copy Int i,
-    copy Char c,
-    copy Bool b,
-    user String str,
-    user Array{Int} arr,
-    user File fobj,
-    user Test t,
-    user Ta ta,
-    user Tb tb,
-    user Tc tc)->(
-    owner String so,
-    copy Int io,
-    user Test to,
-    user Tc tco)
+
+var Int i
+var Char c
+var Bool b
+user String str
+user Array{Int} arr
+user File fobj
+user Test t
+user Ta ta
+user Tb tb
+user Tc tc
+
+func mock()->(owner String so, copy Int io, user Test to, user Tc tco)
   
