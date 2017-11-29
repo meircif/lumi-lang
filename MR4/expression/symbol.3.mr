@@ -48,7 +48,22 @@ class SymbolExpression(Expression)
     write-cname(user self.name)
     if ? self.variable and self.variable.is-output and not self.top
       write(user ")")
-
+  
+  func dynamic write-dynamic()
+    if ? self.variable and self.variable.is-output and not self.top
+      write(user "(*")
+      write-cname(user self.name)
+      write(user "_Dynamic)")
+    else
+      base.write-dynamic()
+  
+  func dynamic write-refman()
+    if ? self.variable and self.variable.is-output and not self.top
+      write(user "(*")
+      write-cname(user self.name)
+      write(user "_Refman)")
+    else
+      base.write-refman()
 
 ## An instance member expression
 class MemberExpression(SymbolExpression)
@@ -133,22 +148,24 @@ class MemberExpression(SymbolExpression)
     self.instance := _
   
   func dynamic write-preactions()
+    if ? self.instance
+      self.instance.write-preactions()
     if not (? self.dynamic-call-self-instance or
         (? self.instance and not (? self.function) and
         self.instance.result-type.type-data != glob.type-type))
       return
-    if ? self.instance
-      self.instance.write-preactions()
-    # if (`instance` == NULL[ || *`instance` == NULL]) RAISE(`line-num`)
+    # if (...) RAISE(`line-num`)
     write(user "if (")
     if ? self.instance
-      self.instance.write()
-      if not self.instance.result-type.type-data.is-primitive
-        write(user " == NULL || *")
-        self.instance.write()
+      # `instance` == NULL[ || `instance`_Refman->value == NULL]
+      self.instance.write-validate-ref()
     else-if ? self.dynamic-call-self-instance
+      # `instance`_Dynamic == NULL
+      self.dynamic-call-self-instance.top := true
       self.dynamic-call-self-instance.write-dynamic()
-    write(user " == NULL) ")
+      self.dynamic-call-self-instance.top := false
+      write(user " == NULL")
+    write(user ") ")
     self.write-raise()
     self.code-node.write-spaces()
   
@@ -160,12 +177,7 @@ class MemberExpression(SymbolExpression)
       return
     if ? self.instance and not (? self.function) and
         self.instance.result-type.type-data != glob.type-type
-      if not self.instance.result-type.type-data.is-primitive
-        write(user "(*")
-        self.instance.top := true
       self.instance.write()
-      if not self.instance.result-type.type-data.is-primitive
-        write(user ")")
       self.write-bases()
     base.write()
   
@@ -243,6 +255,7 @@ class UpCastExpression(Expression)
   
   func inst init(copy Int bases, owner Expression expression)
     self.expression := expression
+    self.expression.top := false
     self.bases := bases
     self.expression.result-type.copy-new():(owner self.result-type)
   
@@ -251,15 +264,19 @@ class UpCastExpression(Expression)
   
   func dynamic write()
     # &(`expression`->_base[._base]...)
-    # self.write-pre()
-    write(user "(void*)")
+    self.write-pre()
     self.expression.write()
-    # self.write-post()
+    self.write-post()
   
   func dynamic write-dynamic()
     self.write-pre()
     self.expression.write-dynamic()
     self.write-post()
+  
+  func dynamic write-refman()
+    self.expression.top := true
+    self.expression.write-refman()
+    self.expression.top := false
   
   func inst write-pre()
     write(user "&(")
@@ -373,12 +390,12 @@ class InitExpression(Expression)
         self.result-type.sub-type.type-data = glob.type-string
       self.result-type.sub-type.length.write-preactions()
     
-    self.write-ref-init(user self.symbol)
-    
     if self.symbol.variable.access = ACCESS-VAR
       self.write-var-init()
     else
       self.write-new-init()
+    
+    self.write-refman-init(user self.symbol)
     
     if ? self.constructor
       self.code-node.write-spaces()
@@ -414,8 +431,7 @@ class InitExpression(Expression)
         write(user "_Chars);\n")
   
   func inst write-new-init()
-    self.code-node.write-spaces()
-    write(user "*")
+    # `symbol` = ...
     self.symbol.write()
     write(user " = ")
     
@@ -448,9 +464,9 @@ class InitExpression(Expression)
     
     write(user ");\n")
     
-    # if (*`symbol` == NULL) raise(`line-num`)
+    # if (`symbol` == NULL) raise(`line-num`)
     self.code-node.write-spaces()
-    write(user "if (*")
+    write(user "if (")
     self.symbol.write()
     write(user " == NULL) ")
     self.write-raise()
@@ -465,6 +481,15 @@ class InitExpression(Expression)
     write(user " = ")
     value.write()
     write(user ";\n")
+    
+    if not self.result-type.type-data.is-primitive
+      # `name`_Refman = `value`_Refman;
+      self.code-node.write-spaces()
+      self.symbol.write()
+      write(user "_Refman = ")
+      value.write-refman()
+      write(user ";\n")
+    
     if self.result-type.type-data.is-dynamic
       # `name`_Dynamic = `Type`_Dynamic;
       self.code-node.write-spaces()

@@ -63,20 +63,26 @@ func test-slice-expression(
     copy Int i,
     user TestStruct t,
     user TestClass d,
-    copy Func{()} f)
+    copy Func{()} f,
+    user Array{Int} arrio,
+    user Array{String} arrso,
+    user Array{TestStruct} arrto,
+    user Array{TestClass} arrdo,
+    user Array{Func{()}} arrfo)
   c := s[2] + s[4:7][2] + arrs[3][2] + arrs[4:2][4][1:3][0]
   i := arri[i + 3 - arri[2]] + arrt[4].num + arrt[2:4][1].num +
-      arri[2:4][1:2][1]
-  arri := arri[2 - i + arri[2:4][1]:5 * (i - 1)]
+      arri[3:3][1:2][1]
+  arrio := arri[2 - i + arri[2:4][1]:5 * (i - 1)]
   s := arrs[4]
-  arrs := arrs[2:7]
+  arrso := arrs[2:7]
   t := arrt[4]
-  arrt := arrt[2:7]
+  arrto := arrt[2:7]
   d := arrd[4]
-  arrd := arrd[2:7]
+  arrdo := arrd[2:7]
   f := arrf[4]
-  arrf := arrf[2:7]
+  arrfo := arrf[2:7]
   arrf[4]()
+  arrfo[4]()
 
 
 func test-container-expression(copy Int x, copy Int y, user String s)->(

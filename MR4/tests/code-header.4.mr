@@ -1,5 +1,6 @@
 struct Test
   var Int num
+  user Test t
   var Func{()} fun
   new(copy Int num)
   func meth()
@@ -36,5 +37,7 @@ func mock(
     user Tb tb,
     user Tc tc)->(
     owner String so,
-    copy Int io)
+    copy Int io,
+    user Test to,
+    user Tc tco)
   

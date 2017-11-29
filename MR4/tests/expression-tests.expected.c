@@ -65,13 +65,15 @@ illegal character constant "'aa"
 /// @@ test-string-expression
 /// @ t0
 String aux_String_0_Var = {0};
-  String** aux_String_0 = NULL;
-  aux_String_0 = MR_new_ref();
-  if (aux_String_0 == NULL) RAISE(1)
-  *aux_String_0 = &aux_String_0_Var;
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref();
+  if (aux_String_0_Refman == NULL) RAISE(1)
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "some string";
+  str_Refman = aux_String_0_Refman;
   str = aux_String_0;
 /// @ t1
 illegal string constant ""aaa"
@@ -79,61 +81,88 @@ illegal string constant ""aaa"
 statememnt has no effect
 /// @@ test-empty-expression
 /// @ t0
-str = NULL;
+str_Refman = NULL;
+  str = NULL;
 /// @ t1
-t = NULL;
+t_Refman = NULL;
+  t = NULL;
 /// @ t2
 cannot assign "Empty Symbol" into "Int"
 /// @@ test-member-expression
 /// @ t0
-if (t == NULL || *t == NULL) RAISE(1)
-  i = (*t)->num;
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  i = t->num;
 /// @ t1
-if (tc == NULL || *tc == NULL) RAISE(1)
-  i = (*tc)->_base.numb;
+if (tc == NULL || tc_Refman->value == NULL) RAISE(1)
+  i = tc->_base.numb;
 /// @ t2
-if (tc == NULL || *tc == NULL) RAISE(1)
-  i = (*tc)->_base._base._base.num;
+if (tc == NULL || tc_Refman->value == NULL) RAISE(1)
+  i = tc->_base._base._base.num;
 /// @ t3
-unknown symbol "error"
+if (*to == NULL || (*to_Refman)->value == NULL) RAISE(1)
+  i = (*to)->num;
 /// @ t4
-void expression has no member "error"
+if (*tco == NULL || (*tco_Refman)->value == NULL) RAISE(1)
+  i = (*tco)->_base._base._base.num;
 /// @ t5
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  if (t->t == NULL || t->t_Refman->value == NULL) RAISE(1)
+  i = t->t->num;
+/// @ t6
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  if (t->t == NULL || t->t_Refman->value == NULL) RAISE(1)
+  if (t->t->t == NULL || t->t->t_Refman->value == NULL) RAISE(1)
+  i = t->t->t->num;
+/// @ te0
+unknown symbol "error"
+/// @ te1
+void expression has no member "error"
+/// @ te2
 type "Test" has no member "error"
 /// @@ test-slice-expression
 /// @ t0
-if ((13) < 0 || (13) >= (*str)->length) RAISE(1)
-  c = ((*str)->values)[13];
+if (str == NULL || str_Refman->value == NULL) RAISE(1)
+  if ((13) < 0 || (13) >= (str)->length) RAISE(1)
+  c = ((str)->values)[13];
 /// @ t1
 String aux_String_0_Var = {0};
-  String** aux_String_0 = NULL;
-  aux_String_0 = MR_new_ref();
-  if (aux_String_0 == NULL) RAISE(1)
-  *aux_String_0 = &aux_String_0_Var;
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref();
+  if (aux_String_0_Refman == NULL) RAISE(1)
   aux_String_0_Var.length = 6;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
-  aux_String_0_Var.values = (*str)->values + (2);
-  if ((2) < 0 || (6) < 0 || (2) + (6) > (*str)->length) RAISE(1)
+  aux_String_0_Var.values = (str)->values + (2);
+  if (str == NULL || str_Refman->value == NULL) RAISE(1)
+  if ((2) < 0 || (6) < 0 || (2) + (6) > (str)->length) RAISE(1)
+  str_Refman = str_Refman;
   str = aux_String_0;
 /// @ t2
-if ((13) < 0 || (13) >= (*arr)->length) RAISE(1)
-  i = ((Int*)((*arr)->values))[13];
+if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((13) < 0 || (13) >= (arr)->length) RAISE(1)
+  i = ((Int*)((arr)->values))[13];
 /// @ t3
 Array aux_Array_0_Var = {0};
-  Array** aux_Array_0 = NULL;
-  aux_Array_0 = MR_new_ref();
-  if (aux_Array_0 == NULL) RAISE(1)
-  *aux_Array_0 = &aux_Array_0_Var;
+  Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
+  aux_Array_0 = &aux_Array_0_Var;
+  aux_Array_0_Refman = MR_new_ref();
+  if (aux_Array_0_Refman == NULL) RAISE(1)
   aux_Array_0_Var.length = 6;
-  aux_Array_0_Var.values = (Byte*)((*arr)->values) + (2);
-  if ((2) < 0 || (6) < 0 || (2) + (6) > (*arr)->length) RAISE(1)
+  aux_Array_0_Var.values = (Byte*)((arr)->values) + (2);
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)
+  arr_Refman = arr_Refman;
   arr = aux_Array_0;
 /// @ t4
-if ((4) < 0 || (4) >= (*str)->length) RAISE(1)
-  ((*str)->values)[4] = c;
+if (str == NULL || str_Refman->value == NULL) RAISE(1)
+  if ((4) < 0 || (4) >= (str)->length) RAISE(1)
+  ((str)->values)[4] = c;
 /// @ t5
-if ((4) < 0 || (4) >= (*arr)->length) RAISE(1)
-  ((Int*)((*arr)->values))[4] = i;
+if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((4) < 0 || (4) >= (arr)->length) RAISE(1)
+  ((Int*)((arr)->values))[4] = i;
 /// @ t6
 expected "]", got "new-line"
 /// @ t7
@@ -158,15 +187,16 @@ assigning into non assignable expression
 /// @ t0
 CHECK(1, fun0() )
 /// @ t1
-CHECK(1, fun1(3, str, NULL) )
+CHECK(1, fun1(3, str, str_Refman, NULL, NULL) )
 /// @ t2
-CHECK(1, fun2(&(*so), &(*io)) )
+CHECK(1, fun2(&(*so), &(*so_Refman), &(*io)) )
 /// @ t3
 Int x = 0;
-  String** s = NULL;
-  CHECK(3, fun2(&(s), &(x)) )
+  String* s = NULL;
+  RefManager* s_Refman = NULL;
+  CHECK(3, fun2(&(s), &(s_Refman), &(x)) )
 /// @ t4
-CHECK(1, fun3(0, &(*so)) )
+CHECK(1, fun3(0, &(*so), &(*so_Refman)) )
 /// @ t5
 Int x = 0;
   CHECK(2, fun5(3, &(x)) )
@@ -181,44 +211,55 @@ Int aux_Int_0 = 0;
   CHECK(1, fun5(4, &(aux_Int_0)) )
   *io = aux_Int_0;
 /// @ t9
-String** aux_String_0 = NULL;
-  CHECK(1, fun3(7, &(aux_String_0)) )
+String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  CHECK(1, fun3(7, &(aux_String_0), &(aux_String_0_Refman)) )
+  *so_Refman = aux_String_0_Refman;
   *so = aux_String_0;
 /// @ t10
-CHECK(1, Tc_methc(tc, tc_Dynamic) )
+CHECK(1, Test_meth(t, t_Refman) )
 /// @ t11
-CHECK(1, Tb_methb((void*)tc, &(tc_Dynamic->_base)) )
+CHECK(1, Test_meth(*to, *to_Refman) )
 /// @ t12
-CHECK(1, Test_meth((void*)tc) )
+CHECK(1, Tc_methc(tc, tc_Refman, tc_Dynamic) )
 /// @ t13
-expected access, got " "
+CHECK(1, Tb_methb(&(tc->_base), tc_Refman, &(tc_Dynamic->_base)) )
 /// @ t14
-expected space after access, got ")"
+CHECK(1, Test_meth(&(tc->_base._base._base), tc_Refman) )
 /// @ t15
-expected space or new-line after ",", got "c"
+CHECK(1, Test_meth(&((*tco)->_base._base._base), *tco_Refman) )
 /// @ t16
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  CHECK(1, Test_meth(t->t, t->t_Refman) )
+/// @ te0
+expected access, got " "
+/// @ te1
+expected space after access, got ")"
+/// @ te2
+expected space or new-line after ",", got "c"
+/// @ te3
 expected "," or ")", got "new-line"
-/// @ t17
+/// @ te4
 illegal access "error"
-/// @ t18
+/// @ te5
 void expression is not callable
-/// @ t19
+/// @ te6
 non callable type "Int"
-/// @ t20
+/// @ te7
 non assignable call output
-/// @ t21
+/// @ te8
 cannot assign "Tb" into "Tc"
-/// @ t22
+/// @ te9
 cannot assign void expression
-/// @ t23
+/// @ te10
 expected access "copy" , got "user"
 /// @@ test-type-expression
 /// @ t0
-CHECK(1, Test_meth(t) )
+CHECK(1, Test_meth(t, t_Refman) )
 /// @ t1
-CHECK(1, Tb_methb((void*)tc, &(tc_Dynamic->_base)) )
+CHECK(1, Tb_methb(&(tc->_base), tc_Refman, &(tc_Dynamic->_base)) )
 /// @ t2
-CHECK(1, Test_meth((void*)tc) )
+CHECK(1, Test_meth(&(tc->_base._base._base), tc_Refman) )
 /// @ t3
 unknown type "Error"
 /// @@ test-base-expression
@@ -235,28 +276,28 @@ struct Mid {
 struct Top {
   Mid _base;
 };
-Returncode Base_methb(Base** self);
-Returncode Mid_methm(Mid** self);
-Returncode Top_methb(Top** self);
-Returncode Top_methm(Top** self);
-Returncode Base_methb(Base** self) {
+Returncode Base_methb(Base* self, RefManager* self_Refman);
+Returncode Mid_methm(Mid* self, RefManager* self_Refman);
+Returncode Top_methb(Top* self, RefManager* self_Refman);
+Returncode Top_methm(Top* self, RefManager* self_Refman);
+Returncode Base_methb(Base* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mid_methm(Mid** self) {
+Returncode Mid_methm(Mid* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methb(Top** self) {
+Returncode Top_methb(Top* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methm(Top** self) {
+Returncode Top_methm(Top* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
-  CHECK(9, Mid_methm((void*)self) )
+  CHECK(9, Mid_methm(&(self->_base), self_Refman) )
 MR_cleanup:
   return MR_err;
 }
@@ -273,28 +314,28 @@ struct Mid {
 struct Top {
   Mid _base;
 };
-Returncode Base_methb(Base** self);
-Returncode Mid_methm(Mid** self);
-Returncode Top_methb(Top** self);
-Returncode Top_methm(Top** self);
-Returncode Base_methb(Base** self) {
+Returncode Base_methb(Base* self, RefManager* self_Refman);
+Returncode Mid_methm(Mid* self, RefManager* self_Refman);
+Returncode Top_methb(Top* self, RefManager* self_Refman);
+Returncode Top_methm(Top* self, RefManager* self_Refman);
+Returncode Base_methb(Base* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mid_methm(Mid** self) {
+Returncode Mid_methm(Mid* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methb(Top** self) {
+Returncode Top_methb(Top* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methm(Top** self) {
+Returncode Top_methm(Top* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
-  CHECK(9, Base_methb((void*)self) )
+  CHECK(9, Base_methb(&(self->_base._base), self_Refman) )
 MR_cleanup:
   return MR_err;
 }
@@ -354,7 +395,8 @@ b = (i == 5) || (i != 37);
 /// @ t6
 b = ((2 < i) && (i < 12)) && (12 < (2 * i));
 /// @ t7
-t = (void*)tc;
+t_Refman = tc_Refman;
+  t = &(tc->_base._base._base);
 /// @ t8
 unknown operator "@"
 /// @ t9
@@ -373,82 +415,107 @@ assigning into non assignable expression
 assigning into non assignable expression
 /// @@ test-question-expression
 /// @ t0
-b = str != NULL;
+b = !(str == NULL || str_Refman->value == NULL);
 /// @ t1
-b = ! (str != NULL);
+b = ! (!(str == NULL || str_Refman->value == NULL));
 /// @ t2
-cannot use "?" on void expression
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  b = !(t->fun == NULL);
 /// @ t3
+b = !(*to == NULL || (*to_Refman)->value == NULL);
+/// @ te0
+cannot use "?" on void expression
+/// @ te1
 cannot use "?" on type "Int"
 /// @@ test-dynamic
 /// @ t0
 Ta a_Var = {{0}};
-  Ta** a = NULL;
+  Ta* a = NULL;
+  RefManager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
-  a = MR_new_ref();
-  if (a == NULL) RAISE(1)
-  *a = &a_Var;
-  CHECK(1, Test_new((void*)a, 1) )
+  a = &a_Var;
+  a_Refman = MR_new_ref();
+  if (a_Refman == NULL) RAISE(1)
+  CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t1
-Ta** a = NULL;
+Ta* a = NULL;
+  RefManager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = NULL;
 /// @ t2
-Ta** aux_Ta_0 = NULL;
+Ta* aux_Ta_0 = NULL;
+  RefManager* aux_Ta_0_Refman = NULL;
   Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;
-  aux_Ta_0 = MR_new_ref();
+  aux_Ta_0 = calloc(1, sizeof(Ta));
   if (aux_Ta_0 == NULL) RAISE(1)
-  *aux_Ta_0 = calloc(1, sizeof(Ta));
-  if (*aux_Ta_0 == NULL) RAISE(1)
-  CHECK(1, Test_new((void*)aux_Ta_0, 7) )
+  aux_Ta_0_Refman = MR_new_ref();
+  if (aux_Ta_0_Refman == NULL) RAISE(1)
+  CHECK(1, Test_new(&(aux_Ta_0->_base), aux_Ta_0_Refman, 7) )
+  ta_Refman = aux_Ta_0_Refman;
   ta_Dynamic = aux_Ta_0_Dynamic;
   ta = aux_Ta_0;
 /// @ t3
-Ta** a = NULL;
+Ta* a = NULL;
+  RefManager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
-  a = MR_new_ref();
+  a = calloc(1, sizeof(Ta));
   if (a == NULL) RAISE(1)
-  *a = calloc(1, sizeof(Ta));
-  if (*a == NULL) RAISE(1)
-  CHECK(1, Test_new((void*)a, 1) )
+  a_Refman = MR_new_ref();
+  if (a_Refman == NULL) RAISE(1)
+  CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t4
-Ta** a = NULL;
+Ta* a = NULL;
+  RefManager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = NULL;
   a = ta;
+  a_Refman = ta_Refman;
   a_Dynamic = ta_Dynamic;
 /// @ t5
-ta_Dynamic = ta_Dynamic;
+ta_Refman = ta_Refman;
+  ta_Dynamic = ta_Dynamic;
   ta = ta;
 /// @ t6
-ta_Dynamic = &(tb_Dynamic->_base);
-  ta = (void*)tb;
+ta_Refman = tb_Refman;
+  ta_Dynamic = &(tb_Dynamic->_base);
+  ta = &(tb->_base);
 /// @ t7
-ta_Dynamic = &(tc_Dynamic->_base._base);
-  ta = (void*)tc;
+ta_Refman = tc_Refman;
+  ta_Dynamic = &(tc_Dynamic->_base._base);
+  ta = &(tc->_base._base);
 /// @ t8
-ta_Dynamic = NULL;
+ta_Refman = NULL;
+  ta_Dynamic = NULL;
   ta = NULL;
 /// @ t9
-Array** aa = NULL;
-  if ((4) < 0 || (4) >= (*aa)->length) RAISE(2)
+Array* aa = NULL;
+  RefManager* aa_Refman = NULL;
+  if (aa == NULL || aa_Refman->value == NULL) RAISE(2)
+  if ((4) < 0 || (4) >= (aa)->length) RAISE(2)
+  ta_Refman = aa_Refman;
   ta_Dynamic = &Ta_dynamic;
-  ta = ((Ta***)((*aa)->values))[4];
+  ta = ((Ta**)((aa)->values))[4];
 /// @ t10
-Array** ca = NULL;
-  if ((4) < 0 || (4) >= (*ca)->length) RAISE(2)
+Array* ca = NULL;
+  RefManager* ca_Refman = NULL;
+  if (ca == NULL || ca_Refman->value == NULL) RAISE(2)
+  if ((4) < 0 || (4) >= (ca)->length) RAISE(2)
+  ta_Refman = ca_Refman;
   ta_Dynamic = &(&Tc_dynamic->_base._base);
-  ta = (void*)(((Tc***)((*ca)->values))[4]);
+  ta = &((((Tc**)((ca)->values))[4])->_base._base);
 /// @ t11
 if (ta_Dynamic == NULL) RAISE(1)
-  CHECK(1, ta_Dynamic->dyn(ta, ta_Dynamic) )
+  CHECK(1, ta_Dynamic->dyn(ta, ta_Refman, ta_Dynamic) )
 /// @ t12
 if (tb_Dynamic == NULL) RAISE(1)
-  CHECK(1, tb_Dynamic->_base.dyn((void*)tb, &(tb_Dynamic->_base)) )
+  CHECK(1, tb_Dynamic->_base.dyn(&(tb->_base), tb_Refman, &(tb_Dynamic->_base)) )
 /// @ t13
 if (tc_Dynamic == NULL) RAISE(1)
-  CHECK(1, tc_Dynamic->_base._base.dyn((void*)tc, &(tc_Dynamic->_base._base)) )
+  CHECK(1, tc_Dynamic->_base._base.dyn(&(tc->_base._base), tc_Refman, &(tc_Dynamic->_base._base)) )
 /// @ t14
+if (*tco_Dynamic == NULL) RAISE(1)
+  CHECK(1, (*tco_Dynamic)->_base._base.dyn(&((*tco)->_base._base), *tco_Refman, &((*tco_Dynamic)->_base._base)) )
+/// @ t15
 if (ta != NULL) RAISE(1)
-  CHECK(1, fun7((void*)&(ta), (void*)&(ta_Dynamic)) )
+  CHECK(1, fun7((void*)&(ta), &(ta_Refman), (void*)&(ta_Dynamic)) )
 /// @@ test-function-object
 /// @ t0
 Returncode (*fun)(void) = NULL;
@@ -462,33 +529,36 @@ Returncode (*fun)(Int x, Int* y) = NULL;
   if (fun == NULL) RAISE(3)
   CHECK(3, fun(9, &(x)) )
 /// @ t2
-Returncode (*fun)(Test** self) = NULL;
+Returncode (*fun)(Test* self, RefManager* self_Refman) = NULL;
   fun = Test_meth;
   if (fun == NULL) RAISE(2)
-  CHECK(2, fun(t) )
+  CHECK(2, fun(t, t_Refman) )
 /// @ t3
 Returncode (*fun)(void) = NULL;
   fun = NULL;
-  b = fun != NULL;
+  b = !(fun == NULL);
 /// @ t4
-if (t == NULL || *t == NULL) RAISE(1)
-  (*t)->fun = fun0;
-  if (t == NULL || *t == NULL) RAISE(2)
-  if ((*t)->fun == NULL) RAISE(2)
-  CHECK(2, (*t)->fun() )
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  t->fun = fun0;
+  if (t == NULL || t_Refman->value == NULL) RAISE(2)
+  if (t->fun == NULL) RAISE(2)
+  CHECK(2, t->fun() )
 /// @ t5
 Returncode (*farr_Values[38])(void);
   Array farr_Var = {38, NULL};
-  Array** farr = NULL;
-  farr = MR_new_ref();
-  if (farr == NULL) RAISE(1)
-  *farr = &farr_Var;
+  Array* farr = NULL;
+  RefManager* farr_Refman = NULL;
+  farr = &farr_Var;
   farr_Var.values = farr_Values;
-  if ((3) < 0 || (3) >= (*farr)->length) RAISE(2)
-  ((Returncode (**)(void))((*farr)->values))[3] = fun0;
-  if ((3) < 0 || (3) >= (*farr)->length) RAISE(3)
-  if (((Returncode (**)(void))((*farr)->values))[3] == NULL) RAISE(3)
-  CHECK(3, (((Returncode (**)(void))((*farr)->values))[3])() )
+  farr_Refman = MR_new_ref();
+  if (farr_Refman == NULL) RAISE(1)
+  if (farr == NULL || farr_Refman->value == NULL) RAISE(2)
+  if ((3) < 0 || (3) >= (farr)->length) RAISE(2)
+  ((Returncode (**)(void))((farr)->values))[3] = fun0;
+  if (farr == NULL || farr_Refman->value == NULL) RAISE(3)
+  if ((3) < 0 || (3) >= (farr)->length) RAISE(3)
+  if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3)
+  CHECK(3, (((Returncode (**)(void))((farr)->values))[3])() )
 /// @ t6
 missing arguments in function type
 /// @ t7
@@ -503,7 +573,7 @@ too many parameters
 too few outputs
 /// @@ test-builtin
 /// @ t0
-CHECK(1, Int_str(i, str) )
+CHECK(1, Int_str(i, str, str_Refman) )
 /// @ t1
 b = true;
 /// @ t2
@@ -511,53 +581,55 @@ b = false;
 /// @ t3
 c = EOF;
 /// @ t4
-if (arr == NULL || *arr == NULL) RAISE(1)
-  i = (*arr)->length;
+if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  i = arr->length;
 /// @ t5
-if (str == NULL || *str == NULL) RAISE(1)
-  i = (*str)->length;
+if (str == NULL || str_Refman->value == NULL) RAISE(1)
+  i = str->length;
 /// @ t6
-CHECK(1, String_clear(str) )
+CHECK(1, String_clear(str, str_Refman) )
 /// @ t7
-CHECK(1, String_equal(str, str, &(b)) )
+CHECK(1, String_equal(str, str_Refman, str, str_Refman, &(b)) )
 /// @ t8
-CHECK(1, String_get(str, i, &(c)) )
+CHECK(1, String_get(str, str_Refman, i, &(c)) )
 /// @ t9
-CHECK(1, String_append(str, c) )
+CHECK(1, String_append(str, str_Refman, c) )
 /// @ t10
-CHECK(1, String_new(str, str) )
+CHECK(1, String_new(str, str_Refman, str, str_Refman) )
 /// @ t11
-CHECK(1, String_concat(str, str) )
+CHECK(1, String_concat(str, str_Refman, str, str_Refman) )
 /// @ t12
-CHECK(1, String_concat_int(str, i) )
+CHECK(1, String_concat_int(str, str_Refman, i) )
 /// @ t13
-CHECK(1, String_find(str, str, &(i)) )
+CHECK(1, String_find(str, str_Refman, str, str_Refman, &(i)) )
 /// @ t14
-CHECK(1, String_has(str, c, &(b)) )
+CHECK(1, String_has(str, str_Refman, c, &(b)) )
 /// @ t15
-CHECK(1, file_open_read(str, &(fobj)) )
+CHECK(1, file_open_read(str, str_Refman, &(fobj), &(fobj_Refman)) )
 /// @ t16
-CHECK(1, file_open_write(str, &(fobj)) )
+CHECK(1, file_open_write(str, str_Refman, &(fobj), &(fobj_Refman)) )
 /// @ t17
-CHECK(1, File_close(fobj) )
+CHECK(1, File_close(fobj, fobj_Refman) )
 /// @ t18
-CHECK(1, File_getc(fobj, &(c)) )
+CHECK(1, File_getc(fobj, fobj_Refman, &(c)) )
 /// @ t19
-CHECK(1, File_putc(fobj, c) )
+CHECK(1, File_putc(fobj, fobj_Refman, c) )
 /// @ t20
-CHECK(1, File_write(fobj, str) )
+CHECK(1, File_write(fobj, fobj_Refman, str, str_Refman) )
 /// @ t21
-Array** argv = NULL;
-  if (sys == NULL || *sys == NULL) RAISE(1)
-  argv = (*sys)->argv;
+Array* argv = NULL;
+  RefManager* argv_Refman = NULL;
+  if (sys == NULL || sys_Refman->value == NULL) RAISE(1)
+  argv = sys->argv;
+  argv_Refman = sys->argv_Refman;
 /// @ t22
-CHECK(1, Sys_print(sys, str) )
+CHECK(1, Sys_print(sys, sys_Refman, str, str_Refman) )
 /// @ t23
-CHECK(1, Sys_println(sys, str) )
+CHECK(1, Sys_println(sys, sys_Refman, str, str_Refman) )
 /// @ t24
-CHECK(1, Sys_exit(sys, i) )
+CHECK(1, Sys_exit(sys, sys_Refman, i) )
 /// @ t25
-CHECK(1, Sys_system(sys, str, &(i)) )
+CHECK(1, Sys_system(sys, sys_Refman, str, str_Refman, &(i)) )
 /// @ t26
-CHECK(1, Sys_getenv(sys, str, str, &(b)) )
+CHECK(1, Sys_getenv(sys, sys_Refman, str, str_Refman, str, str_Refman, &(b)) )
 /// @

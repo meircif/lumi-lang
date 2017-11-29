@@ -83,11 +83,19 @@ i := t.num
 i := tc.numb
 ## @ c t2
 i := tc.num
-## @ ec t3
+## @ c t3
+i := to.num
+## @ c t4
+i := tco.num
+## @ c t5
+i := t.t.num
+## @ c t6
+i := t.t.t.num
+## @ ec te0
 error
-## @ ec t4
+## @ ec te1
 (i := 1).error
-## @ ec t5
+## @ ec te2
 t.error
 ## @@ test-slice-expression
 ## @ c t0
@@ -152,32 +160,40 @@ io := fun5(copy 4)
 ## @ c t9
 so := fun3(copy 7)
 ## @ c t10
-tc.methc()
+t.meth()
 ## @ c t11
-tc.methb()
+to.meth()
 ## @ c t12
+tc.methc()
+## @ c t13
+tc.methb()
+## @ c t14
 tc.meth()
-## @ ec t13
+## @ c t15
+tco.meth()
+## @ c t16
+t.t.meth()
+## @ ec te0
 function( copy 1)
-## @ ec t14
+## @ ec te1
 function(user)
-## @ ec t15
+## @ ec te2
 function(copy 4,copy 3)
-## @ ec t16
+## @ ec te3
 function(copy 2
-## @ ec t17
+## @ ec te4
 function(error 4)
-## @ ec t18
+## @ ec te5
 (i := 0)()
-## @ ec t19
+## @ ec te6
 i()
-## @ ec t20
+## @ ec te7
 fun5(copy 0)->(copy 4)
-## @ ec t21
+## @ ec te8
 fun7()->(user tc)
-## @ ec t22
+## @ ec te9
 fun5(copy i := 1)
-## @ ec t23
+## @ ec te10
 fun5(user 8)
 ## @@ test-type-expression
 ## @ c t0
@@ -305,9 +321,13 @@ t := tc
 b := str?
 ## @ c t1
 b := not str?
-## @ ec t2
+## @ c t2
+b := t.fun?
+## @ c t3
+b := to?
+## @ ec te0
 (i := 2)?
-## @ ec t3
+## @ ec te1
 i?
 ## @@ test-dynamic
 ## @ c t0
@@ -341,6 +361,8 @@ tb.dyn()
 ## @ c t13
 tc.dyn()
 ## @ c t14
+tco.dyn()
+## @ c t15
 fun7()->(user ta)
 ## @@ test-function-object
 ## @ c t0

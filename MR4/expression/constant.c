@@ -117,7 +117,7 @@ Returncode TextExpression_write(TextExpression* self) {
 extern Func TextExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func TextExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func TextExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -211,7 +211,7 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
 extern Func IntExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func IntExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func IntExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -311,7 +311,7 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
 extern Func CharExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CharExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func CharExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -378,8 +378,8 @@ Returncode StringExpression_write_preactions(StringExpression* self) {
   /* `symbol`_Var.max_length = `string-length + 1`; */
   /* `symbol`_Var.length = `string-length`; */
   /* `symbol`_Var.values = "`text`"; */
-  CHECK(144, Expression_write_ref_init(&(self->_base._base), self->symbol) )
-  CHECK(145, Expression_write_init_var_ref(&(self->_base._base), self->symbol) )
+  CHECK(144, Expression_write_init_var_ref(&(self->_base._base), self->symbol) )
+  CHECK(145, Expression_write_refman_init(&(self->_base._base), self->symbol) )
   Int real_length = 1;
   {int index; for (index = (1); index < (self->_base.text->length - 1); ++index) {
     if ((index) < 0 || (index) >= (self->_base.text)->length) RAISE(148)
@@ -423,7 +423,7 @@ Returncode StringExpression_write(StringExpression* self) {
 extern Func StringExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func StringExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)StringExpression_analyze, (void*)StringExpression_write, (void*)Expression_write_dynamic, (void*)Expression_analyze_call, (void*)StringExpression_write_preactions};
+Func StringExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)StringExpression_analyze, (void*)StringExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)StringExpression_write_preactions};
 #endif
 
 
@@ -476,10 +476,21 @@ Returncode EmptyExpression_write_dynamic(EmptyExpression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode EmptyExpression_write_refman(EmptyExpression* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_EmptyExpression_write_refman = "EmptyExpression.write-refman";
+#define MR_FUNC_NAME _func_name_EmptyExpression_write_refman
+Returncode EmptyExpression_write_refman(EmptyExpression* self) {
+  CHECK(187, (self)->_base._base._dtl[2](self) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 extern Func EmptyExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func EmptyExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)EmptyExpression_write, (void*)EmptyExpression_write_dynamic, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func EmptyExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)EmptyExpression_write, (void*)EmptyExpression_write_dynamic, (void*)EmptyExpression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

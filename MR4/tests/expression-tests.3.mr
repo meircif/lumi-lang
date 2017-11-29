@@ -24,10 +24,11 @@ func test-code-setup(user String input-text)
 func test-code(user String input-text, user String expected-output)
   if not-first-code-test and not code-header-valid
     return
+  var Bool was-first(not not-first-code-test)
   not-first-code-test := true
   test-code-setup(user input-text)
   write-syntax-tree()
-  var String{4096} expected-header
+  var String{8192} expected-header
   owner File code-header
   var String{256} filename
   set-test-file-name(user filename, user "code-header", user ".expected.c")
@@ -45,9 +46,20 @@ func test-code(user String input-text, user String expected-output)
       copy 0,
       copy expected-header.length,
       copy false)
-  code-header-valid := tests-passed
-  if not tests-passed
-    return
+  if was-first
+    set-test-file-name(user filename, user "code-header", user ".actual.c")
+    file-open-write(user filename):(owner code-header)
+    if tests-passed
+      for n in expected-header.length
+        code-header.putc(copy mock-output-file-text[n])
+    else
+      for n in mock-output-file-text.length
+        code-header.putc(copy mock-output-file-text[n])
+    code-header.close()
+    code-header-valid := tests-passed
+    if not tests-passed
+      return
+  
   f-assert-string-slice(
       user expected-footer,
       user mock-output-file-text,

@@ -36,10 +36,6 @@ typedef Returncode (*Func)();
 
 typedef FILE File;
 
-typedef struct {
-  Array** argv;
-} Sys;
-
 
 extern char* MR_raise_format;
 extern char* MR_assert_format;
@@ -85,44 +81,58 @@ typedef struct {
   int count;
 } RefManager;
 
-void* MR_new_ref(void);
-void MR_inc_ref(void* ref);
-void MR_dec_ref(void* ref);
-void MR_clean_owner(void* ref);
+RefManager* MR_new_ref(void);
+void MR_inc_ref(RefManager* ref);
+void MR_dec_ref(RefManager* ref);
+void MR_clean_owner(RefManager* ref);
 
 String* MR_new_string(int length);
 Array* MR_new_array(int length, int value_size);
 Array* MR_new_string_array(int array_length, int string_length);
 void MR_set_var_string_array(
-  int array_length, int string_length, Array** array, char* chars);
+  int array_length, int string_length, Array* array, char* chars);
 Bool MR_run_test(char* test_name, Func test_func);
 
-Returncode String_clear(String**);
-Returncode String_length(String**, Int* length);
-Returncode String_equal(String**, String** other, Bool* equal);
-Returncode String_get(String**, Int index, Char* ch);
-Returncode String_append(String**, Char ch);
-Returncode String_new(String**, String** source);
-Returncode String_concat(String**, String** ext);
-Returncode String_concat_int(String**, Int num);
-Returncode String_find(String**, String** pattern, Int* index);
-Returncode String_has(String**, Char ch, Bool* found);
+Returncode String_clear(String*, RefManager*);
+Returncode String_length(String*, RefManager*, Int* length);
+Returncode String_equal(
+  String*, RefManager*, String* other, RefManager*, Bool* equal);
+Returncode String_get(String*, RefManager*, Int index, Char* ch);
+Returncode String_append(String*, RefManager*, Char ch);
+Returncode String_new(String*, RefManager*, String* source, RefManager*);
+Returncode String_concat(String*, RefManager*, String* ext, RefManager*);
+Returncode String_concat_int(String*, RefManager*, Int num);
+Returncode String_find(
+  String*, RefManager*, String* pattern, RefManager*, Int* index);
+Returncode String_has(String*, RefManager*, Char ch, Bool* found);
 
-Returncode Int_str(Int value, String** str);
+Returncode Int_str(Int value, String* str, RefManager*);
 
-Returncode file_open_read(String** name, File*** file);
-Returncode file_open_write(String** name, File*** file);
-Returncode File_close(File**);
-Returncode File_getc(File**, Char* ch);
-Returncode File_putc(File**, Char ch);
-Returncode File_write(File**, String** line);
+Returncode file_open_read(
+  String* name, RefManager*, File** file, RefManager**);
+Returncode file_open_write(
+  String* name, RefManager*, File** file, RefManager**);
+Returncode File_close(File*, RefManager*);
+Returncode File_getc(File*, RefManager*, Char* ch);
+Returncode File_putc(File*, RefManager*, Char ch);
+Returncode File_write(File*, RefManager*, String* line, RefManager*);
 
-extern Sys** sys;
-Returncode Sys_print(Sys**, String** text);
-Returncode Sys_println(Sys**, String** text);
-Returncode Sys_exit(Sys**, Int status);
-Returncode Sys_system(Sys**, String** command, Int* status);
-Returncode Sys_getenv(Sys**, String** name, String** value, Bool* exists);
+typedef struct {
+  Array* argv;
+  RefManager* argv_Refman;
+} Sys;
+extern Sys* sys;
+extern RefManager* sys_Refman;
+Returncode Sys_print(Sys*, RefManager*, String* text, RefManager*);
+Returncode Sys_println(Sys*, RefManager*, String* text, RefManager*);
+Returncode Sys_exit(Sys*, RefManager*, Int status);
+Returncode Sys_system(
+  Sys*, RefManager*, String* command, RefManager*, Int* status);
+Returncode Sys_getenv(
+  Sys*, RefManager*,
+  String* name, RefManager*,
+  String* value, RefManager*,
+  Bool* exists);
 
 
 #endif  /*MR_MR4_MR_4_H_INCLUDED_*/

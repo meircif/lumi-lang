@@ -100,6 +100,7 @@ cp ../MR4/tests/*.expected.c tests
 $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   mr4-compiler.c ../MR3/mr.3.c -I. -I../MR3 -o mr4-compiler-tests
 TEST_DIR=tests/ ./mr4-compiler-tests
+diff tests/code-header.actual.c tests/code-header.expected.c
 diff tests/expression-tests.actual.c tests/expression-tests.expected.c
 diff tests/syntax-tree-tests.actual.c tests/syntax-tree-tests.expected.c
 

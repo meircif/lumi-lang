@@ -70,7 +70,7 @@ static char* _func_name_SyntaxTreeExpression_write = "SyntaxTreeExpression.write
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_write
 Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
   CHECK(24, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(25, (self->expression)->_base._dtl[5](self->expression) )
+  CHECK(25, (self->expression)->_base._dtl[6](self->expression) )
   CHECK(26, (self->expression)->_base._dtl[2](self->expression) )
   return OK;
 }
@@ -253,7 +253,7 @@ static char* _func_name_SyntaxTreeWhile_write = "SyntaxTreeWhile.write";
 Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
   /* if (!(`condition`) break; */
   CHECK(84, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(85, (self->condition)->_base._dtl[5](self->condition) )
+  CHECK(85, (self->condition)->_base._dtl[6](self->condition) )
   CHECK(86, write(&(String){7, 6, "if (!("}) )
   CHECK(87, (self->condition)->_base._dtl[2](self->condition) )
   CHECK(88, write(&(String){11, 10, ")) break;\n"}) )

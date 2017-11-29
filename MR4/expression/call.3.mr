@@ -54,9 +54,7 @@ class CallExpression(Expression)
     self.function.write-preactions()
     if self.is-function-object
       write(user "if (")
-      self.function.top := true
-      self.function.write()
-      self.function.top := false
+      self.function.write-as-top()
       write(user " == NULL) ")
       self.write-raise()
       self.code-node.write-spaces()
@@ -122,7 +120,7 @@ class CallArgument(Argument)
       self.code-node.write-spaces()
   
   func dynamic write()
-    # [&(]`value`[)][, [&(]`value`_Dynamic[)]]
+    # [&(]`value`[)][, [&(]`value`_Refman[)]][, [&(]`value`_Dynamic[)]]
     if self.is-output
       if self.is-down-cast
         write(user "(void*)")
@@ -130,6 +128,15 @@ class CallArgument(Argument)
     self.value.write()
     if self.is-output
       write(user ")")
+    
+    if not self.value.result-type.type-data.is-primitive
+      write(user ", ")
+      if self.is-output
+        write(user "&(")
+      self.value.write-refman()
+      if self.is-output
+        write(user ")")
+    
     if self.is-dynamic
       write(user ", ")
       if self.is-output

@@ -766,26 +766,39 @@ Returncode DeclarationArgument_write(DeclarationArgument* self) {
     CHECK(330, (self->variable->type_instance->arguments)->_base._dtl[2](self->variable->type_instance->arguments) )
     return OK;
   }
-  /* `type`[*][*] `name`[, `type`_Dynamic*[*] `name`_Dynamic] */
-  CHECK(333, write_cname(self->variable->type_instance->type_data->name) )
+  /* `type`[*][*] `name` */
+  /* [, RefManager*[*] `name`_Refman] */
+  /* [, `type`_Dynamic*[*] `name`_Dynamic] */
+  CHECK(335, write_cname(self->variable->type_instance->type_data->name) )
   if (self->_base.access != ACCESS_COPY) {
-    CHECK(335, write(&(String){3, 2, "**"}) )
-  }
-  if (self->_base.is_output) {
     CHECK(337, write(&(String){2, 1, "*"}) )
   }
-  CHECK(338, write(&(String){2, 1, " "}) )
-  CHECK(339, write_cname(self->variable->name) )
-  if (self->variable->type_instance->type_data->is_dynamic) {
-    CHECK(341, write(&(String){3, 2, ", "}) )
-    CHECK(342, write_cname(self->variable->type_instance->type_data->name) )
-    CHECK(343, write(&(String){10, 9, "_Dynamic*"}) )
+  if (self->_base.is_output) {
+    CHECK(339, write(&(String){2, 1, "*"}) )
+  }
+  CHECK(340, write(&(String){2, 1, " "}) )
+  CHECK(341, write_cname(self->variable->name) )
+  
+  if (!self->variable->type_instance->type_data->is_primitive) {
+    CHECK(344, write(&(String){14, 13, ", RefManager*"}) )
     if (self->_base.is_output) {
-      CHECK(345, write(&(String){2, 1, "*"}) )
+      CHECK(346, write(&(String){2, 1, "*"}) )
     }
-    CHECK(346, write(&(String){2, 1, " "}) )
-    CHECK(347, write_cname(self->variable->name) )
-    CHECK(348, write(&(String){9, 8, "_Dynamic"}) )
+    CHECK(347, write(&(String){2, 1, " "}) )
+    CHECK(348, write_cname(self->variable->name) )
+    CHECK(349, write(&(String){8, 7, "_Refman"}) )
+  }
+  
+  if (self->variable->type_instance->type_data->is_dynamic) {
+    CHECK(352, write(&(String){3, 2, ", "}) )
+    CHECK(353, write_cname(self->variable->type_instance->type_data->name) )
+    CHECK(354, write(&(String){10, 9, "_Dynamic*"}) )
+    if (self->_base.is_output) {
+      CHECK(356, write(&(String){2, 1, "*"}) )
+    }
+    CHECK(357, write(&(String){2, 1, " "}) )
+    CHECK(358, write_cname(self->variable->name) )
+    CHECK(359, write(&(String){9, 8, "_Dynamic"}) )
   }
   return OK;
 }
@@ -813,7 +826,7 @@ static char* _func_name_DeclarationArgumentFactory_m_new_argument = "Declaration
 #define MR_FUNC_NAME _func_name_DeclarationArgumentFactory_m_new_argument
 Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory* self, Argument** new_argument) {
   DeclarationArgument* _DeclarationArgument90 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument90 == NULL) RAISE(353)
+  if (_DeclarationArgument90 == NULL) RAISE(364)
   *_DeclarationArgument90 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
   _DeclarationArgument90->_base._base._dtl = DeclarationArgument__dtl;
   (*new_argument) = &(_DeclarationArgument90->_base);

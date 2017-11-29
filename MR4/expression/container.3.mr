@@ -204,14 +204,23 @@ class BinaryExpression(UnaryExpression)
   func dynamic write-preactions()
     base.write-preactions()
     self.left-expression.write-preactions()
-    if self.operator.order = 4 and self.operator.group-index = 0 and
-        self.left-expression.result-type.type-data.is-dynamic
-      # := operator to dynamic variable
-      self.left-expression.write-dynamic()
-      write(user " = ")
-      self.right-expression.write-dynamic()
-      write(user ";\n")
-      self.code-node.write-spaces()
+    
+    if self.operator.order = 4 and self.operator.group-index = 0
+      # := operator
+      if not self.left-expression.result-type.type-data.is-primitive
+        # also assign Refman
+        self.left-expression.write-refman()
+        write(user " = ")
+        self.right-expression.write-refman()
+        write(user ";\n")
+        self.code-node.write-spaces()
+      if self.left-expression.result-type.type-data.is-dynamic
+        # also assign Dynamic
+        self.left-expression.write-dynamic()
+        write(user " = ")
+        self.right-expression.write-dynamic()
+        write(user ";\n")
+        self.code-node.write-spaces()
   
   func dynamic write()
     self.write-start()
@@ -259,9 +268,11 @@ class QuestionExpression(Expression)
     self.tested.write-preactions()
   
   func dynamic write()
+    # `tested` != NULL && `tested`_Refman->value != NULL
     if not self.top
       write(user "(")
-    self.tested.write()
-    write(user " != NULL")
+    write(user "!(")
+    self.tested.write-validate-ref()
+    write(user ")")
     if not self.top
       write(user ")")

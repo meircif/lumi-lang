@@ -329,14 +329,25 @@ class DeclarationArgument(Argument)
       write(user ")")
       self.variable.type-instance.arguments.write()
       return
-    # `type`[*][*] `name`[, `type`_Dynamic*[*] `name`_Dynamic]
+    # `type`[*][*] `name`
+    # [, RefManager*[*] `name`_Refman]
+    # [, `type`_Dynamic*[*] `name`_Dynamic]
     write-cname(user self.variable.type-instance.type-data.name)
     if self.access != ACCESS-COPY
-      write(user "**")
+      write(user "*")
     if self.is-output
       write(user "*")
     write(user " ")
     write-cname(user self.variable.name)
+    
+    if not self.variable.type-instance.type-data.is-primitive
+      write(user ", RefManager*")
+      if self.is-output
+        write(user "*")
+      write(user " ")
+      write-cname(user self.variable.name)
+      write(user "_Refman")
+    
     if self.variable.type-instance.type-data.is-dynamic
       write(user ", ")
       write-cname(user self.variable.type-instance.type-data.name)

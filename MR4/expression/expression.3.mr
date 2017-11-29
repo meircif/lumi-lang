@@ -168,29 +168,49 @@ class Expression(SyntaxTreeNode)
         copy access, user type-instance):(user symbol.variable)
     string-new-copy(user symbol.variable.name):(owner symbol.name)
   
-  func inst write-ref-init(user SymbolExpression symbol)
-    # `symbol` = MR_new_ref();
-    # if (`symbol` == NULL) raise(`line-num`)
+  func inst write-refman-init(user SymbolExpression symbol)
+    # `symbol`_Refman = MR_new_ref();
+    # if (`symbol`_Refman == NULL) raise(`line-num`)
+    self.code-node.write-spaces()
     symbol.write()
-    write(user " = MR_new_ref();\n")
+    write(user "_Refman = MR_new_ref();\n")
     self.code-node.write-spaces()
     write(user "if (")
     symbol.write()
-    write(user " == NULL) ")
+    write(user "_Refman == NULL) ")
     self.write-raise()
   
   func inst write-init-var-ref(user SymbolExpression symbol)
-    # &`symbol`_Var;
-    self.code-node.write-spaces()
-    write(user "*")
+    # `symbol` = &`symbol`_Var;
     symbol.write()
     write(user " = &")
     symbol.write()
     write(user "_Var;\n")
   
+  func inst write-validate-ref()
+    self.write-as-top()
+    write(user " == NULL")
+    if not self.result-type.type-data.is-primitive
+      write(user " || ")
+      var Bool top(self.top)
+      self.top := false
+      self.write-refman()
+      self.top := top
+      write(user "->value == NULL")
+  
   func dynamic write-dynamic()
     self.write()
     write(user "_Dynamic")
+  
+  func dynamic write-refman()
+    self.write()
+    write(user "_Refman")
+  
+  func inst write-as-top()
+    var Bool top(self.top)
+    self.top := true
+    self.write()
+    self.top := top
   
   func dynamic analyze-call(user FunctionArguments arguments):(
       copy Bool is-function-object)

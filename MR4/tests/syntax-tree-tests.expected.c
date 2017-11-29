@@ -1,16 +1,17 @@
 /// @@ test-general
 /// @ t0
-String** str;
+String* str = NULL;
+RefManager* str_Refman = NULL;
 /// @ t1
-Int x;
+Int x = 0;
 /// @ t2
-Int x;
+Int x = 0;
 /// @ t3
-Int x;
+Int x = 0;
 /// @ t4
-Int x;
+Int x = 0;
 /// @ t5
-Int x;
+Int x = 0;
 /// @ t6
 unknown keyword "error"
 /// @ t7
@@ -97,8 +98,8 @@ struct Base {
   Int x;
 };
 struct Base_Dynamic {
-  Returncode (*dyn0)(Base** self, Base_Dynamic* self_Dynamic);
-  Returncode (*dyn1)(Base** self, Base_Dynamic* self_Dynamic);
+  Returncode (*dyn0)(Base* self, RefManager* self_Refman, Base_Dynamic* self_Dynamic);
+  Returncode (*dyn1)(Base* self, RefManager* self_Refman, Base_Dynamic* self_Dynamic);
 };
 struct Mid {
   Base _base;
@@ -106,7 +107,7 @@ struct Mid {
 };
 struct Mid_Dynamic {
   Base_Dynamic _base;
-  Returncode (*dyn2)(Mid** self, Mid_Dynamic* self_Dynamic);
+  Returncode (*dyn2)(Mid* self, RefManager* self_Refman, Mid_Dynamic* self_Dynamic);
 };
 struct Top {
   Mid _base;
@@ -114,52 +115,52 @@ struct Top {
 };
 struct Top_Dynamic {
   Mid_Dynamic _base;
-  Returncode (*dyn3)(Top** self, Top_Dynamic* self_Dynamic);
+  Returncode (*dyn3)(Top* self, RefManager* self_Refman, Top_Dynamic* self_Dynamic);
 };
-Returncode Base_stat(Base** self, Base_Dynamic* self_Dynamic);
-Returncode Base_dyn0(Base** self, Base_Dynamic* self_Dynamic);
-Returncode Base_dyn1(Base** self, Base_Dynamic* self_Dynamic);
-Returncode Mid_dyn0(Mid** self, Mid_Dynamic* self_Dynamic);
-Returncode Mid_dyn2(Mid** self, Mid_Dynamic* self_Dynamic);
-Returncode Top_dyn0(Top** self, Top_Dynamic* self_Dynamic);
-Returncode Top_dyn3(Top** self, Top_Dynamic* self_Dynamic);
+Returncode Base_stat(Base* self, RefManager* self_Refman, Base_Dynamic* self_Dynamic);
+Returncode Base_dyn0(Base* self, RefManager* self_Refman, Base_Dynamic* self_Dynamic);
+Returncode Base_dyn1(Base* self, RefManager* self_Refman, Base_Dynamic* self_Dynamic);
+Returncode Mid_dyn0(Mid* self, RefManager* self_Refman, Mid_Dynamic* self_Dynamic);
+Returncode Mid_dyn2(Mid* self, RefManager* self_Refman, Mid_Dynamic* self_Dynamic);
+Returncode Top_dyn0(Top* self, RefManager* self_Refman, Top_Dynamic* self_Dynamic);
+Returncode Top_dyn3(Top* self, RefManager* self_Refman, Top_Dynamic* self_Dynamic);
 Base_Dynamic Base_dynamic = {Base_dyn0, Base_dyn1};
 Mid_Dynamic Mid_dynamic = {{(Func)Mid_dyn0, Base_dyn1}, Mid_dyn2};
 Top_Dynamic Top_dynamic = {{{(Func)Top_dyn0, Base_dyn1}, Mid_dyn2}, Top_dyn3};
-Returncode Base_stat(Base** self, Base_Dynamic* self_Dynamic) {
+Returncode Base_stat(Base* self, RefManager* self_Refman, Base_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Base_dyn0(Base** self, Base_Dynamic* self_Dynamic) {
+Returncode Base_dyn0(Base* self, RefManager* self_Refman, Base_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Base_dyn1(Base** self, Base_Dynamic* self_Dynamic) {
+Returncode Base_dyn1(Base* self, RefManager* self_Refman, Base_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mid_dyn0(Mid** self, Mid_Dynamic* self_Dynamic) {
+Returncode Mid_dyn0(Mid* self, RefManager* self_Refman, Mid_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mid_dyn2(Mid** self, Mid_Dynamic* self_Dynamic) {
+Returncode Mid_dyn2(Mid* self, RefManager* self_Refman, Mid_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_dyn0(Top** self, Top_Dynamic* self_Dynamic) {
+Returncode Top_dyn0(Top* self, RefManager* self_Refman, Top_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
-  CHECK(13, Mid_dyn0((void*)self, &(self_Dynamic->_base)) )
+  CHECK(13, Mid_dyn0(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_dyn3(Top** self, Top_Dynamic* self_Dynamic) {
+Returncode Top_dyn3(Top* self, RefManager* self_Refman, Top_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
-  CHECK(15, Mid_dyn0((void*)self, &(self_Dynamic->_base)) )
+  CHECK(15, Mid_dyn0(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 MR_cleanup:
   return MR_err;
 }
@@ -176,29 +177,29 @@ MR_cleanup:
   return MR_err;
 }
 /// @ t1
-Returncode name(String** self, String** text, Int num);
-Returncode name(String** self, String** text, Int num) {
+Returncode name(String* self, RefManager* self_Refman, String* text, RefManager* text_Refman, Int num);
+Returncode name(String* self, RefManager* self_Refman, String* text, RefManager* text_Refman, Int num) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
 /// @ t2
-Returncode name(String*** text, Int* num);
-Returncode name(String*** text, Int* num) {
+Returncode name(String** text, RefManager** text_Refman, Int* num);
+Returncode name(String** text, RefManager** text_Refman, Int* num) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
 /// @ t3
-Returncode name(Char param, String*** out);
-Returncode name(Char param, String*** out) {
+Returncode name(Char param, String** out, RefManager** out_Refman);
+Returncode name(Char param, String** out, RefManager** out_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
 /// @ t4
-Returncode name(Array** array);
-Returncode name(Array** array) {
+Returncode name(Array* array, RefManager* array_Refman);
+Returncode name(Array* array, RefManager* array_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -269,15 +270,16 @@ multidimensional array not supported yet...
 typedef struct Test Test;
 struct Test {
   Int x;
-  String** str;
+  String* str;
+  RefManager* str_Refman;
 };
 /// @ t1
 typedef struct Test Test;
 struct Test {
   Int x;
 };
-Returncode Test_name(Test** self);
-Returncode Test_name(Test** self) {
+Returncode Test_name(Test* self, RefManager* self_Refman);
+Returncode Test_name(Test* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -287,8 +289,8 @@ typedef struct Test Test;
 struct Test {
   Int x;
 };
-Returncode Test_name(Test** self);
-Returncode Test_name(Test** self) {
+Returncode Test_name(Test* self, RefManager* self_Refman);
+Returncode Test_name(Test* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
   Int x = 0;
 MR_cleanup:
@@ -323,16 +325,16 @@ struct Test1 {
 struct Test2 {
   Int fun;
 };
-Returncode Test1_fun(Test1** self);
-Returncode Test2_name(Test2** self);
-Int name;
+Returncode Test1_fun(Test1* self, RefManager* self_Refman);
+Returncode Test2_name(Test2* self, RefManager* self_Refman);
+Int name = 0;
 Returncode fun(void);
-Returncode Test1_fun(Test1** self) {
+Returncode Test1_fun(Test1* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Test2_name(Test2** self) {
+Returncode Test2_name(Test2* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -371,143 +373,179 @@ MR_cleanup:
 /// @ t0
 Int x = 0;
 /// @ t1
-String** s = NULL;
+String* s = NULL;
+  RefManager* s_Refman = NULL;
 /// @ t2
-Array** a = NULL;
+Array* a = NULL;
+  RefManager* a_Refman = NULL;
 /// @ t3
-Test** tt = NULL;
+Test* tt = NULL;
+  RefManager* tt_Refman = NULL;
 /// @ t4
 char s_Values[12];
   String s_Var = {12, 0, NULL};
-  String** s = NULL;
-  s = MR_new_ref();
-  if (s == NULL) RAISE(1)
-  *s = &s_Var;
+  String* s = NULL;
+  RefManager* s_Refman = NULL;
+  s = &s_Var;
   s_Var.values = s_Values;
+  s_Refman = MR_new_ref();
+  if (s_Refman == NULL) RAISE(1)
 /// @ t5
 Int a_Values[12];
   Array a_Var = {12, NULL};
-  Array** a = NULL;
-  a = MR_new_ref();
-  if (a == NULL) RAISE(1)
-  *a = &a_Var;
+  Array* a = NULL;
+  RefManager* a_Refman = NULL;
+  a = &a_Var;
   a_Var.values = a_Values;
+  a_Refman = MR_new_ref();
+  if (a_Refman == NULL) RAISE(1)
 /// @ t6
 Test a_Values[12];
   Array a_Var = {12, NULL};
-  Array** a = NULL;
-  a = MR_new_ref();
-  if (a == NULL) RAISE(1)
-  *a = &a_Var;
+  Array* a = NULL;
+  RefManager* a_Refman = NULL;
+  a = &a_Var;
   a_Var.values = a_Values;
+  a_Refman = MR_new_ref();
+  if (a_Refman == NULL) RAISE(1)
 /// @ t7
 char sa_Chars[12 * 7];
   String sa_Values[12];
   Array sa_Var = {12, NULL};
-  Array** sa = NULL;
-  sa = MR_new_ref();
-  if (sa == NULL) RAISE(1)
-  *sa = &sa_Var;
+  Array* sa = NULL;
+  RefManager* sa_Refman = NULL;
+  sa = &sa_Var;
   sa_Var.values = sa_Values;
   MR_set_var_string_array(12, 7, sa, sa_Chars);
+  sa_Refman = MR_new_ref();
+  if (sa_Refman == NULL) RAISE(1)
 /// @ t8
-Test** aux_Test_0 = NULL;
-  aux_Test_0 = MR_new_ref();
+Test* aux_Test_0 = NULL;
+  RefManager* aux_Test_0_Refman = NULL;
+  aux_Test_0 = calloc(1, sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(1)
-  *aux_Test_0 = calloc(1, sizeof(Test));
-  if (*aux_Test_0 == NULL) RAISE(1)
-  CHECK(1, Test_new(aux_Test_0, i) )
+  aux_Test_0_Refman = MR_new_ref();
+  if (aux_Test_0_Refman == NULL) RAISE(1)
+  CHECK(1, Test_new(aux_Test_0, aux_Test_0_Refman, i) )
+  t_Refman = aux_Test_0_Refman;
   t = aux_Test_0;
 /// @ t9
-String** aux_String_0 = NULL;
-  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)
-  aux_String_0 = MR_new_ref();
+String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)
+  aux_String_0 = MR_new_string(((Int*)((arr)->values))[0]);
   if (aux_String_0 == NULL) RAISE(1)
-  *aux_String_0 = MR_new_string(((Int*)((*arr)->values))[0]);
-  if (*aux_String_0 == NULL) RAISE(1)
+  aux_String_0_Refman = MR_new_ref();
+  if (aux_String_0_Refman == NULL) RAISE(1)
+  str_Refman = aux_String_0_Refman;
   str = aux_String_0;
 /// @ t10
-Array** aux_Array_0 = NULL;
-  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)
-  aux_Array_0 = MR_new_ref();
+Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)
+  aux_Array_0 = MR_new_array(((Int*)((arr)->values))[0], sizeof(Int));
   if (aux_Array_0 == NULL) RAISE(1)
-  *aux_Array_0 = MR_new_array(((Int*)((*arr)->values))[0], sizeof(Int));
-  if (*aux_Array_0 == NULL) RAISE(1)
+  aux_Array_0_Refman = MR_new_ref();
+  if (aux_Array_0_Refman == NULL) RAISE(1)
+  arr_Refman = aux_Array_0_Refman;
   arr = aux_Array_0;
 /// @ t11
-Array** a = NULL;
-  Array** aux_Array_0 = NULL;
-  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)
-  aux_Array_0 = MR_new_ref();
+Array* a = NULL;
+  RefManager* a_Refman = NULL;
+  Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)
+  aux_Array_0 = MR_new_array(((Int*)((arr)->values))[0], sizeof(Test));
   if (aux_Array_0 == NULL) RAISE(1)
-  *aux_Array_0 = MR_new_array(((Int*)((*arr)->values))[0], sizeof(Test));
-  if (*aux_Array_0 == NULL) RAISE(1)
+  aux_Array_0_Refman = MR_new_ref();
+  if (aux_Array_0_Refman == NULL) RAISE(1)
   a = aux_Array_0;
+  a_Refman = aux_Array_0_Refman;
 /// @ t12
-Array** sa = NULL;
-  Array** aux_Array_0 = NULL;
-  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)
-  if ((1) < 0 || (1) >= (*arr)->length) RAISE(1)
-  aux_Array_0 = MR_new_ref();
+Array* sa = NULL;
+  RefManager* sa_Refman = NULL;
+  Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((1) < 0 || (1) >= (arr)->length) RAISE(1)
+  aux_Array_0 = MR_new_string_array(((Int*)((arr)->values))[0], ((Int*)((arr)->values))[1]);
   if (aux_Array_0 == NULL) RAISE(1)
-  *aux_Array_0 = MR_new_string_array(((Int*)((*arr)->values))[0], ((Int*)((*arr)->values))[1]);
-  if (*aux_Array_0 == NULL) RAISE(1)
+  aux_Array_0_Refman = MR_new_ref();
+  if (aux_Array_0_Refman == NULL) RAISE(1)
   sa = aux_Array_0;
+  sa_Refman = aux_Array_0_Refman;
 /// @ t13
 Int x = 0;
-  if ((0) < 0 || (0) >= (*arr)->length) RAISE(1)
-  x = ((Int*)((*arr)->values))[0];
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(1)
+  x = ((Int*)((arr)->values))[0];
 /// @ t14
-String** s = NULL;
+String* s = NULL;
+  RefManager* s_Refman = NULL;
   s = str;
+  s_Refman = str_Refman;
 /// @ t15
 char s_Values[12];
   String s_Var = {12, 0, NULL};
-  String** s = NULL;
+  String* s = NULL;
+  RefManager* s_Refman = NULL;
   String aux_String_0_Var = {0};
-  String** aux_String_0 = NULL;
-  aux_String_0 = MR_new_ref();
-  if (aux_String_0 == NULL) RAISE(1)
-  *aux_String_0 = &aux_String_0_Var;
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref();
+  if (aux_String_0_Refman == NULL) RAISE(1)
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "some string";
-  s = MR_new_ref();
-  if (s == NULL) RAISE(1)
-  *s = &s_Var;
+  s = &s_Var;
   s_Var.values = s_Values;
-  CHECK(1, String_new(s, aux_String_0) )
+  s_Refman = MR_new_ref();
+  if (s_Refman == NULL) RAISE(1)
+  CHECK(1, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
 /// @ t16
-String** s = NULL;
-  s = MR_new_ref();
+String* s = NULL;
+  RefManager* s_Refman = NULL;
+  s = MR_new_string(i);
   if (s == NULL) RAISE(1)
-  *s = MR_new_string(i);
-  if (*s == NULL) RAISE(1)
-  CHECK(1, String_new(s, str) )
+  s_Refman = MR_new_ref();
+  if (s_Refman == NULL) RAISE(1)
+  CHECK(1, String_new(s, s_Refman, str, str_Refman) )
 /// @ t17
-Test** tt = NULL;
-  tt = (void*)tc;
+Test* tt = NULL;
+  RefManager* tt_Refman = NULL;
+  tt = &(tc->_base._base._base);
+  tt_Refman = tc_Refman;
 /// @ t18
 Test tt_Var = {0};
-  Test** tt = NULL;
-  tt = MR_new_ref();
-  if (tt == NULL) RAISE(1)
-  *tt = &tt_Var;
-  CHECK(1, Test_new(tt, 3) )
+  Test* tt = NULL;
+  RefManager* tt_Refman = NULL;
+  tt = &tt_Var;
+  tt_Refman = MR_new_ref();
+  if (tt_Refman == NULL) RAISE(1)
+  CHECK(1, Test_new(tt, tt_Refman, 3) )
 /// @ t19
-Test** tt = NULL;
-  tt = MR_new_ref();
+Test* tt = NULL;
+  RefManager* tt_Refman = NULL;
+  tt = calloc(1, sizeof(Test));
   if (tt == NULL) RAISE(1)
-  *tt = calloc(1, sizeof(Test));
-  if (*tt == NULL) RAISE(1)
-  CHECK(1, Test_new(tt, 3) )
+  tt_Refman = MR_new_ref();
+  if (tt_Refman == NULL) RAISE(1)
+  CHECK(1, Test_new(tt, tt_Refman, 3) )
 /// @ t20
-Test** aux_Test_0 = NULL;
-  aux_Test_0 = MR_new_ref();
+Test* aux_Test_0 = NULL;
+  RefManager* aux_Test_0_Refman = NULL;
+  aux_Test_0 = calloc(1, sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(1)
-  *aux_Test_0 = calloc(1, sizeof(Test));
-  if (*aux_Test_0 == NULL) RAISE(1)
-  CHECK(1, Test_new(aux_Test_0, 3) )
+  aux_Test_0_Refman = MR_new_ref();
+  if (aux_Test_0_Refman == NULL) RAISE(1)
+  CHECK(1, Test_new(aux_Test_0, aux_Test_0_Refman, 3) )
+  t_Refman = aux_Test_0_Refman;
   t = aux_Test_0;
 /// @ t21
 expected space after type, got "new-line"
@@ -580,8 +618,8 @@ Int x = 0;
 Int x = 0;
 /// @@ test-if-else
 /// @ t0
-if (t == NULL || *t == NULL) RAISE(1)
-  if ((*t)->num > 3) {
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  if (t->num > 3) {
     i -= 2;
   }
 /// @ t1
@@ -596,13 +634,13 @@ if (i > 3) {
     i -= 3;
   }
   else {
-    if (t == NULL || *t == NULL) RAISE(3)
-    if ((*t)->num > 2) {
+    if (t == NULL || t_Refman->value == NULL) RAISE(3)
+    if (t->num > 2) {
       i -= 2;
     }
     else {
-      if (t == NULL || *t == NULL) RAISE(5)
-      if ((*t)->num > 1) {
+      if (t == NULL || t_Refman->value == NULL) RAISE(5)
+      if (t->num > 1) {
         i -= 1;
       }
       else {
@@ -634,8 +672,8 @@ Int x = 0;
 Int x = 0;
 /// @ t2
 while (true) {
-    if (t == NULL || *t == NULL) RAISE(2)
-    if (!((*t)->num > 3)) break;
+    if (t == NULL || t_Refman->value == NULL) RAISE(2)
+    if (!(t->num > 3)) break;
   }
 /// @ t3
 while (true) {
@@ -660,9 +698,9 @@ redefinition of variable "error"
   }
   }
 /// @ t1
-if (t == NULL || *t == NULL) RAISE(1)
-  if (t == NULL || *t == NULL) RAISE(1)
-  {int n; for(n=(*t)->num; n<(*t)->num + 2; ++n) {
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  {int n; for(n=t->num; n<t->num + 2; ++n) {
     i += n;
   }
   }
@@ -680,14 +718,14 @@ got "String" expression, expected "Int"
 unknown symbol "error"
 /// @@ test-testing
 /// @ t0
-if (t == NULL || *t == NULL) RAISE(1)
-  TEST_ASSERT(1, (*t)->num == 2)
+if (t == NULL || t_Refman->value == NULL) RAISE(1)
+  TEST_ASSERT(1, t->num == 2)
 /// @ t1
 do {
     MR_trace_stream = NULL;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (t == NULL || *t == NULL) RAISE(1)
+    if (t == NULL || t_Refman->value == NULL) RAISE(1)
     #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     MR_trace_stream = stdout;
@@ -738,15 +776,15 @@ typedef struct Test Test;
 struct Test {
   Int x;
 };
-Returncode Test_meth(Test** self, Int x);
-Returncode Test_Mock_meth(Test** self, Int x);
-Returncode Test_meth(Test** self, Int x) {
+Returncode Test_meth(Test* self, RefManager* self_Refman, Int x);
+Returncode Test_Mock_meth(Test* self, RefManager* self_Refman, Int x);
+Returncode Test_meth(Test* self, RefManager* self_Refman, Int x) {
   Returncode MR_err = OK;
-  CHECK(5, Test_Mock_meth(self, x) )
+  CHECK(5, Test_Mock_meth(self, self_Refman, x) )
 MR_cleanup:
   return MR_err;
 }
-Returncode Test_Mock_meth(Test** self, Int x) {
+Returncode Test_Mock_meth(Test* self, RefManager* self_Refman, Int x) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;

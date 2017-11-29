@@ -141,8 +141,8 @@ class StringExpression(TextExpression)
     # `symbol`_Var.max_length = `string-length + 1`;
     # `symbol`_Var.length = `string-length`;
     # `symbol`_Var.values = "`text`";
-    self.write-ref-init(user self.symbol)
     self.write-init-var-ref(user self.symbol)
+    self.write-refman-init(user self.symbol)
     var Int real-length(1)
     for index in 1:self.text.length - 1
       if self.text[index] = '\\'
@@ -181,4 +181,7 @@ class EmptyExpression(Expression)
     write(user "NULL")
   
   func dynamic write-dynamic()
+    self.write()
+  
+  func dynamic write-refman()
     self.write()

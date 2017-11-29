@@ -1,5 +1,6 @@
 build
 .test
+*.actual.c
 MR4/mr3
 wip
 .gitattributes

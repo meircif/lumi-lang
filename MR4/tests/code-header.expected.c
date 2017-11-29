@@ -8,6 +8,8 @@ typedef struct Tc Tc;
 typedef struct Tc_Dynamic Tc_Dynamic;
 struct Test {
   Int num;
+  Test* t;
+  RefManager* t_Refman;
   Returncode (*fun)(void);
 };
 struct Ta {
@@ -15,7 +17,7 @@ struct Ta {
   Int numa;
 };
 struct Ta_Dynamic {
-  Returncode (*dyn)(Ta** self, Ta_Dynamic* self_Dynamic);
+  Returncode (*dyn)(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic);
 };
 struct Tb {
   Ta _base;
@@ -31,62 +33,62 @@ struct Tc {
 struct Tc_Dynamic {
   Tb_Dynamic _base;
 };
-Returncode Test_new(Test** self, Int num);
-Returncode Test_meth(Test** self);
-Returncode Ta_metha(Ta** self, Ta_Dynamic* self_Dynamic);
-Returncode Ta_dyn(Ta** self, Ta_Dynamic* self_Dynamic);
-Returncode Tb_methb(Tb** self, Tb_Dynamic* self_Dynamic);
-Returncode Tb_dyn(Tb** self, Tb_Dynamic* self_Dynamic);
-Returncode Tc_methc(Tc** self, Tc_Dynamic* self_Dynamic);
-Returncode Tc_dyn(Tc** self, Tc_Dynamic* self_Dynamic);
+Returncode Test_new(Test* self, RefManager* self_Refman, Int num);
+Returncode Test_meth(Test* self, RefManager* self_Refman);
+Returncode Ta_metha(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic);
+Returncode Ta_dyn(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic);
+Returncode Tb_methb(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic);
+Returncode Tb_dyn(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic);
+Returncode Tc_methc(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic);
+Returncode Tc_dyn(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic);
 Ta_Dynamic Ta_dynamic = {Ta_dyn};
 Tb_Dynamic Tb_dynamic = {{(Func)Tb_dyn}};
 Tc_Dynamic Tc_dynamic = {{{(Func)Tc_dyn}}};
 Returncode fun0(void);
-Returncode fun1(Int x, String** s, String** o);
-Returncode fun2(String*** s, Int* x);
-Returncode fun3(Int x, String*** s);
+Returncode fun1(Int x, String* s, RefManager* s_Refman, String* o, RefManager* o_Refman);
+Returncode fun2(String** s, RefManager** s_Refman, Int* x);
+Returncode fun3(Int x, String** s, RefManager** s_Refman);
 Returncode fun4(Int x);
 Returncode fun5(Int x, Int* y);
 Returncode fun6(Int x, Int y, Int* n, Int* m);
-Returncode fun7(Tb*** tb, Tb_Dynamic** tb_Dynamic);
-Returncode mock(Int i, Char c, Bool b, String** str, Array** arr, File** fobj, Test** t, Ta** ta, Ta_Dynamic* ta_Dynamic, Tb** tb, Tb_Dynamic* tb_Dynamic, Tc** tc, Tc_Dynamic* tc_Dynamic, String*** so, Int* io);
-Returncode Test_new(Test** self, Int num) {
+Returncode fun7(Tb** tb, RefManager** tb_Refman, Tb_Dynamic** tb_Dynamic);
+Returncode mock(Int i, Char c, Bool b, String* str, RefManager* str_Refman, Array* arr, RefManager* arr_Refman, File* fobj, RefManager* fobj_Refman, Test* t, RefManager* t_Refman, Ta* ta, RefManager* ta_Refman, Ta_Dynamic* ta_Dynamic, Tb* tb, RefManager* tb_Refman, Tb_Dynamic* tb_Dynamic, Tc* tc, RefManager* tc_Refman, Tc_Dynamic* tc_Dynamic, String** so, RefManager** so_Refman, Int* io, Test** to, RefManager** to_Refman, Tc** tco, RefManager** tco_Refman, Tc_Dynamic** tco_Dynamic);
+Returncode Test_new(Test* self, RefManager* self_Refman, Int num) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Test_meth(Test** self) {
+Returncode Test_meth(Test* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Ta_metha(Ta** self, Ta_Dynamic* self_Dynamic) {
+Returncode Ta_metha(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Ta_dyn(Ta** self, Ta_Dynamic* self_Dynamic) {
+Returncode Ta_dyn(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Tb_methb(Tb** self, Tb_Dynamic* self_Dynamic) {
+Returncode Tb_methb(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Tb_dyn(Tb** self, Tb_Dynamic* self_Dynamic) {
+Returncode Tb_dyn(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Tc_methc(Tc** self, Tc_Dynamic* self_Dynamic) {
+Returncode Tc_methc(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Tc_dyn(Tc** self, Tc_Dynamic* self_Dynamic) {
+Returncode Tc_dyn(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -96,17 +98,17 @@ Returncode fun0(void) {
 MR_cleanup:
   return MR_err;
 }
-Returncode fun1(Int x, String** s, String** o) {
+Returncode fun1(Int x, String* s, RefManager* s_Refman, String* o, RefManager* o_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode fun2(String*** s, Int* x) {
+Returncode fun2(String** s, RefManager** s_Refman, Int* x) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode fun3(Int x, String*** s) {
+Returncode fun3(Int x, String** s, RefManager** s_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -126,11 +128,11 @@ Returncode fun6(Int x, Int y, Int* n, Int* m) {
 MR_cleanup:
   return MR_err;
 }
-Returncode fun7(Tb*** tb, Tb_Dynamic** tb_Dynamic) {
+Returncode fun7(Tb** tb, RefManager** tb_Refman, Tb_Dynamic** tb_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode mock(Int i, Char c, Bool b, String** str, Array** arr, File** fobj, Test** t, Ta** ta, Ta_Dynamic* ta_Dynamic, Tb** tb, Tb_Dynamic* tb_Dynamic, Tc** tc, Tc_Dynamic* tc_Dynamic, String*** so, Int* io) {
+Returncode mock(Int i, Char c, Bool b, String* str, RefManager* str_Refman, Array* arr, RefManager* arr_Refman, File* fobj, RefManager* fobj_Refman, Test* t, RefManager* t_Refman, Ta* ta, RefManager* ta_Refman, Ta_Dynamic* ta_Dynamic, Tb* tb, RefManager* tb_Refman, Tb_Dynamic* tb_Dynamic, Tc* tc, RefManager* tc_Refman, Tc_Dynamic* tc_Dynamic, String** so, RefManager** so_Refman, Int* io, Test** to, RefManager** to_Refman, Tc** tco, RefManager** tco_Refman, Tc_Dynamic** tco_Dynamic) {
   Returncode MR_err = OK;
   
