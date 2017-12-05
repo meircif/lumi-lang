@@ -315,7 +315,10 @@ class DeclarationArgument(Argument)
   
   func dynamic copy-new():(owner DeclarationArgument new-argument)
     new DeclarationArgument in new-argument
+    new-argument.input-file-name := self.input-file-name
+    new-argument.line-number := self.line-number
     new-argument.access := self.access
+    new-argument.is-output := self.is-output
     new SyntaxTreeVariable in new-argument.variable
     new-argument.variable.access := self.variable.access
     self.variable.type-instance.copy-new():(
@@ -337,9 +340,15 @@ class DeclarationArgument(Argument)
   
   func dynamic analyze()
     if self.variable.type-instance.type-data.is-primitive
-      if self.access != ACCESS-COPY
+      if self.is-output and self.access != ACCESS-VAR
         self.m-syntax-error2(
-            user "argument",
+            user "output",
+            user self.variable.name,
+            user "access should be \"var\" for primitive types, got",
+            user glob.access-names[self.access])
+      else-if not self.is-output and self.access != ACCESS-COPY
+        self.m-syntax-error2(
+            user "parameter",
             user self.variable.name,
             user "access should be \"copy\" for primitive types, got",
             user glob.access-names[self.access])
@@ -370,7 +379,7 @@ class DeclarationArgument(Argument)
     # [, RefManager*[*] `name`_Refman]
     # [, `type`_Dynamic*[*] `name`_Dynamic]
     write-cname(user self.variable.type-instance.type-data.name)
-    if self.access != ACCESS-COPY
+    if not self.variable.type-instance.type-data.is-primitive
       write(user "*")
     if self.is-output
       write(user "*")

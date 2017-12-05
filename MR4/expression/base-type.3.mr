@@ -17,6 +17,7 @@ class BaseMethExpression(Expression)
   func inst init(user SyntaxTreeCode code-node, copy Bool is-call)
     self.code-node := code-node
     self.is-call := is-call
+    self.access := ACCESS-VAR
     self.set-location()
   
   func dynamic analyze()
@@ -71,6 +72,7 @@ class UpCastExpression(Expression)
     self.expression.top := false
     self.bases := bases
     self.expression.result-type.copy-new():(owner self.result-type)
+    self.access := self.expression.access
   
   func dynamic write-preactions()
     self.expression.write-preactions()
@@ -121,6 +123,7 @@ class TypeExpression(Expression)
     self.set-location()
     self.set-simple-type(user glob.type-type)
     self.result-type.sub-type := type-instance
+    self.access := ACCESS-VAR
   
   func dynamic analyze()
     self.result-type.sub-type.analyze(user self)

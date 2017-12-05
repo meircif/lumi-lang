@@ -93,6 +93,10 @@ MR_dec_ref(t_Refman);
   MR_inc_ref(t_Refman);
   t = NULL;
 /// @ t2
+MR_owner_dec_ref(*so_Refman);
+  *so_Refman = NULL;
+  *so = NULL;
+/// @ te0
 cannot assign "Empty Symbol" into "Int"
 /// @@ test-member-expression
 /// @ t0
@@ -224,10 +228,11 @@ Int aux_Int_0 = 0;
 String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   CHECK(1, fun3(7, &(aux_String_0), &(aux_String_0_Refman)) )
-  MR_dec_ref(*so_Refman);
+  MR_owner_dec_ref(*so_Refman);
   *so_Refman = aux_String_0_Refman;
-  MR_inc_ref(*so_Refman);
+  aux_String_0_Refman = NULL;
   *so = aux_String_0;
+  aux_String_0 = NULL;
 /// @ t10
 CHECK(1, Test_meth(t, t_Refman) )
 /// @ t11
@@ -243,6 +248,10 @@ CHECK(1, Test_meth(&((*tco)->_base._base._base), *tco_Refman) )
 /// @ t16
 if (t == NULL || t_Refman->value == NULL) RAISE(1)
   CHECK(1, Test_meth(t->t, t->t_Refman) )
+/// @ t17
+CHECK(1, fun1(3, str, str_Refman, *so, *so_Refman) )
+  *so = NULL;
+  *so_Refman = NULL;
 /// @ te0
 expected access, got " "
 /// @ te1
@@ -265,6 +274,12 @@ cannot assign "Tb" into "Tc"
 cannot assign void expression
 /// @ te10
 expected access "copy" , got "user"
+/// @ te11
+assigning into an owner a non-owner access "user"
+/// @ te12
+assigning into an owner a non-owner access "user"
+/// @ te13
+assigning into access "user" invalid access "owner"
 /// @@ test-type-expression
 /// @ t0
 CHECK(1, Test_meth(t, t_Refman) )
@@ -412,21 +427,36 @@ MR_dec_ref(t_Refman);
   MR_inc_ref(t_Refman);
   t = &(tc->_base._base._base);
 /// @ t8
-unknown operator "@"
+String* s = NULL;
+  RefManager* s_Refman = NULL;
+  MR_owner_dec_ref(s_Refman);
+  s_Refman = *so_Refman;
+  *so_Refman = NULL;
+  s = *so;
+  *so = NULL;
 /// @ t9
+MR_dec_ref(str_Refman);
+  str_Refman = *so_Refman;
+  MR_inc_ref(str_Refman);
+  str = *so;
+/// @ te0
+unknown operator "@"
+/// @ te1
 unexpected "("
-/// @ t10
+/// @ te2
 ambiguous precedence between operators "+" and "*"
-/// @ t11
+/// @ te3
 ambiguous precedence between operators "or" and "and"
-/// @ t12
+/// @ te4
 cannot use "not" as binary operand
-/// @ t13
+/// @ te5
 assigning into non assignable expression
-/// @ t14
+/// @ te6
 assigning into non assignable expression
-/// @ t15
+/// @ te7
 assigning into non assignable expression
+/// @ te8
+assigning into an owner a non-owner access "user"
 /// @@ test-question-expression
 /// @ t0
 b = !(str == NULL || str_Refman->value == NULL);
@@ -589,16 +619,18 @@ Returncode (*farr_Values[38])(void);
   if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3)
   CHECK(3, (((Returncode (**)(void))((farr)->values))[3])() )
 /// @ t6
+Returncode (*fun)(Int x, Int y) = NULL;
+/// @ te0
 missing arguments in function type
-/// @ t7
+/// @ te1
 missing arguments in function type
-/// @ t8
+/// @ te2
 expected "(" inside Function type, got "}"
-/// @ t9
+/// @ te3
 expected "}", got " "
-/// @ t10
+/// @ te4
 too many parameters
-/// @ t11
+/// @ te5
 too few outputs
 /// @@ test-builtin
 /// @ t0

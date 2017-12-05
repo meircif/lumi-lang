@@ -22,6 +22,7 @@ class BlockExpression(Expression)
   func dynamic analyze()
     self.expression.analyze()
     self.expression.result-type.copy-new():(owner self.result-type)
+    self.access := self.expression.access
   
   func dynamic write-preactions()
     self.expression.write-preactions()
@@ -71,6 +72,7 @@ class UnaryExpression(Expression)
       copy Char end, user Operator next-operator)
     self.operator := operator
     self.code-node := code-node
+    self.access := ACCESS-VAR
     self.set-location()
     if end = '\n'
       code-node.read-line-break-spaces()
@@ -175,6 +177,11 @@ class BinaryExpression(UnaryExpression)
       # := operator
       self.left-expression.result-type.check-assign-from(user self):(
           owner self.right-expression)
+      if self.left-expression.access = ACCESS-OWNER and
+          self.right-expression.access != ACCESS-OWNER
+        self.m-syntax-error(
+            user "assigning into an owner a non-owner access",
+            user glob.access-names[self.right-expression.access])
     else
       # any other Int operator
       if self.operator.order = 1 and ? self.binary-left-expression and
@@ -204,33 +211,45 @@ class BinaryExpression(UnaryExpression)
   func dynamic write-preactions()
     base.write-preactions()
     self.left-expression.write-preactions()
-    
     if self.operator.order = 4 and self.operator.group-index = 0
       # := operator
-      if not self.left-expression.result-type.type-data.is-primitive
-        # also assign Refman
-        write(user "MR_dec_ref(")
-        self.left-expression.write-refman()
-        write(user ");\n")
-        self.code-node.write-spaces()
-        
-        self.left-expression.write-refman()
-        write(user " = ")
-        self.right-expression.write-refman()
-        write(user ";\n")
-        self.code-node.write-spaces()
-        
+      self.write-assign-preactions()
+  
+  func inst write-assign-preactions()
+    if not self.left-expression.result-type.type-data.is-primitive
+      write(user "MR_")
+      if self.left-expression.access = ACCESS-OWNER
+        write(user "owner_")
+      write(user "dec_ref(")
+      self.left-expression.write-refman()
+      write(user ");\n")
+      self.code-node.write-spaces()
+      
+      self.left-expression.write-refman()
+      write(user " = ")
+      self.right-expression.write-refman()
+      write(user ";\n")
+      self.code-node.write-spaces()
+      
+      if self.left-expression.access != ACCESS-OWNER
         write(user "MR_inc_ref(")
         self.left-expression.write-refman()
         write(user ");\n")
         self.code-node.write-spaces()
-      if self.left-expression.result-type.type-data.is-dynamic
-        # also assign Dynamic
-        self.left-expression.write-dynamic()
-        write(user " = ")
-        self.right-expression.write-dynamic()
-        write(user ";\n")
+        
+      else-if self.right-expression.result-type.type-data != glob.type-empty
+        self.right-expression.write-refman()
+        write(user " = NULL;\n")
         self.code-node.write-spaces()
+    
+    if self.left-expression.result-type.type-data.is-dynamic
+      # also assign Dynamic
+      self.left-expression.write-dynamic()
+      write(user " = ")
+      self.right-expression.write-dynamic()
+      write(user ";\n")
+      self.code-node.write-spaces()
+    
   
   func dynamic write()
     self.write-start()
@@ -246,6 +265,13 @@ class BinaryExpression(UnaryExpression)
     self.write-end()
     if expand-and
       write(user ")")
+    if self.operator.order = 4 and self.operator.group-index = 0 and
+        self.left-expression.access = ACCESS-OWNER and
+        self.right-expression.result-type.type-data != glob.type-empty
+      # ownership pass
+      self.code-node.write-spaces()
+      self.right-expression.write()
+      write(user " = NULL;\n")
 
 
 ## An expression with the "?" operator
@@ -273,6 +299,7 @@ class QuestionExpression(Expression)
           user "cannot use \"?\" on type",
           user self.tested.result-type.type-data.name)
     self.set-simple-type(user glob.type-bool)
+    self.access := ACCESS-VAR
   
   func dynamic write-preactions()
     self.tested.write-preactions()

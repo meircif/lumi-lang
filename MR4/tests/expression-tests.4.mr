@@ -74,7 +74,9 @@ str := "some string"
 str := _
 ## @ c t1
 t := _
-## @ ec t2
+## @ c t2
+so := _
+## @ ec te0
 i := _
 ## @@ test-member-expression
 ## @ c t0
@@ -137,22 +139,22 @@ fun0()
 ## @ c t1
 fun1(copy 3, user str, owner _)
 ## @ c t2
-fun2()->(owner so, copy io)
+fun2()->(owner so, var io)
 ## @ c t3
 var Int x
   owner String s
-  fun2()->(owner s, copy x)
+  fun2()->(owner s, var x)
 ## @ c t4
 fun3(copy 0)->(owner so)
 ## @ c t5
 var Int x
-  fun4(copy fun5(copy 3)->(copy x))
+  fun4(copy fun5(copy 3)->(var x))
 ## @ c t6
 fun6(
       copy 2,
       copy 3)->(
-      copy io,
-      copy io)
+      var io,
+      var io)
 ## @ c t7
 fun5(copy 4)
 ## @ c t8
@@ -173,6 +175,8 @@ tc.meth()
 tco.meth()
 ## @ c t16
 t.t.meth()
+## @ c t17
+fun1(copy 3, user str, owner so)
 ## @ ec te0
 function( copy 1)
 ## @ ec te1
@@ -188,13 +192,19 @@ function(error 4)
 ## @ ec te6
 i()
 ## @ ec te7
-fun5(copy 0)->(copy 4)
+fun5(copy 0)->(var 4)
 ## @ ec te8
 fun7()->(user tc)
 ## @ ec te9
 fun5(copy i := 1)
 ## @ ec te10
 fun5(user 8)
+## @ ec te11
+fun1(copy 3, user str, owner str)
+## @ ec te12
+fun3(copy 3)->(owner str)
+## @ ec te13
+fun7()->(user tb)
 ## @@ test-type-expression
 ## @ c t0
 Test.meth(var t)
@@ -246,7 +256,7 @@ struct Test(Base)
 struct Base
   var Int x
 struct Test(Base)
-  func mock()->(copy Int x)
+  func mock()->(var Int x)
     x := base.x
 
 ## @@ test-block-expression
@@ -300,22 +310,29 @@ b := i = 5 or i != 37
 b := 2 < i < 12 < 2 * i
 ## @ c t7
 t := tc
-## @ ec t8
+## @ c t8
+owner String s
+  s := so
+## @ c t9
+str := so
+## @ ec te0
 345 @ 2
-## @ ec t9
+## @ ec te1
 80 +(
-## @ ec t10
+## @ ec te2
 1 + 2 * 3
-## @ ec t11
+## @ ec te3
 1 < i or 2 < i and 3 < i
-## @ ec t12
+## @ ec te4
 1 not 2
-## @ ec t13
+## @ ec te5
 1 := 2
-## @ ec t14
+## @ ec te6
 1 += 2
-## @ ec t15
+## @ ec te7
 1 -= 2
+## @ ec te8
+so := str
 ## @@ test-question-expression
 ## @ c t0
 b := str?
@@ -339,7 +356,7 @@ ta := Ta(copy 7)
 ## @ c t3
 new Ta a(copy 1)
 ## @ c t4
-user Ta a(var ta)
+user Ta a(user ta)
 ## @ c t5
 ta := ta
 ## @ c t6
@@ -370,11 +387,11 @@ var Func{()} fun
   fun := fun0
   fun()
 ## @ c t1
-var Func{(copy Int x)->(copy Int y)} fun(var fun5)
+var Func{(copy Int x)->(var Int y)} fun(copy fun5)
   var Int x
-  fun(copy 9)->(copy x)
+  fun(copy 9)->(var x)
 ## @ c t2
-var Func{(var Test self)} fun(var Test.meth)
+var Func{(var Test self)} fun(copy Test.meth)
   fun(var t)
 ## @ c t3
 var Func{()} fun
@@ -387,18 +404,21 @@ t.fun := fun0
 var Array{38:Func{()}} farr
   farr[3] := fun0
   farr[3]()
-## @ ec t6
+## @ c t6
+var Func{(copy Int x,
+      copy Int y)} fun
+## @ ec te0
 var Func error
-## @ ec t7
+## @ ec te1
 var Array{3:Func} error
-## @ ec t8
+## @ ec te2
 var Func{} error
-## @ ec t9
+## @ ec te3
 var Func{() } error
-## @ ec t10
-var Func{()} fun(var fun1)
-## @ ec t11
-var Func{()->(copy Int x)} fun
+## @ ec te4
+var Func{()} fun(copy fun1)
+## @ ec te5
+var Func{()->(var Int x)} fun
   fun := fun0
 ## @@ test-builtin
 ## @ c t0
@@ -416,9 +436,9 @@ i := str.length
 ## @ c t6
 str.clear()
 ## @ c t7
-str.equal(user str)->(copy b)
+str.equal(user str)->(var b)
 ## @ c t8
-str.get(copy i)->(copy c)
+str.get(copy i)->(var c)
 ## @ c t9
 str.append(copy c)
 ## @ c t10
@@ -428,9 +448,9 @@ str.concat(user str)
 ## @ c t12
 str.concat-int(copy i)
 ## @ c t13
-str.find(user str)->(copy i)
+str.find(user str)->(var i)
 ## @ c t14
-str.has(copy c)->(copy b)
+str.has(copy c)->(var b)
 ## @ c t15
 file-open-read(user str)->(owner fobj)
 ## @ c t16
@@ -438,13 +458,13 @@ file-open-write(user str)->(owner fobj)
 ## @ c t17
 fobj.close()
 ## @ c t18
-fobj.getc()->(copy c)
+fobj.getc()->(var c)
 ## @ c t19
 fobj.putc(copy c)
 ## @ c t20
 fobj.write(user str)
 ## @ c t21
-user Array{String} argv(var sys.argv)
+user Array{String} argv(user sys.argv)
 ## @ c t22
 sys.print(user str)
 ## @ c t23
@@ -452,7 +472,7 @@ sys.println(user str)
 ## @ c t24
 sys.exit(copy i)
 ## @ c t25
-sys.system(user str)->(copy i)
+sys.system(user str)->(var i)
 ## @ c t26
-sys.getenv(user str, user str)->(copy b)
+sys.getenv(user str, user str)->(var b)
 ## @

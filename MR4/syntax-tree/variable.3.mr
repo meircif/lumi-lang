@@ -251,6 +251,7 @@ class VariableInit(SyntaxTreeCode)
     self.expression-init.symbol.variable := variable
     variable.type-instance.copy-new():(
         owner self.expression-init.symbol.result-type)
+    self.expression-init.symbol.access := variable.access
     variable.parent.code-nodes.add(owner self)
   
   func dynamic analyze()

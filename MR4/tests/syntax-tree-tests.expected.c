@@ -260,10 +260,11 @@ Returncode name(String* self, RefManager* self_Refman, Int px, String* pu, RefMa
   if (aux_String_0 == NULL) RAISE(8)
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(8)
-  MR_dec_ref(o_Refman);
+  MR_owner_dec_ref(o_Refman);
   o_Refman = aux_String_0_Refman;
-  MR_inc_ref(o_Refman);
+  aux_String_0_Refman = NULL;
   o = aux_String_0;
+  aux_String_0 = NULL;
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(9)
@@ -335,14 +336,16 @@ expected block in a new line, got "EOF"
 /// @ te13
 indentation too big, expected "2" got "4"
 /// @ te14
-argument "x" access should be "copy" for primitive types, got "user"
+parameter "x" access should be "copy" for primitive types, got "user"
 /// @ te15
-argument "s" access should not be "copy" for non-primitive type "String"
+output "x" access should be "var" for primitive types, got "copy"
 /// @ te16
-missing subtype for array
+argument "s" access should not be "copy" for non-primitive type "String"
 /// @ te17
-missing arguments in function type
+missing subtype for array
 /// @ te18
+missing arguments in function type
+/// @ te19
 multidimensional array not supported yet...
 /// @@ test-members
 /// @ t0
@@ -498,7 +501,28 @@ char sa_Chars[12 * 7];
   MR_set_var_string_array(12, 7, sa, sa_Chars);
   sa_Refman = MR_new_ref(sa);
   if (sa_Refman == NULL) RAISE(1)
-/// @ t8
+/// @ te0
+expected space after type, got "new-line"
+/// @ te1
+illegal variable name "Error"
+/// @ te2
+illegal variable name "errorName"
+/// @ te3
+redefinition of variable "name"
+/// @ te4
+redefinition of variable "name"
+/// @ te5
+redefinition of global variable "name"
+/// @ te6
+variable name overrides function "name"
+/// @ te7
+type members cannot be initialized
+/// @ te8
+global variables cannot be initialized
+/// @ te9
+non-primitives cannot be declared "var" here yet...
+/// @@ test-initialize
+/// @ t0
 Test* aux_Test_0 = NULL;
   RefManager* aux_Test_0_Refman = NULL;
   aux_Test_0 = calloc(1, sizeof(Test));
@@ -510,7 +534,7 @@ Test* aux_Test_0 = NULL;
   t_Refman = aux_Test_0_Refman;
   MR_inc_ref(t_Refman);
   t = aux_Test_0;
-/// @ t9
+/// @ t1
 String* aux_String_0 = NULL;
   RefManager* aux_String_0_Refman = NULL;
   if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
@@ -523,7 +547,7 @@ String* aux_String_0 = NULL;
   str_Refman = aux_String_0_Refman;
   MR_inc_ref(str_Refman);
   str = aux_String_0;
-/// @ t10
+/// @ t2
 Array* aux_Array_0 = NULL;
   RefManager* aux_Array_0_Refman = NULL;
   if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
@@ -536,7 +560,7 @@ Array* aux_Array_0 = NULL;
   arr_Refman = aux_Array_0_Refman;
   MR_inc_ref(arr_Refman);
   arr = aux_Array_0;
-/// @ t11
+/// @ t3
 Array* a = NULL;
   RefManager* a_Refman = NULL;
   Array* aux_Array_0 = NULL;
@@ -549,8 +573,9 @@ Array* a = NULL;
   if (aux_Array_0_Refman == NULL) RAISE(1)
   a = aux_Array_0;
   a_Refman = aux_Array_0_Refman;
-  MR_inc_ref(a_Refman);
-/// @ t12
+  aux_Array_0 = NULL;
+  aux_Array_0_Refman = NULL;
+/// @ t4
 Array* sa = NULL;
   RefManager* sa_Refman = NULL;
   Array* aux_Array_0 = NULL;
@@ -565,19 +590,20 @@ Array* sa = NULL;
   if (aux_Array_0_Refman == NULL) RAISE(1)
   sa = aux_Array_0;
   sa_Refman = aux_Array_0_Refman;
-  MR_inc_ref(sa_Refman);
-/// @ t13
+  aux_Array_0 = NULL;
+  aux_Array_0_Refman = NULL;
+/// @ t5
 Int x = 0;
   if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(1)
   x = ((Int*)((arr)->values))[0];
-/// @ t14
+/// @ t6
 String* s = NULL;
   RefManager* s_Refman = NULL;
   s = str;
   s_Refman = str_Refman;
   MR_inc_ref(s_Refman);
-/// @ t15
+/// @ t7
 char s_Values[12];
   String s_Var = {12, 0, NULL};
   String* s = NULL;
@@ -596,7 +622,7 @@ char s_Values[12];
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(1)
   CHECK(1, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
-/// @ t16
+/// @ t8
 String* s = NULL;
   RefManager* s_Refman = NULL;
   s = MR_new_string(i);
@@ -604,13 +630,13 @@ String* s = NULL;
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(1)
   CHECK(1, String_new(s, s_Refman, str, str_Refman) )
-/// @ t17
+/// @ t9
 Test* tt = NULL;
   RefManager* tt_Refman = NULL;
   tt = &(tc->_base._base._base);
   tt_Refman = tc_Refman;
   MR_inc_ref(tt_Refman);
-/// @ t18
+/// @ t10
 Test tt_Var = {0};
   Test* tt = NULL;
   RefManager* tt_Refman = NULL;
@@ -618,7 +644,7 @@ Test tt_Var = {0};
   tt_Refman = MR_new_ref(tt);
   if (tt_Refman == NULL) RAISE(1)
   CHECK(1, Test_new(tt, tt_Refman, 3) )
-/// @ t19
+/// @ t11
 Test* tt = NULL;
   RefManager* tt_Refman = NULL;
   tt = calloc(1, sizeof(Test));
@@ -626,7 +652,7 @@ Test* tt = NULL;
   tt_Refman = MR_new_ref(tt);
   if (tt_Refman == NULL) RAISE(1)
   CHECK(1, Test_new(tt, tt_Refman, 3) )
-/// @ t20
+/// @ t12
 Test* aux_Test_0 = NULL;
   RefManager* aux_Test_0_Refman = NULL;
   aux_Test_0 = calloc(1, sizeof(Test));
@@ -638,66 +664,60 @@ Test* aux_Test_0 = NULL;
   t_Refman = aux_Test_0_Refman;
   MR_inc_ref(t_Refman);
   t = aux_Test_0;
-/// @ t21
-expected space after type, got "new-line"
-/// @ t22
-illegal variable name "Error"
-/// @ t23
-illegal variable name "errorName"
-/// @ t24
-redefinition of variable "name"
-/// @ t25
-redefinition of variable "name"
-/// @ t26
-redefinition of global variable "name"
-/// @ t27
-variable name overrides function "name"
-/// @ t28
-type members cannot be initialized
-/// @ t29
-global variables cannot be initialized
-/// @ t30
-non-primitives cannot be declared "var" here yet...
-/// @ t31
+/// @ t13
+Tb* tt = NULL;
+  RefManager* tt_Refman = NULL;
+  Tb_Dynamic* tt_Dynamic = NULL;
+  tt = tb;
+  tt_Refman = tb_Refman;
+  MR_inc_ref(tt_Refman);
+  tt_Dynamic = tb_Dynamic;
+/// @ te0
 dynamic allocation of primitive type "Int"
-/// @ t32
+/// @ te1
 missing length for sequence
-/// @ t33
+/// @ te2
 missing length for sequence
-/// @ t34
+/// @ te3
 missing length for sequence
-/// @ t35
+/// @ te4
 missing length for sequence
-/// @ t36
+/// @ te5
 missing subtype for array
-/// @ t37
+/// @ te6
 missing subtype for array
-/// @ t38
+/// @ te7
 missing subtype for array
-/// @ t39
+/// @ te8
 missing subtype for array
-/// @ t40
+/// @ te9
 multidimensional array not supported yet...
-/// @ t41
+/// @ te10
 expected ":", got "new-line"
-/// @ t42
+/// @ te11
 expected "}", got "new-line"
-/// @ t43
+/// @ te12
 unknown symbol "error"
-/// @ t44
+/// @ te13
 got "String" expression, expected "Int"
-/// @ t45
+/// @ te14
 only "var" access is supported for primitive types, got "user"
-/// @ t46
+/// @ te15
 only "var" access is supported for primitive types, got "new"
-/// @ t47
+/// @ te16
 no contructor for type "File"
-/// @ t48
+/// @ te17
 cannot assign "Int" into "Bool"
-/// @ t49
+/// @ te18
 only one initialization parameter expected
-/// @ t50
+/// @ te19
 no contructor for type "Test"
+/// @ te20
+access should be "copy" for primitive types, got "user"
+/// @ te21
+assigning into access "owner" invalid access "user"
+/// @ te22
+assigning into an owner a non-owner access "user"
 /// @@ test-comment
 /// @ t0
 Int x = 0;

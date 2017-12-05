@@ -76,6 +76,10 @@ test test-code-variables()
   test-from-file(user "test-code-variables")
 
 
+test test-initialize()
+  test-from-file(user "test-initialize")
+
+
 test test-comment()
   test-from-file(user "test-comment")
 

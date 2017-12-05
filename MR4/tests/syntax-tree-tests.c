@@ -181,12 +181,25 @@ Returncode test_code_variables() {
 
 
 #if MR_STAGE == MR_DECLARATIONS
+Returncode test_initialize();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_initialize = "test-initialize";
+#define MR_FUNC_NAME _func_name_test_initialize
+Returncode test_initialize() {
+  CHECK(80, test_from_file(&(String){16, 15, "test-initialize"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
 Returncode test_comment();
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_test_comment = "test-comment";
 #define MR_FUNC_NAME _func_name_test_comment
 Returncode test_comment() {
-  CHECK(80, test_from_file(&(String){13, 12, "test-comment"}) )
+  CHECK(84, test_from_file(&(String){13, 12, "test-comment"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -199,7 +212,7 @@ Returncode test_if_else();
 static char* _func_name_test_if_else = "test-if-else";
 #define MR_FUNC_NAME _func_name_test_if_else
 Returncode test_if_else() {
-  CHECK(84, test_from_file(&(String){13, 12, "test-if-else"}) )
+  CHECK(88, test_from_file(&(String){13, 12, "test-if-else"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -212,7 +225,7 @@ Returncode test_do_loop();
 static char* _func_name_test_do_loop = "test-do-loop";
 #define MR_FUNC_NAME _func_name_test_do_loop
 Returncode test_do_loop() {
-  CHECK(88, test_from_file(&(String){13, 12, "test-do-loop"}) )
+  CHECK(92, test_from_file(&(String){13, 12, "test-do-loop"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -225,7 +238,7 @@ Returncode test_for_loop();
 static char* _func_name_test_for_loop = "test-for-loop";
 #define MR_FUNC_NAME _func_name_test_for_loop
 Returncode test_for_loop() {
-  CHECK(92, test_from_file(&(String){14, 13, "test-for-loop"}) )
+  CHECK(96, test_from_file(&(String){14, 13, "test-for-loop"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -238,7 +251,7 @@ Returncode test_testing();
 static char* _func_name_test_testing = "test-testing";
 #define MR_FUNC_NAME _func_name_test_testing
 Returncode test_testing() {
-  CHECK(96, test_from_file(&(String){13, 12, "test-testing"}) )
+  CHECK(100, test_from_file(&(String){13, 12, "test-testing"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

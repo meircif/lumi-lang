@@ -30,6 +30,7 @@ func parse-new-expression(user String ends, user SyntaxTreeCode code-node):(
 class Expression(SyntaxTreeNode)
   user SyntaxTreeCode code-node
   owner TypeInstance result-type
+  var Int access
   var Bool assignable
   var Bool top
   var Bool is-statement

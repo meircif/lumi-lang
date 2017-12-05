@@ -1040,10 +1040,11 @@ Returncode test_call_expression(void) {
   CHECK(259, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
   CHECK(260, f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
-  MR_dec_ref(s_Refman);
+  MR_owner_dec_ref(s_Refman);
   s_Refman = aux_String_1_Refman;
-  MR_inc_ref(s_Refman);
+  aux_String_1_Refman = NULL;
   s = aux_String_1;
+  aux_String_1 = NULL;
 MR_cleanup:
   MR_owner_dec_ref(aux_String_1_Refman);
   MR_dec_ref(aux_String_0_Refman);
@@ -1150,44 +1151,47 @@ MR_cleanup:
 #define MR_FUNC_NAME "test-builtins"
 Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman, Array* a, RefManager* a_Refman) {
   Returncode MR_err = OK;
+  Int iv = 0;
+  Char cv = 0;
+  Bool bv = 0;
   File* f = NULL;
   RefManager* f_Refman = NULL;
   MR_inc_ref(s_Refman);
   MR_inc_ref(a_Refman);
-  CHECK(295, Int_str(i, s, s_Refman) )
-  b = true || false;
-  c = EOF;
-  if (a == NULL || a_Refman->value == NULL) RAISE(298)
+  CHECK(298, Int_str(i, s, s_Refman) )
+  bv = true || false;
+  cv = EOF;
+  if (a == NULL || a_Refman->value == NULL) RAISE(301)
   i = a->length;
-  if (s == NULL || s_Refman->value == NULL) RAISE(299)
+  if (s == NULL || s_Refman->value == NULL) RAISE(302)
   i = s->length;
-  CHECK(300, String_clear(s, s_Refman) )
-  CHECK(301, String_equal(s, s_Refman, s, s_Refman, &(b)) )
-  CHECK(302, String_get(s, s_Refman, i, &(c)) )
-  CHECK(303, String_append(s, s_Refman, c) )
-  CHECK(304, String_new(s, s_Refman, s, s_Refman) )
-  CHECK(305, String_concat(s, s_Refman, s, s_Refman) )
-  CHECK(306, String_concat_int(s, s_Refman, i) )
-  CHECK(307, String_find(s, s_Refman, s, s_Refman, &(i)) )
-  CHECK(308, String_has(s, s_Refman, c, &(b)) )
-  CHECK(310, file_open_read(s, s_Refman, &(f), &(f_Refman)) )
-  CHECK(311, file_open_write(s, s_Refman, &(f), &(f_Refman)) )
-  CHECK(312, File_getc(f, f_Refman, &(c)) )
-  CHECK(313, File_putc(f, f_Refman, c) )
-  CHECK(314, File_write(f, f_Refman, s, s_Refman) )
-  CHECK(315, File_close(f, f_Refman) )
-  if (sys == NULL || sys_Refman->value == NULL) RAISE(316)
-  if (sys->argv == NULL || sys->argv_Refman->value == NULL) RAISE(316)
-  if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(316)
+  CHECK(303, String_clear(s, s_Refman) )
+  CHECK(304, String_equal(s, s_Refman, s, s_Refman, &(bv)) )
+  CHECK(305, String_get(s, s_Refman, i, &(cv)) )
+  CHECK(306, String_append(s, s_Refman, c) )
+  CHECK(307, String_new(s, s_Refman, s, s_Refman) )
+  CHECK(308, String_concat(s, s_Refman, s, s_Refman) )
+  CHECK(309, String_concat_int(s, s_Refman, i) )
+  CHECK(310, String_find(s, s_Refman, s, s_Refman, &(iv)) )
+  CHECK(311, String_has(s, s_Refman, c, &(bv)) )
+  CHECK(313, file_open_read(s, s_Refman, &(f), &(f_Refman)) )
+  CHECK(314, file_open_write(s, s_Refman, &(f), &(f_Refman)) )
+  CHECK(315, File_getc(f, f_Refman, &(cv)) )
+  CHECK(316, File_putc(f, f_Refman, c) )
+  CHECK(317, File_write(f, f_Refman, s, s_Refman) )
+  CHECK(318, File_close(f, f_Refman) )
+  if (sys == NULL || sys_Refman->value == NULL) RAISE(319)
+  if (sys->argv == NULL || sys->argv_Refman->value == NULL) RAISE(319)
+  if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(319)
   MR_dec_ref(s_Refman);
   s_Refman = sys->argv_Refman;
   MR_inc_ref(s_Refman);
   s = ((String**)((sys->argv)->values))[1];
-  CHECK(317, Sys_print(sys, sys_Refman, s, s_Refman) )
-  CHECK(318, Sys_println(sys, sys_Refman, s, s_Refman) )
-  CHECK(319, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(b)) )
-  CHECK(320, Sys_system(sys, sys_Refman, s, s_Refman, &(i)) )
-  CHECK(321, Sys_exit(sys, sys_Refman, i) )
+  CHECK(320, Sys_print(sys, sys_Refman, s, s_Refman) )
+  CHECK(321, Sys_println(sys, sys_Refman, s, s_Refman) )
+  CHECK(322, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(bv)) )
+  CHECK(323, Sys_system(sys, sys_Refman, s, s_Refman, &(iv)) )
+  CHECK(324, Sys_exit(sys, sys_Refman, i) )
 MR_cleanup:
   MR_owner_dec_ref(f_Refman);
   MR_dec_ref(a_Refman);
@@ -1204,8 +1208,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(325, test_simple_function() )
-  CHECK(326, test_call_expression() )
+  CHECK(328, test_simple_function() )
+  CHECK(329, test_call_expression() )
 MR_cleanup:
   return MR_err;
 }

@@ -45,6 +45,9 @@ class Argument(SyntaxTreeNode)
   
   func dynamic write-preactions()
     raise
+  
+  func dynamic write-postactions()
+    raise
 
 
 class ArgumentFactory
@@ -137,11 +140,13 @@ class FunctionArguments(SyntaxTreeNode)
     self.analyze-children(user self.parameters)
     self.analyze-children(user self.outputs)
   
-  func inst get-result-type():(user TypeInstance result-type)
+  func inst get-result-type():(copy Int access, user TypeInstance result-type)
     if ? self.outputs.last
       self.outputs.last.item.get-type-instance():(user result-type)
+      access := self.outputs.last.item.access
     else
       result-type := _
+      access := ACCESS-VAR
   
   func inst get-output():(user Expression output)
     if ? self.outputs.last
@@ -235,3 +240,10 @@ class FunctionArguments(SyntaxTreeNode)
     write-cname(user name)
     write(user ")")
     self.write()
+  
+  func inst write-postactions()
+    user ListNode{Argument} node(self.parameters.first)
+    do
+      while ? node
+      node.item.write-postactions()
+      node := node.next

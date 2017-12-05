@@ -18,6 +18,7 @@ class SliceExpression(Expression)
       copy Char end)
     self.code-node := code-node
     self.sequence := sequence
+    self.access := ACCESS-VAR
     self.set-location()
     parse-new-expression(user ":]", user code-node):(owner self.index, copy end)
     if end = ':'

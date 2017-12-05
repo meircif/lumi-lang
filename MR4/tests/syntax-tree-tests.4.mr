@@ -133,19 +133,19 @@ func name()
 ## @ g t1
 func name(var String self, user String text, copy Int num)
 ## @ g t2
-func name()->(owner String text, copy Int num)
+func name()->(owner String text, var Int num)
 ## @ g t3
 func name(copy Char param)->(owner String out)
 ## @ g t4
 func name(user Array{Int} array)
 ## @ g t5
-func name(copy Func{(copy Int x)->(copy Int y)} fun)->(copy Func{()} joy)
+func name(copy Func{(copy Int x)->(var Int y)} fun)->(var Func{()} joy)
 ## @ g t6
 func name()
   var Int x
 ## @ g t7
 func name(var String self, copy Int px, user String pu, owner String po)->(
-    var String oself, copy Int ox, user String ou, owner String oo)
+    var String oself, var Int ox, user String ou, owner String oo)
   var Int x
   user String u
   owner String o
@@ -204,15 +204,18 @@ func name()
 func name(user Int x)
 
 ## @ eg te15
-func name(copy String s)
+func name()->(copy Int x)
 
 ## @ eg te16
-func name(user Array error)
+func name(copy String s)
 
 ## @ eg te17
-func name(copy Func error)
+func name(user Array error)
 
 ## @ eg te18
+func name(copy Func error)
+
+## @ eg te19
 func name(user Array{Array{Int}} error)
 
 ## @@ test-members
@@ -303,110 +306,119 @@ var Array{12:Int} a
 var Array{12:Test} a
 ## @ c t7
 var Array{12:String{7}} sa
-## @ c t8
-t := Test(copy i)
-## @ c t9
-str := String{arr[0]}()
-## @ c t10
-arr := Array{arr[0]:Int}()
-## @ c t11
-owner Array{Test} a(var Array{arr[0]:Test}())
-## @ c t12
-owner Array{String} sa(var Array{arr[0]:String{arr[1]}}())
-## @ c t13
-var Int x(var arr[0])
-## @ c t14
-user String s(var str)
-## @ c t15
-var String{12} s(user "some string")
-## @ c t16
-new String{i} s(user str)
-## @ c t17
-user Test tt(var tc)
-## @ c t18
-var Test tt(copy 3)
-## @ c t19
-new Test tt(copy 3)
-## @ c t20
-t := Test(copy 3)
-## @ ec t21
+## @ ec te0
 var Int
-## @ ec t22
+## @ ec te1
 var Int Error
-## @ ec t23
+## @ ec te2
 var Int errorName
-## @ ec t24
+## @ ec te3
 var Int name
   var Int name
 
-## @ ec t25
+## @ ec te4
 var Int name
   do
     var Int x
     do
       var Int name
 
-## @ eg t26
+## @ eg te5
 var Int name
 func mock()
   var Int name
-## @ eg t27
+## @ eg te6
 func name()
 func mock()
   var Int name
-## @ eg t28
+## @ eg te7
 struct Test
   var Int x(1)
-## @ eg t29
+## @ eg te8
 var Int x(1)
-## @ eg t30
+## @ eg te9
 struct Test
   var Test t
 
-## @ ec t31
+## @@ test-initialize
+## @ c t0
+t := Test(copy i)
+## @ c t1
+str := String{arr[0]}()
+## @ c t2
+arr := Array{arr[0]:Int}()
+## @ c t3
+owner Array{Test} a(owner Array{arr[0]:Test}())
+## @ c t4
+owner Array{String} sa(owner Array{arr[0]:String{arr[1]}}())
+## @ c t5
+var Int x(copy arr[0])
+## @ c t6
+user String s(user str)
+## @ c t7
+var String{12} s(user "some string")
+## @ c t8
+new String{i} s(user str)
+## @ c t9
+user Test tt(user tc)
+## @ c t10
+var Test tt(copy 3)
+## @ c t11
+new Test tt(copy 3)
+## @ c t12
+t := Test(copy 3)
+## @ c t13
+user Tb tt(user tb)
+## @ ec te0
 Int()
-## @ ec t32
+## @ ec te1
 var String s
-## @ ec t33
+## @ ec te2
 var Array{4:String} sa
-## @ ec t34
+## @ ec te3
 new String s
-## @ ec t35
+## @ ec te4
 String()
-## @ ec t36
+## @ ec te5
 user Array a
-## @ ec t37
+## @ ec te6
 new Array a
-## @ ec t38
+## @ ec te7
 Array()
-## @ ec t39
+## @ ec te8
 var Array{23} a
-## @ ec t40
+## @ ec te9
 var Array{1:Array{2:Int}} a
-## @ ec t41
+## @ ec te10
 var Array{1
-## @ ec t42
+## @ ec te11
 var String{12
-## @ ec t43
+## @ ec te12
 var Array{error:Int} a
-## @ ec t44
+## @ ec te13
 var Array{"12":Int} a
-## @ ec t45
+## @ ec te14
 user Int x
-## @ ec t46
+## @ ec te15
 new Int x
-## @ ec t47
+## @ ec te16
 var File f(copy 1)
-## @ ec t48
+## @ ec te17
 var Bool x(var 1)
-## @ ec t49
+## @ ec te18
 var Int x(var 1, var 2)
-## @ eg t50
+## @ eg te19
 struct Test
   var Int x
 func mock()
   Test(copy 1)
 
+## @ ec te20
+var Int x(user 3)
+## @ ec te21
+owner String s(user so)
+## @ ec te22
+owner String s(owner str)
 ## @@ test-comment
 ## @ c t0
 # comment

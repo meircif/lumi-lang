@@ -151,13 +151,13 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "pattern")
     self.add-builtin-output(
-        user arguments, copy ACCESS-COPY, user glob.type-bool, user "equal")
+        user arguments, copy ACCESS-VAR, user glob.type-bool, user "equal")
     
     self.add-builtin-method(user glob.type-string, user "get"):(user arguments)
     self.add-builtin-parameter(
         user arguments, copy ACCESS-COPY, user glob.type-int, user "index")
     self.add-builtin-output(
-        user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
+        user arguments, copy ACCESS-VAR, user glob.type-char, user "ch")
     
     self.add-builtin-method(user glob.type-string, user "append"):(
         user arguments)
@@ -178,13 +178,13 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "pattern")
     self.add-builtin-output(
-        user arguments, copy ACCESS-COPY, user glob.type-int, user "index")
+        user arguments, copy ACCESS-VAR, user glob.type-int, user "index")
     
     self.add-builtin-method(user glob.type-string, user "has"):(user arguments)
     self.add-builtin-parameter(
         user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
     self.add-builtin-output(
-        user arguments, copy ACCESS-COPY, user glob.type-bool, user "equal")
+        user arguments, copy ACCESS-VAR, user glob.type-bool, user "equal")
     
     # Array
     self.add-builtin-field(
@@ -207,7 +207,7 @@ static Global
     
     self.add-builtin-method(user glob.type-file, user "getc"):(user arguments)
     self.add-builtin-output(
-        user arguments, copy ACCESS-COPY, user glob.type-char, user "ch")
+        user arguments, copy ACCESS-VAR, user glob.type-char, user "ch")
     
     self.add-builtin-method(user glob.type-file, user "putc"):(user arguments)
     self.add-builtin-parameter(
@@ -240,7 +240,7 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "command")
     self.add-builtin-output(
-        user arguments, copy ACCESS-COPY, user glob.type-int, user "status")
+        user arguments, copy ACCESS-VAR, user glob.type-int, user "status")
     
     self.add-builtin-method(user glob.type-sys, user "getenv"):(user arguments)
     self.add-builtin-parameter(
@@ -248,7 +248,7 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "value")
     self.add-builtin-output(
-        user arguments, copy ACCESS-COPY, user glob.type-bool, user "exists")
+        user arguments, copy ACCESS-VAR, user glob.type-bool, user "exists")
     
     self.add-builtin-global-variable(user glob.type-sys, user "sys")
   

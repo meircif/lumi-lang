@@ -22,12 +22,14 @@ class SymbolExpression(Expression)
     self.code-node.find-variable(user self.name):(user self.variable)
     if ? self.variable
       self.variable.type-instance.copy-new():(owner self.result-type)
+      self.access := self.variable.access
       self.assignable := true
     else
       glob.root.find-function(user self.name):(user self.function)
       if not (? self.function)
         self.m-syntax-error(user "unknown symbol", user self.name)
       self.set-simple-type(user glob.type-func)
+      self.access := ACCESS-VAR
       self.function.arguments.copy-new():(owner self.result-type.arguments)
   
   func dynamic analyze-call(user FunctionArguments arguments):(
@@ -105,6 +107,7 @@ class MemberExpression(SymbolExpression)
     type-data.find-field(user self.name):(user self.variable, copy self.bases)
     if ? self.variable
       self.variable.type-instance.copy-new():(owner self.result-type)
+      self.access := self.variable.access
       self.assignable := true
     else
       type-data.find-meth(user self.name):(
@@ -122,6 +125,7 @@ class MemberExpression(SymbolExpression)
         self.function := self.function.dynamic-base-method
         self.is-dynamic-call := true
       self.set-simple-type(user glob.type-func)
+      self.access := ACCESS-VAR
       self.function.arguments.copy-new():(owner self.result-type.arguments)
     if self.instance.result-type.type-data = glob.type-base
       if not (? self.function)

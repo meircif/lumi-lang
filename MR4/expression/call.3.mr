@@ -32,8 +32,10 @@ class CallExpression(Expression)
           user "non callable type",
           user self.function.result-type.type-data.name)
     user FunctionArguments declaration(self.function.result-type.arguments)
+    user TypeInstance result-type
+    declaration.get-result-type():(copy self.access, user result-type)
     if not self.is-statement
-      declaration.get-result-type().copy-new():(owner self.result-type)
+      result-type.copy-new():(owner self.result-type)
     self.function.analyze-call(user self.arguments):(
         copy self.is-function-object)
     if self.arguments.check-same-as(user declaration)
@@ -42,8 +44,7 @@ class CallExpression(Expression)
       output.is-output := true
       output.access := declaration.outputs.last.item.access
       output.value := self.add-aux-variable(
-          copy declaration.outputs.last.item.access,
-          user declaration.get-result-type())
+          copy declaration.outputs.last.item.access, user result-type)
       self.output := output.value
       self.arguments.outputs.add(owner output)
     else-if ? self.result-type
@@ -76,7 +77,7 @@ class CallExpression(Expression)
     self.function.write()
     self.arguments.write-call()
     write(user " )\n")
-  
+    self.arguments.write-postactions()
 
 
 ## Function argument call
@@ -99,6 +100,17 @@ class CallArgument(Argument)
       self.m-syntax-error-msg(user "non assignable call output")
   
   func dynamic check-same-type-as(user TypeInstance type-instance)
+    if self.access = ACCESS-OWNER and self.value.access != ACCESS-OWNER
+      self.m-syntax-error(
+          user "assigning into an owner a non-owner access",
+          user glob.access-names[self.value.access])
+    if self.is-output and self.access != self.value.access
+      self.m-syntax-error2(
+          user "assigning into access",
+          user glob.access-names[self.access],
+          user "invalid access",
+          user glob.access-names[self.value.access])
+    
     if self.is-output
       self.is-down-cast := type-instance.check-assign-to(
           user self.value.result-type, user self) > 0
@@ -146,6 +158,16 @@ class CallArgument(Argument)
       self.value.write-dynamic()
       if self.is-output
         write(user ")")
+  
+  func dynamic write-postactions()
+    if self.access = ACCESS-OWNER and not self.is-output and
+        self.value.result-type.type-data != glob.type-empty
+      self.code-node.write-spaces()
+      self.value.write()
+      write(user " = NULL;\n")
+      self.code-node.write-spaces()
+      self.value.write-refman()
+      write(user " = NULL;\n")
 
 
 class CallArgumentFactory(ArgumentFactory)

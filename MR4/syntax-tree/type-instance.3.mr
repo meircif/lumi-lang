@@ -46,7 +46,7 @@ static TypeInstance
               user "expected \"(\" inside Function type, got", copy end)
         new FunctionArguments in self.arguments
         var DeclarationArgumentFactory argument-factory
-        self.arguments.parse(user argument-factory, user _):(copy end)
+        self.arguments.parse(user argument-factory, user code-node):(copy end)
       else-if ? code-node and self.name.equal(user "String")
         parse-new-expression(user "}", user code-node):(
             owner self.length-owner, copy end)
