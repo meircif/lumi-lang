@@ -22,6 +22,7 @@ class BlockExpression(Expression)
   func dynamic analyze()
     self.expression.analyze()
     self.expression.result-type.copy-new():(owner self.result-type)
+    self.access := self.expression.access
   
   func dynamic write-preactions()
     self.expression.write-preactions()
@@ -71,6 +72,7 @@ class UnaryExpression(Expression)
       copy Char end, user Operator next-operator)
     self.operator := operator
     self.code-node := code-node
+    self.access := ACCESS-VAR
     self.set-location()
     if end = '\n'
       code-node.read-line-break-spaces()
@@ -168,13 +170,23 @@ class BinaryExpression(UnaryExpression)
       # `not` operator
       self.m-syntax-error-msg(user "cannot use \"not\" as binary operand")
     if self.operator.order = 3
-      # `or`\`and` operator
+      # `or`/`and` operator
       self.test-operands-type(user glob.type-bool)
       self.set-simple-type(user glob.type-bool)
     else-if self.operator.order = 4 and self.operator.group-index = 0
       # := operator
       self.left-expression.result-type.check-assign-from(user self):(
           owner self.right-expression)
+      if self.left-expression.access = ACCESS-OWNER and
+          self.right-expression.access != ACCESS-OWNER
+        self.m-syntax-error(
+            user "assigning into an owner a non-owner access",
+            user glob.access-names[self.right-expression.access])
+    else-if self.operator.order = 1 and self.operator.name[0] = 'i'
+      # `is`/`is-not` operator
+      self.test-not-primitive(user self.right-expression)
+      self.test-not-primitive(user self.left-expression)
+      self.set-simple-type(user glob.type-bool)
     else
       # any other Int operator
       if self.operator.order = 1 and ? self.binary-left-expression and
@@ -201,17 +213,56 @@ class BinaryExpression(UnaryExpression)
     self.test-operand-type(user self.right-expression, user expected-type)
     self.test-operand-type(user self.left-expression, user expected-type)
   
+  func inst test-not-primitive(user Expression operand)
+    if operand.result-type.type-data.is-primitive
+      self.m-syntax-error2(
+          user "operator",
+          user self.operator.name,
+          user "expected non primitive operand, got",
+          user operand.result-type.type-data.name)
+  
   func dynamic write-preactions()
     base.write-preactions()
     self.left-expression.write-preactions()
-    if self.operator.order = 4 and self.operator.group-index = 0 and
-        self.left-expression.result-type.type-data.is-dynamic
-      # := operator to dynamic variable
+    if self.operator.order = 4 and self.operator.group-index = 0
+      # := operator
+      self.write-assign-preactions()
+  
+  func inst write-assign-preactions()
+    if not self.left-expression.result-type.type-data.is-primitive
+      write(user "MR_")
+      if self.left-expression.access = ACCESS-OWNER
+        write(user "owner_")
+      write(user "dec_ref(")
+      self.left-expression.write-refman()
+      write(user ");\n")
+      self.code-node.write-spaces()
+      
+      self.left-expression.write-refman()
+      write(user " = ")
+      self.right-expression.write-refman()
+      write(user ";\n")
+      self.code-node.write-spaces()
+      
+      if self.left-expression.access != ACCESS-OWNER
+        write(user "MR_inc_ref(")
+        self.left-expression.write-refman()
+        write(user ");\n")
+        self.code-node.write-spaces()
+        
+      else-if self.right-expression.result-type.type-data != glob.type-empty
+        self.right-expression.write-refman()
+        write(user " = NULL;\n")
+        self.code-node.write-spaces()
+    
+    if self.left-expression.result-type.type-data.is-dynamic
+      # also assign Dynamic
       self.left-expression.write-dynamic()
       write(user " = ")
       self.right-expression.write-dynamic()
       write(user ";\n")
       self.code-node.write-spaces()
+    
   
   func dynamic write()
     self.write-start()
@@ -227,6 +278,13 @@ class BinaryExpression(UnaryExpression)
     self.write-end()
     if expand-and
       write(user ")")
+    if self.operator.order = 4 and self.operator.group-index = 0 and
+        self.left-expression.access = ACCESS-OWNER and
+        self.right-expression.result-type.type-data != glob.type-empty
+      # ownership pass
+      self.code-node.write-spaces()
+      self.right-expression.write()
+      write(user " = NULL;\n")
 
 
 ## An expression with the "?" operator
@@ -254,14 +312,17 @@ class QuestionExpression(Expression)
           user "cannot use \"?\" on type",
           user self.tested.result-type.type-data.name)
     self.set-simple-type(user glob.type-bool)
+    self.access := ACCESS-VAR
   
   func dynamic write-preactions()
     self.tested.write-preactions()
   
   func dynamic write()
+    # `tested` != NULL && `tested`_Refman->value != NULL
     if not self.top
       write(user "(")
-    self.tested.write()
-    write(user " != NULL")
+    write(user "!(")
+    self.tested.write-validate-ref()
+    write(user ")")
     if not self.top
       write(user ")")

@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file18_name = "syntax-tree/node.3.mr";
+static char* _mr_file20_name = "syntax-tree/node.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file18_name
+#define MR_FILE_NAME _mr_file20_name
 
 /*  MR4 compiler - Syntax tree basic node types
 
@@ -42,11 +42,11 @@ Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, I
 static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_get_access
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
-  {int n; for (n = (0); n < (4); ++n) {
+  {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool89;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool89)) )
-    if (_Bool89) {
+    Bool _Bool90;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool90)) )
+    if (_Bool90) {
       (*access) = n;
       return OK;
     }
@@ -79,13 +79,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(28)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char90;
-    CHECK(30, read_c(&(_Char90)) )
-    CHECK(30, String_append(actual_text, _Char90) )
+    Char _Char91;
+    CHECK(30, read_c(&(_Char91)) )
+    CHECK(30, String_append(actual_text, _Char91) )
   }}
-  Bool _Bool91;
-  CHECK(31, String_equal(actual_text, expected_text, &(_Bool91)) )
-  if (!_Bool91) {
+  Bool _Bool92;
+  CHECK(31, String_equal(actual_text, expected_text, &(_Bool92)) )
+  if (!_Bool92) {
     CHECK(32, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);
@@ -449,10 +449,12 @@ Func NodeWriteAction__dtl[] = {(void*)NodeWriteAction_m_action};
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -463,6 +465,7 @@ Func NodeWriteAction__dtl[] = {(void*)NodeWriteAction_m_action};
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)

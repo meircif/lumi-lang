@@ -35,8 +35,8 @@ class TopType(MiddleType)
     self.num-mid := self.num-base
     self.top-base-ref := self.top-mid-ref
     self.top-base-ref := self
-    user MiddleType mt(var self)
-    user BaseType bt(var mt)
+    user MiddleType mt(user self)
+    user BaseType bt(user mt)
     test-mid-out()->(user bt)
 
 
@@ -66,7 +66,7 @@ func test-mid-out()->(user MiddleType mt)
   mt := new-mt
 
 
-mock TestStruct.get()->(copy Int x, user String s)
+mock TestStruct.get()->(var Int x, user String s)
   x := 12
   s := ""
 
@@ -76,9 +76,9 @@ mock f-test-int2str(copy Int x)->(owner String s)
 
 
 test test-func()
-  var TestStruct t
+  var TestStruct t(copy 0, user _)
   var Int x
-  t.get()->(copy x)
+  t.get()->(var x)
   assert x = 12
   assert-error f-test-int2str(copy 3)
 

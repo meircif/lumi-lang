@@ -166,7 +166,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
   
   func inst write-test-main()
     write(user "\nUSER_MAIN_HEADER {\n")
-    write(user "  Bool success = true;\n")
+    write(user "  Bool MR_success = true;\n")
     user NameMapNode{SyntaxTreeTestFunction} node(glob.test-functions.first)
     do
       write(user "  RUN_TEST(")
@@ -174,7 +174,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       write(user ");\n")
       node := node.next
       while ? node
-    write(user "  return success? OK : FAIL;\n")
+    write(user "  return MR_success? OK : FAIL;\n")
     write(user "}\n")
     write(user "\nTEST_MAIN_FUNC\n")
 

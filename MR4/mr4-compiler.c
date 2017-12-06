@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file23_name = "mr4-compiler.3.mr";
+static char* _mr_file26_name = "mr4-compiler.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file23_name
+#define MR_FILE_NAME _mr_file26_name
 
 /*  MR4 compiler main - written in MR3
 
@@ -53,10 +53,12 @@ MAIN_FUNC
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -68,6 +70,7 @@ MAIN_FUNC
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

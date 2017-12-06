@@ -2,7 +2,7 @@
 
 ## Function node in the syntax tree
 class SyntaxTreeFunction(SyntaxTreeBlock)
-  owner List{TypeCount} aux-variables-owner
+  owner List{TypeCount} aux-variables
   user TypeData parent-type
   owner String name
   owner FunctionArguments arguments
@@ -35,15 +35,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst init()
     self.set-location()
-    new List{TypeCount} in self.aux-variables-owner
-    self.aux-variables := self.aux-variables-owner
+    new List{TypeCount} in self.aux-variables
   
   func inst parse-body():(copy Char end)
     self.indentation-spaces += 2
     self.parse-block():(copy end)
-    if not self.m-has-end-point()
-      self.code-nodes.add(
-          owner SyntaxTreeReturn.parse-new(var _, user self):(copy end))
     self.indentation-spaces := 2
   
   func inst parse-header():(copy Char end)
@@ -87,6 +83,41 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func dynamic get-function():(user SyntaxTreeFunction function)
     function := self
   
+  func inst add-aux-variable(
+      copy Int access, copy Bool is-create, user TypeInstance type-instance):(
+      user SyntaxTreeVariable new-variable)
+    var Int index(0)
+    user ListNode{TypeCount} node(self.aux-variables.first)
+    do
+      while ? node
+      while node.item.type-data != type-instance.type-data
+      node := node.next
+    if ? node
+      node.item.count += 1
+      index := node.item.count
+    else
+      new TypeCount type-count
+      type-count.type-data := type-instance.type-data
+      self.aux-variables.add(owner type-count)
+    new SyntaxTreeVariable variable
+    new String{type-instance.type-data.name.length +
+        21} in variable.name
+    variable.name.copy(user "aux_")
+    variable.name.concat(user type-instance.type-data.name)
+    variable.name.append(copy '_')
+    var String{16} index-str
+    index.str(user index-str)
+    variable.name.concat(user index-str)
+    variable.parent := self
+    if access = ACCESS-COPY
+      variable.access := ACCESS-VAR
+    else
+      variable.access := access
+    variable.is-create := is-create
+    type-instance.copy-new():(owner variable.type-instance)
+    new-variable := variable
+    self.variables.add(owner variable)
+  
   func dynamic find-variable(user String name):(
       user SyntaxTreeVariable variable)
     base.find-variable(user name):(user variable)
@@ -126,6 +157,60 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-cname()
     self.arguments.write()
   
+  func inst write-block()
+    # `previous-text` {
+    #   Returncode MR_err = OK;
+    #   `block...`
+    # MR_cleanup:
+    #   return MR_err;
+    # }
+    self.write-block-start()
+    write(user "  Returncode MR_err = OK;\n")
+    base.write()
+    self.write-setup()
+    self.write-children(user self.code-nodes)
+    write(user "MR_cleanup:\n")
+    self.write-cleanup()
+    write(user "  return MR_err;\n")
+    self.write-block-end()
+  
+  func inst write-setup()
+    user ListNode{Argument} node(self.arguments.parameters.first)
+    do
+      while ? node
+      if node.item.access = ACCESS-USER or node.item.access = ACCESS-OWNER
+        write(user "  MR_inc_ref(")
+        write-cname(user node.item.get-variable().name)
+        write(user "_Refman);\n")
+      node := node.next
+  
+  func inst write-cleanup()
+    user ListNode{SyntaxTreeVariable} var-node(self.variables.last)
+    do
+      while ? var-node
+      if not var-node.item.type-instance.type-data.is-primitive
+        write(user "  MR_")
+        if var-node.item.access = ACCESS-OWNER
+          write(user "owner_")
+        write(user "dec_ref(")
+        write-cname(user var-node.item.name)
+        write(user "_Refman);\n")
+      var-node := var-node.prev
+    
+    user ListNode{Argument} param-node(self.arguments.parameters.last)
+    do
+      while ? param-node
+      if param-node.item.access = ACCESS-USER or
+          param-node.item.access = ACCESS-OWNER
+        write(user "  MR_")
+        if param-node.item.access = ACCESS-OWNER
+          write(user "owner_")
+        write(user "dec_ref(")
+        write-cname(user param-node.item.get-variable().name)
+        write(user "_Refman);\n")
+      param-node := param-node.prev
+    
+  
   func inst write-cname()
     if ? self.parent-type
       write-cname(user self.parent-type.name)
@@ -155,6 +240,12 @@ func write-pre-func(user SyntaxTreeFunction self)
 func write-post-func()
     write(user "#undef MR_FILE_NAME\n")
     write(user "#undef MR_FUNC_NAME\n")
+
+
+## Count occurrences of a specific type
+static TypeCount
+  user TypeData type-data
+  var Int count
 
 
 ## Constructor declaration in the syntax tree
@@ -225,7 +316,10 @@ class DeclarationArgument(Argument)
   
   func dynamic copy-new():(owner DeclarationArgument new-argument)
     new DeclarationArgument in new-argument
+    new-argument.input-file-name := self.input-file-name
+    new-argument.line-number := self.line-number
     new-argument.access := self.access
+    new-argument.is-output := self.is-output
     new SyntaxTreeVariable in new-argument.variable
     new-argument.variable.access := self.variable.access
     self.variable.type-instance.copy-new():(
@@ -247,9 +341,15 @@ class DeclarationArgument(Argument)
   
   func dynamic analyze()
     if self.variable.type-instance.type-data.is-primitive
-      if self.access != ACCESS-COPY
+      if self.is-output and self.access != ACCESS-VAR
         self.m-syntax-error2(
-            user "argument",
+            user "output",
+            user self.variable.name,
+            user "access should be \"var\" for primitive types, got",
+            user glob.access-names[self.access])
+      else-if not self.is-output and self.access != ACCESS-COPY
+        self.m-syntax-error2(
+            user "parameter",
             user self.variable.name,
             user "access should be \"copy\" for primitive types, got",
             user glob.access-names[self.access])
@@ -276,14 +376,25 @@ class DeclarationArgument(Argument)
       write(user ")")
       self.variable.type-instance.arguments.write()
       return
-    # `type`[*][*] `name`[, `type`_Dynamic*[*] `name`_Dynamic]
+    # `type`[*][*] `name`
+    # [, RefManager*[*] `name`_Refman]
+    # [, `type`_Dynamic*[*] `name`_Dynamic]
     write-cname(user self.variable.type-instance.type-data.name)
-    if self.access != ACCESS-COPY
+    if not self.variable.type-instance.type-data.is-primitive
       write(user "*")
     if self.is-output
       write(user "*")
     write(user " ")
     write-cname(user self.variable.name)
+    
+    if not self.variable.type-instance.type-data.is-primitive
+      write(user ", RefManager*")
+      if self.is-output
+        write(user "*")
+      write(user " ")
+      write-cname(user self.variable.name)
+      write(user "_Refman")
+    
     if self.variable.type-instance.type-data.is-dynamic
       write(user ", ")
       write-cname(user self.variable.type-instance.type-data.name)

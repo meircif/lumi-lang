@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file15_name = "syntax-tree/code.3.mr";
+static char* _mr_file17_name = "syntax-tree/code.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file15_name
+#define MR_FILE_NAME _mr_file17_name
 
 /* MR4 compiler - Syntax tree code nodes */
 
@@ -70,7 +70,7 @@ static char* _func_name_SyntaxTreeExpression_write = "SyntaxTreeExpression.write
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_write
 Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
   CHECK(24, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(25, (self->expression)->_base._dtl[5](self->expression) )
+  CHECK(25, (self->expression)->_base._dtl[6](self->expression) )
   CHECK(26, (self->expression)->_base._dtl[2](self->expression) )
   return OK;
 }
@@ -126,7 +126,7 @@ static char* _func_name_SyntaxTreeReturn_write = "SyntaxTreeReturn.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeReturn_write
 Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self) {
   CHECK(42, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(43, write(&(String){12, 11, "return OK;\n"}) )
+  CHECK(43, write(&(String){18, 17, "goto MR_cleanup;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -253,7 +253,7 @@ static char* _func_name_SyntaxTreeWhile_write = "SyntaxTreeWhile.write";
 Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
   /* if (!(`condition`) break; */
   CHECK(84, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(85, (self->condition)->_base._dtl[5](self->condition) )
+  CHECK(85, (self->condition)->_base._dtl[6](self->condition) )
   CHECK(86, write(&(String){7, 6, "if (!("}) )
   CHECK(87, (self->condition)->_base._dtl[2](self->condition) )
   CHECK(88, write(&(String){11, 10, ")) break;\n"}) )
@@ -336,10 +336,12 @@ Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)Synta
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -350,6 +352,7 @@ Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)Synta
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)

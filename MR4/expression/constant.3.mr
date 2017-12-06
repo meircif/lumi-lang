@@ -73,6 +73,7 @@ class IntExpression(TextExpression)
     else-if not f-is-decimal(user number)
       self.m-syntax-error(user "illegal number", user text)
     self.set-simple-type(user glob.type-int)
+    self.access := ACCESS-VAR
     self.text := text
 
 
@@ -111,12 +112,13 @@ class CharExpression(TextExpression)
     if text[text.length - 1] != '\''
       self.m-syntax-error(user "illegal character constant", user text)
     self.set-simple-type(user glob.type-char)
+    self.access := ACCESS-VAR
     self.text := text
 
 
 ## Constant string expression
 class StringExpression(TextExpression)
-  owner Expression symbol
+  owner SymbolExpression symbol
   
   func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
       owner Expression expression)
@@ -131,33 +133,37 @@ class StringExpression(TextExpression)
     if text[text.length - 1] != '\"'
       self.m-syntax-error(user "illegal string constant", user text)
     self.set-simple-type(user glob.type-string)
+    self.access := ACCESS-VAR
     self.text := text
   
   func dynamic analyze()
-    self.add-aux-variable(copy ACCESS-AUX, user self.result-type):(
+    self.add-aux-variable(copy ACCESS-VAR, copy false, user self.result-type):(
         owner self.symbol)
   
   func dynamic write-preactions()
-    # `symbol`.max_length = `string-length + 1`;
-    # `symbol`.length = `string-length`;
-    # `symbol`.values = "`text`";
+    # `symbol`_Var.max_length = `string-length + 1`;
+    # `symbol`_Var.length = `string-length`;
+    # `symbol`_Var.values = "`text`";
+    self.write-init-var-ref(user self.symbol)
+    self.write-refman-init(user self.symbol)
     var Int real-length(1)
     for index in 1:self.text.length - 1
       if self.text[index] = '\\'
         index += 1
       real-length := real-length + 1
+    self.code-node.write-spaces()
     self.symbol.write()
-    write(user "->max_length = ")
+    write(user "_Var.max_length = ")
     write-int(copy real-length)
     write(user ";\n")
     self.code-node.write-spaces()
     self.symbol.write()
-    write(user "->length = ")
+    write(user "_Var.length = ")
     write-int(copy real-length - 1)
     write(user ";\n")
     self.code-node.write-spaces()
     self.symbol.write()
-    write(user "->values = ")
+    write(user "_Var.values = ")
     write(user self.text)
     write(user ";\n")
     self.code-node.write-spaces()
@@ -169,13 +175,21 @@ class StringExpression(TextExpression)
 ## Constant empty expression `_`
 class EmptyExpression(Expression)
   func inst parse-new(owner String text):(owner Expression expression)
-    new EmptyExpression in expression
-    expression.set-location()
-    expression.set-simple-type(user glob.type-empty)
+    new EmptyExpression empty-expression
+    empty-expression.init()
+    expression := empty-expression
     delete text
+  
+  func inst init()
+    self.set-location()
+    self.set-simple-type(user glob.type-empty)
+    self.access := ACCESS-OWNER
   
   func dynamic write()
     write(user "NULL")
   
   func dynamic write-dynamic()
+    self.write()
+  
+  func dynamic write-refman()
     self.write()

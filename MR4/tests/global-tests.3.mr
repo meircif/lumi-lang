@@ -4,11 +4,17 @@
 
 var String{1024} mock-print-text
 var String{1024} mock-input-file-text
-var String{4096} mock-output-file-text
+var String{8192} mock-output-file-text
 var Int mock-input-file-index
 var Int mock-input-line-reset-index
 var Bool mock-print-active
 var Char mock-output-file-last
+
+owner File input-file
+owner File actual-output-file
+owner File expected-output-file
+var Bool tests-passed
+var Bool had-test-error
 
 mock print(user String text)
   if mock-print-active
@@ -79,22 +85,29 @@ func f-setup-test()
 # string assertion
 
 func f-assert-string-slice(
-    user String expected, user String actual, copy Int start, copy Int length)
+    user String expected,
+    user String actual,
+    copy Int start,
+    copy Int slice-length,
+    copy Bool is-main)
   user String actual-slice("")
-  if actual.length >= start + length
-    actual-slice := actual[start:length]
-    if actual-slice.equal(user expected)
-      return
+  if actual.length >= start + slice-length
+    actual-slice := actual[start:slice-length]
   else-if actual.length > start
     actual-slice := actual[start:actual.length - start]
-  sys.print-raw(user "[expected `")
+  if is-main
+    actual-output-file.write(user actual-slice)
+    actual-output-file.write(user "\n")
+  if actual-slice.equal(user expected)
+    return
+  sys.print-raw(user "\n  [expected `")
   sys.print-raw(user expected)
   sys.print-raw(user "`, got `")
   sys.print-raw(user actual-slice)
   sys.print-raw(user "`] ")
   write-new-file(user "expected.txt", user expected)
   write-new-file(user "actual.txt", user actual-slice)
-  assert false
+  tests-passed := false
 
 func write-new-file(user String filename, user String data)
   owner File file
@@ -104,7 +117,146 @@ func write-new-file(user String filename, user String data)
 
 func f-assert-string(user String expected, user String actual)
   assert ? actual
-  f-assert-string-slice(user expected, user actual, copy 0, copy actual.length)
+  f-assert-string-slice(
+      user expected, user actual, copy 0, copy actual.length, copy false)
+
+
+func set-test-file-name(
+    user String filename, user String base-name, user String suffix)
+  var String{1024} base-dir
+  if sys.getenv(user "TEST_DIR", user base-dir)
+    filename.copy(user base-dir)
+  filename.concat(user base-name)
+  filename.concat(user suffix)
+
+
+func test-new-file(user String base-name, user String name)
+  var String{256} filename
+  set-test-file-name(user filename, user base-name, user ".4.mr")
+  file-open-read(user filename):(owner input-file)
+  set-test-file-name(user filename, user base-name, user ".expected.c")
+  file-open-read(user filename):(owner expected-output-file)
+  set-test-file-name(user filename, user base-name, user ".actual.c")
+  file-open-write(user filename):(owner actual-output-file)
+  
+  had-test-error := false
+  var String{1024} line
+  if not read-line(user input-file, user line, user "## @@ ")
+    file-error(user name, user line)
+  if not read-line(user expected-output-file, user line, user "/// @@ ")
+    file-error(user name, user line)
+  test-from-file(user name)
+
+
+func test-from-file(user String name)
+  var String{1024} line
+  var String{1024} subname("start")
+  if had-test-error
+    do
+      while not read-line(user input-file, user line, user "## @@ ")
+    do
+      while not read-line(user expected-output-file, user line, user "/// @@ ")
+  had-test-error := true
+  read-line(user input-file, user line, user _)
+  if not line.equal(user name)
+    file-error(user name, user line)
+  read-line(user expected-output-file, user line, user _)
+  if not line.equal(user name)
+    file-error(user name, user line)
+  actual-output-file.write(user "/// @@ ")
+  actual-output-file.write(user name)
+  actual-output-file.write(user "\n")
+  
+  var String{4096} input
+  var String{4096} expected
+  if not read-line(user input-file, user line, user "## @ ")
+    file-error(user name, user line)
+  if not read-line(user expected-output-file, user line, user "/// @ ")
+    file-error(user name, user line)
+  
+  var Char type-char
+  var Bool is-error-test
+  tests-passed := true
+  do
+    input-file.getc():(copy type-char)
+    is-error-test := type-char = 'e'
+    if is-error-test
+      input-file.getc():(copy type-char)
+    if type-char != 'g' and type-char != 'c'
+      file-error(user name, user subname)
+    if input-file.getc() != ' '
+      file-error(user name, user subname)
+    read-line(user input-file, user subname, user _)
+    read-line(user expected-output-file, user line, user _)
+    if not line.equal(user subname)
+      file-error(user name, user subname)
+    actual-output-file.write(user "/// @ ")
+    actual-output-file.write(user subname)
+    actual-output-file.write(user "\n")
+    
+    read-data(user input-file, user input, user "## @")
+    read-data(user expected-output-file, user expected, user "/// @")
+    if type-char = 'c'
+      if is-error-test
+        test-code-error(user input, user expected)
+      else
+        test-code(user input, user expected)
+    else
+      if is-error-test
+        test-global-scope-error(user input, user expected)
+      else
+        test-global-scope(user input, user expected)
+    
+    expected-output-file.getc()
+    while input-file.getc() = ' '
+  
+  expected-output-file.getc()
+  if input-file.getc() = EOF
+    if expected-output-file.getc() != EOF
+      file-error(user name, user subname)
+    actual-output-file.write(user "/// @\n")
+    input-file.close()
+    expected-output-file.close()
+    actual-output-file.close()
+  
+  had-test-error := false
+  assert tests-passed
+
+func read-line(user File file, user String line, user String prefix):(
+    copy Bool found-prefix)
+  line.clear()
+  found-prefix := false
+  var Char ch
+  do
+    file.getc():(copy ch)
+    while ch != EOF and ch != '\n'
+    line.append(copy ch)
+    if ? prefix and not found-prefix
+      if line.equal(user prefix)
+        found-prefix := true
+        return
+  if ch = EOF and line.length = 0
+    raise
+
+
+func read-data(user File file, user String data, user String prefix)
+  data.clear()
+  var String{1024} line
+  do
+    while not read-line(user file, user line, user prefix)
+    if data.length > 0
+      data.append(copy '\n')
+    data.concat(user line)
+
+
+func file-error(user String name, user String subname)
+  sys.print-raw(user "file format error in [")
+  sys.print-raw(user name)
+  if ? subname
+    sys.print-raw(user "] / [")
+    sys.print-raw(user subname)
+  sys.print(user "]")
+  raise
 
 
 # List tests

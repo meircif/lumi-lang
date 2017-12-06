@@ -40,7 +40,7 @@ class SyntaxTreeReturn(SyntaxTreeCode)
   
   func dynamic write()
     self.write-spaces()
-    write(user "return OK;\n")
+    write(user "goto MR_cleanup;\n")
 
 
 ## Raise statement in the syntax tree

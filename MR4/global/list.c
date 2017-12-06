@@ -39,10 +39,11 @@ static char* _func_name_List_add = "List.add";
 Returncode List_add(List* self, void* item) {
   ListNode* node = malloc(sizeof(ListNode));
   if (node == NULL) RAISE(12)
-  *node = (ListNode){NULL, NULL};
+  *node = (ListNode){NULL, NULL, NULL};
   node->item = item;
   if (NULL != self->last) {
     self->last->next = node;
+    node->prev = self->last;
   }
   else {
     self->first = node;
@@ -59,8 +60,8 @@ static char* _func_name_List_prepend = "List.prepend";
 #define MR_FUNC_NAME _func_name_List_prepend
 Returncode List_prepend(List* self, void* item) {
   ListNode* node = malloc(sizeof(ListNode));
-  if (node == NULL) RAISE(21)
-  *node = (ListNode){NULL, NULL};
+  if (node == NULL) RAISE(22)
+  *node = (ListNode){NULL, NULL, NULL};
   node->item = item;
   node->next = self->first;
   self->first = node;
@@ -82,7 +83,10 @@ Returncode List_pop(List* self, void** item) {
     ListNode* first = self->first;
     self->first = first->next;
     free(first);
-    if (!(NULL != self->first)) {
+    if (NULL != self->first) {
+      self->first->prev = NULL;
+    }
+    else {
       self->last = NULL;
     }
   }
@@ -100,6 +104,7 @@ typedef struct ListNode ListNode;
 #elif MR_STAGE == MR_TYPES(0)
 struct ListNode {
   ListNode* next;
+  ListNode* prev;
   void* item;
 };
 #endif
@@ -113,10 +118,12 @@ struct ListNode {
 #include "global/file-io.c"
 #include "global/global.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -128,6 +135,7 @@ struct ListNode {
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)

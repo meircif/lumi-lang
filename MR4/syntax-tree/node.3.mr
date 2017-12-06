@@ -13,7 +13,7 @@ class SyntaxTreeNode
     self.line-number := glob.line-number
   
   func inst get-access(user String access-str):(copy Int access)
-    for n in 4
+    for n in 1:5
       if glob.access-names[n].equal(user access-str)
         access := n
         return

@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file20_name = "syntax-tree/test.3.mr";
+static char* _mr_file22_name = "syntax-tree/test.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file20_name
+#define MR_FILE_NAME _mr_file22_name
 
 /* MR4 compiler - Syntax tree testing nodes */
 
@@ -67,7 +67,7 @@ static char* _func_name_SyntaxTreeAssert_write = "SyntaxTreeAssert.write";
 Returncode SyntaxTreeAssert_write(SyntaxTreeAssert* self) {
   /* TEST_ASSERT(`line`, `tested`) */
   CHECK(22, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(23, (self->tested)->_base._dtl[5](self->tested) )
+  CHECK(23, (self->tested)->_base._dtl[6](self->tested) )
   CHECK(24, write(&(String){13, 12, "TEST_ASSERT("}) )
   CHECK(25, SyntaxTreeNode_write_line_num(&(self->_base._base)) )
   CHECK(26, write(&(String){3, 2, ", "}) )
@@ -146,9 +146,9 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
   CHECK(53, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
   CHECK(54, write(&(String){35, 34, "#define RETURN_ERROR(value) break\n"}) )
   CHECK(55, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(56, (self->tested)->_base._dtl[5](self->tested) )
+  CHECK(56, (self->tested)->_base._dtl[6](self->tested) )
   CHECK(57, write(&(String){22, 21, "\n#undef RETURN_ERROR\n"}) )
-  CHECK(58, write(&(String){42, 41, "#define RETURN_ERROR(value) return value\n"}) )
+  CHECK(58, write(&(String){61, 60, "#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup\n"}) )
   CHECK(59, SyntaxTreeCode_write_spaces(&(self->_base)) )
   CHECK(60, write(&(String){27, 26, "MR_trace_stream = stdout;\n"}) )
   CHECK(61, SyntaxTreeCode_write_spaces(&(self->_base)) )
@@ -158,6 +158,8 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
   self->_base.parent->_base.indentation_spaces -= 2;
   CHECK(66, SyntaxTreeCode_write_spaces(&(self->_base)) )
   CHECK(67, write(&(String){18, 17, "} while (false);\n"}) )
+  CHECK(68, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(69, write(&(String){27, 26, "MR_trace_stream = stdout;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -185,10 +187,10 @@ static char* _func_name_SyntaxTreeTestFunction_parse_new = "SyntaxTreeTestFuncti
 #define MR_FUNC_NAME _func_name_SyntaxTreeTestFunction_parse_new
 Returncode SyntaxTreeTestFunction_parse_new(SyntaxTreeTestFunction* self, Char* end, SyntaxTreeTestFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeTestFunction));
-  if ((*new_node) == NULL) RAISE(73)
-  *(*new_node) = (SyntaxTreeTestFunction){SyntaxTreeTestFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
+  if ((*new_node) == NULL) RAISE(75)
+  *(*new_node) = (SyntaxTreeTestFunction){SyntaxTreeTestFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeTestFunction__dtl;
-  CHECK(74, SyntaxTreeTestFunction_parse((*new_node), &((*end))) )
+  CHECK(76, SyntaxTreeTestFunction_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -199,11 +201,11 @@ Returncode SyntaxTreeTestFunction_parse(SyntaxTreeTestFunction* self, Char* end)
 static char* _func_name_SyntaxTreeTestFunction_parse = "SyntaxTreeTestFunction.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeTestFunction_parse
 Returncode SyntaxTreeTestFunction_parse(SyntaxTreeTestFunction* self, Char* end) {
-  CHECK(77, SyntaxTreeFunction_parse(&(self->_base), NULL, &((*end))) )
+  CHECK(79, SyntaxTreeFunction_parse(&(self->_base), NULL, &((*end))) )
   if ((NULL != self->_base.arguments->parameters->first) || (NULL != self->_base.arguments->outputs->first)) {
-    CHECK(79, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){36, 35, "test function cannot have arguments"}) )
+    CHECK(81, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){36, 35, "test function cannot have arguments"}) )
   }
-  CHECK(80, NameMap_add(glob->test_functions, self->_base.name, self) )
+  CHECK(82, NameMap_add(glob->test_functions, self->_base.name, self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -233,10 +235,10 @@ static char* _func_name_SyntaxTreeMockFunction_parse_new = "SyntaxTreeMockFuncti
 #define MR_FUNC_NAME _func_name_SyntaxTreeMockFunction_parse_new
 Returncode SyntaxTreeMockFunction_parse_new(SyntaxTreeMockFunction* self, Char* end, SyntaxTreeMockFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMockFunction));
-  if ((*new_node) == NULL) RAISE(89)
-  *(*new_node) = (SyntaxTreeMockFunction){SyntaxTreeMockFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, NULL};
+  if ((*new_node) == NULL) RAISE(91)
+  *(*new_node) = (SyntaxTreeMockFunction){SyntaxTreeMockFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, NULL};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMockFunction__dtl;
-  CHECK(90, SyntaxTreeMockFunction_parse((*new_node), &((*end))) )
+  CHECK(92, SyntaxTreeMockFunction_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -247,20 +249,20 @@ Returncode SyntaxTreeMockFunction_parse(SyntaxTreeMockFunction* self, Char* end)
 static char* _func_name_SyntaxTreeMockFunction_parse = "SyntaxTreeMockFunction.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeMockFunction_parse
 Returncode SyntaxTreeMockFunction_parse(SyntaxTreeMockFunction* self, Char* end) {
-  CHECK(93, SyntaxTreeFunction_parse(&(self->_base), NULL, &((*end))) )
+  CHECK(95, SyntaxTreeFunction_parse(&(self->_base), NULL, &((*end))) )
   Int index = 0;
-  CHECK(95, String_find(self->_base.name, &(String){2, 1, "."}, &(index)) )
+  CHECK(97, String_find(self->_base.name, &(String){2, 1, "."}, &(index)) )
   if (index < self->_base.name->length) {
-    if ((0) < 0 || (index) < 0 || (0) + (index) > (self->_base.name)->length) RAISE(97)
-    CHECK(97, string_new_copy((&(String){index, index, (self->_base.name)->values + (0)}), &(self->type_name)) )
-    if ((index + 1) < 0 || (self->_base.name->length - index - 1) < 0 || (index + 1) + (self->_base.name->length - index - 1) > (self->_base.name)->length) RAISE(98)
-    CHECK(98, string_new_copy((&(String){self->_base.name->length - index - 1, self->_base.name->length - index - 1, (self->_base.name)->values + (index + 1)}), &(self->mocked_name)) )
+    if ((0) < 0 || (index) < 0 || (0) + (index) > (self->_base.name)->length) RAISE(99)
+    CHECK(99, string_new_copy((&(String){index, index, (self->_base.name)->values + (0)}), &(self->type_name)) )
+    if ((index + 1) < 0 || (self->_base.name->length - index - 1) < 0 || (index + 1) + (self->_base.name->length - index - 1) > (self->_base.name)->length) RAISE(100)
+    CHECK(100, string_new_copy((&(String){self->_base.name->length - index - 1, self->_base.name->length - index - 1, (self->_base.name)->values + (index + 1)}), &(self->mocked_name)) )
     free(self->_base.name);
   }
   else {
     self->mocked_name = self->_base.name;
   }
-  CHECK(103, string_new_concat(&(String){6, 5, "Mock "}, self->mocked_name, &(self->_base.name)) )
+  CHECK(105, string_new_concat(&(String){6, 5, "Mock "}, self->mocked_name, &(self->_base.name)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -284,26 +286,26 @@ static char* _func_name_SyntaxTreeMockFunction_analyze = "SyntaxTreeMockFunction
 Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
   SyntaxTreeFunction* mocked_func = NULL;
   if (NULL != self->type_name) {
-    CHECK(111, SyntaxTreeNode_find_type(&(self->_base._base._base._base), self->type_name, &(self->_base.parent_type)) )
-    Int _Int105;
-    CHECK(112, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int105)) )
+    CHECK(113, SyntaxTreeNode_find_type(&(self->_base._base._base._base), self->type_name, &(self->_base.parent_type)) )
+    Int _Int106;
+    CHECK(114, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int106)) )
     if (!(NULL != mocked_func)) {
-      CHECK(114, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base._base), &(String){23, 22, "mocking unknown method"}, self->mocked_name, &(String){8, 7, "of type"}, self->type_name) )
+      CHECK(116, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base._base), &(String){23, 22, "mocking unknown method"}, self->mocked_name, &(String){8, 7, "of type"}, self->type_name) )
     }
-    TypeInstance* _TypeInstance106;
-    CHECK(119, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance106)) )
-    CHECK(119, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance106) )
+    TypeInstance* _TypeInstance107;
+    CHECK(121, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance107)) )
+    CHECK(121, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance107) )
   }
   else {
-    CHECK(122, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
+    CHECK(124, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
     if (!(NULL != mocked_func)) {
-      CHECK(124, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
+      CHECK(126, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
     }
   }
-  Bool _Bool107;
-  CHECK(126, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool107)) )
+  Bool _Bool108;
+  CHECK(128, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool108)) )
   mocked_func->mocker_function = self;
-  CHECK(128, SyntaxTreeFunction_analyze(&(self->_base)) )
+  CHECK(130, SyntaxTreeFunction_analyze(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -325,10 +327,12 @@ Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_link_types, (voi
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -339,6 +343,7 @@ Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_link_types, (voi
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)

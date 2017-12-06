@@ -12,7 +12,6 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.parent := parent
     self.block.parent := parent
     self.block.indentation-spaces := parent.indentation-spaces + 2
-    self.block.aux-variables := parent.aux-variables
     self.block.is-in-loop := parent.is-in-loop
   
   func inst parse-block(user SyntaxTreeBlock parent, copy Bool is-loop):(

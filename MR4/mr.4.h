@@ -36,25 +36,6 @@ typedef Returncode (*Func)();
 
 typedef FILE File;
 
-typedef struct {
-  Array* argv;
-} Sys;
-
-#define MANAGER_TYPEDEF(type) \
-typedef struct { int ref_count; type* ref; } type##_Manager;
-
-#define STATIC_REF_TYPEDEF(type) \
-MANAGER_TYPEDEF(type) \
-typedef struct { type##_Manager* manager; } type##_ManagerRef; \
-typedef struct { type##_Manager* manager; type* ref; } type##_WeakRef;
-
-#define DYNAMIC_REF_TYPEDEF(type) \
-MANAGER_TYPEDEF(type) \
-typedef struct { type##_Manager* manager; type##_Dtl* dtl; } \
-type##_ManagerRef; \
-typedef struct { type##_Manager* manager; type* ref; type##_Dtl* dtl; } \
-type##_WeakRef;
-
 
 extern char* MR_raise_format;
 extern char* MR_assert_format;
@@ -66,7 +47,7 @@ void MR_trace_print(
   int line,
   char const* funcname);
 
-#define RETURN_ERROR(value) return value
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
 
 #define START_TRACE(line, value, format) { \
   MR_trace_print(format, MR_FILE_NAME, line, MR_FUNC_NAME); \
@@ -82,7 +63,7 @@ void MR_trace_print(
 
 #define TEST_ASSERT(line, condition) if (!(condition)) TEST_FAIL(line)
 
-#define RUN_TEST(test_func) success &= MR_run_test(#test_func, test_func)
+#define RUN_TEST(test_func) MR_success &= MR_run_test(#test_func, test_func)
 
 int MR_main(int argc, char* argv[]);
 int MR_test_main(int argc, char* argv[]);
@@ -95,6 +76,16 @@ int MR_test_main(int argc, char* argv[]);
 #define TEST_MAIN_FUNC MAIN_PROXY(MR_test_main)
 #define USER_MAIN_HEADER Returncode MR_user_main()
 
+typedef struct {
+  int count;
+  void* value;
+} RefManager;
+
+RefManager* MR_new_ref(void* value);
+void MR_inc_ref(RefManager* ref);
+void MR_dec_ref(RefManager* ref);
+void MR_owner_dec_ref(RefManager* ref);
+
 String* MR_new_string(int length);
 Array* MR_new_array(int length, int value_size);
 Array* MR_new_string_array(int array_length, int string_length);
@@ -102,32 +93,46 @@ void MR_set_var_string_array(
   int array_length, int string_length, Array* array, char* chars);
 Bool MR_run_test(char* test_name, Func test_func);
 
-Returncode String_clear(String* this);
-Returncode String_length(String* this, Int* length);
-Returncode String_equal(String* this, String* other, Bool* equal);
-Returncode String_get(String* this, Int index, Char* ch);
-Returncode String_append(String* this, Char ch);
-Returncode String_new(String* this, String* source);
-Returncode String_concat(String* this, String* ext);
-Returncode String_concat_int(String* this, Int num);
-Returncode String_find(String* this, String* pattern, Int* index);
-Returncode String_has(String* this, Char ch, Bool* found);
+Returncode String_clear(String*, RefManager*);
+Returncode String_length(String*, RefManager*, Int* length);
+Returncode String_equal(
+  String*, RefManager*, String* other, RefManager*, Bool* equal);
+Returncode String_get(String*, RefManager*, Int index, Char* ch);
+Returncode String_append(String*, RefManager*, Char ch);
+Returncode String_new(String*, RefManager*, String* source, RefManager*);
+Returncode String_concat(String*, RefManager*, String* ext, RefManager*);
+Returncode String_concat_int(String*, RefManager*, Int num);
+Returncode String_find(
+  String*, RefManager*, String* pattern, RefManager*, Int* index);
+Returncode String_has(String*, RefManager*, Char ch, Bool* found);
 
-Returncode Int_str(Int value, String* str);
+Returncode Int_str(Int value, String* str, RefManager*);
 
-Returncode file_open_read(String* name, File** file);
-Returncode file_open_write(String* name, File** file);
-Returncode File_close(File* this);
-Returncode File_getc(File* this, Char* ch);
-Returncode File_putc(File* this, Char ch);
-Returncode File_write(File* this, String* line);
+Returncode file_open_read(
+  String* name, RefManager*, File** file, RefManager**);
+Returncode file_open_write(
+  String* name, RefManager*, File** file, RefManager**);
+Returncode File_close(File*, RefManager*);
+Returncode File_getc(File*, RefManager*, Char* ch);
+Returncode File_putc(File*, RefManager*, Char ch);
+Returncode File_write(File*, RefManager*, String* line, RefManager*);
 
+typedef struct {
+  Array* argv;
+  RefManager* argv_Refman;
+} Sys;
 extern Sys* sys;
-Returncode Sys_print(Sys*, String* text);
-Returncode Sys_println(Sys*, String* text);
-Returncode Sys_exit(Sys*, Int status);
-Returncode Sys_system(Sys*, String* command, Int* status);
-Returncode Sys_getenv(Sys*, String* name, String* value, Bool* exists);
+extern RefManager* sys_Refman;
+Returncode Sys_print(Sys*, RefManager*, String* text, RefManager*);
+Returncode Sys_println(Sys*, RefManager*, String* text, RefManager*);
+Returncode Sys_exit(Sys*, RefManager*, Int status);
+Returncode Sys_system(
+  Sys*, RefManager*, String* command, RefManager*, Int* status);
+Returncode Sys_getenv(
+  Sys*, RefManager*,
+  String* name, RefManager*,
+  String* value, RefManager*,
+  Bool* exists);
 
 
 #endif  /*MR_MR4_MR_4_H_INCLUDED_*/

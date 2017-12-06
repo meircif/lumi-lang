@@ -5,7 +5,7 @@ class SliceExpression(Expression)
   owner Expression sequence
   owner Expression index
   owner Expression second-index
-  owner Expression slice-symbol
+  owner SymbolExpression slice-symbol
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -18,6 +18,7 @@ class SliceExpression(Expression)
       copy Char end)
     self.code-node := code-node
     self.sequence := sequence
+    self.access := ACCESS-VAR
     self.set-location()
     parse-new-expression(user ":]", user code-node):(owner self.index, copy end)
     if end = ':'
@@ -51,7 +52,8 @@ class SliceExpression(Expression)
       self.second-index.analyze()
       self.check-index(user self.second-index)
       self.sequence.result-type.copy-new():(owner self.result-type)
-      self.add-aux-variable(copy ACCESS-AUX, user self.result-type):(
+      self.add-aux-variable(
+          copy ACCESS-VAR, copy false, user self.result-type):(
           owner self.slice-symbol)
   
   func inst check-index(user Expression index)
@@ -70,10 +72,13 @@ class SliceExpression(Expression)
     
     if ? self.second-index
       self.second-index.write-preactions()
+      self.write-init-var-ref(user self.slice-symbol)
+      self.write-refman-init(user self.slice-symbol)
       # symbol_Var.length = second;
       # symbol_Var.max_length = symbol.length + 1;
       # symbol_Var.values = (seq)->values + (index);
       # symbol_Var.values = (Byte*)((seq)->values) + (index);
+      self.code-node.write-spaces()
       self.slice-symbol.write()
       write(user "_Var.length = ")
       self.second-index.write()
@@ -97,6 +102,13 @@ class SliceExpression(Expression)
       self.index.write()
       write(user ");\n")
       self.code-node.write-spaces()
+    
+    # if (seq == NULL || seq_Refman->value == NULL) RAISE(line-num)
+    write(user "if (")
+    self.sequence.write-validate-ref()
+    write(user ") ")
+    self.write-raise()
+    self.code-node.write-spaces()
     
     # if ((index) < 0 || (index) >= (seq)->length) RAISE(line-num)
     # if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length)
@@ -156,3 +168,6 @@ class SliceExpression(Expression)
     write(user "&")
     write-cname(user self.result-type.type-data.name)
     write(user "_dynamic")
+  
+  func dynamic write-refman()
+    self.sequence.write-refman()

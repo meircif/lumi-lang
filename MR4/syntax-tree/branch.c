@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file14_name = "syntax-tree/branch.3.mr";
+static char* _mr_file16_name = "syntax-tree/branch.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file14_name
+#define MR_FILE_NAME _mr_file16_name
 
 /* MR4 compiler - Syntax tree node branch */
 
@@ -148,32 +148,39 @@ static char* _func_name_SyntaxTreeBranch_parse_if_common = "SyntaxTreeBranch.par
 #define MR_FUNC_NAME _func_name_SyntaxTreeBranch_parse_if_common
 Returncode SyntaxTreeBranch_parse_if_common(SyntaxTreeBranch* self, String* keyword, TypeData* parent_type, SyntaxTreeBlock* parent_block, Char* end, Bool* is_parsed) {
   (*is_parsed) = (*end) == ' ';
+  List* variables = self->variables;
+  if (NULL != parent_block) {
+    SyntaxTreeFunction* _SyntaxTreeFunction68;
+    CHECK(86, (parent_block)->_base._base._dtl[5](parent_block, &(_SyntaxTreeFunction68)) )
+    variables = _SyntaxTreeFunction68->_base._base.variables;
+  }
+  
   if (!(*is_parsed)) {
     return OK;
   }
   else {
-    Bool _Bool68;
-    CHECK(87, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool68)) )
-    if (_Bool68) {
-      SyntaxTreeVariable* _SyntaxTreeVariable69;
-      CHECK(88, SyntaxTreeVariable_parse_new(NULL, ACCESS_VAR, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable69)) )
-      CHECK(88, List_add(self->variables, _SyntaxTreeVariable69) )
+    Bool _Bool69;
+    CHECK(91, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool69)) )
+    if (_Bool69) {
+      SyntaxTreeVariable* _SyntaxTreeVariable70;
+      CHECK(92, SyntaxTreeVariable_parse_new(NULL, ACCESS_VAR, true, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable70)) )
+      CHECK(92, List_add(variables, _SyntaxTreeVariable70) )
     }
     else {
-      Bool _Bool70;
-      CHECK(91, String_equal(keyword, &(String){5, 4, "user"}, &(_Bool70)) )
-      if (_Bool70) {
-        SyntaxTreeVariable* _SyntaxTreeVariable71;
-        CHECK(92, SyntaxTreeVariable_parse_new(NULL, ACCESS_USER, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable71)) )
-        CHECK(92, List_add(self->variables, _SyntaxTreeVariable71) )
+      Bool _Bool71;
+      CHECK(99, String_equal(keyword, &(String){5, 4, "user"}, &(_Bool71)) )
+      if (_Bool71) {
+        SyntaxTreeVariable* _SyntaxTreeVariable72;
+        CHECK(100, SyntaxTreeVariable_parse_new(NULL, ACCESS_USER, false, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable72)) )
+        CHECK(100, List_add(variables, _SyntaxTreeVariable72) )
       }
       else {
-        Bool _Bool72;
-        CHECK(95, String_equal(keyword, &(String){6, 5, "owner"}, &(_Bool72)) )
-        if (_Bool72) {
-          SyntaxTreeVariable* _SyntaxTreeVariable73;
-          CHECK(96, SyntaxTreeVariable_parse_new(NULL, ACCESS_OWNER, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable73)) )
-          CHECK(96, List_add(self->variables, _SyntaxTreeVariable73) )
+        Bool _Bool73;
+        CHECK(107, String_equal(keyword, &(String){6, 5, "owner"}, &(_Bool73)) )
+        if (_Bool73) {
+          SyntaxTreeVariable* _SyntaxTreeVariable74;
+          CHECK(108, SyntaxTreeVariable_parse_new(NULL, ACCESS_OWNER, false, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable74)) )
+          CHECK(108, List_add(variables, _SyntaxTreeVariable74) )
           
         }
         else {
@@ -192,7 +199,7 @@ Returncode SyntaxTreeBranch_parse_child(SyntaxTreeBranch* self, String* keyword,
 static char* _func_name_SyntaxTreeBranch_parse_child = "SyntaxTreeBranch.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBranch_parse_child
 Returncode SyntaxTreeBranch_parse_child(SyntaxTreeBranch* self, String* keyword, Char* end) {
-  RAISE(104)
+  RAISE(120)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -206,9 +213,9 @@ Returncode SyntaxTreeBranch_find_variable(SyntaxTreeBranch* self, String* name, 
   ListNode* child = self->variables->first;
   while (true) {
     if (!(NULL != child)) break;
-    Bool _Bool74;
-    CHECK(112, SyntaxTreeVariable_find_variable(((SyntaxTreeVariable*)(child->item)), name, &((*variable)), &(_Bool74)) )
-    if (!(!_Bool74)) break;
+    Bool _Bool75;
+    CHECK(128, SyntaxTreeVariable_find_variable(((SyntaxTreeVariable*)(child->item)), name, &((*variable)), &(_Bool75)) )
+    if (!(!_Bool75)) break;
     child = child->next;
   }
   return OK;
@@ -221,7 +228,7 @@ Returncode SyntaxTreeBranch_link_types(SyntaxTreeBranch* self);
 static char* _func_name_SyntaxTreeBranch_link_types = "SyntaxTreeBranch.link-types";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBranch_link_types
 Returncode SyntaxTreeBranch_link_types(SyntaxTreeBranch* self) {
-  CHECK(116, SyntaxTreeNode_link_children_types(&(self->_base), self->variables) )
+  CHECK(132, SyntaxTreeNode_link_children_types(&(self->_base), self->variables) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -232,7 +239,7 @@ Returncode SyntaxTreeBranch_analyze(SyntaxTreeBranch* self);
 static char* _func_name_SyntaxTreeBranch_analyze = "SyntaxTreeBranch.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBranch_analyze
 Returncode SyntaxTreeBranch_analyze(SyntaxTreeBranch* self) {
-  CHECK(119, SyntaxTreeNode_analyze_children(&(self->_base), self->variables) )
+  CHECK(135, SyntaxTreeNode_analyze_children(&(self->_base), self->variables) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -243,7 +250,7 @@ Returncode SyntaxTreeBranch_write(SyntaxTreeBranch* self);
 static char* _func_name_SyntaxTreeBranch_write = "SyntaxTreeBranch.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBranch_write
 Returncode SyntaxTreeBranch_write(SyntaxTreeBranch* self) {
-  CHECK(122, SyntaxTreeNode_write_children(&(self->_base), self->variables) )
+  CHECK(138, SyntaxTreeNode_write_children(&(self->_base), self->variables) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -254,7 +261,7 @@ Returncode SyntaxTreeBranch_write_spaces(SyntaxTreeBranch* self);
 static char* _func_name_SyntaxTreeBranch_write_spaces = "SyntaxTreeBranch.write-spaces";
 #define MR_FUNC_NAME _func_name_SyntaxTreeBranch_write_spaces
 Returncode SyntaxTreeBranch_write_spaces(SyntaxTreeBranch* self) {
-  CHECK(125, write_spaces(self->indentation_spaces) )
+  CHECK(141, write_spaces(self->indentation_spaces) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -282,9 +289,9 @@ Returncode SyntaxTreeNamespace_init(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_init = "SyntaxTreeNamespace.init";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_init
 Returncode SyntaxTreeNamespace_init(SyntaxTreeNamespace* self) {
-  CHECK(133, SyntaxTreeBranch_init(&(self->_base)) )
+  CHECK(149, SyntaxTreeBranch_init(&(self->_base)) )
   self->functions = malloc(sizeof(List));
-  if (self->functions == NULL) RAISE(134)
+  if (self->functions == NULL) RAISE(150)
   *self->functions = (List){NULL, NULL};
   return OK;
 }
@@ -296,14 +303,14 @@ Returncode SyntaxTreeNamespace_parse_if_function(SyntaxTreeNamespace* self, Stri
 static char* _func_name_SyntaxTreeNamespace_parse_if_function = "SyntaxTreeNamespace.parse-if-function";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_parse_if_function
 Returncode SyntaxTreeNamespace_parse_if_function(SyntaxTreeNamespace* self, String* keyword, TypeData* parent_type, Char* end, Bool* is_func) {
-  CHECK(139, String_equal(keyword, &(String){5, 4, "func"}, &((*is_func))) )
+  CHECK(155, String_equal(keyword, &(String){5, 4, "func"}, &((*is_func))) )
   if ((*is_func)) {
     if ((*end) != ' ') {
-      CHECK(142, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){33, 32, "expected space after \"func\", got"}, (*end)) )
+      CHECK(158, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){33, 32, "expected space after \"func\", got"}, (*end)) )
     }
-    SyntaxTreeFunction* _SyntaxTreeFunction75;
-    CHECK(144, SyntaxTreeFunction_parse_new(NULL, parent_type, &((*end)), &(_SyntaxTreeFunction75)) )
-    CHECK(144, List_add(self->functions, _SyntaxTreeFunction75) )
+    SyntaxTreeFunction* _SyntaxTreeFunction76;
+    CHECK(160, SyntaxTreeFunction_parse_new(NULL, parent_type, &((*end)), &(_SyntaxTreeFunction76)) )
+    CHECK(160, List_add(self->functions, _SyntaxTreeFunction76) )
   }
   return OK;
 }
@@ -318,9 +325,9 @@ Returncode SyntaxTreeNamespace_find_function(SyntaxTreeNamespace* self, String* 
   ListNode* child = self->functions->first;
   while (true) {
     if (!(NULL != child)) break;
-    Bool _Bool76;
-    CHECK(151, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool76)) )
-    if (_Bool76) {
+    Bool _Bool77;
+    CHECK(167, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool77)) )
+    if (_Bool77) {
       (*function) = ((SyntaxTreeFunction*)(child->item));
       return OK;
     }
@@ -337,8 +344,8 @@ Returncode SyntaxTreeNamespace_link_types(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_link_types = "SyntaxTreeNamespace.link-types";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_link_types
 Returncode SyntaxTreeNamespace_link_types(SyntaxTreeNamespace* self) {
-  CHECK(158, SyntaxTreeBranch_link_types(&(self->_base)) )
-  CHECK(159, SyntaxTreeNode_link_children_types(&(self->_base._base), self->functions) )
+  CHECK(174, SyntaxTreeBranch_link_types(&(self->_base)) )
+  CHECK(175, SyntaxTreeNode_link_children_types(&(self->_base._base), self->functions) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -349,8 +356,8 @@ Returncode SyntaxTreeNamespace_analyze(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_analyze = "SyntaxTreeNamespace.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_analyze
 Returncode SyntaxTreeNamespace_analyze(SyntaxTreeNamespace* self) {
-  CHECK(162, SyntaxTreeBranch_analyze(&(self->_base)) )
-  CHECK(163, SyntaxTreeNode_analyze_children(&(self->_base._base), self->functions) )
+  CHECK(178, SyntaxTreeBranch_analyze(&(self->_base)) )
+  CHECK(179, SyntaxTreeNode_analyze_children(&(self->_base._base), self->functions) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -361,8 +368,8 @@ Returncode SyntaxTreeNamespace_write(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_write = "SyntaxTreeNamespace.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_write
 Returncode SyntaxTreeNamespace_write(SyntaxTreeNamespace* self) {
-  CHECK(166, SyntaxTreeBranch_write(&(self->_base)) )
-  CHECK(167, SyntaxTreeNode_write_children(&(self->_base._base), self->functions) )
+  CHECK(182, SyntaxTreeBranch_write(&(self->_base)) )
+  CHECK(183, SyntaxTreeNode_write_children(&(self->_base._base), self->functions) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -376,7 +383,7 @@ Returncode SyntaxTreeNamespace_write_functions_declaration(SyntaxTreeNamespace* 
   ListNode* child = self->functions->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(173, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[7](((SyntaxTreeFunction*)(child->item))) )
+    CHECK(189, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[7](((SyntaxTreeFunction*)(child->item))) )
     child = child->next;
   }
   return OK;
@@ -400,10 +407,12 @@ Func SyntaxTreeNamespace__dtl[] = {(void*)SyntaxTreeNamespace_link_types, (void*
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
 #include "expression/expression.c"
+#include "expression/initialize.c"
 #include "expression/slice.c"
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
@@ -414,6 +423,7 @@ Func SyntaxTreeNamespace__dtl[] = {(void*)SyntaxTreeNamespace_link_types, (void*
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"
+#include "syntax-tree/type-instance.c"
 #include "syntax-tree/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
