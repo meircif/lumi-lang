@@ -132,9 +132,6 @@ static Global
     self.add-builtin-global-variable(user glob.type-bool, user "true")
     self.add-builtin-global-variable(user glob.type-bool, user "false")
     
-    # Char
-    self.add-builtin-global-variable(user glob.type-char, user "EOF")
-    
     # String
     self.add-builtin-field(
         user glob.type-string, user "length", user glob.type-int, user _)
@@ -208,6 +205,8 @@ static Global
     self.add-builtin-method(user glob.type-file, user "getc"):(user arguments)
     self.add-builtin-output(
         user arguments, copy ACCESS-VAR, user glob.type-char, user "ch")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-bool, user "is-eof")
     
     self.add-builtin-method(user glob.type-file, user "putc"):(user arguments)
     self.add-builtin-parameter(
@@ -239,6 +238,8 @@ static Global
     self.add-builtin-method(user glob.type-sys, user "getchar"):(user arguments)
     self.add-builtin-output(
         user arguments, copy ACCESS-VAR, user glob.type-char, user "ch")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-bool, user "is-eof")
         
     self.add-builtin-method(user glob.type-sys, user "getline"):(user arguments)
     self.add-builtin-parameter(

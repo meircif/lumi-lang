@@ -255,10 +255,21 @@ Returncode File_close(File* file, RefManager* file_Refman) {
 }
 #undef MR_FUNC_NAME
 
+Bool getc_is_eof(int get, char* ch) {
+  if (get == EOF) {
+    return true;
+  }
+  else {
+    *ch = get;
+    return false;
+  }
+}
+
 #define MR_FUNC_NAME "File.getc"
-Returncode File_getc(File* file, RefManager* file_Refman, Char* out_char) {
+Returncode File_getc(
+    File* file, RefManager* file_Refman, Char* out_char, Bool* is_eof) {
   CHECK_NOT_NULL(file)
-  *out_char = getc(file);
+  *is_eof = getc_is_eof(getc(file), out_char);
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -502,8 +513,8 @@ Returncode Sys_println(
   return OK;
 }
 
-Returncode Sys_getchar(Sys* _, RefManager* __, char* ch) {
-  *ch = getchar();
+Returncode Sys_getchar(Sys* _, RefManager* __, char* out_char, Bool* is_eof) {
+  *is_eof = getc_is_eof(getchar(), out_char);
   return OK;
 }
 

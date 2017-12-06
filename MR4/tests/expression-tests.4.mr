@@ -451,7 +451,7 @@ i.str(user str)
 b := true
 ## @ c t2
 b := false
-## @ c t3
+## @ ec t3
 c := EOF
 ## @ c t4
 i := arr.length
@@ -482,7 +482,7 @@ file-open-write(user str)->(owner fobj)
 ## @ c t17
 fobj.close()
 ## @ c t18
-fobj.getc()->(var c)
+fobj.getc()->(var c, var b)
 ## @ c t19
 fobj.putc(copy c)
 ## @ c t20
@@ -494,7 +494,7 @@ sys.print(user str)
 ## @ c t23
 sys.println(user str)
 ## @ c t24
-sys.getchar()->(var c)
+sys.getchar()->(var c, var b)
 ## @ c t25
 sys.getline(user str)
 ## @ c t26
@@ -506,7 +506,7 @@ sys.getenv(user str, user str)->(var b)
 ## @ c t29
 stdout.putc(copy c)
 ## @ c t30
-stdin.getc()->(var c)
+stdin.getc()->(var c, var b)
 ## @ c t31
 stderr.putc(copy c)
 ## @

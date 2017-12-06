@@ -664,7 +664,7 @@ b = true;
 /// @ t2
 b = false;
 /// @ t3
-c = EOF;
+unknown symbol "EOF"
 /// @ t4
 if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
   i = arr->length;
@@ -696,7 +696,7 @@ CHECK(1, file_open_write(str, str_Refman, &(fobj), &(fobj_Refman)) )
 /// @ t17
 CHECK(1, File_close(fobj, fobj_Refman) )
 /// @ t18
-CHECK(1, File_getc(fobj, fobj_Refman, &(c)) )
+CHECK(1, File_getc(fobj, fobj_Refman, &(c), &(b)) )
 /// @ t19
 CHECK(1, File_putc(fobj, fobj_Refman, c) )
 /// @ t20
@@ -713,7 +713,7 @@ CHECK(1, Sys_print(sys, sys_Refman, str, str_Refman) )
 /// @ t23
 CHECK(1, Sys_println(sys, sys_Refman, str, str_Refman) )
 /// @ t24
-CHECK(1, Sys_getchar(sys, sys_Refman, &(c)) )
+CHECK(1, Sys_getchar(sys, sys_Refman, &(c), &(b)) )
 /// @ t25
 CHECK(1, Sys_getline(sys, sys_Refman, str, str_Refman) )
 /// @ t26
@@ -725,7 +725,7 @@ CHECK(1, Sys_getenv(sys, sys_Refman, str, str_Refman, str, str_Refman, &(b)) )
 /// @ t29
 CHECK(1, File_putc(stdout, stdout_Refman, c) )
 /// @ t30
-CHECK(1, File_getc(stdin, stdin_Refman, &(c)) )
+CHECK(1, File_getc(stdin, stdin_Refman, &(c), &(b)) )
 /// @ t31
 CHECK(1, File_putc(stderr, stderr_Refman, c) )
 /// @

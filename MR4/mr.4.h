@@ -113,7 +113,7 @@ Returncode file_open_read(
 Returncode file_open_write(
   String* name, RefManager*, File** file, RefManager**);
 Returncode File_close(File*, RefManager*);
-Returncode File_getc(File*, RefManager*, Char* ch);
+Returncode File_getc(File*, RefManager*, Char* ch, Bool* is_eof);
 Returncode File_putc(File*, RefManager*, Char ch);
 Returncode File_write(File*, RefManager*, String* line, RefManager*);
 
@@ -128,7 +128,7 @@ extern RefManager* stdin_Refman;
 extern RefManager* stderr_Refman;
 Returncode Sys_print(Sys*, RefManager*, String* text, RefManager*);
 Returncode Sys_println(Sys*, RefManager*, String* text, RefManager*);
-Returncode Sys_getchar(Sys*, RefManager*, char* ch);
+Returncode Sys_getchar(Sys*, RefManager*, char* ch, Bool* is_eof);
 Returncode Sys_getline(Sys*, RefManager*, String* line, RefManager*);
 Returncode Sys_exit(Sys*, RefManager*, Int status);
 Returncode Sys_system(
