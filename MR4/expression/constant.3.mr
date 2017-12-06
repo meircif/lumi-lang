@@ -137,7 +137,7 @@ class StringExpression(TextExpression)
     self.text := text
   
   func dynamic analyze()
-    self.add-aux-variable(copy ACCESS-AUX, user self.result-type):(
+    self.add-aux-variable(copy ACCESS-VAR, copy false, user self.result-type):(
         owner self.symbol)
   
   func dynamic write-preactions()

@@ -306,6 +306,9 @@ var Array{12:Int} a
 var Array{12:Test} a
 ## @ c t7
 var Array{12:String{7}} sa
+## @ c t8
+new String{12} s
+  so := s
 ## @ ec te0
 var Int
 ## @ ec te1

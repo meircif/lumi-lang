@@ -1,12 +1,11 @@
 ## MR4 compiler - Global compiler data
 
 ## Access values
-var Int ACCESS-COPY(0)
-var Int ACCESS-USER(1)
-var Int ACCESS-OWNER(2)
-var Int ACCESS-VAR(3)
-var Int ACCESS-NEW(4)
-var Int ACCESS-AUX(5)
+var Int ACCESS-UNDEFINED(0)
+var Int ACCESS-COPY(1)
+var Int ACCESS-USER(2)
+var Int ACCESS-OWNER(3)
+var Int ACCESS-VAR(4)
 
 
 static Global
@@ -63,13 +62,12 @@ static Global
     new NameMap{SyntaxTreeTestFunction} in self.test-functions
     self.init-operator-map()
     self.init-builtin-types()
-    new Array{6:String{8}} in self.access-names
+    new Array{5:String{16}} in self.access-names
+    self.access-names[ACCESS-UNDEFINED].copy(user "undefined")
     self.access-names[ACCESS-COPY].copy(user "copy")
     self.access-names[ACCESS-USER].copy(user "user")
     self.access-names[ACCESS-OWNER].copy(user "owner")
     self.access-names[ACCESS-VAR].copy(user "var")
-    self.access-names[ACCESS-NEW].copy(user "new")
-    self.access-names[ACCESS-AUX].copy(user "aux")
   
   func inst init-operator-map()
     new NameMap{Operator} in self.operator-map

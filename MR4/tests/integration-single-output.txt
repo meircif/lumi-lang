@@ -1,0 +1,5 @@
+I am a simple function
+test string
+test string
+ownership passed
+string deleted

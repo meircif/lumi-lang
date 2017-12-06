@@ -90,15 +90,27 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       
     else-if keyword.equal(user "var")
       variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-VAR, user parent-type, user parent-block):(
+          var _,
+          copy ACCESS-VAR,
+          copy true,
+          user parent-type,
+          user parent-block):(
           copy end))
     else-if keyword.equal(user "user")
       variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-USER, user parent-type, user parent-block):(
+          var _,
+          copy ACCESS-USER,
+          copy false,
+          user parent-type,
+          user parent-block):(
           copy end))
     else-if keyword.equal(user "owner")
       variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-OWNER, user parent-type, user parent-block):(
+          var _,
+          copy ACCESS-OWNER,
+          copy false,
+          user parent-type,
+          user parent-block):(
           copy end))
       
     else

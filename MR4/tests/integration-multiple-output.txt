@@ -1,0 +1,4 @@
+Running tests:
+testing test_func... OK
+testing test_another... OK
+Tests passed

@@ -44,7 +44,9 @@ class CallExpression(Expression)
       output.is-output := true
       output.access := declaration.outputs.last.item.access
       output.value := self.add-aux-variable(
-          copy declaration.outputs.last.item.access, user result-type)
+          copy declaration.outputs.last.item.access,
+          copy false,
+          user result-type)
       self.output := output.value
       self.arguments.outputs.add(owner output)
     else-if ? self.result-type

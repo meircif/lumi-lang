@@ -25,21 +25,21 @@ class InitExpression(Expression)
     self.arguments.analyze()
     if ? self.symbol
       self.symbol.result-type.analyze(user self)
-      self.access := self.symbol.access
     else
-      self.add-aux-variable(copy ACCESS-NEW, user self.result-type):(
+      self.add-aux-variable(
+          copy ACCESS-OWNER, copy true, user self.result-type):(
           owner self.symbol)
-      self.access := ACCESS-OWNER
+    self.access := self.symbol.access
     
-    if self.symbol.variable.access = ACCESS-NEW and
+    if self.symbol.variable.access = ACCESS-OWNER and
+        self.symbol.variable.is-create and
         self.result-type.type-data.is-primitive
       self.m-syntax-error(
           user "dynamic allocation of primitive type",
           user self.result-type.type-data.name)
     
     if not self.result-type.type-data.is-primitive and
-        (self.symbol.variable.access = ACCESS-VAR or
-        self.symbol.variable.access = ACCESS-NEW)
+        self.symbol.variable.is-create
       self.result-type.check-sequence(user self)
       self.result-type.type-data.find-meth(user "new"):(user self.constructor)
       if not (? self.arguments.parameters.first) and
@@ -211,8 +211,7 @@ class InitExpression(Expression)
   func dynamic write()
     if self.is-statement
       if not self.result-type.type-data.is-primitive and
-          (self.symbol.variable.access = ACCESS-VAR or
-          self.symbol.variable.access = ACCESS-NEW)
+          self.symbol.variable.is-create
         self.code-node.write-spaces()
         self.write-allocation()
       else-if ? self.arguments.parameters.first

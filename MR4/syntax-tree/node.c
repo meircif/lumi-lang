@@ -42,7 +42,7 @@ Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, I
 static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_get_access
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
-  {int n; for (n = (0); n < (4); ++n) {
+  {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
     Bool _Bool90;
     CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool90)) )

@@ -258,7 +258,7 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
                       SyntaxTreeFunction* _SyntaxTreeFunction53;
                       CHECK(125, (self)->_base._base._dtl[5](self, &(_SyntaxTreeFunction53)) )
                       SyntaxTreeVariable* _SyntaxTreeVariable54;
-                      CHECK(125, SyntaxTreeVariable_parse_new(NULL, ACCESS_NEW, NULL, self, &((*end)), &(_SyntaxTreeVariable54)) )
+                      CHECK(125, SyntaxTreeVariable_parse_new(NULL, ACCESS_OWNER, true, NULL, self, &((*end)), &(_SyntaxTreeVariable54)) )
                       CHECK(125, List_add(_SyntaxTreeFunction53->_base._base.variables, _SyntaxTreeVariable54) )
                       
                     }

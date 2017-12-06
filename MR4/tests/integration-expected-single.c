@@ -98,6 +98,10 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res);
 
 Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman, Array* a, RefManager* a_Refman);
 
+Returncode test_ref_count(void);
+
+Returncode f_remove(String* s, RefManager* s_Refman);
+
 
 /* types methods body */
 
@@ -115,16 +119,18 @@ Returncode TestStruct_new(TestStruct* self, RefManager* self_Refman, Int x, Stri
   self->text_Refman = s_Refman;
   MR_inc_ref(self->text_Refman);
   self->text = s;
-  aux_TestStruct_0 = calloc(1, sizeof(TestStruct));
-  if (aux_TestStruct_0 == NULL) RAISE(197)
-  aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
-  if (aux_TestStruct_0_Refman == NULL) RAISE(197)
-  CHECK(197, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman) )
-  if (self == NULL || self_Refman->value == NULL) RAISE(197)
-  MR_dec_ref(self->ts_Refman);
-  self->ts_Refman = aux_TestStruct_0_Refman;
-  MR_inc_ref(self->ts_Refman);
-  self->ts = aux_TestStruct_0;
+  if (x < 0) {
+      aux_TestStruct_0 = calloc(1, sizeof(TestStruct));
+      if (aux_TestStruct_0 == NULL) RAISE(198)
+      aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
+      if (aux_TestStruct_0_Refman == NULL) RAISE(198)
+      CHECK(198, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman) )
+      if (self == NULL || self_Refman->value == NULL) RAISE(198)
+      MR_dec_ref(self->ts_Refman);
+      self->ts_Refman = aux_TestStruct_0_Refman;
+      MR_inc_ref(self->ts_Refman);
+      self->ts = aux_TestStruct_0;
+    }
 MR_cleanup:
   MR_owner_dec_ref(aux_TestStruct_0_Refman);
   MR_dec_ref(s_Refman);
@@ -137,9 +143,9 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestStruct.get"
 Returncode TestStruct_get(TestStruct* self, RefManager* self_Refman, Int* x, String** s, RefManager** s_Refman) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(204)
-  *x = self->num;
   if (self == NULL || self_Refman->value == NULL) RAISE(205)
+  *x = self->num;
+  if (self == NULL || self_Refman->value == NULL) RAISE(206)
   MR_dec_ref(*s_Refman);
   *s_Refman = self->text_Refman;
   MR_inc_ref(*s_Refman);
@@ -154,8 +160,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestStruct.print"
 Returncode TestStruct_print(TestStruct* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(208)
-  CHECK(208, Sys_println(sys, sys_Refman, self->text, self->text_Refman) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(209)
+  CHECK(209, Sys_println(sys, sys_Refman, self->text, self->text_Refman) )
 MR_cleanup:
   return MR_err;
 }
@@ -166,7 +172,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestClass.new"
 Returncode TestClass_new(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(216)
+  if (self == NULL || self_Refman->value == NULL) RAISE(217)
   self->num = 1;
 MR_cleanup:
   return MR_err;
@@ -178,7 +184,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestClass.static-meth"
 Returncode TestClass_static_meth(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(219)
+  if (self == NULL || self_Refman->value == NULL) RAISE(220)
   self->num = 3;
 MR_cleanup:
   return MR_err;
@@ -190,7 +196,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestClass.dynamic-meth"
 Returncode TestClass_dynamic_meth(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(222)
+  if (self == NULL || self_Refman->value == NULL) RAISE(223)
   self->num = 6;
 MR_cleanup:
   return MR_err;
@@ -202,8 +208,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestClass.print"
 Returncode TestClass_print(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(225)
-  CHECK(225, Sys_println(sys, sys_Refman, self->text, self->text_Refman) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(226)
+  CHECK(226, Sys_println(sys, sys_Refman, self->text, self->text_Refman) )
 MR_cleanup:
   return MR_err;
 }
@@ -217,7 +223,18 @@ MR_cleanup:
 #define MR_FUNC_NAME "test-simple-function"
 Returncode test_simple_function(void) {
   Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(26)
+  aux_String_0_Var.max_length = 23;
+  aux_String_0_Var.length = 22;
+  aux_String_0_Var.values = "I am a simple function";
+  CHECK(26, Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -947,7 +964,7 @@ Returncode f_test_params(Int x, String* s, RefManager* s_Refman, String* o, RefM
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
   MR_inc_ref(o_Refman);
-  RAISE(231)
+  RAISE(232)
 MR_cleanup:
   MR_owner_dec_ref(o_Refman);
   MR_dec_ref(s_Refman);
@@ -1021,25 +1038,25 @@ Returncode test_call_expression(void) {
   Int aux_Int_1 = 0;
   String* aux_String_1 = NULL;
   RefManager* aux_String_1_Refman = NULL;
-  CHECK(246, f_test_void() )
+  CHECK(247, f_test_void() )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(247)
+  if (aux_String_0_Refman == NULL) RAISE(248)
   aux_String_0_Var.max_length = 5;
   aux_String_0_Var.length = 4;
   aux_String_0_Var.values = "text";
-  CHECK(247, f_test_params(3, aux_String_0, aux_String_0_Refman, NULL, NULL) )
-  CHECK(248, f_test_outs(&(s), &(s_Refman), &(x)) )
-  CHECK(249, f_test_int2str(4, &(s), &(s_Refman)) )
-  CHECK(250, f_test_int(5) )
-  CHECK(251, f_test_int2int(6, &(x)) )
-  CHECK(252, f_test_many(7, 8, &(x), &(x)) )
-  CHECK(258, f_test_int2int(9, &(tmp)) )
-  CHECK(258, f_test_int(tmp) )
-  CHECK(259, f_test_many(11, 12, &(x), &(aux_Int_0)) )
-  CHECK(259, f_test_int2int(10, &(aux_Int_1)) )
+  CHECK(248, f_test_params(3, aux_String_0, aux_String_0_Refman, NULL, NULL) )
+  CHECK(249, f_test_outs(&(s), &(s_Refman), &(x)) )
+  CHECK(250, f_test_int2str(4, &(s), &(s_Refman)) )
+  CHECK(251, f_test_int(5) )
+  CHECK(252, f_test_int2int(6, &(x)) )
+  CHECK(253, f_test_many(7, 8, &(x), &(x)) )
+  CHECK(259, f_test_int2int(9, &(tmp)) )
+  CHECK(259, f_test_int(tmp) )
+  CHECK(260, f_test_many(11, 12, &(x), &(aux_Int_0)) )
+  CHECK(260, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
-  CHECK(260, f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
+  CHECK(261, f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
   MR_owner_dec_ref(s_Refman);
   s_Refman = aux_String_1_Refman;
   aux_String_1_Refman = NULL;
@@ -1063,8 +1080,8 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
   Int z = 0;
   Int w = 0;
   MR_inc_ref(arr_Refman);
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(264)
-  if ((4) < 0 || (4) >= (arr)->length) RAISE(264)
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(265)
+  if ((4) < 0 || (4) >= (arr)->length) RAISE(265)
   if ((((Int*)((arr)->values))[4]) > 6) {
     *res = 6;
   }
@@ -1073,16 +1090,16 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
       *res = 6;
     }
     else {
-      if (arr == NULL || arr_Refman->value == NULL) RAISE(268)
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(268)
-      if (arr == NULL || arr_Refman->value == NULL) RAISE(268)
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(268)
+      if (arr == NULL || arr_Refman->value == NULL) RAISE(269)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(269)
+      if (arr == NULL || arr_Refman->value == NULL) RAISE(269)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(269)
       if ((((Int*)((arr)->values))[4]) != (((Int*)((arr)->values))[4])) {
         *res = 6;
       }
       else {
-        if (arr == NULL || arr_Refman->value == NULL) RAISE(270)
-        if ((0) < 0 || (0) >= (arr)->length) RAISE(270)
+        if (arr == NULL || arr_Refman->value == NULL) RAISE(271)
+        if ((0) < 0 || (0) >= (arr)->length) RAISE(271)
         if (0 == (((Int*)((arr)->values))[0])) {
           *res = 6;
         }
@@ -1093,49 +1110,49 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
     }
   }
   while (true) {
-    if (arr == NULL || arr_Refman->value == NULL) RAISE(275)
-    if ((6) < 0 || (6) >= (arr)->length) RAISE(275)
-    ((Int*)((arr)->values))[6] = 6;
     if (arr == NULL || arr_Refman->value == NULL) RAISE(276)
-    if ((2) < 0 || (2) >= (arr)->length) RAISE(276)
+    if ((6) < 0 || (6) >= (arr)->length) RAISE(276)
+    ((Int*)((arr)->values))[6] = 6;
+    if (arr == NULL || arr_Refman->value == NULL) RAISE(277)
+    if ((2) < 0 || (2) >= (arr)->length) RAISE(277)
     x = ((Int*)((arr)->values))[2];
     if (!(x > 3)) break;
     y = x - 1;
     while (true) {
-      if (arr == NULL || arr_Refman->value == NULL) RAISE(280)
-      if ((8) < 0 || (8) >= (arr)->length) RAISE(280)
-      if (arr == NULL || arr_Refman->value == NULL) RAISE(280)
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(280)
-      ((Int*)((arr)->values))[4] = ((Int*)((arr)->values))[8];
+      if (arr == NULL || arr_Refman->value == NULL) RAISE(281)
+      if ((8) < 0 || (8) >= (arr)->length) RAISE(281)
       if (arr == NULL || arr_Refman->value == NULL) RAISE(281)
       if ((4) < 0 || (4) >= (arr)->length) RAISE(281)
+      ((Int*)((arr)->values))[4] = ((Int*)((arr)->values))[8];
+      if (arr == NULL || arr_Refman->value == NULL) RAISE(282)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(282)
       if (y > (((Int*)((arr)->values))[4])) {
         continue;
       }
       z = 7;
-      if (arr == NULL || arr_Refman->value == NULL) RAISE(284)
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(284)
+      if (arr == NULL || arr_Refman->value == NULL) RAISE(285)
+      if ((4) < 0 || (4) >= (arr)->length) RAISE(285)
       if (z <= (((Int*)((arr)->values))[4])) {
         if (!(z > 0)) break;
       }
     }
   }
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(286)
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(286)
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(286)
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(286)
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(287)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(287)
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(287)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(287)
   {int n; for(n=((Int*)((arr)->values))[2]; n<2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
-    if (arr == NULL || arr_Refman->value == NULL) RAISE(287)
-    if ((2) < 0 || (2) >= (arr)->length) RAISE(287)
-    if (arr == NULL || arr_Refman->value == NULL) RAISE(287)
-    if ((0) < 0 || (0) >= (arr)->length) RAISE(287)
-    ((Int*)((arr)->values))[0] = ((Int*)((arr)->values))[2];
+    if (arr == NULL || arr_Refman->value == NULL) RAISE(288)
+    if ((2) < 0 || (2) >= (arr)->length) RAISE(288)
     if (arr == NULL || arr_Refman->value == NULL) RAISE(288)
     if ((0) < 0 || (0) >= (arr)->length) RAISE(288)
+    ((Int*)((arr)->values))[0] = ((Int*)((arr)->values))[2];
+    if (arr == NULL || arr_Refman->value == NULL) RAISE(289)
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(289)
     w = ((Int*)((arr)->values))[0];
     if (w > 4) {
-      if (arr == NULL || arr_Refman->value == NULL) RAISE(290)
-      if ((1) < 0 || (1) >= (arr)->length) RAISE(290)
+      if (arr == NULL || arr_Refman->value == NULL) RAISE(291)
+      if ((1) < 0 || (1) >= (arr)->length) RAISE(291)
       ((Int*)((arr)->values))[1] = w;
     }
   }
@@ -1158,44 +1175,121 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman,
   RefManager* f_Refman = NULL;
   MR_inc_ref(s_Refman);
   MR_inc_ref(a_Refman);
-  CHECK(298, Int_str(i, s, s_Refman) )
+  CHECK(299, Int_str(i, s, s_Refman) )
   bv = true || false;
   cv = EOF;
-  if (a == NULL || a_Refman->value == NULL) RAISE(301)
+  if (a == NULL || a_Refman->value == NULL) RAISE(302)
   i = a->length;
-  if (s == NULL || s_Refman->value == NULL) RAISE(302)
+  if (s == NULL || s_Refman->value == NULL) RAISE(303)
   i = s->length;
-  CHECK(303, String_clear(s, s_Refman) )
-  CHECK(304, String_equal(s, s_Refman, s, s_Refman, &(bv)) )
-  CHECK(305, String_get(s, s_Refman, i, &(cv)) )
-  CHECK(306, String_append(s, s_Refman, c) )
-  CHECK(307, String_new(s, s_Refman, s, s_Refman) )
-  CHECK(308, String_concat(s, s_Refman, s, s_Refman) )
-  CHECK(309, String_concat_int(s, s_Refman, i) )
-  CHECK(310, String_find(s, s_Refman, s, s_Refman, &(iv)) )
-  CHECK(311, String_has(s, s_Refman, c, &(bv)) )
-  CHECK(313, file_open_read(s, s_Refman, &(f), &(f_Refman)) )
-  CHECK(314, file_open_write(s, s_Refman, &(f), &(f_Refman)) )
-  CHECK(315, File_getc(f, f_Refman, &(cv)) )
-  CHECK(316, File_putc(f, f_Refman, c) )
-  CHECK(317, File_write(f, f_Refman, s, s_Refman) )
-  CHECK(318, File_close(f, f_Refman) )
-  if (sys == NULL || sys_Refman->value == NULL) RAISE(319)
-  if (sys->argv == NULL || sys->argv_Refman->value == NULL) RAISE(319)
-  if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(319)
+  CHECK(304, String_clear(s, s_Refman) )
+  CHECK(305, String_equal(s, s_Refman, s, s_Refman, &(bv)) )
+  CHECK(306, String_get(s, s_Refman, i, &(cv)) )
+  CHECK(307, String_append(s, s_Refman, c) )
+  CHECK(308, String_new(s, s_Refman, s, s_Refman) )
+  CHECK(309, String_concat(s, s_Refman, s, s_Refman) )
+  CHECK(310, String_concat_int(s, s_Refman, i) )
+  CHECK(311, String_find(s, s_Refman, s, s_Refman, &(iv)) )
+  CHECK(312, String_has(s, s_Refman, c, &(bv)) )
+  CHECK(314, file_open_read(s, s_Refman, &(f), &(f_Refman)) )
+  CHECK(315, file_open_write(s, s_Refman, &(f), &(f_Refman)) )
+  CHECK(316, File_getc(f, f_Refman, &(cv)) )
+  CHECK(317, File_putc(f, f_Refman, c) )
+  CHECK(318, File_write(f, f_Refman, s, s_Refman) )
+  CHECK(319, File_close(f, f_Refman) )
+  if (sys == NULL || sys_Refman->value == NULL) RAISE(320)
+  if (sys->argv == NULL || sys->argv_Refman->value == NULL) RAISE(320)
+  if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(320)
   MR_dec_ref(s_Refman);
   s_Refman = sys->argv_Refman;
   MR_inc_ref(s_Refman);
   s = ((String**)((sys->argv)->values))[1];
-  CHECK(320, Sys_print(sys, sys_Refman, s, s_Refman) )
-  CHECK(321, Sys_println(sys, sys_Refman, s, s_Refman) )
-  CHECK(322, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(bv)) )
-  CHECK(323, Sys_system(sys, sys_Refman, s, s_Refman, &(iv)) )
-  CHECK(324, Sys_exit(sys, sys_Refman, i) )
+  CHECK(321, Sys_print(sys, sys_Refman, s, s_Refman) )
+  CHECK(322, Sys_println(sys, sys_Refman, s, s_Refman) )
+  CHECK(323, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(bv)) )
+  CHECK(324, Sys_system(sys, sys_Refman, s, s_Refman, &(iv)) )
+  CHECK(325, Sys_exit(sys, sys_Refman, i) )
 MR_cleanup:
   MR_owner_dec_ref(f_Refman);
   MR_dec_ref(a_Refman);
   MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-ref-count"
+Returncode test_ref_count(void) {
+  Returncode MR_err = OK;
+  String* s = NULL;
+  RefManager* s_Refman = NULL;
+  String* s_user = NULL;
+  RefManager* s_user_Refman = NULL;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  RefManager* aux_String_1_Refman = NULL;
+  String aux_String_2_Var = {0};
+  String* aux_String_2 = NULL;
+  RefManager* aux_String_2_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(329)
+  aux_String_0_Var.max_length = 12;
+  aux_String_0_Var.length = 11;
+  aux_String_0_Var.values = "test string";
+  s = MR_new_string(32);
+  if (s == NULL) RAISE(329)
+  s_Refman = MR_new_ref(s);
+  if (s_Refman == NULL) RAISE(329)
+  CHECK(329, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
+  s_user = s;
+  s_user_Refman = s_Refman;
+  MR_inc_ref(s_user_Refman);
+  CHECK(331, Sys_println(sys, sys_Refman, s, s_Refman) )
+  CHECK(332, Sys_println(sys, sys_Refman, s_user, s_user_Refman) )
+  CHECK(333, f_remove(s, s_Refman) )
+  s = NULL;
+  s_Refman = NULL;
+  if (! (!(s == NULL || s_Refman->value == NULL))) {
+    aux_String_1 = &aux_String_1_Var;
+    aux_String_1_Refman = MR_new_ref(aux_String_1);
+    if (aux_String_1_Refman == NULL) RAISE(335)
+    aux_String_1_Var.max_length = 17;
+    aux_String_1_Var.length = 16;
+    aux_String_1_Var.values = "ownership passed";
+    CHECK(335, Sys_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
+  }
+  if (! (!(s_user == NULL || s_user_Refman->value == NULL))) {
+    aux_String_2 = &aux_String_2_Var;
+    aux_String_2_Refman = MR_new_ref(aux_String_2);
+    if (aux_String_2_Refman == NULL) RAISE(337)
+    aux_String_2_Var.max_length = 15;
+    aux_String_2_Var.length = 14;
+    aux_String_2_Var.values = "string deleted";
+    CHECK(337, Sys_println(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
+  }
+MR_cleanup:
+  MR_dec_ref(aux_String_2_Refman);
+  MR_dec_ref(aux_String_1_Refman);
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_user_Refman);
+  MR_owner_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "f-remove"
+Returncode f_remove(String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(s_Refman);
+MR_cleanup:
+  MR_owner_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -1208,8 +1302,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(328, test_simple_function() )
-  CHECK(329, test_call_expression() )
+  CHECK(344, test_simple_function() )
+  CHECK(345, test_ref_count() )
 MR_cleanup:
   return MR_err;
 }

@@ -65,6 +65,8 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     self.parent.indentation-spaces -= 2
     self.write-spaces()
     write(user "} while (false);\n")
+    self.write-spaces()
+    write(user "MR_trace_stream = stdout;\n")
 
 
 ## Test function in the syntax tree

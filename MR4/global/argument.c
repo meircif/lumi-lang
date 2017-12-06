@@ -261,7 +261,7 @@ Returncode FunctionArguments_add_self_parameter(FunctionArguments* self, TypeIns
   self_args->_base.access = ACCESS_VAR;
   self_args->variable = malloc(sizeof(SyntaxTreeVariable));
   if (self_args->variable == NULL) RAISE(96)
-  *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false};
+  *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false};
   self_args->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   CHECK(97, string_new_copy(&(String){5, 4, "self"}, &(self_args->variable->name)) )
   self_args->variable->type_instance = type_instance;

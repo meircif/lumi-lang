@@ -23,7 +23,7 @@ user String global-string
 
 # Test functions
 func test-simple-function()
-  # sys.print(user "I am test func")
+  sys.println(user "I am a simple function")
 
 
 func test-const-expression()->(
@@ -194,7 +194,8 @@ struct TestStruct
   new(copy Int x, user String s)
     self.num := x
     self.text := s
-    self.ts := TestStruct(copy x + 1, user s)
+    if x < 0
+      self.ts := TestStruct(copy x + 1, user s)
   
   {# Test
   multiline
@@ -324,6 +325,21 @@ func test-builtins(
   sys.exit(copy i)
 
 
+func test-ref-count()
+  new String{32} s(user "test string")
+  user String s-user(user s)
+  sys.println(user s)
+  sys.println(user s-user)
+  f-remove(owner s)
+  if not s?
+    sys.println(user "ownership passed")
+  if not s-user?
+    sys.println(user "string deleted")
+
+func f-remove(owner String s)
+  # remove s
+
+
 main
   test-simple-function()
-  test-call-expression()
+  test-ref-count()

@@ -58,18 +58,17 @@ Returncode InitExpression_analyze(InitExpression* self) {
   CHECK(25, (self->arguments)->_base._dtl[1](self->arguments) )
   if (NULL != self->symbol) {
     CHECK(27, TypeInstance_analyze(self->symbol->_base.result_type, &(self->_base._base)) )
-    self->_base.access = self->symbol->_base.access;
   }
   else {
-    CHECK(30, Expression_add_aux_variable(&(self->_base), ACCESS_NEW, self->_base.result_type, &(self->symbol)) )
-    self->_base.access = ACCESS_OWNER;
+    CHECK(29, Expression_add_aux_variable(&(self->_base), ACCESS_OWNER, true, self->_base.result_type, &(self->symbol)) )
+  }
+  self->_base.access = self->symbol->_base.access;
+  
+  if (self->symbol->variable->access == ACCESS_OWNER && self->symbol->variable->is_create && self->_base.result_type->type_data->is_primitive) {
+    CHECK(37, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){37, 36, "dynamic allocation of primitive type"}, self->_base.result_type->type_data->name) )
   }
   
-  if (self->symbol->variable->access == ACCESS_NEW && self->_base.result_type->type_data->is_primitive) {
-    CHECK(36, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){37, 36, "dynamic allocation of primitive type"}, self->_base.result_type->type_data->name) )
-  }
-  
-  if (!self->_base.result_type->type_data->is_primitive && (self->symbol->variable->access == ACCESS_VAR || self->symbol->variable->access == ACCESS_NEW)) {
+  if (!self->_base.result_type->type_data->is_primitive && self->symbol->variable->is_create) {
     CHECK(43, TypeInstance_check_sequence(self->_base.result_type, &(self->_base._base)) )
     Int _Int32;
     CHECK(44, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int32)) )
@@ -310,18 +309,18 @@ static char* _func_name_InitExpression_write = "InitExpression.write";
 #define MR_FUNC_NAME _func_name_InitExpression_write
 Returncode InitExpression_write(InitExpression* self) {
   if (self->_base.is_statement) {
-    if (!self->_base.result_type->type_data->is_primitive && (self->symbol->variable->access == ACCESS_VAR || self->symbol->variable->access == ACCESS_NEW)) {
-      CHECK(216, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-      CHECK(217, InitExpression_write_allocation(self) )
+    if (!self->_base.result_type->type_data->is_primitive && self->symbol->variable->is_create) {
+      CHECK(215, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+      CHECK(216, InitExpression_write_allocation(self) )
     }
     else {
       if (NULL != self->arguments->parameters->first) {
-        CHECK(219, InitExpression_write_assign(self) )
+        CHECK(218, InitExpression_write_assign(self) )
       }
     }
   }
   else {
-    CHECK(221, (self->symbol)->_base._base._dtl[2](self->symbol) )
+    CHECK(220, (self->symbol)->_base._base._dtl[2](self->symbol) )
   }
   return OK;
 }

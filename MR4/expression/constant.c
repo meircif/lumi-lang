@@ -367,7 +367,7 @@ Returncode StringExpression_analyze(StringExpression* self);
 static char* _func_name_StringExpression_analyze = "StringExpression.analyze";
 #define MR_FUNC_NAME _func_name_StringExpression_analyze
 Returncode StringExpression_analyze(StringExpression* self) {
-  CHECK(140, Expression_add_aux_variable(&(self->_base._base), ACCESS_AUX, self->_base._base.result_type, &(self->symbol)) )
+  CHECK(140, Expression_add_aux_variable(&(self->_base._base), ACCESS_VAR, false, self->_base._base.result_type, &(self->symbol)) )
   return OK;
 }
 #undef MR_FUNC_NAME

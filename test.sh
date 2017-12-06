@@ -110,6 +110,9 @@ diff ../MR4/tests/integration-expected-single.c \
   tests/integration-actual-single.c
 $CCW -Wno-unused-label --pedantic tests/integration-actual-single.c \
   ../MR4/mr.4.c -I../MR4 -o  test-mr4-single
+./test-mr4-single > tests/integration-single-output.txt
+diff ../MR4/tests/integration-single-output.txt \
+  tests/integration-single-output.txt
 
 # run mr4-compiler multiple-file integration test
 ./mr4-compiler tests/integration-actual-multiple.c \
@@ -119,6 +122,9 @@ diff ../MR4/tests/integration-expected-multiple.c \
   tests/integration-actual-multiple.c
 $CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
   ../MR4/mr.4.c -I../MR4 -o test-mr4-multiple
+./test-mr4-multiple > tests/integration-multiple-output.txt
+diff ../MR4/tests/integration-multiple-output.txt \
+  tests/integration-multiple-output.txt
 
 
 # --< MRB >--

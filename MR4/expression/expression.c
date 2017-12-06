@@ -237,22 +237,23 @@ Returncode Expression_set_simple_type(Expression* self, TypeData* type_data) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstance* type_instance, SymbolExpression** symbol);
+Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_create, TypeInstance* type_instance, SymbolExpression** symbol);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_add_aux_variable = "Expression.add-aux-variable";
 #define MR_FUNC_NAME _func_name_Expression_add_aux_variable
-Returncode Expression_add_aux_variable(Expression* self, Int access, TypeInstance* type_instance, SymbolExpression** symbol) {
+Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_create, TypeInstance* type_instance, SymbolExpression** symbol) {
   (*symbol) = malloc(sizeof(SymbolExpression));
-  if ((*symbol) == NULL) RAISE(164)
+  if ((*symbol) == NULL) RAISE(165)
   *(*symbol) = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL};
   (*symbol)->_base._base._dtl = SymbolExpression__dtl;
   (*symbol)->_base.code_node = self->code_node;
-  CHECK(166, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
+  CHECK(167, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
+  (*symbol)->_base.access = access;
   (*symbol)->_base.assignable = true;
   SyntaxTreeFunction* _SyntaxTreeFunction31;
-  CHECK(168, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction31)) )
-  CHECK(168, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction31, access, type_instance, &((*symbol)->variable)) )
-  CHECK(170, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
+  CHECK(170, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction31)) )
+  CHECK(170, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction31, access, is_create, type_instance, &((*symbol)->variable)) )
+  CHECK(172, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -265,16 +266,16 @@ static char* _func_name_Expression_write_refman_init = "Expression.write-refman-
 Returncode Expression_write_refman_init(Expression* self, SymbolExpression* symbol) {
   /* `symbol`_Refman = MR_new_ref(`symbol`); */
   /* if (`symbol`_Refman == NULL) raise(`line-num`) */
-  CHECK(175, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(176, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(177, write(&(String){22, 21, "_Refman = MR_new_ref("}) )
+  CHECK(177, SyntaxTreeCode_write_spaces(self->code_node) )
   CHECK(178, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(179, write(&(String){4, 3, ");\n"}) )
-  CHECK(180, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(181, write(&(String){5, 4, "if ("}) )
-  CHECK(182, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(183, write(&(String){18, 17, "_Refman == NULL) "}) )
-  CHECK(184, SyntaxTreeNode_write_raise(&(self->_base)) )
+  CHECK(179, write(&(String){22, 21, "_Refman = MR_new_ref("}) )
+  CHECK(180, (symbol)->_base._base._dtl[2](symbol) )
+  CHECK(181, write(&(String){4, 3, ");\n"}) )
+  CHECK(182, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(183, write(&(String){5, 4, "if ("}) )
+  CHECK(184, (symbol)->_base._base._dtl[2](symbol) )
+  CHECK(185, write(&(String){18, 17, "_Refman == NULL) "}) )
+  CHECK(186, SyntaxTreeNode_write_raise(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -286,10 +287,10 @@ static char* _func_name_Expression_write_init_var_ref = "Expression.write-init-v
 #define MR_FUNC_NAME _func_name_Expression_write_init_var_ref
 Returncode Expression_write_init_var_ref(Expression* self, SymbolExpression* symbol) {
   /* `symbol` = &`symbol`_Var; */
-  CHECK(188, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(189, write(&(String){5, 4, " = &"}) )
   CHECK(190, (symbol)->_base._base._dtl[2](symbol) )
-  CHECK(191, write(&(String){7, 6, "_Var;\n"}) )
+  CHECK(191, write(&(String){5, 4, " = &"}) )
+  CHECK(192, (symbol)->_base._base._dtl[2](symbol) )
+  CHECK(193, write(&(String){7, 6, "_Var;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -300,15 +301,15 @@ Returncode Expression_write_validate_ref(Expression* self);
 static char* _func_name_Expression_write_validate_ref = "Expression.write-validate-ref";
 #define MR_FUNC_NAME _func_name_Expression_write_validate_ref
 Returncode Expression_write_validate_ref(Expression* self) {
-  CHECK(194, Expression_write_as_top(self) )
-  CHECK(195, write(&(String){9, 8, " == NULL"}) )
+  CHECK(196, Expression_write_as_top(self) )
+  CHECK(197, write(&(String){9, 8, " == NULL"}) )
   if (!self->result_type->type_data->is_primitive) {
-    CHECK(197, write(&(String){5, 4, " || "}) )
+    CHECK(199, write(&(String){5, 4, " || "}) )
     Bool top = self->top;
     self->top = false;
-    CHECK(200, (self)->_base._dtl[4](self) )
+    CHECK(202, (self)->_base._dtl[4](self) )
     self->top = top;
-    CHECK(202, write(&(String){16, 15, "->value == NULL"}) )
+    CHECK(204, write(&(String){16, 15, "->value == NULL"}) )
   }
   return OK;
 }
@@ -320,8 +321,8 @@ Returncode Expression_write_dynamic(Expression* self);
 static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
 #define MR_FUNC_NAME _func_name_Expression_write_dynamic
 Returncode Expression_write_dynamic(Expression* self) {
-  CHECK(205, (self)->_base._dtl[2](self) )
-  CHECK(206, write(&(String){9, 8, "_Dynamic"}) )
+  CHECK(207, (self)->_base._dtl[2](self) )
+  CHECK(208, write(&(String){9, 8, "_Dynamic"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -332,8 +333,8 @@ Returncode Expression_write_refman(Expression* self);
 static char* _func_name_Expression_write_refman = "Expression.write-refman";
 #define MR_FUNC_NAME _func_name_Expression_write_refman
 Returncode Expression_write_refman(Expression* self) {
-  CHECK(209, (self)->_base._dtl[2](self) )
-  CHECK(210, write(&(String){8, 7, "_Refman"}) )
+  CHECK(211, (self)->_base._dtl[2](self) )
+  CHECK(212, write(&(String){8, 7, "_Refman"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -346,7 +347,7 @@ static char* _func_name_Expression_write_as_top = "Expression.write-as-top";
 Returncode Expression_write_as_top(Expression* self) {
   Bool top = self->top;
   self->top = true;
-  CHECK(215, (self)->_base._dtl[2](self) )
+  CHECK(217, (self)->_base._dtl[2](self) )
   self->top = top;
   return OK;
 }

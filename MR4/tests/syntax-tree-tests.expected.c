@@ -501,6 +501,18 @@ char sa_Chars[12 * 7];
   MR_set_var_string_array(12, 7, sa, sa_Chars);
   sa_Refman = MR_new_ref(sa);
   if (sa_Refman == NULL) RAISE(1)
+/// @ t8
+String* s = NULL;
+  RefManager* s_Refman = NULL;
+  s = MR_new_string(12);
+  if (s == NULL) RAISE(1)
+  s_Refman = MR_new_ref(s);
+  if (s_Refman == NULL) RAISE(1)
+  MR_owner_dec_ref(*so_Refman);
+  *so_Refman = s_Refman;
+  s_Refman = NULL;
+  *so = s;
+  s = NULL;
 /// @ te0
 expected space after type, got "new-line"
 /// @ te1
@@ -703,7 +715,7 @@ got "String" expression, expected "Int"
 /// @ te14
 only "var" access is supported for primitive types, got "user"
 /// @ te15
-only "var" access is supported for primitive types, got "new"
+only "var" access is supported for primitive types, got "owner"
 /// @ te16
 no contructor for type "File"
 /// @ te17
@@ -842,6 +854,7 @@ do {
     MR_trace_stream = stdout;
     TEST_FAIL(1)
   } while (false);
+  MR_trace_stream = stdout;
 /// @ t2
 do {
     MR_trace_stream = NULL;
@@ -853,6 +866,7 @@ do {
     MR_trace_stream = stdout;
     TEST_FAIL(1)
   } while (false);
+  MR_trace_stream = stdout;
 /// @ t3
 Returncode fun(void);
 Returncode Mock_fun(void);

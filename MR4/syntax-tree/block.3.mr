@@ -123,7 +123,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
         self.m-syntax-error-c(
             user "expected space after \"new\", got", copy end)
       self.get-function().variables.add(owner SyntaxTreeVariable.parse-new(
-          var _, copy ACCESS-NEW, user _, user self):(copy end))
+          var _, copy ACCESS-OWNER, copy true, user _, user self):(copy end))
       
     else-if keyword.equal(user "assert")
       if end != ' '
