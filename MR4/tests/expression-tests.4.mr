@@ -319,6 +319,12 @@ owner String s
 str := so
 ## @ c t10
 b := t is ta or tb is-not tc
+## @ c t11
+c := '0' + 4
+## @ c t12
+b := fun0 is-not fun1
+## @ c t13
+b := b is b
 ## @ ec te0
 345 @ 2
 ## @ ec te1

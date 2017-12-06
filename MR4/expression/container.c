@@ -356,8 +356,8 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
       if ((0) < 0 || (0) >= (self->_base.operator->name)->length) RAISE(185)
       if (self->_base.operator->order == 1 && ((self->_base.operator->name)->values[0]) == 'i') {
         /* `is`/`is-not` operator */
-        CHECK(187, BinaryExpression_test_not_primitive(self, self->_base.right_expression) )
-        CHECK(188, BinaryExpression_test_not_primitive(self, self->left_expression) )
+        CHECK(187, BinaryExpression_test_not_int(self, self->_base.right_expression) )
+        CHECK(188, BinaryExpression_test_not_int(self, self->left_expression) )
         CHECK(189, Expression_set_simple_type(&(self->_base._base), &(glob->type_bool->_base)) )
       }
       else {
@@ -408,13 +408,15 @@ Returncode BinaryExpression_test_operands_type(BinaryExpression* self, TypeData*
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode BinaryExpression_test_not_primitive(BinaryExpression* self, Expression* operand);
+Returncode BinaryExpression_test_not_int(BinaryExpression* self, Expression* operand);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_BinaryExpression_test_not_primitive = "BinaryExpression.test-not-primitive";
-#define MR_FUNC_NAME _func_name_BinaryExpression_test_not_primitive
-Returncode BinaryExpression_test_not_primitive(BinaryExpression* self, Expression* operand) {
-  if (operand->result_type->type_data->is_primitive) {
-    CHECK(218, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){9, 8, "operator"}, self->_base.operator->name, &(String){36, 35, "expected non primitive operand, got"}, operand->result_type->type_data->name) )
+static char* _func_name_BinaryExpression_test_not_int = "BinaryExpression.test-not-int";
+#define MR_FUNC_NAME _func_name_BinaryExpression_test_not_int
+Returncode BinaryExpression_test_not_int(BinaryExpression* self, Expression* operand) {
+  Bool _Bool27;
+  CHECK(217, TypeData_m_is_same(operand->result_type->type_data, &(glob->type_int->_base), &(_Bool27)) )
+  if (_Bool27) {
+    CHECK(218, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){9, 8, "operator"}, self->_base.operator->name, &(String){26, 25, "is not supported for type"}, operand->result_type->type_data->name) )
   }
   return OK;
 }

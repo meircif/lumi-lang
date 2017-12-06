@@ -35,8 +35,8 @@ Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Express
 static char* _func_name_parse_new_expression = "parse-new-expression";
 #define MR_FUNC_NAME _func_name_parse_new_expression
 Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  Operator* _Operator27;
-  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator27)) )
+  Operator* _Operator28;
+  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator28)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -66,9 +66,9 @@ static char* _func_name_Expression_parse_new = "Expression.parse-new";
 #define MR_FUNC_NAME _func_name_Expression_parse_new
 Returncode Expression_parse_new(Expression* self, String* ends, SyntaxTreeCode* code_node, Operator* curr_operator, Expression** expression, Char* end, Operator** operator) {
   (*expression) = NULL;
-  Bool _Bool28;
-  CHECK(47, String_has(ends, ' ', &(_Bool28)) )
-  Bool multi_operands = !_Bool28;
+  Bool _Bool29;
+  CHECK(47, String_has(ends, ' ', &(_Bool29)) )
+  Bool multi_operands = !_Bool29;
   String* text = NULL;
   CHECK(49, Expression_read_new_value(self, ends, &(text), &((*end))) )
   CHECK(50, NameMap_find(glob->operator_map, text, (void**)&((*operator))) )
@@ -140,9 +140,9 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     if ((*end) == '?') {
       CHECK(109, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool29;
-    CHECK(110, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool29)) )
-    if (!(_Bool29)) break;
+    Bool _Bool30;
+    CHECK(110, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool30)) )
+    if (!(_Bool30)) break;
   }
   return OK;
 }
@@ -181,9 +181,9 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Syn
             CHECK(133, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool30;
-            CHECK(134, String_equal(text, &(String){5, 4, "base"}, &(_Bool30)) )
-            if (_Bool30) {
+            Bool _Bool31;
+            CHECK(134, String_equal(text, &(String){5, 4, "base"}, &(_Bool31)) )
+            if (_Bool31) {
               CHECK(135, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
             }
             else {
@@ -250,9 +250,9 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_cre
   CHECK(167, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
   (*symbol)->_base.access = access;
   (*symbol)->_base.assignable = true;
-  SyntaxTreeFunction* _SyntaxTreeFunction31;
-  CHECK(170, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction31)) )
-  CHECK(170, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction31, access, is_create, type_instance, &((*symbol)->variable)) )
+  SyntaxTreeFunction* _SyntaxTreeFunction32;
+  CHECK(170, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction32)) )
+  CHECK(170, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction32, access, is_create, type_instance, &((*symbol)->variable)) )
   CHECK(172, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
   return OK;
 }

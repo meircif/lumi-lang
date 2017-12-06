@@ -443,6 +443,12 @@ MR_dec_ref(str_Refman);
   str = *so;
 /// @ t10
 b = (t == ta) || (tb != tc);
+/// @ t11
+c = '0' + 4;
+/// @ t12
+b = fun0 != fun1;
+/// @ t13
+b = b == b;
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -474,7 +480,7 @@ operator "+=" expected "Int" operand, got "Test"
 /// @ te14
 operator "-=" expected "Int" operand, got "Bool"
 /// @ te15
-operator "is" expected non primitive operand, got "Int"
+operator "is" is not supported for type "Int"
 /// @@ test-question-expression
 /// @ t0
 b = !(str == NULL || str_Refman->value == NULL);

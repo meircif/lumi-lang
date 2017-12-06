@@ -54,10 +54,10 @@ static char* _func_name_TypeInstance_parse = "TypeInstance.parse";
 #define MR_FUNC_NAME _func_name_TypeInstance_parse
 Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* node, SyntaxTreeCode* code_node, Char* end) {
   String* name = NULL;
-  String* _String117;
-  CHECK(31, string_new_concat(ends, &(String){2, 1, "{"}, &(_String117)) )
-  Int _Int118;
-  CHECK(31, read_until(_String117, false, &(name), &((*end)), &(_Int118)) )
+  String* _String118;
+  CHECK(31, string_new_concat(ends, &(String){2, 1, "{"}, &(_String118)) )
+  Int _Int119;
+  CHECK(31, read_until(_String118, false, &(name), &((*end)), &(_Int119)) )
   CHECK(33, TypeInstance_parse_name(self, name, node, code_node, &((*end))) )
   return OK;
 }
@@ -71,9 +71,9 @@ static char* _func_name_TypeInstance_parse_name = "TypeInstance.parse-name";
 Returncode TypeInstance_parse_name(TypeInstance* self, String* name, SyntaxTreeNode* node, SyntaxTreeCode* code_node, Char* end) {
   CHECK(40, string_new_copy(name, &(self->name)) )
   if ((*end) == '{') {
-    Bool _Bool119;
-    CHECK(42, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool119)) )
-    if (_Bool119) {
+    Bool _Bool120;
+    CHECK(42, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool120)) )
+    if (_Bool120) {
       CHECK(43, read_c(&((*end))) )
       if ((*end) != '(') {
         CHECK(45, SyntaxTreeNode_m_syntax_error_c(node, &(String){39, 38, "expected \"(\" inside Function type, got"}, (*end)) )
@@ -87,17 +87,17 @@ Returncode TypeInstance_parse_name(TypeInstance* self, String* name, SyntaxTreeN
       CHECK(49, FunctionArguments_parse(self->arguments, &(argument_factory->_base), code_node, &((*end))) )
     }
     else {
-      Bool _Bool120;
-      CHECK(50, String_equal(self->name, &(String){7, 6, "String"}, &(_Bool120)) )
-      if (NULL != code_node && _Bool120) {
+      Bool _Bool121;
+      CHECK(50, String_equal(self->name, &(String){7, 6, "String"}, &(_Bool121)) )
+      if (NULL != code_node && _Bool121) {
         CHECK(51, parse_new_expression(&(String){2, 1, "}"}, code_node, &(self->length_owner), &((*end))) )
         self->length = self->length_owner;
       }
       else {
         Bool has_sub_type = true;
-        Bool _Bool121;
-        CHECK(56, String_equal(self->name, &(String){6, 5, "Array"}, &(_Bool121)) )
-        if (NULL != code_node && _Bool121) {
+        Bool _Bool122;
+        CHECK(56, String_equal(self->name, &(String){6, 5, "Array"}, &(_Bool122)) )
+        if (NULL != code_node && _Bool122) {
           CHECK(57, parse_new_expression(&(String){3, 2, ":}"}, code_node, &(self->length_owner), &((*end))) )
           self->length = self->length_owner;
           if ((*end) != ':' && (*end) != '}') {
@@ -232,9 +232,9 @@ Returncode TypeInstance_check_assign_to(TypeInstance* self, TypeInstance* target
   }
   TypeData* base_type = self->type_data;
   while (true) {
-    Bool _Bool122;
-    CHECK(122, TypeData_m_is_same(target->type_data, base_type, &(_Bool122)) )
-    if (!(!_Bool122)) break;
+    Bool _Bool123;
+    CHECK(122, TypeData_m_is_same(target->type_data, base_type, &(_Bool123)) )
+    if (!(!_Bool123)) break;
     if (!(NULL != base_type->base_type)) {
       CHECK(124, SyntaxTreeNode_m_syntax_error2(node, &(String){14, 13, "cannot assign"}, self->type_data->name, &(String){5, 4, "into"}, target->type_data->name) )
     }
@@ -243,9 +243,9 @@ Returncode TypeInstance_check_assign_to(TypeInstance* self, TypeInstance* target
   }
   
   if (NULL != self->arguments) {
-    Bool _Bool123;
-    CHECK(133, FunctionArguments_check_same_as(self->arguments, target->arguments, &(_Bool123)) )
-    if (_Bool123) {
+    Bool _Bool124;
+    CHECK(133, FunctionArguments_check_same_as(self->arguments, target->arguments, &(_Bool124)) )
+    if (_Bool124) {
       CHECK(134, SyntaxTreeNode_m_syntax_error_msg(node, &(String){16, 15, "too few outputs"}) )
     }
   }
