@@ -290,9 +290,16 @@ Returncode File_putc(File* file, RefManager* file_Refman, Char in_char) {
 Returncode File_write(
     File* file, RefManager* file_Refman,
     String* data, RefManager* data_Refman) {
+  int n, ch, res;
   CHECK_NOT_NULL(file)
   CHECK_NOT_NULL(data)
-  fprintf(file, "%.*s", data->length, data->values);
+  for (n = 0; n < data->length; ++n) {
+    ch = data->values[n];
+    res = putc(ch, file);
+    if (ch != res) {
+      CRAISE
+    }
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -500,16 +507,22 @@ RefManager* stderr_Refman;
 Returncode Sys_print(
     Sys* _, RefManager* __, String* text, RefManager* text_Refman) {
   if (text != NULL && text_Refman->value != NULL) {
-    printf("%.*s", text->length, text->values);
+    int n, ch, res;
+    for (n = 0; n < text->length; ++n) {
+      ch = text->values[n];
+      res = putchar(ch);
+      if (ch != res) {
+        return OK;
+      }
+    }
   }
   return OK;
 }
 
 Returncode Sys_println(
     Sys* _, RefManager* __, String* text, RefManager* text_Refman) {
-  if (text != NULL && text_Refman->value != NULL) {
-    printf("%.*s\n", text->length, text->values);
-  }
+  Sys_print(NULL, NULL, text, text_Refman);
+  putchar('\n');
   return OK;
 }
 
