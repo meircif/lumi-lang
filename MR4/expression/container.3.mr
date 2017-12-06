@@ -184,8 +184,8 @@ class BinaryExpression(UnaryExpression)
             user glob.access-names[self.right-expression.access])
     else-if self.operator.order = 1 and self.operator.name[0] = 'i'
       # `is`/`is-not` operator
-      self.test-not-primitive(user self.right-expression)
-      self.test-not-primitive(user self.left-expression)
+      self.test-not-int(user self.right-expression)
+      self.test-not-int(user self.left-expression)
       self.set-simple-type(user glob.type-bool)
     else
       # any other Int operator
@@ -213,12 +213,12 @@ class BinaryExpression(UnaryExpression)
     self.test-operand-type(user self.right-expression, user expected-type)
     self.test-operand-type(user self.left-expression, user expected-type)
   
-  func inst test-not-primitive(user Expression operand)
-    if operand.result-type.type-data.is-primitive
+  func inst test-not-int(user Expression operand)
+    if operand.result-type.type-data.m-is-same(user glob.type-int)
       self.m-syntax-error2(
           user "operator",
           user self.operator.name,
-          user "expected non primitive operand, got",
+          user "is not supported for type",
           user operand.result-type.type-data.name)
   
   func dynamic write-preactions()

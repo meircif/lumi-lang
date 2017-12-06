@@ -1188,38 +1188,42 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman,
   MR_inc_ref(a_Refman);
   CHECK(299, Int_str(i, s, s_Refman) )
   bv = true || false;
-  cv = EOF;
-  if (a == NULL || a_Refman->value == NULL) RAISE(302)
+  if (a == NULL || a_Refman->value == NULL) RAISE(301)
   i = a->length;
-  if (s == NULL || s_Refman->value == NULL) RAISE(303)
+  if (s == NULL || s_Refman->value == NULL) RAISE(302)
   i = s->length;
-  CHECK(304, String_clear(s, s_Refman) )
-  CHECK(305, String_equal(s, s_Refman, s, s_Refman, &(bv)) )
-  CHECK(306, String_get(s, s_Refman, i, &(cv)) )
-  CHECK(307, String_append(s, s_Refman, c) )
-  CHECK(308, String_new(s, s_Refman, s, s_Refman) )
-  CHECK(309, String_concat(s, s_Refman, s, s_Refman) )
-  CHECK(310, String_concat_int(s, s_Refman, i) )
-  CHECK(311, String_find(s, s_Refman, s, s_Refman, &(iv)) )
-  CHECK(312, String_has(s, s_Refman, c, &(bv)) )
-  CHECK(314, file_open_read(s, s_Refman, &(f), &(f_Refman)) )
-  CHECK(315, file_open_write(s, s_Refman, &(f), &(f_Refman)) )
-  CHECK(316, File_getc(f, f_Refman, &(cv)) )
-  CHECK(317, File_putc(f, f_Refman, c) )
-  CHECK(318, File_write(f, f_Refman, s, s_Refman) )
-  CHECK(319, File_close(f, f_Refman) )
-  if (sys == NULL || sys_Refman->value == NULL) RAISE(320)
-  if (sys->argv == NULL || sys->argv_Refman->value == NULL) RAISE(320)
-  if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(320)
+  CHECK(303, String_clear(s, s_Refman) )
+  CHECK(304, String_equal(s, s_Refman, s, s_Refman, &(bv)) )
+  CHECK(305, String_get(s, s_Refman, i, &(cv)) )
+  CHECK(306, String_append(s, s_Refman, c) )
+  CHECK(307, String_new(s, s_Refman, s, s_Refman) )
+  CHECK(308, String_concat(s, s_Refman, s, s_Refman) )
+  CHECK(309, String_concat_int(s, s_Refman, i) )
+  CHECK(310, String_find(s, s_Refman, s, s_Refman, &(iv)) )
+  CHECK(311, String_has(s, s_Refman, c, &(bv)) )
+  CHECK(313, file_open_read(s, s_Refman, &(f), &(f_Refman)) )
+  CHECK(314, file_open_write(s, s_Refman, &(f), &(f_Refman)) )
+  CHECK(315, File_getc(f, f_Refman, &(cv), &(bv)) )
+  CHECK(316, File_putc(f, f_Refman, c) )
+  CHECK(317, File_write(f, f_Refman, s, s_Refman) )
+  CHECK(318, File_close(f, f_Refman) )
+  if (sys == NULL || sys_Refman->value == NULL) RAISE(319)
+  if (sys->argv == NULL || sys->argv_Refman->value == NULL) RAISE(319)
+  if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(319)
   MR_dec_ref(s_Refman);
   s_Refman = sys->argv_Refman;
   MR_inc_ref(s_Refman);
   s = ((String**)((sys->argv)->values))[1];
-  CHECK(321, Sys_print(sys, sys_Refman, s, s_Refman) )
-  CHECK(322, Sys_println(sys, sys_Refman, s, s_Refman) )
-  CHECK(323, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(bv)) )
-  CHECK(324, Sys_system(sys, sys_Refman, s, s_Refman, &(iv)) )
-  CHECK(325, Sys_exit(sys, sys_Refman, i) )
+  CHECK(320, Sys_print(sys, sys_Refman, s, s_Refman) )
+  CHECK(321, Sys_println(sys, sys_Refman, s, s_Refman) )
+  CHECK(322, Sys_getchar(sys, sys_Refman, &(cv), &(bv)) )
+  CHECK(323, Sys_getline(sys, sys_Refman, s, s_Refman) )
+  CHECK(324, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(bv)) )
+  CHECK(325, Sys_system(sys, sys_Refman, s, s_Refman, &(iv)) )
+  CHECK(326, Sys_exit(sys, sys_Refman, i) )
+  CHECK(327, File_putc(stdout, stdout_Refman, c) )
+  CHECK(328, File_getc(stdin, stdin_Refman, &(cv), &(bv)) )
+  CHECK(329, File_putc(stderr, stderr_Refman, c) )
 MR_cleanup:
   MR_owner_dec_ref(f_Refman);
   MR_dec_ref(a_Refman);
@@ -1248,40 +1252,40 @@ Returncode test_ref_count(void) {
   RefManager* aux_String_2_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(329)
+  if (aux_String_0_Refman == NULL) RAISE(333)
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "test string";
   s = MR_new_string(32);
-  if (s == NULL) RAISE(329)
+  if (s == NULL) RAISE(333)
   s_Refman = MR_new_ref(s);
-  if (s_Refman == NULL) RAISE(329)
-  CHECK(329, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
+  if (s_Refman == NULL) RAISE(333)
+  CHECK(333, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
   s_user = s;
   s_user_Refman = s_Refman;
   MR_inc_ref(s_user_Refman);
-  CHECK(331, Sys_println(sys, sys_Refman, s, s_Refman) )
-  CHECK(332, Sys_println(sys, sys_Refman, s_user, s_user_Refman) )
-  CHECK(333, f_remove(s, s_Refman) )
+  CHECK(335, Sys_println(sys, sys_Refman, s, s_Refman) )
+  CHECK(336, Sys_println(sys, sys_Refman, s_user, s_user_Refman) )
+  CHECK(337, f_remove(s, s_Refman) )
   s = NULL;
   s_Refman = NULL;
   if (! (!(s == NULL || s_Refman->value == NULL))) {
     aux_String_1 = &aux_String_1_Var;
     aux_String_1_Refman = MR_new_ref(aux_String_1);
-    if (aux_String_1_Refman == NULL) RAISE(335)
+    if (aux_String_1_Refman == NULL) RAISE(339)
     aux_String_1_Var.max_length = 17;
     aux_String_1_Var.length = 16;
     aux_String_1_Var.values = "ownership passed";
-    CHECK(335, Sys_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
+    CHECK(339, Sys_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
   }
   if (! (!(s_user == NULL || s_user_Refman->value == NULL))) {
     aux_String_2 = &aux_String_2_Var;
     aux_String_2_Refman = MR_new_ref(aux_String_2);
-    if (aux_String_2_Refman == NULL) RAISE(337)
+    if (aux_String_2_Refman == NULL) RAISE(341)
     aux_String_2_Var.max_length = 15;
     aux_String_2_Var.length = 14;
     aux_String_2_Var.values = "string deleted";
-    CHECK(337, Sys_println(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
+    CHECK(341, Sys_println(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
   }
 MR_cleanup:
   MR_dec_ref(aux_String_2_Refman);
@@ -1313,8 +1317,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(344, test_simple_function() )
-  CHECK(345, test_ref_count() )
+  CHECK(348, test_simple_function() )
+  CHECK(349, test_ref_count() )
 MR_cleanup:
   return MR_err;
 }

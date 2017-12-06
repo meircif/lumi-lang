@@ -42,8 +42,12 @@ int MR_main(int argc, char* argv[]) {
   args_strings = malloc(argc * sizeof(String));
   sys_Var.argv_Refman = MR_new_ref(&sys_argv);
   sys_Refman = MR_new_ref(&sys_Var);
+  stdout_Refman = MR_new_ref(stdout);
+  stdin_Refman = MR_new_ref(stdin);
+  stderr_Refman = MR_new_ref(stderr);
   if (args_strings == NULL || sys_Var.argv_Refman == NULL ||
-      sys_Refman == NULL) {
+      sys_Refman == NULL || stdout_Refman == NULL || stdin_Refman == NULL ||
+      stderr_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
@@ -251,10 +255,21 @@ Returncode File_close(File* file, RefManager* file_Refman) {
 }
 #undef MR_FUNC_NAME
 
+Bool getc_is_eof(int get, char* ch) {
+  if (get == EOF) {
+    return true;
+  }
+  else {
+    *ch = get;
+    return false;
+  }
+}
+
 #define MR_FUNC_NAME "File.getc"
-Returncode File_getc(File* file, RefManager* file_Refman, Char* out_char) {
+Returncode File_getc(
+    File* file, RefManager* file_Refman, Char* out_char, Bool* is_eof) {
   CHECK_NOT_NULL(file)
-  *out_char = getc(file);
+  *is_eof = getc_is_eof(getc(file), out_char);
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -478,6 +493,9 @@ Returncode String_has(
 /*system*/
 Sys* sys;
 RefManager* sys_Refman;
+RefManager* stdout_Refman;
+RefManager* stdin_Refman;
+RefManager* stderr_Refman;
 
 Returncode Sys_print(
     Sys* _, RefManager* __, String* text, RefManager* text_Refman) {
@@ -494,6 +512,30 @@ Returncode Sys_println(
   }
   return OK;
 }
+
+Returncode Sys_getchar(Sys* _, RefManager* __, char* out_char, Bool* is_eof) {
+  *is_eof = getc_is_eof(getchar(), out_char);
+  return OK;
+}
+
+#define MR_FUNC_NAME "Sys.getline"
+Returncode Sys_getline(
+    Sys* _, RefManager* __, String* line, RefManager* line_Refman) {
+  int ch;
+  CHECK_NOT_NULL(line);
+  line->length = 0;
+  ch = getchar();
+  while (ch != EOF && ch != '\n') {
+    if (line->length >= line->max_length) {
+      CRAISE
+    }
+    line->values[line->length] = ch;
+    ++line->length;
+    ch = getchar();
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "Sys.exit"
 Returncode Sys_exit(Sys* _, RefManager* __, Int status) {

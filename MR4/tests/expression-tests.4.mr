@@ -319,6 +319,12 @@ owner String s
 str := so
 ## @ c t10
 b := t is ta or tb is-not tc
+## @ c t11
+c := '0' + 4
+## @ c t12
+b := fun0 is-not fun1
+## @ c t13
+b := b is b
 ## @ ec te0
 345 @ 2
 ## @ ec te1
@@ -445,7 +451,7 @@ i.str(user str)
 b := true
 ## @ c t2
 b := false
-## @ c t3
+## @ ec t3
 c := EOF
 ## @ c t4
 i := arr.length
@@ -476,7 +482,7 @@ file-open-write(user str)->(owner fobj)
 ## @ c t17
 fobj.close()
 ## @ c t18
-fobj.getc()->(var c)
+fobj.getc()->(var c, var b)
 ## @ c t19
 fobj.putc(copy c)
 ## @ c t20
@@ -488,9 +494,19 @@ sys.print(user str)
 ## @ c t23
 sys.println(user str)
 ## @ c t24
-sys.exit(copy i)
+sys.getchar()->(var c, var b)
 ## @ c t25
-sys.system(user str)->(var i)
+sys.getline(user str)
 ## @ c t26
+sys.exit(copy i)
+## @ c t27
+sys.system(user str)->(var i)
+## @ c t28
 sys.getenv(user str, user str)->(var b)
+## @ c t29
+stdout.putc(copy c)
+## @ c t30
+stdin.getc()->(var c, var b)
+## @ c t31
+stderr.putc(copy c)
 ## @

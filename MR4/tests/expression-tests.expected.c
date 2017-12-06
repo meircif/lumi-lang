@@ -443,6 +443,12 @@ MR_dec_ref(str_Refman);
   str = *so;
 /// @ t10
 b = (t == ta) || (tb != tc);
+/// @ t11
+c = '0' + 4;
+/// @ t12
+b = fun0 != fun1;
+/// @ t13
+b = b == b;
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -474,7 +480,7 @@ operator "+=" expected "Int" operand, got "Test"
 /// @ te14
 operator "-=" expected "Int" operand, got "Bool"
 /// @ te15
-operator "is" expected non primitive operand, got "Int"
+operator "is" is not supported for type "Int"
 /// @@ test-question-expression
 /// @ t0
 b = !(str == NULL || str_Refman->value == NULL);
@@ -658,7 +664,7 @@ b = true;
 /// @ t2
 b = false;
 /// @ t3
-c = EOF;
+unknown symbol "EOF"
 /// @ t4
 if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
   i = arr->length;
@@ -690,7 +696,7 @@ CHECK(1, file_open_write(str, str_Refman, &(fobj), &(fobj_Refman)) )
 /// @ t17
 CHECK(1, File_close(fobj, fobj_Refman) )
 /// @ t18
-CHECK(1, File_getc(fobj, fobj_Refman, &(c)) )
+CHECK(1, File_getc(fobj, fobj_Refman, &(c), &(b)) )
 /// @ t19
 CHECK(1, File_putc(fobj, fobj_Refman, c) )
 /// @ t20
@@ -707,9 +713,19 @@ CHECK(1, Sys_print(sys, sys_Refman, str, str_Refman) )
 /// @ t23
 CHECK(1, Sys_println(sys, sys_Refman, str, str_Refman) )
 /// @ t24
-CHECK(1, Sys_exit(sys, sys_Refman, i) )
+CHECK(1, Sys_getchar(sys, sys_Refman, &(c), &(b)) )
 /// @ t25
-CHECK(1, Sys_system(sys, sys_Refman, str, str_Refman, &(i)) )
+CHECK(1, Sys_getline(sys, sys_Refman, str, str_Refman) )
 /// @ t26
+CHECK(1, Sys_exit(sys, sys_Refman, i) )
+/// @ t27
+CHECK(1, Sys_system(sys, sys_Refman, str, str_Refman, &(i)) )
+/// @ t28
 CHECK(1, Sys_getenv(sys, sys_Refman, str, str_Refman, str, str_Refman, &(b)) )
+/// @ t29
+CHECK(1, File_putc(stdout, stdout_Refman, c) )
+/// @ t30
+CHECK(1, File_getc(stdin, stdin_Refman, &(c), &(b)) )
+/// @ t31
+CHECK(1, File_putc(stderr, stderr_Refman, c) )
 /// @

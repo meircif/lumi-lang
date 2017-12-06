@@ -298,7 +298,6 @@ func test-builtins(
   var Bool bv
   i.str(user s)
   bv := true or false
-  cv := EOF
   i := a.length
   i := s.length
   s.clear()
@@ -313,16 +312,21 @@ func test-builtins(
   owner File f
   file-open-read(user s)->(owner f)
   file-open-write(user s)->(owner f)
-  f.getc()->(var cv)
+  f.getc()->(var cv, var bv)
   f.putc(copy c)
   f.write(user s)
   f.close()
   s := sys.argv[1]
   sys.print(user s)
   sys.println(user s)
+  sys.getchar()->(var cv, var bv)
+  sys.getline(user s)
   sys.getenv(user s, user s)->(var bv)
   sys.system(user s)->(var iv)
   sys.exit(copy i)
+  stdout.putc(copy c)
+  stdin.getc()->(var cv, var bv)
+  stderr.putc(copy c)
 
 
 func test-ref-count()

@@ -70,8 +70,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
   
   if (!self->_base.result_type->type_data->is_primitive && self->symbol->variable->is_create) {
     CHECK(43, TypeInstance_check_sequence(self->_base.result_type, &(self->_base._base)) )
-    Int _Int32;
-    CHECK(44, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int32)) )
+    Int _Int33;
+    CHECK(44, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int33)) )
     if (!(NULL != self->arguments->parameters->first) &&  ! (NULL != self->arguments->outputs->first) && (!(NULL != self->constructor) || self->_base.result_type->type_data == &(glob->type_string->_base))) {
       self->constructor = NULL;
     }
@@ -88,8 +88,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
         self_param->code_node = self->_base.code_node;
         self_param->value = &(self->symbol->_base);
         CHECK(58, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-        Bool _Bool33;
-        CHECK(59, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, &(_Bool33)) )
+        Bool _Bool34;
+        CHECK(59, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, &(_Bool34)) )
       }
     }
     
