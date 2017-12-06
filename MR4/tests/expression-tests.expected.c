@@ -96,6 +96,8 @@ MR_dec_ref(t_Refman);
 MR_owner_dec_ref(*so_Refman);
   *so_Refman = NULL;
   *so = NULL;
+/// @ t3
+b = (t == NULL) || (ta != NULL);
 /// @ te0
 cannot assign "Empty Symbol" into "Int"
 /// @@ test-member-expression
@@ -439,6 +441,8 @@ MR_dec_ref(str_Refman);
   str_Refman = *so_Refman;
   MR_inc_ref(str_Refman);
   str = *so;
+/// @ t10
+b = (t == ta) || (tb != tc);
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -457,6 +461,20 @@ assigning into non assignable expression
 assigning into non assignable expression
 /// @ te8
 assigning into an owner a non-owner access "user"
+/// @ te9
+operator "or" expected "Bool" operand, got "Int"
+/// @ te10
+operator ">" expected "Int" operand, got "Test"
+/// @ te11
+operator ">" expected "Int" operand, got "Test"
+/// @ te12
+operator "+" expected "Int" operand, got "Test"
+/// @ te13
+operator "+=" expected "Int" operand, got "Test"
+/// @ te14
+operator "-=" expected "Int" operand, got "Bool"
+/// @ te15
+operator "is" expected non primitive operand, got "Int"
 /// @@ test-question-expression
 /// @ t0
 b = !(str == NULL || str_Refman->value == NULL);

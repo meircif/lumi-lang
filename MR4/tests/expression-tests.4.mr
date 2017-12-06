@@ -76,6 +76,8 @@ str := _
 t := _
 ## @ c t2
 so := _
+## @ c t3
+b := t is _ or ta is-not _
 ## @ ec te0
 i := _
 ## @@ test-member-expression
@@ -315,6 +317,8 @@ owner String s
   s := so
 ## @ c t9
 str := so
+## @ c t10
+b := t is ta or tb is-not tc
 ## @ ec te0
 345 @ 2
 ## @ ec te1
@@ -333,6 +337,20 @@ str := so
 1 -= 2
 ## @ ec te8
 so := str
+## @ ec te9
+b := 1 or 2
+## @ ec te10
+b := t > 3
+## @ ec te11
+b := 1 > 4 > t
+## @ ec te12
+i := 3 + t
+## @ ec te13
+t += 3
+## @ ec te14
+i -= b
+## @ ec te15
+b := 3 is t
 ## @@ test-question-expression
 ## @ c t0
 b := str?

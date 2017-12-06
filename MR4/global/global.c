@@ -125,12 +125,14 @@ Returncode Global_init_operator_map(Global* self) {
   CHECK(82, Global_add_operator_copy(self, &(String){2, 1, "<"}, 1, 0) )
   CHECK(83, Global_add_operator_copy(self, &(String){3, 2, ">="}, 1, 0) )
   CHECK(84, Global_add_operator_copy(self, &(String){3, 2, "<="}, 1, 0) )
-  CHECK(85, Global_add_operator(self, &(String){4, 3, "not"}, &(String){2, 1, "!"}, 2, 0) )
-  CHECK(86, Global_add_operator(self, &(String){3, 2, "or"}, &(String){3, 2, "||"}, 3, 0) )
-  CHECK(87, Global_add_operator(self, &(String){4, 3, "and"}, &(String){3, 2, "&&"}, 3, 1) )
-  CHECK(88, Global_add_operator(self, &(String){3, 2, ":="}, &(String){2, 1, "="}, 4, 0) )
-  CHECK(89, Global_add_operator_copy(self, &(String){3, 2, "+="}, 4, 1) )
-  CHECK(90, Global_add_operator_copy(self, &(String){3, 2, "-="}, 4, 2) )
+  CHECK(85, Global_add_operator(self, &(String){3, 2, "is"}, &(String){3, 2, "=="}, 1, 0) )
+  CHECK(86, Global_add_operator(self, &(String){7, 6, "is-not"}, &(String){3, 2, "!="}, 1, 0) )
+  CHECK(87, Global_add_operator(self, &(String){4, 3, "not"}, &(String){2, 1, "!"}, 2, 0) )
+  CHECK(88, Global_add_operator(self, &(String){3, 2, "or"}, &(String){3, 2, "||"}, 3, 0) )
+  CHECK(89, Global_add_operator(self, &(String){4, 3, "and"}, &(String){3, 2, "&&"}, 3, 1) )
+  CHECK(90, Global_add_operator(self, &(String){3, 2, ":="}, &(String){2, 1, "="}, 4, 0) )
+  CHECK(91, Global_add_operator_copy(self, &(String){3, 2, "+="}, 4, 1) )
+  CHECK(92, Global_add_operator_copy(self, &(String){3, 2, "-="}, 4, 2) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -142,10 +144,10 @@ static char* _func_name_Global_add_operator = "Global.add-operator";
 #define MR_FUNC_NAME _func_name_Global_add_operator
 Returncode Global_add_operator(Global* self, String* name, String* c_name, Int order, Int group_index) {
   Operator* operator = malloc(sizeof(Operator));
-  if (operator == NULL) RAISE(97)
+  if (operator == NULL) RAISE(99)
   *operator = (Operator){NULL, NULL, 0, 0};
-  CHECK(98, Operator_init(operator, name, c_name, order, group_index) )
-  CHECK(99, NameMap_add(self->operator_map, operator->name, operator) )
+  CHECK(100, Operator_init(operator, name, c_name, order, group_index) )
+  CHECK(101, NameMap_add(self->operator_map, operator->name, operator) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -156,7 +158,7 @@ Returncode Global_add_operator_copy(Global* self, String* name, Int order, Int g
 static char* _func_name_Global_add_operator_copy = "Global.add-operator-copy";
 #define MR_FUNC_NAME _func_name_Global_add_operator_copy
 Returncode Global_add_operator_copy(Global* self, String* name, Int order, Int group_index) {
-  CHECK(105, Global_add_operator(self, name, name, order, group_index) )
+  CHECK(107, Global_add_operator(self, name, name, order, group_index) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -168,111 +170,111 @@ static char* _func_name_Global_init_builtin_types = "Global.init-builtin-types";
 #define MR_FUNC_NAME _func_name_Global_init_builtin_types
 Returncode Global_init_builtin_types(Global* self) {
   self->type_map = malloc(sizeof(NameMap));
-  if (self->type_map == NULL) RAISE(108)
+  if (self->type_map == NULL) RAISE(110)
   *self->type_map = (NameMap){NULL, NULL};
-  CHECK(109, Global_add_builtin_type(self, &(String){5, 4, "Char"}, true, &(self->type_char)) )
-  CHECK(110, Global_add_builtin_type(self, &(String){5, 4, "Bool"}, true, &(self->type_bool)) )
-  CHECK(111, Global_add_builtin_type(self, &(String){4, 3, "Int"}, true, &(self->type_int)) )
-  CHECK(112, Global_add_builtin_type(self, &(String){13, 12, "Empty Symbol"}, false, &(self->type_empty)) )
-  CHECK(114, Global_add_builtin_type(self, &(String){5, 4, "Func"}, true, &(self->type_func)) )
-  CHECK(115, Global_add_builtin_type(self, &(String){7, 6, "String"}, false, &(self->type_string)) )
-  CHECK(116, Global_add_builtin_type(self, &(String){6, 5, "Array"}, false, &(self->type_array)) )
-  CHECK(117, Global_add_builtin_type(self, &(String){5, 4, "Type"}, false, &(self->type_type)) )
-  CHECK(118, Global_add_builtin_type(self, &(String){12, 11, "Base Symbol"}, false, &(self->type_base)) )
-  CHECK(119, Global_add_builtin_type(self, &(String){5, 4, "File"}, false, &(self->type_file)) )
-  CHECK(120, Global_add_builtin_type(self, &(String){4, 3, "Sys"}, false, &(self->type_sys)) )
+  CHECK(111, Global_add_builtin_type(self, &(String){5, 4, "Char"}, true, &(self->type_char)) )
+  CHECK(112, Global_add_builtin_type(self, &(String){5, 4, "Bool"}, true, &(self->type_bool)) )
+  CHECK(113, Global_add_builtin_type(self, &(String){4, 3, "Int"}, true, &(self->type_int)) )
+  CHECK(114, Global_add_builtin_type(self, &(String){13, 12, "Empty Symbol"}, false, &(self->type_empty)) )
+  CHECK(116, Global_add_builtin_type(self, &(String){5, 4, "Func"}, true, &(self->type_func)) )
+  CHECK(117, Global_add_builtin_type(self, &(String){7, 6, "String"}, false, &(self->type_string)) )
+  CHECK(118, Global_add_builtin_type(self, &(String){6, 5, "Array"}, false, &(self->type_array)) )
+  CHECK(119, Global_add_builtin_type(self, &(String){5, 4, "Type"}, false, &(self->type_type)) )
+  CHECK(120, Global_add_builtin_type(self, &(String){12, 11, "Base Symbol"}, false, &(self->type_base)) )
+  CHECK(121, Global_add_builtin_type(self, &(String){5, 4, "File"}, false, &(self->type_file)) )
+  CHECK(122, Global_add_builtin_type(self, &(String){4, 3, "Sys"}, false, &(self->type_sys)) )
   
   FunctionArguments* arguments = NULL;
   
   /* Int */
-  CHECK(125, Global_add_builtin_method(self, &(glob->type_int->_base), &(String){4, 3, "str"}, &(arguments)) )
-  CHECK(126, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){4, 3, "str"}) )
+  CHECK(127, Global_add_builtin_method(self, &(glob->type_int->_base), &(String){4, 3, "str"}, &(arguments)) )
+  CHECK(128, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){4, 3, "str"}) )
   
   /* Bool */
-  CHECK(130, Global_add_builtin_global_variable(self, &(glob->type_bool->_base), &(String){5, 4, "true"}) )
-  CHECK(131, Global_add_builtin_global_variable(self, &(glob->type_bool->_base), &(String){6, 5, "false"}) )
+  CHECK(132, Global_add_builtin_global_variable(self, &(glob->type_bool->_base), &(String){5, 4, "true"}) )
+  CHECK(133, Global_add_builtin_global_variable(self, &(glob->type_bool->_base), &(String){6, 5, "false"}) )
   
   /* Char */
-  CHECK(134, Global_add_builtin_global_variable(self, &(glob->type_char->_base), &(String){4, 3, "EOF"}) )
+  CHECK(136, Global_add_builtin_global_variable(self, &(glob->type_char->_base), &(String){4, 3, "EOF"}) )
   
   /* String */
-  CHECK(137, Global_add_builtin_field(self, &(glob->type_string->_base), &(String){7, 6, "length"}, &(glob->type_int->_base), NULL) )
+  CHECK(139, Global_add_builtin_field(self, &(glob->type_string->_base), &(String){7, 6, "length"}, &(glob->type_int->_base), NULL) )
   
-  CHECK(140, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "new"}, &(arguments)) )
-  CHECK(141, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "other"}) )
+  CHECK(142, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "new"}, &(arguments)) )
+  CHECK(143, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "other"}) )
   
-  CHECK(144, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){6, 5, "clear"}, &(arguments)) )
+  CHECK(146, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){6, 5, "clear"}, &(arguments)) )
   
-  CHECK(147, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){6, 5, "equal"}, &(arguments)) )
-  CHECK(149, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){8, 7, "pattern"}) )
-  CHECK(151, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_bool->_base), &(String){6, 5, "equal"}) )
+  CHECK(149, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){6, 5, "equal"}, &(arguments)) )
+  CHECK(151, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){8, 7, "pattern"}) )
+  CHECK(153, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_bool->_base), &(String){6, 5, "equal"}) )
   
-  CHECK(154, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "get"}, &(arguments)) )
-  CHECK(155, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_int->_base), &(String){6, 5, "index"}) )
-  CHECK(157, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
+  CHECK(156, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "get"}, &(arguments)) )
+  CHECK(157, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_int->_base), &(String){6, 5, "index"}) )
+  CHECK(159, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
   
-  CHECK(160, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){7, 6, "append"}, &(arguments)) )
-  CHECK(162, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
+  CHECK(162, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){7, 6, "append"}, &(arguments)) )
+  CHECK(164, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
   
-  CHECK(165, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){7, 6, "concat"}, &(arguments)) )
-  CHECK(167, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "other"}) )
+  CHECK(167, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){7, 6, "concat"}, &(arguments)) )
+  CHECK(169, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "other"}) )
   
-  CHECK(170, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){11, 10, "concat-int"}, &(arguments)) )
-  CHECK(172, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_int->_base), &(String){7, 6, "number"}) )
+  CHECK(172, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){11, 10, "concat-int"}, &(arguments)) )
+  CHECK(174, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_int->_base), &(String){7, 6, "number"}) )
   
-  CHECK(175, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){5, 4, "find"}, &(arguments)) )
-  CHECK(176, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){8, 7, "pattern"}) )
-  CHECK(178, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_int->_base), &(String){6, 5, "index"}) )
+  CHECK(177, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){5, 4, "find"}, &(arguments)) )
+  CHECK(178, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){8, 7, "pattern"}) )
+  CHECK(180, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_int->_base), &(String){6, 5, "index"}) )
   
-  CHECK(181, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "has"}, &(arguments)) )
-  CHECK(182, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
-  CHECK(184, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_bool->_base), &(String){6, 5, "equal"}) )
+  CHECK(183, Global_add_builtin_method(self, &(glob->type_string->_base), &(String){4, 3, "has"}, &(arguments)) )
+  CHECK(184, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
+  CHECK(186, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_bool->_base), &(String){6, 5, "equal"}) )
   
   /* Array */
-  CHECK(188, Global_add_builtin_field(self, &(glob->type_array->_base), &(String){7, 6, "length"}, &(glob->type_int->_base), NULL) )
+  CHECK(190, Global_add_builtin_field(self, &(glob->type_array->_base), &(String){7, 6, "length"}, &(glob->type_int->_base), NULL) )
   
   /* File */
-  CHECK(192, Global_add_builtin_global_function(self, &(String){15, 14, "file-open-read"}, &(arguments)) )
-  CHECK(193, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "name"}) )
-  CHECK(195, Global_add_builtin_output(self, arguments, ACCESS_OWNER, &(glob->type_file->_base), &(String){5, 4, "file"}) )
+  CHECK(194, Global_add_builtin_global_function(self, &(String){15, 14, "file-open-read"}, &(arguments)) )
+  CHECK(195, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "name"}) )
+  CHECK(197, Global_add_builtin_output(self, arguments, ACCESS_OWNER, &(glob->type_file->_base), &(String){5, 4, "file"}) )
   
-  CHECK(198, Global_add_builtin_global_function(self, &(String){16, 15, "file-open-write"}, &(arguments)) )
-  CHECK(199, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "name"}) )
-  CHECK(201, Global_add_builtin_output(self, arguments, ACCESS_OWNER, &(glob->type_file->_base), &(String){5, 4, "file"}) )
+  CHECK(200, Global_add_builtin_global_function(self, &(String){16, 15, "file-open-write"}, &(arguments)) )
+  CHECK(201, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "name"}) )
+  CHECK(203, Global_add_builtin_output(self, arguments, ACCESS_OWNER, &(glob->type_file->_base), &(String){5, 4, "file"}) )
   
-  CHECK(204, Global_add_builtin_method(self, &(glob->type_file->_base), &(String){6, 5, "close"}, &(arguments)) )
+  CHECK(206, Global_add_builtin_method(self, &(glob->type_file->_base), &(String){6, 5, "close"}, &(arguments)) )
   
-  CHECK(206, Global_add_builtin_method(self, &(glob->type_file->_base), &(String){5, 4, "getc"}, &(arguments)) )
-  CHECK(207, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
+  CHECK(208, Global_add_builtin_method(self, &(glob->type_file->_base), &(String){5, 4, "getc"}, &(arguments)) )
+  CHECK(209, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
   
-  CHECK(210, Global_add_builtin_method(self, &(glob->type_file->_base), &(String){5, 4, "putc"}, &(arguments)) )
-  CHECK(211, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
+  CHECK(212, Global_add_builtin_method(self, &(glob->type_file->_base), &(String){5, 4, "putc"}, &(arguments)) )
+  CHECK(213, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_char->_base), &(String){3, 2, "ch"}) )
   
-  CHECK(214, Global_add_builtin_method(self, &(glob->type_file->_base), &(String){6, 5, "write"}, &(arguments)) )
-  CHECK(215, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "text"}) )
+  CHECK(216, Global_add_builtin_method(self, &(glob->type_file->_base), &(String){6, 5, "write"}, &(arguments)) )
+  CHECK(217, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "text"}) )
   
   /* Sys */
-  CHECK(219, Global_add_builtin_field(self, &(glob->type_sys->_base), &(String){5, 4, "argv"}, &(glob->type_array->_base), &(glob->type_string->_base)) )
+  CHECK(221, Global_add_builtin_field(self, &(glob->type_sys->_base), &(String){5, 4, "argv"}, &(glob->type_array->_base), &(glob->type_string->_base)) )
   
-  CHECK(225, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){6, 5, "print"}, &(arguments)) )
-  CHECK(226, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "text"}) )
+  CHECK(227, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){6, 5, "print"}, &(arguments)) )
+  CHECK(228, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "text"}) )
   
-  CHECK(229, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){8, 7, "println"}, &(arguments)) )
-  CHECK(230, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "text"}) )
+  CHECK(231, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){8, 7, "println"}, &(arguments)) )
+  CHECK(232, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "text"}) )
   
-  CHECK(233, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){5, 4, "exit"}, &(arguments)) )
-  CHECK(234, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_int->_base), &(String){7, 6, "status"}) )
+  CHECK(235, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){5, 4, "exit"}, &(arguments)) )
+  CHECK(236, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, &(glob->type_int->_base), &(String){7, 6, "status"}) )
   
-  CHECK(237, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){7, 6, "system"}, &(arguments)) )
-  CHECK(238, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){8, 7, "command"}) )
-  CHECK(240, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_int->_base), &(String){7, 6, "status"}) )
+  CHECK(239, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){7, 6, "system"}, &(arguments)) )
+  CHECK(240, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){8, 7, "command"}) )
+  CHECK(242, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_int->_base), &(String){7, 6, "status"}) )
   
-  CHECK(243, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){7, 6, "getenv"}, &(arguments)) )
-  CHECK(244, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "name"}) )
-  CHECK(246, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "value"}) )
-  CHECK(248, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_bool->_base), &(String){7, 6, "exists"}) )
+  CHECK(245, Global_add_builtin_method(self, &(glob->type_sys->_base), &(String){7, 6, "getenv"}, &(arguments)) )
+  CHECK(246, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){5, 4, "name"}) )
+  CHECK(248, Global_add_builtin_parameter(self, arguments, ACCESS_USER, &(glob->type_string->_base), &(String){6, 5, "value"}) )
+  CHECK(250, Global_add_builtin_output(self, arguments, ACCESS_VAR, &(glob->type_bool->_base), &(String){7, 6, "exists"}) )
   
-  CHECK(251, Global_add_builtin_global_variable(self, &(glob->type_sys->_base), &(String){4, 3, "sys"}) )
+  CHECK(253, Global_add_builtin_global_variable(self, &(glob->type_sys->_base), &(String){4, 3, "sys"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -284,13 +286,13 @@ static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_type
 Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, BuiltinType** type_data) {
   (*type_data) = malloc(sizeof(BuiltinType));
-  if ((*type_data) == NULL) RAISE(255)
+  if ((*type_data) == NULL) RAISE(257)
   *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
   (*type_data)->_base._base._base._base._dtl = BuiltinType__dtl;
-  CHECK(256, string_new_copy(name, &((*type_data)->_base.name)) )
+  CHECK(258, string_new_copy(name, &((*type_data)->_base.name)) )
   (*type_data)->_base.is_primitive = is_primitive;
-  CHECK(258, Global_add_type(self, &((*type_data)->_base)) )
-  CHECK(259, List_add(self->root->types, &((*type_data)->_base)) )
+  CHECK(260, Global_add_type(self, &((*type_data)->_base)) )
+  CHECK(261, List_add(self->root->types, &((*type_data)->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -301,8 +303,8 @@ Returncode Global_add_type(Global* self, TypeData* type_data);
 static char* _func_name_Global_add_type = "Global.add-type";
 #define MR_FUNC_NAME _func_name_Global_add_type
 Returncode Global_add_type(Global* self, TypeData* type_data) {
-  CHECK(262, SyntaxTreeNamespace_init(&(type_data->_base)) )
-  CHECK(263, NameMap_add(self->type_map, type_data->name, type_data) )
+  CHECK(264, SyntaxTreeNamespace_init(&(type_data->_base)) )
+  CHECK(265, NameMap_add(self->type_map, type_data->name, type_data) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -313,7 +315,7 @@ Returncode Global_add_builtin_global_variable(Global* self, TypeData* variable_t
 static char* _func_name_Global_add_builtin_global_variable = "Global.add-builtin-global-variable";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_global_variable
 Returncode Global_add_builtin_global_variable(Global* self, TypeData* variable_type, String* name) {
-  CHECK(267, Global_add_builtin_variable(self, name, variable_type, NULL, NULL, &(self->root->_base._base)) )
+  CHECK(269, Global_add_builtin_variable(self, name, variable_type, NULL, NULL, &(self->root->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -324,7 +326,7 @@ Returncode Global_add_builtin_field(Global* self, TypeData* builtin_type, String
 static char* _func_name_Global_add_builtin_field = "Global.add-builtin-field";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_field
 Returncode Global_add_builtin_field(Global* self, TypeData* builtin_type, String* name, TypeData* field_type, TypeData* field_subtype) {
-  CHECK(275, Global_add_builtin_variable(self, name, field_type, field_subtype, builtin_type, &(builtin_type->_base._base)) )
+  CHECK(277, Global_add_builtin_variable(self, name, field_type, field_subtype, builtin_type, &(builtin_type->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -336,22 +338,22 @@ static char* _func_name_Global_add_builtin_variable = "Global.add-builtin-variab
 #define MR_FUNC_NAME _func_name_Global_add_builtin_variable
 Returncode Global_add_builtin_variable(Global* self, String* name, TypeData* variable_type, TypeData* variable_subtype, TypeData* parent_type, SyntaxTreeBranch* branch) {
   BuiltinVariable* variable = malloc(sizeof(BuiltinVariable));
-  if (variable == NULL) RAISE(288)
+  if (variable == NULL) RAISE(290)
   *variable = (BuiltinVariable){BuiltinVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false};
   variable->_base._base._base._dtl = BuiltinVariable__dtl;
-  CHECK(289, string_new_copy(name, &(variable->_base.name)) )
+  CHECK(291, string_new_copy(name, &(variable->_base.name)) )
   if (variable_type->is_primitive) {
     variable->_base.access = ACCESS_VAR;
   }
   else {
     variable->_base.access = ACCESS_OWNER;
   }
-  CHECK(294, TypeData_m_new_type_instance(variable_type, &(variable->_base.type_instance)) )
+  CHECK(296, TypeData_m_new_type_instance(variable_type, &(variable->_base.type_instance)) )
   if (NULL != variable_subtype) {
-    CHECK(296, TypeData_m_new_type_instance(variable_subtype, &(variable->_base.type_instance->sub_type)) )
+    CHECK(298, TypeData_m_new_type_instance(variable_subtype, &(variable->_base.type_instance->sub_type)) )
   }
   variable->_base.parent_type = parent_type;
-  CHECK(299, List_add(branch->variables, &(variable->_base)) )
+  CHECK(301, List_add(branch->variables, &(variable->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -362,7 +364,7 @@ Returncode Global_add_builtin_global_function(Global* self, String* name, Functi
 static char* _func_name_Global_add_builtin_global_function = "Global.add-builtin-global-function";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_global_function
 Returncode Global_add_builtin_global_function(Global* self, String* name, FunctionArguments** arguments) {
-  CHECK(303, Global_add_builtin_function(self, name, NULL, &(glob->root->_base), &((*arguments))) )
+  CHECK(305, Global_add_builtin_function(self, name, NULL, &(glob->root->_base), &((*arguments))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -373,8 +375,8 @@ Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, Strin
 static char* _func_name_Global_add_builtin_method = "Global.add-builtin-method";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_method
 Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, String* name, FunctionArguments** arguments) {
-  CHECK(308, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
-  CHECK(310, Global_add_builtin_parameter(self, (*arguments), ACCESS_VAR, builtin_type, &(String){5, 4, "self"}) )
+  CHECK(310, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
+  CHECK(312, Global_add_builtin_parameter(self, (*arguments), ACCESS_VAR, builtin_type, &(String){5, 4, "self"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -386,19 +388,19 @@ static char* _func_name_Global_add_builtin_function = "Global.add-builtin-functi
 #define MR_FUNC_NAME _func_name_Global_add_builtin_function
 Returncode Global_add_builtin_function(Global* self, String* name, TypeData* parent_type, SyntaxTreeNamespace* namespace, FunctionArguments** arguments) {
   BuiltinFunction* function = malloc(sizeof(BuiltinFunction));
-  if (function == NULL) RAISE(318)
+  if (function == NULL) RAISE(320)
   *function = (BuiltinFunction){BuiltinFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   function->_base._base._base._base._dtl = BuiltinFunction__dtl;
-  CHECK(319, SyntaxTreeFunction_init(&(function->_base)) )
-  CHECK(320, string_new_copy(name, &(function->_base.name)) )
+  CHECK(321, SyntaxTreeFunction_init(&(function->_base)) )
+  CHECK(322, string_new_copy(name, &(function->_base.name)) )
   function->_base.parent_type = parent_type;
   function->_base.arguments = malloc(sizeof(FunctionArguments));
-  if (function->_base.arguments == NULL) RAISE(322)
+  if (function->_base.arguments == NULL) RAISE(324)
   *function->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   function->_base.arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(323, FunctionArguments_init(function->_base.arguments) )
+  CHECK(325, FunctionArguments_init(function->_base.arguments) )
   (*arguments) = function->_base.arguments;
-  CHECK(325, List_add(namespace->functions, &(function->_base)) )
+  CHECK(327, List_add(namespace->functions, &(function->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -409,7 +411,7 @@ Returncode Global_add_builtin_parameter(Global* self, FunctionArguments* argumen
 static char* _func_name_Global_add_builtin_parameter = "Global.add-builtin-parameter";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_parameter
 Returncode Global_add_builtin_parameter(Global* self, FunctionArguments* arguments, Int access, TypeData* parameter_type, String* name) {
-  CHECK(332, Global_add_builtin_argument(self, arguments->parameters, false, access, parameter_type, name) )
+  CHECK(334, Global_add_builtin_argument(self, arguments->parameters, false, access, parameter_type, name) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -420,7 +422,7 @@ Returncode Global_add_builtin_output(Global* self, FunctionArguments* arguments,
 static char* _func_name_Global_add_builtin_output = "Global.add-builtin-output";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_output
 Returncode Global_add_builtin_output(Global* self, FunctionArguments* arguments, Int access, TypeData* output_type, String* name) {
-  CHECK(344, Global_add_builtin_argument(self, arguments->outputs, true, access, output_type, name) )
+  CHECK(346, Global_add_builtin_argument(self, arguments->outputs, true, access, output_type, name) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -432,19 +434,19 @@ static char* _func_name_Global_add_builtin_argument = "Global.add-builtin-argume
 #define MR_FUNC_NAME _func_name_Global_add_builtin_argument
 Returncode Global_add_builtin_argument(Global* self, List* argument_list, Bool is_output, Int access, TypeData* argument_type, String* name) {
   DeclarationArgument* argument = malloc(sizeof(DeclarationArgument));
-  if (argument == NULL) RAISE(357)
+  if (argument == NULL) RAISE(359)
   *argument = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
   argument->_base._base._dtl = DeclarationArgument__dtl;
   argument->_base.access = access;
   argument->_base.is_output = is_output;
   argument->variable = malloc(sizeof(SyntaxTreeVariable));
-  if (argument->variable == NULL) RAISE(360)
+  if (argument->variable == NULL) RAISE(362)
   *argument->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false};
   argument->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
-  CHECK(361, string_new_copy(name, &(argument->variable->name)) )
+  CHECK(363, string_new_copy(name, &(argument->variable->name)) )
   argument->variable->access = access;
-  CHECK(363, TypeData_m_new_type_instance(argument_type, &(argument->variable->type_instance)) )
-  CHECK(365, List_add(argument_list, &(argument->_base)) )
+  CHECK(365, TypeData_m_new_type_instance(argument_type, &(argument->variable->type_instance)) )
+  CHECK(367, List_add(argument_list, &(argument->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME

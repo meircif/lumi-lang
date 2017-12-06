@@ -170,7 +170,7 @@ class BinaryExpression(UnaryExpression)
       # `not` operator
       self.m-syntax-error-msg(user "cannot use \"not\" as binary operand")
     if self.operator.order = 3
-      # `or`\`and` operator
+      # `or`/`and` operator
       self.test-operands-type(user glob.type-bool)
       self.set-simple-type(user glob.type-bool)
     else-if self.operator.order = 4 and self.operator.group-index = 0
@@ -182,6 +182,11 @@ class BinaryExpression(UnaryExpression)
         self.m-syntax-error(
             user "assigning into an owner a non-owner access",
             user glob.access-names[self.right-expression.access])
+    else-if self.operator.order = 1 and self.operator.name[0] = 'i'
+      # `is`/`is-not` operator
+      self.test-not-primitive(user self.right-expression)
+      self.test-not-primitive(user self.left-expression)
+      self.set-simple-type(user glob.type-bool)
     else
       # any other Int operator
       if self.operator.order = 1 and ? self.binary-left-expression and
@@ -207,6 +212,14 @@ class BinaryExpression(UnaryExpression)
   func inst test-operands-type(user TypeData expected-type)
     self.test-operand-type(user self.right-expression, user expected-type)
     self.test-operand-type(user self.left-expression, user expected-type)
+  
+  func inst test-not-primitive(user Expression operand)
+    if operand.result-type.type-data.is-primitive
+      self.m-syntax-error2(
+          user "operator",
+          user self.operator.name,
+          user "expected non primitive operand, got",
+          user operand.result-type.type-data.name)
   
   func dynamic write-preactions()
     base.write-preactions()

@@ -634,8 +634,8 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   Array* sfn = NULL;
   RefManager* sfn_Refman = NULL;
   Int ix = 0;
-  String* is = NULL;
-  RefManager* is_Refman = NULL;
+  String* si = NULL;
+  RefManager* si_Refman = NULL;
   char isv_Values[12];
   String isv_Var = {12, 0, NULL};
   String* isv = NULL;
@@ -763,9 +763,9 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   if (arr == NULL || arr_Refman->value == NULL) RAISE(119)
   if ((0) < 0 || (0) >= (arr)->length) RAISE(119)
   ix = ((Int*)((arr)->values))[0];
-  is = text;
-  is_Refman = text_Refman;
-  MR_inc_ref(is_Refman);
+  si = text;
+  si_Refman = text_Refman;
+  MR_inc_ref(si_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(121)
@@ -880,7 +880,7 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   TEST_ASSERT(156, !(san == NULL || san_Refman->value == NULL))
   TEST_ASSERT(157, !(sfn == NULL || sfn_Refman->value == NULL))
   TEST_ASSERT(158, ix == 0)
-  TEST_ASSERT(159, !(is == NULL || is_Refman->value == NULL))
+  TEST_ASSERT(159, !(si == NULL || si_Refman->value == NULL))
   if (fi == NULL) RAISE(160)
   CHECK(160, fi(7, &(aux_String_2), &(aux_String_2_Refman)) )
   TEST_ASSERT(161, !(isv == NULL || isv_Refman->value == NULL))
@@ -902,7 +902,7 @@ MR_cleanup:
   MR_dec_ref(itv_Refman);
   MR_owner_dec_ref(isn_Refman);
   MR_dec_ref(isv_Refman);
-  MR_dec_ref(is_Refman);
+  MR_dec_ref(si_Refman);
   MR_owner_dec_ref(sfn_Refman);
   MR_owner_dec_ref(san_Refman);
   MR_owner_dec_ref(dan_Refman);
@@ -1079,6 +1079,9 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
   Int y = 0;
   Int z = 0;
   Int w = 0;
+  Array aux_Array_0_Var = {0};
+  Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
   MR_inc_ref(arr_Refman);
   if (arr == NULL || arr_Refman->value == NULL) RAISE(265)
   if ((4) < 0 || (4) >= (arr)->length) RAISE(265)
@@ -1116,7 +1119,7 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
     if (arr == NULL || arr_Refman->value == NULL) RAISE(277)
     if ((2) < 0 || (2) >= (arr)->length) RAISE(277)
     x = ((Int*)((arr)->values))[2];
-    if (!(x > 3)) break;
+    if (!((x > 3) && (arr == NULL))) break;
     y = x - 1;
     while (true) {
       if (arr == NULL || arr_Refman->value == NULL) RAISE(281)
@@ -1150,7 +1153,14 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
     if (arr == NULL || arr_Refman->value == NULL) RAISE(289)
     if ((0) < 0 || (0) >= (arr)->length) RAISE(289)
     w = ((Int*)((arr)->values))[0];
-    if (w > 4) {
+    aux_Array_0 = &aux_Array_0_Var;
+    aux_Array_0_Refman = MR_new_ref(aux_Array_0);
+    if (aux_Array_0_Refman == NULL) RAISE(290)
+    aux_Array_0_Var.length = 2;
+    aux_Array_0_Var.values = (Byte*)((arr)->values) + (3);
+    if (arr == NULL || arr_Refman->value == NULL) RAISE(290)
+    if ((3) < 0 || (2) < 0 || (3) + (2) > (arr)->length) RAISE(290)
+    if ((w > 4) && (arr != aux_Array_0)) {
       if (arr == NULL || arr_Refman->value == NULL) RAISE(291)
       if ((1) < 0 || (1) >= (arr)->length) RAISE(291)
       ((Int*)((arr)->values))[1] = w;
@@ -1158,6 +1168,7 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
   }
   }
 MR_cleanup:
+  MR_dec_ref(aux_Array_0_Refman);
   MR_dec_ref(arr_Refman);
   return MR_err;
 }

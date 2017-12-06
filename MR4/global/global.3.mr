@@ -82,6 +82,8 @@ static Global
     self.add-operator-copy(user "<", copy 1, copy 0)
     self.add-operator-copy(user ">=", copy 1, copy 0)
     self.add-operator-copy(user "<=", copy 1, copy 0)
+    self.add-operator(user "is", user "==", copy 1, copy 0)
+    self.add-operator(user "is-not", user "!=", copy 1, copy 0)
     self.add-operator(user "not", user "!", copy 2, copy 0)
     self.add-operator(user "or", user "||", copy 3, copy 0)
     self.add-operator(user "and", user "&&", copy 3, copy 1)
