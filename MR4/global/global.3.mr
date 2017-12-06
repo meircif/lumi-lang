@@ -217,6 +217,10 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "text")
     
+    self.add-builtin-global-variable(user glob.type-file, user "stdout")
+    self.add-builtin-global-variable(user glob.type-file, user "stdin")
+    self.add-builtin-global-variable(user glob.type-file, user "stderr")
+    
     # Sys
     self.add-builtin-field(
         user glob.type-sys,

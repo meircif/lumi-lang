@@ -722,4 +722,10 @@ CHECK(1, Sys_exit(sys, sys_Refman, i) )
 CHECK(1, Sys_system(sys, sys_Refman, str, str_Refman, &(i)) )
 /// @ t28
 CHECK(1, Sys_getenv(sys, sys_Refman, str, str_Refman, str, str_Refman, &(b)) )
+/// @ t29
+CHECK(1, File_putc(stdout, stdout_Refman, c) )
+/// @ t30
+CHECK(1, File_getc(stdin, stdin_Refman, &(c)) )
+/// @ t31
+CHECK(1, File_putc(stderr, stderr_Refman, c) )
 /// @

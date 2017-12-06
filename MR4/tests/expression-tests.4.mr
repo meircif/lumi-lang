@@ -503,4 +503,10 @@ sys.exit(copy i)
 sys.system(user str)->(var i)
 ## @ c t28
 sys.getenv(user str, user str)->(var b)
+## @ c t29
+stdout.putc(copy c)
+## @ c t30
+stdin.getc()->(var c)
+## @ c t31
+stderr.putc(copy c)
 ## @

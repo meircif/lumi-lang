@@ -1222,6 +1222,9 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman,
   CHECK(325, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(bv)) )
   CHECK(326, Sys_system(sys, sys_Refman, s, s_Refman, &(iv)) )
   CHECK(327, Sys_exit(sys, sys_Refman, i) )
+  CHECK(328, File_putc(stdout, stdout_Refman, c) )
+  CHECK(329, File_getc(stdin, stdin_Refman, &(cv)) )
+  CHECK(330, File_putc(stderr, stderr_Refman, c) )
 MR_cleanup:
   MR_owner_dec_ref(f_Refman);
   MR_dec_ref(a_Refman);
@@ -1250,40 +1253,40 @@ Returncode test_ref_count(void) {
   RefManager* aux_String_2_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(331)
+  if (aux_String_0_Refman == NULL) RAISE(334)
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "test string";
   s = MR_new_string(32);
-  if (s == NULL) RAISE(331)
+  if (s == NULL) RAISE(334)
   s_Refman = MR_new_ref(s);
-  if (s_Refman == NULL) RAISE(331)
-  CHECK(331, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
+  if (s_Refman == NULL) RAISE(334)
+  CHECK(334, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
   s_user = s;
   s_user_Refman = s_Refman;
   MR_inc_ref(s_user_Refman);
-  CHECK(333, Sys_println(sys, sys_Refman, s, s_Refman) )
-  CHECK(334, Sys_println(sys, sys_Refman, s_user, s_user_Refman) )
-  CHECK(335, f_remove(s, s_Refman) )
+  CHECK(336, Sys_println(sys, sys_Refman, s, s_Refman) )
+  CHECK(337, Sys_println(sys, sys_Refman, s_user, s_user_Refman) )
+  CHECK(338, f_remove(s, s_Refman) )
   s = NULL;
   s_Refman = NULL;
   if (! (!(s == NULL || s_Refman->value == NULL))) {
     aux_String_1 = &aux_String_1_Var;
     aux_String_1_Refman = MR_new_ref(aux_String_1);
-    if (aux_String_1_Refman == NULL) RAISE(337)
+    if (aux_String_1_Refman == NULL) RAISE(340)
     aux_String_1_Var.max_length = 17;
     aux_String_1_Var.length = 16;
     aux_String_1_Var.values = "ownership passed";
-    CHECK(337, Sys_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
+    CHECK(340, Sys_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
   }
   if (! (!(s_user == NULL || s_user_Refman->value == NULL))) {
     aux_String_2 = &aux_String_2_Var;
     aux_String_2_Refman = MR_new_ref(aux_String_2);
-    if (aux_String_2_Refman == NULL) RAISE(339)
+    if (aux_String_2_Refman == NULL) RAISE(342)
     aux_String_2_Var.max_length = 15;
     aux_String_2_Var.length = 14;
     aux_String_2_Var.values = "string deleted";
-    CHECK(339, Sys_println(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
+    CHECK(342, Sys_println(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
   }
 MR_cleanup:
   MR_dec_ref(aux_String_2_Refman);
@@ -1315,8 +1318,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(346, test_simple_function() )
-  CHECK(347, test_ref_count() )
+  CHECK(349, test_simple_function() )
+  CHECK(350, test_ref_count() )
 MR_cleanup:
   return MR_err;
 }

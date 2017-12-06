@@ -325,6 +325,9 @@ func test-builtins(
   sys.getenv(user s, user s)->(var bv)
   sys.system(user s)->(var iv)
   sys.exit(copy i)
+  stdout.putc(copy c)
+  stdin.getc()->(var cv)
+  stderr.putc(copy c)
 
 
 func test-ref-count()

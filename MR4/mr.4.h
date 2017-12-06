@@ -123,6 +123,9 @@ typedef struct {
 } Sys;
 extern Sys* sys;
 extern RefManager* sys_Refman;
+extern RefManager* stdout_Refman;
+extern RefManager* stdin_Refman;
+extern RefManager* stderr_Refman;
 Returncode Sys_print(Sys*, RefManager*, String* text, RefManager*);
 Returncode Sys_println(Sys*, RefManager*, String* text, RefManager*);
 Returncode Sys_getchar(Sys*, RefManager*, char* ch);

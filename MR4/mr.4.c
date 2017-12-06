@@ -42,8 +42,12 @@ int MR_main(int argc, char* argv[]) {
   args_strings = malloc(argc * sizeof(String));
   sys_Var.argv_Refman = MR_new_ref(&sys_argv);
   sys_Refman = MR_new_ref(&sys_Var);
+  stdout_Refman = MR_new_ref(stdout);
+  stdin_Refman = MR_new_ref(stdin);
+  stderr_Refman = MR_new_ref(stderr);
   if (args_strings == NULL || sys_Var.argv_Refman == NULL ||
-      sys_Refman == NULL) {
+      sys_Refman == NULL || stdout_Refman == NULL || stdin_Refman == NULL ||
+      stderr_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
@@ -478,6 +482,9 @@ Returncode String_has(
 /*system*/
 Sys* sys;
 RefManager* sys_Refman;
+RefManager* stdout_Refman;
+RefManager* stdin_Refman;
+RefManager* stderr_Refman;
 
 Returncode Sys_print(
     Sys* _, RefManager* __, String* text, RefManager* text_Refman) {
