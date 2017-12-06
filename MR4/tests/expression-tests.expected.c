@@ -713,9 +713,13 @@ CHECK(1, Sys_print(sys, sys_Refman, str, str_Refman) )
 /// @ t23
 CHECK(1, Sys_println(sys, sys_Refman, str, str_Refman) )
 /// @ t24
-CHECK(1, Sys_exit(sys, sys_Refman, i) )
+CHECK(1, Sys_getchar(sys, sys_Refman, &(c)) )
 /// @ t25
-CHECK(1, Sys_system(sys, sys_Refman, str, str_Refman, &(i)) )
+CHECK(1, Sys_getline(sys, sys_Refman, str, str_Refman) )
 /// @ t26
+CHECK(1, Sys_exit(sys, sys_Refman, i) )
+/// @ t27
+CHECK(1, Sys_system(sys, sys_Refman, str, str_Refman, &(i)) )
+/// @ t28
 CHECK(1, Sys_getenv(sys, sys_Refman, str, str_Refman, str, str_Refman, &(b)) )
 /// @

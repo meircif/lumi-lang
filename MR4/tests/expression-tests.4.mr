@@ -494,9 +494,13 @@ sys.print(user str)
 ## @ c t23
 sys.println(user str)
 ## @ c t24
-sys.exit(copy i)
+sys.getchar()->(var c)
 ## @ c t25
-sys.system(user str)->(var i)
+sys.getline(user str)
 ## @ c t26
+sys.exit(copy i)
+## @ c t27
+sys.system(user str)->(var i)
+## @ c t28
 sys.getenv(user str, user str)->(var b)
 ## @

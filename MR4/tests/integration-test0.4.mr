@@ -320,6 +320,8 @@ func test-builtins(
   s := sys.argv[1]
   sys.print(user s)
   sys.println(user s)
+  sys.getchar()->(var cv)
+  sys.getline(user s)
   sys.getenv(user s, user s)->(var bv)
   sys.system(user s)->(var iv)
   sys.exit(copy i)

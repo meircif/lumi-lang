@@ -495,6 +495,30 @@ Returncode Sys_println(
   return OK;
 }
 
+Returncode Sys_getchar(Sys* _, RefManager* __, char* ch) {
+  *ch = getchar();
+  return OK;
+}
+
+#define MR_FUNC_NAME "Sys.getline"
+Returncode Sys_getline(
+    Sys* _, RefManager* __, String* line, RefManager* line_Refman) {
+  int ch;
+  CHECK_NOT_NULL(line);
+  line->length = 0;
+  ch = getchar();
+  while (ch != EOF && ch != '\n') {
+    if (line->length >= line->max_length) {
+      CRAISE
+    }
+    line->values[line->length] = ch;
+    ++line->length;
+    ch = getchar();
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+
 #define MR_FUNC_NAME "Sys.exit"
 Returncode Sys_exit(Sys* _, RefManager* __, Int status) {
   exit(status);

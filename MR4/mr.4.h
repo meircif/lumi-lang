@@ -125,6 +125,8 @@ extern Sys* sys;
 extern RefManager* sys_Refman;
 Returncode Sys_print(Sys*, RefManager*, String* text, RefManager*);
 Returncode Sys_println(Sys*, RefManager*, String* text, RefManager*);
+Returncode Sys_getchar(Sys*, RefManager*, char* ch);
+Returncode Sys_getline(Sys*, RefManager*, String* line, RefManager*);
 Returncode Sys_exit(Sys*, RefManager*, Int status);
 Returncode Sys_system(
   Sys*, RefManager*, String* command, RefManager*, Int* status);

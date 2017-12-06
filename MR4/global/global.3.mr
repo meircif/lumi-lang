@@ -232,6 +232,14 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "text")
     
+    self.add-builtin-method(user glob.type-sys, user "getchar"):(user arguments)
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-char, user "ch")
+        
+    self.add-builtin-method(user glob.type-sys, user "getline"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "line")
+    
     self.add-builtin-method(user glob.type-sys, user "exit"):(user arguments)
     self.add-builtin-parameter(
         user arguments, copy ACCESS-COPY, user glob.type-int, user "status")
