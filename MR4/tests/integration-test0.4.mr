@@ -178,7 +178,7 @@ func test-complex-function(
 
 # Test types
 struct TestStruct
-  ## dosumentation test
+  ## documentation test
   var Int num
   
   {## Test

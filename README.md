@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/meircif/mr-dev.svg?branch=master)](https://travis-ci.org/meircif/mr-dev)
+[![codecov](https://codecov.io/gh/meircif/mr-dev/branch/master/graph/badge.svg)](https://codecov.io/gh/meircif/mr-dev)
 
 # mr-dev
 MR programming language development.

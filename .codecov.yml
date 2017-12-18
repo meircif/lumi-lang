@@ -1,0 +1,6 @@
+coverage:
+  range 80..100
+
+ignore:
+  - "mr.3.c"
+  - "MR4/tests"
