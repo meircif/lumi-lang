@@ -4,7 +4,6 @@ coverage:
     project:
       default:
         target: 90
-
-ignore:
-  - "mr.3.c"
-  - "MR4/tests"
+  ignore:
+    - "mr.3.c"
+    - "MR4/tests"
