@@ -160,7 +160,9 @@ $CCW -Wno-unused-variable -Wno-missing-braces \
 
 # --< Teardown >--
 cd ..
-rm -rf .test
+if [ ! -z $CLEAR_TEST ]; then
+  rm -rf .test
+fi
 
 
 # All tests passed
