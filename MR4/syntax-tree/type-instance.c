@@ -312,22 +312,6 @@ Returncode TypeInstance_check_sequence(TypeInstance* self, SyntaxTreeNode* node)
 }
 #undef MR_FUNC_NAME
 #endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode TypeInstance_write(TypeInstance* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_TypeInstance_write = "TypeInstance.write";
-#define MR_FUNC_NAME _func_name_TypeInstance_write
-Returncode TypeInstance_write(TypeInstance* self) {
-  CHECK(180, write(self->type_data->name) )
-  if (NULL != self->sub_type) {
-    CHECK(182, write(&(String){2, 1, "{"}) )
-    CHECK(183, TypeInstance_write(self->sub_type) )
-    CHECK(184, write(&(String){2, 1, "}"}) )
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
 
 #undef MR_FILE_NAME
 

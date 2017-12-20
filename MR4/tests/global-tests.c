@@ -619,7 +619,6 @@ Returncode test_list() {
 
 
 /* NameMap tests */
-
 #if MR_STAGE == MR_DECLARATIONS
 Returncode test_name_map();
 #elif MR_STAGE == MR_FUNCTIONS
@@ -628,22 +627,207 @@ static char* _func_name_test_name_map = "test-name-map";
 Returncode test_name_map() {
   NameMap* map = &(NameMap){NULL, NULL};
   String* _String164;
-  CHECK(279, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String164)) )
-  TEST_ASSERT(279, !(NULL != _String164))
-  CHECK(280, NameMap_add(map, &(String){6, 5, "name1"}, &(String){7, 6, "value1"}) )
+  CHECK(278, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String164)) )
+  TEST_ASSERT(278, !(NULL != _String164))
+  CHECK(279, NameMap_add(map, &(String){6, 5, "name1"}, &(String){7, 6, "value1"}) )
   String* _String165;
-  CHECK(281, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String165)) )
-  CHECK(281, f_assert_string(&(String){7, 6, "value1"}, _String165) )
+  CHECK(280, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String165)) )
+  CHECK(280, f_assert_string(&(String){7, 6, "value1"}, _String165) )
   String* _String166;
-  CHECK(282, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String166)) )
-  TEST_ASSERT(282, !(NULL != _String166))
-  CHECK(283, NameMap_add(map, &(String){6, 5, "name2"}, &(String){7, 6, "value2"}) )
+  CHECK(281, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String166)) )
+  TEST_ASSERT(281, !(NULL != _String166))
+  CHECK(282, NameMap_add(map, &(String){6, 5, "name2"}, &(String){7, 6, "value2"}) )
   String* _String167;
-  CHECK(284, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String167)) )
-  CHECK(284, f_assert_string(&(String){7, 6, "value1"}, _String167) )
+  CHECK(283, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String167)) )
+  CHECK(283, f_assert_string(&(String){7, 6, "value1"}, _String167) )
   String* _String168;
-  CHECK(285, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String168)) )
-  CHECK(285, f_assert_string(&(String){7, 6, "value2"}, _String168) )
+  CHECK(284, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String168)) )
+  CHECK(284, f_assert_string(&(String){7, 6, "value2"}, _String168) )
+  CHECK(285, NameMap_update_or_add(map, &(String){6, 5, "name3"}, &(String){7, 6, "value3"}) )
+  String* _String169;
+  CHECK(286, NameMap_find(map, &(String){6, 5, "name3"}, (void**)&(_String169)) )
+  CHECK(286, f_assert_string(&(String){7, 6, "value3"}, _String169) )
+  CHECK(287, NameMap_update_or_add(map, &(String){6, 5, "name2"}, &(String){8, 7, "value2x"}) )
+  String* _String170;
+  CHECK(288, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String170)) )
+  CHECK(288, f_assert_string(&(String){8, 7, "value2x"}, _String170) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+/* Illegal call tests */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_illegal_call();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_illegal_call = "test-illegal-call";
+#define MR_FUNC_NAME _func_name_test_illegal_call
+Returncode test_illegal_call() {
+  Argument* arg = &(Argument){Argument__dtl, NULL, 0, 0, false};
+  arg->_base._dtl = Argument__dtl;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    DeclarationArgument* _DeclarationArgument171;
+    CHECK(294, (arg)->_base._dtl[3](arg, &(_DeclarationArgument171)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(294)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    Char _Char172;
+    CHECK(295, (arg)->_base._dtl[4](arg, NULL, &(_Char172)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(295)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    TypeInstance* _TypeInstance173;
+    CHECK(296, (arg)->_base._dtl[5](arg, &(_TypeInstance173)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(296)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    SyntaxTreeVariable* _SyntaxTreeVariable174;
+    CHECK(297, (arg)->_base._dtl[7](arg, &(_SyntaxTreeVariable174)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(297)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    Expression* _Expression175;
+    CHECK(298, (arg)->_base._dtl[8](arg, &(_Expression175)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(298)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(299, (arg)->_base._dtl[9](arg) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(299)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(300, (arg)->_base._dtl[10](arg) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(300)
+  } while (false);
+  _trace_stream = stdout;
+  ArgumentFactory* factory = &(ArgumentFactory){ArgumentFactory__dtl};
+  factory->_dtl = ArgumentFactory__dtl;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    Argument* _Argument176;
+    CHECK(302, (factory)->_dtl[0](factory, &(_Argument176)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(302)
+  } while (false);
+  _trace_stream = stdout;
+  SyntaxTreeBranch* branch = &(SyntaxTreeBranch){SyntaxTreeBranch__dtl, NULL, 0, 0, NULL};
+  branch->_base._dtl = SyntaxTreeBranch__dtl;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    Char _Char177;
+    CHECK(304, (branch)->_base._dtl[3](branch, NULL, &(_Char177)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(304)
+  } while (false);
+  _trace_stream = stdout;
+  SyntaxTreeNode* node = &(SyntaxTreeNode){SyntaxTreeNode__dtl, NULL, 0};
+  node->_dtl = SyntaxTreeNode__dtl;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(306, (node)->_dtl[2](node) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(306)
+  } while (false);
+  _trace_stream = stdout;
+  NodeAction* action = &(NodeAction){NodeAction__dtl};
+  action->_dtl = NodeAction__dtl;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(308, (action)->_dtl[0](action, NULL) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(308)
+  } while (false);
+  _trace_stream = stdout;
+  SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL};
+  root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(310, (root)->_base._base._base._dtl[0](root) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(310)
+  } while (false);
+  _trace_stream = stdout;
+  TypeWriter* tw = &(TypeWriter){TypeWriter__dtl};
+  tw->_dtl = TypeWriter__dtl;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(312, (tw)->_dtl[0](tw, NULL) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(312)
+  } while (false);
+  _trace_stream = stdout;
   return OK;
 }
 #undef MR_FUNC_NAME

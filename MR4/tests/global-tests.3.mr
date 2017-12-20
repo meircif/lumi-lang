@@ -273,7 +273,6 @@ test test-list()
 
 
 # NameMap tests
-
 test test-name-map()
   var NameMap{String} map
   assert not (? map.find(user "name1"))
@@ -283,3 +282,31 @@ test test-name-map()
   map.add(user "name2", user "value2")
   f-assert-string(user "value1", user map.find(user "name1"))
   f-assert-string(user "value2", user map.find(user "name2"))
+  map.update-or-add(user "name3", user "value3")
+  f-assert-string(user "value3", user map.find(user "name3"))
+  map.update-or-add(user "name2", user "value2x")
+  f-assert-string(user "value2x", user map.find(user "name2"))
+
+
+# Illegal call tests
+test test-illegal-call()
+  var Argument arg
+  assert-error arg.copy-new()
+  assert-error arg.parse-value(user _)
+  assert-error arg.get-type-instance()
+  assert-error arg.get-variable()
+  assert-error arg.get-output()
+  assert-error arg.write-preactions()
+  assert-error arg.write-postactions()
+  var ArgumentFactory factory
+  assert-error factory.m-new-argument()
+  var SyntaxTreeBranch branch
+  assert-error branch.parse-child(user _)
+  var SyntaxTreeNode node
+  assert-error node.write()
+  var NodeAction action
+  assert-error action.m-action(user _)
+  var SyntaxTreeRoot root
+  assert-error root.link-types()
+  var TypeWriter tw
+  assert-error tw.write(user _)

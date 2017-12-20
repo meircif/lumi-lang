@@ -175,10 +175,3 @@ static TypeInstance
         self.sub-type.type-data = glob.type-string and
         not (? self.sub-type.length)
       node.m-syntax-error-msg(user "missing length for sequence")
-  
-  func inst write()
-    write(user self.type-data.name)
-    if ? self.sub-type
-      write(user "{")
-      self.sub-type.write()
-      write(user "}")
