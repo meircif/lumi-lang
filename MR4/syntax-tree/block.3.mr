@@ -22,7 +22,7 @@ class SyntaxTreeCode(SyntaxTreeNode)
         var String{16} expected-spaces-str
         var String{16} actual-spaces-str
         expected-spaces.str(user expected-spaces-str)
-        Int.str(var n - 1, user actual-spaces-str)
+        Int.str(var n, user actual-spaces-str)
         self.m-syntax-error2(
             user "too short indentation, expected",
             user expected-spaces-str,

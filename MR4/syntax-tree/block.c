@@ -68,7 +68,7 @@ Returncode SyntaxTreeCode_read_line_break_spaces(SyntaxTreeCode* self) {
       String* expected_spaces_str = &(String){16, 0, (char[16]){0}};
       String* actual_spaces_str = &(String){16, 0, (char[16]){0}};
       CHECK(24, Int_str(expected_spaces, expected_spaces_str) )
-      CHECK(25, Int_str(n - 1, actual_spaces_str) )
+      CHECK(25, Int_str(n, actual_spaces_str) )
       CHECK(26, SyntaxTreeNode_m_syntax_error2(&(self->_base), &(String){32, 31, "too short indentation, expected"}, expected_spaces_str, &(String){4, 3, "got"}, actual_spaces_str) )
     }
   }}
