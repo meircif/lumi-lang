@@ -68,25 +68,27 @@ struct Test2 {
   Test1 _base;
   Int y;
 };
-/// @ t4
+/// @ te0
 expected space after "struct", got "("
-/// @ t5
+/// @ te1
 illegal type name "error"
-/// @ t6
+/// @ te2
 illegal type name "ERrror"
-/// @ t7
+/// @ te3
 illegal type name "Error-name"
-/// @ t8
+/// @ te4
+illegal type name "E"
+/// @ te5
 redefinition of type "Int"
-/// @ t9
+/// @ te6
 redefinition of type "Test"
-/// @ t10
+/// @ te7
 expected ")" after base type, got "new-line"
-/// @ t11
+/// @ te8
 unknown keyword "error"
-/// @ t12
+/// @ te9
 expected block in a new line, got "EOF"
-/// @ t13
+/// @ te10
 type with no fields "Error"
 /// @@ test-class
 /// @ t0

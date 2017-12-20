@@ -77,34 +77,37 @@ struct Test2(Test1)
   var Int y
 struct Test1
   var Int x
-## @ eg t4
+## @ eg te0
 struct(
 
-## @ eg t5
+## @ eg te1
 struct error
 
-## @ eg t6
+## @ eg te2
 struct ERrror
 
-## @ eg t7
+## @ eg te3
 struct Error-name
 
-## @ eg t8
+## @ eg te4
+struct E
+
+## @ eg te5
 struct Int
 
-## @ eg t9
+## @ eg te6
 struct Test
 struct Test
 
-## @ eg t10
+## @ eg te7
 struct Test(Base
 
-## @ eg t11
+## @ eg te8
 struct Test
   error 
-## @ eg t12
+## @ eg te9
 struct Test
-## @ eg t13
+## @ eg te10
 struct Error
 
 ## @@ test-class

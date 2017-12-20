@@ -282,6 +282,14 @@ assigning into an owner a non-owner access "user"
 assigning into an owner a non-owner access "user"
 /// @ te13
 assigning into access "user" invalid access "owner"
+/// @ te14
+too many parameters
+/// @ te15
+too few parameters
+/// @ te16
+too many outputs
+/// @ te17
+too few outputs
 /// @@ test-type-expression
 /// @ t0
 CHECK(1, Test_meth(t, t_Refman) )

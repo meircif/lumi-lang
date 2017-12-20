@@ -207,6 +207,14 @@ fun1(copy 3, user str, owner str)
 fun3(copy 3)->(owner str)
 ## @ ec te13
 fun7()->(user tb)
+## @ ec te14
+fun0(copy i)
+## @ ec te15
+fun1()
+## @ ec te16
+fun0()->(copy i)
+## @ ec te17
+fun2()
 ## @@ test-type-expression
 ## @ c t0
 Test.meth(var t)

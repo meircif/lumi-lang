@@ -828,6 +828,17 @@ Returncode test_illegal_call() {
     TEST_FAIL(312)
   } while (false);
   _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(313, write_cname(NULL) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(313)
+  } while (false);
+  _trace_stream = stdout;
   return OK;
 }
 #undef MR_FUNC_NAME

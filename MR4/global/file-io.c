@@ -11,73 +11,6 @@ static char* _mr_file3_name = "global/file-io.3.mr";
 
 /* MR4 compiler - File read and write functions */
 
-/* Proxy functions to be mocked in tests */
-#if MR_STAGE == MR_DECLARATIONS
-Returncode file_open(String* name, Bool is_read, File** file);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_file_open = "file-open";
-#define MR_FUNC_NAME _func_name_file_open
-Returncode file_open(String* name, Bool is_read, File** file) {
-  if (is_read) {
-    CHECK(6, file_open_read(name, &((*file))) )
-  }
-  else {
-    CHECK(8, file_open_write(name, &((*file))) )
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-
-#if MR_STAGE == MR_DECLARATIONS
-Returncode file_close(File* file);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_file_close = "file-close";
-#define MR_FUNC_NAME _func_name_file_close
-Returncode file_close(File* file) {
-  CHECK(11, File_close(file) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-
-#if MR_STAGE == MR_DECLARATIONS
-Returncode file_getc(File* file, Char* ch);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_file_getc = "file-getc";
-#define MR_FUNC_NAME _func_name_file_getc
-Returncode file_getc(File* file, Char* ch) {
-  CHECK(14, File_getc(file, &((*ch))) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-
-#if MR_STAGE == MR_DECLARATIONS
-Returncode file_putc(File* file, Char ch);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_file_putc = "file-putc";
-#define MR_FUNC_NAME _func_name_file_putc
-Returncode file_putc(File* file, Char ch) {
-  CHECK(17, File_putc(file, ch) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-
-#if MR_STAGE == MR_DECLARATIONS
-Returncode file_write(File* file, String* text);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_file_write = "file-write";
-#define MR_FUNC_NAME _func_name_file_write
-Returncode file_write(File* file, String* text) {
-  CHECK(20, File_write(file, text) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-
-
 /* Read a single character from the input file */
 #if MR_STAGE == MR_DECLARATIONS
 Returncode read_c(Char* ch);
@@ -88,7 +21,7 @@ Returncode read_c(Char* ch) {
   if (glob->got_new_line) {
     glob->line_number += 1;
   }
-  CHECK(27, file_getc(glob->input_file, &((*ch))) )
+  CHECK(7, file_getc(glob->input_file, &((*ch))) )
   glob->got_new_line = (*ch) == '\n';
   return OK;
 }
@@ -114,15 +47,15 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
     (*spaces) = glob->input_spaces;
   }
   else {
-    CHECK(44, String_clear(glob->input_buffer) )
+    CHECK(24, String_clear(glob->input_buffer) )
     (*spaces) = 0;
-    CHECK(46, read_c(&(ch)) )
+    CHECK(26, read_c(&(ch)) )
     if (indent) {
       /* ignore and count indent */
       while (true) {
         if (!(ch == ' ')) break;
         (*spaces) += 1;
-        CHECK(52, read_c(&(ch)) )
+        CHECK(32, read_c(&(ch)) )
       }
     }
   }
@@ -132,7 +65,7 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
     if (!(ch != EOF && ch != '\n')) break;
     if (quote == '\0') {
       Bool _Bool8;
-      CHECK(58, String_has(ends, ch, &(_Bool8)) )
+      CHECK(38, String_has(ends, ch, &(_Bool8)) )
       if (!(!_Bool8)) break;
       if (ch == '\'' || ch == '"' || ch == '`') {
         quote = ch;
@@ -140,8 +73,8 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
     }
     else {
       if (ch == '\\') {
-        CHECK(62, String_append(glob->input_buffer, ch) )
-        CHECK(63, read_c(&(ch)) )
+        CHECK(42, String_append(glob->input_buffer, ch) )
+        CHECK(43, read_c(&(ch)) )
       }
       else {
         if (ch == quote) {
@@ -149,8 +82,8 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
         }
       }
     }
-    CHECK(66, String_append(glob->input_buffer, ch) )
-    CHECK(67, read_c(&(ch)) )
+    CHECK(46, String_append(glob->input_buffer, ch) )
+    CHECK(47, read_c(&(ch)) )
   }
   
   glob->input_end = ch;
@@ -173,8 +106,8 @@ static char* _func_name_read_new = "read-new";
 Returncode read_new(String* ends, String** new_text, Char* end) {
   String* text = NULL;
   Int _Int9;
-  CHECK(79, read_until(ends, false, &(text), &((*end)), &(_Int9)) )
-  CHECK(80, string_new_copy(text, &((*new_text))) )
+  CHECK(59, read_until(ends, false, &(text), &((*end)), &(_Int9)) )
+  CHECK(60, string_new_copy(text, &((*new_text))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -188,7 +121,7 @@ Returncode write_c(Char ch);
 static char* _func_name_write_c = "write-c";
 #define MR_FUNC_NAME _func_name_write_c
 Returncode write_c(Char ch) {
-  CHECK(85, file_putc(glob->output_file, ch) )
+  CHECK(65, file_putc(glob->output_file, ch) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -202,7 +135,7 @@ Returncode write(String* text);
 static char* _func_name_write = "write";
 #define MR_FUNC_NAME _func_name_write
 Returncode write(String* text) {
-  CHECK(90, file_write(glob->output_file, text) )
+  CHECK(70, file_write(glob->output_file, text) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -217,16 +150,16 @@ static char* _func_name_write_cname = "write-cname";
 #define MR_FUNC_NAME _func_name_write_cname
 Returncode write_cname(String* name) {
   if (!(NULL != name)) {
-    RAISE(96)
+    RAISE(76)
   }
   {int index; for (index = (0); index < (name->length); ++index) {
-    if ((index) < 0 || (index) >= (name)->length) RAISE(98)
+    if ((index) < 0 || (index) >= (name)->length) RAISE(78)
     Char ch = ((name)->values[index]);
     if (ch == '-' || ch == ' ') {
-      CHECK(100, write_c('_') )
+      CHECK(80, write_c('_') )
     }
     else {
-      CHECK(102, write_c(ch) )
+      CHECK(82, write_c(ch) )
     }
   }}
   return OK;
@@ -243,8 +176,8 @@ static char* _func_name_write_int = "write-int";
 #define MR_FUNC_NAME _func_name_write_int
 Returncode write_int(Int num) {
   String* num_str = &(String){64, 0, (char[64]){0}};
-  CHECK(108, Int_str(num, num_str) )
-  CHECK(109, write(num_str) )
+  CHECK(88, Int_str(num, num_str) )
+  CHECK(89, write(num_str) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -259,8 +192,75 @@ static char* _func_name_write_spaces = "write-spaces";
 #define MR_FUNC_NAME _func_name_write_spaces
 Returncode write_spaces(Int num) {
   {int n; for (n = (0); n < (num); ++n) {
-    CHECK(115, write_c(' ') )
+    CHECK(95, write_c(' ') )
   }}
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+/* Proxy functions to be mocked in tests */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode file_open(String* name, Bool is_read, File** file);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_file_open = "file-open";
+#define MR_FUNC_NAME _func_name_file_open
+Returncode file_open(String* name, Bool is_read, File** file) {
+  if (is_read) {
+    CHECK(101, file_open_read(name, &((*file))) )
+  }
+  else {
+    CHECK(103, file_open_write(name, &((*file))) )
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode file_close(File* file);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_file_close = "file-close";
+#define MR_FUNC_NAME _func_name_file_close
+Returncode file_close(File* file) {
+  CHECK(106, File_close(file) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode file_getc(File* file, Char* ch);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_file_getc = "file-getc";
+#define MR_FUNC_NAME _func_name_file_getc
+Returncode file_getc(File* file, Char* ch) {
+  CHECK(109, File_getc(file, &((*ch))) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode file_putc(File* file, Char ch);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_file_putc = "file-putc";
+#define MR_FUNC_NAME _func_name_file_putc
+Returncode file_putc(File* file, Char ch) {
+  CHECK(112, File_putc(file, ch) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode file_write(File* file, String* text);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_file_write = "file-write";
+#define MR_FUNC_NAME _func_name_file_write
+Returncode file_write(File* file, String* text) {
+  CHECK(115, File_write(file, text) )
   return OK;
 }
 #undef MR_FUNC_NAME

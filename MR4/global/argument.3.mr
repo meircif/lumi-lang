@@ -151,8 +151,6 @@ class FunctionArguments(SyntaxTreeNode)
   func inst get-output():(user Expression output)
     if ? self.outputs.last
       self.outputs.last.item.get-output():(user output)
-    else
-      output := _
   
   func inst find-variable(user String name):(
       user SyntaxTreeVariable variable)

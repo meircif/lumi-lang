@@ -310,3 +310,4 @@ test test-illegal-call()
   assert-error root.link-types()
   var TypeWriter tw
   assert-error tw.write(user _)
+  assert-error write-cname(user _)

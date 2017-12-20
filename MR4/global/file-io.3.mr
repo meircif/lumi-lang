@@ -1,25 +1,5 @@
 ## MR4 compiler - File read and write functions
 
-## Proxy functions to be mocked in tests
-func file-open(user String name, copy Bool is-read):(owner File file)
-  if is-read
-    file-open-read(user name):(owner file)
-  else
-    file-open-write(user name):(owner file)
-
-func file-close(owner File file)
-  file.close()
-
-func file-getc(user File file):(copy Char ch)
-  file.getc():(copy ch)
-
-func file-putc(user File file, copy Char ch)
-  file.putc(copy ch)
-
-func file-write(user File file, user String text)
-  file.write(user text)
-
-
 ## Read a single character from the input file
 func read-c():(copy Char ch)
   if glob.got-new-line
@@ -113,3 +93,23 @@ func write-int(copy Int num)
 func write-spaces(copy Int num)
   for n in num
     write-c(copy ' ')
+
+
+## Proxy functions to be mocked in tests
+func file-open(user String name, copy Bool is-read):(owner File file)
+  if is-read
+    file-open-read(user name):(owner file)
+  else
+    file-open-write(user name):(owner file)
+
+func file-close(owner File file)
+  file.close()
+
+func file-getc(user File file):(copy Char ch)
+  file.getc():(copy ch)
+
+func file-putc(user File file, copy Char ch)
+  file.putc(copy ch)
+
+func file-write(user File file, user String text)
+  file.write(user text)
