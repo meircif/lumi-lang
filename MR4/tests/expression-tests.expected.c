@@ -17,16 +17,18 @@ i = -0xfda940;
 i = 0xFDA940;
 /// @ t8
 i = -0xFDA940;
-/// @ t9
+/// @ te0
 illegal number "2a"
-/// @ t10
+/// @ te1
 illegal number "0a"
-/// @ t11
+/// @ te2
 illegal octal number "038"
-/// @ t12
+/// @ te3
 illegal binary number "0b021"
-/// @ t13
+/// @ te4
 illegal hexadecimal number "0xadg"
+/// @ te5
+binary numbers not supported yet... "0b1001"
 /// @@ test-char-expression
 /// @ t0
 c = 'a';
@@ -40,27 +42,27 @@ c = '\x0f';
 c = '\xA9';
 /// @ t5
 c = '\270';
-/// @ t6
+/// @ te0
 illegal character constant "'''"
-/// @ t7
+/// @ te1
 illegal character constant "'\'"
-/// @ t8
+/// @ te2
 illegal character constant "'aa'"
-/// @ t9
+/// @ te3
 illegal character constant "'\c'"
-/// @ t10
+/// @ te4
 illegal character constant "'aaaa'"
-/// @ t11
-illegal character constant "'\x6fg'"
-/// @ t12
+/// @ te5
+illegal character constant "'\x6g'"
+/// @ te6
 illegal character constant "'\058'"
-/// @ t13
+/// @ te7
 illegal character constant "''"
-/// @ t14
+/// @ te8
 illegal character constant "'aaa'"
-/// @ t15
+/// @ te9
 illegal character constant "'aaaaa'"
-/// @ t16
+/// @ te10
 illegal character constant "'aa"
 /// @@ test-string-expression
 /// @ t0
@@ -78,8 +80,22 @@ String aux_String_0_Var = {0};
   MR_inc_ref(str_Refman);
   str = aux_String_0;
 /// @ t1
+String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(1)
+  aux_String_0_Var.max_length = 25;
+  aux_String_0_Var.length = 24;
+  aux_String_0_Var.values = "\nstring\twith\\formatting\n";
+  MR_dec_ref(str_Refman);
+  str_Refman = aux_String_0_Refman;
+  MR_inc_ref(str_Refman);
+  str = aux_String_0;
+/// @ te0
 illegal string constant ""aaa"
-/// @ t2
+/// @ te1
 statememnt has no effect
 /// @@ test-empty-expression
 /// @ t0
@@ -376,13 +392,15 @@ Returncode Top_methm(Top* self, RefManager* self_Refman) {
 MR_cleanup:
   return MR_err;
 }
-/// @ t2
+/// @ te0
 "base" used not in method
-/// @ t3
+/// @ te1
 no base type for type "Test"
-/// @ t4
+/// @ te2
+no base method for method "mock"
+/// @ te3
 cannot assign "Test" into "Base Symbol"
-/// @ t5
+/// @ te4
 calling "base" with non-method "x"
 /// @@ test-block-expression
 /// @ t0

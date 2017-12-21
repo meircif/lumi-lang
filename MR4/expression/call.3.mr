@@ -71,8 +71,6 @@ class CallExpression(Expression)
       self.write-func-call()
     else-if ? self.output
       self.output.write()
-    else
-      raise
   
   func inst write-func-call()
     self.write-call()

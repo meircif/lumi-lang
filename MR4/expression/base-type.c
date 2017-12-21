@@ -71,7 +71,7 @@ Returncode BaseMethExpression_analyze(BaseMethExpression* self) {
   if (self->is_call) {
     Int _Int12;
     CHECK(33, TypeData_find_meth(self->parent_type->base_type, function->name, &(self->function), &(_Int12)) )
-    if (!(NULL != function)) {
+    if (!(NULL != self->function)) {
       CHECK(36, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){26, 25, "no base method for method"}, function->name) )
     }
     CHECK(38, Expression_set_simple_type(&(self->_base), &(glob->type_func->_base)) )
@@ -322,21 +322,10 @@ Returncode TypeExpression_analyze(TypeExpression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode TypeExpression_write(TypeExpression* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_TypeExpression_write = "TypeExpression.write";
-#define MR_FUNC_NAME _func_name_TypeExpression_write
-Returncode TypeExpression_write(TypeExpression* self) {
-  CHECK(132, write_cname(self->_base.result_type->sub_type->type_data->name) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
 extern Func TypeExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func TypeExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)TypeExpression_analyze, (void*)TypeExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func TypeExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)TypeExpression_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

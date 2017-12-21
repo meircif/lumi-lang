@@ -17,16 +17,18 @@ i := -0xfda940
 i := 0xFDA940
 ## @ c t8
 i := -0xFDA940
-## @ ec t9
+## @ ec te0
 2a
-## @ ec t10
+## @ ec te1
 0a
-## @ ec t11
+## @ ec te2
 038
-## @ ec t12
+## @ ec te3
 0b021
-## @ ec t13
+## @ ec te4
 0xadg
+## @ ec te5
+0b1001
 ## @@ test-char-expression
 ## @ c t0
 c := 'a'
@@ -40,34 +42,36 @@ c := '\x0f'
 c := '\xA9'
 ## @ c t5
 c := '\270'
-## @ ec t6
+## @ ec te0
 '''
-## @ ec t7
+## @ ec te1
 '\'
-## @ ec t8
+## @ ec te2
 'aa'
-## @ ec t9
+## @ ec te3
 '\c'
-## @ ec t10
+## @ ec te4
 'aaaa'
-## @ ec t11
-'\x6fg'
-## @ ec t12
+## @ ec te5
+'\x6g'
+## @ ec te6
 '\058'
-## @ ec t13
+## @ ec te7
 ''
-## @ ec t14
+## @ ec te8
 'aaa'
-## @ ec t15
+## @ ec te9
 'aaaaa'
-## @ ec t16
+## @ ec te10
 'aa
 ## @@ test-string-expression
 ## @ c t0
 str := "some string"
-## @ ec t1
+## @ c t1
+str := "\nstring\twith\\formatting\n"
+## @ ec te0
 "aaa
-## @ ec t2
+## @ ec te1
 "
 ## @@ test-empty-expression
 ## @ c t0
@@ -247,22 +251,30 @@ struct Top(Mid)
   func methm()
     base.methb()
 
-## @ ec t2
+## @ ec te0
 base
-## @ eg t3
+## @ eg te1
 struct Test
   var Int x
   func mock()
     base
 
-## @ eg t4
+## @ eg te2
+struct Base
+  var Int x
+struct Test(Base)
+  var Int x
+  func mock()
+    base()
+
+## @ eg te3
 struct Base
   var Int x
 struct Test(Base)
   func mock()
     base := self
 
-## @ eg t5
+## @ eg te4
 struct Base
   var Int x
 struct Test(Base)

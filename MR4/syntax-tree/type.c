@@ -51,14 +51,14 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
   self->is_dynamic = is_dynamic;
   CHECK(21, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
   CHECK(22, read_new(&(String){2, 1, "("}, &(self->name), &((*end))) )
-  Bool _Bool110;
-  CHECK(23, f_is_legal_name(self->name, true, &(_Bool110)) )
-  if (!_Bool110) {
+  Bool _Bool109;
+  CHECK(23, f_is_legal_name(self->name, true, &(_Bool109)) )
+  if (!_Bool109) {
     CHECK(24, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){18, 17, "illegal type name"}, self->name) )
   }
-  TypeData* _TypeData111;
-  CHECK(25, NameMap_find(glob->type_map, self->name, (void**)&(_TypeData111)) )
-  if (NULL != _TypeData111) {
+  TypeData* _TypeData110;
+  CHECK(25, NameMap_find(glob->type_map, self->name, (void**)&(_TypeData110)) )
+  if (NULL != _TypeData110) {
     CHECK(26, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){21, 20, "redefinition of type"}, self->name) )
   }
   CHECK(27, Global_add_type(glob, self) )
@@ -82,15 +82,15 @@ Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end);
 static char* _func_name_TypeData_parse_child = "TypeData.parse-child";
 #define MR_FUNC_NAME _func_name_TypeData_parse_child
 Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end) {
-  Bool _Bool112;
-  CHECK(39, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool112)) )
-  if (_Bool112) {
+  Bool _Bool111;
+  CHECK(39, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool111)) )
+  if (_Bool111) {
     return OK;
   }
   
-  Bool _Bool113;
-  CHECK(42, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool113)) )
-  if (_Bool113) {
+  Bool _Bool112;
+  CHECK(42, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool112)) )
+  if (_Bool112) {
     if ((*end) != '(') {
       CHECK(44, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){30, 29, "expected \"(\" after \"new\", got"}, (*end)) )
     }
@@ -148,9 +148,9 @@ Returncode TypeData_find_field(TypeData* self, String* name, SyntaxTreeVariable*
     ListNode* child = type_data->_base._base.variables->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool114;
-      CHECK(75, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool114)) )
-      if (_Bool114) {
+      Bool _Bool113;
+      CHECK(75, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool113)) )
+      if (_Bool113) {
         (*field) = ((SyntaxTreeVariable*)(child->item));
         return OK;
       }
@@ -177,9 +177,9 @@ Returncode TypeData_find_meth(TypeData* self, String* name, SyntaxTreeFunction**
     ListNode* child = type_data->_base.functions->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool115;
-      CHECK(92, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool115)) )
-      if (_Bool115) {
+      Bool _Bool114;
+      CHECK(92, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool114)) )
+      if (_Bool114) {
         (*method) = ((SyntaxTreeFunction*)(child->item));
         return OK;
       }
@@ -246,9 +246,9 @@ Returncode TypeData_analyze(TypeData* self);
 static char* _func_name_TypeData_analyze = "TypeData.analyze";
 #define MR_FUNC_NAME _func_name_TypeData_analyze
 Returncode TypeData_analyze(TypeData* self) {
-  Bool _Bool116;
-  CHECK(129, List_m_is_empty(self->_base._base.variables, &(_Bool116)) )
-  if (!(NULL != self->base_type) && _Bool116) {
+  Bool _Bool115;
+  CHECK(129, List_m_is_empty(self->_base._base.variables, &(_Bool115)) )
+  if (!(NULL != self->base_type) && _Bool115) {
     CHECK(130, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){20, 19, "type with no fields"}, self->name) )
   }
   if (self->is_dynamic &&  ! (NULL != self->base_type && self->base_type->is_dynamic)) {
@@ -383,8 +383,8 @@ Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data) {
   while (true) {
     if (!(NULL != child)) break;
     SyntaxTreeFunction* method = NULL;
-    Int _Int117;
-    CHECK(214, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int117)) )
+    Int _Int116;
+    CHECK(214, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int116)) )
     if (not_first) {
       CHECK(216, write(&(String){3, 2, ", "}) )
     }
