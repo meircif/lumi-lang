@@ -110,6 +110,20 @@ struct Test
 ## @ eg te10
 struct Error
 
+## @ eg te11
+struct Error
+  new 
+
+## @ eg te12
+struct Error
+  new()
+  new()
+
+## @ eg te13
+struct Error
+  var Int x
+  new()->(var Int x)
+
 ## @@ test-class
 ## @ g t0
 class Base
@@ -127,12 +141,30 @@ class Top(Mid)
     base()
   func dynamic dyn3()
     base.dyn0()
-## @ eg t1
+## @ eg te0
 class(
 
-## @ eg t2
+## @ eg te1
 class Error
   var Int x
+
+## @ eg te2
+class Error
+  func error f()
+
+## @ eg te3
+struct Base
+  var Int x
+  func meth()
+class Error(Base)
+  func dynamic meth()
+
+## @ eg te4
+class Base
+  var Int x
+  func dynamic meth()
+class Error(Base)
+  func inst meth()
 
 ## @@ test-function
 ## @ g t0
@@ -529,23 +561,26 @@ do
 ## @ c t3
 do
     continue
-## @ ec t4
+## @ ec te0
 do(
-## @ ec t5
+## @ ec te1
 while true
-## @ ec t6
+## @ ec te2
 continue
-## @ ec t7
+## @ ec te3
 do
     while 2
-## @ ec t8
+## @ ec te4
 do
     error
-## @ ec t9
+## @ ec te5
 do
     var Int error
   do
     var Int error
+## @ ec te6
+do
+    while i := 3
 ## @@ test-for-loop
 ## @ c t0
 for n in 5
@@ -637,4 +672,11 @@ func fun(user Array{Int} a)
 assert
 ## @ ec te12
 assert-error
+## @ eg te13
+mock()
+## @@ test-native
+## @ g t0
+native external()
+## @ eg te0
+native()
 ## @

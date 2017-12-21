@@ -90,6 +90,12 @@ unknown keyword "error"
 expected block in a new line, got "EOF"
 /// @ te10
 type with no fields "Error"
+/// @ te11
+expected "(" after "new", got " "
+/// @ te12
+constructor already defined for type "Error"
+/// @ te13
+constructor with outputs
 /// @@ test-class
 /// @ t0
 typedef struct Base Base;
@@ -168,10 +174,16 @@ Returncode Top_dyn3(Top* self, RefManager* self_Refman, Top_Dynamic* self_Dynami
 MR_cleanup:
   return MR_err;
 }
-/// @ t1
+/// @ te0
 expected space after "class", got "("
-/// @ t2
+/// @ te1
 class with no dynamic methods "Error"
+/// @ te2
+expected "dynamic" or "inst" method type, got "error"
+/// @ te3
+illegal dynamic in function "meth"
+/// @ te4
+illegal dynamic in function "meth"
 /// @@ test-function
 /// @ t0
 Returncode name(void);
@@ -822,18 +834,20 @@ while (true) {
 while (true) {
     continue;
   }
-/// @ t4
+/// @ te0
 expected new-line after "do", got "("
-/// @ t5
+/// @ te1
 "while" used not inside loop
-/// @ t6
+/// @ te2
 "continue" used not inside loop
-/// @ t7
+/// @ te3
 got "Int" expression, expected "Bool"
-/// @ t8
+/// @ te4
 unknown symbol "error"
-/// @ t9
+/// @ te5
 redefinition of variable "error"
+/// @ te6
+got void expression, expected "Bool"
 /// @@ test-for-loop
 /// @ t0
 {int n; for(n=0; n<5; ++n) {
@@ -1000,4 +1014,11 @@ non matching subtypes "Char" and "Int"
 expected space after "assert", got "new-line"
 /// @ te12
 expected space after "assert-error", got "new-line"
+/// @ te13
+expected space after "mock", got "("
+/// @@ test-native
+/// @ t0
+Returncode external(void);
+/// @ te0
+expected space after "native", got "("
 /// @

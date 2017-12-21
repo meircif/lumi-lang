@@ -109,10 +109,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     index.str(user index-str)
     variable.name.concat(user index-str)
     variable.parent := self
-    if access = ACCESS-COPY
-      variable.access := ACCESS-VAR
-    else
-      variable.access := access
+    variable.access := access
     variable.is-create := is-create
     type-instance.copy-new():(owner variable.type-instance)
     new-variable := variable
@@ -225,22 +222,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-header()
     write(user ";\n")
 
-# to be mocked in unit-tests
-func write-pre-func(user SyntaxTreeFunction self)
-  write(user "\n#define MR_FILE_NAME \"")
-  write(user self.input-file-name)
-  write(user "\"\n#define MR_FUNC_NAME \"")
-  if ? self.parent-type
-    write(user self.parent-type.name)
-    write(user ".")
-  write(user self.name)
-  write(user "\"")
-
-# to be mocked in unit-tests
-func write-post-func()
-    write(user "#undef MR_FILE_NAME\n")
-    write(user "#undef MR_FUNC_NAME\n")
-
 
 ## Count occurrences of a specific type
 static TypeCount
@@ -305,6 +286,7 @@ class SyntaxTreeNativeFunction(SyntaxTreeFunction)
     self.indentation-spaces := 2
     self.parse-header():(copy end)
     new List{SyntaxTreeCode} in self.code-nodes
+    new List{SyntaxTreeVariable} in self.variables
   
   func dynamic write()
     # do nothing
@@ -409,3 +391,20 @@ class DeclarationArgument(Argument)
 class DeclarationArgumentFactory(ArgumentFactory)
   func dynamic m-new-argument():(owner Argument new-argument)
     new DeclarationArgument in new-argument
+
+
+# to be mocked in unit-tests
+func write-pre-func(user SyntaxTreeFunction self)
+  write(user "\n#define MR_FILE_NAME \"")
+  write(user self.input-file-name)
+  write(user "\"\n#define MR_FUNC_NAME \"")
+  if ? self.parent-type
+    write(user self.parent-type.name)
+    write(user ".")
+  write(user self.name)
+  write(user "\"")
+
+# to be mocked in unit-tests
+func write-post-func()
+    write(user "#undef MR_FILE_NAME\n")
+    write(user "#undef MR_FUNC_NAME\n")

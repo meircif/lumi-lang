@@ -388,17 +388,6 @@ Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeForLoop_m_is_in_loop(SyntaxTreeForLoop* self, Bool* is_in_loop);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeForLoop_m_is_in_loop = "SyntaxTreeForLoop.m-is-in-loop";
-#define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_m_is_in_loop
-Returncode SyntaxTreeForLoop_m_is_in_loop(SyntaxTreeForLoop* self, Bool* is_in_loop) {
-  (*is_in_loop) = true;
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeForLoop_write = "SyntaxTreeForLoop.write";
@@ -407,32 +396,32 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
   /* {int `index`; for(`index`=`start`; `index`<`upper-bound`; ++`index`) { */
   /*    `block...` */
   /* }} */
-  CHECK(160, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(157, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
   if (NULL != self->start) {
-    CHECK(162, (self->start)->_base._dtl[6](self->start) )
+    CHECK(159, (self->start)->_base._dtl[6](self->start) )
   }
-  CHECK(163, (self->upper_bound)->_base._dtl[6](self->upper_bound) )
-  CHECK(164, write(&(String){6, 5, "{int "}) )
-  CHECK(165, write_cname(self->index_name) )
-  CHECK(166, write(&(String){7, 6, "; for("}) )
-  CHECK(167, write_cname(self->index_name) )
-  CHECK(168, write(&(String){2, 1, "="}) )
+  CHECK(160, (self->upper_bound)->_base._dtl[6](self->upper_bound) )
+  CHECK(161, write(&(String){6, 5, "{int "}) )
+  CHECK(162, write_cname(self->index_name) )
+  CHECK(163, write(&(String){7, 6, "; for("}) )
+  CHECK(164, write_cname(self->index_name) )
+  CHECK(165, write(&(String){2, 1, "="}) )
   if (NULL != self->start) {
-    CHECK(170, (self->start)->_base._dtl[2](self->start) )
+    CHECK(167, (self->start)->_base._dtl[2](self->start) )
   }
   else {
-    CHECK(172, write(&(String){2, 1, "0"}) )
+    CHECK(169, write(&(String){2, 1, "0"}) )
   }
-  CHECK(173, write(&(String){3, 2, "; "}) )
-  CHECK(174, write_cname(self->index_name) )
-  CHECK(175, write(&(String){2, 1, "<"}) )
-  CHECK(176, (self->upper_bound)->_base._dtl[2](self->upper_bound) )
-  CHECK(177, write(&(String){5, 4, "; ++"}) )
-  CHECK(178, write_cname(self->index_name) )
-  CHECK(179, write(&(String){2, 1, ")"}) )
-  CHECK(180, SyntaxTreeFlowElement_write_block(&(self->_base)) )
-  CHECK(181, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(182, write(&(String){3, 2, "}\n"}) )
+  CHECK(170, write(&(String){3, 2, "; "}) )
+  CHECK(171, write_cname(self->index_name) )
+  CHECK(172, write(&(String){2, 1, "<"}) )
+  CHECK(173, (self->upper_bound)->_base._dtl[2](self->upper_bound) )
+  CHECK(174, write(&(String){5, 4, "; ++"}) )
+  CHECK(175, write_cname(self->index_name) )
+  CHECK(176, write(&(String){2, 1, ")"}) )
+  CHECK(177, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  CHECK(178, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(179, write(&(String){3, 2, "}\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -441,7 +430,7 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
 extern Func SyntaxTreeForLoop__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeForLoop_analyze, (void*)SyntaxTreeForLoop_write, (void*)SyntaxTreeCode_m_is_end_point, (void*)SyntaxTreeForLoop_m_is_in_loop};
+Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeForLoop_analyze, (void*)SyntaxTreeForLoop_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 #undef MR_FILE_NAME

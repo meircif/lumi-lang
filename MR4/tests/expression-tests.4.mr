@@ -183,6 +183,9 @@ tco.meth()
 t.t.meth()
 ## @ c t17
 fun1(copy 3, user str, owner so)
+## @ c t18
+fun3(copy 1)
+  fun5(copy 2)
 ## @ ec te0
 function( copy 1)
 ## @ ec te1
@@ -377,6 +380,8 @@ t += 3
 i -= b
 ## @ ec te15
 b := 3 is t
+## @ ec te16
+user Array{Char} ca(user arr)
 ## @@ test-question-expression
 ## @ c t0
 b := str?

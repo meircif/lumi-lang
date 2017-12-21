@@ -17,7 +17,8 @@ class SyntaxTreeNode
       if glob.access-names[n].equal(user access-str)
         access := n
         return
-    self.m-syntax-error(user "illegal access", user access-str)
+    self.print-syntax-error(user "illegal access", user access-str)
+    raise
   
   func inst find-type(user String name):(user TypeData type-data)
     if not (? glob.type-map.find(user name):(user type-data))
@@ -59,12 +60,15 @@ class SyntaxTreeNode
     self.write-line-num()
     write(user ", ")
   
-  ## Raise a syntax error with message:
+  ## Print a syntax error with message:
   ## `Code error in {file-name}[{line-number}] {text} "{item}"`
-  func inst m-syntax-error(user String text, user String item)
+  func inst print-syntax-error(user String text, user String item)
     self.print-syntax-error-header()
     print-msg-with-item(user text, user item)
     print(user "\n")
+  
+  func inst m-syntax-error(user String text, user String item)
+    self.print-syntax-error(user text, user item)
     raise
   
   ## Same as `m-syntax-error` but but with another `{text} "{item}" pair
@@ -103,7 +107,8 @@ class SyntaxTreeNode
       char-str.copy(user "new-line")
     else
       char-str.append(copy item)
-    self.m-syntax-error(user text, user char-str)
+    self.print-syntax-error(user text, user char-str)
+    raise
   
   func inst m-syntax-error-msg(user String text)
     self.print-syntax-error-header()

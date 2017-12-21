@@ -363,18 +363,6 @@ Returncode SyntaxTreeNamespace_analyze(SyntaxTreeNamespace* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeNamespace_write(SyntaxTreeNamespace* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeNamespace_write = "SyntaxTreeNamespace.write";
-#define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_write
-Returncode SyntaxTreeNamespace_write(SyntaxTreeNamespace* self) {
-  CHECK(182, SyntaxTreeBranch_write(&(self->_base)) )
-  CHECK(183, SyntaxTreeNode_write_children(&(self->_base._base), self->functions) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeNamespace_write_functions_declaration(SyntaxTreeNamespace* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeNamespace_write_functions_declaration = "SyntaxTreeNamespace.write-functions-declaration";
@@ -383,7 +371,7 @@ Returncode SyntaxTreeNamespace_write_functions_declaration(SyntaxTreeNamespace* 
   ListNode* child = self->functions->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(189, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[7](((SyntaxTreeFunction*)(child->item))) )
+    CHECK(185, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[7](((SyntaxTreeFunction*)(child->item))) )
     child = child->next;
   }
   return OK;
@@ -394,7 +382,7 @@ Returncode SyntaxTreeNamespace_write_functions_declaration(SyntaxTreeNamespace* 
 extern Func SyntaxTreeNamespace__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeNamespace__dtl[] = {(void*)SyntaxTreeNamespace_link_types, (void*)SyntaxTreeNamespace_analyze, (void*)SyntaxTreeNamespace_write, (void*)SyntaxTreeBranch_parse_child, (void*)SyntaxTreeBranch_find_variable};
+Func SyntaxTreeNamespace__dtl[] = {(void*)SyntaxTreeNamespace_link_types, (void*)SyntaxTreeNamespace_analyze, (void*)SyntaxTreeBranch_write, (void*)SyntaxTreeBranch_parse_child, (void*)SyntaxTreeBranch_find_variable};
 #endif
 
 #undef MR_FILE_NAME

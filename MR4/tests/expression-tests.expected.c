@@ -270,6 +270,12 @@ if (t == NULL || t_Refman->value == NULL) RAISE(1)
 CHECK(1, fun1(3, str, str_Refman, *so, *so_Refman) )
   *so = NULL;
   *so_Refman = NULL;
+/// @ t18
+String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  Int aux_Int_0 = 0;
+  CHECK(1, fun3(1, &(aux_String_0), &(aux_String_0_Refman)) )
+  CHECK(2, fun5(2, &(aux_Int_0)) )
 /// @ te0
 expected access, got " "
 /// @ te1
@@ -507,6 +513,8 @@ operator "+=" expected "Int" operand, got "Test"
 operator "-=" expected "Int" operand, got "Bool"
 /// @ te15
 operator "is" is not supported for type "Int"
+/// @ te16
+non matching subtypes "Int" and "Char"
 /// @@ test-question-expression
 /// @ t0
 b = !(str == NULL || str_Refman->value == NULL);

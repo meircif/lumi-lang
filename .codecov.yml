@@ -3,7 +3,7 @@ coverage:
   status:
     project:
       default:
-        target: 98.5%
+        target: 100%
   ignore:
     - "MR3/*"
     - "MR4/tests/*"

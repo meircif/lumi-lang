@@ -12,8 +12,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
   
   func inst parse(user Array{String} argv)
     if argv.length < 3
-      sys.print(
-          user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...")
+      print(user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...")
       raise
     
     self.output-file-name := argv[1]

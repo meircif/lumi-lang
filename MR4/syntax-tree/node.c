@@ -22,7 +22,7 @@ struct SyntaxTreeNode {
   Func* _dtl;
   String* input_file_name;
   Int line_number;
-/* Expect `expected-text` to be read exaclty from the input file *//* Raise a syntax error with message: *//* `Code error in {file-name}[{line-number}] {text} "{item}"` *//* Same as `m-syntax-error` but but with another `{text} "{item}" pair *//* Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair *//* Same as `m-syntax-error` but with a character item */};
+/* Expect `expected-text` to be read exaclty from the input file *//* Print a syntax error with message: *//* `Code error in {file-name}[{line-number}] {text} "{item}"` *//* Same as `m-syntax-error` but but with another `{text} "{item}" pair *//* Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair *//* Same as `m-syntax-error` but with a character item */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeNode_set_location(SyntaxTreeNode* self);
@@ -51,8 +51,8 @@ Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, I
       return OK;
     }
   }}
-  CHECK(20, SyntaxTreeNode_m_syntax_error(self, &(String){15, 14, "illegal access"}, access_str) )
-  return OK;
+  CHECK(20, SyntaxTreeNode_print_syntax_error(self, &(String){15, 14, "illegal access"}, access_str) )
+  RAISE(21)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -62,9 +62,9 @@ Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, TypeData
 static char* _func_name_SyntaxTreeNode_find_type = "SyntaxTreeNode.find-type";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_find_type
 Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, TypeData** type_data) {
-  CHECK(23, NameMap_find(glob->type_map, name, (void**)&((*type_data))) )
+  CHECK(24, NameMap_find(glob->type_map, name, (void**)&((*type_data))) )
   if (!(NULL != (*type_data))) {
-    CHECK(24, SyntaxTreeNode_m_syntax_error(self, &(String){13, 12, "unknown type"}, name) )
+    CHECK(25, SyntaxTreeNode_m_syntax_error(self, &(String){13, 12, "unknown type"}, name) )
   }
   return OK;
 }
@@ -77,16 +77,16 @@ static char* _func_name_SyntaxTreeNode_read_expect = "SyntaxTreeNode.read-expect
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_read_expect
 Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_text) {
   String* actual_text = _new_string(expected_text->length + 1);
-  if (actual_text == NULL) RAISE(28)
+  if (actual_text == NULL) RAISE(29)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
     Char _Char91;
-    CHECK(30, read_c(&(_Char91)) )
-    CHECK(30, String_append(actual_text, _Char91) )
+    CHECK(31, read_c(&(_Char91)) )
+    CHECK(31, String_append(actual_text, _Char91) )
   }}
   Bool _Bool92;
-  CHECK(31, String_equal(actual_text, expected_text, &(_Bool92)) )
+  CHECK(32, String_equal(actual_text, expected_text, &(_Bool92)) )
   if (!_Bool92) {
-    CHECK(32, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
+    CHECK(33, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);
   return OK;
@@ -99,12 +99,12 @@ Returncode SyntaxTreeNode_analyze_expression(SyntaxTreeNode* self, Expression* e
 static char* _func_name_SyntaxTreeNode_analyze_expression = "SyntaxTreeNode.analyze-expression";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_analyze_expression
 Returncode SyntaxTreeNode_analyze_expression(SyntaxTreeNode* self, Expression* expression, TypeData* expected_type) {
-  CHECK(38, (expression)->_base._dtl[1](expression) )
+  CHECK(39, (expression)->_base._dtl[1](expression) )
   if (!(NULL != expression->result_type)) {
-    CHECK(40, SyntaxTreeNode_m_syntax_error(self, &(String){30, 29, "got void expression, expected"}, expected_type->name) )
+    CHECK(41, SyntaxTreeNode_m_syntax_error(self, &(String){30, 29, "got void expression, expected"}, expected_type->name) )
   }
   if (expression->result_type->type_data != expected_type) {
-    CHECK(43, SyntaxTreeNode_m_syntax_error2(self, &(String){4, 3, "got"}, expression->result_type->type_data->name, &(String){21, 20, "expression, expected"}, expected_type->name) )
+    CHECK(44, SyntaxTreeNode_m_syntax_error2(self, &(String){4, 3, "got"}, expression->result_type->type_data->name, &(String){21, 20, "expression, expected"}, expected_type->name) )
   }
   return OK;
 }
@@ -116,7 +116,7 @@ Returncode SyntaxTreeNode_write_line_num(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_write_line_num = "SyntaxTreeNode.write-line-num";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_write_line_num
 Returncode SyntaxTreeNode_write_line_num(SyntaxTreeNode* self) {
-  CHECK(50, write_int(self->line_number) )
+  CHECK(51, write_int(self->line_number) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -127,9 +127,9 @@ Returncode SyntaxTreeNode_write_raise(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_write_raise = "SyntaxTreeNode.write-raise";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_write_raise
 Returncode SyntaxTreeNode_write_raise(SyntaxTreeNode* self) {
-  CHECK(53, write(&(String){7, 6, "RAISE("}) )
-  CHECK(54, SyntaxTreeNode_write_line_num(self) )
-  CHECK(55, write(&(String){3, 2, ")\n"}) )
+  CHECK(54, write(&(String){7, 6, "RAISE("}) )
+  CHECK(55, SyntaxTreeNode_write_line_num(self) )
+  CHECK(56, write(&(String){3, 2, ")\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -140,23 +140,34 @@ Returncode SyntaxTreeNode_write_call(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_write_call = "SyntaxTreeNode.write-call";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_write_call
 Returncode SyntaxTreeNode_write_call(SyntaxTreeNode* self) {
-  CHECK(58, write(&(String){7, 6, "CHECK("}) )
-  CHECK(59, SyntaxTreeNode_write_line_num(self) )
-  CHECK(60, write(&(String){3, 2, ", "}) )
+  CHECK(59, write(&(String){7, 6, "CHECK("}) )
+  CHECK(60, SyntaxTreeNode_write_line_num(self) )
+  CHECK(61, write(&(String){3, 2, ", "}) )
   return OK;
 }
 #undef MR_FUNC_NAME
-#endif/* Raise a syntax error with message: *//* `Code error in {file-name}[{line-number}] {text} "{item}"` */
+#endif/* Print a syntax error with message: *//* `Code error in {file-name}[{line-number}] {text} "{item}"` */
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_print_syntax_error(SyntaxTreeNode* self, String* text, String* item);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_print_syntax_error = "SyntaxTreeNode.print-syntax-error";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_print_syntax_error
+Returncode SyntaxTreeNode_print_syntax_error(SyntaxTreeNode* self, String* text, String* item) {
+  CHECK(66, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(67, print_msg_with_item(text, item) )
+  CHECK(68, print(&(String){2, 1, "\n"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
 #if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeNode_m_syntax_error(SyntaxTreeNode* self, String* text, String* item);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeNode_m_syntax_error = "SyntaxTreeNode.m-syntax-error";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error
 Returncode SyntaxTreeNode_m_syntax_error(SyntaxTreeNode* self, String* text, String* item) {
-  CHECK(65, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(66, print_msg_with_item(text, item) )
-  CHECK(67, print(&(String){2, 1, "\n"}) )
-  RAISE(68)
+  CHECK(71, SyntaxTreeNode_print_syntax_error(self, text, item) )
+  RAISE(72)
 }
 #undef MR_FUNC_NAME
 #endif/* Same as `m-syntax-error` but but with another `{text} "{item}" pair */
@@ -166,12 +177,12 @@ Returncode SyntaxTreeNode_m_syntax_error2(SyntaxTreeNode* self, String* text1, S
 static char* _func_name_SyntaxTreeNode_m_syntax_error2 = "SyntaxTreeNode.m-syntax-error2";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error2
 Returncode SyntaxTreeNode_m_syntax_error2(SyntaxTreeNode* self, String* text1, String* item1, String* text2, String* item2) {
-  CHECK(73, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(74, print_msg_with_item(text1, item1) )
-  CHECK(75, print(&(String){2, 1, " "}) )
-  CHECK(76, print_msg_with_item(text2, item2) )
-  CHECK(77, print(&(String){2, 1, "\n"}) )
-  RAISE(78)
+  CHECK(77, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(78, print_msg_with_item(text1, item1) )
+  CHECK(79, print(&(String){2, 1, " "}) )
+  CHECK(80, print_msg_with_item(text2, item2) )
+  CHECK(81, print(&(String){2, 1, "\n"}) )
+  RAISE(82)
 }
 #undef MR_FUNC_NAME
 #endif/* Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair */
@@ -181,14 +192,14 @@ Returncode SyntaxTreeNode_m_syntax_error3(SyntaxTreeNode* self, String* text1, S
 static char* _func_name_SyntaxTreeNode_m_syntax_error3 = "SyntaxTreeNode.m-syntax-error3";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error3
 Returncode SyntaxTreeNode_m_syntax_error3(SyntaxTreeNode* self, String* text1, String* item1, String* text2, String* item2, String* text3, String* item3) {
-  CHECK(88, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(89, print_msg_with_item(text1, item1) )
-  CHECK(90, print(&(String){2, 1, " "}) )
-  CHECK(91, print_msg_with_item(text2, item2) )
-  CHECK(92, print(&(String){2, 1, " "}) )
-  CHECK(93, print_msg_with_item(text3, item3) )
-  CHECK(94, print(&(String){2, 1, "\n"}) )
-  RAISE(95)
+  CHECK(92, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(93, print_msg_with_item(text1, item1) )
+  CHECK(94, print(&(String){2, 1, " "}) )
+  CHECK(95, print_msg_with_item(text2, item2) )
+  CHECK(96, print(&(String){2, 1, " "}) )
+  CHECK(97, print_msg_with_item(text3, item3) )
+  CHECK(98, print(&(String){2, 1, "\n"}) )
+  RAISE(99)
 }
 #undef MR_FUNC_NAME
 #endif/* Same as `m-syntax-error` but with a character item */
@@ -200,18 +211,18 @@ static char* _func_name_SyntaxTreeNode_m_syntax_error_c = "SyntaxTreeNode.m-synt
 Returncode SyntaxTreeNode_m_syntax_error_c(SyntaxTreeNode* self, String* text, Char item) {
   String* char_str = &(String){16, 0, (char[16]){0}};
   if (item == EOF) {
-    CHECK(101, String_copy(char_str, &(String){4, 3, "EOF"}) )
+    CHECK(105, String_copy(char_str, &(String){4, 3, "EOF"}) )
   }
   else {
     if (item == '\n') {
-      CHECK(103, String_copy(char_str, &(String){9, 8, "new-line"}) )
+      CHECK(107, String_copy(char_str, &(String){9, 8, "new-line"}) )
     }
     else {
-      CHECK(105, String_append(char_str, item) )
+      CHECK(109, String_append(char_str, item) )
     }
   }
-  CHECK(106, SyntaxTreeNode_m_syntax_error(self, text, char_str) )
-  return OK;
+  CHECK(110, SyntaxTreeNode_print_syntax_error(self, text, char_str) )
+  RAISE(111)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -221,10 +232,10 @@ Returncode SyntaxTreeNode_m_syntax_error_msg(SyntaxTreeNode* self, String* text)
 static char* _func_name_SyntaxTreeNode_m_syntax_error_msg = "SyntaxTreeNode.m-syntax-error-msg";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error_msg
 Returncode SyntaxTreeNode_m_syntax_error_msg(SyntaxTreeNode* self, String* text) {
-  CHECK(109, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(110, print(text) )
-  CHECK(111, print(&(String){2, 1, "\n"}) )
-  RAISE(112)
+  CHECK(114, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(115, print(text) )
+  CHECK(116, print(&(String){2, 1, "\n"}) )
+  RAISE(117)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -234,13 +245,13 @@ Returncode SyntaxTreeNode_print_syntax_error_header(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_print_syntax_error_header = "SyntaxTreeNode.print-syntax-error-header";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_print_syntax_error_header
 Returncode SyntaxTreeNode_print_syntax_error_header(SyntaxTreeNode* self) {
-  CHECK(115, print(&(String){15, 14, "Code error in "}) )
-  CHECK(116, print(self->input_file_name) )
-  CHECK(117, print(&(String){2, 1, "["}) )
+  CHECK(120, print(&(String){15, 14, "Code error in "}) )
+  CHECK(121, print(self->input_file_name) )
+  CHECK(122, print(&(String){2, 1, "["}) )
   String* line_num_str = &(String){32, 0, (char[32]){0}};
-  CHECK(119, Int_str(self->line_number, line_num_str) )
-  CHECK(120, print(line_num_str) )
-  CHECK(121, print(&(String){3, 2, "] "}) )
+  CHECK(124, Int_str(self->line_number, line_num_str) )
+  CHECK(125, print(line_num_str) )
+  CHECK(126, print(&(String){3, 2, "] "}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -273,7 +284,7 @@ Returncode SyntaxTreeNode_write(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_write = "SyntaxTreeNode.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_write
 Returncode SyntaxTreeNode_write(SyntaxTreeNode* self) {
-  RAISE(130)
+  RAISE(135)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -285,7 +296,7 @@ static char* _func_name_SyntaxTreeNode_link_children_types = "SyntaxTreeNode.lin
 Returncode SyntaxTreeNode_link_children_types(SyntaxTreeNode* self, List* child_list) {
   NodeLinkTypesAction* action_link_types = &(NodeLinkTypesAction){NodeLinkTypesAction__dtl};
   action_link_types->_base._dtl = NodeLinkTypesAction__dtl;
-  CHECK(134, SyntaxTreeNode_do_on_children(self, child_list, &(action_link_types->_base)) )
+  CHECK(139, SyntaxTreeNode_do_on_children(self, child_list, &(action_link_types->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -298,7 +309,7 @@ static char* _func_name_SyntaxTreeNode_analyze_children = "SyntaxTreeNode.analyz
 Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list) {
   NodeAnalyzeAction* action_analyze = &(NodeAnalyzeAction){NodeAnalyzeAction__dtl};
   action_analyze->_base._dtl = NodeAnalyzeAction__dtl;
-  CHECK(138, SyntaxTreeNode_do_on_children(self, child_list, &(action_analyze->_base)) )
+  CHECK(143, SyntaxTreeNode_do_on_children(self, child_list, &(action_analyze->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -311,7 +322,7 @@ static char* _func_name_SyntaxTreeNode_write_children = "SyntaxTreeNode.write-ch
 Returncode SyntaxTreeNode_write_children(SyntaxTreeNode* self, List* child_list) {
   NodeWriteAction* action_write = &(NodeWriteAction){NodeWriteAction__dtl};
   action_write->_base._dtl = NodeWriteAction__dtl;
-  CHECK(142, SyntaxTreeNode_do_on_children(self, child_list, &(action_write->_base)) )
+  CHECK(147, SyntaxTreeNode_do_on_children(self, child_list, &(action_write->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -325,7 +336,7 @@ Returncode SyntaxTreeNode_do_on_children(SyntaxTreeNode* self, List* child_list,
   ListNode* child = child_list->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(149, (action)->_dtl[0](action, child->item) )
+    CHECK(154, (action)->_dtl[0](action, child->item) )
     child = child->next;
   }
   return OK;
@@ -353,7 +364,7 @@ Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node);
 static char* _func_name_NodeAction_m_action = "NodeAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeAction_m_action
 Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node) {
-  RAISE(155)
+  RAISE(160)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -377,7 +388,7 @@ Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNod
 static char* _func_name_NodeLinkTypesAction_m_action = "NodeLinkTypesAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeLinkTypesAction_m_action
 Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNode* node) {
-  CHECK(159, (node)->_dtl[0](node) )
+  CHECK(164, (node)->_dtl[0](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -402,7 +413,7 @@ Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* n
 static char* _func_name_NodeAnalyzeAction_m_action = "NodeAnalyzeAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeAnalyzeAction_m_action
 Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* node) {
-  CHECK(163, (node)->_dtl[1](node) )
+  CHECK(168, (node)->_dtl[1](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -427,7 +438,7 @@ Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node)
 static char* _func_name_NodeWriteAction_m_action = "NodeWriteAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeWriteAction_m_action
 Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node) {
-  CHECK(167, (node)->_dtl[2](node) )
+  CHECK(172, (node)->_dtl[2](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
