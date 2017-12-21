@@ -44,12 +44,16 @@ main(
 ## @ eg t12
   struct Test
 ## @ eg t13
-var Int x
+func f()
+  x :=
+    y
 ## @ eg t14
+var Int x
+## @ eg t15
 var Int name
 var Int name
 
-## @ eg t15
+## @ eg t16
 func name()
 var Int name
 ## @@ test-struct
@@ -73,35 +77,52 @@ struct Test2(Test1)
   var Int y
 struct Test1
   var Int x
-## @ eg t4
+## @ eg te0
 struct(
 
-## @ eg t5
+## @ eg te1
 struct error
 
-## @ eg t6
+## @ eg te2
 struct ERrror
 
-## @ eg t7
+## @ eg te3
 struct Error-name
 
-## @ eg t8
+## @ eg te4
+struct E
+
+## @ eg te5
 struct Int
 
-## @ eg t9
+## @ eg te6
 struct Test
 struct Test
 
-## @ eg t10
+## @ eg te7
 struct Test(Base
 
-## @ eg t11
+## @ eg te8
 struct Test
   error 
-## @ eg t12
+## @ eg te9
 struct Test
-## @ eg t13
+## @ eg te10
 struct Error
+
+## @ eg te11
+struct Error
+  new 
+
+## @ eg te12
+struct Error
+  new()
+  new()
+
+## @ eg te13
+struct Error
+  var Int x
+  new()->(var Int x)
 
 ## @@ test-class
 ## @ g t0
@@ -120,12 +141,30 @@ class Top(Mid)
     base()
   func dynamic dyn3()
     base.dyn0()
-## @ eg t1
+## @ eg te0
 class(
 
-## @ eg t2
+## @ eg te1
 class Error
   var Int x
+
+## @ eg te2
+class Error
+  func error f()
+
+## @ eg te3
+struct Base
+  var Int x
+  func meth()
+class Error(Base)
+  func dynamic meth()
+
+## @ eg te4
+class Base
+  var Int x
+  func dynamic meth()
+class Error(Base)
+  func inst meth()
 
 ## @@ test-function
 ## @ g t0
@@ -289,6 +328,12 @@ func name()
 ## @ g t1
 func name()
   raise
+## @ eg te0
+func name()
+  return()
+## @ eg te1
+func name()
+  raise()
 ## @@ test-code-variables
 ## @ c t0
 var Int x
@@ -343,6 +388,8 @@ var Int x(1)
 struct Test
   var Test t
 
+## @ ec te10
+new
 ## @@ test-initialize
 ## @ c t0
 t := Test(copy i)
@@ -484,6 +531,20 @@ if b
 if b
     return
     i := 3
+## @ ec t9
+if()
+## @ ec t10
+else
+## @ ec t11
+if false
+    # ...
+  else 
+## @ ec t12
+else-if
+## @ ec t13
+if false
+    # ...
+  else-if()
 ## @@ test-do-loop
 ## @ c t0
 do
@@ -500,23 +561,26 @@ do
 ## @ c t3
 do
     continue
-## @ ec t4
+## @ ec te0
 do(
-## @ ec t5
+## @ ec te1
 while true
-## @ ec t6
+## @ ec te2
 continue
-## @ ec t7
+## @ ec te3
 do
     while 2
-## @ ec t8
+## @ ec te4
 do
     error
-## @ ec t9
+## @ ec te5
 do
     var Int error
   do
     var Int error
+## @ ec te6
+do
+    while i := 3
 ## @@ test-for-loop
 ## @ c t0
 for n in 5
@@ -569,39 +633,50 @@ test fun0()
 test fun1()
 main
 
-## @ ec t8
+## @ ec te0
 assert 3
-## @ ec t9
+## @ ec te1
 assert error
-## @ ec t10
+## @ ec te2
 assert-error error
-## @ eg t11
+## @ eg te3
 test fun(copy Int x)
 
-## @ eg t12
+## @ eg te4
 test fun()->(copy Int x)
 
-## @ eg t13
+## @ eg te5
 mock error()
 
-## @ eg t14
+## @ eg te6
 mock Error.fun()
 
-## @ eg t15
+## @ eg te7
 struct Test
   var Int x
 mock Test.error()
 
-## @ eg t16
+## @ eg te8
 mock fun(owner String s)
 func fun(user String s)
 
-## @ eg t17
+## @ eg te9
 mock fun(user Int s)
 func fun(user String s)
 
-## @ eg t18
+## @ eg te10
 mock fun(user Array{Char} a)
 func fun(user Array{Int} a)
 
+## @ ec te11
+assert
+## @ ec te12
+assert-error
+## @ eg te13
+mock()
+## @@ test-native
+## @ g t0
+native external()
+## @ eg te0
+native()
 ## @

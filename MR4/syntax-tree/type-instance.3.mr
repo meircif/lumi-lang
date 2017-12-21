@@ -112,8 +112,6 @@ static TypeInstance
     bases := 0
     if not (? self)
       node.m-syntax-error-msg(user "cannot assign void expression")
-    if not (? target)
-      node.m-syntax-error-msg(user "cannot assign into void expression")
     if self.type-data = glob.type-empty and
         (not target.type-data.is-primitive or target.type-data = glob.type-func)
       return
@@ -154,18 +152,6 @@ static TypeInstance
               user "and",
               user other.sub-type.type-data.name)
         self.sub-type.check-sub-equal(user other.sub-type, user node)
-      else
-        node.m-syntax-error2(
-            user "non matching subtypes",
-            user self.sub-type.type-data.name,
-            user "and type with no subtype",
-            user other.type-data.name)
-    else-if ? other.sub-type
-      node.m-syntax-error2(
-          user "non matching type with no subtype",
-          user self.type-data.name,
-          user "and subtype",
-          user other.sub-type.type-data.name)
     
   func inst check-sequence(user SyntaxTreeNode node)
     if (self.type-data = glob.type-array or
@@ -175,10 +161,3 @@ static TypeInstance
         self.sub-type.type-data = glob.type-string and
         not (? self.sub-type.length)
       node.m-syntax-error-msg(user "missing length for sequence")
-  
-  func inst write()
-    write(user self.type-data.name)
-    if ? self.sub-type
-      write(user "{")
-      self.sub-type.write()
-      write(user "}")

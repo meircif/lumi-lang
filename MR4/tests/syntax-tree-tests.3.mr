@@ -48,6 +48,20 @@ func test-global-scope-error(user String input-text, user String expected-error)
       copy true)
 
 
+test test-illegal-usage()
+  var Array{2:String{4}} mock-argv
+  var SyntaxTreeRoot root
+  mock-print-active := true
+  assert-error glob.root.parse(user mock-argv)
+  mock-print-active := false
+  f-assert-string-slice(
+      user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...",
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+
+
 test test-general()
   test-new-file(user "syntax-tree-tests", user "test-general")
 
@@ -98,3 +112,7 @@ test test-for-loop()
 
 test test-testing()
   test-from-file(user "test-testing")
+
+
+test test-native()
+  test-from-file(user "test-native")

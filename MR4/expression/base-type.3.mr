@@ -32,7 +32,7 @@ class BaseMethExpression(Expression)
     if self.is-call
       self.parent-type.base-type.find-meth(user function.name):(
           user self.function)
-      if not (? function)
+      if not (? self.function)
         self.m-syntax-error(
             user "no base method for method", user function.name)
       self.set-simple-type(user glob.type-func)
@@ -127,6 +127,3 @@ class TypeExpression(Expression)
   
   func dynamic analyze()
     self.result-type.sub-type.analyze(user self)
-  
-  func dynamic write()
-    write-cname(user self.result-type.sub-type.type-data.name)

@@ -178,10 +178,6 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
     base.analyze()
     self.analyze-children(user self.functions)
   
-  func dynamic write()
-    base.write()
-    self.write-children(user self.functions)
-  
   func inst write-functions-declaration()
     user ListNode{SyntaxTreeFunction} child(self.functions.first)
     do

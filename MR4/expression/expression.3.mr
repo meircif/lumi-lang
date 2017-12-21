@@ -44,20 +44,17 @@ class Expression(SyntaxTreeNode)
       copy Char end,
       user Operator operator)
     expression := _
-    var Bool multi-operands(not ends.has(copy ' '))
     owner String text
     self.read-new-value(user ends):(owner text, copy end)
     glob.operator-map.find(user text):(user operator)
     if ? operator
-      if not multi-operands
-        code-node.m-syntax-error(user "unexpected operator", user operator.name)
       UnaryExpression.parse-new(
           var _, user ends, user operator, user code-node):(
           owner expression, copy end, user operator)
     else
       self.parse-new-operand(owner text, user ends, user code-node):(
           owner expression, copy end)
-      if multi-operands and end = ' '
+      if end = ' '
         self.read-new-value(user ends):(owner text, copy end)
         glob.operator-map.find(user text):(user operator)
         if not (? operator)

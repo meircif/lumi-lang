@@ -150,9 +150,6 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.analyze-expression(user self.upper-bound, user glob.type-int)
     base.analyze()
   
-  func dynamic m-is-in-loop():(copy Bool is-in-loop)
-    is-in-loop := true
-  
   func dynamic write()
     # {int `index`; for(`index`=`start`; `index`<`upper-bound`; ++`index`) {
     #    `block...`

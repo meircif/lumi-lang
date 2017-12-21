@@ -27,10 +27,12 @@ expected new-line after "main", got "("
 /// @ t12
 indentation too big, expected "0" got "2"
 /// @ t13
-no new-line before file end
+too short indentation, expected "6" got "4"
 /// @ t14
-redefinition of global variable "name"
+no new-line before file end
 /// @ t15
+redefinition of global variable "name"
+/// @ t16
 variable name overrides function "name"
 /// @@ test-struct
 /// @ t0
@@ -66,26 +68,34 @@ struct Test2 {
   Test1 _base;
   Int y;
 };
-/// @ t4
+/// @ te0
 expected space after "struct", got "("
-/// @ t5
+/// @ te1
 illegal type name "error"
-/// @ t6
+/// @ te2
 illegal type name "ERrror"
-/// @ t7
+/// @ te3
 illegal type name "Error-name"
-/// @ t8
+/// @ te4
+illegal type name "E"
+/// @ te5
 redefinition of type "Int"
-/// @ t9
+/// @ te6
 redefinition of type "Test"
-/// @ t10
+/// @ te7
 expected ")" after base type, got "new-line"
-/// @ t11
+/// @ te8
 unknown keyword "error"
-/// @ t12
+/// @ te9
 expected block in a new line, got "EOF"
-/// @ t13
+/// @ te10
 type with no fields "Error"
+/// @ te11
+expected "(" after "new", got " "
+/// @ te12
+constructor already defined for type "Error"
+/// @ te13
+constructor with outputs
 /// @@ test-class
 /// @ t0
 typedef struct Base Base;
@@ -164,10 +174,16 @@ Returncode Top_dyn3(Top* self, RefManager* self_Refman, Top_Dynamic* self_Dynami
 MR_cleanup:
   return MR_err;
 }
-/// @ t1
+/// @ te0
 expected space after "class", got "("
-/// @ t2
+/// @ te1
 class with no dynamic methods "Error"
+/// @ te2
+expected "dynamic" or "inst" method type, got "error"
+/// @ te3
+illegal dynamic in function "meth"
+/// @ te4
+illegal dynamic in function "meth"
 /// @@ test-function
 /// @ t0
 Returncode name(void);
@@ -451,6 +467,10 @@ Returncode name(void) {
 MR_cleanup:
   return MR_err;
 }
+/// @ te0
+expected new-line after "return", got "("
+/// @ te1
+expected new-line after "raise", got "("
 /// @@ test-code-variables
 /// @ t0
 Int x = 0;
@@ -533,6 +553,8 @@ type members cannot be initialized
 global variables cannot be initialized
 /// @ te9
 non-primitives cannot be declared "var" here yet...
+/// @ te10
+expected space after "new", got "new-line"
 /// @@ test-initialize
 /// @ t0
 Test* aux_Test_0 = NULL;
@@ -786,6 +808,16 @@ unknown symbol "error"
 unknown symbol "error"
 /// @ t8
 unreachable code
+/// @ t9
+expected space after "if", got "("
+/// @ t10
+"else" without a previous "if"
+/// @ t11
+expected new-line after "else", got " "
+/// @ t12
+"else-if" without a previous "if"
+/// @ t13
+expected space after "else-if", got "("
 /// @@ test-do-loop
 /// @ t0
 Int x = 0;
@@ -802,18 +834,20 @@ while (true) {
 while (true) {
     continue;
   }
-/// @ t4
+/// @ te0
 expected new-line after "do", got "("
-/// @ t5
+/// @ te1
 "while" used not inside loop
-/// @ t6
+/// @ te2
 "continue" used not inside loop
-/// @ t7
+/// @ te3
 got "Int" expression, expected "Bool"
-/// @ t8
+/// @ te4
 unknown symbol "error"
-/// @ t9
+/// @ te5
 redefinition of variable "error"
+/// @ te6
+got void expression, expected "Bool"
 /// @@ test-for-loop
 /// @ t0
 {int n; for(n=0; n<5; ++n) {
@@ -954,26 +988,37 @@ USER_MAIN_HEADER {
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
-/// @ t8
+/// @ te0
 got "Int" expression, expected "Bool"
-/// @ t9
+/// @ te1
 unknown symbol "error"
-/// @ t10
+/// @ te2
 unknown symbol "error"
-/// @ t11
+/// @ te3
 test function cannot have arguments
-/// @ t12
+/// @ te4
 test function cannot have arguments
-/// @ t13
+/// @ te5
 mocking unknown function "error"
-/// @ t14
+/// @ te6
 unknown type "Error"
-/// @ t15
+/// @ te7
 mocking unknown method "error" of type "Test"
-/// @ t16
+/// @ te8
 expected access "user" , got "owner"
-/// @ t17
+/// @ te9
 non matching types "Int" and "String"
-/// @ t18
+/// @ te10
 non matching subtypes "Char" and "Int"
+/// @ te11
+expected space after "assert", got "new-line"
+/// @ te12
+expected space after "assert-error", got "new-line"
+/// @ te13
+expected space after "mock", got "("
+/// @@ test-native
+/// @ t0
+Returncode external(void);
+/// @ te0
+expected space after "native", got "("
 /// @
