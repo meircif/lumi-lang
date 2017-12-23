@@ -348,7 +348,7 @@ static char* _func_name_Global_add_builtin_variable = "Global.add-builtin-variab
 Returncode Global_add_builtin_variable(Global* self, String* name, TypeData* variable_type, TypeData* variable_subtype, TypeData* parent_type, SyntaxTreeBranch* branch) {
   BuiltinVariable* variable = malloc(sizeof(BuiltinVariable));
   if (variable == NULL) RAISE(303)
-  *variable = (BuiltinVariable){BuiltinVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false};
+  *variable = (BuiltinVariable){BuiltinVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
   variable->_base._base._base._dtl = BuiltinVariable__dtl;
   CHECK(304, string_new_copy(name, &(variable->_base.name)) )
   if (variable_type->is_primitive) {
@@ -444,13 +444,13 @@ static char* _func_name_Global_add_builtin_argument = "Global.add-builtin-argume
 Returncode Global_add_builtin_argument(Global* self, List* argument_list, Bool is_output, Int access, TypeData* argument_type, String* name) {
   DeclarationArgument* argument = malloc(sizeof(DeclarationArgument));
   if (argument == NULL) RAISE(372)
-  *argument = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, NULL};
+  *argument = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, false, NULL};
   argument->_base._base._dtl = DeclarationArgument__dtl;
   argument->_base.access = access;
   argument->_base.is_output = is_output;
   argument->variable = malloc(sizeof(SyntaxTreeVariable));
   if (argument->variable == NULL) RAISE(375)
-  *argument->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false};
+  *argument->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
   argument->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   CHECK(376, string_new_copy(name, &(argument->variable->name)) )
   argument->variable->access = access;
@@ -523,7 +523,7 @@ Returncode BuiltinType_write_me(BuiltinType* self, TypeWriter* type_writer) {
 extern Func BuiltinType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinType__dtl[] = {(void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)BuiltinType_write_me};
+Func BuiltinType__dtl[] = {(void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)BuiltinType_write_me};
 #endif
 
 #if MR_STAGE == MR_TYPEDEFS
@@ -653,6 +653,7 @@ Func BuiltinFunction__dtl[] = {(void*)BuiltinFunction_link_types, (void*)Builtin
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
+#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"

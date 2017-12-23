@@ -129,7 +129,8 @@ diff ../MR4/tests/integration-single-output.txt \
 diff ../MR4/tests/integration-expected-multiple.c \
   tests/integration-actual-multiple.c
 $CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
-  ../MR4/mr.4.c -I../MR4 -o test-mr4-multiple
+  ../MR4/mr.4.c ../MR4/tests/integration-external.c -I../MR4 -o \
+  test-mr4-multiple
 ./test-mr4-multiple > tests/integration-multiple-output.txt
 diff ../MR4/tests/integration-multiple-output.txt \
   tests/integration-multiple-output.txt

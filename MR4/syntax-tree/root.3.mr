@@ -61,8 +61,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"native\", got", copy end)
-      self.functions.add(owner SyntaxTreeNativeFunction.parse-new(var _):(
-          copy end))
+      parse-native(user self):(copy end)
       
     else-if keyword.equal(user "test")
       if end != ' '

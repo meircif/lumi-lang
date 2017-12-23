@@ -21,6 +21,8 @@ typedef struct TopType TopType;
 
 typedef struct TopType_Dynamic TopType_Dynamic;
 
+typedef void* Native;
+
 
 /* types struct */
 
@@ -159,6 +161,8 @@ Int global_int = 0;
 String* global_string = NULL;
 RefManager* global_string_Refman = NULL;
 
+extern Int external_int;
+
 
 /* global functions declaration */
 
@@ -209,6 +213,12 @@ Returncode Mock_f_test_int2str(Int x, String** s, RefManager** s_Refman);
 Returncode test_func(void);
 
 Returncode test_another(void);
+
+Returncode external(Int i, String* s, Int* io, Native* n);
+
+Returncode external2(Native n, Bool* b);
+
+Returncode test_native(void);
 
 
 /* types methods body */
@@ -1874,10 +1884,63 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "test-native"
+Returncode test_native(void) {
+  Returncode MR_err = OK;
+  Int i = 0;
+  Native n = 0;
+  char s_Values[4];
+  String s_Var = {4, 0, NULL};
+  String* s = NULL;
+  RefManager* s_Refman = NULL;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  Bool aux_Bool_0 = 0;
+  TEST_ASSERT(98, external_int == 6)
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(101)
+  aux_String_0_Var.max_length = 3;
+  aux_String_0_Var.length = 2;
+  aux_String_0_Var.values = "bb";
+  s = &s_Var;
+  s_Var.values = s_Values;
+  s_Refman = MR_new_ref(s);
+  if (s_Refman == NULL) RAISE(101)
+  CHECK(101, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
+  do {
+    MR_trace_stream = NULL;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(102, external(3, s, &(i), &(n)) )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    MR_trace_stream = stdout;
+    TEST_FAIL(102)
+  } while (false);
+  MR_trace_stream = stdout;
+  TEST_ASSERT(103, i == 3)
+  if (s == NULL || s_Refman->value == NULL) RAISE(104)
+  if ((0) < 0 || (0) >= (s)->length) RAISE(104)
+  TEST_ASSERT(104, (((s)->values)[0]) == 'a')
+  CHECK(105, external2(n, &(aux_Bool_0)) )
+  TEST_ASSERT(105, aux_Bool_0)
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(test_func);
   RUN_TEST(test_another);
+  RUN_TEST(test_native);
   return MR_success? OK : FAIL;
 }
 

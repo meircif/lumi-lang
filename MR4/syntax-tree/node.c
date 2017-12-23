@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file20_name = "syntax-tree/node.3.mr";
+static char* _mr_file21_name = "syntax-tree/node.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file20_name
+#define MR_FILE_NAME _mr_file21_name
 
 /*  MR4 compiler - Syntax tree basic node types
 
@@ -44,9 +44,9 @@ static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
   {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool90;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool90)) )
-    if (_Bool90) {
+    Bool _Bool97;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool97)) )
+    if (_Bool97) {
       (*access) = n;
       return OK;
     }
@@ -79,13 +79,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(29)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char91;
-    CHECK(31, read_c(&(_Char91)) )
-    CHECK(31, String_append(actual_text, _Char91) )
+    Char _Char98;
+    CHECK(31, read_c(&(_Char98)) )
+    CHECK(31, String_append(actual_text, _Char98) )
   }}
-  Bool _Bool92;
-  CHECK(32, String_equal(actual_text, expected_text, &(_Bool92)) )
-  if (!_Bool92) {
+  Bool _Bool99;
+  CHECK(32, String_equal(actual_text, expected_text, &(_Bool99)) )
+  if (!_Bool99) {
     CHECK(33, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);
@@ -473,6 +473,7 @@ Func NodeWriteAction__dtl[] = {(void*)NodeWriteAction_m_action};
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
+#include "syntax-tree/native.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"
 #include "syntax-tree/type.c"

@@ -398,6 +398,7 @@ Func Expression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNod
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
+#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"

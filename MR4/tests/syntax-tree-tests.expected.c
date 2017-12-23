@@ -363,6 +363,8 @@ missing subtype for array
 missing arguments in function type
 /// @ te19
 multidimensional array not supported yet...
+/// @ te20
+too short indentation, expected "4" got "2"
 /// @@ test-members
 /// @ t0
 typedef struct Test Test;
@@ -1017,8 +1019,64 @@ expected space after "assert-error", got "new-line"
 /// @ te13
 expected space after "mock", got "("
 /// @@ test-native
-/// @ t0
+/// @ tf0
 Returncode external(void);
+Returncode call(void);
+Returncode call(void) {
+  Returncode MR_err = OK;
+  CHECK(3, external() )
+MR_cleanup:
+  return MR_err;
+}
+/// @ tf1
+typedef struct Test Test;
+typedef struct Test_Dynamic Test_Dynamic;
+struct Test {
+  Int x;
+};
+struct Test_Dynamic {
+  Returncode (*meth)(Test* self, RefManager* self_Refman, Test_Dynamic* self_Dynamic);
+};
+Returncode Test_meth(Test* self, RefManager* self_Refman, Test_Dynamic* self_Dynamic);
+Test_Dynamic Test_dynamic = {Test_meth};
+Returncode external(Int i, String* s, Test* ta, Int* io);
+Returncode call(void);
+Returncode Test_meth(Test* self, RefManager* self_Refman, Test_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode call(void) {
+  Returncode MR_err = OK;
+  Int i = 0;
+  String* s = NULL;
+  RefManager* s_Refman = NULL;
+  Test* ta = NULL;
+  RefManager* ta_Refman = NULL;
+  Test_Dynamic* ta_Dynamic = NULL;
+  CHECK(9, external(5, s, ta, &(i)) )
+MR_cleanup:
+  MR_dec_ref(ta_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+/// @ tv0
+extern Int x;
+/// @ tt0
+typedef void* Native;
+Returncode external(Native n, Native* no);
 /// @ te0
 expected space after "native", got "("
+/// @ te1
+expected space after "native" keyword, got "EOF"
+/// @ te2
+unknown "native" keyword "error"
+/// @ tef1
+owner argument to native function
+/// @ tef2
+user output to native function
+/// @ tef3
+owner argument to native function
+/// @ tev3
+only primitive types supported for native variable, got "String"
 /// @
