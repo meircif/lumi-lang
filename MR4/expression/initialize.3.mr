@@ -15,7 +15,8 @@ class InitExpression(Expression)
     new FunctionArguments in self.arguments
     if end = '('
       var CallArgumentFactory argument-factory
-      self.arguments.parse(user argument-factory, user code-node):(copy end)
+      self.arguments.parse(user argument-factory, copy false, user code-node):(
+          copy end)
     else
       self.arguments.init()
   

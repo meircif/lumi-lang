@@ -362,7 +362,7 @@ Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* par
   CHECK(139, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, true, &((*end))) )
   self->_base.block->ref_variable = malloc(sizeof(SyntaxTreeVariable));
   if (self->_base.block->ref_variable == NULL) RAISE(140)
-  *self->_base.block->ref_variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false};
+  *self->_base.block->ref_variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
   self->_base.block->ref_variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   CHECK(141, string_new_copy(self->index_name, &(self->_base.block->ref_variable->name)) )
   CHECK(142, SyntaxTreeVariable_check_name(self->_base.block->ref_variable) )
@@ -455,6 +455,7 @@ Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeFlowElement_link_types, (void*
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/function.c"
+#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"

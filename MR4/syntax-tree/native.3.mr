@@ -1,0 +1,82 @@
+## MR4 compiler - Syntax tree native nodes
+
+## Parse "native" keyword in the root tree
+func parse-native(user SyntaxTreeRoot root):(copy Char end)
+  user String keyword
+  read-until(user " ", copy false):(user keyword, copy end)
+  if end != ' '
+    root.m-syntax-error-c(
+        user "expected space after \"native\" keyword, got", copy end)
+  
+  if keyword.equal(user "func")
+    root.functions.add(owner NativeFunction.parse-new(var _):(copy end))
+    
+  else-if keyword.equal(user "var")
+    root.variables.add(owner NativeVariable.parse-new(var _):(copy end))
+    
+  else-if keyword.equal(user "type")
+    root.types.add(owner NativeType.parse-new(var _):(copy end))
+    
+  else
+    root.m-syntax-error(user "unknown \"native\" keyword", user keyword)
+
+
+## Native function declaration in the syntax tree
+class NativeFunction(SyntaxTreeFunction)
+  func inst parse-new():(copy Char end, owner NativeFunction new-node)
+    new NativeFunction in new-node
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.set-location()
+    # self.indentation-spaces := 2
+    self.parse-header(copy true):(copy end)
+    new List{SyntaxTreeCode} in self.code-nodes
+    new List{SyntaxTreeVariable} in self.variables
+  
+  func dynamic write()
+    # do nothing
+
+
+## Native variable declaration in the syntax tree
+class NativeVariable(SyntaxTreeVariable)
+  func inst parse-new():(copy Char end, owner NativeVariable new-node)
+    new NativeVariable in new-node
+    new-node.parse(copy ACCESS-VAR, copy false, user _, user _):(copy end)
+    new-node.is-native := true
+  
+  func dynamic analyze()
+    if not self.type-instance.type-data.is-primitive
+      self.m-syntax-error(
+          user "only primitive types supported for native variable, got",
+          user self.type-instance.type-data.name)
+    base.analyze()
+  
+  func dynamic write()
+    write(user "\nextern ")
+    base.write()
+
+
+## Native variable declaration in the syntax tree
+class NativeType(TypeData)
+  func inst parse-new():(copy Char end, owner NativeType new-node)
+    new NativeType in new-node
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.is-primitive := true
+    read-new(user ""):(owner self.name, copy end)
+    self.add-type()
+    self.init()
+  
+  func dynamic analyze()
+    # do nothing
+  
+  func dynamic write-declaration()
+    # typedef void* `name`;
+    write(user "\ntypedef void* ")
+    write-cname(user self.name)
+    write(user ";\n")
+  
+  func dynamic write()
+    # do nothing

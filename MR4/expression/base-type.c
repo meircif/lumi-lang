@@ -94,7 +94,7 @@ Returncode BaseMethExpression_analyze_call(BaseMethExpression* self, FunctionArg
   (*is_function_object) = false;
   CallArgument* self_param = malloc(sizeof(CallArgument));
   if (self_param == NULL) RAISE(47)
-  *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, NULL, NULL, false, false};
+  *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false};
   self_param->_base._base._dtl = CallArgument__dtl;
   self_param->_base.access = ((Argument*)(self->function->arguments->parameters->first->item))->access;
   BaseMethExpression* _BaseMethExpression13 = malloc(sizeof(BaseMethExpression));
@@ -350,6 +350,7 @@ Func TypeExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)TypeExpre
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
+#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"

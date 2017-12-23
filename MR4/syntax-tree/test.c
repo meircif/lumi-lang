@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file22_name = "syntax-tree/test.3.mr";
+static char* _mr_file23_name = "syntax-tree/test.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file22_name
+#define MR_FILE_NAME _mr_file23_name
 
 /* MR4 compiler - Syntax tree testing nodes */
 
@@ -287,14 +287,14 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
   SyntaxTreeFunction* mocked_func = NULL;
   if (NULL != self->type_name) {
     CHECK(113, SyntaxTreeNode_find_type(&(self->_base._base._base._base), self->type_name, &(self->_base.parent_type)) )
-    Int _Int106;
-    CHECK(114, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int106)) )
+    Int _Int112;
+    CHECK(114, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int112)) )
     if (!(NULL != mocked_func)) {
       CHECK(116, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base._base), &(String){23, 22, "mocking unknown method"}, self->mocked_name, &(String){8, 7, "of type"}, self->type_name) )
     }
-    TypeInstance* _TypeInstance107;
-    CHECK(121, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance107)) )
-    CHECK(121, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance107) )
+    TypeInstance* _TypeInstance113;
+    CHECK(121, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance113)) )
+    CHECK(121, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance113) )
   }
   else {
     CHECK(124, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
@@ -302,8 +302,8 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
       CHECK(126, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
     }
   }
-  Bool _Bool108;
-  CHECK(128, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool108)) )
+  Bool _Bool114;
+  CHECK(128, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, &(_Bool114)) )
   mocked_func->mocker_function = self;
   CHECK(130, SyntaxTreeFunction_analyze(&(self->_base)) )
   return OK;
@@ -340,6 +340,7 @@ Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_link_types, (voi
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
+#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/type.c"

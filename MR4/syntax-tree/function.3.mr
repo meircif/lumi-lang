@@ -30,7 +30,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           self.m-syntax-error(
               user "expected \"dynamic\" or \"inst\" method type, got",
               user meth-type)
-    self.parse-header():(copy end)
+    self.parse-header(copy false):(copy end)
     self.parse-body():(copy end)
   
   func inst init()
@@ -42,20 +42,22 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.parse-block():(copy end)
     self.indentation-spaces := 2
   
-  func inst parse-header():(copy Char end)
+  func inst parse-header(copy Bool is-native):(copy Char end)
     read-new(user "("):(owner self.name, copy end)
     self.check-name()
     if end != '('
       self.m-syntax-error-c(
           user "expected \"(\" after function name, got", copy end)
-    self.parse-arguments():(copy end)
+    self.parse-arguments(copy is-native):(copy end)
   
-  func inst parse-arguments():(copy Char end)
+  func inst parse-arguments(copy Bool is-native):(copy Char end)
     new FunctionArguments in self.arguments
     var DeclarationArgumentFactory argument-factory
     var SyntaxTreeCode dummy-node
+    dummy-node.set-location()
     dummy-node.parent := self
-    self.arguments.parse(user argument-factory, user dummy-node):(copy end)
+    self.arguments.parse(
+        user argument-factory, copy is-native, user dummy-node):(copy end)
     if ? self.parent-type
       self.arguments.add-self-parameter(
           owner self.parent-type.m-new-type-instance())
@@ -241,7 +243,7 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
     self.parent-type := parent-type
     self.indentation-spaces := 2
     string-new-copy(user "new"):(owner self.name)
-    self.parse-arguments():(copy end)
+    self.parse-arguments(copy false):(copy end)
     self.parse-body():(copy end)
   
   func dynamic analyze()
@@ -275,23 +277,6 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     write(user "\nMAIN_FUNC\n")
 
 
-## Native function declaration in the syntax tree
-class SyntaxTreeNativeFunction(SyntaxTreeFunction)
-  func inst parse-new():(copy Char end, owner SyntaxTreeNativeFunction new-node)
-    new SyntaxTreeNativeFunction in new-node
-    new-node.parse():(copy end)
-  
-  func inst parse():(copy Char end)
-    self.set-location()
-    self.indentation-spaces := 2
-    self.parse-header():(copy end)
-    new List{SyntaxTreeCode} in self.code-nodes
-    new List{SyntaxTreeVariable} in self.variables
-  
-  func dynamic write()
-    # do nothing
-
-
 ## Function declaration argument
 class DeclarationArgument(Argument)
   owner SyntaxTreeVariable variable
@@ -302,6 +287,7 @@ class DeclarationArgument(Argument)
     new-argument.line-number := self.line-number
     new-argument.access := self.access
     new-argument.is-output := self.is-output
+    new-argument.is-native := self.is-native
     new SyntaxTreeVariable in new-argument.variable
     new-argument.variable.access := self.variable.access
     self.variable.type-instance.copy-new():(
@@ -342,6 +328,12 @@ class DeclarationArgument(Argument)
           user "access should not be \"copy\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
     self.variable.type-instance.analyze-lengths(user self)
+    if self.is-native
+      if self.access = ACCESS-OWNER
+        self.m-syntax-error-msg(user "owner argument to native function")
+      if self.is-output and self.access = ACCESS-USER
+        self.m-syntax-error-msg(user "user output to native function")
+      
   
   func dynamic get-type-instance():(user TypeInstance type-instance)
     type-instance := self.variable.type-instance
@@ -369,7 +361,8 @@ class DeclarationArgument(Argument)
     write(user " ")
     write-cname(user self.variable.name)
     
-    if not self.variable.type-instance.type-data.is-primitive
+    if not self.variable.type-instance.type-data.is-primitive and
+        not self.is-native
       write(user ", RefManager*")
       if self.is-output
         write(user "*")
@@ -377,7 +370,7 @@ class DeclarationArgument(Argument)
       write-cname(user self.variable.name)
       write(user "_Refman")
     
-    if self.variable.type-instance.type-data.is-dynamic
+    if self.variable.type-instance.type-data.is-dynamic and not self.is-native
       write(user ", ")
       write-cname(user self.variable.type-instance.type-data.name)
       write(user "_Dynamic*")

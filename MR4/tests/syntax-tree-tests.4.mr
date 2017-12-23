@@ -257,6 +257,10 @@ func name(copy Func error)
 ## @ eg te19
 func name(user Array{Array{Int}} error)
 
+## @ eg te20
+func name(
+  copy Int x)
+
 ## @@ test-members
 ## @ g t0
 struct Test
@@ -675,8 +679,41 @@ assert-error
 ## @ eg te13
 mock()
 ## @@ test-native
-## @ g t0
-native external()
+## @ g tf0
+native func external()
+func call()
+  external()
+## @ g tf1
+class Test
+  var Int x
+  func dynamic meth()
+native func external(copy Int i, user String s, user Test ta)->(var Int io)
+func call()
+  var Int i
+  user String s
+  user Test ta
+  external(copy 5, user s, user ta)->(var i)
+## @ g tv0
+native var Int x
+## @ g tt0
+native type Native
+native func external(copy Native n)->(var Native no)
 ## @ eg te0
 native()
+## @ eg te1
+native error
+## @ eg te2
+native error 
+## @ eg tef1
+native func error(owner String s)
+
+## @ eg tef2
+native func error()->(user String s)
+
+## @ eg tef3
+native func error()->(owner String s)
+
+## @ eg tev3
+native var String s
+
 ## @

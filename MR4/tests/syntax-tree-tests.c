@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file28_name = "tests/syntax-tree-tests.3.mr";
+static char* _mr_file29_name = "tests/syntax-tree-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file28_name
+#define MR_FILE_NAME _mr_file29_name
 
 /* MR4 compiler tests - Syntax tree */
 
@@ -323,6 +323,7 @@ Returncode test_native() {
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/function.c"
+#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "syntax-tree/test.c"

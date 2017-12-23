@@ -5,6 +5,7 @@
 class Argument(SyntaxTreeNode)
   var Int access
   var Bool is-output
+  var Bool is-native
   
   func dynamic copy-new():(owner DeclarationArgument new-argument)
     raise
@@ -12,9 +13,11 @@ class Argument(SyntaxTreeNode)
   func inst parse(
       user String access-str,
       copy Bool is-output,
+      copy Bool is-native,
       user SyntaxTreeCode code-node):(
       copy Char end)
     self.is-output := is-output
+    self.is-native := is-native
     self.set-location()
     self.get-access(user access-str):(copy self.access)
     self.parse-value(user code-node):(copy end)
@@ -33,6 +36,7 @@ class Argument(SyntaxTreeNode)
           user ", got",
           user glob.access-names[self.access])
     self.check-same-type-as(user other.get-type-instance())
+    self.is-native := other.is-native
   
   func dynamic check-same-type-as(user TypeInstance type-instance)
     self.get-type-instance().check-equal(user type-instance, user self)
@@ -80,15 +84,25 @@ class FunctionArguments(SyntaxTreeNode)
     new List{Argument} in self.outputs
   
   func inst parse(
-      user ArgumentFactory argument-factory, user SyntaxTreeCode code-node):(
+      user ArgumentFactory argument-factory,
+      copy Bool is-native,
+      user SyntaxTreeCode code-node):(
       copy Char end)
     self.init()
     self.parse-args(
-        user self.parameters, user argument-factory, user code-node):(copy end)
+        user self.parameters,
+        user argument-factory,
+        copy is-native,
+        user code-node):(
+        copy end)
     if end = '-'
       self.read-expect(user ">(")
       self.parse-args(
-          user self.outputs, user argument-factory, user code-node):(copy end)
+          user self.outputs,
+          user argument-factory,
+          copy is-native,
+          user code-node):(
+          copy end)
   
   func inst add-self-parameter(owner TypeInstance type-instance)
     new DeclarationArgument self-args
@@ -101,6 +115,7 @@ class FunctionArguments(SyntaxTreeNode)
   func inst parse-args(
       user List{Argument} arguments,
       user ArgumentFactory argument-factory,
+      copy Bool is-native,
       user SyntaxTreeCode code-node):(
       copy Char end)
     owner Argument argument
@@ -119,7 +134,8 @@ class FunctionArguments(SyntaxTreeNode)
               user "expected space after access, got", copy end)
         argument-factory.m-new-argument():(owner argument)
         arguments.add(owner argument)
-        argument.parse(user access-str, copy is-output, user code-node):(
+        argument.parse(
+            user access-str, copy is-output, copy is-native, user code-node):(
             copy end)
         while end = ','
         read-c():(copy end)

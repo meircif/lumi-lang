@@ -8,6 +8,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   user TypeData parent-type
   var Bool is-output
   var Bool is-create
+  var Bool is-native
   
   func inst parse-new(
       copy Int access,
@@ -101,7 +102,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func dynamic write()
     if ? self.parent or ? self.parent-type
       self.write-spaces()
-    else
+    else-if not self.is-native
       write(user "\n")
     
     if self.access = ACCESS-VAR and self.is-create and
@@ -125,7 +126,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       write(user " ")
       write-cname(user self.name)
     
-    if not (? self.parent-type)
+    if not (? self.parent-type) and not self.is-native
       if self.type-instance.type-data.is-primitive and
           self.type-instance.type-data != glob.type-func
         write(user " = 0")
