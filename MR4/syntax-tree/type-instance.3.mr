@@ -4,7 +4,7 @@
 static TypeInstance
   owner String name
   user TypeData type-data
-  owner TypeInstance sub-type
+  owner List{TypeInstance} sub-types
   owner Expression length-owner
   user Expression length
   owner FunctionArguments arguments
@@ -17,8 +17,13 @@ static TypeInstance
     self.type-data.m-new-type-instance():(owner type-instance)
     string-new-copy(user self.name):(owner type-instance.name)
     type-instance.length := self.length
-    if ? self.sub-type
-      self.sub-type.copy-new():(owner type-instance.sub-type)
+    if ? self.sub-types
+      new List{TypeInstance} in type-instance.sub-types
+      user ListNode{TypeInstance} node(self.sub-types.first)
+      do
+        while ? node
+        type-instance.sub-types.add(owner node.item.copy-new())
+        node := node.next
     if ? self.arguments
       self.arguments.copy-new():(owner type-instance.arguments)
   
@@ -54,19 +59,34 @@ static TypeInstance
         self.length := self.length-owner
       else
         var Bool has-sub-type(true)
-        if ? code-node and self.name.equal(user "Array")
+        var Bool is-array(self.name.equal(user "Array"))
+        if ? code-node and is-array
           parse-new-expression(user ":}", user code-node):(
               owner self.length-owner, copy end)
           self.length := self.length-owner
           if end != ':' and end != '}'
-            node.m-syntax-error-c(user "expected \":\", got", copy end)
+            node.m-syntax-error-c(
+                user "expected \":\" or \"} after array length\", got",
+                copy end)
           has-sub-type := end = ':'
         if has-sub-type
-          new TypeInstance in self.sub-type
-          self.sub-type.parse(user "}", user node, user code-node):(copy end)
+          new List{TypeInstance} in self.sub-types
+          do
+            new TypeInstance sub-type
+            sub-type.parse(user ":}", user node, user code-node):(copy end)
+            self.sub-types.add(owner sub-type)
+            while end = ':'
+            if is-array
+              node.m-syntax-error-msg(user "more than one sub-type for array")
       if end != '}'
-        node.m-syntax-error-c(user "expected \"}\", got", copy end)
+        node.m-syntax-error-c(user "expected \"}\" after sub-types, got",
+            copy end)
       read-c():(copy end)
+  
+  func inst add-subtype-copy(user TypeData type-data)
+    if not (? self.sub-types)
+      new List{TypeInstance} in self.sub-types
+    self.sub-types.add(owner type-data.m-new-type-instance())
   
   func inst analyze(user SyntaxTreeNode node)
     self.analyze-part(user node, copy true, copy true)
@@ -89,13 +109,18 @@ static TypeInstance
         node.analyze-expression(user self.length, user glob.type-int)
       if ? self.arguments
         self.arguments.analyze()
-    if ? self.sub-type
-      self.sub-type.analyze-part(user node, copy check-types, copy check-length)
+    if ? self.sub-types
+      user ListNode{TypeInstance} sub-type(self.sub-types.first)
+      do
+        while ? sub-type
+        sub-type.item.analyze-part(
+            user node, copy check-types, copy check-length)
+        sub-type := sub-type.next
     if check-types
       if self.type-data = glob.type-array
-        if not (? self.sub-type)
+        if not (? self.sub-types)
           node.m-syntax-error-msg(user "missing subtype for array")
-        if self.sub-type.type-data = glob.type-array
+        if self.sub-types.first.item.type-data = glob.type-array
           node.m-syntax-error-msg(
               user "multidimensional array not supported yet...")
       else-if self.type-data = glob.type-func and not (? self.arguments)
@@ -144,21 +169,27 @@ static TypeInstance
     self.check-sub-equal(user other, user node)
   
   func inst check-sub-equal(user TypeInstance other, user SyntaxTreeNode node)
-    if ? self.sub-type
-      if ? other.sub-type
-        if self.sub-type.type-data != other.sub-type.type-data
-          node.m-syntax-error2(
-              user "non matching subtypes",
-              user self.sub-type.type-data.name,
-              user "and",
-              user other.sub-type.type-data.name)
-        self.sub-type.check-sub-equal(user other.sub-type, user node)
+    if ? self.sub-types
+      if ? other.sub-types
+        user ListNode{TypeInstance} my-sub-type(self.sub-types.first)
+        user ListNode{TypeInstance} other-sub-type(other.sub-types.first)
+        do
+          while ? my-sub-type and ? other-sub-type
+          if my-sub-type.item.type-data != other-sub-type.item.type-data
+            node.m-syntax-error2(
+                user "non matching subtypes",
+                user my-sub-type.item.type-data.name,
+                user "and",
+                user other-sub-type.item.type-data.name)
+          my-sub-type.item.check-sub-equal(user other-sub-type.item, user node)
+          my-sub-type := my-sub-type.next
+          other-sub-type := other-sub-type.next
     
   func inst check-sequence(user SyntaxTreeNode node)
     if (self.type-data = glob.type-array or
         self.type-data = glob.type-string) and not (? self.length)
       node.m-syntax-error-msg(user "missing length for sequence")
     if self.type-data = glob.type-array and
-        self.sub-type.type-data = glob.type-string and
-        not (? self.sub-type.length)
+        self.sub-types.first.item.type-data = glob.type-string and
+        not (? self.sub-types.first.item.length)
       node.m-syntax-error-msg(user "missing length for sequence")

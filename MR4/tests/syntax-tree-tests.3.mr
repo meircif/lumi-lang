@@ -116,3 +116,7 @@ test test-testing()
 
 test test-native()
   test-from-file(user "test-native")
+
+
+test test-parameter-type()
+  test-from-file(user "test-parameter-type")

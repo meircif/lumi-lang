@@ -685,7 +685,7 @@ missing arguments in function type
 /// @ te2
 expected "(" inside Function type, got "}"
 /// @ te3
-expected "}", got " "
+expected "}" after sub-types, got " "
 /// @ te4
 too many parameters
 /// @ te5

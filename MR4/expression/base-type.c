@@ -79,7 +79,7 @@ Returncode BaseMethExpression_analyze(BaseMethExpression* self) {
   }
   else {
     CHECK(41, Expression_set_simple_type(&(self->_base), &(glob->type_base->_base)) )
-    CHECK(42, TypeData_m_new_type_instance(self->parent_type, &(self->_base.result_type->sub_type)) )
+    CHECK(42, TypeInstance_add_subtype_copy(self->_base.result_type, self->parent_type) )
   }
   return OK;
 }
@@ -304,7 +304,10 @@ static char* _func_name_TypeExpression_parse = "TypeExpression.parse";
 Returncode TypeExpression_parse(TypeExpression* self, TypeInstance* type_instance) {
   CHECK(123, SyntaxTreeNode_set_location(&(self->_base._base)) )
   CHECK(124, Expression_set_simple_type(&(self->_base), &(glob->type_type->_base)) )
-  self->_base.result_type->sub_type = type_instance;
+  self->_base.result_type->sub_types = malloc(sizeof(List));
+  if (self->_base.result_type->sub_types == NULL) RAISE(125)
+  *self->_base.result_type->sub_types = (List){NULL, NULL};
+  CHECK(126, List_add(self->_base.result_type->sub_types, type_instance) )
   self->_base.access = ACCESS_VAR;
   return OK;
 }
@@ -316,7 +319,7 @@ Returncode TypeExpression_analyze(TypeExpression* self);
 static char* _func_name_TypeExpression_analyze = "TypeExpression.analyze";
 #define MR_FUNC_NAME _func_name_TypeExpression_analyze
 Returncode TypeExpression_analyze(TypeExpression* self) {
-  CHECK(129, TypeInstance_analyze(self->_base.result_type->sub_type, &(self->_base._base)) )
+  CHECK(130, TypeInstance_analyze(((TypeInstance*)(self->_base.result_type->sub_types->first->item)), &(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME

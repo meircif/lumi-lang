@@ -5,6 +5,7 @@ class TypeData(SyntaxTreeNamespace)
   owner String name
   owner String base-type-name
   user TypeData base-type
+  owner List{String} sub-types
   owner NameMap{SyntaxTreeFunction} dynamic-base-methods
   user SyntaxTreeConstructor constructor
   var Bool is-primitive
@@ -19,8 +20,19 @@ class TypeData(SyntaxTreeNamespace)
   func inst parse(copy Bool is-dynamic):(copy Char end)
     self.is-dynamic := is-dynamic
     self.set-location()
-    read-new(user "("):(owner self.name, copy end)
+    read-new(user "({"):(owner self.name, copy end)
     self.add-type()
+    if end = '{'
+      new List{String} in self.sub-types
+      do
+        owner String name
+        read-new(user ":}"):(owner name, copy end)
+        self.sub-types.add(owner name)
+        while end = ':'
+      if end != '}'
+        self.m-syntax-error-c(
+            user "expected \"}\" after sub-types, got", copy end)
+      read-c():(copy end)
     if end = '('
       read-new(user ")"):(owner self.base-type-name, copy end)
       if end != ')'

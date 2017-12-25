@@ -129,8 +129,8 @@ Returncode InitExpression_write_allocation(InitExpression* self) {
   if (self->_base.result_type->type_data == &(glob->type_array->_base) || self->_base.result_type->type_data == &(glob->type_string->_base)) {
     CHECK(86, (self->_base.result_type->length)->_base._dtl[6](self->_base.result_type->length) )
   }
-  if (self->_base.result_type->type_data == &(glob->type_array->_base) && self->_base.result_type->sub_type->type_data == &(glob->type_string->_base)) {
-    CHECK(89, (self->_base.result_type->sub_type->length)->_base._dtl[6](self->_base.result_type->sub_type->length) )
+  if (self->_base.result_type->type_data == &(glob->type_array->_base) && ((TypeInstance*)(self->_base.result_type->sub_types->first->item))->type_data == &(glob->type_string->_base)) {
+    CHECK(89, (((TypeInstance*)(self->_base.result_type->sub_types->first->item))->length)->_base._dtl[6](((TypeInstance*)(self->_base.result_type->sub_types->first->item))->length) )
   }
   
   if (self->symbol->variable->access == ACCESS_VAR) {
@@ -169,14 +169,14 @@ Returncode InitExpression_write_var_init(InitExpression* self) {
     CHECK(114, write(&(String){15, 14, "_Var.values = "}) )
     CHECK(115, (self->symbol)->_base._base._dtl[2](self->symbol) )
     CHECK(116, write(&(String){10, 9, "_Values;\n"}) )
-    if (self->_base.result_type->type_data == &(glob->type_array->_base) && self->_base.result_type->sub_type->type_data == &(glob->type_string->_base)) {
+    if (self->_base.result_type->type_data == &(glob->type_array->_base) && ((TypeInstance*)(self->_base.result_type->sub_types->first->item))->type_data == &(glob->type_string->_base)) {
       /* MR_set_var_string_array( */
       /*    `array-length`, `string-length`, `name`, `name`_Chars); */
       CHECK(121, SyntaxTreeCode_write_spaces(self->_base.code_node) )
       CHECK(122, write(&(String){25, 24, "MR_set_var_string_array("}) )
       CHECK(123, (self->_base.result_type->length)->_base._dtl[2](self->_base.result_type->length) )
       CHECK(124, write(&(String){3, 2, ", "}) )
-      CHECK(125, (self->_base.result_type->sub_type->length)->_base._dtl[2](self->_base.result_type->sub_type->length) )
+      CHECK(125, (((TypeInstance*)(self->_base.result_type->sub_types->first->item))->length)->_base._dtl[2](((TypeInstance*)(self->_base.result_type->sub_types->first->item))->length) )
       CHECK(126, write(&(String){3, 2, ", "}) )
       CHECK(127, (self->symbol)->_base._base._dtl[2](self->symbol) )
       CHECK(128, write(&(String){3, 2, ", "}) )
@@ -199,12 +199,12 @@ Returncode InitExpression_write_new_init(InitExpression* self) {
   CHECK(135, write(&(String){4, 3, " = "}) )
   
   if (self->_base.result_type->type_data == &(glob->type_array->_base)) {
-    if (self->_base.result_type->sub_type->type_data == &(glob->type_string->_base)) {
+    if (((TypeInstance*)(self->_base.result_type->sub_types->first->item))->type_data == &(glob->type_string->_base)) {
       /* MR_new_string_array(`length`, `string-length`); */
       CHECK(140, write(&(String){21, 20, "MR_new_string_array("}) )
       CHECK(141, (self->_base.result_type->length)->_base._dtl[2](self->_base.result_type->length) )
       CHECK(142, write(&(String){3, 2, ", "}) )
-      CHECK(143, (self->_base.result_type->sub_type->length)->_base._dtl[2](self->_base.result_type->sub_type->length) )
+      CHECK(143, (((TypeInstance*)(self->_base.result_type->sub_types->first->item))->length)->_base._dtl[2](((TypeInstance*)(self->_base.result_type->sub_types->first->item))->length) )
       
     }
     else {
@@ -212,7 +212,7 @@ Returncode InitExpression_write_new_init(InitExpression* self) {
       CHECK(147, write(&(String){14, 13, "MR_new_array("}) )
       CHECK(148, (self->_base.result_type->length)->_base._dtl[2](self->_base.result_type->length) )
       CHECK(149, write(&(String){10, 9, ", sizeof("}) )
-      CHECK(150, write_cname(self->_base.result_type->sub_type->type_data->name) )
+      CHECK(150, write_cname(((TypeInstance*)(self->_base.result_type->sub_types->first->item))->type_data->name) )
       CHECK(151, write(&(String){2, 1, ")"}) )
       
     }

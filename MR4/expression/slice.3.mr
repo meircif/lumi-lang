@@ -37,7 +37,8 @@ class SliceExpression(Expression)
         self.set-simple-type(user glob.type-char)
     else-if self.sequence.result-type.type-data = glob.type-array
       if not (? self.second-index)
-        self.sequence.result-type.sub-type.copy-new():(owner self.result-type)
+        self.sequence.result-type.sub-types.first.item.copy-new():(
+            owner self.result-type)
     else
       self.m-syntax-error(
           user "cannot slice type",

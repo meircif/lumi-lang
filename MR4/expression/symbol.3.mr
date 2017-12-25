@@ -100,9 +100,10 @@ class MemberExpression(SymbolExpression)
       self.m-syntax-error(user "void expression has no member", user self.name)
     user TypeData type-data(self.instance.result-type.type-data)
     if type-data = glob.type-type
-      type-data := self.instance.result-type.sub-type.type-data
+      type-data := self.instance.result-type.sub-types.first.item.type-data
     else-if type-data = glob.type-base
-      type-data := self.instance.result-type.sub-type.type-data.base-type
+      type-data :=
+          self.instance.result-type.sub-types.first.item.type-data.base-type
     
     type-data.find-field(user self.name):(user self.variable, copy self.bases)
     if ? self.variable
@@ -132,7 +133,7 @@ class MemberExpression(SymbolExpression)
         self.m-syntax-error(
             user "calling \"base\" with non-method", user self.name)
       owner TypeInstance base-result-type(self.instance.result-type)
-      self.instance.result-type := base-result-type.sub-type
+      self.instance.result-type := base-result-type.sub-types.first.item
       delete base-result-type
   
   func dynamic analyze-call(user FunctionArguments arguments):(

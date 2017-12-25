@@ -473,6 +473,8 @@ var Int x(user 3)
 owner String s(user so)
 ## @ ec te22
 owner String s(owner str)
+## @ ec te23
+var Array{1:Int:Int} a
 ## @@ test-comment
 ## @ c t0
 # comment
@@ -716,4 +718,17 @@ native func error()->(owner String s)
 ## @ eg tev3
 native var String s
 
+## @@ test-parameter-type
+## @ g t0
+struct Test{Generic}
+  var Int x
+## @ g t1
+struct Test{First:Second:Third}
+  var Int x
+## @ g t2
+struct Base
+  var Int x
+struct Test{Generic}(Base)
+## @ eg te0
+struct Test{First:Second:Third
 ## @

@@ -197,7 +197,7 @@ static char* _func_name_NativeType_parse_new = "NativeType.parse-new";
 Returncode NativeType_parse_new(NativeType* self, Char* end, NativeType** new_node) {
   (*new_node) = malloc(sizeof(NativeType));
   if ((*new_node) == NULL) RAISE(63)
-  *(*new_node) = (NativeType){NativeType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
+  *(*new_node) = (NativeType){NativeType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
   (*new_node)->_base._base._base._base._dtl = NativeType__dtl;
   CHECK(64, NativeType_parse((*new_node), &((*end))) )
   return OK;

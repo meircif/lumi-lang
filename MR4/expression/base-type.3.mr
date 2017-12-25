@@ -39,7 +39,7 @@ class BaseMethExpression(Expression)
       self.result-type.arguments := self.function.arguments
     else
       self.set-simple-type(user glob.type-base)
-      self.parent-type.m-new-type-instance():(owner self.result-type.sub-type)
+      self.result-type.add-subtype-copy(user self.parent-type)
   
   func dynamic analyze-call(user FunctionArguments arguments):(
       copy Bool is-function-object)
@@ -122,8 +122,9 @@ class TypeExpression(Expression)
   func inst parse(owner TypeInstance type-instance)
     self.set-location()
     self.set-simple-type(user glob.type-type)
-    self.result-type.sub-type := type-instance
+    new List{TypeInstance} in self.result-type.sub-types
+    self.result-type.sub-types.add(owner type-instance)
     self.access := ACCESS-VAR
   
   func dynamic analyze()
-    self.result-type.sub-type.analyze(user self)
+    self.result-type.sub-types.first.item.analyze(user self)

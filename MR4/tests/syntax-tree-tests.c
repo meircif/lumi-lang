@@ -300,6 +300,19 @@ Returncode test_native() {
 #undef MR_FUNC_NAME
 #endif
 
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_parameter_type();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_parameter_type = "test-parameter-type";
+#define MR_FUNC_NAME _func_name_test_parameter_type
+Returncode test_parameter_type() {
+  CHECK(122, test_from_file(&(String){20, 19, "test-parameter-type"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES

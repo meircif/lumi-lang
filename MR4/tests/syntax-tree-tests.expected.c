@@ -729,9 +729,9 @@ missing subtype for array
 /// @ te9
 multidimensional array not supported yet...
 /// @ te10
-expected ":", got "new-line"
+expected ":" or "} after array length", got "new-line"
 /// @ te11
-expected "}", got "new-line"
+expected "}" after sub-types, got "new-line"
 /// @ te12
 unknown symbol "error"
 /// @ te13
@@ -754,6 +754,8 @@ access should be "copy" for primitive types, got "user"
 assigning into access "owner" invalid access "user"
 /// @ te22
 assigning into an owner a non-owner access "user"
+/// @ te23
+more than one sub-type for array
 /// @@ test-comment
 /// @ t0
 Int x = 0;
@@ -1079,4 +1081,26 @@ user output to native function
 owner argument to native function
 /// @ tev3
 only primitive types supported for native variable, got "String"
+/// @@ test-parameter-type
+/// @ t0
+typedef struct Test Test;
+struct Test {
+  Int x;
+};
+/// @ t1
+typedef struct Test Test;
+struct Test {
+  Int x;
+};
+/// @ t2
+typedef struct Base Base;
+typedef struct Test Test;
+struct Base {
+  Int x;
+};
+struct Test {
+  Base _base;
+};
+/// @ te0
+expected "}" after sub-types, got "EOF"
 /// @

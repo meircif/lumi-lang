@@ -296,7 +296,7 @@ static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, BuiltinType** type_data) {
   (*type_data) = malloc(sizeof(BuiltinType));
   if ((*type_data) == NULL) RAISE(270)
-  *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
+  *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
   (*type_data)->_base._base._base._base._dtl = BuiltinType__dtl;
   CHECK(271, string_new_copy(name, &((*type_data)->_base.name)) )
   (*type_data)->_base.is_primitive = is_primitive;
@@ -359,10 +359,10 @@ Returncode Global_add_builtin_variable(Global* self, String* name, TypeData* var
   }
   CHECK(309, TypeData_m_new_type_instance(variable_type, &(variable->_base.type_instance)) )
   if (NULL != variable_subtype) {
-    CHECK(311, TypeData_m_new_type_instance(variable_subtype, &(variable->_base.type_instance->sub_type)) )
+    CHECK(311, TypeInstance_add_subtype_copy(variable->_base.type_instance, variable_subtype) )
   }
   variable->_base.parent_type = parent_type;
-  CHECK(314, List_add(branch->variables, &(variable->_base)) )
+  CHECK(313, List_add(branch->variables, &(variable->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -373,7 +373,7 @@ Returncode Global_add_builtin_global_function(Global* self, String* name, Functi
 static char* _func_name_Global_add_builtin_global_function = "Global.add-builtin-global-function";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_global_function
 Returncode Global_add_builtin_global_function(Global* self, String* name, FunctionArguments** arguments) {
-  CHECK(318, Global_add_builtin_function(self, name, NULL, &(glob->root->_base), &((*arguments))) )
+  CHECK(317, Global_add_builtin_function(self, name, NULL, &(glob->root->_base), &((*arguments))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -384,8 +384,8 @@ Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, Strin
 static char* _func_name_Global_add_builtin_method = "Global.add-builtin-method";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_method
 Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, String* name, FunctionArguments** arguments) {
-  CHECK(323, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
-  CHECK(325, Global_add_builtin_parameter(self, (*arguments), ACCESS_VAR, builtin_type, &(String){5, 4, "self"}) )
+  CHECK(322, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
+  CHECK(324, Global_add_builtin_parameter(self, (*arguments), ACCESS_VAR, builtin_type, &(String){5, 4, "self"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -397,19 +397,19 @@ static char* _func_name_Global_add_builtin_function = "Global.add-builtin-functi
 #define MR_FUNC_NAME _func_name_Global_add_builtin_function
 Returncode Global_add_builtin_function(Global* self, String* name, TypeData* parent_type, SyntaxTreeNamespace* namespace, FunctionArguments** arguments) {
   BuiltinFunction* function = malloc(sizeof(BuiltinFunction));
-  if (function == NULL) RAISE(333)
+  if (function == NULL) RAISE(332)
   *function = (BuiltinFunction){BuiltinFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   function->_base._base._base._base._dtl = BuiltinFunction__dtl;
-  CHECK(334, SyntaxTreeFunction_init(&(function->_base)) )
-  CHECK(335, string_new_copy(name, &(function->_base.name)) )
+  CHECK(333, SyntaxTreeFunction_init(&(function->_base)) )
+  CHECK(334, string_new_copy(name, &(function->_base.name)) )
   function->_base.parent_type = parent_type;
   function->_base.arguments = malloc(sizeof(FunctionArguments));
-  if (function->_base.arguments == NULL) RAISE(337)
+  if (function->_base.arguments == NULL) RAISE(336)
   *function->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   function->_base.arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(338, FunctionArguments_init(function->_base.arguments) )
+  CHECK(337, FunctionArguments_init(function->_base.arguments) )
   (*arguments) = function->_base.arguments;
-  CHECK(340, List_add(namespace->functions, &(function->_base)) )
+  CHECK(339, List_add(namespace->functions, &(function->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -420,7 +420,7 @@ Returncode Global_add_builtin_parameter(Global* self, FunctionArguments* argumen
 static char* _func_name_Global_add_builtin_parameter = "Global.add-builtin-parameter";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_parameter
 Returncode Global_add_builtin_parameter(Global* self, FunctionArguments* arguments, Int access, TypeData* parameter_type, String* name) {
-  CHECK(347, Global_add_builtin_argument(self, arguments->parameters, false, access, parameter_type, name) )
+  CHECK(346, Global_add_builtin_argument(self, arguments->parameters, false, access, parameter_type, name) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -431,7 +431,7 @@ Returncode Global_add_builtin_output(Global* self, FunctionArguments* arguments,
 static char* _func_name_Global_add_builtin_output = "Global.add-builtin-output";
 #define MR_FUNC_NAME _func_name_Global_add_builtin_output
 Returncode Global_add_builtin_output(Global* self, FunctionArguments* arguments, Int access, TypeData* output_type, String* name) {
-  CHECK(359, Global_add_builtin_argument(self, arguments->outputs, true, access, output_type, name) )
+  CHECK(358, Global_add_builtin_argument(self, arguments->outputs, true, access, output_type, name) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -443,19 +443,19 @@ static char* _func_name_Global_add_builtin_argument = "Global.add-builtin-argume
 #define MR_FUNC_NAME _func_name_Global_add_builtin_argument
 Returncode Global_add_builtin_argument(Global* self, List* argument_list, Bool is_output, Int access, TypeData* argument_type, String* name) {
   DeclarationArgument* argument = malloc(sizeof(DeclarationArgument));
-  if (argument == NULL) RAISE(372)
+  if (argument == NULL) RAISE(371)
   *argument = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, false, NULL};
   argument->_base._base._dtl = DeclarationArgument__dtl;
   argument->_base.access = access;
   argument->_base.is_output = is_output;
   argument->variable = malloc(sizeof(SyntaxTreeVariable));
-  if (argument->variable == NULL) RAISE(375)
+  if (argument->variable == NULL) RAISE(374)
   *argument->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
   argument->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
-  CHECK(376, string_new_copy(name, &(argument->variable->name)) )
+  CHECK(375, string_new_copy(name, &(argument->variable->name)) )
   argument->variable->access = access;
-  CHECK(378, TypeData_m_new_type_instance(argument_type, &(argument->variable->type_instance)) )
-  CHECK(380, List_add(argument_list, &(argument->_base)) )
+  CHECK(377, TypeData_m_new_type_instance(argument_type, &(argument->variable->type_instance)) )
+  CHECK(379, List_add(argument_list, &(argument->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME

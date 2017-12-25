@@ -143,32 +143,32 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func dynamic write-sequence()
     if self.type-instance.type-data = glob.type-array and
-        self.type-instance.sub-type.type-data = glob.type-string
+        self.type-instance.sub-types.first.item.type-data = glob.type-string
       # char `name`_Chars[`length` * `string-legth`];
       write(user "char ")
       write-cname(user self.name)
       write(user "_Chars[")
       self.type-instance.length.write()
       write(user " * ")
-      self.type-instance.sub-type.length.write()
+      self.type-instance.sub-types.first.item.length.write()
       write(user "];\n")
       self.write-spaces()
     # `sub-type` `name`_Values[`length`];
     if self.type-instance.type-data = glob.type-string
       write(user "char ")
-    else-if self.type-instance.sub-type.type-data = glob.type-func
+    else-if self.type-instance.sub-types.first.item.type-data = glob.type-func
       write(user "Returncode (*")
     else
-      write-cname(user self.type-instance.sub-type.type-data.name)
+      write-cname(user self.type-instance.sub-types.first.item.type-data.name)
       write(user " ")
     write-cname(user self.name)
     write(user "_Values[")
     self.type-instance.length.write()
     write(user "]")
     if self.type-instance.type-data = glob.type-array and
-        self.type-instance.sub-type.type-data = glob.type-func
+        self.type-instance.sub-types.first.item.type-data = glob.type-func
       write(user ")")
-      self.type-instance.sub-type.arguments.write()
+      self.type-instance.sub-types.first.item.arguments.write()
     write(user ";\n")
     self.write-spaces()
   
