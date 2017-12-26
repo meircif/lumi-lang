@@ -302,10 +302,10 @@ Returncode SyntaxTreeVariable_write_var(SyntaxTreeVariable* self) {
   }
   else {
     Int bases = 0;
-    TypeData* type_data = self->type_instance->type_data->base_type;
+    TypeData* type_data = self->type_instance->type_data;
     while (true) {
-      if (!(NULL != type_data)) break;
-      type_data = type_data->base_type;
+      if (!(NULL != type_data->base_type)) break;
+      type_data = type_data->base_type->type_data;
       bases += 1;
       CHECK(196, write(&(String){2, 1, "{"}) )
     }

@@ -188,10 +188,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       write(user ", NULL")
     else
       var Int bases
-      user TypeData type-data(self.type-instance.type-data.base-type)
+      user TypeData type-data(self.type-instance.type-data)
       do
-        while ? type-data
-        type-data := type-data.base-type
+        while ? type-data.base-type
+        type-data := type-data.base-type.type-data
         bases += 1
         write(user "{")
       write(user "0")

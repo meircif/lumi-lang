@@ -218,7 +218,7 @@ Returncode MemberExpression_analyze(MemberExpression* self) {
   }
   else {
     if (type_data == &(glob->type_base->_base)) {
-      type_data = ((TypeInstance*)(self->instance->result_type->sub_types->first->item))->type_data->base_type;
+      type_data = ((TypeInstance*)(self->instance->result_type->sub_types->first->item))->type_data->base_type->type_data;
     }
   }
   

@@ -150,7 +150,8 @@ static TypeInstance
             user self.type-data.name,
             user "into",
             user target.type-data.name)
-      base-type := base-type.base-type
+      while ? base-type.base-type
+      base-type := base-type.base-type.type-data
       bases += 1
     
     if ? self.arguments

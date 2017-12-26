@@ -103,7 +103,7 @@ class MemberExpression(SymbolExpression)
       type-data := self.instance.result-type.sub-types.first.item.type-data
     else-if type-data = glob.type-base
       type-data :=
-          self.instance.result-type.sub-types.first.item.type-data.base-type
+          self.instance.result-type.sub-types.first.item.type-data.base-type.type-data
     
     type-data.find-field(user self.name):(user self.variable, copy self.bases)
     if ? self.variable

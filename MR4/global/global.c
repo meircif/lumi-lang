@@ -296,7 +296,7 @@ static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, BuiltinType** type_data) {
   (*type_data) = malloc(sizeof(BuiltinType));
   if ((*type_data) == NULL) RAISE(270)
-  *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
+  *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false};
   (*type_data)->_base._base._base._base._dtl = BuiltinType__dtl;
   CHECK(271, string_new_copy(name, &((*type_data)->_base.name)) )
   (*type_data)->_base.is_primitive = is_primitive;

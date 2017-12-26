@@ -279,19 +279,20 @@ Returncode TypeInstance_check_assign_to(TypeInstance* self, TypeInstance* target
     if (!(NULL != base_type->base_type)) {
       CHECK(148, SyntaxTreeNode_m_syntax_error2(node, &(String){14, 13, "cannot assign"}, self->type_data->name, &(String){5, 4, "into"}, target->type_data->name) )
     }
-    base_type = base_type->base_type;
+    if (!(NULL != base_type->base_type)) break;
+    base_type = base_type->base_type->type_data;
     (*bases) += 1;
   }
   
   if (NULL != self->arguments) {
     Bool _Bool131;
-    CHECK(157, FunctionArguments_check_same_as(self->arguments, target->arguments, &(_Bool131)) )
+    CHECK(158, FunctionArguments_check_same_as(self->arguments, target->arguments, &(_Bool131)) )
     if (_Bool131) {
-      CHECK(158, SyntaxTreeNode_m_syntax_error_msg(node, &(String){16, 15, "too few outputs"}) )
+      CHECK(159, SyntaxTreeNode_m_syntax_error_msg(node, &(String){16, 15, "too few outputs"}) )
     }
   }
   
-  CHECK(160, TypeInstance_check_sub_equal(self, target, node) )
+  CHECK(161, TypeInstance_check_sub_equal(self, target, node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -303,9 +304,9 @@ static char* _func_name_TypeInstance_check_equal = "TypeInstance.check-equal";
 #define MR_FUNC_NAME _func_name_TypeInstance_check_equal
 Returncode TypeInstance_check_equal(TypeInstance* self, TypeInstance* other, SyntaxTreeNode* node) {
   if (self->type_data != other->type_data) {
-    CHECK(164, SyntaxTreeNode_m_syntax_error2(node, &(String){19, 18, "non matching types"}, self->type_data->name, &(String){4, 3, "and"}, other->type_data->name) )
+    CHECK(165, SyntaxTreeNode_m_syntax_error2(node, &(String){19, 18, "non matching types"}, self->type_data->name, &(String){4, 3, "and"}, other->type_data->name) )
   }
-  CHECK(169, TypeInstance_check_sub_equal(self, other, node) )
+  CHECK(170, TypeInstance_check_sub_equal(self, other, node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -323,9 +324,9 @@ Returncode TypeInstance_check_sub_equal(TypeInstance* self, TypeInstance* other,
       while (true) {
         if (!(NULL != my_sub_type &&  NULL !=  other_sub_type)) break;
         if (((TypeInstance*)(my_sub_type->item))->type_data != ((TypeInstance*)(other_sub_type->item))->type_data) {
-          CHECK(179, SyntaxTreeNode_m_syntax_error2(node, &(String){22, 21, "non matching subtypes"}, ((TypeInstance*)(my_sub_type->item))->type_data->name, &(String){4, 3, "and"}, ((TypeInstance*)(other_sub_type->item))->type_data->name) )
+          CHECK(180, SyntaxTreeNode_m_syntax_error2(node, &(String){22, 21, "non matching subtypes"}, ((TypeInstance*)(my_sub_type->item))->type_data->name, &(String){4, 3, "and"}, ((TypeInstance*)(other_sub_type->item))->type_data->name) )
         }
-        CHECK(184, TypeInstance_check_sub_equal(((TypeInstance*)(my_sub_type->item)), other_sub_type->item, node) )
+        CHECK(185, TypeInstance_check_sub_equal(((TypeInstance*)(my_sub_type->item)), other_sub_type->item, node) )
         my_sub_type = my_sub_type->next;
         other_sub_type = other_sub_type->next;
       }
@@ -343,10 +344,10 @@ static char* _func_name_TypeInstance_check_sequence = "TypeInstance.check-sequen
 #define MR_FUNC_NAME _func_name_TypeInstance_check_sequence
 Returncode TypeInstance_check_sequence(TypeInstance* self, SyntaxTreeNode* node) {
   if ((self->type_data == &(glob->type_array->_base) || self->type_data == &(glob->type_string->_base)) &&  ! (NULL != self->length)) {
-    CHECK(191, SyntaxTreeNode_m_syntax_error_msg(node, &(String){28, 27, "missing length for sequence"}) )
+    CHECK(192, SyntaxTreeNode_m_syntax_error_msg(node, &(String){28, 27, "missing length for sequence"}) )
   }
   if (self->type_data == &(glob->type_array->_base) && ((TypeInstance*)(self->sub_types->first->item))->type_data == &(glob->type_string->_base) &&  ! (NULL != ((TypeInstance*)(self->sub_types->first->item))->length)) {
-    CHECK(195, SyntaxTreeNode_m_syntax_error_msg(node, &(String){28, 27, "missing length for sequence"}) )
+    CHECK(196, SyntaxTreeNode_m_syntax_error_msg(node, &(String){28, 27, "missing length for sequence"}) )
   }
   return OK;
 }

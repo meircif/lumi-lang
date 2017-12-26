@@ -70,7 +70,7 @@ Returncode BaseMethExpression_analyze(BaseMethExpression* self) {
   }
   if (self->is_call) {
     Int _Int12;
-    CHECK(33, TypeData_find_meth(self->parent_type->base_type, function->name, &(self->function), &(_Int12)) )
+    CHECK(33, TypeData_find_meth(self->parent_type->base_type->type_data, function->name, &(self->function), &(_Int12)) )
     if (!(NULL != self->function)) {
       CHECK(36, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){26, 25, "no base method for method"}, function->name) )
     }

@@ -30,7 +30,7 @@ class BaseMethExpression(Expression)
       self.m-syntax-error(
           user "no base type for type", user function.parent-type.name)
     if self.is-call
-      self.parent-type.base-type.find-meth(user function.name):(
+      self.parent-type.base-type.type-data.find-meth(user function.name):(
           user self.function)
       if not (? self.function)
         self.m-syntax-error(
