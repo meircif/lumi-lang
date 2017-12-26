@@ -3,7 +3,7 @@
 # IO mocks
 
 var String{1024} mock-print-text
-var String{1024} mock-input-file-text
+var String{2048} mock-input-file-text
 var String{8192} mock-output-file-text
 var Int mock-input-file-index
 var Int mock-input-line-reset-index
@@ -168,7 +168,7 @@ func test-from-file(user String name)
   actual-output-file.write(user "\n")
   
   var String{4096} input
-  var String{4096} expected
+  var String{8192} expected
   if not read-line(user input-file, user line, user "## @ ")
     file-error(user name, user line)
   if not read-line(user expected-output-file, user line, user "/// @ ")

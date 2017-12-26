@@ -16,6 +16,11 @@ class Tc(Tb)
   var Int numc
   func inst methc()
   func dynamic dyn()
+struct Data{Generic}
+  user Generic item
+  user Array{Generic} arr
+  func set(owner Generic item, user Array{Generic} arr)
+  func get()->(user Generic item)
 
 func fun0()
 func fun1(copy Int x, user String s, owner String o)
@@ -36,6 +41,8 @@ user Test t
 user Ta ta
 owner Tb tb
 user Tc tc
+user Data{String} d
+user Array{String} sarr
 
 func mock()->(owner String so, var Int io, user Test to, user Tc tco)
   

@@ -125,6 +125,6 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       if not (? mocked-func)
         self.m-syntax-error(
             user "mocking unknown function", user self.mocked-name)
-    self.arguments.check-same-as(user mocked-func.arguments)
+    self.arguments.check-same-as(user mocked-func.arguments, user _)
     mocked-func.mocker-function := self
     base.analyze()

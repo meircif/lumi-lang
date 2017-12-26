@@ -344,6 +344,42 @@ func f-remove(owner String s)
   # remove s
 
 
+struct Data{Generic}
+  user Generic item
+  user Array{Generic} arr
+  
+  func set(user Generic item, user Array{Generic} arr)
+    user Generic x(user item)
+    self.item := x
+    self.arr := arr
+    x := arr[2]
+    new Data{Generic} d
+    d.item := self.item
+    self.item := d.item
+  
+  func get()->(user Generic item)
+    item := self.item
+
+func test-type-parameters(user String s)
+  var Data{String} d
+  var Array{6:String{16}} sarr
+  d.item := s
+  s := d.item
+  d.arr := sarr
+  s := d.arr[4]
+  var Array{5:Data{String}} ad
+  s := ad[2].item
+  s := ad[2].arr[3]
+  var Data{Array{String}} da
+  s := da.item[1]
+  var Data{Data{Data{String}}} dr
+  s := dr.item.item.item
+  d.set(user s, user sarr)
+  d.get()->(user s)
+  user Data dg(user d)
+  assert dg?
+
+
 main
   test-simple-function()
   test-ref-count()

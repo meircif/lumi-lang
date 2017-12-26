@@ -75,6 +75,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           self.m-syntax-error(
               user "redefinition of variable", user self.name)
   
+  func dynamic get-parent-type():(user TypeData parent-type)
+    if ? self.parent-type
+      parent-type := self.parent-type
+    else
+      base.get-parent-type():(user parent-type)
+  
   func inst find-variable(user String name):(
       user SyntaxTreeVariable variable, copy Bool found)
     self.name.equal(user name):(copy found)
@@ -92,6 +98,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "only \"var\" access is supported for primitive types, got",
           user glob.access-names[self.access])
     self.type-instance.analyze-lengths(user self)
+    if self.is-create and self.type-instance.type-data = glob.type-subtype
+      self.m-syntax-error(
+          user "declared variable with generic subtype",
+          user self.type-instance.name)
     if self.is-create and not self.type-instance.type-data.is-primitive and
         not (? self.parent)
       self.m-syntax-error-msg(

@@ -11,6 +11,9 @@ class SyntaxTreeCode(SyntaxTreeNode)
   func inst get-function():(user SyntaxTreeFunction function)
     self.parent.get-function():(user function)
   
+  func dynamic get-parent-type():(user TypeData parent-type)
+    parent-type := self.get-function().parent-type
+  
   func inst write-spaces()
     self.parent.write-spaces()
   

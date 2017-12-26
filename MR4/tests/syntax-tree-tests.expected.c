@@ -755,7 +755,7 @@ assigning into access "owner" invalid access "user"
 /// @ te22
 assigning into an owner a non-owner access "user"
 /// @ te23
-more than one sub-type for array
+more than one subtype for array
 /// @@ test-comment
 /// @ t0
 Int x = 0;
@@ -1085,14 +1085,159 @@ only primitive types supported for native variable, got "String"
 /// @ t0
 typedef struct Test Test;
 struct Test {
-  Int x;
+  Generic_Subtype* item;
+  RefManager* item_Refman;
+  Array* arr;
+  RefManager* arr_Refman;
 };
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
+  Returncode MR_err = OK;
+  Generic_Subtype* x = NULL;
+  RefManager* x_Refman = NULL;
+  Generic_Subtype* y = NULL;
+  RefManager* y_Refman = NULL;
+  Test* t = NULL;
+  RefManager* t_Refman = NULL;
+  MR_inc_ref(item_Refman);
+  MR_inc_ref(arr_Refman);
+  x = item;
+  x_Refman = item_Refman;
+  item = NULL;
+  item_Refman = NULL;
+  if (self == NULL || self_Refman->value == NULL) RAISE(6)
+  MR_owner_dec_ref(self->item_Refman);
+  self->item_Refman = x_Refman;
+  x_Refman = NULL;
+  self->item = x;
+  x = NULL;
+  if (self == NULL || self_Refman->value == NULL) RAISE(7)
+  MR_dec_ref(self->arr_Refman);
+  self->arr_Refman = arr_Refman;
+  MR_inc_ref(self->arr_Refman);
+  self->arr = arr;
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(9)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(9)
+  MR_dec_ref(y_Refman);
+  y_Refman = arr_Refman;
+  MR_inc_ref(y_Refman);
+  y = ((Generic_Subtype**)((arr)->values))[2];
+  t = calloc(1, sizeof(Test));
+  if (t == NULL) RAISE(10)
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(10)
+  if (self == NULL || self_Refman->value == NULL) RAISE(11)
+  if (t == NULL || t_Refman->value == NULL) RAISE(11)
+  MR_owner_dec_ref(t->item_Refman);
+  t->item_Refman = self->item_Refman;
+  self->item_Refman = NULL;
+  t->item = self->item;
+  self->item = NULL;
+  if (t == NULL || t_Refman->value == NULL) RAISE(12)
+  if (self == NULL || self_Refman->value == NULL) RAISE(12)
+  MR_owner_dec_ref(self->item_Refman);
+  self->item_Refman = t->item_Refman;
+  t->item_Refman = NULL;
+  self->item = t->item;
+  t->item = NULL;
+MR_cleanup:
+  MR_owner_dec_ref(t_Refman);
+  MR_dec_ref(y_Refman);
+  MR_owner_dec_ref(x_Refman);
+  MR_dec_ref(arr_Refman);
+  MR_owner_dec_ref(item_Refman);
+  return MR_err;
+}
 /// @ t1
 typedef struct Test Test;
 struct Test {
-  Int x;
+  Generic_Subtype* item;
+  RefManager* item_Refman;
 };
+Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Subtype** item, RefManager** item_Refman);
+Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Subtype** item, RefManager** item_Refman) {
+  Returncode MR_err = OK;
+  if (self == NULL || self_Refman->value == NULL) RAISE(4)
+  MR_dec_ref(*item_Refman);
+  *item_Refman = self->item_Refman;
+  MR_inc_ref(*item_Refman);
+  *item = self->item;
+MR_cleanup:
+  return MR_err;
+}
 /// @ t2
+typedef struct Test Test;
+struct Test {
+  Generic_Subtype* first;
+  RefManager* first_Refman;
+  Generic_Subtype* second;
+  RefManager* second_Refman;
+  Generic_Subtype* third;
+  RefManager* third_Refman;
+};
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* first, RefManager* first_Refman, Generic_Subtype* second, RefManager* second_Refman, Generic_Subtype* third, RefManager* third_Refman);
+Returncode use(String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* first, RefManager* first_Refman, Generic_Subtype* second, RefManager* second_Refman, Generic_Subtype* third, RefManager* third_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(first_Refman);
+  MR_inc_ref(second_Refman);
+  MR_inc_ref(third_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(6)
+  MR_dec_ref(self->first_Refman);
+  self->first_Refman = first_Refman;
+  MR_inc_ref(self->first_Refman);
+  self->first = first;
+  if (self == NULL || self_Refman->value == NULL) RAISE(7)
+  MR_dec_ref(self->second_Refman);
+  self->second_Refman = second_Refman;
+  MR_inc_ref(self->second_Refman);
+  self->second = second;
+  if (self == NULL || self_Refman->value == NULL) RAISE(8)
+  MR_dec_ref(self->third_Refman);
+  self->third_Refman = third_Refman;
+  MR_inc_ref(self->third_Refman);
+  self->third = third;
+MR_cleanup:
+  MR_dec_ref(third_Refman);
+  MR_dec_ref(second_Refman);
+  MR_dec_ref(first_Refman);
+  return MR_err;
+}
+Returncode use(String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman) {
+  Returncode MR_err = OK;
+  Test t_Var = {0};
+  Test* t = NULL;
+  RefManager* t_Refman = NULL;
+  MR_inc_ref(first_Refman);
+  MR_inc_ref(second_Refman);
+  MR_inc_ref(third_Refman);
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(10)
+  if (t == NULL || t_Refman->value == NULL) RAISE(11)
+  MR_dec_ref(t->first_Refman);
+  t->first_Refman = first_Refman;
+  MR_inc_ref(t->first_Refman);
+  t->first = first;
+  if (t == NULL || t_Refman->value == NULL) RAISE(12)
+  MR_dec_ref(t->second_Refman);
+  t->second_Refman = second_Refman;
+  MR_inc_ref(t->second_Refman);
+  t->second = second;
+  if (t == NULL || t_Refman->value == NULL) RAISE(13)
+  MR_dec_ref(t->third_Refman);
+  t->third_Refman = third_Refman;
+  MR_inc_ref(t->third_Refman);
+  t->third = third;
+  CHECK(14, Test_set(t, t_Refman, first, first_Refman, second, second_Refman, third, third_Refman) )
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(third_Refman);
+  MR_dec_ref(second_Refman);
+  MR_dec_ref(first_Refman);
+  return MR_err;
+}
+/// @ t3
 typedef struct Base Base;
 typedef struct Test Test;
 struct Base {
@@ -1101,6 +1246,144 @@ struct Base {
 struct Test {
   Base _base;
 };
-/// @ te0
+/// @ t4
+if (d == NULL || d_Refman->value == NULL) RAISE(1)
+  MR_dec_ref(d->item_Refman);
+  d->item_Refman = str_Refman;
+  MR_inc_ref(d->item_Refman);
+  d->item = str;
+/// @ t5
+if (d == NULL || d_Refman->value == NULL) RAISE(1)
+  MR_dec_ref(str_Refman);
+  str_Refman = d->item_Refman;
+  MR_inc_ref(str_Refman);
+  str = d->item;
+/// @ t6
+if (d == NULL || d_Refman->value == NULL) RAISE(1)
+  MR_dec_ref(d->arr_Refman);
+  d->arr_Refman = sarr_Refman;
+  MR_inc_ref(d->arr_Refman);
+  d->arr = sarr;
+/// @ t7
+if (d == NULL || d_Refman->value == NULL) RAISE(1)
+  if (d->arr == NULL || d->arr_Refman->value == NULL) RAISE(1)
+  if ((4) < 0 || (4) >= (d->arr)->length) RAISE(1)
+  MR_dec_ref(str_Refman);
+  str_Refman = d->arr_Refman;
+  MR_inc_ref(str_Refman);
+  str = ((String**)((d->arr)->values))[4];
+/// @ t8
+Data ad_Values[5];
+  Array ad_Var = {5, NULL};
+  Array* ad = NULL;
+  RefManager* ad_Refman = NULL;
+  ad = &ad_Var;
+  ad_Var.values = ad_Values;
+  ad_Refman = MR_new_ref(ad);
+  if (ad_Refman == NULL) RAISE(1)
+  if (ad == NULL || ad_Refman->value == NULL) RAISE(2)
+  if ((2) < 0 || (2) >= (ad)->length) RAISE(2)
+  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(2)
+  MR_dec_ref(str_Refman);
+  str_Refman = (((Data**)((ad)->values))[2])->item_Refman;
+  MR_inc_ref(str_Refman);
+  str = (((Data**)((ad)->values))[2])->item;
+/// @ t9
+Data ad_Values[5];
+  Array ad_Var = {5, NULL};
+  Array* ad = NULL;
+  RefManager* ad_Refman = NULL;
+  ad = &ad_Var;
+  ad_Var.values = ad_Values;
+  ad_Refman = MR_new_ref(ad);
+  if (ad_Refman == NULL) RAISE(1)
+  if (ad == NULL || ad_Refman->value == NULL) RAISE(2)
+  if ((2) < 0 || (2) >= (ad)->length) RAISE(2)
+  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(2)
+  if ((((Data**)((ad)->values))[2])->arr == NULL || (((Data**)((ad)->values))[2])->arr_Refman->value == NULL) RAISE(2)
+  if ((3) < 0 || (3) >= ((((Data**)((ad)->values))[2])->arr)->length) RAISE(2)
+  MR_dec_ref(str_Refman);
+  str_Refman = (((Data**)((ad)->values))[2])->arr_Refman;
+  MR_inc_ref(str_Refman);
+  str = ((String**)(((((Data**)((ad)->values))[2])->arr)->values))[3];
+/// @ t10
+Data da_Var = {0};
+  Data* da = NULL;
+  RefManager* da_Refman = NULL;
+  da = &da_Var;
+  da_Refman = MR_new_ref(da);
+  if (da_Refman == NULL) RAISE(1)
+  if (da == NULL || da_Refman->value == NULL) RAISE(2)
+  if (da->item == NULL || da->item_Refman->value == NULL) RAISE(2)
+  if ((1) < 0 || (1) >= (((Array*)(da->item)))->length) RAISE(2)
+  MR_dec_ref(str_Refman);
+  str_Refman = da->item_Refman;
+  MR_inc_ref(str_Refman);
+  str = ((String**)((((Array*)(da->item)))->values))[1];
+/// @ t11
+Data dr_Var = {0};
+  Data* dr = NULL;
+  RefManager* dr_Refman = NULL;
+  dr = &dr_Var;
+  dr_Refman = MR_new_ref(dr);
+  if (dr_Refman == NULL) RAISE(1)
+  if (dr == NULL || dr_Refman->value == NULL) RAISE(2)
+  if (dr->item == NULL || dr->item_Refman->value == NULL) RAISE(2)
+  if (((Data*)(dr->item))->item == NULL || ((Data*)(dr->item))->item_Refman->value == NULL) RAISE(2)
+  MR_dec_ref(str_Refman);
+  str_Refman = ((Data*)(((Data*)(dr->item))->item))->item_Refman;
+  MR_inc_ref(str_Refman);
+  str = ((Data*)(((Data*)(dr->item))->item))->item;
+/// @ t12
+CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, sarr, sarr_Refman) )
+  *so = NULL;
+  *so_Refman = NULL;
+/// @ t13
+if (str != NULL) RAISE(1)
+  CHECK(1, Data_get(d, d_Refman, (void*)&(str), &(str_Refman)) )
+/// @ t14
+Data dg_Var = {0};
+  Data* dg = NULL;
+  RefManager* dg_Refman = NULL;
+  dg = &dg_Var;
+  dg_Refman = MR_new_ref(dg);
+  if (dg_Refman == NULL) RAISE(1)
+/// @ t15
+Data* dg = NULL;
+  RefManager* dg_Refman = NULL;
+  dg = d;
+  dg_Refman = d_Refman;
+  MR_inc_ref(dg_Refman);
+/// @ teg0
 expected "}" after sub-types, got "EOF"
+/// @ teg1
+declared variable with generic subtype "Generic"
+/// @ teg2
+argument "error" access should not be "copy" for non-primitive type "Generic Subtype"
+/// @ teg3
+cannot assign "String" into "Generic Subtype"
+/// @ teg4
+cannot assign "Generic Subtype" into "String"
+/// @ teg5
+declared variable with generic subtype "Generic"
+/// @ teg6
+cannot assign generic subtype "Second" into different generic subtype "First"
+/// @ teg7
+illegal parameter name "error"
+/// @ tec0
+unsupported primitive parameter type "Int"
+/// @ tec1
+too many parameter for type "Data"
+/// @ tec2
+unknown type "Error"
+/// @ tec3
+parameter given for type with no parameters "Char"
+/// @ tec4
+cannot assign "Generic Subtype" into "String"
+/// @ tec5
+cannot assign type "Data" with no parameter into same type with parameter "String"
+/// @ tec6
+cannot assign "String" into "Test"
+/// @ tec7
+cannot assign type "Test" with parameters into same type with more parameters "String"
 /// @

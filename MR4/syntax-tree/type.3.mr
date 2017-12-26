@@ -26,6 +26,8 @@ class TypeData(SyntaxTreeNamespace)
       do
         owner String name
         read-new(user ":}"):(owner name, copy end)
+        if not f-is-legal-name(user name, copy true)
+          self.m-syntax-error(user "illegal parameter name", user name)
         self.sub-types.add(owner name)
         while end = ':'
       if end != '}'

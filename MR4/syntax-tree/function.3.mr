@@ -85,6 +85,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func dynamic get-function():(user SyntaxTreeFunction function)
     function := self
   
+  func dynamic get-parent-type():(user TypeData parent-type)
+    parent-type := self.parent-type
+  
   func inst add-aux-variable(
       copy Int access, copy Bool is-create, user TypeInstance type-instance):(
       user SyntaxTreeVariable new-variable)
@@ -290,6 +293,7 @@ class DeclarationArgument(Argument)
     new-argument.is-native := self.is-native
     new SyntaxTreeVariable in new-argument.variable
     new-argument.variable.access := self.variable.access
+    new-argument.variable.parent-type := self.variable.parent-type
     self.variable.type-instance.copy-new():(
         owner new-argument.variable.type-instance)
     string-new-copy(user self.variable.name):(owner new-argument.variable.name)
@@ -298,11 +302,16 @@ class DeclarationArgument(Argument)
     new SyntaxTreeVariable in self.variable
     self.variable.access := self.access
     self.variable.is-output := self.is-output
+    if ? code-node
+      code-node.get-parent-type():(user self.variable.parent-type)
     new TypeInstance in self.variable.type-instance
     self.variable.type-instance.parse(user " ", user self, user _):(copy end)
     if end != ' '
       self.m-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user ",)"):(owner self.variable.name, copy end)
+  
+  func dynamic get-parent-type():(user TypeData parent-type)
+    parent-type := self.variable.parent-type
   
   func dynamic link-types()
     self.variable.type-instance.link-types(user self)

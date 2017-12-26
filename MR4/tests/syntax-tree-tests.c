@@ -24,8 +24,8 @@ Returncode write_syntax_tree() {
   SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL};
   root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
   CHECK(7, SyntaxTreeRoot_parse(glob->root, mock_argv) )
-  CHECK(8, (glob->root)->_base._base._base._dtl[1](glob->root) )
-  CHECK(9, (glob->root)->_base._base._base._dtl[2](glob->root) )
+  CHECK(8, (glob->root)->_base._base._base._dtl[2](glob->root) )
+  CHECK(9, (glob->root)->_base._base._base._dtl[3](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -721,14 +721,131 @@ native var String s
 ## @@ test-parameter-type
 ## @ g t0
 struct Test{Generic}
-  var Int x
+  owner Generic item
+  user Array{Generic} arr
+  func set(owner Generic item, user Array{Generic} arr)
+    owner Generic x(owner item)
+    self.item := x
+    self.arr := arr
+    user Generic y
+    y := arr[2]
+    new Test{Generic} t
+    t.item := self.item
+    self.item := t.item
 ## @ g t1
-struct Test{First:Second:Third}
-  var Int x
+struct Test{Generic}
+  owner Generic item
+  func get()->(user Generic item)
+    item := self.item
 ## @ g t2
+struct Test{First:Second:Third}
+  user First first
+  user Second second
+  user Third third
+  func set(user First first, user Second second, user Third third)
+    self.first := first
+    self.second := second
+    self.third := third
+func use(user String first, user Array{Int} second, user File third)
+  var Test{String:Array{Int}:File} t
+  t.first := first
+  t.second := second
+  t.third := third
+  t.set(user first, user second, user third)
+## @ g t3
 struct Base
   var Int x
 struct Test{Generic}(Base)
-## @ eg te0
+## @ c t4
+d.item := str
+## @ c t5
+str := d.item
+## @ c t6
+d.arr := sarr
+## @ c t7
+str := d.arr[4]
+## @ c t8
+var Array{5:Data{String}} ad
+  str := ad[2].item
+## @ c t9
+var Array{5:Data{String}} ad
+  str := ad[2].arr[3]
+## @ c t10
+var Data{Array{String}} da
+  str := da.item[1]
+## @ c t11
+var Data{Data{Data{String}}} dr
+  str := dr.item.item.item
+## @ c t12
+d.set(owner so, user sarr)
+## @ c t13
+d.get()->(user str)
+## @ c t14
+var Data dg
+## @ c t15
+user Data dg(user d)
+## @ eg teg0
 struct Test{First:Second:Third
+## @ eg teg1
+struct Test{Generic}
+  var Generic error
+
+## @ eg teg2
+struct Test{Generic}
+  user Generic item
+  func meth(copy Generic error)
+
+## @ eg teg3
+struct Test{Generic}
+  user Generic item
+  func meth(user String s)
+    self.item := s
+
+## @ eg teg4
+struct Test{Generic}
+  user Generic item
+  func meth(user String s)
+    s := self.item
+
+## @ eg teg5
+struct Test{Generic}
+  user Generic item
+  func meth()
+    var Generic error
+
+## @ eg teg6
+struct Test{First:Second}
+  user First first
+  user Second second
+  func meth()
+    self.first := self.second
+
+## @ eg teg7
+struct Test{error}
+  var Int x
+
+## @ ec tec0
+var Data{Int} error
+## @ ec tec1
+var Data{String:String} error
+## @ ec tec2
+var Data{Error} error
+## @ ec tec3
+var Char{String} error
+## @ ec tec4
+var Data dg
+  str := dg.item
+## @ ec tec5
+var Data dg
+  d := dg
+## @ ec tec6
+t := d.item
+## @ eg tec7
+struct Test{First:Second:Third}
+  user First first
+  user Second second
+  user Third third
+func meth(user Test{String:String} t)
+  user Test{String:String:String} error(user t)
+
 ## @

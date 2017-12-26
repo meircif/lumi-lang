@@ -47,17 +47,18 @@ class InitExpression(Expression)
           not (? self.arguments.outputs.first) and (not (? self.constructor) or
           self.result-type.type-data = glob.type-string)
         self.constructor := _
-      else-if not (? self.constructor)
-        self.m-syntax-error(
-            user "no contructor for type", user self.result-type.type-data.name)
-      else
+      else-if ? self.constructor
         new CallArgument self-param
         self-param.access :=
             self.constructor.arguments.parameters.first.item.access
         self-param.code-node := self.code-node
         self-param.value := self.symbol
         self.arguments.parameters.prepend(owner self-param)
-        self.arguments.check-same-as(user self.constructor.arguments)
+        self.arguments.check-same-as(
+            user self.constructor.arguments, user self.result-type)
+      else
+        self.m-syntax-error(
+            user "no contructor for type", user self.result-type.type-data.name)
       
     else-if ? self.arguments.parameters.first
       if ? self.arguments.parameters.first.next or
@@ -65,7 +66,7 @@ class InitExpression(Expression)
         self.m-syntax-error-msg(
             user "only one initialization parameter expected")
       user Argument param(self.arguments.parameters.first.item)
-      param.check-same-type-as(user self.result-type)
+      param.check-same-type-as(user self.result-type, user _)
       if self.result-type.type-data.is-primitive and param.access != ACCESS-COPY
         self.m-syntax-error(
             user "access should be \"copy\" for primitive types, got",

@@ -55,7 +55,7 @@ Returncode SyntaxTreeExpression_analyze(SyntaxTreeExpression* self);
 static char* _func_name_SyntaxTreeExpression_analyze = "SyntaxTreeExpression.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_analyze
 Returncode SyntaxTreeExpression_analyze(SyntaxTreeExpression* self) {
-  CHECK(19, (self->expression)->_base._dtl[1](self->expression) )
+  CHECK(19, (self->expression)->_base._dtl[2](self->expression) )
   if (NULL != self->expression->result_type) {
     CHECK(21, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){25, 24, "statememnt has no effect"}) )
   }
@@ -70,8 +70,8 @@ static char* _func_name_SyntaxTreeExpression_write = "SyntaxTreeExpression.write
 #define MR_FUNC_NAME _func_name_SyntaxTreeExpression_write
 Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
   CHECK(24, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(25, (self->expression)->_base._dtl[6](self->expression) )
-  CHECK(26, (self->expression)->_base._dtl[2](self->expression) )
+  CHECK(25, (self->expression)->_base._dtl[7](self->expression) )
+  CHECK(26, (self->expression)->_base._dtl[3](self->expression) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -80,7 +80,7 @@ Returncode SyntaxTreeExpression_write(SyntaxTreeExpression* self) {
 extern Func SyntaxTreeExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeExpression_analyze, (void*)SyntaxTreeExpression_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeExpression__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeExpression_analyze, (void*)SyntaxTreeExpression_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -135,7 +135,7 @@ Returncode SyntaxTreeReturn_write(SyntaxTreeReturn* self) {
 extern Func SyntaxTreeReturn__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeReturn__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeReturn_write, (void*)SyntaxTreeReturn_m_is_end_point};
+Func SyntaxTreeReturn__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeReturn_write, (void*)SyntaxTreeReturn_m_is_end_point};
 #endif
 
 
@@ -190,7 +190,7 @@ Returncode SyntaxTreeRaise_write(SyntaxTreeRaise* self) {
 extern Func SyntaxTreeRaise__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeRaise__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeRaise_write, (void*)SyntaxTreeRaise_m_is_end_point};
+Func SyntaxTreeRaise__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeRaise_write, (void*)SyntaxTreeRaise_m_is_end_point};
 #endif
 
 
@@ -253,9 +253,9 @@ static char* _func_name_SyntaxTreeWhile_write = "SyntaxTreeWhile.write";
 Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
   /* if (!(`condition`) break; */
   CHECK(84, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(85, (self->condition)->_base._dtl[6](self->condition) )
+  CHECK(85, (self->condition)->_base._dtl[7](self->condition) )
   CHECK(86, write(&(String){7, 6, "if (!("}) )
-  CHECK(87, (self->condition)->_base._dtl[2](self->condition) )
+  CHECK(87, (self->condition)->_base._dtl[3](self->condition) )
   CHECK(88, write(&(String){11, 10, ")) break;\n"}) )
   return OK;
 }
@@ -265,7 +265,7 @@ Returncode SyntaxTreeWhile_write(SyntaxTreeWhile* self) {
 extern Func SyntaxTreeWhile__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeWhile__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeWhile_analyze, (void*)SyntaxTreeWhile_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeWhile__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeWhile_analyze, (void*)SyntaxTreeWhile_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -323,7 +323,7 @@ Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self) {
 extern Func SyntaxTreeContinue__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeContinue_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeContinue_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 #undef MR_FILE_NAME
