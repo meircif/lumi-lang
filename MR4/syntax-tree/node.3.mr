@@ -20,9 +20,23 @@ class SyntaxTreeNode
     self.print-syntax-error(user "illegal access", user access-str)
     raise
   
+  func dynamic get-parent-type():(user TypeData parent-type)
+    parent-type := _
+  
   func inst find-type(user String name):(user TypeData type-data)
-    if not (? glob.type-map.find(user name):(user type-data))
-      self.m-syntax-error(user "unknown type", user name)
+    if ? glob.type-map.find(user name):(user type-data)
+      return
+    user TypeData parent-type
+    if ? self.get-parent-type():(user parent-type) and ? parent-type.parameters
+      user ListNode{String} node(parent-type.parameters.first)
+      do
+        while ? node
+        if node.item.equal(user name)
+          type-data := glob.type-generic
+          return
+        node := node.next
+    self.print-syntax-error(user "unknown type", user name)
+    raise
   
   ## Expect `expected-text` to be read exaclty from the input file
   func inst read-expect(user String expected-text)

@@ -75,6 +75,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           self.m-syntax-error(
               user "redefinition of variable", user self.name)
   
+  func dynamic get-parent-type():(user TypeData parent-type)
+    if ? self.parent-type
+      parent-type := self.parent-type
+    else
+      base.get-parent-type():(user parent-type)
+  
   func inst find-variable(user String name):(
       user SyntaxTreeVariable variable, copy Bool found)
     self.name.equal(user name):(copy found)
@@ -82,8 +88,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       variable := self
   
   func dynamic link-types()
-    # sys.print-raw(user "m-link-type var ")
-    # sys.print(user self.name)
     self.type-instance.link-types(user self)
   
   func dynamic analyze()
@@ -92,6 +96,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "only \"var\" access is supported for primitive types, got",
           user glob.access-names[self.access])
     self.type-instance.analyze-lengths(user self)
+    if self.is-create and self.type-instance.type-data = glob.type-generic
+      self.m-syntax-error(
+          user "declared variable with generic subtype",
+          user self.type-instance.name)
     if self.is-create and not self.type-instance.type-data.is-primitive and
         not (? self.parent)
       self.m-syntax-error-msg(
@@ -143,32 +151,32 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func dynamic write-sequence()
     if self.type-instance.type-data = glob.type-array and
-        self.type-instance.sub-type.type-data = glob.type-string
+        self.type-instance.parameters.first.item.type-data = glob.type-string
       # char `name`_Chars[`length` * `string-legth`];
       write(user "char ")
       write-cname(user self.name)
       write(user "_Chars[")
       self.type-instance.length.write()
       write(user " * ")
-      self.type-instance.sub-type.length.write()
+      self.type-instance.parameters.first.item.length.write()
       write(user "];\n")
       self.write-spaces()
     # `sub-type` `name`_Values[`length`];
     if self.type-instance.type-data = glob.type-string
       write(user "char ")
-    else-if self.type-instance.sub-type.type-data = glob.type-func
+    else-if self.type-instance.parameters.first.item.type-data = glob.type-func
       write(user "Returncode (*")
     else
-      write-cname(user self.type-instance.sub-type.type-data.name)
+      write-cname(user self.type-instance.parameters.first.item.type-data.name)
       write(user " ")
     write-cname(user self.name)
     write(user "_Values[")
     self.type-instance.length.write()
     write(user "]")
     if self.type-instance.type-data = glob.type-array and
-        self.type-instance.sub-type.type-data = glob.type-func
+        self.type-instance.parameters.first.item.type-data = glob.type-func
       write(user ")")
-      self.type-instance.sub-type.arguments.write()
+      self.type-instance.parameters.first.item.arguments.write()
     write(user ";\n")
     self.write-spaces()
   
@@ -188,10 +196,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       write(user ", NULL")
     else
       var Int bases
-      user TypeData type-data(self.type-instance.type-data.base-type)
+      user TypeData type-data(self.type-instance.type-data)
       do
-        while ? type-data
-        type-data := type-data.base-type
+        while ? type-data.base-type
+        type-data := type-data.base-type.type-data
         bases += 1
         write(user "{")
       write(user "0")

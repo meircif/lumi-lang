@@ -119,7 +119,7 @@ Returncode NativeFunction_write(NativeFunction* self) {
 extern Func NativeFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func NativeFunction__dtl[] = {(void*)SyntaxTreeFunction_link_types, (void*)SyntaxTreeFunction_analyze, (void*)NativeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeFunction_check_name, (void*)SyntaxTreeFunction_write_declaration};
+Func NativeFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*)SyntaxTreeFunction_link_types, (void*)SyntaxTreeFunction_analyze, (void*)NativeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeFunction_check_name, (void*)SyntaxTreeFunction_write_declaration};
 #endif
 
 
@@ -177,7 +177,7 @@ Returncode NativeVariable_write(NativeVariable* self) {
 extern Func NativeVariable__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func NativeVariable__dtl[] = {(void*)SyntaxTreeVariable_link_types, (void*)NativeVariable_analyze, (void*)NativeVariable_write, (void*)SyntaxTreeCode_m_is_end_point, (void*)SyntaxTreeVariable_write_sequence};
+Func NativeVariable__dtl[] = {(void*)SyntaxTreeVariable_get_parent_type, (void*)SyntaxTreeVariable_link_types, (void*)NativeVariable_analyze, (void*)NativeVariable_write, (void*)SyntaxTreeCode_m_is_end_point, (void*)SyntaxTreeVariable_write_sequence};
 #endif
 
 
@@ -258,7 +258,7 @@ Returncode NativeType_write(NativeType* self) {
 extern Func NativeType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func NativeType__dtl[] = {(void*)SyntaxTreeNamespace_link_types, (void*)NativeType_analyze, (void*)NativeType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)NativeType_write_declaration, (void*)TypeData_write_me};
+Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_types, (void*)NativeType_analyze, (void*)NativeType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)NativeType_write_declaration, (void*)TypeData_write_me};
 #endif
 
 #undef MR_FILE_NAME

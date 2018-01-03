@@ -117,7 +117,7 @@ Returncode TextExpression_write(TextExpression* self) {
 extern Func TextExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func TextExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func TextExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -163,9 +163,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     if ((1) < 0 || (1) >= (number)->length) RAISE(57)
     Char second = ((number)->values[1]);
     if (second >= '0' && second <= '7') {
-      Bool _Bool18;
-      CHECK(59, f_is_octal(number, &(_Bool18)) )
-      if (!_Bool18) {
+      Bool _Bool17;
+      CHECK(59, f_is_octal(number, &(_Bool17)) )
+      if (!_Bool17) {
         CHECK(60, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){21, 20, "illegal octal number"}, text) )
       }
     }
@@ -173,18 +173,18 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
       if ((2) < 0 || (number->length - 2) < 0 || (2) + (number->length - 2) > (number)->length) RAISE(62)
       number = (&(String){number->length - 2, number->length - 2, (number)->values + (2)});
       if (second == 'b' || second == 'B') {
-        Bool _Bool19;
-        CHECK(64, f_is_binary(number, &(_Bool19)) )
-        if (!_Bool19) {
+        Bool _Bool18;
+        CHECK(64, f_is_binary(number, &(_Bool18)) )
+        if (!_Bool18) {
           CHECK(65, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){22, 21, "illegal binary number"}, text) )
         }
         CHECK(66, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){36, 35, "binary numbers not supported yet..."}, text) )
       }
       else {
         if (second == 'x' || second == 'X') {
-          Bool _Bool20;
-          CHECK(69, f_is_hex(number, &(_Bool20)) )
-          if (!_Bool20) {
+          Bool _Bool19;
+          CHECK(69, f_is_hex(number, &(_Bool19)) )
+          if (!_Bool19) {
             CHECK(70, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal hexadecimal number"}, text) )
           }
         }
@@ -195,9 +195,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     }
   }
   else {
-    Bool _Bool21;
-    CHECK(73, f_is_decimal(number, &(_Bool21)) )
-    if (!_Bool21) {
+    Bool _Bool20;
+    CHECK(73, f_is_decimal(number, &(_Bool20)) )
+    if (!_Bool20) {
       CHECK(74, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){15, 14, "illegal number"}, text) )
     }
   }
@@ -212,7 +212,7 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
 extern Func IntExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func IntExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func IntExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -262,9 +262,9 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         CHECK(97, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }
       if ((2) < 0 || (2) >= (text)->length) RAISE(98)
-      Bool _Bool22;
-      CHECK(98, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool22)) )
-      if (!_Bool22) {
+      Bool _Bool21;
+      CHECK(98, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool21)) )
+      if (!_Bool21) {
         CHECK(99, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }
     }
@@ -278,17 +278,17 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         ch = ((text)->values[2]);
         if (ch == 'x') {
           if ((3) < 0 || (2) < 0 || (3) + (2) > (text)->length) RAISE(105)
-          Bool _Bool23;
-          CHECK(105, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool23)) )
-          if (!_Bool23) {
+          Bool _Bool22;
+          CHECK(105, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool22)) )
+          if (!_Bool22) {
             CHECK(106, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
           }
         }
         else {
           if ((2) < 0 || (3) < 0 || (2) + (3) > (text)->length) RAISE(108)
-          Bool _Bool24;
-          CHECK(108, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool24)) )
-          if (!_Bool24) {
+          Bool _Bool23;
+          CHECK(108, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool23)) )
+          if (!_Bool23) {
             CHECK(109, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
           }
         }
@@ -313,7 +313,7 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
 extern Func CharExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CharExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func CharExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)TextExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 
@@ -392,17 +392,17 @@ Returncode StringExpression_write_preactions(StringExpression* self) {
     real_length = real_length + 1;
   }}
   CHECK(154, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(155, (self->symbol)->_base._base._dtl[2](self->symbol) )
+  CHECK(155, (self->symbol)->_base._base._dtl[3](self->symbol) )
   CHECK(156, write(&(String){19, 18, "_Var.max_length = "}) )
   CHECK(157, write_int(real_length) )
   CHECK(158, write(&(String){3, 2, ";\n"}) )
   CHECK(159, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(160, (self->symbol)->_base._base._dtl[2](self->symbol) )
+  CHECK(160, (self->symbol)->_base._base._dtl[3](self->symbol) )
   CHECK(161, write(&(String){15, 14, "_Var.length = "}) )
   CHECK(162, write_int(real_length - 1) )
   CHECK(163, write(&(String){3, 2, ";\n"}) )
   CHECK(164, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(165, (self->symbol)->_base._base._dtl[2](self->symbol) )
+  CHECK(165, (self->symbol)->_base._base._dtl[3](self->symbol) )
   CHECK(166, write(&(String){15, 14, "_Var.values = "}) )
   CHECK(167, write(self->_base.text) )
   CHECK(168, write(&(String){3, 2, ";\n"}) )
@@ -417,7 +417,7 @@ Returncode StringExpression_write(StringExpression* self);
 static char* _func_name_StringExpression_write = "StringExpression.write";
 #define MR_FUNC_NAME _func_name_StringExpression_write
 Returncode StringExpression_write(StringExpression* self) {
-  CHECK(172, (self->symbol)->_base._base._dtl[2](self->symbol) )
+  CHECK(172, (self->symbol)->_base._base._dtl[3](self->symbol) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -426,7 +426,7 @@ Returncode StringExpression_write(StringExpression* self) {
 extern Func StringExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func StringExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)StringExpression_analyze, (void*)StringExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)StringExpression_write_preactions};
+Func StringExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)StringExpression_analyze, (void*)StringExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)StringExpression_write_preactions};
 #endif
 
 
@@ -485,7 +485,7 @@ Returncode EmptyExpression_write_dynamic(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write_dynamic = "EmptyExpression.write-dynamic";
 #define MR_FUNC_NAME _func_name_EmptyExpression_write_dynamic
 Returncode EmptyExpression_write_dynamic(EmptyExpression* self) {
-  CHECK(192, (self)->_base._base._dtl[2](self) )
+  CHECK(192, (self)->_base._base._dtl[3](self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -496,7 +496,7 @@ Returncode EmptyExpression_write_refman(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write_refman = "EmptyExpression.write-refman";
 #define MR_FUNC_NAME _func_name_EmptyExpression_write_refman
 Returncode EmptyExpression_write_refman(EmptyExpression* self) {
-  CHECK(195, (self)->_base._base._dtl[2](self) )
+  CHECK(195, (self)->_base._base._dtl[3](self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -505,7 +505,7 @@ Returncode EmptyExpression_write_refman(EmptyExpression* self) {
 extern Func EmptyExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func EmptyExpression__dtl[] = {(void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)EmptyExpression_write, (void*)EmptyExpression_write_dynamic, (void*)EmptyExpression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func EmptyExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)EmptyExpression_write, (void*)EmptyExpression_write_dynamic, (void*)EmptyExpression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

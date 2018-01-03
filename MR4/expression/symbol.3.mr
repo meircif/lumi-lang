@@ -33,8 +33,12 @@ class SymbolExpression(Expression)
       self.function.arguments.copy-new():(owner self.result-type.arguments)
   
   func dynamic analyze-call(user FunctionArguments arguments):(
+      user TypeInstance instance-type,
+      copy Int bases,
       copy Bool is-function-object)
     is-function-object := ? self.variable
+    bases := 0
+    instance-type := _
   
   func dynamic write()
     if ? self.function
@@ -73,6 +77,7 @@ class MemberExpression(SymbolExpression)
   user Expression dynamic-call-self-instance
   var Int bases
   var Bool is-dynamic-call
+  var Bool is-generic-cast
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -95,27 +100,30 @@ class MemberExpression(SymbolExpression)
   func dynamic analyze()
     self.instance.analyze()
     self.assignable := self.instance.assignable
-    if not (? self.instance.result-type) or
-        not (? self.instance.result-type.type-data)
+    user TypeInstance instance-type(self.instance.result-type)
+    if not (? instance-type) or not (? instance-type.type-data)
       self.m-syntax-error(user "void expression has no member", user self.name)
-    user TypeData type-data(self.instance.result-type.type-data)
-    if type-data = glob.type-type
-      type-data := self.instance.result-type.sub-type.type-data
-    else-if type-data = glob.type-base
-      type-data := self.instance.result-type.sub-type.type-data.base-type
+    if instance-type.type-data = glob.type-type
+      instance-type := instance-type.parameters.first.item
+    else-if instance-type.type-data = glob.type-base
+      instance-type := instance-type.parameters.first.item.type-data.base-type
     
-    type-data.find-field(user self.name):(user self.variable, copy self.bases)
+    instance-type.type-data.find-field(user self.name):(
+        user self.variable, copy self.bases)
     if ? self.variable
-      self.variable.type-instance.copy-new():(owner self.result-type)
+      self.is-generic-cast :=
+          self.variable.type-instance.type-data = glob.type-generic
+      self.variable.type-instance.f-new-replace-params(
+          user instance-type, copy self.bases):(owner self.result-type)
       self.access := self.variable.access
       self.assignable := true
     else
-      type-data.find-meth(user self.name):(
+      instance-type.type-data.find-meth(user self.name):(
           user self.function, copy self.bases)
       if not (? self.function)
         self.m-syntax-error2(
             user "type",
-            user type-data.name,
+            user instance-type.type-data.name,
             user "has no member",
             user self.name)
       if self.function.is-dynamic and
@@ -132,16 +140,21 @@ class MemberExpression(SymbolExpression)
         self.m-syntax-error(
             user "calling \"base\" with non-method", user self.name)
       owner TypeInstance base-result-type(self.instance.result-type)
-      self.instance.result-type := base-result-type.sub-type
+      self.instance.result-type := base-result-type.parameters.first.item
       delete base-result-type
   
   func dynamic analyze-call(user FunctionArguments arguments):(
+      user TypeInstance instance-type,
+      copy Int bases,
       copy Bool is-function-object)
-    if base.analyze-call(user arguments):(copy is-function-object)
+    if base.analyze-call(user arguments):(
+        user instance-type, copy bases, copy is-function-object)
       return
+    bases := self.bases
     if self.instance.result-type.type-data = glob.type-type
-      delete self.instance
+      instance-type := self.instance.result-type.parameters.first.item
     else
+      instance-type := self.instance.result-type
       new CallArgument self-param
       self-param.access := self.function.arguments.parameters.first.item.access
       self-param.value := self.instance
@@ -179,11 +192,24 @@ class MemberExpression(SymbolExpression)
       self.write-bases()
       write-cname(user self.function.name)
       return
+    if self.is-generic-cast and not self.top
+      write(user "((")
+      write-cname(user self.result-type.type-data.name)
+      write(user "*)(")
     if ? self.instance and not (? self.function) and
         self.instance.result-type.type-data != glob.type-type
       self.instance.write()
       self.write-bases()
     base.write()
+    if self.is-generic-cast and not self.top
+      write(user "))")
+  
+  func dynamic write-refman()
+    var Bool top(self.top)
+    if self.is-generic-cast and not self.top
+      self.top := true
+    base.write-refman()
+    self.top := top
   
   func inst write-bases()
     write(user "->")

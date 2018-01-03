@@ -24,8 +24,8 @@ Returncode write_syntax_tree() {
   SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL};
   root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
   CHECK(7, SyntaxTreeRoot_parse(glob->root, mock_argv) )
-  CHECK(8, (glob->root)->_base._base._base._dtl[1](glob->root) )
-  CHECK(9, (glob->root)->_base._base._base._dtl[2](glob->root) )
+  CHECK(8, (glob->root)->_base._base._base._dtl[2](glob->root) )
+  CHECK(9, (glob->root)->_base._base._base._dtl[3](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -295,6 +295,32 @@ static char* _func_name_test_native = "test-native";
 #define MR_FUNC_NAME _func_name_test_native
 Returncode test_native() {
   CHECK(118, test_from_file(&(String){12, 11, "test-native"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_parameter_type();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_parameter_type = "test-parameter-type";
+#define MR_FUNC_NAME _func_name_test_parameter_type
+Returncode test_parameter_type() {
+  CHECK(122, test_from_file(&(String){20, 19, "test-parameter-type"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_parameter_inheritance();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_parameter_inheritance = "test-parameter-inheritance";
+#define MR_FUNC_NAME _func_name_test_parameter_inheritance
+Returncode test_parameter_inheritance() {
+  CHECK(126, test_from_file(&(String){27, 26, "test-parameter-inheritance"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

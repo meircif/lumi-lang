@@ -6,6 +6,7 @@ typedef struct Tb Tb;
 typedef struct Tb_Dynamic Tb_Dynamic;
 typedef struct Tc Tc;
 typedef struct Tc_Dynamic Tc_Dynamic;
+typedef struct Data Data;
 struct Test {
   Int num;
   Test* t;
@@ -33,6 +34,12 @@ struct Tc {
 struct Tc_Dynamic {
   Tb_Dynamic _base;
 };
+struct Data {
+  Generic_Type* item;
+  RefManager* item_Refman;
+  Array* arr;
+  RefManager* arr_Refman;
+};
 Returncode Test_new(Test* self, RefManager* self_Refman, Int num);
 Returncode Test_meth(Test* self, RefManager* self_Refman);
 Returncode Ta_metha(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic);
@@ -41,6 +48,8 @@ Returncode Tb_methb(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic)
 Returncode Tb_dyn(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic);
 Returncode Tc_methc(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic);
 Returncode Tc_dyn(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic);
+Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
+Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
 Ta_Dynamic Ta_dynamic = {Ta_dyn};
 Tb_Dynamic Tb_dynamic = {{(Func)Tb_dyn}};
 Tc_Dynamic Tc_dynamic = {{{(Func)Tc_dyn}}};
@@ -64,6 +73,10 @@ Tb_Dynamic* tb_Dynamic;
 Tc* tc = NULL;
 RefManager* tc_Refman = NULL;
 Tc_Dynamic* tc_Dynamic;
+Data* d = NULL;
+RefManager* d_Refman = NULL;
+Array* sarr = NULL;
+RefManager* sarr_Refman = NULL;
 Returncode fun0(void);
 Returncode fun1(Int x, String* s, RefManager* s_Refman, String* o, RefManager* o_Refman);
 Returncode fun2(String** s, RefManager** s_Refman, Int* x);
@@ -109,6 +122,20 @@ MR_cleanup:
   return MR_err;
 }
 Returncode Tc_dyn(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(item_Refman);
+  MR_inc_ref(arr_Refman);
+MR_cleanup:
+  MR_dec_ref(arr_Refman);
+  MR_owner_dec_ref(item_Refman);
+  return MR_err;
+}
+Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;

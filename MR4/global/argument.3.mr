@@ -28,17 +28,22 @@ class Argument(SyntaxTreeNode)
   func dynamic get-type-instance():(user TypeInstance type-instance)
     raise
   
-  func inst check-same-as(user Argument other)
+  func inst check-same-as(
+      user Argument other, user TypeInstance instance-type, copy Int bases)
     if self.access != other.access
       self.m-syntax-error2(
           user "expected access",
           user glob.access-names[other.access],
           user ", got",
           user glob.access-names[self.access])
-    self.check-same-type-as(user other.get-type-instance())
+    self.check-same-type-as(
+        user other.get-type-instance(), user instance-type, copy bases)
     self.is-native := other.is-native
   
-  func dynamic check-same-type-as(user TypeInstance type-instance)
+  func dynamic check-same-type-as(
+      user TypeInstance type-instance,
+      user TypeInstance instance-type,
+      copy Int bases)
     self.get-type-instance().check-equal(user type-instance, user self)
   
   func dynamic get-variable():(user SyntaxTreeVariable variable)
@@ -185,12 +190,16 @@ class FunctionArguments(SyntaxTreeNode)
       node := node.next
   
   func inst check-same-as(
-      user FunctionArguments other):(copy Bool output-ommited)
+      user FunctionArguments other,
+      user TypeInstance instance-type,
+      copy Int bases):(
+      copy Bool output-ommited)
     user ListNode{Argument} my-node(self.parameters.first)
     user ListNode{Argument} other-node(other.parameters.first)
     do
       while ? my-node and ? other-node
-      my-node.item.check-same-as(user other-node.item)
+      my-node.item.check-same-as(
+          user other-node.item, user instance-type, copy bases)
       my-node := my-node.next
       other-node := other-node.next
     if ? my-node
@@ -202,7 +211,8 @@ class FunctionArguments(SyntaxTreeNode)
     other-node := other.outputs.first
     do
       while ? my-node and ? other-node
-      my-node.item.check-same-as(user other-node.item)
+      my-node.item.check-same-as(
+          user other-node.item, user instance-type, copy bases)
       my-node := my-node.next
       other-node := other-node.next
     if ? my-node

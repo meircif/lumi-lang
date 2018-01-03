@@ -25,7 +25,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     do
       user String keyword
       var Int spaces
-      read-until(user " .([?", copy true):(user keyword, copy end, copy spaces)
+      read-until(user " .([{?", copy true):(user keyword, copy end, copy spaces)
       # ignore empty lines
       if keyword.length > 0 or end != '\n'
         self.set-location()
@@ -63,12 +63,12 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     if keyword.equal(user "#") or keyword.equal(user "##")
       user String text
       read-until(user "", copy false):(user text, copy end)
-    else-if keyword.equal(user "{#") or keyword.equal(user "{##")
+    else-if keyword.equal(user "~#") or keyword.equal(user "~##")
       var Char prev('\0')
       do
         var Char curr
         read-c():(copy curr)
-        while curr != EOF and (curr != '}' or prev != '#')
+        while curr != EOF and (curr != '~' or prev != '#')
         prev := curr
       read-c():(copy end)
     else

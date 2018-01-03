@@ -3,8 +3,8 @@
 ## Type node in the syntax tree 
 class TypeData(SyntaxTreeNamespace)
   owner String name
-  owner String base-type-name
-  user TypeData base-type
+  user TypeInstance base-type
+  owner List{String} parameters
   owner NameMap{SyntaxTreeFunction} dynamic-base-methods
   user SyntaxTreeConstructor constructor
   var Bool is-primitive
@@ -19,10 +19,24 @@ class TypeData(SyntaxTreeNamespace)
   func inst parse(copy Bool is-dynamic):(copy Char end)
     self.is-dynamic := is-dynamic
     self.set-location()
-    read-new(user "("):(owner self.name, copy end)
+    read-new(user "({"):(owner self.name, copy end)
     self.add-type()
+    if end = '{'
+      new List{String} in self.parameters
+      do
+        owner String name
+        read-new(user ":}"):(owner name, copy end)
+        if not f-is-legal-name(user name, copy true)
+          self.m-syntax-error(user "illegal type parameter name", user name)
+        self.parameters.add(owner name)
+        while end = ':'
+      if end != '}'
+        self.m-syntax-error-c(
+            user "expected \"}\" after type parameters, got", copy end)
+      read-c():(copy end)
     if end = '('
-      read-new(user ")"):(owner self.base-type-name, copy end)
+      new TypeInstance in self.base-type
+      self.base-type.parse(user ")", user self, user _):(copy end)
       if end != ')'
         self.m-syntax-error-c(
             user "expected \")\" after base type, got", copy end)
@@ -66,6 +80,9 @@ class TypeData(SyntaxTreeNamespace)
     new TypeInstance in type-instance
     type-instance.type-data := self
   
+  func dynamic get-parent-type():(user TypeData parent-type)
+    parent-type := self
+  
   func inst find-field(user String name):(
       user SyntaxTreeVariable field, copy Int bases)
     user TypeData type-data(self)
@@ -79,7 +96,8 @@ class TypeData(SyntaxTreeNamespace)
           field := child.item
           return
         child := child.next
-      type-data := type-data.base-type
+      while ? type-data.base-type
+      type-data := type-data.base-type.type-data
       bases += 1
     field := _
   
@@ -96,17 +114,17 @@ class TypeData(SyntaxTreeNamespace)
           method := child.item
           return
         child := child.next
-      type-data := type-data.base-type
+      while ? type-data.base-type
+      type-data := type-data.base-type.type-data
       bases += 1
     method := _
   
   func inst m-order-bases(user List{TypeData} ordered-list)
     if self.is-ordered
       return
-    # init `self.base-type`
-    if ? self.base-type-name
-      self.find-type(user self.base-type-name):(user self.base-type)
-      self.base-type.m-order-bases(user ordered-list)
+    if ? self.base-type
+      self.find-type(user self.base-type.name):(user self.base-type.type-data)
+      self.base-type.type-data.m-order-bases(user ordered-list)
     ordered-list.add(owner self)
     # init `self.dynamic-base-methods` and test override methods
     if self.is-dynamic
@@ -116,7 +134,9 @@ class TypeData(SyntaxTreeNamespace)
       while ? child
       user SyntaxTreeFunction method
       var Int bases
-      self.base-type.find-meth(user child.item.name):(user method, copy bases)
+      if ? self.base-type
+        self.base-type.type-data.find-meth(user child.item.name):(
+            user method, copy bases)
       if ? method
         child.item.m-compare(user method)
         if child.item.is-dynamic
@@ -128,10 +148,18 @@ class TypeData(SyntaxTreeNamespace)
       child := child.next
     self.is-ordered := true
   
+  func dynamic link-types()
+    if ? self.base-type
+      self.base-type.link-types(user self)
+    base.link-types()
+  
   func dynamic analyze()
+    if ? self.base-type
+      self.base-type.analyze-lengths(user self)
     if not (? self.base-type) and self.variables.m-is-empty()
       self.m-syntax-error(user "type with no fields", user self.name)
-    if self.is-dynamic and not (? self.base-type and self.base-type.is-dynamic)
+    if self.is-dynamic and
+        not (? self.base-type and self.base-type.type-data.is-dynamic)
       user ListNode{SyntaxTreeFunction} node(self.functions.first)
       do
         if not (? node)
@@ -169,7 +197,7 @@ class TypeData(SyntaxTreeNamespace)
     self.indentation-spaces := 2
     if ? self.base-type
       self.write-spaces()
-      write-cname(user self.base-type.name)
+      write-cname(user self.base-type.type-data.name)
       write(user " _base;\n")
     self.write-children(user self.variables)
     write(user "};\n")
@@ -177,9 +205,9 @@ class TypeData(SyntaxTreeNamespace)
       write(user "\nstruct ")
       write-cname(user self.name)
       write(user "_Dynamic {\n")
-      if ? self.base-type and self.base-type.is-dynamic
+      if ? self.base-type and self.base-type.type-data.is-dynamic
         self.write-spaces()
-        write-cname(user self.base-type.name)
+        write-cname(user self.base-type.type-data.name)
         write(user "_Dynamic _base;\n")
       user NameMapNode{SyntaxTreeFunction} child(self.dynamic-base-methods.first)
       do
@@ -207,9 +235,10 @@ class TypeData(SyntaxTreeNamespace)
   
   func inst write-dynamic-init(user TypeData type-data)
     write(user "{")
-    var Bool not-first(? type-data.base-type and type-data.base-type.is-dynamic)
+    var Bool not-first(? type-data.base-type and
+        type-data.base-type.type-data.is-dynamic)
     if not-first
-      self.write-dynamic-init(user type-data.base-type)
+      self.write-dynamic-init(user type-data.base-type.type-data)
     user NameMapNode{SyntaxTreeFunction} child(type-data.dynamic-base-methods.first)
     do
       while ? child

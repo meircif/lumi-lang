@@ -52,6 +52,7 @@ static Global
   owner BuiltinType type-array
   owner BuiltinType type-type
   owner BuiltinType type-base
+  owner BuiltinType type-generic
   owner BuiltinType type-file
   owner BuiltinType type-sys
   
@@ -118,6 +119,8 @@ static Global
     self.add-builtin-type(user "Array", copy false):(owner self.type-array)
     self.add-builtin-type(user "Type", copy false):(owner self.type-type)
     self.add-builtin-type(user "Base Symbol", copy false):(owner self.type-base)
+    self.add-builtin-type(user "Generic Type", copy false):(
+        owner self.type-generic)
     self.add-builtin-type(user "File", copy false):(owner self.type-file)
     self.add-builtin-type(user "Sys", copy false):(owner self.type-sys)
     
@@ -308,8 +311,7 @@ static Global
       variable.access := ACCESS-OWNER
     variable-type.m-new-type-instance():(owner variable.type-instance)
     if ? variable-subtype
-      variable-subtype.m-new-type-instance():(
-          owner variable.type-instance.sub-type)
+      variable.type-instance.add-subtype-copy(user variable-subtype)
     variable.parent-type := parent-type
     branch.variables.add(owner variable)
   

@@ -36,6 +36,8 @@ typedef Returncode (*Func)();
 
 typedef FILE File;
 
+typedef void Generic_Type;
+
 
 extern char* MR_raise_format;
 extern char* MR_assert_format;
