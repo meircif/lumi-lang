@@ -13,3 +13,10 @@ build_script:
   - "%CCW% -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition -Wno-deprecated-declarations mr4-compiler.c ../MR3/mr.3.c -I../MR3 -I. -o mr4-compiler"
   - "cd .."
   - "%CCW% -Wno-deprecated-declarations mrb.c MR3/mr.3.c -I. -IMR3 -o mrb"
+
+test_script:
+  - "dir /B mr0-compiler >nul"
+  - "dir /B mr1-compiler >nul"
+  - "dir /B mr2-compiler >nul"
+  - "dir /B mr3-compiler >nul"
+  - "dir /B mr4-compiler >nul"
