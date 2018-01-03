@@ -1,0 +1,15 @@
+environment:
+  matrix:
+    - CC: "clang"
+  
+  CCW: "%CC% --std=c89 -Wall -Werror"
+
+build_script:
+  - %CCW% -Wno-deprecated-declarations MR0/mr0-compiler.c MR0/mr0-file.c MR0/mr0-string.c -o mr0-compiler
+  - %CCW% -Wno-deprecated-declarations MR1/mr1-compiler.c MR0/mr0-file.c MR0/mr0-string.c -IMR0 -o mr1-compiler
+  - %CCW% -Wno-deprecated-declarations MR2/mr2-compiler.c MR1/mr.1.c -IMR1 -o mr2-compiler
+  - %CCW% -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition -Wno-deprecated-declarations MR3/mr3-compiler.c MR2/mr.2.c -IMR2 -o mr3-compiler
+  - cd MR4
+  - %CCW% -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition -Wno-deprecated-declarations mr4-compiler.c ../MR3/mr.3.c -I../MR3 -I. -o mr4-compiler
+  - cd ..
+  - %CCW% -Wno-deprecated-declarations mrb.c MR3/mr.3.c -I. -IMR3 -o mrb
