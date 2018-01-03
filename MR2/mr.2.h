@@ -35,7 +35,7 @@ typedef Returncode (*Func)();
 
 typedef FILE File;
 
-typedef struct {} Sys;
+typedef void* Sys;
 
 typedef struct {
   int size;
