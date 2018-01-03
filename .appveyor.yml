@@ -1,12 +1,19 @@
 environment:
   matrix:
-    - CC: "clang"
-    - CC: "C:\\MinGW\\bin\\gcc"
     - CC: "cl"
+    - CC: "gcc"
+    - CC: "clang"
   
   CCW: "%CC% --std=c89 -Wall -Werror"
 
+image: Visual Studio 2015 
+
+platform: x64
+
 build_script:
+  - 'if [%CC%]==[gcc] set PATH=C:\MinGW\bin;%PATH%'
+  - 'if [%CC%]==[cl] "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Bin\\SetEnv.cmd" /x64'
+  - 'if [%CC%]==[cl] "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" x86_amd64'
   - "%CCW% -Wno-deprecated-declarations MR0/mr0-compiler.c MR0/mr0-file.c MR0/mr0-string.c -o mr0-compiler"
   - "%CCW% -Wno-deprecated-declarations MR1/mr1-compiler.c MR0/mr0-file.c MR0/mr0-string.c -IMR0 -o mr1-compiler"
   - "%CCW% -Wno-deprecated-declarations MR2/mr2-compiler.c MR1/mr.1.c -IMR1 -o mr2-compiler"
