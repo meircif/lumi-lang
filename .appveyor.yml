@@ -1,7 +1,7 @@
 environment:
   matrix:
     - CC: "clang"
-    - CC: "C:\MinGW\bin\gcc"
+    - CC: "C:\\MinGW\\bin\\gcc"
     - CC: "cl"
   
   CCW: "%CC% --std=c89 -Wall -Werror"
