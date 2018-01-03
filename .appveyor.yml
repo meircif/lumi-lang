@@ -2,8 +2,6 @@ environment:
   matrix:
     - CC: "cl"
       PLATFORM: x86
-    - CC: "cl"
-      PLATFORM: x64
     - CC: "gcc"
     - CC: "clang"
 
@@ -11,9 +9,7 @@ image: Visual Studio 2015
 
 build_script:
   - 'if [%CC%]==[gcc] set PATH=C:\MinGW\bin;%PATH%'
-  - 'if [%CC%]==[cl] if [%PLATFORM%]==[x64] "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Bin\\SetEnv.cmd" /x64'
-  - 'if [%CC%]==[cl] if [%PLATFORM%]==[x64] "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" x86_amd64'
-  - 'if [%CC%]==[cl] if [%PLATFORM%]==[x86] "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" x86'
+  - 'if [%CC%]==[cl] "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" x86'
   - "%CC% MR0/mr0-compiler.c MR0/mr0-file.c MR0/mr0-string.c -o mr0-compiler.exe"
   - "%CC% MR1/mr1-compiler.c MR0/mr0-file.c MR0/mr0-string.c -IMR0 -o mr1-compiler.exe"
   - "%CC% MR2/mr2-compiler.c MR1/mr.1.c -IMR1 -o mr2-compiler.exe"
