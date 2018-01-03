@@ -1,12 +1,12 @@
 environment:
   matrix:
     - CC: "cl"
-      PLATFORM: x64
     - CC: "gcc"
     - CC: "clang"
-      PLATFORM: x64
 
 image: Visual Studio 2015
+
+platform: x64
 
 build_script:
   - 'if [%CC%]==[gcc] set PATH=C:\MinGW\bin;%PATH%'

@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/meircif/mr-dev.svg?branch=master)](https://travis-ci.org/meircif/mr-dev)
+[![Build status](https://ci.appveyor.com/api/projects/status/wtam4i4gh28aw7su?svg=true)](https://ci.appveyor.com/project/meircif/mr-dev)
 [![codecov](https://codecov.io/gh/meircif/mr-dev/branch/master/graph/badge.svg)](https://codecov.io/gh/meircif/mr-dev)
 
 # mr-dev
