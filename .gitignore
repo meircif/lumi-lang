@@ -4,6 +4,7 @@ build
 MR4/mr3
 wip
 .gitattributes
+*.WinMerge
 
 # Visual-Studio files
 *.sln

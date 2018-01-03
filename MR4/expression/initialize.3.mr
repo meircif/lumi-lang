@@ -55,7 +55,7 @@ class InitExpression(Expression)
         self-param.value := self.symbol
         self.arguments.parameters.prepend(owner self-param)
         self.arguments.check-same-as(
-            user self.constructor.arguments, user self.result-type)
+            user self.constructor.arguments, user self.result-type, copy 0)
       else
         self.m-syntax-error(
             user "no contructor for type", user self.result-type.type-data.name)
@@ -66,7 +66,7 @@ class InitExpression(Expression)
         self.m-syntax-error-msg(
             user "only one initialization parameter expected")
       user Argument param(self.arguments.parameters.first.item)
-      param.check-same-type-as(user self.result-type, user _)
+      param.check-same-type-as(user self.result-type, user _, copy 0)
       if self.result-type.type-data.is-primitive and param.access != ACCESS-COPY
         self.m-syntax-error(
             user "access should be \"copy\" for primitive types, got",
@@ -86,8 +86,8 @@ class InitExpression(Expression)
         self.result-type.type-data = glob.type-string
       self.result-type.length.write-preactions()
     if self.result-type.type-data = glob.type-array and
-        self.result-type.sub-types.first.item.type-data = glob.type-string
-      self.result-type.sub-types.first.item.length.write-preactions()
+        self.result-type.parameters.first.item.type-data = glob.type-string
+      self.result-type.parameters.first.item.length.write-preactions()
     
     if self.symbol.variable.access = ACCESS-VAR
       self.write-var-init()
@@ -116,14 +116,14 @@ class InitExpression(Expression)
       self.symbol.write()
       write(user "_Values;\n")
       if self.result-type.type-data = glob.type-array and
-          self.result-type.sub-types.first.item.type-data = glob.type-string
+          self.result-type.parameters.first.item.type-data = glob.type-string
         # MR_set_var_string_array(
         #    `array-length`, `string-length`, `name`, `name`_Chars);
         self.code-node.write-spaces()
         write(user "MR_set_var_string_array(")
         self.result-type.length.write()
         write(user ", ")
-        self.result-type.sub-types.first.item.length.write()
+        self.result-type.parameters.first.item.length.write()
         write(user ", ")
         self.symbol.write()
         write(user ", ")
@@ -136,19 +136,19 @@ class InitExpression(Expression)
     write(user " = ")
     
     if self.result-type.type-data = glob.type-array
-      if self.result-type.sub-types.first.item.type-data = glob.type-string
+      if self.result-type.parameters.first.item.type-data = glob.type-string
         # MR_new_string_array(`length`, `string-length`);
         write(user "MR_new_string_array(")
         self.result-type.length.write()
         write(user ", ")
-        self.result-type.sub-types.first.item.length.write()
+        self.result-type.parameters.first.item.length.write()
         
       else
         # MR_new_array(`length`, sizeof(`SubType`));
         write(user "MR_new_array(")
         self.result-type.length.write()
         write(user ", sizeof(")
-        write-cname(user self.result-type.sub-types.first.item.type-data.name)
+        write-cname(user self.result-type.parameters.first.item.type-data.name)
         write(user ")")
         
     else-if self.result-type.type-data = glob.type-string

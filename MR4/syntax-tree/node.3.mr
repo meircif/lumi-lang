@@ -27,12 +27,12 @@ class SyntaxTreeNode
     if ? glob.type-map.find(user name):(user type-data)
       return
     user TypeData parent-type
-    if ? self.get-parent-type():(user parent-type) and ? parent-type.sub-types
-      user ListNode{String} node(parent-type.sub-types.first)
+    if ? self.get-parent-type():(user parent-type) and ? parent-type.parameters
+      user ListNode{String} node(parent-type.parameters.first)
       do
         while ? node
         if node.item.equal(user name)
-          type-data := glob.type-subtype
+          type-data := glob.type-generic
           return
         node := node.next
     self.print-syntax-error(user "unknown type", user name)

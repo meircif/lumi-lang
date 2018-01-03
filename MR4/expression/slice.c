@@ -79,7 +79,7 @@ Returncode SliceExpression_analyze(SliceExpression* self) {
   else {
     if (self->sequence->result_type->type_data == &(glob->type_array->_base)) {
       if (!(NULL != self->second_index)) {
-        CHECK(40, TypeInstance_copy_new(((TypeInstance*)(self->sequence->result_type->sub_types->first->item)), &(self->_base.result_type)) )
+        CHECK(40, TypeInstance_copy_new(((TypeInstance*)(self->sequence->result_type->parameters->first->item)), &(self->_base.result_type)) )
       }
     }
     else {

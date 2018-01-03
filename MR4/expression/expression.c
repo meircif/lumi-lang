@@ -35,8 +35,8 @@ Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Express
 static char* _func_name_parse_new_expression = "parse-new-expression";
 #define MR_FUNC_NAME _func_name_parse_new_expression
 Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  Operator* _Operator28;
-  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator28)) )
+  Operator* _Operator27;
+  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator27)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -134,9 +134,9 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     if ((*end) == '?') {
       CHECK(106, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool29;
-    CHECK(107, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool29)) )
-    if (!(_Bool29)) break;
+    Bool _Bool28;
+    CHECK(107, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool28)) )
+    if (!(_Bool28)) break;
   }
   return OK;
 }
@@ -175,9 +175,9 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Syn
             CHECK(130, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool30;
-            CHECK(131, String_equal(text, &(String){5, 4, "base"}, &(_Bool30)) )
-            if (_Bool30) {
+            Bool _Bool29;
+            CHECK(131, String_equal(text, &(String){5, 4, "base"}, &(_Bool29)) )
+            if (_Bool29) {
               CHECK(132, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
             }
             else {
@@ -244,9 +244,9 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_cre
   CHECK(164, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
   (*symbol)->_base.access = access;
   (*symbol)->_base.assignable = true;
-  SyntaxTreeFunction* _SyntaxTreeFunction31;
-  CHECK(167, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction31)) )
-  CHECK(167, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction31, access, is_create, type_instance, &((*symbol)->variable)) )
+  SyntaxTreeFunction* _SyntaxTreeFunction30;
+  CHECK(167, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction30)) )
+  CHECK(167, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction30, access, is_create, type_instance, &((*symbol)->variable)) )
   CHECK(169, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
   return OK;
 }
@@ -364,12 +364,13 @@ Returncode Expression_write_as_top(Expression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments, TypeInstance** instance_type, Bool* is_function_object);
+Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments, TypeInstance** instance_type, Int* bases, Bool* is_function_object);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_analyze_call = "Expression.analyze-call";
 #define MR_FUNC_NAME _func_name_Expression_analyze_call
-Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments, TypeInstance** instance_type, Bool* is_function_object) {
+Returncode Expression_analyze_call(Expression* self, FunctionArguments* arguments, TypeInstance** instance_type, Int* bases, Bool* is_function_object) {
   (*is_function_object) = true;
+  (*bases) = 0;
   (*instance_type) = NULL;
   return OK;
 }

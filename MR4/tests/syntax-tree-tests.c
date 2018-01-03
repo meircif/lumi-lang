@@ -313,6 +313,19 @@ Returncode test_parameter_type() {
 #undef MR_FUNC_NAME
 #endif
 
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_parameter_inheritance();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_parameter_inheritance = "test-parameter-inheritance";
+#define MR_FUNC_NAME _func_name_test_parameter_inheritance
+Returncode test_parameter_inheritance() {
+  CHECK(126, test_from_file(&(String){27, 26, "test-parameter-inheritance"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES

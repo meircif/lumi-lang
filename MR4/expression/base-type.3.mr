@@ -5,6 +5,7 @@ class BaseMethExpression(Expression)
   var Bool is-call
   user SyntaxTreeFunction function
   user TypeData parent-type
+  var Int bases
   
   func inst parse-new(
       owner String text, user SyntaxTreeCode code-node, copy Char end):(
@@ -31,7 +32,7 @@ class BaseMethExpression(Expression)
           user "no base type for type", user function.parent-type.name)
     if self.is-call
       self.parent-type.base-type.type-data.find-meth(user function.name):(
-          user self.function)
+          user self.function, copy self.bases)
       if not (? self.function)
         self.m-syntax-error(
             user "no base method for method", user function.name)
@@ -42,8 +43,12 @@ class BaseMethExpression(Expression)
       self.result-type.add-subtype-copy(user self.parent-type)
   
   func dynamic analyze-call(user FunctionArguments arguments):(
+      user TypeInstance instance-type,
+      copy Int bases,
       copy Bool is-function-object)
     is-function-object := false
+    instance-type := self.parent-type.base-type
+    bases := self.bases
     new CallArgument self-param
     self-param.access := self.function.arguments.parameters.first.item.access
     new BaseMethExpression in self-param.value
@@ -122,9 +127,9 @@ class TypeExpression(Expression)
   func inst parse(owner TypeInstance type-instance)
     self.set-location()
     self.set-simple-type(user glob.type-type)
-    new List{TypeInstance} in self.result-type.sub-types
-    self.result-type.sub-types.add(owner type-instance)
+    new List{TypeInstance} in self.result-type.parameters
+    self.result-type.parameters.add(owner type-instance)
     self.access := ACCESS-VAR
   
   func dynamic analyze()
-    self.result-type.sub-types.first.item.analyze(user self)
+    self.result-type.parameters.first.item.analyze(user self)

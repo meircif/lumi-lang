@@ -1085,17 +1085,17 @@ only primitive types supported for native variable, got "String"
 /// @ t0
 typedef struct Test Test;
 struct Test {
-  Generic_Subtype* item;
+  Generic_Type* item;
   RefManager* item_Refman;
   Array* arr;
   RefManager* arr_Refman;
 };
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
   Returncode MR_err = OK;
-  Generic_Subtype* x = NULL;
+  Generic_Type* x = NULL;
   RefManager* x_Refman = NULL;
-  Generic_Subtype* y = NULL;
+  Generic_Type* y = NULL;
   RefManager* y_Refman = NULL;
   Test* t = NULL;
   RefManager* t_Refman = NULL;
@@ -1121,7 +1121,7 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* item, 
   MR_dec_ref(y_Refman);
   y_Refman = arr_Refman;
   MR_inc_ref(y_Refman);
-  y = ((Generic_Subtype**)((arr)->values))[2];
+  y = ((Generic_Type**)((arr)->values))[2];
   t = calloc(1, sizeof(Test));
   if (t == NULL) RAISE(10)
   t_Refman = MR_new_ref(t);
@@ -1151,11 +1151,11 @@ MR_cleanup:
 /// @ t1
 typedef struct Test Test;
 struct Test {
-  Generic_Subtype* item;
+  Generic_Type* item;
   RefManager* item_Refman;
 };
-Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Subtype** item, RefManager** item_Refman);
-Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Subtype** item, RefManager** item_Refman) {
+Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
+Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(4)
   MR_dec_ref(*item_Refman);
@@ -1168,16 +1168,16 @@ MR_cleanup:
 /// @ t2
 typedef struct Test Test;
 struct Test {
-  Generic_Subtype* first;
+  Generic_Type* first;
   RefManager* first_Refman;
-  Generic_Subtype* second;
+  Generic_Type* second;
   RefManager* second_Refman;
-  Generic_Subtype* third;
+  Generic_Type* third;
   RefManager* third_Refman;
 };
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* first, RefManager* first_Refman, Generic_Subtype* second, RefManager* second_Refman, Generic_Subtype* third, RefManager* third_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman);
 Returncode use(String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Subtype* first, RefManager* first_Refman, Generic_Subtype* second, RefManager* second_Refman, Generic_Subtype* third, RefManager* third_Refman) {
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(first_Refman);
   MR_inc_ref(second_Refman);
@@ -1354,22 +1354,26 @@ Data* dg = NULL;
   dg = d;
   dg_Refman = d_Refman;
   MR_inc_ref(dg_Refman);
+/// @ t16
+CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, sarr, sarr_Refman) )
+  *so = NULL;
+  *so_Refman = NULL;
 /// @ teg0
-expected "}" after sub-types, got "EOF"
+expected "}" after type parameters, got "EOF"
 /// @ teg1
 declared variable with generic subtype "Generic"
 /// @ teg2
-argument "error" access should not be "copy" for non-primitive type "Generic Subtype"
+argument "error" access should not be "copy" for non-primitive type "Generic Type"
 /// @ teg3
-cannot assign "String" into "Generic Subtype"
+cannot assign "String" into "Generic Type"
 /// @ teg4
-cannot assign "Generic Subtype" into "String"
+cannot assign "Generic Type" into "String"
 /// @ teg5
 declared variable with generic subtype "Generic"
 /// @ teg6
 cannot assign generic subtype "Second" into different generic subtype "First"
 /// @ teg7
-illegal parameter name "error"
+illegal type parameter name "error"
 /// @ tec0
 unsupported primitive parameter type "Int"
 /// @ tec1
@@ -1379,11 +1383,476 @@ unknown type "Error"
 /// @ tec3
 parameter given for type with no parameters "Char"
 /// @ tec4
-cannot assign "Generic Subtype" into "String"
+cannot assign "Generic Type" into "String"
 /// @ tec5
 cannot assign type "Data" with no parameter into same type with parameter "String"
 /// @ tec6
 cannot assign "String" into "Test"
 /// @ tec7
 cannot assign type "Test" with parameters into same type with more parameters "String"
+/// @@ test-parameter-inheritance
+/// @ t0
+typedef struct Base Base;
+typedef struct Test Test;
+struct Base {
+  Generic_Type* item;
+  RefManager* item_Refman;
+};
+struct Test {
+  Base _base;
+};
+Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* s_Refman);
+Returncode use(String* s, RefManager* s_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  Test* aux_Test_0 = NULL;
+  RefManager* aux_Test_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(5)
+  MR_dec_ref(self->_base.item_Refman);
+  self->_base.item_Refman = s_Refman;
+  MR_inc_ref(self->_base.item_Refman);
+  self->_base.item = s;
+  aux_Test_0 = calloc(1, sizeof(Test));
+  if (aux_Test_0 == NULL) RAISE(6)
+  aux_Test_0_Refman = MR_new_ref(aux_Test_0);
+  if (aux_Test_0_Refman == NULL) RAISE(6)
+  CHECK(6, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman) )
+MR_cleanup:
+  MR_owner_dec_ref(aux_Test_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+Returncode use(String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  Test t_Var = {{0}};
+  Test* t = NULL;
+  RefManager* t_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(8)
+  if (t == NULL || t_Refman->value == NULL) RAISE(9)
+  MR_dec_ref(t->_base.item_Refman);
+  t->_base.item_Refman = s_Refman;
+  MR_inc_ref(t->_base.item_Refman);
+  t->_base.item = s;
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+/// @ t1
+typedef struct Base Base;
+typedef struct Test Test;
+struct Base {
+  Generic_Type* item;
+  RefManager* item_Refman;
+};
+struct Test {
+  Base _base;
+};
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, String* s, RefManager* s_Refman);
+Returncode use(String* s, RefManager* s_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  Test* aux_Test_0 = NULL;
+  RefManager* aux_Test_0_Refman = NULL;
+  MR_inc_ref(i_Refman);
+  MR_inc_ref(s_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(5)
+  MR_dec_ref(self->_base.item_Refman);
+  self->_base.item_Refman = i_Refman;
+  MR_inc_ref(self->_base.item_Refman);
+  self->_base.item = i;
+  aux_Test_0 = calloc(1, sizeof(Test));
+  if (aux_Test_0 == NULL) RAISE(6)
+  aux_Test_0_Refman = MR_new_ref(aux_Test_0);
+  if (aux_Test_0_Refman == NULL) RAISE(6)
+  CHECK(6, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman, s, s_Refman) )
+MR_cleanup:
+  MR_owner_dec_ref(aux_Test_0_Refman);
+  MR_dec_ref(s_Refman);
+  MR_dec_ref(i_Refman);
+  return MR_err;
+}
+Returncode use(String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  Test t_Var = {{0}};
+  Test* t = NULL;
+  RefManager* t_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(8)
+  if (t == NULL || t_Refman->value == NULL) RAISE(9)
+  MR_dec_ref(t->_base.item_Refman);
+  t->_base.item_Refman = s_Refman;
+  MR_inc_ref(t->_base.item_Refman);
+  t->_base.item = s;
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+/// @ t2
+typedef struct Base Base;
+typedef struct Mid Mid;
+typedef struct Top Top;
+typedef struct Test Test;
+struct Base {
+  Generic_Type* item;
+  RefManager* item_Refman;
+};
+struct Mid {
+  Base _base;
+};
+struct Top {
+  Mid _base;
+};
+struct Test {
+  Top _base;
+};
+Returncode Base_set(Base* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman);
+Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman);
+Returncode Top_set(Top* self, RefManager* self_Refman, String* s, RefManager* s_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* s_Refman);
+Returncode use(String* s, RefManager* s_Refman);
+Returncode Base_set(Base* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(i_Refman);
+MR_cleanup:
+  MR_dec_ref(i_Refman);
+  return MR_err;
+}
+Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(i_Refman);
+MR_cleanup:
+  MR_dec_ref(i_Refman);
+  return MR_err;
+}
+Returncode Top_set(Top* self, RefManager* self_Refman, String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(s_Refman);
+  CHECK(8, Mid_set(&(self->_base), self_Refman, s, s_Refman) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(9)
+  MR_dec_ref(self->_base._base.item_Refman);
+  self->_base._base.item_Refman = s_Refman;
+  MR_inc_ref(self->_base._base.item_Refman);
+  self->_base._base.item = s;
+MR_cleanup:
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  Top* aux_Top_0 = NULL;
+  RefManager* aux_Top_0_Refman = NULL;
+  Test* aux_Test_0 = NULL;
+  RefManager* aux_Test_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  CHECK(12, Top_set(&(self->_base), self_Refman, s, s_Refman) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(13)
+  MR_dec_ref(self->_base._base._base.item_Refman);
+  self->_base._base._base.item_Refman = s_Refman;
+  MR_inc_ref(self->_base._base._base.item_Refman);
+  self->_base._base._base.item = s;
+  aux_Top_0 = calloc(1, sizeof(Top));
+  if (aux_Top_0 == NULL) RAISE(14)
+  aux_Top_0_Refman = MR_new_ref(aux_Top_0);
+  if (aux_Top_0_Refman == NULL) RAISE(14)
+  CHECK(14, Top_set(aux_Top_0, aux_Top_0_Refman, s, s_Refman) )
+  aux_Test_0 = calloc(1, sizeof(Test));
+  if (aux_Test_0 == NULL) RAISE(15)
+  aux_Test_0_Refman = MR_new_ref(aux_Test_0);
+  if (aux_Test_0_Refman == NULL) RAISE(15)
+  CHECK(15, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman) )
+MR_cleanup:
+  MR_owner_dec_ref(aux_Test_0_Refman);
+  MR_owner_dec_ref(aux_Top_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+Returncode use(String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  Test t_Var = {{{{0}}}};
+  Test* t = NULL;
+  RefManager* t_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(17)
+  if (t == NULL || t_Refman->value == NULL) RAISE(18)
+  MR_dec_ref(t->_base._base._base.item_Refman);
+  t->_base._base._base.item_Refman = s_Refman;
+  MR_inc_ref(t->_base._base._base.item_Refman);
+  t->_base._base._base.item = s;
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+/// @ t3
+typedef struct Base Base;
+typedef struct Test Test;
+struct Base {
+  Generic_Type* item;
+  RefManager* item_Refman;
+};
+struct Test {
+  Base _base;
+};
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, String* s, RefManager* s_Refman);
+Returncode use(String* s, RefManager* s_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  Test* aux_Test_0 = NULL;
+  RefManager* aux_Test_0_Refman = NULL;
+  MR_inc_ref(i_Refman);
+  MR_inc_ref(s_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(5)
+  MR_dec_ref(self->_base.item_Refman);
+  self->_base.item_Refman = i_Refman;
+  MR_inc_ref(self->_base.item_Refman);
+  self->_base.item = i;
+  aux_Test_0 = calloc(1, sizeof(Test));
+  if (aux_Test_0 == NULL) RAISE(6)
+  aux_Test_0_Refman = MR_new_ref(aux_Test_0);
+  if (aux_Test_0_Refman == NULL) RAISE(6)
+  CHECK(6, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman, s, s_Refman) )
+MR_cleanup:
+  MR_owner_dec_ref(aux_Test_0_Refman);
+  MR_dec_ref(s_Refman);
+  MR_dec_ref(i_Refman);
+  return MR_err;
+}
+Returncode use(String* s, RefManager* s_Refman) {
+  Returncode MR_err = OK;
+  Test t_Var = {{0}};
+  Test* t = NULL;
+  RefManager* t_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(8)
+  if (t == NULL || t_Refman->value == NULL) RAISE(9)
+  MR_dec_ref(t->_base.item_Refman);
+  t->_base.item_Refman = s_Refman;
+  MR_inc_ref(t->_base.item_Refman);
+  t->_base.item = s;
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+/// @ t4
+typedef struct Base Base;
+typedef struct Mid Mid;
+typedef struct Top Top;
+typedef struct Test Test;
+struct Base {
+  Generic_Type* first;
+  RefManager* first_Refman;
+  Generic_Type* second;
+  RefManager* second_Refman;
+};
+struct Mid {
+  Base _base;
+  Generic_Type* third;
+  RefManager* third_Refman;
+};
+struct Top {
+  Mid _base;
+};
+struct Test {
+  Top _base;
+};
+Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman);
+Returncode Top_set(Top* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
+Returncode use(String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
+Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(first_Refman);
+  MR_inc_ref(second_Refman);
+  MR_inc_ref(third_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(7)
+  MR_dec_ref(self->_base.first_Refman);
+  self->_base.first_Refman = first_Refman;
+  MR_inc_ref(self->_base.first_Refman);
+  self->_base.first = first;
+  if (self == NULL || self_Refman->value == NULL) RAISE(8)
+  MR_dec_ref(self->_base.second_Refman);
+  self->_base.second_Refman = second_Refman;
+  MR_inc_ref(self->_base.second_Refman);
+  self->_base.second = second;
+  if (self == NULL || self_Refman->value == NULL) RAISE(9)
+  MR_dec_ref(self->third_Refman);
+  self->third_Refman = third_Refman;
+  MR_inc_ref(self->third_Refman);
+  self->third = third;
+MR_cleanup:
+  MR_dec_ref(third_Refman);
+  MR_dec_ref(second_Refman);
+  MR_dec_ref(first_Refman);
+  return MR_err;
+}
+Returncode Top_set(Top* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(first_Refman);
+  MR_inc_ref(second_Refman);
+  MR_inc_ref(third_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(12)
+  MR_dec_ref(self->_base._base.first_Refman);
+  self->_base._base.first_Refman = first_Refman;
+  MR_inc_ref(self->_base._base.first_Refman);
+  self->_base._base.first = first;
+  if (self == NULL || self_Refman->value == NULL) RAISE(13)
+  MR_dec_ref(self->_base._base.second_Refman);
+  self->_base._base.second_Refman = second_Refman;
+  MR_inc_ref(self->_base._base.second_Refman);
+  self->_base._base.second = second;
+  if (self == NULL || self_Refman->value == NULL) RAISE(14)
+  MR_dec_ref(self->_base.third_Refman);
+  self->_base.third_Refman = third_Refman;
+  MR_inc_ref(self->_base.third_Refman);
+  self->_base.third = third;
+MR_cleanup:
+  MR_dec_ref(third_Refman);
+  MR_dec_ref(second_Refman);
+  MR_dec_ref(first_Refman);
+  return MR_err;
+}
+Returncode Test_set(Test* self, RefManager* self_Refman, String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(first_Refman);
+  MR_inc_ref(second_Refman);
+  MR_inc_ref(third_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(17)
+  MR_dec_ref(self->_base._base._base.first_Refman);
+  self->_base._base._base.first_Refman = first_Refman;
+  MR_inc_ref(self->_base._base._base.first_Refman);
+  self->_base._base._base.first = first;
+  if (self == NULL || self_Refman->value == NULL) RAISE(18)
+  MR_dec_ref(self->_base._base._base.second_Refman);
+  self->_base._base._base.second_Refman = second_Refman;
+  MR_inc_ref(self->_base._base._base.second_Refman);
+  self->_base._base._base.second = second;
+  if (self == NULL || self_Refman->value == NULL) RAISE(19)
+  MR_dec_ref(self->_base._base.third_Refman);
+  self->_base._base.third_Refman = third_Refman;
+  MR_inc_ref(self->_base._base.third_Refman);
+  self->_base._base.third = third;
+MR_cleanup:
+  MR_dec_ref(third_Refman);
+  MR_dec_ref(second_Refman);
+  MR_dec_ref(first_Refman);
+  return MR_err;
+}
+Returncode use(String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman) {
+  Returncode MR_err = OK;
+  Test t_Var = {{{{0}}}};
+  Test* t = NULL;
+  RefManager* t_Refman = NULL;
+  MR_inc_ref(first_Refman);
+  MR_inc_ref(second_Refman);
+  MR_inc_ref(third_Refman);
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(21)
+  if (t == NULL || t_Refman->value == NULL) RAISE(22)
+  MR_dec_ref(t->_base._base._base.first_Refman);
+  t->_base._base._base.first_Refman = first_Refman;
+  MR_inc_ref(t->_base._base._base.first_Refman);
+  t->_base._base._base.first = first;
+  if (t == NULL || t_Refman->value == NULL) RAISE(23)
+  MR_dec_ref(t->_base._base._base.second_Refman);
+  t->_base._base._base.second_Refman = second_Refman;
+  MR_inc_ref(t->_base._base._base.second_Refman);
+  t->_base._base._base.second = second;
+  if (t == NULL || t_Refman->value == NULL) RAISE(24)
+  MR_dec_ref(t->_base._base.third_Refman);
+  t->_base._base.third_Refman = third_Refman;
+  MR_inc_ref(t->_base._base.third_Refman);
+  t->_base._base.third = third;
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(third_Refman);
+  MR_dec_ref(second_Refman);
+  MR_dec_ref(first_Refman);
+  return MR_err;
+}
+/// @ t5
+typedef struct First First;
+typedef struct Second Second;
+typedef struct Test Test;
+struct First {
+  Generic_Type* item;
+  RefManager* item_Refman;
+};
+struct Second {
+  Generic_Type* item;
+  RefManager* item_Refman;
+};
+struct Test {
+  First _base;
+};
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* g, RefManager* g_Refman, Second* sg, RefManager* sg_Refman);
+Returncode use(String* s, RefManager* s_Refman, Second* ss, RefManager* ss_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* g, RefManager* g_Refman, Second* sg, RefManager* sg_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(g_Refman);
+  MR_inc_ref(sg_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(7)
+  MR_dec_ref(self->_base.item_Refman);
+  self->_base.item_Refman = sg_Refman;
+  MR_inc_ref(self->_base.item_Refman);
+  self->_base.item = sg;
+  if (self == NULL || self_Refman->value == NULL) RAISE(8)
+  if (self->_base.item == NULL || self->_base.item_Refman->value == NULL) RAISE(8)
+  MR_dec_ref(((Second*)(self->_base.item))->item_Refman);
+  ((Second*)(self->_base.item))->item_Refman = g_Refman;
+  MR_inc_ref(((Second*)(self->_base.item))->item_Refman);
+  ((Second*)(self->_base.item))->item = g;
+MR_cleanup:
+  MR_dec_ref(sg_Refman);
+  MR_dec_ref(g_Refman);
+  return MR_err;
+}
+Returncode use(String* s, RefManager* s_Refman, Second* ss, RefManager* ss_Refman) {
+  Returncode MR_err = OK;
+  Test t_Var = {{0}};
+  Test* t = NULL;
+  RefManager* t_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  MR_inc_ref(ss_Refman);
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(10)
+  if (t == NULL || t_Refman->value == NULL) RAISE(11)
+  MR_dec_ref(t->_base.item_Refman);
+  t->_base.item_Refman = ss_Refman;
+  MR_inc_ref(t->_base.item_Refman);
+  t->_base.item = ss;
+  if (t == NULL || t_Refman->value == NULL) RAISE(12)
+  if (t->_base.item == NULL || t->_base.item_Refman->value == NULL) RAISE(12)
+  MR_dec_ref(((Second*)(t->_base.item))->item_Refman);
+  ((Second*)(t->_base.item))->item_Refman = s_Refman;
+  MR_inc_ref(((Second*)(t->_base.item))->item_Refman);
+  ((Second*)(t->_base.item))->item = s;
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(ss_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+/// @ te0
+unknown type "Generic"
+/// @ te1
+cannot assign "File" into "String"
+/// @ te2
+cannot assign "String" into "Generic Type"
+/// @ te3
+cannot assign "File" into "String"
 /// @

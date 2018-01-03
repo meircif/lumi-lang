@@ -221,8 +221,11 @@ class Expression(SyntaxTreeNode)
     self.top := top
   
   func dynamic analyze-call(user FunctionArguments arguments):(
-      user TypeInstance instance-type, copy Bool is-function-object)
+      user TypeInstance instance-type,
+      copy Int bases,
+      copy Bool is-function-object)
     is-function-object := true
+    bases := 0
     instance-type := _
   
   func dynamic write-preactions()

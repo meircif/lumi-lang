@@ -3,6 +3,7 @@
 user String str
 ## @ g t1
 
+
   
 
 var Int x
@@ -15,15 +16,15 @@ var Int x
 
 var Int x
 ## @ g t4
-{# multi 
+~# multi 
  line 
- comment #}
+ comment #~
 
 var Int x
 ## @ g t5
-{## multi 
+~## multi 
  line 
- documemtation #}
+ documemtation #~
 
 var Int x
 ## @ eg t6
@@ -37,7 +38,7 @@ return
 raise
   i := 3
 ## @ eg t10
-{# comment #}?
+~# comment #~?
 ## @ eg t11
 main(
 
@@ -285,15 +286,15 @@ struct Test
   var Int x
 ## @ g t5
 struct Test
-  {# multi 
+  ~# multi 
  line 
- comment #}
+ comment #~
   var Int x
 ## @ g t6
 struct Test
-  {## multi 
+  ~## multi 
  line 
- documemtation #}
+ documemtation #~
   var Int x
 ## @ g t7
 var Int name
@@ -485,15 +486,15 @@ var Array{1:Int:Int} a
 
   var Int x
 ## @ c t2
-{# multi 
+~# multi 
  line 
- comment #}
+ comment #~
 
   var Int x
 ## @ c t3
-{## multi 
+~## multi 
  line 
- documemtation #}
+ documemtation #~
 
   var Int x
 ## @@ test-if-else
@@ -784,6 +785,8 @@ d.get()->(user str)
 var Data dg
 ## @ c t15
 user Data dg(user d)
+## @ c t16
+Data{String}.set(var d, owner so, user sarr)
 ## @ eg teg0
 struct Test{First:Second:Third
 ## @ eg teg1
@@ -847,5 +850,122 @@ struct Test{First:Second:Third}
   user Third third
 func meth(user Test{String:String} t)
   user Test{String:String:String} error(user t)
+
+## @@ test-parameter-inheritance
+## @ g t0
+struct Base{Generic}
+  user Generic item
+struct Test(Base{String})
+  func set(user String s)
+    self.item := s
+    Test.set(var Test(), user s)
+func use(user String s)
+  var Test t
+  t.item := s
+## @ g t1
+struct Base{Generic}
+  user Generic item
+struct Test{Param}(Base{Param})
+  func set(user Param i, user String s)
+    self.item := i
+    Test{String}.set(var Test{String}(), user s, user s)
+func use(user String s)
+  var Test{String} t
+  t.item := s
+## @ g t2
+struct Base{Pbase}
+  user Pbase item
+  func set(user Pbase i)
+struct Mid{Pmid}(Base{Pmid})
+  func set(user Pmid i)
+struct Top(Mid{String})
+  func set(user String s)
+    base(user s)
+    self.item := s
+struct Test(Top)
+  func set(user String s)
+    base(user s)
+    self.item := s
+    Top.set(var Top(), user s)
+    Test.set(var Test(), user s)
+func use(user String s)
+  var Test t
+  t.item := s
+## @ g t3
+struct Base{Generic}
+  user Generic item
+struct Test{Generic}(Base{Generic})
+  func set(user Generic i, user String s)
+    self.item := i
+    Test{String}.set(var Test{String}(), user s, user s)
+func use(user String s)
+  var Test{String} t
+  t.item := s
+## @ g t4
+struct Base{First:Second}
+  user First first
+  user Second second
+struct Mid{Param:Third}(Base{Param:Array{Int}})
+  user Third third
+  func set(user Param first, user Array{Int} second, user Third third)
+    self.first := first
+    self.second := second
+    self.third := third
+struct Top{Generic}(Mid{Generic:File})
+  func set(user Generic first, user Array{Int} second, user File third)
+    self.first := first
+    self.second := second
+    self.third := third
+struct Test(Top{String})
+  func set(user String first, user Array{Int} second, user File third)
+    self.first := first
+    self.second := second
+    self.third := third
+func use(user String first, user Array{Int} second, user File third)
+  var Test t
+  t.first := first
+  t.second := second
+  t.third := third
+## @ g t5
+struct First{FirstGeneric}
+  user FirstGeneric item
+struct Second{SecondGeneric}
+  user SecondGeneric item
+struct Test{Generic}(First{Second{Generic}})
+  func set(user Generic g, user Second{Generic} sg)
+    self.item := sg
+    self.item.item := g
+func use(user String s, user Second{String} ss)
+  var Test{String} t
+  t.item := ss
+  t.item.item := s
+## @ eg te0
+struct Base{Generic}
+  user Generic item
+struct Test{Param}(Base{Param})
+  user Generic error
+
+## @ eg te1
+struct Base{Generic}
+  user Generic item
+struct Test(Base{String})
+  func set(user File error)
+    self.item := error
+
+## @ eg te2
+struct Base{Generic}
+  user Generic item
+struct Test{Param}(Base{Param})
+  func set(user String error)
+    self.item := error
+
+## @ eg te3
+struct Base{Pbase}
+  user Pbase item
+struct Mid{Pmid}(Base{Pmid})
+struct Top(Mid{String})
+struct Test(Top)
+  func set(user File error)
+    self.item := error
 
 ## @

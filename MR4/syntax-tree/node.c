@@ -44,9 +44,9 @@ static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
   {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool98;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool98)) )
-    if (_Bool98) {
+    Bool _Bool97;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool97)) )
+    if (_Bool97) {
       (*access) = n;
       return OK;
     }
@@ -79,14 +79,14 @@ Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, TypeData
   }
   TypeData* parent_type = NULL;
   CHECK(30, (self)->_dtl[0](self, &(parent_type)) )
-  if (NULL != parent_type &&  NULL !=  parent_type->sub_types) {
-    ListNode* node = parent_type->sub_types->first;
+  if (NULL != parent_type &&  NULL !=  parent_type->parameters) {
+    ListNode* node = parent_type->parameters->first;
     while (true) {
       if (!(NULL != node)) break;
-      Bool _Bool99;
-      CHECK(34, String_equal(((String*)(node->item)), name, &(_Bool99)) )
-      if (_Bool99) {
-        (*type_data) = &(glob->type_subtype->_base);
+      Bool _Bool98;
+      CHECK(34, String_equal(((String*)(node->item)), name, &(_Bool98)) )
+      if (_Bool98) {
+        (*type_data) = &(glob->type_generic->_base);
         return OK;
       }
       node = node->next;
@@ -106,13 +106,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(43)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char100;
-    CHECK(45, read_c(&(_Char100)) )
-    CHECK(45, String_append(actual_text, _Char100) )
+    Char _Char99;
+    CHECK(45, read_c(&(_Char99)) )
+    CHECK(45, String_append(actual_text, _Char99) )
   }}
-  Bool _Bool101;
-  CHECK(46, String_equal(actual_text, expected_text, &(_Bool101)) )
-  if (!_Bool101) {
+  Bool _Bool100;
+  CHECK(46, String_equal(actual_text, expected_text, &(_Bool100)) )
+  if (!_Bool100) {
     CHECK(47, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);

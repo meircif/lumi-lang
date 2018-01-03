@@ -66,7 +66,7 @@ struct Global {
   BuiltinType* type_array;
   BuiltinType* type_type;
   BuiltinType* type_base;
-  BuiltinType* type_subtype;
+  BuiltinType* type_generic;
   BuiltinType* type_file;
   BuiltinType* type_sys;
 };
@@ -182,7 +182,7 @@ Returncode Global_init_builtin_types(Global* self) {
   CHECK(119, Global_add_builtin_type(self, &(String){6, 5, "Array"}, false, &(self->type_array)) )
   CHECK(120, Global_add_builtin_type(self, &(String){5, 4, "Type"}, false, &(self->type_type)) )
   CHECK(121, Global_add_builtin_type(self, &(String){12, 11, "Base Symbol"}, false, &(self->type_base)) )
-  CHECK(122, Global_add_builtin_type(self, &(String){16, 15, "Generic Subtype"}, false, &(self->type_subtype)) )
+  CHECK(122, Global_add_builtin_type(self, &(String){13, 12, "Generic Type"}, false, &(self->type_generic)) )
   CHECK(124, Global_add_builtin_type(self, &(String){5, 4, "File"}, false, &(self->type_file)) )
   CHECK(125, Global_add_builtin_type(self, &(String){4, 3, "Sys"}, false, &(self->type_sys)) )
   
@@ -525,7 +525,7 @@ Returncode BuiltinType_write_me(BuiltinType* self, TypeWriter* type_writer) {
 extern Func BuiltinType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinType__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)BuiltinType_write_me};
+Func BuiltinType__dtl[] = {(void*)TypeData_get_parent_type, (void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)BuiltinType_write_me};
 #endif
 
 #if MR_STAGE == MR_TYPEDEFS

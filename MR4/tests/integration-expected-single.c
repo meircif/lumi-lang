@@ -11,6 +11,12 @@ typedef struct TestClass_Dynamic TestClass_Dynamic;
 
 typedef struct Data Data;
 
+typedef struct Dataset Dataset;
+
+typedef struct MidData MidData;
+
+typedef struct TopData TopData;
+
 
 /* types struct */
 
@@ -34,10 +40,26 @@ struct TestClass_Dynamic {
 };
 
 struct Data {
-  Generic_Subtype* item;
+  Generic_Type* item;
   RefManager* item_Refman;
   Array* arr;
   RefManager* arr_Refman;
+};
+
+struct Dataset {
+  Data _base;
+  Generic_Type* second;
+  RefManager* second_Refman;
+  Generic_Type* third;
+  RefManager* third_Refman;
+};
+
+struct MidData {
+  Dataset _base;
+};
+
+struct TopData {
+  MidData _base;
 };
 
 
@@ -57,9 +79,9 @@ Returncode TestClass_dynamic_meth(TestClass* self, RefManager* self_Refman, Test
 
 Returncode TestClass_print(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic);
 
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Subtype* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
+Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
 
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Subtype** item, RefManager** item_Refman);
+Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
 
 
 /* types global variables */
@@ -233,9 +255,9 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Data.set"
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Subtype* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
+Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
   Returncode MR_err = OK;
-  Generic_Subtype* x = NULL;
+  Generic_Type* x = NULL;
   RefManager* x_Refman = NULL;
   Data* d = NULL;
   RefManager* d_Refman = NULL;
@@ -259,7 +281,7 @@ Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Subtype* item, 
   MR_dec_ref(x_Refman);
   x_Refman = arr_Refman;
   MR_inc_ref(x_Refman);
-  x = ((Generic_Subtype**)((arr)->values))[2];
+  x = ((Generic_Type**)((arr)->values))[2];
   d = calloc(1, sizeof(Data));
   if (d == NULL) RAISE(356)
   d_Refman = MR_new_ref(d);
@@ -288,7 +310,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Data.get"
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Subtype** item, RefManager** item_Refman) {
+Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(361)
   MR_dec_ref(*item_Refman);
@@ -1419,33 +1441,43 @@ Returncode test_type_parameters(String* s, RefManager* s_Refman) {
   RefManager* dr_Refman = NULL;
   Data* dg = NULL;
   RefManager* dg_Refman = NULL;
+  TopData t_Var = {{{{0}}}};
+  TopData* t = NULL;
+  RefManager* t_Refman = NULL;
+  TestStruct at_Values[8];
+  Array at_Var = {8, NULL};
+  Array* at = NULL;
+  RefManager* at_Refman = NULL;
+  TestStruct ts_Var = {0};
+  TestStruct* ts = NULL;
+  RefManager* ts_Refman = NULL;
   MR_inc_ref(s_Refman);
   d = &d_Var;
   d_Refman = MR_new_ref(d);
-  if (d_Refman == NULL) RAISE(364)
+  if (d_Refman == NULL) RAISE(372)
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   MR_set_var_string_array(6, 16, sarr, sarr_Chars);
   sarr_Refman = MR_new_ref(sarr);
-  if (sarr_Refman == NULL) RAISE(365)
-  if (d == NULL || d_Refman->value == NULL) RAISE(366)
+  if (sarr_Refman == NULL) RAISE(373)
+  if (d == NULL || d_Refman->value == NULL) RAISE(374)
   MR_dec_ref(d->item_Refman);
   d->item_Refman = s_Refman;
   MR_inc_ref(d->item_Refman);
   d->item = s;
-  if (d == NULL || d_Refman->value == NULL) RAISE(367)
+  if (d == NULL || d_Refman->value == NULL) RAISE(375)
   MR_dec_ref(s_Refman);
   s_Refman = d->item_Refman;
   MR_inc_ref(s_Refman);
   s = d->item;
-  if (d == NULL || d_Refman->value == NULL) RAISE(368)
+  if (d == NULL || d_Refman->value == NULL) RAISE(376)
   MR_dec_ref(d->arr_Refman);
   d->arr_Refman = sarr_Refman;
   MR_inc_ref(d->arr_Refman);
   d->arr = sarr;
-  if (d == NULL || d_Refman->value == NULL) RAISE(369)
-  if (d->arr == NULL || d->arr_Refman->value == NULL) RAISE(369)
-  if ((4) < 0 || (4) >= (d->arr)->length) RAISE(369)
+  if (d == NULL || d_Refman->value == NULL) RAISE(377)
+  if (d->arr == NULL || d->arr_Refman->value == NULL) RAISE(377)
+  if ((4) < 0 || (4) >= (d->arr)->length) RAISE(377)
   MR_dec_ref(s_Refman);
   s_Refman = d->arr_Refman;
   MR_inc_ref(s_Refman);
@@ -1453,51 +1485,85 @@ Returncode test_type_parameters(String* s, RefManager* s_Refman) {
   ad = &ad_Var;
   ad_Var.values = ad_Values;
   ad_Refman = MR_new_ref(ad);
-  if (ad_Refman == NULL) RAISE(370)
-  if (ad == NULL || ad_Refman->value == NULL) RAISE(371)
-  if ((2) < 0 || (2) >= (ad)->length) RAISE(371)
-  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(371)
+  if (ad_Refman == NULL) RAISE(378)
+  if (ad == NULL || ad_Refman->value == NULL) RAISE(379)
+  if ((2) < 0 || (2) >= (ad)->length) RAISE(379)
+  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(379)
   MR_dec_ref(s_Refman);
   s_Refman = (((Data**)((ad)->values))[2])->item_Refman;
   MR_inc_ref(s_Refman);
   s = (((Data**)((ad)->values))[2])->item;
-  if (ad == NULL || ad_Refman->value == NULL) RAISE(372)
-  if ((2) < 0 || (2) >= (ad)->length) RAISE(372)
-  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(372)
-  if ((((Data**)((ad)->values))[2])->arr == NULL || (((Data**)((ad)->values))[2])->arr_Refman->value == NULL) RAISE(372)
-  if ((3) < 0 || (3) >= ((((Data**)((ad)->values))[2])->arr)->length) RAISE(372)
+  if (ad == NULL || ad_Refman->value == NULL) RAISE(380)
+  if ((2) < 0 || (2) >= (ad)->length) RAISE(380)
+  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(380)
+  if ((((Data**)((ad)->values))[2])->arr == NULL || (((Data**)((ad)->values))[2])->arr_Refman->value == NULL) RAISE(380)
+  if ((3) < 0 || (3) >= ((((Data**)((ad)->values))[2])->arr)->length) RAISE(380)
   MR_dec_ref(s_Refman);
   s_Refman = (((Data**)((ad)->values))[2])->arr_Refman;
   MR_inc_ref(s_Refman);
   s = ((String**)(((((Data**)((ad)->values))[2])->arr)->values))[3];
   da = &da_Var;
   da_Refman = MR_new_ref(da);
-  if (da_Refman == NULL) RAISE(373)
-  if (da == NULL || da_Refman->value == NULL) RAISE(374)
-  if (da->item == NULL || da->item_Refman->value == NULL) RAISE(374)
-  if ((1) < 0 || (1) >= (((Array*)(da->item)))->length) RAISE(374)
+  if (da_Refman == NULL) RAISE(381)
+  if (da == NULL || da_Refman->value == NULL) RAISE(382)
+  if (da->item == NULL || da->item_Refman->value == NULL) RAISE(382)
+  if ((1) < 0 || (1) >= (((Array*)(da->item)))->length) RAISE(382)
   MR_dec_ref(s_Refman);
   s_Refman = da->item_Refman;
   MR_inc_ref(s_Refman);
   s = ((String**)((((Array*)(da->item)))->values))[1];
   dr = &dr_Var;
   dr_Refman = MR_new_ref(dr);
-  if (dr_Refman == NULL) RAISE(375)
-  if (dr == NULL || dr_Refman->value == NULL) RAISE(376)
-  if (dr->item == NULL || dr->item_Refman->value == NULL) RAISE(376)
-  if (((Data*)(dr->item))->item == NULL || ((Data*)(dr->item))->item_Refman->value == NULL) RAISE(376)
+  if (dr_Refman == NULL) RAISE(383)
+  if (dr == NULL || dr_Refman->value == NULL) RAISE(384)
+  if (dr->item == NULL || dr->item_Refman->value == NULL) RAISE(384)
+  if (((Data*)(dr->item))->item == NULL || ((Data*)(dr->item))->item_Refman->value == NULL) RAISE(384)
   MR_dec_ref(s_Refman);
   s_Refman = ((Data*)(((Data*)(dr->item))->item))->item_Refman;
   MR_inc_ref(s_Refman);
   s = ((Data*)(((Data*)(dr->item))->item))->item;
-  CHECK(377, Data_set(d, d_Refman, s, s_Refman, sarr, sarr_Refman) )
-  if (s != NULL) RAISE(378)
-  CHECK(378, Data_get(d, d_Refman, (void*)&(s), &(s_Refman)) )
+  CHECK(385, Data_set(d, d_Refman, s, s_Refman, sarr, sarr_Refman) )
+  if (s != NULL) RAISE(386)
+  CHECK(386, Data_get(d, d_Refman, (void*)&(s), &(s_Refman)) )
   dg = d;
   dg_Refman = d_Refman;
   MR_inc_ref(dg_Refman);
-  TEST_ASSERT(380, !(dg == NULL || dg_Refman->value == NULL))
+  TEST_ASSERT(388, !(dg == NULL || dg_Refman->value == NULL))
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(390)
+  at = &at_Var;
+  at_Var.values = at_Values;
+  at_Refman = MR_new_ref(at);
+  if (at_Refman == NULL) RAISE(391)
+  ts = &ts_Var;
+  ts_Refman = MR_new_ref(ts);
+  if (ts_Refman == NULL) RAISE(392)
+  CHECK(392, TestStruct_new(ts, ts_Refman, 0, NULL, NULL) )
+  if (t == NULL || t_Refman->value == NULL) RAISE(393)
+  MR_dec_ref(t->_base._base._base.item_Refman);
+  t->_base._base._base.item_Refman = s_Refman;
+  MR_inc_ref(t->_base._base._base.item_Refman);
+  t->_base._base._base.item = s;
+  if (t == NULL || t_Refman->value == NULL) RAISE(394)
+  MR_dec_ref(t->_base._base._base.arr_Refman);
+  t->_base._base._base.arr_Refman = sarr_Refman;
+  MR_inc_ref(t->_base._base._base.arr_Refman);
+  t->_base._base._base.arr = sarr;
+  if (t == NULL || t_Refman->value == NULL) RAISE(395)
+  MR_dec_ref(t->_base._base.second_Refman);
+  t->_base._base.second_Refman = at_Refman;
+  MR_inc_ref(t->_base._base.second_Refman);
+  t->_base._base.second = at;
+  if (t == NULL || t_Refman->value == NULL) RAISE(396)
+  MR_dec_ref(t->_base._base.third_Refman);
+  t->_base._base.third_Refman = ts_Refman;
+  MR_inc_ref(t->_base._base.third_Refman);
+  t->_base._base.third = ts;
 MR_cleanup:
+  MR_dec_ref(ts_Refman);
+  MR_dec_ref(at_Refman);
+  MR_dec_ref(t_Refman);
   MR_dec_ref(dg_Refman);
   MR_dec_ref(dr_Refman);
   MR_dec_ref(da_Refman);
@@ -1517,8 +1583,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(384, test_simple_function() )
-  CHECK(385, test_ref_count() )
+  CHECK(400, test_simple_function() )
+  CHECK(401, test_ref_count() )
 MR_cleanup:
   return MR_err;
 }

@@ -19,36 +19,36 @@ static char* _func_name_parse_native = "parse-native";
 #define MR_FUNC_NAME _func_name_parse_native
 Returncode parse_native(SyntaxTreeRoot* root, Char* end) {
   String* keyword = NULL;
-  Int _Int91;
-  CHECK(6, read_until(&(String){2, 1, " "}, false, &(keyword), &((*end)), &(_Int91)) )
+  Int _Int90;
+  CHECK(6, read_until(&(String){2, 1, " "}, false, &(keyword), &((*end)), &(_Int90)) )
   if ((*end) != ' ') {
     CHECK(8, SyntaxTreeNode_m_syntax_error_c(&(root->_base._base._base), &(String){43, 42, "expected space after \"native\" keyword, got"}, (*end)) )
   }
   
-  Bool _Bool92;
-  CHECK(11, String_equal(keyword, &(String){5, 4, "func"}, &(_Bool92)) )
-  if (_Bool92) {
-    NativeFunction* _NativeFunction93;
-    CHECK(12, NativeFunction_parse_new(NULL, &((*end)), &(_NativeFunction93)) )
-    CHECK(12, List_add(root->_base.functions, &(_NativeFunction93->_base)) )
+  Bool _Bool91;
+  CHECK(11, String_equal(keyword, &(String){5, 4, "func"}, &(_Bool91)) )
+  if (_Bool91) {
+    NativeFunction* _NativeFunction92;
+    CHECK(12, NativeFunction_parse_new(NULL, &((*end)), &(_NativeFunction92)) )
+    CHECK(12, List_add(root->_base.functions, &(_NativeFunction92->_base)) )
     
   }
   else {
-    Bool _Bool94;
-    CHECK(14, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool94)) )
-    if (_Bool94) {
-      NativeVariable* _NativeVariable95;
-      CHECK(15, NativeVariable_parse_new(NULL, &((*end)), &(_NativeVariable95)) )
-      CHECK(15, List_add(root->_base._base.variables, &(_NativeVariable95->_base)) )
+    Bool _Bool93;
+    CHECK(14, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool93)) )
+    if (_Bool93) {
+      NativeVariable* _NativeVariable94;
+      CHECK(15, NativeVariable_parse_new(NULL, &((*end)), &(_NativeVariable94)) )
+      CHECK(15, List_add(root->_base._base.variables, &(_NativeVariable94->_base)) )
       
     }
     else {
-      Bool _Bool96;
-      CHECK(17, String_equal(keyword, &(String){5, 4, "type"}, &(_Bool96)) )
-      if (_Bool96) {
-        NativeType* _NativeType97;
-        CHECK(18, NativeType_parse_new(NULL, &((*end)), &(_NativeType97)) )
-        CHECK(18, List_add(root->types, &(_NativeType97->_base)) )
+      Bool _Bool95;
+      CHECK(17, String_equal(keyword, &(String){5, 4, "type"}, &(_Bool95)) )
+      if (_Bool95) {
+        NativeType* _NativeType96;
+        CHECK(18, NativeType_parse_new(NULL, &((*end)), &(_NativeType96)) )
+        CHECK(18, List_add(root->types, &(_NativeType96->_base)) )
         
       }
       else {
@@ -258,7 +258,7 @@ Returncode NativeType_write(NativeType* self) {
 extern Func NativeType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func NativeType__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)SyntaxTreeNamespace_link_types, (void*)NativeType_analyze, (void*)NativeType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)NativeType_write_declaration, (void*)TypeData_write_me};
+Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_types, (void*)NativeType_analyze, (void*)NativeType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)NativeType_write_declaration, (void*)TypeData_write_me};
 #endif
 
 #undef MR_FILE_NAME

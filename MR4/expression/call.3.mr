@@ -38,9 +38,11 @@ class CallExpression(Expression)
     if not self.is-statement
       result-type.copy-new():(owner self.result-type)
     user TypeInstance instance-type
+    var Int bases
     self.function.analyze-call(user self.arguments):(
-        user instance-type, copy self.is-function-object)
-    if self.arguments.check-same-as(user declaration, user instance-type)
+        user instance-type, copy bases, copy self.is-function-object)
+    if self.arguments.check-same-as(
+        user declaration, user instance-type, copy bases)
       # add omitted output
       new CallArgument output
       output.is-output := true
@@ -103,7 +105,9 @@ class CallArgument(Argument)
       self.m-syntax-error-msg(user "non assignable call output")
   
   func dynamic check-same-type-as(
-      user TypeInstance type-instance, user TypeInstance instance-type)
+      user TypeInstance type-instance,
+      user TypeInstance instance-type,
+      copy Int bases)
     if self.access = ACCESS-OWNER and self.value.access != ACCESS-OWNER
       self.m-syntax-error(
           user "assigning into an owner a non-owner access",
@@ -116,14 +120,16 @@ class CallArgument(Argument)
           user glob.access-names[self.value.access])
     
     owner TypeInstance real-type
-    type-instance.f-new-replace-params(user instance-type):(owner real-type)
+    type-instance.f-new-replace-params(user instance-type, copy bases):(
+        owner real-type)
     if self.is-output
       self.is-down-cast := real-type.check-assign-to(
           user self.value.result-type, user self) > 0 or
-          type-instance.type-data = glob.type-subtype
+          type-instance.type-data = glob.type-generic
     else
       real-type.check-assign-from(user self):(owner self.value)
     self.is-dynamic := real-type.type-data.is-dynamic
+    delete real-type
   
   func dynamic get-output():(user Expression output)
     output := self.value

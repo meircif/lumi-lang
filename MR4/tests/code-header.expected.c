@@ -35,7 +35,7 @@ struct Tc_Dynamic {
   Tb_Dynamic _base;
 };
 struct Data {
-  Generic_Subtype* item;
+  Generic_Type* item;
   RefManager* item_Refman;
   Array* arr;
   RefManager* arr_Refman;
@@ -48,8 +48,8 @@ Returncode Tb_methb(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic)
 Returncode Tb_dyn(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic);
 Returncode Tc_methc(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic);
 Returncode Tc_dyn(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic);
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Subtype* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Subtype** item, RefManager** item_Refman);
+Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
+Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
 Ta_Dynamic Ta_dynamic = {Ta_dyn};
 Tb_Dynamic Tb_dynamic = {{(Func)Tb_dyn}};
 Tc_Dynamic Tc_dynamic = {{{(Func)Tc_dyn}}};
@@ -126,7 +126,7 @@ Returncode Tc_dyn(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic) {
 MR_cleanup:
   return MR_err;
 }
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Subtype* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
+Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(item_Refman);
   MR_inc_ref(arr_Refman);
@@ -135,7 +135,7 @@ MR_cleanup:
   MR_owner_dec_ref(item_Refman);
   return MR_err;
 }
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Subtype** item, RefManager** item_Refman) {
+Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;

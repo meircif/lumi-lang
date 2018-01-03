@@ -88,8 +88,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       variable := self
   
   func dynamic link-types()
-    # sys.print-raw(user "m-link-type var ")
-    # sys.print(user self.name)
     self.type-instance.link-types(user self)
   
   func dynamic analyze()
@@ -98,7 +96,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "only \"var\" access is supported for primitive types, got",
           user glob.access-names[self.access])
     self.type-instance.analyze-lengths(user self)
-    if self.is-create and self.type-instance.type-data = glob.type-subtype
+    if self.is-create and self.type-instance.type-data = glob.type-generic
       self.m-syntax-error(
           user "declared variable with generic subtype",
           user self.type-instance.name)
@@ -153,32 +151,32 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func dynamic write-sequence()
     if self.type-instance.type-data = glob.type-array and
-        self.type-instance.sub-types.first.item.type-data = glob.type-string
+        self.type-instance.parameters.first.item.type-data = glob.type-string
       # char `name`_Chars[`length` * `string-legth`];
       write(user "char ")
       write-cname(user self.name)
       write(user "_Chars[")
       self.type-instance.length.write()
       write(user " * ")
-      self.type-instance.sub-types.first.item.length.write()
+      self.type-instance.parameters.first.item.length.write()
       write(user "];\n")
       self.write-spaces()
     # `sub-type` `name`_Values[`length`];
     if self.type-instance.type-data = glob.type-string
       write(user "char ")
-    else-if self.type-instance.sub-types.first.item.type-data = glob.type-func
+    else-if self.type-instance.parameters.first.item.type-data = glob.type-func
       write(user "Returncode (*")
     else
-      write-cname(user self.type-instance.sub-types.first.item.type-data.name)
+      write-cname(user self.type-instance.parameters.first.item.type-data.name)
       write(user " ")
     write-cname(user self.name)
     write(user "_Values[")
     self.type-instance.length.write()
     write(user "]")
     if self.type-instance.type-data = glob.type-array and
-        self.type-instance.sub-types.first.item.type-data = glob.type-func
+        self.type-instance.parameters.first.item.type-data = glob.type-func
       write(user ")")
-      self.type-instance.sub-types.first.item.arguments.write()
+      self.type-instance.parameters.first.item.arguments.write()
     write(user ";\n")
     self.write-spaces()
   

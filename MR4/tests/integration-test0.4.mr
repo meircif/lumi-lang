@@ -1,15 +1,15 @@
-{## MR4 compiler integration main test file
+~## MR4 compiler integration main test file
 
 This file should be stand-alone.
 
 Testing multiline documentation
 confused by # or } or }# or # } ?
-#}
+#~
 
-{# Test
+~# Test
 multiline
 comment
-#}
+#~
 
 ## Test Single line documentation
 # Test Single line comment
@@ -164,9 +164,9 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
 
 func test-complex-function(
     copy Int num, user String text)->(var Int out-num, user String out-text)
-  {# Test
+  ~# Test
   multiline
-  comment #}
+  comment #~
 
   # Test Single line comment
 
@@ -181,9 +181,9 @@ struct TestStruct
   ## documentation test
   var Int num
   
-  {## Test
+  ~## Test
   multiline
-  documentation #}
+  documentation #~
   user String text
   
   # comment test
@@ -197,9 +197,9 @@ struct TestStruct
     if x < 0
       self.ts := TestStruct(copy x + 1, user s)
   
-  {# Test
+  ~# Test
   multiline
-  comment #}
+  comment #~
   
   func get()->(var Int x, user String s)
     x := self.num
@@ -360,6 +360,14 @@ struct Data{Generic}
   func get()->(user Generic item)
     item := self.item
 
+struct Dataset{First:Second:Third}(Data{First})
+  user Second second
+  user Third third
+
+struct MidData{Generic}(Dataset{String:Array{Generic}:Generic})
+
+struct TopData(MidData{TestStruct})
+
 func test-type-parameters(user String s)
   var Data{String} d
   var Array{6:String{16}} sarr
@@ -378,6 +386,14 @@ func test-type-parameters(user String s)
   d.get()->(user s)
   user Data dg(user d)
   assert dg?
+  
+  var TopData t
+  var Array{8:TestStruct} at
+  var TestStruct ts(copy 0, user _)
+  t.item := s
+  t.arr := sarr
+  t.second := at
+  t.third := ts
 
 
 main

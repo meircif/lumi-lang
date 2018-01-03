@@ -120,3 +120,7 @@ test test-native()
 
 test test-parameter-type()
   test-from-file(user "test-parameter-type")
+
+
+test test-parameter-inheritance()
+  test-from-file(user "test-parameter-inheritance")

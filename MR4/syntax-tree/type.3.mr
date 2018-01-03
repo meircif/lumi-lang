@@ -4,7 +4,7 @@
 class TypeData(SyntaxTreeNamespace)
   owner String name
   user TypeInstance base-type
-  owner List{String} sub-types
+  owner List{String} parameters
   owner NameMap{SyntaxTreeFunction} dynamic-base-methods
   user SyntaxTreeConstructor constructor
   var Bool is-primitive
@@ -22,17 +22,17 @@ class TypeData(SyntaxTreeNamespace)
     read-new(user "({"):(owner self.name, copy end)
     self.add-type()
     if end = '{'
-      new List{String} in self.sub-types
+      new List{String} in self.parameters
       do
         owner String name
         read-new(user ":}"):(owner name, copy end)
         if not f-is-legal-name(user name, copy true)
-          self.m-syntax-error(user "illegal parameter name", user name)
-        self.sub-types.add(owner name)
+          self.m-syntax-error(user "illegal type parameter name", user name)
+        self.parameters.add(owner name)
         while end = ':'
       if end != '}'
         self.m-syntax-error-c(
-            user "expected \"}\" after sub-types, got", copy end)
+            user "expected \"}\" after type parameters, got", copy end)
       read-c():(copy end)
     if end = '('
       new TypeInstance in self.base-type
@@ -79,6 +79,9 @@ class TypeData(SyntaxTreeNamespace)
   func inst m-new-type-instance():(owner TypeInstance type-instance)
     new TypeInstance in type-instance
     type-instance.type-data := self
+  
+  func dynamic get-parent-type():(user TypeData parent-type)
+    parent-type := self
   
   func inst find-field(user String name):(
       user SyntaxTreeVariable field, copy Int bases)
@@ -145,9 +148,14 @@ class TypeData(SyntaxTreeNamespace)
       child := child.next
     self.is-ordered := true
   
+  func dynamic link-types()
+    if ? self.base-type
+      self.base-type.link-types(user self)
+    base.link-types()
+  
   func dynamic analyze()
     if ? self.base-type
-      self.base-type.analyze(user self)
+      self.base-type.analyze-lengths(user self)
     if not (? self.base-type) and self.variables.m-is-empty()
       self.m-syntax-error(user "type with no fields", user self.name)
     if self.is-dynamic and

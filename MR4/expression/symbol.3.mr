@@ -33,8 +33,11 @@ class SymbolExpression(Expression)
       self.function.arguments.copy-new():(owner self.result-type.arguments)
   
   func dynamic analyze-call(user FunctionArguments arguments):(
-      user TypeInstance instance-type, copy Bool is-function-object)
+      user TypeInstance instance-type,
+      copy Int bases,
+      copy Bool is-function-object)
     is-function-object := ? self.variable
+    bases := 0
     instance-type := _
   
   func dynamic write()
@@ -97,22 +100,21 @@ class MemberExpression(SymbolExpression)
   func dynamic analyze()
     self.instance.analyze()
     self.assignable := self.instance.assignable
-    if not (? self.instance.result-type) or
-        not (? self.instance.result-type.type-data)
-      self.m-syntax-error(user "void expression has no member", user self.name)
     user TypeInstance instance-type(self.instance.result-type)
+    if not (? instance-type) or not (? instance-type.type-data)
+      self.m-syntax-error(user "void expression has no member", user self.name)
     if instance-type.type-data = glob.type-type
-      instance-type := instance-type.sub-types.first.item
+      instance-type := instance-type.parameters.first.item
     else-if instance-type.type-data = glob.type-base
-      instance-type := instance-type.sub-types.first.item.type-data.base-type
+      instance-type := instance-type.parameters.first.item.type-data.base-type
     
     instance-type.type-data.find-field(user self.name):(
         user self.variable, copy self.bases)
     if ? self.variable
       self.is-generic-cast :=
-          self.variable.type-instance.type-data = glob.type-subtype
-      self.variable.type-instance.f-new-replace-params(user instance-type):(
-          owner self.result-type)
+          self.variable.type-instance.type-data = glob.type-generic
+      self.variable.type-instance.f-new-replace-params(
+          user instance-type, copy self.bases):(owner self.result-type)
       self.access := self.variable.access
       self.assignable := true
     else
@@ -138,16 +140,19 @@ class MemberExpression(SymbolExpression)
         self.m-syntax-error(
             user "calling \"base\" with non-method", user self.name)
       owner TypeInstance base-result-type(self.instance.result-type)
-      self.instance.result-type := base-result-type.sub-types.first.item
+      self.instance.result-type := base-result-type.parameters.first.item
       delete base-result-type
   
   func dynamic analyze-call(user FunctionArguments arguments):(
-      user TypeInstance instance-type, copy Bool is-function-object)
+      user TypeInstance instance-type,
+      copy Int bases,
+      copy Bool is-function-object)
     if base.analyze-call(user arguments):(
-        user instance-type, copy is-function-object)
+        user instance-type, copy bases, copy is-function-object)
       return
+    bases := self.bases
     if self.instance.result-type.type-data = glob.type-type
-      instance-type := self.instance.result-type.sub-types.first.item
+      instance-type := self.instance.result-type.parameters.first.item
     else
       instance-type := self.instance.result-type
       new CallArgument self-param

@@ -1,7 +1,7 @@
-{## MR4 compiler integration test file #1
+~## MR4 compiler integration test file #1
 
 This file should onlw work together with test file #2.
-#}
+#~
 
 
 class TopType(MiddleType)
