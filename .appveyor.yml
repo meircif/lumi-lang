@@ -1,31 +1,29 @@
 environment:
   matrix:
     - CC: "cl"
+      PLATFORM: x86
+    - CC: "cl"
+      PLATFORM: x64
     - CC: "gcc"
     - CC: "clang"
-  
-  CCW: "%CC% --std=c89 -Wall -Werror"
 
 image: Visual Studio 2015
 
 build_script:
-  - "echo %CC%"
-  - "echo %PLATFORM%"
   - 'if [%CC%]==[gcc] set PATH=C:\MinGW\bin;%PATH%'
   - 'if [%CC%]==[cl] if [%PLATFORM%]==[x64] "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Bin\\SetEnv.cmd" /x64'
   - 'if [%CC%]==[cl] if [%PLATFORM%]==[x64] "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" x86_amd64'
-  - '"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" x86'
-  - "%CCW% -Wno-deprecated-declarations MR0/mr0-compiler.c MR0/mr0-file.c MR0/mr0-string.c -o mr0-compiler.exe"
-  - "%CCW% -Wno-deprecated-declarations MR1/mr1-compiler.c MR0/mr0-file.c MR0/mr0-string.c -IMR0 -o mr1-compiler.exe"
-  - "%CCW% -Wno-parentheses -Wno-deprecated-declarations MR2/mr2-compiler.c MR1/mr.1.c -IMR1 -o mr2-compiler.exe"
-  - "%CCW% -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition -Wno-deprecated-declarations MR3/mr3-compiler.c MR2/mr.2.c -IMR2 -o mr3-compiler.exe"
+  - 'if [%CC%]==[cl] if [%PLATFORM%]==[x86] "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" x86'
+  - "%CC% MR0/mr0-compiler.c MR0/mr0-file.c MR0/mr0-string.c -o mr0-compiler.exe"
+  - "%CC% MR1/mr1-compiler.c MR0/mr0-file.c MR0/mr0-string.c -IMR0 -o mr1-compiler.exe"
+  - "%CC% MR2/mr2-compiler.c MR1/mr.1.c -IMR1 -o mr2-compiler.exe"
+  - "%CC% MR3/mr3-compiler.c MR2/mr.2.c -IMR2 -o mr3-compiler.exe"
   - "cd MR4"
-  - "%CCW% -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition -Wno-deprecated-declarations mr4-compiler.c ../MR3/mr.3.c -I../MR3 -I. -o ../mr4-compiler.exe"
+  - "%CC% mr4-compiler.c ../MR3/mr.3.c -I../MR3 -I. -o ../mr4-compiler.exe"
   - "cd .."
-  - "%CCW% -Wno-deprecated-declarations mrb.c MR3/mr.3.c -I. -IMR3 -o mrb"
+  - "%CC% mrb.c MR3/mr.3.c -I. -IMR3 -o mrb"
 
 test_script:
-  - "dir"
   - "dir /B mr0-compiler.exe >nul"
   - "dir /B mr1-compiler.exe >nul"
   - "dir /B mr2-compiler.exe >nul"
