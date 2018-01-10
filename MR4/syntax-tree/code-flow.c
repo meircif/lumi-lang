@@ -28,7 +28,7 @@ static char* _func_name_SyntaxTreeFlowElement_init = "SyntaxTreeFlowElement.init
 Returncode SyntaxTreeFlowElement_init(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent) {
   self->block = malloc(sizeof(SyntaxTreeBlock));
   if (self->block == NULL) RAISE(8)
-  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false};
+  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false};
   self->block->_base._base._dtl = SyntaxTreeBlock__dtl;
   CHECK(9, SyntaxTreeFlowElement_set_parent(self, parent) )
   return OK;

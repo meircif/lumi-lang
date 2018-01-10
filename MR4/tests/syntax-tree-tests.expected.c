@@ -883,28 +883,28 @@ if (t == NULL || t_Refman->value == NULL) RAISE(1)
   TEST_ASSERT(1, t->num == 2)
 /// @ t1
 do {
-    MR_trace_stream = NULL;
+    ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
     if (t == NULL || t_Refman->value == NULL) RAISE(1)
     #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    MR_trace_stream = stdout;
+    --MR_trace_ignore_count;
     TEST_FAIL(1)
   } while (false);
-  MR_trace_stream = stdout;
+  --MR_trace_ignore_count;
 /// @ t2
 do {
-    MR_trace_stream = NULL;
+    ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
     CHECK(1, fun0() )
     #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    MR_trace_stream = stdout;
+    --MR_trace_ignore_count;
     TEST_FAIL(1)
   } while (false);
-  MR_trace_stream = stdout;
+  --MR_trace_ignore_count;
 /// @ t3
 Returncode fun(void);
 Returncode Mock_fun(void);
@@ -1855,4 +1855,81 @@ cannot assign "File" into "String"
 cannot assign "String" into "Generic Type"
 /// @ te3
 cannot assign "File" into "String"
+/// @@ test-error-handling
+/// @ t0
+do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+    if (t == NULL || t_Refman->value == NULL) RAISE(2)
+    t->num = 1;
+    CHECK(3, fun0() )
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  } while (false);
+  --MR_trace_ignore_count;
+  if (MR_err != OK) {
+    MR_err = OK;
+    if (t == NULL || t_Refman->value == NULL) RAISE(5)
+    i = t->num;
+    CHECK(6, fun4(2) )
+  }
+/// @ t1
+do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+    if (t == NULL || t_Refman->value == NULL) RAISE(2)
+    t->num = 1;
+    CHECK(3, fun0() )
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_err = OK;
+/// @ t2
+do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+    if (t == NULL || t_Refman->value == NULL) RAISE(2)
+    t->num = 1;
+    do {
+      ++MR_trace_ignore_count;
+      CHECK(4, fun0() )
+    } while (false);
+    --MR_trace_ignore_count;
+    if (MR_err != OK) {
+      MR_err = OK;
+      CHECK(6, fun4(2) )
+    }
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  } while (false);
+  --MR_trace_ignore_count;
+  if (MR_err != OK) {
+    MR_err = OK;
+    do {
+      ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+      if (arr == NULL || arr_Refman->value == NULL) RAISE(9)
+      if ((3) < 0 || (3) >= (arr)->length) RAISE(9)
+      i = ((Int*)((arr)->values))[3];
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    } while (false);
+    --MR_trace_ignore_count;
+    if (MR_err != OK) {
+      MR_err = OK;
+      if (t == NULL || t_Refman->value == NULL) RAISE(11)
+      i = t->num;
+    }
+  }
+/// @ te0
+expected new-line after "try", got "("
+/// @ te1
+"catch" without a previous "try"
+/// @ te2
+expected new-line after "catch", got "("
 /// @

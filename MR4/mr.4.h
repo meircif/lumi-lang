@@ -42,7 +42,7 @@ typedef void Generic_Type;
 extern char* MR_raise_format;
 extern char* MR_assert_format;
 extern char* MR_traceline_format;
-extern FILE* MR_trace_stream;
+extern int MR_trace_ignore_count;
 void MR_trace_print(
   char const* format,
   char const* filename,

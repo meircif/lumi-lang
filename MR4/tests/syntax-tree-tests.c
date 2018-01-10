@@ -326,6 +326,19 @@ Returncode test_parameter_inheritance() {
 #undef MR_FUNC_NAME
 #endif
 
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_error_handling();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_error_handling = "test-error-handling";
+#define MR_FUNC_NAME _func_name_test_error_handling
+Returncode test_error_handling() {
+  CHECK(130, test_from_file(&(String){20, 19, "test-error-handling"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES

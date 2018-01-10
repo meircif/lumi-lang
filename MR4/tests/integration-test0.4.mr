@@ -396,6 +396,19 @@ func test-type-parameters(user String s)
   t.third := ts
 
 
+func test-error-handling(user TestStruct t)
+  try
+    t.num := 1
+    try
+      f-test-void()
+    catch
+      f-test-int(copy 2)
+  catch
+    try
+      t.num := 2
+
+
 main
   test-simple-function()
   test-ref-count()
+  test-error-handling(user _)

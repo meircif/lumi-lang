@@ -139,6 +139,8 @@ Returncode f_remove(String* s, RefManager* s_Refman);
 
 Returncode test_type_parameters(String* s, RefManager* s_Refman);
 
+Returncode test_error_handling(TestStruct* t, RefManager* t_Refman);
+
 
 /* types methods body */
 
@@ -1576,6 +1578,53 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-error-handling"
+Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(t_Refman);
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+    if (t == NULL || t_Refman->value == NULL) RAISE(401)
+    t->num = 1;
+    do {
+      ++MR_trace_ignore_count;
+      CHECK(403, f_test_void() )
+    } while (false);
+    --MR_trace_ignore_count;
+    if (MR_err != OK) {
+      MR_err = OK;
+      CHECK(405, f_test_int(2) )
+    }
+
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  } while (false);
+  --MR_trace_ignore_count;
+  if (MR_err != OK) {
+    MR_err = OK;
+    do {
+      ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+      if (t == NULL || t_Refman->value == NULL) RAISE(408)
+      t->num = 2;
+
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    } while (false);
+    --MR_trace_ignore_count;
+    MR_err = OK;
+  }
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
 
 /* main function */
 
@@ -1583,8 +1632,9 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(400, test_simple_function() )
-  CHECK(401, test_ref_count() )
+  CHECK(412, test_simple_function() )
+  CHECK(413, test_ref_count() )
+  CHECK(414, test_error_handling(NULL, NULL) )
 MR_cleanup:
   return MR_err;
 }

@@ -241,6 +241,8 @@ Returncode f_remove(String* s, RefManager* s_Refman);
 
 Returncode test_type_parameters(String* s, RefManager* s_Refman);
 
+Returncode test_error_handling(TestStruct* t, RefManager* t_Refman);
+
 Returncode test_mid_out(MiddleType** mt, RefManager** mt_Refman, MiddleType_Dynamic** mt_Dynamic);
 
 Returncode TestStruct_Mock_get(TestStruct* self, RefManager* self_Refman, Int* x, String** s, RefManager** s_Refman);
@@ -2039,6 +2041,53 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-error-handling"
+Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(t_Refman);
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+    if (t == NULL || t_Refman->value == NULL) RAISE(401)
+    t->num = 1;
+    do {
+      ++MR_trace_ignore_count;
+      CHECK(403, f_test_void() )
+    } while (false);
+    --MR_trace_ignore_count;
+    if (MR_err != OK) {
+      MR_err = OK;
+      CHECK(405, f_test_int(2) )
+    }
+
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  } while (false);
+  --MR_trace_ignore_count;
+  if (MR_err != OK) {
+    MR_err = OK;
+    do {
+      ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+      if (t == NULL || t_Refman->value == NULL) RAISE(408)
+      t->num = 2;
+
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    } while (false);
+    --MR_trace_ignore_count;
+    MR_err = OK;
+  }
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "test-mid-out"
 Returncode test_mid_out(MiddleType** mt, RefManager** mt_Refman, MiddleType_Dynamic** mt_Dynamic) {
@@ -2118,17 +2167,17 @@ Returncode test_func(void) {
   CHECK(81, TestStruct_Mock_get(t, t_Refman, &(x), &(aux_String_0), &(aux_String_0_Refman)) )
   TEST_ASSERT(82, x == 12)
   do {
-    MR_trace_stream = NULL;
+    ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
     CHECK(83, Mock_f_test_int2str(3, &(aux_String_1), &(aux_String_1_Refman)) )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    MR_trace_stream = stdout;
+    --MR_trace_ignore_count;
     TEST_FAIL(83)
   } while (false);
-  MR_trace_stream = stdout;
+  --MR_trace_ignore_count;
 MR_cleanup:
   MR_owner_dec_ref(aux_String_1_Refman);
   MR_dec_ref(aux_String_0_Refman);
@@ -2177,17 +2226,17 @@ Returncode test_native(void) {
   if (s_Refman == NULL) RAISE(101)
   CHECK(101, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
   do {
-    MR_trace_stream = NULL;
+    ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
     CHECK(102, external(3, s, &(i), &(n)) )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    MR_trace_stream = stdout;
+    --MR_trace_ignore_count;
     TEST_FAIL(102)
   } while (false);
-  MR_trace_stream = stdout;
+  --MR_trace_ignore_count;
   TEST_ASSERT(103, i == 3)
   if (s == NULL || s_Refman->value == NULL) RAISE(104)
   if ((0) < 0 || (0) >= (s)->length) RAISE(104)
