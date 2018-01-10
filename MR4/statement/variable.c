@@ -1,13 +1,13 @@
 #ifndef MR_MAINFILE
-#define MR_MAINFILE "syntax-tree/variable.c"
+#define MR_MAINFILE "statement/variable.c"
 #define DEPTH 5
 #include "mr.3.h"
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file26_name = "syntax-tree/variable.3.mr";
+static char* _mr_file27_name = "statement/variable.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file26_name
+#define MR_FILE_NAME _mr_file27_name
 
 /* MR4 compiler - Syntax tree variable */
 
@@ -506,6 +506,7 @@ Func VariableInit__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Syntax
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -518,13 +519,13 @@ Func VariableInit__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Syntax
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/type.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

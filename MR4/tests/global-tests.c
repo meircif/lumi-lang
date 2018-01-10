@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file28_name = "tests/global-tests.3.mr";
+static char* _mr_file29_name = "tests/global-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file28_name
+#define MR_FILE_NAME _mr_file29_name
 
 /* MR4 compiler tests - Global */
 
@@ -854,6 +854,7 @@ Returncode test_illegal_call() {
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -866,14 +867,14 @@ Returncode test_illegal_call() {
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "tests/expression-tests.c"
 #include "tests/syntax-tree-tests.c"
 #include "mr4-compiler.c"

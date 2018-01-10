@@ -1,13 +1,13 @@
 #ifndef MR_MAINFILE
-#define MR_MAINFILE "syntax-tree/test.c"
+#define MR_MAINFILE "statement/test.c"
 #define DEPTH 5
 #include "mr.3.h"
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file23_name = "syntax-tree/test.3.mr";
+static char* _mr_file25_name = "statement/test.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file23_name
+#define MR_FILE_NAME _mr_file25_name
 
 /* MR4 compiler - Syntax tree testing nodes */
 
@@ -287,14 +287,14 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
   SyntaxTreeFunction* mocked_func = NULL;
   if (NULL != self->type_name) {
     CHECK(113, SyntaxTreeNode_find_type(&(self->_base._base._base._base), self->type_name, &(self->_base.parent_type)) )
-    Int _Int113;
-    CHECK(114, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int113)) )
+    Int _Int124;
+    CHECK(114, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(mocked_func), &(_Int124)) )
     if (!(NULL != mocked_func)) {
       CHECK(116, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base._base), &(String){23, 22, "mocking unknown method"}, self->mocked_name, &(String){8, 7, "of type"}, self->type_name) )
     }
-    TypeInstance* _TypeInstance114;
-    CHECK(121, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance114)) )
-    CHECK(121, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance114) )
+    TypeInstance* _TypeInstance125;
+    CHECK(121, TypeData_m_new_type_instance(self->_base.parent_type, &(_TypeInstance125)) )
+    CHECK(121, FunctionArguments_add_self_parameter(self->_base.arguments, _TypeInstance125) )
   }
   else {
     CHECK(124, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
@@ -302,8 +302,8 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
       CHECK(126, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
     }
   }
-  Bool _Bool115;
-  CHECK(128, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, NULL, 0, &(_Bool115)) )
+  Bool _Bool126;
+  CHECK(128, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, NULL, 0, &(_Bool126)) )
   mocked_func->mocker_function = self;
   CHECK(130, SyntaxTreeFunction_analyze(&(self->_base)) )
   return OK;
@@ -327,6 +327,7 @@ Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type,
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -339,13 +340,13 @@ Func SyntaxTreeMockFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type,
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

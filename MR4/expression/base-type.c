@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file7_name = "expression/base-type.3.mr";
+static char* _mr_file8_name = "expression/base-type.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file7_name
+#define MR_FILE_NAME _mr_file8_name
 
 /* MR4 compiler - Base and Type expressions */
 
@@ -99,11 +99,11 @@ Returncode BaseMethExpression_analyze_call(BaseMethExpression* self, FunctionArg
   *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false};
   self_param->_base._base._dtl = CallArgument__dtl;
   self_param->_base.access = ((Argument*)(self->function->arguments->parameters->first->item))->access;
-  BaseMethExpression* _BaseMethExpression12 = malloc(sizeof(BaseMethExpression));
-  if (_BaseMethExpression12 == NULL) RAISE(54)
-  *_BaseMethExpression12 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, 0};
-  _BaseMethExpression12->_base._base._dtl = BaseMethExpression__dtl;
-  self_param->value = &(_BaseMethExpression12->_base);
+  BaseMethExpression* _BaseMethExpression23 = malloc(sizeof(BaseMethExpression));
+  if (_BaseMethExpression23 == NULL) RAISE(54)
+  *_BaseMethExpression23 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, 0};
+  _BaseMethExpression23->_base._base._dtl = BaseMethExpression__dtl;
+  self_param->value = &(_BaseMethExpression23->_base);
   CHECK(55, TypeData_m_new_type_instance(self->parent_type, &(self_param->value->result_type)) )
   CHECK(56, List_prepend(arguments->parameters, &(self_param->_base)) )
   return OK;
@@ -343,6 +343,7 @@ Func TypeExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/call.c"
 #include "expression/constant.c"
 #include "expression/container.c"
@@ -354,14 +355,14 @@ Func TypeExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

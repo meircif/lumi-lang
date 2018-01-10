@@ -1,47 +1,17 @@
 #ifndef MR_MAINFILE
-#define MR_MAINFILE "mr4-compiler.c"
+#define MR_MAINFILE "statement/error.c"
 #define DEPTH 5
 #include "mr.3.h"
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file28_name = "mr4-compiler.3.mr";
+static char* _mr_file22_name = "statement/error.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file28_name
+#define MR_FILE_NAME _mr_file22_name
 
-/*  MR4 compiler main - written in MR3
+/* MR4 compiler - Syntax tree error handling nodes */
 
-A work in progres...
-
-Currently only expression parsing is fully implemented, along with some global
-functionality that supports it.
-
-Expression design is documented in expression/expression.3.mr.
-
-Global notes:
-  * Because MR3 not supports constructors or class-methods, they are replaced
-    by calling instance methods directly with `_` as the self instance.
- */
-
-/* compiler main function! */
-#if MR_STAGE == MR_DECLARATIONS
-Returncode func(Array* argv);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_func = "func";
-#define MR_FUNC_NAME _func_name_func
-Returncode func(Array* argv) {
-  CHECK(17, Global_init(glob) )
-  CHECK(18, SyntaxTreeRoot_parse(glob->root, argv) )
-  CHECK(19, (glob->root)->_base._base._base._dtl[2](glob->root) )
-  CHECK(20, (glob->root)->_base._base._base._dtl[3](glob->root) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-
-#if MR_STAGE == MR_FUNCTIONS
-MAIN_FUNC
-#endif
+/* Try statement in the syntax tree */
 
 #undef MR_FILE_NAME
 
@@ -68,12 +38,12 @@ MAIN_FUNC
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "statement/error.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
+#include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE
 #define MR_STAGE MR_TYPES(2)

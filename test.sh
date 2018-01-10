@@ -72,15 +72,17 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../MR3/mr3-compiler.c ../MR2/mr.2.c -I../MR2 -o mr3-compiler
 
 # test mr3-compiler on mr4-compiler files
-mkdir global expression syntax-tree
+mkdir global expression syntax-tree statement
 cp ../MR4/global/*.3.mr global
 cp ../MR4/expression/*.3.mr expression
 cp ../MR4/syntax-tree/*.3.mr syntax-tree
+cp ../MR4/statement/*.3.mr statement
 ./mr3-compiler global/*.3.mr expression/*.3.mr syntax-tree/*.3.mr \
-  mr4-compiler.3.mr
+  statement/*.3.mr mr4-compiler.3.mr
 diff ../MR4/global global
 diff ../MR4/expression expression
 diff ../MR4/syntax-tree syntax-tree
+diff ../MR4/statement statement
 diff ../MR4/mr4-compiler.c mr4-compiler.c
 
 
@@ -96,7 +98,7 @@ cp ../MR4/tests/*.3.mr tests
 cp ../MR4/tests/*.4.mr tests
 cp ../MR4/tests/*.expected.c tests
 ./mr3-compiler global/*.3.mr expression/*.3.mr syntax-tree/*.3.mr \
-  tests/*.3.mr mr4-compiler.3.mr
+  statement/*.3.mr tests/*.3.mr mr4-compiler.3.mr
 if [ $CC == "gcc" ]; then
   COVERAGE="-coverage -O0"
 else

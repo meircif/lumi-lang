@@ -1,13 +1,13 @@
 #ifndef MR_MAINFILE
-#define MR_MAINFILE "syntax-tree/native.c"
+#define MR_MAINFILE "statement/native.c"
 #define DEPTH 5
 #include "mr.3.h"
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file20_name = "syntax-tree/native.3.mr";
+static char* _mr_file24_name = "statement/native.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file20_name
+#define MR_FILE_NAME _mr_file24_name
 
 /* MR4 compiler - Syntax tree native nodes */
 
@@ -19,36 +19,36 @@ static char* _func_name_parse_native = "parse-native";
 #define MR_FUNC_NAME _func_name_parse_native
 Returncode parse_native(SyntaxTreeRoot* root, Char* end) {
   String* keyword = NULL;
-  Int _Int90;
-  CHECK(6, read_until(&(String){2, 1, " "}, false, &(keyword), &((*end)), &(_Int90)) )
+  Int _Int117;
+  CHECK(6, read_until(&(String){2, 1, " "}, false, &(keyword), &((*end)), &(_Int117)) )
   if ((*end) != ' ') {
     CHECK(8, SyntaxTreeNode_m_syntax_error_c(&(root->_base._base._base), &(String){43, 42, "expected space after \"native\" keyword, got"}, (*end)) )
   }
   
-  Bool _Bool91;
-  CHECK(11, String_equal(keyword, &(String){5, 4, "func"}, &(_Bool91)) )
-  if (_Bool91) {
-    NativeFunction* _NativeFunction92;
-    CHECK(12, NativeFunction_parse_new(NULL, &((*end)), &(_NativeFunction92)) )
-    CHECK(12, List_add(root->_base.functions, &(_NativeFunction92->_base)) )
+  Bool _Bool118;
+  CHECK(11, String_equal(keyword, &(String){5, 4, "func"}, &(_Bool118)) )
+  if (_Bool118) {
+    NativeFunction* _NativeFunction119;
+    CHECK(12, NativeFunction_parse_new(NULL, &((*end)), &(_NativeFunction119)) )
+    CHECK(12, List_add(root->_base.functions, &(_NativeFunction119->_base)) )
     
   }
   else {
-    Bool _Bool93;
-    CHECK(14, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool93)) )
-    if (_Bool93) {
-      NativeVariable* _NativeVariable94;
-      CHECK(15, NativeVariable_parse_new(NULL, &((*end)), &(_NativeVariable94)) )
-      CHECK(15, List_add(root->_base._base.variables, &(_NativeVariable94->_base)) )
+    Bool _Bool120;
+    CHECK(14, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool120)) )
+    if (_Bool120) {
+      NativeVariable* _NativeVariable121;
+      CHECK(15, NativeVariable_parse_new(NULL, &((*end)), &(_NativeVariable121)) )
+      CHECK(15, List_add(root->_base._base.variables, &(_NativeVariable121->_base)) )
       
     }
     else {
-      Bool _Bool95;
-      CHECK(17, String_equal(keyword, &(String){5, 4, "type"}, &(_Bool95)) )
-      if (_Bool95) {
-        NativeType* _NativeType96;
-        CHECK(18, NativeType_parse_new(NULL, &((*end)), &(_NativeType96)) )
-        CHECK(18, List_add(root->types, &(_NativeType96->_base)) )
+      Bool _Bool122;
+      CHECK(17, String_equal(keyword, &(String){5, 4, "type"}, &(_Bool122)) )
+      if (_Bool122) {
+        NativeType* _NativeType123;
+        CHECK(18, NativeType_parse_new(NULL, &((*end)), &(_NativeType123)) )
+        CHECK(18, List_add(root->types, &(_NativeType123->_base)) )
         
       }
       else {
@@ -271,6 +271,7 @@ Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -283,13 +284,13 @@ Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/test.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

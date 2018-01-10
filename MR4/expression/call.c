@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file8_name = "expression/call.3.mr";
+static char* _mr_file9_name = "expression/call.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file8_name
+#define MR_FILE_NAME _mr_file9_name
 
 /* MR4 compiler - Call expression */
 
@@ -82,9 +82,9 @@ Returncode CallExpression_analyze(CallExpression* self) {
   TypeInstance* instance_type = NULL;
   Int bases = 0;
   CHECK(42, (self->function)->_base._dtl[6](self->function, self->arguments, &(instance_type), &(bases), &(self->is_function_object)) )
-  Bool _Bool13;
-  CHECK(44, FunctionArguments_check_same_as(self->arguments, declaration, instance_type, bases, &(_Bool13)) )
-  if (_Bool13) {
+  Bool _Bool24;
+  CHECK(44, FunctionArguments_check_same_as(self->arguments, declaration, instance_type, bases, &(_Bool24)) )
+  if (_Bool24) {
     /* add omitted output */
     CallArgument* output = malloc(sizeof(CallArgument));
     if (output == NULL) RAISE(47)
@@ -93,9 +93,9 @@ Returncode CallExpression_analyze(CallExpression* self) {
     output->_base.is_output = true;
     output->_base.is_native = ((Argument*)(declaration->outputs->last->item))->is_native;
     output->_base.access = ((Argument*)(declaration->outputs->last->item))->access;
-    SymbolExpression* _SymbolExpression14;
-    CHECK(51, Expression_add_aux_variable(&(self->_base), ((Argument*)(declaration->outputs->last->item))->access, false, result_type, &(_SymbolExpression14)) )
-    output->value = &(_SymbolExpression14->_base);
+    SymbolExpression* _SymbolExpression25;
+    CHECK(51, Expression_add_aux_variable(&(self->_base), ((Argument*)(declaration->outputs->last->item))->access, false, result_type, &(_SymbolExpression25)) )
+    output->value = &(_SymbolExpression25->_base);
     self->output = output->value;
     CHECK(56, List_add(self->arguments->outputs, &(output->_base)) )
   }
@@ -233,9 +233,9 @@ Returncode CallArgument_check_same_type_as(CallArgument* self, TypeInstance* typ
   TypeInstance* real_type = NULL;
   CHECK(123, TypeInstance_f_new_replace_params(type_instance, instance_type, bases, &(real_type)) )
   if (self->_base.is_output) {
-    Int _Int15;
-    CHECK(126, TypeInstance_check_assign_to(real_type, self->value->result_type, &(self->_base._base), &(_Int15)) )
-    self->is_down_cast = _Int15 > 0 || type_instance->type_data == &(glob->type_generic->_base);
+    Int _Int26;
+    CHECK(126, TypeInstance_check_assign_to(real_type, self->value->result_type, &(self->_base._base), &(_Int26)) )
+    self->is_down_cast = _Int26 > 0 || type_instance->type_data == &(glob->type_generic->_base);
   }
   else {
     CHECK(130, TypeInstance_check_assign_from(real_type, &(self->_base._base), &(self->value)) )
@@ -361,11 +361,11 @@ Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argumen
 static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactory.m-new-argument";
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
-  CallArgument* _CallArgument16 = malloc(sizeof(CallArgument));
-  if (_CallArgument16 == NULL) RAISE(188)
-  *_CallArgument16 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false};
-  _CallArgument16->_base._base._dtl = CallArgument__dtl;
-  (*new_argument) = &(_CallArgument16->_base);
+  CallArgument* _CallArgument27 = malloc(sizeof(CallArgument));
+  if (_CallArgument27 == NULL) RAISE(188)
+  *_CallArgument27 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false};
+  _CallArgument27->_base._base._dtl = CallArgument__dtl;
+  (*new_argument) = &(_CallArgument27->_base);
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -387,6 +387,7 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/constant.c"
 #include "expression/container.c"
@@ -398,14 +399,14 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE
