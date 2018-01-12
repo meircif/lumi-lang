@@ -396,6 +396,41 @@ func test-type-parameters(user String s)
   t.third := ts
 
 
+func f-try-catch-raise(user TestStruct t)
+  try
+    t.num := 1
+  catch
+    raise
+
+func test-error-handling(user TestStruct t)
+  try
+    sys.print(user "error handling { 1 ")
+    t.num := 1
+    sys.print(user " X ")
+    try
+      f-test-void()
+    catch
+      f-test-int(copy 2)
+  catch
+    sys.print(user "2 ")
+    try
+      sys.print(user "3 ")
+      t.num := 2
+      sys.print(user " X ")
+    sys.print(user "4 ")
+  sys.print(user "5 ")
+  try
+    sys.print(user "6 ")
+    try
+      sys.print(user "7 ")
+      f-try-catch-raise(user t)
+      sys.print(user " X ")
+    sys.print(user "8 ")
+    raise
+  sys.println(user "}")
+
+
 main
   test-simple-function()
   test-ref-count()
+  test-error-handling(user _)

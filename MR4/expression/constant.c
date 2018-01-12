@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file9_name = "expression/constant.3.mr";
+static char* _mr_file10_name = "expression/constant.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file9_name
+#define MR_FILE_NAME _mr_file10_name
 
 /* MR4 compiler - Constant expressions */
 
@@ -163,9 +163,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     if ((1) < 0 || (1) >= (number)->length) RAISE(57)
     Char second = ((number)->values[1]);
     if (second >= '0' && second <= '7') {
-      Bool _Bool17;
-      CHECK(59, f_is_octal(number, &(_Bool17)) )
-      if (!_Bool17) {
+      Bool _Bool28;
+      CHECK(59, f_is_octal(number, &(_Bool28)) )
+      if (!_Bool28) {
         CHECK(60, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){21, 20, "illegal octal number"}, text) )
       }
     }
@@ -173,18 +173,18 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
       if ((2) < 0 || (number->length - 2) < 0 || (2) + (number->length - 2) > (number)->length) RAISE(62)
       number = (&(String){number->length - 2, number->length - 2, (number)->values + (2)});
       if (second == 'b' || second == 'B') {
-        Bool _Bool18;
-        CHECK(64, f_is_binary(number, &(_Bool18)) )
-        if (!_Bool18) {
+        Bool _Bool29;
+        CHECK(64, f_is_binary(number, &(_Bool29)) )
+        if (!_Bool29) {
           CHECK(65, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){22, 21, "illegal binary number"}, text) )
         }
         CHECK(66, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){36, 35, "binary numbers not supported yet..."}, text) )
       }
       else {
         if (second == 'x' || second == 'X') {
-          Bool _Bool19;
-          CHECK(69, f_is_hex(number, &(_Bool19)) )
-          if (!_Bool19) {
+          Bool _Bool30;
+          CHECK(69, f_is_hex(number, &(_Bool30)) )
+          if (!_Bool30) {
             CHECK(70, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal hexadecimal number"}, text) )
           }
         }
@@ -195,9 +195,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     }
   }
   else {
-    Bool _Bool20;
-    CHECK(73, f_is_decimal(number, &(_Bool20)) )
-    if (!_Bool20) {
+    Bool _Bool31;
+    CHECK(73, f_is_decimal(number, &(_Bool31)) )
+    if (!_Bool31) {
       CHECK(74, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){15, 14, "illegal number"}, text) )
     }
   }
@@ -262,9 +262,9 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         CHECK(97, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }
       if ((2) < 0 || (2) >= (text)->length) RAISE(98)
-      Bool _Bool21;
-      CHECK(98, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool21)) )
-      if (!_Bool21) {
+      Bool _Bool32;
+      CHECK(98, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool32)) )
+      if (!_Bool32) {
         CHECK(99, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }
     }
@@ -278,17 +278,17 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         ch = ((text)->values[2]);
         if (ch == 'x') {
           if ((3) < 0 || (2) < 0 || (3) + (2) > (text)->length) RAISE(105)
-          Bool _Bool22;
-          CHECK(105, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool22)) )
-          if (!_Bool22) {
+          Bool _Bool33;
+          CHECK(105, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool33)) )
+          if (!_Bool33) {
             CHECK(106, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
           }
         }
         else {
           if ((2) < 0 || (3) < 0 || (2) + (3) > (text)->length) RAISE(108)
-          Bool _Bool23;
-          CHECK(108, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool23)) )
-          if (!_Bool23) {
+          Bool _Bool34;
+          CHECK(108, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool34)) )
+          if (!_Bool34) {
             CHECK(109, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
           }
         }
@@ -518,6 +518,7 @@ Func EmptyExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxT
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/container.c"
@@ -529,14 +530,14 @@ Func EmptyExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxT
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

@@ -1,13 +1,13 @@
 #ifndef MR_MAINFILE
-#define MR_MAINFILE "syntax-tree/type.c"
+#define MR_MAINFILE "statement/type.c"
 #define DEPTH 5
 #include "mr.3.h"
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file24_name = "syntax-tree/type.3.mr";
+static char* _mr_file26_name = "statement/type.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file24_name
+#define MR_FILE_NAME _mr_file26_name
 
 /* MR4 compiler - Syntax tree type */
 
@@ -59,9 +59,9 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
     while (true) {
       String* name = NULL;
       CHECK(28, read_new(&(String){3, 2, ":}"}, &(name), &((*end))) )
-      Bool _Bool116;
-      CHECK(29, f_is_legal_name(name, true, &(_Bool116)) )
-      if (!_Bool116) {
+      Bool _Bool129;
+      CHECK(29, f_is_legal_name(name, true, &(_Bool129)) )
+      if (!_Bool129) {
         CHECK(30, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "illegal type parameter name"}, name) )
       }
       CHECK(31, List_add(self->parameters, name) )
@@ -95,14 +95,14 @@ Returncode TypeData_add_type(TypeData* self);
 static char* _func_name_TypeData_add_type = "TypeData.add-type";
 #define MR_FUNC_NAME _func_name_TypeData_add_type
 Returncode TypeData_add_type(TypeData* self) {
-  Bool _Bool117;
-  CHECK(49, f_is_legal_name(self->name, true, &(_Bool117)) )
-  if (!_Bool117) {
+  Bool _Bool130;
+  CHECK(49, f_is_legal_name(self->name, true, &(_Bool130)) )
+  if (!_Bool130) {
     CHECK(50, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){18, 17, "illegal type name"}, self->name) )
   }
-  TypeData* _TypeData118;
-  CHECK(51, NameMap_find(glob->type_map, self->name, (void**)&(_TypeData118)) )
-  if (NULL != _TypeData118) {
+  TypeData* _TypeData131;
+  CHECK(51, NameMap_find(glob->type_map, self->name, (void**)&(_TypeData131)) )
+  if (NULL != _TypeData131) {
     CHECK(52, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){21, 20, "redefinition of type"}, self->name) )
   }
   CHECK(53, Global_add_type(glob, self) )
@@ -116,15 +116,15 @@ Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end);
 static char* _func_name_TypeData_parse_child = "TypeData.parse-child";
 #define MR_FUNC_NAME _func_name_TypeData_parse_child
 Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end) {
-  Bool _Bool119;
-  CHECK(56, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool119)) )
-  if (_Bool119) {
+  Bool _Bool132;
+  CHECK(56, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool132)) )
+  if (_Bool132) {
     return OK;
   }
   
-  Bool _Bool120;
-  CHECK(59, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool120)) )
-  if (_Bool120) {
+  Bool _Bool133;
+  CHECK(59, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool133)) )
+  if (_Bool133) {
     if ((*end) != '(') {
       CHECK(61, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){30, 29, "expected \"(\" after \"new\", got"}, (*end)) )
     }
@@ -193,9 +193,9 @@ Returncode TypeData_find_field(TypeData* self, String* name, SyntaxTreeVariable*
     ListNode* child = type_data->_base._base.variables->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool121;
-      CHECK(95, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool121)) )
-      if (_Bool121) {
+      Bool _Bool134;
+      CHECK(95, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool134)) )
+      if (_Bool134) {
         (*field) = ((SyntaxTreeVariable*)(child->item));
         return OK;
       }
@@ -223,9 +223,9 @@ Returncode TypeData_find_meth(TypeData* self, String* name, SyntaxTreeFunction**
     ListNode* child = type_data->_base.functions->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool122;
-      CHECK(113, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool122)) )
-      if (_Bool122) {
+      Bool _Bool135;
+      CHECK(113, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool135)) )
+      if (_Bool135) {
         (*method) = ((SyntaxTreeFunction*)(child->item));
         return OK;
       }
@@ -311,9 +311,9 @@ Returncode TypeData_analyze(TypeData* self) {
   if (NULL != self->base_type) {
     CHECK(158, TypeInstance_analyze_lengths(self->base_type, &(self->_base._base._base)) )
   }
-  Bool _Bool123;
-  CHECK(159, List_m_is_empty(self->_base._base.variables, &(_Bool123)) )
-  if (!(NULL != self->base_type) && _Bool123) {
+  Bool _Bool136;
+  CHECK(159, List_m_is_empty(self->_base._base.variables, &(_Bool136)) )
+  if (!(NULL != self->base_type) && _Bool136) {
     CHECK(160, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){20, 19, "type with no fields"}, self->name) )
   }
   if (self->is_dynamic &&  ! (NULL != self->base_type && self->base_type->type_data->is_dynamic)) {
@@ -448,8 +448,8 @@ Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data) {
   while (true) {
     if (!(NULL != child)) break;
     SyntaxTreeFunction* method = NULL;
-    Int _Int124;
-    CHECK(246, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int124)) )
+    Int _Int137;
+    CHECK(246, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int137)) )
     if (not_first) {
       CHECK(248, write(&(String){3, 2, ", "}) )
     }
@@ -631,6 +631,7 @@ Func TypeMethodsBodyWriter__dtl[] = {(void*)TypeMethodsBodyWriter_write};
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -643,13 +644,13 @@ Func TypeMethodsBodyWriter__dtl[] = {(void*)TypeMethodsBodyWriter_write};
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

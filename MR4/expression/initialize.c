@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file12_name = "expression/initialize.3.mr";
+static char* _mr_file13_name = "expression/initialize.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file12_name
+#define MR_FILE_NAME _mr_file13_name
 
 /* MR4 compiler - Initialization expression */
 
@@ -70,8 +70,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
   
   if (!self->_base.result_type->type_data->is_primitive && self->symbol->variable->is_create) {
     CHECK(44, TypeInstance_check_sequence(self->_base.result_type, &(self->_base._base)) )
-    Int _Int31;
-    CHECK(45, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int31)) )
+    Int _Int42;
+    CHECK(45, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int42)) )
     if (!(NULL != self->arguments->parameters->first) &&  ! (NULL != self->arguments->outputs->first) && (!(NULL != self->constructor) || self->_base.result_type->type_data == &(glob->type_string->_base))) {
       self->constructor = NULL;
     }
@@ -85,8 +85,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
         self_param->code_node = self->_base.code_node;
         self_param->value = &(self->symbol->_base);
         CHECK(56, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-        Bool _Bool32;
-        CHECK(57, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base.result_type, 0, &(_Bool32)) )
+        Bool _Bool43;
+        CHECK(57, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base.result_type, 0, &(_Bool43)) )
       }
       else {
         CHECK(60, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "no contructor for type"}, self->_base.result_type->type_data->name) )
@@ -343,6 +343,7 @@ Func InitExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -354,14 +355,14 @@ Func InitExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

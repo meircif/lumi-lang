@@ -968,4 +968,47 @@ struct Test(Top)
   func set(user File error)
     self.item := error
 
+## @@ test-error-handling
+## @ c t0
+try
+    t.num := 1
+    fun0()
+  catch
+    i := t.num
+    fun4(copy 2)
+## @ c t1
+try
+    t.num := 1
+    fun0()
+## @ c t2
+try
+    t.num := 1
+    try
+      fun0()
+    catch
+      fun4(copy 2)
+  catch
+    try
+      i := arr[3]
+    catch
+      i := t.num
+## @ ec te0
+try()
+## @ ec te1
+catch
+## @ ec te2
+try
+  catch()
+## @ ec te3
+try
+## @ ec te4
+try
+    i := 1
+  catch
+## @ ec te5
+try
+    i := 1
+  i := 2
+  catch
+    i := 3
 ## @

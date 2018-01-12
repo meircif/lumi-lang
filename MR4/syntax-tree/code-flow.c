@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file18_name = "syntax-tree/code-flow.3.mr";
+static char* _mr_file19_name = "syntax-tree/code-flow.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file18_name
+#define MR_FILE_NAME _mr_file19_name
 
 /* MR4 compiler - Syntax tree code flow elements */
 
@@ -28,7 +28,7 @@ static char* _func_name_SyntaxTreeFlowElement_init = "SyntaxTreeFlowElement.init
 Returncode SyntaxTreeFlowElement_init(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent) {
   self->block = malloc(sizeof(SyntaxTreeBlock));
   if (self->block == NULL) RAISE(8)
-  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false};
+  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false};
   self->block->_base._base._dtl = SyntaxTreeBlock__dtl;
   CHECK(9, SyntaxTreeFlowElement_set_parent(self, parent) )
   return OK;
@@ -443,6 +443,7 @@ Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)S
 #include "global/global.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -454,14 +455,14 @@ Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)S
 #include "syntax-tree/block.c"
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

@@ -400,7 +400,7 @@ static char* _func_name_Global_add_builtin_function = "Global.add-builtin-functi
 Returncode Global_add_builtin_function(Global* self, String* name, TypeData* parent_type, SyntaxTreeNamespace* namespace, FunctionArguments** arguments) {
   BuiltinFunction* function = malloc(sizeof(BuiltinFunction));
   if (function == NULL) RAISE(335)
-  *function = (BuiltinFunction){BuiltinFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
+  *function = (BuiltinFunction){BuiltinFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   function->_base._base._base._base._dtl = BuiltinFunction__dtl;
   CHECK(336, SyntaxTreeFunction_init(&(function->_base)) )
   CHECK(337, string_new_copy(name, &(function->_base.name)) )
@@ -642,6 +642,7 @@ Func BuiltinFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*
 #include "global/file-io.c"
 #include "global/list.c"
 #include "global/map.c"
+#include "global/type-instance.c"
 #include "expression/base-type.c"
 #include "expression/call.c"
 #include "expression/constant.c"
@@ -654,14 +655,14 @@ Func BuiltinFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*
 #include "syntax-tree/branch.c"
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
-#include "syntax-tree/function.c"
-#include "syntax-tree/native.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
-#include "syntax-tree/test.c"
-#include "syntax-tree/type.c"
-#include "syntax-tree/type-instance.c"
-#include "syntax-tree/variable.c"
+#include "statement/error.c"
+#include "statement/function.c"
+#include "statement/native.c"
+#include "statement/test.c"
+#include "statement/type.c"
+#include "statement/variable.c"
 #include "mr4-compiler.c"
 #if MR_STAGE == MR_TYPES(1)
 #undef MR_STAGE

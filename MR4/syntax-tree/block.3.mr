@@ -41,6 +41,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeBlock parent
   owner List{SyntaxTreeCode} code-nodes
   user SyntaxTreeIf previous-if
+  user SyntaxTreeTry previous-try
   owner SyntaxTreeVariable ref-variable
   var Bool is-in-loop
   
@@ -51,6 +52,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node
     user SyntaxTreeIf new-if
+    user SyntaxTreeTry new-try
     
     if self.m-has-end-point()
       self.m-syntax-error-msg(user "unreachable code")
@@ -128,6 +130,26 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.get-function().variables.add(owner SyntaxTreeVariable.parse-new(
           var _, copy ACCESS-OWNER, copy true, user _, user self):(copy end))
       
+    else-if keyword.equal(user "try")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"try\", got", copy end)
+      owner SyntaxTreeTry try-node
+      SyntaxTreeTry.parse-new(var _, user self):(copy end, owner try-node)
+      new-try := try-node
+      self.code-nodes.add(owner try-node)
+      
+    else-if keyword.equal(user "catch")
+      if not (? self.previous-try)
+        self.m-syntax-error-msg(user "\"catch\" without a previous \"try\"")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"catch\", got", copy end)
+      owner SyntaxTreeCatch catch-node
+      SyntaxTreeCatch.parse-new(var _, user self):(copy end, owner catch-node)
+      self.previous-try.catch-node := catch-node
+      self.code-nodes.add(owner catch-node)
+      
     else-if keyword.equal(user "assert")
       if end != ' '
         self.m-syntax-error-c(
@@ -148,6 +170,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
           owner SyntaxTreeExpression.parse-new(var _, user self):(copy end))
     
     self.previous-if := new-if
+    self.previous-try := new-try
   
   func inst m-has-end-point():(copy Bool has-end)
     if ? self.code-nodes.last
@@ -179,11 +202,14 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     #   `block...`
     # }
     self.write-block-start()
-    self.write-children(user self.code-nodes)
+    self.write-block-body()
     self.write-block-end()
   
   func inst write-block-start()
     write(user " {\n")
+  
+  func inst write-block-body()
+    self.write-children(user self.code-nodes)
   
   func inst write-block-end()
     write-spaces(copy self.indentation-spaces - 2)

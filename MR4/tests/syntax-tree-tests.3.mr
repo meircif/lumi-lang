@@ -124,3 +124,7 @@ test test-parameter-type()
 
 test test-parameter-inheritance()
   test-from-file(user "test-parameter-inheritance")
+
+
+test test-error-handling()
+  test-from-file(user "test-error-handling")
