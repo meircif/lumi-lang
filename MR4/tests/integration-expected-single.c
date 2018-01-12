@@ -139,6 +139,8 @@ Returncode f_remove(String* s, RefManager* s_Refman);
 
 Returncode test_type_parameters(String* s, RefManager* s_Refman);
 
+Returncode f_try_catch_raise(TestStruct* t, RefManager* t_Refman);
+
 Returncode test_error_handling(TestStruct* t, RefManager* t_Refman);
 
 
@@ -1579,8 +1581,8 @@ MR_cleanup:
 #undef MR_FUNC_NAME
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
-#define MR_FUNC_NAME "test-error-handling"
-Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
+#define MR_FUNC_NAME "f-try-catch-raise"
+Returncode f_try_catch_raise(TestStruct* t, RefManager* t_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(t_Refman);
   do {
@@ -1589,14 +1591,91 @@ Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
 #define RETURN_ERROR(value) MR_err = value; break
     if (t == NULL || t_Refman->value == NULL) RAISE(401)
     t->num = 1;
+
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  } while (false);
+  --MR_trace_ignore_count;
+  if (MR_err != OK) {
+    MR_err = OK;
+    RAISE(403)
+  }
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-error-handling"
+Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  RefManager* aux_String_1_Refman = NULL;
+  String aux_String_2_Var = {0};
+  String* aux_String_2 = NULL;
+  RefManager* aux_String_2_Refman = NULL;
+  String aux_String_3_Var = {0};
+  String* aux_String_3 = NULL;
+  RefManager* aux_String_3_Refman = NULL;
+  String aux_String_4_Var = {0};
+  String* aux_String_4 = NULL;
+  RefManager* aux_String_4_Refman = NULL;
+  String aux_String_5_Var = {0};
+  String* aux_String_5 = NULL;
+  RefManager* aux_String_5_Refman = NULL;
+  String aux_String_6_Var = {0};
+  String* aux_String_6 = NULL;
+  RefManager* aux_String_6_Refman = NULL;
+  String aux_String_7_Var = {0};
+  String* aux_String_7 = NULL;
+  RefManager* aux_String_7_Refman = NULL;
+  String aux_String_8_Var = {0};
+  String* aux_String_8 = NULL;
+  RefManager* aux_String_8_Refman = NULL;
+  String aux_String_9_Var = {0};
+  String* aux_String_9 = NULL;
+  RefManager* aux_String_9_Refman = NULL;
+  String aux_String_10_Var = {0};
+  String* aux_String_10 = NULL;
+  RefManager* aux_String_10_Refman = NULL;
+  String aux_String_11_Var = {0};
+  String* aux_String_11 = NULL;
+  RefManager* aux_String_11_Refman = NULL;
+  MR_inc_ref(t_Refman);
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+    aux_String_0 = &aux_String_0_Var;
+    aux_String_0_Refman = MR_new_ref(aux_String_0);
+    if (aux_String_0_Refman == NULL) RAISE(407)
+    aux_String_0_Var.max_length = 20;
+    aux_String_0_Var.length = 19;
+    aux_String_0_Var.values = "error handling { 1 ";
+    CHECK(407, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+    if (t == NULL || t_Refman->value == NULL) RAISE(408)
+    t->num = 1;
+    aux_String_1 = &aux_String_1_Var;
+    aux_String_1_Refman = MR_new_ref(aux_String_1);
+    if (aux_String_1_Refman == NULL) RAISE(409)
+    aux_String_1_Var.max_length = 4;
+    aux_String_1_Var.length = 3;
+    aux_String_1_Var.values = " X ";
+    CHECK(409, Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
     do {
       ++MR_trace_ignore_count;
-      CHECK(403, f_test_void() )
+      CHECK(411, f_test_void() )
     } while (false);
     --MR_trace_ignore_count;
     if (MR_err != OK) {
       MR_err = OK;
-      CHECK(405, f_test_int(2) )
+      CHECK(413, f_test_int(2) )
     }
 
 #undef RETURN_ERROR
@@ -1605,20 +1684,119 @@ Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
   --MR_trace_ignore_count;
   if (MR_err != OK) {
     MR_err = OK;
+    aux_String_2 = &aux_String_2_Var;
+    aux_String_2_Refman = MR_new_ref(aux_String_2);
+    if (aux_String_2_Refman == NULL) RAISE(415)
+    aux_String_2_Var.max_length = 3;
+    aux_String_2_Var.length = 2;
+    aux_String_2_Var.values = "2 ";
+    CHECK(415, Sys_print(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
     do {
       ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
-      if (t == NULL || t_Refman->value == NULL) RAISE(408)
+      aux_String_3 = &aux_String_3_Var;
+      aux_String_3_Refman = MR_new_ref(aux_String_3);
+      if (aux_String_3_Refman == NULL) RAISE(417)
+      aux_String_3_Var.max_length = 3;
+      aux_String_3_Var.length = 2;
+      aux_String_3_Var.values = "3 ";
+      CHECK(417, Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
+      if (t == NULL || t_Refman->value == NULL) RAISE(418)
       t->num = 2;
+      aux_String_4 = &aux_String_4_Var;
+      aux_String_4_Refman = MR_new_ref(aux_String_4);
+      if (aux_String_4_Refman == NULL) RAISE(419)
+      aux_String_4_Var.max_length = 4;
+      aux_String_4_Var.length = 3;
+      aux_String_4_Var.values = " X ";
+      CHECK(419, Sys_print(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
 
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     } while (false);
     --MR_trace_ignore_count;
     MR_err = OK;
+    aux_String_5 = &aux_String_5_Var;
+    aux_String_5_Refman = MR_new_ref(aux_String_5);
+    if (aux_String_5_Refman == NULL) RAISE(420)
+    aux_String_5_Var.max_length = 3;
+    aux_String_5_Var.length = 2;
+    aux_String_5_Var.values = "4 ";
+    CHECK(420, Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
   }
+  aux_String_6 = &aux_String_6_Var;
+  aux_String_6_Refman = MR_new_ref(aux_String_6);
+  if (aux_String_6_Refman == NULL) RAISE(421)
+  aux_String_6_Var.max_length = 3;
+  aux_String_6_Var.length = 2;
+  aux_String_6_Var.values = "5 ";
+  CHECK(421, Sys_print(sys, sys_Refman, aux_String_6, aux_String_6_Refman) )
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+    aux_String_7 = &aux_String_7_Var;
+    aux_String_7_Refman = MR_new_ref(aux_String_7);
+    if (aux_String_7_Refman == NULL) RAISE(423)
+    aux_String_7_Var.max_length = 3;
+    aux_String_7_Var.length = 2;
+    aux_String_7_Var.values = "6 ";
+    CHECK(423, Sys_print(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
+    do {
+      ++MR_trace_ignore_count;
+      aux_String_8 = &aux_String_8_Var;
+      aux_String_8_Refman = MR_new_ref(aux_String_8);
+      if (aux_String_8_Refman == NULL) RAISE(425)
+      aux_String_8_Var.max_length = 3;
+      aux_String_8_Var.length = 2;
+      aux_String_8_Var.values = "7 ";
+      CHECK(425, Sys_print(sys, sys_Refman, aux_String_8, aux_String_8_Refman) )
+      CHECK(426, f_try_catch_raise(t, t_Refman) )
+      aux_String_9 = &aux_String_9_Var;
+      aux_String_9_Refman = MR_new_ref(aux_String_9);
+      if (aux_String_9_Refman == NULL) RAISE(427)
+      aux_String_9_Var.max_length = 4;
+      aux_String_9_Var.length = 3;
+      aux_String_9_Var.values = " X ";
+      CHECK(427, Sys_print(sys, sys_Refman, aux_String_9, aux_String_9_Refman) )
+    } while (false);
+    --MR_trace_ignore_count;
+    MR_err = OK;
+    aux_String_10 = &aux_String_10_Var;
+    aux_String_10_Refman = MR_new_ref(aux_String_10);
+    if (aux_String_10_Refman == NULL) RAISE(428)
+    aux_String_10_Var.max_length = 3;
+    aux_String_10_Var.length = 2;
+    aux_String_10_Var.values = "8 ";
+    CHECK(428, Sys_print(sys, sys_Refman, aux_String_10, aux_String_10_Refman) )
+    RAISE(429)
+
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_err = OK;
+  aux_String_11 = &aux_String_11_Var;
+  aux_String_11_Refman = MR_new_ref(aux_String_11);
+  if (aux_String_11_Refman == NULL) RAISE(430)
+  aux_String_11_Var.max_length = 2;
+  aux_String_11_Var.length = 1;
+  aux_String_11_Var.values = "}";
+  CHECK(430, Sys_println(sys, sys_Refman, aux_String_11, aux_String_11_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_11_Refman);
+  MR_dec_ref(aux_String_10_Refman);
+  MR_dec_ref(aux_String_9_Refman);
+  MR_dec_ref(aux_String_8_Refman);
+  MR_dec_ref(aux_String_7_Refman);
+  MR_dec_ref(aux_String_6_Refman);
+  MR_dec_ref(aux_String_5_Refman);
+  MR_dec_ref(aux_String_4_Refman);
+  MR_dec_ref(aux_String_3_Refman);
+  MR_dec_ref(aux_String_2_Refman);
+  MR_dec_ref(aux_String_1_Refman);
+  MR_dec_ref(aux_String_0_Refman);
   MR_dec_ref(t_Refman);
   return MR_err;
 }
@@ -1632,9 +1810,9 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(412, test_simple_function() )
-  CHECK(413, test_ref_count() )
-  CHECK(414, test_error_handling(NULL, NULL) )
+  CHECK(434, test_simple_function() )
+  CHECK(435, test_ref_count() )
+  CHECK(436, test_error_handling(NULL, NULL) )
 MR_cleanup:
   return MR_err;
 }

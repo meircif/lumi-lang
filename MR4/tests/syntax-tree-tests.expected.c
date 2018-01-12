@@ -1932,4 +1932,10 @@ expected new-line after "try", got "("
 "catch" without a previous "try"
 /// @ te2
 expected new-line after "catch", got "("
+/// @ te3
+"try" statement with no code
+/// @ te4
+"catch" statement with no code
+/// @ te5
+"catch" without a previous "try"
 /// @

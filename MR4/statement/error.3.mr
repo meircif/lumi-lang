@@ -12,6 +12,11 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
     new-node.set-location()
     new-node.parse-block(user parent, copy false):(copy end)
   
+  func dynamic analyze()
+    if not (? self.block.code-nodes.first)
+      self.m-syntax-error-msg(user "\"try\" statement with no code")
+    base.analyze()
+  
   func dynamic write()
     self.write-spaces()
     write(user "do {\n")
@@ -47,6 +52,11 @@ class SyntaxTreeCatch(SyntaxTreeFlowElement)
     new SyntaxTreeCatch in new-node
     new-node.set-location()
     new-node.parse-block(user parent, copy false):(copy end)
+  
+  func dynamic analyze()
+    if not (? self.block.code-nodes.first)
+      self.m-syntax-error-msg(user "\"catch\" statement with no code")
+    base.analyze()
   
   func dynamic write()
     self.write-spaces()

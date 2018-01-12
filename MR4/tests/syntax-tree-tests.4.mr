@@ -999,4 +999,16 @@ catch
 ## @ ec te2
 try
   catch()
+## @ ec te3
+try
+## @ ec te4
+try
+    i := 1
+  catch
+## @ ec te5
+try
+    i := 1
+  i := 2
+  catch
+    i := 3
 ## @
