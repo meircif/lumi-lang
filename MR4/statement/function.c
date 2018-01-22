@@ -54,17 +54,17 @@ Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, TypeData* parent_t
     self->_base._base.indentation_spaces = 2;
     if (self->parent_type->is_dynamic) {
       String* meth_type = NULL;
-      Int _Int107;
-      CHECK(26, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int107)) )
-      Bool _Bool108;
-      CHECK(27, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool108)) )
-      if (_Bool108) {
+      Int _Int112;
+      CHECK(26, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int112)) )
+      Bool _Bool113;
+      CHECK(27, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool113)) )
+      if (_Bool113) {
         self->is_dynamic = true;
       }
       else {
-        Bool _Bool109;
-        CHECK(29, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool109)) )
-        if (!_Bool109) {
+        Bool _Bool114;
+        CHECK(29, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool114)) )
+        if (!_Bool114) {
           CHECK(30, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){46, 45, "expected \"dynamic\" or \"inst\" method type, got"}, meth_type) )
         }
       }
@@ -137,9 +137,9 @@ Returncode SyntaxTreeFunction_parse_arguments(SyntaxTreeFunction* self, Bool is_
   dummy_node->parent = &(self->_base);
   CHECK(59, FunctionArguments_parse(self->arguments, &(argument_factory->_base), is_native, dummy_node, &((*end))) )
   if (NULL != self->parent_type) {
-    TypeInstance* _TypeInstance110;
-    CHECK(62, TypeData_m_new_type_instance(self->parent_type, &(_TypeInstance110)) )
-    CHECK(62, FunctionArguments_add_self_parameter(self->arguments, _TypeInstance110) )
+    TypeInstance* _TypeInstance115;
+    CHECK(62, TypeData_m_new_type_instance(self->parent_type, &(_TypeInstance115)) )
+    CHECK(62, FunctionArguments_add_self_parameter(self->arguments, _TypeInstance115) )
   }
   return OK;
 }
@@ -151,34 +151,34 @@ Returncode SyntaxTreeFunction_check_name(SyntaxTreeFunction* self);
 static char* _func_name_SyntaxTreeFunction_check_name = "SyntaxTreeFunction.check-name";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_check_name
 Returncode SyntaxTreeFunction_check_name(SyntaxTreeFunction* self) {
-  Bool _Bool111;
-  CHECK(66, f_is_legal_name(self->name, false, &(_Bool111)) )
-  if (!_Bool111) {
+  Bool _Bool116;
+  CHECK(66, f_is_legal_name(self->name, false, &(_Bool116)) )
+  if (!_Bool116) {
     CHECK(67, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){22, 21, "illegal function name"}, self->name) )
   }
   if (NULL != self->parent_type) {
     SyntaxTreeFunction* meth = NULL;
-    Int _Int112;
-    CHECK(70, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int112)) )
+    Int _Int117;
+    CHECK(70, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int117)) )
     if (NULL != meth) {
       CHECK(72, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){23, 22, "redefinition of method"}, self->name) )
     }
     SyntaxTreeVariable* field = NULL;
-    Int _Int113;
-    CHECK(74, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int113)) )
+    Int _Int118;
+    CHECK(74, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int118)) )
     if (NULL != field) {
       CHECK(76, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "method name overrides field"}, self->name) )
     }
   }
   else {
-    SyntaxTreeFunction* _SyntaxTreeFunction114;
-    CHECK(79, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction114)) )
-    if (NULL != _SyntaxTreeFunction114) {
+    SyntaxTreeFunction* _SyntaxTreeFunction119;
+    CHECK(79, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction119)) )
+    if (NULL != _SyntaxTreeFunction119) {
       CHECK(80, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){25, 24, "redefinition of function"}, self->name) )
     }
-    SyntaxTreeVariable* _SyntaxTreeVariable115;
-    CHECK(81, (glob->root)->_base._base._base._dtl[5](glob->root, self->name, &(_SyntaxTreeVariable115)) )
-    if (NULL != _SyntaxTreeVariable115) {
+    SyntaxTreeVariable* _SyntaxTreeVariable120;
+    CHECK(81, (glob->root)->_base._base._base._dtl[5](glob->root, self->name, &(_SyntaxTreeVariable120)) )
+    if (NULL != _SyntaxTreeVariable120) {
       CHECK(82, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){40, 39, "function name overrides global variable"}, self->name) )
     }
   }
@@ -378,9 +378,9 @@ Returncode SyntaxTreeFunction_write_setup(SyntaxTreeFunction* self) {
     if (!(NULL != node)) break;
     if (((Argument*)(node->item))->access == ACCESS_USER || ((Argument*)(node->item))->access == ACCESS_OWNER) {
       CHECK(184, write(&(String){14, 13, "  MR_inc_ref("}) )
-      SyntaxTreeVariable* _SyntaxTreeVariable116;
-      CHECK(185, (((Argument*)(node->item)))->_base._dtl[8](((Argument*)(node->item)), &(_SyntaxTreeVariable116)) )
-      CHECK(185, write_cname(_SyntaxTreeVariable116->name) )
+      SyntaxTreeVariable* _SyntaxTreeVariable121;
+      CHECK(185, (((Argument*)(node->item)))->_base._dtl[8](((Argument*)(node->item)), &(_SyntaxTreeVariable121)) )
+      CHECK(185, write_cname(_SyntaxTreeVariable121->name) )
       CHECK(186, write(&(String){11, 10, "_Refman);\n"}) )
     }
     node = node->next;
@@ -419,9 +419,9 @@ Returncode SyntaxTreeFunction_write_cleanup(SyntaxTreeFunction* self) {
         CHECK(209, write(&(String){7, 6, "owner_"}) )
       }
       CHECK(210, write(&(String){9, 8, "dec_ref("}) )
-      SyntaxTreeVariable* _SyntaxTreeVariable117;
-      CHECK(211, (((Argument*)(param_node->item)))->_base._dtl[8](((Argument*)(param_node->item)), &(_SyntaxTreeVariable117)) )
-      CHECK(211, write_cname(_SyntaxTreeVariable117->name) )
+      SyntaxTreeVariable* _SyntaxTreeVariable122;
+      CHECK(211, (((Argument*)(param_node->item)))->_base._dtl[8](((Argument*)(param_node->item)), &(_SyntaxTreeVariable122)) )
+      CHECK(211, write_cname(_SyntaxTreeVariable122->name) )
       CHECK(212, write(&(String){11, 10, "_Refman);\n"}) )
     }
     param_node = param_node->prev;
@@ -837,11 +837,11 @@ Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory*
 static char* _func_name_DeclarationArgumentFactory_m_new_argument = "DeclarationArgumentFactory.m-new-argument";
 #define MR_FUNC_NAME _func_name_DeclarationArgumentFactory_m_new_argument
 Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory* self, Argument** new_argument) {
-  DeclarationArgument* _DeclarationArgument118 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument118 == NULL) RAISE(395)
-  *_DeclarationArgument118 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, false, NULL};
-  _DeclarationArgument118->_base._base._dtl = DeclarationArgument__dtl;
-  (*new_argument) = &(_DeclarationArgument118->_base);
+  DeclarationArgument* _DeclarationArgument123 = malloc(sizeof(DeclarationArgument));
+  if (_DeclarationArgument123 == NULL) RAISE(395)
+  *_DeclarationArgument123 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, false, NULL};
+  _DeclarationArgument123->_base._base._dtl = DeclarationArgument__dtl;
+  (*new_argument) = &(_DeclarationArgument123->_base);
   return OK;
 }
 #undef MR_FUNC_NAME

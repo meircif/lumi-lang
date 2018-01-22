@@ -430,7 +430,48 @@ func test-error-handling(user TestStruct t)
   sys.println(user "}")
 
 
+struct Container{Generic}
+  user Generic value
+  user Container{Generic} next
+  
+  new(user Generic value, user Container{Generic} next)
+    self.value := value
+    self.next := next
+  
+  func iter()->(owner ContainerIterator{Generic} iter)
+    iter := ContainerIterator{Generic}(user self.next)
+
+struct ContainerIterator{Generic}
+  user Container{Generic} curr
+  
+  new(user Container{Generic} first)
+    self.curr := first
+  
+  func has()->(var Bool has-data)
+    has-data := self.curr?
+  
+  func get()->(user Generic item)
+    item := self.curr.value
+  
+  func next()
+    self.curr := self.curr.next
+
+func test-for-each()
+  var Container{String} container-last(user "ccc", user _)
+  var Container{String} container-mid(user "bbb", user container-last)
+  var Container{String} container-first(user "aaa", user container-mid)
+  var Container{String} container(user _, user container-first)
+  owner ContainerIterator{String} iter
+  container.iter()->(owner iter)
+  sys.print(user "values[ ")
+  for s in iter
+    sys.print(user s)
+    sys.print(user " ")
+  sys.println(user "]")
+
+
 main
   test-simple-function()
   test-ref-count()
   test-error-handling(user _)
+  test-for-each()

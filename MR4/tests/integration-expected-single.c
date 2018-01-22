@@ -17,6 +17,10 @@ typedef struct MidData MidData;
 
 typedef struct TopData TopData;
 
+typedef struct Container Container;
+
+typedef struct ContainerIterator ContainerIterator;
+
 
 /* types struct */
 
@@ -62,6 +66,18 @@ struct TopData {
   MidData _base;
 };
 
+struct Container {
+  Generic_Type* value;
+  RefManager* value_Refman;
+  Container* next;
+  RefManager* next_Refman;
+};
+
+struct ContainerIterator {
+  Container* curr;
+  RefManager* curr_Refman;
+};
+
 
 /* types methods declaration */
 
@@ -82,6 +98,18 @@ Returncode TestClass_print(TestClass* self, RefManager* self_Refman, TestClass_D
 Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
 
 Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
+
+Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type* value, RefManager* value_Refman, Container* next, RefManager* next_Refman);
+
+Returncode Container_iter(Container* self, RefManager* self_Refman, ContainerIterator** iter, RefManager** iter_Refman);
+
+Returncode ContainerIterator_new(ContainerIterator* self, RefManager* self_Refman, Container* first, RefManager* first_Refman);
+
+Returncode ContainerIterator_has(ContainerIterator* self, RefManager* self_Refman, Bool* has_data);
+
+Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
+
+Returncode ContainerIterator_next(ContainerIterator* self, RefManager* self_Refman);
 
 
 /* types global variables */
@@ -142,6 +170,8 @@ Returncode test_type_parameters(String* s, RefManager* s_Refman);
 Returncode f_try_catch_raise(TestStruct* t, RefManager* t_Refman);
 
 Returncode test_error_handling(TestStruct* t, RefManager* t_Refman);
+
+Returncode test_for_each(void);
 
 
 /* types methods body */
@@ -321,6 +351,116 @@ Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, Re
   *item_Refman = self->item_Refman;
   MR_inc_ref(*item_Refman);
   *item = self->item;
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "Container.new"
+Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type* value, RefManager* value_Refman, Container* next, RefManager* next_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(value_Refman);
+  MR_inc_ref(next_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(438)
+  MR_dec_ref(self->value_Refman);
+  self->value_Refman = value_Refman;
+  MR_inc_ref(self->value_Refman);
+  self->value = value;
+  if (self == NULL || self_Refman->value == NULL) RAISE(439)
+  MR_dec_ref(self->next_Refman);
+  self->next_Refman = next_Refman;
+  MR_inc_ref(self->next_Refman);
+  self->next = next;
+MR_cleanup:
+  MR_dec_ref(next_Refman);
+  MR_dec_ref(value_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "Container.iter"
+Returncode Container_iter(Container* self, RefManager* self_Refman, ContainerIterator** iter, RefManager** iter_Refman) {
+  Returncode MR_err = OK;
+  ContainerIterator* aux_ContainerIterator_0 = NULL;
+  RefManager* aux_ContainerIterator_0_Refman = NULL;
+  if (self == NULL || self_Refman->value == NULL) RAISE(442)
+  aux_ContainerIterator_0 = calloc(1, sizeof(ContainerIterator));
+  if (aux_ContainerIterator_0 == NULL) RAISE(442)
+  aux_ContainerIterator_0_Refman = MR_new_ref(aux_ContainerIterator_0);
+  if (aux_ContainerIterator_0_Refman == NULL) RAISE(442)
+  CHECK(442, ContainerIterator_new(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, self->next, self->next_Refman) )
+  MR_owner_dec_ref(*iter_Refman);
+  *iter_Refman = aux_ContainerIterator_0_Refman;
+  aux_ContainerIterator_0_Refman = NULL;
+  *iter = aux_ContainerIterator_0;
+  aux_ContainerIterator_0 = NULL;
+MR_cleanup:
+  MR_owner_dec_ref(aux_ContainerIterator_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "ContainerIterator.new"
+Returncode ContainerIterator_new(ContainerIterator* self, RefManager* self_Refman, Container* first, RefManager* first_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(first_Refman);
+  if (self == NULL || self_Refman->value == NULL) RAISE(448)
+  MR_dec_ref(self->curr_Refman);
+  self->curr_Refman = first_Refman;
+  MR_inc_ref(self->curr_Refman);
+  self->curr = first;
+MR_cleanup:
+  MR_dec_ref(first_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "ContainerIterator.has"
+Returncode ContainerIterator_has(ContainerIterator* self, RefManager* self_Refman, Bool* has_data) {
+  Returncode MR_err = OK;
+  if (self == NULL || self_Refman->value == NULL) RAISE(451)
+  *has_data = !(self->curr == NULL || self->curr_Refman->value == NULL);
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "ContainerIterator.get"
+Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
+  Returncode MR_err = OK;
+  if (self == NULL || self_Refman->value == NULL) RAISE(454)
+  if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(454)
+  MR_dec_ref(*item_Refman);
+  *item_Refman = self->curr->value_Refman;
+  MR_inc_ref(*item_Refman);
+  *item = self->curr->value;
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "ContainerIterator.next"
+Returncode ContainerIterator_next(ContainerIterator* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+  if (self == NULL || self_Refman->value == NULL) RAISE(457)
+  if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(457)
+  if (self == NULL || self_Refman->value == NULL) RAISE(457)
+  MR_dec_ref(self->curr_Refman);
+  self->curr_Refman = self->curr->next_Refman;
+  MR_inc_ref(self->curr_Refman);
+  self->curr = self->curr->next;
 MR_cleanup:
   return MR_err;
 }
@@ -1255,7 +1395,7 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
   if ((2) < 0 || (2) >= (arr)->length) RAISE(287)
   if (arr == NULL || arr_Refman->value == NULL) RAISE(287)
   if ((2) < 0 || (2) >= (arr)->length) RAISE(287)
-  {int n; for(n=((Int*)((arr)->values))[2]; n<2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
+  {int n; for (n = ((Int*)((arr)->values))[2]; n < 2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
     if (arr == NULL || arr_Refman->value == NULL) RAISE(288)
     if ((2) < 0 || (2) >= (arr)->length) RAISE(288)
     if (arr == NULL || arr_Refman->value == NULL) RAISE(288)
@@ -1803,6 +1943,125 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-for-each"
+Returncode test_for_each(void) {
+  Returncode MR_err = OK;
+  Container container_last_Var = {0};
+  Container* container_last = NULL;
+  RefManager* container_last_Refman = NULL;
+  Container container_mid_Var = {0};
+  Container* container_mid = NULL;
+  RefManager* container_mid_Refman = NULL;
+  Container container_first_Var = {0};
+  Container* container_first = NULL;
+  RefManager* container_first_Refman = NULL;
+  Container container_Var = {0};
+  Container* container = NULL;
+  RefManager* container_Refman = NULL;
+  ContainerIterator* iter = NULL;
+  RefManager* iter_Refman = NULL;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  RefManager* aux_String_1_Refman = NULL;
+  String aux_String_2_Var = {0};
+  String* aux_String_2 = NULL;
+  RefManager* aux_String_2_Refman = NULL;
+  String aux_String_3_Var = {0};
+  String* aux_String_3 = NULL;
+  RefManager* aux_String_3_Refman = NULL;
+  String aux_String_4_Var = {0};
+  String* aux_String_4 = NULL;
+  RefManager* aux_String_4_Refman = NULL;
+  String aux_String_5_Var = {0};
+  String* aux_String_5 = NULL;
+  RefManager* aux_String_5_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(460)
+  aux_String_0_Var.max_length = 4;
+  aux_String_0_Var.length = 3;
+  aux_String_0_Var.values = "ccc";
+  container_last = &container_last_Var;
+  container_last_Refman = MR_new_ref(container_last);
+  if (container_last_Refman == NULL) RAISE(460)
+  CHECK(460, Container_new(container_last, container_last_Refman, aux_String_0, aux_String_0_Refman, NULL, NULL) )
+  aux_String_1 = &aux_String_1_Var;
+  aux_String_1_Refman = MR_new_ref(aux_String_1);
+  if (aux_String_1_Refman == NULL) RAISE(461)
+  aux_String_1_Var.max_length = 4;
+  aux_String_1_Var.length = 3;
+  aux_String_1_Var.values = "bbb";
+  container_mid = &container_mid_Var;
+  container_mid_Refman = MR_new_ref(container_mid);
+  if (container_mid_Refman == NULL) RAISE(461)
+  CHECK(461, Container_new(container_mid, container_mid_Refman, aux_String_1, aux_String_1_Refman, container_last, container_last_Refman) )
+  aux_String_2 = &aux_String_2_Var;
+  aux_String_2_Refman = MR_new_ref(aux_String_2);
+  if (aux_String_2_Refman == NULL) RAISE(462)
+  aux_String_2_Var.max_length = 4;
+  aux_String_2_Var.length = 3;
+  aux_String_2_Var.values = "aaa";
+  container_first = &container_first_Var;
+  container_first_Refman = MR_new_ref(container_first);
+  if (container_first_Refman == NULL) RAISE(462)
+  CHECK(462, Container_new(container_first, container_first_Refman, aux_String_2, aux_String_2_Refman, container_mid, container_mid_Refman) )
+  container = &container_Var;
+  container_Refman = MR_new_ref(container);
+  if (container_Refman == NULL) RAISE(463)
+  CHECK(463, Container_new(container, container_Refman, NULL, NULL, container_first, container_first_Refman) )
+  CHECK(465, Container_iter(container, container_Refman, &(iter), &(iter_Refman)) )
+  aux_String_3 = &aux_String_3_Var;
+  aux_String_3_Refman = MR_new_ref(aux_String_3);
+  if (aux_String_3_Refman == NULL) RAISE(466)
+  aux_String_3_Var.max_length = 9;
+  aux_String_3_Var.length = 8;
+  aux_String_3_Var.values = "values[ ";
+  CHECK(466, Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
+  while (true) {
+    Bool s_Has = false;
+    String* s = NULL;
+    RefManager* s_Refman = NULL;
+    CHECK(467, ContainerIterator_has(iter, iter_Refman, &s_Has) )
+    if (!s_Has) break;
+    CHECK(467, ContainerIterator_get(iter, iter_Refman, (void*)&s, &s_Refman) )
+    CHECK(468, Sys_print(sys, sys_Refman, s, s_Refman) )
+    aux_String_4 = &aux_String_4_Var;
+    aux_String_4_Refman = MR_new_ref(aux_String_4);
+    if (aux_String_4_Refman == NULL) RAISE(469)
+    aux_String_4_Var.max_length = 2;
+    aux_String_4_Var.length = 1;
+    aux_String_4_Var.values = " ";
+    CHECK(469, Sys_print(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
+    CHECK(467, ContainerIterator_next(iter, iter_Refman) )
+  }
+  aux_String_5 = &aux_String_5_Var;
+  aux_String_5_Refman = MR_new_ref(aux_String_5);
+  if (aux_String_5_Refman == NULL) RAISE(470)
+  aux_String_5_Var.max_length = 2;
+  aux_String_5_Var.length = 1;
+  aux_String_5_Var.values = "]";
+  CHECK(470, Sys_println(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_5_Refman);
+  MR_dec_ref(aux_String_4_Refman);
+  MR_dec_ref(aux_String_3_Refman);
+  MR_dec_ref(aux_String_2_Refman);
+  MR_dec_ref(aux_String_1_Refman);
+  MR_dec_ref(aux_String_0_Refman);
+  MR_owner_dec_ref(iter_Refman);
+  MR_dec_ref(container_Refman);
+  MR_dec_ref(container_first_Refman);
+  MR_dec_ref(container_mid_Refman);
+  MR_dec_ref(container_last_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
 
 /* main function */
 
@@ -1810,9 +2069,10 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(434, test_simple_function() )
-  CHECK(435, test_ref_count() )
-  CHECK(436, test_error_handling(NULL, NULL) )
+  CHECK(474, test_simple_function() )
+  CHECK(475, test_ref_count() )
+  CHECK(476, test_error_handling(NULL, NULL) )
+  CHECK(477, test_for_each() )
 MR_cleanup:
   return MR_err;
 }

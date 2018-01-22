@@ -854,28 +854,51 @@ redefinition of variable "error"
 got void expression, expected "Bool"
 /// @@ test-for-loop
 /// @ t0
-{int n; for(n=0; n<5; ++n) {
+{int n; for (n = 0; n < 5; ++n) {
     i += n;
   }
   }
 /// @ t1
 if (t == NULL || t_Refman->value == NULL) RAISE(1)
   if (t == NULL || t_Refman->value == NULL) RAISE(1)
-  {int n; for(n=t->num; n<t->num + 2; ++n) {
+  {int n; for (n = t->num; n < t->num + 2; ++n) {
     i += n;
   }
   }
 /// @ t2
-expected space after "for", got "("
+{int ch_Index; for (ch_Index = 0; ch_Index < str->length; ++ch) {
+    Char ch = 0;
+    ch = str->values[ch_Index];
+    c = ch;
+  }}
 /// @ t3
-expected space after index name, got "new-line"
+{int n_Index; for (n_Index = 0; n_Index < arr->length; ++n) {
+    Int n = 0;
+    n = ((Int*)((arr)->values))[n_Index];
+    i += n;
+  }}
 /// @ t4
+{int s_Index; for (s_Index = 0; s_Index < sarr->length; ++s) {
+    String* s = NULL;
+    RefManager* s_Refman = NULL;
+    s = ((String**)((sarr)->values))[s_Index];
+    s_Refman = sarr_Refman;
+    MR_dec_ref(str_Refman);
+    str_Refman = s_Refman;
+    MR_inc_ref(str_Refman);
+    str = s;
+  }}
+/// @ te0
+expected space after "for", got "("
+/// @ te1
+expected space after index name, got "new-line"
+/// @ te2
 expected "in " got "err"
-/// @ t5
+/// @ te3
+cannot iterate void expression
+/// @ te4
 got "String" expression, expected "Int"
-/// @ t6
-got "String" expression, expected "Int"
-/// @ t7
+/// @ te5
 unknown symbol "error"
 /// @@ test-testing
 /// @ t0
@@ -1938,4 +1961,173 @@ expected new-line after "catch", got "("
 "catch" statement with no code
 /// @ te5
 "catch" without a previous "try"
+/// @@ test-for-each
+/// @ t0
+typedef struct TestIterator TestIterator;
+struct TestIterator {
+  Int counter;
+};
+Returncode TestIterator_new(TestIterator* self, RefManager* self_Refman, Int count);
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data);
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Int* num);
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman);
+Returncode f_mock(Int* i);
+Returncode TestIterator_new(TestIterator* self, RefManager* self_Refman, Int count) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Int* num) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode f_mock(Int* i) {
+  Returncode MR_err = OK;
+  TestIterator* aux_TestIterator_0 = NULL;
+  RefManager* aux_TestIterator_0_Refman = NULL;
+  aux_TestIterator_0 = calloc(1, sizeof(TestIterator));
+  if (aux_TestIterator_0 == NULL) RAISE(9)
+  aux_TestIterator_0_Refman = MR_new_ref(aux_TestIterator_0);
+  if (aux_TestIterator_0_Refman == NULL) RAISE(9)
+  CHECK(9, TestIterator_new(aux_TestIterator_0, aux_TestIterator_0_Refman, 6) )
+  while (true) {
+    Bool n_Has = false;
+    Int n = 0;
+    CHECK(9, TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &n_Has) )
+    if (!n_Has) break;
+    CHECK(9, TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, (void*)&n) )
+    *i = n;
+    CHECK(9, TestIterator_next(aux_TestIterator_0, aux_TestIterator_0_Refman) )
+  }
+MR_cleanup:
+  MR_owner_dec_ref(aux_TestIterator_0_Refman);
+  return MR_err;
+}
+/// @ t1
+typedef struct TestIterator TestIterator;
+struct TestIterator {
+  String* value;
+  RefManager* value_Refman;
+};
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data);
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, String** text, RefManager** text_Refman);
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman);
+Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman);
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, String** text, RefManager** text_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(iter_Refman);
+  while (true) {
+    Bool t_Has = false;
+    String* t = NULL;
+    RefManager* t_Refman = NULL;
+    CHECK(7, TestIterator_has(iter, iter_Refman, &t_Has) )
+    if (!t_Has) break;
+    CHECK(7, TestIterator_get(iter, iter_Refman, (void*)&t, &t_Refman) )
+    MR_dec_ref(*s_Refman);
+    *s_Refman = t_Refman;
+    MR_inc_ref(*s_Refman);
+    *s = t;
+    CHECK(7, TestIterator_next(iter, iter_Refman) )
+  }
+MR_cleanup:
+  MR_dec_ref(iter_Refman);
+  return MR_err;
+}
+/// @ t2
+typedef struct TestIterator TestIterator;
+struct TestIterator {
+  Generic_Type* item;
+  RefManager* item_Refman;
+};
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data);
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman);
+Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman);
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman) {
+  Returncode MR_err = OK;
+  MR_inc_ref(iter_Refman);
+  while (true) {
+    Bool t_Has = false;
+    String* t = NULL;
+    RefManager* t_Refman = NULL;
+    CHECK(7, TestIterator_has(iter, iter_Refman, &t_Has) )
+    if (!t_Has) break;
+    CHECK(7, TestIterator_get(iter, iter_Refman, (void*)&t, &t_Refman) )
+    MR_dec_ref(*s_Refman);
+    *s_Refman = t_Refman;
+    MR_inc_ref(*s_Refman);
+    *s = t;
+    CHECK(7, TestIterator_next(iter, iter_Refman) )
+  }
+MR_cleanup:
+  MR_dec_ref(iter_Refman);
+  return MR_err;
+}
+/// @ te0
+cannot iterate type with no "has" named method -  "TestIterator"
+/// @ te1
+iterator "has" method has parameters in type "TestIterator"
+/// @ te2
+iterator "has" method has no outputs in type "TestIterator"
+/// @ te3
+iterator "has" method has more than one output in type "TestIterator"
+/// @ te4
+iterator "has" method output is not "Bool" in type "TestIterator"
+/// @ te5
+cannot iterate type with no "get" named method -  "TestIterator"
+/// @ te6
+iterator "get" method has parameters in type "TestIterator"
+/// @ te7
+iterator "get" method has no outputs in type "TestIterator"
+/// @ te8
+iterator "get" method has more than one output in type "TestIterator"
+/// @ te9
+iterator "get" method output has "owner" access in type "TestIterator"
+/// @ te10
+cannot iterate type with no "next" named method -  "TestIterator"
+/// @ te11
+iterator "next" method has parameters in type "TestIterator"
+/// @ te12
+iterator "next" method has outputs in type "TestIterator"
 /// @

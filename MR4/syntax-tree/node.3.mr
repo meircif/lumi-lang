@@ -38,7 +38,7 @@ class SyntaxTreeNode
     self.print-syntax-error(user "unknown type", user name)
     raise
   
-  ## Expect `expected-text` to be read exaclty from the input file
+  ## Expect `expected-text` to be read exactly from the input file
   func inst read-expect(user String expected-text)
     new String{expected-text.length + 1} actual-text
     for n in expected-text.length
