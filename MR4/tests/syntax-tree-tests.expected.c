@@ -802,26 +802,28 @@ if (b) {
     goto MR_cleanup;
   }
   i = 3;
-/// @ t4
+/// @ te0
 got "Int" expression, expected "Bool"
-/// @ t5
+/// @ te1
 unknown symbol "error"
-/// @ t6
+/// @ te2
 unknown symbol "error"
-/// @ t7
+/// @ te3
 unknown symbol "error"
-/// @ t8
+/// @ te4
 unreachable code
-/// @ t9
+/// @ te5
 expected space after "if", got "("
-/// @ t10
+/// @ te6
 "else" without a previous "if"
-/// @ t11
+/// @ te7
 expected new-line after "else", got " "
-/// @ t12
+/// @ te8
 "else-if" without a previous "if"
-/// @ t13
+/// @ te9
 expected space after "else-if", got "("
+/// @ te10
+expected block in a new line, got "EOF"
 /// @@ test-do-loop
 /// @ t0
 Int x = 0;

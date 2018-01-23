@@ -519,39 +519,42 @@ if i > 3
 if b
     return
   i := 3
-## @ ec t4
+## @ ec te0
 if 3
-## @ ec t5
+## @ ec te1
 if b
     error
-## @ ec t6
+## @ ec te2
 if b
     i := 0
   else
     error
-## @ ec t7
+## @ ec te3
 if b
     i := 0
   else-if b
     error
-## @ ec t8
+## @ ec te4
 if b
     return
     i := 3
-## @ ec t9
+## @ ec te5
 if()
-## @ ec t10
+## @ ec te6
 else
-## @ ec t11
+## @ ec te7
 if false
     # ...
   else 
-## @ ec t12
+## @ ec te8
 else-if
-## @ ec t13
+## @ ec te9
 if false
     # ...
   else-if()
+## @ eg te10
+func error()
+  if b
 ## @@ test-do-loop
 ## @ c t0
 do

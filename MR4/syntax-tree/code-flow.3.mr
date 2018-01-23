@@ -13,6 +13,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.block.parent := parent
     self.block.indentation-spaces := parent.indentation-spaces + 2
     self.block.is-in-loop := parent.is-in-loop
+    self.block.set-location()
   
   func inst parse-block(user SyntaxTreeBlock parent, copy Bool is-loop):(
       copy Char end)
