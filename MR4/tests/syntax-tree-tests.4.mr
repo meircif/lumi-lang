@@ -359,6 +359,8 @@ var Array{12:String{7}} sa
 ## @ c t8
 new String{12} s
   so := s
+## @ c t9
+var Array{12:Tc} a
 ## @ ec te0
 var Int
 ## @ ec te1
@@ -519,39 +521,42 @@ if i > 3
 if b
     return
   i := 3
-## @ ec t4
+## @ ec te0
 if 3
-## @ ec t5
+## @ ec te1
 if b
     error
-## @ ec t6
+## @ ec te2
 if b
     i := 0
   else
     error
-## @ ec t7
+## @ ec te3
 if b
     i := 0
   else-if b
     error
-## @ ec t8
+## @ ec te4
 if b
     return
     i := 3
-## @ ec t9
+## @ ec te5
 if()
-## @ ec t10
+## @ ec te6
 else
-## @ ec t11
+## @ ec te7
 if false
     # ...
   else 
-## @ ec t12
+## @ ec te8
 else-if
-## @ ec t13
+## @ ec te9
 if false
     # ...
   else-if()
+## @ eg te10
+func error()
+  if b
 ## @@ test-do-loop
 ## @ c t0
 do
@@ -595,19 +600,42 @@ for n in 5
 ## @ c t1
 for n in t.num:t.num + 2
     i += n
-## @ ec t2
+## @ c t2
+for ch in str
+    c := ch
+## @ c t3
+for n in arr
+    i += n
+## @ c t4
+for s in sarr
+    str := s
+## @ c t5
+var Int n
+  for n in 5
+    i += n
+## @ c t6
+for n in 5
+    i += n
+  for n in 7
+    i += n
+## @ ec te0
 for(
-## @ ec t3
+## @ ec te1
 for n
-## @ ec t4
+## @ ec te2
 for n error
-## @ ec t5
-for n in str
-## @ ec t6
+## @ ec te3
+for n in fun0()
+## @ ec te4
 for n in str:8
-## @ ec t7
+## @ ec te5
 for n in 5
     error
+## @ ec te6
+for n in arr
+    i += n
+  for n in sarr
+
 ## @@ test-testing
 ## @ c t0
 assert t.num = 2
@@ -728,8 +756,6 @@ struct Test{Generic}
     owner Generic x(owner item)
     self.item := x
     self.arr := arr
-    user Generic y
-    y := arr[2]
     new Test{Generic} t
     t.item := self.item
     self.item := t.item
@@ -787,6 +813,11 @@ var Data dg
 user Data dg(user d)
 ## @ c t16
 Data{String}.set(var d, owner so, user sarr)
+## @ g t17
+struct Test{Generic}
+  user Test{Generic} next
+  func meth()
+    self.next := self
 ## @ eg teg0
 struct Test{First:Second:Third
 ## @ eg teg1
@@ -826,6 +857,25 @@ struct Test{First:Second}
 ## @ eg teg7
 struct Test{error}
   var Int x
+
+## @ eg teg8
+struct Test{Generic}
+  user Array{Generic} arr
+  func meth()
+    user Generic x
+    x := self.arr[2]
+
+## @ eg teg9
+struct Test{Generic}
+  user Array{Generic} arr
+  func meth()
+    var Array{12:Generic} arr
+
+## @ eg teg10
+struct Test{Generic}
+  user Array{Generic} arr
+  func meth()
+    self.arr := Array{12:Generic}()
 
 ## @ ec tec0
 var Data{Int} error
@@ -888,6 +938,7 @@ struct Test(Top)
     self.item := s
     Top.set(var Top(), user s)
     Test.set(var Test(), user s)
+    Mid{String}.set(var Top(), user s)
 func use(user String s)
   var Test t
   t.item := s
@@ -1011,4 +1062,148 @@ try
   i := 2
   catch
     i := 3
+
+## @@ test-for-each
+## @ g t0
+struct TestIterator
+  var Int counter
+  new(copy Int count)
+  func has()->(var Bool has-data)
+  func get()->(var Int num)
+  func next()
+func f-mock()->(var Int i)
+  for n in TestIterator(copy 6)
+    i := n
+## @ g t1
+struct TestIterator
+  user String value
+  func has()->(var Bool has-data)
+  func get()->(user String text)
+  func next()
+func f-mock(user TestIterator iter)->(user String s)
+  for t in iter
+    s := t
+## @ g t2
+struct TestIterator{Generic}
+  user Generic item
+  func has()->(var Bool has-data)
+  func get()->(user Generic item)
+  func next()
+func f-mock(user TestIterator{String} iter)->(user String s)
+  for t in iter
+    s := t
+## @ eg te0
+struct TestIterator
+  var Int num
+  func get()->(var Int num)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te1
+struct TestIterator
+  var Int num
+  func has(copy Int x)->(var Bool has-data)
+  func get()->(var Int num)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te2
+struct TestIterator
+  var Int num
+  func has()
+  func get()->(var Int num)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te3
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data, var Int x)
+  func get()->(var Int num)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te4
+struct TestIterator
+  var Int num
+  func has()->(var Int x)
+  func get()->(var Int num)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te5
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te6
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data)
+  func get(user Int x)->(var Int num)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te7
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data)
+  func get()
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te8
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data)
+  func get()->(var Int num, var Int x)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te9
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data)
+  func get()->(owner String s)
+  func next()
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te10
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data)
+  func get()->(var Int num)
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te11
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data)
+  func get()->(var Int num)
+  func next(user Int x)
+func f-mock()
+  for n in TestIterator()
+
+## @ eg te12
+struct TestIterator
+  var Int num
+  func has()->(var Bool has-data)
+  func get()->(var Int num)
+  func next()->(var Int x)
+func f-mock()
+  for n in TestIterator()
+
 ## @

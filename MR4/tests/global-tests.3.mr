@@ -17,6 +17,7 @@ var Bool tests-passed
 var Bool had-test-error
 
 mock print(user String text)
+  assert ? text
   if mock-print-active
     mock-print-text.concat(user text)
   else

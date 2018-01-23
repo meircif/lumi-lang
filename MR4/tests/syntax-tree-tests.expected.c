@@ -248,7 +248,7 @@ Returncode name(String* self, RefManager* self_Refman, Int px, String* pu, RefMa
   RefManager* u_Refman = NULL;
   String* o = NULL;
   RefManager* o_Refman = NULL;
-  char v_Values[12];
+  char v_Values[12] = {0};
   String v_Var = {12, 0, NULL};
   String* v = NULL;
   RefManager* v_Refman = NULL;
@@ -486,7 +486,7 @@ Array* a = NULL;
 Test* tt = NULL;
   RefManager* tt_Refman = NULL;
 /// @ t4
-char s_Values[12];
+char s_Values[12] = {0};
   String s_Var = {12, 0, NULL};
   String* s = NULL;
   RefManager* s_Refman = NULL;
@@ -495,7 +495,7 @@ char s_Values[12];
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(1)
 /// @ t5
-Int a_Values[12];
+Int a_Values[12] = {0};
   Array a_Var = {12, NULL};
   Array* a = NULL;
   RefManager* a_Refman = NULL;
@@ -504,7 +504,7 @@ Int a_Values[12];
   a_Refman = MR_new_ref(a);
   if (a_Refman == NULL) RAISE(1)
 /// @ t6
-Test a_Values[12];
+Test a_Values[12] = {{0}};
   Array a_Var = {12, NULL};
   Array* a = NULL;
   RefManager* a_Refman = NULL;
@@ -514,7 +514,7 @@ Test a_Values[12];
   if (a_Refman == NULL) RAISE(1)
 /// @ t7
 char sa_Chars[12 * 7];
-  String sa_Values[12];
+  String sa_Values[12] = {{0}};
   Array sa_Var = {12, NULL};
   Array* sa = NULL;
   RefManager* sa_Refman = NULL;
@@ -535,6 +535,15 @@ String* s = NULL;
   s_Refman = NULL;
   *so = s;
   s = NULL;
+/// @ t9
+Tc a_Values[12] = {{{{{0}}}}};
+  Array a_Var = {12, NULL};
+  Array* a = NULL;
+  RefManager* a_Refman = NULL;
+  a = &a_Var;
+  a_Var.values = a_Values;
+  a_Refman = MR_new_ref(a);
+  if (a_Refman == NULL) RAISE(1)
 /// @ te0
 expected space after type, got "new-line"
 /// @ te1
@@ -640,7 +649,7 @@ String* s = NULL;
   s_Refman = str_Refman;
   MR_inc_ref(s_Refman);
 /// @ t7
-char s_Values[12];
+char s_Values[12] = {0};
   String s_Var = {12, 0, NULL};
   String* s = NULL;
   RefManager* s_Refman = NULL;
@@ -802,26 +811,28 @@ if (b) {
     goto MR_cleanup;
   }
   i = 3;
-/// @ t4
+/// @ te0
 got "Int" expression, expected "Bool"
-/// @ t5
+/// @ te1
 unknown symbol "error"
-/// @ t6
+/// @ te2
 unknown symbol "error"
-/// @ t7
+/// @ te3
 unknown symbol "error"
-/// @ t8
+/// @ te4
 unreachable code
-/// @ t9
+/// @ te5
 expected space after "if", got "("
-/// @ t10
+/// @ te6
 "else" without a previous "if"
-/// @ t11
+/// @ te7
 expected new-line after "else", got " "
-/// @ t12
+/// @ te8
 "else-if" without a previous "if"
-/// @ t13
+/// @ te9
 expected space after "else-if", got "("
+/// @ te10
+expected block in a new line, got "EOF"
 /// @@ test-do-loop
 /// @ t0
 Int x = 0;
@@ -854,29 +865,104 @@ redefinition of variable "error"
 got void expression, expected "Bool"
 /// @@ test-for-loop
 /// @ t0
-{int n; for(n=0; n<5; ++n) {
+Int n = 0;
+  for (n = 0; n < 5; ++n) {
     i += n;
-  }
   }
 /// @ t1
-if (t == NULL || t_Refman->value == NULL) RAISE(1)
+Int n = 0;
   if (t == NULL || t_Refman->value == NULL) RAISE(1)
-  {int n; for(n=t->num; n<t->num + 2; ++n) {
+  for (n = t->num; n < t->num + 2; ++n) {
     i += n;
   }
-  }
 /// @ t2
-expected space after "for", got "("
+Char ch = 0;
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  MR_dec_ref(aux_String_0_Refman);
+  aux_String_0_Refman = str_Refman;
+  MR_inc_ref(aux_String_0_Refman);
+  aux_String_0 = str;
+  {int ch_Index; for (ch_Index = 0; ch_Index < aux_String_0->length; ++ch_Index) {
+    if (aux_String_0 == NULL || aux_String_0_Refman->value == NULL) RAISE(1)
+    if ((ch_Index) < 0 || (ch_Index) >= (aux_String_0)->length) RAISE(1)
+    ch = ((aux_String_0)->values)[ch_Index];
+    c = ch;
+  }}
+  MR_dec_ref(aux_String_0_Refman);
+  aux_String_0_Refman = NULL;
+  MR_inc_ref(aux_String_0_Refman);
+  aux_String_0 = NULL;
 /// @ t3
-expected space after index name, got "new-line"
+Int n = 0;
+  Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
+  MR_dec_ref(aux_Array_0_Refman);
+  aux_Array_0_Refman = arr_Refman;
+  MR_inc_ref(aux_Array_0_Refman);
+  aux_Array_0 = arr;
+  {int n_Index; for (n_Index = 0; n_Index < aux_Array_0->length; ++n_Index) {
+    if (aux_Array_0 == NULL || aux_Array_0_Refman->value == NULL) RAISE(1)
+    if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(1)
+    n = ((Int*)((aux_Array_0)->values))[n_Index];
+    i += n;
+  }}
+  MR_dec_ref(aux_Array_0_Refman);
+  aux_Array_0_Refman = NULL;
+  MR_inc_ref(aux_Array_0_Refman);
+  aux_Array_0 = NULL;
 /// @ t4
-expected "in " got "err"
+String* s = NULL;
+  RefManager* s_Refman = NULL;
+  Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
+  MR_dec_ref(aux_Array_0_Refman);
+  aux_Array_0_Refman = sarr_Refman;
+  MR_inc_ref(aux_Array_0_Refman);
+  aux_Array_0 = sarr;
+  {int s_Index; for (s_Index = 0; s_Index < aux_Array_0->length; ++s_Index) {
+    if (aux_Array_0 == NULL || aux_Array_0_Refman->value == NULL) RAISE(1)
+    if ((s_Index) < 0 || (s_Index) >= (aux_Array_0)->length) RAISE(1)
+    MR_dec_ref(s_Refman);
+    s_Refman = aux_Array_0_Refman;
+    MR_inc_ref(s_Refman);
+    s = ((String*)((aux_Array_0)->values)) + s_Index;
+    MR_dec_ref(str_Refman);
+    str_Refman = s_Refman;
+    MR_inc_ref(str_Refman);
+    str = s;
+  }}
+  MR_dec_ref(aux_Array_0_Refman);
+  aux_Array_0_Refman = NULL;
+  MR_inc_ref(aux_Array_0_Refman);
+  aux_Array_0 = NULL;
 /// @ t5
-got "String" expression, expected "Int"
+Int n = 0;
+  for (n = 0; n < 5; ++n) {
+    i += n;
+  }
 /// @ t6
+Int n = 0;
+  for (n = 0; n < 5; ++n) {
+    i += n;
+  }
+  for (n = 0; n < 7; ++n) {
+    i += n;
+  }
+/// @ te0
+expected space after "for", got "("
+/// @ te1
+expected space after index name, got "new-line"
+/// @ te2
+expected "in " got "err"
+/// @ te3
+cannot iterate void expression
+/// @ te4
 got "String" expression, expected "Int"
-/// @ t7
+/// @ te5
 unknown symbol "error"
+/// @ te6
+cannot assign "String" into "Int"
 /// @@ test-testing
 /// @ t0
 if (t == NULL || t_Refman->value == NULL) RAISE(1)
@@ -1095,8 +1181,6 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, Ref
   Returncode MR_err = OK;
   Generic_Type* x = NULL;
   RefManager* x_Refman = NULL;
-  Generic_Type* y = NULL;
-  RefManager* y_Refman = NULL;
   Test* t = NULL;
   RefManager* t_Refman = NULL;
   MR_inc_ref(item_Refman);
@@ -1116,25 +1200,19 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, Ref
   self->arr_Refman = arr_Refman;
   MR_inc_ref(self->arr_Refman);
   self->arr = arr;
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(9)
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(9)
-  MR_dec_ref(y_Refman);
-  y_Refman = arr_Refman;
-  MR_inc_ref(y_Refman);
-  y = ((Generic_Type**)((arr)->values))[2];
   t = calloc(1, sizeof(Test));
-  if (t == NULL) RAISE(10)
+  if (t == NULL) RAISE(8)
   t_Refman = MR_new_ref(t);
-  if (t_Refman == NULL) RAISE(10)
-  if (self == NULL || self_Refman->value == NULL) RAISE(11)
-  if (t == NULL || t_Refman->value == NULL) RAISE(11)
+  if (t_Refman == NULL) RAISE(8)
+  if (self == NULL || self_Refman->value == NULL) RAISE(9)
+  if (t == NULL || t_Refman->value == NULL) RAISE(9)
   MR_owner_dec_ref(t->item_Refman);
   t->item_Refman = self->item_Refman;
   self->item_Refman = NULL;
   t->item = self->item;
   self->item = NULL;
-  if (t == NULL || t_Refman->value == NULL) RAISE(12)
-  if (self == NULL || self_Refman->value == NULL) RAISE(12)
+  if (t == NULL || t_Refman->value == NULL) RAISE(10)
+  if (self == NULL || self_Refman->value == NULL) RAISE(10)
   MR_owner_dec_ref(self->item_Refman);
   self->item_Refman = t->item_Refman;
   t->item_Refman = NULL;
@@ -1142,7 +1220,6 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, Ref
   t->item = NULL;
 MR_cleanup:
   MR_owner_dec_ref(t_Refman);
-  MR_dec_ref(y_Refman);
   MR_owner_dec_ref(x_Refman);
   MR_dec_ref(arr_Refman);
   MR_owner_dec_ref(item_Refman);
@@ -1271,9 +1348,9 @@ if (d == NULL || d_Refman->value == NULL) RAISE(1)
   MR_dec_ref(str_Refman);
   str_Refman = d->arr_Refman;
   MR_inc_ref(str_Refman);
-  str = ((String**)((d->arr)->values))[4];
+  str = ((String*)((d->arr)->values)) + 4;
 /// @ t8
-Data ad_Values[5];
+Data ad_Values[5] = {{0}};
   Array ad_Var = {5, NULL};
   Array* ad = NULL;
   RefManager* ad_Refman = NULL;
@@ -1283,13 +1360,13 @@ Data ad_Values[5];
   if (ad_Refman == NULL) RAISE(1)
   if (ad == NULL || ad_Refman->value == NULL) RAISE(2)
   if ((2) < 0 || (2) >= (ad)->length) RAISE(2)
-  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(2)
+  if (((Data*)((ad)->values)) + 2 == NULL || ad_Refman->value == NULL) RAISE(2)
   MR_dec_ref(str_Refman);
-  str_Refman = (((Data**)((ad)->values))[2])->item_Refman;
+  str_Refman = (((Data*)((ad)->values)) + 2)->item_Refman;
   MR_inc_ref(str_Refman);
-  str = (((Data**)((ad)->values))[2])->item;
+  str = (((Data*)((ad)->values)) + 2)->item;
 /// @ t9
-Data ad_Values[5];
+Data ad_Values[5] = {{0}};
   Array ad_Var = {5, NULL};
   Array* ad = NULL;
   RefManager* ad_Refman = NULL;
@@ -1299,13 +1376,13 @@ Data ad_Values[5];
   if (ad_Refman == NULL) RAISE(1)
   if (ad == NULL || ad_Refman->value == NULL) RAISE(2)
   if ((2) < 0 || (2) >= (ad)->length) RAISE(2)
-  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(2)
-  if ((((Data**)((ad)->values))[2])->arr == NULL || (((Data**)((ad)->values))[2])->arr_Refman->value == NULL) RAISE(2)
-  if ((3) < 0 || (3) >= ((((Data**)((ad)->values))[2])->arr)->length) RAISE(2)
+  if (((Data*)((ad)->values)) + 2 == NULL || ad_Refman->value == NULL) RAISE(2)
+  if ((((Data*)((ad)->values)) + 2)->arr == NULL || (((Data*)((ad)->values)) + 2)->arr_Refman->value == NULL) RAISE(2)
+  if ((3) < 0 || (3) >= ((((Data*)((ad)->values)) + 2)->arr)->length) RAISE(2)
   MR_dec_ref(str_Refman);
-  str_Refman = (((Data**)((ad)->values))[2])->arr_Refman;
+  str_Refman = (((Data*)((ad)->values)) + 2)->arr_Refman;
   MR_inc_ref(str_Refman);
-  str = ((String**)(((((Data**)((ad)->values))[2])->arr)->values))[3];
+  str = ((String*)(((((Data*)((ad)->values)) + 2)->arr)->values)) + 3;
 /// @ t10
 Data da_Var = {0};
   Data* da = NULL;
@@ -1319,7 +1396,7 @@ Data da_Var = {0};
   MR_dec_ref(str_Refman);
   str_Refman = da->item_Refman;
   MR_inc_ref(str_Refman);
-  str = ((String**)((((Array*)(da->item)))->values))[1];
+  str = ((String*)((((Array*)(da->item)))->values)) + 1;
 /// @ t11
 Data dr_Var = {0};
   Data* dr = NULL;
@@ -1339,8 +1416,7 @@ CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, sarr, sarr_Refman) )
   *so = NULL;
   *so_Refman = NULL;
 /// @ t13
-if (str != NULL) RAISE(1)
-  CHECK(1, Data_get(d, d_Refman, (void*)&(str), &(str_Refman)) )
+CHECK(1, Data_get(d, d_Refman, (void*)&(str), &(str_Refman)) )
 /// @ t14
 Data dg_Var = {0};
   Data* dg = NULL;
@@ -1358,6 +1434,23 @@ Data* dg = NULL;
 CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, sarr, sarr_Refman) )
   *so = NULL;
   *so_Refman = NULL;
+/// @ t17
+typedef struct Test Test;
+struct Test {
+  Test* next;
+  RefManager* next_Refman;
+};
+Returncode Test_meth(Test* self, RefManager* self_Refman);
+Returncode Test_meth(Test* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+  if (self == NULL || self_Refman->value == NULL) RAISE(4)
+  MR_dec_ref(self->next_Refman);
+  self->next_Refman = self_Refman;
+  MR_inc_ref(self->next_Refman);
+  self->next = self;
+MR_cleanup:
+  return MR_err;
+}
 /// @ teg0
 expected "}" after type parameters, got "EOF"
 /// @ teg1
@@ -1374,6 +1467,12 @@ declared variable with generic subtype "Generic"
 cannot assign generic subtype "Second" into different generic subtype "First"
 /// @ teg7
 illegal type parameter name "error"
+/// @ teg8
+cannot slice generic array
+/// @ teg9
+cannot create generic array
+/// @ teg10
+cannot create generic array
 /// @ tec0
 unsupported primitive parameter type "Int"
 /// @ tec1
@@ -1551,6 +1650,8 @@ Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* 
   RefManager* aux_Top_0_Refman = NULL;
   Test* aux_Test_0 = NULL;
   RefManager* aux_Test_0_Refman = NULL;
+  Top* aux_Top_1 = NULL;
+  RefManager* aux_Top_1_Refman = NULL;
   MR_inc_ref(s_Refman);
   CHECK(12, Top_set(&(self->_base), self_Refman, s, s_Refman) )
   if (self == NULL || self_Refman->value == NULL) RAISE(13)
@@ -1568,7 +1669,13 @@ Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* 
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(15)
   CHECK(15, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman) )
+  aux_Top_1 = calloc(1, sizeof(Top));
+  if (aux_Top_1 == NULL) RAISE(16)
+  aux_Top_1_Refman = MR_new_ref(aux_Top_1);
+  if (aux_Top_1_Refman == NULL) RAISE(16)
+  CHECK(16, Mid_set(&(aux_Top_1->_base), aux_Top_1_Refman, s, s_Refman) )
 MR_cleanup:
+  MR_owner_dec_ref(aux_Top_1_Refman);
   MR_owner_dec_ref(aux_Test_0_Refman);
   MR_owner_dec_ref(aux_Top_0_Refman);
   MR_dec_ref(s_Refman);
@@ -1582,8 +1689,8 @@ Returncode use(String* s, RefManager* s_Refman) {
   MR_inc_ref(s_Refman);
   t = &t_Var;
   t_Refman = MR_new_ref(t);
-  if (t_Refman == NULL) RAISE(17)
-  if (t == NULL || t_Refman->value == NULL) RAISE(18)
+  if (t_Refman == NULL) RAISE(18)
+  if (t == NULL || t_Refman->value == NULL) RAISE(19)
   MR_dec_ref(t->_base._base._base.item_Refman);
   t->_base._base._base.item_Refman = s_Refman;
   MR_inc_ref(t->_base._base._base.item_Refman);
@@ -1938,4 +2045,208 @@ expected new-line after "catch", got "("
 "catch" statement with no code
 /// @ te5
 "catch" without a previous "try"
+/// @@ test-for-each
+/// @ t0
+typedef struct TestIterator TestIterator;
+struct TestIterator {
+  Int counter;
+};
+Returncode TestIterator_new(TestIterator* self, RefManager* self_Refman, Int count);
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data);
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Int* num);
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman);
+Returncode f_mock(Int* i);
+Returncode TestIterator_new(TestIterator* self, RefManager* self_Refman, Int count) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Int* num) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode f_mock(Int* i) {
+  Returncode MR_err = OK;
+  TestIterator* aux_TestIterator_0 = NULL;
+  RefManager* aux_TestIterator_0_Refman = NULL;
+  Int n = 0;
+  TestIterator* aux_TestIterator_1 = NULL;
+  RefManager* aux_TestIterator_1_Refman = NULL;
+  aux_TestIterator_0 = calloc(1, sizeof(TestIterator));
+  if (aux_TestIterator_0 == NULL) RAISE(9)
+  aux_TestIterator_0_Refman = MR_new_ref(aux_TestIterator_0);
+  if (aux_TestIterator_0_Refman == NULL) RAISE(9)
+  CHECK(9, TestIterator_new(aux_TestIterator_0, aux_TestIterator_0_Refman, 6) )
+  MR_dec_ref(aux_TestIterator_1_Refman);
+  aux_TestIterator_1_Refman = aux_TestIterator_0_Refman;
+  MR_inc_ref(aux_TestIterator_1_Refman);
+  aux_TestIterator_1 = aux_TestIterator_0;
+  while (true) {
+    Bool n_Has = false;
+    CHECK(9, TestIterator_has(aux_TestIterator_1, aux_TestIterator_1_Refman, &(n_Has)) )
+    if (!n_Has) break;
+    CHECK(9, TestIterator_get(aux_TestIterator_1, aux_TestIterator_1_Refman, &(n)) )
+    *i = n;
+    CHECK(9, TestIterator_next(aux_TestIterator_1, aux_TestIterator_1_Refman) )
+  }
+  MR_dec_ref(aux_TestIterator_1_Refman);
+  aux_TestIterator_1_Refman = NULL;
+  MR_inc_ref(aux_TestIterator_1_Refman);
+  aux_TestIterator_1 = NULL;
+MR_cleanup:
+  MR_dec_ref(aux_TestIterator_1_Refman);
+  MR_owner_dec_ref(aux_TestIterator_0_Refman);
+  return MR_err;
+}
+/// @ t1
+typedef struct TestIterator TestIterator;
+struct TestIterator {
+  String* value;
+  RefManager* value_Refman;
+};
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data);
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, String** text, RefManager** text_Refman);
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman);
+Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman);
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, String** text, RefManager** text_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman) {
+  Returncode MR_err = OK;
+  String* t = NULL;
+  RefManager* t_Refman = NULL;
+  TestIterator* aux_TestIterator_0 = NULL;
+  RefManager* aux_TestIterator_0_Refman = NULL;
+  MR_inc_ref(iter_Refman);
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = iter_Refman;
+  MR_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = iter;
+  while (true) {
+    Bool t_Has = false;
+    CHECK(7, TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &(t_Has)) )
+    if (!t_Has) break;
+    CHECK(7, TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, &(t), &(t_Refman)) )
+    MR_dec_ref(*s_Refman);
+    *s_Refman = t_Refman;
+    MR_inc_ref(*s_Refman);
+    *s = t;
+    CHECK(7, TestIterator_next(aux_TestIterator_0, aux_TestIterator_0_Refman) )
+  }
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = NULL;
+  MR_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = NULL;
+MR_cleanup:
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(iter_Refman);
+  return MR_err;
+}
+/// @ t2
+typedef struct TestIterator TestIterator;
+struct TestIterator {
+  Generic_Type* item;
+  RefManager* item_Refman;
+};
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data);
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman);
+Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman);
+Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman) {
+  Returncode MR_err = OK;
+  String* t = NULL;
+  RefManager* t_Refman = NULL;
+  TestIterator* aux_TestIterator_0 = NULL;
+  RefManager* aux_TestIterator_0_Refman = NULL;
+  MR_inc_ref(iter_Refman);
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = iter_Refman;
+  MR_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = iter;
+  while (true) {
+    Bool t_Has = false;
+    CHECK(7, TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &(t_Has)) )
+    if (!t_Has) break;
+    CHECK(7, TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, (void*)&(t), &(t_Refman)) )
+    MR_dec_ref(*s_Refman);
+    *s_Refman = t_Refman;
+    MR_inc_ref(*s_Refman);
+    *s = t;
+    CHECK(7, TestIterator_next(aux_TestIterator_0, aux_TestIterator_0_Refman) )
+  }
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = NULL;
+  MR_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = NULL;
+MR_cleanup:
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(iter_Refman);
+  return MR_err;
+}
+/// @ te0
+cannot iterate type with no "has" named method -  "TestIterator"
+/// @ te1
+iterator "has" method has parameters in type "TestIterator"
+/// @ te2
+iterator "has" method has no outputs in type "TestIterator"
+/// @ te3
+iterator "has" method has more than one output in type "TestIterator"
+/// @ te4
+iterator "has" method output is not "Bool" in type "TestIterator"
+/// @ te5
+cannot iterate type with no "get" named method -  "TestIterator"
+/// @ te6
+iterator "get" method has parameters in type "TestIterator"
+/// @ te7
+iterator "get" method has no outputs in type "TestIterator"
+/// @ te8
+iterator "get" method has more than one output in type "TestIterator"
+/// @ te9
+iterator "get" method output has "owner" access in type "TestIterator"
+/// @ te10
+cannot iterate type with no "next" named method -  "TestIterator"
+/// @ te11
+iterator "next" method has parameters in type "TestIterator"
+/// @ te12
+iterator "next" method has outputs in type "TestIterator"
 /// @

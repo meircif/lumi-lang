@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file30_name = "tests/syntax-tree-tests.3.mr";
+static char* _mr_file31_name = "tests/syntax-tree-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file30_name
+#define MR_FILE_NAME _mr_file31_name
 
 /* MR4 compiler tests - Syntax tree */
 
@@ -339,6 +339,19 @@ Returncode test_error_handling() {
 #undef MR_FUNC_NAME
 #endif
 
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_for_each();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_for_each = "test-for-each";
+#define MR_FUNC_NAME _func_name_test_for_each
+Returncode test_for_each() {
+  CHECK(134, test_from_file(&(String){14, 13, "test-for-each"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES
@@ -365,6 +378,7 @@ Returncode test_error_handling() {
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

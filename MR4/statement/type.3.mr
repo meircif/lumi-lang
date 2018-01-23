@@ -80,6 +80,20 @@ class TypeData(SyntaxTreeNamespace)
     new TypeInstance in type-instance
     type-instance.type-data := self
   
+  func inst m-self-type-instance():(owner TypeInstance type-instance)
+    self.m-new-type-instance():(owner type-instance)
+    if ? self.parameters
+      new List{TypeInstance} in type-instance.parameters
+      user ListNode{String} node(self.parameters.first)
+      do
+        while ? node
+        new TypeInstance parameter
+        parameter.type-data := glob.type-generic
+        string-new-copy(user node.item):(owner parameter.name)
+        type-instance.parameters.add(owner parameter)
+        node := node.next
+    
+  
   func dynamic get-parent-type():(user TypeData parent-type)
     parent-type := self
   

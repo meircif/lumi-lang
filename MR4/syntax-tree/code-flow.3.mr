@@ -13,6 +13,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.block.parent := parent
     self.block.indentation-spaces := parent.indentation-spaces + 2
     self.block.is-in-loop := parent.is-in-loop
+    self.block.set-location()
   
   func inst parse-block(user SyntaxTreeBlock parent, copy Bool is-loop):(
       copy Char end)
@@ -29,6 +30,9 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
   
   func inst write-block()
     self.block.write-block()
+  
+  func inst write-block-body()
+    self.block.write-block-body()
 
 
 ## If statement node in the syntax tree
@@ -111,69 +115,3 @@ class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
     self.write-spaces()
     write(user "while (true)")
     self.write-block()
-
-
-## For loop node in the syntax tree
-class SyntaxTreeForLoop(SyntaxTreeFlowElement)
-  owner String index-name
-  owner Expression start
-  owner Expression upper-bound
-  
-  func inst parse-new(user SyntaxTreeBlock parent):(
-      copy Char end, owner SyntaxTreeForLoop new-node)
-    new SyntaxTreeForLoop in new-node
-    new-node.parse(user parent):(copy end)
-  
-  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
-    self.set-location()
-    read-new(user " "):(owner self.index-name, copy end)
-    if end != ' '
-      self.m-syntax-error-c(
-          user "expected space after index name, got", copy end)
-    self.read-expect(user "in ")
-    parse-new-expression(user ":", user self):(owner self.upper-bound, copy end)
-    if end = ':'
-      self.start := self.upper-bound
-      parse-new-expression(
-          user "", user self):(owner self.upper-bound, copy end)
-    self.parse-block(user parent, copy true):(copy end)
-    new SyntaxTreeVariable in self.block.ref-variable
-    string-new-copy(user self.index-name):(owner self.block.ref-variable.name)
-    self.block.ref-variable.check-name()
-    self.block.ref-variable.access := ACCESS-VAR
-    glob.type-int.m-new-type-instance():(
-        owner self.block.ref-variable.type-instance)
-  
-  func dynamic analyze()
-    if ? self.start
-      self.analyze-expression(user self.start, user glob.type-int)
-    self.analyze-expression(user self.upper-bound, user glob.type-int)
-    base.analyze()
-  
-  func dynamic write()
-    # {int `index`; for(`index`=`start`; `index`<`upper-bound`; ++`index`) {
-    #    `block...`
-    # }}
-    self.write-spaces()
-    if ? self.start
-      self.start.write-preactions()
-    self.upper-bound.write-preactions()
-    write(user "{int ")
-    write-cname(user self.index-name)
-    write(user "; for(")
-    write-cname(user self.index-name)
-    write(user "=")
-    if ? self.start
-      self.start.write()
-    else
-      write(user "0")
-    write(user "; ")
-    write-cname(user self.index-name)
-    write(user "<")
-    self.upper-bound.write()
-    write(user "; ++")
-    write-cname(user self.index-name)
-    write(user ")")
-    self.write-block()
-    self.write-spaces()
-    write(user "}\n")

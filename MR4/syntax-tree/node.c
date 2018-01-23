@@ -22,7 +22,7 @@ struct SyntaxTreeNode {
   Func* _dtl;
   String* input_file_name;
   Int line_number;
-/* Expect `expected-text` to be read exaclty from the input file *//* Print a syntax error with message: *//* `Code error in {file-name}[{line-number}] {text} "{item}"` *//* Same as `m-syntax-error` but but with another `{text} "{item}" pair *//* Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair *//* Same as `m-syntax-error` but with a character item */};
+/* Expect `expected-text` to be read exactly from the input file *//* Print a syntax error with message: *//* `Code error in {file-name}[{line-number}] {text} "{item}"` *//* Same as `m-syntax-error` but but with another `{text} "{item}" pair *//* Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair *//* Same as `m-syntax-error` but with a character item */};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeNode_set_location(SyntaxTreeNode* self);
@@ -44,9 +44,9 @@ static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
   {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool91;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool91)) )
-    if (_Bool91) {
+    Bool _Bool90;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool90)) )
+    if (_Bool90) {
       (*access) = n;
       return OK;
     }
@@ -83,9 +83,9 @@ Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, TypeData
     ListNode* node = parent_type->parameters->first;
     while (true) {
       if (!(NULL != node)) break;
-      Bool _Bool92;
-      CHECK(34, String_equal(((String*)(node->item)), name, &(_Bool92)) )
-      if (_Bool92) {
+      Bool _Bool91;
+      CHECK(34, String_equal(((String*)(node->item)), name, &(_Bool91)) )
+      if (_Bool91) {
         (*type_data) = &(glob->type_generic->_base);
         return OK;
       }
@@ -96,7 +96,7 @@ Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, TypeData
   RAISE(39)
 }
 #undef MR_FUNC_NAME
-#endif/* Expect `expected-text` to be read exaclty from the input file */
+#endif/* Expect `expected-text` to be read exactly from the input file */
 #if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_text);
 #elif MR_STAGE == MR_FUNCTIONS
@@ -106,13 +106,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(43)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char93;
-    CHECK(45, read_c(&(_Char93)) )
-    CHECK(45, String_append(actual_text, _Char93) )
+    Char _Char92;
+    CHECK(45, read_c(&(_Char92)) )
+    CHECK(45, String_append(actual_text, _Char92) )
   }}
-  Bool _Bool94;
-  CHECK(46, String_equal(actual_text, expected_text, &(_Bool94)) )
-  if (!_Bool94) {
+  Bool _Bool93;
+  CHECK(46, String_equal(actual_text, expected_text, &(_Bool93)) )
+  if (!_Bool93) {
     CHECK(47, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);
@@ -363,7 +363,9 @@ Returncode SyntaxTreeNode_do_on_children(SyntaxTreeNode* self, List* child_list,
   ListNode* child = child_list->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(168, (action)->_dtl[0](action, child->item) )
+    glob->input_file_name = ((SyntaxTreeNode*)(child->item))->input_file_name;
+    glob->line_number = ((SyntaxTreeNode*)(child->item))->line_number;
+    CHECK(170, (action)->_dtl[0](action, child->item) )
     child = child->next;
   }
   return OK;
@@ -391,7 +393,7 @@ Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node);
 static char* _func_name_NodeAction_m_action = "NodeAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeAction_m_action
 Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node) {
-  RAISE(174)
+  RAISE(176)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -415,7 +417,7 @@ Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNod
 static char* _func_name_NodeLinkTypesAction_m_action = "NodeLinkTypesAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeLinkTypesAction_m_action
 Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNode* node) {
-  CHECK(178, (node)->_dtl[1](node) )
+  CHECK(180, (node)->_dtl[1](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -440,7 +442,7 @@ Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* n
 static char* _func_name_NodeAnalyzeAction_m_action = "NodeAnalyzeAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeAnalyzeAction_m_action
 Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* node) {
-  CHECK(182, (node)->_dtl[2](node) )
+  CHECK(184, (node)->_dtl[2](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -465,7 +467,7 @@ Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node)
 static char* _func_name_NodeWriteAction_m_action = "NodeWriteAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeWriteAction_m_action
 Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node) {
-  CHECK(186, (node)->_dtl[3](node) )
+  CHECK(188, (node)->_dtl[3](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -502,6 +504,7 @@ Func NodeWriteAction__dtl[] = {(void*)NodeWriteAction_m_action};
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

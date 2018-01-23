@@ -607,7 +607,7 @@ Array* aa = NULL;
   ta_Refman = aa_Refman;
   MR_inc_ref(ta_Refman);
   ta_Dynamic = &Ta_dynamic;
-  ta = ((Ta**)((aa)->values))[4];
+  ta = ((Ta*)((aa)->values)) + 4;
 /// @ t10
 Array* ca = NULL;
   RefManager* ca_Refman = NULL;
@@ -617,7 +617,7 @@ Array* ca = NULL;
   ta_Refman = ca_Refman;
   MR_inc_ref(ta_Refman);
   ta_Dynamic = &(&Tc_dynamic->_base._base);
-  ta = &((((Tc**)((ca)->values))[4])->_base._base);
+  ta = &((((Tc*)((ca)->values)) + 4)->_base._base);
 /// @ t11
 if (ta_Dynamic == NULL) RAISE(1)
   CHECK(1, ta_Dynamic->dyn(ta, ta_Refman, ta_Dynamic) )
@@ -661,7 +661,7 @@ if (t == NULL || t_Refman->value == NULL) RAISE(1)
   if (t->fun == NULL) RAISE(2)
   CHECK(2, t->fun() )
 /// @ t5
-Returncode (*farr_Values[38])(void);
+Returncode (*farr_Values[38])(void) = {0};
   Array farr_Var = {38, NULL};
   Array* farr = NULL;
   RefManager* farr_Refman = NULL;

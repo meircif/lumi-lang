@@ -39,6 +39,9 @@ class SliceExpression(Expression)
       if not (? self.second-index)
         self.sequence.result-type.parameters.first.item.copy-new():(
             owner self.result-type)
+      if self.sequence.result-type.parameters.first.item.type-data =
+          glob.type-generic
+        self.m-syntax-error-msg(user "cannot slice generic array")
     else
       self.m-syntax-error(
           user "cannot slice type",
@@ -141,7 +144,7 @@ class SliceExpression(Expression)
     
     # ((seq)->values)[index]
     # ((Prmitive*)((seq)->values))[index]
-    # ((Complex**)((seq)->values))[index]
+    # ((Complex*)((seq)->values)) + index
     if not self.top
       write(user "(")
     write(user "((")
@@ -151,17 +154,19 @@ class SliceExpression(Expression)
         self.result-type.arguments.write-pointer(user "*")
       else
         write-cname(user self.result-type.type-data.name)
-        if not self.result-type.type-data.is-primitive
-          write(user "*")
         write(user "*")
       write(user ")((")
     self.sequence.write()
     write(user ")->values)")
     if self.sequence.result-type.type-data != glob.type-string
       write(user ")")
-    write(user "[")
+    if self.result-type.type-data.is-primitive
+      write(user "[")
+    else
+      write(user " + ")
     self.index.write()
-    write(user "]")
+    if self.result-type.type-data.is-primitive
+      write(user "]")
     if not self.top
       write(user ")")
   

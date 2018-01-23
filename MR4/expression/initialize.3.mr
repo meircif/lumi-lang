@@ -42,6 +42,9 @@ class InitExpression(Expression)
     if not self.result-type.type-data.is-primitive and
         self.symbol.variable.is-create
       self.result-type.check-sequence(user self)
+      if self.result-type.type-data = glob.type-array and
+          self.result-type.parameters.first.item.type-data = glob.type-generic
+        self.m-syntax-error-msg(user "cannot create generic array")
       self.result-type.type-data.find-meth(user "new"):(user self.constructor)
       if not (? self.arguments.parameters.first) and
           not (? self.arguments.outputs.first) and (not (? self.constructor) or
@@ -49,6 +52,7 @@ class InitExpression(Expression)
         self.constructor := _
       else-if ? self.constructor
         new CallArgument self-param
+        self-param.set-location()
         self-param.access :=
             self.constructor.arguments.parameters.first.item.access
         self-param.code-node := self.code-node

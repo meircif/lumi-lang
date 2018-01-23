@@ -45,6 +45,7 @@ class CallExpression(Expression)
         user declaration, user instance-type, copy bases)
       # add omitted output
       new CallArgument output
+      output.set-location()
       output.is-output := true
       output.is-native := declaration.outputs.last.item.is-native
       output.access := declaration.outputs.last.item.access
@@ -91,6 +92,7 @@ class CallArgument(Argument)
   user SyntaxTreeCode code-node
   var Bool is-down-cast
   var Bool is-dynamic
+  var Bool is-generic
   
   func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
     self.code-node := code-node
@@ -124,8 +126,8 @@ class CallArgument(Argument)
         owner real-type)
     if self.is-output
       self.is-down-cast := real-type.check-assign-to(
-          user self.value.result-type, user self) > 0 or
-          type-instance.type-data = glob.type-generic
+          user self.value.result-type, user self) > 0
+      self.is-generic := type-instance.type-data = glob.type-generic
     else
       real-type.check-assign-from(user self):(owner self.value)
     self.is-dynamic := real-type.type-data.is-dynamic
@@ -147,7 +149,7 @@ class CallArgument(Argument)
   func dynamic write()
     # [&(]`value`[)][, [&(]`value`_Refman[)]][, [&(]`value`_Dynamic[)]]
     if self.is-output
-      if self.is-down-cast
+      if self.is-down-cast or self.is-generic
         write(user "(void*)")
       write(user "&(")
     self.value.write()

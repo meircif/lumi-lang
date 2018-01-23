@@ -331,28 +331,27 @@ Returncode TypeInstance_check_assign_to(TypeInstance* self, TypeInstance* target
       CHECK(176, SyntaxTreeNode_m_syntax_error2(node, &(String){30, 29, "cannot assign generic subtype"}, self->name, &(String){31, 30, "into different generic subtype"}, target->name) )
     }
   }
-  TypeData* base_type = self->type_data;
+  TypeInstance* self_type_instance = self;
   while (true) {
     Bool _Bool20;
-    CHECK(183, TypeData_m_is_same(target->type_data, base_type, &(_Bool20)) )
+    CHECK(183, TypeData_m_is_same(target->type_data, self_type_instance->type_data, &(_Bool20)) )
     if (!(!_Bool20)) break;
-    if (!(NULL != base_type->base_type)) {
+    if (!(NULL != self_type_instance->type_data->base_type)) {
       CHECK(185, SyntaxTreeNode_m_syntax_error2(node, &(String){14, 13, "cannot assign"}, self->type_data->name, &(String){5, 4, "into"}, target->type_data->name) )
     }
-    if (!(NULL != base_type->base_type)) break;
-    base_type = base_type->base_type->type_data;
+    self_type_instance = self_type_instance->type_data->base_type;
     (*bases) += 1;
   }
   
   if (NULL != self->arguments) {
     Bool _Bool21;
-    CHECK(195, FunctionArguments_check_same_as(self->arguments, target->arguments, NULL, 0, &(_Bool21)) )
+    CHECK(194, FunctionArguments_check_same_as(self->arguments, target->arguments, NULL, 0, &(_Bool21)) )
     if (_Bool21) {
       CHECK(196, SyntaxTreeNode_m_syntax_error_msg(node, &(String){16, 15, "too few outputs"}) )
     }
   }
   
-  CHECK(198, TypeInstance_check_sub_equal(self, target, node) )
+  CHECK(198, TypeInstance_check_sub_equal(self_type_instance, target, node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -498,6 +497,7 @@ Returncode TypeInstance_f_replace_type_parameters(TypeInstance* self, TypeInstan
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

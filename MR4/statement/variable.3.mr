@@ -106,6 +106,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "non-primitives cannot be declared \"var\" here yet...")
     if self.access = ACCESS-VAR
       self.type-instance.check-sequence(user self)
+    if self.is-create and self.type-instance.type-data = glob.type-array and
+        self.type-instance.parameters.first.item.type-data = glob.type-generic
+      self.m-syntax-error-msg(user "cannot create generic array")
   
   func dynamic write()
     if ? self.parent or ? self.parent-type
@@ -152,7 +155,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func dynamic write-sequence()
     if self.type-instance.type-data = glob.type-array and
         self.type-instance.parameters.first.item.type-data = glob.type-string
-      # char `name`_Chars[`length` * `string-legth`];
+      # char `name`_Chars[`length` * `string-legth`] = {0};
       write(user "char ")
       write-cname(user self.name)
       write(user "_Chars[")
@@ -177,6 +180,20 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.type-instance.parameters.first.item.type-data = glob.type-func
       write(user ")")
       self.type-instance.parameters.first.item.arguments.write()
+    write(user " = ")
+    var Int bases
+    if self.type-instance.type-data = glob.type-array and
+        not self.type-instance.parameters.first.item.type-data.is-primitive
+      user TypeData type-data(self.type-instance.parameters.first.item.type-data)
+      bases := 1
+      do
+        write(user "{")
+        while ? type-data.base-type
+        type-data := type-data.base-type.type-data
+        bases += 1
+    write(user "{0}")
+    for n in bases
+      write(user "}")
     write(user ";\n")
     self.write-spaces()
   

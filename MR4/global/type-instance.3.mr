@@ -178,24 +178,24 @@ static TypeInstance
             user self.name,
             user "into different generic subtype",
             user target.name)
-    user TypeData base-type(self.type-data)
+    user TypeInstance self-type-instance(self)
     do
-      while not target.type-data.m-is-same(user base-type)
-      if not (? base-type.base-type)
+      while not target.type-data.m-is-same(user self-type-instance.type-data)
+      if not (? self-type-instance.type-data.base-type)
         node.m-syntax-error2(
             user "cannot assign",
             user self.type-data.name,
             user "into",
             user target.type-data.name)
-      while ? base-type.base-type
-      base-type := base-type.base-type.type-data
+      self-type-instance := self-type-instance.type-data.base-type
       bases += 1
     
     if ? self.arguments
-      if self.arguments.check-same-as(user target.arguments, user _, copy 0)
+      if self.arguments.check-same-as(
+          user target.arguments, user _, copy 0)
         node.m-syntax-error-msg(user "too few outputs")
     
-    self.check-sub-equal(user target, user node)
+    self-type-instance.check-sub-equal(user target, user node)
   
   func inst check-equal(user TypeInstance other, user SyntaxTreeNode node)
     if self.type-data != other.type-data

@@ -156,6 +156,7 @@ class MemberExpression(SymbolExpression)
     else
       instance-type := self.instance.result-type
       new CallArgument self-param
+      self-param.set-location()
       self-param.access := self.function.arguments.parameters.first.item.access
       self-param.value := self.instance
       self-param.value.top := true

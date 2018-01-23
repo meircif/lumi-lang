@@ -134,6 +134,7 @@ Returncode NameMapNode_init(NameMapNode* self, String* name, void* value) {
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

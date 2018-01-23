@@ -187,6 +187,7 @@ Func SyntaxTreeCatch__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Syn
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

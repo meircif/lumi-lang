@@ -400,7 +400,7 @@ static char* _func_name_Global_add_builtin_function = "Global.add-builtin-functi
 Returncode Global_add_builtin_function(Global* self, String* name, TypeData* parent_type, SyntaxTreeNamespace* namespace, FunctionArguments** arguments) {
   BuiltinFunction* function = malloc(sizeof(BuiltinFunction));
   if (function == NULL) RAISE(335)
-  *function = (BuiltinFunction){BuiltinFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
+  *function = (BuiltinFunction){BuiltinFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   function->_base._base._base._base._dtl = BuiltinFunction__dtl;
   CHECK(336, SyntaxTreeFunction_init(&(function->_base)) )
   CHECK(337, string_new_copy(name, &(function->_base.name)) )
@@ -658,6 +658,7 @@ Func BuiltinFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

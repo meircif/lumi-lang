@@ -352,7 +352,6 @@ struct Data{Generic}
     user Generic x(user item)
     self.item := x
     self.arr := arr
-    x := arr[2]
     new Data{Generic} d
     d.item := self.item
     self.item := d.item
@@ -430,7 +429,89 @@ func test-error-handling(user TestStruct t)
   sys.println(user "}")
 
 
+struct Container{Generic}
+  user Generic value
+  user Container{Generic} next
+  
+  new(user Generic value, user Container{Generic} next)
+    self.value := value
+    self.next := next
+  
+  func iter()->(owner ContainerIterator{Generic} iter)
+    iter := ContainerIterator{Generic}(user self.next)
+
+struct ContainerIterator{Generic}
+  user Container{Generic} curr
+  
+  new(user Container{Generic} first)
+    self.curr := first
+  
+  func has()->(var Bool has-data)
+    has-data := self.curr?
+  
+  func get()->(user Generic item)
+    item := self.curr.value
+  
+  func next()
+    self.curr := self.curr.next
+
+func test-for-each()
+  var String{16} text
+  sys.print(user "chars[ ")
+  for c in "abcdef"
+    text.clear()
+    text.append(copy c)
+    sys.print(user text)
+    sys.print(user " ")
+  sys.println(user "]")
+  
+  var Array{3:Int} arr
+  arr[0] := 14
+  arr[1] := 15
+  arr[2] := 16
+  sys.print(user "numbers[ ")
+  for n in arr
+    text.clear()
+    n.str(user text)
+    sys.print(user text)
+    sys.print(user " ")
+  sys.println(user "]")
+  
+  var Array{3:TestStruct} tsarr
+  tsarr[0].text := "aaa"
+  tsarr[1].text := "bbb"
+  tsarr[2].text := "ccc"
+  sys.print(user "structs[ ")
+  for ts in tsarr
+    sys.print(user ts.text)
+    sys.print(user " ")
+  sys.println(user "]")
+  
+  var Array{3:String{16}} sarr
+  sarr[0].new(user "ddd")
+  sarr[1].new(user "eee")
+  sarr[2].new(user "fff")
+  sys.print(user "strings[ ")
+  for s in sarr
+    sys.print(user s)
+    sys.print(user " ")
+  sys.println(user "]")
+  
+  var Container{String} container-last(user "iii", user _)
+  var Container{String} container-mid(user "hhh", user container-last)
+  var Container{String} container-first(user "ggg", user container-mid)
+  var Container{String} container(user _, user container-first)
+  owner ContainerIterator{String} iter
+  container.iter()->(owner iter)
+  sys.print(user "values[ ")
+  for s in iter
+    sys.print(user s)
+    sys.print(user " ")
+  sys.println(user "]")
+
+
 main
   test-simple-function()
   test-ref-count()
   test-error-handling(user _)
+  test-for-each()
