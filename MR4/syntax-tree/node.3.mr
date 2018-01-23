@@ -165,6 +165,8 @@ class SyntaxTreeNode
     user ListNode{SyntaxTreeNode} child(child-list.first)
     do
       while ? child
+      glob.input-file-name := child.item.input-file-name
+      glob.line-number := child.item.line-number
       action.m-action(user child.item)
       child := child.next
 

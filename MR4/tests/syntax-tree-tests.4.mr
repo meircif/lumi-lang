@@ -813,6 +813,11 @@ var Data dg
 user Data dg(user d)
 ## @ c t16
 Data{String}.set(var d, owner so, user sarr)
+## @ g t17
+struct Test{Generic}
+  user Test{Generic} next
+  func meth()
+    self.next := self
 ## @ eg teg0
 struct Test{First:Second:Third
 ## @ eg teg1
@@ -933,6 +938,7 @@ struct Test(Top)
     self.item := s
     Top.set(var Top(), user s)
     Test.set(var Test(), user s)
+    Mid{String}.set(var Top(), user s)
 func use(user String s)
   var Test t
   t.item := s

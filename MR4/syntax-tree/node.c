@@ -363,7 +363,9 @@ Returncode SyntaxTreeNode_do_on_children(SyntaxTreeNode* self, List* child_list,
   ListNode* child = child_list->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(168, (action)->_dtl[0](action, child->item) )
+    glob->input_file_name = ((SyntaxTreeNode*)(child->item))->input_file_name;
+    glob->line_number = ((SyntaxTreeNode*)(child->item))->line_number;
+    CHECK(170, (action)->_dtl[0](action, child->item) )
     child = child->next;
   }
   return OK;
@@ -391,7 +393,7 @@ Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node);
 static char* _func_name_NodeAction_m_action = "NodeAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeAction_m_action
 Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node) {
-  RAISE(174)
+  RAISE(176)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -415,7 +417,7 @@ Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNod
 static char* _func_name_NodeLinkTypesAction_m_action = "NodeLinkTypesAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeLinkTypesAction_m_action
 Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNode* node) {
-  CHECK(178, (node)->_dtl[1](node) )
+  CHECK(180, (node)->_dtl[1](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -440,7 +442,7 @@ Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* n
 static char* _func_name_NodeAnalyzeAction_m_action = "NodeAnalyzeAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeAnalyzeAction_m_action
 Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* node) {
-  CHECK(182, (node)->_dtl[2](node) )
+  CHECK(184, (node)->_dtl[2](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -465,7 +467,7 @@ Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node)
 static char* _func_name_NodeWriteAction_m_action = "NodeWriteAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeWriteAction_m_action
 Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node) {
-  CHECK(186, (node)->_dtl[3](node) )
+  CHECK(188, (node)->_dtl[3](node) )
   return OK;
 }
 #undef MR_FUNC_NAME

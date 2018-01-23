@@ -59,8 +59,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.arguments.parse(
         user argument-factory, copy is-native, user dummy-node):(copy end)
     if ? self.parent-type
-      self.arguments.add-self-parameter(
-          owner self.parent-type.m-new-type-instance())
+      self.arguments.add-self-parameter(user self.parent-type)
   
   func dynamic check-name()
     if not f-is-legal-name(user self.name, copy false)

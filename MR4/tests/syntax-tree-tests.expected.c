@@ -1434,6 +1434,23 @@ Data* dg = NULL;
 CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, sarr, sarr_Refman) )
   *so = NULL;
   *so_Refman = NULL;
+/// @ t17
+typedef struct Test Test;
+struct Test {
+  Test* next;
+  RefManager* next_Refman;
+};
+Returncode Test_meth(Test* self, RefManager* self_Refman);
+Returncode Test_meth(Test* self, RefManager* self_Refman) {
+  Returncode MR_err = OK;
+  if (self == NULL || self_Refman->value == NULL) RAISE(4)
+  MR_dec_ref(self->next_Refman);
+  self->next_Refman = self_Refman;
+  MR_inc_ref(self->next_Refman);
+  self->next = self;
+MR_cleanup:
+  return MR_err;
+}
 /// @ teg0
 expected "}" after type parameters, got "EOF"
 /// @ teg1
@@ -1633,6 +1650,8 @@ Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* 
   RefManager* aux_Top_0_Refman = NULL;
   Test* aux_Test_0 = NULL;
   RefManager* aux_Test_0_Refman = NULL;
+  Top* aux_Top_1 = NULL;
+  RefManager* aux_Top_1_Refman = NULL;
   MR_inc_ref(s_Refman);
   CHECK(12, Top_set(&(self->_base), self_Refman, s, s_Refman) )
   if (self == NULL || self_Refman->value == NULL) RAISE(13)
@@ -1650,7 +1669,13 @@ Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* 
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(15)
   CHECK(15, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman) )
+  aux_Top_1 = calloc(1, sizeof(Top));
+  if (aux_Top_1 == NULL) RAISE(16)
+  aux_Top_1_Refman = MR_new_ref(aux_Top_1);
+  if (aux_Top_1_Refman == NULL) RAISE(16)
+  CHECK(16, Mid_set(&(aux_Top_1->_base), aux_Top_1_Refman, s, s_Refman) )
 MR_cleanup:
+  MR_owner_dec_ref(aux_Top_1_Refman);
   MR_owner_dec_ref(aux_Test_0_Refman);
   MR_owner_dec_ref(aux_Top_0_Refman);
   MR_dec_ref(s_Refman);
@@ -1664,8 +1689,8 @@ Returncode use(String* s, RefManager* s_Refman) {
   MR_inc_ref(s_Refman);
   t = &t_Var;
   t_Refman = MR_new_ref(t);
-  if (t_Refman == NULL) RAISE(17)
-  if (t == NULL || t_Refman->value == NULL) RAISE(18)
+  if (t_Refman == NULL) RAISE(18)
+  if (t == NULL || t_Refman->value == NULL) RAISE(19)
   MR_dec_ref(t->_base._base._base.item_Refman);
   t->_base._base._base.item_Refman = s_Refman;
   MR_inc_ref(t->_base._base._base.item_Refman);

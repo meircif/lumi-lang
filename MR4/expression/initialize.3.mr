@@ -52,6 +52,7 @@ class InitExpression(Expression)
         self.constructor := _
       else-if ? self.constructor
         new CallArgument self-param
+        self-param.set-location()
         self-param.access :=
             self.constructor.arguments.parameters.first.item.access
         self-param.code-node := self.code-node

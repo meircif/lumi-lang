@@ -50,9 +50,10 @@ class BaseMethExpression(Expression)
     instance-type := self.parent-type.base-type
     bases := self.bases
     new CallArgument self-param
+    self-param.set-location()
     self-param.access := self.function.arguments.parameters.first.item.access
     new BaseMethExpression in self-param.value
-    self.parent-type.m-new-type-instance():(owner self-param.value.result-type)
+    self.parent-type.m-self-type-instance():(owner self-param.value.result-type)
     arguments.parameters.prepend(owner self-param)
   
   func dynamic write()

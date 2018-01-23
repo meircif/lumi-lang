@@ -118,8 +118,7 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
             user self.mocked-name,
             user "of type",
             user self.type-name)
-      self.arguments.add-self-parameter(
-          owner self.parent-type.m-new-type-instance())
+      self.arguments.add-self-parameter(user self.parent-type)
     else
       glob.root.find-function(user self.mocked-name):(user mocked-func)
       if not (? mocked-func)

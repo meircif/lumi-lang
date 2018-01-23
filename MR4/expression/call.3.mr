@@ -45,6 +45,7 @@ class CallExpression(Expression)
         user declaration, user instance-type, copy bases)
       # add omitted output
       new CallArgument output
+      output.set-location()
       output.is-output := true
       output.is-native := declaration.outputs.last.item.is-native
       output.access := declaration.outputs.last.item.access
