@@ -303,6 +303,7 @@ Func SliceExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxT
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

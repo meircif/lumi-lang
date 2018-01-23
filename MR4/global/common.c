@@ -144,6 +144,7 @@ Returncode f_is_legal_name(String* name, Bool is_type, Bool* is_legal) {
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

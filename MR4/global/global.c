@@ -658,6 +658,7 @@ Func BuiltinFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

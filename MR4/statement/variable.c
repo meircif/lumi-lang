@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file27_name = "statement/variable.3.mr";
+static char* _mr_file28_name = "statement/variable.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file27_name
+#define MR_FILE_NAME _mr_file28_name
 
 /* MR4 compiler - Syntax tree variable */
 
@@ -522,6 +522,7 @@ Func VariableInit__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Syntax
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"
 #include "statement/test.c"

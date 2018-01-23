@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file23_name = "statement/function.3.mr";
+static char* _mr_file24_name = "statement/function.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file23_name
+#define MR_FILE_NAME _mr_file24_name
 
 /* MR4 compiler - Syntax tree function */
 
@@ -915,6 +915,7 @@ Returncode write_post_func() {
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"
+#include "statement/for.c"
 #include "statement/native.c"
 #include "statement/test.c"
 #include "statement/type.c"
