@@ -248,7 +248,7 @@ Returncode name(String* self, RefManager* self_Refman, Int px, String* pu, RefMa
   RefManager* u_Refman = NULL;
   String* o = NULL;
   RefManager* o_Refman = NULL;
-  char v_Values[12];
+  char v_Values[12] = {0};
   String v_Var = {12, 0, NULL};
   String* v = NULL;
   RefManager* v_Refman = NULL;
@@ -486,7 +486,7 @@ Array* a = NULL;
 Test* tt = NULL;
   RefManager* tt_Refman = NULL;
 /// @ t4
-char s_Values[12];
+char s_Values[12] = {0};
   String s_Var = {12, 0, NULL};
   String* s = NULL;
   RefManager* s_Refman = NULL;
@@ -495,7 +495,7 @@ char s_Values[12];
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(1)
 /// @ t5
-Int a_Values[12];
+Int a_Values[12] = {0};
   Array a_Var = {12, NULL};
   Array* a = NULL;
   RefManager* a_Refman = NULL;
@@ -504,7 +504,7 @@ Int a_Values[12];
   a_Refman = MR_new_ref(a);
   if (a_Refman == NULL) RAISE(1)
 /// @ t6
-Test a_Values[12];
+Test a_Values[12] = {{0}};
   Array a_Var = {12, NULL};
   Array* a = NULL;
   RefManager* a_Refman = NULL;
@@ -514,7 +514,7 @@ Test a_Values[12];
   if (a_Refman == NULL) RAISE(1)
 /// @ t7
 char sa_Chars[12 * 7];
-  String sa_Values[12];
+  String sa_Values[12] = {{0}};
   Array sa_Var = {12, NULL};
   Array* sa = NULL;
   RefManager* sa_Refman = NULL;
@@ -535,6 +535,15 @@ String* s = NULL;
   s_Refman = NULL;
   *so = s;
   s = NULL;
+/// @ t9
+Tc a_Values[12] = {{{{{0}}}}};
+  Array a_Var = {12, NULL};
+  Array* a = NULL;
+  RefManager* a_Refman = NULL;
+  a = &a_Var;
+  a_Var.values = a_Values;
+  a_Refman = MR_new_ref(a);
+  if (a_Refman == NULL) RAISE(1)
 /// @ te0
 expected space after type, got "new-line"
 /// @ te1
@@ -640,7 +649,7 @@ String* s = NULL;
   s_Refman = str_Refman;
   MR_inc_ref(s_Refman);
 /// @ t7
-char s_Values[12];
+char s_Values[12] = {0};
   String s_Var = {12, 0, NULL};
   String* s = NULL;
   RefManager* s_Refman = NULL;
@@ -917,7 +926,7 @@ String* s = NULL;
     MR_dec_ref(s_Refman);
     s_Refman = aux_Array_0_Refman;
     MR_inc_ref(s_Refman);
-    s = ((String**)((aux_Array_0)->values))[s_Index];
+    s = ((String*)((aux_Array_0)->values)) + s_Index;
     MR_dec_ref(str_Refman);
     str_Refman = s_Refman;
     MR_inc_ref(str_Refman);
@@ -1172,8 +1181,6 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, Ref
   Returncode MR_err = OK;
   Generic_Type* x = NULL;
   RefManager* x_Refman = NULL;
-  Generic_Type* y = NULL;
-  RefManager* y_Refman = NULL;
   Test* t = NULL;
   RefManager* t_Refman = NULL;
   MR_inc_ref(item_Refman);
@@ -1193,25 +1200,19 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, Ref
   self->arr_Refman = arr_Refman;
   MR_inc_ref(self->arr_Refman);
   self->arr = arr;
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(9)
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(9)
-  MR_dec_ref(y_Refman);
-  y_Refman = arr_Refman;
-  MR_inc_ref(y_Refman);
-  y = ((Generic_Type**)((arr)->values))[2];
   t = calloc(1, sizeof(Test));
-  if (t == NULL) RAISE(10)
+  if (t == NULL) RAISE(8)
   t_Refman = MR_new_ref(t);
-  if (t_Refman == NULL) RAISE(10)
-  if (self == NULL || self_Refman->value == NULL) RAISE(11)
-  if (t == NULL || t_Refman->value == NULL) RAISE(11)
+  if (t_Refman == NULL) RAISE(8)
+  if (self == NULL || self_Refman->value == NULL) RAISE(9)
+  if (t == NULL || t_Refman->value == NULL) RAISE(9)
   MR_owner_dec_ref(t->item_Refman);
   t->item_Refman = self->item_Refman;
   self->item_Refman = NULL;
   t->item = self->item;
   self->item = NULL;
-  if (t == NULL || t_Refman->value == NULL) RAISE(12)
-  if (self == NULL || self_Refman->value == NULL) RAISE(12)
+  if (t == NULL || t_Refman->value == NULL) RAISE(10)
+  if (self == NULL || self_Refman->value == NULL) RAISE(10)
   MR_owner_dec_ref(self->item_Refman);
   self->item_Refman = t->item_Refman;
   t->item_Refman = NULL;
@@ -1219,7 +1220,6 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, Ref
   t->item = NULL;
 MR_cleanup:
   MR_owner_dec_ref(t_Refman);
-  MR_dec_ref(y_Refman);
   MR_owner_dec_ref(x_Refman);
   MR_dec_ref(arr_Refman);
   MR_owner_dec_ref(item_Refman);
@@ -1348,9 +1348,9 @@ if (d == NULL || d_Refman->value == NULL) RAISE(1)
   MR_dec_ref(str_Refman);
   str_Refman = d->arr_Refman;
   MR_inc_ref(str_Refman);
-  str = ((String**)((d->arr)->values))[4];
+  str = ((String*)((d->arr)->values)) + 4;
 /// @ t8
-Data ad_Values[5];
+Data ad_Values[5] = {{0}};
   Array ad_Var = {5, NULL};
   Array* ad = NULL;
   RefManager* ad_Refman = NULL;
@@ -1360,13 +1360,13 @@ Data ad_Values[5];
   if (ad_Refman == NULL) RAISE(1)
   if (ad == NULL || ad_Refman->value == NULL) RAISE(2)
   if ((2) < 0 || (2) >= (ad)->length) RAISE(2)
-  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(2)
+  if (((Data*)((ad)->values)) + 2 == NULL || ad_Refman->value == NULL) RAISE(2)
   MR_dec_ref(str_Refman);
-  str_Refman = (((Data**)((ad)->values))[2])->item_Refman;
+  str_Refman = (((Data*)((ad)->values)) + 2)->item_Refman;
   MR_inc_ref(str_Refman);
-  str = (((Data**)((ad)->values))[2])->item;
+  str = (((Data*)((ad)->values)) + 2)->item;
 /// @ t9
-Data ad_Values[5];
+Data ad_Values[5] = {{0}};
   Array ad_Var = {5, NULL};
   Array* ad = NULL;
   RefManager* ad_Refman = NULL;
@@ -1376,13 +1376,13 @@ Data ad_Values[5];
   if (ad_Refman == NULL) RAISE(1)
   if (ad == NULL || ad_Refman->value == NULL) RAISE(2)
   if ((2) < 0 || (2) >= (ad)->length) RAISE(2)
-  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(2)
-  if ((((Data**)((ad)->values))[2])->arr == NULL || (((Data**)((ad)->values))[2])->arr_Refman->value == NULL) RAISE(2)
-  if ((3) < 0 || (3) >= ((((Data**)((ad)->values))[2])->arr)->length) RAISE(2)
+  if (((Data*)((ad)->values)) + 2 == NULL || ad_Refman->value == NULL) RAISE(2)
+  if ((((Data*)((ad)->values)) + 2)->arr == NULL || (((Data*)((ad)->values)) + 2)->arr_Refman->value == NULL) RAISE(2)
+  if ((3) < 0 || (3) >= ((((Data*)((ad)->values)) + 2)->arr)->length) RAISE(2)
   MR_dec_ref(str_Refman);
-  str_Refman = (((Data**)((ad)->values))[2])->arr_Refman;
+  str_Refman = (((Data*)((ad)->values)) + 2)->arr_Refman;
   MR_inc_ref(str_Refman);
-  str = ((String**)(((((Data**)((ad)->values))[2])->arr)->values))[3];
+  str = ((String*)(((((Data*)((ad)->values)) + 2)->arr)->values)) + 3;
 /// @ t10
 Data da_Var = {0};
   Data* da = NULL;
@@ -1396,7 +1396,7 @@ Data da_Var = {0};
   MR_dec_ref(str_Refman);
   str_Refman = da->item_Refman;
   MR_inc_ref(str_Refman);
-  str = ((String**)((((Array*)(da->item)))->values))[1];
+  str = ((String*)((((Array*)(da->item)))->values)) + 1;
 /// @ t11
 Data dr_Var = {0};
   Data* dr = NULL;
@@ -1450,6 +1450,12 @@ declared variable with generic subtype "Generic"
 cannot assign generic subtype "Second" into different generic subtype "First"
 /// @ teg7
 illegal type parameter name "error"
+/// @ teg8
+cannot slice generic array
+/// @ teg9
+cannot create generic array
+/// @ teg10
+cannot create generic array
 /// @ tec0
 unsupported primitive parameter type "Int"
 /// @ tec1

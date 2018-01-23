@@ -6,4 +6,6 @@ string deleted
 error handling { 1 2 3 4 5 6 7 8 }
 chars[ a b c d e f ]
 numbers[ 14 15 16 ]
-values[ aaa bbb ccc ]
+structs[ aaa bbb ccc ]
+strings[ ddd eee fff ]
+values[ ggg hhh iii ]

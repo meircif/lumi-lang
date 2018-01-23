@@ -352,7 +352,6 @@ struct Data{Generic}
     user Generic x(user item)
     self.item := x
     self.arr := arr
-    x := arr[2]
     new Data{Generic} d
     d.item := self.item
     self.item := d.item
@@ -478,9 +477,29 @@ func test-for-each()
     sys.print(user " ")
   sys.println(user "]")
   
-  var Container{String} container-last(user "ccc", user _)
-  var Container{String} container-mid(user "bbb", user container-last)
-  var Container{String} container-first(user "aaa", user container-mid)
+  var Array{3:TestStruct} tsarr
+  tsarr[0].text := "aaa"
+  tsarr[1].text := "bbb"
+  tsarr[2].text := "ccc"
+  sys.print(user "structs[ ")
+  for ts in tsarr
+    sys.print(user ts.text)
+    sys.print(user " ")
+  sys.println(user "]")
+  
+  var Array{3:String{16}} sarr
+  sarr[0].new(user "ddd")
+  sarr[1].new(user "eee")
+  sarr[2].new(user "fff")
+  sys.print(user "strings[ ")
+  for s in sarr
+    sys.print(user s)
+    sys.print(user " ")
+  sys.println(user "]")
+  
+  var Container{String} container-last(user "iii", user _)
+  var Container{String} container-mid(user "hhh", user container-last)
+  var Container{String} container-first(user "ggg", user container-mid)
   var Container{String} container(user _, user container-first)
   owner ContainerIterator{String} iter
   container.iter()->(owner iter)

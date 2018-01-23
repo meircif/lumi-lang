@@ -310,24 +310,18 @@ Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, Ref
   self->arr_Refman = arr_Refman;
   MR_inc_ref(self->arr_Refman);
   self->arr = arr;
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(355)
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(355)
-  MR_dec_ref(x_Refman);
-  x_Refman = arr_Refman;
-  MR_inc_ref(x_Refman);
-  x = ((Generic_Type**)((arr)->values))[2];
   d = calloc(1, sizeof(Data));
-  if (d == NULL) RAISE(356)
+  if (d == NULL) RAISE(355)
   d_Refman = MR_new_ref(d);
-  if (d_Refman == NULL) RAISE(356)
-  if (self == NULL || self_Refman->value == NULL) RAISE(357)
-  if (d == NULL || d_Refman->value == NULL) RAISE(357)
+  if (d_Refman == NULL) RAISE(355)
+  if (self == NULL || self_Refman->value == NULL) RAISE(356)
+  if (d == NULL || d_Refman->value == NULL) RAISE(356)
   MR_dec_ref(d->item_Refman);
   d->item_Refman = self->item_Refman;
   MR_inc_ref(d->item_Refman);
   d->item = self->item;
-  if (d == NULL || d_Refman->value == NULL) RAISE(358)
-  if (self == NULL || self_Refman->value == NULL) RAISE(358)
+  if (d == NULL || d_Refman->value == NULL) RAISE(357)
+  if (self == NULL || self_Refman->value == NULL) RAISE(357)
   MR_dec_ref(self->item_Refman);
   self->item_Refman = d->item_Refman;
   MR_inc_ref(self->item_Refman);
@@ -346,7 +340,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "Data.get"
 Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(361)
+  if (self == NULL || self_Refman->value == NULL) RAISE(360)
   MR_dec_ref(*item_Refman);
   *item_Refman = self->item_Refman;
   MR_inc_ref(*item_Refman);
@@ -363,12 +357,12 @@ Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type*
   Returncode MR_err = OK;
   MR_inc_ref(value_Refman);
   MR_inc_ref(next_Refman);
-  if (self == NULL || self_Refman->value == NULL) RAISE(438)
+  if (self == NULL || self_Refman->value == NULL) RAISE(437)
   MR_dec_ref(self->value_Refman);
   self->value_Refman = value_Refman;
   MR_inc_ref(self->value_Refman);
   self->value = value;
-  if (self == NULL || self_Refman->value == NULL) RAISE(439)
+  if (self == NULL || self_Refman->value == NULL) RAISE(438)
   MR_dec_ref(self->next_Refman);
   self->next_Refman = next_Refman;
   MR_inc_ref(self->next_Refman);
@@ -387,12 +381,12 @@ Returncode Container_iter(Container* self, RefManager* self_Refman, ContainerIte
   Returncode MR_err = OK;
   ContainerIterator* aux_ContainerIterator_0 = NULL;
   RefManager* aux_ContainerIterator_0_Refman = NULL;
-  if (self == NULL || self_Refman->value == NULL) RAISE(442)
+  if (self == NULL || self_Refman->value == NULL) RAISE(441)
   aux_ContainerIterator_0 = calloc(1, sizeof(ContainerIterator));
-  if (aux_ContainerIterator_0 == NULL) RAISE(442)
+  if (aux_ContainerIterator_0 == NULL) RAISE(441)
   aux_ContainerIterator_0_Refman = MR_new_ref(aux_ContainerIterator_0);
-  if (aux_ContainerIterator_0_Refman == NULL) RAISE(442)
-  CHECK(442, ContainerIterator_new(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, self->next, self->next_Refman) )
+  if (aux_ContainerIterator_0_Refman == NULL) RAISE(441)
+  CHECK(441, ContainerIterator_new(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, self->next, self->next_Refman) )
   MR_owner_dec_ref(*iter_Refman);
   *iter_Refman = aux_ContainerIterator_0_Refman;
   aux_ContainerIterator_0_Refman = NULL;
@@ -410,7 +404,7 @@ MR_cleanup:
 Returncode ContainerIterator_new(ContainerIterator* self, RefManager* self_Refman, Container* first, RefManager* first_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(first_Refman);
-  if (self == NULL || self_Refman->value == NULL) RAISE(448)
+  if (self == NULL || self_Refman->value == NULL) RAISE(447)
   MR_dec_ref(self->curr_Refman);
   self->curr_Refman = first_Refman;
   MR_inc_ref(self->curr_Refman);
@@ -426,7 +420,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "ContainerIterator.has"
 Returncode ContainerIterator_has(ContainerIterator* self, RefManager* self_Refman, Bool* has_data) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(451)
+  if (self == NULL || self_Refman->value == NULL) RAISE(450)
   *has_data = !(self->curr == NULL || self->curr_Refman->value == NULL);
 MR_cleanup:
   return MR_err;
@@ -438,8 +432,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "ContainerIterator.get"
 Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(454)
-  if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(454)
+  if (self == NULL || self_Refman->value == NULL) RAISE(453)
+  if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(453)
   MR_dec_ref(*item_Refman);
   *item_Refman = self->curr->value_Refman;
   MR_inc_ref(*item_Refman);
@@ -454,9 +448,9 @@ MR_cleanup:
 #define MR_FUNC_NAME "ContainerIterator.next"
 Returncode ContainerIterator_next(ContainerIterator* self, RefManager* self_Refman) {
   Returncode MR_err = OK;
-  if (self == NULL || self_Refman->value == NULL) RAISE(457)
-  if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(457)
-  if (self == NULL || self_Refman->value == NULL) RAISE(457)
+  if (self == NULL || self_Refman->value == NULL) RAISE(456)
+  if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(456)
+  if (self == NULL || self_Refman->value == NULL) RAISE(456)
   MR_dec_ref(self->curr_Refman);
   self->curr_Refman = self->curr->next_Refman;
   MR_inc_ref(self->curr_Refman);
@@ -632,15 +626,15 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if (aux_String_0_Refman == NULL) RAISE(72)
   aux_String_0_Var.length = 3;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
-  aux_String_0_Var.values = ((((String**)((aux_Array_0)->values))[4]))->values + (1);
-  if (((String**)((aux_Array_0)->values))[4] == NULL || arrs_Refman->value == NULL) RAISE(72)
-  if ((1) < 0 || (3) < 0 || (1) + (3) > ((((String**)((aux_Array_0)->values))[4]))->length) RAISE(72)
+  aux_String_0_Var.values = ((((String*)((aux_Array_0)->values)) + 4))->values + (1);
+  if (((String*)((aux_Array_0)->values)) + 4 == NULL || arrs_Refman->value == NULL) RAISE(72)
+  if ((1) < 0 || (3) < 0 || (1) + (3) > ((((String*)((aux_Array_0)->values)) + 4))->length) RAISE(72)
   if (aux_String_0 == NULL || arrs_Refman->value == NULL) RAISE(72)
   if ((0) < 0 || (0) >= (aux_String_0)->length) RAISE(72)
   if (arrs == NULL || arrs_Refman->value == NULL) RAISE(72)
   if ((3) < 0 || (3) >= (arrs)->length) RAISE(72)
-  if (((String**)((arrs)->values))[3] == NULL || arrs_Refman->value == NULL) RAISE(72)
-  if ((2) < 0 || (2) >= ((((String**)((arrs)->values))[3]))->length) RAISE(72)
+  if (((String*)((arrs)->values)) + 3 == NULL || arrs_Refman->value == NULL) RAISE(72)
+  if ((2) < 0 || (2) >= ((((String*)((arrs)->values)) + 3))->length) RAISE(72)
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(72)
@@ -653,7 +647,7 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if ((2) < 0 || (2) >= (aux_String_1)->length) RAISE(72)
   if (s == NULL || s_Refman->value == NULL) RAISE(72)
   if ((2) < 0 || (2) >= (s)->length) RAISE(72)
-  *c = (((((s)->values)[2]) + (((aux_String_1)->values)[2])) + ((((((String**)((arrs)->values))[3]))->values)[2])) + (((aux_String_0)->values)[0]);
+  *c = (((((s)->values)[2]) + (((aux_String_1)->values)[2])) + ((((((String*)((arrs)->values)) + 3))->values)[2])) + (((aux_String_0)->values)[0]);
   aux_Array_1 = &aux_Array_1_Var;
   aux_Array_1_Refman = MR_new_ref(aux_Array_1);
   if (aux_Array_1_Refman == NULL) RAISE(74)
@@ -679,15 +673,15 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   if ((2) < 0 || (4) < 0 || (2) + (4) > (arrt)->length) RAISE(73)
   if (aux_Array_3 == NULL || arrt_Refman->value == NULL) RAISE(73)
   if ((1) < 0 || (1) >= (aux_Array_3)->length) RAISE(73)
-  if (((TestStruct**)((aux_Array_3)->values))[1] == NULL || arrt_Refman->value == NULL) RAISE(73)
+  if (((TestStruct*)((aux_Array_3)->values)) + 1 == NULL || arrt_Refman->value == NULL) RAISE(73)
   if (arrt == NULL || arrt_Refman->value == NULL) RAISE(73)
   if ((4) < 0 || (4) >= (arrt)->length) RAISE(73)
-  if (((TestStruct**)((arrt)->values))[4] == NULL || arrt_Refman->value == NULL) RAISE(73)
+  if (((TestStruct*)((arrt)->values)) + 4 == NULL || arrt_Refman->value == NULL) RAISE(73)
   if (arri == NULL || arri_Refman->value == NULL) RAISE(73)
   if ((2) < 0 || (2) >= (arri)->length) RAISE(73)
   if (arri == NULL || arri_Refman->value == NULL) RAISE(73)
   if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (((*i) + 3) - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(73)
-  *i = (((((Int*)((arri)->values))[((*i) + 3) - (((Int*)((arri)->values))[2])]) + (((TestStruct**)((arrt)->values))[4])->num) + (((TestStruct**)((aux_Array_3)->values))[1])->num) + (((Int*)((aux_Array_2)->values))[1]);
+  *i = (((((Int*)((arri)->values))[((*i) + 3) - (((Int*)((arri)->values))[2])]) + (((TestStruct*)((arrt)->values)) + 4)->num) + (((TestStruct*)((aux_Array_3)->values)) + 1)->num) + (((Int*)((aux_Array_2)->values))[1]);
   aux_Array_4 = &aux_Array_4_Var;
   aux_Array_4_Refman = MR_new_ref(aux_Array_4);
   if (aux_Array_4_Refman == NULL) RAISE(75)
@@ -713,7 +707,7 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   MR_dec_ref(s_Refman);
   s_Refman = arrs_Refman;
   MR_inc_ref(s_Refman);
-  s = ((String**)((arrs)->values))[4];
+  s = ((String*)((arrs)->values)) + 4;
   aux_Array_6 = &aux_Array_6_Var;
   aux_Array_6_Refman = MR_new_ref(aux_Array_6);
   if (aux_Array_6_Refman == NULL) RAISE(77)
@@ -730,7 +724,7 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   MR_dec_ref(*t_Refman);
   *t_Refman = arrt_Refman;
   MR_inc_ref(*t_Refman);
-  *t = ((TestStruct**)((arrt)->values))[4];
+  *t = ((TestStruct*)((arrt)->values)) + 4;
   aux_Array_7 = &aux_Array_7_Var;
   aux_Array_7_Refman = MR_new_ref(aux_Array_7);
   if (aux_Array_7_Refman == NULL) RAISE(79)
@@ -748,7 +742,7 @@ Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, R
   *d_Refman = arrd_Refman;
   MR_inc_ref(*d_Refman);
   *d_Dynamic = &TestClass_dynamic;
-  *d = ((TestClass**)((arrd)->values))[4];
+  *d = ((TestClass*)((arrd)->values)) + 4;
   aux_Array_8 = &aux_Array_8_Var;
   aux_Array_8_Refman = MR_new_ref(aux_Array_8);
   if (aux_Array_8_Refman == NULL) RAISE(81)
@@ -841,29 +835,29 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   TestClass* dv = NULL;
   RefManager* dv_Refman = NULL;
   TestClass_Dynamic* dv_Dynamic = &TestClass_dynamic;
-  char sv_Values[12];
+  char sv_Values[12] = {0};
   String sv_Var = {12, 0, NULL};
   String* sv = NULL;
   RefManager* sv_Refman = NULL;
   Returncode (*f)(Int xi, String* si, RefManager* si_Refman, Int* xo, String** so, RefManager** so_Refman) = NULL;
-  Int ia_Values[12];
+  Int ia_Values[12] = {0};
   Array ia_Var = {12, NULL};
   Array* ia = NULL;
   RefManager* ia_Refman = NULL;
-  TestStruct ta_Values[12];
+  TestStruct ta_Values[12] = {{0}};
   Array ta_Var = {12, NULL};
   Array* ta = NULL;
   RefManager* ta_Refman = NULL;
-  TestClass da_Values[12];
+  TestClass da_Values[12] = {{0}};
   Array da_Var = {12, NULL};
   Array* da = NULL;
   RefManager* da_Refman = NULL;
   char sa_Chars[12 * 7];
-  String sa_Values[12];
+  String sa_Values[12] = {{0}};
   Array sa_Var = {12, NULL};
   Array* sa = NULL;
   RefManager* sa_Refman = NULL;
-  Returncode (*fa_Values[12])(void);
+  Returncode (*fa_Values[12])(void) = {0};
   Array fa_Var = {12, NULL};
   Array* fa = NULL;
   RefManager* fa_Refman = NULL;
@@ -887,7 +881,7 @@ Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* ar
   Int ix = 0;
   String* si = NULL;
   RefManager* si_Refman = NULL;
-  char isv_Values[12];
+  char isv_Values[12] = {0};
   String isv_Var = {12, 0, NULL};
   String* isv = NULL;
   RefManager* isv_Refman = NULL;
@@ -1462,7 +1456,7 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman,
   MR_dec_ref(s_Refman);
   s_Refman = sys->argv_Refman;
   MR_inc_ref(s_Refman);
-  s = ((String**)((sys->argv)->values))[1];
+  s = ((String*)((sys->argv)->values)) + 1;
   CHECK(320, Sys_print(sys, sys_Refman, s, s_Refman) )
   CHECK(321, Sys_println(sys, sys_Refman, s, s_Refman) )
   CHECK(322, Sys_getchar(sys, sys_Refman, &(cv), &(bv)) )
@@ -1567,11 +1561,11 @@ Returncode test_type_parameters(String* s, RefManager* s_Refman) {
   Data* d = NULL;
   RefManager* d_Refman = NULL;
   char sarr_Chars[6 * 16];
-  String sarr_Values[6];
+  String sarr_Values[6] = {{0}};
   Array sarr_Var = {6, NULL};
   Array* sarr = NULL;
   RefManager* sarr_Refman = NULL;
-  Data ad_Values[5];
+  Data ad_Values[5] = {{0}};
   Array ad_Var = {5, NULL};
   Array* ad = NULL;
   RefManager* ad_Refman = NULL;
@@ -1586,7 +1580,7 @@ Returncode test_type_parameters(String* s, RefManager* s_Refman) {
   TopData t_Var = {{{{0}}}};
   TopData* t = NULL;
   RefManager* t_Refman = NULL;
-  TestStruct at_Values[8];
+  TestStruct at_Values[8] = {{0}};
   Array at_Var = {8, NULL};
   Array* at = NULL;
   RefManager* at_Refman = NULL;
@@ -1596,107 +1590,107 @@ Returncode test_type_parameters(String* s, RefManager* s_Refman) {
   MR_inc_ref(s_Refman);
   d = &d_Var;
   d_Refman = MR_new_ref(d);
-  if (d_Refman == NULL) RAISE(372)
+  if (d_Refman == NULL) RAISE(371)
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   MR_set_var_string_array(6, 16, sarr, sarr_Chars);
   sarr_Refman = MR_new_ref(sarr);
-  if (sarr_Refman == NULL) RAISE(373)
-  if (d == NULL || d_Refman->value == NULL) RAISE(374)
+  if (sarr_Refman == NULL) RAISE(372)
+  if (d == NULL || d_Refman->value == NULL) RAISE(373)
   MR_dec_ref(d->item_Refman);
   d->item_Refman = s_Refman;
   MR_inc_ref(d->item_Refman);
   d->item = s;
-  if (d == NULL || d_Refman->value == NULL) RAISE(375)
+  if (d == NULL || d_Refman->value == NULL) RAISE(374)
   MR_dec_ref(s_Refman);
   s_Refman = d->item_Refman;
   MR_inc_ref(s_Refman);
   s = d->item;
-  if (d == NULL || d_Refman->value == NULL) RAISE(376)
+  if (d == NULL || d_Refman->value == NULL) RAISE(375)
   MR_dec_ref(d->arr_Refman);
   d->arr_Refman = sarr_Refman;
   MR_inc_ref(d->arr_Refman);
   d->arr = sarr;
-  if (d == NULL || d_Refman->value == NULL) RAISE(377)
-  if (d->arr == NULL || d->arr_Refman->value == NULL) RAISE(377)
-  if ((4) < 0 || (4) >= (d->arr)->length) RAISE(377)
+  if (d == NULL || d_Refman->value == NULL) RAISE(376)
+  if (d->arr == NULL || d->arr_Refman->value == NULL) RAISE(376)
+  if ((4) < 0 || (4) >= (d->arr)->length) RAISE(376)
   MR_dec_ref(s_Refman);
   s_Refman = d->arr_Refman;
   MR_inc_ref(s_Refman);
-  s = ((String**)((d->arr)->values))[4];
+  s = ((String*)((d->arr)->values)) + 4;
   ad = &ad_Var;
   ad_Var.values = ad_Values;
   ad_Refman = MR_new_ref(ad);
-  if (ad_Refman == NULL) RAISE(378)
+  if (ad_Refman == NULL) RAISE(377)
+  if (ad == NULL || ad_Refman->value == NULL) RAISE(378)
+  if ((2) < 0 || (2) >= (ad)->length) RAISE(378)
+  if (((Data*)((ad)->values)) + 2 == NULL || ad_Refman->value == NULL) RAISE(378)
+  MR_dec_ref(s_Refman);
+  s_Refman = (((Data*)((ad)->values)) + 2)->item_Refman;
+  MR_inc_ref(s_Refman);
+  s = (((Data*)((ad)->values)) + 2)->item;
   if (ad == NULL || ad_Refman->value == NULL) RAISE(379)
   if ((2) < 0 || (2) >= (ad)->length) RAISE(379)
-  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(379)
+  if (((Data*)((ad)->values)) + 2 == NULL || ad_Refman->value == NULL) RAISE(379)
+  if ((((Data*)((ad)->values)) + 2)->arr == NULL || (((Data*)((ad)->values)) + 2)->arr_Refman->value == NULL) RAISE(379)
+  if ((3) < 0 || (3) >= ((((Data*)((ad)->values)) + 2)->arr)->length) RAISE(379)
   MR_dec_ref(s_Refman);
-  s_Refman = (((Data**)((ad)->values))[2])->item_Refman;
+  s_Refman = (((Data*)((ad)->values)) + 2)->arr_Refman;
   MR_inc_ref(s_Refman);
-  s = (((Data**)((ad)->values))[2])->item;
-  if (ad == NULL || ad_Refman->value == NULL) RAISE(380)
-  if ((2) < 0 || (2) >= (ad)->length) RAISE(380)
-  if (((Data**)((ad)->values))[2] == NULL || ad_Refman->value == NULL) RAISE(380)
-  if ((((Data**)((ad)->values))[2])->arr == NULL || (((Data**)((ad)->values))[2])->arr_Refman->value == NULL) RAISE(380)
-  if ((3) < 0 || (3) >= ((((Data**)((ad)->values))[2])->arr)->length) RAISE(380)
-  MR_dec_ref(s_Refman);
-  s_Refman = (((Data**)((ad)->values))[2])->arr_Refman;
-  MR_inc_ref(s_Refman);
-  s = ((String**)(((((Data**)((ad)->values))[2])->arr)->values))[3];
+  s = ((String*)(((((Data*)((ad)->values)) + 2)->arr)->values)) + 3;
   da = &da_Var;
   da_Refman = MR_new_ref(da);
-  if (da_Refman == NULL) RAISE(381)
-  if (da == NULL || da_Refman->value == NULL) RAISE(382)
-  if (da->item == NULL || da->item_Refman->value == NULL) RAISE(382)
-  if ((1) < 0 || (1) >= (((Array*)(da->item)))->length) RAISE(382)
+  if (da_Refman == NULL) RAISE(380)
+  if (da == NULL || da_Refman->value == NULL) RAISE(381)
+  if (da->item == NULL || da->item_Refman->value == NULL) RAISE(381)
+  if ((1) < 0 || (1) >= (((Array*)(da->item)))->length) RAISE(381)
   MR_dec_ref(s_Refman);
   s_Refman = da->item_Refman;
   MR_inc_ref(s_Refman);
-  s = ((String**)((((Array*)(da->item)))->values))[1];
+  s = ((String*)((((Array*)(da->item)))->values)) + 1;
   dr = &dr_Var;
   dr_Refman = MR_new_ref(dr);
-  if (dr_Refman == NULL) RAISE(383)
-  if (dr == NULL || dr_Refman->value == NULL) RAISE(384)
-  if (dr->item == NULL || dr->item_Refman->value == NULL) RAISE(384)
-  if (((Data*)(dr->item))->item == NULL || ((Data*)(dr->item))->item_Refman->value == NULL) RAISE(384)
+  if (dr_Refman == NULL) RAISE(382)
+  if (dr == NULL || dr_Refman->value == NULL) RAISE(383)
+  if (dr->item == NULL || dr->item_Refman->value == NULL) RAISE(383)
+  if (((Data*)(dr->item))->item == NULL || ((Data*)(dr->item))->item_Refman->value == NULL) RAISE(383)
   MR_dec_ref(s_Refman);
   s_Refman = ((Data*)(((Data*)(dr->item))->item))->item_Refman;
   MR_inc_ref(s_Refman);
   s = ((Data*)(((Data*)(dr->item))->item))->item;
-  CHECK(385, Data_set(d, d_Refman, s, s_Refman, sarr, sarr_Refman) )
-  CHECK(386, Data_get(d, d_Refman, (void*)&(s), &(s_Refman)) )
+  CHECK(384, Data_set(d, d_Refman, s, s_Refman, sarr, sarr_Refman) )
+  CHECK(385, Data_get(d, d_Refman, (void*)&(s), &(s_Refman)) )
   dg = d;
   dg_Refman = d_Refman;
   MR_inc_ref(dg_Refman);
-  TEST_ASSERT(388, !(dg == NULL || dg_Refman->value == NULL))
+  TEST_ASSERT(387, !(dg == NULL || dg_Refman->value == NULL))
   t = &t_Var;
   t_Refman = MR_new_ref(t);
-  if (t_Refman == NULL) RAISE(390)
+  if (t_Refman == NULL) RAISE(389)
   at = &at_Var;
   at_Var.values = at_Values;
   at_Refman = MR_new_ref(at);
-  if (at_Refman == NULL) RAISE(391)
+  if (at_Refman == NULL) RAISE(390)
   ts = &ts_Var;
   ts_Refman = MR_new_ref(ts);
-  if (ts_Refman == NULL) RAISE(392)
-  CHECK(392, TestStruct_new(ts, ts_Refman, 0, NULL, NULL) )
-  if (t == NULL || t_Refman->value == NULL) RAISE(393)
+  if (ts_Refman == NULL) RAISE(391)
+  CHECK(391, TestStruct_new(ts, ts_Refman, 0, NULL, NULL) )
+  if (t == NULL || t_Refman->value == NULL) RAISE(392)
   MR_dec_ref(t->_base._base._base.item_Refman);
   t->_base._base._base.item_Refman = s_Refman;
   MR_inc_ref(t->_base._base._base.item_Refman);
   t->_base._base._base.item = s;
-  if (t == NULL || t_Refman->value == NULL) RAISE(394)
+  if (t == NULL || t_Refman->value == NULL) RAISE(393)
   MR_dec_ref(t->_base._base._base.arr_Refman);
   t->_base._base._base.arr_Refman = sarr_Refman;
   MR_inc_ref(t->_base._base._base.arr_Refman);
   t->_base._base._base.arr = sarr;
-  if (t == NULL || t_Refman->value == NULL) RAISE(395)
+  if (t == NULL || t_Refman->value == NULL) RAISE(394)
   MR_dec_ref(t->_base._base.second_Refman);
   t->_base._base.second_Refman = at_Refman;
   MR_inc_ref(t->_base._base.second_Refman);
   t->_base._base.second = at;
-  if (t == NULL || t_Refman->value == NULL) RAISE(396)
+  if (t == NULL || t_Refman->value == NULL) RAISE(395)
   MR_dec_ref(t->_base._base.third_Refman);
   t->_base._base.third_Refman = ts_Refman;
   MR_inc_ref(t->_base._base.third_Refman);
@@ -1726,7 +1720,7 @@ Returncode f_try_catch_raise(TestStruct* t, RefManager* t_Refman) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
-    if (t == NULL || t_Refman->value == NULL) RAISE(401)
+    if (t == NULL || t_Refman->value == NULL) RAISE(400)
     t->num = 1;
 
 #undef RETURN_ERROR
@@ -1735,7 +1729,7 @@ Returncode f_try_catch_raise(TestStruct* t, RefManager* t_Refman) {
   --MR_trace_ignore_count;
   if (MR_err != OK) {
     MR_err = OK;
-    RAISE(403)
+    RAISE(402)
   }
 MR_cleanup:
   MR_dec_ref(t_Refman);
@@ -1791,28 +1785,28 @@ Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
 #define RETURN_ERROR(value) MR_err = value; break
     aux_String_0 = &aux_String_0_Var;
     aux_String_0_Refman = MR_new_ref(aux_String_0);
-    if (aux_String_0_Refman == NULL) RAISE(407)
+    if (aux_String_0_Refman == NULL) RAISE(406)
     aux_String_0_Var.max_length = 20;
     aux_String_0_Var.length = 19;
     aux_String_0_Var.values = "error handling { 1 ";
-    CHECK(407, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-    if (t == NULL || t_Refman->value == NULL) RAISE(408)
+    CHECK(406, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+    if (t == NULL || t_Refman->value == NULL) RAISE(407)
     t->num = 1;
     aux_String_1 = &aux_String_1_Var;
     aux_String_1_Refman = MR_new_ref(aux_String_1);
-    if (aux_String_1_Refman == NULL) RAISE(409)
+    if (aux_String_1_Refman == NULL) RAISE(408)
     aux_String_1_Var.max_length = 4;
     aux_String_1_Var.length = 3;
     aux_String_1_Var.values = " X ";
-    CHECK(409, Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
+    CHECK(408, Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
     do {
       ++MR_trace_ignore_count;
-      CHECK(411, f_test_void() )
+      CHECK(410, f_test_void() )
     } while (false);
     --MR_trace_ignore_count;
     if (MR_err != OK) {
       MR_err = OK;
-      CHECK(413, f_test_int(2) )
+      CHECK(412, f_test_int(2) )
     }
 
 #undef RETURN_ERROR
@@ -1823,31 +1817,31 @@ Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
     MR_err = OK;
     aux_String_2 = &aux_String_2_Var;
     aux_String_2_Refman = MR_new_ref(aux_String_2);
-    if (aux_String_2_Refman == NULL) RAISE(415)
+    if (aux_String_2_Refman == NULL) RAISE(414)
     aux_String_2_Var.max_length = 3;
     aux_String_2_Var.length = 2;
     aux_String_2_Var.values = "2 ";
-    CHECK(415, Sys_print(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
+    CHECK(414, Sys_print(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
     do {
       ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = MR_new_ref(aux_String_3);
-      if (aux_String_3_Refman == NULL) RAISE(417)
+      if (aux_String_3_Refman == NULL) RAISE(416)
       aux_String_3_Var.max_length = 3;
       aux_String_3_Var.length = 2;
       aux_String_3_Var.values = "3 ";
-      CHECK(417, Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
-      if (t == NULL || t_Refman->value == NULL) RAISE(418)
+      CHECK(416, Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
+      if (t == NULL || t_Refman->value == NULL) RAISE(417)
       t->num = 2;
       aux_String_4 = &aux_String_4_Var;
       aux_String_4_Refman = MR_new_ref(aux_String_4);
-      if (aux_String_4_Refman == NULL) RAISE(419)
+      if (aux_String_4_Refman == NULL) RAISE(418)
       aux_String_4_Var.max_length = 4;
       aux_String_4_Var.length = 3;
       aux_String_4_Var.values = " X ";
-      CHECK(419, Sys_print(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
+      CHECK(418, Sys_print(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
 
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
@@ -1856,58 +1850,58 @@ Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
     MR_err = OK;
     aux_String_5 = &aux_String_5_Var;
     aux_String_5_Refman = MR_new_ref(aux_String_5);
-    if (aux_String_5_Refman == NULL) RAISE(420)
+    if (aux_String_5_Refman == NULL) RAISE(419)
     aux_String_5_Var.max_length = 3;
     aux_String_5_Var.length = 2;
     aux_String_5_Var.values = "4 ";
-    CHECK(420, Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
+    CHECK(419, Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
   }
   aux_String_6 = &aux_String_6_Var;
   aux_String_6_Refman = MR_new_ref(aux_String_6);
-  if (aux_String_6_Refman == NULL) RAISE(421)
+  if (aux_String_6_Refman == NULL) RAISE(420)
   aux_String_6_Var.max_length = 3;
   aux_String_6_Var.length = 2;
   aux_String_6_Var.values = "5 ";
-  CHECK(421, Sys_print(sys, sys_Refman, aux_String_6, aux_String_6_Refman) )
+  CHECK(420, Sys_print(sys, sys_Refman, aux_String_6, aux_String_6_Refman) )
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
     aux_String_7 = &aux_String_7_Var;
     aux_String_7_Refman = MR_new_ref(aux_String_7);
-    if (aux_String_7_Refman == NULL) RAISE(423)
+    if (aux_String_7_Refman == NULL) RAISE(422)
     aux_String_7_Var.max_length = 3;
     aux_String_7_Var.length = 2;
     aux_String_7_Var.values = "6 ";
-    CHECK(423, Sys_print(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
+    CHECK(422, Sys_print(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
     do {
       ++MR_trace_ignore_count;
       aux_String_8 = &aux_String_8_Var;
       aux_String_8_Refman = MR_new_ref(aux_String_8);
-      if (aux_String_8_Refman == NULL) RAISE(425)
+      if (aux_String_8_Refman == NULL) RAISE(424)
       aux_String_8_Var.max_length = 3;
       aux_String_8_Var.length = 2;
       aux_String_8_Var.values = "7 ";
-      CHECK(425, Sys_print(sys, sys_Refman, aux_String_8, aux_String_8_Refman) )
-      CHECK(426, f_try_catch_raise(t, t_Refman) )
+      CHECK(424, Sys_print(sys, sys_Refman, aux_String_8, aux_String_8_Refman) )
+      CHECK(425, f_try_catch_raise(t, t_Refman) )
       aux_String_9 = &aux_String_9_Var;
       aux_String_9_Refman = MR_new_ref(aux_String_9);
-      if (aux_String_9_Refman == NULL) RAISE(427)
+      if (aux_String_9_Refman == NULL) RAISE(426)
       aux_String_9_Var.max_length = 4;
       aux_String_9_Var.length = 3;
       aux_String_9_Var.values = " X ";
-      CHECK(427, Sys_print(sys, sys_Refman, aux_String_9, aux_String_9_Refman) )
+      CHECK(426, Sys_print(sys, sys_Refman, aux_String_9, aux_String_9_Refman) )
     } while (false);
     --MR_trace_ignore_count;
     MR_err = OK;
     aux_String_10 = &aux_String_10_Var;
     aux_String_10_Refman = MR_new_ref(aux_String_10);
-    if (aux_String_10_Refman == NULL) RAISE(428)
+    if (aux_String_10_Refman == NULL) RAISE(427)
     aux_String_10_Var.max_length = 3;
     aux_String_10_Var.length = 2;
     aux_String_10_Var.values = "8 ";
-    CHECK(428, Sys_print(sys, sys_Refman, aux_String_10, aux_String_10_Refman) )
-    RAISE(429)
+    CHECK(427, Sys_print(sys, sys_Refman, aux_String_10, aux_String_10_Refman) )
+    RAISE(428)
 
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
@@ -1916,11 +1910,11 @@ Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
   MR_err = OK;
   aux_String_11 = &aux_String_11_Var;
   aux_String_11_Refman = MR_new_ref(aux_String_11);
-  if (aux_String_11_Refman == NULL) RAISE(430)
+  if (aux_String_11_Refman == NULL) RAISE(429)
   aux_String_11_Var.max_length = 2;
   aux_String_11_Var.length = 1;
   aux_String_11_Var.values = "}";
-  CHECK(430, Sys_println(sys, sys_Refman, aux_String_11, aux_String_11_Refman) )
+  CHECK(429, Sys_println(sys, sys_Refman, aux_String_11, aux_String_11_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_11_Refman);
   MR_dec_ref(aux_String_10_Refman);
@@ -1944,14 +1938,23 @@ MR_cleanup:
 #define MR_FUNC_NAME "test-for-each"
 Returncode test_for_each(void) {
   Returncode MR_err = OK;
-  char text_Values[16];
+  char text_Values[16] = {0};
   String text_Var = {16, 0, NULL};
   String* text = NULL;
   RefManager* text_Refman = NULL;
-  Int arr_Values[3];
+  Int arr_Values[3] = {0};
   Array arr_Var = {3, NULL};
   Array* arr = NULL;
   RefManager* arr_Refman = NULL;
+  TestStruct tsarr_Values[3] = {{0}};
+  Array tsarr_Var = {3, NULL};
+  Array* tsarr = NULL;
+  RefManager* tsarr_Refman = NULL;
+  char sarr_Chars[3 * 16];
+  String sarr_Values[3] = {{0}};
+  Array sarr_Var = {3, NULL};
+  Array* sarr = NULL;
+  RefManager* sarr_Refman = NULL;
   Container container_last_Var = {0};
   Container* container_last = NULL;
   RefManager* container_last_Refman = NULL;
@@ -2005,30 +2008,72 @@ Returncode test_for_each(void) {
   String aux_String_11_Var = {0};
   String* aux_String_11 = NULL;
   RefManager* aux_String_11_Refman = NULL;
-  String* s = NULL;
-  RefManager* s_Refman = NULL;
-  ContainerIterator* aux_ContainerIterator_0 = NULL;
-  RefManager* aux_ContainerIterator_0_Refman = NULL;
+  TestStruct* ts = NULL;
+  RefManager* ts_Refman = NULL;
+  Array* aux_Array_1 = NULL;
+  RefManager* aux_Array_1_Refman = NULL;
   String aux_String_12_Var = {0};
   String* aux_String_12 = NULL;
   RefManager* aux_String_12_Refman = NULL;
   String aux_String_13_Var = {0};
   String* aux_String_13 = NULL;
   RefManager* aux_String_13_Refman = NULL;
+  String aux_String_14_Var = {0};
+  String* aux_String_14 = NULL;
+  RefManager* aux_String_14_Refman = NULL;
+  String aux_String_15_Var = {0};
+  String* aux_String_15 = NULL;
+  RefManager* aux_String_15_Refman = NULL;
+  String aux_String_16_Var = {0};
+  String* aux_String_16 = NULL;
+  RefManager* aux_String_16_Refman = NULL;
+  String aux_String_17_Var = {0};
+  String* aux_String_17 = NULL;
+  RefManager* aux_String_17_Refman = NULL;
+  String* s = NULL;
+  RefManager* s_Refman = NULL;
+  Array* aux_Array_2 = NULL;
+  RefManager* aux_Array_2_Refman = NULL;
+  String aux_String_18_Var = {0};
+  String* aux_String_18 = NULL;
+  RefManager* aux_String_18_Refman = NULL;
+  String aux_String_19_Var = {0};
+  String* aux_String_19 = NULL;
+  RefManager* aux_String_19_Refman = NULL;
+  String aux_String_20_Var = {0};
+  String* aux_String_20 = NULL;
+  RefManager* aux_String_20_Refman = NULL;
+  String aux_String_21_Var = {0};
+  String* aux_String_21 = NULL;
+  RefManager* aux_String_21_Refman = NULL;
+  String aux_String_22_Var = {0};
+  String* aux_String_22 = NULL;
+  RefManager* aux_String_22_Refman = NULL;
+  String aux_String_23_Var = {0};
+  String* aux_String_23 = NULL;
+  RefManager* aux_String_23_Refman = NULL;
+  ContainerIterator* aux_ContainerIterator_0 = NULL;
+  RefManager* aux_ContainerIterator_0_Refman = NULL;
+  String aux_String_24_Var = {0};
+  String* aux_String_24 = NULL;
+  RefManager* aux_String_24_Refman = NULL;
+  String aux_String_25_Var = {0};
+  String* aux_String_25 = NULL;
+  RefManager* aux_String_25_Refman = NULL;
   text = &text_Var;
   text_Var.values = text_Values;
   text_Refman = MR_new_ref(text);
-  if (text_Refman == NULL) RAISE(460)
+  if (text_Refman == NULL) RAISE(459)
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(461)
+  if (aux_String_0_Refman == NULL) RAISE(460)
   aux_String_0_Var.max_length = 8;
   aux_String_0_Var.length = 7;
   aux_String_0_Var.values = "chars[ ";
-  CHECK(461, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(460, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(462)
+  if (aux_String_1_Refman == NULL) RAISE(461)
   aux_String_1_Var.max_length = 7;
   aux_String_1_Var.length = 6;
   aux_String_1_Var.values = "abcdef";
@@ -2037,19 +2082,19 @@ Returncode test_for_each(void) {
   MR_inc_ref(aux_String_2_Refman);
   aux_String_2 = aux_String_1;
   {int c_Index; for (c_Index = 0; c_Index < aux_String_2->length; ++c_Index) {
-    if (aux_String_2 == NULL || aux_String_2_Refman->value == NULL) RAISE(462)
-    if ((c_Index) < 0 || (c_Index) >= (aux_String_2)->length) RAISE(462)
+    if (aux_String_2 == NULL || aux_String_2_Refman->value == NULL) RAISE(461)
+    if ((c_Index) < 0 || (c_Index) >= (aux_String_2)->length) RAISE(461)
     c = ((aux_String_2)->values)[c_Index];
-    CHECK(463, String_clear(text, text_Refman) )
-    CHECK(464, String_append(text, text_Refman, c) )
-    CHECK(465, Sys_print(sys, sys_Refman, text, text_Refman) )
+    CHECK(462, String_clear(text, text_Refman) )
+    CHECK(463, String_append(text, text_Refman, c) )
+    CHECK(464, Sys_print(sys, sys_Refman, text, text_Refman) )
     aux_String_3 = &aux_String_3_Var;
     aux_String_3_Refman = MR_new_ref(aux_String_3);
-    if (aux_String_3_Refman == NULL) RAISE(466)
+    if (aux_String_3_Refman == NULL) RAISE(465)
     aux_String_3_Var.max_length = 2;
     aux_String_3_Var.length = 1;
     aux_String_3_Var.values = " ";
-    CHECK(466, Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
+    CHECK(465, Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
   }}
   MR_dec_ref(aux_String_2_Refman);
   aux_String_2_Refman = NULL;
@@ -2057,49 +2102,49 @@ Returncode test_for_each(void) {
   aux_String_2 = NULL;
   aux_String_4 = &aux_String_4_Var;
   aux_String_4_Refman = MR_new_ref(aux_String_4);
-  if (aux_String_4_Refman == NULL) RAISE(467)
+  if (aux_String_4_Refman == NULL) RAISE(466)
   aux_String_4_Var.max_length = 2;
   aux_String_4_Var.length = 1;
   aux_String_4_Var.values = "]";
-  CHECK(467, Sys_println(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
+  CHECK(466, Sys_println(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
   arr = &arr_Var;
   arr_Var.values = arr_Values;
   arr_Refman = MR_new_ref(arr);
-  if (arr_Refman == NULL) RAISE(469)
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(470)
-  if ((0) < 0 || (0) >= (arr)->length) RAISE(470)
+  if (arr_Refman == NULL) RAISE(468)
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(469)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(469)
   ((Int*)((arr)->values))[0] = 14;
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(471)
-  if ((1) < 0 || (1) >= (arr)->length) RAISE(471)
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(470)
+  if ((1) < 0 || (1) >= (arr)->length) RAISE(470)
   ((Int*)((arr)->values))[1] = 15;
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(472)
-  if ((2) < 0 || (2) >= (arr)->length) RAISE(472)
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(471)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(471)
   ((Int*)((arr)->values))[2] = 16;
   aux_String_5 = &aux_String_5_Var;
   aux_String_5_Refman = MR_new_ref(aux_String_5);
-  if (aux_String_5_Refman == NULL) RAISE(473)
+  if (aux_String_5_Refman == NULL) RAISE(472)
   aux_String_5_Var.max_length = 10;
   aux_String_5_Var.length = 9;
   aux_String_5_Var.values = "numbers[ ";
-  CHECK(473, Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
+  CHECK(472, Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
   MR_dec_ref(aux_Array_0_Refman);
   aux_Array_0_Refman = arr_Refman;
   MR_inc_ref(aux_Array_0_Refman);
   aux_Array_0 = arr;
   {int n_Index; for (n_Index = 0; n_Index < aux_Array_0->length; ++n_Index) {
-    if (aux_Array_0 == NULL || aux_Array_0_Refman->value == NULL) RAISE(474)
-    if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(474)
+    if (aux_Array_0 == NULL || aux_Array_0_Refman->value == NULL) RAISE(473)
+    if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(473)
     n = ((Int*)((aux_Array_0)->values))[n_Index];
-    CHECK(475, String_clear(text, text_Refman) )
-    CHECK(476, Int_str(n, text, text_Refman) )
-    CHECK(477, Sys_print(sys, sys_Refman, text, text_Refman) )
+    CHECK(474, String_clear(text, text_Refman) )
+    CHECK(475, Int_str(n, text, text_Refman) )
+    CHECK(476, Sys_print(sys, sys_Refman, text, text_Refman) )
     aux_String_6 = &aux_String_6_Var;
     aux_String_6_Refman = MR_new_ref(aux_String_6);
-    if (aux_String_6_Refman == NULL) RAISE(478)
+    if (aux_String_6_Refman == NULL) RAISE(477)
     aux_String_6_Var.max_length = 2;
     aux_String_6_Var.length = 1;
     aux_String_6_Var.values = " ";
-    CHECK(478, Sys_print(sys, sys_Refman, aux_String_6, aux_String_6_Refman) )
+    CHECK(477, Sys_print(sys, sys_Refman, aux_String_6, aux_String_6_Refman) )
   }}
   MR_dec_ref(aux_Array_0_Refman);
   aux_Array_0_Refman = NULL;
@@ -2107,88 +2152,255 @@ Returncode test_for_each(void) {
   aux_Array_0 = NULL;
   aux_String_7 = &aux_String_7_Var;
   aux_String_7_Refman = MR_new_ref(aux_String_7);
-  if (aux_String_7_Refman == NULL) RAISE(479)
+  if (aux_String_7_Refman == NULL) RAISE(478)
   aux_String_7_Var.max_length = 2;
   aux_String_7_Var.length = 1;
   aux_String_7_Var.values = "]";
-  CHECK(479, Sys_println(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
+  CHECK(478, Sys_println(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
+  tsarr = &tsarr_Var;
+  tsarr_Var.values = tsarr_Values;
+  tsarr_Refman = MR_new_ref(tsarr);
+  if (tsarr_Refman == NULL) RAISE(480)
   aux_String_8 = &aux_String_8_Var;
   aux_String_8_Refman = MR_new_ref(aux_String_8);
   if (aux_String_8_Refman == NULL) RAISE(481)
   aux_String_8_Var.max_length = 4;
   aux_String_8_Var.length = 3;
-  aux_String_8_Var.values = "ccc";
-  container_last = &container_last_Var;
-  container_last_Refman = MR_new_ref(container_last);
-  if (container_last_Refman == NULL) RAISE(481)
-  CHECK(481, Container_new(container_last, container_last_Refman, aux_String_8, aux_String_8_Refman, NULL, NULL) )
+  aux_String_8_Var.values = "aaa";
+  if (tsarr == NULL || tsarr_Refman->value == NULL) RAISE(481)
+  if ((0) < 0 || (0) >= (tsarr)->length) RAISE(481)
+  if (((TestStruct*)((tsarr)->values)) + 0 == NULL || tsarr_Refman->value == NULL) RAISE(481)
+  MR_dec_ref((((TestStruct*)((tsarr)->values)) + 0)->text_Refman);
+  (((TestStruct*)((tsarr)->values)) + 0)->text_Refman = aux_String_8_Refman;
+  MR_inc_ref((((TestStruct*)((tsarr)->values)) + 0)->text_Refman);
+  (((TestStruct*)((tsarr)->values)) + 0)->text = aux_String_8;
   aux_String_9 = &aux_String_9_Var;
   aux_String_9_Refman = MR_new_ref(aux_String_9);
   if (aux_String_9_Refman == NULL) RAISE(482)
   aux_String_9_Var.max_length = 4;
   aux_String_9_Var.length = 3;
   aux_String_9_Var.values = "bbb";
-  container_mid = &container_mid_Var;
-  container_mid_Refman = MR_new_ref(container_mid);
-  if (container_mid_Refman == NULL) RAISE(482)
-  CHECK(482, Container_new(container_mid, container_mid_Refman, aux_String_9, aux_String_9_Refman, container_last, container_last_Refman) )
+  if (tsarr == NULL || tsarr_Refman->value == NULL) RAISE(482)
+  if ((1) < 0 || (1) >= (tsarr)->length) RAISE(482)
+  if (((TestStruct*)((tsarr)->values)) + 1 == NULL || tsarr_Refman->value == NULL) RAISE(482)
+  MR_dec_ref((((TestStruct*)((tsarr)->values)) + 1)->text_Refman);
+  (((TestStruct*)((tsarr)->values)) + 1)->text_Refman = aux_String_9_Refman;
+  MR_inc_ref((((TestStruct*)((tsarr)->values)) + 1)->text_Refman);
+  (((TestStruct*)((tsarr)->values)) + 1)->text = aux_String_9;
   aux_String_10 = &aux_String_10_Var;
   aux_String_10_Refman = MR_new_ref(aux_String_10);
   if (aux_String_10_Refman == NULL) RAISE(483)
   aux_String_10_Var.max_length = 4;
   aux_String_10_Var.length = 3;
-  aux_String_10_Var.values = "aaa";
-  container_first = &container_first_Var;
-  container_first_Refman = MR_new_ref(container_first);
-  if (container_first_Refman == NULL) RAISE(483)
-  CHECK(483, Container_new(container_first, container_first_Refman, aux_String_10, aux_String_10_Refman, container_mid, container_mid_Refman) )
-  container = &container_Var;
-  container_Refman = MR_new_ref(container);
-  if (container_Refman == NULL) RAISE(484)
-  CHECK(484, Container_new(container, container_Refman, NULL, NULL, container_first, container_first_Refman) )
-  CHECK(486, Container_iter(container, container_Refman, &(iter), &(iter_Refman)) )
+  aux_String_10_Var.values = "ccc";
+  if (tsarr == NULL || tsarr_Refman->value == NULL) RAISE(483)
+  if ((2) < 0 || (2) >= (tsarr)->length) RAISE(483)
+  if (((TestStruct*)((tsarr)->values)) + 2 == NULL || tsarr_Refman->value == NULL) RAISE(483)
+  MR_dec_ref((((TestStruct*)((tsarr)->values)) + 2)->text_Refman);
+  (((TestStruct*)((tsarr)->values)) + 2)->text_Refman = aux_String_10_Refman;
+  MR_inc_ref((((TestStruct*)((tsarr)->values)) + 2)->text_Refman);
+  (((TestStruct*)((tsarr)->values)) + 2)->text = aux_String_10;
   aux_String_11 = &aux_String_11_Var;
   aux_String_11_Refman = MR_new_ref(aux_String_11);
-  if (aux_String_11_Refman == NULL) RAISE(487)
-  aux_String_11_Var.max_length = 9;
-  aux_String_11_Var.length = 8;
-  aux_String_11_Var.values = "values[ ";
-  CHECK(487, Sys_print(sys, sys_Refman, aux_String_11, aux_String_11_Refman) )
+  if (aux_String_11_Refman == NULL) RAISE(484)
+  aux_String_11_Var.max_length = 10;
+  aux_String_11_Var.length = 9;
+  aux_String_11_Var.values = "structs[ ";
+  CHECK(484, Sys_print(sys, sys_Refman, aux_String_11, aux_String_11_Refman) )
+  MR_dec_ref(aux_Array_1_Refman);
+  aux_Array_1_Refman = tsarr_Refman;
+  MR_inc_ref(aux_Array_1_Refman);
+  aux_Array_1 = tsarr;
+  {int ts_Index; for (ts_Index = 0; ts_Index < aux_Array_1->length; ++ts_Index) {
+    if (aux_Array_1 == NULL || aux_Array_1_Refman->value == NULL) RAISE(485)
+    if ((ts_Index) < 0 || (ts_Index) >= (aux_Array_1)->length) RAISE(485)
+    MR_dec_ref(ts_Refman);
+    ts_Refman = aux_Array_1_Refman;
+    MR_inc_ref(ts_Refman);
+    ts = ((TestStruct*)((aux_Array_1)->values)) + ts_Index;
+    if (ts == NULL || ts_Refman->value == NULL) RAISE(486)
+    CHECK(486, Sys_print(sys, sys_Refman, ts->text, ts->text_Refman) )
+    aux_String_12 = &aux_String_12_Var;
+    aux_String_12_Refman = MR_new_ref(aux_String_12);
+    if (aux_String_12_Refman == NULL) RAISE(487)
+    aux_String_12_Var.max_length = 2;
+    aux_String_12_Var.length = 1;
+    aux_String_12_Var.values = " ";
+    CHECK(487, Sys_print(sys, sys_Refman, aux_String_12, aux_String_12_Refman) )
+  }}
+  MR_dec_ref(aux_Array_1_Refman);
+  aux_Array_1_Refman = NULL;
+  MR_inc_ref(aux_Array_1_Refman);
+  aux_Array_1 = NULL;
+  aux_String_13 = &aux_String_13_Var;
+  aux_String_13_Refman = MR_new_ref(aux_String_13);
+  if (aux_String_13_Refman == NULL) RAISE(488)
+  aux_String_13_Var.max_length = 2;
+  aux_String_13_Var.length = 1;
+  aux_String_13_Var.values = "]";
+  CHECK(488, Sys_println(sys, sys_Refman, aux_String_13, aux_String_13_Refman) )
+  sarr = &sarr_Var;
+  sarr_Var.values = sarr_Values;
+  MR_set_var_string_array(3, 16, sarr, sarr_Chars);
+  sarr_Refman = MR_new_ref(sarr);
+  if (sarr_Refman == NULL) RAISE(490)
+  if (sarr == NULL || sarr_Refman->value == NULL) RAISE(491)
+  if ((0) < 0 || (0) >= (sarr)->length) RAISE(491)
+  aux_String_14 = &aux_String_14_Var;
+  aux_String_14_Refman = MR_new_ref(aux_String_14);
+  if (aux_String_14_Refman == NULL) RAISE(491)
+  aux_String_14_Var.max_length = 4;
+  aux_String_14_Var.length = 3;
+  aux_String_14_Var.values = "ddd";
+  CHECK(491, String_new(((String*)((sarr)->values)) + 0, sarr_Refman, aux_String_14, aux_String_14_Refman) )
+  if (sarr == NULL || sarr_Refman->value == NULL) RAISE(492)
+  if ((1) < 0 || (1) >= (sarr)->length) RAISE(492)
+  aux_String_15 = &aux_String_15_Var;
+  aux_String_15_Refman = MR_new_ref(aux_String_15);
+  if (aux_String_15_Refman == NULL) RAISE(492)
+  aux_String_15_Var.max_length = 4;
+  aux_String_15_Var.length = 3;
+  aux_String_15_Var.values = "eee";
+  CHECK(492, String_new(((String*)((sarr)->values)) + 1, sarr_Refman, aux_String_15, aux_String_15_Refman) )
+  if (sarr == NULL || sarr_Refman->value == NULL) RAISE(493)
+  if ((2) < 0 || (2) >= (sarr)->length) RAISE(493)
+  aux_String_16 = &aux_String_16_Var;
+  aux_String_16_Refman = MR_new_ref(aux_String_16);
+  if (aux_String_16_Refman == NULL) RAISE(493)
+  aux_String_16_Var.max_length = 4;
+  aux_String_16_Var.length = 3;
+  aux_String_16_Var.values = "fff";
+  CHECK(493, String_new(((String*)((sarr)->values)) + 2, sarr_Refman, aux_String_16, aux_String_16_Refman) )
+  aux_String_17 = &aux_String_17_Var;
+  aux_String_17_Refman = MR_new_ref(aux_String_17);
+  if (aux_String_17_Refman == NULL) RAISE(494)
+  aux_String_17_Var.max_length = 10;
+  aux_String_17_Var.length = 9;
+  aux_String_17_Var.values = "strings[ ";
+  CHECK(494, Sys_print(sys, sys_Refman, aux_String_17, aux_String_17_Refman) )
+  MR_dec_ref(aux_Array_2_Refman);
+  aux_Array_2_Refman = sarr_Refman;
+  MR_inc_ref(aux_Array_2_Refman);
+  aux_Array_2 = sarr;
+  {int s_Index; for (s_Index = 0; s_Index < aux_Array_2->length; ++s_Index) {
+    if (aux_Array_2 == NULL || aux_Array_2_Refman->value == NULL) RAISE(495)
+    if ((s_Index) < 0 || (s_Index) >= (aux_Array_2)->length) RAISE(495)
+    MR_dec_ref(s_Refman);
+    s_Refman = aux_Array_2_Refman;
+    MR_inc_ref(s_Refman);
+    s = ((String*)((aux_Array_2)->values)) + s_Index;
+    CHECK(496, Sys_print(sys, sys_Refman, s, s_Refman) )
+    aux_String_18 = &aux_String_18_Var;
+    aux_String_18_Refman = MR_new_ref(aux_String_18);
+    if (aux_String_18_Refman == NULL) RAISE(497)
+    aux_String_18_Var.max_length = 2;
+    aux_String_18_Var.length = 1;
+    aux_String_18_Var.values = " ";
+    CHECK(497, Sys_print(sys, sys_Refman, aux_String_18, aux_String_18_Refman) )
+  }}
+  MR_dec_ref(aux_Array_2_Refman);
+  aux_Array_2_Refman = NULL;
+  MR_inc_ref(aux_Array_2_Refman);
+  aux_Array_2 = NULL;
+  aux_String_19 = &aux_String_19_Var;
+  aux_String_19_Refman = MR_new_ref(aux_String_19);
+  if (aux_String_19_Refman == NULL) RAISE(498)
+  aux_String_19_Var.max_length = 2;
+  aux_String_19_Var.length = 1;
+  aux_String_19_Var.values = "]";
+  CHECK(498, Sys_println(sys, sys_Refman, aux_String_19, aux_String_19_Refman) )
+  aux_String_20 = &aux_String_20_Var;
+  aux_String_20_Refman = MR_new_ref(aux_String_20);
+  if (aux_String_20_Refman == NULL) RAISE(500)
+  aux_String_20_Var.max_length = 4;
+  aux_String_20_Var.length = 3;
+  aux_String_20_Var.values = "iii";
+  container_last = &container_last_Var;
+  container_last_Refman = MR_new_ref(container_last);
+  if (container_last_Refman == NULL) RAISE(500)
+  CHECK(500, Container_new(container_last, container_last_Refman, aux_String_20, aux_String_20_Refman, NULL, NULL) )
+  aux_String_21 = &aux_String_21_Var;
+  aux_String_21_Refman = MR_new_ref(aux_String_21);
+  if (aux_String_21_Refman == NULL) RAISE(501)
+  aux_String_21_Var.max_length = 4;
+  aux_String_21_Var.length = 3;
+  aux_String_21_Var.values = "hhh";
+  container_mid = &container_mid_Var;
+  container_mid_Refman = MR_new_ref(container_mid);
+  if (container_mid_Refman == NULL) RAISE(501)
+  CHECK(501, Container_new(container_mid, container_mid_Refman, aux_String_21, aux_String_21_Refman, container_last, container_last_Refman) )
+  aux_String_22 = &aux_String_22_Var;
+  aux_String_22_Refman = MR_new_ref(aux_String_22);
+  if (aux_String_22_Refman == NULL) RAISE(502)
+  aux_String_22_Var.max_length = 4;
+  aux_String_22_Var.length = 3;
+  aux_String_22_Var.values = "ggg";
+  container_first = &container_first_Var;
+  container_first_Refman = MR_new_ref(container_first);
+  if (container_first_Refman == NULL) RAISE(502)
+  CHECK(502, Container_new(container_first, container_first_Refman, aux_String_22, aux_String_22_Refman, container_mid, container_mid_Refman) )
+  container = &container_Var;
+  container_Refman = MR_new_ref(container);
+  if (container_Refman == NULL) RAISE(503)
+  CHECK(503, Container_new(container, container_Refman, NULL, NULL, container_first, container_first_Refman) )
+  CHECK(505, Container_iter(container, container_Refman, &(iter), &(iter_Refman)) )
+  aux_String_23 = &aux_String_23_Var;
+  aux_String_23_Refman = MR_new_ref(aux_String_23);
+  if (aux_String_23_Refman == NULL) RAISE(506)
+  aux_String_23_Var.max_length = 9;
+  aux_String_23_Var.length = 8;
+  aux_String_23_Var.values = "values[ ";
+  CHECK(506, Sys_print(sys, sys_Refman, aux_String_23, aux_String_23_Refman) )
   MR_dec_ref(aux_ContainerIterator_0_Refman);
   aux_ContainerIterator_0_Refman = iter_Refman;
   MR_inc_ref(aux_ContainerIterator_0_Refman);
   aux_ContainerIterator_0 = iter;
   while (true) {
     Bool s_Has = false;
-    CHECK(488, ContainerIterator_has(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, &(s_Has)) )
+    CHECK(507, ContainerIterator_has(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, &(s_Has)) )
     if (!s_Has) break;
-    CHECK(488, ContainerIterator_get(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, (void*)&(s), &(s_Refman)) )
-    CHECK(489, Sys_print(sys, sys_Refman, s, s_Refman) )
-    aux_String_12 = &aux_String_12_Var;
-    aux_String_12_Refman = MR_new_ref(aux_String_12);
-    if (aux_String_12_Refman == NULL) RAISE(490)
-    aux_String_12_Var.max_length = 2;
-    aux_String_12_Var.length = 1;
-    aux_String_12_Var.values = " ";
-    CHECK(490, Sys_print(sys, sys_Refman, aux_String_12, aux_String_12_Refman) )
-    CHECK(488, ContainerIterator_next(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman) )
+    CHECK(507, ContainerIterator_get(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, (void*)&(s), &(s_Refman)) )
+    CHECK(508, Sys_print(sys, sys_Refman, s, s_Refman) )
+    aux_String_24 = &aux_String_24_Var;
+    aux_String_24_Refman = MR_new_ref(aux_String_24);
+    if (aux_String_24_Refman == NULL) RAISE(509)
+    aux_String_24_Var.max_length = 2;
+    aux_String_24_Var.length = 1;
+    aux_String_24_Var.values = " ";
+    CHECK(509, Sys_print(sys, sys_Refman, aux_String_24, aux_String_24_Refman) )
+    CHECK(507, ContainerIterator_next(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman) )
   }
   MR_dec_ref(aux_ContainerIterator_0_Refman);
   aux_ContainerIterator_0_Refman = NULL;
   MR_inc_ref(aux_ContainerIterator_0_Refman);
   aux_ContainerIterator_0 = NULL;
-  aux_String_13 = &aux_String_13_Var;
-  aux_String_13_Refman = MR_new_ref(aux_String_13);
-  if (aux_String_13_Refman == NULL) RAISE(491)
-  aux_String_13_Var.max_length = 2;
-  aux_String_13_Var.length = 1;
-  aux_String_13_Var.values = "]";
-  CHECK(491, Sys_println(sys, sys_Refman, aux_String_13, aux_String_13_Refman) )
+  aux_String_25 = &aux_String_25_Var;
+  aux_String_25_Refman = MR_new_ref(aux_String_25);
+  if (aux_String_25_Refman == NULL) RAISE(510)
+  aux_String_25_Var.max_length = 2;
+  aux_String_25_Var.length = 1;
+  aux_String_25_Var.values = "]";
+  CHECK(510, Sys_println(sys, sys_Refman, aux_String_25, aux_String_25_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_25_Refman);
+  MR_dec_ref(aux_String_24_Refman);
+  MR_dec_ref(aux_ContainerIterator_0_Refman);
+  MR_dec_ref(aux_String_23_Refman);
+  MR_dec_ref(aux_String_22_Refman);
+  MR_dec_ref(aux_String_21_Refman);
+  MR_dec_ref(aux_String_20_Refman);
+  MR_dec_ref(aux_String_19_Refman);
+  MR_dec_ref(aux_String_18_Refman);
+  MR_dec_ref(aux_Array_2_Refman);
+  MR_dec_ref(s_Refman);
+  MR_dec_ref(aux_String_17_Refman);
+  MR_dec_ref(aux_String_16_Refman);
+  MR_dec_ref(aux_String_15_Refman);
+  MR_dec_ref(aux_String_14_Refman);
   MR_dec_ref(aux_String_13_Refman);
   MR_dec_ref(aux_String_12_Refman);
-  MR_dec_ref(aux_ContainerIterator_0_Refman);
-  MR_dec_ref(s_Refman);
+  MR_dec_ref(aux_Array_1_Refman);
+  MR_dec_ref(ts_Refman);
   MR_dec_ref(aux_String_11_Refman);
   MR_dec_ref(aux_String_10_Refman);
   MR_dec_ref(aux_String_9_Refman);
@@ -2207,6 +2419,8 @@ MR_cleanup:
   MR_dec_ref(container_first_Refman);
   MR_dec_ref(container_mid_Refman);
   MR_dec_ref(container_last_Refman);
+  MR_dec_ref(sarr_Refman);
+  MR_dec_ref(tsarr_Refman);
   MR_dec_ref(arr_Refman);
   MR_dec_ref(text_Refman);
   return MR_err;
@@ -2221,10 +2435,10 @@ MR_cleanup:
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(495, test_simple_function() )
-  CHECK(496, test_ref_count() )
-  CHECK(497, test_error_handling(NULL, NULL) )
-  CHECK(498, test_for_each() )
+  CHECK(514, test_simple_function() )
+  CHECK(515, test_ref_count() )
+  CHECK(516, test_error_handling(NULL, NULL) )
+  CHECK(517, test_for_each() )
 MR_cleanup:
   return MR_err;
 }
