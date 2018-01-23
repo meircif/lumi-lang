@@ -866,19 +866,19 @@ if (t == NULL || t_Refman->value == NULL) RAISE(1)
   }
   }
 /// @ t2
-{int ch_Index; for (ch_Index = 0; ch_Index < str->length; ++ch) {
+{int ch_Index; for (ch_Index = 0; ch_Index < str->length; ++ch_Index) {
     Char ch = 0;
     ch = str->values[ch_Index];
     c = ch;
   }}
 /// @ t3
-{int n_Index; for (n_Index = 0; n_Index < arr->length; ++n) {
+{int n_Index; for (n_Index = 0; n_Index < arr->length; ++n_Index) {
     Int n = 0;
     n = ((Int*)((arr)->values))[n_Index];
     i += n;
   }}
 /// @ t4
-{int s_Index; for (s_Index = 0; s_Index < sarr->length; ++s) {
+{int s_Index; for (s_Index = 0; s_Index < sarr->length; ++s_Index) {
     String* s = NULL;
     RefManager* s_Refman = NULL;
     s = ((String**)((sarr)->values))[s_Index];

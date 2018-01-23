@@ -2410,6 +2410,14 @@ MR_cleanup:
 #define MR_FUNC_NAME "test-for-each"
 Returncode test_for_each(void) {
   Returncode MR_err = OK;
+  char text_Values[16];
+  String text_Var = {16, 0, NULL};
+  String* text = NULL;
+  RefManager* text_Refman = NULL;
+  Int arr_Values[3];
+  Array arr_Var = {3, NULL};
+  Array* arr = NULL;
+  RefManager* arr_Refman = NULL;
   Container container_last_Var = {0};
   Container* container_last = NULL;
   RefManager* container_last_Refman = NULL;
@@ -2442,73 +2450,180 @@ Returncode test_for_each(void) {
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   RefManager* aux_String_5_Refman = NULL;
+  String aux_String_6_Var = {0};
+  String* aux_String_6 = NULL;
+  RefManager* aux_String_6_Refman = NULL;
+  String aux_String_7_Var = {0};
+  String* aux_String_7 = NULL;
+  RefManager* aux_String_7_Refman = NULL;
+  String aux_String_8_Var = {0};
+  String* aux_String_8 = NULL;
+  RefManager* aux_String_8_Refman = NULL;
+  String aux_String_9_Var = {0};
+  String* aux_String_9 = NULL;
+  RefManager* aux_String_9_Refman = NULL;
+  String aux_String_10_Var = {0};
+  String* aux_String_10 = NULL;
+  RefManager* aux_String_10_Refman = NULL;
+  String aux_String_11_Var = {0};
+  String* aux_String_11 = NULL;
+  RefManager* aux_String_11_Refman = NULL;
+  String aux_String_12_Var = {0};
+  String* aux_String_12 = NULL;
+  RefManager* aux_String_12_Refman = NULL;
+  text = &text_Var;
+  text_Var.values = text_Values;
+  text_Refman = MR_new_ref(text);
+  if (text_Refman == NULL) RAISE(460)
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(460)
-  aux_String_0_Var.max_length = 4;
-  aux_String_0_Var.length = 3;
-  aux_String_0_Var.values = "ccc";
-  container_last = &container_last_Var;
-  container_last_Refman = MR_new_ref(container_last);
-  if (container_last_Refman == NULL) RAISE(460)
-  CHECK(460, Container_new(container_last, container_last_Refman, aux_String_0, aux_String_0_Refman, NULL, NULL) )
+  if (aux_String_0_Refman == NULL) RAISE(461)
+  aux_String_0_Var.max_length = 8;
+  aux_String_0_Var.length = 7;
+  aux_String_0_Var.values = "chars[ ";
+  CHECK(461, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(461)
-  aux_String_1_Var.max_length = 4;
-  aux_String_1_Var.length = 3;
-  aux_String_1_Var.values = "bbb";
-  container_mid = &container_mid_Var;
-  container_mid_Refman = MR_new_ref(container_mid);
-  if (container_mid_Refman == NULL) RAISE(461)
-  CHECK(461, Container_new(container_mid, container_mid_Refman, aux_String_1, aux_String_1_Refman, container_last, container_last_Refman) )
-  aux_String_2 = &aux_String_2_Var;
-  aux_String_2_Refman = MR_new_ref(aux_String_2);
-  if (aux_String_2_Refman == NULL) RAISE(462)
-  aux_String_2_Var.max_length = 4;
-  aux_String_2_Var.length = 3;
-  aux_String_2_Var.values = "aaa";
-  container_first = &container_first_Var;
-  container_first_Refman = MR_new_ref(container_first);
-  if (container_first_Refman == NULL) RAISE(462)
-  CHECK(462, Container_new(container_first, container_first_Refman, aux_String_2, aux_String_2_Refman, container_mid, container_mid_Refman) )
-  container = &container_Var;
-  container_Refman = MR_new_ref(container);
-  if (container_Refman == NULL) RAISE(463)
-  CHECK(463, Container_new(container, container_Refman, NULL, NULL, container_first, container_first_Refman) )
-  CHECK(465, Container_iter(container, container_Refman, &(iter), &(iter_Refman)) )
+  if (aux_String_1_Refman == NULL) RAISE(462)
+  aux_String_1_Var.max_length = 7;
+  aux_String_1_Var.length = 6;
+  aux_String_1_Var.values = "abcdef";
+  {int c_Index; for (c_Index = 0; c_Index < aux_String_1->length; ++c_Index) {
+    Char c = 0;
+    c = aux_String_1->values[c_Index];
+    CHECK(463, String_clear(text, text_Refman) )
+    CHECK(464, String_append(text, text_Refman, c) )
+    CHECK(465, Sys_print(sys, sys_Refman, text, text_Refman) )
+    aux_String_2 = &aux_String_2_Var;
+    aux_String_2_Refman = MR_new_ref(aux_String_2);
+    if (aux_String_2_Refman == NULL) RAISE(466)
+    aux_String_2_Var.max_length = 2;
+    aux_String_2_Var.length = 1;
+    aux_String_2_Var.values = " ";
+    CHECK(466, Sys_print(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
+  }}
   aux_String_3 = &aux_String_3_Var;
   aux_String_3_Refman = MR_new_ref(aux_String_3);
-  if (aux_String_3_Refman == NULL) RAISE(466)
-  aux_String_3_Var.max_length = 9;
-  aux_String_3_Var.length = 8;
-  aux_String_3_Var.values = "values[ ";
-  CHECK(466, Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
+  if (aux_String_3_Refman == NULL) RAISE(467)
+  aux_String_3_Var.max_length = 2;
+  aux_String_3_Var.length = 1;
+  aux_String_3_Var.values = "]";
+  CHECK(467, Sys_println(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
+  arr = &arr_Var;
+  arr_Var.values = arr_Values;
+  arr_Refman = MR_new_ref(arr);
+  if (arr_Refman == NULL) RAISE(469)
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(470)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(470)
+  ((Int*)((arr)->values))[0] = 14;
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(471)
+  if ((1) < 0 || (1) >= (arr)->length) RAISE(471)
+  ((Int*)((arr)->values))[1] = 15;
+  if (arr == NULL || arr_Refman->value == NULL) RAISE(472)
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(472)
+  ((Int*)((arr)->values))[2] = 16;
+  aux_String_4 = &aux_String_4_Var;
+  aux_String_4_Refman = MR_new_ref(aux_String_4);
+  if (aux_String_4_Refman == NULL) RAISE(473)
+  aux_String_4_Var.max_length = 10;
+  aux_String_4_Var.length = 9;
+  aux_String_4_Var.values = "numbers[ ";
+  CHECK(473, Sys_print(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
+  {int n_Index; for (n_Index = 0; n_Index < arr->length; ++n_Index) {
+    Int n = 0;
+    n = ((Int*)((arr)->values))[n_Index];
+    CHECK(475, String_clear(text, text_Refman) )
+    CHECK(476, Int_str(n, text, text_Refman) )
+    CHECK(477, Sys_print(sys, sys_Refman, text, text_Refman) )
+    aux_String_5 = &aux_String_5_Var;
+    aux_String_5_Refman = MR_new_ref(aux_String_5);
+    if (aux_String_5_Refman == NULL) RAISE(478)
+    aux_String_5_Var.max_length = 2;
+    aux_String_5_Var.length = 1;
+    aux_String_5_Var.values = " ";
+    CHECK(478, Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
+  }}
+  aux_String_6 = &aux_String_6_Var;
+  aux_String_6_Refman = MR_new_ref(aux_String_6);
+  if (aux_String_6_Refman == NULL) RAISE(479)
+  aux_String_6_Var.max_length = 2;
+  aux_String_6_Var.length = 1;
+  aux_String_6_Var.values = "]";
+  CHECK(479, Sys_println(sys, sys_Refman, aux_String_6, aux_String_6_Refman) )
+  aux_String_7 = &aux_String_7_Var;
+  aux_String_7_Refman = MR_new_ref(aux_String_7);
+  if (aux_String_7_Refman == NULL) RAISE(481)
+  aux_String_7_Var.max_length = 4;
+  aux_String_7_Var.length = 3;
+  aux_String_7_Var.values = "ccc";
+  container_last = &container_last_Var;
+  container_last_Refman = MR_new_ref(container_last);
+  if (container_last_Refman == NULL) RAISE(481)
+  CHECK(481, Container_new(container_last, container_last_Refman, aux_String_7, aux_String_7_Refman, NULL, NULL) )
+  aux_String_8 = &aux_String_8_Var;
+  aux_String_8_Refman = MR_new_ref(aux_String_8);
+  if (aux_String_8_Refman == NULL) RAISE(482)
+  aux_String_8_Var.max_length = 4;
+  aux_String_8_Var.length = 3;
+  aux_String_8_Var.values = "bbb";
+  container_mid = &container_mid_Var;
+  container_mid_Refman = MR_new_ref(container_mid);
+  if (container_mid_Refman == NULL) RAISE(482)
+  CHECK(482, Container_new(container_mid, container_mid_Refman, aux_String_8, aux_String_8_Refman, container_last, container_last_Refman) )
+  aux_String_9 = &aux_String_9_Var;
+  aux_String_9_Refman = MR_new_ref(aux_String_9);
+  if (aux_String_9_Refman == NULL) RAISE(483)
+  aux_String_9_Var.max_length = 4;
+  aux_String_9_Var.length = 3;
+  aux_String_9_Var.values = "aaa";
+  container_first = &container_first_Var;
+  container_first_Refman = MR_new_ref(container_first);
+  if (container_first_Refman == NULL) RAISE(483)
+  CHECK(483, Container_new(container_first, container_first_Refman, aux_String_9, aux_String_9_Refman, container_mid, container_mid_Refman) )
+  container = &container_Var;
+  container_Refman = MR_new_ref(container);
+  if (container_Refman == NULL) RAISE(484)
+  CHECK(484, Container_new(container, container_Refman, NULL, NULL, container_first, container_first_Refman) )
+  CHECK(486, Container_iter(container, container_Refman, &(iter), &(iter_Refman)) )
+  aux_String_10 = &aux_String_10_Var;
+  aux_String_10_Refman = MR_new_ref(aux_String_10);
+  if (aux_String_10_Refman == NULL) RAISE(487)
+  aux_String_10_Var.max_length = 9;
+  aux_String_10_Var.length = 8;
+  aux_String_10_Var.values = "values[ ";
+  CHECK(487, Sys_print(sys, sys_Refman, aux_String_10, aux_String_10_Refman) )
   while (true) {
     Bool s_Has = false;
     String* s = NULL;
     RefManager* s_Refman = NULL;
-    CHECK(467, ContainerIterator_has(iter, iter_Refman, &s_Has) )
+    CHECK(488, ContainerIterator_has(iter, iter_Refman, &s_Has) )
     if (!s_Has) break;
-    CHECK(467, ContainerIterator_get(iter, iter_Refman, (void*)&s, &s_Refman) )
-    CHECK(468, Sys_print(sys, sys_Refman, s, s_Refman) )
-    aux_String_4 = &aux_String_4_Var;
-    aux_String_4_Refman = MR_new_ref(aux_String_4);
-    if (aux_String_4_Refman == NULL) RAISE(469)
-    aux_String_4_Var.max_length = 2;
-    aux_String_4_Var.length = 1;
-    aux_String_4_Var.values = " ";
-    CHECK(469, Sys_print(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
-    CHECK(467, ContainerIterator_next(iter, iter_Refman) )
+    CHECK(488, ContainerIterator_get(iter, iter_Refman, (void*)&s, &s_Refman) )
+    CHECK(489, Sys_print(sys, sys_Refman, s, s_Refman) )
+    aux_String_11 = &aux_String_11_Var;
+    aux_String_11_Refman = MR_new_ref(aux_String_11);
+    if (aux_String_11_Refman == NULL) RAISE(490)
+    aux_String_11_Var.max_length = 2;
+    aux_String_11_Var.length = 1;
+    aux_String_11_Var.values = " ";
+    CHECK(490, Sys_print(sys, sys_Refman, aux_String_11, aux_String_11_Refman) )
+    CHECK(488, ContainerIterator_next(iter, iter_Refman) )
   }
-  aux_String_5 = &aux_String_5_Var;
-  aux_String_5_Refman = MR_new_ref(aux_String_5);
-  if (aux_String_5_Refman == NULL) RAISE(470)
-  aux_String_5_Var.max_length = 2;
-  aux_String_5_Var.length = 1;
-  aux_String_5_Var.values = "]";
-  CHECK(470, Sys_println(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
+  aux_String_12 = &aux_String_12_Var;
+  aux_String_12_Refman = MR_new_ref(aux_String_12);
+  if (aux_String_12_Refman == NULL) RAISE(491)
+  aux_String_12_Var.max_length = 2;
+  aux_String_12_Var.length = 1;
+  aux_String_12_Var.values = "]";
+  CHECK(491, Sys_println(sys, sys_Refman, aux_String_12, aux_String_12_Refman) )
 MR_cleanup:
+  MR_dec_ref(aux_String_12_Refman);
+  MR_dec_ref(aux_String_11_Refman);
+  MR_dec_ref(aux_String_10_Refman);
+  MR_dec_ref(aux_String_9_Refman);
+  MR_dec_ref(aux_String_8_Refman);
+  MR_dec_ref(aux_String_7_Refman);
+  MR_dec_ref(aux_String_6_Refman);
   MR_dec_ref(aux_String_5_Refman);
   MR_dec_ref(aux_String_4_Refman);
   MR_dec_ref(aux_String_3_Refman);
@@ -2520,6 +2635,8 @@ MR_cleanup:
   MR_dec_ref(container_first_Refman);
   MR_dec_ref(container_mid_Refman);
   MR_dec_ref(container_last_Refman);
+  MR_dec_ref(arr_Refman);
+  MR_dec_ref(text_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME

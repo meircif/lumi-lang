@@ -576,7 +576,7 @@ Returncode SyntaxTreeForLoop_write_seq(SyntaxTreeForLoop* self) {
   CHECK(296, (self->iterator)->_base._dtl[3](self->iterator) )
   CHECK(297, write(&(String){13, 12, "->length; ++"}) )
   CHECK(298, write_cname(self->item_name) )
-  CHECK(299, write(&(String){7, 6, ") {\n  "}) )
+  CHECK(299, write(&(String){13, 12, "_Index) {\n  "}) )
   CHECK(300, SyntaxTreeForLoop_write_item_var(self) )
   CHECK(301, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
   CHECK(302, write_cname(self->item_name) )
