@@ -604,6 +604,15 @@ for n in arr
 ## @ c t4
 for s in sarr
     str := s
+## @ c t5
+var Int n
+  for n in 5
+    i += n
+## @ c t6
+for n in 5
+    i += n
+  for n in 7
+    i += n
 ## @ ec te0
 for(
 ## @ ec te1
@@ -617,6 +626,11 @@ for n in str:8
 ## @ ec te5
 for n in 5
     error
+## @ ec te6
+for n in arr
+    i += n
+  for n in sarr
+
 ## @@ test-testing
 ## @ c t0
 assert t.num = 2

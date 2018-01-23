@@ -854,40 +854,90 @@ redefinition of variable "error"
 got void expression, expected "Bool"
 /// @@ test-for-loop
 /// @ t0
-{int n; for (n = 0; n < 5; ++n) {
+Int n = 0;
+  for (n = 0; n < 5; ++n) {
     i += n;
-  }
   }
 /// @ t1
-if (t == NULL || t_Refman->value == NULL) RAISE(1)
+Int n = 0;
   if (t == NULL || t_Refman->value == NULL) RAISE(1)
-  {int n; for (n = t->num; n < t->num + 2; ++n) {
+  for (n = t->num; n < t->num + 2; ++n) {
     i += n;
-  }
   }
 /// @ t2
-{int ch_Index; for (ch_Index = 0; ch_Index < str->length; ++ch_Index) {
-    Char ch = 0;
-    ch = str->values[ch_Index];
+Char ch = 0;
+  String* aux_String_0 = NULL;
+  RefManager* aux_String_0_Refman = NULL;
+  MR_dec_ref(aux_String_0_Refman);
+  aux_String_0_Refman = str_Refman;
+  MR_inc_ref(aux_String_0_Refman);
+  aux_String_0 = str;
+  {int ch_Index; for (ch_Index = 0; ch_Index < aux_String_0->length; ++ch_Index) {
+    if (aux_String_0 == NULL || aux_String_0_Refman->value == NULL) RAISE(1)
+    if ((ch_Index) < 0 || (ch_Index) >= (aux_String_0)->length) RAISE(1)
+    ch = ((aux_String_0)->values)[ch_Index];
     c = ch;
   }}
+  MR_dec_ref(aux_String_0_Refman);
+  aux_String_0_Refman = NULL;
+  MR_inc_ref(aux_String_0_Refman);
+  aux_String_0 = NULL;
 /// @ t3
-{int n_Index; for (n_Index = 0; n_Index < arr->length; ++n_Index) {
-    Int n = 0;
-    n = ((Int*)((arr)->values))[n_Index];
+Int n = 0;
+  Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
+  MR_dec_ref(aux_Array_0_Refman);
+  aux_Array_0_Refman = arr_Refman;
+  MR_inc_ref(aux_Array_0_Refman);
+  aux_Array_0 = arr;
+  {int n_Index; for (n_Index = 0; n_Index < aux_Array_0->length; ++n_Index) {
+    if (aux_Array_0 == NULL || aux_Array_0_Refman->value == NULL) RAISE(1)
+    if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(1)
+    n = ((Int*)((aux_Array_0)->values))[n_Index];
     i += n;
   }}
+  MR_dec_ref(aux_Array_0_Refman);
+  aux_Array_0_Refman = NULL;
+  MR_inc_ref(aux_Array_0_Refman);
+  aux_Array_0 = NULL;
 /// @ t4
-{int s_Index; for (s_Index = 0; s_Index < sarr->length; ++s_Index) {
-    String* s = NULL;
-    RefManager* s_Refman = NULL;
-    s = ((String**)((sarr)->values))[s_Index];
-    s_Refman = sarr_Refman;
+String* s = NULL;
+  RefManager* s_Refman = NULL;
+  Array* aux_Array_0 = NULL;
+  RefManager* aux_Array_0_Refman = NULL;
+  MR_dec_ref(aux_Array_0_Refman);
+  aux_Array_0_Refman = sarr_Refman;
+  MR_inc_ref(aux_Array_0_Refman);
+  aux_Array_0 = sarr;
+  {int s_Index; for (s_Index = 0; s_Index < aux_Array_0->length; ++s_Index) {
+    if (aux_Array_0 == NULL || aux_Array_0_Refman->value == NULL) RAISE(1)
+    if ((s_Index) < 0 || (s_Index) >= (aux_Array_0)->length) RAISE(1)
+    MR_dec_ref(s_Refman);
+    s_Refman = aux_Array_0_Refman;
+    MR_inc_ref(s_Refman);
+    s = ((String**)((aux_Array_0)->values))[s_Index];
     MR_dec_ref(str_Refman);
     str_Refman = s_Refman;
     MR_inc_ref(str_Refman);
     str = s;
   }}
+  MR_dec_ref(aux_Array_0_Refman);
+  aux_Array_0_Refman = NULL;
+  MR_inc_ref(aux_Array_0_Refman);
+  aux_Array_0 = NULL;
+/// @ t5
+Int n = 0;
+  for (n = 0; n < 5; ++n) {
+    i += n;
+  }
+/// @ t6
+Int n = 0;
+  for (n = 0; n < 5; ++n) {
+    i += n;
+  }
+  for (n = 0; n < 7; ++n) {
+    i += n;
+  }
 /// @ te0
 expected space after "for", got "("
 /// @ te1
@@ -900,6 +950,8 @@ cannot iterate void expression
 got "String" expression, expected "Int"
 /// @ te5
 unknown symbol "error"
+/// @ te6
+cannot assign "String" into "Int"
 /// @@ test-testing
 /// @ t0
 if (t == NULL || t_Refman->value == NULL) RAISE(1)
@@ -1362,8 +1414,7 @@ CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, sarr, sarr_Refman) )
   *so = NULL;
   *so_Refman = NULL;
 /// @ t13
-if (str != NULL) RAISE(1)
-  CHECK(1, Data_get(d, d_Refman, (void*)&(str), &(str_Refman)) )
+CHECK(1, Data_get(d, d_Refman, (void*)&(str), &(str_Refman)) )
 /// @ t14
 Data dg_Var = {0};
   Data* dg = NULL;
@@ -1996,21 +2047,32 @@ Returncode f_mock(Int* i) {
   Returncode MR_err = OK;
   TestIterator* aux_TestIterator_0 = NULL;
   RefManager* aux_TestIterator_0_Refman = NULL;
+  Int n = 0;
+  TestIterator* aux_TestIterator_1 = NULL;
+  RefManager* aux_TestIterator_1_Refman = NULL;
   aux_TestIterator_0 = calloc(1, sizeof(TestIterator));
   if (aux_TestIterator_0 == NULL) RAISE(9)
   aux_TestIterator_0_Refman = MR_new_ref(aux_TestIterator_0);
   if (aux_TestIterator_0_Refman == NULL) RAISE(9)
   CHECK(9, TestIterator_new(aux_TestIterator_0, aux_TestIterator_0_Refman, 6) )
+  MR_dec_ref(aux_TestIterator_1_Refman);
+  aux_TestIterator_1_Refman = aux_TestIterator_0_Refman;
+  MR_inc_ref(aux_TestIterator_1_Refman);
+  aux_TestIterator_1 = aux_TestIterator_0;
   while (true) {
     Bool n_Has = false;
-    Int n = 0;
-    CHECK(9, TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &n_Has) )
+    CHECK(9, TestIterator_has(aux_TestIterator_1, aux_TestIterator_1_Refman, &(n_Has)) )
     if (!n_Has) break;
-    CHECK(9, TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, (void*)&n) )
+    CHECK(9, TestIterator_get(aux_TestIterator_1, aux_TestIterator_1_Refman, &(n)) )
     *i = n;
-    CHECK(9, TestIterator_next(aux_TestIterator_0, aux_TestIterator_0_Refman) )
+    CHECK(9, TestIterator_next(aux_TestIterator_1, aux_TestIterator_1_Refman) )
   }
+  MR_dec_ref(aux_TestIterator_1_Refman);
+  aux_TestIterator_1_Refman = NULL;
+  MR_inc_ref(aux_TestIterator_1_Refman);
+  aux_TestIterator_1 = NULL;
 MR_cleanup:
+  MR_dec_ref(aux_TestIterator_1_Refman);
   MR_owner_dec_ref(aux_TestIterator_0_Refman);
   return MR_err;
 }
@@ -2041,21 +2103,33 @@ MR_cleanup:
 }
 Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman) {
   Returncode MR_err = OK;
+  String* t = NULL;
+  RefManager* t_Refman = NULL;
+  TestIterator* aux_TestIterator_0 = NULL;
+  RefManager* aux_TestIterator_0_Refman = NULL;
   MR_inc_ref(iter_Refman);
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = iter_Refman;
+  MR_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = iter;
   while (true) {
     Bool t_Has = false;
-    String* t = NULL;
-    RefManager* t_Refman = NULL;
-    CHECK(7, TestIterator_has(iter, iter_Refman, &t_Has) )
+    CHECK(7, TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &(t_Has)) )
     if (!t_Has) break;
-    CHECK(7, TestIterator_get(iter, iter_Refman, (void*)&t, &t_Refman) )
+    CHECK(7, TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, &(t), &(t_Refman)) )
     MR_dec_ref(*s_Refman);
     *s_Refman = t_Refman;
     MR_inc_ref(*s_Refman);
     *s = t;
-    CHECK(7, TestIterator_next(iter, iter_Refman) )
+    CHECK(7, TestIterator_next(aux_TestIterator_0, aux_TestIterator_0_Refman) )
   }
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = NULL;
+  MR_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = NULL;
 MR_cleanup:
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  MR_dec_ref(t_Refman);
   MR_dec_ref(iter_Refman);
   return MR_err;
 }
@@ -2086,21 +2160,33 @@ MR_cleanup:
 }
 Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman) {
   Returncode MR_err = OK;
+  String* t = NULL;
+  RefManager* t_Refman = NULL;
+  TestIterator* aux_TestIterator_0 = NULL;
+  RefManager* aux_TestIterator_0_Refman = NULL;
   MR_inc_ref(iter_Refman);
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = iter_Refman;
+  MR_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = iter;
   while (true) {
     Bool t_Has = false;
-    String* t = NULL;
-    RefManager* t_Refman = NULL;
-    CHECK(7, TestIterator_has(iter, iter_Refman, &t_Has) )
+    CHECK(7, TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &(t_Has)) )
     if (!t_Has) break;
-    CHECK(7, TestIterator_get(iter, iter_Refman, (void*)&t, &t_Refman) )
+    CHECK(7, TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, (void*)&(t), &(t_Refman)) )
     MR_dec_ref(*s_Refman);
     *s_Refman = t_Refman;
     MR_inc_ref(*s_Refman);
     *s = t;
-    CHECK(7, TestIterator_next(iter, iter_Refman) )
+    CHECK(7, TestIterator_next(aux_TestIterator_0, aux_TestIterator_0_Refman) )
   }
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = NULL;
+  MR_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = NULL;
 MR_cleanup:
+  MR_dec_ref(aux_TestIterator_0_Refman);
+  MR_dec_ref(t_Refman);
   MR_dec_ref(iter_Refman);
   return MR_err;
 }

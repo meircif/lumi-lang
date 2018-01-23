@@ -119,9 +119,10 @@ class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
 ## For loop node in the syntax tree
 class SyntaxTreeForLoop(SyntaxTreeFlowElement)
   owner String item-name
+  user SyntaxTreeVariable item
   owner Expression start
   owner Expression iterator
-  user TypeData item-type
+  user SymbolExpression aux-symbol
   user SyntaxTreeFunction has-func
   user SyntaxTreeFunction get-func
   user SyntaxTreeFunction next-func
@@ -142,35 +143,61 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     if end = ':'
       self.start := self.iterator
       parse-new-expression(user "", user self):(owner self.iterator, copy end)
+    
     self.parse-block(user parent, copy true):(copy end)
-    new SyntaxTreeVariable in self.block.ref-variable
-    string-new-copy(user self.item-name):(owner self.block.ref-variable.name)
-    self.block.ref-variable.check-name()
-    self.block.ref-variable.access := ACCESS-VAR
   
   func dynamic analyze()
+    owner TypeInstance type-instance
     if ? self.start
       self.analyze-expression(user self.start, user glob.type-int)
       self.analyze-expression(user self.iterator, user glob.type-int)
-      self.item-type := glob.type-int
+      glob.type-int.m-new-type-instance():(owner type-instance)
     else
       self.iterator.analyze()
       if not (? self.iterator.result-type)
         self.m-syntax-error-msg(user "cannot iterate void expression")
       if self.iterator.result-type.type-data = glob.type-int
-        self.item-type := glob.type-int
+        glob.type-int.m-new-type-instance():(owner type-instance)
       else-if self.iterator.result-type.type-data = glob.type-string
-        self.item-type := glob.type-char
+        glob.type-char.m-new-type-instance():(owner type-instance)
       else-if self.iterator.result-type.type-data = glob.type-array
-        self.item-type :=
-            self.iterator.result-type.parameters.first.item.type-data
+        self.iterator.result-type.parameters.first.item.copy-new():(
+            owner type-instance)
       else
-        self.check-iterator-type()
-    self.item-type.m-new-type-instance():(
-        owner self.block.ref-variable.type-instance)
+        self.get-iterator-type():(owner type-instance)
+    
+    if ? self.parent.find-variable(user self.item-name):(user self.item)
+      type-instance.check-assign-to(user self.item.type-instance, user self)
+      delete type-instance
+      delete self.item-name
+    else
+      new SyntaxTreeVariable item
+      item.name := self.item-name
+      if type-instance.type-data.is-primitive
+        item.access := ACCESS-VAR
+      else
+        item.access := ACCESS-USER
+      item.type-instance := type-instance
+      user SyntaxTreeFunction function
+      self.get-function():(user function)
+      item.parent := function
+      self.item := item
+      function.variables.add(owner item)
+    self.item-name := _
+    
+    if self.iterator.result-type.type-data != glob.type-int
+      new SymbolExpression in self.aux-symbol
+      self.aux-symbol.code-node := self
+      self.iterator.result-type.copy-new():(owner self.aux-symbol.result-type)
+      self.get-function().add-aux-variable(
+          copy ACCESS-USER, copy false, user self.iterator.result-type):(
+          user self.aux-symbol.variable)
+      string-new-copy(user self.aux-symbol.variable.name):(
+          owner self.aux-symbol.name)
+    
     base.analyze()
   
-  func inst check-iterator-type()
+  func inst get-iterator-type():(owner TypeInstance type-instance)
     self.iterator.result-type.type-data.find-meth(user "has"):(
         user self.has-func)
     if not (? self.has-func)
@@ -218,11 +245,8 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
           user "iterator \"get\" method output has \"owner\" access in type",
           user self.iterator.result-type.type-data.name)
     
-    owner TypeInstance real-type
     self.get-func.arguments.outputs.first.item.get-type-instance().f-new-replace-params(
-        user self.iterator.result-type, copy 0):(owner real-type)
-    self.item-type := real-type.type-data
-    delete real-type
+        user self.iterator.result-type, copy 0):(owner type-instance)
     
     self.iterator.result-type.type-data.find-meth(user "next"):(
         user self.next-func)
@@ -240,162 +264,167 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
           user self.iterator.result-type.type-data.name)
   
   func dynamic write()
+    user TypeData iterator-type(self.iterator.result-type.type-data)
+    if ? self.aux-symbol
+      self.write-assign(
+          user self.aux-symbol.variable, owner self.iterator, user self.parent)
     self.write-spaces()
     if ? self.start
       self.start.write-preactions()
-    self.iterator.write-preactions()
-    if self.iterator.result-type.type-data = glob.type-int
+    if iterator-type = glob.type-int
       self.write-int-iter()
-    else-if self.iterator.result-type.type-data = glob.type-string or
-        self.iterator.result-type.type-data = glob.type-array
+    else-if iterator-type = glob.type-string or iterator-type = glob.type-array
       self.write-seq()
     else
       self.write-iter()
+    if ? self.aux-symbol
+      new EmptyExpression empty
+      self.write-assign(
+          user self.aux-symbol.variable, owner empty, user self.parent)
+  
+  func inst write-assign(
+      user SyntaxTreeVariable item,
+      owner Expression value,
+      user SyntaxTreeBlock parent)
+    var SyntaxTreeExpression expression-node
+    expression-node.parent := parent
+    value.code-node := expression-node
+    
+    new SymbolExpression symbol
+    string-new-copy(user item.name):(owner symbol.name)
+    item.type-instance.copy-new():(owner symbol.result-type)
+    
+    new BinaryExpression assign
+    assign.top := true
+    assign.is-statement := true
+    assign.code-node := expression-node
+    assign.left-expression := symbol
+    glob.operator-map.find(user ":="):(user assign.operator)
+    assign.right-expression := value
+    
+    expression-node.expression := assign
+    expression-node.write()
   
   func inst write-int-iter()
-    # {int `item`; for(`item` = `start`; `item` < `iterator`; ++`item`) {
+    # for(`item` = `start`; `item` < `iterator`; ++`item`) {
     #   `block...`
-    # }}
-    write(user "{int ")
-    write-cname(user self.item-name)
-    write(user "; for (")
-    write-cname(user self.item-name)
+    # }
+    write(user "for (")
+    write-cname(user self.item.name)
     write(user " = ")
     if ? self.start
       self.start.write()
     else
       write(user "0")
     write(user "; ")
-    write-cname(user self.item-name)
+    write-cname(user self.item.name)
     write(user " < ")
     self.iterator.write()
     write(user "; ++")
-    write-cname(user self.item-name)
+    write-cname(user self.item.name)
     write(user ")")
     self.write-block()
-    self.write-spaces()
-    write(user "}\n")
   
   func inst write-seq()
     # {int `item`_Index; for (`item`_Index = 0; `item`_Index < `iterator`->length; ++`item`_Index) {
-    #   `item-type`* `item` = NULL;
-    #   RefManager* `item`_Refman = NULL;
-    #   `item` = `iterator`->values[`item`_Index];
-    #   `item` = ((`item-type`*)((`iterator`)->values))[`item`_Index];
-    #   `item` = ((`item-type`**)((`iterator`)->values))[`item`_Index];
-    #   `item`_Refman = `iterator-Refman`;
+    #   `item` = `aux-var`[`item`_Index];
     #   `block...`
     # }}
     write(user "{int ")
-    write-cname(user self.item-name)
+    write-cname(user self.item.name)
     write(user "_Index; for (")
-    write-cname(user self.item-name)
+    write-cname(user self.item.name)
     write(user "_Index = 0; ")
-    write-cname(user self.item-name)
+    write-cname(user self.item.name)
     write(user "_Index < ")
-    self.iterator.write()
+    self.aux-symbol.write()
     write(user "->length; ++")
-    write-cname(user self.item-name)
-    write(user "_Index) {\n  ")
-    self.write-item-var()
-    self.write-spaces()
-    write-cname(user self.item-name)
-    write(user " = ")
-    if self.iterator.result-type.type-data = glob.type-string
-      self.iterator.write()
-      write(user "->values")
-    else
-      write(user "((")
-      write-cname(user self.item-type.name)
-      if not self.item-type.is-primitive
-        write(user "*")
-      write(user "*)((")
-      self.iterator.write()
-      write(user ")->values))")
-    write(user "[")
-    write-cname(user self.item-name)
-    write(user "_Index];\n")
-    if not self.item-type.is-primitive
-      self.write-spaces()
-      write(user "  ")
-      write-cname(user self.item-name)
-      write(user "_Refman = ")
-      self.iterator.write-refman()
-      write(user ";\n")
+    write-cname(user self.item.name)
+    write(user "_Index) {\n")
+    
+    new SymbolExpression index-symbol
+    string-new-concat(user self.item.name, user "_Index"):(
+        owner index-symbol.name)
+    new SliceExpression slice
+    slice.top := true
+    slice.line-number := self.line-number
+    slice.sequence := self.aux-symbol
+    slice.index := index-symbol
+    self.item.type-instance.copy-new():(owner slice.result-type)
+    self.write-assign(user self.item, owner slice, user self.block)
     
     self.write-block-body()
     
     self.write-spaces()
     write(user "}}\n")
   
-  func inst write-item-var()
-    self.write-spaces()
-    write-cname(user self.item-type.name)
-    if not self.item-type.is-primitive
-      write(user "*")
-    write(user " ")
-    write-cname(user self.item-name)
-    write(user " = ")
-    if self.item-type.is-primitive
-      write(user "0")
-    else
-      write(user "NULL")
-    write(user ";\n  ")
-    if not self.item-type.is-primitive
-      self.write-spaces()
-      write(user "RefManager* ")
-      write-cname(user self.item-name)
-      write(user "_Refman = NULL;\n  ")
-  
   func inst write-iter()
     # while (true) {
     #   Bool `item`_Has = false;
-    #   `item-type`* `item` = NULL;
-    #   RefManager* `item`_Refman = NULL;
-    #   CALL( `iterator-type`_has(`iterator`, &`item`_Has) )
+    #   `has-func`()->(`item`_Has)
     #   if (!`item`_Has) break;
-    #   CALL( `iterator-type`_get(`iterator`, (void*)&`item`, &`item-refman`) )
+    #   `get-func`()->(`item`)
     #   `block...`
-    #   CALL( `iterator-type`_next(`iterator`) )
+    #   `next-func`()
     # }
-    write(user "while (true) {\n  ")
-    self.write-spaces()
+    write(user "while (true) {\n")
+    self.block.write-spaces()
     write(user "Bool ")
-    write-cname(user self.item-name)
-    write(user "_Has = false;\n  ")
-    self.write-item-var()
-    self.write-spaces()
-    self.write-iter-meth(user self.has-func)
-    write(user ", &")
-    write-cname(user self.item-name)
-    write(user "_Has) )\n  ")
-    self.write-spaces()
+    write-cname(user self.item.name)
+    write(user "_Has = false;\n")
+    
+    new SymbolExpression has-symbol
+    string-new-concat(user self.item.name, user "_Has"):(owner has-symbol.name)
+    glob.type-bool.m-new-type-instance():(owner has-symbol.result-type)
+    new CallArgument has-arg
+    has-arg.value := has-symbol
+    self.write-iter-meth(user self.has-func, owner has-arg)
+    
+    self.block.write-spaces()
     write(user "if (!")
-    write-cname(user self.item-name)
-    write(user "_Has) break;\n  ")
-    self.write-spaces()
-    self.write-iter-meth(user self.get-func)
-    write(user ", (void*)&")
-    write-cname(user self.item-name)
-    if not self.item-type.is-primitive
-      write(user ", &")
-      write-cname(user self.item-name)
-      write(user "_Refman")
-    write(user ") )\n")
+    write-cname(user self.item.name)
+    write(user "_Has) break;\n")
+    
+    new SymbolExpression item-symbol
+    string-new-copy(user self.item.name):(owner item-symbol.name)
+    self.item.type-instance.copy-new():(owner item-symbol.result-type)
+    new CallArgument item-arg
+    item-arg.value := item-symbol
+    item-arg.is-generic :=
+        self.get-func.arguments.outputs.first.item.get-type-instance().type-data =
+        glob.type-generic
+    self.write-iter-meth(user self.get-func, owner item-arg)
     
     self.write-block-body()
     
-    self.write-spaces()
-    write(user "  ")
-    self.write-iter-meth(user self.next-func)
-    write(user ") )\n")
+    self.write-iter-meth(user self.next-func, owner _)
     self.write-spaces()
     write(user "}\n")
   
-  func inst write-iter-meth(user SyntaxTreeFunction meth)
-    self.write-call()
-    meth.write-cname()
-    write(user "(")
-    self.iterator.write()
-    write(user ", ")
-    self.iterator.write-refman()
+  func inst write-iter-meth(
+      user SyntaxTreeFunction meth, owner CallArgument output-arg)
+    var SyntaxTreeExpression expression-node
+    expression-node.parent := self.block
+    
+    new SymbolExpression symbol
+    symbol.function := meth
+    
+    new CallArgument self-arg
+    self-arg.is-dynamic := self.aux-symbol.result-type.type-data.is-dynamic
+    self-arg.value := self.aux-symbol
+    
+    new CallExpression call
+    call.line-number := self.line-number
+    call.top := true
+    call.is-statement := true
+    call.function := symbol
+    new FunctionArguments in call.arguments
+    call.arguments.init()
+    call.arguments.parameters.add(owner self-arg)
+    if ? output-arg
+      output-arg.is-output := true
+      output-arg.code-node := expression-node
+      call.arguments.outputs.add(owner output-arg)
+    
+    expression-node.expression := call
+    expression-node.write()

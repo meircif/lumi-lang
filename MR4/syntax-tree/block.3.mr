@@ -42,7 +42,6 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   owner List{SyntaxTreeCode} code-nodes
   user SyntaxTreeIf previous-if
   user SyntaxTreeTry previous-try
-  owner SyntaxTreeVariable ref-variable
   var Bool is-in-loop
   
   func inst parse-block():(copy Char end)
@@ -181,8 +180,6 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   func dynamic find-variable(user String name):(
       user SyntaxTreeVariable variable)
     base.find-variable(user name):(user variable)
-    if not (? variable) and ? self.ref-variable
-      self.ref-variable.find-variable(user name):(user variable)
     if not (? variable) and ? self.parent
       self.parent.find-variable(user name):(user variable)
   

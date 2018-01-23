@@ -28,7 +28,7 @@ static char* _func_name_SyntaxTreeFlowElement_init = "SyntaxTreeFlowElement.init
 Returncode SyntaxTreeFlowElement_init(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent) {
   self->block = malloc(sizeof(SyntaxTreeBlock));
   if (self->block == NULL) RAISE(8)
-  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false};
+  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false};
   self->block->_base._base._dtl = SyntaxTreeBlock__dtl;
   CHECK(9, SyntaxTreeFlowElement_set_parent(self, parent) )
   return OK;
@@ -334,9 +334,10 @@ typedef struct SyntaxTreeForLoop SyntaxTreeForLoop;
 struct SyntaxTreeForLoop {
   SyntaxTreeFlowElement _base;
   String* item_name;
+  SyntaxTreeVariable* item;
   Expression* start;
   Expression* iterator;
-  TypeData* item_type;
+  SymbolExpression* aux_symbol;
   SyntaxTreeFunction* has_func;
   SyntaxTreeFunction* get_func;
   SyntaxTreeFunction* next_func;
@@ -349,10 +350,10 @@ static char* _func_name_SyntaxTreeForLoop_parse_new = "SyntaxTreeForLoop.parse-n
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_parse_new
 Returncode SyntaxTreeForLoop_parse_new(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeForLoop** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeForLoop));
-  if ((*new_node) == NULL) RAISE(131)
-  *(*new_node) = (SyntaxTreeForLoop){SyntaxTreeForLoop__dtl, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  if ((*new_node) == NULL) RAISE(132)
+  *(*new_node) = (SyntaxTreeForLoop){SyntaxTreeForLoop__dtl, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeForLoop__dtl;
-  CHECK(132, SyntaxTreeForLoop_parse((*new_node), parent, &((*end))) )
+  CHECK(133, SyntaxTreeForLoop_parse((*new_node), parent, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -363,25 +364,19 @@ Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* par
 static char* _func_name_SyntaxTreeForLoop_parse = "SyntaxTreeForLoop.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_parse
 Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end) {
-  CHECK(135, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
-  CHECK(136, read_new(&(String){2, 1, " "}, &(self->item_name), &((*end))) )
+  CHECK(136, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
+  CHECK(137, read_new(&(String){2, 1, " "}, &(self->item_name), &((*end))) )
   if ((*end) != ' ') {
-    CHECK(138, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){37, 36, "expected space after index name, got"}, (*end)) )
+    CHECK(139, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){37, 36, "expected space after index name, got"}, (*end)) )
   }
-  CHECK(140, SyntaxTreeNode_read_expect(&(self->_base._base._base), &(String){4, 3, "in "}) )
-  CHECK(141, parse_new_expression(&(String){2, 1, ":"}, &(self->_base._base), &(self->iterator), &((*end))) )
+  CHECK(141, SyntaxTreeNode_read_expect(&(self->_base._base._base), &(String){4, 3, "in "}) )
+  CHECK(142, parse_new_expression(&(String){2, 1, ":"}, &(self->_base._base), &(self->iterator), &((*end))) )
   if ((*end) == ':') {
     self->start = self->iterator;
-    CHECK(144, parse_new_expression(&(String){1, 0, ""}, &(self->_base._base), &(self->iterator), &((*end))) )
+    CHECK(145, parse_new_expression(&(String){1, 0, ""}, &(self->_base._base), &(self->iterator), &((*end))) )
   }
-  CHECK(145, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, true, &((*end))) )
-  self->_base.block->ref_variable = malloc(sizeof(SyntaxTreeVariable));
-  if (self->_base.block->ref_variable == NULL) RAISE(146)
-  *self->_base.block->ref_variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
-  self->_base.block->ref_variable->_base._base._dtl = SyntaxTreeVariable__dtl;
-  CHECK(147, string_new_copy(self->item_name, &(self->_base.block->ref_variable->name)) )
-  CHECK(148, SyntaxTreeVariable_check_name(self->_base.block->ref_variable) )
-  self->_base.block->ref_variable->access = ACCESS_VAR;
+  
+  CHECK(147, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, true, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -392,100 +387,139 @@ Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self);
 static char* _func_name_SyntaxTreeForLoop_analyze = "SyntaxTreeForLoop.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_analyze
 Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self) {
+  TypeInstance* type_instance = NULL;
   if (NULL != self->start) {
-    CHECK(153, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->start, &(glob->type_int->_base)) )
-    CHECK(154, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->iterator, &(glob->type_int->_base)) )
-    self->item_type = &(glob->type_int->_base);
+    CHECK(152, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->start, &(glob->type_int->_base)) )
+    CHECK(153, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->iterator, &(glob->type_int->_base)) )
+    CHECK(154, TypeData_m_new_type_instance(&(glob->type_int->_base), &(type_instance)) )
   }
   else {
-    CHECK(157, (self->iterator)->_base._dtl[2](self->iterator) )
+    CHECK(156, (self->iterator)->_base._dtl[2](self->iterator) )
     if (!(NULL != self->iterator->result_type)) {
-      CHECK(159, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){31, 30, "cannot iterate void expression"}) )
+      CHECK(158, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){31, 30, "cannot iterate void expression"}) )
     }
     if (self->iterator->result_type->type_data == &(glob->type_int->_base)) {
-      self->item_type = &(glob->type_int->_base);
+      CHECK(160, TypeData_m_new_type_instance(&(glob->type_int->_base), &(type_instance)) )
     }
     else {
       if (self->iterator->result_type->type_data == &(glob->type_string->_base)) {
-        self->item_type = &(glob->type_char->_base);
+        CHECK(162, TypeData_m_new_type_instance(&(glob->type_char->_base), &(type_instance)) )
       }
       else {
         if (self->iterator->result_type->type_data == &(glob->type_array->_base)) {
-          self->item_type = ((TypeInstance*)(self->iterator->result_type->parameters->first->item))->type_data;
+          CHECK(164, TypeInstance_copy_new(((TypeInstance*)(self->iterator->result_type->parameters->first->item)), &(type_instance)) )
         }
         else {
-          CHECK(168, SyntaxTreeForLoop_check_iterator_type(self) )
+          CHECK(167, SyntaxTreeForLoop_get_iterator_type(self, &(type_instance)) )
         }
       }
     }
   }
-  CHECK(169, TypeData_m_new_type_instance(self->item_type, &(self->_base.block->ref_variable->type_instance)) )
-  CHECK(171, SyntaxTreeFlowElement_analyze(&(self->_base)) )
+  
+  CHECK(169, (self->_base._base.parent)->_base._base._dtl[5](self->_base._base.parent, self->item_name, &(self->item)) )
+  if (NULL != self->item) {
+    Int _Int90;
+    CHECK(170, TypeInstance_check_assign_to(type_instance, self->item->type_instance, &(self->_base._base._base), &(_Int90)) )
+    free(type_instance);
+    free(self->item_name);
+  }
+  else {
+    SyntaxTreeVariable* item = malloc(sizeof(SyntaxTreeVariable));
+    if (item == NULL) RAISE(174)
+    *item = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
+    item->_base._base._dtl = SyntaxTreeVariable__dtl;
+    item->name = self->item_name;
+    if (type_instance->type_data->is_primitive) {
+      item->access = ACCESS_VAR;
+    }
+    else {
+      item->access = ACCESS_USER;
+    }
+    item->type_instance = type_instance;
+    SyntaxTreeFunction* function = NULL;
+    CHECK(182, SyntaxTreeCode_get_function(&(self->_base._base), &(function)) )
+    item->_base.parent = &(function->_base);
+    self->item = item;
+    CHECK(185, List_add(function->_base._base.variables, item) )
+  }
+  self->item_name = NULL;
+  
+  if (self->iterator->result_type->type_data != &(glob->type_int->_base)) {
+    self->aux_symbol = malloc(sizeof(SymbolExpression));
+    if (self->aux_symbol == NULL) RAISE(189)
+    *self->aux_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL};
+    self->aux_symbol->_base._base._dtl = SymbolExpression__dtl;
+    self->aux_symbol->_base.code_node = &(self->_base._base);
+    CHECK(191, TypeInstance_copy_new(self->iterator->result_type, &(self->aux_symbol->_base.result_type)) )
+    SyntaxTreeFunction* _SyntaxTreeFunction91;
+    CHECK(192, SyntaxTreeCode_get_function(&(self->_base._base), &(_SyntaxTreeFunction91)) )
+    CHECK(192, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction91, ACCESS_USER, false, self->iterator->result_type, &(self->aux_symbol->variable)) )
+    CHECK(195, string_new_copy(self->aux_symbol->variable->name, &(self->aux_symbol->name)) )
+  }
+  
+  CHECK(198, SyntaxTreeFlowElement_analyze(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeForLoop_check_iterator_type(SyntaxTreeForLoop* self);
+Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInstance** type_instance);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeForLoop_check_iterator_type = "SyntaxTreeForLoop.check-iterator-type";
-#define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_check_iterator_type
-Returncode SyntaxTreeForLoop_check_iterator_type(SyntaxTreeForLoop* self) {
-  Int _Int91;
-  CHECK(174, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "has"}, &(self->has_func), &(_Int91)) )
+static char* _func_name_SyntaxTreeForLoop_get_iterator_type = "SyntaxTreeForLoop.get-iterator-type";
+#define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_get_iterator_type
+Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInstance** type_instance) {
+  Int _Int92;
+  CHECK(201, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "has"}, &(self->has_func), &(_Int92)) )
   if (!(NULL != self->has_func)) {
-    CHECK(177, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"has\" named method - "}, self->iterator->result_type->type_data->name) )
+    CHECK(204, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"has\" named method - "}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->has_func->arguments->parameters->first->next) {
-    CHECK(181, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"has\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(208, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"has\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
   }
   if (!(NULL != self->has_func->arguments->outputs->first)) {
-    CHECK(185, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"has\" method has no outputs in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(212, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"has\" method has no outputs in type"}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->has_func->arguments->outputs->first->next) {
-    CHECK(189, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){55, 54, "iterator \"has\" method has more than one output in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(216, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){55, 54, "iterator \"has\" method has more than one output in type"}, self->iterator->result_type->type_data->name) )
   }
-  TypeInstance* _TypeInstance92;
-  CHECK(192, (((Argument*)(self->has_func->arguments->outputs->first->item)))->_base._dtl[6](((Argument*)(self->has_func->arguments->outputs->first->item)), &(_TypeInstance92)) )
-  if (_TypeInstance92->type_data != &(glob->type_bool->_base)) {
-    CHECK(194, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){51, 50, "iterator \"has\" method output is not \"Bool\" in type"}, self->iterator->result_type->type_data->name) )
+  TypeInstance* _TypeInstance93;
+  CHECK(219, (((Argument*)(self->has_func->arguments->outputs->first->item)))->_base._dtl[6](((Argument*)(self->has_func->arguments->outputs->first->item)), &(_TypeInstance93)) )
+  if (_TypeInstance93->type_data != &(glob->type_bool->_base)) {
+    CHECK(221, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){51, 50, "iterator \"has\" method output is not \"Bool\" in type"}, self->iterator->result_type->type_data->name) )
   }
   
-  Int _Int93;
-  CHECK(198, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "get"}, &(self->get_func), &(_Int93)) )
+  Int _Int94;
+  CHECK(225, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "get"}, &(self->get_func), &(_Int94)) )
   if (!(NULL != self->get_func)) {
-    CHECK(201, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"get\" named method - "}, self->iterator->result_type->type_data->name) )
+    CHECK(228, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"get\" named method - "}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->get_func->arguments->parameters->first->next) {
-    CHECK(205, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"get\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(232, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"get\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
   }
   if (!(NULL != self->get_func->arguments->outputs->first)) {
-    CHECK(209, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"get\" method has no outputs in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(236, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"get\" method has no outputs in type"}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->get_func->arguments->outputs->first->next) {
-    CHECK(213, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){55, 54, "iterator \"get\" method has more than one output in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(240, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){55, 54, "iterator \"get\" method has more than one output in type"}, self->iterator->result_type->type_data->name) )
   }
   if (((Argument*)(self->get_func->arguments->outputs->first->item))->access == ACCESS_OWNER) {
-    CHECK(217, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){56, 55, "iterator \"get\" method output has \"owner\" access in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(244, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){56, 55, "iterator \"get\" method output has \"owner\" access in type"}, self->iterator->result_type->type_data->name) )
   }
   
-  TypeInstance* real_type = NULL;
-  TypeInstance* _TypeInstance94;
-  CHECK(222, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[6](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance94)) )
-  CHECK(222, TypeInstance_f_new_replace_params(_TypeInstance94, self->iterator->result_type, 0, &(real_type)) )
-  self->item_type = real_type->type_data;
-  free(real_type);
+  TypeInstance* _TypeInstance95;
+  CHECK(248, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[6](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance95)) )
+  CHECK(248, TypeInstance_f_new_replace_params(_TypeInstance95, self->iterator->result_type, 0, &((*type_instance))) )
   
-  Int _Int95;
-  CHECK(227, TypeData_find_meth(self->iterator->result_type->type_data, &(String){5, 4, "next"}, &(self->next_func), &(_Int95)) )
+  Int _Int96;
+  CHECK(251, TypeData_find_meth(self->iterator->result_type->type_data, &(String){5, 4, "next"}, &(self->next_func), &(_Int96)) )
   if (!(NULL != self->next_func)) {
-    CHECK(230, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){51, 50, "cannot iterate type with no \"next\" named method - "}, self->iterator->result_type->type_data->name) )
+    CHECK(254, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){51, 50, "cannot iterate type with no \"next\" named method - "}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->next_func->arguments->parameters->first->next) {
-    CHECK(234, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){46, 45, "iterator \"next\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(258, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){46, 45, "iterator \"next\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->next_func->arguments->outputs->first) {
-    CHECK(238, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){43, 42, "iterator \"next\" method has outputs in type"}, self->iterator->result_type->type_data->name) )
+    CHECK(262, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){43, 42, "iterator \"next\" method has outputs in type"}, self->iterator->result_type->type_data->name) )
   }
   return OK;
 }
@@ -497,22 +531,67 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self);
 static char* _func_name_SyntaxTreeForLoop_write = "SyntaxTreeForLoop.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_write
 Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
-  CHECK(243, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  if (NULL != self->start) {
-    CHECK(245, (self->start)->_base._dtl[7](self->start) )
+  TypeData* iterator_type = self->iterator->result_type->type_data;
+  if (NULL != self->aux_symbol) {
+    CHECK(269, SyntaxTreeForLoop_write_assign(self, self->aux_symbol->variable, self->iterator, self->_base._base.parent) )
   }
-  CHECK(246, (self->iterator)->_base._dtl[7](self->iterator) )
-  if (self->iterator->result_type->type_data == &(glob->type_int->_base)) {
-    CHECK(248, SyntaxTreeForLoop_write_int_iter(self) )
+  CHECK(271, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  if (NULL != self->start) {
+    CHECK(273, (self->start)->_base._dtl[7](self->start) )
+  }
+  if (iterator_type == &(glob->type_int->_base)) {
+    CHECK(275, SyntaxTreeForLoop_write_int_iter(self) )
   }
   else {
-    if (self->iterator->result_type->type_data == &(glob->type_string->_base) || self->iterator->result_type->type_data == &(glob->type_array->_base)) {
-      CHECK(251, SyntaxTreeForLoop_write_seq(self) )
+    if (iterator_type == &(glob->type_string->_base) || iterator_type == &(glob->type_array->_base)) {
+      CHECK(277, SyntaxTreeForLoop_write_seq(self) )
     }
     else {
-      CHECK(253, SyntaxTreeForLoop_write_iter(self) )
+      CHECK(279, SyntaxTreeForLoop_write_iter(self) )
     }
   }
+  if (NULL != self->aux_symbol) {
+    EmptyExpression* empty = malloc(sizeof(EmptyExpression));
+    if (empty == NULL) RAISE(281)
+    *empty = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false};
+    empty->_base._base._dtl = EmptyExpression__dtl;
+    CHECK(282, SyntaxTreeForLoop_write_assign(self, self->aux_symbol->variable, &(empty->_base), self->_base._base.parent) )
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeForLoop_write_assign(SyntaxTreeForLoop* self, SyntaxTreeVariable* item, Expression* value, SyntaxTreeBlock* parent);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeForLoop_write_assign = "SyntaxTreeForLoop.write-assign";
+#define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_write_assign
+Returncode SyntaxTreeForLoop_write_assign(SyntaxTreeForLoop* self, SyntaxTreeVariable* item, Expression* value, SyntaxTreeBlock* parent) {
+  SyntaxTreeExpression* expression_node = &(SyntaxTreeExpression){SyntaxTreeExpression__dtl, NULL, 0, NULL, NULL};
+  expression_node->_base._base._dtl = SyntaxTreeExpression__dtl;
+  expression_node->_base.parent = parent;
+  value->code_node = &(expression_node->_base);
+  
+  SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
+  if (symbol == NULL) RAISE(293)
+  *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL};
+  symbol->_base._base._dtl = SymbolExpression__dtl;
+  CHECK(294, string_new_copy(item->name, &(symbol->name)) )
+  CHECK(295, TypeInstance_copy_new(item->type_instance, &(symbol->_base.result_type)) )
+  
+  BinaryExpression* assign = malloc(sizeof(BinaryExpression));
+  if (assign == NULL) RAISE(297)
+  *assign = (BinaryExpression){BinaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL, NULL};
+  assign->_base._base._base._dtl = BinaryExpression__dtl;
+  assign->_base._base.top = true;
+  assign->_base._base.is_statement = true;
+  assign->_base._base.code_node = &(expression_node->_base);
+  assign->left_expression = &(symbol->_base);
+  CHECK(302, NameMap_find(glob->operator_map, &(String){3, 2, ":="}, (void**)&(assign->_base.operator)) )
+  assign->_base.right_expression = value;
+  
+  expression_node->expression = &(assign->_base._base);
+  CHECK(306, (expression_node)->_base._base._dtl[3](expression_node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -523,30 +602,26 @@ Returncode SyntaxTreeForLoop_write_int_iter(SyntaxTreeForLoop* self);
 static char* _func_name_SyntaxTreeForLoop_write_int_iter = "SyntaxTreeForLoop.write-int-iter";
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_write_int_iter
 Returncode SyntaxTreeForLoop_write_int_iter(SyntaxTreeForLoop* self) {
-  /* {int `item`; for(`item` = `start`; `item` < `iterator`; ++`item`) { */
+  /* for(`item` = `start`; `item` < `iterator`; ++`item`) { */
   /*   `block...` */
-  /* }} */
-  CHECK(259, write(&(String){6, 5, "{int "}) )
-  CHECK(260, write_cname(self->item_name) )
-  CHECK(261, write(&(String){8, 7, "; for ("}) )
-  CHECK(262, write_cname(self->item_name) )
-  CHECK(263, write(&(String){4, 3, " = "}) )
+  /* } */
+  CHECK(312, write(&(String){6, 5, "for ("}) )
+  CHECK(313, write_cname(self->item->name) )
+  CHECK(314, write(&(String){4, 3, " = "}) )
   if (NULL != self->start) {
-    CHECK(265, (self->start)->_base._dtl[3](self->start) )
+    CHECK(316, (self->start)->_base._dtl[3](self->start) )
   }
   else {
-    CHECK(267, write(&(String){2, 1, "0"}) )
+    CHECK(318, write(&(String){2, 1, "0"}) )
   }
-  CHECK(268, write(&(String){3, 2, "; "}) )
-  CHECK(269, write_cname(self->item_name) )
-  CHECK(270, write(&(String){4, 3, " < "}) )
-  CHECK(271, (self->iterator)->_base._dtl[3](self->iterator) )
-  CHECK(272, write(&(String){5, 4, "; ++"}) )
-  CHECK(273, write_cname(self->item_name) )
-  CHECK(274, write(&(String){2, 1, ")"}) )
-  CHECK(275, SyntaxTreeFlowElement_write_block(&(self->_base)) )
-  CHECK(276, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(277, write(&(String){3, 2, "}\n"}) )
+  CHECK(319, write(&(String){3, 2, "; "}) )
+  CHECK(320, write_cname(self->item->name) )
+  CHECK(321, write(&(String){4, 3, " < "}) )
+  CHECK(322, (self->iterator)->_base._dtl[3](self->iterator) )
+  CHECK(323, write(&(String){5, 4, "; ++"}) )
+  CHECK(324, write_cname(self->item->name) )
+  CHECK(325, write(&(String){2, 1, ")"}) )
+  CHECK(326, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -558,90 +633,41 @@ static char* _func_name_SyntaxTreeForLoop_write_seq = "SyntaxTreeForLoop.write-s
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_write_seq
 Returncode SyntaxTreeForLoop_write_seq(SyntaxTreeForLoop* self) {
   /* {int `item`_Index; for (`item`_Index = 0; `item`_Index < `iterator`->length; ++`item`_Index) { */
-  /*   `item-type`* `item` = NULL; */
-  /*   RefManager* `item`_Refman = NULL; */
-  /*   `item` = `iterator`->values[`item`_Index]; */
-  /*   `item` = ((`item-type`*)((`iterator`)->values))[`item`_Index]; */
-  /*   `item` = ((`item-type`**)((`iterator`)->values))[`item`_Index]; */
-  /*   `item`_Refman = `iterator-Refman`; */
+  /*   `item` = `aux-var`[`item`_Index]; */
   /*   `block...` */
   /* }} */
-  CHECK(289, write(&(String){6, 5, "{int "}) )
-  CHECK(290, write_cname(self->item_name) )
-  CHECK(291, write(&(String){14, 13, "_Index; for ("}) )
-  CHECK(292, write_cname(self->item_name) )
-  CHECK(293, write(&(String){13, 12, "_Index = 0; "}) )
-  CHECK(294, write_cname(self->item_name) )
-  CHECK(295, write(&(String){10, 9, "_Index < "}) )
-  CHECK(296, (self->iterator)->_base._dtl[3](self->iterator) )
-  CHECK(297, write(&(String){13, 12, "->length; ++"}) )
-  CHECK(298, write_cname(self->item_name) )
-  CHECK(299, write(&(String){13, 12, "_Index) {\n  "}) )
-  CHECK(300, SyntaxTreeForLoop_write_item_var(self) )
-  CHECK(301, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(302, write_cname(self->item_name) )
-  CHECK(303, write(&(String){4, 3, " = "}) )
-  if (self->iterator->result_type->type_data == &(glob->type_string->_base)) {
-    CHECK(305, (self->iterator)->_base._dtl[3](self->iterator) )
-    CHECK(306, write(&(String){9, 8, "->values"}) )
-  }
-  else {
-    CHECK(308, write(&(String){3, 2, "(("}) )
-    CHECK(309, write_cname(self->item_type->name) )
-    if (!self->item_type->is_primitive) {
-      CHECK(311, write(&(String){2, 1, "*"}) )
-    }
-    CHECK(312, write(&(String){5, 4, "*)(("}) )
-    CHECK(313, (self->iterator)->_base._dtl[3](self->iterator) )
-    CHECK(314, write(&(String){12, 11, ")->values))"}) )
-  }
-  CHECK(315, write(&(String){2, 1, "["}) )
-  CHECK(316, write_cname(self->item_name) )
-  CHECK(317, write(&(String){10, 9, "_Index];\n"}) )
-  if (!self->item_type->is_primitive) {
-    CHECK(319, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-    CHECK(320, write(&(String){3, 2, "  "}) )
-    CHECK(321, write_cname(self->item_name) )
-    CHECK(322, write(&(String){11, 10, "_Refman = "}) )
-    CHECK(323, (self->iterator)->_base._dtl[5](self->iterator) )
-    CHECK(324, write(&(String){3, 2, ";\n"}) )
-  }
+  CHECK(333, write(&(String){6, 5, "{int "}) )
+  CHECK(334, write_cname(self->item->name) )
+  CHECK(335, write(&(String){14, 13, "_Index; for ("}) )
+  CHECK(336, write_cname(self->item->name) )
+  CHECK(337, write(&(String){13, 12, "_Index = 0; "}) )
+  CHECK(338, write_cname(self->item->name) )
+  CHECK(339, write(&(String){10, 9, "_Index < "}) )
+  CHECK(340, (self->aux_symbol)->_base._base._dtl[3](self->aux_symbol) )
+  CHECK(341, write(&(String){13, 12, "->length; ++"}) )
+  CHECK(342, write_cname(self->item->name) )
+  CHECK(343, write(&(String){11, 10, "_Index) {\n"}) )
   
-  CHECK(326, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )
+  SymbolExpression* index_symbol = malloc(sizeof(SymbolExpression));
+  if (index_symbol == NULL) RAISE(345)
+  *index_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL};
+  index_symbol->_base._base._dtl = SymbolExpression__dtl;
+  CHECK(346, string_new_concat(self->item->name, &(String){7, 6, "_Index"}, &(index_symbol->name)) )
+  SliceExpression* slice = malloc(sizeof(SliceExpression));
+  if (slice == NULL) RAISE(348)
+  *slice = (SliceExpression){SliceExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL, NULL};
+  slice->_base._base._dtl = SliceExpression__dtl;
+  slice->_base.top = true;
+  slice->_base._base.line_number = self->_base._base._base.line_number;
+  slice->sequence = &(self->aux_symbol->_base);
+  slice->index = &(index_symbol->_base);
+  CHECK(353, TypeInstance_copy_new(self->item->type_instance, &(slice->_base.result_type)) )
+  CHECK(354, SyntaxTreeForLoop_write_assign(self, self->item, &(slice->_base), self->_base.block) )
   
-  CHECK(328, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(329, write(&(String){4, 3, "}}\n"}) )
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeForLoop_write_item_var(SyntaxTreeForLoop* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_SyntaxTreeForLoop_write_item_var = "SyntaxTreeForLoop.write-item-var";
-#define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_write_item_var
-Returncode SyntaxTreeForLoop_write_item_var(SyntaxTreeForLoop* self) {
-  CHECK(332, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(333, write_cname(self->item_type->name) )
-  if (!self->item_type->is_primitive) {
-    CHECK(335, write(&(String){2, 1, "*"}) )
-  }
-  CHECK(336, write(&(String){2, 1, " "}) )
-  CHECK(337, write_cname(self->item_name) )
-  CHECK(338, write(&(String){4, 3, " = "}) )
-  if (self->item_type->is_primitive) {
-    CHECK(340, write(&(String){2, 1, "0"}) )
-  }
-  else {
-    CHECK(342, write(&(String){5, 4, "NULL"}) )
-  }
-  CHECK(343, write(&(String){5, 4, ";\n  "}) )
-  if (!self->item_type->is_primitive) {
-    CHECK(345, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-    CHECK(346, write(&(String){13, 12, "RefManager* "}) )
-    CHECK(347, write_cname(self->item_name) )
-    CHECK(348, write(&(String){19, 18, "_Refman = NULL;\n  "}) )
-  }
+  CHECK(356, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )
+  
+  CHECK(358, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(359, write(&(String){4, 3, "}}\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -654,64 +680,106 @@ static char* _func_name_SyntaxTreeForLoop_write_iter = "SyntaxTreeForLoop.write-
 Returncode SyntaxTreeForLoop_write_iter(SyntaxTreeForLoop* self) {
   /* while (true) { */
   /*   Bool `item`_Has = false; */
-  /*   `item-type`* `item` = NULL; */
-  /*   RefManager* `item`_Refman = NULL; */
-  /*   CALL( `iterator-type`_has(`iterator`, &`item`_Has) ) */
+  /*   `has-func`()->(`item`_Has) */
   /*   if (!`item`_Has) break; */
-  /*   CALL( `iterator-type`_get(`iterator`, (void*)&`item`, &`item-refman`) ) */
+  /*   `get-func`()->(`item`) */
   /*   `block...` */
-  /*   CALL( `iterator-type`_next(`iterator`) ) */
+  /*   `next-func`() */
   /* } */
-  CHECK(361, write(&(String){18, 17, "while (true) {\n  "}) )
-  CHECK(362, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(363, write(&(String){6, 5, "Bool "}) )
-  CHECK(364, write_cname(self->item_name) )
-  CHECK(365, write(&(String){17, 16, "_Has = false;\n  "}) )
-  CHECK(366, SyntaxTreeForLoop_write_item_var(self) )
-  CHECK(367, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(368, SyntaxTreeForLoop_write_iter_meth(self, self->has_func) )
-  CHECK(369, write(&(String){4, 3, ", &"}) )
-  CHECK(370, write_cname(self->item_name) )
-  CHECK(371, write(&(String){11, 10, "_Has) )\n  "}) )
-  CHECK(372, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(373, write(&(String){6, 5, "if (!"}) )
-  CHECK(374, write_cname(self->item_name) )
-  CHECK(375, write(&(String){16, 15, "_Has) break;\n  "}) )
-  CHECK(376, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(377, SyntaxTreeForLoop_write_iter_meth(self, self->get_func) )
-  CHECK(378, write(&(String){11, 10, ", (void*)&"}) )
-  CHECK(379, write_cname(self->item_name) )
-  if (!self->item_type->is_primitive) {
-    CHECK(381, write(&(String){4, 3, ", &"}) )
-    CHECK(382, write_cname(self->item_name) )
-    CHECK(383, write(&(String){8, 7, "_Refman"}) )
-  }
-  CHECK(384, write(&(String){5, 4, ") )\n"}) )
+  CHECK(370, write(&(String){16, 15, "while (true) {\n"}) )
+  CHECK(371, SyntaxTreeBranch_write_spaces(&(self->_base.block->_base)) )
+  CHECK(372, write(&(String){6, 5, "Bool "}) )
+  CHECK(373, write_cname(self->item->name) )
+  CHECK(374, write(&(String){15, 14, "_Has = false;\n"}) )
   
-  CHECK(386, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )
+  SymbolExpression* has_symbol = malloc(sizeof(SymbolExpression));
+  if (has_symbol == NULL) RAISE(376)
+  *has_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL};
+  has_symbol->_base._base._dtl = SymbolExpression__dtl;
+  CHECK(377, string_new_concat(self->item->name, &(String){5, 4, "_Has"}, &(has_symbol->name)) )
+  CHECK(378, TypeData_m_new_type_instance(&(glob->type_bool->_base), &(has_symbol->_base.result_type)) )
+  CallArgument* has_arg = malloc(sizeof(CallArgument));
+  if (has_arg == NULL) RAISE(379)
+  *has_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false, false};
+  has_arg->_base._base._dtl = CallArgument__dtl;
+  has_arg->value = &(has_symbol->_base);
+  CHECK(381, SyntaxTreeForLoop_write_iter_meth(self, self->has_func, has_arg) )
   
-  CHECK(388, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(389, write(&(String){3, 2, "  "}) )
-  CHECK(390, SyntaxTreeForLoop_write_iter_meth(self, self->next_func) )
-  CHECK(391, write(&(String){5, 4, ") )\n"}) )
-  CHECK(392, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(393, write(&(String){3, 2, "}\n"}) )
+  CHECK(383, SyntaxTreeBranch_write_spaces(&(self->_base.block->_base)) )
+  CHECK(384, write(&(String){6, 5, "if (!"}) )
+  CHECK(385, write_cname(self->item->name) )
+  CHECK(386, write(&(String){14, 13, "_Has) break;\n"}) )
+  
+  SymbolExpression* item_symbol = malloc(sizeof(SymbolExpression));
+  if (item_symbol == NULL) RAISE(388)
+  *item_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL};
+  item_symbol->_base._base._dtl = SymbolExpression__dtl;
+  CHECK(389, string_new_copy(self->item->name, &(item_symbol->name)) )
+  CHECK(390, TypeInstance_copy_new(self->item->type_instance, &(item_symbol->_base.result_type)) )
+  CallArgument* item_arg = malloc(sizeof(CallArgument));
+  if (item_arg == NULL) RAISE(391)
+  *item_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false, false};
+  item_arg->_base._base._dtl = CallArgument__dtl;
+  item_arg->value = &(item_symbol->_base);
+  TypeInstance* _TypeInstance97;
+  CHECK(393, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[6](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance97)) )
+  item_arg->is_generic = _TypeInstance97->type_data == &(glob->type_generic->_base);
+  CHECK(396, SyntaxTreeForLoop_write_iter_meth(self, self->get_func, item_arg) )
+  
+  CHECK(398, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )
+  
+  CHECK(400, SyntaxTreeForLoop_write_iter_meth(self, self->next_func, NULL) )
+  CHECK(401, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(402, write(&(String){3, 2, "}\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTreeFunction* meth);
+Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTreeFunction* meth, CallArgument* output_arg);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeForLoop_write_iter_meth = "SyntaxTreeForLoop.write-iter-meth";
 #define MR_FUNC_NAME _func_name_SyntaxTreeForLoop_write_iter_meth
-Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTreeFunction* meth) {
-  CHECK(396, SyntaxTreeNode_write_call(&(self->_base._base._base)) )
-  CHECK(397, SyntaxTreeFunction_write_cname(meth) )
-  CHECK(398, write(&(String){2, 1, "("}) )
-  CHECK(399, (self->iterator)->_base._dtl[3](self->iterator) )
-  CHECK(400, write(&(String){3, 2, ", "}) )
-  CHECK(401, (self->iterator)->_base._dtl[5](self->iterator) )
+Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTreeFunction* meth, CallArgument* output_arg) {
+  SyntaxTreeExpression* expression_node = &(SyntaxTreeExpression){SyntaxTreeExpression__dtl, NULL, 0, NULL, NULL};
+  expression_node->_base._base._dtl = SyntaxTreeExpression__dtl;
+  expression_node->_base.parent = self->_base.block;
+  
+  SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
+  if (symbol == NULL) RAISE(409)
+  *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL};
+  symbol->_base._base._dtl = SymbolExpression__dtl;
+  symbol->function = meth;
+  
+  CallArgument* self_arg = malloc(sizeof(CallArgument));
+  if (self_arg == NULL) RAISE(412)
+  *self_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false, false};
+  self_arg->_base._base._dtl = CallArgument__dtl;
+  self_arg->is_dynamic = self->aux_symbol->_base.result_type->type_data->is_dynamic;
+  self_arg->value = &(self->aux_symbol->_base);
+  
+  CallExpression* call = malloc(sizeof(CallExpression));
+  if (call == NULL) RAISE(416)
+  *call = (CallExpression){CallExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL, false};
+  call->_base._base._dtl = CallExpression__dtl;
+  call->_base._base.line_number = self->_base._base._base.line_number;
+  call->_base.top = true;
+  call->_base.is_statement = true;
+  call->function = &(symbol->_base);
+  call->arguments = malloc(sizeof(FunctionArguments));
+  if (call->arguments == NULL) RAISE(421)
+  *call->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
+  call->arguments->_base._dtl = FunctionArguments__dtl;
+  CHECK(422, FunctionArguments_init(call->arguments) )
+  CHECK(423, List_add(call->arguments->parameters, &(self_arg->_base)) )
+  if (NULL != output_arg) {
+    output_arg->_base.is_output = true;
+    output_arg->code_node = &(expression_node->_base);
+    CHECK(427, List_add(call->arguments->outputs, &(output_arg->_base)) )
+  }
+  
+  expression_node->expression = &(call->_base);
+  CHECK(430, (expression_node)->_base._base._dtl[3](expression_node) )
   return OK;
 }
 #undef MR_FUNC_NAME

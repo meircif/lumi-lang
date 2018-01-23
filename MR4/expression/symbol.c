@@ -276,7 +276,7 @@ Returncode MemberExpression_analyze_call(MemberExpression* self, FunctionArgumen
     (*instance_type) = self->instance->result_type;
     CallArgument* self_param = malloc(sizeof(CallArgument));
     if (self_param == NULL) RAISE(158)
-    *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false};
+    *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false, false};
     self_param->_base._base._dtl = CallArgument__dtl;
     self_param->_base.access = ((Argument*)(self->_base.function->arguments->parameters->first->item))->access;
     self_param->value = self->instance;

@@ -96,7 +96,7 @@ Returncode BaseMethExpression_analyze_call(BaseMethExpression* self, FunctionArg
   (*bases) = self->bases;
   CallArgument* self_param = malloc(sizeof(CallArgument));
   if (self_param == NULL) RAISE(52)
-  *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false};
+  *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false, false};
   self_param->_base._base._dtl = CallArgument__dtl;
   self_param->_base.access = ((Argument*)(self->function->arguments->parameters->first->item))->access;
   BaseMethExpression* _BaseMethExpression23 = malloc(sizeof(BaseMethExpression));
