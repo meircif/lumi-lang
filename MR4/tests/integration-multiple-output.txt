@@ -2,4 +2,5 @@ Running tests:
 testing test_func... OK
 testing test_another... OK
 testing test_native... OK
+testing test_dynamic_type_parameters... OK
 Tests passed

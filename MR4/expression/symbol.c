@@ -372,14 +372,36 @@ Returncode MemberExpression_write_refman(MemberExpression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode MemberExpression_write_dynamic(MemberExpression* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_MemberExpression_write_dynamic = "MemberExpression.write-dynamic";
+#define MR_FUNC_NAME _func_name_MemberExpression_write_dynamic
+Returncode MemberExpression_write_dynamic(MemberExpression* self) {
+  Bool top = self->_base._base.top;
+  if (self->is_generic_cast &&  ! self->_base._base.top) {
+    CHECK(218, write(&(String){3, 2, "(("}) )
+    CHECK(219, write_cname(self->_base._base.result_type->type_data->name) )
+    CHECK(220, write(&(String){12, 11, "_Dynamic*)("}) )
+    self->_base._base.top = true;
+  }
+  CHECK(222, SymbolExpression_write_dynamic(&(self->_base)) )
+  self->_base._base.top = top;
+  if (self->is_generic_cast &&  ! self->_base._base.top) {
+    CHECK(225, write(&(String){3, 2, "))"}) )
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode MemberExpression_write_bases(MemberExpression* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_MemberExpression_write_bases = "MemberExpression.write-bases";
 #define MR_FUNC_NAME _func_name_MemberExpression_write_bases
 Returncode MemberExpression_write_bases(MemberExpression* self) {
-  CHECK(216, write(&(String){3, 2, "->"}) )
+  CHECK(228, write(&(String){3, 2, "->"}) )
   {int n; for (n = (0); n < (self->bases); ++n) {
-    CHECK(218, write(&(String){7, 6, "_base."}) )
+    CHECK(230, write(&(String){7, 6, "_base."}) )
   }}
   return OK;
 }
@@ -389,7 +411,7 @@ Returncode MemberExpression_write_bases(MemberExpression* self) {
 extern Func MemberExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func MemberExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)MemberExpression_analyze, (void*)MemberExpression_write, (void*)SymbolExpression_write_dynamic, (void*)MemberExpression_write_refman, (void*)MemberExpression_analyze_call, (void*)MemberExpression_write_preactions};
+Func MemberExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)MemberExpression_analyze, (void*)MemberExpression_write, (void*)MemberExpression_write_dynamic, (void*)MemberExpression_write_refman, (void*)MemberExpression_analyze_call, (void*)MemberExpression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

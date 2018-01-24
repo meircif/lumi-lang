@@ -13,6 +13,7 @@ char* MR_assert_format = "Assert failed in %s:%d %s()\n";
 char* MR_traceline_format = "  called from %s:%d %s()\n";
 FILE* MR_trace_stream = NULL;
 int MR_trace_ignore_count = 0;
+Generic_Type_Dynamic* dynamic_Void = NULL;
 
 void MR_trace_print(
     char const* format, char const* filename, int line, char const* funcname) {

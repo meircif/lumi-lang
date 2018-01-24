@@ -1173,26 +1173,30 @@ typedef struct Test Test;
 struct Test {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
   Array* arr;
   RefManager* arr_Refman;
 };
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, RefManager* arr_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, RefManager* arr_Refman) {
   Returncode MR_err = OK;
   Generic_Type* x = NULL;
   RefManager* x_Refman = NULL;
+  Generic_Type_Dynamic* x_Dynamic = NULL;
   Test* t = NULL;
   RefManager* t_Refman = NULL;
   MR_inc_ref(item_Refman);
   MR_inc_ref(arr_Refman);
   x = item;
   x_Refman = item_Refman;
+  x_Dynamic = item_Dynamic;
   item = NULL;
   item_Refman = NULL;
   if (self == NULL || self_Refman->value == NULL) RAISE(6)
   MR_owner_dec_ref(self->item_Refman);
   self->item_Refman = x_Refman;
   x_Refman = NULL;
+  self->item_Dynamic = x_Dynamic;
   self->item = x;
   x = NULL;
   if (self == NULL || self_Refman->value == NULL) RAISE(7)
@@ -1209,6 +1213,7 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, Ref
   MR_owner_dec_ref(t->item_Refman);
   t->item_Refman = self->item_Refman;
   self->item_Refman = NULL;
+  t->item_Dynamic = self->item_Dynamic;
   t->item = self->item;
   self->item = NULL;
   if (t == NULL || t_Refman->value == NULL) RAISE(10)
@@ -1216,6 +1221,7 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* item, Ref
   MR_owner_dec_ref(self->item_Refman);
   self->item_Refman = t->item_Refman;
   t->item_Refman = NULL;
+  self->item_Dynamic = t->item_Dynamic;
   self->item = t->item;
   t->item = NULL;
 MR_cleanup:
@@ -1230,14 +1236,16 @@ typedef struct Test Test;
 struct Test {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
 };
-Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
-Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
+Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+Returncode Test_get(Test* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(4)
   MR_dec_ref(*item_Refman);
   *item_Refman = self->item_Refman;
   MR_inc_ref(*item_Refman);
+  *item_Dynamic = self->item_Dynamic;
   *item = self->item;
 MR_cleanup:
   return MR_err;
@@ -1247,14 +1255,17 @@ typedef struct Test Test;
 struct Test {
   Generic_Type* first;
   RefManager* first_Refman;
+  Generic_Type_Dynamic* first_Dynamic;
   Generic_Type* second;
   RefManager* second_Refman;
+  Generic_Type_Dynamic* second_Dynamic;
   Generic_Type* third;
   RefManager* third_Refman;
+  Generic_Type_Dynamic* third_Dynamic;
 };
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Generic_Type* second, RefManager* second_Refman, Generic_Type_Dynamic* second_Dynamic, Generic_Type* third, RefManager* third_Refman, Generic_Type_Dynamic* third_Dynamic);
 Returncode use(String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman) {
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Generic_Type* second, RefManager* second_Refman, Generic_Type_Dynamic* second_Dynamic, Generic_Type* third, RefManager* third_Refman, Generic_Type_Dynamic* third_Dynamic) {
   Returncode MR_err = OK;
   MR_inc_ref(first_Refman);
   MR_inc_ref(second_Refman);
@@ -1263,16 +1274,19 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* first, Re
   MR_dec_ref(self->first_Refman);
   self->first_Refman = first_Refman;
   MR_inc_ref(self->first_Refman);
+  self->first_Dynamic = first_Dynamic;
   self->first = first;
   if (self == NULL || self_Refman->value == NULL) RAISE(7)
   MR_dec_ref(self->second_Refman);
   self->second_Refman = second_Refman;
   MR_inc_ref(self->second_Refman);
+  self->second_Dynamic = second_Dynamic;
   self->second = second;
   if (self == NULL || self_Refman->value == NULL) RAISE(8)
   MR_dec_ref(self->third_Refman);
   self->third_Refman = third_Refman;
   MR_inc_ref(self->third_Refman);
+  self->third_Dynamic = third_Dynamic;
   self->third = third;
 MR_cleanup:
   MR_dec_ref(third_Refman);
@@ -1306,7 +1320,7 @@ Returncode use(String* first, RefManager* first_Refman, Array* second, RefManage
   t->third_Refman = third_Refman;
   MR_inc_ref(t->third_Refman);
   t->third = third;
-  CHECK(14, Test_set(t, t_Refman, first, first_Refman, second, second_Refman, third, third_Refman) )
+  CHECK(14, Test_set(t, t_Refman, first, first_Refman, NULL, second, second_Refman, NULL, third, third_Refman, NULL) )
 MR_cleanup:
   MR_dec_ref(t_Refman);
   MR_dec_ref(third_Refman);
@@ -1412,11 +1426,11 @@ Data dr_Var = {0};
   MR_inc_ref(str_Refman);
   str = ((Data*)(((Data*)(dr->item))->item))->item;
 /// @ t12
-CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, sarr, sarr_Refman) )
+CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, NULL, sarr, sarr_Refman) )
   *so = NULL;
   *so_Refman = NULL;
 /// @ t13
-CHECK(1, Data_get(d, d_Refman, (void*)&(str), &(str_Refman)) )
+CHECK(1, Data_get(d, d_Refman, (void*)&(str), &(str_Refman), &dynamic_Void) )
 /// @ t14
 Data dg_Var = {0};
   Data* dg = NULL;
@@ -1431,7 +1445,7 @@ Data* dg = NULL;
   dg_Refman = d_Refman;
   MR_inc_ref(dg_Refman);
 /// @ t16
-CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, sarr, sarr_Refman) )
+CHECK(1, Data_set(d, d_Refman, *so, *so_Refman, NULL, sarr, sarr_Refman) )
   *so = NULL;
   *so_Refman = NULL;
 /// @ t17
@@ -1451,6 +1465,33 @@ Returncode Test_meth(Test* self, RefManager* self_Refman) {
 MR_cleanup:
   return MR_err;
 }
+/// @ t18
+Data dt_Var = {0};
+  Data* dt = NULL;
+  RefManager* dt_Refman = NULL;
+  Tc* otc = NULL;
+  RefManager* otc_Refman = NULL;
+  Tc_Dynamic* otc_Dynamic = NULL;
+  dt = &dt_Var;
+  dt_Refman = MR_new_ref(dt);
+  if (dt_Refman == NULL) RAISE(1)
+  if (dt == NULL || dt_Refman->value == NULL) RAISE(2)
+  MR_dec_ref(dt->item_Refman);
+  dt->item_Refman = tc_Refman;
+  MR_inc_ref(dt->item_Refman);
+  dt->item_Dynamic = &(tc_Dynamic->_base);
+  dt->item = &(tc->_base);
+  if (dt == NULL || dt_Refman->value == NULL) RAISE(3)
+  MR_dec_ref(ta_Refman);
+  ta_Refman = dt->item_Refman;
+  MR_inc_ref(ta_Refman);
+  ta_Dynamic = &(((Tb_Dynamic*)(dt->item_Dynamic))->_base);
+  ta = &(((Tb*)(dt->item))->_base);
+  CHECK(5, Data_set(dt, dt_Refman, &(otc->_base), otc_Refman, &(otc_Dynamic->_base), NULL, NULL) )
+  &(otc->_base) = NULL;
+  otc_Refman = NULL;
+  if (ta != NULL) RAISE(6)
+  CHECK(6, Data_get(dt, dt_Refman, (void*)&(ta), &(ta_Refman), (void*)&(ta_Dynamic)) )
 /// @ teg0
 expected "}" after type parameters, got "EOF"
 /// @ teg1
@@ -1496,6 +1537,7 @@ typedef struct Test Test;
 struct Base {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
 };
 struct Test {
   Base _base;
@@ -1547,13 +1589,14 @@ typedef struct Test Test;
 struct Base {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
 };
 struct Test {
   Base _base;
 };
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, String* s, RefManager* s_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, Generic_Type_Dynamic* i_Dynamic, String* s, RefManager* s_Refman);
 Returncode use(String* s, RefManager* s_Refman);
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, String* s, RefManager* s_Refman) {
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, Generic_Type_Dynamic* i_Dynamic, String* s, RefManager* s_Refman) {
   Returncode MR_err = OK;
   Test* aux_Test_0 = NULL;
   RefManager* aux_Test_0_Refman = NULL;
@@ -1563,12 +1606,13 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefMan
   MR_dec_ref(self->_base.item_Refman);
   self->_base.item_Refman = i_Refman;
   MR_inc_ref(self->_base.item_Refman);
+  self->_base.item_Dynamic = i_Dynamic;
   self->_base.item = i;
   aux_Test_0 = calloc(1, sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(6)
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(6)
-  CHECK(6, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman, s, s_Refman) )
+  CHECK(6, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman, NULL, s, s_Refman) )
 MR_cleanup:
   MR_owner_dec_ref(aux_Test_0_Refman);
   MR_dec_ref(s_Refman);
@@ -1602,6 +1646,7 @@ typedef struct Test Test;
 struct Base {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
 };
 struct Mid {
   Base _base;
@@ -1612,19 +1657,19 @@ struct Top {
 struct Test {
   Top _base;
 };
-Returncode Base_set(Base* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman);
-Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman);
+Returncode Base_set(Base* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, Generic_Type_Dynamic* i_Dynamic);
+Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, Generic_Type_Dynamic* i_Dynamic);
 Returncode Top_set(Top* self, RefManager* self_Refman, String* s, RefManager* s_Refman);
 Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* s_Refman);
 Returncode use(String* s, RefManager* s_Refman);
-Returncode Base_set(Base* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman) {
+Returncode Base_set(Base* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, Generic_Type_Dynamic* i_Dynamic) {
   Returncode MR_err = OK;
   MR_inc_ref(i_Refman);
 MR_cleanup:
   MR_dec_ref(i_Refman);
   return MR_err;
 }
-Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman) {
+Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, Generic_Type_Dynamic* i_Dynamic) {
   Returncode MR_err = OK;
   MR_inc_ref(i_Refman);
 MR_cleanup:
@@ -1634,7 +1679,7 @@ MR_cleanup:
 Returncode Top_set(Top* self, RefManager* self_Refman, String* s, RefManager* s_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
-  CHECK(8, Mid_set(&(self->_base), self_Refman, s, s_Refman) )
+  CHECK(8, Mid_set(&(self->_base), self_Refman, s, s_Refman, NULL) )
   if (self == NULL || self_Refman->value == NULL) RAISE(9)
   MR_dec_ref(self->_base._base.item_Refman);
   self->_base._base.item_Refman = s_Refman;
@@ -1673,7 +1718,7 @@ Returncode Test_set(Test* self, RefManager* self_Refman, String* s, RefManager* 
   if (aux_Top_1 == NULL) RAISE(16)
   aux_Top_1_Refman = MR_new_ref(aux_Top_1);
   if (aux_Top_1_Refman == NULL) RAISE(16)
-  CHECK(16, Mid_set(&(aux_Top_1->_base), aux_Top_1_Refman, s, s_Refman) )
+  CHECK(16, Mid_set(&(aux_Top_1->_base), aux_Top_1_Refman, s, s_Refman, NULL) )
 MR_cleanup:
   MR_owner_dec_ref(aux_Top_1_Refman);
   MR_owner_dec_ref(aux_Test_0_Refman);
@@ -1706,13 +1751,14 @@ typedef struct Test Test;
 struct Base {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
 };
 struct Test {
   Base _base;
 };
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, String* s, RefManager* s_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, Generic_Type_Dynamic* i_Dynamic, String* s, RefManager* s_Refman);
 Returncode use(String* s, RefManager* s_Refman);
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, String* s, RefManager* s_Refman) {
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefManager* i_Refman, Generic_Type_Dynamic* i_Dynamic, String* s, RefManager* s_Refman) {
   Returncode MR_err = OK;
   Test* aux_Test_0 = NULL;
   RefManager* aux_Test_0_Refman = NULL;
@@ -1722,12 +1768,13 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* i, RefMan
   MR_dec_ref(self->_base.item_Refman);
   self->_base.item_Refman = i_Refman;
   MR_inc_ref(self->_base.item_Refman);
+  self->_base.item_Dynamic = i_Dynamic;
   self->_base.item = i;
   aux_Test_0 = calloc(1, sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(6)
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(6)
-  CHECK(6, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman, s, s_Refman) )
+  CHECK(6, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman, NULL, s, s_Refman) )
 MR_cleanup:
   MR_owner_dec_ref(aux_Test_0_Refman);
   MR_dec_ref(s_Refman);
@@ -1761,13 +1808,16 @@ typedef struct Test Test;
 struct Base {
   Generic_Type* first;
   RefManager* first_Refman;
+  Generic_Type_Dynamic* first_Dynamic;
   Generic_Type* second;
   RefManager* second_Refman;
+  Generic_Type_Dynamic* second_Dynamic;
 };
 struct Mid {
   Base _base;
   Generic_Type* third;
   RefManager* third_Refman;
+  Generic_Type_Dynamic* third_Dynamic;
 };
 struct Top {
   Mid _base;
@@ -1775,11 +1825,11 @@ struct Top {
 struct Test {
   Top _base;
 };
-Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman);
-Returncode Top_set(Top* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
+Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Array* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman, Generic_Type_Dynamic* third_Dynamic);
+Returncode Top_set(Top* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
 Returncode Test_set(Test* self, RefManager* self_Refman, String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
 Returncode use(String* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman);
-Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman) {
+Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Array* second, RefManager* second_Refman, Generic_Type* third, RefManager* third_Refman, Generic_Type_Dynamic* third_Dynamic) {
   Returncode MR_err = OK;
   MR_inc_ref(first_Refman);
   MR_inc_ref(second_Refman);
@@ -1788,6 +1838,7 @@ Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* first, RefM
   MR_dec_ref(self->_base.first_Refman);
   self->_base.first_Refman = first_Refman;
   MR_inc_ref(self->_base.first_Refman);
+  self->_base.first_Dynamic = first_Dynamic;
   self->_base.first = first;
   if (self == NULL || self_Refman->value == NULL) RAISE(8)
   MR_dec_ref(self->_base.second_Refman);
@@ -1798,6 +1849,7 @@ Returncode Mid_set(Mid* self, RefManager* self_Refman, Generic_Type* first, RefM
   MR_dec_ref(self->third_Refman);
   self->third_Refman = third_Refman;
   MR_inc_ref(self->third_Refman);
+  self->third_Dynamic = third_Dynamic;
   self->third = third;
 MR_cleanup:
   MR_dec_ref(third_Refman);
@@ -1805,7 +1857,7 @@ MR_cleanup:
   MR_dec_ref(first_Refman);
   return MR_err;
 }
-Returncode Top_set(Top* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman) {
+Returncode Top_set(Top* self, RefManager* self_Refman, Generic_Type* first, RefManager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Array* second, RefManager* second_Refman, File* third, RefManager* third_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(first_Refman);
   MR_inc_ref(second_Refman);
@@ -1814,6 +1866,7 @@ Returncode Top_set(Top* self, RefManager* self_Refman, Generic_Type* first, RefM
   MR_dec_ref(self->_base._base.first_Refman);
   self->_base._base.first_Refman = first_Refman;
   MR_inc_ref(self->_base._base.first_Refman);
+  self->_base._base.first_Dynamic = first_Dynamic;
   self->_base._base.first = first;
   if (self == NULL || self_Refman->value == NULL) RAISE(13)
   MR_dec_ref(self->_base._base.second_Refman);
@@ -1897,17 +1950,19 @@ typedef struct Test Test;
 struct First {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
 };
 struct Second {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
 };
 struct Test {
   First _base;
 };
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* g, RefManager* g_Refman, Second* sg, RefManager* sg_Refman);
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* g, RefManager* g_Refman, Generic_Type_Dynamic* g_Dynamic, Second* sg, RefManager* sg_Refman);
 Returncode use(String* s, RefManager* s_Refman, Second* ss, RefManager* ss_Refman);
-Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* g, RefManager* g_Refman, Second* sg, RefManager* sg_Refman) {
+Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* g, RefManager* g_Refman, Generic_Type_Dynamic* g_Dynamic, Second* sg, RefManager* sg_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(g_Refman);
   MR_inc_ref(sg_Refman);
@@ -1921,6 +1976,7 @@ Returncode Test_set(Test* self, RefManager* self_Refman, Generic_Type* g, RefMan
   MR_dec_ref(((Second*)(self->_base.item))->item_Refman);
   ((Second*)(self->_base.item))->item_Refman = g_Refman;
   MR_inc_ref(((Second*)(self->_base.item))->item_Refman);
+  ((Second*)(self->_base.item))->item_Dynamic = g_Dynamic;
   ((Second*)(self->_base.item))->item = g;
 MR_cleanup:
   MR_dec_ref(sg_Refman);
@@ -2171,9 +2227,10 @@ typedef struct TestIterator TestIterator;
 struct TestIterator {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
 };
 Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data);
-Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 Returncode TestIterator_next(TestIterator* self, RefManager* self_Refman);
 Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefManager** s_Refman);
 Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* has_data) {
@@ -2181,7 +2238,7 @@ Returncode TestIterator_has(TestIterator* self, RefManager* self_Refman, Bool* h
 MR_cleanup:
   return MR_err;
 }
-Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
+Returncode TestIterator_get(TestIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -2206,7 +2263,7 @@ Returncode f_mock(TestIterator* iter, RefManager* iter_Refman, String** s, RefMa
     Bool t_Has = false;
     CHECK(7, TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &(t_Has)) )
     if (!t_Has) break;
-    CHECK(7, TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, (void*)&(t), &(t_Refman)) )
+    CHECK(7, TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, (void*)&(t), &(t_Refman), &dynamic_Void) )
     MR_dec_ref(*s_Refman);
     *s_Refman = t_Refman;
     MR_inc_ref(*s_Refman);

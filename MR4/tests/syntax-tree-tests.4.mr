@@ -818,6 +818,13 @@ struct Test{Generic}
   user Test{Generic} next
   func meth()
     self.next := self
+## @ c t18
+var Data{Tb} dt
+  dt.item := tc
+  ta := dt.item
+  owner Tc otc
+  dt.set(owner otc, user _)
+  dt.get()->(user ta)
 ## @ eg teg0
 struct Test{First:Second:Third
 ## @ eg teg1

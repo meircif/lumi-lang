@@ -46,6 +46,7 @@ struct TestClass_Dynamic {
 struct Data {
   Generic_Type* item;
   RefManager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
   Array* arr;
   RefManager* arr_Refman;
 };
@@ -54,8 +55,10 @@ struct Dataset {
   Data _base;
   Generic_Type* second;
   RefManager* second_Refman;
+  Generic_Type_Dynamic* second_Dynamic;
   Generic_Type* third;
   RefManager* third_Refman;
+  Generic_Type_Dynamic* third_Dynamic;
 };
 
 struct MidData {
@@ -69,6 +72,7 @@ struct TopData {
 struct Container {
   Generic_Type* value;
   RefManager* value_Refman;
+  Generic_Type_Dynamic* value_Dynamic;
   Container* next;
   RefManager* next_Refman;
 };
@@ -95,11 +99,11 @@ Returncode TestClass_dynamic_meth(TestClass* self, RefManager* self_Refman, Test
 
 Returncode TestClass_print(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic);
 
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman);
+Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, RefManager* arr_Refman);
 
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
+Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 
-Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type* value, RefManager* value_Refman, Container* next, RefManager* next_Refman);
+Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type* value, RefManager* value_Refman, Generic_Type_Dynamic* value_Dynamic, Container* next, RefManager* next_Refman);
 
 Returncode Container_iter(Container* self, RefManager* self_Refman, ContainerIterator** iter, RefManager** iter_Refman);
 
@@ -107,7 +111,7 @@ Returncode ContainerIterator_new(ContainerIterator* self, RefManager* self_Refma
 
 Returncode ContainerIterator_has(ContainerIterator* self, RefManager* self_Refman, Bool* has_data);
 
-Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman);
+Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 
 Returncode ContainerIterator_next(ContainerIterator* self, RefManager* self_Refman);
 
@@ -289,10 +293,11 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Data.set"
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Array* arr, RefManager* arr_Refman) {
+Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, RefManager* arr_Refman) {
   Returncode MR_err = OK;
   Generic_Type* x = NULL;
   RefManager* x_Refman = NULL;
+  Generic_Type_Dynamic* x_Dynamic = NULL;
   Data* d = NULL;
   RefManager* d_Refman = NULL;
   MR_inc_ref(item_Refman);
@@ -300,10 +305,12 @@ Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, Ref
   x = item;
   x_Refman = item_Refman;
   MR_inc_ref(x_Refman);
+  x_Dynamic = item_Dynamic;
   if (self == NULL || self_Refman->value == NULL) RAISE(353)
   MR_dec_ref(self->item_Refman);
   self->item_Refman = x_Refman;
   MR_inc_ref(self->item_Refman);
+  self->item_Dynamic = x_Dynamic;
   self->item = x;
   if (self == NULL || self_Refman->value == NULL) RAISE(354)
   MR_dec_ref(self->arr_Refman);
@@ -319,12 +326,14 @@ Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, Ref
   MR_dec_ref(d->item_Refman);
   d->item_Refman = self->item_Refman;
   MR_inc_ref(d->item_Refman);
+  d->item_Dynamic = self->item_Dynamic;
   d->item = self->item;
   if (d == NULL || d_Refman->value == NULL) RAISE(357)
   if (self == NULL || self_Refman->value == NULL) RAISE(357)
   MR_dec_ref(self->item_Refman);
   self->item_Refman = d->item_Refman;
   MR_inc_ref(self->item_Refman);
+  self->item_Dynamic = d->item_Dynamic;
   self->item = d->item;
 MR_cleanup:
   MR_owner_dec_ref(d_Refman);
@@ -338,12 +347,13 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Data.get"
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
+Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(360)
   MR_dec_ref(*item_Refman);
   *item_Refman = self->item_Refman;
   MR_inc_ref(*item_Refman);
+  *item_Dynamic = self->item_Dynamic;
   *item = self->item;
 MR_cleanup:
   return MR_err;
@@ -353,7 +363,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Container.new"
-Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type* value, RefManager* value_Refman, Container* next, RefManager* next_Refman) {
+Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type* value, RefManager* value_Refman, Generic_Type_Dynamic* value_Dynamic, Container* next, RefManager* next_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(value_Refman);
   MR_inc_ref(next_Refman);
@@ -361,6 +371,7 @@ Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type*
   MR_dec_ref(self->value_Refman);
   self->value_Refman = value_Refman;
   MR_inc_ref(self->value_Refman);
+  self->value_Dynamic = value_Dynamic;
   self->value = value;
   if (self == NULL || self_Refman->value == NULL) RAISE(438)
   MR_dec_ref(self->next_Refman);
@@ -430,13 +441,14 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "ContainerIterator.get"
-Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman) {
+Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(453)
   if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(453)
   MR_dec_ref(*item_Refman);
   *item_Refman = self->curr->value_Refman;
   MR_inc_ref(*item_Refman);
+  *item_Dynamic = self->curr->value_Dynamic;
   *item = self->curr->value;
 MR_cleanup:
   return MR_err;
@@ -1658,8 +1670,8 @@ Returncode test_type_parameters(String* s, RefManager* s_Refman) {
   s_Refman = ((Data*)(((Data*)(dr->item))->item))->item_Refman;
   MR_inc_ref(s_Refman);
   s = ((Data*)(((Data*)(dr->item))->item))->item;
-  CHECK(384, Data_set(d, d_Refman, s, s_Refman, sarr, sarr_Refman) )
-  CHECK(385, Data_get(d, d_Refman, (void*)&(s), &(s_Refman)) )
+  CHECK(384, Data_set(d, d_Refman, s, s_Refman, NULL, sarr, sarr_Refman) )
+  CHECK(385, Data_get(d, d_Refman, (void*)&(s), &(s_Refman), &dynamic_Void) )
   dg = d;
   dg_Refman = d_Refman;
   MR_inc_ref(dg_Refman);
@@ -2318,7 +2330,7 @@ Returncode test_for_each(void) {
   container_last = &container_last_Var;
   container_last_Refman = MR_new_ref(container_last);
   if (container_last_Refman == NULL) RAISE(500)
-  CHECK(500, Container_new(container_last, container_last_Refman, aux_String_20, aux_String_20_Refman, NULL, NULL) )
+  CHECK(500, Container_new(container_last, container_last_Refman, aux_String_20, aux_String_20_Refman, NULL, NULL, NULL) )
   aux_String_21 = &aux_String_21_Var;
   aux_String_21_Refman = MR_new_ref(aux_String_21);
   if (aux_String_21_Refman == NULL) RAISE(501)
@@ -2328,7 +2340,7 @@ Returncode test_for_each(void) {
   container_mid = &container_mid_Var;
   container_mid_Refman = MR_new_ref(container_mid);
   if (container_mid_Refman == NULL) RAISE(501)
-  CHECK(501, Container_new(container_mid, container_mid_Refman, aux_String_21, aux_String_21_Refman, container_last, container_last_Refman) )
+  CHECK(501, Container_new(container_mid, container_mid_Refman, aux_String_21, aux_String_21_Refman, NULL, container_last, container_last_Refman) )
   aux_String_22 = &aux_String_22_Var;
   aux_String_22_Refman = MR_new_ref(aux_String_22);
   if (aux_String_22_Refman == NULL) RAISE(502)
@@ -2338,11 +2350,11 @@ Returncode test_for_each(void) {
   container_first = &container_first_Var;
   container_first_Refman = MR_new_ref(container_first);
   if (container_first_Refman == NULL) RAISE(502)
-  CHECK(502, Container_new(container_first, container_first_Refman, aux_String_22, aux_String_22_Refman, container_mid, container_mid_Refman) )
+  CHECK(502, Container_new(container_first, container_first_Refman, aux_String_22, aux_String_22_Refman, NULL, container_mid, container_mid_Refman) )
   container = &container_Var;
   container_Refman = MR_new_ref(container);
   if (container_Refman == NULL) RAISE(503)
-  CHECK(503, Container_new(container, container_Refman, NULL, NULL, container_first, container_first_Refman) )
+  CHECK(503, Container_new(container, container_Refman, NULL, NULL, NULL, container_first, container_first_Refman) )
   CHECK(505, Container_iter(container, container_Refman, &(iter), &(iter_Refman)) )
   aux_String_23 = &aux_String_23_Var;
   aux_String_23_Refman = MR_new_ref(aux_String_23);
@@ -2359,7 +2371,7 @@ Returncode test_for_each(void) {
     Bool s_Has = false;
     CHECK(507, ContainerIterator_has(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, &(s_Has)) )
     if (!s_Has) break;
-    CHECK(507, ContainerIterator_get(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, (void*)&(s), &(s_Refman)) )
+    CHECK(507, ContainerIterator_get(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, (void*)&(s), &(s_Refman), &dynamic_Void) )
     CHECK(508, Sys_print(sys, sys_Refman, s, s_Refman) )
     aux_String_24 = &aux_String_24_Var;
     aux_String_24_Refman = MR_new_ref(aux_String_24);

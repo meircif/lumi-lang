@@ -121,6 +121,7 @@ static Global
     self.add-builtin-type(user "Base Symbol", copy false):(owner self.type-base)
     self.add-builtin-type(user "Generic Type", copy false):(
         owner self.type-generic)
+    self.type-generic.is-dynamic := true
     self.add-builtin-type(user "File", copy false):(owner self.type-file)
     self.add-builtin-type(user "Sys", copy false):(owner self.type-sys)
     

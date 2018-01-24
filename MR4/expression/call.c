@@ -238,12 +238,12 @@ Returncode CallArgument_check_same_type_as(CallArgument* self, TypeInstance* typ
     Int _Int26;
     CHECK(128, TypeInstance_check_assign_to(real_type, self->value->result_type, &(self->_base._base), &(_Int26)) )
     self->is_down_cast = _Int26 > 0;
-    self->is_generic = type_instance->type_data == &(glob->type_generic->_base);
   }
   else {
-    CHECK(132, TypeInstance_check_assign_from(real_type, &(self->_base._base), &(self->value)) )
+    CHECK(131, TypeInstance_check_assign_from(real_type, &(self->_base._base), &(self->value)) )
   }
   self->is_dynamic = real_type->type_data->is_dynamic;
+  self->is_generic = type_instance->type_data == &(glob->type_generic->_base);
   free(real_type);
   return OK;
 }
@@ -321,6 +321,17 @@ Returncode CallArgument_write(CallArgument* self) {
       CHECK(175, write(&(String){2, 1, ")"}) )
     }
   }
+  else {
+    if (self->is_generic) {
+      CHECK(177, write(&(String){3, 2, ", "}) )
+      if (self->_base.is_output) {
+        CHECK(179, write(&(String){14, 13, "&dynamic_Void"}) )
+      }
+      else {
+        CHECK(181, write(&(String){5, 4, "NULL"}) )
+      }
+    }
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -332,12 +343,12 @@ static char* _func_name_CallArgument_write_postactions = "CallArgument.write-pos
 #define MR_FUNC_NAME _func_name_CallArgument_write_postactions
 Returncode CallArgument_write_postactions(CallArgument* self) {
   if (self->_base.access == ACCESS_OWNER &&  ! self->_base.is_output && self->value->result_type->type_data != &(glob->type_empty->_base)) {
-    CHECK(180, SyntaxTreeCode_write_spaces(self->code_node) )
-    CHECK(181, (self->value)->_base._dtl[3](self->value) )
-    CHECK(182, write(&(String){10, 9, " = NULL;\n"}) )
-    CHECK(183, SyntaxTreeCode_write_spaces(self->code_node) )
-    CHECK(184, (self->value)->_base._dtl[5](self->value) )
-    CHECK(185, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(186, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(187, (self->value)->_base._dtl[3](self->value) )
+    CHECK(188, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(189, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(190, (self->value)->_base._dtl[5](self->value) )
+    CHECK(191, write(&(String){10, 9, " = NULL;\n"}) )
   }
   return OK;
 }
@@ -365,7 +376,7 @@ static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactor
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
   CallArgument* _CallArgument27 = malloc(sizeof(CallArgument));
-  if (_CallArgument27 == NULL) RAISE(190)
+  if (_CallArgument27 == NULL) RAISE(196)
   *_CallArgument27 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false, false};
   _CallArgument27->_base._base._dtl = CallArgument__dtl;
   (*new_argument) = &(_CallArgument27->_base);

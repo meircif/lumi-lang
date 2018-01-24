@@ -103,3 +103,18 @@ test test-native()
   assert i = 3
   assert s[0] = 'a'
   assert external2(copy n)
+
+
+test test-dynamic-type-parameters()
+  var Data{MiddleType} dmid
+  var TopType ttop
+  ttop.num-base := 12
+  dmid.item := ttop
+  user BaseType tbase
+  tbase := dmid.item
+  assert tbase.num-base = 12
+  ttop.num-base := 13
+  dmid.set(user ttop, user _)
+  tbase := _
+  dmid.get()->(user tbase)
+  assert tbase.num-base = 13

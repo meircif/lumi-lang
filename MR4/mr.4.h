@@ -37,6 +37,9 @@ typedef Returncode (*Func)();
 typedef FILE File;
 
 typedef void Generic_Type;
+typedef void Generic_Type_Dynamic;
+
+extern Generic_Type_Dynamic* dynamic_Void;
 
 
 extern char* MR_raise_format;

@@ -127,10 +127,10 @@ class CallArgument(Argument)
     if self.is-output
       self.is-down-cast := real-type.check-assign-to(
           user self.value.result-type, user self) > 0
-      self.is-generic := type-instance.type-data = glob.type-generic
     else
       real-type.check-assign-from(user self):(owner self.value)
     self.is-dynamic := real-type.type-data.is-dynamic
+    self.is-generic := type-instance.type-data = glob.type-generic
     delete real-type
   
   func dynamic get-output():(user Expression output)
@@ -173,6 +173,12 @@ class CallArgument(Argument)
       self.value.write-dynamic()
       if self.is-output
         write(user ")")
+    else-if self.is-generic
+      write(user ", ")
+      if self.is-output
+        write(user "&dynamic_Void")
+      else
+        write(user "NULL")
   
   func dynamic write-postactions()
     if self.access = ACCESS-OWNER and not self.is-output and

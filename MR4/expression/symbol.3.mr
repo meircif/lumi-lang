@@ -212,6 +212,18 @@ class MemberExpression(SymbolExpression)
     base.write-refman()
     self.top := top
   
+  func dynamic write-dynamic()
+    var Bool top(self.top)
+    if self.is-generic-cast and not self.top
+      write(user "((")
+      write-cname(user self.result-type.type-data.name)
+      write(user "_Dynamic*)(")
+      self.top := true
+    base.write-dynamic()
+    self.top := top
+    if self.is-generic-cast and not self.top
+      write(user "))")
+  
   func inst write-bases()
     write(user "->")
     for n in self.bases
