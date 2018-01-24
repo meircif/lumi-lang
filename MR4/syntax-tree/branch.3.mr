@@ -150,26 +150,32 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   
   func inst write-variable-cleanup(
       user SyntaxTreeVariable variable, copy Bool is-type)
-    if variable.access = ACCESS-OWNER and
-        variable.type-instance.type-data != glob.type-string and
-        variable.type-instance.type-data != glob.type-file and
-        variable.type-instance.type-data != glob.type-array and
-        variable.type-instance.type-data != glob.type-generic
+    user TypeData item-type-data(variable.type-instance.type-data)
+    if item-type-data = glob.type-array
+      item-type-data := variable.type-instance.parameters.first.item.type-data
+    if variable.access = ACCESS-OWNER and not item-type-data.is-primitive and
+        item-type-data != glob.type-string and
+        item-type-data != glob.type-file and
+        item-type-data != glob.type-generic
       write(user "  ")
       if variable.type-instance.type-data.is-dynamic
         if is-type
           write(user "self->")
         write-cname(user variable.name)
         write(user "_Dynamic->")
-        user TypeData type-data(variable.type-instance.type-data)
+        user TypeData type-data(item-type-data)
         do
           while ? type-data.base-type
           type-data := type-data.base-type.type-data
           while type-data.is-dynamic
           write(user "_base.")
         write(user "_del(")
+      else-if variable.type-instance.type-data = glob.type-array
+        write(user "ARRAY_DEL(")
+        write-cname(user item-type-data.name)
+        write(user ", ")
       else
-        write-cname(user variable.type-instance.type-data.name)
+        write-cname(user item-type-data.name)
         write(user "_Del(")
       if is-type
         write(user "self->")

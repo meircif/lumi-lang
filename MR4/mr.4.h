@@ -88,6 +88,10 @@ int MR_test_main(int argc, char* argv[]);
 #define TEST_MAIN_FUNC MAIN_PROXY(MR_test_main)
 #define USER_MAIN_HEADER Returncode MR_user_main()
 
+#define ARRAY_DEL(Type, array) \
+{int MR_n=0; for(;MR_n<array->length; ++MR_n) \
+ Type##_Del(((Type*)(array->values))+MR_n);}
+
 #define SRD(Type, field) \
 while (self->field != NULL) { \
   Type* value = self->field; \

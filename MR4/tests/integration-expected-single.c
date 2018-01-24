@@ -1211,7 +1211,9 @@ MR_cleanup:
   MR_owner_dec_ref(aux_String_2_Refman);
   MR_owner_dec_ref(aux_Array_4_Refman);
   MR_owner_dec_ref(aux_Array_3_Refman);
+  ARRAY_DEL(TestClass, aux_Array_2);
   MR_owner_dec_ref(aux_Array_2_Refman);
+  ARRAY_DEL(TestStruct, aux_Array_1);
   MR_owner_dec_ref(aux_Array_1_Refman);
   MR_owner_dec_ref(aux_Array_0_Refman);
   MR_owner_dec_ref(aux_String_1_Refman);
@@ -1231,7 +1233,9 @@ MR_cleanup:
   MR_dec_ref(si_Refman);
   MR_owner_dec_ref(sfn_Refman);
   MR_owner_dec_ref(san_Refman);
+  ARRAY_DEL(TestClass, dan);
   MR_owner_dec_ref(dan_Refman);
+  ARRAY_DEL(TestStruct, tan);
   MR_owner_dec_ref(tan_Refman);
   MR_owner_dec_ref(ian_Refman);
   MR_owner_dec_ref(sn_Refman);

@@ -374,6 +374,91 @@ MR_cleanup:
   MR_dec_ref(pu_Refman);
   return MR_err;
 }
+/// @ t8
+typedef struct Struct Struct;
+typedef struct Class Class;
+typedef struct Class_Dynamic Class_Dynamic;
+struct Struct {
+  Struct* s;
+  Ref_Manager* s_Refman;
+  Array* as;
+  Ref_Manager* as_Refman;
+};
+struct Class {
+  Class* c;
+  Ref_Manager* c_Refman;
+  Class_Dynamic* c_Dynamic;
+  Array* ac;
+  Ref_Manager* ac_Refman;
+};
+struct Class_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(Class* self, Ref_Manager* self_Refman, Class_Dynamic* self_Dynamic);
+};
+void Struct_Del(Struct* self);
+Returncode Class_meth(Class* self, Ref_Manager* self_Refman, Class_Dynamic* self_Dynamic);
+void Class_Del(Class* self);
+Class_Dynamic Class_dynamic = {(Dynamic_Del)Class_Del, Class_meth};
+Returncode name(Struct* ps, Ref_Manager* ps_Refman, Class* pc, Ref_Manager* pc_Refman, Class_Dynamic* pc_Dynamic, Array* pas, Ref_Manager* pas_Refman, Array* pac, Ref_Manager* pac_Refman);
+void Struct_Del(Struct* self) {
+  if (self == NULL) return;
+  ARRAY_DEL(Struct, self->as);
+  MR_owner_dec_ref(self->as_Refman);
+  Struct_Del(self->s);
+  MR_owner_dec_ref(self->s_Refman);
+}
+Returncode Class_meth(Class* self, Ref_Manager* self_Refman, Class_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+void Class_Del(Class* self) {
+  if (self == NULL) return;
+  ARRAY_DEL(Class, self->ac);
+  MR_owner_dec_ref(self->ac_Refman);
+  self->c_Dynamic->_del(self->c);
+  MR_owner_dec_ref(self->c_Refman);
+}
+Returncode name(Struct* ps, Ref_Manager* ps_Refman, Class* pc, Ref_Manager* pc_Refman, Class_Dynamic* pc_Dynamic, Array* pas, Ref_Manager* pas_Refman, Array* pac, Ref_Manager* pac_Refman) {
+  Returncode MR_err = OK;
+  Struct* s = NULL;
+  Ref_Manager* s_Refman = NULL;
+  Class* c = NULL;
+  Ref_Manager* c_Refman = NULL;
+  Class_Dynamic* c_Dynamic = NULL;
+  Array* as = NULL;
+  Ref_Manager* as_Refman = NULL;
+  Array* ac = NULL;
+  Ref_Manager* ac_Refman = NULL;
+  Array* ai = NULL;
+  Ref_Manager* ai_Refman = NULL;
+  Array* af = NULL;
+  Ref_Manager* af_Refman = NULL;
+  MR_inc_ref(ps_Refman);
+  MR_inc_ref(pc_Refman);
+  MR_inc_ref(pas_Refman);
+  MR_inc_ref(pac_Refman);
+MR_cleanup:
+  MR_owner_dec_ref(af_Refman);
+  MR_owner_dec_ref(ai_Refman);
+  ARRAY_DEL(Class, ac);
+  MR_owner_dec_ref(ac_Refman);
+  ARRAY_DEL(Struct, as);
+  MR_owner_dec_ref(as_Refman);
+  c_Dynamic->_del(c);
+  MR_owner_dec_ref(c_Refman);
+  Struct_Del(s);
+  MR_owner_dec_ref(s_Refman);
+  ARRAY_DEL(Class, pac);
+  MR_owner_dec_ref(pac_Refman);
+  ARRAY_DEL(Struct, pas);
+  MR_owner_dec_ref(pas_Refman);
+  pc_Dynamic->_del(pc);
+  MR_owner_dec_ref(pc_Refman);
+  Struct_Del(ps);
+  MR_owner_dec_ref(ps_Refman);
+  return MR_err;
+}
 /// @ tm0
 USER_MAIN_HEADER {
   Returncode MR_err = OK;

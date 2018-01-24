@@ -197,6 +197,25 @@ func name(var String self, copy Int px, user String pu, owner String po)->(
   o := String{12}()
   u := "constant string"
   pu := po[2:6]
+## @ g t8
+struct Struct
+  owner Struct s
+  owner Array{Struct} as
+class Class
+  owner Class c
+  owner Array{Class} ac
+  func dynamic meth()
+func name(
+    owner Struct ps,
+    owner Class pc,
+    owner Array{Struct} pas,
+    owner Array{Class} pac)
+  owner Struct s
+  owner Class c
+  owner Array{Struct} as
+  owner Array{Class} ac
+  owner Array{Int} ai
+  owner Array{File} af
 ## @ g tm0
 main
   var Int x
