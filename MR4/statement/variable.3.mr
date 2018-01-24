@@ -127,7 +127,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     
     # `type` `name`[ = 0];
     # `type`* `name`[ = NULL];
-    # RefManager* `name`_Refman[ = NULL];
+    # Ref_Manager* `name`_Refman[ = NULL];
     if self.type-instance.type-data = glob.type-func
       self.type-instance.arguments.write-pointer(user self.name)
     else
@@ -227,7 +227,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func inst write-refman()
     self.write-spaces()
-    write(user "RefManager* ")
+    write(user "Ref_Manager* ")
     write-cname(user self.name)
     write(user "_Refman")
     if not (? self.parent-type)

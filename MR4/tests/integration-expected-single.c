@@ -27,37 +27,38 @@ typedef struct ContainerIterator ContainerIterator;
 struct TestStruct {
   Int num;
   String* text;
-  RefManager* text_Refman;
+  Ref_Manager* text_Refman;
   TestStruct* ts;
-  RefManager* ts_Refman;
+  Ref_Manager* ts_Refman;
   Returncode (*fun)(void);
 };
 
 struct TestClass {
   Int num;
   String* text;
-  RefManager* text_Refman;
+  Ref_Manager* text_Refman;
 };
 
 struct TestClass_Dynamic {
-  Returncode (*dynamic_meth)(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic);
+  Dynamic_Del _del;
+  Returncode (*dynamic_meth)(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic);
 };
 
 struct Data {
   Generic_Type* item;
-  RefManager* item_Refman;
+  Ref_Manager* item_Refman;
   Generic_Type_Dynamic* item_Dynamic;
   Array* arr;
-  RefManager* arr_Refman;
+  Ref_Manager* arr_Refman;
 };
 
 struct Dataset {
   Data _base;
   Generic_Type* second;
-  RefManager* second_Refman;
+  Ref_Manager* second_Refman;
   Generic_Type_Dynamic* second_Dynamic;
   Generic_Type* third;
-  RefManager* third_Refman;
+  Ref_Manager* third_Refman;
   Generic_Type_Dynamic* third_Dynamic;
 };
 
@@ -71,54 +72,70 @@ struct TopData {
 
 struct Container {
   Generic_Type* value;
-  RefManager* value_Refman;
+  Ref_Manager* value_Refman;
   Generic_Type_Dynamic* value_Dynamic;
   Container* next;
-  RefManager* next_Refman;
+  Ref_Manager* next_Refman;
 };
 
 struct ContainerIterator {
   Container* curr;
-  RefManager* curr_Refman;
+  Ref_Manager* curr_Refman;
 };
 
 
 /* types methods declaration */
 
-Returncode TestStruct_new(TestStruct* self, RefManager* self_Refman, Int x, String* s, RefManager* s_Refman);
+Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, String* s, Ref_Manager* s_Refman);
 
-Returncode TestStruct_get(TestStruct* self, RefManager* self_Refman, Int* x, String** s, RefManager** s_Refman);
+Returncode TestStruct_get(TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman);
 
-Returncode TestStruct_print(TestStruct* self, RefManager* self_Refman);
+Returncode TestStruct_print(TestStruct* self, Ref_Manager* self_Refman);
 
-Returncode TestClass_new(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic);
+void TestStruct_Del(TestStruct* self);
 
-Returncode TestClass_static_meth(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic);
+Returncode TestClass_new(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic);
 
-Returncode TestClass_dynamic_meth(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic);
+Returncode TestClass_static_meth(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic);
 
-Returncode TestClass_print(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic);
+Returncode TestClass_dynamic_meth(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic);
 
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, RefManager* arr_Refman);
+Returncode TestClass_print(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic);
 
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+void TestClass_Del(TestClass* self);
 
-Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type* value, RefManager* value_Refman, Generic_Type_Dynamic* value_Dynamic, Container* next, RefManager* next_Refman);
+Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, Ref_Manager* arr_Refman);
 
-Returncode Container_iter(Container* self, RefManager* self_Refman, ContainerIterator** iter, RefManager** iter_Refman);
+Returncode Data_get(Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 
-Returncode ContainerIterator_new(ContainerIterator* self, RefManager* self_Refman, Container* first, RefManager* first_Refman);
+void Data_Del(Data* self);
 
-Returncode ContainerIterator_has(ContainerIterator* self, RefManager* self_Refman, Bool* has_data);
+void Dataset_Del(Dataset* self);
 
-Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+void MidData_Del(MidData* self);
 
-Returncode ContainerIterator_next(ContainerIterator* self, RefManager* self_Refman);
+void TopData_Del(TopData* self);
+
+Returncode Container_new(Container* self, Ref_Manager* self_Refman, Generic_Type* value, Ref_Manager* value_Refman, Generic_Type_Dynamic* value_Dynamic, Container* next, Ref_Manager* next_Refman);
+
+Returncode Container_iter(Container* self, Ref_Manager* self_Refman, ContainerIterator** iter, Ref_Manager** iter_Refman);
+
+void Container_Del(Container* self);
+
+Returncode ContainerIterator_new(ContainerIterator* self, Ref_Manager* self_Refman, Container* first, Ref_Manager* first_Refman);
+
+Returncode ContainerIterator_has(ContainerIterator* self, Ref_Manager* self_Refman, Bool* has_data);
+
+Returncode ContainerIterator_get(ContainerIterator* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+
+Returncode ContainerIterator_next(ContainerIterator* self, Ref_Manager* self_Refman);
+
+void ContainerIterator_Del(ContainerIterator* self);
 
 
 /* types global variables */
 
-TestClass_Dynamic TestClass_dynamic = {TestClass_dynamic_meth};
+TestClass_Dynamic TestClass_dynamic = {(Dynamic_Del)TestClass_Del, TestClass_dynamic_meth};
 
 
 /* global variables */
@@ -126,32 +143,32 @@ TestClass_Dynamic TestClass_dynamic = {TestClass_dynamic_meth};
 Int global_int = 0;
 
 String* global_string = NULL;
-RefManager* global_string_Refman = NULL;
+Ref_Manager* global_string_Refman = NULL;
 
 
 /* global functions declaration */
 
 Returncode test_simple_function(void);
 
-Returncode test_const_expression(Int* i, Char* c, String** s, RefManager** s_Refman, TestStruct** t, RefManager** t_Refman, TestClass** d, RefManager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void));
+Returncode test_const_expression(Int* i, Char* c, String** s, Ref_Manager** s_Refman, TestStruct** t, Ref_Manager** t_Refman, TestClass** d, Ref_Manager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void));
 
-Returncode test_member_expression(TestStruct* t, RefManager* t_Refman, TestStruct** to, RefManager** to_Refman, Int* i);
+Returncode test_member_expression(TestStruct* t, Ref_Manager* t_Refman, TestStruct** to, Ref_Manager** to_Refman, Int* i);
 
-Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, RefManager* arri_Refman, Array* arrs, RefManager* arrs_Refman, Array* arrt, RefManager* arrt_Refman, Array* arrd, RefManager* arrd_Refman, Array* arrf, RefManager* arrf_Refman, Char* c, Int* i, TestStruct** t, RefManager** t_Refman, TestClass** d, RefManager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void), Array** arrio, RefManager** arrio_Refman, Array** arrso, RefManager** arrso_Refman, Array** arrto, RefManager** arrto_Refman, Array** arrdo, RefManager** arrdo_Refman, Array** arrfo, RefManager** arrfo_Refman);
+Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, Ref_Manager* arri_Refman, Array* arrs, Ref_Manager* arrs_Refman, Array* arrt, Ref_Manager* arrt_Refman, Array* arrd, Ref_Manager* arrd_Refman, Array* arrf, Ref_Manager* arrf_Refman, Char* c, Int* i, TestStruct** t, Ref_Manager** t_Refman, TestClass** d, Ref_Manager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void), Array** arrio, Ref_Manager** arrio_Refman, Array** arrso, Ref_Manager** arrso_Refman, Array** arrto, Ref_Manager** arrto_Refman, Array** arrdo, Ref_Manager** arrdo_Refman, Array** arrfo, Ref_Manager** arrfo_Refman);
 
-Returncode test_container_expression(Int x, Int y, String* s, RefManager* s_Refman, Int* i, Bool* b);
+Returncode test_container_expression(Int x, Int y, String* s, Ref_Manager* s_Refman, Int* i, Bool* b);
 
-Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* arr, RefManager* arr_Refman);
+Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* arr, Ref_Manager* arr_Refman);
 
-Returncode test_complex_function(Int num, String* text, RefManager* text_Refman, Int* out_num, String** out_text, RefManager** out_text_Refman);
+Returncode test_complex_function(Int num, String* text, Ref_Manager* text_Refman, Int* out_num, String** out_text, Ref_Manager** out_text_Refman);
 
 Returncode f_test_void(void);
 
-Returncode f_test_params(Int x, String* s, RefManager* s_Refman, String* o, RefManager* o_Refman);
+Returncode f_test_params(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman);
 
-Returncode f_test_outs(String** s, RefManager** s_Refman, Int* x);
+Returncode f_test_outs(String** s, Ref_Manager** s_Refman, Int* x);
 
-Returncode f_test_int2str(Int x, String** s, RefManager** s_Refman);
+Returncode f_test_int2str(Int x, String** s, Ref_Manager** s_Refman);
 
 Returncode f_test_int(Int x);
 
@@ -161,19 +178,19 @@ Returncode f_test_many(Int x, Int y, Int* n, Int* m);
 
 Returncode test_call_expression(void);
 
-Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res);
+Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res);
 
-Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman, Array* a, RefManager* a_Refman);
+Returncode test_builtins(Int i, Char c, Bool b, String* s, Ref_Manager* s_Refman, Array* a, Ref_Manager* a_Refman);
 
 Returncode test_ref_count(void);
 
-Returncode f_remove(String* s, RefManager* s_Refman);
+Returncode f_remove(String* s, Ref_Manager* s_Refman);
 
-Returncode test_type_parameters(String* s, RefManager* s_Refman);
+Returncode test_type_parameters(String* s, Ref_Manager* s_Refman);
 
-Returncode f_try_catch_raise(TestStruct* t, RefManager* t_Refman);
+Returncode f_try_catch_raise(TestStruct* t, Ref_Manager* t_Refman);
 
-Returncode test_error_handling(TestStruct* t, RefManager* t_Refman);
+Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman);
 
 Returncode test_for_each(void);
 
@@ -182,10 +199,10 @@ Returncode test_for_each(void);
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.new"
-Returncode TestStruct_new(TestStruct* self, RefManager* self_Refman, Int x, String* s, RefManager* s_Refman) {
+Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, String* s, Ref_Manager* s_Refman) {
   Returncode MR_err = OK;
   TestStruct* aux_TestStruct_0 = NULL;
-  RefManager* aux_TestStruct_0_Refman = NULL;
+  Ref_Manager* aux_TestStruct_0_Refman = NULL;
   MR_inc_ref(s_Refman);
   if (self == NULL || self_Refman->value == NULL) RAISE(195)
   self->num = x;
@@ -207,6 +224,7 @@ Returncode TestStruct_new(TestStruct* self, RefManager* self_Refman, Int x, Stri
       self->ts = aux_TestStruct_0;
     }
 MR_cleanup:
+  TestStruct_Del(aux_TestStruct_0);
   MR_owner_dec_ref(aux_TestStruct_0_Refman);
   MR_dec_ref(s_Refman);
   return MR_err;
@@ -216,7 +234,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.get"
-Returncode TestStruct_get(TestStruct* self, RefManager* self_Refman, Int* x, String** s, RefManager** s_Refman) {
+Returncode TestStruct_get(TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(205)
   *x = self->num;
@@ -233,7 +251,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.print"
-Returncode TestStruct_print(TestStruct* self, RefManager* self_Refman) {
+Returncode TestStruct_print(TestStruct* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(209)
   CHECK(209, Sys_println(sys, sys_Refman, self->text, self->text_Refman) )
@@ -243,9 +261,15 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+void TestStruct_Del(TestStruct* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->ts_Refman);
+  MR_dec_ref(self->text_Refman);
+}
+
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestClass.new"
-Returncode TestClass_new(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic) {
+Returncode TestClass_new(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(217)
   self->num = 1;
@@ -257,7 +281,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestClass.static-meth"
-Returncode TestClass_static_meth(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic) {
+Returncode TestClass_static_meth(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(220)
   self->num = 3;
@@ -269,7 +293,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestClass.dynamic-meth"
-Returncode TestClass_dynamic_meth(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic) {
+Returncode TestClass_dynamic_meth(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(223)
   self->num = 6;
@@ -281,7 +305,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestClass.print"
-Returncode TestClass_print(TestClass* self, RefManager* self_Refman, TestClass_Dynamic* self_Dynamic) {
+Returncode TestClass_print(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(226)
   CHECK(226, Sys_println(sys, sys_Refman, self->text, self->text_Refman) )
@@ -291,15 +315,20 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+void TestClass_Del(TestClass* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->text_Refman);
+}
+
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Data.set"
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, RefManager* arr_Refman) {
+Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, Ref_Manager* arr_Refman) {
   Returncode MR_err = OK;
   Generic_Type* x = NULL;
-  RefManager* x_Refman = NULL;
+  Ref_Manager* x_Refman = NULL;
   Generic_Type_Dynamic* x_Dynamic = NULL;
   Data* d = NULL;
-  RefManager* d_Refman = NULL;
+  Ref_Manager* d_Refman = NULL;
   MR_inc_ref(item_Refman);
   MR_inc_ref(arr_Refman);
   x = item;
@@ -336,6 +365,7 @@ Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, Ref
   self->item_Dynamic = d->item_Dynamic;
   self->item = d->item;
 MR_cleanup:
+  Data_Del(d);
   MR_owner_dec_ref(d_Refman);
   MR_dec_ref(x_Refman);
   MR_dec_ref(arr_Refman);
@@ -347,7 +377,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Data.get"
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
+Returncode Data_get(Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(360)
   MR_dec_ref(*item_Refman);
@@ -361,9 +391,32 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+void Data_Del(Data* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->arr_Refman);
+  MR_dec_ref(self->item_Refman);
+}
+
+void Dataset_Del(Dataset* self) {
+  if (self == NULL) return;
+  Data_Del(&(self->_base));
+  MR_dec_ref(self->third_Refman);
+  MR_dec_ref(self->second_Refman);
+}
+
+void MidData_Del(MidData* self) {
+  if (self == NULL) return;
+  Dataset_Del(&(self->_base));
+}
+
+void TopData_Del(TopData* self) {
+  if (self == NULL) return;
+  MidData_Del(&(self->_base));
+}
+
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Container.new"
-Returncode Container_new(Container* self, RefManager* self_Refman, Generic_Type* value, RefManager* value_Refman, Generic_Type_Dynamic* value_Dynamic, Container* next, RefManager* next_Refman) {
+Returncode Container_new(Container* self, Ref_Manager* self_Refman, Generic_Type* value, Ref_Manager* value_Refman, Generic_Type_Dynamic* value_Dynamic, Container* next, Ref_Manager* next_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(value_Refman);
   MR_inc_ref(next_Refman);
@@ -388,10 +441,10 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "Container.iter"
-Returncode Container_iter(Container* self, RefManager* self_Refman, ContainerIterator** iter, RefManager** iter_Refman) {
+Returncode Container_iter(Container* self, Ref_Manager* self_Refman, ContainerIterator** iter, Ref_Manager** iter_Refman) {
   Returncode MR_err = OK;
   ContainerIterator* aux_ContainerIterator_0 = NULL;
-  RefManager* aux_ContainerIterator_0_Refman = NULL;
+  Ref_Manager* aux_ContainerIterator_0_Refman = NULL;
   if (self == NULL || self_Refman->value == NULL) RAISE(441)
   aux_ContainerIterator_0 = calloc(1, sizeof(ContainerIterator));
   if (aux_ContainerIterator_0 == NULL) RAISE(441)
@@ -404,15 +457,22 @@ Returncode Container_iter(Container* self, RefManager* self_Refman, ContainerIte
   *iter = aux_ContainerIterator_0;
   aux_ContainerIterator_0 = NULL;
 MR_cleanup:
+  ContainerIterator_Del(aux_ContainerIterator_0);
   MR_owner_dec_ref(aux_ContainerIterator_0_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+void Container_Del(Container* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->next_Refman);
+  MR_dec_ref(self->value_Refman);
+}
+
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "ContainerIterator.new"
-Returncode ContainerIterator_new(ContainerIterator* self, RefManager* self_Refman, Container* first, RefManager* first_Refman) {
+Returncode ContainerIterator_new(ContainerIterator* self, Ref_Manager* self_Refman, Container* first, Ref_Manager* first_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(first_Refman);
   if (self == NULL || self_Refman->value == NULL) RAISE(447)
@@ -429,7 +489,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "ContainerIterator.has"
-Returncode ContainerIterator_has(ContainerIterator* self, RefManager* self_Refman, Bool* has_data) {
+Returncode ContainerIterator_has(ContainerIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(450)
   *has_data = !(self->curr == NULL || self->curr_Refman->value == NULL);
@@ -441,7 +501,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "ContainerIterator.get"
-Returncode ContainerIterator_get(ContainerIterator* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
+Returncode ContainerIterator_get(ContainerIterator* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(453)
   if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(453)
@@ -458,7 +518,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "ContainerIterator.next"
-Returncode ContainerIterator_next(ContainerIterator* self, RefManager* self_Refman) {
+Returncode ContainerIterator_next(ContainerIterator* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
   if (self == NULL || self_Refman->value == NULL) RAISE(456)
   if (self->curr == NULL || self->curr_Refman->value == NULL) RAISE(456)
@@ -473,6 +533,11 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+void ContainerIterator_Del(ContainerIterator* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->curr_Refman);
+}
+
 
 /* global functions body */
 
@@ -482,7 +547,7 @@ Returncode test_simple_function(void) {
   Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(26)
@@ -499,11 +564,11 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-const-expression"
-Returncode test_const_expression(Int* i, Char* c, String** s, RefManager** s_Refman, TestStruct** t, RefManager** t_Refman, TestClass** d, RefManager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void)) {
+Returncode test_const_expression(Int* i, Char* c, String** s, Ref_Manager** s_Refman, TestStruct** t, Ref_Manager** t_Refman, TestClass** d, Ref_Manager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void)) {
   Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   *i = (((((((0 + 9630) + -9630) + 07520) + -07520) + 0xfda940) + -0xfda940) + 0xFDA940) + -0xFDA940;
   *c = (((('a' + '\'') + '\n') + '\x0f') + '\xA9') + '\270';
   aux_String_0 = &aux_String_0_Var;
@@ -537,11 +602,11 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-member-expression"
-Returncode test_member_expression(TestStruct* t, RefManager* t_Refman, TestStruct** to, RefManager** to_Refman, Int* i) {
+Returncode test_member_expression(TestStruct* t, Ref_Manager* t_Refman, TestStruct** to, Ref_Manager** to_Refman, Int* i) {
   Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   MR_inc_ref(t_Refman);
   if (t == NULL || t_Refman->value == NULL) RAISE(47)
   if (t->ts == NULL || t->ts_Refman->value == NULL) RAISE(47)
@@ -580,44 +645,44 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-slice-expression"
-Returncode test_slice_expression(String* s, RefManager* s_Refman, Array* arri, RefManager* arri_Refman, Array* arrs, RefManager* arrs_Refman, Array* arrt, RefManager* arrt_Refman, Array* arrd, RefManager* arrd_Refman, Array* arrf, RefManager* arrf_Refman, Char* c, Int* i, TestStruct** t, RefManager** t_Refman, TestClass** d, RefManager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void), Array** arrio, RefManager** arrio_Refman, Array** arrso, RefManager** arrso_Refman, Array** arrto, RefManager** arrto_Refman, Array** arrdo, RefManager** arrdo_Refman, Array** arrfo, RefManager** arrfo_Refman) {
+Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, Ref_Manager* arri_Refman, Array* arrs, Ref_Manager* arrs_Refman, Array* arrt, Ref_Manager* arrt_Refman, Array* arrd, Ref_Manager* arrd_Refman, Array* arrf, Ref_Manager* arrf_Refman, Char* c, Int* i, TestStruct** t, Ref_Manager** t_Refman, TestClass** d, Ref_Manager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void), Array** arrio, Ref_Manager** arrio_Refman, Array** arrso, Ref_Manager** arrso_Refman, Array** arrto, Ref_Manager** arrto_Refman, Array** arrdo, Ref_Manager** arrdo_Refman, Array** arrfo, Ref_Manager** arrfo_Refman) {
   Returncode MR_err = OK;
   Array aux_Array_0_Var = {0};
   Array* aux_Array_0 = NULL;
-  RefManager* aux_Array_0_Refman = NULL;
+  Ref_Manager* aux_Array_0_Refman = NULL;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
-  RefManager* aux_String_1_Refman = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
   Array aux_Array_1_Var = {0};
   Array* aux_Array_1 = NULL;
-  RefManager* aux_Array_1_Refman = NULL;
+  Ref_Manager* aux_Array_1_Refman = NULL;
   Array aux_Array_2_Var = {0};
   Array* aux_Array_2 = NULL;
-  RefManager* aux_Array_2_Refman = NULL;
+  Ref_Manager* aux_Array_2_Refman = NULL;
   Array aux_Array_3_Var = {0};
   Array* aux_Array_3 = NULL;
-  RefManager* aux_Array_3_Refman = NULL;
+  Ref_Manager* aux_Array_3_Refman = NULL;
   Array aux_Array_4_Var = {0};
   Array* aux_Array_4 = NULL;
-  RefManager* aux_Array_4_Refman = NULL;
+  Ref_Manager* aux_Array_4_Refman = NULL;
   Array aux_Array_5_Var = {0};
   Array* aux_Array_5 = NULL;
-  RefManager* aux_Array_5_Refman = NULL;
+  Ref_Manager* aux_Array_5_Refman = NULL;
   Array aux_Array_6_Var = {0};
   Array* aux_Array_6 = NULL;
-  RefManager* aux_Array_6_Refman = NULL;
+  Ref_Manager* aux_Array_6_Refman = NULL;
   Array aux_Array_7_Var = {0};
   Array* aux_Array_7 = NULL;
-  RefManager* aux_Array_7_Refman = NULL;
+  Ref_Manager* aux_Array_7_Refman = NULL;
   Array aux_Array_8_Var = {0};
   Array* aux_Array_8 = NULL;
-  RefManager* aux_Array_8_Refman = NULL;
+  Ref_Manager* aux_Array_8_Refman = NULL;
   Array aux_Array_9_Var = {0};
   Array* aux_Array_9 = NULL;
-  RefManager* aux_Array_9_Refman = NULL;
+  Ref_Manager* aux_Array_9_Refman = NULL;
   MR_inc_ref(s_Refman);
   MR_inc_ref(arri_Refman);
   MR_inc_ref(arrs_Refman);
@@ -814,7 +879,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-container-expression"
-Returncode test_container_expression(Int x, Int y, String* s, RefManager* s_Refman, Int* i, Bool* b) {
+Returncode test_container_expression(Int x, Int y, String* s, Ref_Manager* s_Refman, Int* i, Bool* b) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
   *i = (- x) + (- (- (- y)));
@@ -828,112 +893,112 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-variable"
-Returncode test_variable(Int i, String* text, RefManager* text_Refman, Array* arr, RefManager* arr_Refman) {
+Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* arr, Ref_Manager* arr_Refman) {
   Returncode MR_err = OK;
   Int x = 0;
   String* s = NULL;
-  RefManager* s_Refman = NULL;
+  Ref_Manager* s_Refman = NULL;
   Array* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   TestStruct* t = NULL;
-  RefManager* t_Refman = NULL;
+  Ref_Manager* t_Refman = NULL;
   TestClass* d = NULL;
-  RefManager* d_Refman = NULL;
+  Ref_Manager* d_Refman = NULL;
   TestClass_Dynamic* d_Dynamic = NULL;
   TestStruct tv_Var = {0};
   TestStruct* tv = NULL;
-  RefManager* tv_Refman = NULL;
+  Ref_Manager* tv_Refman = NULL;
   TestClass dv_Var = {0};
   TestClass* dv = NULL;
-  RefManager* dv_Refman = NULL;
+  Ref_Manager* dv_Refman = NULL;
   TestClass_Dynamic* dv_Dynamic = &TestClass_dynamic;
   char sv_Values[12] = {0};
   String sv_Var = {12, 0, NULL};
   String* sv = NULL;
-  RefManager* sv_Refman = NULL;
-  Returncode (*f)(Int xi, String* si, RefManager* si_Refman, Int* xo, String** so, RefManager** so_Refman) = NULL;
+  Ref_Manager* sv_Refman = NULL;
+  Returncode (*f)(Int xi, String* si, Ref_Manager* si_Refman, Int* xo, String** so, Ref_Manager** so_Refman) = NULL;
   Int ia_Values[12] = {0};
   Array ia_Var = {12, NULL};
   Array* ia = NULL;
-  RefManager* ia_Refman = NULL;
+  Ref_Manager* ia_Refman = NULL;
   TestStruct ta_Values[12] = {{0}};
   Array ta_Var = {12, NULL};
   Array* ta = NULL;
-  RefManager* ta_Refman = NULL;
+  Ref_Manager* ta_Refman = NULL;
   TestClass da_Values[12] = {{0}};
   Array da_Var = {12, NULL};
   Array* da = NULL;
-  RefManager* da_Refman = NULL;
+  Ref_Manager* da_Refman = NULL;
   char sa_Chars[12 * 7];
   String sa_Values[12] = {{0}};
   Array sa_Var = {12, NULL};
   Array* sa = NULL;
-  RefManager* sa_Refman = NULL;
+  Ref_Manager* sa_Refman = NULL;
   Returncode (*fa_Values[12])(void) = {0};
   Array fa_Var = {12, NULL};
   Array* fa = NULL;
-  RefManager* fa_Refman = NULL;
+  Ref_Manager* fa_Refman = NULL;
   TestStruct* tn = NULL;
-  RefManager* tn_Refman = NULL;
+  Ref_Manager* tn_Refman = NULL;
   TestClass* dn = NULL;
-  RefManager* dn_Refman = NULL;
+  Ref_Manager* dn_Refman = NULL;
   TestClass_Dynamic* dn_Dynamic = &TestClass_dynamic;
   String* sn = NULL;
-  RefManager* sn_Refman = NULL;
+  Ref_Manager* sn_Refman = NULL;
   Array* ian = NULL;
-  RefManager* ian_Refman = NULL;
+  Ref_Manager* ian_Refman = NULL;
   Array* tan = NULL;
-  RefManager* tan_Refman = NULL;
+  Ref_Manager* tan_Refman = NULL;
   Array* dan = NULL;
-  RefManager* dan_Refman = NULL;
+  Ref_Manager* dan_Refman = NULL;
   Array* san = NULL;
-  RefManager* san_Refman = NULL;
+  Ref_Manager* san_Refman = NULL;
   Array* sfn = NULL;
-  RefManager* sfn_Refman = NULL;
+  Ref_Manager* sfn_Refman = NULL;
   Int ix = 0;
   String* si = NULL;
-  RefManager* si_Refman = NULL;
+  Ref_Manager* si_Refman = NULL;
   char isv_Values[12] = {0};
   String isv_Var = {12, 0, NULL};
   String* isv = NULL;
-  RefManager* isv_Refman = NULL;
+  Ref_Manager* isv_Refman = NULL;
   String* isn = NULL;
-  RefManager* isn_Refman = NULL;
-  Returncode (*fi)(Int x, String** s, RefManager** s_Refman) = NULL;
+  Ref_Manager* isn_Refman = NULL;
+  Returncode (*fi)(Int x, String** s, Ref_Manager** s_Refman) = NULL;
   TestStruct itv_Var = {0};
   TestStruct* itv = NULL;
-  RefManager* itv_Refman = NULL;
+  Ref_Manager* itv_Refman = NULL;
   TestStruct* itn = NULL;
-  RefManager* itn_Refman = NULL;
+  Ref_Manager* itn_Refman = NULL;
   TestClass idv_Var = {0};
   TestClass* idv = NULL;
-  RefManager* idv_Refman = NULL;
+  Ref_Manager* idv_Refman = NULL;
   TestClass_Dynamic* idv_Dynamic = &TestClass_dynamic;
   TestClass* idn = NULL;
-  RefManager* idn_Refman = NULL;
+  Ref_Manager* idn_Refman = NULL;
   TestClass_Dynamic* idn_Dynamic = &TestClass_dynamic;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   TestStruct* aux_TestStruct_0 = NULL;
-  RefManager* aux_TestStruct_0_Refman = NULL;
+  Ref_Manager* aux_TestStruct_0_Refman = NULL;
   TestClass* aux_TestClass_0 = NULL;
-  RefManager* aux_TestClass_0_Refman = NULL;
+  Ref_Manager* aux_TestClass_0_Refman = NULL;
   TestClass_Dynamic* aux_TestClass_0_Dynamic = &TestClass_dynamic;
   String* aux_String_1 = NULL;
-  RefManager* aux_String_1_Refman = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
   Array* aux_Array_0 = NULL;
-  RefManager* aux_Array_0_Refman = NULL;
+  Ref_Manager* aux_Array_0_Refman = NULL;
   Array* aux_Array_1 = NULL;
-  RefManager* aux_Array_1_Refman = NULL;
+  Ref_Manager* aux_Array_1_Refman = NULL;
   Array* aux_Array_2 = NULL;
-  RefManager* aux_Array_2_Refman = NULL;
+  Ref_Manager* aux_Array_2_Refman = NULL;
   Array* aux_Array_3 = NULL;
-  RefManager* aux_Array_3_Refman = NULL;
+  Ref_Manager* aux_Array_3_Refman = NULL;
   Array* aux_Array_4 = NULL;
-  RefManager* aux_Array_4_Refman = NULL;
+  Ref_Manager* aux_Array_4_Refman = NULL;
   String* aux_String_2 = NULL;
-  RefManager* aux_String_2_Refman = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
   MR_inc_ref(text_Refman);
   MR_inc_ref(arr_Refman);
   tv = &tv_Var;
@@ -1150,11 +1215,15 @@ MR_cleanup:
   MR_owner_dec_ref(aux_Array_1_Refman);
   MR_owner_dec_ref(aux_Array_0_Refman);
   MR_owner_dec_ref(aux_String_1_Refman);
+  aux_TestClass_0_Dynamic->_del(aux_TestClass_0);
   MR_owner_dec_ref(aux_TestClass_0_Refman);
+  TestStruct_Del(aux_TestStruct_0);
   MR_owner_dec_ref(aux_TestStruct_0_Refman);
   MR_dec_ref(aux_String_0_Refman);
+  idn_Dynamic->_del(idn);
   MR_owner_dec_ref(idn_Refman);
   MR_dec_ref(idv_Refman);
+  TestStruct_Del(itn);
   MR_owner_dec_ref(itn_Refman);
   MR_dec_ref(itv_Refman);
   MR_owner_dec_ref(isn_Refman);
@@ -1166,7 +1235,9 @@ MR_cleanup:
   MR_owner_dec_ref(tan_Refman);
   MR_owner_dec_ref(ian_Refman);
   MR_owner_dec_ref(sn_Refman);
+  dn_Dynamic->_del(dn);
   MR_owner_dec_ref(dn_Refman);
+  TestStruct_Del(tn);
   MR_owner_dec_ref(tn_Refman);
   MR_dec_ref(fa_Refman);
   MR_dec_ref(sa_Refman);
@@ -1189,7 +1260,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-complex-function"
-Returncode test_complex_function(Int num, String* text, RefManager* text_Refman, Int* out_num, String** out_text, RefManager** out_text_Refman) {
+Returncode test_complex_function(Int num, String* text, Ref_Manager* text_Refman, Int* out_num, String** out_text, Ref_Manager** out_text_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(text_Refman);
   *out_num = num;
@@ -1217,7 +1288,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-params"
-Returncode f_test_params(Int x, String* s, RefManager* s_Refman, String* o, RefManager* o_Refman) {
+Returncode f_test_params(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
   MR_inc_ref(o_Refman);
@@ -1232,7 +1303,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-outs"
-Returncode f_test_outs(String** s, RefManager** s_Refman, Int* x) {
+Returncode f_test_outs(String** s, Ref_Manager** s_Refman, Int* x) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -1242,7 +1313,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-test-int2str"
-Returncode f_test_int2str(Int x, String** s, RefManager** s_Refman) {
+Returncode f_test_int2str(Int x, String** s, Ref_Manager** s_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -1285,16 +1356,16 @@ MR_cleanup:
 Returncode test_call_expression(void) {
   Returncode MR_err = OK;
   String* s = NULL;
-  RefManager* s_Refman = NULL;
+  Ref_Manager* s_Refman = NULL;
   Int x = 0;
   Int tmp = 0;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   Int aux_Int_0 = 0;
   Int aux_Int_1 = 0;
   String* aux_String_1 = NULL;
-  RefManager* aux_String_1_Refman = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
   CHECK(247, f_test_void() )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
@@ -1330,7 +1401,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-code-flow"
-Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
+Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res) {
   Returncode MR_err = OK;
   Int x = 0;
   Int y = 0;
@@ -1339,7 +1410,7 @@ Returncode test_code_flow(Array* arr, RefManager* arr_Refman, Int* res) {
   Int n = 0;
   Array aux_Array_0_Var = {0};
   Array* aux_Array_0 = NULL;
-  RefManager* aux_Array_0_Refman = NULL;
+  Ref_Manager* aux_Array_0_Refman = NULL;
   MR_inc_ref(arr_Refman);
   if (arr == NULL || arr_Refman->value == NULL) RAISE(265)
   if ((4) < 0 || (4) >= (arr)->length) RAISE(265)
@@ -1432,13 +1503,13 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-builtins"
-Returncode test_builtins(Int i, Char c, Bool b, String* s, RefManager* s_Refman, Array* a, RefManager* a_Refman) {
+Returncode test_builtins(Int i, Char c, Bool b, String* s, Ref_Manager* s_Refman, Array* a, Ref_Manager* a_Refman) {
   Returncode MR_err = OK;
   Int iv = 0;
   Char cv = 0;
   Bool bv = 0;
   File* f = NULL;
-  RefManager* f_Refman = NULL;
+  Ref_Manager* f_Refman = NULL;
   MR_inc_ref(s_Refman);
   MR_inc_ref(a_Refman);
   CHECK(299, Int_str(i, s, s_Refman) )
@@ -1493,18 +1564,18 @@ MR_cleanup:
 Returncode test_ref_count(void) {
   Returncode MR_err = OK;
   String* s = NULL;
-  RefManager* s_Refman = NULL;
+  Ref_Manager* s_Refman = NULL;
   String* s_user = NULL;
-  RefManager* s_user_Refman = NULL;
+  Ref_Manager* s_user_Refman = NULL;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
-  RefManager* aux_String_1_Refman = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
-  RefManager* aux_String_2_Refman = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(333)
@@ -1555,7 +1626,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-remove"
-Returncode f_remove(String* s, RefManager* s_Refman) {
+Returncode f_remove(String* s, Ref_Manager* s_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
 MR_cleanup:
@@ -1567,38 +1638,38 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-type-parameters"
-Returncode test_type_parameters(String* s, RefManager* s_Refman) {
+Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   Returncode MR_err = OK;
   Data d_Var = {0};
   Data* d = NULL;
-  RefManager* d_Refman = NULL;
+  Ref_Manager* d_Refman = NULL;
   char sarr_Chars[6 * 16];
   String sarr_Values[6] = {{0}};
   Array sarr_Var = {6, NULL};
   Array* sarr = NULL;
-  RefManager* sarr_Refman = NULL;
+  Ref_Manager* sarr_Refman = NULL;
   Data ad_Values[5] = {{0}};
   Array ad_Var = {5, NULL};
   Array* ad = NULL;
-  RefManager* ad_Refman = NULL;
+  Ref_Manager* ad_Refman = NULL;
   Data da_Var = {0};
   Data* da = NULL;
-  RefManager* da_Refman = NULL;
+  Ref_Manager* da_Refman = NULL;
   Data dr_Var = {0};
   Data* dr = NULL;
-  RefManager* dr_Refman = NULL;
+  Ref_Manager* dr_Refman = NULL;
   Data* dg = NULL;
-  RefManager* dg_Refman = NULL;
+  Ref_Manager* dg_Refman = NULL;
   TopData t_Var = {{{{0}}}};
   TopData* t = NULL;
-  RefManager* t_Refman = NULL;
+  Ref_Manager* t_Refman = NULL;
   TestStruct at_Values[8] = {{0}};
   Array at_Var = {8, NULL};
   Array* at = NULL;
-  RefManager* at_Refman = NULL;
+  Ref_Manager* at_Refman = NULL;
   TestStruct ts_Var = {0};
   TestStruct* ts = NULL;
-  RefManager* ts_Refman = NULL;
+  Ref_Manager* ts_Refman = NULL;
   MR_inc_ref(s_Refman);
   d = &d_Var;
   d_Refman = MR_new_ref(d);
@@ -1725,7 +1796,7 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "f-try-catch-raise"
-Returncode f_try_catch_raise(TestStruct* t, RefManager* t_Refman) {
+Returncode f_try_catch_raise(TestStruct* t, Ref_Manager* t_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(t_Refman);
   do {
@@ -1752,44 +1823,44 @@ MR_cleanup:
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "test-error-handling"
-Returncode test_error_handling(TestStruct* t, RefManager* t_Refman) {
+Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
   Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
-  RefManager* aux_String_1_Refman = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
-  RefManager* aux_String_2_Refman = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
-  RefManager* aux_String_3_Refman = NULL;
+  Ref_Manager* aux_String_3_Refman = NULL;
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
-  RefManager* aux_String_4_Refman = NULL;
+  Ref_Manager* aux_String_4_Refman = NULL;
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
-  RefManager* aux_String_5_Refman = NULL;
+  Ref_Manager* aux_String_5_Refman = NULL;
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
-  RefManager* aux_String_6_Refman = NULL;
+  Ref_Manager* aux_String_6_Refman = NULL;
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
-  RefManager* aux_String_7_Refman = NULL;
+  Ref_Manager* aux_String_7_Refman = NULL;
   String aux_String_8_Var = {0};
   String* aux_String_8 = NULL;
-  RefManager* aux_String_8_Refman = NULL;
+  Ref_Manager* aux_String_8_Refman = NULL;
   String aux_String_9_Var = {0};
   String* aux_String_9 = NULL;
-  RefManager* aux_String_9_Refman = NULL;
+  Ref_Manager* aux_String_9_Refman = NULL;
   String aux_String_10_Var = {0};
   String* aux_String_10 = NULL;
-  RefManager* aux_String_10_Refman = NULL;
+  Ref_Manager* aux_String_10_Refman = NULL;
   String aux_String_11_Var = {0};
   String* aux_String_11 = NULL;
-  RefManager* aux_String_11_Refman = NULL;
+  Ref_Manager* aux_String_11_Refman = NULL;
   MR_inc_ref(t_Refman);
   do {
     ++MR_trace_ignore_count;
@@ -1953,125 +2024,125 @@ Returncode test_for_each(void) {
   char text_Values[16] = {0};
   String text_Var = {16, 0, NULL};
   String* text = NULL;
-  RefManager* text_Refman = NULL;
+  Ref_Manager* text_Refman = NULL;
   Int arr_Values[3] = {0};
   Array arr_Var = {3, NULL};
   Array* arr = NULL;
-  RefManager* arr_Refman = NULL;
+  Ref_Manager* arr_Refman = NULL;
   TestStruct tsarr_Values[3] = {{0}};
   Array tsarr_Var = {3, NULL};
   Array* tsarr = NULL;
-  RefManager* tsarr_Refman = NULL;
+  Ref_Manager* tsarr_Refman = NULL;
   char sarr_Chars[3 * 16];
   String sarr_Values[3] = {{0}};
   Array sarr_Var = {3, NULL};
   Array* sarr = NULL;
-  RefManager* sarr_Refman = NULL;
+  Ref_Manager* sarr_Refman = NULL;
   Container container_last_Var = {0};
   Container* container_last = NULL;
-  RefManager* container_last_Refman = NULL;
+  Ref_Manager* container_last_Refman = NULL;
   Container container_mid_Var = {0};
   Container* container_mid = NULL;
-  RefManager* container_mid_Refman = NULL;
+  Ref_Manager* container_mid_Refman = NULL;
   Container container_first_Var = {0};
   Container* container_first = NULL;
-  RefManager* container_first_Refman = NULL;
+  Ref_Manager* container_first_Refman = NULL;
   Container container_Var = {0};
   Container* container = NULL;
-  RefManager* container_Refman = NULL;
+  Ref_Manager* container_Refman = NULL;
   ContainerIterator* iter = NULL;
-  RefManager* iter_Refman = NULL;
+  Ref_Manager* iter_Refman = NULL;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
-  RefManager* aux_String_1_Refman = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
   Char c = 0;
   String* aux_String_2 = NULL;
-  RefManager* aux_String_2_Refman = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
-  RefManager* aux_String_3_Refman = NULL;
+  Ref_Manager* aux_String_3_Refman = NULL;
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
-  RefManager* aux_String_4_Refman = NULL;
+  Ref_Manager* aux_String_4_Refman = NULL;
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
-  RefManager* aux_String_5_Refman = NULL;
+  Ref_Manager* aux_String_5_Refman = NULL;
   Int n = 0;
   Array* aux_Array_0 = NULL;
-  RefManager* aux_Array_0_Refman = NULL;
+  Ref_Manager* aux_Array_0_Refman = NULL;
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
-  RefManager* aux_String_6_Refman = NULL;
+  Ref_Manager* aux_String_6_Refman = NULL;
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
-  RefManager* aux_String_7_Refman = NULL;
+  Ref_Manager* aux_String_7_Refman = NULL;
   String aux_String_8_Var = {0};
   String* aux_String_8 = NULL;
-  RefManager* aux_String_8_Refman = NULL;
+  Ref_Manager* aux_String_8_Refman = NULL;
   String aux_String_9_Var = {0};
   String* aux_String_9 = NULL;
-  RefManager* aux_String_9_Refman = NULL;
+  Ref_Manager* aux_String_9_Refman = NULL;
   String aux_String_10_Var = {0};
   String* aux_String_10 = NULL;
-  RefManager* aux_String_10_Refman = NULL;
+  Ref_Manager* aux_String_10_Refman = NULL;
   String aux_String_11_Var = {0};
   String* aux_String_11 = NULL;
-  RefManager* aux_String_11_Refman = NULL;
+  Ref_Manager* aux_String_11_Refman = NULL;
   TestStruct* ts = NULL;
-  RefManager* ts_Refman = NULL;
+  Ref_Manager* ts_Refman = NULL;
   Array* aux_Array_1 = NULL;
-  RefManager* aux_Array_1_Refman = NULL;
+  Ref_Manager* aux_Array_1_Refman = NULL;
   String aux_String_12_Var = {0};
   String* aux_String_12 = NULL;
-  RefManager* aux_String_12_Refman = NULL;
+  Ref_Manager* aux_String_12_Refman = NULL;
   String aux_String_13_Var = {0};
   String* aux_String_13 = NULL;
-  RefManager* aux_String_13_Refman = NULL;
+  Ref_Manager* aux_String_13_Refman = NULL;
   String aux_String_14_Var = {0};
   String* aux_String_14 = NULL;
-  RefManager* aux_String_14_Refman = NULL;
+  Ref_Manager* aux_String_14_Refman = NULL;
   String aux_String_15_Var = {0};
   String* aux_String_15 = NULL;
-  RefManager* aux_String_15_Refman = NULL;
+  Ref_Manager* aux_String_15_Refman = NULL;
   String aux_String_16_Var = {0};
   String* aux_String_16 = NULL;
-  RefManager* aux_String_16_Refman = NULL;
+  Ref_Manager* aux_String_16_Refman = NULL;
   String aux_String_17_Var = {0};
   String* aux_String_17 = NULL;
-  RefManager* aux_String_17_Refman = NULL;
+  Ref_Manager* aux_String_17_Refman = NULL;
   String* s = NULL;
-  RefManager* s_Refman = NULL;
+  Ref_Manager* s_Refman = NULL;
   Array* aux_Array_2 = NULL;
-  RefManager* aux_Array_2_Refman = NULL;
+  Ref_Manager* aux_Array_2_Refman = NULL;
   String aux_String_18_Var = {0};
   String* aux_String_18 = NULL;
-  RefManager* aux_String_18_Refman = NULL;
+  Ref_Manager* aux_String_18_Refman = NULL;
   String aux_String_19_Var = {0};
   String* aux_String_19 = NULL;
-  RefManager* aux_String_19_Refman = NULL;
+  Ref_Manager* aux_String_19_Refman = NULL;
   String aux_String_20_Var = {0};
   String* aux_String_20 = NULL;
-  RefManager* aux_String_20_Refman = NULL;
+  Ref_Manager* aux_String_20_Refman = NULL;
   String aux_String_21_Var = {0};
   String* aux_String_21 = NULL;
-  RefManager* aux_String_21_Refman = NULL;
+  Ref_Manager* aux_String_21_Refman = NULL;
   String aux_String_22_Var = {0};
   String* aux_String_22 = NULL;
-  RefManager* aux_String_22_Refman = NULL;
+  Ref_Manager* aux_String_22_Refman = NULL;
   String aux_String_23_Var = {0};
   String* aux_String_23 = NULL;
-  RefManager* aux_String_23_Refman = NULL;
+  Ref_Manager* aux_String_23_Refman = NULL;
   ContainerIterator* aux_ContainerIterator_0 = NULL;
-  RefManager* aux_ContainerIterator_0_Refman = NULL;
+  Ref_Manager* aux_ContainerIterator_0_Refman = NULL;
   String aux_String_24_Var = {0};
   String* aux_String_24 = NULL;
-  RefManager* aux_String_24_Refman = NULL;
+  Ref_Manager* aux_String_24_Refman = NULL;
   String aux_String_25_Var = {0};
   String* aux_String_25 = NULL;
-  RefManager* aux_String_25_Refman = NULL;
+  Ref_Manager* aux_String_25_Refman = NULL;
   text = &text_Var;
   text_Var.values = text_Values;
   text_Refman = MR_new_ref(text);
@@ -2426,6 +2497,7 @@ MR_cleanup:
   MR_dec_ref(aux_String_2_Refman);
   MR_dec_ref(aux_String_1_Refman);
   MR_dec_ref(aux_String_0_Refman);
+  ContainerIterator_Del(iter);
   MR_owner_dec_ref(iter_Refman);
   MR_dec_ref(container_Refman);
   MR_dec_ref(container_first_Refman);

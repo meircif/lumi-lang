@@ -36,6 +36,13 @@ typedef Returncode (*Func)();
 
 typedef FILE File;
 
+typedef struct {
+  int count;
+  void* value;
+} Ref_Manager;
+
+typedef void (*Dynamic_Del)(void*);
+
 typedef void Generic_Type;
 typedef void Generic_Type_Dynamic;
 
@@ -81,15 +88,36 @@ int MR_test_main(int argc, char* argv[]);
 #define TEST_MAIN_FUNC MAIN_PROXY(MR_test_main)
 #define USER_MAIN_HEADER Returncode MR_user_main()
 
-typedef struct {
-  int count;
-  void* value;
-} RefManager;
+#define SRD(Type, field) \
+while (self->field != NULL) { \
+  Type* value = self->field; \
+  Ref_Manager* value_Refman = self->field##_Refman; \
+  self->field = value->field; \
+  self->field##_Refman = value->field##_Refman; \
+  value->field = NULL; \
+  value->field##_Refman = NULL; \
+  Type##_Del(value); \
+  MR_owner_dec_ref(value_Refman); \
+}
 
-RefManager* MR_new_ref(void* value);
-void MR_inc_ref(RefManager* ref);
-void MR_dec_ref(RefManager* ref);
-void MR_owner_dec_ref(RefManager* ref);
+#define SDRD(Type, field, bases) \
+while (self->field != NULL) { \
+  Type* value = self->field; \
+  Ref_Manager* value_Refman = self->field##_Refman; \
+  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \
+  self->field = value->field; \
+  self->field##_Refman = value->field##_Refman; \
+  value->field = NULL; \
+  value->field##_Refman = NULL; \
+  value->field##_Dynamic = NULL; \
+  value_Dynamic->bases##del(value); \
+  MR_owner_dec_ref(value_Refman); \
+}
+
+Ref_Manager* MR_new_ref(void* value);
+void MR_inc_ref(Ref_Manager* ref);
+void MR_dec_ref(Ref_Manager* ref);
+void MR_owner_dec_ref(Ref_Manager* ref);
 
 String* MR_new_string(int length);
 Array* MR_new_array(int length, int value_size);
@@ -98,50 +126,50 @@ void MR_set_var_string_array(
   int array_length, int string_length, Array* array, char* chars);
 Bool MR_run_test(char* test_name, Func test_func);
 
-Returncode String_clear(String*, RefManager*);
-Returncode String_length(String*, RefManager*, Int* length);
+Returncode String_clear(String*, Ref_Manager*);
+Returncode String_length(String*, Ref_Manager*, Int* length);
 Returncode String_equal(
-  String*, RefManager*, String* other, RefManager*, Bool* equal);
-Returncode String_get(String*, RefManager*, Int index, Char* ch);
-Returncode String_append(String*, RefManager*, Char ch);
-Returncode String_new(String*, RefManager*, String* source, RefManager*);
-Returncode String_concat(String*, RefManager*, String* ext, RefManager*);
-Returncode String_concat_int(String*, RefManager*, Int num);
+  String*, Ref_Manager*, String* other, Ref_Manager*, Bool* equal);
+Returncode String_get(String*, Ref_Manager*, Int index, Char* ch);
+Returncode String_append(String*, Ref_Manager*, Char ch);
+Returncode String_new(String*, Ref_Manager*, String* source, Ref_Manager*);
+Returncode String_concat(String*, Ref_Manager*, String* ext, Ref_Manager*);
+Returncode String_concat_int(String*, Ref_Manager*, Int num);
 Returncode String_find(
-  String*, RefManager*, String* pattern, RefManager*, Int* index);
-Returncode String_has(String*, RefManager*, Char ch, Bool* found);
+  String*, Ref_Manager*, String* pattern, Ref_Manager*, Int* index);
+Returncode String_has(String*, Ref_Manager*, Char ch, Bool* found);
 
-Returncode Int_str(Int value, String* str, RefManager*);
+Returncode Int_str(Int value, String* str, Ref_Manager*);
 
 Returncode file_open_read(
-  String* name, RefManager*, File** file, RefManager**);
+  String* name, Ref_Manager*, File** file, Ref_Manager**);
 Returncode file_open_write(
-  String* name, RefManager*, File** file, RefManager**);
-Returncode File_close(File*, RefManager*);
-Returncode File_getc(File*, RefManager*, Char* ch, Bool* is_eof);
-Returncode File_putc(File*, RefManager*, Char ch);
-Returncode File_write(File*, RefManager*, String* line, RefManager*);
+  String* name, Ref_Manager*, File** file, Ref_Manager**);
+Returncode File_close(File*, Ref_Manager*);
+Returncode File_getc(File*, Ref_Manager*, Char* ch, Bool* is_eof);
+Returncode File_putc(File*, Ref_Manager*, Char ch);
+Returncode File_write(File*, Ref_Manager*, String* line, Ref_Manager*);
 
 typedef struct {
   Array* argv;
-  RefManager* argv_Refman;
+  Ref_Manager* argv_Refman;
 } Sys;
 extern Sys* sys;
-extern RefManager* sys_Refman;
-extern RefManager* stdout_Refman;
-extern RefManager* stdin_Refman;
-extern RefManager* stderr_Refman;
-Returncode Sys_print(Sys*, RefManager*, String* text, RefManager*);
-Returncode Sys_println(Sys*, RefManager*, String* text, RefManager*);
-Returncode Sys_getchar(Sys*, RefManager*, char* ch, Bool* is_eof);
-Returncode Sys_getline(Sys*, RefManager*, String* line, RefManager*);
-Returncode Sys_exit(Sys*, RefManager*, Int status);
+extern Ref_Manager* sys_Refman;
+extern Ref_Manager* stdout_Refman;
+extern Ref_Manager* stdin_Refman;
+extern Ref_Manager* stderr_Refman;
+Returncode Sys_print(Sys*, Ref_Manager*, String* text, Ref_Manager*);
+Returncode Sys_println(Sys*, Ref_Manager*, String* text, Ref_Manager*);
+Returncode Sys_getchar(Sys*, Ref_Manager*, char* ch, Bool* is_eof);
+Returncode Sys_getline(Sys*, Ref_Manager*, String* line, Ref_Manager*);
+Returncode Sys_exit(Sys*, Ref_Manager*, Int status);
 Returncode Sys_system(
-  Sys*, RefManager*, String* command, RefManager*, Int* status);
+  Sys*, Ref_Manager*, String* command, Ref_Manager*, Int* status);
 Returncode Sys_getenv(
-  Sys*, RefManager*,
-  String* name, RefManager*,
-  String* value, RefManager*,
+  Sys*, Ref_Manager*,
+  String* name, Ref_Manager*,
+  String* value, Ref_Manager*,
   Bool* exists);
 
 

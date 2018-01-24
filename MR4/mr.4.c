@@ -102,7 +102,7 @@ Bool MR_run_test(char* test_name, Func test_func) {
 
 /*helpers*/
 #define MR_FUNC_NAME "set_cstring"
-Returncode set_cstring(String* str, RefManager* str_Refman) {
+Returncode set_cstring(String* str, Ref_Manager* str_Refman) {
   CHECK_NOT_NULL(str)
   if (str->length >= str->max_length) {
     if (cstring_length(str->values, str->max_length) >= str->max_length) {
@@ -117,8 +117,8 @@ Returncode set_cstring(String* str, RefManager* str_Refman) {
 #undef MR_FUNC_NAME
 
 /*reference counting*/
-RefManager* MR_new_ref(void* value) {
-  RefManager* ref = malloc(sizeof(RefManager));
+Ref_Manager* MR_new_ref(void* value) {
+  Ref_Manager* ref = malloc(sizeof(Ref_Manager));
   if (ref != NULL) {
     ref->count = 1;
     ref->value = value;
@@ -126,26 +126,26 @@ RefManager* MR_new_ref(void* value) {
   return ref;
 }
 
-void MR_inc_ref(RefManager* ref) {
+void MR_inc_ref(Ref_Manager* ref) {
   if (ref != NULL) {
     ++ref->count;
   }
 }
 
-void dec_ref(RefManager* ref) {
+void dec_ref(Ref_Manager* ref) {
   --ref->count;
   if (ref->count == 0) {
     free(ref);
   }
 }
 
-void MR_dec_ref(RefManager* ref) {
+void MR_dec_ref(Ref_Manager* ref) {
   if (ref != NULL) {
     dec_ref(ref);
   }
 }
 
-void MR_owner_dec_ref(RefManager* ref) {
+void MR_owner_dec_ref(Ref_Manager* ref) {
   if (ref != NULL) {
     free(ref->value);
     ref->value = NULL;
@@ -219,8 +219,8 @@ void MR_set_var_string_array(
 /*Files*/
 #define MR_FUNC_NAME "open-file"
 Returncode open_file(
-    File** file, RefManager** file_Refman,
-    String* name, RefManager* name_Refman,
+    File** file, Ref_Manager** file_Refman,
+    String* name, Ref_Manager* name_Refman,
     char* mode) {
   CCHECK(set_cstring(name, name_Refman));
   *file = fopen(name->values, mode);
@@ -236,19 +236,19 @@ Returncode open_file(
 #undef MR_FUNC_NAME
 
 Returncode file_open_read(
-    String* name, RefManager* name_Refman,
-    File** file, RefManager** file_Refman) {
+    String* name, Ref_Manager* name_Refman,
+    File** file, Ref_Manager** file_Refman) {
   return open_file(file, file_Refman, name, name_Refman, "r");
 }
 
 Returncode file_open_write(
-    String* name, RefManager* name_Refman,
-    File** file, RefManager** file_Refman) {
+    String* name, Ref_Manager* name_Refman,
+    File** file, Ref_Manager** file_Refman) {
   return open_file(file, file_Refman, name, name_Refman, "w");
 }
 
 #define MR_FUNC_NAME "File.close"
-Returncode File_close(File* file, RefManager* file_Refman) {
+Returncode File_close(File* file, Ref_Manager* file_Refman) {
   CHECK_NOT_NULL(file)
   if (fclose(file) == 0) {
     return OK;
@@ -269,7 +269,7 @@ Bool getc_is_eof(int get, char* ch) {
 
 #define MR_FUNC_NAME "File.getc"
 Returncode File_getc(
-    File* file, RefManager* file_Refman, Char* out_char, Bool* is_eof) {
+    File* file, Ref_Manager* file_Refman, Char* out_char, Bool* is_eof) {
   CHECK_NOT_NULL(file)
   *is_eof = getc_is_eof(getc(file), out_char);
   return OK;
@@ -277,7 +277,7 @@ Returncode File_getc(
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "File.putc"
-Returncode File_putc(File* file, RefManager* file_Refman, Char in_char) {
+Returncode File_putc(File* file, Ref_Manager* file_Refman, Char in_char) {
   int res;
   CHECK_NOT_NULL(file)
   res = putc(in_char, file);
@@ -290,8 +290,8 @@ Returncode File_putc(File* file, RefManager* file_Refman, Char in_char) {
 
 #define MR_FUNC_NAME "File.write"
 Returncode File_write(
-    File* file, RefManager* file_Refman,
-    String* data, RefManager* data_Refman) {
+    File* file, Ref_Manager* file_Refman,
+    String* data, Ref_Manager* data_Refman) {
   int n, ch, res;
   CHECK_NOT_NULL(file)
   CHECK_NOT_NULL(data)
@@ -308,7 +308,7 @@ Returncode File_write(
 
 /*Strings*/
 #define MR_FUNC_NAME "String.clear"
-Returncode String_clear(String* self, RefManager* self_Refman) {
+Returncode String_clear(String* self, Ref_Manager* self_Refman) {
   CHECK_NOT_NULL(self)
   self->length = 0;
   return OK;
@@ -316,8 +316,8 @@ Returncode String_clear(String* self, RefManager* self_Refman) {
 #undef MR_FUNC_NAME
 
 Returncode String_equal(
-    String* self, RefManager* self_Refman,
-    String* other, RefManager* other_Refman,
+    String* self, Ref_Manager* self_Refman,
+    String* other, Ref_Manager* other_Refman,
     Bool* out_equal) {
   if ((self_Refman != NULL && self_Refman->value == NULL) ||
       (self_Refman != NULL && self_Refman->value == NULL)) {
@@ -346,7 +346,7 @@ Returncode String_equal(
 
 #define MR_FUNC_NAME "String.get"
 Returncode String_get(
-    String* self, RefManager* self_Refman,
+    String* self, Ref_Manager* self_Refman,
     Int index,
     Char* out_char) {
   CHECK_NOT_NULL(self)
@@ -359,7 +359,7 @@ Returncode String_get(
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "String.append"
-Returncode String_append(String* self, RefManager* self_Refman, Char in_char) {
+Returncode String_append(String* self, Ref_Manager* self_Refman, Char in_char) {
   CHECK_NOT_NULL(self)
   if (self->length == self->max_length) {
     CRAISE
@@ -371,7 +371,7 @@ Returncode String_append(String* self, RefManager* self_Refman, Char in_char) {
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "Int.str"
-Returncode Int_str(Int value, String* out_str, RefManager* out_str_Refman) {
+Returncode Int_str(Int value, String* out_str, Ref_Manager* out_str_Refman) {
   Bool is_neg;
   int abs;
   int swap;
@@ -412,8 +412,8 @@ Returncode Int_str(Int value, String* out_str, RefManager* out_str_Refman) {
 
 #define MR_FUNC_NAME "String.new"
 Returncode String_new(
-    String* self, RefManager* self_Refman,
-    String* source, RefManager* source_Refman) {
+    String* self, Ref_Manager* self_Refman,
+    String* source, Ref_Manager* source_Refman) {
   CHECK_NOT_NULL(self)
   if (source == NULL || source_Refman->value == NULL || self == source) {
     return OK;
@@ -429,8 +429,8 @@ Returncode String_new(
 
 #define MR_FUNC_NAME "String.concat"
 Returncode String_concat(
-    String* self, RefManager* self_Refman,
-    String* ext, RefManager* ext_Refman) {
+    String* self, Ref_Manager* self_Refman,
+    String* ext, Ref_Manager* ext_Refman) {
   CHECK_NOT_NULL(self)
   if (ext == NULL || ext_Refman->value == NULL) {
     return OK;
@@ -445,10 +445,10 @@ Returncode String_concat(
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "String.concat-int"
-Returncode String_concat_int(String* self, RefManager* self_Refman, Int num) {
+Returncode String_concat_int(String* self, Ref_Manager* self_Refman, Int num) {
   String remain;
   String* remain_ref = &remain;
-  RefManager remain_Refman = { 1 , NULL };
+  Ref_Manager remain_Refman = { 1 , NULL };
   remain_Refman.value = remain_ref;
   remain.max_length = self->max_length - self->length;
   remain.length = 0;
@@ -461,8 +461,8 @@ Returncode String_concat_int(String* self, RefManager* self_Refman, Int num) {
 
 #define MR_FUNC_NAME "String.find"
 Returncode String_find(
-    String* self, RefManager* self_Refman,
-    String* pattern, RefManager* pattern_Refman,
+    String* self, Ref_Manager* self_Refman,
+    String* pattern, Ref_Manager* pattern_Refman,
     Int* out_index) {
   int n;
   CHECK_NOT_NULL(self)
@@ -483,7 +483,7 @@ Returncode String_find(
 #undef MR_FUNC_NAME
 
 Returncode String_has(
-    String* self, RefManager* self_Refman, Char ch, Bool* found) {
+    String* self, Ref_Manager* self_Refman, Char ch, Bool* found) {
   int n;
   if (self == NULL || self_Refman->value == NULL) {
     *found = false;
@@ -501,13 +501,13 @@ Returncode String_has(
 
 /*system*/
 Sys* sys;
-RefManager* sys_Refman;
-RefManager* stdout_Refman;
-RefManager* stdin_Refman;
-RefManager* stderr_Refman;
+Ref_Manager* sys_Refman;
+Ref_Manager* stdout_Refman;
+Ref_Manager* stdin_Refman;
+Ref_Manager* stderr_Refman;
 
 Returncode Sys_print(
-    Sys* _, RefManager* __, String* text, RefManager* text_Refman) {
+    Sys* _, Ref_Manager* __, String* text, Ref_Manager* text_Refman) {
   if (text != NULL && text_Refman->value != NULL) {
     int n, ch, res;
     for (n = 0; n < text->length; ++n) {
@@ -522,20 +522,20 @@ Returncode Sys_print(
 }
 
 Returncode Sys_println(
-    Sys* _, RefManager* __, String* text, RefManager* text_Refman) {
+    Sys* _, Ref_Manager* __, String* text, Ref_Manager* text_Refman) {
   Sys_print(NULL, NULL, text, text_Refman);
   putchar('\n');
   return OK;
 }
 
-Returncode Sys_getchar(Sys* _, RefManager* __, char* out_char, Bool* is_eof) {
+Returncode Sys_getchar(Sys* _, Ref_Manager* __, char* out_char, Bool* is_eof) {
   *is_eof = getc_is_eof(getchar(), out_char);
   return OK;
 }
 
 #define MR_FUNC_NAME "Sys.getline"
 Returncode Sys_getline(
-    Sys* _, RefManager* __, String* line, RefManager* line_Refman) {
+    Sys* _, Ref_Manager* __, String* line, Ref_Manager* line_Refman) {
   int ch;
   CHECK_NOT_NULL(line);
   line->length = 0;
@@ -553,7 +553,7 @@ Returncode Sys_getline(
 #undef MR_FUNC_NAME
 
 #define MR_FUNC_NAME "Sys.exit"
-Returncode Sys_exit(Sys* _, RefManager* __, Int status) {
+Returncode Sys_exit(Sys* _, Ref_Manager* __, Int status) {
   exit(status);
   CRAISE
 }
@@ -561,8 +561,8 @@ Returncode Sys_exit(Sys* _, RefManager* __, Int status) {
 
 #define MR_FUNC_NAME "Sys.system"
 Returncode Sys_system(
-    Sys* _, RefManager* __,
-    String* command, RefManager* command_Refman,
+    Sys* _, Ref_Manager* __,
+    String* command, Ref_Manager* command_Refman,
     Int* status) {
   int res;
   CCHECK(set_cstring(command, command_Refman));
@@ -577,9 +577,9 @@ Returncode Sys_system(
 
 #define MR_FUNC_NAME "Sys.getenv"
 Returncode Sys_getenv(
-    Sys* _, RefManager* __,
-    String* name, RefManager* name_Refman,
-    String* value, RefManager* value_Refman,
+    Sys* _, Ref_Manager* __,
+    String* name, Ref_Manager* name_Refman,
+    String* value, Ref_Manager* value_Refman,
     Bool* exists) {
   char* ret;
   CCHECK(set_cstring(name, name_Refman));

@@ -222,7 +222,7 @@ Returncode SyntaxTreeVariable_write(SyntaxTreeVariable* self) {
   
   /* `type` `name`[ = 0]; */
   /* `type`* `name`[ = NULL]; */
-  /* RefManager* `name`_Refman[ = NULL]; */
+  /* Ref_Manager* `name`_Refman[ = NULL]; */
   if (self->type_instance->type_data == &(glob->type_func->_base)) {
     CHECK(132, FunctionArguments_write_pointer(self->type_instance->arguments, self->name) )
   }
@@ -363,7 +363,7 @@ static char* _func_name_SyntaxTreeVariable_write_refman = "SyntaxTreeVariable.wr
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariable_write_refman
 Returncode SyntaxTreeVariable_write_refman(SyntaxTreeVariable* self) {
   CHECK(229, SyntaxTreeVariable_write_spaces(self) )
-  CHECK(230, write(&(String){13, 12, "RefManager* "}) )
+  CHECK(230, write(&(String){14, 13, "Ref_Manager* "}) )
   CHECK(231, write_cname(self->name) )
   CHECK(232, write(&(String){8, 7, "_Refman"}) )
   if (!(NULL != self->parent_type)) {

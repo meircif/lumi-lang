@@ -223,6 +223,9 @@ class TypeData(SyntaxTreeNamespace)
         self.write-spaces()
         write-cname(user self.base-type.type-data.name)
         write(user "_Dynamic _base;\n")
+      else
+        self.write-spaces()
+        write(user "Dynamic_Del _del;\n")
       user NameMapNode{SyntaxTreeFunction} child(self.dynamic-base-methods.first)
       do
         while ? child
@@ -233,8 +236,14 @@ class TypeData(SyntaxTreeNamespace)
       write(user "};\n")
     self.indentation-spaces := 0
   
-  func inst write-methods-declaration()
+  func dynamic write-methods-declaration()
     self.write-functions-declaration()
+    # void `cname`_Del(`cname`* self);
+    write(user "\nvoid ")
+    write-cname(user self.name)
+    write(user "_Del(")
+    write-cname(user self.name)
+    write(user "* self);\n")
   
   func inst write-global()
     # `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
@@ -249,28 +258,45 @@ class TypeData(SyntaxTreeNamespace)
   
   func inst write-dynamic-init(user TypeData type-data)
     write(user "{")
-    var Bool not-first(? type-data.base-type and
-        type-data.base-type.type-data.is-dynamic)
-    if not-first
+    if ? type-data.base-type and type-data.base-type.type-data.is-dynamic
       self.write-dynamic-init(user type-data.base-type.type-data)
+    else
+      write(user "(Dynamic_Del)")
+      write-cname(user self.name)
+      write(user "_Del")
     user NameMapNode{SyntaxTreeFunction} child(type-data.dynamic-base-methods.first)
     do
       while ? child
       user SyntaxTreeFunction method
       self.find-meth(user child.value.name):(user method)
-      if not-first
-        write(user ", ")
+      write(user ", ")
       if method != child.value
         write(user "(Func)")
       write-cname(user method.parent-type.name)
       write(user "_")
       write-cname(user method.name)
-      not-first := true
       child := child.next
     write(user "}")
   
-  func inst write-methods-body()
+  func dynamic write-methods-body()
     self.write-children(user self.functions)
+    # void `cname`_Del(`cname`* self) {
+    #   if (self == NULL) return;
+    #   `base`_Del(self);
+    #   ...
+    # }
+    write(user "\nvoid ")
+    write-cname(user self.name)
+    write(user "_Del(")
+    write-cname(user self.name)
+    write(user "* self) {\n")
+    write(user "  if (self == NULL) return;\n")
+    if ? self.base-type
+      write(user "  ")
+      write-cname(user self.base-type.type-data.name)
+      write(user "_Del(&(self->_base));\n")
+    self.write-cleanup(copy true)
+    write(user "}\n")
   
   func dynamic write-me(user TypeWriter type-writer)
     type-writer.write(user self)

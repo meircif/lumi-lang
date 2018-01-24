@@ -68,7 +68,7 @@ illegal character constant "'aa"
 /// @ t0
 String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(1)
@@ -82,7 +82,7 @@ String aux_String_0_Var = {0};
 /// @ t1
 String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(1)
@@ -155,7 +155,7 @@ if (str == NULL || str_Refman->value == NULL) RAISE(1)
 /// @ t1
 String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(1)
@@ -175,7 +175,7 @@ if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
 /// @ t3
 Array aux_Array_0_Var = {0};
   Array* aux_Array_0 = NULL;
-  RefManager* aux_Array_0_Refman = NULL;
+  Ref_Manager* aux_Array_0_Refman = NULL;
   aux_Array_0 = &aux_Array_0_Var;
   aux_Array_0_Refman = MR_new_ref(aux_Array_0);
   if (aux_Array_0_Refman == NULL) RAISE(1)
@@ -225,7 +225,7 @@ CHECK(1, fun2(&(*so), &(*so_Refman), &(*io)) )
 /// @ t3
 Int x = 0;
   String* s = NULL;
-  RefManager* s_Refman = NULL;
+  Ref_Manager* s_Refman = NULL;
   CHECK(3, fun2(&(s), &(s_Refman), &(x)) )
 /// @ t4
 CHECK(1, fun3(0, &(*so), &(*so_Refman)) )
@@ -244,7 +244,7 @@ Int aux_Int_0 = 0;
   *io = aux_Int_0;
 /// @ t9
 String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   CHECK(1, fun3(7, &(aux_String_0), &(aux_String_0_Refman)) )
   MR_owner_dec_ref(*so_Refman);
   *so_Refman = aux_String_0_Refman;
@@ -272,7 +272,7 @@ CHECK(1, fun1(3, str, str_Refman, *so, *so_Refman) )
   *so_Refman = NULL;
 /// @ t18
 String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   Int aux_Int_0 = 0;
   CHECK(1, fun3(1, &(aux_String_0), &(aux_String_0_Refman)) )
   CHECK(2, fun5(2, &(aux_Int_0)) )
@@ -335,30 +335,44 @@ struct Mid {
 struct Top {
   Mid _base;
 };
-Returncode Base_methb(Base* self, RefManager* self_Refman);
-Returncode Mid_methm(Mid* self, RefManager* self_Refman);
-Returncode Top_methb(Top* self, RefManager* self_Refman);
-Returncode Top_methm(Top* self, RefManager* self_Refman);
-Returncode Base_methb(Base* self, RefManager* self_Refman) {
+Returncode Base_methb(Base* self, Ref_Manager* self_Refman);
+void Base_Del(Base* self);
+Returncode Mid_methm(Mid* self, Ref_Manager* self_Refman);
+void Mid_Del(Mid* self);
+Returncode Top_methb(Top* self, Ref_Manager* self_Refman);
+Returncode Top_methm(Top* self, Ref_Manager* self_Refman);
+void Top_Del(Top* self);
+Returncode Base_methb(Base* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mid_methm(Mid* self, RefManager* self_Refman) {
+void Base_Del(Base* self) {
+  if (self == NULL) return;
+}
+Returncode Mid_methm(Mid* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methb(Top* self, RefManager* self_Refman) {
+void Mid_Del(Mid* self) {
+  if (self == NULL) return;
+  Base_Del(&(self->_base));
+}
+Returncode Top_methb(Top* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methm(Top* self, RefManager* self_Refman) {
+Returncode Top_methm(Top* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
   CHECK(9, Mid_methm(&(self->_base), self_Refman) )
 MR_cleanup:
   return MR_err;
+}
+void Top_Del(Top* self) {
+  if (self == NULL) return;
+  Mid_Del(&(self->_base));
 }
 /// @ t1
 typedef struct Base Base;
@@ -373,30 +387,44 @@ struct Mid {
 struct Top {
   Mid _base;
 };
-Returncode Base_methb(Base* self, RefManager* self_Refman);
-Returncode Mid_methm(Mid* self, RefManager* self_Refman);
-Returncode Top_methb(Top* self, RefManager* self_Refman);
-Returncode Top_methm(Top* self, RefManager* self_Refman);
-Returncode Base_methb(Base* self, RefManager* self_Refman) {
+Returncode Base_methb(Base* self, Ref_Manager* self_Refman);
+void Base_Del(Base* self);
+Returncode Mid_methm(Mid* self, Ref_Manager* self_Refman);
+void Mid_Del(Mid* self);
+Returncode Top_methb(Top* self, Ref_Manager* self_Refman);
+Returncode Top_methm(Top* self, Ref_Manager* self_Refman);
+void Top_Del(Top* self);
+Returncode Base_methb(Base* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mid_methm(Mid* self, RefManager* self_Refman) {
+void Base_Del(Base* self) {
+  if (self == NULL) return;
+}
+Returncode Mid_methm(Mid* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methb(Top* self, RefManager* self_Refman) {
+void Mid_Del(Mid* self) {
+  if (self == NULL) return;
+  Base_Del(&(self->_base));
+}
+Returncode Top_methb(Top* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methm(Top* self, RefManager* self_Refman) {
+Returncode Top_methm(Top* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
   CHECK(9, Base_methb(&(self->_base._base), self_Refman) )
 MR_cleanup:
   return MR_err;
+}
+void Top_Del(Top* self) {
+  if (self == NULL) return;
+  Mid_Del(&(self->_base));
 }
 /// @ te0
 "base" used not in method
@@ -462,7 +490,7 @@ MR_dec_ref(t_Refman);
   t = &(tc->_base._base._base);
 /// @ t8
 String* s = NULL;
-  RefManager* s_Refman = NULL;
+  Ref_Manager* s_Refman = NULL;
   MR_owner_dec_ref(s_Refman);
   s_Refman = *so_Refman;
   *so_Refman = NULL;
@@ -533,7 +561,7 @@ cannot use "?" on type "Int"
 /// @ t0
 Ta a_Var = {{0}};
   Ta* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
   a = &a_Var;
   a_Refman = MR_new_ref(a);
@@ -541,11 +569,11 @@ Ta a_Var = {{0}};
   CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t1
 Ta* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = NULL;
 /// @ t2
 Ta* aux_Ta_0 = NULL;
-  RefManager* aux_Ta_0_Refman = NULL;
+  Ref_Manager* aux_Ta_0_Refman = NULL;
   Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;
   aux_Ta_0 = calloc(1, sizeof(Ta));
   if (aux_Ta_0 == NULL) RAISE(1)
@@ -559,7 +587,7 @@ Ta* aux_Ta_0 = NULL;
   ta = aux_Ta_0;
 /// @ t3
 Ta* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
   a = calloc(1, sizeof(Ta));
   if (a == NULL) RAISE(1)
@@ -568,7 +596,7 @@ Ta* a = NULL;
   CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t4
 Ta* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = NULL;
   a = ta;
   a_Refman = ta_Refman;
@@ -600,7 +628,7 @@ MR_dec_ref(ta_Refman);
   ta = NULL;
 /// @ t9
 Array* aa = NULL;
-  RefManager* aa_Refman = NULL;
+  Ref_Manager* aa_Refman = NULL;
   if (aa == NULL || aa_Refman->value == NULL) RAISE(2)
   if ((4) < 0 || (4) >= (aa)->length) RAISE(2)
   MR_dec_ref(ta_Refman);
@@ -610,7 +638,7 @@ Array* aa = NULL;
   ta = ((Ta*)((aa)->values)) + 4;
 /// @ t10
 Array* ca = NULL;
-  RefManager* ca_Refman = NULL;
+  Ref_Manager* ca_Refman = NULL;
   if (ca == NULL || ca_Refman->value == NULL) RAISE(2)
   if ((4) < 0 || (4) >= (ca)->length) RAISE(2)
   MR_dec_ref(ta_Refman);
@@ -646,7 +674,7 @@ Returncode (*fun)(Int x, Int* y) = NULL;
   if (fun == NULL) RAISE(3)
   CHECK(3, fun(9, &(x)) )
 /// @ t2
-Returncode (*fun)(Test* self, RefManager* self_Refman) = NULL;
+Returncode (*fun)(Test* self, Ref_Manager* self_Refman) = NULL;
   fun = Test_meth;
   if (fun == NULL) RAISE(2)
   CHECK(2, fun(t, t_Refman) )
@@ -664,7 +692,7 @@ if (t == NULL || t_Refman->value == NULL) RAISE(1)
 Returncode (*farr_Values[38])(void) = {0};
   Array farr_Var = {38, NULL};
   Array* farr = NULL;
-  RefManager* farr_Refman = NULL;
+  Ref_Manager* farr_Refman = NULL;
   farr = &farr_Var;
   farr_Var.values = farr_Values;
   farr_Refman = MR_new_ref(farr);
@@ -737,7 +765,7 @@ CHECK(1, File_putc(fobj, fobj_Refman, c) )
 CHECK(1, File_write(fobj, fobj_Refman, str, str_Refman) )
 /// @ t21
 Array* argv = NULL;
-  RefManager* argv_Refman = NULL;
+  Ref_Manager* argv_Refman = NULL;
   if (sys == NULL || sys_Refman->value == NULL) RAISE(1)
   argv = sys->argv;
   argv_Refman = sys->argv_Refman;

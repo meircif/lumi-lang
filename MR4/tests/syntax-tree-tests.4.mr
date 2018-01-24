@@ -129,15 +129,18 @@ struct Error
 ## @ g t0
 class Base
   var Int x
+  owner Base b
   func inst stat()
   func dynamic dyn0()
   func dynamic dyn1()
 class Mid(Base)
   var Int y
+  owner Mid m
   func dynamic dyn0()
   func dynamic dyn2()
 class Top(Mid)
   var Int z
+  owner Top t
   func dynamic dyn0()
     base()
   func dynamic dyn3()

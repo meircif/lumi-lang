@@ -10,7 +10,7 @@ typedef struct Data Data;
 struct Test {
   Int num;
   Test* t;
-  RefManager* t_Refman;
+  Ref_Manager* t_Refman;
   Returncode (*fun)(void);
 };
 struct Ta {
@@ -18,7 +18,8 @@ struct Ta {
   Int numa;
 };
 struct Ta_Dynamic {
-  Returncode (*dyn)(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic);
+  Dynamic_Del _del;
+  Returncode (*dyn)(Ta* self, Ref_Manager* self_Refman, Ta_Dynamic* self_Dynamic);
 };
 struct Tb {
   Ta _base;
@@ -36,98 +37,119 @@ struct Tc_Dynamic {
 };
 struct Data {
   Generic_Type* item;
-  RefManager* item_Refman;
+  Ref_Manager* item_Refman;
   Generic_Type_Dynamic* item_Dynamic;
   Array* arr;
-  RefManager* arr_Refman;
+  Ref_Manager* arr_Refman;
 };
-Returncode Test_new(Test* self, RefManager* self_Refman, Int num);
-Returncode Test_meth(Test* self, RefManager* self_Refman);
-Returncode Ta_metha(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic);
-Returncode Ta_dyn(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic);
-Returncode Tb_methb(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic);
-Returncode Tb_dyn(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic);
-Returncode Tc_methc(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic);
-Returncode Tc_dyn(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic);
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, RefManager* arr_Refman);
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
-Ta_Dynamic Ta_dynamic = {Ta_dyn};
-Tb_Dynamic Tb_dynamic = {{(Func)Tb_dyn}};
-Tc_Dynamic Tc_dynamic = {{{(Func)Tc_dyn}}};
+Returncode Test_new(Test* self, Ref_Manager* self_Refman, Int num);
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman);
+void Test_Del(Test* self);
+Returncode Ta_metha(Ta* self, Ref_Manager* self_Refman, Ta_Dynamic* self_Dynamic);
+Returncode Ta_dyn(Ta* self, Ref_Manager* self_Refman, Ta_Dynamic* self_Dynamic);
+void Ta_Del(Ta* self);
+Returncode Tb_methb(Tb* self, Ref_Manager* self_Refman, Tb_Dynamic* self_Dynamic);
+Returncode Tb_dyn(Tb* self, Ref_Manager* self_Refman, Tb_Dynamic* self_Dynamic);
+void Tb_Del(Tb* self);
+Returncode Tc_methc(Tc* self, Ref_Manager* self_Refman, Tc_Dynamic* self_Dynamic);
+Returncode Tc_dyn(Tc* self, Ref_Manager* self_Refman, Tc_Dynamic* self_Dynamic);
+void Tc_Del(Tc* self);
+Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, Ref_Manager* arr_Refman);
+Returncode Data_get(Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+void Data_Del(Data* self);
+Ta_Dynamic Ta_dynamic = {(Dynamic_Del)Ta_Del, Ta_dyn};
+Tb_Dynamic Tb_dynamic = {{(Dynamic_Del)Tb_Del, (Func)Tb_dyn}};
+Tc_Dynamic Tc_dynamic = {{{(Dynamic_Del)Tc_Del, (Func)Tc_dyn}}};
 Int i = 0;
 Char c = 0;
 Bool b = 0;
 String* str = NULL;
-RefManager* str_Refman = NULL;
+Ref_Manager* str_Refman = NULL;
 Array* arr = NULL;
-RefManager* arr_Refman = NULL;
+Ref_Manager* arr_Refman = NULL;
 File* fobj = NULL;
-RefManager* fobj_Refman = NULL;
+Ref_Manager* fobj_Refman = NULL;
 Test* t = NULL;
-RefManager* t_Refman = NULL;
+Ref_Manager* t_Refman = NULL;
 Ta* ta = NULL;
-RefManager* ta_Refman = NULL;
+Ref_Manager* ta_Refman = NULL;
 Ta_Dynamic* ta_Dynamic;
 Tb* tb = NULL;
-RefManager* tb_Refman = NULL;
+Ref_Manager* tb_Refman = NULL;
 Tb_Dynamic* tb_Dynamic;
 Tc* tc = NULL;
-RefManager* tc_Refman = NULL;
+Ref_Manager* tc_Refman = NULL;
 Tc_Dynamic* tc_Dynamic;
 Data* d = NULL;
-RefManager* d_Refman = NULL;
+Ref_Manager* d_Refman = NULL;
 Array* sarr = NULL;
-RefManager* sarr_Refman = NULL;
+Ref_Manager* sarr_Refman = NULL;
 Returncode fun0(void);
-Returncode fun1(Int x, String* s, RefManager* s_Refman, String* o, RefManager* o_Refman);
-Returncode fun2(String** s, RefManager** s_Refman, Int* x);
-Returncode fun3(Int x, String** s, RefManager** s_Refman);
+Returncode fun1(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman);
+Returncode fun2(String** s, Ref_Manager** s_Refman, Int* x);
+Returncode fun3(Int x, String** s, Ref_Manager** s_Refman);
 Returncode fun4(Int x);
 Returncode fun5(Int x, Int* y);
 Returncode fun6(Int x, Int y, Int* n, Int* m);
-Returncode fun7(Tb** tb, RefManager** tb_Refman, Tb_Dynamic** tb_Dynamic);
-Returncode mock(String** so, RefManager** so_Refman, Int* io, Test** to, RefManager** to_Refman, Tc** tco, RefManager** tco_Refman, Tc_Dynamic** tco_Dynamic);
-Returncode Test_new(Test* self, RefManager* self_Refman, Int num) {
+Returncode fun7(Tb** tb, Ref_Manager** tb_Refman, Tb_Dynamic** tb_Dynamic);
+Returncode mock(String** so, Ref_Manager** so_Refman, Int* io, Test** to, Ref_Manager** to_Refman, Tc** tco, Ref_Manager** tco_Refman, Tc_Dynamic** tco_Dynamic);
+Returncode Test_new(Test* self, Ref_Manager* self_Refman, Int num) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Test_meth(Test* self, RefManager* self_Refman) {
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Ta_metha(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic) {
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->t_Refman);
+}
+Returncode Ta_metha(Ta* self, Ref_Manager* self_Refman, Ta_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Ta_dyn(Ta* self, RefManager* self_Refman, Ta_Dynamic* self_Dynamic) {
+Returncode Ta_dyn(Ta* self, Ref_Manager* self_Refman, Ta_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Tb_methb(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic) {
+void Ta_Del(Ta* self) {
+  if (self == NULL) return;
+  Test_Del(&(self->_base));
+}
+Returncode Tb_methb(Tb* self, Ref_Manager* self_Refman, Tb_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Tb_dyn(Tb* self, RefManager* self_Refman, Tb_Dynamic* self_Dynamic) {
+Returncode Tb_dyn(Tb* self, Ref_Manager* self_Refman, Tb_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Tc_methc(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic) {
+void Tb_Del(Tb* self) {
+  if (self == NULL) return;
+  Ta_Del(&(self->_base));
+}
+Returncode Tc_methc(Tc* self, Ref_Manager* self_Refman, Tc_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Tc_dyn(Tc* self, RefManager* self_Refman, Tc_Dynamic* self_Dynamic) {
+Returncode Tc_dyn(Tc* self, Ref_Manager* self_Refman, Tc_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Data_set(Data* self, RefManager* self_Refman, Generic_Type* item, RefManager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, RefManager* arr_Refman) {
+void Tc_Del(Tc* self) {
+  if (self == NULL) return;
+  Tb_Del(&(self->_base));
+}
+Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, Ref_Manager* arr_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(item_Refman);
   MR_inc_ref(arr_Refman);
@@ -136,17 +158,22 @@ MR_cleanup:
   MR_owner_dec_ref(item_Refman);
   return MR_err;
 }
-Returncode Data_get(Data* self, RefManager* self_Refman, Generic_Type** item, RefManager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
+Returncode Data_get(Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
+}
+void Data_Del(Data* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->arr_Refman);
+  MR_dec_ref(self->item_Refman);
 }
 Returncode fun0(void) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode fun1(Int x, String* s, RefManager* s_Refman, String* o, RefManager* o_Refman) {
+Returncode fun1(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
   MR_inc_ref(o_Refman);
@@ -155,12 +182,12 @@ MR_cleanup:
   MR_dec_ref(s_Refman);
   return MR_err;
 }
-Returncode fun2(String** s, RefManager** s_Refman, Int* x) {
+Returncode fun2(String** s, Ref_Manager** s_Refman, Int* x) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode fun3(Int x, String** s, RefManager** s_Refman) {
+Returncode fun3(Int x, String** s, Ref_Manager** s_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
@@ -180,11 +207,11 @@ Returncode fun6(Int x, Int y, Int* n, Int* m) {
 MR_cleanup:
   return MR_err;
 }
-Returncode fun7(Tb** tb, RefManager** tb_Refman, Tb_Dynamic** tb_Dynamic) {
+Returncode fun7(Tb** tb, Ref_Manager** tb_Refman, Tb_Dynamic** tb_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode mock(String** so, RefManager** so_Refman, Int* io, Test** to, RefManager** to_Refman, Tc** tco, RefManager** tco_Refman, Tc_Dynamic** tco_Dynamic) {
+Returncode mock(String** so, Ref_Manager** so_Refman, Int* io, Test** to, Ref_Manager** to_Refman, Tc** tco, Ref_Manager** tco_Refman, Tc_Dynamic** tco_Dynamic) {
   Returncode MR_err = OK;
   

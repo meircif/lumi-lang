@@ -78,5 +78,11 @@ class NativeType(TypeData)
     write-cname(user self.name)
     write(user ";\n")
   
+  func dynamic write-methods-declaration()
+    # do nothing
+  
+  func dynamic write-methods-body()
+    # do nothing
+  
   func dynamic write()
     # do nothing

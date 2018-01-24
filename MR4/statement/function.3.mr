@@ -186,31 +186,15 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       node := node.next
   
   func inst write-cleanup()
-    user ListNode{SyntaxTreeVariable} var-node(self.variables.last)
-    do
-      while ? var-node
-      if not var-node.item.type-instance.type-data.is-primitive
-        write(user "  MR_")
-        if var-node.item.access = ACCESS-OWNER
-          write(user "owner_")
-        write(user "dec_ref(")
-        write-cname(user var-node.item.name)
-        write(user "_Refman);\n")
-      var-node := var-node.prev
-    
+    base.write-cleanup(copy false)
     user ListNode{Argument} param-node(self.arguments.parameters.last)
     do
       while ? param-node
       if param-node.item.access = ACCESS-USER or
           param-node.item.access = ACCESS-OWNER
-        write(user "  MR_")
-        if param-node.item.access = ACCESS-OWNER
-          write(user "owner_")
-        write(user "dec_ref(")
-        write-cname(user param-node.item.get-variable().name)
-        write(user "_Refman);\n")
+        self.write-variable-cleanup(
+            user param-node.item.get-variable(), copy false)
       param-node := param-node.prev
-    
   
   func inst write-cname()
     if ? self.parent-type
@@ -359,7 +343,7 @@ class DeclarationArgument(Argument)
       self.variable.type-instance.arguments.write()
       return
     # `type`[*][*] `name`
-    # [, RefManager*[*] `name`_Refman]
+    # [, Ref_Manager*[*] `name`_Refman]
     # [, `type`_Dynamic*[*] `name`_Dynamic]
     write-cname(user self.variable.type-instance.type-data.name)
     if not self.variable.type-instance.type-data.is-primitive
@@ -371,7 +355,7 @@ class DeclarationArgument(Argument)
     
     if not self.variable.type-instance.type-data.is-primitive and
         not self.is-native
-      write(user ", RefManager*")
+      write(user ", Ref_Manager*")
       if self.is-output
         write(user "*")
       write(user " ")
