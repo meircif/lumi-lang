@@ -83,6 +83,9 @@ class NativeType(TypeData)
   
   func dynamic write-methods-body()
     # do nothing
+    
+  func dynamic write-global()
+    # do nothing
   
   func dynamic write()
     # do nothing

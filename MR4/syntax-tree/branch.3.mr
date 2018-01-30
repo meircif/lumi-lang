@@ -153,10 +153,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     user TypeData item-type-data(variable.type-instance.type-data)
     if item-type-data = glob.type-array
       item-type-data := variable.type-instance.parameters.first.item.type-data
-    if variable.access = ACCESS-OWNER and not item-type-data.is-primitive and
-        item-type-data != glob.type-string and
-        item-type-data != glob.type-file and
-        item-type-data != glob.type-generic
+    if variable.access = ACCESS-OWNER and not item-type-data.is-primitive
       write(user "  ")
       if variable.type-instance.type-data.is-dynamic
         if is-type

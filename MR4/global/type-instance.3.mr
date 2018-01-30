@@ -150,6 +150,8 @@ static TypeInstance
           node.m-syntax-error(
               user "unsupported primitive parameter type",
               user sub-type.item.type-data.name)
+        if sub-type.item.type-data = glob.type-array
+          node.m-syntax-error-msg(user "array as parameter type is unsupported")
         sub-type := sub-type.next
         dec-node := dec-node.next
     else-if self.type-data = glob.type-func and not (? self.arguments)

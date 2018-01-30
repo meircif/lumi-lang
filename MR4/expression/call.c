@@ -31,7 +31,7 @@ static char* _func_name_CallExpression_parse_new = "CallExpression.parse-new";
 Returncode CallExpression_parse_new(CallExpression* self, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
   CallExpression* call_expression = malloc(sizeof(CallExpression));
   if (call_expression == NULL) RAISE(12)
-  *call_expression = (CallExpression){CallExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL, false};
+  *call_expression = (CallExpression){CallExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, false};
   call_expression->_base._base._dtl = CallExpression__dtl;
   CHECK(13, CallExpression_parse(call_expression, (*expression), code_node, &((*end))) )
   (*expression) = &(call_expression->_base);
@@ -310,10 +310,10 @@ Returncode CallArgument_write(CallArgument* self) {
   
   if (self->is_dynamic &&  ! self->_base.is_native) {
     CHECK(168, write(&(String){3, 2, ", "}) )
+    if ((self->_base.is_output && self->is_down_cast) || self->is_generic) {
+      CHECK(170, write(&(String){8, 7, "(void*)"}) )
+    }
     if (self->_base.is_output) {
-      if (self->is_down_cast) {
-        CHECK(171, write(&(String){8, 7, "(void*)"}) )
-      }
       CHECK(172, write(&(String){3, 2, "&("}) )
     }
     CHECK(173, (self->value)->_base._dtl[4](self->value) )
@@ -328,7 +328,14 @@ Returncode CallArgument_write(CallArgument* self) {
         CHECK(179, write(&(String){14, 13, "&dynamic_Void"}) )
       }
       else {
-        CHECK(181, write(&(String){5, 4, "NULL"}) )
+        if (self->value->result_type->type_data == &(glob->type_empty->_base)) {
+          CHECK(181, write(&(String){5, 4, "NULL"}) )
+        }
+        else {
+          CHECK(183, write(&(String){2, 1, "&"}) )
+          CHECK(184, write_cname(self->value->result_type->type_data->name) )
+          CHECK(185, write(&(String){9, 8, "_dynamic"}) )
+        }
       }
     }
   }
@@ -343,12 +350,12 @@ static char* _func_name_CallArgument_write_postactions = "CallArgument.write-pos
 #define MR_FUNC_NAME _func_name_CallArgument_write_postactions
 Returncode CallArgument_write_postactions(CallArgument* self) {
   if (self->_base.access == ACCESS_OWNER &&  ! self->_base.is_output && self->value->result_type->type_data != &(glob->type_empty->_base)) {
-    CHECK(186, SyntaxTreeCode_write_spaces(self->code_node) )
-    CHECK(187, (self->value)->_base._dtl[3](self->value) )
-    CHECK(188, write(&(String){10, 9, " = NULL;\n"}) )
-    CHECK(189, SyntaxTreeCode_write_spaces(self->code_node) )
-    CHECK(190, (self->value)->_base._dtl[5](self->value) )
-    CHECK(191, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(190, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(191, (self->value)->_base._dtl[3](self->value) )
+    CHECK(192, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(193, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(194, (self->value)->_base._dtl[5](self->value) )
+    CHECK(195, write(&(String){10, 9, " = NULL;\n"}) )
   }
   return OK;
 }
@@ -376,7 +383,7 @@ static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactor
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
   CallArgument* _CallArgument27 = malloc(sizeof(CallArgument));
-  if (_CallArgument27 == NULL) RAISE(196)
+  if (_CallArgument27 == NULL) RAISE(200)
   *_CallArgument27 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false, false};
   _CallArgument27->_base._base._dtl = CallArgument__dtl;
   (*new_argument) = &(_CallArgument27->_base);

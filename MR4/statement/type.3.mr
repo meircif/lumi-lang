@@ -245,16 +245,23 @@ class TypeData(SyntaxTreeNamespace)
     write-cname(user self.name)
     write(user "* self);\n")
   
-  func inst write-global()
-    # `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
+  func dynamic write-global()
+    write(user "\n")
     if self.is-dynamic
-      write(user "\n")
+      # `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
       write-cname(user self.name)
       write(user "_Dynamic ")
       write-cname(user self.name)
       write(user "_dynamic = ")
       self.write-dynamic-init(user self)
-      write(user ";\n")
+    else
+      # Generic_Type_Dynamic `name`_dynamic = {(Dynamic_Del)`name`_Del};
+      write(user "Generic_Type_Dynamic ")
+      write-cname(user self.name)
+      write(user "_dynamic = {(Dynamic_Del)")
+      write-cname(user self.name)
+      write(user "_Del}")
+    write(user ";\n")
   
   func inst write-dynamic-init(user TypeData type-data)
     write(user "{")

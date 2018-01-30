@@ -261,6 +261,18 @@ static char* _func_name_NativeType_write_methods_body = "NativeType.write-method
 #define MR_FUNC_NAME _func_name_NativeType_write_methods_body
 Returncode NativeType_write_methods_body(NativeType* self) {
   /* do nothing */
+  
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode NativeType_write_global(NativeType* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_NativeType_write_global = "NativeType.write-global";
+#define MR_FUNC_NAME _func_name_NativeType_write_global
+Returncode NativeType_write_global(NativeType* self) {
+  /* do nothing */
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -280,7 +292,7 @@ Returncode NativeType_write(NativeType* self) {
 extern Func NativeType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_types, (void*)NativeType_analyze, (void*)NativeType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)NativeType_write_declaration, (void*)NativeType_write_methods_declaration, (void*)NativeType_write_methods_body, (void*)TypeData_write_me};
+Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_types, (void*)NativeType_analyze, (void*)NativeType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)NativeType_write_declaration, (void*)NativeType_write_methods_declaration, (void*)NativeType_write_global, (void*)NativeType_write_methods_body, (void*)TypeData_write_me};
 #endif
 
 #undef MR_FILE_NAME

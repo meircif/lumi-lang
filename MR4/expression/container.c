@@ -28,7 +28,7 @@ static char* _func_name_BlockExpression_parse_new = "BlockExpression.parse-new";
 Returncode BlockExpression_parse_new(BlockExpression* self, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
   BlockExpression* block_expression = malloc(sizeof(BlockExpression));
   if (block_expression == NULL) RAISE(9)
-  *block_expression = (BlockExpression){BlockExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL};
+  *block_expression = (BlockExpression){BlockExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL};
   block_expression->_base._base._dtl = BlockExpression__dtl;
   CHECK(10, BlockExpression_parse(block_expression, code_node, &((*end))) )
   (*expression) = &(block_expression->_base);
@@ -145,7 +145,7 @@ static char* _func_name_UnaryExpression_parse_new = "UnaryExpression.parse-new";
 Returncode UnaryExpression_parse_new(UnaryExpression* self, String* ends, Operator* operator, SyntaxTreeCode* code_node, Expression** expression, Char* end, Operator** next_operator) {
   UnaryExpression* unary_expression = malloc(sizeof(UnaryExpression));
   if (unary_expression == NULL) RAISE(63)
-  *unary_expression = (UnaryExpression){UnaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL};
+  *unary_expression = (UnaryExpression){UnaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL};
   unary_expression->_base._base._dtl = UnaryExpression__dtl;
   CHECK(64, UnaryExpression_parse(unary_expression, operator, ends, code_node, &((*end)), &((*next_operator))) )
   (*expression) = &(unary_expression->_base);
@@ -313,7 +313,7 @@ static char* _func_name_BinaryExpression_parse_new = "BinaryExpression.parse-new
 Returncode BinaryExpression_parse_new(BinaryExpression* self, String* ends, Operator* operator, SyntaxTreeCode* code_node, Expression* left_expression, BinaryExpression* binary_left_expression, BinaryExpression** expression, Char* end, Operator** next_operator) {
   BinaryExpression* binary_expression = malloc(sizeof(BinaryExpression));
   if (binary_expression == NULL) RAISE(150)
-  *binary_expression = (BinaryExpression){BinaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL, NULL};
+  *binary_expression = (BinaryExpression){BinaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, NULL};
   binary_expression->_base._base._base._dtl = BinaryExpression__dtl;
   binary_expression->left_expression = left_expression;
   binary_expression->binary_left_expression = binary_left_expression;
@@ -480,11 +480,14 @@ Returncode BinaryExpression_write_assign_preactions(BinaryExpression* self) {
     /* also assign Dynamic */
     CHECK(260, (self->left_expression)->_base._dtl[4](self->left_expression) )
     CHECK(261, write(&(String){4, 3, " = "}) )
-    CHECK(262, (self->_base.right_expression)->_base._dtl[4](self->_base.right_expression) )
-    CHECK(263, write(&(String){3, 2, ";\n"}) )
-    CHECK(264, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+    if ((self->left_expression->result_type->type_data == &(glob->type_generic->_base) || self->left_expression->is_generic_cast) && self->_base.right_expression->result_type->type_data != &(glob->type_generic->_base) &&  ! self->_base.right_expression->is_generic_cast) {
+      CHECK(266, write(&(String){24, 23, "(Generic_Type_Dynamic*)"}) )
+      self->_base.right_expression->top = false;
+    }
+    CHECK(268, (self->_base.right_expression)->_base._dtl[4](self->_base.right_expression) )
+    CHECK(269, write(&(String){3, 2, ";\n"}) )
+    CHECK(270, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   }
-  
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -495,24 +498,24 @@ Returncode BinaryExpression_write(BinaryExpression* self);
 static char* _func_name_BinaryExpression_write = "BinaryExpression.write";
 #define MR_FUNC_NAME _func_name_BinaryExpression_write
 Returncode BinaryExpression_write(BinaryExpression* self) {
-  CHECK(268, UnaryExpression_write_start(&(self->_base)) )
-  CHECK(269, (self->left_expression)->_base._dtl[3](self->left_expression) )
+  CHECK(273, UnaryExpression_write_start(&(self->_base)) )
+  CHECK(274, (self->left_expression)->_base._dtl[3](self->left_expression) )
   Bool expand_and = self->_base.operator->order == 1 &&  NULL !=  self->binary_left_expression && self->binary_left_expression->_base.operator->order == 1;
   if (expand_and) {
     /* (a > b) > c --> (a > b) && (b > c) */
-    CHECK(275, write(&(String){6, 5, " && ("}) )
-    CHECK(276, (self->binary_left_expression->_base.right_expression)->_base._dtl[3](self->binary_left_expression->_base.right_expression) )
+    CHECK(280, write(&(String){6, 5, " && ("}) )
+    CHECK(281, (self->binary_left_expression->_base.right_expression)->_base._dtl[3](self->binary_left_expression->_base.right_expression) )
   }
-  CHECK(277, write(&(String){2, 1, " "}) )
-  CHECK(278, UnaryExpression_write_end(&(self->_base)) )
+  CHECK(282, write(&(String){2, 1, " "}) )
+  CHECK(283, UnaryExpression_write_end(&(self->_base)) )
   if (expand_and) {
-    CHECK(280, write(&(String){2, 1, ")"}) )
+    CHECK(285, write(&(String){2, 1, ")"}) )
   }
   if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0 && self->left_expression->access == ACCESS_OWNER && self->_base.right_expression->result_type->type_data != &(glob->type_empty->_base)) {
     /* ownership pass */
-    CHECK(285, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-    CHECK(286, (self->_base.right_expression)->_base._dtl[3](self->_base.right_expression) )
-    CHECK(287, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(290, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+    CHECK(291, (self->_base.right_expression)->_base._dtl[3](self->_base.right_expression) )
+    CHECK(292, write(&(String){10, 9, " = NULL;\n"}) )
   }
   return OK;
 }
@@ -542,10 +545,10 @@ static char* _func_name_QuestionExpression_parse_new = "QuestionExpression.parse
 #define MR_FUNC_NAME _func_name_QuestionExpression_parse_new
 Returncode QuestionExpression_parse_new(QuestionExpression* self, Expression** expression, Char* end) {
   QuestionExpression* question_expression = malloc(sizeof(QuestionExpression));
-  if (question_expression == NULL) RAISE(295)
-  *question_expression = (QuestionExpression){QuestionExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL};
+  if (question_expression == NULL) RAISE(300)
+  *question_expression = (QuestionExpression){QuestionExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL};
   question_expression->_base._base._dtl = QuestionExpression__dtl;
-  CHECK(296, QuestionExpression_parse(question_expression, (*expression), &((*end))) )
+  CHECK(301, QuestionExpression_parse(question_expression, (*expression), &((*end))) )
   (*expression) = &(question_expression->_base);
   return OK;
 }
@@ -558,8 +561,8 @@ static char* _func_name_QuestionExpression_parse = "QuestionExpression.parse";
 #define MR_FUNC_NAME _func_name_QuestionExpression_parse
 Returncode QuestionExpression_parse(QuestionExpression* self, Expression* tested, Char* end) {
   self->tested = tested;
-  CHECK(302, SyntaxTreeNode_set_location(&(self->_base._base)) )
-  CHECK(303, read_c(&((*end))) )
+  CHECK(307, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(308, read_c(&((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -570,14 +573,14 @@ Returncode QuestionExpression_analyze(QuestionExpression* self);
 static char* _func_name_QuestionExpression_analyze = "QuestionExpression.analyze";
 #define MR_FUNC_NAME _func_name_QuestionExpression_analyze
 Returncode QuestionExpression_analyze(QuestionExpression* self) {
-  CHECK(306, (self->tested)->_base._dtl[2](self->tested) )
+  CHECK(311, (self->tested)->_base._dtl[2](self->tested) )
   if (!(NULL != self->tested->result_type)) {
-    CHECK(308, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
+    CHECK(313, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
   }
   if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == &(glob->type_func->_base))) {
-    CHECK(311, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
+    CHECK(316, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
   }
-  CHECK(314, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
+  CHECK(319, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
   self->_base.access = ACCESS_VAR;
   return OK;
 }
@@ -589,7 +592,7 @@ Returncode QuestionExpression_write_preactions(QuestionExpression* self);
 static char* _func_name_QuestionExpression_write_preactions = "QuestionExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_QuestionExpression_write_preactions
 Returncode QuestionExpression_write_preactions(QuestionExpression* self) {
-  CHECK(318, (self->tested)->_base._dtl[7](self->tested) )
+  CHECK(323, (self->tested)->_base._dtl[7](self->tested) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -602,13 +605,13 @@ static char* _func_name_QuestionExpression_write = "QuestionExpression.write";
 Returncode QuestionExpression_write(QuestionExpression* self) {
   /* `tested` != NULL && `tested`_Refman->value != NULL */
   if (!self->_base.top) {
-    CHECK(323, write(&(String){2, 1, "("}) )
+    CHECK(328, write(&(String){2, 1, "("}) )
   }
-  CHECK(324, write(&(String){3, 2, "!("}) )
-  CHECK(325, Expression_write_validate_ref(self->tested) )
-  CHECK(326, write(&(String){2, 1, ")"}) )
+  CHECK(329, write(&(String){3, 2, "!("}) )
+  CHECK(330, Expression_write_validate_ref(self->tested) )
+  CHECK(331, write(&(String){2, 1, ")"}) )
   if (!self->_base.top) {
-    CHECK(328, write(&(String){2, 1, ")"}) )
+    CHECK(333, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }

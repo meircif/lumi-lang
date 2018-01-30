@@ -526,7 +526,7 @@ Returncode BuiltinType_write_me(BuiltinType* self, TypeWriter* type_writer) {
 extern Func BuiltinType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinType__dtl[] = {(void*)TypeData_get_parent_type, (void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)TypeData_write_methods_declaration, (void*)TypeData_write_methods_body, (void*)BuiltinType_write_me};
+Func BuiltinType__dtl[] = {(void*)TypeData_get_parent_type, (void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)TypeData_write_methods_declaration, (void*)TypeData_write_global, (void*)TypeData_write_methods_body, (void*)BuiltinType_write_me};
 #endif
 
 #if MR_STAGE == MR_TYPEDEFS

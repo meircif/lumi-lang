@@ -57,9 +57,11 @@ void Tc_Del(Tc* self);
 Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, Ref_Manager* arr_Refman);
 Returncode Data_get(Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 void Data_Del(Data* self);
+Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
 Ta_Dynamic Ta_dynamic = {(Dynamic_Del)Ta_Del, Ta_dyn};
 Tb_Dynamic Tb_dynamic = {{(Dynamic_Del)Tb_Del, (Func)Tb_dyn}};
 Tc_Dynamic Tc_dynamic = {{{(Dynamic_Del)Tc_Del, (Func)Tc_dyn}}};
+Generic_Type_Dynamic Data_dynamic = {(Dynamic_Del)Data_Del};
 Int i = 0;
 Char c = 0;
 Bool b = 0;
@@ -155,6 +157,7 @@ Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   MR_inc_ref(arr_Refman);
 MR_cleanup:
   MR_dec_ref(arr_Refman);
+  item_Dynamic->_del(item);
   MR_owner_dec_ref(item_Refman);
   return MR_err;
 }
@@ -178,6 +181,7 @@ Returncode fun1(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager*
   MR_inc_ref(s_Refman);
   MR_inc_ref(o_Refman);
 MR_cleanup:
+  String_Del(o);
   MR_owner_dec_ref(o_Refman);
   MR_dec_ref(s_Refman);
   return MR_err;

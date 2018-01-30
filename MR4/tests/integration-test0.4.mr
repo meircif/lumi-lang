@@ -363,7 +363,7 @@ struct Dataset{First:Second:Third}(Data{First})
   user Second second
   user Third third
 
-struct MidData{Generic}(Dataset{String:Array{Generic}:Generic})
+struct MidData{Generic}(Dataset{String:Data{Generic}:Generic})
 
 struct TopData(MidData{TestStruct})
 
@@ -377,8 +377,6 @@ func test-type-parameters(user String s)
   var Array{5:Data{String}} ad
   s := ad[2].item
   s := ad[2].arr[3]
-  var Data{Array{String}} da
-  s := da.item[1]
   var Data{Data{Data{String}}} dr
   s := dr.item.item.item
   d.set(user s, user sarr)
@@ -387,11 +385,11 @@ func test-type-parameters(user String s)
   assert dg?
   
   var TopData t
-  var Array{8:TestStruct} at
+  var Data{TestStruct} dt
   var TestStruct ts(copy 0, user _)
   t.item := s
   t.arr := sarr
-  t.second := at
+  t.second := dt
   t.third := ts
 
 

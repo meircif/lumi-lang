@@ -467,7 +467,7 @@ Returncode VariableInit_parse(VariableInit* self, SyntaxTreeVariable* variable, 
   self->_base.parent = variable->_base.parent;
   self->expression_init = malloc(sizeof(InitExpression));
   if (self->expression_init == NULL) RAISE(275)
-  *self->expression_init = (InitExpression){InitExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL, NULL};
+  *self->expression_init = (InitExpression){InitExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, NULL};
   self->expression_init->_base._base._dtl = InitExpression__dtl;
   TypeInstance* _TypeInstance150;
   CHECK(276, TypeInstance_copy_new(variable->type_instance, &(_TypeInstance150)) )
@@ -475,7 +475,7 @@ Returncode VariableInit_parse(VariableInit* self, SyntaxTreeVariable* variable, 
   self->expression_init->_base.is_statement = true;
   self->expression_init->symbol = malloc(sizeof(SymbolExpression));
   if (self->expression_init->symbol == NULL) RAISE(279)
-  *self->expression_init->symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL};
+  *self->expression_init->symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL};
   self->expression_init->symbol->_base._base._dtl = SymbolExpression__dtl;
   CHECK(280, string_new_copy(variable->name, &(self->expression_init->symbol->name)) )
   self->expression_init->symbol->variable = variable;

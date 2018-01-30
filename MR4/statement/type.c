@@ -457,16 +457,24 @@ Returncode TypeData_write_global(TypeData* self);
 static char* _func_name_TypeData_write_global = "TypeData.write-global";
 #define MR_FUNC_NAME _func_name_TypeData_write_global
 Returncode TypeData_write_global(TypeData* self) {
-  /* `name`_Dynamic `name`_dynamic = {`dynamic-functions...`}; */
+  CHECK(249, write(&(String){2, 1, "\n"}) )
   if (self->is_dynamic) {
-    CHECK(251, write(&(String){2, 1, "\n"}) )
+    /* `name`_Dynamic `name`_dynamic = {`dynamic-functions...`}; */
     CHECK(252, write_cname(self->name) )
     CHECK(253, write(&(String){10, 9, "_Dynamic "}) )
     CHECK(254, write_cname(self->name) )
     CHECK(255, write(&(String){12, 11, "_dynamic = "}) )
     CHECK(256, TypeData_write_dynamic_init(self, self) )
-    CHECK(257, write(&(String){3, 2, ";\n"}) )
   }
+  else {
+    /* Generic_Type_Dynamic `name`_dynamic = {(Dynamic_Del)`name`_Del}; */
+    CHECK(259, write(&(String){22, 21, "Generic_Type_Dynamic "}) )
+    CHECK(260, write_cname(self->name) )
+    CHECK(261, write(&(String){26, 25, "_dynamic = {(Dynamic_Del)"}) )
+    CHECK(262, write_cname(self->name) )
+    CHECK(263, write(&(String){6, 5, "_Del}"}) )
+  }
+  CHECK(264, write(&(String){3, 2, ";\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -477,31 +485,31 @@ Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data);
 static char* _func_name_TypeData_write_dynamic_init = "TypeData.write-dynamic-init";
 #define MR_FUNC_NAME _func_name_TypeData_write_dynamic_init
 Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data) {
-  CHECK(260, write(&(String){2, 1, "{"}) )
+  CHECK(267, write(&(String){2, 1, "{"}) )
   if (NULL != type_data->base_type && type_data->base_type->type_data->is_dynamic) {
-    CHECK(262, TypeData_write_dynamic_init(self, type_data->base_type->type_data) )
+    CHECK(269, TypeData_write_dynamic_init(self, type_data->base_type->type_data) )
   }
   else {
-    CHECK(264, write(&(String){14, 13, "(Dynamic_Del)"}) )
-    CHECK(265, write_cname(self->name) )
-    CHECK(266, write(&(String){5, 4, "_Del"}) )
+    CHECK(271, write(&(String){14, 13, "(Dynamic_Del)"}) )
+    CHECK(272, write_cname(self->name) )
+    CHECK(273, write(&(String){5, 4, "_Del"}) )
   }
   NameMapNode* child = type_data->dynamic_base_methods->first;
   while (true) {
     if (!(NULL != child)) break;
     SyntaxTreeFunction* method = NULL;
     Int _Int142;
-    CHECK(271, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int142)) )
-    CHECK(272, write(&(String){3, 2, ", "}) )
+    CHECK(278, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int142)) )
+    CHECK(279, write(&(String){3, 2, ", "}) )
     if (method != ((SyntaxTreeFunction*)(child->value))) {
-      CHECK(274, write(&(String){7, 6, "(Func)"}) )
+      CHECK(281, write(&(String){7, 6, "(Func)"}) )
     }
-    CHECK(275, write_cname(method->parent_type->name) )
-    CHECK(276, write(&(String){2, 1, "_"}) )
-    CHECK(277, write_cname(method->name) )
+    CHECK(282, write_cname(method->parent_type->name) )
+    CHECK(283, write(&(String){2, 1, "_"}) )
+    CHECK(284, write_cname(method->name) )
     child = child->next;
   }
-  CHECK(279, write(&(String){2, 1, "}"}) )
+  CHECK(286, write(&(String){2, 1, "}"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -512,25 +520,25 @@ Returncode TypeData_write_methods_body(TypeData* self);
 static char* _func_name_TypeData_write_methods_body = "TypeData.write-methods-body";
 #define MR_FUNC_NAME _func_name_TypeData_write_methods_body
 Returncode TypeData_write_methods_body(TypeData* self) {
-  CHECK(282, SyntaxTreeNode_write_children(&(self->_base._base._base), self->_base.functions) )
+  CHECK(289, SyntaxTreeNode_write_children(&(self->_base._base._base), self->_base.functions) )
   /* void `cname`_Del(`cname`* self) { */
   /*   if (self == NULL) return; */
   /*   `base`_Del(self); */
   /*   ... */
   /* } */
-  CHECK(288, write(&(String){7, 6, "\nvoid "}) )
-  CHECK(289, write_cname(self->name) )
-  CHECK(290, write(&(String){6, 5, "_Del("}) )
-  CHECK(291, write_cname(self->name) )
-  CHECK(292, write(&(String){11, 10, "* self) {\n"}) )
-  CHECK(293, write(&(String){29, 28, "  if (self == NULL) return;\n"}) )
+  CHECK(295, write(&(String){7, 6, "\nvoid "}) )
+  CHECK(296, write_cname(self->name) )
+  CHECK(297, write(&(String){6, 5, "_Del("}) )
+  CHECK(298, write_cname(self->name) )
+  CHECK(299, write(&(String){11, 10, "* self) {\n"}) )
+  CHECK(300, write(&(String){29, 28, "  if (self == NULL) return;\n"}) )
   if (NULL != self->base_type) {
-    CHECK(295, write(&(String){3, 2, "  "}) )
-    CHECK(296, write_cname(self->base_type->type_data->name) )
-    CHECK(297, write(&(String){23, 22, "_Del(&(self->_base));\n"}) )
+    CHECK(302, write(&(String){3, 2, "  "}) )
+    CHECK(303, write_cname(self->base_type->type_data->name) )
+    CHECK(304, write(&(String){23, 22, "_Del(&(self->_base));\n"}) )
   }
-  CHECK(298, SyntaxTreeBranch_write_cleanup(&(self->_base._base), true) )
-  CHECK(299, write(&(String){3, 2, "}\n"}) )
+  CHECK(305, SyntaxTreeBranch_write_cleanup(&(self->_base._base), true) )
+  CHECK(306, write(&(String){3, 2, "}\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -541,7 +549,7 @@ Returncode TypeData_write_me(TypeData* self, TypeWriter* type_writer);
 static char* _func_name_TypeData_write_me = "TypeData.write-me";
 #define MR_FUNC_NAME _func_name_TypeData_write_me
 Returncode TypeData_write_me(TypeData* self, TypeWriter* type_writer) {
-  CHECK(302, (type_writer)->_dtl[0](type_writer, self) )
+  CHECK(309, (type_writer)->_dtl[0](type_writer, self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -550,7 +558,7 @@ Returncode TypeData_write_me(TypeData* self, TypeWriter* type_writer) {
 extern Func TypeData__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func TypeData__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_types, (void*)TypeData_analyze, (void*)TypeData_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)TypeData_write_methods_declaration, (void*)TypeData_write_methods_body, (void*)TypeData_write_me};
+Func TypeData__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_types, (void*)TypeData_analyze, (void*)TypeData_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)TypeData_write_methods_declaration, (void*)TypeData_write_global, (void*)TypeData_write_methods_body, (void*)TypeData_write_me};
 #endif
 
 
@@ -567,7 +575,7 @@ Returncode TypeWriter_write(TypeWriter* self, TypeData* type_data);
 static char* _func_name_TypeWriter_write = "TypeWriter.write";
 #define MR_FUNC_NAME _func_name_TypeWriter_write
 Returncode TypeWriter_write(TypeWriter* self, TypeData* type_data) {
-  RAISE(307)
+  RAISE(314)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -591,7 +599,7 @@ Returncode TypeDeclarationWriter_write(TypeDeclarationWriter* self, TypeData* ty
 static char* _func_name_TypeDeclarationWriter_write = "TypeDeclarationWriter.write";
 #define MR_FUNC_NAME _func_name_TypeDeclarationWriter_write
 Returncode TypeDeclarationWriter_write(TypeDeclarationWriter* self, TypeData* type_data) {
-  CHECK(311, (type_data)->_base._base._base._dtl[6](type_data) )
+  CHECK(318, (type_data)->_base._base._base._dtl[6](type_data) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -616,7 +624,7 @@ Returncode TypeMethodsDeclarationWriter_write(TypeMethodsDeclarationWriter* self
 static char* _func_name_TypeMethodsDeclarationWriter_write = "TypeMethodsDeclarationWriter.write";
 #define MR_FUNC_NAME _func_name_TypeMethodsDeclarationWriter_write
 Returncode TypeMethodsDeclarationWriter_write(TypeMethodsDeclarationWriter* self, TypeData* type_data) {
-  CHECK(315, (type_data)->_base._base._base._dtl[7](type_data) )
+  CHECK(322, (type_data)->_base._base._base._dtl[7](type_data) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -641,7 +649,7 @@ Returncode TypeGlobalWriter_write(TypeGlobalWriter* self, TypeData* type_data);
 static char* _func_name_TypeGlobalWriter_write = "TypeGlobalWriter.write";
 #define MR_FUNC_NAME _func_name_TypeGlobalWriter_write
 Returncode TypeGlobalWriter_write(TypeGlobalWriter* self, TypeData* type_data) {
-  CHECK(319, TypeData_write_global(type_data) )
+  CHECK(326, (type_data)->_base._base._base._dtl[8](type_data) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -666,7 +674,7 @@ Returncode TypeMethodsBodyWriter_write(TypeMethodsBodyWriter* self, TypeData* ty
 static char* _func_name_TypeMethodsBodyWriter_write = "TypeMethodsBodyWriter.write";
 #define MR_FUNC_NAME _func_name_TypeMethodsBodyWriter_write
 Returncode TypeMethodsBodyWriter_write(TypeMethodsBodyWriter* self, TypeData* type_data) {
-  CHECK(323, (type_data)->_base._base._base._dtl[8](type_data) )
+  CHECK(330, (type_data)->_base._base._base._dtl[9](type_data) )
   return OK;
 }
 #undef MR_FUNC_NAME

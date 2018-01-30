@@ -297,7 +297,7 @@ Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, TypeWriter* type_
   ListNode* child = self->types->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(162, (((TypeData*)(child->item)))->_base._base._base._dtl[9](((TypeData*)(child->item)), type_writer) )
+    CHECK(162, (((TypeData*)(child->item)))->_base._base._base._dtl[10](((TypeData*)(child->item)), type_writer) )
     child = child->next;
   }
   return OK;

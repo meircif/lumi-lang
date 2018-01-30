@@ -137,7 +137,7 @@ static char* _func_name_IntExpression_parse_new = "IntExpression.parse-new";
 Returncode IntExpression_parse_new(IntExpression* self, String* text, Expression** expression) {
   IntExpression* int_expression = malloc(sizeof(IntExpression));
   if (int_expression == NULL) RAISE(46)
-  *int_expression = (IntExpression){IntExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL};
+  *int_expression = (IntExpression){IntExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL};
   int_expression->_base._base._base._dtl = IntExpression__dtl;
   CHECK(47, IntExpression_parse(int_expression, text) )
   (*expression) = &(int_expression->_base._base);
@@ -232,7 +232,7 @@ static char* _func_name_CharExpression_parse_new = "CharExpression.parse-new";
 Returncode CharExpression_parse_new(CharExpression* self, String* text, Expression** expression) {
   CharExpression* char_expression = malloc(sizeof(CharExpression));
   if (char_expression == NULL) RAISE(83)
-  *char_expression = (CharExpression){CharExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL};
+  *char_expression = (CharExpression){CharExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL};
   char_expression->_base._base._base._dtl = CharExpression__dtl;
   CHECK(84, CharExpression_parse(char_expression, text) )
   (*expression) = &(char_expression->_base._base);
@@ -334,7 +334,7 @@ static char* _func_name_StringExpression_parse_new = "StringExpression.parse-new
 Returncode StringExpression_parse_new(StringExpression* self, String* text, SyntaxTreeCode* code_node, Expression** expression) {
   StringExpression* string_expression = malloc(sizeof(StringExpression));
   if (string_expression == NULL) RAISE(125)
-  *string_expression = (StringExpression){StringExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL};
+  *string_expression = (StringExpression){StringExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL};
   string_expression->_base._base._base._dtl = StringExpression__dtl;
   CHECK(126, StringExpression_parse(string_expression, text, code_node) )
   (*expression) = &(string_expression->_base._base);
@@ -446,7 +446,7 @@ static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
   EmptyExpression* empty_expression = malloc(sizeof(EmptyExpression));
   if (empty_expression == NULL) RAISE(178)
-  *empty_expression = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false};
+  *empty_expression = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false};
   empty_expression->_base._base._dtl = EmptyExpression__dtl;
   CHECK(179, EmptyExpression_init(empty_expression) )
   (*expression) = &(empty_expression->_base);

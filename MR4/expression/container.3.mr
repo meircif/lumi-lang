@@ -259,10 +259,15 @@ class BinaryExpression(UnaryExpression)
       # also assign Dynamic
       self.left-expression.write-dynamic()
       write(user " = ")
+      if (self.left-expression.result-type.type-data = glob.type-generic or
+          self.left-expression.is-generic-cast) and
+          self.right-expression.result-type.type-data != glob.type-generic and
+          not self.right-expression.is-generic-cast
+        write(user "(Generic_Type_Dynamic*)")
+        self.right-expression.top := false
       self.right-expression.write-dynamic()
       write(user ";\n")
       self.code-node.write-spaces()
-    
   
   func dynamic write()
     self.write-start()

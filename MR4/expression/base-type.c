@@ -32,7 +32,7 @@ Returncode BaseMethExpression_parse_new(BaseMethExpression* self, String* text, 
   free(text);
   BaseMethExpression* base_expression = malloc(sizeof(BaseMethExpression));
   if (base_expression == NULL) RAISE(14)
-  *base_expression = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, 0};
+  *base_expression = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, 0};
   base_expression->_base._base._dtl = BaseMethExpression__dtl;
   CHECK(15, BaseMethExpression_init(base_expression, code_node, end == '(') )
   (*expression) = &(base_expression->_base);
@@ -102,7 +102,7 @@ Returncode BaseMethExpression_analyze_call(BaseMethExpression* self, FunctionArg
   self_param->_base.access = ((Argument*)(self->function->arguments->parameters->first->item))->access;
   BaseMethExpression* _BaseMethExpression23 = malloc(sizeof(BaseMethExpression));
   if (_BaseMethExpression23 == NULL) RAISE(55)
-  *_BaseMethExpression23 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, 0};
+  *_BaseMethExpression23 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, 0};
   _BaseMethExpression23->_base._base._dtl = BaseMethExpression__dtl;
   self_param->value = &(_BaseMethExpression23->_base);
   CHECK(56, TypeData_m_self_type_instance(self->parent_type, &(self_param->value->result_type)) )
@@ -153,7 +153,7 @@ static char* _func_name_UpCastExpression_init_new = "UpCastExpression.init-new";
 Returncode UpCastExpression_init_new(UpCastExpression* self, Int bases, Expression** expression) {
   UpCastExpression* up_cast = malloc(sizeof(UpCastExpression));
   if (up_cast == NULL) RAISE(72)
-  *up_cast = (UpCastExpression){UpCastExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, 0};
+  *up_cast = (UpCastExpression){UpCastExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, 0};
   up_cast->_base._base._dtl = UpCastExpression__dtl;
   CHECK(73, UpCastExpression_init(up_cast, bases, (*expression)) )
   (*expression) = &(up_cast->_base);
@@ -282,7 +282,7 @@ Returncode TypeExpression_parse_new(TypeExpression* self, String* text, SyntaxTr
   if ((*end) == '(') {
     InitExpression* expression_init = malloc(sizeof(InitExpression));
     if (expression_init == NULL) RAISE(120)
-    *expression_init = (InitExpression){InitExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, NULL, NULL, NULL, NULL};
+    *expression_init = (InitExpression){InitExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, NULL};
     expression_init->_base._base._dtl = InitExpression__dtl;
     CHECK(121, InitExpression_parse(expression_init, type_instance, code_node, &((*end))) )
     (*expression) = &(expression_init->_base);
@@ -290,7 +290,7 @@ Returncode TypeExpression_parse_new(TypeExpression* self, String* text, SyntaxTr
   else {
     TypeExpression* type_expression = malloc(sizeof(TypeExpression));
     if (type_expression == NULL) RAISE(124)
-    *type_expression = (TypeExpression){TypeExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false};
+    *type_expression = (TypeExpression){TypeExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false};
     type_expression->_base._base._dtl = TypeExpression__dtl;
     CHECK(125, TypeExpression_parse(type_expression, type_instance) )
     (*expression) = &(type_expression->_base);

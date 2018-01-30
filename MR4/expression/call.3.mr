@@ -166,9 +166,9 @@ class CallArgument(Argument)
     
     if self.is-dynamic and not self.is-native
       write(user ", ")
+      if (self.is-output and self.is-down-cast) or self.is-generic
+        write(user "(void*)")
       if self.is-output
-        if self.is-down-cast
-          write(user "(void*)")
         write(user "&(")
       self.value.write-dynamic()
       if self.is-output
@@ -177,8 +177,12 @@ class CallArgument(Argument)
       write(user ", ")
       if self.is-output
         write(user "&dynamic_Void")
-      else
+      else-if self.value.result-type.type-data = glob.type-empty
         write(user "NULL")
+      else
+        write(user "&")
+        write-cname(user self.value.result-type.type-data.name)
+        write(user "_dynamic")
   
   func dynamic write-postactions()
     if self.access = ACCESS-OWNER and not self.is-output and

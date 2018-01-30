@@ -77,7 +77,6 @@ class MemberExpression(SymbolExpression)
   user Expression dynamic-call-self-instance
   var Int bases
   var Bool is-dynamic-call
-  var Bool is-generic-cast
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)

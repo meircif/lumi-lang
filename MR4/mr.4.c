@@ -247,6 +247,11 @@ Returncode file_open_write(
   return open_file(file, file_Refman, name, name_Refman, "w");
 }
 
+void File_Del(File* self) {
+  fclose(self);
+}
+Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
+
 #define MR_FUNC_NAME "File.close"
 Returncode File_close(File* file, Ref_Manager* file_Refman) {
   CHECK_NOT_NULL(file)
@@ -307,6 +312,9 @@ Returncode File_write(
 #undef MR_FUNC_NAME
 
 /*Strings*/
+void String_Del(String* self) {}
+Generic_Type_Dynamic String_dynamic = { (Dynamic_Del)String_Del };
+
 #define MR_FUNC_NAME "String.clear"
 Returncode String_clear(String* self, Ref_Manager* self_Refman) {
   CHECK_NOT_NULL(self)
@@ -505,6 +513,9 @@ Ref_Manager* sys_Refman;
 Ref_Manager* stdout_Refman;
 Ref_Manager* stdin_Refman;
 Ref_Manager* stderr_Refman;
+
+void Sys_Del(Sys* self) {}
+Generic_Type_Dynamic Sys_dynamic = { (Dynamic_Del)Sys_Del };
 
 Returncode Sys_print(
     Sys* _, Ref_Manager* __, String* text, Ref_Manager* text_Refman) {

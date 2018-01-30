@@ -44,8 +44,7 @@ typedef struct {
 typedef void (*Dynamic_Del)(void*);
 
 typedef void Generic_Type;
-typedef void Generic_Type_Dynamic;
-
+typedef struct { Dynamic_Del _del; } Generic_Type_Dynamic;
 extern Generic_Type_Dynamic* dynamic_Void;
 
 
@@ -130,6 +129,8 @@ void MR_set_var_string_array(
   int array_length, int string_length, Array* array, char* chars);
 Bool MR_run_test(char* test_name, Func test_func);
 
+void String_Del(String*);
+extern Generic_Type_Dynamic String_dynamic;
 Returncode String_clear(String*, Ref_Manager*);
 Returncode String_length(String*, Ref_Manager*, Int* length);
 Returncode String_equal(
@@ -149,6 +150,8 @@ Returncode file_open_read(
   String* name, Ref_Manager*, File** file, Ref_Manager**);
 Returncode file_open_write(
   String* name, Ref_Manager*, File** file, Ref_Manager**);
+void File_Del(File*);
+extern Generic_Type_Dynamic File_dynamic;
 Returncode File_close(File*, Ref_Manager*);
 Returncode File_getc(File*, Ref_Manager*, Char* ch, Bool* is_eof);
 Returncode File_putc(File*, Ref_Manager*, Char ch);
@@ -163,6 +166,8 @@ extern Ref_Manager* sys_Refman;
 extern Ref_Manager* stdout_Refman;
 extern Ref_Manager* stdin_Refman;
 extern Ref_Manager* stderr_Refman;
+void Sys_Del(Sys*);
+extern Generic_Type_Dynamic Sys_dynamic;
 Returncode Sys_print(Sys*, Ref_Manager*, String* text, Ref_Manager*);
 Returncode Sys_println(Sys*, Ref_Manager*, String* text, Ref_Manager*);
 Returncode Sys_getchar(Sys*, Ref_Manager*, char* ch, Bool* is_eof);

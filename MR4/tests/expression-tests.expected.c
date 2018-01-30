@@ -342,6 +342,9 @@ void Mid_Del(Mid* self);
 Returncode Top_methb(Top* self, Ref_Manager* self_Refman);
 Returncode Top_methm(Top* self, Ref_Manager* self_Refman);
 void Top_Del(Top* self);
+Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
+Generic_Type_Dynamic Mid_dynamic = {(Dynamic_Del)Mid_Del};
+Generic_Type_Dynamic Top_dynamic = {(Dynamic_Del)Top_Del};
 Returncode Base_methb(Base* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -394,6 +397,9 @@ void Mid_Del(Mid* self);
 Returncode Top_methb(Top* self, Ref_Manager* self_Refman);
 Returncode Top_methm(Top* self, Ref_Manager* self_Refman);
 void Top_Del(Top* self);
+Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
+Generic_Type_Dynamic Mid_dynamic = {(Dynamic_Del)Mid_Del};
+Generic_Type_Dynamic Top_dynamic = {(Dynamic_Del)Top_Del};
 Returncode Base_methb(Base* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:

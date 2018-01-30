@@ -795,8 +795,8 @@ struct Test{First:Second:Third}
     self.first := first
     self.second := second
     self.third := third
-func use(user String first, user Array{Int} second, user File third)
-  var Test{String:Array{Int}:File} t
+func use(user String first, user Sys second, user File third)
+  var Test{String:Sys:File} t
   t.first := first
   t.second := second
   t.third := third
@@ -820,8 +820,7 @@ var Array{5:Data{String}} ad
 var Array{5:Data{String}} ad
   str := ad[2].arr[3]
 ## @ c t10
-var Data{Array{String}} da
-  str := da.item[1]
+d.set(owner _, user _)
 ## @ c t11
 var Data{Data{Data{String}}} dr
   str := dr.item.item.item
@@ -906,6 +905,14 @@ struct Test{Generic}
   func meth()
     self.arr := Array{12:Generic}()
 
+## @ eg teg11
+struct Test{First:Second:Third}
+  user First first
+  user Second second
+  user Third third
+func meth(user Test{String:String} t)
+  user Test{String:String:String} error(user t)
+
 ## @ ec tec0
 var Data{Int} error
 ## @ ec tec1
@@ -922,14 +929,8 @@ var Data dg
   d := dg
 ## @ ec tec6
 t := d.item
-## @ eg tec7
-struct Test{First:Second:Third}
-  user First first
-  user Second second
-  user Third third
-func meth(user Test{String:String} t)
-  user Test{String:String:String} error(user t)
-
+## @ ec tec7
+var Data{Array{Int}} error
 ## @@ test-parameter-inheritance
 ## @ g t0
 struct Base{Generic}
@@ -985,23 +986,23 @@ func use(user String s)
 struct Base{First:Second}
   user First first
   user Second second
-struct Mid{Param:Third}(Base{Param:Array{Int}})
+struct Mid{Param:Third}(Base{Param:Sys})
   user Third third
-  func set(user Param first, user Array{Int} second, user Third third)
+  func set(user Param first, user Sys second, user Third third)
     self.first := first
     self.second := second
     self.third := third
 struct Top{Generic}(Mid{Generic:File})
-  func set(user Generic first, user Array{Int} second, user File third)
+  func set(user Generic first, user Sys second, user File third)
     self.first := first
     self.second := second
     self.third := third
 struct Test(Top{String})
-  func set(user String first, user Array{Int} second, user File third)
+  func set(user String first, user Sys second, user File third)
     self.first := first
     self.second := second
     self.third := third
-func use(user String first, user Array{Int} second, user File third)
+func use(user String first, user Sys second, user File third)
   var Test t
   t.first := first
   t.second := second
