@@ -91,7 +91,7 @@ int MR_test_main(int argc, char* argv[]);
 {int MR_n=0; for(;MR_n<array->length; ++MR_n) \
  Type##_Del(((Type*)(array->values))+MR_n);}
 
-#define SRD(Type, field) \
+#define SELF_REF_DEL(Type, field) \
 while (self->field != NULL) { \
   Type* value = self->field; \
   Ref_Manager* value_Refman = self->field##_Refman; \
@@ -103,7 +103,7 @@ while (self->field != NULL) { \
   MR_owner_dec_ref(value_Refman); \
 }
 
-#define SDRD(Type, field, bases) \
+#define DYN_SELF_REF_DEL(Type, bases, field) \
 while (self->field != NULL) { \
   Type* value = self->field; \
   Ref_Manager* value_Refman = self->field##_Refman; \

@@ -140,52 +140,73 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   func inst write-spaces()
     write-spaces(copy self.indentation-spaces)
   
-  func inst write-cleanup(copy Bool is-type)
+  func inst write-cleanup(user TypeData type-data)
     user ListNode{SyntaxTreeVariable} var-node(self.variables.last)
     do
       while ? var-node
       if not var-node.item.type-instance.type-data.is-primitive
-        self.write-variable-cleanup(user var-node.item, copy is-type)
+        self.write-variable-cleanup(user var-node.item, user type-data)
       var-node := var-node.prev
   
   func inst write-variable-cleanup(
-      user SyntaxTreeVariable variable, copy Bool is-type)
+      user SyntaxTreeVariable variable, user TypeData type-data)
     user TypeData item-type-data(variable.type-instance.type-data)
     if item-type-data = glob.type-array
       item-type-data := variable.type-instance.parameters.first.item.type-data
     if variable.access = ACCESS-OWNER and not item-type-data.is-primitive
-      write(user "  ")
-      if variable.type-instance.type-data.is-dynamic
-        if is-type
-          write(user "self->")
-        write-cname(user variable.name)
-        write(user "_Dynamic->")
-        user TypeData type-data(item-type-data)
-        do
-          while ? type-data.base-type
-          type-data := type-data.base-type.type-data
-          while type-data.is-dynamic
-          write(user "_base.")
-        write(user "_del(")
-      else-if variable.type-instance.type-data = glob.type-array
-        write(user "ARRAY_DEL(")
-        write-cname(user item-type-data.name)
-        write(user ", ")
-      else
-        write-cname(user item-type-data.name)
-        write(user "_Del(")
-      if is-type
-        write(user "self->")
-      write-cname(user variable.name)
-      write(user ");\n")
+      self.write-owner-reference-cleanup(
+          user variable, user type-data, user item-type-data)
     write(user "  MR_")
     if variable.access = ACCESS-OWNER
       write(user "owner_")
     write(user "dec_ref(")
-    if is-type
+    if ? type-data
       write(user "self->")
     write-cname(user variable.name)
     write(user "_Refman);\n")
+  
+  func inst write-owner-reference-cleanup(
+      user SyntaxTreeVariable variable,
+      user TypeData type-data,
+      user TypeData item-type-data)
+    write(user "  ")
+    if variable.type-instance.type-data = type-data
+      if type-data.is-dynamic
+        write(user "DYN_")
+      write(user "SELF_REF_DEL(")
+      write-cname(user type-data.name)
+      write(user ", ")
+      if type-data.is-dynamic
+        user TypeData base-type(type-data)
+        do
+          while ? base-type.base-type
+          write(user "_base.")
+          base-type := base-type.base-type.type-data
+        write(user "_, ")
+      type-data := _
+    else-if variable.type-instance.type-data.is-dynamic
+      if ? type-data
+        write(user "self->")
+      write-cname(user variable.name)
+      write(user "_Dynamic->")
+      user TypeData base-data(item-type-data)
+      do
+        while ? base-data.base-type
+        base-data := base-data.base-type.type-data
+        while base-data.is-dynamic
+        write(user "_base.")
+      write(user "_del(")
+    else-if variable.type-instance.type-data = glob.type-array
+      write(user "ARRAY_DEL(")
+      write-cname(user item-type-data.name)
+      write(user ", ")
+    else
+      write-cname(user item-type-data.name)
+      write(user "_Del(")
+    if ? type-data
+      write(user "self->")
+    write-cname(user variable.name)
+    write(user ");\n")
 
 
 ## A basic namespace node in the syntax tree

@@ -537,7 +537,7 @@ Returncode TypeData_write_methods_body(TypeData* self) {
     CHECK(303, write_cname(self->base_type->type_data->name) )
     CHECK(304, write(&(String){23, 22, "_Del(&(self->_base));\n"}) )
   }
-  CHECK(305, SyntaxTreeBranch_write_cleanup(&(self->_base._base), true) )
+  CHECK(305, SyntaxTreeBranch_write_cleanup(&(self->_base._base), self) )
   CHECK(306, write(&(String){3, 2, "}\n"}) )
   return OK;
 }

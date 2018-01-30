@@ -188,7 +188,7 @@ struct TestStruct
   
   # comment test
   
-  user TestStruct ts
+  owner TestStruct ts
   var Func{()} fun
   
   new(copy Int x, user String s)
@@ -212,6 +212,7 @@ struct TestStruct
 class TestClass
   var Int num
   user String text
+  owner TestClass tc
   
   new()
     self.num := 1

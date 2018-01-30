@@ -302,7 +302,7 @@ class TypeData(SyntaxTreeNamespace)
       write(user "  ")
       write-cname(user self.base-type.type-data.name)
       write(user "_Del(&(self->_base));\n")
-    self.write-cleanup(copy true)
+    self.write-cleanup(user self)
     write(user "}\n")
   
   func dynamic write-me(user TypeWriter type-writer)

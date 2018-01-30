@@ -203,7 +203,7 @@ MR_cleanup:
 }
 void Base_Del(Base* self) {
   if (self == NULL) return;
-  self->b_Dynamic->_del(self->b);
+  DYN_SELF_REF_DEL(Base, _, b);
   MR_owner_dec_ref(self->b_Refman);
 }
 Returncode Mid_dyn0(Mid* self, Ref_Manager* self_Refman, Mid_Dynamic* self_Dynamic) {
@@ -219,7 +219,7 @@ MR_cleanup:
 void Mid_Del(Mid* self) {
   if (self == NULL) return;
   Base_Del(&(self->_base));
-  self->m_Dynamic->_base._del(self->m);
+  DYN_SELF_REF_DEL(Mid, _base._, m);
   MR_owner_dec_ref(self->m_Refman);
 }
 Returncode Top_dyn0(Top* self, Ref_Manager* self_Refman, Top_Dynamic* self_Dynamic) {
@@ -237,7 +237,7 @@ MR_cleanup:
 void Top_Del(Top* self) {
   if (self == NULL) return;
   Mid_Del(&(self->_base));
-  self->t_Dynamic->_base._base._del(self->t);
+  DYN_SELF_REF_DEL(Top, _base._base._, t);
   MR_owner_dec_ref(self->t_Refman);
 }
 /// @ te0
@@ -416,7 +416,7 @@ void Struct_Del(Struct* self) {
   if (self == NULL) return;
   ARRAY_DEL(Struct, self->as);
   MR_owner_dec_ref(self->as_Refman);
-  Struct_Del(self->s);
+  SELF_REF_DEL(Struct, s);
   MR_owner_dec_ref(self->s_Refman);
 }
 Returncode Class_meth(Class* self, Ref_Manager* self_Refman, Class_Dynamic* self_Dynamic) {
@@ -428,7 +428,7 @@ void Class_Del(Class* self) {
   if (self == NULL) return;
   ARRAY_DEL(Class, self->ac);
   MR_owner_dec_ref(self->ac_Refman);
-  self->c_Dynamic->_del(self->c);
+  DYN_SELF_REF_DEL(Class, _, c);
   MR_owner_dec_ref(self->c_Refman);
 }
 Returncode name(Struct* ps, Ref_Manager* ps_Refman, Class* pc, Ref_Manager* pc_Refman, Class_Dynamic* pc_Dynamic, Array* pas, Ref_Manager* pas_Refman, Array* pac, Ref_Manager* pac_Refman) {

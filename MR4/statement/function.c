@@ -393,14 +393,14 @@ Returncode SyntaxTreeFunction_write_cleanup(SyntaxTreeFunction* self);
 static char* _func_name_SyntaxTreeFunction_write_cleanup = "SyntaxTreeFunction.write-cleanup";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFunction_write_cleanup
 Returncode SyntaxTreeFunction_write_cleanup(SyntaxTreeFunction* self) {
-  CHECK(189, SyntaxTreeBranch_write_cleanup(&(self->_base._base), false) )
+  CHECK(189, SyntaxTreeBranch_write_cleanup(&(self->_base._base), NULL) )
   ListNode* param_node = self->arguments->parameters->last;
   while (true) {
     if (!(NULL != param_node)) break;
     if (((Argument*)(param_node->item))->access == ACCESS_USER || ((Argument*)(param_node->item))->access == ACCESS_OWNER) {
       SyntaxTreeVariable* _SyntaxTreeVariable123;
       CHECK(195, (((Argument*)(param_node->item)))->_base._dtl[8](((Argument*)(param_node->item)), &(_SyntaxTreeVariable123)) )
-      CHECK(195, SyntaxTreeBranch_write_variable_cleanup(&(self->_base._base), _SyntaxTreeVariable123, false) )
+      CHECK(195, SyntaxTreeBranch_write_variable_cleanup(&(self->_base._base), _SyntaxTreeVariable123, NULL) )
     }
     param_node = param_node->prev;
   }
