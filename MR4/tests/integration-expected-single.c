@@ -237,9 +237,9 @@ Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, Str
       if (self == NULL || self_Refman->value == NULL) RAISE(198)
       MR_owner_dec_ref(self->ts_Refman);
       self->ts_Refman = aux_TestStruct_0_Refman;
-      aux_TestStruct_0_Refman = NULL;
       self->ts = aux_TestStruct_0;
       aux_TestStruct_0 = NULL;
+      aux_TestStruct_0_Refman = NULL;
     }
 MR_cleanup:
   TestStruct_Del(aux_TestStruct_0);
@@ -474,9 +474,9 @@ Returncode Container_iter(Container* self, Ref_Manager* self_Refman, ContainerIt
   CHECK(440, ContainerIterator_new(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, self->next, self->next_Refman) )
   MR_owner_dec_ref(*iter_Refman);
   *iter_Refman = aux_ContainerIterator_0_Refman;
-  aux_ContainerIterator_0_Refman = NULL;
   *iter = aux_ContainerIterator_0;
   aux_ContainerIterator_0 = NULL;
+  aux_ContainerIterator_0_Refman = NULL;
 MR_cleanup:
   ContainerIterator_Del(aux_ContainerIterator_0);
   MR_owner_dec_ref(aux_ContainerIterator_0_Refman);
@@ -1419,9 +1419,9 @@ Returncode test_call_expression(void) {
   CHECK(262, f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
   MR_owner_dec_ref(s_Refman);
   s_Refman = aux_String_1_Refman;
-  aux_String_1_Refman = NULL;
   s = aux_String_1;
   aux_String_1 = NULL;
+  aux_String_1_Refman = NULL;
 MR_cleanup:
   String_Del(aux_String_1);
   MR_owner_dec_ref(aux_String_1_Refman);

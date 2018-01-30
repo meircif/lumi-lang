@@ -248,9 +248,9 @@ String* aux_String_0 = NULL;
   CHECK(1, fun3(7, &(aux_String_0), &(aux_String_0_Refman)) )
   MR_owner_dec_ref(*so_Refman);
   *so_Refman = aux_String_0_Refman;
-  aux_String_0_Refman = NULL;
   *so = aux_String_0;
   aux_String_0 = NULL;
+  aux_String_0_Refman = NULL;
 /// @ t10
 CHECK(1, Test_meth(t, t_Refman) )
 /// @ t11
@@ -276,6 +276,57 @@ String* aux_String_0 = NULL;
   Int aux_Int_0 = 0;
   CHECK(1, fun3(1, &(aux_String_0), &(aux_String_0_Refman)) )
   CHECK(2, fun5(2, &(aux_Int_0)) )
+/// @ t19
+typedef struct Base Base;
+typedef struct Base_Dynamic Base_Dynamic;
+typedef struct Test Test;
+typedef struct Test_Dynamic Test_Dynamic;
+struct Base {
+  Int x;
+};
+struct Base_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic, Base* b, Ref_Manager* b_Refman, Base_Dynamic* b_Dynamic);
+};
+struct Test {
+  Base _base;
+};
+struct Test_Dynamic {
+  Base_Dynamic _base;
+};
+Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic, Base* b, Ref_Manager* b_Refman, Base_Dynamic* b_Dynamic);
+void Base_Del(Base* self);
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Test* t, Ref_Manager* t_Refman, Test_Dynamic* t_Dynamic);
+void Test_Del(Test* self);
+Base_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del, Base_meth};
+Test_Dynamic Test_dynamic = {{(Dynamic_Del)Test_Del, (Func)Test_meth}};
+Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic, Base* b, Ref_Manager* b_Refman, Base_Dynamic* b_Dynamic) {
+  Returncode MR_err = OK;
+  MR_inc_ref(b_Refman);
+MR_cleanup:
+  b_Dynamic->_del(b);
+  MR_owner_dec_ref(b_Refman);
+  return MR_err;
+}
+void Base_Del(Base* self) {
+  if (self == NULL) return;
+}
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Test* t, Ref_Manager* t_Refman, Test_Dynamic* t_Dynamic) {
+  Returncode MR_err = OK;
+  MR_inc_ref(t_Refman);
+  CHECK(6, Base_meth(&(self->_base), self_Refman, &(self_Dynamic->_base), &(t->_base), t_Refman, &(t_Dynamic->_base)) )
+  t = NULL;
+  t_Refman = NULL;
+  t_Dynamic = NULL;
+MR_cleanup:
+  t_Dynamic->_base._del(t);
+  MR_owner_dec_ref(t_Refman);
+  return MR_err;
+}
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+  Base_Del(&(self->_base));
+}
 /// @ te0
 expected access, got " "
 /// @ te1
@@ -312,6 +363,8 @@ too few parameters
 too many outputs
 /// @ te17
 too few outputs
+/// @ te18
+passing ownership of type "Test" into static type "Base"
 /// @@ test-type-expression
 /// @ t0
 CHECK(1, Test_meth(t, t_Refman) )
@@ -499,9 +552,9 @@ String* s = NULL;
   Ref_Manager* s_Refman = NULL;
   MR_owner_dec_ref(s_Refman);
   s_Refman = *so_Refman;
-  *so_Refman = NULL;
   s = *so;
   *so = NULL;
+  *so_Refman = NULL;
 /// @ t9
 MR_dec_ref(str_Refman);
   str_Refman = *so_Refman;
@@ -515,6 +568,17 @@ c = '0' + 4;
 b = fun0 != fun1;
 /// @ t13
 b = b == b;
+/// @ t14
+Tc* otc = NULL;
+  Ref_Manager* otc_Refman = NULL;
+  Tc_Dynamic* otc_Dynamic = NULL;
+  MR_owner_dec_ref(tb_Refman);
+  tb_Refman = otc_Refman;
+  tb_Dynamic = &(otc_Dynamic->_base);
+  tb = &(otc->_base);
+  otc = NULL;
+  otc_Refman = NULL;
+  otc_Dynamic = NULL;
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -549,6 +613,8 @@ operator "-=" expected "Int" operand, got "Bool"
 operator "is" is not supported for type "Int"
 /// @ te16
 non matching subtypes "Int" and "Char"
+/// @ te17
+passing ownership of type "Tb" into static type "Test"
 /// @@ test-question-expression
 /// @ t0
 b = !(str == NULL || str_Refman->value == NULL);

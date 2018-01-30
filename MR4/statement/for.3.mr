@@ -51,7 +51,11 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
         self.get-iterator-type():(owner type-instance)
     
     if ? self.parent.find-variable(user self.item-name):(user self.item)
-      type-instance.check-assign-to(user self.item.type-instance, user self)
+      type-instance.check-assign-to(
+          copy self.item.access,
+          user self.item.type-instance,
+          copy self.item.access,
+          user self)
       delete type-instance
       delete self.item-name
     else

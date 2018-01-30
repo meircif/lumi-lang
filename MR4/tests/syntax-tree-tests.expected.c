@@ -344,9 +344,9 @@ Returncode name(String* self, Ref_Manager* self_Refman, Int px, String* pu, Ref_
   if (aux_String_0_Refman == NULL) RAISE(8)
   MR_owner_dec_ref(o_Refman);
   o_Refman = aux_String_0_Refman;
-  aux_String_0_Refman = NULL;
   o = aux_String_0;
   aux_String_0 = NULL;
+  aux_String_0_Refman = NULL;
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(9)
@@ -735,9 +735,9 @@ String* s = NULL;
   if (s_Refman == NULL) RAISE(1)
   MR_owner_dec_ref(*so_Refman);
   *so_Refman = s_Refman;
-  s_Refman = NULL;
   *so = s;
   s = NULL;
+  s_Refman = NULL;
 /// @ t9
 Tc a_Values[12] = {{{{{0}}}}};
   Array a_Var = {12, NULL};
@@ -920,6 +920,16 @@ Tb* tt = NULL;
   tt_Refman = tb_Refman;
   MR_inc_ref(tt_Refman);
   tt_Dynamic = tb_Dynamic;
+/// @ t14
+Ta* ota = NULL;
+  Ref_Manager* ota_Refman = NULL;
+  Ta_Dynamic* ota_Dynamic = NULL;
+  ota = &(tb->_base);
+  ota_Refman = tb_Refman;
+  ota_Dynamic = &(tb_Dynamic->_base);
+  tb = NULL;
+  tb_Refman = NULL;
+  tb_Dynamic = NULL;
 /// @ te0
 dynamic allocation of primitive type "Int"
 /// @ te1
@@ -968,6 +978,8 @@ assigning into access "owner" invalid access "user"
 assigning into an owner a non-owner access "user"
 /// @ te23
 more than one subtype for array
+/// @ te24
+passing ownership of type "Tb" into static type "Test"
 /// @@ test-comment
 /// @ t0
 Int x = 0;
@@ -1407,13 +1419,15 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   x_Dynamic = item_Dynamic;
   item = NULL;
   item_Refman = NULL;
+  item_Dynamic = NULL;
   if (self == NULL || self_Refman->value == NULL) RAISE(6)
   MR_owner_dec_ref(self->item_Refman);
   self->item_Refman = x_Refman;
-  x_Refman = NULL;
   self->item_Dynamic = x_Dynamic;
   self->item = x;
   x = NULL;
+  x_Refman = NULL;
+  x_Dynamic = NULL;
   if (self == NULL || self_Refman->value == NULL) RAISE(7)
   MR_dec_ref(self->arr_Refman);
   self->arr_Refman = arr_Refman;
@@ -1427,18 +1441,20 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   if (t == NULL || t_Refman->value == NULL) RAISE(9)
   MR_owner_dec_ref(t->item_Refman);
   t->item_Refman = self->item_Refman;
-  self->item_Refman = NULL;
   t->item_Dynamic = self->item_Dynamic;
   t->item = self->item;
   self->item = NULL;
+  self->item_Refman = NULL;
+  self->item_Dynamic = NULL;
   if (t == NULL || t_Refman->value == NULL) RAISE(10)
   if (self == NULL || self_Refman->value == NULL) RAISE(10)
   MR_owner_dec_ref(self->item_Refman);
   self->item_Refman = t->item_Refman;
-  t->item_Refman = NULL;
   self->item_Dynamic = t->item_Dynamic;
   self->item = t->item;
   t->item = NULL;
+  t->item_Refman = NULL;
+  t->item_Dynamic = NULL;
 MR_cleanup:
   Test_Del(t);
   MR_owner_dec_ref(t_Refman);
@@ -1732,8 +1748,9 @@ Data dt_Var = {0};
   ta_Dynamic = &(((Tb_Dynamic*)(dt->item_Dynamic))->_base);
   ta = &(((Tb*)(dt->item))->_base);
   CHECK(5, Data_set(dt, dt_Refman, &(otc->_base), otc_Refman, (void*)&(otc_Dynamic->_base), NULL, NULL) )
-  &(otc->_base) = NULL;
+  otc = NULL;
   otc_Refman = NULL;
+  otc_Dynamic = NULL;
   if (ta != NULL) RAISE(6)
   CHECK(6, Data_get(dt, dt_Refman, (void*)&(ta), &(ta_Refman), (void*)&(ta_Dynamic)) )
 /// @ teg0

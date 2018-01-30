@@ -89,6 +89,7 @@ class CallExpression(Expression)
 ## Function argument call
 class CallArgument(Argument)
   owner Expression value
+  user Expression assignee
   user SyntaxTreeCode code-node
   var Bool is-down-cast
   var Bool is-dynamic
@@ -126,9 +127,13 @@ class CallArgument(Argument)
         owner real-type)
     if self.is-output
       self.is-down-cast := real-type.check-assign-to(
-          user self.value.result-type, user self) > 0
+          copy self.access,
+          user self.value.result-type,
+          copy self.value.access,
+          user self) > 0
     else
-      real-type.check-assign-from(user self):(owner self.value)
+      real-type.check-assign-from(copy self.access, user self):(
+          owner self.value, user self.assignee)
     self.is-dynamic := real-type.type-data.is-dynamic
     self.is-generic := type-instance.type-data = glob.type-generic
     delete real-type
@@ -187,12 +192,7 @@ class CallArgument(Argument)
   func dynamic write-postactions()
     if self.access = ACCESS-OWNER and not self.is-output and
         self.value.result-type.type-data != glob.type-empty
-      self.code-node.write-spaces()
-      self.value.write()
-      write(user " = NULL;\n")
-      self.code-node.write-spaces()
-      self.value.write-refman()
-      write(user " = NULL;\n")
+      self.assignee.write-assign-null()
 
 
 class CallArgumentFactory(ArgumentFactory)

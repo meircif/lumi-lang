@@ -82,7 +82,7 @@ Returncode InitExpression_analyze(InitExpression* self) {
       if (NULL != self->constructor) {
         CallArgument* self_param = malloc(sizeof(CallArgument));
         if (self_param == NULL) RAISE(54)
-        *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, false, false, false};
+        *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
         self_param->_base._base._dtl = CallArgument__dtl;
         CHECK(55, SyntaxTreeNode_set_location(&(self_param->_base._base)) )
         self_param->_base.access = ((Argument*)(self->constructor->arguments->parameters->first->item))->access;

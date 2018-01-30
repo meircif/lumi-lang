@@ -448,6 +448,8 @@ new Test tt(copy 3)
 t := Test(copy 3)
 ## @ c t13
 user Tb tt(user tb)
+## @ c t14
+owner Ta ota(owner tb)
 ## @ ec te0
 Int()
 ## @ ec te1
@@ -500,6 +502,8 @@ owner String s(user so)
 owner String s(owner str)
 ## @ ec te23
 var Array{1:Int:Int} a
+## @ ec te24
+owner Test ot(owner tb)
 ## @@ test-comment
 ## @ c t0
 # comment

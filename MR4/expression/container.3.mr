@@ -137,6 +137,7 @@ class UnaryExpression(Expression)
 class BinaryExpression(UnaryExpression)
   owner Expression left-expression
   user BinaryExpression binary-left-expression
+  user Expression assignee
   
   func inst parse-new(
       user String ends,
@@ -175,13 +176,9 @@ class BinaryExpression(UnaryExpression)
       self.set-simple-type(user glob.type-bool)
     else-if self.operator.order = 4 and self.operator.group-index = 0
       # := operator
-      self.left-expression.result-type.check-assign-from(user self):(
-          owner self.right-expression)
-      if self.left-expression.access = ACCESS-OWNER and
-          self.right-expression.access != ACCESS-OWNER
-        self.m-syntax-error(
-            user "assigning into an owner a non-owner access",
-            user glob.access-names[self.right-expression.access])
+      self.left-expression.result-type.check-assign-from(
+          copy self.left-expression.access, user self):(
+          owner self.right-expression, user self.assignee)
     else-if self.operator.order = 1 and self.operator.name[0] = 'i'
       # `is`/`is-not` operator
       self.test-not-int(user self.right-expression)
@@ -249,11 +246,6 @@ class BinaryExpression(UnaryExpression)
         self.left-expression.write-refman()
         write(user ");\n")
         self.code-node.write-spaces()
-        
-      else-if self.right-expression.result-type.type-data != glob.type-empty
-        self.right-expression.write-refman()
-        write(user " = NULL;\n")
-        self.code-node.write-spaces()
     
     if self.left-expression.result-type.type-data.is-dynamic
       # also assign Dynamic
@@ -287,9 +279,7 @@ class BinaryExpression(UnaryExpression)
         self.left-expression.access = ACCESS-OWNER and
         self.right-expression.result-type.type-data != glob.type-empty
       # ownership pass
-      self.code-node.write-spaces()
-      self.right-expression.write()
-      write(user " = NULL;\n")
+      self.assignee.write-assign-null()
 
 
 ## An expression with the "?" operator

@@ -327,13 +327,34 @@ Returncode Expression_write_validate_ref(Expression* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode Expression_write_assign_null(Expression* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_Expression_write_assign_null = "Expression.write-assign-null";
+#define MR_FUNC_NAME _func_name_Expression_write_assign_null
+Returncode Expression_write_assign_null(Expression* self) {
+  CHECK(211, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(212, (self)->_base._dtl[3](self) )
+  CHECK(213, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(214, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(215, (self)->_base._dtl[5](self) )
+  CHECK(216, write(&(String){10, 9, " = NULL;\n"}) )
+  if (self->result_type->type_data->is_dynamic) {
+    CHECK(218, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(219, (self)->_base._dtl[4](self) )
+    CHECK(220, write(&(String){10, 9, " = NULL;\n"}) )
+  }
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode Expression_write_dynamic(Expression* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
 #define MR_FUNC_NAME _func_name_Expression_write_dynamic
 Returncode Expression_write_dynamic(Expression* self) {
-  CHECK(211, (self)->_base._dtl[3](self) )
-  CHECK(212, write(&(String){9, 8, "_Dynamic"}) )
+  CHECK(223, (self)->_base._dtl[3](self) )
+  CHECK(224, write(&(String){9, 8, "_Dynamic"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -344,8 +365,8 @@ Returncode Expression_write_refman(Expression* self);
 static char* _func_name_Expression_write_refman = "Expression.write-refman";
 #define MR_FUNC_NAME _func_name_Expression_write_refman
 Returncode Expression_write_refman(Expression* self) {
-  CHECK(215, (self)->_base._dtl[3](self) )
-  CHECK(216, write(&(String){8, 7, "_Refman"}) )
+  CHECK(227, (self)->_base._dtl[3](self) )
+  CHECK(228, write(&(String){8, 7, "_Refman"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -358,7 +379,7 @@ static char* _func_name_Expression_write_as_top = "Expression.write-as-top";
 Returncode Expression_write_as_top(Expression* self) {
   Bool top = self->top;
   self->top = true;
-  CHECK(221, (self)->_base._dtl[3](self) )
+  CHECK(233, (self)->_base._dtl[3](self) )
   self->top = top;
   return OK;
 }

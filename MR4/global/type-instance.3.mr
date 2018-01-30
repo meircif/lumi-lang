@@ -157,21 +157,41 @@ static TypeInstance
     else-if self.type-data = glob.type-func and not (? self.arguments)
       node.m-syntax-error-msg(user "missing arguments in function type")
   
-  func inst check-assign-from(user SyntaxTreeNode node):(
-      owner Expression value)
+  func inst check-assign-from(copy Int access, user SyntaxTreeNode node):(
+      owner Expression value, user Expression assignee)
+    assignee := value
     var Int bases
-    value.result-type.check-assign-to(user self, user node):(copy bases)
+    value.result-type.check-assign-to(
+        copy value.access, user self, copy access, user node):(copy bases)
     if bases > 0
       UpCastExpression.init-new(var _, copy bases):(owner value)
   
   func inst check-assign-to(
-      user TypeInstance target, user SyntaxTreeNode node):(copy Int bases)
+      copy Int self-access,
+      user TypeInstance target,
+      copy Int target-access,
+      user SyntaxTreeNode node):(
+      copy Int bases)
     bases := 0
     if not (? self)
       node.m-syntax-error-msg(user "cannot assign void expression")
     if self.type-data = glob.type-empty and
         (not target.type-data.is-primitive or target.type-data = glob.type-func)
       return
+    if target-access = ACCESS-OWNER
+      if self-access != ACCESS-OWNER
+        node.m-syntax-error(
+            user "assigning into an owner a non-owner access",
+            user glob.access-names[self-access])
+      if self.type-data != target.type-data and
+          self.type-data != glob.type-empty and
+          not target.type-data.is-primitive and
+          not target.type-data.is-dynamic
+        node.m-syntax-error2(
+            user "passing ownership of type",
+            user self.type-data.name,
+            user "into static type",
+            user target.type-data.name)
     if self.type-data = glob.type-generic and
         target.type-data = glob.type-generic
       if not self.name.equal(user target.name)
