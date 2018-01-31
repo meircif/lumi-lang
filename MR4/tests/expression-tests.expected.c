@@ -68,7 +68,7 @@ illegal character constant "'aa"
 /// @ t0
 String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(1)
@@ -82,7 +82,7 @@ String aux_String_0_Var = {0};
 /// @ t1
 String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(1)
@@ -109,7 +109,8 @@ MR_dec_ref(t_Refman);
   MR_inc_ref(t_Refman);
   t = NULL;
 /// @ t2
-MR_owner_dec_ref(*so_Refman);
+String_Del(*so);
+  MR_owner_dec_ref(*so_Refman);
   *so_Refman = NULL;
   *so = NULL;
 /// @ t3
@@ -155,7 +156,7 @@ if (str == NULL || str_Refman->value == NULL) RAISE(1)
 /// @ t1
 String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(1)
@@ -175,7 +176,7 @@ if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
 /// @ t3
 Array aux_Array_0_Var = {0};
   Array* aux_Array_0 = NULL;
-  RefManager* aux_Array_0_Refman = NULL;
+  Ref_Manager* aux_Array_0_Refman = NULL;
   aux_Array_0 = &aux_Array_0_Var;
   aux_Array_0_Refman = MR_new_ref(aux_Array_0);
   if (aux_Array_0_Refman == NULL) RAISE(1)
@@ -225,7 +226,7 @@ CHECK(1, fun2(&(*so), &(*so_Refman), &(*io)) )
 /// @ t3
 Int x = 0;
   String* s = NULL;
-  RefManager* s_Refman = NULL;
+  Ref_Manager* s_Refman = NULL;
   CHECK(3, fun2(&(s), &(s_Refman), &(x)) )
 /// @ t4
 CHECK(1, fun3(0, &(*so), &(*so_Refman)) )
@@ -244,13 +245,14 @@ Int aux_Int_0 = 0;
   *io = aux_Int_0;
 /// @ t9
 String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   CHECK(1, fun3(7, &(aux_String_0), &(aux_String_0_Refman)) )
+  String_Del(*so);
   MR_owner_dec_ref(*so_Refman);
   *so_Refman = aux_String_0_Refman;
-  aux_String_0_Refman = NULL;
   *so = aux_String_0;
   aux_String_0 = NULL;
+  aux_String_0_Refman = NULL;
 /// @ t10
 CHECK(1, Test_meth(t, t_Refman) )
 /// @ t11
@@ -272,10 +274,59 @@ CHECK(1, fun1(3, str, str_Refman, *so, *so_Refman) )
   *so_Refman = NULL;
 /// @ t18
 String* aux_String_0 = NULL;
-  RefManager* aux_String_0_Refman = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
   Int aux_Int_0 = 0;
   CHECK(1, fun3(1, &(aux_String_0), &(aux_String_0_Refman)) )
   CHECK(2, fun5(2, &(aux_Int_0)) )
+/// @ t19
+typedef struct Base Base;
+typedef struct Base_Dynamic Base_Dynamic;
+typedef struct Test Test;
+typedef struct Test_Dynamic Test_Dynamic;
+struct Base {
+  Int x;
+};
+struct Base_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic, Base* b, Ref_Manager* b_Refman, Base_Dynamic* b_Dynamic);
+};
+struct Test {
+  Base _base;
+};
+struct Test_Dynamic {
+  Base_Dynamic _base;
+};
+Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic, Base* b, Ref_Manager* b_Refman, Base_Dynamic* b_Dynamic);
+void Base_Del(Base* self);
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Test* t, Ref_Manager* t_Refman, Test_Dynamic* t_Dynamic);
+void Test_Del(Test* self);
+Base_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del, Base_meth};
+Test_Dynamic Test_dynamic = {{(Dynamic_Del)Test_Del, (Func)Test_meth}};
+Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic, Base* b, Ref_Manager* b_Refman, Base_Dynamic* b_Dynamic) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  if (b_Dynamic != NULL) b_Dynamic->_del(b);
+  MR_owner_dec_ref(b_Refman);
+  return MR_err;
+}
+void Base_Del(Base* self) {
+  if (self == NULL) return;
+}
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Test* t, Ref_Manager* t_Refman, Test_Dynamic* t_Dynamic) {
+  Returncode MR_err = OK;
+  CHECK(6, Base_meth(&(self->_base), self_Refman, &(self_Dynamic->_base), &(t->_base), t_Refman, &(t_Dynamic->_base)) )
+  t = NULL;
+  t_Refman = NULL;
+  t_Dynamic = NULL;
+MR_cleanup:
+  if (t_Dynamic != NULL) t_Dynamic->_base._del(t);
+  MR_owner_dec_ref(t_Refman);
+  return MR_err;
+}
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+  Base_Del(&(self->_base));
+}
 /// @ te0
 expected access, got " "
 /// @ te1
@@ -312,6 +363,8 @@ too few parameters
 too many outputs
 /// @ te17
 too few outputs
+/// @ te18
+passing ownership of type "Test" into static type "Base"
 /// @@ test-type-expression
 /// @ t0
 CHECK(1, Test_meth(t, t_Refman) )
@@ -335,30 +388,47 @@ struct Mid {
 struct Top {
   Mid _base;
 };
-Returncode Base_methb(Base* self, RefManager* self_Refman);
-Returncode Mid_methm(Mid* self, RefManager* self_Refman);
-Returncode Top_methb(Top* self, RefManager* self_Refman);
-Returncode Top_methm(Top* self, RefManager* self_Refman);
-Returncode Base_methb(Base* self, RefManager* self_Refman) {
+Returncode Base_methb(Base* self, Ref_Manager* self_Refman);
+void Base_Del(Base* self);
+Returncode Mid_methm(Mid* self, Ref_Manager* self_Refman);
+void Mid_Del(Mid* self);
+Returncode Top_methb(Top* self, Ref_Manager* self_Refman);
+Returncode Top_methm(Top* self, Ref_Manager* self_Refman);
+void Top_Del(Top* self);
+Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
+Generic_Type_Dynamic Mid_dynamic = {(Dynamic_Del)Mid_Del};
+Generic_Type_Dynamic Top_dynamic = {(Dynamic_Del)Top_Del};
+Returncode Base_methb(Base* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mid_methm(Mid* self, RefManager* self_Refman) {
+void Base_Del(Base* self) {
+  if (self == NULL) return;
+}
+Returncode Mid_methm(Mid* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methb(Top* self, RefManager* self_Refman) {
+void Mid_Del(Mid* self) {
+  if (self == NULL) return;
+  Base_Del(&(self->_base));
+}
+Returncode Top_methb(Top* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methm(Top* self, RefManager* self_Refman) {
+Returncode Top_methm(Top* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
   CHECK(9, Mid_methm(&(self->_base), self_Refman) )
 MR_cleanup:
   return MR_err;
+}
+void Top_Del(Top* self) {
+  if (self == NULL) return;
+  Mid_Del(&(self->_base));
 }
 /// @ t1
 typedef struct Base Base;
@@ -373,30 +443,47 @@ struct Mid {
 struct Top {
   Mid _base;
 };
-Returncode Base_methb(Base* self, RefManager* self_Refman);
-Returncode Mid_methm(Mid* self, RefManager* self_Refman);
-Returncode Top_methb(Top* self, RefManager* self_Refman);
-Returncode Top_methm(Top* self, RefManager* self_Refman);
-Returncode Base_methb(Base* self, RefManager* self_Refman) {
+Returncode Base_methb(Base* self, Ref_Manager* self_Refman);
+void Base_Del(Base* self);
+Returncode Mid_methm(Mid* self, Ref_Manager* self_Refman);
+void Mid_Del(Mid* self);
+Returncode Top_methb(Top* self, Ref_Manager* self_Refman);
+Returncode Top_methm(Top* self, Ref_Manager* self_Refman);
+void Top_Del(Top* self);
+Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
+Generic_Type_Dynamic Mid_dynamic = {(Dynamic_Del)Mid_Del};
+Generic_Type_Dynamic Top_dynamic = {(Dynamic_Del)Top_Del};
+Returncode Base_methb(Base* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mid_methm(Mid* self, RefManager* self_Refman) {
+void Base_Del(Base* self) {
+  if (self == NULL) return;
+}
+Returncode Mid_methm(Mid* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methb(Top* self, RefManager* self_Refman) {
+void Mid_Del(Mid* self) {
+  if (self == NULL) return;
+  Base_Del(&(self->_base));
+}
+Returncode Top_methb(Top* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-Returncode Top_methm(Top* self, RefManager* self_Refman) {
+Returncode Top_methm(Top* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
   CHECK(9, Base_methb(&(self->_base._base), self_Refman) )
 MR_cleanup:
   return MR_err;
+}
+void Top_Del(Top* self) {
+  if (self == NULL) return;
+  Mid_Del(&(self->_base));
 }
 /// @ te0
 "base" used not in method
@@ -462,12 +549,13 @@ MR_dec_ref(t_Refman);
   t = &(tc->_base._base._base);
 /// @ t8
 String* s = NULL;
-  RefManager* s_Refman = NULL;
+  Ref_Manager* s_Refman = NULL;
+  String_Del(s);
   MR_owner_dec_ref(s_Refman);
   s_Refman = *so_Refman;
-  *so_Refman = NULL;
   s = *so;
   *so = NULL;
+  *so_Refman = NULL;
 /// @ t9
 MR_dec_ref(str_Refman);
   str_Refman = *so_Refman;
@@ -481,6 +569,18 @@ c = '0' + 4;
 b = fun0 != fun1;
 /// @ t13
 b = b == b;
+/// @ t14
+Tc* otc = NULL;
+  Ref_Manager* otc_Refman = NULL;
+  Tc_Dynamic* otc_Dynamic = NULL;
+  if (tb_Dynamic != NULL) tb_Dynamic->_base._del(tb);
+  MR_owner_dec_ref(tb_Refman);
+  tb_Refman = otc_Refman;
+  tb_Dynamic = &(otc_Dynamic->_base);
+  tb = &(otc->_base);
+  otc = NULL;
+  otc_Refman = NULL;
+  otc_Dynamic = NULL;
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -515,6 +615,8 @@ operator "-=" expected "Int" operand, got "Bool"
 operator "is" is not supported for type "Int"
 /// @ te16
 non matching subtypes "Int" and "Char"
+/// @ te17
+passing ownership of type "Tb" into static type "Test"
 /// @@ test-question-expression
 /// @ t0
 b = !(str == NULL || str_Refman->value == NULL);
@@ -533,7 +635,7 @@ cannot use "?" on type "Int"
 /// @ t0
 Ta a_Var = {{0}};
   Ta* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
   a = &a_Var;
   a_Refman = MR_new_ref(a);
@@ -541,11 +643,11 @@ Ta a_Var = {{0}};
   CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t1
 Ta* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = NULL;
 /// @ t2
 Ta* aux_Ta_0 = NULL;
-  RefManager* aux_Ta_0_Refman = NULL;
+  Ref_Manager* aux_Ta_0_Refman = NULL;
   Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;
   aux_Ta_0 = calloc(1, sizeof(Ta));
   if (aux_Ta_0 == NULL) RAISE(1)
@@ -559,7 +661,7 @@ Ta* aux_Ta_0 = NULL;
   ta = aux_Ta_0;
 /// @ t3
 Ta* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
   a = calloc(1, sizeof(Ta));
   if (a == NULL) RAISE(1)
@@ -568,7 +670,7 @@ Ta* a = NULL;
   CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t4
 Ta* a = NULL;
-  RefManager* a_Refman = NULL;
+  Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = NULL;
   a = ta;
   a_Refman = ta_Refman;
@@ -600,7 +702,7 @@ MR_dec_ref(ta_Refman);
   ta = NULL;
 /// @ t9
 Array* aa = NULL;
-  RefManager* aa_Refman = NULL;
+  Ref_Manager* aa_Refman = NULL;
   if (aa == NULL || aa_Refman->value == NULL) RAISE(2)
   if ((4) < 0 || (4) >= (aa)->length) RAISE(2)
   MR_dec_ref(ta_Refman);
@@ -610,7 +712,7 @@ Array* aa = NULL;
   ta = ((Ta*)((aa)->values)) + 4;
 /// @ t10
 Array* ca = NULL;
-  RefManager* ca_Refman = NULL;
+  Ref_Manager* ca_Refman = NULL;
   if (ca == NULL || ca_Refman->value == NULL) RAISE(2)
   if ((4) < 0 || (4) >= (ca)->length) RAISE(2)
   MR_dec_ref(ta_Refman);
@@ -646,7 +748,7 @@ Returncode (*fun)(Int x, Int* y) = NULL;
   if (fun == NULL) RAISE(3)
   CHECK(3, fun(9, &(x)) )
 /// @ t2
-Returncode (*fun)(Test* self, RefManager* self_Refman) = NULL;
+Returncode (*fun)(Test* self, Ref_Manager* self_Refman) = NULL;
   fun = Test_meth;
   if (fun == NULL) RAISE(2)
   CHECK(2, fun(t, t_Refman) )
@@ -664,7 +766,7 @@ if (t == NULL || t_Refman->value == NULL) RAISE(1)
 Returncode (*farr_Values[38])(void) = {0};
   Array farr_Var = {38, NULL};
   Array* farr = NULL;
-  RefManager* farr_Refman = NULL;
+  Ref_Manager* farr_Refman = NULL;
   farr = &farr_Var;
   farr_Var.values = farr_Values;
   farr_Refman = MR_new_ref(farr);
@@ -737,7 +839,7 @@ CHECK(1, File_putc(fobj, fobj_Refman, c) )
 CHECK(1, File_write(fobj, fobj_Refman, str, str_Refman) )
 /// @ t21
 Array* argv = NULL;
-  RefManager* argv_Refman = NULL;
+  Ref_Manager* argv_Refman = NULL;
   if (sys == NULL || sys_Refman->value == NULL) RAISE(1)
   argv = sys->argv;
   argv_Refman = sys->argv_Refman;

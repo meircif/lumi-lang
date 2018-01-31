@@ -77,7 +77,6 @@ class MemberExpression(SymbolExpression)
   user Expression dynamic-call-self-instance
   var Int bases
   var Bool is-dynamic-call
-  var Bool is-generic-cast
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -211,6 +210,18 @@ class MemberExpression(SymbolExpression)
       self.top := true
     base.write-refman()
     self.top := top
+  
+  func dynamic write-dynamic()
+    var Bool top(self.top)
+    if self.is-generic-cast and not self.top
+      write(user "((")
+      write-cname(user self.result-type.type-data.name)
+      write(user "_Dynamic*)(")
+      self.top := true
+    base.write-dynamic()
+    self.top := top
+    if self.is-generic-cast and not self.top
+      write(user "))")
   
   func inst write-bases()
     write(user "->")

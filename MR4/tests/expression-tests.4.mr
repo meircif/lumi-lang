@@ -186,6 +186,13 @@ fun1(copy 3, user str, owner so)
 ## @ c t18
 fun3(copy 1)
   fun5(copy 2)
+## @ g t19
+class Base
+  var Int x
+  func dynamic meth(owner Base b)
+class Test(Base)
+  func dynamic meth(owner Test t)
+    base(owner t)
 ## @ ec te0
 function( copy 1)
 ## @ ec te1
@@ -222,6 +229,14 @@ fun1()
 fun0()->(copy i)
 ## @ ec te17
 fun2()
+## @ eg te18
+struct Base
+  var Int x
+  func meth(owner Base b)
+struct Test(Base)
+  func meth(owner Test t)
+    base(owner t)
+
 ## @@ test-type-expression
 ## @ c t0
 Test.meth(var t)
@@ -348,6 +363,9 @@ c := '0' + 4
 b := fun0 is-not fun1
 ## @ c t13
 b := b is b
+## @ c t14
+owner Tc otc
+  tb := otc
 ## @ ec te0
 345 @ 2
 ## @ ec te1
@@ -381,7 +399,11 @@ i -= b
 ## @ ec te15
 b := 3 is t
 ## @ ec te16
-user Array{Char} ca(user arr)
+user Array{Char} ca
+  ca := arr
+## @ ec te17
+owner Test ot
+  ot := tb
 ## @@ test-question-expression
 ## @ c t0
 b := str?

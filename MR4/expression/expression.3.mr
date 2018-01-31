@@ -34,6 +34,7 @@ class Expression(SyntaxTreeNode)
   var Bool assignable
   var Bool top
   var Bool is-statement
+  var Bool is-generic-cast
   
   ## Parse any expression
   func inst parse-new(
@@ -205,6 +206,18 @@ class Expression(SyntaxTreeNode)
       self.write-refman()
       self.top := top
       write(user "->value == NULL")
+  
+  func inst write-assign-null()
+    self.code-node.write-spaces()
+    self.write()
+    write(user " = NULL;\n")
+    self.code-node.write-spaces()
+    self.write-refman()
+    write(user " = NULL;\n")
+    if self.result-type.type-data.is-dynamic
+      self.code-node.write-spaces()
+      self.write-dynamic()
+      write(user " = NULL;\n")
   
   func dynamic write-dynamic()
     self.write()

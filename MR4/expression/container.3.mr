@@ -137,6 +137,7 @@ class UnaryExpression(Expression)
 class BinaryExpression(UnaryExpression)
   owner Expression left-expression
   user BinaryExpression binary-left-expression
+  user Expression assignee
   
   func inst parse-new(
       user String ends,
@@ -175,13 +176,9 @@ class BinaryExpression(UnaryExpression)
       self.set-simple-type(user glob.type-bool)
     else-if self.operator.order = 4 and self.operator.group-index = 0
       # := operator
-      self.left-expression.result-type.check-assign-from(user self):(
-          owner self.right-expression)
-      if self.left-expression.access = ACCESS-OWNER and
-          self.right-expression.access != ACCESS-OWNER
-        self.m-syntax-error(
-            user "assigning into an owner a non-owner access",
-            user glob.access-names[self.right-expression.access])
+      self.left-expression.result-type.check-assign-from(
+          copy self.left-expression.access, user self):(
+          owner self.right-expression, user self.assignee)
     else-if self.operator.order = 1 and self.operator.name[0] = 'i'
       # `is`/`is-not` operator
       self.test-not-int(user self.right-expression)
@@ -230,6 +227,8 @@ class BinaryExpression(UnaryExpression)
   
   func inst write-assign-preactions()
     if not self.left-expression.result-type.type-data.is-primitive
+      if self.left-expression.access = ACCESS-OWNER
+        self.write-left-delete()
       write(user "MR_")
       if self.left-expression.access = ACCESS-OWNER
         write(user "owner_")
@@ -249,20 +248,49 @@ class BinaryExpression(UnaryExpression)
         self.left-expression.write-refman()
         write(user ");\n")
         self.code-node.write-spaces()
-        
-      else-if self.right-expression.result-type.type-data != glob.type-empty
-        self.right-expression.write-refman()
-        write(user " = NULL;\n")
-        self.code-node.write-spaces()
     
-    if self.left-expression.result-type.type-data.is-dynamic
+    if self.left-expression.result-type.type-data.is-dynamic or
+        self.left-expression.is-generic-cast
       # also assign Dynamic
       self.left-expression.write-dynamic()
       write(user " = ")
-      self.right-expression.write-dynamic()
+      if not self.right-expression.result-type.type-data.is-dynamic and
+          not self.right-expression.is-generic-cast and
+          self.right-expression.result-type.type-data != glob.type-empty
+        write(user "&")
+        write-cname(user self.right-expression.result-type.type-data.name)
+        write(user "_dynamic")
+      else
+        if (self.left-expression.result-type.type-data = glob.type-generic or
+            self.left-expression.is-generic-cast) and
+            self.right-expression.result-type.type-data != glob.type-generic and
+            not self.right-expression.is-generic-cast
+          write(user "(Generic_Type_Dynamic*)")
+          self.right-expression.top := false
+        self.right-expression.write-dynamic()
       write(user ";\n")
       self.code-node.write-spaces()
-    
+  
+  func inst write-left-delete()
+    user TypeData type-data(self.left-expression.result-type.type-data)
+    if type-data.is-dynamic
+      write(user "if (")
+      self.left-expression.write-dynamic()
+      write(user " != NULL) ")
+      self.left-expression.write-dynamic()
+      write(user "->")
+      do
+        while ? type-data.base-type
+        type-data := type-data.base-type.type-data
+        while type-data.is-dynamic
+        write(user "_base.")
+      write(user "_del(")
+    else
+      write-cname(user type-data.name)
+      write(user "_Del(")
+    self.left-expression.write()
+    write(user ");\n")
+    self.code-node.write-spaces()
   
   func dynamic write()
     self.write-start()
@@ -282,9 +310,7 @@ class BinaryExpression(UnaryExpression)
         self.left-expression.access = ACCESS-OWNER and
         self.right-expression.result-type.type-data != glob.type-empty
       # ownership pass
-      self.code-node.write-spaces()
-      self.right-expression.write()
-      write(user " = NULL;\n")
+      self.assignee.write-assign-null()
 
 
 ## An expression with the "?" operator

@@ -27,36 +27,39 @@ var Int x
  documemtation #~
 
 var Int x
-## @ eg t6
+## @ eg te0
 error 
-## @ ec t7
+## @ ec te1
 1 + 2
-## @ ec t8
+## @ ec te2
 return
   i := 3
-## @ ec t9
+## @ ec te3
 raise
   i := 3
-## @ eg t10
+## @ eg te4
 ~# comment #~?
-## @ eg t11
+## @ eg te5
 main(
 
-## @ eg t12
+## @ eg te6
   struct Test
-## @ eg t13
+## @ eg te7
 func f()
   x :=
     y
-## @ eg t14
+## @ eg te8
 var Int x
-## @ eg t15
+## @ eg te9
 var Int name
 var Int name
 
-## @ eg t16
+## @ eg te10
 func name()
 var Int name
+## @ eg te11
+user Error error
+
 ## @@ test-struct
 ## @ g t0
 struct Test
@@ -129,15 +132,18 @@ struct Error
 ## @ g t0
 class Base
   var Int x
+  owner Base b
   func inst stat()
   func dynamic dyn0()
   func dynamic dyn1()
 class Mid(Base)
   var Int y
+  owner Mid m
   func dynamic dyn0()
   func dynamic dyn2()
 class Top(Mid)
   var Int z
+  owner Top t
   func dynamic dyn0()
     base()
   func dynamic dyn3()
@@ -194,6 +200,25 @@ func name(var String self, copy Int px, user String pu, owner String po)->(
   o := String{12}()
   u := "constant string"
   pu := po[2:6]
+## @ g t8
+struct Struct
+  owner Struct s
+  owner Array{Struct} as
+class Class
+  owner Class c
+  owner Array{Class} ac
+  func dynamic meth()
+func name(
+    owner Struct ps,
+    owner Class pc,
+    owner Array{Struct} pas,
+    owner Array{Class} pac)
+  owner Struct s
+  owner Class c
+  owner Array{Struct} as
+  owner Array{Class} ac
+  owner Array{Int} ai
+  owner Array{File} af
 ## @ g tm0
 main
   var Int x
@@ -426,6 +451,8 @@ new Test tt(copy 3)
 t := Test(copy 3)
 ## @ c t13
 user Tb tt(user tb)
+## @ c t14
+owner Ta ota(owner tb)
 ## @ ec te0
 Int()
 ## @ ec te1
@@ -478,6 +505,8 @@ owner String s(user so)
 owner String s(owner str)
 ## @ ec te23
 var Array{1:Int:Int} a
+## @ ec te24
+owner Test ot(owner tb)
 ## @@ test-comment
 ## @ c t0
 # comment
@@ -668,6 +697,29 @@ test fun0()
 test fun1()
 main
 
+## @ g t8
+mock Test.delete()
+  var Ref r(copy self)
+struct Test
+  user String s
+
+## @ g t9
+mock delete()
+  var Ref r(copy self)
+main
+## @ c tr0
+var Ref r
+## @ c tr1
+var Ref r
+  r := str
+## @ c tr2
+var Ref r
+  r := _
+## @ c tr3
+var Ref r(copy str)
+## @ c tr4
+var Ref r
+  assert r is r
 ## @ ec te0
 assert 3
 ## @ ec te1
@@ -709,6 +761,28 @@ assert
 assert-error
 ## @ eg te13
 mock()
+## @ eg te14
+func fun()
+mock fun()
+mock fun()
+
+## @ eg te15
+struct Test
+  var Int x
+  func fun()
+mock Test.fun()
+mock Test.fun()
+
+## @ eg te16
+mock delete()
+mock delete()
+
+## @ eg te17
+struct Test
+  var Int x
+mock Test.delete()
+mock Test.delete()
+
 ## @@ test-native
 ## @ g tf0
 native func external()
@@ -773,8 +847,8 @@ struct Test{First:Second:Third}
     self.first := first
     self.second := second
     self.third := third
-func use(user String first, user Array{Int} second, user File third)
-  var Test{String:Array{Int}:File} t
+func use(user String first, user Sys second, user File third)
+  var Test{String:Sys:File} t
   t.first := first
   t.second := second
   t.third := third
@@ -798,8 +872,7 @@ var Array{5:Data{String}} ad
 var Array{5:Data{String}} ad
   str := ad[2].arr[3]
 ## @ c t10
-var Data{Array{String}} da
-  str := da.item[1]
+d.set(owner _, user _)
 ## @ c t11
 var Data{Data{Data{String}}} dr
   str := dr.item.item.item
@@ -818,6 +891,13 @@ struct Test{Generic}
   user Test{Generic} next
   func meth()
     self.next := self
+## @ c t18
+var Data{Tb} dt
+  dt.item := tc
+  ta := dt.item
+  owner Tc otc
+  dt.set(owner otc, user _)
+  dt.get()->(user ta)
 ## @ eg teg0
 struct Test{First:Second:Third
 ## @ eg teg1
@@ -877,6 +957,14 @@ struct Test{Generic}
   func meth()
     self.arr := Array{12:Generic}()
 
+## @ eg teg11
+struct Test{First:Second:Third}
+  user First first
+  user Second second
+  user Third third
+func meth(user Test{String:String} t)
+  user Test{String:String:String} error(user t)
+
 ## @ ec tec0
 var Data{Int} error
 ## @ ec tec1
@@ -893,14 +981,8 @@ var Data dg
   d := dg
 ## @ ec tec6
 t := d.item
-## @ eg tec7
-struct Test{First:Second:Third}
-  user First first
-  user Second second
-  user Third third
-func meth(user Test{String:String} t)
-  user Test{String:String:String} error(user t)
-
+## @ ec tec7
+var Data{Array{Int}} error
 ## @@ test-parameter-inheritance
 ## @ g t0
 struct Base{Generic}
@@ -956,23 +1038,23 @@ func use(user String s)
 struct Base{First:Second}
   user First first
   user Second second
-struct Mid{Param:Third}(Base{Param:Array{Int}})
+struct Mid{Param:Third}(Base{Param:Sys})
   user Third third
-  func set(user Param first, user Array{Int} second, user Third third)
+  func set(user Param first, user Sys second, user Third third)
     self.first := first
     self.second := second
     self.third := third
 struct Top{Generic}(Mid{Generic:File})
-  func set(user Generic first, user Array{Int} second, user File third)
+  func set(user Generic first, user Sys second, user File third)
     self.first := first
     self.second := second
     self.third := third
 struct Test(Top{String})
-  func set(user String first, user Array{Int} second, user File third)
+  func set(user String first, user Sys second, user File third)
     self.first := first
     self.second := second
     self.third := third
-func use(user String first, user Array{Int} second, user File third)
+func use(user String first, user Sys second, user File third)
   var Test t
   t.first := first
   t.second := second

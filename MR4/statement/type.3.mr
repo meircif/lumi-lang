@@ -10,6 +10,7 @@ class TypeData(SyntaxTreeNamespace)
   var Bool is-primitive
   var Bool is-dynamic
   var Bool is-ordered
+  var Bool is-delete-mocked
   
   func inst parse-new(copy Bool is-dynamic):(
       copy Char end, owner TypeData new-node)
@@ -223,6 +224,9 @@ class TypeData(SyntaxTreeNamespace)
         self.write-spaces()
         write-cname(user self.base-type.type-data.name)
         write(user "_Dynamic _base;\n")
+      else
+        self.write-spaces()
+        write(user "Dynamic_Del _del;\n")
       user NameMapNode{SyntaxTreeFunction} child(self.dynamic-base-methods.first)
       do
         while ? child
@@ -233,44 +237,78 @@ class TypeData(SyntaxTreeNamespace)
       write(user "};\n")
     self.indentation-spaces := 0
   
-  func inst write-methods-declaration()
+  func dynamic write-methods-declaration()
     self.write-functions-declaration()
+    # void `cname`_Del(`cname`* self);
+    write(user "\nvoid ")
+    write-cname(user self.name)
+    write(user "_Del(")
+    write-cname(user self.name)
+    write(user "* self);\n")
   
-  func inst write-global()
-    # `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
+  func dynamic write-global()
+    write(user "\n")
     if self.is-dynamic
-      write(user "\n")
+      # `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
       write-cname(user self.name)
       write(user "_Dynamic ")
       write-cname(user self.name)
       write(user "_dynamic = ")
       self.write-dynamic-init(user self)
-      write(user ";\n")
+    else
+      # Generic_Type_Dynamic `name`_dynamic = {(Dynamic_Del)`name`_Del};
+      write(user "Generic_Type_Dynamic ")
+      write-cname(user self.name)
+      write(user "_dynamic = {(Dynamic_Del)")
+      write-cname(user self.name)
+      write(user "_Del}")
+    write(user ";\n")
   
   func inst write-dynamic-init(user TypeData type-data)
     write(user "{")
-    var Bool not-first(? type-data.base-type and
-        type-data.base-type.type-data.is-dynamic)
-    if not-first
+    if ? type-data.base-type and type-data.base-type.type-data.is-dynamic
       self.write-dynamic-init(user type-data.base-type.type-data)
+    else
+      write(user "(Dynamic_Del)")
+      write-cname(user self.name)
+      write(user "_Del")
     user NameMapNode{SyntaxTreeFunction} child(type-data.dynamic-base-methods.first)
     do
       while ? child
       user SyntaxTreeFunction method
       self.find-meth(user child.value.name):(user method)
-      if not-first
-        write(user ", ")
+      write(user ", ")
       if method != child.value
         write(user "(Func)")
       write-cname(user method.parent-type.name)
       write(user "_")
       write-cname(user method.name)
-      not-first := true
       child := child.next
     write(user "}")
   
-  func inst write-methods-body()
+  func dynamic write-methods-body()
     self.write-children(user self.functions)
+    # void `cname`_Del(`cname`* self) {
+    #   if (self == NULL) return;
+    #   `base`_Del(self);
+    #   ...
+    # }
+    write(user "\nvoid ")
+    write-cname(user self.name)
+    write(user "_Del(")
+    write-cname(user self.name)
+    write(user "* self) {\n")
+    write(user "  if (self == NULL) return;\n")
+    if ? self.base-type
+      write(user "  ")
+      write-cname(user self.base-type.type-data.name)
+      write(user "_Del(&(self->_base));\n")
+    if self.is-delete-mocked
+      write(user "  IGNORE_ERRORS( ")
+      write-cname(user self.name)
+      write(user "_MockDel(self) )\n")
+    self.write-cleanup(user self)
+    write(user "}\n")
   
   func dynamic write-me(user TypeWriter type-writer)
     type-writer.write(user self)

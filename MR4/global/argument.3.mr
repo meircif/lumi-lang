@@ -111,7 +111,10 @@ class FunctionArguments(SyntaxTreeNode)
   
   func inst add-self-parameter(user TypeData type-data)
     new DeclarationArgument self-args
-    self-args.access := ACCESS-VAR
+    if type-data.is-primitive
+      self-args.access := ACCESS-COPY
+    else
+      self-args.access := ACCESS-VAR
     self-args.set-location()
     new SyntaxTreeVariable in self-args.variable
     string-new-copy(user "self"):(owner self-args.variable.name)
