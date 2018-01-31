@@ -12,28 +12,30 @@ Int x = 0;
 Int x = 0;
 /// @ t5
 Int x = 0;
-/// @ t6
+/// @ te0
 unknown keyword "error"
-/// @ t7
+/// @ te1
 statememnt has no effect
-/// @ t8
+/// @ te2
 unreachable code
-/// @ t9
+/// @ te3
 unreachable code
-/// @ t10
+/// @ te4
 expected new-line in line end, got "?"
-/// @ t11
+/// @ te5
 expected new-line after "main", got "("
-/// @ t12
+/// @ te6
 indentation too big, expected "0" got "2"
-/// @ t13
+/// @ te7
 too short indentation, expected "6" got "4"
-/// @ t14
+/// @ te8
 no new-line before file end
-/// @ t15
+/// @ te9
 redefinition of global variable "name"
-/// @ t16
+/// @ te10
 variable name overrides function "name"
+/// @ te11
+unknown type "Error"
 /// @@ test-struct
 /// @ t0
 typedef struct Test Test;
@@ -329,7 +331,6 @@ Returncode name(String* self, Ref_Manager* self_Refman, Int px, String* pu, Ref_
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
   MR_inc_ref(pu_Refman);
-  MR_inc_ref(po_Refman);
   v = &v_Var;
   v_Var.values = v_Values;
   v_Refman = MR_new_ref(v);
@@ -342,6 +343,7 @@ Returncode name(String* self, Ref_Manager* self_Refman, Int px, String* pu, Ref_
   if (aux_String_0 == NULL) RAISE(8)
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(8)
+  String_Del(o);
   MR_owner_dec_ref(o_Refman);
   o_Refman = aux_String_0_Refman;
   o = aux_String_0;
@@ -446,10 +448,6 @@ Returncode name(Struct* ps, Ref_Manager* ps_Refman, Class* pc, Ref_Manager* pc_R
   Ref_Manager* ai_Refman = NULL;
   Array* af = NULL;
   Ref_Manager* af_Refman = NULL;
-  MR_inc_ref(ps_Refman);
-  MR_inc_ref(pc_Refman);
-  MR_inc_ref(pas_Refman);
-  MR_inc_ref(pac_Refman);
 MR_cleanup:
   ARRAY_DEL(File, af);
   MR_owner_dec_ref(af_Refman);
@@ -458,7 +456,7 @@ MR_cleanup:
   MR_owner_dec_ref(ac_Refman);
   ARRAY_DEL(Struct, as);
   MR_owner_dec_ref(as_Refman);
-  c_Dynamic->_del(c);
+  if (c_Dynamic != NULL) c_Dynamic->_del(c);
   MR_owner_dec_ref(c_Refman);
   Struct_Del(s);
   MR_owner_dec_ref(s_Refman);
@@ -466,13 +464,14 @@ MR_cleanup:
   MR_owner_dec_ref(pac_Refman);
   ARRAY_DEL(Struct, pas);
   MR_owner_dec_ref(pas_Refman);
-  pc_Dynamic->_del(pc);
+  if (pc_Dynamic != NULL) pc_Dynamic->_del(pc);
   MR_owner_dec_ref(pc_Refman);
   Struct_Del(ps);
   MR_owner_dec_ref(ps_Refman);
   return MR_err;
 }
 /// @ tm0
+void Mock_delete(Ref self) {}
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
   Int x = 0;
@@ -733,6 +732,7 @@ String* s = NULL;
   if (s == NULL) RAISE(1)
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(1)
+  String_Del(*so);
   MR_owner_dec_ref(*so_Refman);
   *so_Refman = s_Refman;
   *so = s;
@@ -1271,6 +1271,7 @@ Returncode fun1(void) {
 MR_cleanup:
   return MR_err;
 }
+void Mock_delete(Ref self) {}
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
@@ -1291,6 +1292,7 @@ Returncode fun1(void) {
 MR_cleanup:
   return MR_err;
 }
+void Mock_delete(Ref self) {}
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
@@ -1298,6 +1300,56 @@ USER_MAIN_HEADER {
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
+/// @ t8
+typedef struct Test Test;
+struct Test {
+  String* s;
+  Ref_Manager* s_Refman;
+};
+void Test_Del(Test* self);
+Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
+Returncode Test_MockDel(Ref self);
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+  IGNORE_ERRORS( Test_MockDel(self) )
+  MR_dec_ref(self->s_Refman);
+}
+Returncode Test_MockDel(Ref self) {
+  Returncode MR_err = OK;
+  Ref r = NULL;
+  r = self;
+MR_cleanup:
+  return MR_err;
+}
+/// @ t9
+Returncode Mock_delete(Ref self);
+Returncode Mock_delete(Ref self) {
+  Returncode MR_err = OK;
+  Ref r = NULL;
+  r = self;
+MR_cleanup:
+  return MR_err;
+}
+USER_MAIN_HEADER {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+MAIN_FUNC
+/// @ tr0
+Ref r = NULL;
+/// @ tr1
+Ref r = NULL;
+  r = str;
+/// @ tr2
+Ref r = NULL;
+  r = NULL;
+/// @ tr3
+Ref r = NULL;
+  r = str;
+/// @ tr4
+Ref r = NULL;
+  TEST_ASSERT(2, r == r)
 /// @ te0
 got "Int" expression, expected "Bool"
 /// @ te1
@@ -1326,6 +1378,14 @@ expected space after "assert", got "new-line"
 expected space after "assert-error", got "new-line"
 /// @ te13
 expected space after "mock", got "("
+/// @ te14
+already mocking function "fun"
+/// @ te15
+already mocking function "fun"
+/// @ te16
+already mocking global delete
+/// @ te17
+already mocking delete of type "Test"
 /// @@ test-native
 /// @ tf0
 Returncode external(void);
@@ -1412,7 +1472,6 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   Generic_Type_Dynamic* x_Dynamic = NULL;
   Test* t = NULL;
   Ref_Manager* t_Refman = NULL;
-  MR_inc_ref(item_Refman);
   MR_inc_ref(arr_Refman);
   x = item;
   x_Refman = item_Refman;
@@ -1421,6 +1480,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   item_Refman = NULL;
   item_Dynamic = NULL;
   if (self == NULL || self_Refman->value == NULL) RAISE(6)
+  if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
   MR_owner_dec_ref(self->item_Refman);
   self->item_Refman = x_Refman;
   self->item_Dynamic = x_Dynamic;
@@ -1439,6 +1499,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   if (t_Refman == NULL) RAISE(8)
   if (self == NULL || self_Refman->value == NULL) RAISE(9)
   if (t == NULL || t_Refman->value == NULL) RAISE(9)
+  if (t->item_Dynamic != NULL) t->item_Dynamic->_del(t->item);
   MR_owner_dec_ref(t->item_Refman);
   t->item_Refman = self->item_Refman;
   t->item_Dynamic = self->item_Dynamic;
@@ -1448,6 +1509,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   self->item_Dynamic = NULL;
   if (t == NULL || t_Refman->value == NULL) RAISE(10)
   if (self == NULL || self_Refman->value == NULL) RAISE(10)
+  if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
   MR_owner_dec_ref(self->item_Refman);
   self->item_Refman = t->item_Refman;
   self->item_Dynamic = t->item_Dynamic;
@@ -1458,17 +1520,17 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* item, Re
 MR_cleanup:
   Test_Del(t);
   MR_owner_dec_ref(t_Refman);
-  x_Dynamic->_del(x);
+  if (x_Dynamic != NULL) x_Dynamic->_del(x);
   MR_owner_dec_ref(x_Refman);
   MR_dec_ref(arr_Refman);
-  item_Dynamic->_del(item);
+  if (item_Dynamic != NULL) item_Dynamic->_del(item);
   MR_owner_dec_ref(item_Refman);
   return MR_err;
 }
 void Test_Del(Test* self) {
   if (self == NULL) return;
   MR_dec_ref(self->arr_Refman);
-  self->item_Dynamic->_del(self->item);
+  if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
   MR_owner_dec_ref(self->item_Refman);
 }
 /// @ t1
@@ -1494,7 +1556,7 @@ MR_cleanup:
 }
 void Test_Del(Test* self) {
   if (self == NULL) return;
-  self->item_Dynamic->_del(self->item);
+  if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
   MR_owner_dec_ref(self->item_Refman);
 }
 /// @ t2
@@ -1564,16 +1626,19 @@ Returncode use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_Manage
   MR_dec_ref(t->first_Refman);
   t->first_Refman = first_Refman;
   MR_inc_ref(t->first_Refman);
+  t->first_Dynamic = &String_dynamic;
   t->first = first;
   if (t == NULL || t_Refman->value == NULL) RAISE(12)
   MR_dec_ref(t->second_Refman);
   t->second_Refman = second_Refman;
   MR_inc_ref(t->second_Refman);
+  t->second_Dynamic = &Sys_dynamic;
   t->second = second;
   if (t == NULL || t_Refman->value == NULL) RAISE(13)
   MR_dec_ref(t->third_Refman);
   t->third_Refman = third_Refman;
   MR_inc_ref(t->third_Refman);
+  t->third_Dynamic = &File_dynamic;
   t->third = third;
   CHECK(14, Test_set(t, t_Refman, first, first_Refman, &String_dynamic, second, second_Refman, &Sys_dynamic, third, third_Refman, &File_dynamic) )
 MR_cleanup:
@@ -1608,6 +1673,7 @@ if (d == NULL || d_Refman->value == NULL) RAISE(1)
   MR_dec_ref(d->item_Refman);
   d->item_Refman = str_Refman;
   MR_inc_ref(d->item_Refman);
+  d->item_Dynamic = &String_dynamic;
   d->item = str;
 /// @ t5
 if (d == NULL || d_Refman->value == NULL) RAISE(1)
@@ -1824,6 +1890,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, String* s, Ref_Manager
   MR_dec_ref(self->_base.item_Refman);
   self->_base.item_Refman = s_Refman;
   MR_inc_ref(self->_base.item_Refman);
+  self->_base.item_Dynamic = &String_dynamic;
   self->_base.item = s;
   aux_Test_0 = calloc(1, sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(6)
@@ -1853,6 +1920,7 @@ Returncode use(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(t->_base.item_Refman);
   t->_base.item_Refman = s_Refman;
   MR_inc_ref(t->_base.item_Refman);
+  t->_base.item_Dynamic = &String_dynamic;
   t->_base.item = s;
 MR_cleanup:
   MR_dec_ref(t_Refman);
@@ -1921,6 +1989,7 @@ Returncode use(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(t->_base.item_Refman);
   t->_base.item_Refman = s_Refman;
   MR_inc_ref(t->_base.item_Refman);
+  t->_base.item_Dynamic = &String_dynamic;
   t->_base.item = s;
 MR_cleanup:
   MR_dec_ref(t_Refman);
@@ -1989,6 +2058,7 @@ Returncode Top_set(Top* self, Ref_Manager* self_Refman, String* s, Ref_Manager* 
   MR_dec_ref(self->_base._base.item_Refman);
   self->_base._base.item_Refman = s_Refman;
   MR_inc_ref(self->_base._base.item_Refman);
+  self->_base._base.item_Dynamic = &String_dynamic;
   self->_base._base.item = s;
 MR_cleanup:
   MR_dec_ref(s_Refman);
@@ -2012,6 +2082,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, String* s, Ref_Manager
   MR_dec_ref(self->_base._base._base.item_Refman);
   self->_base._base._base.item_Refman = s_Refman;
   MR_inc_ref(self->_base._base._base.item_Refman);
+  self->_base._base._base.item_Dynamic = &String_dynamic;
   self->_base._base._base.item = s;
   aux_Top_0 = calloc(1, sizeof(Top));
   if (aux_Top_0 == NULL) RAISE(14)
@@ -2055,6 +2126,7 @@ Returncode use(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(t->_base._base._base.item_Refman);
   t->_base._base._base.item_Refman = s_Refman;
   MR_inc_ref(t->_base._base._base.item_Refman);
+  t->_base._base._base.item_Dynamic = &String_dynamic;
   t->_base._base._base.item = s;
 MR_cleanup:
   MR_dec_ref(t_Refman);
@@ -2123,6 +2195,7 @@ Returncode use(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(t->_base.item_Refman);
   t->_base.item_Refman = s_Refman;
   MR_inc_ref(t->_base.item_Refman);
+  t->_base.item_Dynamic = &String_dynamic;
   t->_base.item = s;
 MR_cleanup:
   MR_dec_ref(t_Refman);
@@ -2186,6 +2259,7 @@ Returncode Mid_set(Mid* self, Ref_Manager* self_Refman, Generic_Type* first, Ref
   MR_dec_ref(self->_base.second_Refman);
   self->_base.second_Refman = second_Refman;
   MR_inc_ref(self->_base.second_Refman);
+  self->_base.second_Dynamic = &Sys_dynamic;
   self->_base.second = second;
   if (self == NULL || self_Refman->value == NULL) RAISE(9)
   MR_dec_ref(self->third_Refman);
@@ -2219,11 +2293,13 @@ Returncode Top_set(Top* self, Ref_Manager* self_Refman, Generic_Type* first, Ref
   MR_dec_ref(self->_base._base.second_Refman);
   self->_base._base.second_Refman = second_Refman;
   MR_inc_ref(self->_base._base.second_Refman);
+  self->_base._base.second_Dynamic = &Sys_dynamic;
   self->_base._base.second = second;
   if (self == NULL || self_Refman->value == NULL) RAISE(14)
   MR_dec_ref(self->_base.third_Refman);
   self->_base.third_Refman = third_Refman;
   MR_inc_ref(self->_base.third_Refman);
+  self->_base.third_Dynamic = &File_dynamic;
   self->_base.third = third;
 MR_cleanup:
   MR_dec_ref(third_Refman);
@@ -2244,16 +2320,19 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, String* first, Ref_Man
   MR_dec_ref(self->_base._base._base.first_Refman);
   self->_base._base._base.first_Refman = first_Refman;
   MR_inc_ref(self->_base._base._base.first_Refman);
+  self->_base._base._base.first_Dynamic = &String_dynamic;
   self->_base._base._base.first = first;
   if (self == NULL || self_Refman->value == NULL) RAISE(18)
   MR_dec_ref(self->_base._base._base.second_Refman);
   self->_base._base._base.second_Refman = second_Refman;
   MR_inc_ref(self->_base._base._base.second_Refman);
+  self->_base._base._base.second_Dynamic = &Sys_dynamic;
   self->_base._base._base.second = second;
   if (self == NULL || self_Refman->value == NULL) RAISE(19)
   MR_dec_ref(self->_base._base.third_Refman);
   self->_base._base.third_Refman = third_Refman;
   MR_inc_ref(self->_base._base.third_Refman);
+  self->_base._base.third_Dynamic = &File_dynamic;
   self->_base._base.third = third;
 MR_cleanup:
   MR_dec_ref(third_Refman);
@@ -2280,16 +2359,19 @@ Returncode use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_Manage
   MR_dec_ref(t->_base._base._base.first_Refman);
   t->_base._base._base.first_Refman = first_Refman;
   MR_inc_ref(t->_base._base._base.first_Refman);
+  t->_base._base._base.first_Dynamic = &String_dynamic;
   t->_base._base._base.first = first;
   if (t == NULL || t_Refman->value == NULL) RAISE(23)
   MR_dec_ref(t->_base._base._base.second_Refman);
   t->_base._base._base.second_Refman = second_Refman;
   MR_inc_ref(t->_base._base._base.second_Refman);
+  t->_base._base._base.second_Dynamic = &Sys_dynamic;
   t->_base._base._base.second = second;
   if (t == NULL || t_Refman->value == NULL) RAISE(24)
   MR_dec_ref(t->_base._base.third_Refman);
   t->_base._base.third_Refman = third_Refman;
   MR_inc_ref(t->_base._base.third_Refman);
+  t->_base._base.third_Dynamic = &File_dynamic;
   t->_base._base.third = third;
 MR_cleanup:
   MR_dec_ref(t_Refman);
@@ -2339,6 +2421,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* g, Ref_M
   MR_dec_ref(self->_base.item_Refman);
   self->_base.item_Refman = sg_Refman;
   MR_inc_ref(self->_base.item_Refman);
+  self->_base.item_Dynamic = &Second_dynamic;
   self->_base.item = sg;
   if (self == NULL || self_Refman->value == NULL) RAISE(8)
   if (self->_base.item == NULL || self->_base.item_Refman->value == NULL) RAISE(8)
@@ -2370,12 +2453,14 @@ Returncode use(String* s, Ref_Manager* s_Refman, Second* ss, Ref_Manager* ss_Ref
   MR_dec_ref(t->_base.item_Refman);
   t->_base.item_Refman = ss_Refman;
   MR_inc_ref(t->_base.item_Refman);
+  t->_base.item_Dynamic = &Second_dynamic;
   t->_base.item = ss;
   if (t == NULL || t_Refman->value == NULL) RAISE(12)
   if (t->_base.item == NULL || t->_base.item_Refman->value == NULL) RAISE(12)
   MR_dec_ref(((Second*)(t->_base.item))->item_Refman);
   ((Second*)(t->_base.item))->item_Refman = s_Refman;
   MR_inc_ref(((Second*)(t->_base.item))->item_Refman);
+  ((Second*)(t->_base.item))->item_Dynamic = &String_dynamic;
   ((Second*)(t->_base.item))->item = s;
 MR_cleanup:
   MR_dec_ref(t_Refman);

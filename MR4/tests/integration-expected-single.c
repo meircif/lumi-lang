@@ -235,6 +235,7 @@ Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, Str
       if (aux_TestStruct_0_Refman == NULL) RAISE(198)
       CHECK(198, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman) )
       if (self == NULL || self_Refman->value == NULL) RAISE(198)
+      TestStruct_Del(self->ts);
       MR_owner_dec_ref(self->ts_Refman);
       self->ts_Refman = aux_TestStruct_0_Refman;
       self->ts = aux_TestStruct_0;
@@ -472,6 +473,7 @@ Returncode Container_iter(Container* self, Ref_Manager* self_Refman, ContainerIt
   aux_ContainerIterator_0_Refman = MR_new_ref(aux_ContainerIterator_0);
   if (aux_ContainerIterator_0_Refman == NULL) RAISE(440)
   CHECK(440, ContainerIterator_new(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, self->next, self->next_Refman) )
+  ContainerIterator_Del(*iter);
   MR_owner_dec_ref(*iter_Refman);
   *iter_Refman = aux_ContainerIterator_0_Refman;
   *iter = aux_ContainerIterator_0;
@@ -1241,12 +1243,12 @@ MR_cleanup:
   MR_owner_dec_ref(aux_Array_0_Refman);
   String_Del(aux_String_1);
   MR_owner_dec_ref(aux_String_1_Refman);
-  aux_TestClass_0_Dynamic->_del(aux_TestClass_0);
+  if (aux_TestClass_0_Dynamic != NULL) aux_TestClass_0_Dynamic->_del(aux_TestClass_0);
   MR_owner_dec_ref(aux_TestClass_0_Refman);
   TestStruct_Del(aux_TestStruct_0);
   MR_owner_dec_ref(aux_TestStruct_0_Refman);
   MR_dec_ref(aux_String_0_Refman);
-  idn_Dynamic->_del(idn);
+  if (idn_Dynamic != NULL) idn_Dynamic->_del(idn);
   MR_owner_dec_ref(idn_Refman);
   MR_dec_ref(idv_Refman);
   TestStruct_Del(itn);
@@ -1266,7 +1268,7 @@ MR_cleanup:
   MR_owner_dec_ref(ian_Refman);
   String_Del(sn);
   MR_owner_dec_ref(sn_Refman);
-  dn_Dynamic->_del(dn);
+  if (dn_Dynamic != NULL) dn_Dynamic->_del(dn);
   MR_owner_dec_ref(dn_Refman);
   TestStruct_Del(tn);
   MR_owner_dec_ref(tn_Refman);
@@ -1322,7 +1324,6 @@ MR_cleanup:
 Returncode f_test_params(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
-  MR_inc_ref(o_Refman);
   RAISE(233)
 MR_cleanup:
   String_Del(o);
@@ -1417,6 +1418,7 @@ Returncode test_call_expression(void) {
   CHECK(261, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
   CHECK(262, f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
+  String_Del(s);
   MR_owner_dec_ref(s_Refman);
   s_Refman = aux_String_1_Refman;
   s = aux_String_1;
@@ -1664,7 +1666,6 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-remove"
 Returncode f_remove(String* s, Ref_Manager* s_Refman) {
   Returncode MR_err = OK;
-  MR_inc_ref(s_Refman);
 MR_cleanup:
   String_Del(s);
   MR_owner_dec_ref(s_Refman);
@@ -1716,6 +1717,7 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(d->item_Refman);
   d->item_Refman = s_Refman;
   MR_inc_ref(d->item_Refman);
+  d->item_Dynamic = &String_dynamic;
   d->item = s;
   if (d == NULL || d_Refman->value == NULL) RAISE(375)
   MR_dec_ref(s_Refman);
@@ -1784,6 +1786,7 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(t->_base._base._base.item_Refman);
   t->_base._base._base.item_Refman = s_Refman;
   MR_inc_ref(t->_base._base._base.item_Refman);
+  t->_base._base._base.item_Dynamic = &String_dynamic;
   t->_base._base._base.item = s;
   if (t == NULL || t_Refman->value == NULL) RAISE(392)
   MR_dec_ref(t->_base._base._base.arr_Refman);
@@ -1794,11 +1797,13 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(t->_base._base.second_Refman);
   t->_base._base.second_Refman = dt_Refman;
   MR_inc_ref(t->_base._base.second_Refman);
+  t->_base._base.second_Dynamic = &Data_dynamic;
   t->_base._base.second = dt;
   if (t == NULL || t_Refman->value == NULL) RAISE(394)
   MR_dec_ref(t->_base._base.third_Refman);
   t->_base._base.third_Refman = ts_Refman;
   MR_inc_ref(t->_base._base.third_Refman);
+  t->_base._base.third_Dynamic = &TestStruct_dynamic;
   t->_base._base.third = ts;
 MR_cleanup:
   MR_dec_ref(ts_Refman);
@@ -2533,6 +2538,8 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+
+void Mock_delete(Ref self) {}
 
 /* main function */
 

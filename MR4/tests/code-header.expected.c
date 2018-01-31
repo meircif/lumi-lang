@@ -153,11 +153,10 @@ void Tc_Del(Tc* self) {
 }
 Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, Ref_Manager* arr_Refman) {
   Returncode MR_err = OK;
-  MR_inc_ref(item_Refman);
   MR_inc_ref(arr_Refman);
 MR_cleanup:
   MR_dec_ref(arr_Refman);
-  item_Dynamic->_del(item);
+  if (item_Dynamic != NULL) item_Dynamic->_del(item);
   MR_owner_dec_ref(item_Refman);
   return MR_err;
 }
@@ -179,7 +178,6 @@ MR_cleanup:
 Returncode fun1(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
-  MR_inc_ref(o_Refman);
 MR_cleanup:
   String_Del(o);
   MR_owner_dec_ref(o_Refman);

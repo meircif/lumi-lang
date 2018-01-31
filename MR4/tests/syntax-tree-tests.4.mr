@@ -27,36 +27,39 @@ var Int x
  documemtation #~
 
 var Int x
-## @ eg t6
+## @ eg te0
 error 
-## @ ec t7
+## @ ec te1
 1 + 2
-## @ ec t8
+## @ ec te2
 return
   i := 3
-## @ ec t9
+## @ ec te3
 raise
   i := 3
-## @ eg t10
+## @ eg te4
 ~# comment #~?
-## @ eg t11
+## @ eg te5
 main(
 
-## @ eg t12
+## @ eg te6
   struct Test
-## @ eg t13
+## @ eg te7
 func f()
   x :=
     y
-## @ eg t14
+## @ eg te8
 var Int x
-## @ eg t15
+## @ eg te9
 var Int name
 var Int name
 
-## @ eg t16
+## @ eg te10
 func name()
 var Int name
+## @ eg te11
+user Error error
+
 ## @@ test-struct
 ## @ g t0
 struct Test
@@ -694,6 +697,29 @@ test fun0()
 test fun1()
 main
 
+## @ g t8
+mock Test.delete()
+  var Ref r(copy self)
+struct Test
+  user String s
+
+## @ g t9
+mock delete()
+  var Ref r(copy self)
+main
+## @ c tr0
+var Ref r
+## @ c tr1
+var Ref r
+  r := str
+## @ c tr2
+var Ref r
+  r := _
+## @ c tr3
+var Ref r(copy str)
+## @ c tr4
+var Ref r
+  assert r is r
 ## @ ec te0
 assert 3
 ## @ ec te1
@@ -735,6 +761,28 @@ assert
 assert-error
 ## @ eg te13
 mock()
+## @ eg te14
+func fun()
+mock fun()
+mock fun()
+
+## @ eg te15
+struct Test
+  var Int x
+  func fun()
+mock Test.fun()
+mock Test.fun()
+
+## @ eg te16
+mock delete()
+mock delete()
+
+## @ eg te17
+struct Test
+  var Int x
+mock Test.delete()
+mock Test.delete()
+
 ## @@ test-native
 ## @ g tf0
 native func external()

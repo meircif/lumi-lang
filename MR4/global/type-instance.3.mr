@@ -178,6 +178,8 @@ static TypeInstance
     if self.type-data = glob.type-empty and
         (not target.type-data.is-primitive or target.type-data = glob.type-func)
       return
+    if target.type-data = glob.type-ref and not self.type-data.is-primitive
+      return
     if target-access = ACCESS-OWNER
       if self-access != ACCESS-OWNER
         node.m-syntax-error(

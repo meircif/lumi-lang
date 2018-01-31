@@ -36,9 +36,12 @@ typedef Returncode (*Func)();
 
 typedef FILE File;
 
+typedef void* Ref;
+
 typedef struct {
   int count;
   void* value;
+  void* ref;
 } Ref_Manager;
 
 typedef void (*Dynamic_Del)(void*);
@@ -69,6 +72,9 @@ void MR_trace_print(
 #define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
   MR_trace_print(MR_traceline_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
   RETURN_ERROR(_err); } }
+
+#define IGNORE_ERRORS(call) \
+  ++MR_trace_ignore_count; (void)call; --MR_trace_ignore_count;
 
 #define TEST_FAIL(line) START_TRACE(line, FAIL, MR_assert_format)
 

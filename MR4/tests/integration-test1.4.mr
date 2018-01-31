@@ -118,3 +118,158 @@ test test-dynamic-type-parameters()
   tbase := _
   dmid.get()->(user tbase)
   assert tbase.num-base = 13
+
+
+struct Link
+  owner Link next
+
+class BaseLink
+  owner BaseLink next
+  user Link link
+  
+  func dynamic m-meth()
+    # do nothing
+
+class TopLink{Generic}(BaseLink)
+  owner Generic item
+
+struct RefNode
+  owner RefNode next
+  var Ref ref
+  
+  func new(copy Ref ref, owner RefNode next)
+    self.ref := ref
+    self.next := next
+
+var Bool record-delete
+owner RefNode deleted-links
+owner RefNode deleted-base-links
+owner RefNode deleted-top-links
+owner RefNode deleted-refmans
+
+mock delete()
+  if record-delete
+    deleted-refmans := RefNode(copy self, owner deleted-refmans)
+
+mock Link.delete()
+  if record-delete
+    deleted-links := RefNode(copy self, owner deleted-links)
+
+mock BaseLink.delete()
+  if record-delete
+    deleted-base-links := RefNode(copy self, owner deleted-base-links)
+
+mock TopLink.delete()
+  if record-delete
+    deleted-top-links := RefNode(copy self, owner deleted-top-links)
+
+func f-remove-obj(owner Link b)
+  # remove b
+
+test test-simple-delete()
+  assert not deleted-refmans?
+  assert not deleted-links?
+  record-delete := true
+  
+  new Link l
+  user Link l-user(user l)
+  assert l?
+  assert l-user?
+  var Ref l-ref(copy l)
+  f-remove-obj(owner l)
+  assert not l?
+  assert not l-user?
+  assert not deleted-refmans?
+  assert deleted-links?
+  assert deleted-links.ref is l-ref
+  assert not deleted-links.next?
+  l-user := _
+  assert deleted-refmans?
+  assert deleted-refmans.ref is l-ref
+  assert not deleted-refmans.next?
+  
+  record-delete := false
+  deleted-refmans := _
+  deleted-links := _
+
+func f-has-ref(copy Ref ref)->(owner RefNode node)
+  f-has-ref-rec(copy ref)->(owner node)
+  f-has-ref-rec(copy ref)->(owner deleted-refmans)
+
+func f-has-ref-rec(copy Ref ref)->(owner RefNode node)
+  assert node?
+  if node.ref is ref
+    owner RefNode next(owner node.next)
+    node := next
+  else
+    f-has-ref-rec(copy ref)->(owner node.next)
+
+test test-complex-delete()
+  assert not deleted-refmans?
+  assert not deleted-links?
+  assert not deleted-base-links?
+  assert not deleted-top-links?
+  record-delete := true
+  
+  new BaseLink b1
+  var Ref b1-ref(copy b1)
+  new BaseLink b2
+  var Ref b2-ref(copy b2)
+  new TopLink{Link} t1
+  var Ref t1-ref(copy t1)
+  new TopLink{BaseLink} t2
+  var Ref t2-ref(copy t2)
+  new TopLink{BaseLink} t3
+  var Ref t3-ref(copy t3)
+  new Link l1
+  var Ref l1-ref(copy l1)
+  new Link l2
+  var Ref l2-ref(copy l2)
+  new Link l3
+  var Ref l3-ref(copy l3)
+  
+  b1.link := l1
+  b2.link := l2
+  t1.link := l1
+  t2.link := l2
+  t3.link := l3
+  
+  l2.next := l3
+  assert not l3?
+  l1.next := l2
+  assert not l2?
+  t3.item := b2
+  assert not b2?
+  t2.item := t3
+  assert not t3?
+  t1.next := t2
+  assert not t2?
+  t1.item := l1
+  assert not l1?
+  b1.next := t1
+  assert not t1?
+  
+  assert not deleted-refmans?
+  assert not deleted-links?
+  assert not deleted-base-links?
+  assert not deleted-top-links?
+  b1 := _
+  assert not b1?
+  
+  record-delete := false
+  f-has-ref(copy b1-ref)->(owner deleted-base-links)
+  f-has-ref(copy t1-ref)->(owner deleted-top-links)
+  f-has-ref-rec(copy t1-ref)->(owner deleted-base-links)
+  f-has-ref(copy t2-ref)->(owner deleted-top-links)
+  f-has-ref-rec(copy t2-ref)->(owner deleted-base-links)
+  f-has-ref(copy t3-ref)->(owner deleted-top-links)
+  f-has-ref-rec(copy t3-ref)->(owner deleted-base-links)
+  f-has-ref(copy b2-ref)->(owner deleted-base-links)
+  f-has-ref(copy l1-ref)->(owner deleted-links)
+  f-has-ref(copy l2-ref)->(owner deleted-links)
+  f-has-ref(copy l3-ref)->(owner deleted-links)
+  
+  assert not deleted-refmans?
+  assert not deleted-links?
+  assert not deleted-base-links?
+  assert not deleted-top-links?

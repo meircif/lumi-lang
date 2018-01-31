@@ -338,37 +338,43 @@ Returncode SyntaxTreeBranch_write_owner_reference_cleanup(SyntaxTreeBranch* self
   }
   else {
     if (variable->type_instance->type_data->is_dynamic) {
+      CHECK(188, write(&(String){5, 4, "if ("}) )
       if (NULL != type_data) {
-        CHECK(189, write(&(String){7, 6, "self->"}) )
+        CHECK(190, write(&(String){7, 6, "self->"}) )
       }
-      CHECK(190, write_cname(variable->name) )
-      CHECK(191, write(&(String){11, 10, "_Dynamic->"}) )
+      CHECK(191, write_cname(variable->name) )
+      CHECK(192, write(&(String){19, 18, "_Dynamic != NULL) "}) )
+      if (NULL != type_data) {
+        CHECK(194, write(&(String){7, 6, "self->"}) )
+      }
+      CHECK(195, write_cname(variable->name) )
+      CHECK(196, write(&(String){11, 10, "_Dynamic->"}) )
       TypeData* base_data = item_type_data;
       while (true) {
         if (!(NULL != base_data->base_type)) break;
         base_data = base_data->base_type->type_data;
         if (!(base_data->is_dynamic)) break;
-        CHECK(197, write(&(String){7, 6, "_base."}) )
+        CHECK(202, write(&(String){7, 6, "_base."}) )
       }
-      CHECK(198, write(&(String){6, 5, "_del("}) )
+      CHECK(203, write(&(String){6, 5, "_del("}) )
     }
     else {
       if (variable->type_instance->type_data == &(glob->type_array->_base)) {
-        CHECK(200, write(&(String){11, 10, "ARRAY_DEL("}) )
-        CHECK(201, write_cname(item_type_data->name) )
-        CHECK(202, write(&(String){3, 2, ", "}) )
+        CHECK(205, write(&(String){11, 10, "ARRAY_DEL("}) )
+        CHECK(206, write_cname(item_type_data->name) )
+        CHECK(207, write(&(String){3, 2, ", "}) )
       }
       else {
-        CHECK(204, write_cname(item_type_data->name) )
-        CHECK(205, write(&(String){6, 5, "_Del("}) )
+        CHECK(209, write_cname(item_type_data->name) )
+        CHECK(210, write(&(String){6, 5, "_Del("}) )
       }
     }
   }
   if (NULL != type_data) {
-    CHECK(207, write(&(String){7, 6, "self->"}) )
+    CHECK(212, write(&(String){7, 6, "self->"}) )
   }
-  CHECK(208, write_cname(variable->name) )
-  CHECK(209, write(&(String){4, 3, ");\n"}) )
+  CHECK(213, write_cname(variable->name) )
+  CHECK(214, write(&(String){4, 3, ");\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -396,9 +402,9 @@ Returncode SyntaxTreeNamespace_init(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_init = "SyntaxTreeNamespace.init";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_init
 Returncode SyntaxTreeNamespace_init(SyntaxTreeNamespace* self) {
-  CHECK(217, SyntaxTreeBranch_init(&(self->_base)) )
+  CHECK(222, SyntaxTreeBranch_init(&(self->_base)) )
   self->functions = malloc(sizeof(List));
-  if (self->functions == NULL) RAISE(218)
+  if (self->functions == NULL) RAISE(223)
   *self->functions = (List){NULL, NULL};
   return OK;
 }
@@ -410,14 +416,14 @@ Returncode SyntaxTreeNamespace_parse_if_function(SyntaxTreeNamespace* self, Stri
 static char* _func_name_SyntaxTreeNamespace_parse_if_function = "SyntaxTreeNamespace.parse-if-function";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_parse_if_function
 Returncode SyntaxTreeNamespace_parse_if_function(SyntaxTreeNamespace* self, String* keyword, TypeData* parent_type, Char* end, Bool* is_func) {
-  CHECK(223, String_equal(keyword, &(String){5, 4, "func"}, &((*is_func))) )
+  CHECK(228, String_equal(keyword, &(String){5, 4, "func"}, &((*is_func))) )
   if ((*is_func)) {
     if ((*end) != ' ') {
-      CHECK(226, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){33, 32, "expected space after \"func\", got"}, (*end)) )
+      CHECK(231, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){33, 32, "expected space after \"func\", got"}, (*end)) )
     }
     SyntaxTreeFunction* _SyntaxTreeFunction88;
-    CHECK(228, SyntaxTreeFunction_parse_new(NULL, parent_type, &((*end)), &(_SyntaxTreeFunction88)) )
-    CHECK(228, List_add(self->functions, _SyntaxTreeFunction88) )
+    CHECK(233, SyntaxTreeFunction_parse_new(NULL, parent_type, &((*end)), &(_SyntaxTreeFunction88)) )
+    CHECK(233, List_add(self->functions, _SyntaxTreeFunction88) )
   }
   return OK;
 }
@@ -433,7 +439,7 @@ Returncode SyntaxTreeNamespace_find_function(SyntaxTreeNamespace* self, String* 
   while (true) {
     if (!(NULL != child)) break;
     Bool _Bool89;
-    CHECK(235, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool89)) )
+    CHECK(240, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool89)) )
     if (_Bool89) {
       (*function) = ((SyntaxTreeFunction*)(child->item));
       return OK;
@@ -451,8 +457,8 @@ Returncode SyntaxTreeNamespace_link_types(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_link_types = "SyntaxTreeNamespace.link-types";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_link_types
 Returncode SyntaxTreeNamespace_link_types(SyntaxTreeNamespace* self) {
-  CHECK(242, SyntaxTreeBranch_link_types(&(self->_base)) )
-  CHECK(243, SyntaxTreeNode_link_children_types(&(self->_base._base), self->functions) )
+  CHECK(247, SyntaxTreeBranch_link_types(&(self->_base)) )
+  CHECK(248, SyntaxTreeNode_link_children_types(&(self->_base._base), self->functions) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -463,8 +469,8 @@ Returncode SyntaxTreeNamespace_analyze(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_analyze = "SyntaxTreeNamespace.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNamespace_analyze
 Returncode SyntaxTreeNamespace_analyze(SyntaxTreeNamespace* self) {
-  CHECK(246, SyntaxTreeBranch_analyze(&(self->_base)) )
-  CHECK(247, SyntaxTreeNode_analyze_children(&(self->_base._base), self->functions) )
+  CHECK(251, SyntaxTreeBranch_analyze(&(self->_base)) )
+  CHECK(252, SyntaxTreeNode_analyze_children(&(self->_base._base), self->functions) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -478,7 +484,7 @@ Returncode SyntaxTreeNamespace_write_functions_declaration(SyntaxTreeNamespace* 
   ListNode* child = self->functions->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(253, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[8](((SyntaxTreeFunction*)(child->item))) )
+    CHECK(258, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[8](((SyntaxTreeFunction*)(child->item))) )
     child = child->next;
   }
   return OK;

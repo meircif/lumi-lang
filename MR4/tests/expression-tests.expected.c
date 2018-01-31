@@ -109,7 +109,8 @@ MR_dec_ref(t_Refman);
   MR_inc_ref(t_Refman);
   t = NULL;
 /// @ t2
-MR_owner_dec_ref(*so_Refman);
+String_Del(*so);
+  MR_owner_dec_ref(*so_Refman);
   *so_Refman = NULL;
   *so = NULL;
 /// @ t3
@@ -246,6 +247,7 @@ Int aux_Int_0 = 0;
 String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   CHECK(1, fun3(7, &(aux_String_0), &(aux_String_0_Refman)) )
+  String_Del(*so);
   MR_owner_dec_ref(*so_Refman);
   *so_Refman = aux_String_0_Refman;
   *so = aux_String_0;
@@ -302,9 +304,8 @@ Base_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del, Base_meth};
 Test_Dynamic Test_dynamic = {{(Dynamic_Del)Test_Del, (Func)Test_meth}};
 Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic, Base* b, Ref_Manager* b_Refman, Base_Dynamic* b_Dynamic) {
   Returncode MR_err = OK;
-  MR_inc_ref(b_Refman);
 MR_cleanup:
-  b_Dynamic->_del(b);
+  if (b_Dynamic != NULL) b_Dynamic->_del(b);
   MR_owner_dec_ref(b_Refman);
   return MR_err;
 }
@@ -313,13 +314,12 @@ void Base_Del(Base* self) {
 }
 Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Test* t, Ref_Manager* t_Refman, Test_Dynamic* t_Dynamic) {
   Returncode MR_err = OK;
-  MR_inc_ref(t_Refman);
   CHECK(6, Base_meth(&(self->_base), self_Refman, &(self_Dynamic->_base), &(t->_base), t_Refman, &(t_Dynamic->_base)) )
   t = NULL;
   t_Refman = NULL;
   t_Dynamic = NULL;
 MR_cleanup:
-  t_Dynamic->_base._del(t);
+  if (t_Dynamic != NULL) t_Dynamic->_base._del(t);
   MR_owner_dec_ref(t_Refman);
   return MR_err;
 }
@@ -550,6 +550,7 @@ MR_dec_ref(t_Refman);
 /// @ t8
 String* s = NULL;
   Ref_Manager* s_Refman = NULL;
+  String_Del(s);
   MR_owner_dec_ref(s_Refman);
   s_Refman = *so_Refman;
   s = *so;
@@ -572,6 +573,7 @@ b = b == b;
 Tc* otc = NULL;
   Ref_Manager* otc_Refman = NULL;
   Tc_Dynamic* otc_Dynamic = NULL;
+  if (tb_Dynamic != NULL) tb_Dynamic->_base._del(tb);
   MR_owner_dec_ref(tb_Refman);
   tb_Refman = otc_Refman;
   tb_Dynamic = &(otc_Dynamic->_base);

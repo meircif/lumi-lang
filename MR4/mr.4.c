@@ -122,6 +122,7 @@ Ref_Manager* MR_new_ref(void* value) {
   if (ref != NULL) {
     ref->count = 1;
     ref->value = value;
+    ref->ref = value;
   }
   return ref;
 }
@@ -132,9 +133,12 @@ void MR_inc_ref(Ref_Manager* ref) {
   }
 }
 
+void Mock_delete(Ref);
+
 void dec_ref(Ref_Manager* ref) {
   --ref->count;
   if (ref->count == 0) {
+    Mock_delete(ref->ref);
     free(ref);
   }
 }

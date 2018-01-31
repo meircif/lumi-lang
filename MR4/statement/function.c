@@ -374,7 +374,7 @@ Returncode SyntaxTreeFunction_write_setup(SyntaxTreeFunction* self) {
   ListNode* node = self->arguments->parameters->first;
   while (true) {
     if (!(NULL != node)) break;
-    if (((Argument*)(node->item))->access == ACCESS_USER || ((Argument*)(node->item))->access == ACCESS_OWNER) {
+    if (((Argument*)(node->item))->access == ACCESS_USER) {
       CHECK(183, write(&(String){14, 13, "  MR_inc_ref("}) )
       SyntaxTreeVariable* _SyntaxTreeVariable122;
       CHECK(184, (((Argument*)(node->item)))->_base._dtl[8](((Argument*)(node->item)), &(_SyntaxTreeVariable122)) )

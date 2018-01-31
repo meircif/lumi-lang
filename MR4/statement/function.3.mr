@@ -179,7 +179,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     user ListNode{Argument} node(self.arguments.parameters.first)
     do
       while ? node
-      if node.item.access = ACCESS-USER or node.item.access = ACCESS-OWNER
+      if node.item.access = ACCESS-USER
         write(user "  MR_inc_ref(")
         write-cname(user node.item.get-variable().name)
         write(user "_Refman);\n")

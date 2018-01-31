@@ -102,7 +102,10 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       delete self.name
     else
       self.mocked-name := self.name
-    string-new-concat(user "Mock ", user self.mocked-name):(owner self.name)
+    if ? self.type-name and self.mocked-name.equal(user "delete")
+      string-new-copy(user "MockDel"):(owner self.name)
+    else
+      string-new-concat(user "Mock ", user self.mocked-name):(owner self.name)
   
   func dynamic check-name()
     # do not check
@@ -111,19 +114,35 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
     user SyntaxTreeFunction mocked-func
     if ? self.type-name
       self.find-type(user self.type-name):(user self.parent-type)
-      self.parent-type.find-meth(user self.mocked-name):(user mocked-func)
-      if not (? mocked-func)
-        self.m-syntax-error2(
-            user "mocking unknown method",
-            user self.mocked-name,
-            user "of type",
-            user self.type-name)
-      self.arguments.add-self-parameter(user self.parent-type)
+      if self.mocked-name.equal(user "delete")
+        if self.parent-type.is-delete-mocked
+          self.m-syntax-error(
+              user "already mocking delete of type", user self.type-name)
+        self.parent-type.is-delete-mocked := true
+        self.arguments.add-self-parameter(user glob.type-ref)
+      else
+        self.parent-type.find-meth(user self.mocked-name):(user mocked-func)
+        if not (? mocked-func)
+          self.m-syntax-error2(
+              user "mocking unknown method",
+              user self.mocked-name,
+              user "of type",
+              user self.type-name)
+        self.arguments.add-self-parameter(user self.parent-type)
+    else-if self.mocked-name.equal(user "delete")
+      if glob.is-delete-mocked
+        self.m-syntax-error-msg(user "already mocking global delete")
+      glob.is-delete-mocked := true
+      self.arguments.add-self-parameter(user glob.type-ref)
     else
       glob.root.find-function(user self.mocked-name):(user mocked-func)
       if not (? mocked-func)
         self.m-syntax-error(
             user "mocking unknown function", user self.mocked-name)
-    self.arguments.check-same-as(user mocked-func.arguments, user _, copy 0)
-    mocked-func.mocker-function := self
+    if ? mocked-func
+      if ? mocked-func.mocker-function
+        self.m-syntax-error(
+            user "already mocking function", user self.mocked-name)
+      self.arguments.check-same-as(user mocked-func.arguments, user _, copy 0)
+      mocked-func.mocker-function := self
     base.analyze()

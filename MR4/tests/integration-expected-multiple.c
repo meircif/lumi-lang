@@ -35,6 +35,18 @@ typedef struct TopType_Dynamic TopType_Dynamic;
 
 typedef void* Native;
 
+typedef struct Link Link;
+
+typedef struct BaseLink BaseLink;
+
+typedef struct BaseLink_Dynamic BaseLink_Dynamic;
+
+typedef struct TopLink TopLink;
+
+typedef struct TopLink_Dynamic TopLink_Dynamic;
+
+typedef struct RefNode RefNode;
+
 
 /* types struct */
 
@@ -151,6 +163,41 @@ struct TopType_Dynamic {
   Returncode (*meth6)(TopType* self, Ref_Manager* self_Refman, TopType_Dynamic* self_Dynamic);
 };
 
+struct Link {
+  Link* next;
+  Ref_Manager* next_Refman;
+};
+
+struct BaseLink {
+  BaseLink* next;
+  Ref_Manager* next_Refman;
+  BaseLink_Dynamic* next_Dynamic;
+  Link* link;
+  Ref_Manager* link_Refman;
+};
+
+struct BaseLink_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*m_meth)(BaseLink* self, Ref_Manager* self_Refman, BaseLink_Dynamic* self_Dynamic);
+};
+
+struct TopLink {
+  BaseLink _base;
+  Generic_Type* item;
+  Ref_Manager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
+};
+
+struct TopLink_Dynamic {
+  BaseLink_Dynamic _base;
+};
+
+struct RefNode {
+  RefNode* next;
+  Ref_Manager* next_Refman;
+  Ref ref;
+};
+
 
 /* types methods declaration */
 
@@ -236,6 +283,18 @@ Returncode TopType_meth6(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
 
 void TopType_Del(TopType* self);
 
+void Link_Del(Link* self);
+
+Returncode BaseLink_m_meth(BaseLink* self, Ref_Manager* self_Refman, BaseLink_Dynamic* self_Dynamic);
+
+void BaseLink_Del(BaseLink* self);
+
+void TopLink_Del(TopLink* self);
+
+Returncode RefNode_new(RefNode* self, Ref_Manager* self_Refman, Ref ref, RefNode* next, Ref_Manager* next_Refman);
+
+void RefNode_Del(RefNode* self);
+
 
 /* types global variables */
 
@@ -261,6 +320,14 @@ MiddleType_Dynamic MiddleType_dynamic = {{(Dynamic_Del)MiddleType_Del, BaseType_
 
 TopType_Dynamic TopType_dynamic = {{{(Dynamic_Del)TopType_Del, BaseType_meth0, (Func)MiddleType_meth1, (Func)TopType_meth2, (Func)TopType_meth3}, MiddleType_meth4, (Func)TopType_meth5}, TopType_meth6};
 
+Generic_Type_Dynamic Link_dynamic = {(Dynamic_Del)Link_Del};
+
+BaseLink_Dynamic BaseLink_dynamic = {(Dynamic_Del)BaseLink_Del, BaseLink_m_meth};
+
+TopLink_Dynamic TopLink_dynamic = {{(Dynamic_Del)TopLink_Del, BaseLink_m_meth}};
+
+Generic_Type_Dynamic RefNode_dynamic = {(Dynamic_Del)RefNode_Del};
+
 
 /* global variables */
 
@@ -270,6 +337,20 @@ String* global_string = NULL;
 Ref_Manager* global_string_Refman = NULL;
 
 extern Int external_int;
+
+Bool record_delete = 0;
+
+RefNode* deleted_links = NULL;
+Ref_Manager* deleted_links_Refman = NULL;
+
+RefNode* deleted_base_links = NULL;
+Ref_Manager* deleted_base_links_Refman = NULL;
+
+RefNode* deleted_top_links = NULL;
+Ref_Manager* deleted_top_links_Refman = NULL;
+
+RefNode* deleted_refmans = NULL;
+Ref_Manager* deleted_refmans_Refman = NULL;
 
 
 /* global functions declaration */
@@ -338,6 +419,24 @@ Returncode test_native(void);
 
 Returncode test_dynamic_type_parameters(void);
 
+Returncode Mock_delete(Ref self);
+
+Returncode Link_MockDel(Ref self);
+
+Returncode BaseLink_MockDel(Ref self);
+
+Returncode TopLink_MockDel(Ref self);
+
+Returncode f_remove_obj(Link* b, Ref_Manager* b_Refman);
+
+Returncode test_simple_delete(void);
+
+Returncode f_has_ref(Ref ref, RefNode** node, Ref_Manager** node_Refman);
+
+Returncode f_has_ref_rec(Ref ref, RefNode** node, Ref_Manager** node_Refman);
+
+Returncode test_complex_delete(void);
+
 
 /* types methods body */
 
@@ -362,6 +461,7 @@ Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, Str
       if (aux_TestStruct_0_Refman == NULL) RAISE(198)
       CHECK(198, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman) )
       if (self == NULL || self_Refman->value == NULL) RAISE(198)
+      TestStruct_Del(self->ts);
       MR_owner_dec_ref(self->ts_Refman);
       self->ts_Refman = aux_TestStruct_0_Refman;
       self->ts = aux_TestStruct_0;
@@ -599,6 +699,7 @@ Returncode Container_iter(Container* self, Ref_Manager* self_Refman, ContainerIt
   aux_ContainerIterator_0_Refman = MR_new_ref(aux_ContainerIterator_0);
   if (aux_ContainerIterator_0_Refman == NULL) RAISE(440)
   CHECK(440, ContainerIterator_new(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, self->next, self->next_Refman) )
+  ContainerIterator_Del(*iter);
   MR_owner_dec_ref(*iter_Refman);
   *iter_Refman = aux_ContainerIterator_0_Refman;
   *iter = aux_ContainerIterator_0;
@@ -1049,6 +1150,66 @@ void TopType_Del(TopType* self) {
   MiddleType_Del(&(self->_base));
   MR_dec_ref(self->top_mid_ref_Refman);
   MR_dec_ref(self->top_base_ref_Refman);
+}
+
+void Link_Del(Link* self) {
+  if (self == NULL) return;
+  IGNORE_ERRORS( Link_MockDel(self) )
+  SELF_REF_DEL(Link, next);
+  MR_owner_dec_ref(self->next_Refman);
+}
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseLink.m-meth"
+Returncode BaseLink_m_meth(BaseLink* self, Ref_Manager* self_Refman, BaseLink_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+void BaseLink_Del(BaseLink* self) {
+  if (self == NULL) return;
+  IGNORE_ERRORS( BaseLink_MockDel(self) )
+  MR_dec_ref(self->link_Refman);
+  DYN_SELF_REF_DEL(BaseLink, _, next);
+  MR_owner_dec_ref(self->next_Refman);
+}
+
+void TopLink_Del(TopLink* self) {
+  if (self == NULL) return;
+  BaseLink_Del(&(self->_base));
+  IGNORE_ERRORS( TopLink_MockDel(self) )
+  if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
+  MR_owner_dec_ref(self->item_Refman);
+}
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "RefNode.new"
+Returncode RefNode_new(RefNode* self, Ref_Manager* self_Refman, Ref ref, RefNode* next, Ref_Manager* next_Refman) {
+  Returncode MR_err = OK;
+  if (self == NULL || self_Refman->value == NULL) RAISE(141)
+  self->ref = ref;
+  if (self == NULL || self_Refman->value == NULL) RAISE(142)
+  RefNode_Del(self->next);
+  MR_owner_dec_ref(self->next_Refman);
+  self->next_Refman = next_Refman;
+  self->next = next;
+  next = NULL;
+  next_Refman = NULL;
+MR_cleanup:
+  RefNode_Del(next);
+  MR_owner_dec_ref(next_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+void RefNode_Del(RefNode* self) {
+  if (self == NULL) return;
+  SELF_REF_DEL(RefNode, next);
+  MR_owner_dec_ref(self->next_Refman);
 }
 
 
@@ -1733,12 +1894,12 @@ MR_cleanup:
   MR_owner_dec_ref(aux_Array_0_Refman);
   String_Del(aux_String_1);
   MR_owner_dec_ref(aux_String_1_Refman);
-  aux_TestClass_0_Dynamic->_del(aux_TestClass_0);
+  if (aux_TestClass_0_Dynamic != NULL) aux_TestClass_0_Dynamic->_del(aux_TestClass_0);
   MR_owner_dec_ref(aux_TestClass_0_Refman);
   TestStruct_Del(aux_TestStruct_0);
   MR_owner_dec_ref(aux_TestStruct_0_Refman);
   MR_dec_ref(aux_String_0_Refman);
-  idn_Dynamic->_del(idn);
+  if (idn_Dynamic != NULL) idn_Dynamic->_del(idn);
   MR_owner_dec_ref(idn_Refman);
   MR_dec_ref(idv_Refman);
   TestStruct_Del(itn);
@@ -1758,7 +1919,7 @@ MR_cleanup:
   MR_owner_dec_ref(ian_Refman);
   String_Del(sn);
   MR_owner_dec_ref(sn_Refman);
-  dn_Dynamic->_del(dn);
+  if (dn_Dynamic != NULL) dn_Dynamic->_del(dn);
   MR_owner_dec_ref(dn_Refman);
   TestStruct_Del(tn);
   MR_owner_dec_ref(tn_Refman);
@@ -1814,7 +1975,6 @@ MR_cleanup:
 Returncode f_test_params(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
-  MR_inc_ref(o_Refman);
   RAISE(233)
 MR_cleanup:
   String_Del(o);
@@ -1909,6 +2069,7 @@ Returncode test_call_expression(void) {
   CHECK(261, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
   CHECK(262, Mock_f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
+  String_Del(s);
   MR_owner_dec_ref(s_Refman);
   s_Refman = aux_String_1_Refman;
   s = aux_String_1;
@@ -2156,7 +2317,6 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-remove"
 Returncode f_remove(String* s, Ref_Manager* s_Refman) {
   Returncode MR_err = OK;
-  MR_inc_ref(s_Refman);
 MR_cleanup:
   String_Del(s);
   MR_owner_dec_ref(s_Refman);
@@ -2208,6 +2368,7 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(d->item_Refman);
   d->item_Refman = s_Refman;
   MR_inc_ref(d->item_Refman);
+  d->item_Dynamic = &String_dynamic;
   d->item = s;
   if (d == NULL || d_Refman->value == NULL) RAISE(375)
   MR_dec_ref(s_Refman);
@@ -2276,6 +2437,7 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(t->_base._base._base.item_Refman);
   t->_base._base._base.item_Refman = s_Refman;
   MR_inc_ref(t->_base._base._base.item_Refman);
+  t->_base._base._base.item_Dynamic = &String_dynamic;
   t->_base._base._base.item = s;
   if (t == NULL || t_Refman->value == NULL) RAISE(392)
   MR_dec_ref(t->_base._base._base.arr_Refman);
@@ -2286,11 +2448,13 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_dec_ref(t->_base._base.second_Refman);
   t->_base._base.second_Refman = dt_Refman;
   MR_inc_ref(t->_base._base.second_Refman);
+  t->_base._base.second_Dynamic = &Data_dynamic;
   t->_base._base.second = dt;
   if (t == NULL || t_Refman->value == NULL) RAISE(394)
   MR_dec_ref(t->_base._base.third_Refman);
   t->_base._base.third_Refman = ts_Refman;
   MR_inc_ref(t->_base._base.third_Refman);
+  t->_base._base.third_Dynamic = &TestStruct_dynamic;
   t->_base._base.third = ts;
 MR_cleanup:
   MR_dec_ref(ts_Refman);
@@ -3043,7 +3207,7 @@ Returncode test_mid_out(MiddleType** mt, Ref_Manager** mt_Refman, MiddleType_Dyn
   *mt_Dynamic = new_mt_Dynamic;
   *mt = new_mt;
 MR_cleanup:
-  new_mt_Dynamic->_base._del(new_mt);
+  if (new_mt_Dynamic != NULL) new_mt_Dynamic->_base._del(new_mt);
   MR_owner_dec_ref(new_mt_Refman);
   return MR_err;
 }
@@ -3248,12 +3412,463 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "Mock delete"
+Returncode Mock_delete(Ref self) {
+  Returncode MR_err = OK;
+  RefNode* aux_RefNode_0 = NULL;
+  Ref_Manager* aux_RefNode_0_Refman = NULL;
+  if (record_delete) {
+    aux_RefNode_0 = calloc(1, sizeof(RefNode));
+    if (aux_RefNode_0 == NULL) RAISE(152)
+    aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
+    if (aux_RefNode_0_Refman == NULL) RAISE(152)
+    CHECK(152, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_refmans, deleted_refmans_Refman) )
+    deleted_refmans = NULL;
+    deleted_refmans_Refman = NULL;
+    RefNode_Del(deleted_refmans);
+    MR_owner_dec_ref(deleted_refmans_Refman);
+    deleted_refmans_Refman = aux_RefNode_0_Refman;
+    deleted_refmans = aux_RefNode_0;
+    aux_RefNode_0 = NULL;
+    aux_RefNode_0_Refman = NULL;
+  }
+MR_cleanup:
+  RefNode_Del(aux_RefNode_0);
+  MR_owner_dec_ref(aux_RefNode_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "Link.MockDel"
+Returncode Link_MockDel(Ref self) {
+  Returncode MR_err = OK;
+  RefNode* aux_RefNode_0 = NULL;
+  Ref_Manager* aux_RefNode_0_Refman = NULL;
+  if (record_delete) {
+    aux_RefNode_0 = calloc(1, sizeof(RefNode));
+    if (aux_RefNode_0 == NULL) RAISE(156)
+    aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
+    if (aux_RefNode_0_Refman == NULL) RAISE(156)
+    CHECK(156, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_links, deleted_links_Refman) )
+    deleted_links = NULL;
+    deleted_links_Refman = NULL;
+    RefNode_Del(deleted_links);
+    MR_owner_dec_ref(deleted_links_Refman);
+    deleted_links_Refman = aux_RefNode_0_Refman;
+    deleted_links = aux_RefNode_0;
+    aux_RefNode_0 = NULL;
+    aux_RefNode_0_Refman = NULL;
+  }
+MR_cleanup:
+  RefNode_Del(aux_RefNode_0);
+  MR_owner_dec_ref(aux_RefNode_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseLink.MockDel"
+Returncode BaseLink_MockDel(Ref self) {
+  Returncode MR_err = OK;
+  RefNode* aux_RefNode_0 = NULL;
+  Ref_Manager* aux_RefNode_0_Refman = NULL;
+  if (record_delete) {
+    aux_RefNode_0 = calloc(1, sizeof(RefNode));
+    if (aux_RefNode_0 == NULL) RAISE(160)
+    aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
+    if (aux_RefNode_0_Refman == NULL) RAISE(160)
+    CHECK(160, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_base_links, deleted_base_links_Refman) )
+    deleted_base_links = NULL;
+    deleted_base_links_Refman = NULL;
+    RefNode_Del(deleted_base_links);
+    MR_owner_dec_ref(deleted_base_links_Refman);
+    deleted_base_links_Refman = aux_RefNode_0_Refman;
+    deleted_base_links = aux_RefNode_0;
+    aux_RefNode_0 = NULL;
+    aux_RefNode_0_Refman = NULL;
+  }
+MR_cleanup:
+  RefNode_Del(aux_RefNode_0);
+  MR_owner_dec_ref(aux_RefNode_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "TopLink.MockDel"
+Returncode TopLink_MockDel(Ref self) {
+  Returncode MR_err = OK;
+  RefNode* aux_RefNode_0 = NULL;
+  Ref_Manager* aux_RefNode_0_Refman = NULL;
+  if (record_delete) {
+    aux_RefNode_0 = calloc(1, sizeof(RefNode));
+    if (aux_RefNode_0 == NULL) RAISE(164)
+    aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
+    if (aux_RefNode_0_Refman == NULL) RAISE(164)
+    CHECK(164, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_top_links, deleted_top_links_Refman) )
+    deleted_top_links = NULL;
+    deleted_top_links_Refman = NULL;
+    RefNode_Del(deleted_top_links);
+    MR_owner_dec_ref(deleted_top_links_Refman);
+    deleted_top_links_Refman = aux_RefNode_0_Refman;
+    deleted_top_links = aux_RefNode_0;
+    aux_RefNode_0 = NULL;
+    aux_RefNode_0_Refman = NULL;
+  }
+MR_cleanup:
+  RefNode_Del(aux_RefNode_0);
+  MR_owner_dec_ref(aux_RefNode_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "f-remove-obj"
+Returncode f_remove_obj(Link* b, Ref_Manager* b_Refman) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  Link_Del(b);
+  MR_owner_dec_ref(b_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "test-simple-delete"
+Returncode test_simple_delete(void) {
+  Returncode MR_err = OK;
+  Link* l = NULL;
+  Ref_Manager* l_Refman = NULL;
+  Link* l_user = NULL;
+  Ref_Manager* l_user_Refman = NULL;
+  Ref l_ref = NULL;
+  TEST_ASSERT(170, ! (!(deleted_refmans == NULL || deleted_refmans_Refman->value == NULL)))
+  TEST_ASSERT(171, ! (!(deleted_links == NULL || deleted_links_Refman->value == NULL)))
+  record_delete = true;
+  l = calloc(1, sizeof(Link));
+  if (l == NULL) RAISE(174)
+  l_Refman = MR_new_ref(l);
+  if (l_Refman == NULL) RAISE(174)
+  l_user = l;
+  l_user_Refman = l_Refman;
+  MR_inc_ref(l_user_Refman);
+  TEST_ASSERT(176, !(l == NULL || l_Refman->value == NULL))
+  TEST_ASSERT(177, !(l_user == NULL || l_user_Refman->value == NULL))
+  l_ref = l;
+  CHECK(179, f_remove_obj(l, l_Refman) )
+  l = NULL;
+  l_Refman = NULL;
+  TEST_ASSERT(180, ! (!(l == NULL || l_Refman->value == NULL)))
+  TEST_ASSERT(181, ! (!(l_user == NULL || l_user_Refman->value == NULL)))
+  TEST_ASSERT(182, ! (!(deleted_refmans == NULL || deleted_refmans_Refman->value == NULL)))
+  TEST_ASSERT(183, !(deleted_links == NULL || deleted_links_Refman->value == NULL))
+  if (deleted_links == NULL || deleted_links_Refman->value == NULL) RAISE(184)
+  TEST_ASSERT(184, deleted_links->ref == l_ref)
+  if (deleted_links == NULL || deleted_links_Refman->value == NULL) RAISE(185)
+  TEST_ASSERT(185, ! (!(deleted_links->next == NULL || deleted_links->next_Refman->value == NULL)))
+  MR_dec_ref(l_user_Refman);
+  l_user_Refman = NULL;
+  MR_inc_ref(l_user_Refman);
+  l_user = NULL;
+  TEST_ASSERT(187, !(deleted_refmans == NULL || deleted_refmans_Refman->value == NULL))
+  if (deleted_refmans == NULL || deleted_refmans_Refman->value == NULL) RAISE(188)
+  TEST_ASSERT(188, deleted_refmans->ref == l_ref)
+  if (deleted_refmans == NULL || deleted_refmans_Refman->value == NULL) RAISE(189)
+  TEST_ASSERT(189, ! (!(deleted_refmans->next == NULL || deleted_refmans->next_Refman->value == NULL)))
+  record_delete = false;
+  RefNode_Del(deleted_refmans);
+  MR_owner_dec_ref(deleted_refmans_Refman);
+  deleted_refmans_Refman = NULL;
+  deleted_refmans = NULL;
+  RefNode_Del(deleted_links);
+  MR_owner_dec_ref(deleted_links_Refman);
+  deleted_links_Refman = NULL;
+  deleted_links = NULL;
+MR_cleanup:
+  MR_dec_ref(l_user_Refman);
+  Link_Del(l);
+  MR_owner_dec_ref(l_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "f-has-ref"
+Returncode f_has_ref(Ref ref, RefNode** node, Ref_Manager** node_Refman) {
+  Returncode MR_err = OK;
+  CHECK(196, f_has_ref_rec(ref, &(*node), &(*node_Refman)) )
+  CHECK(197, f_has_ref_rec(ref, &(deleted_refmans), &(deleted_refmans_Refman)) )
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "f-has-ref-rec"
+Returncode f_has_ref_rec(Ref ref, RefNode** node, Ref_Manager** node_Refman) {
+  Returncode MR_err = OK;
+  RefNode* next = NULL;
+  Ref_Manager* next_Refman = NULL;
+  TEST_ASSERT(200, !(*node == NULL || (*node_Refman)->value == NULL))
+  if (*node == NULL || (*node_Refman)->value == NULL) RAISE(201)
+  if ((*node)->ref == ref) {
+    if (*node == NULL || (*node_Refman)->value == NULL) RAISE(202)
+    next = (*node)->next;
+    next_Refman = (*node)->next_Refman;
+    (*node)->next = NULL;
+    (*node)->next_Refman = NULL;
+    RefNode_Del(*node);
+    MR_owner_dec_ref(*node_Refman);
+    *node_Refman = next_Refman;
+    *node = next;
+    next = NULL;
+    next_Refman = NULL;
+  }
+  else {
+    if (*node == NULL || (*node_Refman)->value == NULL) RAISE(205)
+    CHECK(205, f_has_ref_rec(ref, &((*node)->next), &((*node)->next_Refman)) )
+  }
+MR_cleanup:
+  RefNode_Del(next);
+  MR_owner_dec_ref(next_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "test-complex-delete"
+Returncode test_complex_delete(void) {
+  Returncode MR_err = OK;
+  BaseLink* b1 = NULL;
+  Ref_Manager* b1_Refman = NULL;
+  BaseLink_Dynamic* b1_Dynamic = &BaseLink_dynamic;
+  Ref b1_ref = NULL;
+  BaseLink* b2 = NULL;
+  Ref_Manager* b2_Refman = NULL;
+  BaseLink_Dynamic* b2_Dynamic = &BaseLink_dynamic;
+  Ref b2_ref = NULL;
+  TopLink* t1 = NULL;
+  Ref_Manager* t1_Refman = NULL;
+  TopLink_Dynamic* t1_Dynamic = &TopLink_dynamic;
+  Ref t1_ref = NULL;
+  TopLink* t2 = NULL;
+  Ref_Manager* t2_Refman = NULL;
+  TopLink_Dynamic* t2_Dynamic = &TopLink_dynamic;
+  Ref t2_ref = NULL;
+  TopLink* t3 = NULL;
+  Ref_Manager* t3_Refman = NULL;
+  TopLink_Dynamic* t3_Dynamic = &TopLink_dynamic;
+  Ref t3_ref = NULL;
+  Link* l1 = NULL;
+  Ref_Manager* l1_Refman = NULL;
+  Ref l1_ref = NULL;
+  Link* l2 = NULL;
+  Ref_Manager* l2_Refman = NULL;
+  Ref l2_ref = NULL;
+  Link* l3 = NULL;
+  Ref_Manager* l3_Refman = NULL;
+  Ref l3_ref = NULL;
+  TEST_ASSERT(208, ! (!(deleted_refmans == NULL || deleted_refmans_Refman->value == NULL)))
+  TEST_ASSERT(209, ! (!(deleted_links == NULL || deleted_links_Refman->value == NULL)))
+  TEST_ASSERT(210, ! (!(deleted_base_links == NULL || deleted_base_links_Refman->value == NULL)))
+  TEST_ASSERT(211, ! (!(deleted_top_links == NULL || deleted_top_links_Refman->value == NULL)))
+  record_delete = true;
+  b1 = calloc(1, sizeof(BaseLink));
+  if (b1 == NULL) RAISE(214)
+  b1_Refman = MR_new_ref(b1);
+  if (b1_Refman == NULL) RAISE(214)
+  b1_ref = b1;
+  b2 = calloc(1, sizeof(BaseLink));
+  if (b2 == NULL) RAISE(216)
+  b2_Refman = MR_new_ref(b2);
+  if (b2_Refman == NULL) RAISE(216)
+  b2_ref = b2;
+  t1 = calloc(1, sizeof(TopLink));
+  if (t1 == NULL) RAISE(218)
+  t1_Refman = MR_new_ref(t1);
+  if (t1_Refman == NULL) RAISE(218)
+  t1_ref = t1;
+  t2 = calloc(1, sizeof(TopLink));
+  if (t2 == NULL) RAISE(220)
+  t2_Refman = MR_new_ref(t2);
+  if (t2_Refman == NULL) RAISE(220)
+  t2_ref = t2;
+  t3 = calloc(1, sizeof(TopLink));
+  if (t3 == NULL) RAISE(222)
+  t3_Refman = MR_new_ref(t3);
+  if (t3_Refman == NULL) RAISE(222)
+  t3_ref = t3;
+  l1 = calloc(1, sizeof(Link));
+  if (l1 == NULL) RAISE(224)
+  l1_Refman = MR_new_ref(l1);
+  if (l1_Refman == NULL) RAISE(224)
+  l1_ref = l1;
+  l2 = calloc(1, sizeof(Link));
+  if (l2 == NULL) RAISE(226)
+  l2_Refman = MR_new_ref(l2);
+  if (l2_Refman == NULL) RAISE(226)
+  l2_ref = l2;
+  l3 = calloc(1, sizeof(Link));
+  if (l3 == NULL) RAISE(228)
+  l3_Refman = MR_new_ref(l3);
+  if (l3_Refman == NULL) RAISE(228)
+  l3_ref = l3;
+  if (b1 == NULL || b1_Refman->value == NULL) RAISE(231)
+  MR_dec_ref(b1->link_Refman);
+  b1->link_Refman = l1_Refman;
+  MR_inc_ref(b1->link_Refman);
+  b1->link = l1;
+  if (b2 == NULL || b2_Refman->value == NULL) RAISE(232)
+  MR_dec_ref(b2->link_Refman);
+  b2->link_Refman = l2_Refman;
+  MR_inc_ref(b2->link_Refman);
+  b2->link = l2;
+  if (t1 == NULL || t1_Refman->value == NULL) RAISE(233)
+  MR_dec_ref(t1->_base.link_Refman);
+  t1->_base.link_Refman = l1_Refman;
+  MR_inc_ref(t1->_base.link_Refman);
+  t1->_base.link = l1;
+  if (t2 == NULL || t2_Refman->value == NULL) RAISE(234)
+  MR_dec_ref(t2->_base.link_Refman);
+  t2->_base.link_Refman = l2_Refman;
+  MR_inc_ref(t2->_base.link_Refman);
+  t2->_base.link = l2;
+  if (t3 == NULL || t3_Refman->value == NULL) RAISE(235)
+  MR_dec_ref(t3->_base.link_Refman);
+  t3->_base.link_Refman = l3_Refman;
+  MR_inc_ref(t3->_base.link_Refman);
+  t3->_base.link = l3;
+  if (l2 == NULL || l2_Refman->value == NULL) RAISE(237)
+  Link_Del(l2->next);
+  MR_owner_dec_ref(l2->next_Refman);
+  l2->next_Refman = l3_Refman;
+  l2->next = l3;
+  l3 = NULL;
+  l3_Refman = NULL;
+  TEST_ASSERT(238, ! (!(l3 == NULL || l3_Refman->value == NULL)))
+  if (l1 == NULL || l1_Refman->value == NULL) RAISE(239)
+  Link_Del(l1->next);
+  MR_owner_dec_ref(l1->next_Refman);
+  l1->next_Refman = l2_Refman;
+  l1->next = l2;
+  l2 = NULL;
+  l2_Refman = NULL;
+  TEST_ASSERT(240, ! (!(l2 == NULL || l2_Refman->value == NULL)))
+  if (t3 == NULL || t3_Refman->value == NULL) RAISE(241)
+  if (t3->item_Dynamic != NULL) t3->item_Dynamic->_del(t3->item);
+  MR_owner_dec_ref(t3->item_Refman);
+  t3->item_Refman = b2_Refman;
+  t3->item_Dynamic = (Generic_Type_Dynamic*)b2_Dynamic;
+  t3->item = b2;
+  b2 = NULL;
+  b2_Refman = NULL;
+  b2_Dynamic = NULL;
+  TEST_ASSERT(242, ! (!(b2 == NULL || b2_Refman->value == NULL)))
+  if (t2 == NULL || t2_Refman->value == NULL) RAISE(243)
+  if (t2->item_Dynamic != NULL) t2->item_Dynamic->_del(t2->item);
+  MR_owner_dec_ref(t2->item_Refman);
+  t2->item_Refman = t3_Refman;
+  t2->item_Dynamic = (Generic_Type_Dynamic*)&(t3_Dynamic->_base);
+  t2->item = &(t3->_base);
+  t3 = NULL;
+  t3_Refman = NULL;
+  t3_Dynamic = NULL;
+  TEST_ASSERT(244, ! (!(t3 == NULL || t3_Refman->value == NULL)))
+  if (t1 == NULL || t1_Refman->value == NULL) RAISE(245)
+  if (t1->_base.next_Dynamic != NULL) t1->_base.next_Dynamic->_del(t1->_base.next);
+  MR_owner_dec_ref(t1->_base.next_Refman);
+  t1->_base.next_Refman = t2_Refman;
+  t1->_base.next_Dynamic = &(t2_Dynamic->_base);
+  t1->_base.next = &(t2->_base);
+  t2 = NULL;
+  t2_Refman = NULL;
+  t2_Dynamic = NULL;
+  TEST_ASSERT(246, ! (!(t2 == NULL || t2_Refman->value == NULL)))
+  if (t1 == NULL || t1_Refman->value == NULL) RAISE(247)
+  Link_Del(t1->item);
+  MR_owner_dec_ref(t1->item_Refman);
+  t1->item_Refman = l1_Refman;
+  t1->item_Dynamic = &Link_dynamic;
+  t1->item = l1;
+  l1 = NULL;
+  l1_Refman = NULL;
+  TEST_ASSERT(248, ! (!(l1 == NULL || l1_Refman->value == NULL)))
+  if (b1 == NULL || b1_Refman->value == NULL) RAISE(249)
+  if (b1->next_Dynamic != NULL) b1->next_Dynamic->_del(b1->next);
+  MR_owner_dec_ref(b1->next_Refman);
+  b1->next_Refman = t1_Refman;
+  b1->next_Dynamic = &(t1_Dynamic->_base);
+  b1->next = &(t1->_base);
+  t1 = NULL;
+  t1_Refman = NULL;
+  t1_Dynamic = NULL;
+  TEST_ASSERT(250, ! (!(t1 == NULL || t1_Refman->value == NULL)))
+  TEST_ASSERT(252, ! (!(deleted_refmans == NULL || deleted_refmans_Refman->value == NULL)))
+  TEST_ASSERT(253, ! (!(deleted_links == NULL || deleted_links_Refman->value == NULL)))
+  TEST_ASSERT(254, ! (!(deleted_base_links == NULL || deleted_base_links_Refman->value == NULL)))
+  TEST_ASSERT(255, ! (!(deleted_top_links == NULL || deleted_top_links_Refman->value == NULL)))
+  if (b1_Dynamic != NULL) b1_Dynamic->_del(b1);
+  MR_owner_dec_ref(b1_Refman);
+  b1_Refman = NULL;
+  b1_Dynamic = NULL;
+  b1 = NULL;
+  TEST_ASSERT(257, ! (!(b1 == NULL || b1_Refman->value == NULL)))
+  record_delete = false;
+  CHECK(260, f_has_ref(b1_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(261, f_has_ref(t1_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  CHECK(262, f_has_ref_rec(t1_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(263, f_has_ref(t2_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  CHECK(264, f_has_ref_rec(t2_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(265, f_has_ref(t3_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  CHECK(266, f_has_ref_rec(t3_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(267, f_has_ref(b2_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(268, f_has_ref(l1_ref, &(deleted_links), &(deleted_links_Refman)) )
+  CHECK(269, f_has_ref(l2_ref, &(deleted_links), &(deleted_links_Refman)) )
+  CHECK(270, f_has_ref(l3_ref, &(deleted_links), &(deleted_links_Refman)) )
+  TEST_ASSERT(272, ! (!(deleted_refmans == NULL || deleted_refmans_Refman->value == NULL)))
+  TEST_ASSERT(273, ! (!(deleted_links == NULL || deleted_links_Refman->value == NULL)))
+  TEST_ASSERT(274, ! (!(deleted_base_links == NULL || deleted_base_links_Refman->value == NULL)))
+  TEST_ASSERT(275, ! (!(deleted_top_links == NULL || deleted_top_links_Refman->value == NULL)))
+MR_cleanup:
+  Link_Del(l3);
+  MR_owner_dec_ref(l3_Refman);
+  Link_Del(l2);
+  MR_owner_dec_ref(l2_Refman);
+  Link_Del(l1);
+  MR_owner_dec_ref(l1_Refman);
+  if (t3_Dynamic != NULL) t3_Dynamic->_base._del(t3);
+  MR_owner_dec_ref(t3_Refman);
+  if (t2_Dynamic != NULL) t2_Dynamic->_base._del(t2);
+  MR_owner_dec_ref(t2_Refman);
+  if (t1_Dynamic != NULL) t1_Dynamic->_base._del(t1);
+  MR_owner_dec_ref(t1_Refman);
+  if (b2_Dynamic != NULL) b2_Dynamic->_del(b2);
+  MR_owner_dec_ref(b2_Refman);
+  if (b1_Dynamic != NULL) b1_Dynamic->_del(b1);
+  MR_owner_dec_ref(b1_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(test_func);
   RUN_TEST(test_another);
   RUN_TEST(test_native);
   RUN_TEST(test_dynamic_type_parameters);
+  RUN_TEST(test_simple_delete);
+  RUN_TEST(test_complex_delete);
   return MR_success? OK : FAIL;
 }
 

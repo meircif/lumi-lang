@@ -34,6 +34,7 @@ static Global
   
   ## test functions list
   owner NameMap{SyntaxTreeTestFunction} test-functions
+  var Bool is-delete-mocked
   
   ## input reading state
   owner String input-buffer
@@ -48,6 +49,7 @@ static Global
   owner BuiltinType type-int
   owner BuiltinType type-empty
   owner BuiltinType type-func
+  owner BuiltinType type-ref
   owner BuiltinType type-string
   owner BuiltinType type-array
   owner BuiltinType type-type
@@ -115,6 +117,7 @@ static Global
     self.add-builtin-type(user "Empty Symbol", copy false):(
         owner self.type-empty)
     self.add-builtin-type(user "Func", copy true):(owner self.type-func)
+    self.add-builtin-type(user "Ref", copy true):(owner self.type-ref)
     self.add-builtin-type(user "String", copy false):(owner self.type-string)
     self.add-builtin-type(user "Array", copy false):(owner self.type-array)
     self.add-builtin-type(user "Type", copy false):(owner self.type-type)

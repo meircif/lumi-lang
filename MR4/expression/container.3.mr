@@ -227,6 +227,8 @@ class BinaryExpression(UnaryExpression)
   
   func inst write-assign-preactions()
     if not self.left-expression.result-type.type-data.is-primitive
+      if self.left-expression.access = ACCESS-OWNER
+        self.write-left-delete()
       write(user "MR_")
       if self.left-expression.access = ACCESS-OWNER
         write(user "owner_")
@@ -247,19 +249,48 @@ class BinaryExpression(UnaryExpression)
         write(user ");\n")
         self.code-node.write-spaces()
     
-    if self.left-expression.result-type.type-data.is-dynamic
+    if self.left-expression.result-type.type-data.is-dynamic or
+        self.left-expression.is-generic-cast
       # also assign Dynamic
       self.left-expression.write-dynamic()
       write(user " = ")
-      if (self.left-expression.result-type.type-data = glob.type-generic or
-          self.left-expression.is-generic-cast) and
-          self.right-expression.result-type.type-data != glob.type-generic and
-          not self.right-expression.is-generic-cast
-        write(user "(Generic_Type_Dynamic*)")
-        self.right-expression.top := false
-      self.right-expression.write-dynamic()
+      if not self.right-expression.result-type.type-data.is-dynamic and
+          not self.right-expression.is-generic-cast and
+          self.right-expression.result-type.type-data != glob.type-empty
+        write(user "&")
+        write-cname(user self.right-expression.result-type.type-data.name)
+        write(user "_dynamic")
+      else
+        if (self.left-expression.result-type.type-data = glob.type-generic or
+            self.left-expression.is-generic-cast) and
+            self.right-expression.result-type.type-data != glob.type-generic and
+            not self.right-expression.is-generic-cast
+          write(user "(Generic_Type_Dynamic*)")
+          self.right-expression.top := false
+        self.right-expression.write-dynamic()
       write(user ";\n")
       self.code-node.write-spaces()
+  
+  func inst write-left-delete()
+    user TypeData type-data(self.left-expression.result-type.type-data)
+    if type-data.is-dynamic
+      write(user "if (")
+      self.left-expression.write-dynamic()
+      write(user " != NULL) ")
+      self.left-expression.write-dynamic()
+      write(user "->")
+      do
+        while ? type-data.base-type
+        type-data := type-data.base-type.type-data
+        while type-data.is-dynamic
+        write(user "_base.")
+      write(user "_del(")
+    else
+      write-cname(user type-data.name)
+      write(user "_Del(")
+    self.left-expression.write()
+    write(user ");\n")
+    self.code-node.write-spaces()
   
   func dynamic write()
     self.write-start()

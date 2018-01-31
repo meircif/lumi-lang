@@ -3,4 +3,6 @@ testing test_func... OK
 testing test_another... OK
 testing test_native... OK
 testing test_dynamic_type_parameters... OK
+testing test_simple_delete... OK
+testing test_complex_delete... OK
 Tests passed

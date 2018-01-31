@@ -78,8 +78,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func dynamic get-parent-type():(user TypeData parent-type)
     if ? self.parent-type
       parent-type := self.parent-type
-    else
+    else-if ? self.parent
       base.get-parent-type():(user parent-type)
+    else
+      parent-type := _
   
   func inst find-variable(user String name):(
       user SyntaxTreeVariable variable, copy Bool found)
@@ -139,7 +141,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     
     if not (? self.parent-type) and not self.is-native
       if self.type-instance.type-data.is-primitive and
-          self.type-instance.type-data != glob.type-func
+          self.type-instance.type-data != glob.type-func and
+          self.type-instance.type-data != glob.type-ref
         write(user " = 0")
       else
         write(user " = NULL")

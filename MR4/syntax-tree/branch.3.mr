@@ -185,6 +185,11 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         write(user "_, ")
       type-data := _
     else-if variable.type-instance.type-data.is-dynamic
+      write(user "if (")
+      if ? type-data
+        write(user "self->")
+      write-cname(user variable.name)
+      write(user "_Dynamic != NULL) ")
       if ? type-data
         write(user "self->")
       write-cname(user variable.name)

@@ -10,6 +10,7 @@ class TypeData(SyntaxTreeNamespace)
   var Bool is-primitive
   var Bool is-dynamic
   var Bool is-ordered
+  var Bool is-delete-mocked
   
   func inst parse-new(copy Bool is-dynamic):(
       copy Char end, owner TypeData new-node)
@@ -302,6 +303,10 @@ class TypeData(SyntaxTreeNamespace)
       write(user "  ")
       write-cname(user self.base-type.type-data.name)
       write(user "_Del(&(self->_base));\n")
+    if self.is-delete-mocked
+      write(user "  IGNORE_ERRORS( ")
+      write-cname(user self.name)
+      write(user "_MockDel(self) )\n")
     self.write-cleanup(user self)
     write(user "}\n")
   
