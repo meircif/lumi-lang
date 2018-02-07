@@ -3,7 +3,7 @@
 func write-syntax-tree()
   var Array{3:String{256}} mock-argv
   mock-argv[2].copy(user "mock.3.mr")
-  var SyntaxTreeRoot root
+  glob.root.is-library := true
   glob.root.parse(user mock-argv)
   glob.root.analyze()
   glob.root.write()
@@ -49,13 +49,27 @@ func test-global-scope-error(user String input-text, user String expected-error)
 
 
 test test-illegal-usage()
+  f-setup-test()
   var Array{2:String{4}} mock-argv
-  var SyntaxTreeRoot root
   mock-print-active := true
   assert-error glob.root.parse(user mock-argv)
   mock-print-active := false
   f-assert-string-slice(
       user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...",
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+
+
+test test-no-main()
+  f-setup-test()
+  glob.root.is-library := false
+  mock-print-active := true
+  assert-error glob.root.analyze()
+  mock-print-active := false
+  f-assert-string-slice(
+      user "General code error: no main or test functions",
       user mock-print-text,
       copy 0,
       copy mock-print-text.length,

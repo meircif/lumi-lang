@@ -15,10 +15,8 @@ comment
 # Test Single line comment
 
 # Test global variables
-var Int global-int
-# var Int CONSTANT-INT(23)
-user String global-string
-# user String CONSTANT-STRING("a constant string")
+var Int global-int(copy 23)
+user String global-string(user "a constant string")
 
 
 # Test functions

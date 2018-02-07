@@ -205,7 +205,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   func inst write-block-start()
     write(user " {\n")
   
-  func inst write-block-body()
+  func dynamic write-block-body()
     self.write-children(user self.code-nodes)
   
   func inst write-block-end()

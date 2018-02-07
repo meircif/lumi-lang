@@ -81,7 +81,7 @@ static char* _func_name_Global_init = "Global.init";
 Returncode Global_init(Global* self) {
   self->root = malloc(sizeof(SyntaxTreeRoot));
   if (self->root == NULL) RAISE(62)
-  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL};
+  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false};
   self->root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
   CHECK(63, SyntaxTreeRoot_init(self->root) )
   self->input_buffer = _new_string(1024);
@@ -634,7 +634,7 @@ Returncode BuiltinFunction_write_declaration(BuiltinFunction* self) {
 extern Func BuiltinFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*)BuiltinFunction_link_types, (void*)BuiltinFunction_analyze, (void*)BuiltinFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeFunction_check_name, (void*)BuiltinFunction_write_declaration};
+Func BuiltinFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*)BuiltinFunction_link_types, (void*)BuiltinFunction_analyze, (void*)BuiltinFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeBlock_write_block_body, (void*)SyntaxTreeFunction_check_name, (void*)BuiltinFunction_write_declaration};
 #endif
 
 #undef MR_FILE_NAME

@@ -27,6 +27,16 @@ var Int x
  documemtation #~
 
 var Int x
+## @ g t6
+var String{12} s
+user String us(user s)
+user String gs(user "global text")
+main
+  var Int x(copy 6)
+  x := 7
+## @ g t7
+var String{12} s
+test dummy()
 ## @ eg te0
 error 
 ## @ ec te1
@@ -61,7 +71,7 @@ var Int name
 user Error error
 
 ## @ eg te12
-var String{12} error
+var Int x(copy error)
 
 ## @@ test-struct
 ## @ g t0
@@ -417,9 +427,7 @@ func mock()
 ## @ eg te7
 struct Test
   var Int x(1)
-## @ eg te8
-var Int x(1)
-## @ ec te9
+## @ ec te8
 new
 ## @@ test-initialize
 ## @ c t0

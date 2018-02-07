@@ -494,7 +494,7 @@ Returncode SyntaxTreeNamespace_write_functions_declaration(SyntaxTreeNamespace* 
   ListNode* child = self->functions->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(265, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[8](((SyntaxTreeFunction*)(child->item))) )
+    CHECK(265, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[9](((SyntaxTreeFunction*)(child->item))) )
     child = child->next;
   }
   return OK;

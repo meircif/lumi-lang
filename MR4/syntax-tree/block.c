@@ -430,7 +430,7 @@ Returncode SyntaxTreeBlock_write_block(SyntaxTreeBlock* self) {
   /*   `block...` */
   /* } */
   CHECK(201, SyntaxTreeBlock_write_block_start(self) )
-  CHECK(202, SyntaxTreeBlock_write_block_body(self) )
+  CHECK(202, (self)->_base._base._dtl[7](self) )
   CHECK(203, SyntaxTreeBlock_write_block_end(self) )
   return OK;
 }
@@ -474,7 +474,7 @@ Returncode SyntaxTreeBlock_write_block_end(SyntaxTreeBlock* self) {
 extern Func SyntaxTreeBlock__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeBlock__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)SyntaxTreeBlock_link_types, (void*)SyntaxTreeBlock_analyze, (void*)SyntaxTreeBranch_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeBlock_find_variable, (void*)SyntaxTreeBlock_get_function};
+Func SyntaxTreeBlock__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)SyntaxTreeBlock_link_types, (void*)SyntaxTreeBlock_analyze, (void*)SyntaxTreeBranch_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeBlock_find_variable, (void*)SyntaxTreeBlock_get_function, (void*)SyntaxTreeBlock_write_block_body};
 #endif
 
 #undef MR_FILE_NAME

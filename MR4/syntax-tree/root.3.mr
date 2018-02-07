@@ -5,10 +5,19 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
   owner List{TypeData} types
   user String output-file-name
   owner SyntaxTreeMainFunction main-function
+  owner SyntaxTreeFunction global-init
+  var Bool is-library
   
   func inst init()
     base.init()
     new List{TypeData} in self.types
+    new SyntaxTreeFunction in self.global-init
+    self.global-init.init()
+    new List{SyntaxTreeCode} in self.global-init.code-nodes
+    new List{SyntaxTreeVariable} in self.global-init.variables
+    new FunctionArguments in self.global-init.arguments
+    self.global-init.arguments.init()
+    self.global-init.indentation-spaces := 2
   
   func inst parse(user Array{String} argv)
     if argv.length < 3
@@ -87,12 +96,17 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     self.m-order-types()
     base.link-types()
     self.link-children-types(user self.types)
+    self.global-init.link-children-types(user self.global-init.code-nodes)
     if ? self.main-function
       self.main-function.link-types()
     base.analyze()
     self.analyze-children(user self.types)
+    self.global-init.analyze-children(user self.global-init.code-nodes)
     if ? self.main-function
       self.main-function.analyze()
+    else-if not (? glob.test-functions.first) and not self.is-library
+      print(user "General code error: no main or test functions")
+      raise
   
   func inst m-order-types()
     new List{TypeData} ordered-list
@@ -110,6 +124,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
   3. function declarations
   4. global variables
   5. function bodies
+  6. main function
   #)
   func dynamic write()
     file-open(user self.output-file-name, copy false):(owner glob.output-file)
@@ -120,7 +135,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     var TypeDeclarationWriter type-declaration-writer
     self.write-for-type(user type-declaration-writer)
     
-    # will write type structs
+    # will write type structures
     write-global(user "\n\n/* types struct */\n")
     self.write-children(user self.types)
     
@@ -167,8 +182,11 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       child := child.next
   
   func inst write-test-main()
+    write(user "\n#define MR_FILE_NAME \"global\"\n")
+    write(user "#define MR_FUNC_NAME \"global\"")
     write(user "\nUSER_MAIN_HEADER {\n")
     write(user "  Bool MR_success = true;\n")
+    self.write-global-init()
     user NameMapNode{SyntaxTreeTestFunction} node(glob.test-functions.first)
     do
       write(user "  RUN_TEST(")
@@ -178,7 +196,48 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       while ? node
     write(user "  return MR_success? OK : FAIL;\n")
     write(user "}\n")
+    write(user "#undef MR_FILE_NAME\n")
+    write(user "#undef MR_FUNC_NAME\n")
     write(user "\nTEST_MAIN_FUNC\n")
+  
+  func inst write-global-init()
+    if not (? self.global-init.code-nodes.first)
+      return
+    write(user "#undef RETURN_ERROR\n")
+    write(user "#define RETURN_ERROR(value) return value;\n")
+    self.global-init.write-children(user self.global-init.variables)
+    self.global-init.write-block-body()
+    write(user "#undef RETURN_ERROR\n")
+    write(user "#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup\n")
+
+
+## Main function node in the syntax tree
+class SyntaxTreeMainFunction(SyntaxTreeFunction)
+  func inst parse-new():(copy Char end, owner SyntaxTreeMainFunction new-node)
+    new SyntaxTreeMainFunction in new-node
+    new-node.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.init()
+    string-new-copy(user "main"):(owner self.name)
+    new FunctionArguments in self.arguments
+    self.arguments.init()
+    self.parse-body():(copy end)
+  
+  func dynamic write()
+    # USER_MAIN_HEADER {
+    #   `block...`
+    # }
+    # MAIN_FUNC
+    write-pre-func(user self)
+    write(user "\nUSER_MAIN_HEADER")
+    self.write-block()
+    write-post-func()
+    write(user "\nMAIN_FUNC\n")
+  
+  func dynamic write-block-body()
+    glob.root.write-global-init()
+    base.write-block-body()
 
 
 ## proxy write function to be mocked on unit-tests

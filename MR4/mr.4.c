@@ -73,7 +73,7 @@ int MR_main(int argc, char* argv[]) {
 /*tests*/
 int MR_test_main(int argc, char* argv[]) {
   Returncode err;
-  MR_trace_stream = stderr;
+  MR_trace_stream = stdout;
   printf("Running tests:\n");
   err = MR_user_main();
   if (err == OK) {
@@ -90,9 +90,7 @@ Bool MR_run_test(char* test_name, Func test_func) {
   Returncode err;
   printf("testing %s... ", test_name);
   fflush(stdout);
-  MR_trace_stream = stdout;
   err = test_func();
-  MR_trace_stream = stderr;
   if (err == OK) {
     printf("OK\n");
     return true;
