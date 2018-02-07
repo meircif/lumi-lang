@@ -60,6 +60,9 @@ var Int name
 ## @ eg te11
 user Error error
 
+## @ eg te12
+var String{12} error
+
 ## @@ test-struct
 ## @ g t0
 struct Test
@@ -416,11 +419,7 @@ struct Test
   var Int x(1)
 ## @ eg te8
 var Int x(1)
-## @ eg te9
-struct Test
-  var Test t
-
-## @ ec te10
+## @ ec te9
 new
 ## @@ test-initialize
 ## @ c t0
@@ -1287,5 +1286,40 @@ struct TestIterator
   func next()->(var Int x)
 func f-mock()
   for n in TestIterator()
+
+## @@ test-complex-fields
+## @ g t0
+class Base
+  user Base b
+  func dynamic meth()
+struct Test
+  var Base b
+  func test()
+    user Base b(user self.b)
+    b := self.b
+    self.b.meth()
+    Base.meth(var self.b)
+    user Base b2(user self.b.b)
+    b2 := self.b.b
+    self.b.b.meth()
+    Base.meth(var self.b.b)
+    var Test t
+## @ eg te0
+struct Test
+  var String{12} error
+
+## @ eg te1
+struct Test
+  var Array{12:Int} error
+
+## @ eg te2
+struct Test
+  var Test error
+
+## @ eg te3
+struct Test
+  var Base error
+struct Base
+  var Test t
 
 ## @

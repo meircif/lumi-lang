@@ -36,6 +36,8 @@ redefinition of global variable "name"
 variable name overrides function "name"
 /// @ te11
 unknown type "Error"
+/// @ te12
+non-primitives cannot be declared "var" here yet...
 /// @@ test-struct
 /// @ t0
 typedef struct Test Test;
@@ -766,8 +768,6 @@ type members cannot be initialized
 /// @ te8
 global variables cannot be initialized
 /// @ te9
-non-primitives cannot be declared "var" here yet...
-/// @ te10
 expected space after "new", got "new-line"
 /// @@ test-initialize
 /// @ t0
@@ -2782,4 +2782,99 @@ cannot iterate type with no "next" named method -  "TestIterator"
 iterator "next" method has parameters in type "TestIterator"
 /// @ te12
 iterator "next" method has outputs in type "TestIterator"
+/// @@ test-complex-fields
+/// @ t0
+typedef struct Base Base;
+typedef struct Base_Dynamic Base_Dynamic;
+typedef struct Test Test;
+struct Base {
+  Base* b;
+  Ref_Manager* b_Refman;
+  Base_Dynamic* b_Dynamic;
+};
+struct Base_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic);
+};
+struct Test {
+  Base b;
+};
+Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic);
+void Base_Del(Base* self);
+Returncode Test_test(Test* self, Ref_Manager* self_Refman);
+void Test_Del(Test* self);
+Base_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del, Base_meth};
+Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
+Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+void Base_Del(Base* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->b_Refman);
+}
+Returncode Test_test(Test* self, Ref_Manager* self_Refman) {
+  Returncode MR_err = OK;
+  Base* b = NULL;
+  Ref_Manager* b_Refman = NULL;
+  Base_Dynamic* b_Dynamic = NULL;
+  Base* b2 = NULL;
+  Ref_Manager* b2_Refman = NULL;
+  Base_Dynamic* b2_Dynamic = NULL;
+  Test t_Var = {{0}};
+  Test* t = NULL;
+  Ref_Manager* t_Refman = NULL;
+  if (self == NULL || self_Refman->value == NULL) RAISE(7)
+  b = &(self->b);
+  b_Refman = self_Refman;
+  MR_inc_ref(b_Refman);
+  b_Dynamic = &Base_dynamic;
+  if (self == NULL || self_Refman->value == NULL) RAISE(8)
+  MR_dec_ref(b_Refman);
+  b_Refman = self_Refman;
+  MR_inc_ref(b_Refman);
+  b_Dynamic = &Base_dynamic;
+  b = &(self->b);
+  if (self == NULL || self_Refman->value == NULL) RAISE(9)
+  CHECK(9, Base_meth(&(self->b), self_Refman, &Base_dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(10)
+  CHECK(10, Base_meth(&(self->b), self_Refman, &Base_dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(11)
+  b2 = self->b.b;
+  b2_Refman = self->b.b_Refman;
+  MR_inc_ref(b2_Refman);
+  b2_Dynamic = self->b.b_Dynamic;
+  if (self == NULL || self_Refman->value == NULL) RAISE(12)
+  MR_dec_ref(b2_Refman);
+  b2_Refman = self->b.b_Refman;
+  MR_inc_ref(b2_Refman);
+  b2_Dynamic = self->b.b_Dynamic;
+  b2 = self->b.b;
+  if (self->b.b_Dynamic == NULL) RAISE(13)
+  if (self == NULL || self_Refman->value == NULL) RAISE(13)
+  CHECK(13, self->b.b_Dynamic->meth(self->b.b, self->b.b_Refman, self->b.b_Dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(14)
+  CHECK(14, Base_meth(self->b.b, self->b.b_Refman, self->b.b_Dynamic) )
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(15)
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(b2_Refman);
+  MR_dec_ref(b_Refman);
+  return MR_err;
+}
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+  Base_Del(&(self->b));
+}
+/// @ te0
+cannot declared "var" field of sequence type "String"
+/// @ te1
+cannot declared "var" field of sequence type "Array"
+/// @ te2
+variable will cause recursive declaration of type "Test"
+/// @ te3
+variable will cause recursive declaration of type "Test"
 /// @

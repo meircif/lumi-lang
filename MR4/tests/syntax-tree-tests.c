@@ -352,6 +352,19 @@ Returncode test_for_each() {
 #undef MR_FUNC_NAME
 #endif
 
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_complex_fields();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_complex_fields = "test-complex-fields";
+#define MR_FUNC_NAME _func_name_test_complex_fields
+Returncode test_complex_fields() {
+  CHECK(138, test_from_file(&(String){20, 19, "test-complex-fields"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES

@@ -104,13 +104,33 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user self.type-instance.name)
     if self.is-create and not self.type-instance.type-data.is-primitive and
         not (? self.parent)
-      self.m-syntax-error-msg(
-          user "non-primitives cannot be declared \"var\" here yet...")
+      if not (? self.parent-type)
+        self.m-syntax-error-msg(
+            user "non-primitives cannot be declared \"var\" here yet...")
+      if self.type-instance.type-data = glob.type-string or
+          self.type-instance.type-data = glob.type-array
+        self.m-syntax-error(
+            user "cannot declared \"var\" field of sequence type",
+            user self.type-instance.type-data.name)
+      self.check-var-recursion(user self)
     if self.access = ACCESS-VAR
       self.type-instance.check-sequence(user self)
     if self.is-create and self.type-instance.type-data = glob.type-array and
         self.type-instance.parameters.first.item.type-data = glob.type-generic
       self.m-syntax-error-msg(user "cannot create generic array")
+  
+  func inst check-var-recursion(user SyntaxTreeVariable variable)
+    if variable.type-instance.type-data = self.parent-type
+      self.m-syntax-error(
+          user "variable will cause recursive declaration of type",
+          user self.parent-type.name)
+    user ListNode{SyntaxTreeVariable} child(variable.type-instance.type-data.variables.first)
+    do
+      while ? child
+      if child.item.access = ACCESS-VAR and
+          not child.item.type-instance.type-data.is-primitive
+        self.check-var-recursion(user child.item)
+      child := child.next
   
   func dynamic write()
     if ? self.parent or ? self.parent-type
@@ -124,7 +144,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.write-sequence()
     
     if not self.type-instance.type-data.is-primitive and
-        self.access = ACCESS-VAR
+        self.access = ACCESS-VAR and not (? self.parent-type)
       self.write-var()
     
     # `type` `name`[ = 0];
@@ -134,7 +154,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.type-instance.arguments.write-pointer(user self.name)
     else
       write-cname(user self.type-instance.type-data.name)
-      if not self.type-instance.type-data.is-primitive
+      if not self.type-instance.type-data.is-primitive and
+          not (? self.parent-type and self.access = ACCESS-VAR)
         write(user "*")
       write(user " ")
       write-cname(user self.name)
@@ -149,10 +170,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     
     write(user ";\n")
     
-    if not self.type-instance.type-data.is-primitive
+    if not self.type-instance.type-data.is-primitive and
+        not (? self.parent-type and self.access = ACCESS-VAR)
       self.write-refman()
     
-    if self.type-instance.type-data.is-dynamic
+    if self.type-instance.type-data.is-dynamic and
+        not (? self.parent-type and self.access = ACCESS-VAR)
       self.write-dynamic()
   
   func dynamic write-sequence()
@@ -218,8 +241,13 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       var Int bases
       user TypeData type-data(self.type-instance.type-data)
       do
-        while ? type-data.base-type
-        type-data := type-data.base-type.type-data
+        if ? type-data.base-type
+          type-data := type-data.base-type.type-data
+        else-if type-data.variables.first.item.access = ACCESS-VAR and
+            not type-data.variables.first.item.type-instance.type-data.is-primitive
+          type-data := type-data.variables.first.item.type-instance.type-data
+        else
+          while false
         bases += 1
         write(user "{")
       write(user "0")

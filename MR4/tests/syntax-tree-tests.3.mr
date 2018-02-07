@@ -132,3 +132,7 @@ test test-error-handling()
 
 test test-for-each()
   test-from-file(user "test-for-each")
+
+
+test test-complex-fields()
+  test-from-file(user "test-complex-fields")

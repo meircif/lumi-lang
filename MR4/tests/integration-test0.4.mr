@@ -509,8 +509,36 @@ func test-for-each()
   sys.println(user "]")
 
 
+class ComplexField
+  user ComplexField x
+  func dynamic meth()
+    sys.print(user "$")
+
+struct HasComplexField
+  var ComplexField x
+  func run()
+    user ComplexField x(user self.x)
+    x := self.x
+    x.meth()
+    self.x.meth()
+    ComplexField.meth(var self.x)
+    user ComplexField x2(user self.x.x)
+    x2 := self.x.x
+    x2.meth()
+    self.x.x.meth()
+    ComplexField.meth(var self.x.x)
+
+func test-complex-field()
+  var HasComplexField y
+  y.x.x := y.x
+  sys.print(user "complex fields: ")
+  y.run()
+  sys.println(user "")
+
+
 main
   test-simple-function()
   test-ref-count()
   test-error-handling(user _)
   test-for-each()
+  test-complex-field()

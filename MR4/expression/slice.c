@@ -31,7 +31,7 @@ static char* _func_name_SliceExpression_parse_new = "SliceExpression.parse-new";
 Returncode SliceExpression_parse_new(SliceExpression* self, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
   SliceExpression* slice_expression = malloc(sizeof(SliceExpression));
   if (slice_expression == NULL) RAISE(12)
-  *slice_expression = (SliceExpression){SliceExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, NULL};
+  *slice_expression = (SliceExpression){SliceExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, NULL};
   slice_expression->_base._base._dtl = SliceExpression__dtl;
   CHECK(13, SliceExpression_parse(slice_expression, (*expression), code_node, &((*end))) )
   (*expression) = &(slice_expression->_base);

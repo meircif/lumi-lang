@@ -21,6 +21,12 @@ typedef struct Container Container;
 
 typedef struct ContainerIterator ContainerIterator;
 
+typedef struct ComplexField ComplexField;
+
+typedef struct ComplexField_Dynamic ComplexField_Dynamic;
+
+typedef struct HasComplexField HasComplexField;
+
 
 /* types struct */
 
@@ -86,6 +92,21 @@ struct ContainerIterator {
   Ref_Manager* curr_Refman;
 };
 
+struct ComplexField {
+  ComplexField* x;
+  Ref_Manager* x_Refman;
+  ComplexField_Dynamic* x_Dynamic;
+};
+
+struct ComplexField_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(ComplexField* self, Ref_Manager* self_Refman, ComplexField_Dynamic* self_Dynamic);
+};
+
+struct HasComplexField {
+  ComplexField x;
+};
+
 
 /* types methods declaration */
 
@@ -135,6 +156,14 @@ Returncode ContainerIterator_next(ContainerIterator* self, Ref_Manager* self_Ref
 
 void ContainerIterator_Del(ContainerIterator* self);
 
+Returncode ComplexField_meth(ComplexField* self, Ref_Manager* self_Refman, ComplexField_Dynamic* self_Dynamic);
+
+void ComplexField_Del(ComplexField* self);
+
+Returncode HasComplexField_run(HasComplexField* self, Ref_Manager* self_Refman);
+
+void HasComplexField_Del(HasComplexField* self);
+
 
 /* types global variables */
 
@@ -153,6 +182,10 @@ Generic_Type_Dynamic TopData_dynamic = {(Dynamic_Del)TopData_Del};
 Generic_Type_Dynamic Container_dynamic = {(Dynamic_Del)Container_Del};
 
 Generic_Type_Dynamic ContainerIterator_dynamic = {(Dynamic_Del)ContainerIterator_Del};
+
+ComplexField_Dynamic ComplexField_dynamic = {(Dynamic_Del)ComplexField_Del, ComplexField_meth};
+
+Generic_Type_Dynamic HasComplexField_dynamic = {(Dynamic_Del)HasComplexField_Del};
 
 
 /* global variables */
@@ -210,6 +243,8 @@ Returncode f_try_catch_raise(TestStruct* t, Ref_Manager* t_Refman);
 Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman);
 
 Returncode test_for_each(void);
+
+Returncode test_complex_field(void);
 
 
 /* types methods body */
@@ -559,6 +594,90 @@ MR_cleanup:
 void ContainerIterator_Del(ContainerIterator* self) {
   if (self == NULL) return;
   MR_dec_ref(self->curr_Refman);
+}
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "ComplexField.meth"
+Returncode ComplexField_meth(ComplexField* self, Ref_Manager* self_Refman, ComplexField_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(515)
+  aux_String_0_Var.max_length = 2;
+  aux_String_0_Var.length = 1;
+  aux_String_0_Var.values = "$";
+  CHECK(515, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+void ComplexField_Del(ComplexField* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->x_Refman);
+}
+
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "HasComplexField.run"
+Returncode HasComplexField_run(HasComplexField* self, Ref_Manager* self_Refman) {
+  Returncode MR_err = OK;
+  ComplexField* x = NULL;
+  Ref_Manager* x_Refman = NULL;
+  ComplexField_Dynamic* x_Dynamic = NULL;
+  ComplexField* x2 = NULL;
+  Ref_Manager* x2_Refman = NULL;
+  ComplexField_Dynamic* x2_Dynamic = NULL;
+  if (self == NULL || self_Refman->value == NULL) RAISE(520)
+  x = &(self->x);
+  x_Refman = self_Refman;
+  MR_inc_ref(x_Refman);
+  x_Dynamic = &ComplexField_dynamic;
+  if (self == NULL || self_Refman->value == NULL) RAISE(521)
+  MR_dec_ref(x_Refman);
+  x_Refman = self_Refman;
+  MR_inc_ref(x_Refman);
+  x_Dynamic = &ComplexField_dynamic;
+  x = &(self->x);
+  if (x_Dynamic == NULL) RAISE(522)
+  CHECK(522, x_Dynamic->meth(x, x_Refman, x_Dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(523)
+  CHECK(523, ComplexField_meth(&(self->x), self_Refman, &ComplexField_dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(524)
+  CHECK(524, ComplexField_meth(&(self->x), self_Refman, &ComplexField_dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(525)
+  x2 = self->x.x;
+  x2_Refman = self->x.x_Refman;
+  MR_inc_ref(x2_Refman);
+  x2_Dynamic = self->x.x_Dynamic;
+  if (self == NULL || self_Refman->value == NULL) RAISE(526)
+  MR_dec_ref(x2_Refman);
+  x2_Refman = self->x.x_Refman;
+  MR_inc_ref(x2_Refman);
+  x2_Dynamic = self->x.x_Dynamic;
+  x2 = self->x.x;
+  if (x2_Dynamic == NULL) RAISE(527)
+  CHECK(527, x2_Dynamic->meth(x2, x2_Refman, x2_Dynamic) )
+  if (self->x.x_Dynamic == NULL) RAISE(528)
+  if (self == NULL || self_Refman->value == NULL) RAISE(528)
+  CHECK(528, self->x.x_Dynamic->meth(self->x.x, self->x.x_Refman, self->x.x_Dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(529)
+  CHECK(529, ComplexField_meth(self->x.x, self->x.x_Refman, self->x.x_Dynamic) )
+MR_cleanup:
+  MR_dec_ref(x2_Refman);
+  MR_dec_ref(x_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+void HasComplexField_Del(HasComplexField* self) {
+  if (self == NULL) return;
+  ComplexField_Del(&(self->x));
 }
 
 
@@ -2538,6 +2657,53 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "test-complex-field"
+Returncode test_complex_field(void) {
+  Returncode MR_err = OK;
+  HasComplexField y_Var = {{0}};
+  HasComplexField* y = NULL;
+  Ref_Manager* y_Refman = NULL;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  y = &y_Var;
+  y_Refman = MR_new_ref(y);
+  if (y_Refman == NULL) RAISE(532)
+  if (y == NULL || y_Refman->value == NULL) RAISE(533)
+  if (y == NULL || y_Refman->value == NULL) RAISE(533)
+  MR_dec_ref(y->x.x_Refman);
+  y->x.x_Refman = y_Refman;
+  MR_inc_ref(y->x.x_Refman);
+  y->x.x_Dynamic = &ComplexField_dynamic;
+  y->x.x = &(y->x);
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(534)
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "complex fields: ";
+  CHECK(534, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(535, HasComplexField_run(y, y_Refman) )
+  aux_String_1 = &aux_String_1_Var;
+  aux_String_1_Refman = MR_new_ref(aux_String_1);
+  if (aux_String_1_Refman == NULL) RAISE(536)
+  aux_String_1_Var.max_length = 1;
+  aux_String_1_Var.length = 0;
+  aux_String_1_Var.values = "";
+  CHECK(536, Sys_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_1_Refman);
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(y_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
 
 void Mock_delete(Ref self) {}
 
@@ -2547,10 +2713,11 @@ void Mock_delete(Ref self) {}
 #define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-  CHECK(513, test_simple_function() )
-  CHECK(514, test_ref_count() )
-  CHECK(515, test_error_handling(NULL, NULL) )
-  CHECK(516, test_for_each() )
+  CHECK(540, test_simple_function() )
+  CHECK(541, test_ref_count() )
+  CHECK(542, test_error_handling(NULL, NULL) )
+  CHECK(543, test_for_each() )
+  CHECK(544, test_complex_field() )
 MR_cleanup:
   return MR_err;
 }
