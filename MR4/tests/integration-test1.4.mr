@@ -1,7 +1,7 @@
-~## MR4 compiler integration test file #1
+~~~ MR4 compiler integration test file #1
 
 This file should only work together with test file #2.
-#~
+~~~
 
 
 class TopType(MiddleType)
@@ -128,7 +128,7 @@ class BaseLink
   user Link link
   
   func dynamic m-meth()
-    # do nothing
+    ; do nothing
 
 class TopLink{Generic}(BaseLink)
   owner Generic item
@@ -164,7 +164,7 @@ mock TopLink.delete()
     deleted-top-links := RefNode(copy self, owner deleted-top-links)
 
 func f-remove-obj(owner Link b)
-  # remove b
+  ; remove b
 
 test test-simple-delete()
   assert not deleted-refmans?

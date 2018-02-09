@@ -44,9 +44,9 @@ static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
   {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool90;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool90)) )
-    if (_Bool90) {
+    Bool _Bool89;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool89)) )
+    if (_Bool89) {
       (*access) = n;
       return OK;
     }
@@ -83,9 +83,9 @@ Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, TypeData
     ListNode* node = parent_type->parameters->first;
     while (true) {
       if (!(NULL != node)) break;
-      Bool _Bool91;
-      CHECK(34, String_equal(((String*)(node->item)), name, &(_Bool91)) )
-      if (_Bool91) {
+      Bool _Bool90;
+      CHECK(34, String_equal(((String*)(node->item)), name, &(_Bool90)) )
+      if (_Bool90) {
         (*type_data) = &(glob->type_generic->_base);
         return OK;
       }
@@ -106,13 +106,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(43)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char92;
-    CHECK(45, read_c(&(_Char92)) )
-    CHECK(45, String_append(actual_text, _Char92) )
+    Char _Char91;
+    CHECK(45, read_c(&(_Char91)) )
+    CHECK(45, String_append(actual_text, _Char91) )
   }}
-  Bool _Bool93;
-  CHECK(46, String_equal(actual_text, expected_text, &(_Bool93)) )
-  if (!_Bool93) {
+  Bool _Bool92;
+  CHECK(46, String_equal(actual_text, expected_text, &(_Bool92)) )
+  if (!_Bool92) {
     CHECK(47, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);

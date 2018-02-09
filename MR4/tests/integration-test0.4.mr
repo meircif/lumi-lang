@@ -1,25 +1,25 @@
-~## MR4 compiler integration main test file
+~~~ MR4 compiler integration main test file
 
 This file should be stand-alone.
 
 Testing multiline documentation
-confused by # or } or }# or # } ?
-#~
+confused by ~ or ~~ or ; or ~~ ~ ?
+~~~
 
-~# Test
+[; Test
 multiline
 comment
-#~
+;]
 
-## Test Single line documentation
-# Test Single line comment
+~~~ Test Single line documentation ~~~
+; Test Single line comment
 
-# Test global variables
+; Test global variables
 var Int global-int(copy 23)
 user String global-string(user "a constant string")
 
 
-# Test functions
+; Test functions
 func test-simple-function()
   sys.println(user "I am a simple function")
 
@@ -162,29 +162,29 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
 
 func test-complex-function(
     copy Int num, user String text)->(var Int out-num, user String out-text)
-  ~# Test
+  [; Test
   multiline
-  comment #~
+  comment ;]
 
-  # Test Single line comment
+  ; Test Single line comment
 
-  ## Test Single line documentation
-  # Test Single line comment
+  ~~~ Test Single line documentation ~~~
+  ; Test Single line comment
   out-num := num
   out-text := text
 
 
-# Test types
+; Test types
 struct TestStruct
-  ## documentation test
+  ~~~ documentation test ~~~
   var Int num
   
-  ~## Test
+  ~~~ Test
   multiline
-  documentation #~
+  documentation ~~~
   user String text
   
-  # comment test
+  ; comment test
   
   owner TestStruct ts
   var Func{()} fun
@@ -195,9 +195,9 @@ struct TestStruct
     if x < 0
       self.ts := TestStruct(copy x + 1, user s)
   
-  ~# Test
+  [; Test
   multiline
-  comment #~
+  comment ;]
   
   func get()->(var Int x, user String s)
     x := self.num
@@ -340,7 +340,7 @@ func test-ref-count()
     sys.println(user "string deleted")
 
 func f-remove(owner String s)
-  # remove s
+  ; remove s
 
 
 struct Data{Generic}

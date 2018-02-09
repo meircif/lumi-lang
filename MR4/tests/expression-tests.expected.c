@@ -516,7 +516,7 @@ b = ! b;
 /// @ t4
 b = ! (i > 3);
 /// @ t5
-unexpected "["
+unexpected "{"
 /// @ t6
 unexpected "["
 /// @ t7

@@ -118,6 +118,8 @@ variable name overrides function "name"
 unknown type "Error"
 /// @ te12
 unknown symbol "error"
+/// @ te13
+unexpected "["
 /// @@ test-struct
 /// @ t0
 typedef struct Test Test;

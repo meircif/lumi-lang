@@ -8,23 +8,25 @@ user String str
 
 var Int x
 ## @ g t2
-# comment
+; comment
 
 var Int x
 ## @ g t3
-## documemtation
+~~~ documentation ~~~
 
 var Int x
 ## @ g t4
-~# multi 
+[; multi 
  line 
- comment #~
+ comment ;]
 
 var Int x
 ## @ g t5
-~## multi 
- line 
- documemtation #~
+~~~ multi 
+ line  
+ documentation
+ confused by ~ or ~~ or ; or ~~ ~ ?
+~~~
 
 var Int x
 ## @ g t6
@@ -48,7 +50,7 @@ return
 raise
   i := 3
 ## @ eg te4
-~# comment #~?
+[; comment ;]?
 ## @ eg te5
 main(
 
@@ -73,6 +75,8 @@ user Error error
 ## @ eg te12
 var Int x(copy error)
 
+## @ eg te13
+[ ; error
 ## @@ test-struct
 ## @ g t0
 struct Test
@@ -316,23 +320,24 @@ struct Test
     var Int x
 ## @ g t3
 struct Test
-  # comment
+  ; comment
   var Int x
 ## @ g t4
 struct Test
-  ## documemtation
+  ~~~ documemtation ~~~
   var Int x
 ## @ g t5
 struct Test
-  ~# multi 
- line 
- comment #~
+  [; multi 
+  line 
+  comment ;]
   var Int x
 ## @ g t6
 struct Test
-  ~## multi 
- line 
- documemtation #~
+  ~~~ multi 
+  line 
+  documemtation
+  ~~~
   var Int x
 ## @ g t7
 var Int name
@@ -516,23 +521,24 @@ var Array{1:Int:Int} a
 owner Test ot(owner tb)
 ## @@ test-comment
 ## @ c t0
-# comment
+; comment
 
   var Int x
 ## @ c t1
-## documemtation
+~~~ documemtation ~~~
 
   var Int x
 ## @ c t2
-~# multi 
- line 
- comment #~
+[; multi 
+  line 
+  comment ;]
 
   var Int x
 ## @ c t3
-~## multi 
- line 
- documemtation #~
+~~~ multi 
+  line 
+  documemtation
+  ~~~
 
   var Int x
 ## @@ test-if-else
@@ -582,13 +588,13 @@ if()
 else
 ## @ ec te7
 if false
-    # ...
+    ; ...
   else 
 ## @ ec te8
 else-if
 ## @ ec te9
 if false
-    # ...
+    ; ...
   else-if()
 ## @ eg te10
 func error()

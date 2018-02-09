@@ -57,18 +57,29 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   
   func inst parse-if-comment(user String keyword):(
       copy Char end, copy Bool is-parsed)
-    is-parsed := end = ' '
-    if not is-parsed
-      return
-    if keyword.equal(user "#") or keyword.equal(user "##")
+    is-parsed := true
+    if keyword.equal(user ";") and end = ' '
       user String text
       read-until(user "", copy false):(user text, copy end)
-    else-if keyword.equal(user "~#") or keyword.equal(user "~##")
+    else-if keyword.equal(user "~~~") and end = ' '
+      var Int count
+      do
+        var Char ch
+        read-c():(copy ch)
+        if ch = '~'
+          count += 1
+        else
+          count := 0
+        while ch != EOF and count < 3
+      read-c():(copy end)
+    else-if keyword.length = 0 and end = '['
+      if read-c() != ';'
+        self.m-syntax-error-msg(user "unexpected \"[\"")
       var Char prev('\0')
       do
         var Char curr
         read-c():(copy curr)
-        while curr != EOF and (curr != '~' or prev != '#')
+        while curr != EOF and (curr != ']' or prev != ';')
         prev := curr
       read-c():(copy end)
     else
