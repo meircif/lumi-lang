@@ -156,6 +156,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     if variable.access = ACCESS-OWNER and not item-type-data.is-primitive
       self.write-owner-reference-cleanup(
           user variable, user type-data, user item-type-data)
+    else-if ? type-data and variable.access = ACCESS-VAR
+      write(user "  ")
+      write-cname(user item-type-data.name)
+      write(user "_Del(&(self->")
+      write-cname(user variable.name)
+      write(user "));\n")
+      return
     write(user "  MR_")
     if variable.access = ACCESS-OWNER
       write(user "owner_")

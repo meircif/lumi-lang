@@ -104,7 +104,7 @@ Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self);
 static char* _func_name_SyntaxTreeFlowElement_write_block_body = "SyntaxTreeFlowElement.write-block-body";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFlowElement_write_block_body
 Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self) {
-  CHECK(35, SyntaxTreeBlock_write_block_body(self->block) )
+  CHECK(35, (self->block)->_base._base._dtl[7](self->block) )
   return OK;
 }
 #undef MR_FUNC_NAME

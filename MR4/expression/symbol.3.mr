@@ -76,7 +76,6 @@ class MemberExpression(SymbolExpression)
   owner Expression instance
   user Expression dynamic-call-self-instance
   var Int bases
-  var Bool is-dynamic-call
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -110,6 +109,8 @@ class MemberExpression(SymbolExpression)
     instance-type.type-data.find-field(user self.name):(
         user self.variable, copy self.bases)
     if ? self.variable
+      self.is-complex-field := self.variable.access = ACCESS-VAR and
+          not self.variable.type-instance.type-data.is-primitive
       self.is-generic-cast :=
           self.variable.type-instance.type-data = glob.type-generic
       self.variable.type-instance.f-new-replace-params(
@@ -130,7 +131,8 @@ class MemberExpression(SymbolExpression)
           self.instance.result-type.type-data != glob.type-base
         self.bases := self.function.dynamic-base-count
         self.function := self.function.dynamic-base-method
-        self.is-dynamic-call := true
+        if not self.instance.is-complex-field
+          self.dynamic-call-self-instance := self.instance
       self.set-simple-type(user glob.type-func)
       self.access := ACCESS-VAR
       self.function.arguments.copy-new():(owner self.result-type.arguments)
@@ -160,8 +162,6 @@ class MemberExpression(SymbolExpression)
       self-param.value := self.instance
       self-param.value.top := true
       arguments.parameters.prepend(owner self-param)
-      if self.is-dynamic-call
-        self.dynamic-call-self-instance := self.instance
     self.instance := _
   
   func dynamic write-preactions()
@@ -169,7 +169,8 @@ class MemberExpression(SymbolExpression)
       self.instance.write-preactions()
     if not (? self.dynamic-call-self-instance or
         (? self.instance and not (? self.function) and
-        self.instance.result-type.type-data != glob.type-type))
+        self.instance.result-type.type-data != glob.type-type)) or
+        (? self.instance and self.instance.is-complex-field)
       return
     # if (...) RAISE(`line-num`)
     write(user "if (")
@@ -178,9 +179,10 @@ class MemberExpression(SymbolExpression)
       self.instance.write-validate-ref()
     else-if ? self.dynamic-call-self-instance
       # `instance`_Dynamic == NULL
+      var Bool top(self.dynamic-call-self-instance.top)
       self.dynamic-call-self-instance.top := true
       self.dynamic-call-self-instance.write-dynamic()
-      self.dynamic-call-self-instance.top := false
+      self.dynamic-call-self-instance.top := top
       write(user " == NULL")
     write(user ") ")
     self.write-raise()
@@ -198,13 +200,21 @@ class MemberExpression(SymbolExpression)
       write(user "*)(")
     if ? self.instance and not (? self.function) and
         self.instance.result-type.type-data != glob.type-type
+      if self.is-complex-field and self.top
+        write(user "&(")
       self.instance.write()
       self.write-bases()
     base.write()
+    if ? self.instance and not (? self.function) and self.is-complex-field and
+        self.instance.result-type.type-data != glob.type-type and self.top
+      write(user ")")
     if self.is-generic-cast and not self.top
       write(user "))")
   
   func dynamic write-refman()
+    if self.is-complex-field
+      self.instance.write-refman()
+      return
     var Bool top(self.top)
     if self.is-generic-cast and not self.top
       self.top := true
@@ -212,6 +222,11 @@ class MemberExpression(SymbolExpression)
     self.top := top
   
   func dynamic write-dynamic()
+    if self.is-complex-field
+      write(user "&")
+      write-cname(user self.result-type.type-data.name)
+      write(user "_dynamic")
+      return
     var Bool top(self.top)
     if self.is-generic-cast and not self.top
       write(user "((")
@@ -224,6 +239,9 @@ class MemberExpression(SymbolExpression)
       write(user "))")
   
   func inst write-bases()
-    write(user "->")
+    if ? self.instance and self.instance.is-complex-field
+      write(user ".")
+    else
+      write(user "->")
     for n in self.bases
       write(user "_base.")

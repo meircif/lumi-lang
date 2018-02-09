@@ -131,7 +131,7 @@ Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self) {
   if (self->iterator->result_type->type_data != &(glob->type_int->_base)) {
     self->aux_symbol = malloc(sizeof(SymbolExpression));
     if (self->aux_symbol == NULL) RAISE(77)
-    *self->aux_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL};
+    *self->aux_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL};
     self->aux_symbol->_base._base._dtl = SymbolExpression__dtl;
     self->aux_symbol->_base.code_node = &(self->_base._base);
     CHECK(79, TypeInstance_copy_new(self->iterator->result_type, &(self->aux_symbol->_base.result_type)) )
@@ -237,7 +237,7 @@ Returncode SyntaxTreeForLoop_write(SyntaxTreeForLoop* self) {
   if (NULL != self->aux_symbol) {
     EmptyExpression* empty = malloc(sizeof(EmptyExpression));
     if (empty == NULL) RAISE(169)
-    *empty = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false};
+    *empty = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false};
     empty->_base._base._dtl = EmptyExpression__dtl;
     CHECK(170, SyntaxTreeForLoop_write_assign(self, self->aux_symbol->variable, &(empty->_base), self->_base._base.parent) )
   }
@@ -258,14 +258,14 @@ Returncode SyntaxTreeForLoop_write_assign(SyntaxTreeForLoop* self, SyntaxTreeVar
   
   SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
   if (symbol == NULL) RAISE(181)
-  *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL};
+  *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL};
   symbol->_base._base._dtl = SymbolExpression__dtl;
   CHECK(182, string_new_copy(item->name, &(symbol->name)) )
   CHECK(183, TypeInstance_copy_new(item->type_instance, &(symbol->_base.result_type)) )
   
   BinaryExpression* assign = malloc(sizeof(BinaryExpression));
   if (assign == NULL) RAISE(185)
-  *assign = (BinaryExpression){BinaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, NULL, NULL};
+  *assign = (BinaryExpression){BinaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL};
   assign->_base._base._base._dtl = BinaryExpression__dtl;
   assign->_base._base.top = true;
   assign->_base._base.is_statement = true;
@@ -334,12 +334,12 @@ Returncode SyntaxTreeForLoop_write_seq(SyntaxTreeForLoop* self) {
   
   SymbolExpression* index_symbol = malloc(sizeof(SymbolExpression));
   if (index_symbol == NULL) RAISE(233)
-  *index_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL};
+  *index_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL};
   index_symbol->_base._base._dtl = SymbolExpression__dtl;
   CHECK(234, string_new_concat(self->item->name, &(String){7, 6, "_Index"}, &(index_symbol->name)) )
   SliceExpression* slice = malloc(sizeof(SliceExpression));
   if (slice == NULL) RAISE(236)
-  *slice = (SliceExpression){SliceExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, NULL};
+  *slice = (SliceExpression){SliceExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, NULL};
   slice->_base._base._dtl = SliceExpression__dtl;
   slice->_base.top = true;
   slice->_base._base.line_number = self->_base._base._base.line_number;
@@ -378,7 +378,7 @@ Returncode SyntaxTreeForLoop_write_iter(SyntaxTreeForLoop* self) {
   
   SymbolExpression* has_symbol = malloc(sizeof(SymbolExpression));
   if (has_symbol == NULL) RAISE(264)
-  *has_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL};
+  *has_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL};
   has_symbol->_base._base._dtl = SymbolExpression__dtl;
   CHECK(265, string_new_concat(self->item->name, &(String){5, 4, "_Has"}, &(has_symbol->name)) )
   CHECK(266, TypeData_m_new_type_instance(&(glob->type_bool->_base), &(has_symbol->_base.result_type)) )
@@ -396,7 +396,7 @@ Returncode SyntaxTreeForLoop_write_iter(SyntaxTreeForLoop* self) {
   
   SymbolExpression* item_symbol = malloc(sizeof(SymbolExpression));
   if (item_symbol == NULL) RAISE(276)
-  *item_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL};
+  *item_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL};
   item_symbol->_base._base._dtl = SymbolExpression__dtl;
   CHECK(277, string_new_copy(self->item->name, &(item_symbol->name)) )
   CHECK(278, TypeInstance_copy_new(self->item->type_instance, &(item_symbol->_base.result_type)) )
@@ -431,7 +431,7 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   
   SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
   if (symbol == NULL) RAISE(297)
-  *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL};
+  *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL};
   symbol->_base._base._dtl = SymbolExpression__dtl;
   symbol->function = meth;
   
@@ -444,7 +444,7 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   
   CallExpression* call = malloc(sizeof(CallExpression));
   if (call == NULL) RAISE(304)
-  *call = (CallExpression){CallExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, false};
+  *call = (CallExpression){CallExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, false};
   call->_base._base._dtl = CallExpression__dtl;
   call->_base._base.line_number = self->_base._base._base.line_number;
   call->_base.top = true;

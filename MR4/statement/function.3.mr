@@ -238,31 +238,6 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
     base.analyze()
 
 
-## Main function node in the syntax tree
-class SyntaxTreeMainFunction(SyntaxTreeFunction)
-  func inst parse-new():(copy Char end, owner SyntaxTreeMainFunction new-node)
-    new SyntaxTreeMainFunction in new-node
-    new-node.parse():(copy end)
-  
-  func inst parse():(copy Char end)
-    self.init()
-    string-new-copy(user "main"):(owner self.name)
-    new FunctionArguments in self.arguments
-    self.arguments.init()
-    self.parse-body():(copy end)
-  
-  func dynamic write()
-    # USER_MAIN_HEADER {
-    #   `block...`
-    # }
-    # MAIN_FUNC
-    write-pre-func(user self)
-    write(user "\nUSER_MAIN_HEADER")
-    self.write-block()
-    write-post-func()
-    write(user "\nMAIN_FUNC\n")
-
-
 ## Function declaration argument
 class DeclarationArgument(Argument)
   owner SyntaxTreeVariable variable

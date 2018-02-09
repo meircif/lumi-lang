@@ -12,6 +12,86 @@ Int x = 0;
 Int x = 0;
 /// @ t5
 Int x = 0;
+/// @ t6
+char s_Values[12] = {0};
+String s_Var = {12, 0, NULL};
+String* s = NULL;
+Ref_Manager* s_Refman = NULL;
+String* us = NULL;
+Ref_Manager* us_Refman = NULL;
+String* gs = NULL;
+Ref_Manager* gs_Refman = NULL;
+void Mock_delete(Ref self) {}
+USER_MAIN_HEADER {
+  Returncode MR_err = OK;
+  Int x = 0;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value;
+#define MR_FUNC_NAME "global variable initialization"
+#define MR_FILE_NAME "mock.3.mr"
+  s = &s_Var;
+  s_Var.values = s_Values;
+  s_Refman = MR_new_ref(s);
+  if (s_Refman == NULL) RAISE(1)
+#undef MR_FILE_NAME
+#define MR_FILE_NAME "mock.3.mr"
+  us = s;
+  us_Refman = s_Refman;
+  MR_inc_ref(us_Refman);
+#undef MR_FILE_NAME
+#define MR_FILE_NAME "mock.3.mr"
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(3)
+  aux_String_0_Var.max_length = 12;
+  aux_String_0_Var.length = 11;
+  aux_String_0_Var.values = "global text";
+  gs = aux_String_0;
+  gs_Refman = aux_String_0_Refman;
+  MR_inc_ref(gs_Refman);
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  x = 6;
+  x = 7;
+MR_cleanup:
+  return MR_err;
+}
+MAIN_FUNC
+/// @ t7
+char s_Values[12] = {0};
+String s_Var = {12, 0, NULL};
+String* s = NULL;
+Ref_Manager* s_Refman = NULL;
+Returncode dummy(void);
+Returncode dummy(void) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+void Mock_delete(Ref self) {}
+USER_MAIN_HEADER {
+  Bool MR_success = true;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value;
+#define MR_FUNC_NAME "global variable initialization"
+#define MR_FILE_NAME "mock.3.mr"
+  s = &s_Var;
+  s_Var.values = s_Values;
+  s_Refman = MR_new_ref(s);
+  if (s_Refman == NULL) RAISE(1)
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  RUN_TEST(dummy);
+  return MR_success? OK : FAIL;
+}
+TEST_MAIN_FUNC
 /// @ te0
 unknown keyword "error"
 /// @ te1
@@ -36,6 +116,8 @@ redefinition of global variable "name"
 variable name overrides function "name"
 /// @ te11
 unknown type "Error"
+/// @ te12
+unknown symbol "error"
 /// @@ test-struct
 /// @ t0
 typedef struct Test Test;
@@ -764,10 +846,6 @@ variable name overrides function "name"
 /// @ te7
 type members cannot be initialized
 /// @ te8
-global variables cannot be initialized
-/// @ te9
-non-primitives cannot be declared "var" here yet...
-/// @ te10
 expected space after "new", got "new-line"
 /// @@ test-initialize
 /// @ t0
@@ -2782,4 +2860,99 @@ cannot iterate type with no "next" named method -  "TestIterator"
 iterator "next" method has parameters in type "TestIterator"
 /// @ te12
 iterator "next" method has outputs in type "TestIterator"
+/// @@ test-complex-fields
+/// @ t0
+typedef struct Base Base;
+typedef struct Base_Dynamic Base_Dynamic;
+typedef struct Test Test;
+struct Base {
+  Base* b;
+  Ref_Manager* b_Refman;
+  Base_Dynamic* b_Dynamic;
+};
+struct Base_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic);
+};
+struct Test {
+  Base b;
+};
+Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic);
+void Base_Del(Base* self);
+Returncode Test_test(Test* self, Ref_Manager* self_Refman);
+void Test_Del(Test* self);
+Base_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del, Base_meth};
+Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
+Returncode Base_meth(Base* self, Ref_Manager* self_Refman, Base_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+void Base_Del(Base* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->b_Refman);
+}
+Returncode Test_test(Test* self, Ref_Manager* self_Refman) {
+  Returncode MR_err = OK;
+  Base* b = NULL;
+  Ref_Manager* b_Refman = NULL;
+  Base_Dynamic* b_Dynamic = NULL;
+  Base* b2 = NULL;
+  Ref_Manager* b2_Refman = NULL;
+  Base_Dynamic* b2_Dynamic = NULL;
+  Test t_Var = {{0}};
+  Test* t = NULL;
+  Ref_Manager* t_Refman = NULL;
+  if (self == NULL || self_Refman->value == NULL) RAISE(7)
+  b = &(self->b);
+  b_Refman = self_Refman;
+  MR_inc_ref(b_Refman);
+  b_Dynamic = &Base_dynamic;
+  if (self == NULL || self_Refman->value == NULL) RAISE(8)
+  MR_dec_ref(b_Refman);
+  b_Refman = self_Refman;
+  MR_inc_ref(b_Refman);
+  b_Dynamic = &Base_dynamic;
+  b = &(self->b);
+  if (self == NULL || self_Refman->value == NULL) RAISE(9)
+  CHECK(9, Base_meth(&(self->b), self_Refman, &Base_dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(10)
+  CHECK(10, Base_meth(&(self->b), self_Refman, &Base_dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(11)
+  b2 = self->b.b;
+  b2_Refman = self->b.b_Refman;
+  MR_inc_ref(b2_Refman);
+  b2_Dynamic = self->b.b_Dynamic;
+  if (self == NULL || self_Refman->value == NULL) RAISE(12)
+  MR_dec_ref(b2_Refman);
+  b2_Refman = self->b.b_Refman;
+  MR_inc_ref(b2_Refman);
+  b2_Dynamic = self->b.b_Dynamic;
+  b2 = self->b.b;
+  if (self->b.b_Dynamic == NULL) RAISE(13)
+  if (self == NULL || self_Refman->value == NULL) RAISE(13)
+  CHECK(13, self->b.b_Dynamic->meth(self->b.b, self->b.b_Refman, self->b.b_Dynamic) )
+  if (self == NULL || self_Refman->value == NULL) RAISE(14)
+  CHECK(14, Base_meth(self->b.b, self->b.b_Refman, self->b.b_Dynamic) )
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(15)
+MR_cleanup:
+  MR_dec_ref(t_Refman);
+  MR_dec_ref(b2_Refman);
+  MR_dec_ref(b_Refman);
+  return MR_err;
+}
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+  Base_Del(&(self->b));
+}
+/// @ te0
+cannot declared "var" field of sequence type "String"
+/// @ te1
+cannot declared "var" field of sequence type "Array"
+/// @ te2
+variable will cause recursive declaration of type "Test"
+/// @ te3
+variable will cause recursive declaration of type "Test"
 /// @

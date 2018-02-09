@@ -35,6 +35,7 @@ class Expression(SyntaxTreeNode)
   var Bool top
   var Bool is-statement
   var Bool is-generic-cast
+  var Bool is-complex-field
   
   ## Parse any expression
   func inst parse-new(

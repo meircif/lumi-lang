@@ -27,6 +27,16 @@ var Int x
  documemtation #~
 
 var Int x
+## @ g t6
+var String{12} s
+user String us(user s)
+user String gs(user "global text")
+main
+  var Int x(copy 6)
+  x := 7
+## @ g t7
+var String{12} s
+test dummy()
 ## @ eg te0
 error 
 ## @ ec te1
@@ -59,6 +69,9 @@ func name()
 var Int name
 ## @ eg te11
 user Error error
+
+## @ eg te12
+var Int x(copy error)
 
 ## @@ test-struct
 ## @ g t0
@@ -414,13 +427,7 @@ func mock()
 ## @ eg te7
 struct Test
   var Int x(1)
-## @ eg te8
-var Int x(1)
-## @ eg te9
-struct Test
-  var Test t
-
-## @ ec te10
+## @ ec te8
 new
 ## @@ test-initialize
 ## @ c t0
@@ -1287,5 +1294,40 @@ struct TestIterator
   func next()->(var Int x)
 func f-mock()
   for n in TestIterator()
+
+## @@ test-complex-fields
+## @ g t0
+class Base
+  user Base b
+  func dynamic meth()
+struct Test
+  var Base b
+  func test()
+    user Base b(user self.b)
+    b := self.b
+    self.b.meth()
+    Base.meth(var self.b)
+    user Base b2(user self.b.b)
+    b2 := self.b.b
+    self.b.b.meth()
+    Base.meth(var self.b.b)
+    var Test t
+## @ eg te0
+struct Test
+  var String{12} error
+
+## @ eg te1
+struct Test
+  var Array{12:Int} error
+
+## @ eg te2
+struct Test
+  var Test error
+
+## @ eg te3
+struct Test
+  var Base error
+struct Base
+  var Test t
 
 ## @

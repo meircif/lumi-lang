@@ -31,7 +31,7 @@ static char* _func_name_CallExpression_parse_new = "CallExpression.parse-new";
 Returncode CallExpression_parse_new(CallExpression* self, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
   CallExpression* call_expression = malloc(sizeof(CallExpression));
   if (call_expression == NULL) RAISE(12)
-  *call_expression = (CallExpression){CallExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, NULL, NULL, NULL, false};
+  *call_expression = (CallExpression){CallExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, false};
   call_expression->_base._base._dtl = CallExpression__dtl;
   CHECK(13, CallExpression_parse(call_expression, (*expression), code_node, &((*end))) )
   (*expression) = &(call_expression->_base);

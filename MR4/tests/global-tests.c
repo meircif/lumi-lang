@@ -803,7 +803,7 @@ Returncode test_illegal_call() {
     TEST_FAIL(309)
   } while (false);
   _trace_stream = stdout;
-  SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL};
+  SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, false};
   root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
   _trace_stream = NULL;
   do {
