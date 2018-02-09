@@ -145,7 +145,7 @@ var Bool record-delete
 owner RefNode deleted-links
 owner RefNode deleted-base-links
 owner RefNode deleted-top-links
-owner RefNode deleted-refmans
+owner RefNode deleted-refmans(owner _)
 
 mock delete()
   if record-delete

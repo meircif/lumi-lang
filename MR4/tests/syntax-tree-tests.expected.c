@@ -25,18 +25,24 @@ void Mock_delete(Ref self) {}
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
   Int x = 0;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value;
+#define MR_FUNC_NAME "global variable initialization"
+#define MR_FILE_NAME "mock.3.mr"
   s = &s_Var;
   s_Var.values = s_Values;
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(1)
+#undef MR_FILE_NAME
+#define MR_FILE_NAME "mock.3.mr"
   us = s;
   us_Refman = s_Refman;
   MR_inc_ref(us_Refman);
+#undef MR_FILE_NAME
+#define MR_FILE_NAME "mock.3.mr"
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(3)
@@ -46,6 +52,8 @@ USER_MAIN_HEADER {
   gs = aux_String_0;
   gs_Refman = aux_String_0_Refman;
   MR_inc_ref(gs_Refman);
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
   x = 6;
@@ -66,23 +74,23 @@ MR_cleanup:
   return MR_err;
 }
 void Mock_delete(Ref self) {}
-#define MR_FILE_NAME "global"
-#define MR_FUNC_NAME "global"
 USER_MAIN_HEADER {
   Bool MR_success = true;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value;
+#define MR_FUNC_NAME "global variable initialization"
+#define MR_FILE_NAME "mock.3.mr"
   s = &s_Var;
   s_Var.values = s_Values;
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(1)
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
   RUN_TEST(dummy);
   return MR_success? OK : FAIL;
 }
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
 TEST_MAIN_FUNC
 /// @ te0
 unknown keyword "error"
@@ -1342,16 +1350,12 @@ MR_cleanup:
   return MR_err;
 }
 void Mock_delete(Ref self) {}
-#define MR_FILE_NAME "global"
-#define MR_FUNC_NAME "global"
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
   RUN_TEST(fun1);
   return MR_success? OK : FAIL;
 }
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
 TEST_MAIN_FUNC
 /// @ t7
 Returncode fun0(void);
@@ -1367,16 +1371,12 @@ MR_cleanup:
   return MR_err;
 }
 void Mock_delete(Ref self) {}
-#define MR_FILE_NAME "global"
-#define MR_FUNC_NAME "global"
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
   RUN_TEST(fun1);
   return MR_success? OK : FAIL;
 }
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
 TEST_MAIN_FUNC
 /// @ t8
 typedef struct Test Test;

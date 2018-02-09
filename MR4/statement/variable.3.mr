@@ -293,6 +293,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
 
 class VariableInit(SyntaxTreeCode)
   owner InitExpression expression-init
+  user SyntaxTreeVariable variable
   
   func inst parse-new(user SyntaxTreeVariable variable):(copy Char end)
     new VariableInit new-node
@@ -301,6 +302,7 @@ class VariableInit(SyntaxTreeCode)
   func inst parse(user SyntaxTreeVariable variable):(copy Char end)
     self.set-location()
     self.parent := variable.parent
+    self.variable := variable
     new InitExpression in self.expression-init
     self.expression-init.parse(
         owner variable.type-instance.copy-new(), user self):(copy end)
@@ -318,4 +320,13 @@ class VariableInit(SyntaxTreeCode)
     self.expression-init.analyze()
   
   func dynamic write()
+    if self.variable.type-instance.type-data.is-primitive and
+        not (? self.expression-init.arguments.parameters.first)
+      return
+    if self.parent = glob.root.global-init
+      write(user "#define MR_FILE_NAME \"")
+      write(user self.variable.input-file-name)
+      write(user "\"\n")
     self.expression-init.write()
+    if self.parent = glob.root.global-init
+      write(user "#undef MR_FILE_NAME\n")

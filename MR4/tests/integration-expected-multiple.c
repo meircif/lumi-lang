@@ -4027,16 +4027,18 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
-#define MR_FILE_NAME "global"
-#define MR_FUNC_NAME "global"
 USER_MAIN_HEADER {
   Bool MR_success = true;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value;
+#define MR_FUNC_NAME "global variable initialization"
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
   global_int = 23;
+#undef MR_FILE_NAME
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(19)
@@ -4046,6 +4048,12 @@ USER_MAIN_HEADER {
   global_string = aux_String_0;
   global_string_Refman = aux_String_0_Refman;
   MR_inc_ref(global_string_Refman);
+#undef MR_FILE_NAME
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+  deleted_refmans = NULL;
+  deleted_refmans_Refman = NULL;
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
   RUN_TEST(test_func);
@@ -4056,7 +4064,5 @@ USER_MAIN_HEADER {
   RUN_TEST(test_complex_delete);
   return MR_success? OK : FAIL;
 }
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
 
 TEST_MAIN_FUNC

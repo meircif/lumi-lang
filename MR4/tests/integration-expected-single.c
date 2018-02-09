@@ -2709,16 +2709,18 @@ void Mock_delete(Ref self) {}
 
 /* main function */
 
-#define MR_FILE_NAME "tests/integration-test0.4.mr"
-#define MR_FUNC_NAME "main"
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value;
+#define MR_FUNC_NAME "global variable initialization"
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
   global_int = 23;
+#undef MR_FILE_NAME
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(19)
@@ -2728,8 +2730,12 @@ USER_MAIN_HEADER {
   global_string = aux_String_0;
   global_string_Refman = aux_String_0_Refman;
   MR_inc_ref(global_string_Refman);
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+#define MR_FILE_NAME "tests/integration-test0.4.mr"
+#define MR_FUNC_NAME "main"
   CHECK(538, test_simple_function() )
   CHECK(539, test_ref_count() )
   CHECK(540, test_error_handling(NULL, NULL) )

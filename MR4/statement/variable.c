@@ -70,12 +70,12 @@ Returncode SyntaxTreeVariable_parse(SyntaxTreeVariable* self, Int access, Bool i
     CHECK(46, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){35, 34, "type members cannot be initialized"}) )
   }
   if (!(NULL != self->_base.parent) &&  ! (NULL != self->parent_type)) {
-    self->_base.parent = &(glob->root->global_init->_base);
+    self->_base.parent = &(glob->root->global_init->_base._base);
   }
   if (NULL != self->_base.parent && ((*end) == '(' || self->is_create)) {
     CHECK(50, VariableInit_parse_new(NULL, self, &((*end))) )
   }
-  if (self->_base.parent == &(glob->root->global_init->_base)) {
+  if (self->_base.parent == &(glob->root->global_init->_base._base)) {
     self->_base.parent = NULL;
   }
   return OK;
@@ -479,6 +479,7 @@ typedef struct VariableInit VariableInit;
 struct VariableInit {
   SyntaxTreeCode _base;
   InitExpression* expression_init;
+  SyntaxTreeVariable* variable;
 };
 #endif
 #if MR_STAGE == MR_DECLARATIONS
@@ -488,10 +489,10 @@ static char* _func_name_VariableInit_parse_new = "VariableInit.parse-new";
 #define MR_FUNC_NAME _func_name_VariableInit_parse_new
 Returncode VariableInit_parse_new(VariableInit* self, SyntaxTreeVariable* variable, Char* end) {
   VariableInit* new_node = malloc(sizeof(VariableInit));
-  if (new_node == NULL) RAISE(298)
-  *new_node = (VariableInit){VariableInit__dtl, NULL, 0, NULL, NULL};
+  if (new_node == NULL) RAISE(299)
+  *new_node = (VariableInit){VariableInit__dtl, NULL, 0, NULL, NULL, NULL};
   new_node->_base._base._dtl = VariableInit__dtl;
-  CHECK(299, VariableInit_parse(new_node, variable, &((*end))) )
+  CHECK(300, VariableInit_parse(new_node, variable, &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -502,25 +503,26 @@ Returncode VariableInit_parse(VariableInit* self, SyntaxTreeVariable* variable, 
 static char* _func_name_VariableInit_parse = "VariableInit.parse";
 #define MR_FUNC_NAME _func_name_VariableInit_parse
 Returncode VariableInit_parse(VariableInit* self, SyntaxTreeVariable* variable, Char* end) {
-  CHECK(302, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(303, SyntaxTreeNode_set_location(&(self->_base._base)) )
   self->_base.parent = variable->_base.parent;
+  self->variable = variable;
   self->expression_init = malloc(sizeof(InitExpression));
-  if (self->expression_init == NULL) RAISE(304)
+  if (self->expression_init == NULL) RAISE(306)
   *self->expression_init = (InitExpression){InitExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, NULL};
   self->expression_init->_base._base._dtl = InitExpression__dtl;
   TypeInstance* _TypeInstance153;
-  CHECK(305, TypeInstance_copy_new(variable->type_instance, &(_TypeInstance153)) )
-  CHECK(305, InitExpression_parse(self->expression_init, _TypeInstance153, &(self->_base), &((*end))) )
+  CHECK(307, TypeInstance_copy_new(variable->type_instance, &(_TypeInstance153)) )
+  CHECK(307, InitExpression_parse(self->expression_init, _TypeInstance153, &(self->_base), &((*end))) )
   self->expression_init->_base.is_statement = true;
   self->expression_init->symbol = malloc(sizeof(SymbolExpression));
-  if (self->expression_init->symbol == NULL) RAISE(308)
+  if (self->expression_init->symbol == NULL) RAISE(310)
   *self->expression_init->symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL};
   self->expression_init->symbol->_base._base._dtl = SymbolExpression__dtl;
-  CHECK(309, string_new_copy(variable->name, &(self->expression_init->symbol->name)) )
+  CHECK(311, string_new_copy(variable->name, &(self->expression_init->symbol->name)) )
   self->expression_init->symbol->variable = variable;
-  CHECK(312, TypeInstance_copy_new(variable->type_instance, &(self->expression_init->symbol->_base.result_type)) )
+  CHECK(314, TypeInstance_copy_new(variable->type_instance, &(self->expression_init->symbol->_base.result_type)) )
   self->expression_init->symbol->_base.access = variable->access;
-  CHECK(315, List_add(variable->_base.parent->code_nodes, &(self->_base)) )
+  CHECK(317, List_add(variable->_base.parent->code_nodes, &(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -531,7 +533,7 @@ Returncode VariableInit_analyze(VariableInit* self);
 static char* _func_name_VariableInit_analyze = "VariableInit.analyze";
 #define MR_FUNC_NAME _func_name_VariableInit_analyze
 Returncode VariableInit_analyze(VariableInit* self) {
-  CHECK(318, (self->expression_init)->_base._base._dtl[2](self->expression_init) )
+  CHECK(320, (self->expression_init)->_base._base._dtl[2](self->expression_init) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -542,7 +544,18 @@ Returncode VariableInit_write(VariableInit* self);
 static char* _func_name_VariableInit_write = "VariableInit.write";
 #define MR_FUNC_NAME _func_name_VariableInit_write
 Returncode VariableInit_write(VariableInit* self) {
-  CHECK(321, (self->expression_init)->_base._base._dtl[3](self->expression_init) )
+  if (self->variable->type_instance->type_data->is_primitive &&  ! (NULL != self->expression_init->arguments->parameters->first)) {
+    return OK;
+  }
+  if (self->_base.parent == &(glob->root->global_init->_base._base)) {
+    CHECK(327, write(&(String){23, 22, "#define MR_FILE_NAME \""}) )
+    CHECK(328, write(self->variable->_base._base.input_file_name) )
+    CHECK(329, write(&(String){3, 2, "\"\n"}) )
+  }
+  CHECK(330, (self->expression_init)->_base._base._dtl[3](self->expression_init) )
+  if (self->_base.parent == &(glob->root->global_init->_base._base)) {
+    CHECK(332, write(&(String){21, 20, "#undef MR_FILE_NAME\n"}) )
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
