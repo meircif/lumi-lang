@@ -26,7 +26,7 @@ String* mock_input_file_text = &(String){2048, 0, (char[2048]){0}};
 #if MR_STAGE == MR_DECLARATIONS
 extern String* mock_output_file_text;
 #elif MR_STAGE == MR_FUNCTIONS
-String* mock_output_file_text = &(String){8192, 0, (char[8192]){0}};
+String* mock_output_file_text = &(String){16384, 0, (char[16384]){0}};
 #endif
 #if MR_STAGE == MR_DECLARATIONS
 extern Int mock_input_file_index;
@@ -417,7 +417,7 @@ Returncode test_from_file(String* name) {
   CHECK(169, File_write(actual_output_file, &(String){2, 1, "\n"}) )
   
   String* input = &(String){4096, 0, (char[4096]){0}};
-  String* expected = &(String){8192, 0, (char[8192]){0}};
+  String* expected = &(String){16384, 0, (char[16384]){0}};
   Bool _Bool163;
   CHECK(173, read_line(input_file, line, &(String){6, 5, "## @ "}, &(_Bool163)) )
   if (!_Bool163) {

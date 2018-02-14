@@ -59,6 +59,8 @@ static Global
   owner BuiltinType type-sys
   
   func inst init()
+    self.got-new-line := false
+    self.save-input := false
     new SyntaxTreeRoot in self.root
     self.root.init()
     new String{1024} in self.input-buffer

@@ -287,7 +287,7 @@ Returncode Expression_write_refman_init(Expression* self, SymbolExpression* symb
   CHECK(188, write(&(String){5, 4, "if ("}) )
   CHECK(189, (symbol)->_base._base._dtl[3](symbol) )
   CHECK(190, write(&(String){18, 17, "_Refman == NULL) "}) )
-  CHECK(191, SyntaxTreeNode_write_raise(&(self->_base)) )
+  CHECK(191, SyntaxTreeNode_write_raise(&(self->_base), &(String){39, 38, "insufficient memory for managed object"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -308,41 +308,21 @@ Returncode Expression_write_init_var_ref(Expression* self, SymbolExpression* sym
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_write_validate_ref(Expression* self);
-#elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_Expression_write_validate_ref = "Expression.write-validate-ref";
-#define MR_FUNC_NAME _func_name_Expression_write_validate_ref
-Returncode Expression_write_validate_ref(Expression* self) {
-  CHECK(201, Expression_write_as_top(self) )
-  CHECK(202, write(&(String){9, 8, " == NULL"}) )
-  if (!self->result_type->type_data->is_primitive) {
-    CHECK(204, write(&(String){5, 4, " || "}) )
-    Bool top = self->top;
-    self->top = false;
-    CHECK(207, (self)->_base._dtl[5](self) )
-    self->top = top;
-    CHECK(209, write(&(String){16, 15, "->value == NULL"}) )
-  }
-  return OK;
-}
-#undef MR_FUNC_NAME
-#endif
-#if MR_STAGE == MR_DECLARATIONS
 Returncode Expression_write_assign_null(Expression* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_write_assign_null = "Expression.write-assign-null";
 #define MR_FUNC_NAME _func_name_Expression_write_assign_null
 Returncode Expression_write_assign_null(Expression* self) {
-  CHECK(212, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(213, (self)->_base._dtl[3](self) )
-  CHECK(214, write(&(String){10, 9, " = NULL;\n"}) )
-  CHECK(215, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(216, (self)->_base._dtl[5](self) )
-  CHECK(217, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(201, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(202, (self)->_base._dtl[3](self) )
+  CHECK(203, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(204, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(205, (self)->_base._dtl[5](self) )
+  CHECK(206, write(&(String){10, 9, " = NULL;\n"}) )
   if (self->result_type->type_data->is_dynamic) {
-    CHECK(219, SyntaxTreeCode_write_spaces(self->code_node) )
-    CHECK(220, (self)->_base._dtl[4](self) )
-    CHECK(221, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(208, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(209, (self)->_base._dtl[4](self) )
+    CHECK(210, write(&(String){10, 9, " = NULL;\n"}) )
   }
   return OK;
 }
@@ -354,8 +334,8 @@ Returncode Expression_write_dynamic(Expression* self);
 static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
 #define MR_FUNC_NAME _func_name_Expression_write_dynamic
 Returncode Expression_write_dynamic(Expression* self) {
-  CHECK(224, (self)->_base._dtl[3](self) )
-  CHECK(225, write(&(String){9, 8, "_Dynamic"}) )
+  CHECK(213, (self)->_base._dtl[3](self) )
+  CHECK(214, write(&(String){9, 8, "_Dynamic"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -366,8 +346,8 @@ Returncode Expression_write_refman(Expression* self);
 static char* _func_name_Expression_write_refman = "Expression.write-refman";
 #define MR_FUNC_NAME _func_name_Expression_write_refman
 Returncode Expression_write_refman(Expression* self) {
-  CHECK(228, (self)->_base._dtl[3](self) )
-  CHECK(229, write(&(String){8, 7, "_Refman"}) )
+  CHECK(217, (self)->_base._dtl[3](self) )
+  CHECK(218, write(&(String){8, 7, "_Refman"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -380,7 +360,7 @@ static char* _func_name_Expression_write_as_top = "Expression.write-as-top";
 Returncode Expression_write_as_top(Expression* self) {
   Bool top = self->top;
   self->top = true;
-  CHECK(234, (self)->_base._dtl[3](self) )
+  CHECK(223, (self)->_base._dtl[3](self) )
   self->top = top;
   return OK;
 }

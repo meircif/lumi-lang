@@ -1,0 +1,30 @@
+Running tests:
+testing fail_call_empty... Error: empty function called
+  Error raised in tests/integration-error-test.4.mr:21 fail-call-empty()
+testing fail_base_class_output... Error: non empty base class given as output argument
+  Error raised in tests/integration-error-test.4.mr:26 fail-base-class-output()
+testing fail_slice_index... Error: slice index out of bounds
+  Error raised in tests/integration-error-test.4.mr:30 fail-slice-index()
+testing fail_member_empty... Error: used member of empty object
+  Error raised in tests/integration-error-test.4.mr:34 fail-member-empty()
+testing fail_member_outdated... Error: used member of outdated weak reference
+  Error raised in tests/integration-error-test.4.mr:41 fail-member-outdated()
+testing fail_sequence_empty... Error: empty object used as sequence
+  Error raised in tests/integration-error-test.4.mr:46 fail-sequence-empty()
+testing fail_sequence_outdated... Error: outdated weak reference used as sequence
+  Error raised in tests/integration-error-test.4.mr:52 fail-sequence-outdated()
+testing fail_dynamic_empty... Error: dynamic call of empty object
+  Error raised in tests/integration-error-test.4.mr:56 fail-dynamic-empty()
+testing fail_raise... Error raised in tests/integration-error-test.4.mr:59 fail-raise()
+testing fail_raise_message... Error: my error
+  Error raised in tests/integration-error-test.4.mr:16 f-raise-message()
+  called from tests/integration-error-test.4.mr:62 fail-raise-message()
+testing fail_assert... Error: condition is not true
+  Assert failed in tests/integration-error-test.4.mr:65 fail-assert()
+testing fail_assert_error... Error: error not raised
+  Assert failed in tests/integration-error-test.4.mr:68 fail-assert-error()
+testing fail_assert_error_message... Assert failed: unexpected error message "tested other message"
+  Assert failed in tests/integration-error-test.4.mr:71 fail-assert-error-message()
+testing fail_assert_error_message_prefix... Assert failed: unexpected error message "tested message"
+  Assert failed in tests/integration-error-test.4.mr:74 fail-assert-error-message-prefix()
+Tests failed

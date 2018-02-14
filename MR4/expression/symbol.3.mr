@@ -172,20 +172,28 @@ class MemberExpression(SymbolExpression)
         self.instance.result-type.type-data != glob.type-type)) or
         (? self.instance and self.instance.is-complex-field)
       return
-    # if (...) RAISE(`line-num`)
+    # if (...) RAISE(`line-num`, ...)
     write(user "if (")
     if ? self.instance
-      # `instance` == NULL[ || `instance`_Refman->value == NULL]
-      self.instance.write-validate-ref()
+      # if (`instance` == NULL) RAISE("used member of empty object")
+      # if (`instance`_Refman->value == NULL)
+      #   RAISE("used member of outdated weak reference")
+      self.instance.write-as-top()
+      write(user " == NULL) ")
+      self.write-raise(user "used member of empty object")
+      self.code-node.write-spaces()
+      write(user "if (")
+      self.instance.write-refman()
+      write(user "->value == NULL) ")
+      self.write-raise(user "used member of outdated weak reference")
     else-if ? self.dynamic-call-self-instance
-      # `instance`_Dynamic == NULL
+      # if (`instance`_Dynamic == NULL) RAISE("dynamic call of empty object")
       var Bool top(self.dynamic-call-self-instance.top)
       self.dynamic-call-self-instance.top := true
       self.dynamic-call-self-instance.write-dynamic()
+      write(user " == NULL) ")
+      self.write-raise(user "dynamic call of empty object")
       self.dynamic-call-self-instance.top := top
-      write(user " == NULL")
-    write(user ") ")
-    self.write-raise()
     self.code-node.write-spaces()
   
   func dynamic write()

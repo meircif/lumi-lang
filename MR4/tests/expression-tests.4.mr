@@ -68,11 +68,13 @@ c := '\270'
 ## @ c t0
 str := "some string"
 ## @ c t1
-str := "\nstring\twith\\formatting\n"
+str := "\nstring\t\"with\\formatting\n"
 ## @ ec te0
 "aaa
 ## @ ec te1
 "
+## @ ec te2
+"error"+"string"
 ## @@ test-empty-expression
 ## @ c t0
 str := _
@@ -366,6 +368,9 @@ b := b is b
 ## @ c t14
 owner Tc otc
   tb := otc
+## @ c t15
+owner Array{Test} tarr
+  tarr := _
 ## @ ec te0
 345 @ 2
 ## @ ec te1

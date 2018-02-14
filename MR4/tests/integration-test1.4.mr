@@ -273,3 +273,49 @@ test test-complex-delete()
   assert not deleted-links?
   assert not deleted-base-links?
   assert not deleted-top-links?
+
+
+func f-raise-message()
+  raise "tested message"
+
+func f-ignore-and-raise()
+  try
+    f-raise-message()
+  raise "ignore and raise"
+
+func f-failed-assert()
+  assert 1 = 2
+
+func f-good-assert-error()
+  assert-error f-raise-message()
+  raise "good assert error"
+
+func f-failed-assert-error()
+  assert-error f-test-void()
+
+func f-wrong-message-assert-error()
+  assert-error f-raise-message(), "wrong message"
+
+test test-assert-error-message()
+  assert-error f-raise-message(), "tested message"
+  assert-error f-ignore-and-raise(), "ignore and raise"
+  assert-error f-failed-assert(), "condition is not true"
+  assert-error f-good-assert-error(), "good assert error"
+  assert-error f-failed-assert-error(), "error not raised"
+  assert-error f-wrong-message-assert-error()
+  var Func{()} fun
+  assert-error fun(), "empty function called"
+  var BaseType base-var
+  user BaseType base-user(user base-var)
+  assert-error test-mid-out()->(user base-user),
+      "non empty base class given as output argument"
+  new Array{2:Int} arr
+  assert-error arr[6], "slice index out of bounds"
+  user Array{Int} arr2(user arr)
+  arr := _
+  assert-error arr.length, "used member of empty object"
+  assert-error arr2.length, "used member of outdated weak reference"
+  assert-error arr[0], "empty object used as sequence"
+  assert-error arr2[0], "outdated weak reference used as sequence"
+  user TopType top
+  assert-error top.meth2(), "dynamic call of empty object"

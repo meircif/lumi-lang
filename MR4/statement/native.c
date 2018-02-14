@@ -92,13 +92,12 @@ static char* _func_name_NativeFunction_parse = "NativeFunction.parse";
 #define MR_FUNC_NAME _func_name_NativeFunction_parse
 Returncode NativeFunction_parse(NativeFunction* self, Char* end) {
   CHECK(31, SyntaxTreeNode_set_location(&(self->_base._base._base._base)) )
-  /* self.indentation-spaces := 2 */
-  CHECK(33, SyntaxTreeFunction_parse_header(&(self->_base), true, &((*end))) )
+  CHECK(32, SyntaxTreeFunction_parse_header(&(self->_base), true, &((*end))) )
   self->_base._base.code_nodes = malloc(sizeof(List));
-  if (self->_base._base.code_nodes == NULL) RAISE(34)
+  if (self->_base._base.code_nodes == NULL) RAISE(33)
   *self->_base._base.code_nodes = (List){NULL, NULL};
   self->_base._base._base.variables = malloc(sizeof(List));
-  if (self->_base._base._base.variables == NULL) RAISE(35)
+  if (self->_base._base._base.variables == NULL) RAISE(34)
   *self->_base._base._base.variables = (List){NULL, NULL};
   return OK;
 }
@@ -138,10 +137,10 @@ static char* _func_name_NativeVariable_parse_new = "NativeVariable.parse-new";
 #define MR_FUNC_NAME _func_name_NativeVariable_parse_new
 Returncode NativeVariable_parse_new(NativeVariable* self, Char* end, NativeVariable** new_node) {
   (*new_node) = malloc(sizeof(NativeVariable));
-  if ((*new_node) == NULL) RAISE(44)
+  if ((*new_node) == NULL) RAISE(43)
   *(*new_node) = (NativeVariable){NativeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
   (*new_node)->_base._base._base._dtl = NativeVariable__dtl;
-  CHECK(45, SyntaxTreeVariable_parse(&((*new_node)->_base), ACCESS_VAR, false, NULL, NULL, &((*end))) )
+  CHECK(44, SyntaxTreeVariable_parse(&((*new_node)->_base), ACCESS_VAR, false, NULL, NULL, &((*end))) )
   (*new_node)->_base.is_native = true;
   return OK;
 }
@@ -154,9 +153,9 @@ static char* _func_name_NativeVariable_analyze = "NativeVariable.analyze";
 #define MR_FUNC_NAME _func_name_NativeVariable_analyze
 Returncode NativeVariable_analyze(NativeVariable* self) {
   if (!self->_base.type_instance->type_data->is_primitive) {
-    CHECK(50, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){56, 55, "only primitive types supported for native variable, got"}, self->_base.type_instance->type_data->name) )
+    CHECK(49, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){56, 55, "only primitive types supported for native variable, got"}, self->_base.type_instance->type_data->name) )
   }
-  CHECK(53, SyntaxTreeVariable_analyze(&(self->_base)) )
+  CHECK(52, SyntaxTreeVariable_analyze(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -167,8 +166,8 @@ Returncode NativeVariable_write(NativeVariable* self);
 static char* _func_name_NativeVariable_write = "NativeVariable.write";
 #define MR_FUNC_NAME _func_name_NativeVariable_write
 Returncode NativeVariable_write(NativeVariable* self) {
-  CHECK(56, write(&(String){9, 8, "\nextern "}) )
-  CHECK(57, SyntaxTreeVariable_write(&(self->_base)) )
+  CHECK(55, write(&(String){9, 8, "\nextern "}) )
+  CHECK(56, SyntaxTreeVariable_write(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -196,10 +195,10 @@ static char* _func_name_NativeType_parse_new = "NativeType.parse-new";
 #define MR_FUNC_NAME _func_name_NativeType_parse_new
 Returncode NativeType_parse_new(NativeType* self, Char* end, NativeType** new_node) {
   (*new_node) = malloc(sizeof(NativeType));
-  if ((*new_node) == NULL) RAISE(63)
+  if ((*new_node) == NULL) RAISE(62)
   *(*new_node) = (NativeType){NativeType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false, false};
   (*new_node)->_base._base._base._base._dtl = NativeType__dtl;
-  CHECK(64, NativeType_parse((*new_node), &((*end))) )
+  CHECK(63, NativeType_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -211,9 +210,9 @@ static char* _func_name_NativeType_parse = "NativeType.parse";
 #define MR_FUNC_NAME _func_name_NativeType_parse
 Returncode NativeType_parse(NativeType* self, Char* end) {
   self->_base.is_primitive = true;
-  CHECK(68, read_new(&(String){1, 0, ""}, &(self->_base.name), &((*end))) )
-  CHECK(69, TypeData_add_type(&(self->_base)) )
-  CHECK(70, SyntaxTreeNamespace_init(&(self->_base._base)) )
+  CHECK(67, read_new(&(String){1, 0, ""}, &(self->_base.name), &((*end))) )
+  CHECK(68, TypeData_add_type(&(self->_base)) )
+  CHECK(69, SyntaxTreeNamespace_init(&(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -236,9 +235,9 @@ static char* _func_name_NativeType_write_declaration = "NativeType.write-declara
 #define MR_FUNC_NAME _func_name_NativeType_write_declaration
 Returncode NativeType_write_declaration(NativeType* self) {
   /* typedef void* `name`; */
-  CHECK(77, write(&(String){16, 15, "\ntypedef void* "}) )
-  CHECK(78, write_cname(self->_base.name) )
-  CHECK(79, write(&(String){3, 2, ";\n"}) )
+  CHECK(76, write(&(String){16, 15, "\ntypedef void* "}) )
+  CHECK(77, write_cname(self->_base.name) )
+  CHECK(78, write(&(String){3, 2, ";\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

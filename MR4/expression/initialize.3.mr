@@ -173,7 +173,7 @@ class InitExpression(Expression)
     write(user "if (")
     self.symbol.write()
     write(user " == NULL) ")
-    self.write-raise()
+    self.write-raise(user "insufficient memory for object dynamic allocation")
   
   func inst write-assign()
     # `name` = `value`;

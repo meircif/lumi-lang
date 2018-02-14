@@ -4,21 +4,61 @@
 #define MR_FILE_NAME __FILE__
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
-#define CRAISE RAISE(__LINE__)
+#define CRAISE USER_RAISE(__LINE__, NULL, NULL)
 #define CCHECK(err) CHECK(__LINE__, err)
-#define CHECK_NOT_NULL(ref) if (ref == NULL || ref##_Refman == NULL) { CRAISE }
+#define CHECK_NOT_NULL(ref) \
+  if (ref == NULL || ref##_Refman->value == NULL) CRAISE
 
 char* MR_raise_format = "Error raised in %s:%d %s()\n";
 char* MR_assert_format = "Assert failed in %s:%d %s()\n";
 char* MR_traceline_format = "  called from %s:%d %s()\n";
 FILE* MR_trace_stream = NULL;
 int MR_trace_ignore_count = 0;
+char* MR_expected_error = NULL;
+int MR_expected_error_trace_ignore_count = 0;
 Generic_Type_Dynamic* dynamic_Void = NULL;
 
 void MR_trace_print(
-    char const* format, char const* filename, int line, char const* funcname) {
+    char const* format,
+    char const* filename,
+    int line,
+    char const* funcname,
+    String* message,
+    Ref_Manager* message_refman) {
   if (MR_trace_ignore_count == 0) {
+    if (message != NULL && message_refman->value != NULL) {
+      fprintf(
+          MR_trace_stream, "Error: %.*s\n  ", message->length, message->values);
+    }
     fprintf(MR_trace_stream, format, filename, line, funcname);
+  }
+  else if (MR_expected_error != NULL &&
+      MR_expected_error_trace_ignore_count == MR_trace_ignore_count &&
+      format != MR_traceline_format) {
+    int n;
+    if (message == NULL || message_refman->value == NULL) {
+      MR_expected_error = NULL;
+      if (MR_trace_ignore_count == 1) {
+        fprintf(
+            MR_trace_stream,
+            "Assert failed: error with no message raised\n  ");
+      }
+      return;
+    }
+    for (n = 0; n <= message->length; ++n) {
+      if (((n == message->length)? '\0': message->values[n]) !=
+          MR_expected_error[n]) {
+        MR_expected_error = NULL;
+        if (MR_trace_ignore_count == 1) {
+          fprintf(
+              MR_trace_stream,
+              "Assert failed: unexpected error message \"%.*s\"\n  ",
+              message->length,
+              message->values);
+        }
+        return;
+      }
+    }
   }
 }
 

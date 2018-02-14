@@ -30,6 +30,7 @@ class SyntaxTreeAssert(SyntaxTreeCode)
 ## Assert-error statement in the syntax tree
 class SyntaxTreeAssertError(SyntaxTreeCode)
   owner Expression tested
+  owner String expected-error
   
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeAssertError new-node)
@@ -39,12 +40,37 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
     self.parent := parent
     self.set-location()
-    parse-new-expression(user "", user self):(owner self.tested, copy end)
+    parse-new-expression(user ",", user self):(owner self.tested, copy end)
+    if end = ','
+      read-c():(copy end)
+      if end = '\n'
+        self.read-line-break-spaces()
+      else-if end != ' '
+        self.m-syntax-error-c(user "expected space after \",\", got", copy end)
+      read-new(user ""):(owner self.expected-error, copy end)
+      self.check-string(user self.expected-error)
   
   func dynamic analyze()
     self.tested.analyze()
   
   func dynamic write()
+    if ? self.expected-error
+      self.write-spaces()
+      write(user "{char* MR_expected_error_prev;\n")
+      self.write-spaces()
+      write(user "int MR_expected_error_trace_ignore_count_prev;\n")
+      self.write-spaces()
+      write(user "MR_expected_error_prev = MR_expected_error;\n")
+      self.write-spaces()
+      write(user "MR_expected_error_trace_ignore_count_prev =")
+      write(user " MR_expected_error_trace_ignore_count;\n")
+      self.write-spaces()
+      write(user "MR_expected_error = ")
+      write(user self.expected-error)
+      write(user ";\n")
+      self.write-spaces()
+      write(user "MR_expected_error_trace_ignore_count =")
+      write(user " MR_trace_ignore_count + 1;\n")
     self.write-spaces()
     write(user "do {\n")
     self.parent.indentation-spaces += 2
@@ -58,15 +84,37 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     write(user "#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup\n")
     self.write-spaces()
     write(user "--MR_trace_ignore_count;\n")
+    if ? self.expected-error
+      self.write-spaces()
+      write(user "MR_expected_error_trace_ignore_count =")
+      write(user " MR_expected_error_trace_ignore_count_prev;\n")
+      self.write-spaces()
+      write(user "MR_expected_error = MR_expected_error_prev;\n")
     self.write-spaces()
     write(user "TEST_FAIL(")
     self.write-line-num()
-    write(user ")\n")
+    write(user ", 16, \"error not raised\")\n")
     self.parent.indentation-spaces -= 2
     self.write-spaces()
     write(user "} while (false);\n")
     self.write-spaces()
     write(user "--MR_trace_ignore_count;\n")
+    if ? self.expected-error
+      self.write-spaces()
+      write(user "MR_expected_error_trace_ignore_count =")
+      write(user " MR_expected_error_trace_ignore_count_prev;\n")
+      self.write-spaces()
+      write(user "if (MR_expected_error == NULL) {\n")
+      self.write-spaces()
+      write(user "  MR_expected_error = MR_expected_error_prev;\n")
+      self.write-spaces()
+      write(user "  TEST_FAIL_NULL(")
+      self.write-line-num()
+      write(user ")\n")
+      self.write-spaces()
+      write(user "}\n")
+      self.write-spaces()
+      write(user "MR_expected_error = MR_expected_error_prev;}\n")
 
 
 ## Test function in the syntax tree

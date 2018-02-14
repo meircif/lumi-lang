@@ -188,7 +188,7 @@ class Expression(SyntaxTreeNode)
     write(user "if (")
     symbol.write()
     write(user "_Refman == NULL) ")
-    self.write-raise()
+    self.write-raise(user "insufficient memory for managed object")
   
   func inst write-init-var-ref(user SymbolExpression symbol)
     # `symbol` = &`symbol`_Var;
@@ -196,17 +196,6 @@ class Expression(SyntaxTreeNode)
     write(user " = &")
     symbol.write()
     write(user "_Var;\n")
-  
-  func inst write-validate-ref()
-    self.write-as-top()
-    write(user " == NULL")
-    if not self.result-type.type-data.is-primitive
-      write(user " || ")
-      var Bool top(self.top)
-      self.top := false
-      self.write-refman()
-      self.top := top
-      write(user "->value == NULL")
   
   func inst write-assign-null()
     self.code-node.write-spaces()

@@ -55,30 +55,51 @@ extern char* MR_raise_format;
 extern char* MR_assert_format;
 extern char* MR_traceline_format;
 extern int MR_trace_ignore_count;
+extern char* MR_expected_error;
+extern int MR_expected_error_trace_ignore_count;
 void MR_trace_print(
   char const* format,
   char const* filename,
   int line,
-  char const* funcname);
+  char const* funcname,
+  String* message,
+  Ref_Manager* message_refman);
 
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
 
-#define START_TRACE(line, value, format) { \
-  MR_trace_print(format, MR_FILE_NAME, line, MR_FUNC_NAME); \
-  RETURN_ERROR(value); }
+#define START_TRACE(line, value, format, message, message_refman) \
+  MR_trace_print( \
+      format, MR_FILE_NAME, line, MR_FUNC_NAME, message, message_refman); \
+  RETURN_ERROR(value);
 
-#define RAISE(line) START_TRACE(line, ERR, MR_raise_format)
+#define START_TRACE_STATIC(line, err_value, format, message_length, message) { \
+  String MR_msg = { message_length + 1, message_length, message }; \
+  Ref_Manager MR_msg_refman = { 1, NULL, NULL }; \
+  MR_msg_refman.value = &MR_msg; \
+  START_TRACE(line, err_value, format, &MR_msg, &MR_msg_refman) }
+
+#define RAISE(line, message_length, message) \
+  START_TRACE_STATIC(line, ERR, MR_raise_format, message_length, message)
+
+#define USER_RAISE(line, message, message_refman) \
+  { START_TRACE(line, ERR, MR_raise_format, message, message_refman) }
+
+#define TEST_FAIL(line, message_length, message) \
+  START_TRACE_STATIC(line, FAIL, MR_assert_format, message_length, message)
+
+#define TEST_ASSERT(line, condition) if (!(condition)) \
+  TEST_FAIL(line, 21, "condition is not true")
+
+#define TEST_FAIL_NULL(line) \
+  { START_TRACE(line, FAIL, MR_assert_format, NULL, NULL) }
 
 #define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
-  MR_trace_print(MR_traceline_format, MR_FILE_NAME, line, MR_FUNC_NAME); \
+  MR_trace_print( \
+      MR_traceline_format, MR_FILE_NAME, line, MR_FUNC_NAME, NULL, NULL); \
   RETURN_ERROR(_err); } }
 
 #define IGNORE_ERRORS(call) \
   ++MR_trace_ignore_count; (void)call; --MR_trace_ignore_count;
-
-#define TEST_FAIL(line) START_TRACE(line, FAIL, MR_assert_format)
-
-#define TEST_ASSERT(line, condition) if (!(condition)) TEST_FAIL(line)
 
 #define RUN_TEST(test_func) MR_success &= MR_run_test(#test_func, test_func)
 

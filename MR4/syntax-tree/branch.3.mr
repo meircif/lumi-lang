@@ -229,7 +229,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     if ? type-data
       write(user "self->")
     write-cname(user variable.name)
-    write(user ");\n")
+    write(user ")")
+    if variable.type-instance.type-data != glob.type-array
+      write(user ";")
+    write(user "\n")
 
 
 ## A basic namespace node in the syntax tree

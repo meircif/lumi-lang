@@ -77,7 +77,7 @@ class UnaryExpression(Expression)
     if end = '\n'
       code-node.read-line-break-spaces()
     else-if end != ' '
-      self.m-syntax-error-c(user "unexpected", copy end)
+      self.m-syntax-error-c(user "expected space after operator, got", copy end)
     Expression.parse-new(var _, user ends, user code-node, user operator):(
         owner self.right-expression, copy end, user next-operator)
   
@@ -285,9 +285,20 @@ class BinaryExpression(UnaryExpression)
         while type-data.is-dynamic
         write(user "_base.")
       write(user "_del(")
-    else
+    else-if type-data != glob.type-array
       write-cname(user type-data.name)
       write(user "_Del(")
+    else
+      type-data :=
+          self.left-expression.result-type.parameters.first.item.type-data
+      if not type-data.is-primitive
+        write(user "ARRAY_DEL(")
+        write-cname(user type-data.name)
+        write(user ", ")
+        self.left-expression.write()
+        write(user ")\n")
+        self.code-node.write-spaces()
+      return
     self.left-expression.write()
     write(user ");\n")
     self.code-node.write-spaces()
@@ -347,8 +358,11 @@ class QuestionExpression(Expression)
     # `tested` != NULL && `tested`_Refman->value != NULL
     if not self.top
       write(user "(")
-    write(user "!(")
-    self.tested.write-validate-ref()
-    write(user ")")
+    self.tested.write()
+    write(user " != NULL")
+    if not self.tested.result-type.type-data.is-primitive
+      write(user " && ")
+      self.tested.write-refman()
+      write(user "->value != NULL")
     if not self.top
       write(user ")")
