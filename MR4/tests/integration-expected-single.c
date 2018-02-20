@@ -266,7 +266,7 @@ Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, Str
   MR_inc_ref(self->text_Refman);
   self->text = s;
   if (x < 0) {
-      aux_TestStruct_0 = calloc(1, sizeof(TestStruct));
+      aux_TestStruct_0 = MR_alloc(sizeof(TestStruct));
       if (aux_TestStruct_0 == NULL) RAISE(196, 49, "insufficient memory for object dynamic allocation")
       aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
       if (aux_TestStruct_0_Refman == NULL) RAISE(196, 38, "insufficient memory for managed object")
@@ -415,7 +415,7 @@ Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   self->arr_Refman = arr_Refman;
   MR_inc_ref(self->arr_Refman);
   self->arr = arr;
-  d = calloc(1, sizeof(Data));
+  d = MR_alloc(sizeof(Data));
   if (d == NULL) RAISE(354, 49, "insufficient memory for object dynamic allocation")
   d_Refman = MR_new_ref(d);
   if (d_Refman == NULL) RAISE(354, 38, "insufficient memory for managed object")
@@ -523,7 +523,7 @@ Returncode Container_iter(Container* self, Ref_Manager* self_Refman, ContainerIt
   Ref_Manager* aux_ContainerIterator_0_Refman = NULL;
   if (self == NULL) RAISE(438, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(438, 38, "used member of outdated weak reference")
-  aux_ContainerIterator_0 = calloc(1, sizeof(ContainerIterator));
+  aux_ContainerIterator_0 = MR_alloc(sizeof(ContainerIterator));
   if (aux_ContainerIterator_0 == NULL) RAISE(438, 49, "insufficient memory for object dynamic allocation")
   aux_ContainerIterator_0_Refman = MR_new_ref(aux_ContainerIterator_0);
   if (aux_ContainerIterator_0_Refman == NULL) RAISE(438, 38, "insufficient memory for managed object")
@@ -1257,12 +1257,12 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   fa_Var.values = fa_Values;
   fa_Refman = MR_new_ref(fa);
   if (fa_Refman == NULL) RAISE(108, 38, "insufficient memory for managed object")
-  tn = calloc(1, sizeof(TestStruct));
+  tn = MR_alloc(sizeof(TestStruct));
   if (tn == NULL) RAISE(109, 49, "insufficient memory for object dynamic allocation")
   tn_Refman = MR_new_ref(tn);
   if (tn_Refman == NULL) RAISE(109, 38, "insufficient memory for managed object")
   CHECK(109, TestStruct_new(tn, tn_Refman, 0, NULL, NULL) )
-  dn = calloc(1, sizeof(TestClass));
+  dn = MR_alloc(sizeof(TestClass));
   if (dn == NULL) RAISE(110, 49, "insufficient memory for object dynamic allocation")
   dn_Refman = MR_new_ref(dn);
   if (dn_Refman == NULL) RAISE(110, 38, "insufficient memory for managed object")
@@ -1340,7 +1340,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   itv_Refman = MR_new_ref(itv);
   if (itv_Refman == NULL) RAISE(122, 38, "insufficient memory for managed object")
   CHECK(122, TestStruct_new(itv, itv_Refman, i, text, text_Refman) )
-  itn = calloc(1, sizeof(TestStruct));
+  itn = MR_alloc(sizeof(TestStruct));
   if (itn == NULL) RAISE(123, 49, "insufficient memory for object dynamic allocation")
   itn_Refman = MR_new_ref(itn);
   if (itn_Refman == NULL) RAISE(123, 38, "insufficient memory for managed object")
@@ -1349,18 +1349,18 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   idv_Refman = MR_new_ref(idv);
   if (idv_Refman == NULL) RAISE(124, 38, "insufficient memory for managed object")
   CHECK(124, TestClass_new(idv, idv_Refman, idv_Dynamic) )
-  idn = calloc(1, sizeof(TestClass));
+  idn = MR_alloc(sizeof(TestClass));
   if (idn == NULL) RAISE(125, 49, "insufficient memory for object dynamic allocation")
   idn_Refman = MR_new_ref(idn);
   if (idn_Refman == NULL) RAISE(125, 38, "insufficient memory for managed object")
   CHECK(125, TestClass_new(idn, idn_Refman, idn_Dynamic) )
-  aux_TestStruct_0 = calloc(1, sizeof(TestStruct));
+  aux_TestStruct_0 = MR_alloc(sizeof(TestStruct));
   if (aux_TestStruct_0 == NULL) RAISE(126, 49, "insufficient memory for object dynamic allocation")
   aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
   if (aux_TestStruct_0_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
   CHECK(126, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, i, text, text_Refman) )
   CHECK(126, TestStruct_print(aux_TestStruct_0, aux_TestStruct_0_Refman) )
-  aux_TestClass_0 = calloc(1, sizeof(TestClass));
+  aux_TestClass_0 = MR_alloc(sizeof(TestClass));
   if (aux_TestClass_0 == NULL) RAISE(127, 49, "insufficient memory for object dynamic allocation")
   aux_TestClass_0_Refman = MR_new_ref(aux_TestClass_0);
   if (aux_TestClass_0_Refman == NULL) RAISE(127, 38, "insufficient memory for managed object")
@@ -2880,7 +2880,9 @@ MR_cleanup:
 #undef MR_FUNC_NAME
 
 
-void Mock_delete(Ref self) {}
+Returncode Mock_new(Bool* allocate_success) { return OK; }
+
+Returncode Mock_delete(Ref self) { return OK; }
 
 /* main function */
 

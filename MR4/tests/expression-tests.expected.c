@@ -676,7 +676,7 @@ Ta* a = NULL;
 Ta* aux_Ta_0 = NULL;
   Ref_Manager* aux_Ta_0_Refman = NULL;
   Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;
-  aux_Ta_0 = calloc(1, sizeof(Ta));
+  aux_Ta_0 = MR_alloc(sizeof(Ta));
   if (aux_Ta_0 == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
   aux_Ta_0_Refman = MR_new_ref(aux_Ta_0);
   if (aux_Ta_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
@@ -690,7 +690,7 @@ Ta* aux_Ta_0 = NULL;
 Ta* a = NULL;
   Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
-  a = calloc(1, sizeof(Ta));
+  a = MR_alloc(sizeof(Ta));
   if (a == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
   a_Refman = MR_new_ref(a);
   if (a_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")

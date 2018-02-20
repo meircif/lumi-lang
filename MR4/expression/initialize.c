@@ -229,8 +229,8 @@ Returncode InitExpression_write_new_init(InitExpression* self) {
       
     }
     else {
-      /* calloc(1, sizeof(`type`)); */
-      CHECK(165, write(&(String){18, 17, "calloc(1, sizeof("}) )
+      /* MR_alloc(sizeof(`type`)); */
+      CHECK(165, write(&(String){17, 16, "MR_alloc(sizeof("}) )
       CHECK(166, write_cname(self->_base.result_type->type_data->name) )
       CHECK(167, write(&(String){2, 1, ")"}) )
     }

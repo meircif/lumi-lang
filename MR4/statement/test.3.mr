@@ -177,10 +177,25 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
               user "of type",
               user self.type-name)
         self.arguments.add-self-parameter(user self.parent-type)
+    else-if self.mocked-name.equal(user "new")
+      if glob.is-new-mocked
+        self.m-syntax-error-msg(user "already mocking global new")
+      if ? self.arguments.parameters.first or
+          not (? self.arguments.outputs.first) or
+          ? self.arguments.outputs.first.next
+        self.m-syntax-error-msg(
+            user "mock new should have only single Bool output")
+      if self.arguments.outputs.first.item.get-type-instance().type-data !=
+          glob.type-bool
+        self.m-syntax-error-msg(
+            user "mock new should have only single Bool output")
+      glob.is-new-mocked := true
     else-if self.mocked-name.equal(user "delete")
       if glob.is-delete-mocked
         self.m-syntax-error-msg(user "already mocking global delete")
       glob.is-delete-mocked := true
+      if ? self.arguments.parameters.first or ? self.arguments.outputs.first
+        self.m-syntax-error-msg(user "mock delete should have no arguments")
       self.arguments.add-self-parameter(user glob.type-ref)
     else
       glob.root.find-function(user self.mocked-name):(user mocked-func)

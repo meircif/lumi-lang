@@ -15,6 +15,15 @@ func f-good-function()
 func f-raise-message(user String msg)
   raise msg
 
+var Int new-fail-countdown
+
+mock new()->(var Bool alloc-success)
+  alloc-success := true
+  if new-fail-countdown > 0
+    new-fail-countdown -= 1
+    if new-fail-countdown = 0
+      alloc-success := false
+
 
 test fail-call-empty()
   var Func{()} fun
@@ -54,6 +63,14 @@ test fail-sequence-outdated()
 test fail-dynamic-empty()
   user BaseType obj
   obj.meth()
+
+test fail-object-no-memory()
+  new-fail-countdown := 1
+  new BaseType obj
+
+test fail-managed-no-memory()
+  new-fail-countdown := 2
+  new BaseType obj
 
 test fail-raise()
   raise

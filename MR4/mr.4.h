@@ -144,6 +144,7 @@ while (self->field != NULL) { \
   MR_owner_dec_ref(value_Refman); \
 }
 
+void* MR_alloc(size_t size);
 Ref_Manager* MR_new_ref(void* value);
 void MR_inc_ref(Ref_Manager* ref);
 void MR_dec_ref(Ref_Manager* ref);

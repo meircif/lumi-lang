@@ -385,6 +385,8 @@ Ref_Manager* deleted_top_links_Refman = NULL;
 RefNode* deleted_refmans = NULL;
 Ref_Manager* deleted_refmans_Refman = NULL;
 
+Int new_fail_countdown = 0;
+
 
 /* global functions declaration */
 
@@ -484,6 +486,10 @@ Returncode f_failed_assert_error(void);
 
 Returncode f_wrong_message_assert_error(void);
 
+Returncode Mock_new(Bool* alloc_success);
+
+Returncode f_alloc(void);
+
 Returncode test_assert_error_message(void);
 
 
@@ -506,7 +512,7 @@ Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, Str
   MR_inc_ref(self->text_Refman);
   self->text = s;
   if (x < 0) {
-      aux_TestStruct_0 = calloc(1, sizeof(TestStruct));
+      aux_TestStruct_0 = MR_alloc(sizeof(TestStruct));
       if (aux_TestStruct_0 == NULL) RAISE(196, 49, "insufficient memory for object dynamic allocation")
       aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
       if (aux_TestStruct_0_Refman == NULL) RAISE(196, 38, "insufficient memory for managed object")
@@ -655,7 +661,7 @@ Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   self->arr_Refman = arr_Refman;
   MR_inc_ref(self->arr_Refman);
   self->arr = arr;
-  d = calloc(1, sizeof(Data));
+  d = MR_alloc(sizeof(Data));
   if (d == NULL) RAISE(354, 49, "insufficient memory for object dynamic allocation")
   d_Refman = MR_new_ref(d);
   if (d_Refman == NULL) RAISE(354, 38, "insufficient memory for managed object")
@@ -763,7 +769,7 @@ Returncode Container_iter(Container* self, Ref_Manager* self_Refman, ContainerIt
   Ref_Manager* aux_ContainerIterator_0_Refman = NULL;
   if (self == NULL) RAISE(438, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(438, 38, "used member of outdated weak reference")
-  aux_ContainerIterator_0 = calloc(1, sizeof(ContainerIterator));
+  aux_ContainerIterator_0 = MR_alloc(sizeof(ContainerIterator));
   if (aux_ContainerIterator_0 == NULL) RAISE(438, 49, "insufficient memory for object dynamic allocation")
   aux_ContainerIterator_0_Refman = MR_new_ref(aux_ContainerIterator_0);
   if (aux_ContainerIterator_0_Refman == NULL) RAISE(438, 38, "insufficient memory for managed object")
@@ -1932,12 +1938,12 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   fa_Var.values = fa_Values;
   fa_Refman = MR_new_ref(fa);
   if (fa_Refman == NULL) RAISE(108, 38, "insufficient memory for managed object")
-  tn = calloc(1, sizeof(TestStruct));
+  tn = MR_alloc(sizeof(TestStruct));
   if (tn == NULL) RAISE(109, 49, "insufficient memory for object dynamic allocation")
   tn_Refman = MR_new_ref(tn);
   if (tn_Refman == NULL) RAISE(109, 38, "insufficient memory for managed object")
   CHECK(109, TestStruct_new(tn, tn_Refman, 0, NULL, NULL) )
-  dn = calloc(1, sizeof(TestClass));
+  dn = MR_alloc(sizeof(TestClass));
   if (dn == NULL) RAISE(110, 49, "insufficient memory for object dynamic allocation")
   dn_Refman = MR_new_ref(dn);
   if (dn_Refman == NULL) RAISE(110, 38, "insufficient memory for managed object")
@@ -2015,7 +2021,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   itv_Refman = MR_new_ref(itv);
   if (itv_Refman == NULL) RAISE(122, 38, "insufficient memory for managed object")
   CHECK(122, TestStruct_new(itv, itv_Refman, i, text, text_Refman) )
-  itn = calloc(1, sizeof(TestStruct));
+  itn = MR_alloc(sizeof(TestStruct));
   if (itn == NULL) RAISE(123, 49, "insufficient memory for object dynamic allocation")
   itn_Refman = MR_new_ref(itn);
   if (itn_Refman == NULL) RAISE(123, 38, "insufficient memory for managed object")
@@ -2024,18 +2030,18 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   idv_Refman = MR_new_ref(idv);
   if (idv_Refman == NULL) RAISE(124, 38, "insufficient memory for managed object")
   CHECK(124, TestClass_new(idv, idv_Refman, idv_Dynamic) )
-  idn = calloc(1, sizeof(TestClass));
+  idn = MR_alloc(sizeof(TestClass));
   if (idn == NULL) RAISE(125, 49, "insufficient memory for object dynamic allocation")
   idn_Refman = MR_new_ref(idn);
   if (idn_Refman == NULL) RAISE(125, 38, "insufficient memory for managed object")
   CHECK(125, TestClass_new(idn, idn_Refman, idn_Dynamic) )
-  aux_TestStruct_0 = calloc(1, sizeof(TestStruct));
+  aux_TestStruct_0 = MR_alloc(sizeof(TestStruct));
   if (aux_TestStruct_0 == NULL) RAISE(126, 49, "insufficient memory for object dynamic allocation")
   aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
   if (aux_TestStruct_0_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
   CHECK(126, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, i, text, text_Refman) )
   CHECK(126, TestStruct_print(aux_TestStruct_0, aux_TestStruct_0_Refman) )
-  aux_TestClass_0 = calloc(1, sizeof(TestClass));
+  aux_TestClass_0 = MR_alloc(sizeof(TestClass));
   if (aux_TestClass_0 == NULL) RAISE(127, 49, "insufficient memory for object dynamic allocation")
   aux_TestClass_0_Refman = MR_new_ref(aux_TestClass_0);
   if (aux_TestClass_0_Refman == NULL) RAISE(127, 38, "insufficient memory for managed object")
@@ -3561,7 +3567,7 @@ Returncode test_mid_out(MiddleType** mt, Ref_Manager** mt_Refman, MiddleType_Dyn
   MiddleType* new_mt = NULL;
   Ref_Manager* new_mt_Refman = NULL;
   MiddleType_Dynamic* new_mt_Dynamic = &MiddleType_dynamic;
-  new_mt = calloc(1, sizeof(MiddleType));
+  new_mt = MR_alloc(sizeof(MiddleType));
   if (new_mt == NULL) RAISE(65, 49, "insufficient memory for object dynamic allocation")
   new_mt_Refman = MR_new_ref(new_mt);
   if (new_mt_Refman == NULL) RAISE(65, 38, "insufficient memory for managed object")
@@ -3791,7 +3797,7 @@ Returncode Mock_delete(Ref self) {
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   if (record_delete) {
-    aux_RefNode_0 = calloc(1, sizeof(RefNode));
+    aux_RefNode_0 = MR_alloc(sizeof(RefNode));
     if (aux_RefNode_0 == NULL) RAISE(152, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
     if (aux_RefNode_0_Refman == NULL) RAISE(152, 38, "insufficient memory for managed object")
@@ -3820,7 +3826,7 @@ Returncode Link_MockDel(Ref self) {
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   if (record_delete) {
-    aux_RefNode_0 = calloc(1, sizeof(RefNode));
+    aux_RefNode_0 = MR_alloc(sizeof(RefNode));
     if (aux_RefNode_0 == NULL) RAISE(156, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
     if (aux_RefNode_0_Refman == NULL) RAISE(156, 38, "insufficient memory for managed object")
@@ -3849,7 +3855,7 @@ Returncode BaseLink_MockDel(Ref self) {
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   if (record_delete) {
-    aux_RefNode_0 = calloc(1, sizeof(RefNode));
+    aux_RefNode_0 = MR_alloc(sizeof(RefNode));
     if (aux_RefNode_0 == NULL) RAISE(160, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
     if (aux_RefNode_0_Refman == NULL) RAISE(160, 38, "insufficient memory for managed object")
@@ -3878,7 +3884,7 @@ Returncode TopLink_MockDel(Ref self) {
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   if (record_delete) {
-    aux_RefNode_0 = calloc(1, sizeof(RefNode));
+    aux_RefNode_0 = MR_alloc(sizeof(RefNode));
     if (aux_RefNode_0 == NULL) RAISE(164, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
     if (aux_RefNode_0_Refman == NULL) RAISE(164, 38, "insufficient memory for managed object")
@@ -3924,7 +3930,7 @@ Returncode test_simple_delete(void) {
   TEST_ASSERT(170, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
   TEST_ASSERT(171, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
   record_delete = true;
-  l = calloc(1, sizeof(Link));
+  l = MR_alloc(sizeof(Link));
   if (l == NULL) RAISE(174, 49, "insufficient memory for object dynamic allocation")
   l_Refman = MR_new_ref(l);
   if (l_Refman == NULL) RAISE(174, 38, "insufficient memory for managed object")
@@ -4062,42 +4068,42 @@ Returncode test_complex_delete(void) {
   TEST_ASSERT(210, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
   TEST_ASSERT(211, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
   record_delete = true;
-  b1 = calloc(1, sizeof(BaseLink));
+  b1 = MR_alloc(sizeof(BaseLink));
   if (b1 == NULL) RAISE(214, 49, "insufficient memory for object dynamic allocation")
   b1_Refman = MR_new_ref(b1);
   if (b1_Refman == NULL) RAISE(214, 38, "insufficient memory for managed object")
   b1_ref = b1;
-  b2 = calloc(1, sizeof(BaseLink));
+  b2 = MR_alloc(sizeof(BaseLink));
   if (b2 == NULL) RAISE(216, 49, "insufficient memory for object dynamic allocation")
   b2_Refman = MR_new_ref(b2);
   if (b2_Refman == NULL) RAISE(216, 38, "insufficient memory for managed object")
   b2_ref = b2;
-  t1 = calloc(1, sizeof(TopLink));
+  t1 = MR_alloc(sizeof(TopLink));
   if (t1 == NULL) RAISE(218, 49, "insufficient memory for object dynamic allocation")
   t1_Refman = MR_new_ref(t1);
   if (t1_Refman == NULL) RAISE(218, 38, "insufficient memory for managed object")
   t1_ref = t1;
-  t2 = calloc(1, sizeof(TopLink));
+  t2 = MR_alloc(sizeof(TopLink));
   if (t2 == NULL) RAISE(220, 49, "insufficient memory for object dynamic allocation")
   t2_Refman = MR_new_ref(t2);
   if (t2_Refman == NULL) RAISE(220, 38, "insufficient memory for managed object")
   t2_ref = t2;
-  t3 = calloc(1, sizeof(TopLink));
+  t3 = MR_alloc(sizeof(TopLink));
   if (t3 == NULL) RAISE(222, 49, "insufficient memory for object dynamic allocation")
   t3_Refman = MR_new_ref(t3);
   if (t3_Refman == NULL) RAISE(222, 38, "insufficient memory for managed object")
   t3_ref = t3;
-  l1 = calloc(1, sizeof(Link));
+  l1 = MR_alloc(sizeof(Link));
   if (l1 == NULL) RAISE(224, 49, "insufficient memory for object dynamic allocation")
   l1_Refman = MR_new_ref(l1);
   if (l1_Refman == NULL) RAISE(224, 38, "insufficient memory for managed object")
   l1_ref = l1;
-  l2 = calloc(1, sizeof(Link));
+  l2 = MR_alloc(sizeof(Link));
   if (l2 == NULL) RAISE(226, 49, "insufficient memory for object dynamic allocation")
   l2_Refman = MR_new_ref(l2);
   if (l2_Refman == NULL) RAISE(226, 38, "insufficient memory for managed object")
   l2_ref = l2;
-  l3 = calloc(1, sizeof(Link));
+  l3 = MR_alloc(sizeof(Link));
   if (l3 == NULL) RAISE(228, 49, "insufficient memory for object dynamic allocation")
   l3_Refman = MR_new_ref(l3);
   if (l3_Refman == NULL) RAISE(228, 38, "insufficient memory for managed object")
@@ -4408,6 +4414,42 @@ MR_cleanup:
 #undef MR_FUNC_NAME
 
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "Mock new"
+Returncode Mock_new(Bool* alloc_success) {
+  Returncode MR_err = OK;
+  *alloc_success = true;
+  if (new_fail_countdown > 0) {
+    new_fail_countdown -= 1;
+    if (new_fail_countdown == 0) {
+      *alloc_success = false;
+    }
+  }
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "f-alloc"
+Returncode f_alloc(void) {
+  Returncode MR_err = OK;
+  String* string = NULL;
+  Ref_Manager* string_Refman = NULL;
+  string = MR_new_string(16);
+  if (string == NULL) RAISE(309, 49, "insufficient memory for object dynamic allocation")
+  string_Refman = MR_new_ref(string);
+  if (string_Refman == NULL) RAISE(309, 38, "insufficient memory for managed object")
+  TEST_ASSERT(310, string != NULL && string_Refman->value != NULL)
+MR_cleanup:
+  String_Del(string);
+  MR_owner_dec_ref(string_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "test-assert-error-message"
 Returncode test_assert_error_message(void) {
   Returncode MR_err = OK;
@@ -4436,217 +4478,7 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(300, f_raise_message() )
-    
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(300, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(300)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-  {char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "ignore and raise";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    CHECK(301, f_ignore_and_raise() )
-    
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(301, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(301)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-  {char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "condition is not true";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    CHECK(302, f_failed_assert() )
-    
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(302, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(302)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-  {char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "good assert error";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    CHECK(303, f_good_assert_error() )
-    
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(303, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(303)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-  {char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "error not raised";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    CHECK(304, f_failed_assert_error() )
-    
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(304, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(304)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    CHECK(305, f_wrong_message_assert_error() )
-    
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    TEST_FAIL(305, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  {char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "empty function called";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    if (fun == NULL) RAISE(307, 21, "empty function called")
-    CHECK(307, fun() )
-    
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(307, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(307)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-  base_var = &base_var_Var;
-  base_var_Refman = MR_new_ref(base_var);
-  if (base_var_Refman == NULL) RAISE(308, 38, "insufficient memory for managed object")
-  CHECK(308, BaseType_new(base_var, base_var_Refman, base_var_Dynamic) )
-  base_user = base_var;
-  base_user_Refman = base_var_Refman;
-  MR_inc_ref(base_user_Refman);
-  base_user_Dynamic = base_var_Dynamic;
-  {char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "non empty base class given as output argument";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    if (base_user != NULL) RAISE(310, 45, "non empty base class given as output argument")
-    CHECK(310, test_mid_out((void*)&(base_user), &(base_user_Refman), (void*)&(base_user_Dynamic)) )
-    
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(310, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(310)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-  arr = MR_new_array(2, sizeof(Int));
-  if (arr == NULL) RAISE(312, 49, "insufficient memory for object dynamic allocation")
-  arr_Refman = MR_new_ref(arr);
-  if (arr_Refman == NULL) RAISE(312, 38, "insufficient memory for managed object")
-  {char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "slice index out of bounds";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    if (arr == NULL) RAISE(313, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(313, 40, "outdated weak reference used as sequence")
-    if ((6) < 0 || (6) >= (arr)->length) RAISE(313, 25, "slice index out of bounds")
+    CHECK(313, f_raise_message() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
@@ -4662,24 +4494,69 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(313)
   }
   MR_expected_error = MR_expected_error_prev;}
-  arr2 = arr;
-  arr2_Refman = arr_Refman;
-  MR_inc_ref(arr2_Refman);
-  MR_owner_dec_ref(arr_Refman);
-  arr_Refman = NULL;
-  arr = NULL;
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
   MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "used member of empty object";
+  MR_expected_error = "ignore and raise";
   MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr == NULL) RAISE(316, 27, "used member of empty object")
-    if (arr_Refman->value == NULL) RAISE(316, 38, "used member of outdated weak reference")
+    CHECK(314, f_ignore_and_raise() )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(314, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(314)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "condition is not true";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(315, f_failed_assert() )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(315, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(315)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "good assert error";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(316, f_good_assert_error() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
@@ -4699,14 +4576,13 @@ Returncode test_assert_error_message(void) {
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
   MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "used member of outdated weak reference";
+  MR_expected_error = "error not raised";
   MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr2 == NULL) RAISE(317, 27, "used member of empty object")
-    if (arr2_Refman->value == NULL) RAISE(317, 38, "used member of outdated weak reference")
+    CHECK(317, f_failed_assert_error() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
@@ -4722,6 +4598,172 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(317)
   }
   MR_expected_error = MR_expected_error_prev;}
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(318, f_wrong_message_assert_error() )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    TEST_FAIL(318, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "empty function called";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    if (fun == NULL) RAISE(320, 21, "empty function called")
+    CHECK(320, fun() )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(320, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(320)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+  base_var = &base_var_Var;
+  base_var_Refman = MR_new_ref(base_var);
+  if (base_var_Refman == NULL) RAISE(321, 38, "insufficient memory for managed object")
+  CHECK(321, BaseType_new(base_var, base_var_Refman, base_var_Dynamic) )
+  base_user = base_var;
+  base_user_Refman = base_var_Refman;
+  MR_inc_ref(base_user_Refman);
+  base_user_Dynamic = base_var_Dynamic;
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "non empty base class given as output argument";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    if (base_user != NULL) RAISE(323, 45, "non empty base class given as output argument")
+    CHECK(323, test_mid_out((void*)&(base_user), &(base_user_Refman), (void*)&(base_user_Dynamic)) )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(323, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(323)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+  arr = MR_new_array(2, sizeof(Int));
+  if (arr == NULL) RAISE(325, 49, "insufficient memory for object dynamic allocation")
+  arr_Refman = MR_new_ref(arr);
+  if (arr_Refman == NULL) RAISE(325, 38, "insufficient memory for managed object")
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "slice index out of bounds";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    if (arr == NULL) RAISE(326, 29, "empty object used as sequence")
+    if (arr_Refman->value == NULL) RAISE(326, 40, "outdated weak reference used as sequence")
+    if ((6) < 0 || (6) >= (arr)->length) RAISE(326, 25, "slice index out of bounds")
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(326, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(326)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+  arr2 = arr;
+  arr2_Refman = arr_Refman;
+  MR_inc_ref(arr2_Refman);
+  MR_owner_dec_ref(arr_Refman);
+  arr_Refman = NULL;
+  arr = NULL;
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "used member of empty object";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    if (arr == NULL) RAISE(329, 27, "used member of empty object")
+    if (arr_Refman->value == NULL) RAISE(329, 38, "used member of outdated weak reference")
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(329, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(329)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "used member of outdated weak reference";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    if (arr2 == NULL) RAISE(330, 27, "used member of empty object")
+    if (arr2_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(330, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(330)
+  }
+  MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4732,22 +4774,22 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr == NULL) RAISE(318, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(318, 40, "outdated weak reference used as sequence")
-    if ((0) < 0 || (0) >= (arr)->length) RAISE(318, 25, "slice index out of bounds")
+    if (arr == NULL) RAISE(331, 29, "empty object used as sequence")
+    if (arr_Refman->value == NULL) RAISE(331, 40, "outdated weak reference used as sequence")
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(331, 25, "slice index out of bounds")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(318, 16, "error not raised")
+    TEST_FAIL(331, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(318)
+    TEST_FAIL_NULL(331)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4760,22 +4802,22 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr2 == NULL) RAISE(319, 29, "empty object used as sequence")
-    if (arr2_Refman->value == NULL) RAISE(319, 40, "outdated weak reference used as sequence")
-    if ((0) < 0 || (0) >= (arr2)->length) RAISE(319, 25, "slice index out of bounds")
+    if (arr2 == NULL) RAISE(332, 29, "empty object used as sequence")
+    if (arr2_Refman->value == NULL) RAISE(332, 40, "outdated weak reference used as sequence")
+    if ((0) < 0 || (0) >= (arr2)->length) RAISE(332, 25, "slice index out of bounds")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(319, 16, "error not raised")
+    TEST_FAIL(332, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(319)
+    TEST_FAIL_NULL(332)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4788,21 +4830,75 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (top_Dynamic == NULL) RAISE(321, 28, "dynamic call of empty object")
-    CHECK(321, top_Dynamic->_base._base.meth2(&(top->_base._base), top_Refman, &(top_Dynamic->_base._base)) )
+    if (top_Dynamic == NULL) RAISE(334, 28, "dynamic call of empty object")
+    CHECK(334, top_Dynamic->_base._base.meth2(&(top->_base._base), top_Refman, &(top_Dynamic->_base._base)) )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(321, 16, "error not raised")
+    TEST_FAIL(334, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(321)
+    TEST_FAIL_NULL(334)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+  new_fail_countdown = 1;
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "insufficient memory for object dynamic allocation";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(336, f_alloc() )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(336, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(336)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+  new_fail_countdown = 2;
+  {char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "insufficient memory for managed object";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(338, f_alloc() )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(338, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(338)
   }
   MR_expected_error = MR_expected_error_prev;}
 MR_cleanup:

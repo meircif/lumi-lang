@@ -370,30 +370,51 @@ Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
   }
   else {
     Bool _Bool134;
-    CHECK(180, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool134)) )
+    CHECK(180, String_equal(self->mocked_name, &(String){4, 3, "new"}, &(_Bool134)) )
     if (_Bool134) {
-      if (glob->is_delete_mocked) {
-        CHECK(182, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){30, 29, "already mocking global delete"}) )
+      if (glob->is_new_mocked) {
+        CHECK(182, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){27, 26, "already mocking global new"}) )
       }
-      glob->is_delete_mocked = true;
-      CHECK(184, FunctionArguments_add_self_parameter(self->_base.arguments, &(glob->type_ref->_base)) )
+      if (NULL != self->_base.arguments->parameters->first ||  ! (NULL != self->_base.arguments->outputs->first) ||  NULL !=  self->_base.arguments->outputs->first->next) {
+        CHECK(186, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){45, 44, "mock new should have only single Bool output"}) )
+      }
+      TypeInstance* _TypeInstance135;
+      CHECK(188, (((Argument*)(self->_base.arguments->outputs->first->item)))->_base._dtl[6](((Argument*)(self->_base.arguments->outputs->first->item)), &(_TypeInstance135)) )
+      if (_TypeInstance135->type_data != &(glob->type_bool->_base)) {
+        CHECK(190, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){45, 44, "mock new should have only single Bool output"}) )
+      }
+      glob->is_new_mocked = true;
     }
     else {
-      CHECK(186, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
-      if (!(NULL != mocked_func)) {
-        CHECK(188, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
+      Bool _Bool136;
+      CHECK(193, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool136)) )
+      if (_Bool136) {
+        if (glob->is_delete_mocked) {
+          CHECK(195, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){30, 29, "already mocking global delete"}) )
+        }
+        glob->is_delete_mocked = true;
+        if (NULL != self->_base.arguments->parameters->first ||  NULL !=  self->_base.arguments->outputs->first) {
+          CHECK(198, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){37, 36, "mock delete should have no arguments"}) )
+        }
+        CHECK(199, FunctionArguments_add_self_parameter(self->_base.arguments, &(glob->type_ref->_base)) )
+      }
+      else {
+        CHECK(201, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->mocked_name, &(mocked_func)) )
+        if (!(NULL != mocked_func)) {
+          CHECK(203, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "mocking unknown function"}, self->mocked_name) )
+        }
       }
     }
   }
   if (NULL != mocked_func) {
     if (NULL != mocked_func->mocker_function) {
-      CHECK(192, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "already mocking function"}, self->mocked_name) )
+      CHECK(207, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){25, 24, "already mocking function"}, self->mocked_name) )
     }
-    Bool _Bool135;
-    CHECK(194, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, NULL, 0, &(_Bool135)) )
+    Bool _Bool137;
+    CHECK(209, FunctionArguments_check_same_as(self->_base.arguments, mocked_func->arguments, NULL, 0, &(_Bool137)) )
     mocked_func->mocker_function = self;
   }
-  CHECK(196, SyntaxTreeFunction_analyze(&(self->_base)) )
+  CHECK(211, SyntaxTreeFunction_analyze(&(self->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME

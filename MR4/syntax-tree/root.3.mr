@@ -158,9 +158,12 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     self.write-children(user self.functions)
     
     # write main function
-    if not glob.is-delete-mocked and
-        (? glob.test-functions.first or ? self.main-function)
-      write(user "\n\nvoid Mock_delete(Ref self) {}")
+    if ? glob.test-functions.first or ? self.main-function
+      if not glob.is-new-mocked
+        write(
+            user "\n\nReturncode Mock_new(Bool* allocate_success) { return OK; }")
+      if not glob.is-delete-mocked
+        write(user "\n\nReturncode Mock_delete(Ref self) { return OK; }")
     if ? glob.test-functions.first
       self.write-test-main()
     else-if ? self.main-function

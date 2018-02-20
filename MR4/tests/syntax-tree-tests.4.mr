@@ -737,6 +737,10 @@ assert-error fun0(), "expected error in the function"
 ## @ c t12
 assert-error t.num,
       "expected error in new line"
+## @ g t13
+mock new()->(var Bool allocate-success)
+  allocate-success := false
+main
 ## @ c tr0
 var Ref r
 ## @ c tr1
@@ -821,6 +825,28 @@ assert-error t.num,"error"
 assert-error t.num,  "error"
 ## @ ec te21
 assert-error t.num, error
+## @ eg te22
+mock new()->(var Bool res)
+mock new()->(var Bool res)
+
+## @ eg te23
+mock new()->(var Int x)
+
+## @ eg te24
+mock new()
+
+## @ eg te25
+mock new(copy Int x)->(var Bool res)
+
+## @ eg te26
+mock new()->(var Bool res, var Int x)
+
+## @ eg te27
+mock delete(copy Int x)
+
+## @ eg te28
+mock delete()->(copy Int x)
+
 ## @@ test-native
 ## @ g tf0
 native func external()

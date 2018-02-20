@@ -34,6 +34,7 @@ static Global
   
   ## test functions list
   owner NameMap{SyntaxTreeTestFunction} test-functions
+  var Bool is-new-mocked
   var Bool is-delete-mocked
   
   ## input reading state
@@ -61,6 +62,8 @@ static Global
   func inst init()
     self.got-new-line := false
     self.save-input := false
+    self.is-new-mocked := false
+    self.is-delete-mocked := false
     new SyntaxTreeRoot in self.root
     self.root.init()
     new String{1024} in self.input-buffer

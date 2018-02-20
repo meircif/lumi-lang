@@ -296,6 +296,19 @@ func f-failed-assert-error()
 func f-wrong-message-assert-error()
   assert-error f-raise-message(), "wrong message"
 
+var Int new-fail-countdown
+
+mock new()->(var Bool alloc-success)
+  alloc-success := true
+  if new-fail-countdown > 0
+    new-fail-countdown -= 1
+    if new-fail-countdown = 0
+      alloc-success := false
+
+func f-alloc()
+  new String{16} string
+  assert string?
+
 test test-assert-error-message()
   assert-error f-raise-message(), "tested message"
   assert-error f-ignore-and-raise(), "ignore and raise"
@@ -319,3 +332,7 @@ test test-assert-error-message()
   assert-error arr2[0], "outdated weak reference used as sequence"
   user TopType top
   assert-error top.meth2(), "dynamic call of empty object"
+  new-fail-countdown := 1
+  assert-error f-alloc(), "insufficient memory for object dynamic allocation"
+  new-fail-countdown := 2
+  assert-error f-alloc(), "insufficient memory for managed object"

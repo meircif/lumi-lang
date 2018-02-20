@@ -21,7 +21,8 @@ String* us = NULL;
 Ref_Manager* us_Refman = NULL;
 String* gs = NULL;
 Ref_Manager* gs_Refman = NULL;
-void Mock_delete(Ref self) {}
+Returncode Mock_new(Bool* allocate_success) { return OK; }
+Returncode Mock_delete(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
   Int x = 0;
@@ -73,7 +74,8 @@ Returncode dummy(void) {
 MR_cleanup:
   return MR_err;
 }
-void Mock_delete(Ref self) {}
+Returncode Mock_new(Bool* allocate_success) { return OK; }
+Returncode Mock_delete(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Bool MR_success = true;
 #undef RETURN_ERROR
@@ -556,7 +558,8 @@ MR_cleanup:
   return MR_err;
 }
 /// @ tm0
-void Mock_delete(Ref self) {}
+Returncode Mock_new(Bool* allocate_success) { return OK; }
+Returncode Mock_delete(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
   Int x = 0;
@@ -887,7 +890,7 @@ expected space after "new", got "new-line"
 /// @ t0
 Test* aux_Test_0 = NULL;
   Ref_Manager* aux_Test_0_Refman = NULL;
-  aux_Test_0 = calloc(1, sizeof(Test));
+  aux_Test_0 = MR_alloc(sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
@@ -1015,7 +1018,7 @@ Test tt_Var = {0};
 /// @ t11
 Test* tt = NULL;
   Ref_Manager* tt_Refman = NULL;
-  tt = calloc(1, sizeof(Test));
+  tt = MR_alloc(sizeof(Test));
   if (tt == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
   tt_Refman = MR_new_ref(tt);
   if (tt_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
@@ -1023,7 +1026,7 @@ Test* tt = NULL;
 /// @ t12
 Test* aux_Test_0 = NULL;
   Ref_Manager* aux_Test_0_Refman = NULL;
-  aux_Test_0 = calloc(1, sizeof(Test));
+  aux_Test_0 = MR_alloc(sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
@@ -1401,7 +1404,8 @@ Returncode fun1(void) {
 MR_cleanup:
   return MR_err;
 }
-void Mock_delete(Ref self) {}
+Returncode Mock_new(Bool* allocate_success) { return OK; }
+Returncode Mock_delete(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
@@ -1422,7 +1426,8 @@ Returncode fun1(void) {
 MR_cleanup:
   return MR_err;
 }
-void Mock_delete(Ref self) {}
+Returncode Mock_new(Bool* allocate_success) { return OK; }
+Returncode Mock_delete(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
@@ -1460,6 +1465,7 @@ Returncode Mock_delete(Ref self) {
 MR_cleanup:
   return MR_err;
 }
+Returncode Mock_new(Bool* allocate_success) { return OK; }
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -1546,6 +1552,21 @@ MAIN_FUNC
     TEST_FAIL_NULL(1)
   }
   MR_expected_error = MR_expected_error_prev;}
+/// @ t13
+Returncode Mock_new(Bool* allocate_success);
+Returncode Mock_new(Bool* allocate_success) {
+  Returncode MR_err = OK;
+  *allocate_success = false;
+MR_cleanup:
+  return MR_err;
+}
+Returncode Mock_delete(Ref self) { return OK; }
+USER_MAIN_HEADER {
+  Returncode MR_err = OK;
+MR_cleanup:
+  return MR_err;
+}
+MAIN_FUNC
 /// @ tr0
 Ref r = NULL;
 /// @ tr1
@@ -1604,6 +1625,20 @@ expected space after ",", got """
 no '"' around string constant " "error""
 /// @ te21
 no '"' around string constant "error"
+/// @ te22
+already mocking global new
+/// @ te23
+mock new should have only single Bool output
+/// @ te24
+mock new should have only single Bool output
+/// @ te25
+mock new should have only single Bool output
+/// @ te26
+mock new should have only single Bool output
+/// @ te27
+mock delete should have no arguments
+/// @ te28
+mock delete should have no arguments
 /// @@ test-native
 /// @ tf0
 Returncode external(void);
@@ -1713,7 +1748,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   self->arr_Refman = arr_Refman;
   MR_inc_ref(self->arr_Refman);
   self->arr = arr;
-  t = calloc(1, sizeof(Test));
+  t = MR_alloc(sizeof(Test));
   if (t == NULL) RAISE(8, 49, "insufficient memory for object dynamic allocation")
   t_Refman = MR_new_ref(t);
   if (t_Refman == NULL) RAISE(8, 38, "insufficient memory for managed object")
@@ -2140,7 +2175,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, String* s, Ref_Manager
   MR_inc_ref(self->_base.item_Refman);
   self->_base.item_Dynamic = &String_dynamic;
   self->_base.item = s;
-  aux_Test_0 = calloc(1, sizeof(Test));
+  aux_Test_0 = MR_alloc(sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(6, 49, "insufficient memory for object dynamic allocation")
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(6, 38, "insufficient memory for managed object")
@@ -2210,7 +2245,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* i, Ref_M
   MR_inc_ref(self->_base.item_Refman);
   self->_base.item_Dynamic = i_Dynamic;
   self->_base.item = i;
-  aux_Test_0 = calloc(1, sizeof(Test));
+  aux_Test_0 = MR_alloc(sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(6, 49, "insufficient memory for object dynamic allocation")
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(6, 38, "insufficient memory for managed object")
@@ -2337,17 +2372,17 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, String* s, Ref_Manager
   MR_inc_ref(self->_base._base._base.item_Refman);
   self->_base._base._base.item_Dynamic = &String_dynamic;
   self->_base._base._base.item = s;
-  aux_Top_0 = calloc(1, sizeof(Top));
+  aux_Top_0 = MR_alloc(sizeof(Top));
   if (aux_Top_0 == NULL) RAISE(14, 49, "insufficient memory for object dynamic allocation")
   aux_Top_0_Refman = MR_new_ref(aux_Top_0);
   if (aux_Top_0_Refman == NULL) RAISE(14, 38, "insufficient memory for managed object")
   CHECK(14, Top_set(aux_Top_0, aux_Top_0_Refman, s, s_Refman) )
-  aux_Test_0 = calloc(1, sizeof(Test));
+  aux_Test_0 = MR_alloc(sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(15, 49, "insufficient memory for object dynamic allocation")
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(15, 38, "insufficient memory for managed object")
   CHECK(15, Test_set(aux_Test_0, aux_Test_0_Refman, s, s_Refman) )
-  aux_Top_1 = calloc(1, sizeof(Top));
+  aux_Top_1 = MR_alloc(sizeof(Top));
   if (aux_Top_1 == NULL) RAISE(16, 49, "insufficient memory for object dynamic allocation")
   aux_Top_1_Refman = MR_new_ref(aux_Top_1);
   if (aux_Top_1_Refman == NULL) RAISE(16, 38, "insufficient memory for managed object")
@@ -2421,7 +2456,7 @@ Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* i, Ref_M
   MR_inc_ref(self->_base.item_Refman);
   self->_base.item_Dynamic = i_Dynamic;
   self->_base.item = i;
-  aux_Test_0 = calloc(1, sizeof(Test));
+  aux_Test_0 = MR_alloc(sizeof(Test));
   if (aux_Test_0 == NULL) RAISE(6, 49, "insufficient memory for object dynamic allocation")
   aux_Test_0_Refman = MR_new_ref(aux_Test_0);
   if (aux_Test_0_Refman == NULL) RAISE(6, 38, "insufficient memory for managed object")
@@ -2882,7 +2917,7 @@ Returncode f_mock(Int* i) {
   Int n = 0;
   TestIterator* aux_TestIterator_1 = NULL;
   Ref_Manager* aux_TestIterator_1_Refman = NULL;
-  aux_TestIterator_0 = calloc(1, sizeof(TestIterator));
+  aux_TestIterator_0 = MR_alloc(sizeof(TestIterator));
   if (aux_TestIterator_0 == NULL) RAISE(8, 49, "insufficient memory for object dynamic allocation")
   aux_TestIterator_0_Refman = MR_new_ref(aux_TestIterator_0);
   if (aux_TestIterator_0_Refman == NULL) RAISE(8, 38, "insufficient memory for managed object")
