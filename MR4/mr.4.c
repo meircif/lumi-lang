@@ -4,21 +4,61 @@
 #define MR_FILE_NAME __FILE__
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
-#define CRAISE RAISE(__LINE__)
+#define CRAISE USER_RAISE(__LINE__, NULL, NULL)
 #define CCHECK(err) CHECK(__LINE__, err)
-#define CHECK_NOT_NULL(ref) if (ref == NULL || ref##_Refman == NULL) { CRAISE }
+#define CHECK_NOT_NULL(ref) \
+  if (ref == NULL || ref##_Refman->value == NULL) CRAISE
 
 char* MR_raise_format = "Error raised in %s:%d %s()\n";
 char* MR_assert_format = "Assert failed in %s:%d %s()\n";
 char* MR_traceline_format = "  called from %s:%d %s()\n";
 FILE* MR_trace_stream = NULL;
 int MR_trace_ignore_count = 0;
+char* MR_expected_error = NULL;
+int MR_expected_error_trace_ignore_count = 0;
 Generic_Type_Dynamic* dynamic_Void = NULL;
 
 void MR_trace_print(
-    char const* format, char const* filename, int line, char const* funcname) {
+    char const* format,
+    char const* filename,
+    int line,
+    char const* funcname,
+    String* message,
+    Ref_Manager* message_refman) {
   if (MR_trace_ignore_count == 0) {
+    if (message != NULL && message_refman->value != NULL) {
+      fprintf(
+          MR_trace_stream, "Error: %.*s\n  ", message->length, message->values);
+    }
     fprintf(MR_trace_stream, format, filename, line, funcname);
+  }
+  else if (MR_expected_error != NULL &&
+      MR_expected_error_trace_ignore_count == MR_trace_ignore_count &&
+      format != MR_traceline_format) {
+    int n;
+    if (message == NULL || message_refman->value == NULL) {
+      MR_expected_error = NULL;
+      if (MR_trace_ignore_count == 1) {
+        fprintf(
+            MR_trace_stream,
+            "Assert failed: error with no message raised\n  ");
+      }
+      return;
+    }
+    for (n = 0; n <= message->length; ++n) {
+      if (((n == message->length)? '\0': message->values[n]) !=
+          MR_expected_error[n]) {
+        MR_expected_error = NULL;
+        if (MR_trace_ignore_count == 1) {
+          fprintf(
+              MR_trace_stream,
+              "Assert failed: unexpected error message \"%.*s\"\n  ",
+              message->length,
+              message->values);
+        }
+        return;
+      }
+    }
   }
 }
 
@@ -41,7 +81,7 @@ int MR_main(int argc, char* argv[]) {
   int arg;
   Returncode err;
   MR_trace_stream = stderr;
-  args_strings = malloc(argc * sizeof(String));
+  args_strings = MR_alloc(argc * sizeof(String));
   sys_Var.argv_Refman = MR_new_ref(&sys_argv);
   sys_Refman = MR_new_ref(&sys_Var);
   stdout_Refman = MR_new_ref(stdout);
@@ -115,12 +155,29 @@ Returncode set_cstring(String* str, Ref_Manager* str_Refman) {
 #undef MR_FUNC_NAME
 
 /*reference counting*/
+Returncode Mock_new(Bool*);
+Returncode Mock_delete(Ref);
+
+void* MR_alloc(size_t size) {
+  Bool allocate_success = true;
+  IGNORE_ERRORS( Mock_new(&allocate_success); )
+  if (allocate_success) {
+    return calloc(1, size);
+  }
+  return NULL;
+}
+
 Ref_Manager* MR_new_ref(void* value) {
-  Ref_Manager* ref = malloc(sizeof(Ref_Manager));
-  if (ref != NULL) {
-    ref->count = 1;
-    ref->value = value;
-    ref->ref = value;
+  Ref_Manager* ref = NULL;
+  Bool allocate_success = true;
+  IGNORE_ERRORS( Mock_new(&allocate_success); )
+  if (allocate_success) {
+    ref = malloc(sizeof(Ref_Manager));
+    if (ref != NULL) {
+      ref->count = 1;
+      ref->value = value;
+      ref->ref = value;
+    }
   }
   return ref;
 }
@@ -131,12 +188,10 @@ void MR_inc_ref(Ref_Manager* ref) {
   }
 }
 
-void Mock_delete(Ref);
-
 void dec_ref(Ref_Manager* ref) {
   --ref->count;
   if (ref->count == 0) {
-    Mock_delete(ref->ref);
+    IGNORE_ERRORS( Mock_delete(ref->ref); )
     free(ref);
   }
 }
@@ -159,7 +214,7 @@ void MR_owner_dec_ref(Ref_Manager* ref) {
 String* MR_new_string(int length) {
   void* buff;
   String* str;
-  buff = malloc(sizeof(String) + length);
+  buff = MR_alloc(sizeof(String) + length);
   if (buff == NULL) {
     return NULL;
   }
@@ -173,7 +228,7 @@ String* MR_new_string(int length) {
 Array* MR_new_array(int length, int value_size) {
   void* buff;
   Array* array;
-  buff = calloc(1, sizeof(Array) + length * value_size);
+  buff = MR_alloc(sizeof(Array) + length * value_size);
   if (buff == NULL) {
     return NULL;
   }

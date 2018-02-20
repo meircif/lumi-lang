@@ -71,7 +71,7 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(1)
+  if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "some string";
@@ -85,18 +85,20 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(1)
-  aux_String_0_Var.max_length = 25;
-  aux_String_0_Var.length = 24;
-  aux_String_0_Var.values = "\nstring\twith\\formatting\n";
+  if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 26;
+  aux_String_0_Var.length = 25;
+  aux_String_0_Var.values = "\nstring\t\"with\\formatting\n";
   MR_dec_ref(str_Refman);
   str_Refman = aux_String_0_Refman;
   MR_inc_ref(str_Refman);
   str = aux_String_0;
 /// @ te0
-illegal string constant ""aaa"
+no '"' around string constant ""aaa"
 /// @ te1
-statememnt has no effect
+too short string constant """
+/// @ te2
+'"' inside string constant ""error"+"string""
 /// @@ test-empty-expression
 /// @ t0
 MR_dec_ref(str_Refman);
@@ -119,28 +121,38 @@ b = (t == NULL) || (ta != NULL);
 cannot assign "Empty Symbol" into "Int"
 /// @@ test-member-expression
 /// @ t0
-if (t == NULL || t_Refman->value == NULL) RAISE(1)
+if (t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = t->num;
 /// @ t1
-if (tc == NULL || tc_Refman->value == NULL) RAISE(1)
+if (tc == NULL) RAISE(1, 27, "used member of empty object")
+  if (tc_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = tc->_base.numb;
 /// @ t2
-if (tc == NULL || tc_Refman->value == NULL) RAISE(1)
+if (tc == NULL) RAISE(1, 27, "used member of empty object")
+  if (tc_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = tc->_base._base._base.num;
 /// @ t3
-if (*to == NULL || (*to_Refman)->value == NULL) RAISE(1)
+if (*to == NULL) RAISE(1, 27, "used member of empty object")
+  if ((*to_Refman)->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = (*to)->num;
 /// @ t4
-if (*tco == NULL || (*tco_Refman)->value == NULL) RAISE(1)
+if (*tco == NULL) RAISE(1, 27, "used member of empty object")
+  if ((*tco_Refman)->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = (*tco)->_base._base._base.num;
 /// @ t5
-if (t == NULL || t_Refman->value == NULL) RAISE(1)
-  if (t->t == NULL || t->t_Refman->value == NULL) RAISE(1)
+if (t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+  if (t->t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t->t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = t->t->num;
 /// @ t6
-if (t == NULL || t_Refman->value == NULL) RAISE(1)
-  if (t->t == NULL || t->t_Refman->value == NULL) RAISE(1)
-  if (t->t->t == NULL || t->t->t_Refman->value == NULL) RAISE(1)
+if (t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+  if (t->t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t->t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+  if (t->t->t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t->t->t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = t->t->t->num;
 /// @ te0
 unknown symbol "error"
@@ -150,8 +162,9 @@ void expression has no member "error"
 type "Test" has no member "error"
 /// @@ test-slice-expression
 /// @ t0
-if (str == NULL || str_Refman->value == NULL) RAISE(1)
-  if ((13) < 0 || (13) >= (str)->length) RAISE(1)
+if (str == NULL) RAISE(1, 29, "empty object used as sequence")
+  if (str_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+  if ((13) < 0 || (13) >= (str)->length) RAISE(1, 25, "slice index out of bounds")
   c = ((str)->values)[13];
 /// @ t1
 String aux_String_0_Var = {0};
@@ -159,19 +172,21 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(1)
+  if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   aux_String_0_Var.length = 6;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
   aux_String_0_Var.values = (str)->values + (2);
-  if (str == NULL || str_Refman->value == NULL) RAISE(1)
-  if ((2) < 0 || (6) < 0 || (2) + (6) > (str)->length) RAISE(1)
+  if (str == NULL) RAISE(1, 29, "empty object used as sequence")
+  if (str_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+  if ((2) < 0 || (6) < 0 || (2) + (6) > (str)->length) RAISE(1, 25, "slice index out of bounds")
   MR_dec_ref(str_Refman);
   str_Refman = str_Refman;
   MR_inc_ref(str_Refman);
   str = aux_String_0;
 /// @ t2
-if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
-  if ((13) < 0 || (13) >= (arr)->length) RAISE(1)
+if (arr == NULL) RAISE(1, 29, "empty object used as sequence")
+  if (arr_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+  if ((13) < 0 || (13) >= (arr)->length) RAISE(1, 25, "slice index out of bounds")
   i = ((Int*)((arr)->values))[13];
 /// @ t3
 Array aux_Array_0_Var = {0};
@@ -179,22 +194,25 @@ Array aux_Array_0_Var = {0};
   Ref_Manager* aux_Array_0_Refman = NULL;
   aux_Array_0 = &aux_Array_0_Var;
   aux_Array_0_Refman = MR_new_ref(aux_Array_0);
-  if (aux_Array_0_Refman == NULL) RAISE(1)
+  if (aux_Array_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   aux_Array_0_Var.length = 6;
   aux_Array_0_Var.values = (Byte*)((arr)->values) + (2);
-  if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
-  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1)
+  if (arr == NULL) RAISE(1, 29, "empty object used as sequence")
+  if (arr_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+  if ((2) < 0 || (6) < 0 || (2) + (6) > (arr)->length) RAISE(1, 25, "slice index out of bounds")
   MR_dec_ref(arr_Refman);
   arr_Refman = arr_Refman;
   MR_inc_ref(arr_Refman);
   arr = aux_Array_0;
 /// @ t4
-if (str == NULL || str_Refman->value == NULL) RAISE(1)
-  if ((4) < 0 || (4) >= (str)->length) RAISE(1)
+if (str == NULL) RAISE(1, 29, "empty object used as sequence")
+  if (str_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+  if ((4) < 0 || (4) >= (str)->length) RAISE(1, 25, "slice index out of bounds")
   ((str)->values)[4] = c;
 /// @ t5
-if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
-  if ((4) < 0 || (4) >= (arr)->length) RAISE(1)
+if (arr == NULL) RAISE(1, 29, "empty object used as sequence")
+  if (arr_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+  if ((4) < 0 || (4) >= (arr)->length) RAISE(1, 25, "slice index out of bounds")
   ((Int*)((arr)->values))[4] = i;
 /// @ t6
 expected "]", got "new-line"
@@ -266,7 +284,8 @@ CHECK(1, Test_meth(&(tc->_base._base._base), tc_Refman) )
 /// @ t15
 CHECK(1, Test_meth(&((*tco)->_base._base._base), *tco_Refman) )
 /// @ t16
-if (t == NULL || t_Refman->value == NULL) RAISE(1)
+if (t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   CHECK(1, Test_meth(t->t, t->t_Refman) )
 /// @ t17
 CHECK(1, fun1(3, str, str_Refman, *so, *so_Refman) )
@@ -518,7 +537,7 @@ b = ! (i > 3);
 /// @ t5
 unexpected "{"
 /// @ t6
-unexpected "["
+expected space after operator, got "["
 /// @ t7
 not unary operator "+"
 /// @ t8
@@ -581,10 +600,17 @@ Tc* otc = NULL;
   otc = NULL;
   otc_Refman = NULL;
   otc_Dynamic = NULL;
+/// @ t15
+Array* tarr = NULL;
+  Ref_Manager* tarr_Refman = NULL;
+  ARRAY_DEL(Test, tarr)
+  MR_owner_dec_ref(tarr_Refman);
+  tarr_Refman = NULL;
+  tarr = NULL;
 /// @ te0
 unknown operator "@"
 /// @ te1
-unexpected "("
+expected space after operator, got "("
 /// @ te2
 ambiguous precedence between operators "+" and "*"
 /// @ te3
@@ -619,14 +645,15 @@ non matching subtypes "Int" and "Char"
 passing ownership of type "Tb" into static type "Test"
 /// @@ test-question-expression
 /// @ t0
-b = !(str == NULL || str_Refman->value == NULL);
+b = str != NULL && str_Refman->value != NULL;
 /// @ t1
-b = ! (!(str == NULL || str_Refman->value == NULL));
+b = ! (str != NULL && str_Refman->value != NULL);
 /// @ t2
-if (t == NULL || t_Refman->value == NULL) RAISE(1)
-  b = !(t->fun == NULL);
+if (t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+  b = t->fun != NULL;
 /// @ t3
-b = !(*to == NULL || (*to_Refman)->value == NULL);
+b = (*to) != NULL && (*to_Refman)->value != NULL;
 /// @ te0
 cannot use "?" on void expression
 /// @ te1
@@ -639,7 +666,7 @@ Ta a_Var = {{0}};
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
   a = &a_Var;
   a_Refman = MR_new_ref(a);
-  if (a_Refman == NULL) RAISE(1)
+  if (a_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t1
 Ta* a = NULL;
@@ -649,10 +676,10 @@ Ta* a = NULL;
 Ta* aux_Ta_0 = NULL;
   Ref_Manager* aux_Ta_0_Refman = NULL;
   Ta_Dynamic* aux_Ta_0_Dynamic = &Ta_dynamic;
-  aux_Ta_0 = calloc(1, sizeof(Ta));
-  if (aux_Ta_0 == NULL) RAISE(1)
+  aux_Ta_0 = MR_alloc(sizeof(Ta));
+  if (aux_Ta_0 == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
   aux_Ta_0_Refman = MR_new_ref(aux_Ta_0);
-  if (aux_Ta_0_Refman == NULL) RAISE(1)
+  if (aux_Ta_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   CHECK(1, Test_new(&(aux_Ta_0->_base), aux_Ta_0_Refman, 7) )
   MR_dec_ref(ta_Refman);
   ta_Refman = aux_Ta_0_Refman;
@@ -663,10 +690,10 @@ Ta* aux_Ta_0 = NULL;
 Ta* a = NULL;
   Ref_Manager* a_Refman = NULL;
   Ta_Dynamic* a_Dynamic = &Ta_dynamic;
-  a = calloc(1, sizeof(Ta));
-  if (a == NULL) RAISE(1)
+  a = MR_alloc(sizeof(Ta));
+  if (a == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
   a_Refman = MR_new_ref(a);
-  if (a_Refman == NULL) RAISE(1)
+  if (a_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   CHECK(1, Test_new(&(a->_base), a_Refman, 1) )
 /// @ t4
 Ta* a = NULL;
@@ -703,8 +730,9 @@ MR_dec_ref(ta_Refman);
 /// @ t9
 Array* aa = NULL;
   Ref_Manager* aa_Refman = NULL;
-  if (aa == NULL || aa_Refman->value == NULL) RAISE(2)
-  if ((4) < 0 || (4) >= (aa)->length) RAISE(2)
+  if (aa == NULL) RAISE(2, 29, "empty object used as sequence")
+  if (aa_Refman->value == NULL) RAISE(2, 40, "outdated weak reference used as sequence")
+  if ((4) < 0 || (4) >= (aa)->length) RAISE(2, 25, "slice index out of bounds")
   MR_dec_ref(ta_Refman);
   ta_Refman = aa_Refman;
   MR_inc_ref(ta_Refman);
@@ -713,54 +741,57 @@ Array* aa = NULL;
 /// @ t10
 Array* ca = NULL;
   Ref_Manager* ca_Refman = NULL;
-  if (ca == NULL || ca_Refman->value == NULL) RAISE(2)
-  if ((4) < 0 || (4) >= (ca)->length) RAISE(2)
+  if (ca == NULL) RAISE(2, 29, "empty object used as sequence")
+  if (ca_Refman->value == NULL) RAISE(2, 40, "outdated weak reference used as sequence")
+  if ((4) < 0 || (4) >= (ca)->length) RAISE(2, 25, "slice index out of bounds")
   MR_dec_ref(ta_Refman);
   ta_Refman = ca_Refman;
   MR_inc_ref(ta_Refman);
   ta_Dynamic = &(&Tc_dynamic->_base._base);
   ta = &((((Tc*)((ca)->values)) + 4)->_base._base);
 /// @ t11
-if (ta_Dynamic == NULL) RAISE(1)
+if (ta_Dynamic == NULL) RAISE(1, 28, "dynamic call of empty object")
   CHECK(1, ta_Dynamic->dyn(ta, ta_Refman, ta_Dynamic) )
 /// @ t12
-if (tb_Dynamic == NULL) RAISE(1)
+if (tb_Dynamic == NULL) RAISE(1, 28, "dynamic call of empty object")
   CHECK(1, tb_Dynamic->_base.dyn(&(tb->_base), tb_Refman, &(tb_Dynamic->_base)) )
 /// @ t13
-if (tc_Dynamic == NULL) RAISE(1)
+if (tc_Dynamic == NULL) RAISE(1, 28, "dynamic call of empty object")
   CHECK(1, tc_Dynamic->_base._base.dyn(&(tc->_base._base), tc_Refman, &(tc_Dynamic->_base._base)) )
 /// @ t14
-if (*tco_Dynamic == NULL) RAISE(1)
+if (*tco_Dynamic == NULL) RAISE(1, 28, "dynamic call of empty object")
   CHECK(1, (*tco_Dynamic)->_base._base.dyn(&((*tco)->_base._base), *tco_Refman, &((*tco_Dynamic)->_base._base)) )
 /// @ t15
-if (ta != NULL) RAISE(1)
+if (ta != NULL) RAISE(1, 45, "non empty base class given as output argument")
   CHECK(1, fun7((void*)&(ta), &(ta_Refman), (void*)&(ta_Dynamic)) )
 /// @@ test-function-object
 /// @ t0
 Returncode (*fun)(void) = NULL;
   fun = fun0;
-  if (fun == NULL) RAISE(3)
+  if (fun == NULL) RAISE(3, 21, "empty function called")
   CHECK(3, fun() )
 /// @ t1
 Returncode (*fun)(Int x, Int* y) = NULL;
   Int x = 0;
   fun = fun5;
-  if (fun == NULL) RAISE(3)
+  if (fun == NULL) RAISE(3, 21, "empty function called")
   CHECK(3, fun(9, &(x)) )
 /// @ t2
 Returncode (*fun)(Test* self, Ref_Manager* self_Refman) = NULL;
   fun = Test_meth;
-  if (fun == NULL) RAISE(2)
+  if (fun == NULL) RAISE(2, 21, "empty function called")
   CHECK(2, fun(t, t_Refman) )
 /// @ t3
 Returncode (*fun)(void) = NULL;
   fun = NULL;
-  b = !(fun == NULL);
+  b = fun != NULL;
 /// @ t4
-if (t == NULL || t_Refman->value == NULL) RAISE(1)
+if (t == NULL) RAISE(1, 27, "used member of empty object")
+  if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   t->fun = fun0;
-  if (t == NULL || t_Refman->value == NULL) RAISE(2)
-  if (t->fun == NULL) RAISE(2)
+  if (t == NULL) RAISE(2, 27, "used member of empty object")
+  if (t_Refman->value == NULL) RAISE(2, 38, "used member of outdated weak reference")
+  if (t->fun == NULL) RAISE(2, 21, "empty function called")
   CHECK(2, t->fun() )
 /// @ t5
 Returncode (*farr_Values[38])(void) = {0};
@@ -770,13 +801,15 @@ Returncode (*farr_Values[38])(void) = {0};
   farr = &farr_Var;
   farr_Var.values = farr_Values;
   farr_Refman = MR_new_ref(farr);
-  if (farr_Refman == NULL) RAISE(1)
-  if (farr == NULL || farr_Refman->value == NULL) RAISE(2)
-  if ((3) < 0 || (3) >= (farr)->length) RAISE(2)
+  if (farr_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
+  if (farr == NULL) RAISE(2, 29, "empty object used as sequence")
+  if (farr_Refman->value == NULL) RAISE(2, 40, "outdated weak reference used as sequence")
+  if ((3) < 0 || (3) >= (farr)->length) RAISE(2, 25, "slice index out of bounds")
   ((Returncode (**)(void))((farr)->values))[3] = fun0;
-  if (farr == NULL || farr_Refman->value == NULL) RAISE(3)
-  if ((3) < 0 || (3) >= (farr)->length) RAISE(3)
-  if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3)
+  if (farr == NULL) RAISE(3, 29, "empty object used as sequence")
+  if (farr_Refman->value == NULL) RAISE(3, 40, "outdated weak reference used as sequence")
+  if ((3) < 0 || (3) >= (farr)->length) RAISE(3, 25, "slice index out of bounds")
+  if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3, 21, "empty function called")
   CHECK(3, (((Returncode (**)(void))((farr)->values))[3])() )
 /// @ t6
 Returncode (*fun)(Int x, Int y) = NULL;
@@ -802,10 +835,12 @@ b = false;
 /// @ t3
 unknown symbol "EOF"
 /// @ t4
-if (arr == NULL || arr_Refman->value == NULL) RAISE(1)
+if (arr == NULL) RAISE(1, 27, "used member of empty object")
+  if (arr_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = arr->length;
 /// @ t5
-if (str == NULL || str_Refman->value == NULL) RAISE(1)
+if (str == NULL) RAISE(1, 27, "used member of empty object")
+  if (str_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   i = str->length;
 /// @ t6
 CHECK(1, String_clear(str, str_Refman) )
@@ -840,7 +875,8 @@ CHECK(1, File_write(fobj, fobj_Refman, str, str_Refman) )
 /// @ t21
 Array* argv = NULL;
   Ref_Manager* argv_Refman = NULL;
-  if (sys == NULL || sys_Refman->value == NULL) RAISE(1)
+  if (sys == NULL) RAISE(1, 27, "used member of empty object")
+  if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   argv = sys->argv;
   argv_Refman = sys->argv_Refman;
   MR_inc_ref(argv_Refman);

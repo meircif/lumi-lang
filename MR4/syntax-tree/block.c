@@ -254,8 +254,8 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
                   Bool _Bool61;
                   CHECK(118, String_equal(keyword, &(String){6, 5, "raise"}, &(_Bool61)) )
                   if (_Bool61) {
-                    if ((*end) != '\n') {
-                      CHECK(120, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){37, 36, "expected new-line after \"raise\", got"}, (*end)) )
+                    if ((*end) != ' ' && (*end) != '\n') {
+                      CHECK(120, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){46, 45, "expected space or new-line after \"raise\", got"}, (*end)) )
                     }
                     SyntaxTreeRaise* _SyntaxTreeRaise62;
                     CHECK(122, SyntaxTreeRaise_parse_new(NULL, self, &((*end)), &(_SyntaxTreeRaise62)) )

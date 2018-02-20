@@ -64,10 +64,14 @@ class SyntaxTreeNode
   func inst write-line-num()
     write-int(copy self.line-number)
   
-  func inst write-raise()
+  func inst write-raise(user String error-message)
     write(user "RAISE(")
     self.write-line-num()
-    write(user ")\n")
+    write(user ", ")
+    write-int(copy error-message.length)
+    write(user ", \"")
+    write(user error-message)
+    write(user "\")\n")
   
   func inst write-call()
     write(user "CHECK(")
@@ -138,6 +142,19 @@ class SyntaxTreeNode
     self.line-number.str(user line-num-str)
     print(user line-num-str)
     print(user "] ")
+  
+  ## Check `text` is a string constant
+  func inst check-string(user String text)
+    if text.length < 2
+      self.m-syntax-error(user "too short string constant", user text)
+    if text[0] != '\"' or text[text.length - 1] != '\"'
+      self.m-syntax-error(user "no '\"' around string constant", user text)
+    var Char prev
+    for n in 1:text.length - 1
+      var Char curr(text[n])
+      if curr = '"' and prev != '\\'
+        self.m-syntax-error(user "'\"' inside string constant", user text)
+      prev := curr
   
   func dynamic link-types()
     # do nothing as default

@@ -1,0 +1,34 @@
+Running tests:
+testing fail_call_empty... Error: empty function called
+  Error raised in tests/integration-error-test.4.mr:30 fail-call-empty()
+testing fail_base_class_output... Error: non empty base class given as output argument
+  Error raised in tests/integration-error-test.4.mr:35 fail-base-class-output()
+testing fail_slice_index... Error: slice index out of bounds
+  Error raised in tests/integration-error-test.4.mr:39 fail-slice-index()
+testing fail_member_empty... Error: used member of empty object
+  Error raised in tests/integration-error-test.4.mr:43 fail-member-empty()
+testing fail_member_outdated... Error: used member of outdated weak reference
+  Error raised in tests/integration-error-test.4.mr:50 fail-member-outdated()
+testing fail_sequence_empty... Error: empty object used as sequence
+  Error raised in tests/integration-error-test.4.mr:55 fail-sequence-empty()
+testing fail_sequence_outdated... Error: outdated weak reference used as sequence
+  Error raised in tests/integration-error-test.4.mr:61 fail-sequence-outdated()
+testing fail_dynamic_empty... Error: dynamic call of empty object
+  Error raised in tests/integration-error-test.4.mr:65 fail-dynamic-empty()
+testing fail_object_no_memory... Error: insufficient memory for object dynamic allocation
+  Error raised in tests/integration-error-test.4.mr:69 fail-object-no-memory()
+testing fail_managed_no_memory... Error: insufficient memory for managed object
+  Error raised in tests/integration-error-test.4.mr:73 fail-managed-no-memory()
+testing fail_raise... Error raised in tests/integration-error-test.4.mr:76 fail-raise()
+testing fail_raise_message... Error: my error
+  Error raised in tests/integration-error-test.4.mr:16 f-raise-message()
+  called from tests/integration-error-test.4.mr:79 fail-raise-message()
+testing fail_assert... Error: condition is not true
+  Assert failed in tests/integration-error-test.4.mr:82 fail-assert()
+testing fail_assert_error... Error: error not raised
+  Assert failed in tests/integration-error-test.4.mr:85 fail-assert-error()
+testing fail_assert_error_message... Assert failed: unexpected error message "tested other message"
+  Assert failed in tests/integration-error-test.4.mr:88 fail-assert-error-message()
+testing fail_assert_error_message_prefix... Assert failed: unexpected error message "tested message"
+  Assert failed in tests/integration-error-test.4.mr:91 fail-assert-error-message-prefix()
+Tests failed

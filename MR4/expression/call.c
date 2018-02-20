@@ -121,7 +121,7 @@ Returncode CallExpression_write_preactions(CallExpression* self) {
     CHECK(65, write(&(String){5, 4, "if ("}) )
     CHECK(66, Expression_write_as_top(self->function) )
     CHECK(67, write(&(String){11, 10, " == NULL) "}) )
-    CHECK(68, SyntaxTreeNode_write_raise(&(self->_base._base)) )
+    CHECK(68, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){22, 21, "empty function called"}) )
     CHECK(69, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   }
   CHECK(70, FunctionArguments_write_preactions(self->arguments) )
@@ -273,7 +273,7 @@ Returncode CallArgument_write_preactions(CallArgument* self) {
     CHECK(148, write(&(String){5, 4, "if ("}) )
     CHECK(149, (self->value)->_base._dtl[3](self->value) )
     CHECK(150, write(&(String){11, 10, " != NULL) "}) )
-    CHECK(151, SyntaxTreeNode_write_raise(&(self->_base._base)) )
+    CHECK(151, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){46, 45, "non empty base class given as output argument"}) )
     CHECK(152, SyntaxTreeCode_write_spaces(self->code_node) )
   }
   return OK;

@@ -29,7 +29,6 @@ class NativeFunction(SyntaxTreeFunction)
   
   func inst parse():(copy Char end)
     self.set-location()
-    # self.indentation-spaces := 2
     self.parse-header(copy true):(copy end)
     new List{SyntaxTreeCode} in self.code-nodes
     new List{SyntaxTreeVariable} in self.variables

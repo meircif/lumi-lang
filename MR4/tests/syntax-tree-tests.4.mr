@@ -105,7 +105,7 @@ struct(
 struct error
 
 ## @ eg te2
-struct ERrror
+struct ERror
 
 ## @ eg te3
 struct Error-name
@@ -376,12 +376,22 @@ func name()
 ## @ g t1
 func name()
   raise
+## @ g t2
+func name()
+  raise "some error"
+## @ g t3
+func name(user Array{String} arr)
+  raise arr[3]
 ## @ eg te0
 func name()
   return()
 ## @ eg te1
 func name()
   raise()
+## @ eg te2
+func name()
+  raise 2
+
 ## @@ test-code-variables
 ## @ c t0
 var Int x
@@ -720,6 +730,17 @@ struct Test
 mock delete()
   var Ref r(copy self)
 main
+## @ c t10
+assert-error t.num, "expected error"
+## @ c t11
+assert-error fun0(), "expected error in the function"
+## @ c t12
+assert-error t.num,
+      "expected error in new line"
+## @ g t13
+mock new()->(var Bool allocate-success)
+  allocate-success := false
+main
 ## @ c tr0
 var Ref r
 ## @ c tr1
@@ -795,6 +816,36 @@ struct Test
   var Int x
 mock Test.delete()
 mock Test.delete()
+
+## @ ec te18
+assert-error t.num , "error"
+## @ ec te19
+assert-error t.num,"error"
+## @ ec te20
+assert-error t.num,  "error"
+## @ ec te21
+assert-error t.num, error
+## @ eg te22
+mock new()->(var Bool res)
+mock new()->(var Bool res)
+
+## @ eg te23
+mock new()->(var Int x)
+
+## @ eg te24
+mock new()
+
+## @ eg te25
+mock new(copy Int x)->(var Bool res)
+
+## @ eg te26
+mock new()->(var Bool res, var Int x)
+
+## @ eg te27
+mock delete(copy Int x)
+
+## @ eg te28
+mock delete()->(copy Int x)
 
 ## @@ test-native
 ## @ g tf0

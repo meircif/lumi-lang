@@ -45,19 +45,41 @@ class SyntaxTreeReturn(SyntaxTreeCode)
 
 ## Raise statement in the syntax tree
 class SyntaxTreeRaise(SyntaxTreeCode)
+  owner Expression error-message
   
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeRaise new-node)
     new SyntaxTreeRaise in new-node
-    new-node.set-location()
-    new-node.parent := parent
+    new-node.parse(user parent):(copy end)
+  
+  func inst parse(user SyntaxTreeBlock parent):(copy Char end)
+    self.set-location()
+    self.parent := parent
+    if end = ' '
+      parse-new-expression(user "", user self):(
+          owner self.error-message, copy end)
   
   func dynamic m-is-end-point():(copy Bool is-end)
     is-end := true
   
+  func dynamic analyze()
+    if ? self.error-message
+      self.analyze-expression(user self.error-message, user glob.type-string)
+  
   func dynamic write()
     self.write-spaces()
-    self.write-raise()
+    if ? self.error-message
+      self.error-message.write-preactions()
+    write(user "USER_RAISE(")
+    self.write-line-num()
+    write(user ", ")
+    if ? self.error-message
+      self.error-message.write()
+      write(user ", ")
+      self.error-message.write-refman()
+    else
+      write(user "NULL, NULL")
+    write(user ")\n")
 
 
 ## While statement in the syntax tree

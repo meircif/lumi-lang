@@ -161,8 +161,8 @@ class InitExpression(Expression)
       self.result-type.length.write()
       
     else
-      # calloc(1, sizeof(`type`));
-      write(user "calloc(1, sizeof(")
+      # MR_alloc(sizeof(`type`));
+      write(user "MR_alloc(sizeof(")
       write-cname(user self.result-type.type-data.name)
       write(user ")")
     
@@ -173,7 +173,7 @@ class InitExpression(Expression)
     write(user "if (")
     self.symbol.write()
     write(user " == NULL) ")
-    self.write-raise()
+    self.write-raise(user "insufficient memory for object dynamic allocation")
   
   func inst write-assign()
     # `name` = `value`;

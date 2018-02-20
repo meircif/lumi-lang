@@ -130,8 +130,7 @@ class StringExpression(TextExpression)
   func inst parse(owner String text, user SyntaxTreeCode code-node)
     self.code-node := code-node
     self.set-location()
-    if text[text.length - 1] != '\"'
-      self.m-syntax-error(user "illegal string constant", user text)
+    self.check-string(user text)
     self.set-simple-type(user glob.type-string)
     self.access := ACCESS-VAR
     self.text := text

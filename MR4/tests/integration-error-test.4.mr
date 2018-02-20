@@ -1,0 +1,91 @@
+~~~ MR4 compiler integration error test file ~~~
+
+class BaseType
+  var Int x
+  func dynamic meth()
+
+class TopType(BaseType)
+  func dynamic meth()
+
+func f-get-top()->(user TopType top)
+
+func f-good-function()
+  return
+
+func f-raise-message(user String msg)
+  raise msg
+
+var Int new-fail-countdown
+
+mock new()->(var Bool alloc-success)
+  alloc-success := true
+  if new-fail-countdown > 0
+    new-fail-countdown -= 1
+    if new-fail-countdown = 0
+      alloc-success := false
+
+
+test fail-call-empty()
+  var Func{()} fun
+  fun()
+
+test fail-base-class-output()
+  var BaseType base-var
+  user BaseType base-user(user base-var)
+  f-get-top()->(user base-user)
+
+test fail-slice-index()
+  var Array{2:Int} arr
+  assert arr[6] = 0
+
+test fail-member-empty()
+  user BaseType obj
+  assert obj.x = 0
+  obj.meth()
+
+test fail-member-outdated()
+  new BaseType obj-owner
+  user BaseType obj(user obj-owner)
+  obj-owner := _
+  assert obj.x = 0
+  obj.meth()
+
+test fail-sequence-empty()
+  user Array{Int} arr
+  assert arr[0] = 0
+
+test fail-sequence-outdated()
+  new Array{2:Int} arr-owner
+  user Array{Int} arr(user arr-owner)
+  arr-owner := _
+  assert arr[0] = 0
+
+test fail-dynamic-empty()
+  user BaseType obj
+  obj.meth()
+
+test fail-object-no-memory()
+  new-fail-countdown := 1
+  new BaseType obj
+
+test fail-managed-no-memory()
+  new-fail-countdown := 2
+  new BaseType obj
+
+test fail-raise()
+  raise
+
+test fail-raise-message()
+  f-raise-message(user "my error")
+
+test fail-assert()
+  assert 1 = 2
+
+test fail-assert-error()
+  assert-error f-good-function()
+
+test fail-assert-error-message()
+  assert-error f-raise-message(user "tested other message"), "tested message"
+
+test fail-assert-error-message-prefix()
+  assert-error f-raise-message(user "tested message"), "tested message and more"

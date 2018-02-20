@@ -137,6 +137,16 @@ $CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
 diff ../MR4/tests/integration-multiple-output.txt \
   tests/integration-multiple-output.txt
 
+# run mr4-compiler error integration test
+./mr4-compiler tests/integration-actual-error.c \
+  tests/integration-error-test.4.mr
+diff ../MR4/tests/integration-expected-error.c tests/integration-actual-error.c
+$CCW -Wno-unused-label --pedantic tests/integration-actual-error.c \
+  ../MR4/mr.4.c -I../MR4 -o  test-mr4-error
+! ./test-mr4-error > tests/integration-error-output.txt
+diff ../MR4/tests/integration-error-output.txt \
+  tests/integration-error-output.txt
+
 
 # --< MRB >--
 

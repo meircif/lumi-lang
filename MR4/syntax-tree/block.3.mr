@@ -116,9 +116,9 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
           owner SyntaxTreeReturn.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "raise")
-      if end != '\n'
+      if end != ' ' and end != '\n'
         self.m-syntax-error-c(
-            user "expected new-line after \"raise\", got", copy end)
+            user "expected space or new-line after \"raise\", got", copy end)
       self.code-nodes.add(
           owner SyntaxTreeRaise.parse-new(var _, user self):(copy end))
       

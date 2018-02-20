@@ -396,7 +396,7 @@ func f-try-catch-raise(user TestStruct t)
   try
     t.num := 1
   catch
-    raise
+    raise "ignored message"
 
 func test-error-handling(user TestStruct t)
   try
@@ -422,7 +422,7 @@ func test-error-handling(user TestStruct t)
       f-try-catch-raise(user t)
       sys.print(user " X ")
     sys.print(user "8 ")
-    raise
+    raise "another ignored message"
   sys.println(user "}")
 
 

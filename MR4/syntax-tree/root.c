@@ -291,20 +291,25 @@ Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self) {
   CHECK(158, SyntaxTreeNode_write_children(&(self->_base._base._base), self->_base.functions) )
   
   /* write main function */
-  if (!glob->is_delete_mocked && (NULL != glob->test_functions->first ||  NULL !=  self->main_function)) {
-    CHECK(163, write(&(String){32, 31, "\n\nvoid Mock_delete(Ref self) {}"}) )
+  if (NULL != glob->test_functions->first ||  NULL !=  self->main_function) {
+    if (!glob->is_new_mocked) {
+      CHECK(163, write(&(String){61, 60, "\n\nReturncode Mock_new(Bool* allocate_success) { return OK; }"}) )
+    }
+    if (!glob->is_delete_mocked) {
+      CHECK(166, write(&(String){50, 49, "\n\nReturncode Mock_delete(Ref self) { return OK; }"}) )
+    }
   }
   if (NULL != glob->test_functions->first) {
-    CHECK(165, SyntaxTreeRoot_write_test_main(self) )
+    CHECK(168, SyntaxTreeRoot_write_test_main(self) )
   }
   else {
     if (NULL != self->main_function) {
-      CHECK(167, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
-      CHECK(168, (self->main_function)->_base._base._base._base._dtl[3](self->main_function) )
+      CHECK(170, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
+      CHECK(171, (self->main_function)->_base._base._base._base._dtl[3](self->main_function) )
     }
   }
   
-  CHECK(170, file_close(glob->output_file) )
+  CHECK(173, file_close(glob->output_file) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -318,7 +323,7 @@ Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, TypeWriter* type_
   ListNode* child = self->types->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(176, (((TypeData*)(child->item)))->_base._base._base._dtl[10](((TypeData*)(child->item)), type_writer) )
+    CHECK(179, (((TypeData*)(child->item)))->_base._base._base._dtl[10](((TypeData*)(child->item)), type_writer) )
     child = child->next;
   }
   return OK;
@@ -331,21 +336,21 @@ Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_write_test_main = "SyntaxTreeRoot.write-test-main";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write_test_main
 Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self) {
-  CHECK(180, write(&(String){21, 20, "\nUSER_MAIN_HEADER {\n"}) )
-  CHECK(181, write(&(String){27, 26, "  Bool MR_success = true;\n"}) )
-  CHECK(182, (self->global_init)->_base._base._base._base._dtl[3](self->global_init) )
-  CHECK(183, write(&(String){2, 1, "\n"}) )
+  CHECK(183, write(&(String){21, 20, "\nUSER_MAIN_HEADER {\n"}) )
+  CHECK(184, write(&(String){27, 26, "  Bool MR_success = true;\n"}) )
+  CHECK(185, (self->global_init)->_base._base._base._base._dtl[3](self->global_init) )
+  CHECK(186, write(&(String){2, 1, "\n"}) )
   NameMapNode* node = glob->test_functions->first;
   while (true) {
-    CHECK(186, write(&(String){12, 11, "  RUN_TEST("}) )
-    CHECK(187, SyntaxTreeFunction_write_cname(&(((SyntaxTreeTestFunction*)(node->value))->_base)) )
-    CHECK(188, write(&(String){4, 3, ");\n"}) )
+    CHECK(189, write(&(String){12, 11, "  RUN_TEST("}) )
+    CHECK(190, SyntaxTreeFunction_write_cname(&(((SyntaxTreeTestFunction*)(node->value))->_base)) )
+    CHECK(191, write(&(String){4, 3, ");\n"}) )
     node = node->next;
     if (!(NULL != node)) break;
   }
-  CHECK(191, write(&(String){33, 32, "  return MR_success? OK : FAIL;\n"}) )
-  CHECK(192, write(&(String){3, 2, "}\n"}) )
-  CHECK(193, write(&(String){17, 16, "\nTEST_MAIN_FUNC\n"}) )
+  CHECK(194, write(&(String){33, 32, "  return MR_success? OK : FAIL;\n"}) )
+  CHECK(195, write(&(String){3, 2, "}\n"}) )
+  CHECK(196, write(&(String){17, 16, "\nTEST_MAIN_FUNC\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -373,10 +378,10 @@ static char* _func_name_SyntaxTreeMainFunction_parse_new = "SyntaxTreeMainFuncti
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse_new
 Returncode SyntaxTreeMainFunction_parse_new(SyntaxTreeMainFunction* self, Char* end, SyntaxTreeMainFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMainFunction));
-  if ((*new_node) == NULL) RAISE(199)
+  if ((*new_node) == NULL) RAISE(202)
   *(*new_node) = (SyntaxTreeMainFunction){SyntaxTreeMainFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMainFunction__dtl;
-  CHECK(200, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
+  CHECK(203, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -387,14 +392,14 @@ Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end)
 static char* _func_name_SyntaxTreeMainFunction_parse = "SyntaxTreeMainFunction.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse
 Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end) {
-  CHECK(203, SyntaxTreeFunction_init(&(self->_base)) )
-  CHECK(204, string_new_copy(&(String){5, 4, "main"}, &(self->_base.name)) )
+  CHECK(206, SyntaxTreeFunction_init(&(self->_base)) )
+  CHECK(207, string_new_copy(&(String){5, 4, "main"}, &(self->_base.name)) )
   self->_base.arguments = malloc(sizeof(FunctionArguments));
-  if (self->_base.arguments == NULL) RAISE(205)
+  if (self->_base.arguments == NULL) RAISE(208)
   *self->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   self->_base.arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(206, FunctionArguments_init(self->_base.arguments) )
-  CHECK(207, SyntaxTreeFunction_parse_body(&(self->_base), &((*end))) )
+  CHECK(209, FunctionArguments_init(self->_base.arguments) )
+  CHECK(210, SyntaxTreeFunction_parse_body(&(self->_base), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -409,10 +414,10 @@ Returncode SyntaxTreeMainFunction_write(SyntaxTreeMainFunction* self) {
   /*   `block...` */
   /* } */
   /* MAIN_FUNC */
-  CHECK(214, write(&(String){18, 17, "\nUSER_MAIN_HEADER"}) )
-  CHECK(215, SyntaxTreeFunction_write_block(&(self->_base)) )
-  CHECK(216, write_post_func() )
-  CHECK(217, write(&(String){12, 11, "\nMAIN_FUNC\n"}) )
+  CHECK(217, write(&(String){18, 17, "\nUSER_MAIN_HEADER"}) )
+  CHECK(218, SyntaxTreeFunction_write_block(&(self->_base)) )
+  CHECK(219, write_post_func() )
+  CHECK(220, write(&(String){12, 11, "\nMAIN_FUNC\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -423,10 +428,10 @@ Returncode SyntaxTreeMainFunction_write_block_body(SyntaxTreeMainFunction* self)
 static char* _func_name_SyntaxTreeMainFunction_write_block_body = "SyntaxTreeMainFunction.write-block-body";
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_write_block_body
 Returncode SyntaxTreeMainFunction_write_block_body(SyntaxTreeMainFunction* self) {
-  CHECK(220, (glob->root->global_init)->_base._base._base._base._dtl[3](glob->root->global_init) )
-  CHECK(221, write_pre_func(&(self->_base)) )
-  CHECK(222, write(&(String){2, 1, "\n"}) )
-  CHECK(223, SyntaxTreeBlock_write_block_body(&(self->_base._base)) )
+  CHECK(223, (glob->root->global_init)->_base._base._base._base._dtl[3](glob->root->global_init) )
+  CHECK(224, write_pre_func(&(self->_base)) )
+  CHECK(225, write(&(String){2, 1, "\n"}) )
+  CHECK(226, SyntaxTreeBlock_write_block_body(&(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -452,18 +457,18 @@ Returncode GlobalInit_init(GlobalInit* self);
 static char* _func_name_GlobalInit_init = "GlobalInit.init";
 #define MR_FUNC_NAME _func_name_GlobalInit_init
 Returncode GlobalInit_init(GlobalInit* self) {
-  CHECK(228, SyntaxTreeFunction_init(&(self->_base)) )
+  CHECK(231, SyntaxTreeFunction_init(&(self->_base)) )
   self->_base._base.code_nodes = malloc(sizeof(List));
-  if (self->_base._base.code_nodes == NULL) RAISE(229)
+  if (self->_base._base.code_nodes == NULL) RAISE(232)
   *self->_base._base.code_nodes = (List){NULL, NULL};
   self->_base._base._base.variables = malloc(sizeof(List));
-  if (self->_base._base._base.variables == NULL) RAISE(230)
+  if (self->_base._base._base.variables == NULL) RAISE(233)
   *self->_base._base._base.variables = (List){NULL, NULL};
   self->_base.arguments = malloc(sizeof(FunctionArguments));
-  if (self->_base.arguments == NULL) RAISE(231)
+  if (self->_base.arguments == NULL) RAISE(234)
   *self->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   self->_base.arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(232, FunctionArguments_init(self->_base.arguments) )
+  CHECK(235, FunctionArguments_init(self->_base.arguments) )
   self->_base._base._base.indentation_spaces = 2;
   return OK;
 }
@@ -478,14 +483,14 @@ Returncode GlobalInit_write(GlobalInit* self) {
   if (!(NULL != self->_base._base.code_nodes->first)) {
     return OK;
   }
-  CHECK(238, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
-  CHECK(239, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
-  CHECK(240, write(&(String){43, 42, "#define RETURN_ERROR(value) return value;\n"}) )
-  CHECK(241, write(&(String){55, 54, "#define MR_FUNC_NAME \"global variable initialization\"\n"}) )
-  CHECK(242, (self)->_base._base._base._base._dtl[7](self) )
-  CHECK(243, write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}) )
-  CHECK(244, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
-  CHECK(245, write(&(String){60, 59, "#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup"}) )
+  CHECK(241, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
+  CHECK(242, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
+  CHECK(243, write(&(String){43, 42, "#define RETURN_ERROR(value) return value;\n"}) )
+  CHECK(244, write(&(String){55, 54, "#define MR_FUNC_NAME \"global variable initialization\"\n"}) )
+  CHECK(245, (self)->_base._base._base._base._dtl[7](self) )
+  CHECK(246, write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}) )
+  CHECK(247, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
+  CHECK(248, write(&(String){60, 59, "#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -505,7 +510,7 @@ Returncode write_global(String* text);
 static char* _func_name_write_global = "write-global";
 #define MR_FUNC_NAME _func_name_write_global
 Returncode write_global(String* text) {
-  CHECK(250, write(text) )
+  CHECK(253, write(text) )
   return OK;
 }
 #undef MR_FUNC_NAME

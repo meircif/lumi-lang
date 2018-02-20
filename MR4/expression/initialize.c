@@ -229,8 +229,8 @@ Returncode InitExpression_write_new_init(InitExpression* self) {
       
     }
     else {
-      /* calloc(1, sizeof(`type`)); */
-      CHECK(165, write(&(String){18, 17, "calloc(1, sizeof("}) )
+      /* MR_alloc(sizeof(`type`)); */
+      CHECK(165, write(&(String){17, 16, "MR_alloc(sizeof("}) )
       CHECK(166, write_cname(self->_base.result_type->type_data->name) )
       CHECK(167, write(&(String){2, 1, ")"}) )
     }
@@ -243,7 +243,7 @@ Returncode InitExpression_write_new_init(InitExpression* self) {
   CHECK(173, write(&(String){5, 4, "if ("}) )
   CHECK(174, (self->symbol)->_base._base._dtl[3](self->symbol) )
   CHECK(175, write(&(String){11, 10, " == NULL) "}) )
-  CHECK(176, SyntaxTreeNode_write_raise(&(self->_base._base)) )
+  CHECK(176, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){50, 49, "insufficient memory for object dynamic allocation"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

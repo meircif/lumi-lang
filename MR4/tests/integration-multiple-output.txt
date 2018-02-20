@@ -5,4 +5,5 @@ testing test_native... OK
 testing test_dynamic_type_parameters... OK
 testing test_simple_delete... OK
 testing test_complex_delete... OK
+testing test_assert_error_message... OK
 Tests passed
