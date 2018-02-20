@@ -12,7 +12,6 @@ func write-syntax-tree()
 func test-global-scope(user String input-text, user String expected-output)
   f-setup-test()
   set-mock-file-text(user input-text)
-  mock-input-file-text.append(copy '\n')
   write-syntax-tree()
   if mock-output-file-text[0] != '\n'
     print(user mock-output-file-text)

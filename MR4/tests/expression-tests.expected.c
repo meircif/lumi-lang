@@ -47,7 +47,7 @@ illegal character constant "'''"
 /// @ te1
 illegal character constant "'\'"
 /// @ te2
-illegal character constant "'aa'"
+illegal character constant "'aa"
 /// @ te3
 illegal character constant "'\c'"
 /// @ te4
@@ -59,11 +59,11 @@ illegal character constant "'\058'"
 /// @ te7
 illegal character constant "''"
 /// @ te8
-illegal character constant "'aaa'"
+illegal character constant "'aa'"
 /// @ te9
-illegal character constant "'aaaaa'"
+illegal character constant "'aaa'"
 /// @ te10
-illegal character constant "'aa"
+illegal character constant "'aaaaa'"
 /// @@ test-string-expression
 /// @ t0
 String aux_String_0_Var = {0};
@@ -93,12 +93,58 @@ String aux_String_0_Var = {0};
   str_Refman = aux_String_0_Refman;
   MR_inc_ref(str_Refman);
   str = aux_String_0;
+/// @ t2
+String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(4, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 16;
+  aux_String_0_Var.length = 15;
+  aux_String_0_Var.values = "linesplitstring";
+  MR_dec_ref(str_Refman);
+  str_Refman = aux_String_0_Refman;
+  MR_inc_ref(str_Refman);
+  str = aux_String_0;
+/// @ t3
+String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(4, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 19;
+  aux_String_0_Var.length = 18;
+  aux_String_0_Var.values = "multi\nline\nstring\n";
+  MR_dec_ref(str_Refman);
+  str_Refman = aux_String_0_Refman;
+  MR_inc_ref(str_Refman);
+  str = aux_String_0;
+/// @ t4
+String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(2, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 11;
+  aux_String_0_Var.length = 10;
+  aux_String_0_Var.values = "line split";
+  MR_dec_ref(str_Refman);
+  str_Refman = aux_String_0_Refman;
+  MR_inc_ref(str_Refman);
+  str = aux_String_0;
 /// @ te0
 no '"' around string constant ""aaa"
 /// @ te1
 too short string constant """
 /// @ te2
 '"' inside string constant ""error"+"string""
+/// @ te3
+indentation too short, expected 6 got 4
+/// @ te4
+indentation too short, expected 6 got 4
 /// @@ test-empty-expression
 /// @ t0
 MR_dec_ref(str_Refman);

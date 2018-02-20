@@ -62,10 +62,11 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
   
   Char quote = '\0';
   while (true) {
-    if (!(ch != EOF && ch != '\n')) break;
+    if (!(ch != EOF)) break;
     if (quote == '\0') {
+      if (!(ch != '\n')) break;
       Bool _Bool8;
-      CHECK(38, String_has(ends, ch, &(_Bool8)) )
+      CHECK(39, String_has(ends, ch, &(_Bool8)) )
       if (!(!_Bool8)) break;
       if (ch == '\'' || ch == '"' || ch == '`') {
         quote = ch;
@@ -73,8 +74,8 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
     }
     else {
       if (ch == '\\') {
-        CHECK(42, String_append(glob->input_buffer, ch) )
-        CHECK(43, read_c(&(ch)) )
+        CHECK(43, String_append(glob->input_buffer, ch) )
+        CHECK(44, read_c(&(ch)) )
       }
       else {
         if (ch == quote) {
@@ -82,8 +83,8 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
         }
       }
     }
-    CHECK(46, String_append(glob->input_buffer, ch) )
-    CHECK(47, read_c(&(ch)) )
+    CHECK(47, String_append(glob->input_buffer, ch) )
+    CHECK(48, read_c(&(ch)) )
   }
   
   glob->input_end = ch;
@@ -106,8 +107,8 @@ static char* _func_name_read_new = "read-new";
 Returncode read_new(String* ends, String** new_text, Char* end) {
   String* text = NULL;
   Int _Int9;
-  CHECK(59, read_until(ends, false, &(text), &((*end)), &(_Int9)) )
-  CHECK(60, string_new_copy(text, &((*new_text))) )
+  CHECK(60, read_until(ends, false, &(text), &((*end)), &(_Int9)) )
+  CHECK(61, string_new_copy(text, &((*new_text))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -121,7 +122,7 @@ Returncode write_c(Char ch);
 static char* _func_name_write_c = "write-c";
 #define MR_FUNC_NAME _func_name_write_c
 Returncode write_c(Char ch) {
-  CHECK(65, file_putc(glob->output_file, ch) )
+  CHECK(66, file_putc(glob->output_file, ch) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -135,7 +136,7 @@ Returncode write(String* text);
 static char* _func_name_write = "write";
 #define MR_FUNC_NAME _func_name_write
 Returncode write(String* text) {
-  CHECK(70, file_write(glob->output_file, text) )
+  CHECK(71, file_write(glob->output_file, text) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -150,16 +151,16 @@ static char* _func_name_write_cname = "write-cname";
 #define MR_FUNC_NAME _func_name_write_cname
 Returncode write_cname(String* name) {
   if (!(NULL != name)) {
-    RAISE(76)
+    RAISE(77)
   }
   {int index; for (index = (0); index < (name->length); ++index) {
-    if ((index) < 0 || (index) >= (name)->length) RAISE(78)
+    if ((index) < 0 || (index) >= (name)->length) RAISE(79)
     Char ch = ((name)->values[index]);
     if (ch == '-' || ch == ' ') {
-      CHECK(80, write_c('_') )
+      CHECK(81, write_c('_') )
     }
     else {
-      CHECK(82, write_c(ch) )
+      CHECK(83, write_c(ch) )
     }
   }}
   return OK;
@@ -176,8 +177,8 @@ static char* _func_name_write_int = "write-int";
 #define MR_FUNC_NAME _func_name_write_int
 Returncode write_int(Int num) {
   String* num_str = &(String){64, 0, (char[64]){0}};
-  CHECK(88, Int_str(num, num_str) )
-  CHECK(89, write(num_str) )
+  CHECK(89, Int_str(num, num_str) )
+  CHECK(90, write(num_str) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -192,7 +193,7 @@ static char* _func_name_write_spaces = "write-spaces";
 #define MR_FUNC_NAME _func_name_write_spaces
 Returncode write_spaces(Int num) {
   {int n; for (n = (0); n < (num); ++n) {
-    CHECK(95, write_c(' ') )
+    CHECK(96, write_c(' ') )
   }}
   return OK;
 }
@@ -208,10 +209,10 @@ static char* _func_name_file_open = "file-open";
 #define MR_FUNC_NAME _func_name_file_open
 Returncode file_open(String* name, Bool is_read, File** file) {
   if (is_read) {
-    CHECK(101, file_open_read(name, &((*file))) )
+    CHECK(102, file_open_read(name, &((*file))) )
   }
   else {
-    CHECK(103, file_open_write(name, &((*file))) )
+    CHECK(104, file_open_write(name, &((*file))) )
   }
   return OK;
 }
@@ -224,7 +225,7 @@ Returncode file_close(File* file);
 static char* _func_name_file_close = "file-close";
 #define MR_FUNC_NAME _func_name_file_close
 Returncode file_close(File* file) {
-  CHECK(106, File_close(file) )
+  CHECK(107, File_close(file) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -236,7 +237,7 @@ Returncode file_getc(File* file, Char* ch);
 static char* _func_name_file_getc = "file-getc";
 #define MR_FUNC_NAME _func_name_file_getc
 Returncode file_getc(File* file, Char* ch) {
-  CHECK(109, File_getc(file, &((*ch))) )
+  CHECK(110, File_getc(file, &((*ch))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -248,7 +249,7 @@ Returncode file_putc(File* file, Char ch);
 static char* _func_name_file_putc = "file-putc";
 #define MR_FUNC_NAME _func_name_file_putc
 Returncode file_putc(File* file, Char ch) {
-  CHECK(112, File_putc(file, ch) )
+  CHECK(113, File_putc(file, ch) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -260,7 +261,7 @@ Returncode file_write(File* file, String* text);
 static char* _func_name_file_write = "file-write";
 #define MR_FUNC_NAME _func_name_file_write
 Returncode file_write(File* file, String* text) {
-  CHECK(115, File_write(file, text) )
+  CHECK(116, File_write(file, text) )
   return OK;
 }
 #undef MR_FUNC_NAME

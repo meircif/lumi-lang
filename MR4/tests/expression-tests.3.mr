@@ -18,7 +18,6 @@ func test-code-setup(user String input-text)
     mock-input-file-text.append(copy ch)
   mock-input-line-reset-index := mock-input-file-text.length
   mock-input-file-text.concat(user input-text)
-  mock-input-file-text.append(copy '\n')
 
 
 func test-code(user String input-text, user String expected-output)

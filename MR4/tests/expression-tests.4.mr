@@ -42,39 +42,58 @@ c := '\x0f'
 c := '\xA9'
 ## @ c t5
 c := '\270'
-## @ ec te0
-'''
-## @ ec te1
-'\'
-## @ ec te2
-'aa'
+## @ fec te0
+c := '''
+## @ fec te1
+c := '\'
+## @ fec te2
+c := 'aa
 ## @ ec te3
-'\c'
+c := '\c'
 ## @ ec te4
-'aaaa'
+c := 'aaaa'
 ## @ ec te5
-'\x6g'
+c := '\x6g'
 ## @ ec te6
-'\058'
+c := '\058'
 ## @ ec te7
-''
+c := ''
 ## @ ec te8
-'aaa'
+c := 'aa'
 ## @ ec te9
-'aaaaa'
+c := 'aaa'
 ## @ ec te10
-'aa
+c := 'aaaaa'
 ## @@ test-string-expression
 ## @ c t0
 str := "some string"
 ## @ c t1
 str := "\nstring\t\"with\\formatting\n"
-## @ ec te0
-"aaa
-## @ ec te1
-"
+## @ c t2
+str := "line\
+      split\
+      string\
+      "
+## @ c t3
+str := "multi
+      line
+      string
+      "
+## @ c t4
+str := "line\
+       split"
+## @ fec te0
+str := "aaa
+## @ fec te1
+str := "
 ## @ ec te2
 "error"+"string"
+## @ ec te3
+str := "indention
+    too short"
+## @ ec te4
+str := "indention\
+    too short"
 ## @@ test-empty-expression
 ## @ c t0
 str := _
@@ -238,7 +257,6 @@ struct Base
 struct Test(Base)
   func meth(owner Test t)
     base(owner t)
-
 ## @@ test-type-expression
 ## @ c t0
 Test.meth(var t)
@@ -259,7 +277,6 @@ struct Top(Mid)
   func methb()
   func methm()
     base.methm()
-
 ## @ g t1
 struct Base
   var Int x
@@ -270,7 +287,6 @@ struct Top(Mid)
   func methb()
   func methm()
     base.methb()
-
 ## @ ec te0
 base
 ## @ eg te1
@@ -278,7 +294,6 @@ struct Test
   var Int x
   func mock()
     base
-
 ## @ eg te2
 struct Base
   var Int x
@@ -286,21 +301,18 @@ struct Test(Base)
   var Int x
   func mock()
     base()
-
 ## @ eg te3
 struct Base
   var Int x
 struct Test(Base)
   func mock()
     base := self
-
 ## @ eg te4
 struct Base
   var Int x
 struct Test(Base)
   func mock()->(var Int x)
     x := base.x
-
 ## @@ test-block-expression
 ## @ c t0
 i := 2 + (123)

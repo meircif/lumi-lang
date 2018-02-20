@@ -22,15 +22,7 @@ class SyntaxTreeCode(SyntaxTreeNode)
     var Int expected-spaces(self.parent.indentation-spaces + 4)
     for n in expected-spaces
       if read-c() != ' '
-        var String{16} expected-spaces-str
-        var String{16} actual-spaces-str
-        expected-spaces.str(user expected-spaces-str)
-        n.str(user actual-spaces-str)
-        self.m-syntax-error2(
-            user "too short indentation, expected",
-            user expected-spaces-str,
-            user "got",
-            user actual-spaces-str)
+        self.m-syntax-error-indentation(copy n, copy expected-spaces)
   
   func dynamic m-is-end-point():(copy Bool is-end)
     is-end := false

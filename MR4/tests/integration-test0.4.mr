@@ -22,6 +22,10 @@ user String global-string(user "a constant string")
 ; Test functions
 func test-simple-function()
   sys.println(user "I am a simple function")
+  sys.print(user "I am a multi\
+      line
+      string
+      ")
 
 
 func test-const-expression()->(
@@ -35,6 +39,9 @@ func test-const-expression()->(
       -0xFDA940
   c := 'a' + '\'' + '\n' + '\x0f' + '\xA9' + '\270'
   s := "some string"
+  s := "some
+      str\
+      ing"
   t := _
   d := _
   f := _
