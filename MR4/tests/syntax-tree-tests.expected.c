@@ -107,9 +107,9 @@ expected new-line in line end, got "?"
 /// @ te5
 expected new-line after "main", got "("
 /// @ te6
-indentation too big, expected "0" got "2"
+indentation too long, expected 0 got 2
 /// @ te7
-too short indentation, expected "6" got "4"
+indentation too short, expected 6 got 4
 /// @ te8
 no new-line before file end
 /// @ te9
@@ -594,7 +594,7 @@ expected ">(" got "()"
 /// @ te12
 expected block in a new line, got "EOF"
 /// @ te13
-indentation too big, expected "2" got "4"
+indentation too long, expected 2 got 4
 /// @ te14
 parameter "x" access should be "copy" for primitive types, got "user"
 /// @ te15
@@ -608,7 +608,7 @@ missing arguments in function type
 /// @ te19
 multidimensional array not supported yet...
 /// @ te20
-too short indentation, expected "4" got "2"
+indentation too short, expected 4 got 2
 /// @@ test-members
 /// @ t0
 typedef struct Test Test;
@@ -1694,7 +1694,7 @@ Returncode external(Native n, Native* no);
 /// @ te0
 expected space after "native", got "("
 /// @ te1
-expected space after "native" keyword, got "EOF"
+expected space after "native" keyword, got "new-line"
 /// @ te2
 unknown "native" keyword "error"
 /// @ tef1
@@ -2102,7 +2102,7 @@ Data dt_Var = {0};
   if (ta != NULL) RAISE(6, 45, "non empty base class given as output argument")
   CHECK(6, Data_get(dt, dt_Refman, (void*)&(ta), &(ta_Refman), (void*)&(ta_Dynamic)) )
 /// @ teg0
-expected "}" after type parameters, got "EOF"
+expected "}" after type parameters, got "new-line"
 /// @ teg1
 declared variable with generic subtype "Generic"
 /// @ teg2

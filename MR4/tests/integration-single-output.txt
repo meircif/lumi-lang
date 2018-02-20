@@ -1,4 +1,6 @@
 I am a simple function
+I am a multiline
+string
 test string
 test string
 ownership passed

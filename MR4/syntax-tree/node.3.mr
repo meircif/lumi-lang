@@ -134,6 +134,24 @@ class SyntaxTreeNode
     print(user "\n")
     raise
   
+  func inst m-syntax-error-indentation(copy Int actual, copy Int expected)
+    var String{16} expected-str
+    var String{16} actual-str
+    expected.str(user expected-str)
+    actual.str(user actual-str)
+    self.print-syntax-error-header()
+    print(user "indentation too ")
+    if actual < expected
+      print(user "short")
+    else
+      print(user "long")
+    print(user ", expected ")
+    print(user expected-str)
+    print(user " got ")
+    print(user actual-str)
+    print(user "\n")
+    raise
+  
   func inst print-syntax-error-header()
     print(user "Code error in ")
     print(user self.input-file-name)

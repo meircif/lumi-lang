@@ -53,28 +53,24 @@ raise
 [; comment ;]?
 ## @ eg te5
 main(
-
 ## @ eg te6
   struct Test
 ## @ eg te7
 func f()
   x :=
     y
-## @ eg te8
+## @ feg te8
 var Int x
 ## @ eg te9
 var Int name
 var Int name
-
 ## @ eg te10
 func name()
 var Int name
 ## @ eg te11
 user Error error
-
 ## @ eg te12
 var Int x(copy error)
-
 ## @ eg te13
 [ ; error
 ## @@ test-struct
@@ -100,51 +96,39 @@ struct Test1
   var Int x
 ## @ eg te0
 struct(
-
 ## @ eg te1
 struct error
-
 ## @ eg te2
 struct ERror
-
 ## @ eg te3
 struct Error-name
-
 ## @ eg te4
 struct E
-
 ## @ eg te5
 struct Int
-
 ## @ eg te6
 struct Test
 struct Test
-
 ## @ eg te7
 struct Test(Base
-
 ## @ eg te8
 struct Test
   error 
-## @ eg te9
+## @ feg te9
 struct Test
 ## @ eg te10
 struct Error
-
 ## @ eg te11
 struct Error
   new 
-
 ## @ eg te12
 struct Error
   new()
   new()
-
 ## @ eg te13
 struct Error
   var Int x
   new()->(var Int x)
-
 ## @@ test-class
 ## @ g t0
 class Base
@@ -167,29 +151,24 @@ class Top(Mid)
     base.dyn0()
 ## @ eg te0
 class(
-
 ## @ eg te1
 class Error
   var Int x
-
 ## @ eg te2
 class Error
   func error f()
-
 ## @ eg te3
 struct Base
   var Int x
   func meth()
 class Error(Base)
   func dynamic meth()
-
 ## @ eg te4
 class Base
   var Int x
   func dynamic meth()
 class Error(Base)
   func inst meth()
-
 ## @@ test-function
 ## @ g t0
 func name()
@@ -241,69 +220,50 @@ main
   var Int x
 ## @ eg te0
 func(
-
 ## @ eg te1
 func name
-
 ## @ eg te2
 func Error()
-
 ## @ eg te3
 func error_name()
-
 ## @ eg te4
 func name()
 func name()
-
 ## @ eg te5
 var Int name
 func name()
-
 ## @ eg te6
 func name( )
-
 ## @ eg te7
 func name(user)
-
 ## @ eg te8
 func name(var String
-
 ## @ eg te9
 func name(error Int x)
-
 ## @ eg te10
 func name(var String str,user Int x)
-
 ## @ eg te11
 func name()-()
-
-## @ eg te12
+## @ feg te12
 func name()
 ## @ eg te13
 func name()
     var Int x
 ## @ eg te14
 func name(user Int x)
-
 ## @ eg te15
 func name()->(copy Int x)
-
 ## @ eg te16
 func name(copy String s)
-
 ## @ eg te17
 func name(user Array error)
-
 ## @ eg te18
 func name(copy Func error)
-
 ## @ eg te19
 func name(user Array{Array{Int}} error)
-
 ## @ eg te20
 func name(
   copy Int x)
-
 ## @@ test-members
 ## @ g t0
 struct Test
@@ -348,27 +308,22 @@ struct Test1
 struct Test2
   var Int fun
   func name()
-
 ## @ eg t8
 struct Test
   var Int name
   var Int name
-
 ## @ eg t9
 struct Test
   func name()
   var Int name
-
 ## @ eg t10
 struct Test
   func name()
   func name()
-
 ## @ eg t11
 struct Test
   var Int name
   func name()
-
 ## @@ test-return
 ## @ g t0
 func name()
@@ -391,7 +346,6 @@ func name()
 ## @ eg te2
 func name()
   raise 2
-
 ## @@ test-code-variables
 ## @ c t0
 var Int x
@@ -423,14 +377,12 @@ var Int errorName
 ## @ ec te3
 var Int name
   var Int name
-
 ## @ ec te4
 var Int name
   do
     var Int x
     do
       var Int name
-
 ## @ eg te5
 var Int name
 func mock()
@@ -518,7 +470,6 @@ struct Test
   var Int x
 func mock()
   Test(copy 1)
-
 ## @ ec te20
 var Int x(user 3)
 ## @ ec te21
@@ -606,7 +557,7 @@ else-if
 if false
     ; ...
   else-if()
-## @ eg te10
+## @ feg te10
 func error()
   if b
 ## @@ test-do-loop
@@ -687,7 +638,6 @@ for n in 5
 for n in arr
     i += n
   for n in sarr
-
 ## @@ test-testing
 ## @ c t0
 assert t.num = 2
@@ -704,7 +654,6 @@ mock fun()
 mock fun()
 func fun()
   fun()
-
 ## @ g t5
 mock Test.meth(copy Int x)
 struct Test
@@ -714,18 +663,15 @@ struct Test
 ## @ g t6
 test fun0()
 test fun1()
-
 ## @ g t7
 test fun0()
 test fun1()
 main
-
 ## @ g t8
 mock Test.delete()
   var Ref r(copy self)
 struct Test
   user String s
-
 ## @ g t9
 mock delete()
   var Ref r(copy self)
@@ -762,33 +708,25 @@ assert error
 assert-error error
 ## @ eg te3
 test fun(copy Int x)
-
 ## @ eg te4
 test fun()->(copy Int x)
-
 ## @ eg te5
 mock error()
-
 ## @ eg te6
 mock Error.fun()
-
 ## @ eg te7
 struct Test
   var Int x
 mock Test.error()
-
 ## @ eg te8
 mock fun(owner String s)
 func fun(user String s)
-
 ## @ eg te9
 mock fun(user Int s)
 func fun(user String s)
-
 ## @ eg te10
 mock fun(user Array{Char} a)
 func fun(user Array{Int} a)
-
 ## @ ec te11
 assert
 ## @ ec te12
@@ -799,24 +737,20 @@ mock()
 func fun()
 mock fun()
 mock fun()
-
 ## @ eg te15
 struct Test
   var Int x
   func fun()
 mock Test.fun()
 mock Test.fun()
-
 ## @ eg te16
 mock delete()
 mock delete()
-
 ## @ eg te17
 struct Test
   var Int x
 mock Test.delete()
 mock Test.delete()
-
 ## @ ec te18
 assert-error t.num , "error"
 ## @ ec te19
@@ -828,25 +762,18 @@ assert-error t.num, error
 ## @ eg te22
 mock new()->(var Bool res)
 mock new()->(var Bool res)
-
 ## @ eg te23
 mock new()->(var Int x)
-
 ## @ eg te24
 mock new()
-
 ## @ eg te25
 mock new(copy Int x)->(var Bool res)
-
 ## @ eg te26
 mock new()->(var Bool res, var Int x)
-
 ## @ eg te27
 mock delete(copy Int x)
-
 ## @ eg te28
 mock delete()->(copy Int x)
-
 ## @@ test-native
 ## @ g tf0
 native func external()
@@ -875,16 +802,12 @@ native error
 native error 
 ## @ eg tef1
 native func error(owner String s)
-
 ## @ eg tef2
 native func error()->(user String s)
-
 ## @ eg tef3
 native func error()->(owner String s)
-
 ## @ eg tev3
 native var String s
-
 ## @@ test-parameter-type
 ## @ g t0
 struct Test{Generic}
@@ -967,60 +890,50 @@ struct Test{First:Second:Third
 ## @ eg teg1
 struct Test{Generic}
   var Generic error
-
 ## @ eg teg2
 struct Test{Generic}
   user Generic item
   func meth(copy Generic error)
-
 ## @ eg teg3
 struct Test{Generic}
   user Generic item
   func meth(user String s)
     self.item := s
-
 ## @ eg teg4
 struct Test{Generic}
   user Generic item
   func meth(user String s)
     s := self.item
-
 ## @ eg teg5
 struct Test{Generic}
   user Generic item
   func meth()
     var Generic error
-
 ## @ eg teg6
 struct Test{First:Second}
   user First first
   user Second second
   func meth()
     self.first := self.second
-
 ## @ eg teg7
 struct Test{error}
   var Int x
-
 ## @ eg teg8
 struct Test{Generic}
   user Array{Generic} arr
   func meth()
     user Generic x
     x := self.arr[2]
-
 ## @ eg teg9
 struct Test{Generic}
   user Array{Generic} arr
   func meth()
     var Array{12:Generic} arr
-
 ## @ eg teg10
 struct Test{Generic}
   user Array{Generic} arr
   func meth()
     self.arr := Array{12:Generic}()
-
 ## @ eg teg11
 struct Test{First:Second:Third}
   user First first
@@ -1028,7 +941,6 @@ struct Test{First:Second:Third}
   user Third third
 func meth(user Test{String:String} t)
   user Test{String:String:String} error(user t)
-
 ## @ ec tec0
 var Data{Int} error
 ## @ ec tec1
@@ -1141,21 +1053,18 @@ struct Base{Generic}
   user Generic item
 struct Test{Param}(Base{Param})
   user Generic error
-
 ## @ eg te1
 struct Base{Generic}
   user Generic item
 struct Test(Base{String})
   func set(user File error)
     self.item := error
-
 ## @ eg te2
 struct Base{Generic}
   user Generic item
 struct Test{Param}(Base{Param})
   func set(user String error)
     self.item := error
-
 ## @ eg te3
 struct Base{Pbase}
   user Pbase item
@@ -1164,7 +1073,6 @@ struct Top(Mid{String})
 struct Test(Top)
   func set(user File error)
     self.item := error
-
 ## @@ test-error-handling
 ## @ c t0
 try
@@ -1208,7 +1116,6 @@ try
   i := 2
   catch
     i := 3
-
 ## @@ test-for-each
 ## @ g t0
 struct TestIterator
@@ -1245,7 +1152,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te1
 struct TestIterator
   var Int num
@@ -1254,7 +1160,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te2
 struct TestIterator
   var Int num
@@ -1263,7 +1168,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te3
 struct TestIterator
   var Int num
@@ -1272,7 +1176,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te4
 struct TestIterator
   var Int num
@@ -1281,7 +1184,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te5
 struct TestIterator
   var Int num
@@ -1289,7 +1191,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te6
 struct TestIterator
   var Int num
@@ -1298,7 +1199,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te7
 struct TestIterator
   var Int num
@@ -1307,7 +1207,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te8
 struct TestIterator
   var Int num
@@ -1316,7 +1215,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te9
 struct TestIterator
   var Int num
@@ -1325,7 +1223,6 @@ struct TestIterator
   func next()
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te10
 struct TestIterator
   var Int num
@@ -1333,7 +1230,6 @@ struct TestIterator
   func get()->(var Int num)
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te11
 struct TestIterator
   var Int num
@@ -1342,7 +1238,6 @@ struct TestIterator
   func next(user Int x)
 func f-mock()
   for n in TestIterator()
-
 ## @ eg te12
 struct TestIterator
   var Int num
@@ -1351,7 +1246,6 @@ struct TestIterator
   func next()->(var Int x)
 func f-mock()
   for n in TestIterator()
-
 ## @@ test-complex-fields
 ## @ g t0
 class Base
@@ -1372,19 +1266,15 @@ struct Test
 ## @ eg te0
 struct Test
   var String{12} error
-
 ## @ eg te1
 struct Test
   var Array{12:Int} error
-
 ## @ eg te2
 struct Test
   var Test error
-
 ## @ eg te3
 struct Test
   var Base error
 struct Base
   var Test t
-
 ## @

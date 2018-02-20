@@ -354,6 +354,66 @@ Returncode StringExpression_parse(StringExpression* self, String* text, SyntaxTr
   CHECK(134, Expression_set_simple_type(&(self->_base._base), &(glob->type_string->_base)) )
   self->_base._base.access = ACCESS_VAR;
   self->_base.text = text;
+  CHECK(137, StringExpression_m_strip_multilines(self) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode StringExpression_m_strip_multilines(StringExpression* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_StringExpression_m_strip_multilines = "StringExpression.m-strip-multilines";
+#define MR_FUNC_NAME _func_name_StringExpression_m_strip_multilines
+Returncode StringExpression_m_strip_multilines(StringExpression* self) {
+  Int index_write = 1;
+  {int index_read; for (index_read = (1); index_read < (self->_base.text->length - 1); ++index_read) {
+    if ((index_read) < 0 || (index_read) >= (self->_base.text)->length) RAISE(142)
+    if (((self->_base.text)->values[index_read]) == '\n') {
+      Bool skip_new_line = false;
+      if (index_read > 0) {
+        if ((index_read - 1) < 0 || (index_read - 1) >= (self->_base.text)->length) RAISE(145)
+        skip_new_line = ((self->_base.text)->values[index_read - 1]) == '\\';
+      }
+      Int expected = self->_base._base.code_node->parent->_base.indentation_spaces + 4;
+      Int indentation = 0;
+      while (true) {
+        index_read += 1;
+        if (!(index_read < self->_base.text->length - 1)) break;
+        if ((index_read) < 0 || (index_read) >= (self->_base.text)->length) RAISE(151)
+        if (!(((self->_base.text)->values[index_read]) == ' ')) break;
+        indentation += 1;
+        if (!(indentation < expected)) break;
+      }
+      if (indentation < expected) {
+        CHECK(155, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base._base.code_node->_base), indentation, expected) )
+      }
+      if (skip_new_line) {
+        index_write -= 1;
+      }
+      else {
+        if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(160)
+        ((self->_base.text)->values[index_write]) = '\\';
+        index_write += 1;
+        if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(162)
+        ((self->_base.text)->values[index_write]) = 'n';
+        index_write += 1;
+      }
+    }
+    else {
+      if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(165)
+      if ((index_read) < 0 || (index_read) >= (self->_base.text)->length) RAISE(165)
+      ((self->_base.text)->values[index_write]) = ((self->_base.text)->values[index_read]);
+      index_write += 1;
+    }
+  }}
+  if (index_write < self->_base.text->length - 1) {
+    if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(168)
+    ((self->_base.text)->values[index_write]) = '"';
+    index_write += 1;
+    if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(170)
+    ((self->_base.text)->values[index_write]) = '\0';
+    self->_base.text->length = index_write;
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -364,7 +424,7 @@ Returncode StringExpression_analyze(StringExpression* self);
 static char* _func_name_StringExpression_analyze = "StringExpression.analyze";
 #define MR_FUNC_NAME _func_name_StringExpression_analyze
 Returncode StringExpression_analyze(StringExpression* self) {
-  CHECK(139, Expression_add_aux_variable(&(self->_base._base), ACCESS_VAR, false, self->_base._base.result_type, &(self->symbol)) )
+  CHECK(174, Expression_add_aux_variable(&(self->_base._base), ACCESS_VAR, false, self->_base._base.result_type, &(self->symbol)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -378,32 +438,32 @@ Returncode StringExpression_write_preactions(StringExpression* self) {
   /* `symbol`_Var.max_length = `string-length + 1`; */
   /* `symbol`_Var.length = `string-length`; */
   /* `symbol`_Var.values = "`text`"; */
-  CHECK(146, Expression_write_init_var_ref(&(self->_base._base), self->symbol) )
-  CHECK(147, Expression_write_refman_init(&(self->_base._base), self->symbol) )
+  CHECK(181, Expression_write_init_var_ref(&(self->_base._base), self->symbol) )
+  CHECK(182, Expression_write_refman_init(&(self->_base._base), self->symbol) )
   Int real_length = 1;
   {int index; for (index = (1); index < (self->_base.text->length - 1); ++index) {
-    if ((index) < 0 || (index) >= (self->_base.text)->length) RAISE(150)
+    if ((index) < 0 || (index) >= (self->_base.text)->length) RAISE(185)
     if (((self->_base.text)->values[index]) == '\\') {
       index += 1;
     }
     real_length = real_length + 1;
   }}
-  CHECK(153, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(154, (self->symbol)->_base._base._dtl[3](self->symbol) )
-  CHECK(155, write(&(String){19, 18, "_Var.max_length = "}) )
-  CHECK(156, write_int(real_length) )
-  CHECK(157, write(&(String){3, 2, ";\n"}) )
-  CHECK(158, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(159, (self->symbol)->_base._base._dtl[3](self->symbol) )
-  CHECK(160, write(&(String){15, 14, "_Var.length = "}) )
-  CHECK(161, write_int(real_length - 1) )
-  CHECK(162, write(&(String){3, 2, ";\n"}) )
-  CHECK(163, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(164, (self->symbol)->_base._base._dtl[3](self->symbol) )
-  CHECK(165, write(&(String){15, 14, "_Var.values = "}) )
-  CHECK(166, write(self->_base.text) )
-  CHECK(167, write(&(String){3, 2, ";\n"}) )
-  CHECK(168, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(188, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(189, (self->symbol)->_base._base._dtl[3](self->symbol) )
+  CHECK(190, write(&(String){19, 18, "_Var.max_length = "}) )
+  CHECK(191, write_int(real_length) )
+  CHECK(192, write(&(String){3, 2, ";\n"}) )
+  CHECK(193, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(194, (self->symbol)->_base._base._dtl[3](self->symbol) )
+  CHECK(195, write(&(String){15, 14, "_Var.length = "}) )
+  CHECK(196, write_int(real_length - 1) )
+  CHECK(197, write(&(String){3, 2, ";\n"}) )
+  CHECK(198, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(199, (self->symbol)->_base._base._dtl[3](self->symbol) )
+  CHECK(200, write(&(String){15, 14, "_Var.values = "}) )
+  CHECK(201, write(self->_base.text) )
+  CHECK(202, write(&(String){3, 2, ";\n"}) )
+  CHECK(203, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -414,7 +474,7 @@ Returncode StringExpression_write(StringExpression* self);
 static char* _func_name_StringExpression_write = "StringExpression.write";
 #define MR_FUNC_NAME _func_name_StringExpression_write
 Returncode StringExpression_write(StringExpression* self) {
-  CHECK(171, (self->symbol)->_base._base._dtl[3](self->symbol) )
+  CHECK(206, (self->symbol)->_base._base._dtl[3](self->symbol) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -442,10 +502,10 @@ static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 #define MR_FUNC_NAME _func_name_EmptyExpression_parse_new
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
   EmptyExpression* empty_expression = malloc(sizeof(EmptyExpression));
-  if (empty_expression == NULL) RAISE(177)
+  if (empty_expression == NULL) RAISE(212)
   *empty_expression = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false};
   empty_expression->_base._base._dtl = EmptyExpression__dtl;
-  CHECK(178, EmptyExpression_init(empty_expression) )
+  CHECK(213, EmptyExpression_init(empty_expression) )
   (*expression) = &(empty_expression->_base);
   free(text);
   return OK;
@@ -458,8 +518,8 @@ Returncode EmptyExpression_init(EmptyExpression* self);
 static char* _func_name_EmptyExpression_init = "EmptyExpression.init";
 #define MR_FUNC_NAME _func_name_EmptyExpression_init
 Returncode EmptyExpression_init(EmptyExpression* self) {
-  CHECK(183, SyntaxTreeNode_set_location(&(self->_base._base)) )
-  CHECK(184, Expression_set_simple_type(&(self->_base), &(glob->type_empty->_base)) )
+  CHECK(218, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(219, Expression_set_simple_type(&(self->_base), &(glob->type_empty->_base)) )
   self->_base.access = ACCESS_OWNER;
   return OK;
 }
@@ -471,7 +531,7 @@ Returncode EmptyExpression_write(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write = "EmptyExpression.write";
 #define MR_FUNC_NAME _func_name_EmptyExpression_write
 Returncode EmptyExpression_write(EmptyExpression* self) {
-  CHECK(188, write(&(String){5, 4, "NULL"}) )
+  CHECK(223, write(&(String){5, 4, "NULL"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -482,7 +542,7 @@ Returncode EmptyExpression_write_dynamic(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write_dynamic = "EmptyExpression.write-dynamic";
 #define MR_FUNC_NAME _func_name_EmptyExpression_write_dynamic
 Returncode EmptyExpression_write_dynamic(EmptyExpression* self) {
-  CHECK(191, (self)->_base._base._dtl[3](self) )
+  CHECK(226, (self)->_base._base._dtl[3](self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -493,7 +553,7 @@ Returncode EmptyExpression_write_refman(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write_refman = "EmptyExpression.write-refman";
 #define MR_FUNC_NAME _func_name_EmptyExpression_write_refman
 Returncode EmptyExpression_write_refman(EmptyExpression* self) {
-  CHECK(194, (self)->_base._base._dtl[3](self) )
+  CHECK(229, (self)->_base._base._dtl[3](self) )
   return OK;
 }
 #undef MR_FUNC_NAME

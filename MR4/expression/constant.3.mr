@@ -134,6 +134,41 @@ class StringExpression(TextExpression)
     self.set-simple-type(user glob.type-string)
     self.access := ACCESS-VAR
     self.text := text
+    self.m-strip-multilines()
+  
+  func inst m-strip-multilines()
+    var Int index-write(1)
+    for index-read in 1:self.text.length - 1
+      if self.text[index-read] = '\n'
+        var Bool skip-new-line
+        if index-read > 0
+          skip-new-line := self.text[index-read - 1] = '\\'
+        var Int expected(self.code-node.parent.indentation-spaces + 4)
+        var Int indentation
+        do
+          index-read += 1
+          while index-read < self.text.length - 1
+          while self.text[index-read] = ' '
+          indentation += 1
+          while indentation < expected
+        if indentation < expected
+          self.code-node.m-syntax-error-indentation(
+              copy indentation, copy expected)
+        if skip-new-line
+          index-write -= 1
+        else
+          self.text[index-write] := '\\'
+          index-write += 1
+          self.text[index-write] := 'n'
+          index-write += 1
+      else
+        self.text[index-write] := self.text[index-read]
+        index-write += 1
+    if index-write < self.text.length - 1
+      self.text[index-write] := '"'
+      index-write += 1
+      self.text[index-write] := '\0'
+      self.text.length := index-write
   
   func dynamic analyze()
     self.add-aux-variable(copy ACCESS-VAR, copy false, user self.result-type):(
