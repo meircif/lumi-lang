@@ -72,37 +72,14 @@ int cstring_length(char* cstring, int max_length) {
 }
 
 /*main*/
-Returncode MR_user_main();
+Returncode MR_user_main(void);
+int set_sys(int argc, char* argv[]);
+#define SET_SYS err = set_sys(argc, argv); if (err != OK) return err;
 
 int MR_main(int argc, char* argv[]) {
-  String* args_strings;
-  Array sys_argv;
-  Sys sys_Var;
-  int arg;
   Returncode err;
   MR_trace_stream = stderr;
-  args_strings = MR_alloc(argc * sizeof(String));
-  sys_Var.argv_Refman = MR_new_ref(&sys_argv);
-  sys_Refman = MR_new_ref(&sys_Var);
-  stdout_Refman = MR_new_ref(stdout);
-  stdin_Refman = MR_new_ref(stdin);
-  stderr_Refman = MR_new_ref(stderr);
-  if (args_strings == NULL || sys_Var.argv_Refman == NULL ||
-      sys_Refman == NULL || stdout_Refman == NULL || stdin_Refman == NULL ||
-      stderr_Refman == NULL) {
-    fprintf(stderr, "insufficient memory\n");
-    return ERR;
-  }
-  sys_argv.length = argc;
-  sys_argv.values = args_strings;
-  sys_Var.argv = &sys_argv;
-  sys = &sys_Var;
-  for (arg = 0; arg < argc; ++arg) {
-    args_strings[arg].values = argv[arg];
-    args_strings[arg].length = cstring_length(argv[arg], 1024);
-    args_strings[arg].max_length = args_strings[arg].length;
-    args_strings[arg].values[args_strings[arg].length] = '\0';
-  }
+  SET_SYS
   err = MR_user_main();
   if (err != OK) {
     fprintf(stderr, "  called from executable start\n");
@@ -114,6 +91,7 @@ int MR_main(int argc, char* argv[]) {
 int MR_test_main(int argc, char* argv[]) {
   Returncode err;
   MR_trace_stream = stdout;
+  SET_SYS
   printf("Running tests:\n");
   err = MR_user_main();
   if (err == OK) {
@@ -156,13 +134,69 @@ int calc_coverage(File_Coverage* files_coverage, int files_number) {
   return covered_lines * 100 / all_lines;
 }
 
+void make_coverage_xml(File_Coverage* files_coverage, int files_number) {
+  int n;
+  FILE* xml = NULL;
+  xml = fopen("corbetura.xml", "w");
+  if (xml == NULL) {
+    return;
+  }
+  fputs("<?xml version=\"1.0\" ?>\n", xml);
+  fputs(
+    "<!DOCTYPE coverage SYSTEM 'https://raw.githubusercontent.com/cobertura/"
+    "cobertura/master/cobertura/src/site/htdocs/xml/coverage-loose.dtd'>\n",
+    xml);
+  fputs("<coverage timestamp=\"0\" version=\"lumi 0.0.4\">\n", xml);
+  fputs(" <packages>\n", xml);
+
+  for (n = 0; n < files_number; ++n) {
+    int line;
+    fputs("  <package name=\"\">\n", xml);
+    fputs("   <classes>\n", xml);
+    fprintf(
+      xml,
+      "    <class name=\"%s\" filename=\"%s\">\n",
+      files_coverage[n].filename,
+      files_coverage[n].filename);
+    fputs("     <methods/>\n", xml);
+    fputs("     <lines>\n", xml);
+
+    for (line = 0; line < files_coverage[n].lines_number; ++line) {
+      if (files_coverage[n].line_count[line] >= 0) {
+        fprintf(
+          xml,
+          "      <line branch=\"false\" hits=\"%d\" number=\"%d\"/>\n",
+          files_coverage[n].line_count[line],
+          line);
+      }
+    }
+
+    fputs("     </lines>\n", xml);
+    fputs("    </class>\n", xml);
+    fputs("   </classes>\n", xml);
+    fputs("  </package>\n", xml);
+  }
+
+  fputs(" </packages>\n", xml);
+  fputs("</coverage>\n", xml);
+  fclose(xml);
+}
+
 Bool MR_test_coverage(File_Coverage* files_coverage, int files_number) {
   int n;
   int coverage;
+  Bool generate_xml = false;
+  String* args_strings;
+  args_strings = sys->argv->values;
+  generate_xml = sys->argv->length > 1 && args_strings[1].length > 1 &&
+    args_strings[1].values[0] == '-' && args_strings[1].values[1] == 'x';
   printf("testing code coverage... ");
   coverage = calc_coverage(files_coverage, files_number);
   if (coverage == 100) {
     printf("100%%\n");
+    if (generate_xml) {
+      make_coverage_xml(files_coverage, files_number);
+    }
     return true;
   }
 
@@ -191,6 +225,9 @@ Bool MR_test_coverage(File_Coverage* files_coverage, int files_number) {
       }
       printf("\n");
     }
+  }
+  if (generate_xml) {
+    make_coverage_xml(files_coverage, files_number);
   }
   return false;
 }
@@ -622,11 +659,41 @@ Returncode String_has(
 }
 
 /*system*/
-Sys* sys;
+Array sys_argv;
+Sys sys_Var;
+Sys* sys = &sys_Var;
 Ref_Manager* sys_Refman;
 Ref_Manager* stdout_Refman;
 Ref_Manager* stdin_Refman;
 Ref_Manager* stderr_Refman;
+
+
+int set_sys(int argc, char* argv[]) {
+  String* args_strings;
+  int arg;
+  args_strings = MR_alloc(argc * sizeof(String));
+  sys_Var.argv_Refman = MR_new_ref(&sys_argv);
+  sys_Refman = MR_new_ref(&sys_Var);
+  stdout_Refman = MR_new_ref(stdout);
+  stdin_Refman = MR_new_ref(stdin);
+  stderr_Refman = MR_new_ref(stderr);
+  if (args_strings == NULL || sys_Var.argv_Refman == NULL ||
+    sys_Refman == NULL || stdout_Refman == NULL || stdin_Refman == NULL ||
+    stderr_Refman == NULL) {
+    fprintf(stderr, "insufficient memory\n");
+    return ERR;
+  }
+  sys_argv.length = argc;
+  sys_argv.values = args_strings;
+  sys_Var.argv = &sys_argv;
+  for (arg = 0; arg < argc; ++arg) {
+    args_strings[arg].values = argv[arg];
+    args_strings[arg].length = cstring_length(argv[arg], 1024);
+    args_strings[arg].max_length = args_strings[arg].length;
+    args_strings[arg].values[args_strings[arg].length] = '\0';
+  }
+  return OK;
+}
 
 void Sys_Del(Sys* self) {}
 Generic_Type_Dynamic Sys_dynamic = { (Dynamic_Del)Sys_Del };

@@ -110,7 +110,7 @@ TEST_DIR=tests/ ./mr4-compiler-tests
 diff tests/code-header.actual.c tests/code-header.expected.c
 diff tests/expression-tests.actual.c tests/expression-tests.expected.c
 diff tests/syntax-tree-tests.actual.c tests/syntax-tree-tests.expected.c
-if [ ! -z $COVERAGE ]; then
+if [ ! -z "$COVERAGE" ]; then
   gcov mr4-compiler.c > gcov.log
 fi
 
@@ -133,9 +133,13 @@ diff ../MR4/tests/integration-expected-multiple.c \
 $CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
   ../MR4/mr.4.c ../MR4/tests/integration-external.c -I../MR4 -o \
   test-mr4-multiple
-./test-mr4-multiple > tests/integration-multiple-output.txt
+./test-mr4-multiple -xml > tests/integration-multiple-output.txt
 diff ../MR4/tests/integration-multiple-output.txt \
   tests/integration-multiple-output.txt
+diff ../MR4/tests/expected-corbetura.xml corbetura.xml
+if [ -z "$COVERAGE" ]; then
+  rm corbetura.xml
+fi
 
 # run mr4-compiler coverage fail integration test
 ./mr4-compiler tests/integration-actual-uncovered.c \
@@ -186,7 +190,7 @@ $CCW -Wno-unused-variable -Wno-missing-braces \
 
 # --< Teardown >--
 cd ..
-if [ ! -z $CLEAR_TEST ]; then
+if [ ! -z "$CLEAR_TEST" ]; then
   rm -rf .test
 fi
 
