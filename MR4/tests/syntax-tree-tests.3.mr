@@ -1,10 +1,11 @@
 ## MR4 compiler tests - Syntax tree
 
 func write-syntax-tree(copy Bool is-test)
-  var Array{4:String{256}} mock-argv
-  mock-argv[2].copy(user "mock.3.mr")
+  var Array{5:String{256}} mock-argv
+  mock-argv[2].copy(user "mock.4.mr")
   if is-test
-    mock-argv[3].copy(user "-test")
+    mock-argv[3].copy(user "empty.4.mr")
+    mock-argv[4].copy(user "-test")
   else
     mock-argv.length := 3
   glob.root.is-library := true
@@ -36,7 +37,7 @@ func test-global-scope-error(user String input-text, user String expected-error)
   mock-print-active := true
   assert-error write-syntax-tree(copy false)
   mock-print-active := false
-  user String expected-header("Code error in mock.3.mr[")
+  user String expected-header("Code error in mock.4.mr[")
   f-assert-string-slice(
       user expected-header,
       user mock-print-text,

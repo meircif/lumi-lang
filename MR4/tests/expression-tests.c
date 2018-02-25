@@ -136,7 +136,7 @@ Returncode test_code_error(String* input_text, String* expected_error) {
   } while (false);
   _trace_stream = stdout;
   mock_print_active = false;
-  String* expected_header = &(String){25, 24, "Code error in mock.3.mr["};
+  String* expected_header = &(String){25, 24, "Code error in mock.4.mr["};
   CHECK(84, f_assert_string_slice(expected_header, mock_print_text, 0, expected_header->length, false) )
   if ((mock_print_text->length - 1) < 0 || (mock_print_text->length - 1) >= (mock_print_text)->length) RAISE(90)
   TEST_ASSERT(90, ((mock_print_text)->values[mock_print_text->length - 1]) == '\n')

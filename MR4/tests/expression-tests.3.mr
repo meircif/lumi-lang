@@ -80,7 +80,7 @@ func test-code-error(user String input-text, user String expected-error)
   mock-print-active := true
   assert-error write-syntax-tree(copy false)
   mock-print-active := false
-  user String expected-header("Code error in mock.3.mr[")
+  user String expected-header("Code error in mock.4.mr[")
   f-assert-string-slice(
       user expected-header,
       user mock-print-text,

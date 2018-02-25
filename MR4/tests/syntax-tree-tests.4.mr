@@ -672,6 +672,23 @@ test fun0()
     y := 0
   else
     y += 1
+  try
+    x := 0
+    sys.print(user _)
+    y := 0
+  catch
+    x := 1
+    x := 2
+  if x > 3
+    return
+  else
+    raise
+  do
+    while x > 1
+    if x = 5
+      continue
+  for n in 3
+    x += y
 test fun1()
 ## @ tg t7
 test fun0()

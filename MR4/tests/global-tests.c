@@ -238,7 +238,7 @@ Returncode f_setup_test() {
   free(glob->type_map);
   CHECK(73, Global_init(glob) )
   glob->input_file_name = mock_input_file_name;
-  CHECK(75, String_copy(glob->input_file_name, &(String){10, 9, "mock.3.mr"}) )
+  CHECK(75, String_copy(glob->input_file_name, &(String){10, 9, "mock.4.mr"}) )
   glob->line_number = 0;
   glob->save_input = false;
   CHECK(78, String_clear(mock_print_text) )

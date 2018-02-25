@@ -72,7 +72,7 @@ func f-setup-test()
   delete glob.type-map
   glob.init()
   glob.input-file-name := mock-input-file-name
-  glob.input-file-name.copy(user "mock.3.mr")
+  glob.input-file-name.copy(user "mock.4.mr")
   glob.line-number := 0
   glob.save-input := false
   mock-print-text.clear()
