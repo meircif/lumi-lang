@@ -368,6 +368,81 @@ extern Func SyntaxTreeContinue__dtl[];
 Func SyntaxTreeContinue__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeContinue_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
+
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct SyntaxTreeCoverage SyntaxTreeCoverage;
+#elif MR_STAGE == MR_TYPES(2)
+struct SyntaxTreeCoverage {
+  SyntaxTreeCode _base;
+  Int input_file_index;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeCoverage_init_new(SyntaxTreeCoverage* self, SyntaxTreeBlock* parent, SyntaxTreeCoverage** coverage_node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeCoverage_init_new = "SyntaxTreeCoverage.init-new";
+#define MR_FUNC_NAME _func_name_SyntaxTreeCoverage_init_new
+Returncode SyntaxTreeCoverage_init_new(SyntaxTreeCoverage* self, SyntaxTreeBlock* parent, SyntaxTreeCoverage** coverage_node) {
+  (*coverage_node) = malloc(sizeof(SyntaxTreeCoverage));
+  if ((*coverage_node) == NULL) RAISE(137)
+  *(*coverage_node) = (SyntaxTreeCoverage){SyntaxTreeCoverage__dtl, NULL, 0, NULL, 0};
+  (*coverage_node)->_base._base._dtl = SyntaxTreeCoverage__dtl;
+  CHECK(138, SyntaxTreeCoverage_init((*coverage_node), parent) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeCoverage_init(SyntaxTreeCoverage* self, SyntaxTreeBlock* parent);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeCoverage_init = "SyntaxTreeCoverage.init";
+#define MR_FUNC_NAME _func_name_SyntaxTreeCoverage_init
+Returncode SyntaxTreeCoverage_init(SyntaxTreeCoverage* self, SyntaxTreeBlock* parent) {
+  CHECK(141, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  self->_base.parent = parent;
+  self->input_file_index = glob->input_file_index;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeCoverage_analyze(SyntaxTreeCoverage* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeCoverage_analyze = "SyntaxTreeCoverage.analyze";
+#define MR_FUNC_NAME _func_name_SyntaxTreeCoverage_analyze
+Returncode SyntaxTreeCoverage_analyze(SyntaxTreeCoverage* self) {
+  if ((self->input_file_index) < 0 || (self->input_file_index) >= (glob->root->line_counts)->length) RAISE(146)
+  LineCount* line_count = (&(((LineCount*)((glob->root->line_counts)->values))[self->input_file_index]));
+  if ((self->_base._base.line_number) < 0 || (self->_base._base.line_number) >= (line_count->line_needs_cover)->length) RAISE(147)
+  (((Bool*)((line_count->line_needs_cover)->values))[self->_base._base.line_number]) = true;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeCoverage_write(SyntaxTreeCoverage* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeCoverage_write = "SyntaxTreeCoverage.write";
+#define MR_FUNC_NAME _func_name_SyntaxTreeCoverage_write
+Returncode SyntaxTreeCoverage_write(SyntaxTreeCoverage* self) {
+  /* ++MR_file_coverage[`file-index`].line_count[`line-number`]; */
+  CHECK(151, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(152, write(&(String){20, 19, "++MR_file_coverage["}) )
+  CHECK(153, write_int(self->input_file_index) )
+  CHECK(154, write(&(String){14, 13, "].line_count["}) )
+  CHECK(155, write_int(self->_base._base.line_number) )
+  CHECK(156, write(&(String){4, 3, "];\n"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func SyntaxTreeCoverage__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func SyntaxTreeCoverage__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeCoverage_analyze, (void*)SyntaxTreeCoverage_write, (void*)SyntaxTreeCode_m_is_end_point};
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES

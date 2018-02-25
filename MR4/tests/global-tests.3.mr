@@ -178,6 +178,7 @@ func test-from-file(user String name)
   var Char type-char
   var Bool is-error-test
   var Bool append-newline
+  var Bool is-test
   tests-passed := true
   do
     input-file.getc():(copy type-char)
@@ -186,6 +187,9 @@ func test-from-file(user String name)
       input-file.getc():(copy type-char)
     is-error-test := type-char = 'e'
     if is-error-test
+      input-file.getc():(copy type-char)
+    is-test := type-char = 't'
+    if is-test
       input-file.getc():(copy type-char)
     if type-char != 'g' and type-char != 'c'
       file-error(user name, user subname)
@@ -212,7 +216,7 @@ func test-from-file(user String name)
       if is-error-test
         test-global-scope-error(user input, user expected)
       else
-        test-global-scope(user input, user expected)
+        test-global-scope(user input, user expected, copy is-test)
     
     expected-output-file.getc()
     while input-file.getc() = ' '

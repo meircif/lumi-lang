@@ -69,8 +69,11 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"else-if\", got", copy end)
+      owner SyntaxTreeCoverage coverage-node
+      if glob.is-in-testing
+        SyntaxTreeCoverage.init-new(var _, user _):(owner coverage-node)
       SyntaxTreeIf.parse-new(var _, user self):(copy end, owner new-if)
-      self.previous-if.add-else-if(owner new-if)
+      self.previous-if.add-else-if(owner new-if, owner coverage-node)
       
     else-if keyword.equal(user "do")
       if end != '\n'

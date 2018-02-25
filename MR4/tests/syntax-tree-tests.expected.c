@@ -69,6 +69,12 @@ String s_Var = {12, 0, NULL};
 String* s = NULL;
 Ref_Manager* s_Refman = NULL;
 Returncode dummy(void);
+int MR_file0_line_count[4] = {
+  -1,-1,-1,-1
+};
+File_Coverage MR_file_coverage[1] = {
+  {"mock.3.mr", 4, MR_file0_line_count}
+};
 Returncode dummy(void) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -91,6 +97,7 @@ USER_MAIN_HEADER {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
   RUN_TEST(dummy);
+  MR_success &= MR_test_coverage(MR_file_coverage, 1);
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
@@ -1394,8 +1401,40 @@ MR_cleanup:
 /// @ t6
 Returncode fun0(void);
 Returncode fun1(void);
+int MR_file0_line_count[14] = {
+  -1,-1, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0,-1,-1
+};
+File_Coverage MR_file_coverage[1] = {
+  {"mock.3.mr", 14, MR_file0_line_count}
+};
 Returncode fun0(void) {
   Returncode MR_err = OK;
+  Int x = 0;
+  Int y = 0;
+  ++MR_file_coverage[0].line_count[2];
+  x = 4;
+  ++MR_file_coverage[0].line_count[3];
+  x += 1;
+  ++MR_file_coverage[0].line_count[4];
+  y = 5;
+  ++MR_file_coverage[0].line_count[5];
+  y = x;
+  ++MR_file_coverage[0].line_count[6];
+  if (y > 3) {
+    ++MR_file_coverage[0].line_count[7];
+    y = 3;
+  }
+  else {
+    ++MR_file_coverage[0].line_count[8];
+    if (y < 0) {
+      ++MR_file_coverage[0].line_count[9];
+      y = 0;
+    }
+    else {
+      ++MR_file_coverage[0].line_count[11];
+      y += 1;
+    }
+  }
 MR_cleanup:
   return MR_err;
 }
@@ -1410,12 +1449,19 @@ USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
   RUN_TEST(fun1);
+  MR_success &= MR_test_coverage(MR_file_coverage, 1);
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
 /// @ t7
 Returncode fun0(void);
 Returncode fun1(void);
+int MR_file0_line_count[5] = {
+  -1,-1,-1,-1,-1
+};
+File_Coverage MR_file_coverage[1] = {
+  {"mock.3.mr", 5, MR_file0_line_count}
+};
 Returncode fun0(void) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -1432,6 +1478,7 @@ USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
   RUN_TEST(fun1);
+  MR_success &= MR_test_coverage(MR_file_coverage, 1);
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC

@@ -61,7 +61,7 @@ Returncode test_code(String* input_text, String* expected_output) {
   Bool was_first = !not_first_code_test;
   not_first_code_test = true;
   CHECK(28, test_code_setup(input_text) )
-  CHECK(29, write_syntax_tree() )
+  CHECK(29, write_syntax_tree(false) )
   String* expected_header = &(String){8192, 0, (char[8192]){0}};
   File* code_header = NULL;
   String* filename = &(String){256, 0, (char[256]){0}};
@@ -128,7 +128,7 @@ Returncode test_code_error(String* input_text, String* expected_error) {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(81, write_syntax_tree() );
+    CHECK(81, write_syntax_tree(false) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;

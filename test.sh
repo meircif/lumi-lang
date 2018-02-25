@@ -126,8 +126,8 @@ diff ../MR4/tests/integration-single-output.txt \
 
 # run mr4-compiler multiple-file integration test
 ./mr4-compiler tests/integration-actual-multiple.c \
-  tests/integration-test0.4.mr tests/integration-test1.4.mr \
-  tests/integration-test2.4.mr
+  tests/integration-test2.4.mr -test tests/integration-test0.4.mr \
+  tests/integration-test1.4.mr
 diff ../MR4/tests/integration-expected-multiple.c \
   tests/integration-actual-multiple.c
 $CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
@@ -137,8 +137,21 @@ $CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
 diff ../MR4/tests/integration-multiple-output.txt \
   tests/integration-multiple-output.txt
 
+# run mr4-compiler coverage fail integration test
+./mr4-compiler tests/integration-actual-uncovered.c \
+  tests/integration-test0.4.mr tests/integration-test1.4.mr \
+  tests/integration-test2.4.mr -test
+diff ../MR4/tests/integration-expected-uncovered.c \
+  tests/integration-actual-uncovered.c
+$CCW -Wno-unused-label --pedantic tests/integration-actual-uncovered.c \
+  ../MR4/mr.4.c ../MR4/tests/integration-external.c -I../MR4 -o \
+  test-mr4-uncovered
+! ./test-mr4-uncovered > tests/integration-uncovered-output.txt
+diff ../MR4/tests/integration-uncovered-output.txt \
+  tests/integration-uncovered-output.txt
+
 # run mr4-compiler error integration test
-./mr4-compiler tests/integration-actual-error.c \
+./mr4-compiler tests/integration-actual-error.c -test \
   tests/integration-error-test.4.mr
 diff ../MR4/tests/integration-expected-error.c tests/integration-actual-error.c
 $CCW -Wno-unused-label --pedantic tests/integration-actual-error.c \

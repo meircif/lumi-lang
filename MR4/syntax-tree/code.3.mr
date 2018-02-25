@@ -127,3 +127,30 @@ class SyntaxTreeContinue(SyntaxTreeCode)
   func dynamic write()
     self.write-spaces()
     write(user "continue;\n")
+
+
+class SyntaxTreeCoverage(SyntaxTreeCode)
+  var Int input-file-index
+  
+  func inst init-new(user SyntaxTreeBlock parent):(
+      owner SyntaxTreeCoverage coverage-node)
+    new SyntaxTreeCoverage in coverage-node
+    coverage-node.init(user parent)
+  
+  func inst init(user SyntaxTreeBlock parent)
+    self.set-location()
+    self.parent := parent
+    self.input-file-index := glob.input-file-index
+  
+  func dynamic analyze()
+    user LineCount line-count(glob.root.line-counts[self.input-file-index])
+    line-count.line-needs-cover[self.line-number] := true
+  
+  func dynamic write()
+    # ++MR_file_coverage[`file-index`].line_count[`line-number`];
+    self.write-spaces()
+    write(user "++MR_file_coverage[")
+    write-int(copy self.input-file-index)
+    write(user "].line_count[")
+    write-int(copy self.line-number)
+    write(user "];\n")

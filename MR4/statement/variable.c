@@ -88,40 +88,40 @@ Returncode SyntaxTreeVariable_check_name(SyntaxTreeVariable* self);
 static char* _func_name_SyntaxTreeVariable_check_name = "SyntaxTreeVariable.check-name";
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariable_check_name
 Returncode SyntaxTreeVariable_check_name(SyntaxTreeVariable* self) {
-  Bool _Bool147;
-  CHECK(55, f_is_legal_name(self->name, false, &(_Bool147)) )
-  if (!_Bool147) {
+  Bool _Bool152;
+  CHECK(55, f_is_legal_name(self->name, false, &(_Bool152)) )
+  if (!_Bool152) {
     CHECK(56, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "illegal variable name"}, self->name) )
   }
   if (NULL != self->parent_type) {
     SyntaxTreeVariable* field = NULL;
-    Int _Int148;
-    CHECK(59, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int148)) )
+    Int _Int153;
+    CHECK(59, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int153)) )
     if (NULL != field) {
       CHECK(61, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "redefinition of field"}, self->name) )
     }
     SyntaxTreeFunction* meth = NULL;
-    Int _Int149;
-    CHECK(63, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int149)) )
+    Int _Int154;
+    CHECK(63, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int154)) )
     if (NULL != meth) {
       CHECK(65, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){28, 27, "field name overrides method"}, self->name) )
     }
   }
   else {
-    SyntaxTreeVariable* _SyntaxTreeVariable150;
-    CHECK(68, (glob->root)->_base._base._base._dtl[5](glob->root, self->name, &(_SyntaxTreeVariable150)) )
-    if (NULL != _SyntaxTreeVariable150) {
+    SyntaxTreeVariable* _SyntaxTreeVariable155;
+    CHECK(68, (glob->root)->_base._base._base._dtl[5](glob->root, self->name, &(_SyntaxTreeVariable155)) )
+    if (NULL != _SyntaxTreeVariable155) {
       CHECK(69, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){32, 31, "redefinition of global variable"}, self->name) )
     }
-    SyntaxTreeFunction* _SyntaxTreeFunction151;
-    CHECK(71, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction151)) )
-    if (NULL != _SyntaxTreeFunction151) {
+    SyntaxTreeFunction* _SyntaxTreeFunction156;
+    CHECK(71, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->name, &(_SyntaxTreeFunction156)) )
+    if (NULL != _SyntaxTreeFunction156) {
       CHECK(72, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){33, 32, "variable name overrides function"}, self->name) )
     }
     if (NULL != self->_base.parent) {
-      SyntaxTreeVariable* _SyntaxTreeVariable152;
-      CHECK(75, (self->_base.parent)->_base._base._dtl[5](self->_base.parent, self->name, &(_SyntaxTreeVariable152)) )
-      if (NULL != _SyntaxTreeVariable152) {
+      SyntaxTreeVariable* _SyntaxTreeVariable157;
+      CHECK(75, (self->_base.parent)->_base._base._dtl[5](self->_base.parent, self->name, &(_SyntaxTreeVariable157)) )
+      if (NULL != _SyntaxTreeVariable157) {
         CHECK(76, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){25, 24, "redefinition of variable"}, self->name) )
       }
     }
@@ -452,9 +452,9 @@ static char* _func_name_SyntaxTreeVariable_write_spaces = "SyntaxTreeVariable.wr
 #define MR_FUNC_NAME _func_name_SyntaxTreeVariable_write_spaces
 Returncode SyntaxTreeVariable_write_spaces(SyntaxTreeVariable* self) {
   if (NULL != self->_base.parent) {
-    SyntaxTreeFunction* _SyntaxTreeFunction153;
-    CHECK(289, (self->_base.parent)->_base._base._dtl[6](self->_base.parent, &(_SyntaxTreeFunction153)) )
-    CHECK(289, SyntaxTreeBranch_write_spaces(&(_SyntaxTreeFunction153->_base._base)) )
+    SyntaxTreeFunction* _SyntaxTreeFunction158;
+    CHECK(289, (self->_base.parent)->_base._base._dtl[6](self->_base.parent, &(_SyntaxTreeFunction158)) )
+    CHECK(289, SyntaxTreeBranch_write_spaces(&(_SyntaxTreeFunction158->_base._base)) )
   }
   else {
     if (NULL != self->parent_type) {
@@ -510,9 +510,9 @@ Returncode VariableInit_parse(VariableInit* self, SyntaxTreeVariable* variable, 
   if (self->expression_init == NULL) RAISE(306)
   *self->expression_init = (InitExpression){InitExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, NULL};
   self->expression_init->_base._base._dtl = InitExpression__dtl;
-  TypeInstance* _TypeInstance154;
-  CHECK(307, TypeInstance_copy_new(variable->type_instance, &(_TypeInstance154)) )
-  CHECK(307, InitExpression_parse(self->expression_init, _TypeInstance154, &(self->_base), &((*end))) )
+  TypeInstance* _TypeInstance159;
+  CHECK(307, TypeInstance_copy_new(variable->type_instance, &(_TypeInstance159)) )
+  CHECK(307, InitExpression_parse(self->expression_init, _TypeInstance159, &(self->_base), &((*end))) )
   self->expression_init->_base.is_statement = true;
   self->expression_init->symbol = malloc(sizeof(SymbolExpression));
   if (self->expression_init->symbol == NULL) RAISE(310)

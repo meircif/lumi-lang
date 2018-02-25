@@ -12,19 +12,26 @@ static char* _mr_file31_name = "tests/syntax-tree-tests.3.mr";
 /* MR4 compiler tests - Syntax tree */
 
 #if MR_STAGE == MR_DECLARATIONS
-Returncode write_syntax_tree();
+Returncode write_syntax_tree(Bool is_test);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_write_syntax_tree = "write-syntax-tree";
 #define MR_FUNC_NAME _func_name_write_syntax_tree
-Returncode write_syntax_tree() {
-  Array* mock_argv = &(Array){3, (String[3]){0}};
-  _set_var_string_array(3, 256, mock_argv, (char[256 * 3]){0});
+Returncode write_syntax_tree(Bool is_test) {
+  Array* mock_argv = &(Array){4, (String[4]){0}};
+  _set_var_string_array(4, 256, mock_argv, (char[256 * 4]){0});
   if ((2) < 0 || (2) >= (mock_argv)->length) RAISE(5)
   CHECK(5, String_copy((&(((String*)((mock_argv)->values))[2])), &(String){10, 9, "mock.3.mr"}) )
+  if (is_test) {
+    if ((3) < 0 || (3) >= (mock_argv)->length) RAISE(7)
+    CHECK(7, String_copy((&(((String*)((mock_argv)->values))[3])), &(String){6, 5, "-test"}) )
+  }
+  else {
+    mock_argv->length = 3;
+  }
   glob->root->is_library = true;
-  CHECK(7, SyntaxTreeRoot_parse(glob->root, mock_argv) )
-  CHECK(8, (glob->root)->_base._base._base._dtl[2](glob->root) )
-  CHECK(9, (glob->root)->_base._base._base._dtl[3](glob->root) )
+  CHECK(11, SyntaxTreeRoot_parse(glob->root, mock_argv) )
+  CHECK(12, (glob->root)->_base._base._base._dtl[2](glob->root) )
+  CHECK(13, (glob->root)->_base._base._base._dtl[3](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -32,23 +39,23 @@ Returncode write_syntax_tree() {
 
 
 #if MR_STAGE == MR_DECLARATIONS
-Returncode test_global_scope(String* input_text, String* expected_output);
+Returncode test_global_scope(String* input_text, String* expected_output, Bool is_test);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_test_global_scope = "test-global-scope";
 #define MR_FUNC_NAME _func_name_test_global_scope
-Returncode test_global_scope(String* input_text, String* expected_output) {
-  CHECK(13, f_setup_test() )
-  CHECK(14, set_mock_file_text(input_text) )
-  CHECK(15, write_syntax_tree() )
-  if ((0) < 0 || (0) >= (mock_output_file_text)->length) RAISE(16)
+Returncode test_global_scope(String* input_text, String* expected_output, Bool is_test) {
+  CHECK(18, f_setup_test() )
+  CHECK(19, set_mock_file_text(input_text) )
+  CHECK(20, write_syntax_tree(is_test) )
+  if ((0) < 0 || (0) >= (mock_output_file_text)->length) RAISE(21)
   if (((mock_output_file_text)->values[0]) != '\n') {
-    CHECK(17, print(mock_output_file_text) )
+    CHECK(22, print(mock_output_file_text) )
   }
-  if ((0) < 0 || (0) >= (mock_output_file_text)->length) RAISE(18)
-  TEST_ASSERT(18, ((mock_output_file_text)->values[0]) == '\n')
-  if ((mock_output_file_text->length - 1) < 0 || (mock_output_file_text->length - 1) >= (mock_output_file_text)->length) RAISE(19)
-  TEST_ASSERT(19, ((mock_output_file_text)->values[mock_output_file_text->length - 1]) == '\n')
-  CHECK(20, f_assert_string_slice(expected_output, mock_output_file_text, 1, mock_output_file_text->length - 2, true) )
+  if ((0) < 0 || (0) >= (mock_output_file_text)->length) RAISE(23)
+  TEST_ASSERT(23, ((mock_output_file_text)->values[0]) == '\n')
+  if ((mock_output_file_text->length - 1) < 0 || (mock_output_file_text->length - 1) >= (mock_output_file_text)->length) RAISE(24)
+  TEST_ASSERT(24, ((mock_output_file_text)->values[mock_output_file_text->length - 1]) == '\n')
+  CHECK(25, f_assert_string_slice(expected_output, mock_output_file_text, 1, mock_output_file_text->length - 2, true) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -61,26 +68,26 @@ Returncode test_global_scope_error(String* input_text, String* expected_error);
 static char* _func_name_test_global_scope_error = "test-global-scope-error";
 #define MR_FUNC_NAME _func_name_test_global_scope_error
 Returncode test_global_scope_error(String* input_text, String* expected_error) {
-  CHECK(29, f_setup_test() )
-  CHECK(30, set_mock_file_text(input_text) )
+  CHECK(34, f_setup_test() )
+  CHECK(35, set_mock_file_text(input_text) )
   mock_print_active = true;
   _trace_stream = NULL;
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(32, write_syntax_tree() );
+    CHECK(37, write_syntax_tree(false) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(32)
+    TEST_FAIL(37)
   } while (false);
   _trace_stream = stdout;
   mock_print_active = false;
   String* expected_header = &(String){25, 24, "Code error in mock.3.mr["};
-  CHECK(35, f_assert_string_slice(expected_header, mock_print_text, 0, expected_header->length, false) )
-  if ((mock_print_text->length - 1) < 0 || (mock_print_text->length - 1) >= (mock_print_text)->length) RAISE(41)
-  TEST_ASSERT(41, ((mock_print_text)->values[mock_print_text->length - 1]) == '\n')
-  CHECK(42, f_assert_string_slice(expected_error, mock_print_text, expected_header->length + 3, mock_print_text->length - expected_header->length - 4, true) )
+  CHECK(40, f_assert_string_slice(expected_header, mock_print_text, 0, expected_header->length, false) )
+  if ((mock_print_text->length - 1) < 0 || (mock_print_text->length - 1) >= (mock_print_text)->length) RAISE(46)
+  TEST_ASSERT(46, ((mock_print_text)->values[mock_print_text->length - 1]) == '\n')
+  CHECK(47, f_assert_string_slice(expected_error, mock_print_text, expected_header->length + 3, mock_print_text->length - expected_header->length - 4, true) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -93,7 +100,7 @@ Returncode test_illegal_usage();
 static char* _func_name_test_illegal_usage = "test-illegal-usage";
 #define MR_FUNC_NAME _func_name_test_illegal_usage
 Returncode test_illegal_usage() {
-  CHECK(51, f_setup_test() )
+  CHECK(56, f_setup_test() )
   Array* mock_argv = &(Array){2, (String[2]){0}};
   _set_var_string_array(2, 4, mock_argv, (char[4 * 2]){0});
   mock_print_active = true;
@@ -101,15 +108,15 @@ Returncode test_illegal_usage() {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(54, SyntaxTreeRoot_parse(glob->root, mock_argv) );
+    CHECK(59, SyntaxTreeRoot_parse(glob->root, mock_argv) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(54)
+    TEST_FAIL(59)
   } while (false);
   _trace_stream = stdout;
   mock_print_active = false;
-  CHECK(56, f_assert_string_slice(&(String){58, 57, "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES..."}, mock_print_text, 0, mock_print_text->length, false) )
+  CHECK(61, f_assert_string_slice(&(String){58, 57, "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES..."}, mock_print_text, 0, mock_print_text->length, false) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -117,27 +124,52 @@ Returncode test_illegal_usage() {
 
 
 #if MR_STAGE == MR_DECLARATIONS
-Returncode test_no_main();
+Returncode test_no_run_func(Bool testing, String* expected_error);
 #elif MR_STAGE == MR_FUNCTIONS
-static char* _func_name_test_no_main = "test-no-main";
-#define MR_FUNC_NAME _func_name_test_no_main
-Returncode test_no_main() {
-  CHECK(65, f_setup_test() )
+static char* _func_name_test_no_run_func = "test-no-run-func";
+#define MR_FUNC_NAME _func_name_test_no_run_func
+Returncode test_no_run_func(Bool testing, String* expected_error) {
+  CHECK(70, f_setup_test() )
   glob->root->is_library = false;
+  glob->root->testing = testing;
   mock_print_active = true;
   _trace_stream = NULL;
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(68, (glob->root)->_base._base._base._dtl[2](glob->root) );
+    CHECK(74, (glob->root)->_base._base._base._dtl[2](glob->root) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(68)
+    TEST_FAIL(74)
   } while (false);
   _trace_stream = stdout;
   mock_print_active = false;
-  CHECK(70, f_assert_string_slice(&(String){46, 45, "General code error: no main or test functions"}, mock_print_text, 0, mock_print_text->length, false) )
+  CHECK(76, f_assert_string_slice(expected_error, mock_print_text, 0, mock_print_text->length, false) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_no_main();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_no_main = "test-no-main";
+#define MR_FUNC_NAME _func_name_test_no_main
+Returncode test_no_main() {
+  CHECK(84, test_no_run_func(false, &(String){37, 36, "General code error: no main function"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_no_test_func();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_no_test_func = "test-no-test-func";
+#define MR_FUNC_NAME _func_name_test_no_test_func
+Returncode test_no_test_func() {
+  CHECK(88, test_no_run_func(true, &(String){38, 37, "General code error: no test functions"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -150,7 +182,7 @@ Returncode test_general();
 static char* _func_name_test_general = "test-general";
 #define MR_FUNC_NAME _func_name_test_general
 Returncode test_general() {
-  CHECK(79, test_new_file(&(String){18, 17, "syntax-tree-tests"}, &(String){13, 12, "test-general"}) )
+  CHECK(93, test_new_file(&(String){18, 17, "syntax-tree-tests"}, &(String){13, 12, "test-general"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -163,7 +195,7 @@ Returncode test_struct();
 static char* _func_name_test_struct = "test-struct";
 #define MR_FUNC_NAME _func_name_test_struct
 Returncode test_struct() {
-  CHECK(83, test_from_file(&(String){12, 11, "test-struct"}) )
+  CHECK(97, test_from_file(&(String){12, 11, "test-struct"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -176,7 +208,7 @@ Returncode test_class();
 static char* _func_name_test_class = "test-class";
 #define MR_FUNC_NAME _func_name_test_class
 Returncode test_class() {
-  CHECK(87, test_from_file(&(String){11, 10, "test-class"}) )
+  CHECK(101, test_from_file(&(String){11, 10, "test-class"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -189,7 +221,7 @@ Returncode test_function();
 static char* _func_name_test_function = "test-function";
 #define MR_FUNC_NAME _func_name_test_function
 Returncode test_function() {
-  CHECK(91, test_from_file(&(String){14, 13, "test-function"}) )
+  CHECK(105, test_from_file(&(String){14, 13, "test-function"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -202,7 +234,7 @@ Returncode test_members();
 static char* _func_name_test_members = "test-members";
 #define MR_FUNC_NAME _func_name_test_members
 Returncode test_members() {
-  CHECK(95, test_from_file(&(String){13, 12, "test-members"}) )
+  CHECK(109, test_from_file(&(String){13, 12, "test-members"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -215,7 +247,7 @@ Returncode test_return();
 static char* _func_name_test_return = "test-return";
 #define MR_FUNC_NAME _func_name_test_return
 Returncode test_return() {
-  CHECK(99, test_from_file(&(String){12, 11, "test-return"}) )
+  CHECK(113, test_from_file(&(String){12, 11, "test-return"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -228,7 +260,7 @@ Returncode test_code_variables();
 static char* _func_name_test_code_variables = "test-code-variables";
 #define MR_FUNC_NAME _func_name_test_code_variables
 Returncode test_code_variables() {
-  CHECK(103, test_from_file(&(String){20, 19, "test-code-variables"}) )
+  CHECK(117, test_from_file(&(String){20, 19, "test-code-variables"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -241,7 +273,7 @@ Returncode test_initialize();
 static char* _func_name_test_initialize = "test-initialize";
 #define MR_FUNC_NAME _func_name_test_initialize
 Returncode test_initialize() {
-  CHECK(107, test_from_file(&(String){16, 15, "test-initialize"}) )
+  CHECK(121, test_from_file(&(String){16, 15, "test-initialize"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -254,7 +286,7 @@ Returncode test_comment();
 static char* _func_name_test_comment = "test-comment";
 #define MR_FUNC_NAME _func_name_test_comment
 Returncode test_comment() {
-  CHECK(111, test_from_file(&(String){13, 12, "test-comment"}) )
+  CHECK(125, test_from_file(&(String){13, 12, "test-comment"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -267,7 +299,7 @@ Returncode test_if_else();
 static char* _func_name_test_if_else = "test-if-else";
 #define MR_FUNC_NAME _func_name_test_if_else
 Returncode test_if_else() {
-  CHECK(115, test_from_file(&(String){13, 12, "test-if-else"}) )
+  CHECK(129, test_from_file(&(String){13, 12, "test-if-else"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -280,7 +312,7 @@ Returncode test_do_loop();
 static char* _func_name_test_do_loop = "test-do-loop";
 #define MR_FUNC_NAME _func_name_test_do_loop
 Returncode test_do_loop() {
-  CHECK(119, test_from_file(&(String){13, 12, "test-do-loop"}) )
+  CHECK(133, test_from_file(&(String){13, 12, "test-do-loop"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -293,7 +325,7 @@ Returncode test_for_loop();
 static char* _func_name_test_for_loop = "test-for-loop";
 #define MR_FUNC_NAME _func_name_test_for_loop
 Returncode test_for_loop() {
-  CHECK(123, test_from_file(&(String){14, 13, "test-for-loop"}) )
+  CHECK(137, test_from_file(&(String){14, 13, "test-for-loop"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -306,7 +338,7 @@ Returncode test_testing();
 static char* _func_name_test_testing = "test-testing";
 #define MR_FUNC_NAME _func_name_test_testing
 Returncode test_testing() {
-  CHECK(127, test_from_file(&(String){13, 12, "test-testing"}) )
+  CHECK(141, test_from_file(&(String){13, 12, "test-testing"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -319,7 +351,7 @@ Returncode test_native();
 static char* _func_name_test_native = "test-native";
 #define MR_FUNC_NAME _func_name_test_native
 Returncode test_native() {
-  CHECK(131, test_from_file(&(String){12, 11, "test-native"}) )
+  CHECK(145, test_from_file(&(String){12, 11, "test-native"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -332,7 +364,7 @@ Returncode test_parameter_type();
 static char* _func_name_test_parameter_type = "test-parameter-type";
 #define MR_FUNC_NAME _func_name_test_parameter_type
 Returncode test_parameter_type() {
-  CHECK(135, test_from_file(&(String){20, 19, "test-parameter-type"}) )
+  CHECK(149, test_from_file(&(String){20, 19, "test-parameter-type"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -345,7 +377,7 @@ Returncode test_parameter_inheritance();
 static char* _func_name_test_parameter_inheritance = "test-parameter-inheritance";
 #define MR_FUNC_NAME _func_name_test_parameter_inheritance
 Returncode test_parameter_inheritance() {
-  CHECK(139, test_from_file(&(String){27, 26, "test-parameter-inheritance"}) )
+  CHECK(153, test_from_file(&(String){27, 26, "test-parameter-inheritance"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -358,7 +390,7 @@ Returncode test_error_handling();
 static char* _func_name_test_error_handling = "test-error-handling";
 #define MR_FUNC_NAME _func_name_test_error_handling
 Returncode test_error_handling() {
-  CHECK(143, test_from_file(&(String){20, 19, "test-error-handling"}) )
+  CHECK(157, test_from_file(&(String){20, 19, "test-error-handling"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -371,7 +403,7 @@ Returncode test_for_each();
 static char* _func_name_test_for_each = "test-for-each";
 #define MR_FUNC_NAME _func_name_test_for_each
 Returncode test_for_each() {
-  CHECK(147, test_from_file(&(String){14, 13, "test-for-each"}) )
+  CHECK(161, test_from_file(&(String){14, 13, "test-for-each"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -384,7 +416,7 @@ Returncode test_complex_fields();
 static char* _func_name_test_complex_fields = "test-complex-fields";
 #define MR_FUNC_NAME _func_name_test_complex_fields
 Returncode test_complex_fields() {
-  CHECK(151, test_from_file(&(String){20, 19, "test-complex-fields"}) )
+  CHECK(165, test_from_file(&(String){20, 19, "test-complex-fields"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

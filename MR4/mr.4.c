@@ -138,6 +138,63 @@ Bool MR_run_test(char* test_name, Func test_func) {
   return false;
 }
 
+int calc_coverage(File_Coverage* files_coverage, int files_number) {
+  int n;
+  int all_lines = 0;
+  int covered_lines = 0;
+  for (n = 0; n < files_number; ++n) {
+    int line;
+    for (line = 0; line < files_coverage[n].lines_number; ++line) {
+      if (files_coverage[n].line_count[line] >= 0) {
+        ++all_lines;
+      }
+      if (files_coverage[n].line_count[line] > 0) {
+        ++covered_lines;
+      }
+    }
+  }
+  return covered_lines * 100 / all_lines;
+}
+
+Bool MR_test_coverage(File_Coverage* files_coverage, int files_number) {
+  int n;
+  int coverage;
+  printf("testing code coverage... ");
+  coverage = calc_coverage(files_coverage, files_number);
+  if (coverage == 100) {
+    printf("100%%\n");
+    return true;
+  }
+
+  printf("%d%% - failed, not covered:\n", coverage);
+  for (n = 0; n < files_number; ++n) {
+    coverage = calc_coverage(files_coverage + n, 1);
+    if (coverage < 100) {
+      int line;
+      int first_uncovered;
+      Bool prev_uncovered = false;
+      printf("  %s(%d%%):", files_coverage[n].filename, coverage);
+      for (line = 0; line < files_coverage[n].lines_number; ++line) {
+        if (files_coverage[n].line_count[line] == 0) {
+          if (!prev_uncovered) {
+            first_uncovered = line;
+            prev_uncovered = true;
+          }
+        }
+        else if (prev_uncovered) {
+          printf(" %d", first_uncovered);
+          if (first_uncovered < line - 1) {
+            printf("-%d", line - 1);
+          }
+          prev_uncovered = false;
+        }
+      }
+      printf("\n");
+    }
+  }
+  return false;
+}
+
 /*helpers*/
 #define MR_FUNC_NAME "set_cstring"
 Returncode set_cstring(String* str, Ref_Manager* str_Refman) {

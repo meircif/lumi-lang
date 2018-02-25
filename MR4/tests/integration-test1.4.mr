@@ -336,3 +336,13 @@ test test-assert-error-message()
   assert-error f-alloc(), "insufficient memory for object dynamic allocation"
   new-fail-countdown := 2
   assert-error f-alloc(), "insufficient memory for managed object"
+
+mock Sys.println(user String text)
+  assert text?
+
+test test-cover-all()
+  var MiddleType mid
+  mid.meth1(copy 0, user _)
+  mid.meth2()
+  mid.meth4()
+  mid.meth5(copy 0, user _)

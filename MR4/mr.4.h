@@ -44,6 +44,12 @@ typedef struct {
   void* ref;
 } Ref_Manager;
 
+typedef struct {
+  char const* filename;
+  int lines_number;
+  int* line_count;
+} File_Coverage;
+
 typedef void (*Dynamic_Del)(void*);
 
 typedef void Generic_Type;
@@ -156,6 +162,7 @@ Array* MR_new_string_array(int array_length, int string_length);
 void MR_set_var_string_array(
   int array_length, int string_length, Array* array, char* chars);
 Bool MR_run_test(char* test_name, Func test_func);
+Bool MR_test_coverage(File_Coverage* file_coverage, int files_number);
 
 void String_Del(String*);
 extern Generic_Type_Dynamic String_dynamic;

@@ -6,4 +6,6 @@ testing test_dynamic_type_parameters... OK
 testing test_simple_delete... OK
 testing test_complex_delete... OK
 testing test_assert_error_message... OK
+testing test_cover_all... OK
+testing code coverage... 100%
 Tests passed
