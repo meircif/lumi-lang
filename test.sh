@@ -136,9 +136,9 @@ $CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
 ./test-mr4-multiple -xml > tests/integration-multiple-output.txt
 diff ../MR4/tests/integration-multiple-output.txt \
   tests/integration-multiple-output.txt
-diff ../MR4/tests/expected-corbetura.xml corbetura.xml
+diff ../MR4/tests/expected-cobertura.xml cobertura.xml
 if [ -z "$COVERAGE" ]; then
-  rm corbetura.xml
+  rm cobertura.xml
 fi
 
 # run mr4-compiler coverage fail integration test

@@ -137,7 +137,7 @@ int calc_coverage(File_Coverage* files_coverage, int files_number) {
 void make_coverage_xml(File_Coverage* files_coverage, int files_number) {
   int n;
   FILE* xml = NULL;
-  xml = fopen("corbetura.xml", "w");
+  xml = fopen("cobertura.xml", "w");
   if (xml == NULL) {
     return;
   }
