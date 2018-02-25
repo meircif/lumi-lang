@@ -60,9 +60,9 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
     while (true) {
       String* name = NULL;
       CHECK(29, read_new(&(String){3, 2, ":}"}, &(name), &((*end))) )
-      Bool _Bool138;
-      CHECK(30, f_is_legal_name(name, true, &(_Bool138)) )
-      if (!_Bool138) {
+      Bool _Bool143;
+      CHECK(30, f_is_legal_name(name, true, &(_Bool143)) )
+      if (!_Bool143) {
         CHECK(31, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "illegal type parameter name"}, name) )
       }
       CHECK(32, List_add(self->parameters, name) )
@@ -96,14 +96,14 @@ Returncode TypeData_add_type(TypeData* self);
 static char* _func_name_TypeData_add_type = "TypeData.add-type";
 #define MR_FUNC_NAME _func_name_TypeData_add_type
 Returncode TypeData_add_type(TypeData* self) {
-  Bool _Bool139;
-  CHECK(50, f_is_legal_name(self->name, true, &(_Bool139)) )
-  if (!_Bool139) {
+  Bool _Bool144;
+  CHECK(50, f_is_legal_name(self->name, true, &(_Bool144)) )
+  if (!_Bool144) {
     CHECK(51, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){18, 17, "illegal type name"}, self->name) )
   }
-  TypeData* _TypeData140;
-  CHECK(52, NameMap_find(glob->type_map, self->name, (void**)&(_TypeData140)) )
-  if (NULL != _TypeData140) {
+  TypeData* _TypeData145;
+  CHECK(52, NameMap_find(glob->type_map, self->name, (void**)&(_TypeData145)) )
+  if (NULL != _TypeData145) {
     CHECK(53, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){21, 20, "redefinition of type"}, self->name) )
   }
   CHECK(54, Global_add_type(glob, self) )
@@ -117,15 +117,15 @@ Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end);
 static char* _func_name_TypeData_parse_child = "TypeData.parse-child";
 #define MR_FUNC_NAME _func_name_TypeData_parse_child
 Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end) {
-  Bool _Bool141;
-  CHECK(57, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool141)) )
-  if (_Bool141) {
+  Bool _Bool146;
+  CHECK(57, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool146)) )
+  if (_Bool146) {
     return OK;
   }
   
-  Bool _Bool142;
-  CHECK(60, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool142)) )
-  if (_Bool142) {
+  Bool _Bool147;
+  CHECK(60, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool147)) )
+  if (_Bool147) {
     if ((*end) != '(') {
       CHECK(62, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){30, 29, "expected \"(\" after \"new\", got"}, (*end)) )
     }
@@ -222,9 +222,9 @@ Returncode TypeData_find_field(TypeData* self, String* name, SyntaxTreeVariable*
     ListNode* child = type_data->_base._base.variables->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool143;
-      CHECK(110, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool143)) )
-      if (_Bool143) {
+      Bool _Bool148;
+      CHECK(110, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool148)) )
+      if (_Bool148) {
         (*field) = ((SyntaxTreeVariable*)(child->item));
         return OK;
       }
@@ -252,9 +252,9 @@ Returncode TypeData_find_meth(TypeData* self, String* name, SyntaxTreeFunction**
     ListNode* child = type_data->_base.functions->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool144;
-      CHECK(128, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool144)) )
-      if (_Bool144) {
+      Bool _Bool149;
+      CHECK(128, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool149)) )
+      if (_Bool149) {
         (*method) = ((SyntaxTreeFunction*)(child->item));
         return OK;
       }
@@ -340,9 +340,9 @@ Returncode TypeData_analyze(TypeData* self) {
   if (NULL != self->base_type) {
     CHECK(173, TypeInstance_analyze_lengths(self->base_type, &(self->_base._base._base)) )
   }
-  Bool _Bool145;
-  CHECK(174, List_m_is_empty(self->_base._base.variables, &(_Bool145)) )
-  if (!(NULL != self->base_type) && _Bool145) {
+  Bool _Bool150;
+  CHECK(174, List_m_is_empty(self->_base._base.variables, &(_Bool150)) )
+  if (!(NULL != self->base_type) && _Bool150) {
     CHECK(175, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){20, 19, "type with no fields"}, self->name) )
   }
   if (self->is_dynamic &&  ! (NULL != self->base_type && self->base_type->type_data->is_dynamic)) {
@@ -499,8 +499,8 @@ Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data) {
   while (true) {
     if (!(NULL != child)) break;
     SyntaxTreeFunction* method = NULL;
-    Int _Int146;
-    CHECK(279, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int146)) )
+    Int _Int151;
+    CHECK(279, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int151)) )
     CHECK(280, write(&(String){3, 2, ", "}) )
     if (method != ((SyntaxTreeFunction*)(child->value))) {
       CHECK(282, write(&(String){7, 6, "(Func)"}) )

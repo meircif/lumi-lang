@@ -30,12 +30,14 @@ static Global
   ## holds the name of the input-file and the line number of the code currently
   ## been worked with
   user String input-file-name
+  var Int input-file-index
   var Int line-number
   
   ## test functions list
   owner NameMap{SyntaxTreeTestFunction} test-functions
   var Bool is-new-mocked
   var Bool is-delete-mocked
+  var Bool is-in-testing
   
   ## input reading state
   owner String input-buffer

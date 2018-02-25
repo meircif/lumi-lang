@@ -1,18 +1,24 @@
 ## MR4 compiler tests - Syntax tree
 
-func write-syntax-tree()
-  var Array{3:String{256}} mock-argv
-  mock-argv[2].copy(user "mock.3.mr")
+func write-syntax-tree(copy Bool is-test)
+  var Array{5:String{256}} mock-argv
+  mock-argv[2].copy(user "mock.4.mr")
+  if is-test
+    mock-argv[3].copy(user "empty.4.mr")
+    mock-argv[4].copy(user "-test")
+  else
+    mock-argv.length := 3
   glob.root.is-library := true
   glob.root.parse(user mock-argv)
   glob.root.analyze()
   glob.root.write()
 
 
-func test-global-scope(user String input-text, user String expected-output)
+func test-global-scope(
+    user String input-text, user String expected-output, copy Bool is-test)
   f-setup-test()
   set-mock-file-text(user input-text)
-  write-syntax-tree()
+  write-syntax-tree(copy is-test)
   if mock-output-file-text[0] != '\n'
     print(user mock-output-file-text)
   assert mock-output-file-text[0] = '\n'
@@ -29,9 +35,9 @@ func test-global-scope-error(user String input-text, user String expected-error)
   f-setup-test()
   set-mock-file-text(user input-text)
   mock-print-active := true
-  assert-error write-syntax-tree()
+  assert-error write-syntax-tree(copy false)
   mock-print-active := false
-  user String expected-header("Code error in mock.3.mr[")
+  user String expected-header("Code error in mock.4.mr[")
   f-assert-string-slice(
       user expected-header,
       user mock-print-text,
@@ -61,18 +67,27 @@ test test-illegal-usage()
       copy false)
 
 
-test test-no-main()
+func test-no-run-func(copy Bool testing, user String expected-error)
   f-setup-test()
   glob.root.is-library := false
+  glob.root.testing := testing
   mock-print-active := true
   assert-error glob.root.analyze()
   mock-print-active := false
   f-assert-string-slice(
-      user "General code error: no main or test functions",
+      user expected-error,
       user mock-print-text,
       copy 0,
       copy mock-print-text.length,
       copy false)
+
+test test-no-main()
+  test-no-run-func(
+      copy false, user "General code error: no main function")
+
+test test-no-test-func()
+  test-no-run-func(
+      copy true, user "General code error: no test functions")
 
 
 test test-general()

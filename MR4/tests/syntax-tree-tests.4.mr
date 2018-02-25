@@ -36,7 +36,7 @@ user String gs(user "global text")
 main
   var Int x(copy 6)
   x := 7
-## @ g t7
+## @ tg t7
 var String{12} s
 test dummy()
 ## @ eg te0
@@ -660,10 +660,37 @@ struct Test
   var Int x
   func meth(copy Int x)
     self.meth(copy x)
-## @ g t6
+## @ tg t6
 test fun0()
+  var Int x(copy 4)
+  x += 1
+  var Int y(copy 5)
+  y := x
+  if y > 3
+    y := 3
+  else-if y < 0
+    y := 0
+  else
+    y += 1
+  try
+    x := 0
+    sys.print(user _)
+    y := 0
+  catch
+    x := 1
+    x := 2
+  if x > 3
+    return
+  else
+    raise
+  do
+    while x > 1
+    if x = 5
+      continue
+  for n in 3
+    x += y
 test fun1()
-## @ g t7
+## @ tg t7
 test fun0()
 test fun1()
 main

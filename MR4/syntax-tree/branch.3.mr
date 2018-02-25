@@ -85,13 +85,18 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       copy Char end,
       copy Bool is-parsed)
     is-parsed := end = ' '
+    
     user List{SyntaxTreeVariable} variables(self.variables)
     if ? parent-block
       variables := parent-block.get-function().variables
+      if glob.is-in-testing and not keyword.equal(user "else") and
+          not keyword.equal(user "else-if")
+        parent-block.code-nodes.add(
+            owner SyntaxTreeCoverage.init-new(var _, user parent-block))
     
     if not is-parsed
       return
-      
+    
     else-if keyword.equal(user "var")
       variables.add(owner SyntaxTreeVariable.parse-new(
           var _,

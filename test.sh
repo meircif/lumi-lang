@@ -110,7 +110,7 @@ TEST_DIR=tests/ ./mr4-compiler-tests
 diff tests/code-header.actual.c tests/code-header.expected.c
 diff tests/expression-tests.actual.c tests/expression-tests.expected.c
 diff tests/syntax-tree-tests.actual.c tests/syntax-tree-tests.expected.c
-if [ ! -z $COVERAGE ]; then
+if [ ! -z "$COVERAGE" ]; then
   gcov mr4-compiler.c > gcov.log
 fi
 
@@ -126,19 +126,36 @@ diff ../MR4/tests/integration-single-output.txt \
 
 # run mr4-compiler multiple-file integration test
 ./mr4-compiler tests/integration-actual-multiple.c \
-  tests/integration-test0.4.mr tests/integration-test1.4.mr \
-  tests/integration-test2.4.mr
+  tests/integration-test2.4.mr -test tests/integration-test0.4.mr \
+  tests/integration-test1.4.mr
 diff ../MR4/tests/integration-expected-multiple.c \
   tests/integration-actual-multiple.c
 $CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
   ../MR4/mr.4.c ../MR4/tests/integration-external.c -I../MR4 -o \
   test-mr4-multiple
-./test-mr4-multiple > tests/integration-multiple-output.txt
+./test-mr4-multiple -xml > tests/integration-multiple-output.txt
 diff ../MR4/tests/integration-multiple-output.txt \
   tests/integration-multiple-output.txt
+diff ../MR4/tests/expected-cobertura.xml cobertura.xml
+if [ -z "$COVERAGE" ]; then
+  rm cobertura.xml
+fi
+
+# run mr4-compiler coverage fail integration test
+./mr4-compiler tests/integration-actual-uncovered.c \
+  tests/integration-test0.4.mr tests/integration-test1.4.mr \
+  tests/integration-test2.4.mr -test
+diff ../MR4/tests/integration-expected-uncovered.c \
+  tests/integration-actual-uncovered.c
+$CCW -Wno-unused-label --pedantic tests/integration-actual-uncovered.c \
+  ../MR4/mr.4.c ../MR4/tests/integration-external.c -I../MR4 -o \
+  test-mr4-uncovered
+! ./test-mr4-uncovered > tests/integration-uncovered-output.txt
+diff ../MR4/tests/integration-uncovered-output.txt \
+  tests/integration-uncovered-output.txt
 
 # run mr4-compiler error integration test
-./mr4-compiler tests/integration-actual-error.c \
+./mr4-compiler tests/integration-actual-error.c -test \
   tests/integration-error-test.4.mr
 diff ../MR4/tests/integration-expected-error.c tests/integration-actual-error.c
 $CCW -Wno-unused-label --pedantic tests/integration-actual-error.c \
@@ -173,7 +190,7 @@ $CCW -Wno-unused-variable -Wno-missing-braces \
 
 # --< Teardown >--
 cd ..
-if [ ! -z $CLEAR_TEST ]; then
+if [ ! -z "$CLEAR_TEST" ]; then
   rm -rf .test
 fi
 

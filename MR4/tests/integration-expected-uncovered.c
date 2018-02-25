@@ -3,14 +3,6 @@
 
 /* types declaration */
 
-typedef struct BaseType BaseType;
-
-typedef struct BaseType_Dynamic BaseType_Dynamic;
-
-typedef struct MiddleType MiddleType;
-
-typedef struct MiddleType_Dynamic MiddleType_Dynamic;
-
 typedef struct TestStruct TestStruct;
 
 typedef struct TestClass TestClass;
@@ -35,6 +27,14 @@ typedef struct ComplexField_Dynamic ComplexField_Dynamic;
 
 typedef struct HasComplexField HasComplexField;
 
+typedef struct BaseType BaseType;
+
+typedef struct BaseType_Dynamic BaseType_Dynamic;
+
+typedef struct MiddleType MiddleType;
+
+typedef struct MiddleType_Dynamic MiddleType_Dynamic;
+
 typedef struct TopType TopType;
 
 typedef struct TopType_Dynamic TopType_Dynamic;
@@ -55,41 +55,6 @@ typedef struct RefNode RefNode;
 
 
 /* types struct */
-
-struct BaseType {
-  Int num_base;
-  MiddleType* base_mid_ref;
-  Ref_Manager* base_mid_ref_Refman;
-  MiddleType_Dynamic* base_mid_ref_Dynamic;
-  TopType* base_top_ref;
-  Ref_Manager* base_top_ref_Refman;
-  TopType_Dynamic* base_top_ref_Dynamic;
-};
-
-struct BaseType_Dynamic {
-  Dynamic_Del _del;
-  Returncode (*meth0)(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
-  Returncode (*meth1)(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-  Returncode (*meth2)(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
-  Returncode (*meth3)(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-};
-
-struct MiddleType {
-  BaseType _base;
-  Int num_mid;
-  BaseType* mid_base_ref;
-  Ref_Manager* mid_base_ref_Refman;
-  BaseType_Dynamic* mid_base_ref_Dynamic;
-  TopType* mid_top_ref;
-  Ref_Manager* mid_top_ref_Refman;
-  TopType_Dynamic* mid_top_ref_Dynamic;
-};
-
-struct MiddleType_Dynamic {
-  BaseType_Dynamic _base;
-  Returncode (*meth4)(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic);
-  Returncode (*meth5)(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-};
 
 struct TestStruct {
   Int num;
@@ -168,6 +133,41 @@ struct HasComplexField {
   ComplexField x;
 };
 
+struct BaseType {
+  Int num_base;
+  MiddleType* base_mid_ref;
+  Ref_Manager* base_mid_ref_Refman;
+  MiddleType_Dynamic* base_mid_ref_Dynamic;
+  TopType* base_top_ref;
+  Ref_Manager* base_top_ref_Refman;
+  TopType_Dynamic* base_top_ref_Dynamic;
+};
+
+struct BaseType_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth0)(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
+  Returncode (*meth1)(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+  Returncode (*meth2)(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
+  Returncode (*meth3)(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+};
+
+struct MiddleType {
+  BaseType _base;
+  Int num_mid;
+  BaseType* mid_base_ref;
+  Ref_Manager* mid_base_ref_Refman;
+  BaseType_Dynamic* mid_base_ref_Dynamic;
+  TopType* mid_top_ref;
+  Ref_Manager* mid_top_ref_Refman;
+  TopType_Dynamic* mid_top_ref_Dynamic;
+};
+
+struct MiddleType_Dynamic {
+  BaseType_Dynamic _base;
+  Returncode (*meth4)(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic);
+  Returncode (*meth5)(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+};
+
 struct TopType {
   MiddleType _base;
   Int num_top;
@@ -221,30 +221,6 @@ struct RefNode {
 
 
 /* types methods declaration */
-
-Returncode BaseType_new(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
-
-Returncode BaseType_meth0(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
-
-Returncode BaseType_meth1(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-
-Returncode BaseType_meth2(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
-
-Returncode BaseType_meth3(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-
-void BaseType_Del(BaseType* self);
-
-Returncode MiddleType_new(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic);
-
-Returncode MiddleType_meth1(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-
-Returncode MiddleType_meth2(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic);
-
-Returncode MiddleType_meth4(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic);
-
-Returncode MiddleType_meth5(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-
-void MiddleType_Del(MiddleType* self);
 
 Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, String* s, Ref_Manager* s_Refman);
 
@@ -300,6 +276,30 @@ Returncode HasComplexField_run(HasComplexField* self, Ref_Manager* self_Refman);
 
 void HasComplexField_Del(HasComplexField* self);
 
+Returncode BaseType_new(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
+
+Returncode BaseType_meth0(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
+
+Returncode BaseType_meth1(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+
+Returncode BaseType_meth2(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic);
+
+Returncode BaseType_meth3(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+
+void BaseType_Del(BaseType* self);
+
+Returncode MiddleType_new(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic);
+
+Returncode MiddleType_meth1(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+
+Returncode MiddleType_meth2(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic);
+
+Returncode MiddleType_meth4(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic);
+
+Returncode MiddleType_meth5(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+
+void MiddleType_Del(MiddleType* self);
+
 Returncode TopType_new(TopType* self, Ref_Manager* self_Refman, TopType_Dynamic* self_Dynamic);
 
 Returncode TopType_meth2(TopType* self, Ref_Manager* self_Refman, TopType_Dynamic* self_Dynamic);
@@ -327,10 +327,6 @@ void RefNode_Del(RefNode* self);
 
 /* types global variables */
 
-BaseType_Dynamic BaseType_dynamic = {(Dynamic_Del)BaseType_Del, BaseType_meth0, BaseType_meth1, BaseType_meth2, BaseType_meth3};
-
-MiddleType_Dynamic MiddleType_dynamic = {{(Dynamic_Del)MiddleType_Del, BaseType_meth0, (Func)MiddleType_meth1, (Func)MiddleType_meth2, BaseType_meth3}, MiddleType_meth4, MiddleType_meth5};
-
 Generic_Type_Dynamic TestStruct_dynamic = {(Dynamic_Del)TestStruct_Del};
 
 TestClass_Dynamic TestClass_dynamic = {(Dynamic_Del)TestClass_Del, TestClass_dynamic_meth};
@@ -350,6 +346,10 @@ Generic_Type_Dynamic ContainerIterator_dynamic = {(Dynamic_Del)ContainerIterator
 ComplexField_Dynamic ComplexField_dynamic = {(Dynamic_Del)ComplexField_Del, ComplexField_meth};
 
 Generic_Type_Dynamic HasComplexField_dynamic = {(Dynamic_Del)HasComplexField_Del};
+
+BaseType_Dynamic BaseType_dynamic = {(Dynamic_Del)BaseType_Del, BaseType_meth0, BaseType_meth1, BaseType_meth2, BaseType_meth3};
+
+MiddleType_Dynamic MiddleType_dynamic = {{(Dynamic_Del)MiddleType_Del, BaseType_meth0, (Func)MiddleType_meth1, (Func)MiddleType_meth2, BaseType_meth3}, MiddleType_meth4, MiddleType_meth5};
 
 TopType_Dynamic TopType_dynamic = {{{(Dynamic_Del)TopType_Del, BaseType_meth0, (Func)MiddleType_meth1, (Func)TopType_meth2, (Func)TopType_meth3}, MiddleType_meth4, (Func)TopType_meth5}, TopType_meth6};
 
@@ -496,242 +496,59 @@ Returncode Sys_Mock_println(Sys* self, Ref_Manager* self_Refman, String* text, R
 
 Returncode test_cover_all(void);
 
-int MR_file0_line_count[30] = {
+int MR_file0_line_count[551] = {
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0,
+   0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0,-1, 0, 0, 0,-1,-1, 0, 0, 0, 0,-1,
+  -1,-1, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1, 0, 0,-1,-1,-1,
+  -1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+   0, 0, 0, 0,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1, 0,-1,-1,-1,-1,-1,-1,-1,-1, 0,-1,
+  -1, 0,-1,-1, 0,-1,-1, 0,-1,-1,-1, 0,-1, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0,
+   0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,
+  -1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 0,-1,-1, 0,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0,
+  -1,-1,-1, 0, 0, 0, 0,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1, 0,-1,-1,-1,-1,
+  -1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0,
+   0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1, 0,-1,-1,-1,-1,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1
+};
+int MR_file1_line_count[350] = {
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1,-1, 0, 0, 0, 0,-1,-1, 0,
+   0,-1,-1, 0, 0, 0, 0,-1,-1, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1, 0,
+  -1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1,-1, 0, 0,-1,-1,-1, 0, 0,-1,-1,-1,
+   0,-1,-1,-1, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,
+   0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1,-1,-1,-1,-1,-1,
+  -1, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1,-1,-1,-1, 0, 0, 0,-1, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0,-1,-1, 0, 0,-1,-1,
+   0, 0, 0, 0,-1, 0,-1,-1, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0,-1, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0,
+   0,-1,-1,-1, 0,-1,-1, 0, 0, 0,-1,-1, 0,-1,-1, 0, 0,-1,-1, 0,-1,-1, 0,-1,-1,
+  -1,-1, 0, 0, 0, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1, 0,-1,-1, 0, 0, 0, 0, 0,-1
+};
+int MR_file2_line_count[30] = {
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1,
    0,-1,-1, 0,-1
 };
-File_Coverage MR_file_coverage[1] = {
-  {"tests/integration-test2.4.mr", 30, MR_file0_line_count}
+File_Coverage MR_file_coverage[3] = {
+  {"tests/integration-test0.4.mr", 551, MR_file0_line_count},
+  {"tests/integration-test1.4.mr", 350, MR_file1_line_count},
+  {"tests/integration-test2.4.mr", 30, MR_file2_line_count}
 };
 
 
 /* types methods body */
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.new"
-Returncode BaseType_new(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  if (self == NULL) RAISE(49, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(49, 38, "used member of outdated weak reference")
-  self->num_base = 1;
-MR_cleanup:
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.meth0"
-Returncode BaseType_meth0(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(52, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 15;
-  aux_String_0_Var.length = 14;
-  aux_String_0_Var.values = "BaseType.meth0";
-  CHECK(52, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.meth1"
-Returncode BaseType_meth1(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  MR_inc_ref(s_Refman);
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(55, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 15;
-  aux_String_0_Var.length = 14;
-  aux_String_0_Var.values = "BaseType.meth1";
-  CHECK(55, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  MR_dec_ref(s_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.meth2"
-Returncode BaseType_meth2(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(58, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 15;
-  aux_String_0_Var.length = 14;
-  aux_String_0_Var.values = "BaseType.meth2";
-  CHECK(58, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.meth3"
-Returncode BaseType_meth3(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  MR_inc_ref(s_Refman);
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(61, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 15;
-  aux_String_0_Var.length = 14;
-  aux_String_0_Var.values = "BaseType.meth3";
-  CHECK(61, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  MR_dec_ref(s_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-void BaseType_Del(BaseType* self) {
-  if (self == NULL) return;
-  MR_dec_ref(self->base_top_ref_Refman);
-  MR_dec_ref(self->base_mid_ref_Refman);
-}
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.new"
-Returncode MiddleType_new(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  ++MR_file_coverage[0].line_count[13];
-  CHECK(13, BaseType_new(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  ++MR_file_coverage[0].line_count[14];
-  if (self == NULL) RAISE(14, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
-  self->num_mid = 2;
-MR_cleanup:
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.meth1"
-Returncode MiddleType_meth1(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  MR_inc_ref(s_Refman);
-  ++MR_file_coverage[0].line_count[17];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(17, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 17;
-  aux_String_0_Var.length = 16;
-  aux_String_0_Var.values = "MiddleType.meth1";
-  CHECK(17, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-  ++MR_file_coverage[0].line_count[18];
-  CHECK(18, BaseType_meth1(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  MR_dec_ref(s_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.meth2"
-Returncode MiddleType_meth2(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  ++MR_file_coverage[0].line_count[21];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(21, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 17;
-  aux_String_0_Var.length = 16;
-  aux_String_0_Var.values = "MiddleType.meth2";
-  CHECK(21, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-  ++MR_file_coverage[0].line_count[22];
-  CHECK(22, BaseType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.meth4"
-Returncode MiddleType_meth4(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  ++MR_file_coverage[0].line_count[25];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(25, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 17;
-  aux_String_0_Var.length = 16;
-  aux_String_0_Var.values = "MiddleType.meth4";
-  CHECK(25, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.meth5"
-Returncode MiddleType_meth5(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  MR_inc_ref(s_Refman);
-  ++MR_file_coverage[0].line_count[28];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(28, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 17;
-  aux_String_0_Var.length = 16;
-  aux_String_0_Var.values = "MiddleType.meth5";
-  CHECK(28, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  MR_dec_ref(s_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-void MiddleType_Del(MiddleType* self) {
-  if (self == NULL) return;
-  BaseType_Del(&(self->_base));
-  MR_dec_ref(self->mid_top_ref_Refman);
-  MR_dec_ref(self->mid_base_ref_Refman);
-}
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.new"
@@ -740,16 +557,20 @@ Returncode TestStruct_new(TestStruct* self, Ref_Manager* self_Refman, Int x, Str
   TestStruct* aux_TestStruct_0 = NULL;
   Ref_Manager* aux_TestStruct_0_Refman = NULL;
   MR_inc_ref(s_Refman);
+  ++MR_file_coverage[0].line_count[200];
   if (self == NULL) RAISE(200, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(200, 38, "used member of outdated weak reference")
   self->num = x;
+  ++MR_file_coverage[0].line_count[201];
   if (self == NULL) RAISE(201, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
   MR_dec_ref(self->text_Refman);
   self->text_Refman = s_Refman;
   MR_inc_ref(self->text_Refman);
   self->text = s;
+  ++MR_file_coverage[0].line_count[202];
   if (x < 0) {
+      ++MR_file_coverage[0].line_count[203];
       aux_TestStruct_0 = MR_alloc(sizeof(TestStruct));
       if (aux_TestStruct_0 == NULL) RAISE(203, 49, "insufficient memory for object dynamic allocation")
       aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
@@ -777,9 +598,11 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestStruct.get"
 Returncode TestStruct_get(TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[210];
   if (self == NULL) RAISE(210, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
   *x = self->num;
+  ++MR_file_coverage[0].line_count[211];
   if (self == NULL) RAISE(211, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(211, 38, "used member of outdated weak reference")
   MR_dec_ref(*s_Refman);
@@ -796,6 +619,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestStruct.print"
 Returncode TestStruct_print(TestStruct* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[214];
   if (self == NULL) RAISE(214, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(214, 38, "used member of outdated weak reference")
   CHECK(214, Sys_Mock_println(sys, sys_Refman, self->text, self->text_Refman) )
@@ -816,6 +640,7 @@ void TestStruct_Del(TestStruct* self) {
 #define MR_FUNC_NAME "TestClass.new"
 Returncode TestClass_new(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[223];
   if (self == NULL) RAISE(223, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
   self->num = 1;
@@ -829,6 +654,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestClass.static-meth"
 Returncode TestClass_static_meth(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[226];
   if (self == NULL) RAISE(226, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(226, 38, "used member of outdated weak reference")
   self->num = 3;
@@ -842,6 +668,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestClass.dynamic-meth"
 Returncode TestClass_dynamic_meth(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[229];
   if (self == NULL) RAISE(229, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(229, 38, "used member of outdated weak reference")
   self->num = 6;
@@ -855,6 +682,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "TestClass.print"
 Returncode TestClass_print(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[232];
   if (self == NULL) RAISE(232, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
   CHECK(232, Sys_Mock_println(sys, sys_Refman, self->text, self->text_Refman) )
@@ -882,10 +710,12 @@ Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   Ref_Manager* d_Refman = NULL;
   MR_inc_ref(item_Refman);
   MR_inc_ref(arr_Refman);
+  ++MR_file_coverage[0].line_count[358];
   x = item;
   x_Refman = item_Refman;
   MR_inc_ref(x_Refman);
   x_Dynamic = item_Dynamic;
+  ++MR_file_coverage[0].line_count[359];
   if (self == NULL) RAISE(359, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(359, 38, "used member of outdated weak reference")
   MR_dec_ref(self->item_Refman);
@@ -893,16 +723,19 @@ Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   MR_inc_ref(self->item_Refman);
   self->item_Dynamic = x_Dynamic;
   self->item = x;
+  ++MR_file_coverage[0].line_count[360];
   if (self == NULL) RAISE(360, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(360, 38, "used member of outdated weak reference")
   MR_dec_ref(self->arr_Refman);
   self->arr_Refman = arr_Refman;
   MR_inc_ref(self->arr_Refman);
   self->arr = arr;
+  ++MR_file_coverage[0].line_count[361];
   d = MR_alloc(sizeof(Data));
   if (d == NULL) RAISE(361, 49, "insufficient memory for object dynamic allocation")
   d_Refman = MR_new_ref(d);
   if (d_Refman == NULL) RAISE(361, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[362];
   if (self == NULL) RAISE(362, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(362, 38, "used member of outdated weak reference")
   if (d == NULL) RAISE(362, 27, "used member of empty object")
@@ -912,6 +745,7 @@ Returncode Data_set(Data* self, Ref_Manager* self_Refman, Generic_Type* item, Re
   MR_inc_ref(d->item_Refman);
   d->item_Dynamic = self->item_Dynamic;
   d->item = self->item;
+  ++MR_file_coverage[0].line_count[363];
   if (d == NULL) RAISE(363, 27, "used member of empty object")
   if (d_Refman->value == NULL) RAISE(363, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(363, 27, "used member of empty object")
@@ -936,6 +770,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "Data.get"
 Returncode Data_get(Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[366];
   if (self == NULL) RAISE(366, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(366, 38, "used member of outdated weak reference")
   MR_dec_ref(*item_Refman);
@@ -978,6 +813,7 @@ Returncode Container_new(Container* self, Ref_Manager* self_Refman, Generic_Type
   Returncode MR_err = OK;
   MR_inc_ref(value_Refman);
   MR_inc_ref(next_Refman);
+  ++MR_file_coverage[0].line_count[441];
   if (self == NULL) RAISE(441, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(441, 38, "used member of outdated weak reference")
   MR_dec_ref(self->value_Refman);
@@ -985,6 +821,7 @@ Returncode Container_new(Container* self, Ref_Manager* self_Refman, Generic_Type
   MR_inc_ref(self->value_Refman);
   self->value_Dynamic = value_Dynamic;
   self->value = value;
+  ++MR_file_coverage[0].line_count[442];
   if (self == NULL) RAISE(442, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(442, 38, "used member of outdated weak reference")
   MR_dec_ref(self->next_Refman);
@@ -1005,6 +842,7 @@ Returncode Container_iter(Container* self, Ref_Manager* self_Refman, ContainerIt
   Returncode MR_err = OK;
   ContainerIterator* aux_ContainerIterator_0 = NULL;
   Ref_Manager* aux_ContainerIterator_0_Refman = NULL;
+  ++MR_file_coverage[0].line_count[445];
   if (self == NULL) RAISE(445, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(445, 38, "used member of outdated weak reference")
   aux_ContainerIterator_0 = MR_alloc(sizeof(ContainerIterator));
@@ -1037,6 +875,7 @@ void Container_Del(Container* self) {
 Returncode ContainerIterator_new(ContainerIterator* self, Ref_Manager* self_Refman, Container* first, Ref_Manager* first_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(first_Refman);
+  ++MR_file_coverage[0].line_count[451];
   if (self == NULL) RAISE(451, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(451, 38, "used member of outdated weak reference")
   MR_dec_ref(self->curr_Refman);
@@ -1054,6 +893,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "ContainerIterator.has"
 Returncode ContainerIterator_has(ContainerIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[454];
   if (self == NULL) RAISE(454, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(454, 38, "used member of outdated weak reference")
   *has_data = self->curr != NULL && self->curr_Refman->value != NULL;
@@ -1067,6 +907,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "ContainerIterator.get"
 Returncode ContainerIterator_get(ContainerIterator* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[457];
   if (self == NULL) RAISE(457, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(457, 38, "used member of outdated weak reference")
   if (self->curr == NULL) RAISE(457, 27, "used member of empty object")
@@ -1086,6 +927,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "ContainerIterator.next"
 Returncode ContainerIterator_next(ContainerIterator* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[460];
   if (self == NULL) RAISE(460, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(460, 38, "used member of outdated weak reference")
   if (self->curr == NULL) RAISE(460, 27, "used member of empty object")
@@ -1114,6 +956,7 @@ Returncode ComplexField_meth(ComplexField* self, Ref_Manager* self_Refman, Compl
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[0].line_count[520];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(520, 38, "insufficient memory for managed object")
@@ -1143,12 +986,14 @@ Returncode HasComplexField_run(HasComplexField* self, Ref_Manager* self_Refman) 
   ComplexField* x2 = NULL;
   Ref_Manager* x2_Refman = NULL;
   ComplexField_Dynamic* x2_Dynamic = NULL;
+  ++MR_file_coverage[0].line_count[525];
   if (self == NULL) RAISE(525, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(525, 38, "used member of outdated weak reference")
   x = &(self->x);
   x_Refman = self_Refman;
   MR_inc_ref(x_Refman);
   x_Dynamic = &ComplexField_dynamic;
+  ++MR_file_coverage[0].line_count[526];
   if (self == NULL) RAISE(526, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(526, 38, "used member of outdated weak reference")
   MR_dec_ref(x_Refman);
@@ -1156,20 +1001,25 @@ Returncode HasComplexField_run(HasComplexField* self, Ref_Manager* self_Refman) 
   MR_inc_ref(x_Refman);
   x_Dynamic = &ComplexField_dynamic;
   x = &(self->x);
+  ++MR_file_coverage[0].line_count[527];
   if (x_Dynamic == NULL) RAISE(527, 28, "dynamic call of empty object")
   CHECK(527, x_Dynamic->meth(x, x_Refman, x_Dynamic) )
+  ++MR_file_coverage[0].line_count[528];
   if (self == NULL) RAISE(528, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(528, 38, "used member of outdated weak reference")
   CHECK(528, ComplexField_meth(&(self->x), self_Refman, &ComplexField_dynamic) )
+  ++MR_file_coverage[0].line_count[529];
   if (self == NULL) RAISE(529, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(529, 38, "used member of outdated weak reference")
   CHECK(529, ComplexField_meth(&(self->x), self_Refman, &ComplexField_dynamic) )
+  ++MR_file_coverage[0].line_count[530];
   if (self == NULL) RAISE(530, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(530, 38, "used member of outdated weak reference")
   x2 = self->x.x;
   x2_Refman = self->x.x_Refman;
   MR_inc_ref(x2_Refman);
   x2_Dynamic = self->x.x_Dynamic;
+  ++MR_file_coverage[0].line_count[531];
   if (self == NULL) RAISE(531, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(531, 38, "used member of outdated weak reference")
   MR_dec_ref(x2_Refman);
@@ -1177,12 +1027,15 @@ Returncode HasComplexField_run(HasComplexField* self, Ref_Manager* self_Refman) 
   MR_inc_ref(x2_Refman);
   x2_Dynamic = self->x.x_Dynamic;
   x2 = self->x.x;
+  ++MR_file_coverage[0].line_count[532];
   if (x2_Dynamic == NULL) RAISE(532, 28, "dynamic call of empty object")
   CHECK(532, x2_Dynamic->meth(x2, x2_Refman, x2_Dynamic) )
+  ++MR_file_coverage[0].line_count[533];
   if (self->x.x_Dynamic == NULL) RAISE(533, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(533, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(533, 38, "used member of outdated weak reference")
   CHECK(533, self->x.x_Dynamic->meth(self->x.x, self->x.x_Refman, self->x.x_Dynamic) )
+  ++MR_file_coverage[0].line_count[534];
   if (self == NULL) RAISE(534, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(534, 38, "used member of outdated weak reference")
   CHECK(534, ComplexField_meth(self->x.x, self->x.x_Refman, self->x.x_Dynamic) )
@@ -1200,10 +1053,243 @@ void HasComplexField_Del(HasComplexField* self) {
 }
 
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.new"
+Returncode BaseType_new(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[49];
+  if (self == NULL) RAISE(49, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(49, 38, "used member of outdated weak reference")
+  self->num_base = 1;
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.meth0"
+Returncode BaseType_meth0(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[52];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(52, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 15;
+  aux_String_0_Var.length = 14;
+  aux_String_0_Var.values = "BaseType.meth0";
+  CHECK(52, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.meth1"
+Returncode BaseType_meth1(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  ++MR_file_coverage[1].line_count[55];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(55, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 15;
+  aux_String_0_Var.length = 14;
+  aux_String_0_Var.values = "BaseType.meth1";
+  CHECK(55, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.meth2"
+Returncode BaseType_meth2(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[58];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(58, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 15;
+  aux_String_0_Var.length = 14;
+  aux_String_0_Var.values = "BaseType.meth2";
+  CHECK(58, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.meth3"
+Returncode BaseType_meth3(BaseType* self, Ref_Manager* self_Refman, BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  ++MR_file_coverage[1].line_count[61];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(61, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 15;
+  aux_String_0_Var.length = 14;
+  aux_String_0_Var.values = "BaseType.meth3";
+  CHECK(61, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+void BaseType_Del(BaseType* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->base_top_ref_Refman);
+  MR_dec_ref(self->base_mid_ref_Refman);
+}
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.new"
+Returncode MiddleType_new(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  ++MR_file_coverage[2].line_count[13];
+  CHECK(13, BaseType_new(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  ++MR_file_coverage[2].line_count[14];
+  if (self == NULL) RAISE(14, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
+  self->num_mid = 2;
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.meth1"
+Returncode MiddleType_meth1(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  ++MR_file_coverage[2].line_count[17];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(17, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "MiddleType.meth1";
+  CHECK(17, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[2].line_count[18];
+  CHECK(18, BaseType_meth1(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.meth2"
+Returncode MiddleType_meth2(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[2].line_count[21];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(21, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "MiddleType.meth2";
+  CHECK(21, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[2].line_count[22];
+  CHECK(22, BaseType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.meth4"
+Returncode MiddleType_meth4(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[2].line_count[25];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(25, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "MiddleType.meth4";
+  CHECK(25, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.meth5"
+Returncode MiddleType_meth5(MiddleType* self, Ref_Manager* self_Refman, MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  ++MR_file_coverage[2].line_count[28];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(28, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "MiddleType.meth5";
+  CHECK(28, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+void MiddleType_Del(MiddleType* self) {
+  if (self == NULL) return;
+  BaseType_Del(&(self->_base));
+  MR_dec_ref(self->mid_top_ref_Refman);
+  MR_dec_ref(self->mid_base_ref_Refman);
+}
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
 #define MR_FUNC_NAME "TopType.new"
 Returncode TopType_new(TopType* self, Ref_Manager* self_Refman, TopType_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[13];
   CHECK(13, MiddleType_new(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  ++MR_file_coverage[1].line_count[14];
   if (self == NULL) RAISE(14, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
   self->num_top = 3;
@@ -1220,6 +1306,7 @@ Returncode TopType_meth2(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[18];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(18, 38, "insufficient memory for managed object")
@@ -1227,8 +1314,11 @@ Returncode TopType_meth2(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "TopType.meth2";
   CHECK(18, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[1].line_count[19];
   CHECK(19, MiddleType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  ++MR_file_coverage[1].line_count[20];
   CHECK(20, MiddleType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  ++MR_file_coverage[1].line_count[21];
   CHECK(21, BaseType_meth2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
@@ -1245,6 +1335,7 @@ Returncode TopType_meth3(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   MR_inc_ref(s_Refman);
+  ++MR_file_coverage[1].line_count[24];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(24, 38, "insufficient memory for managed object")
@@ -1252,6 +1343,7 @@ Returncode TopType_meth3(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "TopType.meth3";
   CHECK(24, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[1].line_count[25];
   CHECK(25, BaseType_meth3(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), n, s, s_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
@@ -1269,6 +1361,7 @@ Returncode TopType_meth5(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   MR_inc_ref(s_Refman);
+  ++MR_file_coverage[1].line_count[28];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(28, 38, "insufficient memory for managed object")
@@ -1276,8 +1369,11 @@ Returncode TopType_meth5(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "TopType.meth5";
   CHECK(28, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[1].line_count[29];
   CHECK(29, MiddleType_meth5(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
+  ++MR_file_coverage[1].line_count[30];
   CHECK(30, MiddleType_meth1(NULL, NULL, NULL, n, s, s_Refman) )
+  ++MR_file_coverage[1].line_count[31];
   CHECK(31, BaseType_meth1(NULL, NULL, NULL, n, s, s_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
@@ -1300,6 +1396,7 @@ Returncode TopType_meth6(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[34];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(34, 38, "insufficient memory for managed object")
@@ -1307,11 +1404,13 @@ Returncode TopType_meth6(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "TopType.meth6";
   CHECK(34, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[1].line_count[35];
   if (self == NULL) RAISE(35, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(35, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
   self->_base.num_mid = self->_base._base.num_base;
+  ++MR_file_coverage[1].line_count[36];
   if (self == NULL) RAISE(36, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(36, 27, "used member of empty object")
@@ -1321,6 +1420,7 @@ Returncode TopType_meth6(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   MR_inc_ref(self->top_base_ref_Refman);
   self->top_base_ref_Dynamic = &(self->top_mid_ref_Dynamic->_base);
   self->top_base_ref = &(self->top_mid_ref->_base);
+  ++MR_file_coverage[1].line_count[37];
   if (self == NULL) RAISE(37, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(37, 38, "used member of outdated weak reference")
   MR_dec_ref(self->top_base_ref_Refman);
@@ -1328,14 +1428,17 @@ Returncode TopType_meth6(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   MR_inc_ref(self->top_base_ref_Refman);
   self->top_base_ref_Dynamic = &(self_Dynamic->_base._base);
   self->top_base_ref = &(self->_base._base);
+  ++MR_file_coverage[1].line_count[38];
   mt = &(self->_base);
   mt_Refman = self_Refman;
   MR_inc_ref(mt_Refman);
   mt_Dynamic = &(self_Dynamic->_base);
+  ++MR_file_coverage[1].line_count[39];
   bt = &(mt->_base);
   bt_Refman = mt_Refman;
   MR_inc_ref(bt_Refman);
   bt_Dynamic = &(mt_Dynamic->_base);
+  ++MR_file_coverage[1].line_count[40];
   if (bt != NULL) RAISE(40, 45, "non empty base class given as output argument")
   CHECK(40, test_mid_out((void*)&(bt), &(bt_Refman), (void*)&(bt_Dynamic)) )
 MR_cleanup:
@@ -1391,9 +1494,11 @@ void TopLink_Del(TopLink* self) {
 #define MR_FUNC_NAME "RefNode.new"
 Returncode RefNode_new(RefNode* self, Ref_Manager* self_Refman, Ref ref, RefNode* next, Ref_Manager* next_Refman) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[141];
   if (self == NULL) RAISE(141, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(141, 38, "used member of outdated weak reference")
   self->ref = ref;
+  ++MR_file_coverage[1].line_count[142];
   if (self == NULL) RAISE(142, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
   RefNode_Del(self->next);
@@ -1429,6 +1534,7 @@ Returncode test_simple_function(void) {
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  ++MR_file_coverage[0].line_count[24];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(24, 38, "insufficient memory for managed object")
@@ -1436,6 +1542,7 @@ Returncode test_simple_function(void) {
   aux_String_0_Var.length = 22;
   aux_String_0_Var.values = "I am a simple function";
   CHECK(24, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[0].line_count[25];
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(28, 38, "insufficient memory for managed object")
@@ -1461,8 +1568,11 @@ Returncode test_const_expression(Int* i, Char* c, String** s, Ref_Manager** s_Re
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  ++MR_file_coverage[0].line_count[38];
   *i = (((((((0 + 9630) + -9630) + 07520) + -07520) + 0xfda940) + -0xfda940) + 0xFDA940) + -0xFDA940;
+  ++MR_file_coverage[0].line_count[40];
   *c = (((('a' + '\'') + '\n') + '\x0f') + '\xA9') + '\270';
+  ++MR_file_coverage[0].line_count[41];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(41, 38, "insufficient memory for managed object")
@@ -1473,6 +1583,7 @@ Returncode test_const_expression(Int* i, Char* c, String** s, Ref_Manager** s_Re
   *s_Refman = aux_String_0_Refman;
   MR_inc_ref(*s_Refman);
   *s = aux_String_0;
+  ++MR_file_coverage[0].line_count[42];
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(44, 38, "insufficient memory for managed object")
@@ -1483,16 +1594,20 @@ Returncode test_const_expression(Int* i, Char* c, String** s, Ref_Manager** s_Re
   *s_Refman = aux_String_1_Refman;
   MR_inc_ref(*s_Refman);
   *s = aux_String_1;
+  ++MR_file_coverage[0].line_count[45];
   MR_dec_ref(*t_Refman);
   *t_Refman = NULL;
   MR_inc_ref(*t_Refman);
   *t = NULL;
+  ++MR_file_coverage[0].line_count[46];
   MR_dec_ref(*d_Refman);
   *d_Refman = NULL;
   MR_inc_ref(*d_Refman);
   *d_Dynamic = NULL;
   *d = NULL;
+  ++MR_file_coverage[0].line_count[47];
   *f = NULL;
+  ++MR_file_coverage[0].line_count[48];
   if (*f == NULL) RAISE(48, 21, "empty function called")
   CHECK(48, (*f)() )
 MR_cleanup:
@@ -1511,6 +1626,7 @@ Returncode test_member_expression(TestStruct* t, Ref_Manager* t_Refman, TestStru
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   MR_inc_ref(t_Refman);
+  ++MR_file_coverage[0].line_count[52];
   if (t == NULL) RAISE(52, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(52, 38, "used member of outdated weak reference")
   if (t->ts == NULL) RAISE(52, 27, "used member of empty object")
@@ -1526,11 +1642,13 @@ Returncode test_member_expression(TestStruct* t, Ref_Manager* t_Refman, TestStru
   if (t == NULL) RAISE(52, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(52, 38, "used member of outdated weak reference")
   t->num = ((*to)->num + t->ts->num) + t->ts->ts->num;
+  ++MR_file_coverage[0].line_count[53];
   if (t == NULL) RAISE(53, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(53, 38, "used member of outdated weak reference")
   if (*to == NULL) RAISE(53, 27, "used member of empty object")
   if ((*to_Refman)->value == NULL) RAISE(53, 38, "used member of outdated weak reference")
   (*to)->num = t->num;
+  ++MR_file_coverage[0].line_count[54];
   if (t == NULL) RAISE(54, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(54, 38, "used member of outdated weak reference")
   if (t->ts == NULL) RAISE(54, 27, "used member of empty object")
@@ -1538,13 +1656,16 @@ Returncode test_member_expression(TestStruct* t, Ref_Manager* t_Refman, TestStru
   if (t->ts->ts == NULL) RAISE(54, 27, "used member of empty object")
   if (t->ts->ts_Refman->value == NULL) RAISE(54, 38, "used member of outdated weak reference")
   t->ts->ts->num = 4;
+  ++MR_file_coverage[0].line_count[55];
   if (t == NULL) RAISE(55, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(55, 38, "used member of outdated weak reference")
   t->fun = f_test_void;
+  ++MR_file_coverage[0].line_count[56];
   if (t == NULL) RAISE(56, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(56, 38, "used member of outdated weak reference")
   if (t->fun == NULL) RAISE(56, 21, "empty function called")
   CHECK(56, t->fun() )
+  ++MR_file_coverage[0].line_count[57];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(57, 38, "insufficient memory for managed object")
@@ -1606,6 +1727,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   MR_inc_ref(arrt_Refman);
   MR_inc_ref(arrd_Refman);
   MR_inc_ref(arrf_Refman);
+  ++MR_file_coverage[0].line_count[77];
   aux_Array_0 = &aux_Array_0_Var;
   aux_Array_0_Refman = MR_new_ref(aux_Array_0);
   if (aux_Array_0_Refman == NULL) RAISE(77, 38, "insufficient memory for managed object")
@@ -1651,6 +1773,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   if (s_Refman->value == NULL) RAISE(77, 40, "outdated weak reference used as sequence")
   if ((2) < 0 || (2) >= (s)->length) RAISE(77, 25, "slice index out of bounds")
   *c = (((((s)->values)[2]) + (((aux_String_1)->values)[2])) + ((((((String*)((arrs)->values)) + 3))->values)[2])) + (((aux_String_0)->values)[0]);
+  ++MR_file_coverage[0].line_count[78];
   aux_Array_1 = &aux_Array_1_Var;
   aux_Array_1_Refman = MR_new_ref(aux_Array_1);
   if (aux_Array_1_Refman == NULL) RAISE(79, 38, "insufficient memory for managed object")
@@ -1695,6 +1818,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   if (arri_Refman->value == NULL) RAISE(78, 40, "outdated weak reference used as sequence")
   if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (((*i) + 3) - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(78, 25, "slice index out of bounds")
   *i = (((((Int*)((arri)->values))[((*i) + 3) - (((Int*)((arri)->values))[2])]) + (((TestStruct*)((arrt)->values)) + 4)->num) + (((TestStruct*)((aux_Array_3)->values)) + 1)->num) + (((Int*)((aux_Array_2)->values))[1]);
+  ++MR_file_coverage[0].line_count[80];
   aux_Array_4 = &aux_Array_4_Var;
   aux_Array_4_Refman = MR_new_ref(aux_Array_4);
   if (aux_Array_4_Refman == NULL) RAISE(80, 38, "insufficient memory for managed object")
@@ -1718,6 +1842,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   *arrio_Refman = arri_Refman;
   MR_inc_ref(*arrio_Refman);
   *arrio = aux_Array_5;
+  ++MR_file_coverage[0].line_count[81];
   if (arrs == NULL) RAISE(81, 29, "empty object used as sequence")
   if (arrs_Refman->value == NULL) RAISE(81, 40, "outdated weak reference used as sequence")
   if ((4) < 0 || (4) >= (arrs)->length) RAISE(81, 25, "slice index out of bounds")
@@ -1725,6 +1850,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   s_Refman = arrs_Refman;
   MR_inc_ref(s_Refman);
   s = ((String*)((arrs)->values)) + 4;
+  ++MR_file_coverage[0].line_count[82];
   aux_Array_6 = &aux_Array_6_Var;
   aux_Array_6_Refman = MR_new_ref(aux_Array_6);
   if (aux_Array_6_Refman == NULL) RAISE(82, 38, "insufficient memory for managed object")
@@ -1737,6 +1863,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   *arrso_Refman = arrs_Refman;
   MR_inc_ref(*arrso_Refman);
   *arrso = aux_Array_6;
+  ++MR_file_coverage[0].line_count[83];
   if (arrt == NULL) RAISE(83, 29, "empty object used as sequence")
   if (arrt_Refman->value == NULL) RAISE(83, 40, "outdated weak reference used as sequence")
   if ((4) < 0 || (4) >= (arrt)->length) RAISE(83, 25, "slice index out of bounds")
@@ -1744,6 +1871,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   *t_Refman = arrt_Refman;
   MR_inc_ref(*t_Refman);
   *t = ((TestStruct*)((arrt)->values)) + 4;
+  ++MR_file_coverage[0].line_count[84];
   aux_Array_7 = &aux_Array_7_Var;
   aux_Array_7_Refman = MR_new_ref(aux_Array_7);
   if (aux_Array_7_Refman == NULL) RAISE(84, 38, "insufficient memory for managed object")
@@ -1756,6 +1884,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   *arrto_Refman = arrt_Refman;
   MR_inc_ref(*arrto_Refman);
   *arrto = aux_Array_7;
+  ++MR_file_coverage[0].line_count[85];
   if (arrd == NULL) RAISE(85, 29, "empty object used as sequence")
   if (arrd_Refman->value == NULL) RAISE(85, 40, "outdated weak reference used as sequence")
   if ((4) < 0 || (4) >= (arrd)->length) RAISE(85, 25, "slice index out of bounds")
@@ -1764,6 +1893,7 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   MR_inc_ref(*d_Refman);
   *d_Dynamic = &TestClass_dynamic;
   *d = ((TestClass*)((arrd)->values)) + 4;
+  ++MR_file_coverage[0].line_count[86];
   aux_Array_8 = &aux_Array_8_Var;
   aux_Array_8_Refman = MR_new_ref(aux_Array_8);
   if (aux_Array_8_Refman == NULL) RAISE(86, 38, "insufficient memory for managed object")
@@ -1776,10 +1906,12 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   *arrdo_Refman = arrd_Refman;
   MR_inc_ref(*arrdo_Refman);
   *arrdo = aux_Array_8;
+  ++MR_file_coverage[0].line_count[87];
   if (arrf == NULL) RAISE(87, 29, "empty object used as sequence")
   if (arrf_Refman->value == NULL) RAISE(87, 40, "outdated weak reference used as sequence")
   if ((4) < 0 || (4) >= (arrf)->length) RAISE(87, 25, "slice index out of bounds")
   *f = ((Returncode (**)(void))((arrf)->values))[4];
+  ++MR_file_coverage[0].line_count[88];
   aux_Array_9 = &aux_Array_9_Var;
   aux_Array_9_Refman = MR_new_ref(aux_Array_9);
   if (aux_Array_9_Refman == NULL) RAISE(88, 38, "insufficient memory for managed object")
@@ -1792,11 +1924,13 @@ Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, 
   *arrfo_Refman = arrf_Refman;
   MR_inc_ref(*arrfo_Refman);
   *arrfo = aux_Array_9;
+  ++MR_file_coverage[0].line_count[89];
   if (arrf == NULL) RAISE(89, 29, "empty object used as sequence")
   if (arrf_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
   if ((4) < 0 || (4) >= (arrf)->length) RAISE(89, 25, "slice index out of bounds")
   if (((Returncode (**)(void))((arrf)->values))[4] == NULL) RAISE(89, 21, "empty function called")
   CHECK(89, (((Returncode (**)(void))((arrf)->values))[4])() )
+  ++MR_file_coverage[0].line_count[90];
   if (*arrfo == NULL) RAISE(90, 29, "empty object used as sequence")
   if ((*arrfo_Refman)->value == NULL) RAISE(90, 40, "outdated weak reference used as sequence")
   if ((4) < 0 || (4) >= ((*arrfo))->length) RAISE(90, 25, "slice index out of bounds")
@@ -1831,7 +1965,9 @@ MR_cleanup:
 Returncode test_container_expression(Int x, Int y, String* s, Ref_Manager* s_Refman, Int* i, Bool* b) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
+  ++MR_file_coverage[0].line_count[95];
   *i = (- x) + (- (- (- y)));
+  ++MR_file_coverage[0].line_count[96];
   *b = (! (((! ((((x * 3) - 5) > (6 * y)) && ((6 * y) == 234))) && (! ((5 - x) < y))) || (! ((x == (-2 - (-4 * y))) && (((-6 > y) && (y >= 12)) && (12 == x)))))) && ((((- (2 + x)) > y) || (s != NULL && s_Refman->value != NULL)) || (! (s != NULL && s_Refman->value != NULL)));
 MR_cleanup:
   MR_dec_ref(s_Refman);
@@ -1950,49 +2086,66 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   Ref_Manager* aux_String_2_Refman = NULL;
   MR_inc_ref(text_Refman);
   MR_inc_ref(arr_Refman);
+  ++MR_file_coverage[0].line_count[102];
+  ++MR_file_coverage[0].line_count[103];
+  ++MR_file_coverage[0].line_count[104];
+  ++MR_file_coverage[0].line_count[105];
+  ++MR_file_coverage[0].line_count[106];
+  ++MR_file_coverage[0].line_count[107];
   tv = &tv_Var;
   tv_Refman = MR_new_ref(tv);
   if (tv_Refman == NULL) RAISE(107, 38, "insufficient memory for managed object")
   CHECK(107, TestStruct_new(tv, tv_Refman, 0, NULL, NULL) )
+  ++MR_file_coverage[0].line_count[108];
   dv = &dv_Var;
   dv_Refman = MR_new_ref(dv);
   if (dv_Refman == NULL) RAISE(108, 38, "insufficient memory for managed object")
   CHECK(108, TestClass_new(dv, dv_Refman, dv_Dynamic) )
+  ++MR_file_coverage[0].line_count[109];
   sv = &sv_Var;
   sv_Var.values = sv_Values;
   sv_Refman = MR_new_ref(sv);
   if (sv_Refman == NULL) RAISE(109, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[110];
+  ++MR_file_coverage[0].line_count[111];
   ia = &ia_Var;
   ia_Var.values = ia_Values;
   ia_Refman = MR_new_ref(ia);
   if (ia_Refman == NULL) RAISE(111, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[112];
   ta = &ta_Var;
   ta_Var.values = ta_Values;
   ta_Refman = MR_new_ref(ta);
   if (ta_Refman == NULL) RAISE(112, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[113];
   da = &da_Var;
   da_Var.values = da_Values;
   da_Refman = MR_new_ref(da);
   if (da_Refman == NULL) RAISE(113, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[114];
   sa = &sa_Var;
   sa_Var.values = sa_Values;
   MR_set_var_string_array(12, 7, sa, sa_Chars);
   sa_Refman = MR_new_ref(sa);
   if (sa_Refman == NULL) RAISE(114, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[115];
   fa = &fa_Var;
   fa_Var.values = fa_Values;
   fa_Refman = MR_new_ref(fa);
   if (fa_Refman == NULL) RAISE(115, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[116];
   tn = MR_alloc(sizeof(TestStruct));
   if (tn == NULL) RAISE(116, 49, "insufficient memory for object dynamic allocation")
   tn_Refman = MR_new_ref(tn);
   if (tn_Refman == NULL) RAISE(116, 38, "insufficient memory for managed object")
   CHECK(116, TestStruct_new(tn, tn_Refman, 0, NULL, NULL) )
+  ++MR_file_coverage[0].line_count[117];
   dn = MR_alloc(sizeof(TestClass));
   if (dn == NULL) RAISE(117, 49, "insufficient memory for object dynamic allocation")
   dn_Refman = MR_new_ref(dn);
   if (dn_Refman == NULL) RAISE(117, 38, "insufficient memory for managed object")
   CHECK(117, TestClass_new(dn, dn_Refman, dn_Dynamic) )
+  ++MR_file_coverage[0].line_count[118];
   if (arr == NULL) RAISE(118, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(118, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(118, 25, "slice index out of bounds")
@@ -2000,6 +2153,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   if (sn == NULL) RAISE(118, 49, "insufficient memory for object dynamic allocation")
   sn_Refman = MR_new_ref(sn);
   if (sn_Refman == NULL) RAISE(118, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[119];
   if (arr == NULL) RAISE(119, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(119, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(119, 25, "slice index out of bounds")
@@ -2007,6 +2161,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   if (ian == NULL) RAISE(119, 49, "insufficient memory for object dynamic allocation")
   ian_Refman = MR_new_ref(ian);
   if (ian_Refman == NULL) RAISE(119, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[120];
   if (arr == NULL) RAISE(120, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(120, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(120, 25, "slice index out of bounds")
@@ -2014,6 +2169,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   if (tan == NULL) RAISE(120, 49, "insufficient memory for object dynamic allocation")
   tan_Refman = MR_new_ref(tan);
   if (tan_Refman == NULL) RAISE(120, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[121];
   if (arr == NULL) RAISE(121, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(121, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(121, 25, "slice index out of bounds")
@@ -2021,6 +2177,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   if (dan == NULL) RAISE(121, 49, "insufficient memory for object dynamic allocation")
   dan_Refman = MR_new_ref(dan);
   if (dan_Refman == NULL) RAISE(121, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[122];
   if (arr == NULL) RAISE(122, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(122, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(122, 25, "slice index out of bounds")
@@ -2031,6 +2188,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   if (san == NULL) RAISE(122, 49, "insufficient memory for object dynamic allocation")
   san_Refman = MR_new_ref(san);
   if (san_Refman == NULL) RAISE(122, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[123];
   if (arr == NULL) RAISE(123, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(123, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(123, 25, "slice index out of bounds")
@@ -2038,13 +2196,16 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   if (sfn == NULL) RAISE(123, 49, "insufficient memory for object dynamic allocation")
   sfn_Refman = MR_new_ref(sfn);
   if (sfn_Refman == NULL) RAISE(123, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[124];
   if (arr == NULL) RAISE(124, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(124, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(124, 25, "slice index out of bounds")
   ix = ((Int*)((arr)->values))[0];
+  ++MR_file_coverage[0].line_count[125];
   si = text;
   si_Refman = text_Refman;
   MR_inc_ref(si_Refman);
+  ++MR_file_coverage[0].line_count[126];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
@@ -2056,42 +2217,51 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   isv_Refman = MR_new_ref(isv);
   if (isv_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
   CHECK(126, String_new(isv, isv_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[0].line_count[127];
   isn = MR_new_string(i);
   if (isn == NULL) RAISE(127, 49, "insufficient memory for object dynamic allocation")
   isn_Refman = MR_new_ref(isn);
   if (isn_Refman == NULL) RAISE(127, 38, "insufficient memory for managed object")
   CHECK(127, String_new(isn, isn_Refman, text, text_Refman) )
+  ++MR_file_coverage[0].line_count[128];
   fi = Mock_f_test_int2str;
+  ++MR_file_coverage[0].line_count[129];
   itv = &itv_Var;
   itv_Refman = MR_new_ref(itv);
   if (itv_Refman == NULL) RAISE(129, 38, "insufficient memory for managed object")
   CHECK(129, TestStruct_new(itv, itv_Refman, i, text, text_Refman) )
+  ++MR_file_coverage[0].line_count[130];
   itn = MR_alloc(sizeof(TestStruct));
   if (itn == NULL) RAISE(130, 49, "insufficient memory for object dynamic allocation")
   itn_Refman = MR_new_ref(itn);
   if (itn_Refman == NULL) RAISE(130, 38, "insufficient memory for managed object")
   CHECK(130, TestStruct_new(itn, itn_Refman, i, text, text_Refman) )
+  ++MR_file_coverage[0].line_count[131];
   idv = &idv_Var;
   idv_Refman = MR_new_ref(idv);
   if (idv_Refman == NULL) RAISE(131, 38, "insufficient memory for managed object")
   CHECK(131, TestClass_new(idv, idv_Refman, idv_Dynamic) )
+  ++MR_file_coverage[0].line_count[132];
   idn = MR_alloc(sizeof(TestClass));
   if (idn == NULL) RAISE(132, 49, "insufficient memory for object dynamic allocation")
   idn_Refman = MR_new_ref(idn);
   if (idn_Refman == NULL) RAISE(132, 38, "insufficient memory for managed object")
   CHECK(132, TestClass_new(idn, idn_Refman, idn_Dynamic) )
+  ++MR_file_coverage[0].line_count[133];
   aux_TestStruct_0 = MR_alloc(sizeof(TestStruct));
   if (aux_TestStruct_0 == NULL) RAISE(133, 49, "insufficient memory for object dynamic allocation")
   aux_TestStruct_0_Refman = MR_new_ref(aux_TestStruct_0);
   if (aux_TestStruct_0_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
   CHECK(133, TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, i, text, text_Refman) )
   CHECK(133, TestStruct_print(aux_TestStruct_0, aux_TestStruct_0_Refman) )
+  ++MR_file_coverage[0].line_count[134];
   aux_TestClass_0 = MR_alloc(sizeof(TestClass));
   if (aux_TestClass_0 == NULL) RAISE(134, 49, "insufficient memory for object dynamic allocation")
   aux_TestClass_0_Refman = MR_new_ref(aux_TestClass_0);
   if (aux_TestClass_0_Refman == NULL) RAISE(134, 38, "insufficient memory for managed object")
   CHECK(134, TestClass_new(aux_TestClass_0, aux_TestClass_0_Refman, aux_TestClass_0_Dynamic) )
   CHECK(134, TestClass_print(aux_TestClass_0, aux_TestClass_0_Refman, aux_TestClass_0_Dynamic) )
+  ++MR_file_coverage[0].line_count[135];
   if (arr == NULL) RAISE(135, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(135, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(135, 25, "slice index out of bounds")
@@ -2100,6 +2270,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(135, 38, "insufficient memory for managed object")
   TEST_ASSERT(135, aux_String_1 != NULL && aux_String_1_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[136];
   if (arr == NULL) RAISE(136, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(136, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(136, 25, "slice index out of bounds")
@@ -2108,6 +2279,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   aux_Array_0_Refman = MR_new_ref(aux_Array_0);
   if (aux_Array_0_Refman == NULL) RAISE(136, 38, "insufficient memory for managed object")
   TEST_ASSERT(136, aux_Array_0 != NULL && aux_Array_0_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[137];
   if (arr == NULL) RAISE(137, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(137, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(137, 25, "slice index out of bounds")
@@ -2116,6 +2288,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   aux_Array_1_Refman = MR_new_ref(aux_Array_1);
   if (aux_Array_1_Refman == NULL) RAISE(137, 38, "insufficient memory for managed object")
   TEST_ASSERT(137, aux_Array_1 != NULL && aux_Array_1_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[138];
   if (arr == NULL) RAISE(138, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(138, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(138, 25, "slice index out of bounds")
@@ -2124,6 +2297,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   aux_Array_2_Refman = MR_new_ref(aux_Array_2);
   if (aux_Array_2_Refman == NULL) RAISE(138, 38, "insufficient memory for managed object")
   TEST_ASSERT(138, aux_Array_2 != NULL && aux_Array_2_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[139];
   if (arr == NULL) RAISE(139, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(139, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(139, 25, "slice index out of bounds")
@@ -2135,6 +2309,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   aux_Array_3_Refman = MR_new_ref(aux_Array_3);
   if (aux_Array_3_Refman == NULL) RAISE(139, 38, "insufficient memory for managed object")
   TEST_ASSERT(139, aux_Array_3 != NULL && aux_Array_3_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[140];
   if (arr == NULL) RAISE(140, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(140, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(140, 25, "slice index out of bounds")
@@ -2143,33 +2318,60 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   aux_Array_4_Refman = MR_new_ref(aux_Array_4);
   if (aux_Array_4_Refman == NULL) RAISE(140, 38, "insufficient memory for managed object")
   TEST_ASSERT(140, aux_Array_4 != NULL && aux_Array_4_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[141];
   TEST_ASSERT(141, x == 0)
+  ++MR_file_coverage[0].line_count[142];
   TEST_ASSERT(142, s != NULL && s_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[143];
   TEST_ASSERT(143, a != NULL && a_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[144];
   CHECK(144, TestStruct_print(t, t_Refman) )
+  ++MR_file_coverage[0].line_count[145];
   CHECK(145, TestClass_print(d, d_Refman, d_Dynamic) )
+  ++MR_file_coverage[0].line_count[146];
   TEST_ASSERT(146, f != NULL)
+  ++MR_file_coverage[0].line_count[147];
   CHECK(147, TestStruct_print(tv, tv_Refman) )
+  ++MR_file_coverage[0].line_count[148];
   CHECK(148, TestClass_print(dv, dv_Refman, dv_Dynamic) )
+  ++MR_file_coverage[0].line_count[149];
   TEST_ASSERT(149, sv != NULL && sv_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[150];
   TEST_ASSERT(150, ia != NULL && ia_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[151];
   TEST_ASSERT(151, ta != NULL && ta_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[152];
   TEST_ASSERT(152, da != NULL && da_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[153];
   TEST_ASSERT(153, sa != NULL && sa_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[154];
   TEST_ASSERT(154, fa != NULL && fa_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[155];
   CHECK(155, TestStruct_print(tn, tn_Refman) )
+  ++MR_file_coverage[0].line_count[156];
   CHECK(156, TestClass_print(dn, dn_Refman, dn_Dynamic) )
+  ++MR_file_coverage[0].line_count[157];
   TEST_ASSERT(157, sn != NULL && sn_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[158];
   TEST_ASSERT(158, ian != NULL && ian_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[159];
   TEST_ASSERT(159, tan != NULL && tan_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[160];
   TEST_ASSERT(160, dan != NULL && dan_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[161];
   TEST_ASSERT(161, san != NULL && san_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[162];
   TEST_ASSERT(162, sfn != NULL && sfn_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[163];
   TEST_ASSERT(163, ix == 0)
+  ++MR_file_coverage[0].line_count[164];
   TEST_ASSERT(164, si != NULL && si_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[165];
   if (fi == NULL) RAISE(165, 21, "empty function called")
   CHECK(165, fi(7, &(aux_String_2), &(aux_String_2_Refman)) )
+  ++MR_file_coverage[0].line_count[166];
   TEST_ASSERT(166, isv != NULL && isv_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[167];
   TEST_ASSERT(167, isn != NULL && isn_Refman->value != NULL)
 MR_cleanup:
   String_Del(aux_String_2);
@@ -2237,7 +2439,9 @@ MR_cleanup:
 Returncode test_complex_function(Int num, String* text, Ref_Manager* text_Refman, Int* out_num, String** out_text, Ref_Manager** out_text_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(text_Refman);
+  ++MR_file_coverage[0].line_count[180];
   *out_num = num;
+  ++MR_file_coverage[0].line_count[181];
   MR_dec_ref(*out_text_Refman);
   *out_text_Refman = text_Refman;
   MR_inc_ref(*out_text_Refman);
@@ -2253,6 +2457,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-test-void"
 Returncode f_test_void(void) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[236];
   goto MR_cleanup;
 MR_cleanup:
   return MR_err;
@@ -2265,6 +2470,7 @@ MR_cleanup:
 Returncode f_test_params(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(s_Refman);
+  ++MR_file_coverage[0].line_count[238];
   USER_RAISE(238, NULL, NULL)
 MR_cleanup:
   String_Del(o);
@@ -2340,7 +2546,11 @@ Returncode test_call_expression(void) {
   Int aux_Int_1 = 0;
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  ++MR_file_coverage[0].line_count[251];
+  ++MR_file_coverage[0].line_count[252];
+  ++MR_file_coverage[0].line_count[253];
   CHECK(253, f_test_void() )
+  ++MR_file_coverage[0].line_count[254];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(254, 38, "insufficient memory for managed object")
@@ -2348,16 +2558,25 @@ Returncode test_call_expression(void) {
   aux_String_0_Var.length = 4;
   aux_String_0_Var.values = "text";
   CHECK(254, f_test_params(3, aux_String_0, aux_String_0_Refman, NULL, NULL) )
+  ++MR_file_coverage[0].line_count[255];
   CHECK(255, f_test_outs(&(s), &(s_Refman), &(x)) )
+  ++MR_file_coverage[0].line_count[256];
   CHECK(256, Mock_f_test_int2str(4, &(s), &(s_Refman)) )
+  ++MR_file_coverage[0].line_count[257];
   CHECK(257, f_test_int(5) )
+  ++MR_file_coverage[0].line_count[258];
   CHECK(258, f_test_int2int(6, &(x)) )
+  ++MR_file_coverage[0].line_count[259];
   CHECK(259, f_test_many(7, 8, &(x), &(x)) )
+  ++MR_file_coverage[0].line_count[264];
+  ++MR_file_coverage[0].line_count[265];
   CHECK(265, f_test_int2int(9, &(tmp)) )
   CHECK(265, f_test_int(tmp) )
+  ++MR_file_coverage[0].line_count[266];
   CHECK(266, f_test_many(11, 12, &(x), &(aux_Int_0)) )
   CHECK(266, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
+  ++MR_file_coverage[0].line_count[267];
   CHECK(267, Mock_f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
   String_Del(s);
   MR_owner_dec_ref(s_Refman);
@@ -2389,17 +2608,22 @@ Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res) {
   Array* aux_Array_0 = NULL;
   Ref_Manager* aux_Array_0_Refman = NULL;
   MR_inc_ref(arr_Refman);
+  ++MR_file_coverage[0].line_count[271];
   if (arr == NULL) RAISE(271, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(271, 40, "outdated weak reference used as sequence")
   if ((4) < 0 || (4) >= (arr)->length) RAISE(271, 25, "slice index out of bounds")
   if ((((Int*)((arr)->values))[4]) > 6) {
+    ++MR_file_coverage[0].line_count[272];
     *res = 6;
   }
   else {
+    ++MR_file_coverage[0].line_count[273];
     if (arr != NULL && arr_Refman->value != NULL) {
+      ++MR_file_coverage[0].line_count[274];
       *res = 6;
     }
     else {
+      ++MR_file_coverage[0].line_count[275];
       if (arr == NULL) RAISE(275, 29, "empty object used as sequence")
       if (arr_Refman->value == NULL) RAISE(275, 40, "outdated weak reference used as sequence")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(275, 25, "slice index out of bounds")
@@ -2407,33 +2631,44 @@ Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res) {
       if (arr_Refman->value == NULL) RAISE(275, 40, "outdated weak reference used as sequence")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(275, 25, "slice index out of bounds")
       if ((((Int*)((arr)->values))[4]) != (((Int*)((arr)->values))[4])) {
+        ++MR_file_coverage[0].line_count[276];
         *res = 6;
       }
       else {
+        ++MR_file_coverage[0].line_count[277];
         if (arr == NULL) RAISE(277, 29, "empty object used as sequence")
         if (arr_Refman->value == NULL) RAISE(277, 40, "outdated weak reference used as sequence")
         if ((0) < 0 || (0) >= (arr)->length) RAISE(277, 25, "slice index out of bounds")
         if (0 == (((Int*)((arr)->values))[0])) {
+          ++MR_file_coverage[0].line_count[278];
           *res = 6;
         }
         else {
+          ++MR_file_coverage[0].line_count[280];
           *res = 0;
         }
       }
     }
   }
+  ++MR_file_coverage[0].line_count[281];
   while (true) {
+    ++MR_file_coverage[0].line_count[282];
     if (arr == NULL) RAISE(282, 29, "empty object used as sequence")
     if (arr_Refman->value == NULL) RAISE(282, 40, "outdated weak reference used as sequence")
     if ((6) < 0 || (6) >= (arr)->length) RAISE(282, 25, "slice index out of bounds")
     ((Int*)((arr)->values))[6] = 6;
+    ++MR_file_coverage[0].line_count[283];
     if (arr == NULL) RAISE(283, 29, "empty object used as sequence")
     if (arr_Refman->value == NULL) RAISE(283, 40, "outdated weak reference used as sequence")
     if ((2) < 0 || (2) >= (arr)->length) RAISE(283, 25, "slice index out of bounds")
     x = ((Int*)((arr)->values))[2];
+    ++MR_file_coverage[0].line_count[284];
     if (!((x > 3) && (arr == NULL))) break;
+    ++MR_file_coverage[0].line_count[285];
     y = x - 1;
+    ++MR_file_coverage[0].line_count[286];
     while (true) {
+      ++MR_file_coverage[0].line_count[287];
       if (arr == NULL) RAISE(287, 29, "empty object used as sequence")
       if (arr_Refman->value == NULL) RAISE(287, 40, "outdated weak reference used as sequence")
       if ((8) < 0 || (8) >= (arr)->length) RAISE(287, 25, "slice index out of bounds")
@@ -2441,25 +2676,32 @@ Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res) {
       if (arr_Refman->value == NULL) RAISE(287, 40, "outdated weak reference used as sequence")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(287, 25, "slice index out of bounds")
       ((Int*)((arr)->values))[4] = ((Int*)((arr)->values))[8];
+      ++MR_file_coverage[0].line_count[288];
       if (arr == NULL) RAISE(288, 29, "empty object used as sequence")
       if (arr_Refman->value == NULL) RAISE(288, 40, "outdated weak reference used as sequence")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(288, 25, "slice index out of bounds")
       if (y > (((Int*)((arr)->values))[4])) {
+        ++MR_file_coverage[0].line_count[289];
         continue;
       }
+      ++MR_file_coverage[0].line_count[290];
       z = 7;
+      ++MR_file_coverage[0].line_count[291];
       if (arr == NULL) RAISE(291, 29, "empty object used as sequence")
       if (arr_Refman->value == NULL) RAISE(291, 40, "outdated weak reference used as sequence")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(291, 25, "slice index out of bounds")
       if (z <= (((Int*)((arr)->values))[4])) {
+        ++MR_file_coverage[0].line_count[292];
         if (!(z > 0)) break;
       }
     }
   }
+  ++MR_file_coverage[0].line_count[293];
   if (arr == NULL) RAISE(293, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(293, 40, "outdated weak reference used as sequence")
   if ((2) < 0 || (2) >= (arr)->length) RAISE(293, 25, "slice index out of bounds")
   for (n = ((Int*)((arr)->values))[2]; n < 2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
+    ++MR_file_coverage[0].line_count[294];
     if (arr == NULL) RAISE(294, 29, "empty object used as sequence")
     if (arr_Refman->value == NULL) RAISE(294, 40, "outdated weak reference used as sequence")
     if ((2) < 0 || (2) >= (arr)->length) RAISE(294, 25, "slice index out of bounds")
@@ -2467,10 +2709,12 @@ Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res) {
     if (arr_Refman->value == NULL) RAISE(294, 40, "outdated weak reference used as sequence")
     if ((0) < 0 || (0) >= (arr)->length) RAISE(294, 25, "slice index out of bounds")
     ((Int*)((arr)->values))[0] = ((Int*)((arr)->values))[2];
+    ++MR_file_coverage[0].line_count[295];
     if (arr == NULL) RAISE(295, 29, "empty object used as sequence")
     if (arr_Refman->value == NULL) RAISE(295, 40, "outdated weak reference used as sequence")
     if ((0) < 0 || (0) >= (arr)->length) RAISE(295, 25, "slice index out of bounds")
     w = ((Int*)((arr)->values))[0];
+    ++MR_file_coverage[0].line_count[296];
     aux_Array_0 = &aux_Array_0_Var;
     aux_Array_0_Refman = MR_new_ref(aux_Array_0);
     if (aux_Array_0_Refman == NULL) RAISE(296, 38, "insufficient memory for managed object")
@@ -2480,6 +2724,7 @@ Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res) {
     if (arr_Refman->value == NULL) RAISE(296, 40, "outdated weak reference used as sequence")
     if ((3) < 0 || (2) < 0 || (3) + (2) > (arr)->length) RAISE(296, 25, "slice index out of bounds")
     if ((w > 4) && (arr != aux_Array_0)) {
+      ++MR_file_coverage[0].line_count[297];
       if (arr == NULL) RAISE(297, 29, "empty object used as sequence")
       if (arr_Refman->value == NULL) RAISE(297, 40, "outdated weak reference used as sequence")
       if ((1) < 0 || (1) >= (arr)->length) RAISE(297, 25, "slice index out of bounds")
@@ -2505,29 +2750,53 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, Ref_Manager* s_Refman
   Ref_Manager* f_Refman = NULL;
   MR_inc_ref(s_Refman);
   MR_inc_ref(a_Refman);
+  ++MR_file_coverage[0].line_count[302];
+  ++MR_file_coverage[0].line_count[303];
+  ++MR_file_coverage[0].line_count[304];
+  ++MR_file_coverage[0].line_count[305];
   CHECK(305, Int_str(i, s, s_Refman) )
+  ++MR_file_coverage[0].line_count[306];
   bv = true || false;
+  ++MR_file_coverage[0].line_count[307];
   if (a == NULL) RAISE(307, 27, "used member of empty object")
   if (a_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
   i = a->length;
+  ++MR_file_coverage[0].line_count[308];
   if (s == NULL) RAISE(308, 27, "used member of empty object")
   if (s_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
   i = s->length;
+  ++MR_file_coverage[0].line_count[309];
   CHECK(309, String_clear(s, s_Refman) )
+  ++MR_file_coverage[0].line_count[310];
   CHECK(310, String_equal(s, s_Refman, s, s_Refman, &(bv)) )
+  ++MR_file_coverage[0].line_count[311];
   CHECK(311, String_get(s, s_Refman, i, &(cv)) )
+  ++MR_file_coverage[0].line_count[312];
   CHECK(312, String_append(s, s_Refman, c) )
+  ++MR_file_coverage[0].line_count[313];
   CHECK(313, String_new(s, s_Refman, s, s_Refman) )
+  ++MR_file_coverage[0].line_count[314];
   CHECK(314, String_concat(s, s_Refman, s, s_Refman) )
+  ++MR_file_coverage[0].line_count[315];
   CHECK(315, String_concat_int(s, s_Refman, i) )
+  ++MR_file_coverage[0].line_count[316];
   CHECK(316, String_find(s, s_Refman, s, s_Refman, &(iv)) )
+  ++MR_file_coverage[0].line_count[317];
   CHECK(317, String_has(s, s_Refman, c, &(bv)) )
+  ++MR_file_coverage[0].line_count[318];
+  ++MR_file_coverage[0].line_count[319];
   CHECK(319, file_open_read(s, s_Refman, &(f), &(f_Refman)) )
+  ++MR_file_coverage[0].line_count[320];
   CHECK(320, file_open_write(s, s_Refman, &(f), &(f_Refman)) )
+  ++MR_file_coverage[0].line_count[321];
   CHECK(321, File_getc(f, f_Refman, &(cv), &(bv)) )
+  ++MR_file_coverage[0].line_count[322];
   CHECK(322, File_putc(f, f_Refman, c) )
+  ++MR_file_coverage[0].line_count[323];
   CHECK(323, File_write(f, f_Refman, s, s_Refman) )
+  ++MR_file_coverage[0].line_count[324];
   CHECK(324, File_close(f, f_Refman) )
+  ++MR_file_coverage[0].line_count[325];
   if (sys == NULL) RAISE(325, 27, "used member of empty object")
   if (sys_Refman->value == NULL) RAISE(325, 38, "used member of outdated weak reference")
   if (sys->argv == NULL) RAISE(325, 29, "empty object used as sequence")
@@ -2537,15 +2806,25 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, Ref_Manager* s_Refman
   s_Refman = sys->argv_Refman;
   MR_inc_ref(s_Refman);
   s = ((String*)((sys->argv)->values)) + 1;
+  ++MR_file_coverage[0].line_count[326];
   CHECK(326, Sys_print(sys, sys_Refman, s, s_Refman) )
+  ++MR_file_coverage[0].line_count[327];
   CHECK(327, Sys_Mock_println(sys, sys_Refman, s, s_Refman) )
+  ++MR_file_coverage[0].line_count[328];
   CHECK(328, Sys_getchar(sys, sys_Refman, &(cv), &(bv)) )
+  ++MR_file_coverage[0].line_count[329];
   CHECK(329, Sys_getline(sys, sys_Refman, s, s_Refman) )
+  ++MR_file_coverage[0].line_count[330];
   CHECK(330, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(bv)) )
+  ++MR_file_coverage[0].line_count[331];
   CHECK(331, Sys_system(sys, sys_Refman, s, s_Refman, &(iv)) )
+  ++MR_file_coverage[0].line_count[332];
   CHECK(332, Sys_exit(sys, sys_Refman, i) )
+  ++MR_file_coverage[0].line_count[333];
   CHECK(333, File_putc(stdout, stdout_Refman, c) )
+  ++MR_file_coverage[0].line_count[334];
   CHECK(334, File_getc(stdin, stdin_Refman, &(cv), &(bv)) )
+  ++MR_file_coverage[0].line_count[335];
   CHECK(335, File_putc(stderr, stderr_Refman, c) )
 MR_cleanup:
   File_Del(f);
@@ -2574,6 +2853,7 @@ Returncode test_ref_count(void) {
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  ++MR_file_coverage[0].line_count[339];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(339, 38, "insufficient memory for managed object")
@@ -2585,15 +2865,21 @@ Returncode test_ref_count(void) {
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(339, 38, "insufficient memory for managed object")
   CHECK(339, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[0].line_count[340];
   s_user = s;
   s_user_Refman = s_Refman;
   MR_inc_ref(s_user_Refman);
+  ++MR_file_coverage[0].line_count[341];
   CHECK(341, Sys_Mock_println(sys, sys_Refman, s, s_Refman) )
+  ++MR_file_coverage[0].line_count[342];
   CHECK(342, Sys_Mock_println(sys, sys_Refman, s_user, s_user_Refman) )
+  ++MR_file_coverage[0].line_count[343];
   CHECK(343, f_remove(s, s_Refman) )
   s = NULL;
   s_Refman = NULL;
+  ++MR_file_coverage[0].line_count[344];
   if (! (s != NULL && s_Refman->value != NULL)) {
+    ++MR_file_coverage[0].line_count[345];
     aux_String_1 = &aux_String_1_Var;
     aux_String_1_Refman = MR_new_ref(aux_String_1);
     if (aux_String_1_Refman == NULL) RAISE(345, 38, "insufficient memory for managed object")
@@ -2602,7 +2888,9 @@ Returncode test_ref_count(void) {
     aux_String_1_Var.values = "ownership passed";
     CHECK(345, Sys_Mock_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
   }
+  ++MR_file_coverage[0].line_count[346];
   if (! (s_user != NULL && s_user_Refman->value != NULL)) {
+    ++MR_file_coverage[0].line_count[347];
     aux_String_2 = &aux_String_2_Var;
     aux_String_2_Refman = MR_new_ref(aux_String_2);
     if (aux_String_2_Refman == NULL) RAISE(347, 38, "insufficient memory for managed object")
@@ -2666,14 +2954,17 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   TestStruct* ts = NULL;
   Ref_Manager* ts_Refman = NULL;
   MR_inc_ref(s_Refman);
+  ++MR_file_coverage[0].line_count[377];
   d = &d_Var;
   d_Refman = MR_new_ref(d);
   if (d_Refman == NULL) RAISE(377, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[378];
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   MR_set_var_string_array(6, 16, sarr, sarr_Chars);
   sarr_Refman = MR_new_ref(sarr);
   if (sarr_Refman == NULL) RAISE(378, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[379];
   if (d == NULL) RAISE(379, 27, "used member of empty object")
   if (d_Refman->value == NULL) RAISE(379, 38, "used member of outdated weak reference")
   MR_dec_ref(d->item_Refman);
@@ -2681,18 +2972,21 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_inc_ref(d->item_Refman);
   d->item_Dynamic = &String_dynamic;
   d->item = s;
+  ++MR_file_coverage[0].line_count[380];
   if (d == NULL) RAISE(380, 27, "used member of empty object")
   if (d_Refman->value == NULL) RAISE(380, 38, "used member of outdated weak reference")
   MR_dec_ref(s_Refman);
   s_Refman = d->item_Refman;
   MR_inc_ref(s_Refman);
   s = d->item;
+  ++MR_file_coverage[0].line_count[381];
   if (d == NULL) RAISE(381, 27, "used member of empty object")
   if (d_Refman->value == NULL) RAISE(381, 38, "used member of outdated weak reference")
   MR_dec_ref(d->arr_Refman);
   d->arr_Refman = sarr_Refman;
   MR_inc_ref(d->arr_Refman);
   d->arr = sarr;
+  ++MR_file_coverage[0].line_count[382];
   if (d == NULL) RAISE(382, 27, "used member of empty object")
   if (d_Refman->value == NULL) RAISE(382, 38, "used member of outdated weak reference")
   if (d->arr == NULL) RAISE(382, 29, "empty object used as sequence")
@@ -2702,10 +2996,12 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   s_Refman = d->arr_Refman;
   MR_inc_ref(s_Refman);
   s = ((String*)((d->arr)->values)) + 4;
+  ++MR_file_coverage[0].line_count[383];
   ad = &ad_Var;
   ad_Var.values = ad_Values;
   ad_Refman = MR_new_ref(ad);
   if (ad_Refman == NULL) RAISE(383, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[384];
   if (ad == NULL) RAISE(384, 29, "empty object used as sequence")
   if (ad_Refman->value == NULL) RAISE(384, 40, "outdated weak reference used as sequence")
   if ((2) < 0 || (2) >= (ad)->length) RAISE(384, 25, "slice index out of bounds")
@@ -2715,6 +3011,7 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   s_Refman = (((Data*)((ad)->values)) + 2)->item_Refman;
   MR_inc_ref(s_Refman);
   s = (((Data*)((ad)->values)) + 2)->item;
+  ++MR_file_coverage[0].line_count[385];
   if (ad == NULL) RAISE(385, 29, "empty object used as sequence")
   if (ad_Refman->value == NULL) RAISE(385, 40, "outdated weak reference used as sequence")
   if ((2) < 0 || (2) >= (ad)->length) RAISE(385, 25, "slice index out of bounds")
@@ -2727,9 +3024,11 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   s_Refman = (((Data*)((ad)->values)) + 2)->arr_Refman;
   MR_inc_ref(s_Refman);
   s = ((String*)(((((Data*)((ad)->values)) + 2)->arr)->values)) + 3;
+  ++MR_file_coverage[0].line_count[386];
   dr = &dr_Var;
   dr_Refman = MR_new_ref(dr);
   if (dr_Refman == NULL) RAISE(386, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[387];
   if (dr == NULL) RAISE(387, 27, "used member of empty object")
   if (dr_Refman->value == NULL) RAISE(387, 38, "used member of outdated weak reference")
   if (dr->item == NULL) RAISE(387, 27, "used member of empty object")
@@ -2740,22 +3039,30 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   s_Refman = ((Data*)(((Data*)(dr->item))->item))->item_Refman;
   MR_inc_ref(s_Refman);
   s = ((Data*)(((Data*)(dr->item))->item))->item;
+  ++MR_file_coverage[0].line_count[388];
   CHECK(388, Data_set(d, d_Refman, s, s_Refman, &String_dynamic, sarr, sarr_Refman) )
+  ++MR_file_coverage[0].line_count[389];
   CHECK(389, Data_get(d, d_Refman, (void*)&(s), &(s_Refman), &dynamic_Void) )
+  ++MR_file_coverage[0].line_count[390];
   dg = d;
   dg_Refman = d_Refman;
   MR_inc_ref(dg_Refman);
+  ++MR_file_coverage[0].line_count[391];
   TEST_ASSERT(391, dg != NULL && dg_Refman->value != NULL)
+  ++MR_file_coverage[0].line_count[393];
   t = &t_Var;
   t_Refman = MR_new_ref(t);
   if (t_Refman == NULL) RAISE(393, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[394];
   dt = &dt_Var;
   dt_Refman = MR_new_ref(dt);
   if (dt_Refman == NULL) RAISE(394, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[395];
   ts = &ts_Var;
   ts_Refman = MR_new_ref(ts);
   if (ts_Refman == NULL) RAISE(395, 38, "insufficient memory for managed object")
   CHECK(395, TestStruct_new(ts, ts_Refman, 0, NULL, NULL) )
+  ++MR_file_coverage[0].line_count[396];
   if (t == NULL) RAISE(396, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(396, 38, "used member of outdated weak reference")
   MR_dec_ref(t->_base._base._base.item_Refman);
@@ -2763,12 +3070,14 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_inc_ref(t->_base._base._base.item_Refman);
   t->_base._base._base.item_Dynamic = &String_dynamic;
   t->_base._base._base.item = s;
+  ++MR_file_coverage[0].line_count[397];
   if (t == NULL) RAISE(397, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(397, 38, "used member of outdated weak reference")
   MR_dec_ref(t->_base._base._base.arr_Refman);
   t->_base._base._base.arr_Refman = sarr_Refman;
   MR_inc_ref(t->_base._base._base.arr_Refman);
   t->_base._base._base.arr = sarr;
+  ++MR_file_coverage[0].line_count[398];
   if (t == NULL) RAISE(398, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(398, 38, "used member of outdated weak reference")
   MR_dec_ref(t->_base._base.second_Refman);
@@ -2776,6 +3085,7 @@ Returncode test_type_parameters(String* s, Ref_Manager* s_Refman) {
   MR_inc_ref(t->_base._base.second_Refman);
   t->_base._base.second_Dynamic = &Data_dynamic;
   t->_base._base.second = dt;
+  ++MR_file_coverage[0].line_count[399];
   if (t == NULL) RAISE(399, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(399, 38, "used member of outdated weak reference")
   MR_dec_ref(t->_base._base.third_Refman);
@@ -2806,10 +3116,12 @@ Returncode f_try_catch_raise(TestStruct* t, Ref_Manager* t_Refman) {
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   MR_inc_ref(t_Refman);
+  ++MR_file_coverage[0].line_count[403];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
+    ++MR_file_coverage[0].line_count[404];
     if (t == NULL) RAISE(404, 27, "used member of empty object")
     if (t_Refman->value == NULL) RAISE(404, 38, "used member of outdated weak reference")
     t->num = 1;
@@ -2818,8 +3130,10 @@ Returncode f_try_catch_raise(TestStruct* t, Ref_Manager* t_Refman) {
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
   } while (false);
   --MR_trace_ignore_count;
+  ++MR_file_coverage[0].line_count[405];
   if (MR_err != OK) {
     MR_err = OK;
+    ++MR_file_coverage[0].line_count[406];
     aux_String_0 = &aux_String_0_Var;
     aux_String_0_Refman = MR_new_ref(aux_String_0);
     if (aux_String_0_Refman == NULL) RAISE(406, 38, "insufficient memory for managed object")
@@ -2880,10 +3194,12 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
   String* aux_String_12 = NULL;
   Ref_Manager* aux_String_12_Refman = NULL;
   MR_inc_ref(t_Refman);
+  ++MR_file_coverage[0].line_count[409];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
+    ++MR_file_coverage[0].line_count[410];
     aux_String_0 = &aux_String_0_Var;
     aux_String_0_Refman = MR_new_ref(aux_String_0);
     if (aux_String_0_Refman == NULL) RAISE(410, 38, "insufficient memory for managed object")
@@ -2891,9 +3207,11 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
     aux_String_0_Var.length = 19;
     aux_String_0_Var.values = "error handling { 1 ";
     CHECK(410, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+    ++MR_file_coverage[0].line_count[411];
     if (t == NULL) RAISE(411, 27, "used member of empty object")
     if (t_Refman->value == NULL) RAISE(411, 38, "used member of outdated weak reference")
     t->num = 1;
+    ++MR_file_coverage[0].line_count[412];
     aux_String_1 = &aux_String_1_Var;
     aux_String_1_Refman = MR_new_ref(aux_String_1);
     if (aux_String_1_Refman == NULL) RAISE(412, 38, "insufficient memory for managed object")
@@ -2901,13 +3219,17 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
     aux_String_1_Var.length = 3;
     aux_String_1_Var.values = " X ";
     CHECK(412, Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
+    ++MR_file_coverage[0].line_count[413];
     do {
       ++MR_trace_ignore_count;
+      ++MR_file_coverage[0].line_count[414];
       CHECK(414, f_test_void() )
     } while (false);
     --MR_trace_ignore_count;
+    ++MR_file_coverage[0].line_count[415];
     if (MR_err != OK) {
       MR_err = OK;
+      ++MR_file_coverage[0].line_count[416];
       CHECK(416, f_test_int(2) )
     }
 
@@ -2915,8 +3237,10 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
   } while (false);
   --MR_trace_ignore_count;
+  ++MR_file_coverage[0].line_count[417];
   if (MR_err != OK) {
     MR_err = OK;
+    ++MR_file_coverage[0].line_count[418];
     aux_String_2 = &aux_String_2_Var;
     aux_String_2_Refman = MR_new_ref(aux_String_2);
     if (aux_String_2_Refman == NULL) RAISE(418, 38, "insufficient memory for managed object")
@@ -2924,10 +3248,12 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
     aux_String_2_Var.length = 2;
     aux_String_2_Var.values = "2 ";
     CHECK(418, Sys_print(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
+    ++MR_file_coverage[0].line_count[419];
     do {
       ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
+      ++MR_file_coverage[0].line_count[420];
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = MR_new_ref(aux_String_3);
       if (aux_String_3_Refman == NULL) RAISE(420, 38, "insufficient memory for managed object")
@@ -2935,9 +3261,11 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
       aux_String_3_Var.length = 2;
       aux_String_3_Var.values = "3 ";
       CHECK(420, Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman) )
+      ++MR_file_coverage[0].line_count[421];
       if (t == NULL) RAISE(421, 27, "used member of empty object")
       if (t_Refman->value == NULL) RAISE(421, 38, "used member of outdated weak reference")
       t->num = 2;
+      ++MR_file_coverage[0].line_count[422];
       aux_String_4 = &aux_String_4_Var;
       aux_String_4_Refman = MR_new_ref(aux_String_4);
       if (aux_String_4_Refman == NULL) RAISE(422, 38, "insufficient memory for managed object")
@@ -2951,6 +3279,7 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
     } while (false);
     --MR_trace_ignore_count;
     MR_err = OK;
+    ++MR_file_coverage[0].line_count[423];
     aux_String_5 = &aux_String_5_Var;
     aux_String_5_Refman = MR_new_ref(aux_String_5);
     if (aux_String_5_Refman == NULL) RAISE(423, 38, "insufficient memory for managed object")
@@ -2959,6 +3288,7 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
     aux_String_5_Var.values = "4 ";
     CHECK(423, Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
   }
+  ++MR_file_coverage[0].line_count[424];
   aux_String_6 = &aux_String_6_Var;
   aux_String_6_Refman = MR_new_ref(aux_String_6);
   if (aux_String_6_Refman == NULL) RAISE(424, 38, "insufficient memory for managed object")
@@ -2966,10 +3296,12 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
   aux_String_6_Var.length = 2;
   aux_String_6_Var.values = "5 ";
   CHECK(424, Sys_print(sys, sys_Refman, aux_String_6, aux_String_6_Refman) )
+  ++MR_file_coverage[0].line_count[425];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
+    ++MR_file_coverage[0].line_count[426];
     aux_String_7 = &aux_String_7_Var;
     aux_String_7_Refman = MR_new_ref(aux_String_7);
     if (aux_String_7_Refman == NULL) RAISE(426, 38, "insufficient memory for managed object")
@@ -2977,8 +3309,10 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
     aux_String_7_Var.length = 2;
     aux_String_7_Var.values = "6 ";
     CHECK(426, Sys_print(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
+    ++MR_file_coverage[0].line_count[427];
     do {
       ++MR_trace_ignore_count;
+      ++MR_file_coverage[0].line_count[428];
       aux_String_8 = &aux_String_8_Var;
       aux_String_8_Refman = MR_new_ref(aux_String_8);
       if (aux_String_8_Refman == NULL) RAISE(428, 38, "insufficient memory for managed object")
@@ -2986,7 +3320,9 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
       aux_String_8_Var.length = 2;
       aux_String_8_Var.values = "7 ";
       CHECK(428, Sys_print(sys, sys_Refman, aux_String_8, aux_String_8_Refman) )
+      ++MR_file_coverage[0].line_count[429];
       CHECK(429, f_try_catch_raise(t, t_Refman) )
+      ++MR_file_coverage[0].line_count[430];
       aux_String_9 = &aux_String_9_Var;
       aux_String_9_Refman = MR_new_ref(aux_String_9);
       if (aux_String_9_Refman == NULL) RAISE(430, 38, "insufficient memory for managed object")
@@ -2997,6 +3333,7 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
     } while (false);
     --MR_trace_ignore_count;
     MR_err = OK;
+    ++MR_file_coverage[0].line_count[431];
     aux_String_10 = &aux_String_10_Var;
     aux_String_10_Refman = MR_new_ref(aux_String_10);
     if (aux_String_10_Refman == NULL) RAISE(431, 38, "insufficient memory for managed object")
@@ -3004,6 +3341,7 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
     aux_String_10_Var.length = 2;
     aux_String_10_Var.values = "8 ";
     CHECK(431, Sys_print(sys, sys_Refman, aux_String_10, aux_String_10_Refman) )
+    ++MR_file_coverage[0].line_count[432];
     aux_String_11 = &aux_String_11_Var;
     aux_String_11_Refman = MR_new_ref(aux_String_11);
     if (aux_String_11_Refman == NULL) RAISE(432, 38, "insufficient memory for managed object")
@@ -3017,6 +3355,7 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
   } while (false);
   --MR_trace_ignore_count;
   MR_err = OK;
+  ++MR_file_coverage[0].line_count[433];
   aux_String_12 = &aux_String_12_Var;
   aux_String_12_Refman = MR_new_ref(aux_String_12);
   if (aux_String_12_Refman == NULL) RAISE(433, 38, "insufficient memory for managed object")
@@ -3170,10 +3509,12 @@ Returncode test_for_each(void) {
   String aux_String_25_Var = {0};
   String* aux_String_25 = NULL;
   Ref_Manager* aux_String_25_Refman = NULL;
+  ++MR_file_coverage[0].line_count[463];
   text = &text_Var;
   text_Var.values = text_Values;
   text_Refman = MR_new_ref(text);
   if (text_Refman == NULL) RAISE(463, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[464];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(464, 38, "insufficient memory for managed object")
@@ -3181,6 +3522,7 @@ Returncode test_for_each(void) {
   aux_String_0_Var.length = 7;
   aux_String_0_Var.values = "chars[ ";
   CHECK(464, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[0].line_count[465];
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(465, 38, "insufficient memory for managed object")
@@ -3196,9 +3538,13 @@ Returncode test_for_each(void) {
     if (aux_String_2_Refman->value == NULL) RAISE(465, 40, "outdated weak reference used as sequence")
     if ((c_Index) < 0 || (c_Index) >= (aux_String_2)->length) RAISE(465, 25, "slice index out of bounds")
     c = ((aux_String_2)->values)[c_Index];
+    ++MR_file_coverage[0].line_count[466];
     CHECK(466, String_clear(text, text_Refman) )
+    ++MR_file_coverage[0].line_count[467];
     CHECK(467, String_append(text, text_Refman, c) )
+    ++MR_file_coverage[0].line_count[468];
     CHECK(468, Sys_print(sys, sys_Refman, text, text_Refman) )
+    ++MR_file_coverage[0].line_count[469];
     aux_String_3 = &aux_String_3_Var;
     aux_String_3_Refman = MR_new_ref(aux_String_3);
     if (aux_String_3_Refman == NULL) RAISE(469, 38, "insufficient memory for managed object")
@@ -3211,6 +3557,7 @@ Returncode test_for_each(void) {
   aux_String_2_Refman = NULL;
   MR_inc_ref(aux_String_2_Refman);
   aux_String_2 = NULL;
+  ++MR_file_coverage[0].line_count[470];
   aux_String_4 = &aux_String_4_Var;
   aux_String_4_Refman = MR_new_ref(aux_String_4);
   if (aux_String_4_Refman == NULL) RAISE(470, 38, "insufficient memory for managed object")
@@ -3218,22 +3565,27 @@ Returncode test_for_each(void) {
   aux_String_4_Var.length = 1;
   aux_String_4_Var.values = "]";
   CHECK(470, Sys_Mock_println(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
+  ++MR_file_coverage[0].line_count[472];
   arr = &arr_Var;
   arr_Var.values = arr_Values;
   arr_Refman = MR_new_ref(arr);
   if (arr_Refman == NULL) RAISE(472, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[473];
   if (arr == NULL) RAISE(473, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(473, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(473, 25, "slice index out of bounds")
   ((Int*)((arr)->values))[0] = 14;
+  ++MR_file_coverage[0].line_count[474];
   if (arr == NULL) RAISE(474, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(474, 40, "outdated weak reference used as sequence")
   if ((1) < 0 || (1) >= (arr)->length) RAISE(474, 25, "slice index out of bounds")
   ((Int*)((arr)->values))[1] = 15;
+  ++MR_file_coverage[0].line_count[475];
   if (arr == NULL) RAISE(475, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(475, 40, "outdated weak reference used as sequence")
   if ((2) < 0 || (2) >= (arr)->length) RAISE(475, 25, "slice index out of bounds")
   ((Int*)((arr)->values))[2] = 16;
+  ++MR_file_coverage[0].line_count[476];
   aux_String_5 = &aux_String_5_Var;
   aux_String_5_Refman = MR_new_ref(aux_String_5);
   if (aux_String_5_Refman == NULL) RAISE(476, 38, "insufficient memory for managed object")
@@ -3241,6 +3593,7 @@ Returncode test_for_each(void) {
   aux_String_5_Var.length = 9;
   aux_String_5_Var.values = "numbers[ ";
   CHECK(476, Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman) )
+  ++MR_file_coverage[0].line_count[477];
   MR_dec_ref(aux_Array_0_Refman);
   aux_Array_0_Refman = arr_Refman;
   MR_inc_ref(aux_Array_0_Refman);
@@ -3250,9 +3603,13 @@ Returncode test_for_each(void) {
     if (aux_Array_0_Refman->value == NULL) RAISE(477, 40, "outdated weak reference used as sequence")
     if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(477, 25, "slice index out of bounds")
     n = ((Int*)((aux_Array_0)->values))[n_Index];
+    ++MR_file_coverage[0].line_count[478];
     CHECK(478, String_clear(text, text_Refman) )
+    ++MR_file_coverage[0].line_count[479];
     CHECK(479, Int_str(n, text, text_Refman) )
+    ++MR_file_coverage[0].line_count[480];
     CHECK(480, Sys_print(sys, sys_Refman, text, text_Refman) )
+    ++MR_file_coverage[0].line_count[481];
     aux_String_6 = &aux_String_6_Var;
     aux_String_6_Refman = MR_new_ref(aux_String_6);
     if (aux_String_6_Refman == NULL) RAISE(481, 38, "insufficient memory for managed object")
@@ -3265,6 +3622,7 @@ Returncode test_for_each(void) {
   aux_Array_0_Refman = NULL;
   MR_inc_ref(aux_Array_0_Refman);
   aux_Array_0 = NULL;
+  ++MR_file_coverage[0].line_count[482];
   aux_String_7 = &aux_String_7_Var;
   aux_String_7_Refman = MR_new_ref(aux_String_7);
   if (aux_String_7_Refman == NULL) RAISE(482, 38, "insufficient memory for managed object")
@@ -3272,10 +3630,12 @@ Returncode test_for_each(void) {
   aux_String_7_Var.length = 1;
   aux_String_7_Var.values = "]";
   CHECK(482, Sys_Mock_println(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
+  ++MR_file_coverage[0].line_count[484];
   tsarr = &tsarr_Var;
   tsarr_Var.values = tsarr_Values;
   tsarr_Refman = MR_new_ref(tsarr);
   if (tsarr_Refman == NULL) RAISE(484, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[485];
   aux_String_8 = &aux_String_8_Var;
   aux_String_8_Refman = MR_new_ref(aux_String_8);
   if (aux_String_8_Refman == NULL) RAISE(485, 38, "insufficient memory for managed object")
@@ -3291,6 +3651,7 @@ Returncode test_for_each(void) {
   (((TestStruct*)((tsarr)->values)) + 0)->text_Refman = aux_String_8_Refman;
   MR_inc_ref((((TestStruct*)((tsarr)->values)) + 0)->text_Refman);
   (((TestStruct*)((tsarr)->values)) + 0)->text = aux_String_8;
+  ++MR_file_coverage[0].line_count[486];
   aux_String_9 = &aux_String_9_Var;
   aux_String_9_Refman = MR_new_ref(aux_String_9);
   if (aux_String_9_Refman == NULL) RAISE(486, 38, "insufficient memory for managed object")
@@ -3306,6 +3667,7 @@ Returncode test_for_each(void) {
   (((TestStruct*)((tsarr)->values)) + 1)->text_Refman = aux_String_9_Refman;
   MR_inc_ref((((TestStruct*)((tsarr)->values)) + 1)->text_Refman);
   (((TestStruct*)((tsarr)->values)) + 1)->text = aux_String_9;
+  ++MR_file_coverage[0].line_count[487];
   aux_String_10 = &aux_String_10_Var;
   aux_String_10_Refman = MR_new_ref(aux_String_10);
   if (aux_String_10_Refman == NULL) RAISE(487, 38, "insufficient memory for managed object")
@@ -3321,6 +3683,7 @@ Returncode test_for_each(void) {
   (((TestStruct*)((tsarr)->values)) + 2)->text_Refman = aux_String_10_Refman;
   MR_inc_ref((((TestStruct*)((tsarr)->values)) + 2)->text_Refman);
   (((TestStruct*)((tsarr)->values)) + 2)->text = aux_String_10;
+  ++MR_file_coverage[0].line_count[488];
   aux_String_11 = &aux_String_11_Var;
   aux_String_11_Refman = MR_new_ref(aux_String_11);
   if (aux_String_11_Refman == NULL) RAISE(488, 38, "insufficient memory for managed object")
@@ -3328,6 +3691,7 @@ Returncode test_for_each(void) {
   aux_String_11_Var.length = 9;
   aux_String_11_Var.values = "structs[ ";
   CHECK(488, Sys_print(sys, sys_Refman, aux_String_11, aux_String_11_Refman) )
+  ++MR_file_coverage[0].line_count[489];
   MR_dec_ref(aux_Array_1_Refman);
   aux_Array_1_Refman = tsarr_Refman;
   MR_inc_ref(aux_Array_1_Refman);
@@ -3340,9 +3704,11 @@ Returncode test_for_each(void) {
     ts_Refman = aux_Array_1_Refman;
     MR_inc_ref(ts_Refman);
     ts = ((TestStruct*)((aux_Array_1)->values)) + ts_Index;
+    ++MR_file_coverage[0].line_count[490];
     if (ts == NULL) RAISE(490, 27, "used member of empty object")
     if (ts_Refman->value == NULL) RAISE(490, 38, "used member of outdated weak reference")
     CHECK(490, Sys_print(sys, sys_Refman, ts->text, ts->text_Refman) )
+    ++MR_file_coverage[0].line_count[491];
     aux_String_12 = &aux_String_12_Var;
     aux_String_12_Refman = MR_new_ref(aux_String_12);
     if (aux_String_12_Refman == NULL) RAISE(491, 38, "insufficient memory for managed object")
@@ -3355,6 +3721,7 @@ Returncode test_for_each(void) {
   aux_Array_1_Refman = NULL;
   MR_inc_ref(aux_Array_1_Refman);
   aux_Array_1 = NULL;
+  ++MR_file_coverage[0].line_count[492];
   aux_String_13 = &aux_String_13_Var;
   aux_String_13_Refman = MR_new_ref(aux_String_13);
   if (aux_String_13_Refman == NULL) RAISE(492, 38, "insufficient memory for managed object")
@@ -3362,11 +3729,13 @@ Returncode test_for_each(void) {
   aux_String_13_Var.length = 1;
   aux_String_13_Var.values = "]";
   CHECK(492, Sys_Mock_println(sys, sys_Refman, aux_String_13, aux_String_13_Refman) )
+  ++MR_file_coverage[0].line_count[494];
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   MR_set_var_string_array(3, 16, sarr, sarr_Chars);
   sarr_Refman = MR_new_ref(sarr);
   if (sarr_Refman == NULL) RAISE(494, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[495];
   if (sarr == NULL) RAISE(495, 29, "empty object used as sequence")
   if (sarr_Refman->value == NULL) RAISE(495, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (sarr)->length) RAISE(495, 25, "slice index out of bounds")
@@ -3377,6 +3746,7 @@ Returncode test_for_each(void) {
   aux_String_14_Var.length = 3;
   aux_String_14_Var.values = "ddd";
   CHECK(495, String_new(((String*)((sarr)->values)) + 0, sarr_Refman, aux_String_14, aux_String_14_Refman) )
+  ++MR_file_coverage[0].line_count[496];
   if (sarr == NULL) RAISE(496, 29, "empty object used as sequence")
   if (sarr_Refman->value == NULL) RAISE(496, 40, "outdated weak reference used as sequence")
   if ((1) < 0 || (1) >= (sarr)->length) RAISE(496, 25, "slice index out of bounds")
@@ -3387,6 +3757,7 @@ Returncode test_for_each(void) {
   aux_String_15_Var.length = 3;
   aux_String_15_Var.values = "eee";
   CHECK(496, String_new(((String*)((sarr)->values)) + 1, sarr_Refman, aux_String_15, aux_String_15_Refman) )
+  ++MR_file_coverage[0].line_count[497];
   if (sarr == NULL) RAISE(497, 29, "empty object used as sequence")
   if (sarr_Refman->value == NULL) RAISE(497, 40, "outdated weak reference used as sequence")
   if ((2) < 0 || (2) >= (sarr)->length) RAISE(497, 25, "slice index out of bounds")
@@ -3397,6 +3768,7 @@ Returncode test_for_each(void) {
   aux_String_16_Var.length = 3;
   aux_String_16_Var.values = "fff";
   CHECK(497, String_new(((String*)((sarr)->values)) + 2, sarr_Refman, aux_String_16, aux_String_16_Refman) )
+  ++MR_file_coverage[0].line_count[498];
   aux_String_17 = &aux_String_17_Var;
   aux_String_17_Refman = MR_new_ref(aux_String_17);
   if (aux_String_17_Refman == NULL) RAISE(498, 38, "insufficient memory for managed object")
@@ -3404,6 +3776,7 @@ Returncode test_for_each(void) {
   aux_String_17_Var.length = 9;
   aux_String_17_Var.values = "strings[ ";
   CHECK(498, Sys_print(sys, sys_Refman, aux_String_17, aux_String_17_Refman) )
+  ++MR_file_coverage[0].line_count[499];
   MR_dec_ref(aux_Array_2_Refman);
   aux_Array_2_Refman = sarr_Refman;
   MR_inc_ref(aux_Array_2_Refman);
@@ -3416,7 +3789,9 @@ Returncode test_for_each(void) {
     s_Refman = aux_Array_2_Refman;
     MR_inc_ref(s_Refman);
     s = ((String*)((aux_Array_2)->values)) + s_Index;
+    ++MR_file_coverage[0].line_count[500];
     CHECK(500, Sys_print(sys, sys_Refman, s, s_Refman) )
+    ++MR_file_coverage[0].line_count[501];
     aux_String_18 = &aux_String_18_Var;
     aux_String_18_Refman = MR_new_ref(aux_String_18);
     if (aux_String_18_Refman == NULL) RAISE(501, 38, "insufficient memory for managed object")
@@ -3429,6 +3804,7 @@ Returncode test_for_each(void) {
   aux_Array_2_Refman = NULL;
   MR_inc_ref(aux_Array_2_Refman);
   aux_Array_2 = NULL;
+  ++MR_file_coverage[0].line_count[502];
   aux_String_19 = &aux_String_19_Var;
   aux_String_19_Refman = MR_new_ref(aux_String_19);
   if (aux_String_19_Refman == NULL) RAISE(502, 38, "insufficient memory for managed object")
@@ -3436,6 +3812,7 @@ Returncode test_for_each(void) {
   aux_String_19_Var.length = 1;
   aux_String_19_Var.values = "]";
   CHECK(502, Sys_Mock_println(sys, sys_Refman, aux_String_19, aux_String_19_Refman) )
+  ++MR_file_coverage[0].line_count[504];
   aux_String_20 = &aux_String_20_Var;
   aux_String_20_Refman = MR_new_ref(aux_String_20);
   if (aux_String_20_Refman == NULL) RAISE(504, 38, "insufficient memory for managed object")
@@ -3446,6 +3823,7 @@ Returncode test_for_each(void) {
   container_last_Refman = MR_new_ref(container_last);
   if (container_last_Refman == NULL) RAISE(504, 38, "insufficient memory for managed object")
   CHECK(504, Container_new(container_last, container_last_Refman, aux_String_20, aux_String_20_Refman, &String_dynamic, NULL, NULL) )
+  ++MR_file_coverage[0].line_count[505];
   aux_String_21 = &aux_String_21_Var;
   aux_String_21_Refman = MR_new_ref(aux_String_21);
   if (aux_String_21_Refman == NULL) RAISE(505, 38, "insufficient memory for managed object")
@@ -3456,6 +3834,7 @@ Returncode test_for_each(void) {
   container_mid_Refman = MR_new_ref(container_mid);
   if (container_mid_Refman == NULL) RAISE(505, 38, "insufficient memory for managed object")
   CHECK(505, Container_new(container_mid, container_mid_Refman, aux_String_21, aux_String_21_Refman, &String_dynamic, container_last, container_last_Refman) )
+  ++MR_file_coverage[0].line_count[506];
   aux_String_22 = &aux_String_22_Var;
   aux_String_22_Refman = MR_new_ref(aux_String_22);
   if (aux_String_22_Refman == NULL) RAISE(506, 38, "insufficient memory for managed object")
@@ -3466,11 +3845,15 @@ Returncode test_for_each(void) {
   container_first_Refman = MR_new_ref(container_first);
   if (container_first_Refman == NULL) RAISE(506, 38, "insufficient memory for managed object")
   CHECK(506, Container_new(container_first, container_first_Refman, aux_String_22, aux_String_22_Refman, &String_dynamic, container_mid, container_mid_Refman) )
+  ++MR_file_coverage[0].line_count[507];
   container = &container_Var;
   container_Refman = MR_new_ref(container);
   if (container_Refman == NULL) RAISE(507, 38, "insufficient memory for managed object")
   CHECK(507, Container_new(container, container_Refman, NULL, NULL, NULL, container_first, container_first_Refman) )
+  ++MR_file_coverage[0].line_count[508];
+  ++MR_file_coverage[0].line_count[509];
   CHECK(509, Container_iter(container, container_Refman, &(iter), &(iter_Refman)) )
+  ++MR_file_coverage[0].line_count[510];
   aux_String_23 = &aux_String_23_Var;
   aux_String_23_Refman = MR_new_ref(aux_String_23);
   if (aux_String_23_Refman == NULL) RAISE(510, 38, "insufficient memory for managed object")
@@ -3478,6 +3861,7 @@ Returncode test_for_each(void) {
   aux_String_23_Var.length = 8;
   aux_String_23_Var.values = "values[ ";
   CHECK(510, Sys_print(sys, sys_Refman, aux_String_23, aux_String_23_Refman) )
+  ++MR_file_coverage[0].line_count[511];
   MR_dec_ref(aux_ContainerIterator_0_Refman);
   aux_ContainerIterator_0_Refman = iter_Refman;
   MR_inc_ref(aux_ContainerIterator_0_Refman);
@@ -3487,7 +3871,9 @@ Returncode test_for_each(void) {
     CHECK(511, ContainerIterator_has(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, &(s_Has)) )
     if (!s_Has) break;
     CHECK(511, ContainerIterator_get(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, (void*)&(s), &(s_Refman), &dynamic_Void) )
+    ++MR_file_coverage[0].line_count[512];
     CHECK(512, Sys_print(sys, sys_Refman, s, s_Refman) )
+    ++MR_file_coverage[0].line_count[513];
     aux_String_24 = &aux_String_24_Var;
     aux_String_24_Refman = MR_new_ref(aux_String_24);
     if (aux_String_24_Refman == NULL) RAISE(513, 38, "insufficient memory for managed object")
@@ -3501,6 +3887,7 @@ Returncode test_for_each(void) {
   aux_ContainerIterator_0_Refman = NULL;
   MR_inc_ref(aux_ContainerIterator_0_Refman);
   aux_ContainerIterator_0 = NULL;
+  ++MR_file_coverage[0].line_count[514];
   aux_String_25 = &aux_String_25_Var;
   aux_String_25_Refman = MR_new_ref(aux_String_25);
   if (aux_String_25_Refman == NULL) RAISE(514, 38, "insufficient memory for managed object")
@@ -3569,9 +3956,11 @@ Returncode test_complex_field(void) {
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  ++MR_file_coverage[0].line_count[537];
   y = &y_Var;
   y_Refman = MR_new_ref(y);
   if (y_Refman == NULL) RAISE(537, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[0].line_count[538];
   if (y == NULL) RAISE(538, 27, "used member of empty object")
   if (y_Refman->value == NULL) RAISE(538, 38, "used member of outdated weak reference")
   if (y == NULL) RAISE(538, 27, "used member of empty object")
@@ -3581,6 +3970,7 @@ Returncode test_complex_field(void) {
   MR_inc_ref(y->x.x_Refman);
   y->x.x_Dynamic = &ComplexField_dynamic;
   y->x.x = &(y->x);
+  ++MR_file_coverage[0].line_count[539];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(539, 38, "insufficient memory for managed object")
@@ -3588,7 +3978,9 @@ Returncode test_complex_field(void) {
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "complex fields: ";
   CHECK(539, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[0].line_count[540];
   CHECK(540, HasComplexField_run(y, y_Refman) )
+  ++MR_file_coverage[0].line_count[541];
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(541, 38, "insufficient memory for managed object")
@@ -3612,11 +4004,13 @@ Returncode test_mid_out(MiddleType** mt, Ref_Manager** mt_Refman, MiddleType_Dyn
   MiddleType* new_mt = NULL;
   Ref_Manager* new_mt_Refman = NULL;
   MiddleType_Dynamic* new_mt_Dynamic = &MiddleType_dynamic;
+  ++MR_file_coverage[1].line_count[65];
   new_mt = MR_alloc(sizeof(MiddleType));
   if (new_mt == NULL) RAISE(65, 49, "insufficient memory for object dynamic allocation")
   new_mt_Refman = MR_new_ref(new_mt);
   if (new_mt_Refman == NULL) RAISE(65, 38, "insufficient memory for managed object")
   CHECK(65, MiddleType_new(new_mt, new_mt_Refman, new_mt_Dynamic) )
+  ++MR_file_coverage[1].line_count[66];
   MR_dec_ref(*mt_Refman);
   *mt_Refman = new_mt_Refman;
   MR_inc_ref(*mt_Refman);
@@ -3637,7 +4031,9 @@ Returncode TestStruct_Mock_get(TestStruct* self, Ref_Manager* self_Refman, Int* 
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[70];
   *x = 12;
+  ++MR_file_coverage[1].line_count[71];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(71, 38, "insufficient memory for managed object")
@@ -3659,6 +4055,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "Mock f-test-int2str"
 Returncode Mock_f_test_int2str(Int x, String** s, Ref_Manager** s_Refman) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[75];
   USER_RAISE(75, NULL, NULL)
 MR_cleanup:
   return MR_err;
@@ -3678,12 +4075,17 @@ Returncode test_func(void) {
   Ref_Manager* aux_String_0_Refman = NULL;
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  ++MR_file_coverage[1].line_count[79];
   t = &t_Var;
   t_Refman = MR_new_ref(t);
   if (t_Refman == NULL) RAISE(79, 38, "insufficient memory for managed object")
   CHECK(79, TestStruct_new(t, t_Refman, 0, NULL, NULL) )
+  ++MR_file_coverage[1].line_count[80];
+  ++MR_file_coverage[1].line_count[81];
   CHECK(81, TestStruct_Mock_get(t, t_Refman, &(x), &(aux_String_0), &(aux_String_0_Refman)) )
+  ++MR_file_coverage[1].line_count[82];
   TEST_ASSERT(82, x == 12)
+  ++MR_file_coverage[1].line_count[83];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
@@ -3711,6 +4113,8 @@ MR_cleanup:
 Returncode test_another(void) {
   Returncode MR_err = OK;
   Int x = 0;
+  ++MR_file_coverage[1].line_count[87];
+  ++MR_file_coverage[1].line_count[88];
   TEST_ASSERT(88, x == 0)
 MR_cleanup:
   return MR_err;
@@ -3732,7 +4136,11 @@ Returncode test_native(void) {
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  ++MR_file_coverage[1].line_count[98];
   TEST_ASSERT(98, external_int == 6)
+  ++MR_file_coverage[1].line_count[99];
+  ++MR_file_coverage[1].line_count[100];
+  ++MR_file_coverage[1].line_count[101];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(101, 38, "insufficient memory for managed object")
@@ -3744,6 +4152,7 @@ Returncode test_native(void) {
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(101, 38, "insufficient memory for managed object")
   CHECK(101, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[1].line_count[102];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
@@ -3756,11 +4165,14 @@ Returncode test_native(void) {
     TEST_FAIL(102, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
+  ++MR_file_coverage[1].line_count[103];
   TEST_ASSERT(103, i == 3)
+  ++MR_file_coverage[1].line_count[104];
   if (s == NULL) RAISE(104, 29, "empty object used as sequence")
   if (s_Refman->value == NULL) RAISE(104, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (s)->length) RAISE(104, 25, "slice index out of bounds")
   TEST_ASSERT(104, (((s)->values)[0]) == 'a')
+  ++MR_file_coverage[1].line_count[105];
   CHECK(105, external2(n, &(aux_Bool_0)) )
   TEST_ASSERT(105, aux_Bool_0)
 MR_cleanup:
@@ -3785,16 +4197,20 @@ Returncode test_dynamic_type_parameters(void) {
   BaseType* tbase = NULL;
   Ref_Manager* tbase_Refman = NULL;
   BaseType_Dynamic* tbase_Dynamic = NULL;
+  ++MR_file_coverage[1].line_count[109];
   dmid = &dmid_Var;
   dmid_Refman = MR_new_ref(dmid);
   if (dmid_Refman == NULL) RAISE(109, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[110];
   ttop = &ttop_Var;
   ttop_Refman = MR_new_ref(ttop);
   if (ttop_Refman == NULL) RAISE(110, 38, "insufficient memory for managed object")
   CHECK(110, TopType_new(ttop, ttop_Refman, ttop_Dynamic) )
+  ++MR_file_coverage[1].line_count[111];
   if (ttop == NULL) RAISE(111, 27, "used member of empty object")
   if (ttop_Refman->value == NULL) RAISE(111, 38, "used member of outdated weak reference")
   ttop->_base._base.num_base = 12;
+  ++MR_file_coverage[1].line_count[112];
   if (dmid == NULL) RAISE(112, 27, "used member of empty object")
   if (dmid_Refman->value == NULL) RAISE(112, 38, "used member of outdated weak reference")
   MR_dec_ref(dmid->item_Refman);
@@ -3802,6 +4218,8 @@ Returncode test_dynamic_type_parameters(void) {
   MR_inc_ref(dmid->item_Refman);
   dmid->item_Dynamic = (Generic_Type_Dynamic*)&(ttop_Dynamic->_base);
   dmid->item = &(ttop->_base);
+  ++MR_file_coverage[1].line_count[113];
+  ++MR_file_coverage[1].line_count[114];
   if (dmid == NULL) RAISE(114, 27, "used member of empty object")
   if (dmid_Refman->value == NULL) RAISE(114, 38, "used member of outdated weak reference")
   MR_dec_ref(tbase_Refman);
@@ -3809,20 +4227,26 @@ Returncode test_dynamic_type_parameters(void) {
   MR_inc_ref(tbase_Refman);
   tbase_Dynamic = &(((MiddleType_Dynamic*)(dmid->item_Dynamic))->_base);
   tbase = &(((MiddleType*)(dmid->item))->_base);
+  ++MR_file_coverage[1].line_count[115];
   if (tbase == NULL) RAISE(115, 27, "used member of empty object")
   if (tbase_Refman->value == NULL) RAISE(115, 38, "used member of outdated weak reference")
   TEST_ASSERT(115, tbase->num_base == 12)
+  ++MR_file_coverage[1].line_count[116];
   if (ttop == NULL) RAISE(116, 27, "used member of empty object")
   if (ttop_Refman->value == NULL) RAISE(116, 38, "used member of outdated weak reference")
   ttop->_base._base.num_base = 13;
+  ++MR_file_coverage[1].line_count[117];
   CHECK(117, Data_set(dmid, dmid_Refman, &(ttop->_base), ttop_Refman, (void*)&(ttop_Dynamic->_base), NULL, NULL) )
+  ++MR_file_coverage[1].line_count[118];
   MR_dec_ref(tbase_Refman);
   tbase_Refman = NULL;
   MR_inc_ref(tbase_Refman);
   tbase_Dynamic = NULL;
   tbase = NULL;
+  ++MR_file_coverage[1].line_count[119];
   if (tbase != NULL) RAISE(119, 45, "non empty base class given as output argument")
   CHECK(119, Data_get(dmid, dmid_Refman, (void*)&(tbase), &(tbase_Refman), (void*)&(tbase_Dynamic)) )
+  ++MR_file_coverage[1].line_count[120];
   if (tbase == NULL) RAISE(120, 27, "used member of empty object")
   if (tbase_Refman->value == NULL) RAISE(120, 38, "used member of outdated weak reference")
   TEST_ASSERT(120, tbase->num_base == 13)
@@ -3841,7 +4265,9 @@ Returncode Mock_delete(Ref self) {
   Returncode MR_err = OK;
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[151];
   if (record_delete) {
+    ++MR_file_coverage[1].line_count[152];
     aux_RefNode_0 = MR_alloc(sizeof(RefNode));
     if (aux_RefNode_0 == NULL) RAISE(152, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
@@ -3870,7 +4296,9 @@ Returncode Link_MockDel(Ref self) {
   Returncode MR_err = OK;
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[155];
   if (record_delete) {
+    ++MR_file_coverage[1].line_count[156];
     aux_RefNode_0 = MR_alloc(sizeof(RefNode));
     if (aux_RefNode_0 == NULL) RAISE(156, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
@@ -3899,7 +4327,9 @@ Returncode BaseLink_MockDel(Ref self) {
   Returncode MR_err = OK;
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[159];
   if (record_delete) {
+    ++MR_file_coverage[1].line_count[160];
     aux_RefNode_0 = MR_alloc(sizeof(RefNode));
     if (aux_RefNode_0 == NULL) RAISE(160, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
@@ -3928,7 +4358,9 @@ Returncode TopLink_MockDel(Ref self) {
   Returncode MR_err = OK;
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[163];
   if (record_delete) {
+    ++MR_file_coverage[1].line_count[164];
     aux_RefNode_0 = MR_alloc(sizeof(RefNode));
     if (aux_RefNode_0 == NULL) RAISE(164, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
@@ -3972,48 +4404,70 @@ Returncode test_simple_delete(void) {
   Link* l_user = NULL;
   Ref_Manager* l_user_Refman = NULL;
   Ref l_ref = NULL;
+  ++MR_file_coverage[1].line_count[170];
   TEST_ASSERT(170, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[171];
   TEST_ASSERT(171, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[172];
   record_delete = true;
+  ++MR_file_coverage[1].line_count[174];
   l = MR_alloc(sizeof(Link));
   if (l == NULL) RAISE(174, 49, "insufficient memory for object dynamic allocation")
   l_Refman = MR_new_ref(l);
   if (l_Refman == NULL) RAISE(174, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[175];
   l_user = l;
   l_user_Refman = l_Refman;
   MR_inc_ref(l_user_Refman);
+  ++MR_file_coverage[1].line_count[176];
   TEST_ASSERT(176, l != NULL && l_Refman->value != NULL)
+  ++MR_file_coverage[1].line_count[177];
   TEST_ASSERT(177, l_user != NULL && l_user_Refman->value != NULL)
+  ++MR_file_coverage[1].line_count[178];
   l_ref = l;
+  ++MR_file_coverage[1].line_count[179];
   CHECK(179, f_remove_obj(l, l_Refman) )
   l = NULL;
   l_Refman = NULL;
+  ++MR_file_coverage[1].line_count[180];
   TEST_ASSERT(180, ! (l != NULL && l_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[181];
   TEST_ASSERT(181, ! (l_user != NULL && l_user_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[182];
   TEST_ASSERT(182, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[183];
   TEST_ASSERT(183, deleted_links != NULL && deleted_links_Refman->value != NULL)
+  ++MR_file_coverage[1].line_count[184];
   if (deleted_links == NULL) RAISE(184, 27, "used member of empty object")
   if (deleted_links_Refman->value == NULL) RAISE(184, 38, "used member of outdated weak reference")
   TEST_ASSERT(184, deleted_links->ref == l_ref)
+  ++MR_file_coverage[1].line_count[185];
   if (deleted_links == NULL) RAISE(185, 27, "used member of empty object")
   if (deleted_links_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
   TEST_ASSERT(185, ! (deleted_links->next != NULL && deleted_links->next_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[186];
   MR_dec_ref(l_user_Refman);
   l_user_Refman = NULL;
   MR_inc_ref(l_user_Refman);
   l_user = NULL;
+  ++MR_file_coverage[1].line_count[187];
   TEST_ASSERT(187, deleted_refmans != NULL && deleted_refmans_Refman->value != NULL)
+  ++MR_file_coverage[1].line_count[188];
   if (deleted_refmans == NULL) RAISE(188, 27, "used member of empty object")
   if (deleted_refmans_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
   TEST_ASSERT(188, deleted_refmans->ref == l_ref)
+  ++MR_file_coverage[1].line_count[189];
   if (deleted_refmans == NULL) RAISE(189, 27, "used member of empty object")
   if (deleted_refmans_Refman->value == NULL) RAISE(189, 38, "used member of outdated weak reference")
   TEST_ASSERT(189, ! (deleted_refmans->next != NULL && deleted_refmans->next_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[191];
   record_delete = false;
+  ++MR_file_coverage[1].line_count[192];
   RefNode_Del(deleted_refmans);
   MR_owner_dec_ref(deleted_refmans_Refman);
   deleted_refmans_Refman = NULL;
   deleted_refmans = NULL;
+  ++MR_file_coverage[1].line_count[193];
   RefNode_Del(deleted_links);
   MR_owner_dec_ref(deleted_links_Refman);
   deleted_links_Refman = NULL;
@@ -4031,7 +4485,9 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-has-ref"
 Returncode f_has_ref(Ref ref, RefNode** node, Ref_Manager** node_Refman) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[196];
   CHECK(196, f_has_ref_rec(ref, &(*node), &(*node_Refman)) )
+  ++MR_file_coverage[1].line_count[197];
   CHECK(197, f_has_ref_rec(ref, &(deleted_refmans), &(deleted_refmans_Refman)) )
 MR_cleanup:
   return MR_err;
@@ -4045,16 +4501,20 @@ Returncode f_has_ref_rec(Ref ref, RefNode** node, Ref_Manager** node_Refman) {
   Returncode MR_err = OK;
   RefNode* next = NULL;
   Ref_Manager* next_Refman = NULL;
+  ++MR_file_coverage[1].line_count[200];
   TEST_ASSERT(200, (*node) != NULL && (*node_Refman)->value != NULL)
+  ++MR_file_coverage[1].line_count[201];
   if (*node == NULL) RAISE(201, 27, "used member of empty object")
   if ((*node_Refman)->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
   if ((*node)->ref == ref) {
+    ++MR_file_coverage[1].line_count[202];
     if (*node == NULL) RAISE(202, 27, "used member of empty object")
     if ((*node_Refman)->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
     next = (*node)->next;
     next_Refman = (*node)->next_Refman;
     (*node)->next = NULL;
     (*node)->next_Refman = NULL;
+    ++MR_file_coverage[1].line_count[203];
     RefNode_Del(*node);
     MR_owner_dec_ref(*node_Refman);
     *node_Refman = next_Refman;
@@ -4063,6 +4523,7 @@ Returncode f_has_ref_rec(Ref ref, RefNode** node, Ref_Manager** node_Refman) {
     next_Refman = NULL;
   }
   else {
+    ++MR_file_coverage[1].line_count[205];
     if (*node == NULL) RAISE(205, 27, "used member of empty object")
     if ((*node_Refman)->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
     CHECK(205, f_has_ref_rec(ref, &((*node)->next), &((*node)->next_Refman)) )
@@ -4108,81 +4569,108 @@ Returncode test_complex_delete(void) {
   Link* l3 = NULL;
   Ref_Manager* l3_Refman = NULL;
   Ref l3_ref = NULL;
+  ++MR_file_coverage[1].line_count[208];
   TEST_ASSERT(208, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[209];
   TEST_ASSERT(209, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[210];
   TEST_ASSERT(210, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[211];
   TEST_ASSERT(211, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[212];
   record_delete = true;
+  ++MR_file_coverage[1].line_count[214];
   b1 = MR_alloc(sizeof(BaseLink));
   if (b1 == NULL) RAISE(214, 49, "insufficient memory for object dynamic allocation")
   b1_Refman = MR_new_ref(b1);
   if (b1_Refman == NULL) RAISE(214, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[215];
   b1_ref = b1;
+  ++MR_file_coverage[1].line_count[216];
   b2 = MR_alloc(sizeof(BaseLink));
   if (b2 == NULL) RAISE(216, 49, "insufficient memory for object dynamic allocation")
   b2_Refman = MR_new_ref(b2);
   if (b2_Refman == NULL) RAISE(216, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[217];
   b2_ref = b2;
+  ++MR_file_coverage[1].line_count[218];
   t1 = MR_alloc(sizeof(TopLink));
   if (t1 == NULL) RAISE(218, 49, "insufficient memory for object dynamic allocation")
   t1_Refman = MR_new_ref(t1);
   if (t1_Refman == NULL) RAISE(218, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[219];
   t1_ref = t1;
+  ++MR_file_coverage[1].line_count[220];
   t2 = MR_alloc(sizeof(TopLink));
   if (t2 == NULL) RAISE(220, 49, "insufficient memory for object dynamic allocation")
   t2_Refman = MR_new_ref(t2);
   if (t2_Refman == NULL) RAISE(220, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[221];
   t2_ref = t2;
+  ++MR_file_coverage[1].line_count[222];
   t3 = MR_alloc(sizeof(TopLink));
   if (t3 == NULL) RAISE(222, 49, "insufficient memory for object dynamic allocation")
   t3_Refman = MR_new_ref(t3);
   if (t3_Refman == NULL) RAISE(222, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[223];
   t3_ref = t3;
+  ++MR_file_coverage[1].line_count[224];
   l1 = MR_alloc(sizeof(Link));
   if (l1 == NULL) RAISE(224, 49, "insufficient memory for object dynamic allocation")
   l1_Refman = MR_new_ref(l1);
   if (l1_Refman == NULL) RAISE(224, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[225];
   l1_ref = l1;
+  ++MR_file_coverage[1].line_count[226];
   l2 = MR_alloc(sizeof(Link));
   if (l2 == NULL) RAISE(226, 49, "insufficient memory for object dynamic allocation")
   l2_Refman = MR_new_ref(l2);
   if (l2_Refman == NULL) RAISE(226, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[227];
   l2_ref = l2;
+  ++MR_file_coverage[1].line_count[228];
   l3 = MR_alloc(sizeof(Link));
   if (l3 == NULL) RAISE(228, 49, "insufficient memory for object dynamic allocation")
   l3_Refman = MR_new_ref(l3);
   if (l3_Refman == NULL) RAISE(228, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[229];
   l3_ref = l3;
+  ++MR_file_coverage[1].line_count[231];
   if (b1 == NULL) RAISE(231, 27, "used member of empty object")
   if (b1_Refman->value == NULL) RAISE(231, 38, "used member of outdated weak reference")
   MR_dec_ref(b1->link_Refman);
   b1->link_Refman = l1_Refman;
   MR_inc_ref(b1->link_Refman);
   b1->link = l1;
+  ++MR_file_coverage[1].line_count[232];
   if (b2 == NULL) RAISE(232, 27, "used member of empty object")
   if (b2_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
   MR_dec_ref(b2->link_Refman);
   b2->link_Refman = l2_Refman;
   MR_inc_ref(b2->link_Refman);
   b2->link = l2;
+  ++MR_file_coverage[1].line_count[233];
   if (t1 == NULL) RAISE(233, 27, "used member of empty object")
   if (t1_Refman->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
   MR_dec_ref(t1->_base.link_Refman);
   t1->_base.link_Refman = l1_Refman;
   MR_inc_ref(t1->_base.link_Refman);
   t1->_base.link = l1;
+  ++MR_file_coverage[1].line_count[234];
   if (t2 == NULL) RAISE(234, 27, "used member of empty object")
   if (t2_Refman->value == NULL) RAISE(234, 38, "used member of outdated weak reference")
   MR_dec_ref(t2->_base.link_Refman);
   t2->_base.link_Refman = l2_Refman;
   MR_inc_ref(t2->_base.link_Refman);
   t2->_base.link = l2;
+  ++MR_file_coverage[1].line_count[235];
   if (t3 == NULL) RAISE(235, 27, "used member of empty object")
   if (t3_Refman->value == NULL) RAISE(235, 38, "used member of outdated weak reference")
   MR_dec_ref(t3->_base.link_Refman);
   t3->_base.link_Refman = l3_Refman;
   MR_inc_ref(t3->_base.link_Refman);
   t3->_base.link = l3;
+  ++MR_file_coverage[1].line_count[237];
   if (l2 == NULL) RAISE(237, 27, "used member of empty object")
   if (l2_Refman->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
   Link_Del(l2->next);
@@ -4191,7 +4679,9 @@ Returncode test_complex_delete(void) {
   l2->next = l3;
   l3 = NULL;
   l3_Refman = NULL;
+  ++MR_file_coverage[1].line_count[238];
   TEST_ASSERT(238, ! (l3 != NULL && l3_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[239];
   if (l1 == NULL) RAISE(239, 27, "used member of empty object")
   if (l1_Refman->value == NULL) RAISE(239, 38, "used member of outdated weak reference")
   Link_Del(l1->next);
@@ -4200,7 +4690,9 @@ Returncode test_complex_delete(void) {
   l1->next = l2;
   l2 = NULL;
   l2_Refman = NULL;
+  ++MR_file_coverage[1].line_count[240];
   TEST_ASSERT(240, ! (l2 != NULL && l2_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[241];
   if (t3 == NULL) RAISE(241, 27, "used member of empty object")
   if (t3_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
   if (t3->item_Dynamic != NULL) t3->item_Dynamic->_del(t3->item);
@@ -4211,7 +4703,9 @@ Returncode test_complex_delete(void) {
   b2 = NULL;
   b2_Refman = NULL;
   b2_Dynamic = NULL;
+  ++MR_file_coverage[1].line_count[242];
   TEST_ASSERT(242, ! (b2 != NULL && b2_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[243];
   if (t2 == NULL) RAISE(243, 27, "used member of empty object")
   if (t2_Refman->value == NULL) RAISE(243, 38, "used member of outdated weak reference")
   if (t2->item_Dynamic != NULL) t2->item_Dynamic->_del(t2->item);
@@ -4222,7 +4716,9 @@ Returncode test_complex_delete(void) {
   t3 = NULL;
   t3_Refman = NULL;
   t3_Dynamic = NULL;
+  ++MR_file_coverage[1].line_count[244];
   TEST_ASSERT(244, ! (t3 != NULL && t3_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[245];
   if (t1 == NULL) RAISE(245, 27, "used member of empty object")
   if (t1_Refman->value == NULL) RAISE(245, 38, "used member of outdated weak reference")
   if (t1->_base.next_Dynamic != NULL) t1->_base.next_Dynamic->_del(t1->_base.next);
@@ -4233,7 +4729,9 @@ Returncode test_complex_delete(void) {
   t2 = NULL;
   t2_Refman = NULL;
   t2_Dynamic = NULL;
+  ++MR_file_coverage[1].line_count[246];
   TEST_ASSERT(246, ! (t2 != NULL && t2_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[247];
   if (t1 == NULL) RAISE(247, 27, "used member of empty object")
   if (t1_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
   Link_Del(t1->item);
@@ -4243,7 +4741,9 @@ Returncode test_complex_delete(void) {
   t1->item = l1;
   l1 = NULL;
   l1_Refman = NULL;
+  ++MR_file_coverage[1].line_count[248];
   TEST_ASSERT(248, ! (l1 != NULL && l1_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[249];
   if (b1 == NULL) RAISE(249, 27, "used member of empty object")
   if (b1_Refman->value == NULL) RAISE(249, 38, "used member of outdated weak reference")
   if (b1->next_Dynamic != NULL) b1->next_Dynamic->_del(b1->next);
@@ -4254,32 +4754,55 @@ Returncode test_complex_delete(void) {
   t1 = NULL;
   t1_Refman = NULL;
   t1_Dynamic = NULL;
+  ++MR_file_coverage[1].line_count[250];
   TEST_ASSERT(250, ! (t1 != NULL && t1_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[252];
   TEST_ASSERT(252, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[253];
   TEST_ASSERT(253, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[254];
   TEST_ASSERT(254, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[255];
   TEST_ASSERT(255, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[256];
   if (b1_Dynamic != NULL) b1_Dynamic->_del(b1);
   MR_owner_dec_ref(b1_Refman);
   b1_Refman = NULL;
   b1_Dynamic = NULL;
   b1 = NULL;
+  ++MR_file_coverage[1].line_count[257];
   TEST_ASSERT(257, ! (b1 != NULL && b1_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[259];
   record_delete = false;
+  ++MR_file_coverage[1].line_count[260];
   CHECK(260, f_has_ref(b1_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  ++MR_file_coverage[1].line_count[261];
   CHECK(261, f_has_ref(t1_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  ++MR_file_coverage[1].line_count[262];
   CHECK(262, f_has_ref_rec(t1_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  ++MR_file_coverage[1].line_count[263];
   CHECK(263, f_has_ref(t2_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  ++MR_file_coverage[1].line_count[264];
   CHECK(264, f_has_ref_rec(t2_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  ++MR_file_coverage[1].line_count[265];
   CHECK(265, f_has_ref(t3_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  ++MR_file_coverage[1].line_count[266];
   CHECK(266, f_has_ref_rec(t3_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  ++MR_file_coverage[1].line_count[267];
   CHECK(267, f_has_ref(b2_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  ++MR_file_coverage[1].line_count[268];
   CHECK(268, f_has_ref(l1_ref, &(deleted_links), &(deleted_links_Refman)) )
+  ++MR_file_coverage[1].line_count[269];
   CHECK(269, f_has_ref(l2_ref, &(deleted_links), &(deleted_links_Refman)) )
+  ++MR_file_coverage[1].line_count[270];
   CHECK(270, f_has_ref(l3_ref, &(deleted_links), &(deleted_links_Refman)) )
+  ++MR_file_coverage[1].line_count[272];
   TEST_ASSERT(272, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[273];
   TEST_ASSERT(273, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[274];
   TEST_ASSERT(274, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
+  ++MR_file_coverage[1].line_count[275];
   TEST_ASSERT(275, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
 MR_cleanup:
   Link_Del(l3);
@@ -4310,6 +4833,7 @@ Returncode f_raise_message(void) {
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[279];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(279, 38, "insufficient memory for managed object")
@@ -4331,10 +4855,12 @@ Returncode f_ignore_and_raise(void) {
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[282];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
+    ++MR_file_coverage[1].line_count[283];
     CHECK(283, f_raise_message() )
 
 #undef RETURN_ERROR
@@ -4342,6 +4868,7 @@ Returncode f_ignore_and_raise(void) {
   } while (false);
   --MR_trace_ignore_count;
   MR_err = OK;
+  ++MR_file_coverage[1].line_count[284];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(284, 38, "insufficient memory for managed object")
@@ -4360,6 +4887,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-failed-assert"
 Returncode f_failed_assert(void) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[287];
   TEST_ASSERT(287, 1 == 2)
 MR_cleanup:
   return MR_err;
@@ -4374,6 +4902,7 @@ Returncode f_good_assert_error(void) {
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[1].line_count[290];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
@@ -4386,6 +4915,7 @@ Returncode f_good_assert_error(void) {
     TEST_FAIL(290, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
+  ++MR_file_coverage[1].line_count[291];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(291, 38, "insufficient memory for managed object")
@@ -4404,6 +4934,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-failed-assert-error"
 Returncode f_failed_assert_error(void) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[294];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
@@ -4426,6 +4957,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-wrong-message-assert-error"
 Returncode f_wrong_message_assert_error(void) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[297];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4462,10 +4994,15 @@ MR_cleanup:
 #define MR_FUNC_NAME "Mock new"
 Returncode Mock_new(Bool* alloc_success) {
   Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[302];
   *alloc_success = true;
+  ++MR_file_coverage[1].line_count[303];
   if (new_fail_countdown > 0) {
+    ++MR_file_coverage[1].line_count[304];
     new_fail_countdown -= 1;
+    ++MR_file_coverage[1].line_count[305];
     if (new_fail_countdown == 0) {
+      ++MR_file_coverage[1].line_count[306];
       *alloc_success = false;
     }
   }
@@ -4481,10 +5018,12 @@ Returncode f_alloc(void) {
   Returncode MR_err = OK;
   String* string = NULL;
   Ref_Manager* string_Refman = NULL;
+  ++MR_file_coverage[1].line_count[309];
   string = MR_new_string(16);
   if (string == NULL) RAISE(309, 49, "insufficient memory for object dynamic allocation")
   string_Refman = MR_new_ref(string);
   if (string_Refman == NULL) RAISE(309, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[310];
   TEST_ASSERT(310, string != NULL && string_Refman->value != NULL)
 MR_cleanup:
   String_Del(string);
@@ -4513,6 +5052,7 @@ Returncode test_assert_error_message(void) {
   TopType* top = NULL;
   Ref_Manager* top_Refman = NULL;
   TopType_Dynamic* top_Dynamic = NULL;
+  ++MR_file_coverage[1].line_count[313];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4539,6 +5079,7 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(313)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[314];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4565,6 +5106,7 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(314)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[315];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4591,6 +5133,7 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(315)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[316];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4617,6 +5160,7 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(316)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[317];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4643,6 +5187,7 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(317)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[318];
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
@@ -4655,6 +5200,8 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL(318, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
+  ++MR_file_coverage[1].line_count[319];
+  ++MR_file_coverage[1].line_count[320];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4682,14 +5229,17 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(320)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[321];
   base_var = &base_var_Var;
   base_var_Refman = MR_new_ref(base_var);
   if (base_var_Refman == NULL) RAISE(321, 38, "insufficient memory for managed object")
   CHECK(321, BaseType_new(base_var, base_var_Refman, base_var_Dynamic) )
+  ++MR_file_coverage[1].line_count[322];
   base_user = base_var;
   base_user_Refman = base_var_Refman;
   MR_inc_ref(base_user_Refman);
   base_user_Dynamic = base_var_Dynamic;
+  ++MR_file_coverage[1].line_count[323];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4717,10 +5267,12 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(323)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[325];
   arr = MR_new_array(2, sizeof(Int));
   if (arr == NULL) RAISE(325, 49, "insufficient memory for object dynamic allocation")
   arr_Refman = MR_new_ref(arr);
   if (arr_Refman == NULL) RAISE(325, 38, "insufficient memory for managed object")
+  ++MR_file_coverage[1].line_count[326];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4749,12 +5301,15 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(326)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[327];
   arr2 = arr;
   arr2_Refman = arr_Refman;
   MR_inc_ref(arr2_Refman);
+  ++MR_file_coverage[1].line_count[328];
   MR_owner_dec_ref(arr_Refman);
   arr_Refman = NULL;
   arr = NULL;
+  ++MR_file_coverage[1].line_count[329];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4782,6 +5337,7 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(329)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[330];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4809,6 +5365,7 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(330)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[331];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4837,6 +5394,7 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(331)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[332];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4865,6 +5423,8 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(332)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[333];
+  ++MR_file_coverage[1].line_count[334];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4892,7 +5452,9 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(334)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[335];
   new_fail_countdown = 1;
+  ++MR_file_coverage[1].line_count[336];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4919,7 +5481,9 @@ Returncode test_assert_error_message(void) {
     TEST_FAIL_NULL(336)
   }
   MR_expected_error = MR_expected_error_prev;}
+  ++MR_file_coverage[1].line_count[337];
   new_fail_countdown = 2;
+  ++MR_file_coverage[1].line_count[338];
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4962,6 +5526,7 @@ MR_cleanup:
 Returncode Sys_Mock_println(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(text_Refman);
+  ++MR_file_coverage[1].line_count[341];
   TEST_ASSERT(341, text != NULL && text_Refman->value != NULL)
 MR_cleanup:
   MR_dec_ref(text_Refman);
@@ -4978,16 +5543,21 @@ Returncode test_cover_all(void) {
   MiddleType* mid = NULL;
   Ref_Manager* mid_Refman = NULL;
   MiddleType_Dynamic* mid_Dynamic = &MiddleType_dynamic;
+  ++MR_file_coverage[1].line_count[344];
   mid = &mid_Var;
   mid_Refman = MR_new_ref(mid);
   if (mid_Refman == NULL) RAISE(344, 38, "insufficient memory for managed object")
   CHECK(344, MiddleType_new(mid, mid_Refman, mid_Dynamic) )
+  ++MR_file_coverage[1].line_count[345];
   if (mid_Dynamic == NULL) RAISE(345, 28, "dynamic call of empty object")
   CHECK(345, mid_Dynamic->_base.meth1(&(mid->_base), mid_Refman, &(mid_Dynamic->_base), 0, NULL, NULL) )
+  ++MR_file_coverage[1].line_count[346];
   if (mid_Dynamic == NULL) RAISE(346, 28, "dynamic call of empty object")
   CHECK(346, mid_Dynamic->_base.meth2(&(mid->_base), mid_Refman, &(mid_Dynamic->_base)) )
+  ++MR_file_coverage[1].line_count[347];
   if (mid_Dynamic == NULL) RAISE(347, 28, "dynamic call of empty object")
   CHECK(347, mid_Dynamic->meth4(mid, mid_Refman, mid_Dynamic) )
+  ++MR_file_coverage[1].line_count[348];
   if (mid_Dynamic == NULL) RAISE(348, 28, "dynamic call of empty object")
   CHECK(348, mid_Dynamic->meth5(mid, mid_Refman, mid_Dynamic, 0, NULL, NULL) )
 MR_cleanup:
@@ -5034,7 +5604,7 @@ USER_MAIN_HEADER {
   RUN_TEST(test_complex_delete);
   RUN_TEST(test_assert_error_message);
   RUN_TEST(test_cover_all);
-  MR_success &= MR_test_coverage(MR_file_coverage, 1);
+  MR_success &= MR_test_coverage(MR_file_coverage, 3);
   return MR_success? OK : FAIL;
 }
 

@@ -54,11 +54,15 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     else-node.set-parent(user self.parent)
     self.else-node := else-node
   
-  func inst add-else-if(owner SyntaxTreeIf new-if)
+  func inst add-else-if(
+      owner SyntaxTreeIf new-if, owner SyntaxTreeCoverage coverage-node)
     new SyntaxTreeElse in self.else-node
     self.else-node.init(user self.parent)
     new List{SyntaxTreeVariable} in self.else-node.block.variables
     new List{SyntaxTreeCode} in self.else-node.block.code-nodes
+    if ? coverage-node
+      coverage-node.parent := self.else-node.block
+      self.else-node.block.code-nodes.add(owner coverage-node)
     self.else-node.block.code-nodes.add(owner new-if)
     new-if.set-parent(user self.else-node.block)
   

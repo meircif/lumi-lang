@@ -6,4 +6,4 @@ coverage:
         target: 100%
   ignore:
     - "MR3/*"
-    - "MR4/tests/*"
+    - "MR4/tests/*.c"

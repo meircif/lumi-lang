@@ -26,7 +26,7 @@ func test-code(user String input-text, user String expected-output)
   var Bool was-first(not not-first-code-test)
   not-first-code-test := true
   test-code-setup(user input-text)
-  write-syntax-tree()
+  write-syntax-tree(copy false)
   var String{8192} expected-header
   owner File code-header
   var String{256} filename
@@ -78,9 +78,9 @@ func test-code-error(user String input-text, user String expected-error)
     return
   test-code-setup(user input-text)
   mock-print-active := true
-  assert-error write-syntax-tree()
+  assert-error write-syntax-tree(copy false)
   mock-print-active := false
-  user String expected-header("Code error in mock.3.mr[")
+  user String expected-header("Code error in mock.4.mr[")
   f-assert-string-slice(
       user expected-header,
       user mock-print-text,

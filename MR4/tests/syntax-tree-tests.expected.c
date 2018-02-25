@@ -32,18 +32,18 @@ USER_MAIN_HEADER {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value;
 #define MR_FUNC_NAME "global variable initialization"
-#define MR_FILE_NAME "mock.3.mr"
+#define MR_FILE_NAME "mock.4.mr"
   s = &s_Var;
   s_Var.values = s_Values;
   s_Refman = MR_new_ref(s);
   if (s_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
 #undef MR_FILE_NAME
-#define MR_FILE_NAME "mock.3.mr"
+#define MR_FILE_NAME "mock.4.mr"
   us = s;
   us_Refman = s_Refman;
   MR_inc_ref(us_Refman);
 #undef MR_FILE_NAME
-#define MR_FILE_NAME "mock.3.mr"
+#define MR_FILE_NAME "mock.4.mr"
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(3, 38, "insufficient memory for managed object")
@@ -69,6 +69,16 @@ String s_Var = {12, 0, NULL};
 String* s = NULL;
 Ref_Manager* s_Refman = NULL;
 Returncode dummy(void);
+int MR_file0_line_count[4] = {
+  -1,-1,-1,-1
+};
+int MR_file1_line_count[2] = {
+  -1,-1
+};
+File_Coverage MR_file_coverage[2] = {
+  {"mock.4.mr", 4, MR_file0_line_count},
+  {"empty.4.mr", 2, MR_file1_line_count}
+};
 Returncode dummy(void) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -81,7 +91,7 @@ USER_MAIN_HEADER {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value;
 #define MR_FUNC_NAME "global variable initialization"
-#define MR_FILE_NAME "mock.3.mr"
+#define MR_FILE_NAME "mock.4.mr"
   s = &s_Var;
   s_Var.values = s_Values;
   s_Refman = MR_new_ref(s);
@@ -91,6 +101,7 @@ USER_MAIN_HEADER {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
   RUN_TEST(dummy);
+  MR_success &= MR_test_coverage(MR_file_coverage, 2);
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
@@ -1394,8 +1405,93 @@ MR_cleanup:
 /// @ t6
 Returncode fun0(void);
 Returncode fun1(void);
+int MR_file0_line_count[31] = {
+  -1,-1, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0,
+   0, 0, 0, 0,-1,-1
+};
+int MR_file1_line_count[2] = {
+  -1,-1
+};
+File_Coverage MR_file_coverage[2] = {
+  {"mock.4.mr", 31, MR_file0_line_count},
+  {"empty.4.mr", 2, MR_file1_line_count}
+};
 Returncode fun0(void) {
   Returncode MR_err = OK;
+  Int x = 0;
+  Int y = 0;
+  Int n = 0;
+  ++MR_file_coverage[0].line_count[2];
+  x = 4;
+  ++MR_file_coverage[0].line_count[3];
+  x += 1;
+  ++MR_file_coverage[0].line_count[4];
+  y = 5;
+  ++MR_file_coverage[0].line_count[5];
+  y = x;
+  ++MR_file_coverage[0].line_count[6];
+  if (y > 3) {
+    ++MR_file_coverage[0].line_count[7];
+    y = 3;
+  }
+  else {
+    ++MR_file_coverage[0].line_count[8];
+    if (y < 0) {
+      ++MR_file_coverage[0].line_count[9];
+      y = 0;
+    }
+    else {
+      ++MR_file_coverage[0].line_count[11];
+      y += 1;
+    }
+  }
+  ++MR_file_coverage[0].line_count[12];
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; break
+    ++MR_file_coverage[0].line_count[13];
+    x = 0;
+    ++MR_file_coverage[0].line_count[14];
+    CHECK(14, Sys_print(sys, sys_Refman, NULL, NULL) )
+    ++MR_file_coverage[0].line_count[15];
+    y = 0;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+  } while (false);
+  --MR_trace_ignore_count;
+  ++MR_file_coverage[0].line_count[16];
+  if (MR_err != OK) {
+    MR_err = OK;
+    ++MR_file_coverage[0].line_count[17];
+    x = 1;
+    ++MR_file_coverage[0].line_count[18];
+    x = 2;
+  }
+  ++MR_file_coverage[0].line_count[19];
+  if (x > 3) {
+    ++MR_file_coverage[0].line_count[20];
+    goto MR_cleanup;
+  }
+  else {
+    ++MR_file_coverage[0].line_count[22];
+    USER_RAISE(22, NULL, NULL)
+  }
+  ++MR_file_coverage[0].line_count[23];
+  while (true) {
+    ++MR_file_coverage[0].line_count[24];
+    if (!(x > 1)) break;
+    ++MR_file_coverage[0].line_count[25];
+    if (x == 5) {
+      ++MR_file_coverage[0].line_count[26];
+      continue;
+    }
+  }
+  ++MR_file_coverage[0].line_count[27];
+  for (n = 0; n < 3; ++n) {
+    ++MR_file_coverage[0].line_count[28];
+    x += y;
+  }
 MR_cleanup:
   return MR_err;
 }
@@ -1410,12 +1506,23 @@ USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
   RUN_TEST(fun1);
+  MR_success &= MR_test_coverage(MR_file_coverage, 2);
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
 /// @ t7
 Returncode fun0(void);
 Returncode fun1(void);
+int MR_file0_line_count[5] = {
+  -1,-1,-1,-1,-1
+};
+int MR_file1_line_count[2] = {
+  -1,-1
+};
+File_Coverage MR_file_coverage[2] = {
+  {"mock.4.mr", 5, MR_file0_line_count},
+  {"empty.4.mr", 2, MR_file1_line_count}
+};
 Returncode fun0(void) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -1432,6 +1539,7 @@ USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
   RUN_TEST(fun1);
+  MR_success &= MR_test_coverage(MR_file_coverage, 2);
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
