@@ -116,7 +116,7 @@ Returncode CallExpression_write_preactions(CallExpression* self);
 static char* _func_name_CallExpression_write_preactions = "CallExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_CallExpression_write_preactions
 Returncode CallExpression_write_preactions(CallExpression* self) {
-  CHECK(63, (self->function)->_base._dtl[7](self->function) )
+  CHECK(63, (self->function)->_base._dtl[8](self->function) )
   if (self->is_function_object) {
     CHECK(65, write(&(String){5, 4, "if ("}) )
     CHECK(66, Expression_write_as_top(self->function) )
@@ -170,7 +170,7 @@ Returncode CallExpression_write_func_call(CallExpression* self) {
 extern Func CallExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func CallExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)CallExpression_analyze, (void*)CallExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)CallExpression_write_preactions};
+Func CallExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)CallExpression_analyze, (void*)CallExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)CallExpression_write_preactions};
 #endif
 
 
@@ -267,7 +267,7 @@ Returncode CallArgument_write_preactions(CallArgument* self);
 static char* _func_name_CallArgument_write_preactions = "CallArgument.write-preactions";
 #define MR_FUNC_NAME _func_name_CallArgument_write_preactions
 Returncode CallArgument_write_preactions(CallArgument* self) {
-  CHECK(145, (self->value)->_base._dtl[7](self->value) )
+  CHECK(145, (self->value)->_base._dtl[8](self->value) )
   if (self->is_down_cast) {
     /* if (`value` != NULL) RAISE(`line-num`) */
     CHECK(148, write(&(String){5, 4, "if ("}) )

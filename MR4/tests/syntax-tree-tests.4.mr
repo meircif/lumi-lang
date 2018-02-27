@@ -639,28 +639,69 @@ for n in arr
     i += n
   for n in sarr
 ## @@ test-testing
-## @ c t0
+## @ c ta0
 assert t.num = 2
-## @ c t1
+## @ c ta1
 assert-error t.num
-## @ c t2
+## @ c ta2
 assert-error fun0()
-## @ g t3
+## @ c ta3
+assert-error t.num, "expected error"
+## @ c ta4
+assert-error fun0(), "expected error in the function"
+## @ c ta5
+assert-error t.num,
+      "expected error in new line"
+## @ g tm0
 func fun()
   fun()
 mock fun()
   raise
-## @ g t4
+## @ g tm1
 mock fun()
 func fun()
   fun()
-## @ g t5
+## @ g tm2
 mock Test.meth(copy Int x)
 struct Test
   var Int x
   func meth(copy Int x)
     self.meth(copy x)
-## @ tg t6
+## @ g tm3
+mock Test.meth(copy Int x)
+class Test
+  var Int x
+  func dynamic meth(copy Int x)
+    self.meth(copy x)
+## @ g tm4
+func fun(copy Int x)->(var Int y)
+mock fun(copy Int x)->(var Int y)
+  fun.mocked(copy x)->(var y)
+  fun.active := false
+  fun(copy x)->(var y)
+  fun.active := true
+## @ g tm5
+struct Test
+  var Int x
+  func meth(copy Int x)->(var Int y)
+    self.meth(copy x)->(var y)
+mock Test.meth(copy Int x)->(var Int y)
+  self.meth.mocked(copy x)->(var y)
+  Test.meth.mocked(var self, copy x)->(var y)
+  self.meth.active := false
+  Test.meth(var self, copy x)->(var y)
+  Test.meth.active := true
+## @ g tm6
+class Test
+  var Int x
+  func dynamic meth(copy Int x)->(var Int y)
+    self.meth(copy x)->(var y)
+mock Test.meth(copy Int x)->(var Int y)
+  Test.meth.mocked(var self, copy x)->(var y)
+  Test.meth.active := false
+  Test.meth(var self, copy x)->(var y)
+  Test.meth.active := true
+## @ tg tt0
 test fun0()
   var Int x(copy 4)
   x += 1
@@ -690,27 +731,20 @@ test fun0()
   for n in 3
     x += y
 test fun1()
-## @ tg t7
+## @ tg tt1
 test fun0()
 test fun1()
 main
-## @ g t8
+## @ g tmg0
 mock Test.delete()
   var Ref r(copy self)
 struct Test
   user String s
-## @ g t9
+## @ g tmg1
 mock delete()
   var Ref r(copy self)
 main
-## @ c t10
-assert-error t.num, "expected error"
-## @ c t11
-assert-error fun0(), "expected error in the function"
-## @ c t12
-assert-error t.num,
-      "expected error in new line"
-## @ g t13
+## @ g tmg2
 mock new()->(var Bool allocate-success)
   allocate-success := false
 main
@@ -801,6 +835,16 @@ mock new()->(var Bool res, var Int x)
 mock delete(copy Int x)
 ## @ eg te28
 mock delete()->(copy Int x)
+## @ eg te29
+func fun()
+mock fun()
+  fun.error
+## @ eg te30
+class Test
+  var Int x
+  func dynamic meth()
+mock Test.meth()
+  self.meth.mocked()
 ## @@ test-native
 ## @ g tf0
 native func external()

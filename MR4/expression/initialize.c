@@ -131,10 +131,10 @@ static char* _func_name_InitExpression_write_allocation = "InitExpression.write-
 Returncode InitExpression_write_allocation(InitExpression* self) {
   CHECK(88, FunctionArguments_write_preactions(self->arguments) )
   if (self->_base.result_type->type_data == &(glob->type_array->_base) || self->_base.result_type->type_data == &(glob->type_string->_base)) {
-    CHECK(91, (self->_base.result_type->length)->_base._dtl[7](self->_base.result_type->length) )
+    CHECK(91, (self->_base.result_type->length)->_base._dtl[8](self->_base.result_type->length) )
   }
   if (self->_base.result_type->type_data == &(glob->type_array->_base) && ((TypeInstance*)(self->_base.result_type->parameters->first->item))->type_data == &(glob->type_string->_base)) {
-    CHECK(94, (((TypeInstance*)(self->_base.result_type->parameters->first->item))->length)->_base._dtl[7](((TypeInstance*)(self->_base.result_type->parameters->first->item))->length) )
+    CHECK(94, (((TypeInstance*)(self->_base.result_type->parameters->first->item))->length)->_base._dtl[8](((TypeInstance*)(self->_base.result_type->parameters->first->item))->length) )
   }
   
   if (self->symbol->variable->access == ACCESS_VAR) {
@@ -258,7 +258,7 @@ Returncode InitExpression_write_assign(InitExpression* self) {
   Expression* value = NULL;
   CHECK(181, (((Argument*)(self->arguments->parameters->first->item)))->_base._dtl[9](((Argument*)(self->arguments->parameters->first->item)), &(value)) )
   CHECK(182, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-  CHECK(183, (value)->_base._dtl[7](value) )
+  CHECK(183, (value)->_base._dtl[8](value) )
   CHECK(184, (self->symbol)->_base._base._dtl[3](self->symbol) )
   CHECK(185, write(&(String){4, 3, " = "}) )
   CHECK(186, (value)->_base._dtl[3](value) )
@@ -334,7 +334,7 @@ Returncode InitExpression_write(InitExpression* self) {
 extern Func InitExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func InitExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)InitExpression_analyze, (void*)InitExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)InitExpression_write_preactions};
+Func InitExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)InitExpression_analyze, (void*)InitExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)InitExpression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME
