@@ -21,8 +21,8 @@ String* us = NULL;
 Ref_Manager* us_Refman = NULL;
 String* gs = NULL;
 Ref_Manager* gs_Refman = NULL;
-Returncode Mock_new(Bool* allocate_success) { return OK; }
-Returncode Mock_delete(Ref self) { return OK; }
+Returncode new_Mock(Bool* allocate_success) { return OK; }
+Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
   Int x = 0;
@@ -64,11 +64,11 @@ MR_cleanup:
 }
 MAIN_FUNC
 /// @ t7
+Returncode dummy(void);
 char s_Values[12] = {0};
 String s_Var = {12, 0, NULL};
 String* s = NULL;
 Ref_Manager* s_Refman = NULL;
-Returncode dummy(void);
 int MR_file0_line_count[4] = {
   -1,-1,-1,-1
 };
@@ -84,8 +84,8 @@ Returncode dummy(void) {
 MR_cleanup:
   return MR_err;
 }
-Returncode Mock_new(Bool* allocate_success) { return OK; }
-Returncode Mock_delete(Ref self) { return OK; }
+Returncode new_Mock(Bool* allocate_success) { return OK; }
+Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Bool MR_success = true;
 #undef RETURN_ERROR
@@ -509,9 +509,9 @@ struct Class_Dynamic {
 void Struct_Del(Struct* self);
 Returncode Class_meth(Class* self, Ref_Manager* self_Refman, Class_Dynamic* self_Dynamic);
 void Class_Del(Class* self);
+Returncode name(Struct* ps, Ref_Manager* ps_Refman, Class* pc, Ref_Manager* pc_Refman, Class_Dynamic* pc_Dynamic, Array* pas, Ref_Manager* pas_Refman, Array* pac, Ref_Manager* pac_Refman);
 Generic_Type_Dynamic Struct_dynamic = {(Dynamic_Del)Struct_Del};
 Class_Dynamic Class_dynamic = {(Dynamic_Del)Class_Del, Class_meth};
-Returncode name(Struct* ps, Ref_Manager* ps_Refman, Class* pc, Ref_Manager* pc_Refman, Class_Dynamic* pc_Dynamic, Array* pas, Ref_Manager* pas_Refman, Array* pac, Ref_Manager* pac_Refman);
 void Struct_Del(Struct* self) {
   if (self == NULL) return;
   ARRAY_DEL(Struct, self->as)
@@ -569,8 +569,8 @@ MR_cleanup:
   return MR_err;
 }
 /// @ tm0
-Returncode Mock_new(Bool* allocate_success) { return OK; }
-Returncode Mock_delete(Ref self) { return OK; }
+Returncode new_Mock(Bool* allocate_success) { return OK; }
+Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
   Int x = 0;
@@ -720,10 +720,10 @@ Returncode Test1_fun(Test1* self, Ref_Manager* self_Refman);
 void Test1_Del(Test1* self);
 Returncode Test2_name(Test2* self, Ref_Manager* self_Refman);
 void Test2_Del(Test2* self);
+Returncode fun(void);
 Generic_Type_Dynamic Test1_dynamic = {(Dynamic_Del)Test1_Del};
 Generic_Type_Dynamic Test2_dynamic = {(Dynamic_Del)Test2_Del};
 Int name = 0;
-Returncode fun(void);
 Returncode Test1_fun(Test1* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -1321,11 +1321,11 @@ unknown symbol "error"
 /// @ te6
 cannot assign "String" into "Int"
 /// @@ test-testing
-/// @ t0
+/// @ ta0
 if (t == NULL) RAISE(1, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
   TEST_ASSERT(1, t->num == 2)
-/// @ t1
+/// @ ta1
 do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
@@ -1338,7 +1338,7 @@ do {
     TEST_FAIL(1, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
-/// @ t2
+/// @ ta2
 do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
@@ -1350,59 +1350,260 @@ do {
     TEST_FAIL(1, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
-/// @ t3
+/// @ ta3
+{char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "expected error";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    if (t == NULL) RAISE(1, 27, "used member of empty object")
+    if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+    #undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(1, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(1)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+/// @ ta4
+{char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "expected error in the function";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(1, fun0() )
+    #undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(1, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(1)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+/// @ ta5
+{char* MR_expected_error_prev;
+  int MR_expected_error_trace_ignore_count_prev;
+  MR_expected_error_prev = MR_expected_error;
+  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
+  MR_expected_error = "expected error in new line";
+  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    if (t == NULL) RAISE(1, 27, "used member of empty object")
+    if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+    #undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL(1, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
+  if (MR_expected_error == NULL) {
+    MR_expected_error = MR_expected_error_prev;
+    TEST_FAIL_NULL(1)
+  }
+  MR_expected_error = MR_expected_error_prev;}
+/// @ tm0
 Returncode fun(void);
-Returncode Mock_fun(void);
+Returncode fun_Mock(void);
 Returncode fun(void) {
   Returncode MR_err = OK;
-  CHECK(2, Mock_fun() )
+  CHECK(2, fun_Mock() )
 MR_cleanup:
   return MR_err;
 }
-Returncode Mock_fun(void) {
+Bool fun_Mock_active = true;
+Returncode fun_Mock(void) {
   Returncode MR_err = OK;
+  if (!fun_Mock_active) return fun();
   USER_RAISE(4, NULL, NULL)
 MR_cleanup:
   return MR_err;
 }
-/// @ t4
-Returncode Mock_fun(void);
+/// @ tm1
+Returncode fun_Mock(void);
 Returncode fun(void);
-Returncode Mock_fun(void) {
+Bool fun_Mock_active = true;
+Returncode fun_Mock(void) {
   Returncode MR_err = OK;
+  if (!fun_Mock_active) return fun();
 MR_cleanup:
   return MR_err;
 }
 Returncode fun(void) {
   Returncode MR_err = OK;
-  CHECK(3, Mock_fun() )
+  CHECK(3, fun_Mock() )
 MR_cleanup:
   return MR_err;
 }
-/// @ t5
+/// @ tm2
 typedef struct Test Test;
 struct Test {
   Int x;
 };
 Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Int x);
 void Test_Del(Test* self);
+Returncode Test_meth_Mock(Test* self, Ref_Manager* self_Refman, Int x);
 Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
-Returncode Test_Mock_meth(Test* self, Ref_Manager* self_Refman, Int x);
 Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Int x) {
   Returncode MR_err = OK;
-  CHECK(5, Test_Mock_meth(self, self_Refman, x) )
+  CHECK(5, Test_meth_Mock(self, self_Refman, x) )
 MR_cleanup:
   return MR_err;
 }
 void Test_Del(Test* self) {
   if (self == NULL) return;
 }
-Returncode Test_Mock_meth(Test* self, Ref_Manager* self_Refman, Int x) {
+Bool Test_meth_Mock_active = true;
+Returncode Test_meth_Mock(Test* self, Ref_Manager* self_Refman, Int x) {
+  Returncode MR_err = OK;
+  if (!Test_meth_Mock_active) return Test_meth(self, self_Refman, x);
+MR_cleanup:
+  return MR_err;
+}
+/// @ tm3
+typedef struct Test Test;
+typedef struct Test_Dynamic Test_Dynamic;
+struct Test {
+  Int x;
+};
+struct Test_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x);
+};
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x);
+void Test_Del(Test* self);
+Returncode Test_meth_Mock(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x);
+Test_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del, Test_meth_Mock};
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x) {
+  Returncode MR_err = OK;
+  if (self_Dynamic == NULL) RAISE(5, 28, "dynamic call of empty object")
+  CHECK(5, self_Dynamic->meth(self, self_Refman, self_Dynamic, x) )
+MR_cleanup:
+  return MR_err;
+}
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+}
+Bool Test_meth_Mock_active = true;
+Returncode Test_meth_Mock(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x) {
+  Returncode MR_err = OK;
+  if (!Test_meth_Mock_active) return Test_meth(self, self_Refman, self_Dynamic, x);
+MR_cleanup:
+  return MR_err;
+}
+/// @ tm4
+Returncode fun(Int x, Int* y);
+Returncode fun_Mock(Int x, Int* y);
+Returncode fun(Int x, Int* y) {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
-/// @ t6
+Bool fun_Mock_active = true;
+Returncode fun_Mock(Int x, Int* y) {
+  Returncode MR_err = OK;
+  if (!fun_Mock_active) return fun(x, y);
+  CHECK(3, fun(x, &(*y)) )
+  fun_Mock_active = false;
+  CHECK(5, fun_Mock(x, &(*y)) )
+  fun_Mock_active = true;
+MR_cleanup:
+  return MR_err;
+}
+/// @ tm5
+typedef struct Test Test;
+struct Test {
+  Int x;
+};
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Int x, Int* y);
+void Test_Del(Test* self);
+Returncode Test_meth_Mock(Test* self, Ref_Manager* self_Refman, Int x, Int* y);
+Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Int x, Int* y) {
+  Returncode MR_err = OK;
+  CHECK(4, Test_meth_Mock(self, self_Refman, x, &(*y)) )
+MR_cleanup:
+  return MR_err;
+}
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+}
+Bool Test_meth_Mock_active = true;
+Returncode Test_meth_Mock(Test* self, Ref_Manager* self_Refman, Int x, Int* y) {
+  Returncode MR_err = OK;
+  if (!Test_meth_Mock_active) return Test_meth(self, self_Refman, x, y);
+  CHECK(6, Test_meth(self, self_Refman, x, &(*y)) )
+  CHECK(7, Test_meth(self, self_Refman, x, &(*y)) )
+  Test_meth_Mock_active = false;
+  CHECK(9, Test_meth_Mock(self, self_Refman, x, &(*y)) )
+  Test_meth_Mock_active = true;
+MR_cleanup:
+  return MR_err;
+}
+/// @ tm6
+typedef struct Test Test;
+typedef struct Test_Dynamic Test_Dynamic;
+struct Test {
+  Int x;
+};
+struct Test_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x, Int* y);
+};
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x, Int* y);
+void Test_Del(Test* self);
+Returncode Test_meth_Mock(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x, Int* y);
+Test_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del, Test_meth_Mock};
+Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x, Int* y) {
+  Returncode MR_err = OK;
+  if (self_Dynamic == NULL) RAISE(4, 28, "dynamic call of empty object")
+  CHECK(4, self_Dynamic->meth(self, self_Refman, self_Dynamic, x, &(*y)) )
+MR_cleanup:
+  return MR_err;
+}
+void Test_Del(Test* self) {
+  if (self == NULL) return;
+}
+Bool Test_meth_Mock_active = true;
+Returncode Test_meth_Mock(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic, Int x, Int* y) {
+  Returncode MR_err = OK;
+  if (!Test_meth_Mock_active) return Test_meth(self, self_Refman, self_Dynamic, x, y);
+  CHECK(6, Test_meth(self, self_Refman, self_Dynamic, x, &(*y)) )
+  Test_meth_Mock_active = false;
+  CHECK(8, Test_meth_Mock(self, self_Refman, self_Dynamic, x, &(*y)) )
+  Test_meth_Mock_active = true;
+MR_cleanup:
+  return MR_err;
+}
+/// @ tt0
 Returncode fun0(void);
 Returncode fun1(void);
 int MR_file0_line_count[31] = {
@@ -1500,8 +1701,8 @@ Returncode fun1(void) {
 MR_cleanup:
   return MR_err;
 }
-Returncode Mock_new(Bool* allocate_success) { return OK; }
-Returncode Mock_delete(Ref self) { return OK; }
+Returncode new_Mock(Bool* allocate_success) { return OK; }
+Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
@@ -1510,7 +1711,7 @@ USER_MAIN_HEADER {
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
-/// @ t7
+/// @ tt1
 Returncode fun0(void);
 Returncode fun1(void);
 int MR_file0_line_count[5] = {
@@ -1533,8 +1734,8 @@ Returncode fun1(void) {
 MR_cleanup:
   return MR_err;
 }
-Returncode Mock_new(Bool* allocate_success) { return OK; }
-Returncode Mock_delete(Ref self) { return OK; }
+Returncode new_Mock(Bool* allocate_success) { return OK; }
+Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Bool MR_success = true;
   RUN_TEST(fun0);
@@ -1543,15 +1744,15 @@ USER_MAIN_HEADER {
   return MR_success? OK : FAIL;
 }
 TEST_MAIN_FUNC
-/// @ t8
+/// @ tmg0
 typedef struct Test Test;
 struct Test {
   String* s;
   Ref_Manager* s_Refman;
 };
 void Test_Del(Test* self);
-Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
 Returncode Test_MockDel(Ref self);
+Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
 void Test_Del(Test* self) {
   if (self == NULL) return;
   IGNORE_ERRORS( Test_MockDel(self) )
@@ -1564,111 +1765,31 @@ Returncode Test_MockDel(Ref self) {
 MR_cleanup:
   return MR_err;
 }
-/// @ t9
-Returncode Mock_delete(Ref self);
-Returncode Mock_delete(Ref self) {
+/// @ tmg1
+Returncode delete_Mock(Ref self);
+Returncode delete_Mock(Ref self) {
   Returncode MR_err = OK;
   Ref r = NULL;
   r = self;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mock_new(Bool* allocate_success) { return OK; }
+Returncode new_Mock(Bool* allocate_success) { return OK; }
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
 MR_cleanup:
   return MR_err;
 }
 MAIN_FUNC
-/// @ t10
-{char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "expected error";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    if (t == NULL) RAISE(1, 27, "used member of empty object")
-    if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
-    #undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(1, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(1)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-/// @ t11
-{char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "expected error in the function";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    CHECK(1, fun0() )
-    #undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(1, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(1)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-/// @ t12
-{char* MR_expected_error_prev;
-  int MR_expected_error_trace_ignore_count_prev;
-  MR_expected_error_prev = MR_expected_error;
-  MR_expected_error_trace_ignore_count_prev = MR_expected_error_trace_ignore_count;
-  MR_expected_error = "expected error in new line";
-  MR_expected_error_trace_ignore_count = MR_trace_ignore_count + 1;
-  do {
-    ++MR_trace_ignore_count;
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    if (t == NULL) RAISE(1, 27, "used member of empty object")
-    if (t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
-    #undef RETURN_ERROR
-#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
-    --MR_trace_ignore_count;
-    MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(1, 16, "error not raised")
-  } while (false);
-  --MR_trace_ignore_count;
-  MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
-  if (MR_expected_error == NULL) {
-    MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(1)
-  }
-  MR_expected_error = MR_expected_error_prev;}
-/// @ t13
-Returncode Mock_new(Bool* allocate_success);
-Returncode Mock_new(Bool* allocate_success) {
+/// @ tmg2
+Returncode new_Mock(Bool* allocate_success);
+Returncode new_Mock(Bool* allocate_success) {
   Returncode MR_err = OK;
   *allocate_success = false;
 MR_cleanup:
   return MR_err;
 }
-Returncode Mock_delete(Ref self) { return OK; }
+Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -1747,6 +1868,10 @@ mock new should have only single Bool output
 mock delete should have no arguments
 /// @ te28
 mock delete should have no arguments
+/// @ te29
+mock function has no member "error"
+/// @ te30
+accessing mock function field in dynamic call to "meth"
 /// @@ test-native
 /// @ tf0
 Returncode external(void);
@@ -1769,9 +1894,9 @@ struct Test_Dynamic {
 };
 Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic);
 void Test_Del(Test* self);
-Test_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del, Test_meth};
 Returncode external(Int i, String* s, Test* ta, Int* io);
 Returncode call(void);
+Test_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del, Test_meth};
 Returncode Test_meth(Test* self, Ref_Manager* self_Refman, Test_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -1942,8 +2067,8 @@ struct Test {
 };
 Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* first, Ref_Manager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Generic_Type* second, Ref_Manager* second_Refman, Generic_Type_Dynamic* second_Dynamic, Generic_Type* third, Ref_Manager* third_Refman, Generic_Type_Dynamic* third_Dynamic);
 void Test_Del(Test* self);
-Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
 Returncode use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_Manager* second_Refman, File* third, Ref_Manager* third_Refman);
+Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
 Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* first, Ref_Manager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Generic_Type* second, Ref_Manager* second_Refman, Generic_Type_Dynamic* second_Dynamic, Generic_Type* third, Ref_Manager* third_Refman, Generic_Type_Dynamic* third_Dynamic) {
   Returncode MR_err = OK;
   MR_inc_ref(first_Refman);
@@ -2264,9 +2389,9 @@ struct Test {
 void Base_Del(Base* self);
 Returncode Test_set(Test* self, Ref_Manager* self_Refman, String* s, Ref_Manager* s_Refman);
 void Test_Del(Test* self);
+Returncode use(String* s, Ref_Manager* s_Refman);
 Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
 Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
-Returncode use(String* s, Ref_Manager* s_Refman);
 void Base_Del(Base* self) {
   if (self == NULL) return;
   MR_dec_ref(self->item_Refman);
@@ -2333,9 +2458,9 @@ struct Test {
 void Base_Del(Base* self);
 Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* i, Ref_Manager* i_Refman, Generic_Type_Dynamic* i_Dynamic, String* s, Ref_Manager* s_Refman);
 void Test_Del(Test* self);
+Returncode use(String* s, Ref_Manager* s_Refman);
 Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
 Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
-Returncode use(String* s, Ref_Manager* s_Refman);
 void Base_Del(Base* self) {
   if (self == NULL) return;
   MR_dec_ref(self->item_Refman);
@@ -2417,11 +2542,11 @@ Returncode Top_set(Top* self, Ref_Manager* self_Refman, String* s, Ref_Manager* 
 void Top_Del(Top* self);
 Returncode Test_set(Test* self, Ref_Manager* self_Refman, String* s, Ref_Manager* s_Refman);
 void Test_Del(Test* self);
+Returncode use(String* s, Ref_Manager* s_Refman);
 Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
 Generic_Type_Dynamic Mid_dynamic = {(Dynamic_Del)Mid_Del};
 Generic_Type_Dynamic Top_dynamic = {(Dynamic_Del)Top_Del};
 Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
-Returncode use(String* s, Ref_Manager* s_Refman);
 Returncode Base_set(Base* self, Ref_Manager* self_Refman, Generic_Type* i, Ref_Manager* i_Refman, Generic_Type_Dynamic* i_Dynamic) {
   Returncode MR_err = OK;
   MR_inc_ref(i_Refman);
@@ -2544,9 +2669,9 @@ struct Test {
 void Base_Del(Base* self);
 Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* i, Ref_Manager* i_Refman, Generic_Type_Dynamic* i_Dynamic, String* s, Ref_Manager* s_Refman);
 void Test_Del(Test* self);
+Returncode use(String* s, Ref_Manager* s_Refman);
 Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
 Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
-Returncode use(String* s, Ref_Manager* s_Refman);
 void Base_Del(Base* self) {
   if (self == NULL) return;
   MR_dec_ref(self->item_Refman);
@@ -2633,11 +2758,11 @@ Returncode Top_set(Top* self, Ref_Manager* self_Refman, Generic_Type* first, Ref
 void Top_Del(Top* self);
 Returncode Test_set(Test* self, Ref_Manager* self_Refman, String* first, Ref_Manager* first_Refman, Sys* second, Ref_Manager* second_Refman, File* third, Ref_Manager* third_Refman);
 void Test_Del(Test* self);
+Returncode use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_Manager* second_Refman, File* third, Ref_Manager* third_Refman);
 Generic_Type_Dynamic Base_dynamic = {(Dynamic_Del)Base_Del};
 Generic_Type_Dynamic Mid_dynamic = {(Dynamic_Del)Mid_Del};
 Generic_Type_Dynamic Top_dynamic = {(Dynamic_Del)Top_Del};
 Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
-Returncode use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_Manager* second_Refman, File* third, Ref_Manager* third_Refman);
 void Base_Del(Base* self) {
   if (self == NULL) return;
   MR_dec_ref(self->second_Refman);
@@ -2812,10 +2937,10 @@ void First_Del(First* self);
 void Second_Del(Second* self);
 Returncode Test_set(Test* self, Ref_Manager* self_Refman, Generic_Type* g, Ref_Manager* g_Refman, Generic_Type_Dynamic* g_Dynamic, Second* sg, Ref_Manager* sg_Refman);
 void Test_Del(Test* self);
+Returncode use(String* s, Ref_Manager* s_Refman, Second* ss, Ref_Manager* ss_Refman);
 Generic_Type_Dynamic First_dynamic = {(Dynamic_Del)First_Del};
 Generic_Type_Dynamic Second_dynamic = {(Dynamic_Del)Second_Del};
 Generic_Type_Dynamic Test_dynamic = {(Dynamic_Del)Test_Del};
-Returncode use(String* s, Ref_Manager* s_Refman, Second* ss, Ref_Manager* ss_Refman);
 void First_Del(First* self) {
   if (self == NULL) return;
   MR_dec_ref(self->item_Refman);
@@ -2993,8 +3118,8 @@ Returncode TestIterator_has(TestIterator* self, Ref_Manager* self_Refman, Bool* 
 Returncode TestIterator_get(TestIterator* self, Ref_Manager* self_Refman, Int* num);
 Returncode TestIterator_next(TestIterator* self, Ref_Manager* self_Refman);
 void TestIterator_Del(TestIterator* self);
-Generic_Type_Dynamic TestIterator_dynamic = {(Dynamic_Del)TestIterator_Del};
 Returncode f_mock(Int* i);
+Generic_Type_Dynamic TestIterator_dynamic = {(Dynamic_Del)TestIterator_Del};
 Returncode TestIterator_new(TestIterator* self, Ref_Manager* self_Refman, Int count) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -3062,8 +3187,8 @@ Returncode TestIterator_has(TestIterator* self, Ref_Manager* self_Refman, Bool* 
 Returncode TestIterator_get(TestIterator* self, Ref_Manager* self_Refman, String** text, Ref_Manager** text_Refman);
 Returncode TestIterator_next(TestIterator* self, Ref_Manager* self_Refman);
 void TestIterator_Del(TestIterator* self);
-Generic_Type_Dynamic TestIterator_dynamic = {(Dynamic_Del)TestIterator_Del};
 Returncode f_mock(TestIterator* iter, Ref_Manager* iter_Refman, String** s, Ref_Manager** s_Refman);
+Generic_Type_Dynamic TestIterator_dynamic = {(Dynamic_Del)TestIterator_Del};
 Returncode TestIterator_has(TestIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
   Returncode MR_err = OK;
 MR_cleanup:
@@ -3126,8 +3251,8 @@ Returncode TestIterator_has(TestIterator* self, Ref_Manager* self_Refman, Bool* 
 Returncode TestIterator_get(TestIterator* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 Returncode TestIterator_next(TestIterator* self, Ref_Manager* self_Refman);
 void TestIterator_Del(TestIterator* self);
-Generic_Type_Dynamic TestIterator_dynamic = {(Dynamic_Del)TestIterator_Del};
 Returncode f_mock(TestIterator* iter, Ref_Manager* iter_Refman, String** s, Ref_Manager** s_Refman);
+Generic_Type_Dynamic TestIterator_dynamic = {(Dynamic_Del)TestIterator_Del};
 Returncode TestIterator_has(TestIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
   Returncode MR_err = OK;
 MR_cleanup:

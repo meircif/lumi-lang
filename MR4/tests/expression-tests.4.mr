@@ -126,6 +126,8 @@ error
 (i := 1).error
 ## @ ec te2
 t.error
+## @ ec te3
+5.error
 ## @@ test-slice-expression
 ## @ c t0
 c := str[13]

@@ -160,6 +160,9 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     var TypeMethodsDeclarationWriter type-methods-declaration-writer
     self.write-for-type(user type-methods-declaration-writer)
     
+    write-global(user "\n\n/* global functions declaration */\n")
+    self.write-functions-declaration()
+    
     write-global(user "\n\n/* types global variables */\n")
     var TypeGlobalWriter type-global-writer
     self.write-for-type(user type-global-writer)
@@ -167,9 +170,6 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     # will write global variables
     write-global(user "\n\n/* global variables */\n")
     self.write-children(user self.variables)
-    
-    write-global(user "\n\n/* global functions declaration */\n")
-    self.write-functions-declaration()
     
     if ? self.line-counts
       self.write-test-coverage-data()
@@ -186,9 +186,9 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     if self.testing or ? self.main-function
       if not glob.is-new-mocked
         write(
-            user "\n\nReturncode Mock_new(Bool* allocate_success) { return OK; }")
+            user "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }")
       if not glob.is-delete-mocked
-        write(user "\n\nReturncode Mock_delete(Ref self) { return OK; }")
+        write(user "\n\nReturncode delete_Mock(Ref self) { return OK; }")
     if self.testing
       self.write-test-main()
     else-if ? self.main-function

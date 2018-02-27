@@ -249,12 +249,12 @@ Returncode set_cstring(String* str, Ref_Manager* str_Refman) {
 #undef MR_FUNC_NAME
 
 /*reference counting*/
-Returncode Mock_new(Bool*);
-Returncode Mock_delete(Ref);
+Returncode new_Mock(Bool*);
+Returncode delete_Mock(Ref);
 
 void* MR_alloc(size_t size) {
   Bool allocate_success = true;
-  IGNORE_ERRORS( Mock_new(&allocate_success); )
+  IGNORE_ERRORS( new_Mock(&allocate_success); )
   if (allocate_success) {
     return calloc(1, size);
   }
@@ -264,7 +264,7 @@ void* MR_alloc(size_t size) {
 Ref_Manager* MR_new_ref(void* value) {
   Ref_Manager* ref = NULL;
   Bool allocate_success = true;
-  IGNORE_ERRORS( Mock_new(&allocate_success); )
+  IGNORE_ERRORS( new_Mock(&allocate_success); )
   if (allocate_success) {
     ref = malloc(sizeof(Ref_Manager));
     if (ref != NULL) {
@@ -285,7 +285,7 @@ void MR_inc_ref(Ref_Manager* ref) {
 void dec_ref(Ref_Manager* ref) {
   --ref->count;
   if (ref->count == 0) {
-    IGNORE_ERRORS( Mock_delete(ref->ref); )
+    IGNORE_ERRORS( delete_Mock(ref->ref); )
     free(ref);
   }
 }

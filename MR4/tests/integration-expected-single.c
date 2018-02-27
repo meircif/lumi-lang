@@ -165,37 +165,6 @@ Returncode HasComplexField_run(HasComplexField* self, Ref_Manager* self_Refman);
 void HasComplexField_Del(HasComplexField* self);
 
 
-/* types global variables */
-
-Generic_Type_Dynamic TestStruct_dynamic = {(Dynamic_Del)TestStruct_Del};
-
-TestClass_Dynamic TestClass_dynamic = {(Dynamic_Del)TestClass_Del, TestClass_dynamic_meth};
-
-Generic_Type_Dynamic Data_dynamic = {(Dynamic_Del)Data_Del};
-
-Generic_Type_Dynamic Dataset_dynamic = {(Dynamic_Del)Dataset_Del};
-
-Generic_Type_Dynamic MidData_dynamic = {(Dynamic_Del)MidData_Del};
-
-Generic_Type_Dynamic TopData_dynamic = {(Dynamic_Del)TopData_Del};
-
-Generic_Type_Dynamic Container_dynamic = {(Dynamic_Del)Container_Del};
-
-Generic_Type_Dynamic ContainerIterator_dynamic = {(Dynamic_Del)ContainerIterator_Del};
-
-ComplexField_Dynamic ComplexField_dynamic = {(Dynamic_Del)ComplexField_Del, ComplexField_meth};
-
-Generic_Type_Dynamic HasComplexField_dynamic = {(Dynamic_Del)HasComplexField_Del};
-
-
-/* global variables */
-
-Int global_int = 0;
-
-String* global_string = NULL;
-Ref_Manager* global_string_Refman = NULL;
-
-
 /* global functions declaration */
 
 Returncode test_simple_function(void);
@@ -245,6 +214,37 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman);
 Returncode test_for_each(void);
 
 Returncode test_complex_field(void);
+
+
+/* types global variables */
+
+Generic_Type_Dynamic TestStruct_dynamic = {(Dynamic_Del)TestStruct_Del};
+
+TestClass_Dynamic TestClass_dynamic = {(Dynamic_Del)TestClass_Del, TestClass_dynamic_meth};
+
+Generic_Type_Dynamic Data_dynamic = {(Dynamic_Del)Data_Del};
+
+Generic_Type_Dynamic Dataset_dynamic = {(Dynamic_Del)Dataset_Del};
+
+Generic_Type_Dynamic MidData_dynamic = {(Dynamic_Del)MidData_Del};
+
+Generic_Type_Dynamic TopData_dynamic = {(Dynamic_Del)TopData_Del};
+
+Generic_Type_Dynamic Container_dynamic = {(Dynamic_Del)Container_Del};
+
+Generic_Type_Dynamic ContainerIterator_dynamic = {(Dynamic_Del)ContainerIterator_Del};
+
+ComplexField_Dynamic ComplexField_dynamic = {(Dynamic_Del)ComplexField_Del, ComplexField_meth};
+
+Generic_Type_Dynamic HasComplexField_dynamic = {(Dynamic_Del)HasComplexField_Del};
+
+
+/* global variables */
+
+Int global_int = 0;
+
+String* global_string = NULL;
+Ref_Manager* global_string_Refman = NULL;
 
 
 /* types methods body */
@@ -2905,9 +2905,9 @@ MR_cleanup:
 #undef MR_FUNC_NAME
 
 
-Returncode Mock_new(Bool* allocate_success) { return OK; }
+Returncode new_Mock(Bool* allocate_success) { return OK; }
 
-Returncode Mock_delete(Ref self) { return OK; }
+Returncode delete_Mock(Ref self) { return OK; }
 
 /* main function */
 

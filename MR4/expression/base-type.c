@@ -131,7 +131,7 @@ Returncode BaseMethExpression_write(BaseMethExpression* self) {
 extern Func BaseMethExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BaseMethExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)BaseMethExpression_analyze, (void*)BaseMethExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)BaseMethExpression_analyze_call, (void*)Expression_write_preactions};
+Func BaseMethExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)BaseMethExpression_analyze, (void*)BaseMethExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)BaseMethExpression_analyze_call, (void*)Expression_analyze_mock, (void*)Expression_write_preactions};
 #endif
 
 
@@ -182,7 +182,7 @@ Returncode UpCastExpression_write_preactions(UpCastExpression* self);
 static char* _func_name_UpCastExpression_write_preactions = "UpCastExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_UpCastExpression_write_preactions
 Returncode UpCastExpression_write_preactions(UpCastExpression* self) {
-  CHECK(84, (self->expression)->_base._dtl[7](self->expression) )
+  CHECK(84, (self->expression)->_base._dtl[8](self->expression) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -257,7 +257,7 @@ Returncode UpCastExpression_write_post(UpCastExpression* self) {
 extern Func UpCastExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func UpCastExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)UpCastExpression_write, (void*)UpCastExpression_write_dynamic, (void*)UpCastExpression_write_refman, (void*)Expression_analyze_call, (void*)UpCastExpression_write_preactions};
+Func UpCastExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)UpCastExpression_write, (void*)UpCastExpression_write_dynamic, (void*)UpCastExpression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)UpCastExpression_write_preactions};
 #endif
 
 
@@ -331,7 +331,7 @@ Returncode TypeExpression_analyze(TypeExpression* self) {
 extern Func TypeExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func TypeExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)TypeExpression_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func TypeExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)TypeExpression_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

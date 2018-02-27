@@ -216,7 +216,7 @@ static char* _func_name_SyntaxTreeIf_write = "SyntaxTreeIf.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_write
 Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
   CHECK(80, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(81, (self->condition)->_base._dtl[7](self->condition) )
+  CHECK(81, (self->condition)->_base._dtl[8](self->condition) )
   CHECK(82, write(&(String){5, 4, "if ("}) )
   CHECK(83, (self->condition)->_base._dtl[3](self->condition) )
   CHECK(84, write(&(String){2, 1, ")"}) )

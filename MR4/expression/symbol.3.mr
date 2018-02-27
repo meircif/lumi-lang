@@ -5,6 +5,7 @@ class SymbolExpression(Expression)
   owner String name
   user SyntaxTreeVariable variable
   user SyntaxTreeFunction function
+  var Bool is-annotate
   
   func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
       owner Expression expression)
@@ -40,9 +41,14 @@ class SymbolExpression(Expression)
     bases := 0
     instance-type := _
   
+  func dynamic analyze-mock(copy Bool is-annotate):(copy Bool is-mock)
+    is-mock := ? self.function and ? self.function.mocker-function
+    if is-mock
+      self.is-annotate := is-annotate
+  
   func dynamic write()
     if ? self.function
-      if ? self.function.mocker-function
+      if ? self.function.mocker-function and not self.is-annotate
         self.function.mocker-function.write-cname()
       else
         self.function.write-cname()
@@ -76,6 +82,7 @@ class MemberExpression(SymbolExpression)
   owner Expression instance
   user Expression dynamic-call-self-instance
   var Int bases
+  var Bool is-mock-field
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -121,6 +128,18 @@ class MemberExpression(SymbolExpression)
       instance-type.type-data.find-meth(user self.name):(
           user self.function, copy self.bases)
       if not (? self.function)
+        self.is-annotate := self.name.equal(user "mocked")
+        if self.instance.analyze-mock(copy self.is-annotate):(
+            copy self.is-mock-field)
+          if self.is-annotate
+            instance-type.copy-new():(owner self.result-type)
+          else-if not self.name.equal(user "active")
+            self.m-syntax-error(
+                user "mock function has no member", user self.name)
+          else
+            self.set-simple-type(user glob.type-bool)
+            self.assignable := true
+          return
         self.m-syntax-error2(
             user "type",
             user instance-type.type-data.name,
@@ -148,6 +167,10 @@ class MemberExpression(SymbolExpression)
       user TypeInstance instance-type,
       copy Int bases,
       copy Bool is-function-object)
+    if self.is-mock-field and self.is-annotate
+      self.instance.analyze-call(user arguments):(
+          user instance-type, copy bases, copy is-function-object)
+      return
     if base.analyze-call(user arguments):(
         user instance-type, copy bases, copy is-function-object)
       return
@@ -164,13 +187,23 @@ class MemberExpression(SymbolExpression)
       arguments.parameters.prepend(owner self-param)
     self.instance := _
   
+  func dynamic analyze-mock(copy Bool is-annotate):(copy Bool is-mock)
+    if base.analyze-mock(copy is-annotate):(copy is-mock)
+      if self.function.is-dynamic and
+          self.instance.result-type.type-data != glob.type-type and
+          self.instance.result-type.type-data != glob.type-base
+        self.m-syntax-error(
+            user "accessing mock function field in dynamic call to",
+            user self.name)
+  
   func dynamic write-preactions()
     if ? self.instance
       self.instance.write-preactions()
     if not (? self.dynamic-call-self-instance or
         (? self.instance and not (? self.function) and
         self.instance.result-type.type-data != glob.type-type)) or
-        (? self.instance and self.instance.is-complex-field)
+        (? self.instance and self.instance.is-complex-field) or
+        self.is-mock-field
       return
     # if (...) RAISE(`line-num`, ...)
     write(user "if (")
@@ -202,6 +235,13 @@ class MemberExpression(SymbolExpression)
       self.write-bases()
       write-cname(user self.function.name)
       return
+    if self.is-mock-field
+      self.instance.write()
+      if not self.is-annotate
+        write(user "_")
+        write-cname(user self.name)
+      return
+    
     if self.is-generic-cast and not self.top
       write(user "((")
       write-cname(user self.result-type.type-data.name)

@@ -325,6 +325,117 @@ Returncode RefNode_new(RefNode* self, Ref_Manager* self_Refman, Ref ref, RefNode
 void RefNode_Del(RefNode* self);
 
 
+/* global functions declaration */
+
+Returncode test_simple_function(void);
+
+Returncode test_const_expression(Int* i, Char* c, String** s, Ref_Manager** s_Refman, TestStruct** t, Ref_Manager** t_Refman, TestClass** d, Ref_Manager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void));
+
+Returncode test_member_expression(TestStruct* t, Ref_Manager* t_Refman, TestStruct** to, Ref_Manager** to_Refman, Int* i);
+
+Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, Ref_Manager* arri_Refman, Array* arrs, Ref_Manager* arrs_Refman, Array* arrt, Ref_Manager* arrt_Refman, Array* arrd, Ref_Manager* arrd_Refman, Array* arrf, Ref_Manager* arrf_Refman, Char* c, Int* i, TestStruct** t, Ref_Manager** t_Refman, TestClass** d, Ref_Manager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void), Array** arrio, Ref_Manager** arrio_Refman, Array** arrso, Ref_Manager** arrso_Refman, Array** arrto, Ref_Manager** arrto_Refman, Array** arrdo, Ref_Manager** arrdo_Refman, Array** arrfo, Ref_Manager** arrfo_Refman);
+
+Returncode test_container_expression(Int x, Int y, String* s, Ref_Manager* s_Refman, Int* i, Bool* b);
+
+Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* arr, Ref_Manager* arr_Refman);
+
+Returncode test_complex_function(Int num, String* text, Ref_Manager* text_Refman, Int* out_num, String** out_text, Ref_Manager** out_text_Refman);
+
+Returncode f_test_void(void);
+
+Returncode f_test_params(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman);
+
+Returncode f_test_outs(String** s, Ref_Manager** s_Refman, Int* x);
+
+Returncode f_test_int2str(Int x, String** s, Ref_Manager** s_Refman);
+
+Returncode f_test_int(Int x);
+
+Returncode f_test_int2int(Int x, Int* r);
+
+Returncode f_test_many(Int x, Int y, Int* n, Int* m);
+
+Returncode test_call_expression(void);
+
+Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res);
+
+Returncode test_builtins(Int i, Char c, Bool b, String* s, Ref_Manager* s_Refman, Array* a, Ref_Manager* a_Refman);
+
+Returncode test_ref_count(void);
+
+Returncode f_remove(String* s, Ref_Manager* s_Refman);
+
+Returncode test_type_parameters(String* s, Ref_Manager* s_Refman);
+
+Returncode f_try_catch_raise(TestStruct* t, Ref_Manager* t_Refman);
+
+Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman);
+
+Returncode test_for_each(void);
+
+Returncode test_complex_field(void);
+
+Returncode test_mid_out(MiddleType** mt, Ref_Manager** mt_Refman, MiddleType_Dynamic** mt_Dynamic);
+
+Returncode TestStruct_get_Mock(TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman);
+
+Returncode f_test_int2str_Mock(Int x, String** s, Ref_Manager** s_Refman);
+
+Returncode TestClass_dynamic_meth_Mock(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic);
+
+Returncode test_func(void);
+
+Returncode test_another(void);
+
+Returncode external(Int i, String* s, Int* io, Native* n);
+
+Returncode external2(Native n, Bool* b);
+
+Returncode test_native(void);
+
+Returncode test_dynamic_type_parameters(void);
+
+Returncode delete_Mock(Ref self);
+
+Returncode Link_MockDel(Ref self);
+
+Returncode BaseLink_MockDel(Ref self);
+
+Returncode TopLink_MockDel(Ref self);
+
+Returncode f_remove_obj(Link* b, Ref_Manager* b_Refman);
+
+Returncode test_simple_delete(void);
+
+Returncode f_has_ref(Ref ref, RefNode** node, Ref_Manager** node_Refman);
+
+Returncode f_has_ref_rec(Ref ref, RefNode** node, Ref_Manager** node_Refman);
+
+Returncode test_complex_delete(void);
+
+Returncode f_raise_message(void);
+
+Returncode f_ignore_and_raise(void);
+
+Returncode f_failed_assert(void);
+
+Returncode f_good_assert_error(void);
+
+Returncode f_failed_assert_error(void);
+
+Returncode f_wrong_message_assert_error(void);
+
+Returncode new_Mock(Bool* alloc_success);
+
+Returncode f_alloc(void);
+
+Returncode test_assert_error_message(void);
+
+Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
+
+Returncode test_cover_all(void);
+
+
 /* types global variables */
 
 BaseType_Dynamic BaseType_dynamic = {(Dynamic_Del)BaseType_Del, BaseType_meth0, BaseType_meth1, BaseType_meth2, BaseType_meth3};
@@ -333,7 +444,7 @@ MiddleType_Dynamic MiddleType_dynamic = {{(Dynamic_Del)MiddleType_Del, BaseType_
 
 Generic_Type_Dynamic TestStruct_dynamic = {(Dynamic_Del)TestStruct_Del};
 
-TestClass_Dynamic TestClass_dynamic = {(Dynamic_Del)TestClass_Del, TestClass_dynamic_meth};
+TestClass_Dynamic TestClass_dynamic = {(Dynamic_Del)TestClass_Del, TestClass_dynamic_meth_Mock};
 
 Generic_Type_Dynamic Data_dynamic = {(Dynamic_Del)Data_Del};
 
@@ -387,115 +498,6 @@ Ref_Manager* deleted_refmans_Refman = NULL;
 
 Int new_fail_countdown = 0;
 
-
-/* global functions declaration */
-
-Returncode test_simple_function(void);
-
-Returncode test_const_expression(Int* i, Char* c, String** s, Ref_Manager** s_Refman, TestStruct** t, Ref_Manager** t_Refman, TestClass** d, Ref_Manager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void));
-
-Returncode test_member_expression(TestStruct* t, Ref_Manager* t_Refman, TestStruct** to, Ref_Manager** to_Refman, Int* i);
-
-Returncode test_slice_expression(String* s, Ref_Manager* s_Refman, Array* arri, Ref_Manager* arri_Refman, Array* arrs, Ref_Manager* arrs_Refman, Array* arrt, Ref_Manager* arrt_Refman, Array* arrd, Ref_Manager* arrd_Refman, Array* arrf, Ref_Manager* arrf_Refman, Char* c, Int* i, TestStruct** t, Ref_Manager** t_Refman, TestClass** d, Ref_Manager** d_Refman, TestClass_Dynamic** d_Dynamic, Returncode (**f)(void), Array** arrio, Ref_Manager** arrio_Refman, Array** arrso, Ref_Manager** arrso_Refman, Array** arrto, Ref_Manager** arrto_Refman, Array** arrdo, Ref_Manager** arrdo_Refman, Array** arrfo, Ref_Manager** arrfo_Refman);
-
-Returncode test_container_expression(Int x, Int y, String* s, Ref_Manager* s_Refman, Int* i, Bool* b);
-
-Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* arr, Ref_Manager* arr_Refman);
-
-Returncode test_complex_function(Int num, String* text, Ref_Manager* text_Refman, Int* out_num, String** out_text, Ref_Manager** out_text_Refman);
-
-Returncode f_test_void(void);
-
-Returncode f_test_params(Int x, String* s, Ref_Manager* s_Refman, String* o, Ref_Manager* o_Refman);
-
-Returncode f_test_outs(String** s, Ref_Manager** s_Refman, Int* x);
-
-Returncode f_test_int2str(Int x, String** s, Ref_Manager** s_Refman);
-
-Returncode f_test_int(Int x);
-
-Returncode f_test_int2int(Int x, Int* r);
-
-Returncode f_test_many(Int x, Int y, Int* n, Int* m);
-
-Returncode test_call_expression(void);
-
-Returncode test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int* res);
-
-Returncode test_builtins(Int i, Char c, Bool b, String* s, Ref_Manager* s_Refman, Array* a, Ref_Manager* a_Refman);
-
-Returncode test_ref_count(void);
-
-Returncode f_remove(String* s, Ref_Manager* s_Refman);
-
-Returncode test_type_parameters(String* s, Ref_Manager* s_Refman);
-
-Returncode f_try_catch_raise(TestStruct* t, Ref_Manager* t_Refman);
-
-Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman);
-
-Returncode test_for_each(void);
-
-Returncode test_complex_field(void);
-
-Returncode test_mid_out(MiddleType** mt, Ref_Manager** mt_Refman, MiddleType_Dynamic** mt_Dynamic);
-
-Returncode TestStruct_Mock_get(TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman);
-
-Returncode Mock_f_test_int2str(Int x, String** s, Ref_Manager** s_Refman);
-
-Returncode test_func(void);
-
-Returncode test_another(void);
-
-Returncode external(Int i, String* s, Int* io, Native* n);
-
-Returncode external2(Native n, Bool* b);
-
-Returncode test_native(void);
-
-Returncode test_dynamic_type_parameters(void);
-
-Returncode Mock_delete(Ref self);
-
-Returncode Link_MockDel(Ref self);
-
-Returncode BaseLink_MockDel(Ref self);
-
-Returncode TopLink_MockDel(Ref self);
-
-Returncode f_remove_obj(Link* b, Ref_Manager* b_Refman);
-
-Returncode test_simple_delete(void);
-
-Returncode f_has_ref(Ref ref, RefNode** node, Ref_Manager** node_Refman);
-
-Returncode f_has_ref_rec(Ref ref, RefNode** node, Ref_Manager** node_Refman);
-
-Returncode test_complex_delete(void);
-
-Returncode f_raise_message(void);
-
-Returncode f_ignore_and_raise(void);
-
-Returncode f_failed_assert(void);
-
-Returncode f_good_assert_error(void);
-
-Returncode f_failed_assert_error(void);
-
-Returncode f_wrong_message_assert_error(void);
-
-Returncode Mock_new(Bool* alloc_success);
-
-Returncode f_alloc(void);
-
-Returncode test_assert_error_message(void);
-
-Returncode Sys_Mock_println(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
-
-Returncode test_cover_all(void);
-
 int MR_file0_line_count[30] = {
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1,
    0,-1,-1, 0,-1
@@ -533,7 +535,7 @@ Returncode BaseType_meth0(BaseType* self, Ref_Manager* self_Refman, BaseType_Dyn
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "BaseType.meth0";
-  CHECK(52, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(52, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   return MR_err;
@@ -555,7 +557,7 @@ Returncode BaseType_meth1(BaseType* self, Ref_Manager* self_Refman, BaseType_Dyn
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "BaseType.meth1";
-  CHECK(55, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(55, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   MR_dec_ref(s_Refman);
@@ -577,7 +579,7 @@ Returncode BaseType_meth2(BaseType* self, Ref_Manager* self_Refman, BaseType_Dyn
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "BaseType.meth2";
-  CHECK(58, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(58, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   return MR_err;
@@ -599,7 +601,7 @@ Returncode BaseType_meth3(BaseType* self, Ref_Manager* self_Refman, BaseType_Dyn
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "BaseType.meth3";
-  CHECK(61, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(61, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   MR_dec_ref(s_Refman);
@@ -645,7 +647,7 @@ Returncode MiddleType_meth1(MiddleType* self, Ref_Manager* self_Refman, MiddleTy
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "MiddleType.meth1";
-  CHECK(17, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(17, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   ++MR_file_coverage[0].line_count[18];
   CHECK(18, BaseType_meth1(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
 MR_cleanup:
@@ -670,7 +672,7 @@ Returncode MiddleType_meth2(MiddleType* self, Ref_Manager* self_Refman, MiddleTy
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "MiddleType.meth2";
-  CHECK(21, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(21, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   ++MR_file_coverage[0].line_count[22];
   CHECK(22, BaseType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 MR_cleanup:
@@ -694,7 +696,7 @@ Returncode MiddleType_meth4(MiddleType* self, Ref_Manager* self_Refman, MiddleTy
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "MiddleType.meth4";
-  CHECK(25, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(25, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   return MR_err;
@@ -717,7 +719,7 @@ Returncode MiddleType_meth5(MiddleType* self, Ref_Manager* self_Refman, MiddleTy
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "MiddleType.meth5";
-  CHECK(28, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(28, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   MR_dec_ref(s_Refman);
@@ -798,7 +800,7 @@ Returncode TestStruct_print(TestStruct* self, Ref_Manager* self_Refman) {
   Returncode MR_err = OK;
   if (self == NULL) RAISE(214, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(214, 38, "used member of outdated weak reference")
-  CHECK(214, Sys_Mock_println(sys, sys_Refman, self->text, self->text_Refman) )
+  CHECK(214, Sys_println_Mock(sys, sys_Refman, self->text, self->text_Refman) )
 MR_cleanup:
   return MR_err;
 }
@@ -857,7 +859,7 @@ Returncode TestClass_print(TestClass* self, Ref_Manager* self_Refman, TestClass_
   Returncode MR_err = OK;
   if (self == NULL) RAISE(232, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
-  CHECK(232, Sys_Mock_println(sys, sys_Refman, self->text, self->text_Refman) )
+  CHECK(232, Sys_println_Mock(sys, sys_Refman, self->text, self->text_Refman) )
 MR_cleanup:
   return MR_err;
 }
@@ -1226,7 +1228,7 @@ Returncode TopType_meth2(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "TopType.meth2";
-  CHECK(18, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(18, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   CHECK(19, MiddleType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   CHECK(20, MiddleType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   CHECK(21, BaseType_meth2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
@@ -1251,7 +1253,7 @@ Returncode TopType_meth3(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "TopType.meth3";
-  CHECK(24, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(24, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   CHECK(25, BaseType_meth3(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), n, s, s_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
@@ -1275,7 +1277,7 @@ Returncode TopType_meth5(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "TopType.meth5";
-  CHECK(28, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(28, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   CHECK(29, MiddleType_meth5(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
   CHECK(30, MiddleType_meth1(NULL, NULL, NULL, n, s, s_Refman) )
   CHECK(31, BaseType_meth1(NULL, NULL, NULL, n, s, s_Refman) )
@@ -1306,7 +1308,7 @@ Returncode TopType_meth6(TopType* self, Ref_Manager* self_Refman, TopType_Dynami
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "TopType.meth6";
-  CHECK(34, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(34, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   if (self == NULL) RAISE(35, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(35, 27, "used member of empty object")
@@ -1391,11 +1393,11 @@ void TopLink_Del(TopLink* self) {
 #define MR_FUNC_NAME "RefNode.new"
 Returncode RefNode_new(RefNode* self, Ref_Manager* self_Refman, Ref ref, RefNode* next, Ref_Manager* next_Refman) {
   Returncode MR_err = OK;
-  if (self == NULL) RAISE(141, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(141, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(172, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
   self->ref = ref;
-  if (self == NULL) RAISE(142, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(173, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
   RefNode_Del(self->next);
   MR_owner_dec_ref(self->next_Refman);
   self->next_Refman = next_Refman;
@@ -1435,7 +1437,7 @@ Returncode test_simple_function(void) {
   aux_String_0_Var.max_length = 23;
   aux_String_0_Var.length = 22;
   aux_String_0_Var.values = "I am a simple function";
-  CHECK(24, Sys_Mock_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  CHECK(24, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = MR_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(28, 38, "insufficient memory for managed object")
@@ -2061,7 +2063,7 @@ Returncode test_variable(Int i, String* text, Ref_Manager* text_Refman, Array* a
   isn_Refman = MR_new_ref(isn);
   if (isn_Refman == NULL) RAISE(127, 38, "insufficient memory for managed object")
   CHECK(127, String_new(isn, isn_Refman, text, text_Refman) )
-  fi = Mock_f_test_int2str;
+  fi = f_test_int2str_Mock;
   itv = &itv_Var;
   itv_Refman = MR_new_ref(itv);
   if (itv_Refman == NULL) RAISE(129, 38, "insufficient memory for managed object")
@@ -2349,7 +2351,7 @@ Returncode test_call_expression(void) {
   aux_String_0_Var.values = "text";
   CHECK(254, f_test_params(3, aux_String_0, aux_String_0_Refman, NULL, NULL) )
   CHECK(255, f_test_outs(&(s), &(s_Refman), &(x)) )
-  CHECK(256, Mock_f_test_int2str(4, &(s), &(s_Refman)) )
+  CHECK(256, f_test_int2str_Mock(4, &(s), &(s_Refman)) )
   CHECK(257, f_test_int(5) )
   CHECK(258, f_test_int2int(6, &(x)) )
   CHECK(259, f_test_many(7, 8, &(x), &(x)) )
@@ -2358,7 +2360,7 @@ Returncode test_call_expression(void) {
   CHECK(266, f_test_many(11, 12, &(x), &(aux_Int_0)) )
   CHECK(266, f_test_int2int(10, &(aux_Int_1)) )
   x = aux_Int_1 + aux_Int_0;
-  CHECK(267, Mock_f_test_int2str(13, &(aux_String_1), &(aux_String_1_Refman)) )
+  CHECK(267, f_test_int2str_Mock(13, &(aux_String_1), &(aux_String_1_Refman)) )
   String_Del(s);
   MR_owner_dec_ref(s_Refman);
   s_Refman = aux_String_1_Refman;
@@ -2538,7 +2540,7 @@ Returncode test_builtins(Int i, Char c, Bool b, String* s, Ref_Manager* s_Refman
   MR_inc_ref(s_Refman);
   s = ((String*)((sys->argv)->values)) + 1;
   CHECK(326, Sys_print(sys, sys_Refman, s, s_Refman) )
-  CHECK(327, Sys_Mock_println(sys, sys_Refman, s, s_Refman) )
+  CHECK(327, Sys_println_Mock(sys, sys_Refman, s, s_Refman) )
   CHECK(328, Sys_getchar(sys, sys_Refman, &(cv), &(bv)) )
   CHECK(329, Sys_getline(sys, sys_Refman, s, s_Refman) )
   CHECK(330, Sys_getenv(sys, sys_Refman, s, s_Refman, s, s_Refman, &(bv)) )
@@ -2588,8 +2590,8 @@ Returncode test_ref_count(void) {
   s_user = s;
   s_user_Refman = s_Refman;
   MR_inc_ref(s_user_Refman);
-  CHECK(341, Sys_Mock_println(sys, sys_Refman, s, s_Refman) )
-  CHECK(342, Sys_Mock_println(sys, sys_Refman, s_user, s_user_Refman) )
+  CHECK(341, Sys_println_Mock(sys, sys_Refman, s, s_Refman) )
+  CHECK(342, Sys_println_Mock(sys, sys_Refman, s_user, s_user_Refman) )
   CHECK(343, f_remove(s, s_Refman) )
   s = NULL;
   s_Refman = NULL;
@@ -2600,7 +2602,7 @@ Returncode test_ref_count(void) {
     aux_String_1_Var.max_length = 17;
     aux_String_1_Var.length = 16;
     aux_String_1_Var.values = "ownership passed";
-    CHECK(345, Sys_Mock_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
+    CHECK(345, Sys_println_Mock(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
   }
   if (! (s_user != NULL && s_user_Refman->value != NULL)) {
     aux_String_2 = &aux_String_2_Var;
@@ -2609,7 +2611,7 @@ Returncode test_ref_count(void) {
     aux_String_2_Var.max_length = 15;
     aux_String_2_Var.length = 14;
     aux_String_2_Var.values = "string deleted";
-    CHECK(347, Sys_Mock_println(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
+    CHECK(347, Sys_println_Mock(sys, sys_Refman, aux_String_2, aux_String_2_Refman) )
   }
 MR_cleanup:
   MR_dec_ref(aux_String_2_Refman);
@@ -3023,7 +3025,7 @@ Returncode test_error_handling(TestStruct* t, Ref_Manager* t_Refman) {
   aux_String_12_Var.max_length = 2;
   aux_String_12_Var.length = 1;
   aux_String_12_Var.values = "}";
-  CHECK(433, Sys_Mock_println(sys, sys_Refman, aux_String_12, aux_String_12_Refman) )
+  CHECK(433, Sys_println_Mock(sys, sys_Refman, aux_String_12, aux_String_12_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_12_Refman);
   MR_dec_ref(aux_String_11_Refman);
@@ -3217,7 +3219,7 @@ Returncode test_for_each(void) {
   aux_String_4_Var.max_length = 2;
   aux_String_4_Var.length = 1;
   aux_String_4_Var.values = "]";
-  CHECK(470, Sys_Mock_println(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
+  CHECK(470, Sys_println_Mock(sys, sys_Refman, aux_String_4, aux_String_4_Refman) )
   arr = &arr_Var;
   arr_Var.values = arr_Values;
   arr_Refman = MR_new_ref(arr);
@@ -3271,7 +3273,7 @@ Returncode test_for_each(void) {
   aux_String_7_Var.max_length = 2;
   aux_String_7_Var.length = 1;
   aux_String_7_Var.values = "]";
-  CHECK(482, Sys_Mock_println(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
+  CHECK(482, Sys_println_Mock(sys, sys_Refman, aux_String_7, aux_String_7_Refman) )
   tsarr = &tsarr_Var;
   tsarr_Var.values = tsarr_Values;
   tsarr_Refman = MR_new_ref(tsarr);
@@ -3361,7 +3363,7 @@ Returncode test_for_each(void) {
   aux_String_13_Var.max_length = 2;
   aux_String_13_Var.length = 1;
   aux_String_13_Var.values = "]";
-  CHECK(492, Sys_Mock_println(sys, sys_Refman, aux_String_13, aux_String_13_Refman) )
+  CHECK(492, Sys_println_Mock(sys, sys_Refman, aux_String_13, aux_String_13_Refman) )
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   MR_set_var_string_array(3, 16, sarr, sarr_Chars);
@@ -3435,7 +3437,7 @@ Returncode test_for_each(void) {
   aux_String_19_Var.max_length = 2;
   aux_String_19_Var.length = 1;
   aux_String_19_Var.values = "]";
-  CHECK(502, Sys_Mock_println(sys, sys_Refman, aux_String_19, aux_String_19_Refman) )
+  CHECK(502, Sys_println_Mock(sys, sys_Refman, aux_String_19, aux_String_19_Refman) )
   aux_String_20 = &aux_String_20_Var;
   aux_String_20_Refman = MR_new_ref(aux_String_20);
   if (aux_String_20_Refman == NULL) RAISE(504, 38, "insufficient memory for managed object")
@@ -3507,7 +3509,7 @@ Returncode test_for_each(void) {
   aux_String_25_Var.max_length = 2;
   aux_String_25_Var.length = 1;
   aux_String_25_Var.values = "]";
-  CHECK(514, Sys_Mock_println(sys, sys_Refman, aux_String_25, aux_String_25_Refman) )
+  CHECK(514, Sys_println_Mock(sys, sys_Refman, aux_String_25, aux_String_25_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_25_Refman);
   MR_dec_ref(aux_String_24_Refman);
@@ -3595,7 +3597,7 @@ Returncode test_complex_field(void) {
   aux_String_1_Var.max_length = 1;
   aux_String_1_Var.length = 0;
   aux_String_1_Var.values = "";
-  CHECK(541, Sys_Mock_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
+  CHECK(541, Sys_println_Mock(sys, sys_Refman, aux_String_1, aux_String_1_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_1_Refman);
   MR_dec_ref(aux_String_0_Refman);
@@ -3630,13 +3632,15 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+Bool TestStruct_get_Mock_active = true;
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "TestStruct.Mock get"
-Returncode TestStruct_Mock_get(TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman) {
+#define MR_FUNC_NAME "TestStruct.get Mock"
+Returncode TestStruct_get_Mock(TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman) {
   Returncode MR_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  if (!TestStruct_get_Mock_active) return TestStruct_get(self, self_Refman, x, s, s_Refman);
   *x = 12;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
@@ -3655,11 +3659,28 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+Bool f_test_int2str_Mock_active = true;
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "Mock f-test-int2str"
-Returncode Mock_f_test_int2str(Int x, String** s, Ref_Manager** s_Refman) {
+#define MR_FUNC_NAME "f-test-int2str Mock"
+Returncode f_test_int2str_Mock(Int x, String** s, Ref_Manager** s_Refman) {
   Returncode MR_err = OK;
-  USER_RAISE(75, NULL, NULL)
+  if (!f_test_int2str_Mock_active) return f_test_int2str(x, s, s_Refman);
+  USER_RAISE(74, NULL, NULL)
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+Bool TestClass_dynamic_meth_Mock_active = true;
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "TestClass.dynamic-meth Mock"
+Returncode TestClass_dynamic_meth_Mock(TestClass* self, Ref_Manager* self_Refman, TestClass_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  if (!TestClass_dynamic_meth_Mock_active) return TestClass_dynamic_meth(self, self_Refman, self_Dynamic);
+  if (self == NULL) RAISE(77, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(77, 38, "used member of outdated weak reference")
+  self->num = 7;
 MR_cleanup:
   return MR_err;
 }
@@ -3670,37 +3691,106 @@ MR_cleanup:
 #define MR_FUNC_NAME "test-func"
 Returncode test_func(void) {
   Returncode MR_err = OK;
+  String* s = NULL;
+  Ref_Manager* s_Refman = NULL;
   TestStruct t_Var = {0};
   TestStruct* t = NULL;
   Ref_Manager* t_Refman = NULL;
   Int x = 0;
+  TestClass c_Var = {0};
+  TestClass* c = NULL;
+  Ref_Manager* c_Refman = NULL;
+  TestClass_Dynamic* c_Dynamic = &TestClass_dynamic;
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
-  t = &t_Var;
-  t_Refman = MR_new_ref(t);
-  if (t_Refman == NULL) RAISE(79, 38, "insufficient memory for managed object")
-  CHECK(79, TestStruct_new(t, t_Refman, 0, NULL, NULL) )
-  CHECK(81, TestStruct_Mock_get(t, t_Refman, &(x), &(aux_String_0), &(aux_String_0_Refman)) )
-  TEST_ASSERT(82, x == 12)
+  String* aux_String_2 = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
+  String* aux_String_3 = NULL;
+  Ref_Manager* aux_String_3_Refman = NULL;
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(83, Mock_f_test_int2str(3, &(aux_String_1), &(aux_String_1_Refman)) )
+    CHECK(81, f_test_int2str_Mock(3, &(s), &(s_Refman)) )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
-    TEST_FAIL(83, 16, "error not raised")
+    TEST_FAIL(81, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
+  CHECK(82, f_test_int2str(4, &(s), &(s_Refman)) )
+  f_test_int2str_Mock_active = false;
+  CHECK(84, f_test_int2str_Mock(5, &(s), &(s_Refman)) )
+  f_test_int2str_Mock_active = true;
+  do {
+    ++MR_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(86, f_test_int2str_Mock(6, &(s), &(s_Refman)) )
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
+    --MR_trace_ignore_count;
+    TEST_FAIL(86, 16, "error not raised")
+  } while (false);
+  --MR_trace_ignore_count;
+  t = &t_Var;
+  t_Refman = MR_new_ref(t);
+  if (t_Refman == NULL) RAISE(88, 38, "insufficient memory for managed object")
+  CHECK(88, TestStruct_new(t, t_Refman, 0, NULL, NULL) )
+  CHECK(90, TestStruct_get_Mock(t, t_Refman, &(x), &(aux_String_0), &(aux_String_0_Refman)) )
+  TEST_ASSERT(91, x == 12)
+  CHECK(92, TestStruct_get(t, t_Refman, &(x), &(aux_String_1), &(aux_String_1_Refman)) )
+  TEST_ASSERT(93, x == 0)
+  TestStruct_get_Mock_active = false;
+  x = 1;
+  CHECK(96, TestStruct_get_Mock(t, t_Refman, &(x), &(aux_String_2), &(aux_String_2_Refman)) )
+  TEST_ASSERT(97, x == 0)
+  TestStruct_get_Mock_active = true;
+  CHECK(99, TestStruct_get_Mock(t, t_Refman, &(x), &(aux_String_3), &(aux_String_3_Refman)) )
+  TEST_ASSERT(100, x == 12)
+  c = &c_Var;
+  c_Refman = MR_new_ref(c);
+  if (c_Refman == NULL) RAISE(102, 38, "insufficient memory for managed object")
+  CHECK(102, TestClass_new(c, c_Refman, c_Dynamic) )
+  if (c == NULL) RAISE(103, 27, "used member of empty object")
+  if (c_Refman->value == NULL) RAISE(103, 38, "used member of outdated weak reference")
+  TEST_ASSERT(103, c->num == 1)
+  if (c_Dynamic == NULL) RAISE(104, 28, "dynamic call of empty object")
+  CHECK(104, c_Dynamic->dynamic_meth(c, c_Refman, c_Dynamic) )
+  if (c == NULL) RAISE(105, 27, "used member of empty object")
+  if (c_Refman->value == NULL) RAISE(105, 38, "used member of outdated weak reference")
+  TEST_ASSERT(105, c->num == 7)
+  CHECK(106, TestClass_dynamic_meth(c, c_Refman, c_Dynamic) )
+  if (c == NULL) RAISE(107, 27, "used member of empty object")
+  if (c_Refman->value == NULL) RAISE(107, 38, "used member of outdated weak reference")
+  TEST_ASSERT(107, c->num == 6)
+  TestClass_dynamic_meth_Mock_active = false;
+  if (c == NULL) RAISE(109, 27, "used member of empty object")
+  if (c_Refman->value == NULL) RAISE(109, 38, "used member of outdated weak reference")
+  c->num = 0;
+  if (c_Dynamic == NULL) RAISE(110, 28, "dynamic call of empty object")
+  CHECK(110, c_Dynamic->dynamic_meth(c, c_Refman, c_Dynamic) )
+  if (c == NULL) RAISE(111, 27, "used member of empty object")
+  if (c_Refman->value == NULL) RAISE(111, 38, "used member of outdated weak reference")
+  TEST_ASSERT(111, c->num == 6)
+  TestClass_dynamic_meth_Mock_active = true;
+  CHECK(113, TestClass_dynamic_meth_Mock(c, c_Refman, c_Dynamic) )
+  if (c == NULL) RAISE(114, 27, "used member of empty object")
+  if (c_Refman->value == NULL) RAISE(114, 38, "used member of outdated weak reference")
+  TEST_ASSERT(114, c->num == 7)
 MR_cleanup:
-  String_Del(aux_String_1);
-  MR_owner_dec_ref(aux_String_1_Refman);
+  MR_dec_ref(aux_String_3_Refman);
+  MR_dec_ref(aux_String_2_Refman);
+  MR_dec_ref(aux_String_1_Refman);
   MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(c_Refman);
   MR_dec_ref(t_Refman);
+  String_Del(s);
+  MR_owner_dec_ref(s_Refman);
   return MR_err;
 }
 #undef MR_FILE_NAME
@@ -3711,7 +3801,7 @@ MR_cleanup:
 Returncode test_another(void) {
   Returncode MR_err = OK;
   Int x = 0;
-  TEST_ASSERT(88, x == 0)
+  TEST_ASSERT(119, x == 0)
 MR_cleanup:
   return MR_err;
 }
@@ -3732,37 +3822,37 @@ Returncode test_native(void) {
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Bool aux_Bool_0 = 0;
-  TEST_ASSERT(98, external_int == 6)
+  TEST_ASSERT(129, external_int == 6)
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(101, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(132, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
   aux_String_0_Var.values = "bb";
   s = &s_Var;
   s_Var.values = s_Values;
   s_Refman = MR_new_ref(s);
-  if (s_Refman == NULL) RAISE(101, 38, "insufficient memory for managed object")
-  CHECK(101, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
+  if (s_Refman == NULL) RAISE(132, 38, "insufficient memory for managed object")
+  CHECK(132, String_new(s, s_Refman, aux_String_0, aux_String_0_Refman) )
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(102, external(3, s, &(i), &(n)) )
+    CHECK(133, external(3, s, &(i), &(n)) )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
-    TEST_FAIL(102, 16, "error not raised")
+    TEST_FAIL(133, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
-  TEST_ASSERT(103, i == 3)
-  if (s == NULL) RAISE(104, 29, "empty object used as sequence")
-  if (s_Refman->value == NULL) RAISE(104, 40, "outdated weak reference used as sequence")
-  if ((0) < 0 || (0) >= (s)->length) RAISE(104, 25, "slice index out of bounds")
-  TEST_ASSERT(104, (((s)->values)[0]) == 'a')
-  CHECK(105, external2(n, &(aux_Bool_0)) )
-  TEST_ASSERT(105, aux_Bool_0)
+  TEST_ASSERT(134, i == 3)
+  if (s == NULL) RAISE(135, 29, "empty object used as sequence")
+  if (s_Refman->value == NULL) RAISE(135, 40, "outdated weak reference used as sequence")
+  if ((0) < 0 || (0) >= (s)->length) RAISE(135, 25, "slice index out of bounds")
+  TEST_ASSERT(135, (((s)->values)[0]) == 'a')
+  CHECK(136, external2(n, &(aux_Bool_0)) )
+  TEST_ASSERT(136, aux_Bool_0)
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   MR_dec_ref(s_Refman);
@@ -3787,45 +3877,45 @@ Returncode test_dynamic_type_parameters(void) {
   BaseType_Dynamic* tbase_Dynamic = NULL;
   dmid = &dmid_Var;
   dmid_Refman = MR_new_ref(dmid);
-  if (dmid_Refman == NULL) RAISE(109, 38, "insufficient memory for managed object")
+  if (dmid_Refman == NULL) RAISE(140, 38, "insufficient memory for managed object")
   ttop = &ttop_Var;
   ttop_Refman = MR_new_ref(ttop);
-  if (ttop_Refman == NULL) RAISE(110, 38, "insufficient memory for managed object")
-  CHECK(110, TopType_new(ttop, ttop_Refman, ttop_Dynamic) )
-  if (ttop == NULL) RAISE(111, 27, "used member of empty object")
-  if (ttop_Refman->value == NULL) RAISE(111, 38, "used member of outdated weak reference")
+  if (ttop_Refman == NULL) RAISE(141, 38, "insufficient memory for managed object")
+  CHECK(141, TopType_new(ttop, ttop_Refman, ttop_Dynamic) )
+  if (ttop == NULL) RAISE(142, 27, "used member of empty object")
+  if (ttop_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
   ttop->_base._base.num_base = 12;
-  if (dmid == NULL) RAISE(112, 27, "used member of empty object")
-  if (dmid_Refman->value == NULL) RAISE(112, 38, "used member of outdated weak reference")
+  if (dmid == NULL) RAISE(143, 27, "used member of empty object")
+  if (dmid_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
   MR_dec_ref(dmid->item_Refman);
   dmid->item_Refman = ttop_Refman;
   MR_inc_ref(dmid->item_Refman);
   dmid->item_Dynamic = (Generic_Type_Dynamic*)&(ttop_Dynamic->_base);
   dmid->item = &(ttop->_base);
-  if (dmid == NULL) RAISE(114, 27, "used member of empty object")
-  if (dmid_Refman->value == NULL) RAISE(114, 38, "used member of outdated weak reference")
+  if (dmid == NULL) RAISE(145, 27, "used member of empty object")
+  if (dmid_Refman->value == NULL) RAISE(145, 38, "used member of outdated weak reference")
   MR_dec_ref(tbase_Refman);
   tbase_Refman = dmid->item_Refman;
   MR_inc_ref(tbase_Refman);
   tbase_Dynamic = &(((MiddleType_Dynamic*)(dmid->item_Dynamic))->_base);
   tbase = &(((MiddleType*)(dmid->item))->_base);
-  if (tbase == NULL) RAISE(115, 27, "used member of empty object")
-  if (tbase_Refman->value == NULL) RAISE(115, 38, "used member of outdated weak reference")
-  TEST_ASSERT(115, tbase->num_base == 12)
-  if (ttop == NULL) RAISE(116, 27, "used member of empty object")
-  if (ttop_Refman->value == NULL) RAISE(116, 38, "used member of outdated weak reference")
+  if (tbase == NULL) RAISE(146, 27, "used member of empty object")
+  if (tbase_Refman->value == NULL) RAISE(146, 38, "used member of outdated weak reference")
+  TEST_ASSERT(146, tbase->num_base == 12)
+  if (ttop == NULL) RAISE(147, 27, "used member of empty object")
+  if (ttop_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
   ttop->_base._base.num_base = 13;
-  CHECK(117, Data_set(dmid, dmid_Refman, &(ttop->_base), ttop_Refman, (void*)&(ttop_Dynamic->_base), NULL, NULL) )
+  CHECK(148, Data_set(dmid, dmid_Refman, &(ttop->_base), ttop_Refman, (void*)&(ttop_Dynamic->_base), NULL, NULL) )
   MR_dec_ref(tbase_Refman);
   tbase_Refman = NULL;
   MR_inc_ref(tbase_Refman);
   tbase_Dynamic = NULL;
   tbase = NULL;
-  if (tbase != NULL) RAISE(119, 45, "non empty base class given as output argument")
-  CHECK(119, Data_get(dmid, dmid_Refman, (void*)&(tbase), &(tbase_Refman), (void*)&(tbase_Dynamic)) )
-  if (tbase == NULL) RAISE(120, 27, "used member of empty object")
-  if (tbase_Refman->value == NULL) RAISE(120, 38, "used member of outdated weak reference")
-  TEST_ASSERT(120, tbase->num_base == 13)
+  if (tbase != NULL) RAISE(150, 45, "non empty base class given as output argument")
+  CHECK(150, Data_get(dmid, dmid_Refman, (void*)&(tbase), &(tbase_Refman), (void*)&(tbase_Dynamic)) )
+  if (tbase == NULL) RAISE(151, 27, "used member of empty object")
+  if (tbase_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
+  TEST_ASSERT(151, tbase->num_base == 13)
 MR_cleanup:
   MR_dec_ref(tbase_Refman);
   MR_dec_ref(ttop_Refman);
@@ -3836,17 +3926,17 @@ MR_cleanup:
 #undef MR_FUNC_NAME
 
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "Mock delete"
-Returncode Mock_delete(Ref self) {
+#define MR_FUNC_NAME "delete Mock"
+Returncode delete_Mock(Ref self) {
   Returncode MR_err = OK;
   RefNode* aux_RefNode_0 = NULL;
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   if (record_delete) {
     aux_RefNode_0 = MR_alloc(sizeof(RefNode));
-    if (aux_RefNode_0 == NULL) RAISE(152, 49, "insufficient memory for object dynamic allocation")
+    if (aux_RefNode_0 == NULL) RAISE(183, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
-    if (aux_RefNode_0_Refman == NULL) RAISE(152, 38, "insufficient memory for managed object")
-    CHECK(152, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_refmans, deleted_refmans_Refman) )
+    if (aux_RefNode_0_Refman == NULL) RAISE(183, 38, "insufficient memory for managed object")
+    CHECK(183, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_refmans, deleted_refmans_Refman) )
     deleted_refmans = NULL;
     deleted_refmans_Refman = NULL;
     RefNode_Del(deleted_refmans);
@@ -3872,10 +3962,10 @@ Returncode Link_MockDel(Ref self) {
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   if (record_delete) {
     aux_RefNode_0 = MR_alloc(sizeof(RefNode));
-    if (aux_RefNode_0 == NULL) RAISE(156, 49, "insufficient memory for object dynamic allocation")
+    if (aux_RefNode_0 == NULL) RAISE(187, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
-    if (aux_RefNode_0_Refman == NULL) RAISE(156, 38, "insufficient memory for managed object")
-    CHECK(156, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_links, deleted_links_Refman) )
+    if (aux_RefNode_0_Refman == NULL) RAISE(187, 38, "insufficient memory for managed object")
+    CHECK(187, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_links, deleted_links_Refman) )
     deleted_links = NULL;
     deleted_links_Refman = NULL;
     RefNode_Del(deleted_links);
@@ -3901,10 +3991,10 @@ Returncode BaseLink_MockDel(Ref self) {
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   if (record_delete) {
     aux_RefNode_0 = MR_alloc(sizeof(RefNode));
-    if (aux_RefNode_0 == NULL) RAISE(160, 49, "insufficient memory for object dynamic allocation")
+    if (aux_RefNode_0 == NULL) RAISE(191, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
-    if (aux_RefNode_0_Refman == NULL) RAISE(160, 38, "insufficient memory for managed object")
-    CHECK(160, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_base_links, deleted_base_links_Refman) )
+    if (aux_RefNode_0_Refman == NULL) RAISE(191, 38, "insufficient memory for managed object")
+    CHECK(191, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_base_links, deleted_base_links_Refman) )
     deleted_base_links = NULL;
     deleted_base_links_Refman = NULL;
     RefNode_Del(deleted_base_links);
@@ -3930,10 +4020,10 @@ Returncode TopLink_MockDel(Ref self) {
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   if (record_delete) {
     aux_RefNode_0 = MR_alloc(sizeof(RefNode));
-    if (aux_RefNode_0 == NULL) RAISE(164, 49, "insufficient memory for object dynamic allocation")
+    if (aux_RefNode_0 == NULL) RAISE(195, 49, "insufficient memory for object dynamic allocation")
     aux_RefNode_0_Refman = MR_new_ref(aux_RefNode_0);
-    if (aux_RefNode_0_Refman == NULL) RAISE(164, 38, "insufficient memory for managed object")
-    CHECK(164, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_top_links, deleted_top_links_Refman) )
+    if (aux_RefNode_0_Refman == NULL) RAISE(195, 38, "insufficient memory for managed object")
+    CHECK(195, RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, deleted_top_links, deleted_top_links_Refman) )
     deleted_top_links = NULL;
     deleted_top_links_Refman = NULL;
     RefNode_Del(deleted_top_links);
@@ -3972,43 +4062,43 @@ Returncode test_simple_delete(void) {
   Link* l_user = NULL;
   Ref_Manager* l_user_Refman = NULL;
   Ref l_ref = NULL;
-  TEST_ASSERT(170, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
-  TEST_ASSERT(171, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
+  TEST_ASSERT(201, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  TEST_ASSERT(202, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
   record_delete = true;
   l = MR_alloc(sizeof(Link));
-  if (l == NULL) RAISE(174, 49, "insufficient memory for object dynamic allocation")
+  if (l == NULL) RAISE(205, 49, "insufficient memory for object dynamic allocation")
   l_Refman = MR_new_ref(l);
-  if (l_Refman == NULL) RAISE(174, 38, "insufficient memory for managed object")
+  if (l_Refman == NULL) RAISE(205, 38, "insufficient memory for managed object")
   l_user = l;
   l_user_Refman = l_Refman;
   MR_inc_ref(l_user_Refman);
-  TEST_ASSERT(176, l != NULL && l_Refman->value != NULL)
-  TEST_ASSERT(177, l_user != NULL && l_user_Refman->value != NULL)
+  TEST_ASSERT(207, l != NULL && l_Refman->value != NULL)
+  TEST_ASSERT(208, l_user != NULL && l_user_Refman->value != NULL)
   l_ref = l;
-  CHECK(179, f_remove_obj(l, l_Refman) )
+  CHECK(210, f_remove_obj(l, l_Refman) )
   l = NULL;
   l_Refman = NULL;
-  TEST_ASSERT(180, ! (l != NULL && l_Refman->value != NULL))
-  TEST_ASSERT(181, ! (l_user != NULL && l_user_Refman->value != NULL))
-  TEST_ASSERT(182, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
-  TEST_ASSERT(183, deleted_links != NULL && deleted_links_Refman->value != NULL)
-  if (deleted_links == NULL) RAISE(184, 27, "used member of empty object")
-  if (deleted_links_Refman->value == NULL) RAISE(184, 38, "used member of outdated weak reference")
-  TEST_ASSERT(184, deleted_links->ref == l_ref)
-  if (deleted_links == NULL) RAISE(185, 27, "used member of empty object")
-  if (deleted_links_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
-  TEST_ASSERT(185, ! (deleted_links->next != NULL && deleted_links->next_Refman->value != NULL))
+  TEST_ASSERT(211, ! (l != NULL && l_Refman->value != NULL))
+  TEST_ASSERT(212, ! (l_user != NULL && l_user_Refman->value != NULL))
+  TEST_ASSERT(213, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  TEST_ASSERT(214, deleted_links != NULL && deleted_links_Refman->value != NULL)
+  if (deleted_links == NULL) RAISE(215, 27, "used member of empty object")
+  if (deleted_links_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+  TEST_ASSERT(215, deleted_links->ref == l_ref)
+  if (deleted_links == NULL) RAISE(216, 27, "used member of empty object")
+  if (deleted_links_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
+  TEST_ASSERT(216, ! (deleted_links->next != NULL && deleted_links->next_Refman->value != NULL))
   MR_dec_ref(l_user_Refman);
   l_user_Refman = NULL;
   MR_inc_ref(l_user_Refman);
   l_user = NULL;
-  TEST_ASSERT(187, deleted_refmans != NULL && deleted_refmans_Refman->value != NULL)
-  if (deleted_refmans == NULL) RAISE(188, 27, "used member of empty object")
-  if (deleted_refmans_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
-  TEST_ASSERT(188, deleted_refmans->ref == l_ref)
-  if (deleted_refmans == NULL) RAISE(189, 27, "used member of empty object")
-  if (deleted_refmans_Refman->value == NULL) RAISE(189, 38, "used member of outdated weak reference")
-  TEST_ASSERT(189, ! (deleted_refmans->next != NULL && deleted_refmans->next_Refman->value != NULL))
+  TEST_ASSERT(218, deleted_refmans != NULL && deleted_refmans_Refman->value != NULL)
+  if (deleted_refmans == NULL) RAISE(219, 27, "used member of empty object")
+  if (deleted_refmans_Refman->value == NULL) RAISE(219, 38, "used member of outdated weak reference")
+  TEST_ASSERT(219, deleted_refmans->ref == l_ref)
+  if (deleted_refmans == NULL) RAISE(220, 27, "used member of empty object")
+  if (deleted_refmans_Refman->value == NULL) RAISE(220, 38, "used member of outdated weak reference")
+  TEST_ASSERT(220, ! (deleted_refmans->next != NULL && deleted_refmans->next_Refman->value != NULL))
   record_delete = false;
   RefNode_Del(deleted_refmans);
   MR_owner_dec_ref(deleted_refmans_Refman);
@@ -4031,8 +4121,8 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-has-ref"
 Returncode f_has_ref(Ref ref, RefNode** node, Ref_Manager** node_Refman) {
   Returncode MR_err = OK;
-  CHECK(196, f_has_ref_rec(ref, &(*node), &(*node_Refman)) )
-  CHECK(197, f_has_ref_rec(ref, &(deleted_refmans), &(deleted_refmans_Refman)) )
+  CHECK(227, f_has_ref_rec(ref, &(*node), &(*node_Refman)) )
+  CHECK(228, f_has_ref_rec(ref, &(deleted_refmans), &(deleted_refmans_Refman)) )
 MR_cleanup:
   return MR_err;
 }
@@ -4045,12 +4135,12 @@ Returncode f_has_ref_rec(Ref ref, RefNode** node, Ref_Manager** node_Refman) {
   Returncode MR_err = OK;
   RefNode* next = NULL;
   Ref_Manager* next_Refman = NULL;
-  TEST_ASSERT(200, (*node) != NULL && (*node_Refman)->value != NULL)
-  if (*node == NULL) RAISE(201, 27, "used member of empty object")
-  if ((*node_Refman)->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
+  TEST_ASSERT(231, (*node) != NULL && (*node_Refman)->value != NULL)
+  if (*node == NULL) RAISE(232, 27, "used member of empty object")
+  if ((*node_Refman)->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
   if ((*node)->ref == ref) {
-    if (*node == NULL) RAISE(202, 27, "used member of empty object")
-    if ((*node_Refman)->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
+    if (*node == NULL) RAISE(233, 27, "used member of empty object")
+    if ((*node_Refman)->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
     next = (*node)->next;
     next_Refman = (*node)->next_Refman;
     (*node)->next = NULL;
@@ -4063,9 +4153,9 @@ Returncode f_has_ref_rec(Ref ref, RefNode** node, Ref_Manager** node_Refman) {
     next_Refman = NULL;
   }
   else {
-    if (*node == NULL) RAISE(205, 27, "used member of empty object")
-    if ((*node_Refman)->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
-    CHECK(205, f_has_ref_rec(ref, &((*node)->next), &((*node)->next_Refman)) )
+    if (*node == NULL) RAISE(236, 27, "used member of empty object")
+    if ((*node_Refman)->value == NULL) RAISE(236, 38, "used member of outdated weak reference")
+    CHECK(236, f_has_ref_rec(ref, &((*node)->next), &((*node)->next_Refman)) )
   }
 MR_cleanup:
   RefNode_Del(next);
@@ -4108,101 +4198,101 @@ Returncode test_complex_delete(void) {
   Link* l3 = NULL;
   Ref_Manager* l3_Refman = NULL;
   Ref l3_ref = NULL;
-  TEST_ASSERT(208, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
-  TEST_ASSERT(209, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
-  TEST_ASSERT(210, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
-  TEST_ASSERT(211, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
+  TEST_ASSERT(239, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  TEST_ASSERT(240, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
+  TEST_ASSERT(241, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
+  TEST_ASSERT(242, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
   record_delete = true;
   b1 = MR_alloc(sizeof(BaseLink));
-  if (b1 == NULL) RAISE(214, 49, "insufficient memory for object dynamic allocation")
+  if (b1 == NULL) RAISE(245, 49, "insufficient memory for object dynamic allocation")
   b1_Refman = MR_new_ref(b1);
-  if (b1_Refman == NULL) RAISE(214, 38, "insufficient memory for managed object")
+  if (b1_Refman == NULL) RAISE(245, 38, "insufficient memory for managed object")
   b1_ref = b1;
   b2 = MR_alloc(sizeof(BaseLink));
-  if (b2 == NULL) RAISE(216, 49, "insufficient memory for object dynamic allocation")
+  if (b2 == NULL) RAISE(247, 49, "insufficient memory for object dynamic allocation")
   b2_Refman = MR_new_ref(b2);
-  if (b2_Refman == NULL) RAISE(216, 38, "insufficient memory for managed object")
+  if (b2_Refman == NULL) RAISE(247, 38, "insufficient memory for managed object")
   b2_ref = b2;
   t1 = MR_alloc(sizeof(TopLink));
-  if (t1 == NULL) RAISE(218, 49, "insufficient memory for object dynamic allocation")
+  if (t1 == NULL) RAISE(249, 49, "insufficient memory for object dynamic allocation")
   t1_Refman = MR_new_ref(t1);
-  if (t1_Refman == NULL) RAISE(218, 38, "insufficient memory for managed object")
+  if (t1_Refman == NULL) RAISE(249, 38, "insufficient memory for managed object")
   t1_ref = t1;
   t2 = MR_alloc(sizeof(TopLink));
-  if (t2 == NULL) RAISE(220, 49, "insufficient memory for object dynamic allocation")
+  if (t2 == NULL) RAISE(251, 49, "insufficient memory for object dynamic allocation")
   t2_Refman = MR_new_ref(t2);
-  if (t2_Refman == NULL) RAISE(220, 38, "insufficient memory for managed object")
+  if (t2_Refman == NULL) RAISE(251, 38, "insufficient memory for managed object")
   t2_ref = t2;
   t3 = MR_alloc(sizeof(TopLink));
-  if (t3 == NULL) RAISE(222, 49, "insufficient memory for object dynamic allocation")
+  if (t3 == NULL) RAISE(253, 49, "insufficient memory for object dynamic allocation")
   t3_Refman = MR_new_ref(t3);
-  if (t3_Refman == NULL) RAISE(222, 38, "insufficient memory for managed object")
+  if (t3_Refman == NULL) RAISE(253, 38, "insufficient memory for managed object")
   t3_ref = t3;
   l1 = MR_alloc(sizeof(Link));
-  if (l1 == NULL) RAISE(224, 49, "insufficient memory for object dynamic allocation")
+  if (l1 == NULL) RAISE(255, 49, "insufficient memory for object dynamic allocation")
   l1_Refman = MR_new_ref(l1);
-  if (l1_Refman == NULL) RAISE(224, 38, "insufficient memory for managed object")
+  if (l1_Refman == NULL) RAISE(255, 38, "insufficient memory for managed object")
   l1_ref = l1;
   l2 = MR_alloc(sizeof(Link));
-  if (l2 == NULL) RAISE(226, 49, "insufficient memory for object dynamic allocation")
+  if (l2 == NULL) RAISE(257, 49, "insufficient memory for object dynamic allocation")
   l2_Refman = MR_new_ref(l2);
-  if (l2_Refman == NULL) RAISE(226, 38, "insufficient memory for managed object")
+  if (l2_Refman == NULL) RAISE(257, 38, "insufficient memory for managed object")
   l2_ref = l2;
   l3 = MR_alloc(sizeof(Link));
-  if (l3 == NULL) RAISE(228, 49, "insufficient memory for object dynamic allocation")
+  if (l3 == NULL) RAISE(259, 49, "insufficient memory for object dynamic allocation")
   l3_Refman = MR_new_ref(l3);
-  if (l3_Refman == NULL) RAISE(228, 38, "insufficient memory for managed object")
+  if (l3_Refman == NULL) RAISE(259, 38, "insufficient memory for managed object")
   l3_ref = l3;
-  if (b1 == NULL) RAISE(231, 27, "used member of empty object")
-  if (b1_Refman->value == NULL) RAISE(231, 38, "used member of outdated weak reference")
+  if (b1 == NULL) RAISE(262, 27, "used member of empty object")
+  if (b1_Refman->value == NULL) RAISE(262, 38, "used member of outdated weak reference")
   MR_dec_ref(b1->link_Refman);
   b1->link_Refman = l1_Refman;
   MR_inc_ref(b1->link_Refman);
   b1->link = l1;
-  if (b2 == NULL) RAISE(232, 27, "used member of empty object")
-  if (b2_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
+  if (b2 == NULL) RAISE(263, 27, "used member of empty object")
+  if (b2_Refman->value == NULL) RAISE(263, 38, "used member of outdated weak reference")
   MR_dec_ref(b2->link_Refman);
   b2->link_Refman = l2_Refman;
   MR_inc_ref(b2->link_Refman);
   b2->link = l2;
-  if (t1 == NULL) RAISE(233, 27, "used member of empty object")
-  if (t1_Refman->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
+  if (t1 == NULL) RAISE(264, 27, "used member of empty object")
+  if (t1_Refman->value == NULL) RAISE(264, 38, "used member of outdated weak reference")
   MR_dec_ref(t1->_base.link_Refman);
   t1->_base.link_Refman = l1_Refman;
   MR_inc_ref(t1->_base.link_Refman);
   t1->_base.link = l1;
-  if (t2 == NULL) RAISE(234, 27, "used member of empty object")
-  if (t2_Refman->value == NULL) RAISE(234, 38, "used member of outdated weak reference")
+  if (t2 == NULL) RAISE(265, 27, "used member of empty object")
+  if (t2_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
   MR_dec_ref(t2->_base.link_Refman);
   t2->_base.link_Refman = l2_Refman;
   MR_inc_ref(t2->_base.link_Refman);
   t2->_base.link = l2;
-  if (t3 == NULL) RAISE(235, 27, "used member of empty object")
-  if (t3_Refman->value == NULL) RAISE(235, 38, "used member of outdated weak reference")
+  if (t3 == NULL) RAISE(266, 27, "used member of empty object")
+  if (t3_Refman->value == NULL) RAISE(266, 38, "used member of outdated weak reference")
   MR_dec_ref(t3->_base.link_Refman);
   t3->_base.link_Refman = l3_Refman;
   MR_inc_ref(t3->_base.link_Refman);
   t3->_base.link = l3;
-  if (l2 == NULL) RAISE(237, 27, "used member of empty object")
-  if (l2_Refman->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
+  if (l2 == NULL) RAISE(268, 27, "used member of empty object")
+  if (l2_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
   Link_Del(l2->next);
   MR_owner_dec_ref(l2->next_Refman);
   l2->next_Refman = l3_Refman;
   l2->next = l3;
   l3 = NULL;
   l3_Refman = NULL;
-  TEST_ASSERT(238, ! (l3 != NULL && l3_Refman->value != NULL))
-  if (l1 == NULL) RAISE(239, 27, "used member of empty object")
-  if (l1_Refman->value == NULL) RAISE(239, 38, "used member of outdated weak reference")
+  TEST_ASSERT(269, ! (l3 != NULL && l3_Refman->value != NULL))
+  if (l1 == NULL) RAISE(270, 27, "used member of empty object")
+  if (l1_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
   Link_Del(l1->next);
   MR_owner_dec_ref(l1->next_Refman);
   l1->next_Refman = l2_Refman;
   l1->next = l2;
   l2 = NULL;
   l2_Refman = NULL;
-  TEST_ASSERT(240, ! (l2 != NULL && l2_Refman->value != NULL))
-  if (t3 == NULL) RAISE(241, 27, "used member of empty object")
-  if (t3_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
+  TEST_ASSERT(271, ! (l2 != NULL && l2_Refman->value != NULL))
+  if (t3 == NULL) RAISE(272, 27, "used member of empty object")
+  if (t3_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
   if (t3->item_Dynamic != NULL) t3->item_Dynamic->_del(t3->item);
   MR_owner_dec_ref(t3->item_Refman);
   t3->item_Refman = b2_Refman;
@@ -4211,9 +4301,9 @@ Returncode test_complex_delete(void) {
   b2 = NULL;
   b2_Refman = NULL;
   b2_Dynamic = NULL;
-  TEST_ASSERT(242, ! (b2 != NULL && b2_Refman->value != NULL))
-  if (t2 == NULL) RAISE(243, 27, "used member of empty object")
-  if (t2_Refman->value == NULL) RAISE(243, 38, "used member of outdated weak reference")
+  TEST_ASSERT(273, ! (b2 != NULL && b2_Refman->value != NULL))
+  if (t2 == NULL) RAISE(274, 27, "used member of empty object")
+  if (t2_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
   if (t2->item_Dynamic != NULL) t2->item_Dynamic->_del(t2->item);
   MR_owner_dec_ref(t2->item_Refman);
   t2->item_Refman = t3_Refman;
@@ -4222,9 +4312,9 @@ Returncode test_complex_delete(void) {
   t3 = NULL;
   t3_Refman = NULL;
   t3_Dynamic = NULL;
-  TEST_ASSERT(244, ! (t3 != NULL && t3_Refman->value != NULL))
-  if (t1 == NULL) RAISE(245, 27, "used member of empty object")
-  if (t1_Refman->value == NULL) RAISE(245, 38, "used member of outdated weak reference")
+  TEST_ASSERT(275, ! (t3 != NULL && t3_Refman->value != NULL))
+  if (t1 == NULL) RAISE(276, 27, "used member of empty object")
+  if (t1_Refman->value == NULL) RAISE(276, 38, "used member of outdated weak reference")
   if (t1->_base.next_Dynamic != NULL) t1->_base.next_Dynamic->_del(t1->_base.next);
   MR_owner_dec_ref(t1->_base.next_Refman);
   t1->_base.next_Refman = t2_Refman;
@@ -4233,9 +4323,9 @@ Returncode test_complex_delete(void) {
   t2 = NULL;
   t2_Refman = NULL;
   t2_Dynamic = NULL;
-  TEST_ASSERT(246, ! (t2 != NULL && t2_Refman->value != NULL))
-  if (t1 == NULL) RAISE(247, 27, "used member of empty object")
-  if (t1_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
+  TEST_ASSERT(277, ! (t2 != NULL && t2_Refman->value != NULL))
+  if (t1 == NULL) RAISE(278, 27, "used member of empty object")
+  if (t1_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
   Link_Del(t1->item);
   MR_owner_dec_ref(t1->item_Refman);
   t1->item_Refman = l1_Refman;
@@ -4243,9 +4333,9 @@ Returncode test_complex_delete(void) {
   t1->item = l1;
   l1 = NULL;
   l1_Refman = NULL;
-  TEST_ASSERT(248, ! (l1 != NULL && l1_Refman->value != NULL))
-  if (b1 == NULL) RAISE(249, 27, "used member of empty object")
-  if (b1_Refman->value == NULL) RAISE(249, 38, "used member of outdated weak reference")
+  TEST_ASSERT(279, ! (l1 != NULL && l1_Refman->value != NULL))
+  if (b1 == NULL) RAISE(280, 27, "used member of empty object")
+  if (b1_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
   if (b1->next_Dynamic != NULL) b1->next_Dynamic->_del(b1->next);
   MR_owner_dec_ref(b1->next_Refman);
   b1->next_Refman = t1_Refman;
@@ -4254,33 +4344,33 @@ Returncode test_complex_delete(void) {
   t1 = NULL;
   t1_Refman = NULL;
   t1_Dynamic = NULL;
-  TEST_ASSERT(250, ! (t1 != NULL && t1_Refman->value != NULL))
-  TEST_ASSERT(252, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
-  TEST_ASSERT(253, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
-  TEST_ASSERT(254, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
-  TEST_ASSERT(255, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
+  TEST_ASSERT(281, ! (t1 != NULL && t1_Refman->value != NULL))
+  TEST_ASSERT(283, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  TEST_ASSERT(284, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
+  TEST_ASSERT(285, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
+  TEST_ASSERT(286, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
   if (b1_Dynamic != NULL) b1_Dynamic->_del(b1);
   MR_owner_dec_ref(b1_Refman);
   b1_Refman = NULL;
   b1_Dynamic = NULL;
   b1 = NULL;
-  TEST_ASSERT(257, ! (b1 != NULL && b1_Refman->value != NULL))
+  TEST_ASSERT(288, ! (b1 != NULL && b1_Refman->value != NULL))
   record_delete = false;
-  CHECK(260, f_has_ref(b1_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
-  CHECK(261, f_has_ref(t1_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
-  CHECK(262, f_has_ref_rec(t1_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
-  CHECK(263, f_has_ref(t2_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
-  CHECK(264, f_has_ref_rec(t2_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
-  CHECK(265, f_has_ref(t3_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
-  CHECK(266, f_has_ref_rec(t3_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
-  CHECK(267, f_has_ref(b2_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
-  CHECK(268, f_has_ref(l1_ref, &(deleted_links), &(deleted_links_Refman)) )
-  CHECK(269, f_has_ref(l2_ref, &(deleted_links), &(deleted_links_Refman)) )
-  CHECK(270, f_has_ref(l3_ref, &(deleted_links), &(deleted_links_Refman)) )
-  TEST_ASSERT(272, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
-  TEST_ASSERT(273, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
-  TEST_ASSERT(274, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
-  TEST_ASSERT(275, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
+  CHECK(291, f_has_ref(b1_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(292, f_has_ref(t1_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  CHECK(293, f_has_ref_rec(t1_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(294, f_has_ref(t2_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  CHECK(295, f_has_ref_rec(t2_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(296, f_has_ref(t3_ref, &(deleted_top_links), &(deleted_top_links_Refman)) )
+  CHECK(297, f_has_ref_rec(t3_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(298, f_has_ref(b2_ref, &(deleted_base_links), &(deleted_base_links_Refman)) )
+  CHECK(299, f_has_ref(l1_ref, &(deleted_links), &(deleted_links_Refman)) )
+  CHECK(300, f_has_ref(l2_ref, &(deleted_links), &(deleted_links_Refman)) )
+  CHECK(301, f_has_ref(l3_ref, &(deleted_links), &(deleted_links_Refman)) )
+  TEST_ASSERT(303, ! (deleted_refmans != NULL && deleted_refmans_Refman->value != NULL))
+  TEST_ASSERT(304, ! (deleted_links != NULL && deleted_links_Refman->value != NULL))
+  TEST_ASSERT(305, ! (deleted_base_links != NULL && deleted_base_links_Refman->value != NULL))
+  TEST_ASSERT(306, ! (deleted_top_links != NULL && deleted_top_links_Refman->value != NULL))
 MR_cleanup:
   Link_Del(l3);
   MR_owner_dec_ref(l3_Refman);
@@ -4312,11 +4402,11 @@ Returncode f_raise_message(void) {
   Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(279, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(310, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
   aux_String_0_Var.values = "tested message";
-  USER_RAISE(279, aux_String_0, aux_String_0_Refman)
+  USER_RAISE(310, aux_String_0, aux_String_0_Refman)
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   return MR_err;
@@ -4335,7 +4425,7 @@ Returncode f_ignore_and_raise(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; break
-    CHECK(283, f_raise_message() )
+    CHECK(314, f_raise_message() )
 
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
@@ -4344,11 +4434,11 @@ Returncode f_ignore_and_raise(void) {
   MR_err = OK;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(284, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(315, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "ignore and raise";
-  USER_RAISE(284, aux_String_0, aux_String_0_Refman)
+  USER_RAISE(315, aux_String_0, aux_String_0_Refman)
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   return MR_err;
@@ -4360,7 +4450,7 @@ MR_cleanup:
 #define MR_FUNC_NAME "f-failed-assert"
 Returncode f_failed_assert(void) {
   Returncode MR_err = OK;
-  TEST_ASSERT(287, 1 == 2)
+  TEST_ASSERT(318, 1 == 2)
 MR_cleanup:
   return MR_err;
 }
@@ -4378,21 +4468,21 @@ Returncode f_good_assert_error(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(290, f_raise_message() )
+    CHECK(321, f_raise_message() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
-    TEST_FAIL(290, 16, "error not raised")
+    TEST_FAIL(321, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(291, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(322, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 18;
   aux_String_0_Var.length = 17;
   aux_String_0_Var.values = "good assert error";
-  USER_RAISE(291, aux_String_0, aux_String_0_Refman)
+  USER_RAISE(322, aux_String_0, aux_String_0_Refman)
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
   return MR_err;
@@ -4408,12 +4498,12 @@ Returncode f_failed_assert_error(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(294, f_test_void() )
+    CHECK(325, f_test_void() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
-    TEST_FAIL(294, 16, "error not raised")
+    TEST_FAIL(325, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
 MR_cleanup:
@@ -4436,20 +4526,20 @@ Returncode f_wrong_message_assert_error(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(297, f_raise_message() )
+    CHECK(328, f_raise_message() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(297, 16, "error not raised")
+    TEST_FAIL(328, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(297)
+    TEST_FAIL_NULL(328)
   }
   MR_expected_error = MR_expected_error_prev;}
 MR_cleanup:
@@ -4459,8 +4549,8 @@ MR_cleanup:
 #undef MR_FUNC_NAME
 
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "Mock new"
-Returncode Mock_new(Bool* alloc_success) {
+#define MR_FUNC_NAME "new Mock"
+Returncode new_Mock(Bool* alloc_success) {
   Returncode MR_err = OK;
   *alloc_success = true;
   if (new_fail_countdown > 0) {
@@ -4482,10 +4572,10 @@ Returncode f_alloc(void) {
   String* string = NULL;
   Ref_Manager* string_Refman = NULL;
   string = MR_new_string(16);
-  if (string == NULL) RAISE(309, 49, "insufficient memory for object dynamic allocation")
+  if (string == NULL) RAISE(340, 49, "insufficient memory for object dynamic allocation")
   string_Refman = MR_new_ref(string);
-  if (string_Refman == NULL) RAISE(309, 38, "insufficient memory for managed object")
-  TEST_ASSERT(310, string != NULL && string_Refman->value != NULL)
+  if (string_Refman == NULL) RAISE(340, 38, "insufficient memory for managed object")
+  TEST_ASSERT(341, string != NULL && string_Refman->value != NULL)
 MR_cleanup:
   String_Del(string);
   MR_owner_dec_ref(string_Refman);
@@ -4523,20 +4613,20 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(313, f_raise_message() )
+    CHECK(344, f_raise_message() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(313, 16, "error not raised")
+    TEST_FAIL(344, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(313)
+    TEST_FAIL_NULL(344)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4549,20 +4639,20 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(314, f_ignore_and_raise() )
+    CHECK(345, f_ignore_and_raise() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(314, 16, "error not raised")
+    TEST_FAIL(345, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(314)
+    TEST_FAIL_NULL(345)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4575,20 +4665,20 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(315, f_failed_assert() )
+    CHECK(346, f_failed_assert() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(315, 16, "error not raised")
+    TEST_FAIL(346, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(315)
+    TEST_FAIL_NULL(346)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4601,20 +4691,20 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(316, f_good_assert_error() )
+    CHECK(347, f_good_assert_error() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(316, 16, "error not raised")
+    TEST_FAIL(347, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(316)
+    TEST_FAIL_NULL(347)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4627,32 +4717,32 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(317, f_failed_assert_error() )
+    CHECK(348, f_failed_assert_error() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(317, 16, "error not raised")
+    TEST_FAIL(348, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(317)
+    TEST_FAIL_NULL(348)
   }
   MR_expected_error = MR_expected_error_prev;}
   do {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(318, f_wrong_message_assert_error() )
+    CHECK(349, f_wrong_message_assert_error() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
-    TEST_FAIL(318, 16, "error not raised")
+    TEST_FAIL(349, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   {char* MR_expected_error_prev;
@@ -4665,27 +4755,27 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (fun == NULL) RAISE(320, 21, "empty function called")
-    CHECK(320, fun() )
+    if (fun == NULL) RAISE(351, 21, "empty function called")
+    CHECK(351, fun() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(320, 16, "error not raised")
+    TEST_FAIL(351, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(320)
+    TEST_FAIL_NULL(351)
   }
   MR_expected_error = MR_expected_error_prev;}
   base_var = &base_var_Var;
   base_var_Refman = MR_new_ref(base_var);
-  if (base_var_Refman == NULL) RAISE(321, 38, "insufficient memory for managed object")
-  CHECK(321, BaseType_new(base_var, base_var_Refman, base_var_Dynamic) )
+  if (base_var_Refman == NULL) RAISE(352, 38, "insufficient memory for managed object")
+  CHECK(352, BaseType_new(base_var, base_var_Refman, base_var_Dynamic) )
   base_user = base_var;
   base_user_Refman = base_var_Refman;
   MR_inc_ref(base_user_Refman);
@@ -4700,27 +4790,27 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (base_user != NULL) RAISE(323, 45, "non empty base class given as output argument")
-    CHECK(323, test_mid_out((void*)&(base_user), &(base_user_Refman), (void*)&(base_user_Dynamic)) )
+    if (base_user != NULL) RAISE(354, 45, "non empty base class given as output argument")
+    CHECK(354, test_mid_out((void*)&(base_user), &(base_user_Refman), (void*)&(base_user_Dynamic)) )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(323, 16, "error not raised")
+    TEST_FAIL(354, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(323)
+    TEST_FAIL_NULL(354)
   }
   MR_expected_error = MR_expected_error_prev;}
   arr = MR_new_array(2, sizeof(Int));
-  if (arr == NULL) RAISE(325, 49, "insufficient memory for object dynamic allocation")
+  if (arr == NULL) RAISE(356, 49, "insufficient memory for object dynamic allocation")
   arr_Refman = MR_new_ref(arr);
-  if (arr_Refman == NULL) RAISE(325, 38, "insufficient memory for managed object")
+  if (arr_Refman == NULL) RAISE(356, 38, "insufficient memory for managed object")
   {char* MR_expected_error_prev;
   int MR_expected_error_trace_ignore_count_prev;
   MR_expected_error_prev = MR_expected_error;
@@ -4731,22 +4821,22 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr == NULL) RAISE(326, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(326, 40, "outdated weak reference used as sequence")
-    if ((6) < 0 || (6) >= (arr)->length) RAISE(326, 25, "slice index out of bounds")
+    if (arr == NULL) RAISE(357, 29, "empty object used as sequence")
+    if (arr_Refman->value == NULL) RAISE(357, 40, "outdated weak reference used as sequence")
+    if ((6) < 0 || (6) >= (arr)->length) RAISE(357, 25, "slice index out of bounds")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(326, 16, "error not raised")
+    TEST_FAIL(357, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(326)
+    TEST_FAIL_NULL(357)
   }
   MR_expected_error = MR_expected_error_prev;}
   arr2 = arr;
@@ -4765,21 +4855,21 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr == NULL) RAISE(329, 27, "used member of empty object")
-    if (arr_Refman->value == NULL) RAISE(329, 38, "used member of outdated weak reference")
+    if (arr == NULL) RAISE(360, 27, "used member of empty object")
+    if (arr_Refman->value == NULL) RAISE(360, 38, "used member of outdated weak reference")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(329, 16, "error not raised")
+    TEST_FAIL(360, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(329)
+    TEST_FAIL_NULL(360)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4792,21 +4882,21 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr2 == NULL) RAISE(330, 27, "used member of empty object")
-    if (arr2_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
+    if (arr2 == NULL) RAISE(361, 27, "used member of empty object")
+    if (arr2_Refman->value == NULL) RAISE(361, 38, "used member of outdated weak reference")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(330, 16, "error not raised")
+    TEST_FAIL(361, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(330)
+    TEST_FAIL_NULL(361)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4819,22 +4909,22 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr == NULL) RAISE(331, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(331, 40, "outdated weak reference used as sequence")
-    if ((0) < 0 || (0) >= (arr)->length) RAISE(331, 25, "slice index out of bounds")
+    if (arr == NULL) RAISE(362, 29, "empty object used as sequence")
+    if (arr_Refman->value == NULL) RAISE(362, 40, "outdated weak reference used as sequence")
+    if ((0) < 0 || (0) >= (arr)->length) RAISE(362, 25, "slice index out of bounds")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(331, 16, "error not raised")
+    TEST_FAIL(362, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(331)
+    TEST_FAIL_NULL(362)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4847,22 +4937,22 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (arr2 == NULL) RAISE(332, 29, "empty object used as sequence")
-    if (arr2_Refman->value == NULL) RAISE(332, 40, "outdated weak reference used as sequence")
-    if ((0) < 0 || (0) >= (arr2)->length) RAISE(332, 25, "slice index out of bounds")
+    if (arr2 == NULL) RAISE(363, 29, "empty object used as sequence")
+    if (arr2_Refman->value == NULL) RAISE(363, 40, "outdated weak reference used as sequence")
+    if ((0) < 0 || (0) >= (arr2)->length) RAISE(363, 25, "slice index out of bounds")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(332, 16, "error not raised")
+    TEST_FAIL(363, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(332)
+    TEST_FAIL_NULL(363)
   }
   MR_expected_error = MR_expected_error_prev;}
   {char* MR_expected_error_prev;
@@ -4875,21 +4965,21 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    if (top_Dynamic == NULL) RAISE(334, 28, "dynamic call of empty object")
-    CHECK(334, top_Dynamic->_base._base.meth2(&(top->_base._base), top_Refman, &(top_Dynamic->_base._base)) )
+    if (top_Dynamic == NULL) RAISE(365, 28, "dynamic call of empty object")
+    CHECK(365, top_Dynamic->_base._base.meth2(&(top->_base._base), top_Refman, &(top_Dynamic->_base._base)) )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(334, 16, "error not raised")
+    TEST_FAIL(365, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(334)
+    TEST_FAIL_NULL(365)
   }
   MR_expected_error = MR_expected_error_prev;}
   new_fail_countdown = 1;
@@ -4903,20 +4993,20 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(336, f_alloc() )
+    CHECK(367, f_alloc() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(336, 16, "error not raised")
+    TEST_FAIL(367, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(336)
+    TEST_FAIL_NULL(367)
   }
   MR_expected_error = MR_expected_error_prev;}
   new_fail_countdown = 2;
@@ -4930,20 +5020,20 @@ Returncode test_assert_error_message(void) {
     ++MR_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(338, f_alloc() )
+    CHECK(369, f_alloc() )
     
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) MR_err = value; goto MR_cleanup
     --MR_trace_ignore_count;
     MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL(338, 16, "error not raised")
+    TEST_FAIL(369, 16, "error not raised")
   } while (false);
   --MR_trace_ignore_count;
   MR_expected_error_trace_ignore_count = MR_expected_error_trace_ignore_count_prev;
   if (MR_expected_error == NULL) {
     MR_expected_error = MR_expected_error_prev;
-    TEST_FAIL_NULL(338)
+    TEST_FAIL_NULL(369)
   }
   MR_expected_error = MR_expected_error_prev;}
 MR_cleanup:
@@ -4957,12 +5047,14 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+Bool Sys_println_Mock_active = true;
 #define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "Sys.Mock println"
-Returncode Sys_Mock_println(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
+#define MR_FUNC_NAME "Sys.println Mock"
+Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
   Returncode MR_err = OK;
   MR_inc_ref(text_Refman);
-  TEST_ASSERT(341, text != NULL && text_Refman->value != NULL)
+  if (!Sys_println_Mock_active) return Sys_println(self, self_Refman, text, text_Refman);
+  TEST_ASSERT(372, text != NULL && text_Refman->value != NULL)
 MR_cleanup:
   MR_dec_ref(text_Refman);
   return MR_err;
@@ -4980,16 +5072,16 @@ Returncode test_cover_all(void) {
   MiddleType_Dynamic* mid_Dynamic = &MiddleType_dynamic;
   mid = &mid_Var;
   mid_Refman = MR_new_ref(mid);
-  if (mid_Refman == NULL) RAISE(344, 38, "insufficient memory for managed object")
-  CHECK(344, MiddleType_new(mid, mid_Refman, mid_Dynamic) )
-  if (mid_Dynamic == NULL) RAISE(345, 28, "dynamic call of empty object")
-  CHECK(345, mid_Dynamic->_base.meth1(&(mid->_base), mid_Refman, &(mid_Dynamic->_base), 0, NULL, NULL) )
-  if (mid_Dynamic == NULL) RAISE(346, 28, "dynamic call of empty object")
-  CHECK(346, mid_Dynamic->_base.meth2(&(mid->_base), mid_Refman, &(mid_Dynamic->_base)) )
-  if (mid_Dynamic == NULL) RAISE(347, 28, "dynamic call of empty object")
-  CHECK(347, mid_Dynamic->meth4(mid, mid_Refman, mid_Dynamic) )
-  if (mid_Dynamic == NULL) RAISE(348, 28, "dynamic call of empty object")
-  CHECK(348, mid_Dynamic->meth5(mid, mid_Refman, mid_Dynamic, 0, NULL, NULL) )
+  if (mid_Refman == NULL) RAISE(375, 38, "insufficient memory for managed object")
+  CHECK(375, MiddleType_new(mid, mid_Refman, mid_Dynamic) )
+  if (mid_Dynamic == NULL) RAISE(376, 28, "dynamic call of empty object")
+  CHECK(376, mid_Dynamic->_base.meth1(&(mid->_base), mid_Refman, &(mid_Dynamic->_base), 0, NULL, NULL) )
+  if (mid_Dynamic == NULL) RAISE(377, 28, "dynamic call of empty object")
+  CHECK(377, mid_Dynamic->_base.meth2(&(mid->_base), mid_Refman, &(mid_Dynamic->_base)) )
+  if (mid_Dynamic == NULL) RAISE(378, 28, "dynamic call of empty object")
+  CHECK(378, mid_Dynamic->meth4(mid, mid_Refman, mid_Dynamic) )
+  if (mid_Dynamic == NULL) RAISE(379, 28, "dynamic call of empty object")
+  CHECK(379, mid_Dynamic->meth5(mid, mid_Refman, mid_Dynamic, 0, NULL, NULL) )
 MR_cleanup:
   MR_dec_ref(mid_Refman);
   return MR_err;

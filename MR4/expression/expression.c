@@ -240,7 +240,7 @@ static char* _func_name_Expression_add_aux_variable = "Expression.add-aux-variab
 Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_create, TypeInstance* type_instance, SymbolExpression** symbol) {
   (*symbol) = malloc(sizeof(SymbolExpression));
   if ((*symbol) == NULL) RAISE(164)
-  *(*symbol) = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL};
+  *(*symbol) = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, false};
   (*symbol)->_base._base._dtl = SymbolExpression__dtl;
   (*symbol)->_base.code_node = self->code_node;
   CHECK(166, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
@@ -380,6 +380,17 @@ Returncode Expression_analyze_call(Expression* self, FunctionArguments* argument
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode Expression_analyze_mock(Expression* self, Bool is_annotate, Bool* is_mock);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_Expression_analyze_mock = "Expression.analyze-mock";
+#define MR_FUNC_NAME _func_name_Expression_analyze_mock
+Returncode Expression_analyze_mock(Expression* self, Bool is_annotate, Bool* is_mock) {
+  (*is_mock) = false;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode Expression_write_preactions(Expression* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_write_preactions = "Expression.write-preactions";
@@ -394,7 +405,7 @@ Returncode Expression_write_preactions(Expression* self) {
 extern Func Expression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Expression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_write_preactions};
+Func Expression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

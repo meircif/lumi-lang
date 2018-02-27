@@ -206,6 +206,8 @@ unknown symbol "error"
 void expression has no member "error"
 /// @ te2
 type "Test" has no member "error"
+/// @ te3
+type "Int" has no member "error"
 /// @@ test-slice-expression
 /// @ t0
 if (str == NULL) RAISE(1, 29, "empty object used as sequence")

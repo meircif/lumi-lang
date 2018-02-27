@@ -43,18 +43,6 @@ Returncode TopType_meth(TopType* self, Ref_Manager* self_Refman, TopType_Dynamic
 void TopType_Del(TopType* self);
 
 
-/* types global variables */
-
-BaseType_Dynamic BaseType_dynamic = {(Dynamic_Del)BaseType_Del, BaseType_meth};
-
-TopType_Dynamic TopType_dynamic = {{(Dynamic_Del)TopType_Del, (Func)TopType_meth}};
-
-
-/* global variables */
-
-Int new_fail_countdown = 0;
-
-
 /* global functions declaration */
 
 Returncode f_get_top(TopType** top, Ref_Manager** top_Refman, TopType_Dynamic** top_Dynamic);
@@ -63,7 +51,7 @@ Returncode f_good_function(void);
 
 Returncode f_raise_message(String* msg, Ref_Manager* msg_Refman);
 
-Returncode Mock_new(Bool* alloc_success);
+Returncode new_Mock(Bool* alloc_success);
 
 Returncode fail_call_empty(void);
 
@@ -96,6 +84,18 @@ Returncode fail_assert_error(void);
 Returncode fail_assert_error_message(void);
 
 Returncode fail_assert_error_message_prefix(void);
+
+
+/* types global variables */
+
+BaseType_Dynamic BaseType_dynamic = {(Dynamic_Del)BaseType_Del, BaseType_meth};
+
+TopType_Dynamic TopType_dynamic = {{(Dynamic_Del)TopType_Del, (Func)TopType_meth}};
+
+
+/* global variables */
+
+Int new_fail_countdown = 0;
 
 
 /* types methods body */
@@ -167,8 +167,8 @@ MR_cleanup:
 #undef MR_FUNC_NAME
 
 #define MR_FILE_NAME "tests/integration-error-test.4.mr"
-#define MR_FUNC_NAME "Mock new"
-Returncode Mock_new(Bool* alloc_success) {
+#define MR_FUNC_NAME "new Mock"
+Returncode new_Mock(Bool* alloc_success) {
   Returncode MR_err = OK;
   *alloc_success = true;
   if (new_fail_countdown > 0) {
@@ -564,7 +564,7 @@ MR_cleanup:
 #undef MR_FUNC_NAME
 
 
-Returncode Mock_delete(Ref self) { return OK; }
+Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
   Bool MR_success = true;
 #undef RETURN_ERROR

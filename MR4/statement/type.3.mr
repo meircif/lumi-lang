@@ -282,7 +282,10 @@ class TypeData(SyntaxTreeNamespace)
         write(user "(Func)")
       write-cname(user method.parent-type.name)
       write(user "_")
-      write-cname(user method.name)
+      if ? method.mocker-function
+        write-cname(user method.mocker-function.name)
+      else
+        write-cname(user method.name)
       child := child.next
     write(user "}")
   

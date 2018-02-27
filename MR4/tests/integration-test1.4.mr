@@ -70,17 +70,48 @@ mock TestStruct.get()->(var Int x, user String s)
   x := 12
   s := ""
 
-
 mock f-test-int2str(copy Int x)->(owner String s)
   raise
 
+mock TestClass.dynamic-meth()
+  self.num := 7
 
 test test-func()
+  owner String s
+  assert-error f-test-int2str(copy 3)->(owner s)
+  f-test-int2str.mocked(copy 4)->(owner s)
+  f-test-int2str.active := false
+  f-test-int2str(copy 5)->(owner s)
+  f-test-int2str.active := true
+  assert-error f-test-int2str(copy 6)->(owner s)
+  
   var TestStruct t(copy 0, user _)
   var Int x
   t.get()->(var x)
   assert x = 12
-  assert-error f-test-int2str(copy 3)
+  t.get.mocked()->(var x)
+  assert x = 0
+  t.get.active := false
+  x := 1
+  t.get()->(var x)
+  assert x = 0
+  TestStruct.get.active := true
+  t.get()->(var x)
+  assert x = 12
+  
+  var TestClass c
+  assert c.num = 1
+  c.dynamic-meth()
+  assert c.num = 7
+  TestClass.dynamic-meth.mocked(var c)
+  assert c.num = 6
+  TestClass.dynamic-meth.active := false
+  c.num := 0
+  c.dynamic-meth()
+  assert c.num = 6
+  TestClass.dynamic-meth.active := true
+  TestClass.dynamic-meth(var c)
+  assert c.num = 7
 
 
 test test-another()

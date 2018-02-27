@@ -128,11 +128,11 @@ Returncode SliceExpression_write_preactions(SliceExpression* self);
 static char* _func_name_SliceExpression_write_preactions = "SliceExpression.write-preactions";
 #define MR_FUNC_NAME _func_name_SliceExpression_write_preactions
 Returncode SliceExpression_write_preactions(SliceExpression* self) {
-  CHECK(74, (self->sequence)->_base._dtl[7](self->sequence) )
-  CHECK(75, (self->index)->_base._dtl[7](self->index) )
+  CHECK(74, (self->sequence)->_base._dtl[8](self->sequence) )
+  CHECK(75, (self->index)->_base._dtl[8](self->index) )
   
   if (NULL != self->second_index) {
-    CHECK(78, (self->second_index)->_base._dtl[7](self->second_index) )
+    CHECK(78, (self->second_index)->_base._dtl[8](self->second_index) )
     CHECK(79, Expression_write_init_var_ref(&(self->_base), self->slice_symbol) )
     CHECK(80, Expression_write_refman_init(&(self->_base), self->slice_symbol) )
     /* symbol_Var.length = second; */
@@ -289,7 +289,7 @@ Returncode SliceExpression_write_refman(SliceExpression* self) {
 extern Func SliceExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SliceExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SliceExpression_analyze, (void*)SliceExpression_write, (void*)SliceExpression_write_dynamic, (void*)SliceExpression_write_refman, (void*)Expression_analyze_call, (void*)SliceExpression_write_preactions};
+Func SliceExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SliceExpression_analyze, (void*)SliceExpression_write, (void*)SliceExpression_write_dynamic, (void*)SliceExpression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)SliceExpression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME
