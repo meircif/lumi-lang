@@ -128,19 +128,18 @@ class MemberExpression(SymbolExpression)
       instance-type.type-data.find-meth(user self.name):(
           user self.function, copy self.bases)
       if not (? self.function)
-        if instance-type.type-data = glob.type-func
-          self.is-annotate := self.name.equal(user "mocked")
-          if self.instance.analyze-mock(copy self.is-annotate):(
-              copy self.is-mock-field)
-            if self.is-annotate
-              instance-type.copy-new():(owner self.result-type)
-            else-if not self.name.equal(user "active")
-              self.m-syntax-error(
-                  user "mock function has no member", user self.name)
-            else
-              self.set-simple-type(user glob.type-bool)
-              self.assignable := true
-            return
+        self.is-annotate := self.name.equal(user "mocked")
+        if self.instance.analyze-mock(copy self.is-annotate):(
+            copy self.is-mock-field)
+          if self.is-annotate
+            instance-type.copy-new():(owner self.result-type)
+          else-if not self.name.equal(user "active")
+            self.m-syntax-error(
+                user "mock function has no member", user self.name)
+          else
+            self.set-simple-type(user glob.type-bool)
+            self.assignable := true
+          return
         self.m-syntax-error2(
             user "type",
             user instance-type.type-data.name,
