@@ -33,7 +33,7 @@ Returncode write_syntax_tree(Bool is_test) {
   glob->root->is_library = true;
   CHECK(12, SyntaxTreeRoot_parse(glob->root, mock_argv) )
   CHECK(13, (glob->root)->_base._base._base._dtl[2](glob->root) )
-  CHECK(14, (glob->root)->_base._base._base._dtl[3](glob->root) )
+  CHECK(14, (glob->root)->_base._base._base._dtl[4](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -436,6 +436,20 @@ Returncode test_enum() {
 }
 #undef MR_FUNC_NAME
 #endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_constant();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_constant = "test-constant";
+#define MR_FUNC_NAME _func_name_test_constant
+Returncode test_constant() {
+  CHECK(174, test_from_file(&(String){14, 13, "test-constant"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
 
 #undef MR_FILE_NAME
 

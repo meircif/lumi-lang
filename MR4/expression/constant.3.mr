@@ -75,6 +75,7 @@ class IntExpression(TextExpression)
     self.set-simple-type(user glob.type-int)
     self.access := ACCESS-VAR
     self.text := text
+    self.constant := true
 
 
 ## Constant character expression

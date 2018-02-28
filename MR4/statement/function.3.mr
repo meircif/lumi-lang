@@ -294,7 +294,7 @@ class DeclarationArgument(Argument)
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
-    self.variable.type-instance.analyze-lengths(user self)
+    self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
       if self.access = ACCESS-OWNER
         self.m-syntax-error-msg(user "owner argument to native function")

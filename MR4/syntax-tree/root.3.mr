@@ -4,6 +4,7 @@
 class SyntaxTreeRoot(SyntaxTreeNamespace)
   owner List{TypeData} types
   owner List{EnumData} enums
+  owner List{SyntaxTreeConstant} constants
   user String output-file-name
   owner SyntaxTreeMainFunction main-function
   owner GlobalInit global-init
@@ -15,6 +16,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     base.init()
     new List{TypeData} in self.types
     new List{EnumData} in self.enums
+    new List{SyntaxTreeConstant} in self.constants
     new GlobalInit in self.global-init
     self.global-init.init()
   
@@ -60,7 +62,13 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     if self.parse-if-function(user keyword, user _):(copy end)
       return
     
-    if keyword.equal(user "struct")
+    if keyword.equal(user "const")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"const\", got", copy end)
+      self.variables.add(owner SyntaxTreeConstant.parse-new(var _):(copy end))
+      
+    else-if keyword.equal(user "struct")
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"struct\", got", copy end)
@@ -130,6 +138,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     else-if not self.is-library
       print(user "General code error: no main function")
       raise
+    self.m-order-children-constants(user self.variables, user self.constants)
   
   func inst m-order-types()
     new List{TypeData} ordered-list
@@ -161,6 +170,10 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     # will write Enums
     write-global(user "\n\n/* Enums */\n")
     self.write-children(user self.enums)
+    
+    # will write constants
+    write-global(user "\n\n/* constants */\n")
+    self.write-children(user self.constants)
     
     # will write type structures
     write-global(user "\n\n/* types struct */\n")

@@ -6,6 +6,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   var Int access
   owner TypeInstance type-instance
   user TypeData parent-type
+  var Bool constant
   var Bool is-output
   var Bool is-create
   var Bool is-native
@@ -98,7 +99,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.m-syntax-error(
           user "only \"var\" access is supported for primitive types, got",
           user glob.access-names[self.access])
-    self.type-instance.analyze-lengths(user self)
+    self.type-instance.analyze-lengths(user self, copy self.access = ACCESS-VAR)
     if self.is-create and self.type-instance.type-data = glob.type-generic
       self.m-syntax-error(
           user "declared variable with generic subtype",
@@ -330,3 +331,64 @@ class VariableInit(SyntaxTreeCode)
     self.expression-init.write()
     if self.parent = glob.root.global-init
       write(user "#undef MR_FILE_NAME\n")
+
+
+class SyntaxTreeConstant(SyntaxTreeVariable)
+  owner Expression value
+  var Bool is-ordered
+  var Bool ordering
+  
+  func inst parse-new():(copy Char end, owner SyntaxTreeConstant constant)
+    new SyntaxTreeConstant in constant
+    constant.parse():(copy end)
+  
+  func inst parse():(copy Char end)
+    self.set-location()
+    self.access := ACCESS-VAR
+    self.constant := true
+    user String type-name
+    read-until(user " ", copy false):(user type-name, copy end)
+    if not type-name.equal(user "Int")
+      self.m-syntax-error(
+          user "Only \"Int\" typed constant supported, got", user type-name)
+    if end != ' '
+      self.m-syntax-error-c(
+          user "expected space after \"Int\", got", copy end)
+    read-new(user " "):(owner self.name, copy end)
+    if not f-is-legal-name(user self.name, copy NAME-CONSTANT)
+      self.m-syntax-error(user "illegal constant name", user self.name)
+    if end != ' '
+      self.m-syntax-error-c(
+          user "expected space after constant name, got", copy end)
+    parse-new-expression(user "", user self):(owner self.value, copy end)
+    glob.type-int.m-new-type-instance():(owner self.type-instance)
+  
+  func dynamic link-types()
+    # do nothing
+  
+  func dynamic analyze()
+    self.analyze-expression(user self.value, user glob.type-int)
+    if not self.value.constant
+      self.m-syntax-error-msg(user "value is not constant")
+  
+  func dynamic m-order-constants(user List{SyntaxTreeConstant} ordered-list)
+    if self.is-ordered
+      return
+    if self.ordering
+      self.m-syntax-error(
+          user "recursive dependency in constant", user self.name)
+    self.ordering := true
+    self.value.m-order-constants(user ordered-list)
+    ordered-list.add(owner self)
+    self.is-ordered := true
+  
+  func dynamic write()
+    if not self.is-ordered
+      return
+    # enum { `name` = `value` };
+    write(user "\nenum { ")
+    write-cname(user self.name)
+    write(user " = ")
+    self.value.write()
+    write(user " };\n")
+    self.is-ordered := false

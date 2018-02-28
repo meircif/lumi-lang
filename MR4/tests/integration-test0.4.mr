@@ -18,6 +18,17 @@ comment
 var Int global-int(copy 23)
 user String global-string(user "a constant string")
 
+var Array{TestEnum.length + LENGTH:Int} int-arr
+const Int LENGTH SIZE * 5
+const Int SIZE 12
+
+
+; Test Enum
+enum TestEnum
+  FIRST-VALUE
+  ANOTHER-VALUE
+  VALUE2
+
 
 ; Test functions
 func test-simple-function()

@@ -73,7 +73,7 @@ Returncode SyntaxTreeTry_write(SyntaxTreeTry* self) {
   }
   try_depth_count += 1;
   
-  CHECK(31, (self->_base.block)->_base._base._dtl[7](self->_base.block) )
+  CHECK(31, (self->_base.block)->_base._base._dtl[8](self->_base.block) )
   
   try_depth_count -= 1;
   if (try_depth_count == 0) {
@@ -97,7 +97,7 @@ Returncode SyntaxTreeTry_write(SyntaxTreeTry* self) {
 extern Func SyntaxTreeTry__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeTry__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeTry_analyze, (void*)SyntaxTreeTry_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeTry__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeTry_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeTry_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -149,7 +149,7 @@ Returncode SyntaxTreeCatch_write(SyntaxTreeCatch* self) {
   CHECK(63, write(&(String){21, 20, "if (MR_err != OK) {\n"}) )
   CHECK(64, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
   CHECK(65, write(&(String){16, 15, "  MR_err = OK;\n"}) )
-  CHECK(66, (self->_base.block)->_base._base._dtl[7](self->_base.block) )
+  CHECK(66, (self->_base.block)->_base._base._dtl[8](self->_base.block) )
   CHECK(67, SyntaxTreeBlock_write_block_end(self->_base.block) )
   return OK;
 }
@@ -159,7 +159,7 @@ Returncode SyntaxTreeCatch_write(SyntaxTreeCatch* self) {
 extern Func SyntaxTreeCatch__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeCatch__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeCatch_analyze, (void*)SyntaxTreeCatch_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeCatch__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeCatch_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeCatch_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 #undef MR_FILE_NAME

@@ -180,6 +180,9 @@ class SyntaxTreeNode
   func dynamic analyze()
     # do nothing as default
   
+  func dynamic m-order-constants(user List{SyntaxTreeConstant} ordered-list)
+    # do nothing as default
+  
   func dynamic write()
     raise
   
@@ -190,6 +193,13 @@ class SyntaxTreeNode
   func inst analyze-children(user List{SyntaxTreeNode} child-list)
     var NodeAnalyzeAction action-analyze
     self.do-on-children(user child-list, user action-analyze)
+  
+  func inst m-order-children-constants(
+      user List{SyntaxTreeNode} child-list,
+      user List{SyntaxTreeConstant} ordered-list)
+    var NodeOrderConstantsAction action-order-constants
+    action-order-constants.ordered-list := ordered-list
+    self.do-on-children(user child-list, user action-order-constants)
   
   func inst write-children(user List{SyntaxTreeNode} child-list)
     var NodeWriteAction action-write
@@ -221,3 +231,9 @@ class NodeAnalyzeAction(NodeAction)
 class NodeWriteAction(NodeAction)
   func dynamic m-action(user SyntaxTreeNode node)
     node.write()
+
+class NodeOrderConstantsAction(NodeAction)
+  user List{SyntaxTreeConstant} ordered-list
+  
+  func dynamic m-action(user SyntaxTreeNode node)
+    node.m-order-constants(user self.ordered-list)

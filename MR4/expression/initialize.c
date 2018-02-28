@@ -104,7 +104,7 @@ Returncode InitExpression_analyze(InitExpression* self) {
         CHECK(70, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){43, 42, "only one initialization parameter expected"}) )
       }
       Argument* param = self->arguments->parameters->first->item;
-      CHECK(73, (param)->_base._dtl[7](param, self->_base.result_type, NULL, 0) )
+      CHECK(73, (param)->_base._dtl[8](param, self->_base.result_type, NULL, 0) )
       if (self->_base.result_type->type_data->is_primitive && param->access != ACCESS_COPY) {
         if ((param->access) < 0 || (param->access) >= (glob->access_names)->length) RAISE(75)
         CHECK(75, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){49, 48, "access should be \"copy\" for primitive types, got"}, (&(((String*)((glob->access_names)->values))[param->access]))) )
@@ -131,10 +131,10 @@ static char* _func_name_InitExpression_write_allocation = "InitExpression.write-
 Returncode InitExpression_write_allocation(InitExpression* self) {
   CHECK(88, FunctionArguments_write_preactions(self->arguments) )
   if (self->_base.result_type->type_data == &(glob->type_array->_base) || self->_base.result_type->type_data == &(glob->type_string->_base)) {
-    CHECK(91, (self->_base.result_type->length)->_base._dtl[8](self->_base.result_type->length) )
+    CHECK(91, (self->_base.result_type->length)->_base._dtl[9](self->_base.result_type->length) )
   }
   if (self->_base.result_type->type_data == &(glob->type_array->_base) && ((TypeInstance*)(self->_base.result_type->parameters->first->item))->type_data == &(glob->type_string->_base)) {
-    CHECK(94, (((TypeInstance*)(self->_base.result_type->parameters->first->item))->length)->_base._dtl[8](((TypeInstance*)(self->_base.result_type->parameters->first->item))->length) )
+    CHECK(94, (((TypeInstance*)(self->_base.result_type->parameters->first->item))->length)->_base._dtl[9](((TypeInstance*)(self->_base.result_type->parameters->first->item))->length) )
   }
   
   if (self->symbol->variable->access == ACCESS_VAR) {
@@ -150,7 +150,7 @@ Returncode InitExpression_write_allocation(InitExpression* self) {
     CHECK(104, SyntaxTreeCode_write_spaces(self->_base.code_node) )
     CHECK(105, SyntaxTreeNode_write_call(&(self->_base._base)) )
     CHECK(106, SyntaxTreeFunction_write_cname(self->constructor) )
-    CHECK(107, (self->arguments)->_base._dtl[4](self->arguments) )
+    CHECK(107, (self->arguments)->_base._dtl[5](self->arguments) )
     CHECK(108, write(&(String){4, 3, " )\n"}) )
     CHECK(109, FunctionArguments_write_postactions(self->arguments) )
   }
@@ -169,22 +169,22 @@ Returncode InitExpression_write_var_init(InitExpression* self) {
   if (self->_base.result_type->type_data == &(glob->type_array->_base) || self->_base.result_type->type_data == &(glob->type_string->_base)) {
     /* `symbol`_Var.values = `symbol`_Values; */
     CHECK(117, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-    CHECK(118, (self->symbol)->_base._base._dtl[3](self->symbol) )
+    CHECK(118, (self->symbol)->_base._base._dtl[4](self->symbol) )
     CHECK(119, write(&(String){15, 14, "_Var.values = "}) )
-    CHECK(120, (self->symbol)->_base._base._dtl[3](self->symbol) )
+    CHECK(120, (self->symbol)->_base._base._dtl[4](self->symbol) )
     CHECK(121, write(&(String){10, 9, "_Values;\n"}) )
     if (self->_base.result_type->type_data == &(glob->type_array->_base) && ((TypeInstance*)(self->_base.result_type->parameters->first->item))->type_data == &(glob->type_string->_base)) {
       /* MR_set_var_string_array( */
       /*    `array-length`, `string-length`, `name`, `name`_Chars); */
       CHECK(126, SyntaxTreeCode_write_spaces(self->_base.code_node) )
       CHECK(127, write(&(String){25, 24, "MR_set_var_string_array("}) )
-      CHECK(128, (self->_base.result_type->length)->_base._dtl[3](self->_base.result_type->length) )
+      CHECK(128, (self->_base.result_type->length)->_base._dtl[4](self->_base.result_type->length) )
       CHECK(129, write(&(String){3, 2, ", "}) )
-      CHECK(130, (((TypeInstance*)(self->_base.result_type->parameters->first->item))->length)->_base._dtl[3](((TypeInstance*)(self->_base.result_type->parameters->first->item))->length) )
+      CHECK(130, (((TypeInstance*)(self->_base.result_type->parameters->first->item))->length)->_base._dtl[4](((TypeInstance*)(self->_base.result_type->parameters->first->item))->length) )
       CHECK(131, write(&(String){3, 2, ", "}) )
-      CHECK(132, (self->symbol)->_base._base._dtl[3](self->symbol) )
+      CHECK(132, (self->symbol)->_base._base._dtl[4](self->symbol) )
       CHECK(133, write(&(String){3, 2, ", "}) )
-      CHECK(134, (self->symbol)->_base._base._dtl[3](self->symbol) )
+      CHECK(134, (self->symbol)->_base._base._dtl[4](self->symbol) )
       CHECK(135, write(&(String){10, 9, "_Chars);\n"}) )
     }
   }
@@ -199,22 +199,22 @@ static char* _func_name_InitExpression_write_new_init = "InitExpression.write-ne
 #define MR_FUNC_NAME _func_name_InitExpression_write_new_init
 Returncode InitExpression_write_new_init(InitExpression* self) {
   /* `symbol` = ... */
-  CHECK(139, (self->symbol)->_base._base._dtl[3](self->symbol) )
+  CHECK(139, (self->symbol)->_base._base._dtl[4](self->symbol) )
   CHECK(140, write(&(String){4, 3, " = "}) )
   
   if (self->_base.result_type->type_data == &(glob->type_array->_base)) {
     if (((TypeInstance*)(self->_base.result_type->parameters->first->item))->type_data == &(glob->type_string->_base)) {
       /* MR_new_string_array(`length`, `string-length`); */
       CHECK(145, write(&(String){21, 20, "MR_new_string_array("}) )
-      CHECK(146, (self->_base.result_type->length)->_base._dtl[3](self->_base.result_type->length) )
+      CHECK(146, (self->_base.result_type->length)->_base._dtl[4](self->_base.result_type->length) )
       CHECK(147, write(&(String){3, 2, ", "}) )
-      CHECK(148, (((TypeInstance*)(self->_base.result_type->parameters->first->item))->length)->_base._dtl[3](((TypeInstance*)(self->_base.result_type->parameters->first->item))->length) )
+      CHECK(148, (((TypeInstance*)(self->_base.result_type->parameters->first->item))->length)->_base._dtl[4](((TypeInstance*)(self->_base.result_type->parameters->first->item))->length) )
       
     }
     else {
       /* MR_new_array(`length`, sizeof(`SubType`)); */
       CHECK(152, write(&(String){14, 13, "MR_new_array("}) )
-      CHECK(153, (self->_base.result_type->length)->_base._dtl[3](self->_base.result_type->length) )
+      CHECK(153, (self->_base.result_type->length)->_base._dtl[4](self->_base.result_type->length) )
       CHECK(154, write(&(String){10, 9, ", sizeof("}) )
       CHECK(155, write_cname(((TypeInstance*)(self->_base.result_type->parameters->first->item))->type_data->name) )
       CHECK(156, write(&(String){2, 1, ")"}) )
@@ -225,7 +225,7 @@ Returncode InitExpression_write_new_init(InitExpression* self) {
     if (self->_base.result_type->type_data == &(glob->type_string->_base)) {
       /* MR_new_string(`length`); */
       CHECK(160, write(&(String){15, 14, "MR_new_string("}) )
-      CHECK(161, (self->_base.result_type->length)->_base._dtl[3](self->_base.result_type->length) )
+      CHECK(161, (self->_base.result_type->length)->_base._dtl[4](self->_base.result_type->length) )
       
     }
     else {
@@ -241,7 +241,7 @@ Returncode InitExpression_write_new_init(InitExpression* self) {
   /* if (`symbol` == NULL) raise(`line-num`) */
   CHECK(172, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   CHECK(173, write(&(String){5, 4, "if ("}) )
-  CHECK(174, (self->symbol)->_base._base._dtl[3](self->symbol) )
+  CHECK(174, (self->symbol)->_base._base._dtl[4](self->symbol) )
   CHECK(175, write(&(String){11, 10, " == NULL) "}) )
   CHECK(176, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){50, 49, "insufficient memory for object dynamic allocation"}) )
   return OK;
@@ -256,26 +256,26 @@ static char* _func_name_InitExpression_write_assign = "InitExpression.write-assi
 Returncode InitExpression_write_assign(InitExpression* self) {
   /* `name` = `value`; */
   Expression* value = NULL;
-  CHECK(181, (((Argument*)(self->arguments->parameters->first->item)))->_base._dtl[9](((Argument*)(self->arguments->parameters->first->item)), &(value)) )
+  CHECK(181, (((Argument*)(self->arguments->parameters->first->item)))->_base._dtl[10](((Argument*)(self->arguments->parameters->first->item)), &(value)) )
   CHECK(182, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-  CHECK(183, (value)->_base._dtl[8](value) )
-  CHECK(184, (self->symbol)->_base._base._dtl[3](self->symbol) )
+  CHECK(183, (value)->_base._dtl[9](value) )
+  CHECK(184, (self->symbol)->_base._base._dtl[4](self->symbol) )
   CHECK(185, write(&(String){4, 3, " = "}) )
-  CHECK(186, (value)->_base._dtl[3](value) )
+  CHECK(186, (value)->_base._dtl[4](value) )
   CHECK(187, write(&(String){3, 2, ";\n"}) )
   
   if (!self->_base.result_type->type_data->is_primitive) {
     /* `name`_Refman = `value`_Refman; */
     /* MR_inc_ref(`name`_Refman); */
     CHECK(192, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-    CHECK(193, (self->symbol)->_base._base._dtl[3](self->symbol) )
+    CHECK(193, (self->symbol)->_base._base._dtl[4](self->symbol) )
     CHECK(194, write(&(String){11, 10, "_Refman = "}) )
-    CHECK(195, (value)->_base._dtl[5](value) )
+    CHECK(195, (value)->_base._dtl[6](value) )
     CHECK(196, write(&(String){3, 2, ";\n"}) )
     if (self->_base.access != ACCESS_OWNER) {
       CHECK(198, SyntaxTreeCode_write_spaces(self->_base.code_node) )
       CHECK(199, write(&(String){12, 11, "MR_inc_ref("}) )
-      CHECK(200, (self->symbol)->_base._base._dtl[3](self->symbol) )
+      CHECK(200, (self->symbol)->_base._base._dtl[4](self->symbol) )
       CHECK(201, write(&(String){11, 10, "_Refman);\n"}) )
     }
   }
@@ -283,9 +283,9 @@ Returncode InitExpression_write_assign(InitExpression* self) {
   if (self->_base.result_type->type_data->is_dynamic) {
     /* `name`_Dynamic = `Type`_Dynamic; */
     CHECK(205, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-    CHECK(206, (self->symbol)->_base._base._dtl[3](self->symbol) )
+    CHECK(206, (self->symbol)->_base._base._dtl[4](self->symbol) )
     CHECK(207, write(&(String){12, 11, "_Dynamic = "}) )
-    CHECK(208, (value)->_base._dtl[4](value) )
+    CHECK(208, (value)->_base._dtl[5](value) )
     CHECK(209, write(&(String){3, 2, ";\n"}) )
   }
   
@@ -324,7 +324,7 @@ Returncode InitExpression_write(InitExpression* self) {
     }
   }
   else {
-    CHECK(226, (self->symbol)->_base._base._dtl[3](self->symbol) )
+    CHECK(226, (self->symbol)->_base._base._dtl[4](self->symbol) )
   }
   return OK;
 }
@@ -334,7 +334,7 @@ Returncode InitExpression_write(InitExpression* self) {
 extern Func InitExpression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func InitExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)InitExpression_analyze, (void*)InitExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)InitExpression_write_preactions};
+Func InitExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)InitExpression_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)InitExpression_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)InitExpression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME

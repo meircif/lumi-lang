@@ -33,7 +33,7 @@ Returncode func(Array* argv) {
   CHECK(17, Global_init(glob) )
   CHECK(18, SyntaxTreeRoot_parse(glob->root, argv) )
   CHECK(19, (glob->root)->_base._base._base._dtl[2](glob->root) )
-  CHECK(20, (glob->root)->_base._base._base._dtl[3](glob->root) )
+  CHECK(20, (glob->root)->_base._base._base._dtl[4](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME

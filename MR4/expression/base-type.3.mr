@@ -163,6 +163,7 @@ class EnumExpression(Expression)
     self.value := value
     self.set-simple-type(user glob.type-int)
     self.access := ACCESS-VAR
+    self.constant := true
   
   func dynamic analyze()
     if not (? glob.enum-map.find(user self.name):(user self.enum-data))

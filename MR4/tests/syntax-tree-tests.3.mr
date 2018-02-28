@@ -168,3 +168,8 @@ test test-complex-fields()
 
 test test-enum()
   test-from-file(user "test-enum")
+
+
+test test-constant()
+  test-from-file(user "test-constant")
+

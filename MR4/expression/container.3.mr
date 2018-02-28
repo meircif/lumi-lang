@@ -23,6 +23,10 @@ class BlockExpression(Expression)
     self.expression.analyze()
     self.expression.result-type.copy-new():(owner self.result-type)
     self.access := self.expression.access
+    self.constant := self.expression.constant
+  
+  func dynamic m-order-constants(user List{SyntaxTreeConstant} ordered-list)
+    self.expression.m-order-constants(user ordered-list)
   
   func dynamic write-preactions()
     self.expression.write-preactions()
@@ -83,6 +87,7 @@ class UnaryExpression(Expression)
   
   func dynamic analyze()
     self.analyze-operand(user self.right-expression)
+    self.constant := self.right-expression.constant
     if self.operator.order = 2
       # `not` operator
       self.test-operand-type(user self.right-expression, user glob.type-bool)
@@ -111,6 +116,9 @@ class UnaryExpression(Expression)
           user expected-type.name,
           user "operand, got",
           user operand.result-type.type-data.name)
+  
+  func dynamic m-order-constants(user List{SyntaxTreeConstant} ordered-list)
+    self.right-expression.m-order-constants(user ordered-list)
   
   func dynamic write-preactions()
     self.right-expression.write-preactions()
@@ -158,6 +166,8 @@ class BinaryExpression(UnaryExpression)
   func dynamic analyze()
     self.analyze-operand(user self.right-expression)
     self.analyze-operand(user self.left-expression)
+    self.constant :=
+        self.left-expression.constant and self.right-expression.constant
     if ? self.binary-left-expression and
         self.operator.order = self.binary-left-expression.operator.order and
         self.operator.group-index !=
@@ -217,6 +227,10 @@ class BinaryExpression(UnaryExpression)
           user self.operator.name,
           user "is not supported for type",
           user operand.result-type.type-data.name)
+  
+  func dynamic m-order-constants(user List{SyntaxTreeConstant} ordered-list)
+    self.left-expression.m-order-constants(user ordered-list)
+    base.m-order-constants(user ordered-list)
   
   func dynamic write-preactions()
     base.write-preactions()

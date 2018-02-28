@@ -89,7 +89,7 @@ Returncode Global_init(Global* self) {
   self->is_delete_mocked = false;
   self->root = malloc(sizeof(SyntaxTreeRoot));
   if (self->root == NULL) RAISE(72)
-  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false};
+  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false};
   self->root->_base._base._base._dtl = SyntaxTreeRoot__dtl;
   CHECK(73, SyntaxTreeRoot_init(self->root) )
   self->input_buffer = _new_string(1024);
@@ -313,7 +313,7 @@ static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, BuiltinType** type_data) {
   (*type_data) = malloc(sizeof(BuiltinType));
   if ((*type_data) == NULL) RAISE(288)
-  *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false, false};
+  *(*type_data) = (BuiltinType){BuiltinType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false, false, false};
   (*type_data)->_base._base._base._base._dtl = BuiltinType__dtl;
   CHECK(289, string_new_copy(name, &((*type_data)->_base.name)) )
   (*type_data)->_base.is_primitive = is_primitive;
@@ -365,7 +365,7 @@ static char* _func_name_Global_add_builtin_variable = "Global.add-builtin-variab
 Returncode Global_add_builtin_variable(Global* self, String* name, TypeData* variable_type, TypeData* variable_subtype, TypeData* parent_type, SyntaxTreeBranch* branch) {
   BuiltinVariable* variable = malloc(sizeof(BuiltinVariable));
   if (variable == NULL) RAISE(321)
-  *variable = (BuiltinVariable){BuiltinVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
+  *variable = (BuiltinVariable){BuiltinVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   variable->_base._base._base._dtl = BuiltinVariable__dtl;
   CHECK(322, string_new_copy(name, &(variable->_base.name)) )
   if (variable_type->is_primitive) {
@@ -467,7 +467,7 @@ Returncode Global_add_builtin_argument(Global* self, List* argument_list, Bool i
   argument->_base.is_output = is_output;
   argument->variable = malloc(sizeof(SyntaxTreeVariable));
   if (argument->variable == NULL) RAISE(392)
-  *argument->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
+  *argument->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   argument->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   CHECK(393, string_new_copy(name, &(argument->variable->name)) )
   argument->variable->access = access;
@@ -540,7 +540,7 @@ Returncode BuiltinType_write_me(BuiltinType* self, TypeWriter* type_writer) {
 extern Func BuiltinType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinType__dtl[] = {(void*)TypeData_get_parent_type, (void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)TypeData_write_methods_declaration, (void*)TypeData_write_global, (void*)TypeData_write_methods_body, (void*)BuiltinType_write_me};
+Func BuiltinType__dtl[] = {(void*)TypeData_get_parent_type, (void*)BuiltinType_link_types, (void*)BuiltinType_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)BuiltinType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)TypeData_write_declaration, (void*)TypeData_write_methods_declaration, (void*)TypeData_write_global, (void*)TypeData_write_methods_body, (void*)BuiltinType_write_me};
 #endif
 
 #if MR_STAGE == MR_TYPEDEFS
@@ -587,7 +587,7 @@ Returncode BuiltinVariable_write(BuiltinVariable* self) {
 extern Func BuiltinVariable__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinVariable__dtl[] = {(void*)SyntaxTreeVariable_get_parent_type, (void*)BuiltinVariable_link_types, (void*)BuiltinVariable_analyze, (void*)BuiltinVariable_write, (void*)SyntaxTreeCode_m_is_end_point, (void*)SyntaxTreeVariable_write_sequence};
+Func BuiltinVariable__dtl[] = {(void*)SyntaxTreeVariable_get_parent_type, (void*)BuiltinVariable_link_types, (void*)BuiltinVariable_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)BuiltinVariable_write, (void*)SyntaxTreeCode_m_is_end_point, (void*)SyntaxTreeVariable_write_sequence};
 #endif
 
 #if MR_STAGE == MR_TYPEDEFS
@@ -645,7 +645,7 @@ Returncode BuiltinFunction_write_declaration(BuiltinFunction* self) {
 extern Func BuiltinFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func BuiltinFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*)BuiltinFunction_link_types, (void*)BuiltinFunction_analyze, (void*)BuiltinFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeBlock_write_block_body, (void*)SyntaxTreeFunction_check_name, (void*)BuiltinFunction_write_declaration};
+Func BuiltinFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*)BuiltinFunction_link_types, (void*)BuiltinFunction_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)BuiltinFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeBlock_write_block_body, (void*)SyntaxTreeFunction_check_name, (void*)BuiltinFunction_write_declaration};
 #endif
 
 #undef MR_FILE_NAME

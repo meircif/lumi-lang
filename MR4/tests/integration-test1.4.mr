@@ -379,13 +379,11 @@ test test-cover-all()
   mid.meth5(copy 0, user _)
 
 
-enum TestEnum
-  FIRST-VALUE
-  ANOTHER-VALUE
-  VALUE2
-
-test test-enum()
+test test-constants()
+  assert SIZE = 12
+  assert LENGTH = 60
   assert TestEnum.FIRST-VALUE = 0
   assert TestEnum.ANOTHER-VALUE = 1
   assert TestEnum.VALUE2 = 2
   assert TestEnum.length = 3
+  assert int-arr.length = 63

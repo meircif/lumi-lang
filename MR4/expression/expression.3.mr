@@ -33,6 +33,7 @@ class Expression(SyntaxTreeNode)
   var Int access
   var Bool assignable
   var Bool top
+  var Bool constant
   var Bool is-statement
   var Bool is-generic-cast
   var Bool is-complex-field

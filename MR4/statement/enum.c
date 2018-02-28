@@ -44,9 +44,9 @@ static char* _func_name_EnumData_parse = "EnumData.parse";
 Returncode EnumData_parse(EnumData* self, Char* end) {
   CHECK(13, SyntaxTreeNode_set_location(&(self->_base)) )
   CHECK(14, read_new(&(String){1, 0, ""}, &(self->name), &((*end))) )
-  Bool _Bool116;
-  CHECK(15, f_is_legal_name(self->name, NAME_TYPE, &(_Bool116)) )
-  if (!_Bool116) {
+  Bool _Bool118;
+  CHECK(15, f_is_legal_name(self->name, NAME_TYPE, &(_Bool118)) )
+  if (!_Bool118) {
     CHECK(16, SyntaxTreeNode_m_syntax_error(&(self->_base), &(String){18, 17, "illegal Enum name"}, self->name) )
   }
   self->values = malloc(sizeof(List));
@@ -60,17 +60,17 @@ Returncode EnumData_parse(EnumData* self, Char* end) {
     if (spaces != 2) {
       CHECK(24, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base), spaces, 2) )
     }
-    Bool _Bool117;
-    CHECK(25, f_is_legal_name(value, NAME_CONSTANT, &(_Bool117)) )
-    if (!_Bool117) {
+    Bool _Bool119;
+    CHECK(25, f_is_legal_name(value, NAME_CONSTANT, &(_Bool119)) )
+    if (!_Bool119) {
       CHECK(26, SyntaxTreeNode_m_syntax_error(&(self->_base), &(String){22, 21, "illegal constant name"}, value) )
     }
     if ((*end) != '\n') {
       CHECK(28, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){40, 39, "expected new-line after Enum value, got"}, (*end)) )
     }
-    String* _String118;
-    CHECK(30, string_new_copy(value, &(_String118)) )
-    CHECK(30, List_add(self->values, _String118) )
+    String* _String120;
+    CHECK(30, string_new_copy(value, &(_String120)) )
+    CHECK(30, List_add(self->values, _String120) )
   }
   if (!(NULL != self->values->first)) {
     CHECK(32, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){20, 19, "Enum with no values"}) )
@@ -88,17 +88,17 @@ static char* _func_name_EnumData_m_has_value = "EnumData.m-has-value";
 #define MR_FUNC_NAME _func_name_EnumData_m_has_value
 Returncode EnumData_m_has_value(EnumData* self, String* value, Bool* has_value) {
   (*has_value) = true;
-  Bool _Bool119;
-  CHECK(38, String_equal(value, &(String){7, 6, "length"}, &(_Bool119)) )
-  if (_Bool119) {
+  Bool _Bool121;
+  CHECK(38, String_equal(value, &(String){7, 6, "length"}, &(_Bool121)) )
+  if (_Bool121) {
     return OK;
   }
   ListNode* node = self->values->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool120;
-    CHECK(43, String_equal(value, node->item, &(_Bool120)) )
-    if (_Bool120) {
+    Bool _Bool122;
+    CHECK(43, String_equal(value, node->item, &(_Bool122)) )
+    if (_Bool122) {
       return OK;
     }
     node = node->next;
@@ -138,7 +138,7 @@ Returncode EnumData_write(EnumData* self) {
 extern Func EnumData__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func EnumData__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)EnumData_write};
+Func EnumData__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)EnumData_write};
 #endif
 
 #undef MR_FILE_NAME

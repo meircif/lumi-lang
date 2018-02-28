@@ -231,6 +231,10 @@ expected "(" after "new", got " "
 constructor already defined for type "Error"
 /// @ te13
 constructor with outputs
+/// @ te14
+recursive inheritance in type "Error"
+/// @ te15
+recursive inheritance in type "Aerror"
 /// @@ test-class
 /// @ t0
 typedef struct Base Base;
@@ -897,6 +901,8 @@ variable name overrides function "name"
 type members cannot be initialized
 /// @ te8
 expected space after "new", got "new-line"
+/// @ te9
+array length is not constant
 /// @@ test-initialize
 /// @ t0
 Test* aux_Test_0 = NULL;
@@ -3451,6 +3457,17 @@ Returncode dummy(void) {
 MR_cleanup:
   return MR_err;
 }
+/// @ t1
+enum {
+  MyEnum_VALUE = 0,
+  MyEnum_ANOTHER_VALUE,
+  MyEnum_LAST_VALUE,
+  MyEnum_length
+};
+Int arr_Values[MyEnum_length] = {0};
+Array arr_Var = {MyEnum_length, NULL};
+Array* arr = NULL;
+Ref_Manager* arr_Refman = NULL;
 /// @ te0
 Enum "MyEnum" has no value "ERROR"
 /// @ te1
@@ -3471,4 +3488,34 @@ expected new-line after Enum value, got "("
 Enum with no values
 /// @ te9
 indentation too long, expected 2 got 4
+/// @@ test-constant
+/// @ t0
+enum { NUMBER = 12 };
+/// @ t1
+enum { SIZE = 12 };
+Int arr_Values[SIZE + 3] = {0};
+Array arr_Var = {SIZE + 3, NULL};
+Array* arr = NULL;
+Ref_Manager* arr_Refman = NULL;
+/// @ t2
+enum { SMALL = 7 };
+enum { LARGE = (- (2 * SMALL)) + 1 };
+/// @ te0
+expected space after "const", got "new-line"
+/// @ te1
+Only "Int" typed constant supported, got "Bool"
+/// @ te2
+expected space after "Int", got "new-line"
+/// @ te3
+illegal constant name "Error"
+/// @ te4
+expected space after constant name, got "new-line"
+/// @ te5
+got "Bool" expression, expected "Int"
+/// @ te6
+value is not constant
+/// @ te7
+recursive dependency in constant "ERROR"
+/// @ te8
+recursive dependency in constant "A-ERROR"
 /// @
