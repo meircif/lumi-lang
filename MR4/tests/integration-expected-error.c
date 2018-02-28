@@ -12,6 +12,9 @@ typedef struct TopType TopType;
 typedef struct TopType_Dynamic TopType_Dynamic;
 
 
+/* Enums */
+
+
 /* types struct */
 
 struct BaseType {

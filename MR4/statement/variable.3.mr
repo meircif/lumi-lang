@@ -52,7 +52,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.parent := _
   
   func inst check-name()
-    if not f-is-legal-name(user self.name, copy false)
+    if not f-is-legal-name(user self.name, copy NAME-DEFAULT)
       self.m-syntax-error(user "illegal variable name", user self.name)
     if ? self.parent-type
       user SyntaxTreeVariable field

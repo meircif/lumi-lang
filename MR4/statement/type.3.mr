@@ -27,7 +27,7 @@ class TypeData(SyntaxTreeNamespace)
       do
         owner String name
         read-new(user ":}"):(owner name, copy end)
-        if not f-is-legal-name(user name, copy true)
+        if not f-is-legal-name(user name, copy NAME-TYPE)
           self.m-syntax-error(user "illegal type parameter name", user name)
         self.parameters.add(owner name)
         while end = ':'
@@ -47,7 +47,7 @@ class TypeData(SyntaxTreeNamespace)
     self.indentation-spaces := 0
   
   func inst add-type()
-    if not f-is-legal-name(user self.name, copy true)
+    if not f-is-legal-name(user self.name, copy NAME-TYPE)
       self.m-syntax-error(user "illegal type name", user self.name)
     if ? glob.type-map.find(user self.name)
       self.m-syntax-error(user "redefinition of type", user self.name)

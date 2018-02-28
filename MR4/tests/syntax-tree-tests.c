@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file31_name = "tests/syntax-tree-tests.3.mr";
+static char* _mr_file32_name = "tests/syntax-tree-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file31_name
+#define MR_FILE_NAME _mr_file32_name
 
 /* MR4 compiler tests - Syntax tree */
 
@@ -424,6 +424,19 @@ Returncode test_complex_fields() {
 #undef MR_FUNC_NAME
 #endif
 
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_enum();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_enum = "test-enum";
+#define MR_FUNC_NAME _func_name_test_enum
+Returncode test_enum() {
+  CHECK(170, test_from_file(&(String){10, 9, "test-enum"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES
@@ -449,6 +462,7 @@ Returncode test_complex_fields() {
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

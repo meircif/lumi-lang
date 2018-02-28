@@ -1348,4 +1348,44 @@ struct Test
   var Base error
 struct Base
   var Test t
+## @@ test-enum
+## @ g t0
+enum MyEnum
+  VALUE
+  ANOTHER-VALUE
+  LAST-VALUE
+func dummy()
+  var Int x(copy MyEnum.VALUE)
+  x += MyEnum.ANOTHER-VALUE
+  x -= MyEnum.length
+## @ eg te0
+enum MyEnum
+  VALUE
+func dummy()
+  var Int x(copy MyEnum.ERROR)
+## @ ec te1
+i := Error.VALUE
+## @ eg te2
+enum MyEnum
+  VALUE
+func dummy()
+  var Int x(copy MyEnum.error)
+## @ eg te3
+enum My-Enum
+## @ eg te4
+enum MyEnum
+  Error
+## @ eg te5
+enum MyEnum
+  ERRoR
+## @ eg te6
+enum
+## @ eg te7
+enum MyEnum
+  VALUE(0)
+## @ eg te8
+enum MyEnum
+## @ eg te9
+enum MyEnum
+    VALUE
 ## @

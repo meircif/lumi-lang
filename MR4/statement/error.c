@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file22_name = "statement/error.3.mr";
+static char* _mr_file23_name = "statement/error.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file22_name
+#define MR_FILE_NAME _mr_file23_name
 
 /* MR4 compiler - Syntax tree error handling nodes */
 
@@ -187,6 +187,7 @@ Func SyntaxTreeCatch__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Syn
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/for.c"
 #include "statement/function.c"
 #include "statement/native.c"

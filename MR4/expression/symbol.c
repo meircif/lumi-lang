@@ -250,18 +250,18 @@ Returncode MemberExpression_analyze(MemberExpression* self) {
   else {
     CHECK(128, TypeData_find_meth(instance_type->type_data, self->_base.name, &(self->_base.function), &(self->bases)) )
     if (!(NULL != self->_base.function)) {
-      Bool _Bool44;
-      CHECK(131, String_equal(self->_base.name, &(String){7, 6, "mocked"}, &(_Bool44)) )
-      self->_base.is_annotate = _Bool44;
+      Bool _Bool46;
+      CHECK(131, String_equal(self->_base.name, &(String){7, 6, "mocked"}, &(_Bool46)) )
+      self->_base.is_annotate = _Bool46;
       CHECK(132, (self->instance)->_base._dtl[7](self->instance, self->_base.is_annotate, &(self->is_mock_field)) )
       if (self->is_mock_field) {
         if (self->_base.is_annotate) {
           CHECK(135, TypeInstance_copy_new(instance_type, &(self->_base._base.result_type)) )
         }
         else {
-          Bool _Bool45;
-          CHECK(136, String_equal(self->_base.name, &(String){7, 6, "active"}, &(_Bool45)) )
-          if (!_Bool45) {
+          Bool _Bool47;
+          CHECK(136, String_equal(self->_base.name, &(String){7, 6, "active"}, &(_Bool47)) )
+          if (!_Bool47) {
             CHECK(137, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "mock function has no member"}, self->_base.name) )
           }
           else {
@@ -532,6 +532,7 @@ Func MemberExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)Syntax
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

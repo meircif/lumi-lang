@@ -3433,4 +3433,42 @@ cannot declared "var" field of sequence type "Array"
 variable will cause recursive declaration of type "Test"
 /// @ te3
 variable will cause recursive declaration of type "Test"
+/// @@ test-enum
+/// @ t0
+enum {
+  MyEnum_VALUE = 0,
+  MyEnum_ANOTHER_VALUE,
+  MyEnum_LAST_VALUE,
+  MyEnum_length
+};
+Returncode dummy(void);
+Returncode dummy(void) {
+  Returncode MR_err = OK;
+  Int x = 0;
+  x = MyEnum_VALUE;
+  x += MyEnum_ANOTHER_VALUE;
+  x -= MyEnum_length;
+MR_cleanup:
+  return MR_err;
+}
+/// @ te0
+Enum "MyEnum" has no value "ERROR"
+/// @ te1
+unknown Enum "Error"
+/// @ te2
+unknown type "MyEnum"
+/// @ te3
+illegal Enum name "My-Enum"
+/// @ te4
+illegal constant name "Error"
+/// @ te5
+illegal constant name "ERRoR"
+/// @ te6
+expected space after "enum", got "new-line"
+/// @ te7
+expected new-line after Enum value, got "("
+/// @ te8
+Enum with no values
+/// @ te9
+indentation too long, expected 2 got 4
 /// @

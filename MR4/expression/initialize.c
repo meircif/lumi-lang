@@ -73,8 +73,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
     if (self->_base.result_type->type_data == &(glob->type_array->_base) && ((TypeInstance*)(self->_base.result_type->parameters->first->item))->type_data == &(glob->type_generic->_base)) {
       CHECK(47, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){28, 27, "cannot create generic array"}) )
     }
-    Int _Int42;
-    CHECK(48, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int42)) )
+    Int _Int44;
+    CHECK(48, TypeData_find_meth(self->_base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int44)) )
     if (!(NULL != self->arguments->parameters->first) &&  ! (NULL != self->arguments->outputs->first) && (!(NULL != self->constructor) || self->_base.result_type->type_data == &(glob->type_string->_base))) {
       self->constructor = NULL;
     }
@@ -89,8 +89,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
         self_param->code_node = self->_base.code_node;
         self_param->value = &(self->symbol->_base);
         CHECK(60, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-        Bool _Bool43;
-        CHECK(61, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base.result_type, 0, &(_Bool43)) )
+        Bool _Bool45;
+        CHECK(61, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base.result_type, 0, &(_Bool45)) )
       }
       else {
         CHECK(64, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "no contructor for type"}, self->_base.result_type->type_data->name) )
@@ -361,6 +361,7 @@ Func InitExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

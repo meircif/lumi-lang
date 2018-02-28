@@ -377,3 +377,15 @@ test test-cover-all()
   mid.meth2()
   mid.meth4()
   mid.meth5(copy 0, user _)
+
+
+enum TestEnum
+  FIRST-VALUE
+  ANOTHER-VALUE
+  VALUE2
+
+test test-enum()
+  assert TestEnum.FIRST-VALUE = 0
+  assert TestEnum.ANOTHER-VALUE = 1
+  assert TestEnum.VALUE2 = 2
+  assert TestEnum.length = 3

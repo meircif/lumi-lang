@@ -62,7 +62,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       self.arguments.add-self-parameter(user self.parent-type)
   
   func dynamic check-name()
-    if not f-is-legal-name(user self.name, copy false)
+    if not f-is-legal-name(user self.name, copy NAME-DEFAULT)
       self.m-syntax-error(user "illegal function name", user self.name)
     if ? self.parent-type
       user SyntaxTreeFunction meth

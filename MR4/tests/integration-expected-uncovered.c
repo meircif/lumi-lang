@@ -54,6 +54,16 @@ typedef struct TopLink_Dynamic TopLink_Dynamic;
 typedef struct RefNode RefNode;
 
 
+/* Enums */
+
+enum {
+  TestEnum_FIRST_VALUE = 0,
+  TestEnum_ANOTHER_VALUE,
+  TestEnum_VALUE2,
+  TestEnum_length
+};
+
+
 /* types struct */
 
 struct TestStruct {
@@ -435,6 +445,8 @@ Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, R
 
 Returncode test_cover_all(void);
 
+Returncode test_enum(void);
+
 
 /* types global variables */
 
@@ -523,7 +535,7 @@ int MR_file0_line_count[551] = {
    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,
   -1
 };
-int MR_file1_line_count[381] = {
+int MR_file1_line_count[393] = {
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1,-1, 0, 0, 0, 0,-1,-1, 0,
    0,-1,-1, 0, 0, 0, 0,-1,-1, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1, 0,
   -1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1,-1, 0, 0,-1,-1,-1, 0, 0,-1,-1, 0,
@@ -539,7 +551,7 @@ int MR_file1_line_count[381] = {
    0, 0,-1, 0, 0, 0, 0,-1,-1,-1, 0,-1,-1, 0, 0, 0,-1,-1, 0,-1,-1, 0, 0,-1,-1,
    0,-1,-1, 0,-1,-1,-1,-1, 0, 0, 0, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0, 0, 0, 0, 0,
    0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1, 0,-1,-1,
-   0, 0, 0, 0, 0,-1
+   0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0,-1
 };
 int MR_file2_line_count[30] = {
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1,
@@ -547,7 +559,7 @@ int MR_file2_line_count[30] = {
 };
 File_Coverage MR_file_coverage[3] = {
   {"tests/integration-test0.4.mr", 551, MR_file0_line_count},
-  {"tests/integration-test1.4.mr", 381, MR_file1_line_count},
+  {"tests/integration-test1.4.mr", 393, MR_file1_line_count},
   {"tests/integration-test2.4.mr", 30, MR_file2_line_count}
 };
 
@@ -5690,6 +5702,24 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "test-enum"
+Returncode test_enum(void) {
+  Returncode MR_err = OK;
+  ++MR_file_coverage[1].line_count[388];
+  TEST_ASSERT(388, TestEnum_FIRST_VALUE == 0)
+  ++MR_file_coverage[1].line_count[389];
+  TEST_ASSERT(389, TestEnum_ANOTHER_VALUE == 1)
+  ++MR_file_coverage[1].line_count[390];
+  TEST_ASSERT(390, TestEnum_VALUE2 == 2)
+  ++MR_file_coverage[1].line_count[391];
+  TEST_ASSERT(391, TestEnum_length == 3)
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
 USER_MAIN_HEADER {
   Bool MR_success = true;
   String aux_String_0_Var = {0};
@@ -5727,6 +5757,7 @@ USER_MAIN_HEADER {
   RUN_TEST(test_complex_delete);
   RUN_TEST(test_assert_error_message);
   RUN_TEST(test_cover_all);
+  RUN_TEST(test_enum);
   MR_success &= MR_test_coverage(MR_file_coverage, 3);
   return MR_success? OK : FAIL;
 }

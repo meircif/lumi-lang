@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file29_name = "mr4-compiler.3.mr";
+static char* _mr_file30_name = "mr4-compiler.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file29_name
+#define MR_FILE_NAME _mr_file30_name
 
 /*  MR4 compiler main - written in MR3
 
@@ -68,6 +68,7 @@ MAIN_FUNC
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

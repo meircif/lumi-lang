@@ -111,8 +111,21 @@ class UpCastExpression(Expression)
 
 ## Type name expression
 class TypeExpression(Expression)
-  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
+  func inst parse-new(
+      owner String text, user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
+    owner String value
+    var Char next-end
+    if end = '.'
+      self.read-new-value(user ends):(owner value, copy next-end)
+      if value.length > 0
+        if value.equal(user "length") or (value[0] >= 'A' and value[0] <= 'Z')
+          new EnumExpression enum-expression
+          enum-expression.parse(owner text, owner value, user code-node)
+          end := next-end
+          expression := enum-expression
+          return
+      glob.save-input := true
     new TypeInstance type-instance
     type-instance.parse-name(user text, user code-node, user code-node):(
         copy end)
@@ -134,3 +147,31 @@ class TypeExpression(Expression)
   
   func dynamic analyze()
     self.result-type.parameters.first.item.analyze(user self)
+
+
+## Enum name expression
+class EnumExpression(Expression)
+  owner String name
+  owner String value
+  user EnumData enum-data
+  
+  func inst parse(
+      owner String name, owner String value, user SyntaxTreeCode code-node)
+    self.set-location()
+    self.code-node := code-node
+    self.name := name
+    self.value := value
+    self.set-simple-type(user glob.type-int)
+    self.access := ACCESS-VAR
+  
+  func dynamic analyze()
+    if not (? glob.enum-map.find(user self.name):(user self.enum-data))
+      self.m-syntax-error(user "unknown Enum", user self.name)
+    if not self.enum-data.m-has-value(user self.value)
+      self.m-syntax-error2(
+          user "Enum", user self.name, user "has no value", user self.value)
+  
+  func dynamic write()
+    write-cname(user self.name)
+    write(user "_")
+    write-cname(user self.value)

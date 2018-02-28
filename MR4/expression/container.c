@@ -189,9 +189,9 @@ Returncode UnaryExpression_analyze(UnaryExpression* self) {
     CHECK(89, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
   }
   else {
-    Bool _Bool35;
-    CHECK(90, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool35)) )
-    if (_Bool35) {
+    Bool _Bool37;
+    CHECK(90, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool37)) )
+    if (_Bool37) {
       CHECK(91, UnaryExpression_test_operand_type(self, self->right_expression, &(glob->type_int->_base)) )
       CHECK(92, Expression_set_simple_type(&(self->_base), &(glob->type_int->_base)) )
     }
@@ -223,9 +223,9 @@ Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* 
 static char* _func_name_UnaryExpression_test_operand_type = "UnaryExpression.test-operand-type";
 #define MR_FUNC_NAME _func_name_UnaryExpression_test_operand_type
 Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* operand, TypeData* expected_type) {
-  Bool _Bool36;
-  CHECK(106, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool36)) )
-  if (!_Bool36) {
+  Bool _Bool38;
+  CHECK(106, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool38)) )
+  if (!_Bool38) {
     CHECK(107, SyntaxTreeNode_m_syntax_error3(&(self->_base._base), &(String){9, 8, "operator"}, self->operator->name, &(String){9, 8, "expected"}, expected_type->name, &(String){13, 12, "operand, got"}, operand->result_type->type_data->name) )
   }
   return OK;
@@ -410,9 +410,9 @@ Returncode BinaryExpression_test_not_int(BinaryExpression* self, Expression* ope
 static char* _func_name_BinaryExpression_test_not_int = "BinaryExpression.test-not-int";
 #define MR_FUNC_NAME _func_name_BinaryExpression_test_not_int
 Returncode BinaryExpression_test_not_int(BinaryExpression* self, Expression* operand) {
-  Bool _Bool37;
-  CHECK(214, TypeData_m_is_same(operand->result_type->type_data, &(glob->type_int->_base), &(_Bool37)) )
-  if (_Bool37) {
+  Bool _Bool39;
+  CHECK(214, TypeData_m_is_same(operand->result_type->type_data, &(glob->type_int->_base), &(_Bool39)) )
+  if (_Bool39) {
     CHECK(215, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){9, 8, "operator"}, self->_base.operator->name, &(String){26, 25, "is not supported for type"}, operand->result_type->type_data->name) )
   }
   return OK;
@@ -695,6 +695,7 @@ Func QuestionExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)Synt
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

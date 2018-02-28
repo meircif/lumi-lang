@@ -28,6 +28,9 @@ typedef struct ComplexField_Dynamic ComplexField_Dynamic;
 typedef struct HasComplexField HasComplexField;
 
 
+/* Enums */
+
+
 /* types struct */
 
 struct TestStruct {

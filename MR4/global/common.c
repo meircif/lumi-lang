@@ -80,36 +80,56 @@ Returncode print_msg_with_item(String* text, String* item) {
 
 
 #if MR_STAGE == MR_DECLARATIONS
-Returncode f_is_legal_name(String* name, Bool is_type, Bool* is_legal);
+extern Int NAME_DEFAULT;
+#elif MR_STAGE == MR_FUNCTIONS
+Int NAME_DEFAULT = 0;
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Int NAME_TYPE;
+#elif MR_STAGE == MR_FUNCTIONS
+Int NAME_TYPE = 1;
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Int NAME_CONSTANT;
+#elif MR_STAGE == MR_FUNCTIONS
+Int NAME_CONSTANT = 2;
+#endif
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode f_is_legal_name(String* name, Int name_type, Bool* is_legal);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_f_is_legal_name = "f-is-legal-name";
 #define MR_FUNC_NAME _func_name_f_is_legal_name
-Returncode f_is_legal_name(String* name, Bool is_type, Bool* is_legal) {
-  if (name->length <= 0 || (is_type && name->length <= 1)) {
-    (*is_legal) = false;
+Returncode f_is_legal_name(String* name, Int name_type, Bool* is_legal) {
+  (*is_legal) = false;
+  if (name->length <= 0 || (name_type != NAME_DEFAULT && name->length <= 1)) {
     return OK;
   }
-  if ((0) < 0 || (0) >= (name)->length) RAISE(37)
+  if ((0) < 0 || (0) >= (name)->length) RAISE(41)
   Char ch = ((name)->values[0]);
   Int first = 1;
-  if (is_type) {
+  if (name_type != NAME_DEFAULT) {
     if (ch < 'A' || ch > 'Z') {
-      (*is_legal) = false;
       return OK;
     }
-    if ((1) < 0 || (1) >= (name)->length) RAISE(43)
+    if ((1) < 0 || (1) >= (name)->length) RAISE(46)
     ch = ((name)->values[1]);
     first = 2;
   }
-  if (ch < 'a' || ch > 'z') {
-    (*is_legal) = false;
-    return OK;
+  if (name_type == NAME_CONSTANT) {
+    if ((ch < 'A' || ch > 'Z') && ch != '-') {
+      return OK;
+    }
+  }
+  else {
+    if (ch < 'a' || ch > 'z') {
+      return OK;
+    }
   }
   {int n; for (n = (first); n < (name->length); ++n) {
-    if ((n) < 0 || (n) >= (name)->length) RAISE(49)
+    if ((n) < 0 || (n) >= (name)->length) RAISE(54)
     ch = ((name)->values[n]);
-    if (!((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || (!is_type && ch == '-') || (is_type && (ch >= 'A' && ch <= 'Z')))) {
-      (*is_legal) = false;
+    if (!((ch >= '0' && ch <= '9') || (name_type != NAME_CONSTANT && ch >= 'a' && ch <= 'z') || (name_type != NAME_DEFAULT && ch >= 'A' && ch <= 'Z') || (name_type != NAME_TYPE && ch == '-'))) {
       return OK;
     }
   }}
@@ -143,6 +163,7 @@ Returncode f_is_legal_name(String* name, Bool is_type, Bool* is_legal) {
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

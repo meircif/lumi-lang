@@ -54,6 +54,16 @@ typedef struct TopLink_Dynamic TopLink_Dynamic;
 typedef struct RefNode RefNode;
 
 
+/* Enums */
+
+enum {
+  TestEnum_FIRST_VALUE = 0,
+  TestEnum_ANOTHER_VALUE,
+  TestEnum_VALUE2,
+  TestEnum_length
+};
+
+
 /* types struct */
 
 struct BaseType {
@@ -434,6 +444,8 @@ Returncode test_assert_error_message(void);
 Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
 
 Returncode test_cover_all(void);
+
+Returncode test_enum(void);
 
 
 /* types global variables */
@@ -5089,6 +5101,20 @@ MR_cleanup:
 #undef MR_FILE_NAME
 #undef MR_FUNC_NAME
 
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "test-enum"
+Returncode test_enum(void) {
+  Returncode MR_err = OK;
+  TEST_ASSERT(388, TestEnum_FIRST_VALUE == 0)
+  TEST_ASSERT(389, TestEnum_ANOTHER_VALUE == 1)
+  TEST_ASSERT(390, TestEnum_VALUE2 == 2)
+  TEST_ASSERT(391, TestEnum_length == 3)
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
 USER_MAIN_HEADER {
   Bool MR_success = true;
   String aux_String_0_Var = {0};
@@ -5126,6 +5152,7 @@ USER_MAIN_HEADER {
   RUN_TEST(test_complex_delete);
   RUN_TEST(test_assert_error_message);
   RUN_TEST(test_cover_all);
+  RUN_TEST(test_enum);
   MR_success &= MR_test_coverage(MR_file_coverage, 1);
   return MR_success? OK : FAIL;
 }

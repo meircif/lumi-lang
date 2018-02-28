@@ -35,8 +35,8 @@ Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Express
 static char* _func_name_parse_new_expression = "parse-new-expression";
 #define MR_FUNC_NAME _func_name_parse_new_expression
 Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  Operator* _Operator38;
-  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator38)) )
+  Operator* _Operator40;
+  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator40)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -129,27 +129,27 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     free(text);
   }
   else {
-    CHECK(103, Expression_parse_new_init_operand(self, text, code_node, &((*expression)), &((*end))) )
+    CHECK(103, Expression_parse_new_init_operand(self, text, ends, code_node, &((*expression)), &((*end))) )
   }
   
   while (true) {
     if ((*end) == '?') {
       CHECK(108, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool39;
-    CHECK(109, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool39)) )
-    if (!(_Bool39)) break;
+    Bool _Bool41;
+    CHECK(109, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool41)) )
+    if (!(_Bool41)) break;
   }
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* Parse the initialize part of an operand expression */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_parse_new_init_operand(Expression* self, String* text, SyntaxTreeCode* code_node, Expression** expression, Char* end);
+Returncode Expression_parse_new_init_operand(Expression* self, String* text, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_parse_new_init_operand = "Expression.parse-new-init-operand";
 #define MR_FUNC_NAME _func_name_Expression_parse_new_init_operand
-Returncode Expression_parse_new_init_operand(Expression* self, String* text, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
+Returncode Expression_parse_new_init_operand(Expression* self, String* text, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
   if ((0) < 0 || (0) >= (text)->length) RAISE(116)
   Char first = ((text)->values[0]);
   Char second = '\0';
@@ -170,16 +170,16 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Syn
       }
       else {
         if (first >= 'A' && first <= 'Z' && second >= 'a' && second <= 'z') {
-          CHECK(129, TypeExpression_parse_new(NULL, text, code_node, &((*expression)), &((*end))) )
+          CHECK(129, TypeExpression_parse_new(NULL, text, ends, code_node, &((*expression)), &((*end))) )
         }
         else {
           if (text->length == 1 && first == '_') {
             CHECK(132, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool40;
-            CHECK(133, String_equal(text, &(String){5, 4, "base"}, &(_Bool40)) )
-            if (_Bool40) {
+            Bool _Bool42;
+            CHECK(133, String_equal(text, &(String){5, 4, "base"}, &(_Bool42)) )
+            if (_Bool42) {
               CHECK(134, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
             }
             else {
@@ -246,9 +246,9 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_cre
   CHECK(166, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
   (*symbol)->_base.access = access;
   (*symbol)->_base.assignable = true;
-  SyntaxTreeFunction* _SyntaxTreeFunction41;
-  CHECK(169, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction41)) )
-  CHECK(169, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction41, access, is_create, type_instance, &((*symbol)->variable)) )
+  SyntaxTreeFunction* _SyntaxTreeFunction43;
+  CHECK(169, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction43)) )
+  CHECK(169, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction43, access, is_create, type_instance, &((*symbol)->variable)) )
   CHECK(171, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
   return OK;
 }
@@ -432,6 +432,7 @@ Func Expression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNo
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"
