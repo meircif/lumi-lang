@@ -6,7 +6,10 @@ class SyntaxTreeCode(SyntaxTreeNode)
   user SyntaxTreeBlock parent
   
   func inst find-variable(user String name):(user SyntaxTreeVariable variable)
-    self.parent.find-variable(user name):(user variable)
+    if ? self.parent
+      self.parent.find-variable(user name):(user variable)
+    else
+      glob.root.find-variable(user name):(user variable)
   
   func inst get-function():(user SyntaxTreeFunction function)
     self.parent.get-function():(user function)

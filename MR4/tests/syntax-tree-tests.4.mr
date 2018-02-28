@@ -129,6 +129,14 @@ struct Error
 struct Error
   var Int x
   new()->(var Int x)
+## @ eg te14
+struct Error(Error)
+  var Int x
+## @ eg te15
+struct Aerror(Berror)
+  var Int x
+struct Berror(Aerror)
+  var Int x
 ## @@ test-class
 ## @ g t0
 class Base
@@ -396,6 +404,8 @@ struct Test
   var Int x(1)
 ## @ ec te8
 new
+## @ ec te9
+var Array{i:Int} error
 ## @@ test-initialize
 ## @ c t0
 t := Test(copy i)
@@ -1348,4 +1358,79 @@ struct Test
   var Base error
 struct Base
   var Test t
+## @@ test-enum
+## @ g t0
+enum MyEnum
+  VALUE
+  ANOTHER-VALUE
+  LAST-VALUE
+func dummy()
+  var Int x(copy MyEnum.VALUE)
+  x += MyEnum.ANOTHER-VALUE
+  x -= MyEnum.length
+## @ g t1
+enum MyEnum
+  VALUE
+  ANOTHER-VALUE
+  LAST-VALUE
+var Array{MyEnum.length:Int} arr
+## @ eg te0
+enum MyEnum
+  VALUE
+func dummy()
+  var Int x(copy MyEnum.ERROR)
+## @ ec te1
+i := Error.VALUE
+## @ eg te2
+enum MyEnum
+  VALUE
+func dummy()
+  var Int x(copy MyEnum.error)
+## @ eg te3
+enum My-Enum
+## @ eg te4
+enum MyEnum
+  Error
+## @ eg te5
+enum MyEnum
+  ERRoR
+## @ eg te6
+enum
+## @ eg te7
+enum MyEnum
+  VALUE(0)
+## @ eg te8
+enum MyEnum
+## @ eg te9
+enum MyEnum
+    VALUE
+## @@ test-constant
+## @ g t0
+const Int NUMBER 12
+## @ g t1
+const Int SIZE 12
+var Array{SIZE + 3:Int} arr
+## @ g t2
+const Int LARGE - (2 * SMALL) + 1
+const Int SMALL 7
+## @ eg te0
+const
+## @ eg te1
+const Bool
+## @ eg te2
+const Int
+## @ eg te3
+const Int Error
+## @ eg te4
+const Int ERROR
+## @ eg te5
+const Int NAME false
+## @ eg te6
+var Int x
+const Int NAME x
+## @ eg te7
+const Int ERROR ERROR + 1
+## @ eg te8
+const Int A-ERROR B-ERROR
+const Int B-ERROR - (2 * A-ERROR) + 1
 ## @

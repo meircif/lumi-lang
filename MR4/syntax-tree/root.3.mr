@@ -3,6 +3,8 @@
 ## The syntax tree root
 class SyntaxTreeRoot(SyntaxTreeNamespace)
   owner List{TypeData} types
+  owner List{EnumData} enums
+  owner List{SyntaxTreeConstant} constants
   user String output-file-name
   owner SyntaxTreeMainFunction main-function
   owner GlobalInit global-init
@@ -13,6 +15,8 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
   func inst init()
     base.init()
     new List{TypeData} in self.types
+    new List{EnumData} in self.enums
+    new List{SyntaxTreeConstant} in self.constants
     new GlobalInit in self.global-init
     self.global-init.init()
   
@@ -58,19 +62,29 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     if self.parse-if-function(user keyword, user _):(copy end)
       return
     
-    if keyword.equal(user "struct")
+    if keyword.equal(user "const")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"const\", got", copy end)
+      self.variables.add(owner SyntaxTreeConstant.parse-new(var _):(copy end))
+      
+    else-if keyword.equal(user "struct")
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"struct\", got", copy end)
-      self.types.add(owner TypeData.parse-new(var _, copy false):(
-          copy end))
+      self.types.add(owner TypeData.parse-new(var _, copy false):(copy end))
       
     else-if keyword.equal(user "class")
       if end != ' '
         self.m-syntax-error-c(
             user "expected space after \"class\", got", copy end)
-      self.types.add(owner TypeData.parse-new(var _, copy true):(
-          copy end))
+      self.types.add(owner TypeData.parse-new(var _, copy true):(copy end))
+      
+    else-if keyword.equal(user "enum")
+      if end != ' '
+        self.m-syntax-error-c(
+            user "expected space after \"enum\", got", copy end)
+      self.enums.add(owner EnumData.parse-new(var _):(copy end))
       
     else-if keyword.equal(user "main")
       if end != '\n'
@@ -124,6 +138,7 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     else-if not self.is-library
       print(user "General code error: no main function")
       raise
+    self.m-order-children-constants(user self.variables, user self.constants)
   
   func inst m-order-types()
     new List{TypeData} ordered-list
@@ -151,6 +166,14 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     write-global(user "\n\n/* types declaration */\n")
     var TypeDeclarationWriter type-declaration-writer
     self.write-for-type(user type-declaration-writer)
+    
+    # will write Enums
+    write-global(user "\n\n/* Enums */\n")
+    self.write-children(user self.enums)
+    
+    # will write constants
+    write-global(user "\n\n/* constants */\n")
+    self.write-children(user self.constants)
     
     # will write type structures
     write-global(user "\n\n/* types struct */\n")

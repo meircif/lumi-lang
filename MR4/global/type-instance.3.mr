@@ -97,16 +97,19 @@ static TypeInstance
     self.parameters.add(owner type-data.m-new-type-instance())
   
   func inst analyze(user SyntaxTreeNode node)
-    self.analyze-part(user node, copy true, copy true)
+    self.analyze-part(user node, copy true, copy true, copy false)
   
   func inst link-types(user SyntaxTreeNode node)
-    self.analyze-part(user node, copy true, copy false)
+    self.analyze-part(user node, copy true, copy false, copy true)
   
-  func inst analyze-lengths(user SyntaxTreeNode node)
-    self.analyze-part(user node, copy false, copy true)
+  func inst analyze-lengths(user SyntaxTreeNode node, copy Bool constant-length)
+    self.analyze-part(user node, copy false, copy true, copy constant-length)
   
   func inst analyze-part(
-      user SyntaxTreeNode node, copy Bool check-types, copy Bool check-length)
+      user SyntaxTreeNode node,
+      copy Bool check-types,
+      copy Bool check-length,
+      copy Bool constant-length)
     if check-types
       if not (? self.type-data)
         node.find-type(user self.name):(user self.type-data)
@@ -115,6 +118,8 @@ static TypeInstance
     if check-length
       if ? self.length
         node.analyze-expression(user self.length, user glob.type-int)
+        if constant-length and not self.length.constant
+          node.m-syntax-error-msg(user "array length is not constant")
       if ? self.arguments
         self.arguments.analyze()
     if ? self.parameters
@@ -122,7 +127,10 @@ static TypeInstance
       do
         while ? sub-type
         sub-type.item.analyze-part(
-            user node, copy check-types, copy check-length)
+            user node,
+            copy check-types,
+            copy check-length,
+            copy constant-length)
         sub-type := sub-type.next
     if check-types
       self.check-parameters(user node)

@@ -25,6 +25,7 @@ class SymbolExpression(Expression)
       self.variable.type-instance.copy-new():(owner self.result-type)
       self.access := self.variable.access
       self.assignable := true
+      self.constant := self.variable.constant
     else
       glob.root.find-function(user self.name):(user self.function)
       if not (? self.function)
@@ -45,6 +46,10 @@ class SymbolExpression(Expression)
     is-mock := ? self.function and ? self.function.mocker-function
     if is-mock
       self.is-annotate := is-annotate
+  
+  func dynamic m-order-constants(user List{SyntaxTreeConstant} ordered-list)
+    if ? self.variable
+      self.variable.m-order-constants(user ordered-list)
   
   func dynamic write()
     if ? self.function

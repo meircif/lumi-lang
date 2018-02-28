@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file29_name = "mr4-compiler.3.mr";
+static char* _mr_file30_name = "mr4-compiler.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file29_name
+#define MR_FILE_NAME _mr_file30_name
 
 /*  MR4 compiler main - written in MR3
 
@@ -33,7 +33,7 @@ Returncode func(Array* argv) {
   CHECK(17, Global_init(glob) )
   CHECK(18, SyntaxTreeRoot_parse(glob->root, argv) )
   CHECK(19, (glob->root)->_base._base._base._dtl[2](glob->root) )
-  CHECK(20, (glob->root)->_base._base._base._dtl[3](glob->root) )
+  CHECK(20, (glob->root)->_base._base._base._dtl[4](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -68,6 +68,7 @@ MAIN_FUNC
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

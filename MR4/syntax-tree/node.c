@@ -44,9 +44,9 @@ static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
   {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool94;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool94)) )
-    if (_Bool94) {
+    Bool _Bool96;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool96)) )
+    if (_Bool96) {
       (*access) = n;
       return OK;
     }
@@ -83,9 +83,9 @@ Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, TypeData
     ListNode* node = parent_type->parameters->first;
     while (true) {
       if (!(NULL != node)) break;
-      Bool _Bool95;
-      CHECK(34, String_equal(((String*)(node->item)), name, &(_Bool95)) )
-      if (_Bool95) {
+      Bool _Bool97;
+      CHECK(34, String_equal(((String*)(node->item)), name, &(_Bool97)) )
+      if (_Bool97) {
         (*type_data) = &(glob->type_generic->_base);
         return OK;
       }
@@ -106,13 +106,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(43)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char96;
-    CHECK(45, read_c(&(_Char96)) )
-    CHECK(45, String_append(actual_text, _Char96) )
+    Char _Char98;
+    CHECK(45, read_c(&(_Char98)) )
+    CHECK(45, String_append(actual_text, _Char98) )
   }}
-  Bool _Bool97;
-  CHECK(46, String_equal(actual_text, expected_text, &(_Bool97)) )
-  if (!_Bool97) {
+  Bool _Bool99;
+  CHECK(46, String_equal(actual_text, expected_text, &(_Bool99)) )
+  if (!_Bool99) {
     CHECK(47, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);
@@ -364,12 +364,23 @@ Returncode SyntaxTreeNode_analyze(SyntaxTreeNode* self) {
 #undef MR_FUNC_NAME
 #endif
 #if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_m_order_constants(SyntaxTreeNode* self, List* ordered_list);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_m_order_constants = "SyntaxTreeNode.m-order-constants";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_order_constants
+Returncode SyntaxTreeNode_m_order_constants(SyntaxTreeNode* self, List* ordered_list) {
+  /* do nothing as default */
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
 Returncode SyntaxTreeNode_write(SyntaxTreeNode* self);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_SyntaxTreeNode_write = "SyntaxTreeNode.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeNode_write
 Returncode SyntaxTreeNode_write(SyntaxTreeNode* self) {
-  RAISE(184)
+  RAISE(187)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -381,7 +392,7 @@ static char* _func_name_SyntaxTreeNode_link_children_types = "SyntaxTreeNode.lin
 Returncode SyntaxTreeNode_link_children_types(SyntaxTreeNode* self, List* child_list) {
   NodeLinkTypesAction* action_link_types = &(NodeLinkTypesAction){NodeLinkTypesAction__dtl};
   action_link_types->_base._dtl = NodeLinkTypesAction__dtl;
-  CHECK(188, SyntaxTreeNode_do_on_children(self, child_list, &(action_link_types->_base)) )
+  CHECK(191, SyntaxTreeNode_do_on_children(self, child_list, &(action_link_types->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -394,7 +405,21 @@ static char* _func_name_SyntaxTreeNode_analyze_children = "SyntaxTreeNode.analyz
 Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list) {
   NodeAnalyzeAction* action_analyze = &(NodeAnalyzeAction){NodeAnalyzeAction__dtl};
   action_analyze->_base._dtl = NodeAnalyzeAction__dtl;
-  CHECK(192, SyntaxTreeNode_do_on_children(self, child_list, &(action_analyze->_base)) )
+  CHECK(195, SyntaxTreeNode_do_on_children(self, child_list, &(action_analyze->_base)) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeNode_m_order_children_constants(SyntaxTreeNode* self, List* child_list, List* ordered_list);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeNode_m_order_children_constants = "SyntaxTreeNode.m-order-children-constants";
+#define MR_FUNC_NAME _func_name_SyntaxTreeNode_m_order_children_constants
+Returncode SyntaxTreeNode_m_order_children_constants(SyntaxTreeNode* self, List* child_list, List* ordered_list) {
+  NodeOrderConstantsAction* action_order_constants = &(NodeOrderConstantsAction){NodeOrderConstantsAction__dtl, NULL};
+  action_order_constants->_base._dtl = NodeOrderConstantsAction__dtl;
+  action_order_constants->ordered_list = ordered_list;
+  CHECK(202, SyntaxTreeNode_do_on_children(self, child_list, &(action_order_constants->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -407,7 +432,7 @@ static char* _func_name_SyntaxTreeNode_write_children = "SyntaxTreeNode.write-ch
 Returncode SyntaxTreeNode_write_children(SyntaxTreeNode* self, List* child_list) {
   NodeWriteAction* action_write = &(NodeWriteAction){NodeWriteAction__dtl};
   action_write->_base._dtl = NodeWriteAction__dtl;
-  CHECK(196, SyntaxTreeNode_do_on_children(self, child_list, &(action_write->_base)) )
+  CHECK(206, SyntaxTreeNode_do_on_children(self, child_list, &(action_write->_base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -423,7 +448,7 @@ Returncode SyntaxTreeNode_do_on_children(SyntaxTreeNode* self, List* child_list,
     if (!(NULL != child)) break;
     glob->input_file_name = ((SyntaxTreeNode*)(child->item))->input_file_name;
     glob->line_number = ((SyntaxTreeNode*)(child->item))->line_number;
-    CHECK(205, (action)->_dtl[0](action, child->item) )
+    CHECK(215, (action)->_dtl[0](action, child->item) )
     child = child->next;
   }
   return OK;
@@ -434,7 +459,7 @@ Returncode SyntaxTreeNode_do_on_children(SyntaxTreeNode* self, List* child_list,
 extern Func SyntaxTreeNode__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeNode__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write};
+Func SyntaxTreeNode__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeNode_write};
 #endif
 
 
@@ -451,7 +476,7 @@ Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node);
 static char* _func_name_NodeAction_m_action = "NodeAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeAction_m_action
 Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node) {
-  RAISE(211)
+  RAISE(221)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -475,7 +500,7 @@ Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNod
 static char* _func_name_NodeLinkTypesAction_m_action = "NodeLinkTypesAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeLinkTypesAction_m_action
 Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNode* node) {
-  CHECK(215, (node)->_dtl[1](node) )
+  CHECK(225, (node)->_dtl[1](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -500,7 +525,7 @@ Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* n
 static char* _func_name_NodeAnalyzeAction_m_action = "NodeAnalyzeAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeAnalyzeAction_m_action
 Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* node) {
-  CHECK(219, (node)->_dtl[2](node) )
+  CHECK(229, (node)->_dtl[2](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -525,7 +550,7 @@ Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node)
 static char* _func_name_NodeWriteAction_m_action = "NodeWriteAction.m-action";
 #define MR_FUNC_NAME _func_name_NodeWriteAction_m_action
 Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node) {
-  CHECK(223, (node)->_dtl[3](node) )
+  CHECK(233, (node)->_dtl[4](node) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -535,6 +560,32 @@ extern Func NodeWriteAction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
 Func NodeWriteAction__dtl[] = {(void*)NodeWriteAction_m_action};
+#endif
+
+#if MR_STAGE == MR_TYPEDEFS
+typedef struct NodeOrderConstantsAction NodeOrderConstantsAction;
+#elif MR_STAGE == MR_TYPES(1)
+struct NodeOrderConstantsAction {
+  NodeAction _base;
+  List* ordered_list;
+};
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode NodeOrderConstantsAction_m_action(NodeOrderConstantsAction* self, SyntaxTreeNode* node);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_NodeOrderConstantsAction_m_action = "NodeOrderConstantsAction.m-action";
+#define MR_FUNC_NAME _func_name_NodeOrderConstantsAction_m_action
+Returncode NodeOrderConstantsAction_m_action(NodeOrderConstantsAction* self, SyntaxTreeNode* node) {
+  CHECK(239, (node)->_dtl[3](node, self->ordered_list) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+extern Func NodeOrderConstantsAction__dtl[];
+#endif
+#if MR_STAGE == MR_FUNCTIONS
+Func NodeOrderConstantsAction__dtl[] = {(void*)NodeOrderConstantsAction_m_action};
 #endif
 
 #undef MR_FILE_NAME
@@ -561,6 +612,7 @@ Func NodeWriteAction__dtl[] = {(void*)NodeWriteAction_m_action};
 #include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

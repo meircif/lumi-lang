@@ -7,7 +7,8 @@ testing test_simple_delete... OK
 testing test_complex_delete... OK
 testing test_assert_error_message... OK
 testing test_cover_all... OK
-testing code coverage... 41% - failed, not covered:
-  tests/integration-test0.4.mr(4%): 24-25 38 40-42 45-48 52-57 77-78 80-90 95-96 102-167 180-181 203 214 226 232 238 251-259 264-267 271-278 280-297 302-335 339-347 377-391 393-399 403-406 409-433 441-442 445 451 454 457 460 463-470 472-482 484-492 494-502 504-514 520 525-534 537-541
+testing test_constants... OK
+testing code coverage... 42% - failed, not covered:
+  tests/integration-test0.4.mr(4%): 35-36 49 51-53 56-59 63-68 88-89 91-101 106-107 113-178 191-192 214 225 237 243 249 262-270 275-278 282-289 291-308 313-346 350-358 388-402 404-410 414-417 420-444 452-453 456 462 465 468 471 474-481 483-493 495-503 505-513 515-525 531 536-545 548-552
   tests/integration-test1.4.mr(90%): 18-21 24-25 28-31 34-40 52 61 65-66 341
 Tests failed

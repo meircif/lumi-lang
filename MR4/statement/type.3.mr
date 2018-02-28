@@ -11,6 +11,7 @@ class TypeData(SyntaxTreeNamespace)
   var Bool is-dynamic
   var Bool is-ordered
   var Bool is-delete-mocked
+  var Bool ordering
   
   func inst parse-new(copy Bool is-dynamic):(
       copy Char end, owner TypeData new-node)
@@ -27,7 +28,7 @@ class TypeData(SyntaxTreeNamespace)
       do
         owner String name
         read-new(user ":}"):(owner name, copy end)
-        if not f-is-legal-name(user name, copy true)
+        if not f-is-legal-name(user name, copy NAME-TYPE)
           self.m-syntax-error(user "illegal type parameter name", user name)
         self.parameters.add(owner name)
         while end = ':'
@@ -47,7 +48,7 @@ class TypeData(SyntaxTreeNamespace)
     self.indentation-spaces := 0
   
   func inst add-type()
-    if not f-is-legal-name(user self.name, copy true)
+    if not f-is-legal-name(user self.name, copy NAME-TYPE)
       self.m-syntax-error(user "illegal type name", user self.name)
     if ? glob.type-map.find(user self.name)
       self.m-syntax-error(user "redefinition of type", user self.name)
@@ -137,10 +138,15 @@ class TypeData(SyntaxTreeNamespace)
   func inst m-order-bases(user List{TypeData} ordered-list)
     if self.is-ordered
       return
+    if self.ordering
+      self.m-syntax-error(
+          user "recursive inheritance in type", user self.name)
+    self.ordering := true
     if ? self.base-type
       self.find-type(user self.base-type.name):(user self.base-type.type-data)
       self.base-type.type-data.m-order-bases(user ordered-list)
     ordered-list.add(owner self)
+    self.is-ordered := true
     # init `self.dynamic-base-methods` and test override methods
     if self.is-dynamic
       new NameMap{SyntaxTreeFunction} in self.dynamic-base-methods
@@ -161,7 +167,6 @@ class TypeData(SyntaxTreeNamespace)
         child.item.dynamic-base-method := child.item
         self.dynamic-base-methods.add(user child.item.name, user child.item)
       child := child.next
-    self.is-ordered := true
   
   func dynamic link-types()
     if ? self.base-type
@@ -170,7 +175,7 @@ class TypeData(SyntaxTreeNamespace)
   
   func dynamic analyze()
     if ? self.base-type
-      self.base-type.analyze-lengths(user self)
+      self.base-type.analyze-lengths(user self, copy true)
     if not (? self.base-type) and self.variables.m-is-empty()
       self.m-syntax-error(user "type with no fields", user self.name)
     if self.is-dynamic and

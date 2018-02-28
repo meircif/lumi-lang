@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file25_name = "statement/native.3.mr";
+static char* _mr_file26_name = "statement/native.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file25_name
+#define MR_FILE_NAME _mr_file26_name
 
 /* MR4 compiler - Syntax tree native nodes */
 
@@ -19,36 +19,36 @@ static char* _func_name_parse_native = "parse-native";
 #define MR_FUNC_NAME _func_name_parse_native
 Returncode parse_native(SyntaxTreeRoot* root, Char* end) {
   String* keyword = NULL;
-  Int _Int131;
-  CHECK(6, read_until(&(String){2, 1, " "}, false, &(keyword), &((*end)), &(_Int131)) )
+  Int _Int142;
+  CHECK(6, read_until(&(String){2, 1, " "}, false, &(keyword), &((*end)), &(_Int142)) )
   if ((*end) != ' ') {
     CHECK(8, SyntaxTreeNode_m_syntax_error_c(&(root->_base._base._base), &(String){43, 42, "expected space after \"native\" keyword, got"}, (*end)) )
   }
   
-  Bool _Bool132;
-  CHECK(11, String_equal(keyword, &(String){5, 4, "func"}, &(_Bool132)) )
-  if (_Bool132) {
-    NativeFunction* _NativeFunction133;
-    CHECK(12, NativeFunction_parse_new(NULL, &((*end)), &(_NativeFunction133)) )
-    CHECK(12, List_add(root->_base.functions, &(_NativeFunction133->_base)) )
+  Bool _Bool143;
+  CHECK(11, String_equal(keyword, &(String){5, 4, "func"}, &(_Bool143)) )
+  if (_Bool143) {
+    NativeFunction* _NativeFunction144;
+    CHECK(12, NativeFunction_parse_new(NULL, &((*end)), &(_NativeFunction144)) )
+    CHECK(12, List_add(root->_base.functions, &(_NativeFunction144->_base)) )
     
   }
   else {
-    Bool _Bool134;
-    CHECK(14, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool134)) )
-    if (_Bool134) {
-      NativeVariable* _NativeVariable135;
-      CHECK(15, NativeVariable_parse_new(NULL, &((*end)), &(_NativeVariable135)) )
-      CHECK(15, List_add(root->_base._base.variables, &(_NativeVariable135->_base)) )
+    Bool _Bool145;
+    CHECK(14, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool145)) )
+    if (_Bool145) {
+      NativeVariable* _NativeVariable146;
+      CHECK(15, NativeVariable_parse_new(NULL, &((*end)), &(_NativeVariable146)) )
+      CHECK(15, List_add(root->_base._base.variables, &(_NativeVariable146->_base)) )
       
     }
     else {
-      Bool _Bool136;
-      CHECK(17, String_equal(keyword, &(String){5, 4, "type"}, &(_Bool136)) )
-      if (_Bool136) {
-        NativeType* _NativeType137;
-        CHECK(18, NativeType_parse_new(NULL, &((*end)), &(_NativeType137)) )
-        CHECK(18, List_add(root->types, &(_NativeType137->_base)) )
+      Bool _Bool147;
+      CHECK(17, String_equal(keyword, &(String){5, 4, "type"}, &(_Bool147)) )
+      if (_Bool147) {
+        NativeType* _NativeType148;
+        CHECK(18, NativeType_parse_new(NULL, &((*end)), &(_NativeType148)) )
+        CHECK(18, List_add(root->types, &(_NativeType148->_base)) )
         
       }
       else {
@@ -118,7 +118,7 @@ Returncode NativeFunction_write(NativeFunction* self) {
 extern Func NativeFunction__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func NativeFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*)SyntaxTreeFunction_link_types, (void*)SyntaxTreeFunction_analyze, (void*)NativeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeBlock_write_block_body, (void*)SyntaxTreeFunction_check_name, (void*)SyntaxTreeFunction_write_declaration};
+Func NativeFunction__dtl[] = {(void*)SyntaxTreeFunction_get_parent_type, (void*)SyntaxTreeFunction_link_types, (void*)SyntaxTreeFunction_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)NativeFunction_write, (void*)SyntaxTreeBlock_parse_child, (void*)SyntaxTreeFunction_find_variable, (void*)SyntaxTreeFunction_get_function, (void*)SyntaxTreeBlock_write_block_body, (void*)SyntaxTreeFunction_check_name, (void*)SyntaxTreeFunction_write_declaration};
 #endif
 
 
@@ -138,7 +138,7 @@ static char* _func_name_NativeVariable_parse_new = "NativeVariable.parse-new";
 Returncode NativeVariable_parse_new(NativeVariable* self, Char* end, NativeVariable** new_node) {
   (*new_node) = malloc(sizeof(NativeVariable));
   if ((*new_node) == NULL) RAISE(43)
-  *(*new_node) = (NativeVariable){NativeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false};
+  *(*new_node) = (NativeVariable){NativeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   (*new_node)->_base._base._base._dtl = NativeVariable__dtl;
   CHECK(44, SyntaxTreeVariable_parse(&((*new_node)->_base), ACCESS_VAR, false, NULL, NULL, &((*end))) )
   (*new_node)->_base.is_native = true;
@@ -176,7 +176,7 @@ Returncode NativeVariable_write(NativeVariable* self) {
 extern Func NativeVariable__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func NativeVariable__dtl[] = {(void*)SyntaxTreeVariable_get_parent_type, (void*)SyntaxTreeVariable_link_types, (void*)NativeVariable_analyze, (void*)NativeVariable_write, (void*)SyntaxTreeCode_m_is_end_point, (void*)SyntaxTreeVariable_write_sequence};
+Func NativeVariable__dtl[] = {(void*)SyntaxTreeVariable_get_parent_type, (void*)SyntaxTreeVariable_link_types, (void*)NativeVariable_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)NativeVariable_write, (void*)SyntaxTreeCode_m_is_end_point, (void*)SyntaxTreeVariable_write_sequence};
 #endif
 
 
@@ -196,7 +196,7 @@ static char* _func_name_NativeType_parse_new = "NativeType.parse-new";
 Returncode NativeType_parse_new(NativeType* self, Char* end, NativeType** new_node) {
   (*new_node) = malloc(sizeof(NativeType));
   if ((*new_node) == NULL) RAISE(62)
-  *(*new_node) = (NativeType){NativeType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false, false};
+  *(*new_node) = (NativeType){NativeType__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false, false, false};
   (*new_node)->_base._base._base._base._dtl = NativeType__dtl;
   CHECK(63, NativeType_parse((*new_node), &((*end))) )
   return OK;
@@ -291,7 +291,7 @@ Returncode NativeType_write(NativeType* self) {
 extern Func NativeType__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_types, (void*)NativeType_analyze, (void*)NativeType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)NativeType_write_declaration, (void*)NativeType_write_methods_declaration, (void*)NativeType_write_global, (void*)NativeType_write_methods_body, (void*)TypeData_write_me};
+Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_types, (void*)NativeType_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)NativeType_write, (void*)TypeData_parse_child, (void*)SyntaxTreeBranch_find_variable, (void*)NativeType_write_declaration, (void*)NativeType_write_methods_declaration, (void*)NativeType_write_global, (void*)NativeType_write_methods_body, (void*)TypeData_write_me};
 #endif
 
 #undef MR_FILE_NAME
@@ -319,6 +319,7 @@ Func NativeType__dtl[] = {(void*)TypeData_get_parent_type, (void*)TypeData_link_
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

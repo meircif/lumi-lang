@@ -18,6 +18,9 @@ static Global
   ## stores all types - language built-ins and user defined
   owner NameMap{TypeData} type-map
   
+  ## stores all Enums
+  owner NameMap{EnumData} enum-map
+  
   ## map access number to its name
   owner Array{String} access-names
   
@@ -72,6 +75,7 @@ static Global
     new NameMap{SyntaxTreeTestFunction} in self.test-functions
     self.init-operator-map()
     self.init-builtin-types()
+    new NameMap{EnumData} in self.enum-map
     new Array{5:String{16}} in self.access-names
     self.access-names[ACCESS-UNDEFINED].copy(user "undefined")
     self.access-names[ACCESS-COPY].copy(user "copy")

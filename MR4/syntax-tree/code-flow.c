@@ -104,7 +104,7 @@ Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self);
 static char* _func_name_SyntaxTreeFlowElement_write_block_body = "SyntaxTreeFlowElement.write-block-body";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFlowElement_write_block_body
 Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self) {
-  CHECK(35, (self->block)->_base._base._dtl[7](self->block) )
+  CHECK(35, (self->block)->_base._base._dtl[8](self->block) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -113,7 +113,7 @@ Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self) {
 extern Func SyntaxTreeFlowElement__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeFlowElement__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeFlowElement_analyze, (void*)SyntaxTreeNode_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeFlowElement__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeFlowElement_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeNode_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -216,13 +216,13 @@ static char* _func_name_SyntaxTreeIf_write = "SyntaxTreeIf.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_write
 Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
   CHECK(80, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(81, (self->condition)->_base._dtl[8](self->condition) )
+  CHECK(81, (self->condition)->_base._dtl[9](self->condition) )
   CHECK(82, write(&(String){5, 4, "if ("}) )
-  CHECK(83, (self->condition)->_base._dtl[3](self->condition) )
+  CHECK(83, (self->condition)->_base._dtl[4](self->condition) )
   CHECK(84, write(&(String){2, 1, ")"}) )
   CHECK(85, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   if (NULL != self->else_node) {
-    CHECK(87, (self->else_node)->_base._base._base._dtl[3](self->else_node) )
+    CHECK(87, (self->else_node)->_base._base._base._dtl[4](self->else_node) )
   }
   return OK;
 }
@@ -232,7 +232,7 @@ Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
 extern Func SyntaxTreeIf__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeIf__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeIf_analyze, (void*)SyntaxTreeIf_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeIf__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeIf_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeIf_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -280,7 +280,7 @@ Returncode SyntaxTreeElse_write(SyntaxTreeElse* self) {
 extern Func SyntaxTreeElse__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeElse__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeFlowElement_analyze, (void*)SyntaxTreeElse_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeElse__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeFlowElement_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeElse_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 
@@ -328,7 +328,7 @@ Returncode SyntaxTreeDoLoop_write(SyntaxTreeDoLoop* self) {
 extern Func SyntaxTreeDoLoop__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeFlowElement_analyze, (void*)SyntaxTreeDoLoop_write, (void*)SyntaxTreeCode_m_is_end_point};
+Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeFlowElement_link_types, (void*)SyntaxTreeFlowElement_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeDoLoop_write, (void*)SyntaxTreeCode_m_is_end_point};
 #endif
 
 #undef MR_FILE_NAME
@@ -355,6 +355,7 @@ Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Sy
 #include "syntax-tree/code.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

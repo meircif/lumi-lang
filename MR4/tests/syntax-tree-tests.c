@@ -5,9 +5,9 @@
 #else
 
 #if MR_STAGE == MR_TYPEDEFS
-static char* _mr_file31_name = "tests/syntax-tree-tests.3.mr";
+static char* _mr_file32_name = "tests/syntax-tree-tests.3.mr";
 #endif
-#define MR_FILE_NAME _mr_file31_name
+#define MR_FILE_NAME _mr_file32_name
 
 /* MR4 compiler tests - Syntax tree */
 
@@ -33,7 +33,7 @@ Returncode write_syntax_tree(Bool is_test) {
   glob->root->is_library = true;
   CHECK(12, SyntaxTreeRoot_parse(glob->root, mock_argv) )
   CHECK(13, (glob->root)->_base._base._base._dtl[2](glob->root) )
-  CHECK(14, (glob->root)->_base._base._base._dtl[3](glob->root) )
+  CHECK(14, (glob->root)->_base._base._base._dtl[4](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -424,6 +424,33 @@ Returncode test_complex_fields() {
 #undef MR_FUNC_NAME
 #endif
 
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_enum();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_enum = "test-enum";
+#define MR_FUNC_NAME _func_name_test_enum
+Returncode test_enum() {
+  CHECK(170, test_from_file(&(String){10, 9, "test-enum"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
+#if MR_STAGE == MR_DECLARATIONS
+Returncode test_constant();
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_test_constant = "test-constant";
+#define MR_FUNC_NAME _func_name_test_constant
+Returncode test_constant() {
+  CHECK(174, test_from_file(&(String){14, 13, "test-constant"}) )
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+
+
 #undef MR_FILE_NAME
 
 #ifndef MR_INCLUDES
@@ -449,6 +476,7 @@ Returncode test_complex_fields() {
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"

@@ -35,8 +35,8 @@ Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Express
 static char* _func_name_parse_new_expression = "parse-new-expression";
 #define MR_FUNC_NAME _func_name_parse_new_expression
 Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  Operator* _Operator38;
-  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator38)) )
+  Operator* _Operator40;
+  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator40)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -56,6 +56,7 @@ struct Expression {
   Int access;
   Bool assignable;
   Bool top;
+  Bool constant;
   Bool is_statement;
   Bool is_generic_cast;
   Bool is_complex_field;
@@ -69,18 +70,18 @@ static char* _func_name_Expression_parse_new = "Expression.parse-new";
 Returncode Expression_parse_new(Expression* self, String* ends, SyntaxTreeCode* code_node, Operator* curr_operator, Expression** expression, Char* end, Operator** operator) {
   (*expression) = NULL;
   String* text = NULL;
-  CHECK(50, Expression_read_new_value(self, ends, &(text), &((*end))) )
-  CHECK(51, NameMap_find(glob->operator_map, text, (void**)&((*operator))) )
+  CHECK(51, Expression_read_new_value(self, ends, &(text), &((*end))) )
+  CHECK(52, NameMap_find(glob->operator_map, text, (void**)&((*operator))) )
   if (NULL != (*operator)) {
-    CHECK(53, UnaryExpression_parse_new(NULL, ends, (*operator), code_node, &((*expression)), &((*end)), &((*operator))) )
+    CHECK(54, UnaryExpression_parse_new(NULL, ends, (*operator), code_node, &((*expression)), &((*end)), &((*operator))) )
   }
   else {
-    CHECK(57, Expression_parse_new_operand(self, text, ends, code_node, &((*expression)), &((*end))) )
+    CHECK(58, Expression_parse_new_operand(self, text, ends, code_node, &((*expression)), &((*end))) )
     if ((*end) == ' ') {
-      CHECK(60, Expression_read_new_value(self, ends, &(text), &((*end))) )
-      CHECK(61, NameMap_find(glob->operator_map, text, (void**)&((*operator))) )
+      CHECK(61, Expression_read_new_value(self, ends, &(text), &((*end))) )
+      CHECK(62, NameMap_find(glob->operator_map, text, (void**)&((*operator))) )
       if (!(NULL != (*operator))) {
-        CHECK(63, SyntaxTreeNode_m_syntax_error(&(code_node->_base), &(String){17, 16, "unknown operator"}, text) )
+        CHECK(64, SyntaxTreeNode_m_syntax_error(&(code_node->_base), &(String){17, 16, "unknown operator"}, text) )
       }
     }
   }
@@ -88,7 +89,7 @@ Returncode Expression_parse_new(Expression* self, String* ends, SyntaxTreeCode* 
   while (true) {
     if (!(NULL != (*operator) && (!(NULL != curr_operator) || (*operator)->order < curr_operator->order))) break;
     BinaryExpression* new_binary_expression = NULL;
-    CHECK(69, BinaryExpression_parse_new(NULL, ends, (*operator), code_node, (*expression), binary_left_expression, &(new_binary_expression), &((*end)), &((*operator))) )
+    CHECK(70, BinaryExpression_parse_new(NULL, ends, (*operator), code_node, (*expression), binary_left_expression, &(new_binary_expression), &((*end)), &((*operator))) )
     binary_left_expression = new_binary_expression;
     (*expression) = &(new_binary_expression->_base._base);
   }
@@ -106,8 +107,8 @@ static char* _func_name_Expression_read_new_value = "Expression.read-new-value";
 #define MR_FUNC_NAME _func_name_Expression_read_new_value
 Returncode Expression_read_new_value(Expression* self, String* ends, String** text, Char* end) {
   String* all_ends = NULL;
-  CHECK(87, string_new_concat(&(String){7, 6, " .[({?"}, ends, &(all_ends)) )
-  CHECK(88, read_new(all_ends, &((*text)), &((*end))) )
+  CHECK(88, string_new_concat(&(String){7, 6, " .[({?"}, ends, &(all_ends)) )
+  CHECK(89, read_new(all_ends, &((*text)), &((*end))) )
   free(all_ends);
   return OK;
 }
@@ -121,69 +122,69 @@ static char* _func_name_Expression_parse_new_operand = "Expression.parse-new-ope
 Returncode Expression_parse_new_operand(Expression* self, String* text, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
   if (text->length == 0) {
     if ((*end) == '(') {
-      CHECK(97, BlockExpression_parse_new(NULL, code_node, &((*expression)), &((*end))) )
+      CHECK(98, BlockExpression_parse_new(NULL, code_node, &((*expression)), &((*end))) )
     }
     else {
-      CHECK(100, SyntaxTreeNode_m_syntax_error_c(&(code_node->_base), &(String){11, 10, "unexpected"}, (*end)) )
+      CHECK(101, SyntaxTreeNode_m_syntax_error_c(&(code_node->_base), &(String){11, 10, "unexpected"}, (*end)) )
     }
     free(text);
   }
   else {
-    CHECK(103, Expression_parse_new_init_operand(self, text, code_node, &((*expression)), &((*end))) )
+    CHECK(104, Expression_parse_new_init_operand(self, text, ends, code_node, &((*expression)), &((*end))) )
   }
   
   while (true) {
     if ((*end) == '?') {
-      CHECK(108, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
+      CHECK(109, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool39;
-    CHECK(109, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool39)) )
-    if (!(_Bool39)) break;
+    Bool _Bool41;
+    CHECK(110, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool41)) )
+    if (!(_Bool41)) break;
   }
   return OK;
 }
 #undef MR_FUNC_NAME
 #endif/* Parse the initialize part of an operand expression */
 #if MR_STAGE == MR_DECLARATIONS
-Returncode Expression_parse_new_init_operand(Expression* self, String* text, SyntaxTreeCode* code_node, Expression** expression, Char* end);
+Returncode Expression_parse_new_init_operand(Expression* self, String* text, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end);
 #elif MR_STAGE == MR_FUNCTIONS
 static char* _func_name_Expression_parse_new_init_operand = "Expression.parse-new-init-operand";
 #define MR_FUNC_NAME _func_name_Expression_parse_new_init_operand
-Returncode Expression_parse_new_init_operand(Expression* self, String* text, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  if ((0) < 0 || (0) >= (text)->length) RAISE(116)
+Returncode Expression_parse_new_init_operand(Expression* self, String* text, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
+  if ((0) < 0 || (0) >= (text)->length) RAISE(117)
   Char first = ((text)->values[0]);
   Char second = '\0';
   if (text->length > 1) {
-    if ((1) < 0 || (1) >= (text)->length) RAISE(119)
+    if ((1) < 0 || (1) >= (text)->length) RAISE(120)
     second = ((text)->values[1]);
   }
   if (first == '\'') {
-    CHECK(121, CharExpression_parse_new(NULL, text, &((*expression))) )
+    CHECK(122, CharExpression_parse_new(NULL, text, &((*expression))) )
   }
   else {
     if (first == '"') {
-      CHECK(123, StringExpression_parse_new(NULL, text, code_node, &((*expression))) )
+      CHECK(124, StringExpression_parse_new(NULL, text, code_node, &((*expression))) )
     }
     else {
       if ((first >= '0' && first <= '9') || (first == '-' && second >= '0' && second <= '9')) {
-        CHECK(127, IntExpression_parse_new(NULL, text, &((*expression))) )
+        CHECK(128, IntExpression_parse_new(NULL, text, &((*expression))) )
       }
       else {
         if (first >= 'A' && first <= 'Z' && second >= 'a' && second <= 'z') {
-          CHECK(129, TypeExpression_parse_new(NULL, text, code_node, &((*expression)), &((*end))) )
+          CHECK(130, TypeExpression_parse_new(NULL, text, ends, code_node, &((*expression)), &((*end))) )
         }
         else {
           if (text->length == 1 && first == '_') {
-            CHECK(132, EmptyExpression_parse_new(NULL, text, &((*expression))) )
+            CHECK(133, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool40;
-            CHECK(133, String_equal(text, &(String){5, 4, "base"}, &(_Bool40)) )
-            if (_Bool40) {
-              CHECK(134, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
+            Bool _Bool42;
+            CHECK(134, String_equal(text, &(String){5, 4, "base"}, &(_Bool42)) )
+            if (_Bool42) {
+              CHECK(135, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
             }
             else {
-              CHECK(137, SymbolExpression_parse_new(NULL, text, code_node, &((*expression))) )
+              CHECK(138, SymbolExpression_parse_new(NULL, text, code_node, &((*expression))) )
             }
           }
         }
@@ -202,15 +203,15 @@ static char* _func_name_Expression_parse_new_follow_operand = "Expression.parse-
 Returncode Expression_parse_new_follow_operand(Expression* self, String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end, Bool* has_more) {
   (*has_more) = true;
   if ((*end) == '.') {
-    CHECK(146, MemberExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
+    CHECK(147, MemberExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
   }
   else {
     if ((*end) == '[') {
-      CHECK(149, SliceExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
+      CHECK(150, SliceExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
     }
     else {
       if ((*end) == '(') {
-        CHECK(152, CallExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
+        CHECK(153, CallExpression_parse_new(NULL, ends, code_node, &((*expression)), &((*end))) )
       }
       else {
         (*has_more) = false;
@@ -227,7 +228,7 @@ Returncode Expression_set_simple_type(Expression* self, TypeData* type_data);
 static char* _func_name_Expression_set_simple_type = "Expression.set-simple-type";
 #define MR_FUNC_NAME _func_name_Expression_set_simple_type
 Returncode Expression_set_simple_type(Expression* self, TypeData* type_data) {
-  CHECK(159, TypeData_m_new_type_instance(type_data, &(self->result_type)) )
+  CHECK(160, TypeData_m_new_type_instance(type_data, &(self->result_type)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -239,17 +240,17 @@ static char* _func_name_Expression_add_aux_variable = "Expression.add-aux-variab
 #define MR_FUNC_NAME _func_name_Expression_add_aux_variable
 Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_create, TypeInstance* type_instance, SymbolExpression** symbol) {
   (*symbol) = malloc(sizeof(SymbolExpression));
-  if ((*symbol) == NULL) RAISE(164)
-  *(*symbol) = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, NULL, NULL, NULL, false};
+  if ((*symbol) == NULL) RAISE(165)
+  *(*symbol) = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, false};
   (*symbol)->_base._base._dtl = SymbolExpression__dtl;
   (*symbol)->_base.code_node = self->code_node;
-  CHECK(166, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
+  CHECK(167, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
   (*symbol)->_base.access = access;
   (*symbol)->_base.assignable = true;
-  SyntaxTreeFunction* _SyntaxTreeFunction41;
-  CHECK(169, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction41)) )
-  CHECK(169, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction41, access, is_create, type_instance, &((*symbol)->variable)) )
-  CHECK(171, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
+  SyntaxTreeFunction* _SyntaxTreeFunction43;
+  CHECK(170, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction43)) )
+  CHECK(170, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction43, access, is_create, type_instance, &((*symbol)->variable)) )
+  CHECK(172, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -261,10 +262,10 @@ static char* _func_name_Expression_get_parent_type = "Expression.get-parent-type
 #define MR_FUNC_NAME _func_name_Expression_get_parent_type
 Returncode Expression_get_parent_type(Expression* self, TypeData** parent_type) {
   if (NULL != self->code_node) {
-    CHECK(175, (self->code_node)->_base._dtl[0](self->code_node, &((*parent_type))) )
+    CHECK(176, (self->code_node)->_base._dtl[0](self->code_node, &((*parent_type))) )
   }
   else {
-    CHECK(177, SyntaxTreeNode_get_parent_type(&(self->_base), &((*parent_type))) )
+    CHECK(178, SyntaxTreeNode_get_parent_type(&(self->_base), &((*parent_type))) )
   }
   return OK;
 }
@@ -278,16 +279,16 @@ static char* _func_name_Expression_write_refman_init = "Expression.write-refman-
 Returncode Expression_write_refman_init(Expression* self, SymbolExpression* symbol) {
   /* `symbol`_Refman = MR_new_ref(`symbol`); */
   /* if (`symbol`_Refman == NULL) raise(`line-num`) */
-  CHECK(182, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(183, (symbol)->_base._base._dtl[3](symbol) )
-  CHECK(184, write(&(String){22, 21, "_Refman = MR_new_ref("}) )
-  CHECK(185, (symbol)->_base._base._dtl[3](symbol) )
-  CHECK(186, write(&(String){4, 3, ");\n"}) )
-  CHECK(187, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(188, write(&(String){5, 4, "if ("}) )
-  CHECK(189, (symbol)->_base._base._dtl[3](symbol) )
-  CHECK(190, write(&(String){18, 17, "_Refman == NULL) "}) )
-  CHECK(191, SyntaxTreeNode_write_raise(&(self->_base), &(String){39, 38, "insufficient memory for managed object"}) )
+  CHECK(183, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(184, (symbol)->_base._base._dtl[4](symbol) )
+  CHECK(185, write(&(String){22, 21, "_Refman = MR_new_ref("}) )
+  CHECK(186, (symbol)->_base._base._dtl[4](symbol) )
+  CHECK(187, write(&(String){4, 3, ");\n"}) )
+  CHECK(188, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(189, write(&(String){5, 4, "if ("}) )
+  CHECK(190, (symbol)->_base._base._dtl[4](symbol) )
+  CHECK(191, write(&(String){18, 17, "_Refman == NULL) "}) )
+  CHECK(192, SyntaxTreeNode_write_raise(&(self->_base), &(String){39, 38, "insufficient memory for managed object"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -299,10 +300,10 @@ static char* _func_name_Expression_write_init_var_ref = "Expression.write-init-v
 #define MR_FUNC_NAME _func_name_Expression_write_init_var_ref
 Returncode Expression_write_init_var_ref(Expression* self, SymbolExpression* symbol) {
   /* `symbol` = &`symbol`_Var; */
-  CHECK(195, (symbol)->_base._base._dtl[3](symbol) )
-  CHECK(196, write(&(String){5, 4, " = &"}) )
-  CHECK(197, (symbol)->_base._base._dtl[3](symbol) )
-  CHECK(198, write(&(String){7, 6, "_Var;\n"}) )
+  CHECK(196, (symbol)->_base._base._dtl[4](symbol) )
+  CHECK(197, write(&(String){5, 4, " = &"}) )
+  CHECK(198, (symbol)->_base._base._dtl[4](symbol) )
+  CHECK(199, write(&(String){7, 6, "_Var;\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -313,16 +314,16 @@ Returncode Expression_write_assign_null(Expression* self);
 static char* _func_name_Expression_write_assign_null = "Expression.write-assign-null";
 #define MR_FUNC_NAME _func_name_Expression_write_assign_null
 Returncode Expression_write_assign_null(Expression* self) {
-  CHECK(201, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(202, (self)->_base._dtl[3](self) )
-  CHECK(203, write(&(String){10, 9, " = NULL;\n"}) )
-  CHECK(204, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(205, (self)->_base._dtl[5](self) )
-  CHECK(206, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(202, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(203, (self)->_base._dtl[4](self) )
+  CHECK(204, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(205, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(206, (self)->_base._dtl[6](self) )
+  CHECK(207, write(&(String){10, 9, " = NULL;\n"}) )
   if (self->result_type->type_data->is_dynamic) {
-    CHECK(208, SyntaxTreeCode_write_spaces(self->code_node) )
-    CHECK(209, (self)->_base._dtl[4](self) )
-    CHECK(210, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(209, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(210, (self)->_base._dtl[5](self) )
+    CHECK(211, write(&(String){10, 9, " = NULL;\n"}) )
   }
   return OK;
 }
@@ -334,8 +335,8 @@ Returncode Expression_write_dynamic(Expression* self);
 static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
 #define MR_FUNC_NAME _func_name_Expression_write_dynamic
 Returncode Expression_write_dynamic(Expression* self) {
-  CHECK(213, (self)->_base._dtl[3](self) )
-  CHECK(214, write(&(String){9, 8, "_Dynamic"}) )
+  CHECK(214, (self)->_base._dtl[4](self) )
+  CHECK(215, write(&(String){9, 8, "_Dynamic"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -346,8 +347,8 @@ Returncode Expression_write_refman(Expression* self);
 static char* _func_name_Expression_write_refman = "Expression.write-refman";
 #define MR_FUNC_NAME _func_name_Expression_write_refman
 Returncode Expression_write_refman(Expression* self) {
-  CHECK(217, (self)->_base._dtl[3](self) )
-  CHECK(218, write(&(String){8, 7, "_Refman"}) )
+  CHECK(218, (self)->_base._dtl[4](self) )
+  CHECK(219, write(&(String){8, 7, "_Refman"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -360,7 +361,7 @@ static char* _func_name_Expression_write_as_top = "Expression.write-as-top";
 Returncode Expression_write_as_top(Expression* self) {
   Bool top = self->top;
   self->top = true;
-  CHECK(223, (self)->_base._dtl[3](self) )
+  CHECK(224, (self)->_base._dtl[4](self) )
   self->top = top;
   return OK;
 }
@@ -405,7 +406,7 @@ Returncode Expression_write_preactions(Expression* self) {
 extern Func Expression__dtl[];
 #endif
 #if MR_STAGE == MR_FUNCTIONS
-Func Expression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)Expression_write_preactions};
+Func Expression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeNode_write, (void*)Expression_write_dynamic, (void*)Expression_write_refman, (void*)Expression_analyze_call, (void*)Expression_analyze_mock, (void*)Expression_write_preactions};
 #endif
 
 #undef MR_FILE_NAME
@@ -432,6 +433,7 @@ Func Expression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNo
 #include "syntax-tree/code-flow.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
+#include "statement/enum.c"
 #include "statement/error.c"
 #include "statement/for.c"
 #include "statement/function.c"
