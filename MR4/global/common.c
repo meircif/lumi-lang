@@ -127,9 +127,10 @@ Returncode f_is_legal_name(String* name, Int name_type, Bool* is_legal) {
     }
   }
   {int n; for (n = (first); n < (name->length); ++n) {
-    if ((n) < 0 || (n) >= (name)->length) RAISE(54)
+    Char prev = ch;
+    if ((n) < 0 || (n) >= (name)->length) RAISE(55)
     ch = ((name)->values[n]);
-    if (!((ch >= '0' && ch <= '9') || (name_type != NAME_CONSTANT && ch >= 'a' && ch <= 'z') || (name_type != NAME_DEFAULT && ch >= 'A' && ch <= 'Z') || (name_type != NAME_TYPE && ch == '-'))) {
+    if (!((ch >= '0' && ch <= '9') || (name_type != NAME_CONSTANT && ch >= 'a' && ch <= 'z') || (name_type != NAME_DEFAULT && ch >= 'A' && ch <= 'Z') || (name_type != NAME_TYPE && ch == '-' && prev != '-'))) {
       return OK;
     }
   }}

@@ -24,8 +24,8 @@ class SymbolExpression(Expression)
     if ? self.variable
       self.variable.type-instance.copy-new():(owner self.result-type)
       self.access := self.variable.access
-      self.assignable := true
       self.constant := self.variable.constant
+      self.assignable := not self.constant
     else
       glob.root.find-function(user self.name):(user self.function)
       if not (? self.function)

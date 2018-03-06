@@ -903,6 +903,8 @@ type members cannot be initialized
 expected space after "new", got "new-line"
 /// @ te9
 array length is not constant
+/// @ te10
+illegal variable name "error--name"
 /// @@ test-initialize
 /// @ t0
 Test* aux_Test_0 = NULL;
@@ -3518,4 +3520,8 @@ value is not constant
 recursive dependency in constant "ERROR"
 /// @ te8
 recursive dependency in constant "A-ERROR"
+/// @ te9
+assigning into non assignable expression
+/// @ te10
+non assignable call output
 /// @

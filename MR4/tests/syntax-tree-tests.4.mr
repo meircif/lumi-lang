@@ -406,6 +406,8 @@ struct Test
 new
 ## @ ec te9
 var Array{i:Int} error
+## @ ec te10
+var Int error--name
 ## @@ test-initialize
 ## @ c t0
 t := Test(copy i)
@@ -1433,4 +1435,12 @@ const Int ERROR ERROR + 1
 ## @ eg te8
 const Int A-ERROR B-ERROR
 const Int B-ERROR - (2 * A-ERROR) + 1
+## @ eg te9
+const Int NUMBER 12
+func dummy()
+  NUMBER := 3
+## @ eg te10
+const Int NUMBER 12
+func dummy()->(var Int x)
+  dummy()->(var NUMBER)
 ## @

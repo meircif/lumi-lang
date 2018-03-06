@@ -62,8 +62,8 @@ Returncode SymbolExpression_analyze(SymbolExpression* self) {
   if (NULL != self->variable) {
     CHECK(25, TypeInstance_copy_new(self->variable->type_instance, &(self->_base.result_type)) )
     self->_base.access = self->variable->access;
-    self->_base.assignable = true;
     self->_base.constant = self->variable->constant;
+    self->_base.assignable =  ! self->_base.constant;
   }
   else {
     CHECK(30, SyntaxTreeNamespace_find_function(&(glob->root->_base), self->name, &(self->function)) )
