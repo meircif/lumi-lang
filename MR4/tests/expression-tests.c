@@ -30,7 +30,7 @@ static char* _func_name_test_code_setup = "test-code-setup";
 #define MR_FUNC_NAME _func_name_test_code_setup
 Returncode test_code_setup(String* input_text) {
   CHECK(8, f_setup_test() )
-  CHECK(9, set_mock_file_text(&(String){1, 0, ""}) )
+  CHECK(9, set_mock_file_text(&(String){1, 0, ""}, NULL) )
   File* code_header = NULL;
   String* filename = &(String){256, 0, (char[256]){0}};
   CHECK(12, set_test_file_name(filename, &(String){12, 11, "code-header"}, &(String){6, 5, ".4.mr"}) )

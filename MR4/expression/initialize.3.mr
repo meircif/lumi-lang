@@ -1,17 +1,20 @@
 ## MR4 compiler - Initialization expression
 
-class InitExpression(Expression)
+class InitExpression(ModuleTypeExpression)
   owner FunctionArguments arguments
   owner SymbolExpression symbol
   user SyntaxTreeFunction constructor
   owner Expression value
   
   func inst parse(
-      owner TypeInstance result-type, user SyntaxTreeCode code-node):(
+      owner TypeInstance result-type,
+      owner Expression module-expression,
+      user SyntaxTreeCode code-node):(
       copy Char end)
     self.code-node := code-node
     self.result-type := result-type
     self.set-location()
+    self.module-expression := module-expression
     new FunctionArguments in self.arguments
     if end = '('
       var CallArgumentFactory argument-factory
@@ -21,7 +24,7 @@ class InitExpression(Expression)
       self.arguments.init()
   
   func dynamic analyze()
-    self.result-type.analyze(user self)
+    self.analyze-type-instance(user self.result-type)
     
     self.arguments.analyze()
     if ? self.symbol
@@ -152,7 +155,7 @@ class InitExpression(Expression)
         write(user "MR_new_array(")
         self.result-type.length.write()
         write(user ", sizeof(")
-        write-cname(user self.result-type.parameters.first.item.type-data.name)
+        self.result-type.parameters.first.item.type-data.write-cname()
         write(user ")")
         
     else-if self.result-type.type-data = glob.type-string
@@ -163,7 +166,7 @@ class InitExpression(Expression)
     else
       # MR_alloc(sizeof(`type`));
       write(user "MR_alloc(sizeof(")
-      write-cname(user self.result-type.type-data.name)
+      self.result-type.type-data.write-cname()
       write(user ")")
     
     write(user ");\n")

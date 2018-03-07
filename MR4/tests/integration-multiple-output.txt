@@ -1,12 +1,12 @@
 Running tests:
-testing test_func... OK
-testing test_another... OK
-testing test_native... OK
-testing test_dynamic_type_parameters... OK
-testing test_simple_delete... OK
-testing test_complex_delete... OK
-testing test_assert_error_message... OK
-testing test_cover_all... OK
-testing test_constants... OK
+testing test-func... OK
+testing test-another... OK
+testing test-native... OK
+testing test-dynamic-type-parameters... OK
+testing test-simple-delete... OK
+testing test-complex-delete... OK
+testing test-assert-error-message... OK
+testing test-cover-all... OK
+testing test-constants... OK
 testing code coverage... 100%
 Tests passed

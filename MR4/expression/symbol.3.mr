@@ -3,6 +3,7 @@
 ## A single symbol expression (variable or global-function)
 class SymbolExpression(Expression)
   owner String name
+  user String module-name
   user SyntaxTreeVariable variable
   user SyntaxTreeFunction function
   var Bool is-annotate
@@ -20,19 +21,29 @@ class SymbolExpression(Expression)
     self.set-location()
   
   func dynamic analyze()
-    self.code-node.find-variable(user self.name):(user self.variable)
-    if ? self.variable
+    if ? glob.module-map.find(user self.name)
+      new TypeInstance in self.result-type
+      string-new-copy(user self.name):(owner self.result-type.name)
+      self.result-type.type-data := glob.type-module
+    else-if ? self.code-node.find-variable(
+        user self.name, user self.module-name):(user self.variable)
       self.variable.type-instance.copy-new():(owner self.result-type)
       self.access := self.variable.access
       self.constant := self.variable.constant
       self.assignable := not self.constant
-    else
-      glob.root.find-function(user self.name):(user self.function)
-      if not (? self.function)
-        self.m-syntax-error(user "unknown symbol", user self.name)
+    else-if ? self.code-node.find-function(
+        user self.name, user self.module-name):(user self.function)
       self.set-simple-type(user glob.type-func)
       self.access := ACCESS-VAR
       self.function.arguments.copy-new():(owner self.result-type.arguments)
+    else-if ? self.module-name
+      self.m-syntax-error2(
+          user "unknown symbol",
+          user self.name,
+          user "in module",
+          user self.module-name)
+    else
+      self.m-syntax-error(user "unknown symbol", user self.name)
   
   func dynamic analyze-call(user FunctionArguments arguments):(
       user TypeInstance instance-type,
@@ -62,7 +73,10 @@ class SymbolExpression(Expression)
       if not self.top
         write(user "(")
       write(user "*")
-    write-cname(user self.name)
+    if ? self.variable
+      self.variable.write-cname()
+    else
+      write-cname(user self.name)
     if ? self.variable and self.variable.is-output and not self.top
       write(user ")")
   
@@ -89,23 +103,21 @@ class MemberExpression(SymbolExpression)
   var Int bases
   var Bool is-mock-field
   
-  func inst parse-new(user String ends, user SyntaxTreeCode code-node):(
-      owner Expression expression, copy Char end)
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node):(
+      owner Expression expression)
     new MemberExpression member-expression
-    member-expression.parse(owner expression, user ends, user code-node):(
-        copy end)
+    member-expression.parse(owner expression, owner text, user code-node)
     expression := member-expression
   
   ## parsing `instance.symbol`
   func inst parse(
       owner Expression instance,
-      user String ends,
-      user SyntaxTreeCode code-node):(
-      copy Char end)
+      owner String text,
+      user SyntaxTreeCode code-node)
     self.code-node := code-node
     self.instance := instance
     self.set-location()
-    self.read-new-value(user ends):(owner self.name, copy end)
+    self.name := text
   
   func dynamic analyze()
     self.instance.analyze()
@@ -117,6 +129,11 @@ class MemberExpression(SymbolExpression)
       instance-type := instance-type.parameters.first.item
     else-if instance-type.type-data = glob.type-base
       instance-type := instance-type.parameters.first.item.type-data.base-type
+    
+    if instance-type.type-data = glob.type-module
+      self.module-name := instance-type.name
+      base.analyze()
+      return
     
     instance-type.type-data.find-field(user self.name):(
         user self.variable, copy self.bases)
@@ -177,7 +194,8 @@ class MemberExpression(SymbolExpression)
           user instance-type, copy bases, copy is-function-object)
       return
     if base.analyze-call(user arguments):(
-        user instance-type, copy bases, copy is-function-object)
+        user instance-type, copy bases, copy is-function-object) or
+        ? self.module-name
       return
     bases := self.bases
     if self.instance.result-type.type-data = glob.type-type
@@ -202,6 +220,8 @@ class MemberExpression(SymbolExpression)
             user self.name)
   
   func dynamic write-preactions()
+    if ? self.module-name
+      return
     if ? self.instance
       self.instance.write-preactions()
     if not (? self.dynamic-call-self-instance or
@@ -249,10 +269,11 @@ class MemberExpression(SymbolExpression)
     
     if self.is-generic-cast and not self.top
       write(user "((")
-      write-cname(user self.result-type.type-data.name)
+      self.result-type.type-data.write-cname()
       write(user "*)(")
     if ? self.instance and not (? self.function) and
-        self.instance.result-type.type-data != glob.type-type
+        self.instance.result-type.type-data != glob.type-type and
+        not (? self.module-name)
       if self.is-complex-field and self.top
         write(user "&(")
       self.instance.write()
@@ -277,13 +298,13 @@ class MemberExpression(SymbolExpression)
   func dynamic write-dynamic()
     if self.is-complex-field
       write(user "&")
-      write-cname(user self.result-type.type-data.name)
+      self.result-type.type-data.write-cname()
       write(user "_dynamic")
       return
     var Bool top(self.top)
     if self.is-generic-cast and not self.top
       write(user "((")
-      write-cname(user self.result-type.type-data.name)
+      self.result-type.type-data.write-cname()
       write(user "_Dynamic*)(")
       self.top := true
     base.write-dynamic()

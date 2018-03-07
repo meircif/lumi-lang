@@ -38,6 +38,8 @@ main
   x := 7
 ## @ tg t7
 var String{12} s
+## @-
+module second
 test dummy()
 ## @ eg te0
 error 
@@ -714,7 +716,7 @@ mock Test.meth(copy Int x)->(var Int y)
   Test.meth(var self, copy x)->(var y)
   Test.meth.active := true
 ## @ tg tt0
-test fun0()
+func fun0()
   var Int x(copy 4)
   x += 1
   var Int y(copy 5)
@@ -742,11 +744,15 @@ test fun0()
       continue
   for n in 3
     x += y
+## @-
+module second
 test fun1()
 ## @ tg tt1
+main
+## @-
+module second
 test fun0()
 test fun1()
-main
 ## @ g tmg0
 mock Test.delete()
   var Ref r(copy self)
@@ -874,6 +880,8 @@ func call()
   external(copy 5, user s, user ta)->(var i)
 ## @ g tv0
 native var Int x
+func use()
+  x := 2
 ## @ g tt0
 native type Native
 native func external(copy Native n)->(var Native no)
@@ -889,6 +897,9 @@ native func error(owner String s)
 native func error()->(user String s)
 ## @ eg tef3
 native func error()->(owner String s)
+## @ eg tef4
+native func error()
+native func error()
 ## @ eg tev3
 native var String s
 ## @@ test-parameter-type
@@ -1406,6 +1417,19 @@ enum MyEnum
 ## @ eg te9
 enum MyEnum
     VALUE
+## @ eg te10
+enum Error
+  VALUE
+enum Error
+## @ eg te11
+struct Error
+  var Int x
+enum Error
+## @ eg te12
+enum Error
+  VALUE
+struct Error
+  var Int x
 ## @@ test-constant
 ## @ g t0
 const Int NUMBER 12
@@ -1443,4 +1467,92 @@ func dummy()
 const Int NUMBER 12
 func dummy()->(var Int x)
   dummy()->(var NUMBER)
+## @@ test-module
+## @ tg t0
+enum Enum
+  VALUE
+const Int SIZE 12
+struct Test
+  var Int x
+  func meth()
+var Test t
+func fun()
+  t.x := Enum.VALUE + SIZE
+  fun()
+  Test.meth(var t)
+  second.t.x := second.Enum.VALUE + second.SIZE
+  second.fun()
+  second.Test.meth(var second.t)
+  new second.Test nt
+## @-
+module second
+enum Enum
+  VALUE
+const Int SIZE 12
+struct Test(ut.Test)
+  func meth()
+var Test t
+func fun()
+  t.x := Enum.VALUE + SIZE
+  fun()
+  Test.meth(var t)
+  ut.t.x := ut.Enum.VALUE + ut.SIZE
+  ut.fun()
+  ut.Test.meth(var ut.t)
+  new ut.Test nt
+test dummy()
+## @ tg t1
+func fun()
+struct Test
+  var Int x
+  func meth()
+    fun()
+    self.meth()
+## @-
+module second
+mock ut.fun()
+mock ut.Test.meth()
+test dummy()
+## @ tg t2
+native type Native
+native var Int x
+native func external()
+## @-
+module second
+test use()
+  var Native n
+  x := 2
+  external()
+## @ ec te0
+ut.error
+## @ eg te1
+var Int ut
+## @ eg te2
+func ut()
+## @ eg te3
+var error.Test x
+## @ eg te4
+var ut.Error x
+## @ etg te5
+; nothing
+## @-
+module(error)
+## @ etg te6
+## @-
+module Error
+## @ etg te7
+## @-
+module true
+## @ etg te8
+## @-
+module file-open-read
+## @ etg te9
+## @-
+func fun()
+## @ ec te10
+fun0().Error
+## @ ec te11
+i.Error
+## @ ec te12
+ut.Error.VALUE
 ## @

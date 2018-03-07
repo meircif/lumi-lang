@@ -23,8 +23,19 @@ class SyntaxTreeNode
   func dynamic get-parent-type():(user TypeData parent-type)
     parent-type := _
   
-  func inst find-type(user String name):(user TypeData type-data)
-    if ? glob.type-map.find(user name):(user type-data)
+  func inst find-module(user String name):(user ModuleMembers module-members)
+    if not (? glob.module-map.find(user name):(user module-members))
+      self.m-syntax-error(user "unknown module", user name)
+  
+  func inst find-type(user String name, user String module-name):(
+      user TypeData type-data)
+    if ? module-name
+      if ? self.find-module(user module-name).type-map.find(user name):(
+          user type-data)
+        return
+      self.m-syntax-error2(
+          user "unknown type", user name, user "in module", user module-name)
+    if ? glob.find-type(user name):(user type-data)
       return
     user TypeData parent-type
     if ? self.get-parent-type():(user parent-type) and ? parent-type.parameters
@@ -37,6 +48,22 @@ class SyntaxTreeNode
         node := node.next
     self.print-syntax-error(user "unknown type", user name)
     raise
+  
+  func inst find-variable(user String name, user String module-name):(
+      user SyntaxTreeVariable variable)
+    if ? module-name
+      self.find-module(user module-name).variable-map.find(user name):(
+          user variable)
+    else
+      glob.find-variable(user name):(user variable)
+  
+  func inst find-function(user String name, user String module-name):(
+      user SyntaxTreeFunction function)
+    if ? module-name
+      self.find-module(user module-name).function-map.find(user name):(
+          user function)
+    else
+      glob.find-function(user name):(user function)
   
   ## Expect `expected-text` to be read exactly from the input file
   func inst read-expect(user String expected-text)

@@ -6,7 +6,7 @@ var Bool code-header-valid
 
 func test-code-setup(user String input-text)
   f-setup-test()
-  set-mock-file-text(user "")
+  set-mock-file-text(user "", user _)
   owner File code-header
   var String{256} filename
   set-test-file-name(user filename, user "code-header", user ".4.mr")

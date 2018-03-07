@@ -23,15 +23,29 @@ func parse-native(user SyntaxTreeRoot root):(copy Char end)
 
 ## Native function declaration in the syntax tree
 class NativeFunction(SyntaxTreeFunction)
+  user ModuleMembers outer-module
+  
   func inst parse-new():(copy Char end, owner NativeFunction new-node)
     new NativeFunction in new-node
     new-node.parse():(copy end)
   
   func inst parse():(copy Char end)
     self.set-location()
+    self.outer-module := glob.current-module
     self.parse-header(copy true):(copy end)
     new List{SyntaxTreeCode} in self.code-nodes
     new List{SyntaxTreeVariable} in self.variables
+    glob.global-module.function-map.add(user self.name, user self)
+  
+  func dynamic link-types()
+    glob.current-module := self.outer-module
+    base.link-types()
+    glob.current-module := _
+  
+  func dynamic analyze()
+    glob.current-module := self.outer-module
+    base.analyze()
+    glob.current-module := _
   
   func dynamic write()
     # do nothing
@@ -41,8 +55,11 @@ class NativeFunction(SyntaxTreeFunction)
 class NativeVariable(SyntaxTreeVariable)
   func inst parse-new():(copy Char end, owner NativeVariable new-node)
     new NativeVariable in new-node
-    new-node.parse(copy ACCESS-VAR, copy false, user _, user _):(copy end)
+    new-node.parse(
+        copy ACCESS-VAR, copy false, user _, user _, user glob.global-module):(
+        copy end)
     new-node.is-native := true
+    new-node.my-module := _
   
   func dynamic analyze()
     if not self.type-instance.type-data.is-primitive
@@ -65,7 +82,7 @@ class NativeType(TypeData)
   func inst parse():(copy Char end)
     self.is-primitive := true
     read-new(user ""):(owner self.name, copy end)
-    self.add-type()
+    self.add-type(user glob.global-module)
     self.init()
   
   func dynamic analyze()

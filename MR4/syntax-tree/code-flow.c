@@ -104,7 +104,7 @@ Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self);
 static char* _func_name_SyntaxTreeFlowElement_write_block_body = "SyntaxTreeFlowElement.write-block-body";
 #define MR_FUNC_NAME _func_name_SyntaxTreeFlowElement_write_block_body
 Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self) {
-  CHECK(35, (self->block)->_base._base._dtl[8](self->block) )
+  CHECK(35, (self->block)->_base._base._dtl[9](self->block) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -200,7 +200,7 @@ Returncode SyntaxTreeIf_analyze(SyntaxTreeIf* self);
 static char* _func_name_SyntaxTreeIf_analyze = "SyntaxTreeIf.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeIf_analyze
 Returncode SyntaxTreeIf_analyze(SyntaxTreeIf* self) {
-  CHECK(70, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->condition, &(glob->type_bool->_base)) )
+  CHECK(70, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->condition, glob->type_bool) )
   CHECK(71, SyntaxTreeFlowElement_analyze(&(self->_base)) )
   if (NULL != self->else_node) {
     CHECK(73, (self->else_node)->_base._base._base._dtl[2](self->else_node) )

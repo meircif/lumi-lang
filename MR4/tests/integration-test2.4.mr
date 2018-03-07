@@ -2,12 +2,13 @@
 
 This file should only work together with test file #1.
 ~~~
+module covered
 
 
-class MiddleType(BaseType)
+class MiddleType(integration.BaseType)
   var Int num-mid
-  user BaseType mid-base-ref
-  user TopType mid-top-ref
+  user integration.BaseType mid-base-ref
+  user integration.TopType mid-top-ref
   
   new()
     base()

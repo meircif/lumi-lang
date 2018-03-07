@@ -107,8 +107,6 @@ void MR_trace_print(
 #define IGNORE_ERRORS(call) \
   ++MR_trace_ignore_count; (void)call; --MR_trace_ignore_count;
 
-#define RUN_TEST(test_func) MR_success &= MR_run_test(#test_func, test_func)
-
 int MR_main(int argc, char* argv[]);
 int MR_test_main(int argc, char* argv[]);
 

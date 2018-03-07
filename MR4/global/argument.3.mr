@@ -190,7 +190,8 @@ class FunctionArguments(SyntaxTreeNode)
     do
       while ? node
       while not
-          node.item.get-variable().find-variable(user name):(user variable)
+          (? node.item.get-variable().find-variable(user name, user _):(
+          user variable))
       node := node.next
   
   func inst check-same-as(

@@ -196,7 +196,7 @@ static char* _func_name_SyntaxTreeRaise_analyze = "SyntaxTreeRaise.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRaise_analyze
 Returncode SyntaxTreeRaise_analyze(SyntaxTreeRaise* self) {
   if (NULL != self->error_message) {
-    CHECK(67, SyntaxTreeNode_analyze_expression(&(self->_base._base), self->error_message, &(glob->type_string->_base)) )
+    CHECK(67, SyntaxTreeNode_analyze_expression(&(self->_base._base), self->error_message, glob->type_string) )
   }
   return OK;
 }
@@ -282,7 +282,7 @@ Returncode SyntaxTreeWhile_analyze(SyntaxTreeWhile* self);
 static char* _func_name_SyntaxTreeWhile_analyze = "SyntaxTreeWhile.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeWhile_analyze
 Returncode SyntaxTreeWhile_analyze(SyntaxTreeWhile* self) {
-  CHECK(102, SyntaxTreeNode_analyze_expression(&(self->_base._base), self->condition, &(glob->type_bool->_base)) )
+  CHECK(102, SyntaxTreeNode_analyze_expression(&(self->_base._base), self->condition, glob->type_bool) )
   return OK;
 }
 #undef MR_FUNC_NAME

@@ -70,7 +70,7 @@ Returncode CallExpression_analyze(CallExpression* self) {
   if (!(NULL != self->function->result_type)) {
     CHECK(30, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "void expression is not callable"}) )
   }
-  if (self->function->result_type->type_data != &(glob->type_func->_base)) {
+  if (self->function->result_type->type_data != glob->type_func) {
     CHECK(32, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){18, 17, "non callable type"}, self->function->result_type->type_data->name) )
   }
   FunctionArguments* declaration = self->function->result_type->arguments;
@@ -82,9 +82,9 @@ Returncode CallExpression_analyze(CallExpression* self) {
   TypeInstance* instance_type = NULL;
   Int bases = 0;
   CHECK(42, (self->function)->_base._dtl[7](self->function, self->arguments, &(instance_type), &(bases), &(self->is_function_object)) )
-  Bool _Bool26;
-  CHECK(44, FunctionArguments_check_same_as(self->arguments, declaration, instance_type, bases, &(_Bool26)) )
-  if (_Bool26) {
+  Bool _Bool28;
+  CHECK(44, FunctionArguments_check_same_as(self->arguments, declaration, instance_type, bases, &(_Bool28)) )
+  if (_Bool28) {
     /* add omitted output */
     CallArgument* output = malloc(sizeof(CallArgument));
     if (output == NULL) RAISE(47)
@@ -94,9 +94,9 @@ Returncode CallExpression_analyze(CallExpression* self) {
     output->_base.is_output = true;
     output->_base.is_native = ((Argument*)(declaration->outputs->last->item))->is_native;
     output->_base.access = ((Argument*)(declaration->outputs->last->item))->access;
-    SymbolExpression* _SymbolExpression27;
-    CHECK(52, Expression_add_aux_variable(&(self->_base), ((Argument*)(declaration->outputs->last->item))->access, false, result_type, &(_SymbolExpression27)) )
-    output->value = &(_SymbolExpression27->_base);
+    SymbolExpression* _SymbolExpression29;
+    CHECK(52, Expression_add_aux_variable(&(self->_base), ((Argument*)(declaration->outputs->last->item))->access, false, result_type, &(_SymbolExpression29)) )
+    output->value = &(_SymbolExpression29->_base);
     self->output = output->value;
     CHECK(57, List_add(self->arguments->outputs, &(output->_base)) )
   }
@@ -236,15 +236,15 @@ Returncode CallArgument_check_same_type_as(CallArgument* self, TypeInstance* typ
   TypeInstance* real_type = NULL;
   CHECK(126, TypeInstance_f_new_replace_params(type_instance, instance_type, bases, &(real_type)) )
   if (self->_base.is_output) {
-    Int _Int28;
-    CHECK(129, TypeInstance_check_assign_to(real_type, self->_base.access, self->value->result_type, self->value->access, &(self->_base._base), &(_Int28)) )
-    self->is_down_cast = _Int28 > 0;
+    Int _Int30;
+    CHECK(129, TypeInstance_check_assign_to(real_type, self->_base.access, self->value->result_type, self->value->access, &(self->_base._base), &(_Int30)) )
+    self->is_down_cast = _Int30 > 0;
   }
   else {
     CHECK(135, TypeInstance_check_assign_from(real_type, self->_base.access, &(self->_base._base), &(self->value), &(self->assignee)) )
   }
   self->is_dynamic = real_type->type_data->is_dynamic;
-  self->is_generic = type_instance->type_data == &(glob->type_generic->_base);
+  self->is_generic = type_instance->type_data == glob->type_generic;
   free(real_type);
   return OK;
 }
@@ -329,12 +329,12 @@ Returncode CallArgument_write(CallArgument* self) {
         CHECK(184, write(&(String){14, 13, "&dynamic_Void"}) )
       }
       else {
-        if (self->value->result_type->type_data == &(glob->type_empty->_base)) {
+        if (self->value->result_type->type_data == glob->type_empty) {
           CHECK(186, write(&(String){5, 4, "NULL"}) )
         }
         else {
           CHECK(188, write(&(String){2, 1, "&"}) )
-          CHECK(189, write_cname(self->value->result_type->type_data->name) )
+          CHECK(189, TypeData_write_cname(self->value->result_type->type_data) )
           CHECK(190, write(&(String){9, 8, "_dynamic"}) )
         }
       }
@@ -350,7 +350,7 @@ Returncode CallArgument_write_postactions(CallArgument* self);
 static char* _func_name_CallArgument_write_postactions = "CallArgument.write-postactions";
 #define MR_FUNC_NAME _func_name_CallArgument_write_postactions
 Returncode CallArgument_write_postactions(CallArgument* self) {
-  if (self->_base.access == ACCESS_OWNER &&  ! self->_base.is_output && self->value->result_type->type_data != &(glob->type_empty->_base)) {
+  if (self->_base.access == ACCESS_OWNER &&  ! self->_base.is_output && self->value->result_type->type_data != glob->type_empty) {
     CHECK(195, Expression_write_assign_null(self->assignee) )
   }
   return OK;
@@ -378,11 +378,11 @@ Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argumen
 static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactory.m-new-argument";
 #define MR_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
-  CallArgument* _CallArgument29 = malloc(sizeof(CallArgument));
-  if (_CallArgument29 == NULL) RAISE(200)
-  *_CallArgument29 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
-  _CallArgument29->_base._base._dtl = CallArgument__dtl;
-  (*new_argument) = &(_CallArgument29->_base);
+  CallArgument* _CallArgument31 = malloc(sizeof(CallArgument));
+  if (_CallArgument31 == NULL) RAISE(200)
+  *_CallArgument31 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
+  _CallArgument31->_base._base._dtl = CallArgument__dtl;
+  (*new_argument) = &(_CallArgument31->_base);
   return OK;
 }
 #undef MR_FUNC_NAME

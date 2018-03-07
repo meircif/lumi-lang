@@ -7,14 +7,14 @@
     <class name="tests/integration-test2.4.mr" filename="tests/integration-test2.4.mr">
      <methods/>
      <lines>
-      <line branch="false" hits="2" number="13"/>
       <line branch="false" hits="2" number="14"/>
-      <line branch="false" hits="1" number="17"/>
+      <line branch="false" hits="2" number="15"/>
       <line branch="false" hits="1" number="18"/>
-      <line branch="false" hits="1" number="21"/>
+      <line branch="false" hits="1" number="19"/>
       <line branch="false" hits="1" number="22"/>
-      <line branch="false" hits="1" number="25"/>
-      <line branch="false" hits="1" number="28"/>
+      <line branch="false" hits="1" number="23"/>
+      <line branch="false" hits="1" number="26"/>
+      <line branch="false" hits="1" number="29"/>
      </lines>
     </class>
    </classes>

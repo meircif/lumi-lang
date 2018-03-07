@@ -4,7 +4,7 @@ func write-syntax-tree(copy Bool is-test)
   var Array{5:String{256}} mock-argv
   mock-argv[2].copy(user "mock.4.mr")
   if is-test
-    mock-argv[3].copy(user "empty.4.mr")
+    mock-argv[3].copy(user "second.4.mr")
     mock-argv[4].copy(user "-test")
   else
     mock-argv.length := 3
@@ -15,9 +15,12 @@ func write-syntax-tree(copy Bool is-test)
 
 
 func test-global-scope(
-    user String input-text, user String expected-output, copy Bool is-test)
+    user String input-text,
+    user String second-file-input-text,
+    user String expected-output,
+    copy Bool is-test)
   f-setup-test()
-  set-mock-file-text(user input-text)
+  set-mock-file-text(user input-text, user second-file-input-text)
   write-syntax-tree(copy is-test)
   if mock-output-file-text[0] != '\n'
     print(user mock-output-file-text)
@@ -31,13 +34,21 @@ func test-global-scope(
       copy true)
 
 
-func test-global-scope-error(user String input-text, user String expected-error)
+func test-global-scope-error(
+    user String input-text,
+    user String second-file-input-text,
+    user String expected-error,
+    copy Bool is-test)
   f-setup-test()
-  set-mock-file-text(user input-text)
+  set-mock-file-text(user input-text, user second-file-input-text)
   mock-print-active := true
-  assert-error write-syntax-tree(copy false)
+  assert-error write-syntax-tree(copy is-test)
   mock-print-active := false
-  user String expected-header("Code error in mock.4.mr[")
+  user String expected-header
+  if is-test
+    expected-header := "Code error in second.4.mr["
+  else
+    expected-header := "Code error in mock.4.mr["
   f-assert-string-slice(
       user expected-header,
       user mock-print-text,
@@ -60,7 +71,7 @@ test test-illegal-usage()
   assert-error glob.root.parse(user mock-argv)
   mock-print-active := false
   f-assert-string-slice(
-      user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...",
+      user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...\n",
       user mock-print-text,
       copy 0,
       copy mock-print-text.length,
@@ -83,11 +94,11 @@ func test-no-run-func(copy Bool testing, user String expected-error)
 
 test test-no-main()
   test-no-run-func(
-      copy false, user "General code error: no main function")
+      copy false, user "General code error: no main function\n")
 
 test test-no-test-func()
   test-no-run-func(
-      copy true, user "General code error: no test functions")
+      copy true, user "General code error: no test functions\n")
 
 
 test test-general()
@@ -173,3 +184,6 @@ test test-enum()
 test test-constant()
   test-from-file(user "test-constant")
 
+
+test test-module()
+  test-from-file(user "test-module")

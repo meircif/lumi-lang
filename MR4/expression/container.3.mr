@@ -272,7 +272,7 @@ class BinaryExpression(UnaryExpression)
           not self.right-expression.is-generic-cast and
           self.right-expression.result-type.type-data != glob.type-empty
         write(user "&")
-        write-cname(user self.right-expression.result-type.type-data.name)
+        self.right-expression.result-type.type-data.write-cname()
         write(user "_dynamic")
       else
         if (self.left-expression.result-type.type-data = glob.type-generic or
@@ -300,14 +300,14 @@ class BinaryExpression(UnaryExpression)
         write(user "_base.")
       write(user "_del(")
     else-if type-data != glob.type-array
-      write-cname(user type-data.name)
+      type-data.write-cname()
       write(user "_Del(")
     else
       type-data :=
           self.left-expression.result-type.parameters.first.item.type-data
       if not type-data.is-primitive
         write(user "ARRAY_DEL(")
-        write-cname(user type-data.name)
+        type-data.write-cname()
         write(user ", ")
         self.left-expression.write()
         write(user ")\n")

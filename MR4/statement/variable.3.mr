@@ -3,6 +3,7 @@
 ## Variable node in the syntax tree
 class SyntaxTreeVariable(SyntaxTreeCode)
   owner String name
+  user ModuleMembers my-module
   var Int access
   owner TypeInstance type-instance
   user TypeData parent-type
@@ -20,14 +21,19 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       owner SyntaxTreeVariable new-node)
     new SyntaxTreeVariable in new-node
     new-node.parse(
-        copy access, copy is-create, user parent-type, user parent-block):(
+        copy access,
+        copy is-create,
+        user parent-type,
+        user parent-block,
+        user glob.current-module):(
         copy end)
   
   func inst parse(
       copy Int access,
       copy Bool is-create,
       user TypeData parent-type,
-      user SyntaxTreeBlock parent-block):(
+      user SyntaxTreeBlock parent-block,
+      user ModuleMembers my-module):(
       copy Char end)
     self.set-location()
     self.parent := parent-block
@@ -47,6 +53,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.m-syntax-error-msg(user "type members cannot be initialized")
     if not (? self.parent) and not (? self.parent-type)
       self.parent := glob.root.global-init
+      self.my-module := my-module
+      self.my-module.variable-map.add(user self.name, user self)
     if ? self.parent and (end = '(' or self.is-create)
       VariableInit.parse-new(var _, user self):(copy end)
     if self.parent = glob.root.global-init
@@ -66,14 +74,17 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.m-syntax-error(
             user "field name overrides method", user self.name)
     else
-      if ? glob.root.find-variable(user self.name)
+      if ? glob.module-map.find(user self.name)
+        self.m-syntax-error(
+            user "variable name overrides module", user self.name)
+      if ? glob.find-variable(user self.name)
         self.m-syntax-error(
             user "redefinition of global variable", user self.name)
-      if ? glob.root.find-function(user self.name)
+      if ? glob.find-function(user self.name)
         self.m-syntax-error(
             user "variable name overrides function", user self.name)
       if ? self.parent
-        if ? self.parent.find-variable(user self.name)
+        if ? self.parent.find-variable(user self.name, user _)
           self.m-syntax-error(
               user "redefinition of variable", user self.name)
   
@@ -85,16 +96,23 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else
       parent-type := _
   
-  func inst find-variable(user String name):(
-      user SyntaxTreeVariable variable, copy Bool found)
-    self.name.equal(user name):(copy found)
-    if found
+  func dynamic find-variable(user String name, user String module-name):(
+      user SyntaxTreeVariable variable)
+    if self.name.equal(user name)
       variable := self
+    else
+      variable := _
   
   func dynamic link-types()
+    if ? self.my-module
+      glob.current-module := self.my-module
     self.type-instance.link-types(user self)
+    if ? self.my-module
+      glob.current-module := _
   
   func dynamic analyze()
+    if ? self.my-module
+      glob.current-module := self.my-module
     if self.type-instance.type-data.is-primitive and self.access != ACCESS-VAR
       self.m-syntax-error(
           user "only \"var\" access is supported for primitive types, got",
@@ -117,6 +135,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.is-create and self.type-instance.type-data = glob.type-array and
         self.type-instance.parameters.first.item.type-data = glob.type-generic
       self.m-syntax-error-msg(user "cannot create generic array")
+    if ? self.my-module
+      glob.current-module := _
   
   func inst check-var-recursion(user SyntaxTreeVariable variable)
     if variable.type-instance.type-data = self.parent-type
@@ -130,6 +150,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           not child.item.type-instance.type-data.is-primitive
         self.check-var-recursion(user child.item)
       child := child.next
+  
+  func inst write-cname()
+    if ? self.my-module
+      self.my-module.write-prefix()
+    write-cname(user self.name)
   
   func dynamic write()
     if ? self.parent or ? self.parent-type
@@ -152,12 +177,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.type-instance.type-data = glob.type-func
       self.type-instance.arguments.write-pointer(user self.name)
     else
-      write-cname(user self.type-instance.type-data.name)
+      self.type-instance.type-data.write-cname()
       if not self.type-instance.type-data.is-primitive and
           not (? self.parent-type and self.access = ACCESS-VAR)
         write(user "*")
       write(user " ")
-      write-cname(user self.name)
+      self.write-cname()
     
     if not (? self.parent-type) and not self.is-native
       if self.type-instance.type-data.is-primitive and
@@ -182,7 +207,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.type-instance.parameters.first.item.type-data = glob.type-string
       # char `name`_Chars[`length` * `string-legth`] = {0};
       write(user "char ")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_Chars[")
       self.type-instance.length.write()
       write(user " * ")
@@ -195,9 +220,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else-if self.type-instance.parameters.first.item.type-data = glob.type-func
       write(user "Returncode (*")
     else
-      write-cname(user self.type-instance.parameters.first.item.type-data.name)
+      self.type-instance.parameters.first.item.type-data.write-cname()
       write(user " ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user "_Values[")
     self.type-instance.length.write()
     write(user "]")
@@ -224,9 +249,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func inst write-var()
     # `type` `name`_Var = {...};
-    write-cname(user self.type-instance.type-data.name)
+    self.type-instance.type-data.write-cname()
     write(user " ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user "_Var = {")
     if self.is-create and
         (self.type-instance.type-data = glob.type-array or
@@ -258,7 +283,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func inst write-refman()
     self.write-spaces()
     write(user "Ref_Manager* ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user "_Refman")
     if not (? self.parent-type)
       write(user " = NULL")
@@ -271,15 +296,15 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       # self.write-spaces()
     # else-if ? self.parent-type
       # write(user "  ")
-    write-cname(user self.type-instance.type-data.name)
+    self.type-instance.type-data.write-cname()
     write(user "_Dynamic* ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user "_Dynamic")
     if not (? self.parent-type)
       write(user " = ")
       if self.is-create
         write(user "&")
-        write-cname(user self.type-instance.type-data.name)
+        self.type-instance.type-data.write-cname()
         write(user "_dynamic")
       else
         write(user "NULL")
@@ -306,7 +331,7 @@ class VariableInit(SyntaxTreeCode)
     self.variable := variable
     new InitExpression in self.expression-init
     self.expression-init.parse(
-        owner variable.type-instance.copy-new(), user self):(copy end)
+        owner variable.type-instance.copy-new(), owner _, user self):(copy end)
     self.expression-init.is-statement := true
     new SymbolExpression in self.expression-init.symbol
     string-new-copy(user variable.name):(
@@ -318,7 +343,11 @@ class VariableInit(SyntaxTreeCode)
     variable.parent.code-nodes.add(owner self)
   
   func dynamic analyze()
+    if self.parent = glob.root.global-init
+      glob.current-module := self.variable.my-module
     self.expression-init.analyze()
+    if self.parent = glob.root.global-init
+      glob.current-module := _
   
   func dynamic write()
     if self.variable.type-instance.type-data.is-primitive and
@@ -346,6 +375,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     self.set-location()
     self.access := ACCESS-VAR
     self.constant := true
+    self.my-module := glob.current-module
     user String type-name
     read-until(user " ", copy false):(user type-name, copy end)
     if not type-name.equal(user "Int")
@@ -362,14 +392,17 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
           user "expected space after constant name, got", copy end)
     parse-new-expression(user "", user self):(owner self.value, copy end)
     glob.type-int.m-new-type-instance():(owner self.type-instance)
+    self.my-module.variable-map.add(user self.name, user self)
   
   func dynamic link-types()
     # do nothing
   
   func dynamic analyze()
+    glob.current-module := self.my-module
     self.analyze-expression(user self.value, user glob.type-int)
     if not self.value.constant
       self.m-syntax-error-msg(user "value is not constant")
+    glob.current-module := _
   
   func dynamic m-order-constants(user List{SyntaxTreeConstant} ordered-list)
     if self.is-ordered
@@ -387,7 +420,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
       return
     # enum { `name` = `value` };
     write(user "\nenum { ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user " = ")
     self.value.write()
     write(user " };\n")

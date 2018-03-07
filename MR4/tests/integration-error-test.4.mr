@@ -1,4 +1,5 @@
 ~~~ MR4 compiler integration error test file ~~~
+module error
 
 class BaseType
   var Int x

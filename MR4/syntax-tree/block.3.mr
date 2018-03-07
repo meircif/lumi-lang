@@ -5,11 +5,12 @@
 class SyntaxTreeCode(SyntaxTreeNode)
   user SyntaxTreeBlock parent
   
-  func inst find-variable(user String name):(user SyntaxTreeVariable variable)
-    if ? self.parent
-      self.parent.find-variable(user name):(user variable)
+  func inst find-variable(user String name, user String module-name):(
+      user SyntaxTreeVariable variable)
+    if ? self.parent and not (? module-name)
+      self.parent.find-variable(user name, user _):(user variable)
     else
-      glob.root.find-variable(user name):(user variable)
+      base.find-variable(user name, user module-name):(user variable)
   
   func inst get-function():(user SyntaxTreeFunction function)
     self.parent.get-function():(user function)
@@ -175,11 +176,11 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     else
       has-end := false
   
-  func dynamic find-variable(user String name):(
+  func dynamic find-variable(user String name, user String module-name):(
       user SyntaxTreeVariable variable)
-    base.find-variable(user name):(user variable)
-    if not (? variable) and ? self.parent
-      self.parent.find-variable(user name):(user variable)
+    base.find-variable(user name, user module-name):(user variable)
+    if not (? variable) and ? self.parent and not (? module-name)
+      self.parent.find-variable(user name, user _):(user variable)
   
   func dynamic get-function():(user SyntaxTreeFunction function)
     self.parent.get-function():(user function)

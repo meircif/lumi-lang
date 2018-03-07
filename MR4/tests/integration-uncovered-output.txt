@@ -1,14 +1,14 @@
 Running tests:
-testing test_func... OK
-testing test_another... OK
-testing test_native... OK
-testing test_dynamic_type_parameters... OK
-testing test_simple_delete... OK
-testing test_complex_delete... OK
-testing test_assert_error_message... OK
-testing test_cover_all... OK
-testing test_constants... OK
+testing test-func... OK
+testing test-another... OK
+testing test-native... OK
+testing test-dynamic-type-parameters... OK
+testing test-simple-delete... OK
+testing test-complex-delete... OK
+testing test-assert-error-message... OK
+testing test-cover-all... OK
+testing test-constants... OK
 testing code coverage... 42% - failed, not covered:
-  tests/integration-test0.4.mr(4%): 35-36 49 51-53 56-59 63-68 88-89 91-101 106-107 113-178 191-192 214 225 237 243 249 262-270 275-278 282-289 291-308 313-346 350-358 388-402 404-410 414-417 420-444 452-453 456 462 465 468 471 474-481 483-493 495-503 505-513 515-525 531 536-545 548-552
-  tests/integration-test1.4.mr(90%): 18-21 24-25 28-31 34-40 52 61 65-66 341
+  tests/integration-test0.4.mr(4%): 36-37 50 52-54 57-60 64-69 89-90 92-102 107-108 114-179 192-193 215 226 238 244 250 263-271 276-279 283-290 292-309 314-347 351-359 389-403 405-411 415-418 421-445 453-454 457 463 466 469 472 475-482 484-494 496-504 506-514 516-526 532 537-546 549-553
+  tests/integration-test1.4.mr(90%): 19-22 25-26 29-32 35-41 53 62 66-67 342
 Tests failed

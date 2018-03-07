@@ -160,7 +160,7 @@ class SliceExpression(Expression)
           ? self.result-type.arguments
         self.result-type.arguments.write-pointer(user "*")
       else
-        write-cname(user self.result-type.type-data.name)
+        self.result-type.type-data.write-cname()
         write(user "*")
       write(user ")((")
     self.sequence.write()
@@ -179,7 +179,7 @@ class SliceExpression(Expression)
   
   func dynamic write-dynamic()
     write(user "&")
-    write-cname(user self.result-type.type-data.name)
+    self.result-type.type-data.write-cname()
     write(user "_dynamic")
   
   func dynamic write-refman()

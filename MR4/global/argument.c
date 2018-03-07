@@ -270,7 +270,7 @@ Returncode FunctionArguments_add_self_parameter(FunctionArguments* self, TypeDat
   CHECK(118, SyntaxTreeNode_set_location(&(self_args->_base._base)) )
   self_args->variable = malloc(sizeof(SyntaxTreeVariable));
   if (self_args->variable == NULL) RAISE(119)
-  *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, 0, NULL, NULL, false, false, false, false};
+  *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   self_args->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
   CHECK(120, string_new_copy(&(String){5, 4, "self"}, &(self_args->variable->name)) )
   CHECK(121, TypeData_m_self_type_instance(type_data, &(self_args->variable->type_instance)) )
@@ -405,9 +405,8 @@ Returncode FunctionArguments_find_variable_args(FunctionArguments* self, List* a
     if (!(NULL != node)) break;
     SyntaxTreeVariable* _SyntaxTreeVariable6;
     CHECK(192, (((Argument*)(node->item)))->_base._dtl[9](((Argument*)(node->item)), &(_SyntaxTreeVariable6)) )
-    Bool _Bool7;
-    CHECK(192, SyntaxTreeVariable_find_variable(_SyntaxTreeVariable6, name, &((*variable)), &(_Bool7)) )
-    if (!(!_Bool7)) break;
+    CHECK(192, (_SyntaxTreeVariable6)->_base._base._dtl[6](_SyntaxTreeVariable6, name, NULL, &((*variable))) )
+    if (!(!(NULL != (*variable)))) break;
     node = node->next;
   }
   return OK;
@@ -424,30 +423,30 @@ Returncode FunctionArguments_check_same_as(FunctionArguments* self, FunctionArgu
   ListNode* other_node = other->parameters->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    CHECK(205, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item, instance_type, bases) )
+    CHECK(206, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item, instance_type, bases) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
   if (NULL != my_node) {
-    CHECK(210, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){20, 19, "too many parameters"}) )
+    CHECK(211, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){20, 19, "too many parameters"}) )
   }
   if (NULL != other_node) {
-    CHECK(212, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){19, 18, "too few parameters"}) )
+    CHECK(213, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){19, 18, "too few parameters"}) )
   }
   
   my_node = self->outputs->first;
   other_node = other->outputs->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    CHECK(218, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item, instance_type, bases) )
+    CHECK(219, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item, instance_type, bases) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
   if (NULL != my_node) {
-    CHECK(223, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){17, 16, "too many outputs"}) )
+    CHECK(224, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){17, 16, "too many outputs"}) )
   }
   if (NULL != other_node &&  NULL !=  other_node->next) {
-    CHECK(225, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){16, 15, "too few outputs"}) )
+    CHECK(226, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){16, 15, "too few outputs"}) )
   }
   (*output_ommited) =  NULL !=  other_node;
   return OK;
@@ -460,8 +459,8 @@ Returncode FunctionArguments_write_preactions(FunctionArguments* self);
 static char* _func_name_FunctionArguments_write_preactions = "FunctionArguments.write-preactions";
 #define MR_FUNC_NAME _func_name_FunctionArguments_write_preactions
 Returncode FunctionArguments_write_preactions(FunctionArguments* self) {
-  CHECK(229, FunctionArguments_write_args_preactions(self, self->parameters) )
-  CHECK(230, FunctionArguments_write_args_preactions(self, self->outputs) )
+  CHECK(230, FunctionArguments_write_args_preactions(self, self->parameters) )
+  CHECK(231, FunctionArguments_write_args_preactions(self, self->outputs) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -475,7 +474,7 @@ Returncode FunctionArguments_write_args_preactions(FunctionArguments* self, List
   ListNode* node = arguments->first;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(236, (((Argument*)(node->item)))->_base._dtl[11](((Argument*)(node->item))) )
+    CHECK(237, (((Argument*)(node->item)))->_base._dtl[11](((Argument*)(node->item))) )
     node = node->next;
   }
   return OK;
@@ -488,7 +487,7 @@ Returncode FunctionArguments_write(FunctionArguments* self);
 static char* _func_name_FunctionArguments_write = "FunctionArguments.write";
 #define MR_FUNC_NAME _func_name_FunctionArguments_write
 Returncode FunctionArguments_write(FunctionArguments* self) {
-  CHECK(240, FunctionArguments_write_if_decleration(self, true) )
+  CHECK(241, FunctionArguments_write_if_decleration(self, true) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -499,7 +498,7 @@ Returncode FunctionArguments_write_call(FunctionArguments* self);
 static char* _func_name_FunctionArguments_write_call = "FunctionArguments.write-call";
 #define MR_FUNC_NAME _func_name_FunctionArguments_write_call
 Returncode FunctionArguments_write_call(FunctionArguments* self) {
-  CHECK(243, FunctionArguments_write_if_decleration(self, false) )
+  CHECK(244, FunctionArguments_write_if_decleration(self, false) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -511,22 +510,22 @@ static char* _func_name_FunctionArguments_write_if_decleration = "FunctionArgume
 #define MR_FUNC_NAME _func_name_FunctionArguments_write_if_decleration
 Returncode FunctionArguments_write_if_decleration(FunctionArguments* self, Bool is_decleration) {
   /* (`params...`, `outputs...`) */
-  CHECK(247, write(&(String){2, 1, "("}) )
+  CHECK(248, write(&(String){2, 1, "("}) )
   if (NULL != self->parameters->first) {
-    CHECK(249, FunctionArguments_write_args(self, self->parameters) )
+    CHECK(250, FunctionArguments_write_args(self, self->parameters) )
   }
   if (NULL != self->outputs->first) {
     if (NULL != self->parameters->first) {
-      CHECK(252, write(&(String){3, 2, ", "}) )
+      CHECK(253, write(&(String){3, 2, ", "}) )
     }
-    CHECK(253, FunctionArguments_write_args(self, self->outputs) )
+    CHECK(254, FunctionArguments_write_args(self, self->outputs) )
   }
   else {
     if (!(NULL != self->parameters->first) && is_decleration) {
-      CHECK(255, write(&(String){5, 4, "void"}) )
+      CHECK(256, write(&(String){5, 4, "void"}) )
     }
   }
-  CHECK(256, write(&(String){2, 1, ")"}) )
+  CHECK(257, write(&(String){2, 1, ")"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -539,10 +538,10 @@ static char* _func_name_FunctionArguments_write_args = "FunctionArguments.write-
 Returncode FunctionArguments_write_args(FunctionArguments* self, List* arguments) {
   ListNode* node = arguments->first;
   while (true) {
-    CHECK(261, (((Argument*)(node->item)))->_base._dtl[4](((Argument*)(node->item))) )
+    CHECK(262, (((Argument*)(node->item)))->_base._dtl[4](((Argument*)(node->item))) )
     node = node->next;
     if (!(NULL != node)) break;
-    CHECK(264, write(&(String){3, 2, ", "}) )
+    CHECK(265, write(&(String){3, 2, ", "}) )
   }
   return OK;
 }
@@ -554,10 +553,10 @@ Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name
 static char* _func_name_FunctionArguments_write_pointer = "FunctionArguments.write-pointer";
 #define MR_FUNC_NAME _func_name_FunctionArguments_write_pointer
 Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name) {
-  CHECK(267, write(&(String){14, 13, "Returncode (*"}) )
-  CHECK(268, write_cname(name) )
-  CHECK(269, write(&(String){2, 1, ")"}) )
-  CHECK(270, (self)->_base._dtl[4](self) )
+  CHECK(268, write(&(String){14, 13, "Returncode (*"}) )
+  CHECK(269, write_cname(name) )
+  CHECK(270, write(&(String){2, 1, ")"}) )
+  CHECK(271, (self)->_base._dtl[4](self) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -571,7 +570,7 @@ Returncode FunctionArguments_write_postactions(FunctionArguments* self) {
   ListNode* node = self->parameters->first;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(276, (((Argument*)(node->item)))->_base._dtl[12](((Argument*)(node->item))) )
+    CHECK(277, (((Argument*)(node->item)))->_base._dtl[12](((Argument*)(node->item))) )
     node = node->next;
   }
   return OK;
