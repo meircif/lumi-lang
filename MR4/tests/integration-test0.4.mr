@@ -5,6 +5,7 @@ This file should be stand-alone.
 Testing multiline documentation
 confused by ~ or ~~ or ; or ~~ ~ ?
 ~~~
+module integration
 
 [; Test
 multiline

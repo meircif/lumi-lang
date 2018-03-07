@@ -144,8 +144,18 @@ class Expression(SyntaxTreeNode)
       owner Expression expression, copy Char end, copy Bool has-more)
     has-more := true
     if end = '.'
-      MemberExpression.parse-new(var _, user ends, user code-node):(
-          owner expression, copy end)
+      owner String text
+      self.read-new-value(user ends):(owner text, copy end)
+      var Char first(text[0])
+      var Char second('\0')
+      if text.length > 1
+        second := text[1]
+      if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
+        TypeExpression.parse-new(var _, owner text, user ends, user code-node):(
+            owner expression, copy end)
+      else
+        MemberExpression.parse-new(var _, owner text, user code-node):(
+            owner expression)
     else-if end = '['
       SliceExpression.parse-new(var _, user ends, user code-node):(
           owner expression, copy end)
@@ -172,10 +182,9 @@ class Expression(SyntaxTreeNode)
     string-new-copy(user symbol.variable.name):(owner symbol.name)
   
   func dynamic get-parent-type():(user TypeData parent-type)
+    parent-type := _
     if ? self.code-node
       self.code-node.get-parent-type():(user parent-type)
-    else
-      base.get-parent-type():(user parent-type)
   
   func inst write-refman-init(user SymbolExpression symbol)
     # `symbol`_Refman = MR_new_ref(`symbol`);

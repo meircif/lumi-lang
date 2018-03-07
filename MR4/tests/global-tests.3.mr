@@ -6,6 +6,7 @@ var String{1024} mock-print-text
 var String{2048} mock-input-file-text
 var String{16384} mock-output-file-text
 var Int mock-input-file-index
+var Int mock-input-line-eof-index
 var Int mock-input-line-reset-index
 var Bool mock-print-active
 var Char mock-output-file-last
@@ -23,19 +24,27 @@ mock print(user String text)
   else
     sys.print-raw(user text)
 
-func set-mock-file-text(user String text)
-  mock-input-file-text.copy(user text)
+func set-mock-file-text(user String text, user String second-file-text)
+  mock-input-file-text.copy(user "module ut\n")
+  mock-input-line-reset-index := mock-input-file-text.length
+  mock-input-file-text.concat(user text)
+  if ? second-file-text
+    mock-input-line-eof-index := mock-input-file-text.length
+    mock-input-file-text.concat(user second-file-text)
+  else
+    mock-input-line-eof-index := - 1
   mock-input-file-index := 0
 
 mock file-open(user String name, copy Bool is-read):(owner File file)
   # do nothing
 
 mock file-close(owner File file)
-  # do nothing
+  mock-input-line-eof-index := - 1
 
 mock file-getc(user File file):(copy Char ch)
   assert file = glob.input-file
-  if mock-input-file-index >= mock-input-file-text.length
+  if mock-input-file-index = mock-input-line-eof-index or
+      mock-input-file-index >= mock-input-file-text.length
     ch := EOF
     return
   ch := mock-input-file-text[mock-input-file-index]
@@ -69,7 +78,7 @@ var String{16} mock-input-file-name
 
 func f-setup-test()
   delete glob.operator-map
-  delete glob.type-map
+  delete glob.module-map
   glob.init()
   glob.input-file-name := mock-input-file-name
   glob.input-file-name.copy(user "mock.4.mr")
@@ -169,6 +178,7 @@ func test-from-file(user String name)
   actual-output-file.write(user "\n")
   
   var String{4096} input
+  var String{1024} second-file-input
   var String{16384} expected
   if not read-line(user input-file, user line, user "## @ ")
     file-error(user name, user line)
@@ -181,6 +191,7 @@ func test-from-file(user String name)
   var Bool is-test
   tests-passed := true
   do
+    user String second-input
     input-file.getc():(copy type-char)
     append-newline := type-char != 'f'
     if not append-newline
@@ -191,6 +202,7 @@ func test-from-file(user String name)
     is-test := type-char = 't'
     if is-test
       input-file.getc():(copy type-char)
+      second-input := second-file-input
     if type-char != 'g' and type-char != 'c'
       file-error(user name, user subname)
     if input-file.getc() != ' '
@@ -204,9 +216,16 @@ func test-from-file(user String name)
     actual-output-file.write(user "\n")
     
     read-data(user input-file, user input, user "## @")
+    if is-test
+      if input-file.getc() != '-'
+        file-error(user name, user subname)
+      input-file.getc()
+      read-data(user input-file, user second-file-input, user "## @")
     read-data(user expected-output-file, user expected, user "/// @")
     if append-newline
       input.append(copy '\n')
+      if is-test
+        second-file-input.append(copy '\n')
     if type-char = 'c'
       if is-error-test
         test-code-error(user input, user expected)
@@ -214,9 +233,11 @@ func test-from-file(user String name)
         test-code(user input, user expected)
     else
       if is-error-test
-        test-global-scope-error(user input, user expected)
+        test-global-scope-error(
+            user input, user second-input, user expected, copy is-test)
       else
-        test-global-scope(user input, user expected, copy is-test)
+        test-global-scope(
+            user input, user second-input, user expected, copy is-test)
     
     expected-output-file.getc()
     while input-file.getc() = ' '
@@ -315,6 +336,7 @@ test test-illegal-call()
   assert-error branch.parse-child(user _)
   var SyntaxTreeNode node
   assert-error node.write()
+  assert not (? node.get-parent-type())
   var NodeAction action
   assert-error action.m-action(user _)
   var SyntaxTreeRoot root

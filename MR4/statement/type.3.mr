@@ -3,6 +3,7 @@
 ## Type node in the syntax tree 
 class TypeData(SyntaxTreeNamespace)
   owner String name
+  user ModuleMembers my-module
   user TypeInstance base-type
   owner List{String} parameters
   owner NameMap{SyntaxTreeFunction} dynamic-base-methods
@@ -21,8 +22,9 @@ class TypeData(SyntaxTreeNamespace)
   func inst parse(copy Bool is-dynamic):(copy Char end)
     self.is-dynamic := is-dynamic
     self.set-location()
+    self.my-module := glob.current-module
     read-new(user "({"):(owner self.name, copy end)
-    self.add-type()
+    self.add-type(user self.my-module)
     if end = '{'
       new List{String} in self.parameters
       do
@@ -47,12 +49,15 @@ class TypeData(SyntaxTreeNamespace)
     self.parse-block-children(user self, user _):(copy end)
     self.indentation-spaces := 0
   
-  func inst add-type()
+  func inst add-type(user ModuleMembers my-module)
     if not f-is-legal-name(user self.name, copy NAME-TYPE)
       self.m-syntax-error(user "illegal type name", user self.name)
-    if ? glob.type-map.find(user self.name)
+    if ? glob.find-type(user self.name)
       self.m-syntax-error(user "redefinition of type", user self.name)
-    glob.add-type(user self)
+    if ? glob.current-module.enum-map.find(user self.name)
+      self.m-syntax-error(user "type name overrides Enum", user self.name)
+    self.init()
+    my-module.type-map.add(user self.name, user self)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     if self.parse-if-function(user keyword, user self):(copy end)
@@ -143,7 +148,9 @@ class TypeData(SyntaxTreeNamespace)
           user "recursive inheritance in type", user self.name)
     self.ordering := true
     if ? self.base-type
-      self.find-type(user self.base-type.name):(user self.base-type.type-data)
+      glob.current-module := self.my-module
+      self.base-type.link-types(user self)
+      glob.current-module := _
       self.base-type.type-data.m-order-bases(user ordered-list)
     ordered-list.add(owner self)
     self.is-ordered := true
@@ -169,11 +176,14 @@ class TypeData(SyntaxTreeNamespace)
       child := child.next
   
   func dynamic link-types()
+    glob.current-module := self.my-module
     if ? self.base-type
       self.base-type.link-types(user self)
     base.link-types()
+    glob.current-module := _
   
   func dynamic analyze()
+    glob.current-module := self.my-module
     if ? self.base-type
       self.base-type.analyze-lengths(user self, copy true)
     if not (? self.base-type) and self.variables.m-is-empty()
@@ -188,20 +198,26 @@ class TypeData(SyntaxTreeNamespace)
         while not node.item.is-dynamic
         node := node.next
     base.analyze()
+    glob.current-module := _
+  
+  func inst write-cname()
+    if ? self.my-module
+      self.my-module.write-prefix()
+    write-cname(user self.name)
   
   func dynamic write-declaration()
     # typedef struct `name` `name`;
     # typedef struct `name`_Dynamic `name`_Dynamic;
     write(user "\ntypedef struct ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user " ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user ";\n")
     if self.is-dynamic
       write(user "\ntypedef struct ")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_Dynamic ")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_Dynamic;\n")
   
   func dynamic write()
@@ -212,22 +228,22 @@ class TypeData(SyntaxTreeNamespace)
     #   `dynamic-function-pointers...`
     # };
     write(user "\nstruct ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user " {\n")
     self.indentation-spaces := 2
     if ? self.base-type
       self.write-spaces()
-      write-cname(user self.base-type.type-data.name)
+      self.base-type.type-data.write-cname()
       write(user " _base;\n")
     self.write-children(user self.variables)
     write(user "};\n")
     if self.is-dynamic
       write(user "\nstruct ")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_Dynamic {\n")
       if ? self.base-type and self.base-type.type-data.is-dynamic
         self.write-spaces()
-        write-cname(user self.base-type.type-data.name)
+        self.base-type.type-data.write-cname()
         write(user "_Dynamic _base;\n")
       else
         self.write-spaces()
@@ -246,26 +262,26 @@ class TypeData(SyntaxTreeNamespace)
     self.write-functions-declaration()
     # void `cname`_Del(`cname`* self);
     write(user "\nvoid ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user "_Del(")
-    write-cname(user self.name)
+    self.write-cname()
     write(user "* self);\n")
   
   func dynamic write-global()
     write(user "\n")
     if self.is-dynamic
       # `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_Dynamic ")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_dynamic = ")
       self.write-dynamic-init(user self)
     else
       # Generic_Type_Dynamic `name`_dynamic = {(Dynamic_Del)`name`_Del};
       write(user "Generic_Type_Dynamic ")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_dynamic = {(Dynamic_Del)")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_Del}")
     write(user ";\n")
   
@@ -275,7 +291,7 @@ class TypeData(SyntaxTreeNamespace)
       self.write-dynamic-init(user type-data.base-type.type-data)
     else
       write(user "(Dynamic_Del)")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_Del")
     user NameMapNode{SyntaxTreeFunction} child(type-data.dynamic-base-methods.first)
     do
@@ -285,7 +301,7 @@ class TypeData(SyntaxTreeNamespace)
       write(user ", ")
       if method != child.value
         write(user "(Func)")
-      write-cname(user method.parent-type.name)
+      method.parent-type.write-cname()
       write(user "_")
       if ? method.mocker-function
         write-cname(user method.mocker-function.name)
@@ -302,18 +318,18 @@ class TypeData(SyntaxTreeNamespace)
     #   ...
     # }
     write(user "\nvoid ")
-    write-cname(user self.name)
+    self.write-cname()
     write(user "_Del(")
-    write-cname(user self.name)
+    self.write-cname()
     write(user "* self) {\n")
     write(user "  if (self == NULL) return;\n")
     if ? self.base-type
       write(user "  ")
-      write-cname(user self.base-type.type-data.name)
+      self.base-type.type-data.write-cname()
       write(user "_Del(&(self->_base));\n")
     if self.is-delete-mocked
       write(user "  IGNORE_ERRORS( ")
-      write-cname(user self.name)
+      self.write-cname()
       write(user "_MockDel(self) )\n")
     self.write-cleanup(user self)
     write(user "}\n")

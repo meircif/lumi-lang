@@ -71,17 +71,17 @@ Returncode SliceExpression_analyze(SliceExpression* self) {
   if (!(NULL != self->sequence->result_type)) {
     CHECK(34, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){31, 30, "cannot slice a void expression"}) )
   }
-  if (self->sequence->result_type->type_data == &(glob->type_string->_base)) {
+  if (self->sequence->result_type->type_data == glob->type_string) {
     if (!(NULL != self->second_index)) {
-      CHECK(37, Expression_set_simple_type(&(self->_base), &(glob->type_char->_base)) )
+      CHECK(37, Expression_set_simple_type(&(self->_base), glob->type_char) )
     }
   }
   else {
-    if (self->sequence->result_type->type_data == &(glob->type_array->_base)) {
+    if (self->sequence->result_type->type_data == glob->type_array) {
       if (!(NULL != self->second_index)) {
         CHECK(40, TypeInstance_copy_new(((TypeInstance*)(self->sequence->result_type->parameters->first->item)), &(self->_base.result_type)) )
       }
-      if (((TypeInstance*)(self->sequence->result_type->parameters->first->item))->type_data == &(glob->type_generic->_base)) {
+      if (((TypeInstance*)(self->sequence->result_type->parameters->first->item))->type_data == glob->type_generic) {
         CHECK(44, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){27, 26, "cannot slice generic array"}) )
       }
     }
@@ -111,7 +111,7 @@ static char* _func_name_SliceExpression_check_index = "SliceExpression.check-ind
 #define MR_FUNC_NAME _func_name_SliceExpression_check_index
 Returncode SliceExpression_check_index(SliceExpression* self, Expression* index) {
   if (NULL != index->result_type) {
-    if (index->result_type->type_data != &(glob->type_int->_base)) {
+    if (index->result_type->type_data != glob->type_int) {
       CHECK(66, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){38, 37, "expected integer index for slice, got"}, index->result_type->type_data->name) )
     }
   }
@@ -145,7 +145,7 @@ Returncode SliceExpression_write_preactions(SliceExpression* self) {
     CHECK(88, (self->second_index)->_base._dtl[4](self->second_index) )
     CHECK(89, write(&(String){3, 2, ";\n"}) )
     CHECK(90, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-    if (self->sequence->result_type->type_data == &(glob->type_string->_base)) {
+    if (self->sequence->result_type->type_data == glob->type_string) {
       CHECK(92, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
       CHECK(93, write(&(String){19, 18, "_Var.max_length = "}) )
       CHECK(94, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
@@ -154,12 +154,12 @@ Returncode SliceExpression_write_preactions(SliceExpression* self) {
     }
     CHECK(97, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
     CHECK(98, write(&(String){16, 15, "_Var.values = ("}) )
-    if (self->sequence->result_type->type_data != &(glob->type_string->_base)) {
+    if (self->sequence->result_type->type_data != glob->type_string) {
       CHECK(100, write(&(String){9, 8, "Byte*)(("}) )
     }
     CHECK(101, (self->sequence)->_base._dtl[4](self->sequence) )
     CHECK(102, write(&(String){10, 9, ")->values"}) )
-    if (self->sequence->result_type->type_data != &(glob->type_string->_base)) {
+    if (self->sequence->result_type->type_data != glob->type_string) {
       CHECK(104, write(&(String){2, 1, ")"}) )
     }
     CHECK(105, write(&(String){5, 4, " + ("}) )
@@ -229,19 +229,19 @@ Returncode SliceExpression_write(SliceExpression* self) {
     CHECK(156, write(&(String){2, 1, "("}) )
   }
   CHECK(157, write(&(String){3, 2, "(("}) )
-  if (self->sequence->result_type->type_data != &(glob->type_string->_base)) {
-    if (self->_base.result_type->type_data == &(glob->type_func->_base) &&  NULL !=  self->_base.result_type->arguments) {
+  if (self->sequence->result_type->type_data != glob->type_string) {
+    if (self->_base.result_type->type_data == glob->type_func &&  NULL !=  self->_base.result_type->arguments) {
       CHECK(161, FunctionArguments_write_pointer(self->_base.result_type->arguments, &(String){2, 1, "*"}) )
     }
     else {
-      CHECK(163, write_cname(self->_base.result_type->type_data->name) )
+      CHECK(163, TypeData_write_cname(self->_base.result_type->type_data) )
       CHECK(164, write(&(String){2, 1, "*"}) )
     }
     CHECK(165, write(&(String){4, 3, ")(("}) )
   }
   CHECK(166, (self->sequence)->_base._dtl[4](self->sequence) )
   CHECK(167, write(&(String){11, 10, ")->values)"}) )
-  if (self->sequence->result_type->type_data != &(glob->type_string->_base)) {
+  if (self->sequence->result_type->type_data != glob->type_string) {
     CHECK(169, write(&(String){2, 1, ")"}) )
   }
   if (self->_base.result_type->type_data->is_primitive) {
@@ -268,7 +268,7 @@ static char* _func_name_SliceExpression_write_dynamic = "SliceExpression.write-d
 #define MR_FUNC_NAME _func_name_SliceExpression_write_dynamic
 Returncode SliceExpression_write_dynamic(SliceExpression* self) {
   CHECK(181, write(&(String){2, 1, "&"}) )
-  CHECK(182, write_cname(self->_base.result_type->type_data->name) )
+  CHECK(182, TypeData_write_cname(self->_base.result_type->type_data) )
   CHECK(183, write(&(String){9, 8, "_dynamic"}) )
   return OK;
 }

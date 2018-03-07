@@ -9,19 +9,7 @@ static char* _mr_file30_name = "mr4-compiler.3.mr";
 #endif
 #define MR_FILE_NAME _mr_file30_name
 
-/*  MR4 compiler main - written in MR3
-
-A work in progres...
-
-Currently only expression parsing is fully implemented, along with some global
-functionality that supports it.
-
-Expression design is documented in expression/expression.3.mr.
-
-Global notes:
-  * Because MR3 not supports constructors or class-methods, they are replaced
-    by calling instance methods directly with `_` as the self instance.
- */
+/* MR4 compiler main - written in MR3 */
 
 /* compiler main function! */
 #if MR_STAGE == MR_DECLARATIONS
@@ -30,10 +18,10 @@ Returncode func(Array* argv);
 static char* _func_name_func = "func";
 #define MR_FUNC_NAME _func_name_func
 Returncode func(Array* argv) {
-  CHECK(17, Global_init(glob) )
-  CHECK(18, SyntaxTreeRoot_parse(glob->root, argv) )
-  CHECK(19, (glob->root)->_base._base._base._dtl[2](glob->root) )
-  CHECK(20, (glob->root)->_base._base._base._dtl[4](glob->root) )
+  CHECK(5, Global_init(glob) )
+  CHECK(6, SyntaxTreeRoot_parse(glob->root, argv) )
+  CHECK(7, (glob->root)->_base._base._base._base._dtl[2](glob->root) )
+  CHECK(8, (glob->root)->_base._base._base._base._dtl[4](glob->root) )
   return OK;
 }
 #undef MR_FUNC_NAME

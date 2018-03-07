@@ -109,8 +109,29 @@ class UpCastExpression(Expression)
     write(user ")")
 
 
+class ModuleTypeExpression(Expression)
+  owner Expression module-expression
+  
+  func inst analyze-module()
+    self.module-expression.analyze()
+    if not (? self.module-expression.result-type)
+      self.code-node.m-syntax-error-msg(
+          user "expected module, got empty expression")
+    if self.module-expression.result-type.type-data != glob.type-module
+      self.code-node.m-syntax-error(
+          user "expected module, got",
+          user self.module-expression.result-type.type-data.name)
+  
+  func inst analyze-type-instance(user TypeInstance type-instance)
+    if ? self.module-expression
+      self.analyze-module()
+      string-new-copy(user self.module-expression.result-type.name):(
+          owner type-instance.module-name)
+    type-instance.analyze(user self)
+
+
 ## Type name expression
-class TypeExpression(Expression)
+class TypeExpression(ModuleTypeExpression)
   func inst parse-new(
       owner String text, user String ends, user SyntaxTreeCode code-node):(
       owner Expression expression, copy Char end)
@@ -121,7 +142,8 @@ class TypeExpression(Expression)
       if value.length > 0
         if value.equal(user "length") or (value[0] >= 'A' and value[0] <= 'Z')
           new EnumExpression enum-expression
-          enum-expression.parse(owner text, owner value, user code-node)
+          enum-expression.parse(
+              owner text, owner value, owner expression, user code-node)
           end := next-end
           expression := enum-expression
           return
@@ -131,32 +153,42 @@ class TypeExpression(Expression)
         copy end)
     if end = '('
       new InitExpression expression-init
-      expression-init.parse(owner type-instance, user code-node):(copy end)
+      expression-init.parse(
+          owner type-instance, owner expression, user code-node):(copy end)
       expression := expression-init
     else
       new TypeExpression type-expression
-      type-expression.parse(owner type-instance)
+      type-expression.parse(
+          owner type-instance, owner expression, user code-node)
       expression := type-expression
   
-  func inst parse(owner TypeInstance type-instance)
+  func inst parse(
+      owner TypeInstance type-instance,
+      owner Expression module-expression,
+      user SyntaxTreeCode code-node)
     self.set-location()
+    self.code-node := code-node
     self.set-simple-type(user glob.type-type)
+    self.module-expression := module-expression
     new List{TypeInstance} in self.result-type.parameters
     self.result-type.parameters.add(owner type-instance)
     self.access := ACCESS-VAR
   
   func dynamic analyze()
-    self.result-type.parameters.first.item.analyze(user self)
+    self.analyze-type-instance(user self.result-type.parameters.first.item)
 
 
 ## Enum name expression
-class EnumExpression(Expression)
+class EnumExpression(ModuleTypeExpression)
   owner String name
   owner String value
   user EnumData enum-data
   
   func inst parse(
-      owner String name, owner String value, user SyntaxTreeCode code-node)
+      owner String name,
+      owner String value,
+      owner Expression module-expression,
+      user SyntaxTreeCode code-node)
     self.set-location()
     self.code-node := code-node
     self.name := name
@@ -164,15 +196,27 @@ class EnumExpression(Expression)
     self.set-simple-type(user glob.type-int)
     self.access := ACCESS-VAR
     self.constant := true
+    self.module-expression := module-expression
   
   func dynamic analyze()
-    if not (? glob.enum-map.find(user self.name):(user self.enum-data))
+    if ? self.module-expression
+      self.analyze-module()
+      user String module-name(self.module-expression.result-type.name)
+      if not (? self.code-node.find-module(user module-name).enum-map.find(
+          user self.name):(user self.enum-data))
+        self.m-syntax-error2(
+            user "unknown Enum",
+            user self.name,
+            user "in module",
+            user module-name)
+    else-if not (? glob.current-module.enum-map.find(user self.name):(
+        user self.enum-data))
       self.m-syntax-error(user "unknown Enum", user self.name)
     if not self.enum-data.m-has-value(user self.value)
       self.m-syntax-error2(
           user "Enum", user self.name, user "has no value", user self.value)
   
   func dynamic write()
-    write-cname(user self.name)
+    self.enum-data.write-cname()
     write(user "_")
     write-cname(user self.value)

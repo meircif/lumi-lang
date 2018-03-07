@@ -198,15 +198,15 @@ Returncode UnaryExpression_analyze(UnaryExpression* self) {
   self->_base.constant = self->right_expression->constant;
   if (self->operator->order == 2) {
     /* `not` operator */
-    CHECK(93, UnaryExpression_test_operand_type(self, self->right_expression, &(glob->type_bool->_base)) )
-    CHECK(94, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
+    CHECK(93, UnaryExpression_test_operand_type(self, self->right_expression, glob->type_bool) )
+    CHECK(94, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   }
   else {
-    Bool _Bool37;
-    CHECK(95, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool37)) )
-    if (_Bool37) {
-      CHECK(96, UnaryExpression_test_operand_type(self, self->right_expression, &(glob->type_int->_base)) )
-      CHECK(97, Expression_set_simple_type(&(self->_base), &(glob->type_int->_base)) )
+    Bool _Bool39;
+    CHECK(95, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool39)) )
+    if (_Bool39) {
+      CHECK(96, UnaryExpression_test_operand_type(self, self->right_expression, glob->type_int) )
+      CHECK(97, Expression_set_simple_type(&(self->_base), glob->type_int) )
     }
     else {
       CHECK(99, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){19, 18, "not unary operator"}, self->operator->name) )
@@ -236,9 +236,9 @@ Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* 
 static char* _func_name_UnaryExpression_test_operand_type = "UnaryExpression.test-operand-type";
 #define MR_FUNC_NAME _func_name_UnaryExpression_test_operand_type
 Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* operand, TypeData* expected_type) {
-  Bool _Bool38;
-  CHECK(111, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool38)) )
-  if (!_Bool38) {
+  Bool _Bool40;
+  CHECK(111, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool40)) )
+  if (!_Bool40) {
     CHECK(112, SyntaxTreeNode_m_syntax_error3(&(self->_base._base), &(String){9, 8, "operator"}, self->operator->name, &(String){9, 8, "expected"}, expected_type->name, &(String){13, 12, "operand, got"}, operand->result_type->type_data->name) )
   }
   return OK;
@@ -366,8 +366,8 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
   }
   if (self->_base.operator->order == 3) {
     /* `or`/`and` operator */
-    CHECK(185, BinaryExpression_test_operands_type(self, &(glob->type_bool->_base)) )
-    CHECK(186, Expression_set_simple_type(&(self->_base._base), &(glob->type_bool->_base)) )
+    CHECK(185, BinaryExpression_test_operands_type(self, glob->type_bool) )
+    CHECK(186, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
   }
   else {
     if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0) {
@@ -380,25 +380,25 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
         /* `is`/`is-not` operator */
         CHECK(194, BinaryExpression_test_not_int(self, self->_base.right_expression) )
         CHECK(195, BinaryExpression_test_not_int(self, self->left_expression) )
-        CHECK(196, Expression_set_simple_type(&(self->_base._base), &(glob->type_bool->_base)) )
+        CHECK(196, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
       }
       else {
         /* any other Int operator */
         if (self->_base.operator->order == 1 &&  NULL !=  self->binary_left_expression && self->binary_left_expression->_base.operator->order == 1) {
           /* (a > b) > c */
-          CHECK(202, UnaryExpression_test_operand_type(&(self->_base), self->_base.right_expression, &(glob->type_int->_base)) )
+          CHECK(202, UnaryExpression_test_operand_type(&(self->_base), self->_base.right_expression, glob->type_int) )
         }
         else {
-          CHECK(204, BinaryExpression_test_operands_type(self, &(glob->type_int->_base)) )
+          CHECK(204, BinaryExpression_test_operands_type(self, glob->type_int) )
         }
         if (self->_base.operator->order == 0) {
           /* aritmetic operator */
-          CHECK(207, Expression_set_simple_type(&(self->_base._base), &(glob->type_int->_base)) )
+          CHECK(207, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
         }
         else {
           if (self->_base.operator->order == 1) {
             /* compare operator */
-            CHECK(210, Expression_set_simple_type(&(self->_base._base), &(glob->type_bool->_base)) )
+            CHECK(210, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
           }
         }
         /* else, assign operator */
@@ -435,9 +435,9 @@ Returncode BinaryExpression_test_not_int(BinaryExpression* self, Expression* ope
 static char* _func_name_BinaryExpression_test_not_int = "BinaryExpression.test-not-int";
 #define MR_FUNC_NAME _func_name_BinaryExpression_test_not_int
 Returncode BinaryExpression_test_not_int(BinaryExpression* self, Expression* operand) {
-  Bool _Bool39;
-  CHECK(224, TypeData_m_is_same(operand->result_type->type_data, &(glob->type_int->_base), &(_Bool39)) )
-  if (_Bool39) {
+  Bool _Bool41;
+  CHECK(224, TypeData_m_is_same(operand->result_type->type_data, glob->type_int, &(_Bool41)) )
+  if (_Bool41) {
     CHECK(225, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){9, 8, "operator"}, self->_base.operator->name, &(String){26, 25, "is not supported for type"}, operand->result_type->type_data->name) )
   }
   return OK;
@@ -509,13 +509,13 @@ Returncode BinaryExpression_write_assign_preactions(BinaryExpression* self) {
     /* also assign Dynamic */
     CHECK(269, (self->left_expression)->_base._dtl[5](self->left_expression) )
     CHECK(270, write(&(String){4, 3, " = "}) )
-    if (!self->_base.right_expression->result_type->type_data->is_dynamic &&  ! self->_base.right_expression->is_generic_cast && self->_base.right_expression->result_type->type_data != &(glob->type_empty->_base)) {
+    if (!self->_base.right_expression->result_type->type_data->is_dynamic &&  ! self->_base.right_expression->is_generic_cast && self->_base.right_expression->result_type->type_data != glob->type_empty) {
       CHECK(274, write(&(String){2, 1, "&"}) )
-      CHECK(275, write_cname(self->_base.right_expression->result_type->type_data->name) )
+      CHECK(275, TypeData_write_cname(self->_base.right_expression->result_type->type_data) )
       CHECK(276, write(&(String){9, 8, "_dynamic"}) )
     }
     else {
-      if ((self->left_expression->result_type->type_data == &(glob->type_generic->_base) || self->left_expression->is_generic_cast) && self->_base.right_expression->result_type->type_data != &(glob->type_generic->_base) &&  ! self->_base.right_expression->is_generic_cast) {
+      if ((self->left_expression->result_type->type_data == glob->type_generic || self->left_expression->is_generic_cast) && self->_base.right_expression->result_type->type_data != glob->type_generic &&  ! self->_base.right_expression->is_generic_cast) {
         CHECK(282, write(&(String){24, 23, "(Generic_Type_Dynamic*)"}) )
         self->_base.right_expression->top = false;
       }
@@ -550,15 +550,15 @@ Returncode BinaryExpression_write_left_delete(BinaryExpression* self) {
     CHECK(301, write(&(String){6, 5, "_del("}) )
   }
   else {
-    if (type_data != &(glob->type_array->_base)) {
-      CHECK(303, write_cname(type_data->name) )
+    if (type_data != glob->type_array) {
+      CHECK(303, TypeData_write_cname(type_data) )
       CHECK(304, write(&(String){6, 5, "_Del("}) )
     }
     else {
       type_data = ((TypeInstance*)(self->left_expression->result_type->parameters->first->item))->type_data;
       if (!type_data->is_primitive) {
         CHECK(309, write(&(String){11, 10, "ARRAY_DEL("}) )
-        CHECK(310, write_cname(type_data->name) )
+        CHECK(310, TypeData_write_cname(type_data) )
         CHECK(311, write(&(String){3, 2, ", "}) )
         CHECK(312, (self->left_expression)->_base._dtl[4](self->left_expression) )
         CHECK(313, write(&(String){3, 2, ")\n"}) )
@@ -593,7 +593,7 @@ Returncode BinaryExpression_write(BinaryExpression* self) {
   if (expand_and) {
     CHECK(333, write(&(String){2, 1, ")"}) )
   }
-  if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0 && self->left_expression->access == ACCESS_OWNER && self->_base.right_expression->result_type->type_data != &(glob->type_empty->_base)) {
+  if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0 && self->left_expression->access == ACCESS_OWNER && self->_base.right_expression->result_type->type_data != glob->type_empty) {
     /* ownership pass */
     CHECK(338, Expression_write_assign_null(self->assignee) )
   }
@@ -657,10 +657,10 @@ Returncode QuestionExpression_analyze(QuestionExpression* self) {
   if (!(NULL != self->tested->result_type)) {
     CHECK(359, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
   }
-  if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == &(glob->type_func->_base))) {
+  if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == glob->type_func)) {
     CHECK(362, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
   }
-  CHECK(365, Expression_set_simple_type(&(self->_base), &(glob->type_bool->_base)) )
+  CHECK(365, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   self->_base.access = ACCESS_VAR;
   return OK;
 }

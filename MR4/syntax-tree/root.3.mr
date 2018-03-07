@@ -1,48 +1,65 @@
 ## MR4 compiler - Syntax tree root
 
-## The syntax tree root
-class SyntaxTreeRoot(SyntaxTreeNamespace)
+class GlobalNodes(SyntaxTreeNamespace)
   owner List{TypeData} types
-  owner List{EnumData} enums
-  owner List{SyntaxTreeConstant} constants
-  user String output-file-name
-  owner SyntaxTreeMainFunction main-function
-  owner GlobalInit global-init
-  owner Array{LineCount} line-counts
-  var Bool is-library
-  var Bool testing
   
   func inst init()
     base.init()
     new List{TypeData} in self.types
+
+
+## The syntax tree root
+class SyntaxTreeRoot(GlobalNodes)
+  owner List{EnumData} enums
+  owner List{SyntaxTreeConstant} constants
+  owner List{ModuleMembers} modules
+  user String output-file-name
+  owner SyntaxTreeMainFunction main-function
+  owner GlobalInit global-init
+  owner Array{LineCount} line-counts
+  var Int covered-files
+  var Bool is-library
+  
+  func inst init()
+    base.init()
     new List{EnumData} in self.enums
     new List{SyntaxTreeConstant} in self.constants
+    new List{ModuleMembers} in self.modules
     new GlobalInit in self.global-init
     self.global-init.init()
   
   func inst parse(user Array{String} argv)
-    if argv.length < 3
-      print(user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...")
+    var Int first-file-index
+    var Int arg-test-index(- 1)
+    var Int input-files-number
+    for n in 1:argv.length
+      user String arg(argv[n])
+      if arg-test-index = n - 1
+        string-new-copy(user arg):(owner glob.tested-module)
+      else-if arg.equal(user "-t") or arg.equal(user "--test")
+        arg-test-index := n
+      else-if first-file-index = 0
+        first-file-index := n
+      else
+        input-files-number += 1
+    
+    if input-files-number = 0 or arg-test-index = argv.length - 1
+      print(user "usage: mr-4compiler [-t TESTED-MODULE]")
+      print(user " OUTPUT-C-FILE-NAME INPUT-MR4-FILES...\n")
       raise
     
-    var Int tested-files
-    for n in 2:argv.length
-      if argv[n].equal(user "-test")
-        self.testing := true
-        while false
-      tested-files += 1
-    if self.testing and tested-files > 0
-      new Array{tested-files:LineCount} in self.line-counts
-      glob.is-in-testing := true
+    if ? glob.tested-module
+      new Array{input-files-number:LineCount} in self.line-counts
     
-    self.output-file-name := argv[1]
-    for n in 2:argv.length
-      glob.input-file-name := argv[n]
-      glob.input-file-index := n - 2
-      if glob.input-file-name.equal(user "-test")
-        glob.is-in-testing := false
-      else
+    self.output-file-name := argv[first-file-index]
+    input-files-number := 0
+    for n in first-file-index + 1:argv.length
+      if n > (arg-test-index + 1) or n < arg-test-index
+        glob.input-file-name := argv[n]
+        glob.input-file-index := input-files-number
+        input-files-number += 1
         glob.line-number := 1
+        glob.current-module := _
         file-open(user glob.input-file-name, copy true):(owner glob.input-file)
         
         self.parse-children(user _, user _)
@@ -52,11 +69,43 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
           self.m-syntax-error-msg(user "no new-line before file end")
         
         file-close(owner glob.input-file)
-        if glob.is-in-testing
-          self.line-counts[n - 2].init()
+        if ? self.line-counts
+          self.line-counts[glob.input-file-index].init()
     
-    self.input-file-name := argv[2]
+    glob.current-module := _
     self.line-number := 0
+  
+  func dynamic parse-if-common(
+      user String keyword,
+      user TypeData parent-type,
+      user SyntaxTreeBlock parent-block):(
+      copy Char end,
+      copy Bool is-parsed)
+    is-parsed := false
+    if not (? glob.current-module)
+      if keyword.equal(user "module")
+        if end != ' '
+          self.m-syntax-error-c(
+              user "expected space after \"module\", got", copy end)
+        user String name
+        read-until(user "", copy false):(user name, copy end)
+        if not f-is-legal-name(user name, copy NAME-DEFAULT)
+          self.m-syntax-error(user "illegal module name", user name)
+        if ? glob.global-module.variable-map.find(user name)
+          self.m-syntax-error(user "module name overrides variable", user name)
+        if ? glob.global-module.function-map.find(user name)
+          self.m-syntax-error(user "module name overrides function", user name)
+        if not (? glob.module-map.find(user name):(user glob.current-module))
+          new ModuleMembers module-members
+          module-members.init(user name)
+          glob.current-module := module-members
+          self.modules.add(owner module-members)
+        is-parsed := true
+        return
+      else
+        self.m-syntax-error(user "no \"module\" in file start", user keyword)
+    base.parse-if-common(user keyword, user parent-type, user parent-block):(
+        copy end, copy is-parsed)
   
   func dynamic parse-child(user String keyword):(copy Char end)
     if self.parse-if-function(user keyword, user _):(copy end)
@@ -129,16 +178,18 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     base.analyze()
     self.analyze-children(user self.types)
     self.global-init.analyze()
-    if self.testing
+    if ? glob.tested-module
       if not (? glob.test-functions.first)
-        print(user "General code error: no test functions")
+        print(user "General code error: no test functions\n")
         raise
     else-if ? self.main-function
       self.main-function.analyze()
     else-if not self.is-library
-      print(user "General code error: no main function")
+      print(user "General code error: no main function\n")
       raise
     self.m-order-children-constants(user self.variables, user self.constants)
+    if ? self.line-counts
+      self.analyze-cover()
   
   func inst m-order-types()
     new List{TypeData} ordered-list
@@ -149,6 +200,25 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
       type-data.m-order-bases(user ordered-list)
     delete self.types
     self.types := ordered-list
+  
+  func inst analyze-cover()
+    if not (? glob.module-map.find(user glob.tested-module))
+      print(user "General code error: unknown tested module \"")
+      print(user glob.tested-module)
+      print(user "\"\n")
+      raise
+    var Int covered-index
+    for n in self.line-counts.length
+      user LineCount line-count(self.line-counts[n])
+      if line-count.needs-cover
+        line-count.covered-index := covered-index
+        covered-index += 1
+    self.covered-files := covered-index
+    if self.covered-files = 0
+      print(user "General code error: no code to test under module \"")
+      print(user glob.tested-module)
+      print(user "\"\n")
+      raise
   
   (## write C file in this order:
   1. type declarations
@@ -206,13 +276,13 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     self.write-children(user self.functions)
     
     # write main function
-    if self.testing or ? self.main-function
+    if ? glob.tested-module or ? self.main-function
       if not glob.is-new-mocked
         write(
             user "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }")
       if not glob.is-delete-mocked
         write(user "\n\nReturncode delete_Mock(Ref self) { return OK; }")
-    if self.testing
+    if ? glob.tested-module
       self.write-test-main()
     else-if ? self.main-function
       write-global(user "\n\n/* main function */\n")
@@ -230,39 +300,41 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
   func inst write-test-coverage-data()
     for n in self.line-counts.length
       user LineCount line-count(self.line-counts[n])
-      write(user "\nint MR_file")
-      write-int(copy n)
-      write(user "_line_count[")
-      write-int(copy line-count.line-needs-cover.length)
-      write(user "] = {\n  ")
-      var Int mod
-      for i in line-count.line-needs-cover.length
-        if i > 0
-          write(user ",")
-        if mod = 25
-          write(user "\n  ")
-          mod := 1
-        else
-          mod += 1
-        if line-count.line-needs-cover[i]
-          write(user " 0")
-        else
-          write(user "-1")
-      write(user "\n};")
+      if line-count.needs-cover
+        write(user "\nint MR_file")
+        write-int(copy line-count.covered-index)
+        write(user "_line_count[")
+        write-int(copy line-count.line-needs-cover.length)
+        write(user "] = {\n  ")
+        var Int mod
+        for i in line-count.line-needs-cover.length
+          if i > 0
+            write(user ",")
+          if mod = 25
+            write(user "\n  ")
+            mod := 1
+          else
+            mod += 1
+          if line-count.line-needs-cover[i]
+            write(user " 0")
+          else
+            write(user "-1")
+        write(user "\n};")
     write(user "\nFile_Coverage MR_file_coverage[")
-    write-int(copy self.line-counts.length)
+    write-int(copy self.covered-files)
     write(user "] = {")
     for n in self.line-counts.length
       user LineCount line-count(self.line-counts[n])
-      if n > 0
-        write(user ",")
-      write(user "\n  {\"")
-      write(user line-count.filename)
-      write(user "\", ")
-      write-int(copy line-count.line-needs-cover.length)
-      write(user ", MR_file")
-      write-int(copy n)
-      write(user "_line_count}")
+      if line-count.needs-cover
+        if line-count.covered-index > 0
+          write(user ",")
+        write(user "\n  {\"")
+        write(user line-count.filename)
+        write(user "\", ")
+        write-int(copy line-count.line-needs-cover.length)
+        write(user ", MR_file")
+        write-int(copy line-count.covered-index)
+        write(user "_line_count}")
     write(user "\n};\n")
   
   func inst write-test-main()
@@ -272,18 +344,42 @@ class SyntaxTreeRoot(SyntaxTreeNamespace)
     write(user "\n")
     user NameMapNode{SyntaxTreeTestFunction} node(glob.test-functions.first)
     do
-      write(user "  RUN_TEST(")
+      # MR_success &= MR_run_test("`test-func.name`", `test-func`);
+      write(user "  MR_success &= MR_run_test(\"")
+      write(user node.value.name)
+      write(user "\", ")
       node.value.write-cname()
       write(user ");\n")
       node := node.next
       while ? node
     if ? self.line-counts
       write(user "  MR_success &= MR_test_coverage(MR_file_coverage, ")
-      write-int(copy self.line-counts.length)
+      write-int(copy self.covered-files)
       write(user ");\n")
     write(user "  return MR_success? OK : FAIL;\n")
     write(user "}\n")
     write(user "\nTEST_MAIN_FUNC\n")
+
+
+static ModuleMembers
+  owner String name
+  owner NameMap{TypeData} type-map
+  owner NameMap{EnumData} enum-map
+  owner NameMap{SyntaxTreeVariable} variable-map
+  owner NameMap{SyntaxTreeFunction} function-map
+  
+  func inst init(user String name)
+    string-new-copy(user name):(owner self.name)
+    new NameMap{TypeData} in self.type-map
+    new NameMap{EnumData} in self.enum-map
+    new NameMap{SyntaxTreeVariable} in self.variable-map
+    new NameMap{SyntaxTreeFunction} in self.function-map
+    if ? self.name
+      glob.module-map.add(user self.name, user self)
+  
+  func inst write-prefix()
+    write-cname(user self.name)
+    write(user "_M_")
 
 
 ## Main function node in the syntax tree
@@ -294,6 +390,7 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
   
   func inst parse():(copy Char end)
     self.init()
+    self.my-module := glob.current-module
     string-new-copy(user "main"):(owner self.name)
     new FunctionArguments in self.arguments
     self.arguments.init()
@@ -340,6 +437,8 @@ class GlobalInit(SyntaxTreeFunction)
 
 static LineCount
   user String filename
+  var Int covered-index
+  var Bool needs-cover
   owner Array{Bool} line-needs-cover
   
   func inst init()

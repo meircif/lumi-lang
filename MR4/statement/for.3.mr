@@ -50,7 +50,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       else
         self.get-iterator-type():(owner type-instance)
     
-    if ? self.parent.find-variable(user self.item-name):(user self.item)
+    if ? self.parent.find-variable(user self.item-name, user _):(user self.item)
       type-instance.check-assign-to(
           copy self.item.access,
           user self.item.type-instance,

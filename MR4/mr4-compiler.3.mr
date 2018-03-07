@@ -1,16 +1,4 @@
-(## MR4 compiler main - written in MR3
-
-A work in progres...
-
-Currently only expression parsing is fully implemented, along with some global
-functionality that supports it.
-
-Expression design is documented in expression/expression.3.mr.
-
-Global notes:
-  * Because MR3 not supports constructors or class-methods, they are replaced
-    by calling instance methods directly with `_` as the self instance.
-#)
+## MR4 compiler main - written in MR3
 
 ## compiler main function!
 main func(user Array{String} argv)

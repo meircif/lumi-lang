@@ -73,7 +73,7 @@ Returncode SyntaxTreeTry_write(SyntaxTreeTry* self) {
   }
   try_depth_count += 1;
   
-  CHECK(31, (self->_base.block)->_base._base._dtl[8](self->_base.block) )
+  CHECK(31, (self->_base.block)->_base._base._dtl[9](self->_base.block) )
   
   try_depth_count -= 1;
   if (try_depth_count == 0) {
@@ -149,7 +149,7 @@ Returncode SyntaxTreeCatch_write(SyntaxTreeCatch* self) {
   CHECK(63, write(&(String){21, 20, "if (MR_err != OK) {\n"}) )
   CHECK(64, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
   CHECK(65, write(&(String){16, 15, "  MR_err = OK;\n"}) )
-  CHECK(66, (self->_base.block)->_base._base._dtl[8](self->_base.block) )
+  CHECK(66, (self->_base.block)->_base._base._dtl[9](self->_base.block) )
   CHECK(67, SyntaxTreeBlock_write_block_end(self->_base.block) )
   return OK;
 }

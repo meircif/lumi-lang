@@ -51,10 +51,11 @@ func f-is-legal-name(user String name, copy Int name-type):(copy Bool is-legal)
   else-if ch < 'a' or ch > 'z'
     return
   for n in first:name.length
+    var Char prev(ch)
     ch := name[n]
     if not ((ch >= '0' and ch <= '9') or
         (name-type != NAME-CONSTANT and ch >= 'a' and ch <= 'z') or
         (name-type != NAME-DEFAULT and ch >= 'A' and ch <= 'Z') or
-        (name-type != NAME-TYPE and ch = '-'))
+        (name-type != NAME-TYPE and ch = '-' and prev != '-'))
       return
   is-legal := true

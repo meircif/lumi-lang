@@ -78,7 +78,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     else
       is-parsed := false
   
-  func inst parse-if-common(
+  func dynamic parse-if-common(
       user String keyword,
       user TypeData parent-type,
       user SyntaxTreeBlock parent-block):(
@@ -89,10 +89,11 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     user List{SyntaxTreeVariable} variables(self.variables)
     if ? parent-block
       variables := parent-block.get-function().variables
-      if glob.is-in-testing and not keyword.equal(user "else") and
-          not keyword.equal(user "else-if")
-        parent-block.code-nodes.add(
-            owner SyntaxTreeCoverage.init-new(var _, user parent-block))
+      if ? glob.tested-module
+        if glob.current-module.name.equal(user glob.tested-module) and
+            not keyword.equal(user "else") and not keyword.equal(user "else-if")
+          parent-block.code-nodes.add(
+              owner SyntaxTreeCoverage.init-new(var _, user parent-block))
     
     if not is-parsed
       return
@@ -128,13 +129,15 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   func dynamic parse-child(user String keyword):(copy Char end)
     raise
   
-  func dynamic find-variable(user String name):(
+  func dynamic find-variable(user String name, user String module-name):(
       user SyntaxTreeVariable variable)
+    if ? base.find-variable(user name, user module-name):(user variable)
+      return
     variable := _
     user ListNode{SyntaxTreeVariable} child(self.variables.first)
     do
       while ? child
-      while not child.item.find-variable(user name):(user variable)
+      while not (? child.item.find-variable(user name, user _):(user variable))
       child := child.next
   
   func dynamic link-types()
@@ -167,7 +170,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           user variable, user type-data, user item-type-data)
     else-if ? type-data and variable.access = ACCESS-VAR
       write(user "  ")
-      write-cname(user item-type-data.name)
+      item-type-data.write-cname()
       write(user "_Del(&(self->")
       write-cname(user variable.name)
       write(user "));\n")
@@ -190,7 +193,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       if type-data.is-dynamic
         write(user "DYN_")
       write(user "SELF_REF_DEL(")
-      write-cname(user type-data.name)
+      type-data.write-cname()
       write(user ", ")
       if type-data.is-dynamic
         user TypeData base-type(type-data)
@@ -219,10 +222,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       write(user "_del(")
     else-if variable.type-instance.type-data = glob.type-array
       write(user "ARRAY_DEL(")
-      write-cname(user item-type-data.name)
+      item-type-data.write-cname()
       write(user ", ")
     else
-      write-cname(user item-type-data.name)
+      item-type-data.write-cname()
       write(user "_Del(")
     if ? type-data
       write(user "self->")
@@ -251,16 +254,6 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
             user "expected space after \"func\", got", copy end)
       self.functions.add(owner SyntaxTreeFunction.parse-new(
           var _, user parent-type):(copy end))
-  
-  func inst find-function(user String name):(user SyntaxTreeFunction function)
-    user ListNode{SyntaxTreeFunction} child(self.functions.first)
-    do
-      while ? child
-      if child.item.name.equal(user name)
-        function := child.item
-        return
-      child := child.next
-    function := _
   
   func dynamic link-types()
     base.link-types()

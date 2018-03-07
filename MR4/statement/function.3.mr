@@ -5,6 +5,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   owner List{TypeCount} aux-variables
   user TypeData parent-type
   owner String name
+  user ModuleMembers my-module
   owner FunctionArguments arguments
   user SyntaxTreeMockFunction mocker-function
   user SyntaxTreeFunction dynamic-base-method
@@ -30,6 +31,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           self.m-syntax-error(
               user "expected \"dynamic\" or \"inst\" method type, got",
               user meth-type)
+    else
+      self.my-module := glob.current-module
     self.parse-header(copy false):(copy end)
     self.parse-body():(copy end)
   
@@ -44,7 +47,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst parse-header(copy Bool is-native):(copy Char end)
     read-new(user "("):(owner self.name, copy end)
-    self.check-name()
+    self.f-register-name()
     if end != '('
       self.m-syntax-error-c(
           user "expected \"(\" after function name, got", copy end)
@@ -61,7 +64,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if ? self.parent-type
       self.arguments.add-self-parameter(user self.parent-type)
   
-  func dynamic check-name()
+  func dynamic f-register-name()
     if not f-is-legal-name(user self.name, copy NAME-DEFAULT)
       self.m-syntax-error(user "illegal function name", user self.name)
     if ? self.parent-type
@@ -75,11 +78,16 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         self.m-syntax-error(
             user "method name overrides field", user self.name)
     else
-      if ? glob.root.find-function(user self.name)
+      if ? glob.module-map.find(user self.name)
+        self.m-syntax-error(
+            user "function name overrides module", user self.name)
+      if ? glob.find-function(user self.name)
         self.m-syntax-error(user "redefinition of function", user self.name)
-      if ? glob.root.find-variable(user self.name)
+      if ? glob.find-variable(user self.name)
         self.m-syntax-error(
             user "function name overrides global variable", user self.name)
+      if ? self.my-module
+        self.my-module.function-map.add(user self.name, user self)
   
   func dynamic get-function():(user SyntaxTreeFunction function)
     function := self
@@ -119,21 +127,29 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     new-variable := variable
     self.variables.add(owner variable)
   
-  func dynamic find-variable(user String name):(
+  func dynamic find-variable(user String name, user String module-name):(
       user SyntaxTreeVariable variable)
-    base.find-variable(user name):(user variable)
-    if not (? variable)
+    if ? base.find-variable(user name, user module-name):(user variable)
+      return
+    if not (? module-name)
       self.arguments.find-variable(user name):(user variable)
-    if not (? variable)
-      glob.root.find-variable(user name):(user variable)
   
   func dynamic link-types()
+    if ? self.my-module
+      glob.current-module := self.my-module
     self.arguments.link-types()
     base.link-types()
+    if ? self.my-module
+      glob.current-module := _
   
   func dynamic analyze()
+    if ? self.my-module
+      glob.current-module := self.my-module
+      assert ? glob.current-module
     self.arguments.analyze()
     base.analyze()
+    if ? self.my-module
+      glob.current-module := _
   
   func inst m-compare(user SyntaxTreeFunction other)
     if self.is-dynamic != other.is-dynamic
@@ -198,8 +214,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst write-cname()
     if ? self.parent-type
-      write-cname(user self.parent-type.name)
+      self.parent-type.write-cname()
       write(user "_")
+    else-if ? self.my-module
+      self.my-module.write-prefix()
     write-cname(user self.name)
   
   func inst write-pointer()
@@ -320,7 +338,7 @@ class DeclarationArgument(Argument)
     # `type`[*][*] `name`
     # [, Ref_Manager*[*] `name`_Refman]
     # [, `type`_Dynamic*[*] `name`_Dynamic]
-    write-cname(user self.variable.type-instance.type-data.name)
+    self.variable.type-instance.type-data.write-cname()
     if not self.variable.type-instance.type-data.is-primitive
       write(user "*")
     if self.is-output
@@ -339,7 +357,7 @@ class DeclarationArgument(Argument)
     
     if self.variable.type-instance.type-data.is-dynamic and not self.is-native
       write(user ", ")
-      write-cname(user self.variable.type-instance.type-data.name)
+      self.variable.type-instance.type-data.write-cname()
       write(user "_Dynamic*")
       if self.is-output
         write(user "*")

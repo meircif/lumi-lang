@@ -3,6 +3,7 @@
 ## Specific usage of a type including the assigned subtypes and values
 static TypeInstance
   owner String name
+  owner String module-name
   user TypeData type-data
   owner List{TypeInstance} parameters
   owner Expression length-owner
@@ -22,6 +23,8 @@ static TypeInstance
     if ? other.name
       delete other.name
     string-new-copy(user self.name):(owner other.name)
+    if ? self.module-name
+      string-new-copy(user self.module-name):(owner other.module-name)
     other.length := self.length
     if ? self.parameters
       new List{TypeInstance} in other.parameters
@@ -39,8 +42,12 @@ static TypeInstance
       user SyntaxTreeCode code-node):(
       copy Char end)
     user String name
-    read-until(user string-new-concat(user ends, user "{"), copy false):(
+    read-until(user string-new-concat(user ends, user ".{"), copy false):(
         user name, copy end)
+    if end = '.'
+      string-new-copy(user name):(owner self.module-name)
+      read-until(user string-new-concat(user ends, user "{"), copy false):(
+          user name, copy end)
     self.parse-name(user name, user node, user code-node):(copy end)
   
   func inst parse-name(
@@ -112,7 +119,8 @@ static TypeInstance
       copy Bool constant-length)
     if check-types
       if not (? self.type-data)
-        node.find-type(user self.name):(user self.type-data)
+        node.find-type(user self.name, user self.module-name):(
+            user self.type-data)
       if ? self.arguments
         self.arguments.link-types()
     if check-length
