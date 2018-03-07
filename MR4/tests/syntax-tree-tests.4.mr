@@ -38,6 +38,8 @@ main
   x := 7
 ## @ tg t7
 var String{12} s
+func fun()
+  s := _
 ## @-
 module second
 test dummy()
@@ -745,9 +747,14 @@ func fun0()
   for n in 3
     x += y
 ## @-
-module second
-test fun1()
+module ut
+func fun1()
+  fun0()
+test fun2()
+  fun1()
 ## @ tg tt1
+func fun()
+  var Int x
 main
 ## @-
 module second
@@ -1517,6 +1524,8 @@ test dummy()
 native type Native
 native var Int x
 native func external()
+func fun()
+  x := 0
 ## @-
 module second
 test use()

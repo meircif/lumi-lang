@@ -57,9 +57,9 @@ struct Global {
   Int input_file_index;
   Int line_number;
 /* test functions list */  NameMap* test_functions;
+  String* tested_module;
   Bool is_new_mocked;
   Bool is_delete_mocked;
-  Bool is_in_testing;
 /* input reading state */  String* input_buffer;
   Char input_end;
   Int input_spaces;
@@ -91,10 +91,10 @@ Returncode Global_init(Global* self) {
   self->save_input = false;
   self->is_new_mocked = false;
   self->is_delete_mocked = false;
-  self->is_in_testing = false;
+  self->tested_module = NULL;
   self->root = malloc(sizeof(SyntaxTreeRoot));
   if (self->root == NULL) RAISE(81)
-  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false};
+  *self->root = (SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   self->root->_base._base._base._base._dtl = SyntaxTreeRoot__dtl;
   CHECK(82, SyntaxTreeRoot_init(self->root) )
   self->builtins = malloc(sizeof(GlobalNodes));
@@ -537,7 +537,7 @@ Returncode Global_find_function(Global* self, String* name, SyntaxTreeFunction**
 #if MR_STAGE == MR_DECLARATIONS
 extern Global* glob;
 #elif MR_STAGE == MR_FUNCTIONS
-Global* glob = &(Global){NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, false, false, false, NULL, '\0', 0, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+Global* glob = &(Global){NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, false, false, NULL, '\0', 0, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 #endif
 
 #undef MR_FILE_NAME

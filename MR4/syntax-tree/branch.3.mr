@@ -89,10 +89,11 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     user List{SyntaxTreeVariable} variables(self.variables)
     if ? parent-block
       variables := parent-block.get-function().variables
-      if glob.is-in-testing and not keyword.equal(user "else") and
-          not keyword.equal(user "else-if")
-        parent-block.code-nodes.add(
-            owner SyntaxTreeCoverage.init-new(var _, user parent-block))
+      if ? glob.tested-module
+        if glob.current-module.name.equal(user glob.tested-module) and
+            not keyword.equal(user "else") and not keyword.equal(user "else-if")
+          parent-block.code-nodes.add(
+              owner SyntaxTreeCoverage.init-new(var _, user parent-block))
     
     if not is-parsed
       return

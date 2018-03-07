@@ -565,14 +565,9 @@ int MR_file1_line_count[392] = {
    0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1, 0,-1,
   -1, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0,-1
 };
-int MR_file2_line_count[31] = {
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,-1,
-  -1, 0,-1,-1, 0,-1
-};
-File_Coverage MR_file_coverage[3] = {
+File_Coverage MR_file_coverage[2] = {
   {"tests/integration-test0.4.mr", 563, MR_file0_line_count},
-  {"tests/integration-test1.4.mr", 392, MR_file1_line_count},
-  {"tests/integration-test2.4.mr", 31, MR_file2_line_count}
+  {"tests/integration-test1.4.mr", 392, MR_file1_line_count}
 };
 
 
@@ -1196,9 +1191,7 @@ void integration_M_BaseType_Del(integration_M_BaseType* self) {
 #define MR_FUNC_NAME "MiddleType.new"
 Returncode covered_M_MiddleType_new(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic) {
   Returncode MR_err = OK;
-  ++MR_file_coverage[2].line_count[14];
   CHECK(14, integration_M_BaseType_new(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  ++MR_file_coverage[2].line_count[15];
   if (self == NULL) RAISE(15, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
   self->num_mid = 2;
@@ -1216,7 +1209,6 @@ Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* s
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   MR_inc_ref(s_Refman);
-  ++MR_file_coverage[2].line_count[18];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(18, 38, "insufficient memory for managed object")
@@ -1224,7 +1216,6 @@ Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* s
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "MiddleType.meth1";
   CHECK(18, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-  ++MR_file_coverage[2].line_count[19];
   CHECK(19, integration_M_BaseType_meth1(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
@@ -1241,7 +1232,6 @@ Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* s
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  ++MR_file_coverage[2].line_count[22];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
@@ -1249,7 +1239,6 @@ Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* s
   aux_String_0_Var.length = 16;
   aux_String_0_Var.values = "MiddleType.meth2";
   CHECK(22, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-  ++MR_file_coverage[2].line_count[23];
   CHECK(23, integration_M_BaseType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 MR_cleanup:
   MR_dec_ref(aux_String_0_Refman);
@@ -1265,7 +1254,6 @@ Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* s
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  ++MR_file_coverage[2].line_count[26];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(26, 38, "insufficient memory for managed object")
@@ -1288,7 +1276,6 @@ Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* s
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   MR_inc_ref(s_Refman);
-  ++MR_file_coverage[2].line_count[29];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = MR_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(29, 38, "insufficient memory for managed object")
@@ -5784,7 +5771,7 @@ USER_MAIN_HEADER {
   MR_success &= MR_run_test("test-assert-error-message", integration_M_test_assert_error_message);
   MR_success &= MR_run_test("test-cover-all", integration_M_test_cover_all);
   MR_success &= MR_run_test("test-constants", integration_M_test_constants);
-  MR_success &= MR_test_coverage(MR_file_coverage, 3);
+  MR_success &= MR_test_coverage(MR_file_coverage, 2);
   return MR_success? OK : FAIL;
 }
 

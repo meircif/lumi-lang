@@ -54,8 +54,8 @@ struct SyntaxTreeRoot {
   SyntaxTreeMainFunction* main_function;
   GlobalInit* global_init;
   Array* line_counts;
+  Int covered_files;
   Bool is_library;
-  Bool testing;
 /*  write C file in this order:
   1. type declarations
   2. type structs (ordered by depth)
@@ -96,56 +96,70 @@ Returncode SyntaxTreeRoot_parse(SyntaxTreeRoot* self, Array* argv);
 static char* _func_name_SyntaxTreeRoot_parse = "SyntaxTreeRoot.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_parse
 Returncode SyntaxTreeRoot_parse(SyntaxTreeRoot* self, Array* argv) {
-  if (argv->length < 3) {
-    CHECK(33, print(&(String){59, 58, "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...\n"}) )
-    RAISE(34)
-  }
-  
-  Int tested_files = 0;
-  {int n; for (n = (2); n < (argv->length); ++n) {
-    if ((n) < 0 || (n) >= (argv)->length) RAISE(38)
-    Bool _Bool104;
-    CHECK(38, String_equal((&(((String*)((argv)->values))[n])), &(String){6, 5, "-test"}, &(_Bool104)) )
-    if (_Bool104) {
-      self->testing = true;
-      if (!(false)) break;
-    }
-    tested_files += 1;
-  }}
-  if (self->testing && tested_files > 0) {
-    self->line_counts = _new_array(tested_files, sizeof(LineCount));
-    if (self->line_counts == NULL) RAISE(43)
-    glob->is_in_testing = true;
-  }
-  
-  if ((1) < 0 || (1) >= (argv)->length) RAISE(46)
-  self->output_file_name = (&(((String*)((argv)->values))[1]));
-  {int n; for (n = (2); n < (argv->length); ++n) {
-    if ((n) < 0 || (n) >= (argv)->length) RAISE(48)
-    glob->input_file_name = (&(((String*)((argv)->values))[n]));
-    Bool _Bool105;
-    CHECK(49, String_equal(glob->input_file_name, &(String){6, 5, "-test"}, &(_Bool105)) )
-    if (_Bool105) {
-      glob->is_in_testing = false;
+  Int first_file_index = 0;
+  Int arg_test_index = -1;
+  Int input_files_number = 0;
+  {int n; for (n = (1); n < (argv->length); ++n) {
+    if ((n) < 0 || (n) >= (argv)->length) RAISE(36)
+    String* arg = (&(((String*)((argv)->values))[n]));
+    if (arg_test_index == n - 1) {
+      CHECK(38, string_new_copy(arg, &(glob->tested_module)) )
     }
     else {
-      glob->input_file_index = n - 2;
+      Bool _Bool106;
+      CHECK(39, String_equal(arg, &(String){3, 2, "-t"}, &(_Bool106)) )
+      Bool _Bool107;
+      CHECK(39, String_equal(arg, &(String){7, 6, "--test"}, &(_Bool107)) )
+      if (_Bool106 || _Bool107) {
+        arg_test_index = n;
+      }
+      else {
+        if (first_file_index == 0) {
+          first_file_index = n;
+        }
+        else {
+          input_files_number += 1;
+        }
+      }
+    }
+  }}
+  
+  if (input_files_number == 0 || arg_test_index == argv->length - 1) {
+    CHECK(47, print(&(String){39, 38, "usage: mr-4compiler [-t TESTED-MODULE]"}) )
+    CHECK(48, print(&(String){40, 39, " OUTPUT-C-FILE-NAME INPUT-MR4-FILES...\n"}) )
+    RAISE(49)
+  }
+  
+  if (NULL != glob->tested_module) {
+    self->line_counts = _new_array(input_files_number, sizeof(LineCount));
+    if (self->line_counts == NULL) RAISE(52)
+  }
+  
+  if ((first_file_index) < 0 || (first_file_index) >= (argv)->length) RAISE(54)
+  self->output_file_name = (&(((String*)((argv)->values))[first_file_index]));
+  input_files_number = 0;
+  {int n; for (n = (first_file_index + 1); n < (argv->length); ++n) {
+    if (n > (arg_test_index + 1) || n < arg_test_index) {
+      if ((n) < 0 || (n) >= (argv)->length) RAISE(58)
+      glob->input_file_name = (&(((String*)((argv)->values))[n]));
+      glob->input_file_index = input_files_number;
+      input_files_number += 1;
       glob->line_number = 1;
       glob->current_module = NULL;
-      CHECK(55, file_open(glob->input_file_name, true, &(glob->input_file)) )
+      CHECK(63, file_open(glob->input_file_name, true, &(glob->input_file)) )
       
-      Char _Char106;
-      CHECK(57, SyntaxTreeBranch_parse_children(&(self->_base._base._base), NULL, NULL, &(_Char106)) )
+      Char _Char108;
+      CHECK(65, SyntaxTreeBranch_parse_children(&(self->_base._base._base), NULL, NULL, &(_Char108)) )
       
       if (glob->input_buffer->length > 0 || glob->input_spaces > 0) {
-        CHECK(60, SyntaxTreeNode_set_location(&(self->_base._base._base._base)) )
-        CHECK(61, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){28, 27, "no new-line before file end"}) )
+        CHECK(68, SyntaxTreeNode_set_location(&(self->_base._base._base._base)) )
+        CHECK(69, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){28, 27, "no new-line before file end"}) )
       }
       
-      CHECK(63, file_close(glob->input_file) )
-      if (glob->is_in_testing) {
-        if ((n - 2) < 0 || (n - 2) >= (self->line_counts)->length) RAISE(65)
-        CHECK(65, LineCount_init((&(((LineCount*)((self->line_counts)->values))[n - 2]))) )
+      CHECK(71, file_close(glob->input_file) )
+      if (NULL != self->line_counts) {
+        if ((glob->input_file_index) < 0 || (glob->input_file_index) >= (self->line_counts)->length) RAISE(73)
+        CHECK(73, LineCount_init((&(((LineCount*)((self->line_counts)->values))[glob->input_file_index]))) )
       }
     }
   }}
@@ -164,47 +178,47 @@ static char* _func_name_SyntaxTreeRoot_parse_if_common = "SyntaxTreeRoot.parse-i
 Returncode SyntaxTreeRoot_parse_if_common(SyntaxTreeRoot* self, String* keyword, TypeData* parent_type, SyntaxTreeBlock* parent_block, Char* end, Bool* is_parsed) {
   (*is_parsed) = false;
   if (!(NULL != glob->current_module)) {
-    Bool _Bool107;
-    CHECK(78, String_equal(keyword, &(String){7, 6, "module"}, &(_Bool107)) )
-    if (_Bool107) {
+    Bool _Bool109;
+    CHECK(86, String_equal(keyword, &(String){7, 6, "module"}, &(_Bool109)) )
+    if (_Bool109) {
       if ((*end) != ' ') {
-        CHECK(80, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){35, 34, "expected space after \"module\", got"}, (*end)) )
+        CHECK(88, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){35, 34, "expected space after \"module\", got"}, (*end)) )
       }
       String* name = NULL;
-      Int _Int108;
-      CHECK(83, read_until(&(String){1, 0, ""}, false, &(name), &((*end)), &(_Int108)) )
-      Bool _Bool109;
-      CHECK(84, f_is_legal_name(name, NAME_DEFAULT, &(_Bool109)) )
-      if (!_Bool109) {
-        CHECK(85, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){20, 19, "illegal module name"}, name) )
+      Int _Int110;
+      CHECK(91, read_until(&(String){1, 0, ""}, false, &(name), &((*end)), &(_Int110)) )
+      Bool _Bool111;
+      CHECK(92, f_is_legal_name(name, NAME_DEFAULT, &(_Bool111)) )
+      if (!_Bool111) {
+        CHECK(93, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){20, 19, "illegal module name"}, name) )
       }
-      SyntaxTreeVariable* _SyntaxTreeVariable110;
-      CHECK(86, NameMap_find(glob->global_module->variable_map, name, (void**)&(_SyntaxTreeVariable110)) )
-      if (NULL != _SyntaxTreeVariable110) {
-        CHECK(87, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){31, 30, "module name overrides variable"}, name) )
+      SyntaxTreeVariable* _SyntaxTreeVariable112;
+      CHECK(94, NameMap_find(glob->global_module->variable_map, name, (void**)&(_SyntaxTreeVariable112)) )
+      if (NULL != _SyntaxTreeVariable112) {
+        CHECK(95, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){31, 30, "module name overrides variable"}, name) )
       }
-      SyntaxTreeFunction* _SyntaxTreeFunction111;
-      CHECK(88, NameMap_find(glob->global_module->function_map, name, (void**)&(_SyntaxTreeFunction111)) )
-      if (NULL != _SyntaxTreeFunction111) {
-        CHECK(89, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){31, 30, "module name overrides function"}, name) )
+      SyntaxTreeFunction* _SyntaxTreeFunction113;
+      CHECK(96, NameMap_find(glob->global_module->function_map, name, (void**)&(_SyntaxTreeFunction113)) )
+      if (NULL != _SyntaxTreeFunction113) {
+        CHECK(97, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){31, 30, "module name overrides function"}, name) )
       }
-      CHECK(90, NameMap_find(glob->module_map, name, (void**)&(glob->current_module)) )
+      CHECK(98, NameMap_find(glob->module_map, name, (void**)&(glob->current_module)) )
       if (!(NULL != glob->current_module)) {
         ModuleMembers* module_members = malloc(sizeof(ModuleMembers));
-        if (module_members == NULL) RAISE(91)
+        if (module_members == NULL) RAISE(99)
         *module_members = (ModuleMembers){NULL, NULL, NULL, NULL, NULL};
-        CHECK(92, ModuleMembers_init(module_members, name) )
+        CHECK(100, ModuleMembers_init(module_members, name) )
         glob->current_module = module_members;
-        CHECK(94, List_add(self->modules, module_members) )
+        CHECK(102, List_add(self->modules, module_members) )
       }
       (*is_parsed) = true;
       return OK;
     }
     else {
-      CHECK(98, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){26, 25, "no \"module\" in file start"}, keyword) )
+      CHECK(106, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){26, 25, "no \"module\" in file start"}, keyword) )
     }
   }
-  CHECK(99, SyntaxTreeBranch_parse_if_common(&(self->_base._base._base), keyword, parent_type, parent_block, &((*end)), &((*is_parsed))) )
+  CHECK(107, SyntaxTreeBranch_parse_if_common(&(self->_base._base._base), keyword, parent_type, parent_block, &((*end)), &((*is_parsed))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -215,105 +229,105 @@ Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Cha
 static char* _func_name_SyntaxTreeRoot_parse_child = "SyntaxTreeRoot.parse-child";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_parse_child
 Returncode SyntaxTreeRoot_parse_child(SyntaxTreeRoot* self, String* keyword, Char* end) {
-  Bool _Bool112;
-  CHECK(103, SyntaxTreeNamespace_parse_if_function(&(self->_base._base), keyword, NULL, &((*end)), &(_Bool112)) )
-  if (_Bool112) {
+  Bool _Bool114;
+  CHECK(111, SyntaxTreeNamespace_parse_if_function(&(self->_base._base), keyword, NULL, &((*end)), &(_Bool114)) )
+  if (_Bool114) {
     return OK;
   }
   
-  Bool _Bool113;
-  CHECK(106, String_equal(keyword, &(String){6, 5, "const"}, &(_Bool113)) )
-  if (_Bool113) {
+  Bool _Bool115;
+  CHECK(114, String_equal(keyword, &(String){6, 5, "const"}, &(_Bool115)) )
+  if (_Bool115) {
     if ((*end) != ' ') {
-      CHECK(108, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){34, 33, "expected space after \"const\", got"}, (*end)) )
+      CHECK(116, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){34, 33, "expected space after \"const\", got"}, (*end)) )
     }
-    SyntaxTreeConstant* _SyntaxTreeConstant114;
-    CHECK(110, SyntaxTreeConstant_parse_new(NULL, &((*end)), &(_SyntaxTreeConstant114)) )
-    CHECK(110, List_add(self->_base._base._base.variables, &(_SyntaxTreeConstant114->_base)) )
+    SyntaxTreeConstant* _SyntaxTreeConstant116;
+    CHECK(118, SyntaxTreeConstant_parse_new(NULL, &((*end)), &(_SyntaxTreeConstant116)) )
+    CHECK(118, List_add(self->_base._base._base.variables, &(_SyntaxTreeConstant116->_base)) )
     
   }
   else {
-    Bool _Bool115;
-    CHECK(112, String_equal(keyword, &(String){7, 6, "struct"}, &(_Bool115)) )
-    if (_Bool115) {
+    Bool _Bool117;
+    CHECK(120, String_equal(keyword, &(String){7, 6, "struct"}, &(_Bool117)) )
+    if (_Bool117) {
       if ((*end) != ' ') {
-        CHECK(114, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){35, 34, "expected space after \"struct\", got"}, (*end)) )
+        CHECK(122, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){35, 34, "expected space after \"struct\", got"}, (*end)) )
       }
-      TypeData* _TypeData116;
-      CHECK(116, TypeData_parse_new(NULL, false, &((*end)), &(_TypeData116)) )
-      CHECK(116, List_add(self->_base.types, _TypeData116) )
+      TypeData* _TypeData118;
+      CHECK(124, TypeData_parse_new(NULL, false, &((*end)), &(_TypeData118)) )
+      CHECK(124, List_add(self->_base.types, _TypeData118) )
       
     }
     else {
-      Bool _Bool117;
-      CHECK(118, String_equal(keyword, &(String){6, 5, "class"}, &(_Bool117)) )
-      if (_Bool117) {
+      Bool _Bool119;
+      CHECK(126, String_equal(keyword, &(String){6, 5, "class"}, &(_Bool119)) )
+      if (_Bool119) {
         if ((*end) != ' ') {
-          CHECK(120, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){34, 33, "expected space after \"class\", got"}, (*end)) )
+          CHECK(128, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){34, 33, "expected space after \"class\", got"}, (*end)) )
         }
-        TypeData* _TypeData118;
-        CHECK(122, TypeData_parse_new(NULL, true, &((*end)), &(_TypeData118)) )
-        CHECK(122, List_add(self->_base.types, _TypeData118) )
+        TypeData* _TypeData120;
+        CHECK(130, TypeData_parse_new(NULL, true, &((*end)), &(_TypeData120)) )
+        CHECK(130, List_add(self->_base.types, _TypeData120) )
         
       }
       else {
-        Bool _Bool119;
-        CHECK(124, String_equal(keyword, &(String){5, 4, "enum"}, &(_Bool119)) )
-        if (_Bool119) {
+        Bool _Bool121;
+        CHECK(132, String_equal(keyword, &(String){5, 4, "enum"}, &(_Bool121)) )
+        if (_Bool121) {
           if ((*end) != ' ') {
-            CHECK(126, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){33, 32, "expected space after \"enum\", got"}, (*end)) )
+            CHECK(134, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){33, 32, "expected space after \"enum\", got"}, (*end)) )
           }
-          EnumData* _EnumData120;
-          CHECK(128, EnumData_parse_new(NULL, &((*end)), &(_EnumData120)) )
-          CHECK(128, List_add(self->enums, _EnumData120) )
+          EnumData* _EnumData122;
+          CHECK(136, EnumData_parse_new(NULL, &((*end)), &(_EnumData122)) )
+          CHECK(136, List_add(self->enums, _EnumData122) )
           
         }
         else {
-          Bool _Bool121;
-          CHECK(130, String_equal(keyword, &(String){5, 4, "main"}, &(_Bool121)) )
-          if (_Bool121) {
+          Bool _Bool123;
+          CHECK(138, String_equal(keyword, &(String){5, 4, "main"}, &(_Bool123)) )
+          if (_Bool123) {
             if ((*end) != '\n') {
-              CHECK(132, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){36, 35, "expected new-line after \"main\", got"}, (*end)) )
+              CHECK(140, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){36, 35, "expected new-line after \"main\", got"}, (*end)) )
             }
-            CHECK(134, SyntaxTreeMainFunction_parse_new(NULL, &((*end)), &(self->main_function)) )
+            CHECK(142, SyntaxTreeMainFunction_parse_new(NULL, &((*end)), &(self->main_function)) )
             
           }
           else {
-            Bool _Bool122;
-            CHECK(137, String_equal(keyword, &(String){7, 6, "native"}, &(_Bool122)) )
-            if (_Bool122) {
+            Bool _Bool124;
+            CHECK(145, String_equal(keyword, &(String){7, 6, "native"}, &(_Bool124)) )
+            if (_Bool124) {
               if ((*end) != ' ') {
-                CHECK(139, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){35, 34, "expected space after \"native\", got"}, (*end)) )
+                CHECK(147, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){35, 34, "expected space after \"native\", got"}, (*end)) )
               }
-              CHECK(141, parse_native(self, &((*end))) )
+              CHECK(149, parse_native(self, &((*end))) )
               
             }
             else {
-              Bool _Bool123;
-              CHECK(143, String_equal(keyword, &(String){5, 4, "test"}, &(_Bool123)) )
-              if (_Bool123) {
+              Bool _Bool125;
+              CHECK(151, String_equal(keyword, &(String){5, 4, "test"}, &(_Bool125)) )
+              if (_Bool125) {
                 if ((*end) != ' ') {
-                  CHECK(145, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){33, 32, "expected space after \"test\", got"}, (*end)) )
+                  CHECK(153, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){33, 32, "expected space after \"test\", got"}, (*end)) )
                 }
-                SyntaxTreeTestFunction* _SyntaxTreeTestFunction124;
-                CHECK(147, SyntaxTreeTestFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeTestFunction124)) )
-                CHECK(147, List_add(self->_base._base.functions, &(_SyntaxTreeTestFunction124->_base)) )
+                SyntaxTreeTestFunction* _SyntaxTreeTestFunction126;
+                CHECK(155, SyntaxTreeTestFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeTestFunction126)) )
+                CHECK(155, List_add(self->_base._base.functions, &(_SyntaxTreeTestFunction126->_base)) )
                 
               }
               else {
-                Bool _Bool125;
-                CHECK(150, String_equal(keyword, &(String){5, 4, "mock"}, &(_Bool125)) )
-                if (_Bool125) {
+                Bool _Bool127;
+                CHECK(158, String_equal(keyword, &(String){5, 4, "mock"}, &(_Bool127)) )
+                if (_Bool127) {
                   if ((*end) != ' ') {
-                    CHECK(152, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){33, 32, "expected space after \"mock\", got"}, (*end)) )
+                    CHECK(160, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base._base), &(String){33, 32, "expected space after \"mock\", got"}, (*end)) )
                   }
-                  SyntaxTreeMockFunction* _SyntaxTreeMockFunction126;
-                  CHECK(154, SyntaxTreeMockFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeMockFunction126)) )
-                  CHECK(154, List_add(self->_base._base.functions, &(_SyntaxTreeMockFunction126->_base)) )
+                  SyntaxTreeMockFunction* _SyntaxTreeMockFunction128;
+                  CHECK(162, SyntaxTreeMockFunction_parse_new(NULL, &((*end)), &(_SyntaxTreeMockFunction128)) )
+                  CHECK(162, List_add(self->_base._base.functions, &(_SyntaxTreeMockFunction128->_base)) )
                   
                 }
                 else {
-                  CHECK(158, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){16, 15, "unknown keyword"}, keyword) )
+                  CHECK(166, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){16, 15, "unknown keyword"}, keyword) )
                 }
               }
             }
@@ -332,7 +346,7 @@ Returncode SyntaxTreeRoot_link_types(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_link_types = "SyntaxTreeRoot.link-types";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_link_types
 Returncode SyntaxTreeRoot_link_types(SyntaxTreeRoot* self) {
-  RAISE(161)
+  RAISE(169)
 }
 #undef MR_FUNC_NAME
 #endif
@@ -342,34 +356,37 @@ Returncode SyntaxTreeRoot_analyze(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_analyze = "SyntaxTreeRoot.analyze";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_analyze
 Returncode SyntaxTreeRoot_analyze(SyntaxTreeRoot* self) {
-  CHECK(164, SyntaxTreeRoot_m_order_types(self) )
-  CHECK(165, SyntaxTreeNamespace_link_types(&(self->_base._base)) )
-  CHECK(166, SyntaxTreeNode_link_children_types(&(self->_base._base._base._base), self->_base.types) )
-  CHECK(167, (self->global_init)->_base._base._base._base._dtl[1](self->global_init) )
+  CHECK(172, SyntaxTreeRoot_m_order_types(self) )
+  CHECK(173, SyntaxTreeNamespace_link_types(&(self->_base._base)) )
+  CHECK(174, SyntaxTreeNode_link_children_types(&(self->_base._base._base._base), self->_base.types) )
+  CHECK(175, (self->global_init)->_base._base._base._base._dtl[1](self->global_init) )
   if (NULL != self->main_function) {
-    CHECK(169, (self->main_function)->_base._base._base._base._dtl[1](self->main_function) )
+    CHECK(177, (self->main_function)->_base._base._base._base._dtl[1](self->main_function) )
   }
-  CHECK(170, SyntaxTreeNamespace_analyze(&(self->_base._base)) )
-  CHECK(171, SyntaxTreeNode_analyze_children(&(self->_base._base._base._base), self->_base.types) )
-  CHECK(172, (self->global_init)->_base._base._base._base._dtl[2](self->global_init) )
-  if (self->testing) {
+  CHECK(178, SyntaxTreeNamespace_analyze(&(self->_base._base)) )
+  CHECK(179, SyntaxTreeNode_analyze_children(&(self->_base._base._base._base), self->_base.types) )
+  CHECK(180, (self->global_init)->_base._base._base._base._dtl[2](self->global_init) )
+  if (NULL != glob->tested_module) {
     if (!(NULL != glob->test_functions->first)) {
-      CHECK(175, print(&(String){39, 38, "General code error: no test functions\n"}) )
-      RAISE(176)
+      CHECK(183, print(&(String){39, 38, "General code error: no test functions\n"}) )
+      RAISE(184)
     }
   }
   else {
     if (NULL != self->main_function) {
-      CHECK(178, (self->main_function)->_base._base._base._base._dtl[2](self->main_function) )
+      CHECK(186, (self->main_function)->_base._base._base._base._dtl[2](self->main_function) )
     }
     else {
       if (!self->is_library) {
-        CHECK(180, print(&(String){38, 37, "General code error: no main function\n"}) )
-        RAISE(181)
+        CHECK(188, print(&(String){38, 37, "General code error: no main function\n"}) )
+        RAISE(189)
       }
     }
   }
-  CHECK(182, SyntaxTreeNode_m_order_children_constants(&(self->_base._base._base._base), self->_base._base._base.variables, self->constants) )
+  CHECK(190, SyntaxTreeNode_m_order_children_constants(&(self->_base._base._base._base), self->_base._base._base.variables, self->constants) )
+  if (NULL != self->line_counts) {
+    CHECK(192, SyntaxTreeRoot_analyze_cover(self) )
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -381,16 +398,50 @@ static char* _func_name_SyntaxTreeRoot_m_order_types = "SyntaxTreeRoot.m-order-t
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_m_order_types
 Returncode SyntaxTreeRoot_m_order_types(SyntaxTreeRoot* self) {
   List* ordered_list = malloc(sizeof(List));
-  if (ordered_list == NULL) RAISE(185)
+  if (ordered_list == NULL) RAISE(195)
   *ordered_list = (List){NULL, NULL};
   while (true) {
     TypeData* type_data = NULL;
-    CHECK(188, List_pop(self->_base.types, (void**)&(type_data)) )
+    CHECK(198, List_pop(self->_base.types, (void**)&(type_data)) )
     if (!(NULL != type_data)) break;
-    CHECK(190, TypeData_m_order_bases(type_data, ordered_list) )
+    CHECK(200, TypeData_m_order_bases(type_data, ordered_list) )
   }
   free(self->_base.types);
   self->_base.types = ordered_list;
+  return OK;
+}
+#undef MR_FUNC_NAME
+#endif
+#if MR_STAGE == MR_DECLARATIONS
+Returncode SyntaxTreeRoot_analyze_cover(SyntaxTreeRoot* self);
+#elif MR_STAGE == MR_FUNCTIONS
+static char* _func_name_SyntaxTreeRoot_analyze_cover = "SyntaxTreeRoot.analyze-cover";
+#define MR_FUNC_NAME _func_name_SyntaxTreeRoot_analyze_cover
+Returncode SyntaxTreeRoot_analyze_cover(SyntaxTreeRoot* self) {
+  ModuleMembers* _ModuleMembers129;
+  CHECK(205, NameMap_find(glob->module_map, glob->tested_module, (void**)&(_ModuleMembers129)) )
+  if (!(NULL != _ModuleMembers129)) {
+    CHECK(206, print(&(String){44, 43, "General code error: unknown tested module \""}) )
+    CHECK(207, print(glob->tested_module) )
+    CHECK(208, print(&(String){3, 2, "\"\n"}) )
+    RAISE(209)
+  }
+  Int covered_index = 0;
+  {int n; for (n = (0); n < (self->line_counts->length); ++n) {
+    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(212)
+    LineCount* line_count = (&(((LineCount*)((self->line_counts)->values))[n]));
+    if (line_count->needs_cover) {
+      line_count->covered_index = covered_index;
+      covered_index += 1;
+    }
+  }}
+  self->covered_files = covered_index;
+  if (self->covered_files == 0) {
+    CHECK(218, print(&(String){51, 50, "General code error: no code to test under module \""}) )
+    CHECK(219, print(glob->tested_module) )
+    CHECK(220, print(&(String){3, 2, "\"\n"}) )
+    RAISE(221)
+  }
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -408,77 +459,77 @@ Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_write = "SyntaxTreeRoot.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write
 Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self) {
-  CHECK(203, file_open(self->output_file_name, false, &(glob->output_file)) )
+  CHECK(232, file_open(self->output_file_name, false, &(glob->output_file)) )
   
-  CHECK(205, write_global(&(String){19, 18, "#include \"mr.4.h\"\n"}) )
+  CHECK(234, write_global(&(String){19, 18, "#include \"mr.4.h\"\n"}) )
   
-  CHECK(207, write_global(&(String){27, 26, "\n\n/* types declaration */\n"}) )
+  CHECK(236, write_global(&(String){27, 26, "\n\n/* types declaration */\n"}) )
   TypeDeclarationWriter* type_declaration_writer = &(TypeDeclarationWriter){TypeDeclarationWriter__dtl};
   type_declaration_writer->_base._dtl = TypeDeclarationWriter__dtl;
-  CHECK(209, SyntaxTreeRoot_write_for_type(self, &(type_declaration_writer->_base)) )
+  CHECK(238, SyntaxTreeRoot_write_for_type(self, &(type_declaration_writer->_base)) )
   
   /* will write Enums */
-  CHECK(212, write_global(&(String){15, 14, "\n\n/* Enums */\n"}) )
-  CHECK(213, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->enums) )
+  CHECK(241, write_global(&(String){15, 14, "\n\n/* Enums */\n"}) )
+  CHECK(242, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->enums) )
   
   /* will write constants */
-  CHECK(216, write_global(&(String){19, 18, "\n\n/* constants */\n"}) )
-  CHECK(217, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->constants) )
+  CHECK(245, write_global(&(String){19, 18, "\n\n/* constants */\n"}) )
+  CHECK(246, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->constants) )
   
   /* will write type structures */
-  CHECK(220, write_global(&(String){22, 21, "\n\n/* types struct */\n"}) )
-  CHECK(221, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base.types) )
+  CHECK(249, write_global(&(String){22, 21, "\n\n/* types struct */\n"}) )
+  CHECK(250, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base.types) )
   
-  CHECK(223, write_global(&(String){35, 34, "\n\n/* types methods declaration */\n"}) )
+  CHECK(252, write_global(&(String){35, 34, "\n\n/* types methods declaration */\n"}) )
   TypeMethodsDeclarationWriter* type_methods_declaration_writer = &(TypeMethodsDeclarationWriter){TypeMethodsDeclarationWriter__dtl};
   type_methods_declaration_writer->_base._dtl = TypeMethodsDeclarationWriter__dtl;
-  CHECK(225, SyntaxTreeRoot_write_for_type(self, &(type_methods_declaration_writer->_base)) )
+  CHECK(254, SyntaxTreeRoot_write_for_type(self, &(type_methods_declaration_writer->_base)) )
   
-  CHECK(227, write_global(&(String){38, 37, "\n\n/* global functions declaration */\n"}) )
-  CHECK(228, SyntaxTreeNamespace_write_functions_declaration(&(self->_base._base)) )
+  CHECK(256, write_global(&(String){38, 37, "\n\n/* global functions declaration */\n"}) )
+  CHECK(257, SyntaxTreeNamespace_write_functions_declaration(&(self->_base._base)) )
   
-  CHECK(230, write_global(&(String){32, 31, "\n\n/* types global variables */\n"}) )
+  CHECK(259, write_global(&(String){32, 31, "\n\n/* types global variables */\n"}) )
   TypeGlobalWriter* type_global_writer = &(TypeGlobalWriter){TypeGlobalWriter__dtl};
   type_global_writer->_base._dtl = TypeGlobalWriter__dtl;
-  CHECK(232, SyntaxTreeRoot_write_for_type(self, &(type_global_writer->_base)) )
+  CHECK(261, SyntaxTreeRoot_write_for_type(self, &(type_global_writer->_base)) )
   
   /* will write global variables */
-  CHECK(235, write_global(&(String){26, 25, "\n\n/* global variables */\n"}) )
-  CHECK(236, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
+  CHECK(264, write_global(&(String){26, 25, "\n\n/* global variables */\n"}) )
+  CHECK(265, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
   
   if (NULL != self->line_counts) {
-    CHECK(239, SyntaxTreeRoot_write_test_coverage_data(self) )
+    CHECK(268, SyntaxTreeRoot_write_test_coverage_data(self) )
   }
   
-  CHECK(241, write_global(&(String){28, 27, "\n\n/* types methods body */\n"}) )
+  CHECK(270, write_global(&(String){28, 27, "\n\n/* types methods body */\n"}) )
   TypeMethodsBodyWriter* type_methods_body_writer = &(TypeMethodsBodyWriter){TypeMethodsBodyWriter__dtl};
   type_methods_body_writer->_base._dtl = TypeMethodsBodyWriter__dtl;
-  CHECK(243, SyntaxTreeRoot_write_for_type(self, &(type_methods_body_writer->_base)) )
+  CHECK(272, SyntaxTreeRoot_write_for_type(self, &(type_methods_body_writer->_base)) )
   
   /* will write global functions bodies */
-  CHECK(246, write_global(&(String){31, 30, "\n\n/* global functions body */\n"}) )
-  CHECK(247, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base.functions) )
+  CHECK(275, write_global(&(String){31, 30, "\n\n/* global functions body */\n"}) )
+  CHECK(276, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base.functions) )
   
   /* write main function */
-  if (self->testing ||  NULL !=  self->main_function) {
+  if (NULL != glob->tested_module ||  NULL !=  self->main_function) {
     if (!glob->is_new_mocked) {
-      CHECK(252, write(&(String){61, 60, "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }"}) )
+      CHECK(281, write(&(String){61, 60, "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }"}) )
     }
     if (!glob->is_delete_mocked) {
-      CHECK(255, write(&(String){50, 49, "\n\nReturncode delete_Mock(Ref self) { return OK; }"}) )
+      CHECK(284, write(&(String){50, 49, "\n\nReturncode delete_Mock(Ref self) { return OK; }"}) )
     }
   }
-  if (self->testing) {
-    CHECK(257, SyntaxTreeRoot_write_test_main(self) )
+  if (NULL != glob->tested_module) {
+    CHECK(286, SyntaxTreeRoot_write_test_main(self) )
   }
   else {
     if (NULL != self->main_function) {
-      CHECK(259, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
-      CHECK(260, (self->main_function)->_base._base._base._base._dtl[4](self->main_function) )
+      CHECK(288, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
+      CHECK(289, (self->main_function)->_base._base._base._base._dtl[4](self->main_function) )
     }
   }
   
-  CHECK(262, file_close(glob->output_file) )
+  CHECK(291, file_close(glob->output_file) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -492,7 +543,7 @@ Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, TypeWriter* type_
   ListNode* child = self->_base.types->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(268, (((TypeData*)(child->item)))->_base._base._base._dtl[12](((TypeData*)(child->item)), type_writer) )
+    CHECK(297, (((TypeData*)(child->item)))->_base._base._base._dtl[12](((TypeData*)(child->item)), type_writer) )
     child = child->next;
   }
   return OK;
@@ -506,53 +557,57 @@ static char* _func_name_SyntaxTreeRoot_write_test_coverage_data = "SyntaxTreeRoo
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write_test_coverage_data
 Returncode SyntaxTreeRoot_write_test_coverage_data(SyntaxTreeRoot* self) {
   {int n; for (n = (0); n < (self->line_counts->length); ++n) {
-    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(273)
+    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(302)
     LineCount* line_count = (&(((LineCount*)((self->line_counts)->values))[n]));
-    CHECK(274, write(&(String){13, 12, "\nint MR_file"}) )
-    CHECK(275, write_int(n) )
-    CHECK(276, write(&(String){13, 12, "_line_count["}) )
-    CHECK(277, write_int(line_count->line_needs_cover->length) )
-    CHECK(278, write(&(String){9, 8, "] = {\n  "}) )
-    Int mod = 0;
-    {int i; for (i = (0); i < (line_count->line_needs_cover->length); ++i) {
-      if (i > 0) {
-        CHECK(282, write(&(String){2, 1, ","}) )
-      }
-      if (mod == 25) {
-        CHECK(284, write(&(String){4, 3, "\n  "}) )
-        mod = 1;
-      }
-      else {
-        mod += 1;
-      }
-      if ((i) < 0 || (i) >= (line_count->line_needs_cover)->length) RAISE(288)
-      if ((((Bool*)((line_count->line_needs_cover)->values))[i])) {
-        CHECK(289, write(&(String){3, 2, " 0"}) )
-      }
-      else {
-        CHECK(291, write(&(String){3, 2, "-1"}) )
-      }
-    }}
-    CHECK(292, write(&(String){4, 3, "\n};"}) )
-  }}
-  CHECK(293, write(&(String){33, 32, "\nFile_Coverage MR_file_coverage["}) )
-  CHECK(294, write_int(self->line_counts->length) )
-  CHECK(295, write(&(String){6, 5, "] = {"}) )
-  {int n; for (n = (0); n < (self->line_counts->length); ++n) {
-    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(297)
-    LineCount* line_count = (&(((LineCount*)((self->line_counts)->values))[n]));
-    if (n > 0) {
-      CHECK(299, write(&(String){2, 1, ","}) )
+    if (line_count->needs_cover) {
+      CHECK(304, write(&(String){13, 12, "\nint MR_file"}) )
+      CHECK(305, write_int(line_count->covered_index) )
+      CHECK(306, write(&(String){13, 12, "_line_count["}) )
+      CHECK(307, write_int(line_count->line_needs_cover->length) )
+      CHECK(308, write(&(String){9, 8, "] = {\n  "}) )
+      Int mod = 0;
+      {int i; for (i = (0); i < (line_count->line_needs_cover->length); ++i) {
+        if (i > 0) {
+          CHECK(312, write(&(String){2, 1, ","}) )
+        }
+        if (mod == 25) {
+          CHECK(314, write(&(String){4, 3, "\n  "}) )
+          mod = 1;
+        }
+        else {
+          mod += 1;
+        }
+        if ((i) < 0 || (i) >= (line_count->line_needs_cover)->length) RAISE(318)
+        if ((((Bool*)((line_count->line_needs_cover)->values))[i])) {
+          CHECK(319, write(&(String){3, 2, " 0"}) )
+        }
+        else {
+          CHECK(321, write(&(String){3, 2, "-1"}) )
+        }
+      }}
+      CHECK(322, write(&(String){4, 3, "\n};"}) )
     }
-    CHECK(300, write(&(String){6, 5, "\n  {\""}) )
-    CHECK(301, write(line_count->filename) )
-    CHECK(302, write(&(String){4, 3, "\", "}) )
-    CHECK(303, write_int(line_count->line_needs_cover->length) )
-    CHECK(304, write(&(String){10, 9, ", MR_file"}) )
-    CHECK(305, write_int(n) )
-    CHECK(306, write(&(String){13, 12, "_line_count}"}) )
   }}
-  CHECK(307, write(&(String){5, 4, "\n};\n"}) )
+  CHECK(323, write(&(String){33, 32, "\nFile_Coverage MR_file_coverage["}) )
+  CHECK(324, write_int(self->covered_files) )
+  CHECK(325, write(&(String){6, 5, "] = {"}) )
+  {int n; for (n = (0); n < (self->line_counts->length); ++n) {
+    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(327)
+    LineCount* line_count = (&(((LineCount*)((self->line_counts)->values))[n]));
+    if (line_count->needs_cover) {
+      if (line_count->covered_index > 0) {
+        CHECK(330, write(&(String){2, 1, ","}) )
+      }
+      CHECK(331, write(&(String){6, 5, "\n  {\""}) )
+      CHECK(332, write(line_count->filename) )
+      CHECK(333, write(&(String){4, 3, "\", "}) )
+      CHECK(334, write_int(line_count->line_needs_cover->length) )
+      CHECK(335, write(&(String){10, 9, ", MR_file"}) )
+      CHECK(336, write_int(line_count->covered_index) )
+      CHECK(337, write(&(String){13, 12, "_line_count}"}) )
+    }
+  }}
+  CHECK(338, write(&(String){5, 4, "\n};\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -563,29 +618,29 @@ Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_write_test_main = "SyntaxTreeRoot.write-test-main";
 #define MR_FUNC_NAME _func_name_SyntaxTreeRoot_write_test_main
 Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self) {
-  CHECK(310, write(&(String){21, 20, "\nUSER_MAIN_HEADER {\n"}) )
-  CHECK(311, write(&(String){27, 26, "  Bool MR_success = true;\n"}) )
-  CHECK(312, (self->global_init)->_base._base._base._base._dtl[4](self->global_init) )
-  CHECK(313, write(&(String){2, 1, "\n"}) )
+  CHECK(341, write(&(String){21, 20, "\nUSER_MAIN_HEADER {\n"}) )
+  CHECK(342, write(&(String){27, 26, "  Bool MR_success = true;\n"}) )
+  CHECK(343, (self->global_init)->_base._base._base._base._dtl[4](self->global_init) )
+  CHECK(344, write(&(String){2, 1, "\n"}) )
   NameMapNode* node = glob->test_functions->first;
   while (true) {
     /* MR_success &= MR_run_test("`test-func.name`", `test-func`); */
-    CHECK(317, write(&(String){30, 29, "  MR_success &= MR_run_test(\""}) )
-    CHECK(318, write(((SyntaxTreeTestFunction*)(node->value))->_base.name) )
-    CHECK(319, write(&(String){4, 3, "\", "}) )
-    CHECK(320, SyntaxTreeFunction_write_cname(&(((SyntaxTreeTestFunction*)(node->value))->_base)) )
-    CHECK(321, write(&(String){4, 3, ");\n"}) )
+    CHECK(348, write(&(String){30, 29, "  MR_success &= MR_run_test(\""}) )
+    CHECK(349, write(((SyntaxTreeTestFunction*)(node->value))->_base.name) )
+    CHECK(350, write(&(String){4, 3, "\", "}) )
+    CHECK(351, SyntaxTreeFunction_write_cname(&(((SyntaxTreeTestFunction*)(node->value))->_base)) )
+    CHECK(352, write(&(String){4, 3, ");\n"}) )
     node = node->next;
     if (!(NULL != node)) break;
   }
   if (NULL != self->line_counts) {
-    CHECK(325, write(&(String){52, 51, "  MR_success &= MR_test_coverage(MR_file_coverage, "}) )
-    CHECK(326, write_int(self->line_counts->length) )
-    CHECK(327, write(&(String){4, 3, ");\n"}) )
+    CHECK(356, write(&(String){52, 51, "  MR_success &= MR_test_coverage(MR_file_coverage, "}) )
+    CHECK(357, write_int(self->covered_files) )
+    CHECK(358, write(&(String){4, 3, ");\n"}) )
   }
-  CHECK(328, write(&(String){33, 32, "  return MR_success? OK : FAIL;\n"}) )
-  CHECK(329, write(&(String){3, 2, "}\n"}) )
-  CHECK(330, write(&(String){17, 16, "\nTEST_MAIN_FUNC\n"}) )
+  CHECK(359, write(&(String){33, 32, "  return MR_success? OK : FAIL;\n"}) )
+  CHECK(360, write(&(String){3, 2, "}\n"}) )
+  CHECK(361, write(&(String){17, 16, "\nTEST_MAIN_FUNC\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -615,21 +670,21 @@ Returncode ModuleMembers_init(ModuleMembers* self, String* name);
 static char* _func_name_ModuleMembers_init = "ModuleMembers.init";
 #define MR_FUNC_NAME _func_name_ModuleMembers_init
 Returncode ModuleMembers_init(ModuleMembers* self, String* name) {
-  CHECK(341, string_new_copy(name, &(self->name)) )
+  CHECK(372, string_new_copy(name, &(self->name)) )
   self->type_map = malloc(sizeof(NameMap));
-  if (self->type_map == NULL) RAISE(342)
+  if (self->type_map == NULL) RAISE(373)
   *self->type_map = (NameMap){NULL, NULL};
   self->enum_map = malloc(sizeof(NameMap));
-  if (self->enum_map == NULL) RAISE(343)
+  if (self->enum_map == NULL) RAISE(374)
   *self->enum_map = (NameMap){NULL, NULL};
   self->variable_map = malloc(sizeof(NameMap));
-  if (self->variable_map == NULL) RAISE(344)
+  if (self->variable_map == NULL) RAISE(375)
   *self->variable_map = (NameMap){NULL, NULL};
   self->function_map = malloc(sizeof(NameMap));
-  if (self->function_map == NULL) RAISE(345)
+  if (self->function_map == NULL) RAISE(376)
   *self->function_map = (NameMap){NULL, NULL};
   if (NULL != self->name) {
-    CHECK(347, NameMap_add(glob->module_map, self->name, self) )
+    CHECK(378, NameMap_add(glob->module_map, self->name, self) )
   }
   return OK;
 }
@@ -641,8 +696,8 @@ Returncode ModuleMembers_write_prefix(ModuleMembers* self);
 static char* _func_name_ModuleMembers_write_prefix = "ModuleMembers.write-prefix";
 #define MR_FUNC_NAME _func_name_ModuleMembers_write_prefix
 Returncode ModuleMembers_write_prefix(ModuleMembers* self) {
-  CHECK(350, write_cname(self->name) )
-  CHECK(351, write(&(String){4, 3, "_M_"}) )
+  CHECK(381, write_cname(self->name) )
+  CHECK(382, write(&(String){4, 3, "_M_"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -664,10 +719,10 @@ static char* _func_name_SyntaxTreeMainFunction_parse_new = "SyntaxTreeMainFuncti
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse_new
 Returncode SyntaxTreeMainFunction_parse_new(SyntaxTreeMainFunction* self, Char* end, SyntaxTreeMainFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMainFunction));
-  if ((*new_node) == NULL) RAISE(357)
+  if ((*new_node) == NULL) RAISE(388)
   *(*new_node) = (SyntaxTreeMainFunction){SyntaxTreeMainFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMainFunction__dtl;
-  CHECK(358, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
+  CHECK(389, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -678,15 +733,15 @@ Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end)
 static char* _func_name_SyntaxTreeMainFunction_parse = "SyntaxTreeMainFunction.parse";
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse
 Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end) {
-  CHECK(361, SyntaxTreeFunction_init(&(self->_base)) )
+  CHECK(392, SyntaxTreeFunction_init(&(self->_base)) )
   self->_base.my_module = glob->current_module;
-  CHECK(363, string_new_copy(&(String){5, 4, "main"}, &(self->_base.name)) )
+  CHECK(394, string_new_copy(&(String){5, 4, "main"}, &(self->_base.name)) )
   self->_base.arguments = malloc(sizeof(FunctionArguments));
-  if (self->_base.arguments == NULL) RAISE(364)
+  if (self->_base.arguments == NULL) RAISE(395)
   *self->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   self->_base.arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(365, FunctionArguments_init(self->_base.arguments) )
-  CHECK(366, SyntaxTreeFunction_parse_body(&(self->_base), &((*end))) )
+  CHECK(396, FunctionArguments_init(self->_base.arguments) )
+  CHECK(397, SyntaxTreeFunction_parse_body(&(self->_base), &((*end))) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -701,10 +756,10 @@ Returncode SyntaxTreeMainFunction_write(SyntaxTreeMainFunction* self) {
   /*   `block...` */
   /* } */
   /* MAIN_FUNC */
-  CHECK(373, write(&(String){18, 17, "\nUSER_MAIN_HEADER"}) )
-  CHECK(374, SyntaxTreeFunction_write_block(&(self->_base)) )
-  CHECK(375, write_post_func() )
-  CHECK(376, write(&(String){12, 11, "\nMAIN_FUNC\n"}) )
+  CHECK(404, write(&(String){18, 17, "\nUSER_MAIN_HEADER"}) )
+  CHECK(405, SyntaxTreeFunction_write_block(&(self->_base)) )
+  CHECK(406, write_post_func() )
+  CHECK(407, write(&(String){12, 11, "\nMAIN_FUNC\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -715,10 +770,10 @@ Returncode SyntaxTreeMainFunction_write_block_body(SyntaxTreeMainFunction* self)
 static char* _func_name_SyntaxTreeMainFunction_write_block_body = "SyntaxTreeMainFunction.write-block-body";
 #define MR_FUNC_NAME _func_name_SyntaxTreeMainFunction_write_block_body
 Returncode SyntaxTreeMainFunction_write_block_body(SyntaxTreeMainFunction* self) {
-  CHECK(379, (glob->root->global_init)->_base._base._base._base._dtl[4](glob->root->global_init) )
-  CHECK(380, write_pre_func(&(self->_base)) )
-  CHECK(381, write(&(String){2, 1, "\n"}) )
-  CHECK(382, SyntaxTreeBlock_write_block_body(&(self->_base._base)) )
+  CHECK(410, (glob->root->global_init)->_base._base._base._base._dtl[4](glob->root->global_init) )
+  CHECK(411, write_pre_func(&(self->_base)) )
+  CHECK(412, write(&(String){2, 1, "\n"}) )
+  CHECK(413, SyntaxTreeBlock_write_block_body(&(self->_base._base)) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -744,18 +799,18 @@ Returncode GlobalInit_init(GlobalInit* self);
 static char* _func_name_GlobalInit_init = "GlobalInit.init";
 #define MR_FUNC_NAME _func_name_GlobalInit_init
 Returncode GlobalInit_init(GlobalInit* self) {
-  CHECK(387, SyntaxTreeFunction_init(&(self->_base)) )
+  CHECK(418, SyntaxTreeFunction_init(&(self->_base)) )
   self->_base._base.code_nodes = malloc(sizeof(List));
-  if (self->_base._base.code_nodes == NULL) RAISE(388)
+  if (self->_base._base.code_nodes == NULL) RAISE(419)
   *self->_base._base.code_nodes = (List){NULL, NULL};
   self->_base._base._base.variables = malloc(sizeof(List));
-  if (self->_base._base._base.variables == NULL) RAISE(389)
+  if (self->_base._base._base.variables == NULL) RAISE(420)
   *self->_base._base._base.variables = (List){NULL, NULL};
   self->_base.arguments = malloc(sizeof(FunctionArguments));
-  if (self->_base.arguments == NULL) RAISE(390)
+  if (self->_base.arguments == NULL) RAISE(421)
   *self->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   self->_base.arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(391, FunctionArguments_init(self->_base.arguments) )
+  CHECK(422, FunctionArguments_init(self->_base.arguments) )
   self->_base._base._base.indentation_spaces = 2;
   return OK;
 }
@@ -770,14 +825,14 @@ Returncode GlobalInit_write(GlobalInit* self) {
   if (!(NULL != self->_base._base.code_nodes->first)) {
     return OK;
   }
-  CHECK(397, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
-  CHECK(398, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
-  CHECK(399, write(&(String){43, 42, "#define RETURN_ERROR(value) return value;\n"}) )
-  CHECK(400, write(&(String){55, 54, "#define MR_FUNC_NAME \"global variable initialization\"\n"}) )
-  CHECK(401, (self)->_base._base._base._base._dtl[9](self) )
-  CHECK(402, write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}) )
-  CHECK(403, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
-  CHECK(404, write(&(String){60, 59, "#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup"}) )
+  CHECK(428, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
+  CHECK(429, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
+  CHECK(430, write(&(String){43, 42, "#define RETURN_ERROR(value) return value;\n"}) )
+  CHECK(431, write(&(String){55, 54, "#define MR_FUNC_NAME \"global variable initialization\"\n"}) )
+  CHECK(432, (self)->_base._base._base._base._dtl[9](self) )
+  CHECK(433, write(&(String){21, 20, "#undef MR_FUNC_NAME\n"}) )
+  CHECK(434, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
+  CHECK(435, write(&(String){60, 59, "#define RETURN_ERROR(value) MR_err = value; goto MR_cleanup"}) )
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -795,6 +850,8 @@ typedef struct LineCount LineCount;
 #elif MR_STAGE == MR_TYPES(0)
 struct LineCount {
   String* filename;
+  Int covered_index;
+  Bool needs_cover;
   Array* line_needs_cover;
 };
 #endif
@@ -806,7 +863,7 @@ static char* _func_name_LineCount_init = "LineCount.init";
 Returncode LineCount_init(LineCount* self) {
   self->filename = glob->input_file_name;
   self->line_needs_cover = _new_array(glob->line_number + 1, sizeof(Bool));
-  if (self->line_needs_cover == NULL) RAISE(413)
+  if (self->line_needs_cover == NULL) RAISE(446)
   return OK;
 }
 #undef MR_FUNC_NAME
@@ -820,7 +877,7 @@ Returncode write_global(String* text);
 static char* _func_name_write_global = "write-global";
 #define MR_FUNC_NAME _func_name_write_global
 Returncode write_global(String* text) {
-  CHECK(418, write(text) )
+  CHECK(451, write(text) )
   return OK;
 }
 #undef MR_FUNC_NAME

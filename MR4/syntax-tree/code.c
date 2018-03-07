@@ -413,7 +413,8 @@ static char* _func_name_SyntaxTreeCoverage_analyze = "SyntaxTreeCoverage.analyze
 Returncode SyntaxTreeCoverage_analyze(SyntaxTreeCoverage* self) {
   if ((self->input_file_index) < 0 || (self->input_file_index) >= (glob->root->line_counts)->length) RAISE(146)
   LineCount* line_count = (&(((LineCount*)((glob->root->line_counts)->values))[self->input_file_index]));
-  if ((self->_base._base.line_number) < 0 || (self->_base._base.line_number) >= (line_count->line_needs_cover)->length) RAISE(147)
+  line_count->needs_cover = true;
+  if ((self->_base._base.line_number) < 0 || (self->_base._base.line_number) >= (line_count->line_needs_cover)->length) RAISE(148)
   (((Bool*)((line_count->line_needs_cover)->values))[self->_base._base.line_number]) = true;
   return OK;
 }
@@ -425,13 +426,14 @@ Returncode SyntaxTreeCoverage_write(SyntaxTreeCoverage* self);
 static char* _func_name_SyntaxTreeCoverage_write = "SyntaxTreeCoverage.write";
 #define MR_FUNC_NAME _func_name_SyntaxTreeCoverage_write
 Returncode SyntaxTreeCoverage_write(SyntaxTreeCoverage* self) {
-  /* ++MR_file_coverage[`file-index`].line_count[`line-number`]; */
-  CHECK(151, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(152, write(&(String){20, 19, "++MR_file_coverage["}) )
-  CHECK(153, write_int(self->input_file_index) )
-  CHECK(154, write(&(String){14, 13, "].line_count["}) )
-  CHECK(155, write_int(self->_base._base.line_number) )
-  CHECK(156, write(&(String){4, 3, "];\n"}) )
+  /* ++MR_file_coverage[`covered-index`].line_count[`line-number`]; */
+  CHECK(152, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(153, write(&(String){20, 19, "++MR_file_coverage["}) )
+  if ((self->input_file_index) < 0 || (self->input_file_index) >= (glob->root->line_counts)->length) RAISE(154)
+  CHECK(154, write_int((&(((LineCount*)((glob->root->line_counts)->values))[self->input_file_index]))->covered_index) )
+  CHECK(155, write(&(String){14, 13, "].line_count["}) )
+  CHECK(156, write_int(self->_base._base.line_number) )
+  CHECK(157, write(&(String){4, 3, "];\n"}) )
   return OK;
 }
 #undef MR_FUNC_NAME

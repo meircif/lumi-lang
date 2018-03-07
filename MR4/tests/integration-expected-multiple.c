@@ -3,14 +3,6 @@
 
 /* types declaration */
 
-typedef struct integration_M_BaseType integration_M_BaseType;
-
-typedef struct integration_M_BaseType_Dynamic integration_M_BaseType_Dynamic;
-
-typedef struct covered_M_MiddleType covered_M_MiddleType;
-
-typedef struct covered_M_MiddleType_Dynamic covered_M_MiddleType_Dynamic;
-
 typedef struct integration_M_TestStruct integration_M_TestStruct;
 
 typedef struct integration_M_TestClass integration_M_TestClass;
@@ -34,6 +26,14 @@ typedef struct integration_M_ComplexField integration_M_ComplexField;
 typedef struct integration_M_ComplexField_Dynamic integration_M_ComplexField_Dynamic;
 
 typedef struct integration_M_HasComplexField integration_M_HasComplexField;
+
+typedef struct integration_M_BaseType integration_M_BaseType;
+
+typedef struct integration_M_BaseType_Dynamic integration_M_BaseType_Dynamic;
+
+typedef struct covered_M_MiddleType covered_M_MiddleType;
+
+typedef struct covered_M_MiddleType_Dynamic covered_M_MiddleType_Dynamic;
 
 typedef struct integration_M_TopType integration_M_TopType;
 
@@ -72,41 +72,6 @@ enum { integration_M_LENGTH = integration_M_SIZE * 5 };
 
 
 /* types struct */
-
-struct integration_M_BaseType {
-  Int num_base;
-  covered_M_MiddleType* base_mid_ref;
-  Ref_Manager* base_mid_ref_Refman;
-  covered_M_MiddleType_Dynamic* base_mid_ref_Dynamic;
-  integration_M_TopType* base_top_ref;
-  Ref_Manager* base_top_ref_Refman;
-  integration_M_TopType_Dynamic* base_top_ref_Dynamic;
-};
-
-struct integration_M_BaseType_Dynamic {
-  Dynamic_Del _del;
-  Returncode (*meth0)(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
-  Returncode (*meth1)(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-  Returncode (*meth2)(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
-  Returncode (*meth3)(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-};
-
-struct covered_M_MiddleType {
-  integration_M_BaseType _base;
-  Int num_mid;
-  integration_M_BaseType* mid_base_ref;
-  Ref_Manager* mid_base_ref_Refman;
-  integration_M_BaseType_Dynamic* mid_base_ref_Dynamic;
-  integration_M_TopType* mid_top_ref;
-  Ref_Manager* mid_top_ref_Refman;
-  integration_M_TopType_Dynamic* mid_top_ref_Dynamic;
-};
-
-struct covered_M_MiddleType_Dynamic {
-  integration_M_BaseType_Dynamic _base;
-  Returncode (*meth4)(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic);
-  Returncode (*meth5)(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-};
 
 struct integration_M_TestStruct {
   Int num;
@@ -185,6 +150,41 @@ struct integration_M_HasComplexField {
   integration_M_ComplexField x;
 };
 
+struct integration_M_BaseType {
+  Int num_base;
+  covered_M_MiddleType* base_mid_ref;
+  Ref_Manager* base_mid_ref_Refman;
+  covered_M_MiddleType_Dynamic* base_mid_ref_Dynamic;
+  integration_M_TopType* base_top_ref;
+  Ref_Manager* base_top_ref_Refman;
+  integration_M_TopType_Dynamic* base_top_ref_Dynamic;
+};
+
+struct integration_M_BaseType_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth0)(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
+  Returncode (*meth1)(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+  Returncode (*meth2)(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
+  Returncode (*meth3)(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+};
+
+struct covered_M_MiddleType {
+  integration_M_BaseType _base;
+  Int num_mid;
+  integration_M_BaseType* mid_base_ref;
+  Ref_Manager* mid_base_ref_Refman;
+  integration_M_BaseType_Dynamic* mid_base_ref_Dynamic;
+  integration_M_TopType* mid_top_ref;
+  Ref_Manager* mid_top_ref_Refman;
+  integration_M_TopType_Dynamic* mid_top_ref_Dynamic;
+};
+
+struct covered_M_MiddleType_Dynamic {
+  integration_M_BaseType_Dynamic _base;
+  Returncode (*meth4)(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic);
+  Returncode (*meth5)(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+};
+
 struct integration_M_TopType {
   covered_M_MiddleType _base;
   Int num_top;
@@ -239,30 +239,6 @@ struct integration_M_RefNode {
 
 /* types methods declaration */
 
-Returncode integration_M_BaseType_new(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
-
-Returncode integration_M_BaseType_meth0(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
-
-Returncode integration_M_BaseType_meth1(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-
-Returncode integration_M_BaseType_meth2(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
-
-Returncode integration_M_BaseType_meth3(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-
-void integration_M_BaseType_Del(integration_M_BaseType* self);
-
-Returncode covered_M_MiddleType_new(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic);
-
-Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-
-Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic);
-
-Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic);
-
-Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
-
-void covered_M_MiddleType_Del(covered_M_MiddleType* self);
-
 Returncode integration_M_TestStruct_new(integration_M_TestStruct* self, Ref_Manager* self_Refman, Int x, String* s, Ref_Manager* s_Refman);
 
 Returncode integration_M_TestStruct_get(integration_M_TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman);
@@ -316,6 +292,30 @@ void integration_M_ComplexField_Del(integration_M_ComplexField* self);
 Returncode integration_M_HasComplexField_run(integration_M_HasComplexField* self, Ref_Manager* self_Refman);
 
 void integration_M_HasComplexField_Del(integration_M_HasComplexField* self);
+
+Returncode integration_M_BaseType_new(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
+
+Returncode integration_M_BaseType_meth0(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
+
+Returncode integration_M_BaseType_meth1(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+
+Returncode integration_M_BaseType_meth2(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic);
+
+Returncode integration_M_BaseType_meth3(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+
+void integration_M_BaseType_Del(integration_M_BaseType* self);
+
+Returncode covered_M_MiddleType_new(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic);
+
+Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+
+Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic);
+
+Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic);
+
+Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman);
+
+void covered_M_MiddleType_Del(covered_M_MiddleType* self);
 
 Returncode integration_M_TopType_new(integration_M_TopType* self, Ref_Manager* self_Refman, integration_M_TopType_Dynamic* self_Dynamic);
 
@@ -457,10 +457,6 @@ Returncode integration_M_test_constants(void);
 
 /* types global variables */
 
-integration_M_BaseType_Dynamic integration_M_BaseType_dynamic = {(Dynamic_Del)integration_M_BaseType_Del, integration_M_BaseType_meth0, integration_M_BaseType_meth1, integration_M_BaseType_meth2, integration_M_BaseType_meth3};
-
-covered_M_MiddleType_Dynamic covered_M_MiddleType_dynamic = {{(Dynamic_Del)covered_M_MiddleType_Del, integration_M_BaseType_meth0, (Func)covered_M_MiddleType_meth1, (Func)covered_M_MiddleType_meth2, integration_M_BaseType_meth3}, covered_M_MiddleType_meth4, covered_M_MiddleType_meth5};
-
 Generic_Type_Dynamic integration_M_TestStruct_dynamic = {(Dynamic_Del)integration_M_TestStruct_Del};
 
 integration_M_TestClass_Dynamic integration_M_TestClass_dynamic = {(Dynamic_Del)integration_M_TestClass_Del, integration_M_TestClass_dynamic_meth_Mock};
@@ -480,6 +476,10 @@ Generic_Type_Dynamic integration_M_ContainerIterator_dynamic = {(Dynamic_Del)int
 integration_M_ComplexField_Dynamic integration_M_ComplexField_dynamic = {(Dynamic_Del)integration_M_ComplexField_Del, integration_M_ComplexField_meth};
 
 Generic_Type_Dynamic integration_M_HasComplexField_dynamic = {(Dynamic_Del)integration_M_HasComplexField_Del};
+
+integration_M_BaseType_Dynamic integration_M_BaseType_dynamic = {(Dynamic_Del)integration_M_BaseType_Del, integration_M_BaseType_meth0, integration_M_BaseType_meth1, integration_M_BaseType_meth2, integration_M_BaseType_meth3};
+
+covered_M_MiddleType_Dynamic covered_M_MiddleType_dynamic = {{(Dynamic_Del)covered_M_MiddleType_Del, integration_M_BaseType_meth0, (Func)covered_M_MiddleType_meth1, (Func)covered_M_MiddleType_meth2, integration_M_BaseType_meth3}, covered_M_MiddleType_meth4, covered_M_MiddleType_meth5};
 
 integration_M_TopType_Dynamic integration_M_TopType_dynamic = {{{(Dynamic_Del)integration_M_TopType_Del, integration_M_BaseType_meth0, (Func)covered_M_MiddleType_meth1, (Func)integration_M_TopType_meth2, (Func)integration_M_TopType_meth3}, covered_M_MiddleType_meth4, (Func)integration_M_TopType_meth5}, integration_M_TopType_meth6};
 
@@ -532,232 +532,6 @@ File_Coverage MR_file_coverage[1] = {
 
 
 /* types methods body */
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.new"
-Returncode integration_M_BaseType_new(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  if (self == NULL) RAISE(50, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(50, 38, "used member of outdated weak reference")
-  self->num_base = 1;
-MR_cleanup:
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.meth0"
-Returncode integration_M_BaseType_meth0(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(53, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 15;
-  aux_String_0_Var.length = 14;
-  aux_String_0_Var.values = "BaseType.meth0";
-  CHECK(53, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.meth1"
-Returncode integration_M_BaseType_meth1(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  MR_inc_ref(s_Refman);
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(56, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 15;
-  aux_String_0_Var.length = 14;
-  aux_String_0_Var.values = "BaseType.meth1";
-  CHECK(56, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  MR_dec_ref(s_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.meth2"
-Returncode integration_M_BaseType_meth2(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(59, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 15;
-  aux_String_0_Var.length = 14;
-  aux_String_0_Var.values = "BaseType.meth2";
-  CHECK(59, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test1.4.mr"
-#define MR_FUNC_NAME "BaseType.meth3"
-Returncode integration_M_BaseType_meth3(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  MR_inc_ref(s_Refman);
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(62, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 15;
-  aux_String_0_Var.length = 14;
-  aux_String_0_Var.values = "BaseType.meth3";
-  CHECK(62, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  MR_dec_ref(s_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-void integration_M_BaseType_Del(integration_M_BaseType* self) {
-  if (self == NULL) return;
-  MR_dec_ref(self->base_top_ref_Refman);
-  MR_dec_ref(self->base_mid_ref_Refman);
-}
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.new"
-Returncode covered_M_MiddleType_new(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  ++MR_file_coverage[0].line_count[14];
-  CHECK(14, integration_M_BaseType_new(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  ++MR_file_coverage[0].line_count[15];
-  if (self == NULL) RAISE(15, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
-  self->num_mid = 2;
-MR_cleanup:
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.meth1"
-Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  MR_inc_ref(s_Refman);
-  ++MR_file_coverage[0].line_count[18];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(18, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 17;
-  aux_String_0_Var.length = 16;
-  aux_String_0_Var.values = "MiddleType.meth1";
-  CHECK(18, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-  ++MR_file_coverage[0].line_count[19];
-  CHECK(19, integration_M_BaseType_meth1(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  MR_dec_ref(s_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.meth2"
-Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  ++MR_file_coverage[0].line_count[22];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 17;
-  aux_String_0_Var.length = 16;
-  aux_String_0_Var.values = "MiddleType.meth2";
-  CHECK(22, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-  ++MR_file_coverage[0].line_count[23];
-  CHECK(23, integration_M_BaseType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.meth4"
-Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  ++MR_file_coverage[0].line_count[26];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(26, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 17;
-  aux_String_0_Var.length = 16;
-  aux_String_0_Var.values = "MiddleType.meth4";
-  CHECK(26, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-#define MR_FILE_NAME "tests/integration-test2.4.mr"
-#define MR_FUNC_NAME "MiddleType.meth5"
-Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
-  Returncode MR_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  MR_inc_ref(s_Refman);
-  ++MR_file_coverage[0].line_count[29];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = MR_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(29, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 17;
-  aux_String_0_Var.length = 16;
-  aux_String_0_Var.values = "MiddleType.meth5";
-  CHECK(29, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
-MR_cleanup:
-  MR_dec_ref(aux_String_0_Refman);
-  MR_dec_ref(s_Refman);
-  return MR_err;
-}
-#undef MR_FILE_NAME
-#undef MR_FUNC_NAME
-
-void covered_M_MiddleType_Del(covered_M_MiddleType* self) {
-  if (self == NULL) return;
-  integration_M_BaseType_Del(&(self->_base));
-  MR_dec_ref(self->mid_top_ref_Refman);
-  MR_dec_ref(self->mid_base_ref_Refman);
-}
 
 #define MR_FILE_NAME "tests/integration-test0.4.mr"
 #define MR_FUNC_NAME "TestStruct.new"
@@ -1223,6 +997,232 @@ MR_cleanup:
 void integration_M_HasComplexField_Del(integration_M_HasComplexField* self) {
   if (self == NULL) return;
   integration_M_ComplexField_Del(&(self->x));
+}
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.new"
+Returncode integration_M_BaseType_new(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  if (self == NULL) RAISE(50, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(50, 38, "used member of outdated weak reference")
+  self->num_base = 1;
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.meth0"
+Returncode integration_M_BaseType_meth0(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(53, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 15;
+  aux_String_0_Var.length = 14;
+  aux_String_0_Var.values = "BaseType.meth0";
+  CHECK(53, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.meth1"
+Returncode integration_M_BaseType_meth1(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(56, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 15;
+  aux_String_0_Var.length = 14;
+  aux_String_0_Var.values = "BaseType.meth1";
+  CHECK(56, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.meth2"
+Returncode integration_M_BaseType_meth2(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(59, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 15;
+  aux_String_0_Var.length = 14;
+  aux_String_0_Var.values = "BaseType.meth2";
+  CHECK(59, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test1.4.mr"
+#define MR_FUNC_NAME "BaseType.meth3"
+Returncode integration_M_BaseType_meth3(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(62, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 15;
+  aux_String_0_Var.length = 14;
+  aux_String_0_Var.values = "BaseType.meth3";
+  CHECK(62, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+void integration_M_BaseType_Del(integration_M_BaseType* self) {
+  if (self == NULL) return;
+  MR_dec_ref(self->base_top_ref_Refman);
+  MR_dec_ref(self->base_mid_ref_Refman);
+}
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.new"
+Returncode covered_M_MiddleType_new(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  ++MR_file_coverage[0].line_count[14];
+  CHECK(14, integration_M_BaseType_new(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  ++MR_file_coverage[0].line_count[15];
+  if (self == NULL) RAISE(15, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
+  self->num_mid = 2;
+MR_cleanup:
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.meth1"
+Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  ++MR_file_coverage[0].line_count[18];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(18, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "MiddleType.meth1";
+  CHECK(18, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[0].line_count[19];
+  CHECK(19, integration_M_BaseType_meth1(&(self->_base), self_Refman, &(self_Dynamic->_base), n, s, s_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.meth2"
+Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[0].line_count[22];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "MiddleType.meth2";
+  CHECK(22, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+  ++MR_file_coverage[0].line_count[23];
+  CHECK(23, integration_M_BaseType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.meth4"
+Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  ++MR_file_coverage[0].line_count[26];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(26, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "MiddleType.meth4";
+  CHECK(26, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+#define MR_FILE_NAME "tests/integration-test2.4.mr"
+#define MR_FUNC_NAME "MiddleType.meth5"
+Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic, Int n, String* s, Ref_Manager* s_Refman) {
+  Returncode MR_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  MR_inc_ref(s_Refman);
+  ++MR_file_coverage[0].line_count[29];
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = MR_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(29, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 17;
+  aux_String_0_Var.length = 16;
+  aux_String_0_Var.values = "MiddleType.meth5";
+  CHECK(29, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
+MR_cleanup:
+  MR_dec_ref(aux_String_0_Refman);
+  MR_dec_ref(s_Refman);
+  return MR_err;
+}
+#undef MR_FILE_NAME
+#undef MR_FUNC_NAME
+
+void covered_M_MiddleType_Del(covered_M_MiddleType* self) {
+  if (self == NULL) return;
+  integration_M_BaseType_Del(&(self->_base));
+  MR_dec_ref(self->mid_top_ref_Refman);
+  MR_dec_ref(self->mid_base_ref_Refman);
 }
 
 #define MR_FILE_NAME "tests/integration-test1.4.mr"

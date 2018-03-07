@@ -19,36 +19,36 @@ static char* _func_name_parse_native = "parse-native";
 #define MR_FUNC_NAME _func_name_parse_native
 Returncode parse_native(SyntaxTreeRoot* root, Char* end) {
   String* keyword = NULL;
-  Int _Int154;
-  CHECK(6, read_until(&(String){2, 1, " "}, false, &(keyword), &((*end)), &(_Int154)) )
+  Int _Int157;
+  CHECK(6, read_until(&(String){2, 1, " "}, false, &(keyword), &((*end)), &(_Int157)) )
   if ((*end) != ' ') {
     CHECK(8, SyntaxTreeNode_m_syntax_error_c(&(root->_base._base._base._base), &(String){43, 42, "expected space after \"native\" keyword, got"}, (*end)) )
   }
   
-  Bool _Bool155;
-  CHECK(11, String_equal(keyword, &(String){5, 4, "func"}, &(_Bool155)) )
-  if (_Bool155) {
-    NativeFunction* _NativeFunction156;
-    CHECK(12, NativeFunction_parse_new(NULL, &((*end)), &(_NativeFunction156)) )
-    CHECK(12, List_add(root->_base._base.functions, &(_NativeFunction156->_base)) )
+  Bool _Bool158;
+  CHECK(11, String_equal(keyword, &(String){5, 4, "func"}, &(_Bool158)) )
+  if (_Bool158) {
+    NativeFunction* _NativeFunction159;
+    CHECK(12, NativeFunction_parse_new(NULL, &((*end)), &(_NativeFunction159)) )
+    CHECK(12, List_add(root->_base._base.functions, &(_NativeFunction159->_base)) )
     
   }
   else {
-    Bool _Bool157;
-    CHECK(14, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool157)) )
-    if (_Bool157) {
-      NativeVariable* _NativeVariable158;
-      CHECK(15, NativeVariable_parse_new(NULL, &((*end)), &(_NativeVariable158)) )
-      CHECK(15, List_add(root->_base._base._base.variables, &(_NativeVariable158->_base)) )
+    Bool _Bool160;
+    CHECK(14, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool160)) )
+    if (_Bool160) {
+      NativeVariable* _NativeVariable161;
+      CHECK(15, NativeVariable_parse_new(NULL, &((*end)), &(_NativeVariable161)) )
+      CHECK(15, List_add(root->_base._base._base.variables, &(_NativeVariable161->_base)) )
       
     }
     else {
-      Bool _Bool159;
-      CHECK(17, String_equal(keyword, &(String){5, 4, "type"}, &(_Bool159)) )
-      if (_Bool159) {
-        NativeType* _NativeType160;
-        CHECK(18, NativeType_parse_new(NULL, &((*end)), &(_NativeType160)) )
-        CHECK(18, List_add(root->_base.types, &(_NativeType160->_base)) )
+      Bool _Bool162;
+      CHECK(17, String_equal(keyword, &(String){5, 4, "type"}, &(_Bool162)) )
+      if (_Bool162) {
+        NativeType* _NativeType163;
+        CHECK(18, NativeType_parse_new(NULL, &((*end)), &(_NativeType163)) )
+        CHECK(18, List_add(root->_base.types, &(_NativeType163->_base)) )
         
       }
       else {

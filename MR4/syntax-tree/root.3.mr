@@ -17,8 +17,8 @@ class SyntaxTreeRoot(GlobalNodes)
   owner SyntaxTreeMainFunction main-function
   owner GlobalInit global-init
   owner Array{LineCount} line-counts
+  var Int covered-files
   var Bool is-library
-  var Bool testing
   
   func inst init()
     base.init()
@@ -29,27 +29,35 @@ class SyntaxTreeRoot(GlobalNodes)
     self.global-init.init()
   
   func inst parse(user Array{String} argv)
-    if argv.length < 3
-      print(user "usage: mr-4compiler OUTPUT-C-FILE-NAME INPUT-MR3-FILES...\n")
+    var Int first-file-index
+    var Int arg-test-index(- 1)
+    var Int input-files-number
+    for n in 1:argv.length
+      user String arg(argv[n])
+      if arg-test-index = n - 1
+        string-new-copy(user arg):(owner glob.tested-module)
+      else-if arg.equal(user "-t") or arg.equal(user "--test")
+        arg-test-index := n
+      else-if first-file-index = 0
+        first-file-index := n
+      else
+        input-files-number += 1
+    
+    if input-files-number = 0 or arg-test-index = argv.length - 1
+      print(user "usage: mr-4compiler [-t TESTED-MODULE]")
+      print(user " OUTPUT-C-FILE-NAME INPUT-MR4-FILES...\n")
       raise
     
-    var Int tested-files
-    for n in 2:argv.length
-      if argv[n].equal(user "-test")
-        self.testing := true
-        while false
-      tested-files += 1
-    if self.testing and tested-files > 0
-      new Array{tested-files:LineCount} in self.line-counts
-      glob.is-in-testing := true
+    if ? glob.tested-module
+      new Array{input-files-number:LineCount} in self.line-counts
     
-    self.output-file-name := argv[1]
-    for n in 2:argv.length
-      glob.input-file-name := argv[n]
-      if glob.input-file-name.equal(user "-test")
-        glob.is-in-testing := false
-      else
-        glob.input-file-index := n - 2
+    self.output-file-name := argv[first-file-index]
+    input-files-number := 0
+    for n in first-file-index + 1:argv.length
+      if n > (arg-test-index + 1) or n < arg-test-index
+        glob.input-file-name := argv[n]
+        glob.input-file-index := input-files-number
+        input-files-number += 1
         glob.line-number := 1
         glob.current-module := _
         file-open(user glob.input-file-name, copy true):(owner glob.input-file)
@@ -61,8 +69,8 @@ class SyntaxTreeRoot(GlobalNodes)
           self.m-syntax-error-msg(user "no new-line before file end")
         
         file-close(owner glob.input-file)
-        if glob.is-in-testing
-          self.line-counts[n - 2].init()
+        if ? self.line-counts
+          self.line-counts[glob.input-file-index].init()
     
     glob.current-module := _
     self.line-number := 0
@@ -170,7 +178,7 @@ class SyntaxTreeRoot(GlobalNodes)
     base.analyze()
     self.analyze-children(user self.types)
     self.global-init.analyze()
-    if self.testing
+    if ? glob.tested-module
       if not (? glob.test-functions.first)
         print(user "General code error: no test functions\n")
         raise
@@ -180,6 +188,8 @@ class SyntaxTreeRoot(GlobalNodes)
       print(user "General code error: no main function\n")
       raise
     self.m-order-children-constants(user self.variables, user self.constants)
+    if ? self.line-counts
+      self.analyze-cover()
   
   func inst m-order-types()
     new List{TypeData} ordered-list
@@ -190,6 +200,25 @@ class SyntaxTreeRoot(GlobalNodes)
       type-data.m-order-bases(user ordered-list)
     delete self.types
     self.types := ordered-list
+  
+  func inst analyze-cover()
+    if not (? glob.module-map.find(user glob.tested-module))
+      print(user "General code error: unknown tested module \"")
+      print(user glob.tested-module)
+      print(user "\"\n")
+      raise
+    var Int covered-index
+    for n in self.line-counts.length
+      user LineCount line-count(self.line-counts[n])
+      if line-count.needs-cover
+        line-count.covered-index := covered-index
+        covered-index += 1
+    self.covered-files := covered-index
+    if self.covered-files = 0
+      print(user "General code error: no code to test under module \"")
+      print(user glob.tested-module)
+      print(user "\"\n")
+      raise
   
   (## write C file in this order:
   1. type declarations
@@ -247,13 +276,13 @@ class SyntaxTreeRoot(GlobalNodes)
     self.write-children(user self.functions)
     
     # write main function
-    if self.testing or ? self.main-function
+    if ? glob.tested-module or ? self.main-function
       if not glob.is-new-mocked
         write(
             user "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }")
       if not glob.is-delete-mocked
         write(user "\n\nReturncode delete_Mock(Ref self) { return OK; }")
-    if self.testing
+    if ? glob.tested-module
       self.write-test-main()
     else-if ? self.main-function
       write-global(user "\n\n/* main function */\n")
@@ -271,39 +300,41 @@ class SyntaxTreeRoot(GlobalNodes)
   func inst write-test-coverage-data()
     for n in self.line-counts.length
       user LineCount line-count(self.line-counts[n])
-      write(user "\nint MR_file")
-      write-int(copy n)
-      write(user "_line_count[")
-      write-int(copy line-count.line-needs-cover.length)
-      write(user "] = {\n  ")
-      var Int mod
-      for i in line-count.line-needs-cover.length
-        if i > 0
-          write(user ",")
-        if mod = 25
-          write(user "\n  ")
-          mod := 1
-        else
-          mod += 1
-        if line-count.line-needs-cover[i]
-          write(user " 0")
-        else
-          write(user "-1")
-      write(user "\n};")
+      if line-count.needs-cover
+        write(user "\nint MR_file")
+        write-int(copy line-count.covered-index)
+        write(user "_line_count[")
+        write-int(copy line-count.line-needs-cover.length)
+        write(user "] = {\n  ")
+        var Int mod
+        for i in line-count.line-needs-cover.length
+          if i > 0
+            write(user ",")
+          if mod = 25
+            write(user "\n  ")
+            mod := 1
+          else
+            mod += 1
+          if line-count.line-needs-cover[i]
+            write(user " 0")
+          else
+            write(user "-1")
+        write(user "\n};")
     write(user "\nFile_Coverage MR_file_coverage[")
-    write-int(copy self.line-counts.length)
+    write-int(copy self.covered-files)
     write(user "] = {")
     for n in self.line-counts.length
       user LineCount line-count(self.line-counts[n])
-      if n > 0
-        write(user ",")
-      write(user "\n  {\"")
-      write(user line-count.filename)
-      write(user "\", ")
-      write-int(copy line-count.line-needs-cover.length)
-      write(user ", MR_file")
-      write-int(copy n)
-      write(user "_line_count}")
+      if line-count.needs-cover
+        if line-count.covered-index > 0
+          write(user ",")
+        write(user "\n  {\"")
+        write(user line-count.filename)
+        write(user "\", ")
+        write-int(copy line-count.line-needs-cover.length)
+        write(user ", MR_file")
+        write-int(copy line-count.covered-index)
+        write(user "_line_count}")
     write(user "\n};\n")
   
   func inst write-test-main()
@@ -323,7 +354,7 @@ class SyntaxTreeRoot(GlobalNodes)
       while ? node
     if ? self.line-counts
       write(user "  MR_success &= MR_test_coverage(MR_file_coverage, ")
-      write-int(copy self.line-counts.length)
+      write-int(copy self.covered-files)
       write(user ");\n")
     write(user "  return MR_success? OK : FAIL;\n")
     write(user "}\n")
@@ -406,6 +437,8 @@ class GlobalInit(SyntaxTreeFunction)
 
 static LineCount
   user String filename
+  var Int covered-index
+  var Bool needs-cover
   owner Array{Bool} line-needs-cover
   
   func inst init()

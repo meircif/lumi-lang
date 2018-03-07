@@ -144,13 +144,14 @@ class SyntaxTreeCoverage(SyntaxTreeCode)
   
   func dynamic analyze()
     user LineCount line-count(glob.root.line-counts[self.input-file-index])
+    line-count.needs-cover := true
     line-count.line-needs-cover[self.line-number] := true
   
   func dynamic write()
-    # ++MR_file_coverage[`file-index`].line_count[`line-number`];
+    # ++MR_file_coverage[`covered-index`].line_count[`line-number`];
     self.write-spaces()
     write(user "++MR_file_coverage[")
-    write-int(copy self.input-file-index)
+    write-int(copy glob.root.line-counts[self.input-file-index].covered-index)
     write(user "].line_count[")
     write-int(copy self.line-number)
     write(user "];\n")

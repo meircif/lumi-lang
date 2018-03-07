@@ -45,9 +45,9 @@ static Global
   
   ## test functions list
   owner NameMap{SyntaxTreeTestFunction} test-functions
+  owner String tested-module
   var Bool is-new-mocked
   var Bool is-delete-mocked
-  var Bool is-in-testing
   
   ## input reading state
   owner String input-buffer
@@ -77,7 +77,7 @@ static Global
     self.save-input := false
     self.is-new-mocked := false
     self.is-delete-mocked := false
-    self.is-in-testing := false
+    self.tested-module := _
     new SyntaxTreeRoot in self.root
     self.root.init()
     new GlobalNodes in self.builtins
