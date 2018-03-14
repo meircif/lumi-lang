@@ -1,5 +1,5 @@
-static char* _mr_file14_name = "test.2.lm";
-#define LUMI_FILE_NAME _mr_file14_name
+static char* _lumi_file14_name = "test.2.lm";
+#define LUMI_FILE_NAME _lumi_file14_name
 /* TL3 compiler - testing */
 
 typedef struct St_assert St_assert; struct St_assert {

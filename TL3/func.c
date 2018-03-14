@@ -1,5 +1,5 @@
-static char* _mr_file8_name = "func.2.lm";
-#define LUMI_FILE_NAME _mr_file8_name
+static char* _lumi_file8_name = "func.2.lm";
+#define LUMI_FILE_NAME _lumi_file8_name
 /* TL3 compiler - function */
 
 typedef struct Mfunc Mfunc; struct Mfunc {

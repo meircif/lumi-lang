@@ -1,5 +1,5 @@
-static char* _mr_file4_name = "exp.2.lm";
-#define LUMI_FILE_NAME _mr_file4_name
+static char* _lumi_file4_name = "exp.2.lm";
+#define LUMI_FILE_NAME _lumi_file4_name
 /* TL3 compiler - expression */
 
 typedef struct Mexp Mexp;

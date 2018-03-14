@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _mr_file20_name = "syntax-tree/node.3.lm";
+static char* _lumi_file20_name = "syntax-tree/node.3.lm";
 #endif
-#define LUMI_FILE_NAME _mr_file20_name
+#define LUMI_FILE_NAME _lumi_file20_name
 
 /*  TL4 compiler - Syntax tree basic node types
 

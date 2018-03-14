@@ -1,5 +1,5 @@
-static char* _mr_file9_name = "member.2.lm";
-#define LUMI_FILE_NAME _mr_file9_name
+static char* _lumi_file9_name = "member.2.lm";
+#define LUMI_FILE_NAME _lumi_file9_name
 /* TL3 compiler - member operands */
 
 typedef struct Cast_operand Cast_operand; struct Cast_operand {

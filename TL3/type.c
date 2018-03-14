@@ -1,5 +1,5 @@
-static char* _mr_file13_name = "type.2.lm";
-#define LUMI_FILE_NAME _mr_file13_name
+static char* _lumi_file13_name = "type.2.lm";
+#define LUMI_FILE_NAME _lumi_file13_name
 /* TL3 compiler - types */
 
 static char* _func_name_analyze_type = "analyze-type";

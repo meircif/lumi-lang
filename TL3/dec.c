@@ -1,5 +1,5 @@
-static char* _mr_file12_name = "dec.2.lm";
-#define LUMI_FILE_NAME _mr_file12_name
+static char* _lumi_file12_name = "dec.2.lm";
+#define LUMI_FILE_NAME _lumi_file12_name
 /* TL3 compiler - variable declerations */
 
 typedef struct St_dec St_dec; struct St_dec {

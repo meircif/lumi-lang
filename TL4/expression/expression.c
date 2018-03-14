@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _mr_file12_name = "expression/expression.3.lm";
+static char* _lumi_file12_name = "expression/expression.3.lm";
 #endif
-#define LUMI_FILE_NAME _mr_file12_name
+#define LUMI_FILE_NAME _lumi_file12_name
 
 /*  TL4 compiler - Expression
 

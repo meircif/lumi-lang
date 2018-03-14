@@ -43,9 +43,9 @@ typedef struct {
   Func* dtl;
 } Type;
 
-extern char* _mr_raise_format;
-extern char* _mr_assert_format;
-extern char* _mr_traceline_format;
+extern char* _lumi_raise_format;
+extern char* _lumi_assert_format;
+extern char* _lumi_traceline_format;
 extern FILE* _trace_stream;
 void _trace_print(
   char const* format,
@@ -59,27 +59,27 @@ void _trace_print(
   _trace_print(format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME); \
   RETURN_ERROR(value); }
 
-#define RAISE(line) START_TRACE(line, ERR, _mr_raise_format)
+#define RAISE(line) START_TRACE(line, ERR, _lumi_raise_format)
 
 #define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
-  _trace_print(_mr_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME); \
+  _trace_print(_lumi_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME); \
   RETURN_ERROR(_err); } }
 
-#define TEST_FAIL(line) START_TRACE(line, FAIL, _mr_assert_format)
+#define TEST_FAIL(line) START_TRACE(line, FAIL, _lumi_assert_format)
 
 #define TEST_ASSERT(line, condition) if (!(condition)) TEST_FAIL(line)
 
 #define RUN_TEST(test_func) success &= _run_test(#test_func, test_func)
 
-int _mr_main(int argc, char* argv[]);
-int _mr_test_main(int argc, char* argv[]);
+int _lumi_main(int argc, char* argv[]);
+int _lumi_test_main(int argc, char* argv[]);
 
 #define MAIN_PROXY(func) int main(int argc, char* argv[]) { \
   return func(argc, argv); \
 }
 
-#define MAIN_FUNC MAIN_PROXY(_mr_main)
-#define MAIN_TEST_FUNC MAIN_PROXY(_mr_test_main)
+#define MAIN_FUNC MAIN_PROXY(_lumi_main)
+#define MAIN_TEST_FUNC MAIN_PROXY(_lumi_test_main)
 
 #define sys NULL
 

@@ -1,5 +1,5 @@
-static char* _mr_file5_name = "st-node.2.lm";
-#define LUMI_FILE_NAME _mr_file5_name
+static char* _lumi_file5_name = "st-node.2.lm";
+#define LUMI_FILE_NAME _lumi_file5_name
 /* TL3 compiler - complex nodes */
 
 typedef struct St_empty St_empty; struct St_empty {
@@ -431,13 +431,13 @@ Returncode St_file_write(St_file* self) {
   CHECK(220, write(&(String){8, 7, "#else\n\n"}));
   
   CHECK(222, write(&(String){33, 32, "#if LUMI_STAGE == LUMI_TYPEDEFS\n"}));
-  CHECK(223, write(&(String){22, 21, "static char* _mr_file"}));
+  CHECK(223, write(&(String){24, 23, "static char* _lumi_file"}));
   CHECK(224, write_int(self->index));
   CHECK(225, write(&(String){10, 9, "_name = \""}));
   CHECK(226, write(self->infile_name));
   CHECK(227, write(&(String){4, 3, "\";\n"}));
   CHECK(228, write(&(String){8, 7, "#endif\n"}));
-  CHECK(229, write(&(String){32, 31, "#define LUMI_FILE_NAME _mr_file"}));
+  CHECK(229, write(&(String){34, 33, "#define LUMI_FILE_NAME _lumi_file"}));
   CHECK(230, write_int(self->index));
   CHECK(231, write(&(String){8, 7, "_name\n\n"}));
   glob->infile_name = self->infile_name;
