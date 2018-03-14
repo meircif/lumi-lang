@@ -1,0 +1,212 @@
+# TL3 compiler - types
+
+func analyze-type(user Mtype self, copy Bool is-dynamic)
+  if ? self.base-typename and not (? self.base-mtype)
+    f-find-type(user self.base-typename):(user self.base-mtype)
+  if is-dynamic and not (? self.dynamic-members)
+    f-copy-new-var-map(user _):(owner self.dynamic-members)
+    var Int dynamic-count(0)
+    var Var-map-iter iter
+    user String name
+    user Mvar mvar
+    if ? self.base-mtype
+      analyze-type(user self.base-mtype, copy is-dynamic)
+      iter.init(user self.base-mtype.dynamic-members)
+      do
+        while iter.m-has-data()
+        iter.get-name():(user name)
+        self.members.find(user name):(user mvar)
+        if ? mvar
+          if not (? mvar.func-dec)
+            f-syntax-error2(user "non-function override of", user name, user "in type", user self.name)
+          self.dynamic-members.add(user name, owner mvar)
+          mvar.func-dec.dynamic-index := dynamic-count
+        else
+          self.dynamic-members.add(user name, owner iter.get-var())
+        dynamic-count := dynamic-count + 1
+        iter.m-next()
+    iter.init(user self.members)
+    do
+      while iter.m-has-data()
+      iter.get-name():(user name)
+      iter.get-var():(user mvar)
+      if ? mvar.func-dec and mvar.func-dec.is-dynamic and not (? self.dynamic-members.find(user name))
+        self.dynamic-members.add(user name, owner mvar)
+        mvar.func-dec.dynamic-index := dynamic-count
+        dynamic-count := dynamic-count + 1
+      iter.m-next()
+
+
+class St-class(St-node)
+  user Mtype mtype
+  var Int depth
+  
+  func dynamic parse()
+    var String{128} name
+    var Char end
+    read(user "({", user name):(copy end)
+    glob.type-map.add(user name):(user self.mtype)
+    if end = '{'
+      new Mtype generic-mtype
+      generic-mtype.init(owner f-new-copy(user "void"))
+      read-new(user "}"):(owner generic-mtype.base-typename)
+      self.mtype.generic-mtype := generic-mtype
+      read-c():(copy end)
+    if end = '('
+      read-new(user ")"):(owner self.mtype.base-typename)
+      read-c()
+    self.depth := 0
+    glob.generic-mtype := self.mtype.generic-mtype
+    glob.mclass := self.mtype
+    base.parse()
+    glob.mclass := _
+    glob.generic-mtype := _
+  
+  func dynamic analyze-first()
+    analyze-type(user self.mtype, copy false)
+    glob.generic-mtype := self.mtype.generic-mtype
+    glob.mclass := self.mtype
+    base.analyze-first()
+    glob.mclass := _
+    glob.generic-mtype := _
+  
+  func dynamic analyze()
+    user Mtype basetype(self.mtype.base-mtype)
+    do
+      while ? basetype
+      self.depth := self.depth + 1
+      basetype := basetype.base-mtype
+    if self.depth > glob.max-type-depth
+      glob.max-type-depth := self.depth
+    glob.generic-mtype := self.mtype.generic-mtype
+    glob.mclass := self.mtype
+    base.analyze()
+    glob.mclass := _
+    glob.generic-mtype := _
+  
+  native func write-vars()
+  native func write-meths()
+  
+  func dynamic write()
+    # #ifdef LUMI_TYPEDEFS
+    # typedef struct name name;
+    # #elif defined LUMI_TYPES
+    # struct name {
+    #   members...
+    # };
+    # #endif
+    # methods...
+    write(user "#if LUMI_STAGE == LUMI_TYPEDEFS\n")
+    write-spaces()
+    write(user "typedef struct ")
+    write-cstyle(user self.mtype.name)
+    write(user " ")
+    write-cstyle(user self.mtype.name)
+    write(user ";\n")
+    write-spaces()
+    write(user "#elif LUMI_STAGE == LUMI_TYPES(")
+    write-int(copy self.depth)
+    write(user ")\n")
+    write-spaces()
+    write(user "struct ")
+    write-cstyle(user self.mtype.name)
+    write(user " {\n")
+    self.write-vars()
+    write(user ";\n")
+    write-spaces()
+    write(user "#endif")
+    self.write-meths()
+    glob.methods := false
+    glob.mclass := _
+  
+  func dynamic write-vars()
+    if ? self.mtype.base-typename
+      write-spaces()
+      write(user "  ")
+      write-cstyle(user self.mtype.base-typename)
+      write(user " _base;\n")
+    glob.mclass := self.mtype
+    glob.methods := false
+    self.write-indent-block()
+  
+  func dynamic write-meths()
+    glob.methods := true
+    self.write-block()
+
+
+class St-static-class(St-class)
+  func dynamic parse()
+    base.parse()
+  func dynamic analyze-first()
+    base.analyze-first()
+  func dynamic analyze()
+    base.analyze()
+  func dynamic write()
+    base.write()
+  func dynamic write-vars()
+    base.write-vars()
+  func dynamic write-meths()
+    base.write-meths()
+
+
+class St-dynamic-class(St-class)
+  func dynamic parse()
+    base.parse()
+  
+  func dynamic analyze-first()
+    analyze-type(user self.mtype, copy true)
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    base.write()
+  
+  func dynamic write-vars()
+    if not (? self.mtype.base-typename)
+      write-spaces()
+      write(user "  Func* _dtl;\n")
+    base.write-vars()
+  
+  func dynamic write-meths()
+    base.write-meths()
+    # #if LUMI_STAGE == LUMI_DECLARATIONS
+    # extern Func {name}__dtl[];
+    # #endif
+    # #if LUMI_STAGE == LUMI_FUNCTIONS
+    # Func {name}__dtl[] = {funcs...};
+    # #endif
+    write-new-indent-line()
+    write(user "#if LUMI_STAGE == LUMI_DECLARATIONS\n")
+    write(user "extern Func ")
+    write-cstyle(user self.mtype.name)
+    write(user "__dtl[];\n")
+    write-spaces()
+    write(user "#endif\n")
+    write-spaces()
+    write(user "#if LUMI_STAGE == LUMI_FUNCTIONS\n")
+    write-spaces()
+    write(user "Func ")
+    write-cstyle(user self.mtype.name)
+    write(user "__dtl[] = {")
+    var Var-map-iter iter
+    iter.init(user self.mtype.dynamic-members)
+    do
+      while iter.m-has-data()
+      user Mvar mvar
+      iter.get-var():(user mvar)
+      if not (? mvar.func-dec)
+        f-syntax-error(user self.mtype.name, user mvar.name)
+      if not (? mvar.func-dec.mclass)
+        f-syntax-error(user self.mtype.name, user mvar.name)
+      write(user "(void*)")
+      write-cstyle(user mvar.func-dec.mclass.name)
+      write(user "_")
+      write-cstyle(user mvar.func-dec.name)
+      iter.m-next()
+      if iter.m-has-data()
+        write(user ", ")
+    write(user "};\n")
+    write-spaces()
+    write(user "#endif")

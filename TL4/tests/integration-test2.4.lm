@@ -1,0 +1,29 @@
+~~~ TL4 compiler integration test file #2
+
+This file should only work together with test file #1.
+~~~
+module covered
+
+
+class MiddleType(integration.BaseType)
+  var Int num-mid
+  user integration.BaseType mid-base-ref
+  user integration.TopType mid-top-ref
+  
+  new()
+    base()
+    self.num-mid := 2
+  
+  func dynamic meth1(copy Int n, user String s)
+    sys.println(user "MiddleType.meth1")
+    base(copy n, user s)
+  
+  func dynamic meth2()
+    sys.println(user "MiddleType.meth2")
+    base.meth2()
+  
+  func dynamic meth4()
+    sys.println(user "MiddleType.meth4")
+  
+  func dynamic meth5(copy Int n, user String s)
+    sys.println(user "MiddleType.meth5")

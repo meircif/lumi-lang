@@ -1,0 +1,47 @@
+## TL4 compiler - Generic mappings
+
+## Maps from a string name to a generic object
+static NameMap{Generic}
+  owner NameMapNode{Generic} first
+  owner NameMapNode{Generic} last
+  
+  ## Add `name` -> `value` mapping
+  func inst add(user String name, user Generic value)
+    new NameMapNode{Generic} node
+    node.init(user name, user value)
+    if ? self.last
+      self.last.next := node
+    else
+      self.first := node
+    self.last := node
+  
+  ## Find a value mapped from `name`, return empty if not exists
+  func inst find(user String name):(user Generic value)
+    user NameMapNode{Generic} node(self.first)
+    do
+      while ? node
+      if node.name.equal(user name)
+        value := node.value
+        return
+      node := node.next
+    value := _
+  
+  func inst update-or-add(user String name, user Generic value)
+    user NameMapNode{Generic} node(self.first)
+    do
+      while ? node
+      if node.name.equal(user name)
+        node.value := value
+        return
+      node := node.next
+    self.add(user name, user value)
+
+
+static NameMapNode{Generic}
+  owner NameMapNode{Generic} next
+  user String name
+  user Generic value
+  
+  func inst init(user String name, user Generic value)
+    self.name := name
+    self.value := value

@@ -1,0 +1,2386 @@
+# TL2 compiler - written in TL1
+
+native func print(user String text)
+
+native type File
+native func file-open-read(user String name): owner File file
+native func file-open-write(user String name): owner File file
+native func file-close(owner File self)
+native func file-getc(user File self): copy Char ch
+native func file-putc(user File self, copy Char ch)
+native func file-write(user File self, user String line)
+
+native func string-clear(user String self)
+native func string-length(user String self): copy Int length
+native func string-equal(user String self, user String other): copy Bool equal
+native func string-get(user String self, copy Int index): copy Char ch
+native func string-append(user String self, copy Char ch)
+native func string-copy(user String self, user String source)
+native func string-concat(user String self, user String ext)
+native func string-find(user String self, user String pattern): copy Int index
+native func string-replace(user String self, copy Char old-ch, copy Char new-ch)
+native func string-has(user String self, copy Char ch): copy Bool found
+native func int-to-string(copy Int self): var String string
+
+native func array-length(user Array{} arr): copy Int length
+
+native func sys-exit(copy Int status)
+native func sys-system(user String command): copy Int status
+native func sys-getenv(user String name): copy Bool exists, var String value
+
+
+native type Generic
+
+
+func f-new-copy(user String text): owner String out-text
+  if text = NULL
+    raise
+  
+  new String{text.actual-length + 1} new-text
+  string-copy(user new-text, user text)
+  out out-text := new-text
+  return
+
+# raising
+func f-msg-raise(user String prefix, user String middle, user String suffix)
+  var String{256} msg
+  string-copy(user msg, user prefix)
+  string-concat(user msg, user middle)
+  string-concat(user msg, user suffix)
+  print(user msg)
+  raise
+
+func f-raise-on-null(user Generic ref, user String prefix, user String middle, user String suffix)
+  if ref = NULL
+    f-msg-raise(user prefix, user middle, user suffix)
+  
+  return
+
+# Function Map
+class Func-map
+  owner String key
+  var Func f-value
+
+func add-fm(user Array{Func-map} map, copy Int index, user String key, copy Func f-value)
+  var Func-map fm
+  [] Func-map fm := map[index]
+  f-new-copy(user key): owner fm.key
+  fm.f-value := f-value
+  return
+
+func f-fm-find(user Array{Func-map} map, user String key): copy Func f-value, copy Bool found
+  for n in map.length
+    var Func-map fm
+    [] Func-map fm := map[n]
+    var Bool flag
+    if string-equal(user key, user fm.key): copy flag
+      out found := true
+      out f-value := fm.f-value
+      return
+    
+  
+  out found := false
+  return
+
+# Name Map
+class Name-map
+  owner Name-map next
+  user String name
+  owner Generic value
+
+class Type-attrs
+  owner String name
+  owner Name-map members
+  user Type-attrs base-type
+  var Bool is-dynamic
+
+class Var-attrs
+  owner String name
+  user Type-attrs type-attrs
+  user Generic subtype
+  owner String access
+  var Bool is-ref
+
+func f-nm-init(user String name, owner Generic value): owner Name-map nm-ptr
+  new Name-map nm
+  nm.next := nm-ptr[0]
+  nm.name := name
+  nm.value := value
+  out nm-ptr := nm
+  return
+
+func f-nm-find(user Name-map self, user String name): user Generic value
+  user Name-map nm(self)
+  do
+    while nm != NULL
+    var Bool equal
+    if string-equal(user nm.name, user name): copy equal
+      out value := nm.value
+      return
+    
+    nm := nm.next
+  
+  out value := NULL
+  return
+
+func f-nm-print(user Name-map self)
+  user Name-map nm(self)
+  do
+    while nm != NULL
+    print(user nm.name)
+    nm := nm.next
+  
+  return
+
+func add-member(user String name, user Type-attrs type-attrs, user Generic subtype): owner Name-map members
+  new Var-attrs new-var
+  f-new-copy(user name): owner new-var.name
+  new-var.type-attrs := type-attrs
+  new-var.subtype := subtype
+  new-var.is-ref := false
+  f-nm-init(user new-var.name, owner new-var): var members
+  return
+
+# Syntax Tree
+class St
+  owner St next-brother
+  owner St first-son
+  user St last-son
+  user St father
+  var Func f-writer
+  owner Generic value
+  owner Name-map var-map
+  var Int line-num
+
+func f-st-del(owner St self)
+  if self = NULL
+    return
+  
+  f-st-del(owner self.first-son)
+  f-st-del(owner self.next-brother)
+  delete self
+  return
+
+# Global data
+class St-class
+  user Type-attrs type-attrs
+  var Int dynamic-count
+
+class Global-data
+  # data
+  owner File infile
+  owner File outfile
+  user Array{Func-map} key-word-map
+  owner Name-map op-map
+  owner Name-map type-map
+  owner Name-map var-map
+  # state
+  user St curr
+  var Int spaces
+  user St-class st-class
+  var Int var-count
+  var Int line-num
+  # vars
+  var Int length
+  var Bool flag
+  var Char end
+
+var Global-data glob
+
+func f-st-new(copy Func f-writer, owner Generic value, user St father): owner St res
+  new St self
+  self.next-brother := NULL
+  self.first-son := NULL
+  self.last-son := NULL
+  self.father := father
+  self.f-writer := f-writer
+  self.value := value
+  self.line-num := glob.line-num
+  out res := self
+  if father != NULL
+    if father.first-son = NULL
+      father.first-son := self
+    
+    else
+      father.last-son.next-brother := self
+    
+    father.last-son := self
+    self.var-map := father.var-map
+  
+  else
+    self.var-map := glob.var-map
+  
+  return
+
+func f-find-type(user String name): user Type-attrs type-attr
+  user Generic value
+  f-nm-find(user glob.type-map, user name): user value
+  f-raise-on-null(user value, user "Undefined type \"", user name, user "\"")
+  out type-attr := value
+  return
+
+func add-type(user String name, user String base-name, owner Name-map members)
+  user Type-attrs type-attrs
+  user Generic value
+  f-nm-find(user glob.type-map, user name): user value
+  if value = NULL
+    new Type-attrs new-type
+    f-new-copy(user name): owner new-type.name
+    type-attrs := new-type
+  
+  else
+    type-attrs := value
+  
+  type-attrs.members := members
+  type-attrs.base-type := NULL
+  type-attrs.is-dynamic := false
+  if base-name != NULL
+    f-find-type(user base-name): user type-attrs.base-type
+  
+  new Name-map nm
+  f-nm-init(user type-attrs.name, user type-attrs): owner glob.type-map
+  return
+
+func f-find-var(user Name-map nm, user String name): user Var-attrs var-attr
+  user Generic value
+  f-nm-find(user nm, user name): user value
+  f-raise-on-null(user value, user "Undefined variable \"", user name, user "\"")
+  out var-attr := value
+  return
+
+# read helpers
+func read-c(): copy Char out-ch
+  var Char ch
+  file-getc(user glob.infile): copy ch
+  if ch = '\n'
+    glob.line-num := glob.line-num + 1
+  
+  out out-ch := ch
+  return
+
+func read-ignore(copy Int chars)
+  for n in chars
+    read-c(): copy glob.end
+  
+  return
+
+func read-indent(user String ends, copy Bool indent): var String text, copy Char end, copy Int out-spaces
+  string-clear(user text)
+  var Char ch(EOF)
+  var Char q('\0')
+  var Int spaces(0)
+  do
+    # ignore indent
+    read-c(): copy ch
+    if indent
+      do
+        while ch = ' '
+        spaces := spaces + 1
+        read-c(): copy ch
+      
+      indent := false
+    
+    while ch != EOF
+    if q != '\0'
+      if ch = '\\'
+        string-append(user text, copy ch)
+        read-c(): copy ch
+      
+      else-if ch = q
+        q := '\0'
+      
+    
+    else
+      while ch != '\n'
+      while string-has(user ends, copy ch): copy glob.flag = false
+      if ch = '\'' or ch = '"'
+        q := ch
+      
+    
+    string-append(user text, copy ch)
+  
+  out end := ch
+  out out-spaces := spaces
+  return
+
+func read(user String ends): var String text, copy Char end
+  var Int spaces(0)
+  read-indent(user ends, copy false): var text, var end, copy spaces
+  return
+
+func read-new(user String ends): owner String out-text, copy Char end
+  var String{256} text
+  read(user ends): var text, var end
+  f-new-copy(user text): var out-text
+  return
+
+# write helpers
+func write-c(copy Char ch)
+  file-putc(user glob.outfile, copy ch)
+  return
+
+func write(user String text)
+  file-write(user glob.outfile, user text)
+  return
+
+func write-cstyle(user String text)
+  if text = NULL
+    raise
+  
+  for index in text.actual-length
+    var Char ch
+    string-get(user text, copy index): copy ch
+    if ch = '-'
+      write-c(copy '_')
+    
+    else
+      write-c(copy ch)
+    
+  
+  return
+
+func write-line-num()
+  var String{64} line-num-str
+  int-to-string(copy glob.curr.line-num): var line-num-str
+  write(user line-num-str)
+  return
+
+func write-tb-raise()
+  write(user "RAISE(")
+  write-line-num()
+  write(user ")")
+  return
+
+func write-tb-check()
+  write(user "CHECK(")
+  write-line-num()
+  write(user ", ")
+  return
+
+# other helpers
+func add-node(copy Func f-writer, owner Generic value)
+  user St node
+  f-st-new(copy f-writer, user value, user glob.curr): user node
+  return
+
+func string-split(user String text, copy Char sep): copy Int index, copy Int length
+  if string-has(user text, copy sep): copy glob.flag
+    var String{2} sep-str
+    string-append(user sep-str, copy sep)
+    var Int sep-index
+    string-find(user text, user sep-str): copy sep-index
+    out index := sep-index
+    out length := text.actual-length - sep-index - 1
+  
+  else
+    out index := text.actual-length
+    out length := 0
+  
+  return
+
+func f-is-primitive(user String typename): copy Bool res
+  var Bool flag
+  if string-equal(user typename, user "Int"): copy flag
+    out res := true
+    return
+  
+  if string-equal(user typename, user "Char"): copy flag
+    out res := true
+    return
+  
+  if string-equal(user typename, user "Func"): copy flag
+    out res := true
+    return
+  
+  string-equal(user typename, user "Bool"): copy flag
+  out res := flag
+  return
+
+# block helpers
+func write-spaces()
+  for n in glob.spaces
+    write(user " ")
+  
+  return
+
+func write-new-indent-line()
+  write(user "\n")
+  write-spaces()
+  return
+
+func write-sons()
+  user St son(glob.curr.first-son)
+  do
+    while son != NULL
+    glob.curr := son
+    write-spaces()
+    son.f-writer(user son.value)
+    son := glob.curr.next-brother
+    glob.curr := glob.curr.father
+  
+  return
+
+func f-start-block()
+  glob.spaces := glob.spaces + 2
+  glob.curr := glob.curr.last-son
+  return
+
+func f-end-block()
+  glob.curr := glob.curr.father
+  glob.spaces := glob.spaces - 2
+  if glob.spaces = 0
+    glob.st-class := NULL
+  
+  return
+
+func write-block-close()
+  glob.spaces := glob.spaces - 2
+  write-spaces()
+  write(user "}")
+  return
+
+func write-block()
+  write(user " {\n")
+  glob.spaces := glob.spaces + 2
+  write-sons()
+  write-block-close()
+  write(user "\n")
+  return
+
+# empty
+func write-empty-line(user Generic null)
+  write(user "\n")
+  return
+
+func add-empty-line()
+  add-node(copy write-empty-line, owner NULL)
+  return
+
+# comment
+func write-comment(user String comment-text)
+  write(user "/* ")
+  write(user comment-text)
+  write(user " */\n")
+  return
+
+func parse-comment()
+  user String comment
+  read-new(user ""): user comment, copy glob.end
+  add-node(copy write-comment, owner comment)
+  return
+
+# member path
+class Member-path
+  owner Member-path next
+  owner String name
+
+func read-mpath(user String ends): owner Member-path mem-path, copy Char end
+  new Member-path new-mem-path
+  user Member-path mpath(new-mem-path)
+  do
+    mpath.next := NULL
+    while read-new(user ends): owner mpath.name, copy glob.end = '.'
+    new Member-path new-mpath
+    mpath.next := new-mpath
+    mpath := new-mpath
+  
+  out mem-path := new-mem-path
+  out end := glob.end
+  return
+
+func f-mpath-attrs(user Member-path mem-path): user Var-attrs ret-var-attrs
+  out ret-var-attrs := NULL
+  user Member-path mpath(mem-path)
+  user Var-attrs var-attrs
+  f-find-var(user glob.curr.var-map, user mpath.name): user var-attrs
+  do
+    mpath := mpath.next
+    while mpath != NULL
+    user Type-attrs type-attrs(var-attrs.type-attrs)
+    do
+      user Generic value
+      var-attrs := f-nm-find(user type-attrs.members, user mpath.name): user value
+      while var-attrs = NULL
+      type-attrs := type-attrs.base-type
+      f-raise-on-null(user type-attrs, user "Undefined variable \"", user mpath.name, user "\"")
+    
+  
+  out ret-var-attrs := var-attrs
+  return
+
+func write-mpath(user Member-path mem-path, copy Bool write-last)
+  user Member-path mpath(mem-path)
+  user Generic value
+  f-nm-find(user glob.curr.var-map, user mpath.name): user value
+  user Var-attrs var-attrs(value)
+  var Bool is-ref := var-attrs != NULL and var-attrs.is-ref
+  if is-ref
+    write(user "(*")
+  
+  write-cstyle(user mpath.name)
+  if is-ref
+    write(user ")")
+  
+  do
+    while mpath.next != NULL and (write-last or mpath.next.next != NULL)
+    f-raise-on-null(user var-attrs, user "unknown variable \"", user mpath.name, user "\"")
+    mpath := mpath.next
+    write(user "->")
+    user Type-attrs type-attrs(var-attrs.type-attrs)
+    do
+      var-attrs := f-nm-find(user type-attrs.members, user mpath.name): user value
+      while var-attrs = NULL
+      type-attrs := type-attrs.base-type
+      f-raise-on-null(user type-attrs, user "unknown variable \"", user mpath.name, user "\"")
+      write(user "_base.")
+    
+    write-cstyle(user mpath.name)
+  
+  return
+
+# expression and function
+class St-arg
+  owner St-arg next
+  owner Generic value
+  owner String typename
+  owner String type-param
+  owner String access
+
+class St-func
+  owner Member-path path
+  owner St-arg params
+  owner St-arg outputs
+  user St-arg last
+  var Bool is-dynamic
+  var Int dynamic-index
+
+class St-exp
+  owner St-exp next
+  owner String operator
+  owner Member-path item
+  owner St-func call
+  owner St-exp subexp
+  owner St-exp slice-length
+
+func f-real-string-length(user String text): copy Int length
+  var Int index(1)
+  var Int real-length(1)
+  var Int text-length(text.actual-length - 1)
+  do
+    while index < text-length
+    if string-get(user text, copy index): copy glob.end = '\\'
+      index := index + 1
+    
+    real-length := real-length + 1
+    index := index + 1
+  
+  out length := real-length
+  return
+
+native func write-exp(user St-exp st-exp)
+
+func write-exp-array(user St-exp st-exp)
+  user Var-attrs var-attrs
+  f-mpath-attrs(user st-exp.item): user var-attrs
+  user String typename(var-attrs.type-attrs.name)
+  var Bool is-array
+  if string-equal(user typename, user "Array"): copy is-array
+    f-raise-on-null(user var-attrs.subtype, user "No subtype in array \"", user var-attrs.name, user "\"")
+    user Type-attrs subtype(var-attrs.subtype)
+    typename := subtype.name
+  
+  if st-exp.slice-length = NULL
+    if is-array
+      write(user "((")
+      write-cstyle(user typename)
+      write(user "*)(")
+      write-mpath(user st-exp.item, copy true)
+      write(user "->values))")
+      if f-is-primitive(user typename): copt glob.flag
+        write(user "[")
+        write-exp(user st-exp.subexp)
+        write(user "]")
+      
+      else
+        write(user " + ")
+        write-exp(user st-exp.subexp)
+      
+    
+    else
+      write-mpath(user st-exp.item, copy true)
+      write(user "->chars[")
+      write-exp(user st-exp.subexp)
+      write(user "]")
+    
+  
+  else-if is-array
+    write(user "&(Array){")
+    write-exp(user st-exp.slice-length)
+    write(user ", ((")
+    write-cstyle(user typename)
+    write(user "*)(")
+    write-mpath(user st-exp.item, copy true)
+    write(user "->values)) + (")
+    write-exp(user st-exp.subexp)
+    write(user ")}")
+  
+  else
+    write(user "&(String){")
+    write-exp(user st-exp.slice-length)
+    write(user ", ")
+    write-exp(user st-exp.slice-length)
+    write(user ", ")
+    write-mpath(user st-exp.item, copy true)
+    write(user "->chars + (")
+    write-exp(user st-exp.subexp)
+    write(copy ")}")
+  
+  return
+
+func write-exp-item(user Member-path mpath)
+  var Char first
+  if string-get(user mpath.name, user 0): copy first = '"'
+    f-real-string-length(user mpath.name): copy glob.length
+    var String{80} length-str
+    write(user "&(String){")
+    int-to-string(copy glob.length): var length-str
+    write(user length-str)
+    write(user ", ")
+    glob.length := glob.length - 1
+    int-to-string(copy glob.length): var length-str
+    write(user length-str)
+    write(user ", ")
+    write(user mpath.name)
+    write(user "}")
+  
+  else-if first = '\'' or first = '-' or first >= '0' and first <= '9'
+    write(user mpath.name)
+  
+  else-if first = '_'
+    write(user "NULL")
+  
+  else
+    write-mpath(user mpath, copy true)
+  
+  return
+
+func write-exp(user St-exp st-exp)
+  if st-exp = NULL
+    raise
+  
+  var Bool binary(true)
+  if st-exp.call != NULL
+    f-raise-on-null(user st-exp.call.last, user "No output for \"", user st-exp.call.path.name, user "\"")
+    write-mpath(user st-exp.call.last.value, copy true)
+  
+  else-if st-exp.item = NULL
+    binary := st-exp.subexp != NULL
+    if binary
+      write(user "(")
+      write-exp(user st-exp.subexp)
+      write(user ")")
+    
+  
+  else-if st-exp.subexp != NULL
+    write-exp-array(user st-exp)
+  
+  else
+    write-exp-item(user st-exp.item)
+  
+  if st-exp.operator != NULL
+    if binary
+      write(user " ")
+    
+    write(user st-exp.operator)
+  
+  if st-exp.next != NULL
+    if binary
+      write(user " ")
+    
+    write-exp(user st-exp.next)
+  
+  return
+
+native func write-func-call(user St-func st-func)
+
+func write-exp-intro(user St-exp st-exp)
+  if st-exp = NULL
+    return
+  
+  write-exp-intro(user st-exp.next)
+  write-exp-intro(user st-exp.subexp)
+  if st-exp.call != NULL
+    write-func-call(user st-exp.call)
+    write-new-indent-line()
+  
+  else-if st-exp.subexp != NULL and st-exp.item != NULL
+    write(user "if ((")
+    write-exp(user st-exp.subexp)
+    write(user ") < 0 || (")
+    if st-exp.slice-length != NULL
+      write-exp(user st-exp.slice-length)
+      write(user ") < 0 || (")
+    
+    write-exp(user st-exp.subexp)
+    if st-exp.slice-length = NULL
+      write(user ") >= ")
+    
+    else
+      write(user ") + (")
+      write-exp(user st-exp.slice-length)
+      write(user ") > ")
+    
+    write-mpath(user st-exp.item, copy true)
+    write(user "->length) ")
+    write-tb-raise()
+    write-new-indent-line()
+  
+  return
+
+func f-get-mpath-attrs(user St-exp st-exp): user Var-attrs var-attrs
+  out var-attrs := NULL
+  if st-exp.item = NULL or st-exp.call != NULL or st-exp.subexp != NULL
+    return
+  
+  if st-exp.operator != NULL or st-exp.next != NULL
+    return
+  
+  var Char first
+  string-get(user st-exp.item.name, copy 0): copy first
+  if first = '"' or first = '\'' or first = '_' or (first >= '0' and first <= '9')
+    return
+  
+  f-mpath-attrs(user st-exp.item): var var-attrs
+  return
+
+func write-type-var(user St-exp st-exp)
+  user String typename(st-exp.item.name)
+  write(user "{sizeof(")
+  write-cstyle(user typename)
+  write(user "), ")
+  user Type-attrs type-attrs
+  f-find-type(user typename): user type-attrs
+  if type-attrs.is-dynamic
+    write-cstyle(user typename)
+    write(user "__dtl")
+  
+  else
+    write(user "NULL")
+  
+  write(user "}")
+  return
+
+func write-exp-typed(user St-exp st-exp, user Type-attrs wanted-type)
+  if string-equal(user wanted-type.name, user "Type"): copy glob.flag and st-exp.item != NULL and st-exp.item.next = NULL
+    var Char first
+    string-get(user st-exp.item.name, copy 0): copy first
+    if first >= 'A' and first <= 'Z'
+      write(user "(Type)")
+      write-type-var(user st-exp)
+      return
+    
+  
+  user Var-attrs var-attrs
+  f-get-mpath-attrs(user st-exp): user var-attrs
+  
+  if var-attrs != NULL
+    f-mpath-attrs(user st-exp.item): user var-attrs
+    user Type-attrs type-attrs(var-attrs.type-attrs)
+    var Bool first-base(true)
+    do
+      while type-attrs != wanted-type
+      type-attrs := type-attrs.base-type
+      if type-attrs = NULL
+        var String{256} msg
+        string-copy(user msg, user "Parameter \"")
+        string-concat(user msg, user st-exp.item.name)
+        string-concat(user msg, user "\" is of type \"")
+        string-concat(user msg, user var-attrs.type-attrs.name)
+        string-concat(user msg, user "\" instead of \"")
+        string-concat(user msg, user wanted-type.name)
+        string-concat(user msg, user "\"")
+        print(user msg)
+        raise
+      
+      if first-base
+        write(user "&(")
+        write-mpath(user st-exp.item, copy true)
+        write(user "->")
+        first-base := false
+      
+      else
+        write(user ".")
+      
+      write(user "_base")
+    
+    if first-base
+      write-mpath(user st-exp.item, copy true)
+    
+    else
+      write(user ")")
+    
+    return
+  
+  write-exp(user st-exp)
+  return
+
+native func parse-func-header(owner Member-path path): owner St-func st-func, copy Char end
+
+func parse-exp(user String exp-ends): owner St-exp new-st-exp, copy Char out-end
+  new St-exp st-exp
+  st-exp.next := NULL
+  st-exp.operator := NULL
+  st-exp.call := NULL
+  st-exp.subexp := NULL
+  st-exp.slice-length := NULL
+  var String{16} ends
+  string-copy(user ends, user " .([")
+  string-concat(user ends, user exp-ends)
+  var Char end
+  if read-mpath(user ends): owner st-exp.item, copy end = '('
+    if st-exp.item.name.actual-length > 0
+      parse-func-header(owner st-exp.item): owner st-exp.call, copy end
+    
+    else
+      parse-exp(user ")"): owner st-exp.subexp, copy end
+      read-c(): copy end
+      delete st-exp.item
+    
+    st-exp.item := NULL
+  
+  else-if end = '['
+    parse-exp(user ":]"): owner st-exp.subexp, copy end
+    if end = ':'
+      parse-exp(user "]"): owner st-exp.slice-length, copy end
+    
+    read-c(): copy end
+    if end = '.'
+      f-new-copy(user "->"): owner st-exp.operator
+      parse-exp(user exp-ends): owner st-exp.next, copy end
+    
+  
+  else-if end = ' ' and st-exp.item.next = NULL
+    user Generic value
+    f-nm-find(user glob.op-map, user st-exp.item.name): user value
+    if value != NULL
+      st-exp.operator := value
+      delete st-exp.item
+      st-exp.item := NULL
+      parse-exp(user exp-ends): owner st-exp.next, copy end
+    
+  
+  if end = ' '
+    var String{16} operator
+    read(user " "): var operator, copy end
+    user Generic value
+    f-nm-find(user glob.op-map, user operator): user value
+    f-raise-on-null(user value, user "Unknow operator \"", user operator, user "\"")
+    st-exp.operator := value
+    parse-exp(user exp-ends): owner st-exp.next, copy end
+  
+  out new-st-exp := st-exp
+  out out-end := end
+  return
+
+# function
+func write-func-last(user St-func st-func, user Var-attrs var-attrs)
+  f-raise-on-null(user var-attrs.subtype, user "\"", user var-attrs.name, user "\" is not a function")
+  user St-func func-def(var-attrs.subtype)
+  user St-arg dec-out(func-def.outputs)
+  if dec-out = NULL
+    write-tb-check()
+    return
+  
+  user St-arg call-out(st-func.outputs)
+  user St-arg call-prev-out(NULL)
+  do
+    while dec-out.next != NULL and call-out != NULL
+    call-prev-out := call-out
+    dec-out := dec-out.next
+    call-out := call-out.next
+  
+  if dec-out.next != NULL
+    f-raise-on-null(user NULL, user "too few outputs in \"", user var-attrs.name, user "\"")
+  
+  if call-out != NULL and call-out.next != NULL
+    f-raise-on-null(user NULL, user "too many outputs in \"", user var-attrs.name, user "\"")
+  
+  if call-out = NULL
+    var String{32} counter
+    int-to-string(copy glob.var-count): var counter
+    glob.var-count := glob.var-count + 1
+    new String{2 + dec-out.typename.actual-length + counter.actual-length} last
+    string-copy(user last, user "_")
+    string-concat(user last, user dec-out.typename)
+    string-concat(user last, user counter)
+    write-cstyle(user dec-out.typename)
+    if string-equal(user dec-out.access, user "copy"): copy glob.flag = false
+      write(user "*")
+    
+    write(user " ")
+    write-cstyle(user last)
+    write(user ";")
+    write-new-indent-line()
+    new Member-path mpath
+    mpath.name := last
+    mpath.next := NULL
+    new St-arg arg
+    arg.value := mpath
+    arg.next := NULL
+    arg.type-param := NULL
+    f-new-copy(user dec-out.typename): owner arg.typename
+    f-new-copy(user dec-out.access): owner arg.access
+    if call-prev-out = NULL
+      st-func.outputs = arg
+    
+    else
+      call-prev-out.next := arg
+    
+    st-func.last := arg
+  
+  else
+    st-func.last := call-out
+  
+  write-tb-check()
+  return
+
+func write-call-func-name(user St-func st-func): user St-func ret-func-def
+  user Var-attrs var-attrs
+  if st-func.path.next = NULL
+    f-find-var(user glob.curr.var-map, user st-func.path.name): user var-attrs
+    write-func-last(user st-func, user var-attrs)
+    write-mpath(user st-func.path, copy true)
+    out ret-func-def := var-attrs.subtype
+    return
+  
+  var Char first
+  user Generic value
+  user Type-attrs type-attrs
+  string-get(user st-func.path.name, copy 0): copy first
+  if first >= 'A' and first <= 'Z'
+    if st-func.path.next.next != NULL
+      f-msg-raise(user "Illegal meth call \"", user st-func.path.next.next.name, user "\"")
+    
+    f-find-type(user st-func.path.name): user type-attrs
+    user String meth(st-func.path.next.name)
+    var-attrs := f-nm-find(user type-attrs.members, user meth): user value
+    f-raise-on-null(user var-attrs, user "unknown method \"", user meth, user "\"")
+    out ret-func-def := var-attrs.subtype
+    write-func-last(user st-func, user var-attrs)
+    write-cstyle(user type-attrs.name)
+    write(user "_")
+    write-cstyle(user meth)
+    return
+  
+  new St-arg param
+  param.typename := NULL
+  param.type-param := NULL
+  f-new-copy(user "user"): owner param.access
+  user Member-path mpath(st-func.path)
+  new Member-path param-mpath
+  param-mpath.next := NULL
+  new St-exp param-exp
+  param-exp.next := NULL
+  param-exp.operator := NULL
+  param-exp.call := NULL
+  param-exp.subexp := NULL
+  param-exp.slice-length := NULL
+  param-exp.item := param-mpath
+  param.value := param-exp
+  param.next := st-func.params
+  st-func.params := param
+  
+  var Bool ignore-dynamic
+  if string-equal(user mpath.name, user "base"): copy ignore-dynamic
+    f-find-var(user glob.curr.var-map, user "self"): user var-attrs
+    type-attrs := var-attrs.type-attrs.base-type
+    f-raise-on-null(user type-attrs, user "no base class", user "", user "")
+    f-new-copy(user "self"): owner param-mpath.name
+  
+  else
+    f-new-copy(user mpath.name): owner param-mpath.name
+    f-find-var(user glob.curr.var-map, user mpath.name): user var-attrs
+    type-attrs := var-attrs.type-attrs
+  
+  do
+    mpath := mpath.next
+    do
+      var-attrs := f-nm-find(user type-attrs.members, user mpath.name): user value
+      while var-attrs = NULL
+      type-attrs := type-attrs.base-type
+      f-raise-on-null(user type-attrs, user "unknown variable \"", user mpath.name, user "\"")
+    
+    while mpath.next != NULL
+    type-attrs := var-attrs.type-attrs
+    new Member-path new-mpath
+    param-mpath.next := new-mpath
+    new-mpath.next := NULL
+    f-new-copy(user mpath.name): owner new-mpath.name
+    param-mpath := new-mpath
+  
+  user St-func func-def(var-attrs.subtype)
+  out ret-func-def := func-def
+  write-func-last(user st-func, user var-attrs)
+  if func-def.is-dynamic and not ignore-dynamic
+    write(user "(*((Func**)(")
+    write-mpath(user st-func.path, copy false)
+    write(user ")))[")
+    var String{32} dynamic-index
+    int-to-string(copy func-def.dynamic-index): var dynamic-index
+    write(user dynamic-index)
+    write(user "]")
+  
+  else
+    write-cstyle(user type-attrs.name)
+    write(user "_")
+    write-cstyle(user mpath.name)
+  
+  return
+
+func write-func-call(user St-func st-func)
+  user St-arg arg(st-func.params)
+  user St-func func-def
+  do
+    while arg != NULL
+    write-exp-intro(user arg.value)
+    arg := arg.next
+  
+  write-call-func-name(user st-func): user func-def
+  write(user "(")
+  arg := st-func.params
+  user St-arg arg-def(func-def.params)
+  do
+    while arg != NULL or arg-def != NULL
+    f-raise-on-null(user arg, user "too few parameters in call to \"", user func-def.path.name, user "\"")
+    f-raise-on-null(user arg-def, user "too much parameters in call to \"", user func-def.path.name, user "\"")
+    user Type-attrs dec-type-attrs
+    f-find-type(user arg-def.typename): user dec-type-attrs
+    write-exp-typed(user arg.value, user dec-type-attrs)
+    arg := arg.next
+    arg-def := arg-def.next
+    if arg != NULL or st-func.outputs != NULL
+      write(user ", ")
+    
+  
+  arg := st-func.outputs
+  do
+    while arg != NULL
+    var Bool is-ref
+    if string-equal(user arg.access, user "var"): copy is-ref = false
+      write(copy "&(")
+    
+    write-mpath(user arg.value, copy true)
+    if not is-ref
+      write(copy ")")
+    
+    arg := arg.next
+    if arg != NULL
+      write(user ", ")
+    
+  
+  write(user "))")
+  return
+
+func write-args(user St-arg first, copy Bool is-out, user St-arg next)
+  user St-arg arg(first)
+  do
+    while arg != NULL
+    write-cstyle(user arg.typename)
+    if string-equal(user arg.access, user "copy"): copy glob.flag = false
+      write(user "*")
+    
+    if string-equal(user arg.access, user "var"): copy glob.flag = false and is-out
+      write(user "*")
+    
+    write(user " ")
+    write-cstyle(user arg.value)
+    arg := arg.next
+    if arg != NULL or next != NULL
+      write(user ", ")
+    
+  
+  return
+
+native func write-class(user St-class st-class)
+
+func write-func-name(user St-func st-func)
+  if glob.curr.father.f-writer = write-class
+    write-cstyle(user glob.st-class.type-attrs.name)
+    write(user "_")
+  
+  write-cstyle(user st-func.path.name)
+  return
+
+func write-func-header(user St-func st-func)
+  write(user "Returncode ")
+  write-func-name(user st-func)
+  write(user "(")
+  write-args(user st-func.params, copy false, user st-func.outputs)
+  write-args(user st-func.outputs, copy true, user NULL)
+  write(user ")")
+  return
+
+func parse-param-dec(user St-arg param)
+  if read-new(user " {"): owner param.typename, copy glob.end = '{'
+    read-new(user "}"): owner param.type-param, copy glob.end
+    read-c(): copy glob.end
+  
+  owner String name
+  read-new(user ",)"): owner name, copy glob.end
+  param.value := name
+  return
+
+func parse-func-header(owner Member-path path): owner St-func st-func, copy Char end
+  new St-func new-func
+  if path = NULL
+    new Member-path mpath
+    mpath.next := NULL
+    read-new(user "("): user mpath.name, copy glob.end
+    new Var-attrs new-var
+    f-new-copy(user mpath.name): owner new-var.name
+    new-func.path := mpath
+    f-find-type(user "Func"): user new-var.type-attrs
+    new-var.subtype := new-func
+    new-var.is-ref := false
+    if glob.curr.f-writer = write-class
+      f-nm-init(user new-var.name, owner new-var): owner glob.st-class.type-attrs.members
+    
+    else
+      f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+    
+  
+  else
+    new-func.path := path
+  
+  new-func.last := NULL
+  new-func.params := NULL
+  new-func.outputs := NULL
+  new-func.is-dynamic := false
+  new-func.dynamic-index := 0
+  user St-arg last(NULL)
+  do
+    var String{256} access
+    while read(user " )"): var access, copy glob.end = ' '
+    new St-arg param
+    param.next := NULL
+    param.typename := NULL
+    param.type-param := NULL
+    f-new-copy(user access): owner param.access
+    if path = NULL
+      parse-param-dec(user param)
+    
+    else
+      owner St-exp value 
+      parse-exp(user ",)"): owner value, copy glob.end
+      param.value := value
+    
+    if last = NULL
+      new-func.params := param
+    
+    else
+      last.next := param
+    
+    last := param
+    while glob.end = ','
+    read-c(): copy glob.end
+  
+  read-c(): copy glob.end
+  last := NULL
+  if glob.end = ':'
+    do
+      read-c(): copy glob.end
+      new St-arg param
+      param.next := NULL
+      param.typename := NULL
+      param.type-param := NULL
+      read-new(user " "): owner param.access, copy glob.end
+      if path = NULL
+        parse-param-dec(user param)
+      
+      else
+        owner Member-path mpath
+        read-mpath(user ",)."): owner mpath, copy glob.end
+        param.value := mpath
+      
+      if last = NULL
+        new-func.outputs := param
+      
+      else
+        last.next := param
+      
+      last := param
+      while glob.end = ','
+    
+    read-c(): copy glob.end
+  
+  out st-func := new-func
+  out end := glob.end
+  return
+
+# return
+func write-return(user Generic null)
+  write(user "return OK;\n")
+  return
+
+func parse-return()
+  add-node(user write-return, user NULL)
+  return
+
+# raise
+func write-raise(user Generic null)
+  write-tb-raise()
+  write(user "\n")
+  return
+
+func parse-raise()
+  add-node(user write-raise, user NULL)
+  return
+
+# func
+func write-func(user St-func st-func)
+  write(user "static char* _func_name_")
+  write-func-name(user st-func)
+  write(user " = \"")
+  if glob.curr.father.f-writer = write-class
+    write(user glob.st-class.type-attrs.name)
+    write(user ".")
+  
+  write(user st-func.path.name)
+  write(user "\";")
+  write-new-indent-line()
+  write(user "#define LUMI_FUNC_NAME _func_name_")
+  write-func-name(user st-func)
+  write-new-indent-line()
+  write-func-header(user st-func)
+  write(user " {\n")
+  glob.spaces := glob.spaces + 2
+  write-sons()
+  if glob.curr.last-son.f-writer != write-return and glob.curr.last-son.f-writer != write-raise
+    write-spaces()
+    write-return(user NULL)
+  
+  write-block-close()
+  write-new-indent-line()
+  write(user "#undef LUMI_FUNC_NAME\n")
+  return
+
+func add-arg-vars(user St-arg first, copy Bool is-ref)
+  user St-arg arg(first)
+  do
+    while arg != NULL
+    new Var-attrs new-var
+    f-new-copy(user arg.value): owner new-var.name
+    f-find-type(user arg.typename): user new-var.type-attrs
+    new-var.subtype := NULL
+    if arg.type-param != NULL
+      user Type-attrs subtype
+      f-find-type(user arg.type-param): user subtype
+      new-var.subtype := subtype
+    
+    new-var.is-ref := string-equal(user arg.access, user "var"): copy glob.flag = false and is-ref
+    f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+    arg := arg.next
+  
+  return
+
+func add-self-param(user St-func st-func)
+  new St-arg param
+  param.type-param := NULL
+  f-new-copy(user "user"): owner param.access
+  f-new-copy(user glob.st-class.type-attrs.name): owner param.typename
+  owner String param-name
+  f-new-copy(user "self"): owner param-name
+  param.value := param-name
+  param.next := st-func.params
+  st-func.params := param
+  return
+
+func parse-func-body(copy Func f-writer)
+  var Bool is-dynamic(false)
+  if glob.curr.f-writer = write-class
+    var String{16} subtype
+    read(user " "): var subtype, copy glob.end
+    string-equal(user subtype, user "dynamic"): copy is-dynamic
+  
+  owner St-func st-func
+  parse-func-header(user NULL): owner st-func, copy glob.end
+  if is-dynamic
+    st-func.is-dynamic := true
+    st-func.dynamic-index := glob.st-class.dynamic-count
+    glob.st-class.dynamic-count := glob.st-class.dynamic-count + 1
+  
+  add-node(copy f-writer, owner st-func)
+  f-start-block()
+  # add "self"
+  if glob.curr.father.f-writer = write-class
+    add-self-param(user st-func)
+    
+    new Var-attrs new-var
+    f-new-copy(user "self"): owner new-var.name
+    new-var.type-attrs := glob.st-class.type-attrs
+    new-var.subtype := NULL
+    new-var.is-ref := false
+    f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+  
+  add-arg-vars(user st-func.params, copy false)
+  add-arg-vars(user st-func.outputs, copy true)
+  return
+
+func parse-func()
+  parse-func-body(copy write-func)
+  return
+
+# native
+func write-native-type(user String name)
+  write(user "typedef void ")
+  write-cstyle(user name)
+  write(user ";\n")
+  return
+
+func write-native-func(user St-func st-func)
+  write-func-header(user st-func)
+  write(user ";\n")
+  return
+
+func write-native-class(user String name)
+  write(user "typedef struct ")
+  write-cstyle(user name)
+  write(user " ")
+  write-cstyle(user name)
+  write(user ";\n")
+  return
+
+func parse-native()
+  var String{80} kind
+  read(user " "): var kind, copy glob.end
+  if string-equal(user kind, user "func"): copy glob.flag
+    owner St-func st-func
+    parse-func-header(user NULL): owner st-func, copy glob.end
+    if glob.curr.f-writer = write-class
+      add-self-param(user st-func)
+    
+    add-node(copy write-native-func, owner st-func)
+    return
+  
+  owner String name
+  read-new(user ""): owner name, copy glob.end
+  add-type(user name, user NULL, user NULL)
+  if string-equal(user kind, user "type"): copy glob.flag
+    add-node(copy write-native-type, owner name)
+  
+  else
+    add-node(copy write-native-class, owner name)
+  
+  return
+
+# main
+func write-main(user St-func st-func)
+  write-func(user st-func)
+  write(user "\nMAIN_FUNC\n")
+  return
+
+func parse-main()
+  parse-func-body(copy write-main)
+  return
+
+# declerations
+class St-dec
+  owner String name
+  owner String typename
+  owner St-exp arr-length
+  owner St-exp str-length
+  owner String type-base
+  owner String type-var
+  owner St-exp init
+
+func parse-dec(): owner St-dec new-st-dec
+  new St-dec st-dec
+  st-dec.arr-length := NULL
+  st-dec.str-length := NULL
+  st-dec.type-base := NULL
+  st-dec.type-var := NULL
+  st-dec.init := NULL
+  
+  read-new(user " {"): owner st-dec.typename, copy glob.end
+  var Bool is-array(false)
+  var Bool is-array-var(false)
+  if glob.end = '{'
+    if string-equal(user st-dec.typename, user "Array"): copy is-array
+      if parse-exp(user "}:"): owner st-dec.arr-length, copy glob.end = ':'
+        is-array-var := true
+        read-new(user "}{"): owner st-dec.typename, copy glob.end
+      
+    
+    if string-equal(user st-dec.typename, user "String"): copy glob.flag
+      parse-exp(user "}"): owner st-dec.str-length, copy glob.end
+      if is-array
+        read-c(): copy glob.end
+      
+    
+    if string-equal(user st-dec.typename, user "Type"): copy glob.flag
+      read-new(user "}"): owner st-dec.type-base, copy glob.end
+    
+    if string-equal(user st-dec.typename, user "As"): copy glob.flag
+      read-new(user "}"): owner st-dec.type-var, copy glob.end
+      user Var-attrs var-attrs
+      f-find-var(user glob.curr.var-map, user st-dec.type-var): user var-attrs
+      f-raise-on-null(user var-attrs.subtype, user "Illegal type variable \"", user st-dec.type-var, user "\"")
+      delete st-dec.typename
+      user Type-attrs subtype(var-attrs.subtype)
+      f-new-copy(user subtype.name): owner st-dec.typename
+    
+    read-c(): copy glob.end
+  
+  if read-new(user "("): owner st-dec.name, copy glob.end = '('
+    parse-exp(user ")"): owner st-dec.init, copy glob.end
+    
+    read-c(): copy glob.end
+  
+  new Var-attrs new-var
+  f-new-copy(user st-dec.name): owner new-var.name
+  user Type-attrs type-attr
+  f-find-type(user st-dec.typename): user type-attr
+  new-var.subtype := NULL
+  if is-array-var
+    new-var.subtype := type-attr
+    f-find-type(user "Array"): user type-attr
+  
+  else-if is-array
+    user Type-attrs subtype
+    f-raise-on-null(user st-dec.arr-length.item, user "Illegal array length for \"", user st-dec.name, user "\"")
+    f-find-type(user st-dec.arr-length.item.name): user subtype
+    new-var.subtype := subtype
+  
+  else-if st-dec.type-base != NULL
+    user Type-attrs subtype
+    f-find-type(user st-dec.type-base): user subtype
+    new-var.subtype := subtype
+  
+  new-var.type-attrs := type-attr
+  new-var.is-ref := false
+  
+  if glob.curr.f-writer = write-class
+    f-nm-init(user new-var.name, owner new-var): owner glob.st-class.type-attrs.members
+  
+  else
+    f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+  
+  out new-st-dec := st-dec
+  return
+
+# var
+func write-dtl-assign(user String name)
+  write(user "*((Func**)(")
+  write-cstyle(user name)
+  write(user ")) = ")
+  return
+
+func write-dtl(user St-dec st-dec)
+  user Type-attrs type-attrs
+  f-find-type(user st-dec.typename): user type-attrs
+  if type-attrs.is-dynamic
+    write-new-indent-line()
+    write-dtl-assign(user st-dec.name)
+    write-cstyle(user st-dec.typename)
+    write(user "__dtl;")
+  
+  return
+
+func write-var-primitive(user St-dec st-dec)
+  write-exp-intro(user st-dec.init)
+  write-cstyle(user st-dec.typename)
+  write(user " ")
+  write-cstyle(user st-dec.name)
+  if st-dec.init != NULL
+    write(user " = ")
+    write-exp(user st-dec.init)
+  
+  write(user ";\n")
+  return
+
+func write-ref-prefix(user String typename, user String name)
+  write-cstyle(user typename)
+  write(user "* ")
+  write-cstyle(user name)
+  write(user " = &(")
+  write-cstyle(user typename)
+  write(user "){")
+  return
+
+func write-var-class(user St-dec st-dec)
+  write-exp-intro(user st-dec.init)
+  write-ref-prefix(user st-dec.typename, user st-dec.name)
+  if st-dec.init = NULL
+    write(user "0")
+  
+  else
+    write-exp(user st-dec.init)
+  
+  write(user "};")
+  write-dtl(user st-dec)
+  write(user "\n")
+  return
+
+func write-var-string(user St-dec st-dec)
+  write-exp-intro(user st-dec.init)
+  write-ref-prefix(user "String", user st-dec.name)
+  write-exp(user st-dec.str-length)
+  write(user ", 0, (char[")
+  write-exp(user st-dec.str-length)
+  write(user "]){0}};")
+  if st-dec.init != NULL
+    write-new-indent-line()
+    write-tb-check()
+    write(user "String_copy(")
+    write-cstyle(user st-dec.name)
+    write(user ", ")
+    write-exp(user st-dec.init)
+    write(user "));")
+  
+  write(user "\n")
+  return
+
+func write-var-array(user St-dec st-dec)
+  write-ref-prefix(user "Array", user st-dec.name)
+  write-exp(user st-dec.arr-length)
+  write(user ", (")
+  write-cstyle(user st-dec.typename)
+  write(user "[")
+  write-exp(user st-dec.arr-length)
+  write(user "]){0}};")
+  
+  if st-dec.str-length != NULL
+    write-new-indent-line()
+    write(user "char _")
+    write-cstyle(user st-dec.name)
+    write(user "_chars[")
+    write-exp(user st-dec.str-length)
+    write(user "][")
+    write-exp(user st-dec.arr-length)
+    write(user "];")
+    write-new-indent-line()
+    write(user "{int n; for(n=0; n<")
+    write-exp(user st-dec.arr-length)
+    write(user "; ++n)")
+    write-new-indent-line()
+    write(user " ((String*)(")
+    write-cstyle(user st-dec.name)
+    write(user "->values))[n] = (String){")
+    write-exp(user st-dec.str-length)
+    write(user ", 0, _")
+    write-cstyle(user st-dec.name)
+    write(user "_chars[n]};}")
+  
+  write(user "\n")
+  return
+
+func write-var-typevar(user St-dec st-dec)
+  write(user "Type ")
+  write-cstyle(user st-dec.name)
+  if st-dec.init != NULL
+    f-raise-on-null(user st-dec.init.item, user "Illegal init for type var\"", user st-dec.name, user "\"")
+    write(user " = ")
+    write-type-var(user st-dec.init)
+  
+  write(user ";\n")
+  return
+
+func write-new-as-dtl(user St-dec st-dec)
+  write-new-indent-line()
+  write(user "if (")
+  write-cstyle(user st-dec.type-var)
+  write(user ".dtl != NULL) { ")
+  write-dtl-assign(user st-dec.name)
+  write-cstyle(user st-dec.type-var)
+  write(user ".dtl; }")
+  return
+
+func write-var-as(user St-dec st-dec)
+  write-cstyle(user st-dec.typename)
+  write(user "* ")
+  write-cstyle(user st-dec.name)
+  write(user " = (")
+  write-cstyle(user st-dec.typename)
+  write(user "*)(Byte[")
+  write-cstyle(user st-dec.type-var)
+  write(user ".size]){0};")
+  write-new-as-dtl(user st-dec)
+  write(user "\n")
+  return
+
+func add-dec-node(copy Func f-writer, owner Generic value)
+  user St node
+  f-st-new(copy f-writer, user value, user glob.curr): user node
+  return
+
+func parse-var()
+  owner St-dec st-dec
+  parse-dec(): owner st-dec
+  
+  if st-dec.arr-length != NULL
+    add-dec-node(copy write-var-array, owner st-dec)
+    return
+  
+  if st-dec.str-length != NULL
+    add-dec-node(copy write-var-string, owner st-dec)
+    return
+  
+  if st-dec.type-base != NULL
+    add-dec-node(copy write-var-typevar, owner st-dec)
+    return
+  
+  if st-dec.type-var != NULL
+    add-dec-node(copy write-var-as, owner st-dec)
+    return
+  
+  if f-is-primitive(user st-dec.typename): copy glob.flag
+    add-dec-node(copy write-var-primitive, owner st-dec)
+    return
+  
+  add-dec-node(copy write-var-class, owner st-dec)
+  return
+
+# ref
+func write-ref(user St-dec st-dec)
+  write-exp-intro(user st-dec.init)
+  write-cstyle(user st-dec.typename)
+  write(user "* ")
+  write-cstyle(user st-dec.name)
+  if st-dec.init != NULL
+    write(user " = ")
+    write-exp(user st-dec.init)
+  
+  write(user ";\n")
+  return
+
+func parse-ref()
+  owner St-dec st-dec
+  parse-dec(): owner st-dec
+  add-dec-node(copy write-ref, owner st-dec)
+  return
+
+# new
+func write-new(user St-dec st-dec)
+  if st-dec.type-var != NULL
+    write(user "if (")
+    write-cstyle(user st-dec.type-var)
+    write(user ".size <= 0) ")
+    write-tb-raise()
+    write-new-indent-line()
+  
+  if st-dec.arr-length != NULL
+    write(user "Array")
+  
+  else
+    write-cstyle(user st-dec.typename)
+  
+  write(user "* ")
+  write-cstyle(user st-dec.name)
+  write(user " = ")
+  
+  if st-dec.arr-length != NULL
+    write(user "new_array(")
+    write-exp(user st-dec.arr-length)
+    write(user ", sizeof(")
+    write-cstyle(user st-dec.typename)
+    write(copy ")")
+    if st-dec.str-length != NULL
+      write(user " + (")
+      write-exp(user st-dec.str-length)
+      write-c(copy ')')
+    
+  
+  else-if st-dec.str-length != NULL
+    write(user "new_string(")
+    write-exp(user st-dec.str-length)
+  
+  else-if st-dec.type-var != NULL
+    write(user "malloc(")
+    write-cstyle(user st-dec.type-var)
+    write(user ".size")
+  
+  else
+    write(user "malloc(sizeof(")
+    write-cstyle(user st-dec.typename)
+    write-c(copy ')')
+    
+  
+  write(user ");")
+  write-new-indent-line()
+  write(user "if (")
+  write-cstyle(user st-dec.name)
+  write(user " == NULL) ")
+  write-tb-raise()
+  
+  if st-dec.arr-length != NULL and st-dec.str-length != NULL
+    write-new-indent-line()
+    write(user "{int n; for(n=0; n<(")
+    write-exp(user st-dec.arr-length)
+    write(user "); ++n)")
+    write-new-indent-line()
+    write(user " ((String*)(")
+    write-cstyle(user st-dec.name)
+    write(user "->values))[n] = (String){")
+    write-exp(user st-dec.str-length)
+    write(user ", 0, (Byte*)(")
+    write-cstyle(user st-dec.name)
+    write(user "->values) + (")
+    write-exp(user st-dec.arr-length)
+    write(user ") * sizeof(String) + (")
+    write-exp(user st-dec.str-length)
+    write(user ") * n};}")
+  
+  if st-dec.type-var != NULL
+    write-new-as-dtl(user st-dec)
+  
+  else-if st-dec.arr-length = NULL and st-dec.str-length = NULL
+    write-dtl(user st-dec)
+  
+  write(copy "\n")
+  return
+
+func parse-new()
+  owner St-dec st-dec
+  parse-dec(): owner st-dec
+  add-node(copy write-new, owner st-dec)
+  return
+
+# delete
+func write-delete(user Member-path mpath)
+  write(user "free(")
+  write-mpath(user mpath, copy true)
+  write(user ");\n")
+  return
+
+func parse-delete()
+  owner Member-path mpath
+  read-mpath(user "."): owner mpath, copy glob.end
+  add-node(copy write-delete, owner mpath)
+  return
+
+# if
+func write-if(user St-exp st-exp)
+  write-exp-intro(user st-exp)
+  write(user "if (")
+  write-exp(user st-exp)
+  write(user ")")
+  write-block()
+  return
+
+func parse-if()
+  owner St-exp st-exp
+  parse-exp(user ""): owner st-exp, copy glob.end
+  add-node(copy write-if, owner st-exp)
+  f-start-block()
+  return
+
+# else
+func write-else(user Generic null)
+  write(user "else")
+  write-block()
+  return
+
+func parse-else()
+  add-node(copy write-else, user NULL)
+  f-start-block()
+  return
+
+# else-if
+func write-else-if(user St-exp st-exp)
+  write(user "else {")
+  glob.spaces := glob.spaces + 2
+  write-new-indent-line()
+  write-exp-intro(user st-exp)
+  write(user "if (")
+  write-exp(user st-exp)
+  write(user ")")
+  write-block()
+  user St next(glob.curr.next-brother)
+  if next != NULL and (next.f-writer = write-else or next.f-writer = write-else-if)
+    glob.curr := next
+    write-spaces()
+    next.f-writer(user next.value)
+  
+  write-block-close()
+  write(user "\n")
+  return
+
+func parse-else-if()
+  owner St-exp st-exp
+  parse-exp(user ""): owner st-exp, copy glob.end
+  add-node(copy write-else-if, owner st-exp)
+  f-start-block()
+  return
+
+# do
+func write-do(user Generic null)
+  write(user "while (true)")
+  write-block()
+  return
+
+func parse-do()
+  add-node(copy write-do, user NULL)
+  f-start-block()
+  return
+
+# while
+func write-while(user St-exp st-exp)
+  write-exp-intro(user st-exp)
+  write(user "if (!(")
+  write-exp(user st-exp)
+  write(user ")) break;\n")
+  return
+
+func parse-while()
+  owner St-exp st-exp
+  parse-exp(user ""): owner st-exp, copy glob.end
+  add-node(copy write-while, owner st-exp)
+  return
+
+# for
+class St-for
+  owner String counter
+  owner St-exp start
+  owner St-exp limit
+
+func write-for(user St-for st-for)
+  write-exp-intro(user st-for.start)
+  write-exp-intro(user st-for.limit)
+  write(user "Int ")
+  write-cstyle(user st-for.counter)
+  write(user "; for (")
+  write-cstyle(user st-for.counter)
+  write(user " = ")
+  if st-for.start = NULL
+    write(user "0")
+  
+  else
+    write-exp(user st-for.start)
+  
+  write(user "; ")
+  write-cstyle(user st-for.counter)
+  write(user " < ")
+  write-exp(user st-for.limit)
+  write(user "; ++")
+  write-cstyle(user st-for.counter)
+  write(user ")")
+  write-block()
+  return
+
+func parse-for()
+  new St-for st-for
+  read-new(user " "): owner st-for.counter, copy glob.end
+  # ignore "in "
+  read-ignore(copy 3)
+  st-for.start := NULL
+  if parse-exp(user ":"): owner st-for.limit, copy glob.end = ':'
+    st-for.start := st-for.limit
+    parse-exp(user ""): owner st-for.limit, copy glob.end
+  
+  # add index to var-map
+  new Var-attrs new-var
+  f-new-copy(user st-for.counter): owner new-var.name
+  f-find-type(user "Int"): user new-var.type-attrs
+  new-var.subtype := NULL
+  new-var.is-ref := false
+  f-nm-init(user new-var.name, owner new-var): owner glob.curr.var-map
+  
+  add-node(copy write-for, owner st-for)
+  f-start-block()
+  return
+
+# class
+func write-class-members(user St self-node, copy Bool is-func)
+  user St son(self-node.first-son)
+  do
+    while son != NULL
+    glob.curr := son
+    var Bool is-func-writer(son.f-writer = write-func or son.f-writer = write-native-func)
+    if is-func = is-func-writer and son.f-writer != write-empty-line
+      write-spaces()
+      son.f-writer(user son.value)
+    
+    son := son.next-brother
+    glob.curr := glob.curr.father
+  
+  return
+
+func write-class(user St-class st-class)
+  user String class-name(st-class.type-attrs.name)
+  write(user "typedef struct ")
+  write-cstyle(user class-name)
+  write(user " ")
+  write-cstyle(user class-name)
+  write(user "; struct ")
+  write-cstyle(user class-name)
+  write(user " {\n")
+  # write members
+  glob.spaces := glob.spaces + 2
+  glob.st-class := st-class
+  if st-class.type-attrs.base-type != NULL
+    write-spaces()
+    write-cstyle(user st-class.type-attrs.base-type.name)
+    write(user " _base;\n")
+  
+  else-if st-class.type-attrs.is-dynamic
+    write-spaces()
+    write(user "Func* _dtl;\n")
+  
+  user St self-node(glob.curr)
+  write-class-members(user self-node, copy false)
+  write-block-close()
+  write(user ";\n")
+  write-class-members(user self-node, copy true)
+  glob.st-class := NULL
+  if st-class.type-attrs.is-dynamic
+    write-spaces()
+    write(user "Func ")
+    write-cstyle(user class-name)
+    write(user "__dtl[] = {")
+    user St son(self-node.first-son)
+    var Bool not-first(false)
+    do
+      while son != NULL
+      if son.f-writer = write-func
+        user St-func st-func(son.value)
+        if st-func.is-dynamic
+          if not-first
+            write(user ", ")
+          
+          write-cstyle(user class-name)
+          write(user "_")
+          write-cstyle(user st-func.path.name)
+          not-first := true
+        
+      
+      son := son.next-brother
+    
+    write(user "};\n")
+  
+  return
+
+func parse-class(copy Bool is-dynamic)
+  var String{256} name
+  var String{256} base-name
+  read(user "("): var name, copy glob.end
+  read(user ")"): var base-name, copy glob.end
+  read-c(): copy glob.end
+  if string-equal(user base-name, user "Object"): copy glob.flag
+    add-type(user name, user NULL, user NULL)
+  
+  else
+    add-type(user name, user base-name, user NULL)
+  
+  new St-class st-class
+  st-class.type-attrs := glob.type-map.value
+  st-class.type-attrs.is-dynamic := is-dynamic
+  st-class.dynamic-count := 0
+  glob.st-class := st-class
+  add-node(copy write-class, owner st-class)
+  f-start-block()
+  return
+
+func parse-dynamic-class()
+  parse-class(copy true)
+  return
+
+func parse-static-class()
+  parse-class(copy false)
+  return
+
+# call
+func write-call(user St-func st-func)
+  write-func-call(user st-func)
+  write(user ";\n")
+  return
+
+func parse-call(owner Member-path mpath)
+  owner St-func st-func
+  parse-func-header(owner mpath): owner st-func, copy glob.end
+  add-node(copy write-call, owner st-func)
+  return
+
+# assign
+class St-assign
+  owner St-exp target
+  owner St-exp value
+
+func write-assign(user St-assign st-assign)
+  write-exp-intro(user st-assign.value)
+  write-exp-intro(user st-assign.target)
+  write-exp(user st-assign.target)
+  write(user " = ")
+  user Var-attrs var-attrs
+  f-get-mpath-attrs(user st-assign.target): user var-attrs
+  if var-attrs = NULL
+    write-exp(user st-assign.value)
+  
+  else
+    write-exp-typed(user st-assign.value, user var-attrs.type-attrs)
+  
+  write(user ";\n")
+  return
+
+func parse-assign(user Member-path mpath, copy Char end)
+  new St-assign st-assign
+  new St-exp target
+  target.next := NULL
+  target.operator := NULL
+  target.item := mpath
+  target.call := NULL
+  target.subexp := NULL
+  if end = '['
+    parse-exp(user "]"): owner target.subexp, copy glob.end
+    read-ignore(copy 1)
+  
+  st-assign.target := target
+  # ignore ":= "
+  read-ignore(copy 3)
+  parse-exp(user ""): owner st-assign.value, copy glob.end
+  add-node(copy write-assign, owner st-assign)
+  return
+
+# member path
+func parse-member-path(user String name)
+  new Member-path mem-path
+  user Member-path mpath(mem-path)
+  f-new-copy(user name): owner mpath.name
+  do
+    new Member-path new-mpath
+    mpath.next := new-mpath
+    mpath := new-mpath
+    mpath.next := NULL
+    while read-new(user " .(["): owner mpath.name, copy glob.end = '.'
+  
+  if glob.end = '('
+    parse-call(owner mem-path)
+  
+  else
+    parse-assign(owner mem-path, copy glob.end)
+  
+  return
+
+# lines
+func parse-line(): copy Bool more-lines
+  var String{80} key-word
+  var Int spaces
+  var Char end
+  read-indent(user " .([", copy true): var key-word, copy end, copy spaces
+  if end = EOF
+    out more-lines := false
+    return
+  
+  out more-lines := true
+  do
+    while spaces < glob.spaces
+    f-end-block()
+  
+  if string-equal(user key-word, user ""): copy glob.flag
+    add-empty-line()
+    return
+  
+  if end = '('
+    new Member-path mpath
+    f-new-copy(user key-word): owner mpath.name
+    mpath.next := NULL
+    parse-call(owner mpath)
+  
+  else-if end = '.'
+    parse-member-path(user key-word)
+  
+  else
+    var Bool parsed(false)
+    if end != '['
+      var Func f-parser
+      if f-fm-find(user glob.key-word-map, user key-word): copy f-parser, copy parsed
+        f-parser()
+      
+    
+    if not parsed
+      new Member-path mpath
+      f-new-copy(user key-word): owner mpath.name
+      mpath.next := NULL
+      parse-assign(owner mpath, copy end)
+    
+  
+  return
+
+func parse-lines()
+  var Bool flag
+  do
+    while parse-line(): copy flag
+  
+  return
+
+# global init
+func f-create-key-word-map()
+  new Array{19:Func-map} key-word-map
+  add-fm(user key-word-map, copy 0, user "#", copy parse-comment)
+  add-fm(user key-word-map, copy 1, user "func", copy parse-func)
+  add-fm(user key-word-map, copy 2, user "native", copy parse-native)
+  add-fm(user key-word-map, copy 3, user "main", copy parse-main)
+  add-fm(user key-word-map, copy 4, user "var", copy parse-var)
+  add-fm(user key-word-map, copy 5, user "owner", copy parse-ref)
+  add-fm(user key-word-map, copy 6, user "user", copy parse-ref)
+  add-fm(user key-word-map, copy 7, user "new", copy parse-new)
+  add-fm(user key-word-map, copy 8, user "delete", copy parse-delete)
+  add-fm(user key-word-map, copy 9, user "if", copy parse-if)
+  add-fm(user key-word-map, copy 10, user "else", copy parse-else)
+  add-fm(user key-word-map, copy 11, user "else-if", copy parse-else-if)
+  add-fm(user key-word-map, copy 12, user "do", copy parse-do)
+  add-fm(user key-word-map, copy 13, user "while", copy parse-while)
+  add-fm(user key-word-map, copy 14, user "for", copy parse-for)
+  add-fm(user key-word-map, copy 15, user "return", copy parse-return)
+  add-fm(user key-word-map, copy 16, user "raise", copy parse-raise)
+  add-fm(user key-word-map, copy 17, user "static", copy parse-static-class)
+  add-fm(user key-word-map, copy 18, user "class", copy parse-dynamic-class)
+  glob.key-word-map := key-word-map
+  return
+
+func f-new-substing(user String text, user String ends): owner String substing, copy Int end, copy Char endch
+  var Int start(end[0])
+  var Int index(start)
+  var Char ch
+  do
+    ch := EOF
+    while index < text.actual-length
+    var Bool has-end
+    string-get(user text, copy index): copy ch
+    while string-has(user ends, copy ch): copy has-end = false
+    index := index + 1
+  
+  user String sub(text[start:index - start])
+  f-new-copy(user sub): var substing
+  out end := index + 1
+  out endch := ch
+  return
+
+func add-args(user String header): owner St-arg args, copy Int index, copy Char endch
+  var Char end
+  user St-arg prev(NULL)
+  out args := NULL
+  do
+    new St-arg param
+    param.next := NULL
+    param.type-param := NULL
+    f-new-substing(user header, user " "): owner param.access, var index, copy end
+    f-new-substing(user header, user " {"): owner param.typename, var index, copy end
+    if end = '{'
+      f-new-substing(user header, user " "): owner param.type-param, var index, copy end
+    
+    owner String value
+    f-new-substing(user header, user ",)"): owner value, var index, copy end
+    param.value := value
+    if prev = NULL
+      out args = param
+    
+    else
+      prev.next := param
+    
+    prev := param
+    while end = ','
+  
+  out endch := end
+  return
+
+func add-meth(user String header, user Type-attrs func-type): owner Name-map members
+  new St-func st-func
+  new Member-path mpath
+  mpath.next := NULL
+  var Int index(0)
+  var Char end
+  f-new-substing(user header, user "()"): owner mpath.name, copy index, copy end
+  st-func.path := mpath
+  st-func.last := NULL
+  if end = '('
+    add-args(user header): owner st-func.params, copy index, copy end
+  
+  if end = ')'
+    add-args(user header): owner st-func.outputs, copy index, copy end
+  
+  add-member(user mpath.name, user func-type, user st-func): var members
+  return
+
+func f-add-op(user String op-name, user String op-c-name)
+  owner String name
+  f-new-copy(user op-name): owner name
+  owner String c-name
+  f-new-copy(user op-c-name): owner c-name
+  f-nm-init(owner name, owner c-name): owner glob.op-map
+  return
+
+func f-add-op-copy(user String name)
+  f-add-op(user name, user name)
+  return
+
+func add-var(user String name, user Type-attrs type-attrs)
+  add-member(user name, user type-attrs, user NULL): owner glob.var-map
+  return
+
+func f-create-name-maps()
+  glob.op-map := NULL
+  glob.type-map := NULL
+  glob.var-map := NULL
+  # Operands
+  f-add-op-copy(user "+")
+  f-add-op-copy(user "-")
+  f-add-op-copy(user "*")
+  f-add-op-copy(user "/")
+  f-add-op(user "=", user "==")
+  f-add-op-copy(user "!=")
+  f-add-op-copy(user ">")
+  f-add-op-copy(user "<")
+  f-add-op-copy(user ">=")
+  f-add-op-copy(user "<=")
+  f-add-op(user "?", user "NULL != ")
+  f-add-op(user "not", user "!")
+  f-add-op(user "or", user "||")
+  f-add-op(user "and", user "&&")
+  # Func
+  add-type(user "Func", owner NULL, user NULL)
+  user Type-attrs func-type(glob.type-map.value)
+  # Int
+  owner Name-map members-int(NULL)
+  add-meth(user "str(user Int self)var String str", user func-type): owner members-int
+  add-type(user "Int", user NULL, owner members-int)
+  user Type-attrs type-int(glob.type-map.value)
+  # Char
+  add-type(user "Char", owner NULL, user NULL)
+  # Bool
+  add-type(user "Bool", owner NULL, user NULL)
+  user Type-attrs type-bool(glob.type-map.value)
+  add-var(user "true", user type-bool)
+  add-var(user "false", user type-bool)
+  # Type
+  add-type(user "Type", owner NULL, user NULL)
+  add-type(user "As", owner NULL, user NULL)
+  # String
+  owner Name-map members-string(NULL)
+  add-member(user "length", user type-int, user NULL): owner members-string
+  add-member(user "max-length", user type-int, user NULL): owner members-string
+  add-meth(user "clear(user String self", user func-type): owner members-string
+  add-meth(user "equal(user String self,user String pattern)copy Bool equal", user func-type): owner members-string
+  add-meth(user "get(user String self,copy Int index)copy Char ch", user func-type): owner members-string
+  add-meth(user "append(user String self,copy Char ch", user func-type): owner members-string
+  add-meth(user "copy(user String self,user String other", user func-type): owner members-string
+  add-meth(user "concat(user String self,user String other", user func-type): owner members-string
+  add-meth(user "find(user String self,user String pattern)copy Int index", user func-type): owner members-string
+  add-meth(user "replace(user String self,copy Char oldch,copy Char newch", user func-type): owner members-string
+  add-meth(user "has(user String self,copy Char ch)copy Bool has", user func-type): owner members-string
+  add-type(user "String", user NULL, owner members-string)
+  # Array
+  owner Name-map members-array(NULL)
+  add-member(user "length", user type-int, user NULL): owner members-array
+  add-type(user "Array", user NULL, owner members-array)
+  # File
+  owner Name-map members-file(NULL)
+  add-meth(user "close(user File self", user func-type): owner members-file
+  add-meth(user "getc(user File self)copy Char ch", user func-type): owner members-file
+  add-meth(user "putc(user File self,copy Char ch", user func-type): owner members-file
+  add-meth(user "write(user File self,user String text", user func-type): owner members-file
+  add-type(user "File", user NULL, owner members-file)
+  add-meth(user "file-open-read(user String name)owner File file", user func-type): owner glob.var-map
+  add-meth(user "file-open-write(user String name)owner File file", user func-type): owner glob.var-map
+  # Sys
+  owner Name-map members-sys(NULL)
+  add-meth(user "print(user Sys self,user String text", user func-type): owner members-sys
+  add-meth(user "exit(user Sys self,copy Int status", user func-type): owner members-sys
+  add-meth(user "system(user Sys self,user String command)copy Int status", user func-type): owner members-sys
+  add-meth(user "getenv(user Sys self,user String name)var String value,copy Bool exists", user func-type): owner members-sys
+  add-type(user "Sys", user NULL, owner members-sys)
+  return
+
+func f-init-glob-state(user St root)
+  glob.curr := root
+  glob.spaces := 0
+  glob.st-class := NULL
+  glob.var-count := 0
+  return
+
+# compile
+func f-compile-file(user Array{String} argv, copy Int index)
+  # get file names
+  user String infile-name
+  [] String infile-name := argv[index]
+  if string-has(user infile-name, copy '"'): copy glob.flag
+    f-msg-raise(user "Illegal \" character in argument '", user infile-name, user "'")
+  
+  if infile-name.actual-length < 6
+    f-msg-raise(user "too short argument \"", user infile-name, user "\"")
+  
+  new String{infile-name.actual-length} outfile-name
+  user String prefix(infile-name[0:infile-name.actual-length - 4])
+  string-copy(user outfile-name, user prefix)
+  string-concat(user outfile-name, user "c\0")
+  
+  # init root node
+  f-st-new(copy write-sons, user NULL, user NULL): owner glob.curr
+  owner St root(glob.curr)
+  
+  # parse
+  print(user infile-name)
+  file-open-read(user infile-name): owner glob.infile
+  print(user "parsing...")
+  f-init-glob-state(user root)
+  glob.line-num := 0
+  parse-lines()
+  file-close(owner glob.infile)
+  
+  # write
+  file-open-write(user outfile-name): owner glob.outfile
+  print(user "writing...")
+  f-init-glob-state(user root)
+  if index = argv.length - 1
+    write(user "#include \"lumi.2.h\"\n")
+    var Int index(1)
+    do
+      while index < argv.length - 1
+      user String infile-name
+      [] String infile-name := argv[index]
+      user String prefix(infile-name[0:infile-name.actual-length - 4])
+      write(user "#include \"")
+      write(user prefix)
+      write(user "c\"\n")
+      index := index + 1
+    
+    write(user "\n")
+  
+  var String{64} index-str
+  int-to-string(copy index): var index-str
+  write(user "static char* _mr_file")
+  write(user index-str)
+  write(user "_name = \"")
+  write(user infile-name)
+  write(user "\";\n#define LUMI_FILE_NAME _mr_file")
+  write(user index-str)
+  write(user "_name\n")
+  root.f-writer()
+  write(user "\n#undef LUMI_FILE_NAME\n")
+  file-close(owner glob.outfile)
+  
+  # finalize
+  glob.var-map = root.var-map
+  delete outfile-name
+  return
+
+# main
+main func(user Array{String} argv)
+  print(user "Lumi compiler start")
+  
+  if argv.length < 2
+    print(user "usage: tl2-compiler [input Lumi files]...")
+    return
+  
+  # init global data
+  f-create-key-word-map()
+  f-create-name-maps()
+  
+  var Int index(1)
+  do
+    while index < argv.length
+    f-compile-file(user argv, copy index)
+    index := index + 1
+  
+  print(user "Lumi compiler end")
+  return
+

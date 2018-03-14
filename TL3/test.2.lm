@@ -1,0 +1,130 @@
+# TL3 compiler - testing
+
+class St-assert(St)
+  owner Mexp condition
+  
+  func dynamic parse()
+    parse-new-exp(user ""):(owner self.condition)
+  
+  func dynamic analyze-first()
+    # nothing
+  
+  func dynamic analyze()
+    self.condition.analyze-type(user glob.type-bool)
+  
+  func dynamic write()
+    self.condition.write-intro()
+    write(user "TEST_ASSERT(")
+    write-line-num()
+    write(user ", ")
+    self.condition.write-final()
+    write(user ")")
+
+
+class St-assert-error(St)
+  owner Mexp exp
+  
+  func dynamic parse()
+    parse-new-exp(user ""):(owner self.exp)
+    self.exp.is-used := false
+  
+  func dynamic analyze-first()
+    # nothing
+  
+  func dynamic analyze()
+    self.exp.analyze-type(user _)
+  
+  func dynamic write()
+    write(user "_trace_stream = NULL;\n")
+    write-spaces()
+    write(user "do {\n")
+    glob.spaces := glob.spaces + 2
+    write(user "#undef RETURN_ERROR\n")
+    write(user "#define RETURN_ERROR(value) break\n")
+    write-spaces()
+    self.exp.write-intro()
+    self.exp.write-final()
+    write(user ";\n")
+    write(user "#undef RETURN_ERROR\n")
+    write(user "#define RETURN_ERROR(value) return value\n")
+    write-spaces()
+    write(user "_trace_stream = stdout;\n")
+    write-spaces()
+    write(user "TEST_FAIL(")
+    write-line-num()
+    write(user ")\n")
+    glob.spaces := glob.spaces - 2
+    write-spaces()
+    write(user "} while (false);\n")
+    write-spaces()
+    write(user "_trace_stream = stdout;")
+
+
+class St-test(St-func)
+  func dynamic parse()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    base.write()
+  
+  func dynamic m-register()
+    glob.test-funcs.add(user self.mfunc.name)
+
+
+class St-mock(St-func)
+  func dynamic parse()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    user Mvar mvar
+    var Int index
+    self.mfunc.name.find(user "."):(copy index)
+    if index < self.mfunc.name.length
+      user String type-name(self.mfunc.name[0:index])
+      new String{self.mfunc.name.length - index} meth-name
+      meth-name.copy(user self.mfunc.name[index + 1:self.mfunc.name.length - index - 1])
+      if not (? f-find-type(user type-name):(user self.mfunc.mclass))
+        f-syntax-error(user "mocking method of unknown type", user type-name)
+      if not (? self.mfunc.mclass.members.find(user meth-name):(user mvar))
+        f-syntax-error2(user "type", user type-name, user "has no member", user meth-name)
+      delete self.mfunc.name
+      self.mfunc.name := meth-name
+      self.mfunc.args.add-param(copy ACCESS-VAR, user self.mfunc.mclass, user "self")
+    else-if not (? self.m-find-var(user self.mfunc.name):(user mvar))
+      f-syntax-error(user "mocking unknown function", user self.mfunc.name)
+    if not (? mvar.func-dec)
+      f-syntax-error(user "cannot mock non-function", user self.mfunc.name)
+    mvar.func-dec.is-mocked := true
+    base.analyze()
+  
+  func dynamic write()
+    base.write()
+  
+  func dynamic m-register()
+    # nothing
+
+
+class St-debug(St)
+  func inst m-swich-debug()
+    glob.debug := not glob.debug
+  
+  func dynamic parse()
+    self.m-swich-debug()
+  
+  func dynamic analyze-first()
+    self.m-swich-debug()
+  
+  func dynamic analyze()
+    self.m-swich-debug()
+  
+  func dynamic write()
+    self.m-swich-debug()

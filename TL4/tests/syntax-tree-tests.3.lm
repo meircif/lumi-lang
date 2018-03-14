@@ -1,0 +1,219 @@
+## TL4 compiler tests - Syntax tree
+
+func write-syntax-tree(copy Bool is-test)
+  var Array{6:String{256}} mock-argv
+  mock-argv[0].copy(user "tl4-compiler")
+  mock-argv[1].copy(user "mock.c")
+  mock-argv[2].copy(user "mock.4.lm")
+  if is-test
+    mock-argv[3].copy(user "-t")
+    mock-argv[4].copy(user "ut")
+    mock-argv[5].copy(user "second.4.lm")
+  else
+    mock-argv.length := 3
+  glob.root.is-library := true
+  glob.root.parse(user mock-argv)
+  glob.root.analyze()
+  glob.root.write()
+
+
+func test-global-scope(
+    user String input-text,
+    user String second-file-input-text,
+    user String expected-output,
+    copy Bool is-test)
+  f-setup-test()
+  set-mock-file-text(user input-text, user second-file-input-text)
+  write-syntax-tree(copy is-test)
+  if mock-output-file-text[0] != '\n'
+    print(user mock-output-file-text)
+  assert mock-output-file-text[0] = '\n'
+  assert mock-output-file-text[mock-output-file-text.length - 1] = '\n'
+  f-assert-string-slice(
+      user expected-output,
+      user mock-output-file-text,
+      copy 1,
+      copy mock-output-file-text.length - 2,
+      copy true)
+
+
+func test-global-scope-error(
+    user String input-text,
+    user String second-file-input-text,
+    user String expected-error,
+    copy Bool is-test)
+  f-setup-test()
+  set-mock-file-text(user input-text, user second-file-input-text)
+  mock-print-active := true
+  assert-error write-syntax-tree(copy is-test)
+  mock-print-active := false
+  user String expected-header
+  if is-test
+    expected-header := "Code error in second.4.lm["
+  else
+    expected-header := "Code error in mock.4.lm["
+  f-assert-string-slice(
+      user expected-header,
+      user mock-print-text,
+      copy 0,
+      copy expected-header.length,
+      copy false)
+  assert mock-print-text[mock-print-text.length - 1] = '\n'
+  f-assert-string-slice(
+      user expected-error,
+      user mock-print-text,
+      copy expected-header.length + 3,
+      copy mock-print-text.length - expected-header.length - 4,
+      copy true)
+
+
+test test-illegal-usage()
+  f-setup-test()
+  var Array{2:String{4}} mock-argv
+  mock-print-active := true
+  assert-error glob.root.parse(user mock-argv)
+  mock-print-active := false
+  f-assert-string-slice(
+      user "usage: tl4-compiler [-t TESTED-MODULE] OUTPUT-C-FILE-NAME INPUT-TL4-FILES...\n",
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+
+
+func test-analyze-error(user String expected-error)
+  mock-print-active := true
+  assert-error glob.root.analyze()
+  mock-print-active := false
+  f-assert-string-slice(
+      user expected-error,
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+
+
+func test-no-run-func(copy Bool testing, user String expected-error)
+  f-setup-test()
+  glob.root.is-library := false
+  if testing
+    string-new-copy(user "ut"):(owner glob.tested-module)
+  test-analyze-error(user expected-error)
+
+test test-no-main()
+  test-no-run-func(
+      copy false, user "General code error: no main function\n")
+
+test test-no-test-func()
+  test-no-run-func(
+      copy true, user "General code error: no test functions\n")
+
+
+func test-cover-error(copy Bool has-module, user String expected-error)
+  f-setup-test()
+  glob.root.is-library := true
+  string-new-copy(user "error"):(owner glob.tested-module)
+  glob.test-functions.add(user _, user _)
+  var ModuleMembers dummy-module
+  if has-module
+    glob.module-map.add(user glob.tested-module, user dummy-module)
+  new Array{1:LineCount} in glob.root.line-counts
+  test-analyze-error(user expected-error)
+
+test test-unknown-test-module()
+  test-cover-error(
+      copy false,
+      user "General code error: unknown tested module \"error\"\n")
+
+test test-no-code-to-test()
+  test-cover-error(
+      copy true,
+      user "General code error: no code to test under module \"error\"\n")
+
+
+test test-general()
+  test-new-file(user "syntax-tree-tests", user "test-general")
+
+
+test test-struct()
+  test-from-file(user "test-struct")
+
+
+test test-class()
+  test-from-file(user "test-class")
+
+
+test test-function()
+  test-from-file(user "test-function")
+
+
+test test-members()
+  test-from-file(user "test-members")
+
+
+test test-return()
+  test-from-file(user "test-return")
+
+
+test test-code-variables()
+  test-from-file(user "test-code-variables")
+
+
+test test-initialize()
+  test-from-file(user "test-initialize")
+
+
+test test-comment()
+  test-from-file(user "test-comment")
+
+
+test test-if-else()
+  test-from-file(user "test-if-else")
+
+
+test test-do-loop()
+  test-from-file(user "test-do-loop")
+
+
+test test-for-loop()
+  test-from-file(user "test-for-loop")
+
+
+test test-testing()
+  test-from-file(user "test-testing")
+
+
+test test-native()
+  test-from-file(user "test-native")
+
+
+test test-parameter-type()
+  test-from-file(user "test-parameter-type")
+
+
+test test-parameter-inheritance()
+  test-from-file(user "test-parameter-inheritance")
+
+
+test test-error-handling()
+  test-from-file(user "test-error-handling")
+
+
+test test-for-each()
+  test-from-file(user "test-for-each")
+
+
+test test-complex-fields()
+  test-from-file(user "test-complex-fields")
+
+
+test test-enum()
+  test-from-file(user "test-enum")
+
+
+test test-constant()
+  test-from-file(user "test-constant")
+
+
+test test-module()
+  test-from-file(user "test-module")

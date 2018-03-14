@@ -1,0 +1,248 @@
+(## TL4 compiler - Expression
+
+Expression is a basic class for all expression types.
+For each part of an expression (variable, constant, function call, etc..) there
+is a class that expends the basic expression type and handles its unique logic.
+From a complex expression an expression tree is generated, with types such
+operators and slices that contain sub-expression inside.
+
+For example, `array[4] + 3` expression is parsed as:
+BinaryExpression:
+  operator: +
+  left: SliceExpression:
+    sequence: SymbolExpression(array)
+    index: IntExpression(4)
+  right: IntExpression(3)
+#)
+
+## Return in `expression` a new allocated expression parsed from the input
+## file until one of the characters in `ends` is reached.
+## Return the end character in `end`
+func parse-new-expression(user String ends, user SyntaxTreeCode code-node):(
+    owner Expression expression, copy Char end)
+  Expression.parse-new(
+      var _, user ends, user code-node, user _):(owner expression, copy end)
+
+
+## Meta type for an expression in the language.
+## Currently only the parsing is fully implemented, `write` is implemented only
+## for testing.
+class Expression(SyntaxTreeNode)
+  user SyntaxTreeCode code-node
+  owner TypeInstance result-type
+  var Int access
+  var Bool assignable
+  var Bool top
+  var Bool constant
+  var Bool is-statement
+  var Bool is-generic-cast
+  var Bool is-complex-field
+  
+  ## Parse any expression
+  func inst parse-new(
+      user String ends,
+      user SyntaxTreeCode code-node,
+      user Operator curr-operator):(
+      owner Expression expression,
+      copy Char end,
+      user Operator operator)
+    expression := _
+    owner String text
+    self.read-new-value(user ends):(owner text, copy end)
+    glob.operator-map.find(user text):(user operator)
+    if ? operator
+      UnaryExpression.parse-new(
+          var _, user ends, user operator, user code-node):(
+          owner expression, copy end, user operator)
+    else
+      self.parse-new-operand(owner text, user ends, user code-node):(
+          owner expression, copy end)
+      if end = ' '
+        self.read-new-value(user ends):(owner text, copy end)
+        glob.operator-map.find(user text):(user operator)
+        if not (? operator)
+          code-node.m-syntax-error(user "unknown operator", user text)
+    user BinaryExpression binary-left-expression
+    do
+      while ? operator and
+          (not (? curr-operator) or operator.order < curr-operator.order)
+      owner BinaryExpression new-binary-expression
+      BinaryExpression.parse-new(
+          var _,
+          user ends,
+          user operator,
+          user code-node,
+          owner expression,
+          user binary-left-expression):(
+          owner new-binary-expression,
+          copy end,
+          user operator)
+      binary-left-expression := new-binary-expression
+      expression := new-binary-expression
+    if not (? curr-operator)
+      expression.top := true
+  
+  ## Read a single expression value as new string
+  func inst read-new-value(user String ends):(owner String text, copy Char end)
+    owner String all-ends
+    string-new-concat(user " .[({?", user ends):(owner all-ends)
+    read-new(user all-ends):(owner text, copy end)
+    delete all-ends
+  
+  ## Parse an expression that is an operand
+  func inst parse-new-operand(
+      owner String text, user String ends, user SyntaxTreeCode code-node):(
+      owner Expression expression, copy Char end)
+    if text.length = 0
+      if end = '('
+        BlockExpression.parse-new(var _, user code-node):(
+            owner expression, copy end)
+      else
+        code-node.m-syntax-error-c(user "unexpected", copy end)
+      delete text
+    else
+      self.parse-new-init-operand(owner text, user ends, user code-node):(
+          owner expression, copy end)
+    
+    do
+      if end = '?'
+        QuestionExpression.parse-new(var _):(owner expression, copy end)
+      while self.parse-new-follow-operand(user ends, user code-node):(
+          owner expression, copy end)
+  
+  ## Parse the initialize part of an operand expression
+  func inst parse-new-init-operand(
+      owner String text, user String ends, user SyntaxTreeCode code-node):(
+      owner Expression expression, copy Char end)
+    var Char first(text[0])
+    var Char second('\0')
+    if text.length > 1
+      second := text[1]
+    if first = '\''
+      CharExpression.parse-new(var _, owner text):(owner expression)
+    else-if first = '"'
+      StringExpression.parse-new(var _, owner text, user code-node):(
+          owner expression)
+    else-if (first >= '0' and first <= '9') or
+        (first = '-' and second >= '0' and second <= '9')
+      IntExpression.parse-new(var _, owner text):(owner expression)
+    else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
+      TypeExpression.parse-new(var _, owner text, user ends, user code-node):(
+          owner expression, copy end)
+    else-if text.length = 1 and first = '_'
+      EmptyExpression.parse-new(var _, owner text):(owner expression)
+    else-if text.equal(user "base")
+      BaseMethExpression.parse-new(
+          var _, owner text, user code-node, copy end):(owner expression)
+    else
+      SymbolExpression.parse-new(var _, owner text, user code-node):(
+          owner expression)
+  
+  ## Parse one following part of an operand
+  func inst parse-new-follow-operand(
+      user String ends, user SyntaxTreeCode code-node):(
+      owner Expression expression, copy Char end, copy Bool has-more)
+    has-more := true
+    if end = '.'
+      owner String text
+      self.read-new-value(user ends):(owner text, copy end)
+      var Char first(text[0])
+      var Char second('\0')
+      if text.length > 1
+        second := text[1]
+      if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
+        TypeExpression.parse-new(var _, owner text, user ends, user code-node):(
+            owner expression, copy end)
+      else
+        MemberExpression.parse-new(var _, owner text, user code-node):(
+            owner expression)
+    else-if end = '['
+      SliceExpression.parse-new(var _, user ends, user code-node):(
+          owner expression, copy end)
+    else-if end = '('
+      CallExpression.parse-new(var _, user ends, user code-node):(
+          owner expression, copy end)
+    else
+      has-more := false
+  
+  ## Set type instance to be a type that has no sub-type
+  func inst set-simple-type(user TypeData type-data)
+    type-data.m-new-type-instance():(owner self.result-type)
+  
+  func inst add-aux-variable(
+      copy Int access, copy Bool is-create, user TypeInstance type-instance):(
+      owner SymbolExpression symbol)
+    new SymbolExpression in symbol
+    symbol.code-node := self.code-node
+    type-instance.copy-new():(owner symbol.result-type)
+    symbol.access := access
+    symbol.assignable := true
+    self.code-node.get-function().add-aux-variable(
+        copy access, copy is-create, user type-instance):(user symbol.variable)
+    string-new-copy(user symbol.variable.name):(owner symbol.name)
+  
+  func dynamic get-parent-type():(user TypeData parent-type)
+    parent-type := _
+    if ? self.code-node
+      self.code-node.get-parent-type():(user parent-type)
+  
+  func inst write-refman-init(user SymbolExpression symbol)
+    # `symbol`_Refman = LUMI_new_ref(`symbol`);
+    # if (`symbol`_Refman == NULL) raise(`line-num`)
+    self.code-node.write-spaces()
+    symbol.write()
+    write(user "_Refman = LUMI_new_ref(")
+    symbol.write()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    write(user "if (")
+    symbol.write()
+    write(user "_Refman == NULL) ")
+    self.write-raise(user "insufficient memory for managed object")
+  
+  func inst write-init-var-ref(user SymbolExpression symbol)
+    # `symbol` = &`symbol`_Var;
+    symbol.write()
+    write(user " = &")
+    symbol.write()
+    write(user "_Var;\n")
+  
+  func inst write-assign-null()
+    self.code-node.write-spaces()
+    self.write()
+    write(user " = NULL;\n")
+    self.code-node.write-spaces()
+    self.write-refman()
+    write(user " = NULL;\n")
+    if self.result-type.type-data.is-dynamic
+      self.code-node.write-spaces()
+      self.write-dynamic()
+      write(user " = NULL;\n")
+  
+  func dynamic write-dynamic()
+    self.write()
+    write(user "_Dynamic")
+  
+  func dynamic write-refman()
+    self.write()
+    write(user "_Refman")
+  
+  func inst write-as-top()
+    var Bool top(self.top)
+    self.top := true
+    self.write()
+    self.top := top
+  
+  func dynamic analyze-call(user FunctionArguments arguments):(
+      user TypeInstance instance-type,
+      copy Int bases,
+      copy Bool is-function-object)
+    is-function-object := true
+    bases := 0
+    instance-type := _
+  
+  func dynamic analyze-mock(copy Bool is-annotate):(copy Bool is-mock)
+    is-mock := false
+  
+  func dynamic write-preactions()
+    # do noting

@@ -1,0 +1,7 @@
+(# Empty main function for testing standard libraries.
+
+Because in TL3 there must be a main function in order to run tests.
+#)
+
+main func(user Array{String} argv)
+  # pass

@@ -1,0 +1,61 @@
+## TL4 compiler - Common stuff
+
+## Create a new copy of given string
+func string-new-copy(user String text):(owner String new-text)
+  if not (? text)
+    new-text := _
+    return
+  new String{text.length + 1} in new-text
+  new-text.copy(user text)
+
+
+## Create a new string that is a concatenation of the 2 given strings
+func string-new-concat(user String first, user String second):(
+    owner String new-text)
+  owner String text
+  new String{first.length + second.length + 1} in new-text
+  new-text.copy(user first)
+  new-text.concat(user second)
+
+
+## Proxy function to be mocked in tests
+func print(user String text)
+  sys.print-raw(user text)
+
+
+func print-msg-with-item(user String text, user String item)
+  print(user text)
+  print(user " \"")
+  print(user item)
+  print(user "\"")
+
+  
+var Int NAME-DEFAULT(0)
+var Int NAME-TYPE(1)
+var Int NAME-CONSTANT(2)
+
+func f-is-legal-name(user String name, copy Int name-type):(copy Bool is-legal)
+  is-legal := false
+  if name.length <= 0 or (name-type != NAME-DEFAULT and name.length <= 1)
+    return
+  var Char ch(name[0])
+  var Int first(1)
+  if name-type != NAME-DEFAULT
+    if ch < 'A' or ch > 'Z'
+      return
+    ch := name[1]
+    first := 2
+  if name-type = NAME-CONSTANT
+    if (ch < 'A' or ch > 'Z') and ch != '-'
+      return
+  else-if ch < 'a' or ch > 'z'
+    return
+  for n in first:name.length
+    var Char prev(ch)
+    ch := name[n]
+    if not ((ch >= '0' and ch <= '9') or
+        (name-type != NAME-CONSTANT and ch >= 'a' and ch <= 'z') or
+        (name-type != NAME-DEFAULT and ch >= 'A' and ch <= 'Z') or
+        (name-type != NAME-TYPE and ch = '-' and prev != '-'))
+      return
+  is-legal := true

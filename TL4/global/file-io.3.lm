@@ -1,0 +1,116 @@
+## TL4 compiler - File read and write functions
+
+## Read a single character from the input file
+func read-c():(copy Char ch)
+  if glob.got-new-line
+    glob.line-number += 1
+  file-getc(user glob.input-file):(copy ch)
+  glob.got-new-line := ch = '\n'
+
+
+(## Read from the input file to `text` until a new-line, EOF, or one of the
+characters in `ends` is reached, and return the end character in `end`.
+If `indent` is true, ignore and count trailing spaces.
+It is possible to "save" previous read result by setting "glob.save-input" to
+true. Next time this function will be colled it will return the saved values.
+#)
+func read-until(user String ends, copy Bool indent):(
+    user String text, copy Char end, copy Int spaces)
+  var Char ch
+  if glob.save-input
+    ch := glob.input-end
+    spaces := glob.input-spaces
+  else
+    glob.input-buffer.clear()
+    spaces := 0
+    read-c():(copy ch)
+    if indent
+      # ignore and count indent
+      do
+        while ch = ' '
+        spaces += 1
+        read-c():(copy ch)
+  
+  var Char quote('\0')
+  do
+    while ch != EOF
+    if quote = '\0'
+      while ch != '\n'
+      while not ends.has(copy ch)
+      if ch = '\'' or ch = '"' or ch = '`'
+        quote := ch
+    else-if ch = '\\'
+      glob.input-buffer.append(copy ch)
+      read-c():(copy ch)
+    else-if ch = quote
+      quote := '\0'
+    glob.input-buffer.append(copy ch)
+    read-c():(copy ch)
+  
+  glob.input-end := ch
+  glob.input-spaces := spaces
+  glob.save-input := false
+  text := glob.input-buffer
+  end := ch
+
+
+## Return in `new-text` a new allocated string read using `read-until`.
+func read-new(user String ends):(owner String new-text, copy Char end)
+  user String text
+  read-until(user ends, copy false):(user text, copy end)
+  string-new-copy(user text):(owner new-text)
+
+
+## write a single character to the output file
+func write-c(copy Char ch)
+  file-putc(user glob.output-file, copy ch)
+
+
+## write `text` to the output file
+func write(user String text)
+  file-write(user glob.output-file, user text)
+
+
+## write `name` with `-` replaced by `_`
+func write-cname(user String name)
+  if not (? name)
+    raise
+  for index in name.length
+    var Char ch(name[index])
+    if ch = '-' or ch = ' '
+      write-c(copy '_')
+    else
+      write-c(copy ch)
+
+
+## write `num` to the output file as text
+func write-int(copy Int num)
+  var String{64} num-str
+  num.str(user num-str)
+  write(user num-str)
+
+
+## write `num` spaces - usefull for writing indentation
+func write-spaces(copy Int num)
+  for n in num
+    write-c(copy ' ')
+
+
+## Proxy functions to be mocked in tests
+func file-open(user String name, copy Bool is-read):(owner File file)
+  if is-read
+    file-open-read(user name):(owner file)
+  else
+    file-open-write(user name):(owner file)
+
+func file-close(owner File file)
+  file.close()
+
+func file-getc(user File file):(copy Char ch)
+  file.getc():(copy ch)
+
+func file-putc(user File file, copy Char ch)
+  file.putc(copy ch)
+
+func file-write(user File file, user String text)
+  file.write(user text)
