@@ -6,9 +6,9 @@
 #define CRAISE RAISE(__LINE__)
 #define CCHECK(err) CHECK(__LINE__, err)
 
-char* _mr_raise_format = "Error raised in %s:%d %s()\n";
-char* _mr_assert_format = "Assert failed in %s:%d %s()\n";
-char* _mr_traceline_format = "  called from %s:%d %s()\n";
+char* _lumi_raise_format = "Error raised in %s:%d %s()\n";
+char* _lumi_assert_format = "Assert failed in %s:%d %s()\n";
+char* _lumi_traceline_format = "  called from %s:%d %s()\n";
 FILE* _trace_stream = NULL;
 
 void _trace_print(
@@ -33,7 +33,7 @@ int cstring_length(char* cstring, int max_length) {
 /*main*/
 Returncode func(Array*);
 
-int _mr_main(int argc, char* argv[]) {
+int _lumi_main(int argc, char* argv[]) {
   _trace_stream = stderr;
   String* args_strings = malloc(argc * sizeof(String));
   if (args_strings == NULL) {
@@ -55,7 +55,7 @@ int _mr_main(int argc, char* argv[]) {
 }
 
 /*tests*/
-int _mr_test_main(int argc, char* argv[]) {
+int _lumi_test_main(int argc, char* argv[]) {
   _trace_stream = stderr;
   printf("Running tests:\n");
   Returncode err = func(NULL);

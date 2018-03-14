@@ -492,7 +492,7 @@ native func n-external-func-name(copy Int{0:255} in-param):
 
 ; in C this will call a function declared as:
 ;   Returncode external_func_name(Uint* out_param, Uint in_param)
-; "Returncode", "Uint" and others are typedefs declared in "mr-c-api.h"
+; "Returncode", "Uint" and others are typedefs declared in "lumi.h"
 
 ; Sometimes we wish to receive and store a reference to some native
 ; data-structure that can be used in other native functions.

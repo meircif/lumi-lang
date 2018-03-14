@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _mr_file21_name = "syntax-tree/root.3.lm";
+static char* _lumi_file21_name = "syntax-tree/root.3.lm";
 #endif
-#define LUMI_FILE_NAME _mr_file21_name
+#define LUMI_FILE_NAME _lumi_file21_name
 
 /* TL4 compiler - Syntax tree root */
 

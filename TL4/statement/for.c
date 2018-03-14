@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _mr_file24_name = "statement/for.3.lm";
+static char* _lumi_file24_name = "statement/for.3.lm";
 #endif
-#define LUMI_FILE_NAME _mr_file24_name
+#define LUMI_FILE_NAME _lumi_file24_name
 
 /* TL4 compiler - Syntax tree for loop */
 

@@ -1,5 +1,5 @@
-static char* _mr_file10_name = "call.2.lm";
-#define LUMI_FILE_NAME _mr_file10_name
+static char* _lumi_file10_name = "call.2.lm";
+#define LUMI_FILE_NAME _lumi_file10_name
 /* TL3 compiler - call operand */
 
 typedef struct Call_operand Call_operand; struct Call_operand {

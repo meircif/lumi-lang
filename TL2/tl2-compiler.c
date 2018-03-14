@@ -2349,11 +2349,11 @@ Returncode f_compile_file(Array* argv, Int index) {
   }
   String* index_str = &(String){64, 0, (char[64]){0}};
   CHECK(int_to_string(index, index_str))
-  CHECK(write(&(String){22, 21, "static char* _mr_file"}))
+  CHECK(write(&(String){24, 23, "static char* _lumi_file"}))
   CHECK(write(index_str))
   CHECK(write(&(String){10, 9, "_name = \""}))
   CHECK(write(infile_name))
-  CHECK(write(&(String){35, 34, "\";\n#define LUMI_FILE_NAME _mr_file"}))
+  CHECK(write(&(String){37, 36, "\";\n#define LUMI_FILE_NAME _lumi_file"}))
   CHECK(write(index_str))
   CHECK(write(&(String){7, 6, "_name\n"}))
   CHECK(root->f_writer())

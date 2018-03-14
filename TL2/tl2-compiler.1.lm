@@ -2347,11 +2347,11 @@ func f-compile-file(user Array{String} argv, copy Int index)
   
   var String{64} index-str
   int-to-string(copy index): var index-str
-  write(user "static char* _mr_file")
+  write(user "static char* _lumi_file")
   write(user index-str)
   write(user "_name = \"")
   write(user infile-name)
-  write(user "\";\n#define LUMI_FILE_NAME _mr_file")
+  write(user "\";\n#define LUMI_FILE_NAME _lumi_file")
   write(user index-str)
   write(user "_name\n")
   root.f-writer()

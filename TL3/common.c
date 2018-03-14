@@ -1,5 +1,5 @@
-static char* _mr_file1_name = "common.2.lm";
-#define LUMI_FILE_NAME _mr_file1_name
+static char* _lumi_file1_name = "common.2.lm";
+#define LUMI_FILE_NAME _lumi_file1_name
 /* TL3 compiler - common stuff */
 
 

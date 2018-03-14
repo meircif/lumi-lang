@@ -1,5 +1,5 @@
-static char* _mr_file2_name = "map.2.lm";
-#define LUMI_FILE_NAME _mr_file2_name
+static char* _lumi_file2_name = "map.2.lm";
+#define LUMI_FILE_NAME _lumi_file2_name
 /* TL3 compiler - attribute mappings */
 
 /* String List */

@@ -1,5 +1,5 @@
-static char* _mr_file6_name = "flow.2.lm";
-#define LUMI_FILE_NAME _mr_file6_name
+static char* _lumi_file6_name = "flow.2.lm";
+#define LUMI_FILE_NAME _lumi_file6_name
 /* TL3 compiler - flow control */
 
 typedef struct St_if St_if; struct St_if {

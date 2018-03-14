@@ -1,5 +1,5 @@
-static char* _mr_file7_name = "args.2.lm";
-#define LUMI_FILE_NAME _mr_file7_name
+static char* _lumi_file7_name = "args.2.lm";
+#define LUMI_FILE_NAME _lumi_file7_name
 /* TL3 compiler - arguments */
 
 typedef struct Dec_arg Dec_arg;

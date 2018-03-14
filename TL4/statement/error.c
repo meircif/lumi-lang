@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _mr_file23_name = "statement/error.3.lm";
+static char* _lumi_file23_name = "statement/error.3.lm";
 #endif
-#define LUMI_FILE_NAME _mr_file23_name
+#define LUMI_FILE_NAME _lumi_file23_name
 
 /* TL4 compiler - Syntax tree error handling nodes */
 

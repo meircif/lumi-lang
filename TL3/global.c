@@ -1,5 +1,5 @@
-static char* _mr_file3_name = "global.2.lm";
-#define LUMI_FILE_NAME _mr_file3_name
+static char* _lumi_file3_name = "global.2.lm";
+#define LUMI_FILE_NAME _lumi_file3_name
 /* TL3 compiler - global data */
 
 /* global data object */

@@ -14,8 +14,8 @@
 #include "type.c"
 #include "test.c"
 
-static char* _mr_file15_name = "tl3-compiler.2.lm";
-#define LUMI_FILE_NAME _mr_file15_name
+static char* _lumi_file15_name = "tl3-compiler.2.lm";
+#define LUMI_FILE_NAME _lumi_file15_name
 /* TL3 compiler main - written in TL2 */
 
 
