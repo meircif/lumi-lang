@@ -2,8 +2,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/wtam4i4gh28aw7su?svg=true)](https://ci.appveyor.com/project/meircif/lumi-lang)
 [![codecov](https://codecov.io/gh/meircif/lumi-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/meircif/lumi-lang)
 
-# lumi-lang
-Lumi programming language development.
+# Lumi programming language development
 
 See [Wiki](https://github.com/meircif/lumi-lang/wiki) for more information on
 Lumi and its development.
@@ -18,8 +17,11 @@ basic Lumi file markup.
 
 Suggestions, comments and questions are welcome!
 
-# How can I help?
-Currently the best way to help is review the
-[Wiki](https://github.com/meircif/lumi-lang/wiki) and notify me on any problem,
-question or suggestion you have about the concepts or the syntax of the
-language.
+## How can I help?
+Chose your difficulty:
+### easy
+Review the [Wiki](https://github.com/meircif/lumi-lang/wiki) and notify me on any problem, question or suggestion you have about the concepts or the syntax of the language.
+### medium
+Add a standard library using the latest [Temporary Lumi 4 (TL4) Syntax](https://github.com/meircif/lumi-lang/wiki/Lumi-Syntax).
+### hard
+Review or add features to the future [Temporary Lumi 5 (TL5) compiler](https://github.com/meircif/lumi-lang/wiki/TL5-Features).
