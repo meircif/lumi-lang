@@ -1,0 +1,236 @@
+# TL3 compiler - expression
+
+native class Mexp
+native class Var-operand
+
+class Operand(Object)
+  owner Operand next
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    # nothing
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    # nothing
+  func dynamic write-intro()
+    # nothing
+  func dynamic write-final()
+    # nothing
+  
+  func inst write-all-intro()
+    self.write-intro()
+    if ? self.next
+      self.next.write-all-intro()
+  
+  func inst write-all-final()
+    self.write-final()
+    if ? self.next
+      self.next.write-all-final()
+
+
+func read-new-value(user String ends):(owner String out-text, copy Char end)
+  new String{ends.length + 5} all-ends
+  all-ends.copy(user " .[(")
+  all-ends.concat(user ends)
+  read-new(user all-ends):(owner out-text, copy end)
+  delete all-ends
+
+native func parse-new-operands(owner String text, user String ends):(owner Operand new-opr, copy Char end)
+
+func f-is-bool-op(user String operator):(copy Bool is)
+  if not (? operator)
+    is := false
+    return
+  is := true
+  if operator.equal(user "<")
+    return
+  if operator.equal(user ">")
+    return
+  if operator.equal(user "<=")
+    return
+  if operator.equal(user ">=")
+    return
+  if operator.equal(user "=")
+    return
+  if operator.equal(user "!=")
+    return
+  is := false
+
+static Mexp(Object)
+  owner Operand operand
+  owner String operator
+  owner Mexp next
+  var Int base-count
+  var Bool is-used
+  
+  func inst init()
+    self.operand := _
+    self.operator := _
+    self.next := _
+    self.is-used := true
+    self.base-count := 0
+  
+  native func parse(owner String text, user String ends):(copy Char end)
+  
+  func inst parse-new-with-text(owner String text, user String ends):(owner Mexp new-exp, copy Char end)
+    new Mexp exp
+    exp.init()
+    exp.parse(owner text, user ends):(copy end)
+    new-exp := exp
+  
+  func inst parse-new(user String ends):(owner Mexp new-exp, copy Char end)
+    owner String text
+    read-new-value(user ends):(owner text, copy end)
+    self.parse-new-with-text(owner text, user ends):(owner new-exp, copy end)
+  
+  func inst parse-new-with-kw(user String ends):(owner Mexp new-exp, copy Char end)
+    if ? glob.key-word
+      owner String text
+      f-new-copy(user glob.key-word.text):(owner text)
+      end := glob.key-word.end
+      self.parse-new-with-text(owner text, user ends):(owner new-exp, copy end)
+    else
+      self.parse-new(user ends):(owner new-exp, copy end)
+  
+  func inst parse(owner String text, user String ends):(copy Char end)
+    if (end = ' ' or end = '\n') and ? glob.op-map.find(user text)
+      self.operator := text
+      if end = '\n'
+        read-cont-spaces()
+      read-new-value(user ends):(owner text, copy end)
+      
+      if end = ' ' and ? glob.op-map.find(user text)
+        self.operand := _
+        self.parse-new-with-text(owner text, user ends):(owner self.next, copy end)
+        return
+    
+    parse-new-operands(owner text, user ends):(owner self.operand, copy end)
+    if end = ' ' and not ends.has(copy ' ')
+      self.parse-new(user ends):(owner self.next, copy end)
+  
+  func inst f-count-bases(user Mtype target-mtype):(user Mtype mtype, copy Int base-count)
+    if not (? target-mtype)
+      return
+    if not (? mtype)
+      f-syntax-error(user "got no value, expected", user target-mtype.name)
+    base-count := 0
+    if target-mtype = glob.type-bool and mtype.is-primitive
+      mtype := glob.type-bool
+      return
+    if target-mtype = glob.type-char and mtype = glob.type-int
+      mtype := glob.type-char
+      return
+    if target-mtype = glob.type-int and mtype = glob.type-char
+      mtype := glob.type-int
+      return
+    user Mtype orig-mtype(mtype)
+    do
+      while mtype != target-mtype
+      mtype := mtype.base-mtype
+      if not (? mtype)
+        f-syntax-error2(user "got", user orig-mtype.name, user "expected", user target-mtype.name)
+      base-count := base-count + 1
+  
+  func inst analyze():(user Mtype mtype, user Mtype sub-mtype)
+    if ? self.operand
+      user Mtype target-mtype(mtype)
+      user Mtype target-sub-mtype(sub-mtype)
+      self.operand.analyze(user self, user _, user _):(user mtype, user sub-mtype)
+      if ? self.operator and ? mtype
+        if self.operator.equal(user "?")
+          if mtype.is-primitive
+            f-syntax-error(user "? on primitive type", user mtype.name)
+          mtype := glob.type-bool
+          sub-mtype := _
+      user Mtype next-mtype(mtype)
+      user Mtype next-sub-mtype(sub-mtype)
+      if ? self.next
+        if f-is-bool-op(user self.next.operator)
+          mtype := glob.type-bool
+          sub-mtype := _
+      self.f-count-bases(user target-mtype):(user mtype, copy self.base-count)
+      self.f-count-bases(user target-sub-mtype):(user sub-mtype)
+      mtype := next-mtype
+      sub-mtype := next-sub-mtype
+      if f-is-bool-op(user self.operator)
+        mtype := glob.type-bool
+        sub-mtype := _
+    
+    if ? self.next
+      self.next.analyze():(user mtype, user sub-mtype)
+  
+  func inst analyze-get-subtype(user Mtype target-mtype):(user Mtype sub-mtype)
+    user Mtype mtype(target-mtype)
+    self.analyze():(user mtype, user sub-mtype)
+  
+  func inst analyze-types(user Mtype target-mtype, user Mtype target-sub-mtype)
+    user Mtype sub-mtype(target-sub-mtype)
+    self.analyze-get-subtype(user target-mtype):(user sub-mtype)
+  
+  func inst analyze-type(user Mtype target-mtype)
+    self.analyze-types(user target-mtype, user _)
+  
+  func inst write-all-final(copy Bool is-binary)
+    if ? self.operator
+      user String op
+      if not (? glob.op-map.find(user self.operator):(user op))
+        f-syntax-error(user "unknow operator", user self.operator)
+      if is-binary
+        write(user " ")
+      write(user op)
+      if is-binary
+        write(user " ")
+    if ? self.operand
+      if self.base-count > 0
+        write(user "&(")
+      self.operand.write-all-final()
+      if self.base-count > 0
+        write(user "->_base")
+        for n in 1:self.base-count
+          write(user "._base")
+        write(user ")")
+    if ? self.next
+      self.next.write-all-final(copy true)
+  
+  func inst write-intro()
+    if ? self.operand
+      self.operand.write-all-intro()
+    if ? self.operator
+      if self.operator.equal(user "/")
+        # if (operand == 0) RAISE
+        write(user "if (")
+        self.operand.write-all-final()
+        write(user " == 0) ")
+        write-tb-raise()
+        write-new-indent-line()
+    if ? self.next
+      self.next.write-intro()
+  
+  func inst write-final()
+    self.write-all-final(copy false)
+
+func parse-new-exp(user String ends):(owner Mexp exp, copy Char end)
+  Mexp.parse-new(user _, user ends):(owner exp, copy end)
+
+func parse-new-exp-with-kw(user String ends):(owner Mexp exp, copy Char end)
+  Mexp.parse-new-with-kw(user _, user ends):(owner exp, copy end)
+
+
+class St-exp(St)
+  owner Mexp exp
+  
+  func dynamic parse()
+    parse-new-exp-with-kw(user ""):(owner self.exp)
+    self.exp.is-used := false
+  
+  func dynamic analyze-first()
+    # do nothing
+  
+  func dynamic analyze()
+    user Mtype mtype(_)
+    user Mtype sub-mtype(_)
+    self.exp.analyze():(user mtype, user sub-mtype)
+  
+  func dynamic write()
+    self.exp.write-intro()
+    self.exp.write-final()
+    if not self.exp.is-used
+      write(user ";")

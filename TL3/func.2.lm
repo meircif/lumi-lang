@@ -1,0 +1,265 @@
+# TL3 compiler - function
+
+static Mfunc(Object)
+  owner String name
+  owner Arg-list args
+  user Mtype mclass
+  var Bool is-dynamic
+  var Bool is-mocked
+  var Int dynamic-index
+  
+  func inst init(user String name)
+    f-new-copy(user name):(owner self.name)
+    new Arg-list args
+    self.args := args
+    self.args.init(copy true)
+    self.mclass := _
+    self.is-dynamic := false
+    self.is-mocked := false
+    self.dynamic-index := 0
+  
+  func inst parse()
+    self.mclass := glob.mclass
+    if ? self.mclass
+      var String{64} meth-type
+      read(user " ", user meth-type)
+      self.is-dynamic := meth-type.equal(user "dynamic")
+    else
+      self.is-dynamic := false
+    self.dynamic-index := 0
+    self.is-mocked := false
+    read-new(user "("):(owner self.name)
+    parse-new-args():(owner self.args)
+    if ? self.mclass
+      self.args.add-param(copy ACCESS-VAR, user self.mclass, user "self")
+  
+  func inst analyze()
+    self.args.analyze()
+  
+  func inst write-name()
+    if ? self.mclass
+      write-cstyle(user self.mclass.name)
+      write(user "_")
+    write-cstyle(user self.name)
+  
+  func inst write()
+    write(user "Returncode ")
+    self.write-name()
+    self.args.write-final()
+  
+  func inst m-new-var():(owner Mvar mvar)
+    init-new-var(user glob.type-func):(owner mvar)
+    f-new-copy(user self.name):(owner mvar.name)
+    mvar.func-dec := self
+
+func parse-new-mfunc():(owner Mfunc new-mfunc)
+  new Mfunc mfunc
+  mfunc.parse()
+  new-mfunc := mfunc
+
+
+class St-func(St-node)
+  owner Mfunc mfunc
+  
+  func inst add-args-vars(user Arg-node fisrt-arg)
+    user Arg-node arg(fisrt-arg)
+    do
+      while ? arg
+      user Dec-arg dec-arg
+      arg.get-dec():(user dec-arg)
+      while ? dec-arg
+      add-var(user self.sons-var-map, owner dec-arg.mvar)
+      arg := arg.next
+  
+  func dynamic parse()
+    parse-new-mfunc():(owner self.mfunc)
+    self.m-register()
+    f-copy-new-var-map(user _):(owner self.sons-var-map)
+    self.add-args-vars(user self.mfunc.args.first-param)
+    self.add-args-vars(user self.mfunc.args.first-out)
+    glob.mclass := _
+    base.parse()
+    glob.mclass := self.mfunc.mclass
+  
+  func dynamic analyze-first()
+    self.mfunc.analyze()
+    glob.mclass := _
+    base.analyze-first()
+    glob.mclass := self.mfunc.mclass
+  
+  func dynamic analyze()
+    new St-return st-return
+    st-return.init(user self)
+    glob.mclass := _
+    base.analyze()
+    glob.mclass := self.mfunc.mclass
+  
+  func dynamic write()
+    if self.mfunc.is-mocked
+      return
+    if ? glob.mclass
+      if not glob.methods
+        return
+      write-new-indent-line()
+    write(user "#if LUMI_STAGE == LUMI_DECLARATIONS\n")
+    write-spaces()
+    self.mfunc.write()
+    write(user ";\n")
+    write-spaces()
+    write(user "#elif LUMI_STAGE == LUMI_FUNCTIONS\n")
+    write-spaces()
+    write(user "static char* _func_name_")
+    self.mfunc.write-name()
+    write(user " = \"")
+    if ? self.mfunc.mclass
+      write(user self.mfunc.mclass.name)
+      write(user ".")
+    write(user self.mfunc.name)
+    write(user "\";\n")
+    write-spaces()
+    write(user "#define LUMI_FUNC_NAME _func_name_")
+    self.mfunc.write-name()
+    write-new-indent-line()
+    self.mfunc.write()
+    user Mtype mclass(glob.mclass)
+    glob.mclass := _
+    base.write()
+    glob.mclass := mclass
+    write-new-indent-line()
+    write(user "#undef LUMI_FUNC_NAME\n")
+    write-spaces()
+    write(user "#endif")
+  
+  func dynamic m-register()
+    self.add-var(owner self.mfunc.m-new-var())
+
+
+class St-main(St-func)
+  func dynamic parse()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    base.analyze()
+  
+  func dynamic write()
+    if glob.test-funcs.has()
+      write(user "#if LUMI_STAGE == LUMI_FUNCTIONS\n")
+      write(user "Returncode func(Array* _) {\n")
+      write(user "  Bool success = true;\n")
+      user String-list-node test-func(glob.test-funcs.first)
+      do
+        write(user "  RUN_TEST(")
+        write-cstyle(user test-func.value)
+        write(user ");\n")
+        test-func := test-func.next
+        while ? test-func
+      write(user "  return success? OK : FAIL;\n")
+      write(user "}\n")
+      write(user "\nMAIN_TEST_FUNC\n")
+      write(user "#endif")
+    else
+      base.write()
+      write(user "\n\n#if LUMI_STAGE == LUMI_FUNCTIONS\n")
+      write(user "MAIN_FUNC\n")
+      write(user "#endif")
+  
+  func dynamic m-register()
+    base.m-register()
+
+
+class St-format(St-node)
+  owner String item-name
+  user Mvar item-mvar
+  owner String func-name
+  owner String format
+  
+  func dynamic parse()
+    self.item-name := _
+    self.item-mvar := _
+    if read-new(user ".("):(owner self.func-name) = '.'
+      self.item-name := self.func-name
+      read-new(user "("):(owner self.func-name)
+    var String{256} format
+    read(user ")", user format)
+    if format.length < 2 or format[0] != '"' or format[format.length - 1] != '"'
+      f-syntax-error(user "illegal format string", user format)
+    f-new-copy(user format[1:format.length - 2]):(owner self.format)
+    read-c()
+    base.parse()
+  
+  func dynamic analyze-first()
+    base.analyze-first()
+  
+  func dynamic analyze()
+    user Mvar mvar
+    if ? self.item-name
+      if not (? f-find-var(user self.item-name):(user self.item-mvar))
+        f-syntax-error(user "unknow variable", user self.item-name)
+      if not (? self.item-mvar.mtype.members.find(user self.func-name):(user mvar))
+        f-syntax-error2(user "type", user self.item-mvar.typename, user "has no method", user self.func-name)
+    else
+      if not (? f-find-var(user self.func-name):(user mvar))
+        f-syntax-error(user "unknow function", user self.func-name)
+    if not (? mvar.func-dec)
+      f-syntax-error(user "non function variable", user self.func-name)
+    if not (? mvar.func-dec.args.first-param)
+      f-syntax-error(user "no parameter for function", user self.func-name)
+    if ? mvar.func-dec.args.first-out
+      f-syntax-error(user "outputs exists in function", user self.func-name)
+    user Dec-arg param-dec
+    if ? self.item-name
+      if not (? mvar.func-dec.args.first-param.next)
+        f-syntax-error(user "no parameter for method", user self.func-name)
+      mvar.func-dec.args.first-param.next.get-dec():(user param-dec)
+    else
+      mvar.func-dec.args.first-param.get-dec():(user param-dec)
+    if ? param-dec.next
+      f-syntax-error(user "too many parameter for function", user self.func-name)
+    if param-dec.mvar.mtype != glob.type-string
+      f-syntax-error2(user "expected a string parameter in function", user self.func-name, user " instead of", user param-dec.mvar.typename)
+    if param-dec.mvar.access != ACCESS-USER
+      f-syntax-error(user "expected parameter with user access in function", user self.func-name)
+    base.analyze()
+  
+  func dynamic write()
+    var Int index(0)
+    var Int len(self.format.length)
+    user St node(self.first-son)
+    do
+      while len > 0
+      if index > 0
+        write-new-indent-line()
+      user String format(self.format[index:len])
+      var Int next(format.find(user "{}"))
+      if next > 0
+        write-tb-check()
+        if ? self.item-mvar
+          write-cstyle(user self.item-mvar.mtype.name)
+          write(user "_")
+        write-cstyle(user self.func-name)
+        write(user "(")
+        if ? self.item-mvar
+          if self.item-mvar.is-ref
+            write(user "*")
+          write-cstyle(user self.item-mvar.name)
+          write(user ", ")
+        write(user "&(String){")
+        write-int(copy next + 1)
+        write(user ", ")
+        write-int(copy next)
+        write(user ", \"")
+        write(user format[0:next])
+        write(user "\"}) )")
+      else
+        if not (? node)
+          f-syntax-error(user "too few lines to format", user self.func-name)
+        glob.line-num := node.line-num
+        node.write()
+        glob.line-num := self.line-num
+        node := node.next-brother
+        next := 2
+      index := index + next
+      len := len - next

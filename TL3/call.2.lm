@@ -1,0 +1,207 @@
+# TL3 compiler - call operand
+
+class Call-operand(Operand)
+  owner Arg-list args
+  owner Operand func-opr
+  user Operand dynamic-opr
+  var Int dynamic-index
+  var Int dynamic-base-count
+  var Bool is-used
+  user Mtype res-mtype
+  user Mexp res-exp
+  owner String res-name
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    new Arg-list args
+    self.args := args
+    self.args.init(copy false)
+    args.parse(copy false):(copy end)
+    self.func-opr := _
+    self.dynamic-opr := _
+    self.dynamic-index := 0
+    self.dynamic-base-count := 0
+    self.res-mtype := _
+    self.res-name := _
+    self.res-exp := _
+  
+  func inst analyze-args(user Mfunc mfunc, copy Bool is-method):(user Mtype mtype, user Mtype sub-mtype)
+    user Arg-node dec-param(mfunc.args.first-param)
+    user Arg-node call-param(self.args.first-param)
+    var Bool not-self(not is-method)
+    do
+      while ? dec-param
+      if not (? call-param)
+        f-syntax-error(user "too few parameters for", user mfunc.name)
+      if not-self
+        call-param.analyze(user dec-param, user mtype, user sub-mtype)
+      else
+        not-self := true
+      dec-param := dec-param.next
+      call-param := call-param.next
+    if ? call-param
+      f-syntax-error(user "too many parameters for", user mfunc.name)
+    
+    user Arg-node dec-out(mfunc.args.first-out)
+    user Arg-node call-out(self.args.first-out)
+    if not (? dec-out)
+      if self.is-used
+        f-syntax-error(user "no return value for", user mfunc.name)
+      if ? call-out
+        f-syntax-error(user "too many outputs for", user mfunc.name)
+      mtype := _
+      sub-mtype := _
+      return
+    
+    if ? call-out
+      call-out.analyze(user dec-out, user mtype, user sub-mtype)
+      do
+        while ? call-out.next
+        call-out := call-out.next
+        dec-out := dec-out.next
+        if not (? dec-out)
+          f-syntax-error(user "too many outputs for", user mfunc.name)
+        call-out.analyze(user dec-out, user mtype, user sub-mtype)
+    
+    var Bool fill-out(? dec-out.next or not (? call-out))
+    if ? dec-out.next
+      dec-out := dec-out.next
+      if ? dec-out.next or not (? call-out)
+        f-syntax-error(user "too few outputs for", user mfunc.name)
+    user Dec-arg dec-res
+    dec-out.get-dec():(user dec-res)
+    user Mtype generic-mtype(_)
+    if dec-res.mvar.mtype = mtype.generic-mtype
+      generic-mtype := mtype.generic-mtype
+      mtype := sub-mtype
+      sub-mtype := _
+    else-if dec-res.mvar.sub-mtype = mtype.generic-mtype
+      mtype := dec-res.mvar.mtype
+      # sub-mtype is the same
+    else
+      mtype := dec-res.mvar.mtype
+      sub-mtype := dec-res.mvar.sub-mtype
+    self.res-mtype := mtype
+    if fill-out
+      f-new-temp-name(user self.res-mtype):(owner self.res-name)
+      new Var-operand var-opr
+      f-new-copy(user self.res-name):(owner var-opr.name)
+      init-new-var(user mtype):(owner var-opr.mvar)
+      f-new-copy(user self.res-name):(owner var-opr.mvar.name)
+      if ? sub-mtype
+        f-new-copy(user sub-mtype.name):(owner var-opr.mvar.sub-typename)
+      var-opr.mvar.sub-mtype := sub-mtype
+      var-opr.mvar.func-dec := dec-res.mvar.func-dec
+      var-opr.mvar.access := dec-res.mvar.access
+      var-opr.next := _
+      new Mexp exp
+      exp.init()
+      exp.operand := var-opr
+      new Call-arg arg
+      arg.access := dec-res.mvar.access
+      arg.generic-mtype := generic-mtype
+      arg.value := exp
+      arg.next := _
+      if ? call-out
+        call-out.next := arg
+      else
+        self.args.first-out := arg
+    else
+      call-out.get-call-value():(user self.res-exp)
+  
+  func inst analyze-func-pointer():(user Mtype mtype, user Mtype sub-mtype)
+    user Arg-node arg(self.args.first-param)
+    var Bool first(true)
+    do
+      while ? arg
+      user Mexp exp
+      arg.get-call-value():(user exp)
+      user Mtype param-mtype(_)
+      user Mtype param-sub-mtype(_)
+      exp.analyze():(user param-mtype, user param-sub-mtype)
+    arg := self.args.first-out
+    mtype := _
+    sub-mtype := _
+    do
+      while ? arg
+      user Mexp exp
+      arg.get-call-value():(user exp)
+      mtype := _
+      sub-mtype := _
+      exp.analyze():(user mtype, user sub-mtype)
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    self.is-used := exp.is-used or ? self.next or ? exp.next or ? exp.operator
+    if not self.is-used
+      exp.is-used := true
+    
+    member.next := _
+    user Operand method-opr
+    method-opr := method
+    var Bool is-method(? method and method-opr != member)
+    if is-method
+      method.next := _
+      self.func-opr := method
+      if method.mvar.func-dec.is-dynamic and method.allow-dynamic
+        self.dynamic-opr := exp.operand
+        self.dynamic-index := method.mvar.func-dec.dynamic-index
+        self.dynamic-base-count := method.base-count
+        method.base-count := 0
+      new Mexp new-exp
+      new-exp.init()
+      new-exp.operand := exp.operand
+      new-exp.base-count := method.base-count
+      self.args.add-self-call(owner new-exp)
+    else
+      self.func-opr := exp.operand
+    exp.operand := self
+    
+    if ? method and ? method.mvar.func-dec
+      self.analyze-args(user method.mvar.func-dec, copy is-method):(user mtype, user sub-mtype)
+    else
+      self.analyze-func-pointer():(user mtype, user sub-mtype)
+    
+    if ? self.next
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+  
+  func inst write-call()
+    write-tb-check()
+    if ? self.dynamic-opr
+      # (opr)->[_base.]_dtl[index]
+      write(user "(")
+      self.dynamic-opr.write-all-final()
+      write(user ")->")
+      for n in self.dynamic-base-count
+        write(user "_base.")
+      write(user "_dtl[")
+      write-int(copy self.dynamic-index)
+      write(user "]")
+    else
+      self.func-opr.write-all-final()
+    self.args.write-final()
+    write(user " )")
+  
+  func dynamic write-intro()
+    self.func-opr.write-all-intro()
+    self.args.write-intro()
+    if ? self.res-exp
+      self.res-exp.write-intro()
+    else-if ? self.res-name
+      write-cstyle(user self.res-mtype.name)
+      if not self.res-mtype.is-primitive
+        write(user "*")
+      write(user " ")
+      write-cstyle(user self.res-name)
+      write(user ";\n")
+      write-spaces()
+    if self.is-used
+      self.write-call()
+      write-new-indent-line()
+  
+  func dynamic write-final()
+    if self.is-used
+      if ? self.res-exp
+        self.res-exp.write-final()
+      else-if ? self.res-name
+        write-cstyle(user self.res-name)
+    else
+      self.write-call()

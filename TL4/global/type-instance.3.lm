@@ -1,0 +1,318 @@
+## TL4 compiler - Type instance
+
+## Specific usage of a type including the assigned subtypes and values
+static TypeInstance
+  owner String name
+  owner String module-name
+  user TypeData type-data
+  owner List{TypeInstance} parameters
+  owner Expression length-owner
+  user Expression length
+  owner FunctionArguments arguments
+  
+  ## Return a new deep-copy of self
+  func inst copy-new():(owner TypeInstance type-instance)
+    if ? self
+      new TypeInstance in type-instance
+      self.copy(user type-instance)
+    else
+      type-instance := _
+        
+  func inst copy(user TypeInstance other)
+    other.type-data := self.type-data
+    if ? other.name
+      delete other.name
+    string-new-copy(user self.name):(owner other.name)
+    if ? self.module-name
+      string-new-copy(user self.module-name):(owner other.module-name)
+    other.length := self.length
+    if ? self.parameters
+      new List{TypeInstance} in other.parameters
+      user ListNode{TypeInstance} node(self.parameters.first)
+      do
+        while ? node
+        other.parameters.add(owner node.item.copy-new())
+        node := node.next
+    if ? self.arguments
+      self.arguments.copy-new():(owner other.arguments)
+  
+  func inst parse(
+      user String ends,
+      user SyntaxTreeNode node,
+      user SyntaxTreeCode code-node):(
+      copy Char end)
+    user String name
+    read-until(user string-new-concat(user ends, user ".{"), copy false):(
+        user name, copy end)
+    if end = '.'
+      string-new-copy(user name):(owner self.module-name)
+      read-until(user string-new-concat(user ends, user "{"), copy false):(
+          user name, copy end)
+    self.parse-name(user name, user node, user code-node):(copy end)
+  
+  func inst parse-name(
+      user String name,
+      user SyntaxTreeNode node,
+      user SyntaxTreeCode code-node):(
+      copy Char end)
+    string-new-copy(user name):(owner self.name)
+    if end = '{'
+      if self.name.equal(user "Func")
+        read-c():(copy end)
+        if end != '('
+          node.m-syntax-error-c(
+              user "expected \"(\" inside Function type, got", copy end)
+        new FunctionArguments in self.arguments
+        var DeclarationArgumentFactory argument-factory
+        self.arguments.parse(
+            user argument-factory, copy false, user code-node):(copy end)
+      else-if ? code-node and self.name.equal(user "String")
+        parse-new-expression(user "}", user code-node):(
+            owner self.length-owner, copy end)
+        self.length := self.length-owner
+      else
+        var Bool has-sub-type(true)
+        var Bool is-array(self.name.equal(user "Array"))
+        if ? code-node and is-array
+          parse-new-expression(user ":}", user code-node):(
+              owner self.length-owner, copy end)
+          self.length := self.length-owner
+          if end != ':' and end != '}'
+            node.m-syntax-error-c(
+                user "expected \":\" or \"} after array length\", got",
+                copy end)
+          has-sub-type := end = ':'
+        if has-sub-type
+          if not is-array
+            code-node := _
+          new List{TypeInstance} in self.parameters
+          do
+            new TypeInstance sub-type
+            sub-type.parse(user ":}", user node, user code-node):(copy end)
+            self.parameters.add(owner sub-type)
+            while end = ':'
+            if is-array
+              node.m-syntax-error-msg(user "more than one subtype for array")
+      if end != '}'
+        node.m-syntax-error-c(user "expected \"}\" after sub-types, got",
+            copy end)
+      read-c():(copy end)
+  
+  func inst add-subtype-copy(user TypeData type-data)
+    if not (? self.parameters)
+      new List{TypeInstance} in self.parameters
+    self.parameters.add(owner type-data.m-new-type-instance())
+  
+  func inst analyze(user SyntaxTreeNode node)
+    self.analyze-part(user node, copy true, copy true, copy false)
+  
+  func inst link-types(user SyntaxTreeNode node)
+    self.analyze-part(user node, copy true, copy false, copy true)
+  
+  func inst analyze-lengths(user SyntaxTreeNode node, copy Bool constant-length)
+    self.analyze-part(user node, copy false, copy true, copy constant-length)
+  
+  func inst analyze-part(
+      user SyntaxTreeNode node,
+      copy Bool check-types,
+      copy Bool check-length,
+      copy Bool constant-length)
+    if check-types
+      if not (? self.type-data)
+        node.find-type(user self.name, user self.module-name):(
+            user self.type-data)
+      if ? self.arguments
+        self.arguments.link-types()
+    if check-length
+      if ? self.length
+        node.analyze-expression(user self.length, user glob.type-int)
+        if constant-length and not self.length.constant
+          node.m-syntax-error-msg(user "array length is not constant")
+      if ? self.arguments
+        self.arguments.analyze()
+    if ? self.parameters
+      user ListNode{TypeInstance} sub-type(self.parameters.first)
+      do
+        while ? sub-type
+        sub-type.item.analyze-part(
+            user node,
+            copy check-types,
+            copy check-length,
+            copy constant-length)
+        sub-type := sub-type.next
+    if check-types
+      self.check-parameters(user node)
+  
+  func inst check-parameters(user SyntaxTreeNode node)
+    if self.type-data = glob.type-array
+      if not (? self.parameters)
+        node.m-syntax-error-msg(user "missing subtype for array")
+      if self.parameters.first.item.type-data = glob.type-array
+        node.m-syntax-error-msg(
+            user "multidimensional array not supported yet...")
+    else-if ? self.parameters
+      if not (? self.type-data.parameters)
+        node.m-syntax-error(
+            user "parameter given for type with no parameters",
+            user self.type-data.name)
+      user ListNode{TypeInstance} sub-type(self.parameters.first)
+      user ListNode{String} dec-node(self.type-data.parameters.first)
+      do
+        while ? sub-type
+        if not (? dec-node)
+          node.m-syntax-error(
+              user "too many parameter for type", user self.type-data.name)
+        if sub-type.item.type-data.is-primitive
+          node.m-syntax-error(
+              user "unsupported primitive parameter type",
+              user sub-type.item.type-data.name)
+        if sub-type.item.type-data = glob.type-array
+          node.m-syntax-error-msg(user "array as parameter type is unsupported")
+        sub-type := sub-type.next
+        dec-node := dec-node.next
+    else-if self.type-data = glob.type-func and not (? self.arguments)
+      node.m-syntax-error-msg(user "missing arguments in function type")
+  
+  func inst check-assign-from(copy Int access, user SyntaxTreeNode node):(
+      owner Expression value, user Expression assignee)
+    assignee := value
+    var Int bases
+    value.result-type.check-assign-to(
+        copy value.access, user self, copy access, user node):(copy bases)
+    if bases > 0
+      UpCastExpression.init-new(var _, copy bases):(owner value)
+  
+  func inst check-assign-to(
+      copy Int self-access,
+      user TypeInstance target,
+      copy Int target-access,
+      user SyntaxTreeNode node):(
+      copy Int bases)
+    bases := 0
+    if not (? self)
+      node.m-syntax-error-msg(user "cannot assign void expression")
+    if self.type-data = glob.type-empty and
+        (not target.type-data.is-primitive or target.type-data = glob.type-func)
+      return
+    if target.type-data = glob.type-ref and not self.type-data.is-primitive
+      return
+    if target-access = ACCESS-OWNER
+      if self-access != ACCESS-OWNER
+        node.m-syntax-error(
+            user "assigning into an owner a non-owner access",
+            user glob.access-names[self-access])
+      if self.type-data != target.type-data and
+          self.type-data != glob.type-empty and
+          not target.type-data.is-primitive and
+          not target.type-data.is-dynamic
+        node.m-syntax-error2(
+            user "passing ownership of type",
+            user self.type-data.name,
+            user "into static type",
+            user target.type-data.name)
+    if self.type-data = glob.type-generic and
+        target.type-data = glob.type-generic
+      if not self.name.equal(user target.name)
+        node.m-syntax-error2(
+            user "cannot assign generic subtype",
+            user self.name,
+            user "into different generic subtype",
+            user target.name)
+    user TypeInstance self-type-instance(self)
+    do
+      while not target.type-data.m-is-same(user self-type-instance.type-data)
+      if not (? self-type-instance.type-data.base-type)
+        node.m-syntax-error2(
+            user "cannot assign",
+            user self.type-data.name,
+            user "into",
+            user target.type-data.name)
+      self-type-instance := self-type-instance.type-data.base-type
+      bases += 1
+    
+    if ? self.arguments
+      if self.arguments.check-same-as(
+          user target.arguments, user _, copy 0)
+        node.m-syntax-error-msg(user "too few outputs")
+    
+    self-type-instance.check-sub-equal(user target, user node)
+  
+  func inst check-equal(user TypeInstance other, user SyntaxTreeNode node)
+    if self.type-data != other.type-data
+      node.m-syntax-error2(
+          user "non matching types",
+          user self.type-data.name,
+          user "and",
+          user other.type-data.name)
+    self.check-sub-equal(user other, user node)
+  
+  func inst check-sub-equal(user TypeInstance target, user SyntaxTreeNode node)
+    if not (? target.parameters)
+      return
+    user ListNode{TypeInstance} target-sub-type(target.parameters.first)
+    if not (? self.parameters)
+      node.m-syntax-error2(
+          user "cannot assign type",
+          user self.type-data.name,
+          user "with no parameter into same type with parameter",
+          user target-sub-type.item.type-data.name)
+    
+    user ListNode{TypeInstance} my-sub-type(self.parameters.first)
+    do
+      while ? target-sub-type
+      if not (? my-sub-type)
+        node.m-syntax-error2(
+            user "cannot assign type",
+            user self.type-data.name,
+            user "with parameters into same type with more parameters",
+            user target-sub-type.item.type-data.name)
+      if my-sub-type.item.type-data != target-sub-type.item.type-data
+        node.m-syntax-error2(
+            user "non matching subtypes",
+            user my-sub-type.item.type-data.name,
+            user "and",
+            user target-sub-type.item.type-data.name)
+      my-sub-type.item.check-sub-equal(user target-sub-type.item, user node)
+      my-sub-type := my-sub-type.next
+      target-sub-type := target-sub-type.next
+    
+  func inst check-sequence(user SyntaxTreeNode node)
+    if (self.type-data = glob.type-array or
+        self.type-data = glob.type-string) and not (? self.length)
+      node.m-syntax-error-msg(user "missing length for sequence")
+    if self.type-data = glob.type-array and
+        self.parameters.first.item.type-data = glob.type-string and
+        not (? self.parameters.first.item.length)
+      node.m-syntax-error-msg(user "missing length for sequence")
+  
+  func inst f-new-replace-params(
+      user TypeInstance instance-type, copy Int bases):(
+      owner TypeInstance type-instance)
+    self.copy-new():(owner type-instance)
+    if ? type-instance
+      type-instance.f-replace-type-parameters(user instance-type, copy bases)
+  
+  func inst f-replace-type-parameters(
+      user TypeInstance instance-type, copy Int bases)
+    if not (? instance-type)
+      return
+    if bases > 0
+      self.f-replace-type-parameters(
+          user instance-type.type-data.base-type, copy bases - 1)
+    if self.type-data = glob.type-generic and ? instance-type.parameters and
+        ? instance-type.type-data.parameters
+      user ListNode{String} dec-node(instance-type.type-data.parameters.first)
+      user ListNode{TypeInstance} inst-node(instance-type.parameters.first)
+      do
+        while ? dec-node and ? inst-node
+        if dec-node.item.equal(user self.name)
+          inst-node.item.copy(user self)
+          while false
+        dec-node := dec-node.next
+        inst-node := inst-node.next
+    if ? self.parameters
+      user ListNode{TypeInstance} node(self.parameters.first)
+      do
+        while ? node
+        node.item.f-replace-type-parameters(user instance-type, copy bases)
+        node := node.next

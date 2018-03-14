@@ -1,0 +1,68 @@
+(## Builds executables from Lumi files
+
+Gets input files as "<name>.<TL-version>.lm",
+generates "<name>.c" files using TL<version> compiler.
+Then compiles the last one to "<name>" executable using "CC" environment
+variable, or "gcc" if not specified.
+(TL0 and TL1 only supports one file)
+
+Supports TL0, TL1, TL2 & TL3.
+#)
+
+func f-error-if(copy Bool is-error, user String error-msg)
+  if is-error
+    sys.print(user error-msg)
+    raise
+
+func f-run-command(user String command, user String error-msg)
+  sys.print(user command)
+  if sys.system(user command) != 0
+    sys.print(user error-msg)
+    raise
+
+main func(user Array{String} argv)
+  # parse input
+  f-error-if(copy argv.length < 2, user "usage: lumi [Lumi file name]...")
+  user String lumi-file(argv[argv.length - 1])
+  f-error-if(copy lumi-file.length < 6, user "Lumi file name too short")
+  f-error-if(
+      copy lumi-file.has(copy '"'),
+      user "Illegal \" character in file name")
+  user String prefix(lumi-file[0:lumi-file.length - 5])
+  var Char version(lumi-file[lumi-file.length - 4])
+  f-error-if(copy version < '0' or version > '3', user "Unsupported TL version")
+  f-error-if(
+      copy version < '2' and argv.length > 2,
+      user "Multiple files not supported before TL2")
+  
+  # run Lumi compiler
+  var String{1024} command
+  command.copy(user "tl")
+  command.append(copy version)
+  command.concat(user "-compiler")
+  for index in 1:argv.length
+    command.concat(user " \"")
+    command.concat(user argv[index])
+    command.concat(user "\"")
+  if version < '2'
+    command.concat(user " \"")
+    command.concat(user prefix)
+    command.concat(user ".c\"")
+  f-run-command(user command, user "Lumi compiler failed")
+  
+  # run C compiler
+  if not sys.getenv(user "CC", user command)
+    command.copy(user "gcc")
+  command.concat(user " -g \"")
+  command.concat(user prefix)
+  command.concat(user ".c\" ")
+  if version = '0'
+    command.concat(user "tl0-file.c tl0-string.c")
+  else
+    command.concat(user "lumi.")
+    command.append(copy version)
+    command.concat(user ".c")
+  command.concat(user " -o \"")
+  command.concat(user prefix)
+  command.concat(user "\"")
+  f-run-command(user command, user "C compiler failed")

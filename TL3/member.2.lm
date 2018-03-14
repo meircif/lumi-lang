@@ -1,0 +1,189 @@
+# TL3 compiler - member operands
+
+class Cast-operand(Operand)
+  user Mtype mtype
+  owner Operand operand
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    raise
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    self.mtype := mtype
+    self.operand := exp.operand
+    exp.operand := self
+    if ? self.next
+      self.next.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    self.operand.write-all-intro()
+  
+  func dynamic write-final()
+    # ((Type*)(operand...))
+    write(user "((")
+    write-cstyle(user self.mtype.name)
+    write(user "*)(")
+    self.operand.write-all-final()
+    write(user "))")
+
+
+class Var-operand(Operand)
+  owner String name
+  user Mvar mvar
+  var Int base-count
+  var Bool allow-dynamic
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    self.name := text
+    self.mvar := _
+    self.base-count := 0
+    self.allow-dynamic := true
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    if not (? f-find-var(user self.name):(user self.mvar))
+      f-syntax-error(user "unknow variable", user self.name)
+    mtype := self.mvar.mtype
+    sub-mtype := self.mvar.sub-mtype
+    if ? self.next
+      self.next.analyze(user exp, user self, user self):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    if self.mvar.is-ref
+      write(user "(*")
+    write-cstyle(user self.name)
+    if self.mvar.is-ref
+      write(user ")")
+
+
+class Member-operand(Var-operand)
+  user Mtype prev-mtype
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    self.base-count := 0
+    self.allow-dynamic := true
+    read-new-value(user ends):(owner self.name, copy end)
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    if not (? mtype)
+      f-syntax-error(user "member with no type", user self.name)
+    self.prev-mtype := mtype
+    do
+      while not (? mtype.members.find(user self.name):(user self.mvar))
+      mtype := mtype.base-mtype
+      if not (? mtype)
+        f-syntax-error2(user "type", user self.prev-mtype.name, user "has no member", user self.name)
+      self.base-count := self.base-count + 1
+    self.prev-mtype := mtype
+    user Mtype prev-sub-mtype(sub-mtype)
+    user Mtype basetype(mtype.base-mtype)
+    if ? mtype.generic-mtype and mtype.generic-mtype = self.mvar.mtype
+      mtype := sub-mtype
+      sub-mtype := _
+      if (? exp.operator or ? self.next) and mtype != self.mvar.mtype
+        new Cast-operand cast
+        cast.next := self.next
+        self.next := _
+        cast.analyze(user exp, user _, user _):(user mtype, user sub-mtype)
+      else-if mtype != self.mvar.mtype and not (? self.next)
+        exp.is-used := false
+    else-if ? mtype.generic-mtype and mtype.generic-mtype = self.mvar.sub-mtype
+      mtype := self.mvar.mtype
+      # sub-mtype is the same
+    else
+      mtype := self.mvar.mtype
+      sub-mtype := self.mvar.sub-mtype
+    if ? self.next
+      if ? self.mvar.func-dec and ? member
+        if self.mvar.func-dec.is-dynamic and self.allow-dynamic
+          do
+            while ? basetype
+            self.base-count := self.base-count + 1
+            basetype := basetype.base-mtype
+        mtype := self.prev-mtype
+        sub-mtype := prev-sub-mtype
+        self.next.analyze(user exp, user member, user self):(user mtype, user sub-mtype)
+      else
+        self.next.analyze(user exp, user self, user self):(user mtype, user sub-mtype)
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    if ? self.mvar.func-dec
+      write-cstyle(user self.prev-mtype.name)
+      write(user "_")
+    else
+      write(user "->")
+      for n in self.base-count
+        write(user "_base.")
+    base.write-final()
+
+
+class Base-meth-operand(Operand)
+  owner Member-operand member
+  var Bool first
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    delete text
+    new Member-operand member
+    self.member := member
+    self.member.parse(owner _, user ends):(copy end)
+    self.member.next := _
+    self.member.allow-dynamic := false
+    if end != '('
+      f-syntax-error(user "not a method", user self.member.mvar.name)
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    sub-mtype := _
+    self.first := not (? member)
+    if self.first
+      user Mvar mvar
+      if not (? f-find-var(user "self"):(user mvar))
+        f-syntax-error(user "not a method, cannot use", user "base")
+      mtype := mvar.mtype
+    if not (? mtype.base-mtype)
+      f-syntax-error(user "no subtype for type", user mtype.name)
+    mtype := mtype.base-mtype
+    self.member.analyze(user exp, user self, user _):(user mtype, user sub-mtype)
+    self.member.base-count := self.member.base-count + 1
+    self.next.analyze(user exp, user self, user self.member):(user mtype, user sub-mtype)
+    self.member := _
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    if self.first
+      write(user "self")
+
+
+class Type-operand(Operand)
+  owner String name
+  user Mtype mtype
+  
+  func dynamic parse(owner String text, user String ends):(copy Char end)
+    self.name := text
+    self.mtype := _
+  
+  func dynamic analyze(user Mexp exp, user Operand member, user Var-operand method):(user Mtype mtype, user Mtype sub-mtype)
+    f-find-type(user self.name):(user mtype)
+    if ? self.next
+      sub-mtype := _
+      exp.operand := self.next
+      self.next.analyze(user exp, user member, user method):(user mtype, user sub-mtype)
+      delete self
+    else
+      self.mtype := mtype
+      mtype := glob.type-type
+      sub-mtype := self.mtype
+  
+  func dynamic write-intro()
+    # nothing
+  
+  func dynamic write-final()
+    # (Type){sizeof(name), name__dtl}
+    write(user "(Type){")
+    write-type-type-params(user self.mtype)
+    write(user "}")

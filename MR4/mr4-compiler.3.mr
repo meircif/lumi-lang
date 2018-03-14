@@ -1,8 +1,0 @@
-## MR4 compiler main - written in MR3
-
-## compiler main function!
-main func(user Array{String} argv)
-  glob.init()
-  glob.root.parse(user argv)
-  glob.root.analyze()
-  glob.root.write()
