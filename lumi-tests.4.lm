@@ -51,14 +51,19 @@ func test-setup(user String args)
   var Int argc(copy 1)
   if args.length > 0
     argc += 1
+  var Bool in-quotes
   for c in args
-    if c = ' '
+    if c = '\''
+      in-quotes := not in-quotes
+    if c = ' ' and not in-quotes
       argc += 1
   mock-argv := Array{argc:String{64}}()
   mock-argv[0].concat(user "lumi")
   argc := 1
   for c in args
-    if c = ' '
+    if c = '\''
+      in-quotes := not in-quotes
+    else-if c = ' ' and not in-quotes
       argc += 1
     else
       mock-argv[argc].append(copy c)
@@ -114,8 +119,13 @@ test test-help()
         -c \t\t only create C file(s)
         -l<version> \t only run C compiler for TL<version>
         -e <file> \t external C file for C compilation
+        -p <lumipath>  path of lumi-lang repository
+        -r \t\t   run the compiled program
+        -ra <arguments>  run the compiled program with given arguments
         -v \t\t print executed commands
+        -d \t\t only print commands without execution
       ")
+  assert mock-exit-result = 0
 
 
 test test-implicit-output()
@@ -299,6 +309,50 @@ test test-lumipath-reverse-separator()
       ")
 
 
+test test-lumipath-flag()
+  f-success-test(
+      user "input.4.lm -p flag-path/ -o output",
+      user "tl4-compiler \"output.c\" \"input.4.lm\"
+      mock-cc -g \"output.c\" flag-path/TL4/lumi.4.c -Iflag-path/TL4/ \
+      -o \"output\"
+      ")
+
+
+test test-run-program()
+  f-success-test(
+      user "input.4.lm -o output -r",
+      user "tl4-compiler \"output.c\" \"input.4.lm\"
+      mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+      -o \"output\"
+      \"output\"
+      ")
+
+
+test test-run-failed-program()
+  test-setup(user "input.4.lm -o output -r")
+  mock-system-fail-count := 3
+  assert-error lumi-object.m-run(), "mock exit"
+  assert mock-exit-result = 1
+  f-assert-string(user mock-output, user "")
+  f-assert-string(
+      user mock-system,
+      user "tl4-compiler \"output.c\" \"input.4.lm\"
+      mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+      -o \"output\"
+      \"output\"
+      ")
+
+
+test test-run-program-with-arguments()
+  f-success-test(
+      user "input.4.lm -o output -ra '-x input'",
+      user "tl4-compiler \"output.c\" \"input.4.lm\"
+      mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+      -o \"output\"
+      \"output\" -x input
+      ")
+
+
 test test-verbose()
   test-setup(user "-v input.4.lm -o output")
   lumi-object.m-run()
@@ -308,6 +362,22 @@ test test-verbose()
       ")
   f-assert-string(user mock-output, user expected-output)
   f-assert-string(user mock-system, user expected-output)
+
+
+test test-dry-run()
+  test-setup(user "input.4.lm -o output -d")
+  lumi-object.m-run()
+  user String expected-output(user "tl4-compiler \"output.c\" \"input.4.lm\"
+      mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+      -o \"output\"
+      ")
+  f-assert-string(
+      user mock-output,
+      user "tl4-compiler \"output.c\" \"input.4.lm\"
+      mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+      -o \"output\"
+      ")
+  f-assert-string(user mock-system, user "")
 
 
 test test-lumi-error()
@@ -336,38 +406,37 @@ test test-input-errors()
   f-fail-test(user "e.lm", user "error: Lumi file name too short\n")
 
 
+func f-flag-with-parameter-error-tests(user String flag, user String parameter)
+  var String{64} input(user "input.4.lm -")
+  input.concat(user flag)
+  var String{256} missing-error(user "error: missing ")
+  missing-error.concat(user parameter)
+  missing-error.concat(user " after \"-")
+  missing-error.concat(user flag)
+  missing-error.concat(user "\" flag\n")
+  f-fail-test(user input, user missing-error)
+  input.concat(user " -v")
+  f-fail-test(user input, user missing-error)
+  input.length -= 3
+  input.concat(user " err\"or")
+  f-fail-test(
+      user input, user "error: illegal \" character in parameter 'err\"or'\n")
+
+
 test test-output-errors()
-  f-fail-test(
-      user "input.4.lm -o", user "error: missing file name after \"o\" flag\n")
-  f-fail-test(
-      user "input.4.lm -o -v",
-      user "error: missing file name after \"o\" flag\n")
-  f-fail-test(
-      user "input.4.lm -o err\"or",
-      user "error: illegal \" character in parameter 'err\"or'\n")
+  f-flag-with-parameter-error-tests(user "o", user "file name")
 
 
 test test-test-errors()
-  f-fail-test(
-      user "input.4.lm -t",
-      user "error: missing module name after \"t\" flag\n")
-  f-fail-test(
-      user "input.4.lm -t -v",
-      user "error: missing module name after \"t\" flag\n")
-  f-fail-test(
-      user "input.4.lm -t err\"or",
-      user "error: illegal \" character in parameter 'err\"or'\n")
+  f-flag-with-parameter-error-tests(user "t", user "module name")
 
 
 test test-external-errors()
-  f-fail-test(
-      user "input.4.lm -e", user "error: missing file name after \"e\" flag\n")
-  f-fail-test(
-      user "input.4.lm -e -v",
-      user "error: missing file name after \"e\" flag\n")
-  f-fail-test(
-      user "input.4.lm -e err\"or",
-      user "error: illegal \" character in parameter 'err\"or'\n")
+  f-flag-with-parameter-error-tests(user "e", user "file name")
+
+
+test test-lumipath-errors()
+  f-flag-with-parameter-error-tests(user "p", user "path")
 
 
 test test-unknow-flags()
@@ -405,3 +474,13 @@ test test-version-errors()
   f-fail-test(
       user "-t mut input.3.lm",
       user "error: testing not supported before TL4\n")
+
+
+test test-run-program-errors()
+  f-fail-test(
+      user "-c input.4.lm -r",
+      user "error: cannot run program when C compilation is turned off by \
+      \"-c\" flag\n")
+  f-fail-test(
+      user "input.4.lm -o output -ra",
+      user "error: missing arguments after \"-ra\" flag\n")

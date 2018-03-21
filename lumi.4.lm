@@ -44,18 +44,25 @@ func f-help()
         -c \t\t only create C file(s)
         -l<version> \t only run C compiler for TL<version>
         -e <file> \t external C file for C compilation
-        -v \t\t print executed commands")
+        -p <lumipath>  path of lumi-lang repository
+        -r \t\t   run the compiled program
+        -ra <arguments>  run the compiled program with given arguments
+        -v \t\t print executed commands
+        -d \t\t only print commands without execution")
   sys.exit(copy 0)
 
 
 struct Lumi
   var Bool run-lumi
   var Bool run-c
+  var Bool run-program
   var Bool explicit-output
   var Bool verbose
+  var Bool execute
   owner String implicit-output
   user String output
   user String mut
+  user String execute-arguments
   var Char version
   user String main-input
   owner String input-files
@@ -68,6 +75,7 @@ struct Lumi
   func new()
     self.run-lumi := true
     self.run-c := true
+    self.execute := true
     self.input-files := String{MAX-COMMNAD-SIZE}()
     self.external-files := String{MAX-COMMNAD-SIZE}()
     self.command := String{MAX-COMMNAD-SIZE}()
@@ -78,16 +86,24 @@ struct Lumi
   func m-run-command(user String error-msg)
     if self.verbose
       sys.println(user self.command)
-    if sys.system(user self.command) != 0
-      sys.println(user error-msg)
-      raise
+    if self.execute
+      if sys.system(user self.command) != 0
+        if error-msg?
+          sys.println(user error-msg)
+          raise
+        else
+          sys.exit(copy 1)
   
-  func get-opt-param(user String option, user String param)->(
+  func get-any-opt-param(user String option, user String param)->(
       var Int index, user String value)
     self.check-opt-param-error(
         copy index >= sys.argv.length - 1, user option, user param)
     index += 1
     value := sys.argv[index]
+  
+  func get-opt-param(user String option, user String param)->(
+      var Int index, user String value)
+    self.get-any-opt-param(user option, user param)->(var index, user value)
     self.check-opt-param-error(copy value[0] = '-', user option, user param)
     self.check-param(user value)
   
@@ -96,7 +112,7 @@ struct Lumi
     if is-error
       sys.print(user "error: missing ")
       sys.print(user param)
-      sys.print(user " after \"")
+      sys.print(user " after \"-")
       sys.print(user option)
       sys.println(user "\" flag")
       raise
@@ -115,10 +131,14 @@ struct Lumi
       self.command.concat(user ".c")
     self.command.concat(user "\"")
   
-  func concat-file-name(user String target, user String name)
-    target.concat(user " \"")
+  func concat-first-file-name(user String target, user String name)
+    target.concat(user "\"")
     target.concat(user name)
     target.concat(user "\"")
+  
+  func concat-file-name(user String target, user String name)
+    target.concat(user " ")
+    self.concat-first-file-name(user target, user name)
   
   func concat-tl-path()
     self.command.concat(user self.lumi-path)
@@ -155,13 +175,25 @@ struct Lumi
                 user self.external-files,
                 user self.get-opt-param(user "e", user "file name")->(
                 var index))
+          else-if op = 'p'
+            self.lumi-path.new(
+                user self.get-opt-param(user "p", user "path")->(var index))
           else-if op = 'c'
             self.run-c := false
-          else-if op = 'l' and arg.length >= 2
+          else-if op = 'l' and arg.length > 2
             self.run-lumi := false
             self.version := arg[2]
+          else-if op = 'r'
+            self.run-program := true
+            if arg.length > 2
+              if arg[2] = 'a'
+                self.get-any-opt-param(user "ra", user "arguments")->(
+                    var index, user self.execute-arguments)
           else-if op = 'v'
             self.verbose := true
+          else-if op = 'd'
+            self.verbose := true
+            self.execute := false
           else
             sys.print(user "warning: unknown flag \"")
             sys.print(user arg)
@@ -175,6 +207,10 @@ struct Lumi
         input-files-num += 1
     
     f-error-if(copy input-files-num = 0, user "error: no input files")
+    f-error-if(
+        copy self.run-program and not self.run-c,
+        user "error: cannot run program when C compilation is turned off by \
+        \"-c\" flag")
     
     if self.run-lumi
       f-error-if(
@@ -228,8 +264,9 @@ struct Lumi
   func m-run-c()
     if not sys.getenv(user "CC", user self.command)
       self.command.new(user "gcc")
-    if sys.getenv(user "LUMIPATH", user self.lumi-path) and
-        self.lumi-path.length > 0
+    if self.lumi-path.length = 0
+      sys.getenv(user "LUMIPATH", user self.lumi-path)
+    if self.lumi-path.length > 0
       var Char last(copy self.lumi-path[self.lumi-path.length - 1])
       if last = '\\'
         self.path-separator := '\\'
@@ -262,12 +299,22 @@ struct Lumi
     self.concat-file-name(user self.command, user self.output)
     self.m-run-command(user "C compiler failed")
   
+  func m-run-program()
+    self.command.clear()
+    self.concat-first-file-name(user self.command, user self.output)
+    if self.execute-arguments?
+      self.command.concat(user " ")
+      self.command.concat(user self.execute-arguments)
+    self.m-run-command(user _)
+  
   func m-run()
     self.read-input()
     if self.run-lumi
       self.m-run-lumi()
     if self.run-c
       self.m-run-c()
+    if self.run-program
+      self.m-run-program()
 
 
 main
