@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file9_name = "expression/call.3.lm";
+static char* _lumi_file10_name = "expression/call.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file9_name
+#define LUMI_FILE_NAME _lumi_file10_name
 
 /* TL4 compiler - Call expression */
 
@@ -398,6 +398,7 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -426,7 +427,6 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

@@ -18,6 +18,14 @@ char* LUMI_expected_error = NULL;
 int LUMI_expected_error_trace_ignore_count = 0;
 Generic_Type_Dynamic* dynamic_Void = NULL;
 
+Sys* sys = NULL;
+Ref_Manager* sys_Refman = NULL;
+Array* sys_argv = NULL;
+Ref_Manager* sys_argv_Refman = NULL;
+Ref_Manager* stdout_Refman = NULL;
+Ref_Manager* stdin_Refman = NULL;
+Ref_Manager* stderr_Refman = NULL;
+
 void LUMI_trace_print(
     char const* format,
     char const* filename,
@@ -189,10 +197,12 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {
   int n;
   int coverage;
   Bool generate_xml = false;
-  String* args_strings;
-  args_strings = sys->argv->values;
-  generate_xml = sys->argv->length > 1 && args_strings[1].length > 1 &&
-    args_strings[1].values[0] == '-' && args_strings[1].values[1] == 'x';
+  if (sys_argv != NULL && sys_argv_Refman->value != NULL) {
+    String* args_strings;
+    args_strings = sys_argv->values;
+    generate_xml = sys_argv->length > 1 && args_strings[1].length > 1 &&
+      args_strings[1].values[0] == '-' && args_strings[1].values[1] == 'x';
+  }
   printf("testing code coverage... ");
   coverage = calc_coverage(files_coverage, files_number);
   if (coverage == 100) {
@@ -662,33 +672,30 @@ Returncode String_has(
 }
 
 /*system*/
-Array sys_argv;
-Sys sys_Var;
-Sys* sys = &sys_Var;
-Ref_Manager* sys_Refman;
-Ref_Manager* stdout_Refman;
-Ref_Manager* stdin_Refman;
-Ref_Manager* stderr_Refman;
-
-
 int set_sys(int argc, char* argv[]) {
   String* args_strings;
   int arg;
-  args_strings = LUMI_alloc(argc * sizeof(String));
-  sys_Var.argv_Refman = LUMI_new_ref(&sys_argv);
-  sys_Refman = LUMI_new_ref(&sys_Var);
+  sys = LUMI_alloc(sizeof(Sys));
+  sys_Refman = LUMI_new_ref(sys);
+  sys_argv = LUMI_new_array(argc, sizeof(String));
+  sys_argv_Refman = LUMI_new_ref(sys_argv);
   stdout_Refman = LUMI_new_ref(stdout);
   stdin_Refman = LUMI_new_ref(stdin);
   stderr_Refman = LUMI_new_ref(stderr);
-  if (args_strings == NULL || sys_Var.argv_Refman == NULL ||
-    sys_Refman == NULL || stdout_Refman == NULL || stdin_Refman == NULL ||
+  if (sys == NULL || sys_Refman == NULL || sys_argv == NULL ||
+    sys_argv_Refman == NULL || stdout_Refman == NULL || stdin_Refman == NULL ||
     stderr_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
-  sys_argv.length = argc;
-  sys_argv.values = args_strings;
-  sys_Var.argv = &sys_argv;
+  ++sys_Refman->count;
+  ++sys_argv_Refman->count;
+  ++stdout_Refman->count;
+  ++stdin_Refman->count;
+  ++stderr_Refman->count;
+  sys->argv = sys_argv;
+  sys->argv_Refman = sys_argv_Refman;
+  args_strings = sys_argv->values;
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
     args_strings[arg].length = cstring_length(argv[arg], 1024);

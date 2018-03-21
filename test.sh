@@ -6,6 +6,7 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Wall -Werror"
+CCA="$CCW --pedantic -Wno-unused-label"
 rm -rf .test
 mkdir .test
 cp *.lm .test
@@ -77,8 +78,8 @@ cp ../TL4/global/*.3.lm global
 cp ../TL4/expression/*.3.lm expression
 cp ../TL4/syntax-tree/*.3.lm syntax-tree
 cp ../TL4/statement/*.3.lm statement
-./tl3-compiler global/*.3.lm expression/*.3.lm syntax-tree/*.3.lm \
-  statement/*.3.lm tl4-compiler.3.lm
+./tl3-compiler tl4-compiler.3.lm global/*.3.lm expression/*.3.lm \
+  syntax-tree/*.3.lm statement/*.3.lm
 diff ../TL4/global global
 diff ../TL4/expression expression
 diff ../TL4/syntax-tree syntax-tree
@@ -118,8 +119,8 @@ fi
 ./tl4-compiler tests/integration-actual-single.c tests/integration-test0.4.lm
 diff ../TL4/tests/integration-expected-single.c \
   tests/integration-actual-single.c
-$CCW -Wno-unused-label --pedantic tests/integration-actual-single.c \
-  ../TL4/lumi.4.c -I../TL4 -o  test-tl4-single
+$CCA tests/integration-actual-single.c ../TL4/lumi.4.c -I../TL4 \
+  -o test-tl4-single
 ./test-tl4-single > tests/integration-single-output.txt
 diff ../TL4/tests/integration-single-output.txt \
   tests/integration-single-output.txt
@@ -130,16 +131,14 @@ diff ../TL4/tests/integration-single-output.txt \
   tests/integration-test2.4.lm
 diff ../TL4/tests/integration-expected-multiple.c \
   tests/integration-actual-multiple.c
-$CCW -Wno-unused-label --pedantic tests/integration-actual-multiple.c \
-  ../TL4/lumi.4.c ../TL4/tests/integration-external.c -I../TL4 -o \
-  test-tl4-multiple
+$CCA tests/integration-actual-multiple.c ../TL4/lumi.4.c \
+  ../TL4/tests/integration-external.c -I../TL4 -o test-tl4-multiple
 ./test-tl4-multiple -xml > tests/integration-multiple-output.txt
+mkdir cover-tl4-tests
+mv cobertura.xml cover-tl4-tests
 diff ../TL4/tests/integration-multiple-output.txt \
   tests/integration-multiple-output.txt
-diff ../TL4/tests/expected-cobertura.xml cobertura.xml
-if [ -z "$COVERAGE" ]; then
-  rm cobertura.xml
-fi
+diff ../TL4/tests/expected-cobertura.xml cover-tl4-tests/cobertura.xml
 
 # run tl4-compiler coverage fail integration test
 ./tl4-compiler -t integration tests/integration-actual-uncovered.c \
@@ -147,9 +146,8 @@ fi
   tests/integration-test2.4.lm
 diff ../TL4/tests/integration-expected-uncovered.c \
   tests/integration-actual-uncovered.c
-$CCW -Wno-unused-label --pedantic tests/integration-actual-uncovered.c \
-  ../TL4/lumi.4.c ../TL4/tests/integration-external.c -I../TL4 -o \
-  test-tl4-uncovered
+$CCA tests/integration-actual-uncovered.c ../TL4/lumi.4.c \
+  ../TL4/tests/integration-external.c -I../TL4 -o test-tl4-uncovered
 ! ./test-tl4-uncovered > tests/integration-uncovered-output.txt
 diff ../TL4/tests/integration-uncovered-output.txt \
   tests/integration-uncovered-output.txt
@@ -158,21 +156,42 @@ diff ../TL4/tests/integration-uncovered-output.txt \
 ./tl4-compiler -t error tests/integration-actual-error.c \
   tests/integration-error-test.4.lm
 diff ../TL4/tests/integration-expected-error.c tests/integration-actual-error.c
-$CCW -Wno-unused-label --pedantic tests/integration-actual-error.c \
-  ../TL4/lumi.4.c -I../TL4 -o  test-tl4-error
+$CCA tests/integration-actual-error.c ../TL4/lumi.4.c -I../TL4 -o test-tl4-error
 ! ./test-tl4-error > tests/integration-error-output.txt
 diff ../TL4/tests/integration-error-output.txt \
   tests/integration-error-output.txt
 
 
-# --< Lumi command >--
+# --< lumi command >--
 
-# test tl3-compiler on lumi command files
-./tl3-compiler lumi.3.lm
+# test tl4-compiler on lumi command files
+./tl4-compiler lumi.c lumi.4.lm
 diff ../lumi.c lumi.c
 
 # compile lumi command
-$CCW ../lumi.c ../TL3/lumi.3.c -I. -I../TL3 -o lumi
+$CCA ../lumi.c ../TL4/lumi.4.c -I../TL4 -o lumi
+
+# run lumi command tests
+./tl4-compiler -t lumi lumi-tests.c lumi.4.lm lumi-tests.4.lm
+$CCA lumi-tests.c ../TL4/lumi.4.c -I../TL4 -o lumi-tests
+./lumi-tests -xml
+mkdir cover-lumi-tests
+mv cobertura.xml cover-lumi-tests
+
+# run lumi command on TL4 integration tests
+PATH="$PATH:." LUMIPATH=".." ./lumi tests/integration-test0.4.lm \
+  -o test-lumi-single
+diff ../TL4/tests/integration-expected-single.c test-lumi-single.c
+./test-lumi-single > lumi-integration-single-output.txt
+diff ../TL4/tests/integration-single-output.txt \
+  lumi-integration-single-output.txt
+PATH="$PATH:." LUMIPATH=".." ./lumi -t covered tests/integration-test0.4.lm \
+  tests/integration-test1.4.lm tests/integration-test2.4.lm -e \
+  ../TL4/tests/integration-external.c -o test-lumi-multiple
+diff ../TL4/tests/integration-expected-multiple.c test-lumi-multiple.c
+./test-lumi-multiple > lumi-integration-multiple-output.txt
+diff ../TL4/tests/integration-multiple-output.txt \
+  lumi-integration-multiple-output.txt
 
 
 # --< Standard Libraries >--

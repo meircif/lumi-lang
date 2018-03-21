@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file4_name = "global/global.3.lm";
+static char* _lumi_file5_name = "global/global.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file4_name
+#define LUMI_FILE_NAME _lumi_file5_name
 
 /* TL4 compiler - Global compiler data */
 
@@ -379,7 +379,7 @@ Returncode Global_add_builtin_variable(Global* self, String* name, TypeData* var
     variable->access = ACCESS_VAR;
   }
   else {
-    variable->access = ACCESS_OWNER;
+    variable->access = ACCESS_USER;
   }
   CHECK(342, TypeData_m_new_type_instance(variable_type, &(variable->type_instance)) )
   if (NULL != variable_subtype) {
@@ -544,6 +544,7 @@ Global* glob = &(Global){NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, N
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -572,7 +573,6 @@ Global* glob = &(Global){NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, N
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

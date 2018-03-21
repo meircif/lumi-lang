@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file23_name = "statement/error.3.lm";
+static char* _lumi_file24_name = "statement/error.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file23_name
+#define LUMI_FILE_NAME _lumi_file24_name
 
 /* TL4 compiler - Syntax tree error handling nodes */
 
@@ -36,8 +36,8 @@ Returncode SyntaxTreeTry_parse_new(SyntaxTreeTry* self, SyntaxTreeBlock* parent,
   if ((*new_node) == NULL) RAISE(11)
   *(*new_node) = (SyntaxTreeTry){SyntaxTreeTry__dtl, NULL, 0, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeTry__dtl;
-  CHECK(12, SyntaxTreeNode_set_location(&((*new_node)->_base._base._base)) )
-  CHECK(13, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), parent, false, &((*end))) )
+  CHECK(12, SyntaxTreeFlowElement_init(&((*new_node)->_base), parent) )
+  CHECK(13, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), false, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -119,8 +119,8 @@ Returncode SyntaxTreeCatch_parse_new(SyntaxTreeCatch* self, SyntaxTreeBlock* par
   if ((*new_node) == NULL) RAISE(52)
   *(*new_node) = (SyntaxTreeCatch){SyntaxTreeCatch__dtl, NULL, 0, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeCatch__dtl;
-  CHECK(53, SyntaxTreeNode_set_location(&((*new_node)->_base._base._base)) )
-  CHECK(54, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), parent, false, &((*end))) )
+  CHECK(53, SyntaxTreeFlowElement_init(&((*new_node)->_base), parent) )
+  CHECK(54, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), false, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -166,6 +166,7 @@ Func SyntaxTreeCatch__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Syn
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -194,7 +195,6 @@ Func SyntaxTreeCatch__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Syn
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file8_name = "expression/base-type.3.lm";
+static char* _lumi_file9_name = "expression/base-type.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file8_name
+#define LUMI_FILE_NAME _lumi_file9_name
 
 /* TL4 compiler - Base and Type expressions */
 
@@ -491,6 +491,7 @@ Func EnumExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -519,7 +520,6 @@ Func EnumExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

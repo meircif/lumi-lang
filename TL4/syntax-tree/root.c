@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file21_name = "syntax-tree/root.3.lm";
+static char* _lumi_file22_name = "syntax-tree/root.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file21_name
+#define LUMI_FILE_NAME _lumi_file22_name
 
 /* TL4 compiler - Syntax tree root */
 
@@ -215,7 +215,7 @@ Returncode SyntaxTreeRoot_parse_if_common(SyntaxTreeRoot* self, String* keyword,
       return OK;
     }
     else {
-      CHECK(106, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){26, 25, "no \"module\" in file start"}, keyword) )
+      CHECK(106, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){26, 25, "no \"module\" in file start"}) )
     }
   }
   CHECK(107, SyntaxTreeBranch_parse_if_common(&(self->_base._base._base), keyword, parent_type, parent_block, &((*end)), &((*is_parsed))) )
@@ -887,6 +887,7 @@ Returncode write_global(String* text) {
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -915,7 +916,6 @@ Returncode write_global(String* text) {
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

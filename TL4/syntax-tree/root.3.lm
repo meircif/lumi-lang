@@ -103,7 +103,7 @@ class SyntaxTreeRoot(GlobalNodes)
         is-parsed := true
         return
       else
-        self.m-syntax-error(user "no \"module\" in file start", user keyword)
+        self.m-syntax-error-msg(user "no \"module\" in file start")
     base.parse-if-common(user keyword, user parent-type, user parent-block):(
         copy end, copy is-parsed)
   

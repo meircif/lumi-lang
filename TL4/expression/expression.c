@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file12_name = "expression/expression.3.lm";
+static char* _lumi_file13_name = "expression/expression.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file12_name
+#define LUMI_FILE_NAME _lumi_file13_name
 
 /*  TL4 compiler - Expression
 
@@ -425,6 +425,7 @@ Func Expression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNo
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -453,7 +454,6 @@ Func Expression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTreeNo
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

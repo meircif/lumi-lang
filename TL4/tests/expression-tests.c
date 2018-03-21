@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file30_name = "tests/expression-tests.3.lm";
+static char* _lumi_file31_name = "tests/expression-tests.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file30_name
+#define LUMI_FILE_NAME _lumi_file31_name
 
 /* TL4 compiler tests - Expression */
 
@@ -358,6 +358,7 @@ Returncode test_builtin() {
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -389,7 +390,6 @@ Returncode test_builtin() {
 #include "statement/variable.c"
 #include "tests/global-tests.c"
 #include "tests/syntax-tree-tests.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

@@ -5,6 +5,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
   owner SyntaxTreeBlock block
   
   func inst init(user SyntaxTreeBlock parent)
+    self.set-location()
     new SyntaxTreeBlock in self.block
     self.set-parent(user parent)
   
@@ -15,9 +16,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.block.is-in-loop := parent.is-in-loop
     self.block.set-location()
   
-  func inst parse-block(user SyntaxTreeBlock parent, copy Bool is-loop):(
-      copy Char end)
-    self.init(user parent)
+  func inst parse-block(copy Bool is-loop):(copy Char end)
     if is-loop
       self.block.is-in-loop := true
     self.block.parse-block():(copy end)
@@ -46,9 +45,9 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     new-node.parse(user parent):(copy end)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
-    self.set-location()
+    self.init(user parent)
     parse-new-expression(user "", user self):(owner self.condition, copy end)
-    self.parse-block(user parent, copy false):(copy end)
+    self.parse-block(copy false):(copy end)
   
   func inst add-else(owner SyntaxTreeElse else-node)
     else-node.set-parent(user self.parent)
@@ -92,8 +91,8 @@ class SyntaxTreeElse(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeElse new-node)
     new SyntaxTreeElse in new-node
-    new-node.set-location()
-    new-node.parse-block(user parent, copy false):(copy end)
+    new-node.init(user parent)
+    new-node.parse-block(copy false):(copy end)
   
   func dynamic write()
     # else {
@@ -109,8 +108,8 @@ class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent):(
       copy Char end, owner SyntaxTreeDoLoop new-node)
     new SyntaxTreeDoLoop in new-node
-    new-node.set-location()
-    new-node.parse-block(user parent, copy true):(copy end)
+    new-node.init(user parent)
+    new-node.parse-block(copy true):(copy end)
   
   func dynamic write()
     # while (true) {

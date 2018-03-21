@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file29_name = "statement/variable.3.lm";
+static char* _lumi_file30_name = "statement/variable.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file29_name
+#define LUMI_FILE_NAME _lumi_file30_name
 
 /* TL4 compiler - Syntax tree variable */
 
@@ -753,6 +753,7 @@ Func SyntaxTreeConstant__dtl[] = {(void*)SyntaxTreeVariable_get_parent_type, (vo
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -781,7 +782,6 @@ Func SyntaxTreeConstant__dtl[] = {(void*)SyntaxTreeVariable_get_parent_type, (vo
 #include "statement/native.c"
 #include "statement/test.c"
 #include "statement/type.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

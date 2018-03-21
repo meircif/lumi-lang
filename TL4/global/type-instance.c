@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file7_name = "global/type-instance.3.lm";
+static char* _lumi_file8_name = "global/type-instance.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file7_name
+#define LUMI_FILE_NAME _lumi_file8_name
 
 /* TL4 compiler - Type instance */
 
@@ -506,6 +506,7 @@ Returncode TypeInstance_f_replace_type_parameters(TypeInstance* self, TypeInstan
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -534,7 +535,6 @@ Returncode TypeInstance_f_replace_type_parameters(TypeInstance* self, TypeInstan
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)
