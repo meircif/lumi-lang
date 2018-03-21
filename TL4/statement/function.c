@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file25_name = "statement/function.3.lm";
+static char* _lumi_file26_name = "statement/function.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file25_name
+#define LUMI_FILE_NAME _lumi_file26_name
 
 /* TL4 compiler - Syntax tree function */
 
@@ -832,6 +832,7 @@ Returncode write_post_func() {
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -860,7 +861,6 @@ Returncode write_post_func() {
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

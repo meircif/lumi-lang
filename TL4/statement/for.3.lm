@@ -17,7 +17,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     new-node.parse(user parent):(copy end)
   
   func inst parse(user SyntaxTreeBlock parent):(copy Char end)
-    self.set-location()
+    self.init(user parent)
     read-new(user " "):(owner self.item-name, copy end)
     if end != ' '
       self.m-syntax-error-c(
@@ -28,7 +28,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       self.start := self.iterator
       parse-new-expression(user "", user self):(owner self.iterator, copy end)
     
-    self.parse-block(user parent, copy true):(copy end)
+    self.parse-block(copy true):(copy end)
   
   func dynamic analyze()
     owner TypeInstance type-instance

@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file1_name = "global/argument.3.lm";
+static char* _lumi_file2_name = "global/argument.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file1_name
+#define LUMI_FILE_NAME _lumi_file2_name
 
 /* TL4 compiler - Function arguments */
 
@@ -588,6 +588,7 @@ Func FunctionArguments__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)F
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/common.c"
 #include "global/file-io.c"
 #include "global/global.c"
@@ -616,7 +617,6 @@ Func FunctionArguments__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)F
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

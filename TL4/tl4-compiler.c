@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file30_name = "tl4-compiler.3.lm";
+static char* _lumi_file1_name = "tl4-compiler.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file30_name
+#define LUMI_FILE_NAME _lumi_file1_name
 
 /* TL4 compiler main - written in TL3 */
 

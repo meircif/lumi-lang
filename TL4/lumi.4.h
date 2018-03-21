@@ -118,9 +118,11 @@ int LUMI_test_main(int argc, char* argv[]);
 #define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)
 #define USER_MAIN_HEADER Returncode LUMI_user_main(void)
 
-#define ARRAY_DEL(Type, array) \
-{int LUMI_n=0; for(;LUMI_n<array->length; ++LUMI_n) \
- Type##_Del(((Type*)(array->values))+LUMI_n);}
+#define ARRAY_DEL(Type, array) if (array != NULL) { \
+  int LUMI_n = 0; \
+  for (; LUMI_n < array->length; ++LUMI_n) \
+    Type##_Del(((Type*)(array->values))+LUMI_n); \
+}
 
 #define SELF_REF_DEL(Type, field) \
 while (self->field != NULL) { \

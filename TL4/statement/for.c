@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file24_name = "statement/for.3.lm";
+static char* _lumi_file25_name = "statement/for.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file24_name
+#define LUMI_FILE_NAME _lumi_file25_name
 
 /* TL4 compiler - Syntax tree for loop */
 
@@ -48,7 +48,7 @@ Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* par
 static char* _func_name_SyntaxTreeForLoop_parse = "SyntaxTreeForLoop.parse";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeForLoop_parse
 Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* parent, Char* end) {
-  CHECK(20, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
+  CHECK(20, SyntaxTreeFlowElement_init(&(self->_base), parent) )
   CHECK(21, read_new(&(String){2, 1, " "}, &(self->item_name), &((*end))) )
   if ((*end) != ' ') {
     CHECK(23, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){37, 36, "expected space after index name, got"}, (*end)) )
@@ -60,7 +60,7 @@ Returncode SyntaxTreeForLoop_parse(SyntaxTreeForLoop* self, SyntaxTreeBlock* par
     CHECK(29, parse_new_expression(&(String){1, 0, ""}, &(self->_base._base), &(self->iterator), &((*end))) )
   }
   
-  CHECK(31, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, true, &((*end))) )
+  CHECK(31, SyntaxTreeFlowElement_parse_block(&(self->_base), true, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -479,6 +479,7 @@ Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)S
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -507,7 +508,6 @@ Func SyntaxTreeForLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)S
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

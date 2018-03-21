@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file3_name = "global/file-io.3.lm";
+static char* _lumi_file4_name = "global/file-io.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file3_name
+#define LUMI_FILE_NAME _lumi_file4_name
 
 /* TL4 compiler - File read and write functions */
 
@@ -271,6 +271,7 @@ Returncode file_write(File* file, String* text) {
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/global.c"
@@ -299,7 +300,6 @@ Returncode file_write(File* file, String* text) {
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

@@ -540,6 +540,10 @@ if i > 3
 if b
     return
   i := 3
+## @ c t4
+if b and
+      b
+    i += 1
 ## @ ec te0
 if 3
 ## @ ec te1
@@ -636,6 +640,10 @@ var Int n
 for n in 5
     i += n
   for n in 7
+    i += n
+## @ c t7
+for n in 1 +
+      2
     i += n
 ## @ ec te0
 for(

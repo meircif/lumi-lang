@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file19_name = "syntax-tree/code-flow.3.lm";
+static char* _lumi_file20_name = "syntax-tree/code-flow.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file19_name
+#define LUMI_FILE_NAME _lumi_file20_name
 
 /* TL4 compiler - Syntax tree code flow elements */
 
@@ -26,11 +26,12 @@ Returncode SyntaxTreeFlowElement_init(SyntaxTreeFlowElement* self, SyntaxTreeBlo
 static char* _func_name_SyntaxTreeFlowElement_init = "SyntaxTreeFlowElement.init";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFlowElement_init
 Returncode SyntaxTreeFlowElement_init(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent) {
+  CHECK(8, SyntaxTreeNode_set_location(&(self->_base._base)) )
   self->block = malloc(sizeof(SyntaxTreeBlock));
-  if (self->block == NULL) RAISE(8)
+  if (self->block == NULL) RAISE(9)
   *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false};
   self->block->_base._base._dtl = SyntaxTreeBlock__dtl;
-  CHECK(9, SyntaxTreeFlowElement_set_parent(self, parent) )
+  CHECK(10, SyntaxTreeFlowElement_set_parent(self, parent) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -45,22 +46,21 @@ Returncode SyntaxTreeFlowElement_set_parent(SyntaxTreeFlowElement* self, SyntaxT
   self->block->parent = parent;
   self->block->_base.indentation_spaces = parent->_base.indentation_spaces + 2;
   self->block->is_in_loop = parent->is_in_loop;
-  CHECK(16, SyntaxTreeNode_set_location(&(self->block->_base._base)) )
+  CHECK(17, SyntaxTreeNode_set_location(&(self->block->_base._base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
 #endif
 #if LUMI_STAGE == LUMI_DECLARATIONS
-Returncode SyntaxTreeFlowElement_parse_block(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent, Bool is_loop, Char* end);
+Returncode SyntaxTreeFlowElement_parse_block(SyntaxTreeFlowElement* self, Bool is_loop, Char* end);
 #elif LUMI_STAGE == LUMI_FUNCTIONS
 static char* _func_name_SyntaxTreeFlowElement_parse_block = "SyntaxTreeFlowElement.parse-block";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFlowElement_parse_block
-Returncode SyntaxTreeFlowElement_parse_block(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent, Bool is_loop, Char* end) {
-  CHECK(20, SyntaxTreeFlowElement_init(self, parent) )
+Returncode SyntaxTreeFlowElement_parse_block(SyntaxTreeFlowElement* self, Bool is_loop, Char* end) {
   if (is_loop) {
     self->block->is_in_loop = true;
   }
-  CHECK(23, SyntaxTreeBlock_parse_block(self->block, &((*end))) )
+  CHECK(22, SyntaxTreeBlock_parse_block(self->block, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -71,7 +71,7 @@ Returncode SyntaxTreeFlowElement_link_types(SyntaxTreeFlowElement* self);
 static char* _func_name_SyntaxTreeFlowElement_link_types = "SyntaxTreeFlowElement.link-types";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFlowElement_link_types
 Returncode SyntaxTreeFlowElement_link_types(SyntaxTreeFlowElement* self) {
-  CHECK(26, (self->block)->_base._base._dtl[1](self->block) )
+  CHECK(25, (self->block)->_base._base._dtl[1](self->block) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -82,7 +82,7 @@ Returncode SyntaxTreeFlowElement_analyze(SyntaxTreeFlowElement* self);
 static char* _func_name_SyntaxTreeFlowElement_analyze = "SyntaxTreeFlowElement.analyze";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFlowElement_analyze
 Returncode SyntaxTreeFlowElement_analyze(SyntaxTreeFlowElement* self) {
-  CHECK(29, (self->block)->_base._base._dtl[2](self->block) )
+  CHECK(28, (self->block)->_base._base._dtl[2](self->block) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -93,7 +93,7 @@ Returncode SyntaxTreeFlowElement_write_block(SyntaxTreeFlowElement* self);
 static char* _func_name_SyntaxTreeFlowElement_write_block = "SyntaxTreeFlowElement.write-block";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFlowElement_write_block
 Returncode SyntaxTreeFlowElement_write_block(SyntaxTreeFlowElement* self) {
-  CHECK(32, SyntaxTreeBlock_write_block(self->block) )
+  CHECK(31, SyntaxTreeBlock_write_block(self->block) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -104,7 +104,7 @@ Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self);
 static char* _func_name_SyntaxTreeFlowElement_write_block_body = "SyntaxTreeFlowElement.write-block-body";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFlowElement_write_block_body
 Returncode SyntaxTreeFlowElement_write_block_body(SyntaxTreeFlowElement* self) {
-  CHECK(35, (self->block)->_base._base._dtl[9](self->block) )
+  CHECK(34, (self->block)->_base._base._dtl[9](self->block) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -134,10 +134,10 @@ static char* _func_name_SyntaxTreeIf_parse_new = "SyntaxTreeIf.parse-new";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeIf_parse_new
 Returncode SyntaxTreeIf_parse_new(SyntaxTreeIf* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeIf** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeIf));
-  if ((*new_node) == NULL) RAISE(45)
+  if ((*new_node) == NULL) RAISE(44)
   *(*new_node) = (SyntaxTreeIf){SyntaxTreeIf__dtl, NULL, 0, NULL, NULL, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeIf__dtl;
-  CHECK(46, SyntaxTreeIf_parse((*new_node), parent, &((*end))) )
+  CHECK(45, SyntaxTreeIf_parse((*new_node), parent, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -148,9 +148,9 @@ Returncode SyntaxTreeIf_parse(SyntaxTreeIf* self, SyntaxTreeBlock* parent, Char*
 static char* _func_name_SyntaxTreeIf_parse = "SyntaxTreeIf.parse";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeIf_parse
 Returncode SyntaxTreeIf_parse(SyntaxTreeIf* self, SyntaxTreeBlock* parent, Char* end) {
-  CHECK(49, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
-  CHECK(50, parse_new_expression(&(String){1, 0, ""}, &(self->_base._base), &(self->condition), &((*end))) )
-  CHECK(51, SyntaxTreeFlowElement_parse_block(&(self->_base), parent, false, &((*end))) )
+  CHECK(48, SyntaxTreeFlowElement_init(&(self->_base), parent) )
+  CHECK(49, parse_new_expression(&(String){1, 0, ""}, &(self->_base._base), &(self->condition), &((*end))) )
+  CHECK(50, SyntaxTreeFlowElement_parse_block(&(self->_base), false, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -161,7 +161,7 @@ Returncode SyntaxTreeIf_add_else(SyntaxTreeIf* self, SyntaxTreeElse* else_node);
 static char* _func_name_SyntaxTreeIf_add_else = "SyntaxTreeIf.add-else";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeIf_add_else
 Returncode SyntaxTreeIf_add_else(SyntaxTreeIf* self, SyntaxTreeElse* else_node) {
-  CHECK(54, SyntaxTreeFlowElement_set_parent(&(else_node->_base), self->_base._base.parent) )
+  CHECK(53, SyntaxTreeFlowElement_set_parent(&(else_node->_base), self->_base._base.parent) )
   self->else_node = else_node;
   return OK;
 }
@@ -174,22 +174,22 @@ static char* _func_name_SyntaxTreeIf_add_else_if = "SyntaxTreeIf.add-else-if";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeIf_add_else_if
 Returncode SyntaxTreeIf_add_else_if(SyntaxTreeIf* self, SyntaxTreeIf* new_if, SyntaxTreeCoverage* coverage_node) {
   self->else_node = malloc(sizeof(SyntaxTreeElse));
-  if (self->else_node == NULL) RAISE(59)
+  if (self->else_node == NULL) RAISE(58)
   *self->else_node = (SyntaxTreeElse){SyntaxTreeElse__dtl, NULL, 0, NULL, NULL};
   self->else_node->_base._base._base._dtl = SyntaxTreeElse__dtl;
-  CHECK(60, SyntaxTreeFlowElement_init(&(self->else_node->_base), self->_base._base.parent) )
+  CHECK(59, SyntaxTreeFlowElement_init(&(self->else_node->_base), self->_base._base.parent) )
   self->else_node->_base.block->_base.variables = malloc(sizeof(List));
-  if (self->else_node->_base.block->_base.variables == NULL) RAISE(61)
+  if (self->else_node->_base.block->_base.variables == NULL) RAISE(60)
   *self->else_node->_base.block->_base.variables = (List){NULL, NULL};
   self->else_node->_base.block->code_nodes = malloc(sizeof(List));
-  if (self->else_node->_base.block->code_nodes == NULL) RAISE(62)
+  if (self->else_node->_base.block->code_nodes == NULL) RAISE(61)
   *self->else_node->_base.block->code_nodes = (List){NULL, NULL};
   if (NULL != coverage_node) {
     coverage_node->_base.parent = self->else_node->_base.block;
-    CHECK(65, List_add(self->else_node->_base.block->code_nodes, &(coverage_node->_base)) )
+    CHECK(64, List_add(self->else_node->_base.block->code_nodes, &(coverage_node->_base)) )
   }
-  CHECK(66, List_add(self->else_node->_base.block->code_nodes, &(new_if->_base._base)) )
-  CHECK(67, SyntaxTreeFlowElement_set_parent(&(new_if->_base), self->else_node->_base.block) )
+  CHECK(65, List_add(self->else_node->_base.block->code_nodes, &(new_if->_base._base)) )
+  CHECK(66, SyntaxTreeFlowElement_set_parent(&(new_if->_base), self->else_node->_base.block) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -200,10 +200,10 @@ Returncode SyntaxTreeIf_analyze(SyntaxTreeIf* self);
 static char* _func_name_SyntaxTreeIf_analyze = "SyntaxTreeIf.analyze";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeIf_analyze
 Returncode SyntaxTreeIf_analyze(SyntaxTreeIf* self) {
-  CHECK(70, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->condition, glob->type_bool) )
-  CHECK(71, SyntaxTreeFlowElement_analyze(&(self->_base)) )
+  CHECK(69, SyntaxTreeNode_analyze_expression(&(self->_base._base._base), self->condition, glob->type_bool) )
+  CHECK(70, SyntaxTreeFlowElement_analyze(&(self->_base)) )
   if (NULL != self->else_node) {
-    CHECK(73, (self->else_node)->_base._base._base._dtl[2](self->else_node) )
+    CHECK(72, (self->else_node)->_base._base._base._dtl[2](self->else_node) )
   }
   return OK;
 }
@@ -215,14 +215,14 @@ Returncode SyntaxTreeIf_write(SyntaxTreeIf* self);
 static char* _func_name_SyntaxTreeIf_write = "SyntaxTreeIf.write";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeIf_write
 Returncode SyntaxTreeIf_write(SyntaxTreeIf* self) {
-  CHECK(80, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(81, (self->condition)->_base._dtl[9](self->condition) )
-  CHECK(82, write(&(String){5, 4, "if ("}) )
-  CHECK(83, (self->condition)->_base._dtl[4](self->condition) )
-  CHECK(84, write(&(String){2, 1, ")"}) )
-  CHECK(85, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  CHECK(79, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(80, (self->condition)->_base._dtl[9](self->condition) )
+  CHECK(81, write(&(String){5, 4, "if ("}) )
+  CHECK(82, (self->condition)->_base._dtl[4](self->condition) )
+  CHECK(83, write(&(String){2, 1, ")"}) )
+  CHECK(84, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   if (NULL != self->else_node) {
-    CHECK(87, (self->else_node)->_base._base._base._dtl[4](self->else_node) )
+    CHECK(86, (self->else_node)->_base._base._base._dtl[4](self->else_node) )
   }
   return OK;
 }
@@ -251,11 +251,11 @@ static char* _func_name_SyntaxTreeElse_parse_new = "SyntaxTreeElse.parse-new";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeElse_parse_new
 Returncode SyntaxTreeElse_parse_new(SyntaxTreeElse* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeElse** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeElse));
-  if ((*new_node) == NULL) RAISE(94)
+  if ((*new_node) == NULL) RAISE(93)
   *(*new_node) = (SyntaxTreeElse){SyntaxTreeElse__dtl, NULL, 0, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeElse__dtl;
-  CHECK(95, SyntaxTreeNode_set_location(&((*new_node)->_base._base._base)) )
-  CHECK(96, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), parent, false, &((*end))) )
+  CHECK(94, SyntaxTreeFlowElement_init(&((*new_node)->_base), parent) )
+  CHECK(95, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), false, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -269,9 +269,9 @@ Returncode SyntaxTreeElse_write(SyntaxTreeElse* self) {
   /* else { */
   /*   `block...` */
   /* } */
-  CHECK(102, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(103, write(&(String){5, 4, "else"}) )
-  CHECK(104, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  CHECK(101, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(102, write(&(String){5, 4, "else"}) )
+  CHECK(103, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -299,11 +299,11 @@ static char* _func_name_SyntaxTreeDoLoop_parse_new = "SyntaxTreeDoLoop.parse-new
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeDoLoop_parse_new
 Returncode SyntaxTreeDoLoop_parse_new(SyntaxTreeDoLoop* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeDoLoop** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeDoLoop));
-  if ((*new_node) == NULL) RAISE(111)
+  if ((*new_node) == NULL) RAISE(110)
   *(*new_node) = (SyntaxTreeDoLoop){SyntaxTreeDoLoop__dtl, NULL, 0, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeDoLoop__dtl;
-  CHECK(112, SyntaxTreeNode_set_location(&((*new_node)->_base._base._base)) )
-  CHECK(113, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), parent, true, &((*end))) )
+  CHECK(111, SyntaxTreeFlowElement_init(&((*new_node)->_base), parent) )
+  CHECK(112, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), true, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -317,9 +317,9 @@ Returncode SyntaxTreeDoLoop_write(SyntaxTreeDoLoop* self) {
   /* while (true) { */
   /*   `block...` */
   /* } */
-  CHECK(119, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(120, write(&(String){13, 12, "while (true)"}) )
-  CHECK(121, SyntaxTreeFlowElement_write_block(&(self->_base)) )
+  CHECK(118, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(119, write(&(String){13, 12, "while (true)"}) )
+  CHECK(120, SyntaxTreeFlowElement_write_block(&(self->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -335,6 +335,7 @@ Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Sy
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -363,7 +364,6 @@ Func SyntaxTreeDoLoop__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Sy
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

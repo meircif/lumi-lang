@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file20_name = "syntax-tree/node.3.lm";
+static char* _lumi_file21_name = "syntax-tree/node.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file20_name
+#define LUMI_FILE_NAME _lumi_file21_name
 
 /*  TL4 compiler - Syntax tree basic node types
 
@@ -651,6 +651,7 @@ Func NodeOrderConstantsAction__dtl[] = {(void*)NodeOrderConstantsAction_m_action
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/common.c"
 #include "global/file-io.c"
@@ -679,7 +680,6 @@ Func NodeOrderConstantsAction__dtl[] = {(void*)NodeOrderConstantsAction_m_action
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

@@ -1178,6 +1178,10 @@ if (ut_M_b) {
     goto LUMI_cleanup;
   }
   ut_M_i = 3;
+/// @ t4
+if (ut_M_b && ut_M_b) {
+    ut_M_i += 1;
+  }
 /// @ te0
 got "Int" expression, expected "Bool"
 /// @ te1
@@ -1319,6 +1323,11 @@ Int n = 0;
     ut_M_i += n;
   }
   for (n = 0; n < 7; ++n) {
+    ut_M_i += n;
+  }
+/// @ t7
+Int n = 0;
+  for (n = 0; n < 1 + 2; ++n) {
     ut_M_i += n;
   }
 /// @ te0
@@ -3818,7 +3827,7 @@ module name overrides variable "true"
 /// @ te8
 module name overrides function "file-open-read"
 /// @ te9
-no "module" in file start "func"
+no "module" in file start
 /// @ te10
 expected module, got empty expression
 /// @ te11

@@ -5,9 +5,9 @@
 #else
 
 #if LUMI_STAGE == LUMI_TYPEDEFS
-static char* _lumi_file2_name = "global/common.3.lm";
+static char* _lumi_file3_name = "global/common.3.lm";
 #endif
-#define LUMI_FILE_NAME _lumi_file2_name
+#define LUMI_FILE_NAME _lumi_file3_name
 
 /* TL4 compiler - Common stuff */
 
@@ -144,6 +144,7 @@ Returncode f_is_legal_name(String* name, Int name_type, Bool* is_legal) {
 
 #ifndef LUMI_INCLUDES
 #define LUMI_INCLUDES
+#include "tl4-compiler.c"
 #include "global/argument.c"
 #include "global/file-io.c"
 #include "global/global.c"
@@ -172,7 +173,6 @@ Returncode f_is_legal_name(String* name, Int name_type, Bool* is_legal) {
 #include "statement/test.c"
 #include "statement/type.c"
 #include "statement/variable.c"
-#include "tl4-compiler.c"
 #if LUMI_STAGE == LUMI_TYPES(1)
 #undef LUMI_STAGE
 #define LUMI_STAGE LUMI_TYPES(2)

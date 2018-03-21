@@ -338,7 +338,7 @@ static Global
     if variable-type.is-primitive
       variable.access := ACCESS-VAR
     else
-      variable.access := ACCESS-OWNER
+      variable.access := ACCESS-USER
     variable-type.m-new-type-instance():(owner variable.type-instance)
     if ? variable-subtype
       variable.type-instance.add-subtype-copy(user variable-subtype)
