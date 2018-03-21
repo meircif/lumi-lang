@@ -179,12 +179,13 @@ mkdir cover-lumi-tests
 mv cobertura.xml cover-lumi-tests
 
 # run lumi command on TL4 integration tests
-LUMIPATH=".." ./lumi tests/integration-test0.4.lm -o test-lumi-single
+PATH="$PATH:." LUMIPATH=".." ./lumi tests/integration-test0.4.lm \
+  -o test-lumi-single
 diff ../TL4/tests/integration-expected-single.c test-lumi-single.c
 ./test-lumi-single > lumi-integration-single-output.txt
 diff ../TL4/tests/integration-single-output.txt \
   lumi-integration-single-output.txt
-LUMIPATH=".." ./lumi -t covered tests/integration-test0.4.lm \
+PATH="$PATH:." LUMIPATH=".." ./lumi -t covered tests/integration-test0.4.lm \
   tests/integration-test1.4.lm tests/integration-test2.4.lm -e \
   ../TL4/tests/integration-external.c -o test-lumi-multiple
 diff ../TL4/tests/integration-expected-multiple.c test-lumi-multiple.c
