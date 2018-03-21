@@ -367,10 +367,6 @@ test test-verbose()
 test test-dry-run()
   test-setup(user "input.4.lm -o output -d")
   lumi-object.m-run()
-  user String expected-output(user "tl4-compiler \"output.c\" \"input.4.lm\"
-      mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
-      -o \"output\"
-      ")
   f-assert-string(
       user mock-output,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
