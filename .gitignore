@@ -16,3 +16,8 @@ wip
 
 # Eclipse files
 /.project
+
+# CLion files
+.idea
+cmake-build-debug/
+CMakeLists.txt
