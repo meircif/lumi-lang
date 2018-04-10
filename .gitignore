@@ -4,6 +4,7 @@ build
 wip
 .gitattributes
 *.WinMerge
+docs/_*
 
 # Visual-Studio files
 *.sln
