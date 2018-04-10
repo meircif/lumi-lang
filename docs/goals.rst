@@ -1,3 +1,5 @@
+.. _goals:
+
 Lumi Language Goals and Features
 ================================
 

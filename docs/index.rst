@@ -19,8 +19,19 @@ Lumi files use ``.lm`` extension.
   strong and fun. (and I like snow)
 * "Lumi" is short and fun to say.
 
+   Lumi Image `Designed by kjpargeter / Freepik <http://www.freepik.com>`_
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-   
+   :caption: Concepts
+
    goals
+   memory-management
+   thread-safety
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Syntax
+
+   general-syntax
+   type-system

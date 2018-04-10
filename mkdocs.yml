@@ -1,5 +1,0 @@
-site_name: Lumi Language Guide
-pages:
-    - Home: index.md
-    - Goals and Features: goals.md
-theme: readthedocs
