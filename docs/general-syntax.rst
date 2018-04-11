@@ -1,3 +1,5 @@
+.. _syntax:
+
 General Syntax Highlights
 =========================
 
@@ -17,77 +19,31 @@ General Syntax Highlights
   ``FirstLetterUppercase`` (CamelCase) and compile time constants that are
   ``FULLY-UPPERCASE``.
 
-.. _syntax:
+TL[number] - Temporary Lumi Language
+------------------------------------
+Lumi language development is done in an iterative style, where in each
+step a compiler is written to a temporary Lumi language - "TL" - which is a
+partial (or different) syntax of the final Lumi language.
+
+These temporary Lumi languages are marked as "TL[number]" where "number is the
+iteration step number. "TL0" is the initial compiler temporary Lumi language,
+the next iteration will be TL1 and so on...
+
+.. _syntax-tl4:
 
 Work in progress...
 -------------------
-The Lumi language is still a work in progress and the final syntax is not decided yet. The latest working compiler is for Temporary Lumi 4 (TL4) syntax, and this spec will describe it, and the differences between it and the planned final Lumi syntax.
+The Lumi language is still a work in progress and the final syntax is not
+decided yet. The latest working compiler is for Temporary Lumi 4 (TL4) syntax,
+and this guide will describe it, and the differences between it and the planned
+final Lumi syntax.
 
-The planned final Lumi syntax is still in development, so this spec is a taste of what **may** be the final syntax. Changes will happily be made based on coding experience and suggestions.
+The final Lumi syntax is still under planning, so this guide refers only to the
+current planning state of the final syntax. Changes will happily be made based
+on coding experience and suggestions.
 
 ..
-   # Examples
-   _written in TL4, see [[spec|Lumi-Syntax#spec]] for comparison with the planned final syntax._
-   ## Hello World
-   ```
-   main func()
-     sys.println(user "hello world")
-   ```
-
-   ## Fibonacci
-   ```
-   func fibonacci(copy Int n)->(var Int res)
-     var Int prev(copy 1)
-     res := 0
-     for _ in n
-       var Int sum(copy res + prev)
-       prev := res
-       res := sum
-   ```
-
-   ## Complex number
-   ```
-   struct Complex
-     var Int real
-     var Int imaginary
-
-     func str(user String out-str)
-       self.real.str(user out-str)
-       out-str.append(copy ' ')
-       if self.imaginary > 0
-         out-str.append(copy '+')
-       else
-         out-str.append(copy '-')
-       out-str.append(copy ' ')
-       var String{128} imaginary-str
-       if self.imaginary > 0
-         self.imaginary.str(user imaginary-str)
-       else
-         (-self.imaginary).str(user imaginary-str)
-       out-str.concat(user imaginary-str)
-       out-str.append(copy 'i')
-
-   main
-     var Complex complex
-     complex.real := 5
-     complex.imaginary := 3
-     var String{1024} complex-str
-     complex.str(complex-str)
-     sys.println(complex-str)
-   ```
-
-   # Spec
-
-   ## Comments
-   ```
-   ; single line comment
-   [; <-- multi-line comment start
-   multi
-   line
-   comment
-   multi-line comment end --> ;]
-   var Int x  ; this will also be a comment in the final syntax - not supported yet
-   ```
+   old:
 
    ## Basics
    ```
@@ -114,16 +70,6 @@ The planned final Lumi syntax is still in development, so this spec is a taste o
    integer-stack-variable := 3 + 8 - (4 * 7 div 2 mod 6)
    boolean-variable := true or false and 3 >= 6 or 5 = 6 or not 6 != 0
    ```
-   ### Operator Precedence
-   1. `. [] () ?`, left-to-right
-   1. `- +`, `* div mod`, `bor band xor >> <<`, left-to-right _(1)_
-   1. `= != > < >= <= is is-not`, left-to-right _(2)_
-   1. `not`, only one is logical
-   1. `or`, `and`, left-to-right _(1)_
-   1. `:= += -= *=`, only one allowed
-
-   _(1) cannot combine operators from different sub-groups of this group, they must be separated using `()`
-   (2) multiple operators from this group combined will be separated with `and` operator, for example, `a < b < c < d` is treated as `(a < b and b < c and c < d)`_
 
    ## Control Flow
    ```
@@ -206,21 +152,6 @@ The planned final Lumi syntax is still in development, so this spec is a taste o
    ## Type Aliasing - planned
    ```
    alias New-name for Array{8:Int}
-   ```
-
-   ## Documentation
-   ```
-   ~~~ single line documentation ~~~
-   func documented-function()
-     ; do stuff
-
-   ~~~  <-- multi-line documentation start
-   multi
-   line
-   documentation
-   multi-line documentation end --> ~~~
-   func another-documented-function()
-     ; do stuff
    ```
 
    ## Testing and Mocking

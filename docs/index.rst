@@ -4,7 +4,7 @@ Lumi Language Guide
 Welcome to **Lumi** programming language guide!
 
 Lumi is a general purpose programming language that is good for all needs,
-specially for long-term project, or where resources efficiency is needed.
+specially for long-term projects, or where resource efficiency is needed.
 
 Lumi aims to be safe, efficient, flexible, easy to write,
 and easy to maintain. See :ref:`goals` for more details.
@@ -13,13 +13,14 @@ Lumi files use ``.lm`` extension.
 
 "Lumi" name was chosen because:
 
-* "Lumi" is an abbreviation for "Illuminating", which is clearly a good thing.
-  (and the meaning of my name "Meir" in Hebrew)
+* "Lumi" is an abbreviation for "Illuminating", and Lumi language aims to cast
+  new light to the programming world. (it's also the meaning of my first name)
 * "Lumi" means "snow" in Finnish, which is bright, light, handy, flexible,
-  strong and fun. (and I like snow)
-* "Lumi" is short and fun to say.
+  strong and fun - such as the Lumi language. (and also - I like snow)
+* "Lumi" is short, easy to pronounce, and fun to say.
 
-   Lumi Image `Designed by kjpargeter / Freepik <http://www.freepik.com>`_
+   The Lumi image is
+   `Designed by kjpargeter / Freepik <http://www.freepik.com>`_
 
 .. toctree::
    :maxdepth: 2
@@ -34,4 +35,6 @@ Lumi files use ``.lm`` extension.
    :caption: Syntax
 
    general-syntax
+   hello-world
+   basics
    type-system
