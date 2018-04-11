@@ -28,22 +28,22 @@ Documentation have their own dedicated syntax: they start and end with ``~~~``.
 Documentation must be placed at line start and may be single or multi-line.
 
 In :ref:`TL4 <syntax-tl4>` documentation are treated as comments. In the final
-syntax they must come after the element they are documenting, they could be
+syntax they must come before the element they are documenting, they could be
 used dynamically in the code, and would be used to automatically generate
 external documentation.
 
 ::
-
+   
+   ~~~ single line documentation ~~~
    func documented-function()
-     ~~~ single line documentation ~~~
      ; do stuff
 
+   ~~~  <-- multi-line documentation start
+   multi
+   line
+   documentation
+   multi-line documentation end --> ~~~
    func another-documented-function()
-     ~~~  <-- multi-line documentation start
-     multi
-     line
-     documentation
-     multi-line documentation end --> ~~~
      ; do stuff
 
 Primitive Types

@@ -33,7 +33,7 @@ diff ../TL1/tl1-compiler.c tl1-compiler.c
 # compile tl1-compiler
 $CCW ../TL1/tl1-compiler.c ../TL0/tl0-file.c ../TL0/tl0-string.c -I../TL0 \
   -o tl1-compiler
-  
+
 # test tl1-compiler on tl2-compiler files
 ./tl1-compiler tl2-compiler.1.lm tl2-compiler.c
 diff ../TL2/tl2-compiler.c tl2-compiler.c
@@ -44,7 +44,7 @@ diff ../TL2/tl2-compiler.c tl2-compiler.c
 # compile tl2-compiler
 $CCW -Wno-parentheses ../TL2/tl2-compiler.c ../TL1/lumi.1.c -I../TL1 \
   -o tl2-compiler
-  
+
 # test tl2-compiler on tl3-compiler files
 ./tl2-compiler common.2.lm map.2.lm global.2.lm exp.2.lm st-node.2.lm \
   flow.2.lm args.2.lm func.2.lm member.2.lm call.2.lm operand.2.lm dec.2.lm \
@@ -206,6 +206,23 @@ $CCW -Wno-unused-variable -Wno-missing-braces \
   -o standard-libraries-tests
 ./standard-libraries-tests
 
+
+# --< Documentation >--
+
+# compile examples
+cp ../docs/*.lm .
+./tl4-compiler hello-world.c hello-world.4.lm
+$CCA hello-world.c ../TL4/lumi.4.c -I../TL4 -o hello-world
+./tl4-compiler hello-world-test.c hello-world.4.lm hello-world-test.4.lm \
+  -t hello-world
+$CCA hello-world-test.c ../TL4/lumi.4.c -I../TL4 -o hello-world-test
+./tl4-compiler examples.c examples.4.lm
+$CCA examples.c ../TL4/lumi.4.c -I../TL4 -o run-examples
+
+# run examples
+./hello-world
+./hello-world-test
+./run-examples
 
 # --< Teardown >--
 cd ..

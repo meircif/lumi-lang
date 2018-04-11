@@ -28,7 +28,7 @@ struct Complex
     if self.imaginary > 0
       self.imaginary.str(user imaginary-str)
     else
-      (-self.imaginary).str(user imaginary-str)
+      (- self.imaginary).str(user imaginary-str)
     out-str.concat(user imaginary-str)
     out-str.append(copy 'i')
 
@@ -37,7 +37,11 @@ func usgae-example()
   complex.real := 5
   complex.imaginary := 3
   var String{1024} complex-str
-  complex.str(complex-str)
-  sys.println(complex-str)
+  complex.str(user complex-str)
+  sys.println(user complex-str)
 
 ; Complex end
+
+main
+  fibonacci(copy 3)
+  usgae-example()

@@ -99,7 +99,7 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
-html_logo = 'lumi.jpg'
+html_logo = 'lumi.jpeg'
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
