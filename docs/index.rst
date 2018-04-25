@@ -37,4 +37,7 @@ Lumi files use ``.lm`` extension.
    general-syntax
    hello-world
    basics
+   builtin
+   variables
    type-system
+   serialization

@@ -14,8 +14,10 @@ flexibility and performance by the user:
 2. :ref:`memory-management-2`
 3. :ref:`memory-management-3`
 
-*Below is a non-final suggestion to implement this, it will probably be
-developed further over time.*
+.. note::
+   Below is a non-final suggestion to implement this, it will probably be
+   developed further over time. See :ref:`variables` section for the currently
+   implemented syntax.
 
 .. _memory-management-1:
 
@@ -34,11 +36,12 @@ freely - but cannot destroy it or modify its sub-owners.
 This is very similar to the memory management in
 `Rust <https://doc.rust-lang.org/stable/book/second-edition/ch04-00-understanding-ownership.html>`_.
 
-Stack variables are treated as owners - but they cannot move their ownership.
+Stack and global variables are treated as owners - but they cannot move their
+ownership.
 
-::
+This is not implemented yet, but in the future the syntax may look like this::
 
-   owner String some-string(String.new(""))  ; new owner reference
+   owner String some-string(String{16}())  ; new owner reference
    user-func(user some-string)  ; give reference to a user
    owning-func(owner some-string)  ; move ownership, cannot be used anymore
 
@@ -61,11 +64,14 @@ manage the weak references, plus the extra check if the weak reference is valid.
 Depends on the implementation of the compiler the extra overhead is small and
 predictable.
 
-*Strong reference counting is not supported because it can cause memory leaks
-because of reference loops.*
-::
+.. note::
+   Strong reference counting is not supported because it can cause memory leaks
+   because of reference loops.
 
-   managed String some-string(String.new(""))  ; new managed reference
+This is :ref:`currently implemented <variables>` in a basic manner, but in the
+future the syntax may be different and look like this::
+
+   managed String some-string(String{16}())  ; new managed reference
    user-func(user some-string)  ; give reference to a user
    weak-func(weak some-string)  ; give weak reference
    owning-func(managed some-string)  ; move ownership
@@ -84,14 +90,17 @@ To allow this a reference should be declared as "shared". This reference can
 then be passed to other "shared", "user" or "weak" references.
 
 Implementing a garbage-collector has a significant and unpredicted performance
-cost, but some MR users may be willing to pay it in some sections of their
+cost, but some Lumi users may be willing to pay it in some sections of their
 project where performance is less important.
-::
 
-   shared String some-string(String.new(""))  ; new shared reference
+This is not implemented yet, but in the future the syntax may look like this::
+
+   shared String some-string(String{16}())  ; new shared reference
    shared-func(shared some-string)  ; copy shared reference
    user-func(user some-string)  ; give reference to a user
    weak-func(weak some-string)  ; give weak reference
+
+.. _memory-management-empty:
 
 Empty references (nil/null/none)
 --------------------------------
@@ -99,7 +108,9 @@ Empty references (nil/null/none)
 As default, (non-weak) references always point to a legal object.
 To allow empty references, a references must be declared as "conditional"
 using the ``?`` sign. Empty value can be set using ``_``.
-::
+
+This is :ref:`currently implemented <variables>` in a basic manner, but in the
+future the syntax may be different and look like this::
 
    user String? cond-str  ; initialized as empty
    cond-str := some-string  ; now not empty

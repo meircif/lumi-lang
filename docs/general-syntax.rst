@@ -13,10 +13,10 @@ General Syntax Highlights
   - file must end with a newline
   - more as can be seen in the examples...
 
-* "Kebab case" naming conventions:
+* "kebab-case" naming conventions:
 
   Everything is ``lowercase-only-with-hyphens`` except types that are
-  ``FirstLetterUppercase`` (CamelCase) and compile time constants that are
+  ``FirstLetterUppercase`` ("CamelCase") and compile time constants that are
   ``FULLY-UPPERCASE``.
 
 TL[number] - Temporary Lumi Language
