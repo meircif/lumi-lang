@@ -29,6 +29,7 @@ Lumi files use ``.lm`` extension.
    goals
    memory-management
    thread-safety
+   type-system
 
 .. toctree::
    :maxdepth: 2
@@ -39,5 +40,5 @@ Lumi files use ``.lm`` extension.
    basics
    builtin
    variables
-   type-system
+   user-types
    serialization

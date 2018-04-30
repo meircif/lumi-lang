@@ -44,8 +44,9 @@ Features
 * :ref:`memory-management` - allowing easy trade-off between flexibility and
   performance by the user
 * :ref:`thread-safety` - Lumi code is ensure to be thread safe
-* :ref:`type-system` - allow variety of typing styles with different trade-offs
-  between simplicity, generality and performance
+* :ref:`type-system` - Lumi is **strongly typed**, and allows variety of typing
+  styles with different trade-offs between simplicity, generality and
+  performance
 * Exception-like error handling implemented with return values
 * Strict coding conventions - all Lumi code should look the same
 * Built-in support for productivity features:
