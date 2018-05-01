@@ -12,8 +12,8 @@ is only partially implemented, and follows only the
 
    * it allows creation of unlimited weak references from it
    * when ownership is passed the old reference is automatically set as empty
-   * when an owner reference is removed the referenced data is deleted, and all
-     weak references to this data are considered "outdated"
+   * when an owner reference is removed the referenced data is automatically
+     deleted, and all weak references to this data are considered "outdated"
 
 3. every reference declared as ``user`` is a weak reference, and every access
    to the reference is automatically perpended with a runtime check that raises

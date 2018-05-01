@@ -82,7 +82,7 @@ Function
 
    Holds (pointer to) a function.
 
-   :param parameters: the function in and out parameters
+   :param parameters: the function in and out :ref:`arguments <arguments>`
 
    For example: ``Func{()}``, ``Func{(copy Int in)}``,
    ``Func{()->(var Int out)}`` , ``Func{(copy Int in)->(var Int out)}``.
@@ -104,6 +104,28 @@ String
 
    String literals are strings surrounded by ``"`` characters: ``"I am a string
    literal"``. Escape :ref:`characters <character>` can be used.
+
+   String literals may contain line breaks, with additional indentation
+   of exactly 4 spaces. It is treated as ``\n``, or ignored if ``\`` is used
+   before it::
+
+      ; the same as "line\nbrake"
+      s := "line
+          break"
+
+      ; the same as "linebrake"
+      s := "line\
+          break"
+
+   Accessing a single character can be done using ``string[index]``.
+
+   It is possible to extract a sub-string from a string by slicing:
+   ``string[start-index:substring-length]``. This will not copy the string but
+   return a string reference that points to the original string.
+
+   .. warning::
+      In :ref:`TL4 <syntax-tl4>` string slicing is not fully safe. It should
+      only be used temporarily before any modification to the original string.
 
    .. cpp:member:: Int length
 
@@ -202,6 +224,16 @@ Array
 
    Array references should be declared without the ``length`` parameter:
    just ``Buffer{Int}`` or ``Array{String}`` for example.
+
+   Accessing a single item can be done using ``array[index]``.
+
+   It is possible to extract a sub-array from an array by slicing:
+   ``array[start-index:sub-array-length]``. This will not copy the array but
+   return an array reference that points to the original array.
+
+   .. warning::
+      In :ref:`TL4 <syntax-tl4>` array slicing is not fully safe. It should
+      only be used temporarily before any modification to the original array.
 
    .. cpp:member:: Int length
 

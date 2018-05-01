@@ -56,11 +56,11 @@ prefix::
 
 Methods
 +++++++
-Methods are declared as normal functions, except they are declared inside the
-type scope, and the ``self`` parameter should not be declared. Inside the
-method implementation ``self`` keyword can be used to access the implicit
-self parameter. Constants and global variables of the type can be accessed
-using ``global`` keyword. ::
+Methods are declared as normal :ref:`functions <functions>`, except they are
+declared inside the type scope, and the ``self`` parameter should not be
+declared. Inside the method implementation ``self`` keyword can be used to
+access the implicit self parameter. Constants and global variables of the type
+can be accessed using ``global`` keyword. ::
 
    struct ExampleStruct
      var Int integer-variable
@@ -87,6 +87,44 @@ There are two ways to call a method::
    instance.method(copy 4)  ; OOP style
    ExampleStruct.method(var instance, copy 4)  ; functional style
 
+Construction and Destruction
+++++++++++++++++++++++++++++
+Structure members are automatically initialized to their default value on
+construction. This can be extended buy defining a "constructor" method for
+the structure. This method will be called on every instance construction after
+the default initialization. A constructor is declared as a normal method with
+a dedicated name ``new``. ::
+
+   struct ExampleStruct
+     func new() _
+
+   func ExampleStruct.new()
+     ; custom initialization
+
+A constructor cannot have outputs, and if it has parameters - they must be
+given on every object creation::
+
+   struct ExampleStruct
+     func new(copy Int x, user String s)
+      ; implementation
+
+   func usage()
+      var ExampleStruct variable(copy 4, user "some string")
+      owner ExampleStruct reference := ExampleStruct(copy 4, user "some string")
+
+A "destructor" method can also be defined for a structure. This method will be
+called just before any object destruction. A destructor is declared as a normal
+method with a dedicated name ``delete``. This is not supported yet in :ref:`TL4
+<syntax-tl4>`. ::
+
+   struct ExampleStruct
+     func delete() _
+
+   func ExampleStruct.delete()
+     ; destruction code
+
+A destructor cannot have any kind of arguments.
+
 Extending Structures
 ++++++++++++++++++++
 In :ref:`TL4 <syntax-tl4>` a structure may only extend one other structure. ::
@@ -99,8 +137,8 @@ expected::
 
    user BaseStruct base-struct := ExtendingStruct()
 
-The overwriting function arguments must be identical to the base overridden
-function. ::
+The extending structure may overwrite a base method, the overwriting method
+arguments access and type must be identical to the base overridden method. ::
 
    struct BaseStruct
      func method(copy Int num)
@@ -109,6 +147,14 @@ function. ::
    struct ExtendingStruct(BaseStruct)
      func method(copy Int num)
        ; other implementation...
+
+An overwriting function can call the overwritten function using ``base``.
+Other overwritten methods can be called using ``base.other-method``. ::
+
+   struct ExtendingStruct(BaseStruct)
+     func method(copy Int num)
+       base(copy num)
+       base.other-method()
 
 Example for the **static** dispatch of structures::
 

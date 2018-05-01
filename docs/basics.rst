@@ -55,6 +55,17 @@ Operators
 * logical: ``not``, ``or``, ``and``
 * miscellaneous: ``.``, ``[]``, ``()``
 
+Any binary operator may be followed by a line brake with additional indentation
+of exactly 4 spaces::
+
+   x := 3 +
+       4
+   y :=
+     3 + 4
+   z :=
+      3 +
+      4
+
 Operator Precedence
 ###################
 
@@ -67,6 +78,27 @@ Operator Precedence
 
 .. [1] cannot combine operators from different sub-groups of this group, they
    must be separated using ``()``
-.. [2] multiple operators from this group combined will be separated with ``and``
-   operator, for example, ``a < b < c < d`` is treated as
-   ``(a < b and b < c and c < d)``
+.. [2] multiple operators from this group combined will be separated with
+   ``and`` operator, for example, ``a < b < c < d`` is treated as ``a < b and
+   b < c and c < d``
+
+
+Modules
+-------
+In :ref:`TL4 <syntax-tl4>` each Lumi file is declared under a single module,
+multiple files may be declared under the same module.
+
+The first line of each file must declare its module using the ``module``
+keyword::
+
+   module my-module-name
+
+Only a single documentation block can come before it.
+
+Using any item of another module must come after the other module prefix::
+
+   var other-module.SomeType variable
+   other-moudle.function(user variable)
+
+In the final syntax modules and libraries support will be greatly extended -
+the exact syntax is still under planning.

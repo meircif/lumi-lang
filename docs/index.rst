@@ -40,5 +40,9 @@ Lumi files use ``.lm`` extension.
    basics
    builtin
    variables
+   functions
    user-types
    serialization
+   flow
+   testing
+   native
