@@ -21,18 +21,18 @@ This is not supported in :ref:`TL4 <syntax-tl4>`.
 Switch-case condition is declared using the ``switch`` keyword, contains
 multiple ``case`` blocks, and optionally one last ``default`` block. A
 ``fall-through`` statement must be used to fall-through the next case - the
-default is not to fall-through::
+default is not to fall-through. ::
 
    switch number
    case 34
-    ; do something
+     ; do something
    case 23
-    ; do something
-    fall-through
+     ; do something
+     fall-through
    case 45, 67, 26, 56, 67, 89, 56, 87
-    ; do something
+     ; do something
    default
-    ; do something
+     ; do something
 
 Do-While Loop
 ---------------

@@ -1,16 +1,19 @@
 Serialization
 =============
 
-3 types of converting structures to buffers, and vice versa:
+This is not supported yet in :ref:`TL4 <syntax-tl4>`.
 
-* encoding - same layout as the structure memory
-* serializing - platform-independent and CPU efficient implicit layout
-* packing - explicit user defined layout
+Lumi plans to support 3 layout types for converting structures to buffers, and
+vice versa:
 
-============== ============== ============== ============== ==============
-type           CPU            memory         cross-platform explicit
-============== ============== ============== ============== ==============
-encoding       best           medium         no             no
-serializing    medium         worst          yes            no
-packing        worst          best           yes            yes
-============== ============== ============== ============== ==============
+* **encoding** - same layout as the structure platform-specific memory layout
+* **serializing** - platform-independent and CPU efficient implicit layout
+* **packing** - explicit, platform-independent, user defined layout
+
+=============== ============== ============== ============== ==============
+type            CPU            memory         cross-platform explicit
+=============== ============== ============== ============== ==============
+**encoding**    best           medium         no             no
+**serializing** medium         worst          yes            no
+**packing**     worst          best           yes            yes
+=============== ============== ============== ============== ==============

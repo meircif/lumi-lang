@@ -22,6 +22,31 @@ Lumi files use ``.lm`` extension.
    The Lumi image is
    `Designed by kjpargeter / Freepik <http://www.freepik.com>`_
 
+A Work in Progress...
+---------------------
+Lumi is still under initial planning and building. Many features are already
+implemented and it is possible to write complex programs with Lumi, but some
+key elements are not, and many implemented feature may change dramatically.
+
+The latest state of the language is named ":ref:`Temporary Lumi 4
+<syntax-tl4>`", or "TL4" in short, to emphasizing the current temporary state
+of the language.
+
+Contributing to Lumi
+--------------------
+Any help, suggestion, comment or questions is welcome! See Lumi repository
+`wiki`_ for more details.
+
+.. _wiki: https://github.com/meircif/lumi-lang/wiki
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Installation and Usage
+
+   install
+   lumi-command
+   lumi-compiler
+
 .. toctree::
    :maxdepth: 2
    :caption: Concepts

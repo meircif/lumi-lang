@@ -7,8 +7,8 @@ Memory should be managed correctly to reach :ref:`Lumi goal <goals>` #1, to
 reach :ref:`Lumi goal <goals>` #2 - it should be done as efficiently as
 possible, and to reach :ref:`Lumi goal <goals>` #3 - it should be flexible.
 
-This is done by combining 3 forms of managing - allowing easy trade-off between
-flexibility and performance by the user:
+This is achieved by combining 3 forms of managing - allowing easy trade-off
+between flexibility and performance by the user:
 
 1. :ref:`memory-management-1`
 2. :ref:`memory-management-2`

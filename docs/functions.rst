@@ -74,7 +74,6 @@ In :ref:`TL4 <syntax-tl4>`:
 * the parameter is a reflection of an actual variable
 * changes to the parameter will **also** change the caller variable
 * only a writable value can be given
-* can only be used as output
 
 ``user`` or ``owner`` parameter:
 
@@ -114,7 +113,7 @@ A ``return`` statement can be used to stop the function in the middle::
 
 In the final syntax this may be possible::
 
-   func example()->(var Int first-output, user String second-output)
+   func example()->(var Int first-output, owner String second-output)
      return 4, String{16}()
 
 Error Handling
@@ -134,7 +133,7 @@ main function - where uncaught errors will stop the execution of the program,
 print the raised error message if given, and print a call traceback.
 
 A ``try`` statement will catch an error raised inside it and break the
-execution of the rest of the code. The error will be ignored unless ``try`` is
+execution of the rest of the block. The error will be ignored unless ``try`` is
 followed by a ``catch`` statement. The code under the ``catch`` statement will
 only run if the above ``try`` statement caught an error. ::
 

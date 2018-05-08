@@ -90,10 +90,10 @@ There are two ways to call a method::
 Construction and Destruction
 ++++++++++++++++++++++++++++
 Structure members are automatically initialized to their default value on
-construction. This can be extended buy defining a "constructor" method for
-the structure. This method will be called on every instance construction after
-the default initialization. A constructor is declared as a normal method with
-a dedicated name ``new``. ::
+construction. This can be extended by defining a "constructor" method for the
+structure. This method will be called on every instance construction after the
+default initialization. A constructor is declared as a normal method with a
+dedicated name ``new``. ::
 
    struct ExampleStruct
      func new() _
@@ -106,7 +106,7 @@ given on every object creation::
 
    struct ExampleStruct
      func new(copy Int x, user String s)
-      ; implementation
+       ; implementation
 
    func usage()
       var ExampleStruct variable(copy 4, user "some string")
@@ -135,7 +135,7 @@ In :ref:`TL4 <syntax-tl4>` a structure may only extend one other structure. ::
 The extending structure may be used in any place one of its base structures is
 expected::
 
-   user BaseStruct base-struct := ExtendingStruct()
+   owner BaseStruct base-struct := ExtendingStruct()
 
 The extending structure may overwrite a base method, the overwriting method
 arguments access and type must be identical to the base overridden method. ::
@@ -148,8 +148,9 @@ arguments access and type must be identical to the base overridden method. ::
      func method(copy Int num)
        ; other implementation...
 
-An overwriting function can call the overwritten function using ``base``.
-Other overwritten methods can be called using ``base.other-method``. ::
+An overwriting function can call the overwritten function using ``base``
+keyword. Other overwritten methods can be called using ``base.other-method``.
+::
 
    struct ExtendingStruct(BaseStruct)
      func method(copy Int num)
@@ -222,11 +223,11 @@ can use ``self`` and ``global`` keywords to access its own members, and also
 members of the implemented dynamic. ::
 
    implement ExampleDynamic for ExampleStructure
-   func dynamic-method(copy Int num)
-     ; implementation...
-   func another-method()->(var Int result)
-     ; another implementation...
-   var Int dynamic-variable(copy 4)
+     func dynamic-method(copy Int num)
+       ; implementation...
+     func another-method()->(var Int result)
+       ; another implementation...
+     var Int dynamic-variable(copy 4)
 
 A dynamic may implement some or all of its members and its base dynamics
 members. Method implementations can use ``self`` and ``global`` keywords to
@@ -243,6 +244,8 @@ access its own members. ::
 
 When a dynamic implements all its and its base dynamics members, it's
 considered as implemented and can be used as a value to ``Dynamic`` references.
+
+.. _syntax-bind:
 
 Classes and Binds
 -----------------
@@ -281,9 +284,10 @@ As all types::
      static var Int addition-static-field
      dynamic func addition-dynamic-method(copy Int num)
 
+In :ref:`TL4 <syntax-tl4>` a class may only extend one other type.
 
 Using the Implicit Structure or Dynamic of a Class
-++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++
 
 The implicit structure of a class can be used using the built-in ``Struct``
 type, and the implicit dynamic can be used using the built-in ``Dynamic``
@@ -318,8 +322,8 @@ This is partially supported in :ref:`TL4 <syntax-tl4>`:
 * Only the parameter name is needed
 * Some types are not supported as parameter values:
    * any primitive type
-   * string
-   * array
+   * String
+   * Array
 
 Embedded Dynamic Reference
 --------------------------

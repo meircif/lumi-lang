@@ -16,7 +16,7 @@ thread - creating a complete isolation of data between threads. Global data
 will be duplicated for each thread (probably using "thread local" mechanism).
 This mean no data sharing is possible - ensuring thread safety.
 
-This is that default approach on all data unless one of the thread data sharing
+This is the default approach on all data unless one of the thread data sharing
 mechanism described below is used.
 
 Sharing data between threads

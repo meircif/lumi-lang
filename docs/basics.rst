@@ -7,7 +7,7 @@ Comments
 In :ref:`TL4 <syntax-tl4>` Single line comments start with ``;``, multi-line
 comments start with ``[;``, and end with ``;]``.
 Comments that are not in line start are not supported yet - but will be
-supported in the final syntax.::
+supported in the final syntax. ::
 
    ; single line comment
    [; <-- multi-line comment start
@@ -29,7 +29,7 @@ Documentation must be placed at line start and may be single or multi-line.
 In :ref:`TL4 <syntax-tl4>` documentation are treated as comments. In the final
 syntax they must come before the element they are documenting, they could be
 used dynamically in the code, and would be used to automatically generate
-external documentation.::
+external documentation. ::
 
    ~~~ single line documentation ~~~
    func documented-function()
@@ -53,7 +53,9 @@ Operators
 * relational (arithmetic): ``=``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
 * relational (referential): ``is``, ``is-not``, ``?``
 * logical: ``not``, ``or``, ``and``
-* miscellaneous: ``.``, ``[]``, ``()``
+* miscellaneous: ``.``, ``[]``, ``[:]``, ``()``
+
+Not supported yet in :ref:`TL4 <syntax-tl4>`: ``*=``, and all bitwise operators
 
 Any binary operator may be followed by a line brake with additional indentation
 of exactly 4 spaces::
@@ -77,7 +79,8 @@ Operator Precedence
 6. ``:= += -= *=``, only one allowed
 
 .. [1] cannot combine operators from different sub-groups of this group, they
-   must be separated using ``()``
+   must be separated using ``()``, for example ``a + b * c`` is not legal and
+   should be changed to ``a + (b * c)``
 .. [2] multiple operators from this group combined will be separated with
    ``and`` operator, for example, ``a < b < c < d`` is treated as ``a < b and
    b < c and c < d``

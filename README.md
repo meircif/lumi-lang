@@ -11,9 +11,9 @@ Lumi and its development.
 See [Issues](https://github.com/meircif/lumi-lang/issues) for current issues
 been worked at.
 
-## Syntax higlighting
+## Syntax highlighting
 
-For Lumi syntax higlighting it's recommended to use [Atom](https://atom.io)
+For Lumi syntax highlighting it's recommended to use [Atom](https://atom.io)
 editor with [language-lumi](https://atom.io/packages/language-lumi) package
 installed.
 

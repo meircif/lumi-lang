@@ -61,7 +61,7 @@ Byte
 
    A single memory byte value.
 
-   Byte is threated as a normal ref:`integers <integer>` with range 0..255.
+   Byte is threated as a normal :ref:`integers <integer>` with range 0..255.
 
 
 Real Number
@@ -78,11 +78,11 @@ Real Number
 
 Function
 --------
-.. cpp:type:: Func(parameters)
+.. cpp:type:: Func(arguments)
 
    Holds (pointer to) a function.
 
-   :param parameters: the function in and out :ref:`arguments <arguments>`
+   :param arguments: the function in and out :ref:`arguments <arguments>`
 
    For example: ``Func{()}``, ``Func{(copy Int in)}``,
    ``Func{()->(var Int out)}`` , ``Func{(copy Int in)->(var Int out)}``.
@@ -223,7 +223,7 @@ Array
    For example: ``Array{12:Int}``, ``Array{6:String{16}}``.
 
    Array references should be declared without the ``length`` parameter:
-   just ``Buffer{Int}`` or ``Array{String}`` for example.
+   just ``Array{Int}`` or ``Array{String}`` for example.
 
    Accessing a single item can be done using ``array[index]``.
 
@@ -261,7 +261,7 @@ File
       file in ``character``, else - return :cpp:var:`true` in ``is-eof`` and do
       nothing with ``character``
 
-   .. cpp:function:: putc(var Char character)
+   .. cpp:function:: putc(copy Char character)
 
       append ``character`` to this file end
 
