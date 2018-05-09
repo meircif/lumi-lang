@@ -77,7 +77,7 @@ func test-setup(user String args)
   lumi-object := lumi.Lumi()
 
 
-func f-assert-string(user String actual, user String expected)
+func assert-string(user String actual, user String expected)
   if not actual.equal(user expected)
     Sys.print.active := false
     sys.print(user "expected [")
@@ -89,29 +89,32 @@ func f-assert-string(user String actual, user String expected)
     assert false
 
 
-func f-success-test(user String input, user String system-output)
+func success-test(user String input, user String system-output)
   test-setup(user input)
-  lumi-object.m-run()
-  f-assert-string(user mock-output, user "")
-  f-assert-string(user mock-system, user system-output)
+  lumi-object.run()
+  assert-string(user mock-output, user "")
+  assert-string(user mock-system, user system-output)
 
 
-func f-fail-test(user String input, user String error-msg)
+func fail-test(user String input, user String error-msg)
   test-setup(user input)
-  assert-error lumi-object.m-run()
-  f-assert-string(user mock-output, user error-msg)
+  assert-error lumi-object.run(), "mock exit"
+  assert mock-exit-result = 1
+  assert-string(user mock-output, user error-msg)
 
 
 test test-usage()
   test-setup(user "")
-  assert-error lumi-object.read-input()
-  f-assert-string(user mock-output, user "Usage: lumi [options] file...\n")
+  assert-error lumi-object.read-input(), "mock exit"
+  assert mock-exit-result = 1
+  assert-string(user mock-output, user "Usage: lumi [options] file...\n")
 
 
 test test-help()
   test-setup(user "-h")
   assert-error lumi-object.read-input(), "mock exit"
-  f-assert-string(user mock-output, user "Usage: lumi [options] file...
+  assert mock-exit-result = 0
+  assert-string(user mock-output, user "Usage: lumi [options] file...
       Options:
         -h \t\t print help
         -o <file> \t output file name
@@ -125,11 +128,10 @@ test test-help()
         -v \t\t print executed commands
         -d \t\t only print commands without execution
       ")
-  assert mock-exit-result = 0
 
 
 test test-implicit-output()
-  f-success-test(
+  success-test(
       user "input.4.lm another.4.lm",
       user "tl4-compiler \"input.c\" \"input.4.lm\" \"another.4.lm\"
       mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
@@ -138,7 +140,7 @@ test test-implicit-output()
 
 
 test test-explicit-output()
-  f-success-test(
+  success-test(
       user "input.4.lm -o output",
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
@@ -147,7 +149,7 @@ test test-explicit-output()
 
 
 test test-tl0()
-  f-success-test(
+  success-test(
       user "input.0.lm -o output",
       user "tl0-compiler \"input.0.lm\" \"output.c\"
       mock-cc -g \"output.c\" lumi-lang/TL0/tl0-file.c \
@@ -156,7 +158,7 @@ test test-tl0()
 
 
 test test-tl1()
-  f-success-test(
+  success-test(
       user "input.1.lm -o output",
       user "tl1-compiler \"input.1.lm\" \"output.c\"
       mock-cc -g \"output.c\" lumi-lang/TL1/lumi.1.c -Ilumi-lang/TL1/ \
@@ -165,7 +167,7 @@ test test-tl1()
 
 
 test test-tl2()
-  f-success-test(
+  success-test(
       user "input.2.lm another.2.lm -o output",
       user "tl2-compiler \"input.2.lm\" \"another.2.lm\"
       mock-cc -g \"another.c\" lumi-lang/TL2/lumi.2.c -Ilumi-lang/TL2/ \
@@ -174,7 +176,7 @@ test test-tl2()
 
 
 test test-tl3()
-  f-success-test(
+  success-test(
       user "input.3.lm another.3.lm -o output",
       user "tl3-compiler \"input.3.lm\" \"another.3.lm\"
       mock-cc -g \"input.c\" lumi-lang/TL3/lumi.3.c -Ilumi-lang/TL3/ \
@@ -183,7 +185,7 @@ test test-tl3()
 
 
 test test-tl4()
-  f-success-test(
+  success-test(
       user "input.4.lm another.4.lm -o output",
       user "tl4-compiler \"output.c\" \"input.4.lm\" \"another.4.lm\"
       mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
@@ -192,7 +194,7 @@ test test-tl4()
 
 
 test test-test()
-  f-success-test(
+  success-test(
       user "-t mut input.4.lm another.4.lm -o output",
       user "tl4-compiler -t \"mut\" \"output.c\" \"input.4.lm\" \"another.4.lm\"
       mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
@@ -201,21 +203,21 @@ test test-test()
 
 
 test test-only-lumi-implicit()
-  f-success-test(
+  success-test(
       user "-c input.4.lm another.4.lm",
       user "tl4-compiler \"input.c\" \"input.4.lm\" \"another.4.lm\"
       ")
 
 
 test test-only-lumi-explicit()
-  f-success-test(
+  success-test(
       user "-c input.4.lm another.4.lm -o output.c",
       user "tl4-compiler \"output.c\" \"input.4.lm\" \"another.4.lm\"
       ")
 
 
 test test-only-c-implicit()
-  f-success-test(
+  success-test(
       user "-l4 input.c",
       user "mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
       -o \"input\"
@@ -223,7 +225,7 @@ test test-only-c-implicit()
 
 
 test test-only-c-explicit()
-  f-success-test(
+  success-test(
       user "-l4 input.c -o output",
       user "mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
       -o \"output\"
@@ -231,7 +233,7 @@ test test-only-c-explicit()
 
 
 test test-external()
-  f-success-test(
+  success-test(
       user "input.4.lm another.4.lm -e external.c -o output",
       user "tl4-compiler \"output.c\" \"input.4.lm\" \"another.4.lm\"
       mock-cc -g \"output.c\" \"external.c\" lumi-lang/TL4/lumi.4.c \
@@ -240,7 +242,7 @@ test test-external()
 
 
 test test-multiple-external()
-  f-success-test(
+  success-test(
       user "input.4.lm another.4.lm -e external.c -e ext.c -o output",
       user "tl4-compiler \"output.c\" \"input.4.lm\" \"another.4.lm\"
       mock-cc -g \"output.c\" \"external.c\" \"ext.c\" lumi-lang/TL4/lumi.4.c \
@@ -251,9 +253,9 @@ test test-multiple-external()
 test test-default-cc()
   test-setup(user "input.4.lm -o output")
   mock-getenv-fail-count := 1
-  lumi-object.m-run()
-  f-assert-string(user mock-output, user "")
-  f-assert-string(
+  lumi-object.run()
+  assert-string(user mock-output, user "")
+  assert-string(
       user mock-system,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       gcc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ -o \"output\"
@@ -263,9 +265,9 @@ test test-default-cc()
 test test-default-lumipath()
   test-setup(user "input.4.lm -o output")
   mock-getenv-fail-count := 2
-  lumi-object.m-run()
-  f-assert-string(user mock-output, user "")
-  f-assert-string(
+  lumi-object.run()
+  assert-string(user mock-output, user "")
+  assert-string(
       user mock-system,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" TL4/lumi.4.c -ITL4/ -o \"output\"
@@ -275,9 +277,9 @@ test test-default-lumipath()
 test test-empty-lumipath()
   test-setup(user "input.4.lm -o output")
   mock-lumipath.clear()
-  lumi-object.m-run()
-  f-assert-string(user mock-output, user "")
-  f-assert-string(
+  lumi-object.run()
+  assert-string(user mock-output, user "")
+  assert-string(
       user mock-system,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" TL4/lumi.4.c -ITL4/ -o \"output\"
@@ -287,9 +289,9 @@ test test-empty-lumipath()
 test test-lumipath-add-separator()
   test-setup(user "input.4.lm -o output")
   mock-lumipath.new(user "no-sep")
-  lumi-object.m-run()
-  f-assert-string(user mock-output, user "")
-  f-assert-string(
+  lumi-object.run()
+  assert-string(user mock-output, user "")
+  assert-string(
       user mock-system,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" no-sep/TL4/lumi.4.c -Ino-sep/TL4/ -o \"output\"
@@ -299,9 +301,9 @@ test test-lumipath-add-separator()
 test test-lumipath-reverse-separator()
   test-setup(user "input.4.lm -o output")
   mock-lumipath.new(user "rev-sep\\")
-  lumi-object.m-run()
-  f-assert-string(user mock-output, user "")
-  f-assert-string(
+  lumi-object.run()
+  assert-string(user mock-output, user "")
+  assert-string(
       user mock-system,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" rev-sep\\TL4\\lumi.4.c -Irev-sep\\TL4\\ \
@@ -310,7 +312,7 @@ test test-lumipath-reverse-separator()
 
 
 test test-lumipath-flag()
-  f-success-test(
+  success-test(
       user "input.4.lm -p flag-path/ -o output",
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" flag-path/TL4/lumi.4.c -Iflag-path/TL4/ \
@@ -319,90 +321,92 @@ test test-lumipath-flag()
 
 
 test test-run-program()
-  f-success-test(
+  success-test(
       user "input.4.lm -o output -r",
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
       -o \"output\"
-      \"output\"
+      ./\"output\"
       ")
 
 
 test test-run-failed-program()
   test-setup(user "input.4.lm -o output -r")
   mock-system-fail-count := 3
-  assert-error lumi-object.m-run(), "mock exit"
+  assert-error lumi-object.run(), "mock exit"
   assert mock-exit-result = 1
-  f-assert-string(user mock-output, user "")
-  f-assert-string(
+  assert-string(user mock-output, user "")
+  assert-string(
       user mock-system,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
       -o \"output\"
-      \"output\"
+      ./\"output\"
       ")
 
 
 test test-run-program-with-arguments()
-  f-success-test(
-      user "input.4.lm -o output -ra '-x input'",
-      user "tl4-compiler \"output.c\" \"input.4.lm\"
-      mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
-      -o \"output\"
-      \"output\" -x input
+  success-test(
+      user "input.4.lm -o path/output -ra '-x input'",
+      user "tl4-compiler \"path/output.c\" \"input.4.lm\"
+      mock-cc -g \"path/output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+      -o \"path/output\"
+      \"path/output\" -x input
       ")
 
 
 test test-verbose()
   test-setup(user "-v input.4.lm -o output")
-  lumi-object.m-run()
+  lumi-object.run()
   user String expected-output(user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
       -o \"output\"
       ")
-  f-assert-string(user mock-output, user expected-output)
-  f-assert-string(user mock-system, user expected-output)
+  assert-string(user mock-output, user expected-output)
+  assert-string(user mock-system, user expected-output)
 
 
 test test-dry-run()
   test-setup(user "input.4.lm -o output -d")
-  lumi-object.m-run()
-  f-assert-string(
+  lumi-object.run()
+  assert-string(
       user mock-output,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
       -o \"output\"
       ")
-  f-assert-string(user mock-system, user "")
+  assert-string(user mock-system, user "")
 
 
 test test-lumi-error()
   test-setup(user "input.4.lm -o output")
   mock-system-fail-count := 1
-  assert-error lumi-object.m-run()
-  f-assert-string(user mock-output, user "Lumi compiler failed\n")
+  assert-error lumi-object.run(), "mock exit"
+  assert mock-exit-result = 1
+  assert-string(user mock-output, user "Lumi compiler failed\n")
 
 
 test test-c-error()
   test-setup(user "input.4.lm -o output")
   mock-system-fail-count := 2
-  assert-error lumi-object.m-run()
-  f-assert-string(user mock-output, user "C compiler failed\n")
+  assert-error lumi-object.run(), "mock exit"
+  assert mock-exit-result = 1
+  assert-string(user mock-output, user "C compiler failed\n")
 
 
 test test-no-input()
-  f-fail-test(user "-o output", user "error: no input files\n")
+  fail-test(user "-o output", user "error: no input files\n")
 
 
 test test-input-errors()
-  f-fail-test(user "-o output", user "error: no input files\n")
-  f-fail-test(
+  fail-test(user "-o output", user "error: no input files\n")
+  fail-test(
       user "err\"or.4.lm",
       user "error: illegal \" character in parameter 'err\"or.4.lm'\n")
-  f-fail-test(user "e.lm", user "error: Lumi file name too short\n")
+  fail-test(user "e.lm", user "error: Lumi file name too short\n")
 
 
-func f-flag-with-parameter-error-tests(user String flag, user String parameter)
+func flag-with-parameter-error-tests(user String flag, user String parameter)
   var String{64} input(user "input.4.lm -")
   input.concat(user flag)
   var String{256} missing-error(user "error: missing ")
@@ -410,38 +414,38 @@ func f-flag-with-parameter-error-tests(user String flag, user String parameter)
   missing-error.concat(user " after \"-")
   missing-error.concat(user flag)
   missing-error.concat(user "\" flag\n")
-  f-fail-test(user input, user missing-error)
+  fail-test(user input, user missing-error)
   input.concat(user " -v")
-  f-fail-test(user input, user missing-error)
+  fail-test(user input, user missing-error)
   input.length -= 3
   input.concat(user " err\"or")
-  f-fail-test(
+  fail-test(
       user input, user "error: illegal \" character in parameter 'err\"or'\n")
 
 
 test test-output-errors()
-  f-flag-with-parameter-error-tests(user "o", user "file name")
+  flag-with-parameter-error-tests(user "o", user "file name")
 
 
 test test-test-errors()
-  f-flag-with-parameter-error-tests(user "t", user "module name")
+  flag-with-parameter-error-tests(user "t", user "module name")
 
 
 test test-external-errors()
-  f-flag-with-parameter-error-tests(user "e", user "file name")
+  flag-with-parameter-error-tests(user "e", user "file name")
 
 
 test test-lumipath-errors()
-  f-flag-with-parameter-error-tests(user "p", user "path")
+  flag-with-parameter-error-tests(user "p", user "path")
 
 
 test test-unknow-flags()
   test-setup(user "input.4.lm - -x -o output")
-  lumi-object.m-run()
-  f-assert-string(user mock-output, user "warning: unknown flag \"-\"
+  lumi-object.run()
+  assert-string(user mock-output, user "warning: unknown flag \"-\"
       warning: unknown flag \"-x\"
       ")
-  f-assert-string(
+  assert-string(
       user mock-system,
       user "tl4-compiler \"output.c\" \"input.4.lm\"
       mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
@@ -450,33 +454,33 @@ test test-unknow-flags()
 
 
 test test-version-errors()
-  f-fail-test(
+  fail-test(
       user "input.5.lm", user "error: unsupported version TL5\n")
-  f-fail-test(
+  fail-test(
       user "input.0.lm another.0.lm",
       user "error: multiple files not supported before TL2\n")
-  f-fail-test(
+  fail-test(
       user "input.1.lm another.1.lm",
       user "error: multiple files not supported before TL2\n")
-  f-fail-test(
+  fail-test(
       user "-c input.2.lm -o output.c",
       user "error: cannot specify C output file in TL2 & TL3\n")
-  f-fail-test(
+  fail-test(
       user "-c input.3.lm -o output.c",
       user "error: cannot specify C output file in TL2 & TL3\n")
-  f-fail-test(
+  fail-test(
       user "-t mut input.0.lm",
       user "error: testing not supported before TL4\n")
-  f-fail-test(
+  fail-test(
       user "-t mut input.3.lm",
       user "error: testing not supported before TL4\n")
 
 
 test test-run-program-errors()
-  f-fail-test(
+  fail-test(
       user "-c input.4.lm -r",
       user "error: cannot run program when C compilation is turned off by \
       \"-c\" flag\n")
-  f-fail-test(
+  fail-test(
       user "input.4.lm -o output -ra",
       user "error: missing arguments after \"-ra\" flag\n")
