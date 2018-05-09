@@ -56,9 +56,9 @@ generate automatic conversion functions between symbol names and values.
 Enumerators are declared in :ref:`TL4 <syntax-tl4>` by::
 
    enum EnumeratorName
-      FIRST-SYMBOL-NAME
-      SECOND-SYMBOL-NAME
-      THIRD-SYMBOL-NAME
+     FIRST-SYMBOL-NAME
+     SECOND-SYMBOL-NAME
+     THIRD-SYMBOL-NAME
 
 Using an enumerator is done by ``EnumeratorName.SYMBOL-NAME``.
 
@@ -114,7 +114,6 @@ using the ``?`` operator, to explicitly check for emptiness the ``is`` and
 
 String and Buffer Literals
 ++++++++++++++++++++++++++
-
 :ref:`string` and :ref:`buffer <buffer>` literals are allocated in the global
 data section. In the scope they are used they are treated as ``user``
 access references to the global data.

@@ -21,7 +21,7 @@ between flexibility and performance by the user:
 
 .. _memory-management-1:
 
-No performance overhead - compile time only reference managing
+No Performance Overhead - compile time only reference managing
 --------------------------------------------------------------
 Lumi will allow performance free reference managing that will be done only in
 compile time.
@@ -46,7 +46,7 @@ This is not implemented yet, but in the future the syntax may look like this::
 
 .. _memory-management-2:
 
-More flexible reference managing - with a small performance cost
+More Flexible Reference Managing - with a small performance cost
 ----------------------------------------------------------------
 Lumi will allow more complex and flexible reference managing that come with a
 small and predictable performance cost.
@@ -76,7 +76,7 @@ future the syntax may be different and look like this::
 
 .. _memory-management-3:
 
-Maximum flexibility - but with performance issues
+Maximum Flexibility - but with performance issues
 -------------------------------------------------
 Lumi will allow declaring a reference as garbage-collected, which will allow
 passing references freely without limitation. The memory will only be cleared

@@ -3,7 +3,6 @@ Control Flow
 
 If-Else Condition
 -----------------
-
 If-else condition is declared using ``if``, ``else``, and ``else-if`` keywords.
 The condition expression must be boolean typed. ::
 
@@ -20,7 +19,7 @@ This is not supported in :ref:`TL4 <syntax-tl4>`.
 
 Switch-case condition is declared using the ``switch`` keyword, contains
 multiple ``case`` blocks, and optionally one last ``default`` block. A
-``fall-through`` statement must be used to fall-through the next case - the
+``fallthrough`` statement must be used to fall-through the next case - the
 default is not to fall-through. ::
 
    switch number
@@ -28,7 +27,7 @@ default is not to fall-through. ::
      ; do something
    case 23
      ; do something
-     fall-through
+     fallthrough
    case 45, 67, 26, 56, 67, 89, 56, 87
      ; do something
    default

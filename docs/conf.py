@@ -28,7 +28,7 @@ version = '0.4'
 # The full version, including alpha/beta/rc tags
 release = 'lumi-0.4'
 
-highlight_language = 'shell'
+highlight_language = 'lumi'
 
 
 # -- General configuration ---------------------------------------------------
@@ -69,6 +69,68 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+
+from pygments.lexer import RegexLexer, bygroups
+from pygments import token
+from sphinx.highlighting import lexers
+
+class LumiLexer(RegexLexer):
+    name = 'lumi'
+    aliases = ['Lumi']
+    filenames = ['*.lm']
+    tokens = {
+        'root': [
+            (r'; .*$', token.Comment.Single),
+            (r'\[;', token.Comment.Multiline, 'comment'),
+            (r'~~~', token.String.Doc, 'documentation'),
+            (r'"', token.String, 'string'),
+            (r"'.*'", token.String.Char),
+            (r'`.*`', token.String.Backtick),
+            (r'-?(?:0x[0-9a-fA-F]+|0b[0-1]+|[0-9]+)', token.Number),
+            (r' [+*><=][ \n]', token.Operator),
+            (r'(?:-|not)[ \n]', token.Operator),
+            (r' (?:div|mod|bnot|bor|band|xpr|>>|<<|is|is-not|or|and|'
+             r'[!><:+\-*]=)[ \n]', token.Operator),
+            (r'[?:.]', token.Operator),
+            (r'->', token.Operator),
+            (r'^ *(module|func|const|struct|class|interface|main|enum|'
+             r'native(?: func| type)?|test|mock|alias|for|new|return|raise|'
+             r'assert|assert-error|try|catch|if|else|else-if|do|while|break|'
+             r'continue|switch|case|default|fallthrough|copy|user|owner|var|'
+             r'managed|weak|shared|static|dynamic|global|implement)[ \n]',
+             token.Keyword),
+            (r'\b(copy|user|owner|var|managed|weak|shared|func|static|'
+             r'dynamic|for|in) ', token.Keyword),
+            (r'(?:true|false|self|base|sys)-[a-z0-9\-]*', token.Name.Variable),
+            (r'_|true|false|self|base|sys', token.Name.Builtin.Pseudo),
+            (r'[A-Z][A-Z0-9\-]+', token.Name.Constant),
+            (r'[A-Z][a-z][a-zA-Z0-9]*', token.Keyword.Type),
+            (r'([a-z][a-z\-0-9]*)(\()',
+             bygroups(token.Name.Function, token.Punctuation)),
+            (r'[a-z][a-z\-0-9]*', token.Name.Variable),
+            (r'[()\[\]{},]', token.Punctuation),
+            (r'\s', token.Whitespace),
+            (r'.', token.Other)
+        ],
+        'comment': [
+            (r'[^;\]]', token.Comment.Multiline),
+            (r'\[;', token.Comment.Multiline, '#push'),
+            (r';\]', token.Comment.Multiline, '#pop'),
+            (r'[;\]]', token.Comment.Multiline)
+        ],
+        'documentation': [
+            (r'[^~]', token.String.Doc),
+            (r'~~~', token.String.Doc, '#pop'),
+            (r'~', token.String.Doc)
+        ],
+        'string': [
+            (r'[^"]', token.String),
+            (r'\.', token.String),
+            (r'"', token.String, '#pop')
+        ]
+    }
+
+lexers['lumi'] = LumiLexer(startinline=True)
 
 
 # -- Options for HTML output -------------------------------------------------

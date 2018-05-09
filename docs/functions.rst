@@ -5,7 +5,6 @@ Functions
 
 Summary
 -------
-
 Function are declared using the ``func`` keyword ::
 
    func func-name(copy Int input-argument)->(var Int output-argument)
@@ -19,7 +18,6 @@ Functions are called using their name::
 
 Arguments
 ---------
-
 First input arguments (a.k.a "parameters") are written inside ``(...)``. If the
 function has no input arguments an empty ``()`` should be used.
 

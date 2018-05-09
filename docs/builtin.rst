@@ -30,8 +30,7 @@ Boolean
    constant.
 
 Built-in Global Constants
-#########################
-
++++++++++++++++++++++++++
 .. cpp:var:: Bool true
 
 .. cpp:var:: Bool false
@@ -274,8 +273,7 @@ File
       :raises: if writing failed
 
 Built-in Global Functions
-#########################
-
++++++++++++++++++++++++++
 .. cpp:function:: file-open-read(user String filename)->(owner File file)
 
    Create a new :cpp:type:`File` object that is capable of **reading** from
@@ -287,8 +285,7 @@ Built-in Global Functions
    ``filename`` file.
 
 Built-in Global Variables
-#########################
-
++++++++++++++++++++++++++
 .. cpp:var:: File stdin
 
    can be used to **read** from the standard input stream
@@ -372,8 +369,7 @@ there will be a ``sys`` module with the same interface.
       with ``value``
 
 Built-in Global Variables
-#########################
-
++++++++++++++++++++++++++
 .. cpp:var:: Sys sys
 
    Only this variable should be be used to access system data and functionality

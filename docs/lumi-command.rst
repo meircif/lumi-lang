@@ -46,7 +46,9 @@ command to ``\``.
 
 Command Help
 ------------
-Running ``lumi -h`` will print help::
+Running ``lumi -h`` will print help
+
+.. code-block:: none
 
    >>> lumi -h
    Usage: lumi [options] file...

@@ -3,7 +3,6 @@ Basic Syntax
 
 Comments
 --------
-
 In :ref:`TL4 <syntax-tl4>` Single line comments start with ``;``, multi-line
 comments start with ``[;``, and end with ``;]``.
 Comments that are not in line start are not supported yet - but will be
@@ -22,7 +21,6 @@ Some suggest to change this in the final syntax to be as in C with ``//``,
 
 Documentation
 -------------
-
 Documentation have their own dedicated syntax: they start and end with ``~~~``.
 Documentation must be placed at line start and may be single or multi-line.
 
@@ -45,7 +43,6 @@ external documentation. ::
 
 Operators
 ---------
-
 * assignment: ``:=``
 * arithmetic: ``+``, ``-``, ``*``, ``div``, ``mod``
 * assignment and arithmetic: ``+=``, ``-=``, ``*=``
@@ -69,8 +66,7 @@ of exactly 4 spaces::
       4
 
 Operator Precedence
-###################
-
++++++++++++++++++++
 1. ``. [] () ?``, left-to-right
 2. ``- +``, ``* div mod``, ``bnot bor band xor >> <<``, left-to-right [1]_
 3. ``= != > < >= <= is is-not``, left-to-right [2]_

@@ -5,7 +5,6 @@ Installing and Building Lumi
 
 Syntax Highlighting
 -------------------
-
 For Lumi syntax highlighting it's recommended to use `Atom`_ editor with
 `language-lumi package`_ installed.
 

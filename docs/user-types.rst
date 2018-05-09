@@ -288,7 +288,6 @@ In :ref:`TL4 <syntax-tl4>` a class may only extend one other type.
 
 Using the Implicit Structure or Dynamic of a Class
 ++++++++++++++++++++++++++++++++++++++++++++++++++
-
 The implicit structure of a class can be used using the built-in ``Struct``
 type, and the implicit dynamic can be used using the built-in ``Dynamic``
 type. This is not supported in :ref:`TL4 <syntax-tl4>`. ::

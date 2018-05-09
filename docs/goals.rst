@@ -5,7 +5,6 @@ Lumi Language Goals and Features
 
 Prioritized Goals
 -----------------
-
 1. **Enforce safe and reliable code**, free from:
     * illegal memory access
     * memory corruption
@@ -36,7 +35,6 @@ Prioritized Goals
 
 Features
 --------
-
 * **Code generating**: Lumi compiler will initially generate **C code**.
   Other "modern machine language" codes may also be generated, such as: Java
   (for Android and other devices), Objective-C/Swift (for Apple devices),
