@@ -23,7 +23,6 @@ between flexibility and performance by the user:
 
 No performance overhead - compile time only reference managing
 --------------------------------------------------------------
-
 Lumi will allow performance free reference managing that will be done only in
 compile time.
 
@@ -49,7 +48,6 @@ This is not implemented yet, but in the future the syntax may look like this::
 
 More flexible reference managing - with a small performance cost
 ----------------------------------------------------------------
-
 Lumi will allow more complex and flexible reference managing that come with a
 small and predictable performance cost.
 
@@ -80,7 +78,6 @@ future the syntax may be different and look like this::
 
 Maximum flexibility - but with performance issues
 -------------------------------------------------
-
 Lumi will allow declaring a reference as garbage-collected, which will allow
 passing references freely without limitation. The memory will only be cleared
 when all "strong" references are destroyed. The garbage-collector must check
@@ -102,12 +99,11 @@ This is not implemented yet, but in the future the syntax may look like this::
 
 .. _memory-management-empty:
 
-Empty references (nil/null/none)
+Conditional and Empty References
 --------------------------------
-
 As default, (non-weak) references always point to a legal object.
-To allow empty references, a references must be declared as "conditional"
-using the ``?`` sign. Empty value can be set using ``_``.
+To allow empty references, the reference type must be declared as "conditional"
+using the ``?`` sign. Empty value can be set using ``_`` sign.
 
 This is :ref:`currently implemented <variables>` in a basic manner, but in the
 future the syntax may be different and look like this::

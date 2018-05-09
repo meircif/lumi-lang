@@ -37,6 +37,13 @@ repository`_ root directory path. This can be configured by one of:
 3. running ``lumi`` with flag ``-p <path>`` (this will override ``LUMIPATH``
    environment variable)
 
+Path Separator
+++++++++++++++
+The default path separator in ``lumi`` command is ``/``. In systems where the
+path separator is ``\`` instead (such as Windows), the :ref:`lumipath` must end
+with a ``\`` character. Doing this will set the path separator in ``lumi``
+command to ``\``.
+
 Command Help
 ------------
 Running ``lumi -h`` will print help::
