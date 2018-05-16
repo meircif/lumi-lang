@@ -8,7 +8,7 @@ Summary
 Function are declared using the ``func`` keyword ::
 
    func func-name(copy Int input-argument)->(var Int output-argument)
-      ; function implementation...
+     ; function implementation...
 
 Functions are called using their name::
 
@@ -33,20 +33,20 @@ A new line can be placed before any argument access, with additional
 indentation of exactly 4 spaces::
 
    func split-arguments0(copy Int x, copy Int y)->(
-      var Int z, var Int w)
+     var Int z, var Int w)
 
    func split-arguments1(
-      copy Int x, copy Int y)->(var Int z, var Int w)
+     copy Int x, copy Int y)->(var Int z, var Int w)
 
    func split-arguments0(
-      copy Int x, copy Int y)->(
-      var Int z, var Int w)
+     copy Int x, copy Int y)->(
+     var Int z, var Int w)
 
    func split-arguments0(
-      copy Int x,
-      copy Int y)->(
-      var Int z,
-      var Int w)
+     copy Int x,
+     copy Int y)->(
+     var Int z,
+     var Int w)
 
 .. _access:
 
@@ -105,9 +105,9 @@ argument::
 A ``return`` statement can be used to stop the function in the middle::
 
    func example(copy int x)
-      if x < 0
-         return
-      ; do something
+     if x < 0
+       return
+     ; do something
 
 In the final syntax this may be possible::
 
@@ -124,7 +124,7 @@ Raising an error can be done using the ``raise`` statement::
 In :ref:`TL4 <syntax-tl4>` an optional string expression can be raised::
 
    func example()
-      raise "error message"
+     raise "error message"
 
 Unless caught, raised error will propagate to the caller function, up until the
 main function - where uncaught errors will stop the execution of the program,
@@ -136,9 +136,9 @@ followed by a ``catch`` statement. The code under the ``catch`` statement will
 only run if the above ``try`` statement caught an error. ::
 
    try
-      ; do something that may raise errors
+     ; do something that may raise errors
    catch
-      ;  do some error handling
+     ;  do some error handling
 
 In the final syntax this may be different - the exact syntax is still under
 planning.

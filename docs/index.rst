@@ -67,8 +67,15 @@ Any help, suggestion, comment or questions is welcome! See Lumi repository
    variables
    functions
    user-types
-   serialization
    flow
    testing
    native
    examples
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Future
+
+   standard-libraries
+   serialization
+   async-io
