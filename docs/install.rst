@@ -29,8 +29,11 @@ optional but recommended:
 
 Building the Lumi Compiler
 --------------------------
-A Lumi compiler must first be compiled using a C compiler. That Lumi compiler
+A Lumi compiler must first be built using a C compiler. That Lumi compiler
 can then be used to generate C code from Lumi code.
+
+It is recommended to add the compiler executable to the system path, for
+example, in Linux move it to ``/usr/local/bin/``.
 
 Latest Version - TL4 Compiler
 +++++++++++++++++++++++++++++
@@ -58,14 +61,16 @@ Old Versions
 
 Building the ``lumi`` Command
 -----------------------------
-The ``lumi`` command must first be compiled using a C compiler. ``lumi``
-command can then be :ref:`used <using-lumi-command>` to compile an executable
-directly from Lumi code by running Lumi compiler and C compiler one after
-another.
+The ``lumi`` command must first be built using a C compiler. ``lumi`` command
+can then be :ref:`used <using-lumi-command>` to compile an executable directly
+from Lumi code by running Lumi compiler and C compiler one after another.
 
 ::
 
    $CC lumi.c TL4/lumi.4.c -ITL4 -o lumi
+
+It is recommended to add the compiler executable to the system path, for
+example, in Linux move it to ``/usr/local/bin/``.
 
 .. _Atom: https://atom.io
 .. _language-lumi package: https://atom.io/packages/language-lumi

@@ -35,7 +35,7 @@ of the language.
 Contributing to Lumi
 --------------------
 Any help, suggestion, comment or questions is welcome! See Lumi repository
-`wiki`_ for more details.
+`wiki`_ for more details on how to contribute to Lumi.
 
 .. _wiki: https://github.com/meircif/lumi-lang/wiki
 
@@ -43,6 +43,7 @@ Any help, suggestion, comment or questions is welcome! See Lumi repository
    :maxdepth: 2
    :caption: Installation and Usage
 
+   quick-start
    install
    lumi-command
    lumi-compiler
@@ -61,7 +62,6 @@ Any help, suggestion, comment or questions is welcome! See Lumi repository
    :caption: Syntax
 
    general-syntax
-   hello-world
    basics
    builtin
    variables
@@ -71,3 +71,4 @@ Any help, suggestion, comment or questions is welcome! See Lumi repository
    flow
    testing
    native
+   examples

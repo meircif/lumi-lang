@@ -32,7 +32,7 @@ struct Complex
     out-str.concat(user imaginary-str)
     out-str.append(copy 'i')
 
-func usgae-example()
+func usage-example()
   var Complex complex
   complex.real := 5
   complex.imaginary := 3
@@ -44,4 +44,4 @@ func usgae-example()
 
 main
   fibonacci(copy 3)
-  usgae-example()
+  usage-example()

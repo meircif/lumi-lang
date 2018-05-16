@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Lumi Language Guide'
-copyright = '2018, Lumi Language'
-author = 'Lumi Language'
+copyright = '2018, Lumi language contributors'
+author = 'Lumi language contributors'
 
 # The short X.Y version
 version = '0.4'
