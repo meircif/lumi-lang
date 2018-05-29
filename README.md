@@ -5,8 +5,11 @@
 
 # Lumi programming language
 
-See [Wiki](https://github.com/meircif/lumi-lang/wiki) for more information on
-Lumi and its development.
+See [Documentation](http://lumi-lang.readthedocs.io/en/latest/) for more
+information on Lumi language.
+
+See [Wiki](https://github.com/meircif/lumi-lang/wiki) for information on how to
+contribute to Lumi development.
 
 See [Issues](https://github.com/meircif/lumi-lang/issues) for current issues
 been worked at.
@@ -20,11 +23,11 @@ installed.
 ## How can I help?
 Chose your difficulty:
 ### easy
-Review the [Wiki](https://github.com/meircif/lumi-lang/wiki) and notify me on
+Review the [docs](http://lumi-lang.readthedocs.io/en/latest/) and notify me on
 any problem, question or suggestion you have about the concepts or the syntax
 of the language.
 ### medium
-Add a standard library using the latest [Temporary Lumi 4 (TL4) Syntax](https://github.com/meircif/lumi-lang/wiki/Lumi-Syntax).
+Add a standard library using the latest [Temporary Lumi 4 (TL4) Syntax](http://lumi-lang.readthedocs.io/en/latest/general-syntax.html).
 ### hard
 Review or add features to the future [Temporary Lumi 5 (TL5) compiler](https://github.com/meircif/lumi-lang/wiki/TL5-Features).
 
