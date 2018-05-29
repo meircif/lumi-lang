@@ -1,0 +1,2 @@
+sphinx-rtd-theme>=0.3.0
+Pygments>=2.2.0
