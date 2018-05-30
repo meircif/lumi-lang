@@ -291,7 +291,9 @@ class BinaryExpression(UnaryExpression)
       write(user "if (")
       self.left-expression.write-dynamic()
       write(user " != NULL) ")
+      self.left-expression.top := false
       self.left-expression.write-dynamic()
+      self.left-expression.top := true
       write(user "->")
       do
         while ? type-data.base-type

@@ -59,9 +59,9 @@ Returncode SymbolExpression_analyze(SymbolExpression* self);
 static char* _func_name_SymbolExpression_analyze = "SymbolExpression.analyze";
 #define LUMI_FUNC_NAME _func_name_SymbolExpression_analyze
 Returncode SymbolExpression_analyze(SymbolExpression* self) {
-  ModuleMembers* _ModuleMembers48;
-  CHECK(24, NameMap_find(glob->module_map, self->name, (void**)&(_ModuleMembers48)) )
-  if (NULL != _ModuleMembers48) {
+  ModuleMembers* _ModuleMembers49;
+  CHECK(24, NameMap_find(glob->module_map, self->name, (void**)&(_ModuleMembers49)) )
+  if (NULL != _ModuleMembers49) {
     self->_base.result_type = malloc(sizeof(TypeInstance));
     if (self->_base.result_type == NULL) RAISE(25)
     *self->_base.result_type = (TypeInstance){NULL, NULL, NULL, NULL, NULL, NULL, NULL};
@@ -294,18 +294,18 @@ Returncode MemberExpression_analyze(MemberExpression* self) {
   else {
     CHECK(150, TypeData_find_meth(instance_type->type_data, self->_base.name, &(self->_base.function), &(self->bases)) )
     if (!(NULL != self->_base.function)) {
-      Bool _Bool49;
-      CHECK(153, String_equal(self->_base.name, &(String){7, 6, "mocked"}, &(_Bool49)) )
-      self->_base.is_annotate = _Bool49;
+      Bool _Bool50;
+      CHECK(153, String_equal(self->_base.name, &(String){7, 6, "mocked"}, &(_Bool50)) )
+      self->_base.is_annotate = _Bool50;
       CHECK(154, (self->instance)->_base._dtl[8](self->instance, self->_base.is_annotate, &(self->is_mock_field)) )
       if (self->is_mock_field) {
         if (self->_base.is_annotate) {
           CHECK(157, TypeInstance_copy_new(instance_type, &(self->_base._base.result_type)) )
         }
         else {
-          Bool _Bool50;
-          CHECK(158, String_equal(self->_base.name, &(String){7, 6, "active"}, &(_Bool50)) )
-          if (!_Bool50) {
+          Bool _Bool51;
+          CHECK(158, String_equal(self->_base.name, &(String){7, 6, "active"}, &(_Bool51)) )
+          if (!_Bool51) {
             CHECK(159, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "mock function has no member"}, self->_base.name) )
           }
           else {

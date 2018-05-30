@@ -33,14 +33,16 @@ class CallExpression(Expression)
           user "non callable type",
           user self.function.result-type.type-data.name)
     user FunctionArguments declaration(self.function.result-type.arguments)
-    user TypeInstance result-type
-    declaration.get-result-type():(copy self.access, user result-type)
-    if not self.is-statement
-      result-type.copy-new():(owner self.result-type)
     user TypeInstance instance-type
     var Int bases
     self.function.analyze-call(user self.arguments):(
         user instance-type, copy bases, copy self.is-function-object)
+    user TypeInstance result-type
+    declaration.get-result-type():(copy self.access, user result-type)
+    if not self.is-statement
+      result-type.f-new-replace-params(user instance-type, copy bases):(
+          owner self.result-type)
+      result-type := self.result-type
     if self.arguments.check-same-as(
         user declaration, user instance-type, copy bases)
       # add omitted output
@@ -48,6 +50,9 @@ class CallExpression(Expression)
       output.set-location()
       output.is-output := true
       output.is-native := declaration.outputs.last.item.is-native
+      output.is-generic :=
+          declaration.outputs.last.item.get-type-instance().type-data =
+          glob.type-generic
       output.access := declaration.outputs.last.item.access
       output.value := self.add-aux-variable(
           copy declaration.outputs.last.item.access,

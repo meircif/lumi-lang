@@ -179,6 +179,11 @@ class TypeData(SyntaxTreeNamespace)
     glob.current-module := self.my-module
     if ? self.base-type
       self.base-type.link-types(user self)
+      if ? self.base-type.type-data.parameters and
+          not (? self.base-type.parameters)
+        self.m-syntax-error(
+            user "no parameter given for type with parameters",
+            user self.base-type.type-data.name)
     base.link-types()
     glob.current-module := _
   

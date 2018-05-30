@@ -63,9 +63,9 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
     while (true) {
       String* name = NULL;
       CHECK(32, read_new(&(String){3, 2, ":}"}, &(name), &((*end))) )
-      Bool _Bool171;
-      CHECK(33, f_is_legal_name(name, NAME_TYPE, &(_Bool171)) )
-      if (!_Bool171) {
+      Bool _Bool172;
+      CHECK(33, f_is_legal_name(name, NAME_TYPE, &(_Bool172)) )
+      if (!_Bool172) {
         CHECK(34, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "illegal type parameter name"}, name) )
       }
       CHECK(35, List_add(self->parameters, name) )
@@ -99,19 +99,19 @@ Returncode TypeData_add_type(TypeData* self, ModuleMembers* my_module);
 static char* _func_name_TypeData_add_type = "TypeData.add-type";
 #define LUMI_FUNC_NAME _func_name_TypeData_add_type
 Returncode TypeData_add_type(TypeData* self, ModuleMembers* my_module) {
-  Bool _Bool172;
-  CHECK(53, f_is_legal_name(self->name, NAME_TYPE, &(_Bool172)) )
-  if (!_Bool172) {
+  Bool _Bool173;
+  CHECK(53, f_is_legal_name(self->name, NAME_TYPE, &(_Bool173)) )
+  if (!_Bool173) {
     CHECK(54, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){18, 17, "illegal type name"}, self->name) )
   }
-  TypeData* _TypeData173;
-  CHECK(55, Global_find_type(glob, self->name, &(_TypeData173)) )
-  if (NULL != _TypeData173) {
+  TypeData* _TypeData174;
+  CHECK(55, Global_find_type(glob, self->name, &(_TypeData174)) )
+  if (NULL != _TypeData174) {
     CHECK(56, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){21, 20, "redefinition of type"}, self->name) )
   }
-  EnumData* _EnumData174;
-  CHECK(57, NameMap_find(glob->current_module->enum_map, self->name, (void**)&(_EnumData174)) )
-  if (NULL != _EnumData174) {
+  EnumData* _EnumData175;
+  CHECK(57, NameMap_find(glob->current_module->enum_map, self->name, (void**)&(_EnumData175)) )
+  if (NULL != _EnumData175) {
     CHECK(58, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){25, 24, "type name overrides Enum"}, self->name) )
   }
   CHECK(59, SyntaxTreeNamespace_init(&(self->_base)) )
@@ -126,15 +126,15 @@ Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end);
 static char* _func_name_TypeData_parse_child = "TypeData.parse-child";
 #define LUMI_FUNC_NAME _func_name_TypeData_parse_child
 Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end) {
-  Bool _Bool175;
-  CHECK(63, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool175)) )
-  if (_Bool175) {
+  Bool _Bool176;
+  CHECK(63, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool176)) )
+  if (_Bool176) {
     return OK;
   }
   
-  Bool _Bool176;
-  CHECK(66, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool176)) )
-  if (_Bool176) {
+  Bool _Bool177;
+  CHECK(66, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool177)) )
+  if (_Bool177) {
     if ((*end) != '(') {
       CHECK(68, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){30, 29, "expected \"(\" after \"new\", got"}, (*end)) )
     }
@@ -231,9 +231,9 @@ Returncode TypeData_find_field(TypeData* self, String* name, SyntaxTreeVariable*
     ListNode* child = type_data->_base._base.variables->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool177;
-      CHECK(116, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool177)) )
-      if (_Bool177) {
+      Bool _Bool178;
+      CHECK(116, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool178)) )
+      if (_Bool178) {
         (*field) = ((SyntaxTreeVariable*)(child->item));
         return OK;
       }
@@ -261,9 +261,9 @@ Returncode TypeData_find_meth(TypeData* self, String* name, SyntaxTreeFunction**
     ListNode* child = type_data->_base.functions->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool178;
-      CHECK(134, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool178)) )
-      if (_Bool178) {
+      Bool _Bool179;
+      CHECK(134, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool179)) )
+      if (_Bool179) {
         (*method) = ((SyntaxTreeFunction*)(child->item));
         return OK;
       }
@@ -341,8 +341,11 @@ Returncode TypeData_link_types(TypeData* self) {
   glob->current_module = self->my_module;
   if (NULL != self->base_type) {
     CHECK(181, TypeInstance_link_types(self->base_type, &(self->_base._base._base)) )
+    if (NULL != self->base_type->type_data->parameters &&  ! (NULL != self->base_type->parameters)) {
+      CHECK(184, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){44, 43, "no parameter given for type with parameters"}, self->base_type->type_data->name) )
+    }
   }
-  CHECK(182, SyntaxTreeNamespace_link_types(&(self->_base)) )
+  CHECK(187, SyntaxTreeNamespace_link_types(&(self->_base)) )
   glob->current_module = NULL;
   return OK;
 }
@@ -356,24 +359,24 @@ static char* _func_name_TypeData_analyze = "TypeData.analyze";
 Returncode TypeData_analyze(TypeData* self) {
   glob->current_module = self->my_module;
   if (NULL != self->base_type) {
-    CHECK(188, TypeInstance_analyze_lengths(self->base_type, &(self->_base._base._base), true) )
+    CHECK(193, TypeInstance_analyze_lengths(self->base_type, &(self->_base._base._base), true) )
   }
-  Bool _Bool179;
-  CHECK(189, List_m_is_empty(self->_base._base.variables, &(_Bool179)) )
-  if (!(NULL != self->base_type) && _Bool179) {
-    CHECK(190, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){20, 19, "type with no fields"}, self->name) )
+  Bool _Bool180;
+  CHECK(194, List_m_is_empty(self->_base._base.variables, &(_Bool180)) )
+  if (!(NULL != self->base_type) && _Bool180) {
+    CHECK(195, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){20, 19, "type with no fields"}, self->name) )
   }
   if (self->is_dynamic &&  ! (NULL != self->base_type && self->base_type->type_data->is_dynamic)) {
     ListNode* node = self->_base.functions->first;
     while (true) {
       if (!(NULL != node)) {
-        CHECK(196, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){30, 29, "class with no dynamic methods"}, self->name) )
+        CHECK(201, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){30, 29, "class with no dynamic methods"}, self->name) )
       }
       if (!(!((SyntaxTreeFunction*)(node->item))->is_dynamic)) break;
       node = node->next;
     }
   }
-  CHECK(200, SyntaxTreeNamespace_analyze(&(self->_base)) )
+  CHECK(205, SyntaxTreeNamespace_analyze(&(self->_base)) )
   glob->current_module = NULL;
   return OK;
 }
@@ -386,9 +389,9 @@ static char* _func_name_TypeData_write_cname = "TypeData.write-cname";
 #define LUMI_FUNC_NAME _func_name_TypeData_write_cname
 Returncode TypeData_write_cname(TypeData* self) {
   if (NULL != self->my_module) {
-    CHECK(205, ModuleMembers_write_prefix(self->my_module) )
+    CHECK(210, ModuleMembers_write_prefix(self->my_module) )
   }
-  CHECK(206, write_cname(self->name) )
+  CHECK(211, write_cname(self->name) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -401,17 +404,17 @@ static char* _func_name_TypeData_write_declaration = "TypeData.write-declaration
 Returncode TypeData_write_declaration(TypeData* self) {
   /* typedef struct `name` `name`; */
   /* typedef struct `name`_Dynamic `name`_Dynamic; */
-  CHECK(211, write(&(String){17, 16, "\ntypedef struct "}) )
-  CHECK(212, TypeData_write_cname(self) )
-  CHECK(213, write(&(String){2, 1, " "}) )
-  CHECK(214, TypeData_write_cname(self) )
-  CHECK(215, write(&(String){3, 2, ";\n"}) )
+  CHECK(216, write(&(String){17, 16, "\ntypedef struct "}) )
+  CHECK(217, TypeData_write_cname(self) )
+  CHECK(218, write(&(String){2, 1, " "}) )
+  CHECK(219, TypeData_write_cname(self) )
+  CHECK(220, write(&(String){3, 2, ";\n"}) )
   if (self->is_dynamic) {
-    CHECK(217, write(&(String){17, 16, "\ntypedef struct "}) )
-    CHECK(218, TypeData_write_cname(self) )
-    CHECK(219, write(&(String){10, 9, "_Dynamic "}) )
-    CHECK(220, TypeData_write_cname(self) )
-    CHECK(221, write(&(String){11, 10, "_Dynamic;\n"}) )
+    CHECK(222, write(&(String){17, 16, "\ntypedef struct "}) )
+    CHECK(223, TypeData_write_cname(self) )
+    CHECK(224, write(&(String){10, 9, "_Dynamic "}) )
+    CHECK(225, TypeData_write_cname(self) )
+    CHECK(226, write(&(String){11, 10, "_Dynamic;\n"}) )
   }
   return OK;
 }
@@ -429,39 +432,39 @@ Returncode TypeData_write(TypeData* self) {
   /* struct `name`_Dynamic { */
   /*   `dynamic-function-pointers...` */
   /* }; */
-  CHECK(230, write(&(String){9, 8, "\nstruct "}) )
-  CHECK(231, TypeData_write_cname(self) )
-  CHECK(232, write(&(String){4, 3, " {\n"}) )
+  CHECK(235, write(&(String){9, 8, "\nstruct "}) )
+  CHECK(236, TypeData_write_cname(self) )
+  CHECK(237, write(&(String){4, 3, " {\n"}) )
   self->_base._base.indentation_spaces = 2;
   if (NULL != self->base_type) {
-    CHECK(235, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
-    CHECK(236, TypeData_write_cname(self->base_type->type_data) )
-    CHECK(237, write(&(String){9, 8, " _base;\n"}) )
+    CHECK(240, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
+    CHECK(241, TypeData_write_cname(self->base_type->type_data) )
+    CHECK(242, write(&(String){9, 8, " _base;\n"}) )
   }
-  CHECK(238, SyntaxTreeNode_write_children(&(self->_base._base._base), self->_base._base.variables) )
-  CHECK(239, write(&(String){4, 3, "};\n"}) )
+  CHECK(243, SyntaxTreeNode_write_children(&(self->_base._base._base), self->_base._base.variables) )
+  CHECK(244, write(&(String){4, 3, "};\n"}) )
   if (self->is_dynamic) {
-    CHECK(241, write(&(String){9, 8, "\nstruct "}) )
-    CHECK(242, TypeData_write_cname(self) )
-    CHECK(243, write(&(String){12, 11, "_Dynamic {\n"}) )
+    CHECK(246, write(&(String){9, 8, "\nstruct "}) )
+    CHECK(247, TypeData_write_cname(self) )
+    CHECK(248, write(&(String){12, 11, "_Dynamic {\n"}) )
     if (NULL != self->base_type && self->base_type->type_data->is_dynamic) {
-      CHECK(245, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
-      CHECK(246, TypeData_write_cname(self->base_type->type_data) )
-      CHECK(247, write(&(String){17, 16, "_Dynamic _base;\n"}) )
+      CHECK(250, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
+      CHECK(251, TypeData_write_cname(self->base_type->type_data) )
+      CHECK(252, write(&(String){17, 16, "_Dynamic _base;\n"}) )
     }
     else {
-      CHECK(249, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
-      CHECK(250, write(&(String){19, 18, "Dynamic_Del _del;\n"}) )
+      CHECK(254, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
+      CHECK(255, write(&(String){19, 18, "Dynamic_Del _del;\n"}) )
     }
     NameMapNode* child = self->dynamic_base_methods->first;
     while (true) {
       if (!(NULL != child)) break;
-      CHECK(254, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
-      CHECK(255, SyntaxTreeFunction_write_pointer(((SyntaxTreeFunction*)(child->value))) )
-      CHECK(256, write(&(String){3, 2, ";\n"}) )
+      CHECK(259, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
+      CHECK(260, SyntaxTreeFunction_write_pointer(((SyntaxTreeFunction*)(child->value))) )
+      CHECK(261, write(&(String){3, 2, ";\n"}) )
       child = child->next;
     }
-    CHECK(258, write(&(String){4, 3, "};\n"}) )
+    CHECK(263, write(&(String){4, 3, "};\n"}) )
   }
   self->_base._base.indentation_spaces = 0;
   return OK;
@@ -474,13 +477,13 @@ Returncode TypeData_write_methods_declaration(TypeData* self);
 static char* _func_name_TypeData_write_methods_declaration = "TypeData.write-methods-declaration";
 #define LUMI_FUNC_NAME _func_name_TypeData_write_methods_declaration
 Returncode TypeData_write_methods_declaration(TypeData* self) {
-  CHECK(262, SyntaxTreeNamespace_write_functions_declaration(&(self->_base)) )
+  CHECK(267, SyntaxTreeNamespace_write_functions_declaration(&(self->_base)) )
   /* void `cname`_Del(`cname`* self); */
-  CHECK(264, write(&(String){7, 6, "\nvoid "}) )
-  CHECK(265, TypeData_write_cname(self) )
-  CHECK(266, write(&(String){6, 5, "_Del("}) )
-  CHECK(267, TypeData_write_cname(self) )
-  CHECK(268, write(&(String){10, 9, "* self);\n"}) )
+  CHECK(269, write(&(String){7, 6, "\nvoid "}) )
+  CHECK(270, TypeData_write_cname(self) )
+  CHECK(271, write(&(String){6, 5, "_Del("}) )
+  CHECK(272, TypeData_write_cname(self) )
+  CHECK(273, write(&(String){10, 9, "* self);\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -491,24 +494,24 @@ Returncode TypeData_write_global(TypeData* self);
 static char* _func_name_TypeData_write_global = "TypeData.write-global";
 #define LUMI_FUNC_NAME _func_name_TypeData_write_global
 Returncode TypeData_write_global(TypeData* self) {
-  CHECK(271, write(&(String){2, 1, "\n"}) )
+  CHECK(276, write(&(String){2, 1, "\n"}) )
   if (self->is_dynamic) {
     /* `name`_Dynamic `name`_dynamic = {`dynamic-functions...`}; */
-    CHECK(274, TypeData_write_cname(self) )
-    CHECK(275, write(&(String){10, 9, "_Dynamic "}) )
-    CHECK(276, TypeData_write_cname(self) )
-    CHECK(277, write(&(String){12, 11, "_dynamic = "}) )
-    CHECK(278, TypeData_write_dynamic_init(self, self) )
+    CHECK(279, TypeData_write_cname(self) )
+    CHECK(280, write(&(String){10, 9, "_Dynamic "}) )
+    CHECK(281, TypeData_write_cname(self) )
+    CHECK(282, write(&(String){12, 11, "_dynamic = "}) )
+    CHECK(283, TypeData_write_dynamic_init(self, self) )
   }
   else {
     /* Generic_Type_Dynamic `name`_dynamic = {(Dynamic_Del)`name`_Del}; */
-    CHECK(281, write(&(String){22, 21, "Generic_Type_Dynamic "}) )
-    CHECK(282, TypeData_write_cname(self) )
-    CHECK(283, write(&(String){26, 25, "_dynamic = {(Dynamic_Del)"}) )
-    CHECK(284, TypeData_write_cname(self) )
-    CHECK(285, write(&(String){6, 5, "_Del}"}) )
+    CHECK(286, write(&(String){22, 21, "Generic_Type_Dynamic "}) )
+    CHECK(287, TypeData_write_cname(self) )
+    CHECK(288, write(&(String){26, 25, "_dynamic = {(Dynamic_Del)"}) )
+    CHECK(289, TypeData_write_cname(self) )
+    CHECK(290, write(&(String){6, 5, "_Del}"}) )
   }
-  CHECK(286, write(&(String){3, 2, ";\n"}) )
+  CHECK(291, write(&(String){3, 2, ";\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -519,36 +522,36 @@ Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data);
 static char* _func_name_TypeData_write_dynamic_init = "TypeData.write-dynamic-init";
 #define LUMI_FUNC_NAME _func_name_TypeData_write_dynamic_init
 Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data) {
-  CHECK(289, write(&(String){2, 1, "{"}) )
+  CHECK(294, write(&(String){2, 1, "{"}) )
   if (NULL != type_data->base_type && type_data->base_type->type_data->is_dynamic) {
-    CHECK(291, TypeData_write_dynamic_init(self, type_data->base_type->type_data) )
+    CHECK(296, TypeData_write_dynamic_init(self, type_data->base_type->type_data) )
   }
   else {
-    CHECK(293, write(&(String){14, 13, "(Dynamic_Del)"}) )
-    CHECK(294, TypeData_write_cname(self) )
-    CHECK(295, write(&(String){5, 4, "_Del"}) )
+    CHECK(298, write(&(String){14, 13, "(Dynamic_Del)"}) )
+    CHECK(299, TypeData_write_cname(self) )
+    CHECK(300, write(&(String){5, 4, "_Del"}) )
   }
   NameMapNode* child = type_data->dynamic_base_methods->first;
   while (true) {
     if (!(NULL != child)) break;
     SyntaxTreeFunction* method = NULL;
-    Int _Int180;
-    CHECK(300, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int180)) )
-    CHECK(301, write(&(String){3, 2, ", "}) )
+    Int _Int181;
+    CHECK(305, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int181)) )
+    CHECK(306, write(&(String){3, 2, ", "}) )
     if (method != ((SyntaxTreeFunction*)(child->value))) {
-      CHECK(303, write(&(String){7, 6, "(Func)"}) )
+      CHECK(308, write(&(String){7, 6, "(Func)"}) )
     }
-    CHECK(304, TypeData_write_cname(method->parent_type) )
-    CHECK(305, write(&(String){2, 1, "_"}) )
+    CHECK(309, TypeData_write_cname(method->parent_type) )
+    CHECK(310, write(&(String){2, 1, "_"}) )
     if (NULL != method->mocker_function) {
-      CHECK(307, write_cname(method->mocker_function->_base.name) )
+      CHECK(312, write_cname(method->mocker_function->_base.name) )
     }
     else {
-      CHECK(309, write_cname(method->name) )
+      CHECK(314, write_cname(method->name) )
     }
     child = child->next;
   }
-  CHECK(311, write(&(String){2, 1, "}"}) )
+  CHECK(316, write(&(String){2, 1, "}"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -559,30 +562,30 @@ Returncode TypeData_write_methods_body(TypeData* self);
 static char* _func_name_TypeData_write_methods_body = "TypeData.write-methods-body";
 #define LUMI_FUNC_NAME _func_name_TypeData_write_methods_body
 Returncode TypeData_write_methods_body(TypeData* self) {
-  CHECK(314, SyntaxTreeNode_write_children(&(self->_base._base._base), self->_base.functions) )
+  CHECK(319, SyntaxTreeNode_write_children(&(self->_base._base._base), self->_base.functions) )
   /* void `cname`_Del(`cname`* self) { */
   /*   if (self == NULL) return; */
   /*   `base`_Del(self); */
   /*   ... */
   /* } */
-  CHECK(320, write(&(String){7, 6, "\nvoid "}) )
-  CHECK(321, TypeData_write_cname(self) )
-  CHECK(322, write(&(String){6, 5, "_Del("}) )
-  CHECK(323, TypeData_write_cname(self) )
-  CHECK(324, write(&(String){11, 10, "* self) {\n"}) )
-  CHECK(325, write(&(String){29, 28, "  if (self == NULL) return;\n"}) )
+  CHECK(325, write(&(String){7, 6, "\nvoid "}) )
+  CHECK(326, TypeData_write_cname(self) )
+  CHECK(327, write(&(String){6, 5, "_Del("}) )
+  CHECK(328, TypeData_write_cname(self) )
+  CHECK(329, write(&(String){11, 10, "* self) {\n"}) )
+  CHECK(330, write(&(String){29, 28, "  if (self == NULL) return;\n"}) )
   if (NULL != self->base_type) {
-    CHECK(327, write(&(String){3, 2, "  "}) )
-    CHECK(328, TypeData_write_cname(self->base_type->type_data) )
-    CHECK(329, write(&(String){23, 22, "_Del(&(self->_base));\n"}) )
+    CHECK(332, write(&(String){3, 2, "  "}) )
+    CHECK(333, TypeData_write_cname(self->base_type->type_data) )
+    CHECK(334, write(&(String){23, 22, "_Del(&(self->_base));\n"}) )
   }
   if (self->is_delete_mocked) {
-    CHECK(331, write(&(String){18, 17, "  IGNORE_ERRORS( "}) )
-    CHECK(332, TypeData_write_cname(self) )
-    CHECK(333, write(&(String){18, 17, "_MockDel(self) )\n"}) )
+    CHECK(336, write(&(String){18, 17, "  IGNORE_ERRORS( "}) )
+    CHECK(337, TypeData_write_cname(self) )
+    CHECK(338, write(&(String){18, 17, "_MockDel(self) )\n"}) )
   }
-  CHECK(334, SyntaxTreeBranch_write_cleanup(&(self->_base._base), self) )
-  CHECK(335, write(&(String){3, 2, "}\n"}) )
+  CHECK(339, SyntaxTreeBranch_write_cleanup(&(self->_base._base), self) )
+  CHECK(340, write(&(String){3, 2, "}\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -593,7 +596,7 @@ Returncode TypeData_write_me(TypeData* self, TypeWriter* type_writer);
 static char* _func_name_TypeData_write_me = "TypeData.write-me";
 #define LUMI_FUNC_NAME _func_name_TypeData_write_me
 Returncode TypeData_write_me(TypeData* self, TypeWriter* type_writer) {
-  CHECK(338, (type_writer)->_dtl[0](type_writer, self) )
+  CHECK(343, (type_writer)->_dtl[0](type_writer, self) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -619,7 +622,7 @@ Returncode TypeWriter_write(TypeWriter* self, TypeData* type_data);
 static char* _func_name_TypeWriter_write = "TypeWriter.write";
 #define LUMI_FUNC_NAME _func_name_TypeWriter_write
 Returncode TypeWriter_write(TypeWriter* self, TypeData* type_data) {
-  RAISE(343)
+  RAISE(348)
 }
 #undef LUMI_FUNC_NAME
 #endif
@@ -643,7 +646,7 @@ Returncode TypeDeclarationWriter_write(TypeDeclarationWriter* self, TypeData* ty
 static char* _func_name_TypeDeclarationWriter_write = "TypeDeclarationWriter.write";
 #define LUMI_FUNC_NAME _func_name_TypeDeclarationWriter_write
 Returncode TypeDeclarationWriter_write(TypeDeclarationWriter* self, TypeData* type_data) {
-  CHECK(347, (type_data)->_base._base._base._dtl[8](type_data) )
+  CHECK(352, (type_data)->_base._base._base._dtl[8](type_data) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -668,7 +671,7 @@ Returncode TypeMethodsDeclarationWriter_write(TypeMethodsDeclarationWriter* self
 static char* _func_name_TypeMethodsDeclarationWriter_write = "TypeMethodsDeclarationWriter.write";
 #define LUMI_FUNC_NAME _func_name_TypeMethodsDeclarationWriter_write
 Returncode TypeMethodsDeclarationWriter_write(TypeMethodsDeclarationWriter* self, TypeData* type_data) {
-  CHECK(351, (type_data)->_base._base._base._dtl[9](type_data) )
+  CHECK(356, (type_data)->_base._base._base._dtl[9](type_data) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -693,7 +696,7 @@ Returncode TypeGlobalWriter_write(TypeGlobalWriter* self, TypeData* type_data);
 static char* _func_name_TypeGlobalWriter_write = "TypeGlobalWriter.write";
 #define LUMI_FUNC_NAME _func_name_TypeGlobalWriter_write
 Returncode TypeGlobalWriter_write(TypeGlobalWriter* self, TypeData* type_data) {
-  CHECK(355, (type_data)->_base._base._base._dtl[10](type_data) )
+  CHECK(360, (type_data)->_base._base._base._dtl[10](type_data) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -718,7 +721,7 @@ Returncode TypeMethodsBodyWriter_write(TypeMethodsBodyWriter* self, TypeData* ty
 static char* _func_name_TypeMethodsBodyWriter_write = "TypeMethodsBodyWriter.write";
 #define LUMI_FUNC_NAME _func_name_TypeMethodsBodyWriter_write
 Returncode TypeMethodsBodyWriter_write(TypeMethodsBodyWriter* self, TypeData* type_data) {
-  CHECK(359, (type_data)->_base._base._base._dtl[11](type_data) )
+  CHECK(364, (type_data)->_base._base._base._dtl[11](type_data) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
