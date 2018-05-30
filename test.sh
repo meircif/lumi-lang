@@ -198,13 +198,22 @@ diff ../TL4/tests/integration-multiple-output.txt \
 
 # run standard-libraries unit-tests
 mkdir standard-libraries
-cp ../standard-libraries/*.3.lm standard-libraries
-cp ../standard-libraries/tests/*.3.lm standard-libraries
-./tl3-compiler standard-libraries/*.3.lm
-$CCW -Wno-unused-variable -Wno-missing-braces \
-  standard-libraries/standard-libraries-tests.c ../TL3/lumi.3.c -I. -I../TL3 \
-  -o standard-libraries-tests
-./standard-libraries-tests
+cp ../standard-libraries/*.4.lm standard-libraries
+cp ../standard-libraries/tests/*.4.lm standard-libraries
+./tl4-compiler standard-libraries/math-tests.c standard-libraries/*.4.lm \
+  -t math
+$CCA -Wno-unused-variable standard-libraries/math-tests.c ../TL4/lumi.4.c \
+  -I../TL4 -o math-tests
+./math-tests -xml
+mkdir math-tests
+mv cobertura.xml math-tests
+./tl4-compiler standard-libraries/ds-tests.c standard-libraries/*.4.lm \
+  -t ds
+$CCA -Wno-unused-variable standard-libraries/ds-tests.c ../TL4/lumi.4.c \
+  -I../TL4 -o ds-tests
+./ds-tests -xml
+mkdir ds-tests
+mv cobertura.xml ds-tests
 
 
 # --< Documentation >--

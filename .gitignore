@@ -22,3 +22,6 @@ docs/_*
 .idea
 cmake-build-debug/
 CMakeLists.txt
+
+# Atom files
+.tags

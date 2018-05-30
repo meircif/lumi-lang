@@ -1,86 +1,108 @@
-## Tests for generic lists
+~~~ Tests for generic lists ~~~
+module list-test
 
-test list-append-test()
-  var List{String} list
-  list.append(owner "first")
-  list.append(owner "second")
-  list.append(owner "third")
-  var ListIterator{String} iter
-  list.get-iterator(user iter)
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "first")
+test append-test()
+  var ds.List{String} list
+  list.append(owner String{8}(user "first"))
+  list.append(owner String{8}(user "second"))
+  list.append(owner String{8}(user "third"))
+  var ds.ListIterator{String} iter(user list)
+  assert iter.has()
+  assert iter.get().equal(user "first")
   iter.next()
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "second")
+  assert iter.has()
+  assert iter.get().equal(user "second")
   iter.next()
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "third")
+  assert iter.has()
+  assert iter.get().equal(user "third")
   iter.next()
-  assert iter.is-end()
-
-
-test list-prepend-test()
-  var List{String} list
-  list.prepend(owner "third")
-  list.prepend(owner "second")
-  list.prepend(owner "first")
-  var ListIterator{String} iter
-  list.get-iterator(user iter)
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "first")
-  iter.next()
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "second")
-  iter.next()
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "third")
-  iter.next()
-  assert iter.is-end()
+  assert not iter.has()
 
 
-test list-pop-test()
-  var List{String} list
-  list.append(owner "first")
-  list.append(owner "second")
-  list.append(owner "third")
+test prepend-test()
+  var ds.List{String} list
+  list.prepend(owner String{8}(user "third"))
+  list.prepend(owner String{8}(user "second"))
+  list.prepend(owner String{8}(user "first"))
+  var ds.ListIterator{String} iter(user list)
+  assert iter.has()
+  assert iter.get().equal(user "first")
+  iter.next()
+  assert iter.has()
+  assert iter.get().equal(user "second")
+  iter.next()
+  assert iter.has()
+  assert iter.get().equal(user "third")
+  iter.next()
+  assert not iter.has()
+
+
+test mixed-test()
+  var ds.List{String} list
+  list.prepend(owner String{8}(user "first"))
+  list.append(owner String{8}(user "second"))
+  list.prepend(owner String{8}(user "third"))
+  var ds.ListIterator{String} iter(user list)
+  assert iter.has()
+  assert iter.get().equal(user "third")
+  iter.next()
+  assert iter.has()
+  assert iter.get().equal(user "first")
+  iter.next()
+  assert iter.has()
+  assert iter.get().equal(user "second")
+  iter.next()
+  assert not iter.has()
+
+
+test pop-test()
+  var ds.List{String} list
+  list.append(owner String{8}(user "first"))
+  list.append(owner String{8}(user "second"))
+  list.append(owner String{8}(user "third"))
   assert list.pop().equal(user "first")
   assert list.pop().equal(user "second")
   assert list.pop().equal(user "third")
-  assert-error list.pop()
+  assert-error list.pop(), "list empty"
 
 
-test list-is-empty-test()
-  var List{String} list
+test is-empty-test()
+  var ds.List{String} list
   assert list.is-empty()
-  list.append(owner "first")
+  list.append(owner String{8}(user "first"))
   assert not list.is-empty()
   list.pop()
   assert list.is-empty()
 
 
-test list-generic-iter-test()
-  var List{String} list
-  list.append(owner "first")
-  list.append(owner "second")
-  list.append(owner "third")
-  var ListIterator{String} list-iter
-  list.get-iterator(user list-iter)
-  user Iterator{String} iter(list-iter)
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "first")
+test generic-iter-test()
+  var ds.List{String} list
+  list.append(owner String{8}(user "first"))
+  list.append(owner String{8}(user "second"))
+  list.append(owner String{8}(user "third"))
+  var ds.ListIterator{String} list-iter(user list)
+  user ds.Iterator{String} iter(user list-iter)
+  assert iter.has()
+  assert iter.get().equal(user "first")
   iter.next()
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "second")
+  assert iter.has()
+  assert iter.get().equal(user "second")
   iter.next()
-  assert not iter.is-end()
-  assert iter.get-item().equal(user "third")
+  assert iter.has()
+  assert iter.get().equal(user "third")
   iter.next()
-  assert iter.is-end()
+  assert not iter.has()
 
 
-test list-empty-iter-test()
-  var ListIterator{String} iter
-  assert iter.is-end()
-  assert-error iter.get-item()
+test empty-iter-test()
+  var ds.ListIterator{String} iter(user _)
+  assert not iter.has()
+  assert-error iter.get()
   iter.next()
-  assert iter.is-end()
+  assert not iter.has()
+
+
+test abstract-methods()
+  assert-error ds.Iterator.has(var _), "unimplemented dynamic method 'has'"
+  assert-error ds.Iterator.get(var _), "unimplemented dynamic method 'get'"
+  assert-error ds.Iterator.next(var _), "unimplemented dynamic method 'next'"

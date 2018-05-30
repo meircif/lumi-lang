@@ -1,16 +1,22 @@
-## Generic iterator dynamic interface
+~~~ Generic iterator dynamic interface ~~~
+module ds
 
 
 class Iterator{Generic}
-  ## Return whether iteration has ended,
-  ## `get-item()` can be used only if this returns false.
-  func dynamic is-end():(copy Bool exist)
-    raise
-  
-  ## Get current item, fail if not exists
-  func dynamic get-item():(user Generic item)
-    raise
-  
-  ## Move to next item
+  ~~~ in TL4 class must contain at least on field. ~~~
+  var Int dummy
+
+  ~~~ Is called before any iteration.
+  Iteration continues only if this method returns true. ~~~
+  func dynamic has()->(var Bool has-another-item)
+    raise "unimplemented dynamic method 'has'"
+
+  ~~~ Is called before any iteration after has() returns true.
+  Returned value is set as the iteration value. ~~~
+  func dynamic get()->(user Generic value)
+    raise "unimplemented dynamic method 'get'"
+
+  ~~~ Is called after the end of any iteration.
+  Should be used to advance the iteration. ~~~
   func dynamic next()
-    raise
+    raise "unimplemented dynamic method 'next'"
