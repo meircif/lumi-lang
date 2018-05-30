@@ -167,6 +167,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       self.write-iter()
     if ? self.aux-symbol
       new EmptyExpression empty
+      empty.init()
       self.write-assign(
           user self.aux-symbol.variable, owner empty, user self.parent)
   
@@ -294,9 +295,6 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     var SyntaxTreeExpression expression-node
     expression-node.parent := self.block
     
-    new SymbolExpression symbol
-    symbol.function := meth
-    
     new CallArgument self-arg
     self-arg.is-dynamic := self.aux-symbol.result-type.type-data.is-dynamic
     self-arg.value := self.aux-symbol
@@ -305,7 +303,6 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     call.line-number := self.line-number
     call.top := true
     call.is-statement := true
-    call.function := symbol
     new FunctionArguments in call.arguments
     call.arguments.init()
     call.arguments.parameters.add(owner self-arg)
@@ -314,5 +311,18 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       output-arg.code-node := expression-node
       call.arguments.outputs.add(owner output-arg)
     
+    if meth.is-dynamic
+      new MemberExpression member
+      member.code-node := self
+      member.function := meth
+      member.dynamic-call-self-instance := self.aux-symbol
+      call.function := member
+    else
+      new SymbolExpression symbol
+      symbol.function := meth
+      call.function := symbol
+    
     expression-node.expression := call
+    self.parent.indentation-spaces += 2
     expression-node.write()
+    self.parent.indentation-spaces -= 2

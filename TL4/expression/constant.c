@@ -163,9 +163,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     if ((1) < 0 || (1) >= (number)->length) RAISE(57)
     Char second = ((number)->values[1]);
     if (second >= '0' && second <= '7') {
-      Bool _Bool32;
-      CHECK(59, f_is_octal(number, &(_Bool32)) )
-      if (!_Bool32) {
+      Bool _Bool33;
+      CHECK(59, f_is_octal(number, &(_Bool33)) )
+      if (!_Bool33) {
         CHECK(60, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){21, 20, "illegal octal number"}, text) )
       }
     }
@@ -173,18 +173,18 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
       if ((2) < 0 || (number->length - 2) < 0 || (2) + (number->length - 2) > (number)->length) RAISE(62)
       number = (&(String){number->length - 2, number->length - 2, (number)->values + (2)});
       if (second == 'b' || second == 'B') {
-        Bool _Bool33;
-        CHECK(64, f_is_binary(number, &(_Bool33)) )
-        if (!_Bool33) {
+        Bool _Bool34;
+        CHECK(64, f_is_binary(number, &(_Bool34)) )
+        if (!_Bool34) {
           CHECK(65, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){22, 21, "illegal binary number"}, text) )
         }
         CHECK(66, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){36, 35, "binary numbers not supported yet..."}, text) )
       }
       else {
         if (second == 'x' || second == 'X') {
-          Bool _Bool34;
-          CHECK(69, f_is_hex(number, &(_Bool34)) )
-          if (!_Bool34) {
+          Bool _Bool35;
+          CHECK(69, f_is_hex(number, &(_Bool35)) )
+          if (!_Bool35) {
             CHECK(70, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal hexadecimal number"}, text) )
           }
         }
@@ -195,9 +195,9 @@ Returncode IntExpression_parse(IntExpression* self, String* text) {
     }
   }
   else {
-    Bool _Bool35;
-    CHECK(73, f_is_decimal(number, &(_Bool35)) )
-    if (!_Bool35) {
+    Bool _Bool36;
+    CHECK(73, f_is_decimal(number, &(_Bool36)) )
+    if (!_Bool36) {
       CHECK(74, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){15, 14, "illegal number"}, text) )
     }
   }
@@ -263,9 +263,9 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         CHECK(98, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }
       if ((2) < 0 || (2) >= (text)->length) RAISE(99)
-      Bool _Bool36;
-      CHECK(99, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool36)) )
-      if (!_Bool36) {
+      Bool _Bool37;
+      CHECK(99, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool37)) )
+      if (!_Bool37) {
         CHECK(100, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }
     }
@@ -279,17 +279,17 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
         ch = ((text)->values[2]);
         if (ch == 'x') {
           if ((3) < 0 || (2) < 0 || (3) + (2) > (text)->length) RAISE(106)
-          Bool _Bool37;
-          CHECK(106, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool37)) )
-          if (!_Bool37) {
+          Bool _Bool38;
+          CHECK(106, f_is_hex((&(String){2, 2, (text)->values + (3)}), &(_Bool38)) )
+          if (!_Bool38) {
             CHECK(107, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
           }
         }
         else {
           if ((2) < 0 || (3) < 0 || (2) + (3) > (text)->length) RAISE(109)
-          Bool _Bool38;
-          CHECK(109, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool38)) )
-          if (!_Bool38) {
+          Bool _Bool39;
+          CHECK(109, f_is_octal((&(String){3, 3, (text)->values + (2)}), &(_Bool39)) )
+          if (!_Bool39) {
             CHECK(110, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
           }
         }

@@ -579,6 +579,38 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(ps_Refman);
   return LUMI_err;
 }
+/// @ t9
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
+struct ut_M_Test {
+  Int x;
+};
+struct ut_M_Test_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*meth)(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic);
+};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic);
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_name(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic) {
+  Returncode LUMI_err = OK;
+LUMI_cleanup:
+  return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+  if (self == NULL) return;
+}
+Returncode ut_M_name(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic) {
+  Returncode LUMI_err = OK;
+  if (*t_Dynamic != NULL) (*t_Dynamic)->_del(*t);
+  LUMI_owner_dec_ref(*t_Refman);
+  *t_Refman = NULL;
+  *t_Dynamic = NULL;
+  *t = NULL;
+LUMI_cleanup:
+  return LUMI_err;
+}
 /// @ tm0
 Returncode new_Mock(Bool* allocate_success) { return OK; }
 Returncode delete_Mock(Ref self) { return OK; }
@@ -1887,6 +1919,8 @@ already mocking delete of type "Test"
 unknown operator ""
 /// @ te19
 expected space after ",", got """
+/// @ te19-copy
+expected space after ",", got """
 /// @ te20
 no '"' around string constant " "error""
 /// @ te21
@@ -2013,7 +2047,7 @@ Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type
   item_Dynamic = NULL;
   if (self == NULL) RAISE(6, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(6, 38, "used member of outdated weak reference")
-  if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
+  if (self->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(self->item_Dynamic))->_del(self->item);
   LUMI_owner_dec_ref(self->item_Refman);
   self->item_Refman = x_Refman;
   self->item_Dynamic = x_Dynamic;
@@ -2035,7 +2069,7 @@ Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type
   if (self_Refman->value == NULL) RAISE(9, 38, "used member of outdated weak reference")
   if (t == NULL) RAISE(9, 27, "used member of empty object")
   if (t_Refman->value == NULL) RAISE(9, 38, "used member of outdated weak reference")
-  if (t->item_Dynamic != NULL) t->item_Dynamic->_del(t->item);
+  if (t->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(t->item_Dynamic))->_del(t->item);
   LUMI_owner_dec_ref(t->item_Refman);
   t->item_Refman = self->item_Refman;
   t->item_Dynamic = self->item_Dynamic;
@@ -2047,7 +2081,7 @@ Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type
   if (t_Refman->value == NULL) RAISE(10, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(10, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(10, 38, "used member of outdated weak reference")
-  if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
+  if (self->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(self->item_Dynamic))->_del(self->item);
   LUMI_owner_dec_ref(self->item_Refman);
   self->item_Refman = t->item_Refman;
   self->item_Dynamic = t->item_Dynamic;
@@ -2308,7 +2342,11 @@ CHECK(1, ut_M_Data_set(ut_M_d, ut_M_d_Refman, *so, *so_Refman, &String_dynamic, 
   *so = NULL;
   *so_Refman = NULL;
 /// @ t13
-CHECK(1, ut_M_Data_get(ut_M_d, ut_M_d_Refman, (void*)&(ut_M_str), &(ut_M_str_Refman), &dynamic_Void) )
+String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  CHECK(1, ut_M_Data_get(ut_M_d, ut_M_d_Refman, (void*)&(ut_M_str), &(ut_M_str_Refman), &dynamic_Void) )
+  CHECK(2, ut_M_Data_get(ut_M_d, ut_M_d_Refman, (void*)&(aux_String_0), &(aux_String_0_Refman), &dynamic_Void) )
+  CHECK(2, String_clear(aux_String_0, aux_String_0_Refman) )
 /// @ t14
 ut_M_Data dg_Var = {0};
   ut_M_Data* dg = NULL;
@@ -2357,6 +2395,9 @@ ut_M_Data dt_Var = {0};
   ut_M_Tc* otc = NULL;
   Ref_Manager* otc_Refman = NULL;
   ut_M_Tc_Dynamic* otc_Dynamic = NULL;
+  ut_M_Tb* aux_Tb_0 = NULL;
+  Ref_Manager* aux_Tb_0_Refman = NULL;
+  ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = NULL;
   dt = &dt_Var;
   dt_Refman = LUMI_new_ref(dt);
   if (dt_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
@@ -2380,6 +2421,166 @@ ut_M_Data dt_Var = {0};
   otc_Dynamic = NULL;
   if (ut_M_ta != NULL) RAISE(6, 45, "non empty base class given as output argument")
   CHECK(6, ut_M_Data_get(dt, dt_Refman, (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic)) )
+  CHECK(7, ut_M_Data_get(dt, dt_Refman, (void*)&(aux_Tb_0), &(aux_Tb_0_Refman), &dynamic_Void) )
+  if (aux_Tb_0 == NULL) RAISE(7, 27, "used member of empty object")
+  if (aux_Tb_0_Refman->value == NULL) RAISE(7, 38, "used member of outdated weak reference")
+  ut_M_i = aux_Tb_0->_base.numa;
+/// @ t19
+typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Base {
+  Generic_Type* item;
+  Ref_Manager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
+};
+struct ut_M_Test {
+  ut_M_Base _base;
+};
+Returncode ut_M_Base_get(ut_M_Base* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self);
+Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, String* text, Ref_Manager* text_Refman);
+Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Base_get(ut_M_Base* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
+  Returncode LUMI_err = OK;
+LUMI_cleanup:
+  return LUMI_err;
+}
+void ut_M_Base_Del(ut_M_Base* self) {
+  if (self == NULL) return;
+  LUMI_dec_ref(self->item_Refman);
+}
+Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
+  Returncode LUMI_err = OK;
+  LUMI_inc_ref(text_Refman);
+  if (self == NULL) RAISE(6, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(6, 38, "used member of outdated weak reference")
+  LUMI_dec_ref(self->_base.item_Refman);
+  self->_base.item_Refman = text_Refman;
+  LUMI_inc_ref(self->_base.item_Refman);
+  self->_base.item_Dynamic = &String_dynamic;
+  self->_base.item = text;
+  CHECK(7, ut_M_Base_get(&(self->_base), self_Refman, (void*)&(text), &(text_Refman), &dynamic_Void) )
+LUMI_cleanup:
+  LUMI_dec_ref(text_Refman);
+  return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+  if (self == NULL) return;
+  ut_M_Base_Del(&(self->_base));
+}
+Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, String* text, Ref_Manager* text_Refman) {
+  Returncode LUMI_err = OK;
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(test_Refman);
+  LUMI_inc_ref(text_Refman);
+  if (test == NULL) RAISE(9, 27, "used member of empty object")
+  if (test_Refman->value == NULL) RAISE(9, 38, "used member of outdated weak reference")
+  LUMI_dec_ref(test->_base.item_Refman);
+  test->_base.item_Refman = text_Refman;
+  LUMI_inc_ref(test->_base.item_Refman);
+  test->_base.item_Dynamic = &String_dynamic;
+  test->_base.item = text;
+  CHECK(10, ut_M_Test_set(test, test_Refman, text, text_Refman) )
+  if (test == NULL) RAISE(11, 27, "used member of empty object")
+  if (test_Refman->value == NULL) RAISE(11, 38, "used member of outdated weak reference")
+  LUMI_dec_ref(text_Refman);
+  text_Refman = test->_base.item_Refman;
+  LUMI_inc_ref(text_Refman);
+  text = test->_base.item;
+  CHECK(12, ut_M_Base_get(&(test->_base), test_Refman, (void*)&(text), &(text_Refman), &dynamic_Void) )
+  CHECK(13, ut_M_Base_get(&(test->_base), test_Refman, (void*)&(aux_String_0), &(aux_String_0_Refman), &dynamic_Void) )
+  CHECK(13, String_clear(aux_String_0, aux_String_0_Refman) )
+LUMI_cleanup:
+  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(text_Refman);
+  LUMI_dec_ref(test_Refman);
+  return LUMI_err;
+}
+/// @ t20
+typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
+struct ut_M_Base {
+  Generic_Type* item;
+  Ref_Manager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
+};
+struct ut_M_Base_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*set)(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic);
+  Returncode (*get)(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+};
+struct ut_M_Test {
+  ut_M_Base _base;
+};
+struct ut_M_Test_Dynamic {
+  ut_M_Base_Dynamic _base;
+};
+Returncode ut_M_Base_set(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic);
+Returncode ut_M_Base_get(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self);
+Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic);
+Returncode ut_M_Test_get(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, ut_M_Test_Dynamic* test_Dynamic, String* text, Ref_Manager* text_Refman);
+ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_set, ut_M_Base_get};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {{(Dynamic_Del)ut_M_Test_Del, (Func)ut_M_Test_set, (Func)ut_M_Test_get}};
+Returncode ut_M_Base_set(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic) {
+  Returncode LUMI_err = OK;
+  LUMI_inc_ref(item_Refman);
+LUMI_cleanup:
+  LUMI_dec_ref(item_Refman);
+  return LUMI_err;
+}
+Returncode ut_M_Base_get(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
+  Returncode LUMI_err = OK;
+LUMI_cleanup:
+  return LUMI_err;
+}
+void ut_M_Base_Del(ut_M_Base* self) {
+  if (self == NULL) return;
+  LUMI_dec_ref(self->item_Refman);
+}
+Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic) {
+  Returncode LUMI_err = OK;
+  LUMI_inc_ref(item_Refman);
+LUMI_cleanup:
+  LUMI_dec_ref(item_Refman);
+  return LUMI_err;
+}
+Returncode ut_M_Test_get(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
+  Returncode LUMI_err = OK;
+LUMI_cleanup:
+  return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+  if (self == NULL) return;
+  ut_M_Base_Del(&(self->_base));
+}
+Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, ut_M_Test_Dynamic* test_Dynamic, String* text, Ref_Manager* text_Refman) {
+  Returncode LUMI_err = OK;
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(test_Refman);
+  LUMI_inc_ref(text_Refman);
+  if (test_Dynamic == NULL) RAISE(9, 28, "dynamic call of empty object")
+  CHECK(9, test_Dynamic->_base.set(&(test->_base), test_Refman, &(test_Dynamic->_base), text, text_Refman, &String_dynamic) )
+  if (test_Dynamic == NULL) RAISE(10, 28, "dynamic call of empty object")
+  CHECK(10, test_Dynamic->_base.get(&(test->_base), test_Refman, &(test_Dynamic->_base), (void*)&(text), &(text_Refman), &dynamic_Void) )
+  if (test_Dynamic == NULL) RAISE(11, 28, "dynamic call of empty object")
+  CHECK(11, test_Dynamic->_base.get(&(test->_base), test_Refman, &(test_Dynamic->_base), (void*)&(aux_String_0), &(aux_String_0_Refman), &dynamic_Void) )
+  CHECK(11, String_clear(aux_String_0, aux_String_0_Refman) )
+LUMI_cleanup:
+  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(text_Refman);
+  LUMI_dec_ref(test_Refman);
+  return LUMI_err;
+}
 /// @ teg0
 expected "}" after type parameters, got "new-line"
 /// @ teg1
@@ -2403,11 +2604,19 @@ cannot create generic array
 /// @ teg10
 cannot create generic array
 /// @ teg11
-cannot assign type "Test" with parameters into same type with more parameters "String"
+too few parameter given for type "Test"
+/// @ teg12
+no parameter given for type with parameters "Base"
+/// @ teg13
+parameter given for type with no parameters "Base"
+/// @ teg14
+too many parameters given for type "Base"
+/// @ teg15
+too few parameter given for type "Base"
 /// @ tec0
 unsupported primitive parameter type "Int"
 /// @ tec1
-too many parameter for type "Data"
+too many parameters given for type "Data"
 /// @ tec2
 unknown type "Error"
 /// @ tec3
@@ -3343,6 +3552,83 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, String
   LUMI_dec_ref(aux_TestIterator_0_Refman);
   aux_TestIterator_0_Refman = NULL;
   LUMI_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0 = NULL;
+LUMI_cleanup:
+  LUMI_dec_ref(aux_TestIterator_0_Refman);
+  LUMI_dec_ref(t_Refman);
+  LUMI_dec_ref(iter_Refman);
+  return LUMI_err;
+}
+/// @ t3
+typedef struct ut_M_TestIterator ut_M_TestIterator;
+typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
+struct ut_M_TestIterator {
+  Generic_Type* item;
+  Ref_Manager* item_Refman;
+  Generic_Type_Dynamic* item_Dynamic;
+};
+struct ut_M_TestIterator_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*has)(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic, Bool* has_data);
+  Returncode (*get)(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+  Returncode (*next)(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic);
+};
+Returncode ut_M_TestIterator_has(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic, Bool* has_data);
+Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+Returncode ut_M_TestIterator_next(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic);
+void ut_M_TestIterator_Del(ut_M_TestIterator* self);
+Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_TestIterator_Dynamic* iter_Dynamic, String** s, Ref_Manager** s_Refman);
+ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del, ut_M_TestIterator_has, ut_M_TestIterator_get, ut_M_TestIterator_next};
+Returncode ut_M_TestIterator_has(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic, Bool* has_data) {
+  Returncode LUMI_err = OK;
+LUMI_cleanup:
+  return LUMI_err;
+}
+Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
+  Returncode LUMI_err = OK;
+LUMI_cleanup:
+  return LUMI_err;
+}
+Returncode ut_M_TestIterator_next(ut_M_TestIterator* self, Ref_Manager* self_Refman, ut_M_TestIterator_Dynamic* self_Dynamic) {
+  Returncode LUMI_err = OK;
+LUMI_cleanup:
+  return LUMI_err;
+}
+void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
+  if (self == NULL) return;
+  LUMI_dec_ref(self->item_Refman);
+}
+Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_TestIterator_Dynamic* iter_Dynamic, String** s, Ref_Manager** s_Refman) {
+  Returncode LUMI_err = OK;
+  String* t = NULL;
+  Ref_Manager* t_Refman = NULL;
+  ut_M_TestIterator* aux_TestIterator_0 = NULL;
+  Ref_Manager* aux_TestIterator_0_Refman = NULL;
+  ut_M_TestIterator_Dynamic* aux_TestIterator_0_Dynamic = NULL;
+  LUMI_inc_ref(iter_Refman);
+  LUMI_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = iter_Refman;
+  LUMI_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Dynamic = iter_Dynamic;
+  aux_TestIterator_0 = iter;
+  while (true) {
+    Bool t_Has = false;
+    if (aux_TestIterator_0_Dynamic == NULL) RAISE(0, 28, "dynamic call of empty object")
+    CHECK(7, aux_TestIterator_0_Dynamic->has(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic, &(t_Has)) )
+    if (!t_Has) break;
+    if (aux_TestIterator_0_Dynamic == NULL) RAISE(0, 28, "dynamic call of empty object")
+    CHECK(7, aux_TestIterator_0_Dynamic->get(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic, (void*)&(t), &(t_Refman), &dynamic_Void) )
+    LUMI_dec_ref(*s_Refman);
+    *s_Refman = t_Refman;
+    LUMI_inc_ref(*s_Refman);
+    *s = t;
+    if (aux_TestIterator_0_Dynamic == NULL) RAISE(0, 28, "dynamic call of empty object")
+    CHECK(7, aux_TestIterator_0_Dynamic->next(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic) )
+  }
+  LUMI_dec_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Refman = NULL;
+  LUMI_inc_ref(aux_TestIterator_0_Refman);
+  aux_TestIterator_0_Dynamic = NULL;
   aux_TestIterator_0 = NULL;
 LUMI_cleanup:
   LUMI_dec_ref(aux_TestIterator_0_Refman);

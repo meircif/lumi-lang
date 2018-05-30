@@ -161,7 +161,8 @@ static TypeInstance
         while ? sub-type
         if not (? dec-node)
           node.m-syntax-error(
-              user "too many parameter for type", user self.type-data.name)
+              user "too many parameters given for type",
+              user self.type-data.name)
         if sub-type.item.type-data.is-primitive
           node.m-syntax-error(
               user "unsupported primitive parameter type",
@@ -170,6 +171,9 @@ static TypeInstance
           node.m-syntax-error-msg(user "array as parameter type is unsupported")
         sub-type := sub-type.next
         dec-node := dec-node.next
+      if ? dec-node
+        node.m-syntax-error(
+            user "too few parameter given for type", user self.type-data.name)
     else-if self.type-data = glob.type-func and not (? self.arguments)
       node.m-syntax-error-msg(user "missing arguments in function type")
   
@@ -219,6 +223,7 @@ static TypeInstance
             user "into different generic subtype",
             user target.name)
     user TypeInstance self-type-instance(self)
+    owner TypeInstance base-type-instance
     do
       while not target.type-data.m-is-same(user self-type-instance.type-data)
       if not (? self-type-instance.type-data.base-type)
@@ -227,7 +232,10 @@ static TypeInstance
             user self.type-data.name,
             user "into",
             user target.type-data.name)
-      self-type-instance := self-type-instance.type-data.base-type
+      owner TypeInstance prev-base-type-instance(base-type-instance)
+      self-type-instance.type-data.base-type.f-new-replace-params(
+          user self-type-instance, copy 0):(owner base-type-instance)
+      self-type-instance := base-type-instance
       bases += 1
     
     if ? self.arguments
@@ -259,13 +267,7 @@ static TypeInstance
     
     user ListNode{TypeInstance} my-sub-type(self.parameters.first)
     do
-      while ? target-sub-type
-      if not (? my-sub-type)
-        node.m-syntax-error2(
-            user "cannot assign type",
-            user self.type-data.name,
-            user "with parameters into same type with more parameters",
-            user target-sub-type.item.type-data.name)
+      while ? target-sub-type and ? my-sub-type
       if my-sub-type.item.type-data != target-sub-type.item.type-data
         node.m-syntax-error2(
             user "non matching subtypes",
@@ -297,8 +299,11 @@ static TypeInstance
     if not (? instance-type)
       return
     if bases > 0
-      self.f-replace-type-parameters(
-          user instance-type.type-data.base-type, copy bases - 1)
+      owner TypeInstance base-type
+      instance-type.type-data.base-type.f-new-replace-params(
+          user instance-type, copy bases - 1):(owner base-type)
+      self.f-replace-type-parameters(user base-type, copy bases - 1)
+      delete base-type
     if self.type-data = glob.type-generic and ? instance-type.parameters and
         ? instance-type.type-data.parameters
       user ListNode{String} dec-node(instance-type.type-data.parameters.first)

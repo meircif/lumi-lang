@@ -227,6 +227,12 @@ func name(
   owner Array{Class} ac
   owner Array{Int} ai
   owner Array{File} af
+## @ g t9
+class Test
+  var Int x
+  func dynamic meth()
+func name()->(owner Test t)
+  t := _
 ## @ g tm0
 main
   var Int x
@@ -849,6 +855,8 @@ mock Test.delete()
 assert-error t.num , "error"
 ## @ ec te19
 assert-error t.num,"error"
+## @ ec te19-copy
+assert-error t.num,"error"
 ## @ ec te20
 assert-error t.num,  "error"
 ## @ ec te21
@@ -976,6 +984,7 @@ var Data{Data{Data{String}}} dr
 d.set(owner so, user sarr)
 ## @ c t13
 d.get()->(user str)
+  d.get().clear()
 ## @ c t14
 var Data dg
 ## @ c t15
@@ -994,6 +1003,33 @@ var Data{Tb} dt
   owner Tc otc
   dt.set(owner otc, user _)
   dt.get()->(user ta)
+  i := dt.get().numa
+## @ g t19
+struct Base{Generic}
+  user Generic item
+  func get()->(user Generic item)
+struct Test(Base{String})
+  func set(user String text)
+    self.item := text
+    self.get()->(user text)
+func mock(user Test test, user String text)
+  test.item := text
+  test.set(user text)
+  text := test.item
+  test.get()->(user text)
+  test.get().clear()
+## @ g t20
+class Base{Param}
+  user Param item
+  func dynamic set(user Param item)
+  func dynamic get()->(user Param item)
+class Test{Generic}(Base{Generic})
+  func dynamic set(user Generic item)
+  func dynamic get()->(user Generic item)
+func mock(user Test{String} test, user String text)
+  test.set(user text)
+  test.get()->(user text)
+  test.get().clear()
 ## @ eg teg0
 struct Test{First:Second:Third
 ## @ eg teg1
@@ -1050,6 +1086,23 @@ struct Test{First:Second:Third}
   user Third third
 func meth(user Test{String:String} t)
   user Test{String:String:String} error(user t)
+## @ eg teg12
+struct Base{Param}
+  user Param item
+struct Error(Base)
+## @ eg teg13
+struct Base
+  user Int x
+struct Error(Base{String})
+## @ eg teg14
+struct Base{Param}
+  user Param item
+struct Error(Base{String:String})
+## @ eg teg15
+struct Base{Param0:Param1}
+  user Param0 item0
+  user Param1 item1
+struct Error(Base{String})
 ## @ ec tec0
 var Data{Int} error
 ## @ ec tec1
@@ -1251,6 +1304,15 @@ struct TestIterator{Generic}
   func has()->(var Bool has-data)
   func get()->(user Generic item)
   func next()
+func f-mock(user TestIterator{String} iter)->(user String s)
+  for t in iter
+    s := t
+## @ g t3
+class TestIterator{Generic}
+  user Generic item
+  func dynamic has()->(var Bool has-data)
+  func dynamic get()->(user Generic item)
+  func dynamic next()
 func f-mock(user TestIterator{String} iter)->(user String s)
   for t in iter
     s := t

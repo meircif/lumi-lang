@@ -4317,7 +4317,7 @@ Returncode integration_M_test_complex_delete(void) {
   TEST_ASSERT(272, ! (l2 != NULL && l2_Refman->value != NULL))
   if (t3 == NULL) RAISE(273, 27, "used member of empty object")
   if (t3_Refman->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
-  if (t3->item_Dynamic != NULL) t3->item_Dynamic->_del(t3->item);
+  if (t3->item_Dynamic != NULL) ((integration_M_BaseLink_Dynamic*)(t3->item_Dynamic))->_del(t3->item);
   LUMI_owner_dec_ref(t3->item_Refman);
   t3->item_Refman = b2_Refman;
   t3->item_Dynamic = (Generic_Type_Dynamic*)b2_Dynamic;
@@ -4328,7 +4328,7 @@ Returncode integration_M_test_complex_delete(void) {
   TEST_ASSERT(274, ! (b2 != NULL && b2_Refman->value != NULL))
   if (t2 == NULL) RAISE(275, 27, "used member of empty object")
   if (t2_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-  if (t2->item_Dynamic != NULL) t2->item_Dynamic->_del(t2->item);
+  if (t2->item_Dynamic != NULL) ((integration_M_BaseLink_Dynamic*)(t2->item_Dynamic))->_del(t2->item);
   LUMI_owner_dec_ref(t2->item_Refman);
   t2->item_Refman = t3_Refman;
   t2->item_Dynamic = (Generic_Type_Dynamic*)&(t3_Dynamic->_base);

@@ -213,7 +213,7 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {
     return true;
   }
 
-  printf("%d%% - failed, not covered:\n", coverage);
+  printf("%d%% - failed, lines not covered:\n", coverage);
   for (n = 0; n < files_number; ++n) {
     coverage = calc_coverage(files_coverage + n, 1);
     if (coverage < 100) {
