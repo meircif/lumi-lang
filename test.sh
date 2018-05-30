@@ -205,15 +205,15 @@ cp ../standard-libraries/tests/*.4.lm standard-libraries
 $CCA -Wno-unused-variable standard-libraries/math-tests.c ../TL4/lumi.4.c \
   -I../TL4 -o math-tests
 ./math-tests -xml
-mkdir math-tests
-mv cobertura.xml math-tests
+mkdir cover-math-tests
+mv cobertura.xml cover-math-tests
 ./tl4-compiler standard-libraries/ds-tests.c standard-libraries/*.4.lm \
   -t ds
 $CCA -Wno-unused-variable standard-libraries/ds-tests.c ../TL4/lumi.4.c \
   -I../TL4 -o ds-tests
 ./ds-tests -xml
-mkdir ds-tests
-mv cobertura.xml ds-tests
+mkdir cover-ds-tests
+mv cobertura.xml cover-ds-tests
 
 
 # --< Documentation >--
