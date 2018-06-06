@@ -191,9 +191,10 @@ class BinaryExpression(UnaryExpression)
           owner self.right-expression, user self.assignee)
     else-if self.operator.order = 1 and self.operator.name[0] = 'i'
       # `is`/`is-not` operator
-      self.test-not-int(user self.right-expression)
-      self.test-not-int(user self.left-expression)
-      self.set-simple-type(user glob.type-bool)
+      self.analyze-equalizer(copy true)
+    else-if self.operator.name.equal(user "=") or
+        self.operator.name.equal(user "!=")
+      self.analyze-equalizer(copy false)
     else
       # any other Int operator
       if self.operator.order = 1 and ? self.binary-left-expression and
@@ -219,9 +220,16 @@ class BinaryExpression(UnaryExpression)
   func inst test-operands-type(user TypeData expected-type)
     self.test-operand-type(user self.right-expression, user expected-type)
     self.test-operand-type(user self.left-expression, user expected-type)
-  
-  func inst test-not-int(user Expression operand)
-    if operand.result-type.type-data.m-is-same(user glob.type-int)
+        
+  func inst analyze-equalizer(copy Bool is-reference)
+    self.test-is-reference(copy is-reference, user self.right-expression)
+    self.test-is-reference(copy is-reference, user self.left-expression)
+    self.set-simple-type(user glob.type-bool)
+        
+  func inst test-is-reference(copy Bool is-reference, user Expression operand)
+    if (not operand.result-type.type-data.is-primitive or
+        operand.result-type.type-data = glob.type-func or
+        operand.result-type.type-data = glob.type-ref) != is-reference
       self.m-syntax-error2(
           user "operator",
           user self.operator.name,
@@ -281,7 +289,12 @@ class BinaryExpression(UnaryExpression)
             not self.right-expression.is-generic-cast
           write(user "(Generic_Type_Dynamic*)")
           self.right-expression.top := false
+        else-if self.right-expression.is-generic-cast and
+            not self.left-expression.is-generic-cast and
+            not (self.left-expression.result-type.type-data = glob.type-generic)
+          self.right-expression.top := false
         self.right-expression.write-dynamic()
+        self.right-expression.top := true
       write(user ";\n")
       self.code-node.write-spaces()
   
@@ -321,7 +334,12 @@ class BinaryExpression(UnaryExpression)
   
   func dynamic write()
     self.write-start()
+    if self.operator.order = 1 and self.operator.name[0] = 'i'
+      # `is`/`is-not` operator
+      write(user "(void*)")
+      self.left-expression.top := false
     self.left-expression.write()
+    self.left-expression.top := true
     var Bool expand-and(self.operator.order = 1 and
         ? self.binary-left-expression and
         self.binary-left-expression.operator.order = 1)

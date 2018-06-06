@@ -74,8 +74,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
     if (self->_base._base.result_type->type_data == glob->type_array && ((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->type_data == glob->type_generic) {
       CHECK(50, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){28, 27, "cannot create generic array"}) )
     }
-    Int _Int47;
-    CHECK(51, TypeData_find_meth(self->_base._base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int47)) )
+    Int _Int48;
+    CHECK(51, TypeData_find_meth(self->_base._base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int48)) )
     if (!(NULL != self->arguments->parameters->first) &&  ! (NULL != self->arguments->outputs->first) && (!(NULL != self->constructor) || self->_base._base.result_type->type_data == glob->type_string)) {
       self->constructor = NULL;
     }
@@ -90,8 +90,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
         self_param->code_node = self->_base._base.code_node;
         self_param->value = &(self->symbol->_base);
         CHECK(63, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-        Bool _Bool48;
-        CHECK(64, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base._base.result_type, 0, &(_Bool48)) )
+        Bool _Bool49;
+        CHECK(64, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base._base.result_type, 0, &(_Bool49)) )
       }
       else {
         CHECK(67, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){23, 22, "no contructor for type"}, self->_base._base.result_type->type_data->name) )
@@ -286,11 +286,15 @@ Returncode InitExpression_write_assign(InitExpression* self) {
     CHECK(208, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
     CHECK(209, (self->symbol)->_base._base._dtl[4](self->symbol) )
     CHECK(210, write(&(String){12, 11, "_Dynamic = "}) )
-    CHECK(211, (value)->_base._dtl[5](value) )
-    CHECK(212, write(&(String){3, 2, ";\n"}) )
+    if (value->is_generic_cast) {
+      value->top = false;
+    }
+    CHECK(213, (value)->_base._dtl[5](value) )
+    value->top = true;
+    CHECK(215, write(&(String){3, 2, ";\n"}) )
   }
   
-  CHECK(214, FunctionArguments_write_postactions(self->arguments) )
+  CHECK(217, FunctionArguments_write_postactions(self->arguments) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -301,8 +305,8 @@ Returncode InitExpression_write_preactions(InitExpression* self);
 static char* _func_name_InitExpression_write_preactions = "InitExpression.write-preactions";
 #define LUMI_FUNC_NAME _func_name_InitExpression_write_preactions
 Returncode InitExpression_write_preactions(InitExpression* self) {
-  CHECK(217, InitExpression_write_allocation(self) )
-  CHECK(218, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(220, InitExpression_write_allocation(self) )
+  CHECK(221, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -315,17 +319,17 @@ static char* _func_name_InitExpression_write = "InitExpression.write";
 Returncode InitExpression_write(InitExpression* self) {
   if (self->_base._base.is_statement) {
     if (!self->_base._base.result_type->type_data->is_primitive && self->symbol->variable->is_create) {
-      CHECK(224, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-      CHECK(225, InitExpression_write_allocation(self) )
+      CHECK(227, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+      CHECK(228, InitExpression_write_allocation(self) )
     }
     else {
       if (NULL != self->arguments->parameters->first) {
-        CHECK(227, InitExpression_write_assign(self) )
+        CHECK(230, InitExpression_write_assign(self) )
       }
     }
   }
   else {
-    CHECK(229, (self->symbol)->_base._base._dtl[4](self->symbol) )
+    CHECK(232, (self->symbol)->_base._base._dtl[4](self->symbol) )
   }
   return OK;
 }

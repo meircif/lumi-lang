@@ -216,6 +216,12 @@ class Base
 class Test(Base)
   func dynamic meth(owner Test t)
     base(owner t)
+## @ g t20
+class Test
+  var Int x
+  func dynamic meth()
+func mock()->(user Test t)
+  mock()->(user t).meth()
 ## @ ec te0
 function( copy 1)
 ## @ ec te1
@@ -233,7 +239,7 @@ i()
 ## @ ec te7
 fun5(copy 0)->(var 4)
 ## @ ec te8
-fun7()->(user tc)
+fun7(user _)->(user tc)
 ## @ ec te9
 fun5(copy i := 1)
 ## @ ec te10
@@ -243,7 +249,7 @@ fun1(copy 3, user str, owner str)
 ## @ ec te12
 fun3(copy 3)->(owner str)
 ## @ ec te13
-fun7()->(user tb)
+fun7(user _)->(user tb)
 ## @ ec te14
 fun0(copy i)
 ## @ ec te15
@@ -372,13 +378,13 @@ owner String s
 ## @ c t9
 str := so
 ## @ c t10
-b := t is ta or tb is-not tc
+b := t is ta or tc is-not tb
 ## @ c t11
 c := '0' + 4
 ## @ c t12
 b := fun0 is-not fun1
 ## @ c t13
-b := b is b
+b := b = b
 ## @ c t14
 owner Tc otc
   tb := otc
@@ -423,6 +429,8 @@ user Array{Char} ca
 ## @ ec te17
 owner Test ot
   ot := tb
+## @ ec te18
+b := b is b
 ## @@ test-question-expression
 ## @ c t0
 b := str?
@@ -432,6 +440,8 @@ b := not str?
 b := t.fun?
 ## @ c t3
 b := to?
+## @ c t4
+b := fun7(user _)->(user to)?
 ## @ ec te0
 (i := 2)?
 ## @ ec te1
@@ -470,7 +480,22 @@ tc.dyn()
 ## @ c t14
 tco.dyn()
 ## @ c t15
-fun7()->(user ta)
+fun7(user tc)->(user ta)
+## @ g t16
+class Test
+  var Int x
+  func dynamic meth()
+func mock()->(user Test t)
+  t.meth()
+## @ g t17
+class Base
+  var Int x
+  func dynamic meth()
+class Test(Base)
+  func inst fun()
+    self.meth()
+## @ c t18
+fun7(user _)
 ## @@ test-function-object
 ## @ c t0
 var Func{()} fun

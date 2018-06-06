@@ -170,7 +170,7 @@ class MemberExpression(SymbolExpression)
       if self.function.is-dynamic and
           self.instance.result-type.type-data != glob.type-type and
           self.instance.result-type.type-data != glob.type-base
-        self.bases := self.function.dynamic-base-count
+        self.bases += self.function.dynamic-base-count
         self.function := self.function.dynamic-base-method
         if not self.instance.is-complex-field
           self.dynamic-call-self-instance := self.instance
@@ -256,7 +256,10 @@ class MemberExpression(SymbolExpression)
   
   func dynamic write()
     if ? self.dynamic-call-self-instance
+      var Bool top(self.dynamic-call-self-instance.top)
+      self.dynamic-call-self-instance.top := false
       self.dynamic-call-self-instance.write-dynamic()
+      self.dynamic-call-self-instance.top := top
       self.write-bases()
       write-cname(user self.function.name)
       return

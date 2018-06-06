@@ -1004,6 +1004,9 @@ var Data{Tb} dt
   dt.set(owner otc, user _)
   dt.get()->(user ta)
   i := dt.get().numa
+  fun7(user dt.item)->(user dt.item)
+  user Tb tb2(user dt.item)
+  tb2 := dt.item
 ## @ g t19
 struct Base{Generic}
   user Generic item

@@ -264,7 +264,7 @@ Returncode CharExpression_parse(CharExpression* self, String* text) {
       }
       if ((2) < 0 || (2) >= (text)->length) RAISE(99)
       Bool _Bool37;
-      CHECK(99, String_has(&(String){12, 11, "'\"?\\abfnrtv"}, ((text)->values[2]), &(_Bool37)) )
+      CHECK(99, String_has(&(String){13, 12, "'\"?\\abfnrtv0"}, ((text)->values[2]), &(_Bool37)) )
       if (!_Bool37) {
         CHECK(100, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){27, 26, "illegal character constant"}, text) )
       }

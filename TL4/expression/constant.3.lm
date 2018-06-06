@@ -96,7 +96,7 @@ class CharExpression(TextExpression)
     else-if text.length = 4
       if text[1] != '\\'
         self.m-syntax-error(user "illegal character constant", user text)
-      if not "'\"?\\abfnrtv".has(copy text[2])
+      if not "'\"?\\abfnrtv0".has(copy text[2])
         self.m-syntax-error(user "illegal character constant", user text)
     else-if text.length = 6
       if text[1] != '\\'
