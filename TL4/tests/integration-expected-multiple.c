@@ -1719,8 +1719,8 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if ((2) < 0 || (2) >= (arri)->length) RAISE(90, 25, "slice index out of bounds")
   if (arri == NULL) RAISE(90, 29, "empty object used as sequence")
   if (arri_Refman->value == NULL) RAISE(90, 40, "outdated weak reference used as sequence")
-  if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (((*i) + 3) - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(90, 25, "slice index out of bounds")
-  *i = (((((Int*)((arri)->values))[((*i) + 3) - (((Int*)((arri)->values))[2])]) + (((integration_M_TestStruct*)((arrt)->values)) + 4)->num) + (((integration_M_TestStruct*)((aux_Array_3)->values)) + 1)->num) + (((Int*)((aux_Array_2)->values))[1]);
+  if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (*i + 3 - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(90, 25, "slice index out of bounds")
+  *i = (((((Int*)((arri)->values))[*i + 3 - (((Int*)((arri)->values))[2])]) + (((integration_M_TestStruct*)((arrt)->values)) + 4)->num) + (((integration_M_TestStruct*)((aux_Array_3)->values)) + 1)->num) + (((Int*)((aux_Array_2)->values))[1]);
   aux_Array_4 = &aux_Array_4_Var;
   aux_Array_4_Refman = LUMI_new_ref(aux_Array_4);
   if (aux_Array_4_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
@@ -1739,7 +1739,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Array_5_Var.values = (Byte*)((arri)->values) + ((2 - (*i)) + (((Int*)((aux_Array_4)->values))[1]));
   if (arri == NULL) RAISE(92, 29, "empty object used as sequence")
   if (arri_Refman->value == NULL) RAISE(92, 40, "outdated weak reference used as sequence")
-  if (((2 - (*i)) + (((Int*)((aux_Array_4)->values))[1])) < 0 || (5 * ((*i) - 1)) < 0 || ((2 - (*i)) + (((Int*)((aux_Array_4)->values))[1])) + (5 * ((*i) - 1)) > (arri)->length) RAISE(92, 25, "slice index out of bounds")
+  if ((2 - (*i) + (((Int*)((aux_Array_4)->values))[1])) < 0 || (5 * (*i - 1)) < 0 || (2 - (*i) + (((Int*)((aux_Array_4)->values))[1])) + (5 * (*i - 1)) > (arri)->length) RAISE(92, 25, "slice index out of bounds")
   LUMI_dec_ref(*arrio_Refman);
   *arrio_Refman = arri_Refman;
   LUMI_inc_ref(*arrio_Refman);
@@ -2457,7 +2457,7 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
     if (arr_Refman->value == NULL) RAISE(295, 40, "outdated weak reference used as sequence")
     if ((2) < 0 || (2) >= (arr)->length) RAISE(295, 25, "slice index out of bounds")
     x = ((Int*)((arr)->values))[2];
-    if (!((x > 3) && (arr == NULL))) break;
+    if (!((x > 3) && ((void*)arr == NULL))) break;
     y = x - 1;
     while (true) {
       if (arr == NULL) RAISE(299, 29, "empty object used as sequence")
@@ -2505,7 +2505,7 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
     if (arr == NULL) RAISE(308, 29, "empty object used as sequence")
     if (arr_Refman->value == NULL) RAISE(308, 40, "outdated weak reference used as sequence")
     if ((3) < 0 || (2) < 0 || (3) + (2) > (arr)->length) RAISE(308, 25, "slice index out of bounds")
-    if ((w > 4) && (arr != aux_Array_0)) {
+    if ((w > 4) && ((void*)arr != aux_Array_0)) {
       if (arr == NULL) RAISE(309, 29, "empty object used as sequence")
       if (arr_Refman->value == NULL) RAISE(309, 40, "outdated weak reference used as sequence")
       if ((1) < 0 || (1) >= (arr)->length) RAISE(309, 25, "slice index out of bounds")
@@ -4108,7 +4108,7 @@ Returncode integration_M_test_simple_delete(void) {
   TEST_ASSERT(215, integration_M_deleted_links != NULL && integration_M_deleted_links_Refman->value != NULL)
   if (integration_M_deleted_links == NULL) RAISE(216, 27, "used member of empty object")
   if (integration_M_deleted_links_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
-  TEST_ASSERT(216, integration_M_deleted_links->ref == l_ref)
+  TEST_ASSERT(216, (void*)integration_M_deleted_links->ref == l_ref)
   if (integration_M_deleted_links == NULL) RAISE(217, 27, "used member of empty object")
   if (integration_M_deleted_links_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
   TEST_ASSERT(217, ! (integration_M_deleted_links->next != NULL && integration_M_deleted_links->next_Refman->value != NULL))
@@ -4119,7 +4119,7 @@ Returncode integration_M_test_simple_delete(void) {
   TEST_ASSERT(219, integration_M_deleted_refmans != NULL && integration_M_deleted_refmans_Refman->value != NULL)
   if (integration_M_deleted_refmans == NULL) RAISE(220, 27, "used member of empty object")
   if (integration_M_deleted_refmans_Refman->value == NULL) RAISE(220, 38, "used member of outdated weak reference")
-  TEST_ASSERT(220, integration_M_deleted_refmans->ref == l_ref)
+  TEST_ASSERT(220, (void*)integration_M_deleted_refmans->ref == l_ref)
   if (integration_M_deleted_refmans == NULL) RAISE(221, 27, "used member of empty object")
   if (integration_M_deleted_refmans_Refman->value == NULL) RAISE(221, 38, "used member of outdated weak reference")
   TEST_ASSERT(221, ! (integration_M_deleted_refmans->next != NULL && integration_M_deleted_refmans->next_Refman->value != NULL))
@@ -4162,7 +4162,7 @@ Returncode integration_M_f_has_ref_rec(Ref ref, integration_M_RefNode** node, Re
   TEST_ASSERT(232, (*node) != NULL && (*node_Refman)->value != NULL)
   if (*node == NULL) RAISE(233, 27, "used member of empty object")
   if ((*node_Refman)->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
-  if ((*node)->ref == ref) {
+  if ((void*)(*node)->ref == ref) {
     if (*node == NULL) RAISE(234, 27, "used member of empty object")
     if ((*node_Refman)->value == NULL) RAISE(234, 38, "used member of outdated weak reference")
     next = (*node)->next;
