@@ -208,7 +208,10 @@ class InitExpression(ModuleTypeExpression)
       self.code-node.write-spaces()
       self.symbol.write()
       write(user "_Dynamic = ")
+      if value.is-generic-cast
+        value.top := false
       value.write-dynamic()
+      value.top := true
       write(user ";\n")
     
     self.arguments.write-postactions()

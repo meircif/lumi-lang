@@ -64,7 +64,7 @@ Returncode ut_M_fun3(Int x, String** s, Ref_Manager** s_Refman);
 Returncode ut_M_fun4(Int x);
 Returncode ut_M_fun5(Int x, Int* y);
 Returncode ut_M_fun6(Int x, Int y, Int* n, Int* m);
-Returncode ut_M_fun7(ut_M_Tb** tb, Ref_Manager** tb_Refman, ut_M_Tb_Dynamic** tb_Dynamic);
+Returncode ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dynamic, ut_M_Tb** tbo, Ref_Manager** tbo_Refman, ut_M_Tb_Dynamic** tbo_Dynamic);
 Returncode ut_M_mock(String** so, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 ut_M_Ta_Dynamic ut_M_Ta_dynamic = {(Dynamic_Del)ut_M_Ta_Del, ut_M_Ta_dyn};
@@ -209,9 +209,11 @@ Returncode ut_M_fun6(Int x, Int y, Int* n, Int* m) {
 LUMI_cleanup:
   return LUMI_err;
 }
-Returncode ut_M_fun7(ut_M_Tb** tb, Ref_Manager** tb_Refman, ut_M_Tb_Dynamic** tb_Dynamic) {
+Returncode ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dynamic, ut_M_Tb** tbo, Ref_Manager** tbo_Refman, ut_M_Tb_Dynamic** tbo_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(tb_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(tb_Refman);
   return LUMI_err;
 }
 Returncode ut_M_mock(String** so, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {

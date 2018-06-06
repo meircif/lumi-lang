@@ -50,6 +50,7 @@ class CallExpression(Expression)
       output.set-location()
       output.is-output := true
       output.is-native := declaration.outputs.last.item.is-native
+      output.is-dynamic := result-type.type-data.is-dynamic
       output.is-generic :=
           declaration.outputs.last.item.get-type-instance().type-data =
           glob.type-generic
@@ -81,7 +82,21 @@ class CallExpression(Expression)
     if self.is-statement
       self.write-func-call()
     else-if ? self.output
+      self.output.top := self.top
       self.output.write()
+      self.output.top := true
+  
+  func dynamic write-refman()
+    if ? self.output
+      self.output.top := self.top
+      self.output.write-refman()
+      self.output.top := true
+  
+  func dynamic write-dynamic()
+    if ? self.output
+      self.output.top := self.top
+      self.output.write-dynamic()
+      self.output.top := true
   
   func inst write-func-call()
     self.write-call()
@@ -180,7 +195,10 @@ class CallArgument(Argument)
         write(user "(void*)")
       if self.is-output
         write(user "&(")
+      if self.value.is-generic-cast
+        self.value.top := false
       self.value.write-dynamic()
+      self.value.top := true
       if self.is-output
         write(user ")")
     else-if self.is-generic

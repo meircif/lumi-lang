@@ -1878,7 +1878,7 @@ Ref r = NULL;
   r = ut_M_str;
 /// @ tr4
 Ref r = NULL;
-  TEST_ASSERT(2, r == r)
+  TEST_ASSERT(2, (void*)r == r)
 /// @ te0
 got "Int" expression, expected "Bool"
 /// @ te1
@@ -2395,6 +2395,9 @@ ut_M_Data dt_Var = {0};
   ut_M_Tc* otc = NULL;
   Ref_Manager* otc_Refman = NULL;
   ut_M_Tc_Dynamic* otc_Dynamic = NULL;
+  ut_M_Tb* tb2 = NULL;
+  Ref_Manager* tb2_Refman = NULL;
+  ut_M_Tb_Dynamic* tb2_Dynamic = NULL;
   ut_M_Tb* aux_Tb_0 = NULL;
   Ref_Manager* aux_Tb_0_Refman = NULL;
   ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = NULL;
@@ -2421,10 +2424,28 @@ ut_M_Data dt_Var = {0};
   otc_Dynamic = NULL;
   if (ut_M_ta != NULL) RAISE(6, 45, "non empty base class given as output argument")
   CHECK(6, ut_M_Data_get(dt, dt_Refman, (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic)) )
-  CHECK(7, ut_M_Data_get(dt, dt_Refman, (void*)&(aux_Tb_0), &(aux_Tb_0_Refman), &dynamic_Void) )
+  CHECK(7, ut_M_Data_get(dt, dt_Refman, (void*)&(aux_Tb_0), &(aux_Tb_0_Refman), (void*)&(aux_Tb_0_Dynamic)) )
   if (aux_Tb_0 == NULL) RAISE(7, 27, "used member of empty object")
   if (aux_Tb_0_Refman->value == NULL) RAISE(7, 38, "used member of outdated weak reference")
   ut_M_i = aux_Tb_0->_base.numa;
+  if (dt == NULL) RAISE(8, 27, "used member of empty object")
+  if (dt_Refman->value == NULL) RAISE(8, 38, "used member of outdated weak reference")
+  if (dt == NULL) RAISE(8, 27, "used member of empty object")
+  if (dt_Refman->value == NULL) RAISE(8, 38, "used member of outdated weak reference")
+  CHECK(8, ut_M_fun7(dt->item, dt->item_Refman, ((ut_M_Tb_Dynamic*)(dt->item_Dynamic)), &(dt->item), &(dt->item_Refman), &(((ut_M_Tb_Dynamic*)(dt->item_Dynamic)))) )
+  if (dt == NULL) RAISE(9, 27, "used member of empty object")
+  if (dt_Refman->value == NULL) RAISE(9, 38, "used member of outdated weak reference")
+  tb2 = dt->item;
+  tb2_Refman = dt->item_Refman;
+  LUMI_inc_ref(tb2_Refman);
+  tb2_Dynamic = ((ut_M_Tb_Dynamic*)(dt->item_Dynamic));
+  if (dt == NULL) RAISE(10, 27, "used member of empty object")
+  if (dt_Refman->value == NULL) RAISE(10, 38, "used member of outdated weak reference")
+  LUMI_dec_ref(tb2_Refman);
+  tb2_Refman = dt->item_Refman;
+  LUMI_inc_ref(tb2_Refman);
+  tb2_Dynamic = ((ut_M_Tb_Dynamic*)(dt->item_Dynamic));
+  tb2 = dt->item;
 /// @ t19
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Test ut_M_Test;
