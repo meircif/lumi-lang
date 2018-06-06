@@ -1,0 +1,188 @@
+~~~ TL5 compiler - Slice expression ~~~
+module tl5-compiler
+
+~~~ A slice expression ~~~
+class SliceExpression(Expression)
+  owner Expression sequence
+  owner Expression index
+  owner Expression second-index
+  owner SymbolExpression slice-symbol
+  
+  func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
+      owner Expression expression, var Char end)
+    new SliceExpression slice-expression
+    slice-expression.parse(owner expression, user code-node)->(var end)
+    expression := slice-expression
+  
+  ~~~ parsing `sequence[index]` or `sequence[index:second-index]` ~~~
+  func inst parse(owner Expression sequence, user SyntaxTreeCode code-node)->(
+      var Char end)
+    self.code-node := code-node
+    self.sequence := sequence
+    self.access := Access.VAR
+    self.set-location()
+    parse-new-expression(user ":]", user code-node)->(
+        owner self.index, var end)
+    if end = ':'
+      parse-new-expression(user "]", user code-node)->(
+          owner self.second-index, var end)
+    if end != ']'
+      self.syntax-error-c(user "expected \"]\", got", copy end)
+    read-c()->(var end)
+  
+  func dynamic analyze()
+    self.sequence.analyze()
+    if not self.sequence.result-type?
+      self.syntax-error-msg(user "cannot slice a void expression")
+    if self.sequence.result-type.type-data is glob.type-string
+      if not self.second-index?
+        self.set-simple-type(user glob.type-char)
+    else-if self.sequence.result-type.type-data is glob.type-array
+      if not self.second-index?
+        self.sequence.result-type.parameters.first.item.copy-new()->(
+            owner self.result-type)
+      if self.sequence.result-type.parameters.first.item.type-data is
+          glob.type-generic
+        self.syntax-error-msg(user "cannot slice generic array")
+    else
+      self.syntax-error(
+          user "cannot slice type",
+          user self.sequence.result-type.type-data.name)
+    self.assignable := self.sequence.assignable and
+        not self.second-index? and self.result-type.type-data.is-primitive
+    
+    self.index.analyze()
+    self.check-index(user self.index)
+    
+    if self.second-index?
+      self.second-index.analyze()
+      self.check-index(user self.second-index)
+      self.sequence.result-type.copy-new()->(owner self.result-type)
+      self.add-aux-variable(
+          copy Access.VAR, copy false, user self.result-type)->(
+          owner self.slice-symbol)
+  
+  func inst check-index(user Expression index)
+    if index.result-type?
+      if index.result-type.type-data is-not glob.type-int
+        self.syntax-error(
+            user "expected integer index for slice, got",
+            user index.result-type.type-data.name)
+    else
+      self.syntax-error-msg(
+          user "expected integer index for slice, got void expression")
+  
+  func dynamic write-preactions()
+    self.sequence.write-preactions()
+    self.index.write-preactions()
+    
+    if self.second-index?
+      self.second-index.write-preactions()
+      self.write-init-var-ref(user self.slice-symbol)
+      self.write-refman-init(user self.slice-symbol)
+      ; symbol_Var.length = second;
+      ; symbol_Var.max_length = symbol.length + 1;
+      ; symbol_Var.values = (seq)->values + (index);
+      ; symbol_Var.values = (Byte*)((seq)->values) + (index);
+      self.code-node.write-spaces()
+      self.slice-symbol.write()
+      write(user "_Var.length = ")
+      self.second-index.write()
+      write(user ";\n")
+      self.code-node.write-spaces()
+      if self.sequence.result-type.type-data is glob.type-string
+        self.slice-symbol.write()
+        write(user "_Var.max_length = ")
+        self.slice-symbol.write()
+        write(user "_Var.length + 1;\n")
+        self.code-node.write-spaces()
+      self.slice-symbol.write()
+      write(user "_Var.values = (")
+      if self.sequence.result-type.type-data is-not glob.type-string
+        write(user "Byte*)((")
+      self.sequence.write()
+      write(user ")->values")
+      if self.sequence.result-type.type-data is-not glob.type-string
+        write(user ")")
+      write(user " + (")
+      self.index.write()
+      write(user ");\n")
+      self.code-node.write-spaces()
+    
+    ; if (seq == NULL) RAISE("empty object used as sequence")
+    ; if (seq_Refman->value == NULL)
+    ;   RAISE("outdated weak reference used as sequence")
+    write(user "if (")
+    self.sequence.write-as-top()
+    write(user " == NULL) ")
+    self.write-raise(user "empty object used as sequence")
+    self.code-node.write-spaces()
+    write(user "if (")
+    self.sequence.write-refman()
+    write(user "->value == NULL) ")
+    self.write-raise(user "outdated weak reference used as sequence")
+    self.code-node.write-spaces()
+    
+    ; if ((index) < 0 || (index) >= (seq)->length)
+    ; if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length)
+    ;     RAISE("slice index out of bounds")
+    write(user "if ((")
+    self.index.write()
+    write(user ") < 0 || (")
+    if self.second-index?
+      self.second-index.write()
+      write(user ") < 0 || (")
+    self.index.write()
+    write(user ") ")
+    if self.second-index?
+      write(user "+ (")
+      self.second-index.write()
+      write(user ") >")
+    else
+      write(user ">=")
+    write(user " (")
+    self.sequence.write()
+    write(user ")->length) ")
+    self.write-raise(user "slice index out of bounds")
+    self.code-node.write-spaces()
+  
+  func dynamic write()
+    if self.second-index?
+      self.slice-symbol.write()
+      return
+    
+    ; ((seq)->values)[index]
+    ; ((Prmitive*)((seq)->values))[index]
+    ; ((Complex*)((seq)->values)) + index
+    if not self.top
+      write(user "(")
+    write(user "((")
+    if self.sequence.result-type.type-data is-not glob.type-string
+      if self.result-type.type-data is glob.type-func and
+          self.result-type.arguments?
+        self.result-type.arguments.write-pointer(user "*")
+      else
+        self.result-type.type-data.write-cname()
+        write(user "*")
+      write(user ")((")
+    self.sequence.write()
+    write(user ")->values)")
+    if self.sequence.result-type.type-data is-not glob.type-string
+      write(user ")")
+    if self.result-type.type-data.is-primitive
+      write(user "[")
+    else
+      write(user " + ")
+    self.index.write()
+    if self.result-type.type-data.is-primitive
+      write(user "]")
+    if not self.top
+      write(user ")")
+  
+  func dynamic write-dynamic()
+    write(user "&")
+    self.result-type.type-data.write-cname()
+    write(user "_dynamic")
+  
+  func dynamic write-refman()
+    self.sequence.write-refman()

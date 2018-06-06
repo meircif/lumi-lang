@@ -1,0 +1,223 @@
+~~~ TL5 compiler - Call expression ~~~
+module tl5-compiler
+
+~~~ Function call expression ~~~
+class CallExpression(Expression)
+  owner Expression function
+  owner FunctionArguments arguments
+  user Expression output
+  var Bool is-function-object
+  
+  func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
+      owner Expression expression, var Char end)
+    new CallExpression call-expression
+    call-expression.parse(owner expression, user code-node)->(var end)
+    expression := call-expression
+  
+  func inst parse(owner Expression function, user SyntaxTreeCode code-node)->(
+      var Char end)
+    self.function := function
+    self.code-node := code-node
+    self.set-location()
+    self.arguments := FunctionArguments()
+    var CallArgumentFactory argument-factory
+    self.arguments.parse(user argument-factory, copy false, user code-node)->(
+        var end)
+  
+  func dynamic analyze()
+    self.function.analyze()
+    self.arguments.analyze()
+    if not self.function.result-type?
+      self.syntax-error-msg(user "void expression is not callable")
+    if self.function.result-type.type-data is-not glob.type-func
+      self.syntax-error(
+          user "non callable type",
+          user self.function.result-type.type-data.name)
+    user FunctionArguments declaration(user self.function.result-type.arguments)
+    user TypeInstance instance-type
+    var Int bases
+    self.function.analyze-call(user self.arguments)->(
+        user instance-type, var bases, var self.is-function-object)
+    user TypeInstance result-type
+    declaration.get-result-type()->(var self.access, user result-type)
+    if not self.is-statement
+      result-type.new-replace-params(user instance-type, copy bases)->(
+          owner self.result-type)
+      result-type := self.result-type
+    if self.arguments.check-same-as(
+        user declaration, user instance-type, copy bases)
+      ; add omitted output
+      new CallArgument output
+      output.set-location()
+      output.is-output := true
+      output.is-native := declaration.outputs.last.item.is-native
+      output.is-dynamic := result-type.type-data.is-dynamic
+      output.is-generic :=
+          declaration.outputs.last.item.get-type-instance().type-data is
+          glob.type-generic
+      output.access := declaration.outputs.last.item.access
+      output.value := self.add-aux-variable(
+          copy declaration.outputs.last.item.access,
+          copy false,
+          user result-type)
+      self.output := output.value
+      self.arguments.outputs.add(owner output)
+    else-if self.result-type?
+      self.arguments.get-output()->(user self.output)
+    self.assignable := self.result-type?
+  
+  func dynamic write-preactions()
+    self.function.write-preactions()
+    if self.is-function-object
+      write(user "if (")
+      self.function.write-as-top()
+      write(user " == NULL) ")
+      self.write-raise(user "empty function called")
+      self.code-node.write-spaces()
+    self.arguments.write-preactions()
+    if not self.is-statement
+      self.write-func-call()
+      self.code-node.write-spaces()
+  
+  func dynamic write()
+    if self.is-statement
+      self.write-func-call()
+    else-if self.output?
+      self.output.top := self.top
+      self.output.write()
+      self.output.top := true
+  
+  func dynamic write-refman()
+    if self.output?
+      self.output.top := self.top
+      self.output.write-refman()
+      self.output.top := true
+  
+  func dynamic write-dynamic()
+    if self.output?
+      self.output.top := self.top
+      self.output.write-dynamic()
+      self.output.top := true
+  
+  func inst write-func-call()
+    self.write-call()
+    self.function.write()
+    self.arguments.write-call()
+    write(user " )\n")
+    self.arguments.write-postactions()
+
+
+~~~ Function argument call ~~~
+class CallArgument(Argument)
+  owner Expression value
+  user Expression assignee
+  user SyntaxTreeCode code-node
+  var Bool is-down-cast
+  var Bool is-dynamic
+  var Bool is-generic
+  
+  func dynamic parse-value(user SyntaxTreeCode code-node)->(var Char end)
+    self.code-node := code-node
+    parse-new-expression(
+        user ",)", user code-node)->(owner self.value, var end)
+    if end != ',' and end != ')'
+      self.syntax-error-c(user "expected \",\" or \")\", got", copy end)
+  
+  func dynamic analyze()
+    self.value.analyze()
+    if self.is-output and not self.value.assignable
+      self.syntax-error-msg(user "non assignable call output")
+  
+  func dynamic check-same-type-as(
+      user TypeInstance type-instance,
+      user TypeInstance instance-type,
+      copy Int bases)
+    if self.access = Access.OWNER and self.value.access != Access.OWNER
+      self.syntax-error(
+          user "assigning into an owner a non-owner access",
+          user glob.access-names[self.value.access])
+    if self.is-output and self.access != self.value.access
+      self.m-syntax-error2(
+          user "assigning into access",
+          user glob.access-names[self.access],
+          user "invalid access",
+          user glob.access-names[self.value.access])
+    
+    owner TypeInstance real-type
+    type-instance.new-replace-params(user instance-type, copy bases)->(
+        owner real-type)
+    if self.is-output
+      self.is-down-cast := real-type.check-assign-to(
+          copy self.access,
+          user self.value.result-type,
+          copy self.value.access,
+          user self) > 0
+    else
+      real-type.check-assign-from(copy self.access, user self)->(
+          owner self.value, user self.assignee)
+    self.is-dynamic := real-type.type-data.is-dynamic
+    self.is-generic := type-instance.type-data is glob.type-generic
+  
+  func dynamic get-output()->(user Expression output)
+    output := self.value
+  
+  func dynamic write-preactions()
+    self.value.write-preactions()
+    if self.is-down-cast
+      ; if (`value` != NULL) RAISE(`line-num`)
+      write(user "if (")
+      self.value.write()
+      write(user " != NULL) ")
+      self.write-raise(user "non empty base class given as output argument")
+      self.code-node.write-spaces()
+  
+  func dynamic write()
+    ; [&(]`value`[)][, [&(]`value`_Refman[)]][, [&(]`value`_Dynamic[)]]
+    if self.is-output
+      if self.is-down-cast or self.is-generic
+        write(user "(void*)")
+      write(user "&(")
+    self.value.write()
+    if self.is-output
+      write(user ")")
+    
+    if not self.value.result-type.type-data.is-primitive and not self.is-native
+      write(user ", ")
+      if self.is-output
+        write(user "&(")
+      self.value.write-refman()
+      if self.is-output
+        write(user ")")
+    
+    if self.is-dynamic and not self.is-native
+      write(user ", ")
+      if (self.is-output and self.is-down-cast) or self.is-generic
+        write(user "(void*)")
+      if self.is-output
+        write(user "&(")
+      if self.value.is-generic-cast
+        self.value.top := false
+      self.value.write-dynamic()
+      self.value.top := true
+      if self.is-output
+        write(user ")")
+    else-if self.is-generic
+      write(user ", ")
+      if self.is-output
+        write(user "&dynamic_Void")
+      else-if self.value.result-type.type-data is glob.type-empty
+        write(user "NULL")
+      else
+        write(user "&")
+        self.value.result-type.type-data.write-cname()
+        write(user "_dynamic")
+  
+  func dynamic write-postactions()
+    if self.access = Access.OWNER and not self.is-output and
+        self.value.result-type.type-data is-not glob.type-empty
+      self.assignee.write-assign-null()
+
+
+class CallArgumentFactory(ArgumentFactory)
+  func dynamic new-argument()->(owner Argument new-argument)
+    new-argument := CallArgument()

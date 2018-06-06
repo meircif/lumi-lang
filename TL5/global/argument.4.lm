@@ -1,0 +1,280 @@
+~~~ TL5 compiler - Function arguments ~~~
+module tl5-compiler
+
+
+~~~ Basic function argument ~~~
+class Argument(SyntaxTreeNode)
+  var Int access
+  var Bool is-output
+  var Bool is-native
+  
+  func dynamic copy-new()->(owner DeclarationArgument new-argument)
+    raise
+  
+  func inst parse(
+      user String access-str,
+      copy Bool is-output,
+      copy Bool is-native,
+      user SyntaxTreeCode code-node)->(
+      var Char end)
+    self.is-output := is-output
+    self.is-native := is-native
+    self.set-location()
+    self.get-access(user access-str)->(var self.access)
+    self.parse-value(user code-node)->(var end)
+  
+  func dynamic parse-value(user SyntaxTreeCode code-node)->(var Char end)
+    raise
+  
+  func dynamic get-type-instance()->(user TypeInstance type-instance)
+    raise
+  
+  func inst check-same-as(
+      user Argument other, user TypeInstance instance-type, copy Int bases)
+    if self.access != other.access
+      self.m-syntax-error2(
+          user "expected access",
+          user glob.access-names[other.access],
+          user ", got",
+          user glob.access-names[self.access])
+    self.check-same-type-as(
+        user other.get-type-instance(), user instance-type, copy bases)
+    self.is-native := other.is-native
+  
+  func dynamic check-same-type-as(
+      user TypeInstance type-instance,
+      user TypeInstance instance-type,
+      copy Int bases)
+    self.get-type-instance().check-equal(user type-instance, user self)
+  
+  func dynamic get-variable()->(user SyntaxTreeVariable variable)
+    raise
+  
+  func dynamic get-output()->(user Expression output)
+    raise
+  
+  func dynamic write-preactions()
+    raise
+  
+  func dynamic write-postactions()
+    raise
+
+
+class ArgumentFactory
+  var Int dummy
+  
+  func dynamic new-argument()->(owner Argument new-argument)
+    raise
+
+
+~~~ All function parameters and outputs ~~~
+class FunctionArguments(SyntaxTreeNode)
+  owner List{Argument} parameters
+  owner List{Argument} outputs
+  
+  func inst copy-new()->(owner FunctionArguments new-arguments)
+    new-arguments := FunctionArguments()
+    new-arguments.init()
+    self.copy-new-args(user self.parameters, user new-arguments.parameters)
+    self.copy-new-args(user self.outputs, user new-arguments.outputs)
+  
+  func inst copy-new-args(
+      user List{Argument} arguments, user List{Argument} new-arguments)
+    user ListNode{Argument} node(user arguments.first)
+    do
+      while node?
+      new-arguments.add(owner node.item.copy-new())
+      node := node.next
+  
+  func inst init()
+    self.set-location()
+    self.parameters := List{Argument}()
+    self.outputs := List{Argument}()
+  
+  func inst parse(
+      user ArgumentFactory argument-factory,
+      copy Bool is-native,
+      user SyntaxTreeCode code-node)->(
+      var Char end)
+    self.init()
+    self.parse-args(
+        user self.parameters,
+        user argument-factory,
+        copy is-native,
+        user code-node)->(
+        var end)
+    if end = '-'
+      self.read-expect(user ">(")
+      self.parse-args(
+          user self.outputs,
+          user argument-factory,
+          copy is-native,
+          user code-node)->(
+          var end)
+  
+  func inst add-self-parameter(user TypeData type-data)
+    new DeclarationArgument self-args
+    if type-data.is-primitive
+      self-args.access := Access.COPY
+    else
+      self-args.access := Access.VAR
+    self-args.set-location()
+    self-args.variable := SyntaxTreeVariable()
+    string-new-copy(user "self")->(owner self-args.variable.name)
+    type-data.self-type-instance()->(owner self-args.variable.type-instance)
+    self.parameters.prepend(owner self-args)
+  
+  func inst parse-args(
+      user List{Argument} arguments,
+      user ArgumentFactory argument-factory,
+      copy Bool is-native,
+      user SyntaxTreeCode code-node)->(
+      var Char end)
+    owner Argument argument
+    user String access-str
+    var Bool is-output(copy arguments is self.outputs)
+    read-until(user " )", copy false)->(user access-str, var end)
+    if end = '\n' and access-str.length = 0
+      code-node.read-line-break-spaces()
+      read-until(user " ", copy false)->(user access-str, var end)
+    if end != ')' or access-str.length > 0
+      do
+        if access-str.length = 0
+          self.syntax-error-c(user "expected access, got", copy end)
+        if end != ' '
+          self.syntax-error-c(
+              user "expected space after access, got", copy end)
+        argument-factory.new-argument()->(owner argument)
+        arguments.add(owner argument)
+        argument.parse(
+            user access-str, copy is-output, copy is-native, user code-node)->(
+            var end)
+        while end = ','
+        read-c()->(var end)
+        if end = '\n'
+          code-node.read-line-break-spaces()
+        else-if end != ' '
+          self.syntax-error-c(
+              user "expected space or new-line after \",\", got",
+              copy end)
+        read-until(user " ", copy false)->(user access-str, var end)
+    read-c()->(var end)
+  
+  func dynamic link-types()
+    ; TODO TL4 self.link-children-types(user self.parameters)
+    ; TODO TL4 self.link-children-types(user self.outputs)
+  
+  func dynamic analyze()
+    ; TODO TL4 self.analyze-children(user self.parameters)
+    ; TODO TL4 self.analyze-children(user self.outputs)
+  
+  func inst get-result-type()->(var Int access, user TypeInstance result-type)
+    if self.outputs.last?
+      self.outputs.last.item.get-type-instance()->(user result-type)
+      access := self.outputs.last.item.access
+    else
+      result-type := _
+      access := Access.VAR
+  
+  func inst get-output()->(user Expression output)
+    if self.outputs.last?
+      self.outputs.last.item.get-output()->(user output)
+  
+  func dynamic find-variable(user String name, user String module-name)->(
+      user SyntaxTreeVariable variable)
+    self.find-variable-args(user self.parameters, user name)->(user variable)
+    if not variable?
+      self.find-variable-args(user self.outputs, user name)->(user variable)
+  
+  func inst find-variable-args(
+      user List{Argument} arguments, user String name)->(
+      user SyntaxTreeVariable variable)
+    user ListNode{Argument} node(user arguments.first)
+    do
+      while node?
+      while not node.item.get-variable().find-variable(user name, user _)->(
+          user variable)?
+      node := node.next
+  
+  func inst check-same-as(
+      user FunctionArguments other,
+      user TypeInstance instance-type,
+      copy Int bases)->(
+      var Bool output-ommited)
+    user ListNode{Argument} my-node(user self.parameters.first)
+    user ListNode{Argument} other-node(user other.parameters.first)
+    do
+      while my-node? and other-node?
+      my-node.item.check-same-as(
+          user other-node.item, user instance-type, copy bases)
+      my-node := my-node.next
+      other-node := other-node.next
+    if my-node?
+      self.syntax-error-msg(user "too many parameters")
+    if other-node?
+      self.syntax-error-msg(user "too few parameters")
+    
+    my-node := self.outputs.first
+    other-node := other.outputs.first
+    do
+      while my-node? and other-node?
+      my-node.item.check-same-as(
+          user other-node.item, user instance-type, copy bases)
+      my-node := my-node.next
+      other-node := other-node.next
+    if my-node?
+      self.syntax-error-msg(user "too many outputs")
+    if other-node? and other-node.next?
+      self.syntax-error-msg(user "too few outputs")
+    output-ommited := other-node?
+  
+  func inst write-preactions()
+    self.write-args-preactions(user self.parameters)
+    self.write-args-preactions(user self.outputs)
+  
+  func inst write-args-preactions(user List{Argument} arguments)
+    user ListNode{Argument} node(user arguments.first)
+    do
+      while node?
+      node.item.write-preactions()
+      node := node.next
+  
+  func dynamic write()
+    self.write-if-decleration(copy true)
+  
+  func dynamic write-call()
+    self.write-if-decleration(copy false)
+  
+  func inst write-if-decleration(copy Bool is-decleration)
+    ; (`params...`, `outputs...`)
+    write(user "(")
+    if self.parameters.first?
+      self.write-args(user self.parameters)
+    if self.outputs.first?
+      if self.parameters.first?
+        write(user ", ")
+      self.write-args(user self.outputs)
+    else-if not self.parameters.first? and is-decleration
+      write(user "void")
+    write(user ")")
+  
+  func inst write-args(user List{Argument} arguments)
+    user ListNode{Argument} node(user arguments.first)
+    do
+      node.item.write()
+      node := node.next
+      while node?
+      write(user ", ")
+  
+  func inst write-pointer(user String name)
+    write(user "Returncode (*")
+    write-cname(user name)
+    write(user ")")
+    self.write()
+  
+  func inst write-postactions()
+    user ListNode{Argument} node(user self.parameters.first)
+    do
+      while node?
+      node.item.write-postactions()
+      node := node.next

@@ -1,0 +1,46 @@
+~~~ TL5 compiler - Generic mappings ~~~
+module tl5-compiler
+
+~~~ A generic single link list ~~~
+struct List{Generic}
+  owner ListNode{Generic} first
+  user ListNode{Generic} last
+  
+  func is-empty()->(var Bool is-empty)
+    is-empty := not self.first?
+  
+  func add(owner Generic item)
+    new ListNode{Generic} node
+    node.item := item
+    if self.last?
+      self.last.next := node
+      node.prev := self.last
+    else
+      self.first := node
+    self.last := node
+  
+  func prepend(owner Generic item)
+    new ListNode{Generic} node
+    node.item := item
+    node.next := self.first
+    self.first := node
+    if not self.last?
+      self.last := node
+  
+  func pop()->(owner Generic item)
+    if self.first?
+      item := self.first.item
+      owner ListNode{Generic} first(owner self.first)
+      self.first := first.next
+      if self.first?
+        self.first.prev := _
+      else
+        self.last := _
+    else
+      item := _
+
+
+struct ListNode{Generic}
+  owner ListNode{Generic} next
+  user ListNode{Generic} prev
+  owner Generic item

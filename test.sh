@@ -161,6 +161,19 @@ $CCA tests/integration-actual-error.c ../TL4/lumi.4.c -I../TL4 -o test-tl4-error
 diff ../TL4/tests/integration-error-output.txt \
   tests/integration-error-output.txt
 
+# test tl4-compiler on tl5-compiler files
+mkdir TL5
+cp -r ../TL5/*/ TL5
+cp ../TL5/*.4.lm TL5
+./tl4-compiler tl5-compiler.c TL5/tl5-compiler.4.lm TL5/*/*.4.lm
+diff ../TL5/tl5-compiler.c tl5-compiler.c
+
+
+# --< TL5 >--
+
+# compile tl5-compiler
+$CC ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o tl5-compiler
+
 
 # --< lumi command >--
 

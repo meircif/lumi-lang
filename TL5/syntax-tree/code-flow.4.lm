@@ -1,0 +1,121 @@
+~~~ TL5 compiler - Syntax tree code flow elements ~~~
+module tl5-compiler
+
+~~~ Basic code flow element node in the syntax tree ~~~
+class SyntaxTreeFlowElement(SyntaxTreeCode)
+  owner SyntaxTreeBlock block
+  
+  func inst init(user SyntaxTreeBlock parent)
+    self.set-location()
+    self.block := SyntaxTreeBlock()
+    self.set-parent(user parent)
+  
+  func inst set-parent(user SyntaxTreeBlock parent)
+    self.parent := parent
+    self.block.parent := parent
+    self.block.indentation-spaces := parent.indentation-spaces + 2
+    self.block.is-in-loop := parent.is-in-loop
+    self.block.set-location()
+  
+  func inst parse-block(copy Bool is-loop)->(var Char end)
+    if is-loop
+      self.block.is-in-loop := true
+    self.block.parse-block()->(var end)
+  
+  func dynamic link-types()
+    self.block.link-types()
+  
+  func dynamic analyze()
+    self.block.analyze()
+  
+  func inst write-block()
+    self.block.write-block()
+  
+  func inst write-block-body()
+    self.block.write-block-body()
+
+
+~~~ If statement node in the syntax tree ~~~
+class SyntaxTreeIf(SyntaxTreeFlowElement)
+  owner Expression condition
+  owner SyntaxTreeElse else-node
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeIf new-node)
+    new-node := SyntaxTreeIf()
+    new-node.parse(user parent)->(var end)
+  
+  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
+    self.init(user parent)
+    parse-new-expression(user "", user self)->(owner self.condition, var end)
+    self.parse-block(copy false)->(var end)
+  
+  func inst add-else(owner SyntaxTreeElse else-node)
+    else-node.set-parent(user self.parent)
+    self.else-node := else-node
+  
+  func inst add-else-if(
+      owner SyntaxTreeIf new-if, owner SyntaxTreeCoverage coverage-node)
+    self.else-node := SyntaxTreeElse()
+    self.else-node.init(user self.parent)
+    self.else-node.block.variables := List{SyntaxTreeVariable}()
+    self.else-node.block.code-nodes := List{SyntaxTreeCode}()
+    if coverage-node?
+      coverage-node.parent := self.else-node.block
+      self.else-node.block.code-nodes.add(owner coverage-node)
+    self.else-node.block.code-nodes.add(owner new-if)
+    new-if.set-parent(user self.else-node.block)
+  
+  func dynamic analyze()
+    self.analyze-expression(user self.condition, user glob.type-bool)
+    base.analyze()
+    if self.else-node?
+      self.else-node.analyze()
+  
+    ; if (`condition`) {
+    ;   `block...`
+    ; }
+    ; `else-block`
+  func dynamic write()
+    self.write-spaces()
+    self.condition.write-preactions()
+    write(user "if (")
+    self.condition.write()
+    write(user ")")
+    self.write-block()
+    if self.else-node?
+      self.else-node.write()
+
+
+~~~ Else statement node in the syntax tree ~~~
+class SyntaxTreeElse(SyntaxTreeFlowElement)
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeElse new-node)
+    new-node := SyntaxTreeElse()
+    new-node.init(user parent)
+    new-node.parse-block(copy false)->(var end)
+  
+  func dynamic write()
+    ; else {
+    ;   `block...`
+    ; }
+    self.write-spaces()
+    write(user "else")
+    self.write-block()
+
+
+~~~ Do loop node in the syntax tree ~~~
+class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeDoLoop new-node)
+    new-node := SyntaxTreeDoLoop()
+    new-node.init(user parent)
+    new-node.parse-block(copy true)->(var end)
+  
+  func dynamic write()
+    ; while (true) {
+    ;   `block...`
+    ; }
+    self.write-spaces()
+    write(user "while (true)")
+    self.write-block()
