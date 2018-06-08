@@ -17483,7 +17483,7 @@ Returncode tl5_compiler_M_Global_add_builtin_method(tl5_compiler_M_Global* self,
   aux_String_0_Var.max_length = 5;
   aux_String_0_Var.length = 4;
   aux_String_0_Var.values = "self";
-  CHECK(361, tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, *arguments, *arguments_Refman, *arguments_Dynamic, tl5_compiler_M_Access_VAR, builtin_type, builtin_type_Refman, builtin_type_Dynamic, aux_String_0, aux_String_0_Refman) )
+  CHECK(361, tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, *arguments, *arguments_Refman, *arguments_Dynamic, tl5_compiler_M_Access_USER, builtin_type, builtin_type_Refman, builtin_type_Dynamic, aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(name_Refman);
