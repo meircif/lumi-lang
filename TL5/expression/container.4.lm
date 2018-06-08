@@ -26,7 +26,7 @@ class BlockExpression(Expression)
     self.access := self.expression.access
     self.constant := self.expression.constant
   
-  func dynamic order-constants(user List{SyntaxTreeConstant} ordered-list)
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
   
   func dynamic write-preactions()
@@ -83,7 +83,7 @@ class UnaryExpression(Expression)
       code-node.read-line-break-spaces()
     else-if end != ' '
       self.syntax-error-c(user "expected space after operator, got", copy end)
-    Expression.parse-new(var _, user ends, user code-node, user operator)->(
+    Expression.parse-new(user _, user ends, user code-node, user operator)->(
         owner self.right-expression, var end, user next-operator)
   
   func dynamic analyze()
@@ -118,7 +118,7 @@ class UnaryExpression(Expression)
           user "operand, got",
           user operand.result-type.type-data.name)
   
-  func dynamic order-constants(user List{SyntaxTreeConstant} ordered-list)
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.right-expression.order-constants(user ordered-list)
   
   func dynamic write-preactions()
@@ -237,7 +237,7 @@ class BinaryExpression(UnaryExpression)
           user "is not supported for type",
           user operand.result-type.type-data.name)
   
-  func dynamic order-constants(user List{SyntaxTreeConstant} ordered-list)
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.left-expression.order-constants(user ordered-list)
     base.order-constants(user ordered-list)
   

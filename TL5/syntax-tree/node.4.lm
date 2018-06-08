@@ -208,7 +208,7 @@ class SyntaxTreeNode
   func dynamic analyze()
     ; do nothing as default
   
-  func dynamic order-constants(user List{SyntaxTreeConstant} ordered-list)
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     ; do nothing as default
   
   func dynamic write()
@@ -223,8 +223,8 @@ class SyntaxTreeNode
     self.do-on-children(user child-list, user action-analyze)
   
   func inst order-children-constants(
-      user List{SyntaxTreeNode} child-list,
-      user List{SyntaxTreeConstant} ordered-list)
+      user List{SyntaxTreeVariable} child-list,
+      user NameMap{SyntaxTreeConstant} ordered-list)
     var NodeOrderConstantsAction action-order-constants
     action-order-constants.ordered-list := ordered-list
     self.do-on-children(user child-list, user action-order-constants)
@@ -238,10 +238,13 @@ class SyntaxTreeNode
     user ListNode{SyntaxTreeNode} child(user child-list.first)
     do
       while child?
-      glob.input-file-name := child.item.input-file-name
-      glob.line-number := child.item.line-number
-      action.action(user child.item)
+      child.item.do-action(user action)
       child := child.next
+  
+  func inst do-action(user NodeAction action)
+    glob.input-file-name := self.input-file-name
+    glob.line-number := self.line-number
+    action.action(user self)
 
 
 class NodeAction
@@ -262,7 +265,7 @@ class NodeWriteAction(NodeAction)
     node.write()
 
 class NodeOrderConstantsAction(NodeAction)
-  user List{SyntaxTreeConstant} ordered-list
+  user NameMap{SyntaxTreeConstant} ordered-list
   
   func dynamic action(user SyntaxTreeNode node)
     node.order-constants(user self.ordered-list)

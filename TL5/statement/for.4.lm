@@ -237,7 +237,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     new SliceExpression slice
     slice.top := true
     slice.line-number := self.line-number
-    ; TODO OWNER slice.sequence := self.aux-symbol
+    self.aux-symbol.copy-new()->(owner slice.sequence)
     slice.index := index-symbol
     self.item.type-instance.copy-new()->(owner slice.result-type)
     self.write-assign(user self.item, owner slice, user self.block)
@@ -297,7 +297,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     
     new CallArgument self-arg
     self-arg.is-dynamic := self.aux-symbol.result-type.type-data.is-dynamic
-    ; TODO OWNER self-arg.value := self.aux-symbol
+    self.aux-symbol.copy-new()->(owner self-arg.value)
     
     new CallExpression call
     call.line-number := self.line-number

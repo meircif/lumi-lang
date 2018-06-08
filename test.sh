@@ -6,7 +6,11 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Wall -Werror"
-CCA="$CCW --pedantic -Wno-unused-label"
+if [ $CC == "gcc" ]; then
+  CCA="$CCW --pedantic -Wno-unused-label -Wno-unused-but-set-variable"
+else
+  CCA="$CCW --pedantic -Wno-unused-label -Wno-self-assign"
+fi
 rm -rf .test
 mkdir .test
 cp *.lm .test
@@ -172,7 +176,7 @@ diff ../TL5/tl5-compiler.c tl5-compiler.c
 # --< TL5 >--
 
 # compile tl5-compiler
-$CC ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o tl5-compiler
+$CCA ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o tl5-compiler
 
 
 # --< lumi command >--

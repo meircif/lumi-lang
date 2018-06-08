@@ -57,7 +57,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.my-module := my-module
       self.my-module.variable-map.add(user self.name, user self)
     if self.parent? and (end = '(' or self.is-create)
-      VariableInit.parse-new(var _, user self)->(var end)
+      VariableInit.parse-new(user _, user self)->(var end)
     if self.parent is glob.root.global-init
       self.parent := _
   
@@ -325,6 +325,7 @@ class VariableInit(SyntaxTreeCode)
   func inst parse-new(user SyntaxTreeVariable variable)->(var Char end)
     new VariableInit new-node
     new-node.parse(user variable)->(var end)
+    variable.parent.code-nodes.add(owner new-node)
   
   func inst parse(user SyntaxTreeVariable variable)->(var Char end)
     self.set-location()
@@ -341,7 +342,6 @@ class VariableInit(SyntaxTreeCode)
     variable.type-instance.copy-new()->(
         owner self.expression-init.symbol.result-type)
     self.expression-init.symbol.access := variable.access
-    ; TODO OWNER variable.parent.code-nodes.add(owner self)
   
   func dynamic analyze()
     if self.parent is glob.root.global-init
@@ -405,7 +405,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
       self.syntax-error-msg(user "value is not constant")
     glob.current-module := _
   
-  func dynamic order-constants(user List{SyntaxTreeConstant} ordered-list)
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     if self.is-ordered
       return
     if self.ordering
@@ -413,7 +413,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
           user "recursive dependency in constant", user self.name)
     self.ordering := true
     self.value.order-constants(user ordered-list)
-    ; TODO OWNER ordered-list.add(owner self)
+    ordered-list.add(user self.name, user self)
     self.is-ordered := true
   
   func dynamic write()

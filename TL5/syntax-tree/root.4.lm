@@ -12,7 +12,7 @@ class GlobalNodes(SyntaxTreeNamespace)
 ~~~ The syntax tree root ~~~
 class SyntaxTreeRoot(GlobalNodes)
   owner List{EnumData} enums
-  owner List{SyntaxTreeConstant} constants
+  owner NameMap{SyntaxTreeConstant} constants
   owner List{ModuleMembers} modules
   user String output-file-name
   owner SyntaxTreeMainFunction main-function
@@ -24,7 +24,7 @@ class SyntaxTreeRoot(GlobalNodes)
   func inst init()
     base.init()
     self.enums := List{EnumData}()
-    self.constants := List{SyntaxTreeConstant}()
+    self.constants := NameMap{SyntaxTreeConstant}()
     self.modules := List{ModuleMembers}()
     self.global-init := GlobalInit()
     self.global-init.init()
@@ -116,31 +116,31 @@ class SyntaxTreeRoot(GlobalNodes)
       if end != ' '
         self.syntax-error-c(
             user "expected space after \"const\", got", copy end)
-      self.variables.add(owner SyntaxTreeConstant.parse-new(var _)->(var end))
+      self.variables.add(owner SyntaxTreeConstant.parse-new(user _)->(var end))
       
     else-if keyword.equal(user "struct")
       if end != ' '
         self.syntax-error-c(
             user "expected space after \"struct\", got", copy end)
-      self.types.add(owner TypeData.parse-new(var _, copy false)->(var end))
+      self.types.add(owner TypeData.parse-new(user _, copy false)->(var end))
       
     else-if keyword.equal(user "class")
       if end != ' '
         self.syntax-error-c(
             user "expected space after \"class\", got", copy end)
-      self.types.add(owner TypeData.parse-new(var _, copy true)->(var end))
+      self.types.add(owner TypeData.parse-new(user _, copy true)->(var end))
       
     else-if keyword.equal(user "enum")
       if end != ' '
         self.syntax-error-c(
             user "expected space after \"enum\", got", copy end)
-      self.enums.add(owner EnumData.parse-new(var _)->(var end))
+      self.enums.add(owner EnumData.parse-new(user _)->(var end))
       
     else-if keyword.equal(user "main")
       if end != '\n'
         self.syntax-error-c(
             user "expected new-line after \"main\", got", copy end)
-      SyntaxTreeMainFunction.parse-new(var _)->(
+      SyntaxTreeMainFunction.parse-new(user _)->(
           var end, owner self.main-function)
       
     else-if keyword.equal(user "native")
@@ -153,14 +153,14 @@ class SyntaxTreeRoot(GlobalNodes)
       if end != ' '
         self.syntax-error-c(
             user "expected space after \"test\", got", copy end)
-      self.functions.add(owner SyntaxTreeTestFunction.parse-new(var _)->(
+      self.functions.add(owner SyntaxTreeTestFunction.parse-new(user _)->(
           var end))
       
     else-if keyword.equal(user "mock")
       if end != ' '
         self.syntax-error-c(
             user "expected space after \"mock\", got", copy end)
-      self.functions.add(owner SyntaxTreeMockFunction.parse-new(var _)->(
+      self.functions.add(owner SyntaxTreeMockFunction.parse-new(user _)->(
           var end))
       
     else
@@ -172,12 +172,12 @@ class SyntaxTreeRoot(GlobalNodes)
   func dynamic analyze()
     self.order-types()
     base.link-types()
-    ; TODO TL4 self.link-children-types(user self.types)
+    self.link-children-types(user self.types)
     self.global-init.link-types()
     if self.main-function?
       self.main-function.link-types()
     base.analyze()
-    ; TODO TL4 self.analyze-children(user self.types)
+    self.analyze-children(user self.types)
     self.global-init.analyze()
     if glob.tested-module?
       if not glob.test-functions.first?
@@ -188,17 +188,15 @@ class SyntaxTreeRoot(GlobalNodes)
     else-if not self.is-library
       print(user "General code error: no main function\n")
       raise
-    ; TODO TL4 self.order-children-constants(user self.variables, user self.constants)
+    self.order-children-constants(user self.variables, user self.constants)
     if self.line-counts?
       self.analyze-cover()
   
   func inst order-types()
     new List{TypeData} ordered-list
     do
-      owner TypeData type-data
-      self.types.pop()->(owner type-data)
-      while type-data?
-      type-data.order-bases(user ordered-list)
+      while self.types.first?
+      self.types.first.item.order-bases(user ordered-list)
     self.types := ordered-list
   
   func inst analyze-cover()
@@ -239,15 +237,20 @@ class SyntaxTreeRoot(GlobalNodes)
     
     ; will write Enums
     write-global(user "\n\n/* Enums */\n")
-    ; TODO TL4 self.write-children(user self.enums)
+    self.write-children(user self.enums)
     
     ; will write constants
     write-global(user "\n\n/* constants */\n")
-    ; TODO TL4 self.write-children(user self.constants)
+    var NodeWriteAction node-write-action
+    user NameMapNode{SyntaxTreeConstant} child(user self.constants.first)
+    do
+      while child?
+      child.value.do-action(user node-write-action)
+      child := child.next
     
     ; will write type structures
     write-global(user "\n\n/* types struct */\n")
-    ; TODO TL4 self.write-children(user self.types)
+    self.write-children(user self.types)
     
     write-global(user "\n\n/* types methods declaration */\n")
     var TypeMethodsDeclarationWriter type-methods-declaration-writer
@@ -262,7 +265,7 @@ class SyntaxTreeRoot(GlobalNodes)
     
     ; will write global variables
     write-global(user "\n\n/* global variables */\n")
-    ; TODO TL4 self.write-children(user self.variables)
+    self.write-children(user self.variables)
     
     if self.line-counts?
       self.write-test-coverage-data()
@@ -273,7 +276,7 @@ class SyntaxTreeRoot(GlobalNodes)
     
     ; will write global functions bodies
     write-global(user "\n\n/* global functions body */\n")
-    ; TODO TL4 self.write-children(user self.functions)
+    self.write-children(user self.functions)
     
     ; write main function
     if glob.tested-module? or self.main-function?
@@ -426,7 +429,7 @@ class GlobalInit(SyntaxTreeFunction)
   func dynamic write()
     if not self.code-nodes.first?
       return
-    ; TODO TL4 self.write-children(user self.variables)
+    self.write-children(user self.variables)
     write(user "#undef RETURN_ERROR\n")
     write(user "#define RETURN_ERROR(value) return value;\n")
     write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")

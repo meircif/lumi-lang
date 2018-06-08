@@ -9,6 +9,14 @@ class SymbolExpression(Expression)
   user SyntaxTreeFunction function
   var Bool is-annotate
   
+  func inst copy-new()->(owner SymbolExpression new-symbol)
+    new-symbol := SymbolExpression()
+    string-new-copy(user self.name)->(owner new-symbol.name)
+    new-symbol.module-name := self.module-name
+    new-symbol.variable := self.variable
+    new-symbol.function := self.function
+    new-symbol.is-annotate := self.is-annotate
+  
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
     new SymbolExpression symbol-expression
@@ -59,7 +67,7 @@ class SymbolExpression(Expression)
     if is-mock
       self.is-annotate := is-annotate
   
-  func dynamic order-constants(user List{SyntaxTreeConstant} ordered-list)
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     if self.variable?
       self.variable.order-constants(user ordered-list)
   

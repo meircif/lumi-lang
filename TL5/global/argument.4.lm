@@ -117,9 +117,10 @@ class FunctionArguments(SyntaxTreeNode)
     if type-data.is-primitive
       self-args.access := Access.COPY
     else
-      self-args.access := Access.VAR
+      self-args.access := Access.USER
     self-args.set-location()
     self-args.variable := SyntaxTreeVariable()
+    self-args.variable.access := self-args.access
     string-new-copy(user "self")->(owner self-args.variable.name)
     type-data.self-type-instance()->(owner self-args.variable.type-instance)
     self.parameters.prepend(owner self-args)
@@ -161,12 +162,12 @@ class FunctionArguments(SyntaxTreeNode)
     read-c()->(var end)
   
   func dynamic link-types()
-    ; TODO TL4 self.link-children-types(user self.parameters)
-    ; TODO TL4 self.link-children-types(user self.outputs)
+    self.link-children-types(user self.parameters)
+    self.link-children-types(user self.outputs)
   
   func dynamic analyze()
-    ; TODO TL4 self.analyze-children(user self.parameters)
-    ; TODO TL4 self.analyze-children(user self.outputs)
+    self.analyze-children(user self.parameters)
+    self.analyze-children(user self.outputs)
   
   func inst get-result-type()->(var Int access, user TypeInstance result-type)
     if self.outputs.last?

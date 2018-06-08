@@ -22,7 +22,7 @@ Return the end character in `end` ~~~
 func parse-new-expression(user String ends, user SyntaxTreeCode code-node)->(
     owner Expression expression, var Char end)
   Expression.parse-new(
-      var _, user ends, user code-node, user _)->(owner expression, var end)
+      user _, user ends, user code-node, user _)->(owner expression, var end)
 
 
 ~~~ Meta type for an expression in the language.
@@ -53,7 +53,7 @@ class Expression(SyntaxTreeNode)
     glob.operator-map.find(user text)->(user operator)
     if operator?
       UnaryExpression.parse-new(
-          var _, user ends, user operator, user code-node)->(
+          user _, user ends, user operator, user code-node)->(
           owner expression, var end, user operator)
     else
       self.parse-new-operand(owner text, user ends, user code-node)->(
@@ -69,7 +69,7 @@ class Expression(SyntaxTreeNode)
           (not curr-operator? or operator.order < curr-operator.order)
       owner BinaryExpression new-binary-expression
       BinaryExpression.parse-new(
-          var _,
+          user _,
           user ends,
           user operator,
           user code-node,
@@ -95,7 +95,7 @@ class Expression(SyntaxTreeNode)
       owner Expression expression, var Char end)
     if text.length = 0
       if end = '('
-        BlockExpression.parse-new(var _, user code-node)->(
+        BlockExpression.parse-new(user _, user code-node)->(
             owner expression, var end)
       else
         code-node.syntax-error-c(user "unexpected", copy end)
@@ -105,7 +105,7 @@ class Expression(SyntaxTreeNode)
     
     do
       if end = '?'
-        QuestionExpression.parse-new(var _)->(owner expression, var end)
+        QuestionExpression.parse-new(user _)->(owner expression, var end)
       while self.parse-new-follow-operand(user ends, user code-node)->(
           owner expression, var end)
   
@@ -118,23 +118,23 @@ class Expression(SyntaxTreeNode)
     if text.length > 1
       second := text[1]
     if first = '\''
-      CharExpression.parse-new(var _, owner text)->(owner expression)
+      CharExpression.parse-new(user _, owner text)->(owner expression)
     else-if first = '"'
-      StringExpression.parse-new(var _, owner text, user code-node)->(
+      StringExpression.parse-new(user _, owner text, user code-node)->(
           owner expression)
     else-if (first >= '0' and first <= '9') or
         (first = '-' and second >= '0' and second <= '9')
-      IntExpression.parse-new(var _, owner text)->(owner expression)
+      IntExpression.parse-new(user _, owner text)->(owner expression)
     else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-      TypeExpression.parse-new(var _, owner text, user ends, user code-node)->(
+      TypeExpression.parse-new(user _, owner text, user ends, user code-node)->(
           owner expression, var end)
     else-if text.length = 1 and first = '_'
-      EmptyExpression.parse-new(var _, owner text)->(owner expression)
+      EmptyExpression.parse-new(user _, owner text)->(owner expression)
     else-if text.equal(user "base")
       BaseMethExpression.parse-new(
-          var _, owner text, user code-node, copy end)->(owner expression)
+          user _, owner text, user code-node, copy end)->(owner expression)
     else
-      SymbolExpression.parse-new(var _, owner text, user code-node)->(
+      SymbolExpression.parse-new(user _, owner text, user code-node)->(
           owner expression)
   
   ~~~ Parse one following part of an operand ~~~
@@ -150,16 +150,16 @@ class Expression(SyntaxTreeNode)
       if text.length > 1
         second := text[1]
       if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-        TypeExpression.parse-new(var _, owner text, user ends, user code-node)->(
+        TypeExpression.parse-new(user _, owner text, user ends, user code-node)->(
             owner expression, var end)
       else
-        MemberExpression.parse-new(var _, owner text, user code-node)->(
+        MemberExpression.parse-new(user _, owner text, user code-node)->(
             owner expression)
     else-if end = '['
-      SliceExpression.parse-new(var _, user ends, user code-node)->(
+      SliceExpression.parse-new(user _, user ends, user code-node)->(
           owner expression, var end)
     else-if end = '('
-      CallExpression.parse-new(var _, user ends, user code-node)->(
+      CallExpression.parse-new(user _, user ends, user code-node)->(
           owner expression, var end)
     else
       has-more := false

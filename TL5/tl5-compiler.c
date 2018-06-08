@@ -355,7 +355,7 @@ struct tl5_compiler_M_SyntaxTreeNode_Dynamic {
   Returncode (*write_call)(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic);
   Returncode (*link_types)(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic);
   Returncode (*analyze)(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic);
-  Returncode (*order_constants)(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman);
+  Returncode (*order_constants)(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman);
   Returncode (*write)(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic);
 };
 
@@ -1367,7 +1367,7 @@ struct tl5_compiler_M_NodeWriteAction_Dynamic {
 
 struct tl5_compiler_M_NodeOrderConstantsAction {
   tl5_compiler_M_NodeAction _base;
-  tl5_compiler_M_List* ordered_list;
+  tl5_compiler_M_NameMap* ordered_list;
   Ref_Manager* ordered_list_Refman;
 };
 
@@ -1389,7 +1389,7 @@ struct tl5_compiler_M_SyntaxTreeRoot {
   tl5_compiler_M_GlobalNodes _base;
   tl5_compiler_M_List* enums;
   Ref_Manager* enums_Refman;
-  tl5_compiler_M_List* constants;
+  tl5_compiler_M_NameMap* constants;
   Ref_Manager* constants_Refman;
   tl5_compiler_M_List* modules;
   Ref_Manager* modules_Refman;
@@ -1498,7 +1498,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_link_types(tl5_compiler_M_SyntaxTreeNod
 
 Returncode tl5_compiler_M_SyntaxTreeNode_analyze(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic);
 
-Returncode tl5_compiler_M_SyntaxTreeNode_order_constants(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman);
+Returncode tl5_compiler_M_SyntaxTreeNode_order_constants(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman);
 
 Returncode tl5_compiler_M_SyntaxTreeNode_write(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic);
 
@@ -1506,11 +1506,13 @@ Returncode tl5_compiler_M_SyntaxTreeNode_link_children_types(tl5_compiler_M_Synt
 
 Returncode tl5_compiler_M_SyntaxTreeNode_analyze_children(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* child_list, Ref_Manager* child_list_Refman);
 
-Returncode tl5_compiler_M_SyntaxTreeNode_order_children_constants(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* child_list, Ref_Manager* child_list_Refman, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman);
+Returncode tl5_compiler_M_SyntaxTreeNode_order_children_constants(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* child_list, Ref_Manager* child_list_Refman, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman);
 
 Returncode tl5_compiler_M_SyntaxTreeNode_write_children(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* child_list, Ref_Manager* child_list_Refman);
 
 Returncode tl5_compiler_M_SyntaxTreeNode_do_on_children(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* child_list, Ref_Manager* child_list_Refman, tl5_compiler_M_NodeAction* action, Ref_Manager* action_Refman, tl5_compiler_M_NodeAction_Dynamic* action_Dynamic);
+
+Returncode tl5_compiler_M_SyntaxTreeNode_do_action(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_NodeAction* action, Ref_Manager* action_Refman, tl5_compiler_M_NodeAction_Dynamic* action_Dynamic);
 
 void tl5_compiler_M_SyntaxTreeNode_Del(tl5_compiler_M_SyntaxTreeNode* self);
 
@@ -1714,7 +1716,7 @@ Returncode tl5_compiler_M_BlockExpression_parse(tl5_compiler_M_BlockExpression* 
 
 Returncode tl5_compiler_M_BlockExpression_analyze(tl5_compiler_M_BlockExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BlockExpression_Dynamic* self_Dynamic);
 
-Returncode tl5_compiler_M_BlockExpression_order_constants(tl5_compiler_M_BlockExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BlockExpression_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman);
+Returncode tl5_compiler_M_BlockExpression_order_constants(tl5_compiler_M_BlockExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BlockExpression_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman);
 
 Returncode tl5_compiler_M_BlockExpression_write_preactions(tl5_compiler_M_BlockExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BlockExpression_Dynamic* self_Dynamic);
 
@@ -1736,7 +1738,7 @@ Returncode tl5_compiler_M_UnaryExpression_analyze_operand(tl5_compiler_M_UnaryEx
 
 Returncode tl5_compiler_M_UnaryExpression_test_operand_type(tl5_compiler_M_UnaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UnaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_Expression* operand, Ref_Manager* operand_Refman, tl5_compiler_M_Expression_Dynamic* operand_Dynamic, tl5_compiler_M_TypeData* expected_type, Ref_Manager* expected_type_Refman, tl5_compiler_M_TypeData_Dynamic* expected_type_Dynamic);
 
-Returncode tl5_compiler_M_UnaryExpression_order_constants(tl5_compiler_M_UnaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UnaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman);
+Returncode tl5_compiler_M_UnaryExpression_order_constants(tl5_compiler_M_UnaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UnaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman);
 
 Returncode tl5_compiler_M_UnaryExpression_write_preactions(tl5_compiler_M_UnaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UnaryExpression_Dynamic* self_Dynamic);
 
@@ -1758,7 +1760,7 @@ Returncode tl5_compiler_M_BinaryExpression_analyze_equalizer(tl5_compiler_M_Bina
 
 Returncode tl5_compiler_M_BinaryExpression_test_is_reference(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic, Bool is_reference, tl5_compiler_M_Expression* operand, Ref_Manager* operand_Refman, tl5_compiler_M_Expression_Dynamic* operand_Dynamic);
 
-Returncode tl5_compiler_M_BinaryExpression_order_constants(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman);
+Returncode tl5_compiler_M_BinaryExpression_order_constants(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman);
 
 Returncode tl5_compiler_M_BinaryExpression_write_preactions(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic);
 
@@ -1818,6 +1820,8 @@ Returncode tl5_compiler_M_SliceExpression_write_refman(tl5_compiler_M_SliceExpre
 
 void tl5_compiler_M_SliceExpression_Del(tl5_compiler_M_SliceExpression* self);
 
+Returncode tl5_compiler_M_SymbolExpression_copy_new(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, tl5_compiler_M_SymbolExpression** new_symbol, Ref_Manager** new_symbol_Refman, tl5_compiler_M_SymbolExpression_Dynamic** new_symbol_Dynamic);
+
 Returncode tl5_compiler_M_SymbolExpression_parse_new(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, String* text, Ref_Manager* text_Refman, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic, tl5_compiler_M_Expression** expression, Ref_Manager** expression_Refman, tl5_compiler_M_Expression_Dynamic** expression_Dynamic);
 
 Returncode tl5_compiler_M_SymbolExpression_parse(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, String* text, Ref_Manager* text_Refman, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic);
@@ -1828,7 +1832,7 @@ Returncode tl5_compiler_M_SymbolExpression_analyze_call(tl5_compiler_M_SymbolExp
 
 Returncode tl5_compiler_M_SymbolExpression_analyze_mock(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, Bool is_annotate, Bool* is_mock);
 
-Returncode tl5_compiler_M_SymbolExpression_order_constants(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman);
+Returncode tl5_compiler_M_SymbolExpression_order_constants(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman);
 
 Returncode tl5_compiler_M_SymbolExpression_write(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic);
 
@@ -1950,6 +1954,8 @@ Returncode tl5_compiler_M_List_prepend(tl5_compiler_M_List* self, Ref_Manager* s
 
 Returncode tl5_compiler_M_List_pop(tl5_compiler_M_List* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 
+Returncode tl5_compiler_M_List_remove(tl5_compiler_M_List* self, Ref_Manager* self_Refman, Generic_Type* ref, Ref_Manager* ref_Refman, Generic_Type_Dynamic* ref_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
+
 void tl5_compiler_M_List_Del(tl5_compiler_M_List* self);
 
 void tl5_compiler_M_ListNode_Del(tl5_compiler_M_ListNode* self);
@@ -1989,6 +1995,10 @@ Returncode tl5_compiler_M_TypeInstance_check_parameters(tl5_compiler_M_TypeInsta
 Returncode tl5_compiler_M_TypeInstance_check_assign_from(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, Int access, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic, tl5_compiler_M_Expression** value, Ref_Manager** value_Refman, tl5_compiler_M_Expression_Dynamic** value_Dynamic, tl5_compiler_M_Expression** assignee, Ref_Manager** assignee_Refman, tl5_compiler_M_Expression_Dynamic** assignee_Dynamic);
 
 Returncode tl5_compiler_M_TypeInstance_check_assign_to(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, Int self_access, tl5_compiler_M_TypeInstance* target, Ref_Manager* target_Refman, Int target_access, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic, Int* bases);
+
+Returncode tl5_compiler_M_TypeInstance_check_sub_assign_to(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeInstance* target, Ref_Manager* target_Refman, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic);
+
+Returncode tl5_compiler_M_TypeInstance_check_has_subytpe(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_ListNode* target_sub_type, Ref_Manager* target_sub_type_Refman, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic);
 
 Returncode tl5_compiler_M_TypeInstance_check_equal(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeInstance* other, Ref_Manager* other_Refman, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic);
 
@@ -2420,7 +2430,7 @@ Returncode tl5_compiler_M_SyntaxTreeConstant_link_types(tl5_compiler_M_SyntaxTre
 
 Returncode tl5_compiler_M_SyntaxTreeConstant_analyze(tl5_compiler_M_SyntaxTreeConstant* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeConstant_Dynamic* self_Dynamic);
 
-Returncode tl5_compiler_M_SyntaxTreeConstant_order_constants(tl5_compiler_M_SyntaxTreeConstant* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeConstant_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman);
+Returncode tl5_compiler_M_SyntaxTreeConstant_order_constants(tl5_compiler_M_SyntaxTreeConstant* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeConstant_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman);
 
 Returncode tl5_compiler_M_SyntaxTreeConstant_write(tl5_compiler_M_SyntaxTreeConstant* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeConstant_Dynamic* self_Dynamic);
 
@@ -2830,6 +2840,7 @@ Int tl5_compiler_M_try_depth_count = 0;
 #define LUMI_FUNC_NAME "SyntaxTreeNode.set-location"
 Returncode tl5_compiler_M_SyntaxTreeNode_set_location(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(14, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(14, 27, "used member of empty object")
@@ -2844,6 +2855,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_set_location(tl5_compiler_M_SyntaxTreeN
   if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
   self->line_number = tl5_compiler_M_glob->line_number;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -2858,6 +2870,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_get_access(tl5_compiler_M_SyntaxTreeNod
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(access_str_Refman);
   for (n = 1; n < 5; ++n) {
       if (tl5_compiler_M_glob == NULL) RAISE(19, 27, "used member of empty object")
@@ -2882,6 +2895,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_get_access(tl5_compiler_M_SyntaxTreeNod
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(access_str_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -2891,12 +2905,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeNode.get-parent-type"
 Returncode tl5_compiler_M_SyntaxTreeNode_get_parent_type(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_TypeData** parent_type, Ref_Manager** parent_type_Refman, tl5_compiler_M_TypeData_Dynamic** parent_type_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_dec_ref(*parent_type_Refman);
   *parent_type_Refman = NULL;
   LUMI_inc_ref(*parent_type_Refman);
   *parent_type_Dynamic = NULL;
   *parent_type = NULL;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -2909,6 +2925,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_find_module(tl5_compiler_M_SyntaxTreeNo
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(29, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(29, 38, "used member of outdated weak reference")
@@ -2925,6 +2942,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_find_module(tl5_compiler_M_SyntaxTreeNo
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -2951,6 +2969,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_find_type(tl5_compiler_M_SyntaxTreeNode
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
   if (module_name != NULL && module_name_Refman->value != NULL) {
@@ -3031,6 +3050,7 @@ LUMI_cleanup:
   LUMI_dec_ref(parent_type_Refman);
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3042,6 +3062,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_find_variable(tl5_compiler_M_SyntaxTree
   Returncode LUMI_err = OK;
   tl5_compiler_M_ModuleMembers* aux_ModuleMembers_0 = NULL;
   Ref_Manager* aux_ModuleMembers_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
   if (module_name != NULL && module_name_Refman->value != NULL) {
@@ -3057,6 +3078,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_ModuleMembers_0_Refman);
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3068,6 +3090,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_find_function(tl5_compiler_M_SyntaxTree
   Returncode LUMI_err = OK;
   tl5_compiler_M_ModuleMembers* aux_ModuleMembers_0 = NULL;
   Ref_Manager* aux_ModuleMembers_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
   if (module_name != NULL && module_name_Refman->value != NULL) {
@@ -3083,6 +3106,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_ModuleMembers_0_Refman);
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3103,6 +3127,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_read_expect(tl5_compiler_M_SyntaxTreeNo
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(expected_text_Refman);
   if (expected_text == NULL) RAISE(72, 27, "used member of empty object")
   if (expected_text_Refman->value == NULL) RAISE(72, 38, "used member of outdated weak reference")
@@ -3136,6 +3161,7 @@ LUMI_cleanup:
   String_Del(actual_text);
   LUMI_owner_dec_ref(actual_text_Refman);
   LUMI_dec_ref(expected_text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3154,6 +3180,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_analyze_expression(tl5_compiler_M_Synta
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(expression_Refman);
   LUMI_inc_ref(expected_type_Refman);
   if (expression_Dynamic == NULL) RAISE(81, 28, "dynamic call of empty object")
@@ -3204,6 +3231,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(expected_type_Refman);
   LUMI_dec_ref(expression_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3213,10 +3241,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeNode.write-line-num"
 Returncode tl5_compiler_M_SyntaxTreeNode_write_line_num(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(93, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(93, 38, "used member of outdated weak reference")
   CHECK(93, tl5_compiler_M_write_int(self->line_number) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3238,6 +3268,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_write_raise(tl5_compiler_M_SyntaxTreeNo
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(error_message_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -3278,6 +3309,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(error_message_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3293,6 +3325,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_write_call(tl5_compiler_M_SyntaxTreeNod
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(105, 38, "insufficient memory for managed object")
@@ -3311,6 +3344,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_write_call(tl5_compiler_M_SyntaxTreeNod
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3323,6 +3357,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_print_syntax_error(tl5_compiler_M_Synta
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
   LUMI_inc_ref(item_Refman);
   CHECK(112, tl5_compiler_M_SyntaxTreeNode_print_syntax_error_header(self, self_Refman, self_Dynamic) )
@@ -3338,6 +3373,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(item_Refman);
   LUMI_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3347,6 +3383,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeNode.syntax-error"
 Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, String* text, Ref_Manager* text_Refman, String* item, Ref_Manager* item_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
   LUMI_inc_ref(item_Refman);
   CHECK(117, tl5_compiler_M_SyntaxTreeNode_print_syntax_error(self, self_Refman, self_Dynamic, text, text_Refman, item, item_Refman) )
@@ -3354,6 +3391,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error(tl5_compiler_M_SyntaxTreeN
 LUMI_cleanup:
   LUMI_dec_ref(item_Refman);
   LUMI_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3369,6 +3407,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(tl5_compiler_M_SyntaxTr
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text1_Refman);
   LUMI_inc_ref(item1_Refman);
   LUMI_inc_ref(text2_Refman);
@@ -3398,6 +3437,7 @@ LUMI_cleanup:
   LUMI_dec_ref(text2_Refman);
   LUMI_dec_ref(item1_Refman);
   LUMI_dec_ref(text1_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3416,6 +3456,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_m_syntax_error3(tl5_compiler_M_SyntaxTr
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text1_Refman);
   LUMI_inc_ref(item1_Refman);
   LUMI_inc_ref(text2_Refman);
@@ -3458,6 +3499,7 @@ LUMI_cleanup:
   LUMI_dec_ref(text2_Refman);
   LUMI_dec_ref(item1_Refman);
   LUMI_dec_ref(text1_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3477,6 +3519,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error_c(tl5_compiler_M_SyntaxTre
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
   char_str = &char_str_Var;
   char_str_Var.values = char_str_Values;
@@ -3512,6 +3555,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(char_str_Refman);
   LUMI_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3524,6 +3568,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(tl5_compiler_M_SyntaxT
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
   CHECK(160, tl5_compiler_M_SyntaxTreeNode_print_syntax_error_header(self, self_Refman, self_Dynamic) )
   CHECK(161, tl5_compiler_M_print(text, text_Refman) )
@@ -3538,6 +3583,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(tl5_compiler_M_SyntaxT
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3573,6 +3619,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error_indentation(tl5_compiler_M
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   expected_str = &expected_str_Var;
   expected_str_Var.values = expected_str_Values;
   expected_str_Refman = LUMI_new_ref(expected_str);
@@ -3642,6 +3689,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(actual_str_Refman);
   LUMI_dec_ref(expected_str_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3664,6 +3712,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_print_syntax_error_header(tl5_compiler_
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(184, 38, "insufficient memory for managed object")
@@ -3701,6 +3750,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(line_num_str_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3722,6 +3772,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_check_string(tl5_compiler_M_SyntaxTreeN
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
   if (text == NULL) RAISE(194, 27, "used member of empty object")
   if (text_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
@@ -3772,6 +3823,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3781,7 +3833,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeNode.link-types"
 Returncode tl5_compiler_M_SyntaxTreeNode_link_types(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3791,7 +3845,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeNode.analyze"
 Returncode tl5_compiler_M_SyntaxTreeNode_analyze(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3799,11 +3855,13 @@ LUMI_cleanup:
 
 #define LUMI_FILE_NAME "TL5/syntax-tree/node.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeNode.order-constants"
-Returncode tl5_compiler_M_SyntaxTreeNode_order_constants(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman) {
+Returncode tl5_compiler_M_SyntaxTreeNode_order_constants(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ordered_list_Refman);
 LUMI_cleanup:
   LUMI_dec_ref(ordered_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3813,8 +3871,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeNode.write"
 Returncode tl5_compiler_M_SyntaxTreeNode_write(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(215, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3828,6 +3888,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_link_children_types(tl5_compiler_M_Synt
   tl5_compiler_M_NodeLinkTypesAction* action_link_types = NULL;
   Ref_Manager* action_link_types_Refman = NULL;
   tl5_compiler_M_NodeLinkTypesAction_Dynamic* action_link_types_Dynamic = &tl5_compiler_M_NodeLinkTypesAction_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(child_list_Refman);
   action_link_types = &action_link_types_Var;
   action_link_types_Refman = LUMI_new_ref(action_link_types);
@@ -3836,6 +3897,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_link_children_types(tl5_compiler_M_Synt
 LUMI_cleanup:
   LUMI_dec_ref(action_link_types_Refman);
   LUMI_dec_ref(child_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3849,6 +3911,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_analyze_children(tl5_compiler_M_SyntaxT
   tl5_compiler_M_NodeAnalyzeAction* action_analyze = NULL;
   Ref_Manager* action_analyze_Refman = NULL;
   tl5_compiler_M_NodeAnalyzeAction_Dynamic* action_analyze_Dynamic = &tl5_compiler_M_NodeAnalyzeAction_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(child_list_Refman);
   action_analyze = &action_analyze_Var;
   action_analyze_Refman = LUMI_new_ref(action_analyze);
@@ -3857,6 +3920,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_analyze_children(tl5_compiler_M_SyntaxT
 LUMI_cleanup:
   LUMI_dec_ref(action_analyze_Refman);
   LUMI_dec_ref(child_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3864,12 +3928,13 @@ LUMI_cleanup:
 
 #define LUMI_FILE_NAME "TL5/syntax-tree/node.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeNode.order-children-constants"
-Returncode tl5_compiler_M_SyntaxTreeNode_order_children_constants(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* child_list, Ref_Manager* child_list_Refman, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman) {
+Returncode tl5_compiler_M_SyntaxTreeNode_order_children_constants(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_List* child_list, Ref_Manager* child_list_Refman, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman) {
   Returncode LUMI_err = OK;
   tl5_compiler_M_NodeOrderConstantsAction action_order_constants_Var = {{0}};
   tl5_compiler_M_NodeOrderConstantsAction* action_order_constants = NULL;
   Ref_Manager* action_order_constants_Refman = NULL;
   tl5_compiler_M_NodeOrderConstantsAction_Dynamic* action_order_constants_Dynamic = &tl5_compiler_M_NodeOrderConstantsAction_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(child_list_Refman);
   LUMI_inc_ref(ordered_list_Refman);
   action_order_constants = &action_order_constants_Var;
@@ -3886,6 +3951,7 @@ LUMI_cleanup:
   LUMI_dec_ref(action_order_constants_Refman);
   LUMI_dec_ref(ordered_list_Refman);
   LUMI_dec_ref(child_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3899,6 +3965,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_write_children(tl5_compiler_M_SyntaxTre
   tl5_compiler_M_NodeWriteAction* action_write = NULL;
   Ref_Manager* action_write_Refman = NULL;
   tl5_compiler_M_NodeWriteAction_Dynamic* action_write_Dynamic = &tl5_compiler_M_NodeWriteAction_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(child_list_Refman);
   action_write = &action_write_Var;
   action_write_Refman = LUMI_new_ref(action_write);
@@ -3907,6 +3974,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_write_children(tl5_compiler_M_SyntaxTre
 LUMI_cleanup:
   LUMI_dec_ref(action_write_Refman);
   LUMI_dec_ref(child_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3918,6 +3986,7 @@ Returncode tl5_compiler_M_SyntaxTreeNode_do_on_children(tl5_compiler_M_SyntaxTre
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* child = NULL;
   Ref_Manager* child_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(child_list_Refman);
   LUMI_inc_ref(action_Refman);
   if (child_list == NULL) RAISE(238, 27, "used member of empty object")
@@ -3929,27 +3998,9 @@ Returncode tl5_compiler_M_SyntaxTreeNode_do_on_children(tl5_compiler_M_SyntaxTre
       if (!(child != NULL && child_Refman->value != NULL)) break;
       if (child == NULL) RAISE(241, 27, "used member of empty object")
       if (child_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
-      if (child->item == NULL) RAISE(241, 27, "used member of empty object")
-      if (child->item_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
-      if (tl5_compiler_M_glob == NULL) RAISE(241, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
-      LUMI_dec_ref(tl5_compiler_M_glob->input_file_name_Refman);
-      tl5_compiler_M_glob->input_file_name_Refman = ((tl5_compiler_M_SyntaxTreeNode*)(child->item))->input_file_name_Refman;
-      LUMI_inc_ref(tl5_compiler_M_glob->input_file_name_Refman);
-      tl5_compiler_M_glob->input_file_name = ((tl5_compiler_M_SyntaxTreeNode*)(child->item))->input_file_name;
+      CHECK(241, tl5_compiler_M_SyntaxTreeNode_do_action(child->item, child->item_Refman, ((tl5_compiler_M_SyntaxTreeNode_Dynamic*)(child->item_Dynamic)), action, action_Refman, action_Dynamic) )
       if (child == NULL) RAISE(242, 27, "used member of empty object")
       if (child_Refman->value == NULL) RAISE(242, 38, "used member of outdated weak reference")
-      if (child->item == NULL) RAISE(242, 27, "used member of empty object")
-      if (child->item_Refman->value == NULL) RAISE(242, 38, "used member of outdated weak reference")
-      if (tl5_compiler_M_glob == NULL) RAISE(242, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(242, 38, "used member of outdated weak reference")
-      tl5_compiler_M_glob->line_number = ((tl5_compiler_M_SyntaxTreeNode*)(child->item))->line_number;
-      if (action_Dynamic == NULL) RAISE(243, 28, "dynamic call of empty object")
-      if (child == NULL) RAISE(243, 27, "used member of empty object")
-      if (child_Refman->value == NULL) RAISE(243, 38, "used member of outdated weak reference")
-      CHECK(243, action_Dynamic->action(action, action_Refman, action_Dynamic, child->item, child->item_Refman, ((tl5_compiler_M_SyntaxTreeNode_Dynamic*)(child->item_Dynamic))) )
-      if (child == NULL) RAISE(244, 27, "used member of empty object")
-      if (child_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
       LUMI_dec_ref(child_Refman);
       child_Refman = child->next_Refman;
       LUMI_inc_ref(child_Refman);
@@ -3959,6 +4010,36 @@ LUMI_cleanup:
   LUMI_dec_ref(child_Refman);
   LUMI_dec_ref(action_Refman);
   LUMI_dec_ref(child_list_Refman);
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/syntax-tree/node.4.lm"
+#define LUMI_FUNC_NAME "SyntaxTreeNode.do-action"
+Returncode tl5_compiler_M_SyntaxTreeNode_do_action(tl5_compiler_M_SyntaxTreeNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* self_Dynamic, tl5_compiler_M_NodeAction* action, Ref_Manager* action_Refman, tl5_compiler_M_NodeAction_Dynamic* action_Dynamic) {
+  Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+  LUMI_inc_ref(action_Refman);
+  if (self == NULL) RAISE(245, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(245, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(245, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(245, 38, "used member of outdated weak reference")
+  LUMI_dec_ref(tl5_compiler_M_glob->input_file_name_Refman);
+  tl5_compiler_M_glob->input_file_name_Refman = self->input_file_name_Refman;
+  LUMI_inc_ref(tl5_compiler_M_glob->input_file_name_Refman);
+  tl5_compiler_M_glob->input_file_name = self->input_file_name;
+  if (self == NULL) RAISE(246, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(246, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(246, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(246, 38, "used member of outdated weak reference")
+  tl5_compiler_M_glob->line_number = self->line_number;
+  if (action_Dynamic == NULL) RAISE(247, 28, "dynamic call of empty object")
+  CHECK(247, action_Dynamic->action(action, action_Refman, action_Dynamic, self, self_Refman, self_Dynamic) )
+LUMI_cleanup:
+  LUMI_dec_ref(action_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -3984,6 +4065,7 @@ Returncode tl5_compiler_M_Expression_parse_new(tl5_compiler_M_Expression* self, 
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(code_node_Refman);
   LUMI_inc_ref(curr_operator_Refman);
@@ -4058,6 +4140,7 @@ LUMI_cleanup:
   LUMI_dec_ref(curr_operator_Refman);
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(ends_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4072,6 +4155,7 @@ Returncode tl5_compiler_M_Expression_read_new_value(tl5_compiler_M_Expression* s
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -4086,6 +4170,7 @@ LUMI_cleanup:
   String_Del(all_ends);
   LUMI_owner_dec_ref(all_ends_Refman);
   LUMI_dec_ref(ends_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4099,6 +4184,7 @@ Returncode tl5_compiler_M_Expression_parse_new_operand(tl5_compiler_M_Expression
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (text == NULL) RAISE(96, 27, "used member of empty object")
@@ -4135,6 +4221,7 @@ LUMI_cleanup:
   LUMI_dec_ref(ends_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4150,6 +4237,7 @@ Returncode tl5_compiler_M_Expression_parse_new_init_operand(tl5_compiler_M_Expre
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (text == NULL) RAISE(116, 29, "empty object used as sequence")
@@ -4225,6 +4313,7 @@ LUMI_cleanup:
   LUMI_dec_ref(ends_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4238,6 +4327,7 @@ Returncode tl5_compiler_M_Expression_parse_new_follow_operand(tl5_compiler_M_Exp
   Ref_Manager* text_Refman = NULL;
   Char first = 0;
   Char second = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(code_node_Refman);
   *has_more = true;
@@ -4285,6 +4375,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(text_Refman);
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(ends_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4294,12 +4385,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Expression.set-simple-type"
 Returncode tl5_compiler_M_Expression_set_simple_type(tl5_compiler_M_Expression* self, Ref_Manager* self_Refman, tl5_compiler_M_Expression_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* type_data, Ref_Manager* type_data_Refman, tl5_compiler_M_TypeData_Dynamic* type_data_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   if (self == NULL) RAISE(169, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(169, 38, "used member of outdated weak reference")
   CHECK(169, tl5_compiler_M_TypeData_new_type_instance(type_data, type_data_Refman, type_data_Dynamic, &(self->result_type), &(self->result_type_Refman)) )
 LUMI_cleanup:
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4315,6 +4408,7 @@ Returncode tl5_compiler_M_Expression_add_aux_variable(tl5_compiler_M_Expression*
   tl5_compiler_M_SyntaxTreeFunction* aux_SyntaxTreeFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* aux_SyntaxTreeFunction_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_instance_Refman);
   aux_SymbolExpression_0 = LUMI_alloc(sizeof(tl5_compiler_M_SymbolExpression));
   if (aux_SymbolExpression_0 == NULL) RAISE(174, 49, "insufficient memory for object dynamic allocation")
@@ -4364,6 +4458,7 @@ LUMI_cleanup:
   if (aux_SymbolExpression_0_Dynamic != NULL) aux_SymbolExpression_0_Dynamic->_base._base._del(aux_SymbolExpression_0);
   LUMI_owner_dec_ref(aux_SymbolExpression_0_Refman);
   LUMI_dec_ref(type_instance_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4373,6 +4468,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Expression.get-parent-type"
 Returncode tl5_compiler_M_Expression_get_parent_type(tl5_compiler_M_Expression* self, Ref_Manager* self_Refman, tl5_compiler_M_Expression_Dynamic* self_Dynamic, tl5_compiler_M_TypeData** parent_type, Ref_Manager** parent_type_Refman, tl5_compiler_M_TypeData_Dynamic** parent_type_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_dec_ref(*parent_type_Refman);
   *parent_type_Refman = NULL;
   LUMI_inc_ref(*parent_type_Refman);
@@ -4387,6 +4483,7 @@ Returncode tl5_compiler_M_Expression_get_parent_type(tl5_compiler_M_Expression* 
       CHECK(186, self->code_node_Dynamic->_base.get_parent_type(&(self->code_node->_base), self->code_node_Refman, &(self->code_node_Dynamic->_base), &(*parent_type), &(*parent_type_Refman), &(*parent_type_Dynamic)) )
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4411,6 +4508,7 @@ Returncode tl5_compiler_M_Expression_write_refman_init(tl5_compiler_M_Expression
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(symbol_Refman);
   if (self == NULL) RAISE(191, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(191, 38, "used member of outdated weak reference")
@@ -4466,6 +4564,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(symbol_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4481,6 +4580,7 @@ Returncode tl5_compiler_M_Expression_write_init_var_ref(tl5_compiler_M_Expressio
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(symbol_Refman);
   if (symbol_Dynamic == NULL) RAISE(204, 28, "dynamic call of empty object")
   CHECK(204, symbol_Dynamic->_base._base.write(&(symbol->_base._base), symbol_Refman, &(symbol_Dynamic->_base._base)) )
@@ -4504,6 +4604,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(symbol_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4522,6 +4623,7 @@ Returncode tl5_compiler_M_Expression_write_assign_null(tl5_compiler_M_Expression
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(210, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
   CHECK(210, tl5_compiler_M_SyntaxTreeCode_write_spaces(self->code_node, self->code_node_Refman, self->code_node_Dynamic) )
@@ -4570,6 +4672,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4582,6 +4685,7 @@ Returncode tl5_compiler_M_Expression_write_dynamic(tl5_compiler_M_Expression* se
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self_Dynamic == NULL) RAISE(222, 28, "dynamic call of empty object")
   CHECK(222, self_Dynamic->_base.write(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_0 = &aux_String_0_Var;
@@ -4593,6 +4697,7 @@ Returncode tl5_compiler_M_Expression_write_dynamic(tl5_compiler_M_Expression* se
   CHECK(223, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4605,6 +4710,7 @@ Returncode tl5_compiler_M_Expression_write_refman(tl5_compiler_M_Expression* sel
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self_Dynamic == NULL) RAISE(226, 28, "dynamic call of empty object")
   CHECK(226, self_Dynamic->_base.write(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_0 = &aux_String_0_Var;
@@ -4616,6 +4722,7 @@ Returncode tl5_compiler_M_Expression_write_refman(tl5_compiler_M_Expression* sel
   CHECK(227, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4626,6 +4733,7 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_Expression_write_as_top(tl5_compiler_M_Expression* self, Ref_Manager* self_Refman, tl5_compiler_M_Expression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
   Bool top = 0;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(230, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(230, 38, "used member of outdated weak reference")
   top = self->top;
@@ -4638,6 +4746,7 @@ Returncode tl5_compiler_M_Expression_write_as_top(tl5_compiler_M_Expression* sel
   if (self_Refman->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
   self->top = top;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4647,6 +4756,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Expression.analyze-call"
 Returncode tl5_compiler_M_Expression_analyze_call(tl5_compiler_M_Expression* self, Ref_Manager* self_Refman, tl5_compiler_M_Expression_Dynamic* self_Dynamic, tl5_compiler_M_FunctionArguments* arguments, Ref_Manager* arguments_Refman, tl5_compiler_M_FunctionArguments_Dynamic* arguments_Dynamic, tl5_compiler_M_TypeInstance** instance_type, Ref_Manager** instance_type_Refman, Int* bases, Bool* is_function_object) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
   *is_function_object = true;
   *bases = 0;
@@ -4656,6 +4766,7 @@ Returncode tl5_compiler_M_Expression_analyze_call(tl5_compiler_M_Expression* sel
   *instance_type = NULL;
 LUMI_cleanup:
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4665,8 +4776,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Expression.analyze-mock"
 Returncode tl5_compiler_M_Expression_analyze_mock(tl5_compiler_M_Expression* self, Ref_Manager* self_Refman, tl5_compiler_M_Expression_Dynamic* self_Dynamic, Bool is_annotate, Bool* is_mock) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   *is_mock = false;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4676,7 +4789,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Expression.write-preactions"
 Returncode tl5_compiler_M_Expression_write_preactions(tl5_compiler_M_Expression* self, Ref_Manager* self_Refman, tl5_compiler_M_Expression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4697,6 +4812,7 @@ Returncode tl5_compiler_M_BaseMethExpression_parse_new(tl5_compiler_M_BaseMethEx
   tl5_compiler_M_BaseMethExpression* base_expression = NULL;
   Ref_Manager* base_expression_Refman = NULL;
   tl5_compiler_M_BaseMethExpression_Dynamic* base_expression_Dynamic = &tl5_compiler_M_BaseMethExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   base_expression = LUMI_alloc(sizeof(tl5_compiler_M_BaseMethExpression));
   if (base_expression == NULL) RAISE(14, 49, "insufficient memory for object dynamic allocation")
@@ -4717,6 +4833,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4726,6 +4843,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "BaseMethExpression.init"
 Returncode tl5_compiler_M_BaseMethExpression_init(tl5_compiler_M_BaseMethExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BaseMethExpression_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic, Bool is_call) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (self == NULL) RAISE(19, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(19, 38, "used member of outdated weak reference")
@@ -4743,6 +4861,7 @@ Returncode tl5_compiler_M_BaseMethExpression_init(tl5_compiler_M_BaseMethExpress
   CHECK(22, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4764,6 +4883,7 @@ Returncode tl5_compiler_M_BaseMethExpression_analyze(tl5_compiler_M_BaseMethExpr
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(26, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(26, 38, "used member of outdated weak reference")
   CHECK(26, tl5_compiler_M_SyntaxTreeCode_get_function(self->_base.code_node, self->_base.code_node_Refman, self->_base.code_node_Dynamic, &(function), &(function_Refman), &(function_Dynamic)) )
@@ -4868,6 +4988,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(function_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4883,6 +5004,7 @@ Returncode tl5_compiler_M_BaseMethExpression_analyze_call(tl5_compiler_M_BaseMet
   tl5_compiler_M_BaseMethExpression* aux_BaseMethExpression_0 = NULL;
   Ref_Manager* aux_BaseMethExpression_0_Refman = NULL;
   tl5_compiler_M_BaseMethExpression_Dynamic* aux_BaseMethExpression_0_Dynamic = &tl5_compiler_M_BaseMethExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
   *is_function_object = false;
   if (self == NULL) RAISE(50, 27, "used member of empty object")
@@ -4949,6 +5071,7 @@ LUMI_cleanup:
   if (self_param_Dynamic != NULL) self_param_Dynamic->_base._base._del(self_param);
   LUMI_owner_dec_ref(self_param_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4961,6 +5084,7 @@ Returncode tl5_compiler_M_BaseMethExpression_write(tl5_compiler_M_BaseMethExpres
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(60, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(60, 38, "used member of outdated weak reference")
   if (self->is_call) {
@@ -4979,6 +5103,7 @@ Returncode tl5_compiler_M_BaseMethExpression_write(tl5_compiler_M_BaseMethExpres
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4998,6 +5123,7 @@ Returncode tl5_compiler_M_UpCastExpression_init_new(tl5_compiler_M_UpCastExpress
   tl5_compiler_M_UpCastExpression* up_cast = NULL;
   Ref_Manager* up_cast_Refman = NULL;
   tl5_compiler_M_UpCastExpression_Dynamic* up_cast_Dynamic = &tl5_compiler_M_UpCastExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   up_cast = LUMI_alloc(sizeof(tl5_compiler_M_UpCastExpression));
   if (up_cast == NULL) RAISE(72, 49, "insufficient memory for object dynamic allocation")
   up_cast_Refman = LUMI_new_ref(up_cast);
@@ -5017,6 +5143,7 @@ Returncode tl5_compiler_M_UpCastExpression_init_new(tl5_compiler_M_UpCastExpress
 LUMI_cleanup:
   if (up_cast_Dynamic != NULL) up_cast_Dynamic->_base._base._del(up_cast);
   LUMI_owner_dec_ref(up_cast_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5026,6 +5153,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "UpCastExpression.init"
 Returncode tl5_compiler_M_UpCastExpression_init(tl5_compiler_M_UpCastExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UpCastExpression_Dynamic* self_Dynamic, Int bases, tl5_compiler_M_Expression* expression, Ref_Manager* expression_Refman, tl5_compiler_M_Expression_Dynamic* expression_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(77, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(77, 38, "used member of outdated weak reference")
   if (self->expression_Dynamic != NULL) self->expression_Dynamic->_base._del(self->expression);
@@ -5061,6 +5189,7 @@ Returncode tl5_compiler_M_UpCastExpression_init(tl5_compiler_M_UpCastExpression*
 LUMI_cleanup:
   if (expression_Dynamic != NULL) expression_Dynamic->_base._del(expression);
   LUMI_owner_dec_ref(expression_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5070,11 +5199,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "UpCastExpression.write-preactions"
 Returncode tl5_compiler_M_UpCastExpression_write_preactions(tl5_compiler_M_UpCastExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UpCastExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->expression_Dynamic == NULL) RAISE(84, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(84, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(84, 38, "used member of outdated weak reference")
   CHECK(84, self->expression_Dynamic->write_preactions(self->expression, self->expression_Refman, self->expression_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5084,6 +5215,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "UpCastExpression.write"
 Returncode tl5_compiler_M_UpCastExpression_write(tl5_compiler_M_UpCastExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UpCastExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(88, tl5_compiler_M_UpCastExpression_write_pre(self, self_Refman, self_Dynamic) )
   if (self->expression_Dynamic == NULL) RAISE(89, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(89, 27, "used member of empty object")
@@ -5091,6 +5223,7 @@ Returncode tl5_compiler_M_UpCastExpression_write(tl5_compiler_M_UpCastExpression
   CHECK(89, self->expression_Dynamic->_base.write(&(self->expression->_base), self->expression_Refman, &(self->expression_Dynamic->_base)) )
   CHECK(90, tl5_compiler_M_UpCastExpression_write_post(self, self_Refman, self_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5100,6 +5233,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "UpCastExpression.write-dynamic"
 Returncode tl5_compiler_M_UpCastExpression_write_dynamic(tl5_compiler_M_UpCastExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UpCastExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(93, tl5_compiler_M_UpCastExpression_write_pre(self, self_Refman, self_Dynamic) )
   if (self->expression_Dynamic == NULL) RAISE(94, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(94, 27, "used member of empty object")
@@ -5107,6 +5241,7 @@ Returncode tl5_compiler_M_UpCastExpression_write_dynamic(tl5_compiler_M_UpCastEx
   CHECK(94, self->expression_Dynamic->write_dynamic(self->expression, self->expression_Refman, self->expression_Dynamic) )
   CHECK(95, tl5_compiler_M_UpCastExpression_write_post(self, self_Refman, self_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5116,6 +5251,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "UpCastExpression.write-refman"
 Returncode tl5_compiler_M_UpCastExpression_write_refman(tl5_compiler_M_UpCastExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UpCastExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(98, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(98, 38, "used member of outdated weak reference")
   if (self->expression == NULL) RAISE(98, 27, "used member of empty object")
@@ -5131,6 +5267,7 @@ Returncode tl5_compiler_M_UpCastExpression_write_refman(tl5_compiler_M_UpCastExp
   if (self->expression_Refman->value == NULL) RAISE(100, 38, "used member of outdated weak reference")
   self->expression->top = false;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5143,6 +5280,7 @@ Returncode tl5_compiler_M_UpCastExpression_write_pre(tl5_compiler_M_UpCastExpres
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(103, 38, "insufficient memory for managed object")
@@ -5152,6 +5290,7 @@ Returncode tl5_compiler_M_UpCastExpression_write_pre(tl5_compiler_M_UpCastExpres
   CHECK(103, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5171,6 +5310,7 @@ Returncode tl5_compiler_M_UpCastExpression_write_post(tl5_compiler_M_UpCastExpre
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(106, 38, "insufficient memory for managed object")
@@ -5198,6 +5338,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5220,6 +5361,7 @@ Returncode tl5_compiler_M_ModuleTypeExpression_analyze_module(tl5_compiler_M_Mod
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->module_expression_Dynamic == NULL) RAISE(116, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(116, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(116, 38, "used member of outdated weak reference")
@@ -5269,6 +5411,7 @@ Returncode tl5_compiler_M_ModuleTypeExpression_analyze_module(tl5_compiler_M_Mod
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5278,6 +5421,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "ModuleTypeExpression.analyze-type-instance"
 Returncode tl5_compiler_M_ModuleTypeExpression_analyze_type_instance(tl5_compiler_M_ModuleTypeExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_ModuleTypeExpression_Dynamic* self_Dynamic, tl5_compiler_M_TypeInstance* type_instance, Ref_Manager* type_instance_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_instance_Refman);
   if (self == NULL) RAISE(126, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(126, 38, "used member of outdated weak reference")
@@ -5296,6 +5440,7 @@ Returncode tl5_compiler_M_ModuleTypeExpression_analyze_type_instance(tl5_compile
   CHECK(130, tl5_compiler_M_TypeInstance_analyze(type_instance, type_instance_Refman, &(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
   LUMI_dec_ref(type_instance_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5330,6 +5475,7 @@ Returncode tl5_compiler_M_TypeExpression_parse_new(tl5_compiler_M_TypeExpression
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(code_node_Refman);
   if ((*end) == '.') {
@@ -5440,6 +5586,7 @@ LUMI_cleanup:
   LUMI_dec_ref(ends_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5451,6 +5598,7 @@ Returncode tl5_compiler_M_TypeExpression_parse(tl5_compiler_M_TypeExpression* se
   Returncode LUMI_err = OK;
   tl5_compiler_M_List* aux_List_0 = NULL;
   Ref_Manager* aux_List_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   CHECK(169, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base)) )
   if (self == NULL) RAISE(170, 27, "used member of empty object")
@@ -5505,6 +5653,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(module_expression_Refman);
   tl5_compiler_M_TypeInstance_Del(type_instance);
   LUMI_owner_dec_ref(type_instance_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5514,6 +5663,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeExpression.analyze"
 Returncode tl5_compiler_M_TypeExpression_analyze(tl5_compiler_M_TypeExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(178, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(178, 38, "used member of outdated weak reference")
   if (self->_base._base.result_type == NULL) RAISE(178, 27, "used member of empty object")
@@ -5524,6 +5674,7 @@ Returncode tl5_compiler_M_TypeExpression_analyze(tl5_compiler_M_TypeExpression* 
   if (self->_base._base.result_type->parameters->first_Refman->value == NULL) RAISE(178, 38, "used member of outdated weak reference")
   CHECK(178, tl5_compiler_M_ModuleTypeExpression_analyze_type_instance(&(self->_base), self_Refman, &(self_Dynamic->_base), self->_base._base.result_type->parameters->first->item, self->_base._base.result_type->parameters->first->item_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5538,6 +5689,7 @@ void tl5_compiler_M_TypeExpression_Del(tl5_compiler_M_TypeExpression* self) {
 #define LUMI_FUNC_NAME "EnumExpression.parse"
 Returncode tl5_compiler_M_EnumExpression_parse(tl5_compiler_M_EnumExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_EnumExpression_Dynamic* self_Dynamic, String* name, Ref_Manager* name_Refman, String* value, Ref_Manager* value_Refman, tl5_compiler_M_Expression* module_expression, Ref_Manager* module_expression_Refman, tl5_compiler_M_Expression_Dynamic* module_expression_Dynamic, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   CHECK(192, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base)) )
   if (self == NULL) RAISE(193, 27, "used member of empty object")
@@ -5590,6 +5742,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(value_Refman);
   String_Del(name);
   LUMI_owner_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5619,6 +5772,7 @@ Returncode tl5_compiler_M_EnumExpression_analyze(tl5_compiler_M_EnumExpression* 
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(202, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
   if (self->_base.module_expression != NULL && self->_base.module_expression_Refman->value != NULL) {
@@ -5714,6 +5868,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(aux_ModuleMembers_0_Refman);
   LUMI_dec_ref(module_name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5726,6 +5881,7 @@ Returncode tl5_compiler_M_EnumExpression_write(tl5_compiler_M_EnumExpression* se
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(220, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(220, 38, "used member of outdated weak reference")
   CHECK(220, tl5_compiler_M_EnumData_write_cname(self->enum_data, self->enum_data_Refman, self->enum_data_Dynamic) )
@@ -5741,6 +5897,7 @@ Returncode tl5_compiler_M_EnumExpression_write(tl5_compiler_M_EnumExpression* se
   CHECK(222, tl5_compiler_M_write_cname(self->value, self->value_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5763,6 +5920,7 @@ Returncode tl5_compiler_M_CallExpression_parse_new(tl5_compiler_M_CallExpression
   tl5_compiler_M_CallExpression* call_expression = NULL;
   Ref_Manager* call_expression_Refman = NULL;
   tl5_compiler_M_CallExpression_Dynamic* call_expression_Dynamic = &tl5_compiler_M_CallExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(code_node_Refman);
   call_expression = LUMI_alloc(sizeof(tl5_compiler_M_CallExpression));
@@ -5786,6 +5944,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(call_expression_Refman);
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(ends_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5802,6 +5961,7 @@ Returncode tl5_compiler_M_CallExpression_parse(tl5_compiler_M_CallExpression* se
   tl5_compiler_M_FunctionArguments* aux_FunctionArguments_0 = NULL;
   Ref_Manager* aux_FunctionArguments_0_Refman = NULL;
   tl5_compiler_M_FunctionArguments_Dynamic* aux_FunctionArguments_0_Dynamic = &tl5_compiler_M_FunctionArguments_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (self == NULL) RAISE(19, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(19, 38, "used member of outdated weak reference")
@@ -5848,6 +6008,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   if (function_Dynamic != NULL) function_Dynamic->_base._del(function);
   LUMI_owner_dec_ref(function_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5880,6 +6041,7 @@ Returncode tl5_compiler_M_CallExpression_analyze(tl5_compiler_M_CallExpression* 
   tl5_compiler_M_SymbolExpression* aux_SymbolExpression_0 = NULL;
   Ref_Manager* aux_SymbolExpression_0_Refman = NULL;
   tl5_compiler_M_SymbolExpression_Dynamic* aux_SymbolExpression_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->function_Dynamic == NULL) RAISE(28, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(28, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
@@ -6080,6 +6242,7 @@ LUMI_cleanup:
   LUMI_dec_ref(result_type_Refman);
   LUMI_dec_ref(instance_type_Refman);
   LUMI_dec_ref(declaration_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6098,6 +6261,7 @@ Returncode tl5_compiler_M_CallExpression_write_preactions(tl5_compiler_M_CallExp
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->function_Dynamic == NULL) RAISE(70, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(70, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(70, 38, "used member of outdated weak reference")
@@ -6148,6 +6312,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6157,6 +6322,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "CallExpression.write"
 Returncode tl5_compiler_M_CallExpression_write(tl5_compiler_M_CallExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_CallExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(83, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(83, 38, "used member of outdated weak reference")
   if (self->_base.is_statement) {
@@ -6185,6 +6351,7 @@ Returncode tl5_compiler_M_CallExpression_write(tl5_compiler_M_CallExpression* se
       }
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6194,6 +6361,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "CallExpression.write-refman"
 Returncode tl5_compiler_M_CallExpression_write_refman(tl5_compiler_M_CallExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_CallExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(91, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(91, 38, "used member of outdated weak reference")
   if (self->output != NULL && self->output_Refman->value != NULL) {
@@ -6215,6 +6383,7 @@ Returncode tl5_compiler_M_CallExpression_write_refman(tl5_compiler_M_CallExpress
       self->output->top = true;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6224,6 +6393,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "CallExpression.write-dynamic"
 Returncode tl5_compiler_M_CallExpression_write_dynamic(tl5_compiler_M_CallExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_CallExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(97, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(97, 38, "used member of outdated weak reference")
   if (self->output != NULL && self->output_Refman->value != NULL) {
@@ -6245,6 +6415,7 @@ Returncode tl5_compiler_M_CallExpression_write_dynamic(tl5_compiler_M_CallExpres
       self->output->top = true;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6257,6 +6428,7 @@ Returncode tl5_compiler_M_CallExpression_write_func_call(tl5_compiler_M_CallExpr
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self_Dynamic == NULL) RAISE(103, 28, "dynamic call of empty object")
   CHECK(103, self_Dynamic->_base._base.write_call(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   if (self->function_Dynamic == NULL) RAISE(104, 28, "dynamic call of empty object")
@@ -6279,6 +6451,7 @@ Returncode tl5_compiler_M_CallExpression_write_func_call(tl5_compiler_M_CallExpr
   CHECK(107, tl5_compiler_M_FunctionArguments_write_postactions(self->arguments, self->arguments_Refman, self->arguments_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6298,8 +6471,10 @@ void tl5_compiler_M_CallExpression_Del(tl5_compiler_M_CallExpression* self) {
 #define LUMI_FUNC_NAME "Argument.copy-new"
 Returncode tl5_compiler_M_Argument_copy_new(tl5_compiler_M_Argument* self, Ref_Manager* self_Refman, tl5_compiler_M_Argument_Dynamic* self_Dynamic, tl5_compiler_M_DeclarationArgument** new_argument, Ref_Manager** new_argument_Refman, tl5_compiler_M_DeclarationArgument_Dynamic** new_argument_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(12, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6309,6 +6484,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Argument.parse"
 Returncode tl5_compiler_M_Argument_parse(tl5_compiler_M_Argument* self, Ref_Manager* self_Refman, tl5_compiler_M_Argument_Dynamic* self_Dynamic, String* access_str, Ref_Manager* access_str_Refman, Bool is_output, Bool is_native, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic, Char* end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(access_str_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (self == NULL) RAISE(20, 27, "used member of empty object")
@@ -6326,6 +6502,7 @@ Returncode tl5_compiler_M_Argument_parse(tl5_compiler_M_Argument* self, Ref_Mana
 LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(access_str_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6335,10 +6512,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Argument.parse-value"
 Returncode tl5_compiler_M_Argument_parse_value(tl5_compiler_M_Argument* self, Ref_Manager* self_Refman, tl5_compiler_M_Argument_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic, Char* end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   USER_RAISE(27, NULL, NULL)
 LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6348,8 +6527,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Argument.get-type-instance"
 Returncode tl5_compiler_M_Argument_get_type_instance(tl5_compiler_M_Argument* self, Ref_Manager* self_Refman, tl5_compiler_M_Argument_Dynamic* self_Dynamic, tl5_compiler_M_TypeInstance** type_instance, Ref_Manager** type_instance_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(30, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6367,6 +6548,7 @@ Returncode tl5_compiler_M_Argument_check_same_as(tl5_compiler_M_Argument* self, 
   Ref_Manager* aux_String_1_Refman = NULL;
   tl5_compiler_M_TypeInstance* aux_TypeInstance_0 = NULL;
   Ref_Manager* aux_TypeInstance_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(other_Refman);
   LUMI_inc_ref(instance_type_Refman);
   if (other == NULL) RAISE(34, 27, "used member of empty object")
@@ -6417,6 +6599,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(instance_type_Refman);
   LUMI_dec_ref(other_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6428,6 +6611,7 @@ Returncode tl5_compiler_M_Argument_check_same_type_as(tl5_compiler_M_Argument* s
   Returncode LUMI_err = OK;
   tl5_compiler_M_TypeInstance* aux_TypeInstance_0 = NULL;
   Ref_Manager* aux_TypeInstance_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_instance_Refman);
   LUMI_inc_ref(instance_type_Refman);
   if (self_Dynamic == NULL) RAISE(48, 28, "dynamic call of empty object")
@@ -6437,6 +6621,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_TypeInstance_0_Refman);
   LUMI_dec_ref(instance_type_Refman);
   LUMI_dec_ref(type_instance_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6446,8 +6631,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Argument.get-variable"
 Returncode tl5_compiler_M_Argument_get_variable(tl5_compiler_M_Argument* self, Ref_Manager* self_Refman, tl5_compiler_M_Argument_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeVariable** variable, Ref_Manager** variable_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic** variable_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(51, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6457,8 +6644,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Argument.get-output"
 Returncode tl5_compiler_M_Argument_get_output(tl5_compiler_M_Argument* self, Ref_Manager* self_Refman, tl5_compiler_M_Argument_Dynamic* self_Dynamic, tl5_compiler_M_Expression** output, Ref_Manager** output_Refman, tl5_compiler_M_Expression_Dynamic** output_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(54, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6468,8 +6657,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Argument.write-preactions"
 Returncode tl5_compiler_M_Argument_write_preactions(tl5_compiler_M_Argument* self, Ref_Manager* self_Refman, tl5_compiler_M_Argument_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(57, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6479,8 +6670,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Argument.write-postactions"
 Returncode tl5_compiler_M_Argument_write_postactions(tl5_compiler_M_Argument* self, Ref_Manager* self_Refman, tl5_compiler_M_Argument_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(60, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6501,6 +6694,7 @@ Returncode tl5_compiler_M_CallArgument_parse_value(tl5_compiler_M_CallArgument* 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (self == NULL) RAISE(120, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(120, 38, "used member of outdated weak reference")
@@ -6531,6 +6725,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(code_node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6543,6 +6738,7 @@ Returncode tl5_compiler_M_CallArgument_analyze(tl5_compiler_M_CallArgument* self
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->value_Dynamic == NULL) RAISE(127, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(127, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(127, 38, "used member of outdated weak reference")
@@ -6564,6 +6760,7 @@ Returncode tl5_compiler_M_CallArgument_analyze(tl5_compiler_M_CallArgument* self
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6585,6 +6782,7 @@ Returncode tl5_compiler_M_CallArgument_check_same_type_as(tl5_compiler_M_CallArg
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
   Int aux_Int_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_instance_Refman);
   LUMI_inc_ref(instance_type_Refman);
   if (self == NULL) RAISE(135, 27, "used member of empty object")
@@ -6700,6 +6898,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(real_type_Refman);
   LUMI_dec_ref(instance_type_Refman);
   LUMI_dec_ref(type_instance_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6709,6 +6908,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "CallArgument.get-output"
 Returncode tl5_compiler_M_CallArgument_get_output(tl5_compiler_M_CallArgument* self, Ref_Manager* self_Refman, tl5_compiler_M_CallArgument_Dynamic* self_Dynamic, tl5_compiler_M_Expression** output, Ref_Manager** output_Refman, tl5_compiler_M_Expression_Dynamic** output_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(162, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(162, 38, "used member of outdated weak reference")
   LUMI_dec_ref(*output_Refman);
@@ -6717,6 +6917,7 @@ Returncode tl5_compiler_M_CallArgument_get_output(tl5_compiler_M_CallArgument* s
   *output_Dynamic = self->value_Dynamic;
   *output = self->value;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6735,6 +6936,7 @@ Returncode tl5_compiler_M_CallArgument_write_preactions(tl5_compiler_M_CallArgum
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->value_Dynamic == NULL) RAISE(165, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(165, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(165, 38, "used member of outdated weak reference")
@@ -6775,6 +6977,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -6829,6 +7032,7 @@ Returncode tl5_compiler_M_CallArgument_write(tl5_compiler_M_CallArgument* self, 
   String aux_String_14_Var = {0};
   String* aux_String_14 = NULL;
   Ref_Manager* aux_String_14_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(176, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
   if (self->_base.is_output) {
@@ -7065,6 +7269,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7074,6 +7279,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "CallArgument.write-postactions"
 Returncode tl5_compiler_M_CallArgument_write_postactions(tl5_compiler_M_CallArgument* self, Ref_Manager* self_Refman, tl5_compiler_M_CallArgument_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(217, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(217, 27, "used member of empty object")
@@ -7092,6 +7298,7 @@ Returncode tl5_compiler_M_CallArgument_write_postactions(tl5_compiler_M_CallArgu
       CHECK(218, tl5_compiler_M_Expression_write_assign_null(self->assignee, self->assignee_Refman, self->assignee_Dynamic) )
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7110,8 +7317,10 @@ void tl5_compiler_M_CallArgument_Del(tl5_compiler_M_CallArgument* self) {
 #define LUMI_FUNC_NAME "ArgumentFactory.new-argument"
 Returncode tl5_compiler_M_ArgumentFactory_new_argument(tl5_compiler_M_ArgumentFactory* self, Ref_Manager* self_Refman, tl5_compiler_M_ArgumentFactory_Dynamic* self_Dynamic, tl5_compiler_M_Argument** new_argument, Ref_Manager** new_argument_Refman, tl5_compiler_M_Argument_Dynamic** new_argument_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(67, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7128,6 +7337,7 @@ Returncode tl5_compiler_M_CallArgumentFactory_new_argument(tl5_compiler_M_CallAr
   tl5_compiler_M_CallArgument* aux_CallArgument_0 = NULL;
   Ref_Manager* aux_CallArgument_0_Refman = NULL;
   tl5_compiler_M_CallArgument_Dynamic* aux_CallArgument_0_Dynamic = &tl5_compiler_M_CallArgument_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_CallArgument_0 = LUMI_alloc(sizeof(tl5_compiler_M_CallArgument));
   if (aux_CallArgument_0 == NULL) RAISE(223, 49, "insufficient memory for object dynamic allocation")
   aux_CallArgument_0_Refman = LUMI_new_ref(aux_CallArgument_0);
@@ -7143,6 +7353,7 @@ Returncode tl5_compiler_M_CallArgumentFactory_new_argument(tl5_compiler_M_CallAr
 LUMI_cleanup:
   if (aux_CallArgument_0_Dynamic != NULL) aux_CallArgument_0_Dynamic->_base._base._del(aux_CallArgument_0);
   LUMI_owner_dec_ref(aux_CallArgument_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7157,10 +7368,12 @@ void tl5_compiler_M_CallArgumentFactory_Del(tl5_compiler_M_CallArgumentFactory* 
 #define LUMI_FUNC_NAME "TextExpression.write"
 Returncode tl5_compiler_M_TextExpression_write(tl5_compiler_M_TextExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_TextExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(41, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(41, 38, "used member of outdated weak reference")
   CHECK(41, tl5_compiler_M_write(self->text, self->text_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7180,6 +7393,7 @@ Returncode tl5_compiler_M_IntExpression_parse_new(tl5_compiler_M_IntExpression* 
   tl5_compiler_M_IntExpression* int_expression = NULL;
   Ref_Manager* int_expression_Refman = NULL;
   tl5_compiler_M_IntExpression_Dynamic* int_expression_Dynamic = &tl5_compiler_M_IntExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   int_expression = LUMI_alloc(sizeof(tl5_compiler_M_IntExpression));
   if (int_expression == NULL) RAISE(47, 49, "insufficient memory for object dynamic allocation")
   int_expression_Refman = LUMI_new_ref(int_expression);
@@ -7200,6 +7414,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(int_expression_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7240,6 +7455,7 @@ Returncode tl5_compiler_M_IntExpression_parse(tl5_compiler_M_IntExpression* self
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(53, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base)) )
   number = text;
   number_Refman = text_Refman;
@@ -7387,6 +7603,7 @@ LUMI_cleanup:
   LUMI_dec_ref(number_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7404,6 +7621,7 @@ Returncode tl5_compiler_M_CharExpression_parse_new(tl5_compiler_M_CharExpression
   tl5_compiler_M_CharExpression* char_expression = NULL;
   Ref_Manager* char_expression_Refman = NULL;
   tl5_compiler_M_CharExpression_Dynamic* char_expression_Dynamic = &tl5_compiler_M_CharExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   char_expression = LUMI_alloc(sizeof(tl5_compiler_M_CharExpression));
   if (char_expression == NULL) RAISE(85, 49, "insufficient memory for object dynamic allocation")
   char_expression_Refman = LUMI_new_ref(char_expression);
@@ -7424,6 +7642,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(char_expression_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7470,6 +7689,7 @@ Returncode tl5_compiler_M_CharExpression_parse(tl5_compiler_M_CharExpression* se
   String aux_String_10_Var = {0};
   String* aux_String_10 = NULL;
   Ref_Manager* aux_String_10_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(91, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base)) )
   if (text == NULL) RAISE(93, 27, "used member of empty object")
   if (text_Refman->value == NULL) RAISE(93, 38, "used member of outdated weak reference")
@@ -7640,6 +7860,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7657,6 +7878,7 @@ Returncode tl5_compiler_M_StringExpression_parse_new(tl5_compiler_M_StringExpres
   tl5_compiler_M_StringExpression* string_expression = NULL;
   Ref_Manager* string_expression_Refman = NULL;
   tl5_compiler_M_StringExpression_Dynamic* string_expression_Dynamic = &tl5_compiler_M_StringExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   string_expression = LUMI_alloc(sizeof(tl5_compiler_M_StringExpression));
   if (string_expression == NULL) RAISE(127, 49, "insufficient memory for object dynamic allocation")
@@ -7679,6 +7901,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7688,6 +7911,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "StringExpression.parse"
 Returncode tl5_compiler_M_StringExpression_parse(tl5_compiler_M_StringExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_StringExpression_Dynamic* self_Dynamic, String* text, Ref_Manager* text_Refman, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (self == NULL) RAISE(133, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(133, 38, "used member of outdated weak reference")
@@ -7717,6 +7941,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7731,6 +7956,7 @@ Returncode tl5_compiler_M_StringExpression_strip_multilines(tl5_compiler_M_Strin
   Int expected = 0;
   Int indentation = 0;
   Int index_read = 0;
+  LUMI_inc_ref(self_Refman);
   index_write = 1;
   for (index_read = 1; index_read < self->_base.text->length - 1; ++index_read) {
       if (self == NULL) RAISE(144, 27, "used member of empty object")
@@ -7835,6 +8061,7 @@ Returncode tl5_compiler_M_StringExpression_strip_multilines(tl5_compiler_M_Strin
       self->_base.text->length = index_write;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7844,12 +8071,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "StringExpression.analyze"
 Returncode tl5_compiler_M_StringExpression_analyze(tl5_compiler_M_StringExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_StringExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(176, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(177, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(177, 38, "used member of outdated weak reference")
   CHECK(176, tl5_compiler_M_Expression_add_aux_variable(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), tl5_compiler_M_Access_VAR, false, self->_base._base.result_type, self->_base._base.result_type_Refman, &(self->symbol), &(self->symbol_Refman), &(self->symbol_Dynamic)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7879,6 +8108,7 @@ Returncode tl5_compiler_M_StringExpression_write_preactions(tl5_compiler_M_Strin
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(183, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(183, 38, "used member of outdated weak reference")
   CHECK(183, tl5_compiler_M_Expression_write_init_var_ref(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->symbol, self->symbol_Refman, self->symbol_Dynamic) )
@@ -7975,6 +8205,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -7984,11 +8215,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "StringExpression.write"
 Returncode tl5_compiler_M_StringExpression_write(tl5_compiler_M_StringExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_StringExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->symbol_Dynamic == NULL) RAISE(208, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(208, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(208, 38, "used member of outdated weak reference")
   CHECK(208, self->symbol_Dynamic->_base._base.write(&(self->symbol->_base._base), self->symbol_Refman, &(self->symbol_Dynamic->_base._base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8008,6 +8241,7 @@ Returncode tl5_compiler_M_EmptyExpression_parse_new(tl5_compiler_M_EmptyExpressi
   tl5_compiler_M_EmptyExpression* empty_expression = NULL;
   Ref_Manager* empty_expression_Refman = NULL;
   tl5_compiler_M_EmptyExpression_Dynamic* empty_expression_Dynamic = &tl5_compiler_M_EmptyExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   empty_expression = LUMI_alloc(sizeof(tl5_compiler_M_EmptyExpression));
   if (empty_expression == NULL) RAISE(214, 49, "insufficient memory for object dynamic allocation")
   empty_expression_Refman = LUMI_new_ref(empty_expression);
@@ -8026,6 +8260,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(empty_expression_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8035,6 +8270,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "EmptyExpression.init"
 Returncode tl5_compiler_M_EmptyExpression_init(tl5_compiler_M_EmptyExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_EmptyExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(219, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   if (tl5_compiler_M_glob == NULL) RAISE(220, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(220, 38, "used member of outdated weak reference")
@@ -8043,6 +8279,7 @@ Returncode tl5_compiler_M_EmptyExpression_init(tl5_compiler_M_EmptyExpression* s
   if (self_Refman->value == NULL) RAISE(221, 38, "used member of outdated weak reference")
   self->_base.access = tl5_compiler_M_Access_OWNER;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8055,6 +8292,7 @@ Returncode tl5_compiler_M_EmptyExpression_write(tl5_compiler_M_EmptyExpression* 
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(224, 38, "insufficient memory for managed object")
@@ -8064,6 +8302,7 @@ Returncode tl5_compiler_M_EmptyExpression_write(tl5_compiler_M_EmptyExpression* 
   CHECK(224, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8073,9 +8312,11 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "EmptyExpression.write-dynamic"
 Returncode tl5_compiler_M_EmptyExpression_write_dynamic(tl5_compiler_M_EmptyExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_EmptyExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self_Dynamic == NULL) RAISE(227, 28, "dynamic call of empty object")
   CHECK(227, self_Dynamic->_base._base.write(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8085,9 +8326,11 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "EmptyExpression.write-refman"
 Returncode tl5_compiler_M_EmptyExpression_write_refman(tl5_compiler_M_EmptyExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_EmptyExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self_Dynamic == NULL) RAISE(230, 28, "dynamic call of empty object")
   CHECK(230, self_Dynamic->_base._base.write(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8105,6 +8348,7 @@ Returncode tl5_compiler_M_BlockExpression_parse_new(tl5_compiler_M_BlockExpressi
   tl5_compiler_M_BlockExpression* block_expression = NULL;
   Ref_Manager* block_expression_Refman = NULL;
   tl5_compiler_M_BlockExpression_Dynamic* block_expression_Dynamic = &tl5_compiler_M_BlockExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   block_expression = LUMI_alloc(sizeof(tl5_compiler_M_BlockExpression));
   if (block_expression == NULL) RAISE(10, 49, "insufficient memory for object dynamic allocation")
@@ -8123,6 +8367,7 @@ LUMI_cleanup:
   if (block_expression_Dynamic != NULL) block_expression_Dynamic->_base._base._del(block_expression);
   LUMI_owner_dec_ref(block_expression_Refman);
   LUMI_dec_ref(code_node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8138,6 +8383,7 @@ Returncode tl5_compiler_M_BlockExpression_parse(tl5_compiler_M_BlockExpression* 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   CHECK(16, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   aux_String_0 = &aux_String_0_Var;
@@ -8163,6 +8409,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(code_node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8172,6 +8419,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "BlockExpression.analyze"
 Returncode tl5_compiler_M_BlockExpression_analyze(tl5_compiler_M_BlockExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BlockExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->expression_Dynamic == NULL) RAISE(24, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(24, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(24, 38, "used member of outdated weak reference")
@@ -8198,6 +8446,7 @@ Returncode tl5_compiler_M_BlockExpression_analyze(tl5_compiler_M_BlockExpression
   if (self_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
   self->_base.constant = self->expression->constant;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8205,8 +8454,9 @@ LUMI_cleanup:
 
 #define LUMI_FILE_NAME "TL5/expression/container.4.lm"
 #define LUMI_FUNC_NAME "BlockExpression.order-constants"
-Returncode tl5_compiler_M_BlockExpression_order_constants(tl5_compiler_M_BlockExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BlockExpression_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman) {
+Returncode tl5_compiler_M_BlockExpression_order_constants(tl5_compiler_M_BlockExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BlockExpression_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ordered_list_Refman);
   if (self->expression_Dynamic == NULL) RAISE(30, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(30, 27, "used member of empty object")
@@ -8214,6 +8464,7 @@ Returncode tl5_compiler_M_BlockExpression_order_constants(tl5_compiler_M_BlockEx
   CHECK(30, self->expression_Dynamic->_base.order_constants(&(self->expression->_base), self->expression_Refman, &(self->expression_Dynamic->_base), ordered_list, ordered_list_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(ordered_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8223,11 +8474,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "BlockExpression.write-preactions"
 Returncode tl5_compiler_M_BlockExpression_write_preactions(tl5_compiler_M_BlockExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BlockExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->expression_Dynamic == NULL) RAISE(33, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(33, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(33, 38, "used member of outdated weak reference")
   CHECK(33, self->expression_Dynamic->write_preactions(self->expression, self->expression_Refman, self->expression_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8243,6 +8496,7 @@ Returncode tl5_compiler_M_BlockExpression_write(tl5_compiler_M_BlockExpression* 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(36, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
   if (! self->_base.top) {
@@ -8272,6 +8526,7 @@ Returncode tl5_compiler_M_BlockExpression_write(tl5_compiler_M_BlockExpression* 
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8288,6 +8543,7 @@ void tl5_compiler_M_BlockExpression_Del(tl5_compiler_M_BlockExpression* self) {
 #define LUMI_FUNC_NAME "Operator.init"
 Returncode tl5_compiler_M_Operator_init(tl5_compiler_M_Operator* self, Ref_Manager* self_Refman, String* name, Ref_Manager* name_Refman, String* c_name, Ref_Manager* c_name_Refman, Int order, Int group_index) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(c_name_Refman);
   if (self == NULL) RAISE(54, 27, "used member of empty object")
@@ -8305,6 +8561,7 @@ Returncode tl5_compiler_M_Operator_init(tl5_compiler_M_Operator* self, Ref_Manag
 LUMI_cleanup:
   LUMI_dec_ref(c_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8325,6 +8582,7 @@ Returncode tl5_compiler_M_UnaryExpression_parse_new(tl5_compiler_M_UnaryExpressi
   tl5_compiler_M_UnaryExpression* unary_expression = NULL;
   Ref_Manager* unary_expression_Refman = NULL;
   tl5_compiler_M_UnaryExpression_Dynamic* unary_expression_Dynamic = &tl5_compiler_M_UnaryExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(operator_Refman);
   LUMI_inc_ref(code_node_Refman);
@@ -8347,6 +8605,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(operator_Refman);
   LUMI_dec_ref(ends_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8359,6 +8618,7 @@ Returncode tl5_compiler_M_UnaryExpression_parse(tl5_compiler_M_UnaryExpression* 
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(operator_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(code_node_Refman);
@@ -8401,6 +8661,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(ends_Refman);
   LUMI_dec_ref(operator_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8417,6 +8678,7 @@ Returncode tl5_compiler_M_UnaryExpression_analyze(tl5_compiler_M_UnaryExpression
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(90, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(90, 38, "used member of outdated weak reference")
   CHECK(90, tl5_compiler_M_UnaryExpression_analyze_operand(self, self_Refman, self_Dynamic, self->right_expression, self->right_expression_Refman, self->right_expression_Dynamic) )
@@ -8480,6 +8742,7 @@ Returncode tl5_compiler_M_UnaryExpression_analyze(tl5_compiler_M_UnaryExpression
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8492,6 +8755,7 @@ Returncode tl5_compiler_M_UnaryExpression_analyze_operand(tl5_compiler_M_UnaryEx
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(operand_Refman);
   if (operand_Dynamic == NULL) RAISE(103, 28, "dynamic call of empty object")
   CHECK(103, operand_Dynamic->_base.analyze(&(operand->_base), operand_Refman, &(operand_Dynamic->_base)) )
@@ -8513,6 +8777,7 @@ Returncode tl5_compiler_M_UnaryExpression_analyze_operand(tl5_compiler_M_UnaryEx
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(operand_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8532,6 +8797,7 @@ Returncode tl5_compiler_M_UnaryExpression_test_operand_type(tl5_compiler_M_Unary
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(operand_Refman);
   LUMI_inc_ref(expected_type_Refman);
   if (operand == NULL) RAISE(112, 27, "used member of empty object")
@@ -8578,6 +8844,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(expected_type_Refman);
   LUMI_dec_ref(operand_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8585,8 +8852,9 @@ LUMI_cleanup:
 
 #define LUMI_FILE_NAME "TL5/expression/container.4.lm"
 #define LUMI_FUNC_NAME "UnaryExpression.order-constants"
-Returncode tl5_compiler_M_UnaryExpression_order_constants(tl5_compiler_M_UnaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UnaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman) {
+Returncode tl5_compiler_M_UnaryExpression_order_constants(tl5_compiler_M_UnaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UnaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ordered_list_Refman);
   if (self->right_expression_Dynamic == NULL) RAISE(122, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(122, 27, "used member of empty object")
@@ -8594,6 +8862,7 @@ Returncode tl5_compiler_M_UnaryExpression_order_constants(tl5_compiler_M_UnaryEx
   CHECK(122, self->right_expression_Dynamic->_base.order_constants(&(self->right_expression->_base), self->right_expression_Refman, &(self->right_expression_Dynamic->_base), ordered_list, ordered_list_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(ordered_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8603,11 +8872,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "UnaryExpression.write-preactions"
 Returncode tl5_compiler_M_UnaryExpression_write_preactions(tl5_compiler_M_UnaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UnaryExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->right_expression_Dynamic == NULL) RAISE(125, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(125, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(125, 38, "used member of outdated weak reference")
   CHECK(125, self->right_expression_Dynamic->write_preactions(self->right_expression, self->right_expression_Refman, self->right_expression_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8617,9 +8888,11 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "UnaryExpression.write"
 Returncode tl5_compiler_M_UnaryExpression_write(tl5_compiler_M_UnaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_UnaryExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(128, tl5_compiler_M_UnaryExpression_write_start(self, self_Refman, self_Dynamic) )
   CHECK(129, tl5_compiler_M_UnaryExpression_write_end(self, self_Refman, self_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8632,6 +8905,7 @@ Returncode tl5_compiler_M_UnaryExpression_write_start(tl5_compiler_M_UnaryExpres
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(132, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(132, 38, "used member of outdated weak reference")
   if (! self->_base.top) {
@@ -8645,6 +8919,7 @@ Returncode tl5_compiler_M_UnaryExpression_write_start(tl5_compiler_M_UnaryExpres
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8663,6 +8938,7 @@ Returncode tl5_compiler_M_UnaryExpression_write_end(tl5_compiler_M_UnaryExpressi
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(136, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(136, 38, "used member of outdated weak reference")
   if (self->operator == NULL) RAISE(136, 27, "used member of empty object")
@@ -8705,6 +8981,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8725,6 +9002,7 @@ Returncode tl5_compiler_M_BinaryExpression_parse_new(tl5_compiler_M_BinaryExpres
   tl5_compiler_M_BinaryExpression* binary_expression = NULL;
   Ref_Manager* binary_expression_Refman = NULL;
   tl5_compiler_M_BinaryExpression_Dynamic* binary_expression_Dynamic = &tl5_compiler_M_BinaryExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(operator_Refman);
   LUMI_inc_ref(code_node_Refman);
@@ -8768,6 +9046,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(operator_Refman);
   LUMI_dec_ref(ends_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -8797,6 +9076,7 @@ Returncode tl5_compiler_M_BinaryExpression_analyze(tl5_compiler_M_BinaryExpressi
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(168, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(168, 38, "used member of outdated weak reference")
   CHECK(168, tl5_compiler_M_UnaryExpression_analyze_operand(&(self->_base), self_Refman, &(self_Dynamic->_base), self->_base.right_expression, self->_base.right_expression_Refman, self->_base.right_expression_Dynamic) )
@@ -9036,6 +9316,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9045,6 +9326,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "BinaryExpression.test-operands-type"
 Returncode tl5_compiler_M_BinaryExpression_test_operands_type(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* expected_type, Ref_Manager* expected_type_Refman, tl5_compiler_M_TypeData_Dynamic* expected_type_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(expected_type_Refman);
   if (self == NULL) RAISE(222, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(222, 38, "used member of outdated weak reference")
@@ -9054,6 +9336,7 @@ Returncode tl5_compiler_M_BinaryExpression_test_operands_type(tl5_compiler_M_Bin
   CHECK(223, tl5_compiler_M_UnaryExpression_test_operand_type(&(self->_base), self_Refman, &(self_Dynamic->_base), self->left_expression, self->left_expression_Refman, self->left_expression_Dynamic, expected_type, expected_type_Refman, expected_type_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(expected_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9063,6 +9346,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "BinaryExpression.analyze-equalizer"
 Returncode tl5_compiler_M_BinaryExpression_analyze_equalizer(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic, Bool is_reference) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(226, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(226, 38, "used member of outdated weak reference")
   CHECK(226, tl5_compiler_M_BinaryExpression_test_is_reference(self, self_Refman, self_Dynamic, is_reference, self->_base.right_expression, self->_base.right_expression_Refman, self->_base.right_expression_Dynamic) )
@@ -9073,6 +9357,7 @@ Returncode tl5_compiler_M_BinaryExpression_analyze_equalizer(tl5_compiler_M_Bina
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(228, 38, "used member of outdated weak reference")
   CHECK(228, tl5_compiler_M_Expression_set_simple_type(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), tl5_compiler_M_glob->type_bool, tl5_compiler_M_glob->type_bool_Refman, tl5_compiler_M_glob->type_bool_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9088,6 +9373,7 @@ Returncode tl5_compiler_M_BinaryExpression_test_is_reference(tl5_compiler_M_Bina
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(operand_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(233, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
@@ -9136,6 +9422,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(operand_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9143,8 +9430,9 @@ LUMI_cleanup:
 
 #define LUMI_FILE_NAME "TL5/expression/container.4.lm"
 #define LUMI_FUNC_NAME "BinaryExpression.order-constants"
-Returncode tl5_compiler_M_BinaryExpression_order_constants(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman) {
+Returncode tl5_compiler_M_BinaryExpression_order_constants(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ordered_list_Refman);
   if (self->left_expression_Dynamic == NULL) RAISE(241, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(241, 27, "used member of empty object")
@@ -9153,6 +9441,7 @@ Returncode tl5_compiler_M_BinaryExpression_order_constants(tl5_compiler_M_Binary
   CHECK(242, tl5_compiler_M_UnaryExpression_order_constants(&(self->_base), self_Refman, &(self_Dynamic->_base), ordered_list, ordered_list_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(ordered_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9162,6 +9451,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "BinaryExpression.write-preactions"
 Returncode tl5_compiler_M_BinaryExpression_write_preactions(tl5_compiler_M_BinaryExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_BinaryExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(245, tl5_compiler_M_UnaryExpression_write_preactions(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   if (self->left_expression_Dynamic == NULL) RAISE(246, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(246, 27, "used member of empty object")
@@ -9179,6 +9469,7 @@ Returncode tl5_compiler_M_BinaryExpression_write_preactions(tl5_compiler_M_Binar
       CHECK(249, tl5_compiler_M_BinaryExpression_write_assign_preactions(self, self_Refman, self_Dynamic) )
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9227,6 +9518,7 @@ Returncode tl5_compiler_M_BinaryExpression_write_assign_preactions(tl5_compiler_
   String aux_String_12_Var = {0};
   String* aux_String_12 = NULL;
   Ref_Manager* aux_String_12_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(252, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(252, 38, "used member of outdated weak reference")
   if (self->left_expression == NULL) RAISE(252, 27, "used member of empty object")
@@ -9503,6 +9795,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9545,6 +9838,7 @@ Returncode tl5_compiler_M_BinaryExpression_write_left_delete(tl5_compiler_M_Bina
   String aux_String_9_Var = {0};
   String* aux_String_9 = NULL;
   Ref_Manager* aux_String_9_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(304, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
   if (self->left_expression == NULL) RAISE(304, 27, "used member of empty object")
@@ -9722,6 +10016,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9744,6 +10039,7 @@ Returncode tl5_compiler_M_BinaryExpression_write(tl5_compiler_M_BinaryExpression
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(338, tl5_compiler_M_UnaryExpression_write_start(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   if (self == NULL) RAISE(339, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(339, 38, "used member of outdated weak reference")
@@ -9854,6 +10150,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9875,6 +10172,7 @@ Returncode tl5_compiler_M_QuestionExpression_parse_new(tl5_compiler_M_QuestionEx
   tl5_compiler_M_QuestionExpression* question_expression = NULL;
   Ref_Manager* question_expression_Refman = NULL;
   tl5_compiler_M_QuestionExpression_Dynamic* question_expression_Dynamic = &tl5_compiler_M_QuestionExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   question_expression = LUMI_alloc(sizeof(tl5_compiler_M_QuestionExpression));
   if (question_expression == NULL) RAISE(368, 49, "insufficient memory for object dynamic allocation")
   question_expression_Refman = LUMI_new_ref(question_expression);
@@ -9894,6 +10192,7 @@ Returncode tl5_compiler_M_QuestionExpression_parse_new(tl5_compiler_M_QuestionEx
 LUMI_cleanup:
   if (question_expression_Dynamic != NULL) question_expression_Dynamic->_base._base._del(question_expression);
   LUMI_owner_dec_ref(question_expression_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9903,6 +10202,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "QuestionExpression.parse"
 Returncode tl5_compiler_M_QuestionExpression_parse(tl5_compiler_M_QuestionExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_QuestionExpression_Dynamic* self_Dynamic, tl5_compiler_M_Expression* tested, Ref_Manager* tested_Refman, tl5_compiler_M_Expression_Dynamic* tested_Dynamic, Char* end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(374, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(374, 38, "used member of outdated weak reference")
   if (self->tested_Dynamic != NULL) self->tested_Dynamic->_base._del(self->tested);
@@ -9918,6 +10218,7 @@ Returncode tl5_compiler_M_QuestionExpression_parse(tl5_compiler_M_QuestionExpres
 LUMI_cleanup:
   if (tested_Dynamic != NULL) tested_Dynamic->_base._del(tested);
   LUMI_owner_dec_ref(tested_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -9933,6 +10234,7 @@ Returncode tl5_compiler_M_QuestionExpression_analyze(tl5_compiler_M_QuestionExpr
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->tested_Dynamic == NULL) RAISE(379, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(379, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(379, 38, "used member of outdated weak reference")
@@ -9992,6 +10294,7 @@ Returncode tl5_compiler_M_QuestionExpression_analyze(tl5_compiler_M_QuestionExpr
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -10001,11 +10304,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "QuestionExpression.write-preactions"
 Returncode tl5_compiler_M_QuestionExpression_write_preactions(tl5_compiler_M_QuestionExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_QuestionExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->tested_Dynamic == NULL) RAISE(391, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(391, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(391, 38, "used member of outdated weak reference")
   CHECK(391, self->tested_Dynamic->write_preactions(self->tested, self->tested_Refman, self->tested_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -10030,6 +10335,7 @@ Returncode tl5_compiler_M_QuestionExpression_write(tl5_compiler_M_QuestionExpres
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(395, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(395, 38, "used member of outdated weak reference")
   if (! self->_base.top) {
@@ -10097,6 +10403,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -10120,6 +10427,7 @@ Returncode tl5_compiler_M_InitExpression_parse(tl5_compiler_M_InitExpression* se
   tl5_compiler_M_FunctionArguments* aux_FunctionArguments_0 = NULL;
   Ref_Manager* aux_FunctionArguments_0_Refman = NULL;
   tl5_compiler_M_FunctionArguments_Dynamic* aux_FunctionArguments_0_Dynamic = &tl5_compiler_M_FunctionArguments_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (self == NULL) RAISE(15, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
@@ -10183,6 +10491,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(module_expression_Refman);
   tl5_compiler_M_TypeInstance_Del(result_type);
   LUMI_owner_dec_ref(result_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -10224,6 +10533,7 @@ Returncode tl5_compiler_M_InitExpression_analyze(tl5_compiler_M_InitExpression* 
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(28, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
   CHECK(28, tl5_compiler_M_ModuleTypeExpression_analyze_type_instance(&(self->_base), self_Refman, &(self_Dynamic->_base), self->_base._base.result_type, self->_base._base.result_type_Refman) )
@@ -10578,6 +10888,7 @@ LUMI_cleanup:
   LUMI_dec_ref(param_Refman);
   if (self_param_Dynamic != NULL) self_param_Dynamic->_base._base._del(self_param);
   LUMI_owner_dec_ref(self_param_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -10590,6 +10901,7 @@ Returncode tl5_compiler_M_InitExpression_write_allocation(tl5_compiler_M_InitExp
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(92, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(92, 38, "used member of outdated weak reference")
   CHECK(92, tl5_compiler_M_FunctionArguments_write_preactions(self->arguments, self->arguments_Refman, self->arguments_Dynamic) )
@@ -10688,6 +11000,7 @@ Returncode tl5_compiler_M_InitExpression_write_allocation(tl5_compiler_M_InitExp
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -10718,6 +11031,7 @@ Returncode tl5_compiler_M_InitExpression_write_var_init(tl5_compiler_M_InitExpre
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(116, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(116, 38, "used member of outdated weak reference")
   CHECK(116, tl5_compiler_M_Expression_write_init_var_ref(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->symbol, self->symbol_Refman, self->symbol_Dynamic) )
@@ -10852,6 +11166,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -10900,6 +11215,7 @@ Returncode tl5_compiler_M_InitExpression_write_new_init(tl5_compiler_M_InitExpre
   String aux_String_12_Var = {0};
   String* aux_String_12 = NULL;
   Ref_Manager* aux_String_12_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->symbol_Dynamic == NULL) RAISE(143, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(143, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
@@ -11098,6 +11414,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -11134,6 +11451,7 @@ Returncode tl5_compiler_M_InitExpression_write_assign(tl5_compiler_M_InitExpress
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->arguments->parameters->first->item_Dynamic == NULL) RAISE(185, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(185, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
@@ -11279,6 +11597,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(value_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -11288,11 +11607,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "InitExpression.write-preactions"
 Returncode tl5_compiler_M_InitExpression_write_preactions(tl5_compiler_M_InitExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_InitExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(221, tl5_compiler_M_InitExpression_write_allocation(self, self_Refman, self_Dynamic) )
   if (self == NULL) RAISE(222, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(222, 38, "used member of outdated weak reference")
   CHECK(222, tl5_compiler_M_SyntaxTreeCode_write_spaces(self->_base._base.code_node, self->_base._base.code_node_Refman, self->_base._base.code_node_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -11302,6 +11623,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "InitExpression.write"
 Returncode tl5_compiler_M_InitExpression_write(tl5_compiler_M_InitExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_InitExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(225, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(225, 38, "used member of outdated weak reference")
   if (self->_base._base.is_statement) {
@@ -11342,6 +11664,7 @@ Returncode tl5_compiler_M_InitExpression_write(tl5_compiler_M_InitExpression* se
       CHECK(233, self->symbol_Dynamic->_base._base.write(&(self->symbol->_base._base), self->symbol_Refman, &(self->symbol_Dynamic->_base._base)) )
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -11366,6 +11689,7 @@ Returncode tl5_compiler_M_SliceExpression_parse_new(tl5_compiler_M_SliceExpressi
   tl5_compiler_M_SliceExpression* slice_expression = NULL;
   Ref_Manager* slice_expression_Refman = NULL;
   tl5_compiler_M_SliceExpression_Dynamic* slice_expression_Dynamic = &tl5_compiler_M_SliceExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(code_node_Refman);
   slice_expression = LUMI_alloc(sizeof(tl5_compiler_M_SliceExpression));
@@ -11389,6 +11713,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(slice_expression_Refman);
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(ends_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -11407,6 +11732,7 @@ Returncode tl5_compiler_M_SliceExpression_parse(tl5_compiler_M_SliceExpression* 
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   if (self == NULL) RAISE(20, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(20, 38, "used member of outdated weak reference")
@@ -11466,6 +11792,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   if (sequence_Dynamic != NULL) sequence_Dynamic->_base._del(sequence);
   LUMI_owner_dec_ref(sequence_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -11484,6 +11811,7 @@ Returncode tl5_compiler_M_SliceExpression_analyze(tl5_compiler_M_SliceExpression
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->sequence_Dynamic == NULL) RAISE(34, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(34, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(34, 38, "used member of outdated weak reference")
@@ -11636,6 +11964,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -11651,6 +11980,7 @@ Returncode tl5_compiler_M_SliceExpression_check_index(tl5_compiler_M_SliceExpres
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(index_Refman);
   if (index == NULL) RAISE(66, 27, "used member of empty object")
   if (index_Refman->value == NULL) RAISE(66, 38, "used member of outdated weak reference")
@@ -11690,6 +12020,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(index_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -11777,6 +12108,7 @@ Returncode tl5_compiler_M_SliceExpression_write_preactions(tl5_compiler_M_SliceE
   String aux_String_25_Var = {0};
   String* aux_String_25 = NULL;
   Ref_Manager* aux_String_25_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->sequence_Dynamic == NULL) RAISE(76, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(76, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(76, 38, "used member of outdated weak reference")
@@ -12124,6 +12456,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12166,6 +12499,7 @@ Returncode tl5_compiler_M_SliceExpression_write(tl5_compiler_M_SliceExpression* 
   String aux_String_10_Var = {0};
   String* aux_String_10 = NULL;
   Ref_Manager* aux_String_10_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(150, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
   if (self->second_index != NULL && self->second_index_Refman->value != NULL) {
@@ -12341,6 +12675,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12356,6 +12691,7 @@ Returncode tl5_compiler_M_SliceExpression_write_dynamic(tl5_compiler_M_SliceExpr
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(183, 38, "insufficient memory for managed object")
@@ -12378,6 +12714,7 @@ Returncode tl5_compiler_M_SliceExpression_write_dynamic(tl5_compiler_M_SliceExpr
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12387,11 +12724,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SliceExpression.write-refman"
 Returncode tl5_compiler_M_SliceExpression_write_refman(tl5_compiler_M_SliceExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SliceExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->sequence_Dynamic == NULL) RAISE(188, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(188, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
   CHECK(188, self->sequence_Dynamic->write_refman(self->sequence, self->sequence_Refman, self->sequence_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12411,18 +12750,84 @@ void tl5_compiler_M_SliceExpression_Del(tl5_compiler_M_SliceExpression* self) {
 }
 
 #define LUMI_FILE_NAME "TL5/expression/symbol.4.lm"
+#define LUMI_FUNC_NAME "SymbolExpression.copy-new"
+Returncode tl5_compiler_M_SymbolExpression_copy_new(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, tl5_compiler_M_SymbolExpression** new_symbol, Ref_Manager** new_symbol_Refman, tl5_compiler_M_SymbolExpression_Dynamic** new_symbol_Dynamic) {
+  Returncode LUMI_err = OK;
+  tl5_compiler_M_SymbolExpression* aux_SymbolExpression_0 = NULL;
+  Ref_Manager* aux_SymbolExpression_0_Refman = NULL;
+  tl5_compiler_M_SymbolExpression_Dynamic* aux_SymbolExpression_0_Dynamic = &tl5_compiler_M_SymbolExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
+  aux_SymbolExpression_0 = LUMI_alloc(sizeof(tl5_compiler_M_SymbolExpression));
+  if (aux_SymbolExpression_0 == NULL) RAISE(13, 49, "insufficient memory for object dynamic allocation")
+  aux_SymbolExpression_0_Refman = LUMI_new_ref(aux_SymbolExpression_0);
+  if (aux_SymbolExpression_0_Refman == NULL) RAISE(13, 38, "insufficient memory for managed object")
+  if (*new_symbol_Dynamic != NULL) (*new_symbol_Dynamic)->_base._base._del(*new_symbol);
+  LUMI_owner_dec_ref(*new_symbol_Refman);
+  *new_symbol_Refman = aux_SymbolExpression_0_Refman;
+  *new_symbol_Dynamic = aux_SymbolExpression_0_Dynamic;
+  *new_symbol = aux_SymbolExpression_0;
+  aux_SymbolExpression_0 = NULL;
+  aux_SymbolExpression_0_Refman = NULL;
+  aux_SymbolExpression_0_Dynamic = NULL;
+  if (self == NULL) RAISE(14, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
+  if (*new_symbol == NULL) RAISE(14, 27, "used member of empty object")
+  if ((*new_symbol_Refman)->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
+  CHECK(14, tl5_compiler_M_string_new_copy(self->name, self->name_Refman, &((*new_symbol)->name), &((*new_symbol)->name_Refman)) )
+  if (self == NULL) RAISE(15, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
+  if (*new_symbol == NULL) RAISE(15, 27, "used member of empty object")
+  if ((*new_symbol_Refman)->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
+  LUMI_dec_ref((*new_symbol)->module_name_Refman);
+  (*new_symbol)->module_name_Refman = self->module_name_Refman;
+  LUMI_inc_ref((*new_symbol)->module_name_Refman);
+  (*new_symbol)->module_name = self->module_name;
+  if (self == NULL) RAISE(16, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(16, 38, "used member of outdated weak reference")
+  if (*new_symbol == NULL) RAISE(16, 27, "used member of empty object")
+  if ((*new_symbol_Refman)->value == NULL) RAISE(16, 38, "used member of outdated weak reference")
+  LUMI_dec_ref((*new_symbol)->variable_Refman);
+  (*new_symbol)->variable_Refman = self->variable_Refman;
+  LUMI_inc_ref((*new_symbol)->variable_Refman);
+  (*new_symbol)->variable_Dynamic = self->variable_Dynamic;
+  (*new_symbol)->variable = self->variable;
+  if (self == NULL) RAISE(17, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(17, 38, "used member of outdated weak reference")
+  if (*new_symbol == NULL) RAISE(17, 27, "used member of empty object")
+  if ((*new_symbol_Refman)->value == NULL) RAISE(17, 38, "used member of outdated weak reference")
+  LUMI_dec_ref((*new_symbol)->function_Refman);
+  (*new_symbol)->function_Refman = self->function_Refman;
+  LUMI_inc_ref((*new_symbol)->function_Refman);
+  (*new_symbol)->function_Dynamic = self->function_Dynamic;
+  (*new_symbol)->function = self->function;
+  if (self == NULL) RAISE(18, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(18, 38, "used member of outdated weak reference")
+  if (*new_symbol == NULL) RAISE(18, 27, "used member of empty object")
+  if ((*new_symbol_Refman)->value == NULL) RAISE(18, 38, "used member of outdated weak reference")
+  (*new_symbol)->is_annotate = self->is_annotate;
+LUMI_cleanup:
+  if (aux_SymbolExpression_0_Dynamic != NULL) aux_SymbolExpression_0_Dynamic->_base._base._del(aux_SymbolExpression_0);
+  LUMI_owner_dec_ref(aux_SymbolExpression_0_Refman);
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/expression/symbol.4.lm"
 #define LUMI_FUNC_NAME "SymbolExpression.parse-new"
 Returncode tl5_compiler_M_SymbolExpression_parse_new(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, String* text, Ref_Manager* text_Refman, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic, tl5_compiler_M_Expression** expression, Ref_Manager** expression_Refman, tl5_compiler_M_Expression_Dynamic** expression_Dynamic) {
   Returncode LUMI_err = OK;
   tl5_compiler_M_SymbolExpression* symbol_expression = NULL;
   Ref_Manager* symbol_expression_Refman = NULL;
   tl5_compiler_M_SymbolExpression_Dynamic* symbol_expression_Dynamic = &tl5_compiler_M_SymbolExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   symbol_expression = LUMI_alloc(sizeof(tl5_compiler_M_SymbolExpression));
-  if (symbol_expression == NULL) RAISE(14, 49, "insufficient memory for object dynamic allocation")
+  if (symbol_expression == NULL) RAISE(22, 49, "insufficient memory for object dynamic allocation")
   symbol_expression_Refman = LUMI_new_ref(symbol_expression);
-  if (symbol_expression_Refman == NULL) RAISE(14, 38, "insufficient memory for managed object")
-  CHECK(15, tl5_compiler_M_SymbolExpression_parse(symbol_expression, symbol_expression_Refman, symbol_expression_Dynamic, text, text_Refman, code_node, code_node_Refman, code_node_Dynamic) )
+  if (symbol_expression_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
+  CHECK(23, tl5_compiler_M_SymbolExpression_parse(symbol_expression, symbol_expression_Refman, symbol_expression_Dynamic, text, text_Refman, code_node, code_node_Refman, code_node_Dynamic) )
   text = NULL;
   text_Refman = NULL;
   if (*expression_Dynamic != NULL) (*expression_Dynamic)->_base._del(*expression);
@@ -12439,6 +12844,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12448,27 +12854,29 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SymbolExpression.parse"
 Returncode tl5_compiler_M_SymbolExpression_parse(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, String* text, Ref_Manager* text_Refman, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
-  if (self == NULL) RAISE(20, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(20, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(28, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->_base.code_node_Refman);
   self->_base.code_node_Refman = code_node_Refman;
   LUMI_inc_ref(self->_base.code_node_Refman);
   self->_base.code_node_Dynamic = code_node_Dynamic;
   self->_base.code_node = code_node;
-  if (self == NULL) RAISE(21, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(21, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(29, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(29, 38, "used member of outdated weak reference")
   String_Del(self->name);
   LUMI_owner_dec_ref(self->name_Refman);
   self->name_Refman = text_Refman;
   self->name = text;
   text = NULL;
   text_Refman = NULL;
-  CHECK(22, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  CHECK(30, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12491,37 +12899,38 @@ Returncode tl5_compiler_M_SymbolExpression_analyze(tl5_compiler_M_SymbolExpressi
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
-  if (tl5_compiler_M_glob == NULL) RAISE(25, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(25, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(25, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(25, 38, "used member of outdated weak reference")
-  CHECK(25, tl5_compiler_M_NameMap_find(tl5_compiler_M_glob->module_map, tl5_compiler_M_glob->module_map_Refman, self->name, self->name_Refman, (void*)&(aux_ModuleMembers_0), &(aux_ModuleMembers_0_Refman), &dynamic_Void) )
+  LUMI_inc_ref(self_Refman);
+  if (tl5_compiler_M_glob == NULL) RAISE(33, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(33, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(33, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(33, 38, "used member of outdated weak reference")
+  CHECK(33, tl5_compiler_M_NameMap_find(tl5_compiler_M_glob->module_map, tl5_compiler_M_glob->module_map_Refman, self->name, self->name_Refman, (void*)&(aux_ModuleMembers_0), &(aux_ModuleMembers_0_Refman), &dynamic_Void) )
   if (aux_ModuleMembers_0 != NULL && aux_ModuleMembers_0_Refman->value != NULL) {
       aux_TypeInstance_0 = LUMI_alloc(sizeof(tl5_compiler_M_TypeInstance));
-      if (aux_TypeInstance_0 == NULL) RAISE(26, 49, "insufficient memory for object dynamic allocation")
+      if (aux_TypeInstance_0 == NULL) RAISE(34, 49, "insufficient memory for object dynamic allocation")
       aux_TypeInstance_0_Refman = LUMI_new_ref(aux_TypeInstance_0);
-      if (aux_TypeInstance_0_Refman == NULL) RAISE(26, 38, "insufficient memory for managed object")
-      if (self == NULL) RAISE(26, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(26, 38, "used member of outdated weak reference")
+      if (aux_TypeInstance_0_Refman == NULL) RAISE(34, 38, "insufficient memory for managed object")
+      if (self == NULL) RAISE(34, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(34, 38, "used member of outdated weak reference")
       tl5_compiler_M_TypeInstance_Del(self->_base.result_type);
       LUMI_owner_dec_ref(self->_base.result_type_Refman);
       self->_base.result_type_Refman = aux_TypeInstance_0_Refman;
       self->_base.result_type = aux_TypeInstance_0;
       aux_TypeInstance_0 = NULL;
       aux_TypeInstance_0_Refman = NULL;
-      if (self == NULL) RAISE(27, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(27, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
-      if (self->_base.result_type == NULL) RAISE(27, 27, "used member of empty object")
-      if (self->_base.result_type_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
-      CHECK(27, tl5_compiler_M_string_new_copy(self->name, self->name_Refman, &(self->_base.result_type->name), &(self->_base.result_type->name_Refman)) )
-      if (tl5_compiler_M_glob == NULL) RAISE(28, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(28, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
-      if (self->_base.result_type == NULL) RAISE(28, 27, "used member of empty object")
-      if (self->_base.result_type_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(35, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(35, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
+      if (self->_base.result_type == NULL) RAISE(35, 27, "used member of empty object")
+      if (self->_base.result_type_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
+      CHECK(35, tl5_compiler_M_string_new_copy(self->name, self->name_Refman, &(self->_base.result_type->name), &(self->_base.result_type->name_Refman)) )
+      if (tl5_compiler_M_glob == NULL) RAISE(36, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(36, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
+      if (self->_base.result_type == NULL) RAISE(36, 27, "used member of empty object")
+      if (self->_base.result_type_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
       LUMI_dec_ref(self->_base.result_type->type_data_Refman);
       self->_base.result_type->type_data_Refman = tl5_compiler_M_glob->type_module_Refman;
       LUMI_inc_ref(self->_base.result_type->type_data_Refman);
@@ -12529,103 +12938,103 @@ Returncode tl5_compiler_M_SymbolExpression_analyze(tl5_compiler_M_SymbolExpressi
       self->_base.result_type->type_data = tl5_compiler_M_glob->type_module;
     }
   else {
-      if (self->_base.code_node_Dynamic == NULL) RAISE(29, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(29, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(29, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(30, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(30, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(30, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(30, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(30, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(30, 38, "used member of outdated weak reference")
-      CHECK(29, self->_base.code_node_Dynamic->_base.find_variable(&(self->_base.code_node->_base), self->_base.code_node_Refman, &(self->_base.code_node_Dynamic->_base), self->name, self->name_Refman, self->module_name, self->module_name_Refman, &(self->variable), &(self->variable_Refman), &(self->variable_Dynamic)) )
+      if (self->_base.code_node_Dynamic == NULL) RAISE(37, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(37, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(37, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(38, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(38, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(38, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(38, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(38, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(38, 38, "used member of outdated weak reference")
+      CHECK(37, self->_base.code_node_Dynamic->_base.find_variable(&(self->_base.code_node->_base), self->_base.code_node_Refman, &(self->_base.code_node_Dynamic->_base), self->name, self->name_Refman, self->module_name, self->module_name_Refman, &(self->variable), &(self->variable_Refman), &(self->variable_Dynamic)) )
       if (self->variable != NULL && self->variable_Refman->value != NULL) {
-        if (self == NULL) RAISE(31, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(31, 38, "used member of outdated weak reference")
-        if (self->variable == NULL) RAISE(31, 27, "used member of empty object")
-        if (self->variable_Refman->value == NULL) RAISE(31, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(31, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(31, 38, "used member of outdated weak reference")
-        CHECK(31, tl5_compiler_M_TypeInstance_copy_new(self->variable->type_instance, self->variable->type_instance_Refman, &(self->_base.result_type), &(self->_base.result_type_Refman)) )
-        if (self == NULL) RAISE(32, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(32, 38, "used member of outdated weak reference")
-        if (self->variable == NULL) RAISE(32, 27, "used member of empty object")
-        if (self->variable_Refman->value == NULL) RAISE(32, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(32, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(32, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(39, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(39, 38, "used member of outdated weak reference")
+        if (self->variable == NULL) RAISE(39, 27, "used member of empty object")
+        if (self->variable_Refman->value == NULL) RAISE(39, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(39, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(39, 38, "used member of outdated weak reference")
+        CHECK(39, tl5_compiler_M_TypeInstance_copy_new(self->variable->type_instance, self->variable->type_instance_Refman, &(self->_base.result_type), &(self->_base.result_type_Refman)) )
+        if (self == NULL) RAISE(40, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(40, 38, "used member of outdated weak reference")
+        if (self->variable == NULL) RAISE(40, 27, "used member of empty object")
+        if (self->variable_Refman->value == NULL) RAISE(40, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(40, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(40, 38, "used member of outdated weak reference")
         self->_base.access = self->variable->access;
-        if (self == NULL) RAISE(33, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(33, 38, "used member of outdated weak reference")
-        if (self->variable == NULL) RAISE(33, 27, "used member of empty object")
-        if (self->variable_Refman->value == NULL) RAISE(33, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(33, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(33, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(41, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(41, 38, "used member of outdated weak reference")
+        if (self->variable == NULL) RAISE(41, 27, "used member of empty object")
+        if (self->variable_Refman->value == NULL) RAISE(41, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(41, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(41, 38, "used member of outdated weak reference")
         self->_base.constant = self->variable->constant;
-        if (self == NULL) RAISE(34, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(34, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(34, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(34, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(42, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(42, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(42, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(42, 38, "used member of outdated weak reference")
         self->_base.assignable = ! self->_base.constant;
       }
       else {
-        if (self == NULL) RAISE(35, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(36, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(36, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(36, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
-        CHECK(35, tl5_compiler_M_SyntaxTreeNode_find_function(&(self->_base.code_node->_base), self->_base.code_node_Refman, &(self->_base.code_node_Dynamic->_base), self->name, self->name_Refman, self->module_name, self->module_name_Refman, &(self->function), &(self->function_Refman), &(self->function_Dynamic)) )
+        if (self == NULL) RAISE(43, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(43, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(44, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(44, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(44, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(44, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(44, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(44, 38, "used member of outdated weak reference")
+        CHECK(43, tl5_compiler_M_SyntaxTreeNode_find_function(&(self->_base.code_node->_base), self->_base.code_node_Refman, &(self->_base.code_node_Dynamic->_base), self->name, self->name_Refman, self->module_name, self->module_name_Refman, &(self->function), &(self->function_Refman), &(self->function_Dynamic)) )
         if (self->function != NULL && self->function_Refman->value != NULL) {
-          if (tl5_compiler_M_glob == NULL) RAISE(37, 27, "used member of empty object")
-          if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(37, 38, "used member of outdated weak reference")
-          CHECK(37, tl5_compiler_M_Expression_set_simple_type(&(self->_base), self_Refman, &(self_Dynamic->_base), tl5_compiler_M_glob->type_func, tl5_compiler_M_glob->type_func_Refman, tl5_compiler_M_glob->type_func_Dynamic) )
-          if (self == NULL) RAISE(38, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(38, 38, "used member of outdated weak reference")
+          if (tl5_compiler_M_glob == NULL) RAISE(45, 27, "used member of empty object")
+          if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(45, 38, "used member of outdated weak reference")
+          CHECK(45, tl5_compiler_M_Expression_set_simple_type(&(self->_base), self_Refman, &(self_Dynamic->_base), tl5_compiler_M_glob->type_func, tl5_compiler_M_glob->type_func_Refman, tl5_compiler_M_glob->type_func_Dynamic) )
+          if (self == NULL) RAISE(46, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(46, 38, "used member of outdated weak reference")
           self->_base.access = tl5_compiler_M_Access_VAR;
-          if (self == NULL) RAISE(39, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(39, 38, "used member of outdated weak reference")
-          if (self->function == NULL) RAISE(39, 27, "used member of empty object")
-          if (self->function_Refman->value == NULL) RAISE(39, 38, "used member of outdated weak reference")
-          if (self == NULL) RAISE(39, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(39, 38, "used member of outdated weak reference")
-          if (self->_base.result_type == NULL) RAISE(39, 27, "used member of empty object")
-          if (self->_base.result_type_Refman->value == NULL) RAISE(39, 38, "used member of outdated weak reference")
-          CHECK(39, tl5_compiler_M_FunctionArguments_copy_new(self->function->arguments, self->function->arguments_Refman, self->function->arguments_Dynamic, &(self->_base.result_type->arguments), &(self->_base.result_type->arguments_Refman), &(self->_base.result_type->arguments_Dynamic)) )
+          if (self == NULL) RAISE(47, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(47, 38, "used member of outdated weak reference")
+          if (self->function == NULL) RAISE(47, 27, "used member of empty object")
+          if (self->function_Refman->value == NULL) RAISE(47, 38, "used member of outdated weak reference")
+          if (self == NULL) RAISE(47, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(47, 38, "used member of outdated weak reference")
+          if (self->_base.result_type == NULL) RAISE(47, 27, "used member of empty object")
+          if (self->_base.result_type_Refman->value == NULL) RAISE(47, 38, "used member of outdated weak reference")
+          CHECK(47, tl5_compiler_M_FunctionArguments_copy_new(self->function->arguments, self->function->arguments_Refman, self->function->arguments_Dynamic, &(self->_base.result_type->arguments), &(self->_base.result_type->arguments_Refman), &(self->_base.result_type->arguments_Dynamic)) )
         }
         else {
-          if (self == NULL) RAISE(40, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(40, 38, "used member of outdated weak reference")
+          if (self == NULL) RAISE(48, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(48, 38, "used member of outdated weak reference")
           if (self->module_name != NULL && self->module_name_Refman->value != NULL) {
             aux_String_0 = &aux_String_0_Var;
             aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-            if (aux_String_0_Refman == NULL) RAISE(42, 38, "insufficient memory for managed object")
+            if (aux_String_0_Refman == NULL) RAISE(50, 38, "insufficient memory for managed object")
             aux_String_0_Var.max_length = 15;
             aux_String_0_Var.length = 14;
             aux_String_0_Var.values = "unknown symbol";
-            if (self == NULL) RAISE(43, 27, "used member of empty object")
-            if (self_Refman->value == NULL) RAISE(43, 38, "used member of outdated weak reference")
+            if (self == NULL) RAISE(51, 27, "used member of empty object")
+            if (self_Refman->value == NULL) RAISE(51, 38, "used member of outdated weak reference")
             aux_String_1 = &aux_String_1_Var;
             aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-            if (aux_String_1_Refman == NULL) RAISE(44, 38, "insufficient memory for managed object")
+            if (aux_String_1_Refman == NULL) RAISE(52, 38, "insufficient memory for managed object")
             aux_String_1_Var.max_length = 10;
             aux_String_1_Var.length = 9;
             aux_String_1_Var.values = "in module";
-            if (self == NULL) RAISE(45, 27, "used member of empty object")
-            if (self_Refman->value == NULL) RAISE(45, 38, "used member of outdated weak reference")
-            CHECK(41, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_0, aux_String_0_Refman, self->name, self->name_Refman, aux_String_1, aux_String_1_Refman, self->module_name, self->module_name_Refman) )
+            if (self == NULL) RAISE(53, 27, "used member of empty object")
+            if (self_Refman->value == NULL) RAISE(53, 38, "used member of outdated weak reference")
+            CHECK(49, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_0, aux_String_0_Refman, self->name, self->name_Refman, aux_String_1, aux_String_1_Refman, self->module_name, self->module_name_Refman) )
           }
           else {
             aux_String_2 = &aux_String_2_Var;
             aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-            if (aux_String_2_Refman == NULL) RAISE(47, 38, "insufficient memory for managed object")
+            if (aux_String_2_Refman == NULL) RAISE(55, 38, "insufficient memory for managed object")
             aux_String_2_Var.max_length = 15;
             aux_String_2_Var.length = 14;
             aux_String_2_Var.values = "unknown symbol";
-            if (self == NULL) RAISE(47, 27, "used member of empty object")
-            if (self_Refman->value == NULL) RAISE(47, 38, "used member of outdated weak reference")
-            CHECK(47, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_2, aux_String_2_Refman, self->name, self->name_Refman) )
+            if (self == NULL) RAISE(55, 27, "used member of empty object")
+            if (self_Refman->value == NULL) RAISE(55, 38, "used member of outdated weak reference")
+            CHECK(55, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_2, aux_String_2_Refman, self->name, self->name_Refman) )
           }
         }
       }
@@ -12637,6 +13046,7 @@ LUMI_cleanup:
   tl5_compiler_M_TypeInstance_Del(aux_TypeInstance_0);
   LUMI_owner_dec_ref(aux_TypeInstance_0_Refman);
   LUMI_dec_ref(aux_ModuleMembers_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12646,9 +13056,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SymbolExpression.analyze-call"
 Returncode tl5_compiler_M_SymbolExpression_analyze_call(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, tl5_compiler_M_FunctionArguments* arguments, Ref_Manager* arguments_Refman, tl5_compiler_M_FunctionArguments_Dynamic* arguments_Dynamic, tl5_compiler_M_TypeInstance** instance_type, Ref_Manager** instance_type_Refman, Int* bases, Bool* is_function_object) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
-  if (self == NULL) RAISE(53, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(53, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(61, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(61, 38, "used member of outdated weak reference")
   *is_function_object = self->variable != NULL && self->variable_Refman->value != NULL;
   *bases = 0;
   LUMI_dec_ref(*instance_type_Refman);
@@ -12657,6 +13068,7 @@ Returncode tl5_compiler_M_SymbolExpression_analyze_call(tl5_compiler_M_SymbolExp
   *instance_type = NULL;
 LUMI_cleanup:
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12666,19 +13078,21 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SymbolExpression.analyze-mock"
 Returncode tl5_compiler_M_SymbolExpression_analyze_mock(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, Bool is_annotate, Bool* is_mock) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(58, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(58, 38, "used member of outdated weak reference")
-  if (self->function == NULL) RAISE(58, 27, "used member of empty object")
-  if (self->function_Refman->value == NULL) RAISE(58, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(58, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(58, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(66, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(66, 38, "used member of outdated weak reference")
+  if (self->function == NULL) RAISE(66, 27, "used member of empty object")
+  if (self->function_Refman->value == NULL) RAISE(66, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(66, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(66, 38, "used member of outdated weak reference")
   *is_mock = (self->function != NULL && self->function_Refman->value != NULL) && (self->function->mocker_function != NULL && self->function->mocker_function_Refman->value != NULL);
   if (*is_mock) {
-      if (self == NULL) RAISE(60, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(60, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(68, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(68, 38, "used member of outdated weak reference")
       self->is_annotate = is_annotate;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12686,19 +13100,21 @@ LUMI_cleanup:
 
 #define LUMI_FILE_NAME "TL5/expression/symbol.4.lm"
 #define LUMI_FUNC_NAME "SymbolExpression.order-constants"
-Returncode tl5_compiler_M_SymbolExpression_order_constants(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman) {
+Returncode tl5_compiler_M_SymbolExpression_order_constants(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ordered_list_Refman);
-  if (self == NULL) RAISE(63, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(63, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(71, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(71, 38, "used member of outdated weak reference")
   if (self->variable != NULL && self->variable_Refman->value != NULL) {
-      if (self->variable_Dynamic == NULL) RAISE(64, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(64, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(64, 38, "used member of outdated weak reference")
-      CHECK(64, self->variable_Dynamic->_base._base.order_constants(&(self->variable->_base._base), self->variable_Refman, &(self->variable_Dynamic->_base._base), ordered_list, ordered_list_Refman) )
+      if (self->variable_Dynamic == NULL) RAISE(72, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(72, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(72, 38, "used member of outdated weak reference")
+      CHECK(72, self->variable_Dynamic->_base._base.order_constants(&(self->variable->_base._base), self->variable_Refman, &(self->variable_Dynamic->_base._base), ordered_list, ordered_list_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(ordered_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12717,88 +13133,90 @@ Returncode tl5_compiler_M_SymbolExpression_write(tl5_compiler_M_SymbolExpression
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
-  if (self == NULL) RAISE(67, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(67, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(75, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(75, 38, "used member of outdated weak reference")
   if (self->function != NULL && self->function_Refman->value != NULL) {
-      if (self == NULL) RAISE(68, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(68, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(68, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(68, 38, "used member of outdated weak reference")
-      if (self->function == NULL) RAISE(68, 27, "used member of empty object")
-      if (self->function_Refman->value == NULL) RAISE(68, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(76, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(76, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(76, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(76, 38, "used member of outdated weak reference")
+      if (self->function == NULL) RAISE(76, 27, "used member of empty object")
+      if (self->function_Refman->value == NULL) RAISE(76, 38, "used member of outdated weak reference")
       if ((self->function->mocker_function != NULL && self->function->mocker_function_Refman->value != NULL) && (! self->is_annotate)) {
-        if (self == NULL) RAISE(69, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(69, 38, "used member of outdated weak reference")
-        if (self->function == NULL) RAISE(69, 27, "used member of empty object")
-        if (self->function_Refman->value == NULL) RAISE(69, 38, "used member of outdated weak reference")
-        CHECK(69, tl5_compiler_M_SyntaxTreeFunction_write_cname(&(self->function->mocker_function->_base), self->function->mocker_function_Refman, &(self->function->mocker_function_Dynamic->_base)) )
+        if (self == NULL) RAISE(77, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(77, 38, "used member of outdated weak reference")
+        if (self->function == NULL) RAISE(77, 27, "used member of empty object")
+        if (self->function_Refman->value == NULL) RAISE(77, 38, "used member of outdated weak reference")
+        CHECK(77, tl5_compiler_M_SyntaxTreeFunction_write_cname(&(self->function->mocker_function->_base), self->function->mocker_function_Refman, &(self->function->mocker_function_Dynamic->_base)) )
       }
       else {
-        if (self == NULL) RAISE(71, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(71, 38, "used member of outdated weak reference")
-        CHECK(71, tl5_compiler_M_SyntaxTreeFunction_write_cname(self->function, self->function_Refman, self->function_Dynamic) )
+        if (self == NULL) RAISE(79, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(79, 38, "used member of outdated weak reference")
+        CHECK(79, tl5_compiler_M_SyntaxTreeFunction_write_cname(self->function, self->function_Refman, self->function_Dynamic) )
       }
       goto LUMI_cleanup;
     }
-  if (self == NULL) RAISE(73, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(73, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(73, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(73, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(73, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(73, 38, "used member of outdated weak reference")
-  if ((self->variable != NULL && self->variable_Refman->value != NULL) && self->variable->is_output) {
-      if (self == NULL) RAISE(74, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(74, 38, "used member of outdated weak reference")
-      if (! self->_base.top) {
-        aux_String_0 = &aux_String_0_Var;
-        aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-        if (aux_String_0_Refman == NULL) RAISE(75, 38, "insufficient memory for managed object")
-        aux_String_0_Var.max_length = 2;
-        aux_String_0_Var.length = 1;
-        aux_String_0_Var.values = "(";
-        CHECK(75, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-      }
-      aux_String_1 = &aux_String_1_Var;
-      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(76, 38, "insufficient memory for managed object")
-      aux_String_1_Var.max_length = 2;
-      aux_String_1_Var.length = 1;
-      aux_String_1_Var.values = "*";
-      CHECK(76, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
-    }
-  if (self == NULL) RAISE(77, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(77, 38, "used member of outdated weak reference")
-  if (self->variable != NULL && self->variable_Refman->value != NULL) {
-      if (self == NULL) RAISE(78, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(78, 38, "used member of outdated weak reference")
-      CHECK(78, tl5_compiler_M_SyntaxTreeVariable_write_cname(self->variable, self->variable_Refman, self->variable_Dynamic) )
-    }
-  else {
-      if (self == NULL) RAISE(80, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(80, 38, "used member of outdated weak reference")
-      CHECK(80, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
-    }
-  if (self == NULL) RAISE(81, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(81, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(81, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(81, 38, "used member of outdated weak reference")
   if (self->variable == NULL) RAISE(81, 27, "used member of empty object")
   if (self->variable_Refman->value == NULL) RAISE(81, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(81, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(81, 38, "used member of outdated weak reference")
+  if ((self->variable != NULL && self->variable_Refman->value != NULL) && self->variable->is_output) {
+      if (self == NULL) RAISE(82, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(82, 38, "used member of outdated weak reference")
+      if (! self->_base.top) {
+        aux_String_0 = &aux_String_0_Var;
+        aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+        if (aux_String_0_Refman == NULL) RAISE(83, 38, "insufficient memory for managed object")
+        aux_String_0_Var.max_length = 2;
+        aux_String_0_Var.length = 1;
+        aux_String_0_Var.values = "(";
+        CHECK(83, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+      }
+      aux_String_1 = &aux_String_1_Var;
+      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+      if (aux_String_1_Refman == NULL) RAISE(84, 38, "insufficient memory for managed object")
+      aux_String_1_Var.max_length = 2;
+      aux_String_1_Var.length = 1;
+      aux_String_1_Var.values = "*";
+      CHECK(84, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+    }
+  if (self == NULL) RAISE(85, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(85, 38, "used member of outdated weak reference")
+  if (self->variable != NULL && self->variable_Refman->value != NULL) {
+      if (self == NULL) RAISE(86, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(86, 38, "used member of outdated weak reference")
+      CHECK(86, tl5_compiler_M_SyntaxTreeVariable_write_cname(self->variable, self->variable_Refman, self->variable_Dynamic) )
+    }
+  else {
+      if (self == NULL) RAISE(88, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(88, 38, "used member of outdated weak reference")
+      CHECK(88, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
+    }
+  if (self == NULL) RAISE(89, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(89, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(89, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(89, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(89, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(89, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(89, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(89, 38, "used member of outdated weak reference")
   if (((self->variable != NULL && self->variable_Refman->value != NULL) && self->variable->is_output) && (! self->_base.top)) {
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-      if (aux_String_2_Refman == NULL) RAISE(82, 38, "insufficient memory for managed object")
+      if (aux_String_2_Refman == NULL) RAISE(90, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 2;
       aux_String_2_Var.length = 1;
       aux_String_2_Var.values = ")";
-      CHECK(82, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+      CHECK(90, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12814,54 +13232,7 @@ Returncode tl5_compiler_M_SymbolExpression_write_dynamic(tl5_compiler_M_SymbolEx
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
-  if (self == NULL) RAISE(85, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(85, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(85, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(85, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(85, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(85, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(85, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(85, 38, "used member of outdated weak reference")
-  if (((self->variable != NULL && self->variable_Refman->value != NULL) && self->variable->is_output) && (! self->_base.top)) {
-      aux_String_0 = &aux_String_0_Var;
-      aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(86, 38, "insufficient memory for managed object")
-      aux_String_0_Var.max_length = 3;
-      aux_String_0_Var.length = 2;
-      aux_String_0_Var.values = "(*";
-      CHECK(86, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-      if (self == NULL) RAISE(87, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(87, 38, "used member of outdated weak reference")
-      CHECK(87, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
-      aux_String_1 = &aux_String_1_Var;
-      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(88, 38, "insufficient memory for managed object")
-      aux_String_1_Var.max_length = 10;
-      aux_String_1_Var.length = 9;
-      aux_String_1_Var.values = "_Dynamic)";
-      CHECK(88, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
-    }
-  else {
-      CHECK(90, tl5_compiler_M_Expression_write_dynamic(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-    }
-LUMI_cleanup:
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
-  return LUMI_err;
-}
-#undef LUMI_FILE_NAME
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FILE_NAME "TL5/expression/symbol.4.lm"
-#define LUMI_FUNC_NAME "SymbolExpression.write-refman"
-Returncode tl5_compiler_M_SymbolExpression_write_refman(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic) {
-  Returncode LUMI_err = OK;
-  String aux_String_0_Var = {0};
-  String* aux_String_0 = NULL;
-  Ref_Manager* aux_String_0_Refman = NULL;
-  String aux_String_1_Var = {0};
-  String* aux_String_1 = NULL;
-  Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(93, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(93, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(93, 27, "used member of empty object")
@@ -12884,17 +13255,68 @@ Returncode tl5_compiler_M_SymbolExpression_write_refman(tl5_compiler_M_SymbolExp
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
       if (aux_String_1_Refman == NULL) RAISE(96, 38, "insufficient memory for managed object")
-      aux_String_1_Var.max_length = 9;
-      aux_String_1_Var.length = 8;
-      aux_String_1_Var.values = "_Refman)";
+      aux_String_1_Var.max_length = 10;
+      aux_String_1_Var.length = 9;
+      aux_String_1_Var.values = "_Dynamic)";
       CHECK(96, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
     }
   else {
-      CHECK(98, tl5_compiler_M_Expression_write_refman(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+      CHECK(98, tl5_compiler_M_Expression_write_dynamic(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/expression/symbol.4.lm"
+#define LUMI_FUNC_NAME "SymbolExpression.write-refman"
+Returncode tl5_compiler_M_SymbolExpression_write_refman(tl5_compiler_M_SymbolExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SymbolExpression_Dynamic* self_Dynamic) {
+  Returncode LUMI_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(101, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(101, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(101, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(101, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(101, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(101, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(101, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(101, 38, "used member of outdated weak reference")
+  if (((self->variable != NULL && self->variable_Refman->value != NULL) && self->variable->is_output) && (! self->_base.top)) {
+      aux_String_0 = &aux_String_0_Var;
+      aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+      if (aux_String_0_Refman == NULL) RAISE(102, 38, "insufficient memory for managed object")
+      aux_String_0_Var.max_length = 3;
+      aux_String_0_Var.length = 2;
+      aux_String_0_Var.values = "(*";
+      CHECK(102, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+      if (self == NULL) RAISE(103, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(103, 38, "used member of outdated weak reference")
+      CHECK(103, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
+      aux_String_1 = &aux_String_1_Var;
+      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+      if (aux_String_1_Refman == NULL) RAISE(104, 38, "insufficient memory for managed object")
+      aux_String_1_Var.max_length = 9;
+      aux_String_1_Var.length = 8;
+      aux_String_1_Var.values = "_Refman)";
+      CHECK(104, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+    }
+  else {
+      CHECK(106, tl5_compiler_M_Expression_write_refman(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+    }
+LUMI_cleanup:
+  LUMI_dec_ref(aux_String_1_Refman);
+  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12917,12 +13339,13 @@ Returncode tl5_compiler_M_MemberExpression_parse_new(tl5_compiler_M_MemberExpres
   tl5_compiler_M_MemberExpression* member_expression = NULL;
   Ref_Manager* member_expression_Refman = NULL;
   tl5_compiler_M_MemberExpression_Dynamic* member_expression_Dynamic = &tl5_compiler_M_MemberExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   member_expression = LUMI_alloc(sizeof(tl5_compiler_M_MemberExpression));
-  if (member_expression == NULL) RAISE(109, 49, "insufficient memory for object dynamic allocation")
+  if (member_expression == NULL) RAISE(117, 49, "insufficient memory for object dynamic allocation")
   member_expression_Refman = LUMI_new_ref(member_expression);
-  if (member_expression_Refman == NULL) RAISE(109, 38, "insufficient memory for managed object")
-  CHECK(110, tl5_compiler_M_MemberExpression_parse(member_expression, member_expression_Refman, member_expression_Dynamic, *expression, *expression_Refman, *expression_Dynamic, text, text_Refman, code_node, code_node_Refman, code_node_Dynamic) )
+  if (member_expression_Refman == NULL) RAISE(117, 38, "insufficient memory for managed object")
+  CHECK(118, tl5_compiler_M_MemberExpression_parse(member_expression, member_expression_Refman, member_expression_Dynamic, *expression, *expression_Refman, *expression_Dynamic, text, text_Refman, code_node, code_node_Refman, code_node_Dynamic) )
   *expression = NULL;
   *expression_Refman = NULL;
   *expression_Dynamic = NULL;
@@ -12942,6 +13365,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   String_Del(text);
   LUMI_owner_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -12951,16 +13375,17 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "MemberExpression.parse"
 Returncode tl5_compiler_M_MemberExpression_parse(tl5_compiler_M_MemberExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_MemberExpression_Dynamic* self_Dynamic, tl5_compiler_M_Expression* instance, Ref_Manager* instance_Refman, tl5_compiler_M_Expression_Dynamic* instance_Dynamic, String* text, Ref_Manager* text_Refman, tl5_compiler_M_SyntaxTreeCode* code_node, Ref_Manager* code_node_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* code_node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
-  if (self == NULL) RAISE(118, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(118, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(126, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(126, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->_base._base.code_node_Refman);
   self->_base._base.code_node_Refman = code_node_Refman;
   LUMI_inc_ref(self->_base._base.code_node_Refman);
   self->_base._base.code_node_Dynamic = code_node_Dynamic;
   self->_base._base.code_node = code_node;
-  if (self == NULL) RAISE(119, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(119, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(127, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(127, 38, "used member of outdated weak reference")
   if (self->instance_Dynamic != NULL) self->instance_Dynamic->_base._del(self->instance);
   LUMI_owner_dec_ref(self->instance_Refman);
   self->instance_Refman = instance_Refman;
@@ -12969,9 +13394,9 @@ Returncode tl5_compiler_M_MemberExpression_parse(tl5_compiler_M_MemberExpression
   instance = NULL;
   instance_Refman = NULL;
   instance_Dynamic = NULL;
-  CHECK(120, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base)) )
-  if (self == NULL) RAISE(121, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(121, 38, "used member of outdated weak reference")
+  CHECK(128, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base)) )
+  if (self == NULL) RAISE(129, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(129, 38, "used member of outdated weak reference")
   String_Del(self->_base.name);
   LUMI_owner_dec_ref(self->_base.name_Refman);
   self->_base.name_Refman = text_Refman;
@@ -12984,6 +13409,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(text_Refman);
   if (instance_Dynamic != NULL) instance_Dynamic->_base._del(instance);
   LUMI_owner_dec_ref(instance_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -13020,217 +13446,218 @@ Returncode tl5_compiler_M_MemberExpression_analyze(tl5_compiler_M_MemberExpressi
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
-  if (self->instance_Dynamic == NULL) RAISE(124, 28, "dynamic call of empty object")
-  if (self == NULL) RAISE(124, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(124, 38, "used member of outdated weak reference")
-  CHECK(124, self->instance_Dynamic->_base.analyze(&(self->instance->_base), self->instance_Refman, &(self->instance_Dynamic->_base)) )
-  if (self == NULL) RAISE(125, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(125, 38, "used member of outdated weak reference")
-  if (self->instance == NULL) RAISE(125, 27, "used member of empty object")
-  if (self->instance_Refman->value == NULL) RAISE(125, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(125, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(125, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self->instance_Dynamic == NULL) RAISE(132, 28, "dynamic call of empty object")
+  if (self == NULL) RAISE(132, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(132, 38, "used member of outdated weak reference")
+  CHECK(132, self->instance_Dynamic->_base.analyze(&(self->instance->_base), self->instance_Refman, &(self->instance_Dynamic->_base)) )
+  if (self == NULL) RAISE(133, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(133, 38, "used member of outdated weak reference")
+  if (self->instance == NULL) RAISE(133, 27, "used member of empty object")
+  if (self->instance_Refman->value == NULL) RAISE(133, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(133, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(133, 38, "used member of outdated weak reference")
   self->_base._base.assignable = self->instance->assignable;
-  if (self == NULL) RAISE(126, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(126, 38, "used member of outdated weak reference")
-  if (self->instance == NULL) RAISE(126, 27, "used member of empty object")
-  if (self->instance_Refman->value == NULL) RAISE(126, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(134, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(134, 38, "used member of outdated weak reference")
+  if (self->instance == NULL) RAISE(134, 27, "used member of empty object")
+  if (self->instance_Refman->value == NULL) RAISE(134, 38, "used member of outdated weak reference")
   instance_type = self->instance->result_type;
   instance_type_Refman = self->instance->result_type_Refman;
   LUMI_inc_ref(instance_type_Refman);
-  if (instance_type == NULL) RAISE(127, 27, "used member of empty object")
-  if (instance_type_Refman->value == NULL) RAISE(127, 38, "used member of outdated weak reference")
+  if (instance_type == NULL) RAISE(135, 27, "used member of empty object")
+  if (instance_type_Refman->value == NULL) RAISE(135, 38, "used member of outdated weak reference")
   if ((! (instance_type != NULL && instance_type_Refman->value != NULL)) || (! (instance_type->type_data != NULL && instance_type->type_data_Refman->value != NULL))) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(128, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(136, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 30;
       aux_String_0_Var.length = 29;
       aux_String_0_Var.values = "void expression has no member";
-      if (self == NULL) RAISE(128, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(128, 38, "used member of outdated weak reference")
-      CHECK(128, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_0, aux_String_0_Refman, self->_base.name, self->_base.name_Refman) )
+      if (self == NULL) RAISE(136, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(136, 38, "used member of outdated weak reference")
+      CHECK(136, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_0, aux_String_0_Refman, self->_base.name, self->_base.name_Refman) )
     }
-  if (tl5_compiler_M_glob == NULL) RAISE(129, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(129, 38, "used member of outdated weak reference")
-  if (instance_type == NULL) RAISE(129, 27, "used member of empty object")
-  if (instance_type_Refman->value == NULL) RAISE(129, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(137, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(137, 38, "used member of outdated weak reference")
+  if (instance_type == NULL) RAISE(137, 27, "used member of empty object")
+  if (instance_type_Refman->value == NULL) RAISE(137, 38, "used member of outdated weak reference")
   if ((void*)instance_type->type_data == tl5_compiler_M_glob->type_type) {
-      if (instance_type == NULL) RAISE(130, 27, "used member of empty object")
-      if (instance_type_Refman->value == NULL) RAISE(130, 38, "used member of outdated weak reference")
-      if (instance_type->parameters == NULL) RAISE(130, 27, "used member of empty object")
-      if (instance_type->parameters_Refman->value == NULL) RAISE(130, 38, "used member of outdated weak reference")
-      if (instance_type->parameters->first == NULL) RAISE(130, 27, "used member of empty object")
-      if (instance_type->parameters->first_Refman->value == NULL) RAISE(130, 38, "used member of outdated weak reference")
+      if (instance_type == NULL) RAISE(138, 27, "used member of empty object")
+      if (instance_type_Refman->value == NULL) RAISE(138, 38, "used member of outdated weak reference")
+      if (instance_type->parameters == NULL) RAISE(138, 27, "used member of empty object")
+      if (instance_type->parameters_Refman->value == NULL) RAISE(138, 38, "used member of outdated weak reference")
+      if (instance_type->parameters->first == NULL) RAISE(138, 27, "used member of empty object")
+      if (instance_type->parameters->first_Refman->value == NULL) RAISE(138, 38, "used member of outdated weak reference")
       LUMI_dec_ref(instance_type_Refman);
       instance_type_Refman = instance_type->parameters->first->item_Refman;
       LUMI_inc_ref(instance_type_Refman);
       instance_type = instance_type->parameters->first->item;
     }
   else {
-      if (tl5_compiler_M_glob == NULL) RAISE(131, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(131, 38, "used member of outdated weak reference")
-      if (instance_type == NULL) RAISE(131, 27, "used member of empty object")
-      if (instance_type_Refman->value == NULL) RAISE(131, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(139, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(139, 38, "used member of outdated weak reference")
+      if (instance_type == NULL) RAISE(139, 27, "used member of empty object")
+      if (instance_type_Refman->value == NULL) RAISE(139, 38, "used member of outdated weak reference")
       if ((void*)instance_type->type_data == tl5_compiler_M_glob->type_base) {
-        if (instance_type == NULL) RAISE(132, 27, "used member of empty object")
-        if (instance_type_Refman->value == NULL) RAISE(132, 38, "used member of outdated weak reference")
-        if (instance_type->parameters == NULL) RAISE(132, 27, "used member of empty object")
-        if (instance_type->parameters_Refman->value == NULL) RAISE(132, 38, "used member of outdated weak reference")
-        if (instance_type->parameters->first == NULL) RAISE(132, 27, "used member of empty object")
-        if (instance_type->parameters->first_Refman->value == NULL) RAISE(132, 38, "used member of outdated weak reference")
-        if (instance_type->parameters->first->item == NULL) RAISE(132, 27, "used member of empty object")
-        if (instance_type->parameters->first->item_Refman->value == NULL) RAISE(132, 38, "used member of outdated weak reference")
-        if (((tl5_compiler_M_TypeInstance*)(instance_type->parameters->first->item))->type_data == NULL) RAISE(132, 27, "used member of empty object")
-        if (((tl5_compiler_M_TypeInstance*)(instance_type->parameters->first->item))->type_data_Refman->value == NULL) RAISE(132, 38, "used member of outdated weak reference")
+        if (instance_type == NULL) RAISE(140, 27, "used member of empty object")
+        if (instance_type_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
+        if (instance_type->parameters == NULL) RAISE(140, 27, "used member of empty object")
+        if (instance_type->parameters_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
+        if (instance_type->parameters->first == NULL) RAISE(140, 27, "used member of empty object")
+        if (instance_type->parameters->first_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
+        if (instance_type->parameters->first->item == NULL) RAISE(140, 27, "used member of empty object")
+        if (instance_type->parameters->first->item_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
+        if (((tl5_compiler_M_TypeInstance*)(instance_type->parameters->first->item))->type_data == NULL) RAISE(140, 27, "used member of empty object")
+        if (((tl5_compiler_M_TypeInstance*)(instance_type->parameters->first->item))->type_data_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
         LUMI_dec_ref(instance_type_Refman);
         instance_type_Refman = ((tl5_compiler_M_TypeInstance*)(instance_type->parameters->first->item))->type_data->base_type_Refman;
         LUMI_inc_ref(instance_type_Refman);
         instance_type = ((tl5_compiler_M_TypeInstance*)(instance_type->parameters->first->item))->type_data->base_type;
       }
     }
-  if (tl5_compiler_M_glob == NULL) RAISE(134, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(134, 38, "used member of outdated weak reference")
-  if (instance_type == NULL) RAISE(134, 27, "used member of empty object")
-  if (instance_type_Refman->value == NULL) RAISE(134, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(142, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
+  if (instance_type == NULL) RAISE(142, 27, "used member of empty object")
+  if (instance_type_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
   if ((void*)instance_type->type_data == tl5_compiler_M_glob->type_module) {
-      if (instance_type == NULL) RAISE(135, 27, "used member of empty object")
-      if (instance_type_Refman->value == NULL) RAISE(135, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(135, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(135, 38, "used member of outdated weak reference")
+      if (instance_type == NULL) RAISE(143, 27, "used member of empty object")
+      if (instance_type_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(143, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
       LUMI_dec_ref(self->_base.module_name_Refman);
       self->_base.module_name_Refman = instance_type->name_Refman;
       LUMI_inc_ref(self->_base.module_name_Refman);
       self->_base.module_name = instance_type->name;
-      CHECK(136, tl5_compiler_M_SymbolExpression_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+      CHECK(144, tl5_compiler_M_SymbolExpression_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
       goto LUMI_cleanup;
     }
-  if (instance_type == NULL) RAISE(139, 27, "used member of empty object")
-  if (instance_type_Refman->value == NULL) RAISE(139, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(139, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(139, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(140, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(140, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
-  CHECK(139, tl5_compiler_M_TypeData_find_field(instance_type->type_data, instance_type->type_data_Refman, instance_type->type_data_Dynamic, self->_base.name, self->_base.name_Refman, &(self->_base.variable), &(self->_base.variable_Refman), &(self->_base.variable_Dynamic), &(self->bases)) )
-  if (self == NULL) RAISE(141, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(141, 38, "used member of outdated weak reference")
+  if (instance_type == NULL) RAISE(147, 27, "used member of empty object")
+  if (instance_type_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(147, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(148, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(148, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
+  CHECK(147, tl5_compiler_M_TypeData_find_field(instance_type->type_data, instance_type->type_data_Refman, instance_type->type_data_Dynamic, self->_base.name, self->_base.name_Refman, &(self->_base.variable), &(self->_base.variable_Refman), &(self->_base.variable_Dynamic), &(self->bases)) )
+  if (self == NULL) RAISE(149, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(149, 38, "used member of outdated weak reference")
   if (self->_base.variable != NULL && self->_base.variable_Refman->value != NULL) {
-      if (self == NULL) RAISE(143, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
-      if (self->_base.variable == NULL) RAISE(143, 27, "used member of empty object")
-      if (self->_base.variable_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
-      if (self->_base.variable->type_instance == NULL) RAISE(143, 27, "used member of empty object")
-      if (self->_base.variable->type_instance_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
-      if (self->_base.variable->type_instance->type_data == NULL) RAISE(143, 27, "used member of empty object")
-      if (self->_base.variable->type_instance->type_data_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(142, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
-      if (self->_base.variable == NULL) RAISE(142, 27, "used member of empty object")
-      if (self->_base.variable_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(142, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(151, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
+      if (self->_base.variable == NULL) RAISE(151, 27, "used member of empty object")
+      if (self->_base.variable_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
+      if (self->_base.variable->type_instance == NULL) RAISE(151, 27, "used member of empty object")
+      if (self->_base.variable->type_instance_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
+      if (self->_base.variable->type_instance->type_data == NULL) RAISE(151, 27, "used member of empty object")
+      if (self->_base.variable->type_instance->type_data_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(150, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
+      if (self->_base.variable == NULL) RAISE(150, 27, "used member of empty object")
+      if (self->_base.variable_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(150, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
       self->_base._base.is_complex_field = (self->_base.variable->access == tl5_compiler_M_Access_VAR) && (! self->_base.variable->type_instance->type_data->is_primitive);
-      if (tl5_compiler_M_glob == NULL) RAISE(145, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(145, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(145, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(145, 38, "used member of outdated weak reference")
-      if (self->_base.variable == NULL) RAISE(145, 27, "used member of empty object")
-      if (self->_base.variable_Refman->value == NULL) RAISE(145, 38, "used member of outdated weak reference")
-      if (self->_base.variable->type_instance == NULL) RAISE(145, 27, "used member of empty object")
-      if (self->_base.variable->type_instance_Refman->value == NULL) RAISE(145, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(144, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(144, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(153, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(153, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(153, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(153, 38, "used member of outdated weak reference")
+      if (self->_base.variable == NULL) RAISE(153, 27, "used member of empty object")
+      if (self->_base.variable_Refman->value == NULL) RAISE(153, 38, "used member of outdated weak reference")
+      if (self->_base.variable->type_instance == NULL) RAISE(153, 27, "used member of empty object")
+      if (self->_base.variable->type_instance_Refman->value == NULL) RAISE(153, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(152, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(152, 38, "used member of outdated weak reference")
       self->_base._base.is_generic_cast = (void*)self->_base.variable->type_instance->type_data == tl5_compiler_M_glob->type_generic;
-      if (self == NULL) RAISE(146, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(146, 38, "used member of outdated weak reference")
-      if (self->_base.variable == NULL) RAISE(146, 27, "used member of empty object")
-      if (self->_base.variable_Refman->value == NULL) RAISE(146, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(147, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(147, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
-      CHECK(146, tl5_compiler_M_TypeInstance_new_replace_params(self->_base.variable->type_instance, self->_base.variable->type_instance_Refman, instance_type, instance_type_Refman, self->bases, &(self->_base._base.result_type), &(self->_base._base.result_type_Refman)) )
-      if (self == NULL) RAISE(148, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
-      if (self->_base.variable == NULL) RAISE(148, 27, "used member of empty object")
-      if (self->_base.variable_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(148, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(154, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
+      if (self->_base.variable == NULL) RAISE(154, 27, "used member of empty object")
+      if (self->_base.variable_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(155, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(155, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(155, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(155, 38, "used member of outdated weak reference")
+      CHECK(154, tl5_compiler_M_TypeInstance_new_replace_params(self->_base.variable->type_instance, self->_base.variable->type_instance_Refman, instance_type, instance_type_Refman, self->bases, &(self->_base._base.result_type), &(self->_base._base.result_type_Refman)) )
+      if (self == NULL) RAISE(156, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
+      if (self->_base.variable == NULL) RAISE(156, 27, "used member of empty object")
+      if (self->_base.variable_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(156, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
       self->_base._base.access = self->_base.variable->access;
-      if (self == NULL) RAISE(149, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(149, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(157, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(157, 38, "used member of outdated weak reference")
       self->_base._base.assignable = true;
     }
   else {
-      if (instance_type == NULL) RAISE(151, 27, "used member of empty object")
-      if (instance_type_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(151, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(152, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(152, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(152, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(152, 38, "used member of outdated weak reference")
-      CHECK(151, tl5_compiler_M_TypeData_find_meth(instance_type->type_data, instance_type->type_data_Refman, instance_type->type_data_Dynamic, self->_base.name, self->_base.name_Refman, &(self->_base.function), &(self->_base.function_Refman), &(self->_base.function_Dynamic), &(self->bases)) )
-      if (self == NULL) RAISE(153, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(153, 38, "used member of outdated weak reference")
+      if (instance_type == NULL) RAISE(159, 27, "used member of empty object")
+      if (instance_type_Refman->value == NULL) RAISE(159, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(159, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(159, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(160, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(160, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(160, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(160, 38, "used member of outdated weak reference")
+      CHECK(159, tl5_compiler_M_TypeData_find_meth(instance_type->type_data, instance_type->type_data_Refman, instance_type->type_data_Dynamic, self->_base.name, self->_base.name_Refman, &(self->_base.function), &(self->_base.function_Refman), &(self->_base.function_Dynamic), &(self->bases)) )
+      if (self == NULL) RAISE(161, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(161, 38, "used member of outdated weak reference")
       if (! (self->_base.function != NULL && self->_base.function_Refman->value != NULL)) {
-        if (self == NULL) RAISE(154, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(162, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(162, 38, "used member of outdated weak reference")
         aux_String_1 = &aux_String_1_Var;
         aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-        if (aux_String_1_Refman == NULL) RAISE(154, 38, "insufficient memory for managed object")
+        if (aux_String_1_Refman == NULL) RAISE(162, 38, "insufficient memory for managed object")
         aux_String_1_Var.max_length = 7;
         aux_String_1_Var.length = 6;
         aux_String_1_Var.values = "mocked";
-        CHECK(154, String_equal(self->_base.name, self->_base.name_Refman, aux_String_1, aux_String_1_Refman, &(aux_Bool_0)) )
-        if (self == NULL) RAISE(154, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
+        CHECK(162, String_equal(self->_base.name, self->_base.name_Refman, aux_String_1, aux_String_1_Refman, &(aux_Bool_0)) )
+        if (self == NULL) RAISE(162, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(162, 38, "used member of outdated weak reference")
         self->_base.is_annotate = aux_Bool_0;
-        if (self->instance_Dynamic == NULL) RAISE(155, 28, "dynamic call of empty object")
-        if (self == NULL) RAISE(155, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(155, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(155, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(155, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(156, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
-        CHECK(155, self->instance_Dynamic->analyze_mock(self->instance, self->instance_Refman, self->instance_Dynamic, self->_base.is_annotate, &(self->is_mock_field)) )
+        if (self->instance_Dynamic == NULL) RAISE(163, 28, "dynamic call of empty object")
+        if (self == NULL) RAISE(163, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(163, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(163, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(163, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(164, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(164, 38, "used member of outdated weak reference")
+        CHECK(163, self->instance_Dynamic->analyze_mock(self->instance, self->instance_Refman, self->instance_Dynamic, self->_base.is_annotate, &(self->is_mock_field)) )
         if (self->is_mock_field) {
-          if (self == NULL) RAISE(157, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(157, 38, "used member of outdated weak reference")
+          if (self == NULL) RAISE(165, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(165, 38, "used member of outdated weak reference")
           if (self->_base.is_annotate) {
-            if (self == NULL) RAISE(158, 27, "used member of empty object")
-            if (self_Refman->value == NULL) RAISE(158, 38, "used member of outdated weak reference")
-            CHECK(158, tl5_compiler_M_TypeInstance_copy_new(instance_type, instance_type_Refman, &(self->_base._base.result_type), &(self->_base._base.result_type_Refman)) )
+            if (self == NULL) RAISE(166, 27, "used member of empty object")
+            if (self_Refman->value == NULL) RAISE(166, 38, "used member of outdated weak reference")
+            CHECK(166, tl5_compiler_M_TypeInstance_copy_new(instance_type, instance_type_Refman, &(self->_base._base.result_type), &(self->_base._base.result_type_Refman)) )
           }
           else {
-            if (self == NULL) RAISE(159, 27, "used member of empty object")
-            if (self_Refman->value == NULL) RAISE(159, 38, "used member of outdated weak reference")
+            if (self == NULL) RAISE(167, 27, "used member of empty object")
+            if (self_Refman->value == NULL) RAISE(167, 38, "used member of outdated weak reference")
             aux_String_2 = &aux_String_2_Var;
             aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-            if (aux_String_2_Refman == NULL) RAISE(159, 38, "insufficient memory for managed object")
+            if (aux_String_2_Refman == NULL) RAISE(167, 38, "insufficient memory for managed object")
             aux_String_2_Var.max_length = 7;
             aux_String_2_Var.length = 6;
             aux_String_2_Var.values = "active";
-            CHECK(159, String_equal(self->_base.name, self->_base.name_Refman, aux_String_2, aux_String_2_Refman, &(aux_Bool_1)) )
+            CHECK(167, String_equal(self->_base.name, self->_base.name_Refman, aux_String_2, aux_String_2_Refman, &(aux_Bool_1)) )
             if (! aux_Bool_1) {
               aux_String_3 = &aux_String_3_Var;
               aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-              if (aux_String_3_Refman == NULL) RAISE(161, 38, "insufficient memory for managed object")
+              if (aux_String_3_Refman == NULL) RAISE(169, 38, "insufficient memory for managed object")
               aux_String_3_Var.max_length = 28;
               aux_String_3_Var.length = 27;
               aux_String_3_Var.values = "mock function has no member";
-              if (self == NULL) RAISE(161, 27, "used member of empty object")
-              if (self_Refman->value == NULL) RAISE(161, 38, "used member of outdated weak reference")
-              CHECK(160, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_3, aux_String_3_Refman, self->_base.name, self->_base.name_Refman) )
+              if (self == NULL) RAISE(169, 27, "used member of empty object")
+              if (self_Refman->value == NULL) RAISE(169, 38, "used member of outdated weak reference")
+              CHECK(168, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_3, aux_String_3_Refman, self->_base.name, self->_base.name_Refman) )
             }
             else {
-              if (tl5_compiler_M_glob == NULL) RAISE(163, 27, "used member of empty object")
-              if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(163, 38, "used member of outdated weak reference")
-              CHECK(163, tl5_compiler_M_Expression_set_simple_type(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), tl5_compiler_M_glob->type_bool, tl5_compiler_M_glob->type_bool_Refman, tl5_compiler_M_glob->type_bool_Dynamic) )
-              if (self == NULL) RAISE(164, 27, "used member of empty object")
-              if (self_Refman->value == NULL) RAISE(164, 38, "used member of outdated weak reference")
+              if (tl5_compiler_M_glob == NULL) RAISE(171, 27, "used member of empty object")
+              if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(171, 38, "used member of outdated weak reference")
+              CHECK(171, tl5_compiler_M_Expression_set_simple_type(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), tl5_compiler_M_glob->type_bool, tl5_compiler_M_glob->type_bool_Refman, tl5_compiler_M_glob->type_bool_Dynamic) )
+              if (self == NULL) RAISE(172, 27, "used member of empty object")
+              if (self_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
               self->_base._base.assignable = true;
             }
           }
@@ -13238,72 +13665,72 @@ Returncode tl5_compiler_M_MemberExpression_analyze(tl5_compiler_M_MemberExpressi
         }
         aux_String_4 = &aux_String_4_Var;
         aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-        if (aux_String_4_Refman == NULL) RAISE(167, 38, "insufficient memory for managed object")
+        if (aux_String_4_Refman == NULL) RAISE(175, 38, "insufficient memory for managed object")
         aux_String_4_Var.max_length = 5;
         aux_String_4_Var.length = 4;
         aux_String_4_Var.values = "type";
-        if (instance_type == NULL) RAISE(168, 27, "used member of empty object")
-        if (instance_type_Refman->value == NULL) RAISE(168, 38, "used member of outdated weak reference")
-        if (instance_type->type_data == NULL) RAISE(168, 27, "used member of empty object")
-        if (instance_type->type_data_Refman->value == NULL) RAISE(168, 38, "used member of outdated weak reference")
+        if (instance_type == NULL) RAISE(176, 27, "used member of empty object")
+        if (instance_type_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
+        if (instance_type->type_data == NULL) RAISE(176, 27, "used member of empty object")
+        if (instance_type->type_data_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
         aux_String_5 = &aux_String_5_Var;
         aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-        if (aux_String_5_Refman == NULL) RAISE(169, 38, "insufficient memory for managed object")
+        if (aux_String_5_Refman == NULL) RAISE(177, 38, "insufficient memory for managed object")
         aux_String_5_Var.max_length = 14;
         aux_String_5_Var.length = 13;
         aux_String_5_Var.values = "has no member";
-        if (self == NULL) RAISE(170, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(170, 38, "used member of outdated weak reference")
-        CHECK(166, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_4, aux_String_4_Refman, instance_type->type_data->name, instance_type->type_data->name_Refman, aux_String_5, aux_String_5_Refman, self->_base.name, self->_base.name_Refman) )
+        if (self == NULL) RAISE(178, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(178, 38, "used member of outdated weak reference")
+        CHECK(174, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_4, aux_String_4_Refman, instance_type->type_data->name, instance_type->type_data->name_Refman, aux_String_5, aux_String_5_Refman, self->_base.name, self->_base.name_Refman) )
       }
-      if (tl5_compiler_M_glob == NULL) RAISE(173, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(173, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
-      if (self->instance == NULL) RAISE(173, 27, "used member of empty object")
-      if (self->instance_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
-      if (self->instance->result_type == NULL) RAISE(173, 27, "used member of empty object")
-      if (self->instance->result_type_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
-      if (tl5_compiler_M_glob == NULL) RAISE(172, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(172, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
-      if (self->instance == NULL) RAISE(172, 27, "used member of empty object")
-      if (self->instance_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
-      if (self->instance->result_type == NULL) RAISE(172, 27, "used member of empty object")
-      if (self->instance->result_type_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(171, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(171, 38, "used member of outdated weak reference")
-      if (self->_base.function == NULL) RAISE(171, 27, "used member of empty object")
-      if (self->_base.function_Refman->value == NULL) RAISE(171, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(181, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(181, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
+      if (self->instance == NULL) RAISE(181, 27, "used member of empty object")
+      if (self->instance_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
+      if (self->instance->result_type == NULL) RAISE(181, 27, "used member of empty object")
+      if (self->instance->result_type_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(180, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(180, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+      if (self->instance == NULL) RAISE(180, 27, "used member of empty object")
+      if (self->instance_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+      if (self->instance->result_type == NULL) RAISE(180, 27, "used member of empty object")
+      if (self->instance->result_type_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(179, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(179, 38, "used member of outdated weak reference")
+      if (self->_base.function == NULL) RAISE(179, 27, "used member of empty object")
+      if (self->_base.function_Refman->value == NULL) RAISE(179, 38, "used member of outdated weak reference")
       if ((self->_base.function->is_dynamic && ((void*)self->instance->result_type->type_data != tl5_compiler_M_glob->type_type)) && ((void*)self->instance->result_type->type_data != tl5_compiler_M_glob->type_base)) {
-        if (self == NULL) RAISE(174, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
-        if (self->_base.function == NULL) RAISE(174, 27, "used member of empty object")
-        if (self->_base.function_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(174, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(182, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(182, 38, "used member of outdated weak reference")
+        if (self->_base.function == NULL) RAISE(182, 27, "used member of empty object")
+        if (self->_base.function_Refman->value == NULL) RAISE(182, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(182, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(182, 38, "used member of outdated weak reference")
         self->bases += self->_base.function->dynamic_base_count;
-        if (self == NULL) RAISE(175, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
-        if (self->_base.function == NULL) RAISE(175, 27, "used member of empty object")
-        if (self->_base.function_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(175, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(183, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(183, 38, "used member of outdated weak reference")
+        if (self->_base.function == NULL) RAISE(183, 27, "used member of empty object")
+        if (self->_base.function_Refman->value == NULL) RAISE(183, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(183, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(183, 38, "used member of outdated weak reference")
         LUMI_dec_ref(self->_base.function_Refman);
         self->_base.function_Refman = self->_base.function->dynamic_base_method_Refman;
         LUMI_inc_ref(self->_base.function_Refman);
         self->_base.function_Dynamic = self->_base.function->dynamic_base_method_Dynamic;
         self->_base.function = self->_base.function->dynamic_base_method;
-        if (self == NULL) RAISE(176, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
-        if (self->instance == NULL) RAISE(176, 27, "used member of empty object")
-        if (self->instance_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(184, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(184, 38, "used member of outdated weak reference")
+        if (self->instance == NULL) RAISE(184, 27, "used member of empty object")
+        if (self->instance_Refman->value == NULL) RAISE(184, 38, "used member of outdated weak reference")
         if (! self->instance->is_complex_field) {
-          if (self == NULL) RAISE(177, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(177, 38, "used member of outdated weak reference")
-          if (self == NULL) RAISE(177, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(177, 38, "used member of outdated weak reference")
+          if (self == NULL) RAISE(185, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
+          if (self == NULL) RAISE(185, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
           LUMI_dec_ref(self->dynamic_call_self_instance_Refman);
           self->dynamic_call_self_instance_Refman = self->instance_Refman;
           LUMI_inc_ref(self->dynamic_call_self_instance_Refman);
@@ -13311,62 +13738,62 @@ Returncode tl5_compiler_M_MemberExpression_analyze(tl5_compiler_M_MemberExpressi
           self->dynamic_call_self_instance = self->instance;
         }
       }
-      if (tl5_compiler_M_glob == NULL) RAISE(178, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(178, 38, "used member of outdated weak reference")
-      CHECK(178, tl5_compiler_M_Expression_set_simple_type(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), tl5_compiler_M_glob->type_func, tl5_compiler_M_glob->type_func_Refman, tl5_compiler_M_glob->type_func_Dynamic) )
-      if (self == NULL) RAISE(179, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(179, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(186, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(186, 38, "used member of outdated weak reference")
+      CHECK(186, tl5_compiler_M_Expression_set_simple_type(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), tl5_compiler_M_glob->type_func, tl5_compiler_M_glob->type_func_Refman, tl5_compiler_M_glob->type_func_Dynamic) )
+      if (self == NULL) RAISE(187, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(187, 38, "used member of outdated weak reference")
       self->_base._base.access = tl5_compiler_M_Access_VAR;
-      if (self == NULL) RAISE(180, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
-      if (self->_base.function == NULL) RAISE(180, 27, "used member of empty object")
-      if (self->_base.function_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(180, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
-      if (self->_base._base.result_type == NULL) RAISE(180, 27, "used member of empty object")
-      if (self->_base._base.result_type_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
-      CHECK(180, tl5_compiler_M_FunctionArguments_copy_new(self->_base.function->arguments, self->_base.function->arguments_Refman, self->_base.function->arguments_Dynamic, &(self->_base._base.result_type->arguments), &(self->_base._base.result_type->arguments_Refman), &(self->_base._base.result_type->arguments_Dynamic)) )
+      if (self == NULL) RAISE(188, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
+      if (self->_base.function == NULL) RAISE(188, 27, "used member of empty object")
+      if (self->_base.function_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(188, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
+      if (self->_base._base.result_type == NULL) RAISE(188, 27, "used member of empty object")
+      if (self->_base._base.result_type_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
+      CHECK(188, tl5_compiler_M_FunctionArguments_copy_new(self->_base.function->arguments, self->_base.function->arguments_Refman, self->_base.function->arguments_Dynamic, &(self->_base._base.result_type->arguments), &(self->_base._base.result_type->arguments_Refman), &(self->_base._base.result_type->arguments_Dynamic)) )
     }
-  if (tl5_compiler_M_glob == NULL) RAISE(181, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(181, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
-  if (self->instance == NULL) RAISE(181, 27, "used member of empty object")
-  if (self->instance_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
-  if (self->instance->result_type == NULL) RAISE(181, 27, "used member of empty object")
-  if (self->instance->result_type_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(189, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(189, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(189, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(189, 38, "used member of outdated weak reference")
+  if (self->instance == NULL) RAISE(189, 27, "used member of empty object")
+  if (self->instance_Refman->value == NULL) RAISE(189, 38, "used member of outdated weak reference")
+  if (self->instance->result_type == NULL) RAISE(189, 27, "used member of empty object")
+  if (self->instance->result_type_Refman->value == NULL) RAISE(189, 38, "used member of outdated weak reference")
   if ((void*)self->instance->result_type->type_data == tl5_compiler_M_glob->type_base) {
-      if (self == NULL) RAISE(182, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(182, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(190, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(190, 38, "used member of outdated weak reference")
       if (! (self->_base.function != NULL && self->_base.function_Refman->value != NULL)) {
         aux_String_6 = &aux_String_6_Var;
         aux_String_6_Refman = LUMI_new_ref(aux_String_6);
-        if (aux_String_6_Refman == NULL) RAISE(184, 38, "insufficient memory for managed object")
+        if (aux_String_6_Refman == NULL) RAISE(192, 38, "insufficient memory for managed object")
         aux_String_6_Var.max_length = 31;
         aux_String_6_Var.length = 30;
         aux_String_6_Var.values = "calling \"base\" with non-method";
-        if (self == NULL) RAISE(184, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(184, 38, "used member of outdated weak reference")
-        CHECK(183, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_6, aux_String_6_Refman, self->_base.name, self->_base.name_Refman) )
+        if (self == NULL) RAISE(192, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(192, 38, "used member of outdated weak reference")
+        CHECK(191, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_6, aux_String_6_Refman, self->_base.name, self->_base.name_Refman) )
       }
-      if (self == NULL) RAISE(185, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
-      if (self->instance == NULL) RAISE(185, 27, "used member of empty object")
-      if (self->instance_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(193, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(193, 38, "used member of outdated weak reference")
+      if (self->instance == NULL) RAISE(193, 27, "used member of empty object")
+      if (self->instance_Refman->value == NULL) RAISE(193, 38, "used member of outdated weak reference")
       base_result_type = self->instance->result_type;
       base_result_type_Refman = self->instance->result_type_Refman;
       self->instance->result_type = NULL;
       self->instance->result_type_Refman = NULL;
-      if (base_result_type == NULL) RAISE(186, 27, "used member of empty object")
-      if (base_result_type_Refman->value == NULL) RAISE(186, 38, "used member of outdated weak reference")
-      if (base_result_type->parameters == NULL) RAISE(186, 27, "used member of empty object")
-      if (base_result_type->parameters_Refman->value == NULL) RAISE(186, 38, "used member of outdated weak reference")
-      if (base_result_type->parameters->first == NULL) RAISE(186, 27, "used member of empty object")
-      if (base_result_type->parameters->first_Refman->value == NULL) RAISE(186, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(186, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(186, 38, "used member of outdated weak reference")
-      if (self->instance == NULL) RAISE(186, 27, "used member of empty object")
-      if (self->instance_Refman->value == NULL) RAISE(186, 38, "used member of outdated weak reference")
+      if (base_result_type == NULL) RAISE(194, 27, "used member of empty object")
+      if (base_result_type_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
+      if (base_result_type->parameters == NULL) RAISE(194, 27, "used member of empty object")
+      if (base_result_type->parameters_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
+      if (base_result_type->parameters->first == NULL) RAISE(194, 27, "used member of empty object")
+      if (base_result_type->parameters->first_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(194, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
+      if (self->instance == NULL) RAISE(194, 27, "used member of empty object")
+      if (self->instance_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
       tl5_compiler_M_TypeInstance_Del(self->instance->result_type);
       LUMI_owner_dec_ref(self->instance->result_type_Refman);
       self->instance->result_type_Refman = base_result_type->parameters->first->item_Refman;
@@ -13385,6 +13812,7 @@ LUMI_cleanup:
   tl5_compiler_M_TypeInstance_Del(base_result_type);
   LUMI_owner_dec_ref(base_result_type_Refman);
   LUMI_dec_ref(instance_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -13397,84 +13825,85 @@ Returncode tl5_compiler_M_MemberExpression_analyze_call(tl5_compiler_M_MemberExp
   tl5_compiler_M_CallArgument* self_param = NULL;
   Ref_Manager* self_param_Refman = NULL;
   tl5_compiler_M_CallArgument_Dynamic* self_param_Dynamic = &tl5_compiler_M_CallArgument_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
-  if (self == NULL) RAISE(192, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(192, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(192, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(192, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(200, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(200, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(200, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(200, 38, "used member of outdated weak reference")
   if (self->is_mock_field && self->_base.is_annotate) {
-      if (self->instance_Dynamic == NULL) RAISE(193, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(193, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(193, 38, "used member of outdated weak reference")
-      CHECK(193, self->instance_Dynamic->analyze_call(self->instance, self->instance_Refman, self->instance_Dynamic, arguments, arguments_Refman, arguments_Dynamic, &(*instance_type), &(*instance_type_Refman), &(*bases), &(*is_function_object)) )
+      if (self->instance_Dynamic == NULL) RAISE(201, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(201, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
+      CHECK(201, self->instance_Dynamic->analyze_call(self->instance, self->instance_Refman, self->instance_Dynamic, arguments, arguments_Refman, arguments_Dynamic, &(*instance_type), &(*instance_type_Refman), &(*bases), &(*is_function_object)) )
       goto LUMI_cleanup;
     }
-  if (self == NULL) RAISE(198, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(198, 38, "used member of outdated weak reference")
-  CHECK(196, tl5_compiler_M_SymbolExpression_analyze_call(&(self->_base), self_Refman, &(self_Dynamic->_base), arguments, arguments_Refman, arguments_Dynamic, &(*instance_type), &(*instance_type_Refman), &(*bases), &(*is_function_object)) )
+  if (self == NULL) RAISE(206, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(206, 38, "used member of outdated weak reference")
+  CHECK(204, tl5_compiler_M_SymbolExpression_analyze_call(&(self->_base), self_Refman, &(self_Dynamic->_base), arguments, arguments_Refman, arguments_Dynamic, &(*instance_type), &(*instance_type_Refman), &(*bases), &(*is_function_object)) )
   if ((*is_function_object) || (self->_base.module_name != NULL && self->_base.module_name_Refman->value != NULL)) {
       goto LUMI_cleanup;
     }
-  if (self == NULL) RAISE(200, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(200, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(208, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(208, 38, "used member of outdated weak reference")
   *bases = self->bases;
-  if (tl5_compiler_M_glob == NULL) RAISE(201, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(201, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
-  if (self->instance == NULL) RAISE(201, 27, "used member of empty object")
-  if (self->instance_Refman->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
-  if (self->instance->result_type == NULL) RAISE(201, 27, "used member of empty object")
-  if (self->instance->result_type_Refman->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(209, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(209, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
+  if (self->instance == NULL) RAISE(209, 27, "used member of empty object")
+  if (self->instance_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
+  if (self->instance->result_type == NULL) RAISE(209, 27, "used member of empty object")
+  if (self->instance->result_type_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
   if ((void*)self->instance->result_type->type_data == tl5_compiler_M_glob->type_type) {
-      if (self == NULL) RAISE(202, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
-      if (self->instance == NULL) RAISE(202, 27, "used member of empty object")
-      if (self->instance_Refman->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
-      if (self->instance->result_type == NULL) RAISE(202, 27, "used member of empty object")
-      if (self->instance->result_type_Refman->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
-      if (self->instance->result_type->parameters == NULL) RAISE(202, 27, "used member of empty object")
-      if (self->instance->result_type->parameters_Refman->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
-      if (self->instance->result_type->parameters->first == NULL) RAISE(202, 27, "used member of empty object")
-      if (self->instance->result_type->parameters->first_Refman->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(210, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
+      if (self->instance == NULL) RAISE(210, 27, "used member of empty object")
+      if (self->instance_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
+      if (self->instance->result_type == NULL) RAISE(210, 27, "used member of empty object")
+      if (self->instance->result_type_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
+      if (self->instance->result_type->parameters == NULL) RAISE(210, 27, "used member of empty object")
+      if (self->instance->result_type->parameters_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
+      if (self->instance->result_type->parameters->first == NULL) RAISE(210, 27, "used member of empty object")
+      if (self->instance->result_type->parameters->first_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
       LUMI_dec_ref(*instance_type_Refman);
       *instance_type_Refman = self->instance->result_type->parameters->first->item_Refman;
       LUMI_inc_ref(*instance_type_Refman);
       *instance_type = self->instance->result_type->parameters->first->item;
     }
   else {
-      if (self == NULL) RAISE(204, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(204, 38, "used member of outdated weak reference")
-      if (self->instance == NULL) RAISE(204, 27, "used member of empty object")
-      if (self->instance_Refman->value == NULL) RAISE(204, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(212, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
+      if (self->instance == NULL) RAISE(212, 27, "used member of empty object")
+      if (self->instance_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
       LUMI_dec_ref(*instance_type_Refman);
       *instance_type_Refman = self->instance->result_type_Refman;
       LUMI_inc_ref(*instance_type_Refman);
       *instance_type = self->instance->result_type;
       self_param = LUMI_alloc(sizeof(tl5_compiler_M_CallArgument));
-      if (self_param == NULL) RAISE(205, 49, "insufficient memory for object dynamic allocation")
+      if (self_param == NULL) RAISE(213, 49, "insufficient memory for object dynamic allocation")
       self_param_Refman = LUMI_new_ref(self_param);
-      if (self_param_Refman == NULL) RAISE(205, 38, "insufficient memory for managed object")
-      CHECK(206, tl5_compiler_M_SyntaxTreeNode_set_location(&(self_param->_base._base), self_param_Refman, &(self_param_Dynamic->_base._base)) )
-      if (self == NULL) RAISE(207, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(207, 38, "used member of outdated weak reference")
-      if (self->_base.function == NULL) RAISE(207, 27, "used member of empty object")
-      if (self->_base.function_Refman->value == NULL) RAISE(207, 38, "used member of outdated weak reference")
-      if (self->_base.function->arguments == NULL) RAISE(207, 27, "used member of empty object")
-      if (self->_base.function->arguments_Refman->value == NULL) RAISE(207, 38, "used member of outdated weak reference")
-      if (self->_base.function->arguments->parameters == NULL) RAISE(207, 27, "used member of empty object")
-      if (self->_base.function->arguments->parameters_Refman->value == NULL) RAISE(207, 38, "used member of outdated weak reference")
-      if (self->_base.function->arguments->parameters->first == NULL) RAISE(207, 27, "used member of empty object")
-      if (self->_base.function->arguments->parameters->first_Refman->value == NULL) RAISE(207, 38, "used member of outdated weak reference")
-      if (self->_base.function->arguments->parameters->first->item == NULL) RAISE(207, 27, "used member of empty object")
-      if (self->_base.function->arguments->parameters->first->item_Refman->value == NULL) RAISE(207, 38, "used member of outdated weak reference")
-      if (self_param == NULL) RAISE(207, 27, "used member of empty object")
-      if (self_param_Refman->value == NULL) RAISE(207, 38, "used member of outdated weak reference")
+      if (self_param_Refman == NULL) RAISE(213, 38, "insufficient memory for managed object")
+      CHECK(214, tl5_compiler_M_SyntaxTreeNode_set_location(&(self_param->_base._base), self_param_Refman, &(self_param_Dynamic->_base._base)) )
+      if (self == NULL) RAISE(215, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (self->_base.function == NULL) RAISE(215, 27, "used member of empty object")
+      if (self->_base.function_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (self->_base.function->arguments == NULL) RAISE(215, 27, "used member of empty object")
+      if (self->_base.function->arguments_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (self->_base.function->arguments->parameters == NULL) RAISE(215, 27, "used member of empty object")
+      if (self->_base.function->arguments->parameters_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (self->_base.function->arguments->parameters->first == NULL) RAISE(215, 27, "used member of empty object")
+      if (self->_base.function->arguments->parameters->first_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (self->_base.function->arguments->parameters->first->item == NULL) RAISE(215, 27, "used member of empty object")
+      if (self->_base.function->arguments->parameters->first->item_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (self_param == NULL) RAISE(215, 27, "used member of empty object")
+      if (self_param_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
       self_param->_base.access = ((tl5_compiler_M_Argument*)(self->_base.function->arguments->parameters->first->item))->access;
-      if (self == NULL) RAISE(208, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(208, 38, "used member of outdated weak reference")
-      if (self_param == NULL) RAISE(208, 27, "used member of empty object")
-      if (self_param_Refman->value == NULL) RAISE(208, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(216, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
+      if (self_param == NULL) RAISE(216, 27, "used member of empty object")
+      if (self_param_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
       if (self_param->value_Dynamic != NULL) self_param->value_Dynamic->_base._del(self_param->value);
       LUMI_owner_dec_ref(self_param->value_Refman);
       self_param->value_Refman = self->instance_Refman;
@@ -13483,20 +13912,20 @@ Returncode tl5_compiler_M_MemberExpression_analyze_call(tl5_compiler_M_MemberExp
       self->instance = NULL;
       self->instance_Refman = NULL;
       self->instance_Dynamic = NULL;
-      if (self_param == NULL) RAISE(209, 27, "used member of empty object")
-      if (self_param_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
-      if (self_param->value == NULL) RAISE(209, 27, "used member of empty object")
-      if (self_param->value_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
+      if (self_param == NULL) RAISE(217, 27, "used member of empty object")
+      if (self_param_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
+      if (self_param->value == NULL) RAISE(217, 27, "used member of empty object")
+      if (self_param->value_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
       self_param->value->top = true;
-      if (arguments == NULL) RAISE(210, 27, "used member of empty object")
-      if (arguments_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
-      CHECK(210, tl5_compiler_M_List_prepend(arguments->parameters, arguments->parameters_Refman, &(self_param->_base), self_param_Refman, (void*)&(self_param_Dynamic->_base)) )
+      if (arguments == NULL) RAISE(218, 27, "used member of empty object")
+      if (arguments_Refman->value == NULL) RAISE(218, 38, "used member of outdated weak reference")
+      CHECK(218, tl5_compiler_M_List_prepend(arguments->parameters, arguments->parameters_Refman, &(self_param->_base), self_param_Refman, (void*)&(self_param_Dynamic->_base)) )
       self_param = NULL;
       self_param_Refman = NULL;
       self_param_Dynamic = NULL;
     }
-  if (self == NULL) RAISE(211, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(211, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(219, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(219, 38, "used member of outdated weak reference")
   if (self->instance_Dynamic != NULL) self->instance_Dynamic->_base._del(self->instance);
   LUMI_owner_dec_ref(self->instance_Refman);
   self->instance_Refman = NULL;
@@ -13506,6 +13935,7 @@ LUMI_cleanup:
   if (self_param_Dynamic != NULL) self_param_Dynamic->_base._base._del(self_param);
   LUMI_owner_dec_ref(self_param_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -13518,42 +13948,44 @@ Returncode tl5_compiler_M_MemberExpression_analyze_mock(tl5_compiler_M_MemberExp
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  CHECK(214, tl5_compiler_M_SymbolExpression_analyze_mock(&(self->_base), self_Refman, &(self_Dynamic->_base), is_annotate, &(*is_mock)) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(222, tl5_compiler_M_SymbolExpression_analyze_mock(&(self->_base), self_Refman, &(self_Dynamic->_base), is_annotate, &(*is_mock)) )
   if (*is_mock) {
-      if (tl5_compiler_M_glob == NULL) RAISE(217, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(217, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
-      if (self->instance == NULL) RAISE(217, 27, "used member of empty object")
-      if (self->instance_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
-      if (self->instance->result_type == NULL) RAISE(217, 27, "used member of empty object")
-      if (self->instance->result_type_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
-      if (tl5_compiler_M_glob == NULL) RAISE(216, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(216, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
-      if (self->instance == NULL) RAISE(216, 27, "used member of empty object")
-      if (self->instance_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
-      if (self->instance->result_type == NULL) RAISE(216, 27, "used member of empty object")
-      if (self->instance->result_type_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(215, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
-      if (self->_base.function == NULL) RAISE(215, 27, "used member of empty object")
-      if (self->_base.function_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(225, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(225, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(225, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(225, 38, "used member of outdated weak reference")
+      if (self->instance == NULL) RAISE(225, 27, "used member of empty object")
+      if (self->instance_Refman->value == NULL) RAISE(225, 38, "used member of outdated weak reference")
+      if (self->instance->result_type == NULL) RAISE(225, 27, "used member of empty object")
+      if (self->instance->result_type_Refman->value == NULL) RAISE(225, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(224, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(224, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(224, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(224, 38, "used member of outdated weak reference")
+      if (self->instance == NULL) RAISE(224, 27, "used member of empty object")
+      if (self->instance_Refman->value == NULL) RAISE(224, 38, "used member of outdated weak reference")
+      if (self->instance->result_type == NULL) RAISE(224, 27, "used member of empty object")
+      if (self->instance->result_type_Refman->value == NULL) RAISE(224, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(223, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
+      if (self->_base.function == NULL) RAISE(223, 27, "used member of empty object")
+      if (self->_base.function_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
       if ((self->_base.function->is_dynamic && ((void*)self->instance->result_type->type_data != tl5_compiler_M_glob->type_type)) && ((void*)self->instance->result_type->type_data != tl5_compiler_M_glob->type_base)) {
         aux_String_0 = &aux_String_0_Var;
         aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-        if (aux_String_0_Refman == NULL) RAISE(219, 38, "insufficient memory for managed object")
+        if (aux_String_0_Refman == NULL) RAISE(227, 38, "insufficient memory for managed object")
         aux_String_0_Var.max_length = 49;
         aux_String_0_Var.length = 48;
         aux_String_0_Var.values = "accessing mock function field in dynamic call to";
-        if (self == NULL) RAISE(220, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(220, 38, "used member of outdated weak reference")
-        CHECK(218, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_0, aux_String_0_Refman, self->_base.name, self->_base.name_Refman) )
+        if (self == NULL) RAISE(228, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(228, 38, "used member of outdated weak reference")
+        CHECK(226, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_0, aux_String_0_Refman, self->_base.name, self->_base.name_Refman) )
       }
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -13588,142 +14020,143 @@ Returncode tl5_compiler_M_MemberExpression_write_preactions(tl5_compiler_M_Membe
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
-  if (self == NULL) RAISE(223, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(231, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(231, 38, "used member of outdated weak reference")
   if (self->_base.module_name != NULL && self->_base.module_name_Refman->value != NULL) {
       goto LUMI_cleanup;
     }
-  if (self == NULL) RAISE(225, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(225, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(233, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
   if (self->instance != NULL && self->instance_Refman->value != NULL) {
-      if (self->instance_Dynamic == NULL) RAISE(226, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(226, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(226, 38, "used member of outdated weak reference")
-      CHECK(226, self->instance_Dynamic->write_preactions(self->instance, self->instance_Refman, self->instance_Dynamic) )
+      if (self->instance_Dynamic == NULL) RAISE(234, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(234, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(234, 38, "used member of outdated weak reference")
+      CHECK(234, self->instance_Dynamic->write_preactions(self->instance, self->instance_Refman, self->instance_Dynamic) )
     }
-  if (self == NULL) RAISE(231, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(231, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(230, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(230, 38, "used member of outdated weak reference")
-  if (self->instance == NULL) RAISE(230, 27, "used member of empty object")
-  if (self->instance_Refman->value == NULL) RAISE(230, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(230, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(230, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(229, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(229, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(229, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(229, 38, "used member of outdated weak reference")
-  if (self->instance == NULL) RAISE(229, 27, "used member of empty object")
-  if (self->instance_Refman->value == NULL) RAISE(229, 38, "used member of outdated weak reference")
-  if (self->instance->result_type == NULL) RAISE(229, 27, "used member of empty object")
-  if (self->instance->result_type_Refman->value == NULL) RAISE(229, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(228, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(228, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(228, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(228, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(227, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(227, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(239, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(239, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(238, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(238, 38, "used member of outdated weak reference")
+  if (self->instance == NULL) RAISE(238, 27, "used member of empty object")
+  if (self->instance_Refman->value == NULL) RAISE(238, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(238, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(238, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(237, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(237, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
+  if (self->instance == NULL) RAISE(237, 27, "used member of empty object")
+  if (self->instance_Refman->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
+  if (self->instance->result_type == NULL) RAISE(237, 27, "used member of empty object")
+  if (self->instance->result_type_Refman->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(236, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(236, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(236, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(236, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(235, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(235, 38, "used member of outdated weak reference")
   if (((! ((self->dynamic_call_self_instance != NULL && self->dynamic_call_self_instance_Refman->value != NULL) || (((self->instance != NULL && self->instance_Refman->value != NULL) && (! (self->_base.function != NULL && self->_base.function_Refman->value != NULL))) && ((void*)self->instance->result_type->type_data != tl5_compiler_M_glob->type_type)))) || ((self->instance != NULL && self->instance_Refman->value != NULL) && self->instance->is_complex_field)) || self->is_mock_field) {
       goto LUMI_cleanup;
     }
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(234, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(242, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 5;
   aux_String_0_Var.length = 4;
   aux_String_0_Var.values = "if (";
-  CHECK(234, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-  if (self == NULL) RAISE(235, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(235, 38, "used member of outdated weak reference")
+  CHECK(242, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  if (self == NULL) RAISE(243, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(243, 38, "used member of outdated weak reference")
   if (self->instance != NULL && self->instance_Refman->value != NULL) {
-      if (self == NULL) RAISE(239, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(239, 38, "used member of outdated weak reference")
-      CHECK(239, tl5_compiler_M_Expression_write_as_top(self->instance, self->instance_Refman, self->instance_Dynamic) )
+      if (self == NULL) RAISE(247, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
+      CHECK(247, tl5_compiler_M_Expression_write_as_top(self->instance, self->instance_Refman, self->instance_Dynamic) )
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(240, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(248, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 11;
       aux_String_1_Var.length = 10;
       aux_String_1_Var.values = " == NULL) ";
-      CHECK(240, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+      CHECK(248, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-      if (aux_String_2_Refman == NULL) RAISE(241, 38, "insufficient memory for managed object")
+      if (aux_String_2_Refman == NULL) RAISE(249, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 28;
       aux_String_2_Var.length = 27;
       aux_String_2_Var.values = "used member of empty object";
-      CHECK(241, tl5_compiler_M_SyntaxTreeNode_write_raise(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_2, aux_String_2_Refman) )
-      if (self == NULL) RAISE(242, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(242, 38, "used member of outdated weak reference")
-      CHECK(242, tl5_compiler_M_SyntaxTreeCode_write_spaces(self->_base._base.code_node, self->_base._base.code_node_Refman, self->_base._base.code_node_Dynamic) )
+      CHECK(249, tl5_compiler_M_SyntaxTreeNode_write_raise(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_2, aux_String_2_Refman) )
+      if (self == NULL) RAISE(250, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(250, 38, "used member of outdated weak reference")
+      CHECK(250, tl5_compiler_M_SyntaxTreeCode_write_spaces(self->_base._base.code_node, self->_base._base.code_node_Refman, self->_base._base.code_node_Dynamic) )
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-      if (aux_String_3_Refman == NULL) RAISE(243, 38, "insufficient memory for managed object")
+      if (aux_String_3_Refman == NULL) RAISE(251, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 5;
       aux_String_3_Var.length = 4;
       aux_String_3_Var.values = "if (";
-      CHECK(243, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
-      if (self->instance_Dynamic == NULL) RAISE(244, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(244, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
-      CHECK(244, self->instance_Dynamic->write_refman(self->instance, self->instance_Refman, self->instance_Dynamic) )
+      CHECK(251, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+      if (self->instance_Dynamic == NULL) RAISE(252, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(252, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(252, 38, "used member of outdated weak reference")
+      CHECK(252, self->instance_Dynamic->write_refman(self->instance, self->instance_Refman, self->instance_Dynamic) )
       aux_String_4 = &aux_String_4_Var;
       aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-      if (aux_String_4_Refman == NULL) RAISE(245, 38, "insufficient memory for managed object")
+      if (aux_String_4_Refman == NULL) RAISE(253, 38, "insufficient memory for managed object")
       aux_String_4_Var.max_length = 18;
       aux_String_4_Var.length = 17;
       aux_String_4_Var.values = "->value == NULL) ";
-      CHECK(245, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
+      CHECK(253, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
       aux_String_5 = &aux_String_5_Var;
       aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-      if (aux_String_5_Refman == NULL) RAISE(246, 38, "insufficient memory for managed object")
+      if (aux_String_5_Refman == NULL) RAISE(254, 38, "insufficient memory for managed object")
       aux_String_5_Var.max_length = 39;
       aux_String_5_Var.length = 38;
       aux_String_5_Var.values = "used member of outdated weak reference";
-      CHECK(246, tl5_compiler_M_SyntaxTreeNode_write_raise(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_5, aux_String_5_Refman) )
+      CHECK(254, tl5_compiler_M_SyntaxTreeNode_write_raise(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_5, aux_String_5_Refman) )
     }
   else {
-      if (self == NULL) RAISE(247, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(255, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(255, 38, "used member of outdated weak reference")
       if (self->dynamic_call_self_instance != NULL && self->dynamic_call_self_instance_Refman->value != NULL) {
-        if (self == NULL) RAISE(249, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(249, 38, "used member of outdated weak reference")
-        if (self->dynamic_call_self_instance == NULL) RAISE(249, 27, "used member of empty object")
-        if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(249, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(257, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(257, 38, "used member of outdated weak reference")
+        if (self->dynamic_call_self_instance == NULL) RAISE(257, 27, "used member of empty object")
+        if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(257, 38, "used member of outdated weak reference")
         top = self->dynamic_call_self_instance->top;
-        if (self == NULL) RAISE(250, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(250, 38, "used member of outdated weak reference")
-        if (self->dynamic_call_self_instance == NULL) RAISE(250, 27, "used member of empty object")
-        if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(250, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(258, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(258, 38, "used member of outdated weak reference")
+        if (self->dynamic_call_self_instance == NULL) RAISE(258, 27, "used member of empty object")
+        if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(258, 38, "used member of outdated weak reference")
         self->dynamic_call_self_instance->top = true;
-        if (self->dynamic_call_self_instance_Dynamic == NULL) RAISE(251, 28, "dynamic call of empty object")
-        if (self == NULL) RAISE(251, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(251, 38, "used member of outdated weak reference")
-        CHECK(251, self->dynamic_call_self_instance_Dynamic->write_dynamic(self->dynamic_call_self_instance, self->dynamic_call_self_instance_Refman, self->dynamic_call_self_instance_Dynamic) )
+        if (self->dynamic_call_self_instance_Dynamic == NULL) RAISE(259, 28, "dynamic call of empty object")
+        if (self == NULL) RAISE(259, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(259, 38, "used member of outdated weak reference")
+        CHECK(259, self->dynamic_call_self_instance_Dynamic->write_dynamic(self->dynamic_call_self_instance, self->dynamic_call_self_instance_Refman, self->dynamic_call_self_instance_Dynamic) )
         aux_String_6 = &aux_String_6_Var;
         aux_String_6_Refman = LUMI_new_ref(aux_String_6);
-        if (aux_String_6_Refman == NULL) RAISE(252, 38, "insufficient memory for managed object")
+        if (aux_String_6_Refman == NULL) RAISE(260, 38, "insufficient memory for managed object")
         aux_String_6_Var.max_length = 11;
         aux_String_6_Var.length = 10;
         aux_String_6_Var.values = " == NULL) ";
-        CHECK(252, tl5_compiler_M_write(aux_String_6, aux_String_6_Refman) )
+        CHECK(260, tl5_compiler_M_write(aux_String_6, aux_String_6_Refman) )
         aux_String_7 = &aux_String_7_Var;
         aux_String_7_Refman = LUMI_new_ref(aux_String_7);
-        if (aux_String_7_Refman == NULL) RAISE(253, 38, "insufficient memory for managed object")
+        if (aux_String_7_Refman == NULL) RAISE(261, 38, "insufficient memory for managed object")
         aux_String_7_Var.max_length = 29;
         aux_String_7_Var.length = 28;
         aux_String_7_Var.values = "dynamic call of empty object";
-        CHECK(253, tl5_compiler_M_SyntaxTreeNode_write_raise(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_7, aux_String_7_Refman) )
-        if (self == NULL) RAISE(254, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
-        if (self->dynamic_call_self_instance == NULL) RAISE(254, 27, "used member of empty object")
-        if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
+        CHECK(261, tl5_compiler_M_SyntaxTreeNode_write_raise(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_7, aux_String_7_Refman) )
+        if (self == NULL) RAISE(262, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(262, 38, "used member of outdated weak reference")
+        if (self->dynamic_call_self_instance == NULL) RAISE(262, 27, "used member of empty object")
+        if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(262, 38, "used member of outdated weak reference")
         self->dynamic_call_self_instance->top = top;
       }
     }
-  if (self == NULL) RAISE(255, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(255, 38, "used member of outdated weak reference")
-  CHECK(255, tl5_compiler_M_SyntaxTreeCode_write_spaces(self->_base._base.code_node, self->_base._base.code_node_Refman, self->_base._base.code_node_Dynamic) )
+  if (self == NULL) RAISE(263, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(263, 38, "used member of outdated weak reference")
+  CHECK(263, tl5_compiler_M_SyntaxTreeCode_write_spaces(self->_base._base.code_node, self->_base._base.code_node_Refman, self->_base._base.code_node_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_7_Refman);
   LUMI_dec_ref(aux_String_6_Refman);
@@ -13733,6 +14166,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -13761,121 +14195,87 @@ Returncode tl5_compiler_M_MemberExpression_write(tl5_compiler_M_MemberExpression
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
-  if (self == NULL) RAISE(258, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(258, 38, "used member of outdated weak reference")
-  if (self->dynamic_call_self_instance != NULL && self->dynamic_call_self_instance_Refman->value != NULL) {
-      if (self == NULL) RAISE(259, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(259, 38, "used member of outdated weak reference")
-      if (self->dynamic_call_self_instance == NULL) RAISE(259, 27, "used member of empty object")
-      if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(259, 38, "used member of outdated weak reference")
-      top = self->dynamic_call_self_instance->top;
-      if (self == NULL) RAISE(260, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(260, 38, "used member of outdated weak reference")
-      if (self->dynamic_call_self_instance == NULL) RAISE(260, 27, "used member of empty object")
-      if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(260, 38, "used member of outdated weak reference")
-      self->dynamic_call_self_instance->top = false;
-      if (self->dynamic_call_self_instance_Dynamic == NULL) RAISE(261, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(261, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(261, 38, "used member of outdated weak reference")
-      CHECK(261, self->dynamic_call_self_instance_Dynamic->write_dynamic(self->dynamic_call_self_instance, self->dynamic_call_self_instance_Refman, self->dynamic_call_self_instance_Dynamic) )
-      if (self == NULL) RAISE(262, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(262, 38, "used member of outdated weak reference")
-      if (self->dynamic_call_self_instance == NULL) RAISE(262, 27, "used member of empty object")
-      if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(262, 38, "used member of outdated weak reference")
-      self->dynamic_call_self_instance->top = top;
-      CHECK(263, tl5_compiler_M_MemberExpression_write_bases(self, self_Refman, self_Dynamic) )
-      if (self == NULL) RAISE(264, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(264, 38, "used member of outdated weak reference")
-      if (self->_base.function == NULL) RAISE(264, 27, "used member of empty object")
-      if (self->_base.function_Refman->value == NULL) RAISE(264, 38, "used member of outdated weak reference")
-      CHECK(264, tl5_compiler_M_write_cname(self->_base.function->name, self->_base.function->name_Refman) )
-      goto LUMI_cleanup;
-    }
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(266, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(266, 38, "used member of outdated weak reference")
-  if (self->is_mock_field) {
-      if (self->instance_Dynamic == NULL) RAISE(267, 28, "dynamic call of empty object")
+  if (self->dynamic_call_self_instance != NULL && self->dynamic_call_self_instance_Refman->value != NULL) {
       if (self == NULL) RAISE(267, 27, "used member of empty object")
       if (self_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
-      CHECK(267, self->instance_Dynamic->_base.write(&(self->instance->_base), self->instance_Refman, &(self->instance_Dynamic->_base)) )
+      if (self->dynamic_call_self_instance == NULL) RAISE(267, 27, "used member of empty object")
+      if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
+      top = self->dynamic_call_self_instance->top;
       if (self == NULL) RAISE(268, 27, "used member of empty object")
       if (self_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
+      if (self->dynamic_call_self_instance == NULL) RAISE(268, 27, "used member of empty object")
+      if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
+      self->dynamic_call_self_instance->top = false;
+      if (self->dynamic_call_self_instance_Dynamic == NULL) RAISE(269, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(269, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(269, 38, "used member of outdated weak reference")
+      CHECK(269, self->dynamic_call_self_instance_Dynamic->write_dynamic(self->dynamic_call_self_instance, self->dynamic_call_self_instance_Refman, self->dynamic_call_self_instance_Dynamic) )
+      if (self == NULL) RAISE(270, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
+      if (self->dynamic_call_self_instance == NULL) RAISE(270, 27, "used member of empty object")
+      if (self->dynamic_call_self_instance_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
+      self->dynamic_call_self_instance->top = top;
+      CHECK(271, tl5_compiler_M_MemberExpression_write_bases(self, self_Refman, self_Dynamic) )
+      if (self == NULL) RAISE(272, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
+      if (self->_base.function == NULL) RAISE(272, 27, "used member of empty object")
+      if (self->_base.function_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
+      CHECK(272, tl5_compiler_M_write_cname(self->_base.function->name, self->_base.function->name_Refman) )
+      goto LUMI_cleanup;
+    }
+  if (self == NULL) RAISE(274, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
+  if (self->is_mock_field) {
+      if (self->instance_Dynamic == NULL) RAISE(275, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(275, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
+      CHECK(275, self->instance_Dynamic->_base.write(&(self->instance->_base), self->instance_Refman, &(self->instance_Dynamic->_base)) )
+      if (self == NULL) RAISE(276, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(276, 38, "used member of outdated weak reference")
       if (! self->_base.is_annotate) {
         aux_String_0 = &aux_String_0_Var;
         aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-        if (aux_String_0_Refman == NULL) RAISE(269, 38, "insufficient memory for managed object")
+        if (aux_String_0_Refman == NULL) RAISE(277, 38, "insufficient memory for managed object")
         aux_String_0_Var.max_length = 2;
         aux_String_0_Var.length = 1;
         aux_String_0_Var.values = "_";
-        CHECK(269, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-        if (self == NULL) RAISE(270, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
-        CHECK(270, tl5_compiler_M_write_cname(self->_base.name, self->_base.name_Refman) )
+        CHECK(277, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+        if (self == NULL) RAISE(278, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
+        CHECK(278, tl5_compiler_M_write_cname(self->_base.name, self->_base.name_Refman) )
       }
       goto LUMI_cleanup;
     }
-  if (self == NULL) RAISE(273, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(273, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(281, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(281, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(281, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(281, 38, "used member of outdated weak reference")
   if (self->_base._base.is_generic_cast && (! self->_base._base.top)) {
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(274, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(282, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 3;
       aux_String_1_Var.length = 2;
       aux_String_1_Var.values = "((";
-      CHECK(274, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
-      if (self == NULL) RAISE(275, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-      if (self->_base._base.result_type == NULL) RAISE(275, 27, "used member of empty object")
-      if (self->_base._base.result_type_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-      CHECK(275, tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic) )
+      CHECK(282, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+      if (self == NULL) RAISE(283, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
+      if (self->_base._base.result_type == NULL) RAISE(283, 27, "used member of empty object")
+      if (self->_base._base.result_type_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
+      CHECK(283, tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic) )
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-      if (aux_String_2_Refman == NULL) RAISE(276, 38, "insufficient memory for managed object")
+      if (aux_String_2_Refman == NULL) RAISE(284, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 4;
       aux_String_2_Var.length = 3;
       aux_String_2_Var.values = "*)(";
-      CHECK(276, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+      CHECK(284, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
     }
-  if (self == NULL) RAISE(279, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(278, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(278, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
-  if (self->instance == NULL) RAISE(278, 27, "used member of empty object")
-  if (self->instance_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
-  if (self->instance->result_type == NULL) RAISE(278, 27, "used member of empty object")
-  if (self->instance->result_type_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(277, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(277, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
-  if ((((self->instance != NULL && self->instance_Refman->value != NULL) && (! (self->_base.function != NULL && self->_base.function_Refman->value != NULL))) && ((void*)self->instance->result_type->type_data != tl5_compiler_M_glob->type_type)) && (! (self->_base.module_name != NULL && self->_base.module_name_Refman->value != NULL))) {
-      if (self == NULL) RAISE(280, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(280, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
-      if (self->_base._base.is_complex_field && self->_base._base.top) {
-        aux_String_3 = &aux_String_3_Var;
-        aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-        if (aux_String_3_Refman == NULL) RAISE(281, 38, "insufficient memory for managed object")
-        aux_String_3_Var.max_length = 3;
-        aux_String_3_Var.length = 2;
-        aux_String_3_Var.values = "&(";
-        CHECK(281, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
-      }
-      if (self->instance_Dynamic == NULL) RAISE(282, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(282, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
-      CHECK(282, self->instance_Dynamic->_base.write(&(self->instance->_base), self->instance_Refman, &(self->instance_Dynamic->_base)) )
-      CHECK(283, tl5_compiler_M_MemberExpression_write_bases(self, self_Refman, self_Dynamic) )
-    }
-  CHECK(284, tl5_compiler_M_SymbolExpression_write(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  if (self == NULL) RAISE(286, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(286, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(287, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(286, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(286, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(286, 27, "used member of empty object")
@@ -13888,29 +14288,64 @@ Returncode tl5_compiler_M_MemberExpression_write(tl5_compiler_M_MemberExpression
   if (self_Refman->value == NULL) RAISE(285, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(285, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(285, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(285, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(285, 38, "used member of outdated weak reference")
+  if ((((self->instance != NULL && self->instance_Refman->value != NULL) && (! (self->_base.function != NULL && self->_base.function_Refman->value != NULL))) && ((void*)self->instance->result_type->type_data != tl5_compiler_M_glob->type_type)) && (! (self->_base.module_name != NULL && self->_base.module_name_Refman->value != NULL))) {
+      if (self == NULL) RAISE(288, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(288, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
+      if (self->_base._base.is_complex_field && self->_base._base.top) {
+        aux_String_3 = &aux_String_3_Var;
+        aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+        if (aux_String_3_Refman == NULL) RAISE(289, 38, "insufficient memory for managed object")
+        aux_String_3_Var.max_length = 3;
+        aux_String_3_Var.length = 2;
+        aux_String_3_Var.values = "&(";
+        CHECK(289, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+      }
+      if (self->instance_Dynamic == NULL) RAISE(290, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(290, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(290, 38, "used member of outdated weak reference")
+      CHECK(290, self->instance_Dynamic->_base.write(&(self->instance->_base), self->instance_Refman, &(self->instance_Dynamic->_base)) )
+      CHECK(291, tl5_compiler_M_MemberExpression_write_bases(self, self_Refman, self_Dynamic) )
+    }
+  CHECK(292, tl5_compiler_M_SymbolExpression_write(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(294, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(294, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(294, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
+  if (self->instance == NULL) RAISE(294, 27, "used member of empty object")
+  if (self->instance_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
+  if (self->instance->result_type == NULL) RAISE(294, 27, "used member of empty object")
+  if (self->instance->result_type_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(293, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(293, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(293, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(293, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(293, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(293, 38, "used member of outdated weak reference")
   if (((((self->instance != NULL && self->instance_Refman->value != NULL) && (! (self->_base.function != NULL && self->_base.function_Refman->value != NULL))) && self->_base._base.is_complex_field) && ((void*)self->instance->result_type->type_data != tl5_compiler_M_glob->type_type)) && self->_base._base.top) {
       aux_String_4 = &aux_String_4_Var;
       aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-      if (aux_String_4_Refman == NULL) RAISE(287, 38, "insufficient memory for managed object")
+      if (aux_String_4_Refman == NULL) RAISE(295, 38, "insufficient memory for managed object")
       aux_String_4_Var.max_length = 2;
       aux_String_4_Var.length = 1;
       aux_String_4_Var.values = ")";
-      CHECK(287, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
+      CHECK(295, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
     }
-  if (self == NULL) RAISE(288, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(288, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(296, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(296, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
   if (self->_base._base.is_generic_cast && (! self->_base._base.top)) {
       aux_String_5 = &aux_String_5_Var;
       aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-      if (aux_String_5_Refman == NULL) RAISE(289, 38, "insufficient memory for managed object")
+      if (aux_String_5_Refman == NULL) RAISE(297, 38, "insufficient memory for managed object")
       aux_String_5_Var.max_length = 3;
       aux_String_5_Var.length = 2;
       aux_String_5_Var.values = "))";
-      CHECK(289, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
+      CHECK(297, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_5_Refman);
@@ -13919,6 +14354,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -13929,32 +14365,34 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_MemberExpression_write_refman(tl5_compiler_M_MemberExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_MemberExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
   Bool top = 0;
-  if (self == NULL) RAISE(292, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(292, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(300, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
   if (self->_base._base.is_complex_field) {
-      if (self->instance_Dynamic == NULL) RAISE(293, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(293, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(293, 38, "used member of outdated weak reference")
-      CHECK(293, self->instance_Dynamic->write_refman(self->instance, self->instance_Refman, self->instance_Dynamic) )
+      if (self->instance_Dynamic == NULL) RAISE(301, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(301, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(301, 38, "used member of outdated weak reference")
+      CHECK(301, self->instance_Dynamic->write_refman(self->instance, self->instance_Refman, self->instance_Dynamic) )
       goto LUMI_cleanup;
     }
-  if (self == NULL) RAISE(295, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(303, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(303, 38, "used member of outdated weak reference")
   top = self->_base._base.top;
-  if (self == NULL) RAISE(296, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(296, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(304, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(304, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
   if (self->_base._base.is_generic_cast && (! self->_base._base.top)) {
-      if (self == NULL) RAISE(297, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(297, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(305, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(305, 38, "used member of outdated weak reference")
       self->_base._base.top = true;
     }
-  CHECK(298, tl5_compiler_M_SymbolExpression_write_refman(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  if (self == NULL) RAISE(299, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(299, 38, "used member of outdated weak reference")
+  CHECK(306, tl5_compiler_M_SymbolExpression_write_refman(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(307, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
   self->_base._base.top = top;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -13980,77 +14418,78 @@ Returncode tl5_compiler_M_MemberExpression_write_dynamic(tl5_compiler_M_MemberEx
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
-  if (self == NULL) RAISE(302, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(302, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(310, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
   if (self->_base._base.is_complex_field) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(303, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(311, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 2;
       aux_String_0_Var.length = 1;
       aux_String_0_Var.values = "&";
-      CHECK(303, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-      if (self == NULL) RAISE(304, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
-      if (self->_base._base.result_type == NULL) RAISE(304, 27, "used member of empty object")
-      if (self->_base._base.result_type_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
-      CHECK(304, tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic) )
+      CHECK(311, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+      if (self == NULL) RAISE(312, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(312, 38, "used member of outdated weak reference")
+      if (self->_base._base.result_type == NULL) RAISE(312, 27, "used member of empty object")
+      if (self->_base._base.result_type_Refman->value == NULL) RAISE(312, 38, "used member of outdated weak reference")
+      CHECK(312, tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic) )
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(305, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(313, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 9;
       aux_String_1_Var.length = 8;
       aux_String_1_Var.values = "_dynamic";
-      CHECK(305, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+      CHECK(313, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
       goto LUMI_cleanup;
     }
-  if (self == NULL) RAISE(307, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(315, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(315, 38, "used member of outdated weak reference")
   top = self->_base._base.top;
-  if (self == NULL) RAISE(308, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(308, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(316, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(316, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(316, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(316, 38, "used member of outdated weak reference")
   if (self->_base._base.is_generic_cast && (! self->_base._base.top)) {
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-      if (aux_String_2_Refman == NULL) RAISE(309, 38, "insufficient memory for managed object")
+      if (aux_String_2_Refman == NULL) RAISE(317, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 3;
       aux_String_2_Var.length = 2;
       aux_String_2_Var.values = "((";
-      CHECK(309, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
-      if (self == NULL) RAISE(310, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
-      if (self->_base._base.result_type == NULL) RAISE(310, 27, "used member of empty object")
-      if (self->_base._base.result_type_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
-      CHECK(310, tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic) )
+      CHECK(317, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+      if (self == NULL) RAISE(318, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(318, 38, "used member of outdated weak reference")
+      if (self->_base._base.result_type == NULL) RAISE(318, 27, "used member of empty object")
+      if (self->_base._base.result_type_Refman->value == NULL) RAISE(318, 38, "used member of outdated weak reference")
+      CHECK(318, tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic) )
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-      if (aux_String_3_Refman == NULL) RAISE(311, 38, "insufficient memory for managed object")
+      if (aux_String_3_Refman == NULL) RAISE(319, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 12;
       aux_String_3_Var.length = 11;
       aux_String_3_Var.values = "_Dynamic*)(";
-      CHECK(311, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
-      if (self == NULL) RAISE(312, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(312, 38, "used member of outdated weak reference")
+      CHECK(319, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+      if (self == NULL) RAISE(320, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(320, 38, "used member of outdated weak reference")
       self->_base._base.top = true;
     }
-  CHECK(313, tl5_compiler_M_SymbolExpression_write_dynamic(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  if (self == NULL) RAISE(314, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
+  CHECK(321, tl5_compiler_M_SymbolExpression_write_dynamic(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(322, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(322, 38, "used member of outdated weak reference")
   self->_base._base.top = top;
-  if (self == NULL) RAISE(315, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(315, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(315, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(315, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(323, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(323, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(323, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(323, 38, "used member of outdated weak reference")
   if (self->_base._base.is_generic_cast && (! self->_base._base.top)) {
       aux_String_4 = &aux_String_4_Var;
       aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-      if (aux_String_4_Refman == NULL) RAISE(316, 38, "insufficient memory for managed object")
+      if (aux_String_4_Refman == NULL) RAISE(324, 38, "insufficient memory for managed object")
       aux_String_4_Var.max_length = 3;
       aux_String_4_Var.length = 2;
       aux_String_4_Var.values = "))";
-      CHECK(316, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
+      CHECK(324, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_4_Refman);
@@ -14058,6 +14497,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14077,43 +14517,45 @@ Returncode tl5_compiler_M_MemberExpression_write_bases(tl5_compiler_M_MemberExpr
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
-  if (self == NULL) RAISE(319, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(319, 38, "used member of outdated weak reference")
-  if (self->instance == NULL) RAISE(319, 27, "used member of empty object")
-  if (self->instance_Refman->value == NULL) RAISE(319, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(319, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(319, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(327, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(327, 38, "used member of outdated weak reference")
+  if (self->instance == NULL) RAISE(327, 27, "used member of empty object")
+  if (self->instance_Refman->value == NULL) RAISE(327, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(327, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(327, 38, "used member of outdated weak reference")
   if ((self->instance != NULL && self->instance_Refman->value != NULL) && self->instance->is_complex_field) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(320, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(328, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 2;
       aux_String_0_Var.length = 1;
       aux_String_0_Var.values = ".";
-      CHECK(320, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+      CHECK(328, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
     }
   else {
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(322, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(330, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 3;
       aux_String_1_Var.length = 2;
       aux_String_1_Var.values = "->";
-      CHECK(322, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+      CHECK(330, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
     }
   for (n = 0; n < self->bases; ++n) {
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-      if (aux_String_2_Refman == NULL) RAISE(324, 38, "insufficient memory for managed object")
+      if (aux_String_2_Refman == NULL) RAISE(332, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 7;
       aux_String_2_Var.length = 6;
       aux_String_2_Var.values = "_base.";
-      CHECK(324, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+      CHECK(332, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14134,6 +14576,7 @@ Returncode tl5_compiler_M_FunctionArguments_copy_new(tl5_compiler_M_FunctionArgu
   tl5_compiler_M_FunctionArguments* aux_FunctionArguments_0 = NULL;
   Ref_Manager* aux_FunctionArguments_0_Refman = NULL;
   tl5_compiler_M_FunctionArguments_Dynamic* aux_FunctionArguments_0_Dynamic = &tl5_compiler_M_FunctionArguments_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_FunctionArguments_0 = LUMI_alloc(sizeof(tl5_compiler_M_FunctionArguments));
   if (aux_FunctionArguments_0 == NULL) RAISE(76, 49, "insufficient memory for object dynamic allocation")
   aux_FunctionArguments_0_Refman = LUMI_new_ref(aux_FunctionArguments_0);
@@ -14160,6 +14603,7 @@ Returncode tl5_compiler_M_FunctionArguments_copy_new(tl5_compiler_M_FunctionArgu
 LUMI_cleanup:
   if (aux_FunctionArguments_0_Dynamic != NULL) aux_FunctionArguments_0_Dynamic->_base._del(aux_FunctionArguments_0);
   LUMI_owner_dec_ref(aux_FunctionArguments_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14174,6 +14618,7 @@ Returncode tl5_compiler_M_FunctionArguments_copy_new_args(tl5_compiler_M_Functio
   tl5_compiler_M_DeclarationArgument* aux_DeclarationArgument_0 = NULL;
   Ref_Manager* aux_DeclarationArgument_0_Refman = NULL;
   tl5_compiler_M_DeclarationArgument_Dynamic* aux_DeclarationArgument_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
   LUMI_inc_ref(new_arguments_Refman);
   if (arguments == NULL) RAISE(83, 27, "used member of empty object")
@@ -14204,6 +14649,7 @@ LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(new_arguments_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14217,6 +14663,7 @@ Returncode tl5_compiler_M_FunctionArguments_init(tl5_compiler_M_FunctionArgument
   Ref_Manager* aux_List_0_Refman = NULL;
   tl5_compiler_M_List* aux_List_1 = NULL;
   Ref_Manager* aux_List_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(90, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_List_0 = LUMI_alloc(sizeof(tl5_compiler_M_List));
   if (aux_List_0 == NULL) RAISE(91, 49, "insufficient memory for object dynamic allocation")
@@ -14247,6 +14694,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_List_1_Refman);
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14259,6 +14707,7 @@ Returncode tl5_compiler_M_FunctionArguments_parse(tl5_compiler_M_FunctionArgumen
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(argument_factory_Refman);
   LUMI_inc_ref(code_node_Refman);
   CHECK(99, tl5_compiler_M_FunctionArguments_init(self, self_Refman, self_Dynamic) )
@@ -14281,6 +14730,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(argument_factory_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14299,6 +14749,7 @@ Returncode tl5_compiler_M_FunctionArguments_add_self_parameter(tl5_compiler_M_Fu
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   self_args = LUMI_alloc(sizeof(tl5_compiler_M_DeclarationArgument));
   if (self_args == NULL) RAISE(116, 49, "insufficient memory for object dynamic allocation")
@@ -14314,7 +14765,7 @@ Returncode tl5_compiler_M_FunctionArguments_add_self_parameter(tl5_compiler_M_Fu
   else {
       if (self_args == NULL) RAISE(120, 27, "used member of empty object")
       if (self_args_Refman->value == NULL) RAISE(120, 38, "used member of outdated weak reference")
-      self_args->_base.access = tl5_compiler_M_Access_VAR;
+      self_args->_base.access = tl5_compiler_M_Access_USER;
     }
   CHECK(121, tl5_compiler_M_SyntaxTreeNode_set_location(&(self_args->_base._base), self_args_Refman, &(self_args_Dynamic->_base._base)) )
   aux_SyntaxTreeVariable_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable));
@@ -14331,25 +14782,32 @@ Returncode tl5_compiler_M_FunctionArguments_add_self_parameter(tl5_compiler_M_Fu
   aux_SyntaxTreeVariable_0 = NULL;
   aux_SyntaxTreeVariable_0_Refman = NULL;
   aux_SyntaxTreeVariable_0_Dynamic = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(123, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 5;
-  aux_String_0_Var.length = 4;
-  aux_String_0_Var.values = "self";
+  if (self_args == NULL) RAISE(123, 27, "used member of empty object")
+  if (self_args_Refman->value == NULL) RAISE(123, 38, "used member of outdated weak reference")
   if (self_args == NULL) RAISE(123, 27, "used member of empty object")
   if (self_args_Refman->value == NULL) RAISE(123, 38, "used member of outdated weak reference")
   if (self_args->variable == NULL) RAISE(123, 27, "used member of empty object")
   if (self_args->variable_Refman->value == NULL) RAISE(123, 38, "used member of outdated weak reference")
-  CHECK(123, tl5_compiler_M_string_new_copy(aux_String_0, aux_String_0_Refman, &(self_args->variable->name), &(self_args->variable->name_Refman)) )
+  self_args->variable->access = self_args->_base.access;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(124, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 5;
+  aux_String_0_Var.length = 4;
+  aux_String_0_Var.values = "self";
   if (self_args == NULL) RAISE(124, 27, "used member of empty object")
   if (self_args_Refman->value == NULL) RAISE(124, 38, "used member of outdated weak reference")
   if (self_args->variable == NULL) RAISE(124, 27, "used member of empty object")
   if (self_args->variable_Refman->value == NULL) RAISE(124, 38, "used member of outdated weak reference")
-  CHECK(124, tl5_compiler_M_TypeData_self_type_instance(type_data, type_data_Refman, type_data_Dynamic, &(self_args->variable->type_instance), &(self_args->variable->type_instance_Refman)) )
-  if (self == NULL) RAISE(125, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(125, 38, "used member of outdated weak reference")
-  CHECK(125, tl5_compiler_M_List_prepend(self->parameters, self->parameters_Refman, &(self_args->_base), self_args_Refman, (void*)&(self_args_Dynamic->_base)) )
+  CHECK(124, tl5_compiler_M_string_new_copy(aux_String_0, aux_String_0_Refman, &(self_args->variable->name), &(self_args->variable->name_Refman)) )
+  if (self_args == NULL) RAISE(125, 27, "used member of empty object")
+  if (self_args_Refman->value == NULL) RAISE(125, 38, "used member of outdated weak reference")
+  if (self_args->variable == NULL) RAISE(125, 27, "used member of empty object")
+  if (self_args->variable_Refman->value == NULL) RAISE(125, 38, "used member of outdated weak reference")
+  CHECK(125, tl5_compiler_M_TypeData_self_type_instance(type_data, type_data_Refman, type_data_Dynamic, &(self_args->variable->type_instance), &(self_args->variable->type_instance_Refman)) )
+  if (self == NULL) RAISE(126, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(126, 38, "used member of outdated weak reference")
+  CHECK(126, tl5_compiler_M_List_prepend(self->parameters, self->parameters_Refman, &(self_args->_base), self_args_Refman, (void*)&(self_args_Dynamic->_base)) )
   self_args = NULL;
   self_args_Refman = NULL;
   self_args_Dynamic = NULL;
@@ -14360,6 +14818,7 @@ LUMI_cleanup:
   if (self_args_Dynamic != NULL) self_args_Dynamic->_base._base._del(self_args);
   LUMI_owner_dec_ref(self_args_Refman);
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14396,88 +14855,89 @@ Returncode tl5_compiler_M_FunctionArguments_parse_args(tl5_compiler_M_FunctionAr
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
   Int aux_Int_2 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
   LUMI_inc_ref(argument_factory_Refman);
   LUMI_inc_ref(code_node_Refman);
-  if (self == NULL) RAISE(135, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(135, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(136, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(136, 38, "used member of outdated weak reference")
   is_output = (void*)arguments == self->outputs;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(136, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(137, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
   aux_String_0_Var.values = " )";
-  CHECK(136, tl5_compiler_M_read_until(aux_String_0, aux_String_0_Refman, false, &(access_str), &(access_str_Refman), &(*end), &(aux_Int_0)) )
-  if (access_str == NULL) RAISE(137, 27, "used member of empty object")
-  if (access_str_Refman->value == NULL) RAISE(137, 38, "used member of outdated weak reference")
+  CHECK(137, tl5_compiler_M_read_until(aux_String_0, aux_String_0_Refman, false, &(access_str), &(access_str_Refman), &(*end), &(aux_Int_0)) )
+  if (access_str == NULL) RAISE(138, 27, "used member of empty object")
+  if (access_str_Refman->value == NULL) RAISE(138, 38, "used member of outdated weak reference")
   if (((*end) == '\n') && (access_str->length == 0)) {
-      CHECK(138, tl5_compiler_M_SyntaxTreeCode_read_line_break_spaces(code_node, code_node_Refman, code_node_Dynamic) )
+      CHECK(139, tl5_compiler_M_SyntaxTreeCode_read_line_break_spaces(code_node, code_node_Refman, code_node_Dynamic) )
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(139, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(140, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 2;
       aux_String_1_Var.length = 1;
       aux_String_1_Var.values = " ";
-      CHECK(139, tl5_compiler_M_read_until(aux_String_1, aux_String_1_Refman, false, &(access_str), &(access_str_Refman), &(*end), &(aux_Int_1)) )
+      CHECK(140, tl5_compiler_M_read_until(aux_String_1, aux_String_1_Refman, false, &(access_str), &(access_str_Refman), &(*end), &(aux_Int_1)) )
     }
-  if (access_str == NULL) RAISE(140, 27, "used member of empty object")
-  if (access_str_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
+  if (access_str == NULL) RAISE(141, 27, "used member of empty object")
+  if (access_str_Refman->value == NULL) RAISE(141, 38, "used member of outdated weak reference")
   if (((*end) != ')') || (access_str->length > 0)) {
       while (true) {
-        if (access_str == NULL) RAISE(142, 27, "used member of empty object")
-        if (access_str_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
+        if (access_str == NULL) RAISE(143, 27, "used member of empty object")
+        if (access_str_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
         if (access_str->length == 0) {
           aux_String_2 = &aux_String_2_Var;
           aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-          if (aux_String_2_Refman == NULL) RAISE(143, 38, "insufficient memory for managed object")
+          if (aux_String_2_Refman == NULL) RAISE(144, 38, "insufficient memory for managed object")
           aux_String_2_Var.max_length = 21;
           aux_String_2_Var.length = 20;
           aux_String_2_Var.values = "expected access, got";
-          CHECK(143, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_2, aux_String_2_Refman, *end) )
+          CHECK(144, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_2, aux_String_2_Refman, *end) )
         }
         if ((*end) != ' ') {
           aux_String_3 = &aux_String_3_Var;
           aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-          if (aux_String_3_Refman == NULL) RAISE(146, 38, "insufficient memory for managed object")
+          if (aux_String_3_Refman == NULL) RAISE(147, 38, "insufficient memory for managed object")
           aux_String_3_Var.max_length = 33;
           aux_String_3_Var.length = 32;
           aux_String_3_Var.values = "expected space after access, got";
-          CHECK(145, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_3, aux_String_3_Refman, *end) )
+          CHECK(146, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_3, aux_String_3_Refman, *end) )
         }
-        if (argument_factory_Dynamic == NULL) RAISE(147, 28, "dynamic call of empty object")
-        CHECK(147, argument_factory_Dynamic->new_argument(argument_factory, argument_factory_Refman, argument_factory_Dynamic, &(argument), &(argument_Refman), &(argument_Dynamic)) )
-        CHECK(148, tl5_compiler_M_List_add(arguments, arguments_Refman, argument, argument_Refman, (void*)argument_Dynamic) )
+        if (argument_factory_Dynamic == NULL) RAISE(148, 28, "dynamic call of empty object")
+        CHECK(148, argument_factory_Dynamic->new_argument(argument_factory, argument_factory_Refman, argument_factory_Dynamic, &(argument), &(argument_Refman), &(argument_Dynamic)) )
+        CHECK(149, tl5_compiler_M_List_add(arguments, arguments_Refman, argument, argument_Refman, (void*)argument_Dynamic) )
         argument = NULL;
         argument_Refman = NULL;
         argument_Dynamic = NULL;
-        CHECK(149, tl5_compiler_M_Argument_parse(argument, argument_Refman, argument_Dynamic, access_str, access_str_Refman, is_output, is_native, code_node, code_node_Refman, code_node_Dynamic, &(*end)) )
+        CHECK(150, tl5_compiler_M_Argument_parse(argument, argument_Refman, argument_Dynamic, access_str, access_str_Refman, is_output, is_native, code_node, code_node_Refman, code_node_Dynamic, &(*end)) )
         if (!((*end) == ',')) break;
-        CHECK(153, tl5_compiler_M_read_c(&(*end)) )
+        CHECK(154, tl5_compiler_M_read_c(&(*end)) )
         if ((*end) == '\n') {
-          CHECK(155, tl5_compiler_M_SyntaxTreeCode_read_line_break_spaces(code_node, code_node_Refman, code_node_Dynamic) )
+          CHECK(156, tl5_compiler_M_SyntaxTreeCode_read_line_break_spaces(code_node, code_node_Refman, code_node_Dynamic) )
         }
         else {
           if ((*end) != ' ') {
             aux_String_4 = &aux_String_4_Var;
             aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-            if (aux_String_4_Refman == NULL) RAISE(158, 38, "insufficient memory for managed object")
+            if (aux_String_4_Refman == NULL) RAISE(159, 38, "insufficient memory for managed object")
             aux_String_4_Var.max_length = 42;
             aux_String_4_Var.length = 41;
             aux_String_4_Var.values = "expected space or new-line after \",\", got";
-            CHECK(157, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_4, aux_String_4_Refman, *end) )
+            CHECK(158, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_4, aux_String_4_Refman, *end) )
           }
         }
         aux_String_5 = &aux_String_5_Var;
         aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-        if (aux_String_5_Refman == NULL) RAISE(160, 38, "insufficient memory for managed object")
+        if (aux_String_5_Refman == NULL) RAISE(161, 38, "insufficient memory for managed object")
         aux_String_5_Var.max_length = 2;
         aux_String_5_Var.length = 1;
         aux_String_5_Var.values = " ";
-        CHECK(160, tl5_compiler_M_read_until(aux_String_5, aux_String_5_Refman, false, &(access_str), &(access_str_Refman), &(*end), &(aux_Int_2)) )
+        CHECK(161, tl5_compiler_M_read_until(aux_String_5, aux_String_5_Refman, false, &(access_str), &(access_str_Refman), &(*end), &(aux_Int_2)) )
       }
     }
-  CHECK(161, tl5_compiler_M_read_c(&(*end)) )
+  CHECK(162, tl5_compiler_M_read_c(&(*end)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_5_Refman);
   LUMI_dec_ref(aux_String_4_Refman);
@@ -14491,6 +14951,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(argument_factory_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14500,7 +14961,15 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "FunctionArguments.link-types"
 Returncode tl5_compiler_M_FunctionArguments_link_types(tl5_compiler_M_FunctionArguments* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(165, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(165, 38, "used member of outdated weak reference")
+  CHECK(165, tl5_compiler_M_SyntaxTreeNode_link_children_types(&(self->_base), self_Refman, &(self_Dynamic->_base), self->parameters, self->parameters_Refman) )
+  if (self == NULL) RAISE(166, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(166, 38, "used member of outdated weak reference")
+  CHECK(166, tl5_compiler_M_SyntaxTreeNode_link_children_types(&(self->_base), self_Refman, &(self_Dynamic->_base), self->outputs, self->outputs_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14510,7 +14979,15 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "FunctionArguments.analyze"
 Returncode tl5_compiler_M_FunctionArguments_analyze(tl5_compiler_M_FunctionArguments* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(169, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(169, 38, "used member of outdated weak reference")
+  CHECK(169, tl5_compiler_M_SyntaxTreeNode_analyze_children(&(self->_base), self_Refman, &(self_Dynamic->_base), self->parameters, self->parameters_Refman) )
+  if (self == NULL) RAISE(170, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(170, 38, "used member of outdated weak reference")
+  CHECK(170, tl5_compiler_M_SyntaxTreeNode_analyze_children(&(self->_base), self_Refman, &(self_Dynamic->_base), self->outputs, self->outputs_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14520,27 +14997,28 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "FunctionArguments.get-result-type"
 Returncode tl5_compiler_M_FunctionArguments_get_result_type(tl5_compiler_M_FunctionArguments* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments_Dynamic* self_Dynamic, Int* access, tl5_compiler_M_TypeInstance** result_type, Ref_Manager** result_type_Refman) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(172, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
-  if (self->outputs == NULL) RAISE(172, 27, "used member of empty object")
-  if (self->outputs_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(173, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
+  if (self->outputs == NULL) RAISE(173, 27, "used member of empty object")
+  if (self->outputs_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
   if (self->outputs->last != NULL && self->outputs->last_Refman->value != NULL) {
-      if (self->outputs->last->item_Dynamic == NULL) RAISE(173, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(173, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
-      if (self->outputs == NULL) RAISE(173, 27, "used member of empty object")
-      if (self->outputs_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
-      if (self->outputs->last == NULL) RAISE(173, 27, "used member of empty object")
-      if (self->outputs->last_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
-      CHECK(173, ((tl5_compiler_M_Argument_Dynamic*)(self->outputs->last->item_Dynamic))->get_type_instance(self->outputs->last->item, self->outputs->last->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(self->outputs->last->item_Dynamic)), &(*result_type), &(*result_type_Refman)) )
+      if (self->outputs->last->item_Dynamic == NULL) RAISE(174, 28, "dynamic call of empty object")
       if (self == NULL) RAISE(174, 27, "used member of empty object")
       if (self_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
       if (self->outputs == NULL) RAISE(174, 27, "used member of empty object")
       if (self->outputs_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
       if (self->outputs->last == NULL) RAISE(174, 27, "used member of empty object")
       if (self->outputs->last_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
-      if (self->outputs->last->item == NULL) RAISE(174, 27, "used member of empty object")
-      if (self->outputs->last->item_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
+      CHECK(174, ((tl5_compiler_M_Argument_Dynamic*)(self->outputs->last->item_Dynamic))->get_type_instance(self->outputs->last->item, self->outputs->last->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(self->outputs->last->item_Dynamic)), &(*result_type), &(*result_type_Refman)) )
+      if (self == NULL) RAISE(175, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
+      if (self->outputs == NULL) RAISE(175, 27, "used member of empty object")
+      if (self->outputs_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
+      if (self->outputs->last == NULL) RAISE(175, 27, "used member of empty object")
+      if (self->outputs->last_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
+      if (self->outputs->last->item == NULL) RAISE(175, 27, "used member of empty object")
+      if (self->outputs->last->item_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
       *access = ((tl5_compiler_M_Argument*)(self->outputs->last->item))->access;
     }
   else {
@@ -14551,6 +15029,7 @@ Returncode tl5_compiler_M_FunctionArguments_get_result_type(tl5_compiler_M_Funct
       *access = tl5_compiler_M_Access_VAR;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14560,21 +15039,23 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "FunctionArguments.get-output"
 Returncode tl5_compiler_M_FunctionArguments_get_output(tl5_compiler_M_FunctionArguments* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments_Dynamic* self_Dynamic, tl5_compiler_M_Expression** output, Ref_Manager** output_Refman, tl5_compiler_M_Expression_Dynamic** output_Dynamic) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(180, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
-  if (self->outputs == NULL) RAISE(180, 27, "used member of empty object")
-  if (self->outputs_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(181, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
+  if (self->outputs == NULL) RAISE(181, 27, "used member of empty object")
+  if (self->outputs_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
   if (self->outputs->last != NULL && self->outputs->last_Refman->value != NULL) {
-      if (self->outputs->last->item_Dynamic == NULL) RAISE(181, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(181, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
-      if (self->outputs == NULL) RAISE(181, 27, "used member of empty object")
-      if (self->outputs_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
-      if (self->outputs->last == NULL) RAISE(181, 27, "used member of empty object")
-      if (self->outputs->last_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
-      CHECK(181, ((tl5_compiler_M_Argument_Dynamic*)(self->outputs->last->item_Dynamic))->get_output(self->outputs->last->item, self->outputs->last->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(self->outputs->last->item_Dynamic)), &(*output), &(*output_Refman), &(*output_Dynamic)) )
+      if (self->outputs->last->item_Dynamic == NULL) RAISE(182, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(182, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(182, 38, "used member of outdated weak reference")
+      if (self->outputs == NULL) RAISE(182, 27, "used member of empty object")
+      if (self->outputs_Refman->value == NULL) RAISE(182, 38, "used member of outdated weak reference")
+      if (self->outputs->last == NULL) RAISE(182, 27, "used member of empty object")
+      if (self->outputs->last_Refman->value == NULL) RAISE(182, 38, "used member of outdated weak reference")
+      CHECK(182, ((tl5_compiler_M_Argument_Dynamic*)(self->outputs->last->item_Dynamic))->get_output(self->outputs->last->item, self->outputs->last->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(self->outputs->last->item_Dynamic)), &(*output), &(*output_Refman), &(*output_Dynamic)) )
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14584,19 +15065,21 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "FunctionArguments.find-variable"
 Returncode tl5_compiler_M_FunctionArguments_find_variable(tl5_compiler_M_FunctionArguments* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments_Dynamic* self_Dynamic, String* name, Ref_Manager* name_Refman, String* module_name, Ref_Manager* module_name_Refman, tl5_compiler_M_SyntaxTreeVariable** variable, Ref_Manager** variable_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic** variable_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
-  if (self == NULL) RAISE(185, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
-  CHECK(185, tl5_compiler_M_FunctionArguments_find_variable_args(self, self_Refman, self_Dynamic, self->parameters, self->parameters_Refman, name, name_Refman, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
+  if (self == NULL) RAISE(186, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(186, 38, "used member of outdated weak reference")
+  CHECK(186, tl5_compiler_M_FunctionArguments_find_variable_args(self, self_Refman, self_Dynamic, self->parameters, self->parameters_Refman, name, name_Refman, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
   if (! ((*variable) != NULL && (*variable_Refman)->value != NULL)) {
-      if (self == NULL) RAISE(187, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(187, 38, "used member of outdated weak reference")
-      CHECK(187, tl5_compiler_M_FunctionArguments_find_variable_args(self, self_Refman, self_Dynamic, self->outputs, self->outputs_Refman, name, name_Refman, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
+      if (self == NULL) RAISE(188, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
+      CHECK(188, tl5_compiler_M_FunctionArguments_find_variable_args(self, self_Refman, self_Dynamic, self->outputs, self->outputs_Refman, name, name_Refman, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14611,24 +15094,25 @@ Returncode tl5_compiler_M_FunctionArguments_find_variable_args(tl5_compiler_M_Fu
   tl5_compiler_M_SyntaxTreeVariable* aux_SyntaxTreeVariable_0 = NULL;
   Ref_Manager* aux_SyntaxTreeVariable_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeVariable_Dynamic* aux_SyntaxTreeVariable_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
   LUMI_inc_ref(name_Refman);
-  if (arguments == NULL) RAISE(192, 27, "used member of empty object")
-  if (arguments_Refman->value == NULL) RAISE(192, 38, "used member of outdated weak reference")
+  if (arguments == NULL) RAISE(193, 27, "used member of empty object")
+  if (arguments_Refman->value == NULL) RAISE(193, 38, "used member of outdated weak reference")
   node = arguments->first;
   node_Refman = arguments->first_Refman;
   LUMI_inc_ref(node_Refman);
   while (true) {
       if (!(node != NULL && node_Refman->value != NULL)) break;
-      if (aux_SyntaxTreeVariable_0_Dynamic == NULL) RAISE(195, 28, "dynamic call of empty object")
-      if (node->item_Dynamic == NULL) RAISE(195, 28, "dynamic call of empty object")
-      if (node == NULL) RAISE(195, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(195, 38, "used member of outdated weak reference")
-      CHECK(195, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->get_variable(node->item, node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic)), &(aux_SyntaxTreeVariable_0), &(aux_SyntaxTreeVariable_0_Refman), &(aux_SyntaxTreeVariable_0_Dynamic)) )
-      CHECK(195, aux_SyntaxTreeVariable_0_Dynamic->_base._base.find_variable(&(aux_SyntaxTreeVariable_0->_base._base), aux_SyntaxTreeVariable_0_Refman, &(aux_SyntaxTreeVariable_0_Dynamic->_base._base), name, name_Refman, NULL, NULL, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
+      if (aux_SyntaxTreeVariable_0_Dynamic == NULL) RAISE(196, 28, "dynamic call of empty object")
+      if (node->item_Dynamic == NULL) RAISE(196, 28, "dynamic call of empty object")
+      if (node == NULL) RAISE(196, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(196, 38, "used member of outdated weak reference")
+      CHECK(196, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->get_variable(node->item, node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic)), &(aux_SyntaxTreeVariable_0), &(aux_SyntaxTreeVariable_0_Refman), &(aux_SyntaxTreeVariable_0_Dynamic)) )
+      CHECK(196, aux_SyntaxTreeVariable_0_Dynamic->_base._base.find_variable(&(aux_SyntaxTreeVariable_0->_base._base), aux_SyntaxTreeVariable_0_Refman, &(aux_SyntaxTreeVariable_0_Dynamic->_base._base), name, name_Refman, NULL, NULL, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
       if (!(! ((*variable) != NULL && (*variable_Refman)->value != NULL))) break;
-      if (node == NULL) RAISE(197, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(197, 38, "used member of outdated weak reference")
+      if (node == NULL) RAISE(198, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(198, 38, "used member of outdated weak reference")
       LUMI_dec_ref(node_Refman);
       node_Refman = node->next_Refman;
       LUMI_inc_ref(node_Refman);
@@ -14639,6 +15123,7 @@ LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14664,37 +15149,38 @@ Returncode tl5_compiler_M_FunctionArguments_check_same_as(tl5_compiler_M_Functio
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(other_Refman);
   LUMI_inc_ref(instance_type_Refman);
-  if (self == NULL) RAISE(204, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(204, 38, "used member of outdated weak reference")
-  if (self->parameters == NULL) RAISE(204, 27, "used member of empty object")
-  if (self->parameters_Refman->value == NULL) RAISE(204, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(205, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
+  if (self->parameters == NULL) RAISE(205, 27, "used member of empty object")
+  if (self->parameters_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
   my_node = self->parameters->first;
   my_node_Refman = self->parameters->first_Refman;
   LUMI_inc_ref(my_node_Refman);
-  if (other == NULL) RAISE(205, 27, "used member of empty object")
-  if (other_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
-  if (other->parameters == NULL) RAISE(205, 27, "used member of empty object")
-  if (other->parameters_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
+  if (other == NULL) RAISE(206, 27, "used member of empty object")
+  if (other_Refman->value == NULL) RAISE(206, 38, "used member of outdated weak reference")
+  if (other->parameters == NULL) RAISE(206, 27, "used member of empty object")
+  if (other->parameters_Refman->value == NULL) RAISE(206, 38, "used member of outdated weak reference")
   other_node = other->parameters->first;
   other_node_Refman = other->parameters->first_Refman;
   LUMI_inc_ref(other_node_Refman);
   while (true) {
       if (!((my_node != NULL && my_node_Refman->value != NULL) && (other_node != NULL && other_node_Refman->value != NULL))) break;
-      if (my_node == NULL) RAISE(208, 27, "used member of empty object")
-      if (my_node_Refman->value == NULL) RAISE(208, 38, "used member of outdated weak reference")
-      if (other_node == NULL) RAISE(209, 27, "used member of empty object")
-      if (other_node_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
-      CHECK(208, tl5_compiler_M_Argument_check_same_as(my_node->item, my_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(my_node->item_Dynamic)), other_node->item, other_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(other_node->item_Dynamic)), instance_type, instance_type_Refman, bases) )
-      if (my_node == NULL) RAISE(210, 27, "used member of empty object")
-      if (my_node_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
+      if (my_node == NULL) RAISE(209, 27, "used member of empty object")
+      if (my_node_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
+      if (other_node == NULL) RAISE(210, 27, "used member of empty object")
+      if (other_node_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
+      CHECK(209, tl5_compiler_M_Argument_check_same_as(my_node->item, my_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(my_node->item_Dynamic)), other_node->item, other_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(other_node->item_Dynamic)), instance_type, instance_type_Refman, bases) )
+      if (my_node == NULL) RAISE(211, 27, "used member of empty object")
+      if (my_node_Refman->value == NULL) RAISE(211, 38, "used member of outdated weak reference")
       LUMI_dec_ref(my_node_Refman);
       my_node_Refman = my_node->next_Refman;
       LUMI_inc_ref(my_node_Refman);
       my_node = my_node->next;
-      if (other_node == NULL) RAISE(211, 27, "used member of empty object")
-      if (other_node_Refman->value == NULL) RAISE(211, 38, "used member of outdated weak reference")
+      if (other_node == NULL) RAISE(212, 27, "used member of empty object")
+      if (other_node_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
       LUMI_dec_ref(other_node_Refman);
       other_node_Refman = other_node->next_Refman;
       LUMI_inc_ref(other_node_Refman);
@@ -14703,52 +15189,52 @@ Returncode tl5_compiler_M_FunctionArguments_check_same_as(tl5_compiler_M_Functio
   if (my_node != NULL && my_node_Refman->value != NULL) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(213, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(214, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 20;
       aux_String_0_Var.length = 19;
       aux_String_0_Var.values = "too many parameters";
-      CHECK(213, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_0, aux_String_0_Refman) )
+      CHECK(214, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_0, aux_String_0_Refman) )
     }
   if (other_node != NULL && other_node_Refman->value != NULL) {
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(215, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(216, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 19;
       aux_String_1_Var.length = 18;
       aux_String_1_Var.values = "too few parameters";
-      CHECK(215, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_1, aux_String_1_Refman) )
+      CHECK(216, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_1, aux_String_1_Refman) )
     }
-  if (self == NULL) RAISE(217, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
-  if (self->outputs == NULL) RAISE(217, 27, "used member of empty object")
-  if (self->outputs_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(218, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(218, 38, "used member of outdated weak reference")
+  if (self->outputs == NULL) RAISE(218, 27, "used member of empty object")
+  if (self->outputs_Refman->value == NULL) RAISE(218, 38, "used member of outdated weak reference")
   LUMI_dec_ref(my_node_Refman);
   my_node_Refman = self->outputs->first_Refman;
   LUMI_inc_ref(my_node_Refman);
   my_node = self->outputs->first;
-  if (other == NULL) RAISE(218, 27, "used member of empty object")
-  if (other_Refman->value == NULL) RAISE(218, 38, "used member of outdated weak reference")
-  if (other->outputs == NULL) RAISE(218, 27, "used member of empty object")
-  if (other->outputs_Refman->value == NULL) RAISE(218, 38, "used member of outdated weak reference")
+  if (other == NULL) RAISE(219, 27, "used member of empty object")
+  if (other_Refman->value == NULL) RAISE(219, 38, "used member of outdated weak reference")
+  if (other->outputs == NULL) RAISE(219, 27, "used member of empty object")
+  if (other->outputs_Refman->value == NULL) RAISE(219, 38, "used member of outdated weak reference")
   LUMI_dec_ref(other_node_Refman);
   other_node_Refman = other->outputs->first_Refman;
   LUMI_inc_ref(other_node_Refman);
   other_node = other->outputs->first;
   while (true) {
       if (!((my_node != NULL && my_node_Refman->value != NULL) && (other_node != NULL && other_node_Refman->value != NULL))) break;
-      if (my_node == NULL) RAISE(221, 27, "used member of empty object")
-      if (my_node_Refman->value == NULL) RAISE(221, 38, "used member of outdated weak reference")
-      if (other_node == NULL) RAISE(222, 27, "used member of empty object")
-      if (other_node_Refman->value == NULL) RAISE(222, 38, "used member of outdated weak reference")
-      CHECK(221, tl5_compiler_M_Argument_check_same_as(my_node->item, my_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(my_node->item_Dynamic)), other_node->item, other_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(other_node->item_Dynamic)), instance_type, instance_type_Refman, bases) )
-      if (my_node == NULL) RAISE(223, 27, "used member of empty object")
-      if (my_node_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
+      if (my_node == NULL) RAISE(222, 27, "used member of empty object")
+      if (my_node_Refman->value == NULL) RAISE(222, 38, "used member of outdated weak reference")
+      if (other_node == NULL) RAISE(223, 27, "used member of empty object")
+      if (other_node_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
+      CHECK(222, tl5_compiler_M_Argument_check_same_as(my_node->item, my_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(my_node->item_Dynamic)), other_node->item, other_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(other_node->item_Dynamic)), instance_type, instance_type_Refman, bases) )
+      if (my_node == NULL) RAISE(224, 27, "used member of empty object")
+      if (my_node_Refman->value == NULL) RAISE(224, 38, "used member of outdated weak reference")
       LUMI_dec_ref(my_node_Refman);
       my_node_Refman = my_node->next_Refman;
       LUMI_inc_ref(my_node_Refman);
       my_node = my_node->next;
-      if (other_node == NULL) RAISE(224, 27, "used member of empty object")
-      if (other_node_Refman->value == NULL) RAISE(224, 38, "used member of outdated weak reference")
+      if (other_node == NULL) RAISE(225, 27, "used member of empty object")
+      if (other_node_Refman->value == NULL) RAISE(225, 38, "used member of outdated weak reference")
       LUMI_dec_ref(other_node_Refman);
       other_node_Refman = other_node->next_Refman;
       LUMI_inc_ref(other_node_Refman);
@@ -14757,22 +15243,22 @@ Returncode tl5_compiler_M_FunctionArguments_check_same_as(tl5_compiler_M_Functio
   if (my_node != NULL && my_node_Refman->value != NULL) {
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-      if (aux_String_2_Refman == NULL) RAISE(226, 38, "insufficient memory for managed object")
+      if (aux_String_2_Refman == NULL) RAISE(227, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 17;
       aux_String_2_Var.length = 16;
       aux_String_2_Var.values = "too many outputs";
-      CHECK(226, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_2, aux_String_2_Refman) )
+      CHECK(227, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_2, aux_String_2_Refman) )
     }
-  if (other_node == NULL) RAISE(227, 27, "used member of empty object")
-  if (other_node_Refman->value == NULL) RAISE(227, 38, "used member of outdated weak reference")
+  if (other_node == NULL) RAISE(228, 27, "used member of empty object")
+  if (other_node_Refman->value == NULL) RAISE(228, 38, "used member of outdated weak reference")
   if ((other_node != NULL && other_node_Refman->value != NULL) && (other_node->next != NULL && other_node->next_Refman->value != NULL)) {
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-      if (aux_String_3_Refman == NULL) RAISE(228, 38, "insufficient memory for managed object")
+      if (aux_String_3_Refman == NULL) RAISE(229, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 16;
       aux_String_3_Var.length = 15;
       aux_String_3_Var.values = "too few outputs";
-      CHECK(228, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_3, aux_String_3_Refman) )
+      CHECK(229, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_3, aux_String_3_Refman) )
     }
   *output_ommited = other_node != NULL && other_node_Refman->value != NULL;
 LUMI_cleanup:
@@ -14784,6 +15270,7 @@ LUMI_cleanup:
   LUMI_dec_ref(my_node_Refman);
   LUMI_dec_ref(instance_type_Refman);
   LUMI_dec_ref(other_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14793,13 +15280,15 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "FunctionArguments.write-preactions"
 Returncode tl5_compiler_M_FunctionArguments_write_preactions(tl5_compiler_M_FunctionArguments* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(232, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
-  CHECK(232, tl5_compiler_M_FunctionArguments_write_args_preactions(self, self_Refman, self_Dynamic, self->parameters, self->parameters_Refman) )
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(233, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
-  CHECK(233, tl5_compiler_M_FunctionArguments_write_args_preactions(self, self_Refman, self_Dynamic, self->outputs, self->outputs_Refman) )
+  CHECK(233, tl5_compiler_M_FunctionArguments_write_args_preactions(self, self_Refman, self_Dynamic, self->parameters, self->parameters_Refman) )
+  if (self == NULL) RAISE(234, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(234, 38, "used member of outdated weak reference")
+  CHECK(234, tl5_compiler_M_FunctionArguments_write_args_preactions(self, self_Refman, self_Dynamic, self->outputs, self->outputs_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14811,20 +15300,21 @@ Returncode tl5_compiler_M_FunctionArguments_write_args_preactions(tl5_compiler_M
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* node = NULL;
   Ref_Manager* node_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
-  if (arguments == NULL) RAISE(236, 27, "used member of empty object")
-  if (arguments_Refman->value == NULL) RAISE(236, 38, "used member of outdated weak reference")
+  if (arguments == NULL) RAISE(237, 27, "used member of empty object")
+  if (arguments_Refman->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
   node = arguments->first;
   node_Refman = arguments->first_Refman;
   LUMI_inc_ref(node_Refman);
   while (true) {
       if (!(node != NULL && node_Refman->value != NULL)) break;
-      if (node->item_Dynamic == NULL) RAISE(239, 28, "dynamic call of empty object")
-      if (node == NULL) RAISE(239, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(239, 38, "used member of outdated weak reference")
-      CHECK(239, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->write_preactions(node->item, node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))) )
+      if (node->item_Dynamic == NULL) RAISE(240, 28, "dynamic call of empty object")
       if (node == NULL) RAISE(240, 27, "used member of empty object")
       if (node_Refman->value == NULL) RAISE(240, 38, "used member of outdated weak reference")
+      CHECK(240, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->write_preactions(node->item, node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))) )
+      if (node == NULL) RAISE(241, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
       LUMI_dec_ref(node_Refman);
       node_Refman = node->next_Refman;
       LUMI_inc_ref(node_Refman);
@@ -14833,6 +15323,7 @@ Returncode tl5_compiler_M_FunctionArguments_write_args_preactions(tl5_compiler_M
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14842,8 +15333,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "FunctionArguments.write"
 Returncode tl5_compiler_M_FunctionArguments_write(tl5_compiler_M_FunctionArguments* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  CHECK(243, tl5_compiler_M_FunctionArguments_write_if_decleration(self, self_Refman, self_Dynamic, true) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(244, tl5_compiler_M_FunctionArguments_write_if_decleration(self, self_Refman, self_Dynamic, true) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14853,8 +15346,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "FunctionArguments.write-call"
 Returncode tl5_compiler_M_FunctionArguments_write_call(tl5_compiler_M_FunctionArguments* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  CHECK(246, tl5_compiler_M_FunctionArguments_write_if_decleration(self, self_Refman, self_Dynamic, false) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(247, tl5_compiler_M_FunctionArguments_write_if_decleration(self, self_Refman, self_Dynamic, false) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14876,71 +15371,73 @@ Returncode tl5_compiler_M_FunctionArguments_write_if_decleration(tl5_compiler_M_
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(250, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(251, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 2;
   aux_String_0_Var.length = 1;
   aux_String_0_Var.values = "(";
-  CHECK(250, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-  if (self == NULL) RAISE(251, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(251, 38, "used member of outdated weak reference")
-  if (self->parameters == NULL) RAISE(251, 27, "used member of empty object")
-  if (self->parameters_Refman->value == NULL) RAISE(251, 38, "used member of outdated weak reference")
+  CHECK(251, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  if (self == NULL) RAISE(252, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(252, 38, "used member of outdated weak reference")
+  if (self->parameters == NULL) RAISE(252, 27, "used member of empty object")
+  if (self->parameters_Refman->value == NULL) RAISE(252, 38, "used member of outdated weak reference")
   if (self->parameters->first != NULL && self->parameters->first_Refman->value != NULL) {
-      if (self == NULL) RAISE(252, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(252, 38, "used member of outdated weak reference")
-      CHECK(252, tl5_compiler_M_FunctionArguments_write_args(self, self_Refman, self_Dynamic, self->parameters, self->parameters_Refman) )
+      if (self == NULL) RAISE(253, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
+      CHECK(253, tl5_compiler_M_FunctionArguments_write_args(self, self_Refman, self_Dynamic, self->parameters, self->parameters_Refman) )
     }
-  if (self == NULL) RAISE(253, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
-  if (self->outputs == NULL) RAISE(253, 27, "used member of empty object")
-  if (self->outputs_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(254, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
+  if (self->outputs == NULL) RAISE(254, 27, "used member of empty object")
+  if (self->outputs_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
   if (self->outputs->first != NULL && self->outputs->first_Refman->value != NULL) {
-      if (self == NULL) RAISE(254, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
-      if (self->parameters == NULL) RAISE(254, 27, "used member of empty object")
-      if (self->parameters_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(255, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(255, 38, "used member of outdated weak reference")
+      if (self->parameters == NULL) RAISE(255, 27, "used member of empty object")
+      if (self->parameters_Refman->value == NULL) RAISE(255, 38, "used member of outdated weak reference")
       if (self->parameters->first != NULL && self->parameters->first_Refman->value != NULL) {
         aux_String_1 = &aux_String_1_Var;
         aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-        if (aux_String_1_Refman == NULL) RAISE(255, 38, "insufficient memory for managed object")
+        if (aux_String_1_Refman == NULL) RAISE(256, 38, "insufficient memory for managed object")
         aux_String_1_Var.max_length = 3;
         aux_String_1_Var.length = 2;
         aux_String_1_Var.values = ", ";
-        CHECK(255, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+        CHECK(256, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
       }
-      if (self == NULL) RAISE(256, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(256, 38, "used member of outdated weak reference")
-      CHECK(256, tl5_compiler_M_FunctionArguments_write_args(self, self_Refman, self_Dynamic, self->outputs, self->outputs_Refman) )
-    }
-  else {
       if (self == NULL) RAISE(257, 27, "used member of empty object")
       if (self_Refman->value == NULL) RAISE(257, 38, "used member of outdated weak reference")
-      if (self->parameters == NULL) RAISE(257, 27, "used member of empty object")
-      if (self->parameters_Refman->value == NULL) RAISE(257, 38, "used member of outdated weak reference")
+      CHECK(257, tl5_compiler_M_FunctionArguments_write_args(self, self_Refman, self_Dynamic, self->outputs, self->outputs_Refman) )
+    }
+  else {
+      if (self == NULL) RAISE(258, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(258, 38, "used member of outdated weak reference")
+      if (self->parameters == NULL) RAISE(258, 27, "used member of empty object")
+      if (self->parameters_Refman->value == NULL) RAISE(258, 38, "used member of outdated weak reference")
       if ((! (self->parameters->first != NULL && self->parameters->first_Refman->value != NULL)) && is_decleration) {
         aux_String_2 = &aux_String_2_Var;
         aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-        if (aux_String_2_Refman == NULL) RAISE(258, 38, "insufficient memory for managed object")
+        if (aux_String_2_Refman == NULL) RAISE(259, 38, "insufficient memory for managed object")
         aux_String_2_Var.max_length = 5;
         aux_String_2_Var.length = 4;
         aux_String_2_Var.values = "void";
-        CHECK(258, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+        CHECK(259, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
       }
     }
   aux_String_3 = &aux_String_3_Var;
   aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-  if (aux_String_3_Refman == NULL) RAISE(259, 38, "insufficient memory for managed object")
+  if (aux_String_3_Refman == NULL) RAISE(260, 38, "insufficient memory for managed object")
   aux_String_3_Var.max_length = 2;
   aux_String_3_Var.length = 1;
   aux_String_3_Var.values = ")";
-  CHECK(259, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+  CHECK(260, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_3_Refman);
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -14955,19 +15452,20 @@ Returncode tl5_compiler_M_FunctionArguments_write_args(tl5_compiler_M_FunctionAr
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
-  if (arguments == NULL) RAISE(262, 27, "used member of empty object")
-  if (arguments_Refman->value == NULL) RAISE(262, 38, "used member of outdated weak reference")
+  if (arguments == NULL) RAISE(263, 27, "used member of empty object")
+  if (arguments_Refman->value == NULL) RAISE(263, 38, "used member of outdated weak reference")
   node = arguments->first;
   node_Refman = arguments->first_Refman;
   LUMI_inc_ref(node_Refman);
   while (true) {
-      if (node->item_Dynamic == NULL) RAISE(264, 28, "dynamic call of empty object")
-      if (node == NULL) RAISE(264, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(264, 38, "used member of outdated weak reference")
-      CHECK(264, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->_base.write(&(((tl5_compiler_M_Argument*)(node->item))->_base), node->item_Refman, &(((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->_base)) )
+      if (node->item_Dynamic == NULL) RAISE(265, 28, "dynamic call of empty object")
       if (node == NULL) RAISE(265, 27, "used member of empty object")
       if (node_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
+      CHECK(265, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->_base.write(&(((tl5_compiler_M_Argument*)(node->item))->_base), node->item_Refman, &(((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->_base)) )
+      if (node == NULL) RAISE(266, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(266, 38, "used member of outdated weak reference")
       LUMI_dec_ref(node_Refman);
       node_Refman = node->next_Refman;
       LUMI_inc_ref(node_Refman);
@@ -14975,16 +15473,17 @@ Returncode tl5_compiler_M_FunctionArguments_write_args(tl5_compiler_M_FunctionAr
       if (!(node != NULL && node_Refman->value != NULL)) break;
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(267, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(268, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 3;
       aux_String_0_Var.length = 2;
       aux_String_0_Var.values = ", ";
-      CHECK(267, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+      CHECK(268, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -15000,28 +15499,30 @@ Returncode tl5_compiler_M_FunctionArguments_write_pointer(tl5_compiler_M_Functio
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(270, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(271, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
   aux_String_0_Var.values = "Returncode (*";
-  CHECK(270, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-  CHECK(271, tl5_compiler_M_write_cname(name, name_Refman) )
+  CHECK(271, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(272, tl5_compiler_M_write_cname(name, name_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(272, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(273, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 2;
   aux_String_1_Var.length = 1;
   aux_String_1_Var.values = ")";
-  CHECK(272, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
-  if (self_Dynamic == NULL) RAISE(273, 28, "dynamic call of empty object")
-  CHECK(273, self_Dynamic->_base.write(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  CHECK(273, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+  if (self_Dynamic == NULL) RAISE(274, 28, "dynamic call of empty object")
+  CHECK(274, self_Dynamic->_base.write(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -15033,21 +15534,22 @@ Returncode tl5_compiler_M_FunctionArguments_write_postactions(tl5_compiler_M_Fun
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* node = NULL;
   Ref_Manager* node_Refman = NULL;
-  if (self == NULL) RAISE(276, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(276, 38, "used member of outdated weak reference")
-  if (self->parameters == NULL) RAISE(276, 27, "used member of empty object")
-  if (self->parameters_Refman->value == NULL) RAISE(276, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(277, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
+  if (self->parameters == NULL) RAISE(277, 27, "used member of empty object")
+  if (self->parameters_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
   node = self->parameters->first;
   node_Refman = self->parameters->first_Refman;
   LUMI_inc_ref(node_Refman);
   while (true) {
       if (!(node != NULL && node_Refman->value != NULL)) break;
-      if (node->item_Dynamic == NULL) RAISE(279, 28, "dynamic call of empty object")
-      if (node == NULL) RAISE(279, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
-      CHECK(279, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->write_postactions(node->item, node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))) )
+      if (node->item_Dynamic == NULL) RAISE(280, 28, "dynamic call of empty object")
       if (node == NULL) RAISE(280, 27, "used member of empty object")
       if (node_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
+      CHECK(280, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->write_postactions(node->item, node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))) )
+      if (node == NULL) RAISE(281, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(281, 38, "used member of outdated weak reference")
       LUMI_dec_ref(node_Refman);
       node_Refman = node->next_Refman;
       LUMI_inc_ref(node_Refman);
@@ -15055,6 +15557,7 @@ Returncode tl5_compiler_M_FunctionArguments_write_postactions(tl5_compiler_M_Fun
     }
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -15106,6 +15609,7 @@ Returncode tl5_compiler_M_Global_init(tl5_compiler_M_Global* self, Ref_Manager* 
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(78, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(78, 38, "used member of outdated weak reference")
   self->got_new_line = false;
@@ -15317,6 +15821,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_GlobalNodes_0_Refman);
   if (aux_SyntaxTreeRoot_0_Dynamic != NULL) aux_SyntaxTreeRoot_0_Dynamic->_base._base._base._base._del(aux_SyntaxTreeRoot_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeRoot_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -15412,6 +15917,7 @@ Returncode tl5_compiler_M_Global_init_operator_map(tl5_compiler_M_Global* self, 
   String aux_String_27_Var = {0};
   String* aux_String_27 = NULL;
   Ref_Manager* aux_String_27_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_NameMap_0 = LUMI_alloc(sizeof(tl5_compiler_M_NameMap));
   if (aux_NameMap_0 == NULL) RAISE(103, 49, "insufficient memory for object dynamic allocation")
   aux_NameMap_0_Refman = LUMI_new_ref(aux_NameMap_0);
@@ -15642,6 +16148,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   tl5_compiler_M_NameMap_Del(aux_NameMap_0);
   LUMI_owner_dec_ref(aux_NameMap_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -15653,6 +16160,7 @@ Returncode tl5_compiler_M_Global_add_operator(tl5_compiler_M_Global* self, Ref_M
   Returncode LUMI_err = OK;
   tl5_compiler_M_Operator* operator = NULL;
   Ref_Manager* operator_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(c_name_Refman);
   operator = LUMI_alloc(sizeof(tl5_compiler_M_Operator));
@@ -15675,6 +16183,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(operator_Refman);
   LUMI_dec_ref(c_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -15684,10 +16193,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Global.add-operator-copy"
 Returncode tl5_compiler_M_Global_add_operator_copy(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, String* name, Ref_Manager* name_Refman, Int order, Int group_index) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   CHECK(138, tl5_compiler_M_Global_add_operator(self, self_Refman, name, name_Refman, name, name_Refman, order, group_index) )
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -15934,6 +16445,7 @@ Returncode tl5_compiler_M_Global_init_builtin_types(tl5_compiler_M_Global* self,
   String aux_String_77_Var = {0};
   String* aux_String_77 = NULL;
   Ref_Manager* aux_String_77_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(141, 38, "insufficient memory for managed object")
@@ -16725,6 +17237,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -16737,6 +17250,7 @@ Returncode tl5_compiler_M_Global_add_builtin_type(tl5_compiler_M_Global* self, R
   tl5_compiler_M_TypeData* aux_TypeData_0 = NULL;
   Ref_Manager* aux_TypeData_0_Refman = NULL;
   tl5_compiler_M_TypeData_Dynamic* aux_TypeData_0_Dynamic = &tl5_compiler_M_TypeData_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   aux_TypeData_0 = LUMI_alloc(sizeof(tl5_compiler_M_TypeData));
   if (aux_TypeData_0 == NULL) RAISE(306, 49, "insufficient memory for object dynamic allocation")
@@ -16776,6 +17290,7 @@ LUMI_cleanup:
   if (aux_TypeData_0_Dynamic != NULL) aux_TypeData_0_Dynamic->_base._base._base._del(aux_TypeData_0);
   LUMI_owner_dec_ref(aux_TypeData_0_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -16788,6 +17303,7 @@ Returncode tl5_compiler_M_Global_add_builtin_global_variable(tl5_compiler_M_Glob
   tl5_compiler_M_SyntaxTreeVariable* variable = NULL;
   Ref_Manager* variable_Refman = NULL;
   tl5_compiler_M_SyntaxTreeVariable_Dynamic* variable_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(variable_type_Refman);
   LUMI_inc_ref(name_Refman);
   if (self == NULL) RAISE(316, 27, "used member of empty object")
@@ -16816,6 +17332,7 @@ LUMI_cleanup:
   LUMI_dec_ref(variable_Refman);
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(variable_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -16825,6 +17342,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Global.add-builtin-field"
 Returncode tl5_compiler_M_Global_add_builtin_field(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeData* builtin_type, Ref_Manager* builtin_type_Refman, tl5_compiler_M_TypeData_Dynamic* builtin_type_Dynamic, String* name, Ref_Manager* name_Refman, tl5_compiler_M_TypeData* field_type, Ref_Manager* field_type_Refman, tl5_compiler_M_TypeData_Dynamic* field_type_Dynamic, tl5_compiler_M_TypeData* field_subtype, Ref_Manager* field_subtype_Refman, tl5_compiler_M_TypeData_Dynamic* field_subtype_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(builtin_type_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(field_type_Refman);
@@ -16835,6 +17353,7 @@ LUMI_cleanup:
   LUMI_dec_ref(field_type_Refman);
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(builtin_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -16847,6 +17366,7 @@ Returncode tl5_compiler_M_Global_add_builtin_variable(tl5_compiler_M_Global* sel
   tl5_compiler_M_SyntaxTreeVariable* variable = NULL;
   Ref_Manager* variable_Refman = NULL;
   tl5_compiler_M_SyntaxTreeVariable_Dynamic* variable_Dynamic = &tl5_compiler_M_SyntaxTreeVariable_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(variable_type_Refman);
   LUMI_inc_ref(variable_subtype_Refman);
@@ -16900,6 +17420,7 @@ LUMI_cleanup:
   LUMI_dec_ref(variable_subtype_Refman);
   LUMI_dec_ref(variable_type_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -16912,6 +17433,7 @@ Returncode tl5_compiler_M_Global_add_builtin_global_function(tl5_compiler_M_Glob
   tl5_compiler_M_SyntaxTreeFunction* function = NULL;
   Ref_Manager* function_Refman = NULL;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* function_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(352, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(352, 38, "used member of outdated weak reference")
@@ -16938,6 +17460,7 @@ Returncode tl5_compiler_M_Global_add_builtin_global_function(tl5_compiler_M_Glob
 LUMI_cleanup:
   LUMI_dec_ref(function_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -16950,6 +17473,7 @@ Returncode tl5_compiler_M_Global_add_builtin_method(tl5_compiler_M_Global* self,
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(builtin_type_Refman);
   LUMI_inc_ref(name_Refman);
   CHECK(359, tl5_compiler_M_Global_add_builtin_function(self, self_Refman, name, name_Refman, builtin_type, builtin_type_Refman, builtin_type_Dynamic, &(builtin_type->_base), builtin_type_Refman, &(builtin_type_Dynamic->_base), &(*arguments), &(*arguments_Refman), &(*arguments_Dynamic)) )
@@ -16964,6 +17488,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(builtin_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -16979,6 +17504,7 @@ Returncode tl5_compiler_M_Global_add_builtin_function(tl5_compiler_M_Global* sel
   tl5_compiler_M_FunctionArguments* aux_FunctionArguments_0 = NULL;
   Ref_Manager* aux_FunctionArguments_0_Refman = NULL;
   tl5_compiler_M_FunctionArguments_Dynamic* aux_FunctionArguments_0_Dynamic = &tl5_compiler_M_FunctionArguments_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(namespace_Refman);
@@ -17035,6 +17561,7 @@ LUMI_cleanup:
   LUMI_dec_ref(namespace_Refman);
   LUMI_dec_ref(parent_type_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17044,6 +17571,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Global.add-builtin-parameter"
 Returncode tl5_compiler_M_Global_add_builtin_parameter(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments* arguments, Ref_Manager* arguments_Refman, tl5_compiler_M_FunctionArguments_Dynamic* arguments_Dynamic, Int access, tl5_compiler_M_TypeData* parameter_type, Ref_Manager* parameter_type_Refman, tl5_compiler_M_TypeData_Dynamic* parameter_type_Dynamic, String* name, Ref_Manager* name_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
   LUMI_inc_ref(parameter_type_Refman);
   LUMI_inc_ref(name_Refman);
@@ -17054,6 +17582,7 @@ LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(parameter_type_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17063,6 +17592,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Global.add-builtin-output"
 Returncode tl5_compiler_M_Global_add_builtin_output(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_FunctionArguments* arguments, Ref_Manager* arguments_Refman, tl5_compiler_M_FunctionArguments_Dynamic* arguments_Dynamic, Int access, tl5_compiler_M_TypeData* output_type, Ref_Manager* output_type_Refman, tl5_compiler_M_TypeData_Dynamic* output_type_Dynamic, String* name, Ref_Manager* name_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arguments_Refman);
   LUMI_inc_ref(output_type_Refman);
   LUMI_inc_ref(name_Refman);
@@ -17073,6 +17603,7 @@ LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(output_type_Refman);
   LUMI_dec_ref(arguments_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17088,6 +17619,7 @@ Returncode tl5_compiler_M_Global_add_builtin_argument(tl5_compiler_M_Global* sel
   tl5_compiler_M_SyntaxTreeVariable* aux_SyntaxTreeVariable_0 = NULL;
   Ref_Manager* aux_SyntaxTreeVariable_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeVariable_Dynamic* aux_SyntaxTreeVariable_0_Dynamic = &tl5_compiler_M_SyntaxTreeVariable_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(argument_list_Refman);
   LUMI_inc_ref(argument_type_Refman);
   LUMI_inc_ref(name_Refman);
@@ -17142,6 +17674,7 @@ LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(argument_type_Refman);
   LUMI_dec_ref(argument_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17151,6 +17684,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Global.find-type"
 Returncode tl5_compiler_M_Global_find_type(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, String* name, Ref_Manager* name_Refman, tl5_compiler_M_TypeData** type_data, Ref_Manager** type_data_Refman, tl5_compiler_M_TypeData_Dynamic** type_data_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   if (self == NULL) RAISE(419, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(419, 38, "used member of outdated weak reference")
@@ -17171,6 +17705,7 @@ Returncode tl5_compiler_M_Global_find_type(tl5_compiler_M_Global* self, Ref_Mana
   CHECK(422, tl5_compiler_M_NameMap_find(self->global_module->type_map, self->global_module->type_map_Refman, name, name_Refman, (void*)&(*type_data), &(*type_data_Refman), (void*)&(*type_data_Dynamic)) )
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17180,6 +17715,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Global.find-variable"
 Returncode tl5_compiler_M_Global_find_variable(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, String* name, Ref_Manager* name_Refman, tl5_compiler_M_SyntaxTreeVariable** variable, Ref_Manager** variable_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic** variable_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   if (self == NULL) RAISE(425, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(425, 38, "used member of outdated weak reference")
@@ -17196,6 +17732,7 @@ Returncode tl5_compiler_M_Global_find_variable(tl5_compiler_M_Global* self, Ref_
   CHECK(427, tl5_compiler_M_NameMap_find(self->global_module->variable_map, self->global_module->variable_map_Refman, name, name_Refman, (void*)&(*variable), &(*variable_Refman), (void*)&(*variable_Dynamic)) )
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17205,6 +17742,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Global.find-function"
 Returncode tl5_compiler_M_Global_find_function(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, String* name, Ref_Manager* name_Refman, tl5_compiler_M_SyntaxTreeFunction** function, Ref_Manager** function_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic** function_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   if (self == NULL) RAISE(430, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(430, 38, "used member of outdated weak reference")
@@ -17221,6 +17759,7 @@ Returncode tl5_compiler_M_Global_find_function(tl5_compiler_M_Global* self, Ref_
   CHECK(432, tl5_compiler_M_NameMap_find(self->global_module->function_map, self->global_module->function_map_Refman, name, name_Refman, (void*)&(*function), &(*function_Refman), (void*)&(*function_Dynamic)) )
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17288,10 +17827,12 @@ void tl5_compiler_M_Global_Del(tl5_compiler_M_Global* self) {
 #define LUMI_FUNC_NAME "List.is-empty"
 Returncode tl5_compiler_M_List_is_empty(tl5_compiler_M_List* self, Ref_Manager* self_Refman, Bool* is_empty) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(10, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(10, 38, "used member of outdated weak reference")
   *is_empty = ! (self->first != NULL && self->first_Refman->value != NULL);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17303,6 +17844,7 @@ Returncode tl5_compiler_M_List_add(tl5_compiler_M_List* self, Ref_Manager* self_
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* node = NULL;
   Ref_Manager* node_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   node = LUMI_alloc(sizeof(tl5_compiler_M_ListNode));
   if (node == NULL) RAISE(13, 49, "insufficient memory for object dynamic allocation")
   node_Refman = LUMI_new_ref(node);
@@ -17360,6 +17902,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(node_Refman);
   if (item_Dynamic != NULL) item_Dynamic->_del(item);
   LUMI_owner_dec_ref(item_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17371,6 +17914,7 @@ Returncode tl5_compiler_M_List_prepend(tl5_compiler_M_List* self, Ref_Manager* s
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* node = NULL;
   Ref_Manager* node_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   node = LUMI_alloc(sizeof(tl5_compiler_M_ListNode));
   if (node == NULL) RAISE(23, 49, "insufficient memory for object dynamic allocation")
   node_Refman = LUMI_new_ref(node);
@@ -17387,27 +17931,39 @@ Returncode tl5_compiler_M_List_prepend(tl5_compiler_M_List* self, Ref_Manager* s
   item_Dynamic = NULL;
   if (self == NULL) RAISE(25, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(25, 38, "used member of outdated weak reference")
-  if (node == NULL) RAISE(25, 27, "used member of empty object")
-  if (node_Refman->value == NULL) RAISE(25, 38, "used member of outdated weak reference")
-  tl5_compiler_M_ListNode_Del(node->next);
-  LUMI_owner_dec_ref(node->next_Refman);
-  node->next_Refman = self->first_Refman;
-  node->next = self->first;
-  self->first = NULL;
-  self->first_Refman = NULL;
-  if (self == NULL) RAISE(26, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(26, 38, "used member of outdated weak reference")
+  if (self->first != NULL && self->first_Refman->value != NULL) {
+      if (self == NULL) RAISE(26, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(26, 38, "used member of outdated weak reference")
+      if (node == NULL) RAISE(26, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(26, 38, "used member of outdated weak reference")
+      tl5_compiler_M_ListNode_Del(node->next);
+      LUMI_owner_dec_ref(node->next_Refman);
+      node->next_Refman = self->first_Refman;
+      node->next = self->first;
+      self->first = NULL;
+      self->first_Refman = NULL;
+      if (self == NULL) RAISE(27, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
+      if (self->first == NULL) RAISE(27, 27, "used member of empty object")
+      if (self->first_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
+      LUMI_dec_ref(self->first->prev_Refman);
+      self->first->prev_Refman = node_Refman;
+      LUMI_inc_ref(self->first->prev_Refman);
+      self->first->prev = node;
+    }
+  if (self == NULL) RAISE(28, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
   tl5_compiler_M_ListNode_Del(self->first);
   LUMI_owner_dec_ref(self->first_Refman);
   self->first_Refman = node_Refman;
   self->first = node;
   node = NULL;
   node_Refman = NULL;
-  if (self == NULL) RAISE(27, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(29, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(29, 38, "used member of outdated weak reference")
   if (! (self->last != NULL && self->last_Refman->value != NULL)) {
-      if (self == NULL) RAISE(28, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(30, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(30, 38, "used member of outdated weak reference")
       LUMI_dec_ref(self->last_Refman);
       self->last_Refman = node_Refman;
       LUMI_inc_ref(self->last_Refman);
@@ -17418,6 +17974,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(node_Refman);
   if (item_Dynamic != NULL) item_Dynamic->_del(item);
   LUMI_owner_dec_ref(item_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17429,13 +17986,14 @@ Returncode tl5_compiler_M_List_pop(tl5_compiler_M_List* self, Ref_Manager* self_
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* first = NULL;
   Ref_Manager* first_Refman = NULL;
-  if (self == NULL) RAISE(31, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(31, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(33, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(33, 38, "used member of outdated weak reference")
   if (self->first != NULL && self->first_Refman->value != NULL) {
-      if (self == NULL) RAISE(32, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(32, 38, "used member of outdated weak reference")
-      if (self->first == NULL) RAISE(32, 27, "used member of empty object")
-      if (self->first_Refman->value == NULL) RAISE(32, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(34, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(34, 38, "used member of outdated weak reference")
+      if (self->first == NULL) RAISE(34, 27, "used member of empty object")
+      if (self->first_Refman->value == NULL) RAISE(34, 38, "used member of outdated weak reference")
       if (*item_Dynamic != NULL) (*item_Dynamic)->_del(*item);
       LUMI_owner_dec_ref(*item_Refman);
       *item_Refman = self->first->item_Refman;
@@ -17444,37 +18002,37 @@ Returncode tl5_compiler_M_List_pop(tl5_compiler_M_List* self, Ref_Manager* self_
       self->first->item = NULL;
       self->first->item_Refman = NULL;
       self->first->item_Dynamic = NULL;
-      if (self == NULL) RAISE(33, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(33, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(35, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
       first = self->first;
       first_Refman = self->first_Refman;
       self->first = NULL;
       self->first_Refman = NULL;
-      if (first == NULL) RAISE(34, 27, "used member of empty object")
-      if (first_Refman->value == NULL) RAISE(34, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(34, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(34, 38, "used member of outdated weak reference")
+      if (first == NULL) RAISE(36, 27, "used member of empty object")
+      if (first_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(36, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
       tl5_compiler_M_ListNode_Del(self->first);
       LUMI_owner_dec_ref(self->first_Refman);
       self->first_Refman = first->next_Refman;
       self->first = first->next;
       first->next = NULL;
       first->next_Refman = NULL;
-      if (self == NULL) RAISE(35, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(37, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(37, 38, "used member of outdated weak reference")
       if (self->first != NULL && self->first_Refman->value != NULL) {
-        if (self == NULL) RAISE(36, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
-        if (self->first == NULL) RAISE(36, 27, "used member of empty object")
-        if (self->first_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(38, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(38, 38, "used member of outdated weak reference")
+        if (self->first == NULL) RAISE(38, 27, "used member of empty object")
+        if (self->first_Refman->value == NULL) RAISE(38, 38, "used member of outdated weak reference")
         LUMI_dec_ref(self->first->prev_Refman);
         self->first->prev_Refman = NULL;
         LUMI_inc_ref(self->first->prev_Refman);
         self->first->prev = NULL;
       }
       else {
-        if (self == NULL) RAISE(38, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(38, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(40, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(40, 38, "used member of outdated weak reference")
         LUMI_dec_ref(self->last_Refman);
         self->last_Refman = NULL;
         LUMI_inc_ref(self->last_Refman);
@@ -17491,6 +18049,107 @@ Returncode tl5_compiler_M_List_pop(tl5_compiler_M_List* self, Ref_Manager* self_
 LUMI_cleanup:
   tl5_compiler_M_ListNode_Del(first);
   LUMI_owner_dec_ref(first_Refman);
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/global/list.4.lm"
+#define LUMI_FUNC_NAME "List.remove"
+Returncode tl5_compiler_M_List_remove(tl5_compiler_M_List* self, Ref_Manager* self_Refman, Generic_Type* ref, Ref_Manager* ref_Refman, Generic_Type_Dynamic* ref_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
+  Returncode LUMI_err = OK;
+  tl5_compiler_M_ListNode* prev = NULL;
+  Ref_Manager* prev_Refman = NULL;
+  tl5_compiler_M_ListNode* node = NULL;
+  Ref_Manager* node_Refman = NULL;
+  tl5_compiler_M_ListNode* next = NULL;
+  Ref_Manager* next_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
+  LUMI_inc_ref(ref_Refman);
+  if (self == NULL) RAISE(46, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(46, 38, "used member of outdated weak reference")
+  node = self->first;
+  node_Refman = self->first_Refman;
+  LUMI_inc_ref(node_Refman);
+  while (true) {
+      if (!(node != NULL && node_Refman->value != NULL)) break;
+      if (node == NULL) RAISE(49, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(49, 38, "used member of outdated weak reference")
+      if ((void*)((Generic_Type*)(node->item)) == ref) {
+        if (node == NULL) RAISE(50, 27, "used member of empty object")
+        if (node_Refman->value == NULL) RAISE(50, 38, "used member of outdated weak reference")
+        if (*item_Dynamic != NULL) (*item_Dynamic)->_del(*item);
+        LUMI_owner_dec_ref(*item_Refman);
+        *item_Refman = node->item_Refman;
+        *item_Dynamic = node->item_Dynamic;
+        *item = node->item;
+        node->item = NULL;
+        node->item_Refman = NULL;
+        node->item_Dynamic = NULL;
+        if (node == NULL) RAISE(51, 27, "used member of empty object")
+        if (node_Refman->value == NULL) RAISE(51, 38, "used member of outdated weak reference")
+        next = node->next;
+        next_Refman = node->next_Refman;
+        node->next = NULL;
+        node->next_Refman = NULL;
+        if (next != NULL && next_Refman->value != NULL) {
+          if (next == NULL) RAISE(53, 27, "used member of empty object")
+          if (next_Refman->value == NULL) RAISE(53, 38, "used member of outdated weak reference")
+          LUMI_dec_ref(next->prev_Refman);
+          next->prev_Refman = prev_Refman;
+          LUMI_inc_ref(next->prev_Refman);
+          next->prev = prev;
+        }
+        else {
+          if (self == NULL) RAISE(55, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(55, 38, "used member of outdated weak reference")
+          LUMI_dec_ref(self->last_Refman);
+          self->last_Refman = prev_Refman;
+          LUMI_inc_ref(self->last_Refman);
+          self->last = prev;
+        }
+        if (prev != NULL && prev_Refman->value != NULL) {
+          if (prev == NULL) RAISE(57, 27, "used member of empty object")
+          if (prev_Refman->value == NULL) RAISE(57, 38, "used member of outdated weak reference")
+          tl5_compiler_M_ListNode_Del(prev->next);
+          LUMI_owner_dec_ref(prev->next_Refman);
+          prev->next_Refman = next_Refman;
+          prev->next = next;
+          next = NULL;
+          next_Refman = NULL;
+        }
+        else {
+          if (self == NULL) RAISE(59, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(59, 38, "used member of outdated weak reference")
+          tl5_compiler_M_ListNode_Del(self->first);
+          LUMI_owner_dec_ref(self->first_Refman);
+          self->first_Refman = next_Refman;
+          self->first = next;
+          next = NULL;
+          next_Refman = NULL;
+        }
+        goto LUMI_cleanup;
+      }
+      if (node == NULL) RAISE(61, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(61, 38, "used member of outdated weak reference")
+      LUMI_dec_ref(node_Refman);
+      node_Refman = node->next_Refman;
+      LUMI_inc_ref(node_Refman);
+      node = node->next;
+    }
+  if (*item_Dynamic != NULL) (*item_Dynamic)->_del(*item);
+  LUMI_owner_dec_ref(*item_Refman);
+  *item_Refman = NULL;
+  *item_Dynamic = (Generic_Type_Dynamic*)NULL;
+  *item = NULL;
+LUMI_cleanup:
+  tl5_compiler_M_ListNode_Del(next);
+  LUMI_owner_dec_ref(next_Refman);
+  LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(prev_Refman);
+  LUMI_dec_ref(ref_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17518,6 +18177,7 @@ Returncode tl5_compiler_M_NameMap_add(tl5_compiler_M_NameMap* self, Ref_Manager*
   Returncode LUMI_err = OK;
   tl5_compiler_M_NameMapNode* node = NULL;
   Ref_Manager* node_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(value_Refman);
   node = LUMI_alloc(sizeof(tl5_compiler_M_NameMapNode));
@@ -17562,6 +18222,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(node_Refman);
   LUMI_dec_ref(value_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17574,6 +18235,7 @@ Returncode tl5_compiler_M_NameMap_find(tl5_compiler_M_NameMap* self, Ref_Manager
   tl5_compiler_M_NameMapNode* node = NULL;
   Ref_Manager* node_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   if (self == NULL) RAISE(21, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(21, 38, "used member of outdated weak reference")
@@ -17610,6 +18272,7 @@ Returncode tl5_compiler_M_NameMap_find(tl5_compiler_M_NameMap* self, Ref_Manager
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17622,6 +18285,7 @@ Returncode tl5_compiler_M_NameMap_update_or_add(tl5_compiler_M_NameMap* self, Re
   tl5_compiler_M_NameMapNode* node = NULL;
   Ref_Manager* node_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(value_Refman);
   if (self == NULL) RAISE(31, 27, "used member of empty object")
@@ -17656,6 +18320,7 @@ LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(value_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17673,6 +18338,7 @@ void tl5_compiler_M_NameMap_Del(tl5_compiler_M_NameMap* self) {
 #define LUMI_FUNC_NAME "NameMapNode.init"
 Returncode tl5_compiler_M_NameMapNode_init(tl5_compiler_M_NameMapNode* self, Ref_Manager* self_Refman, String* name, Ref_Manager* name_Refman, Generic_Type* value, Ref_Manager* value_Refman, Generic_Type_Dynamic* value_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(value_Refman);
   if (self == NULL) RAISE(47, 27, "used member of empty object")
@@ -17691,6 +18357,7 @@ Returncode tl5_compiler_M_NameMapNode_init(tl5_compiler_M_NameMapNode* self, Ref
 LUMI_cleanup:
   LUMI_dec_ref(value_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17710,6 +18377,7 @@ Returncode tl5_compiler_M_TypeInstance_copy_new(tl5_compiler_M_TypeInstance* sel
   Returncode LUMI_err = OK;
   tl5_compiler_M_TypeInstance* aux_TypeInstance_0 = NULL;
   Ref_Manager* aux_TypeInstance_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self != NULL && self_Refman->value != NULL) {
       aux_TypeInstance_0 = LUMI_alloc(sizeof(tl5_compiler_M_TypeInstance));
       if (aux_TypeInstance_0 == NULL) RAISE(17, 49, "insufficient memory for object dynamic allocation")
@@ -17732,6 +18400,7 @@ Returncode tl5_compiler_M_TypeInstance_copy_new(tl5_compiler_M_TypeInstance* sel
 LUMI_cleanup:
   tl5_compiler_M_TypeInstance_Del(aux_TypeInstance_0);
   LUMI_owner_dec_ref(aux_TypeInstance_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17747,6 +18416,7 @@ Returncode tl5_compiler_M_TypeInstance_copy(tl5_compiler_M_TypeInstance* self, R
   Ref_Manager* aux_List_0_Refman = NULL;
   tl5_compiler_M_TypeInstance* aux_TypeInstance_0 = NULL;
   Ref_Manager* aux_TypeInstance_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(other_Refman);
   if (self == NULL) RAISE(23, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(23, 38, "used member of outdated weak reference")
@@ -17840,6 +18510,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_List_0_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(other_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17863,6 +18534,7 @@ Returncode tl5_compiler_M_TypeInstance_parse(tl5_compiler_M_TypeInstance* self, 
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
   Int aux_Int_1 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ends_Refman);
   LUMI_inc_ref(node_Refman);
   LUMI_inc_ref(code_node_Refman);
@@ -17899,6 +18571,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(ends_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -17954,6 +18627,7 @@ Returncode tl5_compiler_M_TypeInstance_parse_name(tl5_compiler_M_TypeInstance* s
   String aux_String_9_Var = {0};
   String* aux_String_9 = NULL;
   Ref_Manager* aux_String_9_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(node_Refman);
   LUMI_inc_ref(code_node_Refman);
@@ -18157,6 +18831,7 @@ LUMI_cleanup:
   LUMI_dec_ref(code_node_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18170,6 +18845,7 @@ Returncode tl5_compiler_M_TypeInstance_add_subtype_copy(tl5_compiler_M_TypeInsta
   Ref_Manager* aux_List_0_Refman = NULL;
   tl5_compiler_M_TypeInstance* aux_TypeInstance_0 = NULL;
   Ref_Manager* aux_TypeInstance_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   if (self == NULL) RAISE(102, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(102, 38, "used member of outdated weak reference")
@@ -18199,6 +18875,7 @@ LUMI_cleanup:
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18208,10 +18885,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeInstance.analyze"
 Returncode tl5_compiler_M_TypeInstance_analyze(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
   CHECK(107, tl5_compiler_M_TypeInstance_analyze_part(self, self_Refman, node, node_Refman, node_Dynamic, true, true, false) )
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18221,10 +18900,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeInstance.link-types"
 Returncode tl5_compiler_M_TypeInstance_link_types(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
   CHECK(110, tl5_compiler_M_TypeInstance_analyze_part(self, self_Refman, node, node_Refman, node_Dynamic, true, false, true) )
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18234,10 +18915,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeInstance.analyze-lengths"
 Returncode tl5_compiler_M_TypeInstance_analyze_lengths(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic, Bool constant_length) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
   CHECK(113, tl5_compiler_M_TypeInstance_analyze_part(self, self_Refman, node, node_Refman, node_Dynamic, false, true, constant_length) )
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18252,6 +18935,7 @@ Returncode tl5_compiler_M_TypeInstance_analyze_part(tl5_compiler_M_TypeInstance*
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
   if (check_types) {
       if (self == NULL) RAISE(121, 27, "used member of empty object")
@@ -18336,6 +19020,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(sub_type_Refman);
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18373,6 +19058,7 @@ Returncode tl5_compiler_M_TypeInstance_check_parameters(tl5_compiler_M_TypeInsta
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(147, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
@@ -18555,6 +19241,7 @@ LUMI_cleanup:
   LUMI_dec_ref(dec_node_Refman);
   LUMI_dec_ref(sub_type_Refman);
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18565,6 +19252,7 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_TypeInstance_check_assign_from(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, Int access, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic, tl5_compiler_M_Expression** value, Ref_Manager** value_Refman, tl5_compiler_M_Expression_Dynamic** value_Dynamic, tl5_compiler_M_Expression** assignee, Ref_Manager** assignee_Refman, tl5_compiler_M_Expression_Dynamic** assignee_Dynamic) {
   Returncode LUMI_err = OK;
   Int bases = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
   LUMI_dec_ref(*assignee_Refman);
   *assignee_Refman = *value_Refman;
@@ -18581,6 +19269,7 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_from(tl5_compiler_M_TypeInst
     }
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18626,6 +19315,7 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_to(tl5_compiler_M_TypeInstan
   String aux_String_8_Var = {0};
   String* aux_String_8 = NULL;
   Ref_Manager* aux_String_8_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(target_Refman);
   LUMI_inc_ref(node_Refman);
   *bases = 0;
@@ -18823,7 +19513,20 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_to(tl5_compiler_M_TypeInstan
         CHECK(245, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_8, aux_String_8_Refman) )
       }
     }
-  CHECK(247, tl5_compiler_M_TypeInstance_check_sub_equal(self_type_instance, self_type_instance_Refman, target, target_Refman, node, node_Refman, node_Dynamic) )
+  if (tl5_compiler_M_glob == NULL) RAISE(247, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
+  if (target == NULL) RAISE(247, 27, "used member of empty object")
+  if (target_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
+  if (target == NULL) RAISE(247, 27, "used member of empty object")
+  if (target_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
+  if (target->type_data == NULL) RAISE(247, 27, "used member of empty object")
+  if (target->type_data_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
+  if (target->type_data->is_primitive || ((void*)target->type_data == tl5_compiler_M_glob->type_array)) {
+      CHECK(248, tl5_compiler_M_TypeInstance_check_sub_equal(self_type_instance, self_type_instance_Refman, target, target_Refman, node, node_Refman, node_Dynamic) )
+    }
+  else {
+      CHECK(250, tl5_compiler_M_TypeInstance_check_sub_assign_to(self_type_instance, self_type_instance_Refman, target, target_Refman, node, node_Refman, node_Dynamic) )
+    }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_8_Refman);
   LUMI_dec_ref(aux_String_7_Refman);
@@ -18841,6 +19544,121 @@ LUMI_cleanup:
   LUMI_dec_ref(self_type_instance_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(target_Refman);
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/global/type-instance.4.lm"
+#define LUMI_FUNC_NAME "TypeInstance.check-sub-assign-to"
+Returncode tl5_compiler_M_TypeInstance_check_sub_assign_to(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeInstance* target, Ref_Manager* target_Refman, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
+  Returncode LUMI_err = OK;
+  tl5_compiler_M_ListNode* target_sub_type = NULL;
+  Ref_Manager* target_sub_type_Refman = NULL;
+  tl5_compiler_M_ListNode* my_sub_type = NULL;
+  Ref_Manager* my_sub_type_Refman = NULL;
+  Int aux_Int_0 = 0;
+  LUMI_inc_ref(self_Refman);
+  LUMI_inc_ref(target_Refman);
+  LUMI_inc_ref(node_Refman);
+  if (target == NULL) RAISE(254, 27, "used member of empty object")
+  if (target_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
+  if (! (target->parameters != NULL && target->parameters_Refman->value != NULL)) {
+      goto LUMI_cleanup;
+    }
+  if (target == NULL) RAISE(256, 27, "used member of empty object")
+  if (target_Refman->value == NULL) RAISE(256, 38, "used member of outdated weak reference")
+  if (target->parameters == NULL) RAISE(256, 27, "used member of empty object")
+  if (target->parameters_Refman->value == NULL) RAISE(256, 38, "used member of outdated weak reference")
+  target_sub_type = target->parameters->first;
+  target_sub_type_Refman = target->parameters->first_Refman;
+  LUMI_inc_ref(target_sub_type_Refman);
+  CHECK(257, tl5_compiler_M_TypeInstance_check_has_subytpe(self, self_Refman, target_sub_type, target_sub_type_Refman, node, node_Refman, node_Dynamic) )
+  if (self == NULL) RAISE(258, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(258, 38, "used member of outdated weak reference")
+  if (self->parameters == NULL) RAISE(258, 27, "used member of empty object")
+  if (self->parameters_Refman->value == NULL) RAISE(258, 38, "used member of outdated weak reference")
+  my_sub_type = self->parameters->first;
+  my_sub_type_Refman = self->parameters->first_Refman;
+  LUMI_inc_ref(my_sub_type_Refman);
+  while (true) {
+      if (!((target_sub_type != NULL && target_sub_type_Refman->value != NULL) && (my_sub_type != NULL && my_sub_type_Refman->value != NULL))) break;
+      if (my_sub_type == NULL) RAISE(261, 27, "used member of empty object")
+      if (my_sub_type_Refman->value == NULL) RAISE(261, 38, "used member of outdated weak reference")
+      if (target_sub_type == NULL) RAISE(263, 27, "used member of empty object")
+      if (target_sub_type_Refman->value == NULL) RAISE(263, 38, "used member of outdated weak reference")
+      CHECK(261, tl5_compiler_M_TypeInstance_check_assign_to(my_sub_type->item, my_sub_type->item_Refman, tl5_compiler_M_Access_VAR, target_sub_type->item, target_sub_type->item_Refman, tl5_compiler_M_Access_VAR, node, node_Refman, node_Dynamic, &(aux_Int_0)) )
+      if (my_sub_type == NULL) RAISE(266, 27, "used member of empty object")
+      if (my_sub_type_Refman->value == NULL) RAISE(266, 38, "used member of outdated weak reference")
+      LUMI_dec_ref(my_sub_type_Refman);
+      my_sub_type_Refman = my_sub_type->next_Refman;
+      LUMI_inc_ref(my_sub_type_Refman);
+      my_sub_type = my_sub_type->next;
+      if (target_sub_type == NULL) RAISE(267, 27, "used member of empty object")
+      if (target_sub_type_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
+      LUMI_dec_ref(target_sub_type_Refman);
+      target_sub_type_Refman = target_sub_type->next_Refman;
+      LUMI_inc_ref(target_sub_type_Refman);
+      target_sub_type = target_sub_type->next;
+    }
+LUMI_cleanup:
+  LUMI_dec_ref(my_sub_type_Refman);
+  LUMI_dec_ref(target_sub_type_Refman);
+  LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(target_Refman);
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/global/type-instance.4.lm"
+#define LUMI_FUNC_NAME "TypeInstance.check-has-subytpe"
+Returncode tl5_compiler_M_TypeInstance_check_has_subytpe(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_ListNode* target_sub_type, Ref_Manager* target_sub_type_Refman, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
+  Returncode LUMI_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
+  LUMI_inc_ref(target_sub_type_Refman);
+  LUMI_inc_ref(node_Refman);
+  if (self == NULL) RAISE(271, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(271, 38, "used member of outdated weak reference")
+  if (! (self->parameters != NULL && self->parameters_Refman->value != NULL)) {
+      aux_String_0 = &aux_String_0_Var;
+      aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+      if (aux_String_0_Refman == NULL) RAISE(273, 38, "insufficient memory for managed object")
+      aux_String_0_Var.max_length = 19;
+      aux_String_0_Var.length = 18;
+      aux_String_0_Var.values = "cannot assign type";
+      if (self == NULL) RAISE(274, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
+      if (self->type_data == NULL) RAISE(274, 27, "used member of empty object")
+      if (self->type_data_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
+      aux_String_1 = &aux_String_1_Var;
+      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+      if (aux_String_1_Refman == NULL) RAISE(275, 38, "insufficient memory for managed object")
+      aux_String_1_Var.max_length = 48;
+      aux_String_1_Var.length = 47;
+      aux_String_1_Var.values = "with no parameter into same type with parameter";
+      if (target_sub_type == NULL) RAISE(276, 27, "used member of empty object")
+      if (target_sub_type_Refman->value == NULL) RAISE(276, 38, "used member of outdated weak reference")
+      if (target_sub_type->item == NULL) RAISE(276, 27, "used member of empty object")
+      if (target_sub_type->item_Refman->value == NULL) RAISE(276, 38, "used member of outdated weak reference")
+      if (((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data == NULL) RAISE(276, 27, "used member of empty object")
+      if (((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data_Refman->value == NULL) RAISE(276, 38, "used member of outdated weak reference")
+      CHECK(272, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_1, aux_String_1_Refman, ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data->name, ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data->name_Refman) )
+    }
+LUMI_cleanup:
+  LUMI_dec_ref(aux_String_1_Refman);
+  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(target_sub_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18856,41 +19674,43 @@ Returncode tl5_compiler_M_TypeInstance_check_equal(tl5_compiler_M_TypeInstance* 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(other_Refman);
   LUMI_inc_ref(node_Refman);
-  if (other == NULL) RAISE(250, 27, "used member of empty object")
-  if (other_Refman->value == NULL) RAISE(250, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(250, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(250, 38, "used member of outdated weak reference")
+  if (other == NULL) RAISE(279, 27, "used member of empty object")
+  if (other_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(279, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
   if ((void*)self->type_data != other->type_data) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(252, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(281, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 19;
       aux_String_0_Var.length = 18;
       aux_String_0_Var.values = "non matching types";
-      if (self == NULL) RAISE(253, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
-      if (self->type_data == NULL) RAISE(253, 27, "used member of empty object")
-      if (self->type_data_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(282, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
+      if (self->type_data == NULL) RAISE(282, 27, "used member of empty object")
+      if (self->type_data_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(254, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(283, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 4;
       aux_String_1_Var.length = 3;
       aux_String_1_Var.values = "and";
-      if (other == NULL) RAISE(255, 27, "used member of empty object")
-      if (other_Refman->value == NULL) RAISE(255, 38, "used member of outdated weak reference")
-      if (other->type_data == NULL) RAISE(255, 27, "used member of empty object")
-      if (other->type_data_Refman->value == NULL) RAISE(255, 38, "used member of outdated weak reference")
-      CHECK(251, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_1, aux_String_1_Refman, other->type_data->name, other->type_data->name_Refman) )
+      if (other == NULL) RAISE(284, 27, "used member of empty object")
+      if (other_Refman->value == NULL) RAISE(284, 38, "used member of outdated weak reference")
+      if (other->type_data == NULL) RAISE(284, 27, "used member of empty object")
+      if (other->type_data_Refman->value == NULL) RAISE(284, 38, "used member of outdated weak reference")
+      CHECK(280, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_1, aux_String_1_Refman, other->type_data->name, other->type_data->name_Refman) )
     }
-  CHECK(256, tl5_compiler_M_TypeInstance_check_sub_equal(self, self_Refman, other, other_Refman, node, node_Refman, node_Dynamic) )
+  CHECK(285, tl5_compiler_M_TypeInstance_check_sub_equal(self, self_Refman, other, other_Refman, node, node_Refman, node_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(other_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -18910,124 +19730,92 @@ Returncode tl5_compiler_M_TypeInstance_check_sub_equal(tl5_compiler_M_TypeInstan
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
-  String aux_String_2_Var = {0};
-  String* aux_String_2 = NULL;
-  Ref_Manager* aux_String_2_Refman = NULL;
-  String aux_String_3_Var = {0};
-  String* aux_String_3 = NULL;
-  Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(target_Refman);
   LUMI_inc_ref(node_Refman);
-  if (target == NULL) RAISE(259, 27, "used member of empty object")
-  if (target_Refman->value == NULL) RAISE(259, 38, "used member of outdated weak reference")
+  if (target == NULL) RAISE(288, 27, "used member of empty object")
+  if (target_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
   if (! (target->parameters != NULL && target->parameters_Refman->value != NULL)) {
       goto LUMI_cleanup;
     }
-  if (target == NULL) RAISE(261, 27, "used member of empty object")
-  if (target_Refman->value == NULL) RAISE(261, 38, "used member of outdated weak reference")
-  if (target->parameters == NULL) RAISE(261, 27, "used member of empty object")
-  if (target->parameters_Refman->value == NULL) RAISE(261, 38, "used member of outdated weak reference")
+  if (target == NULL) RAISE(290, 27, "used member of empty object")
+  if (target_Refman->value == NULL) RAISE(290, 38, "used member of outdated weak reference")
+  if (target->parameters == NULL) RAISE(290, 27, "used member of empty object")
+  if (target->parameters_Refman->value == NULL) RAISE(290, 38, "used member of outdated weak reference")
   target_sub_type = target->parameters->first;
   target_sub_type_Refman = target->parameters->first_Refman;
   LUMI_inc_ref(target_sub_type_Refman);
-  if (self == NULL) RAISE(262, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(262, 38, "used member of outdated weak reference")
-  if (! (self->parameters != NULL && self->parameters_Refman->value != NULL)) {
-      aux_String_0 = &aux_String_0_Var;
-      aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(264, 38, "insufficient memory for managed object")
-      aux_String_0_Var.max_length = 19;
-      aux_String_0_Var.length = 18;
-      aux_String_0_Var.values = "cannot assign type";
-      if (self == NULL) RAISE(265, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
-      if (self->type_data == NULL) RAISE(265, 27, "used member of empty object")
-      if (self->type_data_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
-      aux_String_1 = &aux_String_1_Var;
-      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(266, 38, "insufficient memory for managed object")
-      aux_String_1_Var.max_length = 48;
-      aux_String_1_Var.length = 47;
-      aux_String_1_Var.values = "with no parameter into same type with parameter";
-      if (target_sub_type == NULL) RAISE(267, 27, "used member of empty object")
-      if (target_sub_type_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
-      if (target_sub_type->item == NULL) RAISE(267, 27, "used member of empty object")
-      if (target_sub_type->item_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
-      if (((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data == NULL) RAISE(267, 27, "used member of empty object")
-      if (((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
-      CHECK(263, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_1, aux_String_1_Refman, ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data->name, ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data->name_Refman) )
-    }
-  if (self == NULL) RAISE(269, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(269, 38, "used member of outdated weak reference")
-  if (self->parameters == NULL) RAISE(269, 27, "used member of empty object")
-  if (self->parameters_Refman->value == NULL) RAISE(269, 38, "used member of outdated weak reference")
+  CHECK(291, tl5_compiler_M_TypeInstance_check_has_subytpe(self, self_Refman, target_sub_type, target_sub_type_Refman, node, node_Refman, node_Dynamic) )
+  if (self == NULL) RAISE(292, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(292, 38, "used member of outdated weak reference")
+  if (self->parameters == NULL) RAISE(292, 27, "used member of empty object")
+  if (self->parameters_Refman->value == NULL) RAISE(292, 38, "used member of outdated weak reference")
   my_sub_type = self->parameters->first;
   my_sub_type_Refman = self->parameters->first_Refman;
   LUMI_inc_ref(my_sub_type_Refman);
   while (true) {
       if (!((target_sub_type != NULL && target_sub_type_Refman->value != NULL) && (my_sub_type != NULL && my_sub_type_Refman->value != NULL))) break;
-      if (target_sub_type == NULL) RAISE(272, 27, "used member of empty object")
-      if (target_sub_type_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
-      if (target_sub_type->item == NULL) RAISE(272, 27, "used member of empty object")
-      if (target_sub_type->item_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
-      if (my_sub_type == NULL) RAISE(272, 27, "used member of empty object")
-      if (my_sub_type_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
-      if (my_sub_type->item == NULL) RAISE(272, 27, "used member of empty object")
-      if (my_sub_type->item_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
+      if (target_sub_type == NULL) RAISE(295, 27, "used member of empty object")
+      if (target_sub_type_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
+      if (target_sub_type->item == NULL) RAISE(295, 27, "used member of empty object")
+      if (target_sub_type->item_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
+      if (my_sub_type == NULL) RAISE(295, 27, "used member of empty object")
+      if (my_sub_type_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
+      if (my_sub_type->item == NULL) RAISE(295, 27, "used member of empty object")
+      if (my_sub_type->item_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
       if ((void*)((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data != ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data) {
-        aux_String_2 = &aux_String_2_Var;
-        aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-        if (aux_String_2_Refman == NULL) RAISE(274, 38, "insufficient memory for managed object")
-        aux_String_2_Var.max_length = 22;
-        aux_String_2_Var.length = 21;
-        aux_String_2_Var.values = "non matching subtypes";
-        if (my_sub_type == NULL) RAISE(275, 27, "used member of empty object")
-        if (my_sub_type_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-        if (my_sub_type->item == NULL) RAISE(275, 27, "used member of empty object")
-        if (my_sub_type->item_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-        if (((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data == NULL) RAISE(275, 27, "used member of empty object")
-        if (((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-        aux_String_3 = &aux_String_3_Var;
-        aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-        if (aux_String_3_Refman == NULL) RAISE(276, 38, "insufficient memory for managed object")
-        aux_String_3_Var.max_length = 4;
-        aux_String_3_Var.length = 3;
-        aux_String_3_Var.values = "and";
-        if (target_sub_type == NULL) RAISE(277, 27, "used member of empty object")
-        if (target_sub_type_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
-        if (target_sub_type->item == NULL) RAISE(277, 27, "used member of empty object")
-        if (target_sub_type->item_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
-        if (((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data == NULL) RAISE(277, 27, "used member of empty object")
-        if (((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
-        CHECK(273, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(node, node_Refman, node_Dynamic, aux_String_2, aux_String_2_Refman, ((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data->name, ((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data->name_Refman, aux_String_3, aux_String_3_Refman, ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data->name, ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data->name_Refman) )
+        aux_String_0 = &aux_String_0_Var;
+        aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+        if (aux_String_0_Refman == NULL) RAISE(297, 38, "insufficient memory for managed object")
+        aux_String_0_Var.max_length = 22;
+        aux_String_0_Var.length = 21;
+        aux_String_0_Var.values = "non matching subtypes";
+        if (my_sub_type == NULL) RAISE(298, 27, "used member of empty object")
+        if (my_sub_type_Refman->value == NULL) RAISE(298, 38, "used member of outdated weak reference")
+        if (my_sub_type->item == NULL) RAISE(298, 27, "used member of empty object")
+        if (my_sub_type->item_Refman->value == NULL) RAISE(298, 38, "used member of outdated weak reference")
+        if (((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data == NULL) RAISE(298, 27, "used member of empty object")
+        if (((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data_Refman->value == NULL) RAISE(298, 38, "used member of outdated weak reference")
+        aux_String_1 = &aux_String_1_Var;
+        aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+        if (aux_String_1_Refman == NULL) RAISE(299, 38, "insufficient memory for managed object")
+        aux_String_1_Var.max_length = 4;
+        aux_String_1_Var.length = 3;
+        aux_String_1_Var.values = "and";
+        if (target_sub_type == NULL) RAISE(300, 27, "used member of empty object")
+        if (target_sub_type_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
+        if (target_sub_type->item == NULL) RAISE(300, 27, "used member of empty object")
+        if (target_sub_type->item_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
+        if (((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data == NULL) RAISE(300, 27, "used member of empty object")
+        if (((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
+        CHECK(296, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman, ((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data->name, ((tl5_compiler_M_TypeInstance*)(my_sub_type->item))->type_data->name_Refman, aux_String_1, aux_String_1_Refman, ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data->name, ((tl5_compiler_M_TypeInstance*)(target_sub_type->item))->type_data->name_Refman) )
       }
-      if (my_sub_type == NULL) RAISE(278, 27, "used member of empty object")
-      if (my_sub_type_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
-      if (target_sub_type == NULL) RAISE(278, 27, "used member of empty object")
-      if (target_sub_type_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
-      CHECK(278, tl5_compiler_M_TypeInstance_check_sub_equal(my_sub_type->item, my_sub_type->item_Refman, target_sub_type->item, target_sub_type->item_Refman, node, node_Refman, node_Dynamic) )
-      if (my_sub_type == NULL) RAISE(279, 27, "used member of empty object")
-      if (my_sub_type_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
+      if (my_sub_type == NULL) RAISE(301, 27, "used member of empty object")
+      if (my_sub_type_Refman->value == NULL) RAISE(301, 38, "used member of outdated weak reference")
+      if (target_sub_type == NULL) RAISE(301, 27, "used member of empty object")
+      if (target_sub_type_Refman->value == NULL) RAISE(301, 38, "used member of outdated weak reference")
+      CHECK(301, tl5_compiler_M_TypeInstance_check_sub_equal(my_sub_type->item, my_sub_type->item_Refman, target_sub_type->item, target_sub_type->item_Refman, node, node_Refman, node_Dynamic) )
+      if (my_sub_type == NULL) RAISE(302, 27, "used member of empty object")
+      if (my_sub_type_Refman->value == NULL) RAISE(302, 38, "used member of outdated weak reference")
       LUMI_dec_ref(my_sub_type_Refman);
       my_sub_type_Refman = my_sub_type->next_Refman;
       LUMI_inc_ref(my_sub_type_Refman);
       my_sub_type = my_sub_type->next;
-      if (target_sub_type == NULL) RAISE(280, 27, "used member of empty object")
-      if (target_sub_type_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
+      if (target_sub_type == NULL) RAISE(303, 27, "used member of empty object")
+      if (target_sub_type_Refman->value == NULL) RAISE(303, 38, "used member of outdated weak reference")
       LUMI_dec_ref(target_sub_type_Refman);
       target_sub_type_Refman = target_sub_type->next_Refman;
       LUMI_inc_ref(target_sub_type_Refman);
       target_sub_type = target_sub_type->next;
     }
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_3_Refman);
-  LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(my_sub_type_Refman);
   LUMI_dec_ref(target_sub_type_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(target_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19043,61 +19831,63 @@ Returncode tl5_compiler_M_TypeInstance_check_sequence(tl5_compiler_M_TypeInstanc
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
-  if (self == NULL) RAISE(284, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(284, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(284, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(284, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(284, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(284, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(283, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(283, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(307, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(307, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(307, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(306, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(306, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(306, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(306, 38, "used member of outdated weak reference")
   if ((((void*)self->type_data == tl5_compiler_M_glob->type_array) || ((void*)self->type_data == tl5_compiler_M_glob->type_string)) && (! (self->length != NULL && self->length_Refman->value != NULL))) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(285, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(308, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 28;
       aux_String_0_Var.length = 27;
       aux_String_0_Var.values = "missing length for sequence";
-      CHECK(285, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman) )
+      CHECK(308, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman) )
     }
-  if (self == NULL) RAISE(288, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
-  if (self->parameters == NULL) RAISE(288, 27, "used member of empty object")
-  if (self->parameters_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
-  if (self->parameters->first == NULL) RAISE(288, 27, "used member of empty object")
-  if (self->parameters->first_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
-  if (self->parameters->first->item == NULL) RAISE(288, 27, "used member of empty object")
-  if (self->parameters->first->item_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(287, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(287, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
-  if (self->parameters == NULL) RAISE(287, 27, "used member of empty object")
-  if (self->parameters_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
-  if (self->parameters->first == NULL) RAISE(287, 27, "used member of empty object")
-  if (self->parameters->first_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
-  if (self->parameters->first->item == NULL) RAISE(287, 27, "used member of empty object")
-  if (self->parameters->first->item_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(286, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(286, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(286, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(286, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(311, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
+  if (self->parameters == NULL) RAISE(311, 27, "used member of empty object")
+  if (self->parameters_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
+  if (self->parameters->first == NULL) RAISE(311, 27, "used member of empty object")
+  if (self->parameters->first_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
+  if (self->parameters->first->item == NULL) RAISE(311, 27, "used member of empty object")
+  if (self->parameters->first->item_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(310, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(310, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
+  if (self->parameters == NULL) RAISE(310, 27, "used member of empty object")
+  if (self->parameters_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
+  if (self->parameters->first == NULL) RAISE(310, 27, "used member of empty object")
+  if (self->parameters->first_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
+  if (self->parameters->first->item == NULL) RAISE(310, 27, "used member of empty object")
+  if (self->parameters->first->item_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(309, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(309, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(309, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(309, 38, "used member of outdated weak reference")
   if ((((void*)self->type_data == tl5_compiler_M_glob->type_array) && ((void*)((tl5_compiler_M_TypeInstance*)(self->parameters->first->item))->type_data == tl5_compiler_M_glob->type_string)) && (! (((tl5_compiler_M_TypeInstance*)(self->parameters->first->item))->length != NULL && ((tl5_compiler_M_TypeInstance*)(self->parameters->first->item))->length_Refman->value != NULL))) {
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(289, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(312, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 28;
       aux_String_1_Var.length = 27;
       aux_String_1_Var.values = "missing length for sequence";
-      CHECK(289, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_1, aux_String_1_Refman) )
+      CHECK(312, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_1, aux_String_1_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19107,13 +19897,15 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeInstance.new-replace-params"
 Returncode tl5_compiler_M_TypeInstance_new_replace_params(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeInstance* instance_type, Ref_Manager* instance_type_Refman, Int bases, tl5_compiler_M_TypeInstance** type_instance, Ref_Manager** type_instance_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(instance_type_Refman);
-  CHECK(294, tl5_compiler_M_TypeInstance_copy_new(self, self_Refman, &(*type_instance), &(*type_instance_Refman)) )
+  CHECK(317, tl5_compiler_M_TypeInstance_copy_new(self, self_Refman, &(*type_instance), &(*type_instance_Refman)) )
   if ((*type_instance) != NULL && (*type_instance_Refman)->value != NULL) {
-      CHECK(296, tl5_compiler_M_TypeInstance_replace_type_parameters(*type_instance, *type_instance_Refman, instance_type, instance_type_Refman, bases) )
+      CHECK(319, tl5_compiler_M_TypeInstance_replace_type_parameters(*type_instance, *type_instance_Refman, instance_type, instance_type_Refman, bases) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(instance_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19132,89 +19924,90 @@ Returncode tl5_compiler_M_TypeInstance_replace_type_parameters(tl5_compiler_M_Ty
   tl5_compiler_M_ListNode* node = NULL;
   Ref_Manager* node_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(instance_type_Refman);
   if (! (instance_type != NULL && instance_type_Refman->value != NULL)) {
       goto LUMI_cleanup;
     }
   if (bases > 0) {
-      if (instance_type == NULL) RAISE(304, 27, "used member of empty object")
-      if (instance_type_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
-      if (instance_type->type_data == NULL) RAISE(304, 27, "used member of empty object")
-      if (instance_type->type_data_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
-      CHECK(304, tl5_compiler_M_TypeInstance_new_replace_params(instance_type->type_data->base_type, instance_type->type_data->base_type_Refman, instance_type, instance_type_Refman, bases - 1, &(base_type), &(base_type_Refman)) )
-      CHECK(306, tl5_compiler_M_TypeInstance_replace_type_parameters(self, self_Refman, base_type, base_type_Refman, bases - 1) )
+      if (instance_type == NULL) RAISE(327, 27, "used member of empty object")
+      if (instance_type_Refman->value == NULL) RAISE(327, 38, "used member of outdated weak reference")
+      if (instance_type->type_data == NULL) RAISE(327, 27, "used member of empty object")
+      if (instance_type->type_data_Refman->value == NULL) RAISE(327, 38, "used member of outdated weak reference")
+      CHECK(327, tl5_compiler_M_TypeInstance_new_replace_params(instance_type->type_data->base_type, instance_type->type_data->base_type_Refman, instance_type, instance_type_Refman, bases - 1, &(base_type), &(base_type_Refman)) )
+      CHECK(329, tl5_compiler_M_TypeInstance_replace_type_parameters(self, self_Refman, base_type, base_type_Refman, bases - 1) )
     }
-  if (instance_type == NULL) RAISE(308, 27, "used member of empty object")
-  if (instance_type_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
-  if (instance_type->type_data == NULL) RAISE(308, 27, "used member of empty object")
-  if (instance_type->type_data_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
-  if (instance_type == NULL) RAISE(307, 27, "used member of empty object")
-  if (instance_type_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(307, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(307, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
+  if (instance_type == NULL) RAISE(331, 27, "used member of empty object")
+  if (instance_type_Refman->value == NULL) RAISE(331, 38, "used member of outdated weak reference")
+  if (instance_type->type_data == NULL) RAISE(331, 27, "used member of empty object")
+  if (instance_type->type_data_Refman->value == NULL) RAISE(331, 38, "used member of outdated weak reference")
+  if (instance_type == NULL) RAISE(330, 27, "used member of empty object")
+  if (instance_type_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(330, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(330, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
   if ((((void*)self->type_data == tl5_compiler_M_glob->type_generic) && (instance_type->parameters != NULL && instance_type->parameters_Refman->value != NULL)) && (instance_type->type_data->parameters != NULL && instance_type->type_data->parameters_Refman->value != NULL)) {
-      if (instance_type == NULL) RAISE(310, 27, "used member of empty object")
-      if (instance_type_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
-      if (instance_type->type_data == NULL) RAISE(310, 27, "used member of empty object")
-      if (instance_type->type_data_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
-      if (instance_type->type_data->parameters == NULL) RAISE(310, 27, "used member of empty object")
-      if (instance_type->type_data->parameters_Refman->value == NULL) RAISE(310, 38, "used member of outdated weak reference")
+      if (instance_type == NULL) RAISE(333, 27, "used member of empty object")
+      if (instance_type_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
+      if (instance_type->type_data == NULL) RAISE(333, 27, "used member of empty object")
+      if (instance_type->type_data_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
+      if (instance_type->type_data->parameters == NULL) RAISE(333, 27, "used member of empty object")
+      if (instance_type->type_data->parameters_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
       dec_node = instance_type->type_data->parameters->first;
       dec_node_Refman = instance_type->type_data->parameters->first_Refman;
       LUMI_inc_ref(dec_node_Refman);
-      if (instance_type == NULL) RAISE(311, 27, "used member of empty object")
-      if (instance_type_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
-      if (instance_type->parameters == NULL) RAISE(311, 27, "used member of empty object")
-      if (instance_type->parameters_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
+      if (instance_type == NULL) RAISE(334, 27, "used member of empty object")
+      if (instance_type_Refman->value == NULL) RAISE(334, 38, "used member of outdated weak reference")
+      if (instance_type->parameters == NULL) RAISE(334, 27, "used member of empty object")
+      if (instance_type->parameters_Refman->value == NULL) RAISE(334, 38, "used member of outdated weak reference")
       inst_node = instance_type->parameters->first;
       inst_node_Refman = instance_type->parameters->first_Refman;
       LUMI_inc_ref(inst_node_Refman);
       while (true) {
         if (!((dec_node != NULL && dec_node_Refman->value != NULL) && (inst_node != NULL && inst_node_Refman->value != NULL))) break;
-        if (dec_node == NULL) RAISE(314, 27, "used member of empty object")
-        if (dec_node_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(314, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
-        CHECK(314, String_equal(dec_node->item, dec_node->item_Refman, self->name, self->name_Refman, &(aux_Bool_0)) )
+        if (dec_node == NULL) RAISE(337, 27, "used member of empty object")
+        if (dec_node_Refman->value == NULL) RAISE(337, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(337, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(337, 38, "used member of outdated weak reference")
+        CHECK(337, String_equal(dec_node->item, dec_node->item_Refman, self->name, self->name_Refman, &(aux_Bool_0)) )
         if (aux_Bool_0) {
-          if (inst_node == NULL) RAISE(315, 27, "used member of empty object")
-          if (inst_node_Refman->value == NULL) RAISE(315, 38, "used member of outdated weak reference")
-          CHECK(315, tl5_compiler_M_TypeInstance_copy(inst_node->item, inst_node->item_Refman, self, self_Refman) )
+          if (inst_node == NULL) RAISE(338, 27, "used member of empty object")
+          if (inst_node_Refman->value == NULL) RAISE(338, 38, "used member of outdated weak reference")
+          CHECK(338, tl5_compiler_M_TypeInstance_copy(inst_node->item, inst_node->item_Refman, self, self_Refman) )
           if (!(false)) break;
         }
-        if (dec_node == NULL) RAISE(317, 27, "used member of empty object")
-        if (dec_node_Refman->value == NULL) RAISE(317, 38, "used member of outdated weak reference")
+        if (dec_node == NULL) RAISE(340, 27, "used member of empty object")
+        if (dec_node_Refman->value == NULL) RAISE(340, 38, "used member of outdated weak reference")
         LUMI_dec_ref(dec_node_Refman);
         dec_node_Refman = dec_node->next_Refman;
         LUMI_inc_ref(dec_node_Refman);
         dec_node = dec_node->next;
-        if (inst_node == NULL) RAISE(318, 27, "used member of empty object")
-        if (inst_node_Refman->value == NULL) RAISE(318, 38, "used member of outdated weak reference")
+        if (inst_node == NULL) RAISE(341, 27, "used member of empty object")
+        if (inst_node_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
         LUMI_dec_ref(inst_node_Refman);
         inst_node_Refman = inst_node->next_Refman;
         LUMI_inc_ref(inst_node_Refman);
         inst_node = inst_node->next;
       }
     }
-  if (self == NULL) RAISE(319, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(319, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(342, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
   if (self->parameters != NULL && self->parameters_Refman->value != NULL) {
-      if (self == NULL) RAISE(320, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(320, 38, "used member of outdated weak reference")
-      if (self->parameters == NULL) RAISE(320, 27, "used member of empty object")
-      if (self->parameters_Refman->value == NULL) RAISE(320, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(343, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(343, 38, "used member of outdated weak reference")
+      if (self->parameters == NULL) RAISE(343, 27, "used member of empty object")
+      if (self->parameters_Refman->value == NULL) RAISE(343, 38, "used member of outdated weak reference")
       node = self->parameters->first;
       node_Refman = self->parameters->first_Refman;
       LUMI_inc_ref(node_Refman);
       while (true) {
         if (!(node != NULL && node_Refman->value != NULL)) break;
-        if (node == NULL) RAISE(323, 27, "used member of empty object")
-        if (node_Refman->value == NULL) RAISE(323, 38, "used member of outdated weak reference")
-        CHECK(323, tl5_compiler_M_TypeInstance_replace_type_parameters(node->item, node->item_Refman, instance_type, instance_type_Refman, bases) )
-        if (node == NULL) RAISE(324, 27, "used member of empty object")
-        if (node_Refman->value == NULL) RAISE(324, 38, "used member of outdated weak reference")
+        if (node == NULL) RAISE(346, 27, "used member of empty object")
+        if (node_Refman->value == NULL) RAISE(346, 38, "used member of outdated weak reference")
+        CHECK(346, tl5_compiler_M_TypeInstance_replace_type_parameters(node->item, node->item_Refman, instance_type, instance_type_Refman, bases) )
+        if (node == NULL) RAISE(347, 27, "used member of empty object")
+        if (node_Refman->value == NULL) RAISE(347, 38, "used member of outdated weak reference")
         LUMI_dec_ref(node_Refman);
         node_Refman = node->next_Refman;
         LUMI_inc_ref(node_Refman);
@@ -19228,6 +20021,7 @@ LUMI_cleanup:
   tl5_compiler_M_TypeInstance_Del(base_type);
   LUMI_owner_dec_ref(base_type_Refman);
   LUMI_dec_ref(instance_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19256,6 +20050,7 @@ Returncode tl5_compiler_M_EnumData_parse_new(tl5_compiler_M_EnumData* self, Ref_
   tl5_compiler_M_EnumData* aux_EnumData_0 = NULL;
   Ref_Manager* aux_EnumData_0_Refman = NULL;
   tl5_compiler_M_EnumData_Dynamic* aux_EnumData_0_Dynamic = &tl5_compiler_M_EnumData_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_EnumData_0 = LUMI_alloc(sizeof(tl5_compiler_M_EnumData));
   if (aux_EnumData_0 == NULL) RAISE(11, 49, "insufficient memory for object dynamic allocation")
   aux_EnumData_0_Refman = LUMI_new_ref(aux_EnumData_0);
@@ -19272,6 +20067,7 @@ Returncode tl5_compiler_M_EnumData_parse_new(tl5_compiler_M_EnumData* self, Ref_
 LUMI_cleanup:
   if (aux_EnumData_0_Dynamic != NULL) aux_EnumData_0_Dynamic->_base._del(aux_EnumData_0);
   LUMI_owner_dec_ref(aux_EnumData_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19320,6 +20116,7 @@ Returncode tl5_compiler_M_EnumData_parse(tl5_compiler_M_EnumData* self, Ref_Mana
   String aux_String_8_Var = {0};
   String* aux_String_8 = NULL;
   Ref_Manager* aux_String_8_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(15, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   if (tl5_compiler_M_glob == NULL) RAISE(16, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(16, 38, "used member of outdated weak reference")
@@ -19473,6 +20270,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(value_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19489,6 +20287,7 @@ Returncode tl5_compiler_M_EnumData_has_value(tl5_compiler_M_EnumData* self, Ref_
   Ref_Manager* aux_String_0_Refman = NULL;
   Bool aux_Bool_0 = 0;
   Bool aux_Bool_1 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(value_Refman);
   *has_value = true;
   aux_String_0 = &aux_String_0_Var;
@@ -19528,6 +20327,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(value_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19537,6 +20337,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "EnumData.write-cname"
 Returncode tl5_compiler_M_EnumData_write_cname(tl5_compiler_M_EnumData* self, Ref_Manager* self_Refman, tl5_compiler_M_EnumData_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(56, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(56, 38, "used member of outdated weak reference")
   CHECK(56, tl5_compiler_M_ModuleMembers_write_prefix(self->my_module, self->my_module_Refman) )
@@ -19544,6 +20345,7 @@ Returncode tl5_compiler_M_EnumData_write_cname(tl5_compiler_M_EnumData* self, Re
   if (self_Refman->value == NULL) RAISE(57, 38, "used member of outdated weak reference")
   CHECK(57, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19573,6 +20375,7 @@ Returncode tl5_compiler_M_EnumData_write(tl5_compiler_M_EnumData* self, Ref_Mana
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(60, 38, "insufficient memory for managed object")
@@ -19650,6 +20453,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19669,6 +20473,7 @@ void tl5_compiler_M_EnumData_Del(tl5_compiler_M_EnumData* self) {
 #define LUMI_FUNC_NAME "SyntaxTreeCode.find-variable"
 Returncode tl5_compiler_M_SyntaxTreeCode_find_variable(tl5_compiler_M_SyntaxTreeCode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* self_Dynamic, String* name, Ref_Manager* name_Refman, String* module_name, Ref_Manager* module_name_Refman, tl5_compiler_M_SyntaxTreeVariable** variable, Ref_Manager** variable_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic** variable_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
   if (self == NULL) RAISE(11, 27, "used member of empty object")
@@ -19685,6 +20490,7 @@ Returncode tl5_compiler_M_SyntaxTreeCode_find_variable(tl5_compiler_M_SyntaxTree
 LUMI_cleanup:
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19694,11 +20500,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeCode.get-function"
 Returncode tl5_compiler_M_SyntaxTreeCode_get_function(tl5_compiler_M_SyntaxTreeCode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeFunction** function, Ref_Manager** function_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic** function_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->parent_Dynamic == NULL) RAISE(17, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(17, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(17, 38, "used member of outdated weak reference")
   CHECK(17, self->parent_Dynamic->get_function(self->parent, self->parent_Refman, self->parent_Dynamic, &(*function), &(*function_Refman), &(*function_Dynamic)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19711,6 +20519,7 @@ Returncode tl5_compiler_M_SyntaxTreeCode_get_parent_type(tl5_compiler_M_SyntaxTr
   tl5_compiler_M_SyntaxTreeFunction* aux_SyntaxTreeFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* aux_SyntaxTreeFunction_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(20, tl5_compiler_M_SyntaxTreeCode_get_function(self, self_Refman, self_Dynamic, &(aux_SyntaxTreeFunction_0), &(aux_SyntaxTreeFunction_0_Refman), &(aux_SyntaxTreeFunction_0_Dynamic)) )
   if (aux_SyntaxTreeFunction_0 == NULL) RAISE(20, 27, "used member of empty object")
   if (aux_SyntaxTreeFunction_0_Refman->value == NULL) RAISE(20, 38, "used member of outdated weak reference")
@@ -19721,6 +20530,7 @@ Returncode tl5_compiler_M_SyntaxTreeCode_get_parent_type(tl5_compiler_M_SyntaxTr
   *parent_type = aux_SyntaxTreeFunction_0->parent_type;
 LUMI_cleanup:
   LUMI_dec_ref(aux_SyntaxTreeFunction_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19730,10 +20540,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeCode.write-spaces"
 Returncode tl5_compiler_M_SyntaxTreeCode_write_spaces(tl5_compiler_M_SyntaxTreeCode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(23, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(23, 38, "used member of outdated weak reference")
   CHECK(23, tl5_compiler_M_SyntaxTreeBranch_write_spaces(&(self->parent->_base), self->parent_Refman, &(self->parent_Dynamic->_base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19746,6 +20558,7 @@ Returncode tl5_compiler_M_SyntaxTreeCode_read_line_break_spaces(tl5_compiler_M_S
   Int expected_spaces = 0;
   Int n = 0;
   Char aux_Char_0 = 0;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(27, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
   if (self->parent == NULL) RAISE(27, 27, "used member of empty object")
@@ -19758,6 +20571,7 @@ Returncode tl5_compiler_M_SyntaxTreeCode_read_line_break_spaces(tl5_compiler_M_S
       }
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19767,8 +20581,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeCode.is-end-point"
 Returncode tl5_compiler_M_SyntaxTreeCode_is_end_point(tl5_compiler_M_SyntaxTreeCode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCode_Dynamic* self_Dynamic, Bool* is_end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   *is_end = false;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19787,6 +20603,7 @@ Returncode tl5_compiler_M_SyntaxTreeFlowElement_init(tl5_compiler_M_SyntaxTreeFl
   tl5_compiler_M_SyntaxTreeBlock* aux_SyntaxTreeBlock_0 = NULL;
   Ref_Manager* aux_SyntaxTreeBlock_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeBlock_Dynamic* aux_SyntaxTreeBlock_0_Dynamic = &tl5_compiler_M_SyntaxTreeBlock_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   CHECK(9, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   aux_SyntaxTreeBlock_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeBlock));
@@ -19808,6 +20625,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeBlock_0_Dynamic != NULL) aux_SyntaxTreeBlock_0_Dynamic->_base._base._del(aux_SyntaxTreeBlock_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeBlock_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19817,6 +20635,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.set-parent"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_set_parent(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   if (self == NULL) RAISE(14, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
@@ -19853,6 +20672,7 @@ Returncode tl5_compiler_M_SyntaxTreeFlowElement_set_parent(tl5_compiler_M_Syntax
   CHECK(18, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->block->_base._base), self->block_Refman, &(self->block_Dynamic->_base._base)) )
 LUMI_cleanup:
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19862,6 +20682,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.parse-block"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_parse_block(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic, Bool is_loop, Char* end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (is_loop) {
       if (self == NULL) RAISE(22, 27, "used member of empty object")
       if (self_Refman->value == NULL) RAISE(22, 38, "used member of outdated weak reference")
@@ -19873,6 +20694,7 @@ Returncode tl5_compiler_M_SyntaxTreeFlowElement_parse_block(tl5_compiler_M_Synta
   if (self_Refman->value == NULL) RAISE(23, 38, "used member of outdated weak reference")
   CHECK(23, tl5_compiler_M_SyntaxTreeBlock_parse_block(self->block, self->block_Refman, self->block_Dynamic, &(*end)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19882,11 +20704,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.link-types"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_link_types(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->block_Dynamic == NULL) RAISE(26, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(26, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(26, 38, "used member of outdated weak reference")
   CHECK(26, self->block_Dynamic->_base._base.link_types(&(self->block->_base._base), self->block_Refman, &(self->block_Dynamic->_base._base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19896,11 +20720,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.analyze"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_analyze(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->block_Dynamic == NULL) RAISE(29, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(29, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(29, 38, "used member of outdated weak reference")
   CHECK(29, self->block_Dynamic->_base._base.analyze(&(self->block->_base._base), self->block_Refman, &(self->block_Dynamic->_base._base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19910,10 +20736,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.write-block"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_write_block(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(32, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(32, 38, "used member of outdated weak reference")
   CHECK(32, tl5_compiler_M_SyntaxTreeBlock_write_block(self->block, self->block_Refman, self->block_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19923,11 +20751,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.write-block-body"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_write_block_body(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->block_Dynamic == NULL) RAISE(35, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(35, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
   CHECK(35, self->block_Dynamic->write_block_body(self->block, self->block_Refman, self->block_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19947,6 +20777,7 @@ Returncode tl5_compiler_M_SyntaxTreeTry_parse_new(tl5_compiler_M_SyntaxTreeTry* 
   tl5_compiler_M_SyntaxTreeTry* aux_SyntaxTreeTry_0 = NULL;
   Ref_Manager* aux_SyntaxTreeTry_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeTry_Dynamic* aux_SyntaxTreeTry_0_Dynamic = &tl5_compiler_M_SyntaxTreeTry_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeTry_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeTry));
   if (aux_SyntaxTreeTry_0 == NULL) RAISE(12, 49, "insufficient memory for object dynamic allocation")
@@ -19966,6 +20797,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeTry_0_Dynamic != NULL) aux_SyntaxTreeTry_0_Dynamic->_base._base._base._del(aux_SyntaxTreeTry_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeTry_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -19978,6 +20810,7 @@ Returncode tl5_compiler_M_SyntaxTreeTry_analyze(tl5_compiler_M_SyntaxTreeTry* se
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(17, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(17, 38, "used member of outdated weak reference")
   if (self->_base.block == NULL) RAISE(17, 27, "used member of empty object")
@@ -19996,6 +20829,7 @@ Returncode tl5_compiler_M_SyntaxTreeTry_analyze(tl5_compiler_M_SyntaxTreeTry* se
   CHECK(19, tl5_compiler_M_SyntaxTreeFlowElement_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -20032,6 +20866,7 @@ Returncode tl5_compiler_M_SyntaxTreeTry_write(tl5_compiler_M_SyntaxTreeTry* self
   String aux_String_8_Var = {0};
   String* aux_String_8 = NULL;
   Ref_Manager* aux_String_8_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(22, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -20134,6 +20969,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -20152,6 +20988,7 @@ Returncode tl5_compiler_M_SyntaxTreeCatch_parse_new(tl5_compiler_M_SyntaxTreeCat
   tl5_compiler_M_SyntaxTreeCatch* aux_SyntaxTreeCatch_0 = NULL;
   Ref_Manager* aux_SyntaxTreeCatch_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeCatch_Dynamic* aux_SyntaxTreeCatch_0_Dynamic = &tl5_compiler_M_SyntaxTreeCatch_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeCatch_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeCatch));
   if (aux_SyntaxTreeCatch_0 == NULL) RAISE(53, 49, "insufficient memory for object dynamic allocation")
@@ -20171,6 +21008,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeCatch_0_Dynamic != NULL) aux_SyntaxTreeCatch_0_Dynamic->_base._base._base._del(aux_SyntaxTreeCatch_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeCatch_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -20183,6 +21021,7 @@ Returncode tl5_compiler_M_SyntaxTreeCatch_analyze(tl5_compiler_M_SyntaxTreeCatch
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(58, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(58, 38, "used member of outdated weak reference")
   if (self->_base.block == NULL) RAISE(58, 27, "used member of empty object")
@@ -20201,6 +21040,7 @@ Returncode tl5_compiler_M_SyntaxTreeCatch_analyze(tl5_compiler_M_SyntaxTreeCatch
   CHECK(60, tl5_compiler_M_SyntaxTreeFlowElement_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -20216,6 +21056,7 @@ Returncode tl5_compiler_M_SyntaxTreeCatch_write(tl5_compiler_M_SyntaxTreeCatch* 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(63, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -20242,6 +21083,7 @@ Returncode tl5_compiler_M_SyntaxTreeCatch_write(tl5_compiler_M_SyntaxTreeCatch* 
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -20259,6 +21101,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_parse_new(tl5_compiler_M_SyntaxTreeF
   tl5_compiler_M_SyntaxTreeForLoop* aux_SyntaxTreeForLoop_0 = NULL;
   Ref_Manager* aux_SyntaxTreeForLoop_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeForLoop_Dynamic* aux_SyntaxTreeForLoop_0_Dynamic = &tl5_compiler_M_SyntaxTreeForLoop_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeForLoop_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeForLoop));
   if (aux_SyntaxTreeForLoop_0 == NULL) RAISE(17, 49, "insufficient memory for object dynamic allocation")
@@ -20277,6 +21120,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeForLoop_0_Dynamic != NULL) aux_SyntaxTreeForLoop_0_Dynamic->_base._base._base._del(aux_SyntaxTreeForLoop_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeForLoop_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -20301,6 +21145,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_parse(tl5_compiler_M_SyntaxTreeForLo
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   CHECK(21, tl5_compiler_M_SyntaxTreeFlowElement_init(&(self->_base), self_Refman, &(self_Dynamic->_base), parent, parent_Refman, parent_Dynamic) )
   aux_String_0 = &aux_String_0_Var;
@@ -20368,6 +21213,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -20395,6 +21241,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_analyze(tl5_compiler_M_SyntaxTreeFor
   tl5_compiler_M_SyntaxTreeFunction* aux_SyntaxTreeFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* aux_SyntaxTreeFunction_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(36, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
   if (self->start != NULL && self->start_Refman->value != NULL) {
@@ -20644,6 +21491,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(item_Refman);
   tl5_compiler_M_TypeInstance_Del(type_instance);
   LUMI_owner_dec_ref(type_instance_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -20708,6 +21556,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_get_iterator_type(tl5_compiler_M_Syn
   String aux_String_15_Var = {0};
   String* aux_String_15 = NULL;
   Ref_Manager* aux_String_15_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(88, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(88, 38, "used member of outdated weak reference")
   if (self->iterator == NULL) RAISE(88, 27, "used member of empty object")
@@ -21118,6 +21967,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -21133,6 +21983,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_write(tl5_compiler_M_SyntaxTreeForLo
   tl5_compiler_M_EmptyExpression* empty = NULL;
   Ref_Manager* empty_Refman = NULL;
   tl5_compiler_M_EmptyExpression_Dynamic* empty_Dynamic = &tl5_compiler_M_EmptyExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(154, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
   if (self->iterator == NULL) RAISE(154, 27, "used member of empty object")
@@ -21208,6 +22059,7 @@ LUMI_cleanup:
   if (empty_Dynamic != NULL) empty_Dynamic->_base._base._del(empty);
   LUMI_owner_dec_ref(empty_Refman);
   LUMI_dec_ref(iterator_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -21230,6 +22082,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_write_assign(tl5_compiler_M_SyntaxTr
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(item_Refman);
   LUMI_inc_ref(parent_Refman);
   expression_node = &expression_node_Var;
@@ -21334,6 +22187,7 @@ LUMI_cleanup:
   if (value_Dynamic != NULL) value_Dynamic->_base._del(value);
   LUMI_owner_dec_ref(value_Refman);
   LUMI_dec_ref(item_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -21364,6 +22218,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_write_int_iter(tl5_compiler_M_Syntax
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(201, 38, "insufficient memory for managed object")
@@ -21451,6 +22306,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -21490,6 +22346,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_write_seq(tl5_compiler_M_SyntaxTreeF
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(222, 38, "insufficient memory for managed object")
@@ -21585,6 +22442,12 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_write_seq(tl5_compiler_M_SyntaxTreeF
   if (slice == NULL) RAISE(239, 27, "used member of empty object")
   if (slice_Refman->value == NULL) RAISE(239, 38, "used member of outdated weak reference")
   slice->_base._base.line_number = self->_base._base._base.line_number;
+  if (self == NULL) RAISE(240, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(240, 38, "used member of outdated weak reference")
+  if (slice == NULL) RAISE(240, 27, "used member of empty object")
+  if (slice_Refman->value == NULL) RAISE(240, 38, "used member of outdated weak reference")
+  if (slice->sequence != NULL) RAISE(240, 45, "non empty base class given as output argument")
+  CHECK(240, tl5_compiler_M_SymbolExpression_copy_new(self->aux_symbol, self->aux_symbol_Refman, self->aux_symbol_Dynamic, (void*)&(slice->sequence), &(slice->sequence_Refman), (void*)&(slice->sequence_Dynamic)) )
   if (slice == NULL) RAISE(241, 27, "used member of empty object")
   if (slice_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
   if (slice->index_Dynamic != NULL) slice->index_Dynamic->_base._del(slice->index);
@@ -21632,6 +22495,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(slice_Refman);
   if (index_symbol_Dynamic != NULL) index_symbol_Dynamic->_base._base._del(index_symbol);
   LUMI_owner_dec_ref(index_symbol_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -21676,6 +22540,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_write_iter(tl5_compiler_M_SyntaxTree
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(259, 38, "insufficient memory for managed object")
@@ -21855,6 +22720,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(has_arg_Refman);
   if (has_symbol_Dynamic != NULL) has_symbol_Dynamic->_base._base._del(has_symbol);
   LUMI_owner_dec_ref(has_symbol_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -21883,6 +22749,7 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_write_iter_meth(tl5_compiler_M_Synta
   tl5_compiler_M_FunctionArguments* aux_FunctionArguments_0 = NULL;
   Ref_Manager* aux_FunctionArguments_0_Refman = NULL;
   tl5_compiler_M_FunctionArguments_Dynamic* aux_FunctionArguments_0_Dynamic = &tl5_compiler_M_FunctionArguments_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(meth_Refman);
   expression_node = &expression_node_Var;
   expression_node_Refman = LUMI_new_ref(expression_node);
@@ -21911,6 +22778,12 @@ Returncode tl5_compiler_M_SyntaxTreeForLoop_write_iter_meth(tl5_compiler_M_Synta
   if (self_arg == NULL) RAISE(299, 27, "used member of empty object")
   if (self_arg_Refman->value == NULL) RAISE(299, 38, "used member of outdated weak reference")
   self_arg->is_dynamic = self->aux_symbol->_base.result_type->type_data->is_dynamic;
+  if (self == NULL) RAISE(300, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
+  if (self_arg == NULL) RAISE(300, 27, "used member of empty object")
+  if (self_arg_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
+  if (self_arg->value != NULL) RAISE(300, 45, "non empty base class given as output argument")
+  CHECK(300, tl5_compiler_M_SymbolExpression_copy_new(self->aux_symbol, self->aux_symbol_Refman, self->aux_symbol_Dynamic, (void*)&(self_arg->value), &(self_arg->value_Refman), (void*)&(self_arg->value_Dynamic)) )
   call = LUMI_alloc(sizeof(tl5_compiler_M_CallExpression));
   if (call == NULL) RAISE(302, 49, "insufficient memory for object dynamic allocation")
   call_Refman = LUMI_new_ref(call);
@@ -22072,6 +22945,7 @@ LUMI_cleanup:
   if (output_arg_Dynamic != NULL) output_arg_Dynamic->_base._base._del(output_arg);
   LUMI_owner_dec_ref(output_arg_Refman);
   LUMI_dec_ref(meth_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22099,6 +22973,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_init(tl5_compiler_M_SyntaxTreeBranch*
   Returncode LUMI_err = OK;
   tl5_compiler_M_List* aux_List_0 = NULL;
   Ref_Manager* aux_List_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_List_0 = LUMI_alloc(sizeof(tl5_compiler_M_List));
   if (aux_List_0 == NULL) RAISE(10, 49, "insufficient memory for object dynamic allocation")
   aux_List_0_Refman = LUMI_new_ref(aux_List_0);
@@ -22114,6 +22989,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_init(tl5_compiler_M_SyntaxTreeBranch*
 LUMI_cleanup:
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22126,6 +23002,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_parse_block_children(tl5_compiler_M_S
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(parent_block_Refman);
   if ((*end) != '\n') {
@@ -22148,6 +23025,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_block_Refman);
   LUMI_dec_ref(parent_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22169,6 +23047,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_parse_children(tl5_compiler_M_SyntaxT
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(parent_block_Refman);
   if (self == NULL) RAISE(25, 27, "used member of empty object")
@@ -22228,6 +23107,7 @@ LUMI_cleanup:
   LUMI_dec_ref(keyword_Refman);
   LUMI_dec_ref(parent_block_Refman);
   LUMI_dec_ref(parent_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22259,6 +23139,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_parse_if_comment(tl5_compiler_M_Synta
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(keyword_Refman);
   *is_parsed = true;
   aux_String_0 = &aux_String_0_Var;
@@ -22332,6 +23213,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(text_Refman);
   LUMI_dec_ref(keyword_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22379,6 +23261,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_parse_if_common(tl5_compiler_M_Syntax
   tl5_compiler_M_SyntaxTreeVariable* aux_SyntaxTreeVariable_2 = NULL;
   Ref_Manager* aux_SyntaxTreeVariable_2_Refman = NULL;
   tl5_compiler_M_SyntaxTreeVariable_Dynamic* aux_SyntaxTreeVariable_2_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(keyword_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(parent_block_Refman);
@@ -22505,6 +23388,7 @@ LUMI_cleanup:
   LUMI_dec_ref(parent_block_Refman);
   LUMI_dec_ref(parent_type_Refman);
   LUMI_dec_ref(keyword_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22514,10 +23398,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBranch.parse-child"
 Returncode tl5_compiler_M_SyntaxTreeBranch_parse_child(tl5_compiler_M_SyntaxTreeBranch* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBranch_Dynamic* self_Dynamic, String* keyword, Ref_Manager* keyword_Refman, Char* end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(keyword_Refman);
   USER_RAISE(131, NULL, NULL)
 LUMI_cleanup:
   LUMI_dec_ref(keyword_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22529,6 +23415,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_find_variable(tl5_compiler_M_SyntaxTr
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* child = NULL;
   Ref_Manager* child_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
   CHECK(135, tl5_compiler_M_SyntaxTreeNode_find_variable(&(self->_base), self_Refman, &(self_Dynamic->_base), name, name_Refman, module_name, module_name_Refman, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
@@ -22565,6 +23452,7 @@ LUMI_cleanup:
   LUMI_dec_ref(child_Refman);
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22574,7 +23462,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBranch.link-types"
 Returncode tl5_compiler_M_SyntaxTreeBranch_link_types(tl5_compiler_M_SyntaxTreeBranch* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBranch_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(145, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(145, 38, "used member of outdated weak reference")
+  CHECK(145, tl5_compiler_M_SyntaxTreeNode_link_children_types(&(self->_base), self_Refman, &(self_Dynamic->_base), self->variables, self->variables_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22584,7 +23477,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBranch.analyze"
 Returncode tl5_compiler_M_SyntaxTreeBranch_analyze(tl5_compiler_M_SyntaxTreeBranch* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBranch_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(148, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
+  CHECK(148, tl5_compiler_M_SyntaxTreeNode_analyze_children(&(self->_base), self_Refman, &(self_Dynamic->_base), self->variables, self->variables_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22594,7 +23492,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBranch.write"
 Returncode tl5_compiler_M_SyntaxTreeBranch_write(tl5_compiler_M_SyntaxTreeBranch* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBranch_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(151, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
+  CHECK(151, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base), self_Refman, &(self_Dynamic->_base), self->variables, self->variables_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22604,10 +23507,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBranch.write-spaces"
 Returncode tl5_compiler_M_SyntaxTreeBranch_write_spaces(tl5_compiler_M_SyntaxTreeBranch* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBranch_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(154, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
   CHECK(154, tl5_compiler_M_write_spaces(self->indentation_spaces) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22619,6 +23524,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_write_cleanup(tl5_compiler_M_SyntaxTr
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* var_node = NULL;
   Ref_Manager* var_node_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   if (self == NULL) RAISE(157, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(157, 38, "used member of outdated weak reference")
@@ -22652,6 +23558,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_write_cleanup(tl5_compiler_M_SyntaxTr
 LUMI_cleanup:
   LUMI_dec_ref(var_node_Refman);
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22688,6 +23595,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_write_variable_cleanup(tl5_compiler_M
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(variable_Refman);
   LUMI_inc_ref(type_data_Refman);
   if (variable == NULL) RAISE(166, 27, "used member of empty object")
@@ -22812,6 +23720,7 @@ LUMI_cleanup:
   LUMI_dec_ref(item_type_data_Refman);
   LUMI_dec_ref(type_data_Refman);
   LUMI_dec_ref(variable_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -22887,6 +23796,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_write_owner_reference_cleanup(tl5_com
   String aux_String_19_Var = {0};
   String* aux_String_19 = NULL;
   Ref_Manager* aux_String_19_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(variable_Refman);
   LUMI_inc_ref(type_data_Refman);
   LUMI_inc_ref(item_type_data_Refman);
@@ -23162,6 +24072,7 @@ LUMI_cleanup:
   LUMI_dec_ref(item_type_data_Refman);
   LUMI_dec_ref(type_data_Refman);
   LUMI_dec_ref(variable_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -23180,6 +24091,7 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_block(tl5_compiler_M_SyntaxTreeB
   Returncode LUMI_err = OK;
   tl5_compiler_M_List* aux_List_0 = NULL;
   Ref_Manager* aux_List_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_List_0 = LUMI_alloc(sizeof(tl5_compiler_M_List));
   if (aux_List_0 == NULL) RAISE(45, 49, "insufficient memory for object dynamic allocation")
   aux_List_0_Refman = LUMI_new_ref(aux_List_0);
@@ -23196,6 +24108,7 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_block(tl5_compiler_M_SyntaxTreeB
 LUMI_cleanup:
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -23208,6 +24121,9 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
   tl5_compiler_M_SyntaxTreeCode* node = NULL;
   Ref_Manager* node_Refman = NULL;
   tl5_compiler_M_SyntaxTreeCode_Dynamic* node_Dynamic = NULL;
+  tl5_compiler_M_SyntaxTreeIf* owner_if = NULL;
+  Ref_Manager* owner_if_Refman = NULL;
+  tl5_compiler_M_SyntaxTreeIf_Dynamic* owner_if_Dynamic = NULL;
   tl5_compiler_M_SyntaxTreeIf* new_if = NULL;
   Ref_Manager* new_if_Refman = NULL;
   tl5_compiler_M_SyntaxTreeIf_Dynamic* new_if_Dynamic = NULL;
@@ -23371,68 +24287,81 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
   tl5_compiler_M_SyntaxTreeExpression* aux_SyntaxTreeExpression_0 = NULL;
   Ref_Manager* aux_SyntaxTreeExpression_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeExpression_Dynamic* aux_SyntaxTreeExpression_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(keyword_Refman);
-  CHECK(53, tl5_compiler_M_SyntaxTreeBlock_has_end_point(self, self_Refman, self_Dynamic, &(aux_Bool_0)) )
+  CHECK(54, tl5_compiler_M_SyntaxTreeBlock_has_end_point(self, self_Refman, self_Dynamic, &(aux_Bool_0)) )
   if (aux_Bool_0) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(54, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(55, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 17;
       aux_String_0_Var.length = 16;
       aux_String_0_Var.values = "unreachable code";
-      CHECK(54, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_0, aux_String_0_Refman) )
+      CHECK(55, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_0, aux_String_0_Refman) )
     }
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(56, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(57, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 3;
   aux_String_1_Var.length = 2;
   aux_String_1_Var.values = "if";
-  CHECK(56, String_equal(keyword, keyword_Refman, aux_String_1, aux_String_1_Refman, &(aux_Bool_1)) )
+  CHECK(57, String_equal(keyword, keyword_Refman, aux_String_1, aux_String_1_Refman, &(aux_Bool_1)) )
   if (aux_Bool_1) {
       if ((*end) != ' ') {
         aux_String_2 = &aux_String_2_Var;
         aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-        if (aux_String_2_Refman == NULL) RAISE(58, 38, "insufficient memory for managed object")
+        if (aux_String_2_Refman == NULL) RAISE(59, 38, "insufficient memory for managed object")
         aux_String_2_Var.max_length = 31;
         aux_String_2_Var.length = 30;
         aux_String_2_Var.values = "expected space after \"if\", got";
-        CHECK(58, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_2, aux_String_2_Refman, *end) )
+        CHECK(59, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_2, aux_String_2_Refman, *end) )
       }
+      CHECK(60, tl5_compiler_M_SyntaxTreeIf_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(owner_if), &(owner_if_Refman), &(owner_if_Dynamic)) )
+      LUMI_dec_ref(new_if_Refman);
+      new_if_Refman = owner_if_Refman;
+      LUMI_inc_ref(new_if_Refman);
+      new_if_Dynamic = owner_if_Dynamic;
+      new_if = owner_if;
+      if (self == NULL) RAISE(62, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(62, 38, "used member of outdated weak reference")
+      CHECK(62, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(owner_if->_base._base), owner_if_Refman, (void*)&(owner_if_Dynamic->_base._base)) )
+      owner_if = NULL;
+      owner_if_Refman = NULL;
+      owner_if_Dynamic = NULL;
     }
   else {
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-      if (aux_String_3_Refman == NULL) RAISE(62, 38, "insufficient memory for managed object")
+      if (aux_String_3_Refman == NULL) RAISE(64, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 5;
       aux_String_3_Var.length = 4;
       aux_String_3_Var.values = "else";
-      CHECK(62, String_equal(keyword, keyword_Refman, aux_String_3, aux_String_3_Refman, &(aux_Bool_2)) )
+      CHECK(64, String_equal(keyword, keyword_Refman, aux_String_3, aux_String_3_Refman, &(aux_Bool_2)) )
       if (aux_Bool_2) {
-        if (self == NULL) RAISE(63, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(63, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(65, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(65, 38, "used member of outdated weak reference")
         if (! (self->previous_if != NULL && self->previous_if_Refman->value != NULL)) {
         aux_String_4 = &aux_String_4_Var;
         aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-        if (aux_String_4_Refman == NULL) RAISE(64, 38, "insufficient memory for managed object")
+        if (aux_String_4_Refman == NULL) RAISE(66, 38, "insufficient memory for managed object")
         aux_String_4_Var.max_length = 31;
         aux_String_4_Var.length = 30;
         aux_String_4_Var.values = "\"else\" without a previous \"if\"";
-        CHECK(64, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_4, aux_String_4_Refman) )
+        CHECK(66, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_4, aux_String_4_Refman) )
       }
         if ((*end) != '\n') {
         aux_String_5 = &aux_String_5_Var;
         aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-        if (aux_String_5_Refman == NULL) RAISE(67, 38, "insufficient memory for managed object")
+        if (aux_String_5_Refman == NULL) RAISE(69, 38, "insufficient memory for managed object")
         aux_String_5_Var.max_length = 36;
         aux_String_5_Var.length = 35;
         aux_String_5_Var.values = "expected new-line after \"else\", got";
-        CHECK(66, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_5, aux_String_5_Refman, *end) )
+        CHECK(68, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_5, aux_String_5_Refman, *end) )
       }
-        if (self == NULL) RAISE(68, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(68, 38, "used member of outdated weak reference")
-        CHECK(69, tl5_compiler_M_SyntaxTreeElse_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeElse_0), &(aux_SyntaxTreeElse_0_Refman), &(aux_SyntaxTreeElse_0_Dynamic)) )
-        CHECK(68, tl5_compiler_M_SyntaxTreeIf_add_else(self->previous_if, self->previous_if_Refman, self->previous_if_Dynamic, aux_SyntaxTreeElse_0, aux_SyntaxTreeElse_0_Refman, aux_SyntaxTreeElse_0_Dynamic) )
+        if (self == NULL) RAISE(70, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(70, 38, "used member of outdated weak reference")
+        CHECK(71, tl5_compiler_M_SyntaxTreeElse_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeElse_0), &(aux_SyntaxTreeElse_0_Refman), &(aux_SyntaxTreeElse_0_Dynamic)) )
+        CHECK(70, tl5_compiler_M_SyntaxTreeIf_add_else(self->previous_if, self->previous_if_Refman, self->previous_if_Dynamic, aux_SyntaxTreeElse_0, aux_SyntaxTreeElse_0_Refman, aux_SyntaxTreeElse_0_Dynamic) )
         aux_SyntaxTreeElse_0 = NULL;
         aux_SyntaxTreeElse_0_Refman = NULL;
         aux_SyntaxTreeElse_0_Dynamic = NULL;
@@ -23440,69 +24369,84 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
       else {
         aux_String_6 = &aux_String_6_Var;
         aux_String_6_Refman = LUMI_new_ref(aux_String_6);
-        if (aux_String_6_Refman == NULL) RAISE(71, 38, "insufficient memory for managed object")
+        if (aux_String_6_Refman == NULL) RAISE(73, 38, "insufficient memory for managed object")
         aux_String_6_Var.max_length = 8;
         aux_String_6_Var.length = 7;
         aux_String_6_Var.values = "else-if";
-        CHECK(71, String_equal(keyword, keyword_Refman, aux_String_6, aux_String_6_Refman, &(aux_Bool_3)) )
+        CHECK(73, String_equal(keyword, keyword_Refman, aux_String_6, aux_String_6_Refman, &(aux_Bool_3)) )
         if (aux_Bool_3) {
-          if (self == NULL) RAISE(72, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(72, 38, "used member of outdated weak reference")
+          if (self == NULL) RAISE(74, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(74, 38, "used member of outdated weak reference")
           if (! (self->previous_if != NULL && self->previous_if_Refman->value != NULL)) {
         aux_String_7 = &aux_String_7_Var;
         aux_String_7_Refman = LUMI_new_ref(aux_String_7);
-        if (aux_String_7_Refman == NULL) RAISE(73, 38, "insufficient memory for managed object")
+        if (aux_String_7_Refman == NULL) RAISE(75, 38, "insufficient memory for managed object")
         aux_String_7_Var.max_length = 34;
         aux_String_7_Var.length = 33;
         aux_String_7_Var.values = "\"else-if\" without a previous \"if\"";
-        CHECK(73, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_7, aux_String_7_Refman) )
+        CHECK(75, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_7, aux_String_7_Refman) )
       }
           if ((*end) != ' ') {
         aux_String_8 = &aux_String_8_Var;
         aux_String_8_Refman = LUMI_new_ref(aux_String_8);
-        if (aux_String_8_Refman == NULL) RAISE(76, 38, "insufficient memory for managed object")
+        if (aux_String_8_Refman == NULL) RAISE(78, 38, "insufficient memory for managed object")
         aux_String_8_Var.max_length = 36;
         aux_String_8_Var.length = 35;
         aux_String_8_Var.values = "expected space after \"else-if\", got";
-        CHECK(75, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_8, aux_String_8_Refman, *end) )
+        CHECK(77, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_8, aux_String_8_Refman, *end) )
       }
-          if (tl5_compiler_M_glob == NULL) RAISE(78, 27, "used member of empty object")
-          if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(78, 38, "used member of outdated weak reference")
+          if (tl5_compiler_M_glob == NULL) RAISE(80, 27, "used member of empty object")
+          if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(80, 38, "used member of outdated weak reference")
           if (tl5_compiler_M_glob->tested_module != NULL && tl5_compiler_M_glob->tested_module_Refman->value != NULL) {
-        if (tl5_compiler_M_glob == NULL) RAISE(79, 27, "used member of empty object")
-        if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(79, 38, "used member of outdated weak reference")
-        if (tl5_compiler_M_glob->current_module == NULL) RAISE(79, 27, "used member of empty object")
-        if (tl5_compiler_M_glob->current_module_Refman->value == NULL) RAISE(79, 38, "used member of outdated weak reference")
-        if (tl5_compiler_M_glob == NULL) RAISE(79, 27, "used member of empty object")
-        if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(79, 38, "used member of outdated weak reference")
-        CHECK(79, String_equal(tl5_compiler_M_glob->current_module->name, tl5_compiler_M_glob->current_module->name_Refman, tl5_compiler_M_glob->tested_module, tl5_compiler_M_glob->tested_module_Refman, &(aux_Bool_4)) )
+        if (tl5_compiler_M_glob == NULL) RAISE(81, 27, "used member of empty object")
+        if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(81, 38, "used member of outdated weak reference")
+        if (tl5_compiler_M_glob->current_module == NULL) RAISE(81, 27, "used member of empty object")
+        if (tl5_compiler_M_glob->current_module_Refman->value == NULL) RAISE(81, 38, "used member of outdated weak reference")
+        if (tl5_compiler_M_glob == NULL) RAISE(81, 27, "used member of empty object")
+        if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(81, 38, "used member of outdated weak reference")
+        CHECK(81, String_equal(tl5_compiler_M_glob->current_module->name, tl5_compiler_M_glob->current_module->name_Refman, tl5_compiler_M_glob->tested_module, tl5_compiler_M_glob->tested_module_Refman, &(aux_Bool_4)) )
         if (aux_Bool_4) {
-          CHECK(80, tl5_compiler_M_SyntaxTreeCoverage_init_new(NULL, NULL, NULL, NULL, NULL, NULL, &(coverage_node), &(coverage_node_Refman), &(coverage_node_Dynamic)) )
+          CHECK(82, tl5_compiler_M_SyntaxTreeCoverage_init_new(NULL, NULL, NULL, NULL, NULL, NULL, &(coverage_node), &(coverage_node_Refman), &(coverage_node_Dynamic)) )
         }
       }
+          CHECK(83, tl5_compiler_M_SyntaxTreeIf_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(owner_if), &(owner_if_Refman), &(owner_if_Dynamic)) )
+          LUMI_dec_ref(new_if_Refman);
+          new_if_Refman = owner_if_Refman;
+          LUMI_inc_ref(new_if_Refman);
+          new_if_Dynamic = owner_if_Dynamic;
+          new_if = owner_if;
+          if (self == NULL) RAISE(85, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(85, 38, "used member of outdated weak reference")
+          CHECK(85, tl5_compiler_M_SyntaxTreeIf_add_else_if(self->previous_if, self->previous_if_Refman, self->previous_if_Dynamic, owner_if, owner_if_Refman, owner_if_Dynamic, coverage_node, coverage_node_Refman, coverage_node_Dynamic) )
+          owner_if = NULL;
+          owner_if_Refman = NULL;
+          owner_if_Dynamic = NULL;
+          coverage_node = NULL;
+          coverage_node_Refman = NULL;
+          coverage_node_Dynamic = NULL;
         }
         else {
           aux_String_9 = &aux_String_9_Var;
           aux_String_9_Refman = LUMI_new_ref(aux_String_9);
-          if (aux_String_9_Refman == NULL) RAISE(84, 38, "insufficient memory for managed object")
+          if (aux_String_9_Refman == NULL) RAISE(87, 38, "insufficient memory for managed object")
           aux_String_9_Var.max_length = 3;
           aux_String_9_Var.length = 2;
           aux_String_9_Var.values = "do";
-          CHECK(84, String_equal(keyword, keyword_Refman, aux_String_9, aux_String_9_Refman, &(aux_Bool_5)) )
+          CHECK(87, String_equal(keyword, keyword_Refman, aux_String_9, aux_String_9_Refman, &(aux_Bool_5)) )
           if (aux_Bool_5) {
             if ((*end) != '\n') {
         aux_String_10 = &aux_String_10_Var;
         aux_String_10_Refman = LUMI_new_ref(aux_String_10);
-        if (aux_String_10_Refman == NULL) RAISE(87, 38, "insufficient memory for managed object")
+        if (aux_String_10_Refman == NULL) RAISE(90, 38, "insufficient memory for managed object")
         aux_String_10_Var.max_length = 34;
         aux_String_10_Var.length = 33;
         aux_String_10_Var.values = "expected new-line after \"do\", got";
-        CHECK(86, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_10, aux_String_10_Refman, *end) )
+        CHECK(89, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_10, aux_String_10_Refman, *end) )
       }
-            if (self == NULL) RAISE(88, 27, "used member of empty object")
-            if (self_Refman->value == NULL) RAISE(88, 38, "used member of outdated weak reference")
-            CHECK(89, tl5_compiler_M_SyntaxTreeDoLoop_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeDoLoop_0), &(aux_SyntaxTreeDoLoop_0_Refman), &(aux_SyntaxTreeDoLoop_0_Dynamic)) )
-            CHECK(88, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeDoLoop_0->_base._base), aux_SyntaxTreeDoLoop_0_Refman, (void*)&(aux_SyntaxTreeDoLoop_0_Dynamic->_base._base)) )
+            if (self == NULL) RAISE(91, 27, "used member of empty object")
+            if (self_Refman->value == NULL) RAISE(91, 38, "used member of outdated weak reference")
+            CHECK(92, tl5_compiler_M_SyntaxTreeDoLoop_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeDoLoop_0), &(aux_SyntaxTreeDoLoop_0_Refman), &(aux_SyntaxTreeDoLoop_0_Dynamic)) )
+            CHECK(91, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeDoLoop_0->_base._base), aux_SyntaxTreeDoLoop_0_Refman, (void*)&(aux_SyntaxTreeDoLoop_0_Dynamic->_base._base)) )
             aux_SyntaxTreeDoLoop_0 = NULL;
             aux_SyntaxTreeDoLoop_0_Refman = NULL;
             aux_SyntaxTreeDoLoop_0_Dynamic = NULL;
@@ -23510,25 +24454,25 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
           else {
             aux_String_11 = &aux_String_11_Var;
             aux_String_11_Refman = LUMI_new_ref(aux_String_11);
-            if (aux_String_11_Refman == NULL) RAISE(91, 38, "insufficient memory for managed object")
+            if (aux_String_11_Refman == NULL) RAISE(94, 38, "insufficient memory for managed object")
             aux_String_11_Var.max_length = 4;
             aux_String_11_Var.length = 3;
             aux_String_11_Var.values = "for";
-            CHECK(91, String_equal(keyword, keyword_Refman, aux_String_11, aux_String_11_Refman, &(aux_Bool_6)) )
+            CHECK(94, String_equal(keyword, keyword_Refman, aux_String_11, aux_String_11_Refman, &(aux_Bool_6)) )
             if (aux_Bool_6) {
               if ((*end) != ' ') {
         aux_String_12 = &aux_String_12_Var;
         aux_String_12_Refman = LUMI_new_ref(aux_String_12);
-        if (aux_String_12_Refman == NULL) RAISE(94, 38, "insufficient memory for managed object")
+        if (aux_String_12_Refman == NULL) RAISE(97, 38, "insufficient memory for managed object")
         aux_String_12_Var.max_length = 32;
         aux_String_12_Var.length = 31;
         aux_String_12_Var.values = "expected space after \"for\", got";
-        CHECK(93, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_12, aux_String_12_Refman, *end) )
+        CHECK(96, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_12, aux_String_12_Refman, *end) )
       }
-              if (self == NULL) RAISE(95, 27, "used member of empty object")
-              if (self_Refman->value == NULL) RAISE(95, 38, "used member of outdated weak reference")
-              CHECK(96, tl5_compiler_M_SyntaxTreeForLoop_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeForLoop_0), &(aux_SyntaxTreeForLoop_0_Refman), &(aux_SyntaxTreeForLoop_0_Dynamic)) )
-              CHECK(95, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeForLoop_0->_base._base), aux_SyntaxTreeForLoop_0_Refman, (void*)&(aux_SyntaxTreeForLoop_0_Dynamic->_base._base)) )
+              if (self == NULL) RAISE(98, 27, "used member of empty object")
+              if (self_Refman->value == NULL) RAISE(98, 38, "used member of outdated weak reference")
+              CHECK(99, tl5_compiler_M_SyntaxTreeForLoop_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeForLoop_0), &(aux_SyntaxTreeForLoop_0_Refman), &(aux_SyntaxTreeForLoop_0_Dynamic)) )
+              CHECK(98, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeForLoop_0->_base._base), aux_SyntaxTreeForLoop_0_Refman, (void*)&(aux_SyntaxTreeForLoop_0_Dynamic->_base._base)) )
               aux_SyntaxTreeForLoop_0 = NULL;
               aux_SyntaxTreeForLoop_0_Refman = NULL;
               aux_SyntaxTreeForLoop_0_Dynamic = NULL;
@@ -23536,25 +24480,25 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
             else {
               aux_String_13 = &aux_String_13_Var;
               aux_String_13_Refman = LUMI_new_ref(aux_String_13);
-              if (aux_String_13_Refman == NULL) RAISE(98, 38, "insufficient memory for managed object")
+              if (aux_String_13_Refman == NULL) RAISE(101, 38, "insufficient memory for managed object")
               aux_String_13_Var.max_length = 6;
               aux_String_13_Var.length = 5;
               aux_String_13_Var.values = "while";
-              CHECK(98, String_equal(keyword, keyword_Refman, aux_String_13, aux_String_13_Refman, &(aux_Bool_7)) )
+              CHECK(101, String_equal(keyword, keyword_Refman, aux_String_13, aux_String_13_Refman, &(aux_Bool_7)) )
               if (aux_Bool_7) {
                 if ((*end) != ' ') {
         aux_String_14 = &aux_String_14_Var;
         aux_String_14_Refman = LUMI_new_ref(aux_String_14);
-        if (aux_String_14_Refman == NULL) RAISE(101, 38, "insufficient memory for managed object")
+        if (aux_String_14_Refman == NULL) RAISE(104, 38, "insufficient memory for managed object")
         aux_String_14_Var.max_length = 34;
         aux_String_14_Var.length = 33;
         aux_String_14_Var.values = "expected space after \"while\", got";
-        CHECK(100, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_14, aux_String_14_Refman, *end) )
+        CHECK(103, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_14, aux_String_14_Refman, *end) )
       }
-                if (self == NULL) RAISE(102, 27, "used member of empty object")
-                if (self_Refman->value == NULL) RAISE(102, 38, "used member of outdated weak reference")
-                CHECK(103, tl5_compiler_M_SyntaxTreeWhile_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeWhile_0), &(aux_SyntaxTreeWhile_0_Refman), &(aux_SyntaxTreeWhile_0_Dynamic)) )
-                CHECK(102, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeWhile_0->_base), aux_SyntaxTreeWhile_0_Refman, (void*)&(aux_SyntaxTreeWhile_0_Dynamic->_base)) )
+                if (self == NULL) RAISE(105, 27, "used member of empty object")
+                if (self_Refman->value == NULL) RAISE(105, 38, "used member of outdated weak reference")
+                CHECK(106, tl5_compiler_M_SyntaxTreeWhile_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeWhile_0), &(aux_SyntaxTreeWhile_0_Refman), &(aux_SyntaxTreeWhile_0_Dynamic)) )
+                CHECK(105, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeWhile_0->_base), aux_SyntaxTreeWhile_0_Refman, (void*)&(aux_SyntaxTreeWhile_0_Dynamic->_base)) )
                 aux_SyntaxTreeWhile_0 = NULL;
                 aux_SyntaxTreeWhile_0_Refman = NULL;
                 aux_SyntaxTreeWhile_0_Dynamic = NULL;
@@ -23562,25 +24506,25 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
               else {
                 aux_String_15 = &aux_String_15_Var;
                 aux_String_15_Refman = LUMI_new_ref(aux_String_15);
-                if (aux_String_15_Refman == NULL) RAISE(105, 38, "insufficient memory for managed object")
+                if (aux_String_15_Refman == NULL) RAISE(108, 38, "insufficient memory for managed object")
                 aux_String_15_Var.max_length = 9;
                 aux_String_15_Var.length = 8;
                 aux_String_15_Var.values = "continue";
-                CHECK(105, String_equal(keyword, keyword_Refman, aux_String_15, aux_String_15_Refman, &(aux_Bool_8)) )
+                CHECK(108, String_equal(keyword, keyword_Refman, aux_String_15, aux_String_15_Refman, &(aux_Bool_8)) )
                 if (aux_Bool_8) {
                   if ((*end) != '\n') {
         aux_String_16 = &aux_String_16_Var;
         aux_String_16_Refman = LUMI_new_ref(aux_String_16);
-        if (aux_String_16_Refman == NULL) RAISE(108, 38, "insufficient memory for managed object")
+        if (aux_String_16_Refman == NULL) RAISE(111, 38, "insufficient memory for managed object")
         aux_String_16_Var.max_length = 40;
         aux_String_16_Var.length = 39;
         aux_String_16_Var.values = "expected new-line after \"continue\", got";
-        CHECK(107, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_16, aux_String_16_Refman, *end) )
+        CHECK(110, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_16, aux_String_16_Refman, *end) )
       }
-                  if (self == NULL) RAISE(109, 27, "used member of empty object")
-                  if (self_Refman->value == NULL) RAISE(109, 38, "used member of outdated weak reference")
-                  CHECK(110, tl5_compiler_M_SyntaxTreeContinue_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeContinue_0), &(aux_SyntaxTreeContinue_0_Refman), &(aux_SyntaxTreeContinue_0_Dynamic)) )
-                  CHECK(109, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeContinue_0->_base), aux_SyntaxTreeContinue_0_Refman, (void*)&(aux_SyntaxTreeContinue_0_Dynamic->_base)) )
+                  if (self == NULL) RAISE(112, 27, "used member of empty object")
+                  if (self_Refman->value == NULL) RAISE(112, 38, "used member of outdated weak reference")
+                  CHECK(113, tl5_compiler_M_SyntaxTreeContinue_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeContinue_0), &(aux_SyntaxTreeContinue_0_Refman), &(aux_SyntaxTreeContinue_0_Dynamic)) )
+                  CHECK(112, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeContinue_0->_base), aux_SyntaxTreeContinue_0_Refman, (void*)&(aux_SyntaxTreeContinue_0_Dynamic->_base)) )
                   aux_SyntaxTreeContinue_0 = NULL;
                   aux_SyntaxTreeContinue_0_Refman = NULL;
                   aux_SyntaxTreeContinue_0_Dynamic = NULL;
@@ -23588,25 +24532,25 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
                 else {
                   aux_String_17 = &aux_String_17_Var;
                   aux_String_17_Refman = LUMI_new_ref(aux_String_17);
-                  if (aux_String_17_Refman == NULL) RAISE(112, 38, "insufficient memory for managed object")
+                  if (aux_String_17_Refman == NULL) RAISE(115, 38, "insufficient memory for managed object")
                   aux_String_17_Var.max_length = 7;
                   aux_String_17_Var.length = 6;
                   aux_String_17_Var.values = "return";
-                  CHECK(112, String_equal(keyword, keyword_Refman, aux_String_17, aux_String_17_Refman, &(aux_Bool_9)) )
+                  CHECK(115, String_equal(keyword, keyword_Refman, aux_String_17, aux_String_17_Refman, &(aux_Bool_9)) )
                   if (aux_Bool_9) {
                     if ((*end) != '\n') {
         aux_String_18 = &aux_String_18_Var;
         aux_String_18_Refman = LUMI_new_ref(aux_String_18);
-        if (aux_String_18_Refman == NULL) RAISE(115, 38, "insufficient memory for managed object")
+        if (aux_String_18_Refman == NULL) RAISE(118, 38, "insufficient memory for managed object")
         aux_String_18_Var.max_length = 38;
         aux_String_18_Var.length = 37;
         aux_String_18_Var.values = "expected new-line after \"return\", got";
-        CHECK(114, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_18, aux_String_18_Refman, *end) )
+        CHECK(117, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_18, aux_String_18_Refman, *end) )
       }
-                    if (self == NULL) RAISE(116, 27, "used member of empty object")
-                    if (self_Refman->value == NULL) RAISE(116, 38, "used member of outdated weak reference")
-                    CHECK(117, tl5_compiler_M_SyntaxTreeReturn_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeReturn_0), &(aux_SyntaxTreeReturn_0_Refman), &(aux_SyntaxTreeReturn_0_Dynamic)) )
-                    CHECK(116, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeReturn_0->_base), aux_SyntaxTreeReturn_0_Refman, (void*)&(aux_SyntaxTreeReturn_0_Dynamic->_base)) )
+                    if (self == NULL) RAISE(119, 27, "used member of empty object")
+                    if (self_Refman->value == NULL) RAISE(119, 38, "used member of outdated weak reference")
+                    CHECK(120, tl5_compiler_M_SyntaxTreeReturn_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeReturn_0), &(aux_SyntaxTreeReturn_0_Refman), &(aux_SyntaxTreeReturn_0_Dynamic)) )
+                    CHECK(119, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeReturn_0->_base), aux_SyntaxTreeReturn_0_Refman, (void*)&(aux_SyntaxTreeReturn_0_Dynamic->_base)) )
                     aux_SyntaxTreeReturn_0 = NULL;
                     aux_SyntaxTreeReturn_0_Refman = NULL;
                     aux_SyntaxTreeReturn_0_Dynamic = NULL;
@@ -23614,25 +24558,25 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
                   else {
                     aux_String_19 = &aux_String_19_Var;
                     aux_String_19_Refman = LUMI_new_ref(aux_String_19);
-                    if (aux_String_19_Refman == NULL) RAISE(119, 38, "insufficient memory for managed object")
+                    if (aux_String_19_Refman == NULL) RAISE(122, 38, "insufficient memory for managed object")
                     aux_String_19_Var.max_length = 6;
                     aux_String_19_Var.length = 5;
                     aux_String_19_Var.values = "raise";
-                    CHECK(119, String_equal(keyword, keyword_Refman, aux_String_19, aux_String_19_Refman, &(aux_Bool_10)) )
+                    CHECK(122, String_equal(keyword, keyword_Refman, aux_String_19, aux_String_19_Refman, &(aux_Bool_10)) )
                     if (aux_Bool_10) {
                       if (((*end) != ' ') && ((*end) != '\n')) {
         aux_String_20 = &aux_String_20_Var;
         aux_String_20_Refman = LUMI_new_ref(aux_String_20);
-        if (aux_String_20_Refman == NULL) RAISE(122, 38, "insufficient memory for managed object")
+        if (aux_String_20_Refman == NULL) RAISE(125, 38, "insufficient memory for managed object")
         aux_String_20_Var.max_length = 46;
         aux_String_20_Var.length = 45;
         aux_String_20_Var.values = "expected space or new-line after \"raise\", got";
-        CHECK(121, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_20, aux_String_20_Refman, *end) )
+        CHECK(124, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_20, aux_String_20_Refman, *end) )
       }
-                      if (self == NULL) RAISE(123, 27, "used member of empty object")
-                      if (self_Refman->value == NULL) RAISE(123, 38, "used member of outdated weak reference")
-                      CHECK(124, tl5_compiler_M_SyntaxTreeRaise_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeRaise_0), &(aux_SyntaxTreeRaise_0_Refman), &(aux_SyntaxTreeRaise_0_Dynamic)) )
-                      CHECK(123, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeRaise_0->_base), aux_SyntaxTreeRaise_0_Refman, (void*)&(aux_SyntaxTreeRaise_0_Dynamic->_base)) )
+                      if (self == NULL) RAISE(126, 27, "used member of empty object")
+                      if (self_Refman->value == NULL) RAISE(126, 38, "used member of outdated weak reference")
+                      CHECK(127, tl5_compiler_M_SyntaxTreeRaise_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeRaise_0), &(aux_SyntaxTreeRaise_0_Refman), &(aux_SyntaxTreeRaise_0_Dynamic)) )
+                      CHECK(126, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeRaise_0->_base), aux_SyntaxTreeRaise_0_Refman, (void*)&(aux_SyntaxTreeRaise_0_Dynamic->_base)) )
                       aux_SyntaxTreeRaise_0 = NULL;
                       aux_SyntaxTreeRaise_0_Refman = NULL;
                       aux_SyntaxTreeRaise_0_Dynamic = NULL;
@@ -23640,27 +24584,27 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
                     else {
                       aux_String_21 = &aux_String_21_Var;
                       aux_String_21_Refman = LUMI_new_ref(aux_String_21);
-                      if (aux_String_21_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
+                      if (aux_String_21_Refman == NULL) RAISE(129, 38, "insufficient memory for managed object")
                       aux_String_21_Var.max_length = 4;
                       aux_String_21_Var.length = 3;
                       aux_String_21_Var.values = "new";
-                      CHECK(126, String_equal(keyword, keyword_Refman, aux_String_21, aux_String_21_Refman, &(aux_Bool_11)) )
+                      CHECK(129, String_equal(keyword, keyword_Refman, aux_String_21, aux_String_21_Refman, &(aux_Bool_11)) )
                       if (aux_Bool_11) {
                         if ((*end) != ' ') {
         aux_String_22 = &aux_String_22_Var;
         aux_String_22_Refman = LUMI_new_ref(aux_String_22);
-        if (aux_String_22_Refman == NULL) RAISE(129, 38, "insufficient memory for managed object")
+        if (aux_String_22_Refman == NULL) RAISE(132, 38, "insufficient memory for managed object")
         aux_String_22_Var.max_length = 32;
         aux_String_22_Var.length = 31;
         aux_String_22_Var.values = "expected space after \"new\", got";
-        CHECK(128, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_22, aux_String_22_Refman, *end) )
+        CHECK(131, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_22, aux_String_22_Refman, *end) )
       }
-                        if (self_Dynamic == NULL) RAISE(130, 28, "dynamic call of empty object")
-                        CHECK(130, self_Dynamic->get_function(self, self_Refman, self_Dynamic, &(aux_SyntaxTreeFunction_0), &(aux_SyntaxTreeFunction_0_Refman), &(aux_SyntaxTreeFunction_0_Dynamic)) )
-                        if (aux_SyntaxTreeFunction_0 == NULL) RAISE(130, 27, "used member of empty object")
-                        if (aux_SyntaxTreeFunction_0_Refman->value == NULL) RAISE(130, 38, "used member of outdated weak reference")
-                        CHECK(130, tl5_compiler_M_SyntaxTreeVariable_parse_new(NULL, NULL, NULL, tl5_compiler_M_Access_OWNER, true, NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeVariable_0), &(aux_SyntaxTreeVariable_0_Refman), &(aux_SyntaxTreeVariable_0_Dynamic)) )
-                        CHECK(130, tl5_compiler_M_List_add(aux_SyntaxTreeFunction_0->_base._base.variables, aux_SyntaxTreeFunction_0->_base._base.variables_Refman, aux_SyntaxTreeVariable_0, aux_SyntaxTreeVariable_0_Refman, (void*)aux_SyntaxTreeVariable_0_Dynamic) )
+                        if (self_Dynamic == NULL) RAISE(133, 28, "dynamic call of empty object")
+                        CHECK(133, self_Dynamic->get_function(self, self_Refman, self_Dynamic, &(aux_SyntaxTreeFunction_0), &(aux_SyntaxTreeFunction_0_Refman), &(aux_SyntaxTreeFunction_0_Dynamic)) )
+                        if (aux_SyntaxTreeFunction_0 == NULL) RAISE(133, 27, "used member of empty object")
+                        if (aux_SyntaxTreeFunction_0_Refman->value == NULL) RAISE(133, 38, "used member of outdated weak reference")
+                        CHECK(133, tl5_compiler_M_SyntaxTreeVariable_parse_new(NULL, NULL, NULL, tl5_compiler_M_Access_OWNER, true, NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeVariable_0), &(aux_SyntaxTreeVariable_0_Refman), &(aux_SyntaxTreeVariable_0_Dynamic)) )
+                        CHECK(133, tl5_compiler_M_List_add(aux_SyntaxTreeFunction_0->_base._base.variables, aux_SyntaxTreeFunction_0->_base._base.variables_Refman, aux_SyntaxTreeVariable_0, aux_SyntaxTreeVariable_0_Refman, (void*)aux_SyntaxTreeVariable_0_Dynamic) )
                         aux_SyntaxTreeVariable_0 = NULL;
                         aux_SyntaxTreeVariable_0_Refman = NULL;
                         aux_SyntaxTreeVariable_0_Dynamic = NULL;
@@ -23668,30 +24612,30 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
                       else {
                         aux_String_23 = &aux_String_23_Var;
                         aux_String_23_Refman = LUMI_new_ref(aux_String_23);
-                        if (aux_String_23_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
+                        if (aux_String_23_Refman == NULL) RAISE(136, 38, "insufficient memory for managed object")
                         aux_String_23_Var.max_length = 4;
                         aux_String_23_Var.length = 3;
                         aux_String_23_Var.values = "try";
-                        CHECK(133, String_equal(keyword, keyword_Refman, aux_String_23, aux_String_23_Refman, &(aux_Bool_12)) )
+                        CHECK(136, String_equal(keyword, keyword_Refman, aux_String_23, aux_String_23_Refman, &(aux_Bool_12)) )
                         if (aux_Bool_12) {
                           if ((*end) != '\n') {
         aux_String_24 = &aux_String_24_Var;
         aux_String_24_Refman = LUMI_new_ref(aux_String_24);
-        if (aux_String_24_Refman == NULL) RAISE(136, 38, "insufficient memory for managed object")
+        if (aux_String_24_Refman == NULL) RAISE(139, 38, "insufficient memory for managed object")
         aux_String_24_Var.max_length = 35;
         aux_String_24_Var.length = 34;
         aux_String_24_Var.values = "expected new-line after \"try\", got";
-        CHECK(135, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_24, aux_String_24_Refman, *end) )
+        CHECK(138, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_24, aux_String_24_Refman, *end) )
       }
-                          CHECK(138, tl5_compiler_M_SyntaxTreeTry_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(try_node), &(try_node_Refman), &(try_node_Dynamic)) )
+                          CHECK(141, tl5_compiler_M_SyntaxTreeTry_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(try_node), &(try_node_Refman), &(try_node_Dynamic)) )
                           LUMI_dec_ref(new_try_Refman);
                           new_try_Refman = try_node_Refman;
                           LUMI_inc_ref(new_try_Refman);
                           new_try_Dynamic = try_node_Dynamic;
                           new_try = try_node;
-                          if (self == NULL) RAISE(140, 27, "used member of empty object")
-                          if (self_Refman->value == NULL) RAISE(140, 38, "used member of outdated weak reference")
-                          CHECK(140, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(try_node->_base._base), try_node_Refman, (void*)&(try_node_Dynamic->_base._base)) )
+                          if (self == NULL) RAISE(143, 27, "used member of empty object")
+                          if (self_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
+                          CHECK(143, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(try_node->_base._base), try_node_Refman, (void*)&(try_node_Dynamic->_base._base)) )
                           try_node = NULL;
                           try_node_Refman = NULL;
                           try_node_Dynamic = NULL;
@@ -23699,45 +24643,45 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
                         else {
                           aux_String_25 = &aux_String_25_Var;
                           aux_String_25_Refman = LUMI_new_ref(aux_String_25);
-                          if (aux_String_25_Refman == NULL) RAISE(142, 38, "insufficient memory for managed object")
+                          if (aux_String_25_Refman == NULL) RAISE(145, 38, "insufficient memory for managed object")
                           aux_String_25_Var.max_length = 6;
                           aux_String_25_Var.length = 5;
                           aux_String_25_Var.values = "catch";
-                          CHECK(142, String_equal(keyword, keyword_Refman, aux_String_25, aux_String_25_Refman, &(aux_Bool_13)) )
+                          CHECK(145, String_equal(keyword, keyword_Refman, aux_String_25, aux_String_25_Refman, &(aux_Bool_13)) )
                           if (aux_Bool_13) {
-                            if (self == NULL) RAISE(143, 27, "used member of empty object")
-                            if (self_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
+                            if (self == NULL) RAISE(146, 27, "used member of empty object")
+                            if (self_Refman->value == NULL) RAISE(146, 38, "used member of outdated weak reference")
                             if (! (self->previous_try != NULL && self->previous_try_Refman->value != NULL)) {
         aux_String_26 = &aux_String_26_Var;
         aux_String_26_Refman = LUMI_new_ref(aux_String_26);
-        if (aux_String_26_Refman == NULL) RAISE(144, 38, "insufficient memory for managed object")
+        if (aux_String_26_Refman == NULL) RAISE(147, 38, "insufficient memory for managed object")
         aux_String_26_Var.max_length = 33;
         aux_String_26_Var.length = 32;
         aux_String_26_Var.values = "\"catch\" without a previous \"try\"";
-        CHECK(144, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_26, aux_String_26_Refman) )
+        CHECK(147, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_26, aux_String_26_Refman) )
       }
                             if ((*end) != '\n') {
         aux_String_27 = &aux_String_27_Var;
         aux_String_27_Refman = LUMI_new_ref(aux_String_27);
-        if (aux_String_27_Refman == NULL) RAISE(147, 38, "insufficient memory for managed object")
+        if (aux_String_27_Refman == NULL) RAISE(150, 38, "insufficient memory for managed object")
         aux_String_27_Var.max_length = 37;
         aux_String_27_Var.length = 36;
         aux_String_27_Var.values = "expected new-line after \"catch\", got";
-        CHECK(146, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_27, aux_String_27_Refman, *end) )
+        CHECK(149, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_27, aux_String_27_Refman, *end) )
       }
-                            CHECK(149, tl5_compiler_M_SyntaxTreeCatch_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(catch_node), &(catch_node_Refman), &(catch_node_Dynamic)) )
-                            if (self == NULL) RAISE(150, 27, "used member of empty object")
-                            if (self_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
-                            if (self->previous_try == NULL) RAISE(150, 27, "used member of empty object")
-                            if (self->previous_try_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
+                            CHECK(152, tl5_compiler_M_SyntaxTreeCatch_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(catch_node), &(catch_node_Refman), &(catch_node_Dynamic)) )
+                            if (self == NULL) RAISE(153, 27, "used member of empty object")
+                            if (self_Refman->value == NULL) RAISE(153, 38, "used member of outdated weak reference")
+                            if (self->previous_try == NULL) RAISE(153, 27, "used member of empty object")
+                            if (self->previous_try_Refman->value == NULL) RAISE(153, 38, "used member of outdated weak reference")
                             LUMI_dec_ref(self->previous_try->catch_node_Refman);
                             self->previous_try->catch_node_Refman = catch_node_Refman;
                             LUMI_inc_ref(self->previous_try->catch_node_Refman);
                             self->previous_try->catch_node_Dynamic = catch_node_Dynamic;
                             self->previous_try->catch_node = catch_node;
-                            if (self == NULL) RAISE(151, 27, "used member of empty object")
-                            if (self_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
-                            CHECK(151, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(catch_node->_base._base), catch_node_Refman, (void*)&(catch_node_Dynamic->_base._base)) )
+                            if (self == NULL) RAISE(154, 27, "used member of empty object")
+                            if (self_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
+                            CHECK(154, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(catch_node->_base._base), catch_node_Refman, (void*)&(catch_node_Dynamic->_base._base)) )
                             catch_node = NULL;
                             catch_node_Refman = NULL;
                             catch_node_Dynamic = NULL;
@@ -23745,25 +24689,25 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
                           else {
                             aux_String_28 = &aux_String_28_Var;
                             aux_String_28_Refman = LUMI_new_ref(aux_String_28);
-                            if (aux_String_28_Refman == NULL) RAISE(153, 38, "insufficient memory for managed object")
+                            if (aux_String_28_Refman == NULL) RAISE(156, 38, "insufficient memory for managed object")
                             aux_String_28_Var.max_length = 7;
                             aux_String_28_Var.length = 6;
                             aux_String_28_Var.values = "assert";
-                            CHECK(153, String_equal(keyword, keyword_Refman, aux_String_28, aux_String_28_Refman, &(aux_Bool_14)) )
+                            CHECK(156, String_equal(keyword, keyword_Refman, aux_String_28, aux_String_28_Refman, &(aux_Bool_14)) )
                             if (aux_Bool_14) {
                               if ((*end) != ' ') {
         aux_String_29 = &aux_String_29_Var;
         aux_String_29_Refman = LUMI_new_ref(aux_String_29);
-        if (aux_String_29_Refman == NULL) RAISE(156, 38, "insufficient memory for managed object")
+        if (aux_String_29_Refman == NULL) RAISE(159, 38, "insufficient memory for managed object")
         aux_String_29_Var.max_length = 35;
         aux_String_29_Var.length = 34;
         aux_String_29_Var.values = "expected space after \"assert\", got";
-        CHECK(155, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_29, aux_String_29_Refman, *end) )
+        CHECK(158, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_29, aux_String_29_Refman, *end) )
       }
-                              if (self == NULL) RAISE(157, 27, "used member of empty object")
-                              if (self_Refman->value == NULL) RAISE(157, 38, "used member of outdated weak reference")
-                              CHECK(157, tl5_compiler_M_SyntaxTreeAssert_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeAssert_0), &(aux_SyntaxTreeAssert_0_Refman), &(aux_SyntaxTreeAssert_0_Dynamic)) )
-                              CHECK(157, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeAssert_0->_base), aux_SyntaxTreeAssert_0_Refman, (void*)&(aux_SyntaxTreeAssert_0_Dynamic->_base)) )
+                              if (self == NULL) RAISE(160, 27, "used member of empty object")
+                              if (self_Refman->value == NULL) RAISE(160, 38, "used member of outdated weak reference")
+                              CHECK(160, tl5_compiler_M_SyntaxTreeAssert_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeAssert_0), &(aux_SyntaxTreeAssert_0_Refman), &(aux_SyntaxTreeAssert_0_Dynamic)) )
+                              CHECK(160, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeAssert_0->_base), aux_SyntaxTreeAssert_0_Refman, (void*)&(aux_SyntaxTreeAssert_0_Dynamic->_base)) )
                               aux_SyntaxTreeAssert_0 = NULL;
                               aux_SyntaxTreeAssert_0_Refman = NULL;
                               aux_SyntaxTreeAssert_0_Dynamic = NULL;
@@ -23771,37 +24715,37 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
                             else {
                               aux_String_30 = &aux_String_30_Var;
                               aux_String_30_Refman = LUMI_new_ref(aux_String_30);
-                              if (aux_String_30_Refman == NULL) RAISE(160, 38, "insufficient memory for managed object")
+                              if (aux_String_30_Refman == NULL) RAISE(163, 38, "insufficient memory for managed object")
                               aux_String_30_Var.max_length = 13;
                               aux_String_30_Var.length = 12;
                               aux_String_30_Var.values = "assert-error";
-                              CHECK(160, String_equal(keyword, keyword_Refman, aux_String_30, aux_String_30_Refman, &(aux_Bool_15)) )
+                              CHECK(163, String_equal(keyword, keyword_Refman, aux_String_30, aux_String_30_Refman, &(aux_Bool_15)) )
                               if (aux_Bool_15) {
                                 if ((*end) != ' ') {
         aux_String_31 = &aux_String_31_Var;
         aux_String_31_Refman = LUMI_new_ref(aux_String_31);
-        if (aux_String_31_Refman == NULL) RAISE(163, 38, "insufficient memory for managed object")
+        if (aux_String_31_Refman == NULL) RAISE(166, 38, "insufficient memory for managed object")
         aux_String_31_Var.max_length = 41;
         aux_String_31_Var.length = 40;
         aux_String_31_Var.values = "expected space after \"assert-error\", got";
-        CHECK(162, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_31, aux_String_31_Refman, *end) )
+        CHECK(165, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_31, aux_String_31_Refman, *end) )
       }
-                                if (self == NULL) RAISE(164, 27, "used member of empty object")
-                                if (self_Refman->value == NULL) RAISE(164, 38, "used member of outdated weak reference")
-                                CHECK(164, tl5_compiler_M_SyntaxTreeAssertError_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeAssertError_0), &(aux_SyntaxTreeAssertError_0_Refman), &(aux_SyntaxTreeAssertError_0_Dynamic)) )
-                                CHECK(164, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeAssertError_0->_base), aux_SyntaxTreeAssertError_0_Refman, (void*)&(aux_SyntaxTreeAssertError_0_Dynamic->_base)) )
+                                if (self == NULL) RAISE(167, 27, "used member of empty object")
+                                if (self_Refman->value == NULL) RAISE(167, 38, "used member of outdated weak reference")
+                                CHECK(167, tl5_compiler_M_SyntaxTreeAssertError_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeAssertError_0), &(aux_SyntaxTreeAssertError_0_Refman), &(aux_SyntaxTreeAssertError_0_Dynamic)) )
+                                CHECK(167, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeAssertError_0->_base), aux_SyntaxTreeAssertError_0_Refman, (void*)&(aux_SyntaxTreeAssertError_0_Dynamic->_base)) )
                                 aux_SyntaxTreeAssertError_0 = NULL;
                                 aux_SyntaxTreeAssertError_0_Refman = NULL;
                                 aux_SyntaxTreeAssertError_0_Dynamic = NULL;
                               }
                               else {
-                                if (tl5_compiler_M_glob == NULL) RAISE(168, 27, "used member of empty object")
-                                if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(168, 38, "used member of outdated weak reference")
+                                if (tl5_compiler_M_glob == NULL) RAISE(171, 27, "used member of empty object")
+                                if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(171, 38, "used member of outdated weak reference")
                                 tl5_compiler_M_glob->save_input = true;
-                                if (self == NULL) RAISE(169, 27, "used member of empty object")
-                                if (self_Refman->value == NULL) RAISE(169, 38, "used member of outdated weak reference")
-                                CHECK(170, tl5_compiler_M_SyntaxTreeExpression_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeExpression_0), &(aux_SyntaxTreeExpression_0_Refman), &(aux_SyntaxTreeExpression_0_Dynamic)) )
-                                CHECK(169, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeExpression_0->_base), aux_SyntaxTreeExpression_0_Refman, (void*)&(aux_SyntaxTreeExpression_0_Dynamic->_base)) )
+                                if (self == NULL) RAISE(172, 27, "used member of empty object")
+                                if (self_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
+                                CHECK(173, tl5_compiler_M_SyntaxTreeExpression_parse_new(NULL, NULL, NULL, self, self_Refman, self_Dynamic, &(*end), &(aux_SyntaxTreeExpression_0), &(aux_SyntaxTreeExpression_0_Refman), &(aux_SyntaxTreeExpression_0_Dynamic)) )
+                                CHECK(172, tl5_compiler_M_List_add(self->code_nodes, self->code_nodes_Refman, &(aux_SyntaxTreeExpression_0->_base), aux_SyntaxTreeExpression_0_Refman, (void*)&(aux_SyntaxTreeExpression_0_Dynamic->_base)) )
                                 aux_SyntaxTreeExpression_0 = NULL;
                                 aux_SyntaxTreeExpression_0_Refman = NULL;
                                 aux_SyntaxTreeExpression_0_Dynamic = NULL;
@@ -23819,15 +24763,15 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_parse_child(tl5_compiler_M_SyntaxTreeB
         }
       }
     }
-  if (self == NULL) RAISE(172, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(172, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(175, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->previous_if_Refman);
   self->previous_if_Refman = new_if_Refman;
   LUMI_inc_ref(self->previous_if_Refman);
   self->previous_if_Dynamic = new_if_Dynamic;
   self->previous_if = new_if;
-  if (self == NULL) RAISE(173, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(176, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->previous_try_Refman);
   self->previous_try_Refman = new_try_Refman;
   LUMI_inc_ref(self->previous_try_Refman);
@@ -23897,9 +24841,12 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(coverage_node_Refman);
   LUMI_dec_ref(new_try_Refman);
   LUMI_dec_ref(new_if_Refman);
+  if (owner_if_Dynamic != NULL) owner_if_Dynamic->_base._base._base._del(owner_if);
+  LUMI_owner_dec_ref(owner_if_Refman);
   if (node_Dynamic != NULL) node_Dynamic->_base._del(node);
   LUMI_owner_dec_ref(node_Refman);
   LUMI_dec_ref(keyword_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -23909,24 +24856,26 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBlock.has-end-point"
 Returncode tl5_compiler_M_SyntaxTreeBlock_has_end_point(tl5_compiler_M_SyntaxTreeBlock* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* self_Dynamic, Bool* has_end) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(176, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
-  if (self->code_nodes == NULL) RAISE(176, 27, "used member of empty object")
-  if (self->code_nodes_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(179, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(179, 38, "used member of outdated weak reference")
+  if (self->code_nodes == NULL) RAISE(179, 27, "used member of empty object")
+  if (self->code_nodes_Refman->value == NULL) RAISE(179, 38, "used member of outdated weak reference")
   if (self->code_nodes->last != NULL && self->code_nodes->last_Refman->value != NULL) {
-      if (self->code_nodes->last->item_Dynamic == NULL) RAISE(177, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(177, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(177, 38, "used member of outdated weak reference")
-      if (self->code_nodes == NULL) RAISE(177, 27, "used member of empty object")
-      if (self->code_nodes_Refman->value == NULL) RAISE(177, 38, "used member of outdated weak reference")
-      if (self->code_nodes->last == NULL) RAISE(177, 27, "used member of empty object")
-      if (self->code_nodes->last_Refman->value == NULL) RAISE(177, 38, "used member of outdated weak reference")
-      CHECK(177, ((tl5_compiler_M_SyntaxTreeCode_Dynamic*)(self->code_nodes->last->item_Dynamic))->is_end_point(self->code_nodes->last->item, self->code_nodes->last->item_Refman, ((tl5_compiler_M_SyntaxTreeCode_Dynamic*)(self->code_nodes->last->item_Dynamic)), &(*has_end)) )
+      if (self->code_nodes->last->item_Dynamic == NULL) RAISE(180, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(180, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+      if (self->code_nodes == NULL) RAISE(180, 27, "used member of empty object")
+      if (self->code_nodes_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+      if (self->code_nodes->last == NULL) RAISE(180, 27, "used member of empty object")
+      if (self->code_nodes->last_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+      CHECK(180, ((tl5_compiler_M_SyntaxTreeCode_Dynamic*)(self->code_nodes->last->item_Dynamic))->is_end_point(self->code_nodes->last->item, self->code_nodes->last->item_Refman, ((tl5_compiler_M_SyntaxTreeCode_Dynamic*)(self->code_nodes->last->item_Dynamic)), &(*has_end)) )
     }
   else {
       *has_end = false;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -23936,20 +24885,22 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBlock.find-variable"
 Returncode tl5_compiler_M_SyntaxTreeBlock_find_variable(tl5_compiler_M_SyntaxTreeBlock* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* self_Dynamic, String* name, Ref_Manager* name_Refman, String* module_name, Ref_Manager* module_name_Refman, tl5_compiler_M_SyntaxTreeVariable** variable, Ref_Manager** variable_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic** variable_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
-  CHECK(183, tl5_compiler_M_SyntaxTreeBranch_find_variable(&(self->_base), self_Refman, &(self_Dynamic->_base), name, name_Refman, module_name, module_name_Refman, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
-  if (self == NULL) RAISE(184, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(184, 38, "used member of outdated weak reference")
+  CHECK(186, tl5_compiler_M_SyntaxTreeBranch_find_variable(&(self->_base), self_Refman, &(self_Dynamic->_base), name, name_Refman, module_name, module_name_Refman, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
+  if (self == NULL) RAISE(187, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(187, 38, "used member of outdated weak reference")
   if (((! ((*variable) != NULL && (*variable_Refman)->value != NULL)) && (self->parent != NULL && self->parent_Refman->value != NULL)) && (! (module_name != NULL && module_name_Refman->value != NULL))) {
-      if (self->parent_Dynamic == NULL) RAISE(185, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(185, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
-      CHECK(185, self->parent_Dynamic->_base._base.find_variable(&(self->parent->_base._base), self->parent_Refman, &(self->parent_Dynamic->_base._base), name, name_Refman, NULL, NULL, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
+      if (self->parent_Dynamic == NULL) RAISE(188, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(188, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
+      CHECK(188, self->parent_Dynamic->_base._base.find_variable(&(self->parent->_base._base), self->parent_Refman, &(self->parent_Dynamic->_base._base), name, name_Refman, NULL, NULL, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -23959,11 +24910,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBlock.get-function"
 Returncode tl5_compiler_M_SyntaxTreeBlock_get_function(tl5_compiler_M_SyntaxTreeBlock* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeFunction** function, Ref_Manager** function_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic** function_Dynamic) {
   Returncode LUMI_err = OK;
-  if (self->parent_Dynamic == NULL) RAISE(188, 28, "dynamic call of empty object")
-  if (self == NULL) RAISE(188, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(188, 38, "used member of outdated weak reference")
-  CHECK(188, self->parent_Dynamic->get_function(self->parent, self->parent_Refman, self->parent_Dynamic, &(*function), &(*function_Refman), &(*function_Dynamic)) )
+  LUMI_inc_ref(self_Refman);
+  if (self->parent_Dynamic == NULL) RAISE(191, 28, "dynamic call of empty object")
+  if (self == NULL) RAISE(191, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(191, 38, "used member of outdated weak reference")
+  CHECK(191, self->parent_Dynamic->get_function(self->parent, self->parent_Refman, self->parent_Dynamic, &(*function), &(*function_Refman), &(*function_Dynamic)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -23973,8 +24926,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBlock.link-types"
 Returncode tl5_compiler_M_SyntaxTreeBlock_link_types(tl5_compiler_M_SyntaxTreeBlock* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  CHECK(191, tl5_compiler_M_SyntaxTreeBranch_link_types(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(194, tl5_compiler_M_SyntaxTreeBranch_link_types(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(195, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(195, 38, "used member of outdated weak reference")
+  CHECK(195, tl5_compiler_M_SyntaxTreeNode_link_children_types(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->code_nodes, self->code_nodes_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -23984,8 +24942,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBlock.analyze"
 Returncode tl5_compiler_M_SyntaxTreeBlock_analyze(tl5_compiler_M_SyntaxTreeBlock* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  CHECK(195, tl5_compiler_M_SyntaxTreeBranch_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(198, tl5_compiler_M_SyntaxTreeBranch_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(199, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(199, 38, "used member of outdated weak reference")
+  CHECK(199, tl5_compiler_M_SyntaxTreeNode_analyze_children(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->code_nodes, self->code_nodes_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -23995,11 +24958,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBlock.write-block"
 Returncode tl5_compiler_M_SyntaxTreeBlock_write_block(tl5_compiler_M_SyntaxTreeBlock* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  CHECK(202, tl5_compiler_M_SyntaxTreeBlock_write_block_start(self, self_Refman, self_Dynamic) )
-  if (self_Dynamic == NULL) RAISE(203, 28, "dynamic call of empty object")
-  CHECK(203, self_Dynamic->write_block_body(self, self_Refman, self_Dynamic) )
-  CHECK(204, tl5_compiler_M_SyntaxTreeBlock_write_block_end(self, self_Refman, self_Dynamic) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(205, tl5_compiler_M_SyntaxTreeBlock_write_block_start(self, self_Refman, self_Dynamic) )
+  if (self_Dynamic == NULL) RAISE(206, 28, "dynamic call of empty object")
+  CHECK(206, self_Dynamic->write_block_body(self, self_Refman, self_Dynamic) )
+  CHECK(207, tl5_compiler_M_SyntaxTreeBlock_write_block_end(self, self_Refman, self_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24012,15 +24977,17 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_write_block_start(tl5_compiler_M_Synta
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(207, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(210, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 4;
   aux_String_0_Var.length = 3;
   aux_String_0_Var.values = " {\n";
-  CHECK(207, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(210, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24030,7 +24997,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeBlock.write-block-body"
 Returncode tl5_compiler_M_SyntaxTreeBlock_write_block_body(tl5_compiler_M_SyntaxTreeBlock* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(213, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(213, 38, "used member of outdated weak reference")
+  CHECK(213, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->code_nodes, self->code_nodes_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24043,18 +25015,20 @@ Returncode tl5_compiler_M_SyntaxTreeBlock_write_block_end(tl5_compiler_M_SyntaxT
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  if (self == NULL) RAISE(213, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(213, 38, "used member of outdated weak reference")
-  CHECK(213, tl5_compiler_M_write_spaces(self->_base.indentation_spaces - 2) )
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(216, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
+  CHECK(216, tl5_compiler_M_write_spaces(self->_base.indentation_spaces - 2) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(214, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(217, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
   aux_String_0_Var.values = "}\n";
-  CHECK(214, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(217, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24077,6 +25051,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_parse_new(tl5_compiler_M_SyntaxTree
   tl5_compiler_M_SyntaxTreeFunction* aux_SyntaxTreeFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* aux_SyntaxTreeFunction_0_Dynamic = &tl5_compiler_M_SyntaxTreeFunction_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_type_Refman);
   aux_SyntaxTreeFunction_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeFunction));
   if (aux_SyntaxTreeFunction_0 == NULL) RAISE(18, 49, "insufficient memory for object dynamic allocation")
@@ -24095,6 +25070,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeFunction_0_Dynamic != NULL) aux_SyntaxTreeFunction_0_Dynamic->_base._base._base._del(aux_SyntaxTreeFunction_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeFunction_0_Refman);
   LUMI_dec_ref(parent_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24121,6 +25097,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_parse(tl5_compiler_M_SyntaxTreeFunc
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_type_Refman);
   CHECK(22, tl5_compiler_M_SyntaxTreeFunction_init(self, self_Refman, self_Dynamic) )
   if (self == NULL) RAISE(23, 27, "used member of empty object")
@@ -24199,6 +25176,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(meth_type_Refman);
   LUMI_dec_ref(parent_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24210,6 +25188,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_init(tl5_compiler_M_SyntaxTreeFunct
   Returncode LUMI_err = OK;
   tl5_compiler_M_List* aux_List_0 = NULL;
   Ref_Manager* aux_List_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(41, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base)) )
   aux_List_0 = LUMI_alloc(sizeof(tl5_compiler_M_List));
   if (aux_List_0 == NULL) RAISE(42, 49, "insufficient memory for object dynamic allocation")
@@ -24226,6 +25205,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_init(tl5_compiler_M_SyntaxTreeFunct
 LUMI_cleanup:
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24235,6 +25215,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFunction.parse-body"
 Returncode tl5_compiler_M_SyntaxTreeFunction_parse_body(tl5_compiler_M_SyntaxTreeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic* self_Dynamic, Char* end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(45, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(45, 38, "used member of outdated weak reference")
   self->_base._base.indentation_spaces += 2;
@@ -24243,6 +25224,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_parse_body(tl5_compiler_M_SyntaxTre
   if (self_Refman->value == NULL) RAISE(47, 38, "used member of outdated weak reference")
   self->_base._base.indentation_spaces = 2;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24258,6 +25240,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_parse_header(tl5_compiler_M_SyntaxT
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(50, 38, "insufficient memory for managed object")
@@ -24282,6 +25265,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_parse_header(tl5_compiler_M_SyntaxT
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24302,6 +25286,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_parse_arguments(tl5_compiler_M_Synt
   tl5_compiler_M_FunctionArguments* aux_FunctionArguments_0 = NULL;
   Ref_Manager* aux_FunctionArguments_0_Refman = NULL;
   tl5_compiler_M_FunctionArguments_Dynamic* aux_FunctionArguments_0_Dynamic = &tl5_compiler_M_FunctionArguments_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_FunctionArguments_0 = LUMI_alloc(sizeof(tl5_compiler_M_FunctionArguments));
   if (aux_FunctionArguments_0 == NULL) RAISE(58, 49, "insufficient memory for object dynamic allocation")
   aux_FunctionArguments_0_Refman = LUMI_new_ref(aux_FunctionArguments_0);
@@ -24347,6 +25332,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_FunctionArguments_0_Refman);
   LUMI_dec_ref(dummy_node_Refman);
   LUMI_dec_ref(argument_factory_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24391,6 +25377,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_register_name(tl5_compiler_M_Syntax
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(69, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(69, 38, "used member of outdated weak reference")
   CHECK(69, tl5_compiler_M_is_legal_name(self->name, self->name_Refman, tl5_compiler_M_NameGroup_DEFAULT, &(aux_Bool_0)) )
@@ -24510,6 +25497,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(field_Refman);
   LUMI_dec_ref(meth_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24519,12 +25507,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFunction.get-function"
 Returncode tl5_compiler_M_SyntaxTreeFunction_get_function(tl5_compiler_M_SyntaxTreeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeFunction** function, Ref_Manager** function_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic** function_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_dec_ref(*function_Refman);
   *function_Refman = self_Refman;
   LUMI_inc_ref(*function_Refman);
   *function_Dynamic = self_Dynamic;
   *function = self;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24534,6 +25524,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFunction.get-parent-type"
 Returncode tl5_compiler_M_SyntaxTreeFunction_get_parent_type(tl5_compiler_M_SyntaxTreeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic* self_Dynamic, tl5_compiler_M_TypeData** parent_type, Ref_Manager** parent_type_Refman, tl5_compiler_M_TypeData_Dynamic** parent_type_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(97, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(97, 38, "used member of outdated weak reference")
   LUMI_dec_ref(*parent_type_Refman);
@@ -24542,6 +25533,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_get_parent_type(tl5_compiler_M_Synt
   *parent_type_Dynamic = self->parent_type_Dynamic;
   *parent_type = self->parent_type;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24568,6 +25560,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_add_aux_variable(tl5_compiler_M_Syn
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_instance_Refman);
   index = 0;
   if (self == NULL) RAISE(103, 27, "used member of empty object")
@@ -24712,6 +25705,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(type_count_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(type_instance_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24721,6 +25715,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFunction.find-variable"
 Returncode tl5_compiler_M_SyntaxTreeFunction_find_variable(tl5_compiler_M_SyntaxTreeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic* self_Dynamic, String* name, Ref_Manager* name_Refman, String* module_name, Ref_Manager* module_name_Refman, tl5_compiler_M_SyntaxTreeVariable** variable, Ref_Manager** variable_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic** variable_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
   CHECK(132, tl5_compiler_M_SyntaxTreeBlock_find_variable(&(self->_base), self_Refman, &(self_Dynamic->_base), name, name_Refman, module_name, module_name_Refman, &(*variable), &(*variable_Refman), &(*variable_Dynamic)) )
@@ -24736,6 +25731,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_find_variable(tl5_compiler_M_Syntax
 LUMI_cleanup:
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24745,6 +25741,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFunction.link-types"
 Returncode tl5_compiler_M_SyntaxTreeFunction_link_types(tl5_compiler_M_SyntaxTreeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(138, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(138, 38, "used member of outdated weak reference")
   if (self->my_module != NULL && self->my_module_Refman->value != NULL) {
@@ -24773,6 +25770,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_link_types(tl5_compiler_M_SyntaxTre
       tl5_compiler_M_glob->current_module = NULL;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24782,6 +25780,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFunction.analyze"
 Returncode tl5_compiler_M_SyntaxTreeFunction_analyze(tl5_compiler_M_SyntaxTreeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(146, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(146, 38, "used member of outdated weak reference")
   if (self->my_module != NULL && self->my_module_Refman->value != NULL) {
@@ -24793,26 +25792,24 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_analyze(tl5_compiler_M_SyntaxTreeFu
       tl5_compiler_M_glob->current_module_Refman = self->my_module_Refman;
       LUMI_inc_ref(tl5_compiler_M_glob->current_module_Refman);
       tl5_compiler_M_glob->current_module = self->my_module;
-      if (tl5_compiler_M_glob == NULL) RAISE(148, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
-      TEST_ASSERT(148, tl5_compiler_M_glob->current_module != NULL && tl5_compiler_M_glob->current_module_Refman->value != NULL)
     }
-  if (self->arguments_Dynamic == NULL) RAISE(149, 28, "dynamic call of empty object")
-  if (self == NULL) RAISE(149, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(149, 38, "used member of outdated weak reference")
-  CHECK(149, self->arguments_Dynamic->_base.analyze(&(self->arguments->_base), self->arguments_Refman, &(self->arguments_Dynamic->_base)) )
-  CHECK(150, tl5_compiler_M_SyntaxTreeBlock_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  if (self == NULL) RAISE(151, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
+  if (self->arguments_Dynamic == NULL) RAISE(148, 28, "dynamic call of empty object")
+  if (self == NULL) RAISE(148, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
+  CHECK(148, self->arguments_Dynamic->_base.analyze(&(self->arguments->_base), self->arguments_Refman, &(self->arguments_Dynamic->_base)) )
+  CHECK(149, tl5_compiler_M_SyntaxTreeBlock_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(150, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
   if (self->my_module != NULL && self->my_module_Refman->value != NULL) {
-      if (tl5_compiler_M_glob == NULL) RAISE(152, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(152, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(151, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(151, 38, "used member of outdated weak reference")
       LUMI_dec_ref(tl5_compiler_M_glob->current_module_Refman);
       tl5_compiler_M_glob->current_module_Refman = NULL;
       LUMI_inc_ref(tl5_compiler_M_glob->current_module_Refman);
       tl5_compiler_M_glob->current_module = NULL;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24825,25 +25822,27 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_compare(tl5_compiler_M_SyntaxTreeFu
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(other_Refman);
-  if (other == NULL) RAISE(155, 27, "used member of empty object")
-  if (other_Refman->value == NULL) RAISE(155, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(155, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(155, 38, "used member of outdated weak reference")
+  if (other == NULL) RAISE(154, 27, "used member of empty object")
+  if (other_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(154, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(154, 38, "used member of outdated weak reference")
   if (self->is_dynamic != other->is_dynamic) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(156, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(155, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 28;
       aux_String_0_Var.length = 27;
       aux_String_0_Var.values = "illegal dynamic in function";
-      if (self == NULL) RAISE(156, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
-      CHECK(156, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_0, aux_String_0_Refman, self->name, self->name_Refman) )
+      if (self == NULL) RAISE(155, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(155, 38, "used member of outdated weak reference")
+      CHECK(155, tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), aux_String_0, aux_String_0_Refman, self->name, self->name_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(other_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24853,11 +25852,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFunction.write"
 Returncode tl5_compiler_M_SyntaxTreeFunction_write(tl5_compiler_M_SyntaxTreeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  CHECK(167, tl5_compiler_M_write_pre_func(self, self_Refman, self_Dynamic) )
-  CHECK(168, tl5_compiler_M_SyntaxTreeFunction_write_header(self, self_Refman, self_Dynamic) )
-  CHECK(169, tl5_compiler_M_SyntaxTreeFunction_write_block(self, self_Refman, self_Dynamic) )
-  CHECK(170, tl5_compiler_M_write_post_func() )
+  LUMI_inc_ref(self_Refman);
+  CHECK(166, tl5_compiler_M_write_pre_func(self, self_Refman, self_Dynamic) )
+  CHECK(167, tl5_compiler_M_SyntaxTreeFunction_write_header(self, self_Refman, self_Dynamic) )
+  CHECK(168, tl5_compiler_M_SyntaxTreeFunction_write_block(self, self_Refman, self_Dynamic) )
+  CHECK(169, tl5_compiler_M_write_post_func() )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24870,20 +25871,22 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_write_header(tl5_compiler_M_SyntaxT
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(173, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(172, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 13;
   aux_String_0_Var.length = 12;
   aux_String_0_Var.values = "\nReturncode ";
-  CHECK(173, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-  CHECK(174, tl5_compiler_M_SyntaxTreeFunction_write_cname(self, self_Refman, self_Dynamic) )
-  if (self->arguments_Dynamic == NULL) RAISE(175, 28, "dynamic call of empty object")
-  if (self == NULL) RAISE(175, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
-  CHECK(175, self->arguments_Dynamic->_base.write(&(self->arguments->_base), self->arguments_Refman, &(self->arguments_Dynamic->_base)) )
+  CHECK(172, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(173, tl5_compiler_M_SyntaxTreeFunction_write_cname(self, self_Refman, self_Dynamic) )
+  if (self->arguments_Dynamic == NULL) RAISE(174, 28, "dynamic call of empty object")
+  if (self == NULL) RAISE(174, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
+  CHECK(174, self->arguments_Dynamic->_base.write(&(self->arguments->_base), self->arguments_Refman, &(self->arguments_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24902,38 +25905,40 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_write_block(tl5_compiler_M_SyntaxTr
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
-  CHECK(184, tl5_compiler_M_SyntaxTreeBlock_write_block_start(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(183, tl5_compiler_M_SyntaxTreeBlock_write_block_start(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(185, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(184, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 29;
   aux_String_0_Var.length = 28;
   aux_String_0_Var.values = "  Returncode LUMI_err = OK;\n";
-  CHECK(185, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-  CHECK(186, tl5_compiler_M_SyntaxTreeBranch_write(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
-  CHECK(187, tl5_compiler_M_SyntaxTreeFunction_write_setup(self, self_Refman, self_Dynamic) )
-  if (self_Dynamic == NULL) RAISE(188, 28, "dynamic call of empty object")
-  CHECK(188, self_Dynamic->_base.write_block_body(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  CHECK(184, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(185, tl5_compiler_M_SyntaxTreeBranch_write(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  CHECK(186, tl5_compiler_M_SyntaxTreeFunction_write_setup(self, self_Refman, self_Dynamic) )
+  if (self_Dynamic == NULL) RAISE(187, 28, "dynamic call of empty object")
+  CHECK(187, self_Dynamic->_base.write_block_body(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(189, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(188, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 15;
   aux_String_1_Var.length = 14;
   aux_String_1_Var.values = "LUMI_cleanup:\n";
-  CHECK(189, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
-  CHECK(190, tl5_compiler_M_SyntaxTreeFunction_write_cleanup(self, self_Refman, self_Dynamic) )
+  CHECK(188, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+  CHECK(189, tl5_compiler_M_SyntaxTreeFunction_write_cleanup(self, self_Refman, self_Dynamic) )
   aux_String_2 = &aux_String_2_Var;
   aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-  if (aux_String_2_Refman == NULL) RAISE(191, 38, "insufficient memory for managed object")
+  if (aux_String_2_Refman == NULL) RAISE(190, 38, "insufficient memory for managed object")
   aux_String_2_Var.max_length = 20;
   aux_String_2_Var.length = 19;
   aux_String_2_Var.values = "  return LUMI_err;\n";
-  CHECK(191, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
-  CHECK(192, tl5_compiler_M_SyntaxTreeBlock_write_block_end(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  CHECK(190, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+  CHECK(191, tl5_compiler_M_SyntaxTreeBlock_write_block_end(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -24954,46 +25959,47 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_write_setup(tl5_compiler_M_SyntaxTr
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
-  if (self == NULL) RAISE(195, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(195, 38, "used member of outdated weak reference")
-  if (self->arguments == NULL) RAISE(195, 27, "used member of empty object")
-  if (self->arguments_Refman->value == NULL) RAISE(195, 38, "used member of outdated weak reference")
-  if (self->arguments->parameters == NULL) RAISE(195, 27, "used member of empty object")
-  if (self->arguments->parameters_Refman->value == NULL) RAISE(195, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(194, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
+  if (self->arguments == NULL) RAISE(194, 27, "used member of empty object")
+  if (self->arguments_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
+  if (self->arguments->parameters == NULL) RAISE(194, 27, "used member of empty object")
+  if (self->arguments->parameters_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
   node = self->arguments->parameters->first;
   node_Refman = self->arguments->parameters->first_Refman;
   LUMI_inc_ref(node_Refman);
   while (true) {
       if (!(node != NULL && node_Refman->value != NULL)) break;
-      if (node == NULL) RAISE(198, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(198, 38, "used member of outdated weak reference")
-      if (node->item == NULL) RAISE(198, 27, "used member of empty object")
-      if (node->item_Refman->value == NULL) RAISE(198, 38, "used member of outdated weak reference")
+      if (node == NULL) RAISE(197, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(197, 38, "used member of outdated weak reference")
+      if (node->item == NULL) RAISE(197, 27, "used member of empty object")
+      if (node->item_Refman->value == NULL) RAISE(197, 38, "used member of outdated weak reference")
       if (((tl5_compiler_M_Argument*)(node->item))->access == tl5_compiler_M_Access_USER) {
         aux_String_0 = &aux_String_0_Var;
         aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-        if (aux_String_0_Refman == NULL) RAISE(199, 38, "insufficient memory for managed object")
+        if (aux_String_0_Refman == NULL) RAISE(198, 38, "insufficient memory for managed object")
         aux_String_0_Var.max_length = 16;
         aux_String_0_Var.length = 15;
         aux_String_0_Var.values = "  LUMI_inc_ref(";
-        CHECK(199, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-        if (node->item_Dynamic == NULL) RAISE(200, 28, "dynamic call of empty object")
-        if (node == NULL) RAISE(200, 27, "used member of empty object")
-        if (node_Refman->value == NULL) RAISE(200, 38, "used member of outdated weak reference")
-        CHECK(200, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->get_variable(node->item, node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic)), &(aux_SyntaxTreeVariable_0), &(aux_SyntaxTreeVariable_0_Refman), &(aux_SyntaxTreeVariable_0_Dynamic)) )
-        if (aux_SyntaxTreeVariable_0 == NULL) RAISE(200, 27, "used member of empty object")
-        if (aux_SyntaxTreeVariable_0_Refman->value == NULL) RAISE(200, 38, "used member of outdated weak reference")
-        CHECK(200, tl5_compiler_M_write_cname(aux_SyntaxTreeVariable_0->name, aux_SyntaxTreeVariable_0->name_Refman) )
+        CHECK(198, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+        if (node->item_Dynamic == NULL) RAISE(199, 28, "dynamic call of empty object")
+        if (node == NULL) RAISE(199, 27, "used member of empty object")
+        if (node_Refman->value == NULL) RAISE(199, 38, "used member of outdated weak reference")
+        CHECK(199, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic))->get_variable(node->item, node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(node->item_Dynamic)), &(aux_SyntaxTreeVariable_0), &(aux_SyntaxTreeVariable_0_Refman), &(aux_SyntaxTreeVariable_0_Dynamic)) )
+        if (aux_SyntaxTreeVariable_0 == NULL) RAISE(199, 27, "used member of empty object")
+        if (aux_SyntaxTreeVariable_0_Refman->value == NULL) RAISE(199, 38, "used member of outdated weak reference")
+        CHECK(199, tl5_compiler_M_write_cname(aux_SyntaxTreeVariable_0->name, aux_SyntaxTreeVariable_0->name_Refman) )
         aux_String_1 = &aux_String_1_Var;
         aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-        if (aux_String_1_Refman == NULL) RAISE(201, 38, "insufficient memory for managed object")
+        if (aux_String_1_Refman == NULL) RAISE(200, 38, "insufficient memory for managed object")
         aux_String_1_Var.max_length = 11;
         aux_String_1_Var.length = 10;
         aux_String_1_Var.values = "_Refman);\n";
-        CHECK(201, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+        CHECK(200, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
       }
-      if (node == NULL) RAISE(202, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
+      if (node == NULL) RAISE(201, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(201, 38, "used member of outdated weak reference")
       LUMI_dec_ref(node_Refman);
       node_Refman = node->next_Refman;
       LUMI_inc_ref(node_Refman);
@@ -25004,6 +26010,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_SyntaxTreeVariable_0_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25018,35 +26025,36 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_write_cleanup(tl5_compiler_M_Syntax
   tl5_compiler_M_SyntaxTreeVariable* aux_SyntaxTreeVariable_0 = NULL;
   Ref_Manager* aux_SyntaxTreeVariable_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeVariable_Dynamic* aux_SyntaxTreeVariable_0_Dynamic = NULL;
-  CHECK(205, tl5_compiler_M_SyntaxTreeBranch_write_cleanup(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), NULL, NULL, NULL) )
-  if (self == NULL) RAISE(206, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(206, 38, "used member of outdated weak reference")
-  if (self->arguments == NULL) RAISE(206, 27, "used member of empty object")
-  if (self->arguments_Refman->value == NULL) RAISE(206, 38, "used member of outdated weak reference")
-  if (self->arguments->parameters == NULL) RAISE(206, 27, "used member of empty object")
-  if (self->arguments->parameters_Refman->value == NULL) RAISE(206, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  CHECK(204, tl5_compiler_M_SyntaxTreeBranch_write_cleanup(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), NULL, NULL, NULL) )
+  if (self == NULL) RAISE(205, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
+  if (self->arguments == NULL) RAISE(205, 27, "used member of empty object")
+  if (self->arguments_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
+  if (self->arguments->parameters == NULL) RAISE(205, 27, "used member of empty object")
+  if (self->arguments->parameters_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
   param_node = self->arguments->parameters->last;
   param_node_Refman = self->arguments->parameters->last_Refman;
   LUMI_inc_ref(param_node_Refman);
   while (true) {
       if (!(param_node != NULL && param_node_Refman->value != NULL)) break;
-      if (param_node == NULL) RAISE(210, 27, "used member of empty object")
-      if (param_node_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
-      if (param_node->item == NULL) RAISE(210, 27, "used member of empty object")
-      if (param_node->item_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
       if (param_node == NULL) RAISE(209, 27, "used member of empty object")
       if (param_node_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
       if (param_node->item == NULL) RAISE(209, 27, "used member of empty object")
       if (param_node->item_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
+      if (param_node == NULL) RAISE(208, 27, "used member of empty object")
+      if (param_node_Refman->value == NULL) RAISE(208, 38, "used member of outdated weak reference")
+      if (param_node->item == NULL) RAISE(208, 27, "used member of empty object")
+      if (param_node->item_Refman->value == NULL) RAISE(208, 38, "used member of outdated weak reference")
       if ((((tl5_compiler_M_Argument*)(param_node->item))->access == tl5_compiler_M_Access_USER) || (((tl5_compiler_M_Argument*)(param_node->item))->access == tl5_compiler_M_Access_OWNER)) {
-        if (param_node->item_Dynamic == NULL) RAISE(212, 28, "dynamic call of empty object")
-        if (param_node == NULL) RAISE(212, 27, "used member of empty object")
-        if (param_node_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
-        CHECK(212, ((tl5_compiler_M_Argument_Dynamic*)(param_node->item_Dynamic))->get_variable(param_node->item, param_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(param_node->item_Dynamic)), &(aux_SyntaxTreeVariable_0), &(aux_SyntaxTreeVariable_0_Refman), &(aux_SyntaxTreeVariable_0_Dynamic)) )
-        CHECK(211, tl5_compiler_M_SyntaxTreeBranch_write_variable_cleanup(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_SyntaxTreeVariable_0, aux_SyntaxTreeVariable_0_Refman, aux_SyntaxTreeVariable_0_Dynamic, NULL, NULL, NULL) )
+        if (param_node->item_Dynamic == NULL) RAISE(211, 28, "dynamic call of empty object")
+        if (param_node == NULL) RAISE(211, 27, "used member of empty object")
+        if (param_node_Refman->value == NULL) RAISE(211, 38, "used member of outdated weak reference")
+        CHECK(211, ((tl5_compiler_M_Argument_Dynamic*)(param_node->item_Dynamic))->get_variable(param_node->item, param_node->item_Refman, ((tl5_compiler_M_Argument_Dynamic*)(param_node->item_Dynamic)), &(aux_SyntaxTreeVariable_0), &(aux_SyntaxTreeVariable_0_Refman), &(aux_SyntaxTreeVariable_0_Dynamic)) )
+        CHECK(210, tl5_compiler_M_SyntaxTreeBranch_write_variable_cleanup(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_SyntaxTreeVariable_0, aux_SyntaxTreeVariable_0_Refman, aux_SyntaxTreeVariable_0_Dynamic, NULL, NULL, NULL) )
       }
-      if (param_node == NULL) RAISE(213, 27, "used member of empty object")
-      if (param_node_Refman->value == NULL) RAISE(213, 38, "used member of outdated weak reference")
+      if (param_node == NULL) RAISE(212, 27, "used member of empty object")
+      if (param_node_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
       LUMI_dec_ref(param_node_Refman);
       param_node_Refman = param_node->prev_Refman;
       LUMI_inc_ref(param_node_Refman);
@@ -25055,6 +26063,7 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_write_cleanup(tl5_compiler_M_Syntax
 LUMI_cleanup:
   LUMI_dec_ref(aux_SyntaxTreeVariable_0_Refman);
   LUMI_dec_ref(param_node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25067,34 +26076,36 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_write_cname(tl5_compiler_M_SyntaxTr
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  if (self == NULL) RAISE(216, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(215, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
   if (self->parent_type != NULL && self->parent_type_Refman->value != NULL) {
-      if (self == NULL) RAISE(217, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
-      CHECK(217, tl5_compiler_M_TypeData_write_cname(self->parent_type, self->parent_type_Refman, self->parent_type_Dynamic) )
+      if (self == NULL) RAISE(216, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
+      CHECK(216, tl5_compiler_M_TypeData_write_cname(self->parent_type, self->parent_type_Refman, self->parent_type_Dynamic) )
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(218, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(217, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 2;
       aux_String_0_Var.length = 1;
       aux_String_0_Var.values = "_";
-      CHECK(218, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+      CHECK(217, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
     }
   else {
-      if (self == NULL) RAISE(219, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(219, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(218, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(218, 38, "used member of outdated weak reference")
       if (self->my_module != NULL && self->my_module_Refman->value != NULL) {
-        if (self == NULL) RAISE(220, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(220, 38, "used member of outdated weak reference")
-        CHECK(220, tl5_compiler_M_ModuleMembers_write_prefix(self->my_module, self->my_module_Refman) )
+        if (self == NULL) RAISE(219, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(219, 38, "used member of outdated weak reference")
+        CHECK(219, tl5_compiler_M_ModuleMembers_write_prefix(self->my_module, self->my_module_Refman) )
       }
     }
-  if (self == NULL) RAISE(221, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(221, 38, "used member of outdated weak reference")
-  CHECK(221, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
+  if (self == NULL) RAISE(220, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(220, 38, "used member of outdated weak reference")
+  CHECK(220, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25104,12 +26115,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeFunction.write-pointer"
 Returncode tl5_compiler_M_SyntaxTreeFunction_write_pointer(tl5_compiler_M_SyntaxTreeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFunction_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(224, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(224, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(224, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(224, 38, "used member of outdated weak reference")
-  CHECK(224, tl5_compiler_M_FunctionArguments_write_pointer(self->arguments, self->arguments_Refman, self->arguments_Dynamic, self->name, self->name_Refman) )
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(223, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(223, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
+  CHECK(223, tl5_compiler_M_FunctionArguments_write_pointer(self->arguments, self->arguments_Refman, self->arguments_Dynamic, self->name, self->name_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25122,16 +26135,18 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_write_declaration(tl5_compiler_M_Sy
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  CHECK(228, tl5_compiler_M_SyntaxTreeFunction_write_header(self, self_Refman, self_Dynamic) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(227, tl5_compiler_M_SyntaxTreeFunction_write_header(self, self_Refman, self_Dynamic) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(229, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(228, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
   aux_String_0_Var.values = ";\n";
-  CHECK(229, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(228, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25164,11 +26179,12 @@ Returncode tl5_compiler_M_SyntaxTreeConstructor_parse_new(tl5_compiler_M_SyntaxT
   tl5_compiler_M_SyntaxTreeConstructor* aux_SyntaxTreeConstructor_0 = NULL;
   Ref_Manager* aux_SyntaxTreeConstructor_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeConstructor_Dynamic* aux_SyntaxTreeConstructor_0_Dynamic = &tl5_compiler_M_SyntaxTreeConstructor_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_type_Refman);
   aux_SyntaxTreeConstructor_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeConstructor));
-  if (aux_SyntaxTreeConstructor_0 == NULL) RAISE(242, 49, "insufficient memory for object dynamic allocation")
+  if (aux_SyntaxTreeConstructor_0 == NULL) RAISE(241, 49, "insufficient memory for object dynamic allocation")
   aux_SyntaxTreeConstructor_0_Refman = LUMI_new_ref(aux_SyntaxTreeConstructor_0);
-  if (aux_SyntaxTreeConstructor_0_Refman == NULL) RAISE(242, 38, "insufficient memory for managed object")
+  if (aux_SyntaxTreeConstructor_0_Refman == NULL) RAISE(241, 38, "insufficient memory for managed object")
   if (*new_node_Dynamic != NULL) (*new_node_Dynamic)->_base._base._base._base._del(*new_node);
   LUMI_owner_dec_ref(*new_node_Refman);
   *new_node_Refman = aux_SyntaxTreeConstructor_0_Refman;
@@ -25177,11 +26193,12 @@ Returncode tl5_compiler_M_SyntaxTreeConstructor_parse_new(tl5_compiler_M_SyntaxT
   aux_SyntaxTreeConstructor_0 = NULL;
   aux_SyntaxTreeConstructor_0_Refman = NULL;
   aux_SyntaxTreeConstructor_0_Dynamic = NULL;
-  CHECK(243, tl5_compiler_M_SyntaxTreeConstructor_parse(*new_node, *new_node_Refman, *new_node_Dynamic, parent_type, parent_type_Refman, parent_type_Dynamic, &(*end)) )
+  CHECK(242, tl5_compiler_M_SyntaxTreeConstructor_parse(*new_node, *new_node_Refman, *new_node_Dynamic, parent_type, parent_type_Refman, parent_type_Dynamic, &(*end)) )
 LUMI_cleanup:
   if (aux_SyntaxTreeConstructor_0_Dynamic != NULL) aux_SyntaxTreeConstructor_0_Dynamic->_base._base._base._base._del(aux_SyntaxTreeConstructor_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeConstructor_0_Refman);
   LUMI_dec_ref(parent_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25194,32 +26211,34 @@ Returncode tl5_compiler_M_SyntaxTreeConstructor_parse(tl5_compiler_M_SyntaxTreeC
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_type_Refman);
-  CHECK(246, tl5_compiler_M_SyntaxTreeFunction_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  if (self == NULL) RAISE(247, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
+  CHECK(245, tl5_compiler_M_SyntaxTreeFunction_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(246, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(246, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->_base.parent_type_Refman);
   self->_base.parent_type_Refman = parent_type_Refman;
   LUMI_inc_ref(self->_base.parent_type_Refman);
   self->_base.parent_type_Dynamic = parent_type_Dynamic;
   self->_base.parent_type = parent_type;
-  if (self == NULL) RAISE(248, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(248, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(247, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(247, 38, "used member of outdated weak reference")
   self->_base._base._base.indentation_spaces = 2;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(249, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(248, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 4;
   aux_String_0_Var.length = 3;
   aux_String_0_Var.values = "new";
-  if (self == NULL) RAISE(249, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(249, 38, "used member of outdated weak reference")
-  CHECK(249, tl5_compiler_M_string_new_copy(aux_String_0, aux_String_0_Refman, &(self->_base.name), &(self->_base.name_Refman)) )
-  CHECK(250, tl5_compiler_M_SyntaxTreeFunction_parse_arguments(&(self->_base), self_Refman, &(self_Dynamic->_base), false, &(*end)) )
-  CHECK(251, tl5_compiler_M_SyntaxTreeFunction_parse_body(&(self->_base), self_Refman, &(self_Dynamic->_base), &(*end)) )
+  if (self == NULL) RAISE(248, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(248, 38, "used member of outdated weak reference")
+  CHECK(248, tl5_compiler_M_string_new_copy(aux_String_0, aux_String_0_Refman, &(self->_base.name), &(self->_base.name_Refman)) )
+  CHECK(249, tl5_compiler_M_SyntaxTreeFunction_parse_arguments(&(self->_base), self_Refman, &(self_Dynamic->_base), false, &(*end)) )
+  CHECK(250, tl5_compiler_M_SyntaxTreeFunction_parse_body(&(self->_base), self_Refman, &(self_Dynamic->_base), &(*end)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25232,24 +26251,26 @@ Returncode tl5_compiler_M_SyntaxTreeConstructor_analyze(tl5_compiler_M_SyntaxTre
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  if (self == NULL) RAISE(254, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
-  if (self->_base.arguments == NULL) RAISE(254, 27, "used member of empty object")
-  if (self->_base.arguments_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
-  if (self->_base.arguments->outputs == NULL) RAISE(254, 27, "used member of empty object")
-  if (self->_base.arguments->outputs_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(253, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
+  if (self->_base.arguments == NULL) RAISE(253, 27, "used member of empty object")
+  if (self->_base.arguments_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
+  if (self->_base.arguments->outputs == NULL) RAISE(253, 27, "used member of empty object")
+  if (self->_base.arguments->outputs_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
   if (self->_base.arguments->outputs->first != NULL && self->_base.arguments->outputs->first_Refman->value != NULL) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(255, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(254, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 25;
       aux_String_0_Var.length = 24;
       aux_String_0_Var.values = "constructor with outputs";
-      CHECK(255, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), aux_String_0, aux_String_0_Refman) )
+      CHECK(254, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), aux_String_0, aux_String_0_Refman) )
     }
-  CHECK(256, tl5_compiler_M_SyntaxTreeFunction_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  CHECK(255, tl5_compiler_M_SyntaxTreeFunction_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25270,10 +26291,11 @@ Returncode tl5_compiler_M_DeclarationArgument_copy_new(tl5_compiler_M_Declaratio
   tl5_compiler_M_SyntaxTreeVariable* aux_SyntaxTreeVariable_0 = NULL;
   Ref_Manager* aux_SyntaxTreeVariable_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeVariable_Dynamic* aux_SyntaxTreeVariable_0_Dynamic = &tl5_compiler_M_SyntaxTreeVariable_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_DeclarationArgument_0 = LUMI_alloc(sizeof(tl5_compiler_M_DeclarationArgument));
-  if (aux_DeclarationArgument_0 == NULL) RAISE(264, 49, "insufficient memory for object dynamic allocation")
+  if (aux_DeclarationArgument_0 == NULL) RAISE(263, 49, "insufficient memory for object dynamic allocation")
   aux_DeclarationArgument_0_Refman = LUMI_new_ref(aux_DeclarationArgument_0);
-  if (aux_DeclarationArgument_0_Refman == NULL) RAISE(264, 38, "insufficient memory for managed object")
+  if (aux_DeclarationArgument_0_Refman == NULL) RAISE(263, 38, "insufficient memory for managed object")
   if (*new_argument_Dynamic != NULL) (*new_argument_Dynamic)->_base._base._del(*new_argument);
   LUMI_owner_dec_ref(*new_argument_Refman);
   *new_argument_Refman = aux_DeclarationArgument_0_Refman;
@@ -25282,40 +26304,40 @@ Returncode tl5_compiler_M_DeclarationArgument_copy_new(tl5_compiler_M_Declaratio
   aux_DeclarationArgument_0 = NULL;
   aux_DeclarationArgument_0_Refman = NULL;
   aux_DeclarationArgument_0_Dynamic = NULL;
-  if (self == NULL) RAISE(265, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
-  if (*new_argument == NULL) RAISE(265, 27, "used member of empty object")
-  if ((*new_argument_Refman)->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(264, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(264, 38, "used member of outdated weak reference")
+  if (*new_argument == NULL) RAISE(264, 27, "used member of empty object")
+  if ((*new_argument_Refman)->value == NULL) RAISE(264, 38, "used member of outdated weak reference")
   LUMI_dec_ref((*new_argument)->_base._base.input_file_name_Refman);
   (*new_argument)->_base._base.input_file_name_Refman = self->_base._base.input_file_name_Refman;
   LUMI_inc_ref((*new_argument)->_base._base.input_file_name_Refman);
   (*new_argument)->_base._base.input_file_name = self->_base._base.input_file_name;
+  if (self == NULL) RAISE(265, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
+  if (*new_argument == NULL) RAISE(265, 27, "used member of empty object")
+  if ((*new_argument_Refman)->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
+  (*new_argument)->_base._base.line_number = self->_base._base.line_number;
   if (self == NULL) RAISE(266, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(266, 38, "used member of outdated weak reference")
   if (*new_argument == NULL) RAISE(266, 27, "used member of empty object")
   if ((*new_argument_Refman)->value == NULL) RAISE(266, 38, "used member of outdated weak reference")
-  (*new_argument)->_base._base.line_number = self->_base._base.line_number;
+  (*new_argument)->_base.access = self->_base.access;
   if (self == NULL) RAISE(267, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
   if (*new_argument == NULL) RAISE(267, 27, "used member of empty object")
   if ((*new_argument_Refman)->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
-  (*new_argument)->_base.access = self->_base.access;
+  (*new_argument)->_base.is_output = self->_base.is_output;
   if (self == NULL) RAISE(268, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
   if (*new_argument == NULL) RAISE(268, 27, "used member of empty object")
   if ((*new_argument_Refman)->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
-  (*new_argument)->_base.is_output = self->_base.is_output;
-  if (self == NULL) RAISE(269, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(269, 38, "used member of outdated weak reference")
-  if (*new_argument == NULL) RAISE(269, 27, "used member of empty object")
-  if ((*new_argument_Refman)->value == NULL) RAISE(269, 38, "used member of outdated weak reference")
   (*new_argument)->_base.is_native = self->_base.is_native;
   aux_SyntaxTreeVariable_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable));
-  if (aux_SyntaxTreeVariable_0 == NULL) RAISE(270, 49, "insufficient memory for object dynamic allocation")
+  if (aux_SyntaxTreeVariable_0 == NULL) RAISE(269, 49, "insufficient memory for object dynamic allocation")
   aux_SyntaxTreeVariable_0_Refman = LUMI_new_ref(aux_SyntaxTreeVariable_0);
-  if (aux_SyntaxTreeVariable_0_Refman == NULL) RAISE(270, 38, "insufficient memory for managed object")
-  if (*new_argument == NULL) RAISE(270, 27, "used member of empty object")
-  if ((*new_argument_Refman)->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
+  if (aux_SyntaxTreeVariable_0_Refman == NULL) RAISE(269, 38, "insufficient memory for managed object")
+  if (*new_argument == NULL) RAISE(269, 27, "used member of empty object")
+  if ((*new_argument_Refman)->value == NULL) RAISE(269, 38, "used member of outdated weak reference")
   if ((*new_argument)->variable_Dynamic != NULL) (*new_argument)->variable_Dynamic->_base._base._del((*new_argument)->variable);
   LUMI_owner_dec_ref((*new_argument)->variable_Refman);
   (*new_argument)->variable_Refman = aux_SyntaxTreeVariable_0_Refman;
@@ -25324,6 +26346,15 @@ Returncode tl5_compiler_M_DeclarationArgument_copy_new(tl5_compiler_M_Declaratio
   aux_SyntaxTreeVariable_0 = NULL;
   aux_SyntaxTreeVariable_0_Refman = NULL;
   aux_SyntaxTreeVariable_0_Dynamic = NULL;
+  if (self == NULL) RAISE(270, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(270, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
+  if (*new_argument == NULL) RAISE(270, 27, "used member of empty object")
+  if ((*new_argument_Refman)->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
+  if ((*new_argument)->variable == NULL) RAISE(270, 27, "used member of empty object")
+  if ((*new_argument)->variable_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
+  (*new_argument)->variable->access = self->variable->access;
   if (self == NULL) RAISE(271, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(271, 38, "used member of outdated weak reference")
   if (self->variable == NULL) RAISE(271, 27, "used member of empty object")
@@ -25332,43 +26363,35 @@ Returncode tl5_compiler_M_DeclarationArgument_copy_new(tl5_compiler_M_Declaratio
   if ((*new_argument_Refman)->value == NULL) RAISE(271, 38, "used member of outdated weak reference")
   if ((*new_argument)->variable == NULL) RAISE(271, 27, "used member of empty object")
   if ((*new_argument)->variable_Refman->value == NULL) RAISE(271, 38, "used member of outdated weak reference")
-  (*new_argument)->variable->access = self->variable->access;
-  if (self == NULL) RAISE(272, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(272, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
-  if (*new_argument == NULL) RAISE(272, 27, "used member of empty object")
-  if ((*new_argument_Refman)->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
-  if ((*new_argument)->variable == NULL) RAISE(272, 27, "used member of empty object")
-  if ((*new_argument)->variable_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
   LUMI_dec_ref((*new_argument)->variable->parent_type_Refman);
   (*new_argument)->variable->parent_type_Refman = self->variable->parent_type_Refman;
   LUMI_inc_ref((*new_argument)->variable->parent_type_Refman);
   (*new_argument)->variable->parent_type_Dynamic = self->variable->parent_type_Dynamic;
   (*new_argument)->variable->parent_type = self->variable->parent_type;
-  if (self == NULL) RAISE(273, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(273, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(272, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(272, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
+  if (*new_argument == NULL) RAISE(273, 27, "used member of empty object")
+  if ((*new_argument_Refman)->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
+  if ((*new_argument)->variable == NULL) RAISE(273, 27, "used member of empty object")
+  if ((*new_argument)->variable_Refman->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
+  CHECK(272, tl5_compiler_M_TypeInstance_copy_new(self->variable->type_instance, self->variable->type_instance_Refman, &((*new_argument)->variable->type_instance), &((*new_argument)->variable->type_instance_Refman)) )
+  if (self == NULL) RAISE(274, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(274, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
   if (*new_argument == NULL) RAISE(274, 27, "used member of empty object")
   if ((*new_argument_Refman)->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
   if ((*new_argument)->variable == NULL) RAISE(274, 27, "used member of empty object")
   if ((*new_argument)->variable_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
-  CHECK(273, tl5_compiler_M_TypeInstance_copy_new(self->variable->type_instance, self->variable->type_instance_Refman, &((*new_argument)->variable->type_instance), &((*new_argument)->variable->type_instance_Refman)) )
-  if (self == NULL) RAISE(275, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(275, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-  if (*new_argument == NULL) RAISE(275, 27, "used member of empty object")
-  if ((*new_argument_Refman)->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-  if ((*new_argument)->variable == NULL) RAISE(275, 27, "used member of empty object")
-  if ((*new_argument)->variable_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
-  CHECK(275, tl5_compiler_M_string_new_copy(self->variable->name, self->variable->name_Refman, &((*new_argument)->variable->name), &((*new_argument)->variable->name_Refman)) )
+  CHECK(274, tl5_compiler_M_string_new_copy(self->variable->name, self->variable->name_Refman, &((*new_argument)->variable->name), &((*new_argument)->variable->name_Refman)) )
 LUMI_cleanup:
   if (aux_SyntaxTreeVariable_0_Dynamic != NULL) aux_SyntaxTreeVariable_0_Dynamic->_base._base._del(aux_SyntaxTreeVariable_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeVariable_0_Refman);
   if (aux_DeclarationArgument_0_Dynamic != NULL) aux_DeclarationArgument_0_Dynamic->_base._base._del(aux_DeclarationArgument_0);
   LUMI_owner_dec_ref(aux_DeclarationArgument_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25392,13 +26415,14 @@ Returncode tl5_compiler_M_DeclarationArgument_parse_value(tl5_compiler_M_Declara
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   aux_SyntaxTreeVariable_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable));
-  if (aux_SyntaxTreeVariable_0 == NULL) RAISE(278, 49, "insufficient memory for object dynamic allocation")
+  if (aux_SyntaxTreeVariable_0 == NULL) RAISE(277, 49, "insufficient memory for object dynamic allocation")
   aux_SyntaxTreeVariable_0_Refman = LUMI_new_ref(aux_SyntaxTreeVariable_0);
-  if (aux_SyntaxTreeVariable_0_Refman == NULL) RAISE(278, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(278, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
+  if (aux_SyntaxTreeVariable_0_Refman == NULL) RAISE(277, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(277, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
   if (self->variable_Dynamic != NULL) self->variable_Dynamic->_base._base._del(self->variable);
   LUMI_owner_dec_ref(self->variable_Refman);
   self->variable_Refman = aux_SyntaxTreeVariable_0_Refman;
@@ -25407,73 +26431,73 @@ Returncode tl5_compiler_M_DeclarationArgument_parse_value(tl5_compiler_M_Declara
   aux_SyntaxTreeVariable_0 = NULL;
   aux_SyntaxTreeVariable_0_Refman = NULL;
   aux_SyntaxTreeVariable_0_Dynamic = NULL;
+  if (self == NULL) RAISE(278, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(278, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(278, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
+  self->variable->access = self->_base.access;
   if (self == NULL) RAISE(279, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(279, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
   if (self->variable == NULL) RAISE(279, 27, "used member of empty object")
   if (self->variable_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
-  self->variable->access = self->_base.access;
-  if (self == NULL) RAISE(280, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(280, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(280, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
   self->variable->is_output = self->_base.is_output;
   if (code_node != NULL && code_node_Refman->value != NULL) {
-      if (code_node_Dynamic == NULL) RAISE(282, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(282, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
-      if (self->variable == NULL) RAISE(282, 27, "used member of empty object")
-      if (self->variable_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
-      CHECK(282, code_node_Dynamic->_base.get_parent_type(&(code_node->_base), code_node_Refman, &(code_node_Dynamic->_base), &(self->variable->parent_type), &(self->variable->parent_type_Refman), &(self->variable->parent_type_Dynamic)) )
+      if (code_node_Dynamic == NULL) RAISE(281, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(281, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(281, 38, "used member of outdated weak reference")
+      if (self->variable == NULL) RAISE(281, 27, "used member of empty object")
+      if (self->variable_Refman->value == NULL) RAISE(281, 38, "used member of outdated weak reference")
+      CHECK(281, code_node_Dynamic->_base.get_parent_type(&(code_node->_base), code_node_Refman, &(code_node_Dynamic->_base), &(self->variable->parent_type), &(self->variable->parent_type_Refman), &(self->variable->parent_type_Dynamic)) )
     }
   aux_TypeInstance_0 = LUMI_alloc(sizeof(tl5_compiler_M_TypeInstance));
-  if (aux_TypeInstance_0 == NULL) RAISE(283, 49, "insufficient memory for object dynamic allocation")
+  if (aux_TypeInstance_0 == NULL) RAISE(282, 49, "insufficient memory for object dynamic allocation")
   aux_TypeInstance_0_Refman = LUMI_new_ref(aux_TypeInstance_0);
-  if (aux_TypeInstance_0_Refman == NULL) RAISE(283, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(283, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(283, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
+  if (aux_TypeInstance_0_Refman == NULL) RAISE(282, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(282, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(282, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
   tl5_compiler_M_TypeInstance_Del(self->variable->type_instance);
   LUMI_owner_dec_ref(self->variable->type_instance_Refman);
   self->variable->type_instance_Refman = aux_TypeInstance_0_Refman;
   self->variable->type_instance = aux_TypeInstance_0;
   aux_TypeInstance_0 = NULL;
   aux_TypeInstance_0_Refman = NULL;
-  if (self == NULL) RAISE(284, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(284, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(284, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(284, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(283, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(283, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(284, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(283, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 2;
   aux_String_0_Var.length = 1;
   aux_String_0_Var.values = " ";
-  CHECK(284, tl5_compiler_M_TypeInstance_parse(self->variable->type_instance, self->variable->type_instance_Refman, aux_String_0, aux_String_0_Refman, &(self->_base._base), self_Refman, &(self_Dynamic->_base._base), NULL, NULL, NULL, &(*end)) )
+  CHECK(283, tl5_compiler_M_TypeInstance_parse(self->variable->type_instance, self->variable->type_instance_Refman, aux_String_0, aux_String_0_Refman, &(self->_base._base), self_Refman, &(self_Dynamic->_base._base), NULL, NULL, NULL, &(*end)) )
   if ((*end) != ' ') {
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(286, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(285, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 31;
       aux_String_1_Var.length = 30;
       aux_String_1_Var.values = "expected space after type, got";
-      CHECK(286, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_1, aux_String_1_Refman, *end) )
+      CHECK(285, tl5_compiler_M_SyntaxTreeNode_syntax_error_c(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_1, aux_String_1_Refman, *end) )
     }
   aux_String_2 = &aux_String_2_Var;
   aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-  if (aux_String_2_Refman == NULL) RAISE(287, 38, "insufficient memory for managed object")
+  if (aux_String_2_Refman == NULL) RAISE(286, 38, "insufficient memory for managed object")
   aux_String_2_Var.max_length = 3;
   aux_String_2_Var.length = 2;
   aux_String_2_Var.values = ",)";
-  if (self == NULL) RAISE(287, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(287, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
-  CHECK(287, tl5_compiler_M_read_new(aux_String_2, aux_String_2_Refman, &(self->variable->name), &(self->variable->name_Refman), &(*end)) )
+  if (self == NULL) RAISE(286, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(286, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(286, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(286, 38, "used member of outdated weak reference")
+  CHECK(286, tl5_compiler_M_read_new(aux_String_2, aux_String_2_Refman, &(self->variable->name), &(self->variable->name_Refman), &(*end)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
@@ -25483,6 +26507,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeVariable_0_Dynamic != NULL) aux_SyntaxTreeVariable_0_Dynamic->_base._base._del(aux_SyntaxTreeVariable_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeVariable_0_Refman);
   LUMI_dec_ref(code_node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25492,16 +26517,18 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "DeclarationArgument.get-parent-type"
 Returncode tl5_compiler_M_DeclarationArgument_get_parent_type(tl5_compiler_M_DeclarationArgument* self, Ref_Manager* self_Refman, tl5_compiler_M_DeclarationArgument_Dynamic* self_Dynamic, tl5_compiler_M_TypeData** parent_type, Ref_Manager** parent_type_Refman, tl5_compiler_M_TypeData_Dynamic** parent_type_Dynamic) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(290, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(290, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(290, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(290, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(289, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(289, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(289, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(289, 38, "used member of outdated weak reference")
   LUMI_dec_ref(*parent_type_Refman);
   *parent_type_Refman = self->variable->parent_type_Refman;
   LUMI_inc_ref(*parent_type_Refman);
   *parent_type_Dynamic = self->variable->parent_type_Dynamic;
   *parent_type = self->variable->parent_type;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25511,12 +26538,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "DeclarationArgument.link-types"
 Returncode tl5_compiler_M_DeclarationArgument_link_types(tl5_compiler_M_DeclarationArgument* self, Ref_Manager* self_Refman, tl5_compiler_M_DeclarationArgument_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(293, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(293, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(293, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(293, 38, "used member of outdated weak reference")
-  CHECK(293, tl5_compiler_M_TypeInstance_link_types(self->variable->type_instance, self->variable->type_instance_Refman, &(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(292, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(292, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(292, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(292, 38, "used member of outdated weak reference")
+  CHECK(292, tl5_compiler_M_TypeInstance_link_types(self->variable->type_instance, self->variable->type_instance_Refman, &(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25550,140 +26579,141 @@ Returncode tl5_compiler_M_DeclarationArgument_analyze(tl5_compiler_M_Declaration
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
-  if (self == NULL) RAISE(296, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(296, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance == NULL) RAISE(296, 27, "used member of empty object")
-  if (self->variable->type_instance_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance->type_data == NULL) RAISE(296, 27, "used member of empty object")
-  if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(295, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(295, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance == NULL) RAISE(295, 27, "used member of empty object")
+  if (self->variable->type_instance_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance->type_data == NULL) RAISE(295, 27, "used member of empty object")
+  if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(295, 38, "used member of outdated weak reference")
   if (self->variable->type_instance->type_data->is_primitive) {
-      if (self == NULL) RAISE(297, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(297, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(297, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(297, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(296, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(296, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
       if (self->_base.is_output && (self->_base.access != tl5_compiler_M_Access_VAR)) {
         aux_String_0 = &aux_String_0_Var;
         aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-        if (aux_String_0_Refman == NULL) RAISE(299, 38, "insufficient memory for managed object")
+        if (aux_String_0_Refman == NULL) RAISE(298, 38, "insufficient memory for managed object")
         aux_String_0_Var.max_length = 7;
         aux_String_0_Var.length = 6;
         aux_String_0_Var.values = "output";
-        if (self == NULL) RAISE(300, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
-        if (self->variable == NULL) RAISE(300, 27, "used member of empty object")
-        if (self->variable_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(299, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(299, 38, "used member of outdated weak reference")
+        if (self->variable == NULL) RAISE(299, 27, "used member of empty object")
+        if (self->variable_Refman->value == NULL) RAISE(299, 38, "used member of outdated weak reference")
         aux_String_1 = &aux_String_1_Var;
         aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-        if (aux_String_1_Refman == NULL) RAISE(301, 38, "insufficient memory for managed object")
+        if (aux_String_1_Refman == NULL) RAISE(300, 38, "insufficient memory for managed object")
         aux_String_1_Var.max_length = 48;
         aux_String_1_Var.length = 47;
         aux_String_1_Var.values = "access should be \"var\" for primitive types, got";
-        if (tl5_compiler_M_glob == NULL) RAISE(302, 27, "used member of empty object")
-        if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(302, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(302, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(302, 38, "used member of outdated weak reference")
-        if (tl5_compiler_M_glob->access_names == NULL) RAISE(302, 29, "empty object used as sequence")
-        if (tl5_compiler_M_glob->access_names_Refman->value == NULL) RAISE(302, 40, "outdated weak reference used as sequence")
-        if ((self->_base.access) < 0 || (self->_base.access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(302, 25, "slice index out of bounds")
-        CHECK(298, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_0, aux_String_0_Refman, self->variable->name, self->variable->name_Refman, aux_String_1, aux_String_1_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self->_base.access, tl5_compiler_M_glob->access_names_Refman) )
+        if (tl5_compiler_M_glob == NULL) RAISE(301, 27, "used member of empty object")
+        if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(301, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(301, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(301, 38, "used member of outdated weak reference")
+        if (tl5_compiler_M_glob->access_names == NULL) RAISE(301, 29, "empty object used as sequence")
+        if (tl5_compiler_M_glob->access_names_Refman->value == NULL) RAISE(301, 40, "outdated weak reference used as sequence")
+        if ((self->_base.access) < 0 || (self->_base.access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(301, 25, "slice index out of bounds")
+        CHECK(297, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_0, aux_String_0_Refman, self->variable->name, self->variable->name_Refman, aux_String_1, aux_String_1_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self->_base.access, tl5_compiler_M_glob->access_names_Refman) )
       }
       else {
-        if (self == NULL) RAISE(303, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(303, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(303, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(303, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(302, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(302, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(302, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(302, 38, "used member of outdated weak reference")
         if ((! self->_base.is_output) && (self->_base.access != tl5_compiler_M_Access_COPY)) {
           aux_String_2 = &aux_String_2_Var;
           aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-          if (aux_String_2_Refman == NULL) RAISE(305, 38, "insufficient memory for managed object")
+          if (aux_String_2_Refman == NULL) RAISE(304, 38, "insufficient memory for managed object")
           aux_String_2_Var.max_length = 10;
           aux_String_2_Var.length = 9;
           aux_String_2_Var.values = "parameter";
-          if (self == NULL) RAISE(306, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(306, 38, "used member of outdated weak reference")
-          if (self->variable == NULL) RAISE(306, 27, "used member of empty object")
-          if (self->variable_Refman->value == NULL) RAISE(306, 38, "used member of outdated weak reference")
+          if (self == NULL) RAISE(305, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(305, 38, "used member of outdated weak reference")
+          if (self->variable == NULL) RAISE(305, 27, "used member of empty object")
+          if (self->variable_Refman->value == NULL) RAISE(305, 38, "used member of outdated weak reference")
           aux_String_3 = &aux_String_3_Var;
           aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-          if (aux_String_3_Refman == NULL) RAISE(307, 38, "insufficient memory for managed object")
+          if (aux_String_3_Refman == NULL) RAISE(306, 38, "insufficient memory for managed object")
           aux_String_3_Var.max_length = 49;
           aux_String_3_Var.length = 48;
           aux_String_3_Var.values = "access should be \"copy\" for primitive types, got";
-          if (tl5_compiler_M_glob == NULL) RAISE(308, 27, "used member of empty object")
-          if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
-          if (self == NULL) RAISE(308, 27, "used member of empty object")
-          if (self_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
-          if (tl5_compiler_M_glob->access_names == NULL) RAISE(308, 29, "empty object used as sequence")
-          if (tl5_compiler_M_glob->access_names_Refman->value == NULL) RAISE(308, 40, "outdated weak reference used as sequence")
-          if ((self->_base.access) < 0 || (self->_base.access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(308, 25, "slice index out of bounds")
-          CHECK(304, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_2, aux_String_2_Refman, self->variable->name, self->variable->name_Refman, aux_String_3, aux_String_3_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self->_base.access, tl5_compiler_M_glob->access_names_Refman) )
+          if (tl5_compiler_M_glob == NULL) RAISE(307, 27, "used member of empty object")
+          if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
+          if (self == NULL) RAISE(307, 27, "used member of empty object")
+          if (self_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
+          if (tl5_compiler_M_glob->access_names == NULL) RAISE(307, 29, "empty object used as sequence")
+          if (tl5_compiler_M_glob->access_names_Refman->value == NULL) RAISE(307, 40, "outdated weak reference used as sequence")
+          if ((self->_base.access) < 0 || (self->_base.access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(307, 25, "slice index out of bounds")
+          CHECK(303, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_2, aux_String_2_Refman, self->variable->name, self->variable->name_Refman, aux_String_3, aux_String_3_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self->_base.access, tl5_compiler_M_glob->access_names_Refman) )
         }
       }
     }
   else {
-      if (self == NULL) RAISE(309, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(309, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(308, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
       if (self->_base.access == tl5_compiler_M_Access_COPY) {
         aux_String_4 = &aux_String_4_Var;
         aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-        if (aux_String_4_Refman == NULL) RAISE(311, 38, "insufficient memory for managed object")
+        if (aux_String_4_Refman == NULL) RAISE(310, 38, "insufficient memory for managed object")
         aux_String_4_Var.max_length = 9;
         aux_String_4_Var.length = 8;
         aux_String_4_Var.values = "argument";
-        if (self == NULL) RAISE(312, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(312, 38, "used member of outdated weak reference")
-        if (self->variable == NULL) RAISE(312, 27, "used member of empty object")
-        if (self->variable_Refman->value == NULL) RAISE(312, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(311, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
+        if (self->variable == NULL) RAISE(311, 27, "used member of empty object")
+        if (self->variable_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
         aux_String_5 = &aux_String_5_Var;
         aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-        if (aux_String_5_Refman == NULL) RAISE(313, 38, "insufficient memory for managed object")
+        if (aux_String_5_Refman == NULL) RAISE(312, 38, "insufficient memory for managed object")
         aux_String_5_Var.max_length = 51;
         aux_String_5_Var.length = 50;
         aux_String_5_Var.values = "access should not be \"copy\" for non-primitive type";
-        if (self == NULL) RAISE(314, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
-        if (self->variable == NULL) RAISE(314, 27, "used member of empty object")
-        if (self->variable_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
-        if (self->variable->type_instance == NULL) RAISE(314, 27, "used member of empty object")
-        if (self->variable->type_instance_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
-        if (self->variable->type_instance->type_data == NULL) RAISE(314, 27, "used member of empty object")
-        if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
-        CHECK(310, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_4, aux_String_4_Refman, self->variable->name, self->variable->name_Refman, aux_String_5, aux_String_5_Refman, self->variable->type_instance->type_data->name, self->variable->type_instance->type_data->name_Refman) )
+        if (self == NULL) RAISE(313, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(313, 38, "used member of outdated weak reference")
+        if (self->variable == NULL) RAISE(313, 27, "used member of empty object")
+        if (self->variable_Refman->value == NULL) RAISE(313, 38, "used member of outdated weak reference")
+        if (self->variable->type_instance == NULL) RAISE(313, 27, "used member of empty object")
+        if (self->variable->type_instance_Refman->value == NULL) RAISE(313, 38, "used member of outdated weak reference")
+        if (self->variable->type_instance->type_data == NULL) RAISE(313, 27, "used member of empty object")
+        if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(313, 38, "used member of outdated weak reference")
+        CHECK(309, tl5_compiler_M_SyntaxTreeNode_m_syntax_error2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_4, aux_String_4_Refman, self->variable->name, self->variable->name_Refman, aux_String_5, aux_String_5_Refman, self->variable->type_instance->type_data->name, self->variable->type_instance->type_data->name_Refman) )
       }
     }
+  if (self == NULL) RAISE(314, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(314, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(314, 38, "used member of outdated weak reference")
+  CHECK(314, tl5_compiler_M_TypeInstance_analyze_lengths(self->variable->type_instance, self->variable->type_instance_Refman, &(self->_base._base), self_Refman, &(self_Dynamic->_base._base), false) )
   if (self == NULL) RAISE(315, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(315, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(315, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(315, 38, "used member of outdated weak reference")
-  CHECK(315, tl5_compiler_M_TypeInstance_analyze_lengths(self->variable->type_instance, self->variable->type_instance_Refman, &(self->_base._base), self_Refman, &(self_Dynamic->_base._base), false) )
-  if (self == NULL) RAISE(316, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(316, 38, "used member of outdated weak reference")
   if (self->_base.is_native) {
-      if (self == NULL) RAISE(317, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(317, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(316, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(316, 38, "used member of outdated weak reference")
       if (self->_base.access == tl5_compiler_M_Access_OWNER) {
         aux_String_6 = &aux_String_6_Var;
         aux_String_6_Refman = LUMI_new_ref(aux_String_6);
-        if (aux_String_6_Refman == NULL) RAISE(318, 38, "insufficient memory for managed object")
+        if (aux_String_6_Refman == NULL) RAISE(317, 38, "insufficient memory for managed object")
         aux_String_6_Var.max_length = 34;
         aux_String_6_Var.length = 33;
         aux_String_6_Var.values = "owner argument to native function";
-        CHECK(318, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_6, aux_String_6_Refman) )
+        CHECK(317, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_6, aux_String_6_Refman) )
       }
-      if (self == NULL) RAISE(319, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(319, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(319, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(319, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(318, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(318, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(318, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(318, 38, "used member of outdated weak reference")
       if (self->_base.is_output && (self->_base.access == tl5_compiler_M_Access_USER)) {
         aux_String_7 = &aux_String_7_Var;
         aux_String_7_Refman = LUMI_new_ref(aux_String_7);
-        if (aux_String_7_Refman == NULL) RAISE(320, 38, "insufficient memory for managed object")
+        if (aux_String_7_Refman == NULL) RAISE(319, 38, "insufficient memory for managed object")
         aux_String_7_Var.max_length = 31;
         aux_String_7_Var.length = 30;
         aux_String_7_Var.values = "user output to native function";
-        CHECK(320, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_7, aux_String_7_Refman) )
+        CHECK(319, tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_7, aux_String_7_Refman) )
       }
     }
 LUMI_cleanup:
@@ -25695,6 +26725,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25704,15 +26735,17 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "DeclarationArgument.get-type-instance"
 Returncode tl5_compiler_M_DeclarationArgument_get_type_instance(tl5_compiler_M_DeclarationArgument* self, Ref_Manager* self_Refman, tl5_compiler_M_DeclarationArgument_Dynamic* self_Dynamic, tl5_compiler_M_TypeInstance** type_instance, Ref_Manager** type_instance_Refman) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(324, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(324, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(324, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(324, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(323, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(323, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(323, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(323, 38, "used member of outdated weak reference")
   LUMI_dec_ref(*type_instance_Refman);
   *type_instance_Refman = self->variable->type_instance_Refman;
   LUMI_inc_ref(*type_instance_Refman);
   *type_instance = self->variable->type_instance;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25722,14 +26755,16 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "DeclarationArgument.get-variable"
 Returncode tl5_compiler_M_DeclarationArgument_get_variable(tl5_compiler_M_DeclarationArgument* self, Ref_Manager* self_Refman, tl5_compiler_M_DeclarationArgument_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeVariable** variable, Ref_Manager** variable_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic** variable_Dynamic) {
   Returncode LUMI_err = OK;
-  if (self == NULL) RAISE(327, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(327, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(326, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(326, 38, "used member of outdated weak reference")
   LUMI_dec_ref(*variable_Refman);
   *variable_Refman = self->variable_Refman;
   LUMI_inc_ref(*variable_Refman);
   *variable_Dynamic = self->variable_Dynamic;
   *variable = self->variable;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -25784,213 +26819,214 @@ Returncode tl5_compiler_M_DeclarationArgument_write(tl5_compiler_M_DeclarationAr
   String aux_String_14_Var = {0};
   String* aux_String_14 = NULL;
   Ref_Manager* aux_String_14_Refman = NULL;
-  if (tl5_compiler_M_glob == NULL) RAISE(330, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(330, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(330, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance == NULL) RAISE(330, 27, "used member of empty object")
-  if (self->variable->type_instance_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (tl5_compiler_M_glob == NULL) RAISE(329, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(329, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(329, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(329, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(329, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(329, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance == NULL) RAISE(329, 27, "used member of empty object")
+  if (self->variable->type_instance_Refman->value == NULL) RAISE(329, 38, "used member of outdated weak reference")
   if ((void*)self->variable->type_instance->type_data == tl5_compiler_M_glob->type_func) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(331, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(330, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 14;
       aux_String_0_Var.length = 13;
       aux_String_0_Var.values = "Returncode (*";
-      CHECK(331, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-      if (self == NULL) RAISE(332, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(332, 38, "used member of outdated weak reference")
+      CHECK(330, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+      if (self == NULL) RAISE(331, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(331, 38, "used member of outdated weak reference")
       if (self->_base.is_output) {
         aux_String_1 = &aux_String_1_Var;
         aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-        if (aux_String_1_Refman == NULL) RAISE(333, 38, "insufficient memory for managed object")
+        if (aux_String_1_Refman == NULL) RAISE(332, 38, "insufficient memory for managed object")
         aux_String_1_Var.max_length = 2;
         aux_String_1_Var.length = 1;
         aux_String_1_Var.values = "*";
-        CHECK(333, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+        CHECK(332, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
       }
-      if (self == NULL) RAISE(334, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(334, 38, "used member of outdated weak reference")
-      if (self->variable == NULL) RAISE(334, 27, "used member of empty object")
-      if (self->variable_Refman->value == NULL) RAISE(334, 38, "used member of outdated weak reference")
-      CHECK(334, tl5_compiler_M_write_cname(self->variable->name, self->variable->name_Refman) )
+      if (self == NULL) RAISE(333, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
+      if (self->variable == NULL) RAISE(333, 27, "used member of empty object")
+      if (self->variable_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
+      CHECK(333, tl5_compiler_M_write_cname(self->variable->name, self->variable->name_Refman) )
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-      if (aux_String_2_Refman == NULL) RAISE(335, 38, "insufficient memory for managed object")
+      if (aux_String_2_Refman == NULL) RAISE(334, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 2;
       aux_String_2_Var.length = 1;
       aux_String_2_Var.values = ")";
-      CHECK(335, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
-      if (self->variable->type_instance->arguments_Dynamic == NULL) RAISE(336, 28, "dynamic call of empty object")
-      if (self == NULL) RAISE(336, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(336, 38, "used member of outdated weak reference")
-      if (self->variable == NULL) RAISE(336, 27, "used member of empty object")
-      if (self->variable_Refman->value == NULL) RAISE(336, 38, "used member of outdated weak reference")
-      if (self->variable->type_instance == NULL) RAISE(336, 27, "used member of empty object")
-      if (self->variable->type_instance_Refman->value == NULL) RAISE(336, 38, "used member of outdated weak reference")
-      CHECK(336, self->variable->type_instance->arguments_Dynamic->_base.write(&(self->variable->type_instance->arguments->_base), self->variable->type_instance->arguments_Refman, &(self->variable->type_instance->arguments_Dynamic->_base)) )
+      CHECK(334, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+      if (self->variable->type_instance->arguments_Dynamic == NULL) RAISE(335, 28, "dynamic call of empty object")
+      if (self == NULL) RAISE(335, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(335, 38, "used member of outdated weak reference")
+      if (self->variable == NULL) RAISE(335, 27, "used member of empty object")
+      if (self->variable_Refman->value == NULL) RAISE(335, 38, "used member of outdated weak reference")
+      if (self->variable->type_instance == NULL) RAISE(335, 27, "used member of empty object")
+      if (self->variable->type_instance_Refman->value == NULL) RAISE(335, 38, "used member of outdated weak reference")
+      CHECK(335, self->variable->type_instance->arguments_Dynamic->_base.write(&(self->variable->type_instance->arguments->_base), self->variable->type_instance->arguments_Refman, &(self->variable->type_instance->arguments_Dynamic->_base)) )
       goto LUMI_cleanup;
     }
+  if (self == NULL) RAISE(340, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(340, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(340, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(340, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance == NULL) RAISE(340, 27, "used member of empty object")
+  if (self->variable->type_instance_Refman->value == NULL) RAISE(340, 38, "used member of outdated weak reference")
+  CHECK(340, tl5_compiler_M_TypeData_write_cname(self->variable->type_instance->type_data, self->variable->type_instance->type_data_Refman, self->variable->type_instance->type_data_Dynamic) )
   if (self == NULL) RAISE(341, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
   if (self->variable == NULL) RAISE(341, 27, "used member of empty object")
   if (self->variable_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
   if (self->variable->type_instance == NULL) RAISE(341, 27, "used member of empty object")
   if (self->variable->type_instance_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
-  CHECK(341, tl5_compiler_M_TypeData_write_cname(self->variable->type_instance->type_data, self->variable->type_instance->type_data_Refman, self->variable->type_instance->type_data_Dynamic) )
-  if (self == NULL) RAISE(342, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(342, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance == NULL) RAISE(342, 27, "used member of empty object")
-  if (self->variable->type_instance_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance->type_data == NULL) RAISE(342, 27, "used member of empty object")
-  if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance->type_data == NULL) RAISE(341, 27, "used member of empty object")
+  if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
   if (! self->variable->type_instance->type_data->is_primitive) {
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-      if (aux_String_3_Refman == NULL) RAISE(343, 38, "insufficient memory for managed object")
+      if (aux_String_3_Refman == NULL) RAISE(342, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 2;
       aux_String_3_Var.length = 1;
       aux_String_3_Var.values = "*";
-      CHECK(343, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+      CHECK(342, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
     }
-  if (self == NULL) RAISE(344, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(344, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(343, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(343, 38, "used member of outdated weak reference")
   if (self->_base.is_output) {
       aux_String_4 = &aux_String_4_Var;
       aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-      if (aux_String_4_Refman == NULL) RAISE(345, 38, "insufficient memory for managed object")
+      if (aux_String_4_Refman == NULL) RAISE(344, 38, "insufficient memory for managed object")
       aux_String_4_Var.max_length = 2;
       aux_String_4_Var.length = 1;
       aux_String_4_Var.values = "*";
-      CHECK(345, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
+      CHECK(344, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
     }
   aux_String_5 = &aux_String_5_Var;
   aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-  if (aux_String_5_Refman == NULL) RAISE(346, 38, "insufficient memory for managed object")
+  if (aux_String_5_Refman == NULL) RAISE(345, 38, "insufficient memory for managed object")
   aux_String_5_Var.max_length = 2;
   aux_String_5_Var.length = 1;
   aux_String_5_Var.values = " ";
-  CHECK(346, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
-  if (self == NULL) RAISE(347, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(347, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(347, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(347, 38, "used member of outdated weak reference")
-  CHECK(347, tl5_compiler_M_write_cname(self->variable->name, self->variable->name_Refman) )
-  if (self == NULL) RAISE(350, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(350, 38, "used member of outdated weak reference")
+  CHECK(345, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
+  if (self == NULL) RAISE(346, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(346, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(346, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(346, 38, "used member of outdated weak reference")
+  CHECK(346, tl5_compiler_M_write_cname(self->variable->name, self->variable->name_Refman) )
   if (self == NULL) RAISE(349, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(349, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(349, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(349, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance == NULL) RAISE(349, 27, "used member of empty object")
-  if (self->variable->type_instance_Refman->value == NULL) RAISE(349, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance->type_data == NULL) RAISE(349, 27, "used member of empty object")
-  if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(349, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(348, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(348, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(348, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(348, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance == NULL) RAISE(348, 27, "used member of empty object")
+  if (self->variable->type_instance_Refman->value == NULL) RAISE(348, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance->type_data == NULL) RAISE(348, 27, "used member of empty object")
+  if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(348, 38, "used member of outdated weak reference")
   if ((! self->variable->type_instance->type_data->is_primitive) && (! self->_base.is_native)) {
       aux_String_6 = &aux_String_6_Var;
       aux_String_6_Refman = LUMI_new_ref(aux_String_6);
-      if (aux_String_6_Refman == NULL) RAISE(351, 38, "insufficient memory for managed object")
+      if (aux_String_6_Refman == NULL) RAISE(350, 38, "insufficient memory for managed object")
       aux_String_6_Var.max_length = 15;
       aux_String_6_Var.length = 14;
       aux_String_6_Var.values = ", Ref_Manager*";
-      CHECK(351, tl5_compiler_M_write(aux_String_6, aux_String_6_Refman) )
-      if (self == NULL) RAISE(352, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(352, 38, "used member of outdated weak reference")
+      CHECK(350, tl5_compiler_M_write(aux_String_6, aux_String_6_Refman) )
+      if (self == NULL) RAISE(351, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(351, 38, "used member of outdated weak reference")
       if (self->_base.is_output) {
         aux_String_7 = &aux_String_7_Var;
         aux_String_7_Refman = LUMI_new_ref(aux_String_7);
-        if (aux_String_7_Refman == NULL) RAISE(353, 38, "insufficient memory for managed object")
+        if (aux_String_7_Refman == NULL) RAISE(352, 38, "insufficient memory for managed object")
         aux_String_7_Var.max_length = 2;
         aux_String_7_Var.length = 1;
         aux_String_7_Var.values = "*";
-        CHECK(353, tl5_compiler_M_write(aux_String_7, aux_String_7_Refman) )
+        CHECK(352, tl5_compiler_M_write(aux_String_7, aux_String_7_Refman) )
       }
       aux_String_8 = &aux_String_8_Var;
       aux_String_8_Refman = LUMI_new_ref(aux_String_8);
-      if (aux_String_8_Refman == NULL) RAISE(354, 38, "insufficient memory for managed object")
+      if (aux_String_8_Refman == NULL) RAISE(353, 38, "insufficient memory for managed object")
       aux_String_8_Var.max_length = 2;
       aux_String_8_Var.length = 1;
       aux_String_8_Var.values = " ";
-      CHECK(354, tl5_compiler_M_write(aux_String_8, aux_String_8_Refman) )
-      if (self == NULL) RAISE(355, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(355, 38, "used member of outdated weak reference")
-      if (self->variable == NULL) RAISE(355, 27, "used member of empty object")
-      if (self->variable_Refman->value == NULL) RAISE(355, 38, "used member of outdated weak reference")
-      CHECK(355, tl5_compiler_M_write_cname(self->variable->name, self->variable->name_Refman) )
+      CHECK(353, tl5_compiler_M_write(aux_String_8, aux_String_8_Refman) )
+      if (self == NULL) RAISE(354, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(354, 38, "used member of outdated weak reference")
+      if (self->variable == NULL) RAISE(354, 27, "used member of empty object")
+      if (self->variable_Refman->value == NULL) RAISE(354, 38, "used member of outdated weak reference")
+      CHECK(354, tl5_compiler_M_write_cname(self->variable->name, self->variable->name_Refman) )
       aux_String_9 = &aux_String_9_Var;
       aux_String_9_Refman = LUMI_new_ref(aux_String_9);
-      if (aux_String_9_Refman == NULL) RAISE(356, 38, "insufficient memory for managed object")
+      if (aux_String_9_Refman == NULL) RAISE(355, 38, "insufficient memory for managed object")
       aux_String_9_Var.max_length = 8;
       aux_String_9_Var.length = 7;
       aux_String_9_Var.values = "_Refman";
-      CHECK(356, tl5_compiler_M_write(aux_String_9, aux_String_9_Refman) )
+      CHECK(355, tl5_compiler_M_write(aux_String_9, aux_String_9_Refman) )
     }
-  if (self == NULL) RAISE(358, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(358, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(358, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(358, 38, "used member of outdated weak reference")
-  if (self->variable == NULL) RAISE(358, 27, "used member of empty object")
-  if (self->variable_Refman->value == NULL) RAISE(358, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance == NULL) RAISE(358, 27, "used member of empty object")
-  if (self->variable->type_instance_Refman->value == NULL) RAISE(358, 38, "used member of outdated weak reference")
-  if (self->variable->type_instance->type_data == NULL) RAISE(358, 27, "used member of empty object")
-  if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(358, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(357, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(357, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(357, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(357, 38, "used member of outdated weak reference")
+  if (self->variable == NULL) RAISE(357, 27, "used member of empty object")
+  if (self->variable_Refman->value == NULL) RAISE(357, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance == NULL) RAISE(357, 27, "used member of empty object")
+  if (self->variable->type_instance_Refman->value == NULL) RAISE(357, 38, "used member of outdated weak reference")
+  if (self->variable->type_instance->type_data == NULL) RAISE(357, 27, "used member of empty object")
+  if (self->variable->type_instance->type_data_Refman->value == NULL) RAISE(357, 38, "used member of outdated weak reference")
   if (self->variable->type_instance->type_data->is_dynamic && (! self->_base.is_native)) {
       aux_String_10 = &aux_String_10_Var;
       aux_String_10_Refman = LUMI_new_ref(aux_String_10);
-      if (aux_String_10_Refman == NULL) RAISE(359, 38, "insufficient memory for managed object")
+      if (aux_String_10_Refman == NULL) RAISE(358, 38, "insufficient memory for managed object")
       aux_String_10_Var.max_length = 3;
       aux_String_10_Var.length = 2;
       aux_String_10_Var.values = ", ";
-      CHECK(359, tl5_compiler_M_write(aux_String_10, aux_String_10_Refman) )
-      if (self == NULL) RAISE(360, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(360, 38, "used member of outdated weak reference")
-      if (self->variable == NULL) RAISE(360, 27, "used member of empty object")
-      if (self->variable_Refman->value == NULL) RAISE(360, 38, "used member of outdated weak reference")
-      if (self->variable->type_instance == NULL) RAISE(360, 27, "used member of empty object")
-      if (self->variable->type_instance_Refman->value == NULL) RAISE(360, 38, "used member of outdated weak reference")
-      CHECK(360, tl5_compiler_M_TypeData_write_cname(self->variable->type_instance->type_data, self->variable->type_instance->type_data_Refman, self->variable->type_instance->type_data_Dynamic) )
+      CHECK(358, tl5_compiler_M_write(aux_String_10, aux_String_10_Refman) )
+      if (self == NULL) RAISE(359, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(359, 38, "used member of outdated weak reference")
+      if (self->variable == NULL) RAISE(359, 27, "used member of empty object")
+      if (self->variable_Refman->value == NULL) RAISE(359, 38, "used member of outdated weak reference")
+      if (self->variable->type_instance == NULL) RAISE(359, 27, "used member of empty object")
+      if (self->variable->type_instance_Refman->value == NULL) RAISE(359, 38, "used member of outdated weak reference")
+      CHECK(359, tl5_compiler_M_TypeData_write_cname(self->variable->type_instance->type_data, self->variable->type_instance->type_data_Refman, self->variable->type_instance->type_data_Dynamic) )
       aux_String_11 = &aux_String_11_Var;
       aux_String_11_Refman = LUMI_new_ref(aux_String_11);
-      if (aux_String_11_Refman == NULL) RAISE(361, 38, "insufficient memory for managed object")
+      if (aux_String_11_Refman == NULL) RAISE(360, 38, "insufficient memory for managed object")
       aux_String_11_Var.max_length = 10;
       aux_String_11_Var.length = 9;
       aux_String_11_Var.values = "_Dynamic*";
-      CHECK(361, tl5_compiler_M_write(aux_String_11, aux_String_11_Refman) )
-      if (self == NULL) RAISE(362, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(362, 38, "used member of outdated weak reference")
+      CHECK(360, tl5_compiler_M_write(aux_String_11, aux_String_11_Refman) )
+      if (self == NULL) RAISE(361, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(361, 38, "used member of outdated weak reference")
       if (self->_base.is_output) {
         aux_String_12 = &aux_String_12_Var;
         aux_String_12_Refman = LUMI_new_ref(aux_String_12);
-        if (aux_String_12_Refman == NULL) RAISE(363, 38, "insufficient memory for managed object")
+        if (aux_String_12_Refman == NULL) RAISE(362, 38, "insufficient memory for managed object")
         aux_String_12_Var.max_length = 2;
         aux_String_12_Var.length = 1;
         aux_String_12_Var.values = "*";
-        CHECK(363, tl5_compiler_M_write(aux_String_12, aux_String_12_Refman) )
+        CHECK(362, tl5_compiler_M_write(aux_String_12, aux_String_12_Refman) )
       }
       aux_String_13 = &aux_String_13_Var;
       aux_String_13_Refman = LUMI_new_ref(aux_String_13);
-      if (aux_String_13_Refman == NULL) RAISE(364, 38, "insufficient memory for managed object")
+      if (aux_String_13_Refman == NULL) RAISE(363, 38, "insufficient memory for managed object")
       aux_String_13_Var.max_length = 2;
       aux_String_13_Var.length = 1;
       aux_String_13_Var.values = " ";
-      CHECK(364, tl5_compiler_M_write(aux_String_13, aux_String_13_Refman) )
-      if (self == NULL) RAISE(365, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(365, 38, "used member of outdated weak reference")
-      if (self->variable == NULL) RAISE(365, 27, "used member of empty object")
-      if (self->variable_Refman->value == NULL) RAISE(365, 38, "used member of outdated weak reference")
-      CHECK(365, tl5_compiler_M_write_cname(self->variable->name, self->variable->name_Refman) )
+      CHECK(363, tl5_compiler_M_write(aux_String_13, aux_String_13_Refman) )
+      if (self == NULL) RAISE(364, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(364, 38, "used member of outdated weak reference")
+      if (self->variable == NULL) RAISE(364, 27, "used member of empty object")
+      if (self->variable_Refman->value == NULL) RAISE(364, 38, "used member of outdated weak reference")
+      CHECK(364, tl5_compiler_M_write_cname(self->variable->name, self->variable->name_Refman) )
       aux_String_14 = &aux_String_14_Var;
       aux_String_14_Refman = LUMI_new_ref(aux_String_14);
-      if (aux_String_14_Refman == NULL) RAISE(366, 38, "insufficient memory for managed object")
+      if (aux_String_14_Refman == NULL) RAISE(365, 38, "insufficient memory for managed object")
       aux_String_14_Var.max_length = 9;
       aux_String_14_Var.length = 8;
       aux_String_14_Var.values = "_Dynamic";
-      CHECK(366, tl5_compiler_M_write(aux_String_14, aux_String_14_Refman) )
+      CHECK(365, tl5_compiler_M_write(aux_String_14, aux_String_14_Refman) )
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_14_Refman);
@@ -26008,6 +27044,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26027,10 +27064,11 @@ Returncode tl5_compiler_M_DeclarationArgumentFactory_new_argument(tl5_compiler_M
   tl5_compiler_M_DeclarationArgument* aux_DeclarationArgument_0 = NULL;
   Ref_Manager* aux_DeclarationArgument_0_Refman = NULL;
   tl5_compiler_M_DeclarationArgument_Dynamic* aux_DeclarationArgument_0_Dynamic = &tl5_compiler_M_DeclarationArgument_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_DeclarationArgument_0 = LUMI_alloc(sizeof(tl5_compiler_M_DeclarationArgument));
-  if (aux_DeclarationArgument_0 == NULL) RAISE(371, 49, "insufficient memory for object dynamic allocation")
+  if (aux_DeclarationArgument_0 == NULL) RAISE(370, 49, "insufficient memory for object dynamic allocation")
   aux_DeclarationArgument_0_Refman = LUMI_new_ref(aux_DeclarationArgument_0);
-  if (aux_DeclarationArgument_0_Refman == NULL) RAISE(371, 38, "insufficient memory for managed object")
+  if (aux_DeclarationArgument_0_Refman == NULL) RAISE(370, 38, "insufficient memory for managed object")
   if (*new_argument_Dynamic != NULL) (*new_argument_Dynamic)->_base._del(*new_argument);
   LUMI_owner_dec_ref(*new_argument_Refman);
   *new_argument_Refman = aux_DeclarationArgument_0_Refman;
@@ -26042,6 +27080,7 @@ Returncode tl5_compiler_M_DeclarationArgumentFactory_new_argument(tl5_compiler_M
 LUMI_cleanup:
   if (aux_DeclarationArgument_0_Dynamic != NULL) aux_DeclarationArgument_0_Dynamic->_base._base._del(aux_DeclarationArgument_0);
   LUMI_owner_dec_ref(aux_DeclarationArgument_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26059,6 +27098,7 @@ Returncode tl5_compiler_M_NativeFunction_parse_new(tl5_compiler_M_NativeFunction
   tl5_compiler_M_NativeFunction* aux_NativeFunction_0 = NULL;
   Ref_Manager* aux_NativeFunction_0_Refman = NULL;
   tl5_compiler_M_NativeFunction_Dynamic* aux_NativeFunction_0_Dynamic = &tl5_compiler_M_NativeFunction_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_NativeFunction_0 = LUMI_alloc(sizeof(tl5_compiler_M_NativeFunction));
   if (aux_NativeFunction_0 == NULL) RAISE(30, 49, "insufficient memory for object dynamic allocation")
   aux_NativeFunction_0_Refman = LUMI_new_ref(aux_NativeFunction_0);
@@ -26075,6 +27115,7 @@ Returncode tl5_compiler_M_NativeFunction_parse_new(tl5_compiler_M_NativeFunction
 LUMI_cleanup:
   if (aux_NativeFunction_0_Dynamic != NULL) aux_NativeFunction_0_Dynamic->_base._base._base._base._del(aux_NativeFunction_0);
   LUMI_owner_dec_ref(aux_NativeFunction_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26088,6 +27129,7 @@ Returncode tl5_compiler_M_NativeFunction_parse(tl5_compiler_M_NativeFunction* se
   Ref_Manager* aux_List_0_Refman = NULL;
   tl5_compiler_M_List* aux_List_1 = NULL;
   Ref_Manager* aux_List_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(34, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base)) )
   if (tl5_compiler_M_glob == NULL) RAISE(35, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(35, 38, "used member of outdated weak reference")
@@ -26134,6 +27176,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_List_1_Refman);
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26143,6 +27186,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "NativeFunction.link-types"
 Returncode tl5_compiler_M_NativeFunction_link_types(tl5_compiler_M_NativeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_NativeFunction_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(42, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(42, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(42, 27, "used member of empty object")
@@ -26159,6 +27203,7 @@ Returncode tl5_compiler_M_NativeFunction_link_types(tl5_compiler_M_NativeFunctio
   LUMI_inc_ref(tl5_compiler_M_glob->current_module_Refman);
   tl5_compiler_M_glob->current_module = NULL;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26168,6 +27213,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "NativeFunction.analyze"
 Returncode tl5_compiler_M_NativeFunction_analyze(tl5_compiler_M_NativeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_NativeFunction_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(47, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(47, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(47, 27, "used member of empty object")
@@ -26184,6 +27230,7 @@ Returncode tl5_compiler_M_NativeFunction_analyze(tl5_compiler_M_NativeFunction* 
   LUMI_inc_ref(tl5_compiler_M_glob->current_module_Refman);
   tl5_compiler_M_glob->current_module = NULL;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26193,7 +27240,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "NativeFunction.write"
 Returncode tl5_compiler_M_NativeFunction_write(tl5_compiler_M_NativeFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_NativeFunction_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26212,6 +27261,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_parse_new(tl5_compiler_M_SyntaxTree
   tl5_compiler_M_SyntaxTreeVariable* aux_SyntaxTreeVariable_0 = NULL;
   Ref_Manager* aux_SyntaxTreeVariable_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeVariable_Dynamic* aux_SyntaxTreeVariable_0_Dynamic = &tl5_compiler_M_SyntaxTreeVariable_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(parent_block_Refman);
   aux_SyntaxTreeVariable_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable));
@@ -26234,6 +27284,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_SyntaxTreeVariable_0_Refman);
   LUMI_dec_ref(parent_block_Refman);
   LUMI_dec_ref(parent_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26260,6 +27311,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_parse(tl5_compiler_M_SyntaxTreeVari
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(parent_block_Refman);
   LUMI_inc_ref(my_module_Refman);
@@ -26413,6 +27465,7 @@ LUMI_cleanup:
   LUMI_dec_ref(my_module_Refman);
   LUMI_dec_ref(parent_block_Refman);
   LUMI_dec_ref(parent_type_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26463,6 +27516,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_check_name(tl5_compiler_M_SyntaxTre
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(65, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(65, 38, "used member of outdated weak reference")
   CHECK(65, tl5_compiler_M_is_legal_name(self->name, self->name_Refman, tl5_compiler_M_NameGroup_DEFAULT, &(aux_Bool_0)) )
@@ -26594,6 +27648,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(meth_Refman);
   LUMI_dec_ref(field_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26603,6 +27658,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeVariable.get-parent-type"
 Returncode tl5_compiler_M_SyntaxTreeVariable_get_parent_type(tl5_compiler_M_SyntaxTreeVariable* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic* self_Dynamic, tl5_compiler_M_TypeData** parent_type, Ref_Manager** parent_type_Refman, tl5_compiler_M_TypeData_Dynamic** parent_type_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(93, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(93, 38, "used member of outdated weak reference")
   if (self->parent_type != NULL && self->parent_type_Refman->value != NULL) {
@@ -26629,6 +27685,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_get_parent_type(tl5_compiler_M_Synt
       }
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26639,6 +27696,7 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_SyntaxTreeVariable_find_variable(tl5_compiler_M_SyntaxTreeVariable* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic* self_Dynamic, String* name, Ref_Manager* name_Refman, String* module_name, Ref_Manager* module_name_Refman, tl5_compiler_M_SyntaxTreeVariable** variable, Ref_Manager** variable_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic** variable_Dynamic) {
   Returncode LUMI_err = OK;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(module_name_Refman);
   if (self == NULL) RAISE(102, 27, "used member of empty object")
@@ -26661,6 +27719,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_find_variable(tl5_compiler_M_Syntax
 LUMI_cleanup:
   LUMI_dec_ref(module_name_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26670,6 +27729,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeVariable.link-types"
 Returncode tl5_compiler_M_SyntaxTreeVariable_link_types(tl5_compiler_M_SyntaxTreeVariable* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(108, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(108, 38, "used member of outdated weak reference")
   if (self->my_module != NULL && self->my_module_Refman->value != NULL) {
@@ -26696,6 +27756,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_link_types(tl5_compiler_M_SyntaxTre
       tl5_compiler_M_glob->current_module = NULL;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26717,6 +27778,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_analyze(tl5_compiler_M_SyntaxTreeVa
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(115, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(115, 38, "used member of outdated weak reference")
   if (self->my_module != NULL && self->my_module_Refman->value != NULL) {
@@ -26870,6 +27932,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26884,6 +27947,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_check_var_recursion(tl5_compiler_M_
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(variable_Refman);
   if (self == NULL) RAISE(143, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
@@ -26945,6 +28009,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(child_Refman);
   LUMI_dec_ref(variable_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26954,6 +28019,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeVariable.write-cname"
 Returncode tl5_compiler_M_SyntaxTreeVariable_write_cname(tl5_compiler_M_SyntaxTreeVariable* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeVariable_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(156, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
   if (self->my_module != NULL && self->my_module_Refman->value != NULL) {
@@ -26965,6 +28031,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_cname(tl5_compiler_M_SyntaxTr
   if (self_Refman->value == NULL) RAISE(158, 38, "used member of outdated weak reference")
   CHECK(158, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -26992,6 +28059,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write(tl5_compiler_M_SyntaxTreeVari
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(161, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(161, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(161, 27, "used member of empty object")
@@ -27176,6 +28244,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -27235,6 +28304,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_sequence(tl5_compiler_M_Synta
   String aux_String_14_Var = {0};
   String* aux_String_14 = NULL;
   Ref_Manager* aux_String_14_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(208, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(208, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(208, 27, "used member of empty object")
@@ -27526,6 +28596,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -27564,6 +28635,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_var(tl5_compiler_M_SyntaxTree
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(253, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
   if (self->type_instance == NULL) RAISE(253, 27, "used member of empty object")
@@ -27737,6 +28809,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -27758,6 +28831,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_refman(tl5_compiler_M_SyntaxT
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(285, tl5_compiler_M_SyntaxTreeVariable_write_spaces(self, self_Refman, self_Dynamic) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -27797,6 +28871,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -27827,6 +28902,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_dynamic(tl5_compiler_M_Syntax
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(295, tl5_compiler_M_SyntaxTreeVariable_write_spaces(self, self_Refman, self_Dynamic) )
   if (self == NULL) RAISE(300, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
@@ -27906,6 +28982,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -27918,6 +28995,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_spaces(tl5_compiler_M_SyntaxT
   tl5_compiler_M_SyntaxTreeFunction* aux_SyntaxTreeFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* aux_SyntaxTreeFunction_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(315, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(315, 38, "used member of outdated weak reference")
   if (self->_base.parent != NULL && self->_base.parent_Refman->value != NULL) {
@@ -27938,6 +29016,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_spaces(tl5_compiler_M_SyntaxT
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_SyntaxTreeFunction_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -27961,6 +29040,7 @@ Returncode tl5_compiler_M_NativeVariable_parse_new(tl5_compiler_M_NativeVariable
   tl5_compiler_M_NativeVariable* aux_NativeVariable_0 = NULL;
   Ref_Manager* aux_NativeVariable_0_Refman = NULL;
   tl5_compiler_M_NativeVariable_Dynamic* aux_NativeVariable_0_Dynamic = &tl5_compiler_M_NativeVariable_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_NativeVariable_0 = LUMI_alloc(sizeof(tl5_compiler_M_NativeVariable));
   if (aux_NativeVariable_0 == NULL) RAISE(58, 49, "insufficient memory for object dynamic allocation")
   aux_NativeVariable_0_Refman = LUMI_new_ref(aux_NativeVariable_0);
@@ -27988,6 +29068,7 @@ Returncode tl5_compiler_M_NativeVariable_parse_new(tl5_compiler_M_NativeVariable
 LUMI_cleanup:
   if (aux_NativeVariable_0_Dynamic != NULL) aux_NativeVariable_0_Dynamic->_base._base._base._del(aux_NativeVariable_0);
   LUMI_owner_dec_ref(aux_NativeVariable_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28000,6 +29081,7 @@ Returncode tl5_compiler_M_NativeVariable_analyze(tl5_compiler_M_NativeVariable* 
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(66, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(66, 38, "used member of outdated weak reference")
   if (self->_base.type_instance == NULL) RAISE(66, 27, "used member of empty object")
@@ -28024,6 +29106,7 @@ Returncode tl5_compiler_M_NativeVariable_analyze(tl5_compiler_M_NativeVariable* 
   CHECK(70, tl5_compiler_M_SyntaxTreeVariable_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28036,6 +29119,7 @@ Returncode tl5_compiler_M_NativeVariable_write(tl5_compiler_M_NativeVariable* se
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(73, 38, "insufficient memory for managed object")
@@ -28046,6 +29130,7 @@ Returncode tl5_compiler_M_NativeVariable_write(tl5_compiler_M_NativeVariable* se
   CHECK(74, tl5_compiler_M_SyntaxTreeVariable_write(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28062,6 +29147,7 @@ Returncode tl5_compiler_M_SyntaxTreeNamespace_init(tl5_compiler_M_SyntaxTreeName
   Returncode LUMI_err = OK;
   tl5_compiler_M_List* aux_List_0 = NULL;
   Ref_Manager* aux_List_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(245, tl5_compiler_M_SyntaxTreeBranch_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_List_0 = LUMI_alloc(sizeof(tl5_compiler_M_List));
   if (aux_List_0 == NULL) RAISE(246, 49, "insufficient memory for object dynamic allocation")
@@ -28078,6 +29164,7 @@ Returncode tl5_compiler_M_SyntaxTreeNamespace_init(tl5_compiler_M_SyntaxTreeName
 LUMI_cleanup:
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28096,6 +29183,7 @@ Returncode tl5_compiler_M_SyntaxTreeNamespace_parse_if_function(tl5_compiler_M_S
   tl5_compiler_M_SyntaxTreeFunction* aux_SyntaxTreeFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* aux_SyntaxTreeFunction_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(keyword_Refman);
   LUMI_inc_ref(parent_type_Refman);
   aux_String_0 = &aux_String_0_Var;
@@ -28130,6 +29218,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_type_Refman);
   LUMI_dec_ref(keyword_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28139,8 +29228,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeNamespace.link-types"
 Returncode tl5_compiler_M_SyntaxTreeNamespace_link_types(tl5_compiler_M_SyntaxTreeNamespace* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNamespace_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(260, tl5_compiler_M_SyntaxTreeBranch_link_types(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(261, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(261, 38, "used member of outdated weak reference")
+  CHECK(261, tl5_compiler_M_SyntaxTreeNode_link_children_types(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->functions, self->functions_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28150,8 +29244,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeNamespace.analyze"
 Returncode tl5_compiler_M_SyntaxTreeNamespace_analyze(tl5_compiler_M_SyntaxTreeNamespace* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeNamespace_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(264, tl5_compiler_M_SyntaxTreeBranch_analyze(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (self == NULL) RAISE(265, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
+  CHECK(265, tl5_compiler_M_SyntaxTreeNode_analyze_children(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->functions, self->functions_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28163,6 +29262,7 @@ Returncode tl5_compiler_M_SyntaxTreeNamespace_write_functions_declaration(tl5_co
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* child = NULL;
   Ref_Manager* child_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(268, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
   if (self->functions == NULL) RAISE(268, 27, "used member of empty object")
@@ -28185,6 +29285,7 @@ Returncode tl5_compiler_M_SyntaxTreeNamespace_write_functions_declaration(tl5_co
     }
 LUMI_cleanup:
   LUMI_dec_ref(child_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28204,6 +29305,7 @@ Returncode tl5_compiler_M_TypeData_parse_new(tl5_compiler_M_TypeData* self, Ref_
   tl5_compiler_M_TypeData* aux_TypeData_0 = NULL;
   Ref_Manager* aux_TypeData_0_Refman = NULL;
   tl5_compiler_M_TypeData_Dynamic* aux_TypeData_0_Dynamic = &tl5_compiler_M_TypeData_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_TypeData_0 = LUMI_alloc(sizeof(tl5_compiler_M_TypeData));
   if (aux_TypeData_0 == NULL) RAISE(20, 49, "insufficient memory for object dynamic allocation")
   aux_TypeData_0_Refman = LUMI_new_ref(aux_TypeData_0);
@@ -28220,6 +29322,7 @@ Returncode tl5_compiler_M_TypeData_parse_new(tl5_compiler_M_TypeData* self, Ref_
 LUMI_cleanup:
   if (aux_TypeData_0_Dynamic != NULL) aux_TypeData_0_Dynamic->_base._base._base._del(aux_TypeData_0);
   LUMI_owner_dec_ref(aux_TypeData_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28254,6 +29357,7 @@ Returncode tl5_compiler_M_TypeData_parse(tl5_compiler_M_TypeData* self, Ref_Mana
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(24, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(24, 38, "used member of outdated weak reference")
   self->is_dynamic = is_dynamic;
@@ -28378,6 +29482,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   String_Del(name);
   LUMI_owner_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28403,6 +29508,7 @@ Returncode tl5_compiler_M_TypeData_add_type(tl5_compiler_M_TypeData* self, Ref_M
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(my_module_Refman);
   if (self == NULL) RAISE(54, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(54, 38, "used member of outdated weak reference")
@@ -28463,6 +29569,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_TypeData_0_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(my_module_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28489,6 +29596,7 @@ Returncode tl5_compiler_M_TypeData_parse_child(tl5_compiler_M_TypeData* self, Re
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(keyword_Refman);
   CHECK(64, tl5_compiler_M_SyntaxTreeNamespace_parse_if_function(&(self->_base), self_Refman, &(self_Dynamic->_base), keyword, keyword_Refman, self, self_Refman, self_Dynamic, &(*end), &(aux_Bool_0)) )
   if (aux_Bool_0) {
@@ -28556,6 +29664,7 @@ LUMI_cleanup:
   if (constructor_Dynamic != NULL) constructor_Dynamic->_base._base._base._base._del(constructor);
   LUMI_owner_dec_ref(constructor_Refman);
   LUMI_dec_ref(keyword_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28565,6 +29674,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeData.is-same"
 Returncode tl5_compiler_M_TypeData_is_same(tl5_compiler_M_TypeData* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeData_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* other, Ref_Manager* other_Refman, tl5_compiler_M_TypeData_Dynamic* other_Dynamic, Bool* is_same) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(other_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(85, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(85, 38, "used member of outdated weak reference")
@@ -28577,6 +29687,7 @@ Returncode tl5_compiler_M_TypeData_is_same(tl5_compiler_M_TypeData* self, Ref_Ma
   *is_same = ((void*)self == other) || ((((void*)self == tl5_compiler_M_glob->type_int) || ((void*)self == tl5_compiler_M_glob->type_char)) && (((void*)other == tl5_compiler_M_glob->type_int) || ((void*)other == tl5_compiler_M_glob->type_char)));
 LUMI_cleanup:
   LUMI_dec_ref(other_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28588,6 +29699,7 @@ Returncode tl5_compiler_M_TypeData_new_type_instance(tl5_compiler_M_TypeData* se
   Returncode LUMI_err = OK;
   tl5_compiler_M_TypeInstance* aux_TypeInstance_0 = NULL;
   Ref_Manager* aux_TypeInstance_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_TypeInstance_0 = LUMI_alloc(sizeof(tl5_compiler_M_TypeInstance));
   if (aux_TypeInstance_0 == NULL) RAISE(88, 49, "insufficient memory for object dynamic allocation")
   aux_TypeInstance_0_Refman = LUMI_new_ref(aux_TypeInstance_0);
@@ -28608,6 +29720,7 @@ Returncode tl5_compiler_M_TypeData_new_type_instance(tl5_compiler_M_TypeData* se
 LUMI_cleanup:
   tl5_compiler_M_TypeInstance_Del(aux_TypeInstance_0);
   LUMI_owner_dec_ref(aux_TypeInstance_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28623,6 +29736,7 @@ Returncode tl5_compiler_M_TypeData_self_type_instance(tl5_compiler_M_TypeData* s
   Ref_Manager* parameter_Refman = NULL;
   tl5_compiler_M_List* aux_List_0 = NULL;
   Ref_Manager* aux_List_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(92, tl5_compiler_M_TypeData_new_type_instance(self, self_Refman, self_Dynamic, &(*type_instance), &(*type_instance_Refman)) )
   if (self == NULL) RAISE(93, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(93, 38, "used member of outdated weak reference")
@@ -28685,6 +29799,7 @@ LUMI_cleanup:
   tl5_compiler_M_TypeInstance_Del(parameter);
   LUMI_owner_dec_ref(parameter_Refman);
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28694,12 +29809,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeData.get-parent-type"
 Returncode tl5_compiler_M_TypeData_get_parent_type(tl5_compiler_M_TypeData* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeData_Dynamic* self_Dynamic, tl5_compiler_M_TypeData** parent_type, Ref_Manager** parent_type_Refman, tl5_compiler_M_TypeData_Dynamic** parent_type_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_dec_ref(*parent_type_Refman);
   *parent_type_Refman = self_Refman;
   LUMI_inc_ref(*parent_type_Refman);
   *parent_type_Dynamic = self_Dynamic;
   *parent_type = self;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28715,6 +29832,7 @@ Returncode tl5_compiler_M_TypeData_find_field(tl5_compiler_M_TypeData* self, Ref
   tl5_compiler_M_ListNode* child = NULL;
   Ref_Manager* child_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   type_data = self;
   type_data_Refman = self_Refman;
@@ -28777,6 +29895,7 @@ LUMI_cleanup:
   LUMI_dec_ref(child_Refman);
   LUMI_dec_ref(type_data_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28792,6 +29911,7 @@ Returncode tl5_compiler_M_TypeData_find_meth(tl5_compiler_M_TypeData* self, Ref_
   tl5_compiler_M_ListNode* child = NULL;
   Ref_Manager* child_Refman = NULL;
   Bool aux_Bool_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   type_data = self;
   type_data_Refman = self_Refman;
@@ -28854,6 +29974,7 @@ LUMI_cleanup:
   LUMI_dec_ref(child_Refman);
   LUMI_dec_ref(type_data_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -28872,8 +29993,12 @@ Returncode tl5_compiler_M_TypeData_order_bases(tl5_compiler_M_TypeData* self, Re
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  tl5_compiler_M_TypeData* aux_TypeData_0 = NULL;
+  Ref_Manager* aux_TypeData_0_Refman = NULL;
+  tl5_compiler_M_TypeData_Dynamic* aux_TypeData_0_Dynamic = NULL;
   tl5_compiler_M_NameMap* aux_NameMap_0 = NULL;
   Ref_Manager* aux_NameMap_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ordered_list_Refman);
   if (self == NULL) RAISE(145, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(145, 38, "used member of outdated weak reference")
@@ -28922,6 +30047,15 @@ Returncode tl5_compiler_M_TypeData_order_bases(tl5_compiler_M_TypeData* self, Re
       if (self->base_type_Refman->value == NULL) RAISE(155, 38, "used member of outdated weak reference")
       CHECK(155, tl5_compiler_M_TypeData_order_bases(self->base_type->type_data, self->base_type->type_data_Refman, self->base_type->type_data_Dynamic, ordered_list, ordered_list_Refman) )
     }
+  if (tl5_compiler_M_glob == NULL) RAISE(156, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob->root == NULL) RAISE(156, 27, "used member of empty object")
+  if (tl5_compiler_M_glob->root_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
+  CHECK(156, tl5_compiler_M_List_remove(tl5_compiler_M_glob->root->_base.types, tl5_compiler_M_glob->root->_base.types_Refman, self, self_Refman, (void*)self_Dynamic, (void*)&(aux_TypeData_0), &(aux_TypeData_0_Refman), (void*)&(aux_TypeData_0_Dynamic)) )
+  CHECK(156, tl5_compiler_M_List_add(ordered_list, ordered_list_Refman, aux_TypeData_0, aux_TypeData_0_Refman, (void*)aux_TypeData_0_Dynamic) )
+  aux_TypeData_0 = NULL;
+  aux_TypeData_0_Refman = NULL;
+  aux_TypeData_0_Dynamic = NULL;
   if (self == NULL) RAISE(157, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(157, 38, "used member of outdated weak reference")
   self->is_ordered = true;
@@ -29030,10 +30164,13 @@ Returncode tl5_compiler_M_TypeData_order_bases(tl5_compiler_M_TypeData* self, Re
 LUMI_cleanup:
   tl5_compiler_M_NameMap_Del(aux_NameMap_0);
   LUMI_owner_dec_ref(aux_NameMap_0_Refman);
+  if (aux_TypeData_0_Dynamic != NULL) aux_TypeData_0_Dynamic->_base._base._base._del(aux_TypeData_0);
+  LUMI_owner_dec_ref(aux_TypeData_0_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(method_Refman);
   LUMI_dec_ref(child_Refman);
   LUMI_dec_ref(ordered_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29046,6 +30183,7 @@ Returncode tl5_compiler_M_TypeData_link_types(tl5_compiler_M_TypeData* self, Ref
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(180, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(180, 27, "used member of empty object")
@@ -29095,6 +30233,7 @@ Returncode tl5_compiler_M_TypeData_link_types(tl5_compiler_M_TypeData* self, Ref
   tl5_compiler_M_glob->current_module = NULL;
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29113,6 +30252,7 @@ Returncode tl5_compiler_M_TypeData_analyze(tl5_compiler_M_TypeData* self, Ref_Ma
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(192, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(192, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(192, 27, "used member of empty object")
@@ -29198,6 +30338,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29207,6 +30348,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeData.write-cname"
 Returncode tl5_compiler_M_TypeData_write_cname(tl5_compiler_M_TypeData* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeData_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(210, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
   if (self->my_module != NULL && self->my_module_Refman->value != NULL) {
@@ -29218,6 +30360,7 @@ Returncode tl5_compiler_M_TypeData_write_cname(tl5_compiler_M_TypeData* self, Re
   if (self_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
   CHECK(212, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29245,6 +30388,7 @@ Returncode tl5_compiler_M_TypeData_write_declaration(tl5_compiler_M_TypeData* se
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(217, 38, "insufficient memory for managed object")
@@ -29302,6 +30446,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29343,6 +30488,7 @@ Returncode tl5_compiler_M_TypeData_write(tl5_compiler_M_TypeData* self, Ref_Mana
   String aux_String_9_Var = {0};
   String* aux_String_9 = NULL;
   Ref_Manager* aux_String_9_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(236, 38, "insufficient memory for managed object")
@@ -29378,6 +30524,9 @@ Returncode tl5_compiler_M_TypeData_write(tl5_compiler_M_TypeData* self, Ref_Mana
       aux_String_2_Var.values = " _base;\n";
       CHECK(243, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
     }
+  if (self == NULL) RAISE(244, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
+  CHECK(244, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), self->_base._base.variables, self->_base._base.variables_Refman) )
   aux_String_3 = &aux_String_3_Var;
   aux_String_3_Refman = LUMI_new_ref(aux_String_3);
   if (aux_String_3_Refman == NULL) RAISE(245, 38, "insufficient memory for managed object")
@@ -29486,6 +30635,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(child_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29504,6 +30654,7 @@ Returncode tl5_compiler_M_TypeData_write_methods_declaration(tl5_compiler_M_Type
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(268, tl5_compiler_M_SyntaxTreeNamespace_write_functions_declaration(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -29532,6 +30683,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29562,6 +30714,7 @@ Returncode tl5_compiler_M_TypeData_write_global(tl5_compiler_M_TypeData* self, R
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(277, 38, "insufficient memory for managed object")
@@ -29630,6 +30783,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29666,6 +30820,7 @@ Returncode tl5_compiler_M_TypeData_write_dynamic_init(tl5_compiler_M_TypeData* s
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -29787,6 +30942,7 @@ LUMI_cleanup:
   LUMI_dec_ref(method_Refman);
   LUMI_dec_ref(child_Refman);
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29823,6 +30979,10 @@ Returncode tl5_compiler_M_TypeData_write_methods_body(tl5_compiler_M_TypeData* s
   String aux_String_8_Var = {0};
   String* aux_String_8 = NULL;
   Ref_Manager* aux_String_8_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(320, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(320, 38, "used member of outdated weak reference")
+  CHECK(320, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base), self->_base.functions, self->_base.functions_Refman) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(326, 38, "insufficient memory for managed object")
@@ -29913,6 +31073,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29922,11 +31083,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TypeData.write-me"
 Returncode tl5_compiler_M_TypeData_write_me(tl5_compiler_M_TypeData* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeData_Dynamic* self_Dynamic, tl5_compiler_M_TypeWriter* type_writer, Ref_Manager* type_writer_Refman, tl5_compiler_M_TypeWriter_Dynamic* type_writer_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_writer_Refman);
   if (type_writer_Dynamic == NULL) RAISE(344, 28, "dynamic call of empty object")
   CHECK(344, type_writer_Dynamic->write(type_writer, type_writer_Refman, type_writer_Dynamic, self, self_Refman, self_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(type_writer_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29953,6 +31116,7 @@ Returncode tl5_compiler_M_NativeType_parse_new(tl5_compiler_M_NativeType* self, 
   tl5_compiler_M_NativeType* aux_NativeType_0 = NULL;
   Ref_Manager* aux_NativeType_0_Refman = NULL;
   tl5_compiler_M_NativeType_Dynamic* aux_NativeType_0_Dynamic = &tl5_compiler_M_NativeType_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_NativeType_0 = LUMI_alloc(sizeof(tl5_compiler_M_NativeType));
   if (aux_NativeType_0 == NULL) RAISE(80, 49, "insufficient memory for object dynamic allocation")
   aux_NativeType_0_Refman = LUMI_new_ref(aux_NativeType_0);
@@ -29969,6 +31133,7 @@ Returncode tl5_compiler_M_NativeType_parse_new(tl5_compiler_M_NativeType* self, 
 LUMI_cleanup:
   if (aux_NativeType_0_Dynamic != NULL) aux_NativeType_0_Dynamic->_base._base._base._base._del(aux_NativeType_0);
   LUMI_owner_dec_ref(aux_NativeType_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -29981,6 +31146,7 @@ Returncode tl5_compiler_M_NativeType_parse(tl5_compiler_M_NativeType* self, Ref_
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(84, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(84, 38, "used member of outdated weak reference")
   self->_base.is_primitive = true;
@@ -29999,6 +31165,7 @@ Returncode tl5_compiler_M_NativeType_parse(tl5_compiler_M_NativeType* self, Ref_
   CHECK(87, tl5_compiler_M_SyntaxTreeNamespace_init(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30008,7 +31175,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "NativeType.analyze"
 Returncode tl5_compiler_M_NativeType_analyze(tl5_compiler_M_NativeType* self, Ref_Manager* self_Refman, tl5_compiler_M_NativeType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30024,6 +31193,7 @@ Returncode tl5_compiler_M_NativeType_write_declaration(tl5_compiler_M_NativeType
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(94, 38, "insufficient memory for managed object")
@@ -30044,6 +31214,7 @@ Returncode tl5_compiler_M_NativeType_write_declaration(tl5_compiler_M_NativeType
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30053,7 +31224,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "NativeType.write-methods-declaration"
 Returncode tl5_compiler_M_NativeType_write_methods_declaration(tl5_compiler_M_NativeType* self, Ref_Manager* self_Refman, tl5_compiler_M_NativeType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30063,7 +31236,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "NativeType.write-methods-body"
 Returncode tl5_compiler_M_NativeType_write_methods_body(tl5_compiler_M_NativeType* self, Ref_Manager* self_Refman, tl5_compiler_M_NativeType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30073,7 +31248,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "NativeType.write-global"
 Returncode tl5_compiler_M_NativeType_write_global(tl5_compiler_M_NativeType* self, Ref_Manager* self_Refman, tl5_compiler_M_NativeType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30083,7 +31260,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "NativeType.write"
 Returncode tl5_compiler_M_NativeType_write(tl5_compiler_M_NativeType* self, Ref_Manager* self_Refman, tl5_compiler_M_NativeType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30101,6 +31280,7 @@ Returncode tl5_compiler_M_SyntaxTreeAssert_parse_new(tl5_compiler_M_SyntaxTreeAs
   tl5_compiler_M_SyntaxTreeAssert* aux_SyntaxTreeAssert_0 = NULL;
   Ref_Manager* aux_SyntaxTreeAssert_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeAssert_Dynamic* aux_SyntaxTreeAssert_0_Dynamic = &tl5_compiler_M_SyntaxTreeAssert_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeAssert_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeAssert));
   if (aux_SyntaxTreeAssert_0 == NULL) RAISE(10, 49, "insufficient memory for object dynamic allocation")
@@ -30119,6 +31299,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeAssert_0_Dynamic != NULL) aux_SyntaxTreeAssert_0_Dynamic->_base._base._del(aux_SyntaxTreeAssert_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeAssert_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30131,6 +31312,7 @@ Returncode tl5_compiler_M_SyntaxTreeAssert_parse(tl5_compiler_M_SyntaxTreeAssert
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   if (self == NULL) RAISE(14, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
@@ -30152,6 +31334,7 @@ Returncode tl5_compiler_M_SyntaxTreeAssert_parse(tl5_compiler_M_SyntaxTreeAssert
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30161,12 +31344,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeAssert.analyze"
 Returncode tl5_compiler_M_SyntaxTreeAssert_analyze(tl5_compiler_M_SyntaxTreeAssert* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeAssert_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(19, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(19, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(19, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(19, 38, "used member of outdated weak reference")
   CHECK(19, tl5_compiler_M_SyntaxTreeNode_analyze_expression(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->tested, self->tested_Refman, self->tested_Dynamic, tl5_compiler_M_glob->type_bool, tl5_compiler_M_glob->type_bool_Refman, tl5_compiler_M_glob->type_bool_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30185,6 +31370,7 @@ Returncode tl5_compiler_M_SyntaxTreeAssert_write(tl5_compiler_M_SyntaxTreeAssert
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(23, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   if (self->tested_Dynamic == NULL) RAISE(24, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(24, 27, "used member of empty object")
@@ -30220,6 +31406,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30239,6 +31426,7 @@ Returncode tl5_compiler_M_SyntaxTreeAssertError_parse_new(tl5_compiler_M_SyntaxT
   tl5_compiler_M_SyntaxTreeAssertError* aux_SyntaxTreeAssertError_0 = NULL;
   Ref_Manager* aux_SyntaxTreeAssertError_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeAssertError_Dynamic* aux_SyntaxTreeAssertError_0_Dynamic = &tl5_compiler_M_SyntaxTreeAssertError_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeAssertError_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeAssertError));
   if (aux_SyntaxTreeAssertError_0 == NULL) RAISE(38, 49, "insufficient memory for object dynamic allocation")
@@ -30257,6 +31445,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeAssertError_0_Dynamic != NULL) aux_SyntaxTreeAssertError_0_Dynamic->_base._base._del(aux_SyntaxTreeAssertError_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeAssertError_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30275,6 +31464,7 @@ Returncode tl5_compiler_M_SyntaxTreeAssertError_parse(tl5_compiler_M_SyntaxTreeA
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   if (self == NULL) RAISE(42, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(42, 38, "used member of outdated weak reference")
@@ -30327,6 +31517,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30336,11 +31527,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeAssertError.analyze"
 Returncode tl5_compiler_M_SyntaxTreeAssertError_analyze(tl5_compiler_M_SyntaxTreeAssertError* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeAssertError_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self->tested_Dynamic == NULL) RAISE(55, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(55, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(55, 38, "used member of outdated weak reference")
   CHECK(55, self->tested_Dynamic->_base.analyze(&(self->tested->_base), self->tested_Refman, &(self->tested_Dynamic->_base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30443,6 +31636,7 @@ Returncode tl5_compiler_M_SyntaxTreeAssertError_write(tl5_compiler_M_SyntaxTreeA
   String aux_String_30_Var = {0};
   String* aux_String_30 = NULL;
   Ref_Manager* aux_String_30_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(58, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(58, 38, "used member of outdated weak reference")
   if (self->expected_error != NULL && self->expected_error_Refman->value != NULL) {
@@ -30744,6 +31938,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30765,6 +31960,7 @@ Returncode tl5_compiler_M_SyntaxTreeTestFunction_parse_new(tl5_compiler_M_Syntax
   tl5_compiler_M_SyntaxTreeTestFunction* aux_SyntaxTreeTestFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeTestFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeTestFunction_Dynamic* aux_SyntaxTreeTestFunction_0_Dynamic = &tl5_compiler_M_SyntaxTreeTestFunction_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_SyntaxTreeTestFunction_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeTestFunction));
   if (aux_SyntaxTreeTestFunction_0 == NULL) RAISE(124, 49, "insufficient memory for object dynamic allocation")
   aux_SyntaxTreeTestFunction_0_Refman = LUMI_new_ref(aux_SyntaxTreeTestFunction_0);
@@ -30781,6 +31977,7 @@ Returncode tl5_compiler_M_SyntaxTreeTestFunction_parse_new(tl5_compiler_M_Syntax
 LUMI_cleanup:
   if (aux_SyntaxTreeTestFunction_0_Dynamic != NULL) aux_SyntaxTreeTestFunction_0_Dynamic->_base._base._base._base._del(aux_SyntaxTreeTestFunction_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeTestFunction_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30793,6 +31990,7 @@ Returncode tl5_compiler_M_SyntaxTreeTestFunction_parse(tl5_compiler_M_SyntaxTree
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(128, tl5_compiler_M_SyntaxTreeFunction_parse(&(self->_base), self_Refman, &(self_Dynamic->_base), NULL, NULL, NULL, &(*end)) )
   if (self == NULL) RAISE(129, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(129, 38, "used member of outdated weak reference")
@@ -30822,6 +32020,7 @@ Returncode tl5_compiler_M_SyntaxTreeTestFunction_parse(tl5_compiler_M_SyntaxTree
   CHECK(131, tl5_compiler_M_NameMap_add(tl5_compiler_M_glob->test_functions, tl5_compiler_M_glob->test_functions_Refman, self->_base.name, self->_base.name_Refman, self, self_Refman, (void*)self_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30839,6 +32038,7 @@ Returncode tl5_compiler_M_SyntaxTreeMockFunction_parse_new(tl5_compiler_M_Syntax
   tl5_compiler_M_SyntaxTreeMockFunction* aux_SyntaxTreeMockFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeMockFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeMockFunction_Dynamic* aux_SyntaxTreeMockFunction_0_Dynamic = &tl5_compiler_M_SyntaxTreeMockFunction_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_SyntaxTreeMockFunction_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeMockFunction));
   if (aux_SyntaxTreeMockFunction_0 == NULL) RAISE(142, 49, "insufficient memory for object dynamic allocation")
   aux_SyntaxTreeMockFunction_0_Refman = LUMI_new_ref(aux_SyntaxTreeMockFunction_0);
@@ -30855,6 +32055,7 @@ Returncode tl5_compiler_M_SyntaxTreeMockFunction_parse_new(tl5_compiler_M_Syntax
 LUMI_cleanup:
   if (aux_SyntaxTreeMockFunction_0_Dynamic != NULL) aux_SyntaxTreeMockFunction_0_Dynamic->_base._base._base._base._del(aux_SyntaxTreeMockFunction_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeMockFunction_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -30898,6 +32099,7 @@ Returncode tl5_compiler_M_SyntaxTreeMockFunction_parse(tl5_compiler_M_SyntaxTree
   String aux_String_8_Var = {0};
   String* aux_String_8 = NULL;
   Ref_Manager* aux_String_8_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(146, tl5_compiler_M_SyntaxTreeFunction_parse(&(self->_base), self_Refman, &(self_Dynamic->_base), NULL, NULL, NULL, &(*end)) )
   if (self == NULL) RAISE(147, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
@@ -31076,6 +32278,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(last_Refman);
   LUMI_dec_ref(first_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31085,7 +32288,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeMockFunction.register-name"
 Returncode tl5_compiler_M_SyntaxTreeMockFunction_register_name(tl5_compiler_M_SyntaxTreeMockFunction* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeMockFunction_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31141,6 +32346,7 @@ Returncode tl5_compiler_M_SyntaxTreeMockFunction_analyze(tl5_compiler_M_SyntaxTr
   String* aux_String_12 = NULL;
   Ref_Manager* aux_String_12_Refman = NULL;
   Bool aux_Bool_3 = 0;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(177, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(177, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(177, 27, "used member of empty object")
@@ -31458,6 +32664,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31473,6 +32680,7 @@ Returncode tl5_compiler_M_SyntaxTreeMockFunction_write(tl5_compiler_M_SyntaxTree
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(236, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(236, 38, "used member of outdated weak reference")
   if (self->mocked_function != NULL && self->mocked_function_Refman->value != NULL) {
@@ -31496,6 +32704,7 @@ Returncode tl5_compiler_M_SyntaxTreeMockFunction_write(tl5_compiler_M_SyntaxTree
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31518,6 +32727,7 @@ Returncode tl5_compiler_M_SyntaxTreeMockFunction_write_block_body(tl5_compiler_M
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(244, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
   if (self->mocked_function != NULL && self->mocked_function_Refman->value != NULL) {
@@ -31571,6 +32781,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31600,6 +32811,7 @@ Returncode tl5_compiler_M_SyntaxTreeMockFunction_write_arg_list(tl5_compiler_M_S
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(list_Refman);
   if (list == NULL) RAISE(259, 27, "used member of empty object")
   if (list_Refman->value == NULL) RAISE(259, 38, "used member of outdated weak reference")
@@ -31691,6 +32903,7 @@ LUMI_cleanup:
   LUMI_dec_ref(variable_Refman);
   LUMI_dec_ref(node_Refman);
   LUMI_dec_ref(list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31712,10 +32925,12 @@ void tl5_compiler_M_SyntaxTreeMockFunction_Del(tl5_compiler_M_SyntaxTreeMockFunc
 #define LUMI_FUNC_NAME "TypeWriter.write"
 Returncode tl5_compiler_M_TypeWriter_write(tl5_compiler_M_TypeWriter* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeWriter_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* type_data, Ref_Manager* type_data_Refman, tl5_compiler_M_TypeData_Dynamic* type_data_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   USER_RAISE(350, NULL, NULL)
 LUMI_cleanup:
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31729,11 +32944,13 @@ void tl5_compiler_M_TypeWriter_Del(tl5_compiler_M_TypeWriter* self) {
 #define LUMI_FUNC_NAME "TypeDeclarationWriter.write"
 Returncode tl5_compiler_M_TypeDeclarationWriter_write(tl5_compiler_M_TypeDeclarationWriter* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeDeclarationWriter_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* type_data, Ref_Manager* type_data_Refman, tl5_compiler_M_TypeData_Dynamic* type_data_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   if (type_data_Dynamic == NULL) RAISE(354, 28, "dynamic call of empty object")
   CHECK(354, type_data_Dynamic->write_declaration(type_data, type_data_Refman, type_data_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31748,11 +32965,13 @@ void tl5_compiler_M_TypeDeclarationWriter_Del(tl5_compiler_M_TypeDeclarationWrit
 #define LUMI_FUNC_NAME "TypeMethodsDeclarationWriter.write"
 Returncode tl5_compiler_M_TypeMethodsDeclarationWriter_write(tl5_compiler_M_TypeMethodsDeclarationWriter* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeMethodsDeclarationWriter_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* type_data, Ref_Manager* type_data_Refman, tl5_compiler_M_TypeData_Dynamic* type_data_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   if (type_data_Dynamic == NULL) RAISE(358, 28, "dynamic call of empty object")
   CHECK(358, type_data_Dynamic->write_methods_declaration(type_data, type_data_Refman, type_data_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31767,11 +32986,13 @@ void tl5_compiler_M_TypeMethodsDeclarationWriter_Del(tl5_compiler_M_TypeMethodsD
 #define LUMI_FUNC_NAME "TypeGlobalWriter.write"
 Returncode tl5_compiler_M_TypeGlobalWriter_write(tl5_compiler_M_TypeGlobalWriter* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeGlobalWriter_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* type_data, Ref_Manager* type_data_Refman, tl5_compiler_M_TypeData_Dynamic* type_data_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   if (type_data_Dynamic == NULL) RAISE(362, 28, "dynamic call of empty object")
   CHECK(362, type_data_Dynamic->write_global(type_data, type_data_Refman, type_data_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31786,11 +33007,13 @@ void tl5_compiler_M_TypeGlobalWriter_Del(tl5_compiler_M_TypeGlobalWriter* self) 
 #define LUMI_FUNC_NAME "TypeMethodsBodyWriter.write"
 Returncode tl5_compiler_M_TypeMethodsBodyWriter_write(tl5_compiler_M_TypeMethodsBodyWriter* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeMethodsBodyWriter_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* type_data, Ref_Manager* type_data_Refman, tl5_compiler_M_TypeData_Dynamic* type_data_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_data_Refman);
   if (type_data_Dynamic == NULL) RAISE(366, 28, "dynamic call of empty object")
   CHECK(366, type_data_Dynamic->write_methods_body(type_data, type_data_Refman, type_data_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(type_data_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31808,16 +33031,26 @@ Returncode tl5_compiler_M_VariableInit_parse_new(tl5_compiler_M_VariableInit* se
   tl5_compiler_M_VariableInit* new_node = NULL;
   Ref_Manager* new_node_Refman = NULL;
   tl5_compiler_M_VariableInit_Dynamic* new_node_Dynamic = &tl5_compiler_M_VariableInit_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(variable_Refman);
   new_node = LUMI_alloc(sizeof(tl5_compiler_M_VariableInit));
   if (new_node == NULL) RAISE(326, 49, "insufficient memory for object dynamic allocation")
   new_node_Refman = LUMI_new_ref(new_node);
   if (new_node_Refman == NULL) RAISE(326, 38, "insufficient memory for managed object")
   CHECK(327, tl5_compiler_M_VariableInit_parse(new_node, new_node_Refman, new_node_Dynamic, variable, variable_Refman, variable_Dynamic, &(*end)) )
+  if (variable == NULL) RAISE(328, 27, "used member of empty object")
+  if (variable_Refman->value == NULL) RAISE(328, 38, "used member of outdated weak reference")
+  if (variable->_base.parent == NULL) RAISE(328, 27, "used member of empty object")
+  if (variable->_base.parent_Refman->value == NULL) RAISE(328, 38, "used member of outdated weak reference")
+  CHECK(328, tl5_compiler_M_List_add(variable->_base.parent->code_nodes, variable->_base.parent->code_nodes_Refman, &(new_node->_base), new_node_Refman, (void*)&(new_node_Dynamic->_base)) )
+  new_node = NULL;
+  new_node_Refman = NULL;
+  new_node_Dynamic = NULL;
 LUMI_cleanup:
   if (new_node_Dynamic != NULL) new_node_Dynamic->_base._base._del(new_node);
   LUMI_owner_dec_ref(new_node_Refman);
   LUMI_dec_ref(variable_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31835,30 +33068,31 @@ Returncode tl5_compiler_M_VariableInit_parse(tl5_compiler_M_VariableInit* self, 
   tl5_compiler_M_SymbolExpression* aux_SymbolExpression_0 = NULL;
   Ref_Manager* aux_SymbolExpression_0_Refman = NULL;
   tl5_compiler_M_SymbolExpression_Dynamic* aux_SymbolExpression_0_Dynamic = &tl5_compiler_M_SymbolExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(variable_Refman);
-  CHECK(330, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
-  if (variable == NULL) RAISE(331, 27, "used member of empty object")
-  if (variable_Refman->value == NULL) RAISE(331, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(331, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(331, 38, "used member of outdated weak reference")
+  CHECK(331, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  if (variable == NULL) RAISE(332, 27, "used member of empty object")
+  if (variable_Refman->value == NULL) RAISE(332, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(332, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(332, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->_base.parent_Refman);
   self->_base.parent_Refman = variable->_base.parent_Refman;
   LUMI_inc_ref(self->_base.parent_Refman);
   self->_base.parent_Dynamic = variable->_base.parent_Dynamic;
   self->_base.parent = variable->_base.parent;
-  if (self == NULL) RAISE(332, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(332, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(333, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->variable_Refman);
   self->variable_Refman = variable_Refman;
   LUMI_inc_ref(self->variable_Refman);
   self->variable_Dynamic = variable_Dynamic;
   self->variable = variable;
   aux_InitExpression_0 = LUMI_alloc(sizeof(tl5_compiler_M_InitExpression));
-  if (aux_InitExpression_0 == NULL) RAISE(333, 49, "insufficient memory for object dynamic allocation")
+  if (aux_InitExpression_0 == NULL) RAISE(334, 49, "insufficient memory for object dynamic allocation")
   aux_InitExpression_0_Refman = LUMI_new_ref(aux_InitExpression_0);
-  if (aux_InitExpression_0_Refman == NULL) RAISE(333, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(333, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
+  if (aux_InitExpression_0_Refman == NULL) RAISE(334, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(334, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(334, 38, "used member of outdated weak reference")
   if (self->expression_init_Dynamic != NULL) self->expression_init_Dynamic->_base._base._base._del(self->expression_init);
   LUMI_owner_dec_ref(self->expression_init_Refman);
   self->expression_init_Refman = aux_InitExpression_0_Refman;
@@ -31867,27 +33101,27 @@ Returncode tl5_compiler_M_VariableInit_parse(tl5_compiler_M_VariableInit* self, 
   aux_InitExpression_0 = NULL;
   aux_InitExpression_0_Refman = NULL;
   aux_InitExpression_0_Dynamic = NULL;
-  if (self == NULL) RAISE(334, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(334, 38, "used member of outdated weak reference")
-  if (variable == NULL) RAISE(335, 27, "used member of empty object")
-  if (variable_Refman->value == NULL) RAISE(335, 38, "used member of outdated weak reference")
-  CHECK(335, tl5_compiler_M_TypeInstance_copy_new(variable->type_instance, variable->type_instance_Refman, &(aux_TypeInstance_0), &(aux_TypeInstance_0_Refman)) )
-  CHECK(334, tl5_compiler_M_InitExpression_parse(self->expression_init, self->expression_init_Refman, self->expression_init_Dynamic, aux_TypeInstance_0, aux_TypeInstance_0_Refman, NULL, NULL, NULL, &(self->_base), self_Refman, &(self_Dynamic->_base), &(*end)) )
+  if (self == NULL) RAISE(335, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(335, 38, "used member of outdated weak reference")
+  if (variable == NULL) RAISE(336, 27, "used member of empty object")
+  if (variable_Refman->value == NULL) RAISE(336, 38, "used member of outdated weak reference")
+  CHECK(336, tl5_compiler_M_TypeInstance_copy_new(variable->type_instance, variable->type_instance_Refman, &(aux_TypeInstance_0), &(aux_TypeInstance_0_Refman)) )
+  CHECK(335, tl5_compiler_M_InitExpression_parse(self->expression_init, self->expression_init_Refman, self->expression_init_Dynamic, aux_TypeInstance_0, aux_TypeInstance_0_Refman, NULL, NULL, NULL, &(self->_base), self_Refman, &(self_Dynamic->_base), &(*end)) )
   aux_TypeInstance_0 = NULL;
   aux_TypeInstance_0_Refman = NULL;
-  if (self == NULL) RAISE(336, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(336, 38, "used member of outdated weak reference")
-  if (self->expression_init == NULL) RAISE(336, 27, "used member of empty object")
-  if (self->expression_init_Refman->value == NULL) RAISE(336, 38, "used member of outdated weak reference")
-  self->expression_init->_base._base.is_statement = true;
-  aux_SymbolExpression_0 = LUMI_alloc(sizeof(tl5_compiler_M_SymbolExpression));
-  if (aux_SymbolExpression_0 == NULL) RAISE(337, 49, "insufficient memory for object dynamic allocation")
-  aux_SymbolExpression_0_Refman = LUMI_new_ref(aux_SymbolExpression_0);
-  if (aux_SymbolExpression_0_Refman == NULL) RAISE(337, 38, "insufficient memory for managed object")
   if (self == NULL) RAISE(337, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(337, 38, "used member of outdated weak reference")
   if (self->expression_init == NULL) RAISE(337, 27, "used member of empty object")
   if (self->expression_init_Refman->value == NULL) RAISE(337, 38, "used member of outdated weak reference")
+  self->expression_init->_base._base.is_statement = true;
+  aux_SymbolExpression_0 = LUMI_alloc(sizeof(tl5_compiler_M_SymbolExpression));
+  if (aux_SymbolExpression_0 == NULL) RAISE(338, 49, "insufficient memory for object dynamic allocation")
+  aux_SymbolExpression_0_Refman = LUMI_new_ref(aux_SymbolExpression_0);
+  if (aux_SymbolExpression_0_Refman == NULL) RAISE(338, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(338, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(338, 38, "used member of outdated weak reference")
+  if (self->expression_init == NULL) RAISE(338, 27, "used member of empty object")
+  if (self->expression_init_Refman->value == NULL) RAISE(338, 38, "used member of outdated weak reference")
   if (self->expression_init->symbol_Dynamic != NULL) self->expression_init->symbol_Dynamic->_base._base._del(self->expression_init->symbol);
   LUMI_owner_dec_ref(self->expression_init->symbol_Refman);
   self->expression_init->symbol_Refman = aux_SymbolExpression_0_Refman;
@@ -31896,43 +33130,43 @@ Returncode tl5_compiler_M_VariableInit_parse(tl5_compiler_M_VariableInit* self, 
   aux_SymbolExpression_0 = NULL;
   aux_SymbolExpression_0_Refman = NULL;
   aux_SymbolExpression_0_Dynamic = NULL;
-  if (variable == NULL) RAISE(338, 27, "used member of empty object")
-  if (variable_Refman->value == NULL) RAISE(338, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(339, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(339, 38, "used member of outdated weak reference")
-  if (self->expression_init == NULL) RAISE(339, 27, "used member of empty object")
-  if (self->expression_init_Refman->value == NULL) RAISE(339, 38, "used member of outdated weak reference")
-  if (self->expression_init->symbol == NULL) RAISE(339, 27, "used member of empty object")
-  if (self->expression_init->symbol_Refman->value == NULL) RAISE(339, 38, "used member of outdated weak reference")
-  CHECK(338, tl5_compiler_M_string_new_copy(variable->name, variable->name_Refman, &(self->expression_init->symbol->name), &(self->expression_init->symbol->name_Refman)) )
+  if (variable == NULL) RAISE(339, 27, "used member of empty object")
+  if (variable_Refman->value == NULL) RAISE(339, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(340, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(340, 38, "used member of outdated weak reference")
   if (self->expression_init == NULL) RAISE(340, 27, "used member of empty object")
   if (self->expression_init_Refman->value == NULL) RAISE(340, 38, "used member of outdated weak reference")
   if (self->expression_init->symbol == NULL) RAISE(340, 27, "used member of empty object")
   if (self->expression_init->symbol_Refman->value == NULL) RAISE(340, 38, "used member of outdated weak reference")
+  CHECK(339, tl5_compiler_M_string_new_copy(variable->name, variable->name_Refman, &(self->expression_init->symbol->name), &(self->expression_init->symbol->name_Refman)) )
+  if (self == NULL) RAISE(341, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
+  if (self->expression_init == NULL) RAISE(341, 27, "used member of empty object")
+  if (self->expression_init_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
+  if (self->expression_init->symbol == NULL) RAISE(341, 27, "used member of empty object")
+  if (self->expression_init->symbol_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->expression_init->symbol->variable_Refman);
   self->expression_init->symbol->variable_Refman = variable_Refman;
   LUMI_inc_ref(self->expression_init->symbol->variable_Refman);
   self->expression_init->symbol->variable_Dynamic = variable_Dynamic;
   self->expression_init->symbol->variable = variable;
-  if (variable == NULL) RAISE(341, 27, "used member of empty object")
-  if (variable_Refman->value == NULL) RAISE(341, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(342, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
-  if (self->expression_init == NULL) RAISE(342, 27, "used member of empty object")
-  if (self->expression_init_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
-  if (self->expression_init->symbol == NULL) RAISE(342, 27, "used member of empty object")
-  if (self->expression_init->symbol_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
-  CHECK(341, tl5_compiler_M_TypeInstance_copy_new(variable->type_instance, variable->type_instance_Refman, &(self->expression_init->symbol->_base.result_type), &(self->expression_init->symbol->_base.result_type_Refman)) )
-  if (variable == NULL) RAISE(343, 27, "used member of empty object")
-  if (variable_Refman->value == NULL) RAISE(343, 38, "used member of outdated weak reference")
+  if (variable == NULL) RAISE(342, 27, "used member of empty object")
+  if (variable_Refman->value == NULL) RAISE(342, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(343, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(343, 38, "used member of outdated weak reference")
   if (self->expression_init == NULL) RAISE(343, 27, "used member of empty object")
   if (self->expression_init_Refman->value == NULL) RAISE(343, 38, "used member of outdated weak reference")
   if (self->expression_init->symbol == NULL) RAISE(343, 27, "used member of empty object")
   if (self->expression_init->symbol_Refman->value == NULL) RAISE(343, 38, "used member of outdated weak reference")
+  CHECK(342, tl5_compiler_M_TypeInstance_copy_new(variable->type_instance, variable->type_instance_Refman, &(self->expression_init->symbol->_base.result_type), &(self->expression_init->symbol->_base.result_type_Refman)) )
+  if (variable == NULL) RAISE(344, 27, "used member of empty object")
+  if (variable_Refman->value == NULL) RAISE(344, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(344, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(344, 38, "used member of outdated weak reference")
+  if (self->expression_init == NULL) RAISE(344, 27, "used member of empty object")
+  if (self->expression_init_Refman->value == NULL) RAISE(344, 38, "used member of outdated weak reference")
+  if (self->expression_init->symbol == NULL) RAISE(344, 27, "used member of empty object")
+  if (self->expression_init->symbol_Refman->value == NULL) RAISE(344, 38, "used member of outdated weak reference")
   self->expression_init->symbol->_base.access = variable->access;
 LUMI_cleanup:
   if (aux_SymbolExpression_0_Dynamic != NULL) aux_SymbolExpression_0_Dynamic->_base._base._del(aux_SymbolExpression_0);
@@ -31942,6 +33176,7 @@ LUMI_cleanup:
   if (aux_InitExpression_0_Dynamic != NULL) aux_InitExpression_0_Dynamic->_base._base._base._del(aux_InitExpression_0);
   LUMI_owner_dec_ref(aux_InitExpression_0_Refman);
   LUMI_dec_ref(variable_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -31951,6 +33186,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "VariableInit.analyze"
 Returncode tl5_compiler_M_VariableInit_analyze(tl5_compiler_M_VariableInit* self, Ref_Manager* self_Refman, tl5_compiler_M_VariableInit_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(347, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(347, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob->root == NULL) RAISE(347, 27, "used member of empty object")
@@ -31988,6 +33224,7 @@ Returncode tl5_compiler_M_VariableInit_analyze(tl5_compiler_M_VariableInit* self
       tl5_compiler_M_glob->current_module = NULL;
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32006,6 +33243,7 @@ Returncode tl5_compiler_M_VariableInit_write(tl5_compiler_M_VariableInit* self, 
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(355, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(355, 38, "used member of outdated weak reference")
   if (self->expression_init == NULL) RAISE(355, 27, "used member of empty object")
@@ -32075,6 +33313,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32095,6 +33334,7 @@ Returncode tl5_compiler_M_SyntaxTreeConstant_parse_new(tl5_compiler_M_SyntaxTree
   tl5_compiler_M_SyntaxTreeConstant* aux_SyntaxTreeConstant_0 = NULL;
   Ref_Manager* aux_SyntaxTreeConstant_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeConstant_Dynamic* aux_SyntaxTreeConstant_0_Dynamic = &tl5_compiler_M_SyntaxTreeConstant_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_SyntaxTreeConstant_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeConstant));
   if (aux_SyntaxTreeConstant_0 == NULL) RAISE(372, 49, "insufficient memory for object dynamic allocation")
   aux_SyntaxTreeConstant_0_Refman = LUMI_new_ref(aux_SyntaxTreeConstant_0);
@@ -32111,6 +33351,7 @@ Returncode tl5_compiler_M_SyntaxTreeConstant_parse_new(tl5_compiler_M_SyntaxTree
 LUMI_cleanup:
   if (aux_SyntaxTreeConstant_0_Dynamic != NULL) aux_SyntaxTreeConstant_0_Dynamic->_base._base._base._del(aux_SyntaxTreeConstant_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeConstant_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32149,6 +33390,7 @@ Returncode tl5_compiler_M_SyntaxTreeConstant_parse(tl5_compiler_M_SyntaxTreeCons
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(376, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base)) )
   if (self == NULL) RAISE(377, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(377, 38, "used member of outdated weak reference")
@@ -32259,6 +33501,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(type_name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32268,7 +33511,9 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeConstant.link-types"
 Returncode tl5_compiler_M_SyntaxTreeConstant_link_types(tl5_compiler_M_SyntaxTreeConstant* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeConstant_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32281,6 +33526,7 @@ Returncode tl5_compiler_M_SyntaxTreeConstant_analyze(tl5_compiler_M_SyntaxTreeCo
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(402, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(402, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(402, 27, "used member of empty object")
@@ -32315,6 +33561,7 @@ Returncode tl5_compiler_M_SyntaxTreeConstant_analyze(tl5_compiler_M_SyntaxTreeCo
   tl5_compiler_M_glob->current_module = NULL;
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32322,11 +33569,12 @@ LUMI_cleanup:
 
 #define LUMI_FILE_NAME "TL5/statement/variable.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeConstant.order-constants"
-Returncode tl5_compiler_M_SyntaxTreeConstant_order_constants(tl5_compiler_M_SyntaxTreeConstant* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeConstant_Dynamic* self_Dynamic, tl5_compiler_M_List* ordered_list, Ref_Manager* ordered_list_Refman) {
+Returncode tl5_compiler_M_SyntaxTreeConstant_order_constants(tl5_compiler_M_SyntaxTreeConstant* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeConstant_Dynamic* self_Dynamic, tl5_compiler_M_NameMap* ordered_list, Ref_Manager* ordered_list_Refman) {
   Returncode LUMI_err = OK;
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(ordered_list_Refman);
   if (self == NULL) RAISE(409, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(409, 38, "used member of outdated weak reference")
@@ -32353,12 +33601,16 @@ Returncode tl5_compiler_M_SyntaxTreeConstant_order_constants(tl5_compiler_M_Synt
   if (self == NULL) RAISE(415, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(415, 38, "used member of outdated weak reference")
   CHECK(415, self->value_Dynamic->_base.order_constants(&(self->value->_base), self->value_Refman, &(self->value_Dynamic->_base), ordered_list, ordered_list_Refman) )
+  if (self == NULL) RAISE(416, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(416, 38, "used member of outdated weak reference")
+  CHECK(416, tl5_compiler_M_NameMap_add(ordered_list, ordered_list_Refman, self->_base.name, self->_base.name_Refman, self, self_Refman, (void*)self_Dynamic) )
   if (self == NULL) RAISE(417, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(417, 38, "used member of outdated weak reference")
   self->is_ordered = true;
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(ordered_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32377,6 +33629,7 @@ Returncode tl5_compiler_M_SyntaxTreeConstant_write(tl5_compiler_M_SyntaxTreeCons
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(420, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(420, 38, "used member of outdated weak reference")
   if (! self->is_ordered) {
@@ -32415,6 +33668,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32434,6 +33688,7 @@ Returncode tl5_compiler_M_SyntaxTreeExpression_parse_new(tl5_compiler_M_SyntaxTr
   tl5_compiler_M_SyntaxTreeExpression* aux_SyntaxTreeExpression_0 = NULL;
   Ref_Manager* aux_SyntaxTreeExpression_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeExpression_Dynamic* aux_SyntaxTreeExpression_0_Dynamic = &tl5_compiler_M_SyntaxTreeExpression_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeExpression_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeExpression));
   if (aux_SyntaxTreeExpression_0 == NULL) RAISE(10, 49, "insufficient memory for object dynamic allocation")
@@ -32452,6 +33707,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeExpression_0_Dynamic != NULL) aux_SyntaxTreeExpression_0_Dynamic->_base._base._del(aux_SyntaxTreeExpression_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeExpression_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32464,6 +33720,7 @@ Returncode tl5_compiler_M_SyntaxTreeExpression_parse(tl5_compiler_M_SyntaxTreeEx
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   if (self == NULL) RAISE(14, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(14, 38, "used member of outdated weak reference")
@@ -32490,6 +33747,7 @@ Returncode tl5_compiler_M_SyntaxTreeExpression_parse(tl5_compiler_M_SyntaxTreeEx
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32502,6 +33760,7 @@ Returncode tl5_compiler_M_SyntaxTreeExpression_analyze(tl5_compiler_M_SyntaxTree
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self->expression_Dynamic == NULL) RAISE(20, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(20, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(20, 38, "used member of outdated weak reference")
@@ -32521,6 +33780,7 @@ Returncode tl5_compiler_M_SyntaxTreeExpression_analyze(tl5_compiler_M_SyntaxTree
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32530,6 +33790,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeExpression.write"
 Returncode tl5_compiler_M_SyntaxTreeExpression_write(tl5_compiler_M_SyntaxTreeExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(25, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   if (self->expression_Dynamic == NULL) RAISE(26, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(26, 27, "used member of empty object")
@@ -32540,6 +33801,7 @@ Returncode tl5_compiler_M_SyntaxTreeExpression_write(tl5_compiler_M_SyntaxTreeEx
   if (self_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
   CHECK(27, self->expression_Dynamic->_base.write(&(self->expression->_base), self->expression_Refman, &(self->expression_Dynamic->_base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32559,6 +33821,7 @@ Returncode tl5_compiler_M_SyntaxTreeReturn_parse_new(tl5_compiler_M_SyntaxTreeRe
   tl5_compiler_M_SyntaxTreeReturn* aux_SyntaxTreeReturn_0 = NULL;
   Ref_Manager* aux_SyntaxTreeReturn_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeReturn_Dynamic* aux_SyntaxTreeReturn_0_Dynamic = &tl5_compiler_M_SyntaxTreeReturn_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeReturn_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeReturn));
   if (aux_SyntaxTreeReturn_0 == NULL) RAISE(35, 49, "insufficient memory for object dynamic allocation")
@@ -32584,6 +33847,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeReturn_0_Dynamic != NULL) aux_SyntaxTreeReturn_0_Dynamic->_base._base._del(aux_SyntaxTreeReturn_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeReturn_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32593,8 +33857,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeReturn.is-end-point"
 Returncode tl5_compiler_M_SyntaxTreeReturn_is_end_point(tl5_compiler_M_SyntaxTreeReturn* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeReturn_Dynamic* self_Dynamic, Bool* is_end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   *is_end = true;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32607,6 +33873,7 @@ Returncode tl5_compiler_M_SyntaxTreeReturn_write(tl5_compiler_M_SyntaxTreeReturn
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(43, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -32617,6 +33884,7 @@ Returncode tl5_compiler_M_SyntaxTreeReturn_write(tl5_compiler_M_SyntaxTreeReturn
   CHECK(44, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32634,6 +33902,7 @@ Returncode tl5_compiler_M_SyntaxTreeRaise_parse_new(tl5_compiler_M_SyntaxTreeRai
   tl5_compiler_M_SyntaxTreeRaise* aux_SyntaxTreeRaise_0 = NULL;
   Ref_Manager* aux_SyntaxTreeRaise_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeRaise_Dynamic* aux_SyntaxTreeRaise_0_Dynamic = &tl5_compiler_M_SyntaxTreeRaise_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeRaise_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeRaise));
   if (aux_SyntaxTreeRaise_0 == NULL) RAISE(53, 49, "insufficient memory for object dynamic allocation")
@@ -32652,6 +33921,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeRaise_0_Dynamic != NULL) aux_SyntaxTreeRaise_0_Dynamic->_base._base._del(aux_SyntaxTreeRaise_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeRaise_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32664,6 +33934,7 @@ Returncode tl5_compiler_M_SyntaxTreeRaise_parse(tl5_compiler_M_SyntaxTreeRaise* 
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   CHECK(57, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   if (self == NULL) RAISE(58, 27, "used member of empty object")
@@ -32687,6 +33958,7 @@ Returncode tl5_compiler_M_SyntaxTreeRaise_parse(tl5_compiler_M_SyntaxTreeRaise* 
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32696,8 +33968,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeRaise.is-end-point"
 Returncode tl5_compiler_M_SyntaxTreeRaise_is_end_point(tl5_compiler_M_SyntaxTreeRaise* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeRaise_Dynamic* self_Dynamic, Bool* is_end) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   *is_end = true;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32707,6 +33981,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeRaise.analyze"
 Returncode tl5_compiler_M_SyntaxTreeRaise_analyze(tl5_compiler_M_SyntaxTreeRaise* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeRaise_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(67, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(67, 38, "used member of outdated weak reference")
   if (self->error_message != NULL && self->error_message_Refman->value != NULL) {
@@ -32717,6 +33992,7 @@ Returncode tl5_compiler_M_SyntaxTreeRaise_analyze(tl5_compiler_M_SyntaxTreeRaise
       CHECK(68, tl5_compiler_M_SyntaxTreeNode_analyze_expression(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->error_message, self->error_message_Refman, self->error_message_Dynamic, tl5_compiler_M_glob->type_string, tl5_compiler_M_glob->type_string_Refman, tl5_compiler_M_glob->type_string_Dynamic) )
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32741,6 +34017,7 @@ Returncode tl5_compiler_M_SyntaxTreeRaise_write(tl5_compiler_M_SyntaxTreeRaise* 
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(71, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   if (self == NULL) RAISE(72, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(72, 38, "used member of outdated weak reference")
@@ -32806,6 +34083,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32825,6 +34103,7 @@ Returncode tl5_compiler_M_SyntaxTreeWhile_parse_new(tl5_compiler_M_SyntaxTreeWhi
   tl5_compiler_M_SyntaxTreeWhile* aux_SyntaxTreeWhile_0 = NULL;
   Ref_Manager* aux_SyntaxTreeWhile_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeWhile_Dynamic* aux_SyntaxTreeWhile_0_Dynamic = &tl5_compiler_M_SyntaxTreeWhile_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeWhile_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeWhile));
   if (aux_SyntaxTreeWhile_0 == NULL) RAISE(92, 49, "insufficient memory for object dynamic allocation")
@@ -32843,6 +34122,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeWhile_0_Dynamic != NULL) aux_SyntaxTreeWhile_0_Dynamic->_base._base._del(aux_SyntaxTreeWhile_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeWhile_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32858,6 +34138,7 @@ Returncode tl5_compiler_M_SyntaxTreeWhile_parse(tl5_compiler_M_SyntaxTreeWhile* 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   if (self == NULL) RAISE(96, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(96, 38, "used member of outdated weak reference")
@@ -32891,6 +34172,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32900,12 +34182,14 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeWhile.analyze"
 Returncode tl5_compiler_M_SyntaxTreeWhile_analyze(tl5_compiler_M_SyntaxTreeWhile* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeWhile_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(103, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(103, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(103, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(103, 38, "used member of outdated weak reference")
   CHECK(103, tl5_compiler_M_SyntaxTreeNode_analyze_expression(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), self->condition, self->condition_Refman, self->condition_Dynamic, tl5_compiler_M_glob->type_bool, tl5_compiler_M_glob->type_bool_Refman, tl5_compiler_M_glob->type_bool_Dynamic) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32921,6 +34205,7 @@ Returncode tl5_compiler_M_SyntaxTreeWhile_write(tl5_compiler_M_SyntaxTreeWhile* 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(107, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   if (self->condition_Dynamic == NULL) RAISE(108, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(108, 27, "used member of empty object")
@@ -32947,6 +34232,7 @@ Returncode tl5_compiler_M_SyntaxTreeWhile_write(tl5_compiler_M_SyntaxTreeWhile* 
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32966,6 +34252,7 @@ Returncode tl5_compiler_M_SyntaxTreeContinue_parse_new(tl5_compiler_M_SyntaxTree
   tl5_compiler_M_SyntaxTreeContinue* aux_SyntaxTreeContinue_0 = NULL;
   Ref_Manager* aux_SyntaxTreeContinue_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeContinue_Dynamic* aux_SyntaxTreeContinue_0_Dynamic = &tl5_compiler_M_SyntaxTreeContinue_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeContinue_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeContinue));
   if (aux_SyntaxTreeContinue_0 == NULL) RAISE(119, 49, "insufficient memory for object dynamic allocation")
@@ -32984,6 +34271,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeContinue_0_Dynamic != NULL) aux_SyntaxTreeContinue_0_Dynamic->_base._base._del(aux_SyntaxTreeContinue_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeContinue_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -32996,6 +34284,7 @@ Returncode tl5_compiler_M_SyntaxTreeContinue_parse(tl5_compiler_M_SyntaxTreeCont
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   CHECK(123, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   if (self == NULL) RAISE(124, 27, "used member of empty object")
@@ -33019,6 +34308,7 @@ Returncode tl5_compiler_M_SyntaxTreeContinue_parse(tl5_compiler_M_SyntaxTreeCont
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33031,6 +34321,7 @@ Returncode tl5_compiler_M_SyntaxTreeContinue_write(tl5_compiler_M_SyntaxTreeCont
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(129, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -33041,6 +34332,7 @@ Returncode tl5_compiler_M_SyntaxTreeContinue_write(tl5_compiler_M_SyntaxTreeCont
   CHECK(130, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33058,6 +34350,7 @@ Returncode tl5_compiler_M_SyntaxTreeCoverage_init_new(tl5_compiler_M_SyntaxTreeC
   tl5_compiler_M_SyntaxTreeCoverage* aux_SyntaxTreeCoverage_0 = NULL;
   Ref_Manager* aux_SyntaxTreeCoverage_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeCoverage_Dynamic* aux_SyntaxTreeCoverage_0_Dynamic = &tl5_compiler_M_SyntaxTreeCoverage_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeCoverage_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeCoverage));
   if (aux_SyntaxTreeCoverage_0 == NULL) RAISE(138, 49, "insufficient memory for object dynamic allocation")
@@ -33076,6 +34369,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeCoverage_0_Dynamic != NULL) aux_SyntaxTreeCoverage_0_Dynamic->_base._base._del(aux_SyntaxTreeCoverage_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeCoverage_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33085,6 +34379,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeCoverage.init"
 Returncode tl5_compiler_M_SyntaxTreeCoverage_init(tl5_compiler_M_SyntaxTreeCoverage* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCoverage_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   CHECK(142, tl5_compiler_M_SyntaxTreeNode_set_location(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   if (self == NULL) RAISE(143, 27, "used member of empty object")
@@ -33101,6 +34396,7 @@ Returncode tl5_compiler_M_SyntaxTreeCoverage_init(tl5_compiler_M_SyntaxTreeCover
   self->input_file_index = tl5_compiler_M_glob->input_file_index;
 LUMI_cleanup:
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33112,6 +34408,7 @@ Returncode tl5_compiler_M_SyntaxTreeCoverage_analyze(tl5_compiler_M_SyntaxTreeCo
   Returncode LUMI_err = OK;
   tl5_compiler_M_LineCount* line_count = NULL;
   Ref_Manager* line_count_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (tl5_compiler_M_glob == NULL) RAISE(147, 27, "used member of empty object")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob->root == NULL) RAISE(147, 27, "used member of empty object")
@@ -33137,6 +34434,7 @@ Returncode tl5_compiler_M_SyntaxTreeCoverage_analyze(tl5_compiler_M_SyntaxTreeCo
   ((Bool*)((line_count->line_needs_cover)->values))[self->_base._base.line_number] = true;
 LUMI_cleanup:
   LUMI_dec_ref(line_count_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33155,6 +34453,7 @@ Returncode tl5_compiler_M_SyntaxTreeCoverage_write(tl5_compiler_M_SyntaxTreeCove
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(153, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -33196,6 +34495,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33213,6 +34513,7 @@ Returncode tl5_compiler_M_SyntaxTreeIf_parse_new(tl5_compiler_M_SyntaxTreeIf* se
   tl5_compiler_M_SyntaxTreeIf* aux_SyntaxTreeIf_0 = NULL;
   Ref_Manager* aux_SyntaxTreeIf_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeIf_Dynamic* aux_SyntaxTreeIf_0_Dynamic = &tl5_compiler_M_SyntaxTreeIf_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeIf_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeIf));
   if (aux_SyntaxTreeIf_0 == NULL) RAISE(45, 49, "insufficient memory for object dynamic allocation")
@@ -33231,6 +34532,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeIf_0_Dynamic != NULL) aux_SyntaxTreeIf_0_Dynamic->_base._base._base._del(aux_SyntaxTreeIf_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeIf_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33243,6 +34545,7 @@ Returncode tl5_compiler_M_SyntaxTreeIf_parse(tl5_compiler_M_SyntaxTreeIf* self, 
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   CHECK(49, tl5_compiler_M_SyntaxTreeFlowElement_init(&(self->_base), self_Refman, &(self_Dynamic->_base), parent, parent_Refman, parent_Dynamic) )
   aux_String_0 = &aux_String_0_Var;
@@ -33258,6 +34561,7 @@ Returncode tl5_compiler_M_SyntaxTreeIf_parse(tl5_compiler_M_SyntaxTreeIf* self, 
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33267,6 +34571,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeIf.add-else"
 Returncode tl5_compiler_M_SyntaxTreeIf_add_else(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeElse* else_node, Ref_Manager* else_node_Refman, tl5_compiler_M_SyntaxTreeElse_Dynamic* else_node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(54, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(54, 38, "used member of outdated weak reference")
   CHECK(54, tl5_compiler_M_SyntaxTreeFlowElement_set_parent(&(else_node->_base), else_node_Refman, &(else_node_Dynamic->_base), self->_base._base.parent, self->_base._base.parent_Refman, self->_base._base.parent_Dynamic) )
@@ -33283,6 +34588,7 @@ Returncode tl5_compiler_M_SyntaxTreeIf_add_else(tl5_compiler_M_SyntaxTreeIf* sel
 LUMI_cleanup:
   if (else_node_Dynamic != NULL) else_node_Dynamic->_base._base._base._del(else_node);
   LUMI_owner_dec_ref(else_node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33299,6 +34605,7 @@ Returncode tl5_compiler_M_SyntaxTreeIf_add_else_if(tl5_compiler_M_SyntaxTreeIf* 
   Ref_Manager* aux_List_0_Refman = NULL;
   tl5_compiler_M_List* aux_List_1 = NULL;
   Ref_Manager* aux_List_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_SyntaxTreeElse_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeElse));
   if (aux_SyntaxTreeElse_0 == NULL) RAISE(59, 49, "insufficient memory for object dynamic allocation")
   aux_SyntaxTreeElse_0_Refman = LUMI_new_ref(aux_SyntaxTreeElse_0);
@@ -33399,6 +34706,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(coverage_node_Refman);
   if (new_if_Dynamic != NULL) new_if_Dynamic->_base._base._base._del(new_if);
   LUMI_owner_dec_ref(new_if_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33408,6 +34716,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeIf.analyze"
 Returncode tl5_compiler_M_SyntaxTreeIf_analyze(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(70, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(70, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob == NULL) RAISE(70, 27, "used member of empty object")
@@ -33423,6 +34732,7 @@ Returncode tl5_compiler_M_SyntaxTreeIf_analyze(tl5_compiler_M_SyntaxTreeIf* self
       CHECK(73, self->else_node_Dynamic->_base._base._base.analyze(&(self->else_node->_base._base._base), self->else_node_Refman, &(self->else_node_Dynamic->_base._base._base)) )
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33438,6 +34748,7 @@ Returncode tl5_compiler_M_SyntaxTreeIf_write(tl5_compiler_M_SyntaxTreeIf* self, 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(80, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   if (self->condition_Dynamic == NULL) RAISE(81, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(81, 27, "used member of empty object")
@@ -33473,6 +34784,7 @@ Returncode tl5_compiler_M_SyntaxTreeIf_write(tl5_compiler_M_SyntaxTreeIf* self, 
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33494,6 +34806,7 @@ Returncode tl5_compiler_M_SyntaxTreeElse_parse_new(tl5_compiler_M_SyntaxTreeElse
   tl5_compiler_M_SyntaxTreeElse* aux_SyntaxTreeElse_0 = NULL;
   Ref_Manager* aux_SyntaxTreeElse_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeElse_Dynamic* aux_SyntaxTreeElse_0_Dynamic = &tl5_compiler_M_SyntaxTreeElse_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeElse_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeElse));
   if (aux_SyntaxTreeElse_0 == NULL) RAISE(94, 49, "insufficient memory for object dynamic allocation")
@@ -33513,6 +34826,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeElse_0_Dynamic != NULL) aux_SyntaxTreeElse_0_Dynamic->_base._base._base._del(aux_SyntaxTreeElse_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeElse_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33525,6 +34839,7 @@ Returncode tl5_compiler_M_SyntaxTreeElse_write(tl5_compiler_M_SyntaxTreeElse* se
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(102, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -33536,6 +34851,7 @@ Returncode tl5_compiler_M_SyntaxTreeElse_write(tl5_compiler_M_SyntaxTreeElse* se
   CHECK(104, tl5_compiler_M_SyntaxTreeFlowElement_write_block(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33553,6 +34869,7 @@ Returncode tl5_compiler_M_SyntaxTreeDoLoop_parse_new(tl5_compiler_M_SyntaxTreeDo
   tl5_compiler_M_SyntaxTreeDoLoop* aux_SyntaxTreeDoLoop_0 = NULL;
   Ref_Manager* aux_SyntaxTreeDoLoop_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeDoLoop_Dynamic* aux_SyntaxTreeDoLoop_0_Dynamic = &tl5_compiler_M_SyntaxTreeDoLoop_dynamic;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(parent_Refman);
   aux_SyntaxTreeDoLoop_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeDoLoop));
   if (aux_SyntaxTreeDoLoop_0 == NULL) RAISE(111, 49, "insufficient memory for object dynamic allocation")
@@ -33572,6 +34889,7 @@ LUMI_cleanup:
   if (aux_SyntaxTreeDoLoop_0_Dynamic != NULL) aux_SyntaxTreeDoLoop_0_Dynamic->_base._base._base._del(aux_SyntaxTreeDoLoop_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeDoLoop_0_Refman);
   LUMI_dec_ref(parent_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33584,6 +34902,7 @@ Returncode tl5_compiler_M_SyntaxTreeDoLoop_write(tl5_compiler_M_SyntaxTreeDoLoop
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(119, tl5_compiler_M_SyntaxTreeCode_write_spaces(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -33595,6 +34914,7 @@ Returncode tl5_compiler_M_SyntaxTreeDoLoop_write(tl5_compiler_M_SyntaxTreeDoLoop
   CHECK(121, tl5_compiler_M_SyntaxTreeFlowElement_write_block(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33609,10 +34929,12 @@ void tl5_compiler_M_SyntaxTreeDoLoop_Del(tl5_compiler_M_SyntaxTreeDoLoop* self) 
 #define LUMI_FUNC_NAME "NodeAction.action"
 Returncode tl5_compiler_M_NodeAction_action(tl5_compiler_M_NodeAction* self, Ref_Manager* self_Refman, tl5_compiler_M_NodeAction_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
-  USER_RAISE(250, NULL, NULL)
+  USER_RAISE(253, NULL, NULL)
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33626,11 +34948,13 @@ void tl5_compiler_M_NodeAction_Del(tl5_compiler_M_NodeAction* self) {
 #define LUMI_FUNC_NAME "NodeLinkTypesAction.action"
 Returncode tl5_compiler_M_NodeLinkTypesAction_action(tl5_compiler_M_NodeLinkTypesAction* self, Ref_Manager* self_Refman, tl5_compiler_M_NodeLinkTypesAction_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
-  if (node_Dynamic == NULL) RAISE(254, 28, "dynamic call of empty object")
-  CHECK(254, node_Dynamic->link_types(node, node_Refman, node_Dynamic) )
+  if (node_Dynamic == NULL) RAISE(257, 28, "dynamic call of empty object")
+  CHECK(257, node_Dynamic->link_types(node, node_Refman, node_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33645,11 +34969,13 @@ void tl5_compiler_M_NodeLinkTypesAction_Del(tl5_compiler_M_NodeLinkTypesAction* 
 #define LUMI_FUNC_NAME "NodeAnalyzeAction.action"
 Returncode tl5_compiler_M_NodeAnalyzeAction_action(tl5_compiler_M_NodeAnalyzeAction* self, Ref_Manager* self_Refman, tl5_compiler_M_NodeAnalyzeAction_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
-  if (node_Dynamic == NULL) RAISE(258, 28, "dynamic call of empty object")
-  CHECK(258, node_Dynamic->analyze(node, node_Refman, node_Dynamic) )
+  if (node_Dynamic == NULL) RAISE(261, 28, "dynamic call of empty object")
+  CHECK(261, node_Dynamic->analyze(node, node_Refman, node_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33664,11 +34990,13 @@ void tl5_compiler_M_NodeAnalyzeAction_Del(tl5_compiler_M_NodeAnalyzeAction* self
 #define LUMI_FUNC_NAME "NodeWriteAction.action"
 Returncode tl5_compiler_M_NodeWriteAction_action(tl5_compiler_M_NodeWriteAction* self, Ref_Manager* self_Refman, tl5_compiler_M_NodeWriteAction_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
-  if (node_Dynamic == NULL) RAISE(262, 28, "dynamic call of empty object")
-  CHECK(262, node_Dynamic->write(node, node_Refman, node_Dynamic) )
+  if (node_Dynamic == NULL) RAISE(265, 28, "dynamic call of empty object")
+  CHECK(265, node_Dynamic->write(node, node_Refman, node_Dynamic) )
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33683,13 +35011,15 @@ void tl5_compiler_M_NodeWriteAction_Del(tl5_compiler_M_NodeWriteAction* self) {
 #define LUMI_FUNC_NAME "NodeOrderConstantsAction.action"
 Returncode tl5_compiler_M_NodeOrderConstantsAction_action(tl5_compiler_M_NodeOrderConstantsAction* self, Ref_Manager* self_Refman, tl5_compiler_M_NodeOrderConstantsAction_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeNode* node, Ref_Manager* node_Refman, tl5_compiler_M_SyntaxTreeNode_Dynamic* node_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
-  if (node_Dynamic == NULL) RAISE(268, 28, "dynamic call of empty object")
-  if (self == NULL) RAISE(268, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
-  CHECK(268, node_Dynamic->order_constants(node, node_Refman, node_Dynamic, self->ordered_list, self->ordered_list_Refman) )
+  if (node_Dynamic == NULL) RAISE(271, 28, "dynamic call of empty object")
+  if (self == NULL) RAISE(271, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(271, 38, "used member of outdated weak reference")
+  CHECK(271, node_Dynamic->order_constants(node, node_Refman, node_Dynamic, self->ordered_list, self->ordered_list_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33707,6 +35037,7 @@ Returncode tl5_compiler_M_GlobalNodes_init(tl5_compiler_M_GlobalNodes* self, Ref
   Returncode LUMI_err = OK;
   tl5_compiler_M_List* aux_List_0 = NULL;
   Ref_Manager* aux_List_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(8, tl5_compiler_M_SyntaxTreeNamespace_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_List_0 = LUMI_alloc(sizeof(tl5_compiler_M_List));
   if (aux_List_0 == NULL) RAISE(9, 49, "insufficient memory for object dynamic allocation")
@@ -33723,6 +35054,7 @@ Returncode tl5_compiler_M_GlobalNodes_init(tl5_compiler_M_GlobalNodes* self, Ref
 LUMI_cleanup:
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33741,13 +35073,14 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_init(tl5_compiler_M_SyntaxTreeRoot* sel
   Returncode LUMI_err = OK;
   tl5_compiler_M_List* aux_List_0 = NULL;
   Ref_Manager* aux_List_0_Refman = NULL;
+  tl5_compiler_M_NameMap* aux_NameMap_0 = NULL;
+  Ref_Manager* aux_NameMap_0_Refman = NULL;
   tl5_compiler_M_List* aux_List_1 = NULL;
   Ref_Manager* aux_List_1_Refman = NULL;
-  tl5_compiler_M_List* aux_List_2 = NULL;
-  Ref_Manager* aux_List_2_Refman = NULL;
   tl5_compiler_M_GlobalInit* aux_GlobalInit_0 = NULL;
   Ref_Manager* aux_GlobalInit_0_Refman = NULL;
   tl5_compiler_M_GlobalInit_Dynamic* aux_GlobalInit_0_Dynamic = &tl5_compiler_M_GlobalInit_dynamic;
+  LUMI_inc_ref(self_Refman);
   CHECK(25, tl5_compiler_M_GlobalNodes_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_List_0 = LUMI_alloc(sizeof(tl5_compiler_M_List));
   if (aux_List_0 == NULL) RAISE(26, 49, "insufficient memory for object dynamic allocation")
@@ -33761,30 +35094,30 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_init(tl5_compiler_M_SyntaxTreeRoot* sel
   self->enums = aux_List_0;
   aux_List_0 = NULL;
   aux_List_0_Refman = NULL;
-  aux_List_1 = LUMI_alloc(sizeof(tl5_compiler_M_List));
-  if (aux_List_1 == NULL) RAISE(27, 49, "insufficient memory for object dynamic allocation")
-  aux_List_1_Refman = LUMI_new_ref(aux_List_1);
-  if (aux_List_1_Refman == NULL) RAISE(27, 38, "insufficient memory for managed object")
+  aux_NameMap_0 = LUMI_alloc(sizeof(tl5_compiler_M_NameMap));
+  if (aux_NameMap_0 == NULL) RAISE(27, 49, "insufficient memory for object dynamic allocation")
+  aux_NameMap_0_Refman = LUMI_new_ref(aux_NameMap_0);
+  if (aux_NameMap_0_Refman == NULL) RAISE(27, 38, "insufficient memory for managed object")
   if (self == NULL) RAISE(27, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(27, 38, "used member of outdated weak reference")
-  tl5_compiler_M_List_Del(self->constants);
+  tl5_compiler_M_NameMap_Del(self->constants);
   LUMI_owner_dec_ref(self->constants_Refman);
-  self->constants_Refman = aux_List_1_Refman;
-  self->constants = aux_List_1;
-  aux_List_1 = NULL;
-  aux_List_1_Refman = NULL;
-  aux_List_2 = LUMI_alloc(sizeof(tl5_compiler_M_List));
-  if (aux_List_2 == NULL) RAISE(28, 49, "insufficient memory for object dynamic allocation")
-  aux_List_2_Refman = LUMI_new_ref(aux_List_2);
-  if (aux_List_2_Refman == NULL) RAISE(28, 38, "insufficient memory for managed object")
+  self->constants_Refman = aux_NameMap_0_Refman;
+  self->constants = aux_NameMap_0;
+  aux_NameMap_0 = NULL;
+  aux_NameMap_0_Refman = NULL;
+  aux_List_1 = LUMI_alloc(sizeof(tl5_compiler_M_List));
+  if (aux_List_1 == NULL) RAISE(28, 49, "insufficient memory for object dynamic allocation")
+  aux_List_1_Refman = LUMI_new_ref(aux_List_1);
+  if (aux_List_1_Refman == NULL) RAISE(28, 38, "insufficient memory for managed object")
   if (self == NULL) RAISE(28, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(28, 38, "used member of outdated weak reference")
   tl5_compiler_M_List_Del(self->modules);
   LUMI_owner_dec_ref(self->modules_Refman);
-  self->modules_Refman = aux_List_2_Refman;
-  self->modules = aux_List_2;
-  aux_List_2 = NULL;
-  aux_List_2_Refman = NULL;
+  self->modules_Refman = aux_List_1_Refman;
+  self->modules = aux_List_1;
+  aux_List_1 = NULL;
+  aux_List_1_Refman = NULL;
   aux_GlobalInit_0 = LUMI_alloc(sizeof(tl5_compiler_M_GlobalInit));
   if (aux_GlobalInit_0 == NULL) RAISE(29, 49, "insufficient memory for object dynamic allocation")
   aux_GlobalInit_0_Refman = LUMI_new_ref(aux_GlobalInit_0);
@@ -33805,12 +35138,13 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_init(tl5_compiler_M_SyntaxTreeRoot* sel
 LUMI_cleanup:
   if (aux_GlobalInit_0_Dynamic != NULL) aux_GlobalInit_0_Dynamic->_base._base._base._base._del(aux_GlobalInit_0);
   LUMI_owner_dec_ref(aux_GlobalInit_0_Refman);
-  tl5_compiler_M_List_Del(aux_List_2);
-  LUMI_owner_dec_ref(aux_List_2_Refman);
   tl5_compiler_M_List_Del(aux_List_1);
   LUMI_owner_dec_ref(aux_List_1_Refman);
+  tl5_compiler_M_NameMap_Del(aux_NameMap_0);
+  LUMI_owner_dec_ref(aux_NameMap_0_Refman);
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -33846,6 +35180,7 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_parse(tl5_compiler_M_SyntaxTreeRoot* se
   String aux_String_4_Var = {0};
   String* aux_String_4 = NULL;
   Ref_Manager* aux_String_4_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   arg_test_index = - 1;
   for (n = 1; n < sys->argv->length; ++n) {
       if (sys == NULL) RAISE(37, 27, "used member of empty object")
@@ -34023,6 +35358,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(arg_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -34066,6 +35402,7 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_parse_if_common(tl5_compiler_M_SyntaxTr
   String aux_String_6_Var = {0};
   String* aux_String_6 = NULL;
   Ref_Manager* aux_String_6_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(keyword_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(parent_block_Refman);
@@ -34188,6 +35525,7 @@ LUMI_cleanup:
   LUMI_dec_ref(parent_block_Refman);
   LUMI_dec_ref(parent_type_Refman);
   LUMI_dec_ref(keyword_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -34275,6 +35613,7 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_parse_child(tl5_compiler_M_SyntaxTreeRo
   String aux_String_16_Var = {0};
   String* aux_String_16 = NULL;
   Ref_Manager* aux_String_16_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(keyword_Refman);
   CHECK(112, tl5_compiler_M_SyntaxTreeNamespace_parse_if_function(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), keyword, keyword_Refman, NULL, NULL, NULL, &(*end), &(aux_Bool_0)) )
   if (aux_Bool_0) {
@@ -34524,6 +35863,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(keyword_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -34533,8 +35873,10 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "SyntaxTreeRoot.link-types"
 Returncode tl5_compiler_M_SyntaxTreeRoot_link_types(tl5_compiler_M_SyntaxTreeRoot* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeRoot_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   USER_RAISE(170, NULL, NULL)
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -34550,8 +35892,12 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze(tl5_compiler_M_SyntaxTreeRoot* 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   CHECK(173, tl5_compiler_M_SyntaxTreeRoot_order_types(self, self_Refman, self_Dynamic) )
   CHECK(174, tl5_compiler_M_SyntaxTreeNamespace_link_types(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  if (self == NULL) RAISE(175, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(175, 38, "used member of outdated weak reference")
+  CHECK(175, tl5_compiler_M_SyntaxTreeNode_link_children_types(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), self->_base.types, self->_base.types_Refman) )
   if (self->global_init_Dynamic == NULL) RAISE(176, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(176, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(176, 38, "used member of outdated weak reference")
@@ -34565,6 +35911,9 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze(tl5_compiler_M_SyntaxTreeRoot* 
       CHECK(178, self->main_function_Dynamic->_base._base._base._base.link_types(&(self->main_function->_base._base._base._base), self->main_function_Refman, &(self->main_function_Dynamic->_base._base._base._base)) )
     }
   CHECK(179, tl5_compiler_M_SyntaxTreeNamespace_analyze(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  if (self == NULL) RAISE(180, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+  CHECK(180, tl5_compiler_M_SyntaxTreeNode_analyze_children(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), self->_base.types, self->_base.types_Refman) )
   if (self->global_init_Dynamic == NULL) RAISE(181, 28, "dynamic call of empty object")
   if (self == NULL) RAISE(181, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
@@ -34611,6 +35960,11 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze(tl5_compiler_M_SyntaxTreeRoot* 
         }
       }
     }
+  if (self == NULL) RAISE(191, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(191, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(191, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(191, 38, "used member of outdated weak reference")
+  CHECK(191, tl5_compiler_M_SyntaxTreeNode_order_children_constants(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), self->_base._base._base.variables, self->_base._base._base.variables_Refman, self->constants, self->constants_Refman) )
   if (self == NULL) RAISE(192, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(192, 38, "used member of outdated weak reference")
   if (self->line_counts != NULL && self->line_counts_Refman->value != NULL) {
@@ -34619,6 +35973,7 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze(tl5_compiler_M_SyntaxTreeRoot* 
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -34630,22 +35985,27 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_order_types(tl5_compiler_M_SyntaxTreeRo
   Returncode LUMI_err = OK;
   tl5_compiler_M_List* ordered_list = NULL;
   Ref_Manager* ordered_list_Refman = NULL;
-  tl5_compiler_M_TypeData* type_data = NULL;
-  Ref_Manager* type_data_Refman = NULL;
-  tl5_compiler_M_TypeData_Dynamic* type_data_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   ordered_list = LUMI_alloc(sizeof(tl5_compiler_M_List));
   if (ordered_list == NULL) RAISE(196, 49, "insufficient memory for object dynamic allocation")
   ordered_list_Refman = LUMI_new_ref(ordered_list);
   if (ordered_list_Refman == NULL) RAISE(196, 38, "insufficient memory for managed object")
   while (true) {
+      if (self == NULL) RAISE(198, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(198, 38, "used member of outdated weak reference")
+      if (self->_base.types == NULL) RAISE(198, 27, "used member of empty object")
+      if (self->_base.types_Refman->value == NULL) RAISE(198, 38, "used member of outdated weak reference")
+      if (!(self->_base.types->first != NULL && self->_base.types->first_Refman->value != NULL)) break;
       if (self == NULL) RAISE(199, 27, "used member of empty object")
       if (self_Refman->value == NULL) RAISE(199, 38, "used member of outdated weak reference")
-      CHECK(199, tl5_compiler_M_List_pop(self->_base.types, self->_base.types_Refman, (void*)&(type_data), &(type_data_Refman), (void*)&(type_data_Dynamic)) )
-      if (!(type_data != NULL && type_data_Refman->value != NULL)) break;
-      CHECK(201, tl5_compiler_M_TypeData_order_bases(type_data, type_data_Refman, type_data_Dynamic, ordered_list, ordered_list_Refman) )
+      if (self->_base.types == NULL) RAISE(199, 27, "used member of empty object")
+      if (self->_base.types_Refman->value == NULL) RAISE(199, 38, "used member of outdated weak reference")
+      if (self->_base.types->first == NULL) RAISE(199, 27, "used member of empty object")
+      if (self->_base.types->first_Refman->value == NULL) RAISE(199, 38, "used member of outdated weak reference")
+      CHECK(199, tl5_compiler_M_TypeData_order_bases(self->_base.types->first->item, self->_base.types->first->item_Refman, ((tl5_compiler_M_TypeData_Dynamic*)(self->_base.types->first->item_Dynamic)), ordered_list, ordered_list_Refman) )
     }
-  if (self == NULL) RAISE(202, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(202, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(200, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(200, 38, "used member of outdated weak reference")
   tl5_compiler_M_List_Del(self->_base.types);
   LUMI_owner_dec_ref(self->_base.types_Refman);
   self->_base.types_Refman = ordered_list_Refman;
@@ -34653,10 +36013,9 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_order_types(tl5_compiler_M_SyntaxTreeRo
   ordered_list = NULL;
   ordered_list_Refman = NULL;
 LUMI_cleanup:
-  if (type_data_Dynamic != NULL) type_data_Dynamic->_base._base._base._del(type_data);
-  LUMI_owner_dec_ref(type_data_Refman);
   tl5_compiler_M_List_Del(ordered_list);
   LUMI_owner_dec_ref(ordered_list_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -34684,73 +36043,74 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze_cover(tl5_compiler_M_SyntaxTree
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
-  if (tl5_compiler_M_glob == NULL) RAISE(205, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(205, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
-  CHECK(205, tl5_compiler_M_NameMap_find(tl5_compiler_M_glob->module_map, tl5_compiler_M_glob->module_map_Refman, tl5_compiler_M_glob->tested_module, tl5_compiler_M_glob->tested_module_Refman, (void*)&(aux_ModuleMembers_0), &(aux_ModuleMembers_0_Refman), &dynamic_Void) )
+  LUMI_inc_ref(self_Refman);
+  if (tl5_compiler_M_glob == NULL) RAISE(203, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(203, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(203, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(203, 38, "used member of outdated weak reference")
+  CHECK(203, tl5_compiler_M_NameMap_find(tl5_compiler_M_glob->module_map, tl5_compiler_M_glob->module_map_Refman, tl5_compiler_M_glob->tested_module, tl5_compiler_M_glob->tested_module_Refman, (void*)&(aux_ModuleMembers_0), &(aux_ModuleMembers_0_Refman), &dynamic_Void) )
   if (! (aux_ModuleMembers_0 != NULL && aux_ModuleMembers_0_Refman->value != NULL)) {
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-      if (aux_String_0_Refman == NULL) RAISE(206, 38, "insufficient memory for managed object")
+      if (aux_String_0_Refman == NULL) RAISE(204, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 44;
       aux_String_0_Var.length = 43;
       aux_String_0_Var.values = "General code error: unknown tested module \"";
-      CHECK(206, tl5_compiler_M_print(aux_String_0, aux_String_0_Refman) )
-      if (tl5_compiler_M_glob == NULL) RAISE(207, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(207, 38, "used member of outdated weak reference")
-      CHECK(207, tl5_compiler_M_print(tl5_compiler_M_glob->tested_module, tl5_compiler_M_glob->tested_module_Refman) )
+      CHECK(204, tl5_compiler_M_print(aux_String_0, aux_String_0_Refman) )
+      if (tl5_compiler_M_glob == NULL) RAISE(205, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(205, 38, "used member of outdated weak reference")
+      CHECK(205, tl5_compiler_M_print(tl5_compiler_M_glob->tested_module, tl5_compiler_M_glob->tested_module_Refman) )
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-      if (aux_String_1_Refman == NULL) RAISE(208, 38, "insufficient memory for managed object")
+      if (aux_String_1_Refman == NULL) RAISE(206, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 3;
       aux_String_1_Var.length = 2;
       aux_String_1_Var.values = "\"\n";
-      CHECK(208, tl5_compiler_M_print(aux_String_1, aux_String_1_Refman) )
-      USER_RAISE(209, NULL, NULL)
+      CHECK(206, tl5_compiler_M_print(aux_String_1, aux_String_1_Refman) )
+      USER_RAISE(207, NULL, NULL)
     }
   for (n = 0; n < self->line_counts->length; ++n) {
-      if (self == NULL) RAISE(212, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
-      if (self->line_counts == NULL) RAISE(212, 29, "empty object used as sequence")
-      if (self->line_counts_Refman->value == NULL) RAISE(212, 40, "outdated weak reference used as sequence")
-      if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(212, 25, "slice index out of bounds")
+      if (self == NULL) RAISE(210, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(210, 38, "used member of outdated weak reference")
+      if (self->line_counts == NULL) RAISE(210, 29, "empty object used as sequence")
+      if (self->line_counts_Refman->value == NULL) RAISE(210, 40, "outdated weak reference used as sequence")
+      if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(210, 25, "slice index out of bounds")
       line_count = ((tl5_compiler_M_LineCount*)((self->line_counts)->values)) + n;
       line_count_Refman = self->line_counts_Refman;
       LUMI_inc_ref(line_count_Refman);
-      if (line_count == NULL) RAISE(213, 27, "used member of empty object")
-      if (line_count_Refman->value == NULL) RAISE(213, 38, "used member of outdated weak reference")
+      if (line_count == NULL) RAISE(211, 27, "used member of empty object")
+      if (line_count_Refman->value == NULL) RAISE(211, 38, "used member of outdated weak reference")
       if (line_count->needs_cover) {
-        if (line_count == NULL) RAISE(214, 27, "used member of empty object")
-        if (line_count_Refman->value == NULL) RAISE(214, 38, "used member of outdated weak reference")
+        if (line_count == NULL) RAISE(212, 27, "used member of empty object")
+        if (line_count_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
         line_count->covered_index = covered_index;
         covered_index += 1;
       }
     }
-  if (self == NULL) RAISE(216, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(214, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(214, 38, "used member of outdated weak reference")
   self->covered_files = covered_index;
-  if (self == NULL) RAISE(217, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(215, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
   if (self->covered_files == 0) {
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-      if (aux_String_2_Refman == NULL) RAISE(218, 38, "insufficient memory for managed object")
+      if (aux_String_2_Refman == NULL) RAISE(216, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 51;
       aux_String_2_Var.length = 50;
       aux_String_2_Var.values = "General code error: no code to test under module \"";
-      CHECK(218, tl5_compiler_M_print(aux_String_2, aux_String_2_Refman) )
-      if (tl5_compiler_M_glob == NULL) RAISE(219, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(219, 38, "used member of outdated weak reference")
-      CHECK(219, tl5_compiler_M_print(tl5_compiler_M_glob->tested_module, tl5_compiler_M_glob->tested_module_Refman) )
+      CHECK(216, tl5_compiler_M_print(aux_String_2, aux_String_2_Refman) )
+      if (tl5_compiler_M_glob == NULL) RAISE(217, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
+      CHECK(217, tl5_compiler_M_print(tl5_compiler_M_glob->tested_module, tl5_compiler_M_glob->tested_module_Refman) )
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-      if (aux_String_3_Refman == NULL) RAISE(220, 38, "insufficient memory for managed object")
+      if (aux_String_3_Refman == NULL) RAISE(218, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 3;
       aux_String_3_Var.length = 2;
       aux_String_3_Var.values = "\"\n";
-      CHECK(220, tl5_compiler_M_print(aux_String_3, aux_String_3_Refman) )
-      USER_RAISE(221, NULL, NULL)
+      CHECK(218, tl5_compiler_M_print(aux_String_3, aux_String_3_Refman) )
+      USER_RAISE(219, NULL, NULL)
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_3_Refman);
@@ -34759,6 +36119,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(aux_ModuleMembers_0_Refman);
   LUMI_dec_ref(line_count_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -34772,6 +36133,12 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write(tl5_compiler_M_SyntaxTreeRoot* se
   tl5_compiler_M_TypeDeclarationWriter* type_declaration_writer = NULL;
   Ref_Manager* type_declaration_writer_Refman = NULL;
   tl5_compiler_M_TypeDeclarationWriter_Dynamic* type_declaration_writer_Dynamic = &tl5_compiler_M_TypeDeclarationWriter_dynamic;
+  tl5_compiler_M_NodeWriteAction node_write_action_Var = {{0}};
+  tl5_compiler_M_NodeWriteAction* node_write_action = NULL;
+  Ref_Manager* node_write_action_Refman = NULL;
+  tl5_compiler_M_NodeWriteAction_Dynamic* node_write_action_Dynamic = &tl5_compiler_M_NodeWriteAction_dynamic;
+  tl5_compiler_M_NameMapNode* child = NULL;
+  Ref_Manager* child_Refman = NULL;
   tl5_compiler_M_TypeMethodsDeclarationWriter type_methods_declaration_writer_Var = {{0}};
   tl5_compiler_M_TypeMethodsDeclarationWriter* type_methods_declaration_writer = NULL;
   Ref_Manager* type_methods_declaration_writer_Refman = NULL;
@@ -34826,163 +36193,198 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write(tl5_compiler_M_SyntaxTreeRoot* se
   String aux_String_13_Var = {0};
   String* aux_String_13 = NULL;
   Ref_Manager* aux_String_13_Refman = NULL;
-  if (self == NULL) RAISE(232, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(232, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
-  CHECK(232, tl5_compiler_M_file_open(self->output_file_name, self->output_file_name_Refman, false, &(tl5_compiler_M_glob->output_file), &(tl5_compiler_M_glob->output_file_Refman)) )
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(230, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(230, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(230, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(230, 38, "used member of outdated weak reference")
+  CHECK(230, tl5_compiler_M_file_open(self->output_file_name, self->output_file_name_Refman, false, &(tl5_compiler_M_glob->output_file), &(tl5_compiler_M_glob->output_file_Refman)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(234, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(232, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 21;
   aux_String_0_Var.length = 20;
   aux_String_0_Var.values = ";include \"lumi.4.h\"\n";
-  CHECK(234, tl5_compiler_M_write_global(aux_String_0, aux_String_0_Refman) )
+  CHECK(232, tl5_compiler_M_write_global(aux_String_0, aux_String_0_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(236, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(234, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 27;
   aux_String_1_Var.length = 26;
   aux_String_1_Var.values = "\n\n/* types declaration */\n";
-  CHECK(236, tl5_compiler_M_write_global(aux_String_1, aux_String_1_Refman) )
+  CHECK(234, tl5_compiler_M_write_global(aux_String_1, aux_String_1_Refman) )
   type_declaration_writer = &type_declaration_writer_Var;
   type_declaration_writer_Refman = LUMI_new_ref(type_declaration_writer);
-  if (type_declaration_writer_Refman == NULL) RAISE(237, 38, "insufficient memory for managed object")
-  CHECK(238, tl5_compiler_M_SyntaxTreeRoot_write_for_type(self, self_Refman, self_Dynamic, &(type_declaration_writer->_base), type_declaration_writer_Refman, &(type_declaration_writer_Dynamic->_base)) )
+  if (type_declaration_writer_Refman == NULL) RAISE(235, 38, "insufficient memory for managed object")
+  CHECK(236, tl5_compiler_M_SyntaxTreeRoot_write_for_type(self, self_Refman, self_Dynamic, &(type_declaration_writer->_base), type_declaration_writer_Refman, &(type_declaration_writer_Dynamic->_base)) )
   aux_String_2 = &aux_String_2_Var;
   aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-  if (aux_String_2_Refman == NULL) RAISE(241, 38, "insufficient memory for managed object")
+  if (aux_String_2_Refman == NULL) RAISE(239, 38, "insufficient memory for managed object")
   aux_String_2_Var.max_length = 15;
   aux_String_2_Var.length = 14;
   aux_String_2_Var.values = "\n\n/* Enums */\n";
-  CHECK(241, tl5_compiler_M_write_global(aux_String_2, aux_String_2_Refman) )
+  CHECK(239, tl5_compiler_M_write_global(aux_String_2, aux_String_2_Refman) )
+  if (self == NULL) RAISE(240, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(240, 38, "used member of outdated weak reference")
+  CHECK(240, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), self->enums, self->enums_Refman) )
   aux_String_3 = &aux_String_3_Var;
   aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-  if (aux_String_3_Refman == NULL) RAISE(245, 38, "insufficient memory for managed object")
+  if (aux_String_3_Refman == NULL) RAISE(243, 38, "insufficient memory for managed object")
   aux_String_3_Var.max_length = 19;
   aux_String_3_Var.length = 18;
   aux_String_3_Var.values = "\n\n/* constants */\n";
-  CHECK(245, tl5_compiler_M_write_global(aux_String_3, aux_String_3_Refman) )
+  CHECK(243, tl5_compiler_M_write_global(aux_String_3, aux_String_3_Refman) )
+  node_write_action = &node_write_action_Var;
+  node_write_action_Refman = LUMI_new_ref(node_write_action);
+  if (node_write_action_Refman == NULL) RAISE(244, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(245, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(245, 38, "used member of outdated weak reference")
+  if (self->constants == NULL) RAISE(245, 27, "used member of empty object")
+  if (self->constants_Refman->value == NULL) RAISE(245, 38, "used member of outdated weak reference")
+  child = self->constants->first;
+  child_Refman = self->constants->first_Refman;
+  LUMI_inc_ref(child_Refman);
+  while (true) {
+      if (!(child != NULL && child_Refman->value != NULL)) break;
+      if (child == NULL) RAISE(248, 27, "used member of empty object")
+      if (child_Refman->value == NULL) RAISE(248, 38, "used member of outdated weak reference")
+      CHECK(248, tl5_compiler_M_SyntaxTreeNode_do_action(&(((tl5_compiler_M_SyntaxTreeConstant*)(child->value))->_base._base._base), child->value_Refman, &(((tl5_compiler_M_SyntaxTreeConstant_Dynamic*)(child->value_Dynamic))->_base._base._base), &(node_write_action->_base), node_write_action_Refman, &(node_write_action_Dynamic->_base)) )
+      if (child == NULL) RAISE(249, 27, "used member of empty object")
+      if (child_Refman->value == NULL) RAISE(249, 38, "used member of outdated weak reference")
+      LUMI_dec_ref(child_Refman);
+      child_Refman = child->next_Refman;
+      LUMI_inc_ref(child_Refman);
+      child = child->next;
+    }
   aux_String_4 = &aux_String_4_Var;
   aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-  if (aux_String_4_Refman == NULL) RAISE(249, 38, "insufficient memory for managed object")
+  if (aux_String_4_Refman == NULL) RAISE(252, 38, "insufficient memory for managed object")
   aux_String_4_Var.max_length = 22;
   aux_String_4_Var.length = 21;
   aux_String_4_Var.values = "\n\n/* types struct */\n";
-  CHECK(249, tl5_compiler_M_write_global(aux_String_4, aux_String_4_Refman) )
+  CHECK(252, tl5_compiler_M_write_global(aux_String_4, aux_String_4_Refman) )
+  if (self == NULL) RAISE(253, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
+  CHECK(253, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), self->_base.types, self->_base.types_Refman) )
   aux_String_5 = &aux_String_5_Var;
   aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-  if (aux_String_5_Refman == NULL) RAISE(252, 38, "insufficient memory for managed object")
+  if (aux_String_5_Refman == NULL) RAISE(255, 38, "insufficient memory for managed object")
   aux_String_5_Var.max_length = 35;
   aux_String_5_Var.length = 34;
   aux_String_5_Var.values = "\n\n/* types methods declaration */\n";
-  CHECK(252, tl5_compiler_M_write_global(aux_String_5, aux_String_5_Refman) )
+  CHECK(255, tl5_compiler_M_write_global(aux_String_5, aux_String_5_Refman) )
   type_methods_declaration_writer = &type_methods_declaration_writer_Var;
   type_methods_declaration_writer_Refman = LUMI_new_ref(type_methods_declaration_writer);
-  if (type_methods_declaration_writer_Refman == NULL) RAISE(253, 38, "insufficient memory for managed object")
-  CHECK(254, tl5_compiler_M_SyntaxTreeRoot_write_for_type(self, self_Refman, self_Dynamic, &(type_methods_declaration_writer->_base), type_methods_declaration_writer_Refman, &(type_methods_declaration_writer_Dynamic->_base)) )
+  if (type_methods_declaration_writer_Refman == NULL) RAISE(256, 38, "insufficient memory for managed object")
+  CHECK(257, tl5_compiler_M_SyntaxTreeRoot_write_for_type(self, self_Refman, self_Dynamic, &(type_methods_declaration_writer->_base), type_methods_declaration_writer_Refman, &(type_methods_declaration_writer_Dynamic->_base)) )
   aux_String_6 = &aux_String_6_Var;
   aux_String_6_Refman = LUMI_new_ref(aux_String_6);
-  if (aux_String_6_Refman == NULL) RAISE(256, 38, "insufficient memory for managed object")
+  if (aux_String_6_Refman == NULL) RAISE(259, 38, "insufficient memory for managed object")
   aux_String_6_Var.max_length = 38;
   aux_String_6_Var.length = 37;
   aux_String_6_Var.values = "\n\n/* global functions declaration */\n";
-  CHECK(256, tl5_compiler_M_write_global(aux_String_6, aux_String_6_Refman) )
-  CHECK(257, tl5_compiler_M_SyntaxTreeNamespace_write_functions_declaration(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  CHECK(259, tl5_compiler_M_write_global(aux_String_6, aux_String_6_Refman) )
+  CHECK(260, tl5_compiler_M_SyntaxTreeNamespace_write_functions_declaration(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   aux_String_7 = &aux_String_7_Var;
   aux_String_7_Refman = LUMI_new_ref(aux_String_7);
-  if (aux_String_7_Refman == NULL) RAISE(259, 38, "insufficient memory for managed object")
+  if (aux_String_7_Refman == NULL) RAISE(262, 38, "insufficient memory for managed object")
   aux_String_7_Var.max_length = 32;
   aux_String_7_Var.length = 31;
   aux_String_7_Var.values = "\n\n/* types global variables */\n";
-  CHECK(259, tl5_compiler_M_write_global(aux_String_7, aux_String_7_Refman) )
+  CHECK(262, tl5_compiler_M_write_global(aux_String_7, aux_String_7_Refman) )
   type_global_writer = &type_global_writer_Var;
   type_global_writer_Refman = LUMI_new_ref(type_global_writer);
-  if (type_global_writer_Refman == NULL) RAISE(260, 38, "insufficient memory for managed object")
-  CHECK(261, tl5_compiler_M_SyntaxTreeRoot_write_for_type(self, self_Refman, self_Dynamic, &(type_global_writer->_base), type_global_writer_Refman, &(type_global_writer_Dynamic->_base)) )
+  if (type_global_writer_Refman == NULL) RAISE(263, 38, "insufficient memory for managed object")
+  CHECK(264, tl5_compiler_M_SyntaxTreeRoot_write_for_type(self, self_Refman, self_Dynamic, &(type_global_writer->_base), type_global_writer_Refman, &(type_global_writer_Dynamic->_base)) )
   aux_String_8 = &aux_String_8_Var;
   aux_String_8_Refman = LUMI_new_ref(aux_String_8);
-  if (aux_String_8_Refman == NULL) RAISE(264, 38, "insufficient memory for managed object")
+  if (aux_String_8_Refman == NULL) RAISE(267, 38, "insufficient memory for managed object")
   aux_String_8_Var.max_length = 26;
   aux_String_8_Var.length = 25;
   aux_String_8_Var.values = "\n\n/* global variables */\n";
-  CHECK(264, tl5_compiler_M_write_global(aux_String_8, aux_String_8_Refman) )
-  if (self == NULL) RAISE(267, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
+  CHECK(267, tl5_compiler_M_write_global(aux_String_8, aux_String_8_Refman) )
+  if (self == NULL) RAISE(268, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
+  CHECK(268, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), self->_base._base._base.variables, self->_base._base._base.variables_Refman) )
+  if (self == NULL) RAISE(270, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
   if (self->line_counts != NULL && self->line_counts_Refman->value != NULL) {
-      CHECK(268, tl5_compiler_M_SyntaxTreeRoot_write_test_coverage_data(self, self_Refman, self_Dynamic) )
+      CHECK(271, tl5_compiler_M_SyntaxTreeRoot_write_test_coverage_data(self, self_Refman, self_Dynamic) )
     }
   aux_String_9 = &aux_String_9_Var;
   aux_String_9_Refman = LUMI_new_ref(aux_String_9);
-  if (aux_String_9_Refman == NULL) RAISE(270, 38, "insufficient memory for managed object")
+  if (aux_String_9_Refman == NULL) RAISE(273, 38, "insufficient memory for managed object")
   aux_String_9_Var.max_length = 28;
   aux_String_9_Var.length = 27;
   aux_String_9_Var.values = "\n\n/* types methods body */\n";
-  CHECK(270, tl5_compiler_M_write_global(aux_String_9, aux_String_9_Refman) )
+  CHECK(273, tl5_compiler_M_write_global(aux_String_9, aux_String_9_Refman) )
   type_methods_body_writer = &type_methods_body_writer_Var;
   type_methods_body_writer_Refman = LUMI_new_ref(type_methods_body_writer);
-  if (type_methods_body_writer_Refman == NULL) RAISE(271, 38, "insufficient memory for managed object")
-  CHECK(272, tl5_compiler_M_SyntaxTreeRoot_write_for_type(self, self_Refman, self_Dynamic, &(type_methods_body_writer->_base), type_methods_body_writer_Refman, &(type_methods_body_writer_Dynamic->_base)) )
+  if (type_methods_body_writer_Refman == NULL) RAISE(274, 38, "insufficient memory for managed object")
+  CHECK(275, tl5_compiler_M_SyntaxTreeRoot_write_for_type(self, self_Refman, self_Dynamic, &(type_methods_body_writer->_base), type_methods_body_writer_Refman, &(type_methods_body_writer_Dynamic->_base)) )
   aux_String_10 = &aux_String_10_Var;
   aux_String_10_Refman = LUMI_new_ref(aux_String_10);
-  if (aux_String_10_Refman == NULL) RAISE(275, 38, "insufficient memory for managed object")
+  if (aux_String_10_Refman == NULL) RAISE(278, 38, "insufficient memory for managed object")
   aux_String_10_Var.max_length = 31;
   aux_String_10_Var.length = 30;
   aux_String_10_Var.values = "\n\n/* global functions body */\n";
-  CHECK(275, tl5_compiler_M_write_global(aux_String_10, aux_String_10_Refman) )
+  CHECK(278, tl5_compiler_M_write_global(aux_String_10, aux_String_10_Refman) )
   if (self == NULL) RAISE(279, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob == NULL) RAISE(279, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
+  CHECK(279, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), self->_base._base.functions, self->_base._base.functions_Refman) )
+  if (self == NULL) RAISE(282, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(282, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
   if ((tl5_compiler_M_glob->tested_module != NULL && tl5_compiler_M_glob->tested_module_Refman->value != NULL) || (self->main_function != NULL && self->main_function_Refman->value != NULL)) {
-      if (tl5_compiler_M_glob == NULL) RAISE(280, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(280, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(283, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
       if (! tl5_compiler_M_glob->is_new_mocked) {
         aux_String_11 = &aux_String_11_Var;
         aux_String_11_Refman = LUMI_new_ref(aux_String_11);
-        if (aux_String_11_Refman == NULL) RAISE(282, 38, "insufficient memory for managed object")
+        if (aux_String_11_Refman == NULL) RAISE(285, 38, "insufficient memory for managed object")
         aux_String_11_Var.max_length = 61;
         aux_String_11_Var.length = 60;
         aux_String_11_Var.values = "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }";
-        CHECK(281, tl5_compiler_M_write(aux_String_11, aux_String_11_Refman) )
+        CHECK(284, tl5_compiler_M_write(aux_String_11, aux_String_11_Refman) )
       }
-      if (tl5_compiler_M_glob == NULL) RAISE(283, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
+      if (tl5_compiler_M_glob == NULL) RAISE(286, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(286, 38, "used member of outdated weak reference")
       if (! tl5_compiler_M_glob->is_delete_mocked) {
         aux_String_12 = &aux_String_12_Var;
         aux_String_12_Refman = LUMI_new_ref(aux_String_12);
-        if (aux_String_12_Refman == NULL) RAISE(284, 38, "insufficient memory for managed object")
+        if (aux_String_12_Refman == NULL) RAISE(287, 38, "insufficient memory for managed object")
         aux_String_12_Var.max_length = 50;
         aux_String_12_Var.length = 49;
         aux_String_12_Var.values = "\n\nReturncode delete_Mock(Ref self) { return OK; }";
-        CHECK(284, tl5_compiler_M_write(aux_String_12, aux_String_12_Refman) )
+        CHECK(287, tl5_compiler_M_write(aux_String_12, aux_String_12_Refman) )
       }
     }
-  if (tl5_compiler_M_glob == NULL) RAISE(285, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(285, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(288, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(288, 38, "used member of outdated weak reference")
   if (tl5_compiler_M_glob->tested_module != NULL && tl5_compiler_M_glob->tested_module_Refman->value != NULL) {
-      CHECK(286, tl5_compiler_M_SyntaxTreeRoot_write_test_main(self, self_Refman, self_Dynamic) )
+      CHECK(289, tl5_compiler_M_SyntaxTreeRoot_write_test_main(self, self_Refman, self_Dynamic) )
     }
   else {
-      if (self == NULL) RAISE(287, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(290, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(290, 38, "used member of outdated weak reference")
       if (self->main_function != NULL && self->main_function_Refman->value != NULL) {
         aux_String_13 = &aux_String_13_Var;
         aux_String_13_Refman = LUMI_new_ref(aux_String_13);
-        if (aux_String_13_Refman == NULL) RAISE(288, 38, "insufficient memory for managed object")
+        if (aux_String_13_Refman == NULL) RAISE(291, 38, "insufficient memory for managed object")
         aux_String_13_Var.max_length = 23;
         aux_String_13_Var.length = 22;
         aux_String_13_Var.values = "\n\n/* main function */\n";
-        CHECK(288, tl5_compiler_M_write_global(aux_String_13, aux_String_13_Refman) )
-        if (self->main_function_Dynamic == NULL) RAISE(289, 28, "dynamic call of empty object")
-        if (self == NULL) RAISE(289, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(289, 38, "used member of outdated weak reference")
-        CHECK(289, self->main_function_Dynamic->_base._base._base._base.write(&(self->main_function->_base._base._base._base), self->main_function_Refman, &(self->main_function_Dynamic->_base._base._base._base)) )
+        CHECK(291, tl5_compiler_M_write_global(aux_String_13, aux_String_13_Refman) )
+        if (self->main_function_Dynamic == NULL) RAISE(292, 28, "dynamic call of empty object")
+        if (self == NULL) RAISE(292, 27, "used member of empty object")
+        if (self_Refman->value == NULL) RAISE(292, 38, "used member of outdated weak reference")
+        CHECK(292, self->main_function_Dynamic->_base._base._base._base.write(&(self->main_function->_base._base._base._base), self->main_function_Refman, &(self->main_function_Dynamic->_base._base._base._base)) )
       }
     }
-  if (tl5_compiler_M_glob == NULL) RAISE(291, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(291, 38, "used member of outdated weak reference")
-  CHECK(291, tl5_compiler_M_file_close(tl5_compiler_M_glob->output_file, tl5_compiler_M_glob->output_file_Refman) )
+  if (tl5_compiler_M_glob == NULL) RAISE(294, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
+  CHECK(294, tl5_compiler_M_file_close(tl5_compiler_M_glob->output_file, tl5_compiler_M_glob->output_file_Refman) )
   tl5_compiler_M_glob->output_file = NULL;
   tl5_compiler_M_glob->output_file_Refman = NULL;
 LUMI_cleanup:
@@ -35003,7 +36405,10 @@ LUMI_cleanup:
   LUMI_dec_ref(type_methods_body_writer_Refman);
   LUMI_dec_ref(type_global_writer_Refman);
   LUMI_dec_ref(type_methods_declaration_writer_Refman);
+  LUMI_dec_ref(child_Refman);
+  LUMI_dec_ref(node_write_action_Refman);
   LUMI_dec_ref(type_declaration_writer_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35015,22 +36420,23 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write_for_type(tl5_compiler_M_SyntaxTre
   Returncode LUMI_err = OK;
   tl5_compiler_M_ListNode* child = NULL;
   Ref_Manager* child_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(type_writer_Refman);
-  if (self == NULL) RAISE(294, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
-  if (self->_base.types == NULL) RAISE(294, 27, "used member of empty object")
-  if (self->_base.types_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(297, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(297, 38, "used member of outdated weak reference")
+  if (self->_base.types == NULL) RAISE(297, 27, "used member of empty object")
+  if (self->_base.types_Refman->value == NULL) RAISE(297, 38, "used member of outdated weak reference")
   child = self->_base.types->first;
   child_Refman = self->_base.types->first_Refman;
   LUMI_inc_ref(child_Refman);
   while (true) {
       if (!(child != NULL && child_Refman->value != NULL)) break;
-      if (child->item_Dynamic == NULL) RAISE(297, 28, "dynamic call of empty object")
-      if (child == NULL) RAISE(297, 27, "used member of empty object")
-      if (child_Refman->value == NULL) RAISE(297, 38, "used member of outdated weak reference")
-      CHECK(297, ((tl5_compiler_M_TypeData_Dynamic*)(child->item_Dynamic))->write_me(child->item, child->item_Refman, ((tl5_compiler_M_TypeData_Dynamic*)(child->item_Dynamic)), type_writer, type_writer_Refman, type_writer_Dynamic) )
-      if (child == NULL) RAISE(298, 27, "used member of empty object")
-      if (child_Refman->value == NULL) RAISE(298, 38, "used member of outdated weak reference")
+      if (child->item_Dynamic == NULL) RAISE(300, 28, "dynamic call of empty object")
+      if (child == NULL) RAISE(300, 27, "used member of empty object")
+      if (child_Refman->value == NULL) RAISE(300, 38, "used member of outdated weak reference")
+      CHECK(300, ((tl5_compiler_M_TypeData_Dynamic*)(child->item_Dynamic))->write_me(child->item, child->item_Refman, ((tl5_compiler_M_TypeData_Dynamic*)(child->item_Dynamic)), type_writer, type_writer_Refman, type_writer_Dynamic) )
+      if (child == NULL) RAISE(301, 27, "used member of empty object")
+      if (child_Refman->value == NULL) RAISE(301, 38, "used member of outdated weak reference")
       LUMI_dec_ref(child_Refman);
       child_Refman = child->next_Refman;
       LUMI_inc_ref(child_Refman);
@@ -35039,6 +36445,7 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write_for_type(tl5_compiler_M_SyntaxTre
 LUMI_cleanup:
   LUMI_dec_ref(child_Refman);
   LUMI_dec_ref(type_writer_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35101,193 +36508,194 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write_test_coverage_data(tl5_compiler_M
   String aux_String_15_Var = {0};
   String* aux_String_15 = NULL;
   Ref_Manager* aux_String_15_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   for (n = 0; n < self->line_counts->length; ++n) {
-      if (self == NULL) RAISE(303, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(303, 38, "used member of outdated weak reference")
-      if (self->line_counts == NULL) RAISE(303, 29, "empty object used as sequence")
-      if (self->line_counts_Refman->value == NULL) RAISE(303, 40, "outdated weak reference used as sequence")
-      if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(303, 25, "slice index out of bounds")
+      if (self == NULL) RAISE(306, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(306, 38, "used member of outdated weak reference")
+      if (self->line_counts == NULL) RAISE(306, 29, "empty object used as sequence")
+      if (self->line_counts_Refman->value == NULL) RAISE(306, 40, "outdated weak reference used as sequence")
+      if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(306, 25, "slice index out of bounds")
       LUMI_dec_ref(line_count_Refman);
       line_count_Refman = self->line_counts_Refman;
       LUMI_inc_ref(line_count_Refman);
       line_count = ((tl5_compiler_M_LineCount*)((self->line_counts)->values)) + n;
-      if (line_count == NULL) RAISE(304, 27, "used member of empty object")
-      if (line_count_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
+      if (line_count == NULL) RAISE(307, 27, "used member of empty object")
+      if (line_count_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
       if (line_count->needs_cover) {
         aux_String_0 = &aux_String_0_Var;
         aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-        if (aux_String_0_Refman == NULL) RAISE(305, 38, "insufficient memory for managed object")
+        if (aux_String_0_Refman == NULL) RAISE(308, 38, "insufficient memory for managed object")
         aux_String_0_Var.max_length = 15;
         aux_String_0_Var.length = 14;
         aux_String_0_Var.values = "\nint LUMI_file";
-        CHECK(305, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-        if (line_count == NULL) RAISE(306, 27, "used member of empty object")
-        if (line_count_Refman->value == NULL) RAISE(306, 38, "used member of outdated weak reference")
-        CHECK(306, tl5_compiler_M_write_int(line_count->covered_index) )
+        CHECK(308, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+        if (line_count == NULL) RAISE(309, 27, "used member of empty object")
+        if (line_count_Refman->value == NULL) RAISE(309, 38, "used member of outdated weak reference")
+        CHECK(309, tl5_compiler_M_write_int(line_count->covered_index) )
         aux_String_1 = &aux_String_1_Var;
         aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-        if (aux_String_1_Refman == NULL) RAISE(307, 38, "insufficient memory for managed object")
+        if (aux_String_1_Refman == NULL) RAISE(310, 38, "insufficient memory for managed object")
         aux_String_1_Var.max_length = 13;
         aux_String_1_Var.length = 12;
         aux_String_1_Var.values = "_line_count[";
-        CHECK(307, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
-        if (line_count == NULL) RAISE(308, 27, "used member of empty object")
-        if (line_count_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
-        if (line_count->line_needs_cover == NULL) RAISE(308, 27, "used member of empty object")
-        if (line_count->line_needs_cover_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
-        CHECK(308, tl5_compiler_M_write_int(line_count->line_needs_cover->length) )
+        CHECK(310, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+        if (line_count == NULL) RAISE(311, 27, "used member of empty object")
+        if (line_count_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
+        if (line_count->line_needs_cover == NULL) RAISE(311, 27, "used member of empty object")
+        if (line_count->line_needs_cover_Refman->value == NULL) RAISE(311, 38, "used member of outdated weak reference")
+        CHECK(311, tl5_compiler_M_write_int(line_count->line_needs_cover->length) )
         aux_String_2 = &aux_String_2_Var;
         aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-        if (aux_String_2_Refman == NULL) RAISE(309, 38, "insufficient memory for managed object")
+        if (aux_String_2_Refman == NULL) RAISE(312, 38, "insufficient memory for managed object")
         aux_String_2_Var.max_length = 9;
         aux_String_2_Var.length = 8;
         aux_String_2_Var.values = "] = {\n  ";
-        CHECK(309, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+        CHECK(312, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
         for (i = 0; i < line_count->line_needs_cover->length; ++i) {
           if (i > 0) {
             aux_String_3 = &aux_String_3_Var;
             aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-            if (aux_String_3_Refman == NULL) RAISE(313, 38, "insufficient memory for managed object")
+            if (aux_String_3_Refman == NULL) RAISE(316, 38, "insufficient memory for managed object")
             aux_String_3_Var.max_length = 2;
             aux_String_3_Var.length = 1;
             aux_String_3_Var.values = ",";
-            CHECK(313, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+            CHECK(316, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
           }
           if (modulo == 25) {
             aux_String_4 = &aux_String_4_Var;
             aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-            if (aux_String_4_Refman == NULL) RAISE(315, 38, "insufficient memory for managed object")
+            if (aux_String_4_Refman == NULL) RAISE(318, 38, "insufficient memory for managed object")
             aux_String_4_Var.max_length = 4;
             aux_String_4_Var.length = 3;
             aux_String_4_Var.values = "\n  ";
-            CHECK(315, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
+            CHECK(318, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
             modulo = 1;
           }
           else {
             modulo += 1;
           }
-          if (line_count == NULL) RAISE(319, 27, "used member of empty object")
-          if (line_count_Refman->value == NULL) RAISE(319, 38, "used member of outdated weak reference")
-          if (line_count->line_needs_cover == NULL) RAISE(319, 29, "empty object used as sequence")
-          if (line_count->line_needs_cover_Refman->value == NULL) RAISE(319, 40, "outdated weak reference used as sequence")
-          if ((i) < 0 || (i) >= (line_count->line_needs_cover)->length) RAISE(319, 25, "slice index out of bounds")
+          if (line_count == NULL) RAISE(322, 27, "used member of empty object")
+          if (line_count_Refman->value == NULL) RAISE(322, 38, "used member of outdated weak reference")
+          if (line_count->line_needs_cover == NULL) RAISE(322, 29, "empty object used as sequence")
+          if (line_count->line_needs_cover_Refman->value == NULL) RAISE(322, 40, "outdated weak reference used as sequence")
+          if ((i) < 0 || (i) >= (line_count->line_needs_cover)->length) RAISE(322, 25, "slice index out of bounds")
           if (((Bool*)((line_count->line_needs_cover)->values))[i]) {
             aux_String_5 = &aux_String_5_Var;
             aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-            if (aux_String_5_Refman == NULL) RAISE(320, 38, "insufficient memory for managed object")
+            if (aux_String_5_Refman == NULL) RAISE(323, 38, "insufficient memory for managed object")
             aux_String_5_Var.max_length = 3;
             aux_String_5_Var.length = 2;
             aux_String_5_Var.values = " 0";
-            CHECK(320, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
+            CHECK(323, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
           }
           else {
             aux_String_6 = &aux_String_6_Var;
             aux_String_6_Refman = LUMI_new_ref(aux_String_6);
-            if (aux_String_6_Refman == NULL) RAISE(322, 38, "insufficient memory for managed object")
+            if (aux_String_6_Refman == NULL) RAISE(325, 38, "insufficient memory for managed object")
             aux_String_6_Var.max_length = 3;
             aux_String_6_Var.length = 2;
             aux_String_6_Var.values = "-1";
-            CHECK(322, tl5_compiler_M_write(aux_String_6, aux_String_6_Refman) )
+            CHECK(325, tl5_compiler_M_write(aux_String_6, aux_String_6_Refman) )
           }
         }
         aux_String_7 = &aux_String_7_Var;
         aux_String_7_Refman = LUMI_new_ref(aux_String_7);
-        if (aux_String_7_Refman == NULL) RAISE(323, 38, "insufficient memory for managed object")
+        if (aux_String_7_Refman == NULL) RAISE(326, 38, "insufficient memory for managed object")
         aux_String_7_Var.max_length = 4;
         aux_String_7_Var.length = 3;
         aux_String_7_Var.values = "\n};";
-        CHECK(323, tl5_compiler_M_write(aux_String_7, aux_String_7_Refman) )
+        CHECK(326, tl5_compiler_M_write(aux_String_7, aux_String_7_Refman) )
       }
     }
   aux_String_8 = &aux_String_8_Var;
   aux_String_8_Refman = LUMI_new_ref(aux_String_8);
-  if (aux_String_8_Refman == NULL) RAISE(324, 38, "insufficient memory for managed object")
+  if (aux_String_8_Refman == NULL) RAISE(327, 38, "insufficient memory for managed object")
   aux_String_8_Var.max_length = 35;
   aux_String_8_Var.length = 34;
   aux_String_8_Var.values = "\nFile_Coverage LUMI_file_coverage[";
-  CHECK(324, tl5_compiler_M_write(aux_String_8, aux_String_8_Refman) )
-  if (self == NULL) RAISE(325, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(325, 38, "used member of outdated weak reference")
-  CHECK(325, tl5_compiler_M_write_int(self->covered_files) )
+  CHECK(327, tl5_compiler_M_write(aux_String_8, aux_String_8_Refman) )
+  if (self == NULL) RAISE(328, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(328, 38, "used member of outdated weak reference")
+  CHECK(328, tl5_compiler_M_write_int(self->covered_files) )
   aux_String_9 = &aux_String_9_Var;
   aux_String_9_Refman = LUMI_new_ref(aux_String_9);
-  if (aux_String_9_Refman == NULL) RAISE(326, 38, "insufficient memory for managed object")
+  if (aux_String_9_Refman == NULL) RAISE(329, 38, "insufficient memory for managed object")
   aux_String_9_Var.max_length = 6;
   aux_String_9_Var.length = 5;
   aux_String_9_Var.values = "] = {";
-  CHECK(326, tl5_compiler_M_write(aux_String_9, aux_String_9_Refman) )
+  CHECK(329, tl5_compiler_M_write(aux_String_9, aux_String_9_Refman) )
   for (n = 0; n < self->line_counts->length; ++n) {
-      if (self == NULL) RAISE(328, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(328, 38, "used member of outdated weak reference")
-      if (self->line_counts == NULL) RAISE(328, 29, "empty object used as sequence")
-      if (self->line_counts_Refman->value == NULL) RAISE(328, 40, "outdated weak reference used as sequence")
-      if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(328, 25, "slice index out of bounds")
+      if (self == NULL) RAISE(331, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(331, 38, "used member of outdated weak reference")
+      if (self->line_counts == NULL) RAISE(331, 29, "empty object used as sequence")
+      if (self->line_counts_Refman->value == NULL) RAISE(331, 40, "outdated weak reference used as sequence")
+      if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(331, 25, "slice index out of bounds")
       LUMI_dec_ref(line_count_Refman);
       line_count_Refman = self->line_counts_Refman;
       LUMI_inc_ref(line_count_Refman);
       line_count = ((tl5_compiler_M_LineCount*)((self->line_counts)->values)) + n;
-      if (line_count == NULL) RAISE(329, 27, "used member of empty object")
-      if (line_count_Refman->value == NULL) RAISE(329, 38, "used member of outdated weak reference")
+      if (line_count == NULL) RAISE(332, 27, "used member of empty object")
+      if (line_count_Refman->value == NULL) RAISE(332, 38, "used member of outdated weak reference")
       if (line_count->needs_cover) {
-        if (line_count == NULL) RAISE(330, 27, "used member of empty object")
-        if (line_count_Refman->value == NULL) RAISE(330, 38, "used member of outdated weak reference")
+        if (line_count == NULL) RAISE(333, 27, "used member of empty object")
+        if (line_count_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
         if (line_count->covered_index > 0) {
           aux_String_10 = &aux_String_10_Var;
           aux_String_10_Refman = LUMI_new_ref(aux_String_10);
-          if (aux_String_10_Refman == NULL) RAISE(331, 38, "insufficient memory for managed object")
+          if (aux_String_10_Refman == NULL) RAISE(334, 38, "insufficient memory for managed object")
           aux_String_10_Var.max_length = 2;
           aux_String_10_Var.length = 1;
           aux_String_10_Var.values = ",";
-          CHECK(331, tl5_compiler_M_write(aux_String_10, aux_String_10_Refman) )
+          CHECK(334, tl5_compiler_M_write(aux_String_10, aux_String_10_Refman) )
         }
         aux_String_11 = &aux_String_11_Var;
         aux_String_11_Refman = LUMI_new_ref(aux_String_11);
-        if (aux_String_11_Refman == NULL) RAISE(332, 38, "insufficient memory for managed object")
+        if (aux_String_11_Refman == NULL) RAISE(335, 38, "insufficient memory for managed object")
         aux_String_11_Var.max_length = 6;
         aux_String_11_Var.length = 5;
         aux_String_11_Var.values = "\n  {\"";
-        CHECK(332, tl5_compiler_M_write(aux_String_11, aux_String_11_Refman) )
-        if (line_count == NULL) RAISE(333, 27, "used member of empty object")
-        if (line_count_Refman->value == NULL) RAISE(333, 38, "used member of outdated weak reference")
-        CHECK(333, tl5_compiler_M_write(line_count->filename, line_count->filename_Refman) )
+        CHECK(335, tl5_compiler_M_write(aux_String_11, aux_String_11_Refman) )
+        if (line_count == NULL) RAISE(336, 27, "used member of empty object")
+        if (line_count_Refman->value == NULL) RAISE(336, 38, "used member of outdated weak reference")
+        CHECK(336, tl5_compiler_M_write(line_count->filename, line_count->filename_Refman) )
         aux_String_12 = &aux_String_12_Var;
         aux_String_12_Refman = LUMI_new_ref(aux_String_12);
-        if (aux_String_12_Refman == NULL) RAISE(334, 38, "insufficient memory for managed object")
+        if (aux_String_12_Refman == NULL) RAISE(337, 38, "insufficient memory for managed object")
         aux_String_12_Var.max_length = 4;
         aux_String_12_Var.length = 3;
         aux_String_12_Var.values = "\", ";
-        CHECK(334, tl5_compiler_M_write(aux_String_12, aux_String_12_Refman) )
-        if (line_count == NULL) RAISE(335, 27, "used member of empty object")
-        if (line_count_Refman->value == NULL) RAISE(335, 38, "used member of outdated weak reference")
-        if (line_count->line_needs_cover == NULL) RAISE(335, 27, "used member of empty object")
-        if (line_count->line_needs_cover_Refman->value == NULL) RAISE(335, 38, "used member of outdated weak reference")
-        CHECK(335, tl5_compiler_M_write_int(line_count->line_needs_cover->length) )
+        CHECK(337, tl5_compiler_M_write(aux_String_12, aux_String_12_Refman) )
+        if (line_count == NULL) RAISE(338, 27, "used member of empty object")
+        if (line_count_Refman->value == NULL) RAISE(338, 38, "used member of outdated weak reference")
+        if (line_count->line_needs_cover == NULL) RAISE(338, 27, "used member of empty object")
+        if (line_count->line_needs_cover_Refman->value == NULL) RAISE(338, 38, "used member of outdated weak reference")
+        CHECK(338, tl5_compiler_M_write_int(line_count->line_needs_cover->length) )
         aux_String_13 = &aux_String_13_Var;
         aux_String_13_Refman = LUMI_new_ref(aux_String_13);
-        if (aux_String_13_Refman == NULL) RAISE(336, 38, "insufficient memory for managed object")
+        if (aux_String_13_Refman == NULL) RAISE(339, 38, "insufficient memory for managed object")
         aux_String_13_Var.max_length = 12;
         aux_String_13_Var.length = 11;
         aux_String_13_Var.values = ", LUMI_file";
-        CHECK(336, tl5_compiler_M_write(aux_String_13, aux_String_13_Refman) )
-        if (line_count == NULL) RAISE(337, 27, "used member of empty object")
-        if (line_count_Refman->value == NULL) RAISE(337, 38, "used member of outdated weak reference")
-        CHECK(337, tl5_compiler_M_write_int(line_count->covered_index) )
+        CHECK(339, tl5_compiler_M_write(aux_String_13, aux_String_13_Refman) )
+        if (line_count == NULL) RAISE(340, 27, "used member of empty object")
+        if (line_count_Refman->value == NULL) RAISE(340, 38, "used member of outdated weak reference")
+        CHECK(340, tl5_compiler_M_write_int(line_count->covered_index) )
         aux_String_14 = &aux_String_14_Var;
         aux_String_14_Refman = LUMI_new_ref(aux_String_14);
-        if (aux_String_14_Refman == NULL) RAISE(338, 38, "insufficient memory for managed object")
+        if (aux_String_14_Refman == NULL) RAISE(341, 38, "insufficient memory for managed object")
         aux_String_14_Var.max_length = 13;
         aux_String_14_Var.length = 12;
         aux_String_14_Var.values = "_line_count}";
-        CHECK(338, tl5_compiler_M_write(aux_String_14, aux_String_14_Refman) )
+        CHECK(341, tl5_compiler_M_write(aux_String_14, aux_String_14_Refman) )
       }
     }
   aux_String_15 = &aux_String_15_Var;
   aux_String_15_Refman = LUMI_new_ref(aux_String_15);
-  if (aux_String_15_Refman == NULL) RAISE(339, 38, "insufficient memory for managed object")
+  if (aux_String_15_Refman == NULL) RAISE(342, 38, "insufficient memory for managed object")
   aux_String_15_Var.max_length = 5;
   aux_String_15_Var.length = 4;
   aux_String_15_Var.values = "\n};\n";
-  CHECK(339, tl5_compiler_M_write(aux_String_15, aux_String_15_Refman) )
+  CHECK(342, tl5_compiler_M_write(aux_String_15, aux_String_15_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_15_Refman);
   LUMI_dec_ref(aux_String_14_Refman);
@@ -35306,6 +36714,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(line_count_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35350,118 +36759,119 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write_test_main(tl5_compiler_M_SyntaxTr
   String aux_String_10_Var = {0};
   String* aux_String_10 = NULL;
   Ref_Manager* aux_String_10_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(342, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(345, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 21;
   aux_String_0_Var.length = 20;
   aux_String_0_Var.values = "\nUSER_MAIN_HEADER {\n";
-  CHECK(342, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(345, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(343, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(346, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 29;
   aux_String_1_Var.length = 28;
   aux_String_1_Var.values = "  Bool LUMI_success = true;\n";
-  CHECK(343, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
-  if (self->global_init_Dynamic == NULL) RAISE(344, 28, "dynamic call of empty object")
-  if (self == NULL) RAISE(344, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(344, 38, "used member of outdated weak reference")
-  CHECK(344, self->global_init_Dynamic->_base._base._base._base.write(&(self->global_init->_base._base._base._base), self->global_init_Refman, &(self->global_init_Dynamic->_base._base._base._base)) )
+  CHECK(346, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+  if (self->global_init_Dynamic == NULL) RAISE(347, 28, "dynamic call of empty object")
+  if (self == NULL) RAISE(347, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(347, 38, "used member of outdated weak reference")
+  CHECK(347, self->global_init_Dynamic->_base._base._base._base.write(&(self->global_init->_base._base._base._base), self->global_init_Refman, &(self->global_init_Dynamic->_base._base._base._base)) )
   aux_String_2 = &aux_String_2_Var;
   aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-  if (aux_String_2_Refman == NULL) RAISE(345, 38, "insufficient memory for managed object")
+  if (aux_String_2_Refman == NULL) RAISE(348, 38, "insufficient memory for managed object")
   aux_String_2_Var.max_length = 2;
   aux_String_2_Var.length = 1;
   aux_String_2_Var.values = "\n";
-  CHECK(345, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
-  if (tl5_compiler_M_glob == NULL) RAISE(346, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(346, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob->test_functions == NULL) RAISE(346, 27, "used member of empty object")
-  if (tl5_compiler_M_glob->test_functions_Refman->value == NULL) RAISE(346, 38, "used member of outdated weak reference")
+  CHECK(348, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+  if (tl5_compiler_M_glob == NULL) RAISE(349, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(349, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob->test_functions == NULL) RAISE(349, 27, "used member of empty object")
+  if (tl5_compiler_M_glob->test_functions_Refman->value == NULL) RAISE(349, 38, "used member of outdated weak reference")
   node = tl5_compiler_M_glob->test_functions->first;
   node_Refman = tl5_compiler_M_glob->test_functions->first_Refman;
   LUMI_inc_ref(node_Refman);
   while (true) {
       aux_String_3 = &aux_String_3_Var;
       aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-      if (aux_String_3_Refman == NULL) RAISE(349, 38, "insufficient memory for managed object")
+      if (aux_String_3_Refman == NULL) RAISE(352, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 34;
       aux_String_3_Var.length = 33;
       aux_String_3_Var.values = "  LUMI_success &= LUMI_run_test(\"";
-      CHECK(349, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
-      if (node == NULL) RAISE(350, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(350, 38, "used member of outdated weak reference")
-      if (node->value == NULL) RAISE(350, 27, "used member of empty object")
-      if (node->value_Refman->value == NULL) RAISE(350, 38, "used member of outdated weak reference")
-      CHECK(350, tl5_compiler_M_write(((tl5_compiler_M_SyntaxTreeTestFunction*)(node->value))->_base.name, ((tl5_compiler_M_SyntaxTreeTestFunction*)(node->value))->_base.name_Refman) )
+      CHECK(352, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+      if (node == NULL) RAISE(353, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(353, 38, "used member of outdated weak reference")
+      if (node->value == NULL) RAISE(353, 27, "used member of empty object")
+      if (node->value_Refman->value == NULL) RAISE(353, 38, "used member of outdated weak reference")
+      CHECK(353, tl5_compiler_M_write(((tl5_compiler_M_SyntaxTreeTestFunction*)(node->value))->_base.name, ((tl5_compiler_M_SyntaxTreeTestFunction*)(node->value))->_base.name_Refman) )
       aux_String_4 = &aux_String_4_Var;
       aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-      if (aux_String_4_Refman == NULL) RAISE(351, 38, "insufficient memory for managed object")
+      if (aux_String_4_Refman == NULL) RAISE(354, 38, "insufficient memory for managed object")
       aux_String_4_Var.max_length = 4;
       aux_String_4_Var.length = 3;
       aux_String_4_Var.values = "\", ";
-      CHECK(351, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
-      if (node == NULL) RAISE(352, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(352, 38, "used member of outdated weak reference")
-      CHECK(352, tl5_compiler_M_SyntaxTreeFunction_write_cname(&(((tl5_compiler_M_SyntaxTreeTestFunction*)(node->value))->_base), node->value_Refman, &(((tl5_compiler_M_SyntaxTreeTestFunction_Dynamic*)(node->value_Dynamic))->_base)) )
+      CHECK(354, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
+      if (node == NULL) RAISE(355, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(355, 38, "used member of outdated weak reference")
+      CHECK(355, tl5_compiler_M_SyntaxTreeFunction_write_cname(&(((tl5_compiler_M_SyntaxTreeTestFunction*)(node->value))->_base), node->value_Refman, &(((tl5_compiler_M_SyntaxTreeTestFunction_Dynamic*)(node->value_Dynamic))->_base)) )
       aux_String_5 = &aux_String_5_Var;
       aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-      if (aux_String_5_Refman == NULL) RAISE(353, 38, "insufficient memory for managed object")
+      if (aux_String_5_Refman == NULL) RAISE(356, 38, "insufficient memory for managed object")
       aux_String_5_Var.max_length = 4;
       aux_String_5_Var.length = 3;
       aux_String_5_Var.values = ");\n";
-      CHECK(353, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
-      if (node == NULL) RAISE(354, 27, "used member of empty object")
-      if (node_Refman->value == NULL) RAISE(354, 38, "used member of outdated weak reference")
+      CHECK(356, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
+      if (node == NULL) RAISE(357, 27, "used member of empty object")
+      if (node_Refman->value == NULL) RAISE(357, 38, "used member of outdated weak reference")
       LUMI_dec_ref(node_Refman);
       node_Refman = node->next_Refman;
       LUMI_inc_ref(node_Refman);
       node = node->next;
       if (!(node != NULL && node_Refman->value != NULL)) break;
     }
-  if (self == NULL) RAISE(356, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(356, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(359, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(359, 38, "used member of outdated weak reference")
   if (self->line_counts != NULL && self->line_counts_Refman->value != NULL) {
       aux_String_6 = &aux_String_6_Var;
       aux_String_6_Refman = LUMI_new_ref(aux_String_6);
-      if (aux_String_6_Refman == NULL) RAISE(357, 38, "insufficient memory for managed object")
+      if (aux_String_6_Refman == NULL) RAISE(360, 38, "insufficient memory for managed object")
       aux_String_6_Var.max_length = 58;
       aux_String_6_Var.length = 57;
       aux_String_6_Var.values = "  LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, ";
-      CHECK(357, tl5_compiler_M_write(aux_String_6, aux_String_6_Refman) )
-      if (self == NULL) RAISE(358, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(358, 38, "used member of outdated weak reference")
-      CHECK(358, tl5_compiler_M_write_int(self->covered_files) )
+      CHECK(360, tl5_compiler_M_write(aux_String_6, aux_String_6_Refman) )
+      if (self == NULL) RAISE(361, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(361, 38, "used member of outdated weak reference")
+      CHECK(361, tl5_compiler_M_write_int(self->covered_files) )
       aux_String_7 = &aux_String_7_Var;
       aux_String_7_Refman = LUMI_new_ref(aux_String_7);
-      if (aux_String_7_Refman == NULL) RAISE(359, 38, "insufficient memory for managed object")
+      if (aux_String_7_Refman == NULL) RAISE(362, 38, "insufficient memory for managed object")
       aux_String_7_Var.max_length = 4;
       aux_String_7_Var.length = 3;
       aux_String_7_Var.values = ");\n";
-      CHECK(359, tl5_compiler_M_write(aux_String_7, aux_String_7_Refman) )
+      CHECK(362, tl5_compiler_M_write(aux_String_7, aux_String_7_Refman) )
     }
   aux_String_8 = &aux_String_8_Var;
   aux_String_8_Refman = LUMI_new_ref(aux_String_8);
-  if (aux_String_8_Refman == NULL) RAISE(360, 38, "insufficient memory for managed object")
+  if (aux_String_8_Refman == NULL) RAISE(363, 38, "insufficient memory for managed object")
   aux_String_8_Var.max_length = 35;
   aux_String_8_Var.length = 34;
   aux_String_8_Var.values = "  return LUMI_success? OK : FAIL;\n";
-  CHECK(360, tl5_compiler_M_write(aux_String_8, aux_String_8_Refman) )
+  CHECK(363, tl5_compiler_M_write(aux_String_8, aux_String_8_Refman) )
   aux_String_9 = &aux_String_9_Var;
   aux_String_9_Refman = LUMI_new_ref(aux_String_9);
-  if (aux_String_9_Refman == NULL) RAISE(361, 38, "insufficient memory for managed object")
+  if (aux_String_9_Refman == NULL) RAISE(364, 38, "insufficient memory for managed object")
   aux_String_9_Var.max_length = 3;
   aux_String_9_Var.length = 2;
   aux_String_9_Var.values = "}\n";
-  CHECK(361, tl5_compiler_M_write(aux_String_9, aux_String_9_Refman) )
+  CHECK(364, tl5_compiler_M_write(aux_String_9, aux_String_9_Refman) )
   aux_String_10 = &aux_String_10_Var;
   aux_String_10_Refman = LUMI_new_ref(aux_String_10);
-  if (aux_String_10_Refman == NULL) RAISE(362, 38, "insufficient memory for managed object")
+  if (aux_String_10_Refman == NULL) RAISE(365, 38, "insufficient memory for managed object")
   aux_String_10_Var.max_length = 17;
   aux_String_10_Var.length = 16;
   aux_String_10_Var.values = "\nTEST_MAIN_FUNC\n";
-  CHECK(362, tl5_compiler_M_write(aux_String_10, aux_String_10_Refman) )
+  CHECK(365, tl5_compiler_M_write(aux_String_10, aux_String_10_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_10_Refman);
   LUMI_dec_ref(aux_String_9_Refman);
@@ -35475,6 +36885,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(node_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35492,7 +36903,7 @@ void tl5_compiler_M_SyntaxTreeRoot_Del(tl5_compiler_M_SyntaxTreeRoot* self) {
   LUMI_dec_ref(self->output_file_name_Refman);
   tl5_compiler_M_List_Del(self->modules);
   LUMI_owner_dec_ref(self->modules_Refman);
-  tl5_compiler_M_List_Del(self->constants);
+  tl5_compiler_M_NameMap_Del(self->constants);
   LUMI_owner_dec_ref(self->constants_Refman);
   tl5_compiler_M_List_Del(self->enums);
   LUMI_owner_dec_ref(self->enums_Refman);
@@ -35510,16 +36921,17 @@ Returncode tl5_compiler_M_ModuleMembers_init(tl5_compiler_M_ModuleMembers* self,
   Ref_Manager* aux_NameMap_2_Refman = NULL;
   tl5_compiler_M_NameMap* aux_NameMap_3 = NULL;
   Ref_Manager* aux_NameMap_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
-  if (self == NULL) RAISE(373, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(373, 38, "used member of outdated weak reference")
-  CHECK(373, tl5_compiler_M_string_new_copy(name, name_Refman, &(self->name), &(self->name_Refman)) )
+  if (self == NULL) RAISE(376, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(376, 38, "used member of outdated weak reference")
+  CHECK(376, tl5_compiler_M_string_new_copy(name, name_Refman, &(self->name), &(self->name_Refman)) )
   aux_NameMap_0 = LUMI_alloc(sizeof(tl5_compiler_M_NameMap));
-  if (aux_NameMap_0 == NULL) RAISE(374, 49, "insufficient memory for object dynamic allocation")
+  if (aux_NameMap_0 == NULL) RAISE(377, 49, "insufficient memory for object dynamic allocation")
   aux_NameMap_0_Refman = LUMI_new_ref(aux_NameMap_0);
-  if (aux_NameMap_0_Refman == NULL) RAISE(374, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(374, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(374, 38, "used member of outdated weak reference")
+  if (aux_NameMap_0_Refman == NULL) RAISE(377, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(377, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(377, 38, "used member of outdated weak reference")
   tl5_compiler_M_NameMap_Del(self->type_map);
   LUMI_owner_dec_ref(self->type_map_Refman);
   self->type_map_Refman = aux_NameMap_0_Refman;
@@ -35527,11 +36939,11 @@ Returncode tl5_compiler_M_ModuleMembers_init(tl5_compiler_M_ModuleMembers* self,
   aux_NameMap_0 = NULL;
   aux_NameMap_0_Refman = NULL;
   aux_NameMap_1 = LUMI_alloc(sizeof(tl5_compiler_M_NameMap));
-  if (aux_NameMap_1 == NULL) RAISE(375, 49, "insufficient memory for object dynamic allocation")
+  if (aux_NameMap_1 == NULL) RAISE(378, 49, "insufficient memory for object dynamic allocation")
   aux_NameMap_1_Refman = LUMI_new_ref(aux_NameMap_1);
-  if (aux_NameMap_1_Refman == NULL) RAISE(375, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(375, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(375, 38, "used member of outdated weak reference")
+  if (aux_NameMap_1_Refman == NULL) RAISE(378, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(378, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(378, 38, "used member of outdated weak reference")
   tl5_compiler_M_NameMap_Del(self->enum_map);
   LUMI_owner_dec_ref(self->enum_map_Refman);
   self->enum_map_Refman = aux_NameMap_1_Refman;
@@ -35539,11 +36951,11 @@ Returncode tl5_compiler_M_ModuleMembers_init(tl5_compiler_M_ModuleMembers* self,
   aux_NameMap_1 = NULL;
   aux_NameMap_1_Refman = NULL;
   aux_NameMap_2 = LUMI_alloc(sizeof(tl5_compiler_M_NameMap));
-  if (aux_NameMap_2 == NULL) RAISE(376, 49, "insufficient memory for object dynamic allocation")
+  if (aux_NameMap_2 == NULL) RAISE(379, 49, "insufficient memory for object dynamic allocation")
   aux_NameMap_2_Refman = LUMI_new_ref(aux_NameMap_2);
-  if (aux_NameMap_2_Refman == NULL) RAISE(376, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(376, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(376, 38, "used member of outdated weak reference")
+  if (aux_NameMap_2_Refman == NULL) RAISE(379, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(379, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(379, 38, "used member of outdated weak reference")
   tl5_compiler_M_NameMap_Del(self->variable_map);
   LUMI_owner_dec_ref(self->variable_map_Refman);
   self->variable_map_Refman = aux_NameMap_2_Refman;
@@ -35551,25 +36963,25 @@ Returncode tl5_compiler_M_ModuleMembers_init(tl5_compiler_M_ModuleMembers* self,
   aux_NameMap_2 = NULL;
   aux_NameMap_2_Refman = NULL;
   aux_NameMap_3 = LUMI_alloc(sizeof(tl5_compiler_M_NameMap));
-  if (aux_NameMap_3 == NULL) RAISE(377, 49, "insufficient memory for object dynamic allocation")
+  if (aux_NameMap_3 == NULL) RAISE(380, 49, "insufficient memory for object dynamic allocation")
   aux_NameMap_3_Refman = LUMI_new_ref(aux_NameMap_3);
-  if (aux_NameMap_3_Refman == NULL) RAISE(377, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(377, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(377, 38, "used member of outdated weak reference")
+  if (aux_NameMap_3_Refman == NULL) RAISE(380, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(380, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(380, 38, "used member of outdated weak reference")
   tl5_compiler_M_NameMap_Del(self->function_map);
   LUMI_owner_dec_ref(self->function_map_Refman);
   self->function_map_Refman = aux_NameMap_3_Refman;
   self->function_map = aux_NameMap_3;
   aux_NameMap_3 = NULL;
   aux_NameMap_3_Refman = NULL;
-  if (self == NULL) RAISE(378, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(378, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(381, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(381, 38, "used member of outdated weak reference")
   if (self->name != NULL && self->name_Refman->value != NULL) {
-      if (tl5_compiler_M_glob == NULL) RAISE(379, 27, "used member of empty object")
-      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(379, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(379, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(379, 38, "used member of outdated weak reference")
-      CHECK(379, tl5_compiler_M_NameMap_add(tl5_compiler_M_glob->module_map, tl5_compiler_M_glob->module_map_Refman, self->name, self->name_Refman, self, self_Refman, &tl5_compiler_M_ModuleMembers_dynamic) )
+      if (tl5_compiler_M_glob == NULL) RAISE(382, 27, "used member of empty object")
+      if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(382, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(382, 27, "used member of empty object")
+      if (self_Refman->value == NULL) RAISE(382, 38, "used member of outdated weak reference")
+      CHECK(382, tl5_compiler_M_NameMap_add(tl5_compiler_M_glob->module_map, tl5_compiler_M_glob->module_map_Refman, self->name, self->name_Refman, self, self_Refman, &tl5_compiler_M_ModuleMembers_dynamic) )
     }
 LUMI_cleanup:
   tl5_compiler_M_NameMap_Del(aux_NameMap_3);
@@ -35581,6 +36993,7 @@ LUMI_cleanup:
   tl5_compiler_M_NameMap_Del(aux_NameMap_0);
   LUMI_owner_dec_ref(aux_NameMap_0_Refman);
   LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35593,18 +37006,20 @@ Returncode tl5_compiler_M_ModuleMembers_write_prefix(tl5_compiler_M_ModuleMember
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  if (self == NULL) RAISE(382, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(382, 38, "used member of outdated weak reference")
-  CHECK(382, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(385, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(385, 38, "used member of outdated weak reference")
+  CHECK(385, tl5_compiler_M_write_cname(self->name, self->name_Refman) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(383, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(386, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 4;
   aux_String_0_Var.length = 3;
   aux_String_0_Var.values = "_M_";
-  CHECK(383, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(386, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35631,10 +37046,11 @@ Returncode tl5_compiler_M_SyntaxTreeMainFunction_parse_new(tl5_compiler_M_Syntax
   tl5_compiler_M_SyntaxTreeMainFunction* aux_SyntaxTreeMainFunction_0 = NULL;
   Ref_Manager* aux_SyntaxTreeMainFunction_0_Refman = NULL;
   tl5_compiler_M_SyntaxTreeMainFunction_Dynamic* aux_SyntaxTreeMainFunction_0_Dynamic = &tl5_compiler_M_SyntaxTreeMainFunction_dynamic;
+  LUMI_inc_ref(self_Refman);
   aux_SyntaxTreeMainFunction_0 = LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeMainFunction));
-  if (aux_SyntaxTreeMainFunction_0 == NULL) RAISE(389, 49, "insufficient memory for object dynamic allocation")
+  if (aux_SyntaxTreeMainFunction_0 == NULL) RAISE(392, 49, "insufficient memory for object dynamic allocation")
   aux_SyntaxTreeMainFunction_0_Refman = LUMI_new_ref(aux_SyntaxTreeMainFunction_0);
-  if (aux_SyntaxTreeMainFunction_0_Refman == NULL) RAISE(389, 38, "insufficient memory for managed object")
+  if (aux_SyntaxTreeMainFunction_0_Refman == NULL) RAISE(392, 38, "insufficient memory for managed object")
   if (*new_node_Dynamic != NULL) (*new_node_Dynamic)->_base._base._base._base._del(*new_node);
   LUMI_owner_dec_ref(*new_node_Refman);
   *new_node_Refman = aux_SyntaxTreeMainFunction_0_Refman;
@@ -35643,10 +37059,11 @@ Returncode tl5_compiler_M_SyntaxTreeMainFunction_parse_new(tl5_compiler_M_Syntax
   aux_SyntaxTreeMainFunction_0 = NULL;
   aux_SyntaxTreeMainFunction_0_Refman = NULL;
   aux_SyntaxTreeMainFunction_0_Dynamic = NULL;
-  CHECK(390, tl5_compiler_M_SyntaxTreeMainFunction_parse(*new_node, *new_node_Refman, *new_node_Dynamic, &(*end)) )
+  CHECK(393, tl5_compiler_M_SyntaxTreeMainFunction_parse(*new_node, *new_node_Refman, *new_node_Dynamic, &(*end)) )
 LUMI_cleanup:
   if (aux_SyntaxTreeMainFunction_0_Dynamic != NULL) aux_SyntaxTreeMainFunction_0_Dynamic->_base._base._base._base._del(aux_SyntaxTreeMainFunction_0);
   LUMI_owner_dec_ref(aux_SyntaxTreeMainFunction_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35662,30 +37079,31 @@ Returncode tl5_compiler_M_SyntaxTreeMainFunction_parse(tl5_compiler_M_SyntaxTree
   tl5_compiler_M_FunctionArguments* aux_FunctionArguments_0 = NULL;
   Ref_Manager* aux_FunctionArguments_0_Refman = NULL;
   tl5_compiler_M_FunctionArguments_Dynamic* aux_FunctionArguments_0_Dynamic = &tl5_compiler_M_FunctionArguments_dynamic;
-  CHECK(393, tl5_compiler_M_SyntaxTreeFunction_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  if (tl5_compiler_M_glob == NULL) RAISE(394, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(394, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(394, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(394, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  CHECK(396, tl5_compiler_M_SyntaxTreeFunction_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  if (tl5_compiler_M_glob == NULL) RAISE(397, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(397, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(397, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(397, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->_base.my_module_Refman);
   self->_base.my_module_Refman = tl5_compiler_M_glob->current_module_Refman;
   LUMI_inc_ref(self->_base.my_module_Refman);
   self->_base.my_module = tl5_compiler_M_glob->current_module;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(395, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(398, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 5;
   aux_String_0_Var.length = 4;
   aux_String_0_Var.values = "main";
-  if (self == NULL) RAISE(395, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(395, 38, "used member of outdated weak reference")
-  CHECK(395, tl5_compiler_M_string_new_copy(aux_String_0, aux_String_0_Refman, &(self->_base.name), &(self->_base.name_Refman)) )
+  if (self == NULL) RAISE(398, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(398, 38, "used member of outdated weak reference")
+  CHECK(398, tl5_compiler_M_string_new_copy(aux_String_0, aux_String_0_Refman, &(self->_base.name), &(self->_base.name_Refman)) )
   aux_FunctionArguments_0 = LUMI_alloc(sizeof(tl5_compiler_M_FunctionArguments));
-  if (aux_FunctionArguments_0 == NULL) RAISE(396, 49, "insufficient memory for object dynamic allocation")
+  if (aux_FunctionArguments_0 == NULL) RAISE(399, 49, "insufficient memory for object dynamic allocation")
   aux_FunctionArguments_0_Refman = LUMI_new_ref(aux_FunctionArguments_0);
-  if (aux_FunctionArguments_0_Refman == NULL) RAISE(396, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(396, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(396, 38, "used member of outdated weak reference")
+  if (aux_FunctionArguments_0_Refman == NULL) RAISE(399, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(399, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(399, 38, "used member of outdated weak reference")
   if (self->_base.arguments_Dynamic != NULL) self->_base.arguments_Dynamic->_base._del(self->_base.arguments);
   LUMI_owner_dec_ref(self->_base.arguments_Refman);
   self->_base.arguments_Refman = aux_FunctionArguments_0_Refman;
@@ -35694,14 +37112,15 @@ Returncode tl5_compiler_M_SyntaxTreeMainFunction_parse(tl5_compiler_M_SyntaxTree
   aux_FunctionArguments_0 = NULL;
   aux_FunctionArguments_0_Refman = NULL;
   aux_FunctionArguments_0_Dynamic = NULL;
-  if (self == NULL) RAISE(397, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(397, 38, "used member of outdated weak reference")
-  CHECK(397, tl5_compiler_M_FunctionArguments_init(self->_base.arguments, self->_base.arguments_Refman, self->_base.arguments_Dynamic) )
-  CHECK(398, tl5_compiler_M_SyntaxTreeFunction_parse_body(&(self->_base), self_Refman, &(self_Dynamic->_base), &(*end)) )
+  if (self == NULL) RAISE(400, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(400, 38, "used member of outdated weak reference")
+  CHECK(400, tl5_compiler_M_FunctionArguments_init(self->_base.arguments, self->_base.arguments_Refman, self->_base.arguments_Dynamic) )
+  CHECK(401, tl5_compiler_M_SyntaxTreeFunction_parse_body(&(self->_base), self_Refman, &(self_Dynamic->_base), &(*end)) )
 LUMI_cleanup:
   if (aux_FunctionArguments_0_Dynamic != NULL) aux_FunctionArguments_0_Dynamic->_base._del(aux_FunctionArguments_0);
   LUMI_owner_dec_ref(aux_FunctionArguments_0_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35717,25 +37136,27 @@ Returncode tl5_compiler_M_SyntaxTreeMainFunction_write(tl5_compiler_M_SyntaxTree
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(405, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(408, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 18;
   aux_String_0_Var.length = 17;
   aux_String_0_Var.values = "\nUSER_MAIN_HEADER";
-  CHECK(405, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-  CHECK(406, tl5_compiler_M_SyntaxTreeFunction_write_block(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
-  CHECK(407, tl5_compiler_M_write_post_func() )
+  CHECK(408, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(409, tl5_compiler_M_SyntaxTreeFunction_write_block(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  CHECK(410, tl5_compiler_M_write_post_func() )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(408, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(411, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 12;
   aux_String_1_Var.length = 11;
   aux_String_1_Var.values = "\nMAIN_FUNC\n";
-  CHECK(408, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+  CHECK(411, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35748,23 +37169,25 @@ Returncode tl5_compiler_M_SyntaxTreeMainFunction_write_block_body(tl5_compiler_M
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  if (tl5_compiler_M_glob->root->global_init_Dynamic == NULL) RAISE(411, 28, "dynamic call of empty object")
-  if (tl5_compiler_M_glob == NULL) RAISE(411, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(411, 38, "used member of outdated weak reference")
-  if (tl5_compiler_M_glob->root == NULL) RAISE(411, 27, "used member of empty object")
-  if (tl5_compiler_M_glob->root_Refman->value == NULL) RAISE(411, 38, "used member of outdated weak reference")
-  CHECK(411, tl5_compiler_M_glob->root->global_init_Dynamic->_base._base._base._base.write(&(tl5_compiler_M_glob->root->global_init->_base._base._base._base), tl5_compiler_M_glob->root->global_init_Refman, &(tl5_compiler_M_glob->root->global_init_Dynamic->_base._base._base._base)) )
-  CHECK(412, tl5_compiler_M_write_pre_func(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  LUMI_inc_ref(self_Refman);
+  if (tl5_compiler_M_glob->root->global_init_Dynamic == NULL) RAISE(414, 28, "dynamic call of empty object")
+  if (tl5_compiler_M_glob == NULL) RAISE(414, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(414, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob->root == NULL) RAISE(414, 27, "used member of empty object")
+  if (tl5_compiler_M_glob->root_Refman->value == NULL) RAISE(414, 38, "used member of outdated weak reference")
+  CHECK(414, tl5_compiler_M_glob->root->global_init_Dynamic->_base._base._base._base.write(&(tl5_compiler_M_glob->root->global_init->_base._base._base._base), tl5_compiler_M_glob->root->global_init_Refman, &(tl5_compiler_M_glob->root->global_init_Dynamic->_base._base._base._base)) )
+  CHECK(415, tl5_compiler_M_write_pre_func(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(413, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(416, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 2;
   aux_String_0_Var.length = 1;
   aux_String_0_Var.values = "\n";
-  CHECK(413, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-  CHECK(414, tl5_compiler_M_SyntaxTreeBlock_write_block_body(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  CHECK(416, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(417, tl5_compiler_M_SyntaxTreeBlock_write_block_body(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35786,13 +37209,14 @@ Returncode tl5_compiler_M_GlobalInit_init(tl5_compiler_M_GlobalInit* self, Ref_M
   tl5_compiler_M_FunctionArguments* aux_FunctionArguments_0 = NULL;
   Ref_Manager* aux_FunctionArguments_0_Refman = NULL;
   tl5_compiler_M_FunctionArguments_Dynamic* aux_FunctionArguments_0_Dynamic = &tl5_compiler_M_FunctionArguments_dynamic;
-  CHECK(419, tl5_compiler_M_SyntaxTreeFunction_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
+  LUMI_inc_ref(self_Refman);
+  CHECK(422, tl5_compiler_M_SyntaxTreeFunction_init(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   aux_List_0 = LUMI_alloc(sizeof(tl5_compiler_M_List));
-  if (aux_List_0 == NULL) RAISE(420, 49, "insufficient memory for object dynamic allocation")
+  if (aux_List_0 == NULL) RAISE(423, 49, "insufficient memory for object dynamic allocation")
   aux_List_0_Refman = LUMI_new_ref(aux_List_0);
-  if (aux_List_0_Refman == NULL) RAISE(420, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(420, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(420, 38, "used member of outdated weak reference")
+  if (aux_List_0_Refman == NULL) RAISE(423, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(423, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(423, 38, "used member of outdated weak reference")
   tl5_compiler_M_List_Del(self->_base._base.code_nodes);
   LUMI_owner_dec_ref(self->_base._base.code_nodes_Refman);
   self->_base._base.code_nodes_Refman = aux_List_0_Refman;
@@ -35800,11 +37224,11 @@ Returncode tl5_compiler_M_GlobalInit_init(tl5_compiler_M_GlobalInit* self, Ref_M
   aux_List_0 = NULL;
   aux_List_0_Refman = NULL;
   aux_List_1 = LUMI_alloc(sizeof(tl5_compiler_M_List));
-  if (aux_List_1 == NULL) RAISE(421, 49, "insufficient memory for object dynamic allocation")
+  if (aux_List_1 == NULL) RAISE(424, 49, "insufficient memory for object dynamic allocation")
   aux_List_1_Refman = LUMI_new_ref(aux_List_1);
-  if (aux_List_1_Refman == NULL) RAISE(421, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(421, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(421, 38, "used member of outdated weak reference")
+  if (aux_List_1_Refman == NULL) RAISE(424, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(424, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(424, 38, "used member of outdated weak reference")
   tl5_compiler_M_List_Del(self->_base._base._base.variables);
   LUMI_owner_dec_ref(self->_base._base._base.variables_Refman);
   self->_base._base._base.variables_Refman = aux_List_1_Refman;
@@ -35812,11 +37236,11 @@ Returncode tl5_compiler_M_GlobalInit_init(tl5_compiler_M_GlobalInit* self, Ref_M
   aux_List_1 = NULL;
   aux_List_1_Refman = NULL;
   aux_FunctionArguments_0 = LUMI_alloc(sizeof(tl5_compiler_M_FunctionArguments));
-  if (aux_FunctionArguments_0 == NULL) RAISE(422, 49, "insufficient memory for object dynamic allocation")
+  if (aux_FunctionArguments_0 == NULL) RAISE(425, 49, "insufficient memory for object dynamic allocation")
   aux_FunctionArguments_0_Refman = LUMI_new_ref(aux_FunctionArguments_0);
-  if (aux_FunctionArguments_0_Refman == NULL) RAISE(422, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(422, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(422, 38, "used member of outdated weak reference")
+  if (aux_FunctionArguments_0_Refman == NULL) RAISE(425, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(425, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(425, 38, "used member of outdated weak reference")
   if (self->_base.arguments_Dynamic != NULL) self->_base.arguments_Dynamic->_base._del(self->_base.arguments);
   LUMI_owner_dec_ref(self->_base.arguments_Refman);
   self->_base.arguments_Refman = aux_FunctionArguments_0_Refman;
@@ -35825,11 +37249,11 @@ Returncode tl5_compiler_M_GlobalInit_init(tl5_compiler_M_GlobalInit* self, Ref_M
   aux_FunctionArguments_0 = NULL;
   aux_FunctionArguments_0_Refman = NULL;
   aux_FunctionArguments_0_Dynamic = NULL;
-  if (self == NULL) RAISE(423, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(423, 38, "used member of outdated weak reference")
-  CHECK(423, tl5_compiler_M_FunctionArguments_init(self->_base.arguments, self->_base.arguments_Refman, self->_base.arguments_Dynamic) )
-  if (self == NULL) RAISE(424, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(424, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(426, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(426, 38, "used member of outdated weak reference")
+  CHECK(426, tl5_compiler_M_FunctionArguments_init(self->_base.arguments, self->_base.arguments_Refman, self->_base.arguments_Dynamic) )
+  if (self == NULL) RAISE(427, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(427, 38, "used member of outdated weak reference")
   self->_base._base._base.indentation_spaces = 2;
 LUMI_cleanup:
   if (aux_FunctionArguments_0_Dynamic != NULL) aux_FunctionArguments_0_Dynamic->_base._del(aux_FunctionArguments_0);
@@ -35838,6 +37262,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_List_1_Refman);
   tl5_compiler_M_List_Del(aux_List_0);
   LUMI_owner_dec_ref(aux_List_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35865,57 +37290,61 @@ Returncode tl5_compiler_M_GlobalInit_write(tl5_compiler_M_GlobalInit* self, Ref_
   String aux_String_5_Var = {0};
   String* aux_String_5 = NULL;
   Ref_Manager* aux_String_5_Refman = NULL;
-  if (self == NULL) RAISE(427, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(427, 38, "used member of outdated weak reference")
-  if (self->_base._base.code_nodes == NULL) RAISE(427, 27, "used member of empty object")
-  if (self->_base._base.code_nodes_Refman->value == NULL) RAISE(427, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (self == NULL) RAISE(430, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(430, 38, "used member of outdated weak reference")
+  if (self->_base._base.code_nodes == NULL) RAISE(430, 27, "used member of empty object")
+  if (self->_base._base.code_nodes_Refman->value == NULL) RAISE(430, 38, "used member of outdated weak reference")
   if (! (self->_base._base.code_nodes->first != NULL && self->_base._base.code_nodes->first_Refman->value != NULL)) {
       goto LUMI_cleanup;
     }
+  if (self == NULL) RAISE(432, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(432, 38, "used member of outdated weak reference")
+  CHECK(432, tl5_compiler_M_SyntaxTreeNode_write_children(&(self->_base._base._base._base), self_Refman, &(self_Dynamic->_base._base._base._base), self->_base._base._base.variables, self->_base._base._base.variables_Refman) )
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(430, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(433, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 21;
   aux_String_0_Var.length = 20;
   aux_String_0_Var.values = "#undef RETURN_ERROR\n";
-  CHECK(430, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(433, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(431, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(434, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 43;
   aux_String_1_Var.length = 42;
   aux_String_1_Var.values = "#define RETURN_ERROR(value) return value;\n";
-  CHECK(431, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+  CHECK(434, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
   aux_String_2 = &aux_String_2_Var;
   aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-  if (aux_String_2_Refman == NULL) RAISE(432, 38, "insufficient memory for managed object")
+  if (aux_String_2_Refman == NULL) RAISE(435, 38, "insufficient memory for managed object")
   aux_String_2_Var.max_length = 57;
   aux_String_2_Var.length = 56;
   aux_String_2_Var.values = "#define LUMI_FUNC_NAME \"global variable initialization\"\n";
-  CHECK(432, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
-  if (self_Dynamic == NULL) RAISE(433, 28, "dynamic call of empty object")
-  CHECK(433, self_Dynamic->_base._base.write_block_body(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
+  CHECK(435, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+  if (self_Dynamic == NULL) RAISE(436, 28, "dynamic call of empty object")
+  CHECK(436, self_Dynamic->_base._base.write_block_body(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
   aux_String_3 = &aux_String_3_Var;
   aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-  if (aux_String_3_Refman == NULL) RAISE(434, 38, "insufficient memory for managed object")
+  if (aux_String_3_Refman == NULL) RAISE(437, 38, "insufficient memory for managed object")
   aux_String_3_Var.max_length = 23;
   aux_String_3_Var.length = 22;
   aux_String_3_Var.values = "#undef LUMI_FUNC_NAME\n";
-  CHECK(434, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+  CHECK(437, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
   aux_String_4 = &aux_String_4_Var;
   aux_String_4_Refman = LUMI_new_ref(aux_String_4);
-  if (aux_String_4_Refman == NULL) RAISE(435, 38, "insufficient memory for managed object")
+  if (aux_String_4_Refman == NULL) RAISE(438, 38, "insufficient memory for managed object")
   aux_String_4_Var.max_length = 21;
   aux_String_4_Var.length = 20;
   aux_String_4_Var.values = "#undef RETURN_ERROR\n";
-  CHECK(435, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
+  CHECK(438, tl5_compiler_M_write(aux_String_4, aux_String_4_Refman) )
   aux_String_5 = &aux_String_5_Var;
   aux_String_5_Refman = LUMI_new_ref(aux_String_5);
-  if (aux_String_5_Refman == NULL) RAISE(436, 38, "insufficient memory for managed object")
+  if (aux_String_5_Refman == NULL) RAISE(439, 38, "insufficient memory for managed object")
   aux_String_5_Var.max_length = 64;
   aux_String_5_Var.length = 63;
   aux_String_5_Var.values = "#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup";
-  CHECK(436, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
+  CHECK(439, tl5_compiler_M_write(aux_String_5, aux_String_5_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_5_Refman);
   LUMI_dec_ref(aux_String_4_Refman);
@@ -35923,6 +37352,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -35939,22 +37369,23 @@ Returncode tl5_compiler_M_LineCount_init(tl5_compiler_M_LineCount* self, Ref_Man
   Returncode LUMI_err = OK;
   Array* aux_Array_0 = NULL;
   Ref_Manager* aux_Array_0_Refman = NULL;
-  if (tl5_compiler_M_glob == NULL) RAISE(446, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(446, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(446, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(446, 38, "used member of outdated weak reference")
+  LUMI_inc_ref(self_Refman);
+  if (tl5_compiler_M_glob == NULL) RAISE(449, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(449, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(449, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(449, 38, "used member of outdated weak reference")
   LUMI_dec_ref(self->filename_Refman);
   self->filename_Refman = tl5_compiler_M_glob->input_file_name_Refman;
   LUMI_inc_ref(self->filename_Refman);
   self->filename = tl5_compiler_M_glob->input_file_name;
-  if (tl5_compiler_M_glob == NULL) RAISE(447, 27, "used member of empty object")
-  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(447, 38, "used member of outdated weak reference")
+  if (tl5_compiler_M_glob == NULL) RAISE(450, 27, "used member of empty object")
+  if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(450, 38, "used member of outdated weak reference")
   aux_Array_0 = LUMI_new_array(tl5_compiler_M_glob->line_number + 1, sizeof(Bool));
-  if (aux_Array_0 == NULL) RAISE(447, 49, "insufficient memory for object dynamic allocation")
+  if (aux_Array_0 == NULL) RAISE(450, 49, "insufficient memory for object dynamic allocation")
   aux_Array_0_Refman = LUMI_new_ref(aux_Array_0);
-  if (aux_Array_0_Refman == NULL) RAISE(447, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(447, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(447, 38, "used member of outdated weak reference")
+  if (aux_Array_0_Refman == NULL) RAISE(450, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(450, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(450, 38, "used member of outdated weak reference")
   LUMI_owner_dec_ref(self->line_needs_cover_Refman);
   self->line_needs_cover_Refman = aux_Array_0_Refman;
   self->line_needs_cover = aux_Array_0;
@@ -35962,6 +37393,7 @@ Returncode tl5_compiler_M_LineCount_init(tl5_compiler_M_LineCount* self, Ref_Man
   aux_Array_0_Refman = NULL;
 LUMI_cleanup:
   LUMI_owner_dec_ref(aux_Array_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -36580,47 +38012,47 @@ Returncode tl5_compiler_M_write_pre_func(tl5_compiler_M_SyntaxTreeFunction* self
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(376, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(375, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 26;
   aux_String_0_Var.length = 25;
   aux_String_0_Var.values = "\n#define LUMI_FILE_NAME \"";
-  CHECK(376, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
-  if (self == NULL) RAISE(377, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(377, 38, "used member of outdated weak reference")
-  CHECK(377, tl5_compiler_M_write(self->_base._base._base.input_file_name, self->_base._base._base.input_file_name_Refman) )
+  CHECK(375, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  if (self == NULL) RAISE(376, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(376, 38, "used member of outdated weak reference")
+  CHECK(376, tl5_compiler_M_write(self->_base._base._base.input_file_name, self->_base._base._base.input_file_name_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(378, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(377, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 27;
   aux_String_1_Var.length = 26;
   aux_String_1_Var.values = "\"\n#define LUMI_FUNC_NAME \"";
-  CHECK(378, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
-  if (self == NULL) RAISE(379, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(379, 38, "used member of outdated weak reference")
+  CHECK(377, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+  if (self == NULL) RAISE(378, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(378, 38, "used member of outdated weak reference")
   if (self->parent_type != NULL && self->parent_type_Refman->value != NULL) {
-    if (self == NULL) RAISE(380, 27, "used member of empty object")
-    if (self_Refman->value == NULL) RAISE(380, 38, "used member of outdated weak reference")
-    if (self->parent_type == NULL) RAISE(380, 27, "used member of empty object")
-    if (self->parent_type_Refman->value == NULL) RAISE(380, 38, "used member of outdated weak reference")
-    CHECK(380, tl5_compiler_M_write(self->parent_type->name, self->parent_type->name_Refman) )
+    if (self == NULL) RAISE(379, 27, "used member of empty object")
+    if (self_Refman->value == NULL) RAISE(379, 38, "used member of outdated weak reference")
+    if (self->parent_type == NULL) RAISE(379, 27, "used member of empty object")
+    if (self->parent_type_Refman->value == NULL) RAISE(379, 38, "used member of outdated weak reference")
+    CHECK(379, tl5_compiler_M_write(self->parent_type->name, self->parent_type->name_Refman) )
     aux_String_2 = &aux_String_2_Var;
     aux_String_2_Refman = LUMI_new_ref(aux_String_2);
-    if (aux_String_2_Refman == NULL) RAISE(381, 38, "insufficient memory for managed object")
+    if (aux_String_2_Refman == NULL) RAISE(380, 38, "insufficient memory for managed object")
     aux_String_2_Var.max_length = 2;
     aux_String_2_Var.length = 1;
     aux_String_2_Var.values = ".";
-    CHECK(381, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
+    CHECK(380, tl5_compiler_M_write(aux_String_2, aux_String_2_Refman) )
   }
-  if (self == NULL) RAISE(382, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(382, 38, "used member of outdated weak reference")
-  CHECK(382, tl5_compiler_M_write(self->name, self->name_Refman) )
+  if (self == NULL) RAISE(381, 27, "used member of empty object")
+  if (self_Refman->value == NULL) RAISE(381, 38, "used member of outdated weak reference")
+  CHECK(381, tl5_compiler_M_write(self->name, self->name_Refman) )
   aux_String_3 = &aux_String_3_Var;
   aux_String_3_Refman = LUMI_new_ref(aux_String_3);
-  if (aux_String_3_Refman == NULL) RAISE(383, 38, "insufficient memory for managed object")
+  if (aux_String_3_Refman == NULL) RAISE(382, 38, "insufficient memory for managed object")
   aux_String_3_Var.max_length = 2;
   aux_String_3_Var.length = 1;
   aux_String_3_Var.values = "\"";
-  CHECK(383, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
+  CHECK(382, tl5_compiler_M_write(aux_String_3, aux_String_3_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_3_Refman);
   LUMI_dec_ref(aux_String_2_Refman);
@@ -36644,18 +38076,18 @@ Returncode tl5_compiler_M_write_post_func(void) {
   Ref_Manager* aux_String_1_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
-  if (aux_String_0_Refman == NULL) RAISE(387, 38, "insufficient memory for managed object")
+  if (aux_String_0_Refman == NULL) RAISE(386, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 23;
   aux_String_0_Var.length = 22;
   aux_String_0_Var.values = "#undef LUMI_FILE_NAME\n";
-  CHECK(387, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
+  CHECK(386, tl5_compiler_M_write(aux_String_0, aux_String_0_Refman) )
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
-  if (aux_String_1_Refman == NULL) RAISE(388, 38, "insufficient memory for managed object")
+  if (aux_String_1_Refman == NULL) RAISE(387, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 23;
   aux_String_1_Var.length = 22;
   aux_String_1_Var.values = "#undef LUMI_FUNC_NAME\n";
-  CHECK(388, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
+  CHECK(387, tl5_compiler_M_write(aux_String_1, aux_String_1_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
@@ -36804,7 +38236,7 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_write_global(String* text, Ref_Manager* text_Refman) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(text_Refman);
-  CHECK(452, tl5_compiler_M_write(text, text_Refman) )
+  CHECK(455, tl5_compiler_M_write(text, text_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(text_Refman);
   return LUMI_err;

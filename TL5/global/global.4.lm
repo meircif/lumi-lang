@@ -359,7 +359,7 @@ struct Global
     self.add-builtin-function(user name, user builtin-type, user builtin-type)->(
         user arguments)
     self.add-builtin-parameter(
-        user arguments, copy Access.VAR, user builtin-type, user "self")
+        user arguments, copy Access.USER, user builtin-type, user "self")
   
   func add-builtin-function(
       user String name,

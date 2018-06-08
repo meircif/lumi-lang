@@ -10,13 +10,13 @@ func parse-native(user SyntaxTreeRoot root)->(var Char end)
         user "expected space after \"native\" keyword, got", copy end)
   
   if keyword.equal(user "func")
-    root.functions.add(owner NativeFunction.parse-new(var _)->(var end))
+    root.functions.add(owner NativeFunction.parse-new(user _)->(var end))
     
   else-if keyword.equal(user "var")
-    root.variables.add(owner NativeVariable.parse-new(var _)->(var end))
+    root.variables.add(owner NativeVariable.parse-new(user _)->(var end))
     
   else-if keyword.equal(user "type")
-    root.types.add(owner NativeType.parse-new(var _)->(var end))
+    root.types.add(owner NativeType.parse-new(user _)->(var end))
     
   else
     root.syntax-error(user "unknown \"native\" keyword", user keyword)

@@ -22,7 +22,9 @@ struct List{Generic}
   func prepend(owner Generic item)
     new ListNode{Generic} node
     node.item := item
-    node.next := self.first
+    if self.first?
+      node.next := self.first
+      self.first.prev := node
     self.first := node
     if not self.last?
       self.last := node
@@ -38,6 +40,26 @@ struct List{Generic}
         self.last := _
     else
       item := _
+  
+  func remove(user Generic ref)->(owner Generic item)
+    user ListNode{Generic} prev
+    user ListNode{Generic} node(user self.first)
+    do
+      while node?
+      if node.item is ref
+        item := node.item
+        owner ListNode{Generic} next(owner node.next)
+        if next?
+          next.prev := prev
+        else
+          self.last := prev
+        if prev?
+          prev.next := next
+        else
+          self.first := next
+        return
+      node := node.next
+    item := _
 
 
 struct ListNode{Generic}

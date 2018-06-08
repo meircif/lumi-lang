@@ -73,7 +73,7 @@ class TypeData(SyntaxTreeNamespace)
             user "constructor already defined for type", user self.name)
       owner SyntaxTreeConstructor constructor
       self.constructor := SyntaxTreeConstructor.parse-new(
-          var _, user self)->(var end, owner constructor)
+          user _, user self)->(var end, owner constructor)
       self.functions.add(owner constructor)
       
     else
@@ -153,7 +153,7 @@ class TypeData(SyntaxTreeNamespace)
       self.base-type.link-types(user self)
       glob.current-module := _
       self.base-type.type-data.order-bases(user ordered-list)
-    ; TODO OWNER ordered-list.add(owner self)
+    ordered-list.add(owner glob.root.types.remove(user self))
     self.is-ordered := true
     ; init `self.dynamic-base-methods` and test override methods
     if self.is-dynamic
@@ -241,7 +241,7 @@ class TypeData(SyntaxTreeNamespace)
       self.write-spaces()
       self.base-type.type-data.write-cname()
       write(user " _base;\n")
-    ; TODO TL4 self.write-children(user self.variables)
+    self.write-children(user self.variables)
     write(user "};\n")
     if self.is-dynamic
       write(user "\nstruct ")
@@ -317,7 +317,7 @@ class TypeData(SyntaxTreeNamespace)
     write(user "}")
   
   func dynamic write-methods-body()
-    ; TODO TL4 self.write-children(user self.functions)
+    self.write-children(user self.functions)
     ; void `cname`_Del(`cname`* self) {
     ;   if (self == NULL) return;
     ;   `base`_Del(self);

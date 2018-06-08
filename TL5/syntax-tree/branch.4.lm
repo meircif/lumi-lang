@@ -94,14 +94,14 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         if glob.current-module.name.equal(user glob.tested-module) and
             not keyword.equal(user "else") and not keyword.equal(user "else-if")
           parent-block.code-nodes.add(
-              owner SyntaxTreeCoverage.init-new(var _, user parent-block))
+              owner SyntaxTreeCoverage.init-new(user _, user parent-block))
     
     if not is-parsed
       return
     
     else-if keyword.equal(user "var")
       variables.add(owner SyntaxTreeVariable.parse-new(
-          var _,
+          user _,
           copy Access.VAR,
           copy true,
           user parent-type,
@@ -109,7 +109,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           var end))
     else-if keyword.equal(user "user")
       variables.add(owner SyntaxTreeVariable.parse-new(
-          var _,
+          user _,
           copy Access.USER,
           copy false,
           user parent-type,
@@ -117,7 +117,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           var end))
     else-if keyword.equal(user "owner")
       variables.add(owner SyntaxTreeVariable.parse-new(
-          var _,
+          user _,
           copy Access.OWNER,
           copy false,
           user parent-type,
@@ -142,13 +142,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       child := child.next
   
   func dynamic link-types()
-    ; TODO TL4 self.link-children-types(user self.variables)
+    self.link-children-types(user self.variables)
   
   func dynamic analyze()
-    ; TODO TL4 self.analyze-children(user self.variables)
+    self.analyze-children(user self.variables)
   
   func dynamic write()
-    ; TODO TL4 self.write-children(user self.variables)
+    self.write-children(user self.variables)
   
   func inst write-spaces()
     write-spaces(copy self.indentation-spaces)
@@ -254,15 +254,15 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
         self.syntax-error-c(
             user "expected space after \"func\", got", copy end)
       self.functions.add(owner SyntaxTreeFunction.parse-new(
-          var _, user parent-type)->(var end))
+          user _, user parent-type)->(var end))
   
   func dynamic link-types()
     base.link-types()
-    ; TODO TL4 self.link-children-types(user self.functions)
+    self.link-children-types(user self.functions)
   
   func dynamic analyze()
     base.analyze()
-    ; TODO TL4 self.analyze-children(user self.functions)
+    self.analyze-children(user self.functions)
   
   func inst write-functions-declaration()
     user ListNode{SyntaxTreeFunction} child(user self.functions.first)
