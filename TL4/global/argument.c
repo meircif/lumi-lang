@@ -265,16 +265,17 @@ Returncode FunctionArguments_add_self_parameter(FunctionArguments* self, TypeDat
     self_args->_base.access = ACCESS_COPY;
   }
   else {
-    self_args->_base.access = ACCESS_VAR;
+    self_args->_base.access = ACCESS_USER;
   }
   CHECK(118, SyntaxTreeNode_set_location(&(self_args->_base._base)) )
   self_args->variable = malloc(sizeof(SyntaxTreeVariable));
   if (self_args->variable == NULL) RAISE(119)
   *self_args->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   self_args->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
-  CHECK(120, string_new_copy(&(String){5, 4, "self"}, &(self_args->variable->name)) )
-  CHECK(121, TypeData_m_self_type_instance(type_data, &(self_args->variable->type_instance)) )
-  CHECK(122, List_prepend(self->parameters, &(self_args->_base)) )
+  self_args->variable->access = self_args->_base.access;
+  CHECK(121, string_new_copy(&(String){5, 4, "self"}, &(self_args->variable->name)) )
+  CHECK(122, TypeData_m_self_type_instance(type_data, &(self_args->variable->type_instance)) )
+  CHECK(123, List_prepend(self->parameters, &(self_args->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -289,38 +290,38 @@ Returncode FunctionArguments_parse_args(FunctionArguments* self, List* arguments
   String* access_str = NULL;
   Bool is_output = arguments == self->outputs;
   Int _Int3;
-  CHECK(133, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int3)) )
+  CHECK(134, read_until(&(String){3, 2, " )"}, false, &(access_str), &((*end)), &(_Int3)) )
   if ((*end) == '\n' && access_str->length == 0) {
-    CHECK(135, SyntaxTreeCode_read_line_break_spaces(code_node) )
+    CHECK(136, SyntaxTreeCode_read_line_break_spaces(code_node) )
     Int _Int4;
-    CHECK(136, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int4)) )
+    CHECK(137, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int4)) )
   }
   if ((*end) != ')' || access_str->length > 0) {
     while (true) {
       if (access_str->length == 0) {
-        CHECK(140, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){21, 20, "expected access, got"}, (*end)) )
+        CHECK(141, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){21, 20, "expected access, got"}, (*end)) )
       }
       if ((*end) != ' ') {
-        CHECK(142, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){33, 32, "expected space after access, got"}, (*end)) )
+        CHECK(143, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){33, 32, "expected space after access, got"}, (*end)) )
       }
-      CHECK(144, (argument_factory)->_dtl[0](argument_factory, &(argument)) )
-      CHECK(145, List_add(arguments, argument) )
-      CHECK(146, Argument_parse(argument, access_str, is_output, is_native, code_node, &((*end))) )
+      CHECK(145, (argument_factory)->_dtl[0](argument_factory, &(argument)) )
+      CHECK(146, List_add(arguments, argument) )
+      CHECK(147, Argument_parse(argument, access_str, is_output, is_native, code_node, &((*end))) )
       if (!((*end) == ',')) break;
-      CHECK(150, read_c(&((*end))) )
+      CHECK(151, read_c(&((*end))) )
       if ((*end) == '\n') {
-        CHECK(152, SyntaxTreeCode_read_line_break_spaces(code_node) )
+        CHECK(153, SyntaxTreeCode_read_line_break_spaces(code_node) )
       }
       else {
         if ((*end) != ' ') {
-          CHECK(154, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){42, 41, "expected space or new-line after \",\", got"}, (*end)) )
+          CHECK(155, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){42, 41, "expected space or new-line after \",\", got"}, (*end)) )
         }
       }
       Int _Int5;
-      CHECK(157, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int5)) )
+      CHECK(158, read_until(&(String){2, 1, " "}, false, &(access_str), &((*end)), &(_Int5)) )
     }
   }
-  CHECK(158, read_c(&((*end))) )
+  CHECK(159, read_c(&((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -331,8 +332,8 @@ Returncode FunctionArguments_link_types(FunctionArguments* self);
 static char* _func_name_FunctionArguments_link_types = "FunctionArguments.link-types";
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_link_types
 Returncode FunctionArguments_link_types(FunctionArguments* self) {
-  CHECK(161, SyntaxTreeNode_link_children_types(&(self->_base), self->parameters) )
-  CHECK(162, SyntaxTreeNode_link_children_types(&(self->_base), self->outputs) )
+  CHECK(162, SyntaxTreeNode_link_children_types(&(self->_base), self->parameters) )
+  CHECK(163, SyntaxTreeNode_link_children_types(&(self->_base), self->outputs) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -343,8 +344,8 @@ Returncode FunctionArguments_analyze(FunctionArguments* self);
 static char* _func_name_FunctionArguments_analyze = "FunctionArguments.analyze";
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_analyze
 Returncode FunctionArguments_analyze(FunctionArguments* self) {
-  CHECK(165, SyntaxTreeNode_analyze_children(&(self->_base), self->parameters) )
-  CHECK(166, SyntaxTreeNode_analyze_children(&(self->_base), self->outputs) )
+  CHECK(166, SyntaxTreeNode_analyze_children(&(self->_base), self->parameters) )
+  CHECK(167, SyntaxTreeNode_analyze_children(&(self->_base), self->outputs) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -356,7 +357,7 @@ static char* _func_name_FunctionArguments_get_result_type = "FunctionArguments.g
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_get_result_type
 Returncode FunctionArguments_get_result_type(FunctionArguments* self, Int* access, TypeInstance** result_type) {
   if (NULL != self->outputs->last) {
-    CHECK(170, (((Argument*)(self->outputs->last->item)))->_base._dtl[7](((Argument*)(self->outputs->last->item)), &((*result_type))) )
+    CHECK(171, (((Argument*)(self->outputs->last->item)))->_base._dtl[7](((Argument*)(self->outputs->last->item)), &((*result_type))) )
     (*access) = ((Argument*)(self->outputs->last->item))->access;
   }
   else {
@@ -374,7 +375,7 @@ static char* _func_name_FunctionArguments_get_output = "FunctionArguments.get-ou
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_get_output
 Returncode FunctionArguments_get_output(FunctionArguments* self, Expression** output) {
   if (NULL != self->outputs->last) {
-    CHECK(178, (((Argument*)(self->outputs->last->item)))->_base._dtl[10](((Argument*)(self->outputs->last->item)), &((*output))) )
+    CHECK(179, (((Argument*)(self->outputs->last->item)))->_base._dtl[10](((Argument*)(self->outputs->last->item)), &((*output))) )
   }
   return OK;
 }
@@ -386,9 +387,9 @@ Returncode FunctionArguments_find_variable(FunctionArguments* self, String* name
 static char* _func_name_FunctionArguments_find_variable = "FunctionArguments.find-variable";
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_find_variable
 Returncode FunctionArguments_find_variable(FunctionArguments* self, String* name, SyntaxTreeVariable** variable) {
-  CHECK(182, FunctionArguments_find_variable_args(self, self->parameters, name, &((*variable))) )
+  CHECK(183, FunctionArguments_find_variable_args(self, self->parameters, name, &((*variable))) )
   if (!(NULL != (*variable))) {
-    CHECK(184, FunctionArguments_find_variable_args(self, self->outputs, name, &((*variable))) )
+    CHECK(185, FunctionArguments_find_variable_args(self, self->outputs, name, &((*variable))) )
   }
   return OK;
 }
@@ -404,8 +405,8 @@ Returncode FunctionArguments_find_variable_args(FunctionArguments* self, List* a
   while (true) {
     if (!(NULL != node)) break;
     SyntaxTreeVariable* _SyntaxTreeVariable6;
-    CHECK(192, (((Argument*)(node->item)))->_base._dtl[9](((Argument*)(node->item)), &(_SyntaxTreeVariable6)) )
-    CHECK(192, (_SyntaxTreeVariable6)->_base._base._dtl[6](_SyntaxTreeVariable6, name, NULL, &((*variable))) )
+    CHECK(193, (((Argument*)(node->item)))->_base._dtl[9](((Argument*)(node->item)), &(_SyntaxTreeVariable6)) )
+    CHECK(193, (_SyntaxTreeVariable6)->_base._base._dtl[6](_SyntaxTreeVariable6, name, NULL, &((*variable))) )
     if (!(!(NULL != (*variable)))) break;
     node = node->next;
   }
@@ -423,30 +424,30 @@ Returncode FunctionArguments_check_same_as(FunctionArguments* self, FunctionArgu
   ListNode* other_node = other->parameters->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    CHECK(206, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item, instance_type, bases) )
+    CHECK(207, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item, instance_type, bases) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
   if (NULL != my_node) {
-    CHECK(211, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){20, 19, "too many parameters"}) )
+    CHECK(212, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){20, 19, "too many parameters"}) )
   }
   if (NULL != other_node) {
-    CHECK(213, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){19, 18, "too few parameters"}) )
+    CHECK(214, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){19, 18, "too few parameters"}) )
   }
   
   my_node = self->outputs->first;
   other_node = other->outputs->first;
   while (true) {
     if (!(NULL != my_node &&  NULL !=  other_node)) break;
-    CHECK(219, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item, instance_type, bases) )
+    CHECK(220, Argument_check_same_as(((Argument*)(my_node->item)), other_node->item, instance_type, bases) )
     my_node = my_node->next;
     other_node = other_node->next;
   }
   if (NULL != my_node) {
-    CHECK(224, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){17, 16, "too many outputs"}) )
+    CHECK(225, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){17, 16, "too many outputs"}) )
   }
   if (NULL != other_node &&  NULL !=  other_node->next) {
-    CHECK(226, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){16, 15, "too few outputs"}) )
+    CHECK(227, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){16, 15, "too few outputs"}) )
   }
   (*output_ommited) =  NULL !=  other_node;
   return OK;
@@ -459,8 +460,8 @@ Returncode FunctionArguments_write_preactions(FunctionArguments* self);
 static char* _func_name_FunctionArguments_write_preactions = "FunctionArguments.write-preactions";
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_write_preactions
 Returncode FunctionArguments_write_preactions(FunctionArguments* self) {
-  CHECK(230, FunctionArguments_write_args_preactions(self, self->parameters) )
-  CHECK(231, FunctionArguments_write_args_preactions(self, self->outputs) )
+  CHECK(231, FunctionArguments_write_args_preactions(self, self->parameters) )
+  CHECK(232, FunctionArguments_write_args_preactions(self, self->outputs) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -474,7 +475,7 @@ Returncode FunctionArguments_write_args_preactions(FunctionArguments* self, List
   ListNode* node = arguments->first;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(237, (((Argument*)(node->item)))->_base._dtl[11](((Argument*)(node->item))) )
+    CHECK(238, (((Argument*)(node->item)))->_base._dtl[11](((Argument*)(node->item))) )
     node = node->next;
   }
   return OK;
@@ -487,7 +488,7 @@ Returncode FunctionArguments_write(FunctionArguments* self);
 static char* _func_name_FunctionArguments_write = "FunctionArguments.write";
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_write
 Returncode FunctionArguments_write(FunctionArguments* self) {
-  CHECK(241, FunctionArguments_write_if_decleration(self, true) )
+  CHECK(242, FunctionArguments_write_if_decleration(self, true) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -498,7 +499,7 @@ Returncode FunctionArguments_write_call(FunctionArguments* self);
 static char* _func_name_FunctionArguments_write_call = "FunctionArguments.write-call";
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_write_call
 Returncode FunctionArguments_write_call(FunctionArguments* self) {
-  CHECK(244, FunctionArguments_write_if_decleration(self, false) )
+  CHECK(245, FunctionArguments_write_if_decleration(self, false) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -510,22 +511,22 @@ static char* _func_name_FunctionArguments_write_if_decleration = "FunctionArgume
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_write_if_decleration
 Returncode FunctionArguments_write_if_decleration(FunctionArguments* self, Bool is_decleration) {
   /* (`params...`, `outputs...`) */
-  CHECK(248, write(&(String){2, 1, "("}) )
+  CHECK(249, write(&(String){2, 1, "("}) )
   if (NULL != self->parameters->first) {
-    CHECK(250, FunctionArguments_write_args(self, self->parameters) )
+    CHECK(251, FunctionArguments_write_args(self, self->parameters) )
   }
   if (NULL != self->outputs->first) {
     if (NULL != self->parameters->first) {
-      CHECK(253, write(&(String){3, 2, ", "}) )
+      CHECK(254, write(&(String){3, 2, ", "}) )
     }
-    CHECK(254, FunctionArguments_write_args(self, self->outputs) )
+    CHECK(255, FunctionArguments_write_args(self, self->outputs) )
   }
   else {
     if (!(NULL != self->parameters->first) && is_decleration) {
-      CHECK(256, write(&(String){5, 4, "void"}) )
+      CHECK(257, write(&(String){5, 4, "void"}) )
     }
   }
-  CHECK(257, write(&(String){2, 1, ")"}) )
+  CHECK(258, write(&(String){2, 1, ")"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -538,10 +539,10 @@ static char* _func_name_FunctionArguments_write_args = "FunctionArguments.write-
 Returncode FunctionArguments_write_args(FunctionArguments* self, List* arguments) {
   ListNode* node = arguments->first;
   while (true) {
-    CHECK(262, (((Argument*)(node->item)))->_base._dtl[4](((Argument*)(node->item))) )
+    CHECK(263, (((Argument*)(node->item)))->_base._dtl[4](((Argument*)(node->item))) )
     node = node->next;
     if (!(NULL != node)) break;
-    CHECK(265, write(&(String){3, 2, ", "}) )
+    CHECK(266, write(&(String){3, 2, ", "}) )
   }
   return OK;
 }
@@ -553,10 +554,10 @@ Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name
 static char* _func_name_FunctionArguments_write_pointer = "FunctionArguments.write-pointer";
 #define LUMI_FUNC_NAME _func_name_FunctionArguments_write_pointer
 Returncode FunctionArguments_write_pointer(FunctionArguments* self, String* name) {
-  CHECK(268, write(&(String){14, 13, "Returncode (*"}) )
-  CHECK(269, write_cname(name) )
-  CHECK(270, write(&(String){2, 1, ")"}) )
-  CHECK(271, (self)->_base._dtl[4](self) )
+  CHECK(269, write(&(String){14, 13, "Returncode (*"}) )
+  CHECK(270, write_cname(name) )
+  CHECK(271, write(&(String){2, 1, ")"}) )
+  CHECK(272, (self)->_base._dtl[4](self) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -570,7 +571,7 @@ Returncode FunctionArguments_write_postactions(FunctionArguments* self) {
   ListNode* node = self->parameters->first;
   while (true) {
     if (!(NULL != node)) break;
-    CHECK(277, (((Argument*)(node->item)))->_base._dtl[12](((Argument*)(node->item))) )
+    CHECK(278, (((Argument*)(node->item)))->_base._dtl[12](((Argument*)(node->item))) )
     node = node->next;
   }
   return OK;

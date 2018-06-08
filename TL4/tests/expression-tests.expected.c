@@ -371,9 +371,11 @@ ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_met
 ut_M_Test_Dynamic ut_M_Test_dynamic = {{(Dynamic_Del)ut_M_Test_Del, (Func)ut_M_Test_meth}};
 Returncode ut_M_Base_meth(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic, ut_M_Base* b, Ref_Manager* b_Refman, ut_M_Base_Dynamic* b_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
   if (b_Dynamic != NULL) b_Dynamic->_del(b);
   LUMI_owner_dec_ref(b_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Base_Del(ut_M_Base* self) {
@@ -381,6 +383,7 @@ void ut_M_Base_Del(ut_M_Base* self) {
 }
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test* t, Ref_Manager* t_Refman, ut_M_Test_Dynamic* t_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(6, ut_M_Base_meth(&(self->_base), self_Refman, &(self_Dynamic->_base), &(t->_base), t_Refman, &(t_Dynamic->_base)) )
   t = NULL;
   t_Refman = NULL;
@@ -388,6 +391,7 @@ Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_D
 LUMI_cleanup:
   if (t_Dynamic != NULL) t_Dynamic->_base._del(t);
   LUMI_owner_dec_ref(t_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
@@ -410,7 +414,9 @@ Returncode ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** 
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
@@ -462,6 +468,8 @@ too many outputs
 too few outputs
 /// @ te18
 passing ownership of type "Test" into static type "Base"
+/// @ te19
+assigning into an owner a non-owner access "var"
 /// @@ test-type-expression
 /// @ t0
 CHECK(1, ut_M_Test_meth(ut_M_t, ut_M_t_Refman) )
@@ -497,7 +505,9 @@ Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
 Generic_Type_Dynamic ut_M_Top_dynamic = {(Dynamic_Del)ut_M_Top_Del};
 Returncode ut_M_Base_methb(ut_M_Base* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Base_Del(ut_M_Base* self) {
@@ -505,7 +515,9 @@ void ut_M_Base_Del(ut_M_Base* self) {
 }
 Returncode ut_M_Mid_methm(ut_M_Mid* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Mid_Del(ut_M_Mid* self) {
@@ -514,13 +526,17 @@ void ut_M_Mid_Del(ut_M_Mid* self) {
 }
 Returncode ut_M_Top_methb(ut_M_Top* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 Returncode ut_M_Top_methm(ut_M_Top* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(9, ut_M_Mid_methm(&(self->_base), self_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Top_Del(ut_M_Top* self) {
@@ -552,7 +568,9 @@ Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
 Generic_Type_Dynamic ut_M_Top_dynamic = {(Dynamic_Del)ut_M_Top_Del};
 Returncode ut_M_Base_methb(ut_M_Base* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Base_Del(ut_M_Base* self) {
@@ -560,7 +578,9 @@ void ut_M_Base_Del(ut_M_Base* self) {
 }
 Returncode ut_M_Mid_methm(ut_M_Mid* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Mid_Del(ut_M_Mid* self) {
@@ -569,13 +589,17 @@ void ut_M_Mid_Del(ut_M_Mid* self) {
 }
 Returncode ut_M_Top_methb(ut_M_Top* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 Returncode ut_M_Top_methm(ut_M_Top* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(9, ut_M_Base_methb(&(self->_base._base), self_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Top_Del(ut_M_Top* self) {
@@ -864,7 +888,9 @@ Returncode ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** 
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
@@ -903,7 +929,9 @@ ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_met
 ut_M_Test_Dynamic ut_M_Test_dynamic = {{(Dynamic_Del)ut_M_Test_Del, ut_M_Base_meth}};
 Returncode ut_M_Base_meth(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Base_Del(ut_M_Base* self) {
@@ -911,9 +939,11 @@ void ut_M_Base_Del(ut_M_Base* self) {
 }
 Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self_Dynamic == NULL) RAISE(6, 28, "dynamic call of empty object")
   CHECK(6, self_Dynamic->_base.meth(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
@@ -1061,4 +1091,6 @@ CHECK(1, File_putc(stdout, stdout_Refman, ut_M_c) )
 CHECK(1, File_getc(stdin, stdin_Refman, &(ut_M_c), &(ut_M_b)) )
 /// @ t31
 CHECK(1, File_putc(stderr, stderr_Refman, ut_M_c) )
+/// @ t32
+CHECK(1, String_clear(ut_M_str, ut_M_str_Refman) )
 /// @

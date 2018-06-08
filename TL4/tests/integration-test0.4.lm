@@ -538,12 +538,12 @@ struct HasComplexField
     x := self.x
     x.meth()
     self.x.meth()
-    ComplexField.meth(var self.x)
+    ComplexField.meth(user self.x)
     user ComplexField x2(user self.x.x)
     x2 := self.x.x
     x2.meth()
     self.x.x.meth()
-    ComplexField.meth(var self.x.x)
+    ComplexField.meth(user self.x.x)
 
 func test-complex-field()
   var HasComplexField y

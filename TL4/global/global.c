@@ -411,7 +411,7 @@ static char* _func_name_Global_add_builtin_method = "Global.add-builtin-method";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_method
 Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, String* name, FunctionArguments** arguments) {
   CHECK(357, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
-  CHECK(359, Global_add_builtin_parameter(self, (*arguments), ACCESS_VAR, builtin_type, &(String){5, 4, "self"}) )
+  CHECK(359, Global_add_builtin_parameter(self, (*arguments), ACCESS_USER, builtin_type, &(String){5, 4, "self"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

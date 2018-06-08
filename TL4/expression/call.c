@@ -83,9 +83,9 @@ Returncode CallExpression_analyze(CallExpression* self) {
     CHECK(43, TypeInstance_f_new_replace_params(result_type, instance_type, bases, &(self->_base.result_type)) )
     result_type = self->_base.result_type;
   }
-  Bool _Bool28;
-  CHECK(46, FunctionArguments_check_same_as(self->arguments, declaration, instance_type, bases, &(_Bool28)) )
-  if (_Bool28) {
+  Bool _Bool29;
+  CHECK(46, FunctionArguments_check_same_as(self->arguments, declaration, instance_type, bases, &(_Bool29)) )
+  if (_Bool29) {
     /* add omitted output */
     CallArgument* output = malloc(sizeof(CallArgument));
     if (output == NULL) RAISE(49)
@@ -95,13 +95,13 @@ Returncode CallExpression_analyze(CallExpression* self) {
     output->_base.is_output = true;
     output->_base.is_native = ((Argument*)(declaration->outputs->last->item))->is_native;
     output->is_dynamic = result_type->type_data->is_dynamic;
-    TypeInstance* _TypeInstance29;
-    CHECK(54, (((Argument*)(declaration->outputs->last->item)))->_base._dtl[7](((Argument*)(declaration->outputs->last->item)), &(_TypeInstance29)) )
-    output->is_generic = _TypeInstance29->type_data == glob->type_generic;
+    TypeInstance* _TypeInstance30;
+    CHECK(54, (((Argument*)(declaration->outputs->last->item)))->_base._dtl[7](((Argument*)(declaration->outputs->last->item)), &(_TypeInstance30)) )
+    output->is_generic = _TypeInstance30->type_data == glob->type_generic;
     output->_base.access = ((Argument*)(declaration->outputs->last->item))->access;
-    SymbolExpression* _SymbolExpression30;
-    CHECK(58, Expression_add_aux_variable(&(self->_base), ((Argument*)(declaration->outputs->last->item))->access, false, result_type, &(_SymbolExpression30)) )
-    output->value = &(_SymbolExpression30->_base);
+    SymbolExpression* _SymbolExpression31;
+    CHECK(58, Expression_add_aux_variable(&(self->_base), ((Argument*)(declaration->outputs->last->item))->access, false, result_type, &(_SymbolExpression31)) )
+    output->value = &(_SymbolExpression31->_base);
     self->output = output->value;
     CHECK(63, List_add(self->arguments->outputs, &(output->_base)) )
   }
@@ -273,9 +273,9 @@ Returncode CallArgument_check_same_type_as(CallArgument* self, TypeInstance* typ
   TypeInstance* real_type = NULL;
   CHECK(146, TypeInstance_f_new_replace_params(type_instance, instance_type, bases, &(real_type)) )
   if (self->_base.is_output) {
-    Int _Int31;
-    CHECK(149, TypeInstance_check_assign_to(real_type, self->_base.access, self->value->result_type, self->value->access, &(self->_base._base), &(_Int31)) )
-    self->is_down_cast = _Int31 > 0;
+    Int _Int32;
+    CHECK(149, TypeInstance_check_assign_to(real_type, self->_base.access, self->value->result_type, self->value->access, &(self->_base._base), &(_Int32)) )
+    self->is_down_cast = _Int32 > 0;
   }
   else {
     CHECK(155, TypeInstance_check_assign_from(real_type, self->_base.access, &(self->_base._base), &(self->value), &(self->assignee)) )
@@ -419,11 +419,11 @@ Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argumen
 static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactory.m-new-argument";
 #define LUMI_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
-  CallArgument* _CallArgument32 = malloc(sizeof(CallArgument));
-  if (_CallArgument32 == NULL) RAISE(223)
-  *_CallArgument32 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
-  _CallArgument32->_base._base._dtl = CallArgument__dtl;
-  (*new_argument) = &(_CallArgument32->_base);
+  CallArgument* _CallArgument33 = malloc(sizeof(CallArgument));
+  if (_CallArgument33 == NULL) RAISE(223)
+  *_CallArgument33 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
+  _CallArgument33->_base._base._dtl = CallArgument__dtl;
+  (*new_argument) = &(_CallArgument33->_base);
   return OK;
 }
 #undef LUMI_FUNC_NAME

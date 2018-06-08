@@ -357,7 +357,7 @@ static Global
     self.add-builtin-function(user name, user builtin-type, user builtin-type):(
         user arguments)
     self.add-builtin-parameter(
-        user arguments, copy ACCESS-VAR, user builtin-type, user "self")
+        user arguments, copy ACCESS-USER, user builtin-type, user "self")
   
   func inst add-builtin-function(
       user String name,

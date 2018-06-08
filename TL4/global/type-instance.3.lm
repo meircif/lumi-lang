@@ -243,7 +243,36 @@ static TypeInstance
           user target.arguments, user _, copy 0)
         node.m-syntax-error-msg(user "too few outputs")
     
-    self-type-instance.check-sub-equal(user target, user node)
+    if target.type-data.is-primitive or target.type-data = glob.type-array
+      self-type-instance.check-sub-equal(user target, user node)
+    else
+      self-type-instance.check-sub-assign-to(user target, user node)
+  
+  func inst check-sub-assign-to(
+      user TypeInstance target, user SyntaxTreeNode node)
+    if not (? target.parameters)
+      return
+    user ListNode{TypeInstance} target-sub-type(target.parameters.first)
+    self.check-has-subytpe(user target-sub-type, user node)
+    user ListNode{TypeInstance} my-sub-type(self.parameters.first)
+    do
+      while ? target-sub-type and ? my-sub-type
+      my-sub-type.item.check-assign-to(
+          copy ACCESS-VAR,
+          user target-sub-type.item,
+          copy ACCESS-VAR,
+          user node)
+      my-sub-type := my-sub-type.next
+      target-sub-type := target-sub-type.next
+  
+  func inst check-has-subytpe(
+      user ListNode{TypeInstance} target-sub-type, user SyntaxTreeNode node)
+    if not (? self.parameters)
+      node.m-syntax-error2(
+          user "cannot assign type",
+          user self.type-data.name,
+          user "with no parameter into same type with parameter",
+          user target-sub-type.item.type-data.name)
   
   func inst check-equal(user TypeInstance other, user SyntaxTreeNode node)
     if self.type-data != other.type-data
@@ -258,13 +287,7 @@ static TypeInstance
     if not (? target.parameters)
       return
     user ListNode{TypeInstance} target-sub-type(target.parameters.first)
-    if not (? self.parameters)
-      node.m-syntax-error2(
-          user "cannot assign type",
-          user self.type-data.name,
-          user "with no parameter into same type with parameter",
-          user target-sub-type.item.type-data.name)
-    
+    self.check-has-subytpe(user target-sub-type, user node)
     user ListNode{TypeInstance} my-sub-type(self.parameters.first)
     do
       while ? target-sub-type and ? my-sub-type

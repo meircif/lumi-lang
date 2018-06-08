@@ -63,9 +63,9 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
     while (true) {
       String* name = NULL;
       CHECK(32, read_new(&(String){3, 2, ":}"}, &(name), &((*end))) )
-      Bool _Bool173;
-      CHECK(33, f_is_legal_name(name, NAME_TYPE, &(_Bool173)) )
-      if (!_Bool173) {
+      Bool _Bool174;
+      CHECK(33, f_is_legal_name(name, NAME_TYPE, &(_Bool174)) )
+      if (!_Bool174) {
         CHECK(34, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "illegal type parameter name"}, name) )
       }
       CHECK(35, List_add(self->parameters, name) )
@@ -99,19 +99,19 @@ Returncode TypeData_add_type(TypeData* self, ModuleMembers* my_module);
 static char* _func_name_TypeData_add_type = "TypeData.add-type";
 #define LUMI_FUNC_NAME _func_name_TypeData_add_type
 Returncode TypeData_add_type(TypeData* self, ModuleMembers* my_module) {
-  Bool _Bool174;
-  CHECK(53, f_is_legal_name(self->name, NAME_TYPE, &(_Bool174)) )
-  if (!_Bool174) {
+  Bool _Bool175;
+  CHECK(53, f_is_legal_name(self->name, NAME_TYPE, &(_Bool175)) )
+  if (!_Bool175) {
     CHECK(54, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){18, 17, "illegal type name"}, self->name) )
   }
-  TypeData* _TypeData175;
-  CHECK(55, Global_find_type(glob, self->name, &(_TypeData175)) )
-  if (NULL != _TypeData175) {
+  TypeData* _TypeData176;
+  CHECK(55, Global_find_type(glob, self->name, &(_TypeData176)) )
+  if (NULL != _TypeData176) {
     CHECK(56, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){21, 20, "redefinition of type"}, self->name) )
   }
-  EnumData* _EnumData176;
-  CHECK(57, NameMap_find(glob->current_module->enum_map, self->name, (void**)&(_EnumData176)) )
-  if (NULL != _EnumData176) {
+  EnumData* _EnumData177;
+  CHECK(57, NameMap_find(glob->current_module->enum_map, self->name, (void**)&(_EnumData177)) )
+  if (NULL != _EnumData177) {
     CHECK(58, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){25, 24, "type name overrides Enum"}, self->name) )
   }
   CHECK(59, SyntaxTreeNamespace_init(&(self->_base)) )
@@ -126,15 +126,15 @@ Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end);
 static char* _func_name_TypeData_parse_child = "TypeData.parse-child";
 #define LUMI_FUNC_NAME _func_name_TypeData_parse_child
 Returncode TypeData_parse_child(TypeData* self, String* keyword, Char* end) {
-  Bool _Bool177;
-  CHECK(63, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool177)) )
-  if (_Bool177) {
+  Bool _Bool178;
+  CHECK(63, SyntaxTreeNamespace_parse_if_function(&(self->_base), keyword, self, &((*end)), &(_Bool178)) )
+  if (_Bool178) {
     return OK;
   }
   
-  Bool _Bool178;
-  CHECK(66, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool178)) )
-  if (_Bool178) {
+  Bool _Bool179;
+  CHECK(66, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool179)) )
+  if (_Bool179) {
     if ((*end) != '(') {
       CHECK(68, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){30, 29, "expected \"(\" after \"new\", got"}, (*end)) )
     }
@@ -231,9 +231,9 @@ Returncode TypeData_find_field(TypeData* self, String* name, SyntaxTreeVariable*
     ListNode* child = type_data->_base._base.variables->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool179;
-      CHECK(116, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool179)) )
-      if (_Bool179) {
+      Bool _Bool180;
+      CHECK(116, String_equal(((SyntaxTreeVariable*)(child->item))->name, name, &(_Bool180)) )
+      if (_Bool180) {
         (*field) = ((SyntaxTreeVariable*)(child->item));
         return OK;
       }
@@ -261,9 +261,9 @@ Returncode TypeData_find_meth(TypeData* self, String* name, SyntaxTreeFunction**
     ListNode* child = type_data->_base.functions->first;
     while (true) {
       if (!(NULL != child)) break;
-      Bool _Bool180;
-      CHECK(134, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool180)) )
-      if (_Bool180) {
+      Bool _Bool181;
+      CHECK(134, String_equal(((SyntaxTreeFunction*)(child->item))->name, name, &(_Bool181)) )
+      if (_Bool181) {
         (*method) = ((SyntaxTreeFunction*)(child->item));
         return OK;
       }
@@ -361,9 +361,9 @@ Returncode TypeData_analyze(TypeData* self) {
   if (NULL != self->base_type) {
     CHECK(193, TypeInstance_analyze_lengths(self->base_type, &(self->_base._base._base), true) )
   }
-  Bool _Bool181;
-  CHECK(194, List_m_is_empty(self->_base._base.variables, &(_Bool181)) )
-  if (!(NULL != self->base_type) && _Bool181) {
+  Bool _Bool182;
+  CHECK(194, List_m_is_empty(self->_base._base.variables, &(_Bool182)) )
+  if (!(NULL != self->base_type) && _Bool182) {
     CHECK(195, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){20, 19, "type with no fields"}, self->name) )
   }
   if (self->is_dynamic &&  ! (NULL != self->base_type && self->base_type->type_data->is_dynamic)) {
@@ -535,8 +535,8 @@ Returncode TypeData_write_dynamic_init(TypeData* self, TypeData* type_data) {
   while (true) {
     if (!(NULL != child)) break;
     SyntaxTreeFunction* method = NULL;
-    Int _Int182;
-    CHECK(305, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int182)) )
+    Int _Int183;
+    CHECK(305, TypeData_find_meth(self, ((SyntaxTreeFunction*)(child->value))->name, &(method), &(_Int183)) )
     CHECK(306, write(&(String){3, 2, ", "}) )
     if (method != ((SyntaxTreeFunction*)(child->value))) {
       CHECK(308, write(&(String){7, 6, "(Func)"}) )

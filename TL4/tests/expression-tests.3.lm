@@ -27,7 +27,7 @@ func test-code(user String input-text, user String expected-output)
   not-first-code-test := true
   test-code-setup(user input-text)
   write-syntax-tree(copy false)
-  var String{8192} expected-header
+  var String{16384} expected-header
   owner File code-header
   var String{256} filename
   set-test-file-name(user filename, user "code-header", user ".expected.c")
