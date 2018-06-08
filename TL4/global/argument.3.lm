@@ -114,9 +114,10 @@ class FunctionArguments(SyntaxTreeNode)
     if type-data.is-primitive
       self-args.access := ACCESS-COPY
     else
-      self-args.access := ACCESS-VAR
+      self-args.access := ACCESS-USER
     self-args.set-location()
     new SyntaxTreeVariable in self-args.variable
+    self-args.variable.access := self-args.access
     string-new-copy(user "self"):(owner self-args.variable.name)
     type-data.m-self-type-instance():(owner self-args.variable.type-instance)
     self.parameters.prepend(owner self-args)

@@ -202,9 +202,9 @@ Returncode UnaryExpression_analyze(UnaryExpression* self) {
     CHECK(94, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   }
   else {
-    Bool _Bool40;
-    CHECK(95, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool40)) )
-    if (_Bool40) {
+    Bool _Bool41;
+    CHECK(95, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool41)) )
+    if (_Bool41) {
       CHECK(96, UnaryExpression_test_operand_type(self, self->right_expression, glob->type_int) )
       CHECK(97, Expression_set_simple_type(&(self->_base), glob->type_int) )
     }
@@ -236,9 +236,9 @@ Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* 
 static char* _func_name_UnaryExpression_test_operand_type = "UnaryExpression.test-operand-type";
 #define LUMI_FUNC_NAME _func_name_UnaryExpression_test_operand_type
 Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* operand, TypeData* expected_type) {
-  Bool _Bool41;
-  CHECK(111, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool41)) )
-  if (!_Bool41) {
+  Bool _Bool42;
+  CHECK(111, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool42)) )
+  if (!_Bool42) {
     CHECK(112, SyntaxTreeNode_m_syntax_error3(&(self->_base._base), &(String){9, 8, "operator"}, self->operator->name, &(String){9, 8, "expected"}, expected_type->name, &(String){13, 12, "operand, got"}, operand->result_type->type_data->name) )
   }
   return OK;
@@ -381,11 +381,11 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
         CHECK(194, BinaryExpression_analyze_equalizer(self, true) )
       }
       else {
-        Bool _Bool42;
-        CHECK(195, String_equal(self->_base.operator->name, &(String){2, 1, "="}, &(_Bool42)) )
         Bool _Bool43;
-        CHECK(195, String_equal(self->_base.operator->name, &(String){3, 2, "!="}, &(_Bool43)) )
-        if (_Bool42 || _Bool43) {
+        CHECK(195, String_equal(self->_base.operator->name, &(String){2, 1, "="}, &(_Bool43)) )
+        Bool _Bool44;
+        CHECK(195, String_equal(self->_base.operator->name, &(String){3, 2, "!="}, &(_Bool44)) )
+        if (_Bool43 || _Bool44) {
           CHECK(197, BinaryExpression_analyze_equalizer(self, false) )
         }
         else {

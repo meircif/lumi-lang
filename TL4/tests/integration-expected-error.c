@@ -120,7 +120,9 @@ File_Coverage LUMI_file_coverage[1] = {
 #define LUMI_FUNC_NAME "BaseType.meth"
 Returncode error_M_BaseType_meth(error_M_BaseType* self, Ref_Manager* self_Refman, error_M_BaseType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -134,7 +136,9 @@ void error_M_BaseType_Del(error_M_BaseType* self) {
 #define LUMI_FUNC_NAME "TopType.meth"
 Returncode error_M_TopType_meth(error_M_TopType* self, Ref_Manager* self_Refman, error_M_TopType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME

@@ -130,6 +130,7 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Ref_Manager* aux_String_2_Refman = NULL;
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(76, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(76, 38, "used member of outdated weak reference")
   self->running_lumi = true;
@@ -202,6 +203,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_String_1_Refman);
   String_Del(aux_String_0);
   LUMI_owner_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -212,6 +214,7 @@ LUMI_cleanup:
 Returncode lumi_M_Lumi_run_command(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* error_msg, Ref_Manager* error_msg_Refman) {
   Returncode LUMI_err = OK;
   Int aux_Int_0 = 0;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(error_msg_Refman);
   if (self == NULL) RAISE(87, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(87, 38, "used member of outdated weak reference")
@@ -235,6 +238,7 @@ Returncode lumi_M_Lumi_run_command(lumi_M_Lumi* self, Ref_Manager* self_Refman, 
     }
 LUMI_cleanup:
   LUMI_dec_ref(error_msg_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -244,6 +248,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Lumi.get-any-opt-param"
 Returncode lumi_M_Lumi_get_any_opt_param(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* option, Ref_Manager* option_Refman, String* param, Ref_Manager* param_Refman, Int* index, String** value, Ref_Manager** value_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(option_Refman);
   LUMI_inc_ref(param_Refman);
   if (sys == NULL) RAISE(98, 27, "used member of empty object")
@@ -264,6 +269,7 @@ Returncode lumi_M_Lumi_get_any_opt_param(lumi_M_Lumi* self, Ref_Manager* self_Re
 LUMI_cleanup:
   LUMI_dec_ref(param_Refman);
   LUMI_dec_ref(option_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -273,6 +279,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Lumi.get-opt-param"
 Returncode lumi_M_Lumi_get_opt_param(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* option, Ref_Manager* option_Refman, String* param, Ref_Manager* param_Refman, Int* index, String** value, Ref_Manager** value_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(option_Refman);
   LUMI_inc_ref(param_Refman);
   CHECK(104, lumi_M_Lumi_get_any_opt_param(self, self_Refman, option, option_Refman, param, param_Refman, &(*index), &(*value), &(*value_Refman)) )
@@ -284,6 +291,7 @@ Returncode lumi_M_Lumi_get_opt_param(lumi_M_Lumi* self, Ref_Manager* self_Refman
 LUMI_cleanup:
   LUMI_dec_ref(param_Refman);
   LUMI_dec_ref(option_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -302,6 +310,7 @@ Returncode lumi_M_Lumi_check_opt_param_error(lumi_M_Lumi* self, Ref_Manager* sel
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(option_Refman);
   LUMI_inc_ref(param_Refman);
   if (is_error) {
@@ -336,6 +345,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(param_Refman);
   LUMI_dec_ref(option_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -352,6 +362,7 @@ Returncode lumi_M_Lumi_check_param(lumi_M_Lumi* self, Ref_Manager* self_Refman, 
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(value_Refman);
   CHECK(119, String_has(value, value_Refman, '"', &(aux_Bool_0)) )
   if (aux_Bool_0) {
@@ -376,6 +387,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(value_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -394,6 +406,7 @@ Returncode lumi_M_Lumi_concat_lumi_output(lumi_M_Lumi* self, Ref_Manager* self_R
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(126, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(126, 38, "used member of outdated weak reference")
   aux_String_0 = &aux_String_0_Var;
@@ -436,6 +449,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -451,6 +465,7 @@ Returncode lumi_M_Lumi_concat_first_file_name(lumi_M_Lumi* self, Ref_Manager* se
   String aux_String_1_Var = {0};
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(target_Refman);
   LUMI_inc_ref(name_Refman);
   aux_String_0 = &aux_String_0_Var;
@@ -473,6 +488,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(target_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -485,6 +501,7 @@ Returncode lumi_M_Lumi_concat_file_name(lumi_M_Lumi* self, Ref_Manager* self_Ref
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(target_Refman);
   LUMI_inc_ref(name_Refman);
   aux_String_0 = &aux_String_0_Var;
@@ -499,6 +516,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(target_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -511,6 +529,7 @@ Returncode lumi_M_Lumi_concat_tl_path(lumi_M_Lumi* self, Ref_Manager* self_Refma
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(142, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
   if (self == NULL) RAISE(142, 27, "used member of empty object")
@@ -546,6 +565,7 @@ Returncode lumi_M_Lumi_concat_tl_path(lumi_M_Lumi* self, Ref_Manager* self_Refma
   CHECK(147, String_append(self->command, self->command_Refman, self->path_separator) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -638,6 +658,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Ref_Manager* aux_String_22_Refman = NULL;
   String* aux_String_23 = NULL;
   Ref_Manager* aux_String_23_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (sys == NULL) RAISE(150, 27, "used member of empty object")
   if (sys_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
   if (sys->argv == NULL) RAISE(150, 27, "used member of empty object")
@@ -1057,6 +1078,7 @@ LUMI_cleanup:
   LUMI_dec_ref(arg_Refman);
   LUMI_dec_ref(last_input_Refman);
   LUMI_dec_ref(first_input_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1078,6 +1100,7 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   String aux_String_3_Var = {0};
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(249, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(249, 38, "used member of outdated weak reference")
   aux_String_0 = &aux_String_0_Var;
@@ -1146,6 +1169,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1203,6 +1227,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   String aux_String_14_Var = {0};
   String* aux_String_14 = NULL;
   Ref_Manager* aux_String_14_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(263, 38, "insufficient memory for managed object")
@@ -1441,6 +1466,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1454,6 +1480,7 @@ Returncode lumi_M_Lumi_run_program(lumi_M_Lumi* self, Ref_Manager* self_Refman) 
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(301, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(301, 38, "used member of outdated weak reference")
   CHECK(301, String_clear(self->command, self->command_Refman) )
@@ -1498,6 +1525,7 @@ Returncode lumi_M_Lumi_run_program(lumi_M_Lumi* self, Ref_Manager* self_Refman) 
   CHECK(309, lumi_M_Lumi_run_command(self, self_Refman, NULL, NULL) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1507,6 +1535,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Lumi.run"
 Returncode lumi_M_Lumi_run(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(312, lumi_M_Lumi_read_input(self, self_Refman) )
   if (self == NULL) RAISE(313, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(313, 38, "used member of outdated weak reference")
@@ -1524,6 +1553,7 @@ Returncode lumi_M_Lumi_run(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       CHECK(318, lumi_M_Lumi_run_program(self, self_Refman) )
     }
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME

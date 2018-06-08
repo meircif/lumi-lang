@@ -100,11 +100,11 @@ Returncode BaseMethExpression_analyze_call(BaseMethExpression* self, FunctionArg
   self_param->_base._base._dtl = CallArgument__dtl;
   CHECK(53, SyntaxTreeNode_set_location(&(self_param->_base._base)) )
   self_param->_base.access = ((Argument*)(self->function->arguments->parameters->first->item))->access;
-  BaseMethExpression* _BaseMethExpression24 = malloc(sizeof(BaseMethExpression));
-  if (_BaseMethExpression24 == NULL) RAISE(55)
-  *_BaseMethExpression24 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, false, NULL, NULL, 0};
-  _BaseMethExpression24->_base._base._dtl = BaseMethExpression__dtl;
-  self_param->value = &(_BaseMethExpression24->_base);
+  BaseMethExpression* _BaseMethExpression25 = malloc(sizeof(BaseMethExpression));
+  if (_BaseMethExpression25 == NULL) RAISE(55)
+  *_BaseMethExpression25 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, false, NULL, NULL, 0};
+  _BaseMethExpression25->_base._base._dtl = BaseMethExpression__dtl;
+  self_param->value = &(_BaseMethExpression25->_base);
   CHECK(56, TypeData_m_self_type_instance(self->parent_type, &(self_param->value->result_type)) )
   CHECK(57, List_prepend(arguments->parameters, &(self_param->_base)) )
   return OK;
@@ -328,11 +328,11 @@ Returncode TypeExpression_parse_new(TypeExpression* self, String* text, String* 
   if ((*end) == '.') {
     CHECK(141, Expression_read_new_value(&(self->_base._base), ends, &(value), &(next_end)) )
     if (value->length > 0) {
-      Bool _Bool25;
-      CHECK(143, String_equal(value, &(String){7, 6, "length"}, &(_Bool25)) )
+      Bool _Bool26;
+      CHECK(143, String_equal(value, &(String){7, 6, "length"}, &(_Bool26)) )
       if ((0) < 0 || (0) >= (value)->length) RAISE(143)
       if ((0) < 0 || (0) >= (value)->length) RAISE(143)
-      if (_Bool25 || (((value)->values[0]) >= 'A' && ((value)->values[0]) <= 'Z')) {
+      if (_Bool26 || (((value)->values[0]) >= 'A' && ((value)->values[0]) <= 'Z')) {
         EnumExpression* enum_expression = malloc(sizeof(EnumExpression));
         if (enum_expression == NULL) RAISE(144)
         *enum_expression = (EnumExpression){EnumExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL};
@@ -445,9 +445,9 @@ Returncode EnumExpression_analyze(EnumExpression* self) {
   if (NULL != self->_base.module_expression) {
     CHECK(203, ModuleTypeExpression_analyze_module(&(self->_base)) )
     String* module_name = self->_base.module_expression->result_type->name;
-    ModuleMembers* _ModuleMembers26;
-    CHECK(205, SyntaxTreeNode_find_module(&(self->_base._base.code_node->_base), module_name, &(_ModuleMembers26)) )
-    CHECK(205, NameMap_find(_ModuleMembers26->enum_map, self->name, (void**)&(self->enum_data)) )
+    ModuleMembers* _ModuleMembers27;
+    CHECK(205, SyntaxTreeNode_find_module(&(self->_base._base.code_node->_base), module_name, &(_ModuleMembers27)) )
+    CHECK(205, NameMap_find(_ModuleMembers27->enum_map, self->name, (void**)&(self->enum_data)) )
     if (!(NULL != self->enum_data)) {
       CHECK(207, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){13, 12, "unknown Enum"}, self->name, &(String){10, 9, "in module"}, module_name) )
     }
@@ -458,9 +458,9 @@ Returncode EnumExpression_analyze(EnumExpression* self) {
       CHECK(214, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){13, 12, "unknown Enum"}, self->name) )
     }
   }
-  Bool _Bool27;
-  CHECK(215, EnumData_m_has_value(self->enum_data, self->value, &(_Bool27)) )
-  if (!_Bool27) {
+  Bool _Bool28;
+  CHECK(215, EnumData_m_has_value(self->enum_data, self->value, &(_Bool28)) )
+  if (!_Bool28) {
     CHECK(216, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){5, 4, "Enum"}, self->name, &(String){13, 12, "has no value"}, self->value) )
   }
   return OK;

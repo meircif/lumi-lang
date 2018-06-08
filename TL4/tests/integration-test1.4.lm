@@ -18,8 +18,8 @@ class TopType(covered.MiddleType)
   func dynamic meth2()
     sys.println(user "TopType.meth2")
     base()
-    covered.MiddleType.meth2(var self)
-    BaseType.meth2(var self)
+    covered.MiddleType.meth2(user self)
+    BaseType.meth2(user self)
   
   func dynamic meth3(copy Int n, user String s)
     sys.println(user "TopType.meth3")
@@ -28,8 +28,8 @@ class TopType(covered.MiddleType)
   func dynamic meth5(copy Int n, user String s)
     sys.println(user "TopType.meth5")
     base(copy n, user s)
-    covered.MiddleType.meth1(var _, copy n, user s)
-    BaseType.meth1(var _, copy n, user s)
+    covered.MiddleType.meth1(user _, copy n, user s)
+    BaseType.meth1(user _, copy n, user s)
   
   func dynamic meth6()
     sys.println(user "TopType.meth6")
@@ -104,14 +104,14 @@ test test-func()
   assert c.num = 1
   c.dynamic-meth()
   assert c.num = 7
-  TestClass.dynamic-meth.mocked(var c)
+  TestClass.dynamic-meth.mocked(user c)
   assert c.num = 6
   TestClass.dynamic-meth.active := false
   c.num := 0
   c.dynamic-meth()
   assert c.num = 6
   TestClass.dynamic-meth.active := true
-  TestClass.dynamic-meth(var c)
+  TestClass.dynamic-meth(user c)
   assert c.num = 7
 
 

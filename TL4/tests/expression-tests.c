@@ -62,7 +62,7 @@ Returncode test_code(String* input_text, String* expected_output) {
   not_first_code_test = true;
   CHECK(28, test_code_setup(input_text) )
   CHECK(29, write_syntax_tree(false) )
-  String* expected_header = &(String){8192, 0, (char[8192]){0}};
+  String* expected_header = &(String){16384, 0, (char[16384]){0}};
   File* code_header = NULL;
   String* filename = &(String){256, 0, (char[256]){0}};
   CHECK(33, set_test_file_name(filename, &(String){12, 11, "code-header"}, &(String){12, 11, ".expected.c"}) )

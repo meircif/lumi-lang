@@ -5,6 +5,7 @@ wip
 .gitattributes
 *.WinMerge
 docs/_*
+.tags
 
 # Visual-Studio files
 *.sln

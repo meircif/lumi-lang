@@ -74,8 +74,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
     if (self->_base._base.result_type->type_data == glob->type_array && ((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->type_data == glob->type_generic) {
       CHECK(50, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){28, 27, "cannot create generic array"}) )
     }
-    Int _Int48;
-    CHECK(51, TypeData_find_meth(self->_base._base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int48)) )
+    Int _Int49;
+    CHECK(51, TypeData_find_meth(self->_base._base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int49)) )
     if (!(NULL != self->arguments->parameters->first) &&  ! (NULL != self->arguments->outputs->first) && (!(NULL != self->constructor) || self->_base._base.result_type->type_data == glob->type_string)) {
       self->constructor = NULL;
     }
@@ -90,8 +90,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
         self_param->code_node = self->_base._base.code_node;
         self_param->value = &(self->symbol->_base);
         CHECK(63, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-        Bool _Bool49;
-        CHECK(64, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base._base.result_type, 0, &(_Bool49)) )
+        Bool _Bool50;
+        CHECK(64, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base._base.result_type, 0, &(_Bool50)) )
       }
       else {
         CHECK(67, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){23, 22, "no contructor for type"}, self->_base._base.result_type->type_data->name) )

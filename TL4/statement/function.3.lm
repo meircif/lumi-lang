@@ -145,7 +145,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func dynamic analyze()
     if ? self.my-module
       glob.current-module := self.my-module
-      assert ? glob.current-module
     self.arguments.analyze()
     base.analyze()
     if ? self.my-module

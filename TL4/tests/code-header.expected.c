@@ -97,12 +97,16 @@ Array* ut_M_sarr = NULL;
 Ref_Manager* ut_M_sarr_Refman = NULL;
 Returncode ut_M_Test_new(ut_M_Test* self, Ref_Manager* self_Refman, Int num) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
@@ -111,12 +115,16 @@ void ut_M_Test_Del(ut_M_Test* self) {
 }
 Returncode ut_M_Ta_metha(ut_M_Ta* self, Ref_Manager* self_Refman, ut_M_Ta_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 Returncode ut_M_Ta_dyn(ut_M_Ta* self, Ref_Manager* self_Refman, ut_M_Ta_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Ta_Del(ut_M_Ta* self) {
@@ -125,12 +133,16 @@ void ut_M_Ta_Del(ut_M_Ta* self) {
 }
 Returncode ut_M_Tb_methb(ut_M_Tb* self, Ref_Manager* self_Refman, ut_M_Tb_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 Returncode ut_M_Tb_dyn(ut_M_Tb* self, Ref_Manager* self_Refman, ut_M_Tb_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Tb_Del(ut_M_Tb* self) {
@@ -139,12 +151,16 @@ void ut_M_Tb_Del(ut_M_Tb* self) {
 }
 Returncode ut_M_Tc_methc(ut_M_Tc* self, Ref_Manager* self_Refman, ut_M_Tc_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 Returncode ut_M_Tc_dyn(ut_M_Tc* self, Ref_Manager* self_Refman, ut_M_Tc_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Tc_Del(ut_M_Tc* self) {
@@ -153,16 +169,20 @@ void ut_M_Tc_Del(ut_M_Tc* self) {
 }
 Returncode ut_M_Data_set(ut_M_Data* self, Ref_Manager* self_Refman, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic, Array* arr, Ref_Manager* arr_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(arr_Refman);
 LUMI_cleanup:
   LUMI_dec_ref(arr_Refman);
   if (item_Dynamic != NULL) item_Dynamic->_del(item);
   LUMI_owner_dec_ref(item_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 Returncode ut_M_Data_get(ut_M_Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 void ut_M_Data_Del(ut_M_Data* self) {

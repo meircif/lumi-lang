@@ -21,7 +21,9 @@ static List{Generic}
   func inst prepend(owner Generic item)
     new ListNode{Generic} node
     node.item := item
-    node.next := self.first
+    if ? self.first
+      node.next := self.first
+      self.first.prev := node
     self.first := node
     if not (? self.last)
       self.last := node
