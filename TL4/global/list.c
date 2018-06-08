@@ -63,7 +63,10 @@ Returncode List_prepend(List* self, void* item) {
   if (node == NULL) RAISE(22)
   *node = (ListNode){NULL, NULL, NULL};
   node->item = item;
-  node->next = self->first;
+  if (NULL != self->first) {
+    node->next = self->first;
+    self->first->prev = node;
+  }
   self->first = node;
   if (!(NULL != self->last)) {
     self->last = node;

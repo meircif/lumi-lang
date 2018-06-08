@@ -265,13 +265,16 @@ struct Base
 struct Test(Base)
   func meth(owner Test t)
     base(owner t)
+## @ ec te19
+var String{16} text
+  fun1(copy 3, user str, owner text)
 ## @@ test-type-expression
 ## @ c t0
-Test.meth(var t)
+Test.meth(user t)
 ## @ c t1
-Tb.methb(var tc)
+Tb.methb(user tc)
 ## @ c t2
-Tc.meth(var tc)
+Tc.meth(user tc)
 ## @ ec t3
 Error
 ## @@ test-base-expression
@@ -506,8 +509,8 @@ var Func{(copy Int x)->(var Int y)} fun(copy fun5)
   var Int x
   fun(copy 9)->(var x)
 ## @ c t2
-var Func{(var Test self)} fun(copy Test.meth)
-  fun(var t)
+var Func{(user Test self)} fun(copy Test.meth)
+  fun(user t)
 ## @ c t3
 var Func{()} fun
   fun := _
@@ -600,4 +603,6 @@ stdout.putc(copy c)
 stdin.getc()->(var c, var b)
 ## @ c t31
 stderr.putc(copy c)
+## @ c t32
+String.clear(user str)
 ## @

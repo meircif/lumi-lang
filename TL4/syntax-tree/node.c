@@ -44,9 +44,9 @@ static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
   {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool101;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool101)) )
-    if (_Bool101) {
+    Bool _Bool102;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool102)) )
+    if (_Bool102) {
       (*access) = n;
       return OK;
     }
@@ -88,9 +88,9 @@ static char* _func_name_SyntaxTreeNode_find_type = "SyntaxTreeNode.find-type";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_find_type
 Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, String* module_name, TypeData** type_data) {
   if (NULL != module_name) {
-    ModuleMembers* _ModuleMembers102;
-    CHECK(33, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers102)) )
-    CHECK(33, NameMap_find(_ModuleMembers102->type_map, name, (void**)&((*type_data))) )
+    ModuleMembers* _ModuleMembers103;
+    CHECK(33, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers103)) )
+    CHECK(33, NameMap_find(_ModuleMembers103->type_map, name, (void**)&((*type_data))) )
     if (NULL != (*type_data)) {
       return OK;
     }
@@ -106,9 +106,9 @@ Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, String* 
     ListNode* node = parent_type->parameters->first;
     while (true) {
       if (!(NULL != node)) break;
-      Bool _Bool103;
-      CHECK(45, String_equal(((String*)(node->item)), name, &(_Bool103)) )
-      if (_Bool103) {
+      Bool _Bool104;
+      CHECK(45, String_equal(((String*)(node->item)), name, &(_Bool104)) )
+      if (_Bool104) {
         (*type_data) = glob->type_generic;
         return OK;
       }
@@ -127,9 +127,9 @@ static char* _func_name_SyntaxTreeNode_find_variable = "SyntaxTreeNode.find-vari
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_find_variable
 Returncode SyntaxTreeNode_find_variable(SyntaxTreeNode* self, String* name, String* module_name, SyntaxTreeVariable** variable) {
   if (NULL != module_name) {
-    ModuleMembers* _ModuleMembers104;
-    CHECK(55, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers104)) )
-    CHECK(55, NameMap_find(_ModuleMembers104->variable_map, name, (void**)&((*variable))) )
+    ModuleMembers* _ModuleMembers105;
+    CHECK(55, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers105)) )
+    CHECK(55, NameMap_find(_ModuleMembers105->variable_map, name, (void**)&((*variable))) )
   }
   else {
     CHECK(58, Global_find_variable(glob, name, &((*variable))) )
@@ -145,9 +145,9 @@ static char* _func_name_SyntaxTreeNode_find_function = "SyntaxTreeNode.find-func
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_find_function
 Returncode SyntaxTreeNode_find_function(SyntaxTreeNode* self, String* name, String* module_name, SyntaxTreeFunction** function) {
   if (NULL != module_name) {
-    ModuleMembers* _ModuleMembers105;
-    CHECK(63, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers105)) )
-    CHECK(63, NameMap_find(_ModuleMembers105->function_map, name, (void**)&((*function))) )
+    ModuleMembers* _ModuleMembers106;
+    CHECK(63, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers106)) )
+    CHECK(63, NameMap_find(_ModuleMembers106->function_map, name, (void**)&((*function))) )
   }
   else {
     CHECK(66, Global_find_function(glob, name, &((*function))) )
@@ -165,13 +165,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(70)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char106;
-    CHECK(72, read_c(&(_Char106)) )
-    CHECK(72, String_append(actual_text, _Char106) )
+    Char _Char107;
+    CHECK(72, read_c(&(_Char107)) )
+    CHECK(72, String_append(actual_text, _Char107) )
   }}
-  Bool _Bool107;
-  CHECK(73, String_equal(actual_text, expected_text, &(_Bool107)) )
-  if (!_Bool107) {
+  Bool _Bool108;
+  CHECK(73, String_equal(actual_text, expected_text, &(_Bool108)) )
+  if (!_Bool108) {
     CHECK(74, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);

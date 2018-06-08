@@ -277,6 +277,7 @@ Returncode integration_M_TestStruct_new(integration_M_TestStruct* self, Ref_Mana
   Returncode LUMI_err = OK;
   integration_M_TestStruct* aux_TestStruct_0 = NULL;
   Ref_Manager* aux_TestStruct_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   if (self == NULL) RAISE(212, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
@@ -306,6 +307,7 @@ LUMI_cleanup:
   integration_M_TestStruct_Del(aux_TestStruct_0);
   LUMI_owner_dec_ref(aux_TestStruct_0_Refman);
   LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -315,6 +317,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestStruct.get"
 Returncode integration_M_TestStruct_get(integration_M_TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(222, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(222, 38, "used member of outdated weak reference")
   *x = self->num;
@@ -325,6 +328,7 @@ Returncode integration_M_TestStruct_get(integration_M_TestStruct* self, Ref_Mana
   LUMI_inc_ref(*s_Refman);
   *s = self->text;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -334,10 +338,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestStruct.print"
 Returncode integration_M_TestStruct_print(integration_M_TestStruct* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(226, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(226, 38, "used member of outdated weak reference")
   CHECK(226, Sys_println(sys, sys_Refman, self->text, self->text_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -354,10 +360,12 @@ void integration_M_TestStruct_Del(integration_M_TestStruct* self) {
 #define LUMI_FUNC_NAME "TestClass.new"
 Returncode integration_M_TestClass_new(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(235, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(235, 38, "used member of outdated weak reference")
   self->num = 1;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -367,10 +375,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestClass.static-meth"
 Returncode integration_M_TestClass_static_meth(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(238, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(238, 38, "used member of outdated weak reference")
   self->num = 3;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -380,10 +390,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestClass.dynamic-meth"
 Returncode integration_M_TestClass_dynamic_meth(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(241, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
   self->num = 6;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -393,10 +405,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestClass.print"
 Returncode integration_M_TestClass_print(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(244, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
   CHECK(244, Sys_println(sys, sys_Refman, self->text, self->text_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -418,6 +432,7 @@ Returncode integration_M_Data_set(integration_M_Data* self, Ref_Manager* self_Re
   Generic_Type_Dynamic* x_Dynamic = NULL;
   integration_M_Data* d = NULL;
   Ref_Manager* d_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(item_Refman);
   LUMI_inc_ref(arr_Refman);
   x = item;
@@ -465,6 +480,7 @@ LUMI_cleanup:
   LUMI_dec_ref(x_Refman);
   LUMI_dec_ref(arr_Refman);
   LUMI_dec_ref(item_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -474,6 +490,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Data.get"
 Returncode integration_M_Data_get(integration_M_Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(378, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(378, 38, "used member of outdated weak reference")
   LUMI_dec_ref(*item_Refman);
@@ -482,6 +499,7 @@ Returncode integration_M_Data_get(integration_M_Data* self, Ref_Manager* self_Re
   *item_Dynamic = self->item_Dynamic;
   *item = self->item;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -514,6 +532,7 @@ void integration_M_TopData_Del(integration_M_TopData* self) {
 #define LUMI_FUNC_NAME "Container.new"
 Returncode integration_M_Container_new(integration_M_Container* self, Ref_Manager* self_Refman, Generic_Type* value, Ref_Manager* value_Refman, Generic_Type_Dynamic* value_Dynamic, integration_M_Container* next, Ref_Manager* next_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(value_Refman);
   LUMI_inc_ref(next_Refman);
   if (self == NULL) RAISE(453, 27, "used member of empty object")
@@ -532,6 +551,7 @@ Returncode integration_M_Container_new(integration_M_Container* self, Ref_Manage
 LUMI_cleanup:
   LUMI_dec_ref(next_Refman);
   LUMI_dec_ref(value_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -543,6 +563,7 @@ Returncode integration_M_Container_iter(integration_M_Container* self, Ref_Manag
   Returncode LUMI_err = OK;
   integration_M_ContainerIterator* aux_ContainerIterator_0 = NULL;
   Ref_Manager* aux_ContainerIterator_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(457, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(457, 38, "used member of outdated weak reference")
   aux_ContainerIterator_0 = LUMI_alloc(sizeof(integration_M_ContainerIterator));
@@ -559,6 +580,7 @@ Returncode integration_M_Container_iter(integration_M_Container* self, Ref_Manag
 LUMI_cleanup:
   integration_M_ContainerIterator_Del(aux_ContainerIterator_0);
   LUMI_owner_dec_ref(aux_ContainerIterator_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -574,6 +596,7 @@ void integration_M_Container_Del(integration_M_Container* self) {
 #define LUMI_FUNC_NAME "ContainerIterator.new"
 Returncode integration_M_ContainerIterator_new(integration_M_ContainerIterator* self, Ref_Manager* self_Refman, integration_M_Container* first, Ref_Manager* first_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(first_Refman);
   if (self == NULL) RAISE(463, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(463, 38, "used member of outdated weak reference")
@@ -583,6 +606,7 @@ Returncode integration_M_ContainerIterator_new(integration_M_ContainerIterator* 
   self->curr = first;
 LUMI_cleanup:
   LUMI_dec_ref(first_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -592,10 +616,12 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "ContainerIterator.has"
 Returncode integration_M_ContainerIterator_has(integration_M_ContainerIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(466, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(466, 38, "used member of outdated weak reference")
   *has_data = self->curr != NULL && self->curr_Refman->value != NULL;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -605,6 +631,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "ContainerIterator.get"
 Returncode integration_M_ContainerIterator_get(integration_M_ContainerIterator* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(469, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(469, 38, "used member of outdated weak reference")
   if (self->curr == NULL) RAISE(469, 27, "used member of empty object")
@@ -615,6 +642,7 @@ Returncode integration_M_ContainerIterator_get(integration_M_ContainerIterator* 
   *item_Dynamic = self->curr->value_Dynamic;
   *item = self->curr->value;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -624,6 +652,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "ContainerIterator.next"
 Returncode integration_M_ContainerIterator_next(integration_M_ContainerIterator* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(472, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(472, 38, "used member of outdated weak reference")
   if (self->curr == NULL) RAISE(472, 27, "used member of empty object")
@@ -635,6 +664,7 @@ Returncode integration_M_ContainerIterator_next(integration_M_ContainerIterator*
   LUMI_inc_ref(self->curr_Refman);
   self->curr = self->curr->next;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -652,6 +682,7 @@ Returncode integration_M_ComplexField_meth(integration_M_ComplexField* self, Ref
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(532, 38, "insufficient memory for managed object")
@@ -661,6 +692,7 @@ Returncode integration_M_ComplexField_meth(integration_M_ComplexField* self, Ref
   CHECK(532, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -681,6 +713,7 @@ Returncode integration_M_HasComplexField_run(integration_M_HasComplexField* self
   integration_M_ComplexField* x2 = NULL;
   Ref_Manager* x2_Refman = NULL;
   integration_M_ComplexField_Dynamic* x2_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   if (self == NULL) RAISE(537, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(537, 38, "used member of outdated weak reference")
   x = &(self->x);
@@ -727,6 +760,7 @@ Returncode integration_M_HasComplexField_run(integration_M_HasComplexField* self
 LUMI_cleanup:
   LUMI_dec_ref(x2_Refman);
   LUMI_dec_ref(x_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME

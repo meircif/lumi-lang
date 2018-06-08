@@ -579,6 +579,7 @@ Returncode integration_M_TestStruct_new(integration_M_TestStruct* self, Ref_Mana
   Returncode LUMI_err = OK;
   integration_M_TestStruct* aux_TestStruct_0 = NULL;
   Ref_Manager* aux_TestStruct_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[0].line_count[212];
   if (self == NULL) RAISE(212, 27, "used member of empty object")
@@ -612,6 +613,7 @@ LUMI_cleanup:
   integration_M_TestStruct_Del(aux_TestStruct_0);
   LUMI_owner_dec_ref(aux_TestStruct_0_Refman);
   LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -621,6 +623,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestStruct.get"
 Returncode integration_M_TestStruct_get(integration_M_TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[222];
   if (self == NULL) RAISE(222, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(222, 38, "used member of outdated weak reference")
@@ -633,6 +636,7 @@ Returncode integration_M_TestStruct_get(integration_M_TestStruct* self, Ref_Mana
   LUMI_inc_ref(*s_Refman);
   *s = self->text;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -642,11 +646,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestStruct.print"
 Returncode integration_M_TestStruct_print(integration_M_TestStruct* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[226];
   if (self == NULL) RAISE(226, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(226, 38, "used member of outdated weak reference")
   CHECK(226, Sys_println_Mock(sys, sys_Refman, self->text, self->text_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -663,11 +669,13 @@ void integration_M_TestStruct_Del(integration_M_TestStruct* self) {
 #define LUMI_FUNC_NAME "TestClass.new"
 Returncode integration_M_TestClass_new(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[235];
   if (self == NULL) RAISE(235, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(235, 38, "used member of outdated weak reference")
   self->num = 1;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -677,11 +685,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestClass.static-meth"
 Returncode integration_M_TestClass_static_meth(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[238];
   if (self == NULL) RAISE(238, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(238, 38, "used member of outdated weak reference")
   self->num = 3;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -691,11 +701,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestClass.dynamic-meth"
 Returncode integration_M_TestClass_dynamic_meth(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[241];
   if (self == NULL) RAISE(241, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
   self->num = 6;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -705,11 +717,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "TestClass.print"
 Returncode integration_M_TestClass_print(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[244];
   if (self == NULL) RAISE(244, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
   CHECK(244, Sys_println_Mock(sys, sys_Refman, self->text, self->text_Refman) )
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -731,6 +745,7 @@ Returncode integration_M_Data_set(integration_M_Data* self, Ref_Manager* self_Re
   Generic_Type_Dynamic* x_Dynamic = NULL;
   integration_M_Data* d = NULL;
   Ref_Manager* d_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(item_Refman);
   LUMI_inc_ref(arr_Refman);
   ++LUMI_file_coverage[0].line_count[370];
@@ -784,6 +799,7 @@ LUMI_cleanup:
   LUMI_dec_ref(x_Refman);
   LUMI_dec_ref(arr_Refman);
   LUMI_dec_ref(item_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -793,6 +809,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Data.get"
 Returncode integration_M_Data_get(integration_M_Data* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[378];
   if (self == NULL) RAISE(378, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(378, 38, "used member of outdated weak reference")
@@ -802,6 +819,7 @@ Returncode integration_M_Data_get(integration_M_Data* self, Ref_Manager* self_Re
   *item_Dynamic = self->item_Dynamic;
   *item = self->item;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -834,6 +852,7 @@ void integration_M_TopData_Del(integration_M_TopData* self) {
 #define LUMI_FUNC_NAME "Container.new"
 Returncode integration_M_Container_new(integration_M_Container* self, Ref_Manager* self_Refman, Generic_Type* value, Ref_Manager* value_Refman, Generic_Type_Dynamic* value_Dynamic, integration_M_Container* next, Ref_Manager* next_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(value_Refman);
   LUMI_inc_ref(next_Refman);
   ++LUMI_file_coverage[0].line_count[453];
@@ -854,6 +873,7 @@ Returncode integration_M_Container_new(integration_M_Container* self, Ref_Manage
 LUMI_cleanup:
   LUMI_dec_ref(next_Refman);
   LUMI_dec_ref(value_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -865,6 +885,7 @@ Returncode integration_M_Container_iter(integration_M_Container* self, Ref_Manag
   Returncode LUMI_err = OK;
   integration_M_ContainerIterator* aux_ContainerIterator_0 = NULL;
   Ref_Manager* aux_ContainerIterator_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[457];
   if (self == NULL) RAISE(457, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(457, 38, "used member of outdated weak reference")
@@ -882,6 +903,7 @@ Returncode integration_M_Container_iter(integration_M_Container* self, Ref_Manag
 LUMI_cleanup:
   integration_M_ContainerIterator_Del(aux_ContainerIterator_0);
   LUMI_owner_dec_ref(aux_ContainerIterator_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -897,6 +919,7 @@ void integration_M_Container_Del(integration_M_Container* self) {
 #define LUMI_FUNC_NAME "ContainerIterator.new"
 Returncode integration_M_ContainerIterator_new(integration_M_ContainerIterator* self, Ref_Manager* self_Refman, integration_M_Container* first, Ref_Manager* first_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(first_Refman);
   ++LUMI_file_coverage[0].line_count[463];
   if (self == NULL) RAISE(463, 27, "used member of empty object")
@@ -907,6 +930,7 @@ Returncode integration_M_ContainerIterator_new(integration_M_ContainerIterator* 
   self->curr = first;
 LUMI_cleanup:
   LUMI_dec_ref(first_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -916,11 +940,13 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "ContainerIterator.has"
 Returncode integration_M_ContainerIterator_has(integration_M_ContainerIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[466];
   if (self == NULL) RAISE(466, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(466, 38, "used member of outdated weak reference")
   *has_data = self->curr != NULL && self->curr_Refman->value != NULL;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -930,6 +956,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "ContainerIterator.get"
 Returncode integration_M_ContainerIterator_get(integration_M_ContainerIterator* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[469];
   if (self == NULL) RAISE(469, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(469, 38, "used member of outdated weak reference")
@@ -941,6 +968,7 @@ Returncode integration_M_ContainerIterator_get(integration_M_ContainerIterator* 
   *item_Dynamic = self->curr->value_Dynamic;
   *item = self->curr->value;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -950,6 +978,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "ContainerIterator.next"
 Returncode integration_M_ContainerIterator_next(integration_M_ContainerIterator* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[472];
   if (self == NULL) RAISE(472, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(472, 38, "used member of outdated weak reference")
@@ -962,6 +991,7 @@ Returncode integration_M_ContainerIterator_next(integration_M_ContainerIterator*
   LUMI_inc_ref(self->curr_Refman);
   self->curr = self->curr->next;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -979,6 +1009,7 @@ Returncode integration_M_ComplexField_meth(integration_M_ComplexField* self, Ref
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[532];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -989,6 +1020,7 @@ Returncode integration_M_ComplexField_meth(integration_M_ComplexField* self, Ref
   CHECK(532, Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1009,6 +1041,7 @@ Returncode integration_M_HasComplexField_run(integration_M_HasComplexField* self
   integration_M_ComplexField* x2 = NULL;
   Ref_Manager* x2_Refman = NULL;
   integration_M_ComplexField_Dynamic* x2_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[537];
   if (self == NULL) RAISE(537, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(537, 38, "used member of outdated weak reference")
@@ -1065,6 +1098,7 @@ Returncode integration_M_HasComplexField_run(integration_M_HasComplexField* self
 LUMI_cleanup:
   LUMI_dec_ref(x2_Refman);
   LUMI_dec_ref(x_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1079,11 +1113,13 @@ void integration_M_HasComplexField_Del(integration_M_HasComplexField* self) {
 #define LUMI_FUNC_NAME "BaseType.new"
 Returncode integration_M_BaseType_new(integration_M_BaseType* self, Ref_Manager* self_Refman, integration_M_BaseType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[50];
   if (self == NULL) RAISE(50, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(50, 38, "used member of outdated weak reference")
   self->num_base = 1;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1096,6 +1132,7 @@ Returncode integration_M_BaseType_meth0(integration_M_BaseType* self, Ref_Manage
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[53];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -1106,6 +1143,7 @@ Returncode integration_M_BaseType_meth0(integration_M_BaseType* self, Ref_Manage
   CHECK(53, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1118,6 +1156,7 @@ Returncode integration_M_BaseType_meth1(integration_M_BaseType* self, Ref_Manage
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[1].line_count[56];
   aux_String_0 = &aux_String_0_Var;
@@ -1130,6 +1169,7 @@ Returncode integration_M_BaseType_meth1(integration_M_BaseType* self, Ref_Manage
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1142,6 +1182,7 @@ Returncode integration_M_BaseType_meth2(integration_M_BaseType* self, Ref_Manage
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[59];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -1152,6 +1193,7 @@ Returncode integration_M_BaseType_meth2(integration_M_BaseType* self, Ref_Manage
   CHECK(59, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1164,6 +1206,7 @@ Returncode integration_M_BaseType_meth3(integration_M_BaseType* self, Ref_Manage
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[1].line_count[62];
   aux_String_0 = &aux_String_0_Var;
@@ -1176,6 +1219,7 @@ Returncode integration_M_BaseType_meth3(integration_M_BaseType* self, Ref_Manage
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1191,11 +1235,13 @@ void integration_M_BaseType_Del(integration_M_BaseType* self) {
 #define LUMI_FUNC_NAME "MiddleType.new"
 Returncode covered_M_MiddleType_new(covered_M_MiddleType* self, Ref_Manager* self_Refman, covered_M_MiddleType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   CHECK(14, integration_M_BaseType_new(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   if (self == NULL) RAISE(15, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
   self->num_mid = 2;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1208,6 +1254,7 @@ Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* s
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -1220,6 +1267,7 @@ Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* s
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1232,6 +1280,7 @@ Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* s
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
@@ -1242,6 +1291,7 @@ Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* s
   CHECK(23, integration_M_BaseType_meth2(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1254,6 +1304,7 @@ Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* s
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(26, 38, "insufficient memory for managed object")
@@ -1263,6 +1314,7 @@ Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* s
   CHECK(26, Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1275,6 +1327,7 @@ Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* s
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -1286,6 +1339,7 @@ Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* s
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1302,6 +1356,7 @@ void covered_M_MiddleType_Del(covered_M_MiddleType* self) {
 #define LUMI_FUNC_NAME "TopType.new"
 Returncode integration_M_TopType_new(integration_M_TopType* self, Ref_Manager* self_Refman, integration_M_TopType_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[14];
   CHECK(14, covered_M_MiddleType_new(&(self->_base), self_Refman, &(self_Dynamic->_base)) )
   ++LUMI_file_coverage[1].line_count[15];
@@ -1309,6 +1364,7 @@ Returncode integration_M_TopType_new(integration_M_TopType* self, Ref_Manager* s
   if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
   self->num_top = 3;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1321,6 +1377,7 @@ Returncode integration_M_TopType_meth2(integration_M_TopType* self, Ref_Manager*
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[19];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -1337,6 +1394,7 @@ Returncode integration_M_TopType_meth2(integration_M_TopType* self, Ref_Manager*
   CHECK(22, integration_M_BaseType_meth2(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base)) )
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1349,6 +1407,7 @@ Returncode integration_M_TopType_meth3(integration_M_TopType* self, Ref_Manager*
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[1].line_count[25];
   aux_String_0 = &aux_String_0_Var;
@@ -1363,6 +1422,7 @@ Returncode integration_M_TopType_meth3(integration_M_TopType* self, Ref_Manager*
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1375,6 +1435,7 @@ Returncode integration_M_TopType_meth5(integration_M_TopType* self, Ref_Manager*
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[1].line_count[29];
   aux_String_0 = &aux_String_0_Var;
@@ -1393,6 +1454,7 @@ Returncode integration_M_TopType_meth5(integration_M_TopType* self, Ref_Manager*
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1411,6 +1473,7 @@ Returncode integration_M_TopType_meth6(integration_M_TopType* self, Ref_Manager*
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[35];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -1460,6 +1523,7 @@ LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(bt_Refman);
   LUMI_dec_ref(mt_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1483,7 +1547,9 @@ void integration_M_Link_Del(integration_M_Link* self) {
 #define LUMI_FUNC_NAME "BaseLink.m-meth"
 Returncode integration_M_BaseLink_m_meth(integration_M_BaseLink* self, Ref_Manager* self_Refman, integration_M_BaseLink_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -1509,6 +1575,7 @@ void integration_M_TopLink_Del(integration_M_TopLink* self) {
 #define LUMI_FUNC_NAME "RefNode.new"
 Returncode integration_M_RefNode_new(integration_M_RefNode* self, Ref_Manager* self_Refman, Ref ref, integration_M_RefNode* next, Ref_Manager* next_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[173];
   if (self == NULL) RAISE(173, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
@@ -1525,6 +1592,7 @@ Returncode integration_M_RefNode_new(integration_M_RefNode* self, Ref_Manager* s
 LUMI_cleanup:
   integration_M_RefNode_Del(next);
   LUMI_owner_dec_ref(next_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4047,6 +4115,7 @@ Returncode integration_M_TestStruct_get_Mock(integration_M_TestStruct* self, Ref
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
   if (!integration_M_TestStruct_get_Mock_active) return integration_M_TestStruct_get(self, self_Refman, x, s, s_Refman);
   ++LUMI_file_coverage[1].line_count[71];
   *x = 12;
@@ -4063,6 +4132,7 @@ Returncode integration_M_TestStruct_get_Mock(integration_M_TestStruct* self, Ref
   *s = aux_String_0;
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -4087,12 +4157,14 @@ Bool integration_M_TestClass_dynamic_meth_Mock_active = true;
 #define LUMI_FUNC_NAME "TestClass.dynamic-meth Mock"
 Returncode integration_M_TestClass_dynamic_meth_Mock(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   if (!integration_M_TestClass_dynamic_meth_Mock_active) return integration_M_TestClass_dynamic_meth(self, self_Refman, self_Dynamic);
   ++LUMI_file_coverage[1].line_count[78];
   if (self == NULL) RAISE(78, 27, "used member of empty object")
   if (self_Refman->value == NULL) RAISE(78, 38, "used member of outdated weak reference")
   self->num = 7;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -5658,12 +5730,14 @@ Bool Sys_println_Mock_active = true;
 #define LUMI_FUNC_NAME "Sys.println Mock"
 Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
   Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
   if (!Sys_println_Mock_active) return Sys_println(self, self_Refman, text, text_Refman);
   ++LUMI_file_coverage[1].line_count[373];
   TEST_ASSERT(373, text != NULL && text_Refman->value != NULL)
 LUMI_cleanup:
   LUMI_dec_ref(text_Refman);
+  LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
