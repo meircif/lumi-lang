@@ -40,14 +40,15 @@ class SyntaxTreeNode
     if glob.find-type(user name)->(user type-data)?
       return
     user TypeData parent-type
-    if self.get-parent-type()->(user parent-type)? and parent-type.parameters?
-      user ListNode{String} node(user parent-type.parameters.first)
-      do
-        while node?
-        if node.item.equal(user name)
-          type-data := glob.type-generic
-          return
-        node := node.next
+    if self.get-parent-type()->(user parent-type)?
+      if parent-type.parameters?
+        user ListNode{String} node(user parent-type.parameters.first)
+        do
+          while node?
+          if node.item.equal(user name)
+            type-data := glob.type-generic
+            return
+          node := node.next
     self.print-syntax-error(user "unknown type", user name)
     raise
   
@@ -100,11 +101,6 @@ class SyntaxTreeNode
     write(user ", \"")
     write(user error-message)
     write(user "\")\n")
-  
-  func dynamic write-call()
-    write(user "CHECK(")
-    self.write-line-num()
-    write(user ", ")
   
   ~~~ Print a syntax error with message: ~~~
   ~~~ `Code error in {file-name}[{line-number}] {text} "{item}"` ~~~

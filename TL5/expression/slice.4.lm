@@ -48,8 +48,9 @@ class SliceExpression(Expression)
       self.syntax-error(
           user "cannot slice type",
           user self.sequence.result-type.type-data.name)
-    self.assignable := self.sequence.assignable and
-        not self.second-index? and self.result-type.type-data.is-primitive
+    if not self.second-index?
+      self.assignable := self.sequence.assignable and
+          self.result-type.type-data.is-primitive
     
     self.index.analyze()
     self.check-index(user self.index)

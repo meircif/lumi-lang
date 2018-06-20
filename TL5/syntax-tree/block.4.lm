@@ -22,6 +22,15 @@ class SyntaxTreeCode(SyntaxTreeNode)
   func inst write-spaces()
     self.parent.write-spaces()
   
+  func inst write-call(user FunctionArguments arguments)
+    arguments.write-call()
+    write(user ";\n")
+    arguments.write-postactions()
+    self.write-spaces()
+    write(user "CHECK(")
+    self.write-line-num()
+    write(user ")\n")
+  
   ~~~ Read and check indentation spaces for a line break from the input file ~~~
   func inst read-line-break-spaces()
     var Int expected-spaces(copy self.parent.indentation-spaces + 4)

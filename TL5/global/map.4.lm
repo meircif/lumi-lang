@@ -4,17 +4,17 @@ module tl5-compiler
 ~~~ Maps from a string name to a generic object ~~~
 struct NameMap{Generic}
   owner NameMapNode{Generic} first
-  owner NameMapNode{Generic} last
+  user NameMapNode{Generic} last
   
   ~~~ Add `name` -> `value` mapping ~~~
   func add(user String name, user Generic value)
-    new NameMapNode{Generic} node
-    node.init(user name, user value)
+    new NameMapNode{Generic} node(user name, user value)
     if self.last?
       self.last.next := node
+      self.last := self.last.next
     else
       self.first := node
-    self.last := node
+      self.last := self.first
   
   ~~~ Find a value mapped from `name`, return empty if not exists ~~~
   func find(user String name)->(user Generic value)
@@ -43,6 +43,6 @@ struct NameMapNode{Generic}
   user String name
   user Generic value
   
-  func init(user String name, user Generic value)
+  func new(user String name, user Generic value)
     self.name := name
     self.value := value

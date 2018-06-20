@@ -65,8 +65,9 @@ class Expression(SyntaxTreeNode)
           code-node.syntax-error(user "unknown operator", user text)
     user BinaryExpression binary-left-expression
     do
-      while operator? and
-          (not curr-operator? or operator.order < curr-operator.order)
+      while operator?
+      if curr-operator?
+        while operator.order < curr-operator.order
       owner BinaryExpression new-binary-expression
       BinaryExpression.parse-new(
           user _,
@@ -207,7 +208,6 @@ class Expression(SyntaxTreeNode)
     write(user "_Var;\n")
   
   func inst write-assign-null()
-    self.code-node.write-spaces()
     self.write()
     write(user " = NULL;\n")
     self.code-node.write-spaces()

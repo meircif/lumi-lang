@@ -16,6 +16,7 @@ class SymbolExpression(Expression)
     new-symbol.variable := self.variable
     new-symbol.function := self.function
     new-symbol.is-annotate := self.is-annotate
+    self.result-type.copy-new()->(owner new-symbol.result-type)
   
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
@@ -63,13 +64,20 @@ class SymbolExpression(Expression)
     instance-type := _
   
   func dynamic analyze-mock(copy Bool is-annotate)->(var Bool is-mock)
-    is-mock := self.function? and self.function.mocker-function?
-    if is-mock
-      self.is-annotate := is-annotate
+    is-mock := false
+    if self.function?
+      is-mock := self.function.mocker-function?
+      if is-mock
+        self.is-annotate := is-annotate
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     if self.variable?
       self.variable.order-constants(user ordered-list)
+  
+  func inst is-variable-output()->(var Bool is-output)
+    is-output := false
+    if self.variable?
+      is-output := self.variable.is-output
   
   func dynamic write()
     if self.function?
@@ -78,7 +86,7 @@ class SymbolExpression(Expression)
       else
         self.function.write-cname()
       return
-    if self.variable? and self.variable.is-output
+    if self.is-variable-output()
       if not self.top
         write(user "(")
       write(user "*")
@@ -86,11 +94,11 @@ class SymbolExpression(Expression)
       self.variable.write-cname()
     else
       write-cname(user self.name)
-    if self.variable? and self.variable.is-output and not self.top
+    if self.is-variable-output() and not self.top
       write(user ")")
   
   func dynamic write-dynamic()
-    if self.variable? and self.variable.is-output and not self.top
+    if self.is-variable-output() and not self.top
       write(user "(*")
       write-cname(user self.name)
       write(user "_Dynamic)")
@@ -98,7 +106,7 @@ class SymbolExpression(Expression)
       base.write-dynamic()
   
   func dynamic write-refman()
-    if self.variable? and self.variable.is-output and not self.top
+    if self.is-variable-output() and not self.top
       write(user "(*")
       write-cname(user self.name)
       write(user "_Refman)")
@@ -132,7 +140,10 @@ class MemberExpression(SymbolExpression)
     self.instance.analyze()
     self.assignable := self.instance.assignable
     user TypeInstance instance-type(user self.instance.result-type)
-    if not instance-type? or not instance-type.type-data?
+    var Bool typed-expression
+    if instance-type?
+      typed-expression := instance-type.type-data?
+    if not typed-expression
       self.syntax-error(user "void expression has no member", user self.name)
     if instance-type.type-data is glob.type-type
       instance-type := instance-type.parameters.first.item
@@ -216,7 +227,7 @@ class MemberExpression(SymbolExpression)
       self-param.value := self.instance
       self-param.value.top := true
       arguments.parameters.prepend(owner self-param)
-    self.instance := _
+    ; self.instance := _
   
   func dynamic analyze-mock(copy Bool is-annotate)->(var Bool is-mock)
     if base.analyze-mock(copy is-annotate)->(var is-mock)
@@ -232,11 +243,14 @@ class MemberExpression(SymbolExpression)
       return
     if self.instance?
       self.instance.write-preactions()
-    if not (self.dynamic-call-self-instance? or
-        (self.instance? and not self.function? and
-        self.instance.result-type.type-data is-not glob.type-type)) or
-        (self.instance? and self.instance.is-complex-field) or
-        self.is-mock-field
+      if self.instance.is-complex-field
+        return
+      if not self.dynamic-call-self-instance? and (self.function? or
+          self.instance.result-type.type-data is glob.type-type)
+        return
+    else-if not self.dynamic-call-self-instance?
+      return
+    if self.is-mock-field
       return
     ; if (...) RAISE(`line-num`, ...)
     write(user "if (")
@@ -282,17 +296,18 @@ class MemberExpression(SymbolExpression)
       write(user "((")
       self.result-type.type-data.write-cname()
       write(user "*)(")
-    if self.instance? and not self.function? and
-        self.instance.result-type.type-data is-not glob.type-type and
-        not self.module-name?
-      if self.is-complex-field and self.top
-        write(user "&(")
-      self.instance.write()
-      self.write-bases()
+    if self.instance?
+      if not self.function? and not self.module-name? and
+          self.instance.result-type.type-data is-not glob.type-type
+        if self.is-complex-field and self.top
+          write(user "&(")
+        self.instance.write()
+        self.write-bases()
     base.write()
-    if self.instance? and not self.function? and self.is-complex-field and
-        self.instance.result-type.type-data is-not glob.type-type and self.top
-      write(user ")")
+    if self.instance?
+      if not self.function? and self.is-complex-field and self.top and
+          self.instance.result-type.type-data is-not glob.type-type
+        write(user ")")
     if self.is-generic-cast and not self.top
       write(user "))")
   
@@ -324,7 +339,10 @@ class MemberExpression(SymbolExpression)
       write(user "))")
   
   func inst write-bases()
-    if self.instance? and self.instance.is-complex-field
+    var Bool instance-is-complex-field
+    if self.instance?
+      instance-is-complex-field := self.instance.is-complex-field
+    if instance-is-complex-field
       write(user ".")
     else
       write(user "->")

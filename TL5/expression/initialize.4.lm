@@ -46,9 +46,9 @@ class InitExpression(ModuleTypeExpression)
     if not self.result-type.type-data.is-primitive and
         self.symbol.variable.is-create
       self.result-type.check-sequence(user self)
-      if self.result-type.type-data is glob.type-array and
-          self.result-type.parameters.first.item.type-data is glob.type-generic
-        self.syntax-error-msg(user "cannot create generic array")
+      if self.result-type.type-data is glob.type-array
+        if self.result-type.parameters.first.item.type-data is glob.type-generic
+          self.syntax-error-msg(user "cannot create generic array")
       self.result-type.type-data.find-meth(user "new")->(user self.constructor)
       if not self.arguments.parameters.first? and
           not self.arguments.outputs.first? and (not self.constructor? or
@@ -60,7 +60,7 @@ class InitExpression(ModuleTypeExpression)
         self-param.access :=
             self.constructor.arguments.parameters.first.item.access
         self-param.code-node := self.code-node
-        self-param.value := self.symbol
+        self.symbol.copy-new()->(owner self-param.value)
         self.arguments.parameters.prepend(owner self-param)
         self.arguments.check-same-as(
             user self.constructor.arguments, user self.result-type, copy 0)
@@ -86,16 +86,15 @@ class InitExpression(ModuleTypeExpression)
             user glob.access-names[self.access],
             user "invalid access",
             user glob.access-names[param.access])
-        
   
   func inst write-allocation()
     self.arguments.write-preactions()
     if self.result-type.type-data is glob.type-array or
         self.result-type.type-data is glob.type-string
       self.result-type.length.write-preactions()
-    if self.result-type.type-data is glob.type-array and
-        self.result-type.parameters.first.item.type-data is glob.type-string
-      self.result-type.parameters.first.item.length.write-preactions()
+    if self.result-type.type-data is glob.type-array
+      if self.result-type.parameters.first.item.type-data is glob.type-string
+        self.result-type.parameters.first.item.length.write-preactions()
     
     if self.symbol.variable.access = Access.VAR
       self.write-var-init()
@@ -106,11 +105,9 @@ class InitExpression(ModuleTypeExpression)
     
     if self.constructor?
       self.code-node.write-spaces()
-      self.write-call()
+      write(user "LUMI_err = ")
       self.constructor.write-cname()
-      self.arguments.write-call()
-      write(user " )\n")
-      self.arguments.write-postactions()
+      self.code-node.write-call(user self.arguments)
   
   func inst write-var-init()
     self.write-init-var-ref(user self.symbol)
@@ -123,20 +120,20 @@ class InitExpression(ModuleTypeExpression)
       write(user "_Var.values = ")
       self.symbol.write()
       write(user "_Values;\n")
-      if self.result-type.type-data is glob.type-array and
-          self.result-type.parameters.first.item.type-data is glob.type-string
-        ; LUMI_set_var_string_array(
-        ;    `array-length`, `string-length`, `name`, `name`_Chars);
-        self.code-node.write-spaces()
-        write(user "LUMI_set_var_string_array(")
-        self.result-type.length.write()
-        write(user ", ")
-        self.result-type.parameters.first.item.length.write()
-        write(user ", ")
-        self.symbol.write()
-        write(user ", ")
-        self.symbol.write()
-        write(user "_Chars);\n")
+      if self.result-type.type-data is glob.type-array
+        if self.result-type.parameters.first.item.type-data is glob.type-string
+          ; LUMI_set_var_string_array(
+          ;    `array-length`, `string-length`, `name`, `name`_Chars);
+          self.code-node.write-spaces()
+          write(user "LUMI_set_var_string_array(")
+          self.result-type.length.write()
+          write(user ", ")
+          self.result-type.parameters.first.item.length.write()
+          write(user ", ")
+          self.symbol.write()
+          write(user ", ")
+          self.symbol.write()
+          write(user "_Chars);\n")
   
   func inst write-new-init()
     ; `symbol` = ...

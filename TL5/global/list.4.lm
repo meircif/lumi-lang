@@ -6,43 +6,42 @@ struct List{Generic}
   owner ListNode{Generic} first
   user ListNode{Generic} last
   
-  func is-empty()->(var Bool is-empty)
-    is-empty := not self.first?
+  func is-empty()->(var Bool empty)
+    empty := self.first is _
   
+  ~~~ Add item to list end ~~~
   func add(owner Generic item)
-    new ListNode{Generic} node
-    node.item := item
+    new ListNode{Generic} node(owner item, owner _, user self.last)
     if self.last?
       self.last.next := node
-      node.prev := self.last
+      self.last := self.last.next
     else
       self.first := node
-    self.last := node
+      self.last := self.first
   
+  ~~~ Add item to list start ~~~
   func prepend(owner Generic item)
-    new ListNode{Generic} node
-    node.item := item
-    if self.first?
-      node.next := self.first
-      self.first.prev := node
+    new ListNode{Generic} node(owner item, owner self.first, user _)
     self.first := node
-    if not self.last?
-      self.last := node
+    if self.last is _
+      self.last := self.first
+    if self.first.next?
+      self.first.next.prev := self.first
   
+  ~~~ Get and remove first item, fail if list is empty ~~~
   func pop()->(owner Generic item)
-    if self.first?
-      item := self.first.item
-      owner ListNode{Generic} first(owner self.first)
-      self.first := first.next
-      if self.first?
-        self.first.prev := _
-      else
-        self.last := _
-    else
+    if not self.first?
       item := _
+      return
+    item := self.first.item
+    owner ListNode{Generic} first(owner self.first)
+    self.first := first.next
+    if self.first?
+      self.first.prev := _
+    else
+      self.last := _
   
   func remove(user Generic ref)->(owner Generic item)
-    user ListNode{Generic} prev
     user ListNode{Generic} node(user self.first)
     do
       while node?
@@ -50,11 +49,11 @@ struct List{Generic}
         item := node.item
         owner ListNode{Generic} next(owner node.next)
         if next?
-          next.prev := prev
+          next.prev := node.prev
         else
-          self.last := prev
-        if prev?
-          prev.next := next
+          self.last := node.prev
+        if node.prev?
+          node.prev.next := next
         else
           self.first := next
         return
@@ -62,7 +61,16 @@ struct List{Generic}
     item := _
 
 
+~~~ Single node in the list ~~~
 struct ListNode{Generic}
   owner ListNode{Generic} next
   user ListNode{Generic} prev
   owner Generic item
+  
+  func new(
+      owner Generic item,
+      owner ListNode{Generic} next,
+      user ListNode{Generic} prev)
+    self.next := next
+    self.prev := prev
+    self.item := item

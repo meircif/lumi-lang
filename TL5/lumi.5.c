@@ -1,11 +1,11 @@
 #include "lumi.5.h"
 
 /*traceback*/
-#define LUMI_FILE_NAME __FILE__
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value
-#define CRAISE USER_RAISE(__LINE__, NULL, NULL)
-#define CCHECK(err) CHECK(__LINE__, err)
+#define CRAISE { \
+  LUMI_trace_print( \
+      LUMI_raise_format, __FILE__, __LINE__, LUMI_FUNC_NAME, NULL, NULL); \
+  return ERR; }
+#define CCHECK(err) if (err != OK) CRAISE
 #define CHECK_NOT_NULL(ref) \
   if (ref == NULL || ref##_Refman->value == NULL) CRAISE
 
@@ -213,7 +213,7 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {
     return true;
   }
 
-  printf("%d%% - failed, not covered:\n", coverage);
+  printf("%d%% - failed, lines not covered:\n", coverage);
   for (n = 0; n < files_number; ++n) {
     coverage = calc_coverage(files_coverage + n, 1);
     if (coverage < 100) {

@@ -7,7 +7,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
   user SyntaxTreeVariable item
   owner Expression start
   owner Expression iterator
-  user SymbolExpression aux-symbol
+  owner SymbolExpression aux-symbol
   user SyntaxTreeFunction has-func
   user SyntaxTreeFunction get-func
   user SyntaxTreeFunction next-func
@@ -303,6 +303,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     call.line-number := self.line-number
     call.top := true
     call.is-statement := true
+    call.code-node := self
     call.arguments := FunctionArguments()
     call.arguments.init()
     call.arguments.parameters.add(owner self-arg)

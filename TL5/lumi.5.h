@@ -71,12 +71,13 @@ void LUMI_trace_print(
   String* message,
   Ref_Manager* message_refman);
 
-#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup
+#define RETURN_ERROR goto LUMI_cleanup
 
 #define START_TRACE(line, value, format, message, message_refman) \
   LUMI_trace_print( \
       format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, message, message_refman); \
-  RETURN_ERROR(value);
+  LUMI_err = value; \
+  RETURN_ERROR;
 
 #define START_TRACE_STATIC(line, err_value, format, message_length, message) { \
   String LUMI_msg = { message_length + 1, message_length, message }; \
@@ -99,10 +100,10 @@ void LUMI_trace_print(
 #define TEST_FAIL_NULL(line) \
   { START_TRACE(line, FAIL, LUMI_assert_format, NULL, NULL) }
 
-#define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
+#define CHECK(line) if (LUMI_err != OK) { \
   LUMI_trace_print( \
       LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, NULL, NULL); \
-  RETURN_ERROR(_err); } }
+  RETURN_ERROR; }
 
 #define IGNORE_ERRORS(call) \
   ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;

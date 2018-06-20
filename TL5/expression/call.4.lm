@@ -67,6 +67,7 @@ class CallExpression(Expression)
     self.assignable := self.result-type?
   
   func dynamic write-preactions()
+    self.arguments.write-preactions()
     self.function.write-preactions()
     if self.is-function-object
       write(user "if (")
@@ -74,7 +75,6 @@ class CallExpression(Expression)
       write(user " == NULL) ")
       self.write-raise(user "empty function called")
       self.code-node.write-spaces()
-    self.arguments.write-preactions()
     if not self.is-statement
       self.write-func-call()
       self.code-node.write-spaces()
@@ -100,11 +100,9 @@ class CallExpression(Expression)
       self.output.top := true
   
   func inst write-func-call()
-    self.write-call()
+    write(user "LUMI_err = ")
     self.function.write()
-    self.arguments.write-call()
-    write(user " )\n")
-    self.arguments.write-postactions()
+    self.code-node.write-call(user self.arguments)
 
 
 ~~~ Function argument call ~~~
@@ -215,6 +213,7 @@ class CallArgument(Argument)
   func dynamic write-postactions()
     if self.access = Access.OWNER and not self.is-output and
         self.value.result-type.type-data is-not glob.type-empty
+      self.code-node.write-spaces()
       self.assignee.write-assign-null()
 
 

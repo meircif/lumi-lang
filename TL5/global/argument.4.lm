@@ -146,10 +146,10 @@ class FunctionArguments(SyntaxTreeNode)
           self.syntax-error-c(
               user "expected space after access, got", copy end)
         argument-factory.new-argument()->(owner argument)
-        arguments.add(owner argument)
         argument.parse(
             user access-str, copy is-output, copy is-native, user code-node)->(
             var end)
+        arguments.add(owner argument)
         while end = ','
         read-c()->(var end)
         if end = '\n'
@@ -193,7 +193,7 @@ class FunctionArguments(SyntaxTreeNode)
     user ListNode{Argument} node(user arguments.first)
     do
       while node?
-      while not node.item.get-variable().find-variable(user name, user _)->(
+      while not node.item.get-variable().get-if-equal(user name)->(
           user variable)?
       node := node.next
   
@@ -225,8 +225,9 @@ class FunctionArguments(SyntaxTreeNode)
       other-node := other-node.next
     if my-node?
       self.syntax-error-msg(user "too many outputs")
-    if other-node? and other-node.next?
-      self.syntax-error-msg(user "too few outputs")
+    if other-node?
+      if other-node.next?
+        self.syntax-error-msg(user "too few outputs")
     output-ommited := other-node?
   
   func inst write-preactions()

@@ -63,8 +63,8 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     if coverage-node?
       coverage-node.parent := self.else-node.block
       self.else-node.block.code-nodes.add(owner coverage-node)
-    self.else-node.block.code-nodes.add(owner new-if)
     new-if.set-parent(user self.else-node.block)
+    self.else-node.block.code-nodes.add(owner new-if)
   
   func dynamic analyze()
     self.analyze-expression(user self.condition, user glob.type-bool)

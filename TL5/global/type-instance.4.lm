@@ -21,7 +21,6 @@ struct TypeInstance
         
   func copy(user TypeInstance other)
     other.type-data := self.type-data
-    if other.name?
     string-new-copy(user self.name)->(owner other.name)
     if self.module-name?
       string-new-copy(user self.module-name)->(owner other.module-name)
@@ -306,10 +305,10 @@ struct TypeInstance
     if (self.type-data is glob.type-array or
         self.type-data is glob.type-string) and not self.length?
       node.syntax-error-msg(user "missing length for sequence")
-    if self.type-data is glob.type-array and
-        self.parameters.first.item.type-data is glob.type-string and
-        not self.parameters.first.item.length?
-      node.syntax-error-msg(user "missing length for sequence")
+    if self.type-data is glob.type-array
+      if self.parameters.first.item.type-data is glob.type-string and
+          not self.parameters.first.item.length?
+        node.syntax-error-msg(user "missing length for sequence")
   
   func new-replace-params(
       user TypeInstance instance-type, copy Int bases)->(

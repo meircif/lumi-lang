@@ -138,7 +138,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     user ListNode{SyntaxTreeVariable} child(user self.variables.first)
     do
       while child?
-      while not child.item.find-variable(user name, user _)->(user variable)?
+      while not child.item.get-if-equal(user name)->(user variable)?
       child := child.next
   
   func dynamic link-types()

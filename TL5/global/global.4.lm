@@ -59,20 +59,20 @@ struct Global
   var Bool save-input
   
   ~~~ built-in types ~~~
-  owner TypeData type-char
-  owner TypeData type-bool
-  owner TypeData type-int
-  owner TypeData type-empty
-  owner TypeData type-func
-  owner TypeData type-ref
-  owner TypeData type-string
-  owner TypeData type-array
-  owner TypeData type-type
-  owner TypeData type-base
-  owner TypeData type-generic
-  owner TypeData type-module
-  owner TypeData type-file
-  owner TypeData type-sys
+  user TypeData type-char
+  user TypeData type-bool
+  user TypeData type-int
+  user TypeData type-empty
+  user TypeData type-func
+  user TypeData type-ref
+  user TypeData type-string
+  user TypeData type-array
+  user TypeData type-type
+  user TypeData type-base
+  user TypeData type-generic
+  user TypeData type-module
+  user TypeData type-file
+  user TypeData type-sys
   
   func init()
     self.got-new-line := false
@@ -80,6 +80,7 @@ struct Global
     self.is-new-mocked := false
     self.is-delete-mocked := false
     self.tested-module := _
+    self.current-module := _
     self.root := SyntaxTreeRoot()
     self.root.init()
     self.builtins := GlobalNodes()
@@ -138,31 +139,35 @@ struct Global
     self.add-operator(user name, user name, copy order, copy group-index)
   
   func init-builtin-types()
-    self.add-builtin-type(user "Char", copy true)->(owner self.type-char)
-    self.add-builtin-type(user "Bool", copy true)->(owner self.type-bool)
-    self.add-builtin-type(user "Int", copy true)->(owner self.type-int)
+    self.add-builtin-type(user "Char", copy true)->(user self.type-char)
+    self.add-builtin-type(user "Bool", copy true)->(user self.type-bool)
+    assert self.type-char?
+    self.add-builtin-type(user "Int", copy true)->(user self.type-int)
+    assert self.type-int?
     self.add-builtin-type(user "Empty Symbol", copy false)->(
-        owner self.type-empty)
-    self.add-builtin-type(user "Func", copy true)->(owner self.type-func)
-    self.add-builtin-type(user "Ref", copy true)->(owner self.type-ref)
-    self.add-builtin-type(user "String", copy false)->(owner self.type-string)
-    self.add-builtin-type(user "Array", copy false)->(owner self.type-array)
-    self.add-builtin-type(user "Type", copy false)->(owner self.type-type)
-    self.add-builtin-type(user "Base Symbol", copy false)->(owner self.type-base)
+        user self.type-empty)
+    assert self.type-int?
+    self.add-builtin-type(user "Func", copy true)->(user self.type-func)
+    self.add-builtin-type(user "Ref", copy true)->(user self.type-ref)
+    self.add-builtin-type(user "String", copy false)->(user self.type-string)
+    self.add-builtin-type(user "Array", copy false)->(user self.type-array)
+    self.add-builtin-type(user "Type", copy false)->(user self.type-type)
+    self.add-builtin-type(user "Base Symbol", copy false)->(user self.type-base)
     self.add-builtin-type(user "Generic Type", copy false)->(
-        owner self.type-generic)
+        user self.type-generic)
     self.type-generic.is-dynamic := true
     self.add-builtin-type(user "Module Name", copy false)->(
-        owner self.type-module)
-    self.add-builtin-type(user "File", copy false)->(owner self.type-file)
-    self.add-builtin-type(user "Sys", copy false)->(owner self.type-sys)
+        user self.type-module)
+    self.add-builtin-type(user "File", copy false)->(user self.type-file)
+    self.add-builtin-type(user "Sys", copy false)->(user self.type-sys)
     
     user FunctionArguments arguments
     
     ; Int
-    self.add-builtin-method(user glob.type-int, user "str")->(user arguments)
+    assert self.type-int?
+    self.add-builtin-method(user self.type-int, user "str")->(user arguments)
     self.add-builtin-parameter(
-        user arguments, copy Access.USER, user glob.type-string, user "str")
+        user arguments, copy Access.USER, user self.type-string, user "str")
     
     ; Bool
     self.add-builtin-global-variable(user glob.type-bool, user "true")
@@ -302,13 +307,14 @@ struct Global
     self.add-builtin-global-variable(user glob.type-sys, user "sys")
   
   func add-builtin-type(user String name, copy Bool is-primitive)->(
-      owner TypeData type-data)
-    type-data := TypeData()
-    string-new-copy(user name)->(owner type-data.name)
-    type-data.is-primitive := is-primitive
-    type-data.init()
-    self.global-module.type-map.add(user type-data.name, user type-data)
-    self.builtins.types.add(owner type-data)
+      user TypeData type-data)
+    new TypeData new-type
+    type-data := new-type
+    string-new-copy(user name)->(owner new-type.name)
+    new-type.is-primitive := is-primitive
+    new-type.init()
+    self.global-module.type-map.add(user new-type.name, user new-type)
+    self.builtins.types.add(owner new-type)
   
   func add-builtin-global-variable(
       user TypeData variable-type, user String name)
@@ -356,8 +362,8 @@ struct Global
   
   func add-builtin-method(user TypeData builtin-type, user String name)->(
       user FunctionArguments arguments)
-    self.add-builtin-function(user name, user builtin-type, user builtin-type)->(
-        user arguments)
+    self.add-builtin-function(
+        user name, user builtin-type, user builtin-type)->(user arguments)
     self.add-builtin-parameter(
         user arguments, copy Access.USER, user builtin-type, user "self")
   

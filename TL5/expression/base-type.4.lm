@@ -37,7 +37,7 @@ class BaseMethExpression(Expression)
         self.syntax-error(
             user "no base method for method", user function.name)
       self.set-simple-type(user glob.type-func)
-      self.result-type.arguments := self.function.arguments
+      self.function.arguments.copy-new()->(owner self.result-type.arguments)
     else
       self.set-simple-type(user glob.type-base)
       self.result-type.add-subtype-copy(user self.parent-type)

@@ -12,6 +12,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   user SyntaxTreeFunction dynamic-base-method
   var Int dynamic-base-count
   var Bool is-dynamic
+  var Bool has-user-assign
   
   func inst parse-new(user TypeData parent-type)->(
       var Char end, owner SyntaxTreeFunction new-node)
@@ -191,6 +192,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-block-end()
   
   func inst write-setup()
+    if self.has-user-assign
+      write(user "  Ref_Manager* aux_Ref_Manager = NULL;\n")
     user ListNode{Argument} node(user self.arguments.parameters.first)
     do
       while node?
