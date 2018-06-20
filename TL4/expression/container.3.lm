@@ -132,9 +132,12 @@ class UnaryExpression(Expression)
       write(user "(")
   
   func inst write-end()
+    self.write-end-expression(user self.right-expression)
+  
+  func inst write-end-expression(user Expression right-expression)
     write(user self.operator.c-name)
     write(user " ")
-    self.right-expression.write()
+    right-expression.write()
     if not self.top
       write(user ")")
     if self.is-statement
@@ -146,6 +149,7 @@ class BinaryExpression(UnaryExpression)
   owner Expression left-expression
   user BinaryExpression binary-left-expression
   user Expression assignee
+  owner SymbolExpression assigned-value-symbol
   
   func inst parse-new(
       user String ends,
@@ -189,6 +193,15 @@ class BinaryExpression(UnaryExpression)
       self.left-expression.result-type.check-assign-from(
           copy self.left-expression.access, user self):(
           owner self.right-expression, user self.assignee)
+      if self.left-expression.access = ACCESS-USER
+        self.code-node.get-function().has-user-assign := true
+      else-if self.left-expression.access = ACCESS-OWNER
+        # ownership pass
+        self.add-aux-variable(
+            copy ACCESS-OWNER,
+            copy false,
+            user self.left-expression.result-type):(
+            owner self.assigned-value-symbol)
     else-if self.operator.order = 1 and self.operator.name[0] = 'i'
       # `is`/`is-not` operator
       self.analyze-equalizer(copy true)
@@ -220,12 +233,12 @@ class BinaryExpression(UnaryExpression)
   func inst test-operands-type(user TypeData expected-type)
     self.test-operand-type(user self.right-expression, user expected-type)
     self.test-operand-type(user self.left-expression, user expected-type)
-        
+  
   func inst analyze-equalizer(copy Bool is-reference)
     self.test-is-reference(copy is-reference, user self.right-expression)
     self.test-is-reference(copy is-reference, user self.left-expression)
     self.set-simple-type(user glob.type-bool)
-        
+  
   func inst test-is-reference(copy Bool is-reference, user Expression operand)
     if (not operand.result-type.type-data.is-primitive or
         operand.result-type.type-data = glob.type-func or
@@ -250,53 +263,95 @@ class BinaryExpression(UnaryExpression)
   func inst write-assign-preactions()
     if not self.left-expression.result-type.type-data.is-primitive
       if self.left-expression.access = ACCESS-OWNER
-        self.write-left-delete()
-      write(user "LUMI_")
-      if self.left-expression.access = ACCESS-OWNER
-        write(user "owner_")
-      write(user "dec_ref(")
-      self.left-expression.write-refman()
-      write(user ");\n")
-      self.code-node.write-spaces()
-      
-      self.left-expression.write-refman()
-      write(user " = ")
-      self.right-expression.write-refman()
-      write(user ";\n")
-      self.code-node.write-spaces()
-      
-      if self.left-expression.access != ACCESS-OWNER
-        write(user "LUMI_inc_ref(")
-        self.left-expression.write-refman()
-        write(user ");\n")
-        self.code-node.write-spaces()
-    
-    if self.left-expression.result-type.type-data.is-dynamic or
-        self.left-expression.is-generic-cast
-      # also assign Dynamic
-      self.left-expression.write-dynamic()
-      write(user " = ")
-      if not self.right-expression.result-type.type-data.is-dynamic and
-          not self.right-expression.is-generic-cast and
-          self.right-expression.result-type.type-data != glob.type-empty
-        write(user "&")
-        self.right-expression.result-type.type-data.write-cname()
-        write(user "_dynamic")
+        self.write-owner-assign-preactions()
       else
-        if (self.left-expression.result-type.type-data = glob.type-generic or
-            self.left-expression.is-generic-cast) and
-            self.right-expression.result-type.type-data != glob.type-generic and
-            not self.right-expression.is-generic-cast
-          write(user "(Generic_Type_Dynamic*)")
-          self.right-expression.top := false
-        else-if self.right-expression.is-generic-cast and
-            not self.left-expression.is-generic-cast and
-            not (self.left-expression.result-type.type-data = glob.type-generic)
-          self.right-expression.top := false
-        self.right-expression.write-dynamic()
-        self.right-expression.top := true
-      write(user ";\n")
+        self.write-user-assign-preactions()
+  
+  func inst write-user-assign-preactions()
+    write(user "aux_Ref_Manager = ")
+    self.left-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.left-expression.write-refman()
+    write(user " = ")
+    self.right-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.assign-dynamic(user self.left-expression, user self.right-expression)
+    
+    write(user "LUMI_inc_ref(")
+    self.left-expression.write-refman()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    
+    write(user "LUMI_dec_ref(aux_Ref_Manager);\n")
+    self.code-node.write-spaces()
+    write(user "aux_Ref_Manager = NULL;\n")
+    self.code-node.write-spaces()
+  
+  func inst write-owner-assign-preactions()
+    self.assigned-value-symbol.write()
+    write(user " = ")
+    self.right-expression.write()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    self.assigned-value-symbol.write-refman()
+    write(user " = ")
+    self.right-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.assign-dynamic(
+        user self.assigned-value-symbol, user self.right-expression)
+    
+    if self.right-expression.result-type.type-data != glob.type-empty
+      self.assignee.write-assign-null()
       self.code-node.write-spaces()
+    self.write-left-delete()
+    self.code-node.write-spaces()
+    
+    write(user "LUMI_owner_dec_ref(")
+    self.left-expression.write-refman()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    
+    self.left-expression.write-refman()
+    write(user " = ")
+    self.assigned-value-symbol.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.assign-dynamic(
+        user self.left-expression, user self.assigned-value-symbol)
+  
+  func inst assign-dynamic(user Expression target, user Expression source)
+    if not target.result-type.type-data.is-dynamic and
+        not target.is-generic-cast
+      return
+    target.write-dynamic()
+    write(user " = ")
+    if not source.result-type.type-data.is-dynamic and
+        not source.is-generic-cast and
+        source.result-type.type-data != glob.type-empty
+      write(user "&")
+      source.result-type.type-data.write-cname()
+      write(user "_dynamic")
+    else
+      if (target.result-type.type-data = glob.type-generic or
+          target.is-generic-cast) and
+          source.result-type.type-data != glob.type-generic and
+          not source.is-generic-cast
+        write(user "(Generic_Type_Dynamic*)")
+        source.top := false
+      else-if source.is-generic-cast and not target.is-generic-cast and
+          not (target.result-type.type-data = glob.type-generic)
+        source.top := false
+      source.write-dynamic()
+      source.top := true
+    write(user ";\n")
+    self.code-node.write-spaces()
   
   func inst write-left-delete()
     user TypeData type-data(self.left-expression.result-type.type-data)
@@ -326,11 +381,9 @@ class BinaryExpression(UnaryExpression)
         write(user ", ")
         self.left-expression.write()
         write(user ")\n")
-        self.code-node.write-spaces()
       return
     self.left-expression.write()
     write(user ");\n")
-    self.code-node.write-spaces()
   
   func dynamic write()
     self.write-start()
@@ -348,15 +401,16 @@ class BinaryExpression(UnaryExpression)
       write(user " && (")
       self.binary-left-expression.right-expression.write()
     write(user " ")
-    self.write-end()
+    if self.operator.order = 4 and self.operator.group-index = 0 and
+        self.left-expression.access = ACCESS-OWNER
+      self.write-end-expression(user self.assigned-value-symbol)
+      self.code-node.write-spaces()
+      self.assigned-value-symbol.write-assign-null()
+    else
+      self.write-end()
     if expand-and
       write(user ")")
-    if self.operator.order = 4 and self.operator.group-index = 0 and
-        self.left-expression.access = ACCESS-OWNER and
-        self.right-expression.result-type.type-data != glob.type-empty
-      # ownership pass
-      self.assignee.write-assign-null()
-
+    
 
 ## An expression with the "?" operator
 class QuestionExpression(Expression)

@@ -222,6 +222,11 @@ class Test
   func dynamic meth()
 func mock()->(user Test t)
   mock()->(user t).meth()
+## @ g t21
+class Test
+  var Int x
+  func dynamic meth()->(user Test t)
+    self.meth().meth()
 ## @ ec te0
 function( copy 1)
 ## @ ec te1

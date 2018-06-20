@@ -303,6 +303,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     call.line-number := self.line-number
     call.top := true
     call.is-statement := true
+    call.code-node := self
     new FunctionArguments in call.arguments
     call.arguments.init()
     call.arguments.parameters.add(owner self-arg)

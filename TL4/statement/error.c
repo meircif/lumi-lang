@@ -69,7 +69,7 @@ Returncode SyntaxTreeTry_write(SyntaxTreeTry* self) {
   CHECK(25, write(&(String){28, 27, "++LUMI_trace_ignore_count;\n"}) )
   if (try_depth_count == 0) {
     CHECK(27, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
-    CHECK(28, write(&(String){53, 52, "#define RETURN_ERROR(value) LUMI_err = value; break\n"}) )
+    CHECK(28, write(&(String){28, 27, "#define RETURN_ERROR break\n"}) )
   }
   try_depth_count += 1;
   
@@ -78,16 +78,16 @@ Returncode SyntaxTreeTry_write(SyntaxTreeTry* self) {
   try_depth_count -= 1;
   if (try_depth_count == 0) {
     CHECK(35, write(&(String){22, 21, "\n#undef RETURN_ERROR\n"}) )
-    CHECK(36, write(&(String){65, 64, "#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup\n"}) )
+    CHECK(36, write(&(String){40, 39, "#define RETURN_ERROR goto LUMI_cleanup\n"}) )
   }
   self->_base._base.parent->_base.indentation_spaces -= 2;
-  CHECK(39, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(40, write(&(String){18, 17, "} while (false);\n"}) )
-  CHECK(41, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(42, write(&(String){28, 27, "--LUMI_trace_ignore_count;\n"}) )
+  CHECK(38, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(39, write(&(String){18, 17, "} while (false);\n"}) )
+  CHECK(40, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(41, write(&(String){28, 27, "--LUMI_trace_ignore_count;\n"}) )
   if (!(NULL != self->catch_node)) {
-    CHECK(44, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-    CHECK(45, write(&(String){16, 15, "LUMI_err = OK;\n"}) )
+    CHECK(43, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+    CHECK(44, write(&(String){16, 15, "LUMI_err = OK;\n"}) )
   }
   return OK;
 }
@@ -116,11 +116,11 @@ static char* _func_name_SyntaxTreeCatch_parse_new = "SyntaxTreeCatch.parse-new";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeCatch_parse_new
 Returncode SyntaxTreeCatch_parse_new(SyntaxTreeCatch* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeCatch** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeCatch));
-  if ((*new_node) == NULL) RAISE(52)
+  if ((*new_node) == NULL) RAISE(51)
   *(*new_node) = (SyntaxTreeCatch){SyntaxTreeCatch__dtl, NULL, 0, NULL, NULL};
   (*new_node)->_base._base._base._dtl = SyntaxTreeCatch__dtl;
-  CHECK(53, SyntaxTreeFlowElement_init(&((*new_node)->_base), parent) )
-  CHECK(54, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), false, &((*end))) )
+  CHECK(52, SyntaxTreeFlowElement_init(&((*new_node)->_base), parent) )
+  CHECK(53, SyntaxTreeFlowElement_parse_block(&((*new_node)->_base), false, &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -132,9 +132,9 @@ static char* _func_name_SyntaxTreeCatch_analyze = "SyntaxTreeCatch.analyze";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeCatch_analyze
 Returncode SyntaxTreeCatch_analyze(SyntaxTreeCatch* self) {
   if (!(NULL != self->_base.block->code_nodes->first)) {
-    CHECK(58, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){31, 30, "\"catch\" statement with no code"}) )
+    CHECK(57, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){31, 30, "\"catch\" statement with no code"}) )
   }
-  CHECK(59, SyntaxTreeFlowElement_analyze(&(self->_base)) )
+  CHECK(58, SyntaxTreeFlowElement_analyze(&(self->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -145,12 +145,12 @@ Returncode SyntaxTreeCatch_write(SyntaxTreeCatch* self);
 static char* _func_name_SyntaxTreeCatch_write = "SyntaxTreeCatch.write";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeCatch_write
 Returncode SyntaxTreeCatch_write(SyntaxTreeCatch* self) {
-  CHECK(62, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(63, write(&(String){23, 22, "if (LUMI_err != OK) {\n"}) )
-  CHECK(64, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(65, write(&(String){18, 17, "  LUMI_err = OK;\n"}) )
-  CHECK(66, (self->_base.block)->_base._base._dtl[9](self->_base.block) )
-  CHECK(67, SyntaxTreeBlock_write_block_end(self->_base.block) )
+  CHECK(61, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(62, write(&(String){23, 22, "if (LUMI_err != OK) {\n"}) )
+  CHECK(63, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(64, write(&(String){18, 17, "  LUMI_err = OK;\n"}) )
+  CHECK(65, (self->_base.block)->_base._base._dtl[9](self->_base.block) )
+  CHECK(66, SyntaxTreeBlock_write_block_end(self->_base.block) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
