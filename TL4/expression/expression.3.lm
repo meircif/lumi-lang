@@ -208,7 +208,6 @@ class Expression(SyntaxTreeNode)
     write(user "_Var;\n")
   
   func inst write-assign-null()
-    self.code-node.write-spaces()
     self.write()
     write(user " = NULL;\n")
     self.code-node.write-spaces()

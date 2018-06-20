@@ -74,8 +74,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
     if (self->_base._base.result_type->type_data == glob->type_array && ((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->type_data == glob->type_generic) {
       CHECK(50, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){28, 27, "cannot create generic array"}) )
     }
-    Int _Int49;
-    CHECK(51, TypeData_find_meth(self->_base._base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int49)) )
+    Int _Int50;
+    CHECK(51, TypeData_find_meth(self->_base._base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int50)) )
     if (!(NULL != self->arguments->parameters->first) &&  ! (NULL != self->arguments->outputs->first) && (!(NULL != self->constructor) || self->_base._base.result_type->type_data == glob->type_string)) {
       self->constructor = NULL;
     }
@@ -90,8 +90,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
         self_param->code_node = self->_base._base.code_node;
         self_param->value = &(self->symbol->_base);
         CHECK(63, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-        Bool _Bool50;
-        CHECK(64, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base._base.result_type, 0, &(_Bool50)) )
+        Bool _Bool51;
+        CHECK(64, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base._base.result_type, 0, &(_Bool51)) )
       }
       else {
         CHECK(67, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){23, 22, "no contructor for type"}, self->_base._base.result_type->type_data->name) )
@@ -115,7 +115,6 @@ Returncode InitExpression_analyze(InitExpression* self) {
           if ((self->_base._base.access) < 0 || (self->_base._base.access) >= (glob->access_names)->length) RAISE(83)
           if ((param->access) < 0 || (param->access) >= (glob->access_names)->length) RAISE(83)
           CHECK(83, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){22, 21, "assigning into access"}, (&(((String*)((glob->access_names)->values))[self->_base._base.access])), &(String){15, 14, "invalid access"}, (&(((String*)((glob->access_names)->values))[param->access]))) )
-          
         }
       }
     }
@@ -130,30 +129,28 @@ Returncode InitExpression_write_allocation(InitExpression* self);
 static char* _func_name_InitExpression_write_allocation = "InitExpression.write-allocation";
 #define LUMI_FUNC_NAME _func_name_InitExpression_write_allocation
 Returncode InitExpression_write_allocation(InitExpression* self) {
-  CHECK(91, FunctionArguments_write_preactions(self->arguments) )
+  CHECK(90, FunctionArguments_write_preactions(self->arguments) )
   if (self->_base._base.result_type->type_data == glob->type_array || self->_base._base.result_type->type_data == glob->type_string) {
-    CHECK(94, (self->_base._base.result_type->length)->_base._dtl[9](self->_base._base.result_type->length) )
+    CHECK(93, (self->_base._base.result_type->length)->_base._dtl[9](self->_base._base.result_type->length) )
   }
   if (self->_base._base.result_type->type_data == glob->type_array && ((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->type_data == glob->type_string) {
-    CHECK(97, (((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length)->_base._dtl[9](((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length) )
+    CHECK(96, (((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length)->_base._dtl[9](((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length) )
   }
   
   if (self->symbol->variable->access == ACCESS_VAR) {
-    CHECK(100, InitExpression_write_var_init(self) )
+    CHECK(99, InitExpression_write_var_init(self) )
   }
   else {
-    CHECK(102, InitExpression_write_new_init(self) )
+    CHECK(101, InitExpression_write_new_init(self) )
   }
   
-  CHECK(104, Expression_write_refman_init(&(self->_base._base), self->symbol) )
+  CHECK(103, Expression_write_refman_init(&(self->_base._base), self->symbol) )
   
   if (NULL != self->constructor) {
-    CHECK(107, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-    CHECK(108, SyntaxTreeNode_write_call(&(self->_base._base._base)) )
-    CHECK(109, SyntaxTreeFunction_write_cname(self->constructor) )
-    CHECK(110, (self->arguments)->_base._dtl[5](self->arguments) )
-    CHECK(111, write(&(String){4, 3, " )\n"}) )
-    CHECK(112, FunctionArguments_write_postactions(self->arguments) )
+    CHECK(106, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+    CHECK(107, write(&(String){12, 11, "LUMI_err = "}) )
+    CHECK(108, SyntaxTreeFunction_write_cname(self->constructor) )
+    CHECK(109, SyntaxTreeCode_write_call(self->_base._base.code_node, self->arguments) )
   }
   return OK;
 }
@@ -165,28 +162,28 @@ Returncode InitExpression_write_var_init(InitExpression* self);
 static char* _func_name_InitExpression_write_var_init = "InitExpression.write-var-init";
 #define LUMI_FUNC_NAME _func_name_InitExpression_write_var_init
 Returncode InitExpression_write_var_init(InitExpression* self) {
-  CHECK(115, Expression_write_init_var_ref(&(self->_base._base), self->symbol) )
+  CHECK(112, Expression_write_init_var_ref(&(self->_base._base), self->symbol) )
   
   if (self->_base._base.result_type->type_data == glob->type_array || self->_base._base.result_type->type_data == glob->type_string) {
     /* `symbol`_Var.values = `symbol`_Values; */
-    CHECK(120, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-    CHECK(121, (self->symbol)->_base._base._dtl[4](self->symbol) )
-    CHECK(122, write(&(String){15, 14, "_Var.values = "}) )
-    CHECK(123, (self->symbol)->_base._base._dtl[4](self->symbol) )
-    CHECK(124, write(&(String){10, 9, "_Values;\n"}) )
+    CHECK(117, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+    CHECK(118, (self->symbol)->_base._base._dtl[4](self->symbol) )
+    CHECK(119, write(&(String){15, 14, "_Var.values = "}) )
+    CHECK(120, (self->symbol)->_base._base._dtl[4](self->symbol) )
+    CHECK(121, write(&(String){10, 9, "_Values;\n"}) )
     if (self->_base._base.result_type->type_data == glob->type_array && ((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->type_data == glob->type_string) {
       /* LUMI_set_var_string_array( */
       /*    `array-length`, `string-length`, `name`, `name`_Chars); */
-      CHECK(129, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-      CHECK(130, write(&(String){27, 26, "LUMI_set_var_string_array("}) )
-      CHECK(131, (self->_base._base.result_type->length)->_base._dtl[4](self->_base._base.result_type->length) )
-      CHECK(132, write(&(String){3, 2, ", "}) )
-      CHECK(133, (((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length)->_base._dtl[4](((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length) )
-      CHECK(134, write(&(String){3, 2, ", "}) )
-      CHECK(135, (self->symbol)->_base._base._dtl[4](self->symbol) )
-      CHECK(136, write(&(String){3, 2, ", "}) )
-      CHECK(137, (self->symbol)->_base._base._dtl[4](self->symbol) )
-      CHECK(138, write(&(String){10, 9, "_Chars);\n"}) )
+      CHECK(126, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+      CHECK(127, write(&(String){27, 26, "LUMI_set_var_string_array("}) )
+      CHECK(128, (self->_base._base.result_type->length)->_base._dtl[4](self->_base._base.result_type->length) )
+      CHECK(129, write(&(String){3, 2, ", "}) )
+      CHECK(130, (((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length)->_base._dtl[4](((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length) )
+      CHECK(131, write(&(String){3, 2, ", "}) )
+      CHECK(132, (self->symbol)->_base._base._dtl[4](self->symbol) )
+      CHECK(133, write(&(String){3, 2, ", "}) )
+      CHECK(134, (self->symbol)->_base._base._dtl[4](self->symbol) )
+      CHECK(135, write(&(String){10, 9, "_Chars);\n"}) )
     }
   }
   return OK;
@@ -200,51 +197,51 @@ static char* _func_name_InitExpression_write_new_init = "InitExpression.write-ne
 #define LUMI_FUNC_NAME _func_name_InitExpression_write_new_init
 Returncode InitExpression_write_new_init(InitExpression* self) {
   /* `symbol` = ... */
-  CHECK(142, (self->symbol)->_base._base._dtl[4](self->symbol) )
-  CHECK(143, write(&(String){4, 3, " = "}) )
+  CHECK(139, (self->symbol)->_base._base._dtl[4](self->symbol) )
+  CHECK(140, write(&(String){4, 3, " = "}) )
   
   if (self->_base._base.result_type->type_data == glob->type_array) {
     if (((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->type_data == glob->type_string) {
       /* LUMI_new_string_array(`length`, `string-length`); */
-      CHECK(148, write(&(String){23, 22, "LUMI_new_string_array("}) )
-      CHECK(149, (self->_base._base.result_type->length)->_base._dtl[4](self->_base._base.result_type->length) )
-      CHECK(150, write(&(String){3, 2, ", "}) )
-      CHECK(151, (((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length)->_base._dtl[4](((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length) )
+      CHECK(145, write(&(String){23, 22, "LUMI_new_string_array("}) )
+      CHECK(146, (self->_base._base.result_type->length)->_base._dtl[4](self->_base._base.result_type->length) )
+      CHECK(147, write(&(String){3, 2, ", "}) )
+      CHECK(148, (((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length)->_base._dtl[4](((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->length) )
       
     }
     else {
       /* LUMI_new_array(`length`, sizeof(`SubType`)); */
-      CHECK(155, write(&(String){16, 15, "LUMI_new_array("}) )
-      CHECK(156, (self->_base._base.result_type->length)->_base._dtl[4](self->_base._base.result_type->length) )
-      CHECK(157, write(&(String){10, 9, ", sizeof("}) )
-      CHECK(158, TypeData_write_cname(((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->type_data) )
-      CHECK(159, write(&(String){2, 1, ")"}) )
+      CHECK(152, write(&(String){16, 15, "LUMI_new_array("}) )
+      CHECK(153, (self->_base._base.result_type->length)->_base._dtl[4](self->_base._base.result_type->length) )
+      CHECK(154, write(&(String){10, 9, ", sizeof("}) )
+      CHECK(155, TypeData_write_cname(((TypeInstance*)(self->_base._base.result_type->parameters->first->item))->type_data) )
+      CHECK(156, write(&(String){2, 1, ")"}) )
       
     }
   }
   else {
     if (self->_base._base.result_type->type_data == glob->type_string) {
       /* LUMI_new_string(`length`); */
-      CHECK(163, write(&(String){17, 16, "LUMI_new_string("}) )
-      CHECK(164, (self->_base._base.result_type->length)->_base._dtl[4](self->_base._base.result_type->length) )
+      CHECK(160, write(&(String){17, 16, "LUMI_new_string("}) )
+      CHECK(161, (self->_base._base.result_type->length)->_base._dtl[4](self->_base._base.result_type->length) )
       
     }
     else {
       /* LUMI_alloc(sizeof(`type`)); */
-      CHECK(168, write(&(String){19, 18, "LUMI_alloc(sizeof("}) )
-      CHECK(169, TypeData_write_cname(self->_base._base.result_type->type_data) )
-      CHECK(170, write(&(String){2, 1, ")"}) )
+      CHECK(165, write(&(String){19, 18, "LUMI_alloc(sizeof("}) )
+      CHECK(166, TypeData_write_cname(self->_base._base.result_type->type_data) )
+      CHECK(167, write(&(String){2, 1, ")"}) )
     }
   }
   
-  CHECK(172, write(&(String){4, 3, ");\n"}) )
+  CHECK(169, write(&(String){4, 3, ");\n"}) )
   
   /* if (`symbol` == NULL) raise(`line-num`) */
-  CHECK(175, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(176, write(&(String){5, 4, "if ("}) )
-  CHECK(177, (self->symbol)->_base._base._dtl[4](self->symbol) )
-  CHECK(178, write(&(String){11, 10, " == NULL) "}) )
-  CHECK(179, SyntaxTreeNode_write_raise(&(self->_base._base._base), &(String){50, 49, "insufficient memory for object dynamic allocation"}) )
+  CHECK(172, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(173, write(&(String){5, 4, "if ("}) )
+  CHECK(174, (self->symbol)->_base._base._dtl[4](self->symbol) )
+  CHECK(175, write(&(String){11, 10, " == NULL) "}) )
+  CHECK(176, SyntaxTreeNode_write_raise(&(self->_base._base._base), &(String){50, 49, "insufficient memory for object dynamic allocation"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -257,44 +254,44 @@ static char* _func_name_InitExpression_write_assign = "InitExpression.write-assi
 Returncode InitExpression_write_assign(InitExpression* self) {
   /* `name` = `value`; */
   Expression* value = NULL;
-  CHECK(184, (((Argument*)(self->arguments->parameters->first->item)))->_base._dtl[10](((Argument*)(self->arguments->parameters->first->item)), &(value)) )
-  CHECK(185, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(186, (value)->_base._dtl[9](value) )
-  CHECK(187, (self->symbol)->_base._base._dtl[4](self->symbol) )
-  CHECK(188, write(&(String){4, 3, " = "}) )
-  CHECK(189, (value)->_base._dtl[4](value) )
-  CHECK(190, write(&(String){3, 2, ";\n"}) )
+  CHECK(181, (((Argument*)(self->arguments->parameters->first->item)))->_base._dtl[10](((Argument*)(self->arguments->parameters->first->item)), &(value)) )
+  CHECK(182, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(183, (value)->_base._dtl[9](value) )
+  CHECK(184, (self->symbol)->_base._base._dtl[4](self->symbol) )
+  CHECK(185, write(&(String){4, 3, " = "}) )
+  CHECK(186, (value)->_base._dtl[4](value) )
+  CHECK(187, write(&(String){3, 2, ";\n"}) )
   
   if (!self->_base._base.result_type->type_data->is_primitive) {
     /* `name`_Refman = `value`_Refman; */
     /* LUMI_inc_ref(`name`_Refman); */
-    CHECK(195, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-    CHECK(196, (self->symbol)->_base._base._dtl[4](self->symbol) )
-    CHECK(197, write(&(String){11, 10, "_Refman = "}) )
-    CHECK(198, (value)->_base._dtl[6](value) )
-    CHECK(199, write(&(String){3, 2, ";\n"}) )
+    CHECK(192, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+    CHECK(193, (self->symbol)->_base._base._dtl[4](self->symbol) )
+    CHECK(194, write(&(String){11, 10, "_Refman = "}) )
+    CHECK(195, (value)->_base._dtl[6](value) )
+    CHECK(196, write(&(String){3, 2, ";\n"}) )
     if (self->_base._base.access != ACCESS_OWNER) {
-      CHECK(201, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-      CHECK(202, write(&(String){14, 13, "LUMI_inc_ref("}) )
-      CHECK(203, (self->symbol)->_base._base._dtl[4](self->symbol) )
-      CHECK(204, write(&(String){11, 10, "_Refman);\n"}) )
+      CHECK(198, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+      CHECK(199, write(&(String){14, 13, "LUMI_inc_ref("}) )
+      CHECK(200, (self->symbol)->_base._base._dtl[4](self->symbol) )
+      CHECK(201, write(&(String){11, 10, "_Refman);\n"}) )
     }
   }
   
   if (self->_base._base.result_type->type_data->is_dynamic) {
     /* `name`_Dynamic = `Type`_Dynamic; */
-    CHECK(208, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-    CHECK(209, (self->symbol)->_base._base._dtl[4](self->symbol) )
-    CHECK(210, write(&(String){12, 11, "_Dynamic = "}) )
+    CHECK(205, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+    CHECK(206, (self->symbol)->_base._base._dtl[4](self->symbol) )
+    CHECK(207, write(&(String){12, 11, "_Dynamic = "}) )
     if (value->is_generic_cast) {
       value->top = false;
     }
-    CHECK(213, (value)->_base._dtl[5](value) )
+    CHECK(210, (value)->_base._dtl[5](value) )
     value->top = true;
-    CHECK(215, write(&(String){3, 2, ";\n"}) )
+    CHECK(212, write(&(String){3, 2, ";\n"}) )
   }
   
-  CHECK(217, FunctionArguments_write_postactions(self->arguments) )
+  CHECK(214, FunctionArguments_write_postactions(self->arguments) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -305,8 +302,8 @@ Returncode InitExpression_write_preactions(InitExpression* self);
 static char* _func_name_InitExpression_write_preactions = "InitExpression.write-preactions";
 #define LUMI_FUNC_NAME _func_name_InitExpression_write_preactions
 Returncode InitExpression_write_preactions(InitExpression* self) {
-  CHECK(220, InitExpression_write_allocation(self) )
-  CHECK(221, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(217, InitExpression_write_allocation(self) )
+  CHECK(218, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -319,17 +316,17 @@ static char* _func_name_InitExpression_write = "InitExpression.write";
 Returncode InitExpression_write(InitExpression* self) {
   if (self->_base._base.is_statement) {
     if (!self->_base._base.result_type->type_data->is_primitive && self->symbol->variable->is_create) {
-      CHECK(227, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-      CHECK(228, InitExpression_write_allocation(self) )
+      CHECK(224, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+      CHECK(225, InitExpression_write_allocation(self) )
     }
     else {
       if (NULL != self->arguments->parameters->first) {
-        CHECK(230, InitExpression_write_assign(self) )
+        CHECK(227, InitExpression_write_assign(self) )
       }
     }
   }
   else {
-    CHECK(232, (self->symbol)->_base._base._dtl[4](self->symbol) )
+    CHECK(229, (self->symbol)->_base._base._dtl[4](self->symbol) )
   }
   return OK;
 }

@@ -102,8 +102,8 @@ Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self) {
   
   CHECK(53, (self->_base._base.parent)->_base._base._dtl[7](self->_base._base.parent, self->item_name, NULL, &(self->item)) )
   if (NULL != self->item) {
-    Int _Int140;
-    CHECK(54, TypeInstance_check_assign_to(type_instance, self->item->access, self->item->type_instance, self->item->access, &(self->_base._base._base), &(_Int140)) )
+    Int _Int141;
+    CHECK(54, TypeInstance_check_assign_to(type_instance, self->item->access, self->item->type_instance, self->item->access, &(self->_base._base._base), &(_Int141)) )
     free(type_instance);
     free(self->item_name);
   }
@@ -135,9 +135,9 @@ Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self) {
     self->aux_symbol->_base._base._dtl = SymbolExpression__dtl;
     self->aux_symbol->_base.code_node = &(self->_base._base);
     CHECK(79, TypeInstance_copy_new(self->iterator->result_type, &(self->aux_symbol->_base.result_type)) )
-    SyntaxTreeFunction* _SyntaxTreeFunction141;
-    CHECK(80, SyntaxTreeCode_get_function(&(self->_base._base), &(_SyntaxTreeFunction141)) )
-    CHECK(80, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction141, ACCESS_USER, false, self->iterator->result_type, &(self->aux_symbol->variable)) )
+    SyntaxTreeFunction* _SyntaxTreeFunction142;
+    CHECK(80, SyntaxTreeCode_get_function(&(self->_base._base), &(_SyntaxTreeFunction142)) )
+    CHECK(80, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction142, ACCESS_USER, false, self->iterator->result_type, &(self->aux_symbol->variable)) )
     CHECK(83, string_new_copy(self->aux_symbol->variable->name, &(self->aux_symbol->name)) )
   }
   
@@ -152,8 +152,8 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
 static char* _func_name_SyntaxTreeForLoop_get_iterator_type = "SyntaxTreeForLoop.get-iterator-type";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeForLoop_get_iterator_type
 Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInstance** type_instance) {
-  Int _Int142;
-  CHECK(89, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "has"}, &(self->has_func), &(_Int142)) )
+  Int _Int143;
+  CHECK(89, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "has"}, &(self->has_func), &(_Int143)) )
   if (!(NULL != self->has_func)) {
     CHECK(92, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"has\" named method - "}, self->iterator->result_type->type_data->name) )
   }
@@ -166,14 +166,14 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
   if (NULL != self->has_func->arguments->outputs->first->next) {
     CHECK(104, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){55, 54, "iterator \"has\" method has more than one output in type"}, self->iterator->result_type->type_data->name) )
   }
-  TypeInstance* _TypeInstance143;
-  CHECK(107, (((Argument*)(self->has_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->has_func->arguments->outputs->first->item)), &(_TypeInstance143)) )
-  if (_TypeInstance143->type_data != glob->type_bool) {
+  TypeInstance* _TypeInstance144;
+  CHECK(107, (((Argument*)(self->has_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->has_func->arguments->outputs->first->item)), &(_TypeInstance144)) )
+  if (_TypeInstance144->type_data != glob->type_bool) {
     CHECK(109, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){51, 50, "iterator \"has\" method output is not \"Bool\" in type"}, self->iterator->result_type->type_data->name) )
   }
   
-  Int _Int144;
-  CHECK(113, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "get"}, &(self->get_func), &(_Int144)) )
+  Int _Int145;
+  CHECK(113, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "get"}, &(self->get_func), &(_Int145)) )
   if (!(NULL != self->get_func)) {
     CHECK(116, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"get\" named method - "}, self->iterator->result_type->type_data->name) )
   }
@@ -190,12 +190,12 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
     CHECK(132, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){56, 55, "iterator \"get\" method output has \"owner\" access in type"}, self->iterator->result_type->type_data->name) )
   }
   
-  TypeInstance* _TypeInstance145;
-  CHECK(136, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance145)) )
-  CHECK(136, TypeInstance_f_new_replace_params(_TypeInstance145, self->iterator->result_type, 0, &((*type_instance))) )
+  TypeInstance* _TypeInstance146;
+  CHECK(136, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance146)) )
+  CHECK(136, TypeInstance_f_new_replace_params(_TypeInstance146, self->iterator->result_type, 0, &((*type_instance))) )
   
-  Int _Int146;
-  CHECK(139, TypeData_find_meth(self->iterator->result_type->type_data, &(String){5, 4, "next"}, &(self->next_func), &(_Int146)) )
+  Int _Int147;
+  CHECK(139, TypeData_find_meth(self->iterator->result_type->type_data, &(String){5, 4, "next"}, &(self->next_func), &(_Int147)) )
   if (!(NULL != self->next_func)) {
     CHECK(142, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){51, 50, "cannot iterate type with no \"next\" named method - "}, self->iterator->result_type->type_data->name) )
   }
@@ -266,7 +266,7 @@ Returncode SyntaxTreeForLoop_write_assign(SyntaxTreeForLoop* self, SyntaxTreeVar
   
   BinaryExpression* assign = malloc(sizeof(BinaryExpression));
   if (assign == NULL) RAISE(186)
-  *assign = (BinaryExpression){BinaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL};
+  *assign = (BinaryExpression){BinaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL};
   assign->_base._base._base._dtl = BinaryExpression__dtl;
   assign->_base._base.top = true;
   assign->_base._base.is_statement = true;
@@ -406,9 +406,9 @@ Returncode SyntaxTreeForLoop_write_iter(SyntaxTreeForLoop* self) {
   *item_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
   item_arg->_base._base._dtl = CallArgument__dtl;
   item_arg->value = &(item_symbol->_base);
-  TypeInstance* _TypeInstance147;
-  CHECK(282, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance147)) )
-  item_arg->is_generic = _TypeInstance147->type_data == glob->type_generic;
+  TypeInstance* _TypeInstance148;
+  CHECK(282, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance148)) )
+  item_arg->is_generic = _TypeInstance148->type_data == glob->type_generic;
   CHECK(285, SyntaxTreeForLoop_write_iter_meth(self, self->get_func, item_arg) )
   
   CHECK(287, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )
@@ -444,21 +444,22 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   call->_base._base.line_number = self->_base._base._base.line_number;
   call->_base.top = true;
   call->_base.is_statement = true;
+  call->_base.code_node = &(self->_base._base);
   call->arguments = malloc(sizeof(FunctionArguments));
-  if (call->arguments == NULL) RAISE(306)
+  if (call->arguments == NULL) RAISE(307)
   *call->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   call->arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(307, FunctionArguments_init(call->arguments) )
-  CHECK(308, List_add(call->arguments->parameters, &(self_arg->_base)) )
+  CHECK(308, FunctionArguments_init(call->arguments) )
+  CHECK(309, List_add(call->arguments->parameters, &(self_arg->_base)) )
   if (NULL != output_arg) {
     output_arg->_base.is_output = true;
     output_arg->code_node = &(expression_node->_base);
-    CHECK(312, List_add(call->arguments->outputs, &(output_arg->_base)) )
+    CHECK(313, List_add(call->arguments->outputs, &(output_arg->_base)) )
   }
   
   if (meth->is_dynamic) {
     MemberExpression* member = malloc(sizeof(MemberExpression));
-    if (member == NULL) RAISE(315)
+    if (member == NULL) RAISE(316)
     *member = (MemberExpression){MemberExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, false};
     member->_base._base._base._dtl = MemberExpression__dtl;
     member->_base._base.code_node = &(self->_base._base);
@@ -468,7 +469,7 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   }
   else {
     SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
-    if (symbol == NULL) RAISE(321)
+    if (symbol == NULL) RAISE(322)
     *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, false};
     symbol->_base._base._dtl = SymbolExpression__dtl;
     symbol->function = meth;
@@ -477,7 +478,7 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   
   expression_node->expression = &(call->_base);
   self->_base._base.parent->_base.indentation_spaces += 2;
-  CHECK(327, (expression_node)->_base._base._dtl[4](expression_node) )
+  CHECK(328, (expression_node)->_base._base._dtl[4](expression_node) )
   self->_base._base.parent->_base.indentation_spaces -= 2;
   return OK;
 }

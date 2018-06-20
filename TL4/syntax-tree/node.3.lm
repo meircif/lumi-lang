@@ -100,11 +100,6 @@ class SyntaxTreeNode
     write(user error-message)
     write(user "\")\n")
   
-  func inst write-call()
-    write(user "CHECK(")
-    self.write-line-num()
-    write(user ", ")
-  
   ## Print a syntax error with message:
   ## `Code error in {file-name}[{line-number}] {text} "{item}"`
   func inst print-syntax-error(user String text, user String item)

@@ -218,7 +218,8 @@ Returncode error_M_fail_call_empty(void) {
   ++LUMI_file_coverage[0].line_count[30];
   ++LUMI_file_coverage[0].line_count[31];
   if (fun == NULL) RAISE(31, 21, "empty function called")
-  CHECK(31, fun() )
+  LUMI_err = fun();
+  CHECK(31)
 LUMI_cleanup:
   return LUMI_err;
 }
@@ -247,7 +248,8 @@ Returncode error_M_fail_base_class_output(void) {
   base_user_Dynamic = base_var_Dynamic;
   ++LUMI_file_coverage[0].line_count[36];
   if (base_user != NULL) RAISE(36, 45, "non empty base class given as output argument")
-  CHECK(36, error_M_f_get_top((void*)&(base_user), &(base_user_Refman), (void*)&(base_user_Dynamic)) )
+  LUMI_err = error_M_f_get_top((void*)&(base_user), &(base_user_Refman), (void*)&(base_user_Dynamic));
+  CHECK(36)
 LUMI_cleanup:
   LUMI_dec_ref(base_user_Refman);
   LUMI_dec_ref(base_var_Refman);
@@ -295,7 +297,8 @@ Returncode error_M_fail_member_empty(void) {
   TEST_ASSERT(44, obj->x == 0)
   ++LUMI_file_coverage[0].line_count[45];
   if (obj_Dynamic == NULL) RAISE(45, 28, "dynamic call of empty object")
-  CHECK(45, obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic) )
+  LUMI_err = obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic);
+  CHECK(45)
 LUMI_cleanup:
   LUMI_dec_ref(obj_Refman);
   return LUMI_err;
@@ -313,6 +316,9 @@ Returncode error_M_fail_member_outdated(void) {
   error_M_BaseType* obj = NULL;
   Ref_Manager* obj_Refman = NULL;
   error_M_BaseType_Dynamic* obj_Dynamic = NULL;
+  error_M_BaseType* aux_BaseType_0 = NULL;
+  Ref_Manager* aux_BaseType_0_Refman = NULL;
+  error_M_BaseType_Dynamic* aux_BaseType_0_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[48];
   obj_owner = LUMI_alloc(sizeof(error_M_BaseType));
   if (obj_owner == NULL) RAISE(48, 49, "insufficient memory for object dynamic allocation")
@@ -324,19 +330,28 @@ Returncode error_M_fail_member_outdated(void) {
   LUMI_inc_ref(obj_Refman);
   obj_Dynamic = obj_owner_Dynamic;
   ++LUMI_file_coverage[0].line_count[50];
+  aux_BaseType_0 = NULL;
+  aux_BaseType_0_Refman = NULL;
+  aux_BaseType_0_Dynamic = NULL;
   if (obj_owner_Dynamic != NULL) obj_owner_Dynamic->_del(obj_owner);
   LUMI_owner_dec_ref(obj_owner_Refman);
-  obj_owner_Refman = NULL;
-  obj_owner_Dynamic = NULL;
-  obj_owner = NULL;
+  obj_owner_Refman = aux_BaseType_0_Refman;
+  obj_owner_Dynamic = aux_BaseType_0_Dynamic;
+  obj_owner = aux_BaseType_0;
+  aux_BaseType_0 = NULL;
+  aux_BaseType_0_Refman = NULL;
+  aux_BaseType_0_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[51];
   if (obj == NULL) RAISE(51, 27, "used member of empty object")
   if (obj_Refman->value == NULL) RAISE(51, 38, "used member of outdated weak reference")
   TEST_ASSERT(51, obj->x == 0)
   ++LUMI_file_coverage[0].line_count[52];
   if (obj_Dynamic == NULL) RAISE(52, 28, "dynamic call of empty object")
-  CHECK(52, obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic) )
+  LUMI_err = obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic);
+  CHECK(52)
 LUMI_cleanup:
+  if (aux_BaseType_0_Dynamic != NULL) aux_BaseType_0_Dynamic->_del(aux_BaseType_0);
+  LUMI_owner_dec_ref(aux_BaseType_0_Refman);
   LUMI_dec_ref(obj_Refman);
   if (obj_owner_Dynamic != NULL) obj_owner_Dynamic->_del(obj_owner);
   LUMI_owner_dec_ref(obj_owner_Refman);
@@ -372,6 +387,8 @@ Returncode error_M_fail_sequence_outdated(void) {
   Ref_Manager* arr_owner_Refman = NULL;
   Array* arr = NULL;
   Ref_Manager* arr_Refman = NULL;
+  Array* aux_Array_0 = NULL;
+  Ref_Manager* aux_Array_0_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[59];
   arr_owner = LUMI_new_array(2, sizeof(Int));
   if (arr_owner == NULL) RAISE(59, 49, "insufficient memory for object dynamic allocation")
@@ -382,15 +399,20 @@ Returncode error_M_fail_sequence_outdated(void) {
   arr_Refman = arr_owner_Refman;
   LUMI_inc_ref(arr_Refman);
   ++LUMI_file_coverage[0].line_count[61];
-  LUMI_owner_dec_ref(arr_owner_Refman);
-  arr_owner_Refman = NULL;
-  arr_owner = NULL;
+  aux_Array_0 = NULL;
+  aux_Array_0_Refman = NULL;
+    LUMI_owner_dec_ref(arr_owner_Refman);
+  arr_owner_Refman = aux_Array_0_Refman;
+  arr_owner = aux_Array_0;
+  aux_Array_0 = NULL;
+  aux_Array_0_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[62];
   if (arr == NULL) RAISE(62, 29, "empty object used as sequence")
   if (arr_Refman->value == NULL) RAISE(62, 40, "outdated weak reference used as sequence")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(62, 25, "slice index out of bounds")
   TEST_ASSERT(62, (((Int*)((arr)->values))[0]) == 0)
 LUMI_cleanup:
+  LUMI_owner_dec_ref(aux_Array_0_Refman);
   LUMI_dec_ref(arr_Refman);
   LUMI_owner_dec_ref(arr_owner_Refman);
   return LUMI_err;
@@ -408,7 +430,8 @@ Returncode error_M_fail_dynamic_empty(void) {
   ++LUMI_file_coverage[0].line_count[65];
   ++LUMI_file_coverage[0].line_count[66];
   if (obj_Dynamic == NULL) RAISE(66, 28, "dynamic call of empty object")
-  CHECK(66, obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic) )
+  LUMI_err = obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic);
+  CHECK(66)
 LUMI_cleanup:
   LUMI_dec_ref(obj_Refman);
   return LUMI_err;
@@ -486,7 +509,8 @@ Returncode error_M_fail_raise_message(void) {
   aux_String_0_Var.max_length = 9;
   aux_String_0_Var.length = 8;
   aux_String_0_Var.values = "my error";
-  CHECK(80, error_M_f_raise_message(aux_String_0, aux_String_0_Refman) )
+  LUMI_err = error_M_f_raise_message(aux_String_0, aux_String_0_Refman);
+  CHECK(80)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   return LUMI_err;
@@ -514,11 +538,12 @@ Returncode error_M_fail_assert_error(void) {
   do {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    CHECK(86, error_M_f_good_function() )
+#define RETURN_ERROR break
+    LUMI_err = error_M_f_good_function();
+    CHECK(86)
     
 #undef RETURN_ERROR
-#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup
+#define RETURN_ERROR goto LUMI_cleanup
     --LUMI_trace_ignore_count;
     TEST_FAIL(86, 16, "error not raised")
   } while (false);
@@ -546,17 +571,18 @@ Returncode error_M_fail_assert_error_message(void) {
   do {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
-#define RETURN_ERROR(value) break
+#define RETURN_ERROR break
     aux_String_0 = &aux_String_0_Var;
     aux_String_0_Refman = LUMI_new_ref(aux_String_0);
     if (aux_String_0_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
     aux_String_0_Var.max_length = 21;
     aux_String_0_Var.length = 20;
     aux_String_0_Var.values = "tested other message";
-    CHECK(89, error_M_f_raise_message(aux_String_0, aux_String_0_Refman) )
+    LUMI_err = error_M_f_raise_message(aux_String_0, aux_String_0_Refman);
+    CHECK(89)
     
 #undef RETURN_ERROR
-#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup
+#define RETURN_ERROR goto LUMI_cleanup
     --LUMI_trace_ignore_count;
     LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error = LUMI_expected_error_prev;
@@ -568,7 +594,8 @@ Returncode error_M_fail_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(89)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_expected_error = LUMI_expected_error_prev;
+  LUMI_err = OK;}
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   return LUMI_err;
@@ -593,17 +620,18 @@ Returncode error_M_fail_assert_error_message_prefix(void) {
   do {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
-#define RETURN_ERROR(value) break
+#define RETURN_ERROR break
     aux_String_0 = &aux_String_0_Var;
     aux_String_0_Refman = LUMI_new_ref(aux_String_0);
     if (aux_String_0_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
     aux_String_0_Var.max_length = 15;
     aux_String_0_Var.length = 14;
     aux_String_0_Var.values = "tested message";
-    CHECK(92, error_M_f_raise_message(aux_String_0, aux_String_0_Refman) )
+    LUMI_err = error_M_f_raise_message(aux_String_0, aux_String_0_Refman);
+    CHECK(92)
     
 #undef RETURN_ERROR
-#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup
+#define RETURN_ERROR goto LUMI_cleanup
     --LUMI_trace_ignore_count;
     LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error = LUMI_expected_error_prev;
@@ -615,7 +643,8 @@ Returncode error_M_fail_assert_error_message_prefix(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(92)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_expected_error = LUMI_expected_error_prev;
+  LUMI_err = OK;}
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   return LUMI_err;
@@ -626,13 +655,14 @@ LUMI_cleanup:
 
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
+  Returncode LUMI_err = OK;
   Bool LUMI_success = true;
 #undef RETURN_ERROR
-#define RETURN_ERROR(value) return value;
+#define RETURN_ERROR return LUMI_err;
 #define LUMI_FUNC_NAME "global variable initialization"
 #undef LUMI_FUNC_NAME
 #undef RETURN_ERROR
-#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup
+#define RETURN_ERROR goto LUMI_cleanup
   LUMI_success &= LUMI_run_test("fail-call-empty", error_M_fail_call_empty);
   LUMI_success &= LUMI_run_test("fail-base-class-output", error_M_fail_base_class_output);
   LUMI_success &= LUMI_run_test("fail-slice-index", error_M_fail_slice_index);
@@ -650,7 +680,7 @@ USER_MAIN_HEADER {
   LUMI_success &= LUMI_run_test("fail-assert-error-message", error_M_fail_assert_error_message);
   LUMI_success &= LUMI_run_test("fail-assert-error-message-prefix", error_M_fail_assert_error_message_prefix);
   LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);
-  return LUMI_success? OK : FAIL;
+  return LUMI_success? LUMI_err : FAIL;
 }
 
 TEST_MAIN_FUNC

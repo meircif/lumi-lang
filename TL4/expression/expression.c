@@ -35,8 +35,8 @@ Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Express
 static char* _func_name_parse_new_expression = "parse-new-expression";
 #define LUMI_FUNC_NAME _func_name_parse_new_expression
 Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  Operator* _Operator45;
-  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator45)) )
+  Operator* _Operator46;
+  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator46)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -137,9 +137,9 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     if ((*end) == '?') {
       CHECK(109, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool46;
-    CHECK(110, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool46)) )
-    if (!(_Bool46)) break;
+    Bool _Bool47;
+    CHECK(110, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool47)) )
+    if (!(_Bool47)) break;
   }
   return OK;
 }
@@ -178,9 +178,9 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Str
             CHECK(133, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool47;
-            CHECK(134, String_equal(text, &(String){5, 4, "base"}, &(_Bool47)) )
-            if (_Bool47) {
+            Bool _Bool48;
+            CHECK(134, String_equal(text, &(String){5, 4, "base"}, &(_Bool48)) )
+            if (_Bool48) {
               CHECK(135, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
             }
             else {
@@ -261,9 +261,9 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_cre
   CHECK(177, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
   (*symbol)->_base.access = access;
   (*symbol)->_base.assignable = true;
-  SyntaxTreeFunction* _SyntaxTreeFunction48;
-  CHECK(180, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction48)) )
-  CHECK(180, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction48, access, is_create, type_instance, &((*symbol)->variable)) )
+  SyntaxTreeFunction* _SyntaxTreeFunction49;
+  CHECK(180, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction49)) )
+  CHECK(180, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction49, access, is_create, type_instance, &((*symbol)->variable)) )
   CHECK(182, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
   return OK;
 }
@@ -326,16 +326,15 @@ Returncode Expression_write_assign_null(Expression* self);
 static char* _func_name_Expression_write_assign_null = "Expression.write-assign-null";
 #define LUMI_FUNC_NAME _func_name_Expression_write_assign_null
 Returncode Expression_write_assign_null(Expression* self) {
-  CHECK(211, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(212, (self)->_base._dtl[4](self) )
-  CHECK(213, write(&(String){10, 9, " = NULL;\n"}) )
-  CHECK(214, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(215, (self)->_base._dtl[6](self) )
-  CHECK(216, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(211, (self)->_base._dtl[4](self) )
+  CHECK(212, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(213, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(214, (self)->_base._dtl[6](self) )
+  CHECK(215, write(&(String){10, 9, " = NULL;\n"}) )
   if (self->result_type->type_data->is_dynamic) {
-    CHECK(218, SyntaxTreeCode_write_spaces(self->code_node) )
-    CHECK(219, (self)->_base._dtl[5](self) )
-    CHECK(220, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(217, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(218, (self)->_base._dtl[5](self) )
+    CHECK(219, write(&(String){10, 9, " = NULL;\n"}) )
   }
   return OK;
 }
@@ -347,8 +346,8 @@ Returncode Expression_write_dynamic(Expression* self);
 static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
 #define LUMI_FUNC_NAME _func_name_Expression_write_dynamic
 Returncode Expression_write_dynamic(Expression* self) {
-  CHECK(223, (self)->_base._dtl[4](self) )
-  CHECK(224, write(&(String){9, 8, "_Dynamic"}) )
+  CHECK(222, (self)->_base._dtl[4](self) )
+  CHECK(223, write(&(String){9, 8, "_Dynamic"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -359,8 +358,8 @@ Returncode Expression_write_refman(Expression* self);
 static char* _func_name_Expression_write_refman = "Expression.write-refman";
 #define LUMI_FUNC_NAME _func_name_Expression_write_refman
 Returncode Expression_write_refman(Expression* self) {
-  CHECK(227, (self)->_base._dtl[4](self) )
-  CHECK(228, write(&(String){8, 7, "_Refman"}) )
+  CHECK(226, (self)->_base._dtl[4](self) )
+  CHECK(227, write(&(String){8, 7, "_Refman"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -373,7 +372,7 @@ static char* _func_name_Expression_write_as_top = "Expression.write-as-top";
 Returncode Expression_write_as_top(Expression* self) {
   Bool top = self->top;
   self->top = true;
-  CHECK(233, (self)->_base._dtl[4](self) )
+  CHECK(232, (self)->_base._dtl[4](self) )
   self->top = top;
   return OK;
 }

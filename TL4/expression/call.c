@@ -121,15 +121,15 @@ Returncode CallExpression_write_preactions(CallExpression* self);
 static char* _func_name_CallExpression_write_preactions = "CallExpression.write-preactions";
 #define LUMI_FUNC_NAME _func_name_CallExpression_write_preactions
 Returncode CallExpression_write_preactions(CallExpression* self) {
-  CHECK(69, (self->function)->_base._dtl[9](self->function) )
+  CHECK(69, FunctionArguments_write_preactions(self->arguments) )
+  CHECK(70, (self->function)->_base._dtl[9](self->function) )
   if (self->is_function_object) {
-    CHECK(71, write(&(String){5, 4, "if ("}) )
-    CHECK(72, Expression_write_as_top(self->function) )
-    CHECK(73, write(&(String){11, 10, " == NULL) "}) )
-    CHECK(74, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){22, 21, "empty function called"}) )
-    CHECK(75, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(72, write(&(String){5, 4, "if ("}) )
+    CHECK(73, Expression_write_as_top(self->function) )
+    CHECK(74, write(&(String){11, 10, " == NULL) "}) )
+    CHECK(75, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){22, 21, "empty function called"}) )
+    CHECK(76, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   }
-  CHECK(76, FunctionArguments_write_preactions(self->arguments) )
   if (!self->_base.is_statement) {
     CHECK(78, CallExpression_write_func_call(self) )
     CHECK(79, SyntaxTreeCode_write_spaces(self->_base.code_node) )
@@ -194,11 +194,9 @@ Returncode CallExpression_write_func_call(CallExpression* self);
 static char* _func_name_CallExpression_write_func_call = "CallExpression.write-func-call";
 #define LUMI_FUNC_NAME _func_name_CallExpression_write_func_call
 Returncode CallExpression_write_func_call(CallExpression* self) {
-  CHECK(102, SyntaxTreeNode_write_call(&(self->_base._base)) )
+  CHECK(102, write(&(String){12, 11, "LUMI_err = "}) )
   CHECK(103, (self->function)->_base._dtl[4](self->function) )
-  CHECK(104, (self->arguments)->_base._dtl[5](self->arguments) )
-  CHECK(105, write(&(String){4, 3, " )\n"}) )
-  CHECK(106, FunctionArguments_write_postactions(self->arguments) )
+  CHECK(104, SyntaxTreeCode_write_call(self->_base.code_node, self->arguments) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -232,9 +230,9 @@ static char* _func_name_CallArgument_parse_value = "CallArgument.parse-value";
 #define LUMI_FUNC_NAME _func_name_CallArgument_parse_value
 Returncode CallArgument_parse_value(CallArgument* self, SyntaxTreeCode* code_node, Char* end) {
   self->code_node = code_node;
-  CHECK(120, parse_new_expression(&(String){3, 2, ",)"}, code_node, &(self->value), &((*end))) )
+  CHECK(118, parse_new_expression(&(String){3, 2, ",)"}, code_node, &(self->value), &((*end))) )
   if ((*end) != ',' && (*end) != ')') {
-    CHECK(123, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){25, 24, "expected \",\" or \")\", got"}, (*end)) )
+    CHECK(121, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){25, 24, "expected \",\" or \")\", got"}, (*end)) )
   }
   return OK;
 }
@@ -246,9 +244,9 @@ Returncode CallArgument_analyze(CallArgument* self);
 static char* _func_name_CallArgument_analyze = "CallArgument.analyze";
 #define LUMI_FUNC_NAME _func_name_CallArgument_analyze
 Returncode CallArgument_analyze(CallArgument* self) {
-  CHECK(126, (self->value)->_base._dtl[2](self->value) )
+  CHECK(124, (self->value)->_base._dtl[2](self->value) )
   if (self->_base.is_output &&  ! self->value->assignable) {
-    CHECK(128, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){27, 26, "non assignable call output"}) )
+    CHECK(126, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){27, 26, "non assignable call output"}) )
   }
   return OK;
 }
@@ -261,24 +259,24 @@ static char* _func_name_CallArgument_check_same_type_as = "CallArgument.check-sa
 #define LUMI_FUNC_NAME _func_name_CallArgument_check_same_type_as
 Returncode CallArgument_check_same_type_as(CallArgument* self, TypeInstance* type_instance, TypeInstance* instance_type, Int bases) {
   if (self->_base.access == ACCESS_OWNER && self->value->access != ACCESS_OWNER) {
-    if ((self->value->access) < 0 || (self->value->access) >= (glob->access_names)->length) RAISE(135)
-    CHECK(135, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){43, 42, "assigning into an owner a non-owner access"}, (&(((String*)((glob->access_names)->values))[self->value->access]))) )
+    if ((self->value->access) < 0 || (self->value->access) >= (glob->access_names)->length) RAISE(133)
+    CHECK(133, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){43, 42, "assigning into an owner a non-owner access"}, (&(((String*)((glob->access_names)->values))[self->value->access]))) )
   }
   if (self->_base.is_output && self->_base.access != self->value->access) {
-    if ((self->_base.access) < 0 || (self->_base.access) >= (glob->access_names)->length) RAISE(139)
-    if ((self->value->access) < 0 || (self->value->access) >= (glob->access_names)->length) RAISE(139)
-    CHECK(139, SyntaxTreeNode_m_syntax_error2(&(self->_base._base), &(String){22, 21, "assigning into access"}, (&(((String*)((glob->access_names)->values))[self->_base.access])), &(String){15, 14, "invalid access"}, (&(((String*)((glob->access_names)->values))[self->value->access]))) )
+    if ((self->_base.access) < 0 || (self->_base.access) >= (glob->access_names)->length) RAISE(137)
+    if ((self->value->access) < 0 || (self->value->access) >= (glob->access_names)->length) RAISE(137)
+    CHECK(137, SyntaxTreeNode_m_syntax_error2(&(self->_base._base), &(String){22, 21, "assigning into access"}, (&(((String*)((glob->access_names)->values))[self->_base.access])), &(String){15, 14, "invalid access"}, (&(((String*)((glob->access_names)->values))[self->value->access]))) )
   }
   
   TypeInstance* real_type = NULL;
-  CHECK(146, TypeInstance_f_new_replace_params(type_instance, instance_type, bases, &(real_type)) )
+  CHECK(144, TypeInstance_f_new_replace_params(type_instance, instance_type, bases, &(real_type)) )
   if (self->_base.is_output) {
     Int _Int32;
-    CHECK(149, TypeInstance_check_assign_to(real_type, self->_base.access, self->value->result_type, self->value->access, &(self->_base._base), &(_Int32)) )
+    CHECK(147, TypeInstance_check_assign_to(real_type, self->_base.access, self->value->result_type, self->value->access, &(self->_base._base), &(_Int32)) )
     self->is_down_cast = _Int32 > 0;
   }
   else {
-    CHECK(155, TypeInstance_check_assign_from(real_type, self->_base.access, &(self->_base._base), &(self->value), &(self->assignee)) )
+    CHECK(153, TypeInstance_check_assign_from(real_type, self->_base.access, &(self->_base._base), &(self->value), &(self->assignee)) )
   }
   self->is_dynamic = real_type->type_data->is_dynamic;
   self->is_generic = type_instance->type_data == glob->type_generic;
@@ -304,14 +302,14 @@ Returncode CallArgument_write_preactions(CallArgument* self);
 static char* _func_name_CallArgument_write_preactions = "CallArgument.write-preactions";
 #define LUMI_FUNC_NAME _func_name_CallArgument_write_preactions
 Returncode CallArgument_write_preactions(CallArgument* self) {
-  CHECK(165, (self->value)->_base._dtl[9](self->value) )
+  CHECK(163, (self->value)->_base._dtl[9](self->value) )
   if (self->is_down_cast) {
     /* if (`value` != NULL) RAISE(`line-num`) */
-    CHECK(168, write(&(String){5, 4, "if ("}) )
-    CHECK(169, (self->value)->_base._dtl[4](self->value) )
-    CHECK(170, write(&(String){11, 10, " != NULL) "}) )
-    CHECK(171, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){46, 45, "non empty base class given as output argument"}) )
-    CHECK(172, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(166, write(&(String){5, 4, "if ("}) )
+    CHECK(167, (self->value)->_base._dtl[4](self->value) )
+    CHECK(168, write(&(String){11, 10, " != NULL) "}) )
+    CHECK(169, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){46, 45, "non empty base class given as output argument"}) )
+    CHECK(170, SyntaxTreeCode_write_spaces(self->code_node) )
   }
   return OK;
 }
@@ -326,57 +324,57 @@ Returncode CallArgument_write(CallArgument* self) {
   /* [&(]`value`[)][, [&(]`value`_Refman[)]][, [&(]`value`_Dynamic[)]] */
   if (self->_base.is_output) {
     if (self->is_down_cast || self->is_generic) {
-      CHECK(178, write(&(String){8, 7, "(void*)"}) )
+      CHECK(176, write(&(String){8, 7, "(void*)"}) )
     }
-    CHECK(179, write(&(String){3, 2, "&("}) )
+    CHECK(177, write(&(String){3, 2, "&("}) )
   }
-  CHECK(180, (self->value)->_base._dtl[4](self->value) )
+  CHECK(178, (self->value)->_base._dtl[4](self->value) )
   if (self->_base.is_output) {
-    CHECK(182, write(&(String){2, 1, ")"}) )
+    CHECK(180, write(&(String){2, 1, ")"}) )
   }
   
   if (!self->value->result_type->type_data->is_primitive &&  ! self->_base.is_native) {
-    CHECK(185, write(&(String){3, 2, ", "}) )
+    CHECK(183, write(&(String){3, 2, ", "}) )
     if (self->_base.is_output) {
-      CHECK(187, write(&(String){3, 2, "&("}) )
+      CHECK(185, write(&(String){3, 2, "&("}) )
     }
-    CHECK(188, (self->value)->_base._dtl[6](self->value) )
+    CHECK(186, (self->value)->_base._dtl[6](self->value) )
     if (self->_base.is_output) {
-      CHECK(190, write(&(String){2, 1, ")"}) )
+      CHECK(188, write(&(String){2, 1, ")"}) )
     }
   }
   
   if (self->is_dynamic &&  ! self->_base.is_native) {
-    CHECK(193, write(&(String){3, 2, ", "}) )
+    CHECK(191, write(&(String){3, 2, ", "}) )
     if ((self->_base.is_output && self->is_down_cast) || self->is_generic) {
-      CHECK(195, write(&(String){8, 7, "(void*)"}) )
+      CHECK(193, write(&(String){8, 7, "(void*)"}) )
     }
     if (self->_base.is_output) {
-      CHECK(197, write(&(String){3, 2, "&("}) )
+      CHECK(195, write(&(String){3, 2, "&("}) )
     }
     if (self->value->is_generic_cast) {
       self->value->top = false;
     }
-    CHECK(200, (self->value)->_base._dtl[5](self->value) )
+    CHECK(198, (self->value)->_base._dtl[5](self->value) )
     self->value->top = true;
     if (self->_base.is_output) {
-      CHECK(203, write(&(String){2, 1, ")"}) )
+      CHECK(201, write(&(String){2, 1, ")"}) )
     }
   }
   else {
     if (self->is_generic) {
-      CHECK(205, write(&(String){3, 2, ", "}) )
+      CHECK(203, write(&(String){3, 2, ", "}) )
       if (self->_base.is_output) {
-        CHECK(207, write(&(String){14, 13, "&dynamic_Void"}) )
+        CHECK(205, write(&(String){14, 13, "&dynamic_Void"}) )
       }
       else {
         if (self->value->result_type->type_data == glob->type_empty) {
-          CHECK(209, write(&(String){5, 4, "NULL"}) )
+          CHECK(207, write(&(String){5, 4, "NULL"}) )
         }
         else {
-          CHECK(211, write(&(String){2, 1, "&"}) )
-          CHECK(212, TypeData_write_cname(self->value->result_type->type_data) )
-          CHECK(213, write(&(String){9, 8, "_dynamic"}) )
+          CHECK(209, write(&(String){2, 1, "&"}) )
+          CHECK(210, TypeData_write_cname(self->value->result_type->type_data) )
+          CHECK(211, write(&(String){9, 8, "_dynamic"}) )
         }
       }
     }
@@ -392,7 +390,8 @@ static char* _func_name_CallArgument_write_postactions = "CallArgument.write-pos
 #define LUMI_FUNC_NAME _func_name_CallArgument_write_postactions
 Returncode CallArgument_write_postactions(CallArgument* self) {
   if (self->_base.access == ACCESS_OWNER &&  ! self->_base.is_output && self->value->result_type->type_data != glob->type_empty) {
-    CHECK(218, Expression_write_assign_null(self->assignee) )
+    CHECK(216, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(217, Expression_write_assign_null(self->assignee) )
   }
   return OK;
 }
@@ -420,7 +419,7 @@ static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactor
 #define LUMI_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
   CallArgument* _CallArgument33 = malloc(sizeof(CallArgument));
-  if (_CallArgument33 == NULL) RAISE(223)
+  if (_CallArgument33 == NULL) RAISE(222)
   *_CallArgument33 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
   _CallArgument33->_base._base._dtl = CallArgument__dtl;
   (*new_argument) = &(_CallArgument33->_base);
