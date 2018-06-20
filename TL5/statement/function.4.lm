@@ -164,10 +164,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     ; }
     ; #undef LUMI_FILE_NAME
     ; #undef LUMI_FUNC_NAME
-    write-pre-func(user self)
+    self.write-pre-func()
     self.write-header()
     self.write-block()
-    write-post-func()
+    self.write-post-func()
   
   func inst write-header()
     write(user "\nReturncode ")
@@ -229,6 +229,20 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     ; Returncode `Type`_`name`(`args`);
     self.write-header()
     write(user ";\n")
+  
+  func inst write-pre-func()
+    write(user "\n#define LUMI_FILE_NAME \"")
+    write(user self.input-file-name)
+    write(user "\"\n#define LUMI_FUNC_NAME \"")
+    if self.parent-type?
+      write(user self.parent-type.name)
+      write(user ".")
+    write(user self.name)
+    write(user "\"")
+  
+  func inst write-post-func()
+    write(user "#undef LUMI_FILE_NAME\n")
+    write(user "#undef LUMI_FUNC_NAME\n")
 
 
 ~~~ Count occurrences of a specific type ~~~
@@ -297,19 +311,19 @@ class DeclarationArgument(Argument)
   func dynamic analyze()
     if self.variable.type-instance.type-data.is-primitive
       if self.is-output and self.access != Access.VAR
-        self.m-syntax-error2(
+        self.syntax-error2(
             user "output",
             user self.variable.name,
             user "access should be \"var\" for primitive types, got",
             user glob.access-names[self.access])
       else-if not self.is-output and self.access != Access.COPY
-        self.m-syntax-error2(
+        self.syntax-error2(
             user "parameter",
             user self.variable.name,
             user "access should be \"copy\" for primitive types, got",
             user glob.access-names[self.access])
     else-if self.access = Access.COPY
-      self.m-syntax-error2(
+      self.syntax-error2(
           user "argument",
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
@@ -373,18 +387,3 @@ class DeclarationArgumentFactory(ArgumentFactory)
     new-argument := DeclarationArgument()
 
 
-; to be mocked in unit-tests
-func write-pre-func(user SyntaxTreeFunction self)
-  write(user "\n#define LUMI_FILE_NAME \"")
-  write(user self.input-file-name)
-  write(user "\"\n#define LUMI_FUNC_NAME \"")
-  if self.parent-type?
-    write(user self.parent-type.name)
-    write(user ".")
-  write(user self.name)
-  write(user "\"")
-
-; to be mocked in unit-tests
-func write-post-func()
-  write(user "#undef LUMI_FILE_NAME\n")
-  write(user "#undef LUMI_FUNC_NAME\n")

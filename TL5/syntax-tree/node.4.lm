@@ -35,7 +35,7 @@ class SyntaxTreeNode
       if self.find-module(user module-name).type-map.find(user name)->(
           user type-data)?
         return
-      self.m-syntax-error2(
+      self.syntax-error2(
           user "unknown type", user name, user "in module", user module-name)
     if glob.find-type(user name)->(user type-data)?
       return
@@ -74,7 +74,7 @@ class SyntaxTreeNode
     for n in expected-text.length
       actual-text.append(copy read-c())
     if not actual-text.equal(user expected-text)
-      self.m-syntax-error2(
+      self.syntax-error2(
           user "expected", user expected-text, user "got", user actual-text)
   
   func inst analyze-expression(
@@ -84,7 +84,7 @@ class SyntaxTreeNode
       self.syntax-error(
           user "got void expression, expected", user expected-type.name)
     if expression.result-type.type-data is-not expected-type
-      self.m-syntax-error2(
+      self.syntax-error2(
           user "got",
           user expression.result-type.type-data.name,
           user "expression, expected",
@@ -107,24 +107,24 @@ class SyntaxTreeNode
   func inst print-syntax-error(user String text, user String item)
     self.print-syntax-error-header()
     print-msg-with-item(user text, user item)
-    print(user "\n")
+    sys.print(user "\n")
   
   func inst syntax-error(user String text, user String item)
     self.print-syntax-error(user text, user item)
     raise
   
-  ~~~ Same as `m-syntax-error` but but with another `{text} "{item}" pair ~~~
-  func inst m-syntax-error2(
+  ~~~ Same as `syntax-error` but but with another `{text} "{item}" pair ~~~
+  func inst syntax-error2(
       user String text1, user String item1, user String text2, user String item2)
     self.print-syntax-error-header()
     print-msg-with-item(user text1, user item1)
-    print(user " ")
+    sys.print(user " ")
     print-msg-with-item(user text2, user item2)
-    print(user "\n")
+    sys.print(user "\n")
     raise
   
-  ~~~ Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair ~~~
-  func inst m-syntax-error3(
+  ~~~ Same as `syntax-error` but but with another 2 `{text} "{item}" pair ~~~
+  func inst syntax-error3(
       user String text1,
       user String item1,
       user String text2,
@@ -133,14 +133,14 @@ class SyntaxTreeNode
       user String item3)
     self.print-syntax-error-header()
     print-msg-with-item(user text1, user item1)
-    print(user " ")
+    sys.print(user " ")
     print-msg-with-item(user text2, user item2)
-    print(user " ")
+    sys.print(user " ")
     print-msg-with-item(user text3, user item3)
-    print(user "\n")
+    sys.print(user "\n")
     raise
   
-  ~~~ Same as `m-syntax-error` but with a character item ~~~
+  ~~~ Same as `syntax-error` but with a character item ~~~
   func inst syntax-error-c(user String text, copy Char item)
     var String{16} char-str
     if item = EOF
@@ -154,8 +154,8 @@ class SyntaxTreeNode
   
   func inst syntax-error-msg(user String text)
     self.print-syntax-error-header()
-    print(user text)
-    print(user "\n")
+    sys.print(user text)
+    sys.print(user "\n")
     raise
   
   func inst syntax-error-indentation(copy Int actual, copy Int expected)
@@ -164,26 +164,26 @@ class SyntaxTreeNode
     expected.str(user expected-str)
     actual.str(user actual-str)
     self.print-syntax-error-header()
-    print(user "indentation too ")
+    sys.print(user "indentation too ")
     if actual < expected
-      print(user "short")
+      sys.print(user "short")
     else
-      print(user "long")
-    print(user ", expected ")
-    print(user expected-str)
-    print(user " got ")
-    print(user actual-str)
-    print(user "\n")
+      sys.print(user "long")
+    sys.print(user ", expected ")
+    sys.print(user expected-str)
+    sys.print(user " got ")
+    sys.print(user actual-str)
+    sys.print(user "\n")
     raise
   
   func inst print-syntax-error-header()
-    print(user "Code error in ")
-    print(user self.input-file-name)
-    print(user "[")
+    sys.print(user "Code error in ")
+    sys.print(user self.input-file-name)
+    sys.print(user "[")
     var String{32} line-num-str
     self.line-number.str(user line-num-str)
-    print(user line-num-str)
-    print(user "] ")
+    sys.print(user line-num-str)
+    sys.print(user "] ")
   
   ~~~ Check `text` is a string constant ~~~
   func inst check-string(user String text)

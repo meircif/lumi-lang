@@ -41637,9 +41637,9 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write_test_main(tl5_compiler_M_SyntaxTr
   aux_String_9 = &aux_String_9_Var;
   aux_String_9_Refman = LUMI_new_ref(aux_String_9);
   if (aux_String_9_Refman == NULL) RAISE(364, 38, "insufficient memory for managed object")
-  aux_String_9_Var.max_length = 35;
-  aux_String_9_Var.length = 34;
-  aux_String_9_Var.values = "  return LUMI_success? OK : FAIL;\n";
+  aux_String_9_Var.max_length = 41;
+  aux_String_9_Var.length = 40;
+  aux_String_9_Var.values = "  return LUMI_success? LUMI_err : FAIL;\n";
   LUMI_err = tl5_compiler_M_write(aux_String_9, aux_String_9_Refman);
   CHECK(364)
   aux_String_10 = &aux_String_10_Var;

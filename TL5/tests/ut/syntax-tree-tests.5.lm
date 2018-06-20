@@ -745,6 +745,13 @@ mock Test.meth(copy Int x)->(var Int y)
   Test.meth.active := false
   Test.meth(user self, copy x)->(var y)
   Test.meth.active := true
+; @ g tm7
+func fun()
+  sys.print(user "mock print")
+  sys.print.mocked(user "really print")
+  Sys.print.active := false
+  sys.print.active := true
+mock Sys.print(user String text)
 ; @ tg tt0
 func fun0()
   var Int x(copy 4)

@@ -39,7 +39,7 @@ func test-global-scope(
       copy true)
 
 func no-error-raised()
-  mock-print-active := false
+  Sys.print.active := false
   if tests-passed
     sys.print(user "\n  ")
   sys.print(user "[no error raised]\n  ")
@@ -72,12 +72,12 @@ func test-global-scope-error(
     copy Bool is-test)
   setup-test()
   set-mock-file-text(user input-text, user second-file-input-text)
-  mock-print-active := true
+  Sys.print.active := true
   try
     write-syntax-tree(copy is-test)
     no-error-raised()
     return
-  mock-print-active := false
+  Sys.print.active := false
   if mock-print-text.length = 0
     setup-test()
     set-mock-file-text(user input-text, user second-file-input-text)
@@ -94,9 +94,9 @@ test test-illegal-usage()
   setup-test()
   var Array{2:String{4}} mock-argv
   sys.argv := mock-argv
-  mock-print-active := true
+  Sys.print.active := true
   assert-error tl5-compiler.glob.root.parse()
-  mock-print-active := false
+  Sys.print.active := false
   assert-string-slice(
       user "usage: tl4-compiler [-t TESTED-MODULE] OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n",
       user mock-print-text,
@@ -106,9 +106,9 @@ test test-illegal-usage()
 
 
 func test-analyze-error(user String expected-error)
-  mock-print-active := true
+  Sys.print.active := true
   assert-error tl5-compiler.glob.root.analyze()
-  mock-print-active := false
+  Sys.print.active := false
   assert-string-slice(
       user expected-error,
       user mock-print-text,

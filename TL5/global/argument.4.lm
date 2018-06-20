@@ -32,7 +32,7 @@ class Argument(SyntaxTreeNode)
   func inst check-same-as(
       user Argument other, user TypeInstance instance-type, copy Int bases)
     if self.access != other.access
-      self.m-syntax-error2(
+      self.syntax-error2(
           user "expected access",
           user glob.access-names[other.access],
           user ", got",

@@ -11,10 +11,10 @@ func test-code-setup(user String input-text)
   owner File code-header
   var String{256} filename
   set-test-file-name(user filename, user "code-header", user ".5.lm")
-  file-open-read(user filename)->(owner code-header)
+  file-open-read.mocked(user filename)->(owner code-header)
   do
     var Char ch
-    while not code-header.getc()->(var ch)
+    while not code-header.getc.mocked()->(var ch)
     mock-input-file-text.append(copy ch)
   mock-input-line-reset-index := mock-input-file-text.length
   mock-input-file-text.concat(user input-text)
@@ -31,10 +31,10 @@ func test-code(user String input-text, user String expected-output)
   owner File code-header
   var String{256} filename
   set-test-file-name(user filename, user "code-header", user ".expected.c")
-  file-open-read(user filename)->(owner code-header)
+  file-open-read.mocked(user filename)->(owner code-header)
   do
     var Char ch
-    while not code-header.getc()->(var ch)
+    while not code-header.getc.mocked()->(var ch)
     expected-header.append(copy ch)
   
   assert-string-slice(
@@ -45,14 +45,14 @@ func test-code(user String input-text, user String expected-output)
       copy false)
   if was-first
     set-test-file-name(user filename, user "code-header", user ".actual.c")
-    file-open-write(user filename)->(owner code-header)
+    file-open-write.mocked(user filename)->(owner code-header)
     if tests-passed
       for n in expected-header.length
-        code-header.putc(copy mock-output-file-text[n])
+        code-header.putc.mocked(copy mock-output-file-text[n])
     else
       for n in mock-output-file-text.length
-        code-header.putc(copy mock-output-file-text[n])
-    code-header.close()
+        code-header.putc.mocked(copy mock-output-file-text[n])
+    code-header.close.mocked()
     code-header-valid := tests-passed
     if not tests-passed
       return
@@ -76,12 +76,12 @@ func test-code-error(user String input-text, user String expected-error)
   if not-first-code-test and not code-header-valid
     return
   test-code-setup(user input-text)
-  mock-print-active := true
+  Sys.print.active := true
   try
     write-syntax-tree(copy false)
     no-error-raised()
     return
-  mock-print-active := false
+  Sys.print.active := false
   if mock-print-text.length = 0
     test-code-setup(user input-text)
     write-syntax-tree(copy false)

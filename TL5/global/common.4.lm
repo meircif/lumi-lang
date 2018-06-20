@@ -19,16 +19,11 @@ func string-new-concat(user String first, user String second)->(
   new-text.concat(user second)
 
 
-~~~ Proxy function to be mocked in tests ~~~
-func print(user String text)
-  sys.print(user text)
-
-
 func print-msg-with-item(user String text, user String item)
-  print(user text)
-  print(user " \"")
-  print(user item)
-  print(user "\"")
+  sys.print(user text)
+  sys.print(user " \"")
+  sys.print(user item)
+  sys.print(user "\"")
 
 
 enum NameGroup

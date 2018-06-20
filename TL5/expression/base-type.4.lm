@@ -204,7 +204,7 @@ class EnumExpression(ModuleTypeExpression)
       user String module-name(user self.module-expression.result-type.name)
       if not self.code-node.find-module(user module-name).enum-map.find(
           user self.name)->(user self.enum-data)?
-        self.m-syntax-error2(
+        self.syntax-error2(
             user "unknown Enum",
             user self.name,
             user "in module",
@@ -213,7 +213,7 @@ class EnumExpression(ModuleTypeExpression)
         user self.enum-data)?
       self.syntax-error(user "unknown Enum", user self.name)
     if not self.enum-data.has-value(user self.value)
-      self.m-syntax-error2(
+      self.syntax-error2(
           user "Enum", user self.name, user "has no value", user self.value)
   
   func dynamic write()

@@ -47,7 +47,7 @@ class SymbolExpression(Expression)
       self.access := Access.VAR
       self.function.arguments.copy-new()->(owner self.result-type.arguments)
     else-if self.module-name?
-      self.m-syntax-error2(
+      self.syntax-error2(
           user "unknown symbol",
           user self.name,
           user "in module",
@@ -182,7 +182,7 @@ class MemberExpression(SymbolExpression)
             self.set-simple-type(user glob.type-bool)
             self.assignable := true
           return
-        self.m-syntax-error2(
+        self.syntax-error2(
             user "type",
             user instance-type.type-data.name,
             user "has no member",

@@ -110,7 +110,7 @@ class UnaryExpression(Expression)
       user Expression operand,
       user TypeData expected-type)
     if not expected-type.is-same(user operand.result-type.type-data)
-      self.m-syntax-error3(
+      self.syntax-error3(
           user "operator",
           user self.operator.name,
           user "expected",
@@ -177,7 +177,7 @@ class BinaryExpression(UnaryExpression)
       if self.operator.order = self.binary-left-expression.operator.order and
           self.operator.group-index !=
           self.binary-left-expression.operator.group-index
-        self.m-syntax-error2(
+        self.syntax-error2(
             user "ambiguous precedence between operators",
             user self.binary-left-expression.operator.name,
             user "and",
@@ -247,7 +247,7 @@ class BinaryExpression(UnaryExpression)
     if (not operand.result-type.type-data.is-primitive or
         operand.result-type.type-data is glob.type-func or
         operand.result-type.type-data is glob.type-ref) != is-reference
-      self.m-syntax-error2(
+      self.syntax-error2(
           user "operator",
           user self.operator.name,
           user "is not supported for type",

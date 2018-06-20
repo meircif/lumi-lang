@@ -81,7 +81,7 @@ class InitExpression(ModuleTypeExpression)
             user glob.access-names[param.access])
       else-if not self.result-type.type-data.is-primitive and
           self.access != param.access
-        self.m-syntax-error2(
+        self.syntax-error2(
             user "assigning into access",
             user glob.access-names[self.access],
             user "invalid access",

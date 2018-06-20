@@ -45,8 +45,8 @@ class SyntaxTreeRoot(GlobalNodes)
         input-files-number += 1
     
     if input-files-number = 0 or arg-test-index = sys.argv.length - 1
-      print(user "usage: tl4-compiler [-t TESTED-MODULE]")
-      print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
+      sys.print(user "usage: tl4-compiler [-t TESTED-MODULE]")
+      sys.print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
       raise
     
     if glob.tested-module?
@@ -61,7 +61,7 @@ class SyntaxTreeRoot(GlobalNodes)
         input-files-number += 1
         glob.line-number := 1
         glob.current-module := _
-        file-open(user glob.input-file-name, copy true)->(owner glob.input-file)
+        file-open-read(user glob.input-file-name)->(owner glob.input-file)
         
         self.parse-children(user _, user _)
         
@@ -69,7 +69,7 @@ class SyntaxTreeRoot(GlobalNodes)
           self.set-location()
           self.syntax-error-msg(user "no new-line before file end")
         
-        file-close(owner glob.input-file)
+        glob.input-file.close()
         if self.line-counts?
           self.line-counts[glob.input-file-index].init()
     
@@ -181,12 +181,12 @@ class SyntaxTreeRoot(GlobalNodes)
     self.global-init.analyze()
     if glob.tested-module?
       if not glob.test-functions.first?
-        print(user "General code error: no test functions\n")
+        sys.print(user "General code error: no test functions\n")
         raise
     else-if self.main-function?
       self.main-function.analyze()
     else-if not self.is-library
-      print(user "General code error: no main function\n")
+      sys.print(user "General code error: no main function\n")
       raise
     self.order-children-constants(user self.variables, user self.constants)
     if self.line-counts?
@@ -201,9 +201,9 @@ class SyntaxTreeRoot(GlobalNodes)
   
   func inst analyze-cover()
     if not glob.module-map.find(user glob.tested-module)?
-      print(user "General code error: unknown tested module \"")
-      print(user glob.tested-module)
-      print(user "\"\n")
+      sys.print(user "General code error: unknown tested module \"")
+      sys.print(user glob.tested-module)
+      sys.print(user "\"\n")
       raise
     var Int covered-index
     for n in self.line-counts.length
@@ -213,9 +213,9 @@ class SyntaxTreeRoot(GlobalNodes)
         covered-index += 1
     self.covered-files := covered-index
     if self.covered-files = 0
-      print(user "General code error: no code to test under module \"")
-      print(user glob.tested-module)
-      print(user "\"\n")
+      sys.print(user "General code error: no code to test under module \"")
+      sys.print(user glob.tested-module)
+      sys.print(user "\"\n")
       raise
   
   ~~~ write C file in this order:
@@ -227,7 +227,7 @@ class SyntaxTreeRoot(GlobalNodes)
   6. main function
   ~~~
   func dynamic write()
-    file-open(user self.output-file-name, copy false)->(owner glob.output-file)
+    file-open-write(user self.output-file-name)->(owner glob.output-file)
     
     write-global(user ";include \"lumi.4.h\"\n")
     
@@ -291,7 +291,7 @@ class SyntaxTreeRoot(GlobalNodes)
       write-global(user "\n\n/* main function */\n")
       self.main-function.write()
     
-    file-close(owner glob.output-file)
+    glob.output-file.close()
   
   func inst write-for-type(user TypeWriter type-writer)
     user ListNode{TypeData} child(user self.types.first)
@@ -408,12 +408,12 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     ; MAIN_FUNC
     write(user "\nUSER_MAIN_HEADER")
     self.write-block()
-    write-post-func()
+    self.write-post-func()
     write(user "\nMAIN_FUNC\n")
   
   func dynamic write-block-body()
     glob.root.global-init.write()
-    write-pre-func(user self)
+    self.write-pre-func()
     write(user "\n")
     base.write-block-body()
 

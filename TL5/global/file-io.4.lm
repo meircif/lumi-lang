@@ -7,7 +7,8 @@ const Int EOF 0
 func read-c()->(var Char ch)
   if glob.got-new-line
     glob.line-number += 1
-  file-getc(user glob.input-file)->(var ch)
+  if glob.input-file.getc()->(var ch)
+    ch := EOF
   glob.got-new-line := ch = '\n'
 
 
@@ -66,12 +67,12 @@ func read-new(user String ends)->(owner String new-text, var Char end)
 
 ~~~ write a single character to the output file ~~~
 func write-c(copy Char ch)
-  file-putc(user glob.output-file, copy ch)
+  glob.output-file.putc(copy ch)
 
 
 ~~~ write `text` to the output file ~~~
 func write(user String text)
-  file-write(user glob.output-file, user text)
+  glob.output-file.write(user text)
 
 
 ~~~ write `name` with `-` replaced by `_` ~~~
@@ -97,24 +98,3 @@ func write-int(copy Int num)
 func write-spaces(copy Int num)
   for n in num
     write-c(copy ' ')
-
-
-~~~ Proxy functions to be mocked in tests ~~~
-func file-open(user String name, copy Bool is-read)->(owner File file)
-  if is-read
-    file-open-read(user name)->(owner file)
-  else
-    file-open-write(user name)->(owner file)
-
-func file-close(owner File file)
-  file.close()
-
-func file-getc(user File file)->(var Char ch)
-  if file.getc()->(var ch)
-    ch := EOF
-
-func file-putc(user File file, copy Char ch)
-  file.putc(copy ch)
-
-func file-write(user File file, user String text)
-  file.write(user text)
