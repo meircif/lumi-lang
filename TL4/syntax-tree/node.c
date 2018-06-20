@@ -44,9 +44,9 @@ static char* _func_name_SyntaxTreeNode_get_access = "SyntaxTreeNode.get-access";
 Returncode SyntaxTreeNode_get_access(SyntaxTreeNode* self, String* access_str, Int* access) {
   {int n; for (n = (1); n < (5); ++n) {
     if ((n) < 0 || (n) >= (glob->access_names)->length) RAISE(17)
-    Bool _Bool102;
-    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool102)) )
-    if (_Bool102) {
+    Bool _Bool103;
+    CHECK(17, String_equal((&(((String*)((glob->access_names)->values))[n])), access_str, &(_Bool103)) )
+    if (_Bool103) {
       (*access) = n;
       return OK;
     }
@@ -88,9 +88,9 @@ static char* _func_name_SyntaxTreeNode_find_type = "SyntaxTreeNode.find-type";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_find_type
 Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, String* module_name, TypeData** type_data) {
   if (NULL != module_name) {
-    ModuleMembers* _ModuleMembers103;
-    CHECK(33, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers103)) )
-    CHECK(33, NameMap_find(_ModuleMembers103->type_map, name, (void**)&((*type_data))) )
+    ModuleMembers* _ModuleMembers104;
+    CHECK(33, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers104)) )
+    CHECK(33, NameMap_find(_ModuleMembers104->type_map, name, (void**)&((*type_data))) )
     if (NULL != (*type_data)) {
       return OK;
     }
@@ -106,9 +106,9 @@ Returncode SyntaxTreeNode_find_type(SyntaxTreeNode* self, String* name, String* 
     ListNode* node = parent_type->parameters->first;
     while (true) {
       if (!(NULL != node)) break;
-      Bool _Bool104;
-      CHECK(45, String_equal(((String*)(node->item)), name, &(_Bool104)) )
-      if (_Bool104) {
+      Bool _Bool105;
+      CHECK(45, String_equal(((String*)(node->item)), name, &(_Bool105)) )
+      if (_Bool105) {
         (*type_data) = glob->type_generic;
         return OK;
       }
@@ -127,9 +127,9 @@ static char* _func_name_SyntaxTreeNode_find_variable = "SyntaxTreeNode.find-vari
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_find_variable
 Returncode SyntaxTreeNode_find_variable(SyntaxTreeNode* self, String* name, String* module_name, SyntaxTreeVariable** variable) {
   if (NULL != module_name) {
-    ModuleMembers* _ModuleMembers105;
-    CHECK(55, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers105)) )
-    CHECK(55, NameMap_find(_ModuleMembers105->variable_map, name, (void**)&((*variable))) )
+    ModuleMembers* _ModuleMembers106;
+    CHECK(55, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers106)) )
+    CHECK(55, NameMap_find(_ModuleMembers106->variable_map, name, (void**)&((*variable))) )
   }
   else {
     CHECK(58, Global_find_variable(glob, name, &((*variable))) )
@@ -145,9 +145,9 @@ static char* _func_name_SyntaxTreeNode_find_function = "SyntaxTreeNode.find-func
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_find_function
 Returncode SyntaxTreeNode_find_function(SyntaxTreeNode* self, String* name, String* module_name, SyntaxTreeFunction** function) {
   if (NULL != module_name) {
-    ModuleMembers* _ModuleMembers106;
-    CHECK(63, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers106)) )
-    CHECK(63, NameMap_find(_ModuleMembers106->function_map, name, (void**)&((*function))) )
+    ModuleMembers* _ModuleMembers107;
+    CHECK(63, SyntaxTreeNode_find_module(self, module_name, &(_ModuleMembers107)) )
+    CHECK(63, NameMap_find(_ModuleMembers107->function_map, name, (void**)&((*function))) )
   }
   else {
     CHECK(66, Global_find_function(glob, name, &((*function))) )
@@ -165,13 +165,13 @@ Returncode SyntaxTreeNode_read_expect(SyntaxTreeNode* self, String* expected_tex
   String* actual_text = _new_string(expected_text->length + 1);
   if (actual_text == NULL) RAISE(70)
   {int n; for (n = (0); n < (expected_text->length); ++n) {
-    Char _Char107;
-    CHECK(72, read_c(&(_Char107)) )
-    CHECK(72, String_append(actual_text, _Char107) )
+    Char _Char108;
+    CHECK(72, read_c(&(_Char108)) )
+    CHECK(72, String_append(actual_text, _Char108) )
   }}
-  Bool _Bool108;
-  CHECK(73, String_equal(actual_text, expected_text, &(_Bool108)) )
-  if (!_Bool108) {
+  Bool _Bool109;
+  CHECK(73, String_equal(actual_text, expected_text, &(_Bool109)) )
+  if (!_Bool109) {
     CHECK(74, SyntaxTreeNode_m_syntax_error2(self, &(String){9, 8, "expected"}, expected_text, &(String){4, 3, "got"}, actual_text) )
   }
   free(actual_text);
@@ -223,19 +223,6 @@ Returncode SyntaxTreeNode_write_raise(SyntaxTreeNode* self, String* error_messag
   return OK;
 }
 #undef LUMI_FUNC_NAME
-#endif
-#if LUMI_STAGE == LUMI_DECLARATIONS
-Returncode SyntaxTreeNode_write_call(SyntaxTreeNode* self);
-#elif LUMI_STAGE == LUMI_FUNCTIONS
-static char* _func_name_SyntaxTreeNode_write_call = "SyntaxTreeNode.write-call";
-#define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_write_call
-Returncode SyntaxTreeNode_write_call(SyntaxTreeNode* self) {
-  CHECK(104, write(&(String){7, 6, "CHECK("}) )
-  CHECK(105, SyntaxTreeNode_write_line_num(self) )
-  CHECK(106, write(&(String){3, 2, ", "}) )
-  return OK;
-}
-#undef LUMI_FUNC_NAME
 #endif/* Print a syntax error with message: *//* `Code error in {file-name}[{line-number}] {text} "{item}"` */
 #if LUMI_STAGE == LUMI_DECLARATIONS
 Returncode SyntaxTreeNode_print_syntax_error(SyntaxTreeNode* self, String* text, String* item);
@@ -243,9 +230,9 @@ Returncode SyntaxTreeNode_print_syntax_error(SyntaxTreeNode* self, String* text,
 static char* _func_name_SyntaxTreeNode_print_syntax_error = "SyntaxTreeNode.print-syntax-error";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_print_syntax_error
 Returncode SyntaxTreeNode_print_syntax_error(SyntaxTreeNode* self, String* text, String* item) {
-  CHECK(111, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(112, print_msg_with_item(text, item) )
-  CHECK(113, print(&(String){2, 1, "\n"}) )
+  CHECK(106, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(107, print_msg_with_item(text, item) )
+  CHECK(108, print(&(String){2, 1, "\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -256,8 +243,8 @@ Returncode SyntaxTreeNode_m_syntax_error(SyntaxTreeNode* self, String* text, Str
 static char* _func_name_SyntaxTreeNode_m_syntax_error = "SyntaxTreeNode.m-syntax-error";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error
 Returncode SyntaxTreeNode_m_syntax_error(SyntaxTreeNode* self, String* text, String* item) {
-  CHECK(116, SyntaxTreeNode_print_syntax_error(self, text, item) )
-  RAISE(117)
+  CHECK(111, SyntaxTreeNode_print_syntax_error(self, text, item) )
+  RAISE(112)
 }
 #undef LUMI_FUNC_NAME
 #endif/* Same as `m-syntax-error` but but with another `{text} "{item}" pair */
@@ -267,12 +254,12 @@ Returncode SyntaxTreeNode_m_syntax_error2(SyntaxTreeNode* self, String* text1, S
 static char* _func_name_SyntaxTreeNode_m_syntax_error2 = "SyntaxTreeNode.m-syntax-error2";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error2
 Returncode SyntaxTreeNode_m_syntax_error2(SyntaxTreeNode* self, String* text1, String* item1, String* text2, String* item2) {
-  CHECK(122, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(123, print_msg_with_item(text1, item1) )
-  CHECK(124, print(&(String){2, 1, " "}) )
-  CHECK(125, print_msg_with_item(text2, item2) )
-  CHECK(126, print(&(String){2, 1, "\n"}) )
-  RAISE(127)
+  CHECK(117, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(118, print_msg_with_item(text1, item1) )
+  CHECK(119, print(&(String){2, 1, " "}) )
+  CHECK(120, print_msg_with_item(text2, item2) )
+  CHECK(121, print(&(String){2, 1, "\n"}) )
+  RAISE(122)
 }
 #undef LUMI_FUNC_NAME
 #endif/* Same as `m-syntax-error` but but with another 2 `{text} "{item}" pair */
@@ -282,14 +269,14 @@ Returncode SyntaxTreeNode_m_syntax_error3(SyntaxTreeNode* self, String* text1, S
 static char* _func_name_SyntaxTreeNode_m_syntax_error3 = "SyntaxTreeNode.m-syntax-error3";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error3
 Returncode SyntaxTreeNode_m_syntax_error3(SyntaxTreeNode* self, String* text1, String* item1, String* text2, String* item2, String* text3, String* item3) {
-  CHECK(137, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(138, print_msg_with_item(text1, item1) )
-  CHECK(139, print(&(String){2, 1, " "}) )
-  CHECK(140, print_msg_with_item(text2, item2) )
-  CHECK(141, print(&(String){2, 1, " "}) )
-  CHECK(142, print_msg_with_item(text3, item3) )
-  CHECK(143, print(&(String){2, 1, "\n"}) )
-  RAISE(144)
+  CHECK(132, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(133, print_msg_with_item(text1, item1) )
+  CHECK(134, print(&(String){2, 1, " "}) )
+  CHECK(135, print_msg_with_item(text2, item2) )
+  CHECK(136, print(&(String){2, 1, " "}) )
+  CHECK(137, print_msg_with_item(text3, item3) )
+  CHECK(138, print(&(String){2, 1, "\n"}) )
+  RAISE(139)
 }
 #undef LUMI_FUNC_NAME
 #endif/* Same as `m-syntax-error` but with a character item */
@@ -301,18 +288,18 @@ static char* _func_name_SyntaxTreeNode_m_syntax_error_c = "SyntaxTreeNode.m-synt
 Returncode SyntaxTreeNode_m_syntax_error_c(SyntaxTreeNode* self, String* text, Char item) {
   String* char_str = &(String){16, 0, (char[16]){0}};
   if (item == EOF) {
-    CHECK(150, String_copy(char_str, &(String){4, 3, "EOF"}) )
+    CHECK(145, String_copy(char_str, &(String){4, 3, "EOF"}) )
   }
   else {
     if (item == '\n') {
-      CHECK(152, String_copy(char_str, &(String){9, 8, "new-line"}) )
+      CHECK(147, String_copy(char_str, &(String){9, 8, "new-line"}) )
     }
     else {
-      CHECK(154, String_append(char_str, item) )
+      CHECK(149, String_append(char_str, item) )
     }
   }
-  CHECK(155, SyntaxTreeNode_print_syntax_error(self, text, char_str) )
-  RAISE(156)
+  CHECK(150, SyntaxTreeNode_print_syntax_error(self, text, char_str) )
+  RAISE(151)
 }
 #undef LUMI_FUNC_NAME
 #endif
@@ -322,10 +309,10 @@ Returncode SyntaxTreeNode_m_syntax_error_msg(SyntaxTreeNode* self, String* text)
 static char* _func_name_SyntaxTreeNode_m_syntax_error_msg = "SyntaxTreeNode.m-syntax-error-msg";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error_msg
 Returncode SyntaxTreeNode_m_syntax_error_msg(SyntaxTreeNode* self, String* text) {
-  CHECK(159, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(160, print(text) )
-  CHECK(161, print(&(String){2, 1, "\n"}) )
-  RAISE(162)
+  CHECK(154, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(155, print(text) )
+  CHECK(156, print(&(String){2, 1, "\n"}) )
+  RAISE(157)
 }
 #undef LUMI_FUNC_NAME
 #endif
@@ -337,22 +324,22 @@ static char* _func_name_SyntaxTreeNode_m_syntax_error_indentation = "SyntaxTreeN
 Returncode SyntaxTreeNode_m_syntax_error_indentation(SyntaxTreeNode* self, Int actual, Int expected) {
   String* expected_str = &(String){16, 0, (char[16]){0}};
   String* actual_str = &(String){16, 0, (char[16]){0}};
-  CHECK(167, Int_str(expected, expected_str) )
-  CHECK(168, Int_str(actual, actual_str) )
-  CHECK(169, SyntaxTreeNode_print_syntax_error_header(self) )
-  CHECK(170, print(&(String){17, 16, "indentation too "}) )
+  CHECK(162, Int_str(expected, expected_str) )
+  CHECK(163, Int_str(actual, actual_str) )
+  CHECK(164, SyntaxTreeNode_print_syntax_error_header(self) )
+  CHECK(165, print(&(String){17, 16, "indentation too "}) )
   if (actual < expected) {
-    CHECK(172, print(&(String){6, 5, "short"}) )
+    CHECK(167, print(&(String){6, 5, "short"}) )
   }
   else {
-    CHECK(174, print(&(String){5, 4, "long"}) )
+    CHECK(169, print(&(String){5, 4, "long"}) )
   }
-  CHECK(175, print(&(String){12, 11, ", expected "}) )
-  CHECK(176, print(expected_str) )
-  CHECK(177, print(&(String){6, 5, " got "}) )
-  CHECK(178, print(actual_str) )
-  CHECK(179, print(&(String){2, 1, "\n"}) )
-  RAISE(180)
+  CHECK(170, print(&(String){12, 11, ", expected "}) )
+  CHECK(171, print(expected_str) )
+  CHECK(172, print(&(String){6, 5, " got "}) )
+  CHECK(173, print(actual_str) )
+  CHECK(174, print(&(String){2, 1, "\n"}) )
+  RAISE(175)
 }
 #undef LUMI_FUNC_NAME
 #endif
@@ -362,13 +349,13 @@ Returncode SyntaxTreeNode_print_syntax_error_header(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_print_syntax_error_header = "SyntaxTreeNode.print-syntax-error-header";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_print_syntax_error_header
 Returncode SyntaxTreeNode_print_syntax_error_header(SyntaxTreeNode* self) {
-  CHECK(183, print(&(String){15, 14, "Code error in "}) )
-  CHECK(184, print(self->input_file_name) )
-  CHECK(185, print(&(String){2, 1, "["}) )
+  CHECK(178, print(&(String){15, 14, "Code error in "}) )
+  CHECK(179, print(self->input_file_name) )
+  CHECK(180, print(&(String){2, 1, "["}) )
   String* line_num_str = &(String){32, 0, (char[32]){0}};
-  CHECK(187, Int_str(self->line_number, line_num_str) )
-  CHECK(188, print(line_num_str) )
-  CHECK(189, print(&(String){3, 2, "] "}) )
+  CHECK(182, Int_str(self->line_number, line_num_str) )
+  CHECK(183, print(line_num_str) )
+  CHECK(184, print(&(String){3, 2, "] "}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -380,19 +367,19 @@ static char* _func_name_SyntaxTreeNode_check_string = "SyntaxTreeNode.check-stri
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_check_string
 Returncode SyntaxTreeNode_check_string(SyntaxTreeNode* self, String* text) {
   if (text->length < 2) {
-    CHECK(194, SyntaxTreeNode_m_syntax_error(self, &(String){26, 25, "too short string constant"}, text) )
+    CHECK(189, SyntaxTreeNode_m_syntax_error(self, &(String){26, 25, "too short string constant"}, text) )
   }
-  if ((0) < 0 || (0) >= (text)->length) RAISE(195)
-  if ((text->length - 1) < 0 || (text->length - 1) >= (text)->length) RAISE(195)
+  if ((0) < 0 || (0) >= (text)->length) RAISE(190)
+  if ((text->length - 1) < 0 || (text->length - 1) >= (text)->length) RAISE(190)
   if (((text)->values[0]) != '\"' || ((text)->values[text->length - 1]) != '\"') {
-    CHECK(196, SyntaxTreeNode_m_syntax_error(self, &(String){30, 29, "no '\"' around string constant"}, text) )
+    CHECK(191, SyntaxTreeNode_m_syntax_error(self, &(String){30, 29, "no '\"' around string constant"}, text) )
   }
   Char prev = '\0';
   {int n; for (n = (1); n < (text->length - 1); ++n) {
-    if ((n) < 0 || (n) >= (text)->length) RAISE(199)
+    if ((n) < 0 || (n) >= (text)->length) RAISE(194)
     Char curr = ((text)->values[n]);
     if (curr == '"' && prev != '\\') {
-      CHECK(201, SyntaxTreeNode_m_syntax_error(self, &(String){27, 26, "'\"' inside string constant"}, text) )
+      CHECK(196, SyntaxTreeNode_m_syntax_error(self, &(String){27, 26, "'\"' inside string constant"}, text) )
     }
     prev = curr;
   }}
@@ -439,7 +426,7 @@ Returncode SyntaxTreeNode_write(SyntaxTreeNode* self);
 static char* _func_name_SyntaxTreeNode_write = "SyntaxTreeNode.write";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_write
 Returncode SyntaxTreeNode_write(SyntaxTreeNode* self) {
-  RAISE(214)
+  RAISE(209)
 }
 #undef LUMI_FUNC_NAME
 #endif
@@ -451,7 +438,7 @@ static char* _func_name_SyntaxTreeNode_link_children_types = "SyntaxTreeNode.lin
 Returncode SyntaxTreeNode_link_children_types(SyntaxTreeNode* self, List* child_list) {
   NodeLinkTypesAction* action_link_types = &(NodeLinkTypesAction){NodeLinkTypesAction__dtl};
   action_link_types->_base._dtl = NodeLinkTypesAction__dtl;
-  CHECK(218, SyntaxTreeNode_do_on_children(self, child_list, &(action_link_types->_base)) )
+  CHECK(213, SyntaxTreeNode_do_on_children(self, child_list, &(action_link_types->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -464,7 +451,7 @@ static char* _func_name_SyntaxTreeNode_analyze_children = "SyntaxTreeNode.analyz
 Returncode SyntaxTreeNode_analyze_children(SyntaxTreeNode* self, List* child_list) {
   NodeAnalyzeAction* action_analyze = &(NodeAnalyzeAction){NodeAnalyzeAction__dtl};
   action_analyze->_base._dtl = NodeAnalyzeAction__dtl;
-  CHECK(222, SyntaxTreeNode_do_on_children(self, child_list, &(action_analyze->_base)) )
+  CHECK(217, SyntaxTreeNode_do_on_children(self, child_list, &(action_analyze->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -478,7 +465,7 @@ Returncode SyntaxTreeNode_m_order_children_constants(SyntaxTreeNode* self, List*
   NodeOrderConstantsAction* action_order_constants = &(NodeOrderConstantsAction){NodeOrderConstantsAction__dtl, NULL};
   action_order_constants->_base._dtl = NodeOrderConstantsAction__dtl;
   action_order_constants->ordered_list = ordered_list;
-  CHECK(229, SyntaxTreeNode_do_on_children(self, child_list, &(action_order_constants->_base)) )
+  CHECK(224, SyntaxTreeNode_do_on_children(self, child_list, &(action_order_constants->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -491,7 +478,7 @@ static char* _func_name_SyntaxTreeNode_write_children = "SyntaxTreeNode.write-ch
 Returncode SyntaxTreeNode_write_children(SyntaxTreeNode* self, List* child_list) {
   NodeWriteAction* action_write = &(NodeWriteAction){NodeWriteAction__dtl};
   action_write->_base._dtl = NodeWriteAction__dtl;
-  CHECK(233, SyntaxTreeNode_do_on_children(self, child_list, &(action_write->_base)) )
+  CHECK(228, SyntaxTreeNode_do_on_children(self, child_list, &(action_write->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -507,7 +494,7 @@ Returncode SyntaxTreeNode_do_on_children(SyntaxTreeNode* self, List* child_list,
     if (!(NULL != child)) break;
     glob->input_file_name = ((SyntaxTreeNode*)(child->item))->input_file_name;
     glob->line_number = ((SyntaxTreeNode*)(child->item))->line_number;
-    CHECK(242, (action)->_dtl[0](action, child->item) )
+    CHECK(237, (action)->_dtl[0](action, child->item) )
     child = child->next;
   }
   return OK;
@@ -535,7 +522,7 @@ Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node);
 static char* _func_name_NodeAction_m_action = "NodeAction.m-action";
 #define LUMI_FUNC_NAME _func_name_NodeAction_m_action
 Returncode NodeAction_m_action(NodeAction* self, SyntaxTreeNode* node) {
-  RAISE(248)
+  RAISE(243)
 }
 #undef LUMI_FUNC_NAME
 #endif
@@ -559,7 +546,7 @@ Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNod
 static char* _func_name_NodeLinkTypesAction_m_action = "NodeLinkTypesAction.m-action";
 #define LUMI_FUNC_NAME _func_name_NodeLinkTypesAction_m_action
 Returncode NodeLinkTypesAction_m_action(NodeLinkTypesAction* self, SyntaxTreeNode* node) {
-  CHECK(252, (node)->_dtl[1](node) )
+  CHECK(247, (node)->_dtl[1](node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -584,7 +571,7 @@ Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* n
 static char* _func_name_NodeAnalyzeAction_m_action = "NodeAnalyzeAction.m-action";
 #define LUMI_FUNC_NAME _func_name_NodeAnalyzeAction_m_action
 Returncode NodeAnalyzeAction_m_action(NodeAnalyzeAction* self, SyntaxTreeNode* node) {
-  CHECK(256, (node)->_dtl[2](node) )
+  CHECK(251, (node)->_dtl[2](node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -609,7 +596,7 @@ Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node)
 static char* _func_name_NodeWriteAction_m_action = "NodeWriteAction.m-action";
 #define LUMI_FUNC_NAME _func_name_NodeWriteAction_m_action
 Returncode NodeWriteAction_m_action(NodeWriteAction* self, SyntaxTreeNode* node) {
-  CHECK(260, (node)->_dtl[4](node) )
+  CHECK(255, (node)->_dtl[4](node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -635,7 +622,7 @@ Returncode NodeOrderConstantsAction_m_action(NodeOrderConstantsAction* self, Syn
 static char* _func_name_NodeOrderConstantsAction_m_action = "NodeOrderConstantsAction.m-action";
 #define LUMI_FUNC_NAME _func_name_NodeOrderConstantsAction_m_action
 Returncode NodeOrderConstantsAction_m_action(NodeOrderConstantsAction* self, SyntaxTreeNode* node) {
-  CHECK(266, (node)->_dtl[3](node, self->ordered_list) )
+  CHECK(261, (node)->_dtl[3](node, self->ordered_list) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

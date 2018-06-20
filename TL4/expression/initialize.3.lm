@@ -85,7 +85,6 @@ class InitExpression(ModuleTypeExpression)
             user glob.access-names[self.access],
             user "invalid access",
             user glob.access-names[param.access])
-        
   
   func inst write-allocation()
     self.arguments.write-preactions()
@@ -105,11 +104,9 @@ class InitExpression(ModuleTypeExpression)
     
     if ? self.constructor
       self.code-node.write-spaces()
-      self.write-call()
+      write(user "LUMI_err = ")
       self.constructor.write-cname()
-      self.arguments.write-call()
-      write(user " )\n")
-      self.arguments.write-postactions()
+      self.code-node.write-call(user self.arguments)
   
   func inst write-var-init()
     self.write-init-var-ref(user self.symbol)

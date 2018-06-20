@@ -8,7 +8,7 @@ testing test-complex-delete... OK
 testing test-assert-error-message... OK
 testing test-cover-all... OK
 testing test-constants... OK
-testing code coverage... 41% - failed, lines not covered:
-  tests/integration-test0.4.lm(4%): 36-37 50 52-54 57-60 64-69 89-90 92-102 107-108 114-179 192-193 215 226 238 244 250 263-271 276-279 283-290 292-309 314-347 351-359 389-403 405-411 415-418 421-445 453-454 457 463 466 469 472 475-482 484-494 496-504 506-514 516-526 532 537-546 549-553
+testing code coverage... 40% - failed, lines not covered:
+  tests/integration-test0.4.lm(4%): 36-37 50 52-54 57-60 64-69 89-90 92-102 107-108 114-179 192-193 215 226 238 244 250 263-271 276-279 283-290 292-309 314-347 351-365 395-409 411-417 421-424 427-451 459-460 463 469 472 475 478 481-488 490-500 502-510 512-520 522-532 538 543-552 555-559
   tests/integration-test1.4.lm(90%): 19-22 25-26 29-32 35-41 53 62 66-67 342
 Tests failed

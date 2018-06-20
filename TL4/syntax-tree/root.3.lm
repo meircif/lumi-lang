@@ -339,6 +339,7 @@ class SyntaxTreeRoot(GlobalNodes)
   
   func inst write-test-main()
     write(user "\nUSER_MAIN_HEADER {\n")
+    write(user "  Returncode LUMI_err = OK;\n")
     write(user "  Bool LUMI_success = true;\n")
     self.global-init.write()
     write(user "\n")
@@ -356,7 +357,7 @@ class SyntaxTreeRoot(GlobalNodes)
       write(user "  LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, ")
       write-int(copy self.covered-files)
       write(user ");\n")
-    write(user "  return LUMI_success? OK : FAIL;\n")
+    write(user "  return LUMI_success? LUMI_err : FAIL;\n")
     write(user "}\n")
     write(user "\nTEST_MAIN_FUNC\n")
 
@@ -427,12 +428,12 @@ class GlobalInit(SyntaxTreeFunction)
       return
     self.write-children(user self.variables)
     write(user "#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR(value) return value;\n")
+    write(user "#define RETURN_ERROR return LUMI_err;\n")
     write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")
     self.write-block-body()
     write(user "#undef LUMI_FUNC_NAME\n")
     write(user "#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup")
+    write(user "#define RETURN_ERROR goto LUMI_cleanup")
 
 
 static LineCount
