@@ -548,6 +548,7 @@ Returncode error_M_fail_assert_error(void) {
     TEST_FAIL(86, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
 LUMI_cleanup:
   return LUMI_err;
 }
@@ -594,8 +595,8 @@ Returncode error_M_fail_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(89)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   return LUMI_err;
@@ -643,8 +644,8 @@ Returncode error_M_fail_assert_error_message_prefix(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(92)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   return LUMI_err;

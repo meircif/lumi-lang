@@ -1502,6 +1502,7 @@ do {
     TEST_FAIL(1, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
 /// @ ta2
 do {
     ++LUMI_trace_ignore_count;
@@ -1515,6 +1516,7 @@ do {
     TEST_FAIL(1, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
 /// @ ta3
 {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -1541,8 +1543,8 @@ do {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(1)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
 /// @ ta4
 {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -1569,8 +1571,8 @@ do {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(1)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
 /// @ ta5
 {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -1597,11 +1599,12 @@ do {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(1)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
 /// @ tm0
 Returncode ut_M_fun(void);
 Returncode ut_M_fun_Mock(void);
+Bool ut_M_fun_Mock_active = true;
 Returncode ut_M_fun(void) {
   Returncode LUMI_err = OK;
   LUMI_err = ut_M_fun_Mock();
@@ -1609,7 +1612,6 @@ Returncode ut_M_fun(void) {
 LUMI_cleanup:
   return LUMI_err;
 }
-Bool ut_M_fun_Mock_active = true;
 Returncode ut_M_fun_Mock(void) {
   Returncode LUMI_err = OK;
   if (!ut_M_fun_Mock_active) return ut_M_fun();
@@ -1619,8 +1621,8 @@ LUMI_cleanup:
 }
 /// @ tm1
 Returncode ut_M_fun_Mock(void);
-Returncode ut_M_fun(void);
 Bool ut_M_fun_Mock_active = true;
+Returncode ut_M_fun(void);
 Returncode ut_M_fun_Mock(void) {
   Returncode LUMI_err = OK;
   if (!ut_M_fun_Mock_active) return ut_M_fun();
@@ -1642,6 +1644,7 @@ struct ut_M_Test {
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Int x);
 void ut_M_Test_Del(ut_M_Test* self);
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, Int x);
+Bool ut_M_Test_meth_Mock_active = true;
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Int x) {
   Returncode LUMI_err = OK;
@@ -1655,7 +1658,6 @@ LUMI_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
   if (self == NULL) return;
 }
-Bool ut_M_Test_meth_Mock_active = true;
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, Int x) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
@@ -1677,6 +1679,7 @@ struct ut_M_Test_Dynamic {
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x);
 void ut_M_Test_Del(ut_M_Test* self);
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x);
+Bool ut_M_Test_meth_Mock_active = true;
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth_Mock};
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x) {
   Returncode LUMI_err = OK;
@@ -1691,7 +1694,6 @@ LUMI_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
   if (self == NULL) return;
 }
-Bool ut_M_Test_meth_Mock_active = true;
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
@@ -1703,12 +1705,12 @@ LUMI_cleanup:
 /// @ tm4
 Returncode ut_M_fun(Int x, Int* y);
 Returncode ut_M_fun_Mock(Int x, Int* y);
+Bool ut_M_fun_Mock_active = true;
 Returncode ut_M_fun(Int x, Int* y) {
   Returncode LUMI_err = OK;
 LUMI_cleanup:
   return LUMI_err;
 }
-Bool ut_M_fun_Mock_active = true;
 Returncode ut_M_fun_Mock(Int x, Int* y) {
   Returncode LUMI_err = OK;
   if (!ut_M_fun_Mock_active) return ut_M_fun(x, y);
@@ -1729,6 +1731,7 @@ struct ut_M_Test {
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Int x, Int* y);
 void ut_M_Test_Del(ut_M_Test* self);
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, Int x, Int* y);
+Bool ut_M_Test_meth_Mock_active = true;
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Int x, Int* y) {
   Returncode LUMI_err = OK;
@@ -1742,7 +1745,6 @@ LUMI_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
   if (self == NULL) return;
 }
-Bool ut_M_Test_meth_Mock_active = true;
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, Int x, Int* y) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
@@ -1772,6 +1774,7 @@ struct ut_M_Test_Dynamic {
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x, Int* y);
 void ut_M_Test_Del(ut_M_Test* self);
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x, Int* y);
+Bool ut_M_Test_meth_Mock_active = true;
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth_Mock};
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x, Int* y) {
   Returncode LUMI_err = OK;
@@ -1786,7 +1789,6 @@ LUMI_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
   if (self == NULL) return;
 }
-Bool ut_M_Test_meth_Mock_active = true;
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x, Int* y) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
@@ -1798,6 +1800,51 @@ Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_T
   CHECK(8)
   ut_M_Test_meth_Mock_active = true;
 LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+/// @ tm7
+Returncode ut_M_fun(void);
+Returncode Sys_print_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
+Bool Sys_print_Mock_active = true;
+Returncode ut_M_fun(void) {
+  Returncode LUMI_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(2, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 11;
+  aux_String_0_Var.length = 10;
+  aux_String_0_Var.values = "mock print";
+  LUMI_err = Sys_print_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
+  CHECK(2)
+  aux_String_1 = &aux_String_1_Var;
+  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  if (aux_String_1_Refman == NULL) RAISE(3, 38, "insufficient memory for managed object")
+  aux_String_1_Var.max_length = 13;
+  aux_String_1_Var.length = 12;
+  aux_String_1_Var.values = "really print";
+  LUMI_err = Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman);
+  CHECK(3)
+  Sys_print_Mock_active = false;
+  Sys_print_Mock_active = true;
+LUMI_cleanup:
+  LUMI_dec_ref(aux_String_1_Refman);
+  LUMI_dec_ref(aux_String_0_Refman);
+  return LUMI_err;
+}
+Returncode Sys_print_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
+  Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+  LUMI_inc_ref(text_Refman);
+  if (!Sys_print_Mock_active) return Sys_print(self, self_Refman, text, text_Refman);
+LUMI_cleanup:
+  LUMI_dec_ref(text_Refman);
   LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
@@ -4589,7 +4636,9 @@ Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman);
 void ut_M_Test_Del(ut_M_Test* self);
 Returncode ut_M_fun(void);
 Returncode ut_M_fun_Mock(void);
+Bool ut_M_fun_Mock_active = true;
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman);
+Bool ut_M_Test_meth_Mock_active = true;
 Returncode second_M_dummy(void);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 int LUMI_file0_line_count[8] = {
@@ -4619,14 +4668,12 @@ Returncode ut_M_fun(void) {
 LUMI_cleanup:
   return LUMI_err;
 }
-Bool ut_M_fun_Mock_active = true;
 Returncode ut_M_fun_Mock(void) {
   Returncode LUMI_err = OK;
   if (!ut_M_fun_Mock_active) return ut_M_fun();
 LUMI_cleanup:
   return LUMI_err;
 }
-Bool ut_M_Test_meth_Mock_active = true;
 Returncode ut_M_Test_meth_Mock(ut_M_Test* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
