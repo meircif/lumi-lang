@@ -396,10 +396,13 @@ Returncode integration_M_test_mid_out(covered_M_MiddleType** mt, Ref_Manager** m
 
 Returncode integration_M_TestStruct_get_Mock(integration_M_TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman);
 
+Bool integration_M_TestStruct_get_Mock_active = true;
 Returncode integration_M_f_test_int2str_Mock(Int x, String** s, Ref_Manager** s_Refman);
 
+Bool integration_M_f_test_int2str_Mock_active = true;
 Returncode integration_M_TestClass_dynamic_meth_Mock(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic);
 
+Bool integration_M_TestClass_dynamic_meth_Mock_active = true;
 Returncode integration_M_test_func(void);
 
 Returncode integration_M_test_another(void);
@@ -450,6 +453,7 @@ Returncode integration_M_test_assert_error_message(void);
 
 Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
 
+Bool Sys_println_Mock_active = true;
 Returncode integration_M_test_cover_all(void);
 
 Returncode integration_M_test_constants(void);
@@ -4537,7 +4541,6 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-Bool integration_M_TestStruct_get_Mock_active = true;
 #define LUMI_FILE_NAME "tests/integration-test1.4.lm"
 #define LUMI_FUNC_NAME "TestStruct.get Mock"
 Returncode integration_M_TestStruct_get_Mock(integration_M_TestStruct* self, Ref_Manager* self_Refman, Int* x, String** s, Ref_Manager** s_Refman) {
@@ -4571,7 +4574,6 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-Bool integration_M_f_test_int2str_Mock_active = true;
 #define LUMI_FILE_NAME "tests/integration-test1.4.lm"
 #define LUMI_FUNC_NAME "f-test-int2str Mock"
 Returncode integration_M_f_test_int2str_Mock(Int x, String** s, Ref_Manager** s_Refman) {
@@ -4585,7 +4587,6 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-Bool integration_M_TestClass_dynamic_meth_Mock_active = true;
 #define LUMI_FILE_NAME "tests/integration-test1.4.lm"
 #define LUMI_FUNC_NAME "TestClass.dynamic-meth Mock"
 Returncode integration_M_TestClass_dynamic_meth_Mock(integration_M_TestClass* self, Ref_Manager* self_Refman, integration_M_TestClass_Dynamic* self_Dynamic) {
@@ -4640,6 +4641,7 @@ Returncode integration_M_test_func(void) {
     TEST_FAIL(82, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[83];
   LUMI_err = integration_M_f_test_int2str(4, &(s), &(s_Refman));
   CHECK(83)
@@ -4664,6 +4666,7 @@ Returncode integration_M_test_func(void) {
     TEST_FAIL(87, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[89];
   t = &t_Var;
   t_Refman = LUMI_new_ref(t);
@@ -4818,6 +4821,7 @@ Returncode integration_M_test_native(void) {
     TEST_FAIL(134, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[135];
   TEST_ASSERT(135, i == 3)
   ++LUMI_file_coverage[1].line_count[136];
@@ -5749,6 +5753,7 @@ Returncode integration_M_f_good_assert_error(void) {
     TEST_FAIL(322, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[323];
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -5782,6 +5787,7 @@ Returncode integration_M_f_failed_assert_error(void) {
     TEST_FAIL(326, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
 LUMI_cleanup:
   return LUMI_err;
 }
@@ -5819,8 +5825,8 @@ Returncode integration_M_f_wrong_message_assert_error(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(329)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
 LUMI_cleanup:
   return LUMI_err;
 }
@@ -5918,8 +5924,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(345)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[346];
   {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -5947,8 +5953,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(346)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[347];
   {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -5976,8 +5982,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(347)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[348];
   {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -6005,8 +6011,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(348)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[349];
   {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -6034,8 +6040,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(349)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[350];
   do {
     ++LUMI_trace_ignore_count;
@@ -6050,6 +6056,7 @@ Returncode integration_M_test_assert_error_message(void) {
     TEST_FAIL(350, 16, "error not raised")
   } while (false);
   --LUMI_trace_ignore_count;
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[351];
   ++LUMI_file_coverage[1].line_count[352];
   {char* LUMI_expected_error_prev;
@@ -6079,8 +6086,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(352)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[353];
   base_var = &base_var_Var;
   base_var_Refman = LUMI_new_ref(base_var);
@@ -6120,8 +6127,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(355)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[357];
   arr = LUMI_new_array(2, sizeof(Int));
   if (arr == NULL) RAISE(357, 49, "insufficient memory for object dynamic allocation")
@@ -6155,8 +6162,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(358)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[359];
   arr2 = arr;
   arr2_Refman = arr_Refman;
@@ -6196,8 +6203,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(361)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[362];
   {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -6225,8 +6232,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(362)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[363];
   {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -6255,8 +6262,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(363)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[364];
   {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -6285,8 +6292,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(364)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[365];
   ++LUMI_file_coverage[1].line_count[366];
   {char* LUMI_expected_error_prev;
@@ -6316,8 +6323,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(366)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[367];
   integration_M_new_fail_countdown = 1;
   ++LUMI_file_coverage[1].line_count[368];
@@ -6347,8 +6354,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(368)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[369];
   integration_M_new_fail_countdown = 2;
   ++LUMI_file_coverage[1].line_count[370];
@@ -6378,8 +6385,8 @@ Returncode integration_M_test_assert_error_message(void) {
     LUMI_expected_error = LUMI_expected_error_prev;
     TEST_FAIL_NULL(370)
   }
-  LUMI_expected_error = LUMI_expected_error_prev;
-  LUMI_err = OK;}
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
 LUMI_cleanup:
   LUMI_owner_dec_ref(aux_Array_0_Refman);
   LUMI_dec_ref(top_Refman);
@@ -6392,7 +6399,6 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-Bool Sys_println_Mock_active = true;
 #define LUMI_FILE_NAME "tests/integration-test1.4.lm"
 #define LUMI_FUNC_NAME "Sys.println Mock"
 Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
