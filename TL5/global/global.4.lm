@@ -241,7 +241,9 @@ struct Global
     self.add-builtin-output(
         user arguments, copy Access.OWNER, user glob.type-file, user "file")
     
-    self.add-builtin-method(user glob.type-file, user "close")->(user arguments)
+    self.add-builtin-global-function(user "file-close")->(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy Access.OWNER, user glob.type-file, user "file")
     
     self.add-builtin-method(user glob.type-file, user "getc")->(user arguments)
     self.add-builtin-output(
@@ -257,16 +259,30 @@ struct Global
     self.add-builtin-parameter(
         user arguments, copy Access.USER, user glob.type-string, user "text")
     
-    self.add-builtin-global-variable(user glob.type-file, user "stdout")
-    self.add-builtin-global-variable(user glob.type-file, user "stdin")
-    self.add-builtin-global-variable(user glob.type-file, user "stderr")
-    
     ; Sys
     self.add-builtin-field(
         user glob.type-sys,
         user "argv",
         user glob.type-array,
         user glob.type-string)
+        
+    self.add-builtin-field(
+        user glob.type-sys,
+        user "stdout",
+        user glob.type-file,
+        user _)
+        
+    self.add-builtin-field(
+        user glob.type-sys,
+        user "stdin",
+        user glob.type-file,
+        user _)
+        
+    self.add-builtin-field(
+        user glob.type-sys,
+        user "stderr",
+        user glob.type-file,
+        user _)
     
     self.add-builtin-method(user glob.type-sys, user "print")->(user arguments)
     self.add-builtin-parameter(

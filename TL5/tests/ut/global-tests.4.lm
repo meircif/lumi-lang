@@ -38,7 +38,7 @@ mock file-open-read(user String name)->(owner File file)
 mock file-open-write(user String name)->(owner File file)
   ; do nothing
 
-mock File.close()
+mock file-close(owner File file)
   tl5-compiler-tests.mock-input-line-eof-index := - 1
 
 mock File.getc()->(var Char ch, var Bool is-eof)
@@ -125,7 +125,7 @@ func write-new-file(user String filename, user String data)
   owner File file
   file-open-write.mocked(user filename)->(owner file)
   file.write.mocked(user data)
-  file.close.mocked()
+  file-close.mocked(owner file)
 
 func assert-string(user String expected, user String actual)
   assert actual?
@@ -253,9 +253,9 @@ func test-from-file(user String name)
     if not expected-output-file.getc.mocked()->(var ch)
       file-error(user name, user subname)
     actual-output-file.write.mocked(user "/// @\n")
-    input-file.close.mocked()
-    expected-output-file.close.mocked()
-    actual-output-file.close.mocked()
+    file-close.mocked(owner input-file)
+    file-close.mocked(owner expected-output-file)
+    file-close.mocked(owner actual-output-file)
     
   had-test-error := false
   assert tests-passed

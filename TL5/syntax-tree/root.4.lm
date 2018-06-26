@@ -69,7 +69,7 @@ class SyntaxTreeRoot(GlobalNodes)
           self.set-location()
           self.syntax-error-msg(user "no new-line before file end")
         
-        glob.input-file.close()
+        file-close(owner glob.input-file)
         if self.line-counts?
           self.line-counts[glob.input-file-index].init()
     
@@ -291,7 +291,7 @@ class SyntaxTreeRoot(GlobalNodes)
       write-global(user "\n\n/* main function */\n")
       self.main-function.write()
     
-    glob.output-file.close()
+    file-close(owner glob.output-file)
   
   func inst write-for-type(user TypeWriter type-writer)
     user ListNode{TypeData} child(user self.types.first)

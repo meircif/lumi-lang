@@ -52,7 +52,7 @@ func test-code(user String input-text, user String expected-output)
     else
       for n in mock-output-file-text.length
         code-header.putc.mocked(copy mock-output-file-text[n])
-    code-header.close.mocked()
+    file-close.mocked(owner code-header)
     code-header-valid := tests-passed
     if not tests-passed
       return
