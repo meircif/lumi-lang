@@ -54,9 +54,9 @@ Returncode SyntaxTreeCode_get_parent_type(SyntaxTreeCode* self, TypeData** paren
 static char* _func_name_SyntaxTreeCode_get_parent_type = "SyntaxTreeCode.get-parent-type";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeCode_get_parent_type
 Returncode SyntaxTreeCode_get_parent_type(SyntaxTreeCode* self, TypeData** parent_type) {
-  SyntaxTreeFunction* _SyntaxTreeFunction55;
-  CHECK(19, SyntaxTreeCode_get_function(self, &(_SyntaxTreeFunction55)) )
-  (*parent_type) = _SyntaxTreeFunction55->parent_type;
+  SyntaxTreeFunction* _SyntaxTreeFunction58;
+  CHECK(19, SyntaxTreeCode_get_function(self, &(_SyntaxTreeFunction58)) )
+  (*parent_type) = _SyntaxTreeFunction58->parent_type;
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -97,9 +97,9 @@ static char* _func_name_SyntaxTreeCode_read_line_break_spaces = "SyntaxTreeCode.
 Returncode SyntaxTreeCode_read_line_break_spaces(SyntaxTreeCode* self) {
   Int expected_spaces = self->parent->_base.indentation_spaces + 4;
   {int n; for (n = (0); n < (expected_spaces); ++n) {
-    Char _Char56;
-    CHECK(37, read_c(&(_Char56)) )
-    if (_Char56 != ' ') {
+    Char _Char59;
+    CHECK(37, read_c(&(_Char59)) )
+    if (_Char59 != ' ') {
       CHECK(38, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base), n, expected_spaces) )
     }
   }}
@@ -163,15 +163,15 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
   SyntaxTreeIf* new_if = NULL;
   SyntaxTreeTry* new_try = NULL;
   
-  Bool _Bool57;
-  CHECK(61, SyntaxTreeBlock_m_has_end_point(self, &(_Bool57)) )
-  if (_Bool57) {
+  Bool _Bool60;
+  CHECK(61, SyntaxTreeBlock_m_has_end_point(self, &(_Bool60)) )
+  if (_Bool60) {
     CHECK(62, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){17, 16, "unreachable code"}) )
   }
   
-  Bool _Bool58;
-  CHECK(64, String_equal(keyword, &(String){3, 2, "if"}, &(_Bool58)) )
-  if (_Bool58) {
+  Bool _Bool61;
+  CHECK(64, String_equal(keyword, &(String){3, 2, "if"}, &(_Bool61)) )
+  if (_Bool61) {
     if ((*end) != ' ') {
       CHECK(66, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){31, 30, "expected space after \"if\", got"}, (*end)) )
     }
@@ -180,24 +180,24 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
     
   }
   else {
-    Bool _Bool59;
-    CHECK(70, String_equal(keyword, &(String){5, 4, "else"}, &(_Bool59)) )
-    if (_Bool59) {
+    Bool _Bool62;
+    CHECK(70, String_equal(keyword, &(String){5, 4, "else"}, &(_Bool62)) )
+    if (_Bool62) {
       if (!(NULL != self->previous_if)) {
         CHECK(72, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){31, 30, "\"else\" without a previous \"if\""}) )
       }
       if ((*end) != '\n') {
         CHECK(74, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){36, 35, "expected new-line after \"else\", got"}, (*end)) )
       }
-      SyntaxTreeElse* _SyntaxTreeElse60;
-      CHECK(76, SyntaxTreeElse_parse_new(NULL, self, &((*end)), &(_SyntaxTreeElse60)) )
-      CHECK(76, SyntaxTreeIf_add_else(self->previous_if, _SyntaxTreeElse60) )
+      SyntaxTreeElse* _SyntaxTreeElse63;
+      CHECK(76, SyntaxTreeElse_parse_new(NULL, self, &((*end)), &(_SyntaxTreeElse63)) )
+      CHECK(76, SyntaxTreeIf_add_else(self->previous_if, _SyntaxTreeElse63) )
       
     }
     else {
-      Bool _Bool61;
-      CHECK(79, String_equal(keyword, &(String){8, 7, "else-if"}, &(_Bool61)) )
-      if (_Bool61) {
+      Bool _Bool64;
+      CHECK(79, String_equal(keyword, &(String){8, 7, "else-if"}, &(_Bool64)) )
+      if (_Bool64) {
         if (!(NULL != self->previous_if)) {
           CHECK(81, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "\"else-if\" without a previous \"if\""}) )
         }
@@ -206,9 +206,9 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
         }
         SyntaxTreeCoverage* coverage_node = NULL;
         if (NULL != glob->tested_module) {
-          Bool _Bool62;
-          CHECK(87, String_equal(glob->current_module->name, glob->tested_module, &(_Bool62)) )
-          if (_Bool62) {
+          Bool _Bool65;
+          CHECK(87, String_equal(glob->current_module->name, glob->tested_module, &(_Bool65)) )
+          if (_Bool65) {
             CHECK(88, SyntaxTreeCoverage_init_new(NULL, NULL, &(coverage_node)) )
           }
         }
@@ -217,95 +217,95 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
         
       }
       else {
-        Bool _Bool63;
-        CHECK(92, String_equal(keyword, &(String){3, 2, "do"}, &(_Bool63)) )
-        if (_Bool63) {
+        Bool _Bool66;
+        CHECK(92, String_equal(keyword, &(String){3, 2, "do"}, &(_Bool66)) )
+        if (_Bool66) {
           if ((*end) != '\n') {
             CHECK(94, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){34, 33, "expected new-line after \"do\", got"}, (*end)) )
           }
-          SyntaxTreeDoLoop* _SyntaxTreeDoLoop64;
-          CHECK(96, SyntaxTreeDoLoop_parse_new(NULL, self, &((*end)), &(_SyntaxTreeDoLoop64)) )
-          CHECK(96, List_add(self->code_nodes, &(_SyntaxTreeDoLoop64->_base._base)) )
+          SyntaxTreeDoLoop* _SyntaxTreeDoLoop67;
+          CHECK(96, SyntaxTreeDoLoop_parse_new(NULL, self, &((*end)), &(_SyntaxTreeDoLoop67)) )
+          CHECK(96, List_add(self->code_nodes, &(_SyntaxTreeDoLoop67->_base._base)) )
           
         }
         else {
-          Bool _Bool65;
-          CHECK(99, String_equal(keyword, &(String){4, 3, "for"}, &(_Bool65)) )
-          if (_Bool65) {
+          Bool _Bool68;
+          CHECK(99, String_equal(keyword, &(String){4, 3, "for"}, &(_Bool68)) )
+          if (_Bool68) {
             if ((*end) != ' ') {
               CHECK(101, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){32, 31, "expected space after \"for\", got"}, (*end)) )
             }
-            SyntaxTreeForLoop* _SyntaxTreeForLoop66;
-            CHECK(103, SyntaxTreeForLoop_parse_new(NULL, self, &((*end)), &(_SyntaxTreeForLoop66)) )
-            CHECK(103, List_add(self->code_nodes, &(_SyntaxTreeForLoop66->_base._base)) )
+            SyntaxTreeForLoop* _SyntaxTreeForLoop69;
+            CHECK(103, SyntaxTreeForLoop_parse_new(NULL, self, &((*end)), &(_SyntaxTreeForLoop69)) )
+            CHECK(103, List_add(self->code_nodes, &(_SyntaxTreeForLoop69->_base._base)) )
             
           }
           else {
-            Bool _Bool67;
-            CHECK(106, String_equal(keyword, &(String){6, 5, "while"}, &(_Bool67)) )
-            if (_Bool67) {
+            Bool _Bool70;
+            CHECK(106, String_equal(keyword, &(String){6, 5, "while"}, &(_Bool70)) )
+            if (_Bool70) {
               if ((*end) != ' ') {
                 CHECK(108, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){34, 33, "expected space after \"while\", got"}, (*end)) )
               }
-              SyntaxTreeWhile* _SyntaxTreeWhile68;
-              CHECK(110, SyntaxTreeWhile_parse_new(NULL, self, &((*end)), &(_SyntaxTreeWhile68)) )
-              CHECK(110, List_add(self->code_nodes, &(_SyntaxTreeWhile68->_base)) )
+              SyntaxTreeWhile* _SyntaxTreeWhile71;
+              CHECK(110, SyntaxTreeWhile_parse_new(NULL, self, &((*end)), &(_SyntaxTreeWhile71)) )
+              CHECK(110, List_add(self->code_nodes, &(_SyntaxTreeWhile71->_base)) )
               
             }
             else {
-              Bool _Bool69;
-              CHECK(113, String_equal(keyword, &(String){9, 8, "continue"}, &(_Bool69)) )
-              if (_Bool69) {
+              Bool _Bool72;
+              CHECK(113, String_equal(keyword, &(String){9, 8, "continue"}, &(_Bool72)) )
+              if (_Bool72) {
                 if ((*end) != '\n') {
                   CHECK(115, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){40, 39, "expected new-line after \"continue\", got"}, (*end)) )
                 }
-                SyntaxTreeContinue* _SyntaxTreeContinue70;
-                CHECK(117, SyntaxTreeContinue_parse_new(NULL, self, &((*end)), &(_SyntaxTreeContinue70)) )
-                CHECK(117, List_add(self->code_nodes, &(_SyntaxTreeContinue70->_base)) )
+                SyntaxTreeContinue* _SyntaxTreeContinue73;
+                CHECK(117, SyntaxTreeContinue_parse_new(NULL, self, &((*end)), &(_SyntaxTreeContinue73)) )
+                CHECK(117, List_add(self->code_nodes, &(_SyntaxTreeContinue73->_base)) )
                 
               }
               else {
-                Bool _Bool71;
-                CHECK(120, String_equal(keyword, &(String){7, 6, "return"}, &(_Bool71)) )
-                if (_Bool71) {
+                Bool _Bool74;
+                CHECK(120, String_equal(keyword, &(String){7, 6, "return"}, &(_Bool74)) )
+                if (_Bool74) {
                   if ((*end) != '\n') {
                     CHECK(122, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){38, 37, "expected new-line after \"return\", got"}, (*end)) )
                   }
-                  SyntaxTreeReturn* _SyntaxTreeReturn72;
-                  CHECK(124, SyntaxTreeReturn_parse_new(NULL, self, &((*end)), &(_SyntaxTreeReturn72)) )
-                  CHECK(124, List_add(self->code_nodes, &(_SyntaxTreeReturn72->_base)) )
+                  SyntaxTreeReturn* _SyntaxTreeReturn75;
+                  CHECK(124, SyntaxTreeReturn_parse_new(NULL, self, &((*end)), &(_SyntaxTreeReturn75)) )
+                  CHECK(124, List_add(self->code_nodes, &(_SyntaxTreeReturn75->_base)) )
                   
                 }
                 else {
-                  Bool _Bool73;
-                  CHECK(127, String_equal(keyword, &(String){6, 5, "raise"}, &(_Bool73)) )
-                  if (_Bool73) {
+                  Bool _Bool76;
+                  CHECK(127, String_equal(keyword, &(String){6, 5, "raise"}, &(_Bool76)) )
+                  if (_Bool76) {
                     if ((*end) != ' ' && (*end) != '\n') {
                       CHECK(129, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){46, 45, "expected space or new-line after \"raise\", got"}, (*end)) )
                     }
-                    SyntaxTreeRaise* _SyntaxTreeRaise74;
-                    CHECK(131, SyntaxTreeRaise_parse_new(NULL, self, &((*end)), &(_SyntaxTreeRaise74)) )
-                    CHECK(131, List_add(self->code_nodes, &(_SyntaxTreeRaise74->_base)) )
+                    SyntaxTreeRaise* _SyntaxTreeRaise77;
+                    CHECK(131, SyntaxTreeRaise_parse_new(NULL, self, &((*end)), &(_SyntaxTreeRaise77)) )
+                    CHECK(131, List_add(self->code_nodes, &(_SyntaxTreeRaise77->_base)) )
                     
                   }
                   else {
-                    Bool _Bool75;
-                    CHECK(134, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool75)) )
-                    if (_Bool75) {
+                    Bool _Bool78;
+                    CHECK(134, String_equal(keyword, &(String){4, 3, "new"}, &(_Bool78)) )
+                    if (_Bool78) {
                       if ((*end) != ' ') {
                         CHECK(136, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){32, 31, "expected space after \"new\", got"}, (*end)) )
                       }
-                      SyntaxTreeFunction* _SyntaxTreeFunction76;
-                      CHECK(138, (self)->_base._base._dtl[8](self, &(_SyntaxTreeFunction76)) )
-                      SyntaxTreeVariable* _SyntaxTreeVariable77;
-                      CHECK(138, SyntaxTreeVariable_parse_new(NULL, ACCESS_OWNER, true, NULL, self, &((*end)), &(_SyntaxTreeVariable77)) )
-                      CHECK(138, List_add(_SyntaxTreeFunction76->_base._base.variables, _SyntaxTreeVariable77) )
+                      SyntaxTreeFunction* _SyntaxTreeFunction79;
+                      CHECK(138, (self)->_base._base._dtl[8](self, &(_SyntaxTreeFunction79)) )
+                      SyntaxTreeVariable* _SyntaxTreeVariable80;
+                      CHECK(138, SyntaxTreeVariable_parse_new(NULL, ACCESS_OWNER, true, NULL, self, &((*end)), &(_SyntaxTreeVariable80)) )
+                      CHECK(138, List_add(_SyntaxTreeFunction79->_base._base.variables, _SyntaxTreeVariable80) )
                       
                     }
                     else {
-                      Bool _Bool78;
-                      CHECK(141, String_equal(keyword, &(String){4, 3, "try"}, &(_Bool78)) )
-                      if (_Bool78) {
+                      Bool _Bool81;
+                      CHECK(141, String_equal(keyword, &(String){4, 3, "try"}, &(_Bool81)) )
+                      if (_Bool81) {
                         if ((*end) != '\n') {
                           CHECK(143, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){35, 34, "expected new-line after \"try\", got"}, (*end)) )
                         }
@@ -316,9 +316,9 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
                         
                       }
                       else {
-                        Bool _Bool79;
-                        CHECK(150, String_equal(keyword, &(String){6, 5, "catch"}, &(_Bool79)) )
-                        if (_Bool79) {
+                        Bool _Bool82;
+                        CHECK(150, String_equal(keyword, &(String){6, 5, "catch"}, &(_Bool82)) )
+                        if (_Bool82) {
                           if (!(NULL != self->previous_try)) {
                             CHECK(152, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){33, 32, "\"catch\" without a previous \"try\""}) )
                           }
@@ -332,34 +332,34 @@ Returncode SyntaxTreeBlock_parse_child(SyntaxTreeBlock* self, String* keyword, C
                           
                         }
                         else {
-                          Bool _Bool80;
-                          CHECK(161, String_equal(keyword, &(String){7, 6, "assert"}, &(_Bool80)) )
-                          if (_Bool80) {
+                          Bool _Bool83;
+                          CHECK(161, String_equal(keyword, &(String){7, 6, "assert"}, &(_Bool83)) )
+                          if (_Bool83) {
                             if ((*end) != ' ') {
                               CHECK(163, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){35, 34, "expected space after \"assert\", got"}, (*end)) )
                             }
-                            SyntaxTreeAssert* _SyntaxTreeAssert81;
-                            CHECK(165, SyntaxTreeAssert_parse_new(NULL, self, &((*end)), &(_SyntaxTreeAssert81)) )
-                            CHECK(165, List_add(self->code_nodes, &(_SyntaxTreeAssert81->_base)) )
+                            SyntaxTreeAssert* _SyntaxTreeAssert84;
+                            CHECK(165, SyntaxTreeAssert_parse_new(NULL, self, &((*end)), &(_SyntaxTreeAssert84)) )
+                            CHECK(165, List_add(self->code_nodes, &(_SyntaxTreeAssert84->_base)) )
                             
                           }
                           else {
-                            Bool _Bool82;
-                            CHECK(168, String_equal(keyword, &(String){13, 12, "assert-error"}, &(_Bool82)) )
-                            if (_Bool82) {
+                            Bool _Bool85;
+                            CHECK(168, String_equal(keyword, &(String){13, 12, "assert-error"}, &(_Bool85)) )
+                            if (_Bool85) {
                               if ((*end) != ' ') {
                                 CHECK(170, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){41, 40, "expected space after \"assert-error\", got"}, (*end)) )
                               }
-                              SyntaxTreeAssertError* _SyntaxTreeAssertError83;
-                              CHECK(172, SyntaxTreeAssertError_parse_new(NULL, self, &((*end)), &(_SyntaxTreeAssertError83)) )
-                              CHECK(172, List_add(self->code_nodes, &(_SyntaxTreeAssertError83->_base)) )
+                              SyntaxTreeAssertError* _SyntaxTreeAssertError86;
+                              CHECK(172, SyntaxTreeAssertError_parse_new(NULL, self, &((*end)), &(_SyntaxTreeAssertError86)) )
+                              CHECK(172, List_add(self->code_nodes, &(_SyntaxTreeAssertError86->_base)) )
                               
                             }
                             else {
                               glob->save_input = true;
-                              SyntaxTreeExpression* _SyntaxTreeExpression84;
-                              CHECK(177, SyntaxTreeExpression_parse_new(NULL, self, &((*end)), &(_SyntaxTreeExpression84)) )
-                              CHECK(177, List_add(self->code_nodes, &(_SyntaxTreeExpression84->_base)) )
+                              SyntaxTreeExpression* _SyntaxTreeExpression87;
+                              CHECK(177, SyntaxTreeExpression_parse_new(NULL, self, &((*end)), &(_SyntaxTreeExpression87)) )
+                              CHECK(177, List_add(self->code_nodes, &(_SyntaxTreeExpression87->_base)) )
                             }
                           }
                         }

@@ -579,7 +579,7 @@ file-open-read(user str)->(owner fobj)
 ## @ c t16
 file-open-write(user str)->(owner fobj)
 ## @ c t17
-fobj.close()
+file-close(owner fobj)
 ## @ c t18
 fobj.getc()->(var c, var b)
 ## @ c t19
@@ -603,11 +603,11 @@ sys.system(user str)->(var i)
 ## @ c t28
 sys.getenv(user str, user str)->(var b)
 ## @ c t29
-stdout.putc(copy c)
+sys.stdout.putc(copy c)
 ## @ c t30
-stdin.getc()->(var c, var b)
+sys.stdin.getc()->(var c, var b)
 ## @ c t31
-stderr.putc(copy c)
+sys.stderr.putc(copy c)
 ## @ c t32
 String.clear(user str)
 ## @

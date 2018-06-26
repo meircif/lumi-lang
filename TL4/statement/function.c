@@ -56,17 +56,17 @@ Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, TypeData* parent_t
     self->_base._base.indentation_spaces = 2;
     if (self->parent_type->is_dynamic) {
       String* meth_type = NULL;
-      Int _Int149;
-      CHECK(28, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int149)) )
-      Bool _Bool150;
-      CHECK(29, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool150)) )
-      if (_Bool150) {
+      Int _Int152;
+      CHECK(28, read_until(&(String){2, 1, " "}, false, &(meth_type), &((*end)), &(_Int152)) )
+      Bool _Bool153;
+      CHECK(29, String_equal(meth_type, &(String){8, 7, "dynamic"}, &(_Bool153)) )
+      if (_Bool153) {
         self->is_dynamic = true;
       }
       else {
-        Bool _Bool151;
-        CHECK(31, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool151)) )
-        if (!_Bool151) {
+        Bool _Bool154;
+        CHECK(31, String_equal(meth_type, &(String){5, 4, "inst"}, &(_Bool154)) )
+        if (!_Bool154) {
           CHECK(32, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){46, 45, "expected \"dynamic\" or \"inst\" method type, got"}, meth_type) )
         }
       }
@@ -154,39 +154,39 @@ Returncode SyntaxTreeFunction_f_register_name(SyntaxTreeFunction* self);
 static char* _func_name_SyntaxTreeFunction_f_register_name = "SyntaxTreeFunction.f-register-name";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFunction_f_register_name
 Returncode SyntaxTreeFunction_f_register_name(SyntaxTreeFunction* self) {
-  Bool _Bool152;
-  CHECK(69, f_is_legal_name(self->name, NAME_DEFAULT, &(_Bool152)) )
-  if (!_Bool152) {
+  Bool _Bool155;
+  CHECK(69, f_is_legal_name(self->name, NAME_DEFAULT, &(_Bool155)) )
+  if (!_Bool155) {
     CHECK(70, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){22, 21, "illegal function name"}, self->name) )
   }
   if (NULL != self->parent_type) {
     SyntaxTreeFunction* meth = NULL;
-    Int _Int153;
-    CHECK(73, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int153)) )
+    Int _Int156;
+    CHECK(73, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int156)) )
     if (NULL != meth) {
       CHECK(75, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){23, 22, "redefinition of method"}, self->name) )
     }
     SyntaxTreeVariable* field = NULL;
-    Int _Int154;
-    CHECK(77, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int154)) )
+    Int _Int157;
+    CHECK(77, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int157)) )
     if (NULL != field) {
       CHECK(79, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "method name overrides field"}, self->name) )
     }
   }
   else {
-    ModuleMembers* _ModuleMembers155;
-    CHECK(82, NameMap_find(glob->module_map, self->name, (void**)&(_ModuleMembers155)) )
-    if (NULL != _ModuleMembers155) {
+    ModuleMembers* _ModuleMembers158;
+    CHECK(82, NameMap_find(glob->module_map, self->name, (void**)&(_ModuleMembers158)) )
+    if (NULL != _ModuleMembers158) {
       CHECK(83, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){31, 30, "function name overrides module"}, self->name) )
     }
-    SyntaxTreeFunction* _SyntaxTreeFunction156;
-    CHECK(85, Global_find_function(glob, self->name, &(_SyntaxTreeFunction156)) )
-    if (NULL != _SyntaxTreeFunction156) {
+    SyntaxTreeFunction* _SyntaxTreeFunction159;
+    CHECK(85, Global_find_function(glob, self->name, &(_SyntaxTreeFunction159)) )
+    if (NULL != _SyntaxTreeFunction159) {
       CHECK(86, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){25, 24, "redefinition of function"}, self->name) )
     }
-    SyntaxTreeVariable* _SyntaxTreeVariable157;
-    CHECK(87, Global_find_variable(glob, self->name, &(_SyntaxTreeVariable157)) )
-    if (NULL != _SyntaxTreeVariable157) {
+    SyntaxTreeVariable* _SyntaxTreeVariable160;
+    CHECK(87, Global_find_variable(glob, self->name, &(_SyntaxTreeVariable160)) )
+    if (NULL != _SyntaxTreeVariable160) {
       CHECK(88, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){40, 39, "function name overrides global variable"}, self->name) )
     }
     if (NULL != self->my_module) {
@@ -404,9 +404,9 @@ Returncode SyntaxTreeFunction_write_setup(SyntaxTreeFunction* self) {
     if (!(NULL != node)) break;
     if (((Argument*)(node->item))->access == ACCESS_USER) {
       CHECK(201, write(&(String){16, 15, "  LUMI_inc_ref("}) )
-      SyntaxTreeVariable* _SyntaxTreeVariable158;
-      CHECK(202, (((Argument*)(node->item)))->_base._dtl[9](((Argument*)(node->item)), &(_SyntaxTreeVariable158)) )
-      CHECK(202, write_cname(_SyntaxTreeVariable158->name) )
+      SyntaxTreeVariable* _SyntaxTreeVariable161;
+      CHECK(202, (((Argument*)(node->item)))->_base._dtl[9](((Argument*)(node->item)), &(_SyntaxTreeVariable161)) )
+      CHECK(202, write_cname(_SyntaxTreeVariable161->name) )
       CHECK(203, write(&(String){11, 10, "_Refman);\n"}) )
     }
     node = node->next;
@@ -426,9 +426,9 @@ Returncode SyntaxTreeFunction_write_cleanup(SyntaxTreeFunction* self) {
   while (true) {
     if (!(NULL != param_node)) break;
     if (((Argument*)(param_node->item))->access == ACCESS_USER || ((Argument*)(param_node->item))->access == ACCESS_OWNER) {
-      SyntaxTreeVariable* _SyntaxTreeVariable159;
-      CHECK(213, (((Argument*)(param_node->item)))->_base._dtl[9](((Argument*)(param_node->item)), &(_SyntaxTreeVariable159)) )
-      CHECK(213, SyntaxTreeBranch_write_variable_cleanup(&(self->_base._base), _SyntaxTreeVariable159, NULL) )
+      SyntaxTreeVariable* _SyntaxTreeVariable162;
+      CHECK(213, (((Argument*)(param_node->item)))->_base._dtl[9](((Argument*)(param_node->item)), &(_SyntaxTreeVariable162)) )
+      CHECK(213, SyntaxTreeBranch_write_variable_cleanup(&(self->_base._base), _SyntaxTreeVariable162, NULL) )
     }
     param_node = param_node->prev;
   }
@@ -779,11 +779,11 @@ Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory*
 static char* _func_name_DeclarationArgumentFactory_m_new_argument = "DeclarationArgumentFactory.m-new-argument";
 #define LUMI_FUNC_NAME _func_name_DeclarationArgumentFactory_m_new_argument
 Returncode DeclarationArgumentFactory_m_new_argument(DeclarationArgumentFactory* self, Argument** new_argument) {
-  DeclarationArgument* _DeclarationArgument160 = malloc(sizeof(DeclarationArgument));
-  if (_DeclarationArgument160 == NULL) RAISE(373)
-  *_DeclarationArgument160 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, false, NULL};
-  _DeclarationArgument160->_base._base._dtl = DeclarationArgument__dtl;
-  (*new_argument) = &(_DeclarationArgument160->_base);
+  DeclarationArgument* _DeclarationArgument163 = malloc(sizeof(DeclarationArgument));
+  if (_DeclarationArgument163 == NULL) RAISE(373)
+  *_DeclarationArgument163 = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, false, NULL};
+  _DeclarationArgument163->_base._base._dtl = DeclarationArgument__dtl;
+  (*new_argument) = &(_DeclarationArgument163->_base);
   return OK;
 }
 #undef LUMI_FUNC_NAME

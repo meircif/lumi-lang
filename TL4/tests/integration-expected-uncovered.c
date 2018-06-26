@@ -2891,11 +2891,11 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
       ++LUMI_file_coverage[0].line_count[287];
       if (arr == NULL) RAISE(287, 29, "empty object used as sequence")
       if (arr_Refman->value == NULL) RAISE(287, 40, "outdated weak reference used as sequence")
-      if ((4) < 0 || (4) >= (arr)->length) RAISE(287, 25, "slice index out of bounds")
+      if ((5) < 0 || (5) >= (arr)->length) RAISE(287, 25, "slice index out of bounds")
       if (arr == NULL) RAISE(287, 29, "empty object used as sequence")
       if (arr_Refman->value == NULL) RAISE(287, 40, "outdated weak reference used as sequence")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(287, 25, "slice index out of bounds")
-      if ((((Int*)((arr)->values))[4]) != (((Int*)((arr)->values))[4])) {
+      if ((((Int*)((arr)->values))[4]) != (((Int*)((arr)->values))[5])) {
         ++LUMI_file_coverage[0].line_count[288];
         *res = 6;
       }
@@ -3076,7 +3076,9 @@ Returncode integration_M_test_builtins(Int i, Char c, Bool b, String* s, Ref_Man
   LUMI_err = File_write(f, f_Refman, s, s_Refman);
   CHECK(335)
   ++LUMI_file_coverage[0].line_count[336];
-  LUMI_err = File_close(f, f_Refman);
+  LUMI_err = file_close(f, f_Refman);
+  f = NULL;
+  f_Refman = NULL;
   CHECK(336)
   ++LUMI_file_coverage[0].line_count[337];
   if (sys == NULL) RAISE(337, 27, "used member of empty object")
@@ -3112,13 +3114,19 @@ Returncode integration_M_test_builtins(Int i, Char c, Bool b, String* s, Ref_Man
   LUMI_err = Sys_exit(sys, sys_Refman, i);
   CHECK(344)
   ++LUMI_file_coverage[0].line_count[345];
-  LUMI_err = File_putc(stdout, stdout_Refman, c);
+  if (sys == NULL) RAISE(345, 27, "used member of empty object")
+  if (sys_Refman->value == NULL) RAISE(345, 38, "used member of outdated weak reference")
+  LUMI_err = File_putc(sys->stdout_Cname, sys->stdout_Cname_Refman, c);
   CHECK(345)
   ++LUMI_file_coverage[0].line_count[346];
-  LUMI_err = File_getc(stdin, stdin_Refman, &(cv), &(bv));
+  if (sys == NULL) RAISE(346, 27, "used member of empty object")
+  if (sys_Refman->value == NULL) RAISE(346, 38, "used member of outdated weak reference")
+  LUMI_err = File_getc(sys->stdin_Cname, sys->stdin_Cname_Refman, &(cv), &(bv));
   CHECK(346)
   ++LUMI_file_coverage[0].line_count[347];
-  LUMI_err = File_putc(stderr, stderr_Refman, c);
+  if (sys == NULL) RAISE(347, 27, "used member of empty object")
+  if (sys_Refman->value == NULL) RAISE(347, 38, "used member of outdated weak reference")
+  LUMI_err = File_putc(sys->stderr_Cname, sys->stderr_Cname_Refman, c);
   CHECK(347)
 LUMI_cleanup:
   File_Del(f);

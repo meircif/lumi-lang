@@ -5,7 +5,8 @@ set -ev
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCW="$CC --std=c89 -Wall -Werror"
+CC0="$CC --std=c89 -Werror"
+CCW="$CC0 -Wall"
 if [ $CC == "gcc" ]; then
   CCA="$CCW --pedantic -Wno-unused-label -Wno-unused-but-set-variable"
 else
@@ -21,7 +22,7 @@ cd .test
 # --< TL0 >--
 
 # compile tl0-compiler
-$CCW ../TL0/tl0-compiler.c ../TL0/tl0-file.c ../TL0/tl0-string.c -o tl0-compiler
+$CC0 ../TL0/tl0-compiler.c ../TL0/tl0-file.c ../TL0/tl0-string.c -o tl0-compiler
 
 # test tl0-compiler on tl0-compiler
 ./tl0-compiler tl0-compiler.0.lm tl0-compiler.c
@@ -35,7 +36,7 @@ diff ../TL1/tl1-compiler.c tl1-compiler.c
 # --< TL1 >--
 
 # compile tl1-compiler
-$CCW ../TL1/tl1-compiler.c ../TL0/tl0-file.c ../TL0/tl0-string.c -I../TL0 \
+$CC0 ../TL1/tl1-compiler.c ../TL0/tl0-file.c ../TL0/tl0-string.c -I../TL0 \
   -o tl1-compiler
 
 # test tl1-compiler on tl2-compiler files

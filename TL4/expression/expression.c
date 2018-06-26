@@ -35,8 +35,8 @@ Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Express
 static char* _func_name_parse_new_expression = "parse-new-expression";
 #define LUMI_FUNC_NAME _func_name_parse_new_expression
 Returncode parse_new_expression(String* ends, SyntaxTreeCode* code_node, Expression** expression, Char* end) {
-  Operator* _Operator46;
-  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator46)) )
+  Operator* _Operator49;
+  CHECK(23, Expression_parse_new(NULL, ends, code_node, NULL, &((*expression)), &((*end)), &(_Operator49)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -137,9 +137,9 @@ Returncode Expression_parse_new_operand(Expression* self, String* text, String* 
     if ((*end) == '?') {
       CHECK(109, QuestionExpression_parse_new(NULL, &((*expression)), &((*end))) )
     }
-    Bool _Bool47;
-    CHECK(110, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool47)) )
-    if (!(_Bool47)) break;
+    Bool _Bool50;
+    CHECK(110, Expression_parse_new_follow_operand(self, ends, code_node, &((*expression)), &((*end)), &(_Bool50)) )
+    if (!(_Bool50)) break;
   }
   return OK;
 }
@@ -178,9 +178,9 @@ Returncode Expression_parse_new_init_operand(Expression* self, String* text, Str
             CHECK(133, EmptyExpression_parse_new(NULL, text, &((*expression))) )
           }
           else {
-            Bool _Bool48;
-            CHECK(134, String_equal(text, &(String){5, 4, "base"}, &(_Bool48)) )
-            if (_Bool48) {
+            Bool _Bool51;
+            CHECK(134, String_equal(text, &(String){5, 4, "base"}, &(_Bool51)) )
+            if (_Bool51) {
               CHECK(135, BaseMethExpression_parse_new(NULL, text, code_node, (*end), &((*expression))) )
             }
             else {
@@ -261,9 +261,9 @@ Returncode Expression_add_aux_variable(Expression* self, Int access, Bool is_cre
   CHECK(177, TypeInstance_copy_new(type_instance, &((*symbol)->_base.result_type)) )
   (*symbol)->_base.access = access;
   (*symbol)->_base.assignable = true;
-  SyntaxTreeFunction* _SyntaxTreeFunction49;
-  CHECK(180, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction49)) )
-  CHECK(180, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction49, access, is_create, type_instance, &((*symbol)->variable)) )
+  SyntaxTreeFunction* _SyntaxTreeFunction52;
+  CHECK(180, SyntaxTreeCode_get_function(self->code_node, &(_SyntaxTreeFunction52)) )
+  CHECK(180, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction52, access, is_create, type_instance, &((*symbol)->variable)) )
   CHECK(182, string_new_copy((*symbol)->variable->name, &((*symbol)->name)) )
   return OK;
 }
