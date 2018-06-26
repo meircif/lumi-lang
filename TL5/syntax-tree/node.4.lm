@@ -1,0 +1,267 @@
+module tl5-compiler
+
+~~~ TL5 compiler - Syntax tree basic node types
+
+
+~~~
+
+~~~ Basic node type for all syntax tree nodes ~~~
+class SyntaxTreeNode
+  user String input-file-name
+  var Int line-number
+  
+  func inst set-location()
+    self.input-file-name := glob.input-file-name
+    self.line-number := glob.line-number
+  
+  func inst get-access(user String access-str)->(var Int access)
+    for n in 1:5
+      if glob.access-names[n].equal(user access-str)
+        access := n
+        return
+    self.print-syntax-error(user "illegal access", user access-str)
+    raise
+  
+  func dynamic get-parent-type()->(user TypeData parent-type)
+    parent-type := _
+  
+  func inst find-module(user String name)->(user ModuleMembers module-members)
+    if not glob.module-map.find(user name)->(user module-members)?
+      self.syntax-error(user "unknown module", user name)
+  
+  func inst find-type(user String name, user String module-name)->(
+      user TypeData type-data)
+    if module-name?
+      if self.find-module(user module-name).type-map.find(user name)->(
+          user type-data)?
+        return
+      self.syntax-error2(
+          user "unknown type", user name, user "in module", user module-name)
+    if glob.find-type(user name)->(user type-data)?
+      return
+    user TypeData parent-type
+    if self.get-parent-type()->(user parent-type)?
+      if parent-type.parameters?
+        user ListNode{String} node(user parent-type.parameters.first)
+        do
+          while node?
+          if node.item.equal(user name)
+            type-data := glob.type-generic
+            return
+          node := node.next
+    self.print-syntax-error(user "unknown type", user name)
+    raise
+  
+  func dynamic find-variable(user String name, user String module-name)->(
+      user SyntaxTreeVariable variable)
+    if module-name?
+      self.find-module(user module-name).variable-map.find(user name)->(
+          user variable)
+    else
+      glob.find-variable(user name)->(user variable)
+  
+  func inst find-function(user String name, user String module-name)->(
+      user SyntaxTreeFunction function)
+    if module-name?
+      self.find-module(user module-name).function-map.find(user name)->(
+          user function)
+    else
+      glob.find-function(user name)->(user function)
+  
+  ~~~ Expect `expected-text` to be read exactly from the input file ~~~
+  func inst read-expect(user String expected-text)
+    new String{expected-text.length + 1} actual-text
+    for n in expected-text.length
+      actual-text.append(copy read-c())
+    if not actual-text.equal(user expected-text)
+      self.syntax-error2(
+          user "expected", user expected-text, user "got", user actual-text)
+  
+  func inst analyze-expression(
+      user Expression expression, user TypeData expected-type)
+    expression.analyze()
+    if not expression.result-type?
+      self.syntax-error(
+          user "got void expression, expected", user expected-type.name)
+    if expression.result-type.type-data is-not expected-type
+      self.syntax-error2(
+          user "got",
+          user expression.result-type.type-data.name,
+          user "expression, expected",
+          user expected-type.name)
+  
+  func inst write-line-num()
+    write-int(copy self.line-number)
+  
+  func inst write-raise(user String error-message)
+    write(user "RAISE(")
+    self.write-line-num()
+    write(user ", ")
+    write-int(copy error-message.length)
+    write(user ", \"")
+    write(user error-message)
+    write(user "\")\n")
+  
+  ~~~ Print a syntax error with message: ~~~
+  ~~~ `Code error in {file-name}[{line-number}] {text} "{item}"` ~~~
+  func inst print-syntax-error(user String text, user String item)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text, user item)
+    sys.print(user "\n")
+  
+  func inst syntax-error(user String text, user String item)
+    self.print-syntax-error(user text, user item)
+    raise
+  
+  ~~~ Same as `syntax-error` but but with another `{text} "{item}" pair ~~~
+  func inst syntax-error2(
+      user String text1, user String item1, user String text2, user String item2)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text1, user item1)
+    sys.print(user " ")
+    print-msg-with-item(user text2, user item2)
+    sys.print(user "\n")
+    raise
+  
+  ~~~ Same as `syntax-error` but but with another 2 `{text} "{item}" pair ~~~
+  func inst syntax-error3(
+      user String text1,
+      user String item1,
+      user String text2,
+      user String item2,
+      user String text3,
+      user String item3)
+    self.print-syntax-error-header()
+    print-msg-with-item(user text1, user item1)
+    sys.print(user " ")
+    print-msg-with-item(user text2, user item2)
+    sys.print(user " ")
+    print-msg-with-item(user text3, user item3)
+    sys.print(user "\n")
+    raise
+  
+  ~~~ Same as `syntax-error` but with a character item ~~~
+  func inst syntax-error-c(user String text, copy Char item)
+    var String{16} char-str
+    if item = EOF
+      char-str.new(user "EOF")
+    else-if item = '\n'
+      char-str.new(user "new-line")
+    else
+      char-str.append(copy item)
+    self.print-syntax-error(user text, user char-str)
+    raise
+  
+  func inst syntax-error-msg(user String text)
+    self.print-syntax-error-header()
+    sys.print(user text)
+    sys.print(user "\n")
+    raise
+  
+  func inst syntax-error-indentation(copy Int actual, copy Int expected)
+    var String{16} expected-str
+    var String{16} actual-str
+    expected.str(user expected-str)
+    actual.str(user actual-str)
+    self.print-syntax-error-header()
+    sys.print(user "indentation too ")
+    if actual < expected
+      sys.print(user "short")
+    else
+      sys.print(user "long")
+    sys.print(user ", expected ")
+    sys.print(user expected-str)
+    sys.print(user " got ")
+    sys.print(user actual-str)
+    sys.print(user "\n")
+    raise
+  
+  func inst print-syntax-error-header()
+    sys.print(user "Code error in ")
+    sys.print(user self.input-file-name)
+    sys.print(user "[")
+    var String{32} line-num-str
+    self.line-number.str(user line-num-str)
+    sys.print(user line-num-str)
+    sys.print(user "] ")
+  
+  ~~~ Check `text` is a string constant ~~~
+  func inst check-string(user String text)
+    if text.length < 2
+      self.syntax-error(user "too short string constant", user text)
+    if text[0] != '\"' or text[text.length - 1] != '\"'
+      self.syntax-error(user "no '\"' around string constant", user text)
+    var Char prev
+    for n in 1:text.length - 1
+      var Char curr(copy text[n])
+      if curr = '"' and prev != '\\'
+        self.syntax-error(user "'\"' inside string constant", user text)
+      prev := curr
+  
+  func dynamic link-types()
+    ; do nothing as default
+  
+  func dynamic analyze()
+    ; do nothing as default
+  
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
+    ; do nothing as default
+  
+  func dynamic write()
+    raise
+  
+  func inst link-children-types(user List{SyntaxTreeNode} child-list)
+    var NodeLinkTypesAction action-link-types
+    self.do-on-children(user child-list, user action-link-types)
+  
+  func inst analyze-children(user List{SyntaxTreeNode} child-list)
+    var NodeAnalyzeAction action-analyze
+    self.do-on-children(user child-list, user action-analyze)
+  
+  func inst order-children-constants(
+      user List{SyntaxTreeVariable} child-list,
+      user NameMap{SyntaxTreeConstant} ordered-list)
+    var NodeOrderConstantsAction action-order-constants
+    action-order-constants.ordered-list := ordered-list
+    self.do-on-children(user child-list, user action-order-constants)
+  
+  func inst write-children(user List{SyntaxTreeNode} child-list)
+    var NodeWriteAction action-write
+    self.do-on-children(user child-list, user action-write)
+  
+  func inst do-on-children(
+      user List{SyntaxTreeNode} child-list, user NodeAction action)
+    user ListNode{SyntaxTreeNode} child(user child-list.first)
+    do
+      while child?
+      child.item.do-action(user action)
+      child := child.next
+  
+  func inst do-action(user NodeAction action)
+    glob.input-file-name := self.input-file-name
+    glob.line-number := self.line-number
+    action.action(user self)
+
+
+class NodeAction
+  var Int dummy
+  func dynamic action(user SyntaxTreeNode node)
+    raise
+
+class NodeLinkTypesAction(NodeAction)
+  func dynamic action(user SyntaxTreeNode node)
+    node.link-types()
+
+class NodeAnalyzeAction(NodeAction)
+  func dynamic action(user SyntaxTreeNode node)
+    node.analyze()
+
+class NodeWriteAction(NodeAction)
+  func dynamic action(user SyntaxTreeNode node)
+    node.write()
+
+class NodeOrderConstantsAction(NodeAction)
+  user NameMap{SyntaxTreeConstant} ordered-list
+  
+  func dynamic action(user SyntaxTreeNode node)
+    node.order-constants(user self.ordered-list)

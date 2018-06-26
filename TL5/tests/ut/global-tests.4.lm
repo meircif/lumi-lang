@@ -1,0 +1,376 @@
+~~~ TL5 compiler tests - Global ~~~
+module tl5-compiler-tests
+
+; IO mocks
+
+var String{1024} mock-print-text
+var String{2048} mock-input-file-text
+var String{16384} mock-output-file-text
+var Int mock-input-file-index
+var Int mock-input-line-eof-index
+var Int mock-input-line-reset-index
+var Char mock-output-file-last
+
+owner File input-file
+owner File actual-output-file
+owner File expected-output-file
+var Bool tests-passed
+var Bool had-test-error
+
+mock Sys.print(user String text)
+  assert text?
+  tl5-compiler-tests.mock-print-text.concat(user text)
+
+func set-mock-file-text(user String text, user String second-file-text)
+  mock-input-file-text.new(user "module ut\n")
+  mock-input-line-reset-index := mock-input-file-text.length
+  mock-input-file-text.concat(user text)
+  if second-file-text?
+    mock-input-line-eof-index := mock-input-file-text.length
+    mock-input-file-text.concat(user second-file-text)
+  else
+    mock-input-line-eof-index := - 1
+  mock-input-file-index := 0
+
+mock file-open-read(user String name)->(owner File file)
+  ; do nothing
+
+mock file-open-write(user String name)->(owner File file)
+  ; do nothing
+
+mock file-close(owner File file)
+  tl5-compiler-tests.mock-input-line-eof-index := - 1
+
+mock File.getc()->(var Char ch, var Bool is-eof)
+  assert self is tl5-compiler.glob.input-file
+  if tl5-compiler-tests.mock-input-file-index =
+      tl5-compiler-tests.mock-input-line-eof-index or
+      tl5-compiler-tests.mock-input-file-index >=
+      tl5-compiler-tests.mock-input-file-text.length
+    is-eof := true
+    return
+  is-eof := false
+  ch := tl5-compiler-tests.mock-input-file-text[tl5-compiler-tests.mock-input-file-index]
+  if tl5-compiler-tests.mock-input-file-index =
+      tl5-compiler-tests.mock-input-line-reset-index
+    tl5-compiler.glob.line-number := 1
+  tl5-compiler-tests.mock-input-file-index += 1
+
+mock File.putc(copy Char ch)
+  assert self is tl5-compiler.glob.output-file
+  tl5-compiler-tests.mock-output-file-text.append(copy ch)
+
+mock File.write(user String text)
+  assert self is tl5-compiler.glob.output-file
+  for n in text.length
+    var Char ch(copy text[n])
+    if ch != '\n' or ch != tl5-compiler-tests.mock-output-file-last
+      tl5-compiler-tests.mock-output-file-text.append(copy ch)
+    tl5-compiler-tests.mock-output-file-last := ch
+
+mock tl5-compiler.write-global(user String text)
+  ; do nothing
+
+mock tl5-compiler.SyntaxTreeFunction.write-pre-func()
+  ; do nothing
+
+mock tl5-compiler.SyntaxTreeFunction.write-post-func()
+  ; do nothing
+
+
+var String{16} mock-input-file-name
+
+func setup-test()
+  tl5-compiler.glob.init()
+  tl5-compiler.glob.line-number := 0
+  tl5-compiler.glob.save-input := false
+  mock-print-text.clear()
+  mock-input-file-text.clear()
+  mock-output-file-text.clear()
+  mock-output-file-last := '\0'
+  mock-input-file-index := 0
+  Sys.print.active := false
+
+
+; string assertion
+
+func assert-string-slice(
+    user String expected,
+    user String actual,
+    copy Int start,
+    copy Int slice-length,
+    copy Bool is-main)
+  user String actual-slice(user "")
+  if actual.length >= start + slice-length
+    actual-slice := actual[start:slice-length]
+  else-if actual.length > start
+    actual-slice := actual[start:actual.length - start]
+  if is-main
+    actual-output-file.write.mocked(user actual-slice)
+    actual-output-file.write.mocked(user "\n")
+  if actual-slice.equal(user expected)
+    return
+  if tests-passed
+    sys.print(user "\n  ")
+  sys.print(user "[expected `")
+  sys.print(user expected)
+  sys.print(user "`, got `")
+  sys.print(user actual-slice)
+  sys.print(user "`]\n  ")
+  write-new-file(user "expected.txt", user expected)
+  write-new-file(user "actual.txt", user actual-slice)
+  tests-passed := false
+
+func write-new-file(user String filename, user String data)
+  owner File file
+  file-open-write.mocked(user filename)->(owner file)
+  file.write.mocked(user data)
+  file-close.mocked(owner file)
+
+func assert-string(user String expected, user String actual)
+  assert actual?
+  assert-string-slice(
+      user expected, user actual, copy 0, copy actual.length, copy false)
+
+
+func set-test-file-name(
+    user String filename, user String base-name, user String suffix)
+  var String{1024} base-dir
+  if sys.getenv(user "TEST_DIR", user base-dir)
+    filename.new(user base-dir)
+  filename.concat(user base-name)
+  filename.concat(user suffix)
+
+
+func test-new-file(user String base-name, user String name)
+  var String{256} filename
+  set-test-file-name(user filename, user base-name, user ".5.lm")
+  file-open-read.mocked(user filename)->(owner input-file)
+  set-test-file-name(user filename, user base-name, user ".expected.c")
+  file-open-read.mocked(user filename)->(owner expected-output-file)
+  set-test-file-name(user filename, user base-name, user ".actual.c")
+  file-open-write.mocked(user filename)->(owner actual-output-file)
+  
+  had-test-error := false
+  var String{1024} line
+  if not read-line(user input-file, user line, user "; @@ ")
+    file-error(user name, user line)
+  if not read-line(user expected-output-file, user line, user "/// @@ ")
+    file-error(user name, user line)
+  test-from-file(user name)
+
+
+func test-from-file(user String name)
+  var String{1024} line
+  var String{1024} subname(user "start")
+  if had-test-error
+    do
+      while not read-line(user input-file, user line, user "; @@ ")
+    do
+      while not read-line(user expected-output-file, user line, user "/// @@ ")
+  had-test-error := true
+  read-line(user input-file, user line, user _)
+  if not line.equal(user name)
+    file-error(user name, user line)
+  read-line(user expected-output-file, user line, user _)
+  if not line.equal(user name)
+    file-error(user name, user line)
+  actual-output-file.write.mocked(user "/// @@ ")
+  actual-output-file.write.mocked(user name)
+  actual-output-file.write.mocked(user "\n")
+  
+  var String{4096} input
+  var String{1024} second-file-input
+  var String{16384} expected
+  if not read-line(user input-file, user line, user "; @ ")
+    file-error(user name, user line)
+  if not read-line(user expected-output-file, user line, user "/// @ ")
+    file-error(user name, user line)
+  
+  var Char type-char
+  var Char ch
+  var Bool is-error-test
+  var Bool append-newline
+  var Bool is-test
+  tests-passed := true
+  do
+    user String second-input
+    input-file.getc.mocked()->(var type-char)
+    append-newline := type-char != 'f'
+    if not append-newline
+      input-file.getc.mocked()->(var type-char)
+    is-error-test := type-char = 'e'
+    if is-error-test
+      input-file.getc.mocked()->(var type-char)
+    is-test := type-char = 't'
+    if is-test
+      input-file.getc.mocked()->(var type-char)
+      second-input := second-file-input
+    if type-char != 'g' and type-char != 'c'
+      file-error(user name, user subname)
+    input-file.getc.mocked()->(var ch)
+    if ch != ' '
+      file-error(user name, user subname)
+    read-line(user input-file, user subname, user _)
+    read-line(user expected-output-file, user line, user _)
+    if not line.equal(user subname)
+      file-error(user name, user subname)
+    actual-output-file.write.mocked(user "/// @ ")
+    actual-output-file.write.mocked(user subname)
+    actual-output-file.write.mocked(user "\n")
+    
+    read-data(user input-file, user input, user "; @")
+    if is-test
+      input-file.getc.mocked()->(var ch)
+      if ch != '-'
+        file-error(user name, user subname)
+      input-file.getc.mocked()->(var ch)
+      read-data(user input-file, user second-file-input, user "; @")
+    read-data(user expected-output-file, user expected, user "/// @")
+    if append-newline
+      input.append(copy '\n')
+      if is-test
+        second-file-input.append(copy '\n')
+    if type-char = 'c'
+      if is-error-test
+        test-code-error(user input, user expected)
+      else
+        test-code(user input, user expected)
+    else
+      if is-error-test
+        test-global-scope-error(
+            user input, user second-input, user expected, copy is-test)
+      else
+        test-global-scope(
+            user input, user second-input, user expected, copy is-test)
+    
+    expected-output-file.getc.mocked()->(var ch)
+    input-file.getc.mocked()->(var ch)
+    while ch = ' '
+  
+  expected-output-file.getc.mocked()->(var ch)
+  if input-file.getc.mocked()->(var ch)
+    if not expected-output-file.getc.mocked()->(var ch)
+      file-error(user name, user subname)
+    actual-output-file.write.mocked(user "/// @\n")
+    file-close.mocked(owner input-file)
+    file-close.mocked(owner expected-output-file)
+    file-close.mocked(owner actual-output-file)
+    
+  had-test-error := false
+  assert tests-passed
+
+func read-line(user File file, user String line, user String prefix)->(
+    var Bool found-prefix)
+  line.clear()
+  found-prefix := false
+  var Char ch
+  do
+    while not file.getc.mocked()->(var ch)
+    while ch != '\n'
+    line.append(copy ch)
+    if prefix? and not found-prefix
+      if line.equal(user prefix)
+        found-prefix := true
+        return
+
+
+func read-data(user File file, user String data, user String prefix)
+  data.clear()
+  var String{1024} line
+  do
+    while not read-line(user file, user line, user prefix)
+    if data.length > 0
+      data.append(copy '\n')
+    data.concat(user line)
+
+
+func file-error(user String name, user String subname)
+  sys.print(user "file format error in [")
+  sys.print(user name)
+  if subname?
+    sys.print(user "] / [")
+    sys.print(user subname)
+  sys.println(user "]")
+  raise
+
+
+; List tests
+test test-list()
+  var tl5-compiler.List{String} list
+  assert not list.pop()?
+  list.add(owner tl5-compiler.string-new-copy(user "value1"))
+  list.add(owner tl5-compiler.string-new-copy(user "value2"))
+  list.add(owner tl5-compiler.string-new-copy(user "value3"))
+  assert not list.remove(user "value")?
+  assert-string(user "value1", user list.pop())
+  assert-string(user "value2", user list.pop())
+  assert-string(user "value3", user list.pop())
+  assert not list.pop()?
+
+
+; NameMap tests
+test test-name-map()
+  var tl5-compiler.NameMap{String} map
+  assert not map.find(user "name1")?
+  map.add(user "name1", user "value1")
+  assert-string(user "value1", user map.find(user "name1"))
+  assert not map.find(user "name2")?
+  map.add(user "name2", user "value2")
+  assert-string(user "value1", user map.find(user "name1"))
+  assert-string(user "value2", user map.find(user "name2"))
+  map.update-or-add(user "name3", user "value3")
+  assert-string(user "value3", user map.find(user "name3"))
+  map.update-or-add(user "name2", user "value2x")
+  assert-string(user "value2x", user map.find(user "name2"))
+
+
+; Illegal call tests
+test test-illegal-call()
+  var tl5-compiler.Argument arg
+  assert-error arg.copy-new()
+  assert-error arg.parse-value(user _)
+  assert-error arg.get-type-instance()
+  assert-error arg.get-variable()
+  assert-error arg.get-output()
+  assert-error arg.write-preactions()
+  assert-error arg.write-postactions()
+  var tl5-compiler.ArgumentFactory factory
+  assert-error factory.new-argument()
+  var tl5-compiler.SyntaxTreeBranch branch
+  assert-error branch.parse-child(user _)
+  var tl5-compiler.SyntaxTreeNode node
+  assert-error node.write()
+  assert not node.get-parent-type()?
+  var tl5-compiler.NodeAction action
+  assert-error action.action(user _)
+  var tl5-compiler.SyntaxTreeRoot root
+  assert-error root.link-types()
+  var tl5-compiler.TypeWriter tw
+  assert-error tw.write(user _)
+  assert-error tl5-compiler.write-cname(user _)
+
+test test-mocked-functions()
+  setup-test()
+  var tl5-compiler.TypeData parent-type
+  tl5-compiler.string-new-copy(user "MockType")->(owner parent-type.name)
+  var tl5-compiler.SyntaxTreeFunction function
+  tl5-compiler.string-new-copy(user "mock-func")->(owner function.name)
+  function.input-file-name := "mock.5.lm"
+  function.parent-type := parent-type
+  function.write-pre-func.mocked()
+  function.write-post-func.mocked()
+  tl5-compiler.write-global.mocked(user "mock text")
+  user String expected(user "
+      #define LUMI_FILE_NAME \"mock.5.lm\"
+      #define LUMI_FUNC_NAME \"MockType.mock-func\"#undef LUMI_FILE_NAME
+      #undef LUMI_FUNC_NAME
+      mock text")
+  tests-passed := true
+  assert-string-slice(
+      user expected,
+      user mock-output-file-text,
+      copy 0,
+      copy expected.length,
+      copy false)
+  assert tests-passed

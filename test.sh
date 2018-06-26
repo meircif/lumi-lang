@@ -166,6 +166,31 @@ $CCA tests/integration-actual-error.c ../TL4/lumi.4.c -I../TL4 -o test-tl4-error
 diff ../TL4/tests/integration-error-output.txt \
   tests/integration-error-output.txt
 
+# test tl4-compiler on tl5-compiler files
+mkdir TL5
+cp -r ../TL5/*/ TL5
+cp ../TL5/*.4.lm TL5
+./tl4-compiler tl5-compiler.c TL5/tl5-compiler.4.lm TL5/*/*.4.lm
+diff ../TL5/tl5-compiler.c tl5-compiler.c
+
+
+# --< TL5 >--
+
+# compile tl5-compiler
+$CCA ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o tl5-compiler
+
+# run tl5-compiler unit-tests
+./tl4-compiler -t tl5-compiler tl5-compiler-tests.c TL5/tl5-compiler.4.lm \
+  TL5/*/*.4.lm TL5/tests/ut/*.4.lm
+$CCA tl5-compiler-tests.c ../TL4/lumi.4.c -I../TL4 -o tl5-compiler-tests
+TEST_DIR=TL5/tests/ut/ ./tl5-compiler-tests -xml
+mv cobertura.xml TL5/tests/ut
+diff TL5/tests/ut/code-header.actual.c TL5/tests/ut/code-header.expected.c
+diff TL5/tests/ut/expression-tests.actual.c \
+  TL5/tests/ut/expression-tests.expected.c
+diff TL5/tests/ut/syntax-tree-tests.actual.c \
+  TL5/tests/ut/syntax-tree-tests.expected.c
+
 
 # --< lumi command >--
 

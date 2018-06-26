@@ -1,0 +1,461 @@
+~~~ TL5 compiler - Container expressions ~~~
+module tl5-compiler
+
+~~~ An expression surrounded by brackets ~~~
+class BlockExpression(Expression)
+  owner Expression expression
+  
+  func inst parse-new(user SyntaxTreeCode code-node)->(
+      owner Expression expression, var Char end)
+    new BlockExpression block-expression
+    block-expression.parse(user code-node)->(var end)
+    expression := block-expression
+  
+  ~~~ parsing `(expression)` ~~~
+  func inst parse(user SyntaxTreeCode code-node)->(var Char end)
+    self.set-location()
+    parse-new-expression(user ")", user code-node)->(
+        owner self.expression, var end)
+    if end != ')'
+      self.syntax-error-c(user "expected \")\", got", copy end)
+    read-c()->(var end)
+  
+  func dynamic analyze()
+    self.expression.analyze()
+    self.expression.result-type.copy-new()->(owner self.result-type)
+    self.access := self.expression.access
+    self.constant := self.expression.constant
+  
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
+    self.expression.order-constants(user ordered-list)
+  
+  func dynamic write-preactions()
+    self.expression.write-preactions()
+  
+  func dynamic write()
+    if not self.top
+      write(user "(")
+    self.expression.write()
+    if not self.top
+      write(user ")")
+
+
+struct Operator
+  owner String name
+  owner String c-name
+  var Int order
+  var Int group-index
+  
+  func init(
+      user String name,
+      user String c-name,
+      copy Int order,
+      copy Int group-index)
+    string-new-copy(user name)->(owner self.name)
+    string-new-copy(user c-name)->(owner self.c-name)
+    self.order := order
+    self.group-index := group-index
+
+
+~~~ An expression with an unary operator ~~~
+class UnaryExpression(Expression)
+  user Operator operator
+  owner Expression right-expression
+  
+  func inst parse-new(
+      user String ends, user Operator operator, user SyntaxTreeCode code-node)->(
+      owner Expression expression, var Char end, user Operator next-operator)
+    new UnaryExpression unary-expression
+    unary-expression.parse(user operator, user ends, user code-node)->(
+        var end, user next-operator)
+    expression := unary-expression
+  
+  func inst parse(
+      user Operator operator,
+      user String ends,
+      user SyntaxTreeCode code-node)->(
+      var Char end, user Operator next-operator)
+    self.operator := operator
+    self.code-node := code-node
+    self.access := Access.VAR
+    self.set-location()
+    if end = '\n'
+      code-node.read-line-break-spaces()
+    else-if end != ' '
+      self.syntax-error-c(user "expected space after operator, got", copy end)
+    Expression.parse-new(user _, user ends, user code-node, user operator)->(
+        owner self.right-expression, var end, user next-operator)
+  
+  func dynamic analyze()
+    self.analyze-operand(user self.right-expression)
+    self.constant := self.right-expression.constant
+    if self.operator.order = 2
+      ; `not` operator
+      self.test-operand-type(user self.right-expression, user glob.type-bool)
+      self.set-simple-type(user glob.type-bool)
+    else-if self.operator.name.equal(user "-")
+      self.test-operand-type(user self.right-expression, user glob.type-int)
+      self.set-simple-type(user glob.type-int)
+    else
+      self.syntax-error(user "not unary operator", user self.operator.name)
+  
+  func inst analyze-operand(user Expression operand)
+    operand.analyze()
+    if not operand.result-type?
+      self.syntax-error(
+          user "void expression given as operand to operator",
+          user self.operator.name)
+  
+  func inst test-operand-type(
+      user Expression operand,
+      user TypeData expected-type)
+    if not expected-type.is-same(user operand.result-type.type-data)
+      self.syntax-error3(
+          user "operator",
+          user self.operator.name,
+          user "expected",
+          user expected-type.name,
+          user "operand, got",
+          user operand.result-type.type-data.name)
+  
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
+    self.right-expression.order-constants(user ordered-list)
+  
+  func dynamic write-preactions()
+    self.right-expression.write-preactions()
+  
+  func dynamic write()
+    self.write-start()
+    self.write-end()
+  
+  func inst write-start()
+    if not self.top
+      write(user "(")
+  
+  func inst write-end()
+    self.write-end-expression(user self.right-expression)
+  
+  func inst write-end-expression(user Expression right-expression)
+    write(user self.operator.c-name)
+    write(user " ")
+    right-expression.write()
+    if not self.top
+      write(user ")")
+    if self.is-statement
+      write(user ";\n")
+
+
+~~~ An expression with a binary operator ~~~
+class BinaryExpression(UnaryExpression)
+  owner Expression left-expression
+  user BinaryExpression binary-left-expression
+  user Expression assignee
+  owner SymbolExpression assigned-value-symbol
+  
+  func inst parse-new(
+      user String ends,
+      user Operator operator,
+      user SyntaxTreeCode code-node,
+      owner Expression left-expression,
+      user BinaryExpression binary-left-expression)->(
+      owner BinaryExpression expression,
+      var Char end,
+      user Operator next-operator)
+    new BinaryExpression binary-expression
+    binary-expression.left-expression := left-expression
+    binary-expression.binary-left-expression := binary-left-expression
+    binary-expression.parse(user operator, user ends, user code-node)->(
+        var end, user next-operator)
+    expression := binary-expression
+  
+  func dynamic analyze()
+    self.analyze-operand(user self.right-expression)
+    self.analyze-operand(user self.left-expression)
+    self.constant :=
+        self.left-expression.constant and self.right-expression.constant
+    if self.binary-left-expression?
+      if self.operator.order = self.binary-left-expression.operator.order and
+          self.operator.group-index !=
+          self.binary-left-expression.operator.group-index
+        self.syntax-error2(
+            user "ambiguous precedence between operators",
+            user self.binary-left-expression.operator.name,
+            user "and",
+            user self.operator.name)
+    if self.operator.order = 2
+      ; `not` operator
+      self.syntax-error-msg(user "cannot use \"not\" as binary operand")
+    if self.operator.order = 3
+      ; `or`/`and` operator
+      self.test-operands-type(user glob.type-bool)
+      self.set-simple-type(user glob.type-bool)
+    else-if self.operator.order = 4 and self.operator.group-index = 0
+      ; := operator
+      self.left-expression.result-type.check-assign-from(
+          copy self.left-expression.access, user self)->(
+          owner self.right-expression, user self.assignee)
+      if self.left-expression.access = Access.USER
+        self.code-node.get-function().has-user-assign := true
+      else-if self.left-expression.access = Access.OWNER
+        ; ownership pass
+        self.add-aux-variable(
+            copy Access.OWNER,
+            copy false,
+            user self.left-expression.result-type)->(
+            owner self.assigned-value-symbol)
+    else-if self.operator.order = 1 and self.operator.name[0] = 'i'
+      ; `is`/`is-not` operator
+      self.analyze-equalizer(copy true)
+    else-if self.operator.name.equal(user "=") or
+        self.operator.name.equal(user "!=")
+      self.analyze-equalizer(copy false)
+    else
+      ; any other Int operator
+      var Bool binary-int-left-expression
+      if self.binary-left-expression?
+        binary-int-left-expression := self.operator.order = 1 and
+            self.binary-left-expression.operator.order = 1
+      if binary-int-left-expression
+        ; (a > b) > c
+        self.test-operand-type(user self.right-expression, user glob.type-int)
+      else
+        self.test-operands-type(user glob.type-int)
+      if self.operator.order = 0
+        ; aritmetic operator
+        self.set-simple-type(user glob.type-int)
+      else-if self.operator.order = 1
+        ; compare operator
+        self.set-simple-type(user glob.type-bool)
+      ; else, assign operator
+    if self.operator.order = 4
+      ; assign operator
+      if not self.left-expression.assignable
+        self.syntax-error-msg(user "assigning into non assignable expression")
+      self.left-expression.top := true
+      self.right-expression.top := true
+  
+  func inst test-operands-type(user TypeData expected-type)
+    self.test-operand-type(user self.right-expression, user expected-type)
+    self.test-operand-type(user self.left-expression, user expected-type)
+  
+  func inst analyze-equalizer(copy Bool is-reference)
+    self.test-is-reference(copy is-reference, user self.right-expression)
+    self.test-is-reference(copy is-reference, user self.left-expression)
+    self.set-simple-type(user glob.type-bool)
+  
+  func inst test-is-reference(copy Bool is-reference, user Expression operand)
+    if (not operand.result-type.type-data.is-primitive or
+        operand.result-type.type-data is glob.type-func or
+        operand.result-type.type-data is glob.type-ref) != is-reference
+      self.syntax-error2(
+          user "operator",
+          user self.operator.name,
+          user "is not supported for type",
+          user operand.result-type.type-data.name)
+  
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
+    self.left-expression.order-constants(user ordered-list)
+    base.order-constants(user ordered-list)
+  
+  func dynamic write-preactions()
+    base.write-preactions()
+    self.left-expression.write-preactions()
+    if self.operator.order = 4 and self.operator.group-index = 0
+      ; := operator
+      self.write-assign-preactions()
+  
+  func inst write-assign-preactions()
+    if not self.left-expression.result-type.type-data.is-primitive
+      if self.left-expression.access = Access.OWNER
+        self.write-owner-assign-preactions()
+      else
+        self.write-user-assign-preactions()
+  
+  func inst write-user-assign-preactions()
+    write(user "aux_Ref_Manager = ")
+    self.left-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.left-expression.write-refman()
+    write(user " = ")
+    self.right-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.assign-dynamic(user self.left-expression, user self.right-expression)
+    
+    write(user "LUMI_inc_ref(")
+    self.left-expression.write-refman()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    
+    write(user "LUMI_dec_ref(aux_Ref_Manager);\n")
+    self.code-node.write-spaces()
+    write(user "aux_Ref_Manager = NULL;\n")
+    self.code-node.write-spaces()
+  
+  func inst write-owner-assign-preactions()
+    self.assigned-value-symbol.write()
+    write(user " = ")
+    self.right-expression.write()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    self.assigned-value-symbol.write-refman()
+    write(user " = ")
+    self.right-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.assign-dynamic(
+        user self.assigned-value-symbol, user self.right-expression)
+    
+    if self.right-expression.result-type.type-data is-not glob.type-empty
+      self.assignee.write-assign-null()
+      self.code-node.write-spaces()
+    self.write-left-delete()
+    self.code-node.write-spaces()
+    
+    write(user "LUMI_owner_dec_ref(")
+    self.left-expression.write-refman()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    
+    self.left-expression.write-refman()
+    write(user " = ")
+    self.assigned-value-symbol.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.assign-dynamic(
+        user self.left-expression, user self.assigned-value-symbol)
+  
+  func inst assign-dynamic(user Expression target, user Expression source)
+    if not target.result-type.type-data.is-dynamic and
+        not target.is-generic-cast
+      return
+    target.write-dynamic()
+    write(user " = ")
+    if not source.result-type.type-data.is-dynamic and
+        not source.is-generic-cast and
+        source.result-type.type-data is-not glob.type-empty
+      write(user "&")
+      source.result-type.type-data.write-cname()
+      write(user "_dynamic")
+    else
+      if (target.result-type.type-data is glob.type-generic or
+          target.is-generic-cast) and
+          source.result-type.type-data is-not glob.type-generic and
+          not source.is-generic-cast
+        write(user "(Generic_Type_Dynamic*)")
+        source.top := false
+      else-if source.is-generic-cast and not target.is-generic-cast and
+          not (target.result-type.type-data is glob.type-generic)
+        source.top := false
+      source.write-dynamic()
+      source.top := true
+    write(user ";\n")
+    self.code-node.write-spaces()
+  
+  func inst write-left-delete()
+    user TypeData type-data(user self.left-expression.result-type.type-data)
+    if type-data.is-dynamic
+      write(user "if (")
+      self.left-expression.write-dynamic()
+      write(user " != NULL) ")
+      self.left-expression.top := false
+      self.left-expression.write-dynamic()
+      self.left-expression.top := true
+      write(user "->")
+      do
+        while type-data.base-type?
+        type-data := type-data.base-type.type-data
+        while type-data.is-dynamic
+        write(user "_base.")
+      write(user "_del(")
+    else-if type-data is-not glob.type-array
+      type-data.write-cname()
+      write(user "_Del(")
+    else
+      type-data :=
+          self.left-expression.result-type.parameters.first.item.type-data
+      if not type-data.is-primitive
+        write(user "ARRAY_DEL(")
+        type-data.write-cname()
+        write(user ", ")
+        self.left-expression.write()
+        write(user ")\n")
+      return
+    self.left-expression.write()
+    write(user ");\n")
+  
+  func dynamic write()
+    self.write-start()
+    if self.operator.order = 1 and self.operator.name[0] = 'i'
+      ; `is`/`is-not` operator
+      write(user "(void*)")
+      self.left-expression.top := false
+    self.left-expression.write()
+    self.left-expression.top := true
+    var Bool expand-and(copy self.operator.order = 1 and
+        self.binary-left-expression?)
+    if expand-and
+      expand-and := self.binary-left-expression.operator.order = 1
+    if expand-and
+      ; (a > b) > c --> (a > b) && (b > c)
+      write(user " && (")
+      self.binary-left-expression.right-expression.write()
+    write(user " ")
+    if self.operator.order = 4 and self.operator.group-index = 0 and
+        self.left-expression.access = Access.OWNER
+      self.write-end-expression(user self.assigned-value-symbol)
+      self.code-node.write-spaces()
+      self.assigned-value-symbol.write-assign-null()
+    else
+      self.write-end()
+    if expand-and
+      write(user ")")
+
+
+~~~ An expression with the "?" operator ~~~
+class QuestionExpression(Expression)
+  owner Expression tested
+  
+  func inst parse-new()->(owner Expression expression, var Char end)
+    new QuestionExpression question-expression
+    question-expression.parse(owner expression)->(var end)
+    expression := question-expression
+  
+  ~~~ parsing `tested?` ~~~
+  func inst parse(owner Expression tested)->(var Char end)
+    self.tested := tested
+    self.set-location()
+    read-c()->(var end)
+  
+  func dynamic analyze()
+    self.tested.analyze()
+    if not self.tested.result-type?
+      self.syntax-error-msg(user "cannot use \"?\" on void expression")
+    if self.tested.result-type.type-data.is-primitive and
+        not (self.tested.result-type.type-data is glob.type-func)
+      self.syntax-error(
+          user "cannot use \"?\" on type",
+          user self.tested.result-type.type-data.name)
+    self.set-simple-type(user glob.type-bool)
+    self.access := Access.VAR
+  
+  func dynamic write-preactions()
+    self.tested.write-preactions()
+  
+  func dynamic write()
+    ; `tested` != NULL && `tested`_Refman->value != NULL
+    if not self.top
+      write(user "(")
+    self.tested.write()
+    write(user " != NULL")
+    if not self.tested.result-type.type-data.is-primitive
+      write(user " && ")
+      self.tested.write-refman()
+      write(user "->value != NULL")
+    if not self.top
+      write(user ")")

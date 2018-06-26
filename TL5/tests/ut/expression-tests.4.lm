@@ -1,0 +1,152 @@
+~~~ TL5 compiler tests - Expression ~~~
+module tl5-compiler-tests
+
+var Bool not-first-code-test
+var Bool code-header-valid
+
+
+func test-code-setup(user String input-text)
+  setup-test()
+  set-mock-file-text(user "", user _)
+  owner File code-header
+  var String{256} filename
+  set-test-file-name(user filename, user "code-header", user ".5.lm")
+  file-open-read.mocked(user filename)->(owner code-header)
+  do
+    var Char ch
+    while not code-header.getc.mocked()->(var ch)
+    mock-input-file-text.append(copy ch)
+  mock-input-line-reset-index := mock-input-file-text.length
+  mock-input-file-text.concat(user input-text)
+
+
+func test-code(user String input-text, user String expected-output)
+  if not-first-code-test and not code-header-valid
+    return
+  var Bool was-first(copy not not-first-code-test)
+  not-first-code-test := true
+  test-code-setup(user input-text)
+  write-syntax-tree(copy false)
+  var String{16384} expected-header
+  owner File code-header
+  var String{256} filename
+  set-test-file-name(user filename, user "code-header", user ".expected.c")
+  file-open-read.mocked(user filename)->(owner code-header)
+  do
+    var Char ch
+    while not code-header.getc.mocked()->(var ch)
+    expected-header.append(copy ch)
+  
+  assert-string-slice(
+      user expected-header,
+      user mock-output-file-text,
+      copy 0,
+      copy expected-header.length,
+      copy false)
+  if was-first
+    set-test-file-name(user filename, user "code-header", user ".actual.c")
+    file-open-write.mocked(user filename)->(owner code-header)
+    if tests-passed
+      for n in expected-header.length
+        code-header.putc.mocked(copy mock-output-file-text[n])
+    else
+      for n in mock-output-file-text.length
+        code-header.putc.mocked(copy mock-output-file-text[n])
+    file-close.mocked(owner code-header)
+    code-header-valid := tests-passed
+    if not tests-passed
+      return
+  
+  var Int footer-start
+  user String mock-output-no-header(user mock-output-file-text[expected-header.length:mock-output-file-text.length - expected-header.length])
+  mock-output-no-header.find(user "\nLUMI_cleanup:\n  ")->(var footer-start)
+  if footer-start >= mock-output-no-header.length
+    sys.print(user mock-output-no-header)
+    code-header-valid := false
+    raise
+  assert-string-slice(
+      user expected-output,
+      user mock-output-no-header,
+      copy 0,
+      copy footer-start,
+      copy true)
+
+
+func test-code-error(user String input-text, user String expected-error)
+  if not-first-code-test and not code-header-valid
+    return
+  test-code-setup(user input-text)
+  Sys.print.active := true
+  try
+    write-syntax-tree(copy false)
+    no-error-raised()
+    return
+  Sys.print.active := false
+  if mock-print-text.length = 0
+    test-code-setup(user input-text)
+    write-syntax-tree(copy false)
+  test-error-message(user "Code error in mock.5.lm[", user expected-error)
+
+
+test test-int-expression()
+  test-new-file(user "expression-tests", user "test-int-expression")
+
+
+test test-char-expression()
+  test-from-file(user "test-char-expression")
+
+
+test test-string-expression()
+  test-from-file(user "test-string-expression")
+
+; 
+test test-empty-expression()
+  test-from-file(user "test-empty-expression")
+
+
+test test-member-expression()
+  test-from-file(user "test-member-expression")
+
+
+test test-slice-expression()
+  test-from-file(user "test-slice-expression")
+
+
+test test-call-expression()
+  test-from-file(user "test-call-expression")
+
+
+test test-type-expression()
+  test-from-file(user "test-type-expression")
+
+
+test test-base-expression()
+  test-from-file(user "test-base-expression")
+
+
+test test-block-expression()
+  test-from-file(user "test-block-expression")
+
+
+test test-unary-expression()
+  test-from-file(user "test-unary-expression")
+
+
+test test-binary-expression()
+  test-from-file(user "test-binary-expression")
+
+
+test test-question-expression()
+  test-from-file(user "test-question-expression")
+
+
+test test-dynamic()
+  test-from-file(user "test-dynamic")
+
+
+test test-function-object()
+  test-from-file(user "test-function-object")
+
+
+test test-builtin()
+  test-from-file(user "test-builtin")

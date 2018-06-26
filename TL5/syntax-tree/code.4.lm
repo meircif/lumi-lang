@@ -1,0 +1,158 @@
+~~~ TL5 compiler - Syntax tree code nodes ~~~
+module tl5-compiler
+
+~~~ Expression node in the syntax tree ~~~
+class SyntaxTreeExpression(SyntaxTreeCode)
+  owner Expression expression
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeExpression new-node)
+    new-node := SyntaxTreeExpression()
+    new-node.parse(user parent)->(var end)
+  
+  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
+    self.parent := parent
+    self.set-location()
+    parse-new-expression(user "", user self)->(owner self.expression, var end)
+    self.expression.is-statement := true
+  
+  func dynamic analyze()
+    self.expression.analyze()
+    if self.expression.result-type?
+      self.syntax-error-msg(user "statememnt has no effect")
+  
+  func dynamic write()
+    self.write-spaces()
+    self.expression.write-preactions()
+    self.expression.write()
+
+
+~~~ Return statement in the syntax tree ~~~
+class SyntaxTreeReturn(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeReturn new-node)
+    new-node := SyntaxTreeReturn()
+    new-node.set-location()
+    new-node.parent := parent
+  
+  func dynamic is-end-point()->(var Bool is-end)
+    is-end := true
+  
+  func dynamic write()
+    self.write-spaces()
+    write(user "goto LUMI_cleanup;\n")
+
+
+~~~ Raise statement in the syntax tree ~~~
+class SyntaxTreeRaise(SyntaxTreeCode)
+  owner Expression error-message
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeRaise new-node)
+    new-node := SyntaxTreeRaise()
+    new-node.parse(user parent)->(var end)
+  
+  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
+    self.set-location()
+    self.parent := parent
+    if end = ' '
+      parse-new-expression(user "", user self)->(
+          owner self.error-message, var end)
+  
+  func dynamic is-end-point()->(var Bool is-end)
+    is-end := true
+  
+  func dynamic analyze()
+    if self.error-message?
+      self.analyze-expression(user self.error-message, user glob.type-string)
+  
+  func dynamic write()
+    self.write-spaces()
+    if self.error-message?
+      self.error-message.write-preactions()
+    write(user "USER_RAISE(")
+    self.write-line-num()
+    write(user ", ")
+    if self.error-message?
+      self.error-message.write()
+      write(user ", ")
+      self.error-message.write-refman()
+    else
+      write(user "NULL, NULL")
+    write(user ")\n")
+
+
+~~~ While statement in the syntax tree ~~~
+class SyntaxTreeWhile(SyntaxTreeCode)
+  owner Expression condition
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeWhile new-node)
+    new-node := SyntaxTreeWhile()
+    new-node.parse(user parent)->(var end)
+  
+  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
+    self.parent := parent
+    self.set-location()
+    if not parent.is-in-loop
+      self.syntax-error-msg(user "\"while\" used not inside loop")
+    parse-new-expression(user "", user self)->(owner self.condition, var end)
+  
+  func dynamic analyze()
+    self.analyze-expression(user self.condition, user glob.type-bool)
+  
+  func dynamic write()
+    ; if (!(`condition`) break;
+    self.write-spaces()
+    self.condition.write-preactions()
+    write(user "if (!(")
+    self.condition.write()
+    write(user ")) break;\n")
+
+
+~~~ Continue statement in the syntax tree ~~~
+class SyntaxTreeContinue(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeContinue new-node)
+    new-node := SyntaxTreeContinue()
+    new-node.parse(user parent)
+  
+  func inst parse(user SyntaxTreeBlock parent)
+    self.set-location()
+    self.parent := parent
+    if not parent.is-in-loop
+      self.syntax-error-msg(user "\"continue\" used not inside loop")
+  
+  func dynamic write()
+    self.write-spaces()
+    write(user "continue;\n")
+
+
+class SyntaxTreeCoverage(SyntaxTreeCode)
+  var Int input-file-index
+  
+  func inst init-new(user SyntaxTreeBlock parent)->(
+      owner SyntaxTreeCoverage coverage-node)
+    coverage-node := SyntaxTreeCoverage()
+    coverage-node.init(user parent)
+  
+  func inst init(user SyntaxTreeBlock parent)
+    self.set-location()
+    self.parent := parent
+    self.input-file-index := glob.input-file-index
+  
+  func dynamic analyze()
+    user LineCount line-count(user glob.root.line-counts[self.input-file-index])
+    line-count.needs-cover := true
+    line-count.line-needs-cover[self.line-number] := true
+  
+  func dynamic write()
+    ; ++LUMI_file_coverage[`covered-index`].line_count[`line-number`];
+    self.write-spaces()
+    write(user "++LUMI_file_coverage[")
+    write-int(copy glob.root.line-counts[self.input-file-index].covered-index)
+    write(user "].line_count[")
+    write-int(copy self.line-number)
+    write(user "];\n")
