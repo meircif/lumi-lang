@@ -92,45 +92,45 @@ Returncode SyntaxTreeVariable_check_name(SyntaxTreeVariable* self);
 static char* _func_name_SyntaxTreeVariable_check_name = "SyntaxTreeVariable.check-name";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeVariable_check_name
 Returncode SyntaxTreeVariable_check_name(SyntaxTreeVariable* self) {
-  Bool _Bool187;
-  CHECK(64, f_is_legal_name(self->name, NAME_DEFAULT, &(_Bool187)) )
-  if (!_Bool187) {
+  Bool _Bool190;
+  CHECK(64, f_is_legal_name(self->name, NAME_DEFAULT, &(_Bool190)) )
+  if (!_Bool190) {
     CHECK(65, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "illegal variable name"}, self->name) )
   }
   if (NULL != self->parent_type) {
     SyntaxTreeVariable* field = NULL;
-    Int _Int188;
-    CHECK(68, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int188)) )
+    Int _Int191;
+    CHECK(68, TypeData_find_field(self->parent_type, self->name, &(field), &(_Int191)) )
     if (NULL != field) {
       CHECK(70, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){22, 21, "redefinition of field"}, self->name) )
     }
     SyntaxTreeFunction* meth = NULL;
-    Int _Int189;
-    CHECK(72, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int189)) )
+    Int _Int192;
+    CHECK(72, TypeData_find_meth(self->parent_type, self->name, &(meth), &(_Int192)) )
     if (NULL != meth) {
       CHECK(74, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){28, 27, "field name overrides method"}, self->name) )
     }
   }
   else {
-    ModuleMembers* _ModuleMembers190;
-    CHECK(77, NameMap_find(glob->module_map, self->name, (void**)&(_ModuleMembers190)) )
-    if (NULL != _ModuleMembers190) {
+    ModuleMembers* _ModuleMembers193;
+    CHECK(77, NameMap_find(glob->module_map, self->name, (void**)&(_ModuleMembers193)) )
+    if (NULL != _ModuleMembers193) {
       CHECK(78, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){31, 30, "variable name overrides module"}, self->name) )
     }
-    SyntaxTreeVariable* _SyntaxTreeVariable191;
-    CHECK(80, Global_find_variable(glob, self->name, &(_SyntaxTreeVariable191)) )
-    if (NULL != _SyntaxTreeVariable191) {
+    SyntaxTreeVariable* _SyntaxTreeVariable194;
+    CHECK(80, Global_find_variable(glob, self->name, &(_SyntaxTreeVariable194)) )
+    if (NULL != _SyntaxTreeVariable194) {
       CHECK(81, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){32, 31, "redefinition of global variable"}, self->name) )
     }
-    SyntaxTreeFunction* _SyntaxTreeFunction192;
-    CHECK(83, Global_find_function(glob, self->name, &(_SyntaxTreeFunction192)) )
-    if (NULL != _SyntaxTreeFunction192) {
+    SyntaxTreeFunction* _SyntaxTreeFunction195;
+    CHECK(83, Global_find_function(glob, self->name, &(_SyntaxTreeFunction195)) )
+    if (NULL != _SyntaxTreeFunction195) {
       CHECK(84, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){33, 32, "variable name overrides function"}, self->name) )
     }
     if (NULL != self->_base.parent) {
-      SyntaxTreeVariable* _SyntaxTreeVariable193;
-      CHECK(87, (self->_base.parent)->_base._base._dtl[7](self->_base.parent, self->name, NULL, &(_SyntaxTreeVariable193)) )
-      if (NULL != _SyntaxTreeVariable193) {
+      SyntaxTreeVariable* _SyntaxTreeVariable196;
+      CHECK(87, (self->_base.parent)->_base._base._dtl[7](self->_base.parent, self->name, NULL, &(_SyntaxTreeVariable196)) )
+      if (NULL != _SyntaxTreeVariable196) {
         CHECK(88, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){25, 24, "redefinition of variable"}, self->name) )
       }
     }
@@ -166,9 +166,9 @@ Returncode SyntaxTreeVariable_find_variable(SyntaxTreeVariable* self, String* na
 static char* _func_name_SyntaxTreeVariable_find_variable = "SyntaxTreeVariable.find-variable";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeVariable_find_variable
 Returncode SyntaxTreeVariable_find_variable(SyntaxTreeVariable* self, String* name, String* module_name, SyntaxTreeVariable** variable) {
-  Bool _Bool194;
-  CHECK(101, String_equal(self->name, name, &(_Bool194)) )
-  if (_Bool194) {
+  Bool _Bool197;
+  CHECK(101, String_equal(self->name, name, &(_Bool197)) )
+  if (_Bool197) {
     (*variable) = self;
   }
   else {
@@ -491,9 +491,9 @@ static char* _func_name_SyntaxTreeVariable_write_spaces = "SyntaxTreeVariable.wr
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeVariable_write_spaces
 Returncode SyntaxTreeVariable_write_spaces(SyntaxTreeVariable* self) {
   if (NULL != self->_base.parent) {
-    SyntaxTreeFunction* _SyntaxTreeFunction195;
-    CHECK(315, (self->_base.parent)->_base._base._dtl[8](self->_base.parent, &(_SyntaxTreeFunction195)) )
-    CHECK(315, SyntaxTreeBranch_write_spaces(&(_SyntaxTreeFunction195->_base._base)) )
+    SyntaxTreeFunction* _SyntaxTreeFunction198;
+    CHECK(315, (self->_base.parent)->_base._base._dtl[8](self->_base.parent, &(_SyntaxTreeFunction198)) )
+    CHECK(315, SyntaxTreeBranch_write_spaces(&(_SyntaxTreeFunction198->_base._base)) )
   }
   else {
     if (NULL != self->parent_type) {
@@ -549,9 +549,9 @@ Returncode VariableInit_parse(VariableInit* self, SyntaxTreeVariable* variable, 
   if (self->expression_init == NULL) RAISE(332)
   *self->expression_init = (InitExpression){InitExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL};
   self->expression_init->_base._base._base._dtl = InitExpression__dtl;
-  TypeInstance* _TypeInstance196;
-  CHECK(333, TypeInstance_copy_new(variable->type_instance, &(_TypeInstance196)) )
-  CHECK(333, InitExpression_parse(self->expression_init, _TypeInstance196, NULL, &(self->_base), &((*end))) )
+  TypeInstance* _TypeInstance199;
+  CHECK(333, TypeInstance_copy_new(variable->type_instance, &(_TypeInstance199)) )
+  CHECK(333, InitExpression_parse(self->expression_init, _TypeInstance199, NULL, &(self->_base), &((*end))) )
   self->expression_init->_base._base.is_statement = true;
   self->expression_init->symbol = malloc(sizeof(SymbolExpression));
   if (self->expression_init->symbol == NULL) RAISE(336)
@@ -649,20 +649,20 @@ Returncode SyntaxTreeConstant_parse(SyntaxTreeConstant* self, Char* end) {
   self->_base.constant = true;
   self->_base.my_module = glob->current_module;
   String* type_name = NULL;
-  Int _Int197;
-  CHECK(380, read_until(&(String){2, 1, " "}, false, &(type_name), &((*end)), &(_Int197)) )
-  Bool _Bool198;
-  CHECK(381, String_equal(type_name, &(String){4, 3, "Int"}, &(_Bool198)) )
-  if (!_Bool198) {
+  Int _Int200;
+  CHECK(380, read_until(&(String){2, 1, " "}, false, &(type_name), &((*end)), &(_Int200)) )
+  Bool _Bool201;
+  CHECK(381, String_equal(type_name, &(String){4, 3, "Int"}, &(_Bool201)) )
+  if (!_Bool201) {
     CHECK(382, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){41, 40, "Only \"Int\" typed constant supported, got"}, type_name) )
   }
   if ((*end) != ' ') {
     CHECK(385, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){32, 31, "expected space after \"Int\", got"}, (*end)) )
   }
   CHECK(387, read_new(&(String){2, 1, " "}, &(self->_base.name), &((*end))) )
-  Bool _Bool199;
-  CHECK(388, f_is_legal_name(self->_base.name, NAME_CONSTANT, &(_Bool199)) )
-  if (!_Bool199) {
+  Bool _Bool202;
+  CHECK(388, f_is_legal_name(self->_base.name, NAME_CONSTANT, &(_Bool202)) )
+  if (!_Bool202) {
     CHECK(389, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){22, 21, "illegal constant name"}, self->_base.name) )
   }
   if ((*end) != ' ') {

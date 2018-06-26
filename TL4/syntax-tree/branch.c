@@ -67,18 +67,18 @@ Returncode SyntaxTreeBranch_parse_children(SyntaxTreeBranch* self, TypeData* par
     if (keyword->length > 0 || (*end) != '\n') {
       CHECK(31, SyntaxTreeNode_set_location(&(self->_base)) )
       
-      Bool _Bool85;
-      CHECK(33, SyntaxTreeBranch_parse_if_comment(self, keyword, &((*end)), &(_Bool85)) )
-      if (!_Bool85) {
+      Bool _Bool88;
+      CHECK(33, SyntaxTreeBranch_parse_if_comment(self, keyword, &((*end)), &(_Bool88)) )
+      if (!_Bool88) {
         if (spaces > self->indentation_spaces) {
           CHECK(35, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base), spaces, self->indentation_spaces) )
         }
         
         if (!(spaces == self->indentation_spaces && (*end) != EOF)) break;
         
-        Bool _Bool86;
-        CHECK(40, (self)->_base._dtl[5](self, keyword, parent_type, parent_block, &((*end)), &(_Bool86)) )
-        if (!_Bool86) {
+        Bool _Bool89;
+        CHECK(40, (self)->_base._dtl[5](self, keyword, parent_type, parent_block, &((*end)), &(_Bool89)) )
+        if (!_Bool89) {
           CHECK(42, (self)->_base._dtl[6](self, keyword, &((*end))) )
         }
       }
@@ -102,17 +102,17 @@ static char* _func_name_SyntaxTreeBranch_parse_if_comment = "SyntaxTreeBranch.pa
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeBranch_parse_if_comment
 Returncode SyntaxTreeBranch_parse_if_comment(SyntaxTreeBranch* self, String* keyword, Char* end, Bool* is_parsed) {
   (*is_parsed) = true;
-  Bool _Bool87;
-  CHECK(54, String_equal(keyword, &(String){2, 1, ";"}, &(_Bool87)) )
-  if (_Bool87 && (*end) == ' ') {
+  Bool _Bool90;
+  CHECK(54, String_equal(keyword, &(String){2, 1, ";"}, &(_Bool90)) )
+  if (_Bool90 && (*end) == ' ') {
     String* text = NULL;
-    Int _Int88;
-    CHECK(56, read_until(&(String){1, 0, ""}, false, &(text), &((*end)), &(_Int88)) )
+    Int _Int91;
+    CHECK(56, read_until(&(String){1, 0, ""}, false, &(text), &((*end)), &(_Int91)) )
   }
   else {
-    Bool _Bool89;
-    CHECK(57, String_equal(keyword, &(String){4, 3, "~~~"}, &(_Bool89)) )
-    if (_Bool89 && (*end) == ' ') {
+    Bool _Bool92;
+    CHECK(57, String_equal(keyword, &(String){4, 3, "~~~"}, &(_Bool92)) )
+    if (_Bool92 && (*end) == ' ') {
       Int count = 0;
       while (true) {
         Char ch = '\0';
@@ -129,9 +129,9 @@ Returncode SyntaxTreeBranch_parse_if_comment(SyntaxTreeBranch* self, String* key
     }
     else {
       if (keyword->length == 0 && (*end) == '[') {
-        Char _Char90;
-        CHECK(69, read_c(&(_Char90)) )
-        if (_Char90 != ';') {
+        Char _Char93;
+        CHECK(69, read_c(&(_Char93)) )
+        if (_Char93 != ';') {
           CHECK(70, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){15, 14, "unexpected \"[\""}) )
         }
         Char prev = '\0';
@@ -162,20 +162,20 @@ Returncode SyntaxTreeBranch_parse_if_common(SyntaxTreeBranch* self, String* keyw
   
   List* variables = self->variables;
   if (NULL != parent_block) {
-    SyntaxTreeFunction* _SyntaxTreeFunction91;
-    CHECK(91, (parent_block)->_base._base._dtl[8](parent_block, &(_SyntaxTreeFunction91)) )
-    variables = _SyntaxTreeFunction91->_base._base.variables;
+    SyntaxTreeFunction* _SyntaxTreeFunction94;
+    CHECK(91, (parent_block)->_base._base._dtl[8](parent_block, &(_SyntaxTreeFunction94)) )
+    variables = _SyntaxTreeFunction94->_base._base.variables;
     if (NULL != glob->tested_module) {
-      Bool _Bool92;
-      CHECK(93, String_equal(glob->current_module->name, glob->tested_module, &(_Bool92)) )
-      Bool _Bool93;
-      CHECK(93, String_equal(keyword, &(String){5, 4, "else"}, &(_Bool93)) )
-      Bool _Bool94;
-      CHECK(93, String_equal(keyword, &(String){8, 7, "else-if"}, &(_Bool94)) )
-      if (_Bool92 &&  ! _Bool93 &&  ! _Bool94) {
-        SyntaxTreeCoverage* _SyntaxTreeCoverage95;
-        CHECK(95, SyntaxTreeCoverage_init_new(NULL, parent_block, &(_SyntaxTreeCoverage95)) )
-        CHECK(95, List_add(parent_block->code_nodes, &(_SyntaxTreeCoverage95->_base)) )
+      Bool _Bool95;
+      CHECK(93, String_equal(glob->current_module->name, glob->tested_module, &(_Bool95)) )
+      Bool _Bool96;
+      CHECK(93, String_equal(keyword, &(String){5, 4, "else"}, &(_Bool96)) )
+      Bool _Bool97;
+      CHECK(93, String_equal(keyword, &(String){8, 7, "else-if"}, &(_Bool97)) )
+      if (_Bool95 &&  ! _Bool96 &&  ! _Bool97) {
+        SyntaxTreeCoverage* _SyntaxTreeCoverage98;
+        CHECK(95, SyntaxTreeCoverage_init_new(NULL, parent_block, &(_SyntaxTreeCoverage98)) )
+        CHECK(95, List_add(parent_block->code_nodes, &(_SyntaxTreeCoverage98->_base)) )
       }
     }
   }
@@ -185,28 +185,28 @@ Returncode SyntaxTreeBranch_parse_if_common(SyntaxTreeBranch* self, String* keyw
   }
   
   else {
-    Bool _Bool96;
-    CHECK(101, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool96)) )
-    if (_Bool96) {
-      SyntaxTreeVariable* _SyntaxTreeVariable97;
-      CHECK(102, SyntaxTreeVariable_parse_new(NULL, ACCESS_VAR, true, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable97)) )
-      CHECK(102, List_add(variables, _SyntaxTreeVariable97) )
+    Bool _Bool99;
+    CHECK(101, String_equal(keyword, &(String){4, 3, "var"}, &(_Bool99)) )
+    if (_Bool99) {
+      SyntaxTreeVariable* _SyntaxTreeVariable100;
+      CHECK(102, SyntaxTreeVariable_parse_new(NULL, ACCESS_VAR, true, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable100)) )
+      CHECK(102, List_add(variables, _SyntaxTreeVariable100) )
     }
     else {
-      Bool _Bool98;
-      CHECK(109, String_equal(keyword, &(String){5, 4, "user"}, &(_Bool98)) )
-      if (_Bool98) {
-        SyntaxTreeVariable* _SyntaxTreeVariable99;
-        CHECK(110, SyntaxTreeVariable_parse_new(NULL, ACCESS_USER, false, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable99)) )
-        CHECK(110, List_add(variables, _SyntaxTreeVariable99) )
+      Bool _Bool101;
+      CHECK(109, String_equal(keyword, &(String){5, 4, "user"}, &(_Bool101)) )
+      if (_Bool101) {
+        SyntaxTreeVariable* _SyntaxTreeVariable102;
+        CHECK(110, SyntaxTreeVariable_parse_new(NULL, ACCESS_USER, false, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable102)) )
+        CHECK(110, List_add(variables, _SyntaxTreeVariable102) )
       }
       else {
-        Bool _Bool100;
-        CHECK(117, String_equal(keyword, &(String){6, 5, "owner"}, &(_Bool100)) )
-        if (_Bool100) {
-          SyntaxTreeVariable* _SyntaxTreeVariable101;
-          CHECK(118, SyntaxTreeVariable_parse_new(NULL, ACCESS_OWNER, false, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable101)) )
-          CHECK(118, List_add(variables, _SyntaxTreeVariable101) )
+        Bool _Bool103;
+        CHECK(117, String_equal(keyword, &(String){6, 5, "owner"}, &(_Bool103)) )
+        if (_Bool103) {
+          SyntaxTreeVariable* _SyntaxTreeVariable104;
+          CHECK(118, SyntaxTreeVariable_parse_new(NULL, ACCESS_OWNER, false, parent_type, parent_block, &((*end)), &(_SyntaxTreeVariable104)) )
+          CHECK(118, List_add(variables, _SyntaxTreeVariable104) )
           
         }
         else {
@@ -464,9 +464,9 @@ Returncode SyntaxTreeNamespace_parse_if_function(SyntaxTreeNamespace* self, Stri
     if ((*end) != ' ') {
       CHECK(253, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){33, 32, "expected space after \"func\", got"}, (*end)) )
     }
-    SyntaxTreeFunction* _SyntaxTreeFunction102;
-    CHECK(255, SyntaxTreeFunction_parse_new(NULL, parent_type, &((*end)), &(_SyntaxTreeFunction102)) )
-    CHECK(255, List_add(self->functions, _SyntaxTreeFunction102) )
+    SyntaxTreeFunction* _SyntaxTreeFunction105;
+    CHECK(255, SyntaxTreeFunction_parse_new(NULL, parent_type, &((*end)), &(_SyntaxTreeFunction105)) )
+    CHECK(255, List_add(self->functions, _SyntaxTreeFunction105) )
   }
   return OK;
 }

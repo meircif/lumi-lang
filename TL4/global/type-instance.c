@@ -67,9 +67,9 @@ Returncode TypeInstance_copy(TypeInstance* self, TypeInstance* other) {
     ListNode* node = self->parameters->first;
     while (true) {
       if (!(NULL != node)) break;
-      TypeInstance* _TypeInstance11;
-      CHECK(34, TypeInstance_copy_new(((TypeInstance*)(node->item)), &(_TypeInstance11)) )
-      CHECK(34, List_add(other->parameters, _TypeInstance11) )
+      TypeInstance* _TypeInstance14;
+      CHECK(34, TypeInstance_copy_new(((TypeInstance*)(node->item)), &(_TypeInstance14)) )
+      CHECK(34, List_add(other->parameters, _TypeInstance14) )
       node = node->next;
     }
   }
@@ -87,16 +87,16 @@ static char* _func_name_TypeInstance_parse = "TypeInstance.parse";
 #define LUMI_FUNC_NAME _func_name_TypeInstance_parse
 Returncode TypeInstance_parse(TypeInstance* self, String* ends, SyntaxTreeNode* node, SyntaxTreeCode* code_node, Char* end) {
   String* name = NULL;
-  String* _String12;
-  CHECK(45, string_new_concat(ends, &(String){3, 2, ".{"}, &(_String12)) )
-  Int _Int13;
-  CHECK(45, read_until(_String12, false, &(name), &((*end)), &(_Int13)) )
+  String* _String15;
+  CHECK(45, string_new_concat(ends, &(String){3, 2, ".{"}, &(_String15)) )
+  Int _Int16;
+  CHECK(45, read_until(_String15, false, &(name), &((*end)), &(_Int16)) )
   if ((*end) == '.') {
     CHECK(48, string_new_copy(name, &(self->module_name)) )
-    String* _String14;
-    CHECK(49, string_new_concat(ends, &(String){2, 1, "{"}, &(_String14)) )
-    Int _Int15;
-    CHECK(49, read_until(_String14, false, &(name), &((*end)), &(_Int15)) )
+    String* _String17;
+    CHECK(49, string_new_concat(ends, &(String){2, 1, "{"}, &(_String17)) )
+    Int _Int18;
+    CHECK(49, read_until(_String17, false, &(name), &((*end)), &(_Int18)) )
   }
   CHECK(51, TypeInstance_parse_name(self, name, node, code_node, &((*end))) )
   return OK;
@@ -111,9 +111,9 @@ static char* _func_name_TypeInstance_parse_name = "TypeInstance.parse-name";
 Returncode TypeInstance_parse_name(TypeInstance* self, String* name, SyntaxTreeNode* node, SyntaxTreeCode* code_node, Char* end) {
   CHECK(58, string_new_copy(name, &(self->name)) )
   if ((*end) == '{') {
-    Bool _Bool16;
-    CHECK(60, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool16)) )
-    if (_Bool16) {
+    Bool _Bool19;
+    CHECK(60, String_equal(self->name, &(String){5, 4, "Func"}, &(_Bool19)) )
+    if (_Bool19) {
       CHECK(61, read_c(&((*end))) )
       if ((*end) != '(') {
         CHECK(63, SyntaxTreeNode_m_syntax_error_c(node, &(String){39, 38, "expected \"(\" inside Function type, got"}, (*end)) )
@@ -127,17 +127,17 @@ Returncode TypeInstance_parse_name(TypeInstance* self, String* name, SyntaxTreeN
       CHECK(67, FunctionArguments_parse(self->arguments, &(argument_factory->_base), false, code_node, &((*end))) )
     }
     else {
-      Bool _Bool17;
-      CHECK(69, String_equal(self->name, &(String){7, 6, "String"}, &(_Bool17)) )
-      if (NULL != code_node && _Bool17) {
+      Bool _Bool20;
+      CHECK(69, String_equal(self->name, &(String){7, 6, "String"}, &(_Bool20)) )
+      if (NULL != code_node && _Bool20) {
         CHECK(70, parse_new_expression(&(String){2, 1, "}"}, code_node, &(self->length_owner), &((*end))) )
         self->length = self->length_owner;
       }
       else {
         Bool has_sub_type = true;
-        Bool _Bool18;
-        CHECK(75, String_equal(self->name, &(String){6, 5, "Array"}, &(_Bool18)) )
-        Bool is_array = _Bool18;
+        Bool _Bool21;
+        CHECK(75, String_equal(self->name, &(String){6, 5, "Array"}, &(_Bool21)) )
+        Bool is_array = _Bool21;
         if (NULL != code_node && is_array) {
           CHECK(77, parse_new_expression(&(String){3, 2, ":}"}, code_node, &(self->length_owner), &((*end))) )
           self->length = self->length_owner;
@@ -187,9 +187,9 @@ Returncode TypeInstance_add_subtype_copy(TypeInstance* self, TypeData* type_data
     if (self->parameters == NULL) RAISE(103)
     *self->parameters = (List){NULL, NULL};
   }
-  TypeInstance* _TypeInstance19;
-  CHECK(104, TypeData_m_new_type_instance(type_data, &(_TypeInstance19)) )
-  CHECK(104, List_add(self->parameters, _TypeInstance19) )
+  TypeInstance* _TypeInstance22;
+  CHECK(104, TypeData_m_new_type_instance(type_data, &(_TypeInstance22)) )
+  CHECK(104, List_add(self->parameters, _TypeInstance22) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -358,18 +358,18 @@ Returncode TypeInstance_check_assign_to(TypeInstance* self, Int self_access, Typ
     }
   }
   if (self->type_data == glob->type_generic && target->type_data == glob->type_generic) {
-    Bool _Bool20;
-    CHECK(219, String_equal(self->name, target->name, &(_Bool20)) )
-    if (!_Bool20) {
+    Bool _Bool23;
+    CHECK(219, String_equal(self->name, target->name, &(_Bool23)) )
+    if (!_Bool23) {
       CHECK(220, SyntaxTreeNode_m_syntax_error2(node, &(String){30, 29, "cannot assign generic subtype"}, self->name, &(String){31, 30, "into different generic subtype"}, target->name) )
     }
   }
   TypeInstance* self_type_instance = self;
   TypeInstance* base_type_instance = NULL;
   while (true) {
-    Bool _Bool21;
-    CHECK(228, TypeData_m_is_same(target->type_data, self_type_instance->type_data, &(_Bool21)) )
-    if (!(!_Bool21)) break;
+    Bool _Bool24;
+    CHECK(228, TypeData_m_is_same(target->type_data, self_type_instance->type_data, &(_Bool24)) )
+    if (!(!_Bool24)) break;
     if (!(NULL != self_type_instance->type_data->base_type)) {
       CHECK(230, SyntaxTreeNode_m_syntax_error2(node, &(String){14, 13, "cannot assign"}, self->type_data->name, &(String){5, 4, "into"}, target->type_data->name) )
     }
@@ -380,9 +380,9 @@ Returncode TypeInstance_check_assign_to(TypeInstance* self, Int self_access, Typ
   }
   
   if (NULL != self->arguments) {
-    Bool _Bool22;
-    CHECK(242, FunctionArguments_check_same_as(self->arguments, target->arguments, NULL, 0, &(_Bool22)) )
-    if (_Bool22) {
+    Bool _Bool25;
+    CHECK(242, FunctionArguments_check_same_as(self->arguments, target->arguments, NULL, 0, &(_Bool25)) )
+    if (_Bool25) {
       CHECK(244, SyntaxTreeNode_m_syntax_error_msg(node, &(String){16, 15, "too few outputs"}) )
     }
   }
@@ -411,8 +411,8 @@ Returncode TypeInstance_check_sub_assign_to(TypeInstance* self, TypeInstance* ta
   ListNode* my_sub_type = self->parameters->first;
   while (true) {
     if (!(NULL != target_sub_type &&  NULL !=  my_sub_type)) break;
-    Int _Int23;
-    CHECK(260, TypeInstance_check_assign_to(((TypeInstance*)(my_sub_type->item)), ACCESS_VAR, target_sub_type->item, ACCESS_VAR, node, &(_Int23)) )
+    Int _Int26;
+    CHECK(260, TypeInstance_check_assign_to(((TypeInstance*)(my_sub_type->item)), ACCESS_VAR, target_sub_type->item, ACCESS_VAR, node, &(_Int26)) )
     my_sub_type = my_sub_type->next;
     target_sub_type = target_sub_type->next;
   }
@@ -523,9 +523,9 @@ Returncode TypeInstance_f_replace_type_parameters(TypeInstance* self, TypeInstan
     ListNode* inst_node = instance_type->parameters->first;
     while (true) {
       if (!(NULL != dec_node &&  NULL !=  inst_node)) break;
-      Bool _Bool24;
-      CHECK(336, String_equal(((String*)(dec_node->item)), self->name, &(_Bool24)) )
-      if (_Bool24) {
+      Bool _Bool27;
+      CHECK(336, String_equal(((String*)(dec_node->item)), self->name, &(_Bool27)) )
+      if (_Bool27) {
         CHECK(337, TypeInstance_copy(((TypeInstance*)(inst_node->item)), self) )
         if (!(false)) break;
       }

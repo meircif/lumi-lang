@@ -20,11 +20,8 @@ Generic_Type_Dynamic* dynamic_Void = NULL;
 
 Sys* sys = NULL;
 Ref_Manager* sys_Refman = NULL;
-Array* sys_argv = NULL;
-Ref_Manager* sys_argv_Refman = NULL;
-Ref_Manager* stdout_Refman = NULL;
-Ref_Manager* stdin_Refman = NULL;
-Ref_Manager* stderr_Refman = NULL;
+static Array* sys_argv = NULL;
+static Ref_Manager* sys_argv_Refman = NULL;
 
 void LUMI_trace_print(
     char const* format,
@@ -386,13 +383,20 @@ Returncode open_file(
     File** file, Ref_Manager** file_Refman,
     String* name, Ref_Manager* name_Refman,
     char* mode) {
+  CCHECK(file_close(*file, *file_Refman));
+  *file = NULL;
+  *file_Refman = NULL;
   CCHECK(set_cstring(name, name_Refman));
-  *file = fopen(name->values, mode);
+  *file = calloc(1, sizeof(File));
   if (*file == NULL) {
     CRAISE
   }
+  (*file)->fobj = fopen(name->values, mode);
+  if ((*file)->fobj == NULL) {
+    CRAISE
+  }
   *file_Refman = LUMI_new_ref(*file);
-  if (*file == NULL) {
+  if (*file_Refman == NULL) {
     CRAISE
   }
   return OK;
@@ -411,20 +415,25 @@ Returncode file_open_write(
   return open_file(file, file_Refman, name, name_Refman, "w");
 }
 
-void File_Del(File* self) {
-  fclose(self);
-}
-Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
-
-#define LUMI_FUNC_NAME "File.close"
-Returncode File_close(File* file, Ref_Manager* file_Refman) {
-  CHECK_NOT_NULL(file)
-  if (fclose(file) == 0) {
-    return OK;
+#define LUMI_FUNC_NAME "file_close"
+Returncode file_close(File* file, Ref_Manager* file_Refman) {
+  if (file != NULL && file_Refman->value != NULL && file->fobj != NULL) {
+    if (fclose(file->fobj) != 0) {
+      CRAISE
+    }
+    file->fobj = NULL;
   }
-  CRAISE
+  LUMI_owner_dec_ref(file_Refman);
+  return OK;
 }
 #undef LUMI_FUNC_NAME
+
+void File_Del(File* self) {
+  if (self != NULL && self->fobj != NULL) {
+    fclose(self->fobj);
+  }
+}
+Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
 
 Bool getc_is_eof(int get, char* ch) {
   if (get == EOF) {
@@ -440,7 +449,8 @@ Bool getc_is_eof(int get, char* ch) {
 Returncode File_getc(
     File* file, Ref_Manager* file_Refman, Char* out_char, Bool* is_eof) {
   CHECK_NOT_NULL(file)
-  *is_eof = getc_is_eof(getc(file), out_char);
+  if (file->fobj == NULL) CRAISE
+  *is_eof = getc_is_eof(getc(file->fobj), out_char);
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -449,7 +459,8 @@ Returncode File_getc(
 Returncode File_putc(File* file, Ref_Manager* file_Refman, Char in_char) {
   int res;
   CHECK_NOT_NULL(file)
-  res = putc(in_char, file);
+  if (file->fobj == NULL) CRAISE
+  res = putc(in_char, file->fobj);
   if (res != in_char) {
     CRAISE
   }
@@ -463,10 +474,11 @@ Returncode File_write(
     String* data, Ref_Manager* data_Refman) {
   int n, ch, res;
   CHECK_NOT_NULL(file)
+  if (file->fobj == NULL) CRAISE
   CHECK_NOT_NULL(data)
   for (n = 0; n < data->length; ++n) {
     ch = data->values[n];
-    res = putc(ch, file);
+    res = putc(ch, file->fobj);
     if (ch != res) {
       CRAISE
     }
@@ -679,20 +691,30 @@ int set_sys(int argc, char* argv[]) {
   sys_Refman = LUMI_new_ref(sys);
   sys_argv = LUMI_new_array(argc, sizeof(String));
   sys_argv_Refman = LUMI_new_ref(sys_argv);
-  stdout_Refman = LUMI_new_ref(stdout);
-  stdin_Refman = LUMI_new_ref(stdin);
-  stderr_Refman = LUMI_new_ref(stderr);
-  if (sys == NULL || sys_Refman == NULL || sys_argv == NULL ||
-    sys_argv_Refman == NULL || stdout_Refman == NULL || stdin_Refman == NULL ||
-    stderr_Refman == NULL) {
+  if (sys != NULL) {
+    sys->stdout_Cname = LUMI_alloc(sizeof(File));
+    sys->stdout_Cname_Refman = LUMI_new_ref(stdout);
+    sys->stdin_Cname = LUMI_alloc(sizeof(File));
+    sys->stdin_Cname_Refman = LUMI_new_ref(stdin);
+    sys->stderr_Cname = LUMI_alloc(sizeof(File));
+    sys->stderr_Cname_Refman = LUMI_new_ref(stderr);
+  }
+  if (sys == NULL || sys_Refman == NULL ||
+    sys_argv == NULL || sys_argv_Refman == NULL ||
+    sys->stdout_Cname == NULL || sys->stdout_Cname_Refman == NULL ||
+    sys->stdin_Cname == NULL || sys->stdin_Cname_Refman == NULL ||
+    sys->stderr_Cname == NULL || sys->stderr_Cname_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
   ++sys_Refman->count;
   ++sys_argv_Refman->count;
-  ++stdout_Refman->count;
-  ++stdin_Refman->count;
-  ++stderr_Refman->count;
+  ++sys->stdout_Cname_Refman->count;
+  ++sys->stdin_Cname_Refman->count;
+  ++sys->stderr_Cname_Refman->count;
+  sys->stdout_Cname->fobj = stdout;
+  sys->stdin_Cname->fobj = stdin;
+  sys->stderr_Cname->fobj = stderr;
   sys->argv = sys_argv;
   sys->argv_Refman = sys_argv_Refman;
   args_strings = sys_argv->values;
