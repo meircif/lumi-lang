@@ -1,6 +1,8 @@
 build
 .test
 *.actual.c
+actual.txt
+expected.txt
 wip
 .gitattributes
 *.WinMerge

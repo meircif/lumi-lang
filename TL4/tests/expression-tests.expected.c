@@ -1238,7 +1238,9 @@ LUMI_err = file_open_read(ut_M_str, ut_M_str_Refman, &(ut_M_fobj), &(ut_M_fobj_R
 LUMI_err = file_open_write(ut_M_str, ut_M_str_Refman, &(ut_M_fobj), &(ut_M_fobj_Refman));
   CHECK(1)
 /// @ t17
-LUMI_err = File_close(ut_M_fobj, ut_M_fobj_Refman);
+LUMI_err = file_close(ut_M_fobj, ut_M_fobj_Refman);
+  ut_M_fobj = NULL;
+  ut_M_fobj_Refman = NULL;
   CHECK(1)
 /// @ t18
 LUMI_err = File_getc(ut_M_fobj, ut_M_fobj_Refman, &(ut_M_c), &(ut_M_b));
@@ -1279,13 +1281,19 @@ LUMI_err = Sys_system(sys, sys_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_i));
 LUMI_err = Sys_getenv(sys, sys_Refman, ut_M_str, ut_M_str_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_b));
   CHECK(1)
 /// @ t29
-LUMI_err = File_putc(stdout, stdout_Refman, ut_M_c);
+if (sys == NULL) RAISE(1, 27, "used member of empty object")
+  if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+  LUMI_err = File_putc(sys->stdout, sys->stdout_Refman, ut_M_c);
   CHECK(1)
 /// @ t30
-LUMI_err = File_getc(stdin, stdin_Refman, &(ut_M_c), &(ut_M_b));
+if (sys == NULL) RAISE(1, 27, "used member of empty object")
+  if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+  LUMI_err = File_getc(sys->stdin, sys->stdin_Refman, &(ut_M_c), &(ut_M_b));
   CHECK(1)
 /// @ t31
-LUMI_err = File_putc(stderr, stderr_Refman, ut_M_c);
+if (sys == NULL) RAISE(1, 27, "used member of empty object")
+  if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+  LUMI_err = File_putc(sys->stderr, sys->stderr_Refman, ut_M_c);
   CHECK(1)
 /// @ t32
 LUMI_err = String_clear(ut_M_str, ut_M_str_Refman);

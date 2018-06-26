@@ -34,7 +34,9 @@ typedef struct {
 
 typedef Returncode (*Func)();
 
-typedef FILE File;
+typedef struct {
+  FILE* fobj;
+} File;
 
 typedef void* Ref;
 
@@ -186,9 +188,9 @@ Returncode file_open_read(
   String* name, Ref_Manager*, File** file, Ref_Manager**);
 Returncode file_open_write(
   String* name, Ref_Manager*, File** file, Ref_Manager**);
+Returncode file_close(File* file, Ref_Manager* file_Refman);
 void File_Del(File*);
 extern Generic_Type_Dynamic File_dynamic;
-Returncode File_close(File*, Ref_Manager*);
 Returncode File_getc(File*, Ref_Manager*, Char* ch, Bool* is_eof);
 Returncode File_putc(File*, Ref_Manager*, Char ch);
 Returncode File_write(File*, Ref_Manager*, String* line, Ref_Manager*);
@@ -196,12 +198,15 @@ Returncode File_write(File*, Ref_Manager*, String* line, Ref_Manager*);
 typedef struct {
   Array* argv;
   Ref_Manager* argv_Refman;
+  File* stdout;
+  Ref_Manager* stdout_Refman;
+  File* stdin;
+  Ref_Manager* stdin_Refman;
+  File* stderr;
+  Ref_Manager* stderr_Refman;
 } Sys;
 extern Sys* sys;
 extern Ref_Manager* sys_Refman;
-extern Ref_Manager* stdout_Refman;
-extern Ref_Manager* stdin_Refman;
-extern Ref_Manager* stderr_Refman;
 void Sys_Del(Sys*);
 extern Generic_Type_Dynamic Sys_dynamic;
 Returncode Sys_print(Sys*, Ref_Manager*, String* text, Ref_Manager*);
