@@ -42997,26 +42997,82 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_write_cname(String* name, Ref_Manager* name_Refman) {
   Returncode LUMI_err = OK;
   Char ch = 0;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  Bool aux_Bool_0 = 0;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  Bool aux_Bool_1 = 0;
+  String aux_String_2_Var = {0};
+  String* aux_String_2 = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
+  Bool aux_Bool_2 = 0;
+  String aux_String_3_Var = {0};
+  String* aux_String_3 = NULL;
+  Ref_Manager* aux_String_3_Refman = NULL;
   Int index = 0;
   LUMI_inc_ref(name_Refman);
   if (! (name != NULL && name_Refman->value != NULL)) {
     USER_RAISE(81, NULL, NULL)
   }
+  aux_String_0 = &aux_String_0_Var;
+  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  if (aux_String_0_Refman == NULL) RAISE(83, 38, "insufficient memory for managed object")
+  aux_String_0_Var.max_length = 7;
+  aux_String_0_Var.length = 6;
+  aux_String_0_Var.values = "stderr";
+  LUMI_err = String_equal(name, name_Refman, aux_String_0, aux_String_0_Refman, &(aux_Bool_0));
+  CHECK(82)
+  aux_String_1 = &aux_String_1_Var;
+  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  if (aux_String_1_Refman == NULL) RAISE(82, 38, "insufficient memory for managed object")
+  aux_String_1_Var.max_length = 6;
+  aux_String_1_Var.length = 5;
+  aux_String_1_Var.values = "stdin";
+  LUMI_err = String_equal(name, name_Refman, aux_String_1, aux_String_1_Refman, &(aux_Bool_1));
+  CHECK(82)
+  aux_String_2 = &aux_String_2_Var;
+  aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+  if (aux_String_2_Refman == NULL) RAISE(82, 38, "insufficient memory for managed object")
+  aux_String_2_Var.max_length = 7;
+  aux_String_2_Var.length = 6;
+  aux_String_2_Var.values = "stdout";
+  LUMI_err = String_equal(name, name_Refman, aux_String_2, aux_String_2_Refman, &(aux_Bool_2));
+  CHECK(82)
+  if ((aux_Bool_2 || aux_Bool_1) || aux_Bool_0) {
+    LUMI_err = tl5_compiler_M_write(name, name_Refman);
+    CHECK(84)
+    aux_String_3 = &aux_String_3_Var;
+    aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+    if (aux_String_3_Refman == NULL) RAISE(85, 38, "insufficient memory for managed object")
+    aux_String_3_Var.max_length = 7;
+    aux_String_3_Var.length = 6;
+    aux_String_3_Var.values = "_Cname";
+    LUMI_err = tl5_compiler_M_write(aux_String_3, aux_String_3_Refman);
+    CHECK(85)
+    goto LUMI_cleanup;
+  }
   for (index = 0; index < name->length; ++index) {
-    if (name == NULL) RAISE(83, 29, "empty object used as sequence")
-    if (name_Refman->value == NULL) RAISE(83, 40, "outdated weak reference used as sequence")
-    if ((index) < 0 || (index) >= (name)->length) RAISE(83, 25, "slice index out of bounds")
+    if (name == NULL) RAISE(88, 29, "empty object used as sequence")
+    if (name_Refman->value == NULL) RAISE(88, 40, "outdated weak reference used as sequence")
+    if ((index) < 0 || (index) >= (name)->length) RAISE(88, 25, "slice index out of bounds")
     ch = ((name)->values)[index];
     if ((ch == '-') || (ch == ' ')) {
       LUMI_err = tl5_compiler_M_write_c('_');
-      CHECK(85)
+      CHECK(90)
     }
     else {
       LUMI_err = tl5_compiler_M_write_c(ch);
-      CHECK(87)
+      CHECK(92)
     }
   }
 LUMI_cleanup:
+  LUMI_dec_ref(aux_String_3_Refman);
+  LUMI_dec_ref(aux_String_2_Refman);
+  LUMI_dec_ref(aux_String_1_Refman);
+  LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(name_Refman);
   return LUMI_err;
 }
@@ -43034,11 +43090,11 @@ Returncode tl5_compiler_M_write_int(Int num) {
   num_str = &num_str_Var;
   num_str_Var.values = num_str_Values;
   num_str_Refman = LUMI_new_ref(num_str);
-  if (num_str_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
+  if (num_str_Refman == NULL) RAISE(97, 38, "insufficient memory for managed object")
   LUMI_err = Int_str(num, num_str, num_str_Refman);
-  CHECK(93)
+  CHECK(98)
   LUMI_err = tl5_compiler_M_write(num_str, num_str_Refman);
-  CHECK(94)
+  CHECK(99)
 LUMI_cleanup:
   LUMI_dec_ref(num_str_Refman);
   return LUMI_err;
@@ -43053,7 +43109,7 @@ Returncode tl5_compiler_M_write_spaces(Int num) {
   Int n = 0;
   for (n = 0; n < num; ++n) {
     LUMI_err = tl5_compiler_M_write_c(' ');
-    CHECK(100)
+    CHECK(105)
   }
 LUMI_cleanup:
   return LUMI_err;
