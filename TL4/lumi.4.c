@@ -692,29 +692,29 @@ int set_sys(int argc, char* argv[]) {
   sys_argv = LUMI_new_array(argc, sizeof(String));
   sys_argv_Refman = LUMI_new_ref(sys_argv);
   if (sys != NULL) {
-    sys->stdout = LUMI_alloc(sizeof(File));
-    sys->stdout_Refman = LUMI_new_ref(stdout);
-    sys->stdin = LUMI_alloc(sizeof(File));
-    sys->stdin_Refman = LUMI_new_ref(stdin);
-    sys->stderr = LUMI_alloc(sizeof(File));
-    sys->stderr_Refman = LUMI_new_ref(stderr);
+    sys->stdout_Cname = LUMI_alloc(sizeof(File));
+    sys->stdout_Cname_Refman = LUMI_new_ref(stdout);
+    sys->stdin_Cname = LUMI_alloc(sizeof(File));
+    sys->stdin_Cname_Refman = LUMI_new_ref(stdin);
+    sys->stderr_Cname = LUMI_alloc(sizeof(File));
+    sys->stderr_Cname_Refman = LUMI_new_ref(stderr);
   }
   if (sys == NULL || sys_Refman == NULL ||
     sys_argv == NULL || sys_argv_Refman == NULL ||
-    sys->stdout == NULL || sys->stdout_Refman == NULL ||
-    sys->stdin == NULL || sys->stdin_Refman == NULL ||
-    sys->stderr == NULL || sys->stderr_Refman == NULL) {
+    sys->stdout_Cname == NULL || sys->stdout_Cname_Refman == NULL ||
+    sys->stdin_Cname == NULL || sys->stdin_Cname_Refman == NULL ||
+    sys->stderr_Cname == NULL || sys->stderr_Cname_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
   ++sys_Refman->count;
   ++sys_argv_Refman->count;
-  ++sys->stdout_Refman->count;
-  ++sys->stdin_Refman->count;
-  ++sys->stderr_Refman->count;
-  sys->stdout->fobj = stdout;
-  sys->stdin->fobj = stdin;
-  sys->stderr->fobj = stderr;
+  ++sys->stdout_Cname_Refman->count;
+  ++sys->stdin_Cname_Refman->count;
+  ++sys->stderr_Cname_Refman->count;
+  sys->stdout_Cname->fobj = stdout;
+  sys->stdin_Cname->fobj = stdin;
+  sys->stderr_Cname->fobj = stderr;
   sys->argv = sys_argv;
   sys->argv_Refman = sys_argv_Refman;
   args_strings = sys_argv->values;

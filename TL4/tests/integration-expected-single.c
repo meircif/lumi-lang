@@ -2070,15 +2070,15 @@ Returncode integration_M_test_builtins(Int i, Char c, Bool b, String* s, Ref_Man
   CHECK(344)
   if (sys == NULL) RAISE(345, 27, "used member of empty object")
   if (sys_Refman->value == NULL) RAISE(345, 38, "used member of outdated weak reference")
-  LUMI_err = File_putc(sys->stdout, sys->stdout_Refman, c);
+  LUMI_err = File_putc(sys->stdout_Cname, sys->stdout_Cname_Refman, c);
   CHECK(345)
   if (sys == NULL) RAISE(346, 27, "used member of empty object")
   if (sys_Refman->value == NULL) RAISE(346, 38, "used member of outdated weak reference")
-  LUMI_err = File_getc(sys->stdin, sys->stdin_Refman, &(cv), &(bv));
+  LUMI_err = File_getc(sys->stdin_Cname, sys->stdin_Cname_Refman, &(cv), &(bv));
   CHECK(346)
   if (sys == NULL) RAISE(347, 27, "used member of empty object")
   if (sys_Refman->value == NULL) RAISE(347, 38, "used member of outdated weak reference")
-  LUMI_err = File_putc(sys->stderr, sys->stderr_Refman, c);
+  LUMI_err = File_putc(sys->stderr_Cname, sys->stderr_Cname_Refman, c);
   CHECK(347)
 LUMI_cleanup:
   File_Del(f);

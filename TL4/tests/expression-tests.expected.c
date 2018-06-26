@@ -1283,17 +1283,17 @@ LUMI_err = Sys_getenv(sys, sys_Refman, ut_M_str, ut_M_str_Refman, ut_M_str, ut_M
 /// @ t29
 if (sys == NULL) RAISE(1, 27, "used member of empty object")
   if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
-  LUMI_err = File_putc(sys->stdout, sys->stdout_Refman, ut_M_c);
+  LUMI_err = File_putc(sys->stdout_Cname, sys->stdout_Cname_Refman, ut_M_c);
   CHECK(1)
 /// @ t30
 if (sys == NULL) RAISE(1, 27, "used member of empty object")
   if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
-  LUMI_err = File_getc(sys->stdin, sys->stdin_Refman, &(ut_M_c), &(ut_M_b));
+  LUMI_err = File_getc(sys->stdin_Cname, sys->stdin_Cname_Refman, &(ut_M_c), &(ut_M_b));
   CHECK(1)
 /// @ t31
 if (sys == NULL) RAISE(1, 27, "used member of empty object")
   if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
-  LUMI_err = File_putc(sys->stderr, sys->stderr_Refman, ut_M_c);
+  LUMI_err = File_putc(sys->stderr_Cname, sys->stderr_Cname_Refman, ut_M_c);
   CHECK(1)
 /// @ t32
 LUMI_err = String_clear(ut_M_str, ut_M_str_Refman);
