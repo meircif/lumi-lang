@@ -40,12 +40,12 @@ class NativeFunction(SyntaxTreeFunction)
   
   func dynamic link-types()
     glob.current-module := self.outer-module
-    base.link-types()
+    base()
     glob.current-module := _
   
   func dynamic analyze()
     glob.current-module := self.outer-module
-    base.analyze()
+    base()
     glob.current-module := _
   
   func dynamic write()
@@ -67,11 +67,11 @@ class NativeVariable(SyntaxTreeVariable)
       self.syntax-error(
           user "only primitive types supported for native variable, got",
           user self.type-instance.type-data.name)
-    base.analyze()
+    base()
   
   func dynamic write()
     write(user "\nextern ")
-    base.write()
+    base()
 
 
 ~~~ Native variable declaration in the syntax tree ~~~

@@ -16,7 +16,7 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
   func dynamic analyze()
     if not self.block.code-nodes.first?
       self.syntax-error-msg(user "\"try\" statement with no code")
-    base.analyze()
+    base()
   
   func dynamic write()
     self.write-spaces()
@@ -56,7 +56,7 @@ class SyntaxTreeCatch(SyntaxTreeFlowElement)
   func dynamic analyze()
     if not self.block.code-nodes.first?
       self.syntax-error-msg(user "\"catch\" statement with no code")
-    base.analyze()
+    base()
   
   func dynamic write()
     self.write-spaces()

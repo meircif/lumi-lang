@@ -130,7 +130,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
-    if base.find-variable(user name, user module-name)->(user variable)?
+    if base(user name, user module-name)->(user variable)?
       return
     if not module-name?
       self.arguments.find-variable(user name, user _)->(user variable)
@@ -139,7 +139,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if self.my-module?
       glob.current-module := self.my-module
     self.arguments.link-types()
-    base.link-types()
+    base()
     if self.my-module?
       glob.current-module := _
   
@@ -147,7 +147,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if self.my-module?
       glob.current-module := self.my-module
     self.arguments.analyze()
-    base.analyze()
+    base()
     if self.my-module?
       glob.current-module := _
   
@@ -201,7 +201,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         write(user "_Refman);\n")
   
   func inst write-cleanup()
-    base.write-cleanup(user _)
+    base(user _)
     for parameter in self.arguments.parameters.iter-back()
       if parameter.access = Access.USER or parameter.access = Access.OWNER
         self.write-variable-cleanup(user parameter.get-variable(), user _)
@@ -261,7 +261,7 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
   func dynamic analyze()
     if self.arguments.outputs.first?
       self.syntax-error-msg(user "constructor with outputs")
-    base.analyze()
+    base()
 
 
 ~~~ Function declaration argument ~~~

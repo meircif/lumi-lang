@@ -255,10 +255,10 @@ class BinaryExpression(UnaryExpression)
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.left-expression.order-constants(user ordered-list)
-    base.order-constants(user ordered-list)
+    base(user ordered-list)
   
   func dynamic write-preactions()
-    base.write-preactions()
+    base()
     self.left-expression.write-preactions()
     if self.operator.order = 4 and self.operator.group-index = 0
       ; := operator

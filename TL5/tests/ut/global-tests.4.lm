@@ -21,6 +21,9 @@ mock Sys.print(user String text)
   assert text?
   tl5-compiler-tests.mock-print-text.concat(user text)
 
+mock Sys.exit(copy Int returncode)
+  raise "Sys.exit"
+
 func set-mock-file-text(user String text, user String second-file-text)
   mock-input-file-text.new(user "module ut\n")
   mock-input-line-reset-index := mock-input-file-text.length

@@ -104,7 +104,7 @@ class SymbolExpression(Expression)
       write-cname(user self.name)
       write(user "_Dynamic)")
     else
-      base.write-dynamic()
+      base()
   
   func dynamic write-refman()
     if self.is-variable-output() and not self.top
@@ -112,7 +112,7 @@ class SymbolExpression(Expression)
       write-cname(user self.name)
       write(user "_Refman)")
     else
-      base.write-refman()
+      base()
 
 ~~~ An instance member expression ~~~
 class MemberExpression(SymbolExpression)
@@ -153,7 +153,7 @@ class MemberExpression(SymbolExpression)
     
     if instance-type.type-data is glob.type-module
       self.module-name := instance-type.name
-      base.analyze()
+      base()
       return
     
     instance-type.type-data.find-field(user self.name)->(
@@ -213,7 +213,7 @@ class MemberExpression(SymbolExpression)
       self.instance.analyze-call(user arguments)->(
           user instance-type, var bases, var is-function-object)
       return
-    if base.analyze-call(user arguments)->(
+    if base(user arguments)->(
         user instance-type, var bases, var is-function-object) or
         self.module-name?
       return
@@ -230,7 +230,7 @@ class MemberExpression(SymbolExpression)
       arguments.parameters.prepend(owner self-param)
   
   func dynamic analyze-mock(copy Bool is-annotate)->(var Bool is-mock)
-    if base.analyze-mock(copy is-annotate)->(var is-mock)
+    if base(copy is-annotate)->(var is-mock)
       if self.function.is-dynamic and
           self.instance.result-type.type-data is-not glob.type-type and
           self.instance.result-type.type-data is-not glob.type-base
@@ -293,7 +293,7 @@ class MemberExpression(SymbolExpression)
           write(user "&(")
         self.instance.write()
         self.write-bases()
-    base.write()
+    base()
     if self.instance?
       if not self.function? and self.is-complex-field and self.top and
           self.instance.result-type.type-data is-not glob.type-type
@@ -308,7 +308,7 @@ class MemberExpression(SymbolExpression)
     var Bool top(copy self.top)
     if self.is-generic-cast and not self.top
       self.top := true
-    base.write-refman()
+    base()
     self.top := top
   
   func dynamic write-dynamic()
@@ -323,7 +323,7 @@ class MemberExpression(SymbolExpression)
       self.result-type.type-data.write-cname()
       write(user "_Dynamic*)(")
       self.top := true
-    base.write-dynamic()
+    base()
     self.top := top
     if self.is-generic-cast and not self.top
       write(user "))")

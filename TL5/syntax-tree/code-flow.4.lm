@@ -68,7 +68,7 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
   
   func dynamic analyze()
     self.analyze-expression(user self.condition, user glob.type-bool)
-    base.analyze()
+    base()
     if self.else-node?
       self.else-node.analyze()
   

@@ -127,7 +127,7 @@ class SyntaxTreeTestFunction(SyntaxTreeFunction)
     new-node.parse()->(var end)
   
   func inst parse()->(var Char end)
-    base.parse(user _)->(var end)
+    base(user _)->(var end)
     if self.arguments.parameters.first? or self.arguments.outputs.first?
       self.syntax-error-msg(user "test function cannot have arguments")
     glob.test-functions.add(user self.name, user self)
@@ -218,7 +218,7 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
         self.syntax-error(
             user "already mocking function", user self.mocked-name)
       self.mocked-function.mocker-function := self
-    base.link-types()
+    base()
   
   func dynamic analyze()
     glob.current-module := self.my-module
@@ -241,10 +241,10 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       self.arguments.check-same-as(
           user self.mocked-function.arguments, user _, copy 0)
       self.my-module := self.mocked-function.my-module
-    base.analyze()
+    base()
   
   func dynamic write-declaration()
-    base.write-declaration()
+    base()
     if self.mocked-function?
       ; Bool `name`_active = true;
       write(user "\nBool ")
@@ -263,7 +263,7 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       self.write-arg-list(user self.arguments.parameters)->(var first)
       self.write-arg-list(user self.arguments.outputs)->(var first)
       write(user ");\n")
-    base.write-block-body()
+    base()
   
   func inst write-arg-list(user List{Argument} list)->(var Bool first)
     for argument in list.iter()

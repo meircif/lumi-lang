@@ -93,7 +93,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.parent-type?
       parent-type := self.parent-type
     else-if self.parent?
-      base.get-parent-type()->(user parent-type)
+      base()->(user parent-type)
     else
       parent-type := _
   

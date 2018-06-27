@@ -20,7 +20,7 @@ class SyntaxTreeNode
         access := n
         return
     self.print-syntax-error(user "illegal access", user access-str)
-    raise
+    sys.exit(copy 1)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := _
@@ -47,7 +47,7 @@ class SyntaxTreeNode
             type-data := glob.type-generic
             return
     self.print-syntax-error(user "unknown type", user name)
-    raise
+    sys.exit(copy 1)
   
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
@@ -108,7 +108,7 @@ class SyntaxTreeNode
   
   func inst syntax-error(user String text, user String item)
     self.print-syntax-error(user text, user item)
-    raise
+    sys.exit(copy 1)
   
   ~~~ Same as `syntax-error` but but with another `{text} "{item}" pair ~~~
   func inst syntax-error2(
@@ -118,7 +118,7 @@ class SyntaxTreeNode
     sys.print(user " ")
     print-msg-with-item(user text2, user item2)
     sys.print(user "\n")
-    raise
+    sys.exit(copy 1)
   
   ~~~ Same as `syntax-error` but but with another 2 `{text} "{item}" pair ~~~
   func inst syntax-error3(
@@ -135,7 +135,7 @@ class SyntaxTreeNode
     sys.print(user " ")
     print-msg-with-item(user text3, user item3)
     sys.print(user "\n")
-    raise
+    sys.exit(copy 1)
   
   ~~~ Same as `syntax-error` but with a character item ~~~
   func inst syntax-error-c(user String text, copy Char item)
@@ -147,13 +147,13 @@ class SyntaxTreeNode
     else
       char-str.append(copy item)
     self.print-syntax-error(user text, user char-str)
-    raise
+    sys.exit(copy 1)
   
   func inst syntax-error-msg(user String text)
     self.print-syntax-error-header()
     sys.print(user text)
     sys.print(user "\n")
-    raise
+    sys.exit(copy 1)
   
   func inst syntax-error-indentation(copy Int actual, copy Int expected)
     var String{16} expected-str
@@ -171,7 +171,7 @@ class SyntaxTreeNode
     sys.print(user " got ")
     sys.print(user actual-str)
     sys.print(user "\n")
-    raise
+    sys.exit(copy 1)
   
   func inst print-syntax-error-header()
     sys.print(user "Code error in ")

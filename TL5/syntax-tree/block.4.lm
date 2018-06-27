@@ -11,7 +11,7 @@ class SyntaxTreeCode(SyntaxTreeNode)
     if self.parent? and not module-name?
       self.parent.find-variable(user name, user _)->(user variable)
     else
-      base.find-variable(user name, user module-name)->(user variable)
+      base(user name, user module-name)->(user variable)
   
   func inst get-function()->(user SyntaxTreeFunction function)
     self.parent.get-function()->(user function)
@@ -199,7 +199,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
-    base.find-variable(user name, user module-name)->(user variable)
+    base(user name, user module-name)->(user variable)
     if not variable? and self.parent? and not module-name?
       self.parent.find-variable(user name, user _)->(user variable)
   
@@ -207,11 +207,11 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     self.parent.get-function()->(user function)
   
   func dynamic link-types()
-    base.link-types()
+    base()
     self.link-children-types(user self.code-nodes)
   
   func dynamic analyze()
-    base.analyze()
+    base()
     self.analyze-children(user self.code-nodes)
   
   func inst write-block()

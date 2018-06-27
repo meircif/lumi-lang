@@ -5,7 +5,7 @@ class GlobalNodes(SyntaxTreeNamespace)
   owner List{TypeData} types
   
   func inst init()
-    base.init()
+    base()
     self.types := List{TypeData}()
 
 
@@ -22,7 +22,7 @@ class SyntaxTreeRoot(GlobalNodes)
   var Bool is-library
   
   func inst init()
-    base.init()
+    base()
     self.enums := List{EnumData}()
     self.constants := NameMap{SyntaxTreeConstant}()
     self.modules := List{ModuleMembers}()
@@ -47,7 +47,7 @@ class SyntaxTreeRoot(GlobalNodes)
     if input-files-number = 0 or arg-test-index = sys.argv.length - 1
       sys.print(user "usage: tl4-compiler [-t TESTED-MODULE]")
       sys.print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
-      raise
+      sys.exit(copy 1)
     
     if glob.tested-module?
       self.line-counts := Array{input-files-number:LineCount}()
@@ -105,7 +105,7 @@ class SyntaxTreeRoot(GlobalNodes)
         return
       else
         self.syntax-error-msg(user "no \"module\" in file start")
-    base.parse-if-common(user keyword, user parent-type, user parent-block)->(
+    base(user keyword, user parent-type, user parent-block)->(
         var end, var is-parsed)
   
   func dynamic parse-child(user String keyword)->(var Char end)
@@ -176,18 +176,18 @@ class SyntaxTreeRoot(GlobalNodes)
     self.global-init.link-types()
     if self.main-function?
       self.main-function.link-types()
-    base.analyze()
+    base()
     self.analyze-children(user self.types)
     self.global-init.analyze()
     if glob.tested-module?
       if not glob.test-functions.first?
         sys.print(user "General code error: no test functions\n")
-        raise
+        sys.exit(copy 1)
     else-if self.main-function?
       self.main-function.analyze()
     else-if not self.is-library
       sys.print(user "General code error: no main function\n")
-      raise
+      sys.exit(copy 1)
     self.order-children-constants(user self.variables, user self.constants)
     if self.line-counts?
       self.analyze-cover()
@@ -204,7 +204,7 @@ class SyntaxTreeRoot(GlobalNodes)
       sys.print(user "General code error: unknown tested module \"")
       sys.print(user glob.tested-module)
       sys.print(user "\"\n")
-      raise
+      sys.exit(copy 1)
     var Int covered-index
     for n in self.line-counts.length
       user LineCount line-count(user self.line-counts[n])
@@ -216,7 +216,7 @@ class SyntaxTreeRoot(GlobalNodes)
       sys.print(user "General code error: no code to test under module \"")
       sys.print(user glob.tested-module)
       sys.print(user "\"\n")
-      raise
+      sys.exit(copy 1)
   
   ~~~ write C file in this order:
   1. type declarations
@@ -406,12 +406,12 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     glob.root.global-init.write()
     self.write-pre-func()
     write(user "\n")
-    base.write-block-body()
+    base()
 
 
 class GlobalInit(SyntaxTreeFunction)
   func inst init()
-    base.init()
+    base()
     self.code-nodes := List{SyntaxTreeCode}()
     self.variables := List{SyntaxTreeVariable}()
     self.arguments := FunctionArguments()

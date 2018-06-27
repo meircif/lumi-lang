@@ -83,7 +83,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
           owner self.aux-symbol.name)
       self.get-function().has-user-assign := true
     
-    base.analyze()
+    base()
   
   func inst get-iterator-type()->(owner TypeInstance type-instance)
     self.iterator.result-type.type-data.find-meth(user "has")->(

@@ -95,7 +95,7 @@ test test-illegal-usage()
   var Array{2:String{4}} mock-argv
   sys.argv := mock-argv
   Sys.print.active := true
-  assert-error tl5-compiler.glob.root.parse()
+  assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
   Sys.print.active := false
   assert-string-slice(
       user "usage: tl4-compiler [-t TESTED-MODULE] OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n",
@@ -107,7 +107,7 @@ test test-illegal-usage()
 
 func test-analyze-error(user String expected-error)
   Sys.print.active := true
-  assert-error tl5-compiler.glob.root.analyze()
+  assert-error tl5-compiler.glob.root.analyze(), "Sys.exit"
   Sys.print.active := false
   assert-string-slice(
       user expected-error,

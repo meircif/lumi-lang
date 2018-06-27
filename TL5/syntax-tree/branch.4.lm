@@ -132,7 +132,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
-    if base.find-variable(user name, user module-name)->(user variable)?
+    if base(user name, user module-name)->(user variable)?
       return
     variable := _
     for sub-variable in self.variables.iter()
@@ -236,7 +236,7 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
   owner List{SyntaxTreeFunction} functions
   
   func inst init()
-    base.init()
+    base()
     self.functions := List{SyntaxTreeFunction}()
   
   func inst parse-if-function(
@@ -251,11 +251,11 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
           user _, user parent-type)->(var end))
   
   func dynamic link-types()
-    base.link-types()
+    base()
     self.link-children-types(user self.functions)
   
   func dynamic analyze()
-    base.analyze()
+    base()
     self.analyze-children(user self.functions)
   
   func inst write-functions-declaration()

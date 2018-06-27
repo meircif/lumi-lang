@@ -177,7 +177,7 @@ class TypeData(SyntaxTreeNamespace)
         self.syntax-error(
             user "no parameter given for type with parameters",
             user self.base-type.type-data.name)
-    base.link-types()
+    base()
     glob.current-module := _
   
   func dynamic analyze()
@@ -194,7 +194,7 @@ class TypeData(SyntaxTreeNamespace)
               user "class with no dynamic methods", user self.name)
         while not iter.get().is-dynamic
         iter.next()
-    base.analyze()
+    base()
     glob.current-module := _
   
   func inst write-cname()

@@ -2991,7 +2991,8 @@ Returncode tl5_compiler_M_SyntaxTreeNode_get_access(tl5_compiler_M_SyntaxTreeNod
   aux_String_0_Var.values = "illegal access";
   LUMI_err = tl5_compiler_M_SyntaxTreeNode_print_syntax_error(self, self_Refman, self_Dynamic, aux_String_0, aux_String_0_Refman, access_str, access_str_Refman);
   CHECK(22)
-  USER_RAISE(23, NULL, NULL)
+  LUMI_err = Sys_exit(sys, sys_Refman, 1);
+  CHECK(23)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(access_str_Refman);
@@ -3169,7 +3170,8 @@ Returncode tl5_compiler_M_SyntaxTreeNode_find_type(tl5_compiler_M_SyntaxTreeNode
   aux_String_2_Var.values = "unknown type";
   LUMI_err = tl5_compiler_M_SyntaxTreeNode_print_syntax_error(self, self_Refman, self_Dynamic, aux_String_2, aux_String_2_Refman, name, name_Refman);
   CHECK(49)
-  USER_RAISE(50, NULL, NULL)
+  LUMI_err = Sys_exit(sys, sys_Refman, 1);
+  CHECK(50)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_ListIterator_1_Refman);
@@ -3511,7 +3513,8 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error(tl5_compiler_M_SyntaxTreeN
   LUMI_inc_ref(item_Refman);
   LUMI_err = tl5_compiler_M_SyntaxTreeNode_print_syntax_error(self, self_Refman, self_Dynamic, text, text_Refman, item, item_Refman);
   CHECK(110)
-  USER_RAISE(111, NULL, NULL)
+  LUMI_err = Sys_exit(sys, sys_Refman, 1);
+  CHECK(111)
 LUMI_cleanup:
   LUMI_dec_ref(item_Refman);
   LUMI_dec_ref(text_Refman);
@@ -3558,7 +3561,8 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error2(tl5_compiler_M_SyntaxTree
   aux_String_1_Var.values = "\n";
   LUMI_err = Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman);
   CHECK(120)
-  USER_RAISE(121, NULL, NULL)
+  LUMI_err = Sys_exit(sys, sys_Refman, 1);
+  CHECK(121)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
@@ -3624,7 +3628,8 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error3(tl5_compiler_M_SyntaxTree
   aux_String_2_Var.values = "\n";
   LUMI_err = Sys_print(sys, sys_Refman, aux_String_2, aux_String_2_Refman);
   CHECK(137)
-  USER_RAISE(138, NULL, NULL)
+  LUMI_err = Sys_exit(sys, sys_Refman, 1);
+  CHECK(138)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_2_Refman);
   LUMI_dec_ref(aux_String_1_Refman);
@@ -3689,7 +3694,8 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error_c(tl5_compiler_M_SyntaxTre
     }
   LUMI_err = tl5_compiler_M_SyntaxTreeNode_print_syntax_error(self, self_Refman, self_Dynamic, text, text_Refman, char_str, char_str_Refman);
   CHECK(149)
-  USER_RAISE(150, NULL, NULL)
+  LUMI_err = Sys_exit(sys, sys_Refman, 1);
+  CHECK(150)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_1_Refman);
   LUMI_dec_ref(aux_String_0_Refman);
@@ -3722,7 +3728,8 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(tl5_compiler_M_SyntaxT
   aux_String_0_Var.values = "\n";
   LUMI_err = Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(155)
-  USER_RAISE(156, NULL, NULL)
+  LUMI_err = Sys_exit(sys, sys_Refman, 1);
+  CHECK(156)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(text_Refman);
@@ -3833,7 +3840,8 @@ Returncode tl5_compiler_M_SyntaxTreeNode_syntax_error_indentation(tl5_compiler_M
   aux_String_5_Var.values = "\n";
   LUMI_err = Sys_print(sys, sys_Refman, aux_String_5, aux_String_5_Refman);
   CHECK(173)
-  USER_RAISE(174, NULL, NULL)
+  LUMI_err = Sys_exit(sys, sys_Refman, 1);
+  CHECK(174)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_5_Refman);
   LUMI_dec_ref(aux_String_4_Refman);
@@ -41104,7 +41112,8 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_parse(tl5_compiler_M_SyntaxTreeRoot* se
       aux_String_3_Var.values = " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n";
       LUMI_err = Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman);
       CHECK(49)
-      USER_RAISE(50, NULL, NULL)
+      LUMI_err = Sys_exit(sys, sys_Refman, 1);
+      CHECK(50)
     }
   if (tl5_compiler_M_glob == NULL) RAISE(52, 17, "empty object used")
   if (tl5_compiler_M_glob_Refman->value == NULL) RAISE(52, 28, "outdated weak reference used")
@@ -41876,7 +41885,8 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze(tl5_compiler_M_SyntaxTreeRoot* 
         aux_String_0_Var.values = "General code error: no test functions\n";
         LUMI_err = Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
         CHECK(184)
-        USER_RAISE(185, NULL, NULL)
+        LUMI_err = Sys_exit(sys, sys_Refman, 1);
+        CHECK(185)
       }
     }
   else {
@@ -41901,7 +41911,8 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze(tl5_compiler_M_SyntaxTreeRoot* 
           aux_String_1_Var.values = "General code error: no main function\n";
           LUMI_err = Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman);
           CHECK(189)
-          USER_RAISE(190, NULL, NULL)
+          LUMI_err = Sys_exit(sys, sys_Refman, 1);
+          CHECK(190)
         }
       }
     }
@@ -42027,7 +42038,8 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze_cover(tl5_compiler_M_SyntaxTree
       aux_String_1_Var.values = "\"\n";
       LUMI_err = Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman);
       CHECK(206)
-      USER_RAISE(207, NULL, NULL)
+      LUMI_err = Sys_exit(sys, sys_Refman, 1);
+      CHECK(207)
     }
   if (self == NULL) RAISE(209, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(209, 28, "outdated weak reference used")
@@ -42077,7 +42089,8 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_analyze_cover(tl5_compiler_M_SyntaxTree
       aux_String_3_Var.values = "\"\n";
       LUMI_err = Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman);
       CHECK(218)
-      USER_RAISE(219, NULL, NULL)
+      LUMI_err = Sys_exit(sys, sys_Refman, 1);
+      CHECK(219)
     }
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_3_Refman);
