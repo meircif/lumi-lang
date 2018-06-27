@@ -82,6 +82,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
           user self.aux-symbol.variable)
       string-new-copy(user self.aux-symbol.variable.name):(
           owner self.aux-symbol.name)
+      self.get-function().has-user-assign := true
     
     base.analyze()
   
@@ -159,6 +160,8 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.write-spaces()
     if ? self.start
       self.start.write-preactions()
+    if not (? self.aux-symbol)
+      self.iterator.write-preactions()
     if iterator-type = glob.type-int
       self.write-int-iter()
     else-if iterator-type = glob.type-string or iterator-type = glob.type-array
@@ -219,6 +222,8 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     #   `item` = `aux-var`[`item`_Index];
     #   `block...`
     # }}
+    self.aux-symbol.write-check-ref()
+    self.write-spaces()
     write(user "{int ")
     write-cname(user self.item.name)
     write(user "_Index; for (")
@@ -240,7 +245,9 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     slice.sequence := self.aux-symbol
     slice.index := index-symbol
     self.item.type-instance.copy-new():(owner slice.result-type)
+    self.parent.indentation-spaces += 2
     self.write-assign(user self.item, owner slice, user self.block)
+    self.parent.indentation-spaces -= 2
     
     self.write-block-body()
     

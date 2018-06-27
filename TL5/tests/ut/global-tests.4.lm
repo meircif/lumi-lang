@@ -348,7 +348,6 @@ test test-illegal-call()
   assert-error root.link-types()
   var tl5-compiler.TypeWriter tw
   assert-error tw.write(user _)
-  assert-error tl5-compiler.write-cname(user _)
 
 test test-mocked-functions()
   setup-test()

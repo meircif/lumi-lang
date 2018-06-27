@@ -11,6 +11,7 @@ class SymbolExpression(Expression)
   
   func inst copy-new()->(owner SymbolExpression new-symbol)
     new-symbol := SymbolExpression()
+    new-symbol.code-node := self.code-node
     string-new-copy(user self.name)->(owner new-symbol.name)
     new-symbol.module-name := self.module-name
     new-symbol.variable := self.variable
@@ -227,7 +228,6 @@ class MemberExpression(SymbolExpression)
       self-param.value := self.instance
       self-param.value.top := true
       arguments.parameters.prepend(owner self-param)
-    ; self.instance := _
   
   func dynamic analyze-mock(copy Bool is-annotate)->(var Bool is-mock)
     if base.analyze-mock(copy is-annotate)->(var is-mock)
@@ -253,21 +253,11 @@ class MemberExpression(SymbolExpression)
     if self.is-mock-field
       return
     ; if (...) RAISE(`line-num`, ...)
-    write(user "if (")
     if self.instance?
-      ; if (`instance` == NULL) RAISE("used member of empty object")
-      ; if (`instance`_Refman->value == NULL)
-      ;   RAISE("used member of outdated weak reference")
-      self.instance.write-as-top()
-      write(user " == NULL) ")
-      self.write-raise(user "used member of empty object")
-      self.code-node.write-spaces()
-      write(user "if (")
-      self.instance.write-refman()
-      write(user "->value == NULL) ")
-      self.write-raise(user "used member of outdated weak reference")
+      self.instance.write-check-ref()
     else-if self.dynamic-call-self-instance?
       ; if (`instance`_Dynamic == NULL) RAISE("dynamic call of empty object")
+      write(user "if (")
       var Bool top(copy self.dynamic-call-self-instance.top)
       self.dynamic-call-self-instance.top := true
       self.dynamic-call-self-instance.write-dynamic()

@@ -194,38 +194,38 @@ ut_M_b = ((void*)ut_M_t == NULL) || ((void*)ut_M_ta != NULL);
 cannot assign "Empty Symbol" into "Int"
 /// @@ test-member-expression
 /// @ t0
-if (ut_M_t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = ut_M_t->num;
 /// @ t1
-if (ut_M_tc == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_tc_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_tc == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_tc_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = ut_M_tc->_base.numb;
 /// @ t2
-if (ut_M_tc == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_tc_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_tc == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_tc_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = ut_M_tc->_base._base._base.num;
 /// @ t3
-if (*to == NULL) RAISE(1, 27, "used member of empty object")
-  if ((*to_Refman)->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (*to == NULL) RAISE(1, 17, "empty object used")
+  if ((*to_Refman)->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = (*to)->num;
 /// @ t4
-if (*tco == NULL) RAISE(1, 27, "used member of empty object")
-  if ((*tco_Refman)->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (*tco == NULL) RAISE(1, 17, "empty object used")
+  if ((*tco_Refman)->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = (*tco)->_base._base._base.num;
 /// @ t5
-if (ut_M_t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
-  if (ut_M_t->t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t->t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+  if (ut_M_t->t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t->t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = ut_M_t->t->num;
 /// @ t6
-if (ut_M_t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
-  if (ut_M_t->t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t->t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
-  if (ut_M_t->t->t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t->t->t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+  if (ut_M_t->t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t->t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+  if (ut_M_t->t->t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t->t->t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = ut_M_t->t->t->num;
 /// @ te0
 unknown symbol "error"
@@ -237,8 +237,8 @@ type "Test" has no member "error"
 type "Int" has no member "error"
 /// @@ test-slice-expression
 /// @ t0
-if (ut_M_str == NULL) RAISE(1, 29, "empty object used as sequence")
-  if (ut_M_str_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+if (ut_M_str == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_str_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   if ((13) < 0 || (13) >= (ut_M_str)->length) RAISE(1, 25, "slice index out of bounds")
   ut_M_c = ((ut_M_str)->values)[13];
 /// @ t1
@@ -252,8 +252,8 @@ String aux_String_0_Var = {0};
   aux_String_0_Var.length = 6;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
   aux_String_0_Var.values = (ut_M_str)->values + (2);
-  if (ut_M_str == NULL) RAISE(1, 29, "empty object used as sequence")
-  if (ut_M_str_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+  if (ut_M_str == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_str_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_str)->length) RAISE(1, 25, "slice index out of bounds")
   aux_Ref_Manager = ut_M_str_Refman;
   ut_M_str_Refman = ut_M_str_Refman;
@@ -262,8 +262,8 @@ String aux_String_0_Var = {0};
   aux_Ref_Manager = NULL;
   ut_M_str = aux_String_0;
 /// @ t2
-if (ut_M_arr == NULL) RAISE(1, 29, "empty object used as sequence")
-  if (ut_M_arr_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+if (ut_M_arr == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_arr_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   if ((13) < 0 || (13) >= (ut_M_arr)->length) RAISE(1, 25, "slice index out of bounds")
   ut_M_i = ((Int*)((ut_M_arr)->values))[13];
 /// @ t3
@@ -276,8 +276,8 @@ Array aux_Array_0_Var = {0};
   if (aux_Array_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   aux_Array_0_Var.length = 6;
   aux_Array_0_Var.values = (Byte*)((ut_M_arr)->values) + (2);
-  if (ut_M_arr == NULL) RAISE(1, 29, "empty object used as sequence")
-  if (ut_M_arr_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+  if (ut_M_arr == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_arr_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_arr)->length) RAISE(1, 25, "slice index out of bounds")
   aux_Ref_Manager = ut_M_arr_Refman;
   ut_M_arr_Refman = ut_M_arr_Refman;
@@ -286,13 +286,13 @@ Array aux_Array_0_Var = {0};
   aux_Ref_Manager = NULL;
   ut_M_arr = aux_Array_0;
 /// @ t4
-if (ut_M_str == NULL) RAISE(1, 29, "empty object used as sequence")
-  if (ut_M_str_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+if (ut_M_str == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_str_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (ut_M_str)->length) RAISE(1, 25, "slice index out of bounds")
   ((ut_M_str)->values)[4] = ut_M_c;
 /// @ t5
-if (ut_M_arr == NULL) RAISE(1, 29, "empty object used as sequence")
-  if (ut_M_arr_Refman->value == NULL) RAISE(1, 40, "outdated weak reference used as sequence")
+if (ut_M_arr == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_arr_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (ut_M_arr)->length) RAISE(1, 25, "slice index out of bounds")
   ((Int*)((ut_M_arr)->values))[4] = ut_M_i;
 /// @ t6
@@ -388,8 +388,8 @@ LUMI_err = ut_M_Test_meth(&(ut_M_tc->_base._base._base), ut_M_tc_Refman);
 LUMI_err = ut_M_Test_meth(&((*tco)->_base._base._base), *tco_Refman);
   CHECK(1)
 /// @ t16
-if (ut_M_t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   LUMI_err = ut_M_Test_meth(ut_M_t->t, ut_M_t->t_Refman);
   CHECK(1)
 /// @ t17
@@ -885,8 +885,8 @@ ut_M_b = ut_M_str != NULL && ut_M_str_Refman->value != NULL;
 /// @ t1
 ut_M_b = ! (ut_M_str != NULL && ut_M_str_Refman->value != NULL);
 /// @ t2
-if (ut_M_t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_b = ut_M_t->fun != NULL;
 /// @ t3
 ut_M_b = (*to) != NULL && (*to_Refman)->value != NULL;
@@ -990,8 +990,8 @@ Ref_Manager* aux_Ref_Manager = NULL;
 Array* aa = NULL;
   Ref_Manager* aa_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  if (aa == NULL) RAISE(2, 29, "empty object used as sequence")
-  if (aa_Refman->value == NULL) RAISE(2, 40, "outdated weak reference used as sequence")
+  if (aa == NULL) RAISE(2, 17, "empty object used")
+  if (aa_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (aa)->length) RAISE(2, 25, "slice index out of bounds")
   aux_Ref_Manager = ut_M_ta_Refman;
   ut_M_ta_Refman = aa_Refman;
@@ -1004,8 +1004,8 @@ Array* aa = NULL;
 Array* ca = NULL;
   Ref_Manager* ca_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  if (ca == NULL) RAISE(2, 29, "empty object used as sequence")
-  if (ca_Refman->value == NULL) RAISE(2, 40, "outdated weak reference used as sequence")
+  if (ca == NULL) RAISE(2, 17, "empty object used")
+  if (ca_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (ca)->length) RAISE(2, 25, "slice index out of bounds")
   aux_Ref_Manager = ut_M_ta_Refman;
   ut_M_ta_Refman = ca_Refman;
@@ -1145,11 +1145,11 @@ Returncode (*fun)(void) = NULL;
   fun = NULL;
   ut_M_b = fun != NULL;
 /// @ t4
-if (ut_M_t == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_t->fun = ut_M_fun0;
-  if (ut_M_t == NULL) RAISE(2, 27, "used member of empty object")
-  if (ut_M_t_Refman->value == NULL) RAISE(2, 38, "used member of outdated weak reference")
+  if (ut_M_t == NULL) RAISE(2, 17, "empty object used")
+  if (ut_M_t_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
   if (ut_M_t->fun == NULL) RAISE(2, 21, "empty function called")
   LUMI_err = ut_M_t->fun();
   CHECK(2)
@@ -1162,12 +1162,12 @@ Returncode (*farr_Values[38])(void) = {0};
   farr_Var.values = farr_Values;
   farr_Refman = LUMI_new_ref(farr);
   if (farr_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
-  if (farr == NULL) RAISE(2, 29, "empty object used as sequence")
-  if (farr_Refman->value == NULL) RAISE(2, 40, "outdated weak reference used as sequence")
+  if (farr == NULL) RAISE(2, 17, "empty object used")
+  if (farr_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
   if ((3) < 0 || (3) >= (farr)->length) RAISE(2, 25, "slice index out of bounds")
   ((Returncode (**)(void))((farr)->values))[3] = ut_M_fun0;
-  if (farr == NULL) RAISE(3, 29, "empty object used as sequence")
-  if (farr_Refman->value == NULL) RAISE(3, 40, "outdated weak reference used as sequence")
+  if (farr == NULL) RAISE(3, 17, "empty object used")
+  if (farr_Refman->value == NULL) RAISE(3, 28, "outdated weak reference used")
   if ((3) < 0 || (3) >= (farr)->length) RAISE(3, 25, "slice index out of bounds")
   if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3, 21, "empty function called")
   LUMI_err = (((Returncode (**)(void))((farr)->values))[3])();
@@ -1197,12 +1197,12 @@ ut_M_b = false;
 /// @ t3
 unknown symbol "EOF"
 /// @ t4
-if (ut_M_arr == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_arr_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_arr == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_arr_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = ut_M_arr->length;
 /// @ t5
-if (ut_M_str == NULL) RAISE(1, 27, "used member of empty object")
-  if (ut_M_str_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (ut_M_str == NULL) RAISE(1, 17, "empty object used")
+  if (ut_M_str_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   ut_M_i = ut_M_str->length;
 /// @ t6
 LUMI_err = String_clear(ut_M_str, ut_M_str_Refman);
@@ -1254,8 +1254,8 @@ LUMI_err = File_write(ut_M_fobj, ut_M_fobj_Refman, ut_M_str, ut_M_str_Refman);
 /// @ t21
 Array* argv = NULL;
   Ref_Manager* argv_Refman = NULL;
-  if (sys == NULL) RAISE(1, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+  if (sys == NULL) RAISE(1, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   argv = sys->argv;
   argv_Refman = sys->argv_Refman;
   LUMI_inc_ref(argv_Refman);
@@ -1281,18 +1281,18 @@ LUMI_err = Sys_system(sys, sys_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_i));
 LUMI_err = Sys_getenv(sys, sys_Refman, ut_M_str, ut_M_str_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_b));
   CHECK(1)
 /// @ t29
-if (sys == NULL) RAISE(1, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (sys == NULL) RAISE(1, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   LUMI_err = File_putc(sys->stdout_Cname, sys->stdout_Cname_Refman, ut_M_c);
   CHECK(1)
 /// @ t30
-if (sys == NULL) RAISE(1, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (sys == NULL) RAISE(1, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   LUMI_err = File_getc(sys->stdin_Cname, sys->stdin_Cname_Refman, &(ut_M_c), &(ut_M_b));
   CHECK(1)
 /// @ t31
-if (sys == NULL) RAISE(1, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(1, 38, "used member of outdated weak reference")
+if (sys == NULL) RAISE(1, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   LUMI_err = File_putc(sys->stderr_Cname, sys->stderr_Cname_Refman, ut_M_c);
   CHECK(1)
 /// @ t32

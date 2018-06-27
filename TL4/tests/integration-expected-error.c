@@ -272,8 +272,8 @@ Returncode error_M_fail_slice_index(void) {
   arr_Refman = LUMI_new_ref(arr);
   if (arr_Refman == NULL) RAISE(39, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[40];
-  if (arr == NULL) RAISE(40, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(40, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(40, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(40, 28, "outdated weak reference used")
   if ((6) < 0 || (6) >= (arr)->length) RAISE(40, 25, "slice index out of bounds")
   TEST_ASSERT(40, (((Int*)((arr)->values))[6]) == 0)
 LUMI_cleanup:
@@ -292,8 +292,8 @@ Returncode error_M_fail_member_empty(void) {
   error_M_BaseType_Dynamic* obj_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[43];
   ++LUMI_file_coverage[0].line_count[44];
-  if (obj == NULL) RAISE(44, 27, "used member of empty object")
-  if (obj_Refman->value == NULL) RAISE(44, 38, "used member of outdated weak reference")
+  if (obj == NULL) RAISE(44, 17, "empty object used")
+  if (obj_Refman->value == NULL) RAISE(44, 28, "outdated weak reference used")
   TEST_ASSERT(44, obj->x == 0)
   ++LUMI_file_coverage[0].line_count[45];
   if (obj_Dynamic == NULL) RAISE(45, 28, "dynamic call of empty object")
@@ -342,8 +342,8 @@ Returncode error_M_fail_member_outdated(void) {
   aux_BaseType_0_Refman = NULL;
   aux_BaseType_0_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[51];
-  if (obj == NULL) RAISE(51, 27, "used member of empty object")
-  if (obj_Refman->value == NULL) RAISE(51, 38, "used member of outdated weak reference")
+  if (obj == NULL) RAISE(51, 17, "empty object used")
+  if (obj_Refman->value == NULL) RAISE(51, 28, "outdated weak reference used")
   TEST_ASSERT(51, obj->x == 0)
   ++LUMI_file_coverage[0].line_count[52];
   if (obj_Dynamic == NULL) RAISE(52, 28, "dynamic call of empty object")
@@ -368,8 +368,8 @@ Returncode error_M_fail_sequence_empty(void) {
   Ref_Manager* arr_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[55];
   ++LUMI_file_coverage[0].line_count[56];
-  if (arr == NULL) RAISE(56, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(56, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(56, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(56, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(56, 25, "slice index out of bounds")
   TEST_ASSERT(56, (((Int*)((arr)->values))[0]) == 0)
 LUMI_cleanup:
@@ -407,8 +407,8 @@ Returncode error_M_fail_sequence_outdated(void) {
   aux_Array_0 = NULL;
   aux_Array_0_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[62];
-  if (arr == NULL) RAISE(62, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(62, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(62, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(62, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(62, 25, "slice index out of bounds")
   TEST_ASSERT(62, (((Int*)((arr)->values))[0]) == 0)
 LUMI_cleanup:

@@ -635,7 +635,7 @@ do
 for n in 5
     i += n
 ## @ c t1
-for n in t.num:t.num + 2
+for n in t.num:str.length
     i += n
 ## @ c t2
 for ch in str

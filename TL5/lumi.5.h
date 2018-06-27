@@ -198,12 +198,12 @@ Returncode File_write(File*, Ref_Manager*, String* line, Ref_Manager*);
 typedef struct {
   Array* argv;
   Ref_Manager* argv_Refman;
-  File* stdout;
-  Ref_Manager* stdout_Refman;
-  File* stdin;
-  Ref_Manager* stdin_Refman;
-  File* stderr;
-  Ref_Manager* stderr_Refman;
+  File* stdout_Cname;
+  Ref_Manager* stdout_Cname_Refman;
+  File* stdin_Cname;
+  Ref_Manager* stdin_Cname_Refman;
+  File* stderr_Cname;
+  Ref_Manager* stderr_Cname_Refman;
 } Sys;
 extern Sys* sys;
 extern Ref_Manager* sys_Refman;

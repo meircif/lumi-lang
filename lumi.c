@@ -139,21 +139,21 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  if (self == NULL) RAISE(76, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(76, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(76, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(76, 28, "outdated weak reference used")
   self->running_lumi = true;
-  if (self == NULL) RAISE(77, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(77, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(77, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(77, 28, "outdated weak reference used")
   self->running_c = true;
-  if (self == NULL) RAISE(78, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(78, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(78, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(78, 28, "outdated weak reference used")
   self->execute = true;
   aux_String_0 = LUMI_new_string(lumi_M_MAX_COMMNAD_SIZE);
   if (aux_String_0 == NULL) RAISE(79, 49, "insufficient memory for object dynamic allocation")
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(79, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(79, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(79, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(79, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(79, 28, "outdated weak reference used")
   aux_String_1 = aux_String_0;
   aux_String_1_Refman = aux_String_0_Refman;
   aux_String_0 = NULL;
@@ -168,8 +168,8 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (aux_String_2 == NULL) RAISE(80, 49, "insufficient memory for object dynamic allocation")
   aux_String_2_Refman = LUMI_new_ref(aux_String_2);
   if (aux_String_2_Refman == NULL) RAISE(80, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(80, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(80, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(80, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(80, 28, "outdated weak reference used")
   aux_String_3 = aux_String_2;
   aux_String_3_Refman = aux_String_2_Refman;
   aux_String_2 = NULL;
@@ -184,8 +184,8 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (aux_String_4 == NULL) RAISE(81, 49, "insufficient memory for object dynamic allocation")
   aux_String_4_Refman = LUMI_new_ref(aux_String_4);
   if (aux_String_4_Refman == NULL) RAISE(81, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(81, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(81, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(81, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(81, 28, "outdated weak reference used")
   aux_String_5 = aux_String_4;
   aux_String_5_Refman = aux_String_4_Refman;
   aux_String_4 = NULL;
@@ -200,8 +200,8 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (aux_String_6 == NULL) RAISE(82, 49, "insufficient memory for object dynamic allocation")
   aux_String_6_Refman = LUMI_new_ref(aux_String_6);
   if (aux_String_6_Refman == NULL) RAISE(82, 38, "insufficient memory for managed object")
-  if (self == NULL) RAISE(82, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(82, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(82, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(82, 28, "outdated weak reference used")
   aux_String_7 = aux_String_6;
   aux_String_7_Refman = aux_String_6_Refman;
   aux_String_6 = NULL;
@@ -212,11 +212,11 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   self->lumi_path = aux_String_7;
   aux_String_7 = NULL;
   aux_String_7_Refman = NULL;
-  if (self == NULL) RAISE(83, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(83, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(83, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(83, 28, "outdated weak reference used")
   self->path_separator = '/';
-  if (self == NULL) RAISE(84, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(84, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(84, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(84, 28, "outdated weak reference used")
   self->lumi_path_ends_with_separator = true;
 LUMI_cleanup:
   String_Del(aux_String_7);
@@ -248,19 +248,19 @@ Returncode lumi_M_Lumi_run_command(lumi_M_Lumi* self, Ref_Manager* self_Refman, 
   Int aux_Int_0 = 0;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(error_msg_Refman);
-  if (self == NULL) RAISE(87, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(87, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(87, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(87, 28, "outdated weak reference used")
   if (self->verbose) {
-      if (self == NULL) RAISE(88, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(88, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(88, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(88, 28, "outdated weak reference used")
       LUMI_err = Sys_println(sys, sys_Refman, self->command, self->command_Refman);
       CHECK(88)
     }
-  if (self == NULL) RAISE(89, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(89, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(89, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if (self->execute) {
-      if (self == NULL) RAISE(90, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(90, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(90, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(90, 28, "outdated weak reference used")
       LUMI_err = Sys_system(sys, sys_Refman, self->command, self->command_Refman, &(aux_Int_0));
       CHECK(90)
       if (aux_Int_0 != 0) {
@@ -288,17 +288,17 @@ Returncode lumi_M_Lumi_get_any_opt_param(lumi_M_Lumi* self, Ref_Manager* self_Re
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(option_Refman);
   LUMI_inc_ref(param_Refman);
-  if (sys == NULL) RAISE(98, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(98, 38, "used member of outdated weak reference")
-  if (sys->argv == NULL) RAISE(98, 27, "used member of empty object")
-  if (sys->argv_Refman->value == NULL) RAISE(98, 38, "used member of outdated weak reference")
+  if (sys == NULL) RAISE(98, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(98, 28, "outdated weak reference used")
+  if (sys->argv == NULL) RAISE(98, 17, "empty object used")
+  if (sys->argv_Refman->value == NULL) RAISE(98, 28, "outdated weak reference used")
   LUMI_err = lumi_M_Lumi_check_opt_param_error(self, self_Refman, (*index) >= (sys->argv->length - 1), option, option_Refman, param, param_Refman);
   CHECK(97)
   *index += 1;
-  if (sys == NULL) RAISE(100, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(100, 38, "used member of outdated weak reference")
-  if (sys->argv == NULL) RAISE(100, 29, "empty object used as sequence")
-  if (sys->argv_Refman->value == NULL) RAISE(100, 40, "outdated weak reference used as sequence")
+  if (sys == NULL) RAISE(100, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(100, 28, "outdated weak reference used")
+  if (sys->argv == NULL) RAISE(100, 17, "empty object used")
+  if (sys->argv_Refman->value == NULL) RAISE(100, 28, "outdated weak reference used")
   if ((*index) < 0 || (*index) >= (sys->argv)->length) RAISE(100, 25, "slice index out of bounds")
   aux_Ref_Manager = *value_Refman;
   *value_Refman = sys->argv_Refman;
@@ -324,8 +324,8 @@ Returncode lumi_M_Lumi_get_opt_param(lumi_M_Lumi* self, Ref_Manager* self_Refman
   LUMI_inc_ref(param_Refman);
   LUMI_err = lumi_M_Lumi_get_any_opt_param(self, self_Refman, option, option_Refman, param, param_Refman, &(*index), &(*value), &(*value_Refman));
   CHECK(104)
-  if (*value == NULL) RAISE(105, 29, "empty object used as sequence")
-  if ((*value_Refman)->value == NULL) RAISE(105, 40, "outdated weak reference used as sequence")
+  if (*value == NULL) RAISE(105, 17, "empty object used")
+  if ((*value_Refman)->value == NULL) RAISE(105, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= ((*value))->length) RAISE(105, 25, "slice index out of bounds")
   LUMI_err = lumi_M_Lumi_check_opt_param_error(self, self_Refman, ((((*value))->values)[0]) == '-', option, option_Refman, param, param_Refman);
   CHECK(105)
@@ -461,8 +461,8 @@ Returncode lumi_M_Lumi_concat_lumi_output(lumi_M_Lumi* self, Ref_Manager* self_R
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  if (self == NULL) RAISE(126, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(126, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(126, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(126, 28, "outdated weak reference used")
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
@@ -471,19 +471,19 @@ Returncode lumi_M_Lumi_concat_lumi_output(lumi_M_Lumi* self, Ref_Manager* self_R
   aux_String_0_Var.values = " \"";
   LUMI_err = String_concat(self->command, self->command_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(126)
-  if (self == NULL) RAISE(127, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(127, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(127, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(127, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(127, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(127, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(127, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(127, 28, "outdated weak reference used")
   LUMI_err = String_concat(self->command, self->command_Refman, self->output, self->output_Refman);
   CHECK(127)
-  if (self == NULL) RAISE(128, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(128, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(128, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(128, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(128, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(128, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(128, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(128, 28, "outdated weak reference used")
   if (self->running_c || (! self->explicit_output)) {
-      if (self == NULL) RAISE(129, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(129, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(129, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(129, 28, "outdated weak reference used")
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
       if (aux_String_1_Refman == NULL) RAISE(129, 38, "insufficient memory for managed object")
@@ -493,8 +493,8 @@ Returncode lumi_M_Lumi_concat_lumi_output(lumi_M_Lumi* self, Ref_Manager* self_R
       LUMI_err = String_concat(self->command, self->command_Refman, aux_String_1, aux_String_1_Refman);
       CHECK(129)
     }
-  if (self == NULL) RAISE(130, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(130, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(130, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(130, 28, "outdated weak reference used")
   aux_String_2 = &aux_String_2_Var;
   aux_String_2_Refman = LUMI_new_ref(aux_String_2);
   if (aux_String_2_Refman == NULL) RAISE(130, 38, "insufficient memory for managed object")
@@ -593,24 +593,24 @@ Returncode lumi_M_Lumi_concat_tl_path(lumi_M_Lumi* self, Ref_Manager* self_Refma
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  if (self == NULL) RAISE(142, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(142, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(142, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(142, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(142, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(142, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(142, 28, "outdated weak reference used")
   LUMI_err = String_concat(self->command, self->command_Refman, self->lumi_path, self->lumi_path_Refman);
   CHECK(142)
-  if (self == NULL) RAISE(143, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(143, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(143, 28, "outdated weak reference used")
   if (! self->lumi_path_ends_with_separator) {
-      if (self == NULL) RAISE(144, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(144, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(144, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(144, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(144, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(144, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(144, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(144, 28, "outdated weak reference used")
       LUMI_err = String_append(self->command, self->command_Refman, self->path_separator);
       CHECK(144)
     }
-  if (self == NULL) RAISE(145, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(145, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(145, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(145, 28, "outdated weak reference used")
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(145, 38, "insufficient memory for managed object")
@@ -619,16 +619,16 @@ Returncode lumi_M_Lumi_concat_tl_path(lumi_M_Lumi* self, Ref_Manager* self_Refma
   aux_String_0_Var.values = "TL";
   LUMI_err = String_concat(self->command, self->command_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(145)
-  if (self == NULL) RAISE(146, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(146, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(146, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(146, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(146, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(146, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(146, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(146, 28, "outdated weak reference used")
   LUMI_err = String_append(self->command, self->command_Refman, self->version);
   CHECK(146)
-  if (self == NULL) RAISE(147, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(147, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(147, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(147, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(147, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(147, 28, "outdated weak reference used")
   LUMI_err = String_append(self->command, self->command_Refman, self->path_separator);
   CHECK(147)
 LUMI_cleanup:
@@ -730,27 +730,31 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Ref_Manager* aux_String_24_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
-  if (sys == NULL) RAISE(150, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
-  if (sys->argv == NULL) RAISE(150, 27, "used member of empty object")
-  if (sys->argv_Refman->value == NULL) RAISE(150, 38, "used member of outdated weak reference")
+  if (sys == NULL) RAISE(150, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(150, 28, "outdated weak reference used")
+  if (sys->argv == NULL) RAISE(150, 17, "empty object used")
+  if (sys->argv_Refman->value == NULL) RAISE(150, 28, "outdated weak reference used")
   LUMI_err = lumi_M_error_if(sys->argv->length < 2, lumi_M_usage, lumi_M_usage_Refman);
   CHECK(150)
+  if (sys == NULL) RAISE(155, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(155, 28, "outdated weak reference used")
+  if (sys->argv == NULL) RAISE(155, 17, "empty object used")
+  if (sys->argv_Refman->value == NULL) RAISE(155, 28, "outdated weak reference used")
   for (index = 1; index < sys->argv->length; ++index) {
-      if (sys == NULL) RAISE(156, 27, "used member of empty object")
-      if (sys_Refman->value == NULL) RAISE(156, 38, "used member of outdated weak reference")
-      if (sys->argv == NULL) RAISE(156, 29, "empty object used as sequence")
-      if (sys->argv_Refman->value == NULL) RAISE(156, 40, "outdated weak reference used as sequence")
+      if (sys == NULL) RAISE(156, 17, "empty object used")
+      if (sys_Refman->value == NULL) RAISE(156, 28, "outdated weak reference used")
+      if (sys->argv == NULL) RAISE(156, 17, "empty object used")
+      if (sys->argv_Refman->value == NULL) RAISE(156, 28, "outdated weak reference used")
       if ((index) < 0 || (index) >= (sys->argv)->length) RAISE(156, 25, "slice index out of bounds")
       arg = ((String*)((sys->argv)->values)) + index;
       arg_Refman = sys->argv_Refman;
       LUMI_inc_ref(arg_Refman);
-      if (arg == NULL) RAISE(157, 29, "empty object used as sequence")
-      if (arg_Refman->value == NULL) RAISE(157, 40, "outdated weak reference used as sequence")
+      if (arg == NULL) RAISE(157, 17, "empty object used")
+      if (arg_Refman->value == NULL) RAISE(157, 28, "outdated weak reference used")
       if ((0) < 0 || (0) >= (arg)->length) RAISE(157, 25, "slice index out of bounds")
       if ((((arg)->values)[0]) == '-') {
-        if (arg == NULL) RAISE(158, 27, "used member of empty object")
-        if (arg_Refman->value == NULL) RAISE(158, 38, "used member of outdated weak reference")
+        if (arg == NULL) RAISE(158, 17, "empty object used")
+        if (arg_Refman->value == NULL) RAISE(158, 28, "outdated weak reference used")
         if (arg->length < 2) {
           aux_String_0 = &aux_String_0_Var;
           aux_String_0_Refman = LUMI_new_ref(aux_String_0);
@@ -762,8 +766,8 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
           CHECK(159)
         }
         else {
-          if (arg == NULL) RAISE(161, 29, "empty object used as sequence")
-          if (arg_Refman->value == NULL) RAISE(161, 40, "outdated weak reference used as sequence")
+          if (arg == NULL) RAISE(161, 17, "empty object used")
+          if (arg_Refman->value == NULL) RAISE(161, 28, "outdated weak reference used")
           if ((1) < 0 || (1) >= (arg)->length) RAISE(161, 25, "slice index out of bounds")
           op = ((arg)->values)[1];
           if (op == 'h') {
@@ -784,12 +788,12 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
               aux_String_2_Var.max_length = 10;
               aux_String_2_Var.length = 9;
               aux_String_2_Var.values = "file name";
-              if (self == NULL) RAISE(166, 27, "used member of empty object")
-              if (self_Refman->value == NULL) RAISE(166, 38, "used member of outdated weak reference")
+              if (self == NULL) RAISE(166, 17, "empty object used")
+              if (self_Refman->value == NULL) RAISE(166, 28, "outdated weak reference used")
               LUMI_err = lumi_M_Lumi_get_opt_param(self, self_Refman, aux_String_1, aux_String_1_Refman, aux_String_2, aux_String_2_Refman, &(index), &(self->output), &(self->output_Refman));
               CHECK(165)
-              if (self == NULL) RAISE(167, 27, "used member of empty object")
-              if (self_Refman->value == NULL) RAISE(167, 38, "used member of outdated weak reference")
+              if (self == NULL) RAISE(167, 17, "empty object used")
+              if (self_Refman->value == NULL) RAISE(167, 28, "outdated weak reference used")
               self->explicit_output = true;
             }
             else {
@@ -806,15 +810,15 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                 aux_String_4_Var.max_length = 12;
                 aux_String_4_Var.length = 11;
                 aux_String_4_Var.values = "module name";
-                if (self == NULL) RAISE(170, 27, "used member of empty object")
-                if (self_Refman->value == NULL) RAISE(170, 38, "used member of outdated weak reference")
+                if (self == NULL) RAISE(170, 17, "empty object used")
+                if (self_Refman->value == NULL) RAISE(170, 28, "outdated weak reference used")
                 LUMI_err = lumi_M_Lumi_get_opt_param(self, self_Refman, aux_String_3, aux_String_3_Refman, aux_String_4, aux_String_4_Refman, &(index), &(self->mut), &(self->mut_Refman));
                 CHECK(169)
               }
               else {
                 if (op == 'e') {
-                  if (self == NULL) RAISE(173, 27, "used member of empty object")
-                  if (self_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
+                  if (self == NULL) RAISE(173, 17, "empty object used")
+                  if (self_Refman->value == NULL) RAISE(173, 28, "outdated weak reference used")
                   aux_String_5 = &aux_String_5_Var;
                   aux_String_5_Refman = LUMI_new_ref(aux_String_5);
                   if (aux_String_5_Refman == NULL) RAISE(174, 38, "insufficient memory for managed object")
@@ -834,8 +838,8 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                 }
                 else {
                   if (op == 'p') {
-                    if (self == NULL) RAISE(177, 27, "used member of empty object")
-                    if (self_Refman->value == NULL) RAISE(177, 38, "used member of outdated weak reference")
+                    if (self == NULL) RAISE(177, 17, "empty object used")
+                    if (self_Refman->value == NULL) RAISE(177, 28, "outdated weak reference used")
                     aux_String_8 = &aux_String_8_Var;
                     aux_String_8_Refman = LUMI_new_ref(aux_String_8);
                     if (aux_String_8_Refman == NULL) RAISE(178, 38, "insufficient memory for managed object")
@@ -855,34 +859,34 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                   }
                   else {
                     if (op == 'c') {
-                      if (self == NULL) RAISE(180, 27, "used member of empty object")
-                      if (self_Refman->value == NULL) RAISE(180, 38, "used member of outdated weak reference")
+                      if (self == NULL) RAISE(180, 17, "empty object used")
+                      if (self_Refman->value == NULL) RAISE(180, 28, "outdated weak reference used")
                       self->running_c = false;
                     }
                     else {
-                      if (arg == NULL) RAISE(181, 27, "used member of empty object")
-                      if (arg_Refman->value == NULL) RAISE(181, 38, "used member of outdated weak reference")
+                      if (arg == NULL) RAISE(181, 17, "empty object used")
+                      if (arg_Refman->value == NULL) RAISE(181, 28, "outdated weak reference used")
                       if ((op == 'l') && (arg->length > 2)) {
-                        if (self == NULL) RAISE(182, 27, "used member of empty object")
-                        if (self_Refman->value == NULL) RAISE(182, 38, "used member of outdated weak reference")
+                        if (self == NULL) RAISE(182, 17, "empty object used")
+                        if (self_Refman->value == NULL) RAISE(182, 28, "outdated weak reference used")
                         self->running_lumi = false;
-                        if (arg == NULL) RAISE(183, 29, "empty object used as sequence")
-                        if (arg_Refman->value == NULL) RAISE(183, 40, "outdated weak reference used as sequence")
+                        if (arg == NULL) RAISE(183, 17, "empty object used")
+                        if (arg_Refman->value == NULL) RAISE(183, 28, "outdated weak reference used")
                         if ((2) < 0 || (2) >= (arg)->length) RAISE(183, 25, "slice index out of bounds")
-                        if (self == NULL) RAISE(183, 27, "used member of empty object")
-                        if (self_Refman->value == NULL) RAISE(183, 38, "used member of outdated weak reference")
+                        if (self == NULL) RAISE(183, 17, "empty object used")
+                        if (self_Refman->value == NULL) RAISE(183, 28, "outdated weak reference used")
                         self->version = ((arg)->values)[2];
                       }
                       else {
                         if (op == 'r') {
-                          if (self == NULL) RAISE(185, 27, "used member of empty object")
-                          if (self_Refman->value == NULL) RAISE(185, 38, "used member of outdated weak reference")
+                          if (self == NULL) RAISE(185, 17, "empty object used")
+                          if (self_Refman->value == NULL) RAISE(185, 28, "outdated weak reference used")
                           self->running_program = true;
-                          if (arg == NULL) RAISE(186, 27, "used member of empty object")
-                          if (arg_Refman->value == NULL) RAISE(186, 38, "used member of outdated weak reference")
+                          if (arg == NULL) RAISE(186, 17, "empty object used")
+                          if (arg_Refman->value == NULL) RAISE(186, 28, "outdated weak reference used")
                           if (arg->length > 2) {
-              if (arg == NULL) RAISE(187, 29, "empty object used as sequence")
-              if (arg_Refman->value == NULL) RAISE(187, 40, "outdated weak reference used as sequence")
+              if (arg == NULL) RAISE(187, 17, "empty object used")
+              if (arg_Refman->value == NULL) RAISE(187, 28, "outdated weak reference used")
               if ((2) < 0 || (2) >= (arg)->length) RAISE(187, 25, "slice index out of bounds")
               if ((((arg)->values)[2]) == 'a') {
                 aux_String_11 = &aux_String_11_Var;
@@ -897,8 +901,8 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                 aux_String_12_Var.max_length = 10;
                 aux_String_12_Var.length = 9;
                 aux_String_12_Var.values = "arguments";
-                if (self == NULL) RAISE(189, 27, "used member of empty object")
-                if (self_Refman->value == NULL) RAISE(189, 38, "used member of outdated weak reference")
+                if (self == NULL) RAISE(189, 17, "empty object used")
+                if (self_Refman->value == NULL) RAISE(189, 28, "outdated weak reference used")
                 LUMI_err = lumi_M_Lumi_get_any_opt_param(self, self_Refman, aux_String_11, aux_String_11_Refman, aux_String_12, aux_String_12_Refman, &(index), &(self->execute_arguments), &(self->execute_arguments_Refman));
                 CHECK(188)
               }
@@ -906,17 +910,17 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                         }
                         else {
                           if (op == 'v') {
-                            if (self == NULL) RAISE(191, 27, "used member of empty object")
-                            if (self_Refman->value == NULL) RAISE(191, 38, "used member of outdated weak reference")
+                            if (self == NULL) RAISE(191, 17, "empty object used")
+                            if (self_Refman->value == NULL) RAISE(191, 28, "outdated weak reference used")
                             self->verbose = true;
                           }
                           else {
                             if (op == 'd') {
-                              if (self == NULL) RAISE(193, 27, "used member of empty object")
-                              if (self_Refman->value == NULL) RAISE(193, 38, "used member of outdated weak reference")
+                              if (self == NULL) RAISE(193, 17, "empty object used")
+                              if (self_Refman->value == NULL) RAISE(193, 28, "outdated weak reference used")
                               self->verbose = true;
-                              if (self == NULL) RAISE(194, 27, "used member of empty object")
-                              if (self_Refman->value == NULL) RAISE(194, 38, "used member of outdated weak reference")
+                              if (self == NULL) RAISE(194, 17, "empty object used")
+                              if (self_Refman->value == NULL) RAISE(194, 28, "outdated weak reference used")
                               self->execute = false;
                             }
                             else {
@@ -967,8 +971,8 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
         LUMI_dec_ref(aux_Ref_Manager);
         aux_Ref_Manager = NULL;
         last_input = arg;
-        if (self == NULL) RAISE(204, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(204, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(204, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(204, 28, "outdated weak reference used")
         LUMI_err = lumi_M_Lumi_concat_file_name(self, self_Refman, self->input_files, self->input_files_Refman, arg, arg_Refman);
         CHECK(204)
         input_files_num += 1;
@@ -982,10 +986,10 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_15_Var.values = "error: no input files";
   LUMI_err = lumi_M_error_if(input_files_num == 0, aux_String_15, aux_String_15_Refman);
   CHECK(207)
-  if (self == NULL) RAISE(209, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(209, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(209, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(209, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(209, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(209, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(209, 28, "outdated weak reference used")
   aux_String_16 = &aux_String_16_Var;
   aux_String_16_Refman = LUMI_new_ref(aux_String_16);
   if (aux_String_16_Refman == NULL) RAISE(211, 38, "insufficient memory for managed object")
@@ -994,11 +998,11 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_16_Var.values = "error: cannot run program when C compilation is turned off by \"-c\" flag";
   LUMI_err = lumi_M_error_if(self->running_program && (! self->running_c), aux_String_16, aux_String_16_Refman);
   CHECK(208)
-  if (self == NULL) RAISE(213, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(213, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(213, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(213, 28, "outdated weak reference used")
   if (self->running_lumi) {
-      if (first_input == NULL) RAISE(215, 27, "used member of empty object")
-      if (first_input_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (first_input == NULL) RAISE(215, 17, "empty object used")
+      if (first_input_Refman->value == NULL) RAISE(215, 28, "outdated weak reference used")
       aux_String_17 = &aux_String_17_Var;
       aux_String_17_Refman = LUMI_new_ref(aux_String_17);
       if (aux_String_17_Refman == NULL) RAISE(216, 38, "insufficient memory for managed object")
@@ -1007,19 +1011,19 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       aux_String_17_Var.values = "error: Lumi file name too short";
       LUMI_err = lumi_M_error_if(first_input->length < 6, aux_String_17, aux_String_17_Refman);
       CHECK(214)
-      if (first_input == NULL) RAISE(217, 27, "used member of empty object")
-      if (first_input_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
-      if (first_input == NULL) RAISE(217, 29, "empty object used as sequence")
-      if (first_input_Refman->value == NULL) RAISE(217, 40, "outdated weak reference used as sequence")
+      if (first_input == NULL) RAISE(217, 17, "empty object used")
+      if (first_input_Refman->value == NULL) RAISE(217, 28, "outdated weak reference used")
+      if (first_input == NULL) RAISE(217, 17, "empty object used")
+      if (first_input_Refman->value == NULL) RAISE(217, 28, "outdated weak reference used")
       if ((first_input->length - 4) < 0 || (first_input->length - 4) >= (first_input)->length) RAISE(217, 25, "slice index out of bounds")
-      if (self == NULL) RAISE(217, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(217, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(217, 28, "outdated weak reference used")
       self->version = ((first_input)->values)[first_input->length - 4];
     }
-  if (self == NULL) RAISE(218, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(218, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(218, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(218, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(218, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(218, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(218, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(218, 28, "outdated weak reference used")
   if ((self->version < '0') || (self->version > '4')) {
       aux_String_18 = &aux_String_18_Var;
       aux_String_18_Refman = LUMI_new_ref(aux_String_18);
@@ -1033,8 +1037,8 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       version_string_Var.values = version_string_Values;
       version_string_Refman = LUMI_new_ref(version_string);
       if (version_string_Refman == NULL) RAISE(220, 38, "insufficient memory for managed object")
-      if (self == NULL) RAISE(221, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(221, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(221, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(221, 28, "outdated weak reference used")
       LUMI_err = String_append(version_string, version_string_Refman, self->version);
       CHECK(221)
       LUMI_err = Sys_println(sys, sys_Refman, version_string, version_string_Refman);
@@ -1042,8 +1046,8 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       LUMI_err = Sys_exit(sys, sys_Refman, 1);
       CHECK(223)
     }
-  if (self == NULL) RAISE(225, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(225, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(225, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(225, 28, "outdated weak reference used")
   aux_String_19 = &aux_String_19_Var;
   aux_String_19_Refman = LUMI_new_ref(aux_String_19);
   if (aux_String_19_Refman == NULL) RAISE(226, 38, "insufficient memory for managed object")
@@ -1052,14 +1056,14 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_19_Var.values = "error: multiple files not supported before TL2";
   LUMI_err = lumi_M_error_if((self->version < '2') && (input_files_num > 1), aux_String_19, aux_String_19_Refman);
   CHECK(224)
-  if (self == NULL) RAISE(229, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(229, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(229, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(229, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(228, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(228, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(228, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(228, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(229, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(229, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(229, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(229, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(228, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(228, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(228, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(228, 28, "outdated weak reference used")
   aux_String_20 = &aux_String_20_Var;
   aux_String_20_Refman = LUMI_new_ref(aux_String_20);
   if (aux_String_20_Refman == NULL) RAISE(230, 38, "insufficient memory for managed object")
@@ -1068,10 +1072,10 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_20_Var.values = "error: cannot specify C output file in TL2 & TL3";
   LUMI_err = lumi_M_error_if((((self->version >= '2') && (self->version <= '3')) && self->explicit_output) && (! self->running_c), aux_String_20, aux_String_20_Refman);
   CHECK(227)
-  if (self == NULL) RAISE(232, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(232, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(232, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(232, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(232, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(232, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(232, 28, "outdated weak reference used")
   aux_String_21 = &aux_String_21_Var;
   aux_String_21_Refman = LUMI_new_ref(aux_String_21);
   if (aux_String_21_Refman == NULL) RAISE(233, 38, "insufficient memory for managed object")
@@ -1080,11 +1084,11 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_21_Var.values = "error: testing not supported before TL4";
   LUMI_err = lumi_M_error_if((self->version < '4') && (self->mut != NULL && self->mut_Refman->value != NULL), aux_String_21, aux_String_21_Refman);
   CHECK(231)
-  if (self == NULL) RAISE(234, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(234, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(234, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(234, 28, "outdated weak reference used")
   if (self->version <= '2') {
-      if (self == NULL) RAISE(235, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(235, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(235, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(235, 28, "outdated weak reference used")
       aux_Ref_Manager = self->main_input_Refman;
       self->main_input_Refman = last_input_Refman;
       LUMI_inc_ref(self->main_input_Refman);
@@ -1093,8 +1097,8 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       self->main_input = last_input;
     }
   else {
-      if (self == NULL) RAISE(237, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(237, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(237, 28, "outdated weak reference used")
       aux_Ref_Manager = self->main_input_Refman;
       self->main_input_Refman = first_input_Refman;
       LUMI_inc_ref(self->main_input_Refman);
@@ -1102,42 +1106,42 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       aux_Ref_Manager = NULL;
       self->main_input = first_input;
     }
-  if (self == NULL) RAISE(239, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(239, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(239, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(239, 28, "outdated weak reference used")
   if (! (self->output != NULL && self->output_Refman->value != NULL)) {
       suffix_length = 2;
-      if (self == NULL) RAISE(241, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(241, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(241, 28, "outdated weak reference used")
       if (self->running_lumi) {
         suffix_length = 5;
       }
-      if (self == NULL) RAISE(244, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(244, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
-      if (self->main_input == NULL) RAISE(244, 27, "used member of empty object")
-      if (self->main_input_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(244, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(244, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(244, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(244, 28, "outdated weak reference used")
+      if (self->main_input == NULL) RAISE(244, 17, "empty object used")
+      if (self->main_input_Refman->value == NULL) RAISE(244, 28, "outdated weak reference used")
       aux_String_22 = &aux_String_22_Var;
       aux_String_22_Refman = LUMI_new_ref(aux_String_22);
       if (aux_String_22_Refman == NULL) RAISE(244, 38, "insufficient memory for managed object")
       aux_String_22_Var.length = self->main_input->length - suffix_length;
       aux_String_22_Var.max_length = aux_String_22_Var.length + 1;
       aux_String_22_Var.values = (self->main_input)->values + (0);
-      if (self->main_input == NULL) RAISE(244, 29, "empty object used as sequence")
-      if (self->main_input_Refman->value == NULL) RAISE(244, 40, "outdated weak reference used as sequence")
+      if (self->main_input == NULL) RAISE(244, 17, "empty object used")
+      if (self->main_input_Refman->value == NULL) RAISE(244, 28, "outdated weak reference used")
       if ((0) < 0 || (self->main_input->length - suffix_length) < 0 || (0) + (self->main_input->length - suffix_length) > (self->main_input)->length) RAISE(244, 25, "slice index out of bounds")
-      if (self == NULL) RAISE(243, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(243, 38, "used member of outdated weak reference")
-      if (self->main_input == NULL) RAISE(243, 27, "used member of empty object")
-      if (self->main_input_Refman->value == NULL) RAISE(243, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(243, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(243, 28, "outdated weak reference used")
+      if (self->main_input == NULL) RAISE(243, 17, "empty object used")
+      if (self->main_input_Refman->value == NULL) RAISE(243, 28, "outdated weak reference used")
       aux_String_23 = LUMI_new_string(self->main_input->length);
       if (aux_String_23 == NULL) RAISE(243, 49, "insufficient memory for object dynamic allocation")
       aux_String_23_Refman = LUMI_new_ref(aux_String_23);
       if (aux_String_23_Refman == NULL) RAISE(243, 38, "insufficient memory for managed object")
       LUMI_err = String_new(aux_String_23, aux_String_23_Refman, aux_String_22, self->main_input_Refman);
       CHECK(243)
-      if (self == NULL) RAISE(243, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(243, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(243, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(243, 28, "outdated weak reference used")
       aux_String_24 = aux_String_23;
       aux_String_24_Refman = aux_String_23_Refman;
       aux_String_23 = NULL;
@@ -1148,10 +1152,10 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       self->implicit_output = aux_String_24;
       aux_String_24 = NULL;
       aux_String_24_Refman = NULL;
-      if (self == NULL) RAISE(245, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(245, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(245, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(245, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(245, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(245, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(245, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(245, 28, "outdated weak reference used")
       aux_Ref_Manager = self->output_Refman;
       self->output_Refman = self->implicit_output_Refman;
       LUMI_inc_ref(self->output_Refman);
@@ -1214,8 +1218,8 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  if (self == NULL) RAISE(249, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(249, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(249, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(249, 28, "outdated weak reference used")
   aux_String_0 = &aux_String_0_Var;
   aux_String_0_Refman = LUMI_new_ref(aux_String_0);
   if (aux_String_0_Refman == NULL) RAISE(249, 38, "insufficient memory for managed object")
@@ -1224,14 +1228,14 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_0_Var.values = "tl";
   LUMI_err = String_new(self->command, self->command_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(249)
-  if (self == NULL) RAISE(250, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(250, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(250, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(250, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(250, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(250, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(250, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(250, 28, "outdated weak reference used")
   LUMI_err = String_append(self->command, self->command_Refman, self->version);
   CHECK(250)
-  if (self == NULL) RAISE(251, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(251, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(251, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(251, 28, "outdated weak reference used")
   aux_String_1 = &aux_String_1_Var;
   aux_String_1_Refman = LUMI_new_ref(aux_String_1);
   if (aux_String_1_Refman == NULL) RAISE(251, 38, "insufficient memory for managed object")
@@ -1240,14 +1244,14 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_1_Var.values = "-compiler";
   LUMI_err = String_concat(self->command, self->command_Refman, aux_String_1, aux_String_1_Refman);
   CHECK(251)
-  if (self == NULL) RAISE(252, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(252, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(252, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(252, 28, "outdated weak reference used")
   if (self->version >= '4') {
-      if (self == NULL) RAISE(253, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(253, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(253, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(253, 28, "outdated weak reference used")
       if (self->mut != NULL && self->mut_Refman->value != NULL) {
-        if (self == NULL) RAISE(254, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(254, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(254, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(254, 28, "outdated weak reference used")
         aux_String_2 = &aux_String_2_Var;
         aux_String_2_Refman = LUMI_new_ref(aux_String_2);
         if (aux_String_2_Refman == NULL) RAISE(254, 38, "insufficient memory for managed object")
@@ -1256,24 +1260,24 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
         aux_String_2_Var.values = " -t";
         LUMI_err = String_concat(self->command, self->command_Refman, aux_String_2, aux_String_2_Refman);
         CHECK(254)
-        if (self == NULL) RAISE(255, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(255, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(255, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(255, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(255, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(255, 28, "outdated weak reference used")
+        if (self == NULL) RAISE(255, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(255, 28, "outdated weak reference used")
         LUMI_err = lumi_M_Lumi_concat_file_name(self, self_Refman, self->command, self->command_Refman, self->mut, self->mut_Refman);
         CHECK(255)
       }
       LUMI_err = lumi_M_Lumi_concat_lumi_output(self, self_Refman);
       CHECK(256)
     }
-  if (self == NULL) RAISE(257, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(257, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(257, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(257, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(257, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(257, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(257, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(257, 28, "outdated weak reference used")
   LUMI_err = String_concat(self->command, self->command_Refman, self->input_files, self->input_files_Refman);
   CHECK(257)
-  if (self == NULL) RAISE(258, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(258, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(258, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(258, 28, "outdated weak reference used")
   if (self->version <= '1') {
       LUMI_err = lumi_M_Lumi_concat_lumi_output(self, self_Refman);
       CHECK(259)
@@ -1356,13 +1360,13 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
   aux_String_0_Var.values = "CC";
-  if (self == NULL) RAISE(263, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(263, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(263, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(263, 28, "outdated weak reference used")
   LUMI_err = Sys_getenv(sys, sys_Refman, aux_String_0, aux_String_0_Refman, self->command, self->command_Refman, &(aux_Bool_0));
   CHECK(263)
   if (! aux_Bool_0) {
-      if (self == NULL) RAISE(264, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(264, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(264, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(264, 28, "outdated weak reference used")
       aux_String_1 = &aux_String_1_Var;
       aux_String_1_Refman = LUMI_new_ref(aux_String_1);
       if (aux_String_1_Refman == NULL) RAISE(264, 38, "insufficient memory for managed object")
@@ -1372,10 +1376,10 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       LUMI_err = String_new(self->command, self->command_Refman, aux_String_1, aux_String_1_Refman);
       CHECK(264)
     }
-  if (self == NULL) RAISE(265, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
-  if (self->lumi_path == NULL) RAISE(265, 27, "used member of empty object")
-  if (self->lumi_path_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(265, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(265, 28, "outdated weak reference used")
+  if (self->lumi_path == NULL) RAISE(265, 17, "empty object used")
+  if (self->lumi_path_Refman->value == NULL) RAISE(265, 28, "outdated weak reference used")
   if (self->lumi_path->length == 0) {
       aux_String_2 = &aux_String_2_Var;
       aux_String_2_Refman = LUMI_new_ref(aux_String_2);
@@ -1383,39 +1387,39 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       aux_String_2_Var.max_length = 9;
       aux_String_2_Var.length = 8;
       aux_String_2_Var.values = "LUMIPATH";
-      if (self == NULL) RAISE(266, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(266, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(266, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(266, 28, "outdated weak reference used")
       LUMI_err = Sys_getenv(sys, sys_Refman, aux_String_2, aux_String_2_Refman, self->lumi_path, self->lumi_path_Refman, &(aux_Bool_1));
       CHECK(266)
     }
-  if (self == NULL) RAISE(267, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
-  if (self->lumi_path == NULL) RAISE(267, 27, "used member of empty object")
-  if (self->lumi_path_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(267, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(267, 28, "outdated weak reference used")
+  if (self->lumi_path == NULL) RAISE(267, 17, "empty object used")
+  if (self->lumi_path_Refman->value == NULL) RAISE(267, 28, "outdated weak reference used")
   if (self->lumi_path->length > 0) {
-      if (self == NULL) RAISE(268, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(268, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
-      if (self->lumi_path == NULL) RAISE(268, 27, "used member of empty object")
-      if (self->lumi_path_Refman->value == NULL) RAISE(268, 38, "used member of outdated weak reference")
-      if (self->lumi_path == NULL) RAISE(268, 29, "empty object used as sequence")
-      if (self->lumi_path_Refman->value == NULL) RAISE(268, 40, "outdated weak reference used as sequence")
+      if (self == NULL) RAISE(268, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(268, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(268, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(268, 28, "outdated weak reference used")
+      if (self->lumi_path == NULL) RAISE(268, 17, "empty object used")
+      if (self->lumi_path_Refman->value == NULL) RAISE(268, 28, "outdated weak reference used")
+      if (self->lumi_path == NULL) RAISE(268, 17, "empty object used")
+      if (self->lumi_path_Refman->value == NULL) RAISE(268, 28, "outdated weak reference used")
       if ((self->lumi_path->length - 1) < 0 || (self->lumi_path->length - 1) >= (self->lumi_path)->length) RAISE(268, 25, "slice index out of bounds")
       last = ((self->lumi_path)->values)[self->lumi_path->length - 1];
       if (last == '\\') {
-        if (self == NULL) RAISE(270, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(270, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(270, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(270, 28, "outdated weak reference used")
         self->path_separator = '\\';
       }
-      if (self == NULL) RAISE(271, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(271, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(271, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(271, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(271, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(271, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(271, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(271, 28, "outdated weak reference used")
       self->lumi_path_ends_with_separator = last == self->path_separator;
     }
-  if (self == NULL) RAISE(272, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(272, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(272, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(272, 28, "outdated weak reference used")
   aux_String_3 = &aux_String_3_Var;
   aux_String_3_Refman = LUMI_new_ref(aux_String_3);
   if (aux_String_3_Refman == NULL) RAISE(272, 38, "insufficient memory for managed object")
@@ -1424,18 +1428,18 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_3_Var.values = " -g";
   LUMI_err = String_concat(self->command, self->command_Refman, aux_String_3, aux_String_3_Refman);
   CHECK(272)
-  if (self == NULL) RAISE(273, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(273, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(273, 28, "outdated weak reference used")
   if (self->running_lumi) {
-      if (self == NULL) RAISE(274, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(274, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(274, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(274, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(274, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(274, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(274, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(274, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(274, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(274, 28, "outdated weak reference used")
       if (((self->version >= '2') && (self->version <= '3')) && self->explicit_output) {
-        if (self == NULL) RAISE(275, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(275, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(275, 28, "outdated weak reference used")
         aux_String_4 = &aux_String_4_Var;
         aux_String_4_Refman = LUMI_new_ref(aux_String_4);
         if (aux_String_4_Refman == NULL) RAISE(275, 38, "insufficient memory for managed object")
@@ -1444,27 +1448,27 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
         aux_String_4_Var.values = " \"";
         LUMI_err = String_concat(self->command, self->command_Refman, aux_String_4, aux_String_4_Refman);
         CHECK(275)
-        if (self == NULL) RAISE(276, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(276, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(277, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
-        if (self == NULL) RAISE(277, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
-        if (self->main_input == NULL) RAISE(277, 27, "used member of empty object")
-        if (self->main_input_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(276, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(276, 28, "outdated weak reference used")
+        if (self == NULL) RAISE(277, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(277, 28, "outdated weak reference used")
+        if (self == NULL) RAISE(277, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(277, 28, "outdated weak reference used")
+        if (self->main_input == NULL) RAISE(277, 17, "empty object used")
+        if (self->main_input_Refman->value == NULL) RAISE(277, 28, "outdated weak reference used")
         aux_String_5 = &aux_String_5_Var;
         aux_String_5_Refman = LUMI_new_ref(aux_String_5);
         if (aux_String_5_Refman == NULL) RAISE(277, 38, "insufficient memory for managed object")
         aux_String_5_Var.length = self->main_input->length - 5;
         aux_String_5_Var.max_length = aux_String_5_Var.length + 1;
         aux_String_5_Var.values = (self->main_input)->values + (0);
-        if (self->main_input == NULL) RAISE(277, 29, "empty object used as sequence")
-        if (self->main_input_Refman->value == NULL) RAISE(277, 40, "outdated weak reference used as sequence")
+        if (self->main_input == NULL) RAISE(277, 17, "empty object used")
+        if (self->main_input_Refman->value == NULL) RAISE(277, 28, "outdated weak reference used")
         if ((0) < 0 || (self->main_input->length - 5) < 0 || (0) + (self->main_input->length - 5) > (self->main_input)->length) RAISE(277, 25, "slice index out of bounds")
         LUMI_err = String_concat(self->command, self->command_Refman, aux_String_5, self->main_input_Refman);
         CHECK(276)
-        if (self == NULL) RAISE(278, 27, "used member of empty object")
-        if (self_Refman->value == NULL) RAISE(278, 38, "used member of outdated weak reference")
+        if (self == NULL) RAISE(278, 17, "empty object used")
+        if (self_Refman->value == NULL) RAISE(278, 28, "outdated weak reference used")
         aux_String_6 = &aux_String_6_Var;
         aux_String_6_Refman = LUMI_new_ref(aux_String_6);
         if (aux_String_6_Refman == NULL) RAISE(278, 38, "insufficient memory for managed object")
@@ -1480,21 +1484,21 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       }
     }
   else {
-      if (self == NULL) RAISE(282, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(282, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(282, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(282, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(282, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(282, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(282, 28, "outdated weak reference used")
       LUMI_err = String_concat(self->command, self->command_Refman, self->input_files, self->input_files_Refman);
       CHECK(282)
     }
-  if (self == NULL) RAISE(283, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(283, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(283, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(283, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(283, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(283, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(283, 28, "outdated weak reference used")
   LUMI_err = String_concat(self->command, self->command_Refman, self->external_files, self->external_files_Refman);
   CHECK(283)
-  if (self == NULL) RAISE(284, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(284, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(284, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(284, 28, "outdated weak reference used")
   aux_String_7 = &aux_String_7_Var;
   aux_String_7_Refman = LUMI_new_ref(aux_String_7);
   if (aux_String_7_Refman == NULL) RAISE(284, 38, "insufficient memory for managed object")
@@ -1505,11 +1509,11 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   CHECK(284)
   LUMI_err = lumi_M_Lumi_concat_tl_path(self, self_Refman);
   CHECK(285)
-  if (self == NULL) RAISE(286, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(286, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(286, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(286, 28, "outdated weak reference used")
   if (self->version == '0') {
-      if (self == NULL) RAISE(287, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(287, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(287, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(287, 28, "outdated weak reference used")
       aux_String_8 = &aux_String_8_Var;
       aux_String_8_Refman = LUMI_new_ref(aux_String_8);
       if (aux_String_8_Refman == NULL) RAISE(287, 38, "insufficient memory for managed object")
@@ -1520,8 +1524,8 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       CHECK(287)
       LUMI_err = lumi_M_Lumi_concat_tl_path(self, self_Refman);
       CHECK(288)
-      if (self == NULL) RAISE(289, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(289, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(289, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(289, 28, "outdated weak reference used")
       aux_String_9 = &aux_String_9_Var;
       aux_String_9_Refman = LUMI_new_ref(aux_String_9);
       if (aux_String_9_Refman == NULL) RAISE(289, 38, "insufficient memory for managed object")
@@ -1532,8 +1536,8 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       CHECK(289)
     }
   else {
-      if (self == NULL) RAISE(291, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(291, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(291, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(291, 28, "outdated weak reference used")
       aux_String_10 = &aux_String_10_Var;
       aux_String_10_Refman = LUMI_new_ref(aux_String_10);
       if (aux_String_10_Refman == NULL) RAISE(291, 38, "insufficient memory for managed object")
@@ -1542,14 +1546,14 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       aux_String_10_Var.values = "lumi.";
       LUMI_err = String_concat(self->command, self->command_Refman, aux_String_10, aux_String_10_Refman);
       CHECK(291)
-      if (self == NULL) RAISE(292, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(292, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(292, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(292, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(292, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(292, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(292, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(292, 28, "outdated weak reference used")
       LUMI_err = String_append(self->command, self->command_Refman, self->version);
       CHECK(292)
-      if (self == NULL) RAISE(293, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(293, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(293, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(293, 28, "outdated weak reference used")
       aux_String_11 = &aux_String_11_Var;
       aux_String_11_Refman = LUMI_new_ref(aux_String_11);
       if (aux_String_11_Refman == NULL) RAISE(293, 38, "insufficient memory for managed object")
@@ -1559,8 +1563,8 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       LUMI_err = String_concat(self->command, self->command_Refman, aux_String_11, aux_String_11_Refman);
       CHECK(293)
     }
-  if (self == NULL) RAISE(294, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(294, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(294, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(294, 28, "outdated weak reference used")
   aux_String_12 = &aux_String_12_Var;
   aux_String_12_Refman = LUMI_new_ref(aux_String_12);
   if (aux_String_12_Refman == NULL) RAISE(294, 38, "insufficient memory for managed object")
@@ -1571,8 +1575,8 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   CHECK(294)
   LUMI_err = lumi_M_Lumi_concat_tl_path(self, self_Refman);
   CHECK(295)
-  if (self == NULL) RAISE(296, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(296, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(296, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(296, 28, "outdated weak reference used")
   aux_String_13 = &aux_String_13_Var;
   aux_String_13_Refman = LUMI_new_ref(aux_String_13);
   if (aux_String_13_Refman == NULL) RAISE(296, 38, "insufficient memory for managed object")
@@ -1581,10 +1585,10 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_13_Var.values = " -o";
   LUMI_err = String_concat(self->command, self->command_Refman, aux_String_13, aux_String_13_Refman);
   CHECK(296)
-  if (self == NULL) RAISE(297, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(297, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(297, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(297, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(297, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(297, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(297, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(297, 28, "outdated weak reference used")
   LUMI_err = lumi_M_Lumi_concat_file_name(self, self_Refman, self->command, self->command_Refman, self->output, self->output_Refman);
   CHECK(297)
   aux_String_14 = &aux_String_14_Var;
@@ -1626,39 +1630,39 @@ Returncode lumi_M_Lumi_run_program(lumi_M_Lumi* self, Ref_Manager* self_Refman) 
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  if (self == NULL) RAISE(301, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(301, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(301, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(301, 28, "outdated weak reference used")
   LUMI_err = String_clear(self->command, self->command_Refman);
   CHECK(301)
-  if (self == NULL) RAISE(302, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(302, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(302, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(302, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(302, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(302, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(302, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(302, 28, "outdated weak reference used")
   LUMI_err = String_has(self->output, self->output_Refman, self->path_separator, &(aux_Bool_0));
   CHECK(302)
   if (! aux_Bool_0) {
-      if (self == NULL) RAISE(303, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(303, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(303, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(303, 28, "outdated weak reference used")
       LUMI_err = String_append(self->command, self->command_Refman, '.');
       CHECK(303)
-      if (self == NULL) RAISE(304, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(304, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(304, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(304, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(304, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(304, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(304, 28, "outdated weak reference used")
       LUMI_err = String_append(self->command, self->command_Refman, self->path_separator);
       CHECK(304)
     }
-  if (self == NULL) RAISE(305, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(305, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(305, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(305, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(305, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(305, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(305, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(305, 28, "outdated weak reference used")
   LUMI_err = lumi_M_Lumi_concat_first_file_name(self, self_Refman, self->command, self->command_Refman, self->output, self->output_Refman);
   CHECK(305)
-  if (self == NULL) RAISE(306, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(306, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(306, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(306, 28, "outdated weak reference used")
   if (self->execute_arguments != NULL && self->execute_arguments_Refman->value != NULL) {
-      if (self == NULL) RAISE(307, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(307, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(307, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(307, 28, "outdated weak reference used")
       aux_String_0 = &aux_String_0_Var;
       aux_String_0_Refman = LUMI_new_ref(aux_String_0);
       if (aux_String_0_Refman == NULL) RAISE(307, 38, "insufficient memory for managed object")
@@ -1667,10 +1671,10 @@ Returncode lumi_M_Lumi_run_program(lumi_M_Lumi* self, Ref_Manager* self_Refman) 
       aux_String_0_Var.values = " ";
       LUMI_err = String_concat(self->command, self->command_Refman, aux_String_0, aux_String_0_Refman);
       CHECK(307)
-      if (self == NULL) RAISE(308, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
-      if (self == NULL) RAISE(308, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(308, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(308, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(308, 28, "outdated weak reference used")
+      if (self == NULL) RAISE(308, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(308, 28, "outdated weak reference used")
       LUMI_err = String_concat(self->command, self->command_Refman, self->execute_arguments, self->execute_arguments_Refman);
       CHECK(308)
     }
@@ -1691,20 +1695,20 @@ Returncode lumi_M_Lumi_run(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   LUMI_inc_ref(self_Refman);
   LUMI_err = lumi_M_Lumi_read_input(self, self_Refman);
   CHECK(312)
-  if (self == NULL) RAISE(313, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(313, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(313, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(313, 28, "outdated weak reference used")
   if (self->running_lumi) {
       LUMI_err = lumi_M_Lumi_run_lumi(self, self_Refman);
       CHECK(314)
     }
-  if (self == NULL) RAISE(315, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(315, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(315, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(315, 28, "outdated weak reference used")
   if (self->running_c) {
       LUMI_err = lumi_M_Lumi_run_c(self, self_Refman);
       CHECK(316)
     }
-  if (self == NULL) RAISE(317, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(317, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(317, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(317, 28, "outdated weak reference used")
   if (self->running_program) {
       LUMI_err = lumi_M_Lumi_run_program(self, self_Refman);
       CHECK(318)

@@ -358,10 +358,10 @@ test test-assert-error-message()
   assert-error arr[6], "slice index out of bounds"
   user Array{Int} arr2(user arr)
   arr := _
-  assert-error arr.length, "used member of empty object"
-  assert-error arr2.length, "used member of outdated weak reference"
-  assert-error arr[0], "empty object used as sequence"
-  assert-error arr2[0], "outdated weak reference used as sequence"
+  assert-error arr.length, "empty object used"
+  assert-error arr2.length, "outdated weak reference used"
+  assert-error arr[0], "empty object used"
+  assert-error arr2[0], "outdated weak reference used"
   user TopType top
   assert-error top.meth2(), "dynamic call of empty object"
   new-fail-countdown := 1
