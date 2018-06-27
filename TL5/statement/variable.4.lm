@@ -144,12 +144,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "variable will cause recursive declaration of type",
           user self.parent-type.name)
     user ListNode{SyntaxTreeVariable} child(user variable.type-instance.type-data.variables.first)
-    do
-      while child?
-      if child.item.access = Access.VAR and
-          not child.item.type-instance.type-data.is-primitive
-        self.check-var-recursion(user child.item)
-      child := child.next
+    for sub-variable in variable.type-instance.type-data.variables.iter()
+      if sub-variable.access = Access.VAR and
+          not sub-variable.type-instance.type-data.is-primitive
+        self.check-var-recursion(user sub-variable)
   
   func inst write-cname()
     if self.my-module?
@@ -271,7 +269,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             not type-data.variables.first.item.type-instance.type-data.is-primitive
           type-data := type-data.variables.first.item.type-instance.type-data
         else
-          while false
+          break
         bases += 1
         write(user "{")
       write(user "0")

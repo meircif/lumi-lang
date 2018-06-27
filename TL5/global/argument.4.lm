@@ -80,11 +80,8 @@ class FunctionArguments(SyntaxTreeNode)
   
   func inst copy-new-args(
       user List{Argument} arguments, user List{Argument} new-arguments)
-    user ListNode{Argument} node(user arguments.first)
-    do
-      while node?
-      new-arguments.add(owner node.item.copy-new())
-      node := node.next
+    for argument in arguments.iter()
+      new-arguments.add(owner argument.copy-new())
   
   func inst init()
     self.set-location()
@@ -190,56 +187,49 @@ class FunctionArguments(SyntaxTreeNode)
   func inst find-variable-args(
       user List{Argument} arguments, user String name)->(
       user SyntaxTreeVariable variable)
-    user ListNode{Argument} node(user arguments.first)
-    do
-      while node?
-      while not node.item.get-variable().get-if-equal(user name)->(
+    for argument in arguments.iter()
+      while not argument.get-variable().get-if-equal(user name)->(
           user variable)?
-      node := node.next
   
   func inst check-same-as(
       user FunctionArguments other,
       user TypeInstance instance-type,
       copy Int bases)->(
       var Bool output-ommited)
-    user ListNode{Argument} my-node(user self.parameters.first)
-    user ListNode{Argument} other-node(user other.parameters.first)
-    do
-      while my-node? and other-node?
-      my-node.item.check-same-as(
-          user other-node.item, user instance-type, copy bases)
-      my-node := my-node.next
-      other-node := other-node.next
-    if my-node?
+    var ListIterator{Argument} my-iter(user self.parameters)
+    var ListIterator{Argument} other-iter(user other.parameters)
+    for parameter in my-iter
+      while other-iter.has()
+      parameter.check-same-as(
+          user other-iter.get(), user instance-type, copy bases)
+      other-iter.next()
+    if my-iter.has()
       self.syntax-error-msg(user "too many parameters")
-    if other-node?
+    if other-iter.has()
       self.syntax-error-msg(user "too few parameters")
     
-    my-node := self.outputs.first
-    other-node := other.outputs.first
-    do
-      while my-node? and other-node?
-      my-node.item.check-same-as(
-          user other-node.item, user instance-type, copy bases)
-      my-node := my-node.next
-      other-node := other-node.next
-    if my-node?
+    my-iter.new(user self.outputs)
+    other-iter.new(user other.outputs)
+    for output in my-iter
+      while other-iter.has()
+      output.check-same-as(
+          user other-iter.get(), user instance-type, copy bases)
+      other-iter.next()
+    if my-iter.has()
       self.syntax-error-msg(user "too many outputs")
-    if other-node?
-      if other-node.next?
+    output-ommited := other-iter.has()
+    if output-ommited
+      other-iter.next()
+      if other-iter.has()
         self.syntax-error-msg(user "too few outputs")
-    output-ommited := other-node?
   
   func inst write-preactions()
     self.write-args-preactions(user self.parameters)
     self.write-args-preactions(user self.outputs)
   
   func inst write-args-preactions(user List{Argument} arguments)
-    user ListNode{Argument} node(user arguments.first)
-    do
-      while node?
-      node.item.write-preactions()
-      node := node.next
+    for argument in arguments.iter()
+      argument.write-preactions()
   
   func dynamic write()
     self.write-if-decleration(copy true)
@@ -261,11 +251,11 @@ class FunctionArguments(SyntaxTreeNode)
     write(user ")")
   
   func inst write-args(user List{Argument} arguments)
-    user ListNode{Argument} node(user arguments.first)
+    var ListIterator{Argument} iter(user arguments)
     do
-      node.item.write()
-      node := node.next
-      while node?
+      iter.get().write()
+      iter.next()
+      while iter.has()
       write(user ", ")
   
   func inst write-pointer(user String name)
@@ -275,8 +265,5 @@ class FunctionArguments(SyntaxTreeNode)
     self.write()
   
   func inst write-postactions()
-    user ListNode{Argument} node(user self.parameters.first)
-    do
-      while node?
-      node.item.write-postactions()
-      node := node.next
+    for parameter in self.parameters.iter()
+      parameter.write-postactions()

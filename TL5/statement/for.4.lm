@@ -286,6 +286,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.item.type-instance.copy-new()->(owner item-symbol.result-type)
     new CallArgument item-arg
     item-arg.value := item-symbol
+    item-arg.is-dynamic := item-arg.value.result-type.type-data.is-dynamic
     item-arg.is-generic :=
         self.get-func.arguments.outputs.first.item.get-type-instance().type-data is
         glob.type-generic

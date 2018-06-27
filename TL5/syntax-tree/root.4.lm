@@ -242,11 +242,8 @@ class SyntaxTreeRoot(GlobalNodes)
     ; will write constants
     write-global(user "\n\n/* constants */\n")
     var NodeWriteAction node-write-action
-    user NameMapNode{SyntaxTreeConstant} child(user self.constants.first)
-    do
-      while child?
-      child.value.do-action(user node-write-action)
-      child := child.next
+    for constant in self.constants.iter()
+      constant.do-action(user node-write-action)
     
     ; will write type structures
     write-global(user "\n\n/* types struct */\n")
@@ -294,11 +291,8 @@ class SyntaxTreeRoot(GlobalNodes)
     file-close(owner glob.output-file)
   
   func inst write-for-type(user TypeWriter type-writer)
-    user ListNode{TypeData} child(user self.types.first)
-    do
-      while child?
-      child.item.write-me(user type-writer)
-      child := child.next
+    for type-data in self.types.iter()
+      type-data.write-me(user type-writer)
   
   func inst write-test-coverage-data()
     user LineCount line-count
@@ -347,16 +341,13 @@ class SyntaxTreeRoot(GlobalNodes)
     write(user "  Bool LUMI_success = true;\n")
     self.global-init.write()
     write(user "\n")
-    user NameMapNode{SyntaxTreeTestFunction} node(user glob.test-functions.first)
-    do
+    for test-function in glob.test-functions.iter()
       ; LUMI_success &= LUMI_run_test("`test-func.name`", `test-func`);
       write(user "  LUMI_success &= LUMI_run_test(\"")
-      write(user node.value.name)
+      write(user test-function.name)
       write(user "\", ")
-      node.value.write-cname()
+      test-function.write-cname()
       write(user ");\n")
-      node := node.next
-      while node?
     if self.line-counts?
       write(user "  LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, ")
       write-int(copy self.covered-files)

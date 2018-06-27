@@ -1333,7 +1333,9 @@ Int x = 0;
   while (true) {
   }
 /// @ t1
-Int x = 0;
+while (true) {
+    break;
+  }
 /// @ t2
 while (true) {
     if (ut_M_t == NULL) RAISE(2, 17, "empty object used")
@@ -1362,6 +1364,10 @@ got void expression, expected "Bool"
 expected space after "while", got "new-line"
 /// @ te8
 expected new-line after "continue", got " "
+/// @ te9
+"break" used not inside loop
+/// @ te10
+expected new-line after "break", got " "
 /// @@ test-for-loop
 /// @ t0
 Int n = 0;
@@ -4088,17 +4094,29 @@ LUMI_cleanup:
 }
 /// @ t2
 typedef struct ut_M_TestIterator ut_M_TestIterator;
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_TestIterator {
   Generic_Type* item;
   Ref_Manager* item_Refman;
   Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Test {
+  Int x;
+};
+struct ut_M_Test_Dynamic {
+  Dynamic_Del _del;
+  Returncode (*fun)(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic);
+};
 Returncode ut_M_TestIterator_has(ut_M_TestIterator* self, Ref_Manager* self_Refman, Bool* has_data);
 Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 Returncode ut_M_TestIterator_next(ut_M_TestIterator* self, Ref_Manager* self_Refman);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self);
-Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, String** s, Ref_Manager** s_Refman);
+Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic);
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_f_mock(ut_M_TestIterator* siter, Ref_Manager* siter_Refman, ut_M_TestIterator* titer, Ref_Manager* titer_Refman, String** os, Ref_Manager** os_Refman, ut_M_Test** ot, Ref_Manager** ot_Refman, ut_M_Test_Dynamic** ot_Dynamic);
 Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_fun};
 Returncode ut_M_TestIterator_has(ut_M_TestIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
@@ -4124,35 +4142,51 @@ void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
   if (self == NULL) return;
   LUMI_dec_ref(self->item_Refman);
 }
-Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, String** s, Ref_Manager** s_Refman) {
+Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
-  String* t = NULL;
-  Ref_Manager* t_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
+LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+  if (self == NULL) return;
+}
+Returncode ut_M_f_mock(ut_M_TestIterator* siter, Ref_Manager* siter_Refman, ut_M_TestIterator* titer, Ref_Manager* titer_Refman, String** os, Ref_Manager** os_Refman, ut_M_Test** ot, Ref_Manager** ot_Refman, ut_M_Test_Dynamic** ot_Dynamic) {
+  Returncode LUMI_err = OK;
+  String* s = NULL;
+  Ref_Manager* s_Refman = NULL;
   ut_M_TestIterator* aux_TestIterator_0 = NULL;
   Ref_Manager* aux_TestIterator_0_Refman = NULL;
+  ut_M_Test* t = NULL;
+  Ref_Manager* t_Refman = NULL;
+  ut_M_Test_Dynamic* t_Dynamic = NULL;
+  ut_M_TestIterator* aux_TestIterator_1 = NULL;
+  Ref_Manager* aux_TestIterator_1_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  LUMI_inc_ref(iter_Refman);
+  LUMI_inc_ref(siter_Refman);
+  LUMI_inc_ref(titer_Refman);
   aux_Ref_Manager = aux_TestIterator_0_Refman;
-  aux_TestIterator_0_Refman = iter_Refman;
+  aux_TestIterator_0_Refman = siter_Refman;
   LUMI_inc_ref(aux_TestIterator_0_Refman);
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
-  aux_TestIterator_0 = iter;
+  aux_TestIterator_0 = siter;
   while (true) {
-    Bool t_Has = false;
-    LUMI_err = ut_M_TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &(t_Has));
-    CHECK(7)
-    if (!t_Has) break;
-    LUMI_err = ut_M_TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, (void*)&(t), &(t_Refman), &dynamic_Void);
-    CHECK(7)
-    aux_Ref_Manager = *s_Refman;
-    *s_Refman = t_Refman;
-    LUMI_inc_ref(*s_Refman);
+    Bool s_Has = false;
+    LUMI_err = ut_M_TestIterator_has(aux_TestIterator_0, aux_TestIterator_0_Refman, &(s_Has));
+    CHECK(11)
+    if (!s_Has) break;
+    LUMI_err = ut_M_TestIterator_get(aux_TestIterator_0, aux_TestIterator_0_Refman, (void*)&(s), &(s_Refman), &dynamic_Void);
+    CHECK(11)
+    aux_Ref_Manager = *os_Refman;
+    *os_Refman = s_Refman;
+    LUMI_inc_ref(*os_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    *s = t;
+    *os = s;
     LUMI_err = ut_M_TestIterator_next(aux_TestIterator_0, aux_TestIterator_0_Refman);
-    CHECK(7)
+    CHECK(11)
   }
   aux_Ref_Manager = aux_TestIterator_0_Refman;
   aux_TestIterator_0_Refman = NULL;
@@ -4160,10 +4194,42 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, String
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_TestIterator_0 = NULL;
+  aux_Ref_Manager = aux_TestIterator_1_Refman;
+  aux_TestIterator_1_Refman = titer_Refman;
+  LUMI_inc_ref(aux_TestIterator_1_Refman);
+  LUMI_dec_ref(aux_Ref_Manager);
+  aux_Ref_Manager = NULL;
+  aux_TestIterator_1 = titer;
+  while (true) {
+    Bool t_Has = false;
+    LUMI_err = ut_M_TestIterator_has(aux_TestIterator_1, aux_TestIterator_1_Refman, &(t_Has));
+    CHECK(13)
+    if (!t_Has) break;
+    LUMI_err = ut_M_TestIterator_get(aux_TestIterator_1, aux_TestIterator_1_Refman, (void*)&(t), &(t_Refman), (void*)&(t_Dynamic));
+    CHECK(13)
+    aux_Ref_Manager = *ot_Refman;
+    *ot_Refman = t_Refman;
+    *ot_Dynamic = t_Dynamic;
+    LUMI_inc_ref(*ot_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    *ot = t;
+    LUMI_err = ut_M_TestIterator_next(aux_TestIterator_1, aux_TestIterator_1_Refman);
+    CHECK(13)
+  }
+  aux_Ref_Manager = aux_TestIterator_1_Refman;
+  aux_TestIterator_1_Refman = NULL;
+  LUMI_inc_ref(aux_TestIterator_1_Refman);
+  LUMI_dec_ref(aux_Ref_Manager);
+  aux_Ref_Manager = NULL;
+  aux_TestIterator_1 = NULL;
 LUMI_cleanup:
-  LUMI_dec_ref(aux_TestIterator_0_Refman);
+  LUMI_dec_ref(aux_TestIterator_1_Refman);
   LUMI_dec_ref(t_Refman);
-  LUMI_dec_ref(iter_Refman);
+  LUMI_dec_ref(aux_TestIterator_0_Refman);
+  LUMI_dec_ref(s_Refman);
+  LUMI_dec_ref(titer_Refman);
+  LUMI_dec_ref(siter_Refman);
   return LUMI_err;
 }
 /// @ t3

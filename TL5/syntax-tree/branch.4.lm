@@ -135,11 +135,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     if base.find-variable(user name, user module-name)->(user variable)?
       return
     variable := _
-    user ListNode{SyntaxTreeVariable} child(user self.variables.first)
-    do
-      while child?
-      while not child.item.get-if-equal(user name)->(user variable)?
-      child := child.next
+    for sub-variable in self.variables.iter()
+      while not sub-variable.get-if-equal(user name)->(user variable)?
   
   func dynamic link-types()
     self.link-children-types(user self.variables)
@@ -154,12 +151,9 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     write-spaces(copy self.indentation-spaces)
   
   func inst write-cleanup(user TypeData type-data)
-    user ListNode{SyntaxTreeVariable} var-node(user self.variables.last)
-    do
-      while var-node?
-      if not var-node.item.type-instance.type-data.is-primitive
-        self.write-variable-cleanup(user var-node.item, user type-data)
-      var-node := var-node.prev
+    for variable in self.variables.iter-back()
+      if not variable.type-instance.type-data.is-primitive
+        self.write-variable-cleanup(user variable, user type-data)
   
   func inst write-variable-cleanup(
       user SyntaxTreeVariable variable, user TypeData type-data)
@@ -265,8 +259,5 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
     self.analyze-children(user self.functions)
   
   func inst write-functions-declaration()
-    user ListNode{SyntaxTreeFunction} child(user self.functions.first)
-    do
-      while child?
-      child.item.write-declaration()
-      child := child.next
+    for function in self.functions.iter()
+      function.write-declaration()

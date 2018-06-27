@@ -27,11 +27,8 @@ struct TypeInstance
     other.length := self.length
     if self.parameters?
       other.parameters := List{TypeInstance}()
-      user ListNode{TypeInstance} node(user self.parameters.first)
-      do
-        while node?
-        other.parameters.add(owner node.item.copy-new())
-        node := node.next
+      for parameter in self.parameters.iter()
+        other.parameters.add(owner parameter.copy-new())
     if self.arguments?
       self.arguments.copy-new()->(owner other.arguments)
   
@@ -130,15 +127,12 @@ struct TypeInstance
       if self.arguments?
         self.arguments.analyze()
     if self.parameters?
-      user ListNode{TypeInstance} sub-type(user self.parameters.first)
-      do
-        while sub-type?
-        sub-type.item.analyze-part(
+      for sub-type in self.parameters.iter()
+        sub-type.analyze-part(
             user node,
             copy check-types,
             copy check-length,
             copy constant-length)
-        sub-type := sub-type.next
     if check-types
       self.check-parameters(user node)
   
@@ -154,23 +148,20 @@ struct TypeInstance
         node.syntax-error(
             user "parameter given for type with no parameters",
             user self.type-data.name)
-      user ListNode{TypeInstance} sub-type(user self.parameters.first)
-      user ListNode{String} dec-node(user self.type-data.parameters.first)
-      do
-        while sub-type?
-        if not dec-node?
+      var ListIterator{String} param-iter(user self.type-data.parameters)
+      for sub-type in self.parameters.iter()
+        if not param-iter.has()
           node.syntax-error(
               user "too many parameters given for type",
               user self.type-data.name)
-        if sub-type.item.type-data.is-primitive
+        if sub-type.type-data.is-primitive
           node.syntax-error(
               user "unsupported primitive parameter type",
-              user sub-type.item.type-data.name)
-        if sub-type.item.type-data is glob.type-array
+              user sub-type.type-data.name)
+        if sub-type.type-data is glob.type-array
           node.syntax-error-msg(user "array as parameter type is unsupported")
-        sub-type := sub-type.next
-        dec-node := dec-node.next
-      if dec-node?
+        param-iter.next()
+      if param-iter.has()
         node.syntax-error(
             user "too few parameter given for type", user self.type-data.name)
     else-if self.type-data is glob.type-func and not self.arguments?
@@ -252,27 +243,25 @@ struct TypeInstance
       user TypeInstance target, user SyntaxTreeNode node)
     if not target.parameters?
       return
-    user ListNode{TypeInstance} target-sub-type(user target.parameters.first)
-    self.check-has-subytpe(user target-sub-type, user node)
-    user ListNode{TypeInstance} my-sub-type(user self.parameters.first)
-    do
-      while target-sub-type? and my-sub-type?
-      my-sub-type.item.check-assign-to(
+    var ListIterator{TypeInstance} target-iter(user target.parameters)
+    self.check-has-subytpe(user target-iter.get(), user node)
+    for my-sub-type in self.parameters.iter()
+      while target-iter.has()
+      my-sub-type.check-assign-to(
           copy Access.VAR,
-          user target-sub-type.item,
+          user target-iter.get(),
           copy Access.VAR,
           user node)
-      my-sub-type := my-sub-type.next
-      target-sub-type := target-sub-type.next
+      target-iter.next()
   
   func check-has-subytpe(
-      user ListNode{TypeInstance} target-sub-type, user SyntaxTreeNode node)
+      user TypeInstance target-sub-type, user SyntaxTreeNode node)
     if not self.parameters?
       node.syntax-error2(
           user "cannot assign type",
           user self.type-data.name,
           user "with no parameter into same type with parameter",
-          user target-sub-type.item.type-data.name)
+          user target-sub-type.type-data.name)
   
   func check-equal(user TypeInstance other, user SyntaxTreeNode node)
     if self.type-data is-not other.type-data
@@ -286,20 +275,20 @@ struct TypeInstance
   func check-sub-equal(user TypeInstance target, user SyntaxTreeNode node)
     if not target.parameters?
       return
-    user ListNode{TypeInstance} target-sub-type(user target.parameters.first)
-    self.check-has-subytpe(user target-sub-type, user node)
-    user ListNode{TypeInstance} my-sub-type(user self.parameters.first)
-    do
-      while target-sub-type? and my-sub-type?
-      if my-sub-type.item.type-data is-not target-sub-type.item.type-data
+    var ListIterator{TypeInstance} target-iter(user target.parameters)
+    self.check-has-subytpe(user target-iter.get(), user node)
+    for my-sub-type in self.parameters.iter()
+      while target-iter.has()
+      user TypeInstance target-sub-type
+      target-iter.get()->(user target-sub-type)
+      if my-sub-type.type-data is-not target-sub-type.type-data
         node.syntax-error2(
             user "non matching subtypes",
-            user my-sub-type.item.type-data.name,
+            user my-sub-type.type-data.name,
             user "and",
-            user target-sub-type.item.type-data.name)
-      my-sub-type.item.check-sub-equal(user target-sub-type.item, user node)
-      my-sub-type := my-sub-type.next
-      target-sub-type := target-sub-type.next
+            user target-sub-type.type-data.name)
+      my-sub-type.check-sub-equal(user target-sub-type, user node)
+      target-iter.next()
     
   func check-sequence(user SyntaxTreeNode node)
     if (self.type-data is glob.type-array or
@@ -328,19 +317,14 @@ struct TypeInstance
       self.replace-type-parameters(user base-type, copy bases - 1)
     if self.type-data is glob.type-generic and instance-type.parameters? and
         instance-type.type-data.parameters?
-      user ListNode{String} dec-node(
-          user instance-type.type-data.parameters.first)
-      user ListNode{TypeInstance} inst-node(user instance-type.parameters.first)
-      do
-        while dec-node? and inst-node?
-        if dec-node.item.equal(user self.name)
-          inst-node.item.copy(user self)
-          while false
-        dec-node := dec-node.next
-        inst-node := inst-node.next
+      var ListIterator{String} dec-iter(
+          user instance-type.type-data.parameters)
+      for inst-param in instance-type.parameters.iter()
+        while dec-iter.has()
+        if dec-iter.get().equal(user self.name)
+          inst-param.copy(user self)
+          break
+        dec-iter.next()
     if self.parameters?
-      user ListNode{TypeInstance} node(user self.parameters.first)
-      do
-        while node?
-        node.item.replace-type-parameters(user instance-type, copy bases)
-        node := node.next
+      for parameter in self.parameters.iter()
+        parameter.replace-type-parameters(user instance-type, copy bases)

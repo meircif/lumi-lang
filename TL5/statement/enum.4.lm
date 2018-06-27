@@ -44,12 +44,9 @@ class EnumData(SyntaxTreeNode)
     has-value := true
     if value.equal(user "length")
       return
-    user ListNode{String} node(user self.values.first)
-    do
-      while node?
-      if value.equal(user node.item)
+    for text in self.values.iter()
+      if value.equal(user text)
         return
-      node := node.next
     has-value := false
   
   func inst write-cname()
@@ -58,15 +55,12 @@ class EnumData(SyntaxTreeNode)
   
   func dynamic write()
     write(user "\nenum {\n  ")
-    user ListNode{String} node(user self.values.first)
-    do
-      while node?
+    for text in self.values.iter()
       self.write-cname()
       write(user "_")
-      write-cname(user node.item)
-      if node is self.values.first
+      write-cname(user text)
+      if text is self.values.first.item
         write(user " = 0")
-      node := node.next
       write(user ",\n  ")
     self.write-cname()
     write(user "_length\n")

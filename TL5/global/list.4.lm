@@ -59,6 +59,12 @@ struct List{Generic}
         return
       node := node.next
     item := _
+  
+  func iter()->(owner ListIterator{Generic} iter)
+    iter := ListIterator{Generic}(user self)
+  
+  func iter-back()->(owner ListBackIterator{Generic} iter)
+    iter := ListBackIterator{Generic}(user self)
 
 
 ~~~ Single node in the list ~~~
@@ -74,3 +80,37 @@ struct ListNode{Generic}
     self.next := next
     self.prev := prev
     self.item := item
+
+
+~~~ Iterate over a list ~~~
+struct ListIterator{Generic}
+  user ListNode{Generic} node
+  
+  func new(user List{Generic} list)
+    self.node := list.first
+  
+  func has()->(var Bool has)
+    has := self.node?
+  
+  func get()->(user Generic value)
+    value := self.node.item
+  
+  func next()
+    self.node := self.node.next
+
+
+~~~ Iterate over a list backwards ~~~
+struct ListBackIterator{Generic}
+  user ListNode{Generic} node
+  
+  func new(user List{Generic} list)
+    self.node := list.last
+  
+  func has()->(var Bool has)
+    has := self.node?
+  
+  func get()->(user Generic value)
+    value := self.node.item
+  
+  func next()
+    self.node := self.node.prev

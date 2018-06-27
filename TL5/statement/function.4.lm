@@ -101,14 +101,14 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
       user SyntaxTreeVariable new-variable)
     var Int index(copy 0)
-    user ListNode{TypeCount} node(user self.aux-variables.first)
+    var ListIterator{TypeCount} iter(user self.aux-variables)
     do
-      while node?
-      while node.item.type-data is-not type-instance.type-data
-      node := node.next
-    if node?
-      node.item.count += 1
-      index := node.item.count
+      while iter.has()
+      while iter.get().type-data is-not type-instance.type-data
+      iter.next()
+    if iter.has()
+      iter.get().count += 1
+      index := iter.get().count
     else
       new TypeCount type-count
       type-count.type-data := type-instance.type-data
@@ -194,25 +194,17 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst write-setup()
     if self.has-user-assign
       write(user "  Ref_Manager* aux_Ref_Manager = NULL;\n")
-    user ListNode{Argument} node(user self.arguments.parameters.first)
-    do
-      while node?
-      if node.item.access = Access.USER
+    for parameter in self.arguments.parameters.iter()
+      if parameter.access = Access.USER
         write(user "  LUMI_inc_ref(")
-        write-cname(user node.item.get-variable().name)
+        write-cname(user parameter.get-variable().name)
         write(user "_Refman);\n")
-      node := node.next
   
   func inst write-cleanup()
     base.write-cleanup(user _)
-    user ListNode{Argument} param-node(user self.arguments.parameters.last)
-    do
-      while param-node?
-      if param-node.item.access = Access.USER or
-          param-node.item.access = Access.OWNER
-        self.write-variable-cleanup(
-            user param-node.item.get-variable(), user _)
-      param-node := param-node.prev
+    for parameter in self.arguments.parameters.iter-back()
+      if parameter.access = Access.USER or parameter.access = Access.OWNER
+        self.write-variable-cleanup(user parameter.get-variable(), user _)
   
   func inst write-cname()
     if self.parent-type?
@@ -385,5 +377,3 @@ class DeclarationArgument(Argument)
 class DeclarationArgumentFactory(ArgumentFactory)
   func dynamic new-argument()->(owner Argument new-argument)
     new-argument := DeclarationArgument()
-
-

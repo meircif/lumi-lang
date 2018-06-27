@@ -265,15 +265,12 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       write(user ");\n")
     base.write-block-body()
   
-  func inst write-arg-list(user List{Argument} list)->(
-      var Bool first)
-    user ListNode{Argument} node(user list.first)
-    do
-      while node?
+  func inst write-arg-list(user List{Argument} list)->(var Bool first)
+    for argument in list.iter()
       if not first
         write(user ", ")
       user SyntaxTreeVariable variable
-      node.item.get-variable()->(user variable)
+      argument.get-variable()->(user variable)
       write-cname(user variable.name)
       if not variable.type-instance.type-data.is-primitive
         write(user ", ")
@@ -284,4 +281,3 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
         write-cname(user variable.name)
         write(user "_Dynamic")
       first := false
-      node := node.next

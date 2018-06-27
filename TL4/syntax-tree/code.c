@@ -311,6 +311,64 @@ Func SyntaxTreeWhile__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)Syn
 #endif
 
 
+/* Break statement in the syntax tree */
+#if LUMI_STAGE == LUMI_TYPEDEFS
+typedef struct SyntaxTreeBreak SyntaxTreeBreak;
+#elif LUMI_STAGE == LUMI_TYPES(2)
+struct SyntaxTreeBreak {
+  SyntaxTreeCode _base;
+};
+#endif
+#if LUMI_STAGE == LUMI_DECLARATIONS
+Returncode SyntaxTreeBreak_parse_new(SyntaxTreeBreak* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeBreak** new_node);
+#elif LUMI_STAGE == LUMI_FUNCTIONS
+static char* _func_name_SyntaxTreeBreak_parse_new = "SyntaxTreeBreak.parse-new";
+#define LUMI_FUNC_NAME _func_name_SyntaxTreeBreak_parse_new
+Returncode SyntaxTreeBreak_parse_new(SyntaxTreeBreak* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeBreak** new_node) {
+  (*new_node) = malloc(sizeof(SyntaxTreeBreak));
+  if ((*new_node) == NULL) RAISE(118)
+  *(*new_node) = (SyntaxTreeBreak){SyntaxTreeBreak__dtl, NULL, 0, NULL};
+  (*new_node)->_base._base._dtl = SyntaxTreeBreak__dtl;
+  CHECK(119, SyntaxTreeBreak_parse((*new_node), parent) )
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+#endif
+#if LUMI_STAGE == LUMI_DECLARATIONS
+Returncode SyntaxTreeBreak_parse(SyntaxTreeBreak* self, SyntaxTreeBlock* parent);
+#elif LUMI_STAGE == LUMI_FUNCTIONS
+static char* _func_name_SyntaxTreeBreak_parse = "SyntaxTreeBreak.parse";
+#define LUMI_FUNC_NAME _func_name_SyntaxTreeBreak_parse
+Returncode SyntaxTreeBreak_parse(SyntaxTreeBreak* self, SyntaxTreeBlock* parent) {
+  CHECK(122, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  self->_base.parent = parent;
+  if (!parent->is_in_loop) {
+    CHECK(125, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){29, 28, "\"break\" used not inside loop"}) )
+  }
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+#endif
+#if LUMI_STAGE == LUMI_DECLARATIONS
+Returncode SyntaxTreeBreak_write(SyntaxTreeBreak* self);
+#elif LUMI_STAGE == LUMI_FUNCTIONS
+static char* _func_name_SyntaxTreeBreak_write = "SyntaxTreeBreak.write";
+#define LUMI_FUNC_NAME _func_name_SyntaxTreeBreak_write
+Returncode SyntaxTreeBreak_write(SyntaxTreeBreak* self) {
+  CHECK(128, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(129, write(&(String){8, 7, "break;\n"}) )
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+#endif
+#if LUMI_STAGE == LUMI_DECLARATIONS
+extern Func SyntaxTreeBreak__dtl[];
+#endif
+#if LUMI_STAGE == LUMI_FUNCTIONS
+Func SyntaxTreeBreak__dtl[] = {(void*)SyntaxTreeCode_get_parent_type, (void*)SyntaxTreeNode_link_types, (void*)SyntaxTreeNode_analyze, (void*)SyntaxTreeNode_m_order_constants, (void*)SyntaxTreeBreak_write, (void*)SyntaxTreeCode_m_is_end_point};
+#endif
+
+
 /* Continue statement in the syntax tree */
 #if LUMI_STAGE == LUMI_TYPEDEFS
 typedef struct SyntaxTreeContinue SyntaxTreeContinue;
@@ -326,10 +384,10 @@ static char* _func_name_SyntaxTreeContinue_parse_new = "SyntaxTreeContinue.parse
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeContinue_parse_new
 Returncode SyntaxTreeContinue_parse_new(SyntaxTreeContinue* self, SyntaxTreeBlock* parent, Char* end, SyntaxTreeContinue** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeContinue));
-  if ((*new_node) == NULL) RAISE(118)
+  if ((*new_node) == NULL) RAISE(137)
   *(*new_node) = (SyntaxTreeContinue){SyntaxTreeContinue__dtl, NULL, 0, NULL};
   (*new_node)->_base._base._dtl = SyntaxTreeContinue__dtl;
-  CHECK(119, SyntaxTreeContinue_parse((*new_node), parent) )
+  CHECK(138, SyntaxTreeContinue_parse((*new_node), parent) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -340,10 +398,10 @@ Returncode SyntaxTreeContinue_parse(SyntaxTreeContinue* self, SyntaxTreeBlock* p
 static char* _func_name_SyntaxTreeContinue_parse = "SyntaxTreeContinue.parse";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeContinue_parse
 Returncode SyntaxTreeContinue_parse(SyntaxTreeContinue* self, SyntaxTreeBlock* parent) {
-  CHECK(122, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(141, SyntaxTreeNode_set_location(&(self->_base._base)) )
   self->_base.parent = parent;
   if (!parent->is_in_loop) {
-    CHECK(125, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "\"continue\" used not inside loop"}) )
+    CHECK(144, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "\"continue\" used not inside loop"}) )
   }
   return OK;
 }
@@ -355,8 +413,8 @@ Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self);
 static char* _func_name_SyntaxTreeContinue_write = "SyntaxTreeContinue.write";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeContinue_write
 Returncode SyntaxTreeContinue_write(SyntaxTreeContinue* self) {
-  CHECK(128, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(129, write(&(String){11, 10, "continue;\n"}) )
+  CHECK(147, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(148, write(&(String){11, 10, "continue;\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -384,10 +442,10 @@ static char* _func_name_SyntaxTreeCoverage_init_new = "SyntaxTreeCoverage.init-n
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeCoverage_init_new
 Returncode SyntaxTreeCoverage_init_new(SyntaxTreeCoverage* self, SyntaxTreeBlock* parent, SyntaxTreeCoverage** coverage_node) {
   (*coverage_node) = malloc(sizeof(SyntaxTreeCoverage));
-  if ((*coverage_node) == NULL) RAISE(137)
+  if ((*coverage_node) == NULL) RAISE(156)
   *(*coverage_node) = (SyntaxTreeCoverage){SyntaxTreeCoverage__dtl, NULL, 0, NULL, 0};
   (*coverage_node)->_base._base._dtl = SyntaxTreeCoverage__dtl;
-  CHECK(138, SyntaxTreeCoverage_init((*coverage_node), parent) )
+  CHECK(157, SyntaxTreeCoverage_init((*coverage_node), parent) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -398,7 +456,7 @@ Returncode SyntaxTreeCoverage_init(SyntaxTreeCoverage* self, SyntaxTreeBlock* pa
 static char* _func_name_SyntaxTreeCoverage_init = "SyntaxTreeCoverage.init";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeCoverage_init
 Returncode SyntaxTreeCoverage_init(SyntaxTreeCoverage* self, SyntaxTreeBlock* parent) {
-  CHECK(141, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(160, SyntaxTreeNode_set_location(&(self->_base._base)) )
   self->_base.parent = parent;
   self->input_file_index = glob->input_file_index;
   return OK;
@@ -411,10 +469,10 @@ Returncode SyntaxTreeCoverage_analyze(SyntaxTreeCoverage* self);
 static char* _func_name_SyntaxTreeCoverage_analyze = "SyntaxTreeCoverage.analyze";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeCoverage_analyze
 Returncode SyntaxTreeCoverage_analyze(SyntaxTreeCoverage* self) {
-  if ((self->input_file_index) < 0 || (self->input_file_index) >= (glob->root->line_counts)->length) RAISE(146)
+  if ((self->input_file_index) < 0 || (self->input_file_index) >= (glob->root->line_counts)->length) RAISE(165)
   LineCount* line_count = (&(((LineCount*)((glob->root->line_counts)->values))[self->input_file_index]));
   line_count->needs_cover = true;
-  if ((self->_base._base.line_number) < 0 || (self->_base._base.line_number) >= (line_count->line_needs_cover)->length) RAISE(148)
+  if ((self->_base._base.line_number) < 0 || (self->_base._base.line_number) >= (line_count->line_needs_cover)->length) RAISE(167)
   (((Bool*)((line_count->line_needs_cover)->values))[self->_base._base.line_number]) = true;
   return OK;
 }
@@ -427,13 +485,13 @@ static char* _func_name_SyntaxTreeCoverage_write = "SyntaxTreeCoverage.write";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeCoverage_write
 Returncode SyntaxTreeCoverage_write(SyntaxTreeCoverage* self) {
   /* ++LUMI_file_coverage[`covered-index`].line_count[`line-number`]; */
-  CHECK(152, SyntaxTreeCode_write_spaces(&(self->_base)) )
-  CHECK(153, write(&(String){22, 21, "++LUMI_file_coverage["}) )
-  if ((self->input_file_index) < 0 || (self->input_file_index) >= (glob->root->line_counts)->length) RAISE(154)
-  CHECK(154, write_int((&(((LineCount*)((glob->root->line_counts)->values))[self->input_file_index]))->covered_index) )
-  CHECK(155, write(&(String){14, 13, "].line_count["}) )
-  CHECK(156, write_int(self->_base._base.line_number) )
-  CHECK(157, write(&(String){4, 3, "];\n"}) )
+  CHECK(171, SyntaxTreeCode_write_spaces(&(self->_base)) )
+  CHECK(172, write(&(String){22, 21, "++LUMI_file_coverage["}) )
+  if ((self->input_file_index) < 0 || (self->input_file_index) >= (glob->root->line_counts)->length) RAISE(173)
+  CHECK(173, write_int((&(((LineCount*)((glob->root->line_counts)->values))[self->input_file_index]))->covered_index) )
+  CHECK(174, write(&(String){14, 13, "].line_count["}) )
+  CHECK(175, write_int(self->_base._base.line_number) )
+  CHECK(176, write(&(String){4, 3, "];\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

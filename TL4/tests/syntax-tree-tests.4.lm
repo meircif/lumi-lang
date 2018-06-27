@@ -599,11 +599,8 @@ func error()
 do
     var Int x
 ## @ c t1
-
-  
-    
-
-  var Int x
+do
+    break
 ## @ c t2
 do
     while t.num > 3
@@ -630,6 +627,14 @@ do
 ## @ ec te6
 do
     while i := 3
+## @ ec te7
+break
+## @ ec te8
+do
+    break 
+## @ ec te9
+do
+    continue 
 ## @@ test-for-loop
 ## @ c t0
 for n in 5
@@ -1339,9 +1344,15 @@ struct TestIterator{Generic}
   func has()->(var Bool has-data)
   func get()->(user Generic item)
   func next()
-func f-mock(user TestIterator{String} iter)->(user String s)
-  for t in iter
-    s := t
+class Test
+  var Int x
+  func dynamic fun()
+func f-mock(user TestIterator{String} siter, user TestIterator{Test} titer)->(
+    user String os, user Test ot)
+  for s in siter
+    os := s
+  for t in titer
+    ot := t
 ## @ g t3
 class TestIterator{Generic}
   user Generic item

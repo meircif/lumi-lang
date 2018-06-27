@@ -42,13 +42,10 @@ class SyntaxTreeNode
     user TypeData parent-type
     if self.get-parent-type()->(user parent-type)?
       if parent-type.parameters?
-        user ListNode{String} node(user parent-type.parameters.first)
-        do
-          while node?
-          if node.item.equal(user name)
+        for parameter in parent-type.parameters.iter()
+          if parameter.equal(user name)
             type-data := glob.type-generic
             return
-          node := node.next
     self.print-syntax-error(user "unknown type", user name)
     raise
   
@@ -231,11 +228,8 @@ class SyntaxTreeNode
   
   func inst do-on-children(
       user List{SyntaxTreeNode} child-list, user NodeAction action)
-    user ListNode{SyntaxTreeNode} child(user child-list.first)
-    do
-      while child?
-      child.item.do-action(user action)
-      child := child.next
+    for child in child-list.iter()
+      child.do-action(user action)
   
   func inst do-action(user NodeAction action)
     glob.input-file-name := self.input-file-name

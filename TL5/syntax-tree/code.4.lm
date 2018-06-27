@@ -111,6 +111,25 @@ class SyntaxTreeWhile(SyntaxTreeCode)
     write(user ")) break;\n")
 
 
+~~~ Break statement in the syntax tree ~~~
+class SyntaxTreeBreak(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      var Char end, owner SyntaxTreeBreak new-node)
+    new-node := SyntaxTreeBreak()
+    new-node.parse(user parent)
+  
+  func inst parse(user SyntaxTreeBlock parent)
+    self.set-location()
+    self.parent := parent
+    if not parent.is-in-loop
+      self.syntax-error-msg(user "\"break\" used not inside loop")
+  
+  func dynamic write()
+    self.write-spaces()
+    write(user "break;\n")
+
+
 ~~~ Continue statement in the syntax tree ~~~
 class SyntaxTreeContinue(SyntaxTreeCode)
   
