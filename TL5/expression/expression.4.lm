@@ -38,6 +38,10 @@ class Expression(SyntaxTreeNode)
   var Bool is-statement
   var Bool is-generic-cast
   var Bool is-complex-field
+
+  new(user SyntaxTreeCode code-node)
+    self.set-location()
+    self.code-node := code-node
   
   ~~~ Parse any expression ~~~
   func inst parse-new(
@@ -172,8 +176,7 @@ class Expression(SyntaxTreeNode)
   func inst add-aux-variable(
       copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
       owner SymbolExpression symbol)
-    symbol := SymbolExpression()
-    symbol.code-node := self.code-node
+    symbol := SymbolExpression(user self.code-node)
     type-instance.copy-new()->(owner symbol.result-type)
     symbol.access := access
     symbol.assignable := true

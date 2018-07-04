@@ -2,27 +2,25 @@
 module tl5-compiler
 
 class InitExpression(ModuleTypeExpression)
-  owner FunctionArguments arguments
+  var FunctionArguments arguments
   owner SymbolExpression symbol
   user SyntaxTreeFunction constructor
   owner Expression value
   
+  new(user SyntaxTreeCode code-node)
+    base(user code-node)
+    self.arguments.new()
+  
   func inst parse(
-      owner TypeInstance result-type,
-      owner Expression module-expression,
-      user SyntaxTreeCode code-node)->(
+      owner TypeInstance result-type, owner Expression module-expression)->(
       var Char end)
-    self.code-node := code-node
     self.result-type := result-type
-    self.set-location()
     self.module-expression := module-expression
-    self.arguments := FunctionArguments()
     if end = '('
       var CallArgumentFactory argument-factory
-      self.arguments.parse(user argument-factory, copy false, user code-node)->(
+      self.arguments.parse(
+          user argument-factory, copy false, user self.code-node)->(
           var end)
-    else
-      self.arguments.init()
   
   func dynamic analyze()
     self.analyze-type-instance(user self.result-type)

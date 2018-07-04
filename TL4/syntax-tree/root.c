@@ -404,7 +404,12 @@ Returncode SyntaxTreeRoot_m_order_types(SyntaxTreeRoot* self) {
     TypeData* type_data = NULL;
     CHECK(198, List_pop(self->_base.types, (void**)&(type_data)) )
     if (!(NULL != type_data)) break;
-    CHECK(200, TypeData_m_order_bases(type_data, ordered_list) )
+    Bool _Bool138;
+    CHECK(200, TypeData_m_order_bases(type_data, ordered_list, &(_Bool138)) )
+    if (_Bool138) {
+      CHECK(201, print(&(String){2, 1, "\n"}) )
+      RAISE(202)
+    }
   }
   free(self->_base.types);
   self->_base.types = ordered_list;
@@ -418,17 +423,17 @@ Returncode SyntaxTreeRoot_analyze_cover(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_analyze_cover = "SyntaxTreeRoot.analyze-cover";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeRoot_analyze_cover
 Returncode SyntaxTreeRoot_analyze_cover(SyntaxTreeRoot* self) {
-  ModuleMembers* _ModuleMembers138;
-  CHECK(205, NameMap_find(glob->module_map, glob->tested_module, (void**)&(_ModuleMembers138)) )
-  if (!(NULL != _ModuleMembers138)) {
-    CHECK(206, print(&(String){44, 43, "General code error: unknown tested module \""}) )
-    CHECK(207, print(glob->tested_module) )
-    CHECK(208, print(&(String){3, 2, "\"\n"}) )
-    RAISE(209)
+  ModuleMembers* _ModuleMembers139;
+  CHECK(207, NameMap_find(glob->module_map, glob->tested_module, (void**)&(_ModuleMembers139)) )
+  if (!(NULL != _ModuleMembers139)) {
+    CHECK(208, print(&(String){44, 43, "General code error: unknown tested module \""}) )
+    CHECK(209, print(glob->tested_module) )
+    CHECK(210, print(&(String){3, 2, "\"\n"}) )
+    RAISE(211)
   }
   Int covered_index = 0;
   {int n; for (n = (0); n < (self->line_counts->length); ++n) {
-    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(212)
+    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(214)
     LineCount* line_count = (&(((LineCount*)((self->line_counts)->values))[n]));
     if (line_count->needs_cover) {
       line_count->covered_index = covered_index;
@@ -437,10 +442,10 @@ Returncode SyntaxTreeRoot_analyze_cover(SyntaxTreeRoot* self) {
   }}
   self->covered_files = covered_index;
   if (self->covered_files == 0) {
-    CHECK(218, print(&(String){51, 50, "General code error: no code to test under module \""}) )
-    CHECK(219, print(glob->tested_module) )
-    CHECK(220, print(&(String){3, 2, "\"\n"}) )
-    RAISE(221)
+    CHECK(220, print(&(String){51, 50, "General code error: no code to test under module \""}) )
+    CHECK(221, print(glob->tested_module) )
+    CHECK(222, print(&(String){3, 2, "\"\n"}) )
+    RAISE(223)
   }
   return OK;
 }
@@ -459,77 +464,77 @@ Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_write = "SyntaxTreeRoot.write";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeRoot_write
 Returncode SyntaxTreeRoot_write(SyntaxTreeRoot* self) {
-  CHECK(232, file_open(self->output_file_name, false, &(glob->output_file)) )
+  CHECK(234, file_open(self->output_file_name, false, &(glob->output_file)) )
   
-  CHECK(234, write_global(&(String){21, 20, "#include \"lumi.4.h\"\n"}) )
+  CHECK(236, write_global(&(String){21, 20, "#include \"lumi.4.h\"\n"}) )
   
-  CHECK(236, write_global(&(String){27, 26, "\n\n/* types declaration */\n"}) )
+  CHECK(238, write_global(&(String){27, 26, "\n\n/* types declaration */\n"}) )
   TypeDeclarationWriter* type_declaration_writer = &(TypeDeclarationWriter){TypeDeclarationWriter__dtl};
   type_declaration_writer->_base._dtl = TypeDeclarationWriter__dtl;
-  CHECK(238, SyntaxTreeRoot_write_for_type(self, &(type_declaration_writer->_base)) )
+  CHECK(240, SyntaxTreeRoot_write_for_type(self, &(type_declaration_writer->_base)) )
   
   /* will write Enums */
-  CHECK(241, write_global(&(String){15, 14, "\n\n/* Enums */\n"}) )
-  CHECK(242, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->enums) )
+  CHECK(243, write_global(&(String){15, 14, "\n\n/* Enums */\n"}) )
+  CHECK(244, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->enums) )
   
   /* will write constants */
-  CHECK(245, write_global(&(String){19, 18, "\n\n/* constants */\n"}) )
-  CHECK(246, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->constants) )
+  CHECK(247, write_global(&(String){19, 18, "\n\n/* constants */\n"}) )
+  CHECK(248, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->constants) )
   
   /* will write type structures */
-  CHECK(249, write_global(&(String){22, 21, "\n\n/* types struct */\n"}) )
-  CHECK(250, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base.types) )
+  CHECK(251, write_global(&(String){22, 21, "\n\n/* types struct */\n"}) )
+  CHECK(252, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base.types) )
   
-  CHECK(252, write_global(&(String){35, 34, "\n\n/* types methods declaration */\n"}) )
+  CHECK(254, write_global(&(String){35, 34, "\n\n/* types methods declaration */\n"}) )
   TypeMethodsDeclarationWriter* type_methods_declaration_writer = &(TypeMethodsDeclarationWriter){TypeMethodsDeclarationWriter__dtl};
   type_methods_declaration_writer->_base._dtl = TypeMethodsDeclarationWriter__dtl;
-  CHECK(254, SyntaxTreeRoot_write_for_type(self, &(type_methods_declaration_writer->_base)) )
+  CHECK(256, SyntaxTreeRoot_write_for_type(self, &(type_methods_declaration_writer->_base)) )
   
-  CHECK(256, write_global(&(String){38, 37, "\n\n/* global functions declaration */\n"}) )
-  CHECK(257, SyntaxTreeNamespace_write_functions_declaration(&(self->_base._base)) )
+  CHECK(258, write_global(&(String){38, 37, "\n\n/* global functions declaration */\n"}) )
+  CHECK(259, SyntaxTreeNamespace_write_functions_declaration(&(self->_base._base)) )
   
-  CHECK(259, write_global(&(String){32, 31, "\n\n/* types global variables */\n"}) )
+  CHECK(261, write_global(&(String){32, 31, "\n\n/* types global variables */\n"}) )
   TypeGlobalWriter* type_global_writer = &(TypeGlobalWriter){TypeGlobalWriter__dtl};
   type_global_writer->_base._dtl = TypeGlobalWriter__dtl;
-  CHECK(261, SyntaxTreeRoot_write_for_type(self, &(type_global_writer->_base)) )
+  CHECK(263, SyntaxTreeRoot_write_for_type(self, &(type_global_writer->_base)) )
   
   /* will write global variables */
-  CHECK(264, write_global(&(String){26, 25, "\n\n/* global variables */\n"}) )
-  CHECK(265, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
+  CHECK(266, write_global(&(String){26, 25, "\n\n/* global variables */\n"}) )
+  CHECK(267, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
   
   if (NULL != self->line_counts) {
-    CHECK(268, SyntaxTreeRoot_write_test_coverage_data(self) )
+    CHECK(270, SyntaxTreeRoot_write_test_coverage_data(self) )
   }
   
-  CHECK(270, write_global(&(String){28, 27, "\n\n/* types methods body */\n"}) )
+  CHECK(272, write_global(&(String){28, 27, "\n\n/* types methods body */\n"}) )
   TypeMethodsBodyWriter* type_methods_body_writer = &(TypeMethodsBodyWriter){TypeMethodsBodyWriter__dtl};
   type_methods_body_writer->_base._dtl = TypeMethodsBodyWriter__dtl;
-  CHECK(272, SyntaxTreeRoot_write_for_type(self, &(type_methods_body_writer->_base)) )
+  CHECK(274, SyntaxTreeRoot_write_for_type(self, &(type_methods_body_writer->_base)) )
   
   /* will write global functions bodies */
-  CHECK(275, write_global(&(String){31, 30, "\n\n/* global functions body */\n"}) )
-  CHECK(276, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base.functions) )
+  CHECK(277, write_global(&(String){31, 30, "\n\n/* global functions body */\n"}) )
+  CHECK(278, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base.functions) )
   
   /* write main function */
   if (NULL != glob->tested_module ||  NULL !=  self->main_function) {
     if (!glob->is_new_mocked) {
-      CHECK(281, write(&(String){61, 60, "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }"}) )
+      CHECK(283, write(&(String){61, 60, "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }"}) )
     }
     if (!glob->is_delete_mocked) {
-      CHECK(284, write(&(String){50, 49, "\n\nReturncode delete_Mock(Ref self) { return OK; }"}) )
+      CHECK(286, write(&(String){50, 49, "\n\nReturncode delete_Mock(Ref self) { return OK; }"}) )
     }
   }
   if (NULL != glob->tested_module) {
-    CHECK(286, SyntaxTreeRoot_write_test_main(self) )
+    CHECK(288, SyntaxTreeRoot_write_test_main(self) )
   }
   else {
     if (NULL != self->main_function) {
-      CHECK(288, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
-      CHECK(289, (self->main_function)->_base._base._base._base._dtl[4](self->main_function) )
+      CHECK(290, write_global(&(String){23, 22, "\n\n/* main function */\n"}) )
+      CHECK(291, (self->main_function)->_base._base._base._base._dtl[4](self->main_function) )
     }
   }
   
-  CHECK(291, file_close(glob->output_file) )
+  CHECK(293, file_close(glob->output_file) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -543,7 +548,7 @@ Returncode SyntaxTreeRoot_write_for_type(SyntaxTreeRoot* self, TypeWriter* type_
   ListNode* child = self->_base.types->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(297, (((TypeData*)(child->item)))->_base._base._base._dtl[12](((TypeData*)(child->item)), type_writer) )
+    CHECK(299, (((TypeData*)(child->item)))->_base._base._base._dtl[12](((TypeData*)(child->item)), type_writer) )
     child = child->next;
   }
   return OK;
@@ -557,57 +562,57 @@ static char* _func_name_SyntaxTreeRoot_write_test_coverage_data = "SyntaxTreeRoo
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeRoot_write_test_coverage_data
 Returncode SyntaxTreeRoot_write_test_coverage_data(SyntaxTreeRoot* self) {
   {int n; for (n = (0); n < (self->line_counts->length); ++n) {
-    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(302)
+    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(304)
     LineCount* line_count = (&(((LineCount*)((self->line_counts)->values))[n]));
     if (line_count->needs_cover) {
-      CHECK(304, write(&(String){15, 14, "\nint LUMI_file"}) )
-      CHECK(305, write_int(line_count->covered_index) )
-      CHECK(306, write(&(String){13, 12, "_line_count["}) )
-      CHECK(307, write_int(line_count->line_needs_cover->length) )
-      CHECK(308, write(&(String){9, 8, "] = {\n  "}) )
+      CHECK(306, write(&(String){15, 14, "\nint LUMI_file"}) )
+      CHECK(307, write_int(line_count->covered_index) )
+      CHECK(308, write(&(String){13, 12, "_line_count["}) )
+      CHECK(309, write_int(line_count->line_needs_cover->length) )
+      CHECK(310, write(&(String){9, 8, "] = {\n  "}) )
       Int mod = 0;
       {int i; for (i = (0); i < (line_count->line_needs_cover->length); ++i) {
         if (i > 0) {
-          CHECK(312, write(&(String){2, 1, ","}) )
+          CHECK(314, write(&(String){2, 1, ","}) )
         }
         if (mod == 25) {
-          CHECK(314, write(&(String){4, 3, "\n  "}) )
+          CHECK(316, write(&(String){4, 3, "\n  "}) )
           mod = 1;
         }
         else {
           mod += 1;
         }
-        if ((i) < 0 || (i) >= (line_count->line_needs_cover)->length) RAISE(318)
+        if ((i) < 0 || (i) >= (line_count->line_needs_cover)->length) RAISE(320)
         if ((((Bool*)((line_count->line_needs_cover)->values))[i])) {
-          CHECK(319, write(&(String){3, 2, " 0"}) )
+          CHECK(321, write(&(String){3, 2, " 0"}) )
         }
         else {
-          CHECK(321, write(&(String){3, 2, "-1"}) )
+          CHECK(323, write(&(String){3, 2, "-1"}) )
         }
       }}
-      CHECK(322, write(&(String){4, 3, "\n};"}) )
+      CHECK(324, write(&(String){4, 3, "\n};"}) )
     }
   }}
-  CHECK(323, write(&(String){35, 34, "\nFile_Coverage LUMI_file_coverage["}) )
-  CHECK(324, write_int(self->covered_files) )
-  CHECK(325, write(&(String){6, 5, "] = {"}) )
+  CHECK(325, write(&(String){35, 34, "\nFile_Coverage LUMI_file_coverage["}) )
+  CHECK(326, write_int(self->covered_files) )
+  CHECK(327, write(&(String){6, 5, "] = {"}) )
   {int n; for (n = (0); n < (self->line_counts->length); ++n) {
-    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(327)
+    if ((n) < 0 || (n) >= (self->line_counts)->length) RAISE(329)
     LineCount* line_count = (&(((LineCount*)((self->line_counts)->values))[n]));
     if (line_count->needs_cover) {
       if (line_count->covered_index > 0) {
-        CHECK(330, write(&(String){2, 1, ","}) )
+        CHECK(332, write(&(String){2, 1, ","}) )
       }
-      CHECK(331, write(&(String){6, 5, "\n  {\""}) )
-      CHECK(332, write(line_count->filename) )
-      CHECK(333, write(&(String){4, 3, "\", "}) )
-      CHECK(334, write_int(line_count->line_needs_cover->length) )
-      CHECK(335, write(&(String){12, 11, ", LUMI_file"}) )
-      CHECK(336, write_int(line_count->covered_index) )
-      CHECK(337, write(&(String){13, 12, "_line_count}"}) )
+      CHECK(333, write(&(String){6, 5, "\n  {\""}) )
+      CHECK(334, write(line_count->filename) )
+      CHECK(335, write(&(String){4, 3, "\", "}) )
+      CHECK(336, write_int(line_count->line_needs_cover->length) )
+      CHECK(337, write(&(String){12, 11, ", LUMI_file"}) )
+      CHECK(338, write_int(line_count->covered_index) )
+      CHECK(339, write(&(String){13, 12, "_line_count}"}) )
     }
   }}
-  CHECK(338, write(&(String){5, 4, "\n};\n"}) )
+  CHECK(340, write(&(String){5, 4, "\n};\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -618,30 +623,30 @@ Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self);
 static char* _func_name_SyntaxTreeRoot_write_test_main = "SyntaxTreeRoot.write-test-main";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeRoot_write_test_main
 Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self) {
-  CHECK(341, write(&(String){21, 20, "\nUSER_MAIN_HEADER {\n"}) )
-  CHECK(342, write(&(String){29, 28, "  Returncode LUMI_err = OK;\n"}) )
-  CHECK(343, write(&(String){29, 28, "  Bool LUMI_success = true;\n"}) )
-  CHECK(344, (self->global_init)->_base._base._base._base._dtl[4](self->global_init) )
-  CHECK(345, write(&(String){2, 1, "\n"}) )
+  CHECK(343, write(&(String){21, 20, "\nUSER_MAIN_HEADER {\n"}) )
+  CHECK(344, write(&(String){29, 28, "  Returncode LUMI_err = OK;\n"}) )
+  CHECK(345, write(&(String){29, 28, "  Bool LUMI_success = true;\n"}) )
+  CHECK(346, (self->global_init)->_base._base._base._base._dtl[4](self->global_init) )
+  CHECK(347, write(&(String){2, 1, "\n"}) )
   NameMapNode* node = glob->test_functions->first;
   while (true) {
     /* LUMI_success &= LUMI_run_test("`test-func.name`", `test-func`); */
-    CHECK(349, write(&(String){34, 33, "  LUMI_success &= LUMI_run_test(\""}) )
-    CHECK(350, write(((SyntaxTreeTestFunction*)(node->value))->_base.name) )
-    CHECK(351, write(&(String){4, 3, "\", "}) )
-    CHECK(352, SyntaxTreeFunction_write_cname(&(((SyntaxTreeTestFunction*)(node->value))->_base)) )
-    CHECK(353, write(&(String){4, 3, ");\n"}) )
+    CHECK(351, write(&(String){34, 33, "  LUMI_success &= LUMI_run_test(\""}) )
+    CHECK(352, write(((SyntaxTreeTestFunction*)(node->value))->_base.name) )
+    CHECK(353, write(&(String){4, 3, "\", "}) )
+    CHECK(354, SyntaxTreeFunction_write_cname(&(((SyntaxTreeTestFunction*)(node->value))->_base)) )
+    CHECK(355, write(&(String){4, 3, ");\n"}) )
     node = node->next;
     if (!(NULL != node)) break;
   }
   if (NULL != self->line_counts) {
-    CHECK(357, write(&(String){58, 57, "  LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, "}) )
-    CHECK(358, write_int(self->covered_files) )
-    CHECK(359, write(&(String){4, 3, ");\n"}) )
+    CHECK(359, write(&(String){58, 57, "  LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, "}) )
+    CHECK(360, write_int(self->covered_files) )
+    CHECK(361, write(&(String){4, 3, ");\n"}) )
   }
-  CHECK(360, write(&(String){41, 40, "  return LUMI_success? LUMI_err : FAIL;\n"}) )
-  CHECK(361, write(&(String){3, 2, "}\n"}) )
-  CHECK(362, write(&(String){17, 16, "\nTEST_MAIN_FUNC\n"}) )
+  CHECK(362, write(&(String){41, 40, "  return LUMI_success? LUMI_err : FAIL;\n"}) )
+  CHECK(363, write(&(String){3, 2, "}\n"}) )
+  CHECK(364, write(&(String){17, 16, "\nTEST_MAIN_FUNC\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -671,21 +676,21 @@ Returncode ModuleMembers_init(ModuleMembers* self, String* name);
 static char* _func_name_ModuleMembers_init = "ModuleMembers.init";
 #define LUMI_FUNC_NAME _func_name_ModuleMembers_init
 Returncode ModuleMembers_init(ModuleMembers* self, String* name) {
-  CHECK(373, string_new_copy(name, &(self->name)) )
+  CHECK(375, string_new_copy(name, &(self->name)) )
   self->type_map = malloc(sizeof(NameMap));
-  if (self->type_map == NULL) RAISE(374)
+  if (self->type_map == NULL) RAISE(376)
   *self->type_map = (NameMap){NULL, NULL};
   self->enum_map = malloc(sizeof(NameMap));
-  if (self->enum_map == NULL) RAISE(375)
+  if (self->enum_map == NULL) RAISE(377)
   *self->enum_map = (NameMap){NULL, NULL};
   self->variable_map = malloc(sizeof(NameMap));
-  if (self->variable_map == NULL) RAISE(376)
+  if (self->variable_map == NULL) RAISE(378)
   *self->variable_map = (NameMap){NULL, NULL};
   self->function_map = malloc(sizeof(NameMap));
-  if (self->function_map == NULL) RAISE(377)
+  if (self->function_map == NULL) RAISE(379)
   *self->function_map = (NameMap){NULL, NULL};
   if (NULL != self->name) {
-    CHECK(379, NameMap_add(glob->module_map, self->name, self) )
+    CHECK(381, NameMap_add(glob->module_map, self->name, self) )
   }
   return OK;
 }
@@ -697,8 +702,8 @@ Returncode ModuleMembers_write_prefix(ModuleMembers* self);
 static char* _func_name_ModuleMembers_write_prefix = "ModuleMembers.write-prefix";
 #define LUMI_FUNC_NAME _func_name_ModuleMembers_write_prefix
 Returncode ModuleMembers_write_prefix(ModuleMembers* self) {
-  CHECK(382, write_cname(self->name) )
-  CHECK(383, write(&(String){4, 3, "_M_"}) )
+  CHECK(384, write_cname(self->name) )
+  CHECK(385, write(&(String){4, 3, "_M_"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -720,10 +725,10 @@ static char* _func_name_SyntaxTreeMainFunction_parse_new = "SyntaxTreeMainFuncti
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse_new
 Returncode SyntaxTreeMainFunction_parse_new(SyntaxTreeMainFunction* self, Char* end, SyntaxTreeMainFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMainFunction));
-  if ((*new_node) == NULL) RAISE(389)
+  if ((*new_node) == NULL) RAISE(391)
   *(*new_node) = (SyntaxTreeMainFunction){SyntaxTreeMainFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMainFunction__dtl;
-  CHECK(390, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
+  CHECK(392, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -734,15 +739,15 @@ Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end)
 static char* _func_name_SyntaxTreeMainFunction_parse = "SyntaxTreeMainFunction.parse";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeMainFunction_parse
 Returncode SyntaxTreeMainFunction_parse(SyntaxTreeMainFunction* self, Char* end) {
-  CHECK(393, SyntaxTreeFunction_init(&(self->_base)) )
+  CHECK(395, SyntaxTreeFunction_init(&(self->_base)) )
   self->_base.my_module = glob->current_module;
-  CHECK(395, string_new_copy(&(String){5, 4, "main"}, &(self->_base.name)) )
+  CHECK(397, string_new_copy(&(String){5, 4, "main"}, &(self->_base.name)) )
   self->_base.arguments = malloc(sizeof(FunctionArguments));
-  if (self->_base.arguments == NULL) RAISE(396)
+  if (self->_base.arguments == NULL) RAISE(398)
   *self->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   self->_base.arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(397, FunctionArguments_init(self->_base.arguments) )
-  CHECK(398, SyntaxTreeFunction_parse_body(&(self->_base), &((*end))) )
+  CHECK(399, FunctionArguments_init(self->_base.arguments) )
+  CHECK(400, SyntaxTreeFunction_parse_body(&(self->_base), &((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -757,10 +762,10 @@ Returncode SyntaxTreeMainFunction_write(SyntaxTreeMainFunction* self) {
   /*   `block...` */
   /* } */
   /* MAIN_FUNC */
-  CHECK(405, write(&(String){18, 17, "\nUSER_MAIN_HEADER"}) )
-  CHECK(406, SyntaxTreeFunction_write_block(&(self->_base)) )
-  CHECK(407, write_post_func() )
-  CHECK(408, write(&(String){12, 11, "\nMAIN_FUNC\n"}) )
+  CHECK(407, write(&(String){18, 17, "\nUSER_MAIN_HEADER"}) )
+  CHECK(408, SyntaxTreeFunction_write_block(&(self->_base)) )
+  CHECK(409, write_post_func() )
+  CHECK(410, write(&(String){12, 11, "\nMAIN_FUNC\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -771,10 +776,10 @@ Returncode SyntaxTreeMainFunction_write_block_body(SyntaxTreeMainFunction* self)
 static char* _func_name_SyntaxTreeMainFunction_write_block_body = "SyntaxTreeMainFunction.write-block-body";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeMainFunction_write_block_body
 Returncode SyntaxTreeMainFunction_write_block_body(SyntaxTreeMainFunction* self) {
-  CHECK(411, (glob->root->global_init)->_base._base._base._base._dtl[4](glob->root->global_init) )
-  CHECK(412, write_pre_func(&(self->_base)) )
-  CHECK(413, write(&(String){2, 1, "\n"}) )
-  CHECK(414, SyntaxTreeBlock_write_block_body(&(self->_base._base)) )
+  CHECK(413, (glob->root->global_init)->_base._base._base._base._dtl[4](glob->root->global_init) )
+  CHECK(414, write_pre_func(&(self->_base)) )
+  CHECK(415, write(&(String){2, 1, "\n"}) )
+  CHECK(416, SyntaxTreeBlock_write_block_body(&(self->_base._base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -800,18 +805,18 @@ Returncode GlobalInit_init(GlobalInit* self);
 static char* _func_name_GlobalInit_init = "GlobalInit.init";
 #define LUMI_FUNC_NAME _func_name_GlobalInit_init
 Returncode GlobalInit_init(GlobalInit* self) {
-  CHECK(419, SyntaxTreeFunction_init(&(self->_base)) )
+  CHECK(421, SyntaxTreeFunction_init(&(self->_base)) )
   self->_base._base.code_nodes = malloc(sizeof(List));
-  if (self->_base._base.code_nodes == NULL) RAISE(420)
+  if (self->_base._base.code_nodes == NULL) RAISE(422)
   *self->_base._base.code_nodes = (List){NULL, NULL};
   self->_base._base._base.variables = malloc(sizeof(List));
-  if (self->_base._base._base.variables == NULL) RAISE(421)
+  if (self->_base._base._base.variables == NULL) RAISE(423)
   *self->_base._base._base.variables = (List){NULL, NULL};
   self->_base.arguments = malloc(sizeof(FunctionArguments));
-  if (self->_base.arguments == NULL) RAISE(422)
+  if (self->_base.arguments == NULL) RAISE(424)
   *self->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   self->_base.arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(423, FunctionArguments_init(self->_base.arguments) )
+  CHECK(425, FunctionArguments_init(self->_base.arguments) )
   self->_base._base._base.indentation_spaces = 2;
   return OK;
 }
@@ -826,14 +831,14 @@ Returncode GlobalInit_write(GlobalInit* self) {
   if (!(NULL != self->_base._base.code_nodes->first)) {
     return OK;
   }
-  CHECK(429, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
-  CHECK(430, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
-  CHECK(431, write(&(String){39, 38, "#define RETURN_ERROR return LUMI_err;\n"}) )
-  CHECK(432, write(&(String){57, 56, "#define LUMI_FUNC_NAME \"global variable initialization\"\n"}) )
-  CHECK(433, (self)->_base._base._base._base._dtl[9](self) )
-  CHECK(434, write(&(String){23, 22, "#undef LUMI_FUNC_NAME\n"}) )
-  CHECK(435, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
-  CHECK(436, write(&(String){39, 38, "#define RETURN_ERROR goto LUMI_cleanup"}) )
+  CHECK(431, SyntaxTreeNode_write_children(&(self->_base._base._base._base), self->_base._base._base.variables) )
+  CHECK(432, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
+  CHECK(433, write(&(String){39, 38, "#define RETURN_ERROR return LUMI_err;\n"}) )
+  CHECK(434, write(&(String){57, 56, "#define LUMI_FUNC_NAME \"global variable initialization\"\n"}) )
+  CHECK(435, (self)->_base._base._base._base._dtl[9](self) )
+  CHECK(436, write(&(String){23, 22, "#undef LUMI_FUNC_NAME\n"}) )
+  CHECK(437, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
+  CHECK(438, write(&(String){39, 38, "#define RETURN_ERROR goto LUMI_cleanup"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -864,7 +869,7 @@ static char* _func_name_LineCount_init = "LineCount.init";
 Returncode LineCount_init(LineCount* self) {
   self->filename = glob->input_file_name;
   self->line_needs_cover = _new_array(glob->line_number + 1, sizeof(Bool));
-  if (self->line_needs_cover == NULL) RAISE(447)
+  if (self->line_needs_cover == NULL) RAISE(449)
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -878,7 +883,7 @@ Returncode write_global(String* text);
 static char* _func_name_write_global = "write-global";
 #define LUMI_FUNC_NAME _func_name_write_global
 Returncode write_global(String* text) {
-  CHECK(452, write(text) )
+  CHECK(454, write(text) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

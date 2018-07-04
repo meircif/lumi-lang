@@ -242,9 +242,9 @@ constructor already defined for type "Error"
 /// @ te13
 constructor with outputs
 /// @ te14
-recursive inheritance in type "Error"
+recursive declaration of type "Error", extended by type "Error"
 /// @ te15
-recursive inheritance in type "Aerror"
+recursive declaration of type "Aerror", extended by type "Berror", extended by type "Aerror"
 /// @@ test-class
 /// @ t0
 typedef struct ut_M_Base ut_M_Base;
@@ -1394,11 +1394,11 @@ Char ch = 0;
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_String_0 = ut_M_str;
-  if (aux_String_0 == NULL) RAISE(0, 17, "empty object used")
-  if (aux_String_0_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+  if (aux_String_0 == NULL) RAISE(1, 17, "empty object used")
+  if (aux_String_0_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   {int ch_Index; for (ch_Index = 0; ch_Index < aux_String_0->length; ++ch_Index) {
-    if (aux_String_0 == NULL) RAISE(0, 17, "empty object used")
-    if (aux_String_0_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+    if (aux_String_0 == NULL) RAISE(1, 17, "empty object used")
+    if (aux_String_0_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
     if ((ch_Index) < 0 || (ch_Index) >= (aux_String_0)->length) RAISE(1, 25, "slice index out of bounds")
     ch = ((aux_String_0)->values)[ch_Index];
     ut_M_c = ch;
@@ -1420,11 +1420,11 @@ Int n = 0;
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_Array_0 = ut_M_arr;
-  if (aux_Array_0 == NULL) RAISE(0, 17, "empty object used")
-  if (aux_Array_0_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+  if (aux_Array_0 == NULL) RAISE(1, 17, "empty object used")
+  if (aux_Array_0_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   {int n_Index; for (n_Index = 0; n_Index < aux_Array_0->length; ++n_Index) {
-    if (aux_Array_0 == NULL) RAISE(0, 17, "empty object used")
-    if (aux_Array_0_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+    if (aux_Array_0 == NULL) RAISE(1, 17, "empty object used")
+    if (aux_Array_0_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
     if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(1, 25, "slice index out of bounds")
     n = ((Int*)((aux_Array_0)->values))[n_Index];
     ut_M_i += n;
@@ -1447,11 +1447,11 @@ String* s = NULL;
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_Array_0 = ut_M_sarr;
-  if (aux_Array_0 == NULL) RAISE(0, 17, "empty object used")
-  if (aux_Array_0_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+  if (aux_Array_0 == NULL) RAISE(1, 17, "empty object used")
+  if (aux_Array_0_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
   {int s_Index; for (s_Index = 0; s_Index < aux_Array_0->length; ++s_Index) {
-    if (aux_Array_0 == NULL) RAISE(0, 17, "empty object used")
-    if (aux_Array_0_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+    if (aux_Array_0 == NULL) RAISE(1, 17, "empty object used")
+    if (aux_Array_0_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
     if ((s_Index) < 0 || (s_Index) >= (aux_Array_0)->length) RAISE(1, 25, "slice index out of bounds")
     aux_Ref_Manager = s_Refman;
     s_Refman = aux_Array_0_Refman;
@@ -3983,7 +3983,7 @@ Returncode ut_M_f_mock(Int* i) {
   aux_TestIterator_0_Refman = LUMI_new_ref(aux_TestIterator_0);
   if (aux_TestIterator_0_Refman == NULL) RAISE(8, 38, "insufficient memory for managed object")
   LUMI_err = ut_M_TestIterator_new(aux_TestIterator_0, aux_TestIterator_0_Refman, 6);
-  CHECK(0)
+  CHECK(8)
   aux_Ref_Manager = aux_TestIterator_1_Refman;
   aux_TestIterator_1_Refman = aux_TestIterator_0_Refman;
   LUMI_inc_ref(aux_TestIterator_1_Refman);
@@ -4295,11 +4295,11 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_T
   aux_TestIterator_0 = iter;
   while (true) {
     Bool t_Has = false;
-    if (aux_TestIterator_0_Dynamic == NULL) RAISE(0, 28, "dynamic call of empty object")
+    if (aux_TestIterator_0_Dynamic == NULL) RAISE(7, 28, "dynamic call of empty object")
     LUMI_err = aux_TestIterator_0_Dynamic->has(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic, &(t_Has));
     CHECK(7)
     if (!t_Has) break;
-    if (aux_TestIterator_0_Dynamic == NULL) RAISE(0, 28, "dynamic call of empty object")
+    if (aux_TestIterator_0_Dynamic == NULL) RAISE(7, 28, "dynamic call of empty object")
     LUMI_err = aux_TestIterator_0_Dynamic->get(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic, (void*)&(t), &(t_Refman), &dynamic_Void);
     CHECK(7)
     aux_Ref_Manager = *s_Refman;
@@ -4308,7 +4308,7 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_T
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
     *s = t;
-    if (aux_TestIterator_0_Dynamic == NULL) RAISE(0, 28, "dynamic call of empty object")
+    if (aux_TestIterator_0_Dynamic == NULL) RAISE(8, 28, "dynamic call of empty object")
     LUMI_err = aux_TestIterator_0_Dynamic->next(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic);
     CHECK(7)
   }
@@ -4353,82 +4353,105 @@ iterator "next" method has parameters in type "TestIterator"
 iterator "next" method has outputs in type "TestIterator"
 /// @@ test-complex-fields
 /// @ t0
-typedef struct ut_M_Base ut_M_Base;
-typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
+typedef struct ut_M_Astruct ut_M_Astruct;
+typedef struct ut_M_Astruct_Dynamic ut_M_Astruct_Dynamic;
+typedef struct ut_M_Bstruct ut_M_Bstruct;
+typedef struct ut_M_Bstruct_Dynamic ut_M_Bstruct_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
-struct ut_M_Base {
-  ut_M_Base* b;
-  Ref_Manager* b_Refman;
-  ut_M_Base_Dynamic* b_Dynamic;
+struct ut_M_Astruct {
+  Int x;
 };
-struct ut_M_Base_Dynamic {
+struct ut_M_Astruct_Dynamic {
   Dynamic_Del _del;
-  Returncode (*meth)(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic);
+  Returncode (*meth)(ut_M_Astruct* self, Ref_Manager* self_Refman, ut_M_Astruct_Dynamic* self_Dynamic);
+};
+struct ut_M_Bstruct {
+  ut_M_Astruct _base;
+  ut_M_Bstruct* b;
+  Ref_Manager* b_Refman;
+  ut_M_Bstruct_Dynamic* b_Dynamic;
+};
+struct ut_M_Bstruct_Dynamic {
+  ut_M_Astruct_Dynamic _base;
 };
 struct ut_M_Test {
-  ut_M_Base b;
+  ut_M_Bstruct b;
 };
-Returncode ut_M_Base_meth(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic);
-void ut_M_Base_Del(ut_M_Base* self);
+Returncode ut_M_Astruct_meth(ut_M_Astruct* self, Ref_Manager* self_Refman, ut_M_Astruct_Dynamic* self_Dynamic);
+void ut_M_Astruct_Del(ut_M_Astruct* self);
+Returncode ut_M_Bstruct_meth(ut_M_Bstruct* self, Ref_Manager* self_Refman, ut_M_Bstruct_Dynamic* self_Dynamic);
+void ut_M_Bstruct_Del(ut_M_Bstruct* self);
 Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman);
 void ut_M_Test_Del(ut_M_Test* self);
-ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_meth};
+ut_M_Astruct_Dynamic ut_M_Astruct_dynamic = {(Dynamic_Del)ut_M_Astruct_Del, ut_M_Astruct_meth};
+ut_M_Bstruct_Dynamic ut_M_Bstruct_dynamic = {{(Dynamic_Del)ut_M_Bstruct_Del, (Func)ut_M_Bstruct_meth}};
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-Returncode ut_M_Base_meth(ut_M_Base* self, Ref_Manager* self_Refman, ut_M_Base_Dynamic* self_Dynamic) {
+Returncode ut_M_Astruct_meth(ut_M_Astruct* self, Ref_Manager* self_Refman, ut_M_Astruct_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Astruct_Del(ut_M_Astruct* self) {
   if (self == NULL) return;
+}
+Returncode ut_M_Bstruct_meth(ut_M_Bstruct* self, Ref_Manager* self_Refman, ut_M_Bstruct_Dynamic* self_Dynamic) {
+  Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+void ut_M_Bstruct_Del(ut_M_Bstruct* self) {
+  if (self == NULL) return;
+  ut_M_Astruct_Del(&(self->_base));
   LUMI_dec_ref(self->b_Refman);
 }
 Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
-  ut_M_Base* b = NULL;
+  ut_M_Bstruct* b = NULL;
   Ref_Manager* b_Refman = NULL;
-  ut_M_Base_Dynamic* b_Dynamic = NULL;
-  ut_M_Base* b2 = NULL;
+  ut_M_Bstruct_Dynamic* b_Dynamic = NULL;
+  ut_M_Bstruct* b2 = NULL;
   Ref_Manager* b2_Refman = NULL;
-  ut_M_Base_Dynamic* b2_Dynamic = NULL;
-  ut_M_Test t_Var = {{0}};
+  ut_M_Bstruct_Dynamic* b2_Dynamic = NULL;
+  ut_M_Test t_Var = {{{0}}};
   ut_M_Test* t = NULL;
   Ref_Manager* t_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
-  if (self == NULL) RAISE(7, 17, "empty object used")
-  if (self_Refman->value == NULL) RAISE(7, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(4, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(4, 28, "outdated weak reference used")
   b = &(self->b);
   b_Refman = self_Refman;
   LUMI_inc_ref(b_Refman);
-  b_Dynamic = &ut_M_Base_dynamic;
-  if (self == NULL) RAISE(8, 17, "empty object used")
-  if (self_Refman->value == NULL) RAISE(8, 28, "outdated weak reference used")
+  b_Dynamic = &ut_M_Bstruct_dynamic;
+  if (self == NULL) RAISE(5, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(5, 28, "outdated weak reference used")
   aux_Ref_Manager = b_Refman;
   b_Refman = self_Refman;
-  b_Dynamic = &ut_M_Base_dynamic;
+  b_Dynamic = &ut_M_Bstruct_dynamic;
   LUMI_inc_ref(b_Refman);
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   b = &(self->b);
-  if (self == NULL) RAISE(9, 17, "empty object used")
-  if (self_Refman->value == NULL) RAISE(9, 28, "outdated weak reference used")
-  LUMI_err = ut_M_Base_meth(&(self->b), self_Refman, &ut_M_Base_dynamic);
-  CHECK(9)
-  if (self == NULL) RAISE(10, 17, "empty object used")
-  if (self_Refman->value == NULL) RAISE(10, 28, "outdated weak reference used")
-  LUMI_err = ut_M_Base_meth(&(self->b), self_Refman, &ut_M_Base_dynamic);
-  CHECK(10)
-  if (self == NULL) RAISE(11, 17, "empty object used")
-  if (self_Refman->value == NULL) RAISE(11, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(6, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(6, 28, "outdated weak reference used")
+  LUMI_err = ut_M_Bstruct_meth(&(self->b), self_Refman, &ut_M_Bstruct_dynamic);
+  CHECK(6)
+  if (self == NULL) RAISE(7, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(7, 28, "outdated weak reference used")
+  LUMI_err = ut_M_Bstruct_meth(&(self->b), self_Refman, &ut_M_Bstruct_dynamic);
+  CHECK(7)
+  if (self == NULL) RAISE(8, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(8, 28, "outdated weak reference used")
   b2 = self->b.b;
   b2_Refman = self->b.b_Refman;
   LUMI_inc_ref(b2_Refman);
   b2_Dynamic = self->b.b_Dynamic;
-  if (self == NULL) RAISE(12, 17, "empty object used")
-  if (self_Refman->value == NULL) RAISE(12, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(9, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(9, 28, "outdated weak reference used")
   aux_Ref_Manager = b2_Refman;
   b2_Refman = self->b.b_Refman;
   b2_Dynamic = self->b.b_Dynamic;
@@ -4436,18 +4459,40 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   b2 = self->b.b;
-  if (self == NULL) RAISE(13, 17, "empty object used")
-  if (self_Refman->value == NULL) RAISE(13, 28, "outdated weak reference used")
-  if (self->b.b_Dynamic == NULL) RAISE(13, 28, "dynamic call of empty object")
-  LUMI_err = self->b.b_Dynamic->meth(self->b.b, self->b.b_Refman, self->b.b_Dynamic);
-  CHECK(13)
-  if (self == NULL) RAISE(14, 17, "empty object used")
-  if (self_Refman->value == NULL) RAISE(14, 28, "outdated weak reference used")
-  LUMI_err = ut_M_Base_meth(self->b.b, self->b.b_Refman, self->b.b_Dynamic);
-  CHECK(14)
+  if (self == NULL) RAISE(10, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(10, 28, "outdated weak reference used")
+  if (self->b.b_Dynamic == NULL) RAISE(10, 28, "dynamic call of empty object")
+  LUMI_err = self->b.b_Dynamic->_base.meth(&(self->b.b->_base), self->b.b_Refman, &(self->b.b_Dynamic->_base));
+  CHECK(10)
+  if (self == NULL) RAISE(11, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(11, 28, "outdated weak reference used")
+  aux_Ref_Manager = self->b.b_Refman;
+  self->b.b_Refman = b_Refman;
+  self->b.b_Dynamic = b_Dynamic;
+  LUMI_inc_ref(self->b.b_Refman);
+  LUMI_dec_ref(aux_Ref_Manager);
+  aux_Ref_Manager = NULL;
+  self->b.b = b;
+  if (self == NULL) RAISE(12, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(12, 28, "outdated weak reference used")
+  LUMI_err = ut_M_Bstruct_meth(self->b.b, self->b.b_Refman, self->b.b_Dynamic);
+  CHECK(12)
   t = &t_Var;
   t_Refman = LUMI_new_ref(t);
-  if (t_Refman == NULL) RAISE(15, 38, "insufficient memory for managed object")
+  if (t_Refman == NULL) RAISE(13, 38, "insufficient memory for managed object")
+  if (self == NULL) RAISE(14, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(14, 28, "outdated weak reference used")
+  self->b._base.x = 5;
+  if (self == NULL) RAISE(15, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(15, 28, "outdated weak reference used")
+  LUMI_err = ut_M_Astruct_meth(&(self->b._base), self_Refman, &(ut_M_Bstruct_dynamic._base));
+  CHECK(15)
+  if (self == NULL) RAISE(16, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(16, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(16, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(16, 28, "outdated weak reference used")
+  if (((void*)&(self->b) == b) || ((void*)b2 != &(self->b))) {
+    }
 LUMI_cleanup:
   LUMI_dec_ref(t_Refman);
   LUMI_dec_ref(b2_Refman);
@@ -4457,16 +4502,20 @@ LUMI_cleanup:
 }
 void ut_M_Test_Del(ut_M_Test* self) {
   if (self == NULL) return;
-  ut_M_Base_Del(&(self->b));
+  ut_M_Bstruct_Del(&(self->b));
 }
 /// @ te0
 cannot declared "var" field of sequence type "String"
 /// @ te1
 cannot declared "var" field of sequence type "Array"
 /// @ te2
-variable will cause recursive declaration of type "Test"
+recursive declaration of type "Test", variable of type "Test"
 /// @ te3
-variable will cause recursive declaration of type "Test"
+recursive declaration of type "Test", variable of type "Base", variable of type "Test"
+/// @ te4
+recursive declaration of type "Abase", extended by type "Aerror", variable of type "Bbase", extended by type "Berror", variable of type "Abase"
+/// @ te5
+assigning into non assignable expression
 /// @@ test-enum
 /// @ t0
 enum {

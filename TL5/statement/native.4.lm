@@ -31,11 +31,8 @@ class NativeFunction(SyntaxTreeFunction)
     new-node.parse()->(var end)
   
   func inst parse()->(var Char end)
-    self.set-location()
     self.outer-module := glob.current-module
     self.parse-header(copy true)->(var end)
-    self.code-nodes := List{SyntaxTreeCode}()
-    self.variables := List{SyntaxTreeVariable}()
     glob.global-module.function-map.add(user self.name, user self)
   
   func dynamic link-types()
@@ -55,10 +52,9 @@ class NativeFunction(SyntaxTreeFunction)
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeVariable(SyntaxTreeVariable)
   func inst parse-new()->(var Char end, owner NativeVariable new-node)
-    new-node := NativeVariable()
+    new-node := NativeVariable(user _)
     new-node.parse(
-        copy Access.VAR, copy false, user _, user _, user glob.global-module)->(
-        var end)
+        copy Access.VAR, copy false, user _, user glob.global-module)->(var end)
     new-node.is-native := true
     new-node.my-module := _
   
@@ -84,7 +80,6 @@ class NativeType(TypeData)
     self.is-primitive := true
     read-new(user "")->(owner self.name, var end)
     self.add-type(user glob.global-module)
-    self.init()
   
   func dynamic analyze()
     ; do nothing

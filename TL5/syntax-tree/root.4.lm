@@ -4,30 +4,25 @@ module tl5-compiler
 class GlobalNodes(SyntaxTreeNamespace)
   owner List{TypeData} types
   
-  func inst init()
-    base()
+  new()
     self.types := List{TypeData}()
 
 
 ~~~ The syntax tree root ~~~
 class SyntaxTreeRoot(GlobalNodes)
-  owner List{EnumData} enums
-  owner NameMap{SyntaxTreeConstant} constants
-  owner List{ModuleMembers} modules
+  var List{EnumData} enums
+  var NameMap{SyntaxTreeConstant} constants
+  var List{ModuleMembers} modules
   user String output-file-name
   owner SyntaxTreeMainFunction main-function
-  owner GlobalInit global-init
+  var GlobalInit global-init
   owner Array{LineCount} line-counts
   var Int covered-files
   var Bool is-library
   
-  func inst init()
+  new()
     base()
-    self.enums := List{EnumData}()
-    self.constants := NameMap{SyntaxTreeConstant}()
-    self.modules := List{ModuleMembers}()
-    self.global-init := GlobalInit()
-    self.global-init.init()
+    self.global-init.new()
   
   func inst parse()
     var Int first-file-index
@@ -71,7 +66,7 @@ class SyntaxTreeRoot(GlobalNodes)
         
         file-close(owner glob.input-file)
         if self.line-counts?
-          self.line-counts[glob.input-file-index].init()
+          self.line-counts[glob.input-file-index].build-values()
     
     glob.current-module := _
     self.line-number := 0
@@ -97,8 +92,7 @@ class SyntaxTreeRoot(GlobalNodes)
         if glob.global-module.function-map.find(user name)?
           self.syntax-error(user "module name overrides function", user name)
         if not glob.module-map.find(user name)->(user glob.current-module)?
-          new ModuleMembers module-members
-          module-members.init(user name)
+          new ModuleMembers module-members(user name)
           glob.current-module := module-members
           self.modules.add(owner module-members)
         is-parsed := true
@@ -196,7 +190,9 @@ class SyntaxTreeRoot(GlobalNodes)
     new List{TypeData} ordered-list
     do
       while self.types.first?
-      self.types.first.item.order-bases(user ordered-list)
+      if self.types.first.item.order-bases(user ordered-list)
+        sys.print(user "\n")
+        raise
     self.types := ordered-list
   
   func inst analyze-cover()
@@ -359,17 +355,13 @@ class SyntaxTreeRoot(GlobalNodes)
 
 struct ModuleMembers
   owner String name
-  owner NameMap{TypeData} type-map
-  owner NameMap{EnumData} enum-map
-  owner NameMap{SyntaxTreeVariable} variable-map
-  owner NameMap{SyntaxTreeFunction} function-map
+  var NameMap{TypeData} type-map
+  var NameMap{EnumData} enum-map
+  var NameMap{SyntaxTreeVariable} variable-map
+  var NameMap{SyntaxTreeFunction} function-map
   
-  func init(user String name)
+  func new(user String name)
     string-new-copy(user name)->(owner self.name)
-    self.type-map := NameMap{TypeData}()
-    self.enum-map := NameMap{EnumData}()
-    self.variable-map := NameMap{SyntaxTreeVariable}()
-    self.function-map := NameMap{SyntaxTreeFunction}()
     if self.name?
       glob.module-map.add(user self.name, user self)
   
@@ -385,11 +377,8 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     new-node.parse()->(var end)
   
   func inst parse()->(var Char end)
-    self.init()
     self.my-module := glob.current-module
     string-new-copy(user "main")->(owner self.name)
-    self.arguments := FunctionArguments()
-    self.arguments.init()
     self.parse-body()->(var end)
   
   func dynamic write()
@@ -410,12 +399,7 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
 
 
 class GlobalInit(SyntaxTreeFunction)
-  func inst init()
-    base()
-    self.code-nodes := List{SyntaxTreeCode}()
-    self.variables := List{SyntaxTreeVariable}()
-    self.arguments := FunctionArguments()
-    self.arguments.init()
+  new()
     self.indentation-spaces := 2
   
   func dynamic write()
@@ -437,7 +421,7 @@ struct LineCount
   var Bool needs-cover
   owner Array{Bool} line-needs-cover
   
-  func init()
+  func build-values()
     self.filename := glob.input-file-name
     self.line-needs-cover := Array{glob.line-number + 1:Bool}()
 

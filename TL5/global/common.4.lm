@@ -13,9 +13,7 @@ func string-new-copy(user String text)->(owner String new-text)
 ~~~ Create a new string that is a concatenation of the 2 given strings ~~~
 func string-new-concat(user String first, user String second)->(
     owner String new-text)
-  owner String text
-  new-text := String{first.length + second.length + 1}()
-  new-text.new(user first)
+  new-text := String{first.length + second.length + 1}(user first)
   new-text.concat(user second)
 
 

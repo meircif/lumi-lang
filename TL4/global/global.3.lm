@@ -320,6 +320,7 @@ static Global
     new TypeData in type-data
     string-new-copy(user name):(owner type-data.name)
     type-data.is-primitive := is-primitive
+    type-data.is-ordered := true
     type-data.init()
     self.global-module.type-map.add(user type-data.name, user type-data)
     self.builtins.types.add(owner type-data)

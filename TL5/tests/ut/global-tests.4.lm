@@ -1,6 +1,8 @@
 ~~~ TL5 compiler tests - Global ~~~
 module tl5-compiler-tests
 
+owner tl5-compiler.Global tested-compiler
+
 ; IO mocks
 
 var String{1024} mock-print-text
@@ -84,9 +86,7 @@ mock tl5-compiler.SyntaxTreeFunction.write-post-func()
 var String{16} mock-input-file-name
 
 func setup-test()
-  tl5-compiler.glob.init()
-  tl5-compiler.glob.line-number := 0
-  tl5-compiler.glob.save-input := false
+  tested-compiler := tl5-compiler.Global()
   mock-print-text.clear()
   mock-input-file-text.clear()
   mock-output-file-text.clear()

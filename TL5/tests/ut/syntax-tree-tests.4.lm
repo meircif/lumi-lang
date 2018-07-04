@@ -140,7 +140,7 @@ func test-cover-error(copy Bool has-module, user String expected-error)
   tl5-compiler.string-new-copy(user "error")->(
       owner tl5-compiler.glob.tested-module)
   tl5-compiler.glob.test-functions.add(user _, user _)
-  var tl5-compiler.ModuleMembers dummy-module
+  var tl5-compiler.ModuleMembers dummy-module(user _)
   if has-module
     tl5-compiler.glob.module-map.add(
         user tl5-compiler.glob.tested-module, user dummy-module)

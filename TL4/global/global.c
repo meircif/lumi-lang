@@ -336,9 +336,10 @@ Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive
   (*type_data)->_base._base._base._dtl = TypeData__dtl;
   CHECK(321, string_new_copy(name, &((*type_data)->name)) )
   (*type_data)->is_primitive = is_primitive;
-  CHECK(323, SyntaxTreeNamespace_init(&((*type_data)->_base)) )
-  CHECK(324, NameMap_add(self->global_module->type_map, (*type_data)->name, (*type_data)) )
-  CHECK(325, List_add(self->builtins->types, (*type_data)) )
+  (*type_data)->is_ordered = true;
+  CHECK(324, SyntaxTreeNamespace_init(&((*type_data)->_base)) )
+  CHECK(325, NameMap_add(self->global_module->type_map, (*type_data)->name, (*type_data)) )
+  CHECK(326, List_add(self->builtins->types, (*type_data)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -349,9 +350,9 @@ Returncode Global_add_builtin_global_variable(Global* self, TypeData* variable_t
 static char* _func_name_Global_add_builtin_global_variable = "Global.add-builtin-global-variable";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_global_variable
 Returncode Global_add_builtin_global_variable(Global* self, TypeData* variable_type, String* name) {
-  CHECK(329, Global_add_builtin_variable(self, name, variable_type, NULL, NULL, &(self->builtins->_base._base)) )
+  CHECK(330, Global_add_builtin_variable(self, name, variable_type, NULL, NULL, &(self->builtins->_base._base)) )
   SyntaxTreeVariable* variable = self->builtins->_base._base.variables->last->item;
-  CHECK(332, NameMap_add(self->global_module->variable_map, variable->name, variable) )
+  CHECK(333, NameMap_add(self->global_module->variable_map, variable->name, variable) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -362,7 +363,7 @@ Returncode Global_add_builtin_field(Global* self, TypeData* builtin_type, String
 static char* _func_name_Global_add_builtin_field = "Global.add-builtin-field";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_field
 Returncode Global_add_builtin_field(Global* self, TypeData* builtin_type, String* name, TypeData* field_type, TypeData* field_subtype) {
-  CHECK(339, Global_add_builtin_variable(self, name, field_type, field_subtype, builtin_type, &(builtin_type->_base._base)) )
+  CHECK(340, Global_add_builtin_variable(self, name, field_type, field_subtype, builtin_type, &(builtin_type->_base._base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -374,22 +375,22 @@ static char* _func_name_Global_add_builtin_variable = "Global.add-builtin-variab
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_variable
 Returncode Global_add_builtin_variable(Global* self, String* name, TypeData* variable_type, TypeData* variable_subtype, TypeData* parent_type, SyntaxTreeBranch* branch) {
   SyntaxTreeVariable* variable = malloc(sizeof(SyntaxTreeVariable));
-  if (variable == NULL) RAISE(352)
+  if (variable == NULL) RAISE(353)
   *variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   variable->_base._base._dtl = SyntaxTreeVariable__dtl;
-  CHECK(353, string_new_copy(name, &(variable->name)) )
+  CHECK(354, string_new_copy(name, &(variable->name)) )
   if (variable_type->is_primitive) {
     variable->access = ACCESS_VAR;
   }
   else {
     variable->access = ACCESS_USER;
   }
-  CHECK(358, TypeData_m_new_type_instance(variable_type, &(variable->type_instance)) )
+  CHECK(359, TypeData_m_new_type_instance(variable_type, &(variable->type_instance)) )
   if (NULL != variable_subtype) {
-    CHECK(360, TypeInstance_add_subtype_copy(variable->type_instance, variable_subtype) )
+    CHECK(361, TypeInstance_add_subtype_copy(variable->type_instance, variable_subtype) )
   }
   variable->parent_type = parent_type;
-  CHECK(362, List_add(branch->variables, variable) )
+  CHECK(363, List_add(branch->variables, variable) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -400,9 +401,9 @@ Returncode Global_add_builtin_global_function(Global* self, String* name, Functi
 static char* _func_name_Global_add_builtin_global_function = "Global.add-builtin-global-function";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_global_function
 Returncode Global_add_builtin_global_function(Global* self, String* name, FunctionArguments** arguments) {
-  CHECK(366, Global_add_builtin_function(self, name, NULL, &(glob->builtins->_base), &((*arguments))) )
+  CHECK(367, Global_add_builtin_function(self, name, NULL, &(glob->builtins->_base), &((*arguments))) )
   SyntaxTreeFunction* function = self->builtins->_base.functions->last->item;
-  CHECK(369, NameMap_add(self->global_module->function_map, function->name, function) )
+  CHECK(370, NameMap_add(self->global_module->function_map, function->name, function) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -413,8 +414,8 @@ Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, Strin
 static char* _func_name_Global_add_builtin_method = "Global.add-builtin-method";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_method
 Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, String* name, FunctionArguments** arguments) {
-  CHECK(373, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
-  CHECK(375, Global_add_builtin_parameter(self, (*arguments), ACCESS_USER, builtin_type, &(String){5, 4, "self"}) )
+  CHECK(374, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
+  CHECK(376, Global_add_builtin_parameter(self, (*arguments), ACCESS_USER, builtin_type, &(String){5, 4, "self"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -426,19 +427,19 @@ static char* _func_name_Global_add_builtin_function = "Global.add-builtin-functi
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_function
 Returncode Global_add_builtin_function(Global* self, String* name, TypeData* parent_type, SyntaxTreeNamespace* namespace, FunctionArguments** arguments) {
   SyntaxTreeFunction* function = malloc(sizeof(SyntaxTreeFunction));
-  if (function == NULL) RAISE(383)
+  if (function == NULL) RAISE(384)
   *function = (SyntaxTreeFunction){SyntaxTreeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
   function->_base._base._base._dtl = SyntaxTreeFunction__dtl;
-  CHECK(384, SyntaxTreeFunction_init(function) )
-  CHECK(385, string_new_copy(name, &(function->name)) )
+  CHECK(385, SyntaxTreeFunction_init(function) )
+  CHECK(386, string_new_copy(name, &(function->name)) )
   function->parent_type = parent_type;
   function->arguments = malloc(sizeof(FunctionArguments));
-  if (function->arguments == NULL) RAISE(387)
+  if (function->arguments == NULL) RAISE(388)
   *function->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   function->arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(388, FunctionArguments_init(function->arguments) )
+  CHECK(389, FunctionArguments_init(function->arguments) )
   (*arguments) = function->arguments;
-  CHECK(390, List_add(namespace->functions, function) )
+  CHECK(391, List_add(namespace->functions, function) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -449,7 +450,7 @@ Returncode Global_add_builtin_parameter(Global* self, FunctionArguments* argumen
 static char* _func_name_Global_add_builtin_parameter = "Global.add-builtin-parameter";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_parameter
 Returncode Global_add_builtin_parameter(Global* self, FunctionArguments* arguments, Int access, TypeData* parameter_type, String* name) {
-  CHECK(397, Global_add_builtin_argument(self, arguments->parameters, false, access, parameter_type, name) )
+  CHECK(398, Global_add_builtin_argument(self, arguments->parameters, false, access, parameter_type, name) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -460,7 +461,7 @@ Returncode Global_add_builtin_output(Global* self, FunctionArguments* arguments,
 static char* _func_name_Global_add_builtin_output = "Global.add-builtin-output";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_output
 Returncode Global_add_builtin_output(Global* self, FunctionArguments* arguments, Int access, TypeData* output_type, String* name) {
-  CHECK(409, Global_add_builtin_argument(self, arguments->outputs, true, access, output_type, name) )
+  CHECK(410, Global_add_builtin_argument(self, arguments->outputs, true, access, output_type, name) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -472,19 +473,19 @@ static char* _func_name_Global_add_builtin_argument = "Global.add-builtin-argume
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_argument
 Returncode Global_add_builtin_argument(Global* self, List* argument_list, Bool is_output, Int access, TypeData* argument_type, String* name) {
   DeclarationArgument* argument = malloc(sizeof(DeclarationArgument));
-  if (argument == NULL) RAISE(422)
+  if (argument == NULL) RAISE(423)
   *argument = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, false, NULL};
   argument->_base._base._dtl = DeclarationArgument__dtl;
   argument->_base.access = access;
   argument->_base.is_output = is_output;
   argument->variable = malloc(sizeof(SyntaxTreeVariable));
-  if (argument->variable == NULL) RAISE(425)
+  if (argument->variable == NULL) RAISE(426)
   *argument->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   argument->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
-  CHECK(426, string_new_copy(name, &(argument->variable->name)) )
+  CHECK(427, string_new_copy(name, &(argument->variable->name)) )
   argument->variable->access = access;
-  CHECK(428, TypeData_m_new_type_instance(argument_type, &(argument->variable->type_instance)) )
-  CHECK(430, List_add(argument_list, &(argument->_base)) )
+  CHECK(429, TypeData_m_new_type_instance(argument_type, &(argument->variable->type_instance)) )
+  CHECK(431, List_add(argument_list, &(argument->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -496,12 +497,12 @@ static char* _func_name_Global_find_type = "Global.find-type";
 #define LUMI_FUNC_NAME _func_name_Global_find_type
 Returncode Global_find_type(Global* self, String* name, TypeData** type_data) {
   if (NULL != self->current_module) {
-    CHECK(434, NameMap_find(self->current_module->type_map, name, (void**)&((*type_data))) )
+    CHECK(435, NameMap_find(self->current_module->type_map, name, (void**)&((*type_data))) )
     if (NULL != (*type_data)) {
       return OK;
     }
   }
-  CHECK(436, NameMap_find(self->global_module->type_map, name, (void**)&((*type_data))) )
+  CHECK(437, NameMap_find(self->global_module->type_map, name, (void**)&((*type_data))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -512,11 +513,11 @@ Returncode Global_find_variable(Global* self, String* name, SyntaxTreeVariable**
 static char* _func_name_Global_find_variable = "Global.find-variable";
 #define LUMI_FUNC_NAME _func_name_Global_find_variable
 Returncode Global_find_variable(Global* self, String* name, SyntaxTreeVariable** variable) {
-  CHECK(439, NameMap_find(self->current_module->variable_map, name, (void**)&((*variable))) )
+  CHECK(440, NameMap_find(self->current_module->variable_map, name, (void**)&((*variable))) )
   if (NULL != (*variable)) {
     return OK;
   }
-  CHECK(441, NameMap_find(self->global_module->variable_map, name, (void**)&((*variable))) )
+  CHECK(442, NameMap_find(self->global_module->variable_map, name, (void**)&((*variable))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -527,11 +528,11 @@ Returncode Global_find_function(Global* self, String* name, SyntaxTreeFunction**
 static char* _func_name_Global_find_function = "Global.find-function";
 #define LUMI_FUNC_NAME _func_name_Global_find_function
 Returncode Global_find_function(Global* self, String* name, SyntaxTreeFunction** function) {
-  CHECK(444, NameMap_find(self->current_module->function_map, name, (void**)&((*function))) )
+  CHECK(445, NameMap_find(self->current_module->function_map, name, (void**)&((*function))) )
   if (NULL != (*function)) {
     return OK;
   }
-  CHECK(446, NameMap_find(self->global_module->function_map, name, (void**)&((*function))) )
+  CHECK(447, NameMap_find(self->global_module->function_map, name, (void**)&((*function))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

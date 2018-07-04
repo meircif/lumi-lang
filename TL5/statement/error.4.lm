@@ -9,8 +9,7 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
       var Char end, owner SyntaxTreeTry new-node)
-    new-node := SyntaxTreeTry()
-    new-node.init(user parent)
+    new-node := SyntaxTreeTry(user parent)
     new-node.parse-block(copy false)->(var end)
   
   func dynamic analyze()
@@ -49,8 +48,7 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
 class SyntaxTreeCatch(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent)->(
       var Char end, owner SyntaxTreeCatch new-node)
-    new-node := SyntaxTreeCatch()
-    new-node.init(user parent)
+    new-node := SyntaxTreeCatch(user parent)
     new-node.parse-block(copy false)->(var end)
   
   func dynamic analyze()

@@ -137,11 +137,17 @@ class UnaryExpression(Expression)
   func inst write-end-expression(user Expression right-expression)
     write(user self.operator.c-name)
     write(user " ")
-    right-expression.write()
+    self.write-operand(user right-expression)
     if not self.top
       write(user ")")
     if self.is-statement
       write(user ";\n")
+  
+  func inst write-operand(user Expression expression)
+    if expression.is-complex-field
+      expression.write-as-top()
+    else
+      expression.write()
 
 
 ## An expression with a binary operator
@@ -391,7 +397,7 @@ class BinaryExpression(UnaryExpression)
       # `is`/`is-not` operator
       write(user "(void*)")
       self.left-expression.top := false
-    self.left-expression.write()
+    self.write-operand(user self.left-expression)
     self.left-expression.top := true
     var Bool expand-and(self.operator.order = 1 and
         ? self.binary-left-expression and

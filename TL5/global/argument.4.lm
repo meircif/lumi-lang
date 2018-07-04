@@ -7,6 +7,9 @@ class Argument(SyntaxTreeNode)
   var Int access
   var Bool is-output
   var Bool is-native
+
+  new()
+    self.set-location()
   
   func dynamic copy-new()->(owner DeclarationArgument new-argument)
     raise
@@ -19,7 +22,6 @@ class Argument(SyntaxTreeNode)
       var Char end)
     self.is-output := is-output
     self.is-native := is-native
-    self.set-location()
     self.get-access(user access-str)->(var self.access)
     self.parse-value(user code-node)->(var end)
   
@@ -69,12 +71,11 @@ class ArgumentFactory
 
 ~~~ All function parameters and outputs ~~~
 class FunctionArguments(SyntaxTreeNode)
-  owner List{Argument} parameters
-  owner List{Argument} outputs
+  var List{Argument} parameters
+  var List{Argument} outputs
   
   func inst copy-new()->(owner FunctionArguments new-arguments)
     new-arguments := FunctionArguments()
-    new-arguments.init()
     self.copy-new-args(user self.parameters, user new-arguments.parameters)
     self.copy-new-args(user self.outputs, user new-arguments.outputs)
   
@@ -83,17 +84,14 @@ class FunctionArguments(SyntaxTreeNode)
     for argument in arguments.iter()
       new-arguments.add(owner argument.copy-new())
   
-  func inst init()
+  new()
     self.set-location()
-    self.parameters := List{Argument}()
-    self.outputs := List{Argument}()
   
   func inst parse(
       user ArgumentFactory argument-factory,
       copy Bool is-native,
       user SyntaxTreeCode code-node)->(
       var Char end)
-    self.init()
     self.parse-args(
         user self.parameters,
         user argument-factory,
@@ -115,8 +113,7 @@ class FunctionArguments(SyntaxTreeNode)
       self-args.access := Access.COPY
     else
       self-args.access := Access.USER
-    self-args.set-location()
-    self-args.variable := SyntaxTreeVariable()
+    self-args.variable := SyntaxTreeVariable(user _)
     self-args.variable.access := self-args.access
     string-new-copy(user "self")->(owner self-args.variable.name)
     type-data.self-type-instance()->(owner self-args.variable.type-instance)

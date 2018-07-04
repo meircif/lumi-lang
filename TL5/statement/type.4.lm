@@ -62,7 +62,6 @@ class TypeData(SyntaxTreeNamespace)
       self.syntax-error(user "redefinition of type", user self.name)
     if glob.current-module.enum-map.find(user self.name)?
       self.syntax-error(user "type name overrides Enum", user self.name)
-    self.init()
     my-module.type-map.add(user self.name, user self)
   
   func dynamic parse-child(user String keyword)->(var Char end)
@@ -136,20 +135,45 @@ class TypeData(SyntaxTreeNamespace)
       bases += 1
     method := _
   
-  func inst order-bases(user List{TypeData} ordered-list)
+  func inst order-bases(user List{TypeData} ordered-list)->(
+      var Bool recursion-error)
+    recursion-error := false
     if self.is-ordered
       return
     if self.ordering
-      self.syntax-error(
-          user "recursive inheritance in type", user self.name)
+      self.print-syntax-error-header()
+      print-msg-with-item(user "recursive declaration of type", user self.name)
+      recursion-error := true
+      return
+    
     self.ordering := true
+    
+    ; order base type
     if self.base-type?
       glob.current-module := self.my-module
       self.base-type.link-types(user self)
       glob.current-module := _
-      self.base-type.type-data.order-bases(user ordered-list)
+      if self.base-type.type-data.order-bases(user ordered-list)->(
+          var recursion-error)
+        print-msg-with-item(user ", extended by type", user self.name)
+        return
+    
+    ; order complex fields
+    for variable in self.variables.iter()
+      if variable.access = Access.VAR
+        glob.current-module := self.my-module
+        variable.type-instance.link-types(user self)
+        glob.current-module := _
+        if not variable.type-instance.type-data.is-primitive and
+            variable.type-instance.type-data is-not glob.type-generic
+          if variable.type-instance.type-data.order-bases(user ordered-list)->(
+              var recursion-error)
+            print-msg-with-item(user ", variable of type", user self.name)
+            return
+    
     ordered-list.add(owner glob.root.types.remove(user self))
     self.is-ordered := true
+    
     ; init `self.dynamic-base-methods` and test override methods
     if self.is-dynamic
       self.dynamic-base-methods := NameMap{SyntaxTreeFunction}()

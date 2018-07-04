@@ -3652,11 +3652,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_String_2 = aux_String_1;
-  if (aux_String_2 == NULL) RAISE(0, 17, "empty object used")
-  if (aux_String_2_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+  if (aux_String_2 == NULL) RAISE(483, 17, "empty object used")
+  if (aux_String_2_Refman->value == NULL) RAISE(483, 28, "outdated weak reference used")
   {int c_Index; for (c_Index = 0; c_Index < aux_String_2->length; ++c_Index) {
-    if (aux_String_2 == NULL) RAISE(0, 17, "empty object used")
-    if (aux_String_2_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+    if (aux_String_2 == NULL) RAISE(483, 17, "empty object used")
+    if (aux_String_2_Refman->value == NULL) RAISE(483, 28, "outdated weak reference used")
     if ((c_Index) < 0 || (c_Index) >= (aux_String_2)->length) RAISE(483, 25, "slice index out of bounds")
     c = ((aux_String_2)->values)[c_Index];
     LUMI_err = String_clear(text, text_Refman);
@@ -3718,11 +3718,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_Array_0 = arr;
-  if (aux_Array_0 == NULL) RAISE(0, 17, "empty object used")
-  if (aux_Array_0_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+  if (aux_Array_0 == NULL) RAISE(495, 17, "empty object used")
+  if (aux_Array_0_Refman->value == NULL) RAISE(495, 28, "outdated weak reference used")
   {int n_Index; for (n_Index = 0; n_Index < aux_Array_0->length; ++n_Index) {
-    if (aux_Array_0 == NULL) RAISE(0, 17, "empty object used")
-    if (aux_Array_0_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+    if (aux_Array_0 == NULL) RAISE(495, 17, "empty object used")
+    if (aux_Array_0_Refman->value == NULL) RAISE(495, 28, "outdated weak reference used")
     if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(495, 25, "slice index out of bounds")
     n = ((Int*)((aux_Array_0)->values))[n_Index];
     LUMI_err = String_clear(text, text_Refman);
@@ -3823,11 +3823,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_Array_1 = tsarr;
-  if (aux_Array_1 == NULL) RAISE(0, 17, "empty object used")
-  if (aux_Array_1_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+  if (aux_Array_1 == NULL) RAISE(507, 17, "empty object used")
+  if (aux_Array_1_Refman->value == NULL) RAISE(507, 28, "outdated weak reference used")
   {int ts_Index; for (ts_Index = 0; ts_Index < aux_Array_1->length; ++ts_Index) {
-    if (aux_Array_1 == NULL) RAISE(0, 17, "empty object used")
-    if (aux_Array_1_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+    if (aux_Array_1 == NULL) RAISE(507, 17, "empty object used")
+    if (aux_Array_1_Refman->value == NULL) RAISE(507, 28, "outdated weak reference used")
     if ((ts_Index) < 0 || (ts_Index) >= (aux_Array_1)->length) RAISE(507, 25, "slice index out of bounds")
     aux_Ref_Manager = ts_Refman;
     ts_Refman = aux_Array_1_Refman;
@@ -3914,11 +3914,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_Array_2 = sarr;
-  if (aux_Array_2 == NULL) RAISE(0, 17, "empty object used")
-  if (aux_Array_2_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+  if (aux_Array_2 == NULL) RAISE(517, 17, "empty object used")
+  if (aux_Array_2_Refman->value == NULL) RAISE(517, 28, "outdated weak reference used")
   {int s_Index; for (s_Index = 0; s_Index < aux_Array_2->length; ++s_Index) {
-    if (aux_Array_2 == NULL) RAISE(0, 17, "empty object used")
-    if (aux_Array_2_Refman->value == NULL) RAISE(0, 28, "outdated weak reference used")
+    if (aux_Array_2 == NULL) RAISE(517, 17, "empty object used")
+    if (aux_Array_2_Refman->value == NULL) RAISE(517, 28, "outdated weak reference used")
     if ((s_Index) < 0 || (s_Index) >= (aux_Array_2)->length) RAISE(517, 25, "slice index out of bounds")
     aux_Ref_Manager = s_Refman;
     s_Refman = aux_Array_2_Refman;

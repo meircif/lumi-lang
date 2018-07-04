@@ -10,21 +10,18 @@ class SliceExpression(Expression)
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
       owner Expression expression, var Char end)
-    new SliceExpression slice-expression
-    slice-expression.parse(owner expression, user code-node)->(var end)
+    new SliceExpression slice-expression(user code-node)
+    slice-expression.parse(owner expression)->(var end)
     expression := slice-expression
   
   ~~~ parsing `sequence[index]` or `sequence[index:second-index]` ~~~
-  func inst parse(owner Expression sequence, user SyntaxTreeCode code-node)->(
-      var Char end)
-    self.code-node := code-node
+  func inst parse(owner Expression sequence)->(var Char end)
     self.sequence := sequence
     self.access := Access.VAR
-    self.set-location()
-    parse-new-expression(user ":]", user code-node)->(
+    parse-new-expression(user ":]", user self.code-node)->(
         owner self.index, var end)
     if end = ':'
-      parse-new-expression(user "]", user code-node)->(
+      parse-new-expression(user "]", user self.code-node)->(
           owner self.second-index, var end)
     if end != ']'
       self.syntax-error-c(user "expected \"]\", got", copy end)

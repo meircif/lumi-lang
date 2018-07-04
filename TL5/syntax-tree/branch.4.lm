@@ -4,17 +4,13 @@ module tl5-compiler
 ~~~ A basic branch node in the syntax tree - a node with chldren nodes ~~~
 class SyntaxTreeBranch(SyntaxTreeNode)
   var Int indentation-spaces
-  owner List{SyntaxTreeVariable} variables
-  
-  func inst init()
-    self.variables := List{SyntaxTreeVariable}()
+  var List{SyntaxTreeVariable} variables
   
   func inst parse-block-children(
       user TypeData parent-type, user SyntaxTreeBlock parent-block)->(
       var Char end)
     if end != '\n'
       self.syntax-error-c(user "expected block in a new line, got", copy end)
-    self.init()
     self.parse-children(user parent-type, user parent-block)->(var end)
     if end != EOF
       glob.save-input := true
@@ -233,11 +229,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
 
 ~~~ A basic namespace node in the syntax tree ~~~
 class SyntaxTreeNamespace(SyntaxTreeBranch)
-  owner List{SyntaxTreeFunction} functions
-  
-  func inst init()
-    base()
-    self.functions := List{SyntaxTreeFunction}()
+  var List{SyntaxTreeFunction} functions
   
   func inst parse-if-function(
       user String keyword, user TypeData parent-type)->(

@@ -5,7 +5,7 @@ module tl5-compiler
 class EnumData(SyntaxTreeNode)
   owner String name
   user ModuleMembers my-module
-  owner List{String} values
+  var List{String} values
   
   func inst parse-new()->(var Char end, owner EnumData new-node)
     new-node := EnumData()
@@ -21,7 +21,6 @@ class EnumData(SyntaxTreeNode)
       self.syntax-error(user "Enum name overrides type", user self.name)
     if self.my-module.enum-map.find(user self.name)?
       self.syntax-error(user "redefinition of Enum", user self.name)
-    self.values := List{String}()
     do
       user String value
       var Int spaces

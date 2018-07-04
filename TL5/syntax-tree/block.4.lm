@@ -6,6 +6,10 @@ module tl5-compiler
 class SyntaxTreeCode(SyntaxTreeNode)
   user SyntaxTreeBlock parent
   
+  new(user SyntaxTreeBlock parent)
+    self.set-location()
+    self.parent := parent
+  
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
     if self.parent? and not module-name?
@@ -45,13 +49,12 @@ class SyntaxTreeCode(SyntaxTreeNode)
 ~~~ A basic code block node in the syntax tree ~~~
 class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeBlock parent
-  owner List{SyntaxTreeCode} code-nodes
+  var List{SyntaxTreeCode} code-nodes
   user SyntaxTreeIf previous-if
   user SyntaxTreeTry previous-try
   var Bool is-in-loop
   
   func inst parse-block()->(var Char end)
-    self.code-nodes := List{SyntaxTreeCode}()
     self.parse-block-children(user _, user self)->(var end)
   
   func dynamic parse-child(user String keyword)->(var Char end)

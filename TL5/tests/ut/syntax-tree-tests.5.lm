@@ -1470,21 +1470,28 @@ func f-mock()
   for n in TestIterator()
 ; @@ test-complex-fields
 ; @ g t0
-class Base
-  user Base b
-  func dynamic meth()
 struct Test
-  var Base b
+  var Bstruct b
   func test()
-    user Base b(user self.b)
+    user Bstruct b(user self.b)
     b := self.b
     self.b.meth()
-    Base.meth(user self.b)
-    user Base b2(user self.b.b)
+    Bstruct.meth(user self.b)
+    user Bstruct b2(user self.b.b)
     b2 := self.b.b
     self.b.b.meth()
-    Base.meth(user self.b.b)
+    self.b.b := b
+    Bstruct.meth(user self.b.b)
     var Test t
+    self.b.x := 5
+    Astruct.meth(user self.b)
+    if self.b is b or b2 is-not self.b
+class Astruct
+  var Int x
+  func dynamic meth()
+class Bstruct(Astruct)
+  user Bstruct b
+  func dynamic meth()
 ; @ eg te0
 struct Test
   var String{12} error
@@ -1499,6 +1506,20 @@ struct Test
   var Base error
 struct Base
   var Test t
+; @ eg te4
+struct Abase
+  var Berror b
+struct Aerror(Abase)
+struct Bbase
+  var Aerror a
+struct Berror(Bbase)
+; @ eg te5
+struct Base
+  var Int x
+struct Test
+  var Base b
+  func test(user Base b)
+    self.b := b
 ; @@ test-enum
 ; @ g t0
 enum MyEnum

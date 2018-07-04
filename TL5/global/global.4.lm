@@ -8,26 +8,27 @@ enum Access
   USER
   OWNER
   VAR
+  NUMBER
 
 
 struct Global
   ~~~ stores all user defined nodes ~~~
-  owner SyntaxTreeRoot root
+  var SyntaxTreeRoot root
   
   ~~~ stores all built-in nodes ~~~
-  owner GlobalNodes builtins
+  var GlobalNodes builtins
   
   ~~~ stores all language operators ~~~
-  owner List{Operator} operators
+  var List{Operator} operators
   
   ~~~ maps all global-scope nodes ~~~
-  owner ModuleMembers global-module
+  var ModuleMembers global-module
   
   ~~~ maps all language operators ~~~
-  owner NameMap{Operator} operator-map
+  var NameMap{Operator} operator-map
   
   ~~~ maps all modules ~~~
-  owner NameMap{ModuleMembers} module-map
+  var NameMap{ModuleMembers} module-map
   
   ~~~ maps access number to its name ~~~
   owner Array{String} access-names
@@ -38,15 +39,15 @@ struct Global
   ~~~ the currently written output file object ~~~
   owner File output-file
   
-  ~~~ holds the name of the input-file and the line number of the code currently ~~~
-  ~~~ been worked with ~~~
+  ~~~ holds the name of the input-file and the line number of the code
+  currently been worked with ~~~
   user String input-file-name
   user ModuleMembers current-module
   var Int input-file-index
   var Int line-number
   
   ~~~ test functions list ~~~
-  owner NameMap{SyntaxTreeTestFunction} test-functions
+  var NameMap{SyntaxTreeTestFunction} test-functions
   owner String tested-module
   var Bool is-new-mocked
   var Bool is-delete-mocked
@@ -74,26 +75,18 @@ struct Global
   user TypeData type-file
   user TypeData type-sys
   
-  func init()
-    self.got-new-line := false
-    self.save-input := false
-    self.is-new-mocked := false
-    self.is-delete-mocked := false
-    self.tested-module := _
-    self.current-module := _
-    self.root := SyntaxTreeRoot()
-    self.root.init()
-    self.builtins := GlobalNodes()
-    self.builtins.init()
-    self.operators := List{Operator}()
+  func new()
+    glob := self
+    self.builtins.new()
+    self.root.new()
     self.input-buffer := String{1024}()
-    self.test-functions := NameMap{SyntaxTreeTestFunction}()
-    self.global-module := ModuleMembers()
-    self.global-module.init(user _)
-    self.module-map := NameMap{ModuleMembers}()
+    self.global-module.new(user _)
     self.init-operator-map()
+    self.init-access-names()
     self.init-builtin-types()
-    self.access-names := Array{5:String{16}}()
+  
+  func init-access-names()
+    self.access-names := Array{Access.NUMBER:String{16}}()
     self.access-names[Access.UNDEFINED].new(user "undefined")
     self.access-names[Access.COPY].new(user "copy")
     self.access-names[Access.USER].new(user "user")
@@ -101,7 +94,6 @@ struct Global
     self.access-names[Access.VAR].new(user "var")
   
   func init-operator-map()
-    self.operator-map := NameMap{Operator}()
     self.add-operator-copy(user "+", copy 0, copy 0)
     self.add-operator-copy(user "-", copy 0, copy 0)
     self.add-operator-copy(user "*", copy 0, copy 1)
@@ -328,7 +320,7 @@ struct Global
     type-data := new-type
     string-new-copy(user name)->(owner new-type.name)
     new-type.is-primitive := is-primitive
-    new-type.init()
+    new-type.is-ordered := true
     self.global-module.type-map.add(user new-type.name, user new-type)
     self.builtins.types.add(owner new-type)
   
@@ -357,7 +349,7 @@ struct Global
       user TypeData variable-subtype,
       user TypeData parent-type,
       user SyntaxTreeBranch branch)
-    new SyntaxTreeVariable variable
+    new SyntaxTreeVariable variable(user _)
     string-new-copy(user name)->(owner variable.name)
     if variable-type.is-primitive
       variable.access := Access.VAR
@@ -389,11 +381,8 @@ struct Global
       user SyntaxTreeNamespace namespace)->(
       user FunctionArguments arguments)
     new SyntaxTreeFunction function
-    function.init()
     string-new-copy(user name)->(owner function.name)
     function.parent-type := parent-type
-    function.arguments := FunctionArguments()
-    function.arguments.init()
     arguments := function.arguments
     namespace.functions.add(owner function)
   
@@ -430,7 +419,7 @@ struct Global
     new DeclarationArgument argument
     argument.access := access
     argument.is-output := is-output
-    argument.variable := SyntaxTreeVariable()
+    argument.variable := SyntaxTreeVariable(user _)
     string-new-copy(user name)->(owner argument.variable.name)
     argument.variable.access := access
     argument-type.new-type-instance()->(
@@ -453,4 +442,4 @@ struct Global
       return
     self.global-module.function-map.find(user name)->(user function)
 
-var Global glob
+user Global glob

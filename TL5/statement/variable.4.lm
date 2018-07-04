@@ -20,12 +20,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       user SyntaxTreeBlock parent-block)->(
       var Char end,
       owner SyntaxTreeVariable new-node)
-    new-node := SyntaxTreeVariable()
+    new-node := SyntaxTreeVariable(user parent-block)
     new-node.parse(
         copy access,
         copy is-create,
         user parent-type,
-        user parent-block,
         user glob.current-module)->(
         var end)
   
@@ -33,11 +32,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       copy Int access,
       copy Bool is-create,
       user TypeData parent-type,
-      user SyntaxTreeBlock parent-block,
       user ModuleMembers my-module)->(
       var Char end)
-    self.set-location()
-    self.parent := parent-block
     self.parent-type := parent-type
     self.access := access
     self.is-create := is-create
@@ -123,13 +119,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "declared variable with generic subtype",
           user self.type-instance.name)
     if self.is-create and not self.type-instance.type-data.is-primitive and
-        self.parent-type?
-      if self.type-instance.type-data is glob.type-string or
-          self.type-instance.type-data is glob.type-array
-        self.syntax-error(
-            user "cannot declared \"var\" field of sequence type",
-            user self.type-instance.type-data.name)
-      self.check-var-recursion(user self)
+        self.parent-type? and
+        (self.type-instance.type-data is glob.type-string or
+        self.type-instance.type-data is glob.type-array)
+      self.syntax-error(
+          user "cannot declared \"var\" field of sequence type",
+          user self.type-instance.type-data.name)
     if self.access = Access.VAR
       self.type-instance.check-sequence(user self)
     if self.is-create and self.type-instance.type-data is glob.type-array
@@ -137,17 +132,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.syntax-error-msg(user "cannot create generic array")
     if self.my-module?
       glob.current-module := _
-  
-  func inst check-var-recursion(user SyntaxTreeVariable variable)
-    if variable.type-instance.type-data is self.parent-type
-      self.syntax-error(
-          user "variable will cause recursive declaration of type",
-          user self.parent-type.name)
-    user ListNode{SyntaxTreeVariable} child(user variable.type-instance.type-data.variables.first)
-    for sub-variable in variable.type-instance.type-data.variables.iter()
-      if sub-variable.access = Access.VAR and
-          not sub-variable.type-instance.type-data.is-primitive
-        self.check-var-recursion(user sub-variable)
   
   func inst write-cname()
     if self.my-module?
@@ -320,19 +304,17 @@ class VariableInit(SyntaxTreeCode)
   user SyntaxTreeVariable variable
   
   func inst parse-new(user SyntaxTreeVariable variable)->(var Char end)
-    new VariableInit new-node
+    new VariableInit new-node(user variable.parent)
     new-node.parse(user variable)->(var end)
     variable.parent.code-nodes.add(owner new-node)
   
   func inst parse(user SyntaxTreeVariable variable)->(var Char end)
-    self.set-location()
-    self.parent := variable.parent
     self.variable := variable
-    self.expression-init := InitExpression()
+    self.expression-init := InitExpression(user self)
     self.expression-init.parse(
-        owner variable.type-instance.copy-new(), owner _, user self)->(var end)
+        owner variable.type-instance.copy-new(), owner _)->(var end)
     self.expression-init.is-statement := true
-    self.expression-init.symbol := SymbolExpression()
+    self.expression-init.symbol := SymbolExpression(user self)
     string-new-copy(user variable.name)->(
         owner self.expression-init.symbol.name)
     self.expression-init.symbol.variable := variable
@@ -366,11 +348,10 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
   var Bool ordering
   
   func inst parse-new()->(var Char end, owner SyntaxTreeConstant constant)
-    constant := SyntaxTreeConstant()
+    constant := SyntaxTreeConstant(user _)
     constant.parse()->(var end)
   
   func inst parse()->(var Char end)
-    self.set-location()
     self.access := Access.VAR
     self.constant := true
     self.my-module := glob.current-module

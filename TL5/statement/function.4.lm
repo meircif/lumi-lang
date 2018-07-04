@@ -3,11 +3,11 @@ module tl5-compiler
 
 ~~~ Function node in the syntax tree ~~~
 class SyntaxTreeFunction(SyntaxTreeBlock)
-  owner List{TypeCount} aux-variables
+  var List{TypeCount} aux-variables
   user TypeData parent-type
   owner String name
   user ModuleMembers my-module
-  owner FunctionArguments arguments
+  var FunctionArguments arguments
   user SyntaxTreeMockFunction mocker-function
   user SyntaxTreeFunction dynamic-base-method
   var Int dynamic-base-count
@@ -20,7 +20,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     new-node.parse(user parent-type)->(var end)
   
   func inst parse(user TypeData parent-type)->(var Char end)
-    self.init()
     self.parent-type := parent-type
     if self.parent-type?
       self.indentation-spaces := 2
@@ -38,9 +37,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.parse-header(copy false)->(var end)
     self.parse-body()->(var end)
   
-  func inst init()
+  new()
     self.set-location()
-    self.aux-variables := List{TypeCount}()
+    self.arguments.new()
   
   func inst parse-body()->(var Char end)
     self.indentation-spaces += 2
@@ -56,11 +55,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.parse-arguments(copy is-native)->(var end)
   
   func inst parse-arguments(copy Bool is-native)->(var Char end)
-    self.arguments := FunctionArguments()
     var DeclarationArgumentFactory argument-factory
-    var SyntaxTreeCode dummy-node
-    dummy-node.set-location()
-    dummy-node.parent := self
+    var SyntaxTreeCode dummy-node(user self)
     self.arguments.parse(
         user argument-factory, copy is-native, user dummy-node)->(var end)
     if self.parent-type?
@@ -113,7 +109,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       new TypeCount type-count
       type-count.type-data := type-instance.type-data
       self.aux-variables.add(owner type-count)
-    new SyntaxTreeVariable variable
+    new SyntaxTreeVariable variable(user self)
     variable.name := String{type-instance.type-data.name.length + 21}()
     variable.name.new(user "aux_")
     variable.name.concat(user type-instance.type-data.name)
@@ -121,7 +117,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     var String{16} index-str
     index.str(user index-str)
     variable.name.concat(user index-str)
-    variable.parent := self
     variable.access := access
     variable.is-create := is-create
     type-instance.copy-new()->(owner variable.type-instance)
@@ -251,7 +246,6 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
     new-node.parse(user parent-type)->(var end)
   
   func inst parse(user TypeData parent-type)->(var Char end)
-    self.init()
     self.parent-type := parent-type
     self.indentation-spaces := 2
     string-new-copy(user "new")->(owner self.name)
@@ -275,7 +269,7 @@ class DeclarationArgument(Argument)
     new-argument.access := self.access
     new-argument.is-output := self.is-output
     new-argument.is-native := self.is-native
-    new-argument.variable := SyntaxTreeVariable()
+    new-argument.variable := SyntaxTreeVariable(user _)
     new-argument.variable.access := self.variable.access
     new-argument.variable.parent-type := self.variable.parent-type
     self.variable.type-instance.copy-new()->(
@@ -283,7 +277,7 @@ class DeclarationArgument(Argument)
     string-new-copy(user self.variable.name)->(owner new-argument.variable.name)
   
   func dynamic parse-value(user SyntaxTreeCode code-node)->(var Char end)
-    self.variable := SyntaxTreeVariable()
+    self.variable := SyntaxTreeVariable(user _)
     self.variable.access := self.access
     self.variable.is-output := self.is-output
     if code-node?

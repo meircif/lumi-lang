@@ -7,14 +7,13 @@ class BlockExpression(Expression)
   
   func inst parse-new(user SyntaxTreeCode code-node)->(
       owner Expression expression, var Char end)
-    new BlockExpression block-expression
-    block-expression.parse(user code-node)->(var end)
+    new BlockExpression block-expression(user code-node)
+    block-expression.parse()->(var end)
     expression := block-expression
   
   ~~~ parsing `(expression)` ~~~
-  func inst parse(user SyntaxTreeCode code-node)->(var Char end)
-    self.set-location()
-    parse-new-expression(user ")", user code-node)->(
+  func inst parse()->(var Char end)
+    parse-new-expression(user ")", user self.code-node)->(
         owner self.expression, var end)
     if end != ')'
       self.syntax-error-c(user "expected \")\", got", copy end)
@@ -65,25 +64,21 @@ class UnaryExpression(Expression)
   func inst parse-new(
       user String ends, user Operator operator, user SyntaxTreeCode code-node)->(
       owner Expression expression, var Char end, user Operator next-operator)
-    new UnaryExpression unary-expression
-    unary-expression.parse(user operator, user ends, user code-node)->(
+    new UnaryExpression unary-expression(user code-node)
+    unary-expression.parse(user operator, user ends)->(
         var end, user next-operator)
     expression := unary-expression
   
-  func inst parse(
-      user Operator operator,
-      user String ends,
-      user SyntaxTreeCode code-node)->(
+  func inst parse(user Operator operator, user String ends)->(
       var Char end, user Operator next-operator)
     self.operator := operator
-    self.code-node := code-node
     self.access := Access.VAR
-    self.set-location()
     if end = '\n'
-      code-node.read-line-break-spaces()
+      self.code-node.read-line-break-spaces()
     else-if end != ' '
       self.syntax-error-c(user "expected space after operator, got", copy end)
-    Expression.parse-new(user _, user ends, user code-node, user operator)->(
+    Expression.parse-new(
+        user _, user ends, user self.code-node, user operator)->(
         owner self.right-expression, var end, user next-operator)
   
   func dynamic analyze()
@@ -138,11 +133,17 @@ class UnaryExpression(Expression)
   func inst write-end-expression(user Expression right-expression)
     write(user self.operator.c-name)
     write(user " ")
-    right-expression.write()
+    self.write-operand(user right-expression)
     if not self.top
       write(user ")")
     if self.is-statement
       write(user ";\n")
+  
+  func inst write-operand(user Expression expression)
+    if expression.is-complex-field
+      expression.write-as-top()
+    else
+      expression.write()
 
 
 ~~~ An expression with a binary operator ~~~
@@ -161,10 +162,10 @@ class BinaryExpression(UnaryExpression)
       owner BinaryExpression expression,
       var Char end,
       user Operator next-operator)
-    new BinaryExpression binary-expression
+    new BinaryExpression binary-expression(user code-node)
     binary-expression.left-expression := left-expression
     binary-expression.binary-left-expression := binary-left-expression
-    binary-expression.parse(user operator, user ends, user code-node)->(
+    binary-expression.parse(user operator, user ends)->(
         var end, user next-operator)
     expression := binary-expression
   
@@ -395,7 +396,7 @@ class BinaryExpression(UnaryExpression)
       ; `is`/`is-not` operator
       write(user "(void*)")
       self.left-expression.top := false
-    self.left-expression.write()
+    self.write-operand(user self.left-expression)
     self.left-expression.top := true
     var Bool expand-and(copy self.operator.order = 1 and
         self.binary-left-expression?)
@@ -422,14 +423,13 @@ class QuestionExpression(Expression)
   owner Expression tested
   
   func inst parse-new()->(owner Expression expression, var Char end)
-    new QuestionExpression question-expression
+    new QuestionExpression question-expression(user _)
     question-expression.parse(owner expression)->(var end)
     expression := question-expression
   
   ~~~ parsing `tested?` ~~~
   func inst parse(owner Expression tested)->(var Char end)
     self.tested := tested
-    self.set-location()
     read-c()->(var end)
   
   func dynamic analyze()

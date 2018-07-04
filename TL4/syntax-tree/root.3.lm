@@ -197,7 +197,9 @@ class SyntaxTreeRoot(GlobalNodes)
       owner TypeData type-data
       self.types.pop():(owner type-data)
       while ? type-data
-      type-data.m-order-bases(user ordered-list)
+      if type-data.m-order-bases(user ordered-list)
+        print(user "\n")
+        raise
     delete self.types
     self.types := ordered-list
   

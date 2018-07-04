@@ -76,6 +76,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     if self.iterator.result-type.type-data != glob.type-int
       new SymbolExpression in self.aux-symbol
       self.aux-symbol.code-node := self
+      self.aux-symbol.set-location()
       self.iterator.result-type.copy-new():(owner self.aux-symbol.result-type)
       self.get-function().add-aux-variable(
           copy ACCESS-USER, copy false, user self.iterator.result-type):(
@@ -180,6 +181,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       user SyntaxTreeBlock parent)
     var SyntaxTreeExpression expression-node
     expression-node.parent := parent
+    expression-node.set-location()
     value.code-node := expression-node
     
     new SymbolExpression symbol
@@ -322,6 +324,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     
     if meth.is-dynamic
       new MemberExpression member
+      member.set-location()
       member.code-node := self
       member.function := meth
       member.dynamic-call-self-instance := self.aux-symbol

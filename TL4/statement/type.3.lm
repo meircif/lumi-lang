@@ -140,20 +140,48 @@ class TypeData(SyntaxTreeNamespace)
       bases += 1
     method := _
   
-  func inst m-order-bases(user List{TypeData} ordered-list)
+  func inst m-order-bases(user List{TypeData} ordered-list):(
+      copy Bool recursion-error)
+    recursion-error := false
     if self.is-ordered
       return
     if self.ordering
-      self.m-syntax-error(
-          user "recursive inheritance in type", user self.name)
+      self.print-syntax-error-header()
+      print-msg-with-item(user "recursive declaration of type", user self.name)
+      recursion-error := true
+      return
+      
     self.ordering := true
+    
+    # order base type
     if ? self.base-type
       glob.current-module := self.my-module
       self.base-type.link-types(user self)
       glob.current-module := _
-      self.base-type.type-data.m-order-bases(user ordered-list)
+      if self.base-type.type-data.m-order-bases(user ordered-list):(
+          copy recursion-error)
+        print-msg-with-item(user ", extended by type", user self.name)
+        return
+    
+    # order complex fields
+    user ListNode{SyntaxTreeVariable} node(self.variables.first)
+    do
+      while ? node
+      if node.item.access = ACCESS-VAR
+        glob.current-module := self.my-module
+        node.item.type-instance.link-types(user self)
+        glob.current-module := _
+        if not node.item.type-instance.type-data.is-primitive and
+            node.item.type-instance.type-data != glob.type-generic
+          if node.item.type-instance.type-data.m-order-bases(
+              user ordered-list):(copy recursion-error)
+            print-msg-with-item(user ", variable of type", user self.name)
+            return
+      node := node.next
+    
     ordered-list.add(owner self)
     self.is-ordered := true
+    
     # init `self.dynamic-base-methods` and test override methods
     if self.is-dynamic
       new NameMap{SyntaxTreeFunction} in self.dynamic-base-methods

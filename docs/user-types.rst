@@ -96,7 +96,7 @@ default initialization. A constructor is declared as a normal method with a
 dedicated name ``new``. ::
 
    struct ExampleStruct
-     func new() _
+     new() _
 
    func ExampleStruct.new()
      ; custom initialization
@@ -105,7 +105,7 @@ A constructor cannot have outputs, and if it has parameters - they must be
 given on every object creation::
 
    struct ExampleStruct
-     func new(copy Int x, user String s)
+     new(copy Int x, user String s)
        ; implementation
 
    func usage()
