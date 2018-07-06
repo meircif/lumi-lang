@@ -16,10 +16,10 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.block.is-in-loop := parent.is-in-loop
     self.block.set-location()
   
-  func inst parse-block(copy Bool is-loop)->(var Char end)
+  func inst parse-block(copy Bool is-loop)
     if is-loop
       self.block.is-in-loop := true
-    self.block.parse-block()->(var end)
+    self.block.parse-block()
   
   func dynamic link-types()
     self.block.link-types()
@@ -40,13 +40,13 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
   owner SyntaxTreeElse else-node
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeIf new-node)
+      owner SyntaxTreeIf new-node)
     new-node := SyntaxTreeIf(user parent)
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
-    parse-new-expression(user "", user self)->(owner self.condition, var end)
-    self.parse-block(copy false)->(var end)
+  func inst parse()
+    parse-new-expression(user "", user self)->(owner self.condition)
+    self.parse-block(copy false)
   
   func inst add-else(owner SyntaxTreeElse else-node)
     else-node.set-parent(user self.parent)
@@ -85,9 +85,9 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
 ~~~ Else statement node in the syntax tree ~~~
 class SyntaxTreeElse(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeElse new-node)
+      owner SyntaxTreeElse new-node)
     new-node := SyntaxTreeElse(user parent)
-    new-node.parse-block(copy false)->(var end)
+    new-node.parse-block(copy false)
   
   func dynamic write()
     ; else {
@@ -101,9 +101,9 @@ class SyntaxTreeElse(SyntaxTreeFlowElement)
 ~~~ Do loop node in the syntax tree ~~~
 class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeDoLoop new-node)
+      owner SyntaxTreeDoLoop new-node)
     new-node := SyntaxTreeDoLoop(user parent)
-    new-node.parse-block(copy true)->(var end)
+    new-node.parse-block(copy true)
   
   func dynamic write()
     ; while (true) {

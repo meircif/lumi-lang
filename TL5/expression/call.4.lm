@@ -13,16 +13,15 @@ class CallExpression(Expression)
     self.arguments.new()
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
-      owner Expression expression, var Char end)
+      owner Expression expression)
     new CallExpression call-expression(user code-node)
-    call-expression.parse(owner expression)->(var end)
+    call-expression.parse(owner expression)
     expression := call-expression
   
-  func inst parse(owner Expression function)->(var Char end)
+  func inst parse(owner Expression function)
     self.function := function
     var CallArgumentFactory argument-factory
-    self.arguments.parse(
-        user argument-factory, copy false, user self.code-node)->(var end)
+    self.arguments.parse(user argument-factory, copy false, user self.code-node)
   
   func dynamic analyze()
     self.function.analyze()
@@ -114,12 +113,12 @@ class CallArgument(Argument)
   var Bool is-dynamic
   var Bool is-generic
   
-  func dynamic parse-value(user SyntaxTreeCode code-node)->(var Char end)
+  func dynamic parse-value(user SyntaxTreeCode code-node)
     self.code-node := code-node
     parse-new-expression(
-        user ",)", user code-node)->(owner self.value, var end)
-    if end != ',' and end != ')'
-      self.syntax-error-c(user "expected \",\" or \")\", got", copy end)
+        user ",)", user code-node)->(owner self.value)
+    if glob.last-char != ',' and glob.last-char != ')'
+      self.syntax-error-c(user "expected \",\" or \")\", got")
   
   func dynamic analyze()
     self.value.analyze()

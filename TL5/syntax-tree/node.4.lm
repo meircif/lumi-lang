@@ -69,7 +69,8 @@ class SyntaxTreeNode
   func inst read-expect(user String expected-text)
     new String{expected-text.length + 1} actual-text
     for n in expected-text.length
-      actual-text.append(copy read-c())
+      read-c()
+      actual-text.append(copy glob.last-char)
     if not actual-text.equal(user expected-text)
       self.syntax-error2(
           user "expected", user expected-text, user "got", user actual-text)
@@ -138,14 +139,14 @@ class SyntaxTreeNode
     sys.exit(copy 1)
   
   ~~~ Same as `syntax-error` but with a character item ~~~
-  func inst syntax-error-c(user String text, copy Char item)
+  func inst syntax-error-c(user String text)
     var String{16} char-str
-    if item = EOF
-      char-str.new(user "EOF")
-    else-if item = '\n'
+    if glob.file-ended
+      char-str.new(user "end-of-file")
+    else-if glob.last-char = '\n'
       char-str.new(user "new-line")
     else
-      char-str.append(copy item)
+      char-str.append(copy glob.last-char)
     self.print-syntax-error(user text, user char-str)
     sys.exit(copy 1)
   

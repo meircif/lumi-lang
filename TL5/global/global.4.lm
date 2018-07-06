@@ -54,10 +54,11 @@ struct Global
   
   ~~~ input reading state ~~~
   owner String input-buffer
-  var Char input-end
+  var Char last-char
   var Int input-spaces
   var Bool got-new-line
   var Bool save-input
+  var Bool file-ended
   
   ~~~ built-in types ~~~
   user TypeData type-char

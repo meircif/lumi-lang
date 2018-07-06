@@ -9,9 +9,9 @@ class BaseMethExpression(Expression)
   var Int bases
   
   func inst parse-new(
-      owner String text, user SyntaxTreeCode code-node, copy Char end)->(
+      owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
-    expression := BaseMethExpression(user code-node, copy end = '(')
+    expression := BaseMethExpression(user code-node, copy glob.last-char = '(')
   
   new(user SyntaxTreeCode code-node, copy Bool is-call)
     base(user code-node)
@@ -135,30 +135,30 @@ class ModuleTypeExpression(Expression)
 class TypeExpression(ModuleTypeExpression)
   func inst parse-new(
       owner String text, user String ends, user SyntaxTreeCode code-node)->(
-      owner Expression expression, var Char end)
+      owner Expression expression)
     owner String value
-    var Char next-end
-    if end = '.'
-      self.read-new-value(user ends)->(owner value, var next-end)
+    var Bool has-member(copy glob.last-char = '.')
+    if has-member
+      self.read-new-value(user ends)->(owner value)
       if value.length > 0
         if value.equal(user "length") or (value[0] >= 'A' and value[0] <= 'Z')
           new EnumExpression enum-expression(user code-node)
           enum-expression.parse(owner text, owner value, owner expression)
-          end := next-end
           expression := enum-expression
           return
-      glob.save-input := true
     new TypeInstance type-instance
-    type-instance.parse-name(user text, user code-node, user code-node)->(
-        var end)
-    if end = '('
+    type-instance.parse-name(user text, user code-node, user code-node)
+    if not has-member and glob.last-char = '('
       new InitExpression expression-init(user code-node)
-      expression-init.parse(owner type-instance, owner expression)->(var end)
+      expression-init.parse(owner type-instance, owner expression)
       expression := expression-init
     else
       new TypeExpression type-expression(user code-node)
       type-expression.parse(owner type-instance, owner expression)
       expression := type-expression
+      if has-member
+        MemberExpression.parse-new(user _, owner value, user code-node)->(
+            owner expression)
   
   func inst parse(
       owner TypeInstance type-instance, owner Expression module-expression)

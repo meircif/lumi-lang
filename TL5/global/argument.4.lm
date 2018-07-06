@@ -18,14 +18,13 @@ class Argument(SyntaxTreeNode)
       user String access-str,
       copy Bool is-output,
       copy Bool is-native,
-      user SyntaxTreeCode code-node)->(
-      var Char end)
+      user SyntaxTreeCode code-node)
     self.is-output := is-output
     self.is-native := is-native
     self.get-access(user access-str)->(var self.access)
-    self.parse-value(user code-node)->(var end)
+    self.parse-value(user code-node)
   
-  func dynamic parse-value(user SyntaxTreeCode code-node)->(var Char end)
+  func dynamic parse-value(user SyntaxTreeCode code-node)
     raise
   
   func dynamic get-type-instance()->(user TypeInstance type-instance)
@@ -90,22 +89,19 @@ class FunctionArguments(SyntaxTreeNode)
   func inst parse(
       user ArgumentFactory argument-factory,
       copy Bool is-native,
-      user SyntaxTreeCode code-node)->(
-      var Char end)
+      user SyntaxTreeCode code-node)
     self.parse-args(
         user self.parameters,
         user argument-factory,
         copy is-native,
-        user code-node)->(
-        var end)
-    if end = '-'
+        user code-node)
+    if glob.last-char = '-'
       self.read-expect(user ">(")
       self.parse-args(
           user self.outputs,
           user argument-factory,
           copy is-native,
-          user code-node)->(
-          var end)
+          user code-node)
   
   func inst add-self-parameter(user TypeData type-data)
     new DeclarationArgument self-args
@@ -123,37 +119,33 @@ class FunctionArguments(SyntaxTreeNode)
       user List{Argument} arguments,
       user ArgumentFactory argument-factory,
       copy Bool is-native,
-      user SyntaxTreeCode code-node)->(
-      var Char end)
+      user SyntaxTreeCode code-node)
     owner Argument argument
     user String access-str
     var Bool is-output(copy arguments is self.outputs)
-    read-until(user " )", copy false)->(user access-str, var end)
-    if end = '\n' and access-str.length = 0
+    read-until(user " )", copy false)->(user access-str)
+    if glob.last-char = '\n' and access-str.length = 0
       code-node.read-line-break-spaces()
-      read-until(user " ", copy false)->(user access-str, var end)
-    if end != ')' or access-str.length > 0
+      read-until(user " ", copy false)->(user access-str)
+    if glob.last-char != ')' or access-str.length > 0
       do
         if access-str.length = 0
-          self.syntax-error-c(user "expected access, got", copy end)
-        if end != ' '
-          self.syntax-error-c(
-              user "expected space after access, got", copy end)
+          self.syntax-error-c(user "expected access, got")
+        if glob.last-char != ' '
+          self.syntax-error-c(user "expected space after access, got")
         argument-factory.new-argument()->(owner argument)
         argument.parse(
-            user access-str, copy is-output, copy is-native, user code-node)->(
-            var end)
+            user access-str, copy is-output, copy is-native, user code-node)
         arguments.add(owner argument)
-        while end = ','
-        read-c()->(var end)
-        if end = '\n'
+        while glob.last-char = ','
+        read-c()
+        if glob.last-char = '\n'
           code-node.read-line-break-spaces()
-        else-if end != ' '
+        else-if glob.last-char != ' '
           self.syntax-error-c(
-              user "expected space or new-line after \",\", got",
-              copy end)
-        read-until(user " ", copy false)->(user access-str, var end)
-    read-c()->(var end)
+              user "expected space or new-line after \",\", got")
+        read-until(user " ", copy false)->(user access-str)
+    read-c()
   
   func dynamic link-types()
     self.link-children-types(user self.parameters)

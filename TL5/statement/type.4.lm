@@ -15,39 +15,36 @@ class TypeData(SyntaxTreeNamespace)
   var Bool is-delete-mocked
   var Bool ordering
   
-  func inst parse-new(copy Bool is-dynamic)->(
-      var Char end, owner TypeData new-node)
+  func inst parse-new(copy Bool is-dynamic)->(owner TypeData new-node)
     new-node := TypeData()
-    new-node.parse(copy is-dynamic)->(var end)
+    new-node.parse(copy is-dynamic)
   
-  func inst parse(copy Bool is-dynamic)->(var Char end)
+  func inst parse(copy Bool is-dynamic)
     self.is-dynamic := is-dynamic
     self.set-location()
     self.my-module := glob.current-module
-    read-new(user "({")->(owner self.name, var end)
+    read-new(user "({")->(owner self.name)
     self.add-type(user self.my-module)
-    if end = '{'
+    if glob.last-char = '{'
       self.parameters := List{String}()
       do
         owner String name
-        read-new(user ":}")->(owner name, var end)
+        read-new(user ":}")->(owner name)
         if not is-legal-name(user name, copy NameGroup.TYPE)
           self.syntax-error(user "illegal type parameter name", user name)
         self.parameters.add(owner name)
-        while end = ':'
-      if end != '}'
-        self.syntax-error-c(
-            user "expected \"}\" after type parameters, got", copy end)
-      read-c()->(var end)
-    if end = '('
+        while glob.last-char = ':'
+      if glob.last-char != '}'
+        self.syntax-error-c(user "expected \"}\" after type parameters, got")
+      read-c()
+    if glob.last-char = '('
       self.base-type := TypeInstance()
-      self.base-type.parse(user ")", user self, user _)->(var end)
-      if end != ')'
-        self.syntax-error-c(
-            user "expected \")\" after base type, got", copy end)
-      read-c()->(var end)
+      self.base-type.parse(user ")", user self, user _)
+      if glob.last-char != ')'
+        self.syntax-error-c(user "expected \")\" after base type, got")
+      read-c()
     self.indentation-spaces := 2
-    self.parse-block-children(user self, user _)->(var end)
+    self.parse-block-children(user self, user _)
     self.indentation-spaces := 0
   
   func inst is-base-dynamic()->(var Bool base-dynamic)
@@ -64,20 +61,19 @@ class TypeData(SyntaxTreeNamespace)
       self.syntax-error(user "type name overrides Enum", user self.name)
     my-module.type-map.add(user self.name, user self)
   
-  func dynamic parse-child(user String keyword)->(var Char end)
-    if self.parse-if-function(user keyword, user self)->(var end)
+  func dynamic parse-child(user String keyword)
+    if self.parse-if-function(user keyword, user self)
       return
     
     if keyword.equal(user "new")
-      if end != '('
-        self.syntax-error-c(
-            user "expected \"(\" after \"new\", got", copy end)
+      if glob.last-char != '('
+        self.syntax-error-c(user "expected \"(\" after \"new\", got")
       if self.constructor?
         self.syntax-error(
             user "constructor already defined for type", user self.name)
       owner SyntaxTreeConstructor constructor
       self.constructor := SyntaxTreeConstructor.parse-new(
-          user _, user self)->(var end, owner constructor)
+          user _, user self)->(owner constructor)
       self.functions.add(owner constructor)
       
     else

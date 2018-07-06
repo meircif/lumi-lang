@@ -56,6 +56,7 @@ class SyntaxTreeRoot(GlobalNodes)
         input-files-number += 1
         glob.line-number := 1
         glob.current-module := _
+        glob.file-ended := false
         file-open-read(user glob.input-file-name)->(owner glob.input-file)
         
         self.parse-children(user _, user _)
@@ -75,16 +76,14 @@ class SyntaxTreeRoot(GlobalNodes)
       user String keyword,
       user TypeData parent-type,
       user SyntaxTreeBlock parent-block)->(
-      var Char end,
       var Bool is-parsed)
     is-parsed := false
     if not glob.current-module?
       if keyword.equal(user "module")
-        if end != ' '
-          self.syntax-error-c(
-              user "expected space after \"module\", got", copy end)
+        if glob.last-char != ' '
+          self.syntax-error-c(user "expected space after \"module\", got")
         user String name
-        read-until(user "", copy false)->(user name, var end)
+        read-until(user "", copy false)->(user name)
         if not is-legal-name(user name, copy NameGroup.DEFAULT)
           self.syntax-error(user "illegal module name", user name)
         if glob.global-module.variable-map.find(user name)?
@@ -99,63 +98,51 @@ class SyntaxTreeRoot(GlobalNodes)
         return
       else
         self.syntax-error-msg(user "no \"module\" in file start")
-    base(user keyword, user parent-type, user parent-block)->(
-        var end, var is-parsed)
+    base(user keyword, user parent-type, user parent-block)->(var is-parsed)
   
-  func dynamic parse-child(user String keyword)->(var Char end)
-    if self.parse-if-function(user keyword, user _)->(var end)
+  func dynamic parse-child(user String keyword)
+    if self.parse-if-function(user keyword, user _)
       return
     
     if keyword.equal(user "const")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"const\", got", copy end)
-      self.variables.add(owner SyntaxTreeConstant.parse-new(user _)->(var end))
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"const\", got")
+      self.variables.add(owner SyntaxTreeConstant.parse-new(user _))
       
     else-if keyword.equal(user "struct")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"struct\", got", copy end)
-      self.types.add(owner TypeData.parse-new(user _, copy false)->(var end))
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"struct\", got")
+      self.types.add(owner TypeData.parse-new(user _, copy false))
       
     else-if keyword.equal(user "class")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"class\", got", copy end)
-      self.types.add(owner TypeData.parse-new(user _, copy true)->(var end))
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"class\", got")
+      self.types.add(owner TypeData.parse-new(user _, copy true))
       
     else-if keyword.equal(user "enum")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"enum\", got", copy end)
-      self.enums.add(owner EnumData.parse-new(user _)->(var end))
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"enum\", got")
+      self.enums.add(owner EnumData.parse-new(user _))
       
     else-if keyword.equal(user "main")
-      if end != '\n'
-        self.syntax-error-c(
-            user "expected new-line after \"main\", got", copy end)
-      SyntaxTreeMainFunction.parse-new(user _)->(
-          var end, owner self.main-function)
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after \"main\", got")
+      SyntaxTreeMainFunction.parse-new(user _)->(owner self.main-function)
       
     else-if keyword.equal(user "native")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"native\", got", copy end)
-      parse-native(user self)->(var end)
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"native\", got")
+      parse-native(user self)
       
     else-if keyword.equal(user "test")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"test\", got", copy end)
-      self.functions.add(owner SyntaxTreeTestFunction.parse-new(user _)->(
-          var end))
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"test\", got")
+      self.functions.add(owner SyntaxTreeTestFunction.parse-new(user _))
       
     else-if keyword.equal(user "mock")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"mock\", got", copy end)
-      self.functions.add(owner SyntaxTreeMockFunction.parse-new(user _)->(
-          var end))
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"mock\", got")
+      self.functions.add(owner SyntaxTreeMockFunction.parse-new(user _))
       
     else
       self.syntax-error(user "unknown keyword", user keyword)
@@ -372,14 +359,14 @@ struct ModuleMembers
 
 ~~~ Main function node in the syntax tree ~~~
 class SyntaxTreeMainFunction(SyntaxTreeFunction)
-  func inst parse-new()->(var Char end, owner SyntaxTreeMainFunction new-node)
+  func inst parse-new()->(owner SyntaxTreeMainFunction new-node)
     new-node := SyntaxTreeMainFunction()
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
+  func inst parse()
     self.my-module := glob.current-module
     string-new-copy(user "main")->(owner self.name)
-    self.parse-body()->(var end)
+    self.parse-body()
   
   func dynamic write()
     ; USER_MAIN_HEADER {

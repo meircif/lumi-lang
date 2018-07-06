@@ -9,23 +9,22 @@ class SliceExpression(Expression)
   owner SymbolExpression slice-symbol
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
-      owner Expression expression, var Char end)
+      owner Expression expression)
     new SliceExpression slice-expression(user code-node)
-    slice-expression.parse(owner expression)->(var end)
+    slice-expression.parse(owner expression)
     expression := slice-expression
   
   ~~~ parsing `sequence[index]` or `sequence[index:second-index]` ~~~
-  func inst parse(owner Expression sequence)->(var Char end)
+  func inst parse(owner Expression sequence)
     self.sequence := sequence
     self.access := Access.VAR
-    parse-new-expression(user ":]", user self.code-node)->(
-        owner self.index, var end)
-    if end = ':'
+    parse-new-expression(user ":]", user self.code-node)->(owner self.index)
+    if glob.last-char = ':'
       parse-new-expression(user "]", user self.code-node)->(
-          owner self.second-index, var end)
-    if end != ']'
-      self.syntax-error-c(user "expected \"]\", got", copy end)
-    read-c()->(var end)
+          owner self.second-index)
+    if glob.last-char != ']'
+      self.syntax-error-c(user "expected \"]\", got")
+    read-c()
   
   func dynamic analyze()
     self.sequence.analyze()

@@ -12,15 +12,13 @@ class InitExpression(ModuleTypeExpression)
     self.arguments.new()
   
   func inst parse(
-      owner TypeInstance result-type, owner Expression module-expression)->(
-      var Char end)
+      owner TypeInstance result-type, owner Expression module-expression)
     self.result-type := result-type
     self.module-expression := module-expression
-    if end = '('
+    if glob.last-char = '('
       var CallArgumentFactory argument-factory
       self.arguments.parse(
-          user argument-factory, copy false, user self.code-node)->(
-          var end)
+          user argument-factory, copy false, user self.code-node)
   
   func dynamic analyze()
     self.analyze-type-instance(user self.result-type)

@@ -15,17 +15,17 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   var Bool has-user-assign
   
   func inst parse-new(user TypeData parent-type)->(
-      var Char end, owner SyntaxTreeFunction new-node)
+      owner SyntaxTreeFunction new-node)
     new-node := SyntaxTreeFunction()
-    new-node.parse(user parent-type)->(var end)
+    new-node.parse(user parent-type)
   
-  func inst parse(user TypeData parent-type)->(var Char end)
+  func inst parse(user TypeData parent-type)
     self.parent-type := parent-type
     if self.parent-type?
       self.indentation-spaces := 2
       if self.parent-type.is-dynamic
         user String meth-type
-        read-until(user " ", copy false)->(user meth-type, var end)
+        read-until(user " ", copy false)->(user meth-type)
         if meth-type.equal(user "dynamic")
           self.is-dynamic := true
         else-if not meth-type.equal(user "inst")
@@ -34,31 +34,29 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
               user meth-type)
     else
       self.my-module := glob.current-module
-    self.parse-header(copy false)->(var end)
-    self.parse-body()->(var end)
+    self.parse-header(copy false)
+    self.parse-body()
   
   new()
     self.set-location()
     self.arguments.new()
   
-  func inst parse-body()->(var Char end)
+  func inst parse-body()
     self.indentation-spaces += 2
-    self.parse-block()->(var end)
+    self.parse-block()
     self.indentation-spaces := 2
   
-  func inst parse-header(copy Bool is-native)->(var Char end)
-    read-new(user "(")->(owner self.name, var end)
+  func inst parse-header(copy Bool is-native)
+    read-new(user "(")->(owner self.name)
     self.register-name()
-    if end != '('
-      self.syntax-error-c(
-          user "expected \"(\" after function name, got", copy end)
-    self.parse-arguments(copy is-native)->(var end)
+    if glob.last-char != '('
+      self.syntax-error-c(user "expected \"(\" after function name, got")
+    self.parse-arguments(copy is-native)
   
-  func inst parse-arguments(copy Bool is-native)->(var Char end)
+  func inst parse-arguments(copy Bool is-native)
     var DeclarationArgumentFactory argument-factory
     var SyntaxTreeCode dummy-node(user self)
-    self.arguments.parse(
-        user argument-factory, copy is-native, user dummy-node)->(var end)
+    self.arguments.parse(user argument-factory, copy is-native, user dummy-node)
     if self.parent-type?
       self.arguments.add-self-parameter(user self.parent-type)
   
@@ -241,16 +239,16 @@ struct TypeCount
 ~~~ Constructor declaration in the syntax tree ~~~
 class SyntaxTreeConstructor(SyntaxTreeFunction)
   func inst parse-new(user TypeData parent-type)->(
-      var Char end, owner SyntaxTreeConstructor new-node)
+      owner SyntaxTreeConstructor new-node)
     new-node := SyntaxTreeConstructor()
-    new-node.parse(user parent-type)->(var end)
+    new-node.parse(user parent-type)
   
-  func inst parse(user TypeData parent-type)->(var Char end)
+  func inst parse(user TypeData parent-type)
     self.parent-type := parent-type
     self.indentation-spaces := 2
     string-new-copy(user "new")->(owner self.name)
-    self.parse-arguments(copy false)->(var end)
-    self.parse-body()->(var end)
+    self.parse-arguments(copy false)
+    self.parse-body()
   
   func dynamic analyze()
     if self.arguments.outputs.first?
@@ -276,17 +274,17 @@ class DeclarationArgument(Argument)
         owner new-argument.variable.type-instance)
     string-new-copy(user self.variable.name)->(owner new-argument.variable.name)
   
-  func dynamic parse-value(user SyntaxTreeCode code-node)->(var Char end)
+  func dynamic parse-value(user SyntaxTreeCode code-node)
     self.variable := SyntaxTreeVariable(user _)
     self.variable.access := self.access
     self.variable.is-output := self.is-output
     if code-node?
       code-node.get-parent-type()->(user self.variable.parent-type)
     self.variable.type-instance := TypeInstance()
-    self.variable.type-instance.parse(user " ", user self, user _)->(var end)
-    if end != ' '
-      self.syntax-error-c(user "expected space after type, got", copy end)
-    read-new(user ",)")->(owner self.variable.name, var end)
+    self.variable.type-instance.parse(user " ", user self, user _)
+    if glob.last-char != ' '
+      self.syntax-error-c(user "expected space after type, got")
+    read-new(user ",)")->(owner self.variable.name)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := self.variable.parent-type

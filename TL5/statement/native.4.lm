@@ -2,21 +2,20 @@
 module tl5-compiler
 
 ~~~ Parse "native" keyword in the root tree ~~~
-func parse-native(user SyntaxTreeRoot root)->(var Char end)
+func parse-native(user SyntaxTreeRoot root)
   user String keyword
-  read-until(user " ", copy false)->(user keyword, var end)
-  if end != ' '
-    root.syntax-error-c(
-        user "expected space after \"native\" keyword, got", copy end)
+  read-until(user " ", copy false)->(user keyword)
+  if glob.last-char != ' '
+    root.syntax-error-c(user "expected space after \"native\" keyword, got")
   
   if keyword.equal(user "func")
-    root.functions.add(owner NativeFunction.parse-new(user _)->(var end))
+    root.functions.add(owner NativeFunction.parse-new(user _))
     
   else-if keyword.equal(user "var")
-    root.variables.add(owner NativeVariable.parse-new(user _)->(var end))
+    root.variables.add(owner NativeVariable.parse-new(user _))
     
   else-if keyword.equal(user "type")
-    root.types.add(owner NativeType.parse-new(user _)->(var end))
+    root.types.add(owner NativeType.parse-new(user _))
     
   else
     root.syntax-error(user "unknown \"native\" keyword", user keyword)
@@ -26,13 +25,13 @@ func parse-native(user SyntaxTreeRoot root)->(var Char end)
 class NativeFunction(SyntaxTreeFunction)
   user ModuleMembers outer-module
   
-  func inst parse-new()->(var Char end, owner NativeFunction new-node)
+  func inst parse-new()->(owner NativeFunction new-node)
     new-node := NativeFunction()
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
+  func inst parse()
     self.outer-module := glob.current-module
-    self.parse-header(copy true)->(var end)
+    self.parse-header(copy true)
     glob.global-module.function-map.add(user self.name, user self)
   
   func dynamic link-types()
@@ -51,10 +50,10 @@ class NativeFunction(SyntaxTreeFunction)
 
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeVariable(SyntaxTreeVariable)
-  func inst parse-new()->(var Char end, owner NativeVariable new-node)
+  func inst parse-new()->(owner NativeVariable new-node)
     new-node := NativeVariable(user _)
     new-node.parse(
-        copy Access.VAR, copy false, user _, user glob.global-module)->(var end)
+        copy Access.VAR, copy false, user _, user glob.global-module)
     new-node.is-native := true
     new-node.my-module := _
   
@@ -72,13 +71,13 @@ class NativeVariable(SyntaxTreeVariable)
 
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeType(TypeData)
-  func inst parse-new()->(var Char end, owner NativeType new-node)
+  func inst parse-new()->(owner NativeType new-node)
     new-node := NativeType()
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
+  func inst parse()
     self.is-primitive := true
-    read-new(user "")->(owner self.name, var end)
+    read-new(user "")->(owner self.name)
     self.add-type(user glob.global-module)
   
   func dynamic analyze()

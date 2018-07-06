@@ -13,22 +13,21 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
   user SyntaxTreeFunction next-func
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeForLoop new-node)
+      owner SyntaxTreeForLoop new-node)
     new-node := SyntaxTreeForLoop(user parent)
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
-    read-new(user " ")->(owner self.item-name, var end)
-    if end != ' '
-      self.syntax-error-c(
-          user "expected space after index name, got", copy end)
+  func inst parse()
+    read-new(user " ")->(owner self.item-name)
+    if glob.last-char != ' '
+      self.syntax-error-c(user "expected space after index name, got")
     self.read-expect(user "in ")
-    parse-new-expression(user ":", user self)->(owner self.iterator, var end)
-    if end = ':'
+    parse-new-expression(user ":", user self)->(owner self.iterator)
+    if glob.last-char = ':'
       self.start := self.iterator
-      parse-new-expression(user "", user self)->(owner self.iterator, var end)
+      parse-new-expression(user "", user self)->(owner self.iterator)
     
-    self.parse-block(copy true)->(var end)
+    self.parse-block(copy true)
   
   func dynamic analyze()
     owner TypeInstance type-instance

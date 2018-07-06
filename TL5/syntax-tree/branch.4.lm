@@ -7,71 +7,66 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   var List{SyntaxTreeVariable} variables
   
   func inst parse-block-children(
-      user TypeData parent-type, user SyntaxTreeBlock parent-block)->(
-      var Char end)
-    if end != '\n'
-      self.syntax-error-c(user "expected block in a new line, got", copy end)
-    self.parse-children(user parent-type, user parent-block)->(var end)
-    if end != EOF
+      user TypeData parent-type, user SyntaxTreeBlock parent-block)
+    if glob.last-char != '\n'
+      self.syntax-error-c(user "expected block in a new line, got")
+    self.parse-children(user parent-type, user parent-block)
+    if not glob.file-ended
       glob.save-input := true
   
   func inst parse-children(
-      user TypeData parent-type, user SyntaxTreeBlock parent-block)->(
-      var Char end)
+      user TypeData parent-type, user SyntaxTreeBlock parent-block)
     var Int my-line-number(copy self.line-number)
     do
       user String keyword
       var Int spaces
-      read-until(user " .([{?", copy true)->(user keyword, var end, var spaces)
+      read-until(user " .([{?", copy true)->(user keyword, var spaces)
       ; ignore empty lines
-      if keyword.length > 0 or end != '\n'
+      if keyword.length > 0 or glob.last-char != '\n'
         self.set-location()
         
-        if not self.parse-if-comment(user keyword)->(var end)
+        if not self.parse-if-comment(user keyword)
           if spaces > self.indentation-spaces
             self.syntax-error-indentation(
                 copy spaces, copy self.indentation-spaces)
           
-          while spaces = self.indentation-spaces and end != EOF
+          while spaces = self.indentation-spaces and not glob.file-ended
           
           if not self.parse-if-common(
-              user keyword, user parent-type, user parent-block)->(var end)
-            self.parse-child(user keyword)->(var end)
+              user keyword, user parent-type, user parent-block)
+            self.parse-child(user keyword)
         
-        while end != EOF
-        if not glob.save-input and end != '\n'
-          self.syntax-error-c(
-              user "expected new-line in line end, got", copy end)
+        while not glob.file-ended
+        if not glob.save-input and glob.last-char != '\n'
+          self.syntax-error-c(user "expected new-line in line end, got")
     
     self.line-number := my-line-number
   
-  func inst parse-if-comment(user String keyword)->(
-      var Char end, var Bool is-parsed)
+  func inst parse-if-comment(user String keyword)->(var Bool is-parsed)
     is-parsed := true
-    if keyword.equal(user ";") and end = ' '
+    if keyword.equal(user ";") and glob.last-char = ' '
       user String text
-      read-until(user "", copy false)->(user text, var end)
-    else-if keyword.equal(user "~~~") and end = ' '
+      read-until(user "", copy false)->(user text)
+    else-if keyword.equal(user "~~~") and glob.last-char = ' '
       var Int count
       do
-        var Char ch
-        read-c()->(var ch)
-        if ch = '~'
+        read-c()
+        if glob.last-char = '~'
           count += 1
         else
           count := 0
-        while ch != EOF and count < 3
-      read-c()->(var end)
-    else-if keyword.length = 0 and end = '['
-      if read-c() != ';'
+        while not glob.file-ended and count < 3
+      read-c()
+    else-if keyword.length = 0 and glob.last-char = '['
+      read-c()
+      if glob.last-char != ';'
         self.syntax-error-msg(user "unexpected \"[\"")
       var Char prev(copy '\0')
       do
-        var Char curr
-        read-c()->(var curr)
-        while curr != EOF and (curr != ']' or prev != ';')
-        prev := curr
-      read-c()->(var end)
+        read-c()
+        while not glob.file-ended and (glob.last-char != ']' or prev != ';')
+        prev := glob.last-char
+      read-c()
     else
       is-parsed := false
   
@@ -79,9 +74,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       user String keyword,
       user TypeData parent-type,
       user SyntaxTreeBlock parent-block)->(
-      var Char end,
       var Bool is-parsed)
-    is-parsed := end = ' '
+    is-parsed := glob.last-char = ' '
     
     user List{SyntaxTreeVariable} variables(user self.variables)
     if parent-block?
@@ -101,29 +95,26 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           copy Access.VAR,
           copy true,
           user parent-type,
-          user parent-block)->(
-          var end))
+          user parent-block))
     else-if keyword.equal(user "user")
       variables.add(owner SyntaxTreeVariable.parse-new(
           user _,
           copy Access.USER,
           copy false,
           user parent-type,
-          user parent-block)->(
-          var end))
+          user parent-block))
     else-if keyword.equal(user "owner")
       variables.add(owner SyntaxTreeVariable.parse-new(
           user _,
           copy Access.OWNER,
           copy false,
           user parent-type,
-          user parent-block)->(
-          var end))
+          user parent-block))
       
     else
       is-parsed := false
   
-  func dynamic parse-child(user String keyword)->(var Char end)
+  func dynamic parse-child(user String keyword)
     raise
   
   func dynamic find-variable(user String name, user String module-name)->(
@@ -232,15 +223,13 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
   var List{SyntaxTreeFunction} functions
   
   func inst parse-if-function(
-      user String keyword, user TypeData parent-type)->(
-      var Char end, var Bool is-func)
+      user String keyword, user TypeData parent-type)->(var Bool is-func)
     keyword.equal(user "func")->(var is-func)
     if is-func
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"func\", got", copy end)
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"func\", got")
       self.functions.add(owner SyntaxTreeFunction.parse-new(
-          user _, user parent-type)->(var end))
+          user _, user parent-type))
   
   func dynamic link-types()
     base()

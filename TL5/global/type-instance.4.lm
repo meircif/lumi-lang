@@ -35,64 +35,58 @@ struct TypeInstance
   func parse(
       user String ends,
       user SyntaxTreeNode node,
-      user SyntaxTreeCode code-node)->(
-      var Char end)
+      user SyntaxTreeCode code-node)
     user String name
     read-until(user string-new-concat(user ends, user ".{"), copy false)->(
-        user name, var end)
-    if end = '.'
+        user name)
+    if glob.last-char = '.'
       string-new-copy(user name)->(owner self.module-name)
       read-until(user string-new-concat(user ends, user "{"), copy false)->(
-          user name, var end)
-    self.parse-name(user name, user node, user code-node)->(var end)
+          user name)
+    self.parse-name(user name, user node, user code-node)
   
   func parse-name(
       user String name,
       user SyntaxTreeNode node,
-      user SyntaxTreeCode code-node)->(
-      var Char end)
+      user SyntaxTreeCode code-node)
     string-new-copy(user name)->(owner self.name)
-    if end = '{'
+    if glob.last-char = '{'
       if self.name.equal(user "Func")
-        read-c()->(var end)
-        if end != '('
-          node.syntax-error-c(
-              user "expected \"(\" inside Function type, got", copy end)
+        read-c()
+        if glob.last-char != '('
+          node.syntax-error-c(user "expected \"(\" inside Function type, got")
         self.arguments := FunctionArguments()
         var DeclarationArgumentFactory argument-factory
-        self.arguments.parse(
-            user argument-factory, copy false, user code-node)->(var end)
+        self.arguments.parse(user argument-factory, copy false, user code-node)
       else-if code-node? and self.name.equal(user "String")
         parse-new-expression(user "}", user code-node)->(
-            owner self.length-owner, var end)
+            owner self.length-owner)
         self.length := self.length-owner
       else
         var Bool has-sub-type(copy true)
         var Bool is-array(copy self.name.equal(user "Array"))
         if code-node? and is-array
           parse-new-expression(user ":}", user code-node)->(
-              owner self.length-owner, var end)
+              owner self.length-owner)
           self.length := self.length-owner
-          if end != ':' and end != '}'
+          if glob.last-char != ':' and glob.last-char != '}'
             node.syntax-error-c(
-                user "expected \":\" or \"} after array length\", got",
-                copy end)
-          has-sub-type := end = ':'
+                user "expected \":\" or \"} after array length\", got")
+          has-sub-type := glob.last-char = ':'
         if has-sub-type
           if not is-array
             code-node := _
           self.parameters := List{TypeInstance}()
           do
             new TypeInstance sub-type
-            sub-type.parse(user ":}", user node, user code-node)->(var end)
+            sub-type.parse(user ":}", user node, user code-node)
             self.parameters.add(owner sub-type)
-            while end = ':'
+            while glob.last-char = ':'
             if is-array
               node.syntax-error-msg(user "more than one subtype for array")
-      if end != '}'
-        node.syntax-error-c(user "expected \"}\" after sub-types, got",
-            copy end)
-      read-c()->(var end)
+      if glob.last-char != '}'
+        node.syntax-error-c(user "expected \"}\" after sub-types, got")
+      read-c()
   
   func add-subtype-copy(user TypeData type-data)
     if not self.parameters?

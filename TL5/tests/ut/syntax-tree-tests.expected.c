@@ -232,7 +232,7 @@ expected ")" after base type, got "new-line"
 /// @ te8
 unknown keyword "error"
 /// @ te9
-expected block in a new line, got "EOF"
+expected block in a new line, got "end-of-file"
 /// @ te10
 type with no fields "Error"
 /// @ te11
@@ -697,7 +697,7 @@ expected space or new-line after ",", got "u"
 /// @ te11
 expected ">(" got "()"
 /// @ te12
-expected block in a new line, got "EOF"
+expected block in a new line, got "end-of-file"
 /// @ te13
 indentation too long, expected 2 got 4
 /// @ te14
@@ -1326,7 +1326,7 @@ expected new-line after "else", got " "
 /// @ te9
 expected space after "else-if", got "("
 /// @ te10
-expected block in a new line, got "EOF"
+expected block in a new line, got "end-of-file"
 /// @@ test-do-loop
 /// @ t0
 Int x = 0;

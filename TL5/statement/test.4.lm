@@ -6,12 +6,12 @@ class SyntaxTreeAssert(SyntaxTreeCode)
   owner Expression tested
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeAssert new-node)
+      owner SyntaxTreeAssert new-node)
     new-node := SyntaxTreeAssert(user parent)
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
-    parse-new-expression(user "", user self)->(owner self.tested, var end)
+  func inst parse()
+    parse-new-expression(user "", user self)->(owner self.tested)
   
   func dynamic analyze()
     self.analyze-expression(user self.tested, user glob.type-bool)
@@ -32,19 +32,19 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   owner String expected-error
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeAssertError new-node)
+      owner SyntaxTreeAssertError new-node)
     new-node := SyntaxTreeAssertError(user parent)
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
-    parse-new-expression(user ",", user self)->(owner self.tested, var end)
-    if end = ','
-      read-c()->(var end)
-      if end = '\n'
+  func inst parse()
+    parse-new-expression(user ",", user self)->(owner self.tested)
+    if glob.last-char = ','
+      read-c()
+      if glob.last-char = '\n'
         self.read-line-break-spaces()
-      else-if end != ' '
-        self.syntax-error-c(user "expected space after \",\", got", copy end)
-      read-new(user "")->(owner self.expected-error, var end)
+      else-if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \",\", got")
+      read-new(user "")->(owner self.expected-error)
       self.check-string(user self.expected-error)
   
   func dynamic analyze()
@@ -118,12 +118,12 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
 
 ~~~ Test function in the syntax tree ~~~
 class SyntaxTreeTestFunction(SyntaxTreeFunction)
-  func inst parse-new()->(var Char end, owner SyntaxTreeTestFunction new-node)
+  func inst parse-new()->(owner SyntaxTreeTestFunction new-node)
     new-node := SyntaxTreeTestFunction()
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
-    base(user _)->(var end)
+  func inst parse()
+    base(user _)
     if self.arguments.parameters.first? or self.arguments.outputs.first?
       self.syntax-error-msg(user "test function cannot have arguments")
     glob.test-functions.add(user self.name, user self)
@@ -136,12 +136,12 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
   owner String module-name
   user SyntaxTreeFunction mocked-function
   
-  func inst parse-new()->(var Char end, owner SyntaxTreeMockFunction new-node)
+  func inst parse-new()->(owner SyntaxTreeMockFunction new-node)
     new-node := SyntaxTreeMockFunction()
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
-    base(user _)->(var end)
+  func inst parse()
+    base(user _)
     self.mocker-function := self
     var Int index
     self.name.find(user ".")->(var index)
