@@ -27,11 +27,6 @@ class SyntaxTreeExpression(SyntaxTreeCode)
 
 ~~~ Return statement in the syntax tree ~~~
 class SyntaxTreeReturn(SyntaxTreeCode)
-  
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeReturn new-node)
-    new-node := SyntaxTreeReturn(user parent)
-  
   func dynamic is-end-point()->(var Bool is-end)
     is-end := true
   
@@ -138,10 +133,6 @@ class SyntaxTreeContinue(SyntaxTreeCode)
 
 class SyntaxTreeCoverage(SyntaxTreeCode)
   var Int input-file-index
-  
-  func inst init-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeCoverage coverage-node)
-    coverage-node := SyntaxTreeCoverage(user parent)
   
   new(user SyntaxTreeBlock parent)
     base(user parent)

@@ -8,11 +8,6 @@ class BaseMethExpression(Expression)
   user TypeData parent-type
   var Int bases
   
-  func inst parse-new(
-      owner String text, user SyntaxTreeCode code-node)->(
-      owner Expression expression)
-    expression := BaseMethExpression(user code-node, copy glob.last-char = '(')
-  
   new(user SyntaxTreeCode code-node, copy Bool is-call)
     base(user code-node)
     self.is-call := is-call

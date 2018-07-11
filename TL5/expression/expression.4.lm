@@ -131,10 +131,10 @@ class Expression(SyntaxTreeNode)
       TypeExpression.parse-new(user _, owner text, user ends, user code-node)->(
           owner expression)
     else-if text.length = 1 and first = '_'
-      EmptyExpression.parse-new(user _, owner text)->(owner expression)
+      expression := EmptyExpression()
     else-if text.equal(user "base")
-      BaseMethExpression.parse-new(
-          user _, owner text, user code-node)->(owner expression)
+      expression := BaseMethExpression(
+          user code-node, copy glob.last-char = '(')
     else
       SymbolExpression.parse-new(user _, owner text, user code-node)->(
           owner expression)

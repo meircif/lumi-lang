@@ -84,7 +84,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         if glob.current-module.name.equal(user glob.tested-module) and
             not keyword.equal(user "else") and not keyword.equal(user "else-if")
           parent-block.code-nodes.add(
-              owner SyntaxTreeCoverage.init-new(user _, user parent-block))
+              owner SyntaxTreeCoverage(user parent-block))
     
     if not is-parsed
       return

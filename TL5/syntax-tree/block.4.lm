@@ -89,7 +89,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       owner SyntaxTreeCoverage coverage-node
       if glob.tested-module?
         if glob.current-module.name.equal(user glob.tested-module)
-          SyntaxTreeCoverage.init-new(user _, user _)->(owner coverage-node)
+          coverage-node := SyntaxTreeCoverage(user _)
       new-if := SyntaxTreeIf.parse-new(user _, user self)->(owner owner-if)
       self.previous-if.add-else-if(owner owner-if, owner coverage-node)
       
@@ -121,7 +121,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     else-if keyword.equal(user "return")
       if glob.last-char != '\n'
         self.syntax-error-c(user "expected new-line after \"return\", got")
-      self.code-nodes.add(owner SyntaxTreeReturn.parse-new(user _, user self))
+      self.code-nodes.add(owner SyntaxTreeReturn(user self))
       
     else-if keyword.equal(user "raise")
       if glob.last-char != ' ' and glob.last-char != '\n'

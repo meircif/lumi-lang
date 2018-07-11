@@ -206,9 +206,6 @@ class StringExpression(TextExpression)
 
 ~~~ Constant empty expression `_` ~~~
 class EmptyExpression(Expression)
-  func inst parse-new(owner String text)->(owner Expression expression)
-    expression := EmptyExpression()
-  
   new()
     base(user _)
     self.set-simple-type(user glob.type-empty)
