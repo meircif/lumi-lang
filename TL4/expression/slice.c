@@ -134,7 +134,7 @@ Returncode SliceExpression_write_preactions(SliceExpression* self) {
   if (NULL != self->second_index) {
     CHECK(78, (self->second_index)->_base._dtl[9](self->second_index) )
     CHECK(79, Expression_write_init_var_ref(&(self->_base), self->slice_symbol) )
-    CHECK(80, Expression_write_refman_init(&(self->_base), self->slice_symbol) )
+    CHECK(80, Expression_write_refman_init(&(self->_base), self->slice_symbol, false) )
     /* symbol_Var.length = second; */
     /* symbol_Var.max_length = symbol.length + 1; */
     /* symbol_Var.values = (seq)->values + (index); */

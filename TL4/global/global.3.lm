@@ -145,7 +145,7 @@ static Global
     self.add-builtin-type(user "Ref", copy true):(owner self.type-ref)
     self.add-builtin-type(user "String", copy false):(owner self.type-string)
     self.add-builtin-type(user "Array", copy false):(owner self.type-array)
-    self.add-builtin-type(user "Type", copy false):(owner self.type-type)
+    self.add-builtin-type(user "Type Name", copy false):(owner self.type-type)
     self.add-builtin-type(user "Base Symbol", copy false):(owner self.type-base)
     self.add-builtin-type(user "Generic Type", copy false):(
         owner self.type-generic)
@@ -153,7 +153,9 @@ static Global
     self.add-builtin-type(user "Module Name", copy false):(
         owner self.type-module)
     self.add-builtin-type(user "File", copy false):(owner self.type-file)
+    self.type-file.create-disallowed := true
     self.add-builtin-type(user "Sys", copy false):(owner self.type-sys)
+    self.type-sys.create-disallowed := true
     
     user FunctionArguments arguments
     

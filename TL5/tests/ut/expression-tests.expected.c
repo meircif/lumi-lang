@@ -71,7 +71,7 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
@@ -88,7 +88,7 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 26;
   aux_String_0_Var.length = 25;
@@ -105,7 +105,7 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(4, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 16;
   aux_String_0_Var.length = 15;
@@ -122,7 +122,7 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(4, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 19;
   aux_String_0_Var.length = 18;
@@ -139,7 +139,7 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(2, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 11;
   aux_String_0_Var.length = 10;
@@ -247,7 +247,7 @@ String aux_String_0_Var = {0};
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   aux_String_0_Var.length = 6;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
@@ -272,7 +272,7 @@ Array aux_Array_0_Var = {0};
   Ref_Manager* aux_Array_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   aux_Array_0 = &aux_Array_0_Var;
-  aux_Array_0_Refman = LUMI_new_ref(aux_Array_0);
+  aux_Array_0_Refman = LUMI_new_ref((void**)&aux_Array_0, false);
   if (aux_Array_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   aux_Array_0_Var.length = 6;
   aux_Array_0_Var.values = (Byte*)((ut_M_arr)->values) + (2);
@@ -906,7 +906,7 @@ ut_M_Ta a_Var = {{0}};
   Ref_Manager* a_Refman = NULL;
   ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
   a = &a_Var;
-  a_Refman = LUMI_new_ref(a);
+  a_Refman = LUMI_new_ref((void**)&a, false);
   if (a_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   LUMI_err = ut_M_Test_new(&(a->_base), a_Refman, 1);
   CHECK(1)
@@ -921,7 +921,7 @@ ut_M_Ta* aux_Ta_0 = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   aux_Ta_0 = LUMI_alloc(sizeof(ut_M_Ta));
   if (aux_Ta_0 == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
-  aux_Ta_0_Refman = LUMI_new_ref(aux_Ta_0);
+  aux_Ta_0_Refman = LUMI_new_ref((void**)&aux_Ta_0, true);
   if (aux_Ta_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   LUMI_err = ut_M_Test_new(&(aux_Ta_0->_base), aux_Ta_0_Refman, 7);
   CHECK(1)
@@ -938,7 +938,7 @@ ut_M_Ta* a = NULL;
   ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
   a = LUMI_alloc(sizeof(ut_M_Ta));
   if (a == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
-  a_Refman = LUMI_new_ref(a);
+  a_Refman = LUMI_new_ref((void**)&a, true);
   if (a_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   LUMI_err = ut_M_Test_new(&(a->_base), a_Refman, 1);
   CHECK(1)
@@ -1160,7 +1160,7 @@ Returncode (*farr_Values[38])(void) = {0};
   Ref_Manager* farr_Refman = NULL;
   farr = &farr_Var;
   farr_Var.values = farr_Values;
-  farr_Refman = LUMI_new_ref(farr);
+  farr_Refman = LUMI_new_ref((void**)&farr, false);
   if (farr_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
   if (farr == NULL) RAISE(2, 17, "empty object used")
   if (farr_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
@@ -1298,4 +1298,16 @@ if (sys == NULL) RAISE(1, 17, "empty object used")
 /// @ t32
 LUMI_err = String_clear(ut_M_str, ut_M_str_Refman);
   CHECK(1)
+/// @ te0
+cannot create objects with type "File"
+/// @ te1
+cannot create objects with type "File"
+/// @ te2
+cannot create objects with type "File"
+/// @ te3
+cannot create objects with type "Sys"
+/// @ te4
+cannot create objects with type "Sys"
+/// @ te5
+cannot create objects with type "Sys"
 /// @

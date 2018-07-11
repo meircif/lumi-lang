@@ -122,6 +122,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.syntax-error(
           user "cannot declared \"var\" field of sequence type",
           user self.type-instance.type-data.name)
+    if self.is-create and self.type-instance.type-data.create-disallowed
+      self.syntax-error(
+          user "cannot create objects with type",
+          user self.type-instance.type-data.name)
     if self.access = Access.VAR
       self.type-instance.check-sequence(user self)
     if self.is-create and self.type-instance.type-data is glob.type-array

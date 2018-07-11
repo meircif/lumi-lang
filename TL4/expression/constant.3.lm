@@ -180,7 +180,7 @@ class StringExpression(TextExpression)
     # `symbol`_Var.length = `string-length`;
     # `symbol`_Var.values = "`text`";
     self.write-init-var-ref(user self.symbol)
-    self.write-refman-init(user self.symbol)
+    self.write-refman-init(user self.symbol, copy false)
     var Int real-length(1)
     for index in 1:self.text.length - 1
       if self.text[index] = '\\'

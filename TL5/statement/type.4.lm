@@ -14,6 +14,7 @@ class TypeData(SyntaxTreeNamespace)
   var Bool is-ordered
   var Bool is-delete-mocked
   var Bool ordering
+  var Bool create-disallowed
   
   func inst parse-new(copy Bool is-dynamic)->(owner TypeData new-node)
     new-node := TypeData()

@@ -8,7 +8,6 @@ enum Access
   USER
   OWNER
   VAR
-  NUMBER
 
 
 struct Global
@@ -87,7 +86,7 @@ struct Global
     self.init-builtin-types()
   
   func init-access-names()
-    self.access-names := Array{Access.NUMBER:String{16}}()
+    self.access-names := Array{Access.length:String{16}}()
     self.access-names[Access.UNDEFINED].new(user "undefined")
     self.access-names[Access.COPY].new(user "copy")
     self.access-names[Access.USER].new(user "user")
@@ -144,7 +143,7 @@ struct Global
     self.add-builtin-type(user "Ref", copy true)->(user self.type-ref)
     self.add-builtin-type(user "String", copy false)->(user self.type-string)
     self.add-builtin-type(user "Array", copy false)->(user self.type-array)
-    self.add-builtin-type(user "Type", copy false)->(user self.type-type)
+    self.add-builtin-type(user "Type Name", copy false)->(user self.type-type)
     self.add-builtin-type(user "Base Symbol", copy false)->(user self.type-base)
     self.add-builtin-type(user "Generic Type", copy false)->(
         user self.type-generic)
@@ -152,7 +151,9 @@ struct Global
     self.add-builtin-type(user "Module Name", copy false)->(
         user self.type-module)
     self.add-builtin-type(user "File", copy false)->(user self.type-file)
+    self.type-file.create-disallowed := true
     self.add-builtin-type(user "Sys", copy false)->(user self.type-sys)
+    self.type-sys.create-disallowed := true
     
     user FunctionArguments arguments
     

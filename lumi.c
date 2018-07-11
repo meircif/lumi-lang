@@ -150,7 +150,7 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   self->execute = true;
   aux_String_0 = LUMI_new_string(lumi_M_MAX_COMMNAD_SIZE);
   if (aux_String_0 == NULL) RAISE(79, 49, "insufficient memory for object dynamic allocation")
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, true);
   if (aux_String_0_Refman == NULL) RAISE(79, 38, "insufficient memory for managed object")
   if (self == NULL) RAISE(79, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(79, 28, "outdated weak reference used")
@@ -166,7 +166,7 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_1_Refman = NULL;
   aux_String_2 = LUMI_new_string(lumi_M_MAX_COMMNAD_SIZE);
   if (aux_String_2 == NULL) RAISE(80, 49, "insufficient memory for object dynamic allocation")
-  aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+  aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, true);
   if (aux_String_2_Refman == NULL) RAISE(80, 38, "insufficient memory for managed object")
   if (self == NULL) RAISE(80, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(80, 28, "outdated weak reference used")
@@ -182,7 +182,7 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_3_Refman = NULL;
   aux_String_4 = LUMI_new_string(lumi_M_MAX_COMMNAD_SIZE);
   if (aux_String_4 == NULL) RAISE(81, 49, "insufficient memory for object dynamic allocation")
-  aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+  aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, true);
   if (aux_String_4_Refman == NULL) RAISE(81, 38, "insufficient memory for managed object")
   if (self == NULL) RAISE(81, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(81, 28, "outdated weak reference used")
@@ -198,7 +198,7 @@ Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   aux_String_5_Refman = NULL;
   aux_String_6 = LUMI_new_string(lumi_M_MAX_COMMNAD_SIZE);
   if (aux_String_6 == NULL) RAISE(82, 49, "insufficient memory for object dynamic allocation")
-  aux_String_6_Refman = LUMI_new_ref(aux_String_6);
+  aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, true);
   if (aux_String_6_Refman == NULL) RAISE(82, 38, "insufficient memory for managed object")
   if (self == NULL) RAISE(82, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(82, 28, "outdated weak reference used")
@@ -358,7 +358,7 @@ Returncode lumi_M_Lumi_check_opt_param_error(lumi_M_Lumi* self, Ref_Manager* sel
   LUMI_inc_ref(param_Refman);
   if (is_error) {
       aux_String_0 = &aux_String_0_Var;
-      aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+      aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
       if (aux_String_0_Refman == NULL) RAISE(111, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 16;
       aux_String_0_Var.length = 15;
@@ -368,7 +368,7 @@ Returncode lumi_M_Lumi_check_opt_param_error(lumi_M_Lumi* self, Ref_Manager* sel
       LUMI_err = Sys_print(sys, sys_Refman, param, param_Refman);
       CHECK(112)
       aux_String_1 = &aux_String_1_Var;
-      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+      aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
       if (aux_String_1_Refman == NULL) RAISE(113, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 10;
       aux_String_1_Var.length = 9;
@@ -378,7 +378,7 @@ Returncode lumi_M_Lumi_check_opt_param_error(lumi_M_Lumi* self, Ref_Manager* sel
       LUMI_err = Sys_print(sys, sys_Refman, option, option_Refman);
       CHECK(114)
       aux_String_2 = &aux_String_2_Var;
-      aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+      aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
       if (aux_String_2_Refman == NULL) RAISE(115, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 7;
       aux_String_2_Var.length = 6;
@@ -417,7 +417,7 @@ Returncode lumi_M_Lumi_check_param(lumi_M_Lumi* self, Ref_Manager* self_Refman, 
   CHECK(119)
   if (aux_Bool_0) {
       aux_String_0 = &aux_String_0_Var;
-      aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+      aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
       if (aux_String_0_Refman == NULL) RAISE(120, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 42;
       aux_String_0_Var.length = 41;
@@ -427,7 +427,7 @@ Returncode lumi_M_Lumi_check_param(lumi_M_Lumi* self, Ref_Manager* self_Refman, 
       LUMI_err = Sys_print(sys, sys_Refman, value, value_Refman);
       CHECK(121)
       aux_String_1 = &aux_String_1_Var;
-      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+      aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
       if (aux_String_1_Refman == NULL) RAISE(122, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 2;
       aux_String_1_Var.length = 1;
@@ -464,7 +464,7 @@ Returncode lumi_M_Lumi_concat_lumi_output(lumi_M_Lumi* self, Ref_Manager* self_R
   if (self == NULL) RAISE(126, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(126, 28, "outdated weak reference used")
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
@@ -485,7 +485,7 @@ Returncode lumi_M_Lumi_concat_lumi_output(lumi_M_Lumi* self, Ref_Manager* self_R
       if (self == NULL) RAISE(129, 17, "empty object used")
       if (self_Refman->value == NULL) RAISE(129, 28, "outdated weak reference used")
       aux_String_1 = &aux_String_1_Var;
-      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+      aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
       if (aux_String_1_Refman == NULL) RAISE(129, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 3;
       aux_String_1_Var.length = 2;
@@ -496,7 +496,7 @@ Returncode lumi_M_Lumi_concat_lumi_output(lumi_M_Lumi* self, Ref_Manager* self_R
   if (self == NULL) RAISE(130, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(130, 28, "outdated weak reference used")
   aux_String_2 = &aux_String_2_Var;
-  aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+  aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
   if (aux_String_2_Refman == NULL) RAISE(130, 38, "insufficient memory for managed object")
   aux_String_2_Var.max_length = 2;
   aux_String_2_Var.length = 1;
@@ -527,7 +527,7 @@ Returncode lumi_M_Lumi_concat_first_file_name(lumi_M_Lumi* self, Ref_Manager* se
   LUMI_inc_ref(target_Refman);
   LUMI_inc_ref(name_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 2;
   aux_String_0_Var.length = 1;
@@ -537,7 +537,7 @@ Returncode lumi_M_Lumi_concat_first_file_name(lumi_M_Lumi* self, Ref_Manager* se
   LUMI_err = String_concat(target, target_Refman, name, name_Refman);
   CHECK(134)
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(135, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 2;
   aux_String_1_Var.length = 1;
@@ -566,7 +566,7 @@ Returncode lumi_M_Lumi_concat_file_name(lumi_M_Lumi* self, Ref_Manager* self_Ref
   LUMI_inc_ref(target_Refman);
   LUMI_inc_ref(name_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(138, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 2;
   aux_String_0_Var.length = 1;
@@ -612,7 +612,7 @@ Returncode lumi_M_Lumi_concat_tl_path(lumi_M_Lumi* self, Ref_Manager* self_Refma
   if (self == NULL) RAISE(145, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(145, 28, "outdated weak reference used")
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(145, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
@@ -757,7 +757,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
         if (arg_Refman->value == NULL) RAISE(158, 28, "outdated weak reference used")
         if (arg->length < 2) {
           aux_String_0 = &aux_String_0_Var;
-          aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+          aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
           if (aux_String_0_Refman == NULL) RAISE(159, 38, "insufficient memory for managed object")
           aux_String_0_Var.max_length = 26;
           aux_String_0_Var.length = 25;
@@ -777,13 +777,13 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
           else {
             if (op == 'o') {
               aux_String_1 = &aux_String_1_Var;
-              aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+              aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
               if (aux_String_1_Refman == NULL) RAISE(165, 38, "insufficient memory for managed object")
               aux_String_1_Var.max_length = 2;
               aux_String_1_Var.length = 1;
               aux_String_1_Var.values = "o";
               aux_String_2 = &aux_String_2_Var;
-              aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+              aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
               if (aux_String_2_Refman == NULL) RAISE(165, 38, "insufficient memory for managed object")
               aux_String_2_Var.max_length = 10;
               aux_String_2_Var.length = 9;
@@ -799,13 +799,13 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
             else {
               if (op == 't') {
                 aux_String_3 = &aux_String_3_Var;
-                aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+                aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
                 if (aux_String_3_Refman == NULL) RAISE(169, 38, "insufficient memory for managed object")
                 aux_String_3_Var.max_length = 2;
                 aux_String_3_Var.length = 1;
                 aux_String_3_Var.values = "t";
                 aux_String_4 = &aux_String_4_Var;
-                aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+                aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
                 if (aux_String_4_Refman == NULL) RAISE(169, 38, "insufficient memory for managed object")
                 aux_String_4_Var.max_length = 12;
                 aux_String_4_Var.length = 11;
@@ -820,13 +820,13 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                   if (self == NULL) RAISE(173, 17, "empty object used")
                   if (self_Refman->value == NULL) RAISE(173, 28, "outdated weak reference used")
                   aux_String_5 = &aux_String_5_Var;
-                  aux_String_5_Refman = LUMI_new_ref(aux_String_5);
+                  aux_String_5_Refman = LUMI_new_ref((void**)&aux_String_5, false);
                   if (aux_String_5_Refman == NULL) RAISE(174, 38, "insufficient memory for managed object")
                   aux_String_5_Var.max_length = 2;
                   aux_String_5_Var.length = 1;
                   aux_String_5_Var.values = "e";
                   aux_String_6 = &aux_String_6_Var;
-                  aux_String_6_Refman = LUMI_new_ref(aux_String_6);
+                  aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, false);
                   if (aux_String_6_Refman == NULL) RAISE(174, 38, "insufficient memory for managed object")
                   aux_String_6_Var.max_length = 10;
                   aux_String_6_Var.length = 9;
@@ -841,13 +841,13 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                     if (self == NULL) RAISE(177, 17, "empty object used")
                     if (self_Refman->value == NULL) RAISE(177, 28, "outdated weak reference used")
                     aux_String_8 = &aux_String_8_Var;
-                    aux_String_8_Refman = LUMI_new_ref(aux_String_8);
+                    aux_String_8_Refman = LUMI_new_ref((void**)&aux_String_8, false);
                     if (aux_String_8_Refman == NULL) RAISE(178, 38, "insufficient memory for managed object")
                     aux_String_8_Var.max_length = 2;
                     aux_String_8_Var.length = 1;
                     aux_String_8_Var.values = "p";
                     aux_String_9 = &aux_String_9_Var;
-                    aux_String_9_Refman = LUMI_new_ref(aux_String_9);
+                    aux_String_9_Refman = LUMI_new_ref((void**)&aux_String_9, false);
                     if (aux_String_9_Refman == NULL) RAISE(178, 38, "insufficient memory for managed object")
                     aux_String_9_Var.max_length = 5;
                     aux_String_9_Var.length = 4;
@@ -890,13 +890,13 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
               if ((2) < 0 || (2) >= (arg)->length) RAISE(187, 25, "slice index out of bounds")
               if ((((arg)->values)[2]) == 'a') {
                 aux_String_11 = &aux_String_11_Var;
-                aux_String_11_Refman = LUMI_new_ref(aux_String_11);
+                aux_String_11_Refman = LUMI_new_ref((void**)&aux_String_11, false);
                 if (aux_String_11_Refman == NULL) RAISE(188, 38, "insufficient memory for managed object")
                 aux_String_11_Var.max_length = 3;
                 aux_String_11_Var.length = 2;
                 aux_String_11_Var.values = "ra";
                 aux_String_12 = &aux_String_12_Var;
-                aux_String_12_Refman = LUMI_new_ref(aux_String_12);
+                aux_String_12_Refman = LUMI_new_ref((void**)&aux_String_12, false);
                 if (aux_String_12_Refman == NULL) RAISE(188, 38, "insufficient memory for managed object")
                 aux_String_12_Var.max_length = 10;
                 aux_String_12_Var.length = 9;
@@ -925,7 +925,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                             }
                             else {
                               aux_String_13 = &aux_String_13_Var;
-                              aux_String_13_Refman = LUMI_new_ref(aux_String_13);
+                              aux_String_13_Refman = LUMI_new_ref((void**)&aux_String_13, false);
                               if (aux_String_13_Refman == NULL) RAISE(196, 38, "insufficient memory for managed object")
                               aux_String_13_Var.max_length = 24;
                               aux_String_13_Var.length = 23;
@@ -935,7 +935,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                               LUMI_err = Sys_print(sys, sys_Refman, arg, arg_Refman);
                               CHECK(197)
                               aux_String_14 = &aux_String_14_Var;
-                              aux_String_14_Refman = LUMI_new_ref(aux_String_14);
+                              aux_String_14_Refman = LUMI_new_ref((void**)&aux_String_14, false);
                               if (aux_String_14_Refman == NULL) RAISE(198, 38, "insufficient memory for managed object")
                               aux_String_14_Var.max_length = 2;
                               aux_String_14_Var.length = 1;
@@ -979,7 +979,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       }
     }
   aux_String_15 = &aux_String_15_Var;
-  aux_String_15_Refman = LUMI_new_ref(aux_String_15);
+  aux_String_15_Refman = LUMI_new_ref((void**)&aux_String_15, false);
   if (aux_String_15_Refman == NULL) RAISE(207, 38, "insufficient memory for managed object")
   aux_String_15_Var.max_length = 22;
   aux_String_15_Var.length = 21;
@@ -991,7 +991,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(209, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(209, 28, "outdated weak reference used")
   aux_String_16 = &aux_String_16_Var;
-  aux_String_16_Refman = LUMI_new_ref(aux_String_16);
+  aux_String_16_Refman = LUMI_new_ref((void**)&aux_String_16, false);
   if (aux_String_16_Refman == NULL) RAISE(211, 38, "insufficient memory for managed object")
   aux_String_16_Var.max_length = 72;
   aux_String_16_Var.length = 71;
@@ -1004,7 +1004,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       if (first_input == NULL) RAISE(215, 17, "empty object used")
       if (first_input_Refman->value == NULL) RAISE(215, 28, "outdated weak reference used")
       aux_String_17 = &aux_String_17_Var;
-      aux_String_17_Refman = LUMI_new_ref(aux_String_17);
+      aux_String_17_Refman = LUMI_new_ref((void**)&aux_String_17, false);
       if (aux_String_17_Refman == NULL) RAISE(216, 38, "insufficient memory for managed object")
       aux_String_17_Var.max_length = 32;
       aux_String_17_Var.length = 31;
@@ -1026,7 +1026,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self_Refman->value == NULL) RAISE(218, 28, "outdated weak reference used")
   if ((self->version < '0') || (self->version > '4')) {
       aux_String_18 = &aux_String_18_Var;
-      aux_String_18_Refman = LUMI_new_ref(aux_String_18);
+      aux_String_18_Refman = LUMI_new_ref((void**)&aux_String_18, false);
       if (aux_String_18_Refman == NULL) RAISE(219, 38, "insufficient memory for managed object")
       aux_String_18_Var.max_length = 30;
       aux_String_18_Var.length = 29;
@@ -1035,7 +1035,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       CHECK(219)
       version_string = &version_string_Var;
       version_string_Var.values = version_string_Values;
-      version_string_Refman = LUMI_new_ref(version_string);
+      version_string_Refman = LUMI_new_ref((void**)&version_string, false);
       if (version_string_Refman == NULL) RAISE(220, 38, "insufficient memory for managed object")
       if (self == NULL) RAISE(221, 17, "empty object used")
       if (self_Refman->value == NULL) RAISE(221, 28, "outdated weak reference used")
@@ -1049,7 +1049,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(225, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(225, 28, "outdated weak reference used")
   aux_String_19 = &aux_String_19_Var;
-  aux_String_19_Refman = LUMI_new_ref(aux_String_19);
+  aux_String_19_Refman = LUMI_new_ref((void**)&aux_String_19, false);
   if (aux_String_19_Refman == NULL) RAISE(226, 38, "insufficient memory for managed object")
   aux_String_19_Var.max_length = 47;
   aux_String_19_Var.length = 46;
@@ -1065,7 +1065,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(228, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(228, 28, "outdated weak reference used")
   aux_String_20 = &aux_String_20_Var;
-  aux_String_20_Refman = LUMI_new_ref(aux_String_20);
+  aux_String_20_Refman = LUMI_new_ref((void**)&aux_String_20, false);
   if (aux_String_20_Refman == NULL) RAISE(230, 38, "insufficient memory for managed object")
   aux_String_20_Var.max_length = 49;
   aux_String_20_Var.length = 48;
@@ -1077,7 +1077,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(232, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(232, 28, "outdated weak reference used")
   aux_String_21 = &aux_String_21_Var;
-  aux_String_21_Refman = LUMI_new_ref(aux_String_21);
+  aux_String_21_Refman = LUMI_new_ref((void**)&aux_String_21, false);
   if (aux_String_21_Refman == NULL) RAISE(233, 38, "insufficient memory for managed object")
   aux_String_21_Var.max_length = 40;
   aux_String_21_Var.length = 39;
@@ -1122,7 +1122,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       if (self->main_input == NULL) RAISE(244, 17, "empty object used")
       if (self->main_input_Refman->value == NULL) RAISE(244, 28, "outdated weak reference used")
       aux_String_22 = &aux_String_22_Var;
-      aux_String_22_Refman = LUMI_new_ref(aux_String_22);
+      aux_String_22_Refman = LUMI_new_ref((void**)&aux_String_22, false);
       if (aux_String_22_Refman == NULL) RAISE(244, 38, "insufficient memory for managed object")
       aux_String_22_Var.length = self->main_input->length - suffix_length;
       aux_String_22_Var.max_length = aux_String_22_Var.length + 1;
@@ -1136,7 +1136,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       if (self->main_input_Refman->value == NULL) RAISE(243, 28, "outdated weak reference used")
       aux_String_23 = LUMI_new_string(self->main_input->length);
       if (aux_String_23 == NULL) RAISE(243, 49, "insufficient memory for object dynamic allocation")
-      aux_String_23_Refman = LUMI_new_ref(aux_String_23);
+      aux_String_23_Refman = LUMI_new_ref((void**)&aux_String_23, true);
       if (aux_String_23_Refman == NULL) RAISE(243, 38, "insufficient memory for managed object")
       LUMI_err = String_new(aux_String_23, aux_String_23_Refman, aux_String_22, self->main_input_Refman);
       CHECK(243)
@@ -1221,7 +1221,7 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(249, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(249, 28, "outdated weak reference used")
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(249, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
@@ -1237,7 +1237,7 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(251, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(251, 28, "outdated weak reference used")
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(251, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 10;
   aux_String_1_Var.length = 9;
@@ -1253,7 +1253,7 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
         if (self == NULL) RAISE(254, 17, "empty object used")
         if (self_Refman->value == NULL) RAISE(254, 28, "outdated weak reference used")
         aux_String_2 = &aux_String_2_Var;
-        aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+        aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
         if (aux_String_2_Refman == NULL) RAISE(254, 38, "insufficient memory for managed object")
         aux_String_2_Var.max_length = 4;
         aux_String_2_Var.length = 3;
@@ -1283,7 +1283,7 @@ Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       CHECK(259)
     }
   aux_String_3 = &aux_String_3_Var;
-  aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+  aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
   if (aux_String_3_Refman == NULL) RAISE(260, 38, "insufficient memory for managed object")
   aux_String_3_Var.max_length = 21;
   aux_String_3_Var.length = 20;
@@ -1355,7 +1355,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Ref_Manager* aux_String_14_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(263, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
@@ -1368,7 +1368,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       if (self == NULL) RAISE(264, 17, "empty object used")
       if (self_Refman->value == NULL) RAISE(264, 28, "outdated weak reference used")
       aux_String_1 = &aux_String_1_Var;
-      aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+      aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
       if (aux_String_1_Refman == NULL) RAISE(264, 38, "insufficient memory for managed object")
       aux_String_1_Var.max_length = 4;
       aux_String_1_Var.length = 3;
@@ -1382,7 +1382,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self->lumi_path_Refman->value == NULL) RAISE(265, 28, "outdated weak reference used")
   if (self->lumi_path->length == 0) {
       aux_String_2 = &aux_String_2_Var;
-      aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+      aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
       if (aux_String_2_Refman == NULL) RAISE(266, 38, "insufficient memory for managed object")
       aux_String_2_Var.max_length = 9;
       aux_String_2_Var.length = 8;
@@ -1421,7 +1421,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(272, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(272, 28, "outdated weak reference used")
   aux_String_3 = &aux_String_3_Var;
-  aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+  aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
   if (aux_String_3_Refman == NULL) RAISE(272, 38, "insufficient memory for managed object")
   aux_String_3_Var.max_length = 4;
   aux_String_3_Var.length = 3;
@@ -1441,7 +1441,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
         if (self == NULL) RAISE(275, 17, "empty object used")
         if (self_Refman->value == NULL) RAISE(275, 28, "outdated weak reference used")
         aux_String_4 = &aux_String_4_Var;
-        aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+        aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
         if (aux_String_4_Refman == NULL) RAISE(275, 38, "insufficient memory for managed object")
         aux_String_4_Var.max_length = 3;
         aux_String_4_Var.length = 2;
@@ -1457,7 +1457,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
         if (self->main_input == NULL) RAISE(277, 17, "empty object used")
         if (self->main_input_Refman->value == NULL) RAISE(277, 28, "outdated weak reference used")
         aux_String_5 = &aux_String_5_Var;
-        aux_String_5_Refman = LUMI_new_ref(aux_String_5);
+        aux_String_5_Refman = LUMI_new_ref((void**)&aux_String_5, false);
         if (aux_String_5_Refman == NULL) RAISE(277, 38, "insufficient memory for managed object")
         aux_String_5_Var.length = self->main_input->length - 5;
         aux_String_5_Var.max_length = aux_String_5_Var.length + 1;
@@ -1470,7 +1470,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
         if (self == NULL) RAISE(278, 17, "empty object used")
         if (self_Refman->value == NULL) RAISE(278, 28, "outdated weak reference used")
         aux_String_6 = &aux_String_6_Var;
-        aux_String_6_Refman = LUMI_new_ref(aux_String_6);
+        aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, false);
         if (aux_String_6_Refman == NULL) RAISE(278, 38, "insufficient memory for managed object")
         aux_String_6_Var.max_length = 4;
         aux_String_6_Var.length = 3;
@@ -1500,7 +1500,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(284, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(284, 28, "outdated weak reference used")
   aux_String_7 = &aux_String_7_Var;
-  aux_String_7_Refman = LUMI_new_ref(aux_String_7);
+  aux_String_7_Refman = LUMI_new_ref((void**)&aux_String_7, false);
   if (aux_String_7_Refman == NULL) RAISE(284, 38, "insufficient memory for managed object")
   aux_String_7_Var.max_length = 2;
   aux_String_7_Var.length = 1;
@@ -1515,7 +1515,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       if (self == NULL) RAISE(287, 17, "empty object used")
       if (self_Refman->value == NULL) RAISE(287, 28, "outdated weak reference used")
       aux_String_8 = &aux_String_8_Var;
-      aux_String_8_Refman = LUMI_new_ref(aux_String_8);
+      aux_String_8_Refman = LUMI_new_ref((void**)&aux_String_8, false);
       if (aux_String_8_Refman == NULL) RAISE(287, 38, "insufficient memory for managed object")
       aux_String_8_Var.max_length = 12;
       aux_String_8_Var.length = 11;
@@ -1527,7 +1527,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       if (self == NULL) RAISE(289, 17, "empty object used")
       if (self_Refman->value == NULL) RAISE(289, 28, "outdated weak reference used")
       aux_String_9 = &aux_String_9_Var;
-      aux_String_9_Refman = LUMI_new_ref(aux_String_9);
+      aux_String_9_Refman = LUMI_new_ref((void**)&aux_String_9, false);
       if (aux_String_9_Refman == NULL) RAISE(289, 38, "insufficient memory for managed object")
       aux_String_9_Var.max_length = 13;
       aux_String_9_Var.length = 12;
@@ -1539,7 +1539,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       if (self == NULL) RAISE(291, 17, "empty object used")
       if (self_Refman->value == NULL) RAISE(291, 28, "outdated weak reference used")
       aux_String_10 = &aux_String_10_Var;
-      aux_String_10_Refman = LUMI_new_ref(aux_String_10);
+      aux_String_10_Refman = LUMI_new_ref((void**)&aux_String_10, false);
       if (aux_String_10_Refman == NULL) RAISE(291, 38, "insufficient memory for managed object")
       aux_String_10_Var.max_length = 6;
       aux_String_10_Var.length = 5;
@@ -1555,7 +1555,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
       if (self == NULL) RAISE(293, 17, "empty object used")
       if (self_Refman->value == NULL) RAISE(293, 28, "outdated weak reference used")
       aux_String_11 = &aux_String_11_Var;
-      aux_String_11_Refman = LUMI_new_ref(aux_String_11);
+      aux_String_11_Refman = LUMI_new_ref((void**)&aux_String_11, false);
       if (aux_String_11_Refman == NULL) RAISE(293, 38, "insufficient memory for managed object")
       aux_String_11_Var.max_length = 3;
       aux_String_11_Var.length = 2;
@@ -1566,7 +1566,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(294, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(294, 28, "outdated weak reference used")
   aux_String_12 = &aux_String_12_Var;
-  aux_String_12_Refman = LUMI_new_ref(aux_String_12);
+  aux_String_12_Refman = LUMI_new_ref((void**)&aux_String_12, false);
   if (aux_String_12_Refman == NULL) RAISE(294, 38, "insufficient memory for managed object")
   aux_String_12_Var.max_length = 4;
   aux_String_12_Var.length = 3;
@@ -1578,7 +1578,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   if (self == NULL) RAISE(296, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(296, 28, "outdated weak reference used")
   aux_String_13 = &aux_String_13_Var;
-  aux_String_13_Refman = LUMI_new_ref(aux_String_13);
+  aux_String_13_Refman = LUMI_new_ref((void**)&aux_String_13, false);
   if (aux_String_13_Refman == NULL) RAISE(296, 38, "insufficient memory for managed object")
   aux_String_13_Var.max_length = 4;
   aux_String_13_Var.length = 3;
@@ -1592,7 +1592,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   LUMI_err = lumi_M_Lumi_concat_file_name(self, self_Refman, self->command, self->command_Refman, self->output, self->output_Refman);
   CHECK(297)
   aux_String_14 = &aux_String_14_Var;
-  aux_String_14_Refman = LUMI_new_ref(aux_String_14);
+  aux_String_14_Refman = LUMI_new_ref((void**)&aux_String_14, false);
   if (aux_String_14_Refman == NULL) RAISE(298, 38, "insufficient memory for managed object")
   aux_String_14_Var.max_length = 18;
   aux_String_14_Var.length = 17;
@@ -1664,7 +1664,7 @@ Returncode lumi_M_Lumi_run_program(lumi_M_Lumi* self, Ref_Manager* self_Refman) 
       if (self == NULL) RAISE(307, 17, "empty object used")
       if (self_Refman->value == NULL) RAISE(307, 28, "outdated weak reference used")
       aux_String_0 = &aux_String_0_Var;
-      aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+      aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
       if (aux_String_0_Refman == NULL) RAISE(307, 38, "insufficient memory for managed object")
       aux_String_0_Var.max_length = 2;
       aux_String_0_Var.length = 1;
@@ -1769,7 +1769,7 @@ Returncode lumi_M_help(void) {
   LUMI_err = Sys_println(sys, sys_Refman, lumi_M_usage, lumi_M_usage_Refman);
   CHECK(39)
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(51, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 463;
   aux_String_0_Var.length = 462;
@@ -1805,7 +1805,7 @@ USER_MAIN_HEADER {
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "lumi.4.lm"
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(25, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 30;
   aux_String_0_Var.length = 29;
@@ -1820,7 +1820,7 @@ USER_MAIN_HEADER {
 #define LUMI_FILE_NAME "lumi.4.lm"
 #define LUMI_FUNC_NAME "main"
   lumi_object = &lumi_object_Var;
-  lumi_object_Refman = LUMI_new_ref(lumi_object);
+  lumi_object_Refman = LUMI_new_ref((void**)&lumi_object, false);
   if (lumi_object_Refman == NULL) RAISE(322, 38, "insufficient memory for managed object")
   LUMI_err = lumi_M_Lumi_new(lumi_object, lumi_object_Refman);
   CHECK(322)

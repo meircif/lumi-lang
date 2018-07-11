@@ -26,7 +26,7 @@ class SyntaxTreeRoot(GlobalNodes)
   
   func inst parse()
     var Int first-file-index
-    var Int arg-test-index(copy - 1)
+    var Int arg-test-index(copy -1)
     var Int input-files-number
     for n in 1:sys.argv.length
       user String arg(user sys.argv[n])
@@ -40,7 +40,7 @@ class SyntaxTreeRoot(GlobalNodes)
         input-files-number += 1
     
     if input-files-number = 0 or arg-test-index = sys.argv.length - 1
-      sys.print(user "usage: tl4-compiler [-t TESTED-MODULE]")
+      sys.print(user "usage: tl5-compiler [-t TESTED-MODULE]")
       sys.print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
       sys.exit(copy 1)
     
@@ -57,7 +57,13 @@ class SyntaxTreeRoot(GlobalNodes)
         glob.line-number := 1
         glob.current-module := _
         glob.file-ended := false
-        file-open-read(user glob.input-file-name)->(owner glob.input-file)
+        try
+          file-open-read(user glob.input-file-name)->(owner glob.input-file)
+        catch
+          sys.print(user "could not read file \"")
+          sys.print(user glob.input-file-name)
+          sys.print(user "\"\n")
+          sys.exit(copy 1)
         
         self.parse-children(user _, user _)
         
@@ -210,7 +216,13 @@ class SyntaxTreeRoot(GlobalNodes)
   6. main function
   ~~~
   func dynamic write()
-    file-open-write(user self.output-file-name)->(owner glob.output-file)
+    try
+      file-open-write(user self.output-file-name)->(owner glob.output-file)
+    catch
+      sys.print(user "could not write file \"")
+      sys.print(user self.output-file-name)
+      sys.print(user "\"\n")
+      sys.exit(copy 1)
     
     write-global(user ";include \"lumi.4.h\"\n")
     

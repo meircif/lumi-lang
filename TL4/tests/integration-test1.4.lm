@@ -369,6 +369,55 @@ test test-assert-error-message()
   new-fail-countdown := 2
   assert-error f-alloc(), "insufficient memory for managed object"
 
+native var Int lumi-debug-value
+
+test test-builtin-errors()
+  new String{4} outdated-owner
+  user String outdated(user outdated-owner)
+  outdated-owner := _
+  var String{3} too-long(user "abc")
+  
+  owner File file
+  var String{4} filename
+  assert-error file-open-read(user _)->(owner file), "empty object used"
+  assert-error file-open-write(user outdated)->(owner file),
+      "outdated weak reference used"
+  assert-error file-open-read(user too-long)->(owner file), "string too long"
+  lumi-debug-value := 1
+  assert-error file-open-write(user filename)->(owner file), "open file failed"
+  lumi-debug-value := 2
+  new-fail-countdown := 1
+  assert-error file-open-read(user filename)->(owner file),
+      "insufficient memory for object dynamic allocation"
+  new-fail-countdown := 2
+  assert-error file-open-write(user filename)->(owner file),
+      "insufficient memory for managed object"
+  lumi-debug-value := 1
+  assert-error file-close(owner file), "close file failed"
+  var Char ch
+  lumi-debug-value := 2
+  file-open-read(user filename)->(owner file)
+  assert-error file.getc()->(var ch), "file not opened"
+  assert-error file.putc(copy 'a'), "file not opened"
+  assert-error file.write(user "aa"), "file not opened"
+  lumi-debug-value := 1
+  assert-error file.putc(copy 'a'), "file write failed"
+  assert-error file.write(user "aa"), "file write failed"
+  
+  assert-error "aa".get(copy 2), "slice index out of bounds"
+  assert-error too-long.append(copy 'a'), "string too long"
+  assert-error too-long.append(copy 'a'), "string too long"
+  assert-error too-long.concat(user "a"), "string too long"
+  var String{2} short-str
+  assert-error 123.str(user short-str), "string too long"
+  assert-error short-str.new(user "aaaaa"), "string too long"
+  
+  lumi-debug-value := 2
+  assert-error sys.getline(user short-str), "string too long"
+  lumi-debug-value := 1
+  assert-error sys.exit(copy 0), "exit failed"
+  assert-error sys.system(user "aaa"), "command execution failed"
+
 mock Sys.println(user String text)
   assert text?
 

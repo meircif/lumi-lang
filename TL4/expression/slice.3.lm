@@ -77,7 +77,7 @@ class SliceExpression(Expression)
     if ? self.second-index
       self.second-index.write-preactions()
       self.write-init-var-ref(user self.slice-symbol)
-      self.write-refman-init(user self.slice-symbol)
+      self.write-refman-init(user self.slice-symbol, copy false)
       # symbol_Var.length = second;
       # symbol_Var.max_length = symbol.length + 1;
       # symbol_Var.values = (seq)->values + (index);

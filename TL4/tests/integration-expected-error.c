@@ -239,7 +239,7 @@ Returncode error_M_fail_base_class_output(void) {
   error_M_BaseType_Dynamic* base_user_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[34];
   base_var = &base_var_Var;
-  base_var_Refman = LUMI_new_ref(base_var);
+  base_var_Refman = LUMI_new_ref((void**)&base_var, false);
   if (base_var_Refman == NULL) RAISE(34, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[35];
   base_user = base_var;
@@ -269,7 +269,7 @@ Returncode error_M_fail_slice_index(void) {
   ++LUMI_file_coverage[0].line_count[39];
   arr = &arr_Var;
   arr_Var.values = arr_Values;
-  arr_Refman = LUMI_new_ref(arr);
+  arr_Refman = LUMI_new_ref((void**)&arr, false);
   if (arr_Refman == NULL) RAISE(39, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[40];
   if (arr == NULL) RAISE(40, 17, "empty object used")
@@ -322,7 +322,7 @@ Returncode error_M_fail_member_outdated(void) {
   ++LUMI_file_coverage[0].line_count[48];
   obj_owner = LUMI_alloc(sizeof(error_M_BaseType));
   if (obj_owner == NULL) RAISE(48, 49, "insufficient memory for object dynamic allocation")
-  obj_owner_Refman = LUMI_new_ref(obj_owner);
+  obj_owner_Refman = LUMI_new_ref((void**)&obj_owner, true);
   if (obj_owner_Refman == NULL) RAISE(48, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[49];
   obj = obj_owner;
@@ -392,7 +392,7 @@ Returncode error_M_fail_sequence_outdated(void) {
   ++LUMI_file_coverage[0].line_count[59];
   arr_owner = LUMI_new_array(2, sizeof(Int));
   if (arr_owner == NULL) RAISE(59, 49, "insufficient memory for object dynamic allocation")
-  arr_owner_Refman = LUMI_new_ref(arr_owner);
+  arr_owner_Refman = LUMI_new_ref((void**)&arr_owner, true);
   if (arr_owner_Refman == NULL) RAISE(59, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[60];
   arr = arr_owner;
@@ -451,7 +451,7 @@ Returncode error_M_fail_object_no_memory(void) {
   ++LUMI_file_coverage[0].line_count[70];
   obj = LUMI_alloc(sizeof(error_M_BaseType));
   if (obj == NULL) RAISE(70, 49, "insufficient memory for object dynamic allocation")
-  obj_Refman = LUMI_new_ref(obj);
+  obj_Refman = LUMI_new_ref((void**)&obj, true);
   if (obj_Refman == NULL) RAISE(70, 38, "insufficient memory for managed object")
 LUMI_cleanup:
   if (obj_Dynamic != NULL) obj_Dynamic->_del(obj);
@@ -473,7 +473,7 @@ Returncode error_M_fail_managed_no_memory(void) {
   ++LUMI_file_coverage[0].line_count[74];
   obj = LUMI_alloc(sizeof(error_M_BaseType));
   if (obj == NULL) RAISE(74, 49, "insufficient memory for object dynamic allocation")
-  obj_Refman = LUMI_new_ref(obj);
+  obj_Refman = LUMI_new_ref((void**)&obj, true);
   if (obj_Refman == NULL) RAISE(74, 38, "insufficient memory for managed object")
 LUMI_cleanup:
   if (obj_Dynamic != NULL) obj_Dynamic->_del(obj);
@@ -504,7 +504,7 @@ Returncode error_M_fail_raise_message(void) {
   Ref_Manager* aux_String_0_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[80];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(80, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 9;
   aux_String_0_Var.length = 8;
@@ -574,7 +574,7 @@ Returncode error_M_fail_assert_error_message(void) {
 #undef RETURN_ERROR
 #define RETURN_ERROR break
     aux_String_0 = &aux_String_0_Var;
-    aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+    aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
     if (aux_String_0_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
     aux_String_0_Var.max_length = 21;
     aux_String_0_Var.length = 20;
@@ -623,7 +623,7 @@ Returncode error_M_fail_assert_error_message_prefix(void) {
 #undef RETURN_ERROR
 #define RETURN_ERROR break
     aux_String_0 = &aux_String_0_Var;
-    aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+    aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
     if (aux_String_0_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
     aux_String_0_Var.max_length = 15;
     aux_String_0_Var.length = 14;

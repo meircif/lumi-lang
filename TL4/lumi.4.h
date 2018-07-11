@@ -154,7 +154,7 @@ while (self->field != NULL) { \
 }
 
 void* LUMI_alloc(size_t size);
-Ref_Manager* LUMI_new_ref(void* value);
+Ref_Manager* LUMI_new_ref(void** value, Bool is_new);
 void LUMI_inc_ref(Ref_Manager* ref);
 void LUMI_dec_ref(Ref_Manager* ref);
 void LUMI_owner_dec_ref(Ref_Manager* ref);
@@ -221,6 +221,8 @@ Returncode Sys_getenv(
   String* name, Ref_Manager*,
   String* value, Ref_Manager*,
   Bool* exists);
+
+extern int lumi_debug_value;
 
 
 #endif  /*LUMI_TL4_LUMI_4_H_INCLUDED_*/

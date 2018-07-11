@@ -451,6 +451,8 @@ Returncode integration_M_f_alloc(void);
 
 Returncode integration_M_test_assert_error_message(void);
 
+Returncode integration_M_test_builtin_errors(void);
+
 Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
 
 Bool Sys_println_Mock_active = true;
@@ -526,6 +528,8 @@ Ref_Manager* integration_M_deleted_refmans_Refman = NULL;
 
 Int integration_M_new_fail_countdown = 0;
 
+extern Int lumi_debug_value;
+
 int LUMI_file0_line_count[31] = {
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,-1,
   -1, 0,-1,-1, 0,-1
@@ -562,7 +566,7 @@ Returncode integration_M_TestStruct_new(integration_M_TestStruct* self, Ref_Mana
   if (x < 0) {
       aux_TestStruct_0 = LUMI_alloc(sizeof(integration_M_TestStruct));
       if (aux_TestStruct_0 == NULL) RAISE(215, 49, "insufficient memory for object dynamic allocation")
-      aux_TestStruct_0_Refman = LUMI_new_ref(aux_TestStruct_0);
+      aux_TestStruct_0_Refman = LUMI_new_ref((void**)&aux_TestStruct_0, true);
       if (aux_TestStruct_0_Refman == NULL) RAISE(215, 38, "insufficient memory for managed object")
       LUMI_err = integration_M_TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman);
       CHECK(215)
@@ -742,7 +746,7 @@ Returncode integration_M_Data_set(integration_M_Data* self, Ref_Manager* self_Re
   self->arr = arr;
   d = LUMI_alloc(sizeof(integration_M_Data));
   if (d == NULL) RAISE(379, 49, "insufficient memory for object dynamic allocation")
-  d_Refman = LUMI_new_ref(d);
+  d_Refman = LUMI_new_ref((void**)&d, true);
   if (d_Refman == NULL) RAISE(379, 38, "insufficient memory for managed object")
   if (self == NULL) RAISE(380, 17, "empty object used")
   if (self_Refman->value == NULL) RAISE(380, 28, "outdated weak reference used")
@@ -870,7 +874,7 @@ Returncode integration_M_Container_iter(integration_M_Container* self, Ref_Manag
   if (self_Refman->value == NULL) RAISE(463, 28, "outdated weak reference used")
   aux_ContainerIterator_0 = LUMI_alloc(sizeof(integration_M_ContainerIterator));
   if (aux_ContainerIterator_0 == NULL) RAISE(463, 49, "insufficient memory for object dynamic allocation")
-  aux_ContainerIterator_0_Refman = LUMI_new_ref(aux_ContainerIterator_0);
+  aux_ContainerIterator_0_Refman = LUMI_new_ref((void**)&aux_ContainerIterator_0, true);
   if (aux_ContainerIterator_0_Refman == NULL) RAISE(463, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_ContainerIterator_new(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, self->next, self->next_Refman);
   CHECK(463)
@@ -1002,7 +1006,7 @@ Returncode integration_M_ComplexField_meth(integration_M_ComplexField* self, Ref
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(538, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 2;
   aux_String_0_Var.length = 1;
@@ -1125,7 +1129,7 @@ Returncode integration_M_BaseType_meth0(integration_M_BaseType* self, Ref_Manage
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(53, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -1150,7 +1154,7 @@ Returncode integration_M_BaseType_meth1(integration_M_BaseType* self, Ref_Manage
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(56, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -1175,7 +1179,7 @@ Returncode integration_M_BaseType_meth2(integration_M_BaseType* self, Ref_Manage
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(59, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -1200,7 +1204,7 @@ Returncode integration_M_BaseType_meth3(integration_M_BaseType* self, Ref_Manage
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(62, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -1252,7 +1256,7 @@ Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* s
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[0].line_count[18];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(18, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -1281,7 +1285,7 @@ Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* s
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[22];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -1309,7 +1313,7 @@ Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* s
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[26];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(26, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -1335,7 +1339,7 @@ Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* s
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[0].line_count[29];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(29, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -1384,7 +1388,7 @@ Returncode integration_M_TopType_meth2(integration_M_TopType* self, Ref_Manager*
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(19, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -1415,7 +1419,7 @@ Returncode integration_M_TopType_meth3(integration_M_TopType* self, Ref_Manager*
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(25, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -1443,7 +1447,7 @@ Returncode integration_M_TopType_meth5(integration_M_TopType* self, Ref_Manager*
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(29, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -1481,7 +1485,7 @@ Returncode integration_M_TopType_meth6(integration_M_TopType* self, Ref_Manager*
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(35, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -1629,7 +1633,7 @@ Returncode integration_M_test_simple_function(void) {
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(36, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 23;
   aux_String_0_Var.length = 22;
@@ -1637,7 +1641,7 @@ Returncode integration_M_test_simple_function(void) {
   LUMI_err = Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(36)
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(40, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 25;
   aux_String_1_Var.length = 24;
@@ -1666,7 +1670,7 @@ Returncode integration_M_test_const_expression(Int* i, Char* c, String** s, Ref_
   *i = (((((((0 + 9630) + -9630) + 07520) + -07520) + 0xfda940) + -0xfda940) + 0xFDA940) + -0xFDA940;
   *c = (((('a' + '\'') + '\n') + '\x0f') + '\xA9') + '\270';
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(53, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
@@ -1678,7 +1682,7 @@ Returncode integration_M_test_const_expression(Int* i, Char* c, String** s, Ref_
   aux_Ref_Manager = NULL;
   *s = aux_String_0;
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(56, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 12;
   aux_String_1_Var.length = 11;
@@ -1758,7 +1762,7 @@ Returncode integration_M_test_member_expression(integration_M_TestStruct* t, Ref
   LUMI_err = t->fun();
   CHECK(68)
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(69, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 1;
   aux_String_0_Var.length = 0;
@@ -1821,7 +1825,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   LUMI_inc_ref(arrd_Refman);
   LUMI_inc_ref(arrf_Refman);
   aux_Array_0 = &aux_Array_0_Var;
-  aux_Array_0_Refman = LUMI_new_ref(aux_Array_0);
+  aux_Array_0_Refman = LUMI_new_ref((void**)&aux_Array_0, false);
   if (aux_Array_0_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
   aux_Array_0_Var.length = 2;
   aux_Array_0_Var.values = (Byte*)((arrs)->values) + (4);
@@ -1832,7 +1836,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if (arrs_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (aux_Array_0)->length) RAISE(89, 25, "slice index out of bounds")
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
   aux_String_0_Var.length = 3;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
@@ -1850,7 +1854,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if (arrs_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= ((((String*)((arrs)->values)) + 3))->length) RAISE(89, 25, "slice index out of bounds")
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
   aux_String_1_Var.length = 7;
   aux_String_1_Var.max_length = aux_String_1_Var.length + 1;
@@ -1866,7 +1870,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if ((2) < 0 || (2) >= (s)->length) RAISE(89, 25, "slice index out of bounds")
   *c = (((((s)->values)[2]) + (((aux_String_1)->values)[2])) + ((((((String*)((arrs)->values)) + 3))->values)[2])) + (((aux_String_0)->values)[0]);
   aux_Array_1 = &aux_Array_1_Var;
-  aux_Array_1_Refman = LUMI_new_ref(aux_Array_1);
+  aux_Array_1_Refman = LUMI_new_ref((void**)&aux_Array_1, false);
   if (aux_Array_1_Refman == NULL) RAISE(91, 38, "insufficient memory for managed object")
   aux_Array_1_Var.length = 3;
   aux_Array_1_Var.values = (Byte*)((arri)->values) + (3);
@@ -1874,7 +1878,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if (arri_Refman->value == NULL) RAISE(91, 28, "outdated weak reference used")
   if ((3) < 0 || (3) < 0 || (3) + (3) > (arri)->length) RAISE(91, 25, "slice index out of bounds")
   aux_Array_2 = &aux_Array_2_Var;
-  aux_Array_2_Refman = LUMI_new_ref(aux_Array_2);
+  aux_Array_2_Refman = LUMI_new_ref((void**)&aux_Array_2, false);
   if (aux_Array_2_Refman == NULL) RAISE(91, 38, "insufficient memory for managed object")
   aux_Array_2_Var.length = 2;
   aux_Array_2_Var.values = (Byte*)((aux_Array_1)->values) + (1);
@@ -1885,7 +1889,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if (arri_Refman->value == NULL) RAISE(91, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (aux_Array_2)->length) RAISE(91, 25, "slice index out of bounds")
   aux_Array_3 = &aux_Array_3_Var;
-  aux_Array_3_Refman = LUMI_new_ref(aux_Array_3);
+  aux_Array_3_Refman = LUMI_new_ref((void**)&aux_Array_3, false);
   if (aux_Array_3_Refman == NULL) RAISE(90, 38, "insufficient memory for managed object")
   aux_Array_3_Var.length = 4;
   aux_Array_3_Var.values = (Byte*)((arrt)->values) + (2);
@@ -1910,7 +1914,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (*i + 3 - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(90, 25, "slice index out of bounds")
   *i = (((((Int*)((arri)->values))[*i + 3 - (((Int*)((arri)->values))[2])]) + (((integration_M_TestStruct*)((arrt)->values)) + 4)->num) + (((integration_M_TestStruct*)((aux_Array_3)->values)) + 1)->num) + (((Int*)((aux_Array_2)->values))[1]);
   aux_Array_4 = &aux_Array_4_Var;
-  aux_Array_4_Refman = LUMI_new_ref(aux_Array_4);
+  aux_Array_4_Refman = LUMI_new_ref((void**)&aux_Array_4, false);
   if (aux_Array_4_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
   aux_Array_4_Var.length = 4;
   aux_Array_4_Var.values = (Byte*)((arri)->values) + (2);
@@ -1921,7 +1925,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if (arri_Refman->value == NULL) RAISE(92, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (aux_Array_4)->length) RAISE(92, 25, "slice index out of bounds")
   aux_Array_5 = &aux_Array_5_Var;
-  aux_Array_5_Refman = LUMI_new_ref(aux_Array_5);
+  aux_Array_5_Refman = LUMI_new_ref((void**)&aux_Array_5, false);
   if (aux_Array_5_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
   aux_Array_5_Var.length = 5 * ((*i) - 1);
   aux_Array_5_Var.values = (Byte*)((arri)->values) + ((2 - (*i)) + (((Int*)((aux_Array_4)->values))[1]));
@@ -1944,7 +1948,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Ref_Manager = NULL;
   s = ((String*)((arrs)->values)) + 4;
   aux_Array_6 = &aux_Array_6_Var;
-  aux_Array_6_Refman = LUMI_new_ref(aux_Array_6);
+  aux_Array_6_Refman = LUMI_new_ref((void**)&aux_Array_6, false);
   if (aux_Array_6_Refman == NULL) RAISE(94, 38, "insufficient memory for managed object")
   aux_Array_6_Var.length = 7;
   aux_Array_6_Var.values = (Byte*)((arrs)->values) + (2);
@@ -1967,7 +1971,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Ref_Manager = NULL;
   *t = ((integration_M_TestStruct*)((arrt)->values)) + 4;
   aux_Array_7 = &aux_Array_7_Var;
-  aux_Array_7_Refman = LUMI_new_ref(aux_Array_7);
+  aux_Array_7_Refman = LUMI_new_ref((void**)&aux_Array_7, false);
   if (aux_Array_7_Refman == NULL) RAISE(96, 38, "insufficient memory for managed object")
   aux_Array_7_Var.length = 7;
   aux_Array_7_Var.values = (Byte*)((arrt)->values) + (2);
@@ -1991,7 +1995,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Ref_Manager = NULL;
   *d = ((integration_M_TestClass*)((arrd)->values)) + 4;
   aux_Array_8 = &aux_Array_8_Var;
-  aux_Array_8_Refman = LUMI_new_ref(aux_Array_8);
+  aux_Array_8_Refman = LUMI_new_ref((void**)&aux_Array_8, false);
   if (aux_Array_8_Refman == NULL) RAISE(98, 38, "insufficient memory for managed object")
   aux_Array_8_Var.length = 7;
   aux_Array_8_Var.values = (Byte*)((arrd)->values) + (2);
@@ -2009,7 +2013,7 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   if ((4) < 0 || (4) >= (arrf)->length) RAISE(99, 25, "slice index out of bounds")
   *f = ((Returncode (**)(void))((arrf)->values))[4];
   aux_Array_9 = &aux_Array_9_Var;
-  aux_Array_9_Refman = LUMI_new_ref(aux_Array_9);
+  aux_Array_9_Refman = LUMI_new_ref((void**)&aux_Array_9, false);
   if (aux_Array_9_Refman == NULL) RAISE(100, 38, "insufficient memory for managed object")
   aux_Array_9_Var.length = 7;
   aux_Array_9_Var.values = (Byte*)((arrf)->values) + (2);
@@ -2183,49 +2187,49 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   LUMI_inc_ref(text_Refman);
   LUMI_inc_ref(arr_Refman);
   tv = &tv_Var;
-  tv_Refman = LUMI_new_ref(tv);
+  tv_Refman = LUMI_new_ref((void**)&tv, false);
   if (tv_Refman == NULL) RAISE(119, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(tv, tv_Refman, 0, NULL, NULL);
   CHECK(119)
   dv = &dv_Var;
-  dv_Refman = LUMI_new_ref(dv);
+  dv_Refman = LUMI_new_ref((void**)&dv, false);
   if (dv_Refman == NULL) RAISE(120, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(dv, dv_Refman, dv_Dynamic);
   CHECK(120)
   sv = &sv_Var;
   sv_Var.values = sv_Values;
-  sv_Refman = LUMI_new_ref(sv);
+  sv_Refman = LUMI_new_ref((void**)&sv, false);
   if (sv_Refman == NULL) RAISE(121, 38, "insufficient memory for managed object")
   ia = &ia_Var;
   ia_Var.values = ia_Values;
-  ia_Refman = LUMI_new_ref(ia);
+  ia_Refman = LUMI_new_ref((void**)&ia, false);
   if (ia_Refman == NULL) RAISE(123, 38, "insufficient memory for managed object")
   ta = &ta_Var;
   ta_Var.values = ta_Values;
-  ta_Refman = LUMI_new_ref(ta);
+  ta_Refman = LUMI_new_ref((void**)&ta, false);
   if (ta_Refman == NULL) RAISE(124, 38, "insufficient memory for managed object")
   da = &da_Var;
   da_Var.values = da_Values;
-  da_Refman = LUMI_new_ref(da);
+  da_Refman = LUMI_new_ref((void**)&da, false);
   if (da_Refman == NULL) RAISE(125, 38, "insufficient memory for managed object")
   sa = &sa_Var;
   sa_Var.values = sa_Values;
   LUMI_set_var_string_array(12, 7, sa, sa_Chars);
-  sa_Refman = LUMI_new_ref(sa);
+  sa_Refman = LUMI_new_ref((void**)&sa, false);
   if (sa_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
   fa = &fa_Var;
   fa_Var.values = fa_Values;
-  fa_Refman = LUMI_new_ref(fa);
+  fa_Refman = LUMI_new_ref((void**)&fa, false);
   if (fa_Refman == NULL) RAISE(127, 38, "insufficient memory for managed object")
   tn = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (tn == NULL) RAISE(128, 49, "insufficient memory for object dynamic allocation")
-  tn_Refman = LUMI_new_ref(tn);
+  tn_Refman = LUMI_new_ref((void**)&tn, true);
   if (tn_Refman == NULL) RAISE(128, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(tn, tn_Refman, 0, NULL, NULL);
   CHECK(128)
   dn = LUMI_alloc(sizeof(integration_M_TestClass));
   if (dn == NULL) RAISE(129, 49, "insufficient memory for object dynamic allocation")
-  dn_Refman = LUMI_new_ref(dn);
+  dn_Refman = LUMI_new_ref((void**)&dn, true);
   if (dn_Refman == NULL) RAISE(129, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(dn, dn_Refman, dn_Dynamic);
   CHECK(129)
@@ -2234,28 +2238,28 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   if ((0) < 0 || (0) >= (arr)->length) RAISE(130, 25, "slice index out of bounds")
   sn = LUMI_new_string(((Int*)((arr)->values))[0]);
   if (sn == NULL) RAISE(130, 49, "insufficient memory for object dynamic allocation")
-  sn_Refman = LUMI_new_ref(sn);
+  sn_Refman = LUMI_new_ref((void**)&sn, true);
   if (sn_Refman == NULL) RAISE(130, 38, "insufficient memory for managed object")
   if (arr == NULL) RAISE(131, 17, "empty object used")
   if (arr_Refman->value == NULL) RAISE(131, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(131, 25, "slice index out of bounds")
   ian = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(Int));
   if (ian == NULL) RAISE(131, 49, "insufficient memory for object dynamic allocation")
-  ian_Refman = LUMI_new_ref(ian);
+  ian_Refman = LUMI_new_ref((void**)&ian, true);
   if (ian_Refman == NULL) RAISE(131, 38, "insufficient memory for managed object")
   if (arr == NULL) RAISE(132, 17, "empty object used")
   if (arr_Refman->value == NULL) RAISE(132, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(132, 25, "slice index out of bounds")
   tan = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(integration_M_TestStruct));
   if (tan == NULL) RAISE(132, 49, "insufficient memory for object dynamic allocation")
-  tan_Refman = LUMI_new_ref(tan);
+  tan_Refman = LUMI_new_ref((void**)&tan, true);
   if (tan_Refman == NULL) RAISE(132, 38, "insufficient memory for managed object")
   if (arr == NULL) RAISE(133, 17, "empty object used")
   if (arr_Refman->value == NULL) RAISE(133, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(133, 25, "slice index out of bounds")
   dan = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(integration_M_TestClass));
   if (dan == NULL) RAISE(133, 49, "insufficient memory for object dynamic allocation")
-  dan_Refman = LUMI_new_ref(dan);
+  dan_Refman = LUMI_new_ref((void**)&dan, true);
   if (dan_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
   if (arr == NULL) RAISE(134, 17, "empty object used")
   if (arr_Refman->value == NULL) RAISE(134, 28, "outdated weak reference used")
@@ -2265,14 +2269,14 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   if ((1) < 0 || (1) >= (arr)->length) RAISE(134, 25, "slice index out of bounds")
   san = LUMI_new_string_array(((Int*)((arr)->values))[0], ((Int*)((arr)->values))[1]);
   if (san == NULL) RAISE(134, 49, "insufficient memory for object dynamic allocation")
-  san_Refman = LUMI_new_ref(san);
+  san_Refman = LUMI_new_ref((void**)&san, true);
   if (san_Refman == NULL) RAISE(134, 38, "insufficient memory for managed object")
   if (arr == NULL) RAISE(135, 17, "empty object used")
   if (arr_Refman->value == NULL) RAISE(135, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(135, 25, "slice index out of bounds")
   sfn = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(Func));
   if (sfn == NULL) RAISE(135, 49, "insufficient memory for object dynamic allocation")
-  sfn_Refman = LUMI_new_ref(sfn);
+  sfn_Refman = LUMI_new_ref((void**)&sfn, true);
   if (sfn_Refman == NULL) RAISE(135, 38, "insufficient memory for managed object")
   if (arr == NULL) RAISE(136, 17, "empty object used")
   if (arr_Refman->value == NULL) RAISE(136, 28, "outdated weak reference used")
@@ -2282,49 +2286,49 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   si_Refman = text_Refman;
   LUMI_inc_ref(si_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(138, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "some string";
   isv = &isv_Var;
   isv_Var.values = isv_Values;
-  isv_Refman = LUMI_new_ref(isv);
+  isv_Refman = LUMI_new_ref((void**)&isv, false);
   if (isv_Refman == NULL) RAISE(138, 38, "insufficient memory for managed object")
   LUMI_err = String_new(isv, isv_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(138)
   isn = LUMI_new_string(i);
   if (isn == NULL) RAISE(139, 49, "insufficient memory for object dynamic allocation")
-  isn_Refman = LUMI_new_ref(isn);
+  isn_Refman = LUMI_new_ref((void**)&isn, true);
   if (isn_Refman == NULL) RAISE(139, 38, "insufficient memory for managed object")
   LUMI_err = String_new(isn, isn_Refman, text, text_Refman);
   CHECK(139)
   fi = integration_M_f_test_int2str_Mock;
   itv = &itv_Var;
-  itv_Refman = LUMI_new_ref(itv);
+  itv_Refman = LUMI_new_ref((void**)&itv, false);
   if (itv_Refman == NULL) RAISE(141, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(itv, itv_Refman, i, text, text_Refman);
   CHECK(141)
   itn = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (itn == NULL) RAISE(142, 49, "insufficient memory for object dynamic allocation")
-  itn_Refman = LUMI_new_ref(itn);
+  itn_Refman = LUMI_new_ref((void**)&itn, true);
   if (itn_Refman == NULL) RAISE(142, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(itn, itn_Refman, i, text, text_Refman);
   CHECK(142)
   idv = &idv_Var;
-  idv_Refman = LUMI_new_ref(idv);
+  idv_Refman = LUMI_new_ref((void**)&idv, false);
   if (idv_Refman == NULL) RAISE(143, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(idv, idv_Refman, idv_Dynamic);
   CHECK(143)
   idn = LUMI_alloc(sizeof(integration_M_TestClass));
   if (idn == NULL) RAISE(144, 49, "insufficient memory for object dynamic allocation")
-  idn_Refman = LUMI_new_ref(idn);
+  idn_Refman = LUMI_new_ref((void**)&idn, true);
   if (idn_Refman == NULL) RAISE(144, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(idn, idn_Refman, idn_Dynamic);
   CHECK(144)
   aux_TestStruct_0 = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (aux_TestStruct_0 == NULL) RAISE(145, 49, "insufficient memory for object dynamic allocation")
-  aux_TestStruct_0_Refman = LUMI_new_ref(aux_TestStruct_0);
+  aux_TestStruct_0_Refman = LUMI_new_ref((void**)&aux_TestStruct_0, true);
   if (aux_TestStruct_0_Refman == NULL) RAISE(145, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, i, text, text_Refman);
   CHECK(145)
@@ -2332,7 +2336,7 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   CHECK(145)
   aux_TestClass_0 = LUMI_alloc(sizeof(integration_M_TestClass));
   if (aux_TestClass_0 == NULL) RAISE(146, 49, "insufficient memory for object dynamic allocation")
-  aux_TestClass_0_Refman = LUMI_new_ref(aux_TestClass_0);
+  aux_TestClass_0_Refman = LUMI_new_ref((void**)&aux_TestClass_0, true);
   if (aux_TestClass_0_Refman == NULL) RAISE(146, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(aux_TestClass_0, aux_TestClass_0_Refman, aux_TestClass_0_Dynamic);
   CHECK(146)
@@ -2343,7 +2347,7 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   if ((0) < 0 || (0) >= (arr)->length) RAISE(147, 25, "slice index out of bounds")
   aux_String_1 = LUMI_new_string(((Int*)((arr)->values))[0]);
   if (aux_String_1 == NULL) RAISE(147, 49, "insufficient memory for object dynamic allocation")
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, true);
   if (aux_String_1_Refman == NULL) RAISE(147, 38, "insufficient memory for managed object")
   TEST_ASSERT(147, aux_String_1 != NULL && aux_String_1_Refman->value != NULL)
   if (arr == NULL) RAISE(148, 17, "empty object used")
@@ -2351,7 +2355,7 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   if ((0) < 0 || (0) >= (arr)->length) RAISE(148, 25, "slice index out of bounds")
   aux_Array_0 = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(Int));
   if (aux_Array_0 == NULL) RAISE(148, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_0_Refman = LUMI_new_ref(aux_Array_0);
+  aux_Array_0_Refman = LUMI_new_ref((void**)&aux_Array_0, true);
   if (aux_Array_0_Refman == NULL) RAISE(148, 38, "insufficient memory for managed object")
   TEST_ASSERT(148, aux_Array_0 != NULL && aux_Array_0_Refman->value != NULL)
   if (arr == NULL) RAISE(149, 17, "empty object used")
@@ -2359,7 +2363,7 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   if ((0) < 0 || (0) >= (arr)->length) RAISE(149, 25, "slice index out of bounds")
   aux_Array_1 = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(integration_M_TestStruct));
   if (aux_Array_1 == NULL) RAISE(149, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_1_Refman = LUMI_new_ref(aux_Array_1);
+  aux_Array_1_Refman = LUMI_new_ref((void**)&aux_Array_1, true);
   if (aux_Array_1_Refman == NULL) RAISE(149, 38, "insufficient memory for managed object")
   TEST_ASSERT(149, aux_Array_1 != NULL && aux_Array_1_Refman->value != NULL)
   if (arr == NULL) RAISE(150, 17, "empty object used")
@@ -2367,7 +2371,7 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   if ((0) < 0 || (0) >= (arr)->length) RAISE(150, 25, "slice index out of bounds")
   aux_Array_2 = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(integration_M_TestClass));
   if (aux_Array_2 == NULL) RAISE(150, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_2_Refman = LUMI_new_ref(aux_Array_2);
+  aux_Array_2_Refman = LUMI_new_ref((void**)&aux_Array_2, true);
   if (aux_Array_2_Refman == NULL) RAISE(150, 38, "insufficient memory for managed object")
   TEST_ASSERT(150, aux_Array_2 != NULL && aux_Array_2_Refman->value != NULL)
   if (arr == NULL) RAISE(151, 17, "empty object used")
@@ -2378,7 +2382,7 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   if ((1) < 0 || (1) >= (arr)->length) RAISE(151, 25, "slice index out of bounds")
   aux_Array_3 = LUMI_new_string_array(((Int*)((arr)->values))[0], ((Int*)((arr)->values))[1]);
   if (aux_Array_3 == NULL) RAISE(151, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_3_Refman = LUMI_new_ref(aux_Array_3);
+  aux_Array_3_Refman = LUMI_new_ref((void**)&aux_Array_3, true);
   if (aux_Array_3_Refman == NULL) RAISE(151, 38, "insufficient memory for managed object")
   TEST_ASSERT(151, aux_Array_3 != NULL && aux_Array_3_Refman->value != NULL)
   if (arr == NULL) RAISE(152, 17, "empty object used")
@@ -2386,7 +2390,7 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   if ((0) < 0 || (0) >= (arr)->length) RAISE(152, 25, "slice index out of bounds")
   aux_Array_4 = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(Func));
   if (aux_Array_4 == NULL) RAISE(152, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_4_Refman = LUMI_new_ref(aux_Array_4);
+  aux_Array_4_Refman = LUMI_new_ref((void**)&aux_Array_4, true);
   if (aux_Array_4_Refman == NULL) RAISE(152, 38, "insufficient memory for managed object")
   TEST_ASSERT(152, aux_Array_4 != NULL && aux_Array_4_Refman->value != NULL)
   TEST_ASSERT(153, x == 0)
@@ -2601,7 +2605,7 @@ Returncode integration_M_test_call_expression(void) {
   LUMI_err = integration_M_f_test_void();
   CHECK(265)
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(266, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 5;
   aux_String_0_Var.length = 4;
@@ -2751,7 +2755,7 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
     if ((0) < 0 || (0) >= (arr)->length) RAISE(307, 25, "slice index out of bounds")
     w = ((Int*)((arr)->values))[0];
     aux_Array_0 = &aux_Array_0_Var;
-    aux_Array_0_Refman = LUMI_new_ref(aux_Array_0);
+    aux_Array_0_Refman = LUMI_new_ref((void**)&aux_Array_0, false);
     if (aux_Array_0_Refman == NULL) RAISE(308, 38, "insufficient memory for managed object")
     aux_Array_0_Var.length = 2;
     aux_Array_0_Var.values = (Byte*)((arr)->values) + (3);
@@ -2907,14 +2911,14 @@ Returncode integration_M_test_ref_count(void) {
   integration_M_TestStruct* aux_TestStruct_3 = NULL;
   Ref_Manager* aux_TestStruct_3_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(351, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "test string";
   s = LUMI_new_string(32);
   if (s == NULL) RAISE(351, 49, "insufficient memory for object dynamic allocation")
-  s_Refman = LUMI_new_ref(s);
+  s_Refman = LUMI_new_ref((void**)&s, true);
   if (s_Refman == NULL) RAISE(351, 38, "insufficient memory for managed object")
   LUMI_err = String_new(s, s_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(351)
@@ -2931,7 +2935,7 @@ Returncode integration_M_test_ref_count(void) {
   CHECK(355)
   if (! (s != NULL && s_Refman->value != NULL)) {
     aux_String_1 = &aux_String_1_Var;
-    aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+    aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
     if (aux_String_1_Refman == NULL) RAISE(357, 38, "insufficient memory for managed object")
     aux_String_1_Var.max_length = 17;
     aux_String_1_Var.length = 16;
@@ -2941,7 +2945,7 @@ Returncode integration_M_test_ref_count(void) {
   }
   if (! (s_user != NULL && s_user_Refman->value != NULL)) {
     aux_String_2 = &aux_String_2_Var;
-    aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+    aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
     if (aux_String_2_Refman == NULL) RAISE(359, 38, "insufficient memory for managed object")
     aux_String_2_Var.max_length = 15;
     aux_String_2_Var.length = 14;
@@ -2950,14 +2954,14 @@ Returncode integration_M_test_ref_count(void) {
     CHECK(359)
   }
   aux_String_3 = &aux_String_3_Var;
-  aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+  aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
   if (aux_String_3_Refman == NULL) RAISE(360, 38, "insufficient memory for managed object")
   aux_String_3_Var.max_length = 13;
   aux_String_3_Var.length = 12;
   aux_String_3_Var.values = "first struct";
   ts = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (ts == NULL) RAISE(360, 49, "insufficient memory for object dynamic allocation")
-  ts_Refman = LUMI_new_ref(ts);
+  ts_Refman = LUMI_new_ref((void**)&ts, true);
   if (ts_Refman == NULL) RAISE(360, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(ts, ts_Refman, 0, aux_String_3, aux_String_3_Refman);
   CHECK(360)
@@ -2976,14 +2980,14 @@ Returncode integration_M_test_ref_count(void) {
   LUMI_err = Sys_println_Mock(sys, sys_Refman, ts->text, ts->text_Refman);
   CHECK(362)
   aux_String_4 = &aux_String_4_Var;
-  aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+  aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
   if (aux_String_4_Refman == NULL) RAISE(363, 38, "insufficient memory for managed object")
   aux_String_4_Var.max_length = 14;
   aux_String_4_Var.length = 13;
   aux_String_4_Var.values = "second struct";
   aux_TestStruct_1 = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (aux_TestStruct_1 == NULL) RAISE(363, 49, "insufficient memory for object dynamic allocation")
-  aux_TestStruct_1_Refman = LUMI_new_ref(aux_TestStruct_1);
+  aux_TestStruct_1_Refman = LUMI_new_ref((void**)&aux_TestStruct_1, true);
   if (aux_TestStruct_1_Refman == NULL) RAISE(363, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(aux_TestStruct_1, aux_TestStruct_1_Refman, 1, aux_String_4, aux_String_4_Refman);
   CHECK(363)
@@ -3084,12 +3088,12 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(s_Refman);
   d = &d_Var;
-  d_Refman = LUMI_new_ref(d);
+  d_Refman = LUMI_new_ref((void**)&d, false);
   if (d_Refman == NULL) RAISE(395, 38, "insufficient memory for managed object")
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   LUMI_set_var_string_array(6, 16, sarr, sarr_Chars);
-  sarr_Refman = LUMI_new_ref(sarr);
+  sarr_Refman = LUMI_new_ref((void**)&sarr, false);
   if (sarr_Refman == NULL) RAISE(396, 38, "insufficient memory for managed object")
   if (d == NULL) RAISE(397, 17, "empty object used")
   if (d_Refman->value == NULL) RAISE(397, 28, "outdated weak reference used")
@@ -3129,7 +3133,7 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   s = ((String*)((d->arr)->values)) + 4;
   ad = &ad_Var;
   ad_Var.values = ad_Values;
-  ad_Refman = LUMI_new_ref(ad);
+  ad_Refman = LUMI_new_ref((void**)&ad, false);
   if (ad_Refman == NULL) RAISE(401, 38, "insufficient memory for managed object")
   if (ad == NULL) RAISE(402, 17, "empty object used")
   if (ad_Refman->value == NULL) RAISE(402, 28, "outdated weak reference used")
@@ -3157,7 +3161,7 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   s = ((String*)(((((integration_M_Data*)((ad)->values)) + 2)->arr)->values)) + 3;
   dr = &dr_Var;
-  dr_Refman = LUMI_new_ref(dr);
+  dr_Refman = LUMI_new_ref((void**)&dr, false);
   if (dr_Refman == NULL) RAISE(404, 38, "insufficient memory for managed object")
   if (dr == NULL) RAISE(405, 17, "empty object used")
   if (dr_Refman->value == NULL) RAISE(405, 28, "outdated weak reference used")
@@ -3180,13 +3184,13 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   LUMI_inc_ref(dg_Refman);
   TEST_ASSERT(409, dg != NULL && dg_Refman->value != NULL)
   t = &t_Var;
-  t_Refman = LUMI_new_ref(t);
+  t_Refman = LUMI_new_ref((void**)&t, false);
   if (t_Refman == NULL) RAISE(411, 38, "insufficient memory for managed object")
   dt = &dt_Var;
-  dt_Refman = LUMI_new_ref(dt);
+  dt_Refman = LUMI_new_ref((void**)&dt, false);
   if (dt_Refman == NULL) RAISE(412, 38, "insufficient memory for managed object")
   ts = &ts_Var;
-  ts_Refman = LUMI_new_ref(ts);
+  ts_Refman = LUMI_new_ref((void**)&ts, false);
   if (ts_Refman == NULL) RAISE(413, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(ts, ts_Refman, 0, NULL, NULL);
   CHECK(413)
@@ -3263,7 +3267,7 @@ Returncode integration_M_f_try_catch_raise(integration_M_TestStruct* t, Ref_Mana
   if (LUMI_err != OK) {
     LUMI_err = OK;
     aux_String_0 = &aux_String_0_Var;
-    aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+    aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
     if (aux_String_0_Refman == NULL) RAISE(424, 38, "insufficient memory for managed object")
     aux_String_0_Var.max_length = 16;
     aux_String_0_Var.length = 15;
@@ -3327,7 +3331,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
 #undef RETURN_ERROR
 #define RETURN_ERROR break
     aux_String_0 = &aux_String_0_Var;
-    aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+    aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
     if (aux_String_0_Refman == NULL) RAISE(428, 38, "insufficient memory for managed object")
     aux_String_0_Var.max_length = 20;
     aux_String_0_Var.length = 19;
@@ -3338,7 +3342,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     if (t_Refman->value == NULL) RAISE(429, 28, "outdated weak reference used")
     t->num = 1;
     aux_String_1 = &aux_String_1_Var;
-    aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+    aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
     if (aux_String_1_Refman == NULL) RAISE(430, 38, "insufficient memory for managed object")
     aux_String_1_Var.max_length = 4;
     aux_String_1_Var.length = 3;
@@ -3364,7 +3368,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
   if (LUMI_err != OK) {
     LUMI_err = OK;
     aux_String_2 = &aux_String_2_Var;
-    aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+    aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
     if (aux_String_2_Refman == NULL) RAISE(436, 38, "insufficient memory for managed object")
     aux_String_2_Var.max_length = 3;
     aux_String_2_Var.length = 2;
@@ -3376,7 +3380,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
 #undef RETURN_ERROR
 #define RETURN_ERROR break
       aux_String_3 = &aux_String_3_Var;
-      aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+      aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
       if (aux_String_3_Refman == NULL) RAISE(438, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 3;
       aux_String_3_Var.length = 2;
@@ -3387,7 +3391,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
       if (t_Refman->value == NULL) RAISE(439, 28, "outdated weak reference used")
       t->num = 2;
       aux_String_4 = &aux_String_4_Var;
-      aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+      aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
       if (aux_String_4_Refman == NULL) RAISE(440, 38, "insufficient memory for managed object")
       aux_String_4_Var.max_length = 4;
       aux_String_4_Var.length = 3;
@@ -3401,7 +3405,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     --LUMI_trace_ignore_count;
     LUMI_err = OK;
     aux_String_5 = &aux_String_5_Var;
-    aux_String_5_Refman = LUMI_new_ref(aux_String_5);
+    aux_String_5_Refman = LUMI_new_ref((void**)&aux_String_5, false);
     if (aux_String_5_Refman == NULL) RAISE(441, 38, "insufficient memory for managed object")
     aux_String_5_Var.max_length = 3;
     aux_String_5_Var.length = 2;
@@ -3410,7 +3414,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     CHECK(441)
   }
   aux_String_6 = &aux_String_6_Var;
-  aux_String_6_Refman = LUMI_new_ref(aux_String_6);
+  aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, false);
   if (aux_String_6_Refman == NULL) RAISE(442, 38, "insufficient memory for managed object")
   aux_String_6_Var.max_length = 3;
   aux_String_6_Var.length = 2;
@@ -3422,7 +3426,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
 #undef RETURN_ERROR
 #define RETURN_ERROR break
     aux_String_7 = &aux_String_7_Var;
-    aux_String_7_Refman = LUMI_new_ref(aux_String_7);
+    aux_String_7_Refman = LUMI_new_ref((void**)&aux_String_7, false);
     if (aux_String_7_Refman == NULL) RAISE(444, 38, "insufficient memory for managed object")
     aux_String_7_Var.max_length = 3;
     aux_String_7_Var.length = 2;
@@ -3432,7 +3436,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     do {
       ++LUMI_trace_ignore_count;
       aux_String_8 = &aux_String_8_Var;
-      aux_String_8_Refman = LUMI_new_ref(aux_String_8);
+      aux_String_8_Refman = LUMI_new_ref((void**)&aux_String_8, false);
       if (aux_String_8_Refman == NULL) RAISE(446, 38, "insufficient memory for managed object")
       aux_String_8_Var.max_length = 3;
       aux_String_8_Var.length = 2;
@@ -3442,7 +3446,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
       LUMI_err = integration_M_f_try_catch_raise(t, t_Refman);
       CHECK(447)
       aux_String_9 = &aux_String_9_Var;
-      aux_String_9_Refman = LUMI_new_ref(aux_String_9);
+      aux_String_9_Refman = LUMI_new_ref((void**)&aux_String_9, false);
       if (aux_String_9_Refman == NULL) RAISE(448, 38, "insufficient memory for managed object")
       aux_String_9_Var.max_length = 4;
       aux_String_9_Var.length = 3;
@@ -3453,7 +3457,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     --LUMI_trace_ignore_count;
     LUMI_err = OK;
     aux_String_10 = &aux_String_10_Var;
-    aux_String_10_Refman = LUMI_new_ref(aux_String_10);
+    aux_String_10_Refman = LUMI_new_ref((void**)&aux_String_10, false);
     if (aux_String_10_Refman == NULL) RAISE(449, 38, "insufficient memory for managed object")
     aux_String_10_Var.max_length = 3;
     aux_String_10_Var.length = 2;
@@ -3461,7 +3465,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     LUMI_err = Sys_print(sys, sys_Refman, aux_String_10, aux_String_10_Refman);
     CHECK(449)
     aux_String_11 = &aux_String_11_Var;
-    aux_String_11_Refman = LUMI_new_ref(aux_String_11);
+    aux_String_11_Refman = LUMI_new_ref((void**)&aux_String_11, false);
     if (aux_String_11_Refman == NULL) RAISE(450, 38, "insufficient memory for managed object")
     aux_String_11_Var.max_length = 24;
     aux_String_11_Var.length = 23;
@@ -3474,7 +3478,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
   --LUMI_trace_ignore_count;
   LUMI_err = OK;
   aux_String_12 = &aux_String_12_Var;
-  aux_String_12_Refman = LUMI_new_ref(aux_String_12);
+  aux_String_12_Refman = LUMI_new_ref((void**)&aux_String_12, false);
   if (aux_String_12_Refman == NULL) RAISE(451, 38, "insufficient memory for managed object")
   aux_String_12_Var.max_length = 2;
   aux_String_12_Var.length = 1;
@@ -3630,10 +3634,10 @@ Returncode integration_M_test_for_each(void) {
   Ref_Manager* aux_Ref_Manager = NULL;
   text = &text_Var;
   text_Var.values = text_Values;
-  text_Refman = LUMI_new_ref(text);
+  text_Refman = LUMI_new_ref((void**)&text, false);
   if (text_Refman == NULL) RAISE(481, 38, "insufficient memory for managed object")
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(482, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 8;
   aux_String_0_Var.length = 7;
@@ -3641,7 +3645,7 @@ Returncode integration_M_test_for_each(void) {
   LUMI_err = Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(482)
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(483, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 7;
   aux_String_1_Var.length = 6;
@@ -3666,7 +3670,7 @@ Returncode integration_M_test_for_each(void) {
     LUMI_err = Sys_print(sys, sys_Refman, text, text_Refman);
     CHECK(486)
     aux_String_3 = &aux_String_3_Var;
-    aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+    aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
     if (aux_String_3_Refman == NULL) RAISE(487, 38, "insufficient memory for managed object")
     aux_String_3_Var.max_length = 2;
     aux_String_3_Var.length = 1;
@@ -3681,7 +3685,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Ref_Manager = NULL;
   aux_String_2 = NULL;
   aux_String_4 = &aux_String_4_Var;
-  aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+  aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
   if (aux_String_4_Refman == NULL) RAISE(488, 38, "insufficient memory for managed object")
   aux_String_4_Var.max_length = 2;
   aux_String_4_Var.length = 1;
@@ -3690,7 +3694,7 @@ Returncode integration_M_test_for_each(void) {
   CHECK(488)
   arr = &arr_Var;
   arr_Var.values = arr_Values;
-  arr_Refman = LUMI_new_ref(arr);
+  arr_Refman = LUMI_new_ref((void**)&arr, false);
   if (arr_Refman == NULL) RAISE(490, 38, "insufficient memory for managed object")
   if (arr == NULL) RAISE(491, 17, "empty object used")
   if (arr_Refman->value == NULL) RAISE(491, 28, "outdated weak reference used")
@@ -3705,7 +3709,7 @@ Returncode integration_M_test_for_each(void) {
   if ((2) < 0 || (2) >= (arr)->length) RAISE(493, 25, "slice index out of bounds")
   ((Int*)((arr)->values))[2] = 16;
   aux_String_5 = &aux_String_5_Var;
-  aux_String_5_Refman = LUMI_new_ref(aux_String_5);
+  aux_String_5_Refman = LUMI_new_ref((void**)&aux_String_5, false);
   if (aux_String_5_Refman == NULL) RAISE(494, 38, "insufficient memory for managed object")
   aux_String_5_Var.max_length = 10;
   aux_String_5_Var.length = 9;
@@ -3732,7 +3736,7 @@ Returncode integration_M_test_for_each(void) {
     LUMI_err = Sys_print(sys, sys_Refman, text, text_Refman);
     CHECK(498)
     aux_String_6 = &aux_String_6_Var;
-    aux_String_6_Refman = LUMI_new_ref(aux_String_6);
+    aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, false);
     if (aux_String_6_Refman == NULL) RAISE(499, 38, "insufficient memory for managed object")
     aux_String_6_Var.max_length = 2;
     aux_String_6_Var.length = 1;
@@ -3747,7 +3751,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Ref_Manager = NULL;
   aux_Array_0 = NULL;
   aux_String_7 = &aux_String_7_Var;
-  aux_String_7_Refman = LUMI_new_ref(aux_String_7);
+  aux_String_7_Refman = LUMI_new_ref((void**)&aux_String_7, false);
   if (aux_String_7_Refman == NULL) RAISE(500, 38, "insufficient memory for managed object")
   aux_String_7_Var.max_length = 2;
   aux_String_7_Var.length = 1;
@@ -3756,10 +3760,10 @@ Returncode integration_M_test_for_each(void) {
   CHECK(500)
   tsarr = &tsarr_Var;
   tsarr_Var.values = tsarr_Values;
-  tsarr_Refman = LUMI_new_ref(tsarr);
+  tsarr_Refman = LUMI_new_ref((void**)&tsarr, false);
   if (tsarr_Refman == NULL) RAISE(502, 38, "insufficient memory for managed object")
   aux_String_8 = &aux_String_8_Var;
-  aux_String_8_Refman = LUMI_new_ref(aux_String_8);
+  aux_String_8_Refman = LUMI_new_ref((void**)&aux_String_8, false);
   if (aux_String_8_Refman == NULL) RAISE(503, 38, "insufficient memory for managed object")
   aux_String_8_Var.max_length = 4;
   aux_String_8_Var.length = 3;
@@ -3776,7 +3780,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Ref_Manager = NULL;
   (((integration_M_TestStruct*)((tsarr)->values)) + 0)->text = aux_String_8;
   aux_String_9 = &aux_String_9_Var;
-  aux_String_9_Refman = LUMI_new_ref(aux_String_9);
+  aux_String_9_Refman = LUMI_new_ref((void**)&aux_String_9, false);
   if (aux_String_9_Refman == NULL) RAISE(504, 38, "insufficient memory for managed object")
   aux_String_9_Var.max_length = 4;
   aux_String_9_Var.length = 3;
@@ -3793,7 +3797,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Ref_Manager = NULL;
   (((integration_M_TestStruct*)((tsarr)->values)) + 1)->text = aux_String_9;
   aux_String_10 = &aux_String_10_Var;
-  aux_String_10_Refman = LUMI_new_ref(aux_String_10);
+  aux_String_10_Refman = LUMI_new_ref((void**)&aux_String_10, false);
   if (aux_String_10_Refman == NULL) RAISE(505, 38, "insufficient memory for managed object")
   aux_String_10_Var.max_length = 4;
   aux_String_10_Var.length = 3;
@@ -3810,7 +3814,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Ref_Manager = NULL;
   (((integration_M_TestStruct*)((tsarr)->values)) + 2)->text = aux_String_10;
   aux_String_11 = &aux_String_11_Var;
-  aux_String_11_Refman = LUMI_new_ref(aux_String_11);
+  aux_String_11_Refman = LUMI_new_ref((void**)&aux_String_11, false);
   if (aux_String_11_Refman == NULL) RAISE(506, 38, "insufficient memory for managed object")
   aux_String_11_Var.max_length = 10;
   aux_String_11_Var.length = 9;
@@ -3840,7 +3844,7 @@ Returncode integration_M_test_for_each(void) {
     LUMI_err = Sys_print(sys, sys_Refman, ts->text, ts->text_Refman);
     CHECK(508)
     aux_String_12 = &aux_String_12_Var;
-    aux_String_12_Refman = LUMI_new_ref(aux_String_12);
+    aux_String_12_Refman = LUMI_new_ref((void**)&aux_String_12, false);
     if (aux_String_12_Refman == NULL) RAISE(509, 38, "insufficient memory for managed object")
     aux_String_12_Var.max_length = 2;
     aux_String_12_Var.length = 1;
@@ -3855,7 +3859,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Ref_Manager = NULL;
   aux_Array_1 = NULL;
   aux_String_13 = &aux_String_13_Var;
-  aux_String_13_Refman = LUMI_new_ref(aux_String_13);
+  aux_String_13_Refman = LUMI_new_ref((void**)&aux_String_13, false);
   if (aux_String_13_Refman == NULL) RAISE(510, 38, "insufficient memory for managed object")
   aux_String_13_Var.max_length = 2;
   aux_String_13_Var.length = 1;
@@ -3865,13 +3869,13 @@ Returncode integration_M_test_for_each(void) {
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   LUMI_set_var_string_array(3, 16, sarr, sarr_Chars);
-  sarr_Refman = LUMI_new_ref(sarr);
+  sarr_Refman = LUMI_new_ref((void**)&sarr, false);
   if (sarr_Refman == NULL) RAISE(512, 38, "insufficient memory for managed object")
   if (sarr == NULL) RAISE(513, 17, "empty object used")
   if (sarr_Refman->value == NULL) RAISE(513, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (sarr)->length) RAISE(513, 25, "slice index out of bounds")
   aux_String_14 = &aux_String_14_Var;
-  aux_String_14_Refman = LUMI_new_ref(aux_String_14);
+  aux_String_14_Refman = LUMI_new_ref((void**)&aux_String_14, false);
   if (aux_String_14_Refman == NULL) RAISE(513, 38, "insufficient memory for managed object")
   aux_String_14_Var.max_length = 4;
   aux_String_14_Var.length = 3;
@@ -3882,7 +3886,7 @@ Returncode integration_M_test_for_each(void) {
   if (sarr_Refman->value == NULL) RAISE(514, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (sarr)->length) RAISE(514, 25, "slice index out of bounds")
   aux_String_15 = &aux_String_15_Var;
-  aux_String_15_Refman = LUMI_new_ref(aux_String_15);
+  aux_String_15_Refman = LUMI_new_ref((void**)&aux_String_15, false);
   if (aux_String_15_Refman == NULL) RAISE(514, 38, "insufficient memory for managed object")
   aux_String_15_Var.max_length = 4;
   aux_String_15_Var.length = 3;
@@ -3893,7 +3897,7 @@ Returncode integration_M_test_for_each(void) {
   if (sarr_Refman->value == NULL) RAISE(515, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (sarr)->length) RAISE(515, 25, "slice index out of bounds")
   aux_String_16 = &aux_String_16_Var;
-  aux_String_16_Refman = LUMI_new_ref(aux_String_16);
+  aux_String_16_Refman = LUMI_new_ref((void**)&aux_String_16, false);
   if (aux_String_16_Refman == NULL) RAISE(515, 38, "insufficient memory for managed object")
   aux_String_16_Var.max_length = 4;
   aux_String_16_Var.length = 3;
@@ -3901,7 +3905,7 @@ Returncode integration_M_test_for_each(void) {
   LUMI_err = String_new(((String*)((sarr)->values)) + 2, sarr_Refman, aux_String_16, aux_String_16_Refman);
   CHECK(515)
   aux_String_17 = &aux_String_17_Var;
-  aux_String_17_Refman = LUMI_new_ref(aux_String_17);
+  aux_String_17_Refman = LUMI_new_ref((void**)&aux_String_17, false);
   if (aux_String_17_Refman == NULL) RAISE(516, 38, "insufficient memory for managed object")
   aux_String_17_Var.max_length = 10;
   aux_String_17_Var.length = 9;
@@ -3929,7 +3933,7 @@ Returncode integration_M_test_for_each(void) {
     LUMI_err = Sys_print(sys, sys_Refman, s, s_Refman);
     CHECK(518)
     aux_String_18 = &aux_String_18_Var;
-    aux_String_18_Refman = LUMI_new_ref(aux_String_18);
+    aux_String_18_Refman = LUMI_new_ref((void**)&aux_String_18, false);
     if (aux_String_18_Refman == NULL) RAISE(519, 38, "insufficient memory for managed object")
     aux_String_18_Var.max_length = 2;
     aux_String_18_Var.length = 1;
@@ -3944,7 +3948,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Ref_Manager = NULL;
   aux_Array_2 = NULL;
   aux_String_19 = &aux_String_19_Var;
-  aux_String_19_Refman = LUMI_new_ref(aux_String_19);
+  aux_String_19_Refman = LUMI_new_ref((void**)&aux_String_19, false);
   if (aux_String_19_Refman == NULL) RAISE(520, 38, "insufficient memory for managed object")
   aux_String_19_Var.max_length = 2;
   aux_String_19_Var.length = 1;
@@ -3952,47 +3956,47 @@ Returncode integration_M_test_for_each(void) {
   LUMI_err = Sys_println_Mock(sys, sys_Refman, aux_String_19, aux_String_19_Refman);
   CHECK(520)
   aux_String_20 = &aux_String_20_Var;
-  aux_String_20_Refman = LUMI_new_ref(aux_String_20);
+  aux_String_20_Refman = LUMI_new_ref((void**)&aux_String_20, false);
   if (aux_String_20_Refman == NULL) RAISE(522, 38, "insufficient memory for managed object")
   aux_String_20_Var.max_length = 4;
   aux_String_20_Var.length = 3;
   aux_String_20_Var.values = "iii";
   container_last = &container_last_Var;
-  container_last_Refman = LUMI_new_ref(container_last);
+  container_last_Refman = LUMI_new_ref((void**)&container_last, false);
   if (container_last_Refman == NULL) RAISE(522, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_Container_new(container_last, container_last_Refman, aux_String_20, aux_String_20_Refman, &String_dynamic, NULL, NULL);
   CHECK(522)
   aux_String_21 = &aux_String_21_Var;
-  aux_String_21_Refman = LUMI_new_ref(aux_String_21);
+  aux_String_21_Refman = LUMI_new_ref((void**)&aux_String_21, false);
   if (aux_String_21_Refman == NULL) RAISE(523, 38, "insufficient memory for managed object")
   aux_String_21_Var.max_length = 4;
   aux_String_21_Var.length = 3;
   aux_String_21_Var.values = "hhh";
   container_mid = &container_mid_Var;
-  container_mid_Refman = LUMI_new_ref(container_mid);
+  container_mid_Refman = LUMI_new_ref((void**)&container_mid, false);
   if (container_mid_Refman == NULL) RAISE(523, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_Container_new(container_mid, container_mid_Refman, aux_String_21, aux_String_21_Refman, &String_dynamic, container_last, container_last_Refman);
   CHECK(523)
   aux_String_22 = &aux_String_22_Var;
-  aux_String_22_Refman = LUMI_new_ref(aux_String_22);
+  aux_String_22_Refman = LUMI_new_ref((void**)&aux_String_22, false);
   if (aux_String_22_Refman == NULL) RAISE(524, 38, "insufficient memory for managed object")
   aux_String_22_Var.max_length = 4;
   aux_String_22_Var.length = 3;
   aux_String_22_Var.values = "ggg";
   container_first = &container_first_Var;
-  container_first_Refman = LUMI_new_ref(container_first);
+  container_first_Refman = LUMI_new_ref((void**)&container_first, false);
   if (container_first_Refman == NULL) RAISE(524, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_Container_new(container_first, container_first_Refman, aux_String_22, aux_String_22_Refman, &String_dynamic, container_mid, container_mid_Refman);
   CHECK(524)
   container = &container_Var;
-  container_Refman = LUMI_new_ref(container);
+  container_Refman = LUMI_new_ref((void**)&container, false);
   if (container_Refman == NULL) RAISE(525, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_Container_new(container, container_Refman, NULL, NULL, NULL, container_first, container_first_Refman);
   CHECK(525)
   LUMI_err = integration_M_Container_iter(container, container_Refman, &(iter), &(iter_Refman));
   CHECK(527)
   aux_String_23 = &aux_String_23_Var;
-  aux_String_23_Refman = LUMI_new_ref(aux_String_23);
+  aux_String_23_Refman = LUMI_new_ref((void**)&aux_String_23, false);
   if (aux_String_23_Refman == NULL) RAISE(528, 38, "insufficient memory for managed object")
   aux_String_23_Var.max_length = 9;
   aux_String_23_Var.length = 8;
@@ -4015,7 +4019,7 @@ Returncode integration_M_test_for_each(void) {
     LUMI_err = Sys_print(sys, sys_Refman, s, s_Refman);
     CHECK(530)
     aux_String_24 = &aux_String_24_Var;
-    aux_String_24_Refman = LUMI_new_ref(aux_String_24);
+    aux_String_24_Refman = LUMI_new_ref((void**)&aux_String_24, false);
     if (aux_String_24_Refman == NULL) RAISE(531, 38, "insufficient memory for managed object")
     aux_String_24_Var.max_length = 2;
     aux_String_24_Var.length = 1;
@@ -4032,7 +4036,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Ref_Manager = NULL;
   aux_ContainerIterator_0 = NULL;
   aux_String_25 = &aux_String_25_Var;
-  aux_String_25_Refman = LUMI_new_ref(aux_String_25);
+  aux_String_25_Refman = LUMI_new_ref((void**)&aux_String_25, false);
   if (aux_String_25_Refman == NULL) RAISE(532, 38, "insufficient memory for managed object")
   aux_String_25_Var.max_length = 2;
   aux_String_25_Var.length = 1;
@@ -4102,7 +4106,7 @@ Returncode integration_M_test_complex_field(void) {
   Ref_Manager* aux_String_1_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   y = &y_Var;
-  y_Refman = LUMI_new_ref(y);
+  y_Refman = LUMI_new_ref((void**)&y, false);
   if (y_Refman == NULL) RAISE(555, 38, "insufficient memory for managed object")
   if (y == NULL) RAISE(556, 17, "empty object used")
   if (y_Refman->value == NULL) RAISE(556, 28, "outdated weak reference used")
@@ -4116,7 +4120,7 @@ Returncode integration_M_test_complex_field(void) {
   aux_Ref_Manager = NULL;
   y->x.x = &(y->x);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(557, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -4126,7 +4130,7 @@ Returncode integration_M_test_complex_field(void) {
   LUMI_err = integration_M_HasComplexField_run(y, y_Refman);
   CHECK(558)
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(559, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 1;
   aux_String_1_Var.length = 0;
@@ -4152,7 +4156,7 @@ Returncode integration_M_test_mid_out(covered_M_MiddleType** mt, Ref_Manager** m
   Ref_Manager* aux_Ref_Manager = NULL;
   new_mt = LUMI_alloc(sizeof(covered_M_MiddleType));
   if (new_mt == NULL) RAISE(66, 49, "insufficient memory for object dynamic allocation")
-  new_mt_Refman = LUMI_new_ref(new_mt);
+  new_mt_Refman = LUMI_new_ref((void**)&new_mt, true);
   if (new_mt_Refman == NULL) RAISE(66, 38, "insufficient memory for managed object")
   LUMI_err = covered_M_MiddleType_new(new_mt, new_mt_Refman, new_mt_Dynamic);
   CHECK(66)
@@ -4183,7 +4187,7 @@ Returncode integration_M_TestStruct_get_Mock(integration_M_TestStruct* self, Ref
   if (!integration_M_TestStruct_get_Mock_active) return integration_M_TestStruct_get(self, self_Refman, x, s, s_Refman);
   *x = 12;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(72, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 1;
   aux_String_0_Var.length = 0;
@@ -4287,7 +4291,7 @@ Returncode integration_M_test_func(void) {
   --LUMI_trace_ignore_count;
   LUMI_err = OK;
   t = &t_Var;
-  t_Refman = LUMI_new_ref(t);
+  t_Refman = LUMI_new_ref((void**)&t, false);
   if (t_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(t, t_Refman, 0, NULL, NULL);
   CHECK(89)
@@ -4307,7 +4311,7 @@ Returncode integration_M_test_func(void) {
   CHECK(100)
   TEST_ASSERT(101, x == 12)
   c = &c_Var;
-  c_Refman = LUMI_new_ref(c);
+  c_Refman = LUMI_new_ref((void**)&c, false);
   if (c_Refman == NULL) RAISE(103, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(c, c_Refman, c_Dynamic);
   CHECK(103)
@@ -4383,14 +4387,14 @@ Returncode integration_M_test_native(void) {
   Bool aux_Bool_0 = 0;
   TEST_ASSERT(130, external_int == 6)
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
   aux_String_0_Var.values = "bb";
   s = &s_Var;
   s_Var.values = s_Values;
-  s_Refman = LUMI_new_ref(s);
+  s_Refman = LUMI_new_ref((void**)&s, false);
   if (s_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
   LUMI_err = String_new(s, s_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(133)
@@ -4440,10 +4444,10 @@ Returncode integration_M_test_dynamic_type_parameters(void) {
   integration_M_BaseType_Dynamic* tbase_Dynamic = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   dmid = &dmid_Var;
-  dmid_Refman = LUMI_new_ref(dmid);
+  dmid_Refman = LUMI_new_ref((void**)&dmid, false);
   if (dmid_Refman == NULL) RAISE(141, 38, "insufficient memory for managed object")
   ttop = &ttop_Var;
-  ttop_Refman = LUMI_new_ref(ttop);
+  ttop_Refman = LUMI_new_ref((void**)&ttop, false);
   if (ttop_Refman == NULL) RAISE(142, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TopType_new(ttop, ttop_Refman, ttop_Dynamic);
   CHECK(142)
@@ -4509,7 +4513,7 @@ Returncode delete_Mock(Ref self) {
   if (integration_M_record_delete) {
     aux_RefNode_0 = LUMI_alloc(sizeof(integration_M_RefNode));
     if (aux_RefNode_0 == NULL) RAISE(184, 49, "insufficient memory for object dynamic allocation")
-    aux_RefNode_0_Refman = LUMI_new_ref(aux_RefNode_0);
+    aux_RefNode_0_Refman = LUMI_new_ref((void**)&aux_RefNode_0, true);
     if (aux_RefNode_0_Refman == NULL) RAISE(184, 38, "insufficient memory for managed object")
     LUMI_err = integration_M_RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, integration_M_deleted_refmans, integration_M_deleted_refmans_Refman);
     integration_M_deleted_refmans = NULL;
@@ -4547,7 +4551,7 @@ Returncode integration_M_Link_MockDel(Ref self) {
   if (integration_M_record_delete) {
     aux_RefNode_0 = LUMI_alloc(sizeof(integration_M_RefNode));
     if (aux_RefNode_0 == NULL) RAISE(188, 49, "insufficient memory for object dynamic allocation")
-    aux_RefNode_0_Refman = LUMI_new_ref(aux_RefNode_0);
+    aux_RefNode_0_Refman = LUMI_new_ref((void**)&aux_RefNode_0, true);
     if (aux_RefNode_0_Refman == NULL) RAISE(188, 38, "insufficient memory for managed object")
     LUMI_err = integration_M_RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, integration_M_deleted_links, integration_M_deleted_links_Refman);
     integration_M_deleted_links = NULL;
@@ -4585,7 +4589,7 @@ Returncode integration_M_BaseLink_MockDel(Ref self) {
   if (integration_M_record_delete) {
     aux_RefNode_0 = LUMI_alloc(sizeof(integration_M_RefNode));
     if (aux_RefNode_0 == NULL) RAISE(192, 49, "insufficient memory for object dynamic allocation")
-    aux_RefNode_0_Refman = LUMI_new_ref(aux_RefNode_0);
+    aux_RefNode_0_Refman = LUMI_new_ref((void**)&aux_RefNode_0, true);
     if (aux_RefNode_0_Refman == NULL) RAISE(192, 38, "insufficient memory for managed object")
     LUMI_err = integration_M_RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, integration_M_deleted_base_links, integration_M_deleted_base_links_Refman);
     integration_M_deleted_base_links = NULL;
@@ -4623,7 +4627,7 @@ Returncode integration_M_TopLink_MockDel(Ref self) {
   if (integration_M_record_delete) {
     aux_RefNode_0 = LUMI_alloc(sizeof(integration_M_RefNode));
     if (aux_RefNode_0 == NULL) RAISE(196, 49, "insufficient memory for object dynamic allocation")
-    aux_RefNode_0_Refman = LUMI_new_ref(aux_RefNode_0);
+    aux_RefNode_0_Refman = LUMI_new_ref((void**)&aux_RefNode_0, true);
     if (aux_RefNode_0_Refman == NULL) RAISE(196, 38, "insufficient memory for managed object")
     LUMI_err = integration_M_RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, integration_M_deleted_top_links, integration_M_deleted_top_links_Refman);
     integration_M_deleted_top_links = NULL;
@@ -4681,7 +4685,7 @@ Returncode integration_M_test_simple_delete(void) {
   integration_M_record_delete = true;
   l = LUMI_alloc(sizeof(integration_M_Link));
   if (l == NULL) RAISE(206, 49, "insufficient memory for object dynamic allocation")
-  l_Refman = LUMI_new_ref(l);
+  l_Refman = LUMI_new_ref((void**)&l, true);
   if (l_Refman == NULL) RAISE(206, 38, "insufficient memory for managed object")
   l_user = l;
   l_user_Refman = l_Refman;
@@ -4867,42 +4871,42 @@ Returncode integration_M_test_complex_delete(void) {
   integration_M_record_delete = true;
   b1 = LUMI_alloc(sizeof(integration_M_BaseLink));
   if (b1 == NULL) RAISE(246, 49, "insufficient memory for object dynamic allocation")
-  b1_Refman = LUMI_new_ref(b1);
+  b1_Refman = LUMI_new_ref((void**)&b1, true);
   if (b1_Refman == NULL) RAISE(246, 38, "insufficient memory for managed object")
   b1_ref = b1;
   b2 = LUMI_alloc(sizeof(integration_M_BaseLink));
   if (b2 == NULL) RAISE(248, 49, "insufficient memory for object dynamic allocation")
-  b2_Refman = LUMI_new_ref(b2);
+  b2_Refman = LUMI_new_ref((void**)&b2, true);
   if (b2_Refman == NULL) RAISE(248, 38, "insufficient memory for managed object")
   b2_ref = b2;
   t1 = LUMI_alloc(sizeof(integration_M_TopLink));
   if (t1 == NULL) RAISE(250, 49, "insufficient memory for object dynamic allocation")
-  t1_Refman = LUMI_new_ref(t1);
+  t1_Refman = LUMI_new_ref((void**)&t1, true);
   if (t1_Refman == NULL) RAISE(250, 38, "insufficient memory for managed object")
   t1_ref = t1;
   t2 = LUMI_alloc(sizeof(integration_M_TopLink));
   if (t2 == NULL) RAISE(252, 49, "insufficient memory for object dynamic allocation")
-  t2_Refman = LUMI_new_ref(t2);
+  t2_Refman = LUMI_new_ref((void**)&t2, true);
   if (t2_Refman == NULL) RAISE(252, 38, "insufficient memory for managed object")
   t2_ref = t2;
   t3 = LUMI_alloc(sizeof(integration_M_TopLink));
   if (t3 == NULL) RAISE(254, 49, "insufficient memory for object dynamic allocation")
-  t3_Refman = LUMI_new_ref(t3);
+  t3_Refman = LUMI_new_ref((void**)&t3, true);
   if (t3_Refman == NULL) RAISE(254, 38, "insufficient memory for managed object")
   t3_ref = t3;
   l1 = LUMI_alloc(sizeof(integration_M_Link));
   if (l1 == NULL) RAISE(256, 49, "insufficient memory for object dynamic allocation")
-  l1_Refman = LUMI_new_ref(l1);
+  l1_Refman = LUMI_new_ref((void**)&l1, true);
   if (l1_Refman == NULL) RAISE(256, 38, "insufficient memory for managed object")
   l1_ref = l1;
   l2 = LUMI_alloc(sizeof(integration_M_Link));
   if (l2 == NULL) RAISE(258, 49, "insufficient memory for object dynamic allocation")
-  l2_Refman = LUMI_new_ref(l2);
+  l2_Refman = LUMI_new_ref((void**)&l2, true);
   if (l2_Refman == NULL) RAISE(258, 38, "insufficient memory for managed object")
   l2_ref = l2;
   l3 = LUMI_alloc(sizeof(integration_M_Link));
   if (l3 == NULL) RAISE(260, 49, "insufficient memory for object dynamic allocation")
-  l3_Refman = LUMI_new_ref(l3);
+  l3_Refman = LUMI_new_ref((void**)&l3, true);
   if (l3_Refman == NULL) RAISE(260, 38, "insufficient memory for managed object")
   l3_ref = l3;
   if (b1 == NULL) RAISE(263, 17, "empty object used")
@@ -5142,7 +5146,7 @@ Returncode integration_M_f_raise_message(void) {
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(311, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -5175,7 +5179,7 @@ Returncode integration_M_f_ignore_and_raise(void) {
   --LUMI_trace_ignore_count;
   LUMI_err = OK;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(316, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -5221,7 +5225,7 @@ Returncode integration_M_f_good_assert_error(void) {
   --LUMI_trace_ignore_count;
   LUMI_err = OK;
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(323, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 18;
   aux_String_0_Var.length = 17;
@@ -5321,7 +5325,7 @@ Returncode integration_M_f_alloc(void) {
   Ref_Manager* string_Refman = NULL;
   string = LUMI_new_string(16);
   if (string == NULL) RAISE(341, 49, "insufficient memory for object dynamic allocation")
-  string_Refman = LUMI_new_ref(string);
+  string_Refman = LUMI_new_ref((void**)&string, true);
   if (string_Refman == NULL) RAISE(341, 38, "insufficient memory for managed object")
   TEST_ASSERT(342, string != NULL && string_Refman->value != NULL)
 LUMI_cleanup:
@@ -5537,7 +5541,7 @@ Returncode integration_M_test_assert_error_message(void) {
   LUMI_expected_error = LUMI_expected_error_prev;}
   LUMI_err = OK;
   base_var = &base_var_Var;
-  base_var_Refman = LUMI_new_ref(base_var);
+  base_var_Refman = LUMI_new_ref((void**)&base_var, false);
   if (base_var_Refman == NULL) RAISE(353, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_BaseType_new(base_var, base_var_Refman, base_var_Dynamic);
   CHECK(353)
@@ -5576,7 +5580,7 @@ Returncode integration_M_test_assert_error_message(void) {
   LUMI_err = OK;
   arr = LUMI_new_array(2, sizeof(Int));
   if (arr == NULL) RAISE(357, 49, "insufficient memory for object dynamic allocation")
-  arr_Refman = LUMI_new_ref(arr);
+  arr_Refman = LUMI_new_ref((void**)&arr, true);
   if (arr_Refman == NULL) RAISE(357, 38, "insufficient memory for managed object")
   {char* LUMI_expected_error_prev;
   int LUMI_expected_error_trace_ignore_count_prev;
@@ -5831,13 +5835,757 @@ LUMI_cleanup:
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FILE_NAME "tests/integration-test1.4.lm"
+#define LUMI_FUNC_NAME "test-builtin-errors"
+Returncode integration_M_test_builtin_errors(void) {
+  Returncode LUMI_err = OK;
+  String* outdated_owner = NULL;
+  Ref_Manager* outdated_owner_Refman = NULL;
+  String* outdated = NULL;
+  Ref_Manager* outdated_Refman = NULL;
+  char too_long_Values[3] = {0};
+  String too_long_Var = {3, 0, NULL};
+  String* too_long = NULL;
+  Ref_Manager* too_long_Refman = NULL;
+  File* file = NULL;
+  Ref_Manager* file_Refman = NULL;
+  char filename_Values[4] = {0};
+  String filename_Var = {4, 0, NULL};
+  String* filename = NULL;
+  Ref_Manager* filename_Refman = NULL;
+  Char ch = 0;
+  char short_str_Values[2] = {0};
+  String short_str_Var = {2, 0, NULL};
+  String* short_str = NULL;
+  Ref_Manager* short_str_Refman = NULL;
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  Bool aux_Bool_0 = 0;
+  String aux_String_2_Var = {0};
+  String* aux_String_2 = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
+  String aux_String_3_Var = {0};
+  String* aux_String_3 = NULL;
+  Ref_Manager* aux_String_3_Refman = NULL;
+  String aux_String_4_Var = {0};
+  String* aux_String_4 = NULL;
+  Ref_Manager* aux_String_4_Refman = NULL;
+  Char aux_Char_0 = 0;
+  String aux_String_5_Var = {0};
+  String* aux_String_5 = NULL;
+  Ref_Manager* aux_String_5_Refman = NULL;
+  String aux_String_6_Var = {0};
+  String* aux_String_6 = NULL;
+  Ref_Manager* aux_String_6_Refman = NULL;
+  String aux_String_7_Var = {0};
+  String* aux_String_7 = NULL;
+  Ref_Manager* aux_String_7_Refman = NULL;
+  Int aux_Int_0 = 0;
+  outdated_owner = LUMI_new_string(4);
+  if (outdated_owner == NULL) RAISE(375, 49, "insufficient memory for object dynamic allocation")
+  outdated_owner_Refman = LUMI_new_ref((void**)&outdated_owner, true);
+  if (outdated_owner_Refman == NULL) RAISE(375, 38, "insufficient memory for managed object")
+  outdated = outdated_owner;
+  outdated_Refman = outdated_owner_Refman;
+  LUMI_inc_ref(outdated_Refman);
+  aux_String_0 = NULL;
+  aux_String_0_Refman = NULL;
+  String_Del(outdated_owner);
+  LUMI_owner_dec_ref(outdated_owner_Refman);
+  outdated_owner_Refman = aux_String_0_Refman;
+  outdated_owner = aux_String_0;
+  aux_String_0 = NULL;
+  aux_String_0_Refman = NULL;
+  aux_String_1 = &aux_String_1_Var;
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
+  if (aux_String_1_Refman == NULL) RAISE(378, 38, "insufficient memory for managed object")
+  aux_String_1_Var.max_length = 4;
+  aux_String_1_Var.length = 3;
+  aux_String_1_Var.values = "abc";
+  too_long = &too_long_Var;
+  too_long_Var.values = too_long_Values;
+  too_long_Refman = LUMI_new_ref((void**)&too_long, false);
+  if (too_long_Refman == NULL) RAISE(378, 38, "insufficient memory for managed object")
+  LUMI_err = String_new(too_long, too_long_Refman, aux_String_1, aux_String_1_Refman);
+  CHECK(378)
+  filename = &filename_Var;
+  filename_Var.values = filename_Values;
+  filename_Refman = LUMI_new_ref((void**)&filename, false);
+  if (filename_Refman == NULL) RAISE(381, 38, "insufficient memory for managed object")
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "empty object used";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_read(NULL, NULL, &(file), &(file_Refman));
+    CHECK(382)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(382, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(382)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "outdated weak reference used";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_write(outdated, outdated_Refman, &(file), &(file_Refman));
+    CHECK(383)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(383, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(383)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_read(too_long, too_long_Refman, &(file), &(file_Refman));
+    CHECK(385)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(385, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(385)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  lumi_debug_value = 1;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "open file failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_write(filename, filename_Refman, &(file), &(file_Refman));
+    CHECK(387)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(387, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(387)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  lumi_debug_value = 2;
+  integration_M_new_fail_countdown = 1;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "insufficient memory for object dynamic allocation";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_read(filename, filename_Refman, &(file), &(file_Refman));
+    CHECK(390)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(390, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(390)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  integration_M_new_fail_countdown = 2;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "insufficient memory for managed object";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_write(filename, filename_Refman, &(file), &(file_Refman));
+    CHECK(393)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(393, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(393)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  lumi_debug_value = 1;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "close file failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_close(file, file_Refman);
+    file = NULL;
+    file_Refman = NULL;
+    CHECK(396)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(396, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(396)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  lumi_debug_value = 2;
+  LUMI_err = file_open_read(filename, filename_Refman, &(file), &(file_Refman));
+  CHECK(399)
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file not opened";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = File_getc(file, file_Refman, &(ch), &(aux_Bool_0));
+    CHECK(400)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(400, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(400)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file not opened";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = File_putc(file, file_Refman, 'a');
+    CHECK(401)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(401, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(401)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file not opened";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_2 = &aux_String_2_Var;
+    aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
+    if (aux_String_2_Refman == NULL) RAISE(402, 38, "insufficient memory for managed object")
+    aux_String_2_Var.max_length = 3;
+    aux_String_2_Var.length = 2;
+    aux_String_2_Var.values = "aa";
+    LUMI_err = File_write(file, file_Refman, aux_String_2, aux_String_2_Refman);
+    CHECK(402)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(402, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(402)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  lumi_debug_value = 1;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file write failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = File_putc(file, file_Refman, 'a');
+    CHECK(404)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(404, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(404)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file write failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_3 = &aux_String_3_Var;
+    aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
+    if (aux_String_3_Refman == NULL) RAISE(405, 38, "insufficient memory for managed object")
+    aux_String_3_Var.max_length = 3;
+    aux_String_3_Var.length = 2;
+    aux_String_3_Var.values = "aa";
+    LUMI_err = File_write(file, file_Refman, aux_String_3, aux_String_3_Refman);
+    CHECK(405)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(405, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(405)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "slice index out of bounds";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_4 = &aux_String_4_Var;
+    aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
+    if (aux_String_4_Refman == NULL) RAISE(407, 38, "insufficient memory for managed object")
+    aux_String_4_Var.max_length = 3;
+    aux_String_4_Var.length = 2;
+    aux_String_4_Var.values = "aa";
+    LUMI_err = String_get(aux_String_4, aux_String_4_Refman, 2, &(aux_Char_0));
+    CHECK(407)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(407, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(407)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = String_append(too_long, too_long_Refman, 'a');
+    CHECK(408)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(408, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(408)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = String_append(too_long, too_long_Refman, 'a');
+    CHECK(409)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(409, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(409)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_5 = &aux_String_5_Var;
+    aux_String_5_Refman = LUMI_new_ref((void**)&aux_String_5, false);
+    if (aux_String_5_Refman == NULL) RAISE(410, 38, "insufficient memory for managed object")
+    aux_String_5_Var.max_length = 2;
+    aux_String_5_Var.length = 1;
+    aux_String_5_Var.values = "a";
+    LUMI_err = String_concat(too_long, too_long_Refman, aux_String_5, aux_String_5_Refman);
+    CHECK(410)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(410, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(410)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  short_str = &short_str_Var;
+  short_str_Var.values = short_str_Values;
+  short_str_Refman = LUMI_new_ref((void**)&short_str, false);
+  if (short_str_Refman == NULL) RAISE(411, 38, "insufficient memory for managed object")
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = Int_str(123, short_str, short_str_Refman);
+    CHECK(412)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(412, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(412)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_6 = &aux_String_6_Var;
+    aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, false);
+    if (aux_String_6_Refman == NULL) RAISE(413, 38, "insufficient memory for managed object")
+    aux_String_6_Var.max_length = 6;
+    aux_String_6_Var.length = 5;
+    aux_String_6_Var.values = "aaaaa";
+    LUMI_err = String_new(short_str, short_str_Refman, aux_String_6, aux_String_6_Refman);
+    CHECK(413)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(413, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(413)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  lumi_debug_value = 2;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = Sys_getline(sys, sys_Refman, short_str, short_str_Refman);
+    CHECK(416)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(416, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(416)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  lumi_debug_value = 1;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "exit failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = Sys_exit(sys, sys_Refman, 0);
+    CHECK(418)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(418, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(418)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "command execution failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_7 = &aux_String_7_Var;
+    aux_String_7_Refman = LUMI_new_ref((void**)&aux_String_7, false);
+    if (aux_String_7_Refman == NULL) RAISE(419, 38, "insufficient memory for managed object")
+    aux_String_7_Var.max_length = 4;
+    aux_String_7_Var.length = 3;
+    aux_String_7_Var.values = "aaa";
+    LUMI_err = Sys_system(sys, sys_Refman, aux_String_7, aux_String_7_Refman, &(aux_Int_0));
+    CHECK(419)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(419, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(419)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+LUMI_cleanup:
+  LUMI_dec_ref(aux_String_7_Refman);
+  LUMI_dec_ref(aux_String_6_Refman);
+  LUMI_dec_ref(aux_String_5_Refman);
+  LUMI_dec_ref(aux_String_4_Refman);
+  LUMI_dec_ref(aux_String_3_Refman);
+  LUMI_dec_ref(aux_String_2_Refman);
+  LUMI_dec_ref(aux_String_1_Refman);
+  String_Del(aux_String_0);
+  LUMI_owner_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(short_str_Refman);
+  LUMI_dec_ref(filename_Refman);
+  File_Del(file);
+  LUMI_owner_dec_ref(file_Refman);
+  LUMI_dec_ref(too_long_Refman);
+  LUMI_dec_ref(outdated_Refman);
+  String_Del(outdated_owner);
+  LUMI_owner_dec_ref(outdated_owner_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "tests/integration-test1.4.lm"
 #define LUMI_FUNC_NAME "Sys.println Mock"
 Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
   if (!Sys_println_Mock_active) return Sys_println(self, self_Refman, text, text_Refman);
-  TEST_ASSERT(373, text != NULL && text_Refman->value != NULL)
+  TEST_ASSERT(422, text != NULL && text_Refman->value != NULL)
 LUMI_cleanup:
   LUMI_dec_ref(text_Refman);
   LUMI_dec_ref(self_Refman);
@@ -5855,22 +6603,22 @@ Returncode integration_M_test_cover_all(void) {
   Ref_Manager* mid_Refman = NULL;
   covered_M_MiddleType_Dynamic* mid_Dynamic = &covered_M_MiddleType_dynamic;
   mid = &mid_Var;
-  mid_Refman = LUMI_new_ref(mid);
-  if (mid_Refman == NULL) RAISE(376, 38, "insufficient memory for managed object")
+  mid_Refman = LUMI_new_ref((void**)&mid, false);
+  if (mid_Refman == NULL) RAISE(425, 38, "insufficient memory for managed object")
   LUMI_err = covered_M_MiddleType_new(mid, mid_Refman, mid_Dynamic);
-  CHECK(376)
-  if (mid_Dynamic == NULL) RAISE(377, 28, "dynamic call of empty object")
+  CHECK(425)
+  if (mid_Dynamic == NULL) RAISE(426, 28, "dynamic call of empty object")
   LUMI_err = mid_Dynamic->_base.meth1(&(mid->_base), mid_Refman, &(mid_Dynamic->_base), 0, NULL, NULL);
-  CHECK(377)
-  if (mid_Dynamic == NULL) RAISE(378, 28, "dynamic call of empty object")
+  CHECK(426)
+  if (mid_Dynamic == NULL) RAISE(427, 28, "dynamic call of empty object")
   LUMI_err = mid_Dynamic->_base.meth2(&(mid->_base), mid_Refman, &(mid_Dynamic->_base));
-  CHECK(378)
-  if (mid_Dynamic == NULL) RAISE(379, 28, "dynamic call of empty object")
+  CHECK(427)
+  if (mid_Dynamic == NULL) RAISE(428, 28, "dynamic call of empty object")
   LUMI_err = mid_Dynamic->meth4(mid, mid_Refman, mid_Dynamic);
-  CHECK(379)
-  if (mid_Dynamic == NULL) RAISE(380, 28, "dynamic call of empty object")
+  CHECK(428)
+  if (mid_Dynamic == NULL) RAISE(429, 28, "dynamic call of empty object")
   LUMI_err = mid_Dynamic->meth5(mid, mid_Refman, mid_Dynamic, 0, NULL, NULL);
-  CHECK(380)
+  CHECK(429)
 LUMI_cleanup:
   LUMI_dec_ref(mid_Refman);
   return LUMI_err;
@@ -5882,15 +6630,15 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "test-constants"
 Returncode integration_M_test_constants(void) {
   Returncode LUMI_err = OK;
-  TEST_ASSERT(384, integration_M_SIZE == 12)
-  TEST_ASSERT(385, integration_M_LENGTH == 60)
-  TEST_ASSERT(386, integration_M_TestEnum_FIRST_VALUE == 0)
-  TEST_ASSERT(387, integration_M_TestEnum_ANOTHER_VALUE == 1)
-  TEST_ASSERT(388, integration_M_TestEnum_VALUE2 == 2)
-  TEST_ASSERT(389, integration_M_TestEnum_length == 3)
-  if (integration_M_int_arr == NULL) RAISE(390, 17, "empty object used")
-  if (integration_M_int_arr_Refman->value == NULL) RAISE(390, 28, "outdated weak reference used")
-  TEST_ASSERT(390, integration_M_int_arr->length == 63)
+  TEST_ASSERT(433, integration_M_SIZE == 12)
+  TEST_ASSERT(434, integration_M_LENGTH == 60)
+  TEST_ASSERT(435, integration_M_TestEnum_FIRST_VALUE == 0)
+  TEST_ASSERT(436, integration_M_TestEnum_ANOTHER_VALUE == 1)
+  TEST_ASSERT(437, integration_M_TestEnum_VALUE2 == 2)
+  TEST_ASSERT(438, integration_M_TestEnum_length == 3)
+  if (integration_M_int_arr == NULL) RAISE(439, 17, "empty object used")
+  if (integration_M_int_arr_Refman->value == NULL) RAISE(439, 28, "outdated weak reference used")
+  TEST_ASSERT(439, integration_M_int_arr->length == 63)
 LUMI_cleanup:
   return LUMI_err;
 }
@@ -5911,7 +6659,7 @@ USER_MAIN_HEADER {
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "tests/integration-test0.4.lm"
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(20, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 18;
   aux_String_0_Var.length = 17;
@@ -5923,7 +6671,7 @@ USER_MAIN_HEADER {
 #define LUMI_FILE_NAME "tests/integration-test0.4.lm"
   integration_M_int_arr = &integration_M_int_arr_Var;
   integration_M_int_arr_Var.values = integration_M_int_arr_Values;
-  integration_M_int_arr_Refman = LUMI_new_ref(integration_M_int_arr);
+  integration_M_int_arr_Refman = LUMI_new_ref((void**)&integration_M_int_arr, false);
   if (integration_M_int_arr_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "tests/integration-test1.4.lm"
@@ -5940,6 +6688,7 @@ USER_MAIN_HEADER {
   LUMI_success &= LUMI_run_test("test-simple-delete", integration_M_test_simple_delete);
   LUMI_success &= LUMI_run_test("test-complex-delete", integration_M_test_complex_delete);
   LUMI_success &= LUMI_run_test("test-assert-error-message", integration_M_test_assert_error_message);
+  LUMI_success &= LUMI_run_test("test-builtin-errors", integration_M_test_builtin_errors);
   LUMI_success &= LUMI_run_test("test-cover-all", integration_M_test_cover_all);
   LUMI_success &= LUMI_run_test("test-constants", integration_M_test_constants);
   LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);

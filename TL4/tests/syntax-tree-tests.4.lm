@@ -490,7 +490,7 @@ user Int x
 ## @ ec te15
 new Int x
 ## @ ec te16
-var File f(copy 1)
+var Array{4:Int} a(copy 1)
 ## @ ec te17
 var Bool x(var 1)
 ## @ ec te18
