@@ -14,40 +14,38 @@ class TypeData(SyntaxTreeNamespace)
   var Bool is-ordered
   var Bool is-delete-mocked
   var Bool ordering
+  var Bool create-disallowed
   
-  func inst parse-new(copy Bool is-dynamic)->(
-      var Char end, owner TypeData new-node)
+  func inst parse-new(copy Bool is-dynamic)->(owner TypeData new-node)
     new-node := TypeData()
-    new-node.parse(copy is-dynamic)->(var end)
+    new-node.parse(copy is-dynamic)
   
-  func inst parse(copy Bool is-dynamic)->(var Char end)
+  func inst parse(copy Bool is-dynamic)
     self.is-dynamic := is-dynamic
     self.set-location()
     self.my-module := glob.current-module
-    read-new(user "({")->(owner self.name, var end)
+    read-new(user "({")->(owner self.name)
     self.add-type(user self.my-module)
-    if end = '{'
+    if glob.last-char = '{'
       self.parameters := List{String}()
       do
         owner String name
-        read-new(user ":}")->(owner name, var end)
+        read-new(user ":}")->(owner name)
         if not is-legal-name(user name, copy NameGroup.TYPE)
           self.syntax-error(user "illegal type parameter name", user name)
         self.parameters.add(owner name)
-        while end = ':'
-      if end != '}'
-        self.syntax-error-c(
-            user "expected \"}\" after type parameters, got", copy end)
-      read-c()->(var end)
-    if end = '('
+        while glob.last-char = ':'
+      if glob.last-char != '}'
+        self.syntax-error-c(user "expected \"}\" after type parameters, got")
+      read-c()
+    if glob.last-char = '('
       self.base-type := TypeInstance()
-      self.base-type.parse(user ")", user self, user _)->(var end)
-      if end != ')'
-        self.syntax-error-c(
-            user "expected \")\" after base type, got", copy end)
-      read-c()->(var end)
+      self.base-type.parse(user ")", user self, user _)
+      if glob.last-char != ')'
+        self.syntax-error-c(user "expected \")\" after base type, got")
+      read-c()
     self.indentation-spaces := 2
-    self.parse-block-children(user self, user _)->(var end)
+    self.parse-block-children(user self, user _)
     self.indentation-spaces := 0
   
   func inst is-base-dynamic()->(var Bool base-dynamic)
@@ -62,23 +60,21 @@ class TypeData(SyntaxTreeNamespace)
       self.syntax-error(user "redefinition of type", user self.name)
     if glob.current-module.enum-map.find(user self.name)?
       self.syntax-error(user "type name overrides Enum", user self.name)
-    self.init()
     my-module.type-map.add(user self.name, user self)
   
-  func dynamic parse-child(user String keyword)->(var Char end)
-    if self.parse-if-function(user keyword, user self)->(var end)
+  func dynamic parse-child(user String keyword)
+    if self.parse-if-function(user keyword, user self)
       return
     
     if keyword.equal(user "new")
-      if end != '('
-        self.syntax-error-c(
-            user "expected \"(\" after \"new\", got", copy end)
+      if glob.last-char != '('
+        self.syntax-error-c(user "expected \"(\" after \"new\", got")
       if self.constructor?
         self.syntax-error(
             user "constructor already defined for type", user self.name)
       owner SyntaxTreeConstructor constructor
       self.constructor := SyntaxTreeConstructor.parse-new(
-          user _, user self)->(var end, owner constructor)
+          user _, user self)->(owner constructor)
       self.functions.add(owner constructor)
       
     else
@@ -97,15 +93,11 @@ class TypeData(SyntaxTreeNamespace)
     self.new-type-instance()->(owner type-instance)
     if self.parameters?
       type-instance.parameters := List{TypeInstance}()
-      user ListNode{String} node(user self.parameters.first)
-      do
-        while node?
+      for parameter-name in self.parameters.iter()
         new TypeInstance parameter
         parameter.type-data := glob.type-generic
-        string-new-copy(user node.item)->(owner parameter.name)
+        string-new-copy(user parameter-name)->(owner parameter.name)
         type-instance.parameters.add(owner parameter)
-        node := node.next
-    
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := self
@@ -116,13 +108,10 @@ class TypeData(SyntaxTreeNamespace)
     bases := 0
     do
       while type-data?
-      user ListNode{SyntaxTreeVariable} child(user type-data.variables.first)
-      do
-        while child?
-        if child.item.name.equal(user name)
-          field := child.item
+      for variable in type-data.variables.iter()
+        if variable.name.equal(user name)
+          field := variable
           return
-        child := child.next
       while type-data.base-type?
       type-data := type-data.base-type.type-data
       bases += 1
@@ -134,52 +123,71 @@ class TypeData(SyntaxTreeNamespace)
     bases := 0
     do
       while type-data?
-      user ListNode{SyntaxTreeFunction} child(user type-data.functions.first)
-      do
-        while child?
-        if child.item.name.equal(user name)
-          method := child.item
+      for function in type-data.functions.iter()
+        if function.name.equal(user name)
+          method := function
           return
-        child := child.next
       while type-data.base-type?
       type-data := type-data.base-type.type-data
       bases += 1
     method := _
   
-  func inst order-bases(user List{TypeData} ordered-list)
+  func inst order-bases(user List{TypeData} ordered-list)->(
+      var Bool recursion-error)
+    recursion-error := false
     if self.is-ordered
       return
     if self.ordering
-      self.syntax-error(
-          user "recursive inheritance in type", user self.name)
+      self.print-syntax-error-header()
+      print-msg-with-item(user "recursive declaration of type", user self.name)
+      recursion-error := true
+      return
+    
     self.ordering := true
+    
+    ; order base type
     if self.base-type?
       glob.current-module := self.my-module
       self.base-type.link-types(user self)
       glob.current-module := _
-      self.base-type.type-data.order-bases(user ordered-list)
+      if self.base-type.type-data.order-bases(user ordered-list)->(
+          var recursion-error)
+        print-msg-with-item(user ", extended by type", user self.name)
+        return
+    
+    ; order complex fields
+    for variable in self.variables.iter()
+      if variable.access = Access.VAR
+        glob.current-module := self.my-module
+        variable.type-instance.link-types(user self)
+        glob.current-module := _
+        if not variable.type-instance.type-data.is-primitive and
+            variable.type-instance.type-data is-not glob.type-generic
+          if variable.type-instance.type-data.order-bases(user ordered-list)->(
+              var recursion-error)
+            print-msg-with-item(user ", variable of type", user self.name)
+            return
+    
     ordered-list.add(owner glob.root.types.remove(user self))
     self.is-ordered := true
+    
     ; init `self.dynamic-base-methods` and test override methods
     if self.is-dynamic
       self.dynamic-base-methods := NameMap{SyntaxTreeFunction}()
-    user ListNode{SyntaxTreeFunction} child(user self.functions.first)
-    do
-      while child?
+    for function in self.functions.iter()
       user SyntaxTreeFunction method
       var Int bases
       if self.base-type?
-        self.base-type.type-data.find-meth(user child.item.name)->(
+        self.base-type.type-data.find-meth(user function.name)->(
             user method, var bases)
       if method?
-        child.item.compare(user method)
-        if child.item.is-dynamic
-          child.item.dynamic-base-method := method.dynamic-base-method
-          child.item.dynamic-base-count := method.dynamic-base-count + bases + 1
-      else-if child.item.is-dynamic
-        child.item.dynamic-base-method := child.item
-        self.dynamic-base-methods.add(user child.item.name, user child.item)
-      child := child.next
+        function.compare(user method)
+        if function.is-dynamic
+          function.dynamic-base-method := method.dynamic-base-method
+          function.dynamic-base-count := method.dynamic-base-count + bases + 1
+      else-if function.is-dynamic
+        function.dynamic-base-method := function
+        self.dynamic-base-methods.add(user function.name, user function)
   
   func dynamic link-types()
     glob.current-module := self.my-module
@@ -190,7 +198,7 @@ class TypeData(SyntaxTreeNamespace)
         self.syntax-error(
             user "no parameter given for type with parameters",
             user self.base-type.type-data.name)
-    base.link-types()
+    base()
     glob.current-module := _
   
   func dynamic analyze()
@@ -200,14 +208,14 @@ class TypeData(SyntaxTreeNamespace)
     if not self.base-type? and self.variables.is-empty()
       self.syntax-error(user "type with no fields", user self.name)
     if self.is-dynamic and not self.is-base-dynamic()
-      user ListNode{SyntaxTreeFunction} node(user self.functions.first)
+      var ListIterator{SyntaxTreeFunction} iter(user self.functions)
       do
-        if not node?
+        if not iter.has()
           self.syntax-error(
               user "class with no dynamic methods", user self.name)
-        while not node.item.is-dynamic
-        node := node.next
-    base.analyze()
+        while not iter.get().is-dynamic
+        iter.next()
+    base()
     glob.current-module := _
   
   func inst write-cname()
@@ -258,13 +266,10 @@ class TypeData(SyntaxTreeNamespace)
       else
         self.write-spaces()
         write(user "Dynamic_Del _del;\n")
-      user NameMapNode{SyntaxTreeFunction} child(user self.dynamic-base-methods.first)
-      do
-        while child?
+      for method in self.dynamic-base-methods.iter()
         self.write-spaces()
-        child.value.write-pointer()
+        method.write-pointer()
         write(user ";\n")
-        child := child.next
       write(user "};\n")
     self.indentation-spaces := 0
   
@@ -303,13 +308,11 @@ class TypeData(SyntaxTreeNamespace)
       write(user "(Dynamic_Del)")
       self.write-cname()
       write(user "_Del")
-    user NameMapNode{SyntaxTreeFunction} child(user type-data.dynamic-base-methods.first)
-    do
-      while child?
+    for base-method in type-data.dynamic-base-methods.iter()
       user SyntaxTreeFunction method
-      self.find-meth(user child.value.name)->(user method)
+      self.find-meth(user base-method.name)->(user method)
       write(user ", ")
-      if method is-not child.value
+      if method is-not base-method
         write(user "(Func)")
       method.parent-type.write-cname()
       write(user "_")
@@ -317,7 +320,6 @@ class TypeData(SyntaxTreeNamespace)
         write-cname(user method.mocker-function.name)
       else
         write-cname(user method.name)
-      child := child.next
     write(user "}")
   
   func dynamic write-methods-body()

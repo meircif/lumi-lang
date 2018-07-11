@@ -5,35 +5,33 @@ module tl5-compiler
 class EnumData(SyntaxTreeNode)
   owner String name
   user ModuleMembers my-module
-  owner List{String} values
+  var List{String} values
   
-  func inst parse-new()->(var Char end, owner EnumData new-node)
+  func inst parse-new()->(owner EnumData new-node)
     new-node := EnumData()
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
+  func inst parse()
     self.set-location()
     self.my-module := glob.current-module
-    read-new(user "")->(owner self.name, var end)
+    read-new(user "")->(owner self.name)
     if not is-legal-name(user self.name, copy NameGroup.TYPE)
       self.syntax-error(user "illegal Enum name", user self.name)
     if glob.find-type(user self.name)?
       self.syntax-error(user "Enum name overrides type", user self.name)
     if self.my-module.enum-map.find(user self.name)?
       self.syntax-error(user "redefinition of Enum", user self.name)
-    self.values := List{String}()
     do
       user String value
       var Int spaces
-      read-until(user " .([{?", copy true)->(user value, var end, var spaces)
+      read-until(user " .([{?", copy true)->(user value, var spaces)
       while spaces > 0
       if spaces != 2
         self.syntax-error-indentation(copy spaces, copy 2)
       if not is-legal-name(user value, copy NameGroup.CONSTANT)
         self.syntax-error(user "illegal constant name", user value)
-      if end != '\n'
-        self.syntax-error-c(
-            user "expected new-line after Enum value, got", copy end)
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after Enum value, got")
       self.values.add(owner string-new-copy(user value))
     if not self.values.first?
       self.syntax-error-msg(user "Enum with no values")
@@ -44,12 +42,9 @@ class EnumData(SyntaxTreeNode)
     has-value := true
     if value.equal(user "length")
       return
-    user ListNode{String} node(user self.values.first)
-    do
-      while node?
-      if value.equal(user node.item)
+    for text in self.values.iter()
+      if value.equal(user text)
         return
-      node := node.next
     has-value := false
   
   func inst write-cname()
@@ -58,15 +53,12 @@ class EnumData(SyntaxTreeNode)
   
   func dynamic write()
     write(user "\nenum {\n  ")
-    user ListNode{String} node(user self.values.first)
-    do
-      while node?
+    for text in self.values.iter()
       self.write-cname()
       write(user "_")
-      write-cname(user node.item)
-      if node is self.values.first
+      write-cname(user text)
+      if text is self.values.first.item
         write(user " = 0")
-      node := node.next
       write(user ",\n  ")
     self.write-cname()
     write(user "_length\n")

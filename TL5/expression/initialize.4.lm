@@ -2,27 +2,23 @@
 module tl5-compiler
 
 class InitExpression(ModuleTypeExpression)
-  owner FunctionArguments arguments
+  var FunctionArguments arguments
   owner SymbolExpression symbol
   user SyntaxTreeFunction constructor
   owner Expression value
   
+  new(user SyntaxTreeCode code-node)
+    base(user code-node)
+    self.arguments.new()
+  
   func inst parse(
-      owner TypeInstance result-type,
-      owner Expression module-expression,
-      user SyntaxTreeCode code-node)->(
-      var Char end)
-    self.code-node := code-node
+      owner TypeInstance result-type, owner Expression module-expression)
     self.result-type := result-type
-    self.set-location()
     self.module-expression := module-expression
-    self.arguments := FunctionArguments()
-    if end = '('
+    if glob.last-char = '('
       var CallArgumentFactory argument-factory
-      self.arguments.parse(user argument-factory, copy false, user code-node)->(
-          var end)
-    else
-      self.arguments.init()
+      self.arguments.parse(
+          user argument-factory, copy false, user self.code-node)
   
   func dynamic analyze()
     self.analyze-type-instance(user self.result-type)
@@ -49,6 +45,10 @@ class InitExpression(ModuleTypeExpression)
       if self.result-type.type-data is glob.type-array
         if self.result-type.parameters.first.item.type-data is glob.type-generic
           self.syntax-error-msg(user "cannot create generic array")
+      if self.result-type.type-data.create-disallowed
+        self.syntax-error(
+            user "cannot create objects with type",
+            user self.result-type.type-data.name)
       self.result-type.type-data.find-meth(user "new")->(user self.constructor)
       if not self.arguments.parameters.first? and
           not self.arguments.outputs.first? and (not self.constructor? or
@@ -66,7 +66,7 @@ class InitExpression(ModuleTypeExpression)
             user self.constructor.arguments, user self.result-type, copy 0)
       else
         self.syntax-error(
-            user "no contructor for type", user self.result-type.type-data.name)
+            user "no constructor for type", user self.result-type.type-data.name)
       
     else-if self.arguments.parameters.first?
       if self.arguments.parameters.first.next? or
@@ -101,7 +101,8 @@ class InitExpression(ModuleTypeExpression)
     else
       self.write-new-init()
     
-    self.write-refman-init(user self.symbol)
+    self.write-refman-init(
+        user self.symbol, copy self.symbol.variable.access != Access.VAR)
     
     if self.constructor?
       self.code-node.write-spaces()

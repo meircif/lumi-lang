@@ -10,7 +10,7 @@ class SymbolExpression(Expression)
   var Bool is-annotate
   
   func inst copy-new()->(owner SymbolExpression new-symbol)
-    new-symbol := SymbolExpression()
+    new-symbol := SymbolExpression(user self.code-node)
     string-new-copy(user self.name)->(owner new-symbol.name)
     new-symbol.module-name := self.module-name
     new-symbol.variable := self.variable
@@ -20,15 +20,13 @@ class SymbolExpression(Expression)
   
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
-    new SymbolExpression symbol-expression
-    symbol-expression.parse(owner text, user code-node)
+    new SymbolExpression symbol-expression(user code-node)
+    symbol-expression.parse(owner text)
     expression := symbol-expression
   
   ~~~ parsing `symbol` ~~~
-  func inst parse(owner String text, user SyntaxTreeCode code-node)
-    self.code-node := code-node
+  func inst parse(owner String text)
     self.name := text
-    self.set-location()
   
   func dynamic analyze()
     if glob.module-map.find(user self.name)?
@@ -103,7 +101,7 @@ class SymbolExpression(Expression)
       write-cname(user self.name)
       write(user "_Dynamic)")
     else
-      base.write-dynamic()
+      base()
   
   func dynamic write-refman()
     if self.is-variable-output() and not self.top
@@ -111,7 +109,7 @@ class SymbolExpression(Expression)
       write-cname(user self.name)
       write(user "_Refman)")
     else
-      base.write-refman()
+      base()
 
 ~~~ An instance member expression ~~~
 class MemberExpression(SymbolExpression)
@@ -122,18 +120,13 @@ class MemberExpression(SymbolExpression)
   
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
-    new MemberExpression member-expression
-    member-expression.parse(owner expression, owner text, user code-node)
+    new MemberExpression member-expression(user code-node)
+    member-expression.parse(owner expression, owner text)
     expression := member-expression
   
   ~~~ parsing `instance.symbol` ~~~
-  func inst parse(
-      owner Expression instance,
-      owner String text,
-      user SyntaxTreeCode code-node)
-    self.code-node := code-node
+  func inst parse(owner Expression instance, owner String text)
     self.instance := instance
-    self.set-location()
     self.name := text
   
   func dynamic analyze()
@@ -152,7 +145,7 @@ class MemberExpression(SymbolExpression)
     
     if instance-type.type-data is glob.type-module
       self.module-name := instance-type.name
-      base.analyze()
+      base()
       return
     
     instance-type.type-data.find-field(user self.name)->(
@@ -165,7 +158,7 @@ class MemberExpression(SymbolExpression)
       self.variable.type-instance.new-replace-params(
           user instance-type, copy self.bases)->(owner self.result-type)
       self.access := self.variable.access
-      self.assignable := true
+      self.assignable := not self.is-complex-field
     else
       instance-type.type-data.find-meth(user self.name)->(
           user self.function, var self.bases)
@@ -187,13 +180,12 @@ class MemberExpression(SymbolExpression)
             user instance-type.type-data.name,
             user "has no member",
             user self.name)
-      if self.function.is-dynamic and
+      if self.function.is-dynamic and not self.instance.is-complex-field and
           self.instance.result-type.type-data is-not glob.type-type and
           self.instance.result-type.type-data is-not glob.type-base
         self.bases += self.function.dynamic-base-count
         self.function := self.function.dynamic-base-method
-        if not self.instance.is-complex-field
-          self.dynamic-call-self-instance := self.instance
+        self.dynamic-call-self-instance := self.instance
       self.set-simple-type(user glob.type-func)
       self.access := Access.VAR
       self.function.arguments.copy-new()->(owner self.result-type.arguments)
@@ -212,7 +204,7 @@ class MemberExpression(SymbolExpression)
       self.instance.analyze-call(user arguments)->(
           user instance-type, var bases, var is-function-object)
       return
-    if base.analyze-call(user arguments)->(
+    if base(user arguments)->(
         user instance-type, var bases, var is-function-object) or
         self.module-name?
       return
@@ -227,10 +219,9 @@ class MemberExpression(SymbolExpression)
       self-param.value := self.instance
       self-param.value.top := true
       arguments.parameters.prepend(owner self-param)
-    ; self.instance := _
   
   func dynamic analyze-mock(copy Bool is-annotate)->(var Bool is-mock)
-    if base.analyze-mock(copy is-annotate)->(var is-mock)
+    if base(copy is-annotate)->(var is-mock)
       if self.function.is-dynamic and
           self.instance.result-type.type-data is-not glob.type-type and
           self.instance.result-type.type-data is-not glob.type-base
@@ -253,21 +244,11 @@ class MemberExpression(SymbolExpression)
     if self.is-mock-field
       return
     ; if (...) RAISE(`line-num`, ...)
-    write(user "if (")
     if self.instance?
-      ; if (`instance` == NULL) RAISE("used member of empty object")
-      ; if (`instance`_Refman->value == NULL)
-      ;   RAISE("used member of outdated weak reference")
-      self.instance.write-as-top()
-      write(user " == NULL) ")
-      self.write-raise(user "used member of empty object")
-      self.code-node.write-spaces()
-      write(user "if (")
-      self.instance.write-refman()
-      write(user "->value == NULL) ")
-      self.write-raise(user "used member of outdated weak reference")
+      self.instance.write-check-ref()
     else-if self.dynamic-call-self-instance?
       ; if (`instance`_Dynamic == NULL) RAISE("dynamic call of empty object")
+      write(user "if (")
       var Bool top(copy self.dynamic-call-self-instance.top)
       self.dynamic-call-self-instance.top := true
       self.dynamic-call-self-instance.write-dynamic()
@@ -303,7 +284,7 @@ class MemberExpression(SymbolExpression)
           write(user "&(")
         self.instance.write()
         self.write-bases()
-    base.write()
+    base()
     if self.instance?
       if not self.function? and self.is-complex-field and self.top and
           self.instance.result-type.type-data is-not glob.type-type
@@ -318,12 +299,13 @@ class MemberExpression(SymbolExpression)
     var Bool top(copy self.top)
     if self.is-generic-cast and not self.top
       self.top := true
-    base.write-refman()
+    base()
     self.top := top
   
   func dynamic write-dynamic()
     if self.is-complex-field
-      write(user "&")
+      if self.top
+        write(user "&")
       self.result-type.type-data.write-cname()
       write(user "_dynamic")
       return
@@ -333,7 +315,7 @@ class MemberExpression(SymbolExpression)
       self.result-type.type-data.write-cname()
       write(user "_Dynamic*)(")
       self.top := true
-    base.write-dynamic()
+    base()
     self.top := top
     if self.is-generic-cast and not self.top
       write(user "))")

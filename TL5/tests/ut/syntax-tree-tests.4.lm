@@ -95,10 +95,44 @@ test test-illegal-usage()
   var Array{2:String{4}} mock-argv
   sys.argv := mock-argv
   Sys.print.active := true
-  assert-error tl5-compiler.glob.root.parse()
+  assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
   Sys.print.active := false
   assert-string-slice(
-      user "usage: tl4-compiler [-t TESTED-MODULE] OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n",
+      user "usage: tl5-compiler [-t TESTED-MODULE] OUTPUT-C-FILE-NAME \
+      INPUT-TL5-FILES...\n",
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+      
+
+test test-open-file-fail()
+  setup-test()
+  var Array{3:String{256}} mock-argv
+  mock-argv[0].new(user "tl5-compiler")
+  mock-argv[1].new(user "mock.c")
+  mock-argv[2].new(user "mock.5.lm")
+  mock-argv.length := 3
+  sys.argv := mock-argv
+  tl5-compiler.glob.root.is-library := true
+  
+  Sys.print.active := true
+  file-open-error := true
+  assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
+  Sys.print.active := false
+  assert-string-slice(
+      user "could not read file \"mock.5.lm\"\n",
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+  
+  mock-print-text.clear()
+  Sys.print.active := true
+  assert-error tl5-compiler.glob.root.write(), "Sys.exit"
+  Sys.print.active := false
+  assert-string-slice(
+      user "could not write file \"mock.c\"\n",
       user mock-print-text,
       copy 0,
       copy mock-print-text.length,
@@ -107,7 +141,7 @@ test test-illegal-usage()
 
 func test-analyze-error(user String expected-error)
   Sys.print.active := true
-  assert-error tl5-compiler.glob.root.analyze()
+  assert-error tl5-compiler.glob.root.analyze(), "Sys.exit"
   Sys.print.active := false
   assert-string-slice(
       user expected-error,
@@ -140,7 +174,7 @@ func test-cover-error(copy Bool has-module, user String expected-error)
   tl5-compiler.string-new-copy(user "error")->(
       owner tl5-compiler.glob.tested-module)
   tl5-compiler.glob.test-functions.add(user _, user _)
-  var tl5-compiler.ModuleMembers dummy-module
+  var tl5-compiler.ModuleMembers dummy-module(user _)
   if has-module
     tl5-compiler.glob.module-map.add(
         user tl5-compiler.glob.tested-module, user dummy-module)

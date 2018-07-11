@@ -123,13 +123,16 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user "declared variable with generic subtype",
           user self.type-instance.name)
     if self.is-create and not self.type-instance.type-data.is-primitive and
-        ? self.parent-type
-      if self.type-instance.type-data = glob.type-string or
-          self.type-instance.type-data = glob.type-array
-        self.m-syntax-error(
-            user "cannot declared \"var\" field of sequence type",
-            user self.type-instance.type-data.name)
-      self.check-var-recursion(user self)
+        ? self.parent-type and
+        (self.type-instance.type-data = glob.type-string or
+        self.type-instance.type-data = glob.type-array)
+      self.m-syntax-error(
+          user "cannot declared \"var\" field of sequence type",
+          user self.type-instance.type-data.name)
+    if self.is-create and self.type-instance.type-data.create-disallowed
+      self.m-syntax-error(
+          user "cannot create objects with type",
+          user self.type-instance.type-data.name)
     if self.access = ACCESS-VAR
       self.type-instance.check-sequence(user self)
     if self.is-create and self.type-instance.type-data = glob.type-array and
@@ -137,19 +140,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.m-syntax-error-msg(user "cannot create generic array")
     if ? self.my-module
       glob.current-module := _
-  
-  func inst check-var-recursion(user SyntaxTreeVariable variable)
-    if variable.type-instance.type-data = self.parent-type
-      self.m-syntax-error(
-          user "variable will cause recursive declaration of type",
-          user self.parent-type.name)
-    user ListNode{SyntaxTreeVariable} child(variable.type-instance.type-data.variables.first)
-    do
-      while ? child
-      if child.item.access = ACCESS-VAR and
-          not child.item.type-instance.type-data.is-primitive
-        self.check-var-recursion(user child.item)
-      child := child.next
   
   func inst write-cname()
     if ? self.my-module

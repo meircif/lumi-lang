@@ -62,6 +62,9 @@ Enumerators are declared in :ref:`TL4 <syntax-tl4>` by::
 
 Using an enumerator is done by ``EnumeratorName.SYMBOL-NAME``.
 
+The amount of values is defined by a special ``length`` value, for example
+``EnumeratorName.length`` is ``3``.
+
 Primitive Variables
 -------------------
 Primitive variables are declared using ``var`` keyword::

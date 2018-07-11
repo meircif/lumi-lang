@@ -36,6 +36,9 @@ struct NameMap{Generic}
         return
       node := node.next
     self.add(user name, user value)
+  
+  func iter()->(owner NameMapIterator{Generic} iter)
+    iter := NameMapIterator{Generic}(user self)
 
 
 struct NameMapNode{Generic}
@@ -46,3 +49,20 @@ struct NameMapNode{Generic}
   func new(user String name, user Generic value)
     self.name := name
     self.value := value
+
+
+~~~ Iterate over a Map ~~~
+struct NameMapIterator{Generic}
+  user NameMapNode{Generic} node
+  
+  func new(user NameMap{Generic} map)
+    self.node := map.first
+  
+  func has()->(var Bool has)
+    has := self.node?
+  
+  func get()->(user Generic value)
+    value := self.node.value
+  
+  func next()
+    self.node := self.node.next

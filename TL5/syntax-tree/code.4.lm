@@ -6,14 +6,12 @@ class SyntaxTreeExpression(SyntaxTreeCode)
   owner Expression expression
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeExpression new-node)
-    new-node := SyntaxTreeExpression()
-    new-node.parse(user parent)->(var end)
+      owner SyntaxTreeExpression new-node)
+    new-node := SyntaxTreeExpression(user parent)
+    new-node.parse()
   
-  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
-    self.parent := parent
-    self.set-location()
-    parse-new-expression(user "", user self)->(owner self.expression, var end)
+  func inst parse()
+    parse-new-expression(user "", user self)->(owner self.expression)
     self.expression.is-statement := true
   
   func dynamic analyze()
@@ -29,13 +27,6 @@ class SyntaxTreeExpression(SyntaxTreeCode)
 
 ~~~ Return statement in the syntax tree ~~~
 class SyntaxTreeReturn(SyntaxTreeCode)
-  
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeReturn new-node)
-    new-node := SyntaxTreeReturn()
-    new-node.set-location()
-    new-node.parent := parent
-  
   func dynamic is-end-point()->(var Bool is-end)
     is-end := true
   
@@ -49,16 +40,13 @@ class SyntaxTreeRaise(SyntaxTreeCode)
   owner Expression error-message
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeRaise new-node)
-    new-node := SyntaxTreeRaise()
-    new-node.parse(user parent)->(var end)
+      owner SyntaxTreeRaise new-node)
+    new-node := SyntaxTreeRaise(user parent)
+    new-node.parse()
   
-  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
-    self.set-location()
-    self.parent := parent
-    if end = ' '
-      parse-new-expression(user "", user self)->(
-          owner self.error-message, var end)
+  func inst parse()
+    if glob.last-char = ' '
+      parse-new-expression(user "", user self)->(owner self.error-message)
   
   func dynamic is-end-point()->(var Bool is-end)
     is-end := true
@@ -88,16 +76,14 @@ class SyntaxTreeWhile(SyntaxTreeCode)
   owner Expression condition
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeWhile new-node)
-    new-node := SyntaxTreeWhile()
-    new-node.parse(user parent)->(var end)
+      owner SyntaxTreeWhile new-node)
+    new-node := SyntaxTreeWhile(user parent)
+    new-node.parse()
   
-  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
-    self.parent := parent
-    self.set-location()
-    if not parent.is-in-loop
+  func inst parse()
+    if not self.parent.is-in-loop
       self.syntax-error-msg(user "\"while\" used not inside loop")
-    parse-new-expression(user "", user self)->(owner self.condition, var end)
+    parse-new-expression(user "", user self)->(owner self.condition)
   
   func dynamic analyze()
     self.analyze-expression(user self.condition, user glob.type-bool)
@@ -111,18 +97,33 @@ class SyntaxTreeWhile(SyntaxTreeCode)
     write(user ")) break;\n")
 
 
+~~~ Break statement in the syntax tree ~~~
+class SyntaxTreeBreak(SyntaxTreeCode)
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      owner SyntaxTreeBreak new-node)
+    new-node := SyntaxTreeBreak(user parent)
+    new-node.parse()
+  
+  func inst parse()
+    if not self.parent.is-in-loop
+      self.syntax-error-msg(user "\"break\" used not inside loop")
+  
+  func dynamic write()
+    self.write-spaces()
+    write(user "break;\n")
+
+
 ~~~ Continue statement in the syntax tree ~~~
 class SyntaxTreeContinue(SyntaxTreeCode)
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeContinue new-node)
-    new-node := SyntaxTreeContinue()
-    new-node.parse(user parent)
+      owner SyntaxTreeContinue new-node)
+    new-node := SyntaxTreeContinue(user parent)
+    new-node.parse()
   
-  func inst parse(user SyntaxTreeBlock parent)
-    self.set-location()
-    self.parent := parent
-    if not parent.is-in-loop
+  func inst parse()
+    if not self.parent.is-in-loop
       self.syntax-error-msg(user "\"continue\" used not inside loop")
   
   func dynamic write()
@@ -133,14 +134,8 @@ class SyntaxTreeContinue(SyntaxTreeCode)
 class SyntaxTreeCoverage(SyntaxTreeCode)
   var Int input-file-index
   
-  func inst init-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeCoverage coverage-node)
-    coverage-node := SyntaxTreeCoverage()
-    coverage-node.init(user parent)
-  
-  func inst init(user SyntaxTreeBlock parent)
-    self.set-location()
-    self.parent := parent
+  new(user SyntaxTreeBlock parent)
+    base(user parent)
     self.input-file-index := glob.input-file-index
   
   func dynamic analyze()

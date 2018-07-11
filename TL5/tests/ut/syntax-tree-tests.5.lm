@@ -490,7 +490,7 @@ user Int x
 ; @ ec te15
 new Int x
 ; @ ec te16
-var File f(copy 1)
+var Array{4:Int} a(copy 1)
 ; @ ec te17
 var Bool x(var 1)
 ; @ ec te18
@@ -599,11 +599,8 @@ func error()
 do
     var Int x
 ; @ c t1
-
-  
-    
-
-  var Int x
+do
+    break
 ; @ c t2
 do
     while t.num > 3
@@ -636,12 +633,17 @@ do
 ; @ ec te8
 do
     continue error
+; @ ec te9
+break
+; @ ec te10
+do
+    break error
 ; @@ test-for-loop
 ; @ c t0
 for n in 5
     i += n
 ; @ c t1
-for n in t.num:t.num + 2
+for n in t.num:str.length + 2
     i += n
 ; @ c t2
 for ch in str
@@ -1347,9 +1349,15 @@ struct TestIterator{Generic}
   func has()->(var Bool has-data)
   func get()->(user Generic item)
   func next()
-func f-mock(user TestIterator{String} iter)->(user String s)
-  for t in iter
-    s := t
+class Test
+  var Int x
+  func dynamic fun()
+func f-mock(user TestIterator{String} siter, user TestIterator{Test} titer)->(
+    user String os, user Test ot)
+  for s in siter
+    os := s
+  for t in titer
+    ot := t
 ; @ g t3
 class TestIterator{Generic}
   user Generic item
@@ -1462,21 +1470,28 @@ func f-mock()
   for n in TestIterator()
 ; @@ test-complex-fields
 ; @ g t0
-class Base
-  user Base b
-  func dynamic meth()
 struct Test
-  var Base b
+  var Bstruct b
   func test()
-    user Base b(user self.b)
+    user Bstruct b(user self.b)
     b := self.b
     self.b.meth()
-    Base.meth(user self.b)
-    user Base b2(user self.b.b)
+    Bstruct.meth(user self.b)
+    user Bstruct b2(user self.b.b)
     b2 := self.b.b
     self.b.b.meth()
-    Base.meth(user self.b.b)
+    self.b.b := b
+    Bstruct.meth(user self.b.b)
     var Test t
+    self.b.x := 5
+    Astruct.meth(user self.b)
+    if self.b is b or b2 is-not self.b
+class Astruct
+  var Int x
+  func dynamic meth()
+class Bstruct(Astruct)
+  user Bstruct b
+  func dynamic meth()
 ; @ eg te0
 struct Test
   var String{12} error
@@ -1491,6 +1506,20 @@ struct Test
   var Base error
 struct Base
   var Test t
+; @ eg te4
+struct Abase
+  var Berror b
+struct Aerror(Abase)
+struct Bbase
+  var Aerror a
+struct Berror(Bbase)
+; @ eg te5
+struct Base
+  var Int x
+struct Test
+  var Base b
+  func test(user Base b)
+    self.b := b
 ; @@ test-enum
 ; @ g t0
 enum MyEnum

@@ -186,13 +186,18 @@ class Expression(SyntaxTreeNode)
     if ? self.code-node
       self.code-node.get-parent-type():(user parent-type)
   
-  func inst write-refman-init(user SymbolExpression symbol)
-    # `symbol`_Refman = LUMI_new_ref(`symbol`);
+  func inst write-refman-init(user SymbolExpression symbol, copy Bool is-new)
+    # `symbol`_Refman = LUMI_new_ref((void**)&`symbol`, `is-new`);
     # if (`symbol`_Refman == NULL) raise(`line-num`)
     self.code-node.write-spaces()
     symbol.write()
-    write(user "_Refman = LUMI_new_ref(")
+    write(user "_Refman = LUMI_new_ref((void**)&")
     symbol.write()
+    write(user ", ")
+    if is-new
+      write(user "true")
+    else
+      write(user "false")
     write(user ");\n")
     self.code-node.write-spaces()
     write(user "if (")
@@ -217,6 +222,20 @@ class Expression(SyntaxTreeNode)
       self.code-node.write-spaces()
       self.write-dynamic()
       write(user " = NULL;\n")
+    
+  func inst write-check-ref()
+    # if (`instance` == NULL) RAISE("empty object used")
+    # if (`instance`_Refman->value == NULL)
+    #   RAISE("outdated weak reference used")
+    write(user "if (")
+    self.write-as-top()
+    write(user " == NULL) ")
+    self.write-raise(user "empty object used")
+    self.code-node.write-spaces()
+    write(user "if (")
+    self.write-refman()
+    write(user "->value == NULL) ")
+    self.write-raise(user "outdated weak reference used")
   
   func dynamic write-dynamic()
     self.write()

@@ -20,7 +20,7 @@ class SyntaxTreeNode
         access := n
         return
     self.print-syntax-error(user "illegal access", user access-str)
-    raise
+    sys.exit(copy 1)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := _
@@ -42,15 +42,12 @@ class SyntaxTreeNode
     user TypeData parent-type
     if self.get-parent-type()->(user parent-type)?
       if parent-type.parameters?
-        user ListNode{String} node(user parent-type.parameters.first)
-        do
-          while node?
-          if node.item.equal(user name)
+        for parameter in parent-type.parameters.iter()
+          if parameter.equal(user name)
             type-data := glob.type-generic
             return
-          node := node.next
     self.print-syntax-error(user "unknown type", user name)
-    raise
+    sys.exit(copy 1)
   
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
@@ -72,7 +69,8 @@ class SyntaxTreeNode
   func inst read-expect(user String expected-text)
     new String{expected-text.length + 1} actual-text
     for n in expected-text.length
-      actual-text.append(copy read-c())
+      read-c()
+      actual-text.append(copy glob.last-char)
     if not actual-text.equal(user expected-text)
       self.syntax-error2(
           user "expected", user expected-text, user "got", user actual-text)
@@ -111,7 +109,7 @@ class SyntaxTreeNode
   
   func inst syntax-error(user String text, user String item)
     self.print-syntax-error(user text, user item)
-    raise
+    sys.exit(copy 1)
   
   ~~~ Same as `syntax-error` but but with another `{text} "{item}" pair ~~~
   func inst syntax-error2(
@@ -121,7 +119,7 @@ class SyntaxTreeNode
     sys.print(user " ")
     print-msg-with-item(user text2, user item2)
     sys.print(user "\n")
-    raise
+    sys.exit(copy 1)
   
   ~~~ Same as `syntax-error` but but with another 2 `{text} "{item}" pair ~~~
   func inst syntax-error3(
@@ -138,25 +136,25 @@ class SyntaxTreeNode
     sys.print(user " ")
     print-msg-with-item(user text3, user item3)
     sys.print(user "\n")
-    raise
+    sys.exit(copy 1)
   
   ~~~ Same as `syntax-error` but with a character item ~~~
-  func inst syntax-error-c(user String text, copy Char item)
+  func inst syntax-error-c(user String text)
     var String{16} char-str
-    if item = EOF
-      char-str.new(user "EOF")
-    else-if item = '\n'
+    if glob.file-ended
+      char-str.new(user "end-of-file")
+    else-if glob.last-char = '\n'
       char-str.new(user "new-line")
     else
-      char-str.append(copy item)
+      char-str.append(copy glob.last-char)
     self.print-syntax-error(user text, user char-str)
-    raise
+    sys.exit(copy 1)
   
   func inst syntax-error-msg(user String text)
     self.print-syntax-error-header()
     sys.print(user text)
     sys.print(user "\n")
-    raise
+    sys.exit(copy 1)
   
   func inst syntax-error-indentation(copy Int actual, copy Int expected)
     var String{16} expected-str
@@ -174,9 +172,10 @@ class SyntaxTreeNode
     sys.print(user " got ")
     sys.print(user actual-str)
     sys.print(user "\n")
-    raise
+    sys.exit(copy 1)
   
   func inst print-syntax-error-header()
+    assert self.input-file-name?
     sys.print(user "Code error in ")
     sys.print(user self.input-file-name)
     sys.print(user "[")
@@ -231,11 +230,8 @@ class SyntaxTreeNode
   
   func inst do-on-children(
       user List{SyntaxTreeNode} child-list, user NodeAction action)
-    user ListNode{SyntaxTreeNode} child(user child-list.first)
-    do
-      while child?
-      child.item.do-action(user action)
-      child := child.next
+    for child in child-list.iter()
+      child.do-action(user action)
   
   func inst do-action(user NodeAction action)
     glob.input-file-name := self.input-file-name

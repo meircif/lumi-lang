@@ -451,6 +451,8 @@ Returncode integration_M_f_alloc(void);
 
 Returncode integration_M_test_assert_error_message(void);
 
+Returncode integration_M_test_builtin_errors(void);
+
 Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
 
 Bool Sys_println_Mock_active = true;
@@ -526,6 +528,8 @@ Ref_Manager* integration_M_deleted_refmans_Refman = NULL;
 
 Int integration_M_new_fail_countdown = 0;
 
+extern Int lumi_debug_value;
+
 int LUMI_file0_line_count[569] = {
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
@@ -551,7 +555,7 @@ int LUMI_file0_line_count[569] = {
    0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1, 0,-1,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0,
    0, 0, 0,-1,-1, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1
 };
-int LUMI_file1_line_count[392] = {
+int LUMI_file1_line_count[441] = {
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0,-1,-1,-1, 0, 0, 0, 0,-1,-1,
    0, 0,-1,-1, 0, 0, 0, 0,-1,-1, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,
    0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1,-1, 0, 0,-1,-1,-1, 0, 0,-1,-1,
@@ -566,12 +570,14 @@ int LUMI_file1_line_count[392] = {
    0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
    0, 0, 0,-1, 0, 0, 0, 0,-1,-1,-1, 0,-1,-1, 0, 0, 0,-1,-1, 0,-1,-1, 0, 0,-1,
   -1, 0,-1,-1, 0,-1,-1,-1,-1, 0, 0, 0, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0, 0, 0, 0,
-   0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1, 0,-1,
-  -1, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0,-1
+   0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,
+   0, 0, 0, 0,-1, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0,-1, 0, 0,-1, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0,-1,-1, 0,-1,-1,
+   0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0,-1
 };
 File_Coverage LUMI_file_coverage[2] = {
   {"tests/integration-test0.4.lm", 569, LUMI_file0_line_count},
-  {"tests/integration-test1.4.lm", 392, LUMI_file1_line_count}
+  {"tests/integration-test1.4.lm", 441, LUMI_file1_line_count}
 };
 
 
@@ -589,12 +595,12 @@ Returncode integration_M_TestStruct_new(integration_M_TestStruct* self, Ref_Mana
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[0].line_count[212];
-  if (self == NULL) RAISE(212, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(212, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(212, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(212, 28, "outdated weak reference used")
   self->num = x;
   ++LUMI_file_coverage[0].line_count[213];
-  if (self == NULL) RAISE(213, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(213, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(213, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(213, 28, "outdated weak reference used")
   aux_Ref_Manager = self->text_Refman;
   self->text_Refman = s_Refman;
   LUMI_inc_ref(self->text_Refman);
@@ -606,12 +612,12 @@ Returncode integration_M_TestStruct_new(integration_M_TestStruct* self, Ref_Mana
       ++LUMI_file_coverage[0].line_count[215];
       aux_TestStruct_0 = LUMI_alloc(sizeof(integration_M_TestStruct));
       if (aux_TestStruct_0 == NULL) RAISE(215, 49, "insufficient memory for object dynamic allocation")
-      aux_TestStruct_0_Refman = LUMI_new_ref(aux_TestStruct_0);
+      aux_TestStruct_0_Refman = LUMI_new_ref((void**)&aux_TestStruct_0, true);
       if (aux_TestStruct_0_Refman == NULL) RAISE(215, 38, "insufficient memory for managed object")
       LUMI_err = integration_M_TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman);
       CHECK(215)
-      if (self == NULL) RAISE(215, 27, "used member of empty object")
-      if (self_Refman->value == NULL) RAISE(215, 38, "used member of outdated weak reference")
+      if (self == NULL) RAISE(215, 17, "empty object used")
+      if (self_Refman->value == NULL) RAISE(215, 28, "outdated weak reference used")
       aux_TestStruct_1 = aux_TestStruct_0;
       aux_TestStruct_1_Refman = aux_TestStruct_0_Refman;
       aux_TestStruct_0 = NULL;
@@ -642,12 +648,12 @@ Returncode integration_M_TestStruct_get(integration_M_TestStruct* self, Ref_Mana
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[222];
-  if (self == NULL) RAISE(222, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(222, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(222, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(222, 28, "outdated weak reference used")
   *x = self->num;
   ++LUMI_file_coverage[0].line_count[223];
-  if (self == NULL) RAISE(223, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(223, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(223, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(223, 28, "outdated weak reference used")
   aux_Ref_Manager = *s_Refman;
   *s_Refman = self->text_Refman;
   LUMI_inc_ref(*s_Refman);
@@ -667,8 +673,8 @@ Returncode integration_M_TestStruct_print(integration_M_TestStruct* self, Ref_Ma
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[226];
-  if (self == NULL) RAISE(226, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(226, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(226, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(226, 28, "outdated weak reference used")
   LUMI_err = Sys_println_Mock(sys, sys_Refman, self->text, self->text_Refman);
   CHECK(226)
 LUMI_cleanup:
@@ -691,8 +697,8 @@ Returncode integration_M_TestClass_new(integration_M_TestClass* self, Ref_Manage
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[235];
-  if (self == NULL) RAISE(235, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(235, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(235, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(235, 28, "outdated weak reference used")
   self->num = 1;
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -707,8 +713,8 @@ Returncode integration_M_TestClass_static_meth(integration_M_TestClass* self, Re
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[238];
-  if (self == NULL) RAISE(238, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(238, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(238, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(238, 28, "outdated weak reference used")
   self->num = 3;
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -723,8 +729,8 @@ Returncode integration_M_TestClass_dynamic_meth(integration_M_TestClass* self, R
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[241];
-  if (self == NULL) RAISE(241, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(241, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(241, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(241, 28, "outdated weak reference used")
   self->num = 6;
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -739,8 +745,8 @@ Returncode integration_M_TestClass_print(integration_M_TestClass* self, Ref_Mana
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[244];
-  if (self == NULL) RAISE(244, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(244, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(244, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(244, 28, "outdated weak reference used")
   LUMI_err = Sys_println_Mock(sys, sys_Refman, self->text, self->text_Refman);
   CHECK(244)
 LUMI_cleanup:
@@ -776,8 +782,8 @@ Returncode integration_M_Data_set(integration_M_Data* self, Ref_Manager* self_Re
   LUMI_inc_ref(x_Refman);
   x_Dynamic = item_Dynamic;
   ++LUMI_file_coverage[0].line_count[377];
-  if (self == NULL) RAISE(377, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(377, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(377, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(377, 28, "outdated weak reference used")
   aux_Ref_Manager = self->item_Refman;
   self->item_Refman = x_Refman;
   self->item_Dynamic = x_Dynamic;
@@ -786,8 +792,8 @@ Returncode integration_M_Data_set(integration_M_Data* self, Ref_Manager* self_Re
   aux_Ref_Manager = NULL;
   self->item = x;
   ++LUMI_file_coverage[0].line_count[378];
-  if (self == NULL) RAISE(378, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(378, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(378, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(378, 28, "outdated weak reference used")
   aux_Ref_Manager = self->arr_Refman;
   self->arr_Refman = arr_Refman;
   LUMI_inc_ref(self->arr_Refman);
@@ -797,13 +803,13 @@ Returncode integration_M_Data_set(integration_M_Data* self, Ref_Manager* self_Re
   ++LUMI_file_coverage[0].line_count[379];
   d = LUMI_alloc(sizeof(integration_M_Data));
   if (d == NULL) RAISE(379, 49, "insufficient memory for object dynamic allocation")
-  d_Refman = LUMI_new_ref(d);
+  d_Refman = LUMI_new_ref((void**)&d, true);
   if (d_Refman == NULL) RAISE(379, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[380];
-  if (self == NULL) RAISE(380, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(380, 38, "used member of outdated weak reference")
-  if (d == NULL) RAISE(380, 27, "used member of empty object")
-  if (d_Refman->value == NULL) RAISE(380, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(380, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(380, 28, "outdated weak reference used")
+  if (d == NULL) RAISE(380, 17, "empty object used")
+  if (d_Refman->value == NULL) RAISE(380, 28, "outdated weak reference used")
   aux_Ref_Manager = d->item_Refman;
   d->item_Refman = self->item_Refman;
   d->item_Dynamic = self->item_Dynamic;
@@ -812,10 +818,10 @@ Returncode integration_M_Data_set(integration_M_Data* self, Ref_Manager* self_Re
   aux_Ref_Manager = NULL;
   d->item = self->item;
   ++LUMI_file_coverage[0].line_count[381];
-  if (d == NULL) RAISE(381, 27, "used member of empty object")
-  if (d_Refman->value == NULL) RAISE(381, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(381, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(381, 38, "used member of outdated weak reference")
+  if (d == NULL) RAISE(381, 17, "empty object used")
+  if (d_Refman->value == NULL) RAISE(381, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(381, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(381, 28, "outdated weak reference used")
   aux_Ref_Manager = self->item_Refman;
   self->item_Refman = d->item_Refman;
   self->item_Dynamic = d->item_Dynamic;
@@ -842,8 +848,8 @@ Returncode integration_M_Data_get(integration_M_Data* self, Ref_Manager* self_Re
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[384];
-  if (self == NULL) RAISE(384, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(384, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(384, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(384, 28, "outdated weak reference used")
   aux_Ref_Manager = *item_Refman;
   *item_Refman = self->item_Refman;
   *item_Dynamic = self->item_Dynamic;
@@ -890,8 +896,8 @@ Returncode integration_M_Container_new(integration_M_Container* self, Ref_Manage
   LUMI_inc_ref(value_Refman);
   LUMI_inc_ref(next_Refman);
   ++LUMI_file_coverage[0].line_count[459];
-  if (self == NULL) RAISE(459, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(459, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(459, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(459, 28, "outdated weak reference used")
   aux_Ref_Manager = self->value_Refman;
   self->value_Refman = value_Refman;
   self->value_Dynamic = value_Dynamic;
@@ -900,8 +906,8 @@ Returncode integration_M_Container_new(integration_M_Container* self, Ref_Manage
   aux_Ref_Manager = NULL;
   self->value = value;
   ++LUMI_file_coverage[0].line_count[460];
-  if (self == NULL) RAISE(460, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(460, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(460, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(460, 28, "outdated weak reference used")
   aux_Ref_Manager = self->next_Refman;
   self->next_Refman = next_Refman;
   LUMI_inc_ref(self->next_Refman);
@@ -927,11 +933,11 @@ Returncode integration_M_Container_iter(integration_M_Container* self, Ref_Manag
   Ref_Manager* aux_ContainerIterator_1_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[463];
-  if (self == NULL) RAISE(463, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(463, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(463, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(463, 28, "outdated weak reference used")
   aux_ContainerIterator_0 = LUMI_alloc(sizeof(integration_M_ContainerIterator));
   if (aux_ContainerIterator_0 == NULL) RAISE(463, 49, "insufficient memory for object dynamic allocation")
-  aux_ContainerIterator_0_Refman = LUMI_new_ref(aux_ContainerIterator_0);
+  aux_ContainerIterator_0_Refman = LUMI_new_ref((void**)&aux_ContainerIterator_0, true);
   if (aux_ContainerIterator_0_Refman == NULL) RAISE(463, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_ContainerIterator_new(aux_ContainerIterator_0, aux_ContainerIterator_0_Refman, self->next, self->next_Refman);
   CHECK(463)
@@ -970,8 +976,8 @@ Returncode integration_M_ContainerIterator_new(integration_M_ContainerIterator* 
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(first_Refman);
   ++LUMI_file_coverage[0].line_count[469];
-  if (self == NULL) RAISE(469, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(469, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(469, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(469, 28, "outdated weak reference used")
   aux_Ref_Manager = self->curr_Refman;
   self->curr_Refman = first_Refman;
   LUMI_inc_ref(self->curr_Refman);
@@ -992,8 +998,8 @@ Returncode integration_M_ContainerIterator_has(integration_M_ContainerIterator* 
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[472];
-  if (self == NULL) RAISE(472, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(472, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(472, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(472, 28, "outdated weak reference used")
   *has_data = self->curr != NULL && self->curr_Refman->value != NULL;
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -1009,10 +1015,10 @@ Returncode integration_M_ContainerIterator_get(integration_M_ContainerIterator* 
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[475];
-  if (self == NULL) RAISE(475, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(475, 38, "used member of outdated weak reference")
-  if (self->curr == NULL) RAISE(475, 27, "used member of empty object")
-  if (self->curr_Refman->value == NULL) RAISE(475, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(475, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(475, 28, "outdated weak reference used")
+  if (self->curr == NULL) RAISE(475, 17, "empty object used")
+  if (self->curr_Refman->value == NULL) RAISE(475, 28, "outdated weak reference used")
   aux_Ref_Manager = *item_Refman;
   *item_Refman = self->curr->value_Refman;
   *item_Dynamic = self->curr->value_Dynamic;
@@ -1034,12 +1040,12 @@ Returncode integration_M_ContainerIterator_next(integration_M_ContainerIterator*
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[478];
-  if (self == NULL) RAISE(478, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(478, 38, "used member of outdated weak reference")
-  if (self->curr == NULL) RAISE(478, 27, "used member of empty object")
-  if (self->curr_Refman->value == NULL) RAISE(478, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(478, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(478, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(478, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(478, 28, "outdated weak reference used")
+  if (self->curr == NULL) RAISE(478, 17, "empty object used")
+  if (self->curr_Refman->value == NULL) RAISE(478, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(478, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(478, 28, "outdated weak reference used")
   aux_Ref_Manager = self->curr_Refman;
   self->curr_Refman = self->curr->next_Refman;
   LUMI_inc_ref(self->curr_Refman);
@@ -1068,7 +1074,7 @@ Returncode integration_M_ComplexField_meth(integration_M_ComplexField* self, Ref
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[538];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(538, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 2;
   aux_String_0_Var.length = 1;
@@ -1101,15 +1107,15 @@ Returncode integration_M_HasComplexField_run(integration_M_HasComplexField* self
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[0].line_count[543];
-  if (self == NULL) RAISE(543, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(543, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(543, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(543, 28, "outdated weak reference used")
   x = &(self->x);
   x_Refman = self_Refman;
   LUMI_inc_ref(x_Refman);
   x_Dynamic = &integration_M_ComplexField_dynamic;
   ++LUMI_file_coverage[0].line_count[544];
-  if (self == NULL) RAISE(544, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(544, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(544, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(544, 28, "outdated weak reference used")
   aux_Ref_Manager = x_Refman;
   x_Refman = self_Refman;
   x_Dynamic = &integration_M_ComplexField_dynamic;
@@ -1122,25 +1128,25 @@ Returncode integration_M_HasComplexField_run(integration_M_HasComplexField* self
   LUMI_err = x_Dynamic->meth(x, x_Refman, x_Dynamic);
   CHECK(545)
   ++LUMI_file_coverage[0].line_count[546];
-  if (self == NULL) RAISE(546, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(546, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(546, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(546, 28, "outdated weak reference used")
   LUMI_err = integration_M_ComplexField_meth(&(self->x), self_Refman, &integration_M_ComplexField_dynamic);
   CHECK(546)
   ++LUMI_file_coverage[0].line_count[547];
-  if (self == NULL) RAISE(547, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(547, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(547, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(547, 28, "outdated weak reference used")
   LUMI_err = integration_M_ComplexField_meth(&(self->x), self_Refman, &integration_M_ComplexField_dynamic);
   CHECK(547)
   ++LUMI_file_coverage[0].line_count[548];
-  if (self == NULL) RAISE(548, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(548, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(548, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(548, 28, "outdated weak reference used")
   x2 = self->x.x;
   x2_Refman = self->x.x_Refman;
   LUMI_inc_ref(x2_Refman);
   x2_Dynamic = self->x.x_Dynamic;
   ++LUMI_file_coverage[0].line_count[549];
-  if (self == NULL) RAISE(549, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(549, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(549, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(549, 28, "outdated weak reference used")
   aux_Ref_Manager = x2_Refman;
   x2_Refman = self->x.x_Refman;
   x2_Dynamic = self->x.x_Dynamic;
@@ -1153,14 +1159,14 @@ Returncode integration_M_HasComplexField_run(integration_M_HasComplexField* self
   LUMI_err = x2_Dynamic->meth(x2, x2_Refman, x2_Dynamic);
   CHECK(550)
   ++LUMI_file_coverage[0].line_count[551];
-  if (self == NULL) RAISE(551, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(551, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(551, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(551, 28, "outdated weak reference used")
   if (self->x.x_Dynamic == NULL) RAISE(551, 28, "dynamic call of empty object")
   LUMI_err = self->x.x_Dynamic->meth(self->x.x, self->x.x_Refman, self->x.x_Dynamic);
   CHECK(551)
   ++LUMI_file_coverage[0].line_count[552];
-  if (self == NULL) RAISE(552, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(552, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(552, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(552, 28, "outdated weak reference used")
   LUMI_err = integration_M_ComplexField_meth(self->x.x, self->x.x_Refman, self->x.x_Dynamic);
   CHECK(552)
 LUMI_cleanup:
@@ -1183,8 +1189,8 @@ Returncode integration_M_BaseType_new(integration_M_BaseType* self, Ref_Manager*
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[50];
-  if (self == NULL) RAISE(50, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(50, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(50, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(50, 28, "outdated weak reference used")
   self->num_base = 1;
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -1203,7 +1209,7 @@ Returncode integration_M_BaseType_meth0(integration_M_BaseType* self, Ref_Manage
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[53];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(53, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -1229,7 +1235,7 @@ Returncode integration_M_BaseType_meth1(integration_M_BaseType* self, Ref_Manage
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[1].line_count[56];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(56, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -1255,7 +1261,7 @@ Returncode integration_M_BaseType_meth2(integration_M_BaseType* self, Ref_Manage
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[59];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(59, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -1281,7 +1287,7 @@ Returncode integration_M_BaseType_meth3(integration_M_BaseType* self, Ref_Manage
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[1].line_count[62];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(62, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -1310,8 +1316,8 @@ Returncode covered_M_MiddleType_new(covered_M_MiddleType* self, Ref_Manager* sel
   LUMI_inc_ref(self_Refman);
   LUMI_err = integration_M_BaseType_new(&(self->_base), self_Refman, &(self_Dynamic->_base));
   CHECK(14)
-  if (self == NULL) RAISE(15, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(15, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(15, 28, "outdated weak reference used")
   self->num_mid = 2;
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -1330,7 +1336,7 @@ Returncode covered_M_MiddleType_meth1(covered_M_MiddleType* self, Ref_Manager* s
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(18, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -1357,7 +1363,7 @@ Returncode covered_M_MiddleType_meth2(covered_M_MiddleType* self, Ref_Manager* s
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -1383,7 +1389,7 @@ Returncode covered_M_MiddleType_meth4(covered_M_MiddleType* self, Ref_Manager* s
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(26, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -1408,7 +1414,7 @@ Returncode covered_M_MiddleType_meth5(covered_M_MiddleType* self, Ref_Manager* s
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(s_Refman);
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(29, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -1440,8 +1446,8 @@ Returncode integration_M_TopType_new(integration_M_TopType* self, Ref_Manager* s
   LUMI_err = covered_M_MiddleType_new(&(self->_base), self_Refman, &(self_Dynamic->_base));
   CHECK(14)
   ++LUMI_file_coverage[1].line_count[15];
-  if (self == NULL) RAISE(15, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(15, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(15, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(15, 28, "outdated weak reference used")
   self->num_top = 3;
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -1460,7 +1466,7 @@ Returncode integration_M_TopType_meth2(integration_M_TopType* self, Ref_Manager*
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[19];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(19, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -1495,7 +1501,7 @@ Returncode integration_M_TopType_meth3(integration_M_TopType* self, Ref_Manager*
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[1].line_count[25];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(25, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -1525,7 +1531,7 @@ Returncode integration_M_TopType_meth5(integration_M_TopType* self, Ref_Manager*
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[1].line_count[29];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(29, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -1567,7 +1573,7 @@ Returncode integration_M_TopType_meth6(integration_M_TopType* self, Ref_Manager*
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[35];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(35, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 14;
   aux_String_0_Var.length = 13;
@@ -1575,16 +1581,16 @@ Returncode integration_M_TopType_meth6(integration_M_TopType* self, Ref_Manager*
   LUMI_err = Sys_println_Mock(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(35)
   ++LUMI_file_coverage[1].line_count[36];
-  if (self == NULL) RAISE(36, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(36, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(36, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(36, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(36, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(36, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(36, 28, "outdated weak reference used")
   self->_base.num_mid = self->_base._base.num_base;
   ++LUMI_file_coverage[1].line_count[37];
-  if (self == NULL) RAISE(37, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(37, 38, "used member of outdated weak reference")
-  if (self == NULL) RAISE(37, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(37, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(37, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(37, 28, "outdated weak reference used")
+  if (self == NULL) RAISE(37, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(37, 28, "outdated weak reference used")
   aux_Ref_Manager = self->top_base_ref_Refman;
   self->top_base_ref_Refman = self->top_mid_ref_Refman;
   self->top_base_ref_Dynamic = &(self->top_mid_ref_Dynamic->_base);
@@ -1593,8 +1599,8 @@ Returncode integration_M_TopType_meth6(integration_M_TopType* self, Ref_Manager*
   aux_Ref_Manager = NULL;
   self->top_base_ref = &(self->top_mid_ref->_base);
   ++LUMI_file_coverage[1].line_count[38];
-  if (self == NULL) RAISE(38, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(38, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(38, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(38, 28, "outdated weak reference used")
   aux_Ref_Manager = self->top_base_ref_Refman;
   self->top_base_ref_Refman = self_Refman;
   self->top_base_ref_Dynamic = &(self_Dynamic->_base._base);
@@ -1676,12 +1682,12 @@ Returncode integration_M_RefNode_new(integration_M_RefNode* self, Ref_Manager* s
   Ref_Manager* aux_RefNode_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   ++LUMI_file_coverage[1].line_count[173];
-  if (self == NULL) RAISE(173, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(173, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(173, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(173, 28, "outdated weak reference used")
   self->ref = ref;
   ++LUMI_file_coverage[1].line_count[174];
-  if (self == NULL) RAISE(174, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(174, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(174, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(174, 28, "outdated weak reference used")
   aux_RefNode_0 = next;
   aux_RefNode_0_Refman = next_Refman;
   next = NULL;
@@ -1724,7 +1730,7 @@ Returncode integration_M_test_simple_function(void) {
   Ref_Manager* aux_String_1_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[36];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(36, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 23;
   aux_String_0_Var.length = 22;
@@ -1733,7 +1739,7 @@ Returncode integration_M_test_simple_function(void) {
   CHECK(36)
   ++LUMI_file_coverage[0].line_count[37];
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(40, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 25;
   aux_String_1_Var.length = 24;
@@ -1765,7 +1771,7 @@ Returncode integration_M_test_const_expression(Int* i, Char* c, String** s, Ref_
   *c = (((('a' + '\'') + '\n') + '\x0f') + '\xA9') + '\270';
   ++LUMI_file_coverage[0].line_count[53];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(53, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
@@ -1778,7 +1784,7 @@ Returncode integration_M_test_const_expression(Int* i, Char* c, String** s, Ref_
   *s = aux_String_0;
   ++LUMI_file_coverage[0].line_count[54];
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(56, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 12;
   aux_String_1_Var.length = 11;
@@ -1827,48 +1833,48 @@ Returncode integration_M_test_member_expression(integration_M_TestStruct* t, Ref
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(t_Refman);
   ++LUMI_file_coverage[0].line_count[64];
-  if (t == NULL) RAISE(64, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(64, 38, "used member of outdated weak reference")
-  if (t->ts == NULL) RAISE(64, 27, "used member of empty object")
-  if (t->ts_Refman->value == NULL) RAISE(64, 38, "used member of outdated weak reference")
-  if (t->ts->ts == NULL) RAISE(64, 27, "used member of empty object")
-  if (t->ts->ts_Refman->value == NULL) RAISE(64, 38, "used member of outdated weak reference")
-  if (t == NULL) RAISE(64, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(64, 38, "used member of outdated weak reference")
-  if (t->ts == NULL) RAISE(64, 27, "used member of empty object")
-  if (t->ts_Refman->value == NULL) RAISE(64, 38, "used member of outdated weak reference")
-  if (*to == NULL) RAISE(64, 27, "used member of empty object")
-  if ((*to_Refman)->value == NULL) RAISE(64, 38, "used member of outdated weak reference")
-  if (t == NULL) RAISE(64, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(64, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(64, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(64, 28, "outdated weak reference used")
+  if (t->ts == NULL) RAISE(64, 17, "empty object used")
+  if (t->ts_Refman->value == NULL) RAISE(64, 28, "outdated weak reference used")
+  if (t->ts->ts == NULL) RAISE(64, 17, "empty object used")
+  if (t->ts->ts_Refman->value == NULL) RAISE(64, 28, "outdated weak reference used")
+  if (t == NULL) RAISE(64, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(64, 28, "outdated weak reference used")
+  if (t->ts == NULL) RAISE(64, 17, "empty object used")
+  if (t->ts_Refman->value == NULL) RAISE(64, 28, "outdated weak reference used")
+  if (*to == NULL) RAISE(64, 17, "empty object used")
+  if ((*to_Refman)->value == NULL) RAISE(64, 28, "outdated weak reference used")
+  if (t == NULL) RAISE(64, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(64, 28, "outdated weak reference used")
   t->num = ((*to)->num + t->ts->num) + t->ts->ts->num;
   ++LUMI_file_coverage[0].line_count[65];
-  if (t == NULL) RAISE(65, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(65, 38, "used member of outdated weak reference")
-  if (*to == NULL) RAISE(65, 27, "used member of empty object")
-  if ((*to_Refman)->value == NULL) RAISE(65, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(65, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(65, 28, "outdated weak reference used")
+  if (*to == NULL) RAISE(65, 17, "empty object used")
+  if ((*to_Refman)->value == NULL) RAISE(65, 28, "outdated weak reference used")
   (*to)->num = t->num;
   ++LUMI_file_coverage[0].line_count[66];
-  if (t == NULL) RAISE(66, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(66, 38, "used member of outdated weak reference")
-  if (t->ts == NULL) RAISE(66, 27, "used member of empty object")
-  if (t->ts_Refman->value == NULL) RAISE(66, 38, "used member of outdated weak reference")
-  if (t->ts->ts == NULL) RAISE(66, 27, "used member of empty object")
-  if (t->ts->ts_Refman->value == NULL) RAISE(66, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(66, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(66, 28, "outdated weak reference used")
+  if (t->ts == NULL) RAISE(66, 17, "empty object used")
+  if (t->ts_Refman->value == NULL) RAISE(66, 28, "outdated weak reference used")
+  if (t->ts->ts == NULL) RAISE(66, 17, "empty object used")
+  if (t->ts->ts_Refman->value == NULL) RAISE(66, 28, "outdated weak reference used")
   t->ts->ts->num = 4;
   ++LUMI_file_coverage[0].line_count[67];
-  if (t == NULL) RAISE(67, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(67, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(67, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(67, 28, "outdated weak reference used")
   t->fun = integration_M_f_test_void;
   ++LUMI_file_coverage[0].line_count[68];
-  if (t == NULL) RAISE(68, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(68, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(68, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(68, 28, "outdated weak reference used")
   if (t->fun == NULL) RAISE(68, 21, "empty function called")
   LUMI_err = t->fun();
   CHECK(68)
   ++LUMI_file_coverage[0].line_count[69];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(69, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 1;
   aux_String_0_Var.length = 0;
@@ -1932,114 +1938,114 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   LUMI_inc_ref(arrf_Refman);
   ++LUMI_file_coverage[0].line_count[89];
   aux_Array_0 = &aux_Array_0_Var;
-  aux_Array_0_Refman = LUMI_new_ref(aux_Array_0);
+  aux_Array_0_Refman = LUMI_new_ref((void**)&aux_Array_0, false);
   if (aux_Array_0_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
   aux_Array_0_Var.length = 2;
   aux_Array_0_Var.values = (Byte*)((arrs)->values) + (4);
-  if (arrs == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (arrs_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (arrs == NULL) RAISE(89, 17, "empty object used")
+  if (arrs_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((4) < 0 || (2) < 0 || (4) + (2) > (arrs)->length) RAISE(89, 25, "slice index out of bounds")
-  if (aux_Array_0 == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (arrs_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (aux_Array_0 == NULL) RAISE(89, 17, "empty object used")
+  if (arrs_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (aux_Array_0)->length) RAISE(89, 25, "slice index out of bounds")
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
   aux_String_0_Var.length = 3;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
   aux_String_0_Var.values = ((((String*)((aux_Array_0)->values)) + 4))->values + (1);
-  if (((String*)((aux_Array_0)->values)) + 4 == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (arrs_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (((String*)((aux_Array_0)->values)) + 4 == NULL) RAISE(89, 17, "empty object used")
+  if (arrs_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((1) < 0 || (3) < 0 || (1) + (3) > ((((String*)((aux_Array_0)->values)) + 4))->length) RAISE(89, 25, "slice index out of bounds")
-  if (aux_String_0 == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (arrs_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (aux_String_0 == NULL) RAISE(89, 17, "empty object used")
+  if (arrs_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (aux_String_0)->length) RAISE(89, 25, "slice index out of bounds")
-  if (arrs == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (arrs_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (arrs == NULL) RAISE(89, 17, "empty object used")
+  if (arrs_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((3) < 0 || (3) >= (arrs)->length) RAISE(89, 25, "slice index out of bounds")
-  if (((String*)((arrs)->values)) + 3 == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (arrs_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (((String*)((arrs)->values)) + 3 == NULL) RAISE(89, 17, "empty object used")
+  if (arrs_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= ((((String*)((arrs)->values)) + 3))->length) RAISE(89, 25, "slice index out of bounds")
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
   aux_String_1_Var.length = 7;
   aux_String_1_Var.max_length = aux_String_1_Var.length + 1;
   aux_String_1_Var.values = (s)->values + (4);
-  if (s == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (s_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (s == NULL) RAISE(89, 17, "empty object used")
+  if (s_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((4) < 0 || (7) < 0 || (4) + (7) > (s)->length) RAISE(89, 25, "slice index out of bounds")
-  if (aux_String_1 == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (s_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (aux_String_1 == NULL) RAISE(89, 17, "empty object used")
+  if (s_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (aux_String_1)->length) RAISE(89, 25, "slice index out of bounds")
-  if (s == NULL) RAISE(89, 29, "empty object used as sequence")
-  if (s_Refman->value == NULL) RAISE(89, 40, "outdated weak reference used as sequence")
+  if (s == NULL) RAISE(89, 17, "empty object used")
+  if (s_Refman->value == NULL) RAISE(89, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (s)->length) RAISE(89, 25, "slice index out of bounds")
   *c = (((((s)->values)[2]) + (((aux_String_1)->values)[2])) + ((((((String*)((arrs)->values)) + 3))->values)[2])) + (((aux_String_0)->values)[0]);
   ++LUMI_file_coverage[0].line_count[90];
   aux_Array_1 = &aux_Array_1_Var;
-  aux_Array_1_Refman = LUMI_new_ref(aux_Array_1);
+  aux_Array_1_Refman = LUMI_new_ref((void**)&aux_Array_1, false);
   if (aux_Array_1_Refman == NULL) RAISE(91, 38, "insufficient memory for managed object")
   aux_Array_1_Var.length = 3;
   aux_Array_1_Var.values = (Byte*)((arri)->values) + (3);
-  if (arri == NULL) RAISE(91, 29, "empty object used as sequence")
-  if (arri_Refman->value == NULL) RAISE(91, 40, "outdated weak reference used as sequence")
+  if (arri == NULL) RAISE(91, 17, "empty object used")
+  if (arri_Refman->value == NULL) RAISE(91, 28, "outdated weak reference used")
   if ((3) < 0 || (3) < 0 || (3) + (3) > (arri)->length) RAISE(91, 25, "slice index out of bounds")
   aux_Array_2 = &aux_Array_2_Var;
-  aux_Array_2_Refman = LUMI_new_ref(aux_Array_2);
+  aux_Array_2_Refman = LUMI_new_ref((void**)&aux_Array_2, false);
   if (aux_Array_2_Refman == NULL) RAISE(91, 38, "insufficient memory for managed object")
   aux_Array_2_Var.length = 2;
   aux_Array_2_Var.values = (Byte*)((aux_Array_1)->values) + (1);
-  if (aux_Array_1 == NULL) RAISE(91, 29, "empty object used as sequence")
-  if (arri_Refman->value == NULL) RAISE(91, 40, "outdated weak reference used as sequence")
+  if (aux_Array_1 == NULL) RAISE(91, 17, "empty object used")
+  if (arri_Refman->value == NULL) RAISE(91, 28, "outdated weak reference used")
   if ((1) < 0 || (2) < 0 || (1) + (2) > (aux_Array_1)->length) RAISE(91, 25, "slice index out of bounds")
-  if (aux_Array_2 == NULL) RAISE(91, 29, "empty object used as sequence")
-  if (arri_Refman->value == NULL) RAISE(91, 40, "outdated weak reference used as sequence")
+  if (aux_Array_2 == NULL) RAISE(91, 17, "empty object used")
+  if (arri_Refman->value == NULL) RAISE(91, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (aux_Array_2)->length) RAISE(91, 25, "slice index out of bounds")
   aux_Array_3 = &aux_Array_3_Var;
-  aux_Array_3_Refman = LUMI_new_ref(aux_Array_3);
+  aux_Array_3_Refman = LUMI_new_ref((void**)&aux_Array_3, false);
   if (aux_Array_3_Refman == NULL) RAISE(90, 38, "insufficient memory for managed object")
   aux_Array_3_Var.length = 4;
   aux_Array_3_Var.values = (Byte*)((arrt)->values) + (2);
-  if (arrt == NULL) RAISE(90, 29, "empty object used as sequence")
-  if (arrt_Refman->value == NULL) RAISE(90, 40, "outdated weak reference used as sequence")
+  if (arrt == NULL) RAISE(90, 17, "empty object used")
+  if (arrt_Refman->value == NULL) RAISE(90, 28, "outdated weak reference used")
   if ((2) < 0 || (4) < 0 || (2) + (4) > (arrt)->length) RAISE(90, 25, "slice index out of bounds")
-  if (aux_Array_3 == NULL) RAISE(90, 29, "empty object used as sequence")
-  if (arrt_Refman->value == NULL) RAISE(90, 40, "outdated weak reference used as sequence")
+  if (aux_Array_3 == NULL) RAISE(90, 17, "empty object used")
+  if (arrt_Refman->value == NULL) RAISE(90, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (aux_Array_3)->length) RAISE(90, 25, "slice index out of bounds")
-  if (((integration_M_TestStruct*)((aux_Array_3)->values)) + 1 == NULL) RAISE(90, 27, "used member of empty object")
-  if (arrt_Refman->value == NULL) RAISE(90, 38, "used member of outdated weak reference")
-  if (arrt == NULL) RAISE(90, 29, "empty object used as sequence")
-  if (arrt_Refman->value == NULL) RAISE(90, 40, "outdated weak reference used as sequence")
+  if (((integration_M_TestStruct*)((aux_Array_3)->values)) + 1 == NULL) RAISE(90, 17, "empty object used")
+  if (arrt_Refman->value == NULL) RAISE(90, 28, "outdated weak reference used")
+  if (arrt == NULL) RAISE(90, 17, "empty object used")
+  if (arrt_Refman->value == NULL) RAISE(90, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (arrt)->length) RAISE(90, 25, "slice index out of bounds")
-  if (((integration_M_TestStruct*)((arrt)->values)) + 4 == NULL) RAISE(90, 27, "used member of empty object")
-  if (arrt_Refman->value == NULL) RAISE(90, 38, "used member of outdated weak reference")
-  if (arri == NULL) RAISE(90, 29, "empty object used as sequence")
-  if (arri_Refman->value == NULL) RAISE(90, 40, "outdated weak reference used as sequence")
+  if (((integration_M_TestStruct*)((arrt)->values)) + 4 == NULL) RAISE(90, 17, "empty object used")
+  if (arrt_Refman->value == NULL) RAISE(90, 28, "outdated weak reference used")
+  if (arri == NULL) RAISE(90, 17, "empty object used")
+  if (arri_Refman->value == NULL) RAISE(90, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (arri)->length) RAISE(90, 25, "slice index out of bounds")
-  if (arri == NULL) RAISE(90, 29, "empty object used as sequence")
-  if (arri_Refman->value == NULL) RAISE(90, 40, "outdated weak reference used as sequence")
+  if (arri == NULL) RAISE(90, 17, "empty object used")
+  if (arri_Refman->value == NULL) RAISE(90, 28, "outdated weak reference used")
   if ((((*i) + 3) - (((Int*)((arri)->values))[2])) < 0 || (*i + 3 - (((Int*)((arri)->values))[2])) >= (arri)->length) RAISE(90, 25, "slice index out of bounds")
   *i = (((((Int*)((arri)->values))[*i + 3 - (((Int*)((arri)->values))[2])]) + (((integration_M_TestStruct*)((arrt)->values)) + 4)->num) + (((integration_M_TestStruct*)((aux_Array_3)->values)) + 1)->num) + (((Int*)((aux_Array_2)->values))[1]);
   ++LUMI_file_coverage[0].line_count[92];
   aux_Array_4 = &aux_Array_4_Var;
-  aux_Array_4_Refman = LUMI_new_ref(aux_Array_4);
+  aux_Array_4_Refman = LUMI_new_ref((void**)&aux_Array_4, false);
   if (aux_Array_4_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
   aux_Array_4_Var.length = 4;
   aux_Array_4_Var.values = (Byte*)((arri)->values) + (2);
-  if (arri == NULL) RAISE(92, 29, "empty object used as sequence")
-  if (arri_Refman->value == NULL) RAISE(92, 40, "outdated weak reference used as sequence")
+  if (arri == NULL) RAISE(92, 17, "empty object used")
+  if (arri_Refman->value == NULL) RAISE(92, 28, "outdated weak reference used")
   if ((2) < 0 || (4) < 0 || (2) + (4) > (arri)->length) RAISE(92, 25, "slice index out of bounds")
-  if (aux_Array_4 == NULL) RAISE(92, 29, "empty object used as sequence")
-  if (arri_Refman->value == NULL) RAISE(92, 40, "outdated weak reference used as sequence")
+  if (aux_Array_4 == NULL) RAISE(92, 17, "empty object used")
+  if (arri_Refman->value == NULL) RAISE(92, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (aux_Array_4)->length) RAISE(92, 25, "slice index out of bounds")
   aux_Array_5 = &aux_Array_5_Var;
-  aux_Array_5_Refman = LUMI_new_ref(aux_Array_5);
+  aux_Array_5_Refman = LUMI_new_ref((void**)&aux_Array_5, false);
   if (aux_Array_5_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
   aux_Array_5_Var.length = 5 * ((*i) - 1);
   aux_Array_5_Var.values = (Byte*)((arri)->values) + ((2 - (*i)) + (((Int*)((aux_Array_4)->values))[1]));
-  if (arri == NULL) RAISE(92, 29, "empty object used as sequence")
-  if (arri_Refman->value == NULL) RAISE(92, 40, "outdated weak reference used as sequence")
+  if (arri == NULL) RAISE(92, 17, "empty object used")
+  if (arri_Refman->value == NULL) RAISE(92, 28, "outdated weak reference used")
   if ((2 - (*i) + (((Int*)((aux_Array_4)->values))[1])) < 0 || (5 * (*i - 1)) < 0 || (2 - (*i) + (((Int*)((aux_Array_4)->values))[1])) + (5 * (*i - 1)) > (arri)->length) RAISE(92, 25, "slice index out of bounds")
   aux_Ref_Manager = *arrio_Refman;
   *arrio_Refman = arri_Refman;
@@ -2048,8 +2054,8 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Ref_Manager = NULL;
   *arrio = aux_Array_5;
   ++LUMI_file_coverage[0].line_count[93];
-  if (arrs == NULL) RAISE(93, 29, "empty object used as sequence")
-  if (arrs_Refman->value == NULL) RAISE(93, 40, "outdated weak reference used as sequence")
+  if (arrs == NULL) RAISE(93, 17, "empty object used")
+  if (arrs_Refman->value == NULL) RAISE(93, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (arrs)->length) RAISE(93, 25, "slice index out of bounds")
   aux_Ref_Manager = s_Refman;
   s_Refman = arrs_Refman;
@@ -2059,12 +2065,12 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   s = ((String*)((arrs)->values)) + 4;
   ++LUMI_file_coverage[0].line_count[94];
   aux_Array_6 = &aux_Array_6_Var;
-  aux_Array_6_Refman = LUMI_new_ref(aux_Array_6);
+  aux_Array_6_Refman = LUMI_new_ref((void**)&aux_Array_6, false);
   if (aux_Array_6_Refman == NULL) RAISE(94, 38, "insufficient memory for managed object")
   aux_Array_6_Var.length = 7;
   aux_Array_6_Var.values = (Byte*)((arrs)->values) + (2);
-  if (arrs == NULL) RAISE(94, 29, "empty object used as sequence")
-  if (arrs_Refman->value == NULL) RAISE(94, 40, "outdated weak reference used as sequence")
+  if (arrs == NULL) RAISE(94, 17, "empty object used")
+  if (arrs_Refman->value == NULL) RAISE(94, 28, "outdated weak reference used")
   if ((2) < 0 || (7) < 0 || (2) + (7) > (arrs)->length) RAISE(94, 25, "slice index out of bounds")
   aux_Ref_Manager = *arrso_Refman;
   *arrso_Refman = arrs_Refman;
@@ -2073,8 +2079,8 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Ref_Manager = NULL;
   *arrso = aux_Array_6;
   ++LUMI_file_coverage[0].line_count[95];
-  if (arrt == NULL) RAISE(95, 29, "empty object used as sequence")
-  if (arrt_Refman->value == NULL) RAISE(95, 40, "outdated weak reference used as sequence")
+  if (arrt == NULL) RAISE(95, 17, "empty object used")
+  if (arrt_Refman->value == NULL) RAISE(95, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (arrt)->length) RAISE(95, 25, "slice index out of bounds")
   aux_Ref_Manager = *t_Refman;
   *t_Refman = arrt_Refman;
@@ -2084,12 +2090,12 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   *t = ((integration_M_TestStruct*)((arrt)->values)) + 4;
   ++LUMI_file_coverage[0].line_count[96];
   aux_Array_7 = &aux_Array_7_Var;
-  aux_Array_7_Refman = LUMI_new_ref(aux_Array_7);
+  aux_Array_7_Refman = LUMI_new_ref((void**)&aux_Array_7, false);
   if (aux_Array_7_Refman == NULL) RAISE(96, 38, "insufficient memory for managed object")
   aux_Array_7_Var.length = 7;
   aux_Array_7_Var.values = (Byte*)((arrt)->values) + (2);
-  if (arrt == NULL) RAISE(96, 29, "empty object used as sequence")
-  if (arrt_Refman->value == NULL) RAISE(96, 40, "outdated weak reference used as sequence")
+  if (arrt == NULL) RAISE(96, 17, "empty object used")
+  if (arrt_Refman->value == NULL) RAISE(96, 28, "outdated weak reference used")
   if ((2) < 0 || (7) < 0 || (2) + (7) > (arrt)->length) RAISE(96, 25, "slice index out of bounds")
   aux_Ref_Manager = *arrto_Refman;
   *arrto_Refman = arrt_Refman;
@@ -2098,8 +2104,8 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Ref_Manager = NULL;
   *arrto = aux_Array_7;
   ++LUMI_file_coverage[0].line_count[97];
-  if (arrd == NULL) RAISE(97, 29, "empty object used as sequence")
-  if (arrd_Refman->value == NULL) RAISE(97, 40, "outdated weak reference used as sequence")
+  if (arrd == NULL) RAISE(97, 17, "empty object used")
+  if (arrd_Refman->value == NULL) RAISE(97, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (arrd)->length) RAISE(97, 25, "slice index out of bounds")
   aux_Ref_Manager = *d_Refman;
   *d_Refman = arrd_Refman;
@@ -2110,12 +2116,12 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   *d = ((integration_M_TestClass*)((arrd)->values)) + 4;
   ++LUMI_file_coverage[0].line_count[98];
   aux_Array_8 = &aux_Array_8_Var;
-  aux_Array_8_Refman = LUMI_new_ref(aux_Array_8);
+  aux_Array_8_Refman = LUMI_new_ref((void**)&aux_Array_8, false);
   if (aux_Array_8_Refman == NULL) RAISE(98, 38, "insufficient memory for managed object")
   aux_Array_8_Var.length = 7;
   aux_Array_8_Var.values = (Byte*)((arrd)->values) + (2);
-  if (arrd == NULL) RAISE(98, 29, "empty object used as sequence")
-  if (arrd_Refman->value == NULL) RAISE(98, 40, "outdated weak reference used as sequence")
+  if (arrd == NULL) RAISE(98, 17, "empty object used")
+  if (arrd_Refman->value == NULL) RAISE(98, 28, "outdated weak reference used")
   if ((2) < 0 || (7) < 0 || (2) + (7) > (arrd)->length) RAISE(98, 25, "slice index out of bounds")
   aux_Ref_Manager = *arrdo_Refman;
   *arrdo_Refman = arrd_Refman;
@@ -2124,18 +2130,18 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Ref_Manager = NULL;
   *arrdo = aux_Array_8;
   ++LUMI_file_coverage[0].line_count[99];
-  if (arrf == NULL) RAISE(99, 29, "empty object used as sequence")
-  if (arrf_Refman->value == NULL) RAISE(99, 40, "outdated weak reference used as sequence")
+  if (arrf == NULL) RAISE(99, 17, "empty object used")
+  if (arrf_Refman->value == NULL) RAISE(99, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (arrf)->length) RAISE(99, 25, "slice index out of bounds")
   *f = ((Returncode (**)(void))((arrf)->values))[4];
   ++LUMI_file_coverage[0].line_count[100];
   aux_Array_9 = &aux_Array_9_Var;
-  aux_Array_9_Refman = LUMI_new_ref(aux_Array_9);
+  aux_Array_9_Refman = LUMI_new_ref((void**)&aux_Array_9, false);
   if (aux_Array_9_Refman == NULL) RAISE(100, 38, "insufficient memory for managed object")
   aux_Array_9_Var.length = 7;
   aux_Array_9_Var.values = (Byte*)((arrf)->values) + (2);
-  if (arrf == NULL) RAISE(100, 29, "empty object used as sequence")
-  if (arrf_Refman->value == NULL) RAISE(100, 40, "outdated weak reference used as sequence")
+  if (arrf == NULL) RAISE(100, 17, "empty object used")
+  if (arrf_Refman->value == NULL) RAISE(100, 28, "outdated weak reference used")
   if ((2) < 0 || (7) < 0 || (2) + (7) > (arrf)->length) RAISE(100, 25, "slice index out of bounds")
   aux_Ref_Manager = *arrfo_Refman;
   *arrfo_Refman = arrf_Refman;
@@ -2144,15 +2150,15 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   aux_Ref_Manager = NULL;
   *arrfo = aux_Array_9;
   ++LUMI_file_coverage[0].line_count[101];
-  if (arrf == NULL) RAISE(101, 29, "empty object used as sequence")
-  if (arrf_Refman->value == NULL) RAISE(101, 40, "outdated weak reference used as sequence")
+  if (arrf == NULL) RAISE(101, 17, "empty object used")
+  if (arrf_Refman->value == NULL) RAISE(101, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (arrf)->length) RAISE(101, 25, "slice index out of bounds")
   if (((Returncode (**)(void))((arrf)->values))[4] == NULL) RAISE(101, 21, "empty function called")
   LUMI_err = (((Returncode (**)(void))((arrf)->values))[4])();
   CHECK(101)
   ++LUMI_file_coverage[0].line_count[102];
-  if (*arrfo == NULL) RAISE(102, 29, "empty object used as sequence")
-  if ((*arrfo_Refman)->value == NULL) RAISE(102, 40, "outdated weak reference used as sequence")
+  if (*arrfo == NULL) RAISE(102, 17, "empty object used")
+  if ((*arrfo_Refman)->value == NULL) RAISE(102, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= ((*arrfo))->length) RAISE(102, 25, "slice index out of bounds")
   if (((Returncode (**)(void))(((*arrfo))->values))[4] == NULL) RAISE(102, 21, "empty function called")
   LUMI_err = (((Returncode (**)(void))(((*arrfo))->values))[4])();
@@ -2314,116 +2320,116 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   ++LUMI_file_coverage[0].line_count[118];
   ++LUMI_file_coverage[0].line_count[119];
   tv = &tv_Var;
-  tv_Refman = LUMI_new_ref(tv);
+  tv_Refman = LUMI_new_ref((void**)&tv, false);
   if (tv_Refman == NULL) RAISE(119, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(tv, tv_Refman, 0, NULL, NULL);
   CHECK(119)
   ++LUMI_file_coverage[0].line_count[120];
   dv = &dv_Var;
-  dv_Refman = LUMI_new_ref(dv);
+  dv_Refman = LUMI_new_ref((void**)&dv, false);
   if (dv_Refman == NULL) RAISE(120, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(dv, dv_Refman, dv_Dynamic);
   CHECK(120)
   ++LUMI_file_coverage[0].line_count[121];
   sv = &sv_Var;
   sv_Var.values = sv_Values;
-  sv_Refman = LUMI_new_ref(sv);
+  sv_Refman = LUMI_new_ref((void**)&sv, false);
   if (sv_Refman == NULL) RAISE(121, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[122];
   ++LUMI_file_coverage[0].line_count[123];
   ia = &ia_Var;
   ia_Var.values = ia_Values;
-  ia_Refman = LUMI_new_ref(ia);
+  ia_Refman = LUMI_new_ref((void**)&ia, false);
   if (ia_Refman == NULL) RAISE(123, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[124];
   ta = &ta_Var;
   ta_Var.values = ta_Values;
-  ta_Refman = LUMI_new_ref(ta);
+  ta_Refman = LUMI_new_ref((void**)&ta, false);
   if (ta_Refman == NULL) RAISE(124, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[125];
   da = &da_Var;
   da_Var.values = da_Values;
-  da_Refman = LUMI_new_ref(da);
+  da_Refman = LUMI_new_ref((void**)&da, false);
   if (da_Refman == NULL) RAISE(125, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[126];
   sa = &sa_Var;
   sa_Var.values = sa_Values;
   LUMI_set_var_string_array(12, 7, sa, sa_Chars);
-  sa_Refman = LUMI_new_ref(sa);
+  sa_Refman = LUMI_new_ref((void**)&sa, false);
   if (sa_Refman == NULL) RAISE(126, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[127];
   fa = &fa_Var;
   fa_Var.values = fa_Values;
-  fa_Refman = LUMI_new_ref(fa);
+  fa_Refman = LUMI_new_ref((void**)&fa, false);
   if (fa_Refman == NULL) RAISE(127, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[128];
   tn = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (tn == NULL) RAISE(128, 49, "insufficient memory for object dynamic allocation")
-  tn_Refman = LUMI_new_ref(tn);
+  tn_Refman = LUMI_new_ref((void**)&tn, true);
   if (tn_Refman == NULL) RAISE(128, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(tn, tn_Refman, 0, NULL, NULL);
   CHECK(128)
   ++LUMI_file_coverage[0].line_count[129];
   dn = LUMI_alloc(sizeof(integration_M_TestClass));
   if (dn == NULL) RAISE(129, 49, "insufficient memory for object dynamic allocation")
-  dn_Refman = LUMI_new_ref(dn);
+  dn_Refman = LUMI_new_ref((void**)&dn, true);
   if (dn_Refman == NULL) RAISE(129, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(dn, dn_Refman, dn_Dynamic);
   CHECK(129)
   ++LUMI_file_coverage[0].line_count[130];
-  if (arr == NULL) RAISE(130, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(130, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(130, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(130, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(130, 25, "slice index out of bounds")
   sn = LUMI_new_string(((Int*)((arr)->values))[0]);
   if (sn == NULL) RAISE(130, 49, "insufficient memory for object dynamic allocation")
-  sn_Refman = LUMI_new_ref(sn);
+  sn_Refman = LUMI_new_ref((void**)&sn, true);
   if (sn_Refman == NULL) RAISE(130, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[131];
-  if (arr == NULL) RAISE(131, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(131, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(131, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(131, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(131, 25, "slice index out of bounds")
   ian = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(Int));
   if (ian == NULL) RAISE(131, 49, "insufficient memory for object dynamic allocation")
-  ian_Refman = LUMI_new_ref(ian);
+  ian_Refman = LUMI_new_ref((void**)&ian, true);
   if (ian_Refman == NULL) RAISE(131, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[132];
-  if (arr == NULL) RAISE(132, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(132, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(132, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(132, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(132, 25, "slice index out of bounds")
   tan = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(integration_M_TestStruct));
   if (tan == NULL) RAISE(132, 49, "insufficient memory for object dynamic allocation")
-  tan_Refman = LUMI_new_ref(tan);
+  tan_Refman = LUMI_new_ref((void**)&tan, true);
   if (tan_Refman == NULL) RAISE(132, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[133];
-  if (arr == NULL) RAISE(133, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(133, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(133, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(133, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(133, 25, "slice index out of bounds")
   dan = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(integration_M_TestClass));
   if (dan == NULL) RAISE(133, 49, "insufficient memory for object dynamic allocation")
-  dan_Refman = LUMI_new_ref(dan);
+  dan_Refman = LUMI_new_ref((void**)&dan, true);
   if (dan_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[134];
-  if (arr == NULL) RAISE(134, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(134, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(134, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(134, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(134, 25, "slice index out of bounds")
-  if (arr == NULL) RAISE(134, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(134, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(134, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(134, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (arr)->length) RAISE(134, 25, "slice index out of bounds")
   san = LUMI_new_string_array(((Int*)((arr)->values))[0], ((Int*)((arr)->values))[1]);
   if (san == NULL) RAISE(134, 49, "insufficient memory for object dynamic allocation")
-  san_Refman = LUMI_new_ref(san);
+  san_Refman = LUMI_new_ref((void**)&san, true);
   if (san_Refman == NULL) RAISE(134, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[135];
-  if (arr == NULL) RAISE(135, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(135, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(135, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(135, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(135, 25, "slice index out of bounds")
   sfn = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(Func));
   if (sfn == NULL) RAISE(135, 49, "insufficient memory for object dynamic allocation")
-  sfn_Refman = LUMI_new_ref(sfn);
+  sfn_Refman = LUMI_new_ref((void**)&sfn, true);
   if (sfn_Refman == NULL) RAISE(135, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[136];
-  if (arr == NULL) RAISE(136, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(136, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(136, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(136, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(136, 25, "slice index out of bounds")
   ix = ((Int*)((arr)->values))[0];
   ++LUMI_file_coverage[0].line_count[137];
@@ -2432,21 +2438,21 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   LUMI_inc_ref(si_Refman);
   ++LUMI_file_coverage[0].line_count[138];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(138, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "some string";
   isv = &isv_Var;
   isv_Var.values = isv_Values;
-  isv_Refman = LUMI_new_ref(isv);
+  isv_Refman = LUMI_new_ref((void**)&isv, false);
   if (isv_Refman == NULL) RAISE(138, 38, "insufficient memory for managed object")
   LUMI_err = String_new(isv, isv_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(138)
   ++LUMI_file_coverage[0].line_count[139];
   isn = LUMI_new_string(i);
   if (isn == NULL) RAISE(139, 49, "insufficient memory for object dynamic allocation")
-  isn_Refman = LUMI_new_ref(isn);
+  isn_Refman = LUMI_new_ref((void**)&isn, true);
   if (isn_Refman == NULL) RAISE(139, 38, "insufficient memory for managed object")
   LUMI_err = String_new(isn, isn_Refman, text, text_Refman);
   CHECK(139)
@@ -2454,34 +2460,34 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   fi = integration_M_f_test_int2str_Mock;
   ++LUMI_file_coverage[0].line_count[141];
   itv = &itv_Var;
-  itv_Refman = LUMI_new_ref(itv);
+  itv_Refman = LUMI_new_ref((void**)&itv, false);
   if (itv_Refman == NULL) RAISE(141, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(itv, itv_Refman, i, text, text_Refman);
   CHECK(141)
   ++LUMI_file_coverage[0].line_count[142];
   itn = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (itn == NULL) RAISE(142, 49, "insufficient memory for object dynamic allocation")
-  itn_Refman = LUMI_new_ref(itn);
+  itn_Refman = LUMI_new_ref((void**)&itn, true);
   if (itn_Refman == NULL) RAISE(142, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(itn, itn_Refman, i, text, text_Refman);
   CHECK(142)
   ++LUMI_file_coverage[0].line_count[143];
   idv = &idv_Var;
-  idv_Refman = LUMI_new_ref(idv);
+  idv_Refman = LUMI_new_ref((void**)&idv, false);
   if (idv_Refman == NULL) RAISE(143, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(idv, idv_Refman, idv_Dynamic);
   CHECK(143)
   ++LUMI_file_coverage[0].line_count[144];
   idn = LUMI_alloc(sizeof(integration_M_TestClass));
   if (idn == NULL) RAISE(144, 49, "insufficient memory for object dynamic allocation")
-  idn_Refman = LUMI_new_ref(idn);
+  idn_Refman = LUMI_new_ref((void**)&idn, true);
   if (idn_Refman == NULL) RAISE(144, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(idn, idn_Refman, idn_Dynamic);
   CHECK(144)
   ++LUMI_file_coverage[0].line_count[145];
   aux_TestStruct_0 = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (aux_TestStruct_0 == NULL) RAISE(145, 49, "insufficient memory for object dynamic allocation")
-  aux_TestStruct_0_Refman = LUMI_new_ref(aux_TestStruct_0);
+  aux_TestStruct_0_Refman = LUMI_new_ref((void**)&aux_TestStruct_0, true);
   if (aux_TestStruct_0_Refman == NULL) RAISE(145, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, i, text, text_Refman);
   CHECK(145)
@@ -2490,67 +2496,67 @@ Returncode integration_M_test_variable(Int i, String* text, Ref_Manager* text_Re
   ++LUMI_file_coverage[0].line_count[146];
   aux_TestClass_0 = LUMI_alloc(sizeof(integration_M_TestClass));
   if (aux_TestClass_0 == NULL) RAISE(146, 49, "insufficient memory for object dynamic allocation")
-  aux_TestClass_0_Refman = LUMI_new_ref(aux_TestClass_0);
+  aux_TestClass_0_Refman = LUMI_new_ref((void**)&aux_TestClass_0, true);
   if (aux_TestClass_0_Refman == NULL) RAISE(146, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(aux_TestClass_0, aux_TestClass_0_Refman, aux_TestClass_0_Dynamic);
   CHECK(146)
   LUMI_err = integration_M_TestClass_print(aux_TestClass_0, aux_TestClass_0_Refman, aux_TestClass_0_Dynamic);
   CHECK(146)
   ++LUMI_file_coverage[0].line_count[147];
-  if (arr == NULL) RAISE(147, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(147, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(147, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(147, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(147, 25, "slice index out of bounds")
   aux_String_1 = LUMI_new_string(((Int*)((arr)->values))[0]);
   if (aux_String_1 == NULL) RAISE(147, 49, "insufficient memory for object dynamic allocation")
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, true);
   if (aux_String_1_Refman == NULL) RAISE(147, 38, "insufficient memory for managed object")
   TEST_ASSERT(147, aux_String_1 != NULL && aux_String_1_Refman->value != NULL)
   ++LUMI_file_coverage[0].line_count[148];
-  if (arr == NULL) RAISE(148, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(148, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(148, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(148, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(148, 25, "slice index out of bounds")
   aux_Array_0 = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(Int));
   if (aux_Array_0 == NULL) RAISE(148, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_0_Refman = LUMI_new_ref(aux_Array_0);
+  aux_Array_0_Refman = LUMI_new_ref((void**)&aux_Array_0, true);
   if (aux_Array_0_Refman == NULL) RAISE(148, 38, "insufficient memory for managed object")
   TEST_ASSERT(148, aux_Array_0 != NULL && aux_Array_0_Refman->value != NULL)
   ++LUMI_file_coverage[0].line_count[149];
-  if (arr == NULL) RAISE(149, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(149, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(149, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(149, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(149, 25, "slice index out of bounds")
   aux_Array_1 = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(integration_M_TestStruct));
   if (aux_Array_1 == NULL) RAISE(149, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_1_Refman = LUMI_new_ref(aux_Array_1);
+  aux_Array_1_Refman = LUMI_new_ref((void**)&aux_Array_1, true);
   if (aux_Array_1_Refman == NULL) RAISE(149, 38, "insufficient memory for managed object")
   TEST_ASSERT(149, aux_Array_1 != NULL && aux_Array_1_Refman->value != NULL)
   ++LUMI_file_coverage[0].line_count[150];
-  if (arr == NULL) RAISE(150, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(150, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(150, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(150, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(150, 25, "slice index out of bounds")
   aux_Array_2 = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(integration_M_TestClass));
   if (aux_Array_2 == NULL) RAISE(150, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_2_Refman = LUMI_new_ref(aux_Array_2);
+  aux_Array_2_Refman = LUMI_new_ref((void**)&aux_Array_2, true);
   if (aux_Array_2_Refman == NULL) RAISE(150, 38, "insufficient memory for managed object")
   TEST_ASSERT(150, aux_Array_2 != NULL && aux_Array_2_Refman->value != NULL)
   ++LUMI_file_coverage[0].line_count[151];
-  if (arr == NULL) RAISE(151, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(151, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(151, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(151, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(151, 25, "slice index out of bounds")
-  if (arr == NULL) RAISE(151, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(151, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(151, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(151, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (arr)->length) RAISE(151, 25, "slice index out of bounds")
   aux_Array_3 = LUMI_new_string_array(((Int*)((arr)->values))[0], ((Int*)((arr)->values))[1]);
   if (aux_Array_3 == NULL) RAISE(151, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_3_Refman = LUMI_new_ref(aux_Array_3);
+  aux_Array_3_Refman = LUMI_new_ref((void**)&aux_Array_3, true);
   if (aux_Array_3_Refman == NULL) RAISE(151, 38, "insufficient memory for managed object")
   TEST_ASSERT(151, aux_Array_3 != NULL && aux_Array_3_Refman->value != NULL)
   ++LUMI_file_coverage[0].line_count[152];
-  if (arr == NULL) RAISE(152, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(152, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(152, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(152, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(152, 25, "slice index out of bounds")
   aux_Array_4 = LUMI_new_array(((Int*)((arr)->values))[0], sizeof(Func));
   if (aux_Array_4 == NULL) RAISE(152, 49, "insufficient memory for object dynamic allocation")
-  aux_Array_4_Refman = LUMI_new_ref(aux_Array_4);
+  aux_Array_4_Refman = LUMI_new_ref((void**)&aux_Array_4, true);
   if (aux_Array_4_Refman == NULL) RAISE(152, 38, "insufficient memory for managed object")
   TEST_ASSERT(152, aux_Array_4 != NULL && aux_Array_4_Refman->value != NULL)
   ++LUMI_file_coverage[0].line_count[153];
@@ -2800,7 +2806,7 @@ Returncode integration_M_test_call_expression(void) {
   CHECK(265)
   ++LUMI_file_coverage[0].line_count[266];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(266, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 5;
   aux_String_0_Var.length = 4;
@@ -2874,8 +2880,8 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
   Ref_Manager* aux_Array_0_Refman = NULL;
   LUMI_inc_ref(arr_Refman);
   ++LUMI_file_coverage[0].line_count[283];
-  if (arr == NULL) RAISE(283, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(283, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(283, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(283, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (arr)->length) RAISE(283, 25, "slice index out of bounds")
   if ((((Int*)((arr)->values))[4]) > 6) {
     ++LUMI_file_coverage[0].line_count[284];
@@ -2889,11 +2895,11 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
     }
     else {
       ++LUMI_file_coverage[0].line_count[287];
-      if (arr == NULL) RAISE(287, 29, "empty object used as sequence")
-      if (arr_Refman->value == NULL) RAISE(287, 40, "outdated weak reference used as sequence")
+      if (arr == NULL) RAISE(287, 17, "empty object used")
+      if (arr_Refman->value == NULL) RAISE(287, 28, "outdated weak reference used")
       if ((5) < 0 || (5) >= (arr)->length) RAISE(287, 25, "slice index out of bounds")
-      if (arr == NULL) RAISE(287, 29, "empty object used as sequence")
-      if (arr_Refman->value == NULL) RAISE(287, 40, "outdated weak reference used as sequence")
+      if (arr == NULL) RAISE(287, 17, "empty object used")
+      if (arr_Refman->value == NULL) RAISE(287, 28, "outdated weak reference used")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(287, 25, "slice index out of bounds")
       if ((((Int*)((arr)->values))[4]) != (((Int*)((arr)->values))[5])) {
         ++LUMI_file_coverage[0].line_count[288];
@@ -2901,8 +2907,8 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
       }
       else {
         ++LUMI_file_coverage[0].line_count[289];
-        if (arr == NULL) RAISE(289, 29, "empty object used as sequence")
-        if (arr_Refman->value == NULL) RAISE(289, 40, "outdated weak reference used as sequence")
+        if (arr == NULL) RAISE(289, 17, "empty object used")
+        if (arr_Refman->value == NULL) RAISE(289, 28, "outdated weak reference used")
         if ((0) < 0 || (0) >= (arr)->length) RAISE(289, 25, "slice index out of bounds")
         if (0 == (((Int*)((arr)->values))[0])) {
           ++LUMI_file_coverage[0].line_count[290];
@@ -2918,13 +2924,13 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
   ++LUMI_file_coverage[0].line_count[293];
   while (true) {
     ++LUMI_file_coverage[0].line_count[294];
-    if (arr == NULL) RAISE(294, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(294, 40, "outdated weak reference used as sequence")
+    if (arr == NULL) RAISE(294, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(294, 28, "outdated weak reference used")
     if ((6) < 0 || (6) >= (arr)->length) RAISE(294, 25, "slice index out of bounds")
     ((Int*)((arr)->values))[6] = 6;
     ++LUMI_file_coverage[0].line_count[295];
-    if (arr == NULL) RAISE(295, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(295, 40, "outdated weak reference used as sequence")
+    if (arr == NULL) RAISE(295, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(295, 28, "outdated weak reference used")
     if ((2) < 0 || (2) >= (arr)->length) RAISE(295, 25, "slice index out of bounds")
     x = ((Int*)((arr)->values))[2];
     ++LUMI_file_coverage[0].line_count[296];
@@ -2934,16 +2940,16 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
     ++LUMI_file_coverage[0].line_count[298];
     while (true) {
       ++LUMI_file_coverage[0].line_count[299];
-      if (arr == NULL) RAISE(299, 29, "empty object used as sequence")
-      if (arr_Refman->value == NULL) RAISE(299, 40, "outdated weak reference used as sequence")
+      if (arr == NULL) RAISE(299, 17, "empty object used")
+      if (arr_Refman->value == NULL) RAISE(299, 28, "outdated weak reference used")
       if ((8) < 0 || (8) >= (arr)->length) RAISE(299, 25, "slice index out of bounds")
-      if (arr == NULL) RAISE(299, 29, "empty object used as sequence")
-      if (arr_Refman->value == NULL) RAISE(299, 40, "outdated weak reference used as sequence")
+      if (arr == NULL) RAISE(299, 17, "empty object used")
+      if (arr_Refman->value == NULL) RAISE(299, 28, "outdated weak reference used")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(299, 25, "slice index out of bounds")
       ((Int*)((arr)->values))[4] = ((Int*)((arr)->values))[8];
       ++LUMI_file_coverage[0].line_count[300];
-      if (arr == NULL) RAISE(300, 29, "empty object used as sequence")
-      if (arr_Refman->value == NULL) RAISE(300, 40, "outdated weak reference used as sequence")
+      if (arr == NULL) RAISE(300, 17, "empty object used")
+      if (arr_Refman->value == NULL) RAISE(300, 28, "outdated weak reference used")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(300, 25, "slice index out of bounds")
       if (y > (((Int*)((arr)->values))[4])) {
         ++LUMI_file_coverage[0].line_count[301];
@@ -2952,8 +2958,8 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
       ++LUMI_file_coverage[0].line_count[302];
       z = 7;
       ++LUMI_file_coverage[0].line_count[303];
-      if (arr == NULL) RAISE(303, 29, "empty object used as sequence")
-      if (arr_Refman->value == NULL) RAISE(303, 40, "outdated weak reference used as sequence")
+      if (arr == NULL) RAISE(303, 17, "empty object used")
+      if (arr_Refman->value == NULL) RAISE(303, 28, "outdated weak reference used")
       if ((4) < 0 || (4) >= (arr)->length) RAISE(303, 25, "slice index out of bounds")
       if (z <= (((Int*)((arr)->values))[4])) {
         ++LUMI_file_coverage[0].line_count[304];
@@ -2962,36 +2968,39 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
     }
   }
   ++LUMI_file_coverage[0].line_count[305];
-  if (arr == NULL) RAISE(305, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(305, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(305, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(305, 28, "outdated weak reference used")
+  if ((2) < 0 || (2) >= (arr)->length) RAISE(305, 25, "slice index out of bounds")
+  if (arr == NULL) RAISE(305, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(305, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (arr)->length) RAISE(305, 25, "slice index out of bounds")
   for (n = ((Int*)((arr)->values))[2]; n < 2 - (3 * (((Int*)((arr)->values))[2])); ++n) {
     ++LUMI_file_coverage[0].line_count[306];
-    if (arr == NULL) RAISE(306, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(306, 40, "outdated weak reference used as sequence")
+    if (arr == NULL) RAISE(306, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(306, 28, "outdated weak reference used")
     if ((2) < 0 || (2) >= (arr)->length) RAISE(306, 25, "slice index out of bounds")
-    if (arr == NULL) RAISE(306, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(306, 40, "outdated weak reference used as sequence")
+    if (arr == NULL) RAISE(306, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(306, 28, "outdated weak reference used")
     if ((0) < 0 || (0) >= (arr)->length) RAISE(306, 25, "slice index out of bounds")
     ((Int*)((arr)->values))[0] = ((Int*)((arr)->values))[2];
     ++LUMI_file_coverage[0].line_count[307];
-    if (arr == NULL) RAISE(307, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(307, 40, "outdated weak reference used as sequence")
+    if (arr == NULL) RAISE(307, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(307, 28, "outdated weak reference used")
     if ((0) < 0 || (0) >= (arr)->length) RAISE(307, 25, "slice index out of bounds")
     w = ((Int*)((arr)->values))[0];
     ++LUMI_file_coverage[0].line_count[308];
     aux_Array_0 = &aux_Array_0_Var;
-    aux_Array_0_Refman = LUMI_new_ref(aux_Array_0);
+    aux_Array_0_Refman = LUMI_new_ref((void**)&aux_Array_0, false);
     if (aux_Array_0_Refman == NULL) RAISE(308, 38, "insufficient memory for managed object")
     aux_Array_0_Var.length = 2;
     aux_Array_0_Var.values = (Byte*)((arr)->values) + (3);
-    if (arr == NULL) RAISE(308, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(308, 40, "outdated weak reference used as sequence")
+    if (arr == NULL) RAISE(308, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(308, 28, "outdated weak reference used")
     if ((3) < 0 || (2) < 0 || (3) + (2) > (arr)->length) RAISE(308, 25, "slice index out of bounds")
     if ((w > 4) && ((void*)arr != aux_Array_0)) {
       ++LUMI_file_coverage[0].line_count[309];
-      if (arr == NULL) RAISE(309, 29, "empty object used as sequence")
-      if (arr_Refman->value == NULL) RAISE(309, 40, "outdated weak reference used as sequence")
+      if (arr == NULL) RAISE(309, 17, "empty object used")
+      if (arr_Refman->value == NULL) RAISE(309, 28, "outdated weak reference used")
       if ((1) < 0 || (1) >= (arr)->length) RAISE(309, 25, "slice index out of bounds")
       ((Int*)((arr)->values))[1] = w;
     }
@@ -3025,12 +3034,12 @@ Returncode integration_M_test_builtins(Int i, Char c, Bool b, String* s, Ref_Man
   ++LUMI_file_coverage[0].line_count[318];
   bv = true || false;
   ++LUMI_file_coverage[0].line_count[319];
-  if (a == NULL) RAISE(319, 27, "used member of empty object")
-  if (a_Refman->value == NULL) RAISE(319, 38, "used member of outdated weak reference")
+  if (a == NULL) RAISE(319, 17, "empty object used")
+  if (a_Refman->value == NULL) RAISE(319, 28, "outdated weak reference used")
   i = a->length;
   ++LUMI_file_coverage[0].line_count[320];
-  if (s == NULL) RAISE(320, 27, "used member of empty object")
-  if (s_Refman->value == NULL) RAISE(320, 38, "used member of outdated weak reference")
+  if (s == NULL) RAISE(320, 17, "empty object used")
+  if (s_Refman->value == NULL) RAISE(320, 28, "outdated weak reference used")
   i = s->length;
   ++LUMI_file_coverage[0].line_count[321];
   LUMI_err = String_clear(s, s_Refman);
@@ -3081,10 +3090,10 @@ Returncode integration_M_test_builtins(Int i, Char c, Bool b, String* s, Ref_Man
   f_Refman = NULL;
   CHECK(336)
   ++LUMI_file_coverage[0].line_count[337];
-  if (sys == NULL) RAISE(337, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(337, 38, "used member of outdated weak reference")
-  if (sys->argv == NULL) RAISE(337, 29, "empty object used as sequence")
-  if (sys->argv_Refman->value == NULL) RAISE(337, 40, "outdated weak reference used as sequence")
+  if (sys == NULL) RAISE(337, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(337, 28, "outdated weak reference used")
+  if (sys->argv == NULL) RAISE(337, 17, "empty object used")
+  if (sys->argv_Refman->value == NULL) RAISE(337, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (sys->argv)->length) RAISE(337, 25, "slice index out of bounds")
   aux_Ref_Manager = s_Refman;
   s_Refman = sys->argv_Refman;
@@ -3114,18 +3123,18 @@ Returncode integration_M_test_builtins(Int i, Char c, Bool b, String* s, Ref_Man
   LUMI_err = Sys_exit(sys, sys_Refman, i);
   CHECK(344)
   ++LUMI_file_coverage[0].line_count[345];
-  if (sys == NULL) RAISE(345, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(345, 38, "used member of outdated weak reference")
+  if (sys == NULL) RAISE(345, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(345, 28, "outdated weak reference used")
   LUMI_err = File_putc(sys->stdout_Cname, sys->stdout_Cname_Refman, c);
   CHECK(345)
   ++LUMI_file_coverage[0].line_count[346];
-  if (sys == NULL) RAISE(346, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(346, 38, "used member of outdated weak reference")
+  if (sys == NULL) RAISE(346, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(346, 28, "outdated weak reference used")
   LUMI_err = File_getc(sys->stdin_Cname, sys->stdin_Cname_Refman, &(cv), &(bv));
   CHECK(346)
   ++LUMI_file_coverage[0].line_count[347];
-  if (sys == NULL) RAISE(347, 27, "used member of empty object")
-  if (sys_Refman->value == NULL) RAISE(347, 38, "used member of outdated weak reference")
+  if (sys == NULL) RAISE(347, 17, "empty object used")
+  if (sys_Refman->value == NULL) RAISE(347, 28, "outdated weak reference used")
   LUMI_err = File_putc(sys->stderr_Cname, sys->stderr_Cname_Refman, c);
   CHECK(347)
 LUMI_cleanup:
@@ -3173,14 +3182,14 @@ Returncode integration_M_test_ref_count(void) {
   Ref_Manager* aux_TestStruct_3_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[351];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(351, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 12;
   aux_String_0_Var.length = 11;
   aux_String_0_Var.values = "test string";
   s = LUMI_new_string(32);
   if (s == NULL) RAISE(351, 49, "insufficient memory for object dynamic allocation")
-  s_Refman = LUMI_new_ref(s);
+  s_Refman = LUMI_new_ref((void**)&s, true);
   if (s_Refman == NULL) RAISE(351, 38, "insufficient memory for managed object")
   LUMI_err = String_new(s, s_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(351)
@@ -3203,7 +3212,7 @@ Returncode integration_M_test_ref_count(void) {
   if (! (s != NULL && s_Refman->value != NULL)) {
     ++LUMI_file_coverage[0].line_count[357];
     aux_String_1 = &aux_String_1_Var;
-    aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+    aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
     if (aux_String_1_Refman == NULL) RAISE(357, 38, "insufficient memory for managed object")
     aux_String_1_Var.max_length = 17;
     aux_String_1_Var.length = 16;
@@ -3215,7 +3224,7 @@ Returncode integration_M_test_ref_count(void) {
   if (! (s_user != NULL && s_user_Refman->value != NULL)) {
     ++LUMI_file_coverage[0].line_count[359];
     aux_String_2 = &aux_String_2_Var;
-    aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+    aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
     if (aux_String_2_Refman == NULL) RAISE(359, 38, "insufficient memory for managed object")
     aux_String_2_Var.max_length = 15;
     aux_String_2_Var.length = 14;
@@ -3225,14 +3234,14 @@ Returncode integration_M_test_ref_count(void) {
   }
   ++LUMI_file_coverage[0].line_count[360];
   aux_String_3 = &aux_String_3_Var;
-  aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+  aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
   if (aux_String_3_Refman == NULL) RAISE(360, 38, "insufficient memory for managed object")
   aux_String_3_Var.max_length = 13;
   aux_String_3_Var.length = 12;
   aux_String_3_Var.values = "first struct";
   ts = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (ts == NULL) RAISE(360, 49, "insufficient memory for object dynamic allocation")
-  ts_Refman = LUMI_new_ref(ts);
+  ts_Refman = LUMI_new_ref((void**)&ts, true);
   if (ts_Refman == NULL) RAISE(360, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(ts, ts_Refman, 0, aux_String_3, aux_String_3_Refman);
   CHECK(360)
@@ -3248,25 +3257,25 @@ Returncode integration_M_test_ref_count(void) {
   aux_TestStruct_0 = NULL;
   aux_TestStruct_0_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[362];
-  if (ts == NULL) RAISE(362, 27, "used member of empty object")
-  if (ts_Refman->value == NULL) RAISE(362, 38, "used member of outdated weak reference")
+  if (ts == NULL) RAISE(362, 17, "empty object used")
+  if (ts_Refman->value == NULL) RAISE(362, 28, "outdated weak reference used")
   LUMI_err = Sys_println_Mock(sys, sys_Refman, ts->text, ts->text_Refman);
   CHECK(362)
   ++LUMI_file_coverage[0].line_count[363];
   aux_String_4 = &aux_String_4_Var;
-  aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+  aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
   if (aux_String_4_Refman == NULL) RAISE(363, 38, "insufficient memory for managed object")
   aux_String_4_Var.max_length = 14;
   aux_String_4_Var.length = 13;
   aux_String_4_Var.values = "second struct";
   aux_TestStruct_1 = LUMI_alloc(sizeof(integration_M_TestStruct));
   if (aux_TestStruct_1 == NULL) RAISE(363, 49, "insufficient memory for object dynamic allocation")
-  aux_TestStruct_1_Refman = LUMI_new_ref(aux_TestStruct_1);
+  aux_TestStruct_1_Refman = LUMI_new_ref((void**)&aux_TestStruct_1, true);
   if (aux_TestStruct_1_Refman == NULL) RAISE(363, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(aux_TestStruct_1, aux_TestStruct_1_Refman, 1, aux_String_4, aux_String_4_Refman);
   CHECK(363)
-  if (ts == NULL) RAISE(363, 27, "used member of empty object")
-  if (ts_Refman->value == NULL) RAISE(363, 38, "used member of outdated weak reference")
+  if (ts == NULL) RAISE(363, 17, "empty object used")
+  if (ts_Refman->value == NULL) RAISE(363, 28, "outdated weak reference used")
   aux_TestStruct_2 = aux_TestStruct_1;
   aux_TestStruct_2_Refman = aux_TestStruct_1_Refman;
   aux_TestStruct_1 = NULL;
@@ -3278,8 +3287,8 @@ Returncode integration_M_test_ref_count(void) {
   aux_TestStruct_2 = NULL;
   aux_TestStruct_2_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[364];
-  if (ts == NULL) RAISE(364, 27, "used member of empty object")
-  if (ts_Refman->value == NULL) RAISE(364, 38, "used member of outdated weak reference")
+  if (ts == NULL) RAISE(364, 17, "empty object used")
+  if (ts_Refman->value == NULL) RAISE(364, 28, "outdated weak reference used")
   aux_TestStruct_3 = ts->ts;
   aux_TestStruct_3_Refman = ts->ts_Refman;
   ts->ts = NULL;
@@ -3291,8 +3300,8 @@ Returncode integration_M_test_ref_count(void) {
   aux_TestStruct_3 = NULL;
   aux_TestStruct_3_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[365];
-  if (ts == NULL) RAISE(365, 27, "used member of empty object")
-  if (ts_Refman->value == NULL) RAISE(365, 38, "used member of outdated weak reference")
+  if (ts == NULL) RAISE(365, 17, "empty object used")
+  if (ts_Refman->value == NULL) RAISE(365, 28, "outdated weak reference used")
   LUMI_err = Sys_println_Mock(sys, sys_Refman, ts->text, ts->text_Refman);
   CHECK(365)
 LUMI_cleanup:
@@ -3365,17 +3374,17 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   LUMI_inc_ref(s_Refman);
   ++LUMI_file_coverage[0].line_count[395];
   d = &d_Var;
-  d_Refman = LUMI_new_ref(d);
+  d_Refman = LUMI_new_ref((void**)&d, false);
   if (d_Refman == NULL) RAISE(395, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[396];
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   LUMI_set_var_string_array(6, 16, sarr, sarr_Chars);
-  sarr_Refman = LUMI_new_ref(sarr);
+  sarr_Refman = LUMI_new_ref((void**)&sarr, false);
   if (sarr_Refman == NULL) RAISE(396, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[397];
-  if (d == NULL) RAISE(397, 27, "used member of empty object")
-  if (d_Refman->value == NULL) RAISE(397, 38, "used member of outdated weak reference")
+  if (d == NULL) RAISE(397, 17, "empty object used")
+  if (d_Refman->value == NULL) RAISE(397, 28, "outdated weak reference used")
   aux_Ref_Manager = d->item_Refman;
   d->item_Refman = s_Refman;
   d->item_Dynamic = &String_dynamic;
@@ -3384,8 +3393,8 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   d->item = s;
   ++LUMI_file_coverage[0].line_count[398];
-  if (d == NULL) RAISE(398, 27, "used member of empty object")
-  if (d_Refman->value == NULL) RAISE(398, 38, "used member of outdated weak reference")
+  if (d == NULL) RAISE(398, 17, "empty object used")
+  if (d_Refman->value == NULL) RAISE(398, 28, "outdated weak reference used")
   aux_Ref_Manager = s_Refman;
   s_Refman = d->item_Refman;
   LUMI_inc_ref(s_Refman);
@@ -3393,8 +3402,8 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   s = d->item;
   ++LUMI_file_coverage[0].line_count[399];
-  if (d == NULL) RAISE(399, 27, "used member of empty object")
-  if (d_Refman->value == NULL) RAISE(399, 38, "used member of outdated weak reference")
+  if (d == NULL) RAISE(399, 17, "empty object used")
+  if (d_Refman->value == NULL) RAISE(399, 28, "outdated weak reference used")
   aux_Ref_Manager = d->arr_Refman;
   d->arr_Refman = sarr_Refman;
   LUMI_inc_ref(d->arr_Refman);
@@ -3402,10 +3411,10 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   d->arr = sarr;
   ++LUMI_file_coverage[0].line_count[400];
-  if (d == NULL) RAISE(400, 27, "used member of empty object")
-  if (d_Refman->value == NULL) RAISE(400, 38, "used member of outdated weak reference")
-  if (d->arr == NULL) RAISE(400, 29, "empty object used as sequence")
-  if (d->arr_Refman->value == NULL) RAISE(400, 40, "outdated weak reference used as sequence")
+  if (d == NULL) RAISE(400, 17, "empty object used")
+  if (d_Refman->value == NULL) RAISE(400, 28, "outdated weak reference used")
+  if (d->arr == NULL) RAISE(400, 17, "empty object used")
+  if (d->arr_Refman->value == NULL) RAISE(400, 28, "outdated weak reference used")
   if ((4) < 0 || (4) >= (d->arr)->length) RAISE(400, 25, "slice index out of bounds")
   aux_Ref_Manager = s_Refman;
   s_Refman = d->arr_Refman;
@@ -3416,14 +3425,14 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   ++LUMI_file_coverage[0].line_count[401];
   ad = &ad_Var;
   ad_Var.values = ad_Values;
-  ad_Refman = LUMI_new_ref(ad);
+  ad_Refman = LUMI_new_ref((void**)&ad, false);
   if (ad_Refman == NULL) RAISE(401, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[402];
-  if (ad == NULL) RAISE(402, 29, "empty object used as sequence")
-  if (ad_Refman->value == NULL) RAISE(402, 40, "outdated weak reference used as sequence")
+  if (ad == NULL) RAISE(402, 17, "empty object used")
+  if (ad_Refman->value == NULL) RAISE(402, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (ad)->length) RAISE(402, 25, "slice index out of bounds")
-  if (((integration_M_Data*)((ad)->values)) + 2 == NULL) RAISE(402, 27, "used member of empty object")
-  if (ad_Refman->value == NULL) RAISE(402, 38, "used member of outdated weak reference")
+  if (((integration_M_Data*)((ad)->values)) + 2 == NULL) RAISE(402, 17, "empty object used")
+  if (ad_Refman->value == NULL) RAISE(402, 28, "outdated weak reference used")
   aux_Ref_Manager = s_Refman;
   s_Refman = (((integration_M_Data*)((ad)->values)) + 2)->item_Refman;
   LUMI_inc_ref(s_Refman);
@@ -3431,13 +3440,13 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   s = (((integration_M_Data*)((ad)->values)) + 2)->item;
   ++LUMI_file_coverage[0].line_count[403];
-  if (ad == NULL) RAISE(403, 29, "empty object used as sequence")
-  if (ad_Refman->value == NULL) RAISE(403, 40, "outdated weak reference used as sequence")
+  if (ad == NULL) RAISE(403, 17, "empty object used")
+  if (ad_Refman->value == NULL) RAISE(403, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (ad)->length) RAISE(403, 25, "slice index out of bounds")
-  if (((integration_M_Data*)((ad)->values)) + 2 == NULL) RAISE(403, 27, "used member of empty object")
-  if (ad_Refman->value == NULL) RAISE(403, 38, "used member of outdated weak reference")
-  if ((((integration_M_Data*)((ad)->values)) + 2)->arr == NULL) RAISE(403, 29, "empty object used as sequence")
-  if ((((integration_M_Data*)((ad)->values)) + 2)->arr_Refman->value == NULL) RAISE(403, 40, "outdated weak reference used as sequence")
+  if (((integration_M_Data*)((ad)->values)) + 2 == NULL) RAISE(403, 17, "empty object used")
+  if (ad_Refman->value == NULL) RAISE(403, 28, "outdated weak reference used")
+  if ((((integration_M_Data*)((ad)->values)) + 2)->arr == NULL) RAISE(403, 17, "empty object used")
+  if ((((integration_M_Data*)((ad)->values)) + 2)->arr_Refman->value == NULL) RAISE(403, 28, "outdated weak reference used")
   if ((3) < 0 || (3) >= ((((integration_M_Data*)((ad)->values)) + 2)->arr)->length) RAISE(403, 25, "slice index out of bounds")
   aux_Ref_Manager = s_Refman;
   s_Refman = (((integration_M_Data*)((ad)->values)) + 2)->arr_Refman;
@@ -3447,15 +3456,15 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   s = ((String*)(((((integration_M_Data*)((ad)->values)) + 2)->arr)->values)) + 3;
   ++LUMI_file_coverage[0].line_count[404];
   dr = &dr_Var;
-  dr_Refman = LUMI_new_ref(dr);
+  dr_Refman = LUMI_new_ref((void**)&dr, false);
   if (dr_Refman == NULL) RAISE(404, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[405];
-  if (dr == NULL) RAISE(405, 27, "used member of empty object")
-  if (dr_Refman->value == NULL) RAISE(405, 38, "used member of outdated weak reference")
-  if (dr->item == NULL) RAISE(405, 27, "used member of empty object")
-  if (dr->item_Refman->value == NULL) RAISE(405, 38, "used member of outdated weak reference")
-  if (((integration_M_Data*)(dr->item))->item == NULL) RAISE(405, 27, "used member of empty object")
-  if (((integration_M_Data*)(dr->item))->item_Refman->value == NULL) RAISE(405, 38, "used member of outdated weak reference")
+  if (dr == NULL) RAISE(405, 17, "empty object used")
+  if (dr_Refman->value == NULL) RAISE(405, 28, "outdated weak reference used")
+  if (dr->item == NULL) RAISE(405, 17, "empty object used")
+  if (dr->item_Refman->value == NULL) RAISE(405, 28, "outdated weak reference used")
+  if (((integration_M_Data*)(dr->item))->item == NULL) RAISE(405, 17, "empty object used")
+  if (((integration_M_Data*)(dr->item))->item_Refman->value == NULL) RAISE(405, 28, "outdated weak reference used")
   aux_Ref_Manager = s_Refman;
   s_Refman = ((integration_M_Data*)(((integration_M_Data*)(dr->item))->item))->item_Refman;
   LUMI_inc_ref(s_Refman);
@@ -3476,21 +3485,21 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   TEST_ASSERT(409, dg != NULL && dg_Refman->value != NULL)
   ++LUMI_file_coverage[0].line_count[411];
   t = &t_Var;
-  t_Refman = LUMI_new_ref(t);
+  t_Refman = LUMI_new_ref((void**)&t, false);
   if (t_Refman == NULL) RAISE(411, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[412];
   dt = &dt_Var;
-  dt_Refman = LUMI_new_ref(dt);
+  dt_Refman = LUMI_new_ref((void**)&dt, false);
   if (dt_Refman == NULL) RAISE(412, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[413];
   ts = &ts_Var;
-  ts_Refman = LUMI_new_ref(ts);
+  ts_Refman = LUMI_new_ref((void**)&ts, false);
   if (ts_Refman == NULL) RAISE(413, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(ts, ts_Refman, 0, NULL, NULL);
   CHECK(413)
   ++LUMI_file_coverage[0].line_count[414];
-  if (t == NULL) RAISE(414, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(414, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(414, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(414, 28, "outdated weak reference used")
   aux_Ref_Manager = t->_base._base._base.item_Refman;
   t->_base._base._base.item_Refman = s_Refman;
   t->_base._base._base.item_Dynamic = &String_dynamic;
@@ -3499,8 +3508,8 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   t->_base._base._base.item = s;
   ++LUMI_file_coverage[0].line_count[415];
-  if (t == NULL) RAISE(415, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(415, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(415, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(415, 28, "outdated weak reference used")
   aux_Ref_Manager = t->_base._base._base.arr_Refman;
   t->_base._base._base.arr_Refman = sarr_Refman;
   LUMI_inc_ref(t->_base._base._base.arr_Refman);
@@ -3508,8 +3517,8 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   t->_base._base._base.arr = sarr;
   ++LUMI_file_coverage[0].line_count[416];
-  if (t == NULL) RAISE(416, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(416, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(416, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(416, 28, "outdated weak reference used")
   aux_Ref_Manager = t->_base._base.second_Refman;
   t->_base._base.second_Refman = dt_Refman;
   t->_base._base.second_Dynamic = &integration_M_Data_dynamic;
@@ -3518,8 +3527,8 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   t->_base._base.second = dt;
   ++LUMI_file_coverage[0].line_count[417];
-  if (t == NULL) RAISE(417, 27, "used member of empty object")
-  if (t_Refman->value == NULL) RAISE(417, 38, "used member of outdated weak reference")
+  if (t == NULL) RAISE(417, 17, "empty object used")
+  if (t_Refman->value == NULL) RAISE(417, 28, "outdated weak reference used")
   aux_Ref_Manager = t->_base._base.third_Refman;
   t->_base._base.third_Refman = ts_Refman;
   t->_base._base.third_Dynamic = &integration_M_TestStruct_dynamic;
@@ -3556,8 +3565,8 @@ Returncode integration_M_f_try_catch_raise(integration_M_TestStruct* t, Ref_Mana
 #undef RETURN_ERROR
 #define RETURN_ERROR break
     ++LUMI_file_coverage[0].line_count[422];
-    if (t == NULL) RAISE(422, 27, "used member of empty object")
-    if (t_Refman->value == NULL) RAISE(422, 38, "used member of outdated weak reference")
+    if (t == NULL) RAISE(422, 17, "empty object used")
+    if (t_Refman->value == NULL) RAISE(422, 28, "outdated weak reference used")
     t->num = 1;
 
 #undef RETURN_ERROR
@@ -3569,7 +3578,7 @@ Returncode integration_M_f_try_catch_raise(integration_M_TestStruct* t, Ref_Mana
     LUMI_err = OK;
     ++LUMI_file_coverage[0].line_count[424];
     aux_String_0 = &aux_String_0_Var;
-    aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+    aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
     if (aux_String_0_Refman == NULL) RAISE(424, 38, "insufficient memory for managed object")
     aux_String_0_Var.max_length = 16;
     aux_String_0_Var.length = 15;
@@ -3635,7 +3644,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
 #define RETURN_ERROR break
     ++LUMI_file_coverage[0].line_count[428];
     aux_String_0 = &aux_String_0_Var;
-    aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+    aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
     if (aux_String_0_Refman == NULL) RAISE(428, 38, "insufficient memory for managed object")
     aux_String_0_Var.max_length = 20;
     aux_String_0_Var.length = 19;
@@ -3643,12 +3652,12 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     LUMI_err = Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
     CHECK(428)
     ++LUMI_file_coverage[0].line_count[429];
-    if (t == NULL) RAISE(429, 27, "used member of empty object")
-    if (t_Refman->value == NULL) RAISE(429, 38, "used member of outdated weak reference")
+    if (t == NULL) RAISE(429, 17, "empty object used")
+    if (t_Refman->value == NULL) RAISE(429, 28, "outdated weak reference used")
     t->num = 1;
     ++LUMI_file_coverage[0].line_count[430];
     aux_String_1 = &aux_String_1_Var;
-    aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+    aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
     if (aux_String_1_Refman == NULL) RAISE(430, 38, "insufficient memory for managed object")
     aux_String_1_Var.max_length = 4;
     aux_String_1_Var.length = 3;
@@ -3680,7 +3689,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     LUMI_err = OK;
     ++LUMI_file_coverage[0].line_count[436];
     aux_String_2 = &aux_String_2_Var;
-    aux_String_2_Refman = LUMI_new_ref(aux_String_2);
+    aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
     if (aux_String_2_Refman == NULL) RAISE(436, 38, "insufficient memory for managed object")
     aux_String_2_Var.max_length = 3;
     aux_String_2_Var.length = 2;
@@ -3694,7 +3703,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
 #define RETURN_ERROR break
       ++LUMI_file_coverage[0].line_count[438];
       aux_String_3 = &aux_String_3_Var;
-      aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+      aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
       if (aux_String_3_Refman == NULL) RAISE(438, 38, "insufficient memory for managed object")
       aux_String_3_Var.max_length = 3;
       aux_String_3_Var.length = 2;
@@ -3702,12 +3711,12 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
       LUMI_err = Sys_print(sys, sys_Refman, aux_String_3, aux_String_3_Refman);
       CHECK(438)
       ++LUMI_file_coverage[0].line_count[439];
-      if (t == NULL) RAISE(439, 27, "used member of empty object")
-      if (t_Refman->value == NULL) RAISE(439, 38, "used member of outdated weak reference")
+      if (t == NULL) RAISE(439, 17, "empty object used")
+      if (t_Refman->value == NULL) RAISE(439, 28, "outdated weak reference used")
       t->num = 2;
       ++LUMI_file_coverage[0].line_count[440];
       aux_String_4 = &aux_String_4_Var;
-      aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+      aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
       if (aux_String_4_Refman == NULL) RAISE(440, 38, "insufficient memory for managed object")
       aux_String_4_Var.max_length = 4;
       aux_String_4_Var.length = 3;
@@ -3722,7 +3731,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     LUMI_err = OK;
     ++LUMI_file_coverage[0].line_count[441];
     aux_String_5 = &aux_String_5_Var;
-    aux_String_5_Refman = LUMI_new_ref(aux_String_5);
+    aux_String_5_Refman = LUMI_new_ref((void**)&aux_String_5, false);
     if (aux_String_5_Refman == NULL) RAISE(441, 38, "insufficient memory for managed object")
     aux_String_5_Var.max_length = 3;
     aux_String_5_Var.length = 2;
@@ -3732,7 +3741,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
   }
   ++LUMI_file_coverage[0].line_count[442];
   aux_String_6 = &aux_String_6_Var;
-  aux_String_6_Refman = LUMI_new_ref(aux_String_6);
+  aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, false);
   if (aux_String_6_Refman == NULL) RAISE(442, 38, "insufficient memory for managed object")
   aux_String_6_Var.max_length = 3;
   aux_String_6_Var.length = 2;
@@ -3746,7 +3755,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
 #define RETURN_ERROR break
     ++LUMI_file_coverage[0].line_count[444];
     aux_String_7 = &aux_String_7_Var;
-    aux_String_7_Refman = LUMI_new_ref(aux_String_7);
+    aux_String_7_Refman = LUMI_new_ref((void**)&aux_String_7, false);
     if (aux_String_7_Refman == NULL) RAISE(444, 38, "insufficient memory for managed object")
     aux_String_7_Var.max_length = 3;
     aux_String_7_Var.length = 2;
@@ -3758,7 +3767,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
       ++LUMI_trace_ignore_count;
       ++LUMI_file_coverage[0].line_count[446];
       aux_String_8 = &aux_String_8_Var;
-      aux_String_8_Refman = LUMI_new_ref(aux_String_8);
+      aux_String_8_Refman = LUMI_new_ref((void**)&aux_String_8, false);
       if (aux_String_8_Refman == NULL) RAISE(446, 38, "insufficient memory for managed object")
       aux_String_8_Var.max_length = 3;
       aux_String_8_Var.length = 2;
@@ -3770,7 +3779,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
       CHECK(447)
       ++LUMI_file_coverage[0].line_count[448];
       aux_String_9 = &aux_String_9_Var;
-      aux_String_9_Refman = LUMI_new_ref(aux_String_9);
+      aux_String_9_Refman = LUMI_new_ref((void**)&aux_String_9, false);
       if (aux_String_9_Refman == NULL) RAISE(448, 38, "insufficient memory for managed object")
       aux_String_9_Var.max_length = 4;
       aux_String_9_Var.length = 3;
@@ -3782,7 +3791,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     LUMI_err = OK;
     ++LUMI_file_coverage[0].line_count[449];
     aux_String_10 = &aux_String_10_Var;
-    aux_String_10_Refman = LUMI_new_ref(aux_String_10);
+    aux_String_10_Refman = LUMI_new_ref((void**)&aux_String_10, false);
     if (aux_String_10_Refman == NULL) RAISE(449, 38, "insufficient memory for managed object")
     aux_String_10_Var.max_length = 3;
     aux_String_10_Var.length = 2;
@@ -3791,7 +3800,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
     CHECK(449)
     ++LUMI_file_coverage[0].line_count[450];
     aux_String_11 = &aux_String_11_Var;
-    aux_String_11_Refman = LUMI_new_ref(aux_String_11);
+    aux_String_11_Refman = LUMI_new_ref((void**)&aux_String_11, false);
     if (aux_String_11_Refman == NULL) RAISE(450, 38, "insufficient memory for managed object")
     aux_String_11_Var.max_length = 24;
     aux_String_11_Var.length = 23;
@@ -3805,7 +3814,7 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
   LUMI_err = OK;
   ++LUMI_file_coverage[0].line_count[451];
   aux_String_12 = &aux_String_12_Var;
-  aux_String_12_Refman = LUMI_new_ref(aux_String_12);
+  aux_String_12_Refman = LUMI_new_ref((void**)&aux_String_12, false);
   if (aux_String_12_Refman == NULL) RAISE(451, 38, "insufficient memory for managed object")
   aux_String_12_Var.max_length = 2;
   aux_String_12_Var.length = 1;
@@ -3962,11 +3971,11 @@ Returncode integration_M_test_for_each(void) {
   ++LUMI_file_coverage[0].line_count[481];
   text = &text_Var;
   text_Var.values = text_Values;
-  text_Refman = LUMI_new_ref(text);
+  text_Refman = LUMI_new_ref((void**)&text, false);
   if (text_Refman == NULL) RAISE(481, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[482];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(482, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 8;
   aux_String_0_Var.length = 7;
@@ -3975,7 +3984,7 @@ Returncode integration_M_test_for_each(void) {
   CHECK(482)
   ++LUMI_file_coverage[0].line_count[483];
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(483, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 7;
   aux_String_1_Var.length = 6;
@@ -3986,9 +3995,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_String_2 = aux_String_1;
+  if (aux_String_2 == NULL) RAISE(483, 17, "empty object used")
+  if (aux_String_2_Refman->value == NULL) RAISE(483, 28, "outdated weak reference used")
   {int c_Index; for (c_Index = 0; c_Index < aux_String_2->length; ++c_Index) {
-    if (aux_String_2 == NULL) RAISE(483, 29, "empty object used as sequence")
-    if (aux_String_2_Refman->value == NULL) RAISE(483, 40, "outdated weak reference used as sequence")
+    if (aux_String_2 == NULL) RAISE(483, 17, "empty object used")
+    if (aux_String_2_Refman->value == NULL) RAISE(483, 28, "outdated weak reference used")
     if ((c_Index) < 0 || (c_Index) >= (aux_String_2)->length) RAISE(483, 25, "slice index out of bounds")
     c = ((aux_String_2)->values)[c_Index];
     ++LUMI_file_coverage[0].line_count[484];
@@ -4002,7 +4013,7 @@ Returncode integration_M_test_for_each(void) {
     CHECK(486)
     ++LUMI_file_coverage[0].line_count[487];
     aux_String_3 = &aux_String_3_Var;
-    aux_String_3_Refman = LUMI_new_ref(aux_String_3);
+    aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
     if (aux_String_3_Refman == NULL) RAISE(487, 38, "insufficient memory for managed object")
     aux_String_3_Var.max_length = 2;
     aux_String_3_Var.length = 1;
@@ -4018,7 +4029,7 @@ Returncode integration_M_test_for_each(void) {
   aux_String_2 = NULL;
   ++LUMI_file_coverage[0].line_count[488];
   aux_String_4 = &aux_String_4_Var;
-  aux_String_4_Refman = LUMI_new_ref(aux_String_4);
+  aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
   if (aux_String_4_Refman == NULL) RAISE(488, 38, "insufficient memory for managed object")
   aux_String_4_Var.max_length = 2;
   aux_String_4_Var.length = 1;
@@ -4028,26 +4039,26 @@ Returncode integration_M_test_for_each(void) {
   ++LUMI_file_coverage[0].line_count[490];
   arr = &arr_Var;
   arr_Var.values = arr_Values;
-  arr_Refman = LUMI_new_ref(arr);
+  arr_Refman = LUMI_new_ref((void**)&arr, false);
   if (arr_Refman == NULL) RAISE(490, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[491];
-  if (arr == NULL) RAISE(491, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(491, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(491, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(491, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (arr)->length) RAISE(491, 25, "slice index out of bounds")
   ((Int*)((arr)->values))[0] = 14;
   ++LUMI_file_coverage[0].line_count[492];
-  if (arr == NULL) RAISE(492, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(492, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(492, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(492, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (arr)->length) RAISE(492, 25, "slice index out of bounds")
   ((Int*)((arr)->values))[1] = 15;
   ++LUMI_file_coverage[0].line_count[493];
-  if (arr == NULL) RAISE(493, 29, "empty object used as sequence")
-  if (arr_Refman->value == NULL) RAISE(493, 40, "outdated weak reference used as sequence")
+  if (arr == NULL) RAISE(493, 17, "empty object used")
+  if (arr_Refman->value == NULL) RAISE(493, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (arr)->length) RAISE(493, 25, "slice index out of bounds")
   ((Int*)((arr)->values))[2] = 16;
   ++LUMI_file_coverage[0].line_count[494];
   aux_String_5 = &aux_String_5_Var;
-  aux_String_5_Refman = LUMI_new_ref(aux_String_5);
+  aux_String_5_Refman = LUMI_new_ref((void**)&aux_String_5, false);
   if (aux_String_5_Refman == NULL) RAISE(494, 38, "insufficient memory for managed object")
   aux_String_5_Var.max_length = 10;
   aux_String_5_Var.length = 9;
@@ -4061,9 +4072,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_Array_0 = arr;
+  if (aux_Array_0 == NULL) RAISE(495, 17, "empty object used")
+  if (aux_Array_0_Refman->value == NULL) RAISE(495, 28, "outdated weak reference used")
   {int n_Index; for (n_Index = 0; n_Index < aux_Array_0->length; ++n_Index) {
-    if (aux_Array_0 == NULL) RAISE(495, 29, "empty object used as sequence")
-    if (aux_Array_0_Refman->value == NULL) RAISE(495, 40, "outdated weak reference used as sequence")
+    if (aux_Array_0 == NULL) RAISE(495, 17, "empty object used")
+    if (aux_Array_0_Refman->value == NULL) RAISE(495, 28, "outdated weak reference used")
     if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(495, 25, "slice index out of bounds")
     n = ((Int*)((aux_Array_0)->values))[n_Index];
     ++LUMI_file_coverage[0].line_count[496];
@@ -4077,7 +4090,7 @@ Returncode integration_M_test_for_each(void) {
     CHECK(498)
     ++LUMI_file_coverage[0].line_count[499];
     aux_String_6 = &aux_String_6_Var;
-    aux_String_6_Refman = LUMI_new_ref(aux_String_6);
+    aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, false);
     if (aux_String_6_Refman == NULL) RAISE(499, 38, "insufficient memory for managed object")
     aux_String_6_Var.max_length = 2;
     aux_String_6_Var.length = 1;
@@ -4093,7 +4106,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Array_0 = NULL;
   ++LUMI_file_coverage[0].line_count[500];
   aux_String_7 = &aux_String_7_Var;
-  aux_String_7_Refman = LUMI_new_ref(aux_String_7);
+  aux_String_7_Refman = LUMI_new_ref((void**)&aux_String_7, false);
   if (aux_String_7_Refman == NULL) RAISE(500, 38, "insufficient memory for managed object")
   aux_String_7_Var.max_length = 2;
   aux_String_7_Var.length = 1;
@@ -4103,20 +4116,20 @@ Returncode integration_M_test_for_each(void) {
   ++LUMI_file_coverage[0].line_count[502];
   tsarr = &tsarr_Var;
   tsarr_Var.values = tsarr_Values;
-  tsarr_Refman = LUMI_new_ref(tsarr);
+  tsarr_Refman = LUMI_new_ref((void**)&tsarr, false);
   if (tsarr_Refman == NULL) RAISE(502, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[503];
   aux_String_8 = &aux_String_8_Var;
-  aux_String_8_Refman = LUMI_new_ref(aux_String_8);
+  aux_String_8_Refman = LUMI_new_ref((void**)&aux_String_8, false);
   if (aux_String_8_Refman == NULL) RAISE(503, 38, "insufficient memory for managed object")
   aux_String_8_Var.max_length = 4;
   aux_String_8_Var.length = 3;
   aux_String_8_Var.values = "aaa";
-  if (tsarr == NULL) RAISE(503, 29, "empty object used as sequence")
-  if (tsarr_Refman->value == NULL) RAISE(503, 40, "outdated weak reference used as sequence")
+  if (tsarr == NULL) RAISE(503, 17, "empty object used")
+  if (tsarr_Refman->value == NULL) RAISE(503, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (tsarr)->length) RAISE(503, 25, "slice index out of bounds")
-  if (((integration_M_TestStruct*)((tsarr)->values)) + 0 == NULL) RAISE(503, 27, "used member of empty object")
-  if (tsarr_Refman->value == NULL) RAISE(503, 38, "used member of outdated weak reference")
+  if (((integration_M_TestStruct*)((tsarr)->values)) + 0 == NULL) RAISE(503, 17, "empty object used")
+  if (tsarr_Refman->value == NULL) RAISE(503, 28, "outdated weak reference used")
   aux_Ref_Manager = (((integration_M_TestStruct*)((tsarr)->values)) + 0)->text_Refman;
   (((integration_M_TestStruct*)((tsarr)->values)) + 0)->text_Refman = aux_String_8_Refman;
   LUMI_inc_ref((((integration_M_TestStruct*)((tsarr)->values)) + 0)->text_Refman);
@@ -4125,16 +4138,16 @@ Returncode integration_M_test_for_each(void) {
   (((integration_M_TestStruct*)((tsarr)->values)) + 0)->text = aux_String_8;
   ++LUMI_file_coverage[0].line_count[504];
   aux_String_9 = &aux_String_9_Var;
-  aux_String_9_Refman = LUMI_new_ref(aux_String_9);
+  aux_String_9_Refman = LUMI_new_ref((void**)&aux_String_9, false);
   if (aux_String_9_Refman == NULL) RAISE(504, 38, "insufficient memory for managed object")
   aux_String_9_Var.max_length = 4;
   aux_String_9_Var.length = 3;
   aux_String_9_Var.values = "bbb";
-  if (tsarr == NULL) RAISE(504, 29, "empty object used as sequence")
-  if (tsarr_Refman->value == NULL) RAISE(504, 40, "outdated weak reference used as sequence")
+  if (tsarr == NULL) RAISE(504, 17, "empty object used")
+  if (tsarr_Refman->value == NULL) RAISE(504, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (tsarr)->length) RAISE(504, 25, "slice index out of bounds")
-  if (((integration_M_TestStruct*)((tsarr)->values)) + 1 == NULL) RAISE(504, 27, "used member of empty object")
-  if (tsarr_Refman->value == NULL) RAISE(504, 38, "used member of outdated weak reference")
+  if (((integration_M_TestStruct*)((tsarr)->values)) + 1 == NULL) RAISE(504, 17, "empty object used")
+  if (tsarr_Refman->value == NULL) RAISE(504, 28, "outdated weak reference used")
   aux_Ref_Manager = (((integration_M_TestStruct*)((tsarr)->values)) + 1)->text_Refman;
   (((integration_M_TestStruct*)((tsarr)->values)) + 1)->text_Refman = aux_String_9_Refman;
   LUMI_inc_ref((((integration_M_TestStruct*)((tsarr)->values)) + 1)->text_Refman);
@@ -4143,16 +4156,16 @@ Returncode integration_M_test_for_each(void) {
   (((integration_M_TestStruct*)((tsarr)->values)) + 1)->text = aux_String_9;
   ++LUMI_file_coverage[0].line_count[505];
   aux_String_10 = &aux_String_10_Var;
-  aux_String_10_Refman = LUMI_new_ref(aux_String_10);
+  aux_String_10_Refman = LUMI_new_ref((void**)&aux_String_10, false);
   if (aux_String_10_Refman == NULL) RAISE(505, 38, "insufficient memory for managed object")
   aux_String_10_Var.max_length = 4;
   aux_String_10_Var.length = 3;
   aux_String_10_Var.values = "ccc";
-  if (tsarr == NULL) RAISE(505, 29, "empty object used as sequence")
-  if (tsarr_Refman->value == NULL) RAISE(505, 40, "outdated weak reference used as sequence")
+  if (tsarr == NULL) RAISE(505, 17, "empty object used")
+  if (tsarr_Refman->value == NULL) RAISE(505, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (tsarr)->length) RAISE(505, 25, "slice index out of bounds")
-  if (((integration_M_TestStruct*)((tsarr)->values)) + 2 == NULL) RAISE(505, 27, "used member of empty object")
-  if (tsarr_Refman->value == NULL) RAISE(505, 38, "used member of outdated weak reference")
+  if (((integration_M_TestStruct*)((tsarr)->values)) + 2 == NULL) RAISE(505, 17, "empty object used")
+  if (tsarr_Refman->value == NULL) RAISE(505, 28, "outdated weak reference used")
   aux_Ref_Manager = (((integration_M_TestStruct*)((tsarr)->values)) + 2)->text_Refman;
   (((integration_M_TestStruct*)((tsarr)->values)) + 2)->text_Refman = aux_String_10_Refman;
   LUMI_inc_ref((((integration_M_TestStruct*)((tsarr)->values)) + 2)->text_Refman);
@@ -4161,7 +4174,7 @@ Returncode integration_M_test_for_each(void) {
   (((integration_M_TestStruct*)((tsarr)->values)) + 2)->text = aux_String_10;
   ++LUMI_file_coverage[0].line_count[506];
   aux_String_11 = &aux_String_11_Var;
-  aux_String_11_Refman = LUMI_new_ref(aux_String_11);
+  aux_String_11_Refman = LUMI_new_ref((void**)&aux_String_11, false);
   if (aux_String_11_Refman == NULL) RAISE(506, 38, "insufficient memory for managed object")
   aux_String_11_Var.max_length = 10;
   aux_String_11_Var.length = 9;
@@ -4175,9 +4188,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_Array_1 = tsarr;
+  if (aux_Array_1 == NULL) RAISE(507, 17, "empty object used")
+  if (aux_Array_1_Refman->value == NULL) RAISE(507, 28, "outdated weak reference used")
   {int ts_Index; for (ts_Index = 0; ts_Index < aux_Array_1->length; ++ts_Index) {
-    if (aux_Array_1 == NULL) RAISE(507, 29, "empty object used as sequence")
-    if (aux_Array_1_Refman->value == NULL) RAISE(507, 40, "outdated weak reference used as sequence")
+    if (aux_Array_1 == NULL) RAISE(507, 17, "empty object used")
+    if (aux_Array_1_Refman->value == NULL) RAISE(507, 28, "outdated weak reference used")
     if ((ts_Index) < 0 || (ts_Index) >= (aux_Array_1)->length) RAISE(507, 25, "slice index out of bounds")
     aux_Ref_Manager = ts_Refman;
     ts_Refman = aux_Array_1_Refman;
@@ -4186,13 +4201,13 @@ Returncode integration_M_test_for_each(void) {
     aux_Ref_Manager = NULL;
     ts = ((integration_M_TestStruct*)((aux_Array_1)->values)) + ts_Index;
     ++LUMI_file_coverage[0].line_count[508];
-    if (ts == NULL) RAISE(508, 27, "used member of empty object")
-    if (ts_Refman->value == NULL) RAISE(508, 38, "used member of outdated weak reference")
+    if (ts == NULL) RAISE(508, 17, "empty object used")
+    if (ts_Refman->value == NULL) RAISE(508, 28, "outdated weak reference used")
     LUMI_err = Sys_print(sys, sys_Refman, ts->text, ts->text_Refman);
     CHECK(508)
     ++LUMI_file_coverage[0].line_count[509];
     aux_String_12 = &aux_String_12_Var;
-    aux_String_12_Refman = LUMI_new_ref(aux_String_12);
+    aux_String_12_Refman = LUMI_new_ref((void**)&aux_String_12, false);
     if (aux_String_12_Refman == NULL) RAISE(509, 38, "insufficient memory for managed object")
     aux_String_12_Var.max_length = 2;
     aux_String_12_Var.length = 1;
@@ -4208,7 +4223,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Array_1 = NULL;
   ++LUMI_file_coverage[0].line_count[510];
   aux_String_13 = &aux_String_13_Var;
-  aux_String_13_Refman = LUMI_new_ref(aux_String_13);
+  aux_String_13_Refman = LUMI_new_ref((void**)&aux_String_13, false);
   if (aux_String_13_Refman == NULL) RAISE(510, 38, "insufficient memory for managed object")
   aux_String_13_Var.max_length = 2;
   aux_String_13_Var.length = 1;
@@ -4219,14 +4234,14 @@ Returncode integration_M_test_for_each(void) {
   sarr = &sarr_Var;
   sarr_Var.values = sarr_Values;
   LUMI_set_var_string_array(3, 16, sarr, sarr_Chars);
-  sarr_Refman = LUMI_new_ref(sarr);
+  sarr_Refman = LUMI_new_ref((void**)&sarr, false);
   if (sarr_Refman == NULL) RAISE(512, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[513];
-  if (sarr == NULL) RAISE(513, 29, "empty object used as sequence")
-  if (sarr_Refman->value == NULL) RAISE(513, 40, "outdated weak reference used as sequence")
+  if (sarr == NULL) RAISE(513, 17, "empty object used")
+  if (sarr_Refman->value == NULL) RAISE(513, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (sarr)->length) RAISE(513, 25, "slice index out of bounds")
   aux_String_14 = &aux_String_14_Var;
-  aux_String_14_Refman = LUMI_new_ref(aux_String_14);
+  aux_String_14_Refman = LUMI_new_ref((void**)&aux_String_14, false);
   if (aux_String_14_Refman == NULL) RAISE(513, 38, "insufficient memory for managed object")
   aux_String_14_Var.max_length = 4;
   aux_String_14_Var.length = 3;
@@ -4234,11 +4249,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_err = String_new(((String*)((sarr)->values)) + 0, sarr_Refman, aux_String_14, aux_String_14_Refman);
   CHECK(513)
   ++LUMI_file_coverage[0].line_count[514];
-  if (sarr == NULL) RAISE(514, 29, "empty object used as sequence")
-  if (sarr_Refman->value == NULL) RAISE(514, 40, "outdated weak reference used as sequence")
+  if (sarr == NULL) RAISE(514, 17, "empty object used")
+  if (sarr_Refman->value == NULL) RAISE(514, 28, "outdated weak reference used")
   if ((1) < 0 || (1) >= (sarr)->length) RAISE(514, 25, "slice index out of bounds")
   aux_String_15 = &aux_String_15_Var;
-  aux_String_15_Refman = LUMI_new_ref(aux_String_15);
+  aux_String_15_Refman = LUMI_new_ref((void**)&aux_String_15, false);
   if (aux_String_15_Refman == NULL) RAISE(514, 38, "insufficient memory for managed object")
   aux_String_15_Var.max_length = 4;
   aux_String_15_Var.length = 3;
@@ -4246,11 +4261,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_err = String_new(((String*)((sarr)->values)) + 1, sarr_Refman, aux_String_15, aux_String_15_Refman);
   CHECK(514)
   ++LUMI_file_coverage[0].line_count[515];
-  if (sarr == NULL) RAISE(515, 29, "empty object used as sequence")
-  if (sarr_Refman->value == NULL) RAISE(515, 40, "outdated weak reference used as sequence")
+  if (sarr == NULL) RAISE(515, 17, "empty object used")
+  if (sarr_Refman->value == NULL) RAISE(515, 28, "outdated weak reference used")
   if ((2) < 0 || (2) >= (sarr)->length) RAISE(515, 25, "slice index out of bounds")
   aux_String_16 = &aux_String_16_Var;
-  aux_String_16_Refman = LUMI_new_ref(aux_String_16);
+  aux_String_16_Refman = LUMI_new_ref((void**)&aux_String_16, false);
   if (aux_String_16_Refman == NULL) RAISE(515, 38, "insufficient memory for managed object")
   aux_String_16_Var.max_length = 4;
   aux_String_16_Var.length = 3;
@@ -4259,7 +4274,7 @@ Returncode integration_M_test_for_each(void) {
   CHECK(515)
   ++LUMI_file_coverage[0].line_count[516];
   aux_String_17 = &aux_String_17_Var;
-  aux_String_17_Refman = LUMI_new_ref(aux_String_17);
+  aux_String_17_Refman = LUMI_new_ref((void**)&aux_String_17, false);
   if (aux_String_17_Refman == NULL) RAISE(516, 38, "insufficient memory for managed object")
   aux_String_17_Var.max_length = 10;
   aux_String_17_Var.length = 9;
@@ -4273,9 +4288,11 @@ Returncode integration_M_test_for_each(void) {
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   aux_Array_2 = sarr;
+  if (aux_Array_2 == NULL) RAISE(517, 17, "empty object used")
+  if (aux_Array_2_Refman->value == NULL) RAISE(517, 28, "outdated weak reference used")
   {int s_Index; for (s_Index = 0; s_Index < aux_Array_2->length; ++s_Index) {
-    if (aux_Array_2 == NULL) RAISE(517, 29, "empty object used as sequence")
-    if (aux_Array_2_Refman->value == NULL) RAISE(517, 40, "outdated weak reference used as sequence")
+    if (aux_Array_2 == NULL) RAISE(517, 17, "empty object used")
+    if (aux_Array_2_Refman->value == NULL) RAISE(517, 28, "outdated weak reference used")
     if ((s_Index) < 0 || (s_Index) >= (aux_Array_2)->length) RAISE(517, 25, "slice index out of bounds")
     aux_Ref_Manager = s_Refman;
     s_Refman = aux_Array_2_Refman;
@@ -4288,7 +4305,7 @@ Returncode integration_M_test_for_each(void) {
     CHECK(518)
     ++LUMI_file_coverage[0].line_count[519];
     aux_String_18 = &aux_String_18_Var;
-    aux_String_18_Refman = LUMI_new_ref(aux_String_18);
+    aux_String_18_Refman = LUMI_new_ref((void**)&aux_String_18, false);
     if (aux_String_18_Refman == NULL) RAISE(519, 38, "insufficient memory for managed object")
     aux_String_18_Var.max_length = 2;
     aux_String_18_Var.length = 1;
@@ -4304,7 +4321,7 @@ Returncode integration_M_test_for_each(void) {
   aux_Array_2 = NULL;
   ++LUMI_file_coverage[0].line_count[520];
   aux_String_19 = &aux_String_19_Var;
-  aux_String_19_Refman = LUMI_new_ref(aux_String_19);
+  aux_String_19_Refman = LUMI_new_ref((void**)&aux_String_19, false);
   if (aux_String_19_Refman == NULL) RAISE(520, 38, "insufficient memory for managed object")
   aux_String_19_Var.max_length = 2;
   aux_String_19_Var.length = 1;
@@ -4313,43 +4330,43 @@ Returncode integration_M_test_for_each(void) {
   CHECK(520)
   ++LUMI_file_coverage[0].line_count[522];
   aux_String_20 = &aux_String_20_Var;
-  aux_String_20_Refman = LUMI_new_ref(aux_String_20);
+  aux_String_20_Refman = LUMI_new_ref((void**)&aux_String_20, false);
   if (aux_String_20_Refman == NULL) RAISE(522, 38, "insufficient memory for managed object")
   aux_String_20_Var.max_length = 4;
   aux_String_20_Var.length = 3;
   aux_String_20_Var.values = "iii";
   container_last = &container_last_Var;
-  container_last_Refman = LUMI_new_ref(container_last);
+  container_last_Refman = LUMI_new_ref((void**)&container_last, false);
   if (container_last_Refman == NULL) RAISE(522, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_Container_new(container_last, container_last_Refman, aux_String_20, aux_String_20_Refman, &String_dynamic, NULL, NULL);
   CHECK(522)
   ++LUMI_file_coverage[0].line_count[523];
   aux_String_21 = &aux_String_21_Var;
-  aux_String_21_Refman = LUMI_new_ref(aux_String_21);
+  aux_String_21_Refman = LUMI_new_ref((void**)&aux_String_21, false);
   if (aux_String_21_Refman == NULL) RAISE(523, 38, "insufficient memory for managed object")
   aux_String_21_Var.max_length = 4;
   aux_String_21_Var.length = 3;
   aux_String_21_Var.values = "hhh";
   container_mid = &container_mid_Var;
-  container_mid_Refman = LUMI_new_ref(container_mid);
+  container_mid_Refman = LUMI_new_ref((void**)&container_mid, false);
   if (container_mid_Refman == NULL) RAISE(523, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_Container_new(container_mid, container_mid_Refman, aux_String_21, aux_String_21_Refman, &String_dynamic, container_last, container_last_Refman);
   CHECK(523)
   ++LUMI_file_coverage[0].line_count[524];
   aux_String_22 = &aux_String_22_Var;
-  aux_String_22_Refman = LUMI_new_ref(aux_String_22);
+  aux_String_22_Refman = LUMI_new_ref((void**)&aux_String_22, false);
   if (aux_String_22_Refman == NULL) RAISE(524, 38, "insufficient memory for managed object")
   aux_String_22_Var.max_length = 4;
   aux_String_22_Var.length = 3;
   aux_String_22_Var.values = "ggg";
   container_first = &container_first_Var;
-  container_first_Refman = LUMI_new_ref(container_first);
+  container_first_Refman = LUMI_new_ref((void**)&container_first, false);
   if (container_first_Refman == NULL) RAISE(524, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_Container_new(container_first, container_first_Refman, aux_String_22, aux_String_22_Refman, &String_dynamic, container_mid, container_mid_Refman);
   CHECK(524)
   ++LUMI_file_coverage[0].line_count[525];
   container = &container_Var;
-  container_Refman = LUMI_new_ref(container);
+  container_Refman = LUMI_new_ref((void**)&container, false);
   if (container_Refman == NULL) RAISE(525, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_Container_new(container, container_Refman, NULL, NULL, NULL, container_first, container_first_Refman);
   CHECK(525)
@@ -4359,7 +4376,7 @@ Returncode integration_M_test_for_each(void) {
   CHECK(527)
   ++LUMI_file_coverage[0].line_count[528];
   aux_String_23 = &aux_String_23_Var;
-  aux_String_23_Refman = LUMI_new_ref(aux_String_23);
+  aux_String_23_Refman = LUMI_new_ref((void**)&aux_String_23, false);
   if (aux_String_23_Refman == NULL) RAISE(528, 38, "insufficient memory for managed object")
   aux_String_23_Var.max_length = 9;
   aux_String_23_Var.length = 8;
@@ -4385,7 +4402,7 @@ Returncode integration_M_test_for_each(void) {
     CHECK(530)
     ++LUMI_file_coverage[0].line_count[531];
     aux_String_24 = &aux_String_24_Var;
-    aux_String_24_Refman = LUMI_new_ref(aux_String_24);
+    aux_String_24_Refman = LUMI_new_ref((void**)&aux_String_24, false);
     if (aux_String_24_Refman == NULL) RAISE(531, 38, "insufficient memory for managed object")
     aux_String_24_Var.max_length = 2;
     aux_String_24_Var.length = 1;
@@ -4403,7 +4420,7 @@ Returncode integration_M_test_for_each(void) {
   aux_ContainerIterator_0 = NULL;
   ++LUMI_file_coverage[0].line_count[532];
   aux_String_25 = &aux_String_25_Var;
-  aux_String_25_Refman = LUMI_new_ref(aux_String_25);
+  aux_String_25_Refman = LUMI_new_ref((void**)&aux_String_25, false);
   if (aux_String_25_Refman == NULL) RAISE(532, 38, "insufficient memory for managed object")
   aux_String_25_Var.max_length = 2;
   aux_String_25_Var.length = 1;
@@ -4474,13 +4491,13 @@ Returncode integration_M_test_complex_field(void) {
   Ref_Manager* aux_Ref_Manager = NULL;
   ++LUMI_file_coverage[0].line_count[555];
   y = &y_Var;
-  y_Refman = LUMI_new_ref(y);
+  y_Refman = LUMI_new_ref((void**)&y, false);
   if (y_Refman == NULL) RAISE(555, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[556];
-  if (y == NULL) RAISE(556, 27, "used member of empty object")
-  if (y_Refman->value == NULL) RAISE(556, 38, "used member of outdated weak reference")
-  if (y == NULL) RAISE(556, 27, "used member of empty object")
-  if (y_Refman->value == NULL) RAISE(556, 38, "used member of outdated weak reference")
+  if (y == NULL) RAISE(556, 17, "empty object used")
+  if (y_Refman->value == NULL) RAISE(556, 28, "outdated weak reference used")
+  if (y == NULL) RAISE(556, 17, "empty object used")
+  if (y_Refman->value == NULL) RAISE(556, 28, "outdated weak reference used")
   aux_Ref_Manager = y->x.x_Refman;
   y->x.x_Refman = y_Refman;
   y->x.x_Dynamic = &integration_M_ComplexField_dynamic;
@@ -4490,7 +4507,7 @@ Returncode integration_M_test_complex_field(void) {
   y->x.x = &(y->x);
   ++LUMI_file_coverage[0].line_count[557];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(557, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -4502,7 +4519,7 @@ Returncode integration_M_test_complex_field(void) {
   CHECK(558)
   ++LUMI_file_coverage[0].line_count[559];
   aux_String_1 = &aux_String_1_Var;
-  aux_String_1_Refman = LUMI_new_ref(aux_String_1);
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
   if (aux_String_1_Refman == NULL) RAISE(559, 38, "insufficient memory for managed object")
   aux_String_1_Var.max_length = 1;
   aux_String_1_Var.length = 0;
@@ -4529,7 +4546,7 @@ Returncode integration_M_test_mid_out(covered_M_MiddleType** mt, Ref_Manager** m
   ++LUMI_file_coverage[1].line_count[66];
   new_mt = LUMI_alloc(sizeof(covered_M_MiddleType));
   if (new_mt == NULL) RAISE(66, 49, "insufficient memory for object dynamic allocation")
-  new_mt_Refman = LUMI_new_ref(new_mt);
+  new_mt_Refman = LUMI_new_ref((void**)&new_mt, true);
   if (new_mt_Refman == NULL) RAISE(66, 38, "insufficient memory for managed object")
   LUMI_err = covered_M_MiddleType_new(new_mt, new_mt_Refman, new_mt_Dynamic);
   CHECK(66)
@@ -4563,7 +4580,7 @@ Returncode integration_M_TestStruct_get_Mock(integration_M_TestStruct* self, Ref
   *x = 12;
   ++LUMI_file_coverage[1].line_count[72];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(72, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 1;
   aux_String_0_Var.length = 0;
@@ -4602,8 +4619,8 @@ Returncode integration_M_TestClass_dynamic_meth_Mock(integration_M_TestClass* se
   LUMI_inc_ref(self_Refman);
   if (!integration_M_TestClass_dynamic_meth_Mock_active) return integration_M_TestClass_dynamic_meth(self, self_Refman, self_Dynamic);
   ++LUMI_file_coverage[1].line_count[78];
-  if (self == NULL) RAISE(78, 27, "used member of empty object")
-  if (self_Refman->value == NULL) RAISE(78, 38, "used member of outdated weak reference")
+  if (self == NULL) RAISE(78, 17, "empty object used")
+  if (self_Refman->value == NULL) RAISE(78, 28, "outdated weak reference used")
   self->num = 7;
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -4677,7 +4694,7 @@ Returncode integration_M_test_func(void) {
   LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[89];
   t = &t_Var;
-  t_Refman = LUMI_new_ref(t);
+  t_Refman = LUMI_new_ref((void**)&t, false);
   if (t_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestStruct_new(t, t_Refman, 0, NULL, NULL);
   CHECK(89)
@@ -4710,42 +4727,42 @@ Returncode integration_M_test_func(void) {
   TEST_ASSERT(101, x == 12)
   ++LUMI_file_coverage[1].line_count[103];
   c = &c_Var;
-  c_Refman = LUMI_new_ref(c);
+  c_Refman = LUMI_new_ref((void**)&c, false);
   if (c_Refman == NULL) RAISE(103, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TestClass_new(c, c_Refman, c_Dynamic);
   CHECK(103)
   ++LUMI_file_coverage[1].line_count[104];
-  if (c == NULL) RAISE(104, 27, "used member of empty object")
-  if (c_Refman->value == NULL) RAISE(104, 38, "used member of outdated weak reference")
+  if (c == NULL) RAISE(104, 17, "empty object used")
+  if (c_Refman->value == NULL) RAISE(104, 28, "outdated weak reference used")
   TEST_ASSERT(104, c->num == 1)
   ++LUMI_file_coverage[1].line_count[105];
   if (c_Dynamic == NULL) RAISE(105, 28, "dynamic call of empty object")
   LUMI_err = c_Dynamic->dynamic_meth(c, c_Refman, c_Dynamic);
   CHECK(105)
   ++LUMI_file_coverage[1].line_count[106];
-  if (c == NULL) RAISE(106, 27, "used member of empty object")
-  if (c_Refman->value == NULL) RAISE(106, 38, "used member of outdated weak reference")
+  if (c == NULL) RAISE(106, 17, "empty object used")
+  if (c_Refman->value == NULL) RAISE(106, 28, "outdated weak reference used")
   TEST_ASSERT(106, c->num == 7)
   ++LUMI_file_coverage[1].line_count[107];
   LUMI_err = integration_M_TestClass_dynamic_meth(c, c_Refman, c_Dynamic);
   CHECK(107)
   ++LUMI_file_coverage[1].line_count[108];
-  if (c == NULL) RAISE(108, 27, "used member of empty object")
-  if (c_Refman->value == NULL) RAISE(108, 38, "used member of outdated weak reference")
+  if (c == NULL) RAISE(108, 17, "empty object used")
+  if (c_Refman->value == NULL) RAISE(108, 28, "outdated weak reference used")
   TEST_ASSERT(108, c->num == 6)
   ++LUMI_file_coverage[1].line_count[109];
   integration_M_TestClass_dynamic_meth_Mock_active = false;
   ++LUMI_file_coverage[1].line_count[110];
-  if (c == NULL) RAISE(110, 27, "used member of empty object")
-  if (c_Refman->value == NULL) RAISE(110, 38, "used member of outdated weak reference")
+  if (c == NULL) RAISE(110, 17, "empty object used")
+  if (c_Refman->value == NULL) RAISE(110, 28, "outdated weak reference used")
   c->num = 0;
   ++LUMI_file_coverage[1].line_count[111];
   if (c_Dynamic == NULL) RAISE(111, 28, "dynamic call of empty object")
   LUMI_err = c_Dynamic->dynamic_meth(c, c_Refman, c_Dynamic);
   CHECK(111)
   ++LUMI_file_coverage[1].line_count[112];
-  if (c == NULL) RAISE(112, 27, "used member of empty object")
-  if (c_Refman->value == NULL) RAISE(112, 38, "used member of outdated weak reference")
+  if (c == NULL) RAISE(112, 17, "empty object used")
+  if (c_Refman->value == NULL) RAISE(112, 28, "outdated weak reference used")
   TEST_ASSERT(112, c->num == 6)
   ++LUMI_file_coverage[1].line_count[113];
   integration_M_TestClass_dynamic_meth_Mock_active = true;
@@ -4753,8 +4770,8 @@ Returncode integration_M_test_func(void) {
   LUMI_err = integration_M_TestClass_dynamic_meth_Mock(c, c_Refman, c_Dynamic);
   CHECK(114)
   ++LUMI_file_coverage[1].line_count[115];
-  if (c == NULL) RAISE(115, 27, "used member of empty object")
-  if (c_Refman->value == NULL) RAISE(115, 38, "used member of outdated weak reference")
+  if (c == NULL) RAISE(115, 17, "empty object used")
+  if (c_Refman->value == NULL) RAISE(115, 28, "outdated weak reference used")
   TEST_ASSERT(115, c->num == 7)
 LUMI_cleanup:
   LUMI_dec_ref(aux_String_3_Refman);
@@ -4804,14 +4821,14 @@ Returncode integration_M_test_native(void) {
   ++LUMI_file_coverage[1].line_count[132];
   ++LUMI_file_coverage[1].line_count[133];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 3;
   aux_String_0_Var.length = 2;
   aux_String_0_Var.values = "bb";
   s = &s_Var;
   s_Var.values = s_Values;
-  s_Refman = LUMI_new_ref(s);
+  s_Refman = LUMI_new_ref((void**)&s, false);
   if (s_Refman == NULL) RAISE(133, 38, "insufficient memory for managed object")
   LUMI_err = String_new(s, s_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(133)
@@ -4833,8 +4850,8 @@ Returncode integration_M_test_native(void) {
   ++LUMI_file_coverage[1].line_count[135];
   TEST_ASSERT(135, i == 3)
   ++LUMI_file_coverage[1].line_count[136];
-  if (s == NULL) RAISE(136, 29, "empty object used as sequence")
-  if (s_Refman->value == NULL) RAISE(136, 40, "outdated weak reference used as sequence")
+  if (s == NULL) RAISE(136, 17, "empty object used")
+  if (s_Refman->value == NULL) RAISE(136, 28, "outdated weak reference used")
   if ((0) < 0 || (0) >= (s)->length) RAISE(136, 25, "slice index out of bounds")
   TEST_ASSERT(136, (((s)->values)[0]) == 'a')
   ++LUMI_file_coverage[1].line_count[137];
@@ -4866,21 +4883,21 @@ Returncode integration_M_test_dynamic_type_parameters(void) {
   Ref_Manager* aux_Ref_Manager = NULL;
   ++LUMI_file_coverage[1].line_count[141];
   dmid = &dmid_Var;
-  dmid_Refman = LUMI_new_ref(dmid);
+  dmid_Refman = LUMI_new_ref((void**)&dmid, false);
   if (dmid_Refman == NULL) RAISE(141, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[142];
   ttop = &ttop_Var;
-  ttop_Refman = LUMI_new_ref(ttop);
+  ttop_Refman = LUMI_new_ref((void**)&ttop, false);
   if (ttop_Refman == NULL) RAISE(142, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_TopType_new(ttop, ttop_Refman, ttop_Dynamic);
   CHECK(142)
   ++LUMI_file_coverage[1].line_count[143];
-  if (ttop == NULL) RAISE(143, 27, "used member of empty object")
-  if (ttop_Refman->value == NULL) RAISE(143, 38, "used member of outdated weak reference")
+  if (ttop == NULL) RAISE(143, 17, "empty object used")
+  if (ttop_Refman->value == NULL) RAISE(143, 28, "outdated weak reference used")
   ttop->_base._base.num_base = 12;
   ++LUMI_file_coverage[1].line_count[144];
-  if (dmid == NULL) RAISE(144, 27, "used member of empty object")
-  if (dmid_Refman->value == NULL) RAISE(144, 38, "used member of outdated weak reference")
+  if (dmid == NULL) RAISE(144, 17, "empty object used")
+  if (dmid_Refman->value == NULL) RAISE(144, 28, "outdated weak reference used")
   aux_Ref_Manager = dmid->item_Refman;
   dmid->item_Refman = ttop_Refman;
   dmid->item_Dynamic = (Generic_Type_Dynamic*)&(ttop_Dynamic->_base);
@@ -4890,8 +4907,8 @@ Returncode integration_M_test_dynamic_type_parameters(void) {
   dmid->item = &(ttop->_base);
   ++LUMI_file_coverage[1].line_count[145];
   ++LUMI_file_coverage[1].line_count[146];
-  if (dmid == NULL) RAISE(146, 27, "used member of empty object")
-  if (dmid_Refman->value == NULL) RAISE(146, 38, "used member of outdated weak reference")
+  if (dmid == NULL) RAISE(146, 17, "empty object used")
+  if (dmid_Refman->value == NULL) RAISE(146, 28, "outdated weak reference used")
   aux_Ref_Manager = tbase_Refman;
   tbase_Refman = dmid->item_Refman;
   tbase_Dynamic = &(((covered_M_MiddleType_Dynamic*)(dmid->item_Dynamic))->_base);
@@ -4900,12 +4917,12 @@ Returncode integration_M_test_dynamic_type_parameters(void) {
   aux_Ref_Manager = NULL;
   tbase = &(((covered_M_MiddleType*)(dmid->item))->_base);
   ++LUMI_file_coverage[1].line_count[147];
-  if (tbase == NULL) RAISE(147, 27, "used member of empty object")
-  if (tbase_Refman->value == NULL) RAISE(147, 38, "used member of outdated weak reference")
+  if (tbase == NULL) RAISE(147, 17, "empty object used")
+  if (tbase_Refman->value == NULL) RAISE(147, 28, "outdated weak reference used")
   TEST_ASSERT(147, tbase->num_base == 12)
   ++LUMI_file_coverage[1].line_count[148];
-  if (ttop == NULL) RAISE(148, 27, "used member of empty object")
-  if (ttop_Refman->value == NULL) RAISE(148, 38, "used member of outdated weak reference")
+  if (ttop == NULL) RAISE(148, 17, "empty object used")
+  if (ttop_Refman->value == NULL) RAISE(148, 28, "outdated weak reference used")
   ttop->_base._base.num_base = 13;
   ++LUMI_file_coverage[1].line_count[149];
   LUMI_err = integration_M_Data_set(dmid, dmid_Refman, &(ttop->_base), ttop_Refman, (void*)&(ttop_Dynamic->_base), NULL, NULL);
@@ -4923,8 +4940,8 @@ Returncode integration_M_test_dynamic_type_parameters(void) {
   LUMI_err = integration_M_Data_get(dmid, dmid_Refman, (void*)&(tbase), &(tbase_Refman), (void*)&(tbase_Dynamic));
   CHECK(151)
   ++LUMI_file_coverage[1].line_count[152];
-  if (tbase == NULL) RAISE(152, 27, "used member of empty object")
-  if (tbase_Refman->value == NULL) RAISE(152, 38, "used member of outdated weak reference")
+  if (tbase == NULL) RAISE(152, 17, "empty object used")
+  if (tbase_Refman->value == NULL) RAISE(152, 28, "outdated weak reference used")
   TEST_ASSERT(152, tbase->num_base == 13)
 LUMI_cleanup:
   LUMI_dec_ref(tbase_Refman);
@@ -4948,7 +4965,7 @@ Returncode delete_Mock(Ref self) {
     ++LUMI_file_coverage[1].line_count[184];
     aux_RefNode_0 = LUMI_alloc(sizeof(integration_M_RefNode));
     if (aux_RefNode_0 == NULL) RAISE(184, 49, "insufficient memory for object dynamic allocation")
-    aux_RefNode_0_Refman = LUMI_new_ref(aux_RefNode_0);
+    aux_RefNode_0_Refman = LUMI_new_ref((void**)&aux_RefNode_0, true);
     if (aux_RefNode_0_Refman == NULL) RAISE(184, 38, "insufficient memory for managed object")
     LUMI_err = integration_M_RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, integration_M_deleted_refmans, integration_M_deleted_refmans_Refman);
     integration_M_deleted_refmans = NULL;
@@ -4988,7 +5005,7 @@ Returncode integration_M_Link_MockDel(Ref self) {
     ++LUMI_file_coverage[1].line_count[188];
     aux_RefNode_0 = LUMI_alloc(sizeof(integration_M_RefNode));
     if (aux_RefNode_0 == NULL) RAISE(188, 49, "insufficient memory for object dynamic allocation")
-    aux_RefNode_0_Refman = LUMI_new_ref(aux_RefNode_0);
+    aux_RefNode_0_Refman = LUMI_new_ref((void**)&aux_RefNode_0, true);
     if (aux_RefNode_0_Refman == NULL) RAISE(188, 38, "insufficient memory for managed object")
     LUMI_err = integration_M_RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, integration_M_deleted_links, integration_M_deleted_links_Refman);
     integration_M_deleted_links = NULL;
@@ -5028,7 +5045,7 @@ Returncode integration_M_BaseLink_MockDel(Ref self) {
     ++LUMI_file_coverage[1].line_count[192];
     aux_RefNode_0 = LUMI_alloc(sizeof(integration_M_RefNode));
     if (aux_RefNode_0 == NULL) RAISE(192, 49, "insufficient memory for object dynamic allocation")
-    aux_RefNode_0_Refman = LUMI_new_ref(aux_RefNode_0);
+    aux_RefNode_0_Refman = LUMI_new_ref((void**)&aux_RefNode_0, true);
     if (aux_RefNode_0_Refman == NULL) RAISE(192, 38, "insufficient memory for managed object")
     LUMI_err = integration_M_RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, integration_M_deleted_base_links, integration_M_deleted_base_links_Refman);
     integration_M_deleted_base_links = NULL;
@@ -5068,7 +5085,7 @@ Returncode integration_M_TopLink_MockDel(Ref self) {
     ++LUMI_file_coverage[1].line_count[196];
     aux_RefNode_0 = LUMI_alloc(sizeof(integration_M_RefNode));
     if (aux_RefNode_0 == NULL) RAISE(196, 49, "insufficient memory for object dynamic allocation")
-    aux_RefNode_0_Refman = LUMI_new_ref(aux_RefNode_0);
+    aux_RefNode_0_Refman = LUMI_new_ref((void**)&aux_RefNode_0, true);
     if (aux_RefNode_0_Refman == NULL) RAISE(196, 38, "insufficient memory for managed object")
     LUMI_err = integration_M_RefNode_new(aux_RefNode_0, aux_RefNode_0_Refman, self, integration_M_deleted_top_links, integration_M_deleted_top_links_Refman);
     integration_M_deleted_top_links = NULL;
@@ -5130,7 +5147,7 @@ Returncode integration_M_test_simple_delete(void) {
   ++LUMI_file_coverage[1].line_count[206];
   l = LUMI_alloc(sizeof(integration_M_Link));
   if (l == NULL) RAISE(206, 49, "insufficient memory for object dynamic allocation")
-  l_Refman = LUMI_new_ref(l);
+  l_Refman = LUMI_new_ref((void**)&l, true);
   if (l_Refman == NULL) RAISE(206, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[207];
   l_user = l;
@@ -5156,12 +5173,12 @@ Returncode integration_M_test_simple_delete(void) {
   ++LUMI_file_coverage[1].line_count[215];
   TEST_ASSERT(215, integration_M_deleted_links != NULL && integration_M_deleted_links_Refman->value != NULL)
   ++LUMI_file_coverage[1].line_count[216];
-  if (integration_M_deleted_links == NULL) RAISE(216, 27, "used member of empty object")
-  if (integration_M_deleted_links_Refman->value == NULL) RAISE(216, 38, "used member of outdated weak reference")
+  if (integration_M_deleted_links == NULL) RAISE(216, 17, "empty object used")
+  if (integration_M_deleted_links_Refman->value == NULL) RAISE(216, 28, "outdated weak reference used")
   TEST_ASSERT(216, (void*)integration_M_deleted_links->ref == l_ref)
   ++LUMI_file_coverage[1].line_count[217];
-  if (integration_M_deleted_links == NULL) RAISE(217, 27, "used member of empty object")
-  if (integration_M_deleted_links_Refman->value == NULL) RAISE(217, 38, "used member of outdated weak reference")
+  if (integration_M_deleted_links == NULL) RAISE(217, 17, "empty object used")
+  if (integration_M_deleted_links_Refman->value == NULL) RAISE(217, 28, "outdated weak reference used")
   TEST_ASSERT(217, ! (integration_M_deleted_links->next != NULL && integration_M_deleted_links->next_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[218];
   aux_Ref_Manager = l_user_Refman;
@@ -5173,12 +5190,12 @@ Returncode integration_M_test_simple_delete(void) {
   ++LUMI_file_coverage[1].line_count[219];
   TEST_ASSERT(219, integration_M_deleted_refmans != NULL && integration_M_deleted_refmans_Refman->value != NULL)
   ++LUMI_file_coverage[1].line_count[220];
-  if (integration_M_deleted_refmans == NULL) RAISE(220, 27, "used member of empty object")
-  if (integration_M_deleted_refmans_Refman->value == NULL) RAISE(220, 38, "used member of outdated weak reference")
+  if (integration_M_deleted_refmans == NULL) RAISE(220, 17, "empty object used")
+  if (integration_M_deleted_refmans_Refman->value == NULL) RAISE(220, 28, "outdated weak reference used")
   TEST_ASSERT(220, (void*)integration_M_deleted_refmans->ref == l_ref)
   ++LUMI_file_coverage[1].line_count[221];
-  if (integration_M_deleted_refmans == NULL) RAISE(221, 27, "used member of empty object")
-  if (integration_M_deleted_refmans_Refman->value == NULL) RAISE(221, 38, "used member of outdated weak reference")
+  if (integration_M_deleted_refmans == NULL) RAISE(221, 17, "empty object used")
+  if (integration_M_deleted_refmans_Refman->value == NULL) RAISE(221, 28, "outdated weak reference used")
   TEST_ASSERT(221, ! (integration_M_deleted_refmans->next != NULL && integration_M_deleted_refmans->next_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[223];
   integration_M_record_delete = false;
@@ -5240,12 +5257,12 @@ Returncode integration_M_f_has_ref_rec(Ref ref, integration_M_RefNode** node, Re
   ++LUMI_file_coverage[1].line_count[232];
   TEST_ASSERT(232, (*node) != NULL && (*node_Refman)->value != NULL)
   ++LUMI_file_coverage[1].line_count[233];
-  if (*node == NULL) RAISE(233, 27, "used member of empty object")
-  if ((*node_Refman)->value == NULL) RAISE(233, 38, "used member of outdated weak reference")
+  if (*node == NULL) RAISE(233, 17, "empty object used")
+  if ((*node_Refman)->value == NULL) RAISE(233, 28, "outdated weak reference used")
   if ((void*)(*node)->ref == ref) {
     ++LUMI_file_coverage[1].line_count[234];
-    if (*node == NULL) RAISE(234, 27, "used member of empty object")
-    if ((*node_Refman)->value == NULL) RAISE(234, 38, "used member of outdated weak reference")
+    if (*node == NULL) RAISE(234, 17, "empty object used")
+    if ((*node_Refman)->value == NULL) RAISE(234, 28, "outdated weak reference used")
     next = (*node)->next;
     next_Refman = (*node)->next_Refman;
     (*node)->next = NULL;
@@ -5264,8 +5281,8 @@ Returncode integration_M_f_has_ref_rec(Ref ref, integration_M_RefNode** node, Re
   }
   else {
     ++LUMI_file_coverage[1].line_count[237];
-    if (*node == NULL) RAISE(237, 27, "used member of empty object")
-    if ((*node_Refman)->value == NULL) RAISE(237, 38, "used member of outdated weak reference")
+    if (*node == NULL) RAISE(237, 17, "empty object used")
+    if ((*node_Refman)->value == NULL) RAISE(237, 28, "outdated weak reference used")
     LUMI_err = integration_M_f_has_ref_rec(ref, &((*node)->next), &((*node)->next_Refman));
     CHECK(237)
   }
@@ -5347,62 +5364,62 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[246];
   b1 = LUMI_alloc(sizeof(integration_M_BaseLink));
   if (b1 == NULL) RAISE(246, 49, "insufficient memory for object dynamic allocation")
-  b1_Refman = LUMI_new_ref(b1);
+  b1_Refman = LUMI_new_ref((void**)&b1, true);
   if (b1_Refman == NULL) RAISE(246, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[247];
   b1_ref = b1;
   ++LUMI_file_coverage[1].line_count[248];
   b2 = LUMI_alloc(sizeof(integration_M_BaseLink));
   if (b2 == NULL) RAISE(248, 49, "insufficient memory for object dynamic allocation")
-  b2_Refman = LUMI_new_ref(b2);
+  b2_Refman = LUMI_new_ref((void**)&b2, true);
   if (b2_Refman == NULL) RAISE(248, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[249];
   b2_ref = b2;
   ++LUMI_file_coverage[1].line_count[250];
   t1 = LUMI_alloc(sizeof(integration_M_TopLink));
   if (t1 == NULL) RAISE(250, 49, "insufficient memory for object dynamic allocation")
-  t1_Refman = LUMI_new_ref(t1);
+  t1_Refman = LUMI_new_ref((void**)&t1, true);
   if (t1_Refman == NULL) RAISE(250, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[251];
   t1_ref = t1;
   ++LUMI_file_coverage[1].line_count[252];
   t2 = LUMI_alloc(sizeof(integration_M_TopLink));
   if (t2 == NULL) RAISE(252, 49, "insufficient memory for object dynamic allocation")
-  t2_Refman = LUMI_new_ref(t2);
+  t2_Refman = LUMI_new_ref((void**)&t2, true);
   if (t2_Refman == NULL) RAISE(252, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[253];
   t2_ref = t2;
   ++LUMI_file_coverage[1].line_count[254];
   t3 = LUMI_alloc(sizeof(integration_M_TopLink));
   if (t3 == NULL) RAISE(254, 49, "insufficient memory for object dynamic allocation")
-  t3_Refman = LUMI_new_ref(t3);
+  t3_Refman = LUMI_new_ref((void**)&t3, true);
   if (t3_Refman == NULL) RAISE(254, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[255];
   t3_ref = t3;
   ++LUMI_file_coverage[1].line_count[256];
   l1 = LUMI_alloc(sizeof(integration_M_Link));
   if (l1 == NULL) RAISE(256, 49, "insufficient memory for object dynamic allocation")
-  l1_Refman = LUMI_new_ref(l1);
+  l1_Refman = LUMI_new_ref((void**)&l1, true);
   if (l1_Refman == NULL) RAISE(256, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[257];
   l1_ref = l1;
   ++LUMI_file_coverage[1].line_count[258];
   l2 = LUMI_alloc(sizeof(integration_M_Link));
   if (l2 == NULL) RAISE(258, 49, "insufficient memory for object dynamic allocation")
-  l2_Refman = LUMI_new_ref(l2);
+  l2_Refman = LUMI_new_ref((void**)&l2, true);
   if (l2_Refman == NULL) RAISE(258, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[259];
   l2_ref = l2;
   ++LUMI_file_coverage[1].line_count[260];
   l3 = LUMI_alloc(sizeof(integration_M_Link));
   if (l3 == NULL) RAISE(260, 49, "insufficient memory for object dynamic allocation")
-  l3_Refman = LUMI_new_ref(l3);
+  l3_Refman = LUMI_new_ref((void**)&l3, true);
   if (l3_Refman == NULL) RAISE(260, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[261];
   l3_ref = l3;
   ++LUMI_file_coverage[1].line_count[263];
-  if (b1 == NULL) RAISE(263, 27, "used member of empty object")
-  if (b1_Refman->value == NULL) RAISE(263, 38, "used member of outdated weak reference")
+  if (b1 == NULL) RAISE(263, 17, "empty object used")
+  if (b1_Refman->value == NULL) RAISE(263, 28, "outdated weak reference used")
   aux_Ref_Manager = b1->link_Refman;
   b1->link_Refman = l1_Refman;
   LUMI_inc_ref(b1->link_Refman);
@@ -5410,8 +5427,8 @@ Returncode integration_M_test_complex_delete(void) {
   aux_Ref_Manager = NULL;
   b1->link = l1;
   ++LUMI_file_coverage[1].line_count[264];
-  if (b2 == NULL) RAISE(264, 27, "used member of empty object")
-  if (b2_Refman->value == NULL) RAISE(264, 38, "used member of outdated weak reference")
+  if (b2 == NULL) RAISE(264, 17, "empty object used")
+  if (b2_Refman->value == NULL) RAISE(264, 28, "outdated weak reference used")
   aux_Ref_Manager = b2->link_Refman;
   b2->link_Refman = l2_Refman;
   LUMI_inc_ref(b2->link_Refman);
@@ -5419,8 +5436,8 @@ Returncode integration_M_test_complex_delete(void) {
   aux_Ref_Manager = NULL;
   b2->link = l2;
   ++LUMI_file_coverage[1].line_count[265];
-  if (t1 == NULL) RAISE(265, 27, "used member of empty object")
-  if (t1_Refman->value == NULL) RAISE(265, 38, "used member of outdated weak reference")
+  if (t1 == NULL) RAISE(265, 17, "empty object used")
+  if (t1_Refman->value == NULL) RAISE(265, 28, "outdated weak reference used")
   aux_Ref_Manager = t1->_base.link_Refman;
   t1->_base.link_Refman = l1_Refman;
   LUMI_inc_ref(t1->_base.link_Refman);
@@ -5428,8 +5445,8 @@ Returncode integration_M_test_complex_delete(void) {
   aux_Ref_Manager = NULL;
   t1->_base.link = l1;
   ++LUMI_file_coverage[1].line_count[266];
-  if (t2 == NULL) RAISE(266, 27, "used member of empty object")
-  if (t2_Refman->value == NULL) RAISE(266, 38, "used member of outdated weak reference")
+  if (t2 == NULL) RAISE(266, 17, "empty object used")
+  if (t2_Refman->value == NULL) RAISE(266, 28, "outdated weak reference used")
   aux_Ref_Manager = t2->_base.link_Refman;
   t2->_base.link_Refman = l2_Refman;
   LUMI_inc_ref(t2->_base.link_Refman);
@@ -5437,8 +5454,8 @@ Returncode integration_M_test_complex_delete(void) {
   aux_Ref_Manager = NULL;
   t2->_base.link = l2;
   ++LUMI_file_coverage[1].line_count[267];
-  if (t3 == NULL) RAISE(267, 27, "used member of empty object")
-  if (t3_Refman->value == NULL) RAISE(267, 38, "used member of outdated weak reference")
+  if (t3 == NULL) RAISE(267, 17, "empty object used")
+  if (t3_Refman->value == NULL) RAISE(267, 28, "outdated weak reference used")
   aux_Ref_Manager = t3->_base.link_Refman;
   t3->_base.link_Refman = l3_Refman;
   LUMI_inc_ref(t3->_base.link_Refman);
@@ -5446,8 +5463,8 @@ Returncode integration_M_test_complex_delete(void) {
   aux_Ref_Manager = NULL;
   t3->_base.link = l3;
   ++LUMI_file_coverage[1].line_count[269];
-  if (l2 == NULL) RAISE(269, 27, "used member of empty object")
-  if (l2_Refman->value == NULL) RAISE(269, 38, "used member of outdated weak reference")
+  if (l2 == NULL) RAISE(269, 17, "empty object used")
+  if (l2_Refman->value == NULL) RAISE(269, 28, "outdated weak reference used")
   aux_Link_0 = l3;
   aux_Link_0_Refman = l3_Refman;
   l3 = NULL;
@@ -5461,8 +5478,8 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[270];
   TEST_ASSERT(270, ! (l3 != NULL && l3_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[271];
-  if (l1 == NULL) RAISE(271, 27, "used member of empty object")
-  if (l1_Refman->value == NULL) RAISE(271, 38, "used member of outdated weak reference")
+  if (l1 == NULL) RAISE(271, 17, "empty object used")
+  if (l1_Refman->value == NULL) RAISE(271, 28, "outdated weak reference used")
   aux_Link_1 = l2;
   aux_Link_1_Refman = l2_Refman;
   l2 = NULL;
@@ -5476,8 +5493,8 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[272];
   TEST_ASSERT(272, ! (l2 != NULL && l2_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[273];
-  if (t3 == NULL) RAISE(273, 27, "used member of empty object")
-  if (t3_Refman->value == NULL) RAISE(273, 38, "used member of outdated weak reference")
+  if (t3 == NULL) RAISE(273, 17, "empty object used")
+  if (t3_Refman->value == NULL) RAISE(273, 28, "outdated weak reference used")
   aux_BaseLink_0 = b2;
   aux_BaseLink_0_Refman = b2_Refman;
   aux_BaseLink_0_Dynamic = b2_Dynamic;
@@ -5495,8 +5512,8 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[274];
   TEST_ASSERT(274, ! (b2 != NULL && b2_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[275];
-  if (t2 == NULL) RAISE(275, 27, "used member of empty object")
-  if (t2_Refman->value == NULL) RAISE(275, 38, "used member of outdated weak reference")
+  if (t2 == NULL) RAISE(275, 17, "empty object used")
+  if (t2_Refman->value == NULL) RAISE(275, 28, "outdated weak reference used")
   aux_BaseLink_1 = &(t3->_base);
   aux_BaseLink_1_Refman = t3_Refman;
   aux_BaseLink_1_Dynamic = &(t3_Dynamic->_base);
@@ -5514,8 +5531,8 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[276];
   TEST_ASSERT(276, ! (t3 != NULL && t3_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[277];
-  if (t1 == NULL) RAISE(277, 27, "used member of empty object")
-  if (t1_Refman->value == NULL) RAISE(277, 38, "used member of outdated weak reference")
+  if (t1 == NULL) RAISE(277, 17, "empty object used")
+  if (t1_Refman->value == NULL) RAISE(277, 28, "outdated weak reference used")
   aux_BaseLink_2 = &(t2->_base);
   aux_BaseLink_2_Refman = t2_Refman;
   aux_BaseLink_2_Dynamic = &(t2_Dynamic->_base);
@@ -5533,8 +5550,8 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[278];
   TEST_ASSERT(278, ! (t2 != NULL && t2_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[279];
-  if (t1 == NULL) RAISE(279, 27, "used member of empty object")
-  if (t1_Refman->value == NULL) RAISE(279, 38, "used member of outdated weak reference")
+  if (t1 == NULL) RAISE(279, 17, "empty object used")
+  if (t1_Refman->value == NULL) RAISE(279, 28, "outdated weak reference used")
   aux_Link_2 = l1;
   aux_Link_2_Refman = l1_Refman;
   l1 = NULL;
@@ -5549,8 +5566,8 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[280];
   TEST_ASSERT(280, ! (l1 != NULL && l1_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[281];
-  if (b1 == NULL) RAISE(281, 27, "used member of empty object")
-  if (b1_Refman->value == NULL) RAISE(281, 38, "used member of outdated weak reference")
+  if (b1 == NULL) RAISE(281, 17, "empty object used")
+  if (b1_Refman->value == NULL) RAISE(281, 28, "outdated weak reference used")
   aux_BaseLink_3 = &(t1->_base);
   aux_BaseLink_3_Refman = t1_Refman;
   aux_BaseLink_3_Dynamic = &(t1_Dynamic->_base);
@@ -5679,7 +5696,7 @@ Returncode integration_M_f_raise_message(void) {
   Ref_Manager* aux_String_0_Refman = NULL;
   ++LUMI_file_coverage[1].line_count[311];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(311, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 15;
   aux_String_0_Var.length = 14;
@@ -5715,7 +5732,7 @@ Returncode integration_M_f_ignore_and_raise(void) {
   LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[316];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(316, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 17;
   aux_String_0_Var.length = 16;
@@ -5764,7 +5781,7 @@ Returncode integration_M_f_good_assert_error(void) {
   LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[323];
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(323, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 18;
   aux_String_0_Var.length = 17;
@@ -5872,7 +5889,7 @@ Returncode integration_M_f_alloc(void) {
   ++LUMI_file_coverage[1].line_count[341];
   string = LUMI_new_string(16);
   if (string == NULL) RAISE(341, 49, "insufficient memory for object dynamic allocation")
-  string_Refman = LUMI_new_ref(string);
+  string_Refman = LUMI_new_ref((void**)&string, true);
   if (string_Refman == NULL) RAISE(341, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[342];
   TEST_ASSERT(342, string != NULL && string_Refman->value != NULL)
@@ -6098,7 +6115,7 @@ Returncode integration_M_test_assert_error_message(void) {
   LUMI_err = OK;
   ++LUMI_file_coverage[1].line_count[353];
   base_var = &base_var_Var;
-  base_var_Refman = LUMI_new_ref(base_var);
+  base_var_Refman = LUMI_new_ref((void**)&base_var, false);
   if (base_var_Refman == NULL) RAISE(353, 38, "insufficient memory for managed object")
   LUMI_err = integration_M_BaseType_new(base_var, base_var_Refman, base_var_Dynamic);
   CHECK(353)
@@ -6140,7 +6157,7 @@ Returncode integration_M_test_assert_error_message(void) {
   ++LUMI_file_coverage[1].line_count[357];
   arr = LUMI_new_array(2, sizeof(Int));
   if (arr == NULL) RAISE(357, 49, "insufficient memory for object dynamic allocation")
-  arr_Refman = LUMI_new_ref(arr);
+  arr_Refman = LUMI_new_ref((void**)&arr, true);
   if (arr_Refman == NULL) RAISE(357, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[1].line_count[358];
   {char* LUMI_expected_error_prev;
@@ -6153,8 +6170,8 @@ Returncode integration_M_test_assert_error_message(void) {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR break
-    if (arr == NULL) RAISE(358, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(358, 40, "outdated weak reference used as sequence")
+    if (arr == NULL) RAISE(358, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(358, 28, "outdated weak reference used")
     if ((6) < 0 || (6) >= (arr)->length) RAISE(358, 25, "slice index out of bounds")
     
 #undef RETURN_ERROR
@@ -6189,14 +6206,14 @@ Returncode integration_M_test_assert_error_message(void) {
   int LUMI_expected_error_trace_ignore_count_prev;
   LUMI_expected_error_prev = LUMI_expected_error;
   LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
-  LUMI_expected_error = "used member of empty object";
+  LUMI_expected_error = "empty object used";
   LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
   do {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR break
-    if (arr == NULL) RAISE(361, 27, "used member of empty object")
-    if (arr_Refman->value == NULL) RAISE(361, 38, "used member of outdated weak reference")
+    if (arr == NULL) RAISE(361, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(361, 28, "outdated weak reference used")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR goto LUMI_cleanup
@@ -6218,14 +6235,14 @@ Returncode integration_M_test_assert_error_message(void) {
   int LUMI_expected_error_trace_ignore_count_prev;
   LUMI_expected_error_prev = LUMI_expected_error;
   LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
-  LUMI_expected_error = "used member of outdated weak reference";
+  LUMI_expected_error = "outdated weak reference used";
   LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
   do {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR break
-    if (arr2 == NULL) RAISE(362, 27, "used member of empty object")
-    if (arr2_Refman->value == NULL) RAISE(362, 38, "used member of outdated weak reference")
+    if (arr2 == NULL) RAISE(362, 17, "empty object used")
+    if (arr2_Refman->value == NULL) RAISE(362, 28, "outdated weak reference used")
     
 #undef RETURN_ERROR
 #define RETURN_ERROR goto LUMI_cleanup
@@ -6247,14 +6264,14 @@ Returncode integration_M_test_assert_error_message(void) {
   int LUMI_expected_error_trace_ignore_count_prev;
   LUMI_expected_error_prev = LUMI_expected_error;
   LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
-  LUMI_expected_error = "empty object used as sequence";
+  LUMI_expected_error = "empty object used";
   LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
   do {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR break
-    if (arr == NULL) RAISE(363, 29, "empty object used as sequence")
-    if (arr_Refman->value == NULL) RAISE(363, 40, "outdated weak reference used as sequence")
+    if (arr == NULL) RAISE(363, 17, "empty object used")
+    if (arr_Refman->value == NULL) RAISE(363, 28, "outdated weak reference used")
     if ((0) < 0 || (0) >= (arr)->length) RAISE(363, 25, "slice index out of bounds")
     
 #undef RETURN_ERROR
@@ -6277,14 +6294,14 @@ Returncode integration_M_test_assert_error_message(void) {
   int LUMI_expected_error_trace_ignore_count_prev;
   LUMI_expected_error_prev = LUMI_expected_error;
   LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
-  LUMI_expected_error = "outdated weak reference used as sequence";
+  LUMI_expected_error = "outdated weak reference used";
   LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
   do {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR break
-    if (arr2 == NULL) RAISE(364, 29, "empty object used as sequence")
-    if (arr2_Refman->value == NULL) RAISE(364, 40, "outdated weak reference used as sequence")
+    if (arr2 == NULL) RAISE(364, 17, "empty object used")
+    if (arr2_Refman->value == NULL) RAISE(364, 28, "outdated weak reference used")
     if ((0) < 0 || (0) >= (arr2)->length) RAISE(364, 25, "slice index out of bounds")
     
 #undef RETURN_ERROR
@@ -6408,14 +6425,797 @@ LUMI_cleanup:
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FILE_NAME "tests/integration-test1.4.lm"
+#define LUMI_FUNC_NAME "test-builtin-errors"
+Returncode integration_M_test_builtin_errors(void) {
+  Returncode LUMI_err = OK;
+  String* outdated_owner = NULL;
+  Ref_Manager* outdated_owner_Refman = NULL;
+  String* outdated = NULL;
+  Ref_Manager* outdated_Refman = NULL;
+  char too_long_Values[3] = {0};
+  String too_long_Var = {3, 0, NULL};
+  String* too_long = NULL;
+  Ref_Manager* too_long_Refman = NULL;
+  File* file = NULL;
+  Ref_Manager* file_Refman = NULL;
+  char filename_Values[4] = {0};
+  String filename_Var = {4, 0, NULL};
+  String* filename = NULL;
+  Ref_Manager* filename_Refman = NULL;
+  Char ch = 0;
+  char short_str_Values[2] = {0};
+  String short_str_Var = {2, 0, NULL};
+  String* short_str = NULL;
+  Ref_Manager* short_str_Refman = NULL;
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  Bool aux_Bool_0 = 0;
+  String aux_String_2_Var = {0};
+  String* aux_String_2 = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
+  String aux_String_3_Var = {0};
+  String* aux_String_3 = NULL;
+  Ref_Manager* aux_String_3_Refman = NULL;
+  String aux_String_4_Var = {0};
+  String* aux_String_4 = NULL;
+  Ref_Manager* aux_String_4_Refman = NULL;
+  Char aux_Char_0 = 0;
+  String aux_String_5_Var = {0};
+  String* aux_String_5 = NULL;
+  Ref_Manager* aux_String_5_Refman = NULL;
+  String aux_String_6_Var = {0};
+  String* aux_String_6 = NULL;
+  Ref_Manager* aux_String_6_Refman = NULL;
+  String aux_String_7_Var = {0};
+  String* aux_String_7 = NULL;
+  Ref_Manager* aux_String_7_Refman = NULL;
+  Int aux_Int_0 = 0;
+  ++LUMI_file_coverage[1].line_count[375];
+  outdated_owner = LUMI_new_string(4);
+  if (outdated_owner == NULL) RAISE(375, 49, "insufficient memory for object dynamic allocation")
+  outdated_owner_Refman = LUMI_new_ref((void**)&outdated_owner, true);
+  if (outdated_owner_Refman == NULL) RAISE(375, 38, "insufficient memory for managed object")
+  ++LUMI_file_coverage[1].line_count[376];
+  outdated = outdated_owner;
+  outdated_Refman = outdated_owner_Refman;
+  LUMI_inc_ref(outdated_Refman);
+  ++LUMI_file_coverage[1].line_count[377];
+  aux_String_0 = NULL;
+  aux_String_0_Refman = NULL;
+  String_Del(outdated_owner);
+  LUMI_owner_dec_ref(outdated_owner_Refman);
+  outdated_owner_Refman = aux_String_0_Refman;
+  outdated_owner = aux_String_0;
+  aux_String_0 = NULL;
+  aux_String_0_Refman = NULL;
+  ++LUMI_file_coverage[1].line_count[378];
+  aux_String_1 = &aux_String_1_Var;
+  aux_String_1_Refman = LUMI_new_ref((void**)&aux_String_1, false);
+  if (aux_String_1_Refman == NULL) RAISE(378, 38, "insufficient memory for managed object")
+  aux_String_1_Var.max_length = 4;
+  aux_String_1_Var.length = 3;
+  aux_String_1_Var.values = "abc";
+  too_long = &too_long_Var;
+  too_long_Var.values = too_long_Values;
+  too_long_Refman = LUMI_new_ref((void**)&too_long, false);
+  if (too_long_Refman == NULL) RAISE(378, 38, "insufficient memory for managed object")
+  LUMI_err = String_new(too_long, too_long_Refman, aux_String_1, aux_String_1_Refman);
+  CHECK(378)
+  ++LUMI_file_coverage[1].line_count[380];
+  ++LUMI_file_coverage[1].line_count[381];
+  filename = &filename_Var;
+  filename_Var.values = filename_Values;
+  filename_Refman = LUMI_new_ref((void**)&filename, false);
+  if (filename_Refman == NULL) RAISE(381, 38, "insufficient memory for managed object")
+  ++LUMI_file_coverage[1].line_count[382];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "empty object used";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_read(NULL, NULL, &(file), &(file_Refman));
+    CHECK(382)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(382, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(382)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[383];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "outdated weak reference used";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_write(outdated, outdated_Refman, &(file), &(file_Refman));
+    CHECK(383)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(383, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(383)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[385];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_read(too_long, too_long_Refman, &(file), &(file_Refman));
+    CHECK(385)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(385, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(385)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[386];
+  lumi_debug_value = 1;
+  ++LUMI_file_coverage[1].line_count[387];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "open file failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_write(filename, filename_Refman, &(file), &(file_Refman));
+    CHECK(387)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(387, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(387)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[388];
+  lumi_debug_value = 2;
+  ++LUMI_file_coverage[1].line_count[389];
+  integration_M_new_fail_countdown = 1;
+  ++LUMI_file_coverage[1].line_count[390];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "insufficient memory for object dynamic allocation";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_read(filename, filename_Refman, &(file), &(file_Refman));
+    CHECK(390)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(390, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(390)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[392];
+  integration_M_new_fail_countdown = 2;
+  ++LUMI_file_coverage[1].line_count[393];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "insufficient memory for managed object";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_open_write(filename, filename_Refman, &(file), &(file_Refman));
+    CHECK(393)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(393, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(393)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[395];
+  lumi_debug_value = 1;
+  ++LUMI_file_coverage[1].line_count[396];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "close file failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = file_close(file, file_Refman);
+    file = NULL;
+    file_Refman = NULL;
+    CHECK(396)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(396, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(396)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[397];
+  ++LUMI_file_coverage[1].line_count[398];
+  lumi_debug_value = 2;
+  ++LUMI_file_coverage[1].line_count[399];
+  LUMI_err = file_open_read(filename, filename_Refman, &(file), &(file_Refman));
+  CHECK(399)
+  ++LUMI_file_coverage[1].line_count[400];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file not opened";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = File_getc(file, file_Refman, &(ch), &(aux_Bool_0));
+    CHECK(400)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(400, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(400)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[401];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file not opened";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = File_putc(file, file_Refman, 'a');
+    CHECK(401)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(401, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(401)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[402];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file not opened";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_2 = &aux_String_2_Var;
+    aux_String_2_Refman = LUMI_new_ref((void**)&aux_String_2, false);
+    if (aux_String_2_Refman == NULL) RAISE(402, 38, "insufficient memory for managed object")
+    aux_String_2_Var.max_length = 3;
+    aux_String_2_Var.length = 2;
+    aux_String_2_Var.values = "aa";
+    LUMI_err = File_write(file, file_Refman, aux_String_2, aux_String_2_Refman);
+    CHECK(402)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(402, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(402)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[403];
+  lumi_debug_value = 1;
+  ++LUMI_file_coverage[1].line_count[404];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file write failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = File_putc(file, file_Refman, 'a');
+    CHECK(404)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(404, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(404)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[405];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "file write failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_3 = &aux_String_3_Var;
+    aux_String_3_Refman = LUMI_new_ref((void**)&aux_String_3, false);
+    if (aux_String_3_Refman == NULL) RAISE(405, 38, "insufficient memory for managed object")
+    aux_String_3_Var.max_length = 3;
+    aux_String_3_Var.length = 2;
+    aux_String_3_Var.values = "aa";
+    LUMI_err = File_write(file, file_Refman, aux_String_3, aux_String_3_Refman);
+    CHECK(405)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(405, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(405)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[407];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "slice index out of bounds";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_4 = &aux_String_4_Var;
+    aux_String_4_Refman = LUMI_new_ref((void**)&aux_String_4, false);
+    if (aux_String_4_Refman == NULL) RAISE(407, 38, "insufficient memory for managed object")
+    aux_String_4_Var.max_length = 3;
+    aux_String_4_Var.length = 2;
+    aux_String_4_Var.values = "aa";
+    LUMI_err = String_get(aux_String_4, aux_String_4_Refman, 2, &(aux_Char_0));
+    CHECK(407)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(407, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(407)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[408];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = String_append(too_long, too_long_Refman, 'a');
+    CHECK(408)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(408, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(408)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[409];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = String_append(too_long, too_long_Refman, 'a');
+    CHECK(409)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(409, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(409)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[410];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_5 = &aux_String_5_Var;
+    aux_String_5_Refman = LUMI_new_ref((void**)&aux_String_5, false);
+    if (aux_String_5_Refman == NULL) RAISE(410, 38, "insufficient memory for managed object")
+    aux_String_5_Var.max_length = 2;
+    aux_String_5_Var.length = 1;
+    aux_String_5_Var.values = "a";
+    LUMI_err = String_concat(too_long, too_long_Refman, aux_String_5, aux_String_5_Refman);
+    CHECK(410)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(410, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(410)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[411];
+  short_str = &short_str_Var;
+  short_str_Var.values = short_str_Values;
+  short_str_Refman = LUMI_new_ref((void**)&short_str, false);
+  if (short_str_Refman == NULL) RAISE(411, 38, "insufficient memory for managed object")
+  ++LUMI_file_coverage[1].line_count[412];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = Int_str(123, short_str, short_str_Refman);
+    CHECK(412)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(412, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(412)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[413];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_6 = &aux_String_6_Var;
+    aux_String_6_Refman = LUMI_new_ref((void**)&aux_String_6, false);
+    if (aux_String_6_Refman == NULL) RAISE(413, 38, "insufficient memory for managed object")
+    aux_String_6_Var.max_length = 6;
+    aux_String_6_Var.length = 5;
+    aux_String_6_Var.values = "aaaaa";
+    LUMI_err = String_new(short_str, short_str_Refman, aux_String_6, aux_String_6_Refman);
+    CHECK(413)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(413, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(413)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[415];
+  lumi_debug_value = 2;
+  ++LUMI_file_coverage[1].line_count[416];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "string too long";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = Sys_getline(sys, sys_Refman, short_str, short_str_Refman);
+    CHECK(416)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(416, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(416)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[417];
+  lumi_debug_value = 1;
+  ++LUMI_file_coverage[1].line_count[418];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "exit failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    LUMI_err = Sys_exit(sys, sys_Refman, 0);
+    CHECK(418)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(418, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(418)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+  ++LUMI_file_coverage[1].line_count[419];
+  {char* LUMI_expected_error_prev;
+  int LUMI_expected_error_trace_ignore_count_prev;
+  LUMI_expected_error_prev = LUMI_expected_error;
+  LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
+  LUMI_expected_error = "command execution failed";
+  LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
+  do {
+    ++LUMI_trace_ignore_count;
+#undef RETURN_ERROR
+#define RETURN_ERROR break
+    aux_String_7 = &aux_String_7_Var;
+    aux_String_7_Refman = LUMI_new_ref((void**)&aux_String_7, false);
+    if (aux_String_7_Refman == NULL) RAISE(419, 38, "insufficient memory for managed object")
+    aux_String_7_Var.max_length = 4;
+    aux_String_7_Var.length = 3;
+    aux_String_7_Var.values = "aaa";
+    LUMI_err = Sys_system(sys, sys_Refman, aux_String_7, aux_String_7_Refman, &(aux_Int_0));
+    CHECK(419)
+    
+#undef RETURN_ERROR
+#define RETURN_ERROR goto LUMI_cleanup
+    --LUMI_trace_ignore_count;
+    LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL(419, 16, "error not raised")
+  } while (false);
+  --LUMI_trace_ignore_count;
+  LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
+  if (LUMI_expected_error == NULL) {
+    LUMI_expected_error = LUMI_expected_error_prev;
+    TEST_FAIL_NULL(419)
+  }
+  LUMI_expected_error = LUMI_expected_error_prev;}
+  LUMI_err = OK;
+LUMI_cleanup:
+  LUMI_dec_ref(aux_String_7_Refman);
+  LUMI_dec_ref(aux_String_6_Refman);
+  LUMI_dec_ref(aux_String_5_Refman);
+  LUMI_dec_ref(aux_String_4_Refman);
+  LUMI_dec_ref(aux_String_3_Refman);
+  LUMI_dec_ref(aux_String_2_Refman);
+  LUMI_dec_ref(aux_String_1_Refman);
+  String_Del(aux_String_0);
+  LUMI_owner_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(short_str_Refman);
+  LUMI_dec_ref(filename_Refman);
+  File_Del(file);
+  LUMI_owner_dec_ref(file_Refman);
+  LUMI_dec_ref(too_long_Refman);
+  LUMI_dec_ref(outdated_Refman);
+  String_Del(outdated_owner);
+  LUMI_owner_dec_ref(outdated_owner_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "tests/integration-test1.4.lm"
 #define LUMI_FUNC_NAME "Sys.println Mock"
 Returncode Sys_println_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
   if (!Sys_println_Mock_active) return Sys_println(self, self_Refman, text, text_Refman);
-  ++LUMI_file_coverage[1].line_count[373];
-  TEST_ASSERT(373, text != NULL && text_Refman->value != NULL)
+  ++LUMI_file_coverage[1].line_count[422];
+  TEST_ASSERT(422, text != NULL && text_Refman->value != NULL)
 LUMI_cleanup:
   LUMI_dec_ref(text_Refman);
   LUMI_dec_ref(self_Refman);
@@ -6432,28 +7232,28 @@ Returncode integration_M_test_cover_all(void) {
   covered_M_MiddleType* mid = NULL;
   Ref_Manager* mid_Refman = NULL;
   covered_M_MiddleType_Dynamic* mid_Dynamic = &covered_M_MiddleType_dynamic;
-  ++LUMI_file_coverage[1].line_count[376];
+  ++LUMI_file_coverage[1].line_count[425];
   mid = &mid_Var;
-  mid_Refman = LUMI_new_ref(mid);
-  if (mid_Refman == NULL) RAISE(376, 38, "insufficient memory for managed object")
+  mid_Refman = LUMI_new_ref((void**)&mid, false);
+  if (mid_Refman == NULL) RAISE(425, 38, "insufficient memory for managed object")
   LUMI_err = covered_M_MiddleType_new(mid, mid_Refman, mid_Dynamic);
-  CHECK(376)
-  ++LUMI_file_coverage[1].line_count[377];
-  if (mid_Dynamic == NULL) RAISE(377, 28, "dynamic call of empty object")
+  CHECK(425)
+  ++LUMI_file_coverage[1].line_count[426];
+  if (mid_Dynamic == NULL) RAISE(426, 28, "dynamic call of empty object")
   LUMI_err = mid_Dynamic->_base.meth1(&(mid->_base), mid_Refman, &(mid_Dynamic->_base), 0, NULL, NULL);
-  CHECK(377)
-  ++LUMI_file_coverage[1].line_count[378];
-  if (mid_Dynamic == NULL) RAISE(378, 28, "dynamic call of empty object")
+  CHECK(426)
+  ++LUMI_file_coverage[1].line_count[427];
+  if (mid_Dynamic == NULL) RAISE(427, 28, "dynamic call of empty object")
   LUMI_err = mid_Dynamic->_base.meth2(&(mid->_base), mid_Refman, &(mid_Dynamic->_base));
-  CHECK(378)
-  ++LUMI_file_coverage[1].line_count[379];
-  if (mid_Dynamic == NULL) RAISE(379, 28, "dynamic call of empty object")
+  CHECK(427)
+  ++LUMI_file_coverage[1].line_count[428];
+  if (mid_Dynamic == NULL) RAISE(428, 28, "dynamic call of empty object")
   LUMI_err = mid_Dynamic->meth4(mid, mid_Refman, mid_Dynamic);
-  CHECK(379)
-  ++LUMI_file_coverage[1].line_count[380];
-  if (mid_Dynamic == NULL) RAISE(380, 28, "dynamic call of empty object")
+  CHECK(428)
+  ++LUMI_file_coverage[1].line_count[429];
+  if (mid_Dynamic == NULL) RAISE(429, 28, "dynamic call of empty object")
   LUMI_err = mid_Dynamic->meth5(mid, mid_Refman, mid_Dynamic, 0, NULL, NULL);
-  CHECK(380)
+  CHECK(429)
 LUMI_cleanup:
   LUMI_dec_ref(mid_Refman);
   return LUMI_err;
@@ -6465,22 +7265,22 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "test-constants"
 Returncode integration_M_test_constants(void) {
   Returncode LUMI_err = OK;
-  ++LUMI_file_coverage[1].line_count[384];
-  TEST_ASSERT(384, integration_M_SIZE == 12)
-  ++LUMI_file_coverage[1].line_count[385];
-  TEST_ASSERT(385, integration_M_LENGTH == 60)
-  ++LUMI_file_coverage[1].line_count[386];
-  TEST_ASSERT(386, integration_M_TestEnum_FIRST_VALUE == 0)
-  ++LUMI_file_coverage[1].line_count[387];
-  TEST_ASSERT(387, integration_M_TestEnum_ANOTHER_VALUE == 1)
-  ++LUMI_file_coverage[1].line_count[388];
-  TEST_ASSERT(388, integration_M_TestEnum_VALUE2 == 2)
-  ++LUMI_file_coverage[1].line_count[389];
-  TEST_ASSERT(389, integration_M_TestEnum_length == 3)
-  ++LUMI_file_coverage[1].line_count[390];
-  if (integration_M_int_arr == NULL) RAISE(390, 27, "used member of empty object")
-  if (integration_M_int_arr_Refman->value == NULL) RAISE(390, 38, "used member of outdated weak reference")
-  TEST_ASSERT(390, integration_M_int_arr->length == 63)
+  ++LUMI_file_coverage[1].line_count[433];
+  TEST_ASSERT(433, integration_M_SIZE == 12)
+  ++LUMI_file_coverage[1].line_count[434];
+  TEST_ASSERT(434, integration_M_LENGTH == 60)
+  ++LUMI_file_coverage[1].line_count[435];
+  TEST_ASSERT(435, integration_M_TestEnum_FIRST_VALUE == 0)
+  ++LUMI_file_coverage[1].line_count[436];
+  TEST_ASSERT(436, integration_M_TestEnum_ANOTHER_VALUE == 1)
+  ++LUMI_file_coverage[1].line_count[437];
+  TEST_ASSERT(437, integration_M_TestEnum_VALUE2 == 2)
+  ++LUMI_file_coverage[1].line_count[438];
+  TEST_ASSERT(438, integration_M_TestEnum_length == 3)
+  ++LUMI_file_coverage[1].line_count[439];
+  if (integration_M_int_arr == NULL) RAISE(439, 17, "empty object used")
+  if (integration_M_int_arr_Refman->value == NULL) RAISE(439, 28, "outdated weak reference used")
+  TEST_ASSERT(439, integration_M_int_arr->length == 63)
 LUMI_cleanup:
   return LUMI_err;
 }
@@ -6501,7 +7301,7 @@ USER_MAIN_HEADER {
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "tests/integration-test0.4.lm"
   aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref(aux_String_0);
+  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
   if (aux_String_0_Refman == NULL) RAISE(20, 38, "insufficient memory for managed object")
   aux_String_0_Var.max_length = 18;
   aux_String_0_Var.length = 17;
@@ -6513,7 +7313,7 @@ USER_MAIN_HEADER {
 #define LUMI_FILE_NAME "tests/integration-test0.4.lm"
   integration_M_int_arr = &integration_M_int_arr_Var;
   integration_M_int_arr_Var.values = integration_M_int_arr_Values;
-  integration_M_int_arr_Refman = LUMI_new_ref(integration_M_int_arr);
+  integration_M_int_arr_Refman = LUMI_new_ref((void**)&integration_M_int_arr, false);
   if (integration_M_int_arr_Refman == NULL) RAISE(22, 38, "insufficient memory for managed object")
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "tests/integration-test1.4.lm"
@@ -6530,6 +7330,7 @@ USER_MAIN_HEADER {
   LUMI_success &= LUMI_run_test("test-simple-delete", integration_M_test_simple_delete);
   LUMI_success &= LUMI_run_test("test-complex-delete", integration_M_test_complex_delete);
   LUMI_success &= LUMI_run_test("test-assert-error-message", integration_M_test_assert_error_message);
+  LUMI_success &= LUMI_run_test("test-builtin-errors", integration_M_test_builtin_errors);
   LUMI_success &= LUMI_run_test("test-cover-all", integration_M_test_cover_all);
   LUMI_success &= LUMI_run_test("test-constants", integration_M_test_constants);
   LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 2);

@@ -76,12 +76,14 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     if self.iterator.result-type.type-data != glob.type-int
       new SymbolExpression in self.aux-symbol
       self.aux-symbol.code-node := self
+      self.aux-symbol.set-location()
       self.iterator.result-type.copy-new():(owner self.aux-symbol.result-type)
       self.get-function().add-aux-variable(
           copy ACCESS-USER, copy false, user self.iterator.result-type):(
           user self.aux-symbol.variable)
       string-new-copy(user self.aux-symbol.variable.name):(
           owner self.aux-symbol.name)
+      self.get-function().has-user-assign := true
     
     base.analyze()
   
@@ -159,6 +161,8 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.write-spaces()
     if ? self.start
       self.start.write-preactions()
+    if not (? self.aux-symbol)
+      self.iterator.write-preactions()
     if iterator-type = glob.type-int
       self.write-int-iter()
     else-if iterator-type = glob.type-string or iterator-type = glob.type-array
@@ -177,6 +181,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       user SyntaxTreeBlock parent)
     var SyntaxTreeExpression expression-node
     expression-node.parent := parent
+    expression-node.set-location()
     value.code-node := expression-node
     
     new SymbolExpression symbol
@@ -219,6 +224,8 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     #   `item` = `aux-var`[`item`_Index];
     #   `block...`
     # }}
+    self.aux-symbol.write-check-ref()
+    self.write-spaces()
     write(user "{int ")
     write-cname(user self.item.name)
     write(user "_Index; for (")
@@ -240,7 +247,9 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     slice.sequence := self.aux-symbol
     slice.index := index-symbol
     self.item.type-instance.copy-new():(owner slice.result-type)
+    self.parent.indentation-spaces += 2
     self.write-assign(user self.item, owner slice, user self.block)
+    self.parent.indentation-spaces -= 2
     
     self.write-block-body()
     
@@ -279,6 +288,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.item.type-instance.copy-new():(owner item-symbol.result-type)
     new CallArgument item-arg
     item-arg.value := item-symbol
+    item-arg.is-dynamic := item-symbol.result-type.type-data.is-dynamic
     item-arg.is-generic :=
         self.get-func.arguments.outputs.first.item.get-type-instance().type-data =
         glob.type-generic
@@ -314,6 +324,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     
     if meth.is-dynamic
       new MemberExpression member
+      member.set-location()
       member.code-node := self
       member.function := meth
       member.dynamic-call-self-instance := self.aux-symbol

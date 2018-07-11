@@ -440,7 +440,7 @@ Returncode StringExpression_write_preactions(StringExpression* self) {
   /* `symbol`_Var.length = `string-length`; */
   /* `symbol`_Var.values = "`text`"; */
   CHECK(182, Expression_write_init_var_ref(&(self->_base._base), self->symbol) )
-  CHECK(183, Expression_write_refman_init(&(self->_base._base), self->symbol) )
+  CHECK(183, Expression_write_refman_init(&(self->_base._base), self->symbol, false) )
   Int real_length = 1;
   {int index; for (index = (1); index < (self->_base.text->length - 1); ++index) {
     if ((index) < 0 || (index) >= (self->_base.text)->length) RAISE(186)

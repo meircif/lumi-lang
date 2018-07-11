@@ -311,12 +311,28 @@ static char* _func_name_UnaryExpression_write_end_expression = "UnaryExpression.
 Returncode UnaryExpression_write_end_expression(UnaryExpression* self, Expression* right_expression) {
   CHECK(138, write(self->operator->c_name) )
   CHECK(139, write(&(String){2, 1, " "}) )
-  CHECK(140, (right_expression)->_base._dtl[4](right_expression) )
+  CHECK(140, UnaryExpression_write_operand(self, right_expression) )
   if (!self->_base.top) {
     CHECK(142, write(&(String){2, 1, ")"}) )
   }
   if (self->_base.is_statement) {
     CHECK(144, write(&(String){3, 2, ";\n"}) )
+  }
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+#endif
+#if LUMI_STAGE == LUMI_DECLARATIONS
+Returncode UnaryExpression_write_operand(UnaryExpression* self, Expression* expression);
+#elif LUMI_STAGE == LUMI_FUNCTIONS
+static char* _func_name_UnaryExpression_write_operand = "UnaryExpression.write-operand";
+#define LUMI_FUNC_NAME _func_name_UnaryExpression_write_operand
+Returncode UnaryExpression_write_operand(UnaryExpression* self, Expression* expression) {
+  if (expression->is_complex_field) {
+    CHECK(148, Expression_write_as_top(expression) )
+  }
+  else {
+    CHECK(150, (expression)->_base._dtl[4](expression) )
   }
   return OK;
 }
@@ -349,12 +365,12 @@ static char* _func_name_BinaryExpression_parse_new = "BinaryExpression.parse-new
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_parse_new
 Returncode BinaryExpression_parse_new(BinaryExpression* self, String* ends, Operator* operator, SyntaxTreeCode* code_node, Expression* left_expression, BinaryExpression* binary_left_expression, BinaryExpression** expression, Char* end, Operator** next_operator) {
   BinaryExpression* binary_expression = malloc(sizeof(BinaryExpression));
-  if (binary_expression == NULL) RAISE(163)
+  if (binary_expression == NULL) RAISE(169)
   *binary_expression = (BinaryExpression){BinaryExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL};
   binary_expression->_base._base._base._dtl = BinaryExpression__dtl;
   binary_expression->left_expression = left_expression;
   binary_expression->binary_left_expression = binary_left_expression;
-  CHECK(166, UnaryExpression_parse(&(binary_expression->_base), operator, ends, code_node, &((*end)), &((*next_operator))) )
+  CHECK(172, UnaryExpression_parse(&(binary_expression->_base), operator, ends, code_node, &((*end)), &((*next_operator))) )
   (*expression) = binary_expression;
   return OK;
 }
@@ -366,68 +382,68 @@ Returncode BinaryExpression_analyze(BinaryExpression* self);
 static char* _func_name_BinaryExpression_analyze = "BinaryExpression.analyze";
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_analyze
 Returncode BinaryExpression_analyze(BinaryExpression* self) {
-  CHECK(171, UnaryExpression_analyze_operand(&(self->_base), self->_base.right_expression) )
-  CHECK(172, UnaryExpression_analyze_operand(&(self->_base), self->left_expression) )
+  CHECK(177, UnaryExpression_analyze_operand(&(self->_base), self->_base.right_expression) )
+  CHECK(178, UnaryExpression_analyze_operand(&(self->_base), self->left_expression) )
   self->_base._base.constant = self->left_expression->constant && self->_base.right_expression->constant;
   if (NULL != self->binary_left_expression && self->_base.operator->order == self->binary_left_expression->_base.operator->order && self->_base.operator->group_index != self->binary_left_expression->_base.operator->group_index) {
-    CHECK(179, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){39, 38, "ambiguous precedence between operators"}, self->binary_left_expression->_base.operator->name, &(String){4, 3, "and"}, self->_base.operator->name) )
+    CHECK(185, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){39, 38, "ambiguous precedence between operators"}, self->binary_left_expression->_base.operator->name, &(String){4, 3, "and"}, self->_base.operator->name) )
   }
   if (self->_base.operator->order == 2) {
     /* `not` operator */
-    CHECK(186, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){35, 34, "cannot use \"not\" as binary operand"}) )
+    CHECK(192, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){35, 34, "cannot use \"not\" as binary operand"}) )
   }
   if (self->_base.operator->order == 3) {
     /* `or`/`and` operator */
-    CHECK(189, BinaryExpression_test_operands_type(self, glob->type_bool) )
-    CHECK(190, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
+    CHECK(195, BinaryExpression_test_operands_type(self, glob->type_bool) )
+    CHECK(196, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
   }
   else {
     if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0) {
       /* := operator */
-      CHECK(193, TypeInstance_check_assign_from(self->left_expression->result_type, self->left_expression->access, &(self->_base._base._base), &(self->_base.right_expression), &(self->assignee)) )
+      CHECK(199, TypeInstance_check_assign_from(self->left_expression->result_type, self->left_expression->access, &(self->_base._base._base), &(self->_base.right_expression), &(self->assignee)) )
       if (self->left_expression->access == ACCESS_USER) {
         SyntaxTreeFunction* _SyntaxTreeFunction46;
-        CHECK(197, SyntaxTreeCode_get_function(self->_base._base.code_node, &(_SyntaxTreeFunction46)) )
+        CHECK(203, SyntaxTreeCode_get_function(self->_base._base.code_node, &(_SyntaxTreeFunction46)) )
         _SyntaxTreeFunction46->has_user_assign = true;
       }
       else {
         if (self->left_expression->access == ACCESS_OWNER) {
           /* ownership pass */
-          CHECK(200, Expression_add_aux_variable(&(self->_base._base), ACCESS_OWNER, false, self->left_expression->result_type, &(self->assigned_value_symbol)) )
+          CHECK(206, Expression_add_aux_variable(&(self->_base._base), ACCESS_OWNER, false, self->left_expression->result_type, &(self->assigned_value_symbol)) )
         }
       }
     }
     else {
-      if ((0) < 0 || (0) >= (self->_base.operator->name)->length) RAISE(205)
+      if ((0) < 0 || (0) >= (self->_base.operator->name)->length) RAISE(211)
       if (self->_base.operator->order == 1 && ((self->_base.operator->name)->values[0]) == 'i') {
         /* `is`/`is-not` operator */
-        CHECK(207, BinaryExpression_analyze_equalizer(self, true) )
+        CHECK(213, BinaryExpression_analyze_equalizer(self, true) )
       }
       else {
         Bool _Bool47;
-        CHECK(208, String_equal(self->_base.operator->name, &(String){2, 1, "="}, &(_Bool47)) )
+        CHECK(214, String_equal(self->_base.operator->name, &(String){2, 1, "="}, &(_Bool47)) )
         Bool _Bool48;
-        CHECK(208, String_equal(self->_base.operator->name, &(String){3, 2, "!="}, &(_Bool48)) )
+        CHECK(214, String_equal(self->_base.operator->name, &(String){3, 2, "!="}, &(_Bool48)) )
         if (_Bool47 || _Bool48) {
-          CHECK(210, BinaryExpression_analyze_equalizer(self, false) )
+          CHECK(216, BinaryExpression_analyze_equalizer(self, false) )
         }
         else {
           /* any other Int operator */
           if (self->_base.operator->order == 1 &&  NULL !=  self->binary_left_expression && self->binary_left_expression->_base.operator->order == 1) {
             /* (a > b) > c */
-            CHECK(216, UnaryExpression_test_operand_type(&(self->_base), self->_base.right_expression, glob->type_int) )
+            CHECK(222, UnaryExpression_test_operand_type(&(self->_base), self->_base.right_expression, glob->type_int) )
           }
           else {
-            CHECK(218, BinaryExpression_test_operands_type(self, glob->type_int) )
+            CHECK(224, BinaryExpression_test_operands_type(self, glob->type_int) )
           }
           if (self->_base.operator->order == 0) {
             /* aritmetic operator */
-            CHECK(221, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
+            CHECK(227, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
           }
           else {
             if (self->_base.operator->order == 1) {
               /* compare operator */
-              CHECK(224, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
+              CHECK(230, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
             }
           }
           /* else, assign operator */
@@ -438,7 +454,7 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
   if (self->_base.operator->order == 4) {
     /* assign operator */
     if (!self->left_expression->assignable) {
-      CHECK(229, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){41, 40, "assigning into non assignable expression"}) )
+      CHECK(235, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base), &(String){41, 40, "assigning into non assignable expression"}) )
     }
     self->left_expression->top = true;
     self->_base.right_expression->top = true;
@@ -453,8 +469,8 @@ Returncode BinaryExpression_test_operands_type(BinaryExpression* self, TypeData*
 static char* _func_name_BinaryExpression_test_operands_type = "BinaryExpression.test-operands-type";
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_test_operands_type
 Returncode BinaryExpression_test_operands_type(BinaryExpression* self, TypeData* expected_type) {
-  CHECK(234, UnaryExpression_test_operand_type(&(self->_base), self->_base.right_expression, expected_type) )
-  CHECK(235, UnaryExpression_test_operand_type(&(self->_base), self->left_expression, expected_type) )
+  CHECK(240, UnaryExpression_test_operand_type(&(self->_base), self->_base.right_expression, expected_type) )
+  CHECK(241, UnaryExpression_test_operand_type(&(self->_base), self->left_expression, expected_type) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -465,9 +481,9 @@ Returncode BinaryExpression_analyze_equalizer(BinaryExpression* self, Bool is_re
 static char* _func_name_BinaryExpression_analyze_equalizer = "BinaryExpression.analyze-equalizer";
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_analyze_equalizer
 Returncode BinaryExpression_analyze_equalizer(BinaryExpression* self, Bool is_reference) {
-  CHECK(238, BinaryExpression_test_is_reference(self, is_reference, self->_base.right_expression) )
-  CHECK(239, BinaryExpression_test_is_reference(self, is_reference, self->left_expression) )
-  CHECK(240, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
+  CHECK(244, BinaryExpression_test_is_reference(self, is_reference, self->_base.right_expression) )
+  CHECK(245, BinaryExpression_test_is_reference(self, is_reference, self->left_expression) )
+  CHECK(246, Expression_set_simple_type(&(self->_base._base), glob->type_bool) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -479,7 +495,7 @@ static char* _func_name_BinaryExpression_test_is_reference = "BinaryExpression.t
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_test_is_reference
 Returncode BinaryExpression_test_is_reference(BinaryExpression* self, Bool is_reference, Expression* operand) {
   if ((!operand->result_type->type_data->is_primitive || operand->result_type->type_data == glob->type_func || operand->result_type->type_data == glob->type_ref) != is_reference) {
-    CHECK(246, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){9, 8, "operator"}, self->_base.operator->name, &(String){26, 25, "is not supported for type"}, operand->result_type->type_data->name) )
+    CHECK(252, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){9, 8, "operator"}, self->_base.operator->name, &(String){26, 25, "is not supported for type"}, operand->result_type->type_data->name) )
   }
   return OK;
 }
@@ -491,8 +507,8 @@ Returncode BinaryExpression_m_order_constants(BinaryExpression* self, List* orde
 static char* _func_name_BinaryExpression_m_order_constants = "BinaryExpression.m-order-constants";
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_m_order_constants
 Returncode BinaryExpression_m_order_constants(BinaryExpression* self, List* ordered_list) {
-  CHECK(253, (self->left_expression)->_base._dtl[3](self->left_expression, ordered_list) )
-  CHECK(254, UnaryExpression_m_order_constants(&(self->_base), ordered_list) )
+  CHECK(259, (self->left_expression)->_base._dtl[3](self->left_expression, ordered_list) )
+  CHECK(260, UnaryExpression_m_order_constants(&(self->_base), ordered_list) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -503,11 +519,11 @@ Returncode BinaryExpression_write_preactions(BinaryExpression* self);
 static char* _func_name_BinaryExpression_write_preactions = "BinaryExpression.write-preactions";
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_write_preactions
 Returncode BinaryExpression_write_preactions(BinaryExpression* self) {
-  CHECK(257, UnaryExpression_write_preactions(&(self->_base)) )
-  CHECK(258, (self->left_expression)->_base._dtl[9](self->left_expression) )
+  CHECK(263, UnaryExpression_write_preactions(&(self->_base)) )
+  CHECK(264, (self->left_expression)->_base._dtl[9](self->left_expression) )
   if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0) {
     /* := operator */
-    CHECK(261, BinaryExpression_write_assign_preactions(self) )
+    CHECK(267, BinaryExpression_write_assign_preactions(self) )
   }
   return OK;
 }
@@ -521,10 +537,10 @@ static char* _func_name_BinaryExpression_write_assign_preactions = "BinaryExpres
 Returncode BinaryExpression_write_assign_preactions(BinaryExpression* self) {
   if (!self->left_expression->result_type->type_data->is_primitive) {
     if (self->left_expression->access == ACCESS_OWNER) {
-      CHECK(266, BinaryExpression_write_owner_assign_preactions(self) )
+      CHECK(272, BinaryExpression_write_owner_assign_preactions(self) )
     }
     else {
-      CHECK(268, BinaryExpression_write_user_assign_preactions(self) )
+      CHECK(274, BinaryExpression_write_user_assign_preactions(self) )
     }
   }
   return OK;
@@ -537,28 +553,28 @@ Returncode BinaryExpression_write_user_assign_preactions(BinaryExpression* self)
 static char* _func_name_BinaryExpression_write_user_assign_preactions = "BinaryExpression.write-user-assign-preactions";
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_write_user_assign_preactions
 Returncode BinaryExpression_write_user_assign_preactions(BinaryExpression* self) {
-  CHECK(271, write(&(String){19, 18, "aux_Ref_Manager = "}) )
-  CHECK(272, (self->left_expression)->_base._dtl[6](self->left_expression) )
-  CHECK(273, write(&(String){3, 2, ";\n"}) )
-  CHECK(274, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  
-  CHECK(276, (self->left_expression)->_base._dtl[6](self->left_expression) )
-  CHECK(277, write(&(String){4, 3, " = "}) )
-  CHECK(278, (self->_base.right_expression)->_base._dtl[6](self->_base.right_expression) )
+  CHECK(277, write(&(String){19, 18, "aux_Ref_Manager = "}) )
+  CHECK(278, (self->left_expression)->_base._dtl[6](self->left_expression) )
   CHECK(279, write(&(String){3, 2, ";\n"}) )
   CHECK(280, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   
-  CHECK(282, BinaryExpression_assign_dynamic(self, self->left_expression, self->_base.right_expression) )
+  CHECK(282, (self->left_expression)->_base._dtl[6](self->left_expression) )
+  CHECK(283, write(&(String){4, 3, " = "}) )
+  CHECK(284, (self->_base.right_expression)->_base._dtl[6](self->_base.right_expression) )
+  CHECK(285, write(&(String){3, 2, ";\n"}) )
+  CHECK(286, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   
-  CHECK(284, write(&(String){14, 13, "LUMI_inc_ref("}) )
-  CHECK(285, (self->left_expression)->_base._dtl[6](self->left_expression) )
-  CHECK(286, write(&(String){4, 3, ");\n"}) )
-  CHECK(287, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(288, BinaryExpression_assign_dynamic(self, self->left_expression, self->_base.right_expression) )
   
-  CHECK(289, write(&(String){32, 31, "LUMI_dec_ref(aux_Ref_Manager);\n"}) )
-  CHECK(290, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(291, write(&(String){25, 24, "aux_Ref_Manager = NULL;\n"}) )
-  CHECK(292, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(290, write(&(String){14, 13, "LUMI_inc_ref("}) )
+  CHECK(291, (self->left_expression)->_base._dtl[6](self->left_expression) )
+  CHECK(292, write(&(String){4, 3, ");\n"}) )
+  CHECK(293, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  
+  CHECK(295, write(&(String){32, 31, "LUMI_dec_ref(aux_Ref_Manager);\n"}) )
+  CHECK(296, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(297, write(&(String){25, 24, "aux_Ref_Manager = NULL;\n"}) )
+  CHECK(298, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -569,38 +585,38 @@ Returncode BinaryExpression_write_owner_assign_preactions(BinaryExpression* self
 static char* _func_name_BinaryExpression_write_owner_assign_preactions = "BinaryExpression.write-owner-assign-preactions";
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_write_owner_assign_preactions
 Returncode BinaryExpression_write_owner_assign_preactions(BinaryExpression* self) {
-  CHECK(295, (self->assigned_value_symbol)->_base._base._dtl[4](self->assigned_value_symbol) )
-  CHECK(296, write(&(String){4, 3, " = "}) )
-  CHECK(297, (self->_base.right_expression)->_base._dtl[4](self->_base.right_expression) )
-  CHECK(298, write(&(String){3, 2, ";\n"}) )
-  CHECK(299, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(300, (self->assigned_value_symbol)->_base._base._dtl[6](self->assigned_value_symbol) )
-  CHECK(301, write(&(String){4, 3, " = "}) )
-  CHECK(302, (self->_base.right_expression)->_base._dtl[6](self->_base.right_expression) )
-  CHECK(303, write(&(String){3, 2, ";\n"}) )
-  CHECK(304, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(301, (self->assigned_value_symbol)->_base._base._dtl[4](self->assigned_value_symbol) )
+  CHECK(302, write(&(String){4, 3, " = "}) )
+  CHECK(303, (self->_base.right_expression)->_base._dtl[4](self->_base.right_expression) )
+  CHECK(304, write(&(String){3, 2, ";\n"}) )
+  CHECK(305, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(306, (self->assigned_value_symbol)->_base._base._dtl[6](self->assigned_value_symbol) )
+  CHECK(307, write(&(String){4, 3, " = "}) )
+  CHECK(308, (self->_base.right_expression)->_base._dtl[6](self->_base.right_expression) )
+  CHECK(309, write(&(String){3, 2, ";\n"}) )
+  CHECK(310, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   
-  CHECK(306, BinaryExpression_assign_dynamic(self, &(self->assigned_value_symbol->_base), self->_base.right_expression) )
+  CHECK(312, BinaryExpression_assign_dynamic(self, &(self->assigned_value_symbol->_base), self->_base.right_expression) )
   
   if (self->_base.right_expression->result_type->type_data != glob->type_empty) {
-    CHECK(310, Expression_write_assign_null(self->assignee) )
-    CHECK(311, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+    CHECK(316, Expression_write_assign_null(self->assignee) )
+    CHECK(317, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   }
-  CHECK(312, BinaryExpression_write_left_delete(self) )
-  CHECK(313, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(318, BinaryExpression_write_left_delete(self) )
+  CHECK(319, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   
-  CHECK(315, write(&(String){20, 19, "LUMI_owner_dec_ref("}) )
-  CHECK(316, (self->left_expression)->_base._dtl[6](self->left_expression) )
-  CHECK(317, write(&(String){4, 3, ");\n"}) )
-  CHECK(318, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  
-  CHECK(320, (self->left_expression)->_base._dtl[6](self->left_expression) )
-  CHECK(321, write(&(String){4, 3, " = "}) )
-  CHECK(322, (self->assigned_value_symbol)->_base._base._dtl[6](self->assigned_value_symbol) )
-  CHECK(323, write(&(String){3, 2, ";\n"}) )
+  CHECK(321, write(&(String){20, 19, "LUMI_owner_dec_ref("}) )
+  CHECK(322, (self->left_expression)->_base._dtl[6](self->left_expression) )
+  CHECK(323, write(&(String){4, 3, ");\n"}) )
   CHECK(324, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   
-  CHECK(326, BinaryExpression_assign_dynamic(self, self->left_expression, &(self->assigned_value_symbol->_base)) )
+  CHECK(326, (self->left_expression)->_base._dtl[6](self->left_expression) )
+  CHECK(327, write(&(String){4, 3, " = "}) )
+  CHECK(328, (self->assigned_value_symbol)->_base._base._dtl[6](self->assigned_value_symbol) )
+  CHECK(329, write(&(String){3, 2, ";\n"}) )
+  CHECK(330, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  
+  CHECK(332, BinaryExpression_assign_dynamic(self, self->left_expression, &(self->assigned_value_symbol->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -614,16 +630,16 @@ Returncode BinaryExpression_assign_dynamic(BinaryExpression* self, Expression* t
   if (!target->result_type->type_data->is_dynamic &&  ! target->is_generic_cast) {
     return OK;
   }
-  CHECK(333, (target)->_base._dtl[5](target) )
-  CHECK(334, write(&(String){4, 3, " = "}) )
+  CHECK(339, (target)->_base._dtl[5](target) )
+  CHECK(340, write(&(String){4, 3, " = "}) )
   if (!source->result_type->type_data->is_dynamic &&  ! source->is_generic_cast && source->result_type->type_data != glob->type_empty) {
-    CHECK(338, write(&(String){2, 1, "&"}) )
-    CHECK(339, TypeData_write_cname(source->result_type->type_data) )
-    CHECK(340, write(&(String){9, 8, "_dynamic"}) )
+    CHECK(344, write(&(String){2, 1, "&"}) )
+    CHECK(345, TypeData_write_cname(source->result_type->type_data) )
+    CHECK(346, write(&(String){9, 8, "_dynamic"}) )
   }
   else {
     if ((target->result_type->type_data == glob->type_generic || target->is_generic_cast) && source->result_type->type_data != glob->type_generic &&  ! source->is_generic_cast) {
-      CHECK(346, write(&(String){24, 23, "(Generic_Type_Dynamic*)"}) )
+      CHECK(352, write(&(String){24, 23, "(Generic_Type_Dynamic*)"}) )
       source->top = false;
     }
     else {
@@ -631,11 +647,11 @@ Returncode BinaryExpression_assign_dynamic(BinaryExpression* self, Expression* t
         source->top = false;
       }
     }
-    CHECK(351, (source)->_base._dtl[5](source) )
+    CHECK(357, (source)->_base._dtl[5](source) )
     source->top = true;
   }
-  CHECK(353, write(&(String){3, 2, ";\n"}) )
-  CHECK(354, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(359, write(&(String){3, 2, ";\n"}) )
+  CHECK(360, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -648,40 +664,40 @@ static char* _func_name_BinaryExpression_write_left_delete = "BinaryExpression.w
 Returncode BinaryExpression_write_left_delete(BinaryExpression* self) {
   TypeData* type_data = self->left_expression->result_type->type_data;
   if (type_data->is_dynamic) {
-    CHECK(359, write(&(String){5, 4, "if ("}) )
-    CHECK(360, (self->left_expression)->_base._dtl[5](self->left_expression) )
-    CHECK(361, write(&(String){11, 10, " != NULL) "}) )
+    CHECK(365, write(&(String){5, 4, "if ("}) )
+    CHECK(366, (self->left_expression)->_base._dtl[5](self->left_expression) )
+    CHECK(367, write(&(String){11, 10, " != NULL) "}) )
     self->left_expression->top = false;
-    CHECK(363, (self->left_expression)->_base._dtl[5](self->left_expression) )
+    CHECK(369, (self->left_expression)->_base._dtl[5](self->left_expression) )
     self->left_expression->top = true;
-    CHECK(365, write(&(String){3, 2, "->"}) )
+    CHECK(371, write(&(String){3, 2, "->"}) )
     while (true) {
       if (!(NULL != type_data->base_type)) break;
       type_data = type_data->base_type->type_data;
       if (!(type_data->is_dynamic)) break;
-      CHECK(370, write(&(String){7, 6, "_base."}) )
+      CHECK(376, write(&(String){7, 6, "_base."}) )
     }
-    CHECK(371, write(&(String){6, 5, "_del("}) )
+    CHECK(377, write(&(String){6, 5, "_del("}) )
   }
   else {
     if (type_data != glob->type_array) {
-      CHECK(373, TypeData_write_cname(type_data) )
-      CHECK(374, write(&(String){6, 5, "_Del("}) )
+      CHECK(379, TypeData_write_cname(type_data) )
+      CHECK(380, write(&(String){6, 5, "_Del("}) )
     }
     else {
       type_data = ((TypeInstance*)(self->left_expression->result_type->parameters->first->item))->type_data;
       if (!type_data->is_primitive) {
-        CHECK(379, write(&(String){11, 10, "ARRAY_DEL("}) )
-        CHECK(380, TypeData_write_cname(type_data) )
-        CHECK(381, write(&(String){3, 2, ", "}) )
-        CHECK(382, (self->left_expression)->_base._dtl[4](self->left_expression) )
-        CHECK(383, write(&(String){3, 2, ")\n"}) )
+        CHECK(385, write(&(String){11, 10, "ARRAY_DEL("}) )
+        CHECK(386, TypeData_write_cname(type_data) )
+        CHECK(387, write(&(String){3, 2, ", "}) )
+        CHECK(388, (self->left_expression)->_base._dtl[4](self->left_expression) )
+        CHECK(389, write(&(String){3, 2, ")\n"}) )
       }
       return OK;
     }
   }
-  CHECK(385, (self->left_expression)->_base._dtl[4](self->left_expression) )
-  CHECK(386, write(&(String){4, 3, ");\n"}) )
+  CHECK(391, (self->left_expression)->_base._dtl[4](self->left_expression) )
+  CHECK(392, write(&(String){4, 3, ");\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -692,32 +708,32 @@ Returncode BinaryExpression_write(BinaryExpression* self);
 static char* _func_name_BinaryExpression_write = "BinaryExpression.write";
 #define LUMI_FUNC_NAME _func_name_BinaryExpression_write
 Returncode BinaryExpression_write(BinaryExpression* self) {
-  CHECK(389, UnaryExpression_write_start(&(self->_base)) )
-  if ((0) < 0 || (0) >= (self->_base.operator->name)->length) RAISE(390)
+  CHECK(395, UnaryExpression_write_start(&(self->_base)) )
+  if ((0) < 0 || (0) >= (self->_base.operator->name)->length) RAISE(396)
   if (self->_base.operator->order == 1 && ((self->_base.operator->name)->values[0]) == 'i') {
     /* `is`/`is-not` operator */
-    CHECK(392, write(&(String){8, 7, "(void*)"}) )
+    CHECK(398, write(&(String){8, 7, "(void*)"}) )
     self->left_expression->top = false;
   }
-  CHECK(394, (self->left_expression)->_base._dtl[4](self->left_expression) )
+  CHECK(400, UnaryExpression_write_operand(&(self->_base), self->left_expression) )
   self->left_expression->top = true;
   Bool expand_and = self->_base.operator->order == 1 &&  NULL !=  self->binary_left_expression && self->binary_left_expression->_base.operator->order == 1;
   if (expand_and) {
     /* (a > b) > c --> (a > b) && (b > c) */
-    CHECK(401, write(&(String){6, 5, " && ("}) )
-    CHECK(402, (self->binary_left_expression->_base.right_expression)->_base._dtl[4](self->binary_left_expression->_base.right_expression) )
+    CHECK(407, write(&(String){6, 5, " && ("}) )
+    CHECK(408, (self->binary_left_expression->_base.right_expression)->_base._dtl[4](self->binary_left_expression->_base.right_expression) )
   }
-  CHECK(403, write(&(String){2, 1, " "}) )
+  CHECK(409, write(&(String){2, 1, " "}) )
   if (self->_base.operator->order == 4 && self->_base.operator->group_index == 0 && self->left_expression->access == ACCESS_OWNER) {
-    CHECK(406, UnaryExpression_write_end_expression(&(self->_base), &(self->assigned_value_symbol->_base)) )
-    CHECK(407, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-    CHECK(408, Expression_write_assign_null(&(self->assigned_value_symbol->_base)) )
+    CHECK(412, UnaryExpression_write_end_expression(&(self->_base), &(self->assigned_value_symbol->_base)) )
+    CHECK(413, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+    CHECK(414, Expression_write_assign_null(&(self->assigned_value_symbol->_base)) )
   }
   else {
-    CHECK(410, UnaryExpression_write_end(&(self->_base)) )
+    CHECK(416, UnaryExpression_write_end(&(self->_base)) )
   }
   if (expand_and) {
-    CHECK(412, write(&(String){2, 1, ")"}) )
+    CHECK(418, write(&(String){2, 1, ")"}) )
   }
   
   return OK;
@@ -747,10 +763,10 @@ static char* _func_name_QuestionExpression_parse_new = "QuestionExpression.parse
 #define LUMI_FUNC_NAME _func_name_QuestionExpression_parse_new
 Returncode QuestionExpression_parse_new(QuestionExpression* self, Expression** expression, Char* end) {
   QuestionExpression* question_expression = malloc(sizeof(QuestionExpression));
-  if (question_expression == NULL) RAISE(420)
+  if (question_expression == NULL) RAISE(426)
   *question_expression = (QuestionExpression){QuestionExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL};
   question_expression->_base._base._dtl = QuestionExpression__dtl;
-  CHECK(421, QuestionExpression_parse(question_expression, (*expression), &((*end))) )
+  CHECK(427, QuestionExpression_parse(question_expression, (*expression), &((*end))) )
   (*expression) = &(question_expression->_base);
   return OK;
 }
@@ -763,8 +779,8 @@ static char* _func_name_QuestionExpression_parse = "QuestionExpression.parse";
 #define LUMI_FUNC_NAME _func_name_QuestionExpression_parse
 Returncode QuestionExpression_parse(QuestionExpression* self, Expression* tested, Char* end) {
   self->tested = tested;
-  CHECK(427, SyntaxTreeNode_set_location(&(self->_base._base)) )
-  CHECK(428, read_c(&((*end))) )
+  CHECK(433, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(434, read_c(&((*end))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -775,14 +791,14 @@ Returncode QuestionExpression_analyze(QuestionExpression* self);
 static char* _func_name_QuestionExpression_analyze = "QuestionExpression.analyze";
 #define LUMI_FUNC_NAME _func_name_QuestionExpression_analyze
 Returncode QuestionExpression_analyze(QuestionExpression* self) {
-  CHECK(431, (self->tested)->_base._dtl[2](self->tested) )
+  CHECK(437, (self->tested)->_base._dtl[2](self->tested) )
   if (!(NULL != self->tested->result_type)) {
-    CHECK(433, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
+    CHECK(439, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){34, 33, "cannot use \"?\" on void expression"}) )
   }
   if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == glob->type_func)) {
-    CHECK(436, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
+    CHECK(442, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
   }
-  CHECK(439, Expression_set_simple_type(&(self->_base), glob->type_bool) )
+  CHECK(445, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   self->_base.access = ACCESS_VAR;
   return OK;
 }
@@ -794,7 +810,7 @@ Returncode QuestionExpression_write_preactions(QuestionExpression* self);
 static char* _func_name_QuestionExpression_write_preactions = "QuestionExpression.write-preactions";
 #define LUMI_FUNC_NAME _func_name_QuestionExpression_write_preactions
 Returncode QuestionExpression_write_preactions(QuestionExpression* self) {
-  CHECK(443, (self->tested)->_base._dtl[9](self->tested) )
+  CHECK(449, (self->tested)->_base._dtl[9](self->tested) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -807,17 +823,17 @@ static char* _func_name_QuestionExpression_write = "QuestionExpression.write";
 Returncode QuestionExpression_write(QuestionExpression* self) {
   /* `tested` != NULL && `tested`_Refman->value != NULL */
   if (!self->_base.top) {
-    CHECK(448, write(&(String){2, 1, "("}) )
+    CHECK(454, write(&(String){2, 1, "("}) )
   }
-  CHECK(449, (self->tested)->_base._dtl[4](self->tested) )
-  CHECK(450, write(&(String){9, 8, " != NULL"}) )
+  CHECK(455, (self->tested)->_base._dtl[4](self->tested) )
+  CHECK(456, write(&(String){9, 8, " != NULL"}) )
   if (!self->tested->result_type->type_data->is_primitive) {
-    CHECK(452, write(&(String){5, 4, " && "}) )
-    CHECK(453, (self->tested)->_base._dtl[6](self->tested) )
-    CHECK(454, write(&(String){16, 15, "->value != NULL"}) )
+    CHECK(458, write(&(String){5, 4, " && "}) )
+    CHECK(459, (self->tested)->_base._dtl[6](self->tested) )
+    CHECK(460, write(&(String){16, 15, "->value != NULL"}) )
   }
   if (!self->_base.top) {
-    CHECK(456, write(&(String){2, 1, ")"}) )
+    CHECK(462, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }

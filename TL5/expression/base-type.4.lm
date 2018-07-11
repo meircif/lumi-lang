@@ -8,18 +8,10 @@ class BaseMethExpression(Expression)
   user TypeData parent-type
   var Int bases
   
-  func inst parse-new(
-      owner String text, user SyntaxTreeCode code-node, copy Char end)->(
-      owner Expression expression)
-    new BaseMethExpression base-expression
-    base-expression.init(user code-node, copy end = '(')
-    expression := base-expression
-  
-  func inst init(user SyntaxTreeCode code-node, copy Bool is-call)
-    self.code-node := code-node
+  new(user SyntaxTreeCode code-node, copy Bool is-call)
+    base(user code-node)
     self.is-call := is-call
     self.access := Access.VAR
-    self.set-location()
   
   func dynamic analyze()
     user SyntaxTreeFunction function
@@ -52,7 +44,7 @@ class BaseMethExpression(Expression)
     new CallArgument self-param
     self-param.set-location()
     self-param.access := self.function.arguments.parameters.first.item.access
-    self-param.value := BaseMethExpression()
+    self-param.value := BaseMethExpression(user self.code-node, copy false)
     self.parent-type.self-type-instance()->(owner self-param.value.result-type)
     arguments.parameters.prepend(owner self-param)
   
@@ -69,7 +61,7 @@ class UpCastExpression(Expression)
   var Int bases
   
   func inst init-new(copy Int bases)->(owner Expression expression)
-    new UpCastExpression up-cast
+    new UpCastExpression up-cast(user _)
     up-cast.init(copy bases, owner expression)
     expression := up-cast
   
@@ -103,7 +95,11 @@ class UpCastExpression(Expression)
     write(user "&(")
   
   func inst write-post()
-    write(user "->_base")
+    if self.expression.is-complex-field
+      write(user ".")
+    else
+      write(user "->")
+    write(user "_base")
     for n in 1:self.bases
       write(user "._base")
     write(user ")")
@@ -134,40 +130,33 @@ class ModuleTypeExpression(Expression)
 class TypeExpression(ModuleTypeExpression)
   func inst parse-new(
       owner String text, user String ends, user SyntaxTreeCode code-node)->(
-      owner Expression expression, var Char end)
+      owner Expression expression)
     owner String value
-    var Char next-end
-    if end = '.'
-      self.read-new-value(user ends)->(owner value, var next-end)
+    var Bool has-member(copy glob.last-char = '.')
+    if has-member
+      self.read-new-value(user ends)->(owner value)
       if value.length > 0
         if value.equal(user "length") or (value[0] >= 'A' and value[0] <= 'Z')
-          new EnumExpression enum-expression
-          enum-expression.parse(
-              owner text, owner value, owner expression, user code-node)
-          end := next-end
+          new EnumExpression enum-expression(user code-node)
+          enum-expression.parse(owner text, owner value, owner expression)
           expression := enum-expression
           return
-      glob.save-input := true
     new TypeInstance type-instance
-    type-instance.parse-name(user text, user code-node, user code-node)->(
-        var end)
-    if end = '('
-      new InitExpression expression-init
-      expression-init.parse(
-          owner type-instance, owner expression, user code-node)->(var end)
+    type-instance.parse-name(user text, user code-node, user code-node)
+    if not has-member and glob.last-char = '('
+      new InitExpression expression-init(user code-node)
+      expression-init.parse(owner type-instance, owner expression)
       expression := expression-init
     else
-      new TypeExpression type-expression
-      type-expression.parse(
-          owner type-instance, owner expression, user code-node)
+      new TypeExpression type-expression(user code-node)
+      type-expression.parse(owner type-instance, owner expression)
       expression := type-expression
+      if has-member
+        MemberExpression.parse-new(user _, owner value, user code-node)->(
+            owner expression)
   
   func inst parse(
-      owner TypeInstance type-instance,
-      owner Expression module-expression,
-      user SyntaxTreeCode code-node)
-    self.set-location()
-    self.code-node := code-node
+      owner TypeInstance type-instance, owner Expression module-expression)
     self.set-simple-type(user glob.type-type)
     self.module-expression := module-expression
     self.result-type.parameters := List{TypeInstance}()
@@ -187,10 +176,7 @@ class EnumExpression(ModuleTypeExpression)
   func inst parse(
       owner String name,
       owner String value,
-      owner Expression module-expression,
-      user SyntaxTreeCode code-node)
-    self.set-location()
-    self.code-node := code-node
+      owner Expression module-expression)
     self.name := name
     self.value := value
     self.set-simple-type(user glob.type-int)

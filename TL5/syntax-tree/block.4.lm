@@ -6,12 +6,16 @@ module tl5-compiler
 class SyntaxTreeCode(SyntaxTreeNode)
   user SyntaxTreeBlock parent
   
+  new(user SyntaxTreeBlock parent)
+    self.set-location()
+    self.parent := parent
+  
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
     if self.parent? and not module-name?
       self.parent.find-variable(user name, user _)->(user variable)
     else
-      base.find-variable(user name, user module-name)->(user variable)
+      base(user name, user module-name)->(user variable)
   
   func inst get-function()->(user SyntaxTreeFunction function)
     self.parent.get-function()->(user function)
@@ -35,7 +39,8 @@ class SyntaxTreeCode(SyntaxTreeNode)
   func inst read-line-break-spaces()
     var Int expected-spaces(copy self.parent.indentation-spaces + 4)
     for n in expected-spaces
-      if read-c() != ' '
+      read-c()
+      if glob.last-char != ' '
         self.syntax-error-indentation(copy n, copy expected-spaces)
   
   func dynamic is-end-point()->(var Bool is-end)
@@ -45,16 +50,15 @@ class SyntaxTreeCode(SyntaxTreeNode)
 ~~~ A basic code block node in the syntax tree ~~~
 class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeBlock parent
-  owner List{SyntaxTreeCode} code-nodes
+  var List{SyntaxTreeCode} code-nodes
   user SyntaxTreeIf previous-if
   user SyntaxTreeTry previous-try
   var Bool is-in-loop
   
-  func inst parse-block()->(var Char end)
-    self.code-nodes := List{SyntaxTreeCode}()
-    self.parse-block-children(user _, user self)->(var end)
+  func inst parse-block()
+    self.parse-block-children(user _, user self)
   
-  func dynamic parse-child(user String keyword)->(var Char end)
+  func dynamic parse-child(user String keyword)
     owner SyntaxTreeCode node
     owner SyntaxTreeIf owner-if
     user SyntaxTreeIf new-if
@@ -64,122 +68,107 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.syntax-error-msg(user "unreachable code")
     
     if keyword.equal(user "if")
-      if end != ' '
-        self.syntax-error-c(user "expected space after \"if\", got", copy end)
-      new-if := SyntaxTreeIf.parse-new(user _, user self)->(
-          var end, owner owner-if)
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"if\", got")
+      new-if := SyntaxTreeIf.parse-new(user _, user self)->(owner owner-if)
       self.code-nodes.add(owner owner-if)
       
     else-if keyword.equal(user "else")
       if not self.previous-if?
         self.syntax-error-msg(user "\"else\" without a previous \"if\"")
-      if end != '\n'
-        self.syntax-error-c(
-            user "expected new-line after \"else\", got", copy end)
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after \"else\", got")
       self.previous-if.add-else(
-          owner SyntaxTreeElse.parse-new(user _, user self)->(var end))
+          owner SyntaxTreeElse.parse-new(user _, user self))
       
     else-if keyword.equal(user "else-if")
       if not self.previous-if?
         self.syntax-error-msg(user "\"else-if\" without a previous \"if\"")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"else-if\", got", copy end)
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"else-if\", got")
       owner SyntaxTreeCoverage coverage-node
       if glob.tested-module?
         if glob.current-module.name.equal(user glob.tested-module)
-          SyntaxTreeCoverage.init-new(user _, user _)->(owner coverage-node)
-      new-if := SyntaxTreeIf.parse-new(user _, user self)->(
-          var end, owner owner-if)
+          coverage-node := SyntaxTreeCoverage(user _)
+      new-if := SyntaxTreeIf.parse-new(user _, user self)->(owner owner-if)
       self.previous-if.add-else-if(owner owner-if, owner coverage-node)
       
     else-if keyword.equal(user "do")
-      if end != '\n'
-        self.syntax-error-c(
-            user "expected new-line after \"do\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeDoLoop.parse-new(user _, user self)->(var end))
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after \"do\", got")
+      self.code-nodes.add(owner SyntaxTreeDoLoop.parse-new(user _, user self))
       
     else-if keyword.equal(user "for")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"for\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeForLoop.parse-new(user _, user self)->(var end))
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"for\", got")
+      self.code-nodes.add(owner SyntaxTreeForLoop.parse-new(user _, user self))
       
     else-if keyword.equal(user "while")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"while\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeWhile.parse-new(user _, user self)->(var end))
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"while\", got")
+      self.code-nodes.add(owner SyntaxTreeWhile.parse-new(user _, user self))
+      
+    else-if keyword.equal(user "break")
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after \"break\", got")
+      self.code-nodes.add(owner SyntaxTreeBreak.parse-new(user _, user self))
       
     else-if keyword.equal(user "continue")
-      if end != '\n'
-        self.syntax-error-c(
-            user "expected new-line after \"continue\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeContinue.parse-new(user _, user self)->(var end))
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after \"continue\", got")
+      self.code-nodes.add(owner SyntaxTreeContinue.parse-new(user _, user self))
       
     else-if keyword.equal(user "return")
-      if end != '\n'
-        self.syntax-error-c(
-            user "expected new-line after \"return\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeReturn.parse-new(user _, user self)->(var end))
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after \"return\", got")
+      self.code-nodes.add(owner SyntaxTreeReturn(user self))
       
     else-if keyword.equal(user "raise")
-      if end != ' ' and end != '\n'
+      if glob.last-char != ' ' and glob.last-char != '\n'
         self.syntax-error-c(
-            user "expected space or new-line after \"raise\", got", copy end)
-      self.code-nodes.add(
-          owner SyntaxTreeRaise.parse-new(user _, user self)->(var end))
+            user "expected space or new-line after \"raise\", got")
+      self.code-nodes.add(owner SyntaxTreeRaise.parse-new(user _, user self))
       
     else-if keyword.equal(user "new")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"new\", got", copy end)
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"new\", got")
       self.get-function().variables.add(owner SyntaxTreeVariable.parse-new(
-          user _, copy Access.OWNER, copy true, user _, user self)->(var end))
+          user _, copy Access.OWNER, copy true, user _, user self))
       
     else-if keyword.equal(user "try")
-      if end != '\n'
-        self.syntax-error-c(
-            user "expected new-line after \"try\", got", copy end)
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after \"try\", got")
       owner SyntaxTreeTry try-node
-      SyntaxTreeTry.parse-new(user _, user self)->(var end, owner try-node)
+      SyntaxTreeTry.parse-new(user _, user self)->(owner try-node)
       new-try := try-node
       self.code-nodes.add(owner try-node)
       
     else-if keyword.equal(user "catch")
       if not self.previous-try?
         self.syntax-error-msg(user "\"catch\" without a previous \"try\"")
-      if end != '\n'
-        self.syntax-error-c(
-            user "expected new-line after \"catch\", got", copy end)
+      if glob.last-char != '\n'
+        self.syntax-error-c(user "expected new-line after \"catch\", got")
       owner SyntaxTreeCatch catch-node
-      SyntaxTreeCatch.parse-new(user _, user self)->(var end, owner catch-node)
+      SyntaxTreeCatch.parse-new(user _, user self)->(owner catch-node)
       self.previous-try.catch-node := catch-node
       self.code-nodes.add(owner catch-node)
       
     else-if keyword.equal(user "assert")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"assert\", got", copy end)
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"assert\", got")
       self.code-nodes.add(owner SyntaxTreeAssert.parse-new(
-          user _, user self)->(var end))
+          user _, user self))
       
     else-if keyword.equal(user "assert-error")
-      if end != ' '
-        self.syntax-error-c(
-            user "expected space after \"assert-error\", got", copy end)
+      if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \"assert-error\", got")
       self.code-nodes.add(owner SyntaxTreeAssertError.parse-new(
-          user _, user self)->(var end))
+          user _, user self))
       
     else
       glob.save-input := true
       self.code-nodes.add(
-          owner SyntaxTreeExpression.parse-new(user _, user self)->(var end))
+          owner SyntaxTreeExpression.parse-new(user _, user self))
     
     self.previous-if := new-if
     self.previous-try := new-try
@@ -192,7 +181,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
-    base.find-variable(user name, user module-name)->(user variable)
+    base(user name, user module-name)->(user variable)
     if not variable? and self.parent? and not module-name?
       self.parent.find-variable(user name, user _)->(user variable)
   
@@ -200,11 +189,11 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     self.parent.get-function()->(user function)
   
   func dynamic link-types()
-    base.link-types()
+    base()
     self.link-children-types(user self.code-nodes)
   
   func dynamic analyze()
-    base.analyze()
+    base()
     self.analyze-children(user self.code-nodes)
   
   func inst write-block()

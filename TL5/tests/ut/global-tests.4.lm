@@ -1,6 +1,8 @@
 ~~~ TL5 compiler tests - Global ~~~
 module tl5-compiler-tests
 
+owner tl5-compiler.Global tested-compiler
+
 ; IO mocks
 
 var String{1024} mock-print-text
@@ -16,10 +18,14 @@ owner File actual-output-file
 owner File expected-output-file
 var Bool tests-passed
 var Bool had-test-error
+var Bool file-open-error
 
 mock Sys.print(user String text)
   assert text?
   tl5-compiler-tests.mock-print-text.concat(user text)
+
+mock Sys.exit(copy Int returncode)
+  raise "Sys.exit"
 
 func set-mock-file-text(user String text, user String second-file-text)
   mock-input-file-text.new(user "module ut\n")
@@ -33,10 +39,12 @@ func set-mock-file-text(user String text, user String second-file-text)
   mock-input-file-index := 0
 
 mock file-open-read(user String name)->(owner File file)
-  ; do nothing
+  if file-open-error
+    raise
 
 mock file-open-write(user String name)->(owner File file)
-  ; do nothing
+  if file-open-error
+    raise
 
 mock file-close(owner File file)
   tl5-compiler-tests.mock-input-line-eof-index := - 1
@@ -81,15 +89,14 @@ mock tl5-compiler.SyntaxTreeFunction.write-post-func()
 var String{16} mock-input-file-name
 
 func setup-test()
-  tl5-compiler.glob.init()
-  tl5-compiler.glob.line-number := 0
-  tl5-compiler.glob.save-input := false
+  tested-compiler := tl5-compiler.Global()
   mock-print-text.clear()
   mock-input-file-text.clear()
   mock-output-file-text.clear()
   mock-output-file-last := '\0'
   mock-input-file-index := 0
   Sys.print.active := false
+  file-open-error := false
 
 
 ; string assertion
@@ -348,7 +355,6 @@ test test-illegal-call()
   assert-error root.link-types()
   var tl5-compiler.TypeWriter tw
   assert-error tw.write(user _)
-  assert-error tl5-compiler.write-cname(user _)
 
 test test-mocked-functions()
   setup-test()

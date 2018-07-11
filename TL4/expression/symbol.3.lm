@@ -145,7 +145,7 @@ class MemberExpression(SymbolExpression)
       self.variable.type-instance.f-new-replace-params(
           user instance-type, copy self.bases):(owner self.result-type)
       self.access := self.variable.access
-      self.assignable := true
+      self.assignable := not self.is-complex-field
     else
       instance-type.type-data.find-meth(user self.name):(
           user self.function, copy self.bases)
@@ -167,13 +167,12 @@ class MemberExpression(SymbolExpression)
             user instance-type.type-data.name,
             user "has no member",
             user self.name)
-      if self.function.is-dynamic and
+      if self.function.is-dynamic and not self.instance.is-complex-field and
           self.instance.result-type.type-data != glob.type-type and
           self.instance.result-type.type-data != glob.type-base
         self.bases += self.function.dynamic-base-count
         self.function := self.function.dynamic-base-method
-        if not self.instance.is-complex-field
-          self.dynamic-call-self-instance := self.instance
+        self.dynamic-call-self-instance := self.instance
       self.set-simple-type(user glob.type-func)
       self.access := ACCESS-VAR
       self.function.arguments.copy-new():(owner self.result-type.arguments)
@@ -231,21 +230,11 @@ class MemberExpression(SymbolExpression)
         self.is-mock-field
       return
     # if (...) RAISE(`line-num`, ...)
-    write(user "if (")
     if ? self.instance
-      # if (`instance` == NULL) RAISE("used member of empty object")
-      # if (`instance`_Refman->value == NULL)
-      #   RAISE("used member of outdated weak reference")
-      self.instance.write-as-top()
-      write(user " == NULL) ")
-      self.write-raise(user "used member of empty object")
-      self.code-node.write-spaces()
-      write(user "if (")
-      self.instance.write-refman()
-      write(user "->value == NULL) ")
-      self.write-raise(user "used member of outdated weak reference")
+      self.instance.write-check-ref()
     else-if ? self.dynamic-call-self-instance
       # if (`instance`_Dynamic == NULL) RAISE("dynamic call of empty object")
+      write(user "if (")
       var Bool top(self.dynamic-call-self-instance.top)
       self.dynamic-call-self-instance.top := true
       self.dynamic-call-self-instance.write-dynamic()
@@ -300,7 +289,8 @@ class MemberExpression(SymbolExpression)
   
   func dynamic write-dynamic()
     if self.is-complex-field
-      write(user "&")
+      if self.top
+        write(user "&")
       self.result-type.type-data.write-cname()
       write(user "_dynamic")
       return

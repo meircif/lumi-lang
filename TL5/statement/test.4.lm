@@ -6,14 +6,12 @@ class SyntaxTreeAssert(SyntaxTreeCode)
   owner Expression tested
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeAssert new-node)
-    new-node := SyntaxTreeAssert()
-    new-node.parse(user parent)->(var end)
+      owner SyntaxTreeAssert new-node)
+    new-node := SyntaxTreeAssert(user parent)
+    new-node.parse()
   
-  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
-    self.parent := parent
-    self.set-location()
-    parse-new-expression(user "", user self)->(owner self.tested, var end)
+  func inst parse()
+    parse-new-expression(user "", user self)->(owner self.tested)
   
   func dynamic analyze()
     self.analyze-expression(user self.tested, user glob.type-bool)
@@ -34,21 +32,19 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   owner String expected-error
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeAssertError new-node)
-    new-node := SyntaxTreeAssertError()
-    new-node.parse(user parent)->(var end)
+      owner SyntaxTreeAssertError new-node)
+    new-node := SyntaxTreeAssertError(user parent)
+    new-node.parse()
   
-  func inst parse(user SyntaxTreeBlock parent)->(var Char end)
-    self.parent := parent
-    self.set-location()
-    parse-new-expression(user ",", user self)->(owner self.tested, var end)
-    if end = ','
-      read-c()->(var end)
-      if end = '\n'
+  func inst parse()
+    parse-new-expression(user ",", user self)->(owner self.tested)
+    if glob.last-char = ','
+      read-c()
+      if glob.last-char = '\n'
         self.read-line-break-spaces()
-      else-if end != ' '
-        self.syntax-error-c(user "expected space after \",\", got", copy end)
-      read-new(user "")->(owner self.expected-error, var end)
+      else-if glob.last-char != ' '
+        self.syntax-error-c(user "expected space after \",\", got")
+      read-new(user "")->(owner self.expected-error)
       self.check-string(user self.expected-error)
   
   func dynamic analyze()
@@ -122,12 +118,12 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
 
 ~~~ Test function in the syntax tree ~~~
 class SyntaxTreeTestFunction(SyntaxTreeFunction)
-  func inst parse-new()->(var Char end, owner SyntaxTreeTestFunction new-node)
+  func inst parse-new()->(owner SyntaxTreeTestFunction new-node)
     new-node := SyntaxTreeTestFunction()
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
-    base.parse(user _)->(var end)
+  func inst parse()
+    base(user _)
     if self.arguments.parameters.first? or self.arguments.outputs.first?
       self.syntax-error-msg(user "test function cannot have arguments")
     glob.test-functions.add(user self.name, user self)
@@ -140,12 +136,12 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
   owner String module-name
   user SyntaxTreeFunction mocked-function
   
-  func inst parse-new()->(var Char end, owner SyntaxTreeMockFunction new-node)
+  func inst parse-new()->(owner SyntaxTreeMockFunction new-node)
     new-node := SyntaxTreeMockFunction()
-    new-node.parse()->(var end)
+    new-node.parse()
   
-  func inst parse()->(var Char end)
-    base(user _)->(var end)
+  func inst parse()
+    base(user _)
     self.mocker-function := self
     var Int index
     self.name.find(user ".")->(var index)
@@ -218,7 +214,7 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
         self.syntax-error(
             user "already mocking function", user self.mocked-name)
       self.mocked-function.mocker-function := self
-    base.link-types()
+    base()
   
   func dynamic analyze()
     glob.current-module := self.my-module
@@ -241,10 +237,10 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       self.arguments.check-same-as(
           user self.mocked-function.arguments, user _, copy 0)
       self.my-module := self.mocked-function.my-module
-    base.analyze()
+    base()
   
   func dynamic write-declaration()
-    base.write-declaration()
+    base()
     if self.mocked-function?
       ; Bool `name`_active = true;
       write(user "\nBool ")
@@ -263,17 +259,14 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       self.write-arg-list(user self.arguments.parameters)->(var first)
       self.write-arg-list(user self.arguments.outputs)->(var first)
       write(user ");\n")
-    base.write-block-body()
+    base()
   
-  func inst write-arg-list(user List{Argument} list)->(
-      var Bool first)
-    user ListNode{Argument} node(user list.first)
-    do
-      while node?
+  func inst write-arg-list(user List{Argument} list)->(var Bool first)
+    for argument in list.iter()
       if not first
         write(user ", ")
       user SyntaxTreeVariable variable
-      node.item.get-variable()->(user variable)
+      argument.get-variable()->(user variable)
       write-cname(user variable.name)
       if not variable.type-instance.type-data.is-primitive
         write(user ", ")
@@ -284,4 +277,3 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
         write-cname(user variable.name)
         write(user "_Dynamic")
       first := false
-      node := node.next

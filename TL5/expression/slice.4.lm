@@ -9,26 +9,22 @@ class SliceExpression(Expression)
   owner SymbolExpression slice-symbol
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
-      owner Expression expression, var Char end)
-    new SliceExpression slice-expression
-    slice-expression.parse(owner expression, user code-node)->(var end)
+      owner Expression expression)
+    new SliceExpression slice-expression(user code-node)
+    slice-expression.parse(owner expression)
     expression := slice-expression
   
   ~~~ parsing `sequence[index]` or `sequence[index:second-index]` ~~~
-  func inst parse(owner Expression sequence, user SyntaxTreeCode code-node)->(
-      var Char end)
-    self.code-node := code-node
+  func inst parse(owner Expression sequence)
     self.sequence := sequence
     self.access := Access.VAR
-    self.set-location()
-    parse-new-expression(user ":]", user code-node)->(
-        owner self.index, var end)
-    if end = ':'
-      parse-new-expression(user "]", user code-node)->(
-          owner self.second-index, var end)
-    if end != ']'
-      self.syntax-error-c(user "expected \"]\", got", copy end)
-    read-c()->(var end)
+    parse-new-expression(user ":]", user self.code-node)->(owner self.index)
+    if glob.last-char = ':'
+      parse-new-expression(user "]", user self.code-node)->(
+          owner self.second-index)
+    if glob.last-char != ']'
+      self.syntax-error-c(user "expected \"]\", got")
+    read-c()
   
   func dynamic analyze()
     self.sequence.analyze()
@@ -80,7 +76,7 @@ class SliceExpression(Expression)
     if self.second-index?
       self.second-index.write-preactions()
       self.write-init-var-ref(user self.slice-symbol)
-      self.write-refman-init(user self.slice-symbol)
+      self.write-refman-init(user self.slice-symbol, copy false)
       ; symbol_Var.length = second;
       ; symbol_Var.max_length = symbol.length + 1;
       ; symbol_Var.values = (seq)->values + (index);
@@ -110,18 +106,7 @@ class SliceExpression(Expression)
       write(user ");\n")
       self.code-node.write-spaces()
     
-    ; if (seq == NULL) RAISE("empty object used as sequence")
-    ; if (seq_Refman->value == NULL)
-    ;   RAISE("outdated weak reference used as sequence")
-    write(user "if (")
-    self.sequence.write-as-top()
-    write(user " == NULL) ")
-    self.write-raise(user "empty object used as sequence")
-    self.code-node.write-spaces()
-    write(user "if (")
-    self.sequence.write-refman()
-    write(user "->value == NULL) ")
-    self.write-raise(user "outdated weak reference used as sequence")
+    self.sequence.write-check-ref()
     self.code-node.write-spaces()
     
     ; if ((index) < 0 || (index) >= (seq)->length)

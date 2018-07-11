@@ -44,13 +44,12 @@ class TextExpression(Expression)
 ~~~ Constant integer expression ~~~
 class IntExpression(TextExpression)
   func inst parse-new(owner String text)->(owner Expression expression)
-    new IntExpression int-expression
+    new IntExpression int-expression(user _)
     int-expression.parse(owner text)
     expression := int-expression
   
   ~~~ parsing `123` or `-123` or `0b0012` or `0x3d4f` ~~~
   func inst parse(owner String text)
-    self.set-location()
     user String number(user text)
     if number[0] = '-'
       number := number[1:number.length - 1]
@@ -82,13 +81,12 @@ class IntExpression(TextExpression)
 ~~~ Constant character expression ~~~
 class CharExpression(TextExpression)
   func inst parse-new(owner String text)->(owner Expression expression)
-    new CharExpression char-expression
+    new CharExpression char-expression(user _)
     char-expression.parse(owner text)
     expression := char-expression
   
   ~~~ parsing `'a'` or `'\n'` or `'\xf5'` or `'\270'` ~~~
   func inst parse(owner String text)
-    self.set-location()
     var Char ch
     if text.length = 3
       ch := text[1]
@@ -124,14 +122,12 @@ class StringExpression(TextExpression)
   
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
-    new StringExpression string-expression
-    string-expression.parse(owner text, user code-node)
+    new StringExpression string-expression(user code-node)
+    string-expression.parse(owner text)
     expression := string-expression
   
   ~~~ parsing `"some string"` ~~~
-  func inst parse(owner String text, user SyntaxTreeCode code-node)
-    self.code-node := code-node
-    self.set-location()
+  func inst parse(owner String text)
     self.check-string(user text)
     self.set-simple-type(user glob.type-string)
     self.access := Access.VAR
@@ -181,7 +177,7 @@ class StringExpression(TextExpression)
     ; `symbol`_Var.length = `string-length`;
     ; `symbol`_Var.values = "`text`";
     self.write-init-var-ref(user self.symbol)
-    self.write-refman-init(user self.symbol)
+    self.write-refman-init(user self.symbol, copy false)
     var Int real-length(copy 1)
     for index in 1:self.text.length - 1
       if self.text[index] = '\\'
@@ -210,13 +206,8 @@ class StringExpression(TextExpression)
 
 ~~~ Constant empty expression `_` ~~~
 class EmptyExpression(Expression)
-  func inst parse-new(owner String text)->(owner Expression expression)
-    new EmptyExpression empty-expression
-    empty-expression.init()
-    expression := empty-expression
-  
-  func inst init()
-    self.set-location()
+  new()
+    base(user _)
     self.set-simple-type(user glob.type-empty)
     self.access := Access.OWNER
   

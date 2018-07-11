@@ -289,7 +289,7 @@ Returncode MemberExpression_analyze(MemberExpression* self) {
     self->_base._base.is_generic_cast = self->_base.variable->type_instance->type_data == glob->type_generic;
     CHECK(145, TypeInstance_f_new_replace_params(self->_base.variable->type_instance, instance_type, self->bases, &(self->_base._base.result_type)) )
     self->_base._base.access = self->_base.variable->access;
-    self->_base._base.assignable = true;
+    self->_base._base.assignable =  ! self->_base._base.is_complex_field;
   }
   else {
     CHECK(150, TypeData_find_meth(instance_type->type_data, self->_base.name, &(self->_base.function), &(self->bases)) )
@@ -317,20 +317,18 @@ Returncode MemberExpression_analyze(MemberExpression* self) {
       }
       CHECK(165, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){5, 4, "type"}, instance_type->type_data->name, &(String){14, 13, "has no member"}, self->_base.name) )
     }
-    if (self->_base.function->is_dynamic && self->instance->result_type->type_data != glob->type_type && self->instance->result_type->type_data != glob->type_base) {
+    if (self->_base.function->is_dynamic &&  ! self->instance->is_complex_field && self->instance->result_type->type_data != glob->type_type && self->instance->result_type->type_data != glob->type_base) {
       self->bases += self->_base.function->dynamic_base_count;
       self->_base.function = self->_base.function->dynamic_base_method;
-      if (!self->instance->is_complex_field) {
-        self->dynamic_call_self_instance = self->instance;
-      }
+      self->dynamic_call_self_instance = self->instance;
     }
-    CHECK(177, Expression_set_simple_type(&(self->_base._base), glob->type_func) )
+    CHECK(176, Expression_set_simple_type(&(self->_base._base), glob->type_func) )
     self->_base._base.access = ACCESS_VAR;
-    CHECK(179, FunctionArguments_copy_new(self->_base.function->arguments, &(self->_base._base.result_type->arguments)) )
+    CHECK(178, FunctionArguments_copy_new(self->_base.function->arguments, &(self->_base._base.result_type->arguments)) )
   }
   if (self->instance->result_type->type_data == glob->type_base) {
     if (!(NULL != self->_base.function)) {
-      CHECK(182, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){31, 30, "calling \"base\" with non-method"}, self->_base.name) )
+      CHECK(181, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){31, 30, "calling \"base\" with non-method"}, self->_base.name) )
     }
     TypeInstance* base_result_type = self->instance->result_type;
     self->instance->result_type = ((TypeInstance*)(base_result_type->parameters->first->item));
@@ -347,10 +345,10 @@ static char* _func_name_MemberExpression_analyze_call = "MemberExpression.analyz
 #define LUMI_FUNC_NAME _func_name_MemberExpression_analyze_call
 Returncode MemberExpression_analyze_call(MemberExpression* self, FunctionArguments* arguments, TypeInstance** instance_type, Int* bases, Bool* is_function_object) {
   if (self->is_mock_field && self->_base.is_annotate) {
-    CHECK(193, (self->instance)->_base._dtl[7](self->instance, arguments, &((*instance_type)), &((*bases)), &((*is_function_object))) )
+    CHECK(192, (self->instance)->_base._dtl[7](self->instance, arguments, &((*instance_type)), &((*bases)), &((*is_function_object))) )
     return OK;
   }
-  CHECK(196, SymbolExpression_analyze_call(&(self->_base), arguments, &((*instance_type)), &((*bases)), &((*is_function_object))) )
+  CHECK(195, SymbolExpression_analyze_call(&(self->_base), arguments, &((*instance_type)), &((*bases)), &((*is_function_object))) )
   if ((*is_function_object) ||  NULL !=  self->_base.module_name) {
     return OK;
   }
@@ -361,14 +359,14 @@ Returncode MemberExpression_analyze_call(MemberExpression* self, FunctionArgumen
   else {
     (*instance_type) = self->instance->result_type;
     CallArgument* self_param = malloc(sizeof(CallArgument));
-    if (self_param == NULL) RAISE(205)
+    if (self_param == NULL) RAISE(204)
     *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
     self_param->_base._base._dtl = CallArgument__dtl;
-    CHECK(206, SyntaxTreeNode_set_location(&(self_param->_base._base)) )
+    CHECK(205, SyntaxTreeNode_set_location(&(self_param->_base._base)) )
     self_param->_base.access = ((Argument*)(self->_base.function->arguments->parameters->first->item))->access;
     self_param->value = self->instance;
     self_param->value->top = true;
-    CHECK(210, List_prepend(arguments->parameters, &(self_param->_base)) )
+    CHECK(209, List_prepend(arguments->parameters, &(self_param->_base)) )
   }
   self->instance = NULL;
   return OK;
@@ -381,10 +379,10 @@ Returncode MemberExpression_analyze_mock(MemberExpression* self, Bool is_annotat
 static char* _func_name_MemberExpression_analyze_mock = "MemberExpression.analyze-mock";
 #define LUMI_FUNC_NAME _func_name_MemberExpression_analyze_mock
 Returncode MemberExpression_analyze_mock(MemberExpression* self, Bool is_annotate, Bool* is_mock) {
-  CHECK(214, SymbolExpression_analyze_mock(&(self->_base), is_annotate, &((*is_mock))) )
+  CHECK(213, SymbolExpression_analyze_mock(&(self->_base), is_annotate, &((*is_mock))) )
   if ((*is_mock)) {
     if (self->_base.function->is_dynamic && self->instance->result_type->type_data != glob->type_type && self->instance->result_type->type_data != glob->type_base) {
-      CHECK(218, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){49, 48, "accessing mock function field in dynamic call to"}, self->_base.name) )
+      CHECK(217, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){49, 48, "accessing mock function field in dynamic call to"}, self->_base.name) )
     }
   }
   return OK;
@@ -401,38 +399,28 @@ Returncode MemberExpression_write_preactions(MemberExpression* self) {
     return OK;
   }
   if (NULL != self->instance) {
-    CHECK(226, (self->instance)->_base._dtl[9](self->instance) )
+    CHECK(225, (self->instance)->_base._dtl[9](self->instance) )
   }
   if (!(NULL != self->dynamic_call_self_instance || (NULL != self->instance &&  ! (NULL != self->_base.function) && self->instance->result_type->type_data != glob->type_type)) || (NULL != self->instance && self->instance->is_complex_field) || self->is_mock_field) {
     return OK;
   }
   /* if (...) RAISE(`line-num`, ...) */
-  CHECK(234, write(&(String){5, 4, "if ("}) )
   if (NULL != self->instance) {
-    /* if (`instance` == NULL) RAISE("used member of empty object") */
-    /* if (`instance`_Refman->value == NULL) */
-    /*   RAISE("used member of outdated weak reference") */
-    CHECK(239, Expression_write_as_top(self->instance) )
-    CHECK(240, write(&(String){11, 10, " == NULL) "}) )
-    CHECK(241, SyntaxTreeNode_write_raise(&(self->_base._base._base), &(String){28, 27, "used member of empty object"}) )
-    CHECK(242, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-    CHECK(243, write(&(String){5, 4, "if ("}) )
-    CHECK(244, (self->instance)->_base._dtl[6](self->instance) )
-    CHECK(245, write(&(String){18, 17, "->value == NULL) "}) )
-    CHECK(246, SyntaxTreeNode_write_raise(&(self->_base._base._base), &(String){39, 38, "used member of outdated weak reference"}) )
+    CHECK(234, Expression_write_check_ref(self->instance) )
   }
   else {
     if (NULL != self->dynamic_call_self_instance) {
       /* if (`instance`_Dynamic == NULL) RAISE("dynamic call of empty object") */
+      CHECK(237, write(&(String){5, 4, "if ("}) )
       Bool top = self->dynamic_call_self_instance->top;
       self->dynamic_call_self_instance->top = true;
-      CHECK(251, (self->dynamic_call_self_instance)->_base._dtl[5](self->dynamic_call_self_instance) )
-      CHECK(252, write(&(String){11, 10, " == NULL) "}) )
-      CHECK(253, SyntaxTreeNode_write_raise(&(self->_base._base._base), &(String){29, 28, "dynamic call of empty object"}) )
+      CHECK(240, (self->dynamic_call_self_instance)->_base._dtl[5](self->dynamic_call_self_instance) )
+      CHECK(241, write(&(String){11, 10, " == NULL) "}) )
+      CHECK(242, SyntaxTreeNode_write_raise(&(self->_base._base._base), &(String){29, 28, "dynamic call of empty object"}) )
       self->dynamic_call_self_instance->top = top;
     }
   }
-  CHECK(255, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(244, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -446,39 +434,39 @@ Returncode MemberExpression_write(MemberExpression* self) {
   if (NULL != self->dynamic_call_self_instance) {
     Bool top = self->dynamic_call_self_instance->top;
     self->dynamic_call_self_instance->top = false;
-    CHECK(261, (self->dynamic_call_self_instance)->_base._dtl[5](self->dynamic_call_self_instance) )
+    CHECK(250, (self->dynamic_call_self_instance)->_base._dtl[5](self->dynamic_call_self_instance) )
     self->dynamic_call_self_instance->top = top;
-    CHECK(263, MemberExpression_write_bases(self) )
-    CHECK(264, write_cname(self->_base.function->name) )
+    CHECK(252, MemberExpression_write_bases(self) )
+    CHECK(253, write_cname(self->_base.function->name) )
     return OK;
   }
   if (self->is_mock_field) {
-    CHECK(267, (self->instance)->_base._dtl[4](self->instance) )
+    CHECK(256, (self->instance)->_base._dtl[4](self->instance) )
     if (!self->_base.is_annotate) {
-      CHECK(269, write(&(String){2, 1, "_"}) )
-      CHECK(270, write_cname(self->_base.name) )
+      CHECK(258, write(&(String){2, 1, "_"}) )
+      CHECK(259, write_cname(self->_base.name) )
     }
     return OK;
   }
   
   if (self->_base._base.is_generic_cast &&  ! self->_base._base.top) {
-    CHECK(274, write(&(String){3, 2, "(("}) )
-    CHECK(275, TypeData_write_cname(self->_base._base.result_type->type_data) )
-    CHECK(276, write(&(String){4, 3, "*)("}) )
+    CHECK(263, write(&(String){3, 2, "(("}) )
+    CHECK(264, TypeData_write_cname(self->_base._base.result_type->type_data) )
+    CHECK(265, write(&(String){4, 3, "*)("}) )
   }
   if (NULL != self->instance &&  ! (NULL != self->_base.function) && self->instance->result_type->type_data != glob->type_type &&  ! (NULL != self->_base.module_name)) {
     if (self->_base._base.is_complex_field && self->_base._base.top) {
-      CHECK(281, write(&(String){3, 2, "&("}) )
+      CHECK(270, write(&(String){3, 2, "&("}) )
     }
-    CHECK(282, (self->instance)->_base._dtl[4](self->instance) )
-    CHECK(283, MemberExpression_write_bases(self) )
+    CHECK(271, (self->instance)->_base._dtl[4](self->instance) )
+    CHECK(272, MemberExpression_write_bases(self) )
   }
-  CHECK(284, SymbolExpression_write(&(self->_base)) )
+  CHECK(273, SymbolExpression_write(&(self->_base)) )
   if (NULL != self->instance &&  ! (NULL != self->_base.function) && self->_base._base.is_complex_field && self->instance->result_type->type_data != glob->type_type && self->_base._base.top) {
-    CHECK(287, write(&(String){2, 1, ")"}) )
+    CHECK(276, write(&(String){2, 1, ")"}) )
   }
   if (self->_base._base.is_generic_cast &&  ! self->_base._base.top) {
-    CHECK(289, write(&(String){3, 2, "))"}) )
+    CHECK(278, write(&(String){3, 2, "))"}) )
   }
   return OK;
 }
@@ -491,14 +479,14 @@ static char* _func_name_MemberExpression_write_refman = "MemberExpression.write-
 #define LUMI_FUNC_NAME _func_name_MemberExpression_write_refman
 Returncode MemberExpression_write_refman(MemberExpression* self) {
   if (self->_base._base.is_complex_field) {
-    CHECK(293, (self->instance)->_base._dtl[6](self->instance) )
+    CHECK(282, (self->instance)->_base._dtl[6](self->instance) )
     return OK;
   }
   Bool top = self->_base._base.top;
   if (self->_base._base.is_generic_cast &&  ! self->_base._base.top) {
     self->_base._base.top = true;
   }
-  CHECK(298, SymbolExpression_write_refman(&(self->_base)) )
+  CHECK(287, SymbolExpression_write_refman(&(self->_base)) )
   self->_base._base.top = top;
   return OK;
 }
@@ -511,22 +499,24 @@ static char* _func_name_MemberExpression_write_dynamic = "MemberExpression.write
 #define LUMI_FUNC_NAME _func_name_MemberExpression_write_dynamic
 Returncode MemberExpression_write_dynamic(MemberExpression* self) {
   if (self->_base._base.is_complex_field) {
-    CHECK(303, write(&(String){2, 1, "&"}) )
-    CHECK(304, TypeData_write_cname(self->_base._base.result_type->type_data) )
-    CHECK(305, write(&(String){9, 8, "_dynamic"}) )
+    if (self->_base._base.top) {
+      CHECK(293, write(&(String){2, 1, "&"}) )
+    }
+    CHECK(294, TypeData_write_cname(self->_base._base.result_type->type_data) )
+    CHECK(295, write(&(String){9, 8, "_dynamic"}) )
     return OK;
   }
   Bool top = self->_base._base.top;
   if (self->_base._base.is_generic_cast &&  ! self->_base._base.top) {
-    CHECK(309, write(&(String){3, 2, "(("}) )
-    CHECK(310, TypeData_write_cname(self->_base._base.result_type->type_data) )
-    CHECK(311, write(&(String){12, 11, "_Dynamic*)("}) )
+    CHECK(299, write(&(String){3, 2, "(("}) )
+    CHECK(300, TypeData_write_cname(self->_base._base.result_type->type_data) )
+    CHECK(301, write(&(String){12, 11, "_Dynamic*)("}) )
     self->_base._base.top = true;
   }
-  CHECK(313, SymbolExpression_write_dynamic(&(self->_base)) )
+  CHECK(303, SymbolExpression_write_dynamic(&(self->_base)) )
   self->_base._base.top = top;
   if (self->_base._base.is_generic_cast &&  ! self->_base._base.top) {
-    CHECK(316, write(&(String){3, 2, "))"}) )
+    CHECK(306, write(&(String){3, 2, "))"}) )
   }
   return OK;
 }
@@ -539,13 +529,13 @@ static char* _func_name_MemberExpression_write_bases = "MemberExpression.write-b
 #define LUMI_FUNC_NAME _func_name_MemberExpression_write_bases
 Returncode MemberExpression_write_bases(MemberExpression* self) {
   if (NULL != self->instance && self->instance->is_complex_field) {
-    CHECK(320, write(&(String){2, 1, "."}) )
+    CHECK(310, write(&(String){2, 1, "."}) )
   }
   else {
-    CHECK(322, write(&(String){3, 2, "->"}) )
+    CHECK(312, write(&(String){3, 2, "->"}) )
   }
   {int n; for (n = (0); n < (self->bases); ++n) {
-    CHECK(324, write(&(String){7, 6, "_base."}) )
+    CHECK(314, write(&(String){7, 6, "_base."}) )
   }}
   return OK;
 }

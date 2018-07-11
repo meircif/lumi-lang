@@ -110,6 +110,13 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.code-nodes.add(
           owner SyntaxTreeWhile.parse-new(var _, user self):(copy end))
       
+    else-if keyword.equal(user "break")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"break\", got", copy end)
+      self.code-nodes.add(
+          owner SyntaxTreeBreak.parse-new(var _, user self):(copy end))
+      
     else-if keyword.equal(user "continue")
       if end != '\n'
         self.m-syntax-error-c(

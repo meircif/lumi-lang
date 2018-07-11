@@ -8,15 +8,14 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
   user SyntaxTreeCatch catch-node
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeTry new-node)
-    new-node := SyntaxTreeTry()
-    new-node.init(user parent)
-    new-node.parse-block(copy false)->(var end)
+      owner SyntaxTreeTry new-node)
+    new-node := SyntaxTreeTry(user parent)
+    new-node.parse-block(copy false)
   
   func dynamic analyze()
     if not self.block.code-nodes.first?
       self.syntax-error-msg(user "\"try\" statement with no code")
-    base.analyze()
+    base()
   
   func dynamic write()
     self.write-spaces()
@@ -48,15 +47,14 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
 ~~~ Catch statement in the syntax tree ~~~
 class SyntaxTreeCatch(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      var Char end, owner SyntaxTreeCatch new-node)
-    new-node := SyntaxTreeCatch()
-    new-node.init(user parent)
-    new-node.parse-block(copy false)->(var end)
+      owner SyntaxTreeCatch new-node)
+    new-node := SyntaxTreeCatch(user parent)
+    new-node.parse-block(copy false)
   
   func dynamic analyze()
     if not self.block.code-nodes.first?
       self.syntax-error-msg(user "\"catch\" statement with no code")
-    base.analyze()
+    base()
   
   func dynamic write()
     self.write-spaces()

@@ -1,9 +1,12 @@
 ~~~ TL4 compiler main - written in TL3~~~
 module tl5-compiler
 
+
+var Global compiler
+
+
 ~~~ compiler main function!~~~
 main
-  glob.init()
-  glob.root.parse()
-  glob.root.analyze()
-  glob.root.write()
+  compiler.root.parse()
+  compiler.root.analyze()
+  compiler.root.write()
