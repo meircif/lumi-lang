@@ -436,35 +436,15 @@ Returncode StringExpression_write_preactions(StringExpression* self);
 static char* _func_name_StringExpression_write_preactions = "StringExpression.write-preactions";
 #define LUMI_FUNC_NAME _func_name_StringExpression_write_preactions
 Returncode StringExpression_write_preactions(StringExpression* self) {
-  /* `symbol`_Var.max_length = `string-length + 1`; */
-  /* `symbol`_Var.length = `string-length`; */
-  /* `symbol`_Var.values = "`text`"; */
-  CHECK(182, Expression_write_init_var_ref(&(self->_base._base), self->symbol) )
-  CHECK(183, Expression_write_refman_init(&(self->_base._base), self->symbol, false) )
-  Int real_length = 1;
-  {int index; for (index = (1); index < (self->_base.text->length - 1); ++index) {
-    if ((index) < 0 || (index) >= (self->_base.text)->length) RAISE(186)
-    if (((self->_base.text)->values[index]) == '\\') {
-      index += 1;
-    }
-    real_length = real_length + 1;
-  }}
-  CHECK(189, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(190, (self->symbol)->_base._base._dtl[4](self->symbol) )
-  CHECK(191, write(&(String){19, 18, "_Var.max_length = "}) )
-  CHECK(192, write_int(real_length) )
-  CHECK(193, write(&(String){3, 2, ";\n"}) )
-  CHECK(194, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(195, (self->symbol)->_base._base._dtl[4](self->symbol) )
-  CHECK(196, write(&(String){15, 14, "_Var.length = "}) )
-  CHECK(197, write_int(real_length - 1) )
-  CHECK(198, write(&(String){3, 2, ";\n"}) )
-  CHECK(199, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
-  CHECK(200, (self->symbol)->_base._base._dtl[4](self->symbol) )
-  CHECK(201, write(&(String){15, 14, "_Var.values = "}) )
-  CHECK(202, write(self->_base.text) )
-  CHECK(203, write(&(String){3, 2, ";\n"}) )
-  CHECK(204, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  /* INIT_STRING_CONST(`line`, `symbol`, `text`) */
+  CHECK(180, write(&(String){19, 18, "INIT_STRING_CONST("}) )
+  CHECK(181, SyntaxTreeNode_write_line_num(&(self->_base._base._base)) )
+  CHECK(182, write(&(String){3, 2, ", "}) )
+  CHECK(183, (self->symbol)->_base._base._dtl[4](self->symbol) )
+  CHECK(184, write(&(String){3, 2, ", "}) )
+  CHECK(185, write(self->_base.text) )
+  CHECK(186, write(&(String){4, 3, ");\n"}) )
+  CHECK(187, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -475,7 +455,7 @@ Returncode StringExpression_write(StringExpression* self);
 static char* _func_name_StringExpression_write = "StringExpression.write";
 #define LUMI_FUNC_NAME _func_name_StringExpression_write
 Returncode StringExpression_write(StringExpression* self) {
-  CHECK(207, (self->symbol)->_base._base._dtl[4](self->symbol) )
+  CHECK(190, (self->symbol)->_base._base._dtl[4](self->symbol) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -503,10 +483,10 @@ static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_parse_new
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
   EmptyExpression* empty_expression = malloc(sizeof(EmptyExpression));
-  if (empty_expression == NULL) RAISE(213)
+  if (empty_expression == NULL) RAISE(196)
   *empty_expression = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false};
   empty_expression->_base._base._dtl = EmptyExpression__dtl;
-  CHECK(214, EmptyExpression_init(empty_expression) )
+  CHECK(197, EmptyExpression_init(empty_expression) )
   (*expression) = &(empty_expression->_base);
   free(text);
   return OK;
@@ -519,8 +499,8 @@ Returncode EmptyExpression_init(EmptyExpression* self);
 static char* _func_name_EmptyExpression_init = "EmptyExpression.init";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_init
 Returncode EmptyExpression_init(EmptyExpression* self) {
-  CHECK(219, SyntaxTreeNode_set_location(&(self->_base._base)) )
-  CHECK(220, Expression_set_simple_type(&(self->_base), glob->type_empty) )
+  CHECK(202, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(203, Expression_set_simple_type(&(self->_base), glob->type_empty) )
   self->_base.access = ACCESS_OWNER;
   return OK;
 }
@@ -532,7 +512,7 @@ Returncode EmptyExpression_write(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write = "EmptyExpression.write";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_write
 Returncode EmptyExpression_write(EmptyExpression* self) {
-  CHECK(224, write(&(String){5, 4, "NULL"}) )
+  CHECK(207, write(&(String){5, 4, "NULL"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -543,7 +523,7 @@ Returncode EmptyExpression_write_dynamic(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write_dynamic = "EmptyExpression.write-dynamic";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_write_dynamic
 Returncode EmptyExpression_write_dynamic(EmptyExpression* self) {
-  CHECK(227, (self)->_base._base._dtl[4](self) )
+  CHECK(210, (self)->_base._base._dtl[4](self) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -554,7 +534,7 @@ Returncode EmptyExpression_write_refman(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write_refman = "EmptyExpression.write-refman";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_write_refman
 Returncode EmptyExpression_write_refman(EmptyExpression* self) {
-  CHECK(230, (self)->_base._base._dtl[4](self) )
+  CHECK(213, (self)->_base._base._dtl[4](self) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

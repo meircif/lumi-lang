@@ -284,45 +284,17 @@ Returncode Expression_get_parent_type(Expression* self, TypeData** parent_type) 
 #undef LUMI_FUNC_NAME
 #endif
 #if LUMI_STAGE == LUMI_DECLARATIONS
-Returncode Expression_write_refman_init(Expression* self, SymbolExpression* symbol, Bool is_new);
-#elif LUMI_STAGE == LUMI_FUNCTIONS
-static char* _func_name_Expression_write_refman_init = "Expression.write-refman-init";
-#define LUMI_FUNC_NAME _func_name_Expression_write_refman_init
-Returncode Expression_write_refman_init(Expression* self, SymbolExpression* symbol, Bool is_new) {
-  /* `symbol`_Refman = LUMI_new_ref((void**)&`symbol`, `is-new`); */
-  /* if (`symbol`_Refman == NULL) raise(`line-num`) */
-  CHECK(192, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(193, (symbol)->_base._base._dtl[4](symbol) )
-  CHECK(194, write(&(String){33, 32, "_Refman = LUMI_new_ref((void**)&"}) )
-  CHECK(195, (symbol)->_base._base._dtl[4](symbol) )
-  CHECK(196, write(&(String){3, 2, ", "}) )
-  if (is_new) {
-    CHECK(198, write(&(String){5, 4, "true"}) )
-  }
-  else {
-    CHECK(200, write(&(String){6, 5, "false"}) )
-  }
-  CHECK(201, write(&(String){4, 3, ");\n"}) )
-  CHECK(202, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(203, write(&(String){5, 4, "if ("}) )
-  CHECK(204, (symbol)->_base._base._dtl[4](symbol) )
-  CHECK(205, write(&(String){18, 17, "_Refman == NULL) "}) )
-  CHECK(206, SyntaxTreeNode_write_raise(&(self->_base), &(String){39, 38, "insufficient memory for managed object"}) )
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-#endif
-#if LUMI_STAGE == LUMI_DECLARATIONS
 Returncode Expression_write_init_var_ref(Expression* self, SymbolExpression* symbol);
 #elif LUMI_STAGE == LUMI_FUNCTIONS
 static char* _func_name_Expression_write_init_var_ref = "Expression.write-init-var-ref";
 #define LUMI_FUNC_NAME _func_name_Expression_write_init_var_ref
 Returncode Expression_write_init_var_ref(Expression* self, SymbolExpression* symbol) {
-  /* `symbol` = &`symbol`_Var; */
-  CHECK(210, (symbol)->_base._base._dtl[4](symbol) )
-  CHECK(211, write(&(String){5, 4, " = &"}) )
-  CHECK(212, (symbol)->_base._base._dtl[4](symbol) )
-  CHECK(213, write(&(String){7, 6, "_Var;\n"}) )
+  /* INIT_VAR(`line`, `symbol`) */
+  CHECK(191, write(&(String){10, 9, "INIT_VAR("}) )
+  CHECK(192, SyntaxTreeNode_write_line_num(&(self->_base)) )
+  CHECK(193, write(&(String){3, 2, ", "}) )
+  CHECK(194, (symbol)->_base._base._dtl[4](symbol) )
+  CHECK(195, write(&(String){3, 2, ")\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -333,15 +305,15 @@ Returncode Expression_write_assign_null(Expression* self);
 static char* _func_name_Expression_write_assign_null = "Expression.write-assign-null";
 #define LUMI_FUNC_NAME _func_name_Expression_write_assign_null
 Returncode Expression_write_assign_null(Expression* self) {
-  CHECK(216, (self)->_base._dtl[4](self) )
-  CHECK(217, write(&(String){10, 9, " = NULL;\n"}) )
-  CHECK(218, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(219, (self)->_base._dtl[6](self) )
-  CHECK(220, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(198, (self)->_base._dtl[4](self) )
+  CHECK(199, write(&(String){10, 9, " = NULL;\n"}) )
+  CHECK(200, SyntaxTreeCode_write_spaces(self->code_node) )
+  CHECK(201, (self)->_base._dtl[6](self) )
+  CHECK(202, write(&(String){10, 9, " = NULL;\n"}) )
   if (self->result_type->type_data->is_dynamic) {
-    CHECK(222, SyntaxTreeCode_write_spaces(self->code_node) )
-    CHECK(223, (self)->_base._dtl[5](self) )
-    CHECK(224, write(&(String){10, 9, " = NULL;\n"}) )
+    CHECK(204, SyntaxTreeCode_write_spaces(self->code_node) )
+    CHECK(205, (self)->_base._dtl[5](self) )
+    CHECK(206, write(&(String){10, 9, " = NULL;\n"}) )
   }
   
   return OK;
@@ -354,18 +326,14 @@ Returncode Expression_write_check_ref(Expression* self);
 static char* _func_name_Expression_write_check_ref = "Expression.write-check-ref";
 #define LUMI_FUNC_NAME _func_name_Expression_write_check_ref
 Returncode Expression_write_check_ref(Expression* self) {
-  /* if (`instance` == NULL) RAISE("empty object used") */
-  /* if (`instance`_Refman->value == NULL) */
-  /*   RAISE("outdated weak reference used") */
-  CHECK(230, write(&(String){5, 4, "if ("}) )
-  CHECK(231, Expression_write_as_top(self) )
-  CHECK(232, write(&(String){11, 10, " == NULL) "}) )
-  CHECK(233, SyntaxTreeNode_write_raise(&(self->_base), &(String){18, 17, "empty object used"}) )
-  CHECK(234, SyntaxTreeCode_write_spaces(self->code_node) )
-  CHECK(235, write(&(String){5, 4, "if ("}) )
-  CHECK(236, (self)->_base._dtl[6](self) )
-  CHECK(237, write(&(String){18, 17, "->value == NULL) "}) )
-  CHECK(238, SyntaxTreeNode_write_raise(&(self->_base), &(String){29, 28, "outdated weak reference used"}) )
+  /* CHECK_REF(`line`, `instance`, `instance-refman`) */
+  CHECK(210, write(&(String){11, 10, "CHECK_REF("}) )
+  CHECK(211, SyntaxTreeNode_write_line_num(&(self->_base)) )
+  CHECK(212, write(&(String){3, 2, ", "}) )
+  CHECK(213, Expression_write_as_top(self) )
+  CHECK(214, write(&(String){3, 2, ", "}) )
+  CHECK(215, (self)->_base._dtl[6](self) )
+  CHECK(216, write(&(String){3, 2, ")\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -376,8 +344,8 @@ Returncode Expression_write_dynamic(Expression* self);
 static char* _func_name_Expression_write_dynamic = "Expression.write-dynamic";
 #define LUMI_FUNC_NAME _func_name_Expression_write_dynamic
 Returncode Expression_write_dynamic(Expression* self) {
-  CHECK(241, (self)->_base._dtl[4](self) )
-  CHECK(242, write(&(String){9, 8, "_Dynamic"}) )
+  CHECK(219, (self)->_base._dtl[4](self) )
+  CHECK(220, write(&(String){9, 8, "_Dynamic"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -388,8 +356,8 @@ Returncode Expression_write_refman(Expression* self);
 static char* _func_name_Expression_write_refman = "Expression.write-refman";
 #define LUMI_FUNC_NAME _func_name_Expression_write_refman
 Returncode Expression_write_refman(Expression* self) {
-  CHECK(245, (self)->_base._dtl[4](self) )
-  CHECK(246, write(&(String){8, 7, "_Refman"}) )
+  CHECK(223, (self)->_base._dtl[4](self) )
+  CHECK(224, write(&(String){8, 7, "_Refman"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -402,7 +370,7 @@ static char* _func_name_Expression_write_as_top = "Expression.write-as-top";
 Returncode Expression_write_as_top(Expression* self) {
   Bool top = self->top;
   self->top = true;
-  CHECK(251, (self)->_base._dtl[4](self) )
+  CHECK(229, (self)->_base._dtl[4](self) )
   self->top = top;
   return OK;
 }

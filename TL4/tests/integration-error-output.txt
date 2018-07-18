@@ -1,5 +1,5 @@
 Running tests:
-testing fail-call-empty... Error: empty function called
+testing fail-call-empty... Error: empty object used
   Error raised in tests/integration-error-test.4.lm:31 fail-call-empty()
 testing fail-base-class-output... Error: non empty base class given as output argument
   Error raised in tests/integration-error-test.4.lm:36 fail-base-class-output()
@@ -13,7 +13,7 @@ testing fail-sequence-empty... Error: empty object used
   Error raised in tests/integration-error-test.4.lm:56 fail-sequence-empty()
 testing fail-sequence-outdated... Error: outdated weak reference used
   Error raised in tests/integration-error-test.4.lm:62 fail-sequence-outdated()
-testing fail-dynamic-empty... Error: dynamic call of empty object
+testing fail-dynamic-empty... Error: empty object used
   Error raised in tests/integration-error-test.4.lm:66 fail-dynamic-empty()
 testing fail-object-no-memory... Error: insufficient memory for object dynamic allocation
   Error raised in tests/integration-error-test.4.lm:70 fail-object-no-memory()

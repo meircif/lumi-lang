@@ -59,6 +59,23 @@ typedef struct { Dynamic_Del _del; } Generic_Type_Dynamic;
 extern Generic_Type_Dynamic* dynamic_Void;
 
 
+typedef struct {
+  String str;
+  Ref_Manager refman;
+} Error_Message;
+
+typedef struct {
+  Error_Message empty_object;
+  Error_Message outdated_weak_reference;
+  Error_Message object_memory;
+  Error_Message managed_object_memory;
+  Error_Message empty_base_output;
+  Error_Message slice_index;
+} Error_Messages;
+
+extern Error_Messages LUMI_error_messages;
+
+
 extern char* LUMI_raise_format;
 extern char* LUMI_assert_format;
 extern char* LUMI_traceline_format;
@@ -87,8 +104,11 @@ void LUMI_trace_print(
   LUMI_msg_refman.value = &LUMI_msg; \
   START_TRACE(line, err_value, format, &LUMI_msg, &LUMI_msg_refman) }
 
-#define RAISE(line, message_length, message) \
-  START_TRACE_STATIC(line, ERR, LUMI_raise_format, message_length, message)
+#define RAISE(line, message) { \
+  START_TRACE( \
+      line, ERR, LUMI_raise_format, \
+      &(LUMI_error_messages.message.str), \
+      &(LUMI_error_messages.message.refman)) }
 
 #define USER_RAISE(line, message, message_refman) \
   { START_TRACE(line, ERR, LUMI_raise_format, message, message_refman) }
@@ -104,11 +124,16 @@ void LUMI_trace_print(
 
 #define CHECK(line) if (LUMI_err != OK) { \
   LUMI_trace_print( \
-      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, NULL, NULL); \
+      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \
+      NULL, NULL); \
   RETURN_ERROR; }
 
 #define IGNORE_ERRORS(call) \
   ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;
+
+#define CHECK_REF(line, ref, refman) \
+  if (ref == NULL) RAISE(line, empty_object) \
+  if ((refman)->value == NULL) RAISE(line, outdated_weak_reference)
 
 int LUMI_main(int argc, char* argv[]);
 int LUMI_test_main(int argc, char* argv[]);
@@ -153,6 +178,25 @@ while (self->field != NULL) { \
   value_Dynamic->bases##del(value); \
   LUMI_owner_dec_ref(value_Refman); \
 }
+
+#define INIT_REFMAN(line, name, is_new) \
+  name##_Refman = LUMI_new_ref((void**)&name, is_new); \
+  if (name##_Refman == NULL) RAISE(line, managed_object_memory)
+
+#define INIT_VAR(line, name) \
+  name = &name##_Var; \
+  INIT_REFMAN(line, name, false)
+
+#define INIT_NEW(line, name, alloc) \
+  name = alloc; \
+  if (name == NULL) RAISE(line, object_memory) \
+  INIT_REFMAN(line, name, true)
+
+#define INIT_STRING_CONST(line, name, text) \
+  INIT_VAR(line, name) \
+  name##_Var.max_length = sizeof(text); \
+  name##_Var.length = sizeof(text) - 1; \
+  name##_Var.values = text;
 
 void* LUMI_alloc(size_t size);
 Ref_Manager* LUMI_new_ref(void** value, Bool is_new);

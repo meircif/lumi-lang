@@ -105,9 +105,6 @@ class InitExpression(ModuleTypeExpression)
     else
       self.write-new-init()
     
-    self.write-refman-init(
-        user self.symbol, copy self.symbol.variable.access != ACCESS-VAR)
-    
     if ? self.constructor
       self.code-node.write-spaces()
       write(user "LUMI_err = ")
@@ -141,9 +138,12 @@ class InitExpression(ModuleTypeExpression)
         write(user "_Chars);\n")
   
   func inst write-new-init()
-    # `symbol` = ...
+    # INIT_NEW(`line`, `symbol`, ...)
+    write(user "INIT_NEW(")
+    self.write-line-num()
+    write(user ", ")
     self.symbol.write()
-    write(user " = ")
+    write(user ", ")
     
     if self.result-type.type-data = glob.type-array
       if self.result-type.parameters.first.item.type-data = glob.type-string
@@ -172,14 +172,7 @@ class InitExpression(ModuleTypeExpression)
       self.result-type.type-data.write-cname()
       write(user ")")
     
-    write(user ");\n")
-    
-    # if (`symbol` == NULL) raise(`line-num`)
-    self.code-node.write-spaces()
-    write(user "if (")
-    self.symbol.write()
-    write(user " == NULL) ")
-    self.write-raise(user "insufficient memory for object dynamic allocation")
+    write(user "));\n")
   
   func inst write-assign()
     # `name` = `value`;

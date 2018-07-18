@@ -23,6 +23,21 @@ Ref_Manager* sys_Refman = NULL;
 static Array* sys_argv = NULL;
 static Ref_Manager* sys_argv_Refman = NULL;
 
+#define ERROR_MESAGE(field, message) \
+  {{sizeof(message), sizeof(message) - 1, message}, \
+   {1, &(LUMI_error_messages.field.str), &(LUMI_error_messages.field.str)}}
+
+Error_Messages LUMI_error_messages = {
+  ERROR_MESAGE(empty_object, "empty object used"),
+  ERROR_MESAGE(outdated_weak_reference, "outdated weak reference used"),
+  ERROR_MESAGE(
+      object_memory, "insufficient memory for object dynamic allocation"),
+  ERROR_MESAGE(managed_object_memory, "insufficient memory for managed object"),
+  ERROR_MESAGE(
+      empty_base_output, "non empty base class given as output argument"),
+  ERROR_MESAGE(slice_index, "slice index out of bounds")
+};
+
 enum {
   LUMI_DEBUG_NOTHING = 0,
   LUMI_DEBUG_FAIL,

@@ -176,31 +176,14 @@ class StringExpression(TextExpression)
         owner self.symbol)
   
   func dynamic write-preactions()
-    # `symbol`_Var.max_length = `string-length + 1`;
-    # `symbol`_Var.length = `string-length`;
-    # `symbol`_Var.values = "`text`";
-    self.write-init-var-ref(user self.symbol)
-    self.write-refman-init(user self.symbol, copy false)
-    var Int real-length(1)
-    for index in 1:self.text.length - 1
-      if self.text[index] = '\\'
-        index += 1
-      real-length := real-length + 1
-    self.code-node.write-spaces()
+    # INIT_STRING_CONST(`line`, `symbol`, `text`)
+    write(user "INIT_STRING_CONST(")
+    self.write-line-num()
+    write(user ", ")
     self.symbol.write()
-    write(user "_Var.max_length = ")
-    write-int(copy real-length)
-    write(user ";\n")
-    self.code-node.write-spaces()
-    self.symbol.write()
-    write(user "_Var.length = ")
-    write-int(copy real-length - 1)
-    write(user ";\n")
-    self.code-node.write-spaces()
-    self.symbol.write()
-    write(user "_Var.values = ")
+    write(user ", ")
     write(user self.text)
-    write(user ";\n")
+    write(user ");\n")
     self.code-node.write-spaces()
   
   func dynamic write()
