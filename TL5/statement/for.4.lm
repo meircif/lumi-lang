@@ -86,7 +86,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
         user self.has-func)
     if not self.has-func?
       self.syntax-error(
-          user "cannot iterate type with no \"has\" named method - ",
+          user "cannot iterate type with no \"has\" named method -",
           user self.iterator.result-type.type-data.name)
     if self.has-func.arguments.parameters.first.next?
       self.syntax-error(
@@ -110,7 +110,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
         user self.get-func)
     if not self.get-func?
       self.syntax-error(
-          user "cannot iterate type with no \"get\" named method - ",
+          user "cannot iterate type with no \"get\" named method -",
           user self.iterator.result-type.type-data.name)
     if self.get-func.arguments.parameters.first.next?
       self.syntax-error(
@@ -136,7 +136,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
         user self.next-func)
     if not self.next-func?
       self.syntax-error(
-          user "cannot iterate type with no \"next\" named method - ",
+          user "cannot iterate type with no \"next\" named method -",
           user self.iterator.result-type.type-data.name)
     if self.next-func.arguments.parameters.first.next?
       self.syntax-error(
@@ -239,9 +239,9 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.aux-symbol.copy-new()->(owner slice.sequence)
     slice.index := index-symbol
     self.item.type-instance.copy-new()->(owner slice.result-type)
-    self.parent.indentation-spaces += 2
+    self.parent.indentation-spaces += INDENTATION-SPACES
     self.write-assign(user self.item, owner slice, user self.block)
-    self.parent.indentation-spaces -= 2
+    self.parent.indentation-spaces -= INDENTATION-SPACES
     
     self.write-block-body()
     
@@ -321,6 +321,6 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       call.function := symbol
     
     expression-node.expression := call
-    self.parent.indentation-spaces += 2
+    self.parent.indentation-spaces += INDENTATION-SPACES
     expression-node.write()
-    self.parent.indentation-spaces -= 2
+    self.parent.indentation-spaces -= INDENTATION-SPACES

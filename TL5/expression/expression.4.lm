@@ -128,7 +128,7 @@ class Expression(SyntaxTreeNode)
         (first = '-' and second >= '0' and second <= '9')
       IntExpression.parse-new(user _, owner text)->(owner expression)
     else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-      TypeExpression.parse-new(user _, owner text, user ends, user code-node)->(
+      self.parse-type-prefix(owner text, user ends, user code-node)->(
           owner expression)
     else-if text.length = 1 and first = '_'
       expression := EmptyExpression()
@@ -152,8 +152,8 @@ class Expression(SyntaxTreeNode)
       if text.length > 1
         second := text[1]
       if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-        TypeExpression.parse-new(
-            user _, owner text, user ends, user code-node)->(owner expression)
+        self.parse-type-prefix(owner text, user ends, user code-node)->(
+            owner expression)
       else
         MemberExpression.parse-new(user _, owner text, user code-node)->(
             owner expression)
@@ -165,6 +165,34 @@ class Expression(SyntaxTreeNode)
           owner expression)
     else
       has-more := false
+
+  ~~~ Parse expression with type prefix ~~~
+  func inst parse-type-prefix(
+      owner String text, user String ends, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    owner String value
+    var Bool has-member(copy glob.last-char = '.')
+    if has-member
+      self.read-new-value(user ends)->(owner value)
+      if value.length > 0
+        if value.equal(user "length") or (value[0] >= 'A' and value[0] <= 'Z')
+          EnumExpression.parse-new(
+              user _, owner text, owner value, user code-node)->(
+              owner expression)
+          return
+    
+    new TypeInstance type-instance
+    type-instance.parse-name(user text, user code-node, user code-node)
+    if not has-member and glob.last-char = '('
+      InitExpression.parse-new(user _, owner type-instance, user code-node)->(
+          owner expression)
+      return
+    
+    TypeExpression.parse-new(user _, owner type-instance, user code-node)->(
+        owner expression)
+    if has-member
+      MemberExpression.parse-new(user _, owner value, user code-node)->(
+          owner expression)
   
   ~~~ Set type instance to be a type that has no sub-type ~~~
   func inst set-simple-type(user TypeData type-data)

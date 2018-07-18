@@ -16,8 +16,15 @@ func test-code-setup(user String input-text)
     var Char ch
     while not code-header.getc.mocked()->(var ch)
     mock-input-file-text.append(copy ch)
+  if ch = '\n'
+    raise "file \"code-header.5.lm\" ends with new-line"
   mock-input-line-reset-index := mock-input-file-text.length
-  mock-input-file-text.concat(user input-text)
+  for ch in input-text[0:input-text.length - 1]
+    mock-input-file-text.append(copy ch)
+    if ch = '\n'
+      for n in tl5-compiler.INDENTATION-SPACES
+        mock-input-file-text.append(copy ' ')
+  mock-input-file-text.append(copy input-text[input-text.length - 1])
 
 
 func test-code(user String input-text, user String expected-output)
@@ -59,7 +66,7 @@ func test-code(user String input-text, user String expected-output)
   
   var Int footer-start
   user String mock-output-no-header(user mock-output-file-text[expected-header.length:mock-output-file-text.length - expected-header.length])
-  mock-output-no-header.find(user "\nLUMI_cleanup:\n  ")->(var footer-start)
+  mock-output-no-header.find(user "\nLUMI_cleanup:\n    ")->(var footer-start)
   if footer-start >= mock-output-no-header.length
     sys.print(user mock-output-no-header)
     code-header-valid := false

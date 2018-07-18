@@ -7,6 +7,13 @@ class InitExpression(ModuleTypeExpression)
   user SyntaxTreeFunction constructor
   owner Expression value
   
+  func inst parse-new(
+      owner TypeInstance result-type, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new InitExpression expression-init(user code-node)
+    expression-init.parse(owner result-type, owner expression)
+    expression := expression-init
+  
   new(user SyntaxTreeCode code-node)
     base(user code-node)
     self.arguments.new()

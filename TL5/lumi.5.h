@@ -146,6 +146,7 @@ while (self->field != NULL) { \
   Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \
   self->field = value->field; \
   self->field##_Refman = value->field##_Refman; \
+  self->field##_Dynamic = value->field##_Dynamic; \
   value->field = NULL; \
   value->field##_Refman = NULL; \
   value->field##_Dynamic = NULL; \
@@ -223,3 +224,6 @@ Returncode Sys_getenv(
   Bool* exists);
 
 extern int lumi_debug_value;
+
+
+#endif  /*LUMI_TL5_LUMI_5_H_INCLUDED_*/

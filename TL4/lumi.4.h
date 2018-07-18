@@ -146,6 +146,7 @@ while (self->field != NULL) { \
   Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \
   self->field = value->field; \
   self->field##_Refman = value->field##_Refman; \
+  self->field##_Dynamic = value->field##_Dynamic; \
   value->field = NULL; \
   value->field##_Refman = NULL; \
   value->field##_Dynamic = NULL; \

@@ -118,12 +118,12 @@ func assert-string-slice(
   if actual-slice.equal(user expected)
     return
   if tests-passed
-    sys.print(user "\n  ")
+    sys.print(user "\n    ")
   sys.print(user "[expected `")
   sys.print(user expected)
   sys.print(user "`, got `")
   sys.print(user actual-slice)
-  sys.print(user "`]\n  ")
+  sys.print(user "`]\n    ")
   write-new-file(user "expected.txt", user expected)
   write-new-file(user "actual.txt", user actual-slice)
   tests-passed := false

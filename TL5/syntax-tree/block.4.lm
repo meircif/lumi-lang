@@ -37,7 +37,8 @@ class SyntaxTreeCode(SyntaxTreeNode)
   
   ~~~ Read and check indentation spaces for a line break from the input file ~~~
   func inst read-line-break-spaces()
-    var Int expected-spaces(copy self.parent.indentation-spaces + 4)
+    var Int expected-spaces(
+        copy self.parent.indentation-spaces + (2 * INDENTATION-SPACES))
     for n in expected-spaces
       read-c()
       if glob.last-char != ' '
@@ -211,5 +212,5 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     self.write-children(user self.code-nodes)
   
   func inst write-block-end()
-    write-spaces(copy self.indentation-spaces - 2)
+    write-spaces(copy self.indentation-spaces - INDENTATION-SPACES)
     write(user "}\n")
