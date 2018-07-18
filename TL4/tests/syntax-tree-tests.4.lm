@@ -298,6 +298,8 @@ struct Test
   func name()
     var Int x
     x := self.x
+    if x > 2
+      x := 2
 ## @ g t3
 struct Test
   ; comment

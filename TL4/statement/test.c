@@ -343,9 +343,9 @@ Returncode SyntaxTreeMockFunction_parse(SyntaxTreeMockFunction* self, Char* end)
   else {
     self->mocked_name = self->_base.name;
   }
-  Bool _Bool175;
-  CHECK(170, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool175)) )
-  if (NULL != self->type_name && _Bool175) {
+  Bool _Bool176;
+  CHECK(170, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool176)) )
+  if (NULL != self->type_name && _Bool176) {
     CHECK(171, string_new_copy(&(String){8, 7, "MockDel"}, &(self->_base.name)) )
   }
   else {
@@ -375,9 +375,9 @@ Returncode SyntaxTreeMockFunction_link_types(SyntaxTreeMockFunction* self) {
   glob->current_module = self->_base.my_module;
   if (NULL != self->type_name) {
     CHECK(181, SyntaxTreeNode_find_type(&(self->_base._base._base._base), self->type_name, self->module_name, &(self->_base.parent_type)) )
-    Bool _Bool176;
-    CHECK(183, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool176)) )
-    if (_Bool176) {
+    Bool _Bool177;
+    CHECK(183, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool177)) )
+    if (_Bool177) {
       if (self->_base.parent_type->is_delete_mocked) {
         CHECK(185, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base._base), &(String){31, 30, "already mocking delete of type"}, self->type_name) )
       }
@@ -385,8 +385,8 @@ Returncode SyntaxTreeMockFunction_link_types(SyntaxTreeMockFunction* self) {
       CHECK(188, FunctionArguments_add_self_parameter(self->_base.arguments, glob->type_ref) )
     }
     else {
-      Int _Int177;
-      CHECK(190, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(self->mocked_function), &(_Int177)) )
+      Int _Int178;
+      CHECK(190, TypeData_find_meth(self->_base.parent_type, self->mocked_name, &(self->mocked_function), &(_Int178)) )
       if (!(NULL != self->mocked_function)) {
         CHECK(193, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base._base), &(String){23, 22, "mocking unknown method"}, self->mocked_name, &(String){8, 7, "of type"}, self->type_name) )
       }
@@ -394,18 +394,18 @@ Returncode SyntaxTreeMockFunction_link_types(SyntaxTreeMockFunction* self) {
     }
   }
   else {
-    Bool _Bool178;
-    CHECK(199, String_equal(self->mocked_name, &(String){4, 3, "new"}, &(_Bool178)) )
-    if (_Bool178) {
+    Bool _Bool179;
+    CHECK(199, String_equal(self->mocked_name, &(String){4, 3, "new"}, &(_Bool179)) )
+    if (_Bool179) {
       if (glob->is_new_mocked) {
         CHECK(201, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){27, 26, "already mocking global new"}) )
       }
       glob->is_new_mocked = true;
     }
     else {
-      Bool _Bool179;
-      CHECK(203, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool179)) )
-      if (_Bool179) {
+      Bool _Bool180;
+      CHECK(203, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool180)) )
+      if (_Bool180) {
         if (glob->is_delete_mocked) {
           CHECK(205, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){30, 29, "already mocking global delete"}) )
         }
@@ -441,29 +441,29 @@ static char* _func_name_SyntaxTreeMockFunction_analyze = "SyntaxTreeMockFunction
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeMockFunction_analyze
 Returncode SyntaxTreeMockFunction_analyze(SyntaxTreeMockFunction* self) {
   glob->current_module = self->_base.my_module;
-  Bool _Bool180;
-  CHECK(225, String_equal(self->mocked_name, &(String){4, 3, "new"}, &(_Bool180)) )
-  if (!(NULL != self->type_name) && _Bool180) {
+  Bool _Bool181;
+  CHECK(225, String_equal(self->mocked_name, &(String){4, 3, "new"}, &(_Bool181)) )
+  if (!(NULL != self->type_name) && _Bool181) {
     if (NULL != self->_base.arguments->parameters->first ||  ! (NULL != self->_base.arguments->outputs->first) ||  NULL !=  self->_base.arguments->outputs->first->next) {
       CHECK(229, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){45, 44, "mock new should have only single Bool output"}) )
     }
-    TypeInstance* _TypeInstance181;
-    CHECK(231, (((Argument*)(self->_base.arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->_base.arguments->outputs->first->item)), &(_TypeInstance181)) )
-    if (_TypeInstance181->type_data != glob->type_bool) {
+    TypeInstance* _TypeInstance182;
+    CHECK(231, (((Argument*)(self->_base.arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->_base.arguments->outputs->first->item)), &(_TypeInstance182)) )
+    if (_TypeInstance182->type_data != glob->type_bool) {
       CHECK(233, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base._base._base), &(String){45, 44, "mock new should have only single Bool output"}) )
     }
     self->_base.my_module = NULL;
   }
   else {
-    Bool _Bool182;
-    CHECK(236, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool182)) )
-    if (_Bool182) {
+    Bool _Bool183;
+    CHECK(236, String_equal(self->mocked_name, &(String){7, 6, "delete"}, &(_Bool183)) )
+    if (_Bool183) {
       self->_base.my_module = NULL;
     }
   }
   if (NULL != self->mocked_function) {
-    Bool _Bool183;
-    CHECK(239, FunctionArguments_check_same_as(self->_base.arguments, self->mocked_function->arguments, NULL, 0, &(_Bool183)) )
+    Bool _Bool184;
+    CHECK(239, FunctionArguments_check_same_as(self->_base.arguments, self->mocked_function->arguments, NULL, 0, &(_Bool184)) )
     self->_base.my_module = self->mocked_function->my_module;
   }
   CHECK(242, SyntaxTreeFunction_analyze(&(self->_base)) )

@@ -737,6 +737,9 @@ Returncode ut_M_Test_name(ut_M_Test* self, Ref_Manager* self_Refman) {
   LUMI_inc_ref(self_Refman);
   CHECK_REF(5, self, self_Refman)
   x = self->x;
+  if (x > 2) {
+    x = 2;
+  }
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
   return LUMI_err;
@@ -4244,7 +4247,7 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
   CHECK_REF(16, self, self_Refman)
   CHECK_REF(16, self, self_Refman)
   if (((void*)&(self->b) == b) || ((void*)b2 != &(self->b))) {
-    }
+  }
 LUMI_cleanup:
   LUMI_dec_ref(t_Refman);
   LUMI_dec_ref(b2_Refman);

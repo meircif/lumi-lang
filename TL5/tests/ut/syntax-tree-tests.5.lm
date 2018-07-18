@@ -328,23 +328,32 @@ struct Test1
 struct Test2
     var Int fun
     func name()
-; @ eg t8
+; @ g t8
+struct Test
+    var Int x
+    func fun()
+        if self.x > 3
+            self.x := 3
+        do
+            for n in 4
+                self.x += n
+; @ eg te0
 struct Test
     var Int name
     var Int name
-; @ eg t9
+; @ eg te1
 struct Test
     func name()
     var Int name
-; @ eg t10
+; @ eg te2
 struct Test
     func name()
     func name()
-; @ eg t11
+; @ eg te3
 struct Test
     var Int name
     func name()
-; @ eg t12
+; @ eg te4
 struct Test
     var Int x
     func meth()

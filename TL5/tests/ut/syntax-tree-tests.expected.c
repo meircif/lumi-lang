@@ -827,14 +827,44 @@ LUMI_cleanup:
     return LUMI_err;
 }
 /// @ t8
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman) {
+    Returncode LUMI_err = OK;
+    Int n = 0;
+    LUMI_inc_ref(self_Refman);
+    CHECK_REF(4, self, self_Refman)
+    if (self->x > 3) {
+        CHECK_REF(5, self, self_Refman)
+        self->x = 3;
+    }
+    while (true) {
+        for (n = 0; n < 4; ++n) {
+            CHECK_REF(8, self, self_Refman)
+            self->x += n;
+        }
+    }
+LUMI_cleanup:
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+/// @ te0
 redefinition of field "name"
-/// @ t9
+/// @ te1
 field name overrides method "name"
-/// @ t10
+/// @ te2
 redefinition of method "name"
-/// @ t11
+/// @ te3
 method name overrides field "name"
-/// @ t12
+/// @ te4
 assigning into an owner a non-owner access "user"
 /// @@ test-return
 /// @ t0
@@ -4248,7 +4278,7 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
     CHECK_REF(16, self, self_Refman)
     CHECK_REF(16, self, self_Refman)
     if (((void*)&(self->b) == b) || ((void*)b2 != &(self->b))) {
-        }
+    }
 LUMI_cleanup:
     LUMI_dec_ref(t_Refman);
     LUMI_dec_ref(b2_Refman);
