@@ -22,7 +22,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst parse(user TypeData parent-type)
     self.parent-type := parent-type
     if self.parent-type?
-      self.indentation-spaces := 2
+      self.indentation-spaces := INDENTATION-SPACES
       if self.parent-type.is-dynamic
         user String meth-type
         read-until(user " ", copy false)->(user meth-type)
@@ -42,9 +42,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.arguments.new()
   
   func inst parse-body()
-    self.indentation-spaces += 2
+    self.indentation-spaces += INDENTATION-SPACES
     self.parse-block()
-    self.indentation-spaces := 2
+    self.indentation-spaces := INDENTATION-SPACES
   
   func inst parse-header(copy Bool is-native)
     read-new(user "(")->(owner self.name)
@@ -175,21 +175,25 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     ;   return LUMI_err;
     ; }
     self.write-block-start()
-    write(user "  Returncode LUMI_err = OK;\n")
+    write-spaces(copy INDENTATION-SPACES)
+    write(user "Returncode LUMI_err = OK;\n")
     base.write()
     self.write-setup()
     self.write-block-body()
     write(user "LUMI_cleanup:\n")
     self.write-cleanup()
-    write(user "  return LUMI_err;\n")
+    write-spaces(copy INDENTATION-SPACES)
+    write(user "return LUMI_err;\n")
     self.write-block-end()
   
   func inst write-setup()
     if self.has-user-assign
-      write(user "  Ref_Manager* aux_Ref_Manager = NULL;\n")
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "Ref_Manager* aux_Ref_Manager = NULL;\n")
     for parameter in self.arguments.parameters.iter()
       if parameter.access = Access.USER
-        write(user "  LUMI_inc_ref(")
+        write-spaces(copy INDENTATION-SPACES)
+        write(user "LUMI_inc_ref(")
         write-cname(user parameter.get-variable().name)
         write(user "_Refman);\n")
   
@@ -245,7 +249,7 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
   
   func inst parse(user TypeData parent-type)
     self.parent-type := parent-type
-    self.indentation-spaces := 2
+    self.indentation-spaces := INDENTATION-SPACES
     string-new-copy(user "new")->(owner self.name)
     self.parse-arguments(copy false)
     self.parse-body()

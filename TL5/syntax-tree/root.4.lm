@@ -298,13 +298,15 @@ class SyntaxTreeRoot(GlobalNodes)
         write-int(copy line-count.covered-index)
         write(user "_line_count[")
         write-int(copy line-count.line-needs-cover.length)
-        write(user "] = {\n  ")
+        write(user "] = {\n")
+        write-spaces(copy INDENTATION-SPACES)
         var Int modulo
         for i in line-count.line-needs-cover.length
           if i > 0
             write(user ",")
           if modulo = 25
-            write(user "\n  ")
+            write(user "\n")
+            write-spaces(copy INDENTATION-SPACES)
             modulo := 1
           else
             modulo += 1
@@ -321,7 +323,9 @@ class SyntaxTreeRoot(GlobalNodes)
       if line-count.needs-cover
         if line-count.covered-index > 0
           write(user ",")
-        write(user "\n  {\"")
+        write(user "\n")
+        write-spaces(copy INDENTATION-SPACES)
+        write(user "{\"")
         write(user line-count.filename)
         write(user "\", ")
         write-int(copy line-count.line-needs-cover.length)
@@ -332,22 +336,27 @@ class SyntaxTreeRoot(GlobalNodes)
   
   func inst write-test-main()
     write(user "\nUSER_MAIN_HEADER {\n")
-    write(user "  Returncode LUMI_err = OK;\n")
-    write(user "  Bool LUMI_success = true;\n")
+    write-spaces(copy INDENTATION-SPACES)
+    write(user "Returncode LUMI_err = OK;\n")
+    write-spaces(copy INDENTATION-SPACES)
+    write(user "Bool LUMI_success = true;\n")
     self.global-init.write()
     write(user "\n")
     for test-function in glob.test-functions.iter()
       ; LUMI_success &= LUMI_run_test("`test-func.name`", `test-func`);
-      write(user "  LUMI_success &= LUMI_run_test(\"")
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "LUMI_success &= LUMI_run_test(\"")
       write(user test-function.name)
       write(user "\", ")
       test-function.write-cname()
       write(user ");\n")
     if self.line-counts?
-      write(user "  LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, ")
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, ")
       write-int(copy self.covered-files)
       write(user ");\n")
-    write(user "  return LUMI_success? LUMI_err : FAIL;\n")
+    write-spaces(copy INDENTATION-SPACES)
+    write(user "return LUMI_success? LUMI_err : FAIL;\n")
     write(user "}\n")
     write(user "\nTEST_MAIN_FUNC\n")
 
@@ -399,7 +408,7 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
 
 class GlobalInit(SyntaxTreeFunction)
   new()
-    self.indentation-spaces := 2
+    self.indentation-spaces := INDENTATION-SPACES
   
   func dynamic write()
     if not self.code-nodes.first?

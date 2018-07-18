@@ -70,12 +70,7 @@ String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-  if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 12;
-  aux_String_0_Var.length = 11;
-  aux_String_0_Var.values = "some string";
+  INIT_STRING_CONST(1, aux_String_0, "some string");
   aux_Ref_Manager = ut_M_str_Refman;
   ut_M_str_Refman = aux_String_0_Refman;
   LUMI_inc_ref(ut_M_str_Refman);
@@ -87,12 +82,7 @@ String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-  if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 26;
-  aux_String_0_Var.length = 25;
-  aux_String_0_Var.values = "\nstring\t\"with\\formatting\n";
+  INIT_STRING_CONST(1, aux_String_0, "\nstring\t\"with\\formatting\n");
   aux_Ref_Manager = ut_M_str_Refman;
   ut_M_str_Refman = aux_String_0_Refman;
   LUMI_inc_ref(ut_M_str_Refman);
@@ -104,12 +94,7 @@ String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-  if (aux_String_0_Refman == NULL) RAISE(4, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 16;
-  aux_String_0_Var.length = 15;
-  aux_String_0_Var.values = "linesplitstring";
+  INIT_STRING_CONST(4, aux_String_0, "linesplitstring");
   aux_Ref_Manager = ut_M_str_Refman;
   ut_M_str_Refman = aux_String_0_Refman;
   LUMI_inc_ref(ut_M_str_Refman);
@@ -121,12 +106,7 @@ String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-  if (aux_String_0_Refman == NULL) RAISE(4, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 19;
-  aux_String_0_Var.length = 18;
-  aux_String_0_Var.values = "multi\nline\nstring\n";
+  INIT_STRING_CONST(4, aux_String_0, "multi\nline\nstring\n");
   aux_Ref_Manager = ut_M_str_Refman;
   ut_M_str_Refman = aux_String_0_Refman;
   LUMI_inc_ref(ut_M_str_Refman);
@@ -138,12 +118,7 @@ String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-  if (aux_String_0_Refman == NULL) RAISE(2, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 11;
-  aux_String_0_Var.length = 10;
-  aux_String_0_Var.values = "line split";
+  INIT_STRING_CONST(2, aux_String_0, "line split");
   aux_Ref_Manager = ut_M_str_Refman;
   ut_M_str_Refman = aux_String_0_Refman;
   LUMI_inc_ref(ut_M_str_Refman);
@@ -194,38 +169,28 @@ ut_M_b = ((void*)ut_M_t == NULL) || ((void*)ut_M_ta != NULL);
 cannot assign "Empty Symbol" into "Int"
 /// @@ test-member-expression
 /// @ t0
-if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_t, ut_M_t_Refman)
   ut_M_i = ut_M_t->num;
 /// @ t1
-if (ut_M_tc == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_tc_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_tc, ut_M_tc_Refman)
   ut_M_i = ut_M_tc->_base.numb;
 /// @ t2
-if (ut_M_tc == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_tc_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_tc, ut_M_tc_Refman)
   ut_M_i = ut_M_tc->_base._base._base.num;
 /// @ t3
-if (*to == NULL) RAISE(1, 17, "empty object used")
-  if ((*to_Refman)->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, *to, (*to_Refman))
   ut_M_i = (*to)->num;
 /// @ t4
-if (*tco == NULL) RAISE(1, 17, "empty object used")
-  if ((*tco_Refman)->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, *tco, (*tco_Refman))
   ut_M_i = (*tco)->_base._base._base.num;
 /// @ t5
-if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if (ut_M_t->t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t->t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_t, ut_M_t_Refman)
+  CHECK_REF(1, ut_M_t->t, ut_M_t->t_Refman)
   ut_M_i = ut_M_t->t->num;
 /// @ t6
-if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if (ut_M_t->t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t->t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if (ut_M_t->t->t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t->t->t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_t, ut_M_t_Refman)
+  CHECK_REF(1, ut_M_t->t, ut_M_t->t_Refman)
+  CHECK_REF(1, ut_M_t->t->t, ut_M_t->t->t_Refman)
   ut_M_i = ut_M_t->t->t->num;
 /// @ te0
 unknown symbol "error"
@@ -237,24 +202,20 @@ type "Test" has no member "error"
 type "Int" has no member "error"
 /// @@ test-slice-expression
 /// @ t0
-if (ut_M_str == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_str_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if ((13) < 0 || (13) >= (ut_M_str)->length) RAISE(1, 25, "slice index out of bounds")
+CHECK_REF(1, ut_M_str, ut_M_str_Refman)
+  if ((13) < 0 || (13) >= (ut_M_str)->length) RAISE(1, slice_index)
   ut_M_c = ((ut_M_str)->values)[13];
 /// @ t1
 String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-  if (aux_String_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
+  INIT_VAR(1, aux_String_0)
   aux_String_0_Var.length = 6;
   aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
   aux_String_0_Var.values = (ut_M_str)->values + (2);
-  if (ut_M_str == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_str_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_str)->length) RAISE(1, 25, "slice index out of bounds")
+  CHECK_REF(1, ut_M_str, ut_M_str_Refman)
+  if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_str)->length) RAISE(1, slice_index)
   aux_Ref_Manager = ut_M_str_Refman;
   ut_M_str_Refman = ut_M_str_Refman;
   LUMI_inc_ref(ut_M_str_Refman);
@@ -262,23 +223,19 @@ String aux_String_0_Var = {0};
   aux_Ref_Manager = NULL;
   ut_M_str = aux_String_0;
 /// @ t2
-if (ut_M_arr == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_arr_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if ((13) < 0 || (13) >= (ut_M_arr)->length) RAISE(1, 25, "slice index out of bounds")
+CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
+  if ((13) < 0 || (13) >= (ut_M_arr)->length) RAISE(1, slice_index)
   ut_M_i = ((Int*)((ut_M_arr)->values))[13];
 /// @ t3
 Array aux_Array_0_Var = {0};
   Array* aux_Array_0 = NULL;
   Ref_Manager* aux_Array_0_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  aux_Array_0 = &aux_Array_0_Var;
-  aux_Array_0_Refman = LUMI_new_ref((void**)&aux_Array_0, false);
-  if (aux_Array_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
+  INIT_VAR(1, aux_Array_0)
   aux_Array_0_Var.length = 6;
   aux_Array_0_Var.values = (Byte*)((ut_M_arr)->values) + (2);
-  if (ut_M_arr == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_arr_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_arr)->length) RAISE(1, 25, "slice index out of bounds")
+  CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
+  if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_arr)->length) RAISE(1, slice_index)
   aux_Ref_Manager = ut_M_arr_Refman;
   ut_M_arr_Refman = ut_M_arr_Refman;
   LUMI_inc_ref(ut_M_arr_Refman);
@@ -286,14 +243,12 @@ Array aux_Array_0_Var = {0};
   aux_Ref_Manager = NULL;
   ut_M_arr = aux_Array_0;
 /// @ t4
-if (ut_M_str == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_str_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if ((4) < 0 || (4) >= (ut_M_str)->length) RAISE(1, 25, "slice index out of bounds")
+CHECK_REF(1, ut_M_str, ut_M_str_Refman)
+  if ((4) < 0 || (4) >= (ut_M_str)->length) RAISE(1, slice_index)
   ((ut_M_str)->values)[4] = ut_M_c;
 /// @ t5
-if (ut_M_arr == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_arr_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
-  if ((4) < 0 || (4) >= (ut_M_arr)->length) RAISE(1, 25, "slice index out of bounds")
+CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
+  if ((4) < 0 || (4) >= (ut_M_arr)->length) RAISE(1, slice_index)
   ((Int*)((ut_M_arr)->values))[4] = ut_M_i;
 /// @ t6
 expected "]", got "new-line"
@@ -388,8 +343,7 @@ LUMI_err = ut_M_Test_meth(&(ut_M_tc->_base._base._base), ut_M_tc_Refman);
 LUMI_err = ut_M_Test_meth(&((*tco)->_base._base._base), *tco_Refman);
   CHECK(1)
 /// @ t16
-if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_t, ut_M_t_Refman)
   LUMI_err = ut_M_Test_meth(ut_M_t->t, ut_M_t->t_Refman);
   CHECK(1)
 /// @ t17
@@ -487,7 +441,7 @@ Returncode ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** 
   Returncode LUMI_err = OK;
   LUMI_err = ut_M_mock(&(*t), &(*t_Refman), &(*t_Dynamic));
   CHECK(5)
-  if (*t_Dynamic == NULL) RAISE(5, 28, "dynamic call of empty object")
+  if (*t_Dynamic == NULL) RAISE(5, empty_object)
   LUMI_err = (*t_Dynamic)->meth(*t, *t_Refman, *t_Dynamic);
   CHECK(5)
 LUMI_cleanup:
@@ -515,10 +469,10 @@ Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_D
   Ref_Manager* aux_Test_1_Refman = NULL;
   ut_M_Test_Dynamic* aux_Test_1_Dynamic = NULL;
   LUMI_inc_ref(self_Refman);
-  if (self_Dynamic == NULL) RAISE(4, 28, "dynamic call of empty object")
+  if (self_Dynamic == NULL) RAISE(4, empty_object)
   LUMI_err = self_Dynamic->meth(self, self_Refman, self_Dynamic, &(aux_Test_0), &(aux_Test_0_Refman), &(aux_Test_0_Dynamic));
   CHECK(4)
-  if (aux_Test_0_Dynamic == NULL) RAISE(4, 28, "dynamic call of empty object")
+  if (aux_Test_0_Dynamic == NULL) RAISE(4, empty_object)
   LUMI_err = aux_Test_0_Dynamic->meth(aux_Test_0, aux_Test_0_Refman, aux_Test_0_Dynamic, &(aux_Test_1), &(aux_Test_1_Refman), &(aux_Test_1_Dynamic));
   CHECK(4)
 LUMI_cleanup:
@@ -885,13 +839,12 @@ ut_M_b = ut_M_str != NULL && ut_M_str_Refman->value != NULL;
 /// @ t1
 ut_M_b = ! (ut_M_str != NULL && ut_M_str_Refman->value != NULL);
 /// @ t2
-if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_t, ut_M_t_Refman)
   ut_M_b = ut_M_t->fun != NULL;
 /// @ t3
 ut_M_b = (*to) != NULL && (*to_Refman)->value != NULL;
 /// @ t4
-if (*to != NULL) RAISE(1, 45, "non empty base class given as output argument")
+if (*to != NULL) RAISE(1, empty_base_output)
   LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(*to), &(*to_Refman), (void*)&(*to_Dynamic));
   CHECK(1)
   ut_M_b = (*to) != NULL && (*to_Refman)->value != NULL;
@@ -905,9 +858,7 @@ ut_M_Ta a_Var = {{0}};
   ut_M_Ta* a = NULL;
   Ref_Manager* a_Refman = NULL;
   ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
-  a = &a_Var;
-  a_Refman = LUMI_new_ref((void**)&a, false);
-  if (a_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
+  INIT_VAR(1, a)
   LUMI_err = ut_M_Test_new(&(a->_base), a_Refman, 1);
   CHECK(1)
 /// @ t1
@@ -919,10 +870,7 @@ ut_M_Ta* aux_Ta_0 = NULL;
   Ref_Manager* aux_Ta_0_Refman = NULL;
   ut_M_Ta_Dynamic* aux_Ta_0_Dynamic = &ut_M_Ta_dynamic;
   Ref_Manager* aux_Ref_Manager = NULL;
-  aux_Ta_0 = LUMI_alloc(sizeof(ut_M_Ta));
-  if (aux_Ta_0 == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
-  aux_Ta_0_Refman = LUMI_new_ref((void**)&aux_Ta_0, true);
-  if (aux_Ta_0_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
+  INIT_NEW(1, aux_Ta_0, LUMI_alloc(sizeof(ut_M_Ta)));
   LUMI_err = ut_M_Test_new(&(aux_Ta_0->_base), aux_Ta_0_Refman, 7);
   CHECK(1)
   aux_Ref_Manager = ut_M_ta_Refman;
@@ -936,10 +884,7 @@ ut_M_Ta* aux_Ta_0 = NULL;
 ut_M_Ta* a = NULL;
   Ref_Manager* a_Refman = NULL;
   ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
-  a = LUMI_alloc(sizeof(ut_M_Ta));
-  if (a == NULL) RAISE(1, 49, "insufficient memory for object dynamic allocation")
-  a_Refman = LUMI_new_ref((void**)&a, true);
-  if (a_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
+  INIT_NEW(1, a, LUMI_alloc(sizeof(ut_M_Ta)));
   LUMI_err = ut_M_Test_new(&(a->_base), a_Refman, 1);
   CHECK(1)
 /// @ t4
@@ -990,9 +935,8 @@ Ref_Manager* aux_Ref_Manager = NULL;
 Array* aa = NULL;
   Ref_Manager* aa_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  if (aa == NULL) RAISE(2, 17, "empty object used")
-  if (aa_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
-  if ((4) < 0 || (4) >= (aa)->length) RAISE(2, 25, "slice index out of bounds")
+  CHECK_REF(2, aa, aa_Refman)
+  if ((4) < 0 || (4) >= (aa)->length) RAISE(2, slice_index)
   aux_Ref_Manager = ut_M_ta_Refman;
   ut_M_ta_Refman = aa_Refman;
   ut_M_ta_Dynamic = &ut_M_Ta_dynamic;
@@ -1004,9 +948,8 @@ Array* aa = NULL;
 Array* ca = NULL;
   Ref_Manager* ca_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
-  if (ca == NULL) RAISE(2, 17, "empty object used")
-  if (ca_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
-  if ((4) < 0 || (4) >= (ca)->length) RAISE(2, 25, "slice index out of bounds")
+  CHECK_REF(2, ca, ca_Refman)
+  if ((4) < 0 || (4) >= (ca)->length) RAISE(2, slice_index)
   aux_Ref_Manager = ut_M_ta_Refman;
   ut_M_ta_Refman = ca_Refman;
   ut_M_ta_Dynamic = &(&ut_M_Tc_dynamic->_base._base);
@@ -1015,23 +958,23 @@ Array* ca = NULL;
   aux_Ref_Manager = NULL;
   ut_M_ta = &((((ut_M_Tc*)((ca)->values)) + 4)->_base._base);
 /// @ t11
-if (ut_M_ta_Dynamic == NULL) RAISE(1, 28, "dynamic call of empty object")
+if (ut_M_ta_Dynamic == NULL) RAISE(1, empty_object)
   LUMI_err = ut_M_ta_Dynamic->dyn(ut_M_ta, ut_M_ta_Refman, ut_M_ta_Dynamic);
   CHECK(1)
 /// @ t12
-if (ut_M_tb_Dynamic == NULL) RAISE(1, 28, "dynamic call of empty object")
+if (ut_M_tb_Dynamic == NULL) RAISE(1, empty_object)
   LUMI_err = ut_M_tb_Dynamic->_base.dyn(&(ut_M_tb->_base), ut_M_tb_Refman, &(ut_M_tb_Dynamic->_base));
   CHECK(1)
 /// @ t13
-if (ut_M_tc_Dynamic == NULL) RAISE(1, 28, "dynamic call of empty object")
+if (ut_M_tc_Dynamic == NULL) RAISE(1, empty_object)
   LUMI_err = ut_M_tc_Dynamic->_base._base.dyn(&(ut_M_tc->_base._base), ut_M_tc_Refman, &(ut_M_tc_Dynamic->_base._base));
   CHECK(1)
 /// @ t14
-if (*tco_Dynamic == NULL) RAISE(1, 28, "dynamic call of empty object")
+if (*tco_Dynamic == NULL) RAISE(1, empty_object)
   LUMI_err = (*tco_Dynamic)->_base._base.dyn(&((*tco)->_base._base), *tco_Refman, &((*tco_Dynamic)->_base._base));
   CHECK(1)
 /// @ t15
-if (ut_M_ta != NULL) RAISE(1, 45, "non empty base class given as output argument")
+if (ut_M_ta != NULL) RAISE(1, empty_base_output)
   LUMI_err = ut_M_fun7(&(ut_M_tc->_base), ut_M_tc_Refman, &(ut_M_tc_Dynamic->_base), (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic));
   CHECK(1)
 /// @ t16
@@ -1060,7 +1003,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
 }
 Returncode ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic) {
   Returncode LUMI_err = OK;
-  if (*t_Dynamic == NULL) RAISE(5, 28, "dynamic call of empty object")
+  if (*t_Dynamic == NULL) RAISE(5, empty_object)
   LUMI_err = (*t_Dynamic)->meth(*t, *t_Refman, *t_Dynamic);
   CHECK(5)
 LUMI_cleanup:
@@ -1103,7 +1046,7 @@ void ut_M_Base_Del(ut_M_Base* self) {
 Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
-  if (self_Dynamic == NULL) RAISE(6, 28, "dynamic call of empty object")
+  if (self_Dynamic == NULL) RAISE(6, empty_object)
   LUMI_err = self_Dynamic->_base.meth(&(self->_base), self_Refman, &(self_Dynamic->_base));
   CHECK(6)
 LUMI_cleanup:
@@ -1124,20 +1067,20 @@ ut_M_Tb* aux_Tb_0 = NULL;
 /// @ t0
 Returncode (*fun)(void) = NULL;
   fun = ut_M_fun0;
-  if (fun == NULL) RAISE(3, 21, "empty function called")
+  if (fun == NULL) RAISE(3, empty_object)
   LUMI_err = fun();
   CHECK(3)
 /// @ t1
 Returncode (*fun)(Int x, Int* y) = NULL;
   Int x = 0;
   fun = ut_M_fun5;
-  if (fun == NULL) RAISE(3, 21, "empty function called")
+  if (fun == NULL) RAISE(3, empty_object)
   LUMI_err = fun(9, &(x));
   CHECK(3)
 /// @ t2
 Returncode (*fun)(ut_M_Test* self, Ref_Manager* self_Refman) = NULL;
   fun = ut_M_Test_meth;
-  if (fun == NULL) RAISE(2, 21, "empty function called")
+  if (fun == NULL) RAISE(2, empty_object)
   LUMI_err = fun(ut_M_t, ut_M_t_Refman);
   CHECK(2)
 /// @ t3
@@ -1145,12 +1088,10 @@ Returncode (*fun)(void) = NULL;
   fun = NULL;
   ut_M_b = fun != NULL;
 /// @ t4
-if (ut_M_t == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_t_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_t, ut_M_t_Refman)
   ut_M_t->fun = ut_M_fun0;
-  if (ut_M_t == NULL) RAISE(2, 17, "empty object used")
-  if (ut_M_t_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
-  if (ut_M_t->fun == NULL) RAISE(2, 21, "empty function called")
+  CHECK_REF(2, ut_M_t, ut_M_t_Refman)
+  if (ut_M_t->fun == NULL) RAISE(2, empty_object)
   LUMI_err = ut_M_t->fun();
   CHECK(2)
 /// @ t5
@@ -1158,18 +1099,14 @@ Returncode (*farr_Values[38])(void) = {0};
   Array farr_Var = {38, NULL};
   Array* farr = NULL;
   Ref_Manager* farr_Refman = NULL;
-  farr = &farr_Var;
+  INIT_VAR(1, farr)
   farr_Var.values = farr_Values;
-  farr_Refman = LUMI_new_ref((void**)&farr, false);
-  if (farr_Refman == NULL) RAISE(1, 38, "insufficient memory for managed object")
-  if (farr == NULL) RAISE(2, 17, "empty object used")
-  if (farr_Refman->value == NULL) RAISE(2, 28, "outdated weak reference used")
-  if ((3) < 0 || (3) >= (farr)->length) RAISE(2, 25, "slice index out of bounds")
+  CHECK_REF(2, farr, farr_Refman)
+  if ((3) < 0 || (3) >= (farr)->length) RAISE(2, slice_index)
   ((Returncode (**)(void))((farr)->values))[3] = ut_M_fun0;
-  if (farr == NULL) RAISE(3, 17, "empty object used")
-  if (farr_Refman->value == NULL) RAISE(3, 28, "outdated weak reference used")
-  if ((3) < 0 || (3) >= (farr)->length) RAISE(3, 25, "slice index out of bounds")
-  if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3, 21, "empty function called")
+  CHECK_REF(3, farr, farr_Refman)
+  if ((3) < 0 || (3) >= (farr)->length) RAISE(3, slice_index)
+  if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3, empty_object)
   LUMI_err = (((Returncode (**)(void))((farr)->values))[3])();
   CHECK(3)
 /// @ t6
@@ -1197,12 +1134,10 @@ ut_M_b = false;
 /// @ t3
 unknown symbol "EOF"
 /// @ t4
-if (ut_M_arr == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_arr_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
   ut_M_i = ut_M_arr->length;
 /// @ t5
-if (ut_M_str == NULL) RAISE(1, 17, "empty object used")
-  if (ut_M_str_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, ut_M_str, ut_M_str_Refman)
   ut_M_i = ut_M_str->length;
 /// @ t6
 LUMI_err = String_clear(ut_M_str, ut_M_str_Refman);
@@ -1254,8 +1189,7 @@ LUMI_err = File_write(ut_M_fobj, ut_M_fobj_Refman, ut_M_str, ut_M_str_Refman);
 /// @ t21
 Array* argv = NULL;
   Ref_Manager* argv_Refman = NULL;
-  if (sys == NULL) RAISE(1, 17, "empty object used")
-  if (sys_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+  CHECK_REF(1, sys, sys_Refman)
   argv = sys->argv;
   argv_Refman = sys->argv_Refman;
   LUMI_inc_ref(argv_Refman);
@@ -1281,18 +1215,15 @@ LUMI_err = Sys_system(sys, sys_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_i));
 LUMI_err = Sys_getenv(sys, sys_Refman, ut_M_str, ut_M_str_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_b));
   CHECK(1)
 /// @ t29
-if (sys == NULL) RAISE(1, 17, "empty object used")
-  if (sys_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, sys, sys_Refman)
   LUMI_err = File_putc(sys->stdout_Cname, sys->stdout_Cname_Refman, ut_M_c);
   CHECK(1)
 /// @ t30
-if (sys == NULL) RAISE(1, 17, "empty object used")
-  if (sys_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, sys, sys_Refman)
   LUMI_err = File_getc(sys->stdin_Cname, sys->stdin_Cname_Refman, &(ut_M_c), &(ut_M_b));
   CHECK(1)
 /// @ t31
-if (sys == NULL) RAISE(1, 17, "empty object used")
-  if (sys_Refman->value == NULL) RAISE(1, 28, "outdated weak reference used")
+CHECK_REF(1, sys, sys_Refman)
   LUMI_err = File_putc(sys->stderr_Cname, sys->stderr_Cname_Refman, ut_M_c);
   CHECK(1)
 /// @ t32

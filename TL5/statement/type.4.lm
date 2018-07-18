@@ -44,7 +44,7 @@ class TypeData(SyntaxTreeNamespace)
       if glob.last-char != ')'
         self.syntax-error-c(user "expected \")\" after base type, got")
       read-c()
-    self.indentation-spaces := 2
+    self.indentation-spaces := INDENTATION-SPACES
     self.parse-block-children(user self, user _)
     self.indentation-spaces := 0
   
@@ -248,7 +248,7 @@ class TypeData(SyntaxTreeNamespace)
     write(user "\nstruct ")
     self.write-cname()
     write(user " {\n")
-    self.indentation-spaces := 2
+    self.indentation-spaces := INDENTATION-SPACES
     if self.base-type?
       self.write-spaces()
       self.base-type.type-data.write-cname()
@@ -334,13 +334,15 @@ class TypeData(SyntaxTreeNamespace)
     write(user "_Del(")
     self.write-cname()
     write(user "* self) {\n")
-    write(user "  if (self == NULL) return;\n")
+    write-spaces(copy INDENTATION-SPACES)
+    write(user "if (self == NULL) return;\n")
     if self.base-type?
-      write(user "  ")
+      write-spaces(copy INDENTATION-SPACES)
       self.base-type.type-data.write-cname()
       write(user "_Del(&(self->_base));\n")
     if self.is-delete-mocked
-      write(user "  IGNORE_ERRORS( ")
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "IGNORE_ERRORS( ")
       self.write-cname()
       write(user "_MockDel(self) )\n")
     self.write-cleanup(user self)

@@ -20,7 +20,7 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
   func dynamic write()
     self.write-spaces()
     write(user "do {\n")
-    self.parent.indentation-spaces += 2
+    self.parent.indentation-spaces += INDENTATION-SPACES
     self.write-spaces()
     write(user "++LUMI_trace_ignore_count;\n")
     if try-depth-count = 0
@@ -34,7 +34,7 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
     if try-depth-count = 0
       write(user "\n#undef RETURN_ERROR\n")
       write(user "#define RETURN_ERROR goto LUMI_cleanup\n")
-    self.parent.indentation-spaces -= 2
+    self.parent.indentation-spaces -= INDENTATION-SPACES
     self.write-spaces()
     write(user "} while (false);\n")
     self.write-spaces()
@@ -59,7 +59,9 @@ class SyntaxTreeCatch(SyntaxTreeFlowElement)
   func dynamic write()
     self.write-spaces()
     write(user "if (LUMI_err != OK) {\n")
+    self.parent.indentation-spaces += INDENTATION-SPACES
     self.write-spaces()
-    write(user "  LUMI_err = OK;\n")
+    self.parent.indentation-spaces -= INDENTATION-SPACES
+    write(user "LUMI_err = OK;\n")
     self.block.write-block-body()
     self.block.write-block-end()

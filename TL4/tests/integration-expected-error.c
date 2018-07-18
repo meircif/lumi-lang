@@ -217,7 +217,7 @@ Returncode error_M_fail_call_empty(void) {
   Returncode (*fun)(void) = NULL;
   ++LUMI_file_coverage[0].line_count[30];
   ++LUMI_file_coverage[0].line_count[31];
-  if (fun == NULL) RAISE(31, 21, "empty function called")
+  if (fun == NULL) RAISE(31, empty_object)
   LUMI_err = fun();
   CHECK(31)
 LUMI_cleanup:
@@ -238,16 +238,14 @@ Returncode error_M_fail_base_class_output(void) {
   Ref_Manager* base_user_Refman = NULL;
   error_M_BaseType_Dynamic* base_user_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[34];
-  base_var = &base_var_Var;
-  base_var_Refman = LUMI_new_ref((void**)&base_var, false);
-  if (base_var_Refman == NULL) RAISE(34, 38, "insufficient memory for managed object")
+  INIT_VAR(34, base_var)
   ++LUMI_file_coverage[0].line_count[35];
   base_user = base_var;
   base_user_Refman = base_var_Refman;
   LUMI_inc_ref(base_user_Refman);
   base_user_Dynamic = base_var_Dynamic;
   ++LUMI_file_coverage[0].line_count[36];
-  if (base_user != NULL) RAISE(36, 45, "non empty base class given as output argument")
+  if (base_user != NULL) RAISE(36, empty_base_output)
   LUMI_err = error_M_f_get_top((void*)&(base_user), &(base_user_Refman), (void*)&(base_user_Dynamic));
   CHECK(36)
 LUMI_cleanup:
@@ -267,14 +265,11 @@ Returncode error_M_fail_slice_index(void) {
   Array* arr = NULL;
   Ref_Manager* arr_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[39];
-  arr = &arr_Var;
+  INIT_VAR(39, arr)
   arr_Var.values = arr_Values;
-  arr_Refman = LUMI_new_ref((void**)&arr, false);
-  if (arr_Refman == NULL) RAISE(39, 38, "insufficient memory for managed object")
   ++LUMI_file_coverage[0].line_count[40];
-  if (arr == NULL) RAISE(40, 17, "empty object used")
-  if (arr_Refman->value == NULL) RAISE(40, 28, "outdated weak reference used")
-  if ((6) < 0 || (6) >= (arr)->length) RAISE(40, 25, "slice index out of bounds")
+  CHECK_REF(40, arr, arr_Refman)
+  if ((6) < 0 || (6) >= (arr)->length) RAISE(40, slice_index)
   TEST_ASSERT(40, (((Int*)((arr)->values))[6]) == 0)
 LUMI_cleanup:
   LUMI_dec_ref(arr_Refman);
@@ -292,11 +287,10 @@ Returncode error_M_fail_member_empty(void) {
   error_M_BaseType_Dynamic* obj_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[43];
   ++LUMI_file_coverage[0].line_count[44];
-  if (obj == NULL) RAISE(44, 17, "empty object used")
-  if (obj_Refman->value == NULL) RAISE(44, 28, "outdated weak reference used")
+  CHECK_REF(44, obj, obj_Refman)
   TEST_ASSERT(44, obj->x == 0)
   ++LUMI_file_coverage[0].line_count[45];
-  if (obj_Dynamic == NULL) RAISE(45, 28, "dynamic call of empty object")
+  if (obj_Dynamic == NULL) RAISE(45, empty_object)
   LUMI_err = obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic);
   CHECK(45)
 LUMI_cleanup:
@@ -320,10 +314,7 @@ Returncode error_M_fail_member_outdated(void) {
   Ref_Manager* aux_BaseType_0_Refman = NULL;
   error_M_BaseType_Dynamic* aux_BaseType_0_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[48];
-  obj_owner = LUMI_alloc(sizeof(error_M_BaseType));
-  if (obj_owner == NULL) RAISE(48, 49, "insufficient memory for object dynamic allocation")
-  obj_owner_Refman = LUMI_new_ref((void**)&obj_owner, true);
-  if (obj_owner_Refman == NULL) RAISE(48, 38, "insufficient memory for managed object")
+  INIT_NEW(48, obj_owner, LUMI_alloc(sizeof(error_M_BaseType)));
   ++LUMI_file_coverage[0].line_count[49];
   obj = obj_owner;
   obj_Refman = obj_owner_Refman;
@@ -342,11 +333,10 @@ Returncode error_M_fail_member_outdated(void) {
   aux_BaseType_0_Refman = NULL;
   aux_BaseType_0_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[51];
-  if (obj == NULL) RAISE(51, 17, "empty object used")
-  if (obj_Refman->value == NULL) RAISE(51, 28, "outdated weak reference used")
+  CHECK_REF(51, obj, obj_Refman)
   TEST_ASSERT(51, obj->x == 0)
   ++LUMI_file_coverage[0].line_count[52];
-  if (obj_Dynamic == NULL) RAISE(52, 28, "dynamic call of empty object")
+  if (obj_Dynamic == NULL) RAISE(52, empty_object)
   LUMI_err = obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic);
   CHECK(52)
 LUMI_cleanup:
@@ -368,9 +358,8 @@ Returncode error_M_fail_sequence_empty(void) {
   Ref_Manager* arr_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[55];
   ++LUMI_file_coverage[0].line_count[56];
-  if (arr == NULL) RAISE(56, 17, "empty object used")
-  if (arr_Refman->value == NULL) RAISE(56, 28, "outdated weak reference used")
-  if ((0) < 0 || (0) >= (arr)->length) RAISE(56, 25, "slice index out of bounds")
+  CHECK_REF(56, arr, arr_Refman)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(56, slice_index)
   TEST_ASSERT(56, (((Int*)((arr)->values))[0]) == 0)
 LUMI_cleanup:
   LUMI_dec_ref(arr_Refman);
@@ -390,10 +379,7 @@ Returncode error_M_fail_sequence_outdated(void) {
   Array* aux_Array_0 = NULL;
   Ref_Manager* aux_Array_0_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[59];
-  arr_owner = LUMI_new_array(2, sizeof(Int));
-  if (arr_owner == NULL) RAISE(59, 49, "insufficient memory for object dynamic allocation")
-  arr_owner_Refman = LUMI_new_ref((void**)&arr_owner, true);
-  if (arr_owner_Refman == NULL) RAISE(59, 38, "insufficient memory for managed object")
+  INIT_NEW(59, arr_owner, LUMI_new_array(2, sizeof(Int)));
   ++LUMI_file_coverage[0].line_count[60];
   arr = arr_owner;
   arr_Refman = arr_owner_Refman;
@@ -407,9 +393,8 @@ Returncode error_M_fail_sequence_outdated(void) {
   aux_Array_0 = NULL;
   aux_Array_0_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[62];
-  if (arr == NULL) RAISE(62, 17, "empty object used")
-  if (arr_Refman->value == NULL) RAISE(62, 28, "outdated weak reference used")
-  if ((0) < 0 || (0) >= (arr)->length) RAISE(62, 25, "slice index out of bounds")
+  CHECK_REF(62, arr, arr_Refman)
+  if ((0) < 0 || (0) >= (arr)->length) RAISE(62, slice_index)
   TEST_ASSERT(62, (((Int*)((arr)->values))[0]) == 0)
 LUMI_cleanup:
   LUMI_owner_dec_ref(aux_Array_0_Refman);
@@ -429,7 +414,7 @@ Returncode error_M_fail_dynamic_empty(void) {
   error_M_BaseType_Dynamic* obj_Dynamic = NULL;
   ++LUMI_file_coverage[0].line_count[65];
   ++LUMI_file_coverage[0].line_count[66];
-  if (obj_Dynamic == NULL) RAISE(66, 28, "dynamic call of empty object")
+  if (obj_Dynamic == NULL) RAISE(66, empty_object)
   LUMI_err = obj_Dynamic->meth(obj, obj_Refman, obj_Dynamic);
   CHECK(66)
 LUMI_cleanup:
@@ -449,10 +434,7 @@ Returncode error_M_fail_object_no_memory(void) {
   ++LUMI_file_coverage[0].line_count[69];
   error_M_new_fail_countdown = 1;
   ++LUMI_file_coverage[0].line_count[70];
-  obj = LUMI_alloc(sizeof(error_M_BaseType));
-  if (obj == NULL) RAISE(70, 49, "insufficient memory for object dynamic allocation")
-  obj_Refman = LUMI_new_ref((void**)&obj, true);
-  if (obj_Refman == NULL) RAISE(70, 38, "insufficient memory for managed object")
+  INIT_NEW(70, obj, LUMI_alloc(sizeof(error_M_BaseType)));
 LUMI_cleanup:
   if (obj_Dynamic != NULL) obj_Dynamic->_del(obj);
   LUMI_owner_dec_ref(obj_Refman);
@@ -471,10 +453,7 @@ Returncode error_M_fail_managed_no_memory(void) {
   ++LUMI_file_coverage[0].line_count[73];
   error_M_new_fail_countdown = 2;
   ++LUMI_file_coverage[0].line_count[74];
-  obj = LUMI_alloc(sizeof(error_M_BaseType));
-  if (obj == NULL) RAISE(74, 49, "insufficient memory for object dynamic allocation")
-  obj_Refman = LUMI_new_ref((void**)&obj, true);
-  if (obj_Refman == NULL) RAISE(74, 38, "insufficient memory for managed object")
+  INIT_NEW(74, obj, LUMI_alloc(sizeof(error_M_BaseType)));
 LUMI_cleanup:
   if (obj_Dynamic != NULL) obj_Dynamic->_del(obj);
   LUMI_owner_dec_ref(obj_Refman);
@@ -503,12 +482,7 @@ Returncode error_M_fail_raise_message(void) {
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   ++LUMI_file_coverage[0].line_count[80];
-  aux_String_0 = &aux_String_0_Var;
-  aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-  if (aux_String_0_Refman == NULL) RAISE(80, 38, "insufficient memory for managed object")
-  aux_String_0_Var.max_length = 9;
-  aux_String_0_Var.length = 8;
-  aux_String_0_Var.values = "my error";
+  INIT_STRING_CONST(80, aux_String_0, "my error");
   LUMI_err = error_M_f_raise_message(aux_String_0, aux_String_0_Refman);
   CHECK(80)
 LUMI_cleanup:
@@ -573,12 +547,7 @@ Returncode error_M_fail_assert_error_message(void) {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR break
-    aux_String_0 = &aux_String_0_Var;
-    aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-    if (aux_String_0_Refman == NULL) RAISE(89, 38, "insufficient memory for managed object")
-    aux_String_0_Var.max_length = 21;
-    aux_String_0_Var.length = 20;
-    aux_String_0_Var.values = "tested other message";
+    INIT_STRING_CONST(89, aux_String_0, "tested other message");
     LUMI_err = error_M_f_raise_message(aux_String_0, aux_String_0_Refman);
     CHECK(89)
     
@@ -622,12 +591,7 @@ Returncode error_M_fail_assert_error_message_prefix(void) {
     ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR break
-    aux_String_0 = &aux_String_0_Var;
-    aux_String_0_Refman = LUMI_new_ref((void**)&aux_String_0, false);
-    if (aux_String_0_Refman == NULL) RAISE(92, 38, "insufficient memory for managed object")
-    aux_String_0_Var.max_length = 15;
-    aux_String_0_Var.length = 14;
-    aux_String_0_Var.values = "tested message";
+    INIT_STRING_CONST(92, aux_String_0, "tested message");
     LUMI_err = error_M_f_raise_message(aux_String_0, aux_String_0_Refman);
     CHECK(92)
     

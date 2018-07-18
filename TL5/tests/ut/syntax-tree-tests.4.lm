@@ -41,8 +41,8 @@ func test-global-scope(
 func no-error-raised()
   Sys.print.active := false
   if tests-passed
-    sys.print(user "\n  ")
-  sys.print(user "[no error raised]\n  ")
+    sys.print(user "\n    ")
+  sys.print(user "[no error raised]\n    ")
   tests-passed := false
 
 func test-error-message(user String expected-header, user String expected-error)
@@ -54,7 +54,7 @@ func test-error-message(user String expected-header, user String expected-error)
       copy false)
   if mock-print-text.length > 0
     if mock-print-text[mock-print-text.length - 1] != '\n'
-      sys.print(user "  [no new-line in error end]\n")
+      sys.print(user "    [no new-line in error end]\n")
       tests-passed := false
   if mock-print-text.length >= expected-header.length + 4
     assert-string-slice(

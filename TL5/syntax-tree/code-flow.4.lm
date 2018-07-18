@@ -12,7 +12,8 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
   func inst set-parent(user SyntaxTreeBlock parent)
     self.parent := parent
     self.block.parent := parent
-    self.block.indentation-spaces := parent.indentation-spaces + 2
+    self.block.indentation-spaces :=
+        parent.indentation-spaces + INDENTATION-SPACES
     self.block.is-in-loop := parent.is-in-loop
     self.block.set-location()
   

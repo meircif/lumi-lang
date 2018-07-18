@@ -233,13 +233,13 @@ class MemberExpression(SymbolExpression)
     if ? self.instance
       self.instance.write-check-ref()
     else-if ? self.dynamic-call-self-instance
-      # if (`instance`_Dynamic == NULL) RAISE("dynamic call of empty object")
+      # if (`instance`_Dynamic == NULL) RAISE(`line`, empty_object)
       write(user "if (")
       var Bool top(self.dynamic-call-self-instance.top)
       self.dynamic-call-self-instance.top := true
       self.dynamic-call-self-instance.write-dynamic()
       write(user " == NULL) ")
-      self.write-raise(user "dynamic call of empty object")
+      self.write-raise(user "empty_object")
       self.dynamic-call-self-instance.top := top
     self.code-node.write-spaces()
   

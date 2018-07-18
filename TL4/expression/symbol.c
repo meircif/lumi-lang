@@ -410,13 +410,13 @@ Returncode MemberExpression_write_preactions(MemberExpression* self) {
   }
   else {
     if (NULL != self->dynamic_call_self_instance) {
-      /* if (`instance`_Dynamic == NULL) RAISE("dynamic call of empty object") */
+      /* if (`instance`_Dynamic == NULL) RAISE(`line`, empty_object) */
       CHECK(237, write(&(String){5, 4, "if ("}) )
       Bool top = self->dynamic_call_self_instance->top;
       self->dynamic_call_self_instance->top = true;
       CHECK(240, (self->dynamic_call_self_instance)->_base._dtl[5](self->dynamic_call_self_instance) )
       CHECK(241, write(&(String){11, 10, " == NULL) "}) )
-      CHECK(242, SyntaxTreeNode_write_raise(&(self->_base._base._base), &(String){29, 28, "dynamic call of empty object"}) )
+      CHECK(242, SyntaxTreeNode_write_raise(&(self->_base._base._base), &(String){13, 12, "empty_object"}) )
       self->dynamic_call_self_instance->top = top;
     }
   }

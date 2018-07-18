@@ -275,10 +275,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func inst write-dynamic()
     ; `type`_Dynamic* `name`_Dynamic[ = `type`_dynamic];
     self.write-spaces()
-    ; if self.parent?
-      ; self.write-spaces()
-    ; else-if self.parent-type?
-      ; write(user "  ")
     self.type-instance.type-data.write-cname()
     write(user "_Dynamic* ")
     self.write-cname()

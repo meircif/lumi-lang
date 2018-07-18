@@ -95,10 +95,8 @@ class SyntaxTreeNode
     write(user "RAISE(")
     self.write-line-num()
     write(user ", ")
-    write-int(copy error-message.length)
-    write(user ", \"")
     write(user error-message)
-    write(user "\")\n")
+    write(user ")\n")
   
   ## Print a syntax error with message:
   ## `Code error in {file-name}[{line-number}] {text} "{item}"`

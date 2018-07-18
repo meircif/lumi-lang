@@ -128,7 +128,7 @@ class Expression(SyntaxTreeNode)
         (first = '-' and second >= '0' and second <= '9')
       IntExpression.parse-new(user _, owner text)->(owner expression)
     else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-      TypeExpression.parse-new(user _, owner text, user ends, user code-node)->(
+      self.parse-type-prefix(owner text, user ends, user code-node)->(
           owner expression)
     else-if text.length = 1 and first = '_'
       expression := EmptyExpression()
@@ -152,8 +152,8 @@ class Expression(SyntaxTreeNode)
       if text.length > 1
         second := text[1]
       if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-        TypeExpression.parse-new(
-            user _, owner text, user ends, user code-node)->(owner expression)
+        self.parse-type-prefix(owner text, user ends, user code-node)->(
+            owner expression)
       else
         MemberExpression.parse-new(user _, owner text, user code-node)->(
             owner expression)
@@ -165,6 +165,34 @@ class Expression(SyntaxTreeNode)
           owner expression)
     else
       has-more := false
+
+  ~~~ Parse expression with type prefix ~~~
+  func inst parse-type-prefix(
+      owner String text, user String ends, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    owner String value
+    var Bool has-member(copy glob.last-char = '.')
+    if has-member
+      self.read-new-value(user ends)->(owner value)
+      if value.length > 0
+        if value.equal(user "length") or (value[0] >= 'A' and value[0] <= 'Z')
+          EnumExpression.parse-new(
+              user _, owner text, owner value, user code-node)->(
+              owner expression)
+          return
+    
+    new TypeInstance type-instance
+    type-instance.parse-name(user text, user code-node, user code-node)
+    if not has-member and glob.last-char = '('
+      InitExpression.parse-new(user _, owner type-instance, user code-node)->(
+          owner expression)
+      return
+    
+    TypeExpression.parse-new(user _, owner type-instance, user code-node)->(
+        owner expression)
+    if has-member
+      MemberExpression.parse-new(user _, owner value, user code-node)->(
+          owner expression)
   
   ~~~ Set type instance to be a type that has no sub-type ~~~
   func inst set-simple-type(user TypeData type-data)
@@ -186,31 +214,13 @@ class Expression(SyntaxTreeNode)
     if self.code-node?
       self.code-node.get-parent-type()->(user parent-type)
   
-  func inst write-refman-init(user SymbolExpression symbol, copy Bool is-new)
-    ; `symbol`_Refman = LUMI_new_ref((void**)&`symbol`, `is-new`);
-    ; if (`symbol`_Refman == NULL) raise(`line-num`)
-    self.code-node.write-spaces()
-    symbol.write()
-    write(user "_Refman = LUMI_new_ref((void**)&")
-    symbol.write()
-    write(user ", ")
-    if is-new
-      write(user "true")
-    else
-      write(user "false")
-    write(user ");\n")
-    self.code-node.write-spaces()
-    write(user "if (")
-    symbol.write()
-    write(user "_Refman == NULL) ")
-    self.write-raise(user "insufficient memory for managed object")
-  
   func inst write-init-var-ref(user SymbolExpression symbol)
-    ; `symbol` = &`symbol`_Var;
+    ; INIT_VAR(`line`, `symbol`)
+    write(user "INIT_VAR(")
+    self.write-line-num()
+    write(user ", ")
     symbol.write()
-    write(user " = &")
-    symbol.write()
-    write(user "_Var;\n")
+    write(user ")\n")
   
   func inst write-assign-null()
     self.write()
@@ -224,18 +234,14 @@ class Expression(SyntaxTreeNode)
       write(user " = NULL;\n")
     
   func inst write-check-ref()
-    ; if (`instance` == NULL) RAISE("empty object used")
-    ; if (`instance`_Refman->value == NULL)
-    ;   RAISE("outdated weak reference used")
-    write(user "if (")
+    ; CHECK_REF(`line`, `instance`, `instance-refman`)
+    write(user "CHECK_REF(")
+    self.write-line-num()
+    write(user ", ")
     self.write-as-top()
-    write(user " == NULL) ")
-    self.write-raise(user "empty object used")
-    self.code-node.write-spaces()
-    write(user "if (")
+    write(user ", ")
     self.write-refman()
-    write(user "->value == NULL) ")
-    self.write-raise(user "outdated weak reference used")
+    write(user ")\n")
   
   func dynamic write-dynamic()
     self.write()

@@ -77,7 +77,6 @@ class SliceExpression(Expression)
     if ? self.second-index
       self.second-index.write-preactions()
       self.write-init-var-ref(user self.slice-symbol)
-      self.write-refman-init(user self.slice-symbol, copy false)
       # symbol_Var.length = second;
       # symbol_Var.max_length = symbol.length + 1;
       # symbol_Var.values = (seq)->values + (index);
@@ -112,7 +111,7 @@ class SliceExpression(Expression)
     
     # if ((index) < 0 || (index) >= (seq)->length)
     # if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length)
-    #     RAISE("slice index out of bounds")
+    #     RAISE("slice_index")
     write(user "if ((")
     self.index.write()
     write(user ") < 0 || (")
@@ -130,7 +129,7 @@ class SliceExpression(Expression)
     write(user " (")
     self.sequence.write()
     write(user ")->length) ")
-    self.write-raise(user "slice index out of bounds")
+    self.write-raise(user "slice_index")
     self.code-node.write-spaces()
   
   func dynamic write()

@@ -349,7 +349,7 @@ test test-assert-error-message()
   assert-error f-failed-assert-error(), "error not raised"
   assert-error f-wrong-message-assert-error()
   var Func{()} fun
-  assert-error fun(), "empty function called"
+  assert-error fun(), "empty object used"
   var BaseType base-var
   user BaseType base-user(user base-var)
   assert-error test-mid-out()->(user base-user),
@@ -363,7 +363,7 @@ test test-assert-error-message()
   assert-error arr[0], "empty object used"
   assert-error arr2[0], "outdated weak reference used"
   user TopType top
-  assert-error top.meth2(), "dynamic call of empty object"
+  assert-error top.meth2(), "empty object used"
   new-fail-countdown := 1
   assert-error f-alloc(), "insufficient memory for object dynamic allocation"
   new-fail-countdown := 2
