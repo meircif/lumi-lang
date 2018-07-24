@@ -9,7 +9,8 @@ while [ -h "$SOURCE" ]; do
   SOURCE="$(readlink "$SOURCE")"
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
 done
-DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
+MYDIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
+DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 
 if [ -z $CC ]; then
   CC=gcc
@@ -32,17 +33,18 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../TL4/tl4-compiler.c ../TL3/lumi.3.c -I../TL3 -I../TL4 -o lumi/tl4-compiler
 
 # test lumi command C file
-cp ../lumi.4.lm lumi/
+cp ../lumi/lumi.4.lm lumi/
 pushd lumi
 ./tl4-compiler lumi.c lumi.4.lm
 popd
-diff ../lumi.c lumi/lumi.c
+diff ../lumi/lumi.c lumi/lumi.c
 
 # compile lumi command
-$CCA ../lumi.c ../TL4/lumi.4.c -I../TL4 -o lumi/lumi
+$CCA ../lumi/lumi.c ../TL4/lumi.4.c -I../TL4 -o lumi/lumi
 
 # run lumi command tests
-lumi/tl4-compiler -t lumi lumi/lumi-tests.c ../lumi.4.lm ../lumi-tests.4.lm
+lumi/tl4-compiler -t lumi lumi/lumi-tests.c ../lumi/lumi.4.lm \
+  ../lumi/lumi-tests.4.lm
 $CCA lumi/lumi-tests.c ../TL4/lumi.4.c -I../TL4 -o lumi/lumi-tests
 lumi/lumi-tests -xml
 mv cobertura.xml lumi/
