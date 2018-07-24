@@ -1,0 +1,567 @@
+~~~ TL4 compiler integration main test file
+
+This file should be stand-alone.
+
+Testing multiline documentation
+confused by ~ or ~~ or ; or ~~ ~ ?
+~~~
+module integration
+
+[; Test
+multiline
+comment
+;]
+
+~~~ Test Single line documentation ~~~
+; Test Single line comment
+
+; Test global variables
+var Int global-int(copy 23)
+user String global-string(user "a constant string")
+
+var Array{TestEnum.length + LENGTH:Int} int-arr
+const Int LENGTH SIZE * 5
+const Int SIZE 12
+
+
+; Test Enum
+enum TestEnum
+    FIRST-VALUE
+    ANOTHER-VALUE
+    VALUE2
+
+
+; Test functions
+func test-simple-function()
+    sys.println(user "I am a simple function")
+    sys.print(user "I am a multi\
+            line
+            string
+            ")
+
+
+func test-const-expression()->(
+        var Int i,
+        var Char c,
+        user String s,
+        user TestStruct t,
+        user TestClass d,
+        var Func{()} f)
+    i := 0 + 9630 + -9630 + 07520 + -07520 + 0xfda940 + -0xfda940 + 0xFDA940 +
+            -0xFDA940
+    c := 'a' + '\'' + '\n' + '\x0f' + '\xA9' + '\270'
+    s := "some string"
+    s := "some
+            str\
+            ing"
+    t := _
+    d := _
+    f := _
+    f()
+
+
+func test-member-expression(user TestStruct t)->(user TestStruct to, var Int i)
+    t.num := to.num + t.ts.num + t.ts.ts.num
+    to.num := t.num
+    t.ts.ts.num := 4
+    t.fun := f-test-void
+    t.fun()
+    t.new(copy 0, user "")
+
+
+func test-slice-expression(
+        user String s,
+        user Array{Int} arri,
+        user Array{String} arrs,
+        user Array{TestStruct} arrt,
+        user Array{TestClass} arrd,
+        user Array{Func{()}} arrf)->(
+        var Char c,
+        var Int i,
+        user TestStruct t,
+        user TestClass d,
+        var Func{()} f,
+        user Array{Int} arrio,
+        user Array{String} arrso,
+        user Array{TestStruct} arrto,
+        user Array{TestClass} arrdo,
+        user Array{Func{()}} arrfo)
+    c := s[2] + s[4:7][2] + arrs[3][2] + arrs[4:2][4][1:3][0]
+    i := arri[i + 3 - arri[2]] + arrt[4].num + arrt[2:4][1].num +
+            arri[3:3][1:2][1]
+    arrio := arri[2 - i + arri[2:4][1]:5 * (i - 1)]
+    s := arrs[4]
+    arrso := arrs[2:7]
+    t := arrt[4]
+    arrto := arrt[2:7]
+    d := arrd[4]
+    arrdo := arrd[2:7]
+    f := arrf[4]
+    arrfo := arrf[2:7]
+    arrf[4]()
+    arrfo[4]()
+
+
+func test-container-expression(copy Int x, copy Int y, user String s)->(
+        var Int i, var Bool b)
+    i := - x + - - - y
+    b := not ((not (x * 3) - 5 > 6 * y = 234 and not 5 - x < y) or not
+            (x = -2 - (-4 * y) and -6 > y >= 12 = x)) and (- (2 + x) > y or s? or
+            not s?)
+
+
+func test-variable(copy Int i, user String text, user Array{Int} arr)
+    var Int x
+    user String s
+    owner Array{Int} a
+    user TestStruct t
+    user TestClass d
+    var TestStruct tv(copy 0, user _)
+    var TestClass dv
+    var String{12} sv
+    var Func{(copy Int xi, user String si)->(var Int xo, user String so)} f
+    var Array{12:Int} ia
+    var Array{12:TestStruct} ta
+    var Array{12:TestClass} da
+    var Array{12:String{7}} sa
+    var Array{12:Func{()}} fa
+    new TestStruct tn(copy 0, user _)
+    new TestClass dn
+    new String{arr[0]} sn
+    new Array{arr[0]:Int} ian
+    new Array{arr[0]:TestStruct} tan
+    new Array{arr[0]:TestClass} dan
+    new Array{arr[0]:String{arr[1]}} san
+    new Array{arr[0]:Func{()}} sfn
+    var Int ix(copy arr[0])
+    user String si(user text)
+    var String{12} isv(user "some string")
+    new String{i} isn(user text)
+    var Func{(copy Int x)->(owner String s)} fi(copy f-test-int2str)
+    var TestStruct itv(copy i, user text)
+    new TestStruct itn(copy i, user text)
+    var TestClass idv()
+    new TestClass idn()
+    TestStruct(copy i, user text).print()
+    TestClass().print()
+    assert String{arr[0]}()?
+    assert Array{arr[0]:Int}()?
+    assert Array{arr[0]:TestStruct}()?
+    assert Array{arr[0]:TestClass}()?
+    assert Array{arr[0]:String{arr[1]}}()?
+    assert Array{arr[0]:Func{()}}()?
+    assert x = 0
+    assert s?
+    assert a?
+    t.print()
+    d.print()
+    assert f?
+    tv.print()
+    dv.print()
+    assert sv?
+    assert ia?
+    assert ta?
+    assert da?
+    assert sa?
+    assert fa?
+    tn.print()
+    dn.print()
+    assert sn?
+    assert ian?
+    assert tan?
+    assert dan?
+    assert san?
+    assert sfn?
+    assert ix = 0
+    assert si?
+    fi(copy 7)
+    assert isv?
+    assert isn?
+
+
+func test-complex-function(
+        copy Int num, user String text)->(var Int out-num, user String out-text)
+    [; Test
+    multiline
+    comment ;]
+
+    ; Test Single line comment
+
+    ~~~ Test Single line documentation ~~~
+    ; Test Single line comment
+    out-num := num
+    out-text := text
+
+
+; Test types
+struct TestStruct
+    ~~~ documentation test ~~~
+    var Int num
+    
+    ~~~ Test
+    multiline
+    documentation ~~~
+    user String text
+    
+    ; comment test
+    
+    owner TestStruct ts
+    var Func{()} fun
+    
+    new(copy Int x, user String s)
+        self.num := x
+        self.text := s
+        if x < 0
+            self.ts := TestStruct(copy x + 1, user s)
+    
+    [; Test
+    multiline
+    comment ;]
+    
+    func get()->(var Int x, user String s)
+        x := self.num
+        s := self.text
+    
+    func print()
+        sys.println(user self.text)
+
+
+class TestClass
+    var Int num
+    user String text
+    owner TestClass tc
+    
+    new()
+        self.num := 1
+    
+    func inst static-meth()
+        self.num := 3
+        
+    func dynamic dynamic-meth()
+        self.num := 6
+    
+    func inst print()
+        sys.println(user self.text)
+
+
+func f-test-void()
+    return
+func f-test-params(copy Int x, user String s, owner String o)
+    raise
+func f-test-outs()->(owner String s, var Int x)
+func f-test-int2str(copy Int x)->(owner String s)
+func f-test-int(copy Int x)
+func f-test-int2int(copy Int x)->(var Int r)
+func f-test-many(
+        copy Int x,
+        copy Int y)->(
+        var Int n,
+        var Int m)
+
+
+func test-call-expression()
+    owner String s
+    var Int x
+    f-test-void()
+    f-test-params(copy 3, user "text", owner _)
+    f-test-outs()->(owner s, var x)
+    f-test-int2str(copy 4)->(owner s)
+    f-test-int(copy 5)
+    f-test-int2int(copy 6)->(var x)
+    f-test-many(
+            copy 7,
+            copy 8)->(
+            var x,
+            var x)
+    var Int tmp
+    f-test-int(copy f-test-int2int(copy 9)->(var tmp))
+    x := f-test-int2int(copy 10) + f-test-many(copy 11, copy 12)->(var x)
+    s := f-test-int2str(copy 13)
+
+
+func test-code-flow(user Array{Int} arr)->(var Int res)
+    if arr[4] > 6
+        res := 6
+    else-if arr?
+        res := 6
+    else-if arr[4] != arr[5]
+        res := 6
+    else-if 0 = arr[0]
+        res := 6
+    else
+        res := 0
+    do
+        arr[6] := 6
+        var Int x(copy arr[2])
+        while x > 3 and arr is _
+        var Int y(copy x - 1)
+        do
+            arr[4] := arr[8]
+            if y > arr[4]
+                continue
+            var Int z(copy 7)
+            if z <= arr[4]
+                while z > 0
+    for n in arr[2]:2 - (3 * arr[2])
+        arr[0] := arr[2]
+        var Int w(copy arr[0])
+        if w > 4 and arr is-not arr[3:2]
+            arr[1] := w
+
+
+func test-builtins(
+        copy Int i, copy Char c, copy Bool b, user String s, user Array{Int} a)
+    var Int iv
+    var Char cv
+    var Bool bv
+    i.str(user s)
+    bv := true or false
+    i := a.length
+    i := s.length
+    s.clear()
+    s.equal(user s)->(var bv)
+    s.get(copy i)->(var cv)
+    s.append(copy c)
+    s.new(user s)
+    s.concat(user s)
+    s.concat-int(copy i)
+    s.find(user s)->(var iv)
+    s.has(copy c)->(var bv)
+    owner File f
+    file-open-read(user s)->(owner f)
+    file-open-write(user s)->(owner f)
+    f.getc()->(var cv, var bv)
+    f.putc(copy c)
+    f.write(user s)
+    file-close(owner f)
+    s := sys.argv[1]
+    sys.print(user s)
+    sys.println(user s)
+    sys.getchar()->(var cv, var bv)
+    sys.getline(user s)
+    sys.getenv(user s, user s)->(var bv)
+    sys.system(user s)->(var iv)
+    sys.exit(copy i)
+    sys.stdout.putc(copy c)
+    sys.stdin.getc()->(var cv, var bv)
+    sys.stderr.putc(copy c)
+
+
+func test-ref-count()
+    new String{32} s(user "test string")
+    user String s-user(user s)
+    sys.println(user s)
+    sys.println(user s-user)
+    f-remove(owner s)
+    if not s?
+        sys.println(user "ownership passed")
+    if not s-user?
+        sys.println(user "string deleted")
+    new TestStruct ts(copy 0, user "first struct")
+    ts := ts
+    sys.println(user ts.text)
+    ts.ts := TestStruct(copy 1, user "second struct")
+    ts := ts.ts
+    sys.println(user ts.text)
+
+func f-remove(owner String s)
+    ; remove s
+
+
+struct Data{Generic}
+    user Generic item
+    user Array{Generic} arr
+    
+    func set(user Generic item, user Array{Generic} arr)
+        user Generic x(user item)
+        self.item := x
+        self.arr := arr
+        new Data{Generic} d
+        d.item := self.item
+        self.item := d.item
+    
+    func get()->(user Generic item)
+        item := self.item
+
+struct Dataset{First:Second:Third}(Data{First})
+    user Second second
+    user Third third
+
+struct MidData{Generic}(Dataset{String:Data{Generic}:Generic})
+
+struct TopData(MidData{TestStruct})
+
+func test-type-parameters(user String s)
+    var Data{String} d
+    var Array{6:String{16}} sarr
+    d.item := s
+    s := d.item
+    d.arr := sarr
+    s := d.arr[4]
+    var Array{5:Data{String}} ad
+    s := ad[2].item
+    s := ad[2].arr[3]
+    var Data{Data{Data{String}}} dr
+    s := dr.item.item.item
+    d.set(user s, user sarr)
+    d.get()->(user s)
+    user Data dg(user d)
+    assert dg?
+    
+    var TopData t
+    var Data{TestStruct} dt
+    var TestStruct ts(copy 0, user _)
+    t.item := s
+    t.arr := sarr
+    t.second := dt
+    t.third := ts
+
+
+func f-try-catch-raise(user TestStruct t)
+    try
+        t.num := 1
+    catch
+        raise "ignored message"
+
+func test-error-handling(user TestStruct t)
+    try
+        sys.print(user "error handling { 1 ")
+        t.num := 1
+        sys.print(user " X ")
+        try
+            f-test-void()
+        catch
+            f-test-int(copy 2)
+    catch
+        sys.print(user "2 ")
+        try
+            sys.print(user "3 ")
+            t.num := 2
+            sys.print(user " X ")
+        sys.print(user "4 ")
+    sys.print(user "5 ")
+    try
+        sys.print(user "6 ")
+        try
+            sys.print(user "7 ")
+            f-try-catch-raise(user t)
+            sys.print(user " X ")
+        sys.print(user "8 ")
+        raise "another ignored message"
+    sys.println(user "}")
+
+
+struct Container{Generic}
+    user Generic value
+    user Container{Generic} next
+    
+    new(user Generic value, user Container{Generic} next)
+        self.value := value
+        self.next := next
+    
+    func iter()->(owner ContainerIterator{Generic} iter)
+        iter := ContainerIterator{Generic}(user self.next)
+
+struct ContainerIterator{Generic}
+    user Container{Generic} curr
+    
+    new(user Container{Generic} first)
+        self.curr := first
+    
+    func has()->(var Bool has-data)
+        has-data := self.curr?
+    
+    func get()->(user Generic item)
+        item := self.curr.value
+    
+    func next()
+        self.curr := self.curr.next
+
+func test-for-each()
+    var String{16} text
+    sys.print(user "chars[ ")
+    for c in "abcdef"
+        text.clear()
+        text.append(copy c)
+        sys.print(user text)
+        sys.print(user " ")
+    sys.println(user "]")
+    
+    var Array{3:Int} arr
+    arr[0] := 14
+    arr[1] := 15
+    arr[2] := 16
+    sys.print(user "numbers[ ")
+    for n in arr
+        text.clear()
+        n.str(user text)
+        sys.print(user text)
+        sys.print(user " ")
+    sys.println(user "]")
+    
+    var Array{3:TestStruct} tsarr
+    tsarr[0].text := "aaa"
+    tsarr[1].text := "bbb"
+    tsarr[2].text := "ccc"
+    sys.print(user "structs[ ")
+    for ts in tsarr
+        sys.print(user ts.text)
+        sys.print(user " ")
+    sys.println(user "]")
+    
+    var Array{3:String{16}} sarr
+    sarr[0].new(user "ddd")
+    sarr[1].new(user "eee")
+    sarr[2].new(user "fff")
+    sys.print(user "strings[ ")
+    for s in sarr
+        sys.print(user s)
+        sys.print(user " ")
+    sys.println(user "]")
+    
+    var Container{String} container-last(user "iii", user _)
+    var Container{String} container-mid(user "hhh", user container-last)
+    var Container{String} container-first(user "ggg", user container-mid)
+    var Container{String} container(user _, user container-first)
+    owner ContainerIterator{String} iter
+    container.iter()->(owner iter)
+    sys.print(user "values[ ")
+    for s in iter
+        sys.print(user s)
+        sys.print(user " ")
+    sys.println(user "]")
+
+
+class ComplexField
+    user ComplexField x
+    func dynamic meth()
+        sys.print(user "$")
+
+struct HasComplexField
+    var ComplexField x
+    func run()
+        user ComplexField x(user self.x)
+        x := self.x
+        x.meth()
+        self.x.meth()
+        ComplexField.meth(user self.x)
+        user ComplexField x2(user self.x.x)
+        x2 := self.x.x
+        x2.meth()
+        self.x.x.meth()
+        ComplexField.meth(user self.x.x)
+
+func test-complex-field()
+    var HasComplexField y
+    y.x.x := y.x
+    sys.print(user "complex fields: ")
+    y.run()
+    sys.println(user "")
+
+
+main
+    test-simple-function()
+    test-ref-count()
+    test-error-handling(user _)
+    test-for-each()
+    test-complex-field()

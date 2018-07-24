@@ -789,7 +789,7 @@ int set_sys(int argc, char* argv[]) {
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
     args_strings[arg].length = cstring_length(argv[arg], 1024);
-    args_strings[arg].max_length = args_strings[arg].length;
+    args_strings[arg].max_length = args_strings[arg].length + 1;
     args_strings[arg].values[args_strings[arg].length] = '\0';
   }
   return OK;

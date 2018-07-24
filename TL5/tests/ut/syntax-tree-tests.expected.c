@@ -481,7 +481,7 @@ Returncode ut_M_name(String* self, Ref_Manager* self_Refman, Int px, String* pu,
     aux_String_3_Var.max_length = aux_String_3_Var.length + 1;
     aux_String_3_Var.values = (po)->values + (2);
     CHECK_REF(10, po, po_Refman)
-    if ((2) < 0 || (6) < 0 || (2) + (6) > (po)->length) RAISE(10, 11, "slice_index")
+    if ((2) < 0 || (6) < 0 || (2) + (6) > (po)->length) RAISE(10, slice_index)
     aux_Ref_Manager = pu_Refman;
     pu_Refman = po_Refman;
     LUMI_inc_ref(pu_Refman);
@@ -902,7 +902,7 @@ Returncode ut_M_name(Array* arr, Ref_Manager* arr_Refman) {
     Returncode LUMI_err = OK;
     LUMI_inc_ref(arr_Refman);
     CHECK_REF(2, arr, arr_Refman)
-    if ((3) < 0 || (3) >= (arr)->length) RAISE(2, 11, "slice_index")
+    if ((3) < 0 || (3) >= (arr)->length) RAISE(2, slice_index)
     USER_RAISE(2, ((String*)((arr)->values)) + 3, arr_Refman)
 LUMI_cleanup:
     LUMI_dec_ref(arr_Refman);
@@ -1020,7 +1020,7 @@ String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, 11, "slice_index")
+    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
     INIT_NEW(1, aux_String_0, LUMI_new_string(((Int*)((ut_M_arr)->values))[0]));
     aux_Ref_Manager = ut_M_str_Refman;
     ut_M_str_Refman = aux_String_0_Refman;
@@ -1033,7 +1033,7 @@ Array* aux_Array_0 = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, 11, "slice_index")
+    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
     INIT_NEW(1, aux_Array_0, LUMI_new_array(((Int*)((ut_M_arr)->values))[0], sizeof(Int)));
     aux_Ref_Manager = ut_M_arr_Refman;
     ut_M_arr_Refman = aux_Array_0_Refman;
@@ -1047,7 +1047,7 @@ Array* a = NULL;
     Array* aux_Array_0 = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, 11, "slice_index")
+    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
     INIT_NEW(1, aux_Array_0, LUMI_new_array(((Int*)((ut_M_arr)->values))[0], sizeof(ut_M_Test)));
     a = aux_Array_0;
     a_Refman = aux_Array_0_Refman;
@@ -1059,9 +1059,9 @@ Array* sa = NULL;
     Array* aux_Array_0 = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, 11, "slice_index")
+    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((1) < 0 || (1) >= (ut_M_arr)->length) RAISE(1, 11, "slice_index")
+    if ((1) < 0 || (1) >= (ut_M_arr)->length) RAISE(1, slice_index)
     INIT_NEW(1, aux_Array_0, LUMI_new_string_array(((Int*)((ut_M_arr)->values))[0], ((Int*)((ut_M_arr)->values))[1]));
     sa = aux_Array_0;
     sa_Refman = aux_Array_0_Refman;
@@ -1070,7 +1070,7 @@ Array* sa = NULL;
 /// @ t5
 Int x = 0;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, 11, "slice_index")
+    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
     x = ((Int*)((ut_M_arr)->values))[0];
 /// @ t6
 String* s = NULL;
@@ -1336,7 +1336,7 @@ Char ch = 0;
     CHECK_REF(1, aux_String_0, aux_String_0_Refman)
     {int ch_Index; for (ch_Index = 0; ch_Index < aux_String_0->length; ++ch_Index) {
         CHECK_REF(1, aux_String_0, aux_String_0_Refman)
-        if ((ch_Index) < 0 || (ch_Index) >= (aux_String_0)->length) RAISE(1, 11, "slice_index")
+        if ((ch_Index) < 0 || (ch_Index) >= (aux_String_0)->length) RAISE(1, slice_index)
         ch = ((aux_String_0)->values)[ch_Index];
         ut_M_c = ch;
     }}
@@ -1360,7 +1360,7 @@ Int n = 0;
     CHECK_REF(1, aux_Array_0, aux_Array_0_Refman)
     {int n_Index; for (n_Index = 0; n_Index < aux_Array_0->length; ++n_Index) {
         CHECK_REF(1, aux_Array_0, aux_Array_0_Refman)
-        if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(1, 11, "slice_index")
+        if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(1, slice_index)
         n = ((Int*)((aux_Array_0)->values))[n_Index];
         ut_M_i += n;
     }}
@@ -1385,7 +1385,7 @@ String* s = NULL;
     CHECK_REF(1, aux_Array_0, aux_Array_0_Refman)
     {int s_Index; for (s_Index = 0; s_Index < aux_Array_0->length; ++s_Index) {
         CHECK_REF(1, aux_Array_0, aux_Array_0_Refman)
-        if ((s_Index) < 0 || (s_Index) >= (aux_Array_0)->length) RAISE(1, 11, "slice_index")
+        if ((s_Index) < 0 || (s_Index) >= (aux_Array_0)->length) RAISE(1, slice_index)
         aux_Ref_Manager = s_Refman;
         s_Refman = aux_Array_0_Refman;
         LUMI_inc_ref(s_Refman);
@@ -1633,7 +1633,7 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_met
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x) {
     Returncode LUMI_err = OK;
     LUMI_inc_ref(self_Refman);
-    if (self_Dynamic == NULL) RAISE(5, 17, "empty object used")
+    if (self_Dynamic == NULL) RAISE(5, empty_object)
     LUMI_err = self_Dynamic->meth(self, self_Refman, self_Dynamic, x);
     CHECK(5)
 LUMI_cleanup:
@@ -1728,7 +1728,7 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_met
 Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, Int x, Int* y) {
     Returncode LUMI_err = OK;
     LUMI_inc_ref(self_Refman);
-    if (self_Dynamic == NULL) RAISE(4, 17, "empty object used")
+    if (self_Dynamic == NULL) RAISE(4, empty_object)
     LUMI_err = self_Dynamic->meth(self, self_Refman, self_Dynamic, x, &(*y));
     CHECK(4)
 LUMI_cleanup:
@@ -2460,7 +2460,7 @@ Ref_Manager* aux_Ref_Manager = NULL;
 Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(1, ut_M_d, ut_M_d_Refman)
     CHECK_REF(1, ut_M_d->arr, ut_M_d->arr_Refman)
-    if ((4) < 0 || (4) >= (ut_M_d->arr)->length) RAISE(1, 11, "slice_index")
+    if ((4) < 0 || (4) >= (ut_M_d->arr)->length) RAISE(1, slice_index)
     aux_Ref_Manager = ut_M_str_Refman;
     ut_M_str_Refman = ut_M_d->arr_Refman;
     LUMI_inc_ref(ut_M_str_Refman);
@@ -2476,7 +2476,7 @@ ut_M_Data ad_Values[5] = {{0}};
     INIT_VAR(1, ad)
     ad_Var.values = ad_Values;
     CHECK_REF(2, ad, ad_Refman)
-    if ((2) < 0 || (2) >= (ad)->length) RAISE(2, 11, "slice_index")
+    if ((2) < 0 || (2) >= (ad)->length) RAISE(2, slice_index)
     CHECK_REF(2, ((ut_M_Data*)((ad)->values)) + 2, ad_Refman)
     aux_Ref_Manager = ut_M_str_Refman;
     ut_M_str_Refman = (((ut_M_Data*)((ad)->values)) + 2)->item_Refman;
@@ -2493,10 +2493,10 @@ ut_M_Data ad_Values[5] = {{0}};
     INIT_VAR(1, ad)
     ad_Var.values = ad_Values;
     CHECK_REF(2, ad, ad_Refman)
-    if ((2) < 0 || (2) >= (ad)->length) RAISE(2, 11, "slice_index")
+    if ((2) < 0 || (2) >= (ad)->length) RAISE(2, slice_index)
     CHECK_REF(2, ((ut_M_Data*)((ad)->values)) + 2, ad_Refman)
     CHECK_REF(2, (((ut_M_Data*)((ad)->values)) + 2)->arr, (((ut_M_Data*)((ad)->values)) + 2)->arr_Refman)
-    if ((3) < 0 || (3) >= ((((ut_M_Data*)((ad)->values)) + 2)->arr)->length) RAISE(2, 11, "slice_index")
+    if ((3) < 0 || (3) >= ((((ut_M_Data*)((ad)->values)) + 2)->arr)->length) RAISE(2, slice_index)
     aux_Ref_Manager = ut_M_str_Refman;
     ut_M_str_Refman = (((ut_M_Data*)((ad)->values)) + 2)->arr_Refman;
     LUMI_inc_ref(ut_M_str_Refman);
@@ -2615,7 +2615,7 @@ ut_M_Data dt_Var = {0};
     otc_Refman = NULL;
     otc_Dynamic = NULL;
     CHECK(5)
-    if (ut_M_ta != NULL) RAISE(6, 17, "empty_base_output")
+    if (ut_M_ta != NULL) RAISE(6, empty_base_output)
     LUMI_err = ut_M_Data_get(dt, dt_Refman, (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic));
     CHECK(6)
     LUMI_err = ut_M_Data_get(dt, dt_Refman, (void*)&(aux_Tb_0), &(aux_Tb_0_Refman), (void*)&(aux_Tb_0_Dynamic));
@@ -2804,13 +2804,13 @@ Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, ut_M_Test_Dynami
     Ref_Manager* aux_String_0_Refman = NULL;
     LUMI_inc_ref(test_Refman);
     LUMI_inc_ref(text_Refman);
-    if (test_Dynamic == NULL) RAISE(9, 17, "empty object used")
+    if (test_Dynamic == NULL) RAISE(9, empty_object)
     LUMI_err = test_Dynamic->_base.set(&(test->_base), test_Refman, &(test_Dynamic->_base), text, text_Refman, &String_dynamic);
     CHECK(9)
-    if (test_Dynamic == NULL) RAISE(10, 17, "empty object used")
+    if (test_Dynamic == NULL) RAISE(10, empty_object)
     LUMI_err = test_Dynamic->_base.get(&(test->_base), test_Refman, &(test_Dynamic->_base), (void*)&(text), &(text_Refman), &dynamic_Void);
     CHECK(10)
-    if (test_Dynamic == NULL) RAISE(11, 17, "empty object used")
+    if (test_Dynamic == NULL) RAISE(11, empty_object)
     LUMI_err = test_Dynamic->_base.get(&(test->_base), test_Refman, &(test_Dynamic->_base), (void*)&(aux_String_0), &(aux_String_0_Refman), &dynamic_Void);
     CHECK(11)
     LUMI_err = String_clear(aux_String_0, aux_String_0_Refman);
@@ -3706,7 +3706,7 @@ do {
 #undef RETURN_ERROR
 #define RETURN_ERROR break
             CHECK_REF(9, ut_M_arr, ut_M_arr_Refman)
-            if ((3) < 0 || (3) >= (ut_M_arr)->length) RAISE(9, 11, "slice_index")
+            if ((3) < 0 || (3) >= (ut_M_arr)->length) RAISE(9, slice_index)
             ut_M_i = ((Int*)((ut_M_arr)->values))[3];
 #undef RETURN_ERROR
 #define RETURN_ERROR goto LUMI_cleanup
@@ -4096,11 +4096,11 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_T
     aux_TestIterator_0 = iter;
     while (true) {
         Bool t_Has = false;
-        if (aux_TestIterator_0_Dynamic == NULL) RAISE(7, 17, "empty object used")
+        if (aux_TestIterator_0_Dynamic == NULL) RAISE(7, empty_object)
         LUMI_err = aux_TestIterator_0_Dynamic->has(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic, &(t_Has));
         CHECK(7)
         if (!t_Has) break;
-        if (aux_TestIterator_0_Dynamic == NULL) RAISE(7, 17, "empty object used")
+        if (aux_TestIterator_0_Dynamic == NULL) RAISE(7, empty_object)
         LUMI_err = aux_TestIterator_0_Dynamic->get(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic, (void*)&(t), &(t_Refman), &dynamic_Void);
         CHECK(7)
         aux_Ref_Manager = *s_Refman;
@@ -4109,7 +4109,7 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_T
         LUMI_dec_ref(aux_Ref_Manager);
         aux_Ref_Manager = NULL;
         *s = t;
-        if (aux_TestIterator_0_Dynamic == NULL) RAISE(8, 17, "empty object used")
+        if (aux_TestIterator_0_Dynamic == NULL) RAISE(8, empty_object)
         LUMI_err = aux_TestIterator_0_Dynamic->next(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic);
         CHECK(7)
     }
@@ -4255,7 +4255,7 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
     aux_Ref_Manager = NULL;
     b2 = self->b.b;
     CHECK_REF(10, self, self_Refman)
-    if (self->b.b_Dynamic == NULL) RAISE(10, 17, "empty object used")
+    if (self->b.b_Dynamic == NULL) RAISE(10, empty_object)
     LUMI_err = self->b.b_Dynamic->_base.meth(&(self->b.b->_base), self->b.b_Refman, &(self->b.b_Dynamic->_base));
     CHECK(10)
     CHECK_REF(11, self, self_Refman)
