@@ -1,0 +1,16 @@
+I am a simple function
+I am a multiline
+string
+test string
+test string
+ownership passed
+string deleted
+first struct
+second struct
+error handling { 1 2 3 4 5 6 7 8 }
+chars[ a b c d e f ]
+numbers[ 14 15 16 ]
+structs[ aaa bbb ccc ]
+strings[ ddd eee fff ]
+values[ ggg hhh iii ]
+complex fields: $$$$$$

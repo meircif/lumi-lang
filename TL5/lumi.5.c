@@ -193,7 +193,7 @@ void make_coverage_xml(File_Coverage* files_coverage, int files_number) {
     "<!DOCTYPE coverage SYSTEM 'https://raw.githubusercontent.com/cobertura/"
     "cobertura/master/cobertura/src/site/htdocs/xml/coverage-loose.dtd'>\n",
     xml);
-  fputs("<coverage timestamp=\"0\" version=\"lumi 0.0.4\">\n", xml);
+  fputs("<coverage timestamp=\"0\" version=\"lumi 0.0.5\">\n", xml);
   fputs(" <packages>\n", xml);
 
   for (n = 0; n < files_number; ++n) {
@@ -789,7 +789,7 @@ int set_sys(int argc, char* argv[]) {
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
     args_strings[arg].length = cstring_length(argv[arg], 1024);
-    args_strings[arg].max_length = args_strings[arg].length;
+    args_strings[arg].max_length = args_strings[arg].length + 1;
     args_strings[arg].values[args_strings[arg].length] = '\0';
   }
   return OK;

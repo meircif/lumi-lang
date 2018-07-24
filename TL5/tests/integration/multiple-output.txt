@@ -1,0 +1,13 @@
+Running tests:
+testing test-func... OK
+testing test-another... OK
+testing test-native... OK
+testing test-dynamic-type-parameters... OK
+testing test-simple-delete... OK
+testing test-complex-delete... OK
+testing test-assert-error-message... OK
+testing test-builtin-errors... OK
+testing test-cover-all... OK
+testing test-constants... OK
+testing code coverage... 100%
+Tests passed

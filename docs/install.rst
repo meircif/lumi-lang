@@ -22,7 +22,7 @@ Installing Lumi
 optional but recommended:
 
 3. :ref:`build the "lumi" command <build-lumi-command>` with a C compiler:
-   ``$CC lumi.c TL4/lumi.4.c -ITL4 -o lumi``
+   ``$CC lumi/lumi.c TL4/lumi.4.c -ITL4 -o lumi``
 4. add the Lumi compiler and the ``lumi`` command to the system path
 
 .. _build-compiler:
@@ -67,7 +67,7 @@ from Lumi code by running Lumi compiler and C compiler one after another.
 
 ::
 
-   $CC lumi.c TL4/lumi.4.c -ITL4 -o lumi
+   $CC lumi/lumi.c TL4/lumi.4.c -ITL4 -o lumi
 
 It is recommended to add the compiler executable to the system path, for
 example, in Linux move it to ``/usr/local/bin/``.

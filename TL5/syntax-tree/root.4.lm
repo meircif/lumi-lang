@@ -224,7 +224,7 @@ class SyntaxTreeRoot(GlobalNodes)
       sys.print(user "\"\n")
       sys.exit(copy 1)
     
-    write-global(user ";include \"lumi.4.h\"\n")
+    write-global(user "#include \"lumi.5.h\"\n")
     
     write-global(user "\n\n/* types declaration */\n")
     var TypeDeclarationWriter type-declaration-writer

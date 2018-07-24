@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<!DOCTYPE coverage SYSTEM 'https://raw.githubusercontent.com/cobertura/cobertura/master/cobertura/src/site/htdocs/xml/coverage-loose.dtd'>
+<coverage timestamp="0" version="lumi 0.0.5">
+ <packages>
+  <package name="">
+   <classes>
+    <class name="TL5/integration/test2.5.lm" filename="TL5/integration/test2.5.lm">
+     <methods/>
+     <lines>
+      <line branch="false" hits="2" number="14"/>
+      <line branch="false" hits="2" number="15"/>
+      <line branch="false" hits="1" number="18"/>
+      <line branch="false" hits="1" number="19"/>
+      <line branch="false" hits="1" number="22"/>
+      <line branch="false" hits="1" number="23"/>
+      <line branch="false" hits="1" number="26"/>
+      <line branch="false" hits="1" number="29"/>
+     </lines>
+    </class>
+   </classes>
+  </package>
+ </packages>
+</coverage>
