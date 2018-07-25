@@ -133,10 +133,7 @@ class SyntaxTreeTestFunction(SyntaxTreeFunction)
 
 ~~~ Mock function in the syntax tree ~~~
 class SyntaxTreeMockFunction(SyntaxTreeFunction)
-  owner String mocked-name
-  owner String type-name
-  owner String module-name
-  user SyntaxTreeFunction mocked-function
+  owner String mock-name
   
   func inst parse-new()->(owner SyntaxTreeMockFunction new-node)
     new-node := SyntaxTreeMockFunction()
@@ -145,30 +142,10 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
   func inst parse()
     base(user _)
     self.mocker-function := self
-    var Int index
-    self.name.find(user ".")->(var index)
-    if index < self.name.length
-      user String first(user self.name[0:index])
-      user String last(user self.name[index + 1:self.name.length - index - 1])
-      last.find(user ".")->(var index)
-      if index < last.length
-        string-new-copy(user first)->(owner self.module-name)
-        first := last[0:index]
-        last := last[index + 1:last.length - index - 1]
-        string-new-copy(user first)->(owner self.type-name)
-      else
-        var Char ch(copy first[0])
-        if ch >= 'a' and ch <= 'z'
-          string-new-copy(user first)->(owner self.module-name)
-        else
-          string-new-copy(user first)->(owner self.type-name)
-      string-new-copy(user last)->(owner self.mocked-name)
+    if self.type-name? and self.name.equal(user "delete")
+      string-new-copy(user "MockDel")->(owner self.mock-name)
     else
-      self.mocked-name := self.name
-    if self.type-name? and self.mocked-name.equal(user "delete")
-      string-new-copy(user "MockDel")->(owner self.name)
-    else
-      string-new-concat(user self.mocked-name, user " Mock")->(owner self.name)
+      string-new-concat(user self.name, user " Mock")->(owner self.mock-name)
   
   func dynamic register-name()
     ; do not register
@@ -176,29 +153,20 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
   func dynamic link-types()
     glob.current-module := self.my-module
     if self.type-name?
-      self.find-type(user self.type-name, user self.module-name)->(
-          user self.parent-type)
-      if self.mocked-name.equal(user "delete")
+      if self.name.equal(user "delete")
+        self.find-type(user self.type-name, user self.module-name)->(
+            user self.parent-type)
         if self.parent-type.is-delete-mocked
           self.syntax-error(
               user "already mocking delete of type", user self.type-name)
         self.parent-type.is-delete-mocked := true
         self.arguments.add-self-parameter(user glob.type-ref)
-      else
-        self.parent-type.find-meth(user self.mocked-name)->(
-            user self.mocked-function)
-        if not self.mocked-function?
-          self.syntax-error2(
-              user "mocking unknown method",
-              user self.mocked-name,
-              user "of type",
-              user self.type-name)
-        self.arguments.add-self-parameter(user self.parent-type)
-    else-if self.mocked-name.equal(user "new")
+        self.type-name := _
+    else-if self.name.equal(user "new")
       if glob.is-new-mocked
         self.syntax-error-msg(user "already mocking global new")
       glob.is-new-mocked := true
-    else-if self.mocked-name.equal(user "delete")
+    else-if self.name.equal(user "delete")
       if glob.is-delete-mocked
         self.syntax-error-msg(user "already mocking global delete")
       if self.arguments.parameters.first? or self.arguments.outputs.first?
@@ -206,21 +174,24 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       glob.is-delete-mocked := true
       self.arguments.add-self-parameter(user glob.type-ref)
     else
-      self.find-function(user self.mocked-name, user self.module-name)->(
-          user self.mocked-function)
-      if not self.mocked-function?
+      self.find-function(user self.name, user self.module-name)->(
+          user self.implemented-function)
+      if not self.implemented-function?
         self.syntax-error(
-            user "mocking unknown function", user self.mocked-name)
-    if self.mocked-function?
-      if self.mocked-function.mocker-function?
-        self.syntax-error(
-            user "already mocking function", user self.mocked-name)
-      self.mocked-function.mocker-function := self
+            user "mocking unknown function", user self.name)
     base()
+    if self.implemented-function?
+      if self.implemented-function.mocker-function?
+        self.syntax-error(
+            user "already mocking function", user self.name)
+      self.implemented-function.mocker-function := self
+  
+  func dynamic check-already-implemented()
+    ; do not check
   
   func dynamic analyze()
     glob.current-module := self.my-module
-    if not self.type-name? and self.mocked-name.equal(user "new")
+    if not self.type-name? and self.name.equal(user "new")
       var Bool legal-args
       if self.arguments.outputs.first?
         legal-args := not self.arguments.parameters.first? and
@@ -233,30 +204,28 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
         self.syntax-error-msg(
             user "mock new should have only single Bool output")
       self.my-module := _
-    else-if self.mocked-name.equal(user "delete")
+    else-if self.name.equal(user "delete")
       self.my-module := _
-    if self.mocked-function?
-      self.arguments.check-same-as(
-          user self.mocked-function.arguments, user _, copy 0)
-      self.my-module := self.mocked-function.my-module
     base()
+    self.name := self.mock-name
+    self.external-body := false
   
   func dynamic write-declaration()
     base()
-    if self.mocked-function?
+    if self.implemented-function?
       ; Bool `name`_active = true;
       write(user "\nBool ")
       self.write-cname()
       write(user "_active = true;")
   
   func dynamic write-block-body()
-    if self.mocked-function?
+    if self.implemented-function?
       ; if (!`name`_active) return `name`(`arguments`);
       write-spaces(copy INDENTATION-SPACES)
       write(user "if (!")
       self.write-cname()
       write(user "_active) return ")
-      self.mocked-function.write-cname()
+      self.implemented-function.write-cname()
       write(user "(")
       var Bool first(copy true)
       self.write-arg-list(user self.arguments.parameters)->(var first)

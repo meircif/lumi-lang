@@ -689,6 +689,10 @@ missing arguments in function type
 multidimensional array not supported yet...
 /// @ te20
 indentation too short, expected 8 got 4
+/// @ te21
+misplaced item "Error"
+/// @ te22
+misplaced item "error"
 /// @@ test-members
 /// @ t0
 typedef struct ut_M_Test ut_M_Test;
@@ -856,6 +860,68 @@ LUMI_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
+/// @ t9
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman) {
+    Returncode LUMI_err = OK;
+    LUMI_inc_ref(self_Refman);
+    CHECK_REF(5, self, self_Refman)
+    self->x = 3;
+LUMI_cleanup:
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
+/// @ t10
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman, String* s, Ref_Manager* s_Refman, Int* x);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman, String* s, Ref_Manager* s_Refman, Int* x) {
+    Returncode LUMI_err = OK;
+    LUMI_inc_ref(self_Refman);
+    LUMI_inc_ref(s_Refman);
+    CHECK_REF(2, s, s_Refman)
+    *x = s->length;
+LUMI_cleanup:
+    LUMI_dec_ref(s_Refman);
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
+/// @ t11
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+Returncode ut_M_Test_new(ut_M_Test* self, Ref_Manager* self_Refman, Int x);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_Test_new(ut_M_Test* self, Ref_Manager* self_Refman, Int x) {
+    Returncode LUMI_err = OK;
+    LUMI_inc_ref(self_Refman);
+    CHECK_REF(5, self, self_Refman)
+    self->x = x;
+LUMI_cleanup:
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
 /// @ te0
 redefinition of field "name"
 /// @ te1
@@ -866,6 +932,14 @@ redefinition of method "name"
 method name overrides field "name"
 /// @ te4
 assigning into an owner a non-owner access "user"
+/// @ te5
+expected block in a new line, got " "
+/// @ te6
+misplaced item "error"
+/// @ te7
+type "Test" already implemented method "fun"
+/// @ te8
+type "Test" already implemented method "fun"
 /// @@ test-return
 /// @ t0
 Returncode ut_M_name(void);
@@ -2027,7 +2101,7 @@ mocking unknown function "error"
 /// @ te6
 unknown type "Error"
 /// @ te7
-mocking unknown method "error" of type "Test"
+unknown method "error" of type "Test"
 /// @ te8
 expected access "user" , got "owner"
 /// @ te9

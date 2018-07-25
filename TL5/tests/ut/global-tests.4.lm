@@ -119,16 +119,21 @@ func assert-string-slice(
     return
   if tests-passed
     sys.print(user "\n    ")
-  sys.print(user "[expected `")
-  sys.print(user expected)
-  sys.print(user "`, got `")
-  sys.print(user actual-slice)
-  sys.print(user "`]\n    ")
-  write-new-file(user "expected.txt", user expected)
-  write-new-file(user "actual.txt", user actual-slice)
+  if expected.length > 128 or actual-slice.length > 128
+    sys.print(user "[unmatching large text]\n    ")
+  else
+    sys.print(user "[expected `")
+    sys.print(user expected)
+    sys.print(user "`,\n          got `")
+    sys.print(user actual-slice)
+    sys.print(user "`]\n    ")
+  write-new-file(user "expected", user expected)
+  write-new-file(user "actual", user actual-slice)
   tests-passed := false
 
-func write-new-file(user String filename, user String data)
+func write-new-file(user String base-name, user String data)
+  var String{256} filename
+  set-test-file-name(user filename, user base-name, user ".txt")
   owner File file
   file-open-write.mocked(user filename)->(owner file)
   file.write.mocked(user data)
