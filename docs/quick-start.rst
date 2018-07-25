@@ -7,16 +7,12 @@ Linux.
 Quick Installation
 ------------------
 
-Clone `Lumi repository`_: ``git clone
+Clone `Lumi repository`_ (``git clone
 https://github.com/meircif/lumi-lang.git``).
 
 Enter the repository root directory: ``cd lumi-lang``.
 
-:ref:`Build TL4 compiler <build-compiler>`: ``gcc TL4/tl4-compiler.c
-TL3/lumi.3.c -ITL3 -ITL4 -I. -o /usr/local/bin/tl4-compiler``.
-
-:ref:`Build "lumi" command <build-lumi-command>`: ``gcc lumi.c TL4/lumi.4.c
--ITL4 -o /usr/local/bin/lumi``.
+Install it: ``sudo make install``.
 
 Hello World Program
 -------------------

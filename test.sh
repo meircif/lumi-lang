@@ -20,7 +20,7 @@ $DIR/TL2/test.sh
 $DIR/TL3/test.sh
 $DIR/TL4/test.sh
 $DIR/TL5/test.sh
-$DIR/lumi/test.sh
+$DIR/lumi-command/test.sh
 $DIR/standard-libraries/test.sh
 $DIR/docs/test.sh
 
