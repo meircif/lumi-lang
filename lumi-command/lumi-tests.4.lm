@@ -455,7 +455,7 @@ test test-unknow-flags()
 
 test test-version-errors()
   fail-test(
-      user "input.5.lm", user "error: unsupported version TL5\n")
+      user "input.6.lm", user "error: unsupported version TL6\n")
   fail-test(
       user "input.0.lm another.0.lm",
       user "error: multiple files not supported before TL2\n")
