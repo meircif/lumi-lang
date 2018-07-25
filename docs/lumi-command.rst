@@ -11,10 +11,6 @@ an executable directly from Lumi code by simply running ``lumi hello.4.lm``.
 
 The ``lumi`` command:
 
-* must first be :ref:`built <build-lumi-command>` with a C compiler:
-  ``$CC lumi/lumi.c TL4/lumi.4.c -ITL4 -o lumi``, it's recommended to also add
-  it to the system path
-
 * assumes the used Lumi compilers are already :ref:`built <build-compiler>` and
   are in the system path
 

@@ -33,18 +33,18 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../TL4/tl4-compiler.c ../TL3/lumi.3.c -I../TL3 -I../TL4 -o lumi/tl4-compiler
 
 # test lumi command C file
-cp ../lumi/lumi.4.lm lumi/
+cp $MYDIR/lumi.4.lm lumi/
 pushd lumi
 ./tl4-compiler lumi.c lumi.4.lm
 popd
-diff ../lumi/lumi.c lumi/lumi.c
+diff $MYDIR/lumi.c lumi/lumi.c
 
 # compile lumi command
-$CCA ../lumi/lumi.c ../TL4/lumi.4.c -I../TL4 -o lumi/lumi
+$CCA $MYDIR/lumi.c ../TL4/lumi.4.c -I../TL4 -o lumi/lumi
 
 # run lumi command tests
-lumi/tl4-compiler -t lumi lumi/lumi-tests.c ../lumi/lumi.4.lm \
-  ../lumi/lumi-tests.4.lm
+lumi/tl4-compiler -t lumi lumi/lumi-tests.c $MYDIR/lumi.4.lm \
+  $MYDIR/lumi-tests.4.lm
 $CCA lumi/lumi-tests.c ../TL4/lumi.4.c -I../TL4 -o lumi/lumi-tests
 lumi/lumi-tests -xml
 mv cobertura.xml lumi/
