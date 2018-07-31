@@ -1,10 +1,13 @@
 build
 .test
 *.actual.c
+actual.txt
+expected.txt
 wip
 .gitattributes
 *.WinMerge
 docs/_*
+.tags
 
 # Visual-Studio files
 *.sln

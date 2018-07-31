@@ -1,0 +1,231 @@
+~~~ TL5 compiler - Initialization expression ~~~
+module tl5-compiler
+
+class InitExpression(ModuleTypeExpression)
+  var FunctionArguments arguments
+  owner SymbolExpression symbol
+  user SyntaxTreeFunction constructor
+  owner Expression value
+  
+  func inst parse-new(
+      owner TypeInstance result-type, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new InitExpression expression-init(user code-node)
+    expression-init.parse(owner result-type, owner expression)
+    expression := expression-init
+  
+  new(user SyntaxTreeCode code-node)
+    base(user code-node)
+    self.arguments.new()
+  
+  func inst parse(
+      owner TypeInstance result-type, owner Expression module-expression)
+    self.result-type := result-type
+    self.module-expression := module-expression
+    if glob.last-char = '('
+      var CallArgumentFactory argument-factory
+      self.arguments.parse(
+          user argument-factory, copy false, user self.code-node)
+  
+  func dynamic analyze()
+    self.analyze-type-instance(user self.result-type)
+    
+    self.arguments.analyze()
+    if self.symbol?
+      self.symbol.result-type.analyze(user self)
+    else
+      self.add-aux-variable(
+          copy Access.OWNER, copy true, user self.result-type)->(
+          owner self.symbol)
+    self.access := self.symbol.access
+    
+    if self.symbol.variable.access = Access.OWNER and
+        self.symbol.variable.is-create and
+        self.result-type.type-data.is-primitive
+      self.syntax-error(
+          user "dynamic allocation of primitive type",
+          user self.result-type.type-data.name)
+    
+    if not self.result-type.type-data.is-primitive and
+        self.symbol.variable.is-create
+      self.result-type.check-sequence(user self)
+      if self.result-type.type-data is glob.type-array
+        if self.result-type.parameters.first.item.type-data is glob.type-generic
+          self.syntax-error-msg(user "cannot create generic array")
+      if self.result-type.type-data.create-disallowed
+        self.syntax-error(
+            user "cannot create objects with type",
+            user self.result-type.type-data.name)
+      self.result-type.type-data.find-meth(user "new")->(user self.constructor)
+      if not self.arguments.parameters.first? and
+          not self.arguments.outputs.first? and (not self.constructor? or
+          self.result-type.type-data is glob.type-string)
+        self.constructor := _
+      else-if self.constructor?
+        new CallArgument self-param
+        self-param.set-location()
+        self-param.access :=
+            self.constructor.arguments.parameters.first.item.access
+        self-param.code-node := self.code-node
+        self.symbol.copy-new()->(owner self-param.value)
+        self.arguments.parameters.prepend(owner self-param)
+        self.arguments.check-same-as(
+            user self.constructor.arguments, user self.result-type, copy 0)
+      else
+        self.syntax-error(
+            user "no constructor for type", user self.result-type.type-data.name)
+      
+    else-if self.arguments.parameters.first?
+      if self.arguments.parameters.first.next? or
+          self.arguments.outputs.first?
+        self.syntax-error-msg(
+            user "only one initialization parameter expected")
+      user Argument param(user self.arguments.parameters.first.item)
+      param.check-same-type-as(user self.result-type, user _, copy 0)
+      if self.result-type.type-data.is-primitive and param.access != Access.COPY
+        self.syntax-error(
+            user "access should be \"copy\" for primitive types, got",
+            user glob.access-names[param.access])
+      else-if not self.result-type.type-data.is-primitive and
+          self.access != param.access
+        self.syntax-error2(
+            user "assigning into access",
+            user glob.access-names[self.access],
+            user "invalid access",
+            user glob.access-names[param.access])
+  
+  func inst write-allocation()
+    self.arguments.write-preactions()
+    if self.result-type.type-data is glob.type-array or
+        self.result-type.type-data is glob.type-string
+      self.result-type.length.write-preactions()
+    if self.result-type.type-data is glob.type-array
+      if self.result-type.parameters.first.item.type-data is glob.type-string
+        self.result-type.parameters.first.item.length.write-preactions()
+    
+    if self.symbol.variable.access = Access.VAR
+      self.write-var-init()
+    else
+      self.write-new-init()
+    
+    if self.constructor?
+      self.code-node.write-spaces()
+      write(user "LUMI_err = ")
+      self.constructor.write-cname()
+      self.code-node.write-call(user self.arguments)
+  
+  func inst write-var-init()
+    self.write-init-var-ref(user self.symbol)
+    
+    if self.result-type.type-data is glob.type-array or
+        self.result-type.type-data is glob.type-string
+      ; `symbol`_Var.values = `symbol`_Values;
+      self.code-node.write-spaces()
+      self.symbol.write()
+      write(user "_Var.values = ")
+      self.symbol.write()
+      write(user "_Values;\n")
+      if self.result-type.type-data is glob.type-array
+        if self.result-type.parameters.first.item.type-data is glob.type-string
+          ; LUMI_set_var_string_array(
+          ;    `array-length`, `string-length`, `name`, `name`_Chars);
+          self.code-node.write-spaces()
+          write(user "LUMI_set_var_string_array(")
+          self.result-type.length.write()
+          write(user ", ")
+          self.result-type.parameters.first.item.length.write()
+          write(user ", ")
+          self.symbol.write()
+          write(user ", ")
+          self.symbol.write()
+          write(user "_Chars);\n")
+  
+  func inst write-new-init()
+    ; INIT_NEW(`line`, `symbol`, ...)
+    write(user "INIT_NEW(")
+    self.write-line-num()
+    write(user ", ")
+    self.symbol.write()
+    write(user ", ")
+    
+    if self.result-type.type-data is glob.type-array
+      if self.result-type.parameters.first.item.type-data is glob.type-string
+        ; LUMI_new_string_array(`length`, `string-length`);
+        write(user "LUMI_new_string_array(")
+        self.result-type.length.write()
+        write(user ", ")
+        self.result-type.parameters.first.item.length.write()
+        
+      else
+        ; LUMI_new_array(`length`, sizeof(`SubType`));
+        write(user "LUMI_new_array(")
+        self.result-type.length.write()
+        write(user ", sizeof(")
+        self.result-type.parameters.first.item.type-data.write-cname()
+        write(user ")")
+        
+    else-if self.result-type.type-data is glob.type-string
+      ; LUMI_new_string(`length`);
+      write(user "LUMI_new_string(")
+      self.result-type.length.write()
+      
+    else
+      ; LUMI_alloc(sizeof(`type`));
+      write(user "LUMI_alloc(sizeof(")
+      self.result-type.type-data.write-cname()
+      write(user ")")
+    
+    write(user "));\n")
+  
+  func inst write-assign()
+    ; `name` = `value`;
+    user Expression value
+    self.arguments.parameters.first.item.get-output()->(user value)
+    self.code-node.write-spaces()
+    value.write-preactions()
+    self.symbol.write()
+    write(user " = ")
+    value.write()
+    write(user ";\n")
+    
+    if not self.result-type.type-data.is-primitive
+      ; `name`_Refman = `value`_Refman;
+      ; LUMI_inc_ref(`name`_Refman);
+      self.code-node.write-spaces()
+      self.symbol.write()
+      write(user "_Refman = ")
+      value.write-refman()
+      write(user ";\n")
+      if self.access != Access.OWNER
+        self.code-node.write-spaces()
+        write(user "LUMI_inc_ref(")
+        self.symbol.write()
+        write(user "_Refman);\n")
+    
+    if self.result-type.type-data.is-dynamic
+      ; `name`_Dynamic = `Type`_Dynamic;
+      self.code-node.write-spaces()
+      self.symbol.write()
+      write(user "_Dynamic = ")
+      if value.is-generic-cast
+        value.top := false
+      value.write-dynamic()
+      value.top := true
+      write(user ";\n")
+    
+    self.arguments.write-postactions()
+  
+  func dynamic write-preactions()
+    self.write-allocation()
+    self.code-node.write-spaces()
+  
+  func dynamic write()
+    if self.is-statement
+      if not self.result-type.type-data.is-primitive and
+          self.symbol.variable.is-create
+        self.code-node.write-spaces()
+        self.write-allocation()
+      else-if self.arguments.parameters.first?
+        self.write-assign()
+    else
+      self.symbol.write()

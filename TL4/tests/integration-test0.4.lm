@@ -284,7 +284,7 @@ func test-code-flow(user Array{Int} arr)->(var Int res)
     res := 6
   else-if arr?
     res := 6
-  else-if arr[4] != arr[4]
+  else-if arr[4] != arr[5]
     res := 6
   else-if 0 = arr[0]
     res := 6
@@ -333,7 +333,7 @@ func test-builtins(
   f.getc()->(var cv, var bv)
   f.putc(copy c)
   f.write(user s)
-  f.close()
+  file-close(owner f)
   s := sys.argv[1]
   sys.print(user s)
   sys.println(user s)
@@ -342,9 +342,9 @@ func test-builtins(
   sys.getenv(user s, user s)->(var bv)
   sys.system(user s)->(var iv)
   sys.exit(copy i)
-  stdout.putc(copy c)
-  stdin.getc()->(var cv, var bv)
-  stderr.putc(copy c)
+  sys.stdout.putc(copy c)
+  sys.stdin.getc()->(var cv, var bv)
+  sys.stderr.putc(copy c)
 
 
 func test-ref-count()
@@ -357,6 +357,12 @@ func test-ref-count()
     sys.println(user "ownership passed")
   if not s-user?
     sys.println(user "string deleted")
+  new TestStruct ts(copy 0, user "first struct")
+  ts := ts
+  sys.println(user ts.text)
+  ts.ts := TestStruct(copy 1, user "second struct")
+  ts := ts.ts
+  sys.println(user ts.text)
 
 func f-remove(owner String s)
   ; remove s
@@ -538,12 +544,12 @@ struct HasComplexField
     x := self.x
     x.meth()
     self.x.meth()
-    ComplexField.meth(var self.x)
+    ComplexField.meth(user self.x)
     user ComplexField x2(user self.x.x)
     x2 := self.x.x
     x2.meth()
     self.x.x.meth()
-    ComplexField.meth(var self.x.x)
+    ComplexField.meth(user self.x.x)
 
 func test-complex-field()
   var HasComplexField y

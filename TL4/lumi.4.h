@@ -34,7 +34,9 @@ typedef struct {
 
 typedef Returncode (*Func)();
 
-typedef FILE File;
+typedef struct {
+  FILE* fobj;
+} File;
 
 typedef void* Ref;
 
@@ -57,6 +59,23 @@ typedef struct { Dynamic_Del _del; } Generic_Type_Dynamic;
 extern Generic_Type_Dynamic* dynamic_Void;
 
 
+typedef struct {
+  String str;
+  Ref_Manager refman;
+} Error_Message;
+
+typedef struct {
+  Error_Message empty_object;
+  Error_Message outdated_weak_reference;
+  Error_Message object_memory;
+  Error_Message managed_object_memory;
+  Error_Message empty_base_output;
+  Error_Message slice_index;
+} Error_Messages;
+
+extern Error_Messages LUMI_error_messages;
+
+
 extern char* LUMI_raise_format;
 extern char* LUMI_assert_format;
 extern char* LUMI_traceline_format;
@@ -71,12 +90,13 @@ void LUMI_trace_print(
   String* message,
   Ref_Manager* message_refman);
 
-#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup
+#define RETURN_ERROR goto LUMI_cleanup
 
 #define START_TRACE(line, value, format, message, message_refman) \
   LUMI_trace_print( \
       format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, message, message_refman); \
-  RETURN_ERROR(value);
+  LUMI_err = value; \
+  RETURN_ERROR;
 
 #define START_TRACE_STATIC(line, err_value, format, message_length, message) { \
   String LUMI_msg = { message_length + 1, message_length, message }; \
@@ -84,8 +104,11 @@ void LUMI_trace_print(
   LUMI_msg_refman.value = &LUMI_msg; \
   START_TRACE(line, err_value, format, &LUMI_msg, &LUMI_msg_refman) }
 
-#define RAISE(line, message_length, message) \
-  START_TRACE_STATIC(line, ERR, LUMI_raise_format, message_length, message)
+#define RAISE(line, message) { \
+  START_TRACE( \
+      line, ERR, LUMI_raise_format, \
+      &(LUMI_error_messages.message.str), \
+      &(LUMI_error_messages.message.refman)) }
 
 #define USER_RAISE(line, message, message_refman) \
   { START_TRACE(line, ERR, LUMI_raise_format, message, message_refman) }
@@ -99,13 +122,18 @@ void LUMI_trace_print(
 #define TEST_FAIL_NULL(line) \
   { START_TRACE(line, FAIL, LUMI_assert_format, NULL, NULL) }
 
-#define CHECK(line, err) { Returncode _err = err; if (_err != OK) { \
+#define CHECK(line) if (LUMI_err != OK) { \
   LUMI_trace_print( \
-      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, NULL, NULL); \
-  RETURN_ERROR(_err); } }
+      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \
+      NULL, NULL); \
+  RETURN_ERROR; }
 
 #define IGNORE_ERRORS(call) \
   ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;
+
+#define CHECK_REF(line, ref, refman) \
+  if (ref == NULL) RAISE(line, empty_object) \
+  if ((refman)->value == NULL) RAISE(line, outdated_weak_reference)
 
 int LUMI_main(int argc, char* argv[]);
 int LUMI_test_main(int argc, char* argv[]);
@@ -143,6 +171,7 @@ while (self->field != NULL) { \
   Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \
   self->field = value->field; \
   self->field##_Refman = value->field##_Refman; \
+  self->field##_Dynamic = value->field##_Dynamic; \
   value->field = NULL; \
   value->field##_Refman = NULL; \
   value->field##_Dynamic = NULL; \
@@ -150,8 +179,27 @@ while (self->field != NULL) { \
   LUMI_owner_dec_ref(value_Refman); \
 }
 
+#define INIT_REFMAN(line, name, is_new) \
+  name##_Refman = LUMI_new_ref((void**)&name, is_new); \
+  if (name##_Refman == NULL) RAISE(line, managed_object_memory)
+
+#define INIT_VAR(line, name) \
+  name = &name##_Var; \
+  INIT_REFMAN(line, name, false)
+
+#define INIT_NEW(line, name, alloc) \
+  name = alloc; \
+  if (name == NULL) RAISE(line, object_memory) \
+  INIT_REFMAN(line, name, true)
+
+#define INIT_STRING_CONST(line, name, text) \
+  INIT_VAR(line, name) \
+  name##_Var.max_length = sizeof(text); \
+  name##_Var.length = sizeof(text) - 1; \
+  name##_Var.values = text;
+
 void* LUMI_alloc(size_t size);
-Ref_Manager* LUMI_new_ref(void* value);
+Ref_Manager* LUMI_new_ref(void** value, Bool is_new);
 void LUMI_inc_ref(Ref_Manager* ref);
 void LUMI_dec_ref(Ref_Manager* ref);
 void LUMI_owner_dec_ref(Ref_Manager* ref);
@@ -185,9 +233,9 @@ Returncode file_open_read(
   String* name, Ref_Manager*, File** file, Ref_Manager**);
 Returncode file_open_write(
   String* name, Ref_Manager*, File** file, Ref_Manager**);
+Returncode file_close(File* file, Ref_Manager* file_Refman);
 void File_Del(File*);
 extern Generic_Type_Dynamic File_dynamic;
-Returncode File_close(File*, Ref_Manager*);
 Returncode File_getc(File*, Ref_Manager*, Char* ch, Bool* is_eof);
 Returncode File_putc(File*, Ref_Manager*, Char ch);
 Returncode File_write(File*, Ref_Manager*, String* line, Ref_Manager*);
@@ -195,12 +243,15 @@ Returncode File_write(File*, Ref_Manager*, String* line, Ref_Manager*);
 typedef struct {
   Array* argv;
   Ref_Manager* argv_Refman;
+  File* stdout_Cname;
+  Ref_Manager* stdout_Cname_Refman;
+  File* stdin_Cname;
+  Ref_Manager* stdin_Cname_Refman;
+  File* stderr_Cname;
+  Ref_Manager* stderr_Cname_Refman;
 } Sys;
 extern Sys* sys;
 extern Ref_Manager* sys_Refman;
-extern Ref_Manager* stdout_Refman;
-extern Ref_Manager* stdin_Refman;
-extern Ref_Manager* stderr_Refman;
 void Sys_Del(Sys*);
 extern Generic_Type_Dynamic Sys_dynamic;
 Returncode Sys_print(Sys*, Ref_Manager*, String* text, Ref_Manager*);
@@ -215,6 +266,8 @@ Returncode Sys_getenv(
   String* name, Ref_Manager*,
   String* value, Ref_Manager*,
   Bool* exists);
+
+extern int lumi_debug_value;
 
 
 #endif  /*LUMI_TL4_LUMI_4_H_INCLUDED_*/

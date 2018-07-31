@@ -77,11 +77,11 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     self.write-spaces()
     write(user "++LUMI_trace_ignore_count;\n")
     write(user "#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR(value) break\n")
+    write(user "#define RETURN_ERROR break\n")
     self.write-spaces()
     self.tested.write-preactions()
     write(user "\n#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR(value) LUMI_err = value; goto LUMI_cleanup\n")
+    write(user "#define RETURN_ERROR goto LUMI_cleanup\n")
     self.write-spaces()
     write(user "--LUMI_trace_ignore_count;\n")
     if ? self.expected-error
@@ -115,6 +115,8 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
       write(user "}\n")
       self.write-spaces()
       write(user "LUMI_expected_error = LUMI_expected_error_prev;}\n")
+    self.write-spaces()
+    write(user "LUMI_err = OK;\n")
 
 
 ## Test function in the syntax tree
@@ -173,7 +175,7 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
   func dynamic f-register-name()
     # do not register
   
-  func dynamic analyze()
+  func dynamic link-types()
     glob.current-module := self.my-module
     if ? self.type-name
       self.find-type(user self.type-name, user self.module-name):(
@@ -197,24 +199,13 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
     else-if self.mocked-name.equal(user "new")
       if glob.is-new-mocked
         self.m-syntax-error-msg(user "already mocking global new")
-      if ? self.arguments.parameters.first or
-          not (? self.arguments.outputs.first) or
-          ? self.arguments.outputs.first.next
-        self.m-syntax-error-msg(
-            user "mock new should have only single Bool output")
-      if self.arguments.outputs.first.item.get-type-instance().type-data !=
-          glob.type-bool
-        self.m-syntax-error-msg(
-            user "mock new should have only single Bool output")
       glob.is-new-mocked := true
-      self.my-module := _
     else-if self.mocked-name.equal(user "delete")
       if glob.is-delete-mocked
         self.m-syntax-error-msg(user "already mocking global delete")
       if ? self.arguments.parameters.first or ? self.arguments.outputs.first
         self.m-syntax-error-msg(user "mock delete should have no arguments")
       glob.is-delete-mocked := true
-      self.my-module := _
       self.arguments.add-self-parameter(user glob.type-ref)
     else
       self.find-function(user self.mocked-name, user self.module-name):(
@@ -226,19 +217,37 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       if ? self.mocked-function.mocker-function
         self.m-syntax-error(
             user "already mocking function", user self.mocked-name)
+      self.mocked-function.mocker-function := self
+    base.link-types()
+  
+  func dynamic analyze()
+    glob.current-module := self.my-module
+    if not (? self.type-name) and self.mocked-name.equal(user "new")
+      if ? self.arguments.parameters.first or
+          not (? self.arguments.outputs.first) or
+          ? self.arguments.outputs.first.next
+        self.m-syntax-error-msg(
+            user "mock new should have only single Bool output")
+      if self.arguments.outputs.first.item.get-type-instance().type-data !=
+          glob.type-bool
+        self.m-syntax-error-msg(
+            user "mock new should have only single Bool output")
+      self.my-module := _
+    else-if self.mocked-name.equal(user "delete")
+      self.my-module := _
+    if ? self.mocked-function
       self.arguments.check-same-as(
           user self.mocked-function.arguments, user _, copy 0)
-      self.mocked-function.mocker-function := self
       self.my-module := self.mocked-function.my-module
     base.analyze()
   
-  func dynamic write()
+  func dynamic write-declaration()
+    base.write-declaration()
     if ? self.mocked-function
       # Bool `name`_active = true;
       write(user "\nBool ")
       self.write-cname()
       write(user "_active = true;")
-    base.write()
   
   func dynamic write-block-body()
     if ? self.mocked-function

@@ -145,7 +145,7 @@ static Global
     self.add-builtin-type(user "Ref", copy true):(owner self.type-ref)
     self.add-builtin-type(user "String", copy false):(owner self.type-string)
     self.add-builtin-type(user "Array", copy false):(owner self.type-array)
-    self.add-builtin-type(user "Type", copy false):(owner self.type-type)
+    self.add-builtin-type(user "Type Name", copy false):(owner self.type-type)
     self.add-builtin-type(user "Base Symbol", copy false):(owner self.type-base)
     self.add-builtin-type(user "Generic Type", copy false):(
         owner self.type-generic)
@@ -153,7 +153,9 @@ static Global
     self.add-builtin-type(user "Module Name", copy false):(
         owner self.type-module)
     self.add-builtin-type(user "File", copy false):(owner self.type-file)
+    self.type-file.create-disallowed := true
     self.add-builtin-type(user "Sys", copy false):(owner self.type-sys)
+    self.type-sys.create-disallowed := true
     
     user FunctionArguments arguments
     
@@ -234,7 +236,9 @@ static Global
     self.add-builtin-output(
         user arguments, copy ACCESS-OWNER, user glob.type-file, user "file")
     
-    self.add-builtin-method(user glob.type-file, user "close"):(user arguments)
+    self.add-builtin-global-function(user "file-close"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-OWNER, user glob.type-file, user "file")
     
     self.add-builtin-method(user glob.type-file, user "getc"):(user arguments)
     self.add-builtin-output(
@@ -250,16 +254,30 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "text")
     
-    self.add-builtin-global-variable(user glob.type-file, user "stdout")
-    self.add-builtin-global-variable(user glob.type-file, user "stdin")
-    self.add-builtin-global-variable(user glob.type-file, user "stderr")
-    
     # Sys
     self.add-builtin-field(
         user glob.type-sys,
         user "argv",
         user glob.type-array,
         user glob.type-string)
+        
+    self.add-builtin-field(
+        user glob.type-sys,
+        user "stdout",
+        user glob.type-file,
+        user _)
+        
+    self.add-builtin-field(
+        user glob.type-sys,
+        user "stdin",
+        user glob.type-file,
+        user _)
+        
+    self.add-builtin-field(
+        user glob.type-sys,
+        user "stderr",
+        user glob.type-file,
+        user _)
     
     self.add-builtin-method(user glob.type-sys, user "print"):(user arguments)
     self.add-builtin-parameter(
@@ -304,6 +322,7 @@ static Global
     new TypeData in type-data
     string-new-copy(user name):(owner type-data.name)
     type-data.is-primitive := is-primitive
+    type-data.is-ordered := true
     type-data.init()
     self.global-module.type-map.add(user type-data.name, user type-data)
     self.builtins.types.add(owner type-data)
@@ -357,7 +376,7 @@ static Global
     self.add-builtin-function(user name, user builtin-type, user builtin-type):(
         user arguments)
     self.add-builtin-parameter(
-        user arguments, copy ACCESS-VAR, user builtin-type, user "self")
+        user arguments, copy ACCESS-USER, user builtin-type, user "self")
   
   func inst add-builtin-function(
       user String name,

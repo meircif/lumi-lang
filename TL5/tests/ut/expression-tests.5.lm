@@ -1,0 +1,625 @@
+; @@ test-int-expression
+; @ c t0
+i := 0
+; @ c t1
+i := 9630
+; @ c t2
+i := -9630
+; @ c t3
+i := 07520
+; @ c t4
+i := -07520
+; @ c t5
+i := 0xfda940
+; @ c t6
+i := -0xfda940
+; @ c t7
+i := 0xFDA940
+; @ c t8
+i := -0xFDA940
+; @ ec te0
+2a
+; @ ec te1
+0a
+; @ ec te2
+038
+; @ ec te3
+0b021
+; @ ec te4
+0xadg
+; @ ec te5
+0b1001
+; @@ test-char-expression
+; @ c t0
+c := 'a'
+; @ c t1
+c := '\''
+; @ c t2
+c := '\n'
+; @ c t3
+c := '\x0f'
+; @ c t4
+c := '\xA9'
+; @ c t5
+c := '\270'
+; @ fec te0
+c := '''
+; @ fec te1
+c := '\'
+; @ fec te2
+c := 'aa
+; @ ec te3
+c := '\c'
+; @ ec te4
+c := 'aaaa'
+; @ ec te5
+c := '\x6g'
+; @ ec te6
+c := '\058'
+; @ ec te7
+c := ''
+; @ ec te8
+c := 'aa'
+; @ ec te9
+c := 'aaa'
+; @ ec te10
+c := 'aaaaa'
+; @@ test-string-expression
+; @ c t0
+str := "some string"
+; @ c t1
+str := "\nstring\t\"with\\formatting\n"
+; @ c t2
+str := "line\
+        split\
+        string\
+        "
+; @ c t3
+str := "multi
+        line
+        string
+        "
+; @ c t4
+str := "line\
+         split"
+; @ fec te0
+str := "aaa
+; @ fec te1
+str := "
+; @ ec te2
+"error"+"string"
+; @ ec te3
+str := "indention
+    too short"
+; @ ec te4
+str := "indention\
+    too short"
+; @@ test-empty-expression
+; @ c t0
+str := _
+; @ c t1
+t := _
+; @ c t2
+so := _
+; @ c t3
+b := t is _ or ta is-not _
+; @ ec te0
+i := _
+; @@ test-member-expression
+; @ c t0
+i := t.num
+; @ c t1
+i := tc.numb
+; @ c t2
+i := tc.num
+; @ c t3
+i := to.num
+; @ c t4
+i := tco.num
+; @ c t5
+i := t.t.num
+; @ c t6
+i := t.t.t.num
+; @ ec te0
+error
+; @ ec te1
+(i := 1).error
+; @ ec te2
+t.error
+; @ ec te3
+5.error
+; @@ test-slice-expression
+; @ c t0
+c := str[13]
+; @ c t1
+str := str[2:6]
+; @ c t2
+i := arr[13]
+; @ c t3
+arr := arr[2:6]
+; @ c t4
+str[4] := c
+; @ c t5
+arr[4] := i
+; @ ec t6
+arr[2
+; @ ec t7
+arr[2:3
+; @ ec t8
+(i := 3)[2]
+; @ ec t9
+i[2]
+; @ ec t10
+arr[str]
+; @ ec t11
+arr[3:str]
+; @ ec t12
+arr[i += 3]
+; @ ec t13
+str[2:5] := str
+; @ ec t14
+arr[7:2] := arr
+; @ ec t15
+user Array{Test} at
+at[0] := t
+; @@ test-call-expression
+; @ c t0
+fun0()
+; @ c t1
+fun1(copy 3, user str, owner _)
+; @ c t2
+fun2()->(owner so, var io)
+; @ c t3
+var Int x
+owner String s
+fun2()->(owner s, var x)
+; @ c t4
+fun3(copy 0)->(owner so)
+; @ c t5
+var Int x
+fun4(copy fun5(copy 3)->(var x))
+; @ c t6
+fun6(
+        copy 2,
+        copy 3)->(
+        var io,
+        var io)
+; @ c t7
+fun5(copy 4)
+; @ c t8
+io := fun5(copy 4)
+; @ c t9
+so := fun3(copy 7)
+; @ c t10
+t.meth()
+; @ c t11
+to.meth()
+; @ c t12
+tc.methc()
+; @ c t13
+tc.methb()
+; @ c t14
+tc.meth()
+; @ c t15
+tco.meth()
+; @ c t16
+t.t.meth()
+; @ c t17
+fun1(copy 3, user str, owner so)
+; @ c t18
+fun3(copy 1)
+fun5(copy 2)
+; @ g t19
+class Base
+    var Int x
+    func dynamic meth(owner Base b)
+class Test(Base)
+    func dynamic meth(owner Test t)
+        base(owner t)
+; @ g t20
+class Test
+    var Int x
+    func dynamic meth()
+func mock()->(user Test t)
+    mock()->(user t).meth()
+; @ g t21
+class Test
+    var Int x
+    func dynamic meth()->(user Test t)
+        self.meth().meth()
+; @ ec te0
+function( copy 1)
+; @ ec te1
+function(user)
+; @ ec te2
+function(copy 4,copy 3)
+; @ ec te3
+function(copy 2
+; @ ec te4
+function(error 4)
+; @ ec te5
+(i := 0)()
+; @ ec te6
+i()
+; @ ec te7
+fun5(copy 0)->(var 4)
+; @ ec te8
+fun7(user _)->(user tc)
+; @ ec te9
+fun5(copy i := 1)
+; @ ec te10
+fun5(user 8)
+; @ ec te11
+fun1(copy 3, user str, owner str)
+; @ ec te12
+fun3(copy 3)->(owner str)
+; @ ec te13
+fun7(user _)->(user tb)
+; @ ec te14
+fun0(copy i)
+; @ ec te15
+fun1()
+; @ ec te16
+fun0()->(copy i)
+; @ ec te17
+fun2()
+; @ eg te18
+struct Base
+    var Int x
+    func meth(owner Base b)
+struct Test(Base)
+    func meth(owner Test t)
+        base(owner t)
+; @ ec te19
+var String{16} text
+fun1(copy 3, user str, owner text)
+; @@ test-type-expression
+; @ c t0
+Test.meth(user t)
+; @ c t1
+Tb.methb(user tc)
+; @ c t2
+Tc.meth(user tc)
+; @ ec t3
+Error
+; @@ test-base-expression
+; @ g t0
+struct Base
+    var Int x
+    func methb()
+struct Mid(Base)
+    func methm()
+struct Top(Mid)
+    func methb()
+    func methm()
+        base.methm()
+; @ g t1
+struct Base
+    var Int x
+    func methb()
+struct Mid(Base)
+    func methm()
+struct Top(Mid)
+    func methb()
+    func methm()
+        base.methb()
+; @ ec te0
+base
+; @ eg te1
+struct Test
+    var Int x
+    func mock()
+        base
+; @ eg te2
+struct Base
+    var Int x
+struct Test(Base)
+    var Int x
+    func mock()
+        base()
+; @ eg te3
+struct Base
+    var Int x
+struct Test(Base)
+    func mock()
+        base := self
+; @ eg te4
+struct Base
+    var Int x
+struct Test(Base)
+    func mock()->(var Int x)
+        x := base.x
+; @@ test-block-expression
+; @ c t0
+i := 2 + (123)
+; @ c t1
+i := (123)
+; @ c t2
+i := (123 * (i - 4)) + 2
+; @ ec t3
+(error
+; @@ test-unary-expression
+; @ c t0
+i := - i
+; @ c t1
+i := -
+        i
+; @ c t2
+i := - - i
+; @ c t3
+b := not b
+; @ c t4
+b := not i > 3
+; @ ec t5
+{45}
+; @ ec t6
+-[
+; @ ec t7
++ 2
+; @ ec t8
+- (i := 2)
+; @ ec t9
+- (i > 4)
+; @ ec t10
+not i
+; @@ test-binary-expression
+; @ c t0
+i := 23 + 54
+; @ c t1
+i += (100 * 2) - (37 div 5 mod 2)
+; @ c t2
+i -= 12 *
+        13
+; @ c t3
+b := 3 < 5 or 23 > 37
+; @ c t4
+b := 3 <= 5 and 23 >= 37
+; @ c t5
+b := i = 5 or i != 37
+; @ c t6
+b := 2 < i < 12 < 2 * i
+; @ c t7
+t := tc
+; @ c t8
+owner String s
+s := so
+; @ c t9
+str := so
+; @ c t10
+b := t is ta or tc is-not tb
+; @ c t11
+c := '0' + 4
+; @ c t12
+b := fun0 is-not fun1
+; @ c t13
+b := b = b
+; @ c t14
+owner Tc otc
+tb := otc
+; @ c t15
+owner Array{Test} tarr
+tarr := _
+; @ ec te0
+345 @ 2
+; @ ec te1
+80 +(
+; @ ec te2
+1 + 2 * 3
+; @ ec te3
+1 < i or 2 < i and 3 < i
+; @ ec te4
+1 not 2
+; @ ec te5
+1 := 2
+; @ ec te6
+1 += 2
+; @ ec te7
+1 -= 2
+; @ ec te8
+so := str
+; @ ec te9
+b := 1 or 2
+; @ ec te10
+b := t > 3
+; @ ec te11
+b := 1 > 4 > t
+; @ ec te12
+i := 3 + t
+; @ ec te13
+t += 3
+; @ ec te14
+i -= b
+; @ ec te15
+b := 3 is t
+; @ ec te16
+user Array{Char} ca
+ca := arr
+; @ ec te17
+owner Test ot
+ot := tb
+; @ ec te18
+b := b is b
+; @@ test-question-expression
+; @ c t0
+b := str?
+; @ c t1
+b := not str?
+; @ c t2
+b := t.fun?
+; @ c t3
+b := to?
+; @ c t4
+b := fun7(user _)->(user to)?
+; @ ec te0
+(i := 2)?
+; @ ec te1
+i?
+; @@ test-dynamic
+; @ c t0
+var Ta a(copy 1)
+; @ c t1
+user Ta a
+; @ c t2
+ta := Ta(copy 7)
+; @ c t3
+new Ta a(copy 1)
+; @ c t4
+user Ta a(user ta)
+; @ c t5
+ta := ta
+; @ c t6
+ta := tb
+; @ c t7
+ta := tc
+; @ c t8
+ta := _
+; @ c t9
+user Array{Ta} aa
+ta := aa[4]
+; @ c t10
+user Array{Tc} ca
+ta := ca[4]
+; @ c t11
+ta.dyn()
+; @ c t12
+tb.dyn()
+; @ c t13
+tc.dyn()
+; @ c t14
+tco.dyn()
+; @ c t15
+fun7(user tc)->(user ta)
+; @ g t16
+class Test
+    var Int x
+    func dynamic meth()
+func mock()->(user Test t)
+    t.meth()
+; @ g t17
+class Base
+    var Int x
+    func dynamic meth()
+class Test(Base)
+    func inst fun()
+        self.meth()
+; @ c t18
+fun7(user _)
+; @@ test-function-object
+; @ c t0
+var Func{()} fun
+fun := fun0
+fun()
+; @ c t1
+var Func{(copy Int x)->(var Int y)} fun(copy fun5)
+var Int x
+fun(copy 9)->(var x)
+; @ c t2
+var Func{(user Test self)} fun(copy Test.meth)
+fun(user t)
+; @ c t3
+var Func{()} fun
+fun := _
+b := fun?
+; @ c t4
+t.fun := fun0
+t.fun()
+; @ c t5
+var Array{38:Func{()}} farr
+farr[3] := fun0
+farr[3]()
+; @ c t6
+var Func{(copy Int x,
+        copy Int y)} fun
+; @ ec te0
+var Func error
+; @ ec te1
+var Array{3:Func} error
+; @ ec te2
+var Func{} error
+; @ ec te3
+var Func{() } error
+; @ ec te4
+var Func{()} fun(copy fun1)
+; @ ec te5
+var Func{()->(var Int x)} fun
+fun := fun0
+; @@ test-builtin
+; @ c t0
+i.str(user str)
+; @ c t1
+b := true
+; @ c t2
+b := false
+; @ ec t3
+c := EOF
+; @ c t4
+i := arr.length
+; @ c t5
+i := str.length
+; @ c t6
+str.clear()
+; @ c t7
+str.equal(user str)->(var b)
+; @ c t8
+str.get(copy i)->(var c)
+; @ c t9
+str.append(copy c)
+; @ c t10
+str.new(user str)
+; @ c t11
+str.concat(user str)
+; @ c t12
+str.concat-int(copy i)
+; @ c t13
+str.find(user str)->(var i)
+; @ c t14
+str.has(copy c)->(var b)
+; @ c t15
+file-open-read(user str)->(owner fobj)
+; @ c t16
+file-open-write(user str)->(owner fobj)
+; @ c t17
+file-close(owner fobj)
+; @ c t18
+fobj.getc()->(var c, var b)
+; @ c t19
+fobj.putc(copy c)
+; @ c t20
+fobj.write(user str)
+; @ c t21
+user Array{String} argv(user sys.argv)
+; @ c t22
+sys.print(user str)
+; @ c t23
+sys.println(user str)
+; @ c t24
+sys.getchar()->(var c, var b)
+; @ c t25
+sys.getline(user str)
+; @ c t26
+sys.exit(copy i)
+; @ c t27
+sys.system(user str)->(var i)
+; @ c t28
+sys.getenv(user str, user str)->(var b)
+; @ c t29
+sys.stdout.putc(copy c)
+; @ c t30
+sys.stdin.getc()->(var c, var b)
+; @ c t31
+sys.stderr.putc(copy c)
+; @ c t32
+String.clear(user str)
+; @ ec te0
+var File error
+; @ ec te1
+new File error
+; @ ec te2
+File()
+; @ ec te3
+var Sys error
+; @ ec te4
+new Sys error
+; @ ec te5
+Sys()
+; @

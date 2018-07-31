@@ -1,13 +1,13 @@
 #include "lumi.4.h"
 
 /*traceback*/
-#define LUMI_FILE_NAME __FILE__
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value
-#define CRAISE USER_RAISE(__LINE__, NULL, NULL)
-#define CCHECK(err) CHECK(__LINE__, err)
+#define CRAISE(message) { \
+  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, message); \
+  return ERR; }
+#define CCHECK(err) if (err != OK) return err;
 #define CHECK_NOT_NULL(ref) \
-  if (ref == NULL || ref##_Refman->value == NULL) CRAISE
+  if (ref == NULL) CRAISE("empty object used"); \
+  if (ref##_Refman->value == NULL) CRAISE("outdated weak reference used")
 
 char* LUMI_raise_format = "Error raised in %s:%d %s()\n";
 char* LUMI_assert_format = "Assert failed in %s:%d %s()\n";
@@ -20,11 +20,30 @@ Generic_Type_Dynamic* dynamic_Void = NULL;
 
 Sys* sys = NULL;
 Ref_Manager* sys_Refman = NULL;
-Array* sys_argv = NULL;
-Ref_Manager* sys_argv_Refman = NULL;
-Ref_Manager* stdout_Refman = NULL;
-Ref_Manager* stdin_Refman = NULL;
-Ref_Manager* stderr_Refman = NULL;
+static Array* sys_argv = NULL;
+static Ref_Manager* sys_argv_Refman = NULL;
+
+#define ERROR_MESAGE(field, message) \
+  {{sizeof(message), sizeof(message) - 1, message}, \
+   {1, &(LUMI_error_messages.field.str), &(LUMI_error_messages.field.str)}}
+
+Error_Messages LUMI_error_messages = {
+  ERROR_MESAGE(empty_object, "empty object used"),
+  ERROR_MESAGE(outdated_weak_reference, "outdated weak reference used"),
+  ERROR_MESAGE(
+      object_memory, "insufficient memory for object dynamic allocation"),
+  ERROR_MESAGE(managed_object_memory, "insufficient memory for managed object"),
+  ERROR_MESAGE(
+      empty_base_output, "non empty base class given as output argument"),
+  ERROR_MESAGE(slice_index, "slice index out of bounds")
+};
+
+enum {
+  LUMI_DEBUG_NOTHING = 0,
+  LUMI_DEBUG_FAIL,
+  LUMI_DEBUG_SUCCESS
+};
+int lumi_debug_value = LUMI_DEBUG_NOTHING;
 
 void LUMI_trace_print(
     char const* format,
@@ -80,6 +99,23 @@ int cstring_length(char* cstring, int max_length) {
     ++length;
   }
   return length;
+}
+
+void LUMI_C_trace_print(int line, char const* funcname, char* message) {
+  String LUMI_msg;
+  Ref_Manager LUMI_msg_refman = { 1 };
+  LUMI_msg.length = cstring_length(message, 255);
+  LUMI_msg.max_length = LUMI_msg.length + 1;
+  LUMI_msg.values = message;
+  LUMI_msg_refman.value = &LUMI_msg;
+  LUMI_msg_refman.ref = &LUMI_msg;
+  LUMI_trace_print(
+      LUMI_raise_format,
+      "builtin",
+      line,
+      funcname,
+      &LUMI_msg,
+      &LUMI_msg_refman);
 }
 
 /*main*/
@@ -251,7 +287,7 @@ Returncode set_cstring(String* str, Ref_Manager* str_Refman) {
   CHECK_NOT_NULL(str)
   if (str->length >= str->max_length) {
     if (cstring_length(str->values, str->max_length) >= str->max_length) {
-      CRAISE
+      CRAISE("string too long")
     }
   }
   else if (cstring_length(str->values, str->length + 1) > str->length) {
@@ -274,16 +310,20 @@ void* LUMI_alloc(size_t size) {
   return NULL;
 }
 
-Ref_Manager* LUMI_new_ref(void* value) {
+Ref_Manager* LUMI_new_ref(void** value, Bool is_new) {
   Ref_Manager* ref = NULL;
   Bool allocate_success = true;
   IGNORE_ERRORS( new_Mock(&allocate_success); )
   if (allocate_success) {
     ref = malloc(sizeof(Ref_Manager));
-    if (ref != NULL) {
+    if (ref == NULL) {
+      if (is_new) free(*value);
+      *value = NULL;
+    }
+    else {
       ref->count = 1;
-      ref->value = value;
-      ref->ref = value;
+      ref->value = *value;
+      ref->ref = *value;
     }
   }
   return ref;
@@ -386,15 +426,39 @@ Returncode open_file(
     File** file, Ref_Manager** file_Refman,
     String* name, Ref_Manager* name_Refman,
     char* mode) {
+  FILE* new_fobj = NULL;
+  File* new_file = NULL;
+  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {
+    CCHECK(file_close(*file, *file_Refman));
+  }
+  *file = NULL;
+  *file_Refman = NULL;
   CCHECK(set_cstring(name, name_Refman));
-  *file = fopen(name->values, mode);
-  if (*file == NULL) {
-    CRAISE
+  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
+    if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+      new_fobj = fopen(name->values, mode);
+    }
+    if (new_fobj == NULL) {
+      CRAISE("open file failed")
+    }
   }
-  *file_Refman = LUMI_new_ref(*file);
-  if (*file == NULL) {
-    CRAISE
+  if (lumi_debug_value == LUMI_DEBUG_FAIL) printf("open_file fail BUG!\n");
+  new_file = LUMI_alloc(sizeof(File));
+  if (new_file == NULL) {
+    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
+      fclose(new_fobj);
+    }
+    CRAISE("insufficient memory for object dynamic allocation")
   }
+  *file_Refman = LUMI_new_ref((void**)&new_file, true);
+  if (*file_Refman == NULL) {
+    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
+      fclose(new_fobj);
+    }
+    CRAISE("insufficient memory for managed object")
+  }
+  *file = new_file;
+  (*file)->fobj = new_fobj;
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -411,20 +475,27 @@ Returncode file_open_write(
   return open_file(file, file_Refman, name, name_Refman, "w");
 }
 
-void File_Del(File* self) {
-  fclose(self);
-}
-Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
-
-#define LUMI_FUNC_NAME "File.close"
-Returncode File_close(File* file, Ref_Manager* file_Refman) {
-  CHECK_NOT_NULL(file)
-  if (fclose(file) == 0) {
-    return OK;
+#define LUMI_FUNC_NAME "file-close"
+Returncode file_close(File* file, Ref_Manager* file_Refman) {
+  if (lumi_debug_value == LUMI_DEBUG_FAIL ||
+      (file != NULL && file_Refman->value != NULL && file->fobj != NULL)) {
+    if (lumi_debug_value == LUMI_DEBUG_FAIL ||
+        fclose(file->fobj) != 0) {
+      CRAISE("close file failed")
+    }
+    file->fobj = NULL;
   }
-  CRAISE
+  LUMI_owner_dec_ref(file_Refman);
+  return OK;
 }
 #undef LUMI_FUNC_NAME
+
+void File_Del(File* self) {
+  if (self != NULL && self->fobj != NULL) {
+    fclose(self->fobj);
+  }
+}
+Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
 
 Bool getc_is_eof(int get, char* ch) {
   if (get == EOF) {
@@ -440,18 +511,22 @@ Bool getc_is_eof(int get, char* ch) {
 Returncode File_getc(
     File* file, Ref_Manager* file_Refman, Char* out_char, Bool* is_eof) {
   CHECK_NOT_NULL(file)
-  *is_eof = getc_is_eof(getc(file), out_char);
+  if (file->fobj == NULL) CRAISE("file not opened")
+  *is_eof = getc_is_eof(getc(file->fobj), out_char);
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "File.putc"
 Returncode File_putc(File* file, Ref_Manager* file_Refman, Char in_char) {
-  int res;
-  CHECK_NOT_NULL(file)
-  res = putc(in_char, file);
+  int res = '\0';
+  if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+    CHECK_NOT_NULL(file)
+    if (file->fobj == NULL) CRAISE("file not opened")
+    res = putc(in_char, file->fobj);
+  }
   if (res != in_char) {
-    CRAISE
+    CRAISE("file write failed")
   }
   return OK;
 }
@@ -461,14 +536,19 @@ Returncode File_putc(File* file, Ref_Manager* file_Refman, Char in_char) {
 Returncode File_write(
     File* file, Ref_Manager* file_Refman,
     String* data, Ref_Manager* data_Refman) {
-  int n, ch, res;
-  CHECK_NOT_NULL(file)
+  int n, ch, res=0;
+  if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+    CHECK_NOT_NULL(file)
+    if (file->fobj == NULL) CRAISE("file not opened")
+  }
   CHECK_NOT_NULL(data)
   for (n = 0; n < data->length; ++n) {
     ch = data->values[n];
-    res = putc(ch, file);
+    if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+      res = putc(ch, file->fobj);
+    }
     if (ch != res) {
-      CRAISE
+      CRAISE("file write failed")
     }
   }
   return OK;
@@ -523,7 +603,7 @@ Returncode String_get(
     Char* out_char) {
   CHECK_NOT_NULL(self)
   if (index < 0 || index >= self->length) {
-    CRAISE
+    CRAISE("slice index out of bounds")
   }
   *out_char = self->values[index];
   return OK;
@@ -534,7 +614,7 @@ Returncode String_get(
 Returncode String_append(String* self, Ref_Manager* self_Refman, Char in_char) {
   CHECK_NOT_NULL(self)
   if (self->length == self->max_length) {
-    CRAISE
+    CRAISE("string too long")
   }
   self->values[self->length] = in_char;
   ++self->length;
@@ -563,7 +643,7 @@ Returncode Int_str(Int value, String* out_str, Ref_Manager* out_str_Refman) {
     abs /= 10;
     if (out_str->max_length <= out_str->length) {
       out_str->length = 0;
-      CRAISE
+      CRAISE("string too long")
     }
     ++out_str->length;
   } while (abs > 0);
@@ -591,7 +671,7 @@ Returncode String_new(
     return OK;
   }
   if (source->length > self->max_length) {
-    CRAISE
+    CRAISE("string too long")
   }
   self->length = source->length;
   memcpy(self->values, source->values, self->length);
@@ -608,7 +688,7 @@ Returncode String_concat(
     return OK;
   }
   if (self->length + ext->length > self->max_length) {
-    CRAISE
+    CRAISE("string too long")
   }
   memcpy(self->values + self->length, ext->values, ext->length);
   self->length += ext->length;
@@ -676,30 +756,40 @@ int set_sys(int argc, char* argv[]) {
   String* args_strings;
   int arg;
   sys = LUMI_alloc(sizeof(Sys));
-  sys_Refman = LUMI_new_ref(sys);
+  sys_Refman = LUMI_new_ref((void**)&sys, true);
   sys_argv = LUMI_new_array(argc, sizeof(String));
-  sys_argv_Refman = LUMI_new_ref(sys_argv);
-  stdout_Refman = LUMI_new_ref(stdout);
-  stdin_Refman = LUMI_new_ref(stdin);
-  stderr_Refman = LUMI_new_ref(stderr);
-  if (sys == NULL || sys_Refman == NULL || sys_argv == NULL ||
-    sys_argv_Refman == NULL || stdout_Refman == NULL || stdin_Refman == NULL ||
-    stderr_Refman == NULL) {
+  sys_argv_Refman = LUMI_new_ref((void**)&sys_argv, true);
+  if (sys != NULL) {
+    sys->stdout_Cname = LUMI_alloc(sizeof(File));
+    sys->stdout_Cname_Refman = LUMI_new_ref((void**)&(sys->stdout_Cname), true);
+    sys->stdin_Cname = LUMI_alloc(sizeof(File));
+    sys->stdin_Cname_Refman = LUMI_new_ref((void**)&(sys->stdin_Cname), true);
+    sys->stderr_Cname = LUMI_alloc(sizeof(File));
+    sys->stderr_Cname_Refman = LUMI_new_ref((void**)&(sys->stderr_Cname), true);
+  }
+  if (sys == NULL || sys_Refman == NULL ||
+    sys_argv == NULL || sys_argv_Refman == NULL ||
+    sys->stdout_Cname == NULL || sys->stdout_Cname_Refman == NULL ||
+    sys->stdin_Cname == NULL || sys->stdin_Cname_Refman == NULL ||
+    sys->stderr_Cname == NULL || sys->stderr_Cname_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
   ++sys_Refman->count;
   ++sys_argv_Refman->count;
-  ++stdout_Refman->count;
-  ++stdin_Refman->count;
-  ++stderr_Refman->count;
+  ++sys->stdout_Cname_Refman->count;
+  ++sys->stdin_Cname_Refman->count;
+  ++sys->stderr_Cname_Refman->count;
+  sys->stdout_Cname->fobj = stdout;
+  sys->stdin_Cname->fobj = stdin;
+  sys->stderr_Cname->fobj = stderr;
   sys->argv = sys_argv;
   sys->argv_Refman = sys_argv_Refman;
   args_strings = sys_argv->values;
   for (arg = 0; arg < argc; ++arg) {
     args_strings[arg].values = argv[arg];
     args_strings[arg].length = cstring_length(argv[arg], 1024);
-    args_strings[arg].max_length = args_strings[arg].length;
+    args_strings[arg].max_length = args_strings[arg].length + 1;
     args_strings[arg].values[args_strings[arg].length] = '\0';
   }
   return OK;
@@ -738,17 +828,21 @@ Returncode Sys_getchar(Sys* _, Ref_Manager* __, char* out_char, Bool* is_eof) {
 #define LUMI_FUNC_NAME "Sys.getline"
 Returncode Sys_getline(
     Sys* _, Ref_Manager* __, String* line, Ref_Manager* line_Refman) {
-  int ch;
+  int ch = 0;
   CHECK_NOT_NULL(line);
   line->length = 0;
-  ch = getchar();
+  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
+    ch = getchar();
+  }
   while (ch != EOF && ch != '\n') {
     if (line->length >= line->max_length) {
-      CRAISE
+      CRAISE("string too long")
     }
     line->values[line->length] = ch;
     ++line->length;
-    ch = getchar();
+    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
+      ch = getchar();
+    }
   }
   return OK;
 }
@@ -756,8 +850,10 @@ Returncode Sys_getline(
 
 #define LUMI_FUNC_NAME "Sys.exit"
 Returncode Sys_exit(Sys* _, Ref_Manager* __, Int status) {
-  exit(status);
-  CRAISE
+  if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+    exit(status);
+  }
+  CRAISE("exit failed")
 }
 #undef LUMI_FUNC_NAME
 
@@ -766,11 +862,13 @@ Returncode Sys_system(
     Sys* _, Ref_Manager* __,
     String* command, Ref_Manager* command_Refman,
     Int* status) {
-  int res;
+  int res = -1;
   CCHECK(set_cstring(command, command_Refman));
-  res = system(command->values);
+  if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+    res = system(command->values);
+  }
   if (res == -1) {
-    CRAISE
+    CRAISE("command execution failed")
   }
   *status = res;
   return OK;

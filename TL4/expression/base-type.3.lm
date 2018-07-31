@@ -103,7 +103,11 @@ class UpCastExpression(Expression)
     write(user "&(")
   
   func inst write-post()
-    write(user "->_base")
+    if self.expression.is-complex-field
+      write(user ".")
+    else
+      write(user "->")
+    write(user "_base")
     for n in 1:self.bases
       write(user "._base")
     write(user ")")

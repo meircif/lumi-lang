@@ -16,7 +16,7 @@ Then compiles the last one to "<name>" executable using "CC" environment
 variable, or "gcc" if not specified.
 (TL0 and TL1 only supports one file)
 
-Supports TL0, TL1, TL2 & TL3.
+Supports TL0, TL1, TL2, TL3, TL4 & TL5.
 ~~~
 module lumi
 
@@ -215,7 +215,7 @@ struct Lumi
           copy first-input.length < 6,
           user "error: Lumi file name too short")
       self.version := first-input[first-input.length - 4]
-    if self.version < '0' or self.version > '4'
+    if self.version < '0' or self.version > '5'
       sys.print(user "error: unsupported version TL")
       var String{2} version-string
       version-string.append(copy self.version)

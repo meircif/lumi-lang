@@ -50,6 +50,7 @@ class CallExpression(Expression)
       output.set-location()
       output.is-output := true
       output.is-native := declaration.outputs.last.item.is-native
+      output.is-dynamic := result-type.type-data.is-dynamic
       output.is-generic :=
           declaration.outputs.last.item.get-type-instance().type-data =
           glob.type-generic
@@ -65,14 +66,14 @@ class CallExpression(Expression)
     self.assignable := ? self.result-type
   
   func dynamic write-preactions()
+    self.arguments.write-preactions()
     self.function.write-preactions()
     if self.is-function-object
       write(user "if (")
       self.function.write-as-top()
       write(user " == NULL) ")
-      self.write-raise(user "empty function called")
+      self.write-raise(user "empty_object")
       self.code-node.write-spaces()
-    self.arguments.write-preactions()
     if not self.is-statement
       self.write-func-call()
       self.code-node.write-spaces()
@@ -81,14 +82,26 @@ class CallExpression(Expression)
     if self.is-statement
       self.write-func-call()
     else-if ? self.output
+      self.output.top := self.top
       self.output.write()
+      self.output.top := true
+  
+  func dynamic write-refman()
+    if ? self.output
+      self.output.top := self.top
+      self.output.write-refman()
+      self.output.top := true
+  
+  func dynamic write-dynamic()
+    if ? self.output
+      self.output.top := self.top
+      self.output.write-dynamic()
+      self.output.top := true
   
   func inst write-func-call()
-    self.write-call()
+    write(user "LUMI_err = ")
     self.function.write()
-    self.arguments.write-call()
-    write(user " )\n")
-    self.arguments.write-postactions()
+    self.code-node.write-call(user self.arguments)
 
 
 ## Function argument call
@@ -153,7 +166,7 @@ class CallArgument(Argument)
       write(user "if (")
       self.value.write()
       write(user " != NULL) ")
-      self.write-raise(user "non empty base class given as output argument")
+      self.write-raise(user "empty_base_output")
       self.code-node.write-spaces()
   
   func dynamic write()
@@ -180,7 +193,10 @@ class CallArgument(Argument)
         write(user "(void*)")
       if self.is-output
         write(user "&(")
+      if self.value.is-generic-cast
+        self.value.top := false
       self.value.write-dynamic()
+      self.value.top := true
       if self.is-output
         write(user ")")
     else-if self.is-generic
@@ -197,6 +213,7 @@ class CallArgument(Argument)
   func dynamic write-postactions()
     if self.access = ACCESS-OWNER and not self.is-output and
         self.value.result-type.type-data != glob.type-empty
+      self.code-node.write-spaces()
       self.assignee.write-assign-null()
 
 

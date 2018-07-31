@@ -134,79 +134,67 @@ Returncode SliceExpression_write_preactions(SliceExpression* self) {
   if (NULL != self->second_index) {
     CHECK(78, (self->second_index)->_base._dtl[9](self->second_index) )
     CHECK(79, Expression_write_init_var_ref(&(self->_base), self->slice_symbol) )
-    CHECK(80, Expression_write_refman_init(&(self->_base), self->slice_symbol) )
     /* symbol_Var.length = second; */
     /* symbol_Var.max_length = symbol.length + 1; */
     /* symbol_Var.values = (seq)->values + (index); */
     /* symbol_Var.values = (Byte*)((seq)->values) + (index); */
-    CHECK(85, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-    CHECK(86, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
-    CHECK(87, write(&(String){15, 14, "_Var.length = "}) )
-    CHECK(88, (self->second_index)->_base._dtl[4](self->second_index) )
-    CHECK(89, write(&(String){3, 2, ";\n"}) )
-    CHECK(90, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(84, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(85, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
+    CHECK(86, write(&(String){15, 14, "_Var.length = "}) )
+    CHECK(87, (self->second_index)->_base._dtl[4](self->second_index) )
+    CHECK(88, write(&(String){3, 2, ";\n"}) )
+    CHECK(89, SyntaxTreeCode_write_spaces(self->_base.code_node) )
     if (self->sequence->result_type->type_data == glob->type_string) {
-      CHECK(92, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
-      CHECK(93, write(&(String){19, 18, "_Var.max_length = "}) )
-      CHECK(94, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
-      CHECK(95, write(&(String){18, 17, "_Var.length + 1;\n"}) )
-      CHECK(96, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+      CHECK(91, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
+      CHECK(92, write(&(String){19, 18, "_Var.max_length = "}) )
+      CHECK(93, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
+      CHECK(94, write(&(String){18, 17, "_Var.length + 1;\n"}) )
+      CHECK(95, SyntaxTreeCode_write_spaces(self->_base.code_node) )
     }
-    CHECK(97, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
-    CHECK(98, write(&(String){16, 15, "_Var.values = ("}) )
+    CHECK(96, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
+    CHECK(97, write(&(String){16, 15, "_Var.values = ("}) )
     if (self->sequence->result_type->type_data != glob->type_string) {
-      CHECK(100, write(&(String){9, 8, "Byte*)(("}) )
+      CHECK(99, write(&(String){9, 8, "Byte*)(("}) )
     }
-    CHECK(101, (self->sequence)->_base._dtl[4](self->sequence) )
-    CHECK(102, write(&(String){10, 9, ")->values"}) )
+    CHECK(100, (self->sequence)->_base._dtl[4](self->sequence) )
+    CHECK(101, write(&(String){10, 9, ")->values"}) )
     if (self->sequence->result_type->type_data != glob->type_string) {
-      CHECK(104, write(&(String){2, 1, ")"}) )
+      CHECK(103, write(&(String){2, 1, ")"}) )
     }
-    CHECK(105, write(&(String){5, 4, " + ("}) )
-    CHECK(106, (self->index)->_base._dtl[4](self->index) )
-    CHECK(107, write(&(String){4, 3, ");\n"}) )
-    CHECK(108, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+    CHECK(104, write(&(String){5, 4, " + ("}) )
+    CHECK(105, (self->index)->_base._dtl[4](self->index) )
+    CHECK(106, write(&(String){4, 3, ");\n"}) )
+    CHECK(107, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   }
   
-  /* if (seq == NULL) RAISE("empty object used as sequence") */
-  /* if (seq_Refman->value == NULL) */
-  /*   RAISE("outdated weak reference used as sequence") */
-  CHECK(113, write(&(String){5, 4, "if ("}) )
-  CHECK(114, Expression_write_as_top(self->sequence) )
-  CHECK(115, write(&(String){11, 10, " == NULL) "}) )
-  CHECK(116, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){30, 29, "empty object used as sequence"}) )
-  CHECK(117, SyntaxTreeCode_write_spaces(self->_base.code_node) )
-  CHECK(118, write(&(String){5, 4, "if ("}) )
-  CHECK(119, (self->sequence)->_base._dtl[6](self->sequence) )
-  CHECK(120, write(&(String){18, 17, "->value == NULL) "}) )
-  CHECK(121, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){41, 40, "outdated weak reference used as sequence"}) )
-  CHECK(122, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+  CHECK(109, Expression_write_check_ref(self->sequence) )
+  CHECK(110, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   
   /* if ((index) < 0 || (index) >= (seq)->length) */
   /* if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length) */
-  /*     RAISE("slice index out of bounds") */
-  CHECK(127, write(&(String){6, 5, "if (("}) )
-  CHECK(128, (self->index)->_base._dtl[4](self->index) )
-  CHECK(129, write(&(String){11, 10, ") < 0 || ("}) )
+  /*     RAISE("slice_index") */
+  CHECK(115, write(&(String){6, 5, "if (("}) )
+  CHECK(116, (self->index)->_base._dtl[4](self->index) )
+  CHECK(117, write(&(String){11, 10, ") < 0 || ("}) )
   if (NULL != self->second_index) {
-    CHECK(131, (self->second_index)->_base._dtl[4](self->second_index) )
-    CHECK(132, write(&(String){11, 10, ") < 0 || ("}) )
+    CHECK(119, (self->second_index)->_base._dtl[4](self->second_index) )
+    CHECK(120, write(&(String){11, 10, ") < 0 || ("}) )
   }
-  CHECK(133, (self->index)->_base._dtl[4](self->index) )
-  CHECK(134, write(&(String){3, 2, ") "}) )
+  CHECK(121, (self->index)->_base._dtl[4](self->index) )
+  CHECK(122, write(&(String){3, 2, ") "}) )
   if (NULL != self->second_index) {
-    CHECK(136, write(&(String){4, 3, "+ ("}) )
-    CHECK(137, (self->second_index)->_base._dtl[4](self->second_index) )
-    CHECK(138, write(&(String){4, 3, ") >"}) )
+    CHECK(124, write(&(String){4, 3, "+ ("}) )
+    CHECK(125, (self->second_index)->_base._dtl[4](self->second_index) )
+    CHECK(126, write(&(String){4, 3, ") >"}) )
   }
   else {
-    CHECK(140, write(&(String){3, 2, ">="}) )
+    CHECK(128, write(&(String){3, 2, ">="}) )
   }
-  CHECK(141, write(&(String){3, 2, " ("}) )
-  CHECK(142, (self->sequence)->_base._dtl[4](self->sequence) )
-  CHECK(143, write(&(String){12, 11, ")->length) "}) )
-  CHECK(144, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){26, 25, "slice index out of bounds"}) )
-  CHECK(145, SyntaxTreeCode_write_spaces(self->_base.code_node) )
+  CHECK(129, write(&(String){3, 2, " ("}) )
+  CHECK(130, (self->sequence)->_base._dtl[4](self->sequence) )
+  CHECK(131, write(&(String){12, 11, ")->length) "}) )
+  CHECK(132, SyntaxTreeNode_write_raise(&(self->_base._base), &(String){12, 11, "slice_index"}) )
+  CHECK(133, SyntaxTreeCode_write_spaces(self->_base.code_node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -218,7 +206,7 @@ static char* _func_name_SliceExpression_write = "SliceExpression.write";
 #define LUMI_FUNC_NAME _func_name_SliceExpression_write
 Returncode SliceExpression_write(SliceExpression* self) {
   if (NULL != self->second_index) {
-    CHECK(149, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
+    CHECK(137, (self->slice_symbol)->_base._base._dtl[4](self->slice_symbol) )
     return OK;
   }
   
@@ -226,36 +214,36 @@ Returncode SliceExpression_write(SliceExpression* self) {
   /* ((Prmitive*)((seq)->values))[index] */
   /* ((Complex*)((seq)->values)) + index */
   if (!self->_base.top) {
-    CHECK(156, write(&(String){2, 1, "("}) )
+    CHECK(144, write(&(String){2, 1, "("}) )
   }
-  CHECK(157, write(&(String){3, 2, "(("}) )
+  CHECK(145, write(&(String){3, 2, "(("}) )
   if (self->sequence->result_type->type_data != glob->type_string) {
     if (self->_base.result_type->type_data == glob->type_func &&  NULL !=  self->_base.result_type->arguments) {
-      CHECK(161, FunctionArguments_write_pointer(self->_base.result_type->arguments, &(String){2, 1, "*"}) )
+      CHECK(149, FunctionArguments_write_pointer(self->_base.result_type->arguments, &(String){2, 1, "*"}) )
     }
     else {
-      CHECK(163, TypeData_write_cname(self->_base.result_type->type_data) )
-      CHECK(164, write(&(String){2, 1, "*"}) )
+      CHECK(151, TypeData_write_cname(self->_base.result_type->type_data) )
+      CHECK(152, write(&(String){2, 1, "*"}) )
     }
-    CHECK(165, write(&(String){4, 3, ")(("}) )
+    CHECK(153, write(&(String){4, 3, ")(("}) )
   }
-  CHECK(166, (self->sequence)->_base._dtl[4](self->sequence) )
-  CHECK(167, write(&(String){11, 10, ")->values)"}) )
+  CHECK(154, (self->sequence)->_base._dtl[4](self->sequence) )
+  CHECK(155, write(&(String){11, 10, ")->values)"}) )
   if (self->sequence->result_type->type_data != glob->type_string) {
-    CHECK(169, write(&(String){2, 1, ")"}) )
+    CHECK(157, write(&(String){2, 1, ")"}) )
   }
   if (self->_base.result_type->type_data->is_primitive) {
-    CHECK(171, write(&(String){2, 1, "["}) )
+    CHECK(159, write(&(String){2, 1, "["}) )
   }
   else {
-    CHECK(173, write(&(String){4, 3, " + "}) )
+    CHECK(161, write(&(String){4, 3, " + "}) )
   }
-  CHECK(174, (self->index)->_base._dtl[4](self->index) )
+  CHECK(162, (self->index)->_base._dtl[4](self->index) )
   if (self->_base.result_type->type_data->is_primitive) {
-    CHECK(176, write(&(String){2, 1, "]"}) )
+    CHECK(164, write(&(String){2, 1, "]"}) )
   }
   if (!self->_base.top) {
-    CHECK(178, write(&(String){2, 1, ")"}) )
+    CHECK(166, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }
@@ -267,9 +255,9 @@ Returncode SliceExpression_write_dynamic(SliceExpression* self);
 static char* _func_name_SliceExpression_write_dynamic = "SliceExpression.write-dynamic";
 #define LUMI_FUNC_NAME _func_name_SliceExpression_write_dynamic
 Returncode SliceExpression_write_dynamic(SliceExpression* self) {
-  CHECK(181, write(&(String){2, 1, "&"}) )
-  CHECK(182, TypeData_write_cname(self->_base.result_type->type_data) )
-  CHECK(183, write(&(String){9, 8, "_dynamic"}) )
+  CHECK(169, write(&(String){2, 1, "&"}) )
+  CHECK(170, TypeData_write_cname(self->_base.result_type->type_data) )
+  CHECK(171, write(&(String){9, 8, "_dynamic"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -280,7 +268,7 @@ Returncode SliceExpression_write_refman(SliceExpression* self);
 static char* _func_name_SliceExpression_write_refman = "SliceExpression.write-refman";
 #define LUMI_FUNC_NAME _func_name_SliceExpression_write_refman
 Returncode SliceExpression_write_refman(SliceExpression* self) {
-  CHECK(186, (self->sequence)->_base._dtl[6](self->sequence) )
+  CHECK(174, (self->sequence)->_base._dtl[6](self->sequence) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

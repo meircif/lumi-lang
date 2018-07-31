@@ -29,7 +29,7 @@ func fun3(copy Int x)->(owner String s)
 func fun4(copy Int x)
 func fun5(copy Int x)->(var Int y)
 func fun6(copy Int x, copy Int y)->(var Int n, var Int m)
-func fun7()->(user Tb tb)
+func fun7(user Tb tb)->(user Tb tbo)
 
 var Int i
 var Char c

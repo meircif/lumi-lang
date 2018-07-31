@@ -1,0 +1,332 @@
+~~~ TL5 compiler - Symbol expression ~~~
+module tl5-compiler
+
+~~~ A single symbol expression (variable or global-function) ~~~
+class SymbolExpression(Expression)
+  owner String name
+  user String module-name
+  user SyntaxTreeVariable variable
+  user SyntaxTreeFunction function
+  var Bool is-annotate
+  
+  func inst copy-new()->(owner SymbolExpression new-symbol)
+    new-symbol := SymbolExpression(user self.code-node)
+    string-new-copy(user self.name)->(owner new-symbol.name)
+    new-symbol.module-name := self.module-name
+    new-symbol.variable := self.variable
+    new-symbol.function := self.function
+    new-symbol.is-annotate := self.is-annotate
+    self.result-type.copy-new()->(owner new-symbol.result-type)
+  
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new SymbolExpression symbol-expression(user code-node)
+    symbol-expression.parse(owner text)
+    expression := symbol-expression
+  
+  ~~~ parsing `symbol` ~~~
+  func inst parse(owner String text)
+    self.name := text
+  
+  func dynamic analyze()
+    if glob.module-map.find(user self.name)?
+      self.result-type := TypeInstance()
+      string-new-copy(user self.name)->(owner self.result-type.name)
+      self.result-type.type-data := glob.type-module
+    else-if self.code-node.find-variable(
+        user self.name, user self.module-name)->(user self.variable)?
+      self.variable.type-instance.copy-new()->(owner self.result-type)
+      self.access := self.variable.access
+      self.constant := self.variable.constant
+      self.assignable := not self.constant
+    else-if self.code-node.find-function(
+        user self.name, user self.module-name)->(user self.function)?
+      self.set-simple-type(user glob.type-func)
+      self.access := Access.VAR
+      self.function.arguments.copy-new()->(owner self.result-type.arguments)
+    else-if self.module-name?
+      self.syntax-error2(
+          user "unknown symbol",
+          user self.name,
+          user "in module",
+          user self.module-name)
+    else
+      self.syntax-error(user "unknown symbol", user self.name)
+  
+  func dynamic analyze-call(user FunctionArguments arguments)->(
+      user TypeInstance instance-type,
+      var Int bases,
+      var Bool is-function-object)
+    is-function-object := self.variable?
+    bases := 0
+    instance-type := _
+  
+  func dynamic analyze-mock(copy Bool is-annotate)->(var Bool is-mock)
+    is-mock := false
+    if self.function?
+      is-mock := self.function.mocker-function?
+      if is-mock
+        self.is-annotate := is-annotate
+  
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
+    if self.variable?
+      self.variable.order-constants(user ordered-list)
+  
+  func inst is-variable-output()->(var Bool is-output)
+    is-output := false
+    if self.variable?
+      is-output := self.variable.is-output
+  
+  func dynamic write()
+    if self.function?
+      if self.function.mocker-function? and not self.is-annotate
+        self.function.mocker-function.write-cname()
+      else
+        self.function.write-cname()
+      return
+    if self.is-variable-output()
+      if not self.top
+        write(user "(")
+      write(user "*")
+    if self.variable?
+      self.variable.write-cname()
+    else
+      write-cname(user self.name)
+    if self.is-variable-output() and not self.top
+      write(user ")")
+  
+  func dynamic write-dynamic()
+    if self.is-variable-output() and not self.top
+      write(user "(*")
+      write-cname(user self.name)
+      write(user "_Dynamic)")
+    else
+      base()
+  
+  func dynamic write-refman()
+    if self.is-variable-output() and not self.top
+      write(user "(*")
+      write-cname(user self.name)
+      write(user "_Refman)")
+    else
+      base()
+
+~~~ An instance member expression ~~~
+class MemberExpression(SymbolExpression)
+  owner Expression instance
+  user Expression dynamic-call-self-instance
+  var Int bases
+  var Bool is-mock-field
+  
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new MemberExpression member-expression(user code-node)
+    member-expression.parse(owner expression, owner text)
+    expression := member-expression
+  
+  ~~~ parsing `instance.symbol` ~~~
+  func inst parse(owner Expression instance, owner String text)
+    self.instance := instance
+    self.name := text
+  
+  func dynamic analyze()
+    self.instance.analyze()
+    self.assignable := self.instance.assignable
+    user TypeInstance instance-type(user self.instance.result-type)
+    var Bool typed-expression
+    if instance-type?
+      typed-expression := instance-type.type-data?
+    if not typed-expression
+      self.syntax-error(user "void expression has no member", user self.name)
+    if instance-type.type-data is glob.type-type
+      instance-type := instance-type.parameters.first.item
+    else-if instance-type.type-data is glob.type-base
+      instance-type := instance-type.parameters.first.item.type-data.base-type
+    
+    if instance-type.type-data is glob.type-module
+      self.module-name := instance-type.name
+      base()
+      return
+    
+    instance-type.type-data.find-field(user self.name)->(
+        user self.variable, var self.bases)
+    if self.variable?
+      self.is-complex-field := self.variable.access = Access.VAR and
+          not self.variable.type-instance.type-data.is-primitive
+      self.is-generic-cast :=
+          self.variable.type-instance.type-data is glob.type-generic
+      self.variable.type-instance.new-replace-params(
+          user instance-type, copy self.bases)->(owner self.result-type)
+      self.access := self.variable.access
+      self.assignable := not self.is-complex-field
+    else
+      instance-type.type-data.find-meth(user self.name)->(
+          user self.function, var self.bases)
+      if not self.function?
+        self.is-annotate := self.name.equal(user "mocked")
+        if self.instance.analyze-mock(copy self.is-annotate)->(
+            var self.is-mock-field)
+          if self.is-annotate
+            instance-type.copy-new()->(owner self.result-type)
+          else-if not self.name.equal(user "active")
+            self.syntax-error(
+                user "mock function has no member", user self.name)
+          else
+            self.set-simple-type(user glob.type-bool)
+            self.assignable := true
+          return
+        self.syntax-error2(
+            user "type",
+            user instance-type.type-data.name,
+            user "has no member",
+            user self.name)
+      if self.function.is-dynamic and not self.instance.is-complex-field and
+          self.instance.result-type.type-data is-not glob.type-type and
+          self.instance.result-type.type-data is-not glob.type-base
+        self.bases += self.function.dynamic-base-count
+        self.function := self.function.dynamic-base-method
+        self.dynamic-call-self-instance := self.instance
+      self.set-simple-type(user glob.type-func)
+      self.access := Access.VAR
+      self.function.arguments.copy-new()->(owner self.result-type.arguments)
+    if self.instance.result-type.type-data is glob.type-base
+      if not self.function?
+        self.syntax-error(
+            user "calling \"base\" with non-method", user self.name)
+      owner TypeInstance base-result-type(owner self.instance.result-type)
+      self.instance.result-type := base-result-type.parameters.first.item
+  
+  func dynamic analyze-call(user FunctionArguments arguments)->(
+      user TypeInstance instance-type,
+      var Int bases,
+      var Bool is-function-object)
+    if self.is-mock-field and self.is-annotate
+      self.instance.analyze-call(user arguments)->(
+          user instance-type, var bases, var is-function-object)
+      return
+    if base(user arguments)->(
+        user instance-type, var bases, var is-function-object) or
+        self.module-name?
+      return
+    bases := self.bases
+    if self.instance.result-type.type-data is glob.type-type
+      instance-type := self.instance.result-type.parameters.first.item
+    else
+      instance-type := self.instance.result-type
+      new CallArgument self-param
+      self-param.set-location()
+      self-param.access := self.function.arguments.parameters.first.item.access
+      self-param.value := self.instance
+      self-param.value.top := true
+      arguments.parameters.prepend(owner self-param)
+  
+  func dynamic analyze-mock(copy Bool is-annotate)->(var Bool is-mock)
+    if base(copy is-annotate)->(var is-mock)
+      if self.function.is-dynamic and
+          self.instance.result-type.type-data is-not glob.type-type and
+          self.instance.result-type.type-data is-not glob.type-base
+        self.syntax-error(
+            user "accessing mock function field in dynamic call to",
+            user self.name)
+  
+  func dynamic write-preactions()
+    if self.module-name?
+      return
+    if self.instance?
+      self.instance.write-preactions()
+      if self.instance.is-complex-field
+        return
+      if not self.dynamic-call-self-instance? and (self.function? or
+          self.instance.result-type.type-data is glob.type-type)
+        return
+    else-if not self.dynamic-call-self-instance?
+      return
+    if self.is-mock-field
+      return
+    ; if (...) RAISE(`line-num`, ...)
+    if self.instance?
+      self.instance.write-check-ref()
+    else-if self.dynamic-call-self-instance?
+      ; if (`instance`_Dynamic == NULL) RAISE(`line`, empty_object)
+      write(user "if (")
+      var Bool top(copy self.dynamic-call-self-instance.top)
+      self.dynamic-call-self-instance.top := true
+      self.dynamic-call-self-instance.write-dynamic()
+      write(user " == NULL) ")
+      self.write-raise(user "empty_object")
+      self.dynamic-call-self-instance.top := top
+    self.code-node.write-spaces()
+  
+  func dynamic write()
+    if self.dynamic-call-self-instance?
+      var Bool top(copy self.dynamic-call-self-instance.top)
+      self.dynamic-call-self-instance.top := false
+      self.dynamic-call-self-instance.write-dynamic()
+      self.dynamic-call-self-instance.top := top
+      self.write-bases()
+      write-cname(user self.function.name)
+      return
+    if self.is-mock-field
+      self.instance.write()
+      if not self.is-annotate
+        write(user "_")
+        write-cname(user self.name)
+      return
+    
+    if self.is-generic-cast and not self.top
+      write(user "((")
+      self.result-type.type-data.write-cname()
+      write(user "*)(")
+    if self.instance?
+      if not self.function? and not self.module-name? and
+          self.instance.result-type.type-data is-not glob.type-type
+        if self.is-complex-field and self.top
+          write(user "&(")
+        self.instance.write()
+        self.write-bases()
+    base()
+    if self.instance?
+      if not self.function? and self.is-complex-field and self.top and
+          self.instance.result-type.type-data is-not glob.type-type
+        write(user ")")
+    if self.is-generic-cast and not self.top
+      write(user "))")
+  
+  func dynamic write-refman()
+    if self.is-complex-field
+      self.instance.write-refman()
+      return
+    var Bool top(copy self.top)
+    if self.is-generic-cast and not self.top
+      self.top := true
+    base()
+    self.top := top
+  
+  func dynamic write-dynamic()
+    if self.is-complex-field
+      if self.top
+        write(user "&")
+      self.result-type.type-data.write-cname()
+      write(user "_dynamic")
+      return
+    var Bool top(copy self.top)
+    if self.is-generic-cast and not self.top
+      write(user "((")
+      self.result-type.type-data.write-cname()
+      write(user "_Dynamic*)(")
+      self.top := true
+    base()
+    self.top := top
+    if self.is-generic-cast and not self.top
+      write(user "))")
+  
+  func inst write-bases()
+    var Bool instance-is-complex-field
+    if self.instance?
+      instance-is-complex-field := self.instance.is-complex-field
+    if instance-is-complex-field
+      write(user ".")
+    else
+      write(user "->")
+    for n in self.bases
+      write(user "_base.")

@@ -1,0 +1,280 @@
+~~~ TL5 compiler tests - Syntax tree ~~~
+module tl5-compiler-tests
+
+func write-syntax-tree(copy Bool is-test)
+  var Array{6:String{256}} mock-argv
+  mock-argv[0].new(user "tl4-compiler")
+  mock-argv[1].new(user "mock.c")
+  mock-argv[2].new(user "mock.5.lm")
+  if is-test
+    mock-argv[3].new(user "-t")
+    mock-argv[4].new(user "ut")
+    mock-argv[5].new(user "second.5.lm")
+  else
+    mock-argv.length := 3
+  sys.argv := mock-argv
+  tl5-compiler.glob.root.is-library := true
+  tl5-compiler.glob.root.parse()
+  tl5-compiler.glob.root.analyze()
+  tl5-compiler.glob.root.write()
+
+
+func test-global-scope(
+    user String input-text,
+    user String second-file-input-text,
+    user String expected-output,
+    copy Bool is-test)
+  setup-test()
+  set-mock-file-text(user input-text, user second-file-input-text)
+  write-syntax-tree(copy is-test)
+  if mock-output-file-text[0] != '\n'
+    sys.print(user mock-output-file-text)
+  assert mock-output-file-text[0] = '\n'
+  assert mock-output-file-text[mock-output-file-text.length - 1] = '\n'
+  assert-string-slice(
+      user expected-output,
+      user mock-output-file-text,
+      copy 1,
+      copy mock-output-file-text.length - 2,
+      copy true)
+
+func no-error-raised()
+  Sys.print.active := false
+  if tests-passed
+    sys.print(user "\n    ")
+  sys.print(user "[no error raised]\n    ")
+  tests-passed := false
+
+func test-error-message(user String expected-header, user String expected-error)
+  assert-string-slice(
+      user expected-header,
+      user mock-print-text,
+      copy 0,
+      copy expected-header.length,
+      copy false)
+  if mock-print-text.length > 0
+    if mock-print-text[mock-print-text.length - 1] != '\n'
+      sys.print(user "    [no new-line in error end]\n")
+      tests-passed := false
+  if mock-print-text.length >= expected-header.length + 4
+    assert-string-slice(
+        user expected-error,
+        user mock-print-text,
+        copy expected-header.length + 3,
+        copy mock-print-text.length - expected-header.length - 4,
+        copy true)
+
+
+func test-global-scope-error(
+    user String input-text,
+    user String second-file-input-text,
+    user String expected-error,
+    copy Bool is-test)
+  setup-test()
+  set-mock-file-text(user input-text, user second-file-input-text)
+  Sys.print.active := true
+  try
+    write-syntax-tree(copy is-test)
+    no-error-raised()
+    return
+  Sys.print.active := false
+  if mock-print-text.length = 0
+    setup-test()
+    set-mock-file-text(user input-text, user second-file-input-text)
+    write-syntax-tree(copy is-test)
+  user String expected-header
+  if is-test
+    expected-header := "Code error in second.5.lm["
+  else
+    expected-header := "Code error in mock.5.lm["
+  test-error-message(user expected-header, user expected-error)
+
+
+test test-illegal-usage()
+  setup-test()
+  var Array{2:String{4}} mock-argv
+  sys.argv := mock-argv
+  Sys.print.active := true
+  assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
+  Sys.print.active := false
+  assert-string-slice(
+      user "usage: tl5-compiler [-t TESTED-MODULE] OUTPUT-C-FILE-NAME \
+      INPUT-TL5-FILES...\n",
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+      
+
+test test-open-file-fail()
+  setup-test()
+  var Array{3:String{256}} mock-argv
+  mock-argv[0].new(user "tl5-compiler")
+  mock-argv[1].new(user "mock.c")
+  mock-argv[2].new(user "mock.5.lm")
+  mock-argv.length := 3
+  sys.argv := mock-argv
+  tl5-compiler.glob.root.is-library := true
+  
+  Sys.print.active := true
+  file-open-error := true
+  assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
+  Sys.print.active := false
+  assert-string-slice(
+      user "could not read file \"mock.5.lm\"\n",
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+  
+  mock-print-text.clear()
+  Sys.print.active := true
+  assert-error tl5-compiler.glob.root.write(), "Sys.exit"
+  Sys.print.active := false
+  assert-string-slice(
+      user "could not write file \"mock.c\"\n",
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+
+
+func test-analyze-error(user String expected-error)
+  Sys.print.active := true
+  assert-error tl5-compiler.glob.root.analyze(), "Sys.exit"
+  Sys.print.active := false
+  assert-string-slice(
+      user expected-error,
+      user mock-print-text,
+      copy 0,
+      copy mock-print-text.length,
+      copy false)
+
+
+func test-no-run-func(copy Bool testing, user String expected-error)
+  setup-test()
+  tl5-compiler.glob.root.is-library := false
+  if testing
+    tl5-compiler.string-new-copy(user "ut")->(
+        owner tl5-compiler.glob.tested-module)
+  test-analyze-error(user expected-error)
+
+test test-no-main()
+  test-no-run-func(
+      copy false, user "General code error: no main function\n")
+
+test test-no-test-func()
+  test-no-run-func(
+      copy true, user "General code error: no test functions\n")
+
+
+func test-cover-error(copy Bool has-module, user String expected-error)
+  setup-test()
+  tl5-compiler.glob.root.is-library := true
+  tl5-compiler.string-new-copy(user "error")->(
+      owner tl5-compiler.glob.tested-module)
+  tl5-compiler.glob.test-functions.add(user _, user _)
+  var tl5-compiler.ModuleMembers dummy-module(user _)
+  if has-module
+    tl5-compiler.glob.module-map.add(
+        user tl5-compiler.glob.tested-module, user dummy-module)
+  tl5-compiler.glob.root.line-counts := Array{1:tl5-compiler.LineCount}()
+  test-analyze-error(user expected-error)
+
+test test-unknown-test-module()
+  test-cover-error(
+      copy false,
+      user "General code error: unknown tested module \"error\"\n")
+
+test test-no-code-to-test()
+  test-cover-error(
+      copy true,
+      user "General code error: no code to test under module \"error\"\n")
+
+
+test test-general()
+  test-new-file(user "syntax-tree-tests", user "test-general")
+
+
+test test-struct()
+  test-from-file(user "test-struct")
+
+
+test test-class()
+  test-from-file(user "test-class")
+
+
+test test-function()
+  test-from-file(user "test-function")
+
+
+test test-members()
+  test-from-file(user "test-members")
+
+
+test test-return()
+  test-from-file(user "test-return")
+
+
+test test-code-variables()
+  test-from-file(user "test-code-variables")
+
+
+test test-initialize()
+  test-from-file(user "test-initialize")
+
+
+test test-comment()
+  test-from-file(user "test-comment")
+
+
+test test-if-else()
+  test-from-file(user "test-if-else")
+
+
+test test-do-loop()
+  test-from-file(user "test-do-loop")
+
+
+test test-for-loop()
+  test-from-file(user "test-for-loop")
+
+
+test test-testing()
+  test-from-file(user "test-testing")
+
+
+test test-native()
+  test-from-file(user "test-native")
+
+
+test test-parameter-type()
+  test-from-file(user "test-parameter-type")
+
+
+test test-parameter-inheritance()
+  test-from-file(user "test-parameter-inheritance")
+
+
+test test-error-handling()
+  test-from-file(user "test-error-handling")
+
+
+test test-for-each()
+  test-from-file(user "test-for-each")
+
+
+test test-complex-fields()
+  test-from-file(user "test-complex-fields")
+
+
+test test-enum()
+  test-from-file(user "test-enum")
+
+
+test test-constant()
+  test-from-file(user "test-constant")
+
+
+test test-module()
+  test-from-file(user "test-module")

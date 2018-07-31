@@ -185,7 +185,7 @@ class Error(Base)
 ## @ g t0
 func name()
 ## @ g t1
-func name(var String self, user String text, copy Int num)
+func name(user String self, user String text, copy Int num)
 ## @ g t2
 func name()->(owner String text, var Int num)
 ## @ g t3
@@ -198,7 +198,7 @@ func name(copy Func{(copy Int x)->(var Int y)} fun)->(var Func{()} joy)
 func name()
   var Int x
 ## @ g t7
-func name(var String self, copy Int px, user String pu, owner String po)->(
+func name(user String self, copy Int px, user String pu, owner String po)->(
     var String oself, var Int ox, user String ou, owner String oo)
   var Int x
   user String u
@@ -255,11 +255,11 @@ func name( )
 ## @ eg te7
 func name(user)
 ## @ eg te8
-func name(var String
+func name(user String
 ## @ eg te9
 func name(error Int x)
 ## @ eg te10
-func name(var String str,user Int x)
+func name(user String str,user Int x)
 ## @ eg te11
 func name()-()
 ## @ feg te12
@@ -291,11 +291,15 @@ struct Test
 struct Test
   var Int x
   func name()
+    self.x := 2
 ## @ g t2
 struct Test
   var Int x
   func name()
     var Int x
+    x := self.x
+    if x > 2
+      x := 2
 ## @ g t3
 struct Test
   ; comment
@@ -342,6 +346,12 @@ struct Test
 struct Test
   var Int name
   func name()
+## @ eg t12
+struct Test
+  var Int x
+  func meth()
+    owner Test error
+    error := self
 ## @@ test-return
 ## @ g t0
 func name()
@@ -482,7 +492,7 @@ user Int x
 ## @ ec te15
 new Int x
 ## @ ec te16
-var File f(copy 1)
+var Array{4:Int} a(copy 1)
 ## @ ec te17
 var Bool x(var 1)
 ## @ ec te18
@@ -591,11 +601,8 @@ func error()
 do
     var Int x
 ## @ c t1
-
-  
-    
-
-  var Int x
+do
+    break
 ## @ c t2
 do
     while t.num > 3
@@ -622,12 +629,20 @@ do
 ## @ ec te6
 do
     while i := 3
+## @ ec te7
+break
+## @ ec te8
+do
+    break 
+## @ ec te9
+do
+    continue 
 ## @@ test-for-loop
 ## @ c t0
 for n in 5
     i += n
 ## @ c t1
-for n in t.num:t.num + 2
+for n in t.num:str.length
     i += n
 ## @ c t2
 for ch in str
@@ -717,9 +732,9 @@ struct Test
     self.meth(copy x)->(var y)
 mock Test.meth(copy Int x)->(var Int y)
   self.meth.mocked(copy x)->(var y)
-  Test.meth.mocked(var self, copy x)->(var y)
+  Test.meth.mocked(user self, copy x)->(var y)
   self.meth.active := false
-  Test.meth(var self, copy x)->(var y)
+  Test.meth(user self, copy x)->(var y)
   Test.meth.active := true
 ## @ g tm6
 class Test
@@ -727,10 +742,17 @@ class Test
   func dynamic meth(copy Int x)->(var Int y)
     self.meth(copy x)->(var y)
 mock Test.meth(copy Int x)->(var Int y)
-  Test.meth.mocked(var self, copy x)->(var y)
+  Test.meth.mocked(user self, copy x)->(var y)
   Test.meth.active := false
-  Test.meth(var self, copy x)->(var y)
+  Test.meth(user self, copy x)->(var y)
   Test.meth.active := true
+## @ g tm7
+func fun()
+  sys.print(user "mock print")
+  sys.print.mocked(user "really print")
+  Sys.print.active := false
+  sys.print.active := true
+mock Sys.print(user String text)
 ## @ tg tt0
 func fun0()
   var Int x(copy 4)
@@ -990,7 +1012,7 @@ var Data dg
 ## @ c t15
 user Data dg(user d)
 ## @ c t16
-Data{String}.set(var d, owner so, user sarr)
+Data{String}.set(user d, owner so, user sarr)
 ## @ g t17
 struct Test{Generic}
   user Test{Generic} next
@@ -1004,6 +1026,9 @@ var Data{Tb} dt
   dt.set(owner otc, user _)
   dt.get()->(user ta)
   i := dt.get().numa
+  fun7(user dt.item)->(user dt.item)
+  user Tb tb2(user dt.item)
+  tb2 := dt.item
 ## @ g t19
 struct Base{Generic}
   user Generic item
@@ -1128,7 +1153,7 @@ struct Base{Generic}
 struct Test(Base{String})
   func set(user String s)
     self.item := s
-    Test.set(var Test(), user s)
+    Test.set(user Test(), user s)
 func use(user String s)
   var Test t
   t.item := s
@@ -1138,7 +1163,7 @@ struct Base{Generic}
 struct Test{Param}(Base{Param})
   func set(user Param i, user String s)
     self.item := i
-    Test{String}.set(var Test{String}(), user s, user s)
+    Test{String}.set(user Test{String}(), user s, user s)
 func use(user String s)
   var Test{String} t
   t.item := s
@@ -1156,9 +1181,9 @@ struct Test(Top)
   func set(user String s)
     base(user s)
     self.item := s
-    Top.set(var Top(), user s)
-    Test.set(var Test(), user s)
-    Mid{String}.set(var Top(), user s)
+    Top.set(user Top(), user s)
+    Test.set(user Test(), user s)
+    Mid{String}.set(user Top(), user s)
 func use(user String s)
   var Test t
   t.item := s
@@ -1168,7 +1193,7 @@ struct Base{Generic}
 struct Test{Generic}(Base{Generic})
   func set(user Generic i, user String s)
     self.item := i
-    Test{String}.set(var Test{String}(), user s, user s)
+    Test{String}.set(user Test{String}(), user s, user s)
 func use(user String s)
   var Test{String} t
   t.item := s
@@ -1210,6 +1235,23 @@ func use(user String s, user Second{String} ss)
   var Test{String} t
   t.item := ss
   t.item.item := s
+## @ g t6
+struct BaseGen{FirstGeneric}
+  user FirstGeneric item
+struct TestGen{SecondGeneric}(BaseGen{SecondGeneric})
+struct Base
+  var Int x
+struct Test(Base)
+func test()
+  user BaseGen{Base} bb
+  user BaseGen{Test} bt
+  user TestGen{Base} tb
+  user TestGen{Test} tt
+  bb := tb
+  bt := tt
+  bb := bt
+  tb := tt
+  bb := tt
 ## @ eg te0
 struct Base{Generic}
   user Generic item
@@ -1304,9 +1346,15 @@ struct TestIterator{Generic}
   func has()->(var Bool has-data)
   func get()->(user Generic item)
   func next()
-func f-mock(user TestIterator{String} iter)->(user String s)
-  for t in iter
-    s := t
+class Test
+  var Int x
+  func dynamic fun()
+func f-mock(user TestIterator{String} siter, user TestIterator{Test} titer)->(
+    user String os, user Test ot)
+  for s in siter
+    os := s
+  for t in titer
+    ot := t
 ## @ g t3
 class TestIterator{Generic}
   user Generic item
@@ -1419,21 +1467,28 @@ func f-mock()
   for n in TestIterator()
 ## @@ test-complex-fields
 ## @ g t0
-class Base
-  user Base b
-  func dynamic meth()
 struct Test
-  var Base b
+  var Bstruct b
   func test()
-    user Base b(user self.b)
+    user Bstruct b(user self.b)
     b := self.b
     self.b.meth()
-    Base.meth(var self.b)
-    user Base b2(user self.b.b)
+    Bstruct.meth(user self.b)
+    user Bstruct b2(user self.b.b)
     b2 := self.b.b
     self.b.b.meth()
-    Base.meth(var self.b.b)
+    self.b.b := b
+    Bstruct.meth(user self.b.b)
     var Test t
+    self.b.x := 5
+    Astruct.meth(user self.b)
+    if self.b is b or b2 is-not self.b
+class Astruct
+  var Int x
+  func dynamic meth()
+class Bstruct(Astruct)
+  user Bstruct b
+  func dynamic meth()
 ## @ eg te0
 struct Test
   var String{12} error
@@ -1448,6 +1503,20 @@ struct Test
   var Base error
 struct Base
   var Test t
+## @ eg te4
+struct Abase
+  var Berror b
+struct Aerror(Abase)
+struct Bbase
+  var Aerror a
+struct Berror(Bbase)
+## @ eg te5
+struct Base
+  var Int x
+struct Test
+  var Base b
+  func test(user Base b)
+    self.b := b
 ## @@ test-enum
 ## @ g t0
 enum MyEnum
@@ -1556,10 +1625,10 @@ var Test t
 func fun()
   t.x := Enum.VALUE + SIZE
   fun()
-  Test.meth(var t)
+  Test.meth(user t)
   second.t.x := second.Enum.VALUE + second.SIZE
   second.fun()
-  second.Test.meth(var second.t)
+  second.Test.meth(user second.t)
   new second.Test nt
 ## @-
 module second
@@ -1572,10 +1641,10 @@ var Test t
 func fun()
   t.x := Enum.VALUE + SIZE
   fun()
-  Test.meth(var t)
+  Test.meth(user t)
   ut.t.x := ut.Enum.VALUE + ut.SIZE
   ut.fun()
-  ut.Test.meth(var ut.t)
+  ut.Test.meth(user ut.t)
   new ut.Test nt
 test dummy()
 ## @ tg t1

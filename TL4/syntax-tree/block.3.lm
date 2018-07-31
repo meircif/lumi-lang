@@ -16,10 +16,19 @@ class SyntaxTreeCode(SyntaxTreeNode)
     self.parent.get-function():(user function)
   
   func dynamic get-parent-type():(user TypeData parent-type)
-    parent-type := self.get-function().parent-type
+    self.parent.get-parent-type():(user parent-type)
   
   func inst write-spaces()
     self.parent.write-spaces()
+  
+  func inst write-call(user FunctionArguments arguments)
+    arguments.write-call()
+    write(user ";\n")
+    arguments.write-postactions()
+    self.write-spaces()
+    write(user "CHECK(")
+    self.write-line-num()
+    write(user ")\n")
   
   ## Read and check indentation spaces for a line break from the input file
   func inst read-line-break-spaces()
@@ -43,6 +52,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   func inst parse-block():(copy Char end)
     new List{SyntaxTreeCode} in self.code-nodes
     self.parse-block-children(user _, user self):(copy end)
+    if ? self.get-parent-type()
+      self.indentation-spaces -= 2
   
   func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node
@@ -100,6 +111,13 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
             user "expected space after \"while\", got", copy end)
       self.code-nodes.add(
           owner SyntaxTreeWhile.parse-new(var _, user self):(copy end))
+      
+    else-if keyword.equal(user "break")
+      if end != '\n'
+        self.m-syntax-error-c(
+            user "expected new-line after \"break\", got", copy end)
+      self.code-nodes.add(
+          owner SyntaxTreeBreak.parse-new(var _, user self):(copy end))
       
     else-if keyword.equal(user "continue")
       if end != '\n'
@@ -185,6 +203,9 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   
   func dynamic get-function():(user SyntaxTreeFunction function)
     self.parent.get-function():(user function)
+  
+  func inst get-parent-type():(user TypeData parent-type)
+    parent-type := self.get-function().parent-type
   
   func dynamic link-types()
     base.link-types()
