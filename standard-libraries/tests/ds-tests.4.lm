@@ -103,6 +103,6 @@ test empty-iter-test()
 
 
 test abstract-methods()
-  assert-error ds.Iterator.has(var _), "unimplemented dynamic method 'has'"
-  assert-error ds.Iterator.get(var _), "unimplemented dynamic method 'get'"
-  assert-error ds.Iterator.next(var _), "unimplemented dynamic method 'next'"
+  assert-error ds.Iterator.has(user _), "unimplemented dynamic method 'has'"
+  assert-error ds.Iterator.get(user _), "unimplemented dynamic method 'get'"
+  assert-error ds.Iterator.next(user _), "unimplemented dynamic method 'next'"

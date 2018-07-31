@@ -15,25 +15,41 @@ DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCW="$CC --std=c89 -Werror -Wall -Wno-unused-variable -Wno-missing-braces"
+CCW="$CC --std=c89 -Werror -Wall -Wno-unused-variable"
+CCA="$CCW --pedantic -Wno-unused-label"
+if [ $CC == "gcc" ]; then
+  CCA="$CCA -Wno-unused-but-set-variable"
+else
+  CCA="$CCA -Wno-self-assign"
+fi
 
 rm -rf $DIR/.test/standard-libraries
 mkdir -p $DIR/.test/standard-libraries
 pushd $DIR/.test
 
 
-# compile tl3-compiler
-$CCW -Wno-typedef-redefinition ../TL3/tl3-compiler.c ../TL2/lumi.2.c -I../TL2 \
-  -o standard-libraries/tl3-compiler
+# compile tl4-compiler
+$CCW -Wno-missing-braces -Wno-typedef-redefinition ../TL4/tl4-compiler.c \
+  ../TL3/lumi.3.c -I../TL3 -I../TL4 -o standard-libraries/tl4-compiler
 
 
 # run standard-libraries unit-tests
-cp ../standard-libraries/*.3.lm standard-libraries/
-cp ../standard-libraries/tests/*.3.lm standard-libraries/
-standard-libraries/tl3-compiler standard-libraries/*.3.lm
-$CCW standard-libraries/standard-libraries-tests.c ../TL3/lumi.3.c -I. \
-  -I../TL3 -o standard-libraries/standard-libraries-tests
-standard-libraries/standard-libraries-tests
+standard-libraries/tl4-compiler standard-libraries/math-tests.c \
+  ../standard-libraries/math.4.lm ../standard-libraries/iterator.4.lm \
+  ../standard-libraries/tests/math-tests.4.lm -t math
+$CCA standard-libraries/math-tests.c ../TL4/lumi.4.c -I../TL4 \
+  -o standard-libraries/math-tests
+standard-libraries/math-tests -xml
+mkdir standard-libraries/cover-math-tests
+mv cobertura.xml standard-libraries/cover-math-tests
+standard-libraries/tl4-compiler standard-libraries/ds-tests.c \
+  ../standard-libraries/list.4.lm ../standard-libraries/iterator.4.lm \
+  ../standard-libraries/tests/ds-tests.4.lm -t ds
+$CCA standard-libraries/ds-tests.c ../TL4/lumi.4.c -I../TL4 \
+  -o standard-libraries/ds-tests
+standard-libraries/ds-tests -xml
+mkdir standard-libraries/cover-ds-tests
+mv cobertura.xml standard-libraries/cover-ds-tests
 
 
 # Standard Libraries teardown
