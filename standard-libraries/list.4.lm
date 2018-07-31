@@ -1,0 +1,68 @@
+~~~ Generic lists ~~~
+module ds
+
+~~~ Generic single link list ~~~
+struct List{Generic}
+  owner ListNode{Generic} first
+  user ListNode{Generic} last
+
+  ~~~ Add item to list end ~~~
+  func append(owner Generic item)
+    new ListNode{Generic} node(owner item)
+    if self.last?
+      self.last.next := node
+      self.last := self.last.next
+    else
+      self.first := node
+      self.last := self.first
+
+  ~~~ Add item to list start ~~~
+  func prepend(owner Generic item)
+    new ListNode{Generic} node(owner item)
+    node.next := self.first
+    self.first := node
+    if self.last is _
+      self.last := self.first
+
+  func is-empty()->(var Bool empty)
+    empty := self.first is _
+
+  ~~~ Get and remove first item, fail if list is empty ~~~
+  func pop()->(owner Generic item)
+    if not self.first?
+      raise "list empty"
+    item := self.first.item
+    owner ListNode{Generic} first(owner self.first)
+    self.first := first.next
+    if self.first is _
+      self.last := _
+
+
+~~~ Iterate over the list ~~~
+class ListIterator{Generic}(Iterator{Generic})
+  user ListNode{Generic} curr
+
+  func inst new(user List list)
+    if list?
+      self.curr := list.first
+
+  func dynamic has()->(var Bool has-another-item)
+    has-another-item := self.curr?
+
+  func dynamic get()->(user Generic item)
+    if not self.curr?
+      raise "invalid list iterator state"
+    item := self.curr.item
+
+  func dynamic next()
+    if self.curr?
+      self.curr := self.curr.next
+
+
+~~~ Single node in the list ~~~
+struct ListNode{Generic}
+  owner ListNode{Generic} next
+  owner Generic item
+
+  func new(owner Generic item)
+    self.item := item

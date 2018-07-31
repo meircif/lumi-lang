@@ -62,10 +62,11 @@ TL5/test-single > TL5/test-single-output.txt
 diff TL5/tests/integration/single-output.txt TL5/test-single-output.txt
 
 # run tl5-compiler multiple-file integration test
-TL5/tl5-compiler -t covered TL5/test-multiple.c TL5/tests/integration/test0.5.lm \
-  TL5/tests/integration/test1.5.lm TL5/tests/integration/test2.5.lm
-$CCA TL5/test-multiple.c TL5/tests/integration/external.c ../TL5/lumi.5.c -I../TL5 \
-  -o TL5/test-multiple
+TL5/tl5-compiler -t covered TL5/test-multiple.c \
+  TL5/tests/integration/test0.5.lm TL5/tests/integration/test1.5.lm \
+  TL5/tests/integration/test2.5.lm
+$CCA TL5/test-multiple.c TL5/tests/integration/external.c ../TL5/lumi.5.c \
+  -I../TL5 -o TL5/test-multiple
 TL5/test-multiple -xml > TL5/test-multiple-output.txt
 mkdir TL5/cover-tests
 mv cobertura.xml TL5/cover-tests/
@@ -76,8 +77,8 @@ diff TL5/tests/integration/expected-cobertura.xml TL5/cover-tests/cobertura.xml
 TL5/tl5-compiler -t integration TL5/test-uncovered.c \
   TL5/tests/integration/test0.5.lm TL5/tests/integration/test1.5.lm \
   TL5/tests/integration/test2.5.lm
-$CCA TL5/test-uncovered.c TL5/tests/integration/external.c ../TL5/lumi.5.c -I../TL5 \
-  -o TL5/test-uncovered
+$CCA TL5/test-uncovered.c TL5/tests/integration/external.c ../TL5/lumi.5.c \
+  -I../TL5 -o TL5/test-uncovered
 ! TL5/test-uncovered > TL5/test-uncovered-output.txt
 diff TL5/tests/integration/uncovered-output.txt TL5/test-uncovered-output.txt
 
