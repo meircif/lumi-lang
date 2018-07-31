@@ -26077,6 +26077,7 @@ Returncode tl5_compiler_M_DeclarationArgument_parse_value(tl5_compiler_M_Declara
   String aux_String_2_Var = {0};
   String* aux_String_2 = NULL;
   Ref_Manager* aux_String_2_Refman = NULL;
+  Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(code_node_Refman);
   INIT_NEW(341, aux_SyntaxTreeVariable_0, LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable)));
@@ -26106,11 +26107,16 @@ Returncode tl5_compiler_M_DeclarationArgument_parse_value(tl5_compiler_M_Declara
   CHECK_REF(343, self->variable, self->variable_Refman)
   self->variable->is_output = self->_base.is_output;
   if (code_node != NULL && code_node_Refman->value != NULL) {
+    CHECK_REF(345, code_node, code_node_Refman)
     CHECK_REF(345, self, self_Refman)
     CHECK_REF(345, self->variable, self->variable_Refman)
-    if (code_node_Dynamic == NULL) RAISE(345, empty_object)
-    LUMI_err = code_node_Dynamic->_base.get_parent_type(&(code_node->_base), code_node_Refman, &(code_node_Dynamic->_base), &(self->variable->parent_type), &(self->variable->parent_type_Refman), &(self->variable->parent_type_Dynamic));
-    CHECK(345)
+    aux_Ref_Manager = self->variable->_base.parent_Refman;
+    self->variable->_base.parent_Refman = code_node->parent_Refman;
+    self->variable->_base.parent_Dynamic = code_node->parent_Dynamic;
+    LUMI_inc_ref(self->variable->_base.parent_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    self->variable->_base.parent = code_node->parent;
   }
   INIT_NEW(346, aux_TypeInstance_0, LUMI_alloc(sizeof(tl5_compiler_M_TypeInstance)));
   CHECK_REF(346, self, self_Refman)
@@ -26164,17 +26170,11 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "DeclarationArgument.get-parent-type"
 Returncode tl5_compiler_M_DeclarationArgument_get_parent_type(tl5_compiler_M_DeclarationArgument* self, Ref_Manager* self_Refman, tl5_compiler_M_DeclarationArgument_Dynamic* self_Dynamic, tl5_compiler_M_TypeData** parent_type, Ref_Manager** parent_type_Refman, tl5_compiler_M_TypeData_Dynamic** parent_type_Dynamic) {
   Returncode LUMI_err = OK;
-  Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   CHECK_REF(353, self, self_Refman)
-  CHECK_REF(353, self->variable, self->variable_Refman)
-  aux_Ref_Manager = *parent_type_Refman;
-  *parent_type_Refman = self->variable->parent_type_Refman;
-  *parent_type_Dynamic = self->variable->parent_type_Dynamic;
-  LUMI_inc_ref(*parent_type_Refman);
-  LUMI_dec_ref(aux_Ref_Manager);
-  aux_Ref_Manager = NULL;
-  *parent_type = self->variable->parent_type;
+  if (self->variable_Dynamic == NULL) RAISE(353, empty_object)
+  LUMI_err = self->variable_Dynamic->_base._base.get_parent_type(&(self->variable->_base._base), self->variable_Refman, &(self->variable_Dynamic->_base._base), &(*parent_type), &(*parent_type_Refman), &(*parent_type_Dynamic));
+  CHECK(353)
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
   return LUMI_err;

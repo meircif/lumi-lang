@@ -342,7 +342,7 @@ class DeclarationArgument(Argument)
     self.variable.access := self.access
     self.variable.is-output := self.is-output
     if code-node?
-      code-node.get-parent-type()->(user self.variable.parent-type)
+      self.variable.parent := code-node.parent
     self.variable.type-instance := TypeInstance()
     self.variable.type-instance.parse(user " ", user self, user _)
     if glob.last-char != ' '
@@ -350,7 +350,7 @@ class DeclarationArgument(Argument)
     read-new(user ",)")->(owner self.variable.name)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
-    parent-type := self.variable.parent-type
+    self.variable.get-parent-type()->(user parent-type)
   
   func dynamic link-types()
     self.variable.type-instance.link-types(user self)

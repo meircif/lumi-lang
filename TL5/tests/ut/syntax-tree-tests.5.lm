@@ -1108,6 +1108,15 @@ func mock(user Test{String} test, user String text)
     test.set(user text)
     test.get()->(user text)
     test.get().clear()
+; @ g t21
+struct Test{Param}
+    user Param item
+    func meth(user Param in)->(user Param out) _
+func Test.meth(user Param in)->(user Param out)
+    user Param p(user in)
+    out := p
+    self.item := p
+    self.meth(user p)->(user p)
 ; @ eg teg0
 struct Test{First:Second:Third
 ; @ eg teg1

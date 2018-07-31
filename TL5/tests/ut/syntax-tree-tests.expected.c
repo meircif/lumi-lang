@@ -2895,6 +2895,55 @@ LUMI_cleanup:
     LUMI_dec_ref(test_Refman);
     return LUMI_err;
 }
+/// @ t21
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Generic_Type* item;
+    Ref_Manager* item_Refman;
+    Generic_Type_Dynamic* item_Dynamic;
+};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type* in, Ref_Manager* in_Refman, Generic_Type_Dynamic* in_Dynamic, Generic_Type** out, Ref_Manager** out_Refman, Generic_Type_Dynamic** out_Dynamic);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->item_Refman);
+}
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type* in, Ref_Manager* in_Refman, Generic_Type_Dynamic* in_Dynamic, Generic_Type** out, Ref_Manager** out_Refman, Generic_Type_Dynamic** out_Dynamic) {
+    Returncode LUMI_err = OK;
+    Generic_Type* p = NULL;
+    Ref_Manager* p_Refman = NULL;
+    Generic_Type_Dynamic* p_Dynamic = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    LUMI_inc_ref(self_Refman);
+    LUMI_inc_ref(in_Refman);
+    p = in;
+    p_Refman = in_Refman;
+    LUMI_inc_ref(p_Refman);
+    p_Dynamic = in_Dynamic;
+    aux_Ref_Manager = *out_Refman;
+    *out_Refman = p_Refman;
+    *out_Dynamic = p_Dynamic;
+    LUMI_inc_ref(*out_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    *out = p;
+    CHECK_REF(7, self, self_Refman)
+    aux_Ref_Manager = self->item_Refman;
+    self->item_Refman = p_Refman;
+    self->item_Dynamic = p_Dynamic;
+    LUMI_inc_ref(self->item_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    self->item = p;
+    LUMI_err = ut_M_Test_meth(self, self_Refman, p, p_Refman, (void*)p_Dynamic, (void*)&(p), &(p_Refman), (void*)&(p_Dynamic));
+    CHECK(8)
+LUMI_cleanup:
+    LUMI_dec_ref(p_Refman);
+    LUMI_dec_ref(in_Refman);
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
 /// @ teg0
 expected "}" after type parameters, got "new-line"
 /// @ teg1

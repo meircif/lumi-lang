@@ -4,7 +4,7 @@
  <packages>
   <package name="">
    <classes>
-    <class name="TL5/integration/test2.5.lm" filename="TL5/integration/test2.5.lm">
+    <class name="TL5/tests/integration/test2.5.lm" filename="TL5/tests/integration/test2.5.lm">
      <methods/>
      <lines>
       <line branch="false" hits="2" number="14"/>

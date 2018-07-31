@@ -380,24 +380,18 @@ struct Data{Generic}
     user Generic item
     user Array{Generic} arr
     
-    func set(user Generic item, user Array{Generic} arr)
-        user Generic x(user item)
-        self.item := x
-        self.arr := arr
-        new Data{Generic} d
-        d.item := self.item
-        self.item := d.item
+    func set(user Generic item, user Array{Generic} arr) _
     
     func get()->(user Generic item)
         item := self.item
         
-; func Data{Generic}.set(user Generic item, user Array{Generic} arr)
-;     user Generic x(user item)
-;     self.item := x
-;     self.arr := arr
-;     new Data{Generic} d
-;     d.item := self.item
-;     self.item := d.item
+func Data.set(user Generic item, user Array{Generic} arr)
+    user Generic x(user item)
+    self.item := x
+    self.arr := arr
+    new Data{Generic} d
+    d.item := self.item
+    self.item := d.item
 
 struct Dataset{First:Second:Third}(Data{First})
     user Second second
