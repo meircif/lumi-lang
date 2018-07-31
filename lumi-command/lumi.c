@@ -118,7 +118,7 @@ void lumi_M_Input_Del(lumi_M_Input* self) {
   LUMI_dec_ref(self->name_Refman);
 }
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.new"
 Returncode lumi_M_Lumi_new(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
@@ -220,7 +220,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.run-command"
 Returncode lumi_M_Lumi_run_command(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* error_msg, Ref_Manager* error_msg_Refman) {
   Returncode LUMI_err = OK;
@@ -255,7 +255,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.get-any-opt-param"
 Returncode lumi_M_Lumi_get_any_opt_param(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* option, Ref_Manager* option_Refman, String* param, Ref_Manager* param_Refman, Int* index, String** value, Ref_Manager** value_Refman) {
   Returncode LUMI_err = OK;
@@ -286,7 +286,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.get-opt-param"
 Returncode lumi_M_Lumi_get_opt_param(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* option, Ref_Manager* option_Refman, String* param, Ref_Manager* param_Refman, Int* index, String** value, Ref_Manager** value_Refman) {
   Returncode LUMI_err = OK;
@@ -310,7 +310,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.check-opt-param-error"
 Returncode lumi_M_Lumi_check_opt_param_error(lumi_M_Lumi* self, Ref_Manager* self_Refman, Bool is_error, String* option, Ref_Manager* option_Refman, String* param, Ref_Manager* param_Refman) {
   Returncode LUMI_err = OK;
@@ -355,7 +355,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.check-param"
 Returncode lumi_M_Lumi_check_param(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* value, Ref_Manager* value_Refman) {
   Returncode LUMI_err = OK;
@@ -392,7 +392,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.concat-lumi-output"
 Returncode lumi_M_Lumi_concat_lumi_output(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
@@ -436,7 +436,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.concat-first-file-name"
 Returncode lumi_M_Lumi_concat_first_file_name(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* target, Ref_Manager* target_Refman, String* name, Ref_Manager* name_Refman) {
   Returncode LUMI_err = OK;
@@ -468,7 +468,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.concat-file-name"
 Returncode lumi_M_Lumi_concat_file_name(lumi_M_Lumi* self, Ref_Manager* self_Refman, String* target, Ref_Manager* target_Refman, String* name, Ref_Manager* name_Refman) {
   Returncode LUMI_err = OK;
@@ -493,7 +493,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.concat-tl-path"
 Returncode lumi_M_Lumi_concat_tl_path(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
@@ -532,7 +532,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.read-input"
 Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
@@ -801,7 +801,7 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   }
   CHECK_REF(218, self, self_Refman)
   CHECK_REF(218, self, self_Refman)
-  if ((self->version < '0') || (self->version > '4')) {
+  if ((self->version < '0') || (self->version > '5')) {
     INIT_STRING_CONST(219, aux_String_18, "error: unsupported version TL");
     LUMI_err = Sys_print(sys, sys_Refman, aux_String_18, aux_String_18_Refman);
     CHECK(219)
@@ -929,7 +929,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.run-lumi"
 Returncode lumi_M_Lumi_run_lumi(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
@@ -997,7 +997,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.run-c"
 Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
@@ -1203,7 +1203,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.run-program"
 Returncode lumi_M_Lumi_run_program(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
@@ -1253,7 +1253,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "Lumi.run"
 Returncode lumi_M_Lumi_run(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
@@ -1303,7 +1303,7 @@ void lumi_M_Lumi_Del(lumi_M_Lumi* self) {
 
 /* global functions body */
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "error-if"
 Returncode lumi_M_error_if(Bool is_error, String* error_msg, Ref_Manager* error_msg_Refman) {
   Returncode LUMI_err = OK;
@@ -1321,7 +1321,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "help"
 Returncode lumi_M_help(void) {
   Returncode LUMI_err = OK;
@@ -1360,7 +1360,7 @@ USER_MAIN_HEADER {
 #undef RETURN_ERROR
 #define RETURN_ERROR return LUMI_err;
 #define LUMI_FUNC_NAME "global variable initialization"
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
   INIT_STRING_CONST(25, aux_String_0, "Usage: lumi [options] file...");
   lumi_M_usage = aux_String_0;
   lumi_M_usage_Refman = aux_String_0_Refman;
@@ -1369,7 +1369,7 @@ USER_MAIN_HEADER {
 #undef LUMI_FUNC_NAME
 #undef RETURN_ERROR
 #define RETURN_ERROR goto LUMI_cleanup
-#define LUMI_FILE_NAME "lumi.4.lm"
+#define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "main"
   INIT_VAR(322, lumi_object)
   LUMI_err = lumi_M_Lumi_new(lumi_object, lumi_object_Refman);

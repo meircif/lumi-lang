@@ -33,9 +33,10 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../TL4/tl4-compiler.c ../TL3/lumi.3.c -I../TL3 -I../TL4 -o lumi/tl4-compiler
 
 # test lumi command C file
-cp $MYDIR/lumi.4.lm lumi/
 pushd lumi
-./tl4-compiler lumi.c lumi.4.lm
+ln -s ../../lumi-command lumi-command
+./tl4-compiler lumi.c lumi-command/lumi.4.lm
+rm lumi-command
 popd
 diff $MYDIR/lumi.c lumi/lumi.c
 

@@ -55,38 +55,38 @@ diff TL5/ut/expression-tests.actual.c TL5/ut/expression-tests.expected.c
 diff TL5/ut/syntax-tree-tests.actual.c TL5/ut/syntax-tree-tests.expected.c
 
 # run tl5-compiler single-file integration test
-ln -s ../../TL5/tests/integration TL5/integration
-TL5/tl5-compiler TL5/test-single.c TL5/integration/test0.5.lm
+ln -s ../../TL5/tests TL5/tests
+TL5/tl5-compiler TL5/test-single.c TL5/tests/integration/test0.5.lm
 $CCA TL5/test-single.c ../TL5/lumi.5.c -I../TL5 -o TL5/test-single
 TL5/test-single > TL5/test-single-output.txt
-diff TL5/integration/single-output.txt TL5/test-single-output.txt
+diff TL5/tests/integration/single-output.txt TL5/test-single-output.txt
 
 # run tl5-compiler multiple-file integration test
-TL5/tl5-compiler -t covered TL5/test-multiple.c TL5/integration/test0.5.lm \
-  TL5/integration/test1.5.lm TL5/integration/test2.5.lm
-$CCA TL5/test-multiple.c TL5/integration/external.c ../TL5/lumi.5.c -I../TL5 \
+TL5/tl5-compiler -t covered TL5/test-multiple.c TL5/tests/integration/test0.5.lm \
+  TL5/tests/integration/test1.5.lm TL5/tests/integration/test2.5.lm
+$CCA TL5/test-multiple.c TL5/tests/integration/external.c ../TL5/lumi.5.c -I../TL5 \
   -o TL5/test-multiple
 TL5/test-multiple -xml > TL5/test-multiple-output.txt
 mkdir TL5/cover-tests
 mv cobertura.xml TL5/cover-tests/
-diff TL5/integration/multiple-output.txt TL5/test-multiple-output.txt
-diff TL5/integration/expected-cobertura.xml TL5/cover-tests/cobertura.xml
+diff TL5/tests/integration/multiple-output.txt TL5/test-multiple-output.txt
+diff TL5/tests/integration/expected-cobertura.xml TL5/cover-tests/cobertura.xml
 
 # run tl5-compiler coverage fail integration test
 TL5/tl5-compiler -t integration TL5/test-uncovered.c \
-  TL5/integration/test0.5.lm TL5/integration/test1.5.lm \
-  TL5/integration/test2.5.lm
-$CCA TL5/test-uncovered.c TL5/integration/external.c ../TL5/lumi.5.c -I../TL5 \
+  TL5/tests/integration/test0.5.lm TL5/tests/integration/test1.5.lm \
+  TL5/tests/integration/test2.5.lm
+$CCA TL5/test-uncovered.c TL5/tests/integration/external.c ../TL5/lumi.5.c -I../TL5 \
   -o TL5/test-uncovered
 ! TL5/test-uncovered > TL5/test-uncovered-output.txt
-diff TL5/integration/uncovered-output.txt TL5/test-uncovered-output.txt
+diff TL5/tests/integration/uncovered-output.txt TL5/test-uncovered-output.txt
 
 # run tl5-compiler error integration test
-TL5/tl5-compiler -t error TL5/test-error.c TL5/integration/error-test.5.lm
+TL5/tl5-compiler -t error TL5/test-error.c TL5/tests/integration/error-test.5.lm
 $CCA TL5/test-error.c ../TL5/lumi.5.c -I../TL5 -o TL5/test-error
 ! TL5/test-error > TL5/test-error-output.txt
-diff TL5/integration/error-output.txt TL5/test-error-output.txt
-rm TL5/integration
+diff TL5/tests/integration/error-output.txt TL5/test-error-output.txt
+rm TL5/tests
 
 
 # TL5 teardown

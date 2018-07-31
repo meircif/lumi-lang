@@ -208,22 +208,26 @@ struct TestStruct
     owner TestStruct ts
     var Func{()} fun
     
-    new(copy Int x, user String s)
-        self.num := x
-        self.text := s
-        if x < 0
-            self.ts := TestStruct(copy x + 1, user s)
+    new(copy Int x, user String s) _
     
     [; Test
     multiline
     comment ;]
     
-    func get()->(var Int x, user String s)
-        x := self.num
-        s := self.text
+    func get()->(var Int x, user String s) _
     
     func print()
         sys.println(user self.text)
+        
+func TestStruct.new(copy Int x, user String s)
+    self.num := x
+    self.text := s
+    if x < 0
+        self.ts := TestStruct(copy x + 1, user s)
+  
+func TestStruct.get()->(var Int x, user String s)
+    x := self.num
+    s := self.text
 
 
 class TestClass
@@ -234,14 +238,18 @@ class TestClass
     new()
         self.num := 1
     
-    func inst static-meth()
-        self.num := 3
+    func inst static-meth() _
         
-    func dynamic dynamic-meth()
-        self.num := 6
+    func dynamic dynamic-meth() _
     
     func inst print()
         sys.println(user self.text)
+    
+func TestClass.static-meth()
+    self.num := 3
+    
+func TestClass.dynamic-meth()
+    self.num := 6
 
 
 func f-test-void()
@@ -372,16 +380,18 @@ struct Data{Generic}
     user Generic item
     user Array{Generic} arr
     
-    func set(user Generic item, user Array{Generic} arr)
-        user Generic x(user item)
-        self.item := x
-        self.arr := arr
-        new Data{Generic} d
-        d.item := self.item
-        self.item := d.item
+    func set(user Generic item, user Array{Generic} arr) _
     
     func get()->(user Generic item)
         item := self.item
+        
+func Data.set(user Generic item, user Array{Generic} arr)
+    user Generic x(user item)
+    self.item := x
+    self.arr := arr
+    new Data{Generic} d
+    d.item := self.item
+    self.item := d.item
 
 struct Dataset{First:Second:Third}(Data{First})
     user Second second
@@ -539,17 +549,19 @@ class ComplexField
 
 struct HasComplexField
     var ComplexField x
-    func run()
-        user ComplexField x(user self.x)
-        x := self.x
-        x.meth()
-        self.x.meth()
-        ComplexField.meth(user self.x)
-        user ComplexField x2(user self.x.x)
-        x2 := self.x.x
-        x2.meth()
-        self.x.x.meth()
-        ComplexField.meth(user self.x.x)
+    func run() _
+
+func HasComplexField.run()
+    user ComplexField x(user self.x)
+    x := self.x
+    x.meth()
+    self.x.meth()
+    ComplexField.meth(user self.x)
+    user ComplexField x2(user self.x.x)
+    x2 := self.x.x
+    x2.meth()
+    self.x.x.meth()
+    ComplexField.meth(user self.x.x)
 
 func test-complex-field()
     var HasComplexField y

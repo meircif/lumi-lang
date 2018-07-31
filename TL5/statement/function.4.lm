@@ -6,13 +6,18 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   var List{TypeCount} aux-variables
   user TypeData parent-type
   owner String name
+  owner String type-name
+  owner String module-name
   user ModuleMembers my-module
   var FunctionArguments arguments
+  user SyntaxTreeFunction implemented-function
   user SyntaxTreeMockFunction mocker-function
   user SyntaxTreeFunction dynamic-base-method
   var Int dynamic-base-count
   var Bool is-dynamic
   var Bool has-user-assign
+  var Bool header-only
+  var Bool external-body
   
   func inst parse-new(user TypeData parent-type)->(
       owner SyntaxTreeFunction new-node)
@@ -42,15 +47,31 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.arguments.new()
   
   func inst parse-body()
+    if self.header-only
+      return
     self.indentation-spaces += INDENTATION-SPACES
     self.parse-block()
     self.indentation-spaces := INDENTATION-SPACES
   
   func inst parse-header(copy Bool is-native)
-    read-new(user "(")->(owner self.name)
-    self.register-name()
+    read-new(user ".(")->(owner self.name)
+    do
+      while glob.last-char = '.'
+      var Char ch(copy self.name[0])
+      var Bool is-module-name(copy ch >= 'a' and ch <= 'z')
+      if self.parent-type? or self.type-name? or
+          (is-module-name and self.module-name?)
+        self.syntax-error(user "misplaced item", user self.name)
+      self.external-body := true
+      if is-module-name
+        self.module-name := self.name
+      else
+        self.type-name := self.name
+      read-new(user ".(")->(owner self.name)
     if glob.last-char != '('
       self.syntax-error-c(user "expected \"(\" after function name, got")
+    if not self.module-name? and not self.type-name?
+      self.register-name()
     self.parse-arguments(copy is-native)
   
   func inst parse-arguments(copy Bool is-native)
@@ -59,6 +80,13 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.arguments.parse(user argument-factory, copy is-native, user dummy-node)
     if self.parent-type?
       self.arguments.add-self-parameter(user self.parent-type)
+    if glob.last-char = ' ' and self.parent-type?
+      read-c()
+      self.header-only := glob.last-char = '_'
+      if self.header-only
+        read-c()
+      else
+        glob.last-char := ' '
   
   func dynamic register-name()
     if not is-legal-name(user self.name, copy NameGroup.DEFAULT)
@@ -131,14 +159,41 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func dynamic link-types()
     if self.my-module?
       glob.current-module := self.my-module
+    if self.type-name?
+      self.find-type(user self.type-name, user self.module-name)->(
+          user self.parent-type)
+      self.parent-type.find-meth(user self.name)->(
+          user self.implemented-function)
+      if not self.implemented-function?
+        self.syntax-error2(
+            user "unknown method",
+            user self.name,
+            user "of type",
+            user self.type-name)
+      self.check-already-implemented()
+      self.arguments.add-self-parameter(user self.parent-type)
     self.arguments.link-types()
     base()
     if self.my-module?
       glob.current-module := _
   
+  func dynamic check-already-implemented()
+    if not self.implemented-function.header-only or
+        self.implemented-function.external-body
+      self.syntax-error2(
+          user "type",
+          user self.type-name,
+          user "already implemented method",
+          user self.name)
+    self.implemented-function.external-body := true
+  
   func dynamic analyze()
     if self.my-module?
       glob.current-module := self.my-module
+    if self.implemented-function?
+      self.arguments.check-same-as(
+          user self.implemented-function.arguments, user _, copy 0)
+      self.my-module := self.implemented-function.my-module
     self.arguments.analyze()
     base()
     if self.my-module?
@@ -157,6 +212,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     ; }
     ; #undef LUMI_FILE_NAME
     ; #undef LUMI_FUNC_NAME
+    if self.header-only
+      return
     self.write-pre-func()
     self.write-header()
     self.write-block()
@@ -216,6 +273,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func dynamic write-declaration()
     ; Returncode `Type`_`name`(`args`);
+    if self.external-body and not self.header-only
+      return
     self.write-header()
     write(user ";\n")
   
@@ -283,7 +342,7 @@ class DeclarationArgument(Argument)
     self.variable.access := self.access
     self.variable.is-output := self.is-output
     if code-node?
-      code-node.get-parent-type()->(user self.variable.parent-type)
+      self.variable.parent := code-node.parent
     self.variable.type-instance := TypeInstance()
     self.variable.type-instance.parse(user " ", user self, user _)
     if glob.last-char != ' '
@@ -291,7 +350,7 @@ class DeclarationArgument(Argument)
     read-new(user ",)")->(owner self.variable.name)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
-    parent-type := self.variable.parent-type
+    self.variable.get-parent-type()->(user parent-type)
   
   func dynamic link-types()
     self.variable.type-instance.link-types(user self)
