@@ -3,56 +3,41 @@ module tl5-compiler
 
 ~~~ The `base` method expression ~~~
 class BaseMethExpression(Expression)
-  var Bool is-call
-  user SyntaxTreeFunction function
-  user TypeData parent-type
-  var Int bases
-  
-  new(user SyntaxTreeCode code-node, copy Bool is-call)
+  new(user SyntaxTreeCode code-node)
     base(user code-node)
-    self.is-call := is-call
     self.access := Access.VAR
-  
-  func dynamic analyze()
-    user SyntaxTreeFunction function
-    self.code-node.get-function()->(user function)
-    self.parent-type := function.parent-type
-    if not self.parent-type?
+
+  func dynamic restructure()->(
+      owner Expression expression, owner FunctionArguments arguments)
+    user SyntaxTreeFunction parent-function
+    self.code-node.get-function()->(user parent-function)
+    if not parent-function.parent-type?
       self.syntax-error-msg(user "\"base\" used not in method")
-    if not self.parent-type.base-type?
+    if not parent-function.parent-type.base-type?
       self.syntax-error(
-          user "no base type for type", user function.parent-type.name)
-    if self.is-call
-      self.parent-type.base-type.type-data.find-meth(user function.name)->(
-          user self.function, var self.bases)
-      if not self.function?
-        self.syntax-error(
-            user "no base method for method", user function.name)
-      self.set-simple-type(user glob.type-func)
-      self.function.arguments.copy-new()->(owner self.result-type.arguments)
-    else
-      self.set-simple-type(user glob.type-base)
-      self.result-type.add-subtype-copy(user self.parent-type)
-  
-  func dynamic analyze-call(user FunctionArguments arguments)->(
-      user TypeInstance instance-type,
-      var Int bases,
-      var Bool is-function-object)
-    is-function-object := false
-    instance-type := self.parent-type.base-type
-    bases := self.bases
-    new CallArgument self-param
-    self-param.set-location()
-    self-param.access := self.function.arguments.parameters.first.item.access
-    self-param.value := BaseMethExpression(user self.code-node, copy false)
-    self.parent-type.self-type-instance()->(owner self-param.value.result-type)
-    arguments.parameters.prepend(owner self-param)
-  
-  func dynamic write()
-    if self.is-call
-      self.function.write-cname()
-    else
-      write(user "self")
+          user "no base type for type", user parent-function.parent-type.name)
+    self.set-simple-type(user glob.type-base)
+    self.result-type.add-subtype-copy(user parent-function.parent-type)
+    
+    if not arguments?
+      return
+      
+    user SyntaxTreeFunction function
+    var Int bases
+    parent-function.parent-type.base-type.type-data.find-meth(
+        user parent-function.name)->(user function, var bases)
+    if not function?
+      self.syntax-error(
+          user "no base method for method", user parent-function.name)
+    
+    expression := FunctionExpression(
+        user self.code-node,
+        user function,
+        owner expression,
+        copy bases,
+        copy false,
+        copy true)
+    expression.restructure()->(owner expression, owner arguments)
 
 
 ~~~ Up-cast expression ~~~
@@ -67,7 +52,6 @@ class UpCastExpression(Expression)
   
   func inst init(copy Int bases, owner Expression expression)
     self.expression := expression
-    self.expression.top := false
     self.bases := bases
     self.expression.result-type.copy-new()->(owner self.result-type)
     self.access := self.expression.access
@@ -78,18 +62,16 @@ class UpCastExpression(Expression)
   func dynamic write()
     ; &(`expression`->_base[._base]...)
     self.write-pre()
-    self.expression.write()
+    self.expression.write-safe()
     self.write-post()
   
   func dynamic write-dynamic()
     self.write-pre()
-    self.expression.write-dynamic()
+    self.expression.write-dynamic-safe()
     self.write-post()
   
   func dynamic write-refman()
-    self.expression.top := true
     self.expression.write-refman()
-    self.expression.top := false
   
   func inst write-pre()
     write(user "&(")
@@ -109,7 +91,7 @@ class ModuleTypeExpression(Expression)
   owner Expression module-expression
   
   func inst analyze-module()
-    self.module-expression.analyze()
+    analyze-expression()->(owner self.module-expression)
     if not self.module-expression.result-type?
       self.code-node.syntax-error-msg(
           user "expected module, got empty expression")

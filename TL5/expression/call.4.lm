@@ -3,48 +3,21 @@ module tl5-compiler
 
 ~~~ Function call expression ~~~
 class CallExpression(Expression)
-  owner Expression function
-  var FunctionArguments arguments
+  owner FunctionArguments arguments
   user Expression output
-  var Bool is-function-object
-  
-  new(user SyntaxTreeCode code-node)
-    base(user code-node)
-    self.arguments.new()
-  
-  func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
-      owner Expression expression)
-    new CallExpression call-expression(user code-node)
-    call-expression.parse(owner expression)
-    expression := call-expression
-  
-  func inst parse(owner Expression function)
-    self.function := function
-    var CallArgumentFactory argument-factory
-    self.arguments.parse(user argument-factory, copy false, user self.code-node)
-  
-  func dynamic analyze()
-    self.function.analyze()
-    self.arguments.analyze()
-    if not self.function.result-type?
-      self.syntax-error-msg(user "void expression is not callable")
-    if self.function.result-type.type-data is-not glob.type-func
-      self.syntax-error(
-          user "non callable type",
-          user self.function.result-type.type-data.name)
-    user FunctionArguments declaration(user self.function.result-type.arguments)
-    user TypeInstance instance-type
-    var Int bases
-    self.function.analyze-call(user self.arguments)->(
-        user instance-type, var bases, var self.is-function-object)
+
+  func inst analyze-declaration(
+      user FunctionArguments declaration,
+      user TypeInstance actual-params,
+      copy Int bases)
     user TypeInstance result-type
     declaration.get-result-type()->(var self.access, user result-type)
     if not self.is-statement
-      result-type.new-replace-params(user instance-type, copy bases)->(
+      result-type.new-replace-params(user actual-params, copy bases)->(
           owner self.result-type)
       result-type := self.result-type
     if self.arguments.check-same-as(
-        user declaration, user instance-type, copy bases)
+        user declaration, user actual-params, copy bases)
       ; add omitted output
       new CallArgument output
       output.set-location()
@@ -64,44 +37,150 @@ class CallExpression(Expression)
     else-if self.result-type?
       self.arguments.get-output()->(user self.output)
     self.assignable := self.result-type?
-  
+
   func dynamic write-preactions()
     self.arguments.write-preactions()
-    self.function.write-preactions()
-    if self.is-function-object
-      write(user "if (")
-      self.function.write-as-top()
-      write(user " == NULL) ")
-      self.write-raise(user "empty_object")
-      self.code-node.write-spaces()
+    self.write-function-check()
     if not self.is-statement
       self.write-func-call()
       self.code-node.write-spaces()
-  
+
+  func dynamic write-function-check()
+    ; no check
+    
   func dynamic write()
     if self.is-statement
       self.write-func-call()
-    else-if self.output?
-      self.output.top := self.top
+    else
       self.output.write()
-      self.output.top := true
-  
-  func dynamic write-refman()
-    if self.output?
-      self.output.top := self.top
-      self.output.write-refman()
-      self.output.top := true
-  
-  func dynamic write-dynamic()
-    if self.output?
-      self.output.top := self.top
-      self.output.write-dynamic()
-      self.output.top := true
-  
+      
+  func dynamic write-safe()
+    self.output.write-safe()
+
   func inst write-func-call()
     write(user "LUMI_err = ")
-    self.function.write()
+    self.write-function()
     self.code-node.write-call(user self.arguments)
+
+  func dynamic write-function()
+    raise
+  
+  func dynamic write-refman()
+    self.output.write-refman()
+  
+  func dynamic write-refman-safe()
+    self.output.write-refman-safe()
+  
+  func dynamic write-dynamic()
+    self.output.write-dynamic()
+  
+  func dynamic write-dynamic-safe()
+    self.output.write-dynamic-safe()
+
+class FunctionCallExpression(CallExpression)
+  owner FunctionExpression function
+  user TypeInstance actual-params
+
+  new(user SyntaxTreeCode code-node,
+      user FunctionExpression function,
+      owner FunctionArguments arguments,
+      user TypeInstance actual-params)
+    base(user code-node)
+    self.arguments := arguments
+    function.move-new()->(owner self.function)
+    self.actual-params := actual-params
+
+  func dynamic analyze()
+    self.analyze-declaration(
+        user self.function.function.arguments,
+        user self.actual-params,
+        copy self.function.bases)
+
+  func dynamic write-function()
+    self.function.write()
+
+
+class DynamicCallExpression(FunctionCallExpression)
+  user Expression self-instance
+  
+  new(user SyntaxTreeCode code-node,
+      user FunctionExpression function,
+      owner FunctionArguments arguments,
+      user TypeInstance actual-params,
+      user Expression self-instance)
+    self.self-instance := self-instance
+    function.bases += function.function.dynamic-base-count
+    function.function := function.function.dynamic-base-method
+    base(user code-node, user function, owner arguments, user actual-params)
+
+  func dynamic write-function-check()
+    ; if (`instance`_Dynamic == NULL) RAISE(`line`, empty_object)
+    write(user "if (")
+    self.self-instance.write-dynamic()
+    write(user " == NULL) ")
+    self.write-raise(user "empty_object")
+    self.code-node.write-spaces()
+
+  func dynamic write-function()
+    self.self-instance.write-dynamic-safe()
+    self.write-bases()
+    write-cname(user self.function.function.name)
+
+  func inst write-bases()
+    write(user "->")
+    for n in self.function.bases
+      write(user "_base.")
+
+
+class FunctionObjectCallExpression(CallExpression)
+  owner Expression function-object
+  
+  new(user SyntaxTreeCode code-node)
+    base(user code-node)
+    self.arguments := FunctionArguments()
+  
+  func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new FunctionObjectCallExpression call-expression(user code-node)
+    call-expression.parse(owner expression)
+    expression := call-expression
+  
+  func inst parse(owner Expression function-object)
+    self.function-object := function-object
+    var CallArgumentFactory argument-factory
+    self.arguments.parse(user argument-factory, copy false, user self.code-node)
+  
+  func dynamic restructure()->(
+      owner Expression expression, owner FunctionArguments arguments)
+    self.arguments.analyze()
+    self.function-object.restructure()->(
+        owner self.function-object, owner self.arguments)
+    if not self.arguments?
+      expression := self.function-object
+  
+  func dynamic analyze()
+    self.function-object.analyze()
+    if not self.function-object.result-type?
+      self.syntax-error-msg(user "void expression is not callable")
+    if self.function-object.result-type.type-data is-not glob.type-func
+      self.syntax-error(
+          user "non callable type",
+          user self.function-object.result-type.type-data.name)
+    self.analyze-declaration(
+        user self.function-object.result-type.arguments,
+        user self.function-object.result-type,
+        copy 0)
+  
+  func dynamic write-function-check()
+    self.function-object.write-preactions()
+    write(user "if (")
+    self.function-object.write()
+    write(user " == NULL) ")
+    self.write-raise(user "empty_object")
+    self.code-node.write-spaces()
+
+  func dynamic write-function()
+    self.function-object.write-safe()
 
 
 ~~~ Function argument call ~~~
@@ -121,13 +200,13 @@ class CallArgument(Argument)
       self.syntax-error-c(user "expected \",\" or \")\", got")
   
   func dynamic analyze()
-    self.value.analyze()
+    analyze-expression()->(owner self.value)
     if self.is-output and not self.value.assignable
       self.syntax-error-msg(user "non assignable call output")
   
   func dynamic check-same-type-as(
       user TypeInstance type-instance,
-      user TypeInstance instance-type,
+      user TypeInstance actual-params,
       copy Int bases)
     if self.access = Access.OWNER and self.value.access != Access.OWNER
       self.syntax-error(
@@ -141,7 +220,7 @@ class CallArgument(Argument)
           user glob.access-names[self.value.access])
     
     owner TypeInstance real-type
-    type-instance.new-replace-params(user instance-type, copy bases)->(
+    type-instance.new-replace-params(user actual-params, copy bases)->(
         owner real-type)
     if self.is-output
       self.is-down-cast := real-type.check-assign-to(
@@ -193,9 +272,9 @@ class CallArgument(Argument)
       if self.is-output
         write(user "&(")
       if self.value.is-generic-cast
-        self.value.top := false
-      self.value.write-dynamic()
-      self.value.top := true
+        self.value.write-dynamic-safe()
+      else
+        self.value.write-dynamic()
       if self.is-output
         write(user ")")
     else-if self.is-generic

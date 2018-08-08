@@ -76,7 +76,7 @@ class SyntaxTreeNode
           user "expected", user expected-text, user "got", user actual-text)
   
   func inst analyze-expression(
-      user Expression expression, user TypeData expected-type)
+      user ExpressionValue expression, user TypeData expected-type)
     expression.analyze()
     if not expression.result-type?
       self.syntax-error(

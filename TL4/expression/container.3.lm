@@ -442,6 +442,8 @@ class QuestionExpression(Expression)
       self.m-syntax-error(
           user "cannot use \"?\" on type",
           user self.tested.result-type.type-data.name)
+    if self.tested.is-complex-field
+      self.m-syntax-error-msg(user "cannot use \"?\" on complex field")
     self.set-simple-type(user glob.type-bool)
     self.access := ACCESS-VAR
   

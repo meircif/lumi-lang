@@ -118,7 +118,7 @@ class CharExpression(TextExpression)
 
 ~~~ Constant string expression ~~~
 class StringExpression(TextExpression)
-  owner SymbolExpression symbol
+  owner VariableExpression aux-variable
   
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
@@ -171,21 +171,21 @@ class StringExpression(TextExpression)
   
   func dynamic analyze()
     self.add-aux-variable(copy Access.VAR, copy false, user self.result-type)->(
-        owner self.symbol)
+        owner self.aux-variable)
   
   func dynamic write-preactions()
     ; INIT_STRING_CONST(`line`, `symbol`, `text`)
     write(user "INIT_STRING_CONST(")
     self.write-line-num()
     write(user ", ")
-    self.symbol.write()
+    self.aux-variable.write()
     write(user ", ")
     write(user self.text)
     write(user ");\n")
     self.code-node.write-spaces()
   
   func dynamic write()
-    self.symbol.write()
+    self.aux-variable.write()
 
 
 ~~~ Constant empty expression `_` ~~~

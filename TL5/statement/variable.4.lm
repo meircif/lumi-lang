@@ -311,13 +311,13 @@ class VariableInit(SyntaxTreeCode)
     self.expression-init.parse(
         owner variable.type-instance.copy-new(), owner _)
     self.expression-init.is-statement := true
-    self.expression-init.symbol := SymbolExpression(user self)
+    self.expression-init.aux-variable := VariableExpression(user self)
     string-new-copy(user variable.name)->(
-        owner self.expression-init.symbol.name)
-    self.expression-init.symbol.variable := variable
+        owner self.expression-init.aux-variable.name)
+    self.expression-init.aux-variable.variable := variable
     variable.type-instance.copy-new()->(
-        owner self.expression-init.symbol.result-type)
-    self.expression-init.symbol.access := variable.access
+        owner self.expression-init.aux-variable.result-type)
+    self.expression-init.aux-variable.access := variable.access
   
   func dynamic analyze()
     if self.parent is glob.root.global-init
@@ -340,7 +340,7 @@ class VariableInit(SyntaxTreeCode)
 
 
 class SyntaxTreeConstant(SyntaxTreeVariable)
-  owner Expression value
+  var ExpressionValue value
   var Bool is-ordered
   var Bool ordering
   
@@ -364,7 +364,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
       self.syntax-error(user "illegal constant name", user self.name)
     if glob.last-char != ' '
       self.syntax-error-c(user "expected space after constant name, got")
-    parse-new-expression(user "", user self)->(owner self.value)
+    self.value.new(user "", user self)
     glob.type-int.new-type-instance()->(owner self.type-instance)
     self.my-module.variable-map.add(user self.name, user self)
   

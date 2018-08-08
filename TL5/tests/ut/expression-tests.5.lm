@@ -450,6 +450,11 @@ b := t.fun?
 b := to?
 ; @ c t4
 b := fun7(user _)->(user to)?
+; @ g t5
+struct Test
+    user String s
+    func meth()->(var Bool res)
+        res := self.s?
 ; @ ec te0
 (i := 2)?
 ; @ ec te1
@@ -530,6 +535,9 @@ farr[3]()
 ; @ c t6
 var Func{(copy Int x,
         copy Int y)} fun
+; @ g t7
+func mock()->(var Func{()} f)
+    f()
 ; @ ec te0
 var Func error
 ; @ ec te1

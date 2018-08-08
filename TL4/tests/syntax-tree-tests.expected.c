@@ -4271,6 +4271,8 @@ recursive declaration of type "Test", variable of type "Base", variable of type 
 recursive declaration of type "Abase", extended by type "Aerror", variable of type "Bbase", extended by type "Berror", variable of type "Abase"
 /// @ te5
 assigning into non assignable expression
+/// @ te6
+cannot use "?" on complex field
 /// @@ test-enum
 /// @ t0
 enum {

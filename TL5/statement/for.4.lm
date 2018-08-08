@@ -5,9 +5,9 @@ module tl5-compiler
 class SyntaxTreeForLoop(SyntaxTreeFlowElement)
   owner String item-name
   user SyntaxTreeVariable item
-  owner Expression start
-  owner Expression iterator
-  owner SymbolExpression aux-symbol
+  var ExpressionValue start
+  var ExpressionValue iterator
+  owner VariableExpression aux-variable
   user SyntaxTreeFunction has-func
   user SyntaxTreeFunction get-func
   user SyntaxTreeFunction next-func
@@ -22,16 +22,16 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     if glob.last-char != ' '
       self.syntax-error-c(user "expected space after index name, got")
     self.read-expect(user "in ")
-    parse-new-expression(user ":", user self)->(owner self.iterator)
+    self.iterator.new(user ":", user self)
     if glob.last-char = ':'
-      self.start := self.iterator
-      parse-new-expression(user "", user self)->(owner self.iterator)
+      self.start.expression := self.iterator.expression
+      self.iterator.new(user ":", user self)
     
     self.parse-block(copy true)
   
   func dynamic analyze()
     owner TypeInstance type-instance
-    if self.start?
+    if self.start.parsed()
       self.analyze-expression(user self.start, user glob.type-int)
       self.analyze-expression(user self.iterator, user glob.type-int)
       glob.type-int.new-type-instance()->(owner type-instance)
@@ -70,13 +70,14 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.item-name := _
     
     if self.iterator.result-type.type-data is-not glob.type-int
-      self.aux-symbol := SymbolExpression(user self)
-      self.iterator.result-type.copy-new()->(owner self.aux-symbol.result-type)
+      self.aux-variable := VariableExpression(user self)
+      self.iterator.result-type.copy-new()->(
+          owner self.aux-variable.result-type)
       self.get-function().add-aux-variable(
           copy Access.USER, copy false, user self.iterator.result-type)->(
-          user self.aux-symbol.variable)
-      string-new-copy(user self.aux-symbol.variable.name)->(
-          owner self.aux-symbol.name)
+          user self.aux-variable.variable)
+      string-new-copy(user self.aux-variable.variable.name)->(
+          owner self.aux-variable.name)
       self.get-function().has-user-assign := true
     
     base()
@@ -149,13 +150,15 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
   
   func dynamic write()
     user TypeData iterator-type(user self.iterator.result-type.type-data)
-    if self.aux-symbol?
+    if self.aux-variable?
       self.write-assign(
-          user self.aux-symbol.variable, owner self.iterator, user self.parent)
+          user self.aux-variable.variable,
+          owner self.iterator.expression,
+          user self.parent)
     self.write-spaces()
-    if self.start?
+    if self.start.parsed()
       self.start.write-preactions()
-    if not self.aux-symbol?
+    if not self.aux-variable?
       self.iterator.write-preactions()
     if iterator-type is glob.type-int
       self.write-int-iter()
@@ -164,9 +167,9 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       self.write-seq()
     else
       self.write-iter()
-    if self.aux-symbol?
+    if self.aux-variable?
       self.write-assign(
-          user self.aux-symbol.variable,
+          user self.aux-variable.variable,
           owner EmptyExpression(),
           user self.parent)
   
@@ -177,18 +180,19 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     var SyntaxTreeExpression expression-node(user parent)
     value.code-node := expression-node
     
-    new SymbolExpression symbol(user expression-node)
-    string-new-copy(user item.name)->(owner symbol.name)
-    item.type-instance.copy-new()->(owner symbol.result-type)
+    new VariableExpression aux-variable(user expression-node)
+    aux-variable.variable := item
+    string-new-copy(user item.name)->(owner aux-variable.name)
+    item.type-instance.copy-new()->(owner aux-variable.result-type)
     
-    new BinaryExpression assign(user expression-node)
-    assign.top := true
+    new BinaryExpression assign(user expression-node, user _)
     assign.is-statement := true
-    assign.left-expression := symbol
+    assign.left-expression := aux-variable
     glob.operator-map.find(user ":=")->(user assign.operator)
     assign.right-expression := value
+    assign.safe-operand-write := false
     
-    expression-node.expression := assign
+    expression-node.expression.expression := assign
     expression-node.write()
   
   func inst write-int-iter()
@@ -198,7 +202,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     write(user "for (")
     write-cname(user self.item.name)
     write(user " = ")
-    if self.start?
+    if self.start.parsed()
       self.start.write()
     else
       write(user "0")
@@ -216,7 +220,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     ;   `item` = `aux-var`[`item`_Index];
     ;   `block...`
     ; }}
-    self.aux-symbol.write-check-ref()
+    self.aux-variable.write-check-ref()
     self.write-spaces()
     write(user "{int ")
     write-cname(user self.item.name)
@@ -225,19 +229,20 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     write(user "_Index = 0; ")
     write-cname(user self.item.name)
     write(user "_Index < ")
-    self.aux-symbol.write()
+    self.aux-variable.write()
     write(user "->length; ++")
     write-cname(user self.item.name)
     write(user "_Index) {\n")
     
-    new SymbolExpression index-symbol(user self)
-    string-new-concat(user self.item.name, user "_Index")->(
-        owner index-symbol.name)
+    var SyntaxTreeVariable variable(user self.parent)
+    string-new-concat(user self.item.name, user "_Index")->(owner variable.name)
+    
+    new VariableExpression index-variable(user self)
+    index-variable.variable := variable
     new SliceExpression slice(user self)
-    slice.top := true
     slice.line-number := self.line-number
-    self.aux-symbol.copy-new()->(owner slice.sequence)
-    slice.index := index-symbol
+    self.aux-variable.copy-new()->(owner slice.sequence)
+    slice.index := index-variable
     self.item.type-instance.copy-new()->(owner slice.result-type)
     self.parent.indentation-spaces += INDENTATION-SPACES
     self.write-assign(user self.item, owner slice, user self.block)
@@ -263,11 +268,16 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     write-cname(user self.item.name)
     write(user "_Has = false;\n")
     
-    new SymbolExpression has-symbol(user self)
-    string-new-concat(user self.item.name, user "_Has")->(owner has-symbol.name)
-    glob.type-bool.new-type-instance()->(owner has-symbol.result-type)
+    var SyntaxTreeVariable variable(user self.parent)
+    string-new-concat(user self.item.name, user "_Has")->(owner variable.name)
+    
+    new VariableExpression has-variable(user self)
+    has-variable.variable := variable
+    string-new-concat(user self.item.name, user "_Has")->(
+        owner has-variable.name)
+    glob.type-bool.new-type-instance()->(owner has-variable.result-type)
     new CallArgument has-arg
-    has-arg.value := has-symbol
+    has-arg.value := has-variable
     self.write-iter-meth(user self.has-func, owner has-arg)
     
     self.block.write-spaces()
@@ -275,11 +285,12 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     write-cname(user self.item.name)
     write(user "_Has) break;\n")
     
-    new SymbolExpression item-symbol(user self)
-    string-new-copy(user self.item.name)->(owner item-symbol.name)
-    self.item.type-instance.copy-new()->(owner item-symbol.result-type)
+    new VariableExpression item-variable(user self)
+    item-variable.variable := self.item
+    string-new-copy(user self.item.name)->(owner item-variable.name)
+    self.item.type-instance.copy-new()->(owner item-variable.result-type)
     new CallArgument item-arg
-    item-arg.value := item-symbol
+    item-arg.value := item-variable
     item-arg.is-dynamic := item-arg.value.result-type.type-data.is-dynamic
     item-arg.is-generic :=
         self.get-func.arguments.outputs.first.item.get-type-instance().type-data is
@@ -297,12 +308,32 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     var SyntaxTreeExpression expression-node(user self.block)
     
     new CallArgument self-arg
-    self-arg.is-dynamic := self.aux-symbol.result-type.type-data.is-dynamic
-    self.aux-symbol.copy-new()->(owner self-arg.value)
+    self-arg.is-dynamic := self.aux-variable.result-type.type-data.is-dynamic
+    self.aux-variable.copy-new()->(owner self-arg.value)
     
-    new CallExpression call(user self)
+    owner CallExpression call
+    new FunctionArguments arguments
+    new FunctionExpression function(
+        user self,
+        user meth,
+        owner self.aux-variable.copy-new(),
+        copy 0,
+        copy false,
+        copy false)
+    if meth.is-dynamic
+      call := DynamicCallExpression(
+          user self,
+          user function,
+          owner arguments,
+          user self.aux-variable.result-type,
+          user self.aux-variable)
+    else
+      call := FunctionCallExpression(
+          user self,
+          user function,
+          owner arguments,
+          user self.aux-variable.result-type)
     call.line-number := self.line-number
-    call.top := true
     call.is-statement := true
     call.arguments.parameters.add(owner self-arg)
     if output-arg?
@@ -310,17 +341,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
       output-arg.code-node := expression-node
       call.arguments.outputs.add(owner output-arg)
     
-    if meth.is-dynamic
-      new MemberExpression member(user self)
-      member.function := meth
-      member.dynamic-call-self-instance := self.aux-symbol
-      call.function := member
-    else
-      new SymbolExpression symbol(user self)
-      symbol.function := meth
-      call.function := symbol
-    
-    expression-node.expression := call
+    expression-node.expression.expression := call
     self.parent.indentation-spaces += INDENTATION-SPACES
     expression-node.write()
     self.parent.indentation-spaces -= INDENTATION-SPACES

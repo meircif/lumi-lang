@@ -178,10 +178,10 @@ CHECK_REF(1, ut_M_tc, ut_M_tc_Refman)
 CHECK_REF(1, ut_M_tc, ut_M_tc_Refman)
     ut_M_i = ut_M_tc->_base._base._base.num;
 /// @ t3
-CHECK_REF(1, *to, (*to_Refman))
+CHECK_REF(1, *to, *to_Refman)
     ut_M_i = (*to)->num;
 /// @ t4
-CHECK_REF(1, *tco, (*tco_Refman))
+CHECK_REF(1, *tco, *tco_Refman)
     ut_M_i = (*tco)->_base._base._base.num;
 /// @ t5
 CHECK_REF(1, ut_M_t, ut_M_t_Refman)
@@ -848,6 +848,28 @@ if (*to != NULL) RAISE(1, empty_base_output)
     LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(*to), &(*to_Refman), (void*)&(*to_Dynamic));
     CHECK(1)
     ut_M_b = (*to) != NULL && (*to_Refman)->value != NULL;
+/// @ t5
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    String* s;
+    Ref_Manager* s_Refman;
+};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Bool* res);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Bool* res) {
+    Returncode LUMI_err = OK;
+    LUMI_inc_ref(self_Refman);
+    CHECK_REF(4, self, self_Refman)
+    *res = self->s != NULL && self->s_Refman->value != NULL;
+LUMI_cleanup:
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->s_Refman);
+}
 /// @ te0
 cannot use "?" on void expression
 /// @ te1
@@ -1111,6 +1133,16 @@ Returncode (*farr_Values[38])(void) = {0};
     CHECK(3)
 /// @ t6
 Returncode (*fun)(Int x, Int y) = NULL;
+/// @ t7
+Returncode ut_M_mock(Returncode (**f)(void));
+Returncode ut_M_mock(Returncode (**f)(void)) {
+    Returncode LUMI_err = OK;
+    if (*f == NULL) RAISE(2, empty_object)
+    LUMI_err = (*f)();
+    CHECK(2)
+LUMI_cleanup:
+    return LUMI_err;
+}
 /// @ te0
 missing arguments in function type
 /// @ te1

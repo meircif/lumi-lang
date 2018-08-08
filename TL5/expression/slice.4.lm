@@ -6,7 +6,7 @@ class SliceExpression(Expression)
   owner Expression sequence
   owner Expression index
   owner Expression second-index
-  owner SymbolExpression slice-symbol
+  owner VariableExpression slice-variable
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
       owner Expression expression)
@@ -27,7 +27,7 @@ class SliceExpression(Expression)
     read-c()
   
   func dynamic analyze()
-    self.sequence.analyze()
+    analyze-expression()->(owner self.sequence)
     if not self.sequence.result-type?
       self.syntax-error-msg(user "cannot slice a void expression")
     if self.sequence.result-type.type-data is glob.type-string
@@ -48,16 +48,16 @@ class SliceExpression(Expression)
       self.assignable := self.sequence.assignable and
           self.result-type.type-data.is-primitive
     
-    self.index.analyze()
+    analyze-expression()->(owner self.index)
     self.check-index(user self.index)
     
     if self.second-index?
-      self.second-index.analyze()
+      analyze-expression()->(owner self.second-index)
       self.check-index(user self.second-index)
       self.sequence.result-type.copy-new()->(owner self.result-type)
       self.add-aux-variable(
           copy Access.VAR, copy false, user self.result-type)->(
-          owner self.slice-symbol)
+          owner self.slice-variable)
   
   func inst check-index(user Expression index)
     if index.result-type?
@@ -75,24 +75,24 @@ class SliceExpression(Expression)
     
     if self.second-index?
       self.second-index.write-preactions()
-      self.write-init-var-ref(user self.slice-symbol)
+      self.write-init-var-ref(user self.slice-variable)
       ; symbol_Var.length = second;
       ; symbol_Var.max_length = symbol.length + 1;
       ; symbol_Var.values = (seq)->values + (index);
       ; symbol_Var.values = (Byte*)((seq)->values) + (index);
       self.code-node.write-spaces()
-      self.slice-symbol.write()
+      self.slice-variable.write()
       write(user "_Var.length = ")
       self.second-index.write()
       write(user ";\n")
       self.code-node.write-spaces()
       if self.sequence.result-type.type-data is glob.type-string
-        self.slice-symbol.write()
+        self.slice-variable.write()
         write(user "_Var.max_length = ")
-        self.slice-symbol.write()
+        self.slice-variable.write()
         write(user "_Var.length + 1;\n")
         self.code-node.write-spaces()
-      self.slice-symbol.write()
+      self.slice-variable.write()
       write(user "_Var.values = (")
       if self.sequence.result-type.type-data is-not glob.type-string
         write(user "Byte*)((")
@@ -133,14 +133,12 @@ class SliceExpression(Expression)
   
   func dynamic write()
     if self.second-index?
-      self.slice-symbol.write()
+      self.slice-variable.write()
       return
     
     ; ((seq)->values)[index]
     ; ((Prmitive*)((seq)->values))[index]
     ; ((Complex*)((seq)->values)) + index
-    if not self.top
-      write(user "(")
     write(user "((")
     if self.sequence.result-type.type-data is-not glob.type-string
       if self.result-type.type-data is glob.type-func and
@@ -161,8 +159,9 @@ class SliceExpression(Expression)
     self.index.write()
     if self.result-type.type-data.is-primitive
       write(user "]")
-    if not self.top
-      write(user ")")
+    
+  func dynamic write-safe()
+    self.write-with-brackets()
   
   func dynamic write-dynamic()
     write(user "&")

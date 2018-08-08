@@ -31,7 +31,7 @@ class Argument(SyntaxTreeNode)
     raise
   
   func inst check-same-as(
-      user Argument other, user TypeInstance instance-type, copy Int bases)
+      user Argument other, user TypeInstance actual-params, copy Int bases)
     if self.access != other.access
       self.syntax-error2(
           user "expected access",
@@ -39,12 +39,12 @@ class Argument(SyntaxTreeNode)
           user ", got",
           user glob.access-names[self.access])
     self.check-same-type-as(
-        user other.get-type-instance(), user instance-type, copy bases)
+        user other.get-type-instance(), user actual-params, copy bases)
     self.is-native := other.is-native
   
   func dynamic check-same-type-as(
       user TypeInstance type-instance,
-      user TypeInstance instance-type,
+      user TypeInstance actual-params,
       copy Int bases)
     self.get-type-instance().check-equal(user type-instance, user self)
   
@@ -182,7 +182,7 @@ class FunctionArguments(SyntaxTreeNode)
   
   func inst check-same-as(
       user FunctionArguments other,
-      user TypeInstance instance-type,
+      user TypeInstance actual-params,
       copy Int bases)->(
       var Bool output-ommited)
     var ListIterator{Argument} my-iter(user self.parameters)
@@ -190,7 +190,7 @@ class FunctionArguments(SyntaxTreeNode)
     for parameter in my-iter
       while other-iter.has()
       parameter.check-same-as(
-          user other-iter.get(), user instance-type, copy bases)
+          user other-iter.get(), user actual-params, copy bases)
       other-iter.next()
     if my-iter.has()
       self.syntax-error-msg(user "too many parameters")
@@ -202,7 +202,7 @@ class FunctionArguments(SyntaxTreeNode)
     for output in my-iter
       while other-iter.has()
       output.check-same-as(
-          user other-iter.get(), user instance-type, copy bases)
+          user other-iter.get(), user actual-params, copy bases)
       other-iter.next()
     if my-iter.has()
       self.syntax-error-msg(user "too many outputs")

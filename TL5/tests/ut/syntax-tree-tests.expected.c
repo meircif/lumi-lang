@@ -2147,7 +2147,7 @@ mock delete should have no arguments
 /// @ te28
 mock delete should have no arguments
 /// @ te29
-mock function has no member "error"
+type "Func" has no member "error"
 /// @ te30
 accessing mock function field in dynamic call to "meth"
 /// @ te31
@@ -4232,7 +4232,7 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_T
         LUMI_dec_ref(aux_Ref_Manager);
         aux_Ref_Manager = NULL;
         *s = t;
-        if (aux_TestIterator_0_Dynamic == NULL) RAISE(8, empty_object)
+        if (aux_TestIterator_0_Dynamic == NULL) RAISE(7, empty_object)
         LUMI_err = aux_TestIterator_0_Dynamic->next(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic);
         CHECK(7)
     }
@@ -4425,6 +4425,8 @@ recursive declaration of type "Test", variable of type "Base", variable of type 
 recursive declaration of type "Abase", extended by type "Aerror", variable of type "Bbase", extended by type "Berror", variable of type "Abase"
 /// @ te5
 assigning into non assignable expression
+/// @ te6
+cannot use "?" on complex field
 /// @@ test-enum
 /// @ t0
 enum {
