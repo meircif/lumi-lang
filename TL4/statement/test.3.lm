@@ -44,7 +44,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     if end = ','
       read-c():(copy end)
       if end = '\n'
-        self.read-line-break-spaces()
+        self.read-parent-line-break-spaces()
       else-if end != ' '
         self.m-syntax-error-c(user "expected space after \",\", got", copy end)
       read-new(user ""):(owner self.expected-error, copy end)

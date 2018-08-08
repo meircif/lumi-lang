@@ -42,9 +42,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     self.is-create := is-create
     new TypeInstance in self.type-instance
     if self.is-create
-      self.type-instance.parse(user " ", user self, user self):(copy end)
+      self.type-instance.parse(user " ", user self, user self, copy 2):(
+          copy end)
     else
-      self.type-instance.parse(user " ", user self, user _):(copy end)
+      self.type-instance.parse(user " ", user self, user _, copy 2):(copy end)
     if end != ' '
       self.m-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user "("):(owner self.name, copy end)

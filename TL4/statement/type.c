@@ -81,7 +81,7 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
     self->base_type = malloc(sizeof(TypeInstance));
     if (self->base_type == NULL) RAISE(43)
     *self->base_type = (TypeInstance){NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-    CHECK(44, TypeInstance_parse(self->base_type, &(String){2, 1, ")"}, &(self->_base._base._base), NULL, &((*end))) )
+    CHECK(44, TypeInstance_parse(self->base_type, &(String){2, 1, ")"}, &(self->_base._base._base), NULL, 0, &((*end))) )
     if ((*end) != ')') {
       CHECK(46, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base._base), &(String){34, 33, "expected \")\" after base type, got"}, (*end)) )
     }

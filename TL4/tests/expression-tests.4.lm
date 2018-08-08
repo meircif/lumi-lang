@@ -530,6 +530,17 @@ var Array{38:Func{()}} farr
 ## @ c t6
 var Func{(copy Int x,
       copy Int y)} fun
+## @ g t7
+func fun(copy Func{(copy Int x,
+    copy Int y)} fi)->(var Func{(copy Int x,
+    copy Int y)} fo)
+  fun(copy _)
+struct Test
+  var Func{(copy Int x,
+      copy Int y)} fun
+  func meth(copy Func{(copy Int x,
+      copy Int y)} fi)->(var Func{(copy Int x,
+      copy Int y)} fo)
 ## @ ec te0
 var Func error
 ## @ ec te1

@@ -185,7 +185,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     string-new-copy(user item.name)->(owner aux-variable.name)
     item.type-instance.copy-new()->(owner aux-variable.result-type)
     
-    new BinaryExpression assign(user expression-node, user _)
+    new AssignOperatorExpression assign(user expression-node, user _)
     assign.is-statement := true
     assign.left-expression := aux-variable
     glob.operator-map.find(user ":=")->(user assign.operator)
@@ -278,6 +278,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     glob.type-bool.new-type-instance()->(owner has-variable.result-type)
     new CallArgument has-arg
     has-arg.value := has-variable
+    has-arg.is-primitive := has-arg.value.result-type.type-data.is-primitive
     self.write-iter-meth(user self.has-func, owner has-arg)
     
     self.block.write-spaces()
@@ -291,6 +292,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.item.type-instance.copy-new()->(owner item-variable.result-type)
     new CallArgument item-arg
     item-arg.value := item-variable
+    item-arg.is-primitive := item-arg.value.result-type.type-data.is-primitive
     item-arg.is-dynamic := item-arg.value.result-type.type-data.is-dynamic
     item-arg.is-generic :=
         self.get-func.arguments.outputs.first.item.get-type-instance().type-data is
@@ -308,6 +310,8 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     var SyntaxTreeExpression expression-node(user self.block)
     
     new CallArgument self-arg
+    self-arg.is-primitive :=
+        self.aux-variable.result-type.type-data.is-primitive
     self-arg.is-dynamic := self.aux-variable.result-type.type-data.is-dynamic
     self.aux-variable.copy-new()->(owner self-arg.value)
     

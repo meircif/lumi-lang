@@ -96,7 +96,7 @@ Returncode BaseMethExpression_analyze_call(BaseMethExpression* self, FunctionArg
   (*bases) = self->bases;
   CallArgument* self_param = malloc(sizeof(CallArgument));
   if (self_param == NULL) RAISE(52)
-  *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
+  *self_param = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false, false};
   self_param->_base._base._dtl = CallArgument__dtl;
   CHECK(53, SyntaxTreeNode_set_location(&(self_param->_base._base)) )
   self_param->_base.access = ((Argument*)(self->function->arguments->parameters->first->item))->access;
@@ -354,21 +354,21 @@ Returncode TypeExpression_parse_new(TypeExpression* self, String* text, String* 
   TypeInstance* type_instance = malloc(sizeof(TypeInstance));
   if (type_instance == NULL) RAISE(155)
   *type_instance = (TypeInstance){NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-  CHECK(156, TypeInstance_parse_name(type_instance, text, &(code_node->_base), code_node, &((*end))) )
+  CHECK(156, TypeInstance_parse_name(type_instance, text, &(code_node->_base), code_node, code_node->parent->_base.indentation_spaces, &((*end))) )
   if ((*end) == '(') {
     InitExpression* expression_init = malloc(sizeof(InitExpression));
-    if (expression_init == NULL) RAISE(159)
+    if (expression_init == NULL) RAISE(163)
     *expression_init = (InitExpression){InitExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL};
     expression_init->_base._base._base._dtl = InitExpression__dtl;
-    CHECK(160, InitExpression_parse(expression_init, type_instance, (*expression), code_node, &((*end))) )
+    CHECK(164, InitExpression_parse(expression_init, type_instance, (*expression), code_node, &((*end))) )
     (*expression) = &(expression_init->_base._base);
   }
   else {
     TypeExpression* type_expression = malloc(sizeof(TypeExpression));
-    if (type_expression == NULL) RAISE(164)
+    if (type_expression == NULL) RAISE(168)
     *type_expression = (TypeExpression){TypeExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL};
     type_expression->_base._base._base._dtl = TypeExpression__dtl;
-    CHECK(165, TypeExpression_parse(type_expression, type_instance, (*expression), code_node) )
+    CHECK(169, TypeExpression_parse(type_expression, type_instance, (*expression), code_node) )
     (*expression) = &(type_expression->_base._base);
   }
   return OK;
@@ -381,14 +381,14 @@ Returncode TypeExpression_parse(TypeExpression* self, TypeInstance* type_instanc
 static char* _func_name_TypeExpression_parse = "TypeExpression.parse";
 #define LUMI_FUNC_NAME _func_name_TypeExpression_parse
 Returncode TypeExpression_parse(TypeExpression* self, TypeInstance* type_instance, Expression* module_expression, SyntaxTreeCode* code_node) {
-  CHECK(173, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
+  CHECK(177, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
   self->_base._base.code_node = code_node;
-  CHECK(175, Expression_set_simple_type(&(self->_base._base), glob->type_type) )
+  CHECK(179, Expression_set_simple_type(&(self->_base._base), glob->type_type) )
   self->_base.module_expression = module_expression;
   self->_base._base.result_type->parameters = malloc(sizeof(List));
-  if (self->_base._base.result_type->parameters == NULL) RAISE(177)
+  if (self->_base._base.result_type->parameters == NULL) RAISE(181)
   *self->_base._base.result_type->parameters = (List){NULL, NULL};
-  CHECK(178, List_add(self->_base._base.result_type->parameters, type_instance) )
+  CHECK(182, List_add(self->_base._base.result_type->parameters, type_instance) )
   self->_base._base.access = ACCESS_VAR;
   return OK;
 }
@@ -400,7 +400,7 @@ Returncode TypeExpression_analyze(TypeExpression* self);
 static char* _func_name_TypeExpression_analyze = "TypeExpression.analyze";
 #define LUMI_FUNC_NAME _func_name_TypeExpression_analyze
 Returncode TypeExpression_analyze(TypeExpression* self) {
-  CHECK(182, ModuleTypeExpression_analyze_type_instance(&(self->_base), self->_base._base.result_type->parameters->first->item) )
+  CHECK(186, ModuleTypeExpression_analyze_type_instance(&(self->_base), self->_base._base.result_type->parameters->first->item) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -430,11 +430,11 @@ Returncode EnumExpression_parse(EnumExpression* self, String* name, String* valu
 static char* _func_name_EnumExpression_parse = "EnumExpression.parse";
 #define LUMI_FUNC_NAME _func_name_EnumExpression_parse
 Returncode EnumExpression_parse(EnumExpression* self, String* name, String* value, Expression* module_expression, SyntaxTreeCode* code_node) {
-  CHECK(196, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
+  CHECK(200, SyntaxTreeNode_set_location(&(self->_base._base._base)) )
   self->_base._base.code_node = code_node;
   self->name = name;
   self->value = value;
-  CHECK(200, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
+  CHECK(204, Expression_set_simple_type(&(self->_base._base), glob->type_int) )
   self->_base._base.access = ACCESS_VAR;
   self->_base._base.constant = true;
   self->_base.module_expression = module_expression;
@@ -449,25 +449,25 @@ static char* _func_name_EnumExpression_analyze = "EnumExpression.analyze";
 #define LUMI_FUNC_NAME _func_name_EnumExpression_analyze
 Returncode EnumExpression_analyze(EnumExpression* self) {
   if (NULL != self->_base.module_expression) {
-    CHECK(207, ModuleTypeExpression_analyze_module(&(self->_base)) )
+    CHECK(211, ModuleTypeExpression_analyze_module(&(self->_base)) )
     String* module_name = self->_base.module_expression->result_type->name;
     ModuleMembers* _ModuleMembers30;
-    CHECK(209, SyntaxTreeNode_find_module(&(self->_base._base.code_node->_base), module_name, &(_ModuleMembers30)) )
-    CHECK(209, NameMap_find(_ModuleMembers30->enum_map, self->name, (void**)&(self->enum_data)) )
+    CHECK(213, SyntaxTreeNode_find_module(&(self->_base._base.code_node->_base), module_name, &(_ModuleMembers30)) )
+    CHECK(213, NameMap_find(_ModuleMembers30->enum_map, self->name, (void**)&(self->enum_data)) )
     if (!(NULL != self->enum_data)) {
-      CHECK(211, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){13, 12, "unknown Enum"}, self->name, &(String){10, 9, "in module"}, module_name) )
+      CHECK(215, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){13, 12, "unknown Enum"}, self->name, &(String){10, 9, "in module"}, module_name) )
     }
   }
   else {
-    CHECK(216, NameMap_find(glob->current_module->enum_map, self->name, (void**)&(self->enum_data)) )
+    CHECK(220, NameMap_find(glob->current_module->enum_map, self->name, (void**)&(self->enum_data)) )
     if (!(NULL != self->enum_data)) {
-      CHECK(218, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){13, 12, "unknown Enum"}, self->name) )
+      CHECK(222, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){13, 12, "unknown Enum"}, self->name) )
     }
   }
   Bool _Bool31;
-  CHECK(219, EnumData_m_has_value(self->enum_data, self->value, &(_Bool31)) )
+  CHECK(223, EnumData_m_has_value(self->enum_data, self->value, &(_Bool31)) )
   if (!_Bool31) {
-    CHECK(220, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){5, 4, "Enum"}, self->name, &(String){13, 12, "has no value"}, self->value) )
+    CHECK(224, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){5, 4, "Enum"}, self->name, &(String){13, 12, "has no value"}, self->value) )
   }
   return OK;
 }
@@ -479,9 +479,9 @@ Returncode EnumExpression_write(EnumExpression* self);
 static char* _func_name_EnumExpression_write = "EnumExpression.write";
 #define LUMI_FUNC_NAME _func_name_EnumExpression_write
 Returncode EnumExpression_write(EnumExpression* self) {
-  CHECK(224, EnumData_write_cname(self->enum_data) )
-  CHECK(225, write(&(String){2, 1, "_"}) )
-  CHECK(226, write_cname(self->value) )
+  CHECK(228, EnumData_write_cname(self->enum_data) )
+  CHECK(229, write(&(String){2, 1, "_"}) )
+  CHECK(230, write_cname(self->value) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

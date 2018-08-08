@@ -121,7 +121,7 @@ Returncode SyntaxTreeAssertError_parse(SyntaxTreeAssertError* self, SyntaxTreeBl
   if ((*end) == ',') {
     CHECK(45, read_c(&((*end))) )
     if ((*end) == '\n') {
-      CHECK(47, SyntaxTreeCode_read_line_break_spaces(&(self->_base)) )
+      CHECK(47, SyntaxTreeCode_read_parent_line_break_spaces(&(self->_base)) )
     }
     else {
       if ((*end) != ' ') {

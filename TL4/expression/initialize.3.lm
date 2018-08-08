@@ -18,7 +18,11 @@ class InitExpression(ModuleTypeExpression)
     new FunctionArguments in self.arguments
     if end = '('
       var CallArgumentFactory argument-factory
-      self.arguments.parse(user argument-factory, copy false, user code-node):(
+      self.arguments.parse(
+          user argument-factory,
+          copy false,
+          user code-node,
+          copy code-node.parent.indentation-spaces):(
           copy end)
     else
       self.arguments.init()

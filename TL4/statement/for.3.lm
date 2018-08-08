@@ -276,6 +276,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     glob.type-bool.m-new-type-instance():(owner has-symbol.result-type)
     new CallArgument has-arg
     has-arg.value := has-symbol
+    has-arg.is-primitive := has-symbol.result-type.type-data.is-primitive
     self.write-iter-meth(user self.has-func, owner has-arg)
     
     self.block.write-spaces()
@@ -288,6 +289,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.item.type-instance.copy-new():(owner item-symbol.result-type)
     new CallArgument item-arg
     item-arg.value := item-symbol
+    item-arg.is-primitive := item-symbol.result-type.type-data.is-primitive
     item-arg.is-dynamic := item-symbol.result-type.type-data.is-dynamic
     item-arg.is-generic :=
         self.get-func.arguments.outputs.first.item.get-type-instance().type-data =
@@ -306,6 +308,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     expression-node.parent := self.block
     
     new CallArgument self-arg
+    self-arg.is-primitive := self.aux-symbol.result-type.type-data.is-primitive
     self-arg.is-dynamic := self.aux-symbol.result-type.type-data.is-dynamic
     self-arg.value := self.aux-symbol
     

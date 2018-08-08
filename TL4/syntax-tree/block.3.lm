@@ -31,11 +31,8 @@ class SyntaxTreeCode(SyntaxTreeNode)
     write(user ")\n")
   
   ## Read and check indentation spaces for a line break from the input file
-  func inst read-line-break-spaces()
-    var Int expected-spaces(self.parent.indentation-spaces + 4)
-    for n in expected-spaces
-      if read-c() != ' '
-        self.m-syntax-error-indentation(copy n, copy expected-spaces)
+  func inst read-parent-line-break-spaces()
+    self.read-line-break-spaces(copy self.parent.indentation-spaces)
   
   func dynamic m-is-end-point():(copy Bool is-end)
     is-end := false

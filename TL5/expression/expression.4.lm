@@ -215,7 +215,11 @@ class Expression(SyntaxTreeNode)
           return
     
     new TypeInstance type-instance
-    type-instance.parse-name(user text, user code-node, user code-node)
+    type-instance.parse-name(
+        user text,
+        user code-node,
+        user code-node,
+        copy code-node.parent.indentation-spaces)
     if not has-member and glob.last-char = '('
       InitExpression.parse-new(user _, owner type-instance, user code-node)->(
           owner expression)

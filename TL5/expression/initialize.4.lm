@@ -24,7 +24,10 @@ class InitExpression(ModuleTypeExpression)
     if glob.last-char = '('
       var CallArgumentFactory argument-factory
       self.arguments.parse(
-          user argument-factory, copy false, user self.code-node)
+          user argument-factory,
+          copy false,
+          user self.code-node,
+          copy self.code-node.parent.indentation-spaces)
   
   func dynamic analyze()
     self.analyze-type-instance(user self.result-type)

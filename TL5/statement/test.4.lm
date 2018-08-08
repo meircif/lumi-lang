@@ -41,7 +41,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     if glob.last-char = ','
       read-c()
       if glob.last-char = '\n'
-        self.read-line-break-spaces()
+        self.read-parent-line-break-spaces()
       else-if glob.last-char != ' '
         self.syntax-error-c(user "expected space after \",\", got")
       read-new(user "")->(owner self.expected-error)

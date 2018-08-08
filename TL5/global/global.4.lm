@@ -94,41 +94,68 @@ struct Global
     self.access-names[Access.VAR].new(user "var")
   
   func init-operator-map()
-    self.add-operator-copy(user "+", copy 0, copy 0)
-    self.add-operator-copy(user "-", copy 0, copy 0)
-    self.add-operator-copy(user "*", copy 0, copy 1)
-    self.add-operator(user "div", user "/", copy 0, copy 1)
-    self.add-operator(user "mod", user "%", copy 0, copy 1)
-    self.add-operator(user "=", user "==", copy 1, copy 0)
-    self.add-operator-copy(user "!=", copy 1, copy 0)
-    self.add-operator-copy(user ">", copy 1, copy 0)
-    self.add-operator-copy(user "<", copy 1, copy 0)
-    self.add-operator-copy(user ">=", copy 1, copy 0)
-    self.add-operator-copy(user "<=", copy 1, copy 0)
-    self.add-operator(user "is", user "==", copy 1, copy 0)
-    self.add-operator(user "is-not", user "!=", copy 1, copy 0)
-    self.add-operator(user "not", user "!", copy 2, copy 0)
-    self.add-operator(user "or", user "||", copy 3, copy 0)
-    self.add-operator(user "and", user "&&", copy 3, copy 1)
-    self.add-operator(user ":=", user "=", copy 4, copy 0)
-    self.add-operator-copy(user "+=", copy 4, copy 1)
-    self.add-operator-copy(user "-=", copy 4, copy 2)
+    self.add-operator-copy(
+        user "+", copy 0, copy 0, copy arithmetic-operator-factory)
+    self.add-operator-copy(
+        user "-", copy 0, copy 0, copy arithmetic-operator-factory)
+    self.add-operator-copy(
+        user "*", copy 0, copy 1, copy arithmetic-operator-factory)
+    self.add-operator(
+        user "div", user "/", copy 0, copy 1, copy arithmetic-operator-factory)
+    self.add-operator(
+        user "mod", user "%", copy 0, copy 1, copy arithmetic-operator-factory)
+    self.add-operator(
+        user "=", user "==", copy 1, copy 0, copy equalizer-operator-factory)
+    self.add-operator-copy(
+        user "!=", copy 1, copy 0, copy equalizer-operator-factory)
+    self.add-operator-copy(
+        user ">", copy 1, copy 0, copy relational-operator-factory)
+    self.add-operator-copy(
+        user "<", copy 1, copy 0, copy relational-operator-factory)
+    self.add-operator-copy(
+        user ">=", copy 1, copy 0, copy relational-operator-factory)
+    self.add-operator-copy(
+        user "<=", copy 1, copy 0, copy relational-operator-factory)
+    self.add-operator(
+        user "is", user "==", copy 1, copy 0, copy identity-operator-factory)
+    self.add-operator(
+        user "is-not", user "!=", copy 1, copy 0, copy identity-operator-factory)
+    self.add-operator(
+        user "not", user "!", copy 2, copy 0, copy non-binary-operator-factory)
+    self.add-operator(
+        user "or", user "||", copy 3, copy 0, copy logical-operator-factory)
+    self.add-operator(
+        user "and", user "&&", copy 3, copy 1, copy logical-operator-factory)
+    self.add-operator(
+        user ":=", user "=", copy 4, copy 0, copy assign-operator-factory)
+    self.add-operator-copy(
+        user "+=", copy 4, copy 1, copy arithmetic-assign-operator-factory)
+    self.add-operator-copy(
+        user "-=", copy 4, copy 2, copy arithmetic-assign-operator-factory)
+    self.add-operator-copy(
+        user "*=", copy 4, copy 3, copy arithmetic-assign-operator-factory)
   
   func add-operator(
       user String name,
       user String c-name,
       copy Int order,
-      copy Int group-index)
+      copy Int group-index,
+      copy Func{(user SyntaxTreeCode code-node, user Operator operator)->(
+      owner BinaryExpression expression)} factory)
     new Operator operator
-    operator.init(user name, user c-name, copy order, copy group-index)
+    operator.init(
+        user name, user c-name, copy order, copy group-index, copy factory)
     self.operator-map.add(user operator.name, user operator)
     self.operators.add(owner operator)
   
   func add-operator-copy(
       user String name,
       copy Int order,
-      copy Int group-index)
-    self.add-operator(user name, user name, copy order, copy group-index)
+      copy Int group-index,
+      copy Func{(user SyntaxTreeCode code-node, user Operator operator)->(
+      owner BinaryExpression expression)} factory)
+    self.add-operator(
+        user name, user name, copy order, copy group-index, copy factory)
   
   func init-builtin-types()
     self.add-builtin-type(user "Char", copy true)->(user self.type-char)

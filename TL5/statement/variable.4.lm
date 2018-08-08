@@ -36,9 +36,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     self.is-create := is-create
     self.type-instance := TypeInstance()
     if self.is-create
-      self.type-instance.parse(user " ", user self, user self)
+      self.type-instance.parse(
+          user " ", user self, user self, copy INDENTATION-SPACES)
     else
-      self.type-instance.parse(user " ", user self, user _)
+      self.type-instance.parse(
+          user " ", user self, user _, copy INDENTATION-SPACES)
     if glob.last-char != ' '
       self.syntax-error-c(user "expected space after type, got")
     read-new(user "(")->(owner self.name)

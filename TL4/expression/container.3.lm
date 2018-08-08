@@ -79,7 +79,7 @@ class UnaryExpression(Expression)
     self.access := ACCESS-VAR
     self.set-location()
     if end = '\n'
-      code-node.read-line-break-spaces()
+      code-node.read-parent-line-break-spaces()
     else-if end != ' '
       self.m-syntax-error-c(user "expected space after operator, got", copy end)
     Expression.parse-new(var _, user ends, user code-node, user operator):(

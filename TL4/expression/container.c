@@ -176,7 +176,7 @@ Returncode UnaryExpression_parse(UnaryExpression* self, Operator* operator, Stri
   self->_base.access = ACCESS_VAR;
   CHECK(80, SyntaxTreeNode_set_location(&(self->_base._base)) )
   if ((*end) == '\n') {
-    CHECK(82, SyntaxTreeCode_read_line_break_spaces(code_node) )
+    CHECK(82, SyntaxTreeCode_read_parent_line_break_spaces(code_node) )
   }
   else {
     if ((*end) != ' ') {

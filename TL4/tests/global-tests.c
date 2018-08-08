@@ -727,7 +727,7 @@ Returncode test_illegal_call() {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
     Char _Char249;
-    CHECK(327, (arg)->_base._dtl[6](arg, NULL, &(_Char249)) );
+    CHECK(327, (arg)->_base._dtl[6](arg, NULL, 0, &(_Char249)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;

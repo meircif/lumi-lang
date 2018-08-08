@@ -712,6 +712,7 @@ operator "not" expected "Bool" operand, got "Int"
 ut_M_i = 23 + 54;
 /// @ t1
 ut_M_i += (100 * 2) - ((37 / 5) % 2);
+    ut_M_i *= 3;
 /// @ t2
 ut_M_i -= 12 * 13;
 /// @ t3
@@ -721,7 +722,7 @@ ut_M_b = (3 <= 5) && (23 >= 37);
 /// @ t5
 ut_M_b = (ut_M_i == 5) || (ut_M_i != 37);
 /// @ t6
-ut_M_b = ((2 < ut_M_i) && (ut_M_i < 12)) && (12 < (2 * ut_M_i));
+ut_M_b = ((2 < ut_M_i) && (ut_M_i < 12)) && (12 == (2 * ut_M_i));
 /// @ t7
 Ref_Manager* aux_Ref_Manager = NULL;
     aux_Ref_Manager = ut_M_t_Refman;
@@ -804,7 +805,7 @@ ambiguous precedence between operators "+" and "*"
 /// @ te3
 ambiguous precedence between operators "or" and "and"
 /// @ te4
-cannot use "not" as binary operand
+used non-binary operator "not"
 /// @ te5
 assigning into non assignable expression
 /// @ te6
@@ -833,6 +834,8 @@ non matching subtypes "Int" and "Char"
 passing ownership of type "Tb" into static type "Test"
 /// @ te18
 operator "is" is not supported for type "Bool"
+/// @ te19
+operator "<" expected "Int" operand, got "Bool"
 /// @@ test-question-expression
 /// @ t0
 ut_M_b = ut_M_str != NULL && ut_M_str_Refman->value != NULL;
@@ -1140,6 +1143,33 @@ Returncode ut_M_mock(Returncode (**f)(void)) {
     if (*f == NULL) RAISE(2, empty_object)
     LUMI_err = (*f)();
     CHECK(2)
+LUMI_cleanup:
+    return LUMI_err;
+}
+/// @ t8
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Returncode (*fun)(Int x, Int y);
+};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
+    Returncode LUMI_err = OK;
+    LUMI_inc_ref(self_Refman);
+LUMI_cleanup:
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_fun(Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
+    Returncode LUMI_err = OK;
+    Returncode (*aux_Func_0)(Int x, Int y) = NULL;
+    LUMI_err = ut_M_fun(NULL, &(aux_Func_0));
+    CHECK(4)
 LUMI_cleanup:
     return LUMI_err;
 }

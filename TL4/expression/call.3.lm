@@ -20,7 +20,11 @@ class CallExpression(Expression)
     self.set-location()
     new FunctionArguments in self.arguments
     var CallArgumentFactory argument-factory
-    self.arguments.parse(user argument-factory, copy false, user code-node):(
+    self.arguments.parse(
+        user argument-factory,
+        copy false,
+        user code-node,
+        copy code-node.parent.indentation-spaces):(
         copy end)
   
   func dynamic analyze()
@@ -50,6 +54,7 @@ class CallExpression(Expression)
       output.set-location()
       output.is-output := true
       output.is-native := declaration.outputs.last.item.is-native
+      output.is-primitive := result-type.type-data.is-primitive
       output.is-dynamic := result-type.type-data.is-dynamic
       output.is-generic :=
           declaration.outputs.last.item.get-type-instance().type-data =
@@ -110,10 +115,13 @@ class CallArgument(Argument)
   user Expression assignee
   user SyntaxTreeCode code-node
   var Bool is-down-cast
+  var Bool is-primitive
   var Bool is-dynamic
   var Bool is-generic
   
-  func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
+  func dynamic parse-value(
+      user SyntaxTreeCode code-node, copy Int indentation-spaces):(
+      copy Char end)
     self.code-node := code-node
     parse-new-expression(
         user ",)", user code-node):(owner self.value, copy end)
@@ -152,6 +160,7 @@ class CallArgument(Argument)
     else
       real-type.check-assign-from(copy self.access, user self):(
           owner self.value, user self.assignee)
+    self.is-primitive := real-type.type-data.is-primitive
     self.is-dynamic := real-type.type-data.is-dynamic
     self.is-generic := type-instance.type-data = glob.type-generic
     delete real-type
@@ -179,7 +188,7 @@ class CallArgument(Argument)
     if self.is-output
       write(user ")")
     
-    if not self.value.result-type.type-data.is-primitive and not self.is-native
+    if not self.is-primitive and not self.is-native
       write(user ", ")
       if self.is-output
         write(user "&(")
