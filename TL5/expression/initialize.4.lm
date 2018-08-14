@@ -187,7 +187,7 @@ class InitExpression(ModuleTypeExpression)
     value.write-preactions()
     self.aux-variable.write()
     write(user " = ")
-    value.write()
+    value.write-cast()
     write(user ";\n")
     
     if not self.result-type.type-data.is-primitive
@@ -209,10 +209,7 @@ class InitExpression(ModuleTypeExpression)
       self.code-node.write-spaces()
       self.aux-variable.write()
       write(user "_Dynamic = ")
-      if value.is-generic-cast
-        value.write-dynamic-safe()
-      else
-        value.write-dynamic()
+      value.write-dynamic-cast()
       write(user ";\n")
     
     self.arguments.write-postactions()

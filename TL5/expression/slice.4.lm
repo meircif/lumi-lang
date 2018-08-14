@@ -108,26 +108,26 @@ class SliceExpression(Expression)
     self.sequence.write-check-ref()
     self.code-node.write-spaces()
     
-    ; if ((index) < 0 || (index) >= (seq)->length)
-    ; if ((index) < 0 || (second) < 0 || (index) + (second) > (seq)->length)
+    ; if (index < 0 || index >= seq->length)
+    ; if (index < 0 || second < 0 || index + second > seq->length)
     ;     RAISE(`line`, slice_index)
-    write(user "if ((")
-    self.index.write()
-    write(user ") < 0 || (")
+    write(user "if (")
+    self.index.write-safe()
+    write(user " < 0 || ")
     if self.second-index?
-      self.second-index.write()
-      write(user ") < 0 || (")
-    self.index.write()
-    write(user ") ")
+      self.second-index.write-safe()
+      write(user " < 0 || ")
+    self.index.write-safe()
+    write(user " ")
     if self.second-index?
-      write(user "+ (")
-      self.second-index.write()
-      write(user ") >")
+      write(user "+ ")
+      self.second-index.write-safe()
+      write(user " >")
     else
       write(user ">=")
-    write(user " (")
-    self.sequence.write()
-    write(user ")->length) ")
+    write(user " ")
+    self.sequence.write-safe()
+    write(user "->length) ")
     self.write-raise(user "slice_index")
     self.code-node.write-spaces()
   
@@ -136,20 +136,21 @@ class SliceExpression(Expression)
       self.slice-variable.write()
       return
     
-    ; ((seq)->values)[index]
-    ; ((Prmitive*)((seq)->values))[index]
-    ; ((Complex*)((seq)->values)) + index
-    write(user "((")
+    ; (seq->values)[index]
+    ; ((Prmitive*)(seq->values))[index]
+    ; ((Complex*)(seq->values)) + index
+    write(user "(")
     if self.sequence.result-type.type-data is-not glob.type-string
+      write(user "(")
       if self.result-type.type-data is glob.type-func and
           self.result-type.arguments?
         self.result-type.arguments.write-pointer(user "*")
       else
         self.result-type.type-data.write-cname()
         write(user "*")
-      write(user ")((")
-    self.sequence.write()
-    write(user ")->values)")
+      write(user ")(")
+    self.sequence.write-safe()
+    write(user "->values)")
     if self.sequence.result-type.type-data is-not glob.type-string
       write(user ")")
     if self.result-type.type-data.is-primitive

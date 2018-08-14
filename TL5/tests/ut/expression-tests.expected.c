@@ -203,8 +203,8 @@ type "Int" has no member "error"
 /// @@ test-slice-expression
 /// @ t0
 CHECK_REF(1, ut_M_str, ut_M_str_Refman)
-    if ((13) < 0 || (13) >= (ut_M_str)->length) RAISE(1, slice_index)
-    ut_M_c = ((ut_M_str)->values)[13];
+    if (13 < 0 || 13 >= ut_M_str->length) RAISE(1, slice_index)
+    ut_M_c = (ut_M_str->values)[13];
 /// @ t1
 String aux_String_0_Var = {0};
     String* aux_String_0 = NULL;
@@ -215,7 +215,7 @@ String aux_String_0_Var = {0};
     aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
     aux_String_0_Var.values = (ut_M_str)->values + (2);
     CHECK_REF(1, ut_M_str, ut_M_str_Refman)
-    if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_str)->length) RAISE(1, slice_index)
+    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_str->length) RAISE(1, slice_index)
     aux_Ref_Manager = ut_M_str_Refman;
     ut_M_str_Refman = ut_M_str_Refman;
     LUMI_inc_ref(ut_M_str_Refman);
@@ -224,8 +224,8 @@ String aux_String_0_Var = {0};
     ut_M_str = aux_String_0;
 /// @ t2
 CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((13) < 0 || (13) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    ut_M_i = ((Int*)((ut_M_arr)->values))[13];
+    if (13 < 0 || 13 >= ut_M_arr->length) RAISE(1, slice_index)
+    ut_M_i = ((Int*)(ut_M_arr->values))[13];
 /// @ t3
 Array aux_Array_0_Var = {0};
     Array* aux_Array_0 = NULL;
@@ -235,7 +235,7 @@ Array aux_Array_0_Var = {0};
     aux_Array_0_Var.length = 6;
     aux_Array_0_Var.values = (Byte*)((ut_M_arr)->values) + (2);
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_arr)->length) RAISE(1, slice_index)
+    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_arr->length) RAISE(1, slice_index)
     aux_Ref_Manager = ut_M_arr_Refman;
     ut_M_arr_Refman = ut_M_arr_Refman;
     LUMI_inc_ref(ut_M_arr_Refman);
@@ -244,12 +244,12 @@ Array aux_Array_0_Var = {0};
     ut_M_arr = aux_Array_0;
 /// @ t4
 CHECK_REF(1, ut_M_str, ut_M_str_Refman)
-    if ((4) < 0 || (4) >= (ut_M_str)->length) RAISE(1, slice_index)
-    ((ut_M_str)->values)[4] = ut_M_c;
+    if (4 < 0 || 4 >= ut_M_str->length) RAISE(1, slice_index)
+    (ut_M_str->values)[4] = ut_M_c;
 /// @ t5
 CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((4) < 0 || (4) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    ((Int*)((ut_M_arr)->values))[4] = ut_M_i;
+    if (4 < 0 || 4 >= ut_M_arr->length) RAISE(1, slice_index)
+    ((Int*)(ut_M_arr->values))[4] = ut_M_i;
 /// @ t6
 expected "]", got "new-line"
 /// @ t7
@@ -961,27 +961,27 @@ Array* aa = NULL;
     Ref_Manager* aa_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(2, aa, aa_Refman)
-    if ((4) < 0 || (4) >= (aa)->length) RAISE(2, slice_index)
+    if (4 < 0 || 4 >= aa->length) RAISE(2, slice_index)
     aux_Ref_Manager = ut_M_ta_Refman;
     ut_M_ta_Refman = aa_Refman;
     ut_M_ta_Dynamic = &ut_M_Ta_dynamic;
     LUMI_inc_ref(ut_M_ta_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_ta = ((ut_M_Ta*)((aa)->values)) + 4;
+    ut_M_ta = ((ut_M_Ta*)(aa->values)) + 4;
 /// @ t10
 Array* ca = NULL;
     Ref_Manager* ca_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(2, ca, ca_Refman)
-    if ((4) < 0 || (4) >= (ca)->length) RAISE(2, slice_index)
+    if (4 < 0 || 4 >= ca->length) RAISE(2, slice_index)
     aux_Ref_Manager = ut_M_ta_Refman;
     ut_M_ta_Refman = ca_Refman;
     ut_M_ta_Dynamic = &(&ut_M_Tc_dynamic->_base._base);
     LUMI_inc_ref(ut_M_ta_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_ta = &((((ut_M_Tc*)((ca)->values)) + 4)->_base._base);
+    ut_M_ta = &((((ut_M_Tc*)(ca->values)) + 4)->_base._base);
 /// @ t11
 if (ut_M_ta_Dynamic == NULL) RAISE(1, empty_object)
     LUMI_err = ut_M_ta_Dynamic->dyn(ut_M_ta, ut_M_ta_Refman, ut_M_ta_Dynamic);
@@ -1127,12 +1127,12 @@ Returncode (*farr_Values[38])(void) = {0};
     INIT_VAR(1, farr)
     farr_Var.values = farr_Values;
     CHECK_REF(2, farr, farr_Refman)
-    if ((3) < 0 || (3) >= (farr)->length) RAISE(2, slice_index)
-    ((Returncode (**)(void))((farr)->values))[3] = ut_M_fun0;
+    if (3 < 0 || 3 >= farr->length) RAISE(2, slice_index)
+    ((Returncode (**)(void))(farr->values))[3] = ut_M_fun0;
     CHECK_REF(3, farr, farr_Refman)
-    if ((3) < 0 || (3) >= (farr)->length) RAISE(3, slice_index)
-    if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3, empty_object)
-    LUMI_err = (((Returncode (**)(void))((farr)->values))[3])();
+    if (3 < 0 || 3 >= farr->length) RAISE(3, slice_index)
+    if (((Returncode (**)(void))(farr->values))[3] == NULL) RAISE(3, empty_object)
+    LUMI_err = (((Returncode (**)(void))(farr->values))[3])();
     CHECK(3)
 /// @ t6
 Returncode (*fun)(Int x, Int y) = NULL;

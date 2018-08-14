@@ -62,7 +62,10 @@ class UpCastExpression(Expression)
   func dynamic write()
     ; &(`expression`->_base[._base]...)
     self.write-pre()
-    self.expression.write-safe()
+    if self.expression.is-complex-field
+      self.expression.write()
+    else
+      self.expression.write-safe()
     self.write-post()
   
   func dynamic write-dynamic()

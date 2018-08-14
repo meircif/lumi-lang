@@ -138,12 +138,15 @@ class UnaryExpression(Expression)
   func inst write-end-expression(user Expression right-expression)
     write(user self.operator.c-name)
     write(user " ")
-    if self.safe-operand-write
-      right-expression.write-safe()
-    else
-      right-expression.write()
+    self.write-operand(user right-expression)
     if self.is-statement
       write(user ";\n")
+    
+  func inst write-operand(user Expression expression)
+    if self.safe-operand-write
+      expression.write-safe()
+    else
+      expression.write-cast()
 
 
 ~~~ An expression with a binary operator ~~~
@@ -205,10 +208,7 @@ class BinaryExpression(UnaryExpression)
     self.left-expression.write-preactions()
   
   func dynamic write()
-    if self.safe-operand-write
-      self.left-expression.write-safe()
-    else
-      self.left-expression.write()
+    self.write-operand(user self.left-expression)
     write(user " ")
     self.write-end()
   

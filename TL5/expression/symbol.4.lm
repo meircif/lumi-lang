@@ -186,24 +186,22 @@ class FieldExpression(Expression)
       self.code-node.write-spaces()
 
   func dynamic write()
-    if self.is-complex-field
-      write(user "&(")
-    self.write-safe()
-    if self.is-complex-field
-      write(user ")")
-
-  func dynamic write-safe()
-    self.instance.write-safe()
-    self.write-bases()
-    self.variable.write-cname()
-  
-  func inst write-bases()
     if self.instance.is-complex-field
+      self.instance.write()
       write(user ".")
     else
+      self.instance.write-safe()
       write(user "->")
     for n in self.bases
       write(user "_base.")
+    self.variable.write-cname()
+
+  func dynamic write-cast()
+    if self.is-complex-field
+      write(user "&(")
+    self.write()
+    if self.is-complex-field
+      write(user ")")
   
   func dynamic write-refman()
     if self.is-complex-field
@@ -374,9 +372,9 @@ class CastExpression(Expression)
     write(user "))")
 
   func dynamic write-dynamic()
-    self.expression.write-dynamic()
+    self.expression.write-dynamic-safe()
 
-  func dynamic write-dynamic-safe()
+  func dynamic write-dynamic-cast()
     write(user "((")
     self.result-type.type-data.write-cname()
     write(user "_Dynamic*)(")

@@ -261,7 +261,7 @@ class CallArgument(Argument)
       if self.is-down-cast or self.is-generic
         write(user "(void*)")
       write(user "&(")
-    self.value.write()
+    self.value.write-cast()
     if self.is-output
       write(user ")")
     
@@ -279,10 +279,7 @@ class CallArgument(Argument)
         write(user "(void*)")
       if self.is-output
         write(user "&(")
-      if self.value.is-generic-cast
-        self.value.write-dynamic-safe()
-      else
-        self.value.write-dynamic()
+      self.value.write-dynamic-cast()
       if self.is-output
         write(user ")")
     else-if self.is-generic

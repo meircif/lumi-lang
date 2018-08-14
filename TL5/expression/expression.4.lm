@@ -285,15 +285,21 @@ class Expression(SyntaxTreeNode)
     self.write-refman()
     write(user ")\n")
   
-  func dynamic write-safe()
+  func dynamic write-cast()
     self.write()
+  
+  func dynamic write-safe()
+    self.write-cast()
   
   func dynamic write-dynamic()
     self.write()
     write(user "_Dynamic")
   
-  func dynamic write-dynamic-safe()
+  func dynamic write-dynamic-cast()
     self.write-dynamic()
+  
+  func dynamic write-dynamic-safe()
+    self.write-dynamic-cast()
   
   func dynamic write-refman()
     self.write()
