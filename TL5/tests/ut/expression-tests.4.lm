@@ -83,12 +83,8 @@ func test-code-error(user String input-text, user String expected-error)
   if not-first-code-test and not code-header-valid
     return
   test-code-setup(user input-text)
-  Sys.print.active := true
-  try
-    write-syntax-tree(copy false)
-    no-error-raised()
+  if try-write-syntax-tree(copy false)
     return
-  Sys.print.active := false
   if mock-print-text.length = 0
     test-code-setup(user input-text)
     write-syntax-tree(copy false)

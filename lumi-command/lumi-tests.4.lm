@@ -3,7 +3,7 @@ module lumi-tests
 
 var String{1024} mock-output
 var String{1024} mock-system
-var String{32} mock-lumipath
+var String{256} mock-lumipath
 var Int mock-system-fail-count
 var Int mock-getenv-fail-count
 var Int mock-exit-result
@@ -42,7 +42,10 @@ mock Sys.getenv(user String name, user String value)->(var Bool exists)
     if name.equal(user "CC")
       value.new(user "mock-cc")
     else-if name.equal(user "LUMIPATH")
-      value.new(user mock-lumipath)
+      if mock-lumipath.length > value.max-length
+        value.new(user mock-lumipath[0:value.max-length])
+      else
+        value.new(user mock-lumipath)
     else
       assert false
 
@@ -484,3 +487,13 @@ test test-run-program-errors()
   fail-test(
       user "input.4.lm -o output -ra",
       user "error: missing arguments after \"-ra\" flag\n")
+
+
+test incremental-string-getenv()
+  mock-lumipath.clear()
+  for _ in 20
+    mock-lumipath.concat(user "0123456789")
+  var lumi.IncrementalString text
+  assert text.getenv(user "LUMIPATH")
+  assert mock-lumipath.length = 200
+  assert text.text.equal(user mock-lumipath)

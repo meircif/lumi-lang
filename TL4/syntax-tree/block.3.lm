@@ -18,6 +18,15 @@ class SyntaxTreeCode(SyntaxTreeNode)
   func dynamic get-parent-type():(user TypeData parent-type)
     self.parent.get-parent-type():(user parent-type)
   
+  func inst check-try(user String statement)
+    user SyntaxTreeBlock parent(self.parent)
+    do
+      while ? parent
+      if parent.is-try
+        self.m-syntax-error(
+            user "inside \"try\" block cannot use", user statement)
+      parent := parent.parent
+  
   func inst write-spaces()
     self.parent.write-spaces()
   
@@ -45,6 +54,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeIf previous-if
   user SyntaxTreeTry previous-try
   var Bool is-in-loop
+  var Bool is-try
   
   func inst parse-block():(copy Char end)
     new List{SyntaxTreeCode} in self.code-nodes

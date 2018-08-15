@@ -1260,6 +1260,12 @@ while (true) {
 while (true) {
     continue;
   }
+/// @ t4
+while (true) {
+    if (true) {
+      if (!(false)) break;
+    }
+  }
 /// @ te0
 expected new-line after "do", got "("
 /// @ te1
@@ -3699,6 +3705,14 @@ expected new-line after "catch", got "("
 "catch" statement with no code
 /// @ te5
 "catch" without a previous "try"
+/// @ te6
+inside "try" block cannot use "while"
+/// @ te7
+inside "try" block cannot use "break"
+/// @ te8
+inside "try" block cannot use "continue"
+/// @ te9
+inside "try" block cannot use "return"
 /// @@ test-for-each
 /// @ t0
 typedef struct ut_M_TestIterator ut_M_TestIterator;

@@ -10,6 +10,7 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
       copy Char end, owner SyntaxTreeTry new-node)
     new SyntaxTreeTry in new-node
     new-node.init(user parent)
+    new-node.block.is-try := true
     new-node.parse-block(copy false):(copy end)
   
   func dynamic analyze()

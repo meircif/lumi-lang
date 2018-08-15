@@ -197,6 +197,8 @@ struct Global
     ; String
     self.add-builtin-field(
         user glob.type-string, user "length", user glob.type-int, user _)
+    self.add-builtin-field(
+        user glob.type-string, user "max-length", user glob.type-int, user _)
     
     self.add-builtin-method(user glob.type-string, user "new")->(user arguments)
     self.add-builtin-parameter(

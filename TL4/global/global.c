@@ -231,97 +231,98 @@ Returncode Global_init_builtin_types(Global* self) {
   
   /* String */
   CHECK(172, Global_add_builtin_field(self, glob->type_string, &(String){7, 6, "length"}, glob->type_int, NULL) )
+  CHECK(174, Global_add_builtin_field(self, glob->type_string, &(String){11, 10, "max-length"}, glob->type_int, NULL) )
   
-  CHECK(175, Global_add_builtin_method(self, glob->type_string, &(String){4, 3, "new"}, &(arguments)) )
-  CHECK(176, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){6, 5, "other"}) )
+  CHECK(177, Global_add_builtin_method(self, glob->type_string, &(String){4, 3, "new"}, &(arguments)) )
+  CHECK(178, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){6, 5, "other"}) )
   
-  CHECK(179, Global_add_builtin_method(self, glob->type_string, &(String){6, 5, "clear"}, &(arguments)) )
+  CHECK(181, Global_add_builtin_method(self, glob->type_string, &(String){6, 5, "clear"}, &(arguments)) )
   
-  CHECK(182, Global_add_builtin_method(self, glob->type_string, &(String){6, 5, "equal"}, &(arguments)) )
-  CHECK(184, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){8, 7, "pattern"}) )
-  CHECK(186, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){6, 5, "equal"}) )
+  CHECK(184, Global_add_builtin_method(self, glob->type_string, &(String){6, 5, "equal"}, &(arguments)) )
+  CHECK(186, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){8, 7, "pattern"}) )
+  CHECK(188, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){6, 5, "equal"}) )
   
-  CHECK(189, Global_add_builtin_method(self, glob->type_string, &(String){4, 3, "get"}, &(arguments)) )
-  CHECK(190, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_int, &(String){6, 5, "index"}) )
-  CHECK(192, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_char, &(String){3, 2, "ch"}) )
+  CHECK(191, Global_add_builtin_method(self, glob->type_string, &(String){4, 3, "get"}, &(arguments)) )
+  CHECK(192, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_int, &(String){6, 5, "index"}) )
+  CHECK(194, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_char, &(String){3, 2, "ch"}) )
   
-  CHECK(195, Global_add_builtin_method(self, glob->type_string, &(String){7, 6, "append"}, &(arguments)) )
-  CHECK(197, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}) )
+  CHECK(197, Global_add_builtin_method(self, glob->type_string, &(String){7, 6, "append"}, &(arguments)) )
+  CHECK(199, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}) )
   
-  CHECK(200, Global_add_builtin_method(self, glob->type_string, &(String){7, 6, "concat"}, &(arguments)) )
-  CHECK(202, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){6, 5, "other"}) )
+  CHECK(202, Global_add_builtin_method(self, glob->type_string, &(String){7, 6, "concat"}, &(arguments)) )
+  CHECK(204, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){6, 5, "other"}) )
   
-  CHECK(205, Global_add_builtin_method(self, glob->type_string, &(String){11, 10, "concat-int"}, &(arguments)) )
-  CHECK(207, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_int, &(String){7, 6, "number"}) )
+  CHECK(207, Global_add_builtin_method(self, glob->type_string, &(String){11, 10, "concat-int"}, &(arguments)) )
+  CHECK(209, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_int, &(String){7, 6, "number"}) )
   
-  CHECK(210, Global_add_builtin_method(self, glob->type_string, &(String){5, 4, "find"}, &(arguments)) )
-  CHECK(211, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){8, 7, "pattern"}) )
-  CHECK(213, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_int, &(String){6, 5, "index"}) )
+  CHECK(212, Global_add_builtin_method(self, glob->type_string, &(String){5, 4, "find"}, &(arguments)) )
+  CHECK(213, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){8, 7, "pattern"}) )
+  CHECK(215, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_int, &(String){6, 5, "index"}) )
   
-  CHECK(216, Global_add_builtin_method(self, glob->type_string, &(String){4, 3, "has"}, &(arguments)) )
-  CHECK(217, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}) )
-  CHECK(219, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){6, 5, "equal"}) )
+  CHECK(218, Global_add_builtin_method(self, glob->type_string, &(String){4, 3, "has"}, &(arguments)) )
+  CHECK(219, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}) )
+  CHECK(221, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){6, 5, "equal"}) )
   
   /* Array */
-  CHECK(223, Global_add_builtin_field(self, glob->type_array, &(String){7, 6, "length"}, glob->type_int, NULL) )
+  CHECK(225, Global_add_builtin_field(self, glob->type_array, &(String){7, 6, "length"}, glob->type_int, NULL) )
   
   /* File */
-  CHECK(227, Global_add_builtin_global_function(self, &(String){15, 14, "file-open-read"}, &(arguments)) )
-  CHECK(228, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}) )
-  CHECK(230, Global_add_builtin_output(self, arguments, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}) )
+  CHECK(229, Global_add_builtin_global_function(self, &(String){15, 14, "file-open-read"}, &(arguments)) )
+  CHECK(230, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}) )
+  CHECK(232, Global_add_builtin_output(self, arguments, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}) )
   
-  CHECK(233, Global_add_builtin_global_function(self, &(String){16, 15, "file-open-write"}, &(arguments)) )
-  CHECK(234, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}) )
-  CHECK(236, Global_add_builtin_output(self, arguments, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}) )
+  CHECK(235, Global_add_builtin_global_function(self, &(String){16, 15, "file-open-write"}, &(arguments)) )
+  CHECK(236, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}) )
+  CHECK(238, Global_add_builtin_output(self, arguments, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}) )
   
-  CHECK(239, Global_add_builtin_global_function(self, &(String){11, 10, "file-close"}, &(arguments)) )
-  CHECK(240, Global_add_builtin_parameter(self, arguments, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}) )
+  CHECK(241, Global_add_builtin_global_function(self, &(String){11, 10, "file-close"}, &(arguments)) )
+  CHECK(242, Global_add_builtin_parameter(self, arguments, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}) )
   
-  CHECK(243, Global_add_builtin_method(self, glob->type_file, &(String){5, 4, "getc"}, &(arguments)) )
-  CHECK(244, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_char, &(String){3, 2, "ch"}) )
-  CHECK(246, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){7, 6, "is-eof"}) )
+  CHECK(245, Global_add_builtin_method(self, glob->type_file, &(String){5, 4, "getc"}, &(arguments)) )
+  CHECK(246, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_char, &(String){3, 2, "ch"}) )
+  CHECK(248, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){7, 6, "is-eof"}) )
   
-  CHECK(249, Global_add_builtin_method(self, glob->type_file, &(String){5, 4, "putc"}, &(arguments)) )
-  CHECK(250, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}) )
+  CHECK(251, Global_add_builtin_method(self, glob->type_file, &(String){5, 4, "putc"}, &(arguments)) )
+  CHECK(252, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}) )
   
-  CHECK(253, Global_add_builtin_method(self, glob->type_file, &(String){6, 5, "write"}, &(arguments)) )
-  CHECK(254, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}) )
+  CHECK(255, Global_add_builtin_method(self, glob->type_file, &(String){6, 5, "write"}, &(arguments)) )
+  CHECK(256, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}) )
   
   /* Sys */
-  CHECK(258, Global_add_builtin_field(self, glob->type_sys, &(String){5, 4, "argv"}, glob->type_array, glob->type_string) )
+  CHECK(260, Global_add_builtin_field(self, glob->type_sys, &(String){5, 4, "argv"}, glob->type_array, glob->type_string) )
   
-  CHECK(264, Global_add_builtin_field(self, glob->type_sys, &(String){7, 6, "stdout"}, glob->type_file, NULL) )
+  CHECK(266, Global_add_builtin_field(self, glob->type_sys, &(String){7, 6, "stdout"}, glob->type_file, NULL) )
   
-  CHECK(270, Global_add_builtin_field(self, glob->type_sys, &(String){6, 5, "stdin"}, glob->type_file, NULL) )
+  CHECK(272, Global_add_builtin_field(self, glob->type_sys, &(String){6, 5, "stdin"}, glob->type_file, NULL) )
   
-  CHECK(276, Global_add_builtin_field(self, glob->type_sys, &(String){7, 6, "stderr"}, glob->type_file, NULL) )
+  CHECK(278, Global_add_builtin_field(self, glob->type_sys, &(String){7, 6, "stderr"}, glob->type_file, NULL) )
   
-  CHECK(282, Global_add_builtin_method(self, glob->type_sys, &(String){6, 5, "print"}, &(arguments)) )
-  CHECK(283, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}) )
+  CHECK(284, Global_add_builtin_method(self, glob->type_sys, &(String){6, 5, "print"}, &(arguments)) )
+  CHECK(285, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}) )
   
-  CHECK(286, Global_add_builtin_method(self, glob->type_sys, &(String){8, 7, "println"}, &(arguments)) )
-  CHECK(287, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}) )
+  CHECK(288, Global_add_builtin_method(self, glob->type_sys, &(String){8, 7, "println"}, &(arguments)) )
+  CHECK(289, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}) )
   
-  CHECK(290, Global_add_builtin_method(self, glob->type_sys, &(String){8, 7, "getchar"}, &(arguments)) )
-  CHECK(291, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_char, &(String){3, 2, "ch"}) )
-  CHECK(293, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){7, 6, "is-eof"}) )
+  CHECK(292, Global_add_builtin_method(self, glob->type_sys, &(String){8, 7, "getchar"}, &(arguments)) )
+  CHECK(293, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_char, &(String){3, 2, "ch"}) )
+  CHECK(295, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){7, 6, "is-eof"}) )
   
-  CHECK(296, Global_add_builtin_method(self, glob->type_sys, &(String){8, 7, "getline"}, &(arguments)) )
-  CHECK(297, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "line"}) )
+  CHECK(298, Global_add_builtin_method(self, glob->type_sys, &(String){8, 7, "getline"}, &(arguments)) )
+  CHECK(299, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "line"}) )
   
-  CHECK(300, Global_add_builtin_method(self, glob->type_sys, &(String){5, 4, "exit"}, &(arguments)) )
-  CHECK(301, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}) )
+  CHECK(302, Global_add_builtin_method(self, glob->type_sys, &(String){5, 4, "exit"}, &(arguments)) )
+  CHECK(303, Global_add_builtin_parameter(self, arguments, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}) )
   
-  CHECK(304, Global_add_builtin_method(self, glob->type_sys, &(String){7, 6, "system"}, &(arguments)) )
-  CHECK(305, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){8, 7, "command"}) )
-  CHECK(307, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_int, &(String){7, 6, "status"}) )
+  CHECK(306, Global_add_builtin_method(self, glob->type_sys, &(String){7, 6, "system"}, &(arguments)) )
+  CHECK(307, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){8, 7, "command"}) )
+  CHECK(309, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_int, &(String){7, 6, "status"}) )
   
-  CHECK(310, Global_add_builtin_method(self, glob->type_sys, &(String){7, 6, "getenv"}, &(arguments)) )
-  CHECK(311, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}) )
-  CHECK(313, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){6, 5, "value"}) )
-  CHECK(315, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){7, 6, "exists"}) )
+  CHECK(312, Global_add_builtin_method(self, glob->type_sys, &(String){7, 6, "getenv"}, &(arguments)) )
+  CHECK(313, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}) )
+  CHECK(315, Global_add_builtin_parameter(self, arguments, ACCESS_USER, glob->type_string, &(String){6, 5, "value"}) )
+  CHECK(317, Global_add_builtin_output(self, arguments, ACCESS_VAR, glob->type_bool, &(String){7, 6, "exists"}) )
   
-  CHECK(318, Global_add_builtin_global_variable(self, glob->type_sys, &(String){4, 3, "sys"}) )
+  CHECK(320, Global_add_builtin_global_variable(self, glob->type_sys, &(String){4, 3, "sys"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -333,15 +334,15 @@ static char* _func_name_Global_add_builtin_type = "Global.add-builtin-type";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_type
 Returncode Global_add_builtin_type(Global* self, String* name, Bool is_primitive, TypeData** type_data) {
   (*type_data) = malloc(sizeof(TypeData));
-  if ((*type_data) == NULL) RAISE(322)
+  if ((*type_data) == NULL) RAISE(324)
   *(*type_data) = (TypeData){TypeData__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, false, false, false, false, false};
   (*type_data)->_base._base._base._dtl = TypeData__dtl;
-  CHECK(323, string_new_copy(name, &((*type_data)->name)) )
+  CHECK(325, string_new_copy(name, &((*type_data)->name)) )
   (*type_data)->is_primitive = is_primitive;
   (*type_data)->is_ordered = true;
-  CHECK(326, SyntaxTreeNamespace_init(&((*type_data)->_base)) )
-  CHECK(327, NameMap_add(self->global_module->type_map, (*type_data)->name, (*type_data)) )
-  CHECK(328, List_add(self->builtins->types, (*type_data)) )
+  CHECK(328, SyntaxTreeNamespace_init(&((*type_data)->_base)) )
+  CHECK(329, NameMap_add(self->global_module->type_map, (*type_data)->name, (*type_data)) )
+  CHECK(330, List_add(self->builtins->types, (*type_data)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -352,9 +353,9 @@ Returncode Global_add_builtin_global_variable(Global* self, TypeData* variable_t
 static char* _func_name_Global_add_builtin_global_variable = "Global.add-builtin-global-variable";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_global_variable
 Returncode Global_add_builtin_global_variable(Global* self, TypeData* variable_type, String* name) {
-  CHECK(332, Global_add_builtin_variable(self, name, variable_type, NULL, NULL, &(self->builtins->_base._base)) )
+  CHECK(334, Global_add_builtin_variable(self, name, variable_type, NULL, NULL, &(self->builtins->_base._base)) )
   SyntaxTreeVariable* variable = self->builtins->_base._base.variables->last->item;
-  CHECK(335, NameMap_add(self->global_module->variable_map, variable->name, variable) )
+  CHECK(337, NameMap_add(self->global_module->variable_map, variable->name, variable) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -365,7 +366,7 @@ Returncode Global_add_builtin_field(Global* self, TypeData* builtin_type, String
 static char* _func_name_Global_add_builtin_field = "Global.add-builtin-field";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_field
 Returncode Global_add_builtin_field(Global* self, TypeData* builtin_type, String* name, TypeData* field_type, TypeData* field_subtype) {
-  CHECK(342, Global_add_builtin_variable(self, name, field_type, field_subtype, builtin_type, &(builtin_type->_base._base)) )
+  CHECK(344, Global_add_builtin_variable(self, name, field_type, field_subtype, builtin_type, &(builtin_type->_base._base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -377,22 +378,22 @@ static char* _func_name_Global_add_builtin_variable = "Global.add-builtin-variab
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_variable
 Returncode Global_add_builtin_variable(Global* self, String* name, TypeData* variable_type, TypeData* variable_subtype, TypeData* parent_type, SyntaxTreeBranch* branch) {
   SyntaxTreeVariable* variable = malloc(sizeof(SyntaxTreeVariable));
-  if (variable == NULL) RAISE(355)
+  if (variable == NULL) RAISE(357)
   *variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   variable->_base._base._dtl = SyntaxTreeVariable__dtl;
-  CHECK(356, string_new_copy(name, &(variable->name)) )
+  CHECK(358, string_new_copy(name, &(variable->name)) )
   if (variable_type->is_primitive) {
     variable->access = ACCESS_VAR;
   }
   else {
     variable->access = ACCESS_USER;
   }
-  CHECK(361, TypeData_m_new_type_instance(variable_type, &(variable->type_instance)) )
+  CHECK(363, TypeData_m_new_type_instance(variable_type, &(variable->type_instance)) )
   if (NULL != variable_subtype) {
-    CHECK(363, TypeInstance_add_subtype_copy(variable->type_instance, variable_subtype) )
+    CHECK(365, TypeInstance_add_subtype_copy(variable->type_instance, variable_subtype) )
   }
   variable->parent_type = parent_type;
-  CHECK(365, List_add(branch->variables, variable) )
+  CHECK(367, List_add(branch->variables, variable) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -403,9 +404,9 @@ Returncode Global_add_builtin_global_function(Global* self, String* name, Functi
 static char* _func_name_Global_add_builtin_global_function = "Global.add-builtin-global-function";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_global_function
 Returncode Global_add_builtin_global_function(Global* self, String* name, FunctionArguments** arguments) {
-  CHECK(369, Global_add_builtin_function(self, name, NULL, &(glob->builtins->_base), &((*arguments))) )
+  CHECK(371, Global_add_builtin_function(self, name, NULL, &(glob->builtins->_base), &((*arguments))) )
   SyntaxTreeFunction* function = self->builtins->_base.functions->last->item;
-  CHECK(372, NameMap_add(self->global_module->function_map, function->name, function) )
+  CHECK(374, NameMap_add(self->global_module->function_map, function->name, function) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -416,8 +417,8 @@ Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, Strin
 static char* _func_name_Global_add_builtin_method = "Global.add-builtin-method";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_method
 Returncode Global_add_builtin_method(Global* self, TypeData* builtin_type, String* name, FunctionArguments** arguments) {
-  CHECK(376, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
-  CHECK(378, Global_add_builtin_parameter(self, (*arguments), ACCESS_USER, builtin_type, &(String){5, 4, "self"}) )
+  CHECK(378, Global_add_builtin_function(self, name, builtin_type, &(builtin_type->_base), &((*arguments))) )
+  CHECK(380, Global_add_builtin_parameter(self, (*arguments), ACCESS_USER, builtin_type, &(String){5, 4, "self"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -429,19 +430,19 @@ static char* _func_name_Global_add_builtin_function = "Global.add-builtin-functi
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_function
 Returncode Global_add_builtin_function(Global* self, String* name, TypeData* parent_type, SyntaxTreeNamespace* namespace, FunctionArguments** arguments) {
   SyntaxTreeFunction* function = malloc(sizeof(SyntaxTreeFunction));
-  if (function == NULL) RAISE(386)
-  *function = (SyntaxTreeFunction){SyntaxTreeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
+  if (function == NULL) RAISE(388)
+  *function = (SyntaxTreeFunction){SyntaxTreeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
   function->_base._base._base._dtl = SyntaxTreeFunction__dtl;
-  CHECK(387, SyntaxTreeFunction_init(function) )
-  CHECK(388, string_new_copy(name, &(function->name)) )
+  CHECK(389, SyntaxTreeFunction_init(function) )
+  CHECK(390, string_new_copy(name, &(function->name)) )
   function->parent_type = parent_type;
   function->arguments = malloc(sizeof(FunctionArguments));
-  if (function->arguments == NULL) RAISE(390)
+  if (function->arguments == NULL) RAISE(392)
   *function->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   function->arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(391, FunctionArguments_init(function->arguments) )
+  CHECK(393, FunctionArguments_init(function->arguments) )
   (*arguments) = function->arguments;
-  CHECK(393, List_add(namespace->functions, function) )
+  CHECK(395, List_add(namespace->functions, function) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -452,7 +453,7 @@ Returncode Global_add_builtin_parameter(Global* self, FunctionArguments* argumen
 static char* _func_name_Global_add_builtin_parameter = "Global.add-builtin-parameter";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_parameter
 Returncode Global_add_builtin_parameter(Global* self, FunctionArguments* arguments, Int access, TypeData* parameter_type, String* name) {
-  CHECK(400, Global_add_builtin_argument(self, arguments->parameters, false, access, parameter_type, name) )
+  CHECK(402, Global_add_builtin_argument(self, arguments->parameters, false, access, parameter_type, name) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -463,7 +464,7 @@ Returncode Global_add_builtin_output(Global* self, FunctionArguments* arguments,
 static char* _func_name_Global_add_builtin_output = "Global.add-builtin-output";
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_output
 Returncode Global_add_builtin_output(Global* self, FunctionArguments* arguments, Int access, TypeData* output_type, String* name) {
-  CHECK(412, Global_add_builtin_argument(self, arguments->outputs, true, access, output_type, name) )
+  CHECK(414, Global_add_builtin_argument(self, arguments->outputs, true, access, output_type, name) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -475,19 +476,19 @@ static char* _func_name_Global_add_builtin_argument = "Global.add-builtin-argume
 #define LUMI_FUNC_NAME _func_name_Global_add_builtin_argument
 Returncode Global_add_builtin_argument(Global* self, List* argument_list, Bool is_output, Int access, TypeData* argument_type, String* name) {
   DeclarationArgument* argument = malloc(sizeof(DeclarationArgument));
-  if (argument == NULL) RAISE(425)
+  if (argument == NULL) RAISE(427)
   *argument = (DeclarationArgument){DeclarationArgument__dtl, NULL, 0, 0, false, false, NULL};
   argument->_base._base._dtl = DeclarationArgument__dtl;
   argument->_base.access = access;
   argument->_base.is_output = is_output;
   argument->variable = malloc(sizeof(SyntaxTreeVariable));
-  if (argument->variable == NULL) RAISE(428)
+  if (argument->variable == NULL) RAISE(430)
   *argument->variable = (SyntaxTreeVariable){SyntaxTreeVariable__dtl, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, false, false, false, false};
   argument->variable->_base._base._dtl = SyntaxTreeVariable__dtl;
-  CHECK(429, string_new_copy(name, &(argument->variable->name)) )
+  CHECK(431, string_new_copy(name, &(argument->variable->name)) )
   argument->variable->access = access;
-  CHECK(431, TypeData_m_new_type_instance(argument_type, &(argument->variable->type_instance)) )
-  CHECK(433, List_add(argument_list, &(argument->_base)) )
+  CHECK(433, TypeData_m_new_type_instance(argument_type, &(argument->variable->type_instance)) )
+  CHECK(435, List_add(argument_list, &(argument->_base)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -499,12 +500,12 @@ static char* _func_name_Global_find_type = "Global.find-type";
 #define LUMI_FUNC_NAME _func_name_Global_find_type
 Returncode Global_find_type(Global* self, String* name, TypeData** type_data) {
   if (NULL != self->current_module) {
-    CHECK(437, NameMap_find(self->current_module->type_map, name, (void**)&((*type_data))) )
+    CHECK(439, NameMap_find(self->current_module->type_map, name, (void**)&((*type_data))) )
     if (NULL != (*type_data)) {
       return OK;
     }
   }
-  CHECK(439, NameMap_find(self->global_module->type_map, name, (void**)&((*type_data))) )
+  CHECK(441, NameMap_find(self->global_module->type_map, name, (void**)&((*type_data))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -515,11 +516,11 @@ Returncode Global_find_variable(Global* self, String* name, SyntaxTreeVariable**
 static char* _func_name_Global_find_variable = "Global.find-variable";
 #define LUMI_FUNC_NAME _func_name_Global_find_variable
 Returncode Global_find_variable(Global* self, String* name, SyntaxTreeVariable** variable) {
-  CHECK(442, NameMap_find(self->current_module->variable_map, name, (void**)&((*variable))) )
+  CHECK(444, NameMap_find(self->current_module->variable_map, name, (void**)&((*variable))) )
   if (NULL != (*variable)) {
     return OK;
   }
-  CHECK(444, NameMap_find(self->global_module->variable_map, name, (void**)&((*variable))) )
+  CHECK(446, NameMap_find(self->global_module->variable_map, name, (void**)&((*variable))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -530,11 +531,11 @@ Returncode Global_find_function(Global* self, String* name, SyntaxTreeFunction**
 static char* _func_name_Global_find_function = "Global.find-function";
 #define LUMI_FUNC_NAME _func_name_Global_find_function
 Returncode Global_find_function(Global* self, String* name, SyntaxTreeFunction** function) {
-  CHECK(447, NameMap_find(self->current_module->function_map, name, (void**)&((*function))) )
+  CHECK(449, NameMap_find(self->current_module->function_map, name, (void**)&((*function))) )
   if (NULL != (*function)) {
     return OK;
   }
-  CHECK(449, NameMap_find(self->global_module->function_map, name, (void**)&((*function))) )
+  CHECK(451, NameMap_find(self->global_module->function_map, name, (void**)&((*function))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

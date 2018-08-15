@@ -37,7 +37,7 @@ static char* _func_name_SyntaxTreeFunction_parse_new = "SyntaxTreeFunction.parse
 Returncode SyntaxTreeFunction_parse_new(SyntaxTreeFunction* self, TypeData* parent_type, Char* end, SyntaxTreeFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeFunction));
   if ((*new_node) == NULL) RAISE(18)
-  *(*new_node) = (SyntaxTreeFunction){SyntaxTreeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
+  *(*new_node) = (SyntaxTreeFunction){SyntaxTreeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
   (*new_node)->_base._base._base._dtl = SyntaxTreeFunction__dtl;
   CHECK(19, SyntaxTreeFunction_parse((*new_node), parent_type, &((*end))) )
   return OK;
@@ -515,7 +515,7 @@ static char* _func_name_SyntaxTreeConstructor_parse_new = "SyntaxTreeConstructor
 Returncode SyntaxTreeConstructor_parse_new(SyntaxTreeConstructor* self, TypeData* parent_type, Char* end, SyntaxTreeConstructor** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeConstructor));
   if ((*new_node) == NULL) RAISE(248)
-  *(*new_node) = (SyntaxTreeConstructor){SyntaxTreeConstructor__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
+  *(*new_node) = (SyntaxTreeConstructor){SyntaxTreeConstructor__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeConstructor__dtl;
   CHECK(249, SyntaxTreeConstructor_parse((*new_node), parent_type, &((*end))) )
   return OK;

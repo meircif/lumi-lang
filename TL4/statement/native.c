@@ -79,7 +79,7 @@ static char* _func_name_NativeFunction_parse_new = "NativeFunction.parse-new";
 Returncode NativeFunction_parse_new(NativeFunction* self, Char* end, NativeFunction** new_node) {
   (*new_node) = malloc(sizeof(NativeFunction));
   if ((*new_node) == NULL) RAISE(29)
-  *(*new_node) = (NativeFunction){NativeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false, NULL};
+  *(*new_node) = (NativeFunction){NativeFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false, NULL};
   (*new_node)->_base._base._base._base._dtl = NativeFunction__dtl;
   CHECK(30, NativeFunction_parse((*new_node), &((*end))) )
   return OK;
