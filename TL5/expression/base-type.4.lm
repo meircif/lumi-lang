@@ -40,56 +40,6 @@ class BaseMethExpression(Expression)
     expression.restructure()->(owner expression, owner arguments)
 
 
-~~~ Up-cast expression ~~~
-class UpCastExpression(Expression)
-  owner Expression expression
-  var Int bases
-  
-  func inst init-new(copy Int bases)->(owner Expression expression)
-    new UpCastExpression up-cast(user _)
-    up-cast.init(copy bases, owner expression)
-    expression := up-cast
-  
-  func inst init(copy Int bases, owner Expression expression)
-    self.expression := expression
-    self.bases := bases
-    self.expression.result-type.copy-new()->(owner self.result-type)
-    self.access := self.expression.access
-  
-  func dynamic write-preactions()
-    self.expression.write-preactions()
-  
-  func dynamic write()
-    ; &(`expression`->_base[._base]...)
-    self.write-pre()
-    if self.expression.is-complex-field
-      self.expression.write()
-    else
-      self.expression.write-safe()
-    self.write-post()
-  
-  func dynamic write-dynamic()
-    self.write-pre()
-    self.expression.write-dynamic-safe()
-    self.write-post()
-  
-  func dynamic write-refman()
-    self.expression.write-refman()
-  
-  func inst write-pre()
-    write(user "&(")
-  
-  func inst write-post()
-    if self.expression.is-complex-field
-      write(user ".")
-    else
-      write(user "->")
-    write(user "_base")
-    for n in 1:self.bases
-      write(user "._base")
-    write(user ")")
-
-
 class ModuleTypeExpression(Expression)
   owner Expression module-expression
   

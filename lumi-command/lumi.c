@@ -13,7 +13,7 @@ typedef struct lumi_M_Lumi lumi_M_Lumi;
 
 /* constants */
 
-enum { lumi_M_MAX_COMMNAD_SIZE = 1024 };
+enum { lumi_M_MAX_COMMNAD_SIZE = 2048 };
 
 
 /* types struct */

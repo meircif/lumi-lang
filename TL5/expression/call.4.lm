@@ -1,4 +1,4 @@
-~~~ TL5 compiler - Call expression ~~~
+~~~ TL5 compiler - Call expressions ~~~
 module tl5-compiler
 
 ~~~ Function call expression ~~~
