@@ -10,11 +10,44 @@ For example, `array[4] + 3` expression is parsed as:
 BinaryExpression:
   operator: +
   left: SliceExpression:
-    sequence: SymbolExpression(array)
+    sequence: VariableExpression(array)
     index: IntExpression(4)
   right: IntExpression(3)
 ~~~
 module tl5-compiler
+
+
+class ExpressionValue(SyntaxTreeNode)
+  owner Expression expression
+  user TypeInstance result-type
+  var Bool is-statement
+  var Bool constant
+  
+  new(user String ends, user SyntaxTreeCode code-node)
+    parse-new-expression(user ends, user code-node)->(owner self.expression)
+  
+  func inst parsed()->(var Bool is-parsed)
+    is-parsed := self.expression?
+  
+  func dynamic analyze()
+    self.expression.restructure()->(owner self.expression)
+    self.expression.is-statement := self.is-statement
+    self.expression.analyze()
+    self.result-type := self.expression.result-type
+    self.constant := self.expression.constant
+  
+  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
+    self.expression.order-constants(user ordered-list)
+  
+  func inst write-preactions()
+    self.expression.write-preactions()
+  
+  func dynamic write()
+    self.expression.write()
+  
+  func inst write-refman()
+    self.expression.write-refman()
+
 
 ~~~ Return in `expression` a new allocated expression parsed from the input
 file until one of the characters in `ends` is reached.
@@ -23,6 +56,10 @@ func parse-new-expression(user String ends, user SyntaxTreeCode code-node)->(
     owner Expression expression)
   Expression.parse-new(user _, user ends, user code-node, user _)->(
       owner expression)
+
+func analyze-expression()->(owner Expression expression)
+  expression.restructure()->(owner expression)
+  expression.analyze()
 
 
 ~~~ Meta type for an expression in the language.
@@ -33,7 +70,6 @@ class Expression(SyntaxTreeNode)
   owner TypeInstance result-type
   var Int access
   var Bool assignable
-  var Bool top
   var Bool constant
   var Bool is-statement
   var Bool is-generic-cast
@@ -83,8 +119,6 @@ class Expression(SyntaxTreeNode)
           user operator)
       binary-left-expression := new-binary-expression
       expression := new-binary-expression
-    if not curr-operator?
-      expression.top := true
   
   ~~~ Read a single expression value as new string ~~~
   func inst read-new-value(user String ends)->(owner String text)
@@ -133,10 +167,9 @@ class Expression(SyntaxTreeNode)
     else-if text.length = 1 and first = '_'
       expression := EmptyExpression()
     else-if text.equal(user "base")
-      expression := BaseMethExpression(
-          user code-node, copy glob.last-char = '(')
+      expression := BaseMethExpression(user code-node)
     else
-      SymbolExpression.parse-new(user _, owner text, user code-node)->(
+      VariableExpression.parse-new(user _, owner text, user code-node)->(
           owner expression)
   
   ~~~ Parse one following part of an operand ~~~
@@ -155,14 +188,14 @@ class Expression(SyntaxTreeNode)
         self.parse-type-prefix(owner text, user ends, user code-node)->(
             owner expression)
       else
-        MemberExpression.parse-new(user _, owner text, user code-node)->(
+        FieldExpression.parse-new(user _, owner text, user code-node)->(
             owner expression)
     else-if glob.last-char = '['
       SliceExpression.parse-new(user _, user ends, user code-node)->(
           owner expression)
     else-if glob.last-char = '('
-      CallExpression.parse-new(user _, user ends, user code-node)->(
-          owner expression)
+      FunctionObjectCallExpression.parse-new(
+          user _, user ends, user code-node)->(owner expression)
     else
       has-more := false
 
@@ -182,7 +215,11 @@ class Expression(SyntaxTreeNode)
           return
     
     new TypeInstance type-instance
-    type-instance.parse-name(user text, user code-node, user code-node)
+    type-instance.parse-name(
+        user text,
+        user code-node,
+        user code-node,
+        copy code-node.parent.indentation-spaces)
     if not has-member and glob.last-char = '('
       InitExpression.parse-new(user _, owner type-instance, user code-node)->(
           owner expression)
@@ -191,7 +228,7 @@ class Expression(SyntaxTreeNode)
     TypeExpression.parse-new(user _, owner type-instance, user code-node)->(
         owner expression)
     if has-member
-      MemberExpression.parse-new(user _, owner value, user code-node)->(
+      FieldExpression.parse-new(user _, owner value, user code-node)->(
           owner expression)
   
   ~~~ Set type instance to be a type that has no sub-type ~~~
@@ -200,26 +237,31 @@ class Expression(SyntaxTreeNode)
   
   func inst add-aux-variable(
       copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
-      owner SymbolExpression symbol)
-    symbol := SymbolExpression(user self.code-node)
-    type-instance.copy-new()->(owner symbol.result-type)
-    symbol.access := access
-    symbol.assignable := true
+      owner VariableExpression expression)
+    expression := VariableExpression(user self.code-node)
+    type-instance.copy-new()->(owner expression.result-type)
+    expression.access := access
+    expression.assignable := true
     self.code-node.get-function().add-aux-variable(
-        copy access, copy is-create, user type-instance)->(user symbol.variable)
-    string-new-copy(user symbol.variable.name)->(owner symbol.name)
+        copy access, copy is-create, user type-instance)->(
+        user expression.variable)
+    string-new-copy(user expression.variable.name)->(owner expression.name)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := _
     if self.code-node?
       self.code-node.get-parent-type()->(user parent-type)
+
+  func dynamic restructure()->(
+      owner Expression expression, owner FunctionArguments arguments)
+    ; do nothing
   
-  func inst write-init-var-ref(user SymbolExpression symbol)
+  func inst write-init-var-ref(user VariableExpression expression)
     ; INIT_VAR(`line`, `symbol`)
     write(user "INIT_VAR(")
     self.write-line-num()
     write(user ", ")
-    symbol.write()
+    expression.write()
     write(user ")\n")
   
   func inst write-assign-null()
@@ -238,35 +280,41 @@ class Expression(SyntaxTreeNode)
     write(user "CHECK_REF(")
     self.write-line-num()
     write(user ", ")
-    self.write-as-top()
+    self.write()
     write(user ", ")
     self.write-refman()
     write(user ")\n")
+  
+  func dynamic write-cast()
+    self.write()
+  
+  func dynamic write-safe()
+    self.write-cast()
   
   func dynamic write-dynamic()
     self.write()
     write(user "_Dynamic")
   
+  func dynamic write-dynamic-cast()
+    self.write-dynamic()
+  
+  func dynamic write-dynamic-safe()
+    self.write-dynamic-cast()
+  
   func dynamic write-refman()
     self.write()
     write(user "_Refman")
   
-  func inst write-as-top()
-    var Bool top(copy self.top)
-    self.top := true
-    self.write()
-    self.top := top
+  func dynamic write-refman-safe()
+    self.write-refman()
   
-  func dynamic analyze-call(user FunctionArguments arguments)->(
-      user TypeInstance instance-type,
-      var Int bases,
-      var Bool is-function-object)
-    is-function-object := true
-    bases := 0
-    instance-type := _
-  
-  func dynamic analyze-mock(copy Bool is-annotate)->(var Bool is-mock)
+  func dynamic is-mocked-function()->(var Bool is-mock)
     is-mock := false
+  
+  func dynamic write-with-brackets()
+    write(user "(")
+    self.write()
+    write(user ")")
   
   func dynamic write-preactions()
     ; do noting

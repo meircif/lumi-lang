@@ -1,0 +1,90 @@
+~~~ TL5 compiler - Wrap expressions ~~~
+module tl5-compiler
+
+
+class TypeCastExpression(Expression)
+  owner Expression expression
+
+  new(user SyntaxTreeCode code-node, owner Expression expression)
+    base(user code-node)
+    self.expression := expression
+    self.is-generic-cast := true
+    self.access := self.expression.access
+    self.assignable := self.expression.assignable
+    self.expression.result-type.copy-new()->(owner self.result-type)
+
+  func dynamic analyze()
+    self.expression.analyze()
+
+  func dynamic write-preactions()
+    self.expression.write-preactions()
+
+  func dynamic write()
+    self.expression.write()
+
+  func dynamic write-safe()
+    write(user "((")
+    self.result-type.type-data.write-cname()
+    write(user "*)(")
+    self.expression.write()
+    write(user "))")
+
+  func dynamic write-dynamic()
+    self.expression.write-dynamic-safe()
+
+  func dynamic write-dynamic-cast()
+    write(user "((")
+    self.result-type.type-data.write-cname()
+    write(user "_Dynamic*)(")
+    self.expression.write-dynamic()
+    write(user "))")
+
+
+~~~ Up-cast expression ~~~
+class UpCastExpression(Expression)
+  owner Expression expression
+  var Int bases
+  
+  func inst init-new(copy Int bases)->(owner Expression expression)
+    new UpCastExpression up-cast(user _)
+    up-cast.init(copy bases, owner expression)
+    expression := up-cast
+  
+  func inst init(copy Int bases, owner Expression expression)
+    self.expression := expression
+    self.bases := bases
+    self.expression.result-type.copy-new()->(owner self.result-type)
+    self.access := self.expression.access
+  
+  func dynamic write-preactions()
+    self.expression.write-preactions()
+  
+  func dynamic write()
+    ; &(`expression`->_base[._base]...)
+    self.write-pre()
+    if self.expression.is-complex-field
+      self.expression.write()
+    else
+      self.expression.write-safe()
+    self.write-post()
+  
+  func dynamic write-dynamic()
+    self.write-pre()
+    self.expression.write-dynamic-safe()
+    self.write-post()
+  
+  func dynamic write-refman()
+    self.expression.write-refman()
+  
+  func inst write-pre()
+    write(user "&(")
+  
+  func inst write-post()
+    if self.expression.is-complex-field
+      write(user ".")
+    else
+      write(user "->")
+    write(user "_base")
+    for n in 1:self.bases
+      write(user "._base")
+    write(user ")")

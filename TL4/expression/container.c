@@ -176,7 +176,7 @@ Returncode UnaryExpression_parse(UnaryExpression* self, Operator* operator, Stri
   self->_base.access = ACCESS_VAR;
   CHECK(80, SyntaxTreeNode_set_location(&(self->_base._base)) )
   if ((*end) == '\n') {
-    CHECK(82, SyntaxTreeCode_read_line_break_spaces(code_node) )
+    CHECK(82, SyntaxTreeCode_read_parent_line_break_spaces(code_node) )
   }
   else {
     if ((*end) != ' ') {
@@ -798,7 +798,10 @@ Returncode QuestionExpression_analyze(QuestionExpression* self) {
   if (self->tested->result_type->type_data->is_primitive &&  ! (self->tested->result_type->type_data == glob->type_func)) {
     CHECK(442, SyntaxTreeNode_m_syntax_error(&(self->_base._base), &(String){23, 22, "cannot use \"?\" on type"}, self->tested->result_type->type_data->name) )
   }
-  CHECK(445, Expression_set_simple_type(&(self->_base), glob->type_bool) )
+  if (self->tested->is_complex_field) {
+    CHECK(446, SyntaxTreeNode_m_syntax_error_msg(&(self->_base._base), &(String){32, 31, "cannot use \"?\" on complex field"}) )
+  }
+  CHECK(447, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   self->_base.access = ACCESS_VAR;
   return OK;
 }
@@ -810,7 +813,7 @@ Returncode QuestionExpression_write_preactions(QuestionExpression* self);
 static char* _func_name_QuestionExpression_write_preactions = "QuestionExpression.write-preactions";
 #define LUMI_FUNC_NAME _func_name_QuestionExpression_write_preactions
 Returncode QuestionExpression_write_preactions(QuestionExpression* self) {
-  CHECK(449, (self->tested)->_base._dtl[9](self->tested) )
+  CHECK(451, (self->tested)->_base._dtl[9](self->tested) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -823,17 +826,17 @@ static char* _func_name_QuestionExpression_write = "QuestionExpression.write";
 Returncode QuestionExpression_write(QuestionExpression* self) {
   /* `tested` != NULL && `tested`_Refman->value != NULL */
   if (!self->_base.top) {
-    CHECK(454, write(&(String){2, 1, "("}) )
+    CHECK(456, write(&(String){2, 1, "("}) )
   }
-  CHECK(455, (self->tested)->_base._dtl[4](self->tested) )
-  CHECK(456, write(&(String){9, 8, " != NULL"}) )
+  CHECK(457, (self->tested)->_base._dtl[4](self->tested) )
+  CHECK(458, write(&(String){9, 8, " != NULL"}) )
   if (!self->tested->result_type->type_data->is_primitive) {
-    CHECK(458, write(&(String){5, 4, " && "}) )
-    CHECK(459, (self->tested)->_base._dtl[6](self->tested) )
-    CHECK(460, write(&(String){16, 15, "->value != NULL"}) )
+    CHECK(460, write(&(String){5, 4, " && "}) )
+    CHECK(461, (self->tested)->_base._dtl[6](self->tested) )
+    CHECK(462, write(&(String){16, 15, "->value != NULL"}) )
   }
   if (!self->_base.top) {
-    CHECK(462, write(&(String){2, 1, ")"}) )
+    CHECK(464, write(&(String){2, 1, ")"}) )
   }
   return OK;
 }

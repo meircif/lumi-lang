@@ -1,0 +1,303 @@
+~~~ TL5 compiler - Operators ~~~
+module tl5-compiler
+
+
+struct Operator
+  owner String name
+  owner String c-name
+  var Int order
+  var Int group-index
+  var Func{(user SyntaxTreeCode code-node, user Operator operator)->(
+      owner BinaryExpression expression)} binary-expression-factory
+
+  func init(
+      user String name,
+      user String c-name,
+      copy Int order,
+      copy Int group-index,
+      copy Func{(user SyntaxTreeCode code-node, user Operator operator)->(
+      owner BinaryExpression expression)} binary-expression-factory)
+    string-new-copy(user name)->(owner self.name)
+    string-new-copy(user c-name)->(owner self.c-name)
+    self.order := order
+    self.group-index := group-index
+    self.binary-expression-factory := binary-expression-factory
+
+  func create-expression(user SyntaxTreeCode code-node)->(
+      owner BinaryExpression expression)
+    self.binary-expression-factory(user code-node, user self)->(
+        owner expression)
+
+
+~~~ + - * div mod ~~~
+class ArithmeticOperatorExpression(BinaryExpression)
+  func dynamic analyze()
+    base()
+    self.test-operands-type(user glob.type-int)
+    self.set-simple-type(user glob.type-int)
+
+func arithmetic-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := ArithmeticOperatorExpression(user code-node, user operator)
+
+
+~~~ > < >= <= ~~~
+class RelationalOperatorExpression(BinaryExpression)
+  ~~~ expand-and: (a > b) > c --> (a > b) && (b > c) ~~~
+  var Bool expand-and
+  
+  func dynamic analyze()
+    base()
+    if self.binary-left-expression?
+      self.binary-left-expression.is-relational()->(var self.expand-and)
+    self.test-operand(user self.right-expression)
+    if not self.expand-and
+      self.test-operand(user self.left-expression)
+    self.set-simple-type(user glob.type-bool)
+  
+  func dynamic is-relational()->(var Bool is-relational)
+    is-relational := true
+  
+  func dynamic test-operand(user Expression operand)
+    self.test-operand-type(user operand, user glob.type-int)
+  
+  func dynamic write-end()
+    if self.expand-and
+      write(user "&& (")
+      self.binary-left-expression.right-expression.write()
+      write(user " ")
+    base()
+    if self.expand-and
+      write(user ")")
+
+func relational-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := RelationalOperatorExpression(user code-node, user operator)
+
+
+~~~ = != ~~~
+class EqualizerOperatorExpression(RelationalOperatorExpression)
+  func dynamic test-operand(user Expression operand)
+    self.test-is-reference(copy false, user operand)
+
+func equalizer-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := EqualizerOperatorExpression(user code-node, user operator)
+
+
+~~~ is is-not ~~~
+class IdentityOperatorExpression(BinaryExpression)
+  func dynamic analyze()
+    base()
+    self.test-is-reference(copy true, user self.right-expression)
+    self.test-is-reference(copy true, user self.left-expression)
+    self.set-simple-type(user glob.type-bool)
+    self.safe-operand-write := false
+  
+  func dynamic write()
+    write(user "(void*)")
+    base()
+
+func identity-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := IdentityOperatorExpression(user code-node, user operator)
+
+
+~~~ or and ~~~
+class LogicalOperatorExpression(BinaryExpression)
+  func dynamic analyze()
+    base()
+    self.test-operands-type(user glob.type-bool)
+    self.set-simple-type(user glob.type-bool)
+    
+
+func logical-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := LogicalOperatorExpression(user code-node, user operator)
+
+
+~~~ += -= *= ~~~
+class ArithmeticAssignOperatorExpression(BinaryExpression)
+  func dynamic analyze()
+    base()
+    self.analyze-operands()
+    self.safe-operand-write := false
+    if not self.left-expression.assignable
+      self.syntax-error-msg(user "assigning into non assignable expression")
+    
+  func dynamic analyze-operands()
+    self.test-operands-type(user glob.type-int)
+
+func arithmetic-assign-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := ArithmeticAssignOperatorExpression(user code-node, user operator)
+
+
+~~~ := ~~~
+class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
+  user Expression assignee
+  owner VariableExpression assigned-value-variable
+  
+  func dynamic analyze-operands()
+    self.left-expression.result-type.check-assign-from(
+        copy self.left-expression.access, user self)->(
+        owner self.right-expression, user self.assignee)
+    if self.left-expression.access = Access.USER
+      self.code-node.get-function().has-user-assign := true
+    else-if self.left-expression.access = Access.OWNER
+      ; ownership pass
+      self.add-aux-variable(
+          copy Access.OWNER,
+          copy false,
+          user self.left-expression.result-type)->(
+          owner self.assigned-value-variable)
+        
+  func dynamic write-preactions()
+    base()
+    if not self.left-expression.result-type.type-data.is-primitive
+      if self.left-expression.access = Access.OWNER
+        self.write-owner-assign-preactions()
+      else
+        self.write-user-assign-preactions()
+      
+  func dynamic write-end()
+    if self.left-expression.access = Access.OWNER
+      self.write-end-expression(user self.assigned-value-variable)
+      self.code-node.write-spaces()
+      self.assigned-value-variable.write-assign-null()
+    else
+      base()
+      
+  func inst write-user-assign-preactions()
+    write(user "aux_Ref_Manager = ")
+    self.left-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.left-expression.write-refman()
+    write(user " = ")
+    self.right-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.write-assign-dynamic(
+        user self.left-expression, user self.right-expression)
+    
+    write(user "LUMI_inc_ref(")
+    self.left-expression.write-refman()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    
+    write(user "LUMI_dec_ref(aux_Ref_Manager);\n")
+    self.code-node.write-spaces()
+    write(user "aux_Ref_Manager = NULL;\n")
+    self.code-node.write-spaces()
+  
+  func inst write-owner-assign-preactions()
+    self.assigned-value-variable.write()
+    write(user " = ")
+    self.right-expression.write()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    self.assigned-value-variable.write-refman()
+    write(user " = ")
+    self.right-expression.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.write-assign-dynamic(
+        user self.assigned-value-variable, user self.right-expression)
+    
+    if self.right-expression.result-type.type-data is-not glob.type-empty
+      self.assignee.write-assign-null()
+      self.code-node.write-spaces()
+    self.write-left-delete()
+    self.code-node.write-spaces()
+    
+    write(user "LUMI_owner_dec_ref(")
+    self.left-expression.write-refman()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    
+    self.left-expression.write-refman()
+    write(user " = ")
+    self.assigned-value-variable.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.write-assign-dynamic(
+        user self.left-expression, user self.assigned-value-variable)
+      
+  func inst write-assign-dynamic(user Expression target, user Expression source)
+    if not target.result-type.type-data.is-dynamic and
+        not target.is-generic-cast
+      return
+    target.write-dynamic()
+    write(user " = ")
+    if not source.result-type.type-data.is-dynamic and
+        not source.is-generic-cast and
+        source.result-type.type-data is-not glob.type-empty
+      write(user "&")
+      source.result-type.type-data.write-cname()
+      write(user "_dynamic")
+    else
+      if (target.result-type.type-data is glob.type-generic or
+          target.is-generic-cast) and
+          source.result-type.type-data is-not glob.type-generic and
+          not source.is-generic-cast
+        write(user "(Generic_Type_Dynamic*)")
+        source.write-dynamic-safe()
+      else-if source.is-generic-cast and not target.is-generic-cast and
+          not (target.result-type.type-data is glob.type-generic)
+        source.write-dynamic-safe()
+      else
+        source.write-dynamic()
+    write(user ";\n")
+    self.code-node.write-spaces()
+  
+  func inst write-left-delete()
+    user TypeData type-data(user self.left-expression.result-type.type-data)
+    if type-data.is-dynamic
+      write(user "if (")
+      self.left-expression.write-dynamic()
+      write(user " != NULL) ")
+      self.left-expression.write-dynamic-safe()
+      write(user "->")
+      do
+        while type-data.base-type?
+        type-data := type-data.base-type.type-data
+        while type-data.is-dynamic
+        write(user "_base.")
+      write(user "_del(")
+    else-if type-data is-not glob.type-array
+      type-data.write-cname()
+      write(user "_Del(")
+    else
+      type-data :=
+          self.left-expression.result-type.parameters.first.item.type-data
+      if not type-data.is-primitive
+        write(user "ARRAY_DEL(")
+        type-data.write-cname()
+        write(user ", ")
+        self.left-expression.write()
+        write(user ")\n")
+      return
+    self.left-expression.write()
+    write(user ");\n")
+
+func assign-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := AssignOperatorExpression(user code-node, user operator)
+
+
+func non-binary-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  code-node.syntax-error(user "used non-binary operator", user operator.name)

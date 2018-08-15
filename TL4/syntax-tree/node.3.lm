@@ -12,6 +12,12 @@ class SyntaxTreeNode
     self.input-file-name := glob.input-file-name
     self.line-number := glob.line-number
   
+  func inst read-line-break-spaces(copy Int indentation-spaces)
+    var Int expected-spaces(indentation-spaces + 4)
+    for n in expected-spaces
+      if read-c() != ' '
+        self.m-syntax-error-indentation(copy n, copy expected-spaces)
+  
   func inst get-access(user String access-str):(copy Int access)
     for n in 1:5
       if glob.access-names[n].equal(user access-str)

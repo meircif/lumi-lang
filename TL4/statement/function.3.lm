@@ -61,7 +61,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     dummy-node.set-location()
     dummy-node.parent := self
     self.arguments.parse(
-        user argument-factory, copy is-native, user dummy-node):(copy end)
+        user argument-factory,
+        copy is-native,
+        user dummy-node,
+        copy self.indentation-spaces):(
+        copy end)
     if ? self.parent-type
       self.arguments.add-self-parameter(user self.parent-type)
   
@@ -276,14 +280,17 @@ class DeclarationArgument(Argument)
         owner new-argument.variable.type-instance)
     string-new-copy(user self.variable.name):(owner new-argument.variable.name)
   
-  func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
+  func dynamic parse-value(
+      user SyntaxTreeCode code-node, copy Int indentation-spaces):(
+      copy Char end)
     new SyntaxTreeVariable in self.variable
     self.variable.access := self.access
     self.variable.is-output := self.is-output
     if ? code-node
       code-node.get-parent-type():(user self.variable.parent-type)
     new TypeInstance in self.variable.type-instance
-    self.variable.type-instance.parse(user " ", user self, user _):(copy end)
+    self.variable.type-instance.parse(
+        user " ", user self, user _, copy indentation-spaces):(copy end)
     if end != ' '
       self.m-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user ",)"):(owner self.variable.name, copy end)

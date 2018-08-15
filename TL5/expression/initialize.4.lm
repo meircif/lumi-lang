@@ -3,9 +3,8 @@ module tl5-compiler
 
 class InitExpression(ModuleTypeExpression)
   var FunctionArguments arguments
-  owner SymbolExpression symbol
+  owner VariableExpression aux-variable
   user SyntaxTreeFunction constructor
-  owner Expression value
   
   func inst parse-new(
       owner TypeInstance result-type, user SyntaxTreeCode code-node)->(
@@ -25,29 +24,32 @@ class InitExpression(ModuleTypeExpression)
     if glob.last-char = '('
       var CallArgumentFactory argument-factory
       self.arguments.parse(
-          user argument-factory, copy false, user self.code-node)
+          user argument-factory,
+          copy false,
+          user self.code-node,
+          copy self.code-node.parent.indentation-spaces)
   
   func dynamic analyze()
     self.analyze-type-instance(user self.result-type)
     
     self.arguments.analyze()
-    if self.symbol?
-      self.symbol.result-type.analyze(user self)
+    if self.aux-variable?
+      self.aux-variable.result-type.analyze(user self)
     else
       self.add-aux-variable(
           copy Access.OWNER, copy true, user self.result-type)->(
-          owner self.symbol)
-    self.access := self.symbol.access
+          owner self.aux-variable)
+    self.access := self.aux-variable.access
     
-    if self.symbol.variable.access = Access.OWNER and
-        self.symbol.variable.is-create and
+    if self.aux-variable.variable.access = Access.OWNER and
+        self.aux-variable.variable.is-create and
         self.result-type.type-data.is-primitive
       self.syntax-error(
           user "dynamic allocation of primitive type",
           user self.result-type.type-data.name)
     
     if not self.result-type.type-data.is-primitive and
-        self.symbol.variable.is-create
+        self.aux-variable.variable.is-create
       self.result-type.check-sequence(user self)
       if self.result-type.type-data is glob.type-array
         if self.result-type.parameters.first.item.type-data is glob.type-generic
@@ -67,7 +69,7 @@ class InitExpression(ModuleTypeExpression)
         self-param.access :=
             self.constructor.arguments.parameters.first.item.access
         self-param.code-node := self.code-node
-        self.symbol.copy-new()->(owner self-param.value)
+        self.aux-variable.copy-new()->(owner self-param.value)
         self.arguments.parameters.prepend(owner self-param)
         self.arguments.check-same-as(
             user self.constructor.arguments, user self.result-type, copy 0)
@@ -103,7 +105,7 @@ class InitExpression(ModuleTypeExpression)
       if self.result-type.parameters.first.item.type-data is glob.type-string
         self.result-type.parameters.first.item.length.write-preactions()
     
-    if self.symbol.variable.access = Access.VAR
+    if self.aux-variable.variable.access = Access.VAR
       self.write-var-init()
     else
       self.write-new-init()
@@ -115,15 +117,15 @@ class InitExpression(ModuleTypeExpression)
       self.code-node.write-call(user self.arguments)
   
   func inst write-var-init()
-    self.write-init-var-ref(user self.symbol)
+    self.write-init-var-ref(user self.aux-variable)
     
     if self.result-type.type-data is glob.type-array or
         self.result-type.type-data is glob.type-string
-      ; `symbol`_Var.values = `symbol`_Values;
+      ; `aux-variable`_Var.values = `aux-variable`_Values;
       self.code-node.write-spaces()
-      self.symbol.write()
+      self.aux-variable.write()
       write(user "_Var.values = ")
-      self.symbol.write()
+      self.aux-variable.write()
       write(user "_Values;\n")
       if self.result-type.type-data is glob.type-array
         if self.result-type.parameters.first.item.type-data is glob.type-string
@@ -135,17 +137,17 @@ class InitExpression(ModuleTypeExpression)
           write(user ", ")
           self.result-type.parameters.first.item.length.write()
           write(user ", ")
-          self.symbol.write()
+          self.aux-variable.write()
           write(user ", ")
-          self.symbol.write()
+          self.aux-variable.write()
           write(user "_Chars);\n")
   
   func inst write-new-init()
-    ; INIT_NEW(`line`, `symbol`, ...)
+    ; INIT_NEW(`line`, `aux-variable`, ...)
     write(user "INIT_NEW(")
     self.write-line-num()
     write(user ", ")
-    self.symbol.write()
+    self.aux-variable.write()
     write(user ", ")
     
     if self.result-type.type-data is glob.type-array
@@ -183,34 +185,31 @@ class InitExpression(ModuleTypeExpression)
     self.arguments.parameters.first.item.get-output()->(user value)
     self.code-node.write-spaces()
     value.write-preactions()
-    self.symbol.write()
+    self.aux-variable.write()
     write(user " = ")
-    value.write()
+    value.write-cast()
     write(user ";\n")
     
     if not self.result-type.type-data.is-primitive
       ; `name`_Refman = `value`_Refman;
       ; LUMI_inc_ref(`name`_Refman);
       self.code-node.write-spaces()
-      self.symbol.write()
+      self.aux-variable.write()
       write(user "_Refman = ")
       value.write-refman()
       write(user ";\n")
       if self.access != Access.OWNER
         self.code-node.write-spaces()
         write(user "LUMI_inc_ref(")
-        self.symbol.write()
+        self.aux-variable.write()
         write(user "_Refman);\n")
     
     if self.result-type.type-data.is-dynamic
       ; `name`_Dynamic = `Type`_Dynamic;
       self.code-node.write-spaces()
-      self.symbol.write()
+      self.aux-variable.write()
       write(user "_Dynamic = ")
-      if value.is-generic-cast
-        value.top := false
-      value.write-dynamic()
-      value.top := true
+      value.write-dynamic-cast()
       write(user ";\n")
     
     self.arguments.write-postactions()
@@ -222,10 +221,10 @@ class InitExpression(ModuleTypeExpression)
   func dynamic write()
     if self.is-statement
       if not self.result-type.type-data.is-primitive and
-          self.symbol.variable.is-create
+          self.aux-variable.variable.is-create
         self.code-node.write-spaces()
         self.write-allocation()
       else-if self.arguments.parameters.first?
         self.write-assign()
     else
-      self.symbol.write()
+      self.aux-variable.write()

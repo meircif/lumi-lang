@@ -39,7 +39,8 @@ static TypeInstance
   func inst parse(
       user String ends,
       user SyntaxTreeNode node,
-      user SyntaxTreeCode code-node):(
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces):(
       copy Char end)
     user String name
     read-until(user string-new-concat(user ends, user ".{"), copy false):(
@@ -48,12 +49,15 @@ static TypeInstance
       string-new-copy(user name):(owner self.module-name)
       read-until(user string-new-concat(user ends, user "{"), copy false):(
           user name, copy end)
-    self.parse-name(user name, user node, user code-node):(copy end)
+    self.parse-name(
+        user name, user node, user code-node, copy indentation-spaces):(
+        copy end)
   
   func inst parse-name(
       user String name,
       user SyntaxTreeNode node,
-      user SyntaxTreeCode code-node):(
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces):(
       copy Char end)
     string-new-copy(user name):(owner self.name)
     if end = '{'
@@ -65,7 +69,11 @@ static TypeInstance
         new FunctionArguments in self.arguments
         var DeclarationArgumentFactory argument-factory
         self.arguments.parse(
-            user argument-factory, copy false, user code-node):(copy end)
+            user argument-factory,
+            copy false,
+            user code-node,
+            copy indentation-spaces):(
+            copy end)
       else-if ? code-node and self.name.equal(user "String")
         parse-new-expression(user "}", user code-node):(
             owner self.length-owner, copy end)
@@ -88,7 +96,12 @@ static TypeInstance
           new List{TypeInstance} in self.parameters
           do
             new TypeInstance sub-type
-            sub-type.parse(user ":}", user node, user code-node):(copy end)
+            sub-type.parse(
+                user ":}",
+                user node,
+                user code-node,
+                copy indentation-spaces):(
+                copy end)
             self.parameters.add(owner sub-type)
             while end = ':'
             if is-array

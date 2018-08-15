@@ -21,7 +21,7 @@ Supports TL0, TL1, TL2, TL3, TL4 & TL5.
 module lumi
 
 
-const Int MAX-COMMNAD-SIZE 1024
+const Int MAX-COMMNAD-SIZE 2048
 user String usage(user "Usage: lumi [options] file...")
 
 

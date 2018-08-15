@@ -14,15 +14,18 @@ class Argument(SyntaxTreeNode)
       user String access-str,
       copy Bool is-output,
       copy Bool is-native,
-      user SyntaxTreeCode code-node):(
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces):(
       copy Char end)
     self.is-output := is-output
     self.is-native := is-native
     self.set-location()
     self.get-access(user access-str):(copy self.access)
-    self.parse-value(user code-node):(copy end)
+    self.parse-value(user code-node, copy indentation-spaces):(copy end)
   
-  func dynamic parse-value(user SyntaxTreeCode code-node):(copy Char end)
+  func dynamic parse-value(
+      user SyntaxTreeCode code-node, copy Int indentation-spaces):(
+      copy Char end)
     raise
   
   func dynamic get-type-instance():(user TypeInstance type-instance)
@@ -91,14 +94,16 @@ class FunctionArguments(SyntaxTreeNode)
   func inst parse(
       user ArgumentFactory argument-factory,
       copy Bool is-native,
-      user SyntaxTreeCode code-node):(
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces):(
       copy Char end)
     self.init()
     self.parse-args(
         user self.parameters,
         user argument-factory,
         copy is-native,
-        user code-node):(
+        user code-node,
+        copy indentation-spaces):(
         copy end)
     if end = '-'
       self.read-expect(user ">(")
@@ -106,7 +111,8 @@ class FunctionArguments(SyntaxTreeNode)
           user self.outputs,
           user argument-factory,
           copy is-native,
-          user code-node):(
+          user code-node,
+          copy indentation-spaces):(
           copy end)
   
   func inst add-self-parameter(user TypeData type-data)
@@ -126,14 +132,15 @@ class FunctionArguments(SyntaxTreeNode)
       user List{Argument} arguments,
       user ArgumentFactory argument-factory,
       copy Bool is-native,
-      user SyntaxTreeCode code-node):(
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces):(
       copy Char end)
     owner Argument argument
     user String access-str
     var Bool is-output(arguments = self.outputs)
     read-until(user " )", copy false):(user access-str, copy end)
     if end = '\n' and access-str.length = 0
-      code-node.read-line-break-spaces()
+      self.read-line-break-spaces(copy indentation-spaces)
       read-until(user " ", copy false):(user access-str, copy end)
     if end != ')' or access-str.length > 0
       do
@@ -145,12 +152,16 @@ class FunctionArguments(SyntaxTreeNode)
         argument-factory.m-new-argument():(owner argument)
         arguments.add(owner argument)
         argument.parse(
-            user access-str, copy is-output, copy is-native, user code-node):(
+            user access-str,
+            copy is-output,
+            copy is-native,
+            user code-node,
+            copy indentation-spaces):(
             copy end)
         while end = ','
         read-c():(copy end)
         if end = '\n'
-          code-node.read-line-break-spaces()
+          self.read-line-break-spaces(copy indentation-spaces)
         else-if end != ' '
           self.m-syntax-error-c(
               user "expected space or new-line after \",\", got",

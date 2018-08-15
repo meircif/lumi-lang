@@ -178,10 +178,10 @@ CHECK_REF(1, ut_M_tc, ut_M_tc_Refman)
 CHECK_REF(1, ut_M_tc, ut_M_tc_Refman)
     ut_M_i = ut_M_tc->_base._base._base.num;
 /// @ t3
-CHECK_REF(1, *to, (*to_Refman))
+CHECK_REF(1, *to, *to_Refman)
     ut_M_i = (*to)->num;
 /// @ t4
-CHECK_REF(1, *tco, (*tco_Refman))
+CHECK_REF(1, *tco, *tco_Refman)
     ut_M_i = (*tco)->_base._base._base.num;
 /// @ t5
 CHECK_REF(1, ut_M_t, ut_M_t_Refman)
@@ -203,8 +203,8 @@ type "Int" has no member "error"
 /// @@ test-slice-expression
 /// @ t0
 CHECK_REF(1, ut_M_str, ut_M_str_Refman)
-    if ((13) < 0 || (13) >= (ut_M_str)->length) RAISE(1, slice_index)
-    ut_M_c = ((ut_M_str)->values)[13];
+    if (13 < 0 || 13 >= ut_M_str->length) RAISE(1, slice_index)
+    ut_M_c = (ut_M_str->values)[13];
 /// @ t1
 String aux_String_0_Var = {0};
     String* aux_String_0 = NULL;
@@ -215,7 +215,7 @@ String aux_String_0_Var = {0};
     aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
     aux_String_0_Var.values = (ut_M_str)->values + (2);
     CHECK_REF(1, ut_M_str, ut_M_str_Refman)
-    if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_str)->length) RAISE(1, slice_index)
+    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_str->length) RAISE(1, slice_index)
     aux_Ref_Manager = ut_M_str_Refman;
     ut_M_str_Refman = ut_M_str_Refman;
     LUMI_inc_ref(ut_M_str_Refman);
@@ -224,8 +224,8 @@ String aux_String_0_Var = {0};
     ut_M_str = aux_String_0;
 /// @ t2
 CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((13) < 0 || (13) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    ut_M_i = ((Int*)((ut_M_arr)->values))[13];
+    if (13 < 0 || 13 >= ut_M_arr->length) RAISE(1, slice_index)
+    ut_M_i = ((Int*)(ut_M_arr->values))[13];
 /// @ t3
 Array aux_Array_0_Var = {0};
     Array* aux_Array_0 = NULL;
@@ -235,7 +235,7 @@ Array aux_Array_0_Var = {0};
     aux_Array_0_Var.length = 6;
     aux_Array_0_Var.values = (Byte*)((ut_M_arr)->values) + (2);
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((2) < 0 || (6) < 0 || (2) + (6) > (ut_M_arr)->length) RAISE(1, slice_index)
+    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_arr->length) RAISE(1, slice_index)
     aux_Ref_Manager = ut_M_arr_Refman;
     ut_M_arr_Refman = ut_M_arr_Refman;
     LUMI_inc_ref(ut_M_arr_Refman);
@@ -244,12 +244,12 @@ Array aux_Array_0_Var = {0};
     ut_M_arr = aux_Array_0;
 /// @ t4
 CHECK_REF(1, ut_M_str, ut_M_str_Refman)
-    if ((4) < 0 || (4) >= (ut_M_str)->length) RAISE(1, slice_index)
-    ((ut_M_str)->values)[4] = ut_M_c;
+    if (4 < 0 || 4 >= ut_M_str->length) RAISE(1, slice_index)
+    (ut_M_str->values)[4] = ut_M_c;
 /// @ t5
 CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((4) < 0 || (4) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    ((Int*)((ut_M_arr)->values))[4] = ut_M_i;
+    if (4 < 0 || 4 >= ut_M_arr->length) RAISE(1, slice_index)
+    ((Int*)(ut_M_arr->values))[4] = ut_M_i;
 /// @ t6
 expected "]", got "new-line"
 /// @ t7
@@ -712,6 +712,7 @@ operator "not" expected "Bool" operand, got "Int"
 ut_M_i = 23 + 54;
 /// @ t1
 ut_M_i += (100 * 2) - ((37 / 5) % 2);
+    ut_M_i *= 3;
 /// @ t2
 ut_M_i -= 12 * 13;
 /// @ t3
@@ -721,7 +722,7 @@ ut_M_b = (3 <= 5) && (23 >= 37);
 /// @ t5
 ut_M_b = (ut_M_i == 5) || (ut_M_i != 37);
 /// @ t6
-ut_M_b = ((2 < ut_M_i) && (ut_M_i < 12)) && (12 < (2 * ut_M_i));
+ut_M_b = ((2 < ut_M_i) && (ut_M_i < 12)) && (12 == (2 * ut_M_i));
 /// @ t7
 Ref_Manager* aux_Ref_Manager = NULL;
     aux_Ref_Manager = ut_M_t_Refman;
@@ -804,7 +805,7 @@ ambiguous precedence between operators "+" and "*"
 /// @ te3
 ambiguous precedence between operators "or" and "and"
 /// @ te4
-cannot use "not" as binary operand
+used non-binary operator "not"
 /// @ te5
 assigning into non assignable expression
 /// @ te6
@@ -833,6 +834,8 @@ non matching subtypes "Int" and "Char"
 passing ownership of type "Tb" into static type "Test"
 /// @ te18
 operator "is" is not supported for type "Bool"
+/// @ te19
+operator "<" expected "Int" operand, got "Bool"
 /// @@ test-question-expression
 /// @ t0
 ut_M_b = ut_M_str != NULL && ut_M_str_Refman->value != NULL;
@@ -848,6 +851,28 @@ if (*to != NULL) RAISE(1, empty_base_output)
     LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(*to), &(*to_Refman), (void*)&(*to_Dynamic));
     CHECK(1)
     ut_M_b = (*to) != NULL && (*to_Refman)->value != NULL;
+/// @ t5
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    String* s;
+    Ref_Manager* s_Refman;
+};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Bool* res);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Bool* res) {
+    Returncode LUMI_err = OK;
+    LUMI_inc_ref(self_Refman);
+    CHECK_REF(4, self, self_Refman)
+    *res = self->s != NULL && self->s_Refman->value != NULL;
+LUMI_cleanup:
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->s_Refman);
+}
 /// @ te0
 cannot use "?" on void expression
 /// @ te1
@@ -936,27 +961,27 @@ Array* aa = NULL;
     Ref_Manager* aa_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(2, aa, aa_Refman)
-    if ((4) < 0 || (4) >= (aa)->length) RAISE(2, slice_index)
+    if (4 < 0 || 4 >= aa->length) RAISE(2, slice_index)
     aux_Ref_Manager = ut_M_ta_Refman;
     ut_M_ta_Refman = aa_Refman;
     ut_M_ta_Dynamic = &ut_M_Ta_dynamic;
     LUMI_inc_ref(ut_M_ta_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_ta = ((ut_M_Ta*)((aa)->values)) + 4;
+    ut_M_ta = ((ut_M_Ta*)(aa->values)) + 4;
 /// @ t10
 Array* ca = NULL;
     Ref_Manager* ca_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(2, ca, ca_Refman)
-    if ((4) < 0 || (4) >= (ca)->length) RAISE(2, slice_index)
+    if (4 < 0 || 4 >= ca->length) RAISE(2, slice_index)
     aux_Ref_Manager = ut_M_ta_Refman;
     ut_M_ta_Refman = ca_Refman;
     ut_M_ta_Dynamic = &(&ut_M_Tc_dynamic->_base._base);
     LUMI_inc_ref(ut_M_ta_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_ta = &((((ut_M_Tc*)((ca)->values)) + 4)->_base._base);
+    ut_M_ta = &((((ut_M_Tc*)(ca->values)) + 4)->_base._base);
 /// @ t11
 if (ut_M_ta_Dynamic == NULL) RAISE(1, empty_object)
     LUMI_err = ut_M_ta_Dynamic->dyn(ut_M_ta, ut_M_ta_Refman, ut_M_ta_Dynamic);
@@ -1102,15 +1127,52 @@ Returncode (*farr_Values[38])(void) = {0};
     INIT_VAR(1, farr)
     farr_Var.values = farr_Values;
     CHECK_REF(2, farr, farr_Refman)
-    if ((3) < 0 || (3) >= (farr)->length) RAISE(2, slice_index)
-    ((Returncode (**)(void))((farr)->values))[3] = ut_M_fun0;
+    if (3 < 0 || 3 >= farr->length) RAISE(2, slice_index)
+    ((Returncode (**)(void))(farr->values))[3] = ut_M_fun0;
     CHECK_REF(3, farr, farr_Refman)
-    if ((3) < 0 || (3) >= (farr)->length) RAISE(3, slice_index)
-    if (((Returncode (**)(void))((farr)->values))[3] == NULL) RAISE(3, empty_object)
-    LUMI_err = (((Returncode (**)(void))((farr)->values))[3])();
+    if (3 < 0 || 3 >= farr->length) RAISE(3, slice_index)
+    if (((Returncode (**)(void))(farr->values))[3] == NULL) RAISE(3, empty_object)
+    LUMI_err = (((Returncode (**)(void))(farr->values))[3])();
     CHECK(3)
 /// @ t6
 Returncode (*fun)(Int x, Int y) = NULL;
+/// @ t7
+Returncode ut_M_mock(Returncode (**f)(void));
+Returncode ut_M_mock(Returncode (**f)(void)) {
+    Returncode LUMI_err = OK;
+    if (*f == NULL) RAISE(2, empty_object)
+    LUMI_err = (*f)();
+    CHECK(2)
+LUMI_cleanup:
+    return LUMI_err;
+}
+/// @ t8
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Returncode (*fun)(Int x, Int y);
+};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
+    Returncode LUMI_err = OK;
+    LUMI_inc_ref(self_Refman);
+LUMI_cleanup:
+    LUMI_dec_ref(self_Refman);
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_fun(Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
+    Returncode LUMI_err = OK;
+    Returncode (*aux_Func_0)(Int x, Int y) = NULL;
+    LUMI_err = ut_M_fun(NULL, &(aux_Func_0));
+    CHECK(4)
+LUMI_cleanup:
+    return LUMI_err;
+}
 /// @ te0
 missing arguments in function type
 /// @ te1

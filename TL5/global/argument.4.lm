@@ -18,20 +18,22 @@ class Argument(SyntaxTreeNode)
       user String access-str,
       copy Bool is-output,
       copy Bool is-native,
-      user SyntaxTreeCode code-node)
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces)
     self.is-output := is-output
     self.is-native := is-native
     self.get-access(user access-str)->(var self.access)
-    self.parse-value(user code-node)
+    self.parse-value(user code-node, copy indentation-spaces)
   
-  func dynamic parse-value(user SyntaxTreeCode code-node)
+  func dynamic parse-value(
+      user SyntaxTreeCode code-node, copy Int indentation-spaces)
     raise
   
   func dynamic get-type-instance()->(user TypeInstance type-instance)
     raise
   
   func inst check-same-as(
-      user Argument other, user TypeInstance instance-type, copy Int bases)
+      user Argument other, user TypeInstance actual-params, copy Int bases)
     if self.access != other.access
       self.syntax-error2(
           user "expected access",
@@ -39,12 +41,12 @@ class Argument(SyntaxTreeNode)
           user ", got",
           user glob.access-names[self.access])
     self.check-same-type-as(
-        user other.get-type-instance(), user instance-type, copy bases)
+        user other.get-type-instance(), user actual-params, copy bases)
     self.is-native := other.is-native
   
   func dynamic check-same-type-as(
       user TypeInstance type-instance,
-      user TypeInstance instance-type,
+      user TypeInstance actual-params,
       copy Int bases)
     self.get-type-instance().check-equal(user type-instance, user self)
   
@@ -89,19 +91,22 @@ class FunctionArguments(SyntaxTreeNode)
   func inst parse(
       user ArgumentFactory argument-factory,
       copy Bool is-native,
-      user SyntaxTreeCode code-node)
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces)
     self.parse-args(
         user self.parameters,
         user argument-factory,
         copy is-native,
-        user code-node)
+        user code-node,
+        copy indentation-spaces)
     if glob.last-char = '-'
       self.read-expect(user ">(")
       self.parse-args(
           user self.outputs,
           user argument-factory,
           copy is-native,
-          user code-node)
+          user code-node,
+          copy indentation-spaces)
   
   func inst add-self-parameter(user TypeData type-data)
     new DeclarationArgument self-args
@@ -119,13 +124,14 @@ class FunctionArguments(SyntaxTreeNode)
       user List{Argument} arguments,
       user ArgumentFactory argument-factory,
       copy Bool is-native,
-      user SyntaxTreeCode code-node)
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces)
     owner Argument argument
     user String access-str
     var Bool is-output(copy arguments is self.outputs)
     read-until(user " )", copy false)->(user access-str)
     if glob.last-char = '\n' and access-str.length = 0
-      code-node.read-line-break-spaces()
+      self.read-line-break-spaces(copy indentation-spaces)
       read-until(user " ", copy false)->(user access-str)
     if glob.last-char != ')' or access-str.length > 0
       do
@@ -135,12 +141,16 @@ class FunctionArguments(SyntaxTreeNode)
           self.syntax-error-c(user "expected space after access, got")
         argument-factory.new-argument()->(owner argument)
         argument.parse(
-            user access-str, copy is-output, copy is-native, user code-node)
+            user access-str,
+            copy is-output,
+            copy is-native,
+            user code-node,
+            copy indentation-spaces)
         arguments.add(owner argument)
         while glob.last-char = ','
         read-c()
         if glob.last-char = '\n'
-          code-node.read-line-break-spaces()
+          self.read-line-break-spaces(copy indentation-spaces)
         else-if glob.last-char != ' '
           self.syntax-error-c(
               user "expected space or new-line after \",\", got")
@@ -182,7 +192,7 @@ class FunctionArguments(SyntaxTreeNode)
   
   func inst check-same-as(
       user FunctionArguments other,
-      user TypeInstance instance-type,
+      user TypeInstance actual-params,
       copy Int bases)->(
       var Bool output-ommited)
     var ListIterator{Argument} my-iter(user self.parameters)
@@ -190,7 +200,7 @@ class FunctionArguments(SyntaxTreeNode)
     for parameter in my-iter
       while other-iter.has()
       parameter.check-same-as(
-          user other-iter.get(), user instance-type, copy bases)
+          user other-iter.get(), user actual-params, copy bases)
       other-iter.next()
     if my-iter.has()
       self.syntax-error-msg(user "too many parameters")
@@ -202,7 +212,7 @@ class FunctionArguments(SyntaxTreeNode)
     for output in my-iter
       while other-iter.has()
       output.check-same-as(
-          user other-iter.get(), user instance-type, copy bases)
+          user other-iter.get(), user actual-params, copy bases)
       other-iter.next()
     if my-iter.has()
       self.syntax-error-msg(user "too many outputs")

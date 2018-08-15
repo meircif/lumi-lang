@@ -397,38 +397,40 @@ Returncode SyntaxTreeForLoop_write_iter(SyntaxTreeForLoop* self) {
   CHECK(276, TypeData_m_new_type_instance(glob->type_bool, &(has_symbol->_base.result_type)) )
   CallArgument* has_arg = malloc(sizeof(CallArgument));
   if (has_arg == NULL) RAISE(277)
-  *has_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
+  *has_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false, false};
   has_arg->_base._base._dtl = CallArgument__dtl;
   has_arg->value = &(has_symbol->_base);
-  CHECK(279, SyntaxTreeForLoop_write_iter_meth(self, self->has_func, has_arg) )
+  has_arg->is_primitive = has_symbol->_base.result_type->type_data->is_primitive;
+  CHECK(280, SyntaxTreeForLoop_write_iter_meth(self, self->has_func, has_arg) )
   
-  CHECK(281, SyntaxTreeBranch_write_spaces(&(self->_base.block->_base)) )
-  CHECK(282, write(&(String){6, 5, "if (!"}) )
-  CHECK(283, write_cname(self->item->name) )
-  CHECK(284, write(&(String){14, 13, "_Has) break;\n"}) )
+  CHECK(282, SyntaxTreeBranch_write_spaces(&(self->_base.block->_base)) )
+  CHECK(283, write(&(String){6, 5, "if (!"}) )
+  CHECK(284, write_cname(self->item->name) )
+  CHECK(285, write(&(String){14, 13, "_Has) break;\n"}) )
   
   SymbolExpression* item_symbol = malloc(sizeof(SymbolExpression));
-  if (item_symbol == NULL) RAISE(286)
+  if (item_symbol == NULL) RAISE(287)
   *item_symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, false};
   item_symbol->_base._base._dtl = SymbolExpression__dtl;
-  CHECK(287, string_new_copy(self->item->name, &(item_symbol->name)) )
-  CHECK(288, TypeInstance_copy_new(self->item->type_instance, &(item_symbol->_base.result_type)) )
+  CHECK(288, string_new_copy(self->item->name, &(item_symbol->name)) )
+  CHECK(289, TypeInstance_copy_new(self->item->type_instance, &(item_symbol->_base.result_type)) )
   CallArgument* item_arg = malloc(sizeof(CallArgument));
-  if (item_arg == NULL) RAISE(289)
-  *item_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
+  if (item_arg == NULL) RAISE(290)
+  *item_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false, false};
   item_arg->_base._base._dtl = CallArgument__dtl;
   item_arg->value = &(item_symbol->_base);
+  item_arg->is_primitive = item_symbol->_base.result_type->type_data->is_primitive;
   item_arg->is_dynamic = item_symbol->_base.result_type->type_data->is_dynamic;
   TypeInstance* _TypeInstance156;
-  CHECK(292, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance156)) )
+  CHECK(294, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance156)) )
   item_arg->is_generic = _TypeInstance156->type_data == glob->type_generic;
-  CHECK(295, SyntaxTreeForLoop_write_iter_meth(self, self->get_func, item_arg) )
+  CHECK(297, SyntaxTreeForLoop_write_iter_meth(self, self->get_func, item_arg) )
   
-  CHECK(297, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )
+  CHECK(299, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )
   
-  CHECK(299, SyntaxTreeForLoop_write_iter_meth(self, self->next_func, NULL) )
-  CHECK(300, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(301, write(&(String){3, 2, "}\n"}) )
+  CHECK(301, SyntaxTreeForLoop_write_iter_meth(self, self->next_func, NULL) )
+  CHECK(302, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
+  CHECK(303, write(&(String){3, 2, "}\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -444,14 +446,15 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   expression_node->_base.parent = self->_base.block;
   
   CallArgument* self_arg = malloc(sizeof(CallArgument));
-  if (self_arg == NULL) RAISE(308)
-  *self_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false};
+  if (self_arg == NULL) RAISE(310)
+  *self_arg = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false, false};
   self_arg->_base._base._dtl = CallArgument__dtl;
+  self_arg->is_primitive = self->aux_symbol->_base.result_type->type_data->is_primitive;
   self_arg->is_dynamic = self->aux_symbol->_base.result_type->type_data->is_dynamic;
   self_arg->value = &(self->aux_symbol->_base);
   
   CallExpression* call = malloc(sizeof(CallExpression));
-  if (call == NULL) RAISE(312)
+  if (call == NULL) RAISE(315)
   *call = (CallExpression){CallExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, false};
   call->_base._base._dtl = CallExpression__dtl;
   call->_base._base.line_number = self->_base._base._base.line_number;
@@ -459,23 +462,23 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   call->_base.is_statement = true;
   call->_base.code_node = &(self->_base._base);
   call->arguments = malloc(sizeof(FunctionArguments));
-  if (call->arguments == NULL) RAISE(317)
+  if (call->arguments == NULL) RAISE(320)
   *call->arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   call->arguments->_base._dtl = FunctionArguments__dtl;
-  CHECK(318, FunctionArguments_init(call->arguments) )
-  CHECK(319, List_add(call->arguments->parameters, &(self_arg->_base)) )
+  CHECK(321, FunctionArguments_init(call->arguments) )
+  CHECK(322, List_add(call->arguments->parameters, &(self_arg->_base)) )
   if (NULL != output_arg) {
     output_arg->_base.is_output = true;
     output_arg->code_node = &(expression_node->_base);
-    CHECK(323, List_add(call->arguments->outputs, &(output_arg->_base)) )
+    CHECK(326, List_add(call->arguments->outputs, &(output_arg->_base)) )
   }
   
   if (meth->is_dynamic) {
     MemberExpression* member = malloc(sizeof(MemberExpression));
-    if (member == NULL) RAISE(326)
+    if (member == NULL) RAISE(329)
     *member = (MemberExpression){MemberExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, false};
     member->_base._base._base._dtl = MemberExpression__dtl;
-    CHECK(327, SyntaxTreeNode_set_location(&(member->_base._base._base)) )
+    CHECK(330, SyntaxTreeNode_set_location(&(member->_base._base._base)) )
     member->_base._base.code_node = &(self->_base._base);
     member->_base.function = meth;
     member->dynamic_call_self_instance = &(self->aux_symbol->_base);
@@ -483,7 +486,7 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   }
   else {
     SymbolExpression* symbol = malloc(sizeof(SymbolExpression));
-    if (symbol == NULL) RAISE(333)
+    if (symbol == NULL) RAISE(336)
     *symbol = (SymbolExpression){SymbolExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL, false};
     symbol->_base._base._dtl = SymbolExpression__dtl;
     symbol->function = meth;
@@ -492,7 +495,7 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   
   expression_node->expression = &(call->_base);
   self->_base._base.parent->_base.indentation_spaces += 2;
-  CHECK(339, (expression_node)->_base._base._dtl[4](expression_node) )
+  CHECK(342, (expression_node)->_base._base._dtl[4](expression_node) )
   self->_base._base.parent->_base.indentation_spaces -= 2;
   return OK;
 }

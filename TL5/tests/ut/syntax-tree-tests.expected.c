@@ -481,7 +481,7 @@ Returncode ut_M_name(String* self, Ref_Manager* self_Refman, Int px, String* pu,
     aux_String_3_Var.max_length = aux_String_3_Var.length + 1;
     aux_String_3_Var.values = (po)->values + (2);
     CHECK_REF(10, po, po_Refman)
-    if ((2) < 0 || (6) < 0 || (2) + (6) > (po)->length) RAISE(10, slice_index)
+    if (2 < 0 || 6 < 0 || 2 + 6 > po->length) RAISE(10, slice_index)
     aux_Ref_Manager = pu_Refman;
     pu_Refman = po_Refman;
     LUMI_inc_ref(pu_Refman);
@@ -976,8 +976,8 @@ Returncode ut_M_name(Array* arr, Ref_Manager* arr_Refman) {
     Returncode LUMI_err = OK;
     LUMI_inc_ref(arr_Refman);
     CHECK_REF(2, arr, arr_Refman)
-    if ((3) < 0 || (3) >= (arr)->length) RAISE(2, slice_index)
-    USER_RAISE(2, ((String*)((arr)->values)) + 3, arr_Refman)
+    if (3 < 0 || 3 >= arr->length) RAISE(2, slice_index)
+    USER_RAISE(2, ((String*)(arr->values)) + 3, arr_Refman)
 LUMI_cleanup:
     LUMI_dec_ref(arr_Refman);
     return LUMI_err;
@@ -1094,8 +1094,8 @@ String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    INIT_NEW(1, aux_String_0, LUMI_new_string(((Int*)((ut_M_arr)->values))[0]));
+    if (0 < 0 || 0 >= ut_M_arr->length) RAISE(1, slice_index)
+    INIT_NEW(1, aux_String_0, LUMI_new_string(((Int*)(ut_M_arr->values))[0]));
     aux_Ref_Manager = ut_M_str_Refman;
     ut_M_str_Refman = aux_String_0_Refman;
     LUMI_inc_ref(ut_M_str_Refman);
@@ -1107,8 +1107,8 @@ Array* aux_Array_0 = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    INIT_NEW(1, aux_Array_0, LUMI_new_array(((Int*)((ut_M_arr)->values))[0], sizeof(Int)));
+    if (0 < 0 || 0 >= ut_M_arr->length) RAISE(1, slice_index)
+    INIT_NEW(1, aux_Array_0, LUMI_new_array(((Int*)(ut_M_arr->values))[0], sizeof(Int)));
     aux_Ref_Manager = ut_M_arr_Refman;
     ut_M_arr_Refman = aux_Array_0_Refman;
     LUMI_inc_ref(ut_M_arr_Refman);
@@ -1121,8 +1121,8 @@ Array* a = NULL;
     Array* aux_Array_0 = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    INIT_NEW(1, aux_Array_0, LUMI_new_array(((Int*)((ut_M_arr)->values))[0], sizeof(ut_M_Test)));
+    if (0 < 0 || 0 >= ut_M_arr->length) RAISE(1, slice_index)
+    INIT_NEW(1, aux_Array_0, LUMI_new_array(((Int*)(ut_M_arr->values))[0], sizeof(ut_M_Test)));
     a = aux_Array_0;
     a_Refman = aux_Array_0_Refman;
     aux_Array_0 = NULL;
@@ -1133,10 +1133,10 @@ Array* sa = NULL;
     Array* aux_Array_0 = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
+    if (0 < 0 || 0 >= ut_M_arr->length) RAISE(1, slice_index)
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((1) < 0 || (1) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    INIT_NEW(1, aux_Array_0, LUMI_new_string_array(((Int*)((ut_M_arr)->values))[0], ((Int*)((ut_M_arr)->values))[1]));
+    if (1 < 0 || 1 >= ut_M_arr->length) RAISE(1, slice_index)
+    INIT_NEW(1, aux_Array_0, LUMI_new_string_array(((Int*)(ut_M_arr->values))[0], ((Int*)(ut_M_arr->values))[1]));
     sa = aux_Array_0;
     sa_Refman = aux_Array_0_Refman;
     aux_Array_0 = NULL;
@@ -1144,8 +1144,8 @@ Array* sa = NULL;
 /// @ t5
 Int x = 0;
     CHECK_REF(1, ut_M_arr, ut_M_arr_Refman)
-    if ((0) < 0 || (0) >= (ut_M_arr)->length) RAISE(1, slice_index)
-    x = ((Int*)((ut_M_arr)->values))[0];
+    if (0 < 0 || 0 >= ut_M_arr->length) RAISE(1, slice_index)
+    x = ((Int*)(ut_M_arr->values))[0];
 /// @ t6
 String* s = NULL;
     Ref_Manager* s_Refman = NULL;
@@ -1410,8 +1410,8 @@ Char ch = 0;
     CHECK_REF(1, aux_String_0, aux_String_0_Refman)
     {int ch_Index; for (ch_Index = 0; ch_Index < aux_String_0->length; ++ch_Index) {
         CHECK_REF(1, aux_String_0, aux_String_0_Refman)
-        if ((ch_Index) < 0 || (ch_Index) >= (aux_String_0)->length) RAISE(1, slice_index)
-        ch = ((aux_String_0)->values)[ch_Index];
+        if (ch_Index < 0 || ch_Index >= aux_String_0->length) RAISE(1, slice_index)
+        ch = (aux_String_0->values)[ch_Index];
         ut_M_c = ch;
     }}
     aux_Ref_Manager = aux_String_0_Refman;
@@ -1434,8 +1434,8 @@ Int n = 0;
     CHECK_REF(1, aux_Array_0, aux_Array_0_Refman)
     {int n_Index; for (n_Index = 0; n_Index < aux_Array_0->length; ++n_Index) {
         CHECK_REF(1, aux_Array_0, aux_Array_0_Refman)
-        if ((n_Index) < 0 || (n_Index) >= (aux_Array_0)->length) RAISE(1, slice_index)
-        n = ((Int*)((aux_Array_0)->values))[n_Index];
+        if (n_Index < 0 || n_Index >= aux_Array_0->length) RAISE(1, slice_index)
+        n = ((Int*)(aux_Array_0->values))[n_Index];
         ut_M_i += n;
     }}
     aux_Ref_Manager = aux_Array_0_Refman;
@@ -1459,13 +1459,13 @@ String* s = NULL;
     CHECK_REF(1, aux_Array_0, aux_Array_0_Refman)
     {int s_Index; for (s_Index = 0; s_Index < aux_Array_0->length; ++s_Index) {
         CHECK_REF(1, aux_Array_0, aux_Array_0_Refman)
-        if ((s_Index) < 0 || (s_Index) >= (aux_Array_0)->length) RAISE(1, slice_index)
+        if (s_Index < 0 || s_Index >= aux_Array_0->length) RAISE(1, slice_index)
         aux_Ref_Manager = s_Refman;
         s_Refman = aux_Array_0_Refman;
         LUMI_inc_ref(s_Refman);
         LUMI_dec_ref(aux_Ref_Manager);
         aux_Ref_Manager = NULL;
-        s = ((String*)((aux_Array_0)->values)) + s_Index;
+        s = ((String*)(aux_Array_0->values)) + s_Index;
         aux_Ref_Manager = ut_M_str_Refman;
         ut_M_str_Refman = s_Refman;
         LUMI_inc_ref(ut_M_str_Refman);
@@ -2147,7 +2147,7 @@ mock delete should have no arguments
 /// @ te28
 mock delete should have no arguments
 /// @ te29
-mock function has no member "error"
+type "Func" has no member "error"
 /// @ te30
 accessing mock function field in dynamic call to "meth"
 /// @ te31
@@ -2534,13 +2534,13 @@ Ref_Manager* aux_Ref_Manager = NULL;
 Ref_Manager* aux_Ref_Manager = NULL;
     CHECK_REF(1, ut_M_d, ut_M_d_Refman)
     CHECK_REF(1, ut_M_d->arr, ut_M_d->arr_Refman)
-    if ((4) < 0 || (4) >= (ut_M_d->arr)->length) RAISE(1, slice_index)
+    if (4 < 0 || 4 >= ut_M_d->arr->length) RAISE(1, slice_index)
     aux_Ref_Manager = ut_M_str_Refman;
     ut_M_str_Refman = ut_M_d->arr_Refman;
     LUMI_inc_ref(ut_M_str_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_str = ((String*)((ut_M_d->arr)->values)) + 4;
+    ut_M_str = ((String*)(ut_M_d->arr->values)) + 4;
 /// @ t8
 ut_M_Data ad_Values[5] = {{0}};
     Array ad_Var = {5, NULL};
@@ -2550,14 +2550,14 @@ ut_M_Data ad_Values[5] = {{0}};
     INIT_VAR(1, ad)
     ad_Var.values = ad_Values;
     CHECK_REF(2, ad, ad_Refman)
-    if ((2) < 0 || (2) >= (ad)->length) RAISE(2, slice_index)
-    CHECK_REF(2, ((ut_M_Data*)((ad)->values)) + 2, ad_Refman)
+    if (2 < 0 || 2 >= ad->length) RAISE(2, slice_index)
+    CHECK_REF(2, ((ut_M_Data*)(ad->values)) + 2, ad_Refman)
     aux_Ref_Manager = ut_M_str_Refman;
-    ut_M_str_Refman = (((ut_M_Data*)((ad)->values)) + 2)->item_Refman;
+    ut_M_str_Refman = (((ut_M_Data*)(ad->values)) + 2)->item_Refman;
     LUMI_inc_ref(ut_M_str_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_str = (((ut_M_Data*)((ad)->values)) + 2)->item;
+    ut_M_str = (((ut_M_Data*)(ad->values)) + 2)->item;
 /// @ t9
 ut_M_Data ad_Values[5] = {{0}};
     Array ad_Var = {5, NULL};
@@ -2567,16 +2567,16 @@ ut_M_Data ad_Values[5] = {{0}};
     INIT_VAR(1, ad)
     ad_Var.values = ad_Values;
     CHECK_REF(2, ad, ad_Refman)
-    if ((2) < 0 || (2) >= (ad)->length) RAISE(2, slice_index)
-    CHECK_REF(2, ((ut_M_Data*)((ad)->values)) + 2, ad_Refman)
-    CHECK_REF(2, (((ut_M_Data*)((ad)->values)) + 2)->arr, (((ut_M_Data*)((ad)->values)) + 2)->arr_Refman)
-    if ((3) < 0 || (3) >= ((((ut_M_Data*)((ad)->values)) + 2)->arr)->length) RAISE(2, slice_index)
+    if (2 < 0 || 2 >= ad->length) RAISE(2, slice_index)
+    CHECK_REF(2, ((ut_M_Data*)(ad->values)) + 2, ad_Refman)
+    CHECK_REF(2, (((ut_M_Data*)(ad->values)) + 2)->arr, (((ut_M_Data*)(ad->values)) + 2)->arr_Refman)
+    if (3 < 0 || 3 >= (((ut_M_Data*)(ad->values)) + 2)->arr->length) RAISE(2, slice_index)
     aux_Ref_Manager = ut_M_str_Refman;
-    ut_M_str_Refman = (((ut_M_Data*)((ad)->values)) + 2)->arr_Refman;
+    ut_M_str_Refman = (((ut_M_Data*)(ad->values)) + 2)->arr_Refman;
     LUMI_inc_ref(ut_M_str_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_str = ((String*)(((((ut_M_Data*)((ad)->values)) + 2)->arr)->values)) + 3;
+    ut_M_str = ((String*)((((ut_M_Data*)(ad->values)) + 2)->arr->values)) + 3;
 /// @ t10
 LUMI_err = ut_M_Data_set(ut_M_d, ut_M_d_Refman, NULL, NULL, NULL, NULL, NULL);
     CHECK(1)
@@ -3829,8 +3829,8 @@ do {
 #undef RETURN_ERROR
 #define RETURN_ERROR break
             CHECK_REF(9, ut_M_arr, ut_M_arr_Refman)
-            if ((3) < 0 || (3) >= (ut_M_arr)->length) RAISE(9, slice_index)
-            ut_M_i = ((Int*)((ut_M_arr)->values))[3];
+            if (3 < 0 || 3 >= ut_M_arr->length) RAISE(9, slice_index)
+            ut_M_i = ((Int*)(ut_M_arr->values))[3];
 #undef RETURN_ERROR
 #define RETURN_ERROR goto LUMI_cleanup
         } while (false);
@@ -4232,7 +4232,7 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_T
         LUMI_dec_ref(aux_Ref_Manager);
         aux_Ref_Manager = NULL;
         *s = t;
-        if (aux_TestIterator_0_Dynamic == NULL) RAISE(8, empty_object)
+        if (aux_TestIterator_0_Dynamic == NULL) RAISE(7, empty_object)
         LUMI_err = aux_TestIterator_0_Dynamic->next(aux_TestIterator_0, aux_TestIterator_0_Refman, aux_TestIterator_0_Dynamic);
         CHECK(7)
     }
@@ -4425,6 +4425,8 @@ recursive declaration of type "Test", variable of type "Base", variable of type 
 recursive declaration of type "Abase", extended by type "Aerror", variable of type "Bbase", extended by type "Berror", variable of type "Abase"
 /// @ te5
 assigning into non assignable expression
+/// @ te6
+cannot use "?" on complex field
 /// @@ test-enum
 /// @ t0
 enum {

@@ -7,8 +7,8 @@ struct TypeInstance
   owner String module-name
   user TypeData type-data
   owner List{TypeInstance} parameters
-  owner Expression length-owner
-  user Expression length
+  var ExpressionValue length-owner
+  user ExpressionValue length
   owner FunctionArguments arguments
   
   ~~~ Return a new deep-copy of self ~~~
@@ -35,7 +35,8 @@ struct TypeInstance
   func parse(
       user String ends,
       user SyntaxTreeNode node,
-      user SyntaxTreeCode code-node)
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces)
     user String name
     read-until(user string-new-concat(user ends, user ".{"), copy false)->(
         user name)
@@ -43,12 +44,14 @@ struct TypeInstance
       string-new-copy(user name)->(owner self.module-name)
       read-until(user string-new-concat(user ends, user "{"), copy false)->(
           user name)
-    self.parse-name(user name, user node, user code-node)
+    self.parse-name(
+        user name, user node, user code-node, copy indentation-spaces)
   
   func parse-name(
       user String name,
       user SyntaxTreeNode node,
-      user SyntaxTreeCode code-node)
+      user SyntaxTreeCode code-node,
+      copy Int indentation-spaces)
     string-new-copy(user name)->(owner self.name)
     if glob.last-char = '{'
       if self.name.equal(user "Func")
@@ -57,17 +60,19 @@ struct TypeInstance
           node.syntax-error-c(user "expected \"(\" inside Function type, got")
         self.arguments := FunctionArguments()
         var DeclarationArgumentFactory argument-factory
-        self.arguments.parse(user argument-factory, copy false, user code-node)
+        self.arguments.parse(
+            user argument-factory,
+            copy false,
+            user code-node,
+            copy indentation-spaces)
       else-if code-node? and self.name.equal(user "String")
-        parse-new-expression(user "}", user code-node)->(
-            owner self.length-owner)
+        self.length-owner.new(user "}", user code-node)
         self.length := self.length-owner
       else
         var Bool has-sub-type(copy true)
         var Bool is-array(copy self.name.equal(user "Array"))
         if code-node? and is-array
-          parse-new-expression(user ":}", user code-node)->(
-              owner self.length-owner)
+          self.length-owner.new(user ":}", user code-node)
           self.length := self.length-owner
           if glob.last-char != ':' and glob.last-char != '}'
             node.syntax-error-c(
@@ -79,7 +84,8 @@ struct TypeInstance
           self.parameters := List{TypeInstance}()
           do
             new TypeInstance sub-type
-            sub-type.parse(user ":}", user node, user code-node)
+            sub-type.parse(
+                user ":}", user node, user code-node, copy indentation-spaces)
             self.parameters.add(owner sub-type)
             while glob.last-char = ':'
             if is-array
@@ -294,26 +300,25 @@ struct TypeInstance
         node.syntax-error-msg(user "missing length for sequence")
   
   func new-replace-params(
-      user TypeInstance instance-type, copy Int bases)->(
+      user TypeInstance actual-params, copy Int bases)->(
       owner TypeInstance type-instance)
     self.copy-new()->(owner type-instance)
     if type-instance?
-      type-instance.replace-type-parameters(user instance-type, copy bases)
+      type-instance.replace-type-parameters(user actual-params, copy bases)
   
-  func replace-type-parameters(
-      user TypeInstance instance-type, copy Int bases)
-    if not instance-type?
+  func replace-type-parameters(user TypeInstance actual-params, copy Int bases)
+    if not actual-params?
       return
     if bases > 0
       owner TypeInstance base-type
-      instance-type.type-data.base-type.new-replace-params(
-          user instance-type, copy bases - 1)->(owner base-type)
+      actual-params.type-data.base-type.new-replace-params(
+          user actual-params, copy bases - 1)->(owner base-type)
       self.replace-type-parameters(user base-type, copy bases - 1)
-    if self.type-data is glob.type-generic and instance-type.parameters? and
-        instance-type.type-data.parameters?
+    if self.type-data is glob.type-generic and actual-params.parameters? and
+        actual-params.type-data.parameters?
       var ListIterator{String} dec-iter(
-          user instance-type.type-data.parameters)
-      for inst-param in instance-type.parameters.iter()
+          user actual-params.type-data.parameters)
+      for inst-param in actual-params.parameters.iter()
         while dec-iter.has()
         if dec-iter.get().equal(user self.name)
           inst-param.copy(user self)
@@ -321,4 +326,4 @@ struct TypeInstance
         dec-iter.next()
     if self.parameters?
       for parameter in self.parameters.iter()
-        parameter.replace-type-parameters(user instance-type, copy bases)
+        parameter.replace-type-parameters(user actual-params, copy bases)

@@ -40,7 +40,7 @@ class TypeData(SyntaxTreeNamespace)
       read-c()
     if glob.last-char = '('
       self.base-type := TypeInstance()
-      self.base-type.parse(user ")", user self, user _)
+      self.base-type.parse(user ")", user self, user _, copy 0)
       if glob.last-char != ')'
         self.syntax-error-c(user "expected \")\" after base type, got")
       read-c()

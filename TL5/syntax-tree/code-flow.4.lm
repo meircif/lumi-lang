@@ -37,7 +37,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
 
 ~~~ If statement node in the syntax tree ~~~
 class SyntaxTreeIf(SyntaxTreeFlowElement)
-  owner Expression condition
+  var ExpressionValue condition
   owner SyntaxTreeElse else-node
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
@@ -46,7 +46,7 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     new-node.parse()
   
   func inst parse()
-    parse-new-expression(user "", user self)->(owner self.condition)
+    self.condition.new(user "", user self)
     self.parse-block(copy false)
   
   func inst add-else(owner SyntaxTreeElse else-node)

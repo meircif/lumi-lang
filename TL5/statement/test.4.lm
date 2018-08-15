@@ -3,7 +3,7 @@ module tl5-compiler
 
 ~~~ Assert statement in the syntax tree ~~~
 class SyntaxTreeAssert(SyntaxTreeCode)
-  owner Expression tested
+  var ExpressionValue tested
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeAssert new-node)
@@ -11,7 +11,7 @@ class SyntaxTreeAssert(SyntaxTreeCode)
     new-node.parse()
   
   func inst parse()
-    parse-new-expression(user "", user self)->(owner self.tested)
+    self.tested.new(user "", user self)
   
   func dynamic analyze()
     self.analyze-expression(user self.tested, user glob.type-bool)
@@ -28,7 +28,7 @@ class SyntaxTreeAssert(SyntaxTreeCode)
 
 ~~~ Assert-error statement in the syntax tree ~~~
 class SyntaxTreeAssertError(SyntaxTreeCode)
-  owner Expression tested
+  var ExpressionValue tested
   owner String expected-error
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
@@ -37,11 +37,11 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     new-node.parse()
   
   func inst parse()
-    parse-new-expression(user ",", user self)->(owner self.tested)
+    self.tested.new(user ",", user self)
     if glob.last-char = ','
       read-c()
       if glob.last-char = '\n'
-        self.read-line-break-spaces()
+        self.read-parent-line-break-spaces()
       else-if glob.last-char != ' '
         self.syntax-error-c(user "expected space after \",\", got")
       read-new(user "")->(owner self.expected-error)

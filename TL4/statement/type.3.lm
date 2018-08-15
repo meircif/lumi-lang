@@ -41,7 +41,7 @@ class TypeData(SyntaxTreeNamespace)
       read-c():(copy end)
     if end = '('
       new TypeInstance in self.base-type
-      self.base-type.parse(user ")", user self, user _):(copy end)
+      self.base-type.parse(user ")", user self, user _, copy 0):(copy end)
       if end != ')'
         self.m-syntax-error-c(
             user "expected \")\" after base type, got", copy end)

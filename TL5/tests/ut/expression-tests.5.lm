@@ -367,6 +367,7 @@ not i
 i := 23 + 54
 ; @ c t1
 i += (100 * 2) - (37 div 5 mod 2)
+i *= 3
 ; @ c t2
 i -= 12 *
         13
@@ -377,7 +378,7 @@ b := 3 <= 5 and 23 >= 37
 ; @ c t5
 b := i = 5 or i != 37
 ; @ c t6
-b := 2 < i < 12 < 2 * i
+b := 2 < i < 12 = 2 * i
 ; @ c t7
 t := tc
 ; @ c t8
@@ -439,6 +440,8 @@ owner Test ot
 ot := tb
 ; @ ec te18
 b := b is b
+; @ ec te19
+b := t is t < 2
 ; @@ test-question-expression
 ; @ c t0
 b := str?
@@ -450,6 +453,11 @@ b := t.fun?
 b := to?
 ; @ c t4
 b := fun7(user _)->(user to)?
+; @ g t5
+struct Test
+    user String s
+    func meth()->(var Bool res)
+        res := self.s?
 ; @ ec te0
 (i := 2)?
 ; @ ec te1
@@ -530,6 +538,20 @@ farr[3]()
 ; @ c t6
 var Func{(copy Int x,
         copy Int y)} fun
+; @ g t7
+func mock()->(var Func{()} f)
+    f()
+; @ g t8
+func fun(copy Func{(copy Int x,
+        copy Int y)} fi)->(var Func{(copy Int x,
+        copy Int y)} fo)
+    fun(copy _)
+struct Test
+    var Func{(copy Int x,
+            copy Int y)} fun
+    func meth(copy Func{(copy Int x,
+            copy Int y)} fi)->(var Func{(copy Int x,
+            copy Int y)} fo)
 ; @ ec te0
 var Func error
 ; @ ec te1

@@ -1111,6 +1111,33 @@ Returncode (*farr_Values[38])(void) = {0};
   CHECK(3)
 /// @ t6
 Returncode (*fun)(Int x, Int y) = NULL;
+/// @ t7
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+  Returncode (*fun)(Int x, Int y);
+};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
+  Returncode LUMI_err = OK;
+  LUMI_inc_ref(self_Refman);
+LUMI_cleanup:
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+  if (self == NULL) return;
+}
+Returncode ut_M_fun(Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
+  Returncode LUMI_err = OK;
+  Returncode (*aux_Func_0)(Int x, Int y) = NULL;
+  LUMI_err = ut_M_fun(NULL, &(aux_Func_0));
+  CHECK(4)
+LUMI_cleanup:
+  return LUMI_err;
+}
 /// @ te0
 missing arguments in function type
 /// @ te1

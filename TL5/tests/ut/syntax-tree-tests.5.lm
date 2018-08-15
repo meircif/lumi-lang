@@ -1579,6 +1579,13 @@ struct Test
     var Base b
     func test(user Base b)
         self.b := b
+; @ eg te6
+struct Base
+    var Int x
+struct Test
+    var Base b
+    func error()
+        assert self.b?
 ; @@ test-enum
 ; @ g t0
 enum MyEnum

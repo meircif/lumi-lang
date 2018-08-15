@@ -1,9 +1,6 @@
 module tl5-compiler
 
-~~~ TL5 compiler - Syntax tree basic node types
-
-
-~~~
+~~~ TL5 compiler - Syntax tree basic node types ~~~
 
 ~~~ Basic node type for all syntax tree nodes ~~~
 class SyntaxTreeNode
@@ -13,6 +10,13 @@ class SyntaxTreeNode
   func inst set-location()
     self.input-file-name := glob.input-file-name
     self.line-number := glob.line-number
+  
+  func inst read-line-break-spaces(copy Int indentation-spaces)
+    var Int expected-spaces(copy indentation-spaces + (2 * INDENTATION-SPACES))
+    for n in expected-spaces
+      read-c()
+      if glob.last-char != ' '
+        self.syntax-error-indentation(copy n, copy expected-spaces)
   
   func inst get-access(user String access-str)->(var Int access)
     for n in 1:5
@@ -76,7 +80,7 @@ class SyntaxTreeNode
           user "expected", user expected-text, user "got", user actual-text)
   
   func inst analyze-expression(
-      user Expression expression, user TypeData expected-type)
+      user ExpressionValue expression, user TypeData expected-type)
     expression.analyze()
     if not expression.result-type?
       self.syntax-error(

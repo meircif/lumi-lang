@@ -3,7 +3,7 @@ module tl5-compiler
 
 ~~~ Expression node in the syntax tree ~~~
 class SyntaxTreeExpression(SyntaxTreeCode)
-  owner Expression expression
+  var ExpressionValue expression
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeExpression new-node)
@@ -11,7 +11,7 @@ class SyntaxTreeExpression(SyntaxTreeCode)
     new-node.parse()
   
   func inst parse()
-    parse-new-expression(user "", user self)->(owner self.expression)
+    self.expression.new(user "", user self)
     self.expression.is-statement := true
   
   func dynamic analyze()
@@ -37,7 +37,7 @@ class SyntaxTreeReturn(SyntaxTreeCode)
 
 ~~~ Raise statement in the syntax tree ~~~
 class SyntaxTreeRaise(SyntaxTreeCode)
-  owner Expression error-message
+  var ExpressionValue error-message
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeRaise new-node)
@@ -46,23 +46,23 @@ class SyntaxTreeRaise(SyntaxTreeCode)
   
   func inst parse()
     if glob.last-char = ' '
-      parse-new-expression(user "", user self)->(owner self.error-message)
+      self.error-message.new(user "", user self)
   
   func dynamic is-end-point()->(var Bool is-end)
     is-end := true
   
   func dynamic analyze()
-    if self.error-message?
+    if self.error-message.parsed()
       self.analyze-expression(user self.error-message, user glob.type-string)
   
   func dynamic write()
     self.write-spaces()
-    if self.error-message?
+    if self.error-message.parsed()
       self.error-message.write-preactions()
     write(user "USER_RAISE(")
     self.write-line-num()
     write(user ", ")
-    if self.error-message?
+    if self.error-message.parsed()
       self.error-message.write()
       write(user ", ")
       self.error-message.write-refman()
@@ -73,7 +73,7 @@ class SyntaxTreeRaise(SyntaxTreeCode)
 
 ~~~ While statement in the syntax tree ~~~
 class SyntaxTreeWhile(SyntaxTreeCode)
-  owner Expression condition
+  var ExpressionValue condition
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeWhile new-node)
@@ -83,7 +83,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
   func inst parse()
     if not self.parent.is-in-loop
       self.syntax-error-msg(user "\"while\" used not inside loop")
-    parse-new-expression(user "", user self)->(owner self.condition)
+    self.condition.new(user "", user self)
   
   func dynamic analyze()
     self.analyze-expression(user self.condition, user glob.type-bool)

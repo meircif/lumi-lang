@@ -341,7 +341,7 @@ test test-name-map()
 test test-illegal-call()
   var tl5-compiler.Argument arg
   assert-error arg.copy-new()
-  assert-error arg.parse-value(user _)
+  assert-error arg.parse-value(user _, copy 0)
   assert-error arg.get-type-instance()
   assert-error arg.get-variable()
   assert-error arg.get-output()
@@ -360,6 +360,8 @@ test test-illegal-call()
   assert-error root.link-types()
   var tl5-compiler.TypeWriter tw
   assert-error tw.write(user _)
+  var tl5-compiler.CallExpression call(user _)
+  assert-error call.write-function()
 
 test test-mocked-functions()
   setup-test()

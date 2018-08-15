@@ -153,7 +153,11 @@ class TypeExpression(ModuleTypeExpression)
           return
       glob.save-input := true
     new TypeInstance type-instance
-    type-instance.parse-name(user text, user code-node, user code-node):(
+    type-instance.parse-name(
+        user text,
+        user code-node,
+        user code-node,
+        copy code-node.parent.indentation-spaces):(
         copy end)
     if end = '('
       new InitExpression expression-init
