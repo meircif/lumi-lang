@@ -65,10 +65,10 @@ struct Lumi
   user String execute-arguments
   var Char version
   user String main-input
-  owner String input-files
-  owner String external-files
-  owner String command
-  owner String lumi-path
+  var IncrementalString input-files
+  var IncrementalString external-files
+  var IncrementalString command
+  var IncrementalString lumi-path
   var Char path-separator
   var Bool lumi-path-ends-with-separator
 
@@ -76,18 +76,18 @@ struct Lumi
     self.running-lumi := true
     self.running-c := true
     self.execute := true
-    self.input-files := String{MAX-COMMNAD-SIZE}()
-    self.external-files := String{MAX-COMMNAD-SIZE}()
-    self.command := String{MAX-COMMNAD-SIZE}()
-    self.lumi-path := String{MAX-COMMNAD-SIZE}()
+    self.input-files.new()
+    self.external-files.new()
+    self.command.new()
+    self.lumi-path.new()
     self.path-separator := '/'
     self.lumi-path-ends-with-separator := true
 
   func run-command(user String error-msg)
     if self.verbose
-      sys.println(user self.command)
+      sys.println(user self.command.text)
     if self.execute
-      if sys.system(user self.command) != 0
+      if sys.system(user self.command.text) != 0
         if error-msg?
           sys.println(user error-msg)
         sys.exit(copy 1)
@@ -129,17 +129,17 @@ struct Lumi
       self.command.concat(user ".c")
     self.command.concat(user "\"")
 
-  func concat-first-file-name(user String target, user String name)
+  func concat-first-file-name(user IncrementalString target, user String name)
     target.concat(user "\"")
     target.concat(user name)
     target.concat(user "\"")
 
-  func concat-file-name(user String target, user String name)
+  func concat-file-name(user IncrementalString target, user String name)
     target.concat(user " ")
     self.concat-first-file-name(user target, user name)
 
   func concat-tl-path()
-    self.command.concat(user self.lumi-path)
+    self.command.concat(user self.lumi-path.text)
     if not self.lumi-path-ends-with-separator
       self.command.append(copy self.path-separator)
     self.command.concat(user "TL")
@@ -174,7 +174,7 @@ struct Lumi
                 user self.get-opt-param(user "e", user "file name")->(
                 var index))
           else-if op = 'p'
-            self.lumi-path.new(
+            self.lumi-path.clear(
                 user self.get-opt-param(user "p", user "path")->(var index))
           else-if op = 'c'
             self.running-c := false
@@ -246,7 +246,7 @@ struct Lumi
 
 
   func run-lumi()
-    self.command.new(user "tl")
+    self.command.clear(user "tl")
     self.command.append(copy self.version)
     self.command.concat(user "-compiler")
     if self.version >= '4'
@@ -254,18 +254,18 @@ struct Lumi
         self.command.concat(user " -t")
         self.concat-file-name(user self.command, user self.mut)
       self.concat-lumi-output()
-    self.command.concat(user self.input-files)
+    self.command.concat(user self.input-files.text)
     if self.version <= '1'
       self.concat-lumi-output()
     self.run-command(user "Lumi compiler failed")
 
   func run-c()
-    if not sys.getenv(user "CC", user self.command)
-      self.command.new(user "gcc")
-    if self.lumi-path.length = 0
-      sys.getenv(user "LUMIPATH", user self.lumi-path)
-    if self.lumi-path.length > 0
-      var Char last(copy self.lumi-path[self.lumi-path.length - 1])
+    if not self.command.getenv(user "CC")
+      self.command.clear(user "gcc")
+    if self.lumi-path.text.length = 0
+      self.lumi-path.getenv(user "LUMIPATH")
+    if self.lumi-path.text.length > 0
+      var Char last(copy self.lumi-path.text[self.lumi-path.text.length - 1])
       if last = '\\'
         self.path-separator := '\\'
       self.lumi-path-ends-with-separator := last = self.path-separator
@@ -279,8 +279,8 @@ struct Lumi
       else
         self.concat-lumi-output()
     else
-      self.command.concat(user self.input-files)
-    self.command.concat(user self.external-files)
+      self.command.concat(user self.input-files.text)
+    self.command.concat(user self.external-files.text)
     self.command.concat(user " ")
     self.concat-tl-path()
     if self.version = '0'
@@ -298,7 +298,7 @@ struct Lumi
     self.run-command(user "C compiler failed")
 
   func run-program()
-    self.command.clear()
+    self.command.text.clear()
     if not self.output.has(copy self.path-separator)
       self.command.append(copy '.')
       self.command.append(copy self.path-separator)
@@ -316,6 +316,40 @@ struct Lumi
       self.run-c()
     if self.running-program
       self.run-program()
+
+
+struct IncrementalString
+  owner String text
+  
+  new()
+    self.text := String{64}()
+  
+  func clear(user String text)
+    self.text.clear()
+    self.concat(user text)
+  
+  func concat(user String text)
+    do
+      try
+        self.text.concat(user text)
+      catch
+        self.realloc()
+        continue
+      break
+  
+  func append(copy Char ch)
+    var String{2} text
+    text.append(copy ch)
+    self.concat(user text)
+  
+  func getenv(user String name)->(var Bool exists)
+    do
+      while sys.getenv(user name, user self.text)->(var exists)
+      while self.text.length = self.text.max-length
+      self.realloc()
+  
+  func realloc()
+    self.text := String{self.text.max-length * 2}(user self.text)
 
 
 main

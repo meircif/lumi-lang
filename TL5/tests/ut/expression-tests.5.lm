@@ -632,6 +632,8 @@ sys.stdin.getc()->(var c, var b)
 sys.stderr.putc(copy c)
 ; @ c t32
 String.clear(user str)
+; @ c t33
+i := str.max-length
 ; @ ec te0
 var File error
 ; @ ec te1

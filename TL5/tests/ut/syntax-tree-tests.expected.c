@@ -1361,6 +1361,12 @@ while (true) {
 while (true) {
         continue;
     }
+/// @ t4
+while (true) {
+        if (true) {
+            if (!(false)) break;
+        }
+    }
 /// @ te0
 expected new-line after "do", got "("
 /// @ te1

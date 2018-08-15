@@ -38,6 +38,9 @@ class SyntaxTreeReturn(SyntaxTreeCode)
   func dynamic m-is-end-point():(copy Bool is-end)
     is-end := true
   
+  func dynamic analyze()
+    self.check-try(user "return")
+  
   func dynamic write()
     self.write-spaces()
     write(user "goto LUMI_cleanup;\n")
@@ -99,6 +102,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
     parse-new-expression(user "", user self):(owner self.condition, copy end)
   
   func dynamic analyze()
+    self.check-try(user "while")
     self.analyze-expression(user self.condition, user glob.type-bool)
   
   func dynamic write()
@@ -123,6 +127,9 @@ class SyntaxTreeBreak(SyntaxTreeCode)
     self.parent := parent
     if not parent.is-in-loop
       self.m-syntax-error-msg(user "\"break\" used not inside loop")
+    
+  func dynamic analyze()
+    self.check-try(user "break")
   
   func dynamic write()
     self.write-spaces()
@@ -142,6 +149,9 @@ class SyntaxTreeContinue(SyntaxTreeCode)
     self.parent := parent
     if not parent.is-in-loop
       self.m-syntax-error-msg(user "\"continue\" used not inside loop")
+    
+  func dynamic analyze()
+    self.check-try(user "continue")
   
   func dynamic write()
     self.write-spaces()

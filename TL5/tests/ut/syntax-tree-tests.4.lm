@@ -38,12 +38,18 @@ func test-global-scope(
       copy mock-output-file-text.length - 2,
       copy true)
 
-func no-error-raised()
+func try-write-syntax-tree(copy Bool is-test)->(var Bool no-error)
+  Sys.print.active := true
+  no-error := false
+  try
+    write-syntax-tree(copy is-test)
+    Sys.print.active := false
+    if tests-passed
+      sys.print(user "\n    ")
+    sys.print(user "[no error raised]\n    ")
+    tests-passed := false
+    no-error := true
   Sys.print.active := false
-  if tests-passed
-    sys.print(user "\n    ")
-  sys.print(user "[no error raised]\n    ")
-  tests-passed := false
 
 func test-error-message(user String expected-header, user String expected-error)
   assert-string-slice(
@@ -72,12 +78,8 @@ func test-global-scope-error(
     copy Bool is-test)
   setup-test()
   set-mock-file-text(user input-text, user second-file-input-text)
-  Sys.print.active := true
-  try
-    write-syntax-tree(copy is-test)
-    no-error-raised()
+  if try-write-syntax-tree(copy is-test)
     return
-  Sys.print.active := false
   if mock-print-text.length = 0
     setup-test()
     set-mock-file-text(user input-text, user second-file-input-text)

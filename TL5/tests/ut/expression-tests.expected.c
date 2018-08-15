@@ -1291,6 +1291,9 @@ CHECK_REF(1, sys, sys_Refman)
 /// @ t32
 LUMI_err = String_clear(ut_M_str, ut_M_str_Refman);
     CHECK(1)
+/// @ t33
+CHECK_REF(1, ut_M_str, ut_M_str_Refman)
+    ut_M_i = ut_M_str->max_length;
 /// @ te0
 cannot create objects with type "File"
 /// @ te1

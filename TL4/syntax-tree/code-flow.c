@@ -29,7 +29,7 @@ Returncode SyntaxTreeFlowElement_init(SyntaxTreeFlowElement* self, SyntaxTreeBlo
   CHECK(8, SyntaxTreeNode_set_location(&(self->_base._base)) )
   self->block = malloc(sizeof(SyntaxTreeBlock));
   if (self->block == NULL) RAISE(9)
-  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false};
+  *self->block = (SyntaxTreeBlock){SyntaxTreeBlock__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, false};
   self->block->_base._base._dtl = SyntaxTreeBlock__dtl;
   CHECK(10, SyntaxTreeFlowElement_set_parent(self, parent) )
   return OK;

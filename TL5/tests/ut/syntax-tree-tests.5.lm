@@ -657,6 +657,10 @@ do
 ; @ c t3
 do
     continue
+; @ c t4
+do
+    if true
+        while false
 ; @ ec te0
 do(
 ; @ ec te1

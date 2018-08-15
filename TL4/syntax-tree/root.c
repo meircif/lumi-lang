@@ -83,7 +83,7 @@ Returncode SyntaxTreeRoot_init(SyntaxTreeRoot* self) {
   *self->modules = (List){NULL, NULL};
   self->global_init = malloc(sizeof(GlobalInit));
   if (self->global_init == NULL) RAISE(28)
-  *self->global_init = (GlobalInit){GlobalInit__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
+  *self->global_init = (GlobalInit){GlobalInit__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
   self->global_init->_base._base._base._base._dtl = GlobalInit__dtl;
   CHECK(29, GlobalInit_init(self->global_init) )
   return OK;
@@ -726,7 +726,7 @@ static char* _func_name_SyntaxTreeMainFunction_parse_new = "SyntaxTreeMainFuncti
 Returncode SyntaxTreeMainFunction_parse_new(SyntaxTreeMainFunction* self, Char* end, SyntaxTreeMainFunction** new_node) {
   (*new_node) = malloc(sizeof(SyntaxTreeMainFunction));
   if ((*new_node) == NULL) RAISE(391)
-  *(*new_node) = (SyntaxTreeMainFunction){SyntaxTreeMainFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
+  *(*new_node) = (SyntaxTreeMainFunction){SyntaxTreeMainFunction__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false, false};
   (*new_node)->_base._base._base._base._dtl = SyntaxTreeMainFunction__dtl;
   CHECK(392, SyntaxTreeMainFunction_parse((*new_node), &((*end))) )
   return OK;
