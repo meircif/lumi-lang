@@ -2170,13 +2170,13 @@ Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type
   item = NULL;
   item_Refman = NULL;
   item_Dynamic = NULL;
-  CHECK_REF(6, self, self_Refman)
   aux_Generic_Type_0 = x;
   aux_Generic_Type_0_Refman = x_Refman;
   aux_Generic_Type_0_Dynamic = x_Dynamic;
   x = NULL;
   x_Refman = NULL;
   x_Dynamic = NULL;
+  CHECK_REF(6, self, self_Refman)
   if (self->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(self->item_Dynamic))->_del(self->item);
   LUMI_owner_dec_ref(self->item_Refman);
   self->item_Refman = aux_Generic_Type_0_Refman;
@@ -2194,13 +2194,13 @@ Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type
   self->arr = arr;
   INIT_NEW(8, t, LUMI_alloc(sizeof(ut_M_Test)));
   CHECK_REF(9, self, self_Refman)
-  CHECK_REF(9, t, t_Refman)
   aux_Generic_Type_1 = self->item;
   aux_Generic_Type_1_Refman = self->item_Refman;
   aux_Generic_Type_1_Dynamic = self->item_Dynamic;
   self->item = NULL;
   self->item_Refman = NULL;
   self->item_Dynamic = NULL;
+  CHECK_REF(9, t, t_Refman)
   if (t->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(t->item_Dynamic))->_del(t->item);
   LUMI_owner_dec_ref(t->item_Refman);
   t->item_Refman = aux_Generic_Type_1_Refman;
@@ -2210,13 +2210,13 @@ Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type
   aux_Generic_Type_1_Refman = NULL;
   aux_Generic_Type_1_Dynamic = NULL;
   CHECK_REF(10, t, t_Refman)
-  CHECK_REF(10, self, self_Refman)
   aux_Generic_Type_2 = t->item;
   aux_Generic_Type_2_Refman = t->item_Refman;
   aux_Generic_Type_2_Dynamic = t->item_Dynamic;
   t->item = NULL;
   t->item_Refman = NULL;
   t->item_Dynamic = NULL;
+  CHECK_REF(10, self, self_Refman)
   if (self->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(self->item_Dynamic))->_del(self->item);
   LUMI_owner_dec_ref(self->item_Refman);
   self->item_Refman = aux_Generic_Type_2_Refman;

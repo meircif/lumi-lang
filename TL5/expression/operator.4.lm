@@ -159,12 +159,14 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
           owner self.assigned-value-variable)
         
   func dynamic write-preactions()
-    base()
+    self.right-expression.write-preactions()
     if not self.left-expression.result-type.type-data.is-primitive
       if self.left-expression.access = Access.OWNER
         self.write-owner-assign-preactions()
       else
         self.write-user-assign-preactions()
+    else
+      self.left-expression.write-preactions()
       
   func dynamic write-end()
     if self.left-expression.access = Access.OWNER
@@ -175,6 +177,8 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
       base()
       
   func inst write-user-assign-preactions()
+    self.left-expression.write-preactions()
+    
     write(user "aux_Ref_Manager = ")
     self.left-expression.write-refman()
     write(user ";\n")
@@ -217,6 +221,9 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
     if self.right-expression.result-type.type-data is-not glob.type-empty
       self.assignee.write-assign-null()
       self.code-node.write-spaces()
+    
+    self.left-expression.write-preactions()
+    
     self.write-left-delete()
     self.code-node.write-spaces()
     

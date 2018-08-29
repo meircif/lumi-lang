@@ -400,6 +400,13 @@ tb := otc
 ; @ c t15
 owner Array{Test} tarr
 tarr := _
+; @ g t16
+struct Test
+    owner Test t
+func fun()
+    new Test t
+    t := t.t
+    t.t := t
 ; @ ec te0
 345 @ 2
 ; @ ec te1
