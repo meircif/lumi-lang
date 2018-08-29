@@ -90,3 +90,10 @@ test fail-assert-error-message()
 
 test fail-assert-error-message-prefix()
     assert-error f-raise-message(user "tested message"), "tested message and more"
+
+struct Test
+    owner Test t
+
+test fail-owner-cycle()
+    new Test t
+    t.t := t

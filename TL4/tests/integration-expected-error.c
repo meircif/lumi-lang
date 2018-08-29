@@ -11,6 +11,8 @@ typedef struct error_M_TopType error_M_TopType;
 
 typedef struct error_M_TopType_Dynamic error_M_TopType_Dynamic;
 
+typedef struct error_M_Test error_M_Test;
+
 
 /* Enums */
 
@@ -37,6 +39,11 @@ struct error_M_TopType_Dynamic {
   error_M_BaseType_Dynamic _base;
 };
 
+struct error_M_Test {
+  error_M_Test* t;
+  Ref_Manager* t_Refman;
+};
+
 
 /* types methods declaration */
 
@@ -47,6 +54,8 @@ void error_M_BaseType_Del(error_M_BaseType* self);
 Returncode error_M_TopType_meth(error_M_TopType* self, Ref_Manager* self_Refman, error_M_TopType_Dynamic* self_Dynamic);
 
 void error_M_TopType_Del(error_M_TopType* self);
+
+void error_M_Test_Del(error_M_Test* self);
 
 
 /* global functions declaration */
@@ -91,6 +100,8 @@ Returncode error_M_fail_assert_error_message(void);
 
 Returncode error_M_fail_assert_error_message_prefix(void);
 
+Returncode error_M_fail_owner_cycle(void);
+
 
 /* types global variables */
 
@@ -98,19 +109,22 @@ error_M_BaseType_Dynamic error_M_BaseType_dynamic = {(Dynamic_Del)error_M_BaseTy
 
 error_M_TopType_Dynamic error_M_TopType_dynamic = {{(Dynamic_Del)error_M_TopType_Del, (Func)error_M_TopType_meth}};
 
+Generic_Type_Dynamic error_M_Test_dynamic = {(Dynamic_Del)error_M_Test_Del};
+
 
 /* global variables */
 
 Int error_M_new_fail_countdown = 0;
 
-int LUMI_file0_line_count[94] = {
+int LUMI_file0_line_count[101] = {
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0,-1,-1, 0,-1,-1,-1,-1, 0, 0, 0,
    0, 0,-1,-1,-1, 0, 0,-1,-1, 0, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0, 0,-1,-1, 0, 0,
    0, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,-1,-1, 0, 0,
-  -1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1
+  -1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1, 0,-1,-1,-1,-1,-1, 0, 0,
+  -1
 };
 File_Coverage LUMI_file_coverage[1] = {
-  {"tests/integration-error-test.4.lm", 94, LUMI_file0_line_count}
+  {"tests/integration-error-test.4.lm", 101, LUMI_file0_line_count}
 };
 
 
@@ -147,6 +161,12 @@ LUMI_cleanup:
 void error_M_TopType_Del(error_M_TopType* self) {
   if (self == NULL) return;
   error_M_BaseType_Del(&(self->_base));
+}
+
+void error_M_Test_Del(error_M_Test* self) {
+  if (self == NULL) return;
+  SELF_REF_DEL(error_M_Test, t);
+  LUMI_owner_dec_ref(self->t_Refman);
 }
 
 
@@ -617,6 +637,38 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
+#define LUMI_FILE_NAME "tests/integration-error-test.4.lm"
+#define LUMI_FUNC_NAME "fail-owner-cycle"
+Returncode error_M_fail_owner_cycle(void) {
+  Returncode LUMI_err = OK;
+  error_M_Test* t = NULL;
+  Ref_Manager* t_Refman = NULL;
+  error_M_Test* aux_Test_0 = NULL;
+  Ref_Manager* aux_Test_0_Refman = NULL;
+  ++LUMI_file_coverage[0].line_count[98];
+  INIT_NEW(98, t, LUMI_alloc(sizeof(error_M_Test)));
+  ++LUMI_file_coverage[0].line_count[99];
+  aux_Test_0 = t;
+  aux_Test_0_Refman = t_Refman;
+  t = NULL;
+  t_Refman = NULL;
+  CHECK_REF(99, t, t_Refman)
+  error_M_Test_Del(t->t);
+  LUMI_owner_dec_ref(t->t_Refman);
+  t->t_Refman = aux_Test_0_Refman;
+  t->t = aux_Test_0;
+  aux_Test_0 = NULL;
+  aux_Test_0_Refman = NULL;
+LUMI_cleanup:
+  error_M_Test_Del(aux_Test_0);
+  LUMI_owner_dec_ref(aux_Test_0_Refman);
+  error_M_Test_Del(t);
+  LUMI_owner_dec_ref(t_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
 
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
@@ -644,6 +696,7 @@ USER_MAIN_HEADER {
   LUMI_success &= LUMI_run_test("fail-assert-error", error_M_fail_assert_error);
   LUMI_success &= LUMI_run_test("fail-assert-error-message", error_M_fail_assert_error_message);
   LUMI_success &= LUMI_run_test("fail-assert-error-message-prefix", error_M_fail_assert_error_message_prefix);
+  LUMI_success &= LUMI_run_test("fail-owner-cycle", error_M_fail_owner_cycle);
   LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);
   return LUMI_success? LUMI_err : FAIL;
 }

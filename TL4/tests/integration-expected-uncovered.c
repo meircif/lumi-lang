@@ -611,11 +611,11 @@ Returncode integration_M_TestStruct_new(integration_M_TestStruct* self, Ref_Mana
     INIT_NEW(215, aux_TestStruct_0, LUMI_alloc(sizeof(integration_M_TestStruct)));
     LUMI_err = integration_M_TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman);
     CHECK(215)
-    CHECK_REF(215, self, self_Refman)
     aux_TestStruct_1 = aux_TestStruct_0;
     aux_TestStruct_1_Refman = aux_TestStruct_0_Refman;
     aux_TestStruct_0 = NULL;
     aux_TestStruct_0_Refman = NULL;
+    CHECK_REF(215, self, self_Refman)
     integration_M_TestStruct_Del(self->ts);
     LUMI_owner_dec_ref(self->ts_Refman);
     self->ts_Refman = aux_TestStruct_1_Refman;
@@ -1568,11 +1568,11 @@ Returncode integration_M_RefNode_new(integration_M_RefNode* self, Ref_Manager* s
   CHECK_REF(173, self, self_Refman)
   self->ref = ref;
   ++LUMI_file_coverage[1].line_count[174];
-  CHECK_REF(174, self, self_Refman)
   aux_RefNode_0 = next;
   aux_RefNode_0_Refman = next_Refman;
   next = NULL;
   next_Refman = NULL;
+  CHECK_REF(174, self, self_Refman)
   integration_M_RefNode_Del(self->next);
   LUMI_owner_dec_ref(self->next_Refman);
   self->next_Refman = aux_RefNode_0_Refman;
@@ -2895,11 +2895,11 @@ Returncode integration_M_test_ref_count(void) {
   INIT_NEW(363, aux_TestStruct_1, LUMI_alloc(sizeof(integration_M_TestStruct)));
   LUMI_err = integration_M_TestStruct_new(aux_TestStruct_1, aux_TestStruct_1_Refman, 1, aux_String_4, aux_String_4_Refman);
   CHECK(363)
-  CHECK_REF(363, ts, ts_Refman)
   aux_TestStruct_2 = aux_TestStruct_1;
   aux_TestStruct_2_Refman = aux_TestStruct_1_Refman;
   aux_TestStruct_1 = NULL;
   aux_TestStruct_1_Refman = NULL;
+  CHECK_REF(363, ts, ts_Refman)
   integration_M_TestStruct_Del(ts->ts);
   LUMI_owner_dec_ref(ts->ts_Refman);
   ts->ts_Refman = aux_TestStruct_2_Refman;
@@ -4713,11 +4713,11 @@ Returncode integration_M_test_complex_delete(void) {
   aux_Ref_Manager = NULL;
   t3->_base.link = l3;
   ++LUMI_file_coverage[1].line_count[269];
-  CHECK_REF(269, l2, l2_Refman)
   aux_Link_0 = l3;
   aux_Link_0_Refman = l3_Refman;
   l3 = NULL;
   l3_Refman = NULL;
+  CHECK_REF(269, l2, l2_Refman)
   integration_M_Link_Del(l2->next);
   LUMI_owner_dec_ref(l2->next_Refman);
   l2->next_Refman = aux_Link_0_Refman;
@@ -4727,11 +4727,11 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[270];
   TEST_ASSERT(270, ! (l3 != NULL && l3_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[271];
-  CHECK_REF(271, l1, l1_Refman)
   aux_Link_1 = l2;
   aux_Link_1_Refman = l2_Refman;
   l2 = NULL;
   l2_Refman = NULL;
+  CHECK_REF(271, l1, l1_Refman)
   integration_M_Link_Del(l1->next);
   LUMI_owner_dec_ref(l1->next_Refman);
   l1->next_Refman = aux_Link_1_Refman;
@@ -4741,13 +4741,13 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[272];
   TEST_ASSERT(272, ! (l2 != NULL && l2_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[273];
-  CHECK_REF(273, t3, t3_Refman)
   aux_BaseLink_0 = b2;
   aux_BaseLink_0_Refman = b2_Refman;
   aux_BaseLink_0_Dynamic = b2_Dynamic;
   b2 = NULL;
   b2_Refman = NULL;
   b2_Dynamic = NULL;
+  CHECK_REF(273, t3, t3_Refman)
   if (t3->item_Dynamic != NULL) ((integration_M_BaseLink_Dynamic*)(t3->item_Dynamic))->_del(t3->item);
   LUMI_owner_dec_ref(t3->item_Refman);
   t3->item_Refman = aux_BaseLink_0_Refman;
@@ -4759,13 +4759,13 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[274];
   TEST_ASSERT(274, ! (b2 != NULL && b2_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[275];
-  CHECK_REF(275, t2, t2_Refman)
   aux_BaseLink_1 = &(t3->_base);
   aux_BaseLink_1_Refman = t3_Refman;
   aux_BaseLink_1_Dynamic = &(t3_Dynamic->_base);
   t3 = NULL;
   t3_Refman = NULL;
   t3_Dynamic = NULL;
+  CHECK_REF(275, t2, t2_Refman)
   if (t2->item_Dynamic != NULL) ((integration_M_BaseLink_Dynamic*)(t2->item_Dynamic))->_del(t2->item);
   LUMI_owner_dec_ref(t2->item_Refman);
   t2->item_Refman = aux_BaseLink_1_Refman;
@@ -4777,13 +4777,13 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[276];
   TEST_ASSERT(276, ! (t3 != NULL && t3_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[277];
-  CHECK_REF(277, t1, t1_Refman)
   aux_BaseLink_2 = &(t2->_base);
   aux_BaseLink_2_Refman = t2_Refman;
   aux_BaseLink_2_Dynamic = &(t2_Dynamic->_base);
   t2 = NULL;
   t2_Refman = NULL;
   t2_Dynamic = NULL;
+  CHECK_REF(277, t1, t1_Refman)
   if (t1->_base.next_Dynamic != NULL) t1->_base.next_Dynamic->_del(t1->_base.next);
   LUMI_owner_dec_ref(t1->_base.next_Refman);
   t1->_base.next_Refman = aux_BaseLink_2_Refman;
@@ -4795,11 +4795,11 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[278];
   TEST_ASSERT(278, ! (t2 != NULL && t2_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[279];
-  CHECK_REF(279, t1, t1_Refman)
   aux_Link_2 = l1;
   aux_Link_2_Refman = l1_Refman;
   l1 = NULL;
   l1_Refman = NULL;
+  CHECK_REF(279, t1, t1_Refman)
   integration_M_Link_Del(t1->item);
   LUMI_owner_dec_ref(t1->item_Refman);
   t1->item_Refman = aux_Link_2_Refman;
@@ -4810,13 +4810,13 @@ Returncode integration_M_test_complex_delete(void) {
   ++LUMI_file_coverage[1].line_count[280];
   TEST_ASSERT(280, ! (l1 != NULL && l1_Refman->value != NULL))
   ++LUMI_file_coverage[1].line_count[281];
-  CHECK_REF(281, b1, b1_Refman)
   aux_BaseLink_3 = &(t1->_base);
   aux_BaseLink_3_Refman = t1_Refman;
   aux_BaseLink_3_Dynamic = &(t1_Dynamic->_base);
   t1 = NULL;
   t1_Refman = NULL;
   t1_Dynamic = NULL;
+  CHECK_REF(281, b1, b1_Refman)
   if (b1->next_Dynamic != NULL) b1->next_Dynamic->_del(b1->next);
   LUMI_owner_dec_ref(b1->next_Refman);
   b1->next_Refman = aux_BaseLink_3_Refman;

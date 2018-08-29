@@ -295,11 +295,11 @@ Returncode integration_M_TestStruct_new(integration_M_TestStruct* self, Ref_Mana
     INIT_NEW(215, aux_TestStruct_0, LUMI_alloc(sizeof(integration_M_TestStruct)));
     LUMI_err = integration_M_TestStruct_new(aux_TestStruct_0, aux_TestStruct_0_Refman, x + 1, s, s_Refman);
     CHECK(215)
-    CHECK_REF(215, self, self_Refman)
     aux_TestStruct_1 = aux_TestStruct_0;
     aux_TestStruct_1_Refman = aux_TestStruct_0_Refman;
     aux_TestStruct_0 = NULL;
     aux_TestStruct_0_Refman = NULL;
+    CHECK_REF(215, self, self_Refman)
     integration_M_TestStruct_Del(self->ts);
     LUMI_owner_dec_ref(self->ts_Refman);
     self->ts_Refman = aux_TestStruct_1_Refman;
@@ -1898,11 +1898,11 @@ Returncode integration_M_test_ref_count(void) {
   INIT_NEW(363, aux_TestStruct_1, LUMI_alloc(sizeof(integration_M_TestStruct)));
   LUMI_err = integration_M_TestStruct_new(aux_TestStruct_1, aux_TestStruct_1_Refman, 1, aux_String_4, aux_String_4_Refman);
   CHECK(363)
-  CHECK_REF(363, ts, ts_Refman)
   aux_TestStruct_2 = aux_TestStruct_1;
   aux_TestStruct_2_Refman = aux_TestStruct_1_Refman;
   aux_TestStruct_1 = NULL;
   aux_TestStruct_1_Refman = NULL;
+  CHECK_REF(363, ts, ts_Refman)
   integration_M_TestStruct_Del(ts->ts);
   LUMI_owner_dec_ref(ts->ts_Refman);
   ts->ts_Refman = aux_TestStruct_2_Refman;

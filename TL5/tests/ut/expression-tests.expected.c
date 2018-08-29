@@ -796,6 +796,60 @@ Array* tarr = NULL;
     tarr = aux_Array_0;
     aux_Array_0 = NULL;
     aux_Array_0_Refman = NULL;
+/// @ t16
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    ut_M_Test* t;
+    Ref_Manager* t_Refman;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(void);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    SELF_REF_DEL(ut_M_Test, t);
+    LUMI_owner_dec_ref(self->t_Refman);
+}
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    ut_M_Test* t = NULL;
+    Ref_Manager* t_Refman = NULL;
+    ut_M_Test* aux_Test_0 = NULL;
+    Ref_Manager* aux_Test_0_Refman = NULL;
+    ut_M_Test* aux_Test_1 = NULL;
+    Ref_Manager* aux_Test_1_Refman = NULL;
+    INIT_NEW(4, t, LUMI_alloc(sizeof(ut_M_Test)));
+    CHECK_REF(5, t, t_Refman)
+    aux_Test_0 = t->t;
+    aux_Test_0_Refman = t->t_Refman;
+    t->t = NULL;
+    t->t_Refman = NULL;
+    ut_M_Test_Del(t);
+    LUMI_owner_dec_ref(t_Refman);
+    t_Refman = aux_Test_0_Refman;
+    t = aux_Test_0;
+    aux_Test_0 = NULL;
+    aux_Test_0_Refman = NULL;
+    aux_Test_1 = t;
+    aux_Test_1_Refman = t_Refman;
+    t = NULL;
+    t_Refman = NULL;
+    CHECK_REF(6, t, t_Refman)
+    ut_M_Test_Del(t->t);
+    LUMI_owner_dec_ref(t->t_Refman);
+    t->t_Refman = aux_Test_1_Refman;
+    t->t = aux_Test_1;
+    aux_Test_1 = NULL;
+    aux_Test_1_Refman = NULL;
+LUMI_cleanup:
+    ut_M_Test_Del(aux_Test_1);
+    LUMI_owner_dec_ref(aux_Test_1_Refman);
+    ut_M_Test_Del(aux_Test_0);
+    LUMI_owner_dec_ref(aux_Test_0_Refman);
+    ut_M_Test_Del(t);
+    LUMI_owner_dec_ref(t_Refman);
+    return LUMI_err;
+}
 /// @ te0
 unknown operator "@"
 /// @ te1

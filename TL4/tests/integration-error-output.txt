@@ -31,6 +31,8 @@ testing fail-assert-error-message... Assert failed: unexpected error message "te
   Assert failed in tests/integration-error-test.4.lm:89 fail-assert-error-message()
 testing fail-assert-error-message-prefix... Assert failed: unexpected error message "tested message"
   Assert failed in tests/integration-error-test.4.lm:92 fail-assert-error-message-prefix()
+testing fail-owner-cycle... Error: empty object used
+  Error raised in tests/integration-error-test.4.lm:99 fail-owner-cycle()
 testing code coverage... 95% - failed, lines not covered:
   tests/integration-error-test.4.lm(95%): 45 52
 Tests failed

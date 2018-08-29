@@ -261,10 +261,11 @@ class BinaryExpression(UnaryExpression)
   
   func dynamic write-preactions()
     base.write-preactions()
-    self.left-expression.write-preactions()
     if self.operator.order = 4 and self.operator.group-index = 0
       # := operator
       self.write-assign-preactions()
+    else
+      self.left-expression.write-preactions()
   
   func inst write-assign-preactions()
     if not self.left-expression.result-type.type-data.is-primitive
@@ -272,8 +273,11 @@ class BinaryExpression(UnaryExpression)
         self.write-owner-assign-preactions()
       else
         self.write-user-assign-preactions()
+    else
+      self.left-expression.write-preactions()
   
   func inst write-user-assign-preactions()
+    self.left-expression.write-preactions()
     write(user "aux_Ref_Manager = ")
     self.left-expression.write-refman()
     write(user ";\n")
@@ -315,6 +319,9 @@ class BinaryExpression(UnaryExpression)
     if self.right-expression.result-type.type-data != glob.type-empty
       self.assignee.write-assign-null()
       self.code-node.write-spaces()
+      
+    self.left-expression.write-preactions()
+    
     self.write-left-delete()
     self.code-node.write-spaces()
     

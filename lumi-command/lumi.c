@@ -147,11 +147,11 @@ Returncode lumi_M_IncrementalString_new(lumi_M_IncrementalString* self, Ref_Mana
   Ref_Manager* aux_String_1_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   INIT_NEW(325, aux_String_0, LUMI_new_string(64));
-  CHECK_REF(325, self, self_Refman)
   aux_String_1 = aux_String_0;
   aux_String_1_Refman = aux_String_0_Refman;
   aux_String_0 = NULL;
   aux_String_0_Refman = NULL;
+  CHECK_REF(325, self, self_Refman)
   String_Del(self->text);
   LUMI_owner_dec_ref(self->text_Refman);
   self->text_Refman = aux_String_1_Refman;
@@ -288,11 +288,11 @@ Returncode lumi_M_IncrementalString_realloc(lumi_M_IncrementalString* self, Ref_
   INIT_NEW(352, aux_String_0, LUMI_new_string(self->text->max_length * 2));
   LUMI_err = String_new(aux_String_0, aux_String_0_Refman, self->text, self->text_Refman);
   CHECK(352)
-  CHECK_REF(352, self, self_Refman)
   aux_String_1 = aux_String_0;
   aux_String_1_Refman = aux_String_0_Refman;
   aux_String_0 = NULL;
   aux_String_0_Refman = NULL;
+  CHECK_REF(352, self, self_Refman)
   String_Del(self->text);
   LUMI_owner_dec_ref(self->text_Refman);
   self->text_Refman = aux_String_1_Refman;
@@ -1001,11 +1001,11 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
     INIT_NEW(243, aux_String_23, LUMI_new_string(self->main_input->length));
     LUMI_err = String_new(aux_String_23, aux_String_23_Refman, aux_String_22, self->main_input_Refman);
     CHECK(243)
-    CHECK_REF(243, self, self_Refman)
     aux_String_24 = aux_String_23;
     aux_String_24_Refman = aux_String_23_Refman;
     aux_String_23 = NULL;
     aux_String_23_Refman = NULL;
+    CHECK_REF(243, self, self_Refman)
     String_Del(self->implicit_output);
     LUMI_owner_dec_ref(self->implicit_output_Refman);
     self->implicit_output_Refman = aux_String_24_Refman;
