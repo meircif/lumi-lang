@@ -2,7 +2,7 @@
 module tl5-compiler
 
 ~~~ For loop node in the syntax tree ~~~
-class SyntaxTreeForLoop(SyntaxTreeFlowElement)
+class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
   owner String item-name
   user SyntaxTreeVariable item
   var ExpressionValue start
@@ -172,6 +172,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
           user self.aux-variable.variable,
           owner EmptyExpression(),
           user self.parent)
+    self.write-after-block()
   
   func inst write-assign(
       user SyntaxTreeVariable item,
@@ -213,7 +214,9 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     write(user "; ++")
     write-cname(user self.item.name)
     write(user ")")
-    self.write-block()
+    self.block.write-block-start()
+    self.write-loop-block-body()
+    self.block.write-block-end()
   
   func inst write-seq()
     ; {int `item`_Index; for (`item`_Index = 0; `item`_Index < `iterator`->length; ++`item`_Index) {
@@ -248,7 +251,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
     self.write-assign(user self.item, owner slice, user self.block)
     self.parent.indentation-spaces -= INDENTATION-SPACES
     
-    self.write-block-body()
+    self.write-loop-block-body()
     
     self.write-spaces()
     write(user "}}\n")
@@ -299,7 +302,7 @@ class SyntaxTreeForLoop(SyntaxTreeFlowElement)
         glob.type-generic
     self.write-iter-meth(user self.get-func, owner item-arg)
     
-    self.write-block-body()
+    self.write-loop-block-body()
     
     self.write-iter-meth(user self.next-func, owner _)
     self.write-spaces()

@@ -16,7 +16,7 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Werror -Wall"
-CCA="$CCW --pedantic -Wno-unused-label"
+CCA="$CCW --pedantic -Wno-unused-label -Wno-unused-variable"
 if [ $CC == "gcc" ]; then
   CCA="$CCA -Wno-unused-but-set-variable"
 else

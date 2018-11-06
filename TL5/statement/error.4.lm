@@ -33,7 +33,7 @@ class SyntaxTreeTry(SyntaxTreeFlowElement)
     try-depth-count -= 1
     if try-depth-count = 0
       write(user "\n#undef RETURN_ERROR\n")
-      write(user "#define RETURN_ERROR goto LUMI_cleanup\n")
+      write(user "#define RETURN_ERROR goto LUMI_block0_cleanup\n")
     self.parent.indentation-spaces -= INDENTATION-SPACES
     self.write-spaces()
     write(user "} while (false);\n")

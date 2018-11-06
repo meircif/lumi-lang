@@ -417,10 +417,10 @@ class GlobalInit(SyntaxTreeFunction)
     write(user "#undef RETURN_ERROR\n")
     write(user "#define RETURN_ERROR return LUMI_err;\n")
     write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")
-    self.write-block-body()
+    self.write-code-children()
     write(user "#undef LUMI_FUNC_NAME\n")
     write(user "#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR goto LUMI_cleanup")
+    write(user "#define RETURN_ERROR goto LUMI_block0_cleanup")
 
 
 struct LineCount

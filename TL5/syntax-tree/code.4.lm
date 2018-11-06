@@ -32,7 +32,7 @@ class SyntaxTreeReturn(SyntaxTreeCode)
   
   func dynamic write()
     self.write-spaces()
-    write(user "goto LUMI_cleanup;\n")
+    write(user "goto LUMI_block0_cleanup;\n")
 
 
 ~~~ Raise statement in the syntax tree ~~~

@@ -49,7 +49,18 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   var List{SyntaxTreeCode} code-nodes
   user SyntaxTreeIf previous-if
   user SyntaxTreeTry previous-try
+  var Int block-index
+  var Int loop-depth
   var Bool is-in-loop
+  
+  func inst set-parent(user SyntaxTreeBlock parent)
+    self.parent := parent
+    self.indentation-spaces := parent.indentation-spaces + INDENTATION-SPACES
+    self.is-in-loop := parent.is-in-loop
+    user SyntaxTreeFunction func(user self.get-function())
+    func.block-count += 1
+    self.block-index := func.block-count
+    self.set-location()
   
   func inst parse-block()
     self.parse-block-children(user _, user self)
@@ -199,7 +210,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   
   func inst write-block()
     ; `previous-text` {
-    ;   `block...`
+    ;   `body...`
     ; }
     self.write-block-start()
     self.write-block-body()
@@ -209,6 +220,17 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     write(user " {\n")
   
   func dynamic write-block-body()
+    ; TODO write setup...
+    self.write-code-children()
+    write-spaces(copy self.indentation-spaces - INDENTATION-SPACES)
+    write(user "LUMI_block")
+    write-int(copy self.block-index)
+    write(user "_cleanup:\n")
+    ; TODO write cleanup...
+    self.write-spaces()
+    write(user "(void)0;\n")
+  
+  func inst write-code-children()
     self.write-children(user self.code-nodes)
   
   func inst write-block-end()

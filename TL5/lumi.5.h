@@ -90,7 +90,7 @@ void LUMI_trace_print(
   String* message,
   Ref_Manager* message_refman);
 
-#define RETURN_ERROR goto LUMI_cleanup
+#define RETURN_ERROR goto LUMI_block0_cleanup
 
 #define START_TRACE(line, value, format, message, message_refman) \
   LUMI_trace_print( \

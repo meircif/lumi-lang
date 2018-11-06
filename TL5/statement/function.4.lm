@@ -14,6 +14,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   user SyntaxTreeMockFunction mocker-function
   user SyntaxTreeFunction dynamic-base-method
   var Int dynamic-base-count
+  var Int block-count
   var Bool is-dynamic
   var Bool has-user-assign
   var Bool header-only
@@ -231,17 +232,18 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst write-block()
     ; `previous-text` {
     ;   Returncode LUMI_err = OK;
+    ;   unsigned LUMI_loop_depth = 1;
     ;   `block...`
-    ; LUMI_cleanup:
     ;   return LUMI_err;
     ; }
     self.write-block-start()
     write-spaces(copy INDENTATION-SPACES)
     write(user "Returncode LUMI_err = OK;\n")
+    write-spaces(copy INDENTATION-SPACES)
+    write(user "unsigned LUMI_loop_depth = 1;\n")
     base.write()
     self.write-setup()
     self.write-block-body()
-    write(user "LUMI_cleanup:\n")
     self.write-cleanup()
     write-spaces(copy INDENTATION-SPACES)
     write(user "return LUMI_err;\n")
