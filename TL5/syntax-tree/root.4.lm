@@ -339,6 +339,8 @@ class SyntaxTreeRoot(GlobalNodes)
     write-spaces(copy INDENTATION-SPACES)
     write(user "Returncode LUMI_err = OK;\n")
     write-spaces(copy INDENTATION-SPACES)
+    write(user "unsigned LUMI_loop_depth = 1;\n")
+    write-spaces(copy INDENTATION-SPACES)
     write(user "Bool LUMI_success = true;\n")
     self.global-init.write()
     write(user "\n")
@@ -357,6 +359,9 @@ class SyntaxTreeRoot(GlobalNodes)
       write(user ");\n")
     write-spaces(copy INDENTATION-SPACES)
     write(user "return LUMI_success? LUMI_err : FAIL;\n")
+    write(user "LUMI_block0_cleanup:\n")
+    write-spaces(copy INDENTATION-SPACES)
+    write(user "return LUMI_err;\n")
     write(user "}\n")
     write(user "\nTEST_MAIN_FUNC\n")
 
@@ -414,13 +419,9 @@ class GlobalInit(SyntaxTreeFunction)
     if not self.code-nodes.first?
       return
     self.write-children(user self.variables)
-    write(user "#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR return LUMI_err;\n")
     write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")
     self.write-code-children()
     write(user "#undef LUMI_FUNC_NAME\n")
-    write(user "#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR goto LUMI_block0_cleanup")
 
 
 struct LineCount

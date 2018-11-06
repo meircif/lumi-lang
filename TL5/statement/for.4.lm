@@ -27,7 +27,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
       self.start.expression := self.iterator.expression
       self.iterator.new(user ":", user self)
     
-    self.parse-block(copy true)
+    self.parse-block()
   
   func dynamic analyze()
     owner TypeInstance type-instance
@@ -214,8 +214,10 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     write(user "; ++")
     write-cname(user self.item.name)
     write(user ")")
+    
     self.block.write-block-start()
-    self.write-loop-block-body()
+    self.write-loop-block-start()
+    self.write-block-body()
     self.block.write-block-end()
   
   func inst write-seq()
@@ -237,7 +239,9 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     write-cname(user self.item.name)
     write(user "_Index) {\n")
     
-    var SyntaxTreeVariable variable(user self.parent)
+    self.write-loop-block-start()
+    
+    var SyntaxTreeVariable variable(user self.block)
     string-new-concat(user self.item.name, user "_Index")->(owner variable.name)
     
     new VariableExpression index-variable(user self)
@@ -245,13 +249,15 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     new SliceExpression slice(user self)
     slice.line-number := self.line-number
     self.aux-variable.copy-new()->(owner slice.sequence)
+    slice.sequence.code-node := variable
     slice.index := index-variable
     self.item.type-instance.copy-new()->(owner slice.result-type)
     self.parent.indentation-spaces += INDENTATION-SPACES
     self.write-assign(user self.item, owner slice, user self.block)
     self.parent.indentation-spaces -= INDENTATION-SPACES
     
-    self.write-loop-block-body()
+    self.block.write-code-children()
+    self.block.write-block-cleanup()
     
     self.write-spaces()
     write(user "}}\n")
@@ -266,12 +272,15 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     ;   `next-func`()
     ; }
     write(user "while (true) {\n")
+    
     self.block.write-spaces()
     write(user "Bool ")
     write-cname(user self.item.name)
     write(user "_Has = false;\n")
     
-    var SyntaxTreeVariable variable(user self.parent)
+    self.write-loop-block-start()
+    
+    var SyntaxTreeVariable variable(user self.block)
     string-new-concat(user self.item.name, user "_Has")->(owner variable.name)
     
     new VariableExpression has-variable(user self)
@@ -302,26 +311,30 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
         glob.type-generic
     self.write-iter-meth(user self.get-func, owner item-arg)
     
-    self.write-loop-block-body()
+    self.block.write-code-children()
     
     self.write-iter-meth(user self.next-func, owner _)
+    
+    self.block.write-block-cleanup()
     self.write-spaces()
     write(user "}\n")
   
   func inst write-iter-meth(
       user SyntaxTreeFunction meth, owner CallArgument output-arg)
     var SyntaxTreeExpression expression-node(user self.block)
+    expression-node.line-number := self.line-number
     
     new CallArgument self-arg
     self-arg.is-primitive :=
         self.aux-variable.result-type.type-data.is-primitive
     self-arg.is-dynamic := self.aux-variable.result-type.type-data.is-dynamic
     self.aux-variable.copy-new()->(owner self-arg.value)
+    self-arg.value.code-node := expression-node
     
     owner CallExpression call
     new FunctionArguments arguments
     new FunctionExpression function(
-        user self,
+        user expression-node,
         user meth,
         owner self.aux-variable.copy-new(),
         copy 0,
@@ -329,14 +342,14 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
         copy false)
     if meth.is-dynamic
       call := DynamicCallExpression(
-          user self,
+          user expression-node,
           user function,
           owner arguments,
           user self.aux-variable.result-type,
           user self.aux-variable)
     else
       call := FunctionCallExpression(
-          user self,
+          user expression-node,
           user function,
           owner arguments,
           user self.aux-variable.result-type)
@@ -349,6 +362,4 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
       call.arguments.outputs.add(owner output-arg)
     
     expression-node.expression.expression := call
-    self.parent.indentation-spaces += INDENTATION-SPACES
     expression-node.write()
-    self.parent.indentation-spaces -= INDENTATION-SPACES

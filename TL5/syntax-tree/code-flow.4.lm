@@ -13,9 +13,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.parent := parent
     self.block.set-parent(user parent)
   
-  func inst parse-block(copy Bool is-loop)
-    if is-loop
-      self.block.is-in-loop := true
+  func inst parse-block()
     self.block.parse-block()
   
   func dynamic link-types()
@@ -31,13 +29,13 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.block.write-block-body()
   
   func inst write-after-block()
-    ; if (LUMI_loop_depth < `X`) goto LUMI_block`X`_cleanup;
+    ; if (LUMI_loop_depth < `X`) goto `cleanup`;
     self.write-spaces()
     write(user "if (LUMI_loop_depth < ")
     write-int(copy (2 * self.parent.loop-depth) + 1)
-    write(user ") goto LUMI_block")
-    write-int(copy self.parent.block-index)
-    write(user "_cleanup;\n")
+    write(user ") goto ")
+    self.parent.write-cleanup-label()
+    write(user ";\n")
     
 
 
@@ -53,7 +51,7 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
   
   func inst parse()
     self.condition.new(user "", user self)
-    self.parse-block(copy false)
+    self.parse-block()
   
   func inst add-else(owner SyntaxTreeElse else-node)
     else-node.set-parent(user self.parent)
@@ -95,7 +93,7 @@ class SyntaxTreeElse(SyntaxTreeFlowElement)
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeElse new-node)
     new-node := SyntaxTreeElse(user parent)
-    new-node.parse-block(copy false)
+    new-node.parse-block()
   
   func dynamic write()
     ; else {
@@ -112,15 +110,8 @@ class SyntaxTreeBaseLoop(SyntaxTreeFlowElement)
     base(user parent)
     self.block.loop-depth := parent.loop-depth + 1
   
-  func inst write-loop-block-body()
-    ;   LUMI_loop_depth = `X`;
-    ;   `block...`
-    self.write-spaces()
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "LUMI_loop_depth = ")
-    write-int(copy (2 * self.block.loop-depth) + 1)
-    write(user ";\n")
-    self.write-block-body()
+  func inst write-loop-block-start()
+    self.block.write-set-loop-depth()
 
 
 ~~~ Do loop node in the syntax tree ~~~
@@ -128,16 +119,16 @@ class SyntaxTreeDoLoop(SyntaxTreeBaseLoop)
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeDoLoop new-node)
     new-node := SyntaxTreeDoLoop(user parent)
-    new-node.parse-block(copy true)
+    new-node.parse-block()
   
   func dynamic write()
     ; do {
-    ;   LUMI_loop_depth = `X`;
     ;   `block...`
     ; } while (LUMI_loop_depth >= `X`);
     self.write-spaces()
     write(user "do {\n")
-    self.write-loop-block-body()
+    self.write-loop-block-start()
+    self.write-block-body()
     self.write-spaces()
     write(user "} while (LUMI_loop_depth >= ")
     write-int(copy 2 * self.block.loop-depth)

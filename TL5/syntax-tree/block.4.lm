@@ -25,6 +25,25 @@ class SyntaxTreeCode(SyntaxTreeNode)
   
   func inst write-spaces()
     self.parent.write-spaces()
+    
+  func inst write-loop-jump(copy Int depth)
+    write(user "LUMI_loop_depth = ")
+    write-int(copy depth)
+    write(user "; goto ")
+    self.parent.write-cleanup-label()
+    write(user ";")
+    
+  func inst write-loop-diff-jump(copy Int offset)
+    self.write-loop-jump(copy (2 * self.parent.loop-depth) - offset)
+  
+  func inst write-raise(user String error-message)
+    write(user "RAISE(")
+    self.write-line-num()
+    write(user ", ")
+    self.parent.write-cleanup-label()
+    write(user ", ")
+    write(user error-message)
+    write(user ")\n")
   
   func inst write-call(user FunctionArguments arguments)
     arguments.write-call()
@@ -33,6 +52,8 @@ class SyntaxTreeCode(SyntaxTreeNode)
     self.write-spaces()
     write(user "CHECK(")
     self.write-line-num()
+    write(user ", ")
+    self.parent.write-cleanup-label()
     write(user ")\n")
   
   ~~~ Read and check indentation spaces for a line break from the input file ~~~
@@ -51,12 +72,11 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   user SyntaxTreeTry previous-try
   var Int block-index
   var Int loop-depth
-  var Bool is-in-loop
   
   func inst set-parent(user SyntaxTreeBlock parent)
     self.parent := parent
     self.indentation-spaces := parent.indentation-spaces + INDENTATION-SPACES
-    self.is-in-loop := parent.is-in-loop
+    self.loop-depth := parent.loop-depth
     user SyntaxTreeFunction func(user self.get-function())
     func.block-count += 1
     self.block-index := func.block-count
@@ -208,6 +228,12 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     base()
     self.analyze-children(user self.code-nodes)
   
+  func inst write-set-loop-depth()
+    self.write-spaces()
+    write(user "LUMI_loop_depth = ")
+    write-int(copy (2 * self.loop-depth) + 1)
+    write(user ";\n")
+  
   func inst write-block()
     ; `previous-text` {
     ;   `body...`
@@ -220,19 +246,31 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     write(user " {\n")
   
   func dynamic write-block-body()
-    ; TODO write setup...
+    self.write-block-setup()
     self.write-code-children()
-    write-spaces(copy self.indentation-spaces - INDENTATION-SPACES)
-    write(user "LUMI_block")
-    write-int(copy self.block-index)
-    write(user "_cleanup:\n")
-    ; TODO write cleanup...
-    self.write-spaces()
-    write(user "(void)0;\n")
+    self.write-block-cleanup()
+  
+  func dynamic write-block-setup()
+    ; TODO...
   
   func inst write-code-children()
     self.write-children(user self.code-nodes)
   
+  func dynamic write-cleanup-label()
+    write(user "LUMI_block")
+    write-int(copy self.block-index)
+    write(user "_cleanup")
+  
+  func dynamic write-block-cleanup()
+    if self.parent?
+      self.parent.write-spaces()
+    self.write-cleanup-label()
+    write(user ":\n")
+    ; TODO write cleanup...
+    self.write-spaces()
+    write(user "(void)0;\n")
+  
   func inst write-block-end()
-    write-spaces(copy self.indentation-spaces - INDENTATION-SPACES)
+    if self.parent?
+      self.parent.write-spaces()
     write(user "}\n")

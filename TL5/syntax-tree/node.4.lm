@@ -95,13 +95,6 @@ class SyntaxTreeNode
   func inst write-line-num()
     write-int(copy self.line-number)
   
-  func inst write-raise(user String error-message)
-    write(user "RAISE(")
-    self.write-line-num()
-    write(user ", ")
-    write(user error-message)
-    write(user ")\n")
-  
   ~~~ Print a syntax error with message: ~~~
   ~~~ `Code error in {file-name}[{line-number}] {text} "{item}"` ~~~
   func inst print-syntax-error(user String text, user String item)
