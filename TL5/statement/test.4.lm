@@ -42,7 +42,6 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   func inst parse()
     self.dummy-block.set-parent(user self.parent)
     self.dummy-block.indentation-spaces -= INDENTATION-SPACES
-    self.parent := self.dummy-block
     self.tested.new(user ",", user self)
     if glob.last-char = ','
       read-c()
@@ -77,7 +76,11 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     self.write-spaces()
     write(user "++LUMI_trace_ignore_count;\n")
     self.write-spaces()
+    
+    self.parent := self.dummy-block
     self.tested.write-preactions()
+    self.parent := self.dummy-block.parent
+    
     write(user "--LUMI_trace_ignore_count;\n")
     if self.expected-error?
       self.write-spaces()
@@ -89,10 +92,10 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     write(user "TEST_FAIL(")
     self.write-line-num()
     write(user ", ")
-    self.parent.parent.write-cleanup-label()
+    self.parent.write-cleanup-label()
     write(user ", 16, \"error not raised\")\n")
     
-    self.parent.write-block-cleanup()
+    self.dummy-block.write-block-cleanup()
     
     self.write-spaces()
     write(user "--LUMI_trace_ignore_count;\n")
@@ -110,7 +113,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
       self.parent.indentation-spaces -= INDENTATION-SPACES
       self.write-line-num()
       write(user ", ")
-      self.parent.parent.write-cleanup-label()
+      self.parent.write-cleanup-label()
       write(user ")\n")
       self.write-spaces()
       write(user "}\n")

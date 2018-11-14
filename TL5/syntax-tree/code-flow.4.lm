@@ -66,6 +66,11 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     new-if.set-parent(user self.else-node.block)
     self.else-node.block.code-nodes.add(owner new-if)
   
+  func dynamic link-types()
+    base()
+    if self.else-node?
+      self.else-node.link-types()
+  
   func dynamic analyze()
     self.analyze-expression(user self.condition, user glob.type-bool)
     base()
@@ -111,6 +116,7 @@ class SyntaxTreeBaseLoop(SyntaxTreeFlowElement)
     self.block.loop-depth := parent.loop-depth + 1
   
   func inst write-loop-block-start()
+    self.block.write-block-setup()
     self.block.write-set-loop-depth()
 
 
@@ -129,6 +135,7 @@ class SyntaxTreeDoLoop(SyntaxTreeBaseLoop)
     write(user "do {\n")
     self.write-loop-block-start()
     self.write-block-body()
+    self.block.write-block-cleanup()
     self.write-spaces()
     write(user "} while (LUMI_loop_depth >= ")
     write-int(copy 2 * self.block.loop-depth)

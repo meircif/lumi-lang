@@ -161,7 +161,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     else-if keyword.equal(user "new")
       if glob.last-char != ' '
         self.syntax-error-c(user "expected space after \"new\", got")
-      self.get-function().variables.add(owner SyntaxTreeVariable.parse-new(
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
           user _, copy Access.OWNER, copy true, user _, user self))
       
     else-if keyword.equal(user "try")
@@ -220,6 +220,24 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := self.get-function().parent-type
   
+  func inst add-aux-variable(
+      copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
+      user SyntaxTreeVariable new-variable)
+    new SyntaxTreeVariable variable(user self)
+    variable.name := String{type-instance.type-data.name.length + 21}()
+    variable.name.new(user "aux_")
+    variable.name.concat(user type-instance.type-data.name)
+    variable.name.append(copy '_')
+    var String{16} index-str
+    self.get-function().new-aux-variable-index(user type-instance).str(
+        user index-str)
+    variable.name.concat(user index-str)
+    variable.access := access
+    variable.is-create := is-create
+    type-instance.copy-new()->(owner variable.type-instance)
+    new-variable := variable
+    self.variables.add(owner variable)
+  
   func dynamic link-types()
     base()
     self.link-children-types(user self.code-nodes)
@@ -239,22 +257,19 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     ;   `body...`
     ; }
     self.write-block-start()
+    self.write-block-setup()
     self.write-block-body()
+    self.write-block-cleanup()
     self.write-block-end()
   
   func inst write-block-start()
     write(user " {\n")
   
   func dynamic write-block-body()
-    self.write-block-setup()
-    self.write-code-children()
-    self.write-block-cleanup()
+    self.write-children(user self.code-nodes)
   
   func dynamic write-block-setup()
-    ; TODO...
-  
-  func inst write-code-children()
-    self.write-children(user self.code-nodes)
+    base.write()
   
   func dynamic write-cleanup-label()
     write(user "LUMI_block")
@@ -266,9 +281,9 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.parent.write-spaces()
     self.write-cleanup-label()
     write(user ":\n")
-    ; TODO write cleanup...
     self.write-spaces()
     write(user "(void)0;\n")
+    self.write-cleanup(user _)
   
   func inst write-block-end()
     if self.parent?

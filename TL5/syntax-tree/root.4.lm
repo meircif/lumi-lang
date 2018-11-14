@@ -420,7 +420,7 @@ class GlobalInit(SyntaxTreeFunction)
       return
     self.write-children(user self.variables)
     write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")
-    self.write-code-children()
+    self.write-block-body()
     write(user "#undef LUMI_FUNC_NAME\n")
 
 

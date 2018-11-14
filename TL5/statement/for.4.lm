@@ -63,17 +63,15 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
       else
         item.access := Access.USER
       item.type-instance := type-instance
-      user SyntaxTreeFunction function
-      self.get-function()->(user function)
       self.item := item
-      function.variables.add(owner item)
+      self.parent.variables.add(owner item)
     self.item-name := _
     
     if self.iterator.result-type.type-data is-not glob.type-int
       self.aux-variable := VariableExpression(user self)
       self.iterator.result-type.copy-new()->(
           owner self.aux-variable.result-type)
-      self.get-function().add-aux-variable(
+      self.parent.add-aux-variable(
           copy Access.USER, copy false, user self.iterator.result-type)->(
           user self.aux-variable.variable)
       string-new-copy(user self.aux-variable.variable.name)->(
@@ -217,7 +215,8 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     
     self.block.write-block-start()
     self.write-loop-block-start()
-    self.write-block-body()
+    self.block.write-block-body()
+    self.block.write-block-cleanup()
     self.block.write-block-end()
   
   func inst write-seq()
@@ -256,7 +255,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     self.write-assign(user self.item, owner slice, user self.block)
     self.parent.indentation-spaces -= INDENTATION-SPACES
     
-    self.block.write-code-children()
+    self.block.write-block-body()
     self.block.write-block-cleanup()
     
     self.write-spaces()
@@ -311,7 +310,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
         glob.type-generic
     self.write-iter-meth(user self.get-func, owner item-arg)
     
-    self.block.write-code-children()
+    self.block.write-block-body()
     
     self.write-iter-meth(user self.next-func, owner _)
     

@@ -242,7 +242,7 @@ class Expression(SyntaxTreeNode)
     type-instance.copy-new()->(owner expression.result-type)
     expression.access := access
     expression.assignable := true
-    self.code-node.get-function().add-aux-variable(
+    self.code-node.parent.add-aux-variable(
         copy access, copy is-create, user type-instance)->(
         user expression.variable)
     string-new-copy(user expression.variable.name)->(owner expression.name)

@@ -4,6 +4,7 @@ module tl5-compiler
 ~~~ Function node in the syntax tree ~~~
 class SyntaxTreeFunction(SyntaxTreeBlock)
   var List{TypeCount} aux-variables
+  var NameMap{SyntaxTreeVariable} function-variables
   user TypeData parent-type
   owner String name
   owner String type-name
@@ -124,10 +125,15 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := self.parent-type
   
-  func inst add-aux-variable(
-      copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
-      user SyntaxTreeVariable new-variable)
-    var Int index(copy 0)
+  func dynamic find-variable(user String name, user String module-name)->(
+      user SyntaxTreeVariable variable)
+    if base(user name, user module-name)->(user variable)?
+      return
+    if not module-name?
+      self.arguments.find-variable(user name, user _)->(user variable)
+    
+  func inst new-aux-variable-index(user TypeInstance type-instance)->(
+      var Int index)
     var ListIterator{TypeCount} iter(user self.aux-variables)
     do
       while iter.has()
@@ -140,26 +146,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       new TypeCount type-count
       type-count.type-data := type-instance.type-data
       self.aux-variables.add(owner type-count)
-    new SyntaxTreeVariable variable(user self)
-    variable.name := String{type-instance.type-data.name.length + 21}()
-    variable.name.new(user "aux_")
-    variable.name.concat(user type-instance.type-data.name)
-    variable.name.append(copy '_')
-    var String{16} index-str
-    index.str(user index-str)
-    variable.name.concat(user index-str)
-    variable.access := access
-    variable.is-create := is-create
-    type-instance.copy-new()->(owner variable.type-instance)
-    new-variable := variable
-    self.variables.add(owner variable)
-  
-  func dynamic find-variable(user String name, user String module-name)->(
-      user SyntaxTreeVariable variable)
-    if base(user name, user module-name)->(user variable)?
-      return
-    if not module-name?
-      self.arguments.find-variable(user name, user _)->(user variable)
+      index := 0
   
   func dynamic link-types()
     if self.my-module?
@@ -241,10 +228,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     write(user "Returncode LUMI_err = OK;\n")
     write-spaces(copy INDENTATION-SPACES)
     write(user "unsigned LUMI_loop_depth = 1;\n")
-    base.write()
+    self.write-block-setup()
     self.write-setup()
     self.write-block-body()
-    self.write-cleanup()
+    self.write-block-cleanup()
+    self.write-param-cleanup()
     write-spaces(copy INDENTATION-SPACES)
     write(user "return LUMI_err;\n")
     self.write-block-end()
@@ -260,8 +248,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         write-cname(user parameter.get-variable().name)
         write(user "_Refman);\n")
   
-  func inst write-cleanup()
-    base(user _)
+  func inst write-param-cleanup()
     for parameter in self.arguments.parameters.iter-back()
       if parameter.access = Access.USER or parameter.access = Access.OWNER
         self.write-variable-cleanup(user parameter.get-variable(), user _)

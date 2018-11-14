@@ -892,7 +892,6 @@ Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Int n = 0;
     LUMI_inc_ref(self_Refman);
     CHECK_REF(4, LUMI_block0_cleanup, self, self_Refman)
     if (self->x > 3) {
@@ -903,6 +902,7 @@ Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman) {
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     do {
+        Int n = 0;
         LUMI_loop_depth = 3;
         for (n = 0; n < 4; ++n) {
             LUMI_loop_depth = 5;
@@ -1131,6 +1131,43 @@ ut_M_Tc a_Values[12] = {{{{{0}}}}};
     Ref_Manager* a_Refman = NULL;
     INIT_VAR(1, LUMI_block0_cleanup, a)
     a_Var.values = a_Values;
+/// @ t10
+Returncode ut_M_fun(void);
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char sv_Values[4] = {0};
+    String sv_Var = {4, 0, NULL};
+    String* sv = NULL;
+    Ref_Manager* sv_Refman = NULL;
+    INIT_VAR(2, LUMI_block0_cleanup, sv)
+    sv_Var.values = sv_Values;
+    if (1 > 2) {
+        String* su = NULL;
+        Ref_Manager* su_Refman = NULL;
+        String aux_String_0_Var = {0};
+        String* aux_String_0 = NULL;
+        Ref_Manager* aux_String_0_Refman = NULL;
+        INIT_VAR(4, LUMI_block1_cleanup, aux_String_0)
+        aux_String_0_Var.length = 2;
+        aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
+        aux_String_0_Var.values = (sv)->values + (1);
+        CHECK_REF(4, LUMI_block1_cleanup, sv, sv_Refman)
+        if (1 < 0 || 2 < 0 || 1 + 2 > sv->length) RAISE(4, LUMI_block1_cleanup, slice_index)
+        su = aux_String_0;
+        su_Refman = sv_Refman;
+        LUMI_inc_ref(su_Refman);
+    LUMI_block1_cleanup:
+        (void)0;
+        LUMI_dec_ref(aux_String_0_Refman);
+        LUMI_dec_ref(su_Refman);
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(sv_Refman);
+    return LUMI_err;
+}
 /// @ te0
 expected space after type, got "new-line"
 /// @ te1
@@ -1428,6 +1465,85 @@ if (ut_M_b && ut_M_b) {
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t5
+if (ut_M_b) {
+        char sa_Values[4] = {0};
+        String sa_Var = {4, 0, NULL};
+        String* sa = NULL;
+        Ref_Manager* sa_Refman = NULL;
+        INIT_VAR(2, LUMI_block1_cleanup, sa)
+        sa_Var.values = sa_Values;
+        if (ut_M_b) {
+            char sb_Values[4] = {0};
+            String sb_Var = {4, 0, NULL};
+            String* sb = NULL;
+            Ref_Manager* sb_Refman = NULL;
+            INIT_VAR(4, LUMI_block2_cleanup, sb)
+            sb_Var.values = sb_Values;
+        LUMI_block2_cleanup:
+            (void)0;
+            LUMI_dec_ref(sb_Refman);
+        }
+        else {
+            if (ut_M_b) {
+                char sc_Values[4] = {0};
+                String sc_Var = {4, 0, NULL};
+                String* sc = NULL;
+                Ref_Manager* sc_Refman = NULL;
+                INIT_VAR(6, LUMI_block5_cleanup, sc)
+                sc_Var.values = sc_Values;
+            LUMI_block5_cleanup:
+                (void)0;
+                LUMI_dec_ref(sc_Refman);
+            }
+            else {
+                char sd_Values[4] = {0};
+                String sd_Var = {4, 0, NULL};
+                String* sd = NULL;
+                Ref_Manager* sd_Refman = NULL;
+                INIT_VAR(8, LUMI_block7_cleanup, sd)
+                sd_Var.values = sd_Values;
+            LUMI_block7_cleanup:
+                (void)0;
+                LUMI_dec_ref(sd_Refman);
+            }
+            if (LUMI_loop_depth < 1) goto LUMI_block4_cleanup;
+        LUMI_block4_cleanup:
+            (void)0;
+        }
+        if (LUMI_loop_depth < 1) goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+        LUMI_dec_ref(sa_Refman);
+    }
+    else {
+        if (ut_M_b) {
+            char se_Values[4] = {0};
+            String se_Var = {4, 0, NULL};
+            String* se = NULL;
+            Ref_Manager* se_Refman = NULL;
+            INIT_VAR(10, LUMI_block10_cleanup, se)
+            se_Var.values = se_Values;
+        LUMI_block10_cleanup:
+            (void)0;
+            LUMI_dec_ref(se_Refman);
+        }
+        else {
+            char sf_Values[4] = {0};
+            String sf_Var = {4, 0, NULL};
+            String* sf = NULL;
+            Ref_Manager* sf_Refman = NULL;
+            INIT_VAR(12, LUMI_block12_cleanup, sf)
+            sf_Var.values = sf_Values;
+        LUMI_block12_cleanup:
+            (void)0;
+            LUMI_dec_ref(sf_Refman);
+        }
+        if (LUMI_loop_depth < 1) goto LUMI_block9_cleanup;
+    LUMI_block9_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
 got "Int" expression, expected "Bool"
 /// @ te1
@@ -1452,8 +1568,8 @@ expected space after "else-if", got "("
 expected block in a new line, got "end-of-file"
 /// @@ test-do-loop
 /// @ t0
-Int x = 0;
-    do {
+do {
+        Int x = 0;
         LUMI_loop_depth = 3;
     LUMI_block1_cleanup:
         (void)0;
@@ -1495,6 +1611,73 @@ do {
         if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
         (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t5
+do {
+        char sa_Values[4] = {0};
+        String sa_Var = {4, 0, NULL};
+        String* sa = NULL;
+        Ref_Manager* sa_Refman = NULL;
+        LUMI_loop_depth = 3;
+        INIT_VAR(2, LUMI_block1_cleanup, sa)
+        sa_Var.values = sa_Values;
+        if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        LUMI_loop_depth = 1; goto LUMI_block1_cleanup;
+        LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
+        if (ut_M_b) {
+            LUMI_loop_depth = 0; goto LUMI_block2_cleanup;
+        LUMI_block2_cleanup:
+            (void)0;
+        }
+        if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
+        do {
+            char sb_Values[4] = {0};
+            String sb_Var = {4, 0, NULL};
+            String* sb = NULL;
+            Ref_Manager* sb_Refman = NULL;
+            LUMI_loop_depth = 5;
+            INIT_VAR(9, LUMI_block3_cleanup, sb)
+            sb_Var.values = sb_Values;
+            if (!(ut_M_b)) { LUMI_loop_depth = 3; goto LUMI_block3_cleanup; }
+            LUMI_loop_depth = 3; goto LUMI_block3_cleanup;
+            LUMI_loop_depth = 4; goto LUMI_block3_cleanup;
+            if (ut_M_b) {
+                LUMI_loop_depth = 0; goto LUMI_block4_cleanup;
+            LUMI_block4_cleanup:
+                (void)0;
+            }
+            if (LUMI_loop_depth < 5) goto LUMI_block3_cleanup;
+            do {
+                char sc_Values[4] = {0};
+                String sc_Var = {4, 0, NULL};
+                String* sc = NULL;
+                Ref_Manager* sc_Refman = NULL;
+                LUMI_loop_depth = 7;
+                INIT_VAR(16, LUMI_block5_cleanup, sc)
+                sc_Var.values = sc_Values;
+                if (!(ut_M_b)) { LUMI_loop_depth = 5; goto LUMI_block5_cleanup; }
+                LUMI_loop_depth = 5; goto LUMI_block5_cleanup;
+                LUMI_loop_depth = 6; goto LUMI_block5_cleanup;
+                if (ut_M_b) {
+                    LUMI_loop_depth = 0; goto LUMI_block6_cleanup;
+                LUMI_block6_cleanup:
+                    (void)0;
+                }
+                if (LUMI_loop_depth < 7) goto LUMI_block5_cleanup;
+            LUMI_block5_cleanup:
+                (void)0;
+                LUMI_dec_ref(sc_Refman);
+            } while (LUMI_loop_depth >= 6);
+            if (LUMI_loop_depth < 5) goto LUMI_block3_cleanup;
+        LUMI_block3_cleanup:
+            (void)0;
+            LUMI_dec_ref(sb_Refman);
+        } while (LUMI_loop_depth >= 4);
+        if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+        LUMI_dec_ref(sa_Refman);
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
@@ -1669,6 +1852,71 @@ Int n = 0;
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t8
+Int n = 0;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    for (n = 0; n < 6; ++n) {
+        char sa_Values[4] = {0};
+        String sa_Var = {4, 0, NULL};
+        String* sa = NULL;
+        Ref_Manager* sa_Refman = NULL;
+        Char ch = 0;
+        String* aux_String_0 = NULL;
+        Ref_Manager* aux_String_0_Refman = NULL;
+        LUMI_loop_depth = 3;
+        INIT_VAR(2, LUMI_block1_cleanup, sa)
+        sa_Var.values = sa_Values;
+        LUMI_loop_depth = 1; goto LUMI_block1_cleanup;
+        LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
+        if (ut_M_b) {
+            LUMI_loop_depth = 0; goto LUMI_block2_cleanup;
+        LUMI_block2_cleanup:
+            (void)0;
+        }
+        if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
+        aux_Ref_Manager = aux_String_0_Refman;
+        aux_String_0_Refman = ut_M_str_Refman;
+        LUMI_inc_ref(aux_String_0_Refman);
+        LUMI_dec_ref(aux_Ref_Manager);
+        aux_Ref_Manager = NULL;
+        aux_String_0 = ut_M_str;
+        CHECK_REF(7, LUMI_block1_cleanup, aux_String_0, aux_String_0_Refman)
+        {int ch_Index; for (ch_Index = 0; ch_Index < aux_String_0->length; ++ch_Index) {
+            char sb_Values[4] = {0};
+            String sb_Var = {4, 0, NULL};
+            String* sb = NULL;
+            Ref_Manager* sb_Refman = NULL;
+            LUMI_loop_depth = 5;
+            CHECK_REF(8, LUMI_block3_cleanup, aux_String_0, aux_String_0_Refman)
+            if (ch_Index < 0 || ch_Index >= aux_String_0->length) RAISE(8, LUMI_block3_cleanup, slice_index)
+            ch = (aux_String_0->values)[ch_Index];
+            INIT_VAR(8, LUMI_block3_cleanup, sb)
+            sb_Var.values = sb_Values;
+            LUMI_loop_depth = 3; goto LUMI_block3_cleanup;
+            LUMI_loop_depth = 4; goto LUMI_block3_cleanup;
+            if (ut_M_b) {
+                LUMI_loop_depth = 0; goto LUMI_block4_cleanup;
+            LUMI_block4_cleanup:
+                (void)0;
+            }
+            if (LUMI_loop_depth < 5) goto LUMI_block3_cleanup;
+        LUMI_block3_cleanup:
+            (void)0;
+            LUMI_dec_ref(sb_Refman);
+        }}
+        aux_Ref_Manager = aux_String_0_Refman;
+        aux_String_0_Refman = NULL;
+        LUMI_inc_ref(aux_String_0_Refman);
+        LUMI_dec_ref(aux_Ref_Manager);
+        aux_Ref_Manager = NULL;
+        aux_String_0 = NULL;
+        if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+        LUMI_dec_ref(aux_String_0_Refman);
+        LUMI_dec_ref(sa_Refman);
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
 expected space after "for", got "("
 /// @ te1
@@ -1781,6 +2029,62 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_expected_error = LUMI_expected_error_prev;}
     LUMI_err = OK;
     LUMI_loop_depth = 1;
+/// @ ta6
+if (ut_M_b) {
+        char s_Values[4] = {0};
+        String s_Var = {4, 0, NULL};
+        String* s = NULL;
+        Ref_Manager* s_Refman = NULL;
+        String aux_String_0_Var = {0};
+        String* aux_String_0 = NULL;
+        Ref_Manager* aux_String_0_Refman = NULL;
+        INIT_VAR(2, LUMI_block1_cleanup, s)
+        s_Var.values = s_Values;
+        TEST_ASSERT(3, LUMI_block1_cleanup, ut_M_b)
+        ++LUMI_trace_ignore_count;
+        INIT_VAR(4, LUMI_block2_cleanup, aux_String_0)
+        aux_String_0_Var.length = 2;
+        aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
+        aux_String_0_Var.values = (s)->values + (1);
+        CHECK_REF(4, LUMI_block2_cleanup, s, s_Refman)
+        if (1 < 0 || 2 < 0 || 1 + 2 > s->length) RAISE(4, LUMI_block2_cleanup, slice_index)
+        --LUMI_trace_ignore_count;
+        TEST_FAIL(4, LUMI_block1_cleanup, 16, "error not raised")
+        LUMI_block2_cleanup:
+        (void)0;
+        --LUMI_trace_ignore_count;
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        do {
+            String aux_String_1_Var = {0};
+            String* aux_String_1 = NULL;
+            Ref_Manager* aux_String_1_Refman = NULL;
+            LUMI_loop_depth = 3;
+            ++LUMI_trace_ignore_count;
+            INIT_VAR(6, LUMI_block4_cleanup, aux_String_1)
+            aux_String_1_Var.length = 2;
+            aux_String_1_Var.max_length = aux_String_1_Var.length + 1;
+            aux_String_1_Var.values = (s)->values + (1);
+            CHECK_REF(6, LUMI_block4_cleanup, s, s_Refman)
+            if (1 < 0 || 2 < 0 || 1 + 2 > s->length) RAISE(6, LUMI_block4_cleanup, slice_index)
+            --LUMI_trace_ignore_count;
+            TEST_FAIL(6, LUMI_block3_cleanup, 16, "error not raised")
+            LUMI_block4_cleanup:
+            (void)0;
+            --LUMI_trace_ignore_count;
+            LUMI_err = OK;
+            LUMI_loop_depth = 3;
+        LUMI_block3_cleanup:
+            (void)0;
+            LUMI_dec_ref(aux_String_1_Refman);
+        } while (LUMI_loop_depth >= 2);
+        if (LUMI_loop_depth < 1) goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+        LUMI_dec_ref(aux_String_0_Refman);
+        LUMI_dec_ref(s_Refman);
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ tm0
 Returncode ut_M_fun(void);
 Returncode ut_M_fun_Mock(void);
@@ -4168,6 +4472,85 @@ cannot assign "File" into "String"
     LUMI_block4_cleanup:
         (void)0;
     }
+/// @ t3
+{
+        char sa_Values[4] = {0};
+        String sa_Var = {4, 0, NULL};
+        String* sa = NULL;
+        Ref_Manager* sa_Refman = NULL;
+        ++LUMI_trace_ignore_count;
+        INIT_VAR(2, LUMI_block1_cleanup, sa)
+        sa_Var.values = sa_Values;
+        {
+            char sb_Values[4] = {0};
+            String sb_Var = {4, 0, NULL};
+            String* sb = NULL;
+            Ref_Manager* sb_Refman = NULL;
+            ++LUMI_trace_ignore_count;
+            INIT_VAR(4, LUMI_block2_cleanup, sb)
+            sb_Var.values = sb_Values;
+        LUMI_block2_cleanup:
+            (void)0;
+            LUMI_dec_ref(sb_Refman);
+        }
+        --LUMI_trace_ignore_count;
+        if (LUMI_err != OK) {
+            char sc_Values[4] = {0};
+            String sc_Var = {4, 0, NULL};
+            String* sc = NULL;
+            Ref_Manager* sc_Refman = NULL;
+            LUMI_err = OK;
+            LUMI_loop_depth = 1;
+            INIT_VAR(6, LUMI_block3_cleanup, sc)
+            sc_Var.values = sc_Values;
+        LUMI_block3_cleanup:
+            (void)0;
+            LUMI_dec_ref(sc_Refman);
+        }
+    LUMI_block1_cleanup:
+        (void)0;
+        LUMI_dec_ref(sa_Refman);
+    }
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        char sd_Values[4] = {0};
+        String sd_Var = {4, 0, NULL};
+        String* sd = NULL;
+        Ref_Manager* sd_Refman = NULL;
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        INIT_VAR(8, LUMI_block4_cleanup, sd)
+        sd_Var.values = sd_Values;
+        {
+            char se_Values[4] = {0};
+            String se_Var = {4, 0, NULL};
+            String* se = NULL;
+            Ref_Manager* se_Refman = NULL;
+            ++LUMI_trace_ignore_count;
+            INIT_VAR(10, LUMI_block5_cleanup, se)
+            se_Var.values = se_Values;
+        LUMI_block5_cleanup:
+            (void)0;
+            LUMI_dec_ref(se_Refman);
+        }
+        --LUMI_trace_ignore_count;
+        if (LUMI_err != OK) {
+            char sf_Values[4] = {0};
+            String sf_Var = {4, 0, NULL};
+            String* sf = NULL;
+            Ref_Manager* sf_Refman = NULL;
+            LUMI_err = OK;
+            LUMI_loop_depth = 1;
+            INIT_VAR(12, LUMI_block6_cleanup, sf)
+            sf_Var.values = sf_Values;
+        LUMI_block6_cleanup:
+            (void)0;
+            LUMI_dec_ref(sf_Refman);
+        }
+    LUMI_block4_cleanup:
+        (void)0;
+        LUMI_dec_ref(sd_Refman);
+    }
 /// @ te0
 expected new-line after "try", got "("
 /// @ te1
@@ -4191,7 +4574,7 @@ Returncode ut_M_TestIterator_has(ut_M_TestIterator* self, Ref_Manager* self_Refm
 Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, Ref_Manager* self_Refman, Int* num);
 Returncode ut_M_TestIterator_next(ut_M_TestIterator* self, Ref_Manager* self_Refman);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self);
-Returncode ut_M_f_mock(Int* i);
+Returncode ut_M_fun(Int* i);
 Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
 Returncode ut_M_TestIterator_new(ut_M_TestIterator* self, Ref_Manager* self_Refman, Int count) {
     Returncode LUMI_err = OK;
@@ -4232,7 +4615,7 @@ LUMI_block0_cleanup:
 void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
     if (self == NULL) return;
 }
-Returncode ut_M_f_mock(Int* i) {
+Returncode ut_M_fun(Int* i) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     ut_M_TestIterator* aux_TestIterator_0 = NULL;
@@ -4252,17 +4635,24 @@ Returncode ut_M_f_mock(Int* i) {
     aux_TestIterator_1 = aux_TestIterator_0;
     while (true) {
         Bool n_Has = false;
+        char s_Values[4] = {0};
+        String s_Var = {4, 0, NULL};
+        String* s = NULL;
+        Ref_Manager* s_Refman = NULL;
         LUMI_loop_depth = 3;
         LUMI_err = ut_M_TestIterator_has(aux_TestIterator_1, aux_TestIterator_1_Refman, &(n_Has));
         CHECK(8, LUMI_block1_cleanup)
         if (!n_Has) break;
         LUMI_err = ut_M_TestIterator_get(aux_TestIterator_1, aux_TestIterator_1_Refman, &(n));
         CHECK(8, LUMI_block1_cleanup)
+        INIT_VAR(9, LUMI_block1_cleanup, s)
+        s_Var.values = s_Values;
         *i = n;
         LUMI_err = ut_M_TestIterator_next(aux_TestIterator_1, aux_TestIterator_1_Refman);
         CHECK(8, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
+        LUMI_dec_ref(s_Refman);
     }
     aux_Ref_Manager = aux_TestIterator_1_Refman;
     aux_TestIterator_1_Refman = NULL;
@@ -4288,7 +4678,7 @@ Returncode ut_M_TestIterator_has(ut_M_TestIterator* self, Ref_Manager* self_Refm
 Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, Ref_Manager* self_Refman, String** text, Ref_Manager** text_Refman);
 Returncode ut_M_TestIterator_next(ut_M_TestIterator* self, Ref_Manager* self_Refman);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self);
-Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, String** s, Ref_Manager** s_Refman);
+Returncode ut_M_fun(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, String** s, Ref_Manager** s_Refman);
 Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
 Returncode ut_M_TestIterator_has(ut_M_TestIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
     Returncode LUMI_err = OK;
@@ -4321,7 +4711,7 @@ void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
     if (self == NULL) return;
     LUMI_dec_ref(self->value_Refman);
 }
-Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, String** s, Ref_Manager** s_Refman) {
+Returncode ut_M_fun(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, String** s, Ref_Manager** s_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     String* t = NULL;
@@ -4391,7 +4781,7 @@ Returncode ut_M_TestIterator_next(ut_M_TestIterator* self, Ref_Manager* self_Ref
 void ut_M_TestIterator_Del(ut_M_TestIterator* self);
 Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self);
-Returncode ut_M_f_mock(ut_M_TestIterator* siter, Ref_Manager* siter_Refman, ut_M_TestIterator* titer, Ref_Manager* titer_Refman, String** os, Ref_Manager** os_Refman, ut_M_Test** ot, Ref_Manager** ot_Refman, ut_M_Test_Dynamic** ot_Dynamic);
+Returncode ut_M_fun(ut_M_TestIterator* siter, Ref_Manager* siter_Refman, ut_M_TestIterator* titer, Ref_Manager* titer_Refman, String** os, Ref_Manager** os_Refman, ut_M_Test** ot, Ref_Manager** ot_Refman, ut_M_Test_Dynamic** ot_Dynamic);
 Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_fun};
 Returncode ut_M_TestIterator_has(ut_M_TestIterator* self, Ref_Manager* self_Refman, Bool* has_data) {
@@ -4437,7 +4827,7 @@ LUMI_block0_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-Returncode ut_M_f_mock(ut_M_TestIterator* siter, Ref_Manager* siter_Refman, ut_M_TestIterator* titer, Ref_Manager* titer_Refman, String** os, Ref_Manager** os_Refman, ut_M_Test** ot, Ref_Manager** ot_Refman, ut_M_Test_Dynamic** ot_Dynamic) {
+Returncode ut_M_fun(ut_M_TestIterator* siter, Ref_Manager* siter_Refman, ut_M_TestIterator* titer, Ref_Manager* titer_Refman, String** os, Ref_Manager** os_Refman, ut_M_Test** ot, Ref_Manager** ot_Refman, ut_M_Test_Dynamic** ot_Dynamic) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     String* s = NULL;

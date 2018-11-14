@@ -51,8 +51,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.parent := glob.root.global-init
       self.my-module := my-module
       self.my-module.variable-map.add(user self.name, user self)
-    if self.parent? and (glob.last-char = '(' or self.is-create)
-      VariableInit.parse-new(user _, user self)
+    if self.parent?
+      if (glob.last-char = '(' or self.is-create)
+        VariableInit.parse-new(user _, user self)
+      self.get-function().function-variables.add(user self.name, user self)
     if self.parent is glob.root.global-init
       self.parent := _
   
@@ -80,7 +82,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.syntax-error(
             user "variable name overrides function", user self.name)
       if self.parent?
-        if self.parent.find-variable(user self.name, user _)?
+        var Bool redefinition(
+            copy self.parent.find-variable(user self.name, user _)?)
+        if not redefinition
+          redefinition :=
+              self.get-function().function-variables.find(user self.name)?
+        if redefinition
           self.syntax-error(
               user "redefinition of variable", user self.name)
   
@@ -293,7 +300,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func inst write-spaces()
     if self.parent?
-      self.parent.get-function().write-spaces()
+      base()
     else-if self.parent-type?
       self.parent-type.write-spaces()
 

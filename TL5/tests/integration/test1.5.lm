@@ -224,17 +224,17 @@ test test-simple-delete()
     deleted-refmans := _
     deleted-links := _
 
-func f-has-ref(copy Ref ref)->(owner RefNode node)
-    f-has-ref-rec(copy ref)->(owner node)
-    f-has-ref-rec(copy ref)->(owner deleted-refmans)
+func has-ref(copy Ref ref)->(owner RefNode node)
+    has-ref-rec(copy ref)->(owner node)
+    has-ref-rec(copy ref)->(owner deleted-refmans)
 
-func f-has-ref-rec(copy Ref ref)->(owner RefNode node)
+func has-ref-rec(copy Ref ref)->(owner RefNode node)
     assert node?
     if node.ref is ref
         owner RefNode next(owner node.next)
         node := next
     else
-        f-has-ref-rec(copy ref)->(owner node.next)
+        has-ref-rec(copy ref)->(owner node.next)
 
 test test-complex-delete()
     assert not deleted-refmans?
@@ -289,22 +289,82 @@ test test-complex-delete()
     assert not b1?
     
     record-delete := false
-    f-has-ref(copy b1-ref)->(owner deleted-base-links)
-    f-has-ref(copy t1-ref)->(owner deleted-top-links)
-    f-has-ref-rec(copy t1-ref)->(owner deleted-base-links)
-    f-has-ref(copy t2-ref)->(owner deleted-top-links)
-    f-has-ref-rec(copy t2-ref)->(owner deleted-base-links)
-    f-has-ref(copy t3-ref)->(owner deleted-top-links)
-    f-has-ref-rec(copy t3-ref)->(owner deleted-base-links)
-    f-has-ref(copy b2-ref)->(owner deleted-base-links)
-    f-has-ref(copy l1-ref)->(owner deleted-links)
-    f-has-ref(copy l2-ref)->(owner deleted-links)
-    f-has-ref(copy l3-ref)->(owner deleted-links)
+    has-ref(copy b1-ref)->(owner deleted-base-links)
+    has-ref(copy t1-ref)->(owner deleted-top-links)
+    has-ref-rec(copy t1-ref)->(owner deleted-base-links)
+    has-ref(copy t2-ref)->(owner deleted-top-links)
+    has-ref-rec(copy t2-ref)->(owner deleted-base-links)
+    has-ref(copy t3-ref)->(owner deleted-top-links)
+    has-ref-rec(copy t3-ref)->(owner deleted-base-links)
+    has-ref(copy b2-ref)->(owner deleted-base-links)
+    has-ref(copy l1-ref)->(owner deleted-links)
+    has-ref(copy l2-ref)->(owner deleted-links)
+    has-ref(copy l3-ref)->(owner deleted-links)
     
     assert not deleted-refmans?
     assert not deleted-links?
     assert not deleted-base-links?
     assert not deleted-top-links?
+
+func has-refs(user Array{Ref} refs, copy Int number)
+    record-delete := false
+    for n in number
+        has-ref(copy refs[n])->(owner deleted-links)
+    record-delete := true
+
+func cleanup-test(user Array{Ref} refs)
+    try
+        raise
+    catch
+        new Link la
+        refs[0] := la
+        if false
+            ; 
+        else
+            new Link lb
+            refs[1] := lb
+            try
+                new Link lc
+                refs[2] := lc
+                if true
+                    new Link ld
+                    refs[3] := ld
+                    do
+                        new Link le
+                        refs[4] := le
+                        for n in 3
+                            new Link lf
+                            refs[5] := lf
+                            return
+
+test test-block-delete()
+    assert not deleted-refmans?
+    assert not deleted-links?
+    record-delete := true
+    var Array{6:Ref} refs
+    
+    cleanup-test(user refs)
+    has-refs(user refs, copy 6)
+    
+    var Int n
+    do
+        new Link la
+        refs[n] := la
+        n += 1
+        if n = 2
+            continue
+        if n = 3
+            break
+    has-refs(user refs, copy 3)
+    
+    for n in 3
+        new Link lb
+        refs[n] := lb
+    has-refs(user refs, copy 3)
+    
+    record-delete := false
+    deleted-refmans := _
+    deleted-links := _
 
 
 func f-raise-message()
