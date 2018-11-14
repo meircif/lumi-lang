@@ -17,11 +17,13 @@ class SyntaxTreeAssert(SyntaxTreeCode)
     self.analyze-expression(user self.tested, user glob.type-bool)
   
   func dynamic write()
-    ; TEST_ASSERT(`line`, `tested`)
+    ; TEST_ASSERT(`line`, `cleanp`, `tested`)
     self.write-spaces()
     self.tested.write-preactions()
     write(user "TEST_ASSERT(")
     self.write-line-num()
+    write(user ", ")
+    self.parent.write-cleanup-label()
     write(user ", ")
     self.tested.write()
     write(user ")\n")
@@ -29,6 +31,7 @@ class SyntaxTreeAssert(SyntaxTreeCode)
 ~~~ Assert-error statement in the syntax tree ~~~
 class SyntaxTreeAssertError(SyntaxTreeCode)
   var ExpressionValue tested
+  var SyntaxTreeBlock dummy-block
   owner String expected-error
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
@@ -37,6 +40,8 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     new-node.parse()
   
   func inst parse()
+    self.dummy-block.set-parent(user self.parent)
+    self.dummy-block.indentation-spaces -= INDENTATION-SPACES
     self.tested.new(user ",", user self)
     if glob.last-char = ','
       read-c()
@@ -69,17 +74,13 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
       write(user "LUMI_expected_error_trace_ignore_count =")
       write(user " LUMI_trace_ignore_count + 1;\n")
     self.write-spaces()
-    write(user "do {\n")
-    self.parent.indentation-spaces += INDENTATION-SPACES
-    self.write-spaces()
     write(user "++LUMI_trace_ignore_count;\n")
-    write(user "#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR break\n")
     self.write-spaces()
+    
+    self.parent := self.dummy-block
     self.tested.write-preactions()
-    write(user "\n#undef RETURN_ERROR\n")
-    write(user "#define RETURN_ERROR goto LUMI_cleanup\n")
-    self.write-spaces()
+    self.parent := self.dummy-block.parent
+    
     write(user "--LUMI_trace_ignore_count;\n")
     if self.expected-error?
       self.write-spaces()
@@ -90,10 +91,12 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     self.write-spaces()
     write(user "TEST_FAIL(")
     self.write-line-num()
+    write(user ", ")
+    self.parent.write-cleanup-label()
     write(user ", 16, \"error not raised\")\n")
-    self.parent.indentation-spaces -= INDENTATION-SPACES
-    self.write-spaces()
-    write(user "} while (false);\n")
+    
+    self.dummy-block.write-block-cleanup()
+    
     self.write-spaces()
     write(user "--LUMI_trace_ignore_count;\n")
     if self.expected-error?
@@ -109,6 +112,8 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
       write(user "TEST_FAIL_NULL(")
       self.parent.indentation-spaces -= INDENTATION-SPACES
       self.write-line-num()
+      write(user ", ")
+      self.parent.write-cleanup-label()
       write(user ")\n")
       self.write-spaces()
       write(user "}\n")
@@ -116,6 +121,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
       write(user "LUMI_expected_error = LUMI_expected_error_prev;}\n")
     self.write-spaces()
     write(user "LUMI_err = OK;\n")
+    self.parent.write-set-loop-depth()
 
 
 ~~~ Test function in the syntax tree ~~~

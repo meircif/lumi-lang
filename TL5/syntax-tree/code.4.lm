@@ -32,7 +32,8 @@ class SyntaxTreeReturn(SyntaxTreeCode)
   
   func dynamic write()
     self.write-spaces()
-    write(user "goto LUMI_cleanup;\n")
+    self.write-loop-jump(copy 0)
+    write(user "\n")
 
 
 ~~~ Raise statement in the syntax tree ~~~
@@ -62,6 +63,8 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     write(user "USER_RAISE(")
     self.write-line-num()
     write(user ", ")
+    self.parent.write-cleanup-label()
+    write(user ", ")
     if self.error-message.parsed()
       self.error-message.write()
       write(user ", ")
@@ -81,7 +84,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
     new-node.parse()
   
   func inst parse()
-    if not self.parent.is-in-loop
+    if self.parent.loop-depth = 0
       self.syntax-error-msg(user "\"while\" used not inside loop")
     self.condition.new(user "", user self)
   
@@ -94,7 +97,9 @@ class SyntaxTreeWhile(SyntaxTreeCode)
     self.condition.write-preactions()
     write(user "if (!(")
     self.condition.write()
-    write(user ")) break;\n")
+    write(user ")) { ")
+    self.write-loop-diff-jump(copy 1)
+    write(user " }\n")
 
 
 ~~~ Break statement in the syntax tree ~~~
@@ -106,12 +111,13 @@ class SyntaxTreeBreak(SyntaxTreeCode)
     new-node.parse()
   
   func inst parse()
-    if not self.parent.is-in-loop
+    if self.parent.loop-depth = 0
       self.syntax-error-msg(user "\"break\" used not inside loop")
   
   func dynamic write()
     self.write-spaces()
-    write(user "break;\n")
+    self.write-loop-diff-jump(copy 1)
+    write(user "\n")
 
 
 ~~~ Continue statement in the syntax tree ~~~
@@ -123,12 +129,13 @@ class SyntaxTreeContinue(SyntaxTreeCode)
     new-node.parse()
   
   func inst parse()
-    if not self.parent.is-in-loop
+    if self.parent.loop-depth = 0
       self.syntax-error-msg(user "\"continue\" used not inside loop")
   
   func dynamic write()
     self.write-spaces()
-    write(user "continue;\n")
+    self.write-loop-diff-jump(copy 0)
+    write(user "\n")
 
 
 class SyntaxTreeCoverage(SyntaxTreeCode)

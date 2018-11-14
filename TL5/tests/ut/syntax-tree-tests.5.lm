@@ -444,6 +444,11 @@ new String{12} s
 so := s
 ; @ c t9
 var Array{12:Tc} a
+; @ g t10
+func fun()
+    var String{4} sv
+    if 1 > 2
+        user String su(user sv[1:2])
 ; @ ec te0
 var Int
 ; @ ec te1
@@ -608,6 +613,19 @@ i := 3
 if b and
         b
     i += 1
+; @ c t5
+if b
+    var String{4} sa
+    if b
+        var String{4} sb
+    else-if b
+        var String{4} sc
+    else
+        var String{4} sd
+else-if b
+    var String{4} se
+else
+    var String{4} sf
 ; @ ec te0
 if 3
 ; @ ec te1
@@ -661,6 +679,28 @@ do
 do
     if true
         while false
+; @ c t5
+do
+    var String{4} sa
+    while b
+    break
+    continue
+    if b
+        return
+    do
+        var String{4} sb
+        while b
+        break
+        continue
+        if b
+            return
+        do
+            var String{4} sc
+            while b
+            break
+            continue
+            if b
+                return
 ; @ ec te0
 do(
 ; @ ec te1
@@ -721,6 +761,19 @@ for n in 7
 for n in 1 +
         2
     i += n
+; @ c t8
+for n in 6
+    var String{4} sa
+    break
+    continue
+    if b
+        return
+    for ch in str
+        var String{4} sb
+        break
+        continue
+        if b
+            return
 ; @ ec te0
 for(
 ; @ ec te1
@@ -752,6 +805,13 @@ assert-error fun0(), "expected error in the function"
 ; @ c ta5
 assert-error t.num,
         "expected error in new line"
+; @ c ta6
+if b
+    var String{4} s
+    assert b
+    assert-error s[1:2]
+    do
+        assert-error s[1:2]
 ; @ g tm0
 func fun()
     fun()
@@ -1367,6 +1427,19 @@ catch
         i := arr[3]
     catch
         i := t.num
+; @ c t3
+try
+    var String{4} sa
+    try
+        var String{4} sb
+    catch
+        var String{4} sc
+catch
+    var String{4} sd
+    try
+        var String{4} se
+    catch
+        var String{4} sf
 ; @ ec te0
 try()
 ; @ ec te1
@@ -1394,8 +1467,9 @@ struct TestIterator
     func has()->(var Bool has-data)
     func get()->(var Int num)
     func next()
-func f-mock()->(var Int i)
+func fun()->(var Int i)
     for n in TestIterator(copy 6)
+        var String{4} s
         i := n
 ; @ g t1
 struct TestIterator
@@ -1403,7 +1477,7 @@ struct TestIterator
     func has()->(var Bool has-data)
     func get()->(user String text)
     func next()
-func f-mock(user TestIterator iter)->(user String s)
+func fun(user TestIterator iter)->(user String s)
     for t in iter
         s := t
 ; @ g t2
@@ -1415,7 +1489,7 @@ struct TestIterator{Generic}
 class Test
     var Int x
     func dynamic fun()
-func f-mock(user TestIterator{String} siter, user TestIterator{Test} titer)->(
+func fun(user TestIterator{String} siter, user TestIterator{Test} titer)->(
         user String os, user Test ot)
     for s in siter
         os := s

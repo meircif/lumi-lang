@@ -90,50 +90,51 @@ void LUMI_trace_print(
   String* message,
   Ref_Manager* message_refman);
 
-#define RETURN_ERROR goto LUMI_cleanup
-
-#define START_TRACE(line, value, format, message, message_refman) \
+#define START_TRACE(line, cleanup, value, format, message, message_refman) \
   LUMI_trace_print( \
       format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, message, message_refman); \
   LUMI_err = value; \
-  RETURN_ERROR;
+  LUMI_loop_depth = 0; \
+  goto cleanup;
 
-#define START_TRACE_STATIC(line, err_value, format, message_length, message) { \
+#define START_TRACE_STATIC(line, cleanup, err_value, format, message_length, message) { \
   String LUMI_msg = { message_length + 1, message_length, message }; \
   Ref_Manager LUMI_msg_refman = { 1, NULL, NULL }; \
   LUMI_msg_refman.value = &LUMI_msg; \
-  START_TRACE(line, err_value, format, &LUMI_msg, &LUMI_msg_refman) }
+  START_TRACE(line, cleanup, err_value, format, &LUMI_msg, &LUMI_msg_refman) }
 
-#define RAISE(line, message) { \
+#define RAISE(line, cleanup, message) { \
   START_TRACE( \
-      line, ERR, LUMI_raise_format, \
+      line, cleanup, ERR, LUMI_raise_format, \
       &(LUMI_error_messages.message.str), \
       &(LUMI_error_messages.message.refman)) }
 
-#define USER_RAISE(line, message, message_refman) \
-  { START_TRACE(line, ERR, LUMI_raise_format, message, message_refman) }
+#define USER_RAISE(line, cleanup, message, message_refman) \
+  { \
+  START_TRACE(line, cleanup, ERR, LUMI_raise_format, message, message_refman) }
 
-#define TEST_FAIL(line, message_length, message) \
-  START_TRACE_STATIC(line, FAIL, LUMI_assert_format, message_length, message)
+#define TEST_FAIL(line, cleanup, message_length, message) \
+  START_TRACE_STATIC( \
+      line, cleanup, FAIL, LUMI_assert_format, message_length, message)
 
-#define TEST_ASSERT(line, condition) if (!(condition)) \
-  TEST_FAIL(line, 21, "condition is not true")
+#define TEST_ASSERT(line, cleanup, condition) if (!(condition)) \
+  TEST_FAIL(line, cleanup, 21, "condition is not true")
 
-#define TEST_FAIL_NULL(line) \
-  { START_TRACE(line, FAIL, LUMI_assert_format, NULL, NULL) }
+#define TEST_FAIL_NULL(line, cleanup) \
+  { START_TRACE(line, cleanup, FAIL, LUMI_assert_format, NULL, NULL) }
 
-#define CHECK(line) if (LUMI_err != OK) { \
+#define CHECK(line, cleanup) if (LUMI_err != OK) { \
   LUMI_trace_print( \
       LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \
       NULL, NULL); \
-  RETURN_ERROR; }
+  goto cleanup; }
 
 #define IGNORE_ERRORS(call) \
   ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;
 
-#define CHECK_REF(line, ref, refman) \
-  if (ref == NULL) RAISE(line, empty_object) \
-  if ((refman)->value == NULL) RAISE(line, outdated_weak_reference)
+#define CHECK_REF(line, cleanup, ref, refman) \
+  if (ref == NULL) RAISE(line, cleanup, empty_object) \
+  if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)
 
 int LUMI_main(int argc, char* argv[]);
 int LUMI_test_main(int argc, char* argv[]);
@@ -179,21 +180,21 @@ while (self->field != NULL) { \
   LUMI_owner_dec_ref(value_Refman); \
 }
 
-#define INIT_REFMAN(line, name, is_new) \
+#define INIT_REFMAN(line, cleanup, name, is_new) \
   name##_Refman = LUMI_new_ref((void**)&name, is_new); \
-  if (name##_Refman == NULL) RAISE(line, managed_object_memory)
+  if (name##_Refman == NULL) RAISE(line, cleanup, managed_object_memory)
 
-#define INIT_VAR(line, name) \
+#define INIT_VAR(line, cleanup, name) \
   name = &name##_Var; \
-  INIT_REFMAN(line, name, false)
+  INIT_REFMAN(line, cleanup, name, false)
 
-#define INIT_NEW(line, name, alloc) \
+#define INIT_NEW(line, cleanup, name, alloc) \
   name = alloc; \
-  if (name == NULL) RAISE(line, object_memory) \
-  INIT_REFMAN(line, name, true)
+  if (name == NULL) RAISE(line, cleanup, object_memory) \
+  INIT_REFMAN(line, cleanup, name, true)
 
-#define INIT_STRING_CONST(line, name, text) \
-  INIT_VAR(line, name) \
+#define INIT_STRING_CONST(line, cleanup, name, text) \
+  INIT_VAR(line, cleanup, name) \
   name##_Var.max_length = sizeof(text); \
   name##_Var.length = sizeof(text) - 1; \
   name##_Var.values = text;

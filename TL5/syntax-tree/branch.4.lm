@@ -77,34 +77,31 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       var Bool is-parsed)
     is-parsed := glob.last-char = ' '
     
-    user List{SyntaxTreeVariable} variables(user self.variables)
-    if parent-block?
-      variables := parent-block.get-function().variables
-      if glob.tested-module?
-        if glob.current-module.name.equal(user glob.tested-module) and
-            not keyword.equal(user "else") and not keyword.equal(user "else-if")
-          parent-block.code-nodes.add(
-              owner SyntaxTreeCoverage(user parent-block))
+    if parent-block? and glob.tested-module?
+      if glob.current-module.name.equal(user glob.tested-module) and
+          not keyword.equal(user "else") and not keyword.equal(user "else-if")
+        parent-block.code-nodes.add(
+            owner SyntaxTreeCoverage(user parent-block))
     
     if not is-parsed
       return
     
     else-if keyword.equal(user "var")
-      variables.add(owner SyntaxTreeVariable.parse-new(
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
           user _,
           copy Access.VAR,
           copy true,
           user parent-type,
           user parent-block))
     else-if keyword.equal(user "user")
-      variables.add(owner SyntaxTreeVariable.parse-new(
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
           user _,
           copy Access.USER,
           copy false,
           user parent-type,
           user parent-block))
     else-if keyword.equal(user "owner")
-      variables.add(owner SyntaxTreeVariable.parse-new(
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
           user _,
           copy Access.OWNER,
           copy false,
@@ -157,7 +154,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       write-cname(user variable.name)
       write(user "));\n")
       return
-    write-spaces(copy INDENTATION-SPACES)
+    if type-data?
+      write-spaces(copy INDENTATION-SPACES)
+    else
+      self.write-spaces()
     write(user "LUMI_")
     if variable.access = Access.OWNER
       write(user "owner_")
