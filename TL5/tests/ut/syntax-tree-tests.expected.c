@@ -520,15 +520,15 @@ Returncode ut_M_name(String* self, Ref_Manager* self_Refman, Int px, String* pu,
     pu = aux_String_3;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(aux_String_3_Refman);
-    LUMI_dec_ref(aux_String_2_Refman);
+    LUMI_var_dec_ref(aux_String_3_Refman);
+    LUMI_var_dec_ref(aux_String_2_Refman);
     String_Del(aux_String_1);
     LUMI_owner_dec_ref(aux_String_1_Refman);
     String_Del(aux_String_0);
     LUMI_owner_dec_ref(aux_String_0_Refman);
     String_Del(n);
     LUMI_owner_dec_ref(n_Refman);
-    LUMI_dec_ref(v_Refman);
+    LUMI_var_dec_ref(v_Refman);
     String_Del(o);
     LUMI_owner_dec_ref(o_Refman);
     LUMI_dec_ref(u_Refman);
@@ -1043,7 +1043,7 @@ Returncode ut_M_name(void) {
     USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, aux_String_0_Refman)
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(aux_String_0_Refman);
+    LUMI_var_dec_ref(aux_String_0_Refman);
     return LUMI_err;
 }
 /// @ t3
@@ -1159,13 +1159,13 @@ Returncode ut_M_fun(void) {
         LUMI_inc_ref(su_Refman);
     LUMI_block1_cleanup:
         (void)0;
-        LUMI_dec_ref(aux_String_0_Refman);
+        LUMI_var_dec_ref(aux_String_0_Refman);
         LUMI_dec_ref(su_Refman);
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(sv_Refman);
+    LUMI_var_dec_ref(sv_Refman);
     return LUMI_err;
 }
 /// @ te0
@@ -1482,7 +1482,7 @@ if (ut_M_b) {
             sb_Var.values = sb_Values;
         LUMI_block2_cleanup:
             (void)0;
-            LUMI_dec_ref(sb_Refman);
+            LUMI_var_dec_ref(sb_Refman);
         }
         else {
             if (ut_M_b) {
@@ -1494,7 +1494,7 @@ if (ut_M_b) {
                 sc_Var.values = sc_Values;
             LUMI_block5_cleanup:
                 (void)0;
-                LUMI_dec_ref(sc_Refman);
+                LUMI_var_dec_ref(sc_Refman);
             }
             else {
                 char sd_Values[4] = {0};
@@ -1505,7 +1505,7 @@ if (ut_M_b) {
                 sd_Var.values = sd_Values;
             LUMI_block7_cleanup:
                 (void)0;
-                LUMI_dec_ref(sd_Refman);
+                LUMI_var_dec_ref(sd_Refman);
             }
             if (LUMI_loop_depth < 1) goto LUMI_block4_cleanup;
         LUMI_block4_cleanup:
@@ -1514,7 +1514,7 @@ if (ut_M_b) {
         if (LUMI_loop_depth < 1) goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
         (void)0;
-        LUMI_dec_ref(sa_Refman);
+        LUMI_var_dec_ref(sa_Refman);
     }
     else {
         if (ut_M_b) {
@@ -1526,7 +1526,7 @@ if (ut_M_b) {
             se_Var.values = se_Values;
         LUMI_block10_cleanup:
             (void)0;
-            LUMI_dec_ref(se_Refman);
+            LUMI_var_dec_ref(se_Refman);
         }
         else {
             char sf_Values[4] = {0};
@@ -1537,7 +1537,7 @@ if (ut_M_b) {
             sf_Var.values = sf_Values;
         LUMI_block12_cleanup:
             (void)0;
-            LUMI_dec_ref(sf_Refman);
+            LUMI_var_dec_ref(sf_Refman);
         }
         if (LUMI_loop_depth < 1) goto LUMI_block9_cleanup;
     LUMI_block9_cleanup:
@@ -1667,17 +1667,17 @@ do {
                 if (LUMI_loop_depth < 7) goto LUMI_block5_cleanup;
             LUMI_block5_cleanup:
                 (void)0;
-                LUMI_dec_ref(sc_Refman);
+                LUMI_var_dec_ref(sc_Refman);
             } while (LUMI_loop_depth >= 6);
             if (LUMI_loop_depth < 5) goto LUMI_block3_cleanup;
         LUMI_block3_cleanup:
             (void)0;
-            LUMI_dec_ref(sb_Refman);
+            LUMI_var_dec_ref(sb_Refman);
         } while (LUMI_loop_depth >= 4);
         if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
         (void)0;
-        LUMI_dec_ref(sa_Refman);
+        LUMI_var_dec_ref(sa_Refman);
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
@@ -1902,7 +1902,7 @@ Int n = 0;
             if (LUMI_loop_depth < 5) goto LUMI_block3_cleanup;
         LUMI_block3_cleanup:
             (void)0;
-            LUMI_dec_ref(sb_Refman);
+            LUMI_var_dec_ref(sb_Refman);
         }}
         aux_Ref_Manager = aux_String_0_Refman;
         aux_String_0_Refman = NULL;
@@ -1914,7 +1914,7 @@ Int n = 0;
     LUMI_block1_cleanup:
         (void)0;
         LUMI_dec_ref(aux_String_0_Refman);
-        LUMI_dec_ref(sa_Refman);
+        LUMI_var_dec_ref(sa_Refman);
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
@@ -2076,13 +2076,13 @@ if (ut_M_b) {
             LUMI_loop_depth = 3;
         LUMI_block3_cleanup:
             (void)0;
-            LUMI_dec_ref(aux_String_1_Refman);
+            LUMI_var_dec_ref(aux_String_1_Refman);
         } while (LUMI_loop_depth >= 2);
         if (LUMI_loop_depth < 1) goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
         (void)0;
-        LUMI_dec_ref(aux_String_0_Refman);
-        LUMI_dec_ref(s_Refman);
+        LUMI_var_dec_ref(aux_String_0_Refman);
+        LUMI_var_dec_ref(s_Refman);
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ tm0
@@ -2338,8 +2338,8 @@ Returncode ut_M_fun(void) {
     Sys_print_Mock_active = true;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(aux_String_1_Refman);
-    LUMI_dec_ref(aux_String_0_Refman);
+    LUMI_var_dec_ref(aux_String_1_Refman);
+    LUMI_var_dec_ref(aux_String_0_Refman);
     return LUMI_err;
 }
 Returncode Sys_print_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
@@ -3040,7 +3040,7 @@ Returncode ut_M_use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_M
     CHECK(14, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(t_Refman);
+    LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(third_Refman);
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
@@ -3648,7 +3648,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
     t->_base.item = s;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(t_Refman);
+    LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(s_Refman);
     return LUMI_err;
 }
@@ -3725,7 +3725,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
     t->_base.item = s;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(t_Refman);
+    LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(s_Refman);
     return LUMI_err;
 }
@@ -3883,7 +3883,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
     t->_base._base._base.item = s;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(t_Refman);
+    LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(s_Refman);
     return LUMI_err;
 }
@@ -3960,7 +3960,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
     t->_base.item = s;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(t_Refman);
+    LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(s_Refman);
     return LUMI_err;
 }
@@ -4176,7 +4176,7 @@ Returncode ut_M_use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_M
     t->_base._base.third = third;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(t_Refman);
+    LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(third_Refman);
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
@@ -4279,7 +4279,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman, ut_M_Second* ss, Ref_Manag
     ((ut_M_Second*)(t->_base.item))->item = s;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(t_Refman);
+    LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(ss_Refman);
     LUMI_dec_ref(s_Refman);
     return LUMI_err;
@@ -4491,7 +4491,7 @@ cannot assign "File" into "String"
             sb_Var.values = sb_Values;
         LUMI_block2_cleanup:
             (void)0;
-            LUMI_dec_ref(sb_Refman);
+            LUMI_var_dec_ref(sb_Refman);
         }
         --LUMI_trace_ignore_count;
         if (LUMI_err != OK) {
@@ -4505,11 +4505,11 @@ cannot assign "File" into "String"
             sc_Var.values = sc_Values;
         LUMI_block3_cleanup:
             (void)0;
-            LUMI_dec_ref(sc_Refman);
+            LUMI_var_dec_ref(sc_Refman);
         }
     LUMI_block1_cleanup:
         (void)0;
-        LUMI_dec_ref(sa_Refman);
+        LUMI_var_dec_ref(sa_Refman);
     }
     --LUMI_trace_ignore_count;
     if (LUMI_err != OK) {
@@ -4531,7 +4531,7 @@ cannot assign "File" into "String"
             se_Var.values = se_Values;
         LUMI_block5_cleanup:
             (void)0;
-            LUMI_dec_ref(se_Refman);
+            LUMI_var_dec_ref(se_Refman);
         }
         --LUMI_trace_ignore_count;
         if (LUMI_err != OK) {
@@ -4545,11 +4545,11 @@ cannot assign "File" into "String"
             sf_Var.values = sf_Values;
         LUMI_block6_cleanup:
             (void)0;
-            LUMI_dec_ref(sf_Refman);
+            LUMI_var_dec_ref(sf_Refman);
         }
     LUMI_block4_cleanup:
         (void)0;
-        LUMI_dec_ref(sd_Refman);
+        LUMI_var_dec_ref(sd_Refman);
     }
 /// @ te0
 expected new-line after "try", got "("
@@ -4652,7 +4652,7 @@ Returncode ut_M_fun(Int* i) {
         CHECK(8, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
-        LUMI_dec_ref(s_Refman);
+        LUMI_var_dec_ref(s_Refman);
     }
     aux_Ref_Manager = aux_TestIterator_1_Refman;
     aux_TestIterator_1_Refman = NULL;
@@ -5185,7 +5185,7 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(t_Refman);
+    LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(b2_Refman);
     LUMI_dec_ref(b_Refman);
     LUMI_dec_ref(self_Refman);

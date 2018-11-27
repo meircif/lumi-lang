@@ -10,12 +10,6 @@ typedef int Int;
 typedef char Char;
 typedef unsigned char Byte;
 
-typedef struct {
-  int max_length;
-  int length;
-  char* values;
-} String;
-
 typedef enum {
   false = 0,
   true = 1
@@ -26,6 +20,18 @@ typedef enum {
   ERR = EXIT_FAILURE,
   FAIL = EXIT_FAILURE > EXIT_SUCCESS? EXIT_FAILURE + 1 : EXIT_SUCCESS + 1
 } Returncode;
+
+typedef struct {
+  int count;
+  void* value;
+  void* ref;
+} Ref_Manager;
+
+typedef struct {
+  int max_length;
+  int length;
+  char* values;
+} String;
 
 typedef struct {
   int length;
@@ -39,12 +45,6 @@ typedef struct {
 } File;
 
 typedef void* Ref;
-
-typedef struct {
-  int count;
-  void* value;
-  void* ref;
-} Ref_Manager;
 
 typedef struct {
   char const* filename;
@@ -203,6 +203,7 @@ void* LUMI_alloc(size_t size);
 Ref_Manager* LUMI_new_ref(void** value, Bool is_new);
 void LUMI_inc_ref(Ref_Manager* ref);
 void LUMI_dec_ref(Ref_Manager* ref);
+void LUMI_var_dec_ref(Ref_Manager* ref);
 void LUMI_owner_dec_ref(Ref_Manager* ref);
 
 String* LUMI_new_string(int length);

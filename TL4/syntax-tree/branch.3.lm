@@ -176,7 +176,9 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       write(user "));\n")
       return
     write(user "  LUMI_")
-    if variable.access = ACCESS-OWNER
+    if variable.access = ACCESS-VAR
+      write(user "var_")
+    else-if variable.access = ACCESS-OWNER
       write(user "owner_")
     write(user "dec_ref(")
     if ? type-data

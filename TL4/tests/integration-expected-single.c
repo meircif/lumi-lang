@@ -703,7 +703,7 @@ Returncode integration_M_ComplexField_meth(integration_M_ComplexField* self, Ref
   LUMI_err = Sys_print(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(538)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
@@ -806,8 +806,8 @@ Returncode integration_M_test_simple_function(void) {
   LUMI_err = Sys_print(sys, sys_Refman, aux_String_1, aux_String_1_Refman);
   CHECK(37)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -858,8 +858,8 @@ Returncode integration_M_test_const_expression(Int* i, Char* c, String** s, Ref_
   LUMI_err = (*f)();
   CHECK(60)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -898,7 +898,7 @@ Returncode integration_M_test_member_expression(integration_M_TestStruct* t, Ref
   LUMI_err = integration_M_TestStruct_new(t, t_Refman, 0, aux_String_0, aux_String_0_Refman);
   CHECK(69)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(t_Refman);
   return LUMI_err;
 }
@@ -1111,18 +1111,18 @@ Returncode integration_M_test_slice_expression(String* s, Ref_Manager* s_Refman,
   LUMI_err = (((Returncode (**)(void))(((*arrfo))->values))[4])();
   CHECK(102)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_Array_9_Refman);
-  LUMI_dec_ref(aux_Array_8_Refman);
-  LUMI_dec_ref(aux_Array_7_Refman);
-  LUMI_dec_ref(aux_Array_6_Refman);
-  LUMI_dec_ref(aux_Array_5_Refman);
-  LUMI_dec_ref(aux_Array_4_Refman);
-  LUMI_dec_ref(aux_Array_3_Refman);
-  LUMI_dec_ref(aux_Array_2_Refman);
-  LUMI_dec_ref(aux_Array_1_Refman);
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
-  LUMI_dec_ref(aux_Array_0_Refman);
+  LUMI_var_dec_ref(aux_Array_9_Refman);
+  LUMI_var_dec_ref(aux_Array_8_Refman);
+  LUMI_var_dec_ref(aux_Array_7_Refman);
+  LUMI_var_dec_ref(aux_Array_6_Refman);
+  LUMI_var_dec_ref(aux_Array_5_Refman);
+  LUMI_var_dec_ref(aux_Array_4_Refman);
+  LUMI_var_dec_ref(aux_Array_3_Refman);
+  LUMI_var_dec_ref(aux_Array_2_Refman);
+  LUMI_var_dec_ref(aux_Array_1_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_Array_0_Refman);
   LUMI_dec_ref(arrf_Refman);
   LUMI_dec_ref(arrd_Refman);
   LUMI_dec_ref(arrt_Refman);
@@ -1418,16 +1418,16 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_TestClass_0_Refman);
   integration_M_TestStruct_Del(aux_TestStruct_0);
   LUMI_owner_dec_ref(aux_TestStruct_0_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   if (idn_Dynamic != NULL) idn_Dynamic->_del(idn);
   LUMI_owner_dec_ref(idn_Refman);
-  LUMI_dec_ref(idv_Refman);
+  LUMI_var_dec_ref(idv_Refman);
   integration_M_TestStruct_Del(itn);
   LUMI_owner_dec_ref(itn_Refman);
-  LUMI_dec_ref(itv_Refman);
+  LUMI_var_dec_ref(itv_Refman);
   String_Del(isn);
   LUMI_owner_dec_ref(isn_Refman);
-  LUMI_dec_ref(isv_Refman);
+  LUMI_var_dec_ref(isv_Refman);
   LUMI_dec_ref(si_Refman);
   LUMI_owner_dec_ref(sfn_Refman);
   ARRAY_DEL(String, san)
@@ -1443,14 +1443,14 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(dn_Refman);
   integration_M_TestStruct_Del(tn);
   LUMI_owner_dec_ref(tn_Refman);
-  LUMI_dec_ref(fa_Refman);
-  LUMI_dec_ref(sa_Refman);
-  LUMI_dec_ref(da_Refman);
-  LUMI_dec_ref(ta_Refman);
-  LUMI_dec_ref(ia_Refman);
-  LUMI_dec_ref(sv_Refman);
-  LUMI_dec_ref(dv_Refman);
-  LUMI_dec_ref(tv_Refman);
+  LUMI_var_dec_ref(fa_Refman);
+  LUMI_var_dec_ref(sa_Refman);
+  LUMI_var_dec_ref(da_Refman);
+  LUMI_var_dec_ref(ta_Refman);
+  LUMI_var_dec_ref(ia_Refman);
+  LUMI_var_dec_ref(sv_Refman);
+  LUMI_var_dec_ref(dv_Refman);
+  LUMI_var_dec_ref(tv_Refman);
   LUMI_dec_ref(d_Refman);
   LUMI_dec_ref(t_Refman);
   LUMI_owner_dec_ref(a_Refman);
@@ -1616,7 +1616,7 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_String_2_Refman);
   String_Del(aux_String_1);
   LUMI_owner_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   String_Del(s);
   LUMI_owner_dec_ref(s_Refman);
   return LUMI_err;
@@ -1719,7 +1719,7 @@ Returncode integration_M_test_code_flow(Array* arr, Ref_Manager* arr_Refman, Int
     }
   }
 LUMI_cleanup:
-  LUMI_dec_ref(aux_Array_0_Refman);
+  LUMI_var_dec_ref(aux_Array_0_Refman);
   LUMI_dec_ref(arr_Refman);
   return LUMI_err;
 }
@@ -1930,13 +1930,13 @@ LUMI_cleanup:
   LUMI_owner_dec_ref(aux_TestStruct_2_Refman);
   integration_M_TestStruct_Del(aux_TestStruct_1);
   LUMI_owner_dec_ref(aux_TestStruct_1_Refman);
-  LUMI_dec_ref(aux_String_4_Refman);
+  LUMI_var_dec_ref(aux_String_4_Refman);
   integration_M_TestStruct_Del(aux_TestStruct_0);
   LUMI_owner_dec_ref(aux_TestStruct_0_Refman);
-  LUMI_dec_ref(aux_String_3_Refman);
-  LUMI_dec_ref(aux_String_2_Refman);
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_3_Refman);
+  LUMI_var_dec_ref(aux_String_2_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   integration_M_TestStruct_Del(ts);
   LUMI_owner_dec_ref(ts_Refman);
   LUMI_dec_ref(s_user_Refman);
@@ -2103,14 +2103,14 @@ Returncode integration_M_test_type_parameters(String* s, Ref_Manager* s_Refman) 
   aux_Ref_Manager = NULL;
   t->_base._base.third = ts;
 LUMI_cleanup:
-  LUMI_dec_ref(ts_Refman);
-  LUMI_dec_ref(dt_Refman);
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(ts_Refman);
+  LUMI_var_dec_ref(dt_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(dg_Refman);
-  LUMI_dec_ref(dr_Refman);
-  LUMI_dec_ref(ad_Refman);
-  LUMI_dec_ref(sarr_Refman);
-  LUMI_dec_ref(d_Refman);
+  LUMI_var_dec_ref(dr_Refman);
+  LUMI_var_dec_ref(ad_Refman);
+  LUMI_var_dec_ref(sarr_Refman);
+  LUMI_var_dec_ref(d_Refman);
   LUMI_dec_ref(s_Refman);
   return LUMI_err;
 }
@@ -2142,7 +2142,7 @@ Returncode integration_M_f_try_catch_raise(integration_M_TestStruct* t, Ref_Mana
     USER_RAISE(424, aux_String_0, aux_String_0_Refman)
   }
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(t_Refman);
   return LUMI_err;
 }
@@ -2286,19 +2286,19 @@ Returncode integration_M_test_error_handling(integration_M_TestStruct* t, Ref_Ma
   LUMI_err = Sys_println(sys, sys_Refman, aux_String_12, aux_String_12_Refman);
   CHECK(451)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_12_Refman);
-  LUMI_dec_ref(aux_String_11_Refman);
-  LUMI_dec_ref(aux_String_10_Refman);
-  LUMI_dec_ref(aux_String_9_Refman);
-  LUMI_dec_ref(aux_String_8_Refman);
-  LUMI_dec_ref(aux_String_7_Refman);
-  LUMI_dec_ref(aux_String_6_Refman);
-  LUMI_dec_ref(aux_String_5_Refman);
-  LUMI_dec_ref(aux_String_4_Refman);
-  LUMI_dec_ref(aux_String_3_Refman);
-  LUMI_dec_ref(aux_String_2_Refman);
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_12_Refman);
+  LUMI_var_dec_ref(aux_String_11_Refman);
+  LUMI_var_dec_ref(aux_String_10_Refman);
+  LUMI_var_dec_ref(aux_String_9_Refman);
+  LUMI_var_dec_ref(aux_String_8_Refman);
+  LUMI_var_dec_ref(aux_String_7_Refman);
+  LUMI_var_dec_ref(aux_String_6_Refman);
+  LUMI_var_dec_ref(aux_String_5_Refman);
+  LUMI_var_dec_ref(aux_String_4_Refman);
+  LUMI_var_dec_ref(aux_String_3_Refman);
+  LUMI_var_dec_ref(aux_String_2_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(t_Refman);
   return LUMI_err;
 }
@@ -2682,48 +2682,48 @@ Returncode integration_M_test_for_each(void) {
   LUMI_err = Sys_println(sys, sys_Refman, aux_String_25, aux_String_25_Refman);
   CHECK(532)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_25_Refman);
-  LUMI_dec_ref(aux_String_24_Refman);
+  LUMI_var_dec_ref(aux_String_25_Refman);
+  LUMI_var_dec_ref(aux_String_24_Refman);
   LUMI_dec_ref(aux_ContainerIterator_0_Refman);
-  LUMI_dec_ref(aux_String_23_Refman);
-  LUMI_dec_ref(aux_String_22_Refman);
-  LUMI_dec_ref(aux_String_21_Refman);
-  LUMI_dec_ref(aux_String_20_Refman);
-  LUMI_dec_ref(aux_String_19_Refman);
-  LUMI_dec_ref(aux_String_18_Refman);
+  LUMI_var_dec_ref(aux_String_23_Refman);
+  LUMI_var_dec_ref(aux_String_22_Refman);
+  LUMI_var_dec_ref(aux_String_21_Refman);
+  LUMI_var_dec_ref(aux_String_20_Refman);
+  LUMI_var_dec_ref(aux_String_19_Refman);
+  LUMI_var_dec_ref(aux_String_18_Refman);
   LUMI_dec_ref(aux_Array_2_Refman);
   LUMI_dec_ref(s_Refman);
-  LUMI_dec_ref(aux_String_17_Refman);
-  LUMI_dec_ref(aux_String_16_Refman);
-  LUMI_dec_ref(aux_String_15_Refman);
-  LUMI_dec_ref(aux_String_14_Refman);
-  LUMI_dec_ref(aux_String_13_Refman);
-  LUMI_dec_ref(aux_String_12_Refman);
+  LUMI_var_dec_ref(aux_String_17_Refman);
+  LUMI_var_dec_ref(aux_String_16_Refman);
+  LUMI_var_dec_ref(aux_String_15_Refman);
+  LUMI_var_dec_ref(aux_String_14_Refman);
+  LUMI_var_dec_ref(aux_String_13_Refman);
+  LUMI_var_dec_ref(aux_String_12_Refman);
   LUMI_dec_ref(aux_Array_1_Refman);
   LUMI_dec_ref(ts_Refman);
-  LUMI_dec_ref(aux_String_11_Refman);
-  LUMI_dec_ref(aux_String_10_Refman);
-  LUMI_dec_ref(aux_String_9_Refman);
-  LUMI_dec_ref(aux_String_8_Refman);
-  LUMI_dec_ref(aux_String_7_Refman);
-  LUMI_dec_ref(aux_String_6_Refman);
+  LUMI_var_dec_ref(aux_String_11_Refman);
+  LUMI_var_dec_ref(aux_String_10_Refman);
+  LUMI_var_dec_ref(aux_String_9_Refman);
+  LUMI_var_dec_ref(aux_String_8_Refman);
+  LUMI_var_dec_ref(aux_String_7_Refman);
+  LUMI_var_dec_ref(aux_String_6_Refman);
   LUMI_dec_ref(aux_Array_0_Refman);
-  LUMI_dec_ref(aux_String_5_Refman);
-  LUMI_dec_ref(aux_String_4_Refman);
-  LUMI_dec_ref(aux_String_3_Refman);
+  LUMI_var_dec_ref(aux_String_5_Refman);
+  LUMI_var_dec_ref(aux_String_4_Refman);
+  LUMI_var_dec_ref(aux_String_3_Refman);
   LUMI_dec_ref(aux_String_2_Refman);
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   integration_M_ContainerIterator_Del(iter);
   LUMI_owner_dec_ref(iter_Refman);
-  LUMI_dec_ref(container_Refman);
-  LUMI_dec_ref(container_first_Refman);
-  LUMI_dec_ref(container_mid_Refman);
-  LUMI_dec_ref(container_last_Refman);
-  LUMI_dec_ref(sarr_Refman);
-  LUMI_dec_ref(tsarr_Refman);
-  LUMI_dec_ref(arr_Refman);
-  LUMI_dec_ref(text_Refman);
+  LUMI_var_dec_ref(container_Refman);
+  LUMI_var_dec_ref(container_first_Refman);
+  LUMI_var_dec_ref(container_mid_Refman);
+  LUMI_var_dec_ref(container_last_Refman);
+  LUMI_var_dec_ref(sarr_Refman);
+  LUMI_var_dec_ref(tsarr_Refman);
+  LUMI_var_dec_ref(arr_Refman);
+  LUMI_var_dec_ref(text_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -2762,9 +2762,9 @@ Returncode integration_M_test_complex_field(void) {
   LUMI_err = Sys_println(sys, sys_Refman, aux_String_1, aux_String_1_Refman);
   CHECK(559)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
-  LUMI_dec_ref(y_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(y_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME

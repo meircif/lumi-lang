@@ -159,7 +159,9 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     else
       self.write-spaces()
     write(user "LUMI_")
-    if variable.access = Access.OWNER
+    if variable.access = Access.VAR
+      write(user "var_")
+    else-if variable.access = Access.OWNER
       write(user "owner_")
     write(user "dec_ref(")
     if type-data?

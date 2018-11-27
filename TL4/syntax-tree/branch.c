@@ -337,15 +337,20 @@ Returncode SyntaxTreeBranch_write_variable_cleanup(SyntaxTreeBranch* self, Synta
     }
   }
   CHECK(178, write(&(String){8, 7, "  LUMI_"}) )
-  if (variable->access == ACCESS_OWNER) {
-    CHECK(180, write(&(String){7, 6, "owner_"}) )
+  if (variable->access == ACCESS_VAR) {
+    CHECK(180, write(&(String){5, 4, "var_"}) )
   }
-  CHECK(181, write(&(String){9, 8, "dec_ref("}) )
+  else {
+    if (variable->access == ACCESS_OWNER) {
+      CHECK(182, write(&(String){7, 6, "owner_"}) )
+    }
+  }
+  CHECK(183, write(&(String){9, 8, "dec_ref("}) )
   if (NULL != type_data) {
-    CHECK(183, write(&(String){7, 6, "self->"}) )
+    CHECK(185, write(&(String){7, 6, "self->"}) )
   }
-  CHECK(184, write_cname(variable->name) )
-  CHECK(185, write(&(String){11, 10, "_Refman);\n"}) )
+  CHECK(186, write_cname(variable->name) )
+  CHECK(187, write(&(String){11, 10, "_Refman);\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -356,68 +361,68 @@ Returncode SyntaxTreeBranch_write_owner_reference_cleanup(SyntaxTreeBranch* self
 static char* _func_name_SyntaxTreeBranch_write_owner_reference_cleanup = "SyntaxTreeBranch.write-owner-reference-cleanup";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeBranch_write_owner_reference_cleanup
 Returncode SyntaxTreeBranch_write_owner_reference_cleanup(SyntaxTreeBranch* self, SyntaxTreeVariable* variable, TypeData* type_data, TypeData* item_type_data) {
-  CHECK(191, write(&(String){3, 2, "  "}) )
+  CHECK(193, write(&(String){3, 2, "  "}) )
   if (variable->type_instance->type_data == type_data) {
     if (type_data->is_dynamic) {
-      CHECK(194, write(&(String){5, 4, "DYN_"}) )
+      CHECK(196, write(&(String){5, 4, "DYN_"}) )
     }
-    CHECK(195, write(&(String){14, 13, "SELF_REF_DEL("}) )
-    CHECK(196, TypeData_write_cname(type_data) )
-    CHECK(197, write(&(String){3, 2, ", "}) )
+    CHECK(197, write(&(String){14, 13, "SELF_REF_DEL("}) )
+    CHECK(198, TypeData_write_cname(type_data) )
+    CHECK(199, write(&(String){3, 2, ", "}) )
     if (type_data->is_dynamic) {
       TypeData* base_type = type_data;
       while (true) {
         if (!(NULL != base_type->base_type)) break;
-        CHECK(202, write(&(String){7, 6, "_base."}) )
+        CHECK(204, write(&(String){7, 6, "_base."}) )
         base_type = base_type->base_type->type_data;
       }
-      CHECK(204, write(&(String){4, 3, "_, "}) )
+      CHECK(206, write(&(String){4, 3, "_, "}) )
     }
     type_data = NULL;
   }
   else {
     if (variable->type_instance->type_data->is_dynamic) {
-      CHECK(207, write(&(String){5, 4, "if ("}) )
+      CHECK(209, write(&(String){5, 4, "if ("}) )
       if (NULL != type_data) {
-        CHECK(209, write(&(String){7, 6, "self->"}) )
+        CHECK(211, write(&(String){7, 6, "self->"}) )
       }
-      CHECK(210, write_cname(variable->name) )
-      CHECK(211, write(&(String){19, 18, "_Dynamic != NULL) "}) )
+      CHECK(212, write_cname(variable->name) )
+      CHECK(213, write(&(String){19, 18, "_Dynamic != NULL) "}) )
       if (NULL != type_data) {
-        CHECK(213, write(&(String){7, 6, "self->"}) )
+        CHECK(215, write(&(String){7, 6, "self->"}) )
       }
-      CHECK(214, write_cname(variable->name) )
-      CHECK(215, write(&(String){11, 10, "_Dynamic->"}) )
+      CHECK(216, write_cname(variable->name) )
+      CHECK(217, write(&(String){11, 10, "_Dynamic->"}) )
       TypeData* base_data = item_type_data;
       while (true) {
         if (!(NULL != base_data->base_type)) break;
         base_data = base_data->base_type->type_data;
         if (!(base_data->is_dynamic)) break;
-        CHECK(221, write(&(String){7, 6, "_base."}) )
+        CHECK(223, write(&(String){7, 6, "_base."}) )
       }
-      CHECK(222, write(&(String){6, 5, "_del("}) )
+      CHECK(224, write(&(String){6, 5, "_del("}) )
     }
     else {
       if (variable->type_instance->type_data == glob->type_array) {
-        CHECK(224, write(&(String){11, 10, "ARRAY_DEL("}) )
-        CHECK(225, TypeData_write_cname(item_type_data) )
-        CHECK(226, write(&(String){3, 2, ", "}) )
+        CHECK(226, write(&(String){11, 10, "ARRAY_DEL("}) )
+        CHECK(227, TypeData_write_cname(item_type_data) )
+        CHECK(228, write(&(String){3, 2, ", "}) )
       }
       else {
-        CHECK(228, TypeData_write_cname(item_type_data) )
-        CHECK(229, write(&(String){6, 5, "_Del("}) )
+        CHECK(230, TypeData_write_cname(item_type_data) )
+        CHECK(231, write(&(String){6, 5, "_Del("}) )
       }
     }
   }
   if (NULL != type_data) {
-    CHECK(231, write(&(String){7, 6, "self->"}) )
+    CHECK(233, write(&(String){7, 6, "self->"}) )
   }
-  CHECK(232, write_cname(variable->name) )
-  CHECK(233, write(&(String){2, 1, ")"}) )
+  CHECK(234, write_cname(variable->name) )
+  CHECK(235, write(&(String){2, 1, ")"}) )
   if (variable->type_instance->type_data != glob->type_array) {
-    CHECK(235, write(&(String){2, 1, ";"}) )
+    CHECK(237, write(&(String){2, 1, ";"}) )
   }
-  CHECK(236, write(&(String){2, 1, "\n"}) )
+  CHECK(238, write(&(String){2, 1, "\n"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -445,9 +450,9 @@ Returncode SyntaxTreeNamespace_init(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_init = "SyntaxTreeNamespace.init";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNamespace_init
 Returncode SyntaxTreeNamespace_init(SyntaxTreeNamespace* self) {
-  CHECK(244, SyntaxTreeBranch_init(&(self->_base)) )
+  CHECK(246, SyntaxTreeBranch_init(&(self->_base)) )
   self->functions = malloc(sizeof(List));
-  if (self->functions == NULL) RAISE(245)
+  if (self->functions == NULL) RAISE(247)
   *self->functions = (List){NULL, NULL};
   return OK;
 }
@@ -459,14 +464,14 @@ Returncode SyntaxTreeNamespace_parse_if_function(SyntaxTreeNamespace* self, Stri
 static char* _func_name_SyntaxTreeNamespace_parse_if_function = "SyntaxTreeNamespace.parse-if-function";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNamespace_parse_if_function
 Returncode SyntaxTreeNamespace_parse_if_function(SyntaxTreeNamespace* self, String* keyword, TypeData* parent_type, Char* end, Bool* is_func) {
-  CHECK(250, String_equal(keyword, &(String){5, 4, "func"}, &((*is_func))) )
+  CHECK(252, String_equal(keyword, &(String){5, 4, "func"}, &((*is_func))) )
   if ((*is_func)) {
     if ((*end) != ' ') {
-      CHECK(253, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){33, 32, "expected space after \"func\", got"}, (*end)) )
+      CHECK(255, SyntaxTreeNode_m_syntax_error_c(&(self->_base._base), &(String){33, 32, "expected space after \"func\", got"}, (*end)) )
     }
     SyntaxTreeFunction* _SyntaxTreeFunction107;
-    CHECK(255, SyntaxTreeFunction_parse_new(NULL, parent_type, &((*end)), &(_SyntaxTreeFunction107)) )
-    CHECK(255, List_add(self->functions, _SyntaxTreeFunction107) )
+    CHECK(257, SyntaxTreeFunction_parse_new(NULL, parent_type, &((*end)), &(_SyntaxTreeFunction107)) )
+    CHECK(257, List_add(self->functions, _SyntaxTreeFunction107) )
   }
   return OK;
 }
@@ -478,8 +483,8 @@ Returncode SyntaxTreeNamespace_link_types(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_link_types = "SyntaxTreeNamespace.link-types";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNamespace_link_types
 Returncode SyntaxTreeNamespace_link_types(SyntaxTreeNamespace* self) {
-  CHECK(259, SyntaxTreeBranch_link_types(&(self->_base)) )
-  CHECK(260, SyntaxTreeNode_link_children_types(&(self->_base._base), self->functions) )
+  CHECK(261, SyntaxTreeBranch_link_types(&(self->_base)) )
+  CHECK(262, SyntaxTreeNode_link_children_types(&(self->_base._base), self->functions) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -490,8 +495,8 @@ Returncode SyntaxTreeNamespace_analyze(SyntaxTreeNamespace* self);
 static char* _func_name_SyntaxTreeNamespace_analyze = "SyntaxTreeNamespace.analyze";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNamespace_analyze
 Returncode SyntaxTreeNamespace_analyze(SyntaxTreeNamespace* self) {
-  CHECK(263, SyntaxTreeBranch_analyze(&(self->_base)) )
-  CHECK(264, SyntaxTreeNode_analyze_children(&(self->_base._base), self->functions) )
+  CHECK(265, SyntaxTreeBranch_analyze(&(self->_base)) )
+  CHECK(266, SyntaxTreeNode_analyze_children(&(self->_base._base), self->functions) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -505,7 +510,7 @@ Returncode SyntaxTreeNamespace_write_functions_declaration(SyntaxTreeNamespace* 
   ListNode* child = self->functions->first;
   while (true) {
     if (!(NULL != child)) break;
-    CHECK(270, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[11](((SyntaxTreeFunction*)(child->item))) )
+    CHECK(272, (((SyntaxTreeFunction*)(child->item)))->_base._base._base._dtl[11](((SyntaxTreeFunction*)(child->item))) )
     child = child->next;
   }
   return OK;

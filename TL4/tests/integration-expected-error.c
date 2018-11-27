@@ -270,7 +270,7 @@ Returncode error_M_fail_base_class_output(void) {
   CHECK(36)
 LUMI_cleanup:
   LUMI_dec_ref(base_user_Refman);
-  LUMI_dec_ref(base_var_Refman);
+  LUMI_var_dec_ref(base_var_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -292,7 +292,7 @@ Returncode error_M_fail_slice_index(void) {
   if ((6) < 0 || (6) >= (arr)->length) RAISE(40, slice_index)
   TEST_ASSERT(40, (((Int*)((arr)->values))[6]) == 0)
 LUMI_cleanup:
-  LUMI_dec_ref(arr_Refman);
+  LUMI_var_dec_ref(arr_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -506,7 +506,7 @@ Returncode error_M_fail_raise_message(void) {
   LUMI_err = error_M_f_raise_message(aux_String_0, aux_String_0_Refman);
   CHECK(80)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -587,7 +587,7 @@ Returncode error_M_fail_assert_error_message(void) {
   LUMI_expected_error = LUMI_expected_error_prev;}
   LUMI_err = OK;
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
@@ -631,7 +631,7 @@ Returncode error_M_fail_assert_error_message_prefix(void) {
   LUMI_expected_error = LUMI_expected_error_prev;}
   LUMI_err = OK;
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   return LUMI_err;
 }
 #undef LUMI_FILE_NAME
