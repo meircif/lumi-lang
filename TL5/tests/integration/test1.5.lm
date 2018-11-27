@@ -195,8 +195,12 @@ mock TopLink.delete()
     if record-delete
         deleted-top-links := RefNode(copy self, owner deleted-top-links)
 
-func f-remove-obj(owner Link b)
+func remove-obj(owner Link b)
     ; remove b
+
+func get-outdated-var()->(user Link l-out)
+    var Link l-var
+    l-out := l-var
 
 test test-simple-delete()
     assert not deleted-refmans?
@@ -208,7 +212,7 @@ test test-simple-delete()
     assert l?
     assert l-user?
     var Ref l-ref(copy l)
-    f-remove-obj(owner l)
+    remove-obj(owner l)
     assert not l?
     assert not l-user?
     assert not deleted-refmans?
@@ -219,6 +223,9 @@ test test-simple-delete()
     assert deleted-refmans?
     assert deleted-refmans.ref is l-ref
     assert not deleted-refmans.next?
+    get-outdated-var()->(user l-user)
+    assert l-user is-not _
+    assert not l-user?
     
     record-delete := false
     deleted-refmans := _

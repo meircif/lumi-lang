@@ -349,6 +349,13 @@ void LUMI_dec_ref(Ref_Manager* ref) {
   }
 }
 
+void LUMI_var_dec_ref(Ref_Manager* ref) {
+  if (ref != NULL) {
+    ref->value = NULL;
+    dec_ref(ref);
+  }
+}
+
 void LUMI_owner_dec_ref(Ref_Manager* ref) {
   if (ref != NULL) {
     free(ref->value);

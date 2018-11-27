@@ -489,15 +489,15 @@ Returncode ut_M_name(String* self, Ref_Manager* self_Refman, Int px, String* pu,
   aux_Ref_Manager = NULL;
   pu = aux_String_3;
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_3_Refman);
-  LUMI_dec_ref(aux_String_2_Refman);
+  LUMI_var_dec_ref(aux_String_3_Refman);
+  LUMI_var_dec_ref(aux_String_2_Refman);
   String_Del(aux_String_1);
   LUMI_owner_dec_ref(aux_String_1_Refman);
   String_Del(aux_String_0);
   LUMI_owner_dec_ref(aux_String_0_Refman);
   String_Del(n);
   LUMI_owner_dec_ref(n_Refman);
-  LUMI_dec_ref(v_Refman);
+  LUMI_var_dec_ref(v_Refman);
   String_Del(o);
   LUMI_owner_dec_ref(o_Refman);
   LUMI_dec_ref(u_Refman);
@@ -866,7 +866,7 @@ Returncode ut_M_name(void) {
   INIT_STRING_CONST(2, aux_String_0, "some error");
   USER_RAISE(2, aux_String_0, aux_String_0_Refman)
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   return LUMI_err;
 }
 /// @ t3
@@ -1750,8 +1750,8 @@ Returncode ut_M_fun(void) {
   Sys_print_Mock_active = false;
   Sys_print_Mock_active = true;
 LUMI_cleanup:
-  LUMI_dec_ref(aux_String_1_Refman);
-  LUMI_dec_ref(aux_String_0_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   return LUMI_err;
 }
 Returncode Sys_print_Mock(Sys* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman) {
@@ -2377,7 +2377,7 @@ Returncode ut_M_use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_M
   LUMI_err = ut_M_Test_set(t, t_Refman, first, first_Refman, &String_dynamic, second, second_Refman, &Sys_dynamic, third, third_Refman, &File_dynamic);
   CHECK(14)
 LUMI_cleanup:
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(third_Refman);
   LUMI_dec_ref(second_Refman);
   LUMI_dec_ref(first_Refman);
@@ -2912,7 +2912,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
   aux_Ref_Manager = NULL;
   t->_base.item = s;
 LUMI_cleanup:
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(s_Refman);
   return LUMI_err;
 }
@@ -2985,7 +2985,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
   aux_Ref_Manager = NULL;
   t->_base.item = s;
 LUMI_cleanup:
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(s_Refman);
   return LUMI_err;
 }
@@ -3133,7 +3133,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
   aux_Ref_Manager = NULL;
   t->_base._base._base.item = s;
 LUMI_cleanup:
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(s_Refman);
   return LUMI_err;
 }
@@ -3206,7 +3206,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
   aux_Ref_Manager = NULL;
   t->_base.item = s;
 LUMI_cleanup:
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(s_Refman);
   return LUMI_err;
 }
@@ -3414,7 +3414,7 @@ Returncode ut_M_use(String* first, Ref_Manager* first_Refman, Sys* second, Ref_M
   aux_Ref_Manager = NULL;
   t->_base._base.third = third;
 LUMI_cleanup:
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(third_Refman);
   LUMI_dec_ref(second_Refman);
   LUMI_dec_ref(first_Refman);
@@ -3513,7 +3513,7 @@ Returncode ut_M_use(String* s, Ref_Manager* s_Refman, ut_M_Second* ss, Ref_Manag
   aux_Ref_Manager = NULL;
   ((ut_M_Second*)(t->_base.item))->item = s;
 LUMI_cleanup:
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(ss_Refman);
   LUMI_dec_ref(s_Refman);
   return LUMI_err;
@@ -4263,7 +4263,7 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
   if (((void*)&(self->b) == b) || ((void*)b2 != &(self->b))) {
   }
 LUMI_cleanup:
-  LUMI_dec_ref(t_Refman);
+  LUMI_var_dec_ref(t_Refman);
   LUMI_dec_ref(b2_Refman);
   LUMI_dec_ref(b_Refman);
   LUMI_dec_ref(self_Refman);
