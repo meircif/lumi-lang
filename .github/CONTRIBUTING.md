@@ -1,8 +1,8 @@
 # Contributing to Lumi
 
-Thanks for been interesed at contributing to Lumi :+1:.
+Thanks for been interested at contributing to Lumi :+1:.
 
-Full contributing guidlines are described in the repository
+Full contributing guidelines are described in the repository
 [Wiki](https://github.com/meircif/lumi-lang/wiki).
 
 ## How can I help?
