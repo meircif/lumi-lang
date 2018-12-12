@@ -5603,4 +5603,105 @@ expected module, got empty expression
 expected module, got "Int"
 /// @ te12
 unknown Enum "Error" in module "ut"
+/// @@ test-memory
+/// @ t0
+Returncode ut_M_deleting(String** s, Ref_Manager** s_Refman);
+Returncode ut_M_fun(void);
+Returncode ut_M_deleting(String** s, Ref_Manager** s_Refman) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    String* aux_String_0 = NULL;
+    Ref_Manager* aux_String_0_Refman = NULL;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
+    String_Del(*s);
+    LUMI_owner_dec_ref(*s_Refman);
+    *s_Refman = aux_String_0_Refman;
+    *s = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    LUMI_owner_dec_ref(aux_String_0_Refman);
+    return LUMI_err;
+}
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    String* so = NULL;
+    Ref_Manager* so_Refman = NULL;
+    String* s = NULL;
+    Ref_Manager* s_Refman = NULL;
+    INIT_NEW(4, LUMI_block0_cleanup, so, LUMI_new_string(12));
+    s = so;
+    s_Refman = so_Refman;
+    LUMI_inc_ref(s_Refman);
+    LUMI_err = String_clear(s, s_Refman);
+    CHECK(6, LUMI_block0_cleanup)
+    LUMI_err = ut_M_deleting(&(so), &(so_Refman));
+    CHECK(7, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(s_Refman);
+    String_Del(so);
+    LUMI_owner_dec_ref(so_Refman);
+    return LUMI_err;
+}
+/// @ t1
+Returncode ut_M_deleting(String** s, Ref_Manager** s_Refman);
+Returncode ut_M_fun(void);
+Returncode ut_M_deleting(String** s, Ref_Manager** s_Refman) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    String* aux_String_0 = NULL;
+    Ref_Manager* aux_String_0_Refman = NULL;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
+    String_Del(*s);
+    LUMI_owner_dec_ref(*s_Refman);
+    *s_Refman = aux_String_0_Refman;
+    *s = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    LUMI_owner_dec_ref(aux_String_0_Refman);
+    return LUMI_err;
+}
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    String* so = NULL;
+    Ref_Manager* so_Refman = NULL;
+    String* s = NULL;
+    Ref_Manager* s_Refman = NULL;
+    INIT_NEW(4, LUMI_block0_cleanup, so, LUMI_new_string(12));
+    s = so;
+    s_Refman = so_Refman;
+    LUMI_inc_ref(s_Refman);
+    LUMI_err = ut_M_deleting(&(so), &(so_Refman));
+    CHECK(6, LUMI_block0_cleanup)
+    LUMI_err = String_clear(s, s_Refman);
+    CHECK(7, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(s_Refman);
+    String_Del(so);
+    LUMI_owner_dec_ref(so_Refman);
+    return LUMI_err;
+}
+/// @ te0
+using potentially illegal reference "s"
+/// @ te1
+using potentially illegal reference "s"
+/// @ te2
+using potentially illegal reference "s"
+/// @ te3
+using potentially illegal reference "s"
+/// @ te4
+using potentially illegal reference "s"
+/// @ te5
+using potentially illegal reference "s"
 /// @

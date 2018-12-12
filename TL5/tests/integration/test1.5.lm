@@ -71,7 +71,7 @@ mock TestStruct.get()->(var Int x, user String s)
     x := 12
     s := ""
 
-mock f-test-int2str(copy Int x)->(owner String s)
+mock test-int2str(copy Int x)->(owner String s)
     raise
 
 mock TestClass.dynamic-meth()
@@ -79,12 +79,12 @@ mock TestClass.dynamic-meth()
 
 test test-func()
     owner String s
-    assert-error f-test-int2str(copy 3)->(owner s)
-    f-test-int2str.mocked(copy 4)->(owner s)
-    f-test-int2str.active := false
-    f-test-int2str(copy 5)->(owner s)
-    f-test-int2str.active := true
-    assert-error f-test-int2str(copy 6)->(owner s)
+    assert-error test-int2str(copy 3)->(owner s)
+    test-int2str.mocked(copy 4)->(owner s)
+    test-int2str.active := false
+    test-int2str(copy 5)->(owner s)
+    test-int2str.active := true
+    assert-error test-int2str(copy 6)->(owner s)
     
     var TestStruct t(copy 0, user _)
     var Int x
@@ -374,26 +374,26 @@ test test-block-delete()
     deleted-links := _
 
 
-func f-raise-message()
+func raise-message()
     raise "tested message"
 
-func f-ignore-and-raise()
+func ignore-and-raise()
     try
-        f-raise-message()
+        raise-message()
     raise "ignore and raise"
 
-func f-failed-assert()
+func failed-assert()
     assert 1 = 2
 
-func f-good-assert-error()
-    assert-error f-raise-message()
+func good-assert-error()
+    assert-error raise-message()
     raise "good assert error"
 
-func f-failed-assert-error()
-    assert-error f-test-void()
+func failed-assert-error()
+    assert-error test-void()
 
-func f-wrong-message-assert-error()
-    assert-error f-raise-message(), "wrong message"
+func wrong-message-assert-error()
+    assert-error raise-message(), "wrong message"
 
 var Int new-fail-countdown
 
@@ -404,17 +404,17 @@ mock new()->(var Bool alloc-success)
         if new-fail-countdown = 0
             alloc-success := false
 
-func f-alloc()
+func alloc()
     new String{16} string
     assert string?
 
 test test-assert-error-message()
-    assert-error f-raise-message(), "tested message"
-    assert-error f-ignore-and-raise(), "ignore and raise"
-    assert-error f-failed-assert(), "condition is not true"
-    assert-error f-good-assert-error(), "good assert error"
-    assert-error f-failed-assert-error(), "error not raised"
-    assert-error f-wrong-message-assert-error()
+    assert-error raise-message(), "tested message"
+    assert-error ignore-and-raise(), "ignore and raise"
+    assert-error failed-assert(), "condition is not true"
+    assert-error good-assert-error(), "good assert error"
+    assert-error failed-assert-error(), "error not raised"
+    assert-error wrong-message-assert-error()
     var Func{()} fun
     assert-error fun(), "empty object used"
     var BaseType base-var
@@ -432,9 +432,9 @@ test test-assert-error-message()
     user TopType top
     assert-error top.meth2(), "empty object used"
     new-fail-countdown := 1
-    assert-error f-alloc(), "insufficient memory for object dynamic allocation"
+    assert-error alloc(), "insufficient memory for object dynamic allocation"
     new-fail-countdown := 2
-    assert-error f-alloc(), "insufficient memory for managed object"
+    assert-error alloc(), "insufficient memory for managed object"
 
 native var Int lumi-debug-value
 

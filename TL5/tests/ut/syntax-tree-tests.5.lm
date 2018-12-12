@@ -1850,4 +1850,69 @@ fun0().Error
 i.Error
 ; @ ec te12
 ut.Error.VALUE
+; @@ test-memory
+; @ g t0
+func deleting()->(owner String s)
+    s := _
+func fun()
+    new String{12} so
+    user String s(user so)
+    s.clear()
+    deleting()->(owner so)
+; @ g t1
+func deleting()->(owner String s)
+    s := _
+func fun()
+    new String{12} so
+    weak String s(weak so)
+    deleting()->(owner so)
+    s.clear()
+; @ eg te0
+func deleting()->(owner String s)
+    s := _
+func fun()
+    new String{12} so
+    user String s(user so)
+    deleting()->(owner so)
+    s.clear()
+; @ eg te1
+func deleting()->(owner String s)
+    s := _
+func fun()->(user String s-out)
+    new String{12} so
+    user String s(user so)
+    deleting()->(owner so)
+    s-out := s
+; @ eg te2
+func deleting()->(owner String s)
+    s := _
+func fun()->(var Int x)
+    new String{12} so
+    user String s(user so)
+    deleting()->(owner so)
+    x := s.length
+; @ eg te3
+func deleting()->(owner String s)
+    s := _
+func fun()
+    new String{12} so
+    user String s(user so)
+    deleting()->(owner so)
+    String.clear(user s)
+; @ eg te4
+func deleting()->(owner String s)
+    s := _
+func fun()->(var Bool b)
+    new String{12} so
+    user String s(user so)
+    deleting()->(owner so)
+    b := not (false or s.length > 3)
+; @ eg te5
+func deleting()->(owner String s)
+    s := _
+func fun()->(var Char c)
+    new String{12} so
+    user String s(user so)
+    deleting()->(owner so)
+    c := s[2]
 ; @

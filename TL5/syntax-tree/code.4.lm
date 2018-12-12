@@ -18,6 +18,9 @@ class SyntaxTreeExpression(SyntaxTreeCode)
     self.expression.analyze()
     if self.expression.result-type?
       self.syntax-error-msg(user "statememnt has no effect")
+
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    self.expression.check-memory(user refs)
   
   func dynamic write()
     self.write-spaces()

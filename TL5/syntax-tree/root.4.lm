@@ -176,6 +176,7 @@ class SyntaxTreeRoot(GlobalNodes)
       sys.print(user "General code error: no main function\n")
       sys.exit(copy 1)
     self.order-children-constants(user self.variables, user self.constants)
+    self.check-children-memory(user self.functions, user _)
     if self.line-counts?
       self.analyze-cover()
   

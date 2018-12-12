@@ -68,6 +68,12 @@ class SliceExpression(Expression)
     else
       self.syntax-error-msg(
           user "expected integer index for slice, got void expression")
+
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    self.sequence.check-memory(user refs)
+    self.index.check-memory(user refs)
+    if self.second-index?
+      self.second-index.check-memory(user refs)
   
   func dynamic write-preactions()
     self.sequence.write-preactions()

@@ -64,7 +64,7 @@ func test-member-expression(user TestStruct t)->(user TestStruct to, var Int i)
     t.num := to.num + t.ts.num + t.ts.ts.num
     to.num := t.num
     t.ts.ts.num := 4
-    t.fun := f-test-void
+    t.fun := test-void
     t.fun()
     t.new(copy 0, user "")
 
@@ -137,7 +137,7 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
     user String si(user text)
     var String{12} isv(user "some string")
     new String{i} isn(user text)
-    var Func{(copy Int x)->(owner String s)} fi(copy f-test-int2str)
+    var Func{(copy Int x)->(owner String s)} fi(copy test-int2str)
     var TestStruct itv(copy i, user text)
     new TestStruct itn(copy i, user text)
     var TestClass idv()
@@ -252,15 +252,15 @@ func TestClass.dynamic-meth()
     self.num := 6
 
 
-func f-test-void()
+func test-void()
     return
-func f-test-params(copy Int x, user String s, owner String o)
+func test-params(copy Int x, user String s, owner String o)
     raise
-func f-test-outs()->(owner String s, var Int x)
-func f-test-int2str(copy Int x)->(owner String s)
-func f-test-int(copy Int x)
-func f-test-int2int(copy Int x)->(var Int r)
-func f-test-many(
+func test-outs()->(owner String s, var Int x)
+func test-int2str(copy Int x)->(owner String s)
+func test-int(copy Int x)
+func test-int2int(copy Int x)->(var Int r)
+func test-many(
         copy Int x,
         copy Int y)->(
         var Int n,
@@ -270,21 +270,21 @@ func f-test-many(
 func test-call-expression()
     owner String s
     var Int x
-    f-test-void()
-    f-test-params(copy 3, user "text", owner _)
-    f-test-outs()->(owner s, var x)
-    f-test-int2str(copy 4)->(owner s)
-    f-test-int(copy 5)
-    f-test-int2int(copy 6)->(var x)
-    f-test-many(
+    test-void()
+    test-params(copy 3, user "text", owner _)
+    test-outs()->(owner s, var x)
+    test-int2str(copy 4)->(owner s)
+    test-int(copy 5)
+    test-int2int(copy 6)->(var x)
+    test-many(
             copy 7,
             copy 8)->(
             var x,
             var x)
     var Int tmp
-    f-test-int(copy f-test-int2int(copy 9)->(var tmp))
-    x := f-test-int2int(copy 10) + f-test-many(copy 11, copy 12)->(var x)
-    s := f-test-int2str(copy 13)
+    test-int(copy test-int2int(copy 9)->(var tmp))
+    x := test-int2int(copy 10) + test-many(copy 11, copy 12)->(var x)
+    s := test-int2str(copy 13)
 
 
 func test-code-flow(user Array{Int} arr)->(var Int res)
@@ -360,7 +360,7 @@ func test-ref-count()
     user String s-user(user s)
     sys.println(user s)
     sys.println(user s-user)
-    f-remove(owner s)
+    remove(owner s)
     if not s?
         sys.println(user "ownership passed")
     if not s-user?
@@ -372,7 +372,7 @@ func test-ref-count()
     ts := ts.ts
     sys.println(user ts.text)
 
-func f-remove(owner String s)
+func remove(owner String s)
     ; remove s
 
 
@@ -427,7 +427,7 @@ func test-type-parameters(user String s)
     t.third := ts
 
 
-func f-try-catch-raise(user TestStruct t)
+func try-catch-raise(user TestStruct t)
     try
         t.num := 1
     catch
@@ -439,9 +439,9 @@ func test-error-handling(user TestStruct t)
         t.num := 1
         sys.print(user " X ")
         try
-            f-test-void()
+            test-void()
         catch
-            f-test-int(copy 2)
+            test-int(copy 2)
     catch
         sys.print(user "2 ")
         try
@@ -454,7 +454,7 @@ func test-error-handling(user TestStruct t)
         sys.print(user "6 ")
         try
             sys.print(user "7 ")
-            f-try-catch-raise(user t)
+            try-catch-raise(user t)
             sys.print(user " X ")
         sys.print(user "8 ")
         raise "another ignored message"

@@ -142,6 +142,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.syntax-error-msg(user "cannot create generic array")
     if self.my-module?
       glob.current-module := _
+
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    if self.access = Access.USER
+      refs.add(owner ReferenceMemory(user self, copy true))
   
   func inst write-cname()
     if self.my-module?

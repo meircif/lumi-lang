@@ -280,3 +280,7 @@ test test-constant()
 
 test test-module()
   test-from-file(user "test-module")
+
+
+test test-memory()
+  test-from-file(user "test-memory")

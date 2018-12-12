@@ -19,7 +19,7 @@ class SyntaxTreeNode
         self.syntax-error-indentation(copy n, copy expected-spaces)
   
   func inst get-access(user String access-str)->(var Int access)
-    for n in 1:5
+    for n in 1:Access.length
       if glob.access-names[n].equal(user access-str)
         access := n
         return
@@ -201,6 +201,9 @@ class SyntaxTreeNode
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     ; do nothing as default
   
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    ; do nothing as default
+  
   func dynamic write()
     raise
   
@@ -218,6 +221,12 @@ class SyntaxTreeNode
     var NodeOrderConstantsAction action-order-constants
     action-order-constants.ordered-list := ordered-list
     self.do-on-children(user child-list, user action-order-constants)
+  
+  func inst check-children-memory(
+      user List{SyntaxTreeNode} child-list, user List{ReferenceMemory} refs)
+    var NodeCheckMemoryAction action-check-memory
+    action-check-memory.refs := refs
+    self.do-on-children(user child-list, user action-check-memory)
   
   func inst write-children(user List{SyntaxTreeNode} child-list)
     var NodeWriteAction action-write
@@ -246,6 +255,12 @@ class NodeLinkTypesAction(NodeAction)
 class NodeAnalyzeAction(NodeAction)
   func dynamic action(user SyntaxTreeNode node)
     node.analyze()
+
+class NodeCheckMemoryAction(NodeAction)
+  user List{ReferenceMemory} refs
+  
+  func dynamic action(user SyntaxTreeNode node)
+    node.check-memory(user self.refs)
 
 class NodeWriteAction(NodeAction)
   func dynamic action(user SyntaxTreeNode node)

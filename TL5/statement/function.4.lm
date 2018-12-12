@@ -5,6 +5,8 @@ module tl5-compiler
 class SyntaxTreeFunction(SyntaxTreeBlock)
   var List{TypeCount} aux-variables
   var NameMap{SyntaxTreeVariable} function-variables
+  var NameMap{SyntaxTreeFunction} calling-functions
+  var NameMap{TypeData} deleting-types
   user TypeData parent-type
   owner String name
   owner String type-name
@@ -194,6 +196,13 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst compare(user SyntaxTreeFunction other)
     if self.is-dynamic != other.is-dynamic
       self.syntax-error(user "illegal dynamic in function", user self.name)
+    
+  func dynamic check-memory(user List{ReferenceMemory} global-refs)
+    ; do stuff
+    var List{ReferenceMemory} refs
+    self.arguments.check-memory(user refs)
+    self.check-children-memory(user self.variables, user refs)
+    self.check-children-memory(user self.code-nodes, user refs)
   
   ~~~ write function body ~~~
   func dynamic write()
@@ -242,7 +251,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       write-spaces(copy INDENTATION-SPACES)
       write(user "Ref_Manager* aux_Ref_Manager = NULL;\n")
     for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.USER
+      if parameter.access = Access.USER or parameter.access = Access.WEAK
         write-spaces(copy INDENTATION-SPACES)
         write(user "LUMI_inc_ref(")
         write-cname(user parameter.get-variable().name)
@@ -250,7 +259,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst write-param-cleanup()
     for parameter in self.arguments.parameters.iter-back()
-      if parameter.access = Access.USER or parameter.access = Access.OWNER
+      if parameter.access = Access.USER or parameter.access = Access.OWNER or
+          parameter.access = Access.WEAK
         self.write-variable-cleanup(user parameter.get-variable(), user _)
   
   func inst write-cname()
@@ -280,6 +290,22 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       write(user ".")
     write(user self.name)
     write(user "\"")
+    
+    ; write(user "\n/* calling[")
+    ; for function in self.calling-functions.iter()
+    ;   write(user "|")
+    ;   if function.parent-type?
+    ;     write(user function.parent-type.name)
+    ;     write(user ".")
+    ;   write(user function.name)
+    ; write(user "|] */")
+    ; 
+    ; write(user "\n/* deleting[")
+    ; for type-data in self.deleting-types.iter()
+    ;   write(user "|")
+    ;   write(user type-data.name)
+    ; write(user "|] */")
+      
   
   func inst write-post-func()
     write(user "#undef LUMI_FILE_NAME\n")
@@ -374,7 +400,8 @@ class DeclarationArgument(Argument)
     if self.is-native
       if self.access = Access.OWNER
         self.syntax-error-msg(user "owner argument to native function")
-      if self.is-output and self.access = Access.USER
+      if self.is-output and
+          (self.access = Access.USER or self.access = Access.WEAK)
         self.syntax-error-msg(user "user output to native function")
       
   
@@ -383,6 +410,11 @@ class DeclarationArgument(Argument)
   
   func dynamic get-variable()->(user SyntaxTreeVariable variable)
     variable := self.variable
+
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    if not self.is-output and
+        (self.access = Access.USER or self.access = Access.WEAK)
+      refs.add(owner ReferenceMemory(user self.variable, copy true))
   
   func dynamic write()
     if self.variable.type-instance.type-data is glob.type-func
@@ -427,3 +459,11 @@ class DeclarationArgument(Argument)
 class DeclarationArgumentFactory(ArgumentFactory)
   func dynamic new-argument()->(owner Argument new-argument)
     new-argument := DeclarationArgument()
+
+struct ReferenceMemory
+  user SyntaxTreeVariable variable
+  var Bool usable
+  
+  new(user SyntaxTreeVariable variable, copy Bool usable)
+    self.variable := variable
+    self.usable := usable

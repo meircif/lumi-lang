@@ -90,6 +90,9 @@ class FieldExpression(Expression)
         copy after-base)
     expression.restructure()->(owner expression, owner arguments)
 
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    self.instance.check-memory(user refs)
+
   func dynamic write-preactions()
     self.instance.write-preactions()
     if not self.instance.is-complex-field

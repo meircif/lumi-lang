@@ -100,6 +100,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           copy false,
           user parent-type,
           user parent-block))
+    else-if keyword.equal(user "weak")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          user _,
+          copy Access.WEAK,
+          copy false,
+          user parent-type,
+          user parent-block))
     else-if keyword.equal(user "owner")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
           user _,
@@ -107,6 +114,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           copy false,
           user parent-type,
           user parent-block))
+    ; else-if keyword.equal(user "manager")
+    ;   self.variables.add(owner SyntaxTreeVariable.parse-new(
+    ;       user _,
+    ;       copy Access.OWNER,
+    ;       copy false,
+    ;       user parent-type,
+    ;       user parent-block))
       
     else
       is-parsed := false

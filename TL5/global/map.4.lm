@@ -37,6 +37,16 @@ struct NameMap{Generic}
       node := node.next
     self.add(user name, user value)
   
+  ~~~ Add mapping only if value not exists ~~~
+  func add-if-unique-value(user String name, user Generic value)
+    user NameMapNode{Generic} node(user self.first)
+    do
+      while node?
+      if node.value is value
+        return
+      node := node.next
+    self.add(user name, user value)
+  
   func iter()->(owner NameMapIterator{Generic} iter)
     iter := NameMapIterator{Generic}(user self)
 

@@ -164,6 +164,10 @@ class FunctionArguments(SyntaxTreeNode)
   func dynamic analyze()
     self.analyze-children(user self.parameters)
     self.analyze-children(user self.outputs)
+
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    self.check-children-memory(user self.parameters, user refs)
+    self.check-children-memory(user self.outputs, user refs)
   
   func inst get-result-type()->(var Int access, user TypeInstance result-type)
     if self.outputs.last?

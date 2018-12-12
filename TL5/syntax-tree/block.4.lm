@@ -22,6 +22,9 @@ class SyntaxTreeCode(SyntaxTreeNode)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     self.parent.get-parent-type()->(user parent-type)
+
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    ; do nothing
   
   func inst write-spaces()
     self.parent.write-spaces()

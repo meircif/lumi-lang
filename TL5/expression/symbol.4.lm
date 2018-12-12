@@ -63,6 +63,15 @@ class VariableExpression(Expression)
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.variable.order-constants(user ordered-list)
 
+  func dynamic check-memory(user List{ReferenceMemory} refs)
+    for ref-mem in refs.iter()
+      if ref-mem.variable is self.variable
+        if not ref-mem.usable
+          self.syntax-error(
+              user "using potentially illegal reference",
+              user self.variable.name)
+        break
+
   func dynamic write()
     if self.variable.is-output
       write(user "*")
@@ -173,6 +182,8 @@ class FunctionExpression(Expression)
             user self-instance)
         return
         
+    self.code-node.get-function().calling-functions.add-if-unique-value(
+        user self.function.name, user self.function)
     expression := FunctionCallExpression(
         user self.code-node,
         user self,
