@@ -7,12 +7,9 @@ compiler:
 os:
   - linux
 
-python:
-  - "3.6"
-
 install:
-  - pip3 install --user sphinx
-  - pip3 install --user -r docs/requirements.txt
+  - pip install --user sphinx
+  - pip install --user -r docs/requirements.txt
 
 script: ./test.sh
 
