@@ -24,7 +24,7 @@ All user defined types in Lumi are built based on two basic typing styles:
 These can be used to build the more complex typing styles:
 
 3. :ref:`type-system-bind`
-4. :ref:`type-system-parametrized`
+4. :ref:`type-system-parameterized`
 5. :ref:`type-system-embed`
 6. :ref:`type-system-automatic`
 
@@ -119,10 +119,10 @@ implicit dynamic extends all explicit and implicit base dynamics.
 Although classes have a dynamic interface, they cannot be implemented for
 another structure as dynamics, because they also have a static structure.
 
-.. _type-system-parametrized:
+.. _type-system-parameterized:
 
-Parametrized Types
-------------------
+Parameterized Types
+-------------------
 It is possible to declare types with parameters to avoid code duplication of
 generic types. Each parameter can be either **static** or **dynamic**.
 

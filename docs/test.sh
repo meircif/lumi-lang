@@ -33,7 +33,6 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../TL4/tl4-compiler.c ../TL3/lumi.3.c -I../TL3 -I../TL4 -o docs/tl4-compiler
 
 # compile examples
-# cp ../docs/*.lm .
 docs/tl4-compiler docs/hello-world.c ../docs/hello-world.4.lm
 $CCA docs/hello-world.c ../TL4/lumi.4.c -I../TL4 -o docs/hello-world
 docs/tl4-compiler docs/hello-world-test.c ../docs/hello-world.4.lm \
@@ -46,6 +45,9 @@ $CCA docs/examples.c ../TL4/lumi.4.c -I../TL4 -o docs/run-examples
 docs/hello-world
 docs/hello-world-test
 docs/run-examples
+
+# run sphinx with spell checker
+sphinx-build -W -b spelling ../docs docs/spelling
 
 
 # Documentation teardown

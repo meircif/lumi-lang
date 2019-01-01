@@ -97,18 +97,18 @@ User Defined Iterators
 A type can be made into an iterator in :ref:`TL4 <syntax-tl4>` by implementing
 theses methods:
 
-.. cpp:function:: has()->(var Bool has-another-item)
+.. function:: has()->(var Bool has-another-item)
 
    Is called before any iteration. Iteration continues only if this method
-   returns :cpp:var:`true`.
+   returns :data:`true`.
 
-.. cpp:function:: get()->(user SomeType value)
+.. function:: get()->(user SomeType value)
 
-   Is called before any iteration after :cpp:func:`has` returns
-   :cpp:var:`true`. Returned value is set as the iteration value. "SomeType"
+   Is called before any iteration after :func:`has` returns
+   :data:`true`. Returned value is set as the iteration value. "SomeType"
    declared in this method is used as the iterator value type.
 
-.. cpp:function:: next()
+.. function:: next()
 
    Is called after the end of any iteration. Should be used to advance the
    iteration.

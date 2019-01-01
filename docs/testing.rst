@@ -81,7 +81,7 @@ The mocked function can still be called using ``mocked`` member::
    mocked-function-name.mocked()
 
 To disable mocking of a function ``active`` member can be set to
-:cpp:var:`false`. To re-enable mocking it can be set back to :cpp:var:`true`.
+:data:`false`. To re-enable mocking it can be set back to :data:`true`.
 Mocks are active by default. ::
 
       mocked-function-name.active := false
