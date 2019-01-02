@@ -39,7 +39,7 @@ class CallExpression(Expression)
       self.arguments.get-output()->(user self.output)
     self.assignable := self.result-type?
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.arguments.check-memory(user refs)
 
   func dynamic write-preactions()
@@ -100,13 +100,11 @@ class FunctionCallExpression(CallExpression)
         user self.actual-params,
         copy self.function.bases)
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
     for type-data in self.function.function.deleting-types.iter()
-      for ref-mem in refs.iter()
-        if type-data is ref-mem.variable.type-instance.type-data
-          ref-mem.usable := false
-
+      refs.mark-illegal-type(user type-data)
+  
   func dynamic write-function()
     self.function.write()
 
@@ -186,7 +184,7 @@ class FunctionObjectCallExpression(CallExpression)
         user self.function-object.result-type,
         copy 0)
       
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.function-object.check-memory(user refs)
   
   func dynamic write-function-check()
@@ -258,7 +256,7 @@ class CallArgument(Argument)
   func dynamic get-output()->(user Expression output)
     output := self.value
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.value.check-memory(user refs)
   
   func dynamic write-preactions()

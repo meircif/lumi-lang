@@ -27,7 +27,7 @@ class BlockExpression(Expression)
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression.check-memory(user refs)
   
   func dynamic write-preactions()
@@ -103,7 +103,7 @@ class UnaryExpression(Expression)
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.right-expression.order-constants(user ordered-list)
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.right-expression.check-memory(user refs)
   
   func dynamic write-preactions()
@@ -183,7 +183,7 @@ class BinaryExpression(UnaryExpression)
     self.left-expression.order-constants(user ordered-list)
     base(user ordered-list)
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
     self.left-expression.check-memory(user refs)
   
@@ -228,7 +228,7 @@ class QuestionExpression(Expression)
     self.set-simple-type(user glob.type-bool)
     self.access := Access.VAR
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.tested.check-memory(user refs)
   
   func dynamic write-preactions()

@@ -197,9 +197,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if self.is-dynamic != other.is-dynamic
       self.syntax-error(user "illegal dynamic in function", user self.name)
     
-  func dynamic check-memory(user List{ReferenceMemory} global-refs)
+  func dynamic check-memory(user ReferenceMemoryList global-refs)
     ; do stuff
-    var List{ReferenceMemory} refs
+    var ReferenceMemoryList refs
     self.arguments.check-memory(user refs)
     self.check-children-memory(user self.variables, user refs)
     self.check-children-memory(user self.code-nodes, user refs)
@@ -411,10 +411,10 @@ class DeclarationArgument(Argument)
   func dynamic get-variable()->(user SyntaxTreeVariable variable)
     variable := self.variable
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     if not self.is-output and
-        (self.access = Access.USER or self.access = Access.WEAK)
-      refs.add(owner ReferenceMemory(user self.variable, copy true))
+        (self.access = Access.USER or self.access = Access.OWNER)
+      refs.add(user self.variable)
   
   func dynamic write()
     if self.variable.type-instance.type-data is glob.type-func
@@ -459,11 +459,3 @@ class DeclarationArgument(Argument)
 class DeclarationArgumentFactory(ArgumentFactory)
   func dynamic new-argument()->(owner Argument new-argument)
     new-argument := DeclarationArgument()
-
-struct ReferenceMemory
-  user SyntaxTreeVariable variable
-  var Bool usable
-  
-  new(user SyntaxTreeVariable variable, copy Bool usable)
-    self.variable := variable
-    self.usable := usable

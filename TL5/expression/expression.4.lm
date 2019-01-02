@@ -39,7 +39,7 @@ class ExpressionValue(SyntaxTreeNode)
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
   
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression.check-memory(user refs)
   
   func inst write-preactions()
@@ -259,7 +259,7 @@ class Expression(SyntaxTreeNode)
       owner Expression expression, owner FunctionArguments arguments)
     ; do nothing
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     ; do nothing
   
   func inst write-init-var-ref(user VariableExpression expression)

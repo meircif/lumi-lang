@@ -96,7 +96,7 @@ class InitExpression(ModuleTypeExpression)
             user "invalid access",
             user glob.access-names[param.access])
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.arguments.check-memory(user refs)
   
   func inst write-allocation()

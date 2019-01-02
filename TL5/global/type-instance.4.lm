@@ -10,6 +10,7 @@ struct TypeInstance
   var ExpressionValue length-owner
   user ExpressionValue length
   owner FunctionArguments arguments
+  owner ReferencePath reference-path
   
   ~~~ Return a new deep-copy of self ~~~
   func copy-new()->(owner TypeInstance type-instance)
@@ -31,6 +32,8 @@ struct TypeInstance
         other.parameters.add(owner parameter.copy-new())
     if self.arguments?
       self.arguments.copy-new()->(owner other.arguments)
+    if self.reference-path?
+      self.reference-path.copy-new()->(owner other.reference-path)
   
   func parse(
       user String ends,

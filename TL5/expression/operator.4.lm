@@ -125,12 +125,12 @@ func logical-operator-factory(
 class ArithmeticAssignOperatorExpression(BinaryExpression)
   func dynamic analyze()
     base()
-    self.analyze-operands()
+    self.analyze-assignment()
     self.safe-operand-write := false
     if not self.left-expression.assignable
       self.syntax-error-msg(user "assigning into non assignable expression")
     
-  func dynamic analyze-operands()
+  func dynamic analyze-assignment()
     self.test-operands-type(user glob.type-int)
 
 func arithmetic-assign-operator-factory(
@@ -144,7 +144,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
   user Expression assignee
   owner VariableExpression assigned-value-variable
   
-  func dynamic analyze-operands()
+  func dynamic analyze-assignment()
     self.left-expression.result-type.check-assign-from(
         copy self.left-expression.access, user self)->(
         owner self.right-expression, user self.assignee)
@@ -161,6 +161,19 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
       self.code-node.get-function().deleting-types.add-if-unique-value(
           user self.left-expression.result-type.type-data.name,
           user self.left-expression.result-type.type-data)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.right-expression.check-memory(user refs)
+    if self.left-expression.result-type.reference-path?
+      refs.mark-reference(
+          user self.left-expression.result-type.reference-path,
+          copy true)
+    self.left-expression.check-memory(user refs)
+    if self.left-expression.access = Access.OWNER and
+        self.left-expression.result-type.reference-path? and
+        self.right-expression.result-type.type-data is glob.type-empty
+      refs.mark-reference(
+          user self.left-expression.result-type.reference-path, copy false)
         
   func dynamic write-preactions()
     self.right-expression.write-preactions()

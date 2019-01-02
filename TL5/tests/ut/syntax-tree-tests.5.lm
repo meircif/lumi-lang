@@ -1851,7 +1851,18 @@ i.Error
 ; @ ec te12
 ut.Error.VALUE
 ; @@ test-memory
-; @ g t0
+; @ g to0
+func fun(owner String s)
+    s := _
+    s := String{12}()
+    s.clear()
+; @ g tu0
+func deleting()->(owner String s)
+    s := _
+func fun(user String s)->(owner String so)
+    s.clear()
+    deleting()->(owner so)
+; @ g tu1
 func deleting()->(owner String s)
     s := _
 func fun()
@@ -1859,7 +1870,7 @@ func fun()
     user String s(user so)
     s.clear()
     deleting()->(owner so)
-; @ g t1
+; @ g tu2
 func deleting()->(owner String s)
     s := _
 func fun()
@@ -1867,15 +1878,23 @@ func fun()
     weak String s(weak so)
     deleting()->(owner so)
     s.clear()
-; @ eg te0
+; @ eg teo0
+func fun(owner String s)
+    s := _
+    s.clear()
+; @ eg teo1
+struct Test
+    owner String s
+func fun(owner Test t, owner String stt)
+    t.s := _
+    t.s.clear()
+; @ eg teu0
 func deleting()->(owner String s)
     s := _
-func fun()
-    new String{12} so
-    user String s(user so)
+func fun(user String s)->(owner String so)
     deleting()->(owner so)
     s.clear()
-; @ eg te1
+; @ eg teu1
 func deleting()->(owner String s)
     s := _
 func fun()->(user String s-out)
@@ -1883,36 +1902,28 @@ func fun()->(user String s-out)
     user String s(user so)
     deleting()->(owner so)
     s-out := s
-; @ eg te2
+; @ eg teu2
 func deleting()->(owner String s)
     s := _
-func fun()->(var Int x)
-    new String{12} so
-    user String s(user so)
+func fun(user String s)->(owner String so, var Int x)
     deleting()->(owner so)
     x := s.length
-; @ eg te3
+; @ eg teu3
 func deleting()->(owner String s)
     s := _
-func fun()
-    new String{12} so
-    user String s(user so)
+func fun(user String s)->(owner String so)
     deleting()->(owner so)
     String.clear(user s)
-; @ eg te4
+; @ eg teu4
 func deleting()->(owner String s)
     s := _
-func fun()->(var Bool b)
-    new String{12} so
-    user String s(user so)
+func fun(user String s)->(owner String so, var Bool b)
     deleting()->(owner so)
     b := not (false or s.length > 3)
-; @ eg te5
+; @ eg teu5
 func deleting()->(owner String s)
     s := _
-func fun()->(var Char c)
-    new String{12} so
-    user String s(user so)
+func fun(user String s)->(owner String so, var Char c)
     deleting()->(owner so)
     c := s[2]
 ; @

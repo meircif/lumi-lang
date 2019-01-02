@@ -143,9 +143,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.my-module?
       glob.current-module := _
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
-    if self.access = Access.USER
-      refs.add(owner ReferenceMemory(user self, copy true))
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    if self.access = Access.USER or self.access = Access.OWNER
+      refs.add(user self)
   
   func inst write-cname()
     if self.my-module?

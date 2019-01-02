@@ -16,7 +16,7 @@ class TypeCastExpression(Expression)
   func dynamic analyze()
     self.expression.analyze()
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression.check-memory(user refs)
 
   func dynamic write-preactions()
@@ -59,7 +59,7 @@ class UpCastExpression(Expression)
     self.expression.result-type.copy-new()->(owner self.result-type)
     self.access := self.expression.access
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression.check-memory(user refs)
   
   func dynamic write-preactions()

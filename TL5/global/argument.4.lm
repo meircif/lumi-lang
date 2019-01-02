@@ -165,7 +165,7 @@ class FunctionArguments(SyntaxTreeNode)
     self.analyze-children(user self.parameters)
     self.analyze-children(user self.outputs)
 
-  func dynamic check-memory(user List{ReferenceMemory} refs)
+  func dynamic check-memory(user ReferenceMemoryList refs)
     self.check-children-memory(user self.parameters, user refs)
     self.check-children-memory(user self.outputs, user refs)
   
