@@ -206,42 +206,46 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
     if (13 < 0 || 13 >= ut_M_str->length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_c = (ut_M_str->values)[13];
 /// @ t1
-String aux_String_0_Var = {0};
+String* x = NULL;
+    Ref_Manager* x_Refman = NULL;
+    String aux_String_0_Var = {0};
     String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
-    INIT_VAR(1, LUMI_block0_cleanup, aux_String_0)
+    INIT_VAR(2, LUMI_block0_cleanup, aux_String_0)
     aux_String_0_Var.length = 6;
     aux_String_0_Var.max_length = aux_String_0_Var.length + 1;
     aux_String_0_Var.values = (ut_M_str)->values + (2);
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
-    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_str->length) RAISE(1, LUMI_block0_cleanup, slice_index)
-    aux_Ref_Manager = ut_M_str_Refman;
-    ut_M_str_Refman = ut_M_str_Refman;
-    LUMI_inc_ref(ut_M_str_Refman);
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
+    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_str->length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Ref_Manager = x_Refman;
+    x_Refman = ut_M_str_Refman;
+    LUMI_inc_ref(x_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_str = aux_String_0;
+    x = aux_String_0;
 /// @ t2
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (13 < 0 || 13 >= ut_M_arr->length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_i = ((Int*)(ut_M_arr->values))[13];
 /// @ t3
-Array aux_Array_0_Var = {0};
+Array* x = NULL;
+    Ref_Manager* x_Refman = NULL;
+    Array aux_Array_0_Var = {0};
     Array* aux_Array_0 = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
-    INIT_VAR(1, LUMI_block0_cleanup, aux_Array_0)
+    INIT_VAR(2, LUMI_block0_cleanup, aux_Array_0)
     aux_Array_0_Var.length = 6;
     aux_Array_0_Var.values = (Byte*)((ut_M_arr)->values) + (2);
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_arr->length) RAISE(1, LUMI_block0_cleanup, slice_index)
-    aux_Ref_Manager = ut_M_arr_Refman;
-    ut_M_arr_Refman = ut_M_arr_Refman;
-    LUMI_inc_ref(ut_M_arr_Refman);
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
+    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_arr->length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Ref_Manager = x_Refman;
+    x_Refman = ut_M_arr_Refman;
+    LUMI_inc_ref(x_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_arr = aux_Array_0;
+    x = aux_Array_0;
 /// @ t4
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
     if (4 < 0 || 4 >= ut_M_str->length) RAISE(1, LUMI_block0_cleanup, slice_index)
@@ -1005,14 +1009,17 @@ ut_M_Ta* a = NULL;
     LUMI_inc_ref(a_Refman);
     a_Dynamic = ut_M_ta_Dynamic;
 /// @ t5
-Ref_Manager* aux_Ref_Manager = NULL;
-    aux_Ref_Manager = ut_M_ta_Refman;
-    ut_M_ta_Refman = ut_M_ta_Refman;
-    ut_M_ta_Dynamic = ut_M_ta_Dynamic;
-    LUMI_inc_ref(ut_M_ta_Refman);
+ut_M_Ta* x = NULL;
+    Ref_Manager* x_Refman = NULL;
+    ut_M_Ta_Dynamic* x_Dynamic = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    aux_Ref_Manager = x_Refman;
+    x_Refman = ut_M_ta_Refman;
+    x_Dynamic = ut_M_ta_Dynamic;
+    LUMI_inc_ref(x_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    ut_M_ta = ut_M_ta;
+    x = ut_M_ta;
 /// @ t6
 Ref_Manager* aux_Ref_Manager = NULL;
     aux_Ref_Manager = ut_M_ta_Refman;

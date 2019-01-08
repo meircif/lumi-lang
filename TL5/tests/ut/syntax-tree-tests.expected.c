@@ -5775,6 +5775,10 @@ LUMI_block0_cleanup:
 using potentially illegal reference "s"
 /// @ teo1
 using potentially illegal reference "t.s"
+/// @ teo2
+using potentially illegal reference "si"
+/// @ teo3
+using potentially illegal reference "s"
 /// @ teu0
 using potentially illegal reference "s"
 /// @ teu1
@@ -5787,4 +5791,6 @@ using potentially illegal reference "s"
 using potentially illegal reference "s"
 /// @ teu5
 using potentially illegal reference "s"
+/// @ tec0
+assigning reference into itself
 /// @

@@ -29,6 +29,9 @@ struct ReferencePath
       reference.field := ReferencePath(user variable)
   
   func equals(user ReferencePath reference)->(var Bool is-equal)
+    if not self? or not reference?
+      is-equal := false
+      return
     if self.variable is-not reference.variable or
         (self.field? != reference.field?)
       is-equal := false

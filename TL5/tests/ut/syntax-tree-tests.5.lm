@@ -1888,6 +1888,15 @@ struct Test
 func fun(owner Test t, owner String stt)
     t.s := _
     t.s.clear()
+; @ eg teo2
+func fun(owner String si)->(owner String so)
+    so := si
+    si.clear()
+; @ eg teo3
+func taker(owner String s)
+func fun(owner String s)
+    taker(owner s)
+    s.clear()
 ; @ eg teu0
 func deleting()->(owner String s)
     s := _
@@ -1926,4 +1935,6 @@ func deleting()->(owner String s)
 func fun(user String s)->(owner String so, var Char c)
     deleting()->(owner so)
     c := s[2]
+; @ ec tec0
+str := str
 ; @

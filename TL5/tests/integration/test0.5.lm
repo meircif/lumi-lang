@@ -366,7 +366,6 @@ func test-ref-count()
     if not s-user?
         sys.println(user "string deleted")
     new TestStruct ts(copy 0, user "first struct")
-    ts := ts
     sys.println(user ts.text)
     ts.ts := TestStruct(copy 1, user "second struct")
     ts := ts.ts

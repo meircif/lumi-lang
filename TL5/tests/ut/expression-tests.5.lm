@@ -132,11 +132,13 @@ t.error
 ; @ c t0
 c := str[13]
 ; @ c t1
-str := str[2:6]
+user String x
+x := str[2:6]
 ; @ c t2
 i := arr[13]
 ; @ c t3
-arr := arr[2:6]
+user Array{Int} x
+x := arr[2:6]
 ; @ c t4
 str[4] := c
 ; @ c t5
@@ -156,9 +158,9 @@ arr[3:str]
 ; @ ec t12
 arr[i += 3]
 ; @ ec t13
-str[2:5] := str
+str[2:5] := so
 ; @ ec t14
-arr[7:2] := arr
+arr[7:2] := Array{5:Int}()
 ; @ ec t15
 user Array{Test} at
 at[0] := t
@@ -481,7 +483,8 @@ new Ta a(copy 1)
 ; @ c t4
 user Ta a(user ta)
 ; @ c t5
-ta := ta
+user Ta x
+x := ta
 ; @ c t6
 ta := tb
 ; @ c t7

@@ -161,6 +161,9 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
       self.code-node.get-function().deleting-types.add-if-unique-value(
           user self.left-expression.result-type.type-data.name,
           user self.left-expression.result-type.type-data)
+    if self.left-expression.result-type.reference-path.equals(
+        user self.right-expression.result-type.reference-path)
+      self.syntax-error-msg(user "assigning reference into itself")
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.right-expression.check-memory(user refs)
@@ -169,11 +172,15 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
           user self.left-expression.result-type.reference-path,
           copy true)
     self.left-expression.check-memory(user refs)
-    if self.left-expression.access = Access.OWNER and
-        self.left-expression.result-type.reference-path? and
-        self.right-expression.result-type.type-data is glob.type-empty
-      refs.mark-reference(
-          user self.left-expression.result-type.reference-path, copy false)
+    if self.left-expression.access = Access.OWNER
+      if self.left-expression.result-type.reference-path? and
+          self.right-expression.result-type.type-data is glob.type-empty
+        refs.mark-reference(
+            user self.left-expression.result-type.reference-path, copy false)
+      if self.right-expression.access = Access.OWNER and
+          self.right-expression.result-type.reference-path?
+        refs.mark-reference(
+            user self.right-expression.result-type.reference-path, copy false)
         
   func dynamic write-preactions()
     self.right-expression.write-preactions()

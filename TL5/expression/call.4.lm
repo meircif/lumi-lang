@@ -258,6 +258,10 @@ class CallArgument(Argument)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.value.check-memory(user refs)
+    if not self.is-output and self.access = Access.OWNER and
+        self.value.result-type.reference-path?
+      refs.mark-reference(
+          user self.value.result-type.reference-path, copy false)
   
   func dynamic write-preactions()
     self.value.write-preactions()
