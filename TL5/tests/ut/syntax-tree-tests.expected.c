@@ -5616,7 +5616,9 @@ struct ut_M_Bb {
 };
 void ut_M_Aa_Del(ut_M_Aa* self);
 void ut_M_Bb_Del(ut_M_Bb* self);
-Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* b, Ref_Manager* b_Refman);
+Returncode ut_M_use(ut_M_Aa* a, Ref_Manager* a_Refman);
+Returncode ut_M_take(ut_M_Aa* a, Ref_Manager* a_Refman);
+Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* bu, Ref_Manager* bu_Refman, ut_M_Bb* bo, Ref_Manager* bo_Refman);
 Generic_Type_Dynamic ut_M_Aa_dynamic = {(Dynamic_Del)ut_M_Aa_Del};
 Generic_Type_Dynamic ut_M_Bb_dynamic = {(Dynamic_Del)ut_M_Bb_Del};
 void ut_M_Aa_Del(ut_M_Aa* self) {
@@ -5627,9 +5629,29 @@ void ut_M_Bb_Del(ut_M_Bb* self) {
     ut_M_Aa_Del(self->a);
     LUMI_owner_dec_ref(self->a_Refman);
 }
-Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* b, Ref_Manager* b_Refman) {
+Returncode ut_M_use(ut_M_Aa* a, Ref_Manager* a_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
+    LUMI_inc_ref(a_Refman);
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(a_Refman);
+    return LUMI_err;
+}
+Returncode ut_M_take(ut_M_Aa* a, Ref_Manager* a_Refman) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    ut_M_Aa_Del(a);
+    LUMI_owner_dec_ref(a_Refman);
+    return LUMI_err;
+}
+Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* bu, Ref_Manager* bu_Refman, ut_M_Bb* bo, Ref_Manager* bo_Refman) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Aa* a = NULL;
+    Ref_Manager* a_Refman = NULL;
     String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     String* aux_String_1 = NULL;
@@ -5640,6 +5662,7 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* b, Ref_Manager* b
     Ref_Manager* aux_Aa_0_Refman = NULL;
     ut_M_Aa* aux_Aa_1 = NULL;
     Ref_Manager* aux_Aa_1_Refman = NULL;
+    LUMI_inc_ref(bu_Refman);
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     String_Del(s);
@@ -5648,7 +5671,7 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* b, Ref_Manager* b
     s = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
-    INIT_NEW(7, LUMI_block0_cleanup, aux_String_1, LUMI_new_string(12));
+    INIT_NEW(9, LUMI_block0_cleanup, aux_String_1, LUMI_new_string(12));
     aux_String_2 = aux_String_1;
     aux_String_2_Refman = aux_String_1_Refman;
     aux_String_1 = NULL;
@@ -5660,19 +5683,31 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* b, Ref_Manager* b
     aux_String_2 = NULL;
     aux_String_2_Refman = NULL;
     LUMI_err = String_clear(s, s_Refman);
-    CHECK(8, LUMI_block0_cleanup)
-    INIT_NEW(9, LUMI_block0_cleanup, aux_Aa_0, LUMI_alloc(sizeof(ut_M_Aa)));
+    CHECK(10, LUMI_block0_cleanup)
+    INIT_NEW(11, LUMI_block0_cleanup, aux_Aa_0, LUMI_alloc(sizeof(ut_M_Aa)));
     aux_Aa_1 = aux_Aa_0;
     aux_Aa_1_Refman = aux_Aa_0_Refman;
     aux_Aa_0 = NULL;
     aux_Aa_0_Refman = NULL;
-    CHECK_REF(9, LUMI_block0_cleanup, b, b_Refman)
-    ut_M_Aa_Del(b->a);
-    LUMI_owner_dec_ref(b->a_Refman);
-    b->a_Refman = aux_Aa_1_Refman;
-    b->a = aux_Aa_1;
+    CHECK_REF(11, LUMI_block0_cleanup, bo, bo_Refman)
+    ut_M_Aa_Del(bo->a);
+    LUMI_owner_dec_ref(bo->a_Refman);
+    bo->a_Refman = aux_Aa_1_Refman;
+    bo->a = aux_Aa_1;
     aux_Aa_1 = NULL;
     aux_Aa_1_Refman = NULL;
+    CHECK_REF(12, LUMI_block0_cleanup, bu, bu_Refman)
+    a = bu->a;
+    a_Refman = bu->a_Refman;
+    LUMI_inc_ref(a_Refman);
+    CHECK_REF(13, LUMI_block0_cleanup, bu, bu_Refman)
+    LUMI_err = ut_M_use(bu->a, bu->a_Refman);
+    CHECK(13, LUMI_block0_cleanup)
+    CHECK_REF(14, LUMI_block0_cleanup, bo, bo_Refman)
+    LUMI_err = ut_M_take(bo->a, bo->a_Refman);
+    bo->a = NULL;
+    bo->a_Refman = NULL;
+    CHECK(14, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
     ut_M_Aa_Del(aux_Aa_1);
@@ -5685,8 +5720,10 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(aux_String_1_Refman);
     String_Del(aux_String_0);
     LUMI_owner_dec_ref(aux_String_0_Refman);
-    ut_M_Bb_Del(b);
-    LUMI_owner_dec_ref(b_Refman);
+    LUMI_dec_ref(a_Refman);
+    ut_M_Bb_Del(bo);
+    LUMI_owner_dec_ref(bo_Refman);
+    LUMI_dec_ref(bu_Refman);
     String_Del(s);
     LUMI_owner_dec_ref(s_Refman);
     return LUMI_err;
@@ -5824,6 +5861,16 @@ using potentially illegal reference "si"
 using potentially illegal reference "s"
 /// @ teo4
 cannot access owner field "a" in non-owner reference "b.a"
+/// @ teo5
+cannot access owner field "a" in non-owner reference "b.a"
+/// @ teo6
+cannot access owner field "a" in non-owner reference "b.a"
+/// @ teo7
+using potentially illegal reference "t"
+/// @ teo8
+using potentially illegal reference "s"
+/// @ teo9
+using potentially illegal reference "s"
 /// @ teu0
 using potentially illegal reference "s"
 /// @ teu1

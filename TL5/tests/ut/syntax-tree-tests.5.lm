@@ -1856,11 +1856,16 @@ struct Aa
     var Int x
 struct Bb
     owner Aa a
-func fun(owner String s, owner Bb b)
+func use(user Aa a)
+func take(owner Aa a)
+func fun(owner String s, user Bb bu, owner Bb bo)
     s := _
     s := String{12}()
     s.clear()
-    b.a := Aa()
+    bo.a := Aa()
+    user Aa a(user bu.a)
+    use(user bu.a)
+    take(owner bo.a)
 ; @ g tu0
 func deleting()->(owner String s)
     s := _
@@ -1909,6 +1914,34 @@ struct Bb
     owner Aa a
 func fun(user Bb b)
     b.a := Aa()
+; @ eg teo5
+struct Aa
+    var Int x
+struct Bb
+    owner Aa a
+func fun(user Bb b)
+    owner Aa a(owner b.a)
+; @ eg teo6
+struct Aa
+    var Int x
+struct Bb
+    owner Aa a
+func take(owner Aa a)
+func fun(user Bb b)
+    take(owner b.a)
+; @ eg teo7
+struct Test
+    owner Test t
+func fun(owner Test t)
+    t.t := t
+; @ eg teo8
+func taker(owner String s)->(var Int x)
+func fun(owner String s)
+    s.length := taker(owner s)
+; @ eg teo9
+func taker(owner String s1, owner String s2)
+func fun(owner String s)
+    taker(owner s, owner s)
 ; @ eg teu0
 func deleting()->(owner String s)
     s := _

@@ -847,8 +847,6 @@ Returncode ut_M_fun(void) {
     Ref_Manager* t_Refman = NULL;
     ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
-    ut_M_Test* aux_Test_1 = NULL;
-    Ref_Manager* aux_Test_1_Refman = NULL;
     INIT_NEW(4, LUMI_block0_cleanup, t, LUMI_alloc(sizeof(ut_M_Test)));
     CHECK_REF(5, LUMI_block0_cleanup, t, t_Refman)
     aux_Test_0 = t->t;
@@ -861,21 +859,8 @@ Returncode ut_M_fun(void) {
     t = aux_Test_0;
     aux_Test_0 = NULL;
     aux_Test_0_Refman = NULL;
-    aux_Test_1 = t;
-    aux_Test_1_Refman = t_Refman;
-    t = NULL;
-    t_Refman = NULL;
-    CHECK_REF(6, LUMI_block0_cleanup, t, t_Refman)
-    ut_M_Test_Del(t->t);
-    LUMI_owner_dec_ref(t->t_Refman);
-    t->t_Refman = aux_Test_1_Refman;
-    t->t = aux_Test_1;
-    aux_Test_1 = NULL;
-    aux_Test_1_Refman = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(aux_Test_1);
-    LUMI_owner_dec_ref(aux_Test_1_Refman);
     ut_M_Test_Del(aux_Test_0);
     LUMI_owner_dec_ref(aux_Test_0_Refman);
     ut_M_Test_Del(t);

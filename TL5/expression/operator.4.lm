@@ -171,16 +171,24 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
       refs.mark-reference(
           user self.left-expression.result-type.reference-path,
           copy true)
-    self.left-expression.check-memory(user refs)
+    var Bool check-left(copy true)
     if self.left-expression.access = Access.OWNER
       if self.left-expression.result-type.reference-path? and
           self.right-expression.result-type.type-data is glob.type-empty
         refs.mark-reference(
             user self.left-expression.result-type.reference-path, copy false)
-      if self.right-expression.access = Access.OWNER and
-          self.right-expression.result-type.reference-path?
-        refs.mark-reference(
-            user self.right-expression.result-type.reference-path, copy false)
+        check-left := false
+      if self.right-expression.access = Access.OWNER
+        ; move
+        if self.right-expression.result-type.reference-path?
+          refs.mark-reference(
+              user self.right-expression.result-type.reference-path, copy false)
+        self.left-expression.result-type.reference-path.check-pure-owner(
+            user self)
+        self.right-expression.result-type.reference-path.check-pure-owner(
+            user self)
+    if check-left
+      self.left-expression.check-memory(user refs)
         
   func dynamic write-preactions()
     self.right-expression.write-preactions()

@@ -408,7 +408,6 @@ struct Test
 func fun()
     new Test t
     t := t.t
-    t.t := t
 ; @ ec te0
 345 @ 2
 ; @ ec te1

@@ -46,6 +46,26 @@ struct ReferencePath
     if self.field?
       sys.print(user ".")
       self.field.print()
+  
+  func check-pure-owner(user SyntaxTreeNode node)
+    var Bool pure-owner(copy true)
+    user ReferencePath path(user self)
+    do
+      while path?
+      if path.variable.access = Access.OWNER or
+          path.variable.access = Access.STRONG
+        if not pure-owner
+          node.print-syntax-error-header()
+          sys.print(user "cannot access owner field \"")
+          sys.print(user path.variable.name)
+          sys.print(user "\" in non-owner reference \"")
+          self.print()
+          sys.print(user "\"\n")
+          sys.exit(copy 1)
+      else
+        pure-owner := false
+      path := path.field
+
 
 ~~~ Manage a single reference memory ~~~
 struct ReferenceMemory
@@ -55,6 +75,7 @@ struct ReferenceMemory
   new(user SyntaxTreeVariable variable)
     self.path.new(user variable)
     self.usable := true
+
 
 ~~~ List of memory managed references ~~~
 struct ReferenceMemoryList

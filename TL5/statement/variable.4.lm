@@ -338,6 +338,9 @@ class VariableInit(SyntaxTreeCode)
     self.expression-init.analyze()
     if self.parent is glob.root.global-init
       glob.current-module := _
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.expression-init.check-memory(user refs)
   
   func dynamic write()
     if self.variable.type-instance.type-data.is-primitive and

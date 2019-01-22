@@ -262,6 +262,7 @@ class CallArgument(Argument)
         self.value.result-type.reference-path?
       refs.mark-reference(
           user self.value.result-type.reference-path, copy false)
+      self.value.result-type.reference-path.check-pure-owner(user self)
   
   func dynamic write-preactions()
     self.value.write-preactions()
