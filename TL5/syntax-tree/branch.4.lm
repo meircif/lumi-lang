@@ -114,10 +114,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           copy false,
           user parent-type,
           user parent-block))
-    ; else-if keyword.equal(user "manager")
+    ; else-if keyword.equal(user "strong")
     ;   self.variables.add(owner SyntaxTreeVariable.parse-new(
     ;       user _,
-    ;       copy Access.OWNER,
+    ;       copy Access.STRONG,
     ;       copy false,
     ;       user parent-type,
     ;       user parent-block))

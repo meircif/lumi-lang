@@ -5,7 +5,7 @@
 
 # Lumi programming language
 
-See [Documentation](http://lumi-lang.readthedocs.io/en/latest/) for more
+See [Documentation](http://lumi-lang.readthedocs.io/) for more
 information on Lumi language.
 
 See [Wiki](https://github.com/meircif/lumi-lang/wiki) for information on how to

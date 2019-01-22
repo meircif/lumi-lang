@@ -95,6 +95,23 @@ class FieldExpression(Expression)
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.instance.check-memory(user refs)
     refs.check-expression(user self)
+    var Bool pure-owner(copy true)
+    user ReferencePath path(user self.result-type.reference-path)
+    do
+      while path?
+      if path.variable.access = Access.OWNER or
+          path.variable.access = Access.STRONG
+        if not pure-owner
+          self.print-syntax-error-header()
+          sys.print(user "cannot access owner field \"")
+          sys.print(user path.variable.name)
+          sys.print(user "\" in non-owner reference \"")
+          self.result-type.reference-path.print()
+          sys.print(user "\"\n")
+          sys.exit(copy 1)
+      else
+        pure-owner := false
+      path := path.field
 
   func dynamic write-preactions()
     self.instance.write-preactions()

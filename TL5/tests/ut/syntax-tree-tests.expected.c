@@ -5605,8 +5605,29 @@ expected module, got "Int"
 unknown Enum "Error" in module "ut"
 /// @@ test-memory
 /// @ to0
-Returncode ut_M_fun(String* s, Ref_Manager* s_Refman);
-Returncode ut_M_fun(String* s, Ref_Manager* s_Refman) {
+typedef struct ut_M_Aa ut_M_Aa;
+typedef struct ut_M_Bb ut_M_Bb;
+struct ut_M_Aa {
+    Int x;
+};
+struct ut_M_Bb {
+    ut_M_Aa* a;
+    Ref_Manager* a_Refman;
+};
+void ut_M_Aa_Del(ut_M_Aa* self);
+void ut_M_Bb_Del(ut_M_Bb* self);
+Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* b, Ref_Manager* b_Refman);
+Generic_Type_Dynamic ut_M_Aa_dynamic = {(Dynamic_Del)ut_M_Aa_Del};
+Generic_Type_Dynamic ut_M_Bb_dynamic = {(Dynamic_Del)ut_M_Bb_Del};
+void ut_M_Aa_Del(ut_M_Aa* self) {
+    if (self == NULL) return;
+}
+void ut_M_Bb_Del(ut_M_Bb* self) {
+    if (self == NULL) return;
+    ut_M_Aa_Del(self->a);
+    LUMI_owner_dec_ref(self->a_Refman);
+}
+Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* b, Ref_Manager* b_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     String* aux_String_0 = NULL;
@@ -5615,6 +5636,10 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman) {
     Ref_Manager* aux_String_1_Refman = NULL;
     String* aux_String_2 = NULL;
     Ref_Manager* aux_String_2_Refman = NULL;
+    ut_M_Aa* aux_Aa_0 = NULL;
+    Ref_Manager* aux_Aa_0_Refman = NULL;
+    ut_M_Aa* aux_Aa_1 = NULL;
+    Ref_Manager* aux_Aa_1_Refman = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     String_Del(s);
@@ -5623,7 +5648,7 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman) {
     s = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
-    INIT_NEW(3, LUMI_block0_cleanup, aux_String_1, LUMI_new_string(12));
+    INIT_NEW(7, LUMI_block0_cleanup, aux_String_1, LUMI_new_string(12));
     aux_String_2 = aux_String_1;
     aux_String_2_Refman = aux_String_1_Refman;
     aux_String_1 = NULL;
@@ -5635,15 +5660,33 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman) {
     aux_String_2 = NULL;
     aux_String_2_Refman = NULL;
     LUMI_err = String_clear(s, s_Refman);
-    CHECK(4, LUMI_block0_cleanup)
+    CHECK(8, LUMI_block0_cleanup)
+    INIT_NEW(9, LUMI_block0_cleanup, aux_Aa_0, LUMI_alloc(sizeof(ut_M_Aa)));
+    aux_Aa_1 = aux_Aa_0;
+    aux_Aa_1_Refman = aux_Aa_0_Refman;
+    aux_Aa_0 = NULL;
+    aux_Aa_0_Refman = NULL;
+    CHECK_REF(9, LUMI_block0_cleanup, b, b_Refman)
+    ut_M_Aa_Del(b->a);
+    LUMI_owner_dec_ref(b->a_Refman);
+    b->a_Refman = aux_Aa_1_Refman;
+    b->a = aux_Aa_1;
+    aux_Aa_1 = NULL;
+    aux_Aa_1_Refman = NULL;
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Aa_Del(aux_Aa_1);
+    LUMI_owner_dec_ref(aux_Aa_1_Refman);
+    ut_M_Aa_Del(aux_Aa_0);
+    LUMI_owner_dec_ref(aux_Aa_0_Refman);
     String_Del(aux_String_2);
     LUMI_owner_dec_ref(aux_String_2_Refman);
     String_Del(aux_String_1);
     LUMI_owner_dec_ref(aux_String_1_Refman);
     String_Del(aux_String_0);
     LUMI_owner_dec_ref(aux_String_0_Refman);
+    ut_M_Bb_Del(b);
+    LUMI_owner_dec_ref(b_Refman);
     String_Del(s);
     LUMI_owner_dec_ref(s_Refman);
     return LUMI_err;
@@ -5779,6 +5822,8 @@ using potentially illegal reference "t.s"
 using potentially illegal reference "si"
 /// @ teo3
 using potentially illegal reference "s"
+/// @ teo4
+cannot access owner field "a" in non-owner reference "b.a"
 /// @ teu0
 using potentially illegal reference "s"
 /// @ teu1

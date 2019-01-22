@@ -1852,10 +1852,15 @@ i.Error
 ut.Error.VALUE
 ; @@ test-memory
 ; @ g to0
-func fun(owner String s)
+struct Aa
+    var Int x
+struct Bb
+    owner Aa a
+func fun(owner String s, owner Bb b)
     s := _
     s := String{12}()
     s.clear()
+    b.a := Aa()
 ; @ g tu0
 func deleting()->(owner String s)
     s := _
@@ -1897,6 +1902,13 @@ func taker(owner String s)
 func fun(owner String s)
     taker(owner s)
     s.clear()
+; @ eg teo4
+struct Aa
+    var Int x
+struct Bb
+    owner Aa a
+func fun(user Bb b)
+    b.a := Aa()
 ; @ eg teu0
 func deleting()->(owner String s)
     s := _

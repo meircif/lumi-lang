@@ -53,7 +53,7 @@ Lumi will allow more complex and flexible reference managing that come with a
 small and predictable performance cost.
 
 Same as :ref:`memory-management-1` with the addition of weak references.
-To allow this the owner should be declared as "managed". It will work the same
+To allow this the owner should be declared as "strong". It will work the same
 way as a regular owner, plus that it can now give "weak" references to any
 other entity without limitations. Weak references will automatically test that
 the reference is still valid before accessing it.
@@ -70,10 +70,10 @@ predictable.
 This is :ref:`currently implemented <variables>` in a basic manner, but in the
 future the syntax may be different and look like this::
 
-   managed String some-string(String{16}())  ; new managed reference
+   strong String some-string(String{16}())  ; new strong owner reference
    user-func(user some-string)  ; give reference to a user
    weak-func(weak some-string)  ; give weak reference
-   owning-func(managed some-string)  ; move ownership
+   owning-func(strong some-string)  ; move ownership
 
 .. _memory-management-3:
 

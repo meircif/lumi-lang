@@ -4,12 +4,12 @@ module tl5-compiler
 ~~~ Access values ~~~
 enum Access
   UNDEFINED
-  COPY
-  USER
-  OWNER
   VAR
+  COPY
+  OWNER
+  USER
+  STRONG
   WEAK
-  MANAGER
   SHARED
 
 
@@ -91,12 +91,12 @@ struct Global
   func init-access-names()
     self.access-names := Array{Access.length:String{16}}()
     self.access-names[Access.UNDEFINED].new(user "undefined")
-    self.access-names[Access.COPY].new(user "copy")
-    self.access-names[Access.USER].new(user "user")
-    self.access-names[Access.OWNER].new(user "owner")
     self.access-names[Access.VAR].new(user "var")
+    self.access-names[Access.COPY].new(user "copy")
+    self.access-names[Access.OWNER].new(user "owner")
+    self.access-names[Access.USER].new(user "user")
+    self.access-names[Access.STRONG].new(user "strong")
     self.access-names[Access.WEAK].new(user "weak")
-    self.access-names[Access.MANAGER].new(user "manager")
     self.access-names[Access.SHARED].new(user "shared")
   
   func init-operator-map()
