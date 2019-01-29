@@ -58,6 +58,10 @@ class SliceExpression(Expression)
       self.add-aux-variable(
           copy Access.VAR, copy false, user self.result-type)->(
           owner self.slice-variable)
+    
+    if not self.result-type.type-data.is-primitive
+      self.sequence.result-type.reference-path.copy-new()->(
+          owner self.result-type.reference-path)
   
   func inst check-index(user Expression index)
     if index.result-type?

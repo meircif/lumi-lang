@@ -1852,20 +1852,20 @@ i.Error
 ut.Error.VALUE
 ; @@ test-memory
 ; @ g to0
-struct Aa
-    var Int x
-struct Bb
-    owner Aa a
-func use(user Aa a)
-func take(owner Aa a)
-func fun(owner String s, user Bb bu, owner Bb bo)
+struct Test
+    owner String s
+func use(user String s)
+func take(owner String s)
+func fun(owner String s, user Test tu, owner Test to)
     s := _
     s := String{12}()
     s.clear()
-    bo.a := Aa()
-    user Aa a(user bu.a)
-    use(user bu.a)
-    take(owner bo.a)
+    to.s := String{12}()
+    user String su(user tu.s)
+    use(user tu.s)
+    take(owner to.s)
+    var Array{12:Int} arr
+    arr[4] := arr[8]
 ; @ g tu0
 func deleting()->(owner String s)
     s := _
@@ -1908,12 +1908,10 @@ func fun(owner String s)
     taker(owner s)
     s.clear()
 ; @ eg teo4
-struct Aa
-    var Int x
-struct Bb
-    owner Aa a
-func fun(user Bb b)
-    b.a := Aa()
+struct Test
+    owner String s
+func fun(user Test t)
+    t.s := String{12}()
 ; @ eg teo5
 struct Aa
     var Int x
@@ -1942,6 +1940,26 @@ func fun(owner String s)
 func taker(owner String s1, owner String s2)
 func fun(owner String s)
     taker(owner s, owner s)
+; @ eg teo10
+struct Aa
+    owner String s
+struct Bb
+    user Aa a
+func fun(owner Array{Bb} b)
+    b[3].a.s := _
+; @ eg teo11
+struct Test
+    owner String s
+func get-user()->(user Test t)
+func fun()
+    user Test t
+    get-user()->(user t).s := _
+; @ eg teo12
+struct Test
+    owner String s
+func get-user()->(user Test t)
+func fun()
+    get-user().s := _
 ; @ eg teu0
 func deleting()->(owner String s)
     s := _

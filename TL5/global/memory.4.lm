@@ -19,9 +19,6 @@ struct ReferencePath
 
   func copy-and-add-field(user SyntaxTreeVariable variable)->(
       owner ReferencePath reference)
-    if not self?
-      reference := _
-      return
     reference := ReferencePath(user self.variable)
     if self.field?
       self.field.copy-and-add-field(user variable)->(owner reference.field)
@@ -42,7 +39,10 @@ struct ReferencePath
       is-equal := true
   
   func print()
-    sys.print(user self.variable.name)
+    if self.variable.is-aux
+      sys.print(user "{anonymous}")
+    else
+      sys.print(user self.variable.name)
     if self.field?
       sys.print(user ".")
       self.field.print()
@@ -56,7 +56,7 @@ struct ReferencePath
           path.variable.access = Access.STRONG
         if not pure-owner
           node.print-syntax-error-header()
-          sys.print(user "cannot access owner field \"")
+          sys.print(user "cannot modify owner field \"")
           sys.print(user path.variable.name)
           sys.print(user "\" in non-owner reference \"")
           self.print()
@@ -100,8 +100,6 @@ struct ReferenceMemoryList
     self.references.add(owner reference-memory)
   
   func check-expression(user Expression expression)
-    if not expression.result-type.reference-path?
-      return
     for reference in self.references.iter()
       if expression.result-type.reference-path.equals(user reference.path)
         if not reference.usable

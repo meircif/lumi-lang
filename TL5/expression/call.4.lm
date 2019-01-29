@@ -29,14 +29,21 @@ class CallExpression(Expression)
           declaration.outputs.last.item.get-type-instance().type-data is
           glob.type-generic
       output.access := declaration.outputs.last.item.access
-      output.value := self.add-aux-variable(
+      owner VariableExpression variable-expression
+      self.add-aux-variable(
           copy declaration.outputs.last.item.access,
           copy false,
-          user result-type)
+          user result-type)->(owner variable-expression)
+      if self.result-type?
+        self.result-type.reference-path :=
+            ReferencePath(user variable-expression.variable)
+      output.value := variable-expression
       self.output := output.value
       self.arguments.outputs.add(owner output)
     else-if self.result-type?
       self.arguments.get-output()->(user self.output)
+      self.output.result-type.reference-path.copy-new()->(
+          owner self.result-type.reference-path)
     self.assignable := self.result-type?
 
   func dynamic check-memory(user ReferenceMemoryList refs)

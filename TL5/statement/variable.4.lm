@@ -12,6 +12,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   var Bool is-output
   var Bool is-create
   var Bool is-native
+  var Bool is-aux
   
   func inst parse-new(
       copy Int access,

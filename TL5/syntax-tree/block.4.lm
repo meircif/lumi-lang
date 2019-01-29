@@ -237,6 +237,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     variable.name.concat(user index-str)
     variable.access := access
     variable.is-create := is-create
+    variable.is-aux := true
     type-instance.copy-new()->(owner variable.type-instance)
     new-variable := variable
     self.variables.add(owner variable)

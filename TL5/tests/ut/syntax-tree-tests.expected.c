@@ -5605,64 +5605,59 @@ expected module, got "Int"
 unknown Enum "Error" in module "ut"
 /// @@ test-memory
 /// @ to0
-typedef struct ut_M_Aa ut_M_Aa;
-typedef struct ut_M_Bb ut_M_Bb;
-struct ut_M_Aa {
-    Int x;
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    String* s;
+    Ref_Manager* s_Refman;
 };
-struct ut_M_Bb {
-    ut_M_Aa* a;
-    Ref_Manager* a_Refman;
-};
-void ut_M_Aa_Del(ut_M_Aa* self);
-void ut_M_Bb_Del(ut_M_Bb* self);
-Returncode ut_M_use(ut_M_Aa* a, Ref_Manager* a_Refman);
-Returncode ut_M_take(ut_M_Aa* a, Ref_Manager* a_Refman);
-Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* bu, Ref_Manager* bu_Refman, ut_M_Bb* bo, Ref_Manager* bo_Refman);
-Generic_Type_Dynamic ut_M_Aa_dynamic = {(Dynamic_Del)ut_M_Aa_Del};
-Generic_Type_Dynamic ut_M_Bb_dynamic = {(Dynamic_Del)ut_M_Bb_Del};
-void ut_M_Aa_Del(ut_M_Aa* self) {
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_use(String* s, Ref_Manager* s_Refman);
+Returncode ut_M_take(String* s, Ref_Manager* s_Refman);
+Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Test* tu, Ref_Manager* tu_Refman, ut_M_Test* to, Ref_Manager* to_Refman);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
+    String_Del(self->s);
+    LUMI_owner_dec_ref(self->s_Refman);
 }
-void ut_M_Bb_Del(ut_M_Bb* self) {
-    if (self == NULL) return;
-    ut_M_Aa_Del(self->a);
-    LUMI_owner_dec_ref(self->a_Refman);
-}
-Returncode ut_M_use(ut_M_Aa* a, Ref_Manager* a_Refman) {
+Returncode ut_M_use(String* s, Ref_Manager* s_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    LUMI_inc_ref(a_Refman);
+    LUMI_inc_ref(s_Refman);
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(a_Refman);
+    LUMI_dec_ref(s_Refman);
     return LUMI_err;
 }
-Returncode ut_M_take(ut_M_Aa* a, Ref_Manager* a_Refman) {
+Returncode ut_M_take(String* s, Ref_Manager* s_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Aa_Del(a);
-    LUMI_owner_dec_ref(a_Refman);
+    String_Del(s);
+    LUMI_owner_dec_ref(s_Refman);
     return LUMI_err;
 }
-Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* bu, Ref_Manager* bu_Refman, ut_M_Bb* bo, Ref_Manager* bo_Refman) {
+Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Test* tu, Ref_Manager* tu_Refman, ut_M_Test* to, Ref_Manager* to_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    ut_M_Aa* a = NULL;
-    Ref_Manager* a_Refman = NULL;
+    String* su = NULL;
+    Ref_Manager* su_Refman = NULL;
+    Int arr_Values[12] = {0};
+    Array arr_Var = {12, NULL};
+    Array* arr = NULL;
+    Ref_Manager* arr_Refman = NULL;
     String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     String* aux_String_1 = NULL;
     Ref_Manager* aux_String_1_Refman = NULL;
     String* aux_String_2 = NULL;
     Ref_Manager* aux_String_2_Refman = NULL;
-    ut_M_Aa* aux_Aa_0 = NULL;
-    Ref_Manager* aux_Aa_0_Refman = NULL;
-    ut_M_Aa* aux_Aa_1 = NULL;
-    Ref_Manager* aux_Aa_1_Refman = NULL;
-    LUMI_inc_ref(bu_Refman);
+    String* aux_String_3 = NULL;
+    Ref_Manager* aux_String_3_Refman = NULL;
+    String* aux_String_4 = NULL;
+    Ref_Manager* aux_String_4_Refman = NULL;
+    LUMI_inc_ref(tu_Refman);
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     String_Del(s);
@@ -5671,7 +5666,7 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* bu, Ref_Manager* 
     s = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
-    INIT_NEW(9, LUMI_block0_cleanup, aux_String_1, LUMI_new_string(12));
+    INIT_NEW(7, LUMI_block0_cleanup, aux_String_1, LUMI_new_string(12));
     aux_String_2 = aux_String_1;
     aux_String_2_Refman = aux_String_1_Refman;
     aux_String_1 = NULL;
@@ -5683,47 +5678,55 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Bb* bu, Ref_Manager* 
     aux_String_2 = NULL;
     aux_String_2_Refman = NULL;
     LUMI_err = String_clear(s, s_Refman);
-    CHECK(10, LUMI_block0_cleanup)
-    INIT_NEW(11, LUMI_block0_cleanup, aux_Aa_0, LUMI_alloc(sizeof(ut_M_Aa)));
-    aux_Aa_1 = aux_Aa_0;
-    aux_Aa_1_Refman = aux_Aa_0_Refman;
-    aux_Aa_0 = NULL;
-    aux_Aa_0_Refman = NULL;
-    CHECK_REF(11, LUMI_block0_cleanup, bo, bo_Refman)
-    ut_M_Aa_Del(bo->a);
-    LUMI_owner_dec_ref(bo->a_Refman);
-    bo->a_Refman = aux_Aa_1_Refman;
-    bo->a = aux_Aa_1;
-    aux_Aa_1 = NULL;
-    aux_Aa_1_Refman = NULL;
-    CHECK_REF(12, LUMI_block0_cleanup, bu, bu_Refman)
-    a = bu->a;
-    a_Refman = bu->a_Refman;
-    LUMI_inc_ref(a_Refman);
-    CHECK_REF(13, LUMI_block0_cleanup, bu, bu_Refman)
-    LUMI_err = ut_M_use(bu->a, bu->a_Refman);
-    CHECK(13, LUMI_block0_cleanup)
-    CHECK_REF(14, LUMI_block0_cleanup, bo, bo_Refman)
-    LUMI_err = ut_M_take(bo->a, bo->a_Refman);
-    bo->a = NULL;
-    bo->a_Refman = NULL;
-    CHECK(14, LUMI_block0_cleanup)
+    CHECK(8, LUMI_block0_cleanup)
+    INIT_NEW(9, LUMI_block0_cleanup, aux_String_3, LUMI_new_string(12));
+    aux_String_4 = aux_String_3;
+    aux_String_4_Refman = aux_String_3_Refman;
+    aux_String_3 = NULL;
+    aux_String_3_Refman = NULL;
+    CHECK_REF(9, LUMI_block0_cleanup, to, to_Refman)
+    String_Del(to->s);
+    LUMI_owner_dec_ref(to->s_Refman);
+    to->s_Refman = aux_String_4_Refman;
+    to->s = aux_String_4;
+    aux_String_4 = NULL;
+    aux_String_4_Refman = NULL;
+    CHECK_REF(10, LUMI_block0_cleanup, tu, tu_Refman)
+    su = tu->s;
+    su_Refman = tu->s_Refman;
+    LUMI_inc_ref(su_Refman);
+    CHECK_REF(11, LUMI_block0_cleanup, tu, tu_Refman)
+    LUMI_err = ut_M_use(tu->s, tu->s_Refman);
+    CHECK(11, LUMI_block0_cleanup)
+    CHECK_REF(12, LUMI_block0_cleanup, to, to_Refman)
+    LUMI_err = ut_M_take(to->s, to->s_Refman);
+    to->s = NULL;
+    to->s_Refman = NULL;
+    CHECK(12, LUMI_block0_cleanup)
+    INIT_VAR(13, LUMI_block0_cleanup, arr)
+    arr_Var.values = arr_Values;
+    CHECK_REF(14, LUMI_block0_cleanup, arr, arr_Refman)
+    if (8 < 0 || 8 >= arr->length) RAISE(14, LUMI_block0_cleanup, slice_index)
+    CHECK_REF(14, LUMI_block0_cleanup, arr, arr_Refman)
+    if (4 < 0 || 4 >= arr->length) RAISE(14, LUMI_block0_cleanup, slice_index)
+    ((Int*)(arr->values))[4] = ((Int*)(arr->values))[8];
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Aa_Del(aux_Aa_1);
-    LUMI_owner_dec_ref(aux_Aa_1_Refman);
-    ut_M_Aa_Del(aux_Aa_0);
-    LUMI_owner_dec_ref(aux_Aa_0_Refman);
+    String_Del(aux_String_4);
+    LUMI_owner_dec_ref(aux_String_4_Refman);
+    String_Del(aux_String_3);
+    LUMI_owner_dec_ref(aux_String_3_Refman);
     String_Del(aux_String_2);
     LUMI_owner_dec_ref(aux_String_2_Refman);
     String_Del(aux_String_1);
     LUMI_owner_dec_ref(aux_String_1_Refman);
     String_Del(aux_String_0);
     LUMI_owner_dec_ref(aux_String_0_Refman);
-    LUMI_dec_ref(a_Refman);
-    ut_M_Bb_Del(bo);
-    LUMI_owner_dec_ref(bo_Refman);
-    LUMI_dec_ref(bu_Refman);
+    LUMI_var_dec_ref(arr_Refman);
+    LUMI_dec_ref(su_Refman);
+    ut_M_Test_Del(to);
+    LUMI_owner_dec_ref(to_Refman);
+    LUMI_dec_ref(tu_Refman);
     String_Del(s);
     LUMI_owner_dec_ref(s_Refman);
     return LUMI_err;
@@ -5860,17 +5863,23 @@ using potentially illegal reference "si"
 /// @ teo3
 using potentially illegal reference "s"
 /// @ teo4
-cannot access owner field "a" in non-owner reference "b.a"
+cannot modify owner field "s" in non-owner reference "t.s"
 /// @ teo5
-cannot access owner field "a" in non-owner reference "b.a"
+cannot modify owner field "a" in non-owner reference "b.a"
 /// @ teo6
-cannot access owner field "a" in non-owner reference "b.a"
+cannot modify owner field "a" in non-owner reference "b.a"
 /// @ teo7
 using potentially illegal reference "t"
 /// @ teo8
 using potentially illegal reference "s"
 /// @ teo9
 using potentially illegal reference "s"
+/// @ teo10
+cannot modify owner field "s" in non-owner reference "b.a.s"
+/// @ teo11
+cannot modify owner field "s" in non-owner reference "t.s"
+/// @ teo12
+cannot modify owner field "s" in non-owner reference "{anonymous}.s"
 /// @ teu0
 using potentially illegal reference "s"
 /// @ teu1
