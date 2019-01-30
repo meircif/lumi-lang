@@ -170,13 +170,13 @@ fun0()
 ; @ c t1
 fun1(copy 3, user str, owner _)
 ; @ c t2
-fun2()->(owner so, var io)
+fun2()->(strong so, var io)
 ; @ c t3
 var Int x
-owner String s
-fun2()->(owner s, var x)
+strong String s
+fun2()->(strong s, var x)
 ; @ c t4
-fun3(copy 0)->(owner so)
+fun3(copy 0)->(strong so)
 ; @ c t5
 var Int x
 fun4(copy fun5(copy 3)->(var x))
@@ -246,7 +246,7 @@ i()
 ; @ ec te7
 fun5(copy 0)->(var 4)
 ; @ ec te8
-fun7(user _)->(weak tc)
+fun7(weak _)->(weak tc)
 ; @ ec te9
 fun5(copy i := 1)
 ; @ ec te10
@@ -254,9 +254,9 @@ fun5(user 8)
 ; @ ec te11
 fun1(copy 3, user str, owner str)
 ; @ ec te12
-fun3(copy 3)->(owner str)
+fun3(copy 3)->(strong str)
 ; @ ec te13
-fun7(user _)->(weak tb)
+fun7(weak _)->(weak tb)
 ; @ ec te14
 fun0(copy i)
 ; @ ec te15
@@ -275,6 +275,9 @@ struct Test(Base)
 ; @ ec te19
 var String{16} text
 fun1(copy 3, user str, owner text)
+; @ ec te20
+owner Tb tbo
+fun7(weak tbo)
 ; @@ test-type-expression
 ; @ c t0
 Test.meth(user t)
@@ -450,6 +453,8 @@ ot := tb
 b := b is b
 ; @ ec te19
 b := t is t < 2
+; @ ec te20
+t := to
 ; @@ test-question-expression
 ; @ c t0
 b := str?
@@ -460,7 +465,7 @@ b := t.fun?
 ; @ c t3
 b := to?
 ; @ c t4
-b := fun7(user _)->(weak t)?
+b := fun7(weak _)->(weak t)?
 ; @ g t5
 struct Test
     weak String s
@@ -505,7 +510,7 @@ tc.dyn()
 ; @ c t14
 tco.dyn()
 ; @ c t15
-fun7(user tc)->(weak ta)
+fun7(weak tc)->(weak ta)
 ; @ g t16
 class Test
     var Int x
@@ -520,7 +525,7 @@ class Test(Base)
     func inst fun()
         self.meth()
 ; @ c t18
-fun7(user _)
+fun7(weak _)
 ; @@ test-function-object
 ; @ c t0
 var Func{()} fun

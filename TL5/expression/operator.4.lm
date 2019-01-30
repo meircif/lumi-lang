@@ -151,10 +151,11 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
     if self.left-expression.access = Access.USER or
         self.left-expression.access = Access.WEAK
       self.code-node.get-function().has-user-assign := true
-    else-if self.left-expression.access = Access.OWNER
+    else-if (self.left-expression.access = Access.OWNER or
+        self.left-expression.access = Access.STRONG)
       ; ownership pass
       self.add-aux-variable(
-          copy Access.OWNER,
+          copy self.left-expression.access,
           copy false,
           user self.left-expression.result-type)->(
           owner self.assigned-value-variable)
@@ -178,7 +179,8 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
         refs.mark-reference(
             user self.left-expression.result-type.reference-path, copy false)
         check-left := false
-      if self.right-expression.access = Access.OWNER
+      if self.right-expression.access = Access.OWNER or
+          self.right-expression.access = Access.STRONG
         ; move
         if self.right-expression.result-type.reference-path?
           refs.mark-reference(
@@ -193,7 +195,8 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
   func dynamic write-preactions()
     self.right-expression.write-preactions()
     if not self.left-expression.result-type.type-data.is-primitive
-      if self.left-expression.access = Access.OWNER
+      if self.left-expression.access = Access.OWNER or
+          self.left-expression.access = Access.STRONG
         self.write-owner-assign-preactions()
       else
         self.write-user-assign-preactions()
@@ -201,7 +204,8 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
       self.left-expression.write-preactions()
       
   func dynamic write-end()
-    if self.left-expression.access = Access.OWNER
+    if self.left-expression.access = Access.OWNER or
+        self.left-expression.access = Access.STRONG
       self.write-end-expression(user self.assigned-value-variable)
       self.code-node.write-spaces()
       self.assigned-value-variable.write-assign-null()

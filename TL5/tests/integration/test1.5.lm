@@ -35,8 +35,8 @@ class TopType(covered.MiddleType)
         sys.println(user "TopType.meth6")
         self.num-mid := self.num-base
         self.top-base-ref := self.top-mid-ref
-        self.top-base-ref := self
         user covered.MiddleType mt(user self)
+        mt := self
         user BaseType bt(user mt)
         test-mid-out()->(user bt)
 
@@ -86,7 +86,7 @@ test test-func()
     test-int2str.active := true
     assert-error test-int2str(copy 6)->(owner s)
     
-    var TestStruct t(copy 0, user _)
+    var TestStruct t(copy 0, weak _)
     var Int x
     t.get()->(var x)
     assert x = 12
@@ -142,13 +142,13 @@ test test-dynamic-type-parameters()
     var TopType ttop
     ttop.num-base := 12
     dmid.item := ttop
-    user BaseType tbase
+    weak BaseType tbase
     tbase := dmid.item
     assert tbase.num-base = 12
     ttop.num-base := 13
-    dmid.set(user ttop, user _)
+    dmid.set(weak ttop, weak _)
     tbase := _
-    dmid.get()->(user tbase)
+    dmid.get()->(weak tbase)
     assert tbase.num-base = 13
 
 

@@ -1367,7 +1367,7 @@ got "String" expression, expected "Int"
 /// @ te14
 only "var" access is supported for primitive types, got "user"
 /// @ te15
-only "var" access is supported for primitive types, got "owner"
+only "var" access is supported for primitive types, got "strong"
 /// @ te16
 no constructor for type "Array"
 /// @ te17
@@ -1802,12 +1802,8 @@ String* s = NULL;
         LUMI_dec_ref(aux_Ref_Manager);
         aux_Ref_Manager = NULL;
         s = ((String*)(aux_Array_0->values)) + s_Index;
-        aux_Ref_Manager = ut_M_str_Refman;
-        ut_M_str_Refman = s_Refman;
-        LUMI_inc_ref(ut_M_str_Refman);
-        LUMI_dec_ref(aux_Ref_Manager);
-        aux_Ref_Manager = NULL;
-        ut_M_str = s;
+        LUMI_err = String_clear(s, s_Refman);
+        CHECK(2, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
     }}
@@ -3195,23 +3191,31 @@ struct ut_M_Test {
     ut_M_Test* next;
     Ref_Manager* next_Refman;
 };
-Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman);
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test* next, Ref_Manager* next_Refman, ut_M_Test** out, Ref_Manager** out_Refman);
 void ut_M_Test_Del(ut_M_Test* self);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman) {
+Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test* next, Ref_Manager* next_Refman, ut_M_Test** out, Ref_Manager** out_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Ref_Manager* aux_Ref_Manager = NULL;
     LUMI_inc_ref(self_Refman);
+    LUMI_inc_ref(next_Refman);
     CHECK_REF(4, LUMI_block0_cleanup, self, self_Refman)
     aux_Ref_Manager = self->next_Refman;
-    self->next_Refman = self_Refman;
+    self->next_Refman = next_Refman;
     LUMI_inc_ref(self->next_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    self->next = self;
+    self->next = next;
+    aux_Ref_Manager = *out_Refman;
+    *out_Refman = self_Refman;
+    LUMI_inc_ref(*out_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    *out = self;
 LUMI_block0_cleanup:
     (void)0;
+    LUMI_dec_ref(next_Refman);
     LUMI_dec_ref(self_Refman);
     return LUMI_err;
 }
@@ -3294,7 +3298,7 @@ Returncode ut_M_Base_get(ut_M_Base* self, Ref_Manager* self_Refman, Generic_Type
 void ut_M_Base_Del(ut_M_Base* self);
 Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, String* text, Ref_Manager* text_Refman);
 void ut_M_Test_Del(ut_M_Test* self);
-Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, String* text, Ref_Manager* text_Refman);
+Returncode ut_M_fun(ut_M_Test* test, Ref_Manager* test_Refman, String* text, Ref_Manager* text_Refman);
 Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 Returncode ut_M_Base_get(ut_M_Base* self, Ref_Manager* self_Refman, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
@@ -3336,7 +3340,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     ut_M_Base_Del(&(self->_base));
 }
-Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, String* text, Ref_Manager* text_Refman) {
+Returncode ut_M_fun(ut_M_Test* test, Ref_Manager* test_Refman, String* text, Ref_Manager* text_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     String* aux_String_0 = NULL;
@@ -5041,12 +5045,14 @@ iterator "get" method has no outputs in type "TestIterator"
 /// @ te8
 iterator "get" method has more than one output in type "TestIterator"
 /// @ te9
-iterator "get" method output has "owner" access in type "TestIterator"
+iterator "get" method output has an illegal access in type "TestIterator"
 /// @ te10
-cannot iterate type with no "next" named method - "TestIterator"
+iterator "get" method output has an illegal access in type "TestIterator"
 /// @ te11
-iterator "next" method has parameters in type "TestIterator"
+cannot iterate type with no "next" named method - "TestIterator"
 /// @ te12
+iterator "next" method has parameters in type "TestIterator"
+/// @ te13
 iterator "next" method has outputs in type "TestIterator"
 /// @@ test-complex-fields
 /// @ t0

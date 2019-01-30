@@ -114,13 +114,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           copy false,
           user parent-type,
           user parent-block))
-    ; else-if keyword.equal(user "strong")
-    ;   self.variables.add(owner SyntaxTreeVariable.parse-new(
-    ;       user _,
-    ;       copy Access.STRONG,
-    ;       copy false,
-    ;       user parent-type,
-    ;       user parent-block))
+    else-if keyword.equal(user "strong")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          user _,
+          copy Access.STRONG,
+          copy false,
+          user parent-type,
+          user parent-block))
       
     else
       is-parsed := false
@@ -158,7 +158,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     user TypeData item-type-data(user variable.type-instance.type-data)
     if item-type-data is glob.type-array
       item-type-data := variable.type-instance.parameters.first.item.type-data
-    if variable.access = Access.OWNER and not item-type-data.is-primitive
+    if (variable.access = Access.OWNER or variable.access = Access.STRONG) and
+        not item-type-data.is-primitive
       self.write-owner-reference-cleanup(
           user variable, user type-data, user item-type-data)
     else-if type-data? and variable.access = Access.VAR
@@ -175,7 +176,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     write(user "LUMI_")
     if variable.access = Access.VAR
       write(user "var_")
-    else-if variable.access = Access.OWNER
+    else-if variable.access = Access.OWNER or variable.access = Access.STRONG
       write(user "owner_")
     write(user "dec_ref(")
     if type-data?

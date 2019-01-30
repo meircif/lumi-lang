@@ -24,12 +24,12 @@ struct Data{Generic}
 
 func fun0()
 func fun1(copy Int x, user String s, owner String o)
-func fun2()->(owner String s, var Int x)
-func fun3(copy Int x)->(owner String s)
+func fun2()->(strong String s, var Int x)
+func fun3(copy Int x)->(strong String s)
 func fun4(copy Int x)
 func fun5(copy Int x)->(var Int y)
 func fun6(copy Int x, copy Int y)->(var Int n, var Int m)
-func fun7(user Tb tb)->(weak Tb tbo)
+func fun7(weak Tb tb)->(weak Tb tbo)
 
 var Int i
 var Char c
@@ -39,10 +39,10 @@ weak Array{Int} arr
 owner File fobj
 weak Test t
 weak Ta ta
-owner Tb tb
+strong Tb tb
 weak Tc tc
 weak Data{String} d
 weak Array{String} sarr
 
-func mock()->(owner String so, var Int io, user Test to, user Tc tco)
+func mock()->(strong String so, var Int io, user Test to, user Tc tco)
     

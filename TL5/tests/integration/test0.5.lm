@@ -66,7 +66,7 @@ func test-member-expression(owner TestStruct t)->(user TestStruct to, var Int i)
     t.ts.ts.num := 4
     t.fun := test-void
     t.fun()
-    t.new(copy 0, user "")
+    t.new(copy 0, weak "")
 
 
 func test-slice-expression(
@@ -110,13 +110,13 @@ func test-container-expression(copy Int x, copy Int y, user String s)->(
             not s?)
 
 
-func test-variable(copy Int i, user String text, user Array{Int} arr)
+func test-variable(copy Int i, weak String text, user Array{Int} arr)
     var Int x
     user String s
     owner Array{Int} a
     user TestStruct t
     user TestClass d
-    var TestStruct tv(copy 0, user _)
+    var TestStruct tv(copy 0, weak _)
     var TestClass dv
     var String{12} sv
     var Func{(copy Int xi, user String si)->(var Int xo, user String so)} f
@@ -125,7 +125,7 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
     var Array{12:TestClass} da
     var Array{12:String{7}} sa
     var Array{12:Func{()}} fa
-    new TestStruct tn(copy 0, user _)
+    new TestStruct tn(copy 0, weak _)
     new TestClass dn
     new String{arr[0]} sn
     new Array{arr[0]:Int} ian
@@ -138,11 +138,11 @@ func test-variable(copy Int i, user String text, user Array{Int} arr)
     var String{12} isv(user "some string")
     new String{i} isn(user text)
     var Func{(copy Int x)->(owner String s)} fi(copy test-int2str)
-    var TestStruct itv(copy i, user text)
-    new TestStruct itn(copy i, user text)
+    var TestStruct itv(copy i, weak text)
+    new TestStruct itn(copy i, weak text)
     var TestClass idv()
     new TestClass idn()
-    TestStruct(copy i, user text).print()
+    TestStruct(copy i, weak text).print()
     TestClass().print()
     assert String{arr[0]}()?
     assert Array{arr[0]:Int}()?
@@ -208,7 +208,7 @@ struct TestStruct
     owner TestStruct ts
     var Func{()} fun
     
-    new(copy Int x, user String s) _
+    new(copy Int x, weak String s) _
     
     [; Test
     multiline
@@ -219,11 +219,11 @@ struct TestStruct
     func print()
         sys.println(user self.text)
         
-func TestStruct.new(copy Int x, user String s)
+func TestStruct.new(copy Int x, weak String s)
     self.num := x
     self.text := s
     if x < 0
-        self.ts := TestStruct(copy x + 1, user s)
+        self.ts := TestStruct(copy x + 1, weak s)
   
 func TestStruct.get()->(var Int x, user String s)
     x := self.num
@@ -365,9 +365,9 @@ func test-ref-count()
         sys.println(user "ownership passed")
     if not s-user?
         sys.println(user "string deleted")
-    new TestStruct ts(copy 0, user "first struct")
+    new TestStruct ts(copy 0, weak "first struct")
     sys.println(user ts.text)
-    ts.ts := TestStruct(copy 1, user "second struct")
+    ts.ts := TestStruct(copy 1, weak "second struct")
     ts := ts.ts
     sys.println(user ts.text)
 
@@ -379,13 +379,13 @@ struct Data{Generic}
     weak Generic item
     weak Array{Generic} arr
     
-    func set(user Generic item, user Array{Generic} arr) _
+    func set(weak Generic item, weak Array{Generic} arr) _
     
-    func get()->(user Generic item)
+    func get()->(weak Generic item)
         item := self.item
         
-func Data.set(user Generic item, user Array{Generic} arr)
-    user Generic x(user item)
+func Data.set(weak Generic item, weak Array{Generic} arr)
+    weak Generic x(weak item)
     self.item := x
     self.arr := arr
     new Data{Generic} d
@@ -400,7 +400,7 @@ struct MidData{Generic}(Dataset{String:Data{Generic}:Generic})
 
 struct TopData(MidData{TestStruct})
 
-func test-type-parameters(user String s)
+func test-type-parameters(weak String s)
     var Data{String} d
     var Array{6:String{16}} sarr
     d.item := s
@@ -412,14 +412,14 @@ func test-type-parameters(user String s)
     s := ad[2].arr[3]
     var Data{Data{Data{String}}} dr
     s := dr.item.item.item
-    d.set(user s, user sarr)
-    d.get()->(user s)
+    d.set(weak s, weak sarr)
+    d.get()->(weak s)
     user Data dg(user d)
     assert dg?
     
     var TopData t
     var Data{TestStruct} dt
-    var TestStruct ts(copy 0, user _)
+    var TestStruct ts(copy 0, weak _)
     t.item := s
     t.arr := sarr
     t.second := dt
@@ -464,17 +464,17 @@ struct Container{Generic}
     weak Generic value
     weak Container{Generic} next
     
-    new(user Generic value, user Container{Generic} next)
+    new(weak Generic value, weak Container{Generic} next)
         self.value := value
         self.next := next
     
     func iter()->(owner ContainerIterator{Generic} iter)
-        iter := ContainerIterator{Generic}(user self.next)
+        iter := ContainerIterator{Generic}(weak self.next)
 
 struct ContainerIterator{Generic}
     weak Container{Generic} curr
     
-    new(user Container{Generic} first)
+    new(weak Container{Generic} first)
         self.curr := first
     
     func has()->(var Bool has-data)
@@ -528,10 +528,10 @@ func test-for-each()
         sys.print(user " ")
     sys.println(user "]")
     
-    var Container{String} container-last(user "iii", user _)
-    var Container{String} container-mid(user "hhh", user container-last)
-    var Container{String} container-first(user "ggg", user container-mid)
-    var Container{String} container(user _, user container-first)
+    var Container{String} container-last(weak "iii", weak _)
+    var Container{String} container-mid(weak "hhh", weak container-last)
+    var Container{String} container-first(weak "ggg", weak container-mid)
+    var Container{String} container(weak _, weak container-first)
     owner ContainerIterator{String} iter
     container.iter()->(owner iter)
     sys.print(user "values[ ")

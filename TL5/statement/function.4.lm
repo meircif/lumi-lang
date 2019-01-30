@@ -260,7 +260,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst write-param-cleanup()
     for parameter in self.arguments.parameters.iter-back()
       if parameter.access = Access.USER or parameter.access = Access.OWNER or
-          parameter.access = Access.WEAK
+          parameter.access = Access.WEAK or parameter.access = Access.STRONG
         self.write-variable-cleanup(user parameter.get-variable(), user _)
   
   func inst write-cname()
@@ -398,7 +398,7 @@ class DeclarationArgument(Argument)
           user self.variable.type-instance.type-data.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
-      if self.access = Access.OWNER
+      if (self.access = Access.OWNER or self.access = Access.STRONG)
         self.syntax-error-msg(user "owner argument to native function")
       if self.is-output and
           (self.access = Access.USER or self.access = Access.WEAK)

@@ -165,7 +165,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if glob.last-char != ' '
         self.syntax-error-c(user "expected space after \"new\", got")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _, copy Access.OWNER, copy true, user _, user self))
+          user _, copy Access.STRONG, copy true, user _, user self))
       
     else-if keyword.equal(user "try")
       if glob.last-char != '\n'

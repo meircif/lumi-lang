@@ -37,11 +37,12 @@ class InitExpression(ModuleTypeExpression)
       self.aux-variable.result-type.analyze(user self)
     else
       self.add-aux-variable(
-          copy Access.OWNER, copy true, user self.result-type)->(
+          copy Access.STRONG, copy true, user self.result-type)->(
           owner self.aux-variable)
     self.access := self.aux-variable.access
     
-    if self.aux-variable.variable.access = Access.OWNER and
+    if (self.aux-variable.variable.access = Access.OWNER or
+        self.aux-variable.variable.access = Access.STRONG) and
         self.aux-variable.variable.is-create and
         self.result-type.type-data.is-primitive
       self.syntax-error(
@@ -203,7 +204,7 @@ class InitExpression(ModuleTypeExpression)
       write(user "_Refman = ")
       value.write-refman()
       write(user ";\n")
-      if self.access != Access.OWNER
+      if self.access != Access.OWNER and self.access != Access.STRONG
         self.code-node.write-spaces()
         write(user "LUMI_inc_ref(")
         self.aux-variable.write()

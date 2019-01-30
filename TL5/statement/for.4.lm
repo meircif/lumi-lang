@@ -123,9 +123,10 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
       self.syntax-error(
           user "iterator \"get\" method has more than one output in type",
           user self.iterator.result-type.type-data.name)
-    if self.get-func.arguments.outputs.first.item.access = Access.OWNER
+    if self.get-func.arguments.outputs.first.item.access != Access.USER and
+        self.get-func.arguments.outputs.first.item.access != Access.VAR
       self.syntax-error(
-          user "iterator \"get\" method output has \"owner\" access in type",
+          user "iterator \"get\" method output has an illegal access in type",
           user self.iterator.result-type.type-data.name)
     
     self.get-func.arguments.outputs.first.item.get-type-instance().new-replace-params(

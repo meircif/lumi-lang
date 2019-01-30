@@ -525,7 +525,7 @@ assigning into an owner a non-owner access "weak"
 /// @ te12
 assigning into an owner a non-owner access "weak"
 /// @ te13
-assigning into access "weak" invalid access "owner"
+assigning into access "weak" invalid access "strong"
 /// @ te14
 too many parameters
 /// @ te15
@@ -538,6 +538,8 @@ too few outputs
 passing ownership of type "Test" into static type "Base"
 /// @ te19
 assigning into an owner a non-owner access "var"
+/// @ te20
+assigning into a weak reference an illegal access "owner"
 /// @@ test-type-expression
 /// @ t0
 LUMI_err = ut_M_Test_meth(ut_M_t, ut_M_t_Refman);
@@ -907,6 +909,8 @@ passing ownership of type "Tb" into static type "Test"
 operator "is" is not supported for type "Bool"
 /// @ te19
 operator "<" expected "Int" operand, got "Bool"
+/// @ te20
+assigning into a weak reference an illegal access "user"
 /// @@ test-question-expression
 /// @ t0
 ut_M_b = ut_M_str != NULL && ut_M_str_Refman->value != NULL;

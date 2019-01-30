@@ -194,8 +194,8 @@ struct TypeInstance
       return
     if target.type-data is glob.type-ref and not self.type-data.is-primitive
       return
-    if target-access = Access.OWNER
-      if self-access != Access.OWNER
+    if target-access = Access.OWNER or target-access = Access.STRONG
+      if self-access != Access.OWNER and self-access != Access.STRONG
         node.syntax-error(
             user "assigning into an owner a non-owner access",
             user glob.access-names[self-access])
@@ -208,6 +208,11 @@ struct TypeInstance
             user self.type-data.name,
             user "into static type",
             user target.type-data.name)
+    if target-access = Access.WEAK and self-access != Access.WEAK and
+        self-access != Access.STRONG and self-access != Access.VAR
+      node.syntax-error(
+          user "assigning into a weak reference an illegal access",
+          user glob.access-names[self-access])
     if self.type-data is glob.type-generic and
         target.type-data is glob.type-generic
       if not self.name.equal(user target.name)

@@ -195,7 +195,7 @@ class EmptyExpression(Expression)
   new()
     base(user _)
     self.set-simple-type(user glob.type-empty)
-    self.access := Access.OWNER
+    self.access := Access.STRONG
   
   func dynamic write()
     write(user "NULL")

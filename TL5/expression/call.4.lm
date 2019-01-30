@@ -233,7 +233,9 @@ class CallArgument(Argument)
       user TypeInstance type-instance,
       user TypeInstance actual-params,
       copy Int bases)
-    if self.access = Access.OWNER and self.value.access != Access.OWNER
+    if (self.access = Access.OWNER or self.access = Access.STRONG) and
+        self.value.access != Access.OWNER and
+        self.value.access != Access.STRONG
       self.syntax-error(
           user "assigning into an owner a non-owner access",
           user glob.access-names[self.value.access])
@@ -320,7 +322,8 @@ class CallArgument(Argument)
         write(user "_dynamic")
   
   func dynamic write-postactions()
-    if self.access = Access.OWNER and not self.is-output and
+    if (self.access = Access.OWNER or self.access = Access.STRONG) and
+        not self.is-output and
         self.value.result-type.type-data is-not glob.type-empty
       self.code-node.write-spaces()
       self.assignee.write-assign-null()
