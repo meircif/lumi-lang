@@ -521,11 +521,11 @@ cannot assign void expression
 /// @ te10
 expected access "copy" , got "user"
 /// @ te11
-assigning into an owner a non-owner access "user"
+assigning into an owner a non-owner access "weak"
 /// @ te12
-assigning into an owner a non-owner access "user"
+assigning into an owner a non-owner access "weak"
 /// @ te13
-assigning into access "user" invalid access "owner"
+assigning into access "weak" invalid access "owner"
 /// @ te14
 too many parameters
 /// @ te15
@@ -884,7 +884,7 @@ assigning into non assignable expression
 /// @ te7
 assigning into non assignable expression
 /// @ te8
-assigning into an owner a non-owner access "user"
+assigning into an owner a non-owner access "weak"
 /// @ te9
 operator "or" expected "Bool" operand, got "Int"
 /// @ te10
@@ -918,10 +918,10 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
 /// @ t3
 ut_M_b = (*to) != NULL && (*to_Refman)->value != NULL;
 /// @ t4
-if (*to != NULL) RAISE(1, LUMI_block0_cleanup, empty_base_output)
-    LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(*to), &(*to_Refman), (void*)&(*to_Dynamic));
+if (ut_M_t != NULL) RAISE(1, LUMI_block0_cleanup, empty_base_output)
+    LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
     CHECK(1, LUMI_block0_cleanup)
-    ut_M_b = (*to) != NULL && (*to_Refman)->value != NULL;
+    ut_M_b = ut_M_t != NULL && ut_M_t_Refman->value != NULL;
 /// @ t5
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {

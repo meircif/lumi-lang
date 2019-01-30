@@ -141,6 +141,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.is-create and self.type-instance.type-data is glob.type-array
       if self.type-instance.parameters.first.item.type-data is glob.type-generic
         self.syntax-error-msg(user "cannot create generic array")
+    if self.parent-type? and self.access = Access.USER
+      self.syntax-error-msg(user "fields cannot have \"user\" access")
     if self.my-module?
       glob.current-module := _
 

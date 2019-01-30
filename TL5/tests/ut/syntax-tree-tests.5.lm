@@ -290,7 +290,7 @@ func module.error.name()
 ; @ g t0
 struct Test
     var Int x
-    user String str
+    weak String str
 ; @ g t1
 struct Test
     var Int x
@@ -915,7 +915,7 @@ test fun1()
 mock Test.delete()
     var Ref r(copy self)
 struct Test
-    user String s
+    weak String s
 ; @ g tmg1
 mock delete()
     var Ref r(copy self)
@@ -1068,7 +1068,7 @@ native var String s
 ; @ g t0
 struct Test{Generic}
     owner Generic item
-    user Array{Generic} arr
+    weak Array{Generic} arr
     func set(owner Generic item, user Array{Generic} arr)
         owner Generic x(owner item)
         self.item := x
@@ -1083,9 +1083,9 @@ struct Test{Generic}
         item := self.item
 ; @ g t2
 struct Test{First:Second:Third}
-    user First first
-    user Second second
-    user Third third
+    weak First first
+    weak Second second
+    weak Third third
     func set(user First first, user Second second, user Third third)
         self.first := first
         self.second := second
@@ -1122,7 +1122,7 @@ str := dr.item.item.item
 ; @ c t12
 d.set(owner so, user sarr)
 ; @ c t13
-d.get()->(user str)
+d.get()->(weak str)
 d.get().clear()
 ; @ c t14
 var Data dg
@@ -1132,7 +1132,7 @@ user Data dg(user d)
 Data{String}.set(user d, owner so, user sarr)
 ; @ g t17
 struct Test{Generic}
-    user Test{Generic} next
+    weak Test{Generic} next
     func meth()
         self.next := self
 ; @ c t18
@@ -1141,14 +1141,14 @@ dt.item := tc
 ta := dt.item
 owner Tc otc
 dt.set(owner otc, user _)
-dt.get()->(user ta)
+dt.get()->(weak ta)
 i := dt.get().numa
-fun7(user dt.item)->(user dt.item)
+fun7(user dt.item)->(weak dt.item)
 user Tb tb2(user dt.item)
 tb2 := dt.item
 ; @ g t19
 struct Base{Generic}
-    user Generic item
+    weak Generic item
     func get()->(user Generic item)
 struct Test(Base{String})
     func set(user String text)
@@ -1162,7 +1162,7 @@ func mock(user Test test, user String text)
     test.get().clear()
 ; @ g t20
 class Base{Param}
-    user Param item
+    weak Param item
     func dynamic set(user Param item)
     func dynamic get()->(user Param item)
 class Test{Generic}(Base{Generic})
@@ -1174,7 +1174,7 @@ func mock(user Test{String} test, user String text)
     test.get().clear()
 ; @ g t21
 struct Test{Param}
-    user Param item
+    weak Param item
     func meth(user Param in)->(user Param out) _
 func Test.meth(user Param in)->(user Param out)
     user Param p(user in)
@@ -1188,27 +1188,27 @@ struct Test{Generic}
     var Generic error
 ; @ eg teg2
 struct Test{Generic}
-    user Generic item
+    weak Generic item
     func meth(copy Generic error)
 ; @ eg teg3
 struct Test{Generic}
-    user Generic item
+    weak Generic item
     func meth(user String s)
         self.item := s
 ; @ eg teg4
 struct Test{Generic}
-    user Generic item
+    weak Generic item
     func meth(user String s)
         s := self.item
 ; @ eg teg5
 struct Test{Generic}
-    user Generic item
+    weak Generic item
     func meth()
         var Generic error
 ; @ eg teg6
 struct Test{First:Second}
-    user First first
-    user Second second
+    weak First first
+    weak Second second
     func meth()
         self.first := self.second
 ; @ eg teg7
@@ -1216,43 +1216,43 @@ struct Test{error}
     var Int x
 ; @ eg teg8
 struct Test{Generic}
-    user Array{Generic} arr
+    weak Array{Generic} arr
     func meth()
         user Generic x
         x := self.arr[2]
 ; @ eg teg9
 struct Test{Generic}
-    user Array{Generic} arr
+    weak Array{Generic} arr
     func meth()
         var Array{12:Generic} arr
 ; @ eg teg10
 struct Test{Generic}
-    user Array{Generic} arr
+    weak Array{Generic} arr
     func meth()
         self.arr := Array{12:Generic}()
 ; @ eg teg11
 struct Test{First:Second:Third}
-    user First first
-    user Second second
-    user Third third
+    weak First first
+    weak Second second
+    weak Third third
 func meth(user Test{String:String} t)
     user Test{String:String:String} error(user t)
 ; @ eg teg12
 struct Base{Param}
-    user Param item
+    weak Param item
 struct Error(Base)
 ; @ eg teg13
 struct Base
-    user Int x
+    weak Int x
 struct Error(Base{String})
 ; @ eg teg14
 struct Base{Param}
-    user Param item
+    weak Param item
 struct Error(Base{String:String})
 ; @ eg teg15
 struct Base{Param0:Param1}
-    user Param0 item0
-    user Param1 item1
+    weak Param0 item0
+    weak Param1 item1
 struct Error(Base{String})
 ; @ ec tec0
 var Data{Int} error
@@ -1275,7 +1275,7 @@ var Data{Array{Int}} error
 ; @@ test-parameter-inheritance
 ; @ g t0
 struct Base{Generic}
-    user Generic item
+    weak Generic item
 struct Test(Base{String})
     func set(user String s)
         self.item := s
@@ -1285,7 +1285,7 @@ func use(user String s)
     t.item := s
 ; @ g t1
 struct Base{Generic}
-    user Generic item
+    weak Generic item
 struct Test{Param}(Base{Param})
     func set(user Param i, user String s)
         self.item := i
@@ -1295,7 +1295,7 @@ func use(user String s)
     t.item := s
 ; @ g t2
 struct Base{Pbase}
-    user Pbase item
+    weak Pbase item
     func set(user Pbase i)
 struct Mid{Pmid}(Base{Pmid})
     func set(user Pmid i)
@@ -1315,7 +1315,7 @@ func use(user String s)
     t.item := s
 ; @ g t3
 struct Base{Generic}
-    user Generic item
+    weak Generic item
 struct Test{Generic}(Base{Generic})
     func set(user Generic i, user String s)
         self.item := i
@@ -1325,10 +1325,10 @@ func use(user String s)
     t.item := s
 ; @ g t4
 struct Base{First:Second}
-    user First first
-    user Second second
+    weak First first
+    weak Second second
 struct Mid{Param:Third}(Base{Param:Sys})
-    user Third third
+    weak Third third
     func set(user Param first, user Sys second, user Third third)
         self.first := first
         self.second := second
@@ -1350,9 +1350,9 @@ func use(user String first, user Sys second, user File third)
     t.third := third
 ; @ g t5
 struct First{FirstGeneric}
-    user FirstGeneric item
+    weak FirstGeneric item
 struct Second{SecondGeneric}
-    user SecondGeneric item
+    weak SecondGeneric item
 struct Test{Generic}(First{Second{Generic}})
     func set(user Generic g, user Second{Generic} sg)
         self.item := sg
@@ -1363,7 +1363,7 @@ func use(user String s, user Second{String} ss)
     t.item.item := s
 ; @ g t6
 struct BaseGen{FirstGeneric}
-    user FirstGeneric item
+    weak FirstGeneric item
 struct TestGen{SecondGeneric}(BaseGen{SecondGeneric})
 struct Base
     var Int x
@@ -1380,24 +1380,24 @@ func test()
     bb := tt
 ; @ eg te0
 struct Base{Generic}
-    user Generic item
+    weak Generic item
 struct Test{Param}(Base{Param})
-    user Generic error
+    weak Generic error
 ; @ eg te1
 struct Base{Generic}
-    user Generic item
+    weak Generic item
 struct Test(Base{String})
     func set(user File error)
         self.item := error
 ; @ eg te2
 struct Base{Generic}
-    user Generic item
+    weak Generic item
 struct Test{Param}(Base{Param})
     func set(user String error)
         self.item := error
 ; @ eg te3
 struct Base{Pbase}
-    user Pbase item
+    weak Pbase item
 struct Mid{Pmid}(Base{Pmid})
 struct Top(Mid{String})
 struct Test(Top)
@@ -1473,7 +1473,7 @@ func fun()->(var Int i)
         i := n
 ; @ g t1
 struct TestIterator
-    user String value
+    weak String value
     func has()->(var Bool has-data)
     func get()->(user String text)
     func next()
@@ -1482,7 +1482,7 @@ func fun(user TestIterator iter)->(user String s)
         s := t
 ; @ g t2
 struct TestIterator{Generic}
-    user Generic item
+    weak Generic item
     func has()->(var Bool has-data)
     func get()->(user Generic item)
     func next()
@@ -1497,7 +1497,7 @@ func fun(user TestIterator{String} siter, user TestIterator{Test} titer)->(
         ot := t
 ; @ g t3
 class TestIterator{Generic}
-    user Generic item
+    weak Generic item
     func dynamic has()->(var Bool has-data)
     func dynamic get()->(user Generic item)
     func dynamic next()
@@ -1627,7 +1627,7 @@ class Astruct
     var Int x
     func dynamic meth()
 class Bstruct(Astruct)
-    user Bstruct b
+    weak Bstruct b
     func dynamic meth()
 ; @ eg te0
 struct Test
@@ -1944,7 +1944,7 @@ func fun(owner String s)
 struct Aa
     owner String s
 struct Bb
-    user Aa a
+    weak Aa a
 func fun(owner Array{Bb} b)
     b[3].a.s := _
 ; @ eg teo11
@@ -1998,6 +1998,9 @@ func deleting()->(owner String s)
 func fun(user String s)->(owner String so, var Char c)
     deleting()->(owner so)
     c := s[2]
+; @ eg teu6
+struct Error
+    user String s
 ; @ ec tec0
 str := str
 ; @

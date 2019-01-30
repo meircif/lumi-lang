@@ -1,6 +1,6 @@
 struct Test
     var Int num
-    user Test t
+    weak Test t
     var Func{()} fun
     new(copy Int num)
     func meth()
@@ -17,10 +17,10 @@ class Tc(Tb)
     func inst methc()
     func dynamic dyn()
 struct Data{Generic}
-    user Generic item
-    user Array{Generic} arr
+    weak Generic item
+    weak Array{Generic} arr
     func set(owner Generic item, user Array{Generic} arr)
-    func get()->(user Generic item)
+    func get()->(weak Generic item)
 
 func fun0()
 func fun1(copy Int x, user String s, owner String o)
@@ -29,20 +29,20 @@ func fun3(copy Int x)->(owner String s)
 func fun4(copy Int x)
 func fun5(copy Int x)->(var Int y)
 func fun6(copy Int x, copy Int y)->(var Int n, var Int m)
-func fun7(user Tb tb)->(user Tb tbo)
+func fun7(user Tb tb)->(weak Tb tbo)
 
 var Int i
 var Char c
 var Bool b
-user String str
-user Array{Int} arr
+weak String str
+weak Array{Int} arr
 owner File fobj
-user Test t
-user Ta ta
+weak Test t
+weak Ta ta
 owner Tb tb
-user Tc tc
-user Data{String} d
-user Array{String} sarr
+weak Tc tc
+weak Data{String} d
+weak Array{String} sarr
 
 func mock()->(owner String so, var Int io, user Test to, user Tc tco)
     

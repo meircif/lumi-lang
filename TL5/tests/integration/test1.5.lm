@@ -7,8 +7,8 @@ module integration
 
 class TopType(covered.MiddleType)
     var Int num-top
-    user BaseType top-base-ref
-    user covered.MiddleType top-mid-ref
+    weak BaseType top-base-ref
+    weak covered.MiddleType top-mid-ref
     
     new()
         base()
@@ -43,8 +43,8 @@ class TopType(covered.MiddleType)
 
 class BaseType
     var Int num-base
-    user covered.MiddleType base-mid-ref
-    user TopType base-top-ref
+    weak covered.MiddleType base-mid-ref
+    weak TopType base-top-ref
     
     new()
         self.num-base := 1
@@ -157,7 +157,7 @@ struct Link
 
 class BaseLink
     owner BaseLink next
-    user Link link
+    weak Link link
     
     func dynamic m-meth()
         ; do nothing

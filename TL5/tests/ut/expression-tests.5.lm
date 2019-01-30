@@ -246,7 +246,7 @@ i()
 ; @ ec te7
 fun5(copy 0)->(var 4)
 ; @ ec te8
-fun7(user _)->(user tc)
+fun7(user _)->(weak tc)
 ; @ ec te9
 fun5(copy i := 1)
 ; @ ec te10
@@ -256,7 +256,7 @@ fun1(copy 3, user str, owner str)
 ; @ ec te12
 fun3(copy 3)->(owner str)
 ; @ ec te13
-fun7(user _)->(user tb)
+fun7(user _)->(weak tb)
 ; @ ec te14
 fun0(copy i)
 ; @ ec te15
@@ -460,10 +460,10 @@ b := t.fun?
 ; @ c t3
 b := to?
 ; @ c t4
-b := fun7(user _)->(user to)?
+b := fun7(user _)->(weak t)?
 ; @ g t5
 struct Test
-    user String s
+    weak String s
     func meth()->(var Bool res)
         res := self.s?
 ; @ ec te0
@@ -505,7 +505,7 @@ tc.dyn()
 ; @ c t14
 tco.dyn()
 ; @ c t15
-fun7(user tc)->(user ta)
+fun7(user tc)->(weak ta)
 ; @ g t16
 class Test
     var Int x

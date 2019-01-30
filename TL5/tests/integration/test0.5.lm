@@ -201,7 +201,7 @@ struct TestStruct
     ~~~ Test
     multiline
     documentation ~~~
-    user String text
+    weak String text
     
     ; comment test
     
@@ -232,7 +232,7 @@ func TestStruct.get()->(var Int x, user String s)
 
 class TestClass
     var Int num
-    user String text
+    weak String text
     owner TestClass tc
     
     new()
@@ -376,8 +376,8 @@ func remove(owner String s)
 
 
 struct Data{Generic}
-    user Generic item
-    user Array{Generic} arr
+    weak Generic item
+    weak Array{Generic} arr
     
     func set(user Generic item, user Array{Generic} arr) _
     
@@ -393,8 +393,8 @@ func Data.set(user Generic item, user Array{Generic} arr)
     self.item := d.item
 
 struct Dataset{First:Second:Third}(Data{First})
-    user Second second
-    user Third third
+    weak Second second
+    weak Third third
 
 struct MidData{Generic}(Dataset{String:Data{Generic}:Generic})
 
@@ -461,8 +461,8 @@ func test-error-handling(user TestStruct t)
 
 
 struct Container{Generic}
-    user Generic value
-    user Container{Generic} next
+    weak Generic value
+    weak Container{Generic} next
     
     new(user Generic value, user Container{Generic} next)
         self.value := value
@@ -472,7 +472,7 @@ struct Container{Generic}
         iter := ContainerIterator{Generic}(user self.next)
 
 struct ContainerIterator{Generic}
-    user Container{Generic} curr
+    weak Container{Generic} curr
     
     new(user Container{Generic} first)
         self.curr := first
@@ -542,7 +542,7 @@ func test-for-each()
 
 
 class ComplexField
-    user ComplexField x
+    weak ComplexField x
     func dynamic meth()
         sys.print(user "$")
 

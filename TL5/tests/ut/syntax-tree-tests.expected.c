@@ -1381,7 +1381,7 @@ access should be "copy" for primitive types, got "user"
 /// @ te21
 assigning into access "owner" invalid access "user"
 /// @ te22
-assigning into an owner a non-owner access "user"
+assigning into an owner a non-owner access "weak"
 /// @ te23
 more than one subtype for array
 /// @ te24
@@ -5892,6 +5892,8 @@ using potentially illegal reference "s"
 using potentially illegal reference "s"
 /// @ teu5
 using potentially illegal reference "s"
+/// @ teu6
+fields cannot have "user" access
 /// @ tec0
 assigning reference into itself
 /// @
