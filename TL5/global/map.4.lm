@@ -47,6 +47,24 @@ struct NameMap{Generic}
       node := node.next
     self.add(user name, user value)
   
+  func remove(user Generic value)
+    if not self.first?
+      return
+    if self.first.value is value
+      if self.last is self.first
+        self.last := _
+      self.first := self.first.next
+      return
+    user NameMapNode{Generic} node(user self.first)
+    do
+      while node.next?
+      if node.next.value is value
+        if self.last is node.next
+          self.last := node
+        node.next := node.next.next
+        return
+      node := node.next
+  
   func iter()->(owner NameMapIterator{Generic} iter)
     iter := NameMapIterator{Generic}(user self)
 

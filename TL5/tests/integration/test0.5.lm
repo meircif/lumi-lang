@@ -61,6 +61,7 @@ func test-const-expression()->(
 
 
 func test-member-expression(owner TestStruct t)->(user TestStruct to, var Int i)
+    to := t
     t.num := to.num + t.ts.num + t.ts.ts.num
     to.num := t.num
     t.ts.ts.num := 4

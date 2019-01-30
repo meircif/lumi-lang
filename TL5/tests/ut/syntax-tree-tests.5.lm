@@ -1898,37 +1898,18 @@ func fun()
     deleting()->(strong so)
     s.clear()
 ; @ eg teo0
-func fun(owner String s)
-    s := _
-    s.clear()
-; @ eg teo1
-struct Test
-    owner String s
-func fun(owner Test t, owner String stt)
-    t.s := _
-    t.s.clear()
-; @ eg teo2
-func fun(owner String si)->(owner String so)
-    so := si
-    si.clear()
-; @ eg teo3
-func taker(owner String s)
-func fun(owner String s)
-    taker(owner s)
-    s.clear()
-; @ eg teo4
 struct Test
     owner String s
 func fun(user Test t)
     t.s := String{12}()
-; @ eg teo5
+; @ eg teo1
 struct Aa
     var Int x
 struct Bb
     owner Aa a
 func fun(user Bb b)
     owner Aa a(owner b.a)
-; @ eg teo6
+; @ eg teo2
 struct Aa
     var Int x
 struct Bb
@@ -1936,34 +1917,21 @@ struct Bb
 func take(owner Aa a)
 func fun(user Bb b)
     take(owner b.a)
-; @ eg teo7
-struct Test
-    owner Test t
-func fun(owner Test t)
-    t.t := t
-; @ eg teo8
-func taker(owner String s)->(var Int x)
-func fun(owner String s)
-    s.length := taker(owner s)
-; @ eg teo9
-func taker(owner String s1, owner String s2)
-func fun(owner String s)
-    taker(owner s, owner s)
-; @ eg teo10
+; @ eg teo3
 struct Aa
     owner String s
 struct Bb
     weak Aa a
 func fun(owner Array{Bb} b)
     b[3].a.s := _
-; @ eg teo11
+; @ eg teo4
 struct Test
     owner String s
 func get-user()->(user Test t)
 func fun()
     user Test t
     get-user()->(user t).s := _
-; @ eg teo12
+; @ eg teo5
 struct Test
     owner String s
 func get-user()->(user Test t)
@@ -2007,9 +1975,9 @@ func deleting()->(owner String s)
 func fun(user String s)->(owner String so, var Char c)
     deleting()->(owner so)
     c := s[2]
-; @ eg teu6
-struct Error
-    user String s
 ; @ ec tec0
 str := str
+; @ eg tec1
+struct Error
+    user String s
 ; @

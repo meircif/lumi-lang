@@ -10,9 +10,6 @@ struct ReferencePath
     self.variable := variable
 
   func copy-new()->(owner ReferencePath reference)
-    if not self?
-      reference := _
-      return
     reference := ReferencePath(user self.variable)
     if self.field?
       self.field.copy-new()->(owner reference.field)
@@ -34,7 +31,7 @@ struct ReferencePath
       is-equal := false
       return
     if self.field?
-      self.field.equals(user reference.field)->(var is-equal)
+      ; self.field.equals(user reference.field)->(var is-equal)
     else
       is-equal := true
   
@@ -73,39 +70,62 @@ struct ReferenceMemory
   var Bool usable
 
   new(user SyntaxTreeVariable variable)
-    self.path.new(user variable)
-    self.usable := true
+    ; self.path.new(user variable)
+    ; self.usable := true
 
 
 ~~~ List of memory managed references ~~~
 struct ReferenceMemoryList
   var List{ReferenceMemory} references
+  var NameMap{SyntaxTreeVariable} user-references
   
   func add(user SyntaxTreeVariable variable)
-    self.references.add(owner ReferenceMemory(user variable))
+    ; self.references.add(owner ReferenceMemory(user variable))
+    if variable.access = Access.USER
+      self.user-references.add-if-unique-value(
+          user variable.name, user variable)
   
   func mark-illegal-type(user TypeData type-data)
-    for reference in self.references.iter()
-      if type-data is reference.path.variable.type-instance.type-data
-        reference.usable := false
+    ; for reference in self.references.iter()
+    ;   if type-data is reference.path.variable.type-instance.type-data
+    ;     reference.usable := false
+    var NameMap{SyntaxTreeVariable} to-delete
+    for variable in self.user-references.iter()
+      if type-data is variable.type-instance.type-data
+        to-delete.add(user variable.name, user variable)
+    for variable in to-delete.iter()
+      self.user-references.remove(user variable)
   
   func mark-reference(user ReferencePath reference-path, copy Bool usable)
-    for reference in self.references.iter()
-      if reference.path.equals(user reference-path)
-        reference.usable := usable
-        return
-    new ReferenceMemory reference-memory(user reference-path.variable)
-    reference-path.field.copy-new()->(owner reference-memory.path.field)
-    reference-memory.usable := usable
-    self.references.add(owner reference-memory)
+    ; for reference in self.references.iter()
+    ;   if reference.path.equals(user reference-path)
+    ;     reference.usable := usable
+    ;     return
+    ; new ReferenceMemory reference-memory(user reference-path.variable)
+    ; reference-path.field.copy-new()->(owner reference-memory.path.field)
+    ; reference-memory.usable := usable
+    ; self.references.add(owner reference-memory)
   
   func check-expression(user Expression expression)
-    for reference in self.references.iter()
-      if expression.result-type.reference-path.equals(user reference.path)
-        if not reference.usable
-          expression.print-syntax-error-header()
-          sys.print(user "using potentially illegal reference \"")
-          expression.result-type.reference-path.print()
-          sys.print(user "\"\n")
-          sys.exit(copy 1)
+    ; for reference in self.references.iter()
+    ;   if expression.result-type.reference-path.equals(user reference.path)
+    ;     if not reference.usable
+    ;       expression.print-syntax-error-header()
+    ;       sys.print(user "using potentially illegal reference \"")
+    ;       expression.result-type.reference-path.print()
+    ;       sys.print(user "\"\n")
+    ;       sys.exit(copy 1)
+    ;     return
+  
+  func check-user(user Expression expression)
+    user ReferencePath exp-path(user expression.result-type.reference-path)
+    if not exp-path?
+      return
+    if exp-path.field? or exp-path.variable.access != Access.USER
+      return
+    for variable in self.user-references.iter()
+      if variable is exp-path.variable
         return
+    expression.syntax-error(
+        user "using potentially illegal user reference",
+        user exp-path.variable.name)

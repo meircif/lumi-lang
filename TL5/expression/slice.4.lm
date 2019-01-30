@@ -78,6 +78,7 @@ class SliceExpression(Expression)
     self.index.check-memory(user refs)
     if self.second-index?
       self.second-index.check-memory(user refs)
+    refs.check-user(user self.sequence)
   
   func dynamic write-preactions()
     self.sequence.write-preactions()

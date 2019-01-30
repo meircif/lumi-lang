@@ -46,7 +46,7 @@ test fail-member-empty()
 
 test fail-member-outdated()
     new BaseType obj-owner
-    user BaseType obj(user obj-owner)
+    weak BaseType obj(weak obj-owner)
     obj-owner := _
     assert obj.x = 0
     obj.meth()

@@ -198,7 +198,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       self.syntax-error(user "illegal dynamic in function", user self.name)
     
   func dynamic check-memory(user ReferenceMemoryList global-refs)
-    ; do stuff
     var ReferenceMemoryList refs
     self.arguments.check-memory(user refs)
     self.check-children-memory(user self.variables, user refs)

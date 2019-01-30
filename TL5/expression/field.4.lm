@@ -95,6 +95,7 @@ class FieldExpression(Expression)
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.instance.check-memory(user refs)
     refs.check-expression(user self)
+    refs.check-user(user self.instance)
 
   func dynamic write-preactions()
     self.instance.write-preactions()

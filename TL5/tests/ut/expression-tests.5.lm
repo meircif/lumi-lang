@@ -113,8 +113,10 @@ i := tc.numb
 ; @ c t2
 i := tc.num
 ; @ c t3
+to := t
 i := to.num
 ; @ c t4
+tco := tc
 i := tco.num
 ; @ c t5
 i := t.t.num
@@ -195,6 +197,7 @@ so := fun3(copy 7)
 ; @ c t10
 t.meth()
 ; @ c t11
+to := t
 to.meth()
 ; @ c t12
 tc.methc()
@@ -203,6 +206,7 @@ tc.methb()
 ; @ c t14
 tc.meth()
 ; @ c t15
+tco := tc
 tco.meth()
 ; @ c t16
 t.t.meth()
@@ -223,6 +227,7 @@ class Test
     var Int x
     func dynamic meth()
 func mock()->(user Test t)
+    t := Test()
     mock()->(user t).meth()
 ; @ g t21
 class Test
@@ -508,6 +513,7 @@ tb.dyn()
 ; @ c t13
 tc.dyn()
 ; @ c t14
+tco := tc
 tco.dyn()
 ; @ c t15
 fun7(weak tc)->(weak ta)
@@ -516,6 +522,7 @@ class Test
     var Int x
     func dynamic meth()
 func mock()->(user Test t)
+    t := Test()
     t.meth()
 ; @ g t17
 class Base

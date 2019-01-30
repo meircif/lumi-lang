@@ -325,16 +325,29 @@ test test-list()
 test test-name-map()
   var tl5-compiler.NameMap{String} map
   assert not map.find(user "name1")?
-  map.add(user "name1", user "value1")
+  map.remove(user "name1")
+  user String value1(user "value1")
+  map.add(user "name1", user value1)
   assert-string(user "value1", user map.find(user "name1"))
   assert not map.find(user "name2")?
   map.add(user "name2", user "value2")
   assert-string(user "value1", user map.find(user "name1"))
   assert-string(user "value2", user map.find(user "name2"))
-  map.update-or-add(user "name3", user "value3")
+  user String value3(user "value3")
+  map.update-or-add(user "name3", user value3)
   assert-string(user "value3", user map.find(user "name3"))
-  map.update-or-add(user "name2", user "value2x")
+  user String value2(user "value2x")
+  map.update-or-add(user "name2", user value2)
   assert-string(user "value2x", user map.find(user "name2"))
+  map.remove(user value3)
+  assert-string(user "value1", user map.find(user "name1"))
+  assert-string(user "value2x", user map.find(user "name2"))
+  assert not map.find(user "name3")?
+  map.remove(user value2)
+  assert-string(user "value1", user map.find(user "name1"))
+  assert not map.find(user "name2")?
+  map.remove(user value1)
+  assert not map.find(user "name1")?
 
 
 ; Illegal call tests

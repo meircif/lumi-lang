@@ -391,7 +391,7 @@ struct Global
     if variable-type.is-primitive
       variable.access := Access.VAR
     else
-      variable.access := Access.USER
+      variable.access := Access.OWNER
     variable-type.new-type-instance()->(owner variable.type-instance)
     if variable-subtype?
       variable.type-instance.add-subtype-copy(user variable-subtype)

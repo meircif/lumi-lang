@@ -168,29 +168,33 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.right-expression.check-memory(user refs)
-    if self.left-expression.result-type.reference-path?
-      refs.mark-reference(
-          user self.left-expression.result-type.reference-path,
-          copy true)
+    user ReferencePath left-path(
+        user self.left-expression.result-type.reference-path)
+    if left-path?
+      refs.mark-reference(user left-path, copy true)
     var Bool check-left(copy true)
-    if self.left-expression.access = Access.OWNER
-      if self.left-expression.result-type.reference-path? and
+    if self.left-expression.access = Access.OWNER or
+        self.left-expression.access = Access.STRONG
+      refs.mark-illegal-type(user self.left-expression.result-type.type-data)
+      if left-path? and
           self.right-expression.result-type.type-data is glob.type-empty
-        refs.mark-reference(
-            user self.left-expression.result-type.reference-path, copy false)
+        refs.mark-reference(user left-path, copy false)
         check-left := false
       if self.right-expression.access = Access.OWNER or
           self.right-expression.access = Access.STRONG
         ; move
-        if self.right-expression.result-type.reference-path?
-          refs.mark-reference(
-              user self.right-expression.result-type.reference-path, copy false)
-        self.left-expression.result-type.reference-path.check-pure-owner(
-            user self)
-        self.right-expression.result-type.reference-path.check-pure-owner(
-            user self)
+        user ReferencePath right-path(
+            user self.right-expression.result-type.reference-path)
+        if right-path?
+          refs.mark-reference(user right-path, copy false)
+        left-path.check-pure-owner(user self)
+        right-path.check-pure-owner(user self)
     if check-left
       self.left-expression.check-memory(user refs)
+    refs.check-user(user self.right-expression)
+    if left-path?
+      if not left-path.field?
+        refs.add(user left-path.variable)
         
   func dynamic write-preactions()
     self.right-expression.write-preactions()

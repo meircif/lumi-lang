@@ -5861,45 +5861,31 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @ teo0
-using potentially illegal reference "s"
+cannot modify owner field "s" in non-owner reference "t.s"
 /// @ teo1
-using potentially illegal reference "t.s"
+cannot modify owner field "a" in non-owner reference "b.a"
 /// @ teo2
-using potentially illegal reference "si"
+cannot modify owner field "a" in non-owner reference "b.a"
 /// @ teo3
-using potentially illegal reference "s"
+cannot modify owner field "s" in non-owner reference "b.a.s"
 /// @ teo4
 cannot modify owner field "s" in non-owner reference "t.s"
 /// @ teo5
-cannot modify owner field "a" in non-owner reference "b.a"
-/// @ teo6
-cannot modify owner field "a" in non-owner reference "b.a"
-/// @ teo7
-using potentially illegal reference "t"
-/// @ teo8
-using potentially illegal reference "s"
-/// @ teo9
-using potentially illegal reference "s"
-/// @ teo10
-cannot modify owner field "s" in non-owner reference "b.a.s"
-/// @ teo11
-cannot modify owner field "s" in non-owner reference "t.s"
-/// @ teo12
 cannot modify owner field "s" in non-owner reference "{anonymous}.s"
 /// @ teu0
-using potentially illegal reference "s"
+using potentially illegal user reference "s"
 /// @ teu1
-using potentially illegal reference "s"
+using potentially illegal user reference "s"
 /// @ teu2
-using potentially illegal reference "s"
+using potentially illegal user reference "s"
 /// @ teu3
-using potentially illegal reference "s"
+using potentially illegal user reference "s"
 /// @ teu4
-using potentially illegal reference "s"
+using potentially illegal user reference "s"
 /// @ teu5
-using potentially illegal reference "s"
-/// @ teu6
-fields cannot have "user" access
+using potentially illegal user reference "s"
 /// @ tec0
 assigning reference into itself
+/// @ tec1
+fields cannot have "user" access
 /// @
