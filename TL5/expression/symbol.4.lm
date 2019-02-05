@@ -177,8 +177,8 @@ class FunctionExpression(Expression)
             user self-instance)
         return
         
-    self.code-node.get-function().calling-functions.add-if-unique-value(
-        user self.function.name, user self.function)
+    self.code-node.get-function().call-group-builder.add-calling(
+        user self.function)
     expression := FunctionCallExpression(
         user self.code-node,
         user self,

@@ -65,6 +65,15 @@ struct NameMap{Generic}
         return
       node := node.next
   
+  func pop()->(user Generic value)
+    if not self.first?
+      value := _
+      return
+    value := self.first.value
+    self.first := self.first.next
+    if not self.first?
+      self.last := _
+  
   func iter()->(owner NameMapIterator{Generic} iter)
     iter := NameMapIterator{Generic}(user self)
 

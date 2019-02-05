@@ -257,6 +257,14 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
     base()
     self.analyze-children(user self.functions)
   
+  func inst collect-call-groups()
+    for function in self.functions.iter()
+      function.collect-call-group()
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    base(user refs)
+    self.check-children-memory(user self.functions, user refs)
+  
   func inst write-functions-declaration()
     for function in self.functions.iter()
       function.write-declaration()

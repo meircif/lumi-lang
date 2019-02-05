@@ -5,17 +5,19 @@ module tl5-compiler
 class SyntaxTreeFunction(SyntaxTreeBlock)
   var List{TypeCount} aux-variables
   var NameMap{SyntaxTreeVariable} function-variables
-  var NameMap{SyntaxTreeFunction} calling-functions
-  var NameMap{TypeData} deleting-types
-  user TypeData parent-type
+  var FunctionArguments arguments
   owner String name
   owner String type-name
   owner String module-name
+  owner CallGroup call-group-owner
+  owner CallGroupBuilder call-group-builder-owner
+  user TypeData parent-type
   user ModuleMembers my-module
-  var FunctionArguments arguments
   user SyntaxTreeFunction implemented-function
   user SyntaxTreeMockFunction mocker-function
   user SyntaxTreeFunction dynamic-base-method
+  user CallGroup call-group
+  user CallGroupBuilder call-group-builder
   var Int dynamic-base-count
   var Int block-count
   var Bool is-dynamic
@@ -49,6 +51,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   new()
     self.set-location()
     self.arguments.new()
+    self.call-group-builder-owner := CallGroupBuilder(user self)
+    self.call-group-builder := self.call-group-builder-owner
   
   func inst parse-body()
     if self.header-only
@@ -196,6 +200,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst compare(user SyntaxTreeFunction other)
     if self.is-dynamic != other.is-dynamic
       self.syntax-error(user "illegal dynamic in function", user self.name)
+    
+  func inst collect-call-group()->(user CallGroupBuilder recursive)
+    if self.call-group?
+      return
+    self.call-group-builder.build()->(user recursive)
     
   func dynamic check-memory(user ReferenceMemoryList global-refs)
     var ReferenceMemoryList refs
@@ -402,14 +411,13 @@ class DeclarationArgument(Argument)
       if self.is-output and
           (self.access = Access.USER or self.access = Access.WEAK)
         self.syntax-error-msg(user "user output to native function")
-      
   
   func dynamic get-type-instance()->(user TypeInstance type-instance)
     type-instance := self.variable.type-instance
   
   func dynamic get-variable()->(user SyntaxTreeVariable variable)
     variable := self.variable
-
+  
   func dynamic check-memory(user ReferenceMemoryList refs)
     if not self.is-output and
         (self.access = Access.USER or self.access = Access.OWNER)

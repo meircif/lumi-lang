@@ -129,3 +129,75 @@ struct ReferenceMemoryList
     expression.syntax-error(
         user "using potentially illegal user reference",
         user exp-path.variable.name)
+
+
+struct CallGroup
+  owner NameMap{TypeData} deleting-types
+  
+  new(owner NameMap{TypeData} deleting-types)
+    self.deleting-types := deleting-types
+
+
+struct CallGroupBuilder(CallGroup)
+  var NameMap{SyntaxTreeFunction} calling-functions
+  var NameMap{SyntaxTreeFunction} members
+  user SyntaxTreeFunction owner-member
+  var Bool working
+  
+  new(user SyntaxTreeFunction owner-member)
+    base(owner NameMap{TypeData}())
+    self.owner-member := owner-member
+    self.members.add(user self.owner-member.name, user self.owner-member)
+  
+  func add-calling(user SyntaxTreeFunction function)
+    self.calling-functions.add-if-unique-value(
+        user function.name, user function)
+
+  func add-deleting(user TypeData type-data)
+    self.deleting-types.add-if-unique-value(user type-data.name, user type-data)
+
+  func build()->(user CallGroupBuilder recursive)
+    if self.working
+      recursive := self
+      return
+    self.working := true
+    do
+      user SyntaxTreeFunction function
+      while self.calling-functions.pop()->(user function)?
+      if function.collect-call-group()->(user recursive)?
+        if recursive is self
+          recursive := _
+          continue
+        recursive.merge-from(user self)
+        return
+      self.extend(user function.call-group)
+    self.done()
+  
+  func merge-from(user CallGroupBuilder other)
+    self.extend(user other)
+    user SyntaxTreeFunction function
+    do
+      while other.members.pop()->(user function)?
+      self.members.add(user function.name, user function)
+      function.call-group-builder := self
+    do
+      while other.calling-functions.pop()->(user function)?
+      self.calling-functions.add-if-unique-value(
+          user function.name, user function)
+    other.kill()
+  
+  func extend(user CallGroup call-group)
+    for type-data in call-group.deleting-types.iter()
+      self.deleting-types.add-if-unique-value(
+          user type-data.name, user type-data)
+  
+  func done()
+    self.owner-member.call-group-owner := CallGroup(owner self.deleting-types)
+    for member in self.members.iter()
+      member.call-group := self.owner-member.call-group-owner
+      member.call-group-builder := _
+    self.working := false
+    self.kill()
+  
+  func kill()
+    self.owner-member.call-group-builder-owner := _

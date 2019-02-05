@@ -348,6 +348,13 @@ test test-name-map()
   assert not map.find(user "name2")?
   map.remove(user value1)
   assert not map.find(user "name1")?
+  map.add(user "name1", user value1)
+  map.add(user "name2", user value2)
+  map.add(user "name3", user value3)
+  assert-string(user "value1", user map.pop())
+  assert-string(user "value2x", user map.pop())
+  assert-string(user "value3", user map.pop())
+  assert not map.pop()?
 
 
 ; Illegal call tests

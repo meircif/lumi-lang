@@ -2804,39 +2804,22 @@ Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type
     Generic_Type_Dynamic* x_Dynamic = NULL;
     ut_M_Test* t = NULL;
     Ref_Manager* t_Refman = NULL;
-    Generic_Type* aux_Generic_Type_0 = NULL;
-    Ref_Manager* aux_Generic_Type_0_Refman = NULL;
-    Generic_Type_Dynamic* aux_Generic_Type_0_Dynamic = NULL;
-    Generic_Type* aux_Generic_Type_1 = NULL;
-    Ref_Manager* aux_Generic_Type_1_Refman = NULL;
-    Generic_Type_Dynamic* aux_Generic_Type_1_Dynamic = NULL;
-    Generic_Type* aux_Generic_Type_2 = NULL;
-    Ref_Manager* aux_Generic_Type_2_Refman = NULL;
-    Generic_Type_Dynamic* aux_Generic_Type_2_Dynamic = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     LUMI_inc_ref(self_Refman);
+    LUMI_inc_ref(item_Refman);
     LUMI_inc_ref(arr_Refman);
     x = item;
     x_Refman = item_Refman;
+    LUMI_inc_ref(x_Refman);
     x_Dynamic = item_Dynamic;
-    item = NULL;
-    item_Refman = NULL;
-    item_Dynamic = NULL;
-    aux_Generic_Type_0 = x;
-    aux_Generic_Type_0_Refman = x_Refman;
-    aux_Generic_Type_0_Dynamic = x_Dynamic;
-    x = NULL;
-    x_Refman = NULL;
-    x_Dynamic = NULL;
     CHECK_REF(6, LUMI_block0_cleanup, self, self_Refman)
-    if (self->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(self->item_Dynamic))->_del(self->item);
-    LUMI_owner_dec_ref(self->item_Refman);
-    self->item_Refman = aux_Generic_Type_0_Refman;
-    self->item_Dynamic = aux_Generic_Type_0_Dynamic;
-    self->item = aux_Generic_Type_0;
-    aux_Generic_Type_0 = NULL;
-    aux_Generic_Type_0_Refman = NULL;
-    aux_Generic_Type_0_Dynamic = NULL;
+    aux_Ref_Manager = self->item_Refman;
+    self->item_Refman = x_Refman;
+    self->item_Dynamic = x_Dynamic;
+    LUMI_inc_ref(self->item_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    self->item = x;
     CHECK_REF(7, LUMI_block0_cleanup, self, self_Refman)
     aux_Ref_Manager = self->arr_Refman;
     self->arr_Refman = arr_Refman;
@@ -2846,60 +2829,37 @@ Returncode ut_M_Test_set(ut_M_Test* self, Ref_Manager* self_Refman, Generic_Type
     self->arr = arr;
     INIT_NEW(8, LUMI_block0_cleanup, t, LUMI_alloc(sizeof(ut_M_Test)));
     CHECK_REF(9, LUMI_block0_cleanup, self, self_Refman)
-    aux_Generic_Type_1 = self->item;
-    aux_Generic_Type_1_Refman = self->item_Refman;
-    aux_Generic_Type_1_Dynamic = self->item_Dynamic;
-    self->item = NULL;
-    self->item_Refman = NULL;
-    self->item_Dynamic = NULL;
     CHECK_REF(9, LUMI_block0_cleanup, t, t_Refman)
-    if (t->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(t->item_Dynamic))->_del(t->item);
-    LUMI_owner_dec_ref(t->item_Refman);
-    t->item_Refman = aux_Generic_Type_1_Refman;
-    t->item_Dynamic = aux_Generic_Type_1_Dynamic;
-    t->item = aux_Generic_Type_1;
-    aux_Generic_Type_1 = NULL;
-    aux_Generic_Type_1_Refman = NULL;
-    aux_Generic_Type_1_Dynamic = NULL;
+    aux_Ref_Manager = t->item_Refman;
+    t->item_Refman = self->item_Refman;
+    t->item_Dynamic = self->item_Dynamic;
+    LUMI_inc_ref(t->item_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    t->item = self->item;
     CHECK_REF(10, LUMI_block0_cleanup, t, t_Refman)
-    aux_Generic_Type_2 = t->item;
-    aux_Generic_Type_2_Refman = t->item_Refman;
-    aux_Generic_Type_2_Dynamic = t->item_Dynamic;
-    t->item = NULL;
-    t->item_Refman = NULL;
-    t->item_Dynamic = NULL;
     CHECK_REF(10, LUMI_block0_cleanup, self, self_Refman)
-    if (self->item_Dynamic != NULL) ((Generic_Type_Dynamic*)(self->item_Dynamic))->_del(self->item);
-    LUMI_owner_dec_ref(self->item_Refman);
-    self->item_Refman = aux_Generic_Type_2_Refman;
-    self->item_Dynamic = aux_Generic_Type_2_Dynamic;
-    self->item = aux_Generic_Type_2;
-    aux_Generic_Type_2 = NULL;
-    aux_Generic_Type_2_Refman = NULL;
-    aux_Generic_Type_2_Dynamic = NULL;
+    aux_Ref_Manager = self->item_Refman;
+    self->item_Refman = t->item_Refman;
+    self->item_Dynamic = t->item_Dynamic;
+    LUMI_inc_ref(self->item_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    self->item = t->item;
 LUMI_block0_cleanup:
     (void)0;
-    if (aux_Generic_Type_2_Dynamic != NULL) aux_Generic_Type_2_Dynamic->_del(aux_Generic_Type_2);
-    LUMI_owner_dec_ref(aux_Generic_Type_2_Refman);
-    if (aux_Generic_Type_1_Dynamic != NULL) aux_Generic_Type_1_Dynamic->_del(aux_Generic_Type_1);
-    LUMI_owner_dec_ref(aux_Generic_Type_1_Refman);
-    if (aux_Generic_Type_0_Dynamic != NULL) aux_Generic_Type_0_Dynamic->_del(aux_Generic_Type_0);
-    LUMI_owner_dec_ref(aux_Generic_Type_0_Refman);
     ut_M_Test_Del(t);
     LUMI_owner_dec_ref(t_Refman);
-    if (x_Dynamic != NULL) x_Dynamic->_del(x);
-    LUMI_owner_dec_ref(x_Refman);
+    LUMI_dec_ref(x_Refman);
     LUMI_dec_ref(arr_Refman);
-    if (item_Dynamic != NULL) item_Dynamic->_del(item);
-    LUMI_owner_dec_ref(item_Refman);
+    LUMI_dec_ref(item_Refman);
     LUMI_dec_ref(self_Refman);
     return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     LUMI_dec_ref(self->arr_Refman);
-    if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
-    LUMI_owner_dec_ref(self->item_Refman);
+    LUMI_dec_ref(self->item_Refman);
 }
 /// @ t1
 typedef struct ut_M_Test ut_M_Test;
@@ -5883,6 +5843,12 @@ using potentially illegal user reference "s"
 /// @ teu4
 using potentially illegal user reference "s"
 /// @ teu5
+using potentially illegal user reference "s"
+/// @ teu6
+using potentially illegal user reference "s"
+/// @ teu7
+using potentially illegal user reference "s"
+/// @ teu8
 using potentially illegal user reference "s"
 /// @ tec0
 assigning reference into itself

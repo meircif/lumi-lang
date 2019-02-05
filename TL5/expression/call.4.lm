@@ -109,7 +109,7 @@ class FunctionCallExpression(CallExpression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
-    for type-data in self.function.function.deleting-types.iter()
+    for type-data in self.function.function.call-group.deleting-types.iter()
       refs.mark-illegal-type(user type-data)
   
   func dynamic write-function()

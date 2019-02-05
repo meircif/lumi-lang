@@ -1067,10 +1067,10 @@ native var String s
 ; @@ test-parameter-type
 ; @ g t0
 struct Test{Generic}
-    owner Generic item
+    weak Generic item
     weak Array{Generic} arr
-    func set(owner Generic item, weak Array{Generic} arr)
-        owner Generic x(owner item)
+    func set(weak Generic item, weak Array{Generic} arr)
+        weak Generic x(weak item)
         self.item := x
         self.arr := arr
         new Test{Generic} t
@@ -1940,8 +1940,8 @@ func fun()
 ; @ eg teu0
 func deleting()->(owner String s)
     s := _
-func fun(user String s)->(owner String so)
-    deleting()->(owner so)
+func fun(user String s)
+    deleting()
     s.clear()
 ; @ eg teu1
 func deleting()->(owner String s)
@@ -1954,27 +1954,52 @@ func fun()->(user String s-out)
 ; @ eg teu2
 func deleting()->(owner String s)
     s := _
-func fun(user String s)->(owner String so, var Int x)
-    deleting()->(owner so)
+func fun(user String s)->(var Int x)
+    deleting()
     x := s.length
 ; @ eg teu3
 func deleting()->(owner String s)
     s := _
-func fun(user String s)->(owner String so)
-    deleting()->(owner so)
+func fun(user String s)
+    deleting()
     String.clear(user s)
 ; @ eg teu4
 func deleting()->(owner String s)
     s := _
-func fun(user String s)->(owner String so, var Bool b)
-    deleting()->(owner so)
+func fun(user String s)->(var Bool b)
+    deleting()
     b := not (false or s.length > 3)
 ; @ eg teu5
 func deleting()->(owner String s)
     s := _
-func fun(user String s)->(owner String so, var Char c)
-    deleting()->(owner so)
+func fun(user String s)->(var Char c)
+    deleting()
     c := s[2]
+; @ eg teu6
+func deleting()->(owner String s)
+    s := _
+func proxy()
+    deleting()
+func fun(user String s)
+    proxy()
+    s.clear()
+; @ eg teu7
+func deleting()->(owner String s)
+    proxy()
+    s := _
+func proxy()
+    deleting()
+func fun(user String s)
+    proxy()
+    s.clear()
+; @ eg teu8
+struct Test
+    var Int x
+    func deleting()->(owner String s)
+        s := _
+    func fun(user String s)
+        self.deleting()
+        s.clear()
 ; @ ec tec0
 str := str
 ; @ eg tec1

@@ -12,5 +12,5 @@ testing test-cover-all... OK
 testing test-constants... OK
 testing code coverage... 49% - failed, lines not covered:
   TL5/tests/integration/test0.5.lm(4%): 36-37 50 52-54 57-60 64-70 90-91 93-103 108-109 115-180 193-194 221 227 247 250 259 272-280 285-288 292-299 301-318 323-356 360-373 405-419 421-427 431-434 437-461 469-470 473 479 482 485 488 491-498 500-510 512-520 522-530 532-542 548 555-564 567-571
-  TL5/tests/integration/test1.5.lm(93%): 19-22 25-26 29-32 35-41 53 62 66-67 409
+  TL5/tests/integration/test1.5.lm(93%): 19-22 25-26 29-32 35-41 53 62 66-67 414
 Tests failed

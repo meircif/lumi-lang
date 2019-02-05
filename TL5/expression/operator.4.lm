@@ -159,8 +159,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
           copy false,
           user self.left-expression.result-type)->(
           owner self.assigned-value-variable)
-      self.code-node.get-function().deleting-types.add-if-unique-value(
-          user self.left-expression.result-type.type-data.name,
+      self.code-node.get-function().call-group-builder.add-deleting(
           user self.left-expression.result-type.type-data)
     if self.left-expression.result-type.reference-path.equals(
         user self.right-expression.result-type.reference-path)

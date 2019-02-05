@@ -169,9 +169,14 @@ struct RefNode
     owner RefNode next
     var Ref ref
     
-    func new(copy Ref ref, owner RefNode next)
+    func new(copy Ref ref)
         self.ref := ref
-        self.next := next
+
+func new-ref-node(copy Ref ref)->(owner RefNode next)
+    new RefNode ref-node(copy ref)
+    ref-node.next := next
+    next := ref-node
+
 
 var Bool record-delete
 owner RefNode deleted-links
@@ -181,19 +186,19 @@ owner RefNode deleted-refmans(owner _)
 
 mock delete()
     if record-delete
-        deleted-refmans := RefNode(copy self, owner deleted-refmans)
+        new-ref-node(copy self)->(owner deleted-refmans)
 
 mock Link.delete()
     if record-delete
-        deleted-links := RefNode(copy self, owner deleted-links)
+        new-ref-node(copy self)->(owner deleted-links)
 
 mock BaseLink.delete()
     if record-delete
-        deleted-base-links := RefNode(copy self, owner deleted-base-links)
+        new-ref-node(copy self)->(owner deleted-base-links)
 
 mock TopLink.delete()
     if record-delete
-        deleted-top-links := RefNode(copy self, owner deleted-top-links)
+        new-ref-node(copy self)->(owner deleted-top-links)
 
 func remove-obj(owner Link b)
     ; remove b
