@@ -25,11 +25,11 @@ class TopType(covered.MiddleType)
         sys.println(user "TopType.meth3")
         base.meth3(copy n, user s)
     
-    func dynamic meth5(copy Int n, user String s)
+    func dynamic meth5(copy Int n, weak String s)
         sys.println(user "TopType.meth5")
         base(copy n, user s)
-        covered.MiddleType.meth1(user _, copy n, user s)
-        BaseType.meth1(user _, copy n, user s)
+        covered.MiddleType.meth1(user _, copy n, weak s)
+        BaseType.meth1(user _, copy n, weak s)
     
     func dynamic meth6()
         sys.println(user "TopType.meth6")
@@ -52,7 +52,7 @@ class BaseType
     func dynamic meth0()
         sys.println(user "BaseType.meth0")
     
-    func dynamic meth1(copy Int n, user String s)
+    func dynamic meth1(copy Int n, weak String s)
         sys.println(user "BaseType.meth1")
     
     func dynamic meth2()
@@ -495,7 +495,7 @@ mock Sys.println(user String text)
 
 test test-cover-all()
     var covered.MiddleType mid
-    mid.meth1(copy 0, user _)
+    mid.meth1(copy 0, weak _)
     mid.meth2()
     mid.meth4()
     mid.meth5(copy 0, user _)

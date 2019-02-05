@@ -193,7 +193,16 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           user self.implemented-function.arguments, user _, copy 0)
       self.my-module := self.implemented-function.my-module
     self.arguments.analyze()
+    for parameter in self.arguments.parameters.iter()
+      if parameter.access = Access.OWNER or parameter.access = Access.STRONG
+        self.call-group-builder.add-deleting(
+            user parameter.get-type-instance().type-data)
     base()
+    for variable in self.variables.iter()
+      if variable.access = Access.OWNER or variable.access = Access.STRONG or
+          variable.access = Access.VAR
+        self.call-group-builder.add-deleting(
+            user variable.type-instance.type-data)
     if self.my-module?
       glob.current-module := _
   

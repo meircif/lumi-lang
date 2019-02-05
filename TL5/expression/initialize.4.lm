@@ -40,6 +40,8 @@ class InitExpression(ModuleTypeExpression)
           copy Access.STRONG, copy true, user self.result-type)->(
           owner self.aux-variable)
     self.access := self.aux-variable.access
+    self.result-type.reference-path := ReferencePath(
+        user self.aux-variable.variable)
     
     if (self.aux-variable.variable.access = Access.OWNER or
         self.aux-variable.variable.access = Access.STRONG) and

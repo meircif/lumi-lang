@@ -1937,44 +1937,32 @@ struct Test
 func get-user()->(user Test t)
 func fun()
     get-user().s := _
-; @ eg teu0
-func deleting()->(owner String s)
-    s := _
-func fun(user String s)
-    deleting()
-    s.clear()
-; @ eg teu1
-func deleting()->(owner String s)
-    s := _
-func fun()->(user String s-out)
-    owner String so(owner String{12}())
-    user String s(user so)
-    deleting()->(owner so)
-    s-out := s
-; @ eg teu2
-func deleting()->(owner String s)
-    s := _
-func fun(user String s)->(var Int x)
-    deleting()
-    x := s.length
-; @ eg teu3
-func deleting()->(owner String s)
-    s := _
-func fun(user String s)
-    deleting()
-    String.clear(user s)
-; @ eg teu4
-func deleting()->(owner String s)
-    s := _
-func fun(user String s)->(var Bool b)
-    deleting()
-    b := not (false or s.length > 3)
+; @ ec teu0
+user String s
+so := _
+c := s[2]
+; @ ec teu1
+user String s
+user String s2
+so := _
+s2 := s
+; @ ec teu2
+user String s
+so := _
+i := s.length
+; @ ec teu3
+user String s
+so := _
+String.clear(user s)
+; @ ec teu4
+user String s
+so := _
+b := not (false or s.length > 3)
 ; @ eg teu5
-func deleting()->(owner String s)
-    s := _
-func fun(user String s)->(var Char c)
-    deleting()
-    c := s[2]
+func deleting(owner String s)
+func fun(user String s)
+    deleting(owner _)
+    s.clear()
 ; @ eg teu6
 func deleting()->(owner String s)
     s := _
@@ -2000,6 +1988,50 @@ struct Test
     func fun(user String s)
         self.deleting()
         s.clear()
+; @ eg teu9
+func deleting()->(owner String s)
+    s := _
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg teu10
+func deleting()
+    owner String s
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg teu11
+func deleting()
+    var String{12} s
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg teu12
+func deleting()
+    strong String s
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg teu13
+func deleting()
+    user String s(user "I am a string")
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg teu14
+func deleting()
+    var Int x(copy String{12}().length)
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg teu15
+struct Test
+    owner String s
+func deleting(owner Test ta, owner Test tb)
+    ta.s := tb.s
+func fun(user String s)
+    deleting(owner _, owner _)
+    s.clear()
 ; @ ec tec0
 str := str
 ; @ eg tec1

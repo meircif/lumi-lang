@@ -5850,6 +5850,20 @@ using potentially illegal user reference "s"
 using potentially illegal user reference "s"
 /// @ teu8
 using potentially illegal user reference "s"
+/// @ teu9
+using potentially illegal user reference "s"
+/// @ teu10
+using potentially illegal user reference "s"
+/// @ teu11
+using potentially illegal user reference "s"
+/// @ teu12
+using potentially illegal user reference "s"
+/// @ teu13
+using potentially illegal user reference "s"
+/// @ teu14
+using potentially illegal user reference "s"
+/// @ teu15
+using potentially illegal user reference "s"
 /// @ tec0
 assigning reference into itself
 /// @ tec1

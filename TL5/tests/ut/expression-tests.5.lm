@@ -226,9 +226,9 @@ class Test(Base)
 class Test
     var Int x
     func dynamic meth()
-func mock()->(user Test t)
+func mock()->(weak Test t)
     t := Test()
-    mock()->(user t).meth()
+    mock()->(weak t).meth()
 ; @ g t21
 class Test
     var Int x

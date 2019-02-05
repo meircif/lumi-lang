@@ -424,6 +424,7 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
 
 class GlobalInit(SyntaxTreeFunction)
   new()
+    base()
     self.indentation-spaces := INDENTATION-SPACES
   
   func dynamic write()
