@@ -1169,7 +1169,7 @@ class Base{Param}
 class Test{Generic}(Base{Generic})
     func dynamic set(weak Generic item)
     func dynamic get()->(weak Generic item)
-func mock(user Test{String} test, weak String text)
+func mock(weak Test{String} test, weak String text)
     test.set(weak text)
     test.get()->(weak text)
     test.get().clear()
@@ -2046,7 +2046,6 @@ struct Base{Atype}
     var Int x
     func fun(owner Atype a)
 struct Test{Btype}(Base{Btype})
-    var Int x
     func fun()
         base(owner _)
 func fun(user String s)
@@ -2071,6 +2070,47 @@ func fun(user Base b, user Other o)
     deleting(owner _)
     o.x := 0
     b.x := 0
+; @ eg teu20
+class Base
+    var Int x
+    func dynamic fun()
+class Test(Base)
+    func dynamic fun()
+        owner String s
+func fun(user String s, user Base b)
+    b.fun()
+    s.clear()
+; @ eg teu21
+class Base
+    var Int x
+    func dynamic fun()
+class Test{Generic}(Base)
+    func dynamic fun()
+func fun(user String s, user Base b)
+    b.fun()
+    s.clear()
+; @ eg teu22
+class Base
+    var Int x
+    func dynamic fun(owner Base b)
+        recursive()
+class Test{Generic}(Base)
+    func dynamic fun()
+func recursive()
+    Base.fun(user _, owner _)
+func fun(user String s)
+    recursive()
+    s.clear()
+; @ ec teu23
+user String s
+t.fun()
+s.clear()
+; @ eg teu24
+func deleting(copy Func{()} f)
+    f()
+func fun(user String s)
+    deleting(copy _)
+    s.clear()
 ; @ ec tec0
 str := str
 ; @ eg tec1

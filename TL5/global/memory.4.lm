@@ -85,6 +85,16 @@ struct ReferenceMemoryList
       self.user-references.add-if-unique-value(
           user variable.name, user variable)
   
+  func mark-illegal-types(user CallGroup call-group)
+    if call-group.delete-all
+      self.mark-all-illegal()
+    else
+      for type-instance in call-group.deleting-types.iter()
+        self.mark-illegal-type(user type-instance)
+  
+  func mark-all-illegal()
+    self.user-references.clear()
+  
   func mark-illegal-type(user TypeInstance type-instance)
     ; for reference in self.references.iter()
     ;   if type-data is reference.path.variable.type-instance.type-data
@@ -134,9 +144,31 @@ struct ReferenceMemoryList
 
 struct CallGroup
   owner List{TypeInstance} deleting-types
+  var Bool delete-all
   
-  new(owner List{TypeInstance} deleting-types)
+  new(owner List{TypeInstance} deleting-types, copy Bool delete-all)
     self.deleting-types := deleting-types
+    self.delete-all := delete-all
+
+  func add-deleting(user TypeInstance type-instance)
+    if self.delete-all
+      return
+    user ListNode{TypeInstance} node(user self.deleting-types.first)
+    do
+      while node?
+      if type-instance.can-be-assigned-to(user node.item)
+        return
+      if node.item.can-be-assigned-to(user type-instance)
+        owner TypeInstance new-type
+        type-instance.copy-new()->(owner new-type)
+        node.item := new-type
+        return
+      node := node.next
+    self.deleting-types.add(owner type-instance.copy-new())
+
+  func set-delete-all()
+    self.delete-all := true
+    self.deleting-types.clear()
 
 
 struct FunctionCall
@@ -155,7 +187,7 @@ struct CallGroupBuilder(CallGroup)
   var Bool working
   
   new(user SyntaxTreeFunction owner-member)
-    base(owner List{TypeInstance}())
+    base(owner List{TypeInstance}(), copy false)
     self.owner-member := owner-member
     self.members.add(user self.owner-member.name, user self.owner-member)
   
@@ -163,20 +195,17 @@ struct CallGroupBuilder(CallGroup)
       user SyntaxTreeFunction function, user TypeInstance calling-type)
     self.calling-functions.add(
         owner FunctionCall(user function, user calling-type))
-
-  func add-deleting(user TypeInstance type-instance)
-    user ListNode{TypeInstance} node(user self.deleting-types.first)
-    do
-      while node?
-      if type-instance.can-be-assigned-to(user node.item)
-        return
-      if node.item.can-be-assigned-to(user type-instance)
-        owner TypeInstance new-type
-        type-instance.copy-new()->(owner new-type)
-        node.item := new-type
-        return
-      node := node.next
-    self.deleting-types.add(owner type-instance.copy-new())
+      
+  func add-dynamic-override(
+      user TypeData type-data,
+      user SyntaxTreeFunction overwriting,
+      user SyntaxTreeFunction overridden)
+    var TypeInstance calling-type
+    calling-type.type-data := type-data
+    string-new-copy(user type-data.name)->(owner calling-type.name)
+    if type-data.parameters?
+      self.set-delete-all()
+    self.add-calling(user overwriting, user calling-type)
 
   func build()->(user CallGroupBuilder recursive)
     if self.working
@@ -196,13 +225,21 @@ struct CallGroupBuilder(CallGroup)
     self.done()
   
   func extend(owner FunctionCall call)
+    if self.delete-all
+      return
+    if call.function.call-group.delete-all
+      self.set-delete-all()
+      return
     for type-instance in call.function.call-group.deleting-types.iter()
       type-instance.replace-type-parameters(user call.calling-type, copy true)
       self.add-deleting(user type-instance)
   
   func merge-from(user CallGroupBuilder other)
-    for type-instance in other.deleting-types.iter()
-      self.add-deleting(user type-instance)
+    if other.delete-all
+      self.set-delete-all()
+    else-if not self.delete-all
+      for type-instance in other.deleting-types.iter()
+        self.add-deleting(user type-instance)
     do
       user SyntaxTreeFunction function
       while other.members.pop()->(user function)?
@@ -215,7 +252,8 @@ struct CallGroupBuilder(CallGroup)
     other.kill()
   
   func done()
-    self.owner-member.call-group-owner := CallGroup(owner self.deleting-types)
+    self.owner-member.call-group-owner := CallGroup(
+        owner self.deleting-types, copy self.delete-all)
     for member in self.members.iter()
       member.call-group := self.owner-member.call-group-owner
       member.call-group-builder := _

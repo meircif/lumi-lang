@@ -185,6 +185,8 @@ class TypeData(SyntaxTreeNamespace)
         if function.is-dynamic
           function.dynamic-base-method := method.dynamic-base-method
           function.dynamic-base-count := method.dynamic-base-count + bases + 1
+          method.call-group-builder.add-dynamic-override(
+              user self, user function, user method)
       else-if function.is-dynamic
         function.dynamic-base-method := function
         self.dynamic-base-methods.add(user function.name, user function)

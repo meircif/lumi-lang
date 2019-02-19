@@ -76,7 +76,7 @@ func test-slice-expression(
         user Array{String} arrs,
         user Array{TestStruct} arrt,
         user Array{TestClass} arrd,
-        user Array{Func{()}} arrf)->(
+        weak Array{Func{()}} arrf)->(
         var Char c,
         var Int i,
         user TestStruct t,
@@ -86,7 +86,7 @@ func test-slice-expression(
         user Array{String} arrso,
         user Array{TestStruct} arrto,
         user Array{TestClass} arrdo,
-        user Array{Func{()}} arrfo)
+        weak Array{Func{()}} arrfo)
     c := s[2] + s[4:7][2] + arrs[3][2] + arrs[4:2][4][1:3][0]
     i := arri[i + 3 - arri[2]] + arrt[4].num + arrt[2:4][1].num +
             arri[3:3][1:2][1]

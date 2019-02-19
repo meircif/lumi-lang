@@ -73,6 +73,10 @@ struct NameMap{Generic}
     self.first := self.first.next
     if not self.first?
       self.last := _
+    
+  func clear()
+    self.first := _
+    self.last := _
   
   func iter()->(owner NameMapIterator{Generic} iter)
     iter := NameMapIterator{Generic}(user self)
