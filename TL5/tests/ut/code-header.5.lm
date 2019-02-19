@@ -44,5 +44,5 @@ weak Tc tc
 weak Data{String} d
 weak Array{String} sarr
 
-func mock()->(strong String so, var Int io, user Test to, user Tc tco)
+func mock()->(strong String so, var Int io, weak Test to, weak Tc tco)
     

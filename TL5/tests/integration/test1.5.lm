@@ -63,13 +63,17 @@ class BaseType
 
 
 func test-mid-out()->(user covered.MiddleType mt)
+    mt := _
+
+
+func test-new-mid()->(owner covered.MiddleType mt)
     new covered.MiddleType new-mt
     mt := new-mt
 
 
 mock TestStruct.get()->(var Int x, user String s)
     x := 12
-    s := ""
+    s := _
 
 mock test-int2str(copy Int x)->(owner String s)
     raise
@@ -203,8 +207,8 @@ mock TopLink.delete()
 func remove-obj(owner Link b)
     ; remove b
 
-func get-outdated-var()->(user Link l-out)
-    var Link l-var
+func get-outdated-var()->(weak Link l-out)
+    new Link l-var
     l-out := l-var
 
 test test-simple-delete()
@@ -213,7 +217,7 @@ test test-simple-delete()
     record-delete := true
     
     new Link l
-    user Link l-user(user l)
+    weak Link l-user(weak l)
     assert l?
     assert l-user?
     var Ref l-ref(copy l)
@@ -228,7 +232,7 @@ test test-simple-delete()
     assert deleted-refmans?
     assert deleted-refmans.ref is l-ref
     assert not deleted-refmans.next?
-    get-outdated-var()->(user l-user)
+    get-outdated-var()->(weak l-user)
     assert l-user is-not _
     assert not l-user?
     

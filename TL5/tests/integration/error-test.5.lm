@@ -9,6 +9,7 @@ class TopType(BaseType)
     func dynamic meth()
 
 func f-get-top()->(user TopType top)
+    top := _
 
 func f-good-function()
     return

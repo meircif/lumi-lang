@@ -140,6 +140,18 @@ struct ReferenceMemoryList
     expression.syntax-error(
         user "using potentially illegal user reference",
         user exp-path.variable.name)
+      
+  func check-output(user Argument output)
+    if output.access != Access.USER
+      return
+    user SyntaxTreeVariable output-variable
+    output.get-variable()->(user output-variable)
+    for variable in self.user-references.iter()
+      if variable is output-variable
+        return
+    output.syntax-error(
+        user "returning potentially illegal user output",
+        user output-variable.name)
 
 
 struct CallGroup

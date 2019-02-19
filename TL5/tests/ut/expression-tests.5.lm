@@ -232,7 +232,7 @@ func mock()->(weak Test t)
 ; @ g t21
 class Test
     var Int x
-    func dynamic meth()->(user Test t)
+    func dynamic meth()->(weak Test t)
         self.meth().meth()
 ; @ ec te0
 function( copy 1)
@@ -459,7 +459,8 @@ b := b is b
 ; @ ec te19
 b := t is t < 2
 ; @ ec te20
-t := to
+user Test tu
+t := tu
 ; @@ test-question-expression
 ; @ c t0
 b := str?
@@ -521,7 +522,7 @@ fun7(weak tc)->(weak ta)
 class Test
     var Int x
     func dynamic meth()
-func mock()->(user Test t)
+func mock()->(weak Test t)
     t := Test()
     t.meth()
 ; @ g t17

@@ -1,36 +1,36 @@
 Running tests:
 testing fail-call-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:31 fail-call-empty()
+  Error raised in TL5/tests/integration/error-test.5.lm:32 fail-call-empty()
 testing fail-base-class-output... Error: non empty base class given as output argument
-  Error raised in TL5/tests/integration/error-test.5.lm:36 fail-base-class-output()
+  Error raised in TL5/tests/integration/error-test.5.lm:37 fail-base-class-output()
 testing fail-slice-index... Error: slice index out of bounds
-  Error raised in TL5/tests/integration/error-test.5.lm:40 fail-slice-index()
+  Error raised in TL5/tests/integration/error-test.5.lm:41 fail-slice-index()
 testing fail-member-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:44 fail-member-empty()
+  Error raised in TL5/tests/integration/error-test.5.lm:45 fail-member-empty()
 testing fail-member-outdated... Error: outdated weak reference used
-  Error raised in TL5/tests/integration/error-test.5.lm:51 fail-member-outdated()
+  Error raised in TL5/tests/integration/error-test.5.lm:52 fail-member-outdated()
 testing fail-sequence-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:56 fail-sequence-empty()
+  Error raised in TL5/tests/integration/error-test.5.lm:57 fail-sequence-empty()
 testing fail-sequence-outdated... Error: outdated weak reference used
-  Error raised in TL5/tests/integration/error-test.5.lm:62 fail-sequence-outdated()
+  Error raised in TL5/tests/integration/error-test.5.lm:63 fail-sequence-outdated()
 testing fail-dynamic-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:66 fail-dynamic-empty()
+  Error raised in TL5/tests/integration/error-test.5.lm:67 fail-dynamic-empty()
 testing fail-object-no-memory... Error: insufficient memory for object dynamic allocation
-  Error raised in TL5/tests/integration/error-test.5.lm:70 fail-object-no-memory()
+  Error raised in TL5/tests/integration/error-test.5.lm:71 fail-object-no-memory()
 testing fail-managed-no-memory... Error: insufficient memory for managed object
-  Error raised in TL5/tests/integration/error-test.5.lm:74 fail-managed-no-memory()
-testing fail-raise... Error raised in TL5/tests/integration/error-test.5.lm:77 fail-raise()
+  Error raised in TL5/tests/integration/error-test.5.lm:75 fail-managed-no-memory()
+testing fail-raise... Error raised in TL5/tests/integration/error-test.5.lm:78 fail-raise()
 testing fail-raise-message... Error: my error
-  Error raised in TL5/tests/integration/error-test.5.lm:17 f-raise-message()
-  called from TL5/tests/integration/error-test.5.lm:80 fail-raise-message()
+  Error raised in TL5/tests/integration/error-test.5.lm:18 f-raise-message()
+  called from TL5/tests/integration/error-test.5.lm:81 fail-raise-message()
 testing fail-assert... Error: condition is not true
-  Assert failed in TL5/tests/integration/error-test.5.lm:83 fail-assert()
+  Assert failed in TL5/tests/integration/error-test.5.lm:84 fail-assert()
 testing fail-assert-error... Error: error not raised
-  Assert failed in TL5/tests/integration/error-test.5.lm:86 fail-assert-error()
+  Assert failed in TL5/tests/integration/error-test.5.lm:87 fail-assert-error()
 testing fail-assert-error-message... Assert failed: unexpected error message "tested other message"
-  Assert failed in TL5/tests/integration/error-test.5.lm:89 fail-assert-error-message()
+  Assert failed in TL5/tests/integration/error-test.5.lm:90 fail-assert-error-message()
 testing fail-assert-error-message-prefix... Assert failed: unexpected error message "tested message"
-  Assert failed in TL5/tests/integration/error-test.5.lm:92 fail-assert-error-message-prefix()
-testing code coverage... 95% - failed, lines not covered:
-  TL5/tests/integration/error-test.5.lm(95%): 45 52
+  Assert failed in TL5/tests/integration/error-test.5.lm:93 fail-assert-error-message-prefix()
+testing code coverage... 92% - failed, lines not covered:
+  TL5/tests/integration/error-test.5.lm(92%): 12 46 53
 Tests failed

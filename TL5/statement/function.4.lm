@@ -193,6 +193,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           user self.implemented-function.arguments, user _, copy 0, copy true)
       self.my-module := self.implemented-function.my-module
     self.arguments.analyze()
+    if self.header-only
+      return
     for parameter in self.arguments.parameters.iter()
       if parameter.access = Access.OWNER or parameter.access = Access.STRONG
         self.call-group-builder.add-deleting(
@@ -215,10 +217,21 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.call-group-builder.build()->(user recursive)
     
   func dynamic check-memory(user ReferenceMemoryList global-refs)
+    if self.header-only
+      return
     var ReferenceMemoryList refs
     self.arguments.check-memory(user refs)
     self.check-children-memory(user self.variables, user refs)
     self.check-children-memory(user self.code-nodes, user refs)
+    for parameter in self.arguments.parameters.iter()
+      if parameter.access = Access.OWNER or parameter.access = Access.STRONG
+        refs.mark-illegal-type(user parameter.get-type-instance())
+    for variable in self.variables.iter()
+      if variable.access = Access.OWNER or variable.access = Access.STRONG or
+          variable.access = Access.VAR
+        refs.mark-illegal-type(user variable.type-instance)
+    for output in self.arguments.outputs.iter()
+      refs.check-output(user output)
   
   ~~~ write function body ~~~
   func dynamic write()
@@ -385,6 +398,7 @@ class DeclarationArgument(Argument)
     if glob.last-char != ' '
       self.syntax-error-c(user "expected space after type, got")
     read-new(user ",)")->(owner self.variable.name)
+    self.variable.check-name()
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     self.variable.get-parent-type()->(user parent-type)
