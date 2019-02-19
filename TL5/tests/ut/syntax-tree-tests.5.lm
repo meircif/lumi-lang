@@ -1897,6 +1897,11 @@ func fun()
     weak String s(weak so)
     deleting()->(strong so)
     s.clear()
+; @ c tu3
+user String s
+so := _
+s := so
+s.clear()
 ; @ eg teo0
 struct Test
     owner String s
@@ -2032,6 +2037,40 @@ func deleting(owner Test ta, owner Test tb)
 func fun(user String s)
     deleting(owner _, owner _)
     s.clear()
+; @ ec teu16
+user String s
+d.set(owner _, user _)
+s.clear()
+; @ eg teu17
+struct Base{Atype}
+    var Int x
+    func fun(owner Atype a)
+struct Test{Btype}(Base{Btype})
+    var Int x
+    func fun()
+        base(owner _)
+func fun(user String s)
+    var Test{String} t
+    t.fun()
+    s.clear()
+; @ eg teu18
+struct Base
+    var Int x
+struct Test(Base)
+func deleting(owner Base b)
+func fun(user Test t)
+    deleting(owner _)
+    t.x := 0
+; @ eg teu19
+struct Base
+    var Int x
+struct Test(Base)
+struct Other(Base)
+func deleting(owner Test t)
+func fun(user Base b, user Other o)
+    deleting(owner _)
+    o.x := 0
+    b.x := 0
 ; @ ec tec0
 str := str
 ; @ eg tec1

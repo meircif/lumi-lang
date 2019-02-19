@@ -130,7 +130,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
           user self.iterator.result-type.type-data.name)
     
     self.get-func.arguments.outputs.first.item.get-type-instance().new-replace-params(
-        user self.iterator.result-type, copy 0)->(owner type-instance)
+        user self.iterator.result-type)->(owner type-instance)
     
     self.iterator.result-type.type-data.find-meth(user "next")->(
         user self.next-func)

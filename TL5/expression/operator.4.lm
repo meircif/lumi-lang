@@ -172,7 +172,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
     var Bool check-left(copy true)
     if self.left-expression.access = Access.OWNER or
         self.left-expression.access = Access.STRONG
-      refs.mark-illegal-type(user self.left-expression.result-type.type-data)
+      refs.mark-illegal-type(user self.left-expression.result-type)
       if left-path? and
           self.right-expression.result-type.type-data is glob.type-empty
         refs.mark-reference(user left-path, copy false)

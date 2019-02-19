@@ -75,7 +75,10 @@ class InitExpression(ModuleTypeExpression)
         self.aux-variable.copy-new()->(owner self-param.value)
         self.arguments.parameters.prepend(owner self-param)
         self.arguments.check-same-as(
-            user self.constructor.arguments, user self.result-type, copy 0)
+            user self.constructor.arguments,
+            user self.result-type,
+            copy 0,
+            copy true)
       else
         self.syntax-error(
             user "no constructor for type", user self.result-type.type-data.name)
@@ -86,7 +89,7 @@ class InitExpression(ModuleTypeExpression)
         self.syntax-error-msg(
             user "only one initialization parameter expected")
       user Argument param(user self.arguments.parameters.first.item)
-      param.check-same-type-as(user self.result-type, user _, copy 0)
+      param.check-same-type-as(user self.result-type, user _, copy 0, copy true)
       if self.result-type.type-data.is-primitive and param.access != Access.COPY
         self.syntax-error(
             user "access should be \"copy\" for primitive types, got",

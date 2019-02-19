@@ -33,22 +33,33 @@ class Argument(SyntaxTreeNode)
     raise
   
   func inst check-same-as(
-      user Argument other, user TypeInstance actual-params, copy Int bases)
+      user Argument other,
+      user TypeInstance actual-params,
+      copy Int bases,
+      copy Bool print-error)
     if self.access != other.access
+      assert print-error
       self.syntax-error2(
           user "expected access",
           user glob.access-names[other.access],
           user ", got",
           user glob.access-names[self.access])
     self.check-same-type-as(
-        user other.get-type-instance(), user actual-params, copy bases)
+        user other.get-type-instance(),
+        user actual-params,
+        copy bases,
+        copy print-error)
     self.is-native := other.is-native
   
   func dynamic check-same-type-as(
       user TypeInstance type-instance,
       user TypeInstance actual-params,
-      copy Int bases)
-    self.get-type-instance().check-equal(user type-instance, user self)
+      copy Int bases,
+      copy Bool print-error)
+    user SyntaxTreeNode node
+    if print-error
+      node := self
+    self.get-type-instance().check-equal(user type-instance, user node)
   
   func dynamic get-variable()->(user SyntaxTreeVariable variable)
     raise
@@ -197,18 +208,24 @@ class FunctionArguments(SyntaxTreeNode)
   func inst check-same-as(
       user FunctionArguments other,
       user TypeInstance actual-params,
-      copy Int bases)->(
+      copy Int bases,
+      copy Bool print-error)->(
       var Bool output-ommited)
     var ListIterator{Argument} my-iter(user self.parameters)
     var ListIterator{Argument} other-iter(user other.parameters)
     for parameter in my-iter
       while other-iter.has()
       parameter.check-same-as(
-          user other-iter.get(), user actual-params, copy bases)
+          user other-iter.get(),
+          user actual-params,
+          copy bases,
+          copy print-error)
       other-iter.next()
     if my-iter.has()
+      assert print-error
       self.syntax-error-msg(user "too many parameters")
     if other-iter.has()
+      assert print-error
       self.syntax-error-msg(user "too few parameters")
     
     my-iter.new(user self.outputs)
@@ -216,14 +233,19 @@ class FunctionArguments(SyntaxTreeNode)
     for output in my-iter
       while other-iter.has()
       output.check-same-as(
-          user other-iter.get(), user actual-params, copy bases)
+          user other-iter.get(),
+          user actual-params,
+          copy bases,
+          copy print-error)
       other-iter.next()
     if my-iter.has()
+      assert print-error
       self.syntax-error-msg(user "too many outputs")
     output-ommited := other-iter.has()
     if output-ommited
       other-iter.next()
       if other-iter.has()
+        assert print-error
         self.syntax-error-msg(user "too few outputs")
   
   func inst write-preactions()

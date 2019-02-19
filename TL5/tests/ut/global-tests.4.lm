@@ -128,7 +128,7 @@ func assert-string-slice(
     sys.print(user actual-slice)
     sys.print(user "`]\n    ")
   write-new-file(user "expected", user expected)
-  write-new-file(user "actual", user actual-slice)
+  write-new-file(user "actual", user actual)
   tests-passed := false
 
 func write-new-file(user String base-name, user String data)

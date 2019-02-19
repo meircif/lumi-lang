@@ -5820,6 +5820,28 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(so_Refman);
     return LUMI_err;
 }
+/// @ tu3
+String* s = NULL;
+    Ref_Manager* s_Refman = NULL;
+    String* aux_String_0 = NULL;
+    Ref_Manager* aux_String_0_Refman = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
+    String_Del(*so);
+    LUMI_owner_dec_ref(*so_Refman);
+    *so_Refman = aux_String_0_Refman;
+    *so = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
+    aux_Ref_Manager = s_Refman;
+    s_Refman = *so_Refman;
+    LUMI_inc_ref(s_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    s = *so;
+    LUMI_err = String_clear(s, s_Refman);
+    CHECK(4, LUMI_block0_cleanup)
 /// @ teo0
 cannot modify owner field "s" in non-owner reference "t.s"
 /// @ teo1
@@ -5864,6 +5886,14 @@ using potentially illegal user reference "s"
 using potentially illegal user reference "s"
 /// @ teu15
 using potentially illegal user reference "s"
+/// @ teu16
+using potentially illegal user reference "s"
+/// @ teu17
+using potentially illegal user reference "s"
+/// @ teu18
+using potentially illegal user reference "t"
+/// @ teu19
+using potentially illegal user reference "b"
 /// @ tec0
 assigning reference into itself
 /// @ tec1

@@ -85,13 +85,14 @@ struct ReferenceMemoryList
       self.user-references.add-if-unique-value(
           user variable.name, user variable)
   
-  func mark-illegal-type(user TypeData type-data)
+  func mark-illegal-type(user TypeInstance type-instance)
     ; for reference in self.references.iter()
     ;   if type-data is reference.path.variable.type-instance.type-data
     ;     reference.usable := false
     var NameMap{SyntaxTreeVariable} to-delete
     for variable in self.user-references.iter()
-      if type-data is variable.type-instance.type-data
+      if variable.type-instance.can-be-assigned-to(user type-instance) or
+          type-instance.can-be-assigned-to(user variable.type-instance)
         to-delete.add(user variable.name, user variable)
     for variable in to-delete.iter()
       self.user-references.remove(user variable)
@@ -132,29 +133,50 @@ struct ReferenceMemoryList
 
 
 struct CallGroup
-  owner NameMap{TypeData} deleting-types
+  owner List{TypeInstance} deleting-types
   
-  new(owner NameMap{TypeData} deleting-types)
+  new(owner List{TypeInstance} deleting-types)
     self.deleting-types := deleting-types
 
 
+struct FunctionCall
+  owner TypeInstance calling-type
+  user SyntaxTreeFunction function
+  
+  new(user SyntaxTreeFunction function, user TypeInstance calling-type)
+    calling-type.copy-new()->(owner self.calling-type)
+    self.function := function
+
+
 struct CallGroupBuilder(CallGroup)
-  var NameMap{SyntaxTreeFunction} calling-functions
+  var List{FunctionCall} calling-functions
   var NameMap{SyntaxTreeFunction} members
   user SyntaxTreeFunction owner-member
   var Bool working
   
   new(user SyntaxTreeFunction owner-member)
-    base(owner NameMap{TypeData}())
+    base(owner List{TypeInstance}())
     self.owner-member := owner-member
     self.members.add(user self.owner-member.name, user self.owner-member)
   
-  func add-calling(user SyntaxTreeFunction function)
-    self.calling-functions.add-if-unique-value(
-        user function.name, user function)
+  func add-calling(
+      user SyntaxTreeFunction function, user TypeInstance calling-type)
+    self.calling-functions.add(
+        owner FunctionCall(user function, user calling-type))
 
-  func add-deleting(user TypeData type-data)
-    self.deleting-types.add-if-unique-value(user type-data.name, user type-data)
+  func add-deleting(user TypeInstance type-instance)
+    user ListNode{TypeInstance} node(user self.deleting-types.first)
+    do
+      while node?
+      if type-instance.can-be-assigned-to(user node.item)
+        return
+      if node.item.can-be-assigned-to(user type-instance)
+        owner TypeInstance new-type
+        type-instance.copy-new()->(owner new-type)
+        node.item := new-type
+        return
+      node := node.next
+    self.deleting-types.add(owner type-instance.copy-new())
 
   func build()->(user CallGroupBuilder recursive)
     if self.working
@@ -162,34 +184,35 @@ struct CallGroupBuilder(CallGroup)
       return
     self.working := true
     do
-      user SyntaxTreeFunction function
-      while self.calling-functions.pop()->(user function)?
-      if function.collect-call-group()->(user recursive)?
+      owner FunctionCall call
+      while self.calling-functions.pop()->(owner call)?
+      if call.function.collect-call-group()->(user recursive)?
         if recursive is self
           recursive := _
           continue
         recursive.merge-from(user self)
         return
-      self.extend(user function.call-group)
+      self.extend(owner call)
     self.done()
   
+  func extend(owner FunctionCall call)
+    for type-instance in call.function.call-group.deleting-types.iter()
+      type-instance.replace-type-parameters(user call.calling-type, copy true)
+      self.add-deleting(user type-instance)
+  
   func merge-from(user CallGroupBuilder other)
-    self.extend(user other)
-    user SyntaxTreeFunction function
+    for type-instance in other.deleting-types.iter()
+      self.add-deleting(user type-instance)
     do
+      user SyntaxTreeFunction function
       while other.members.pop()->(user function)?
       self.members.add(user function.name, user function)
       function.call-group-builder := self
     do
-      while other.calling-functions.pop()->(user function)?
-      self.calling-functions.add-if-unique-value(
-          user function.name, user function)
+      owner FunctionCall call
+      while other.calling-functions.pop()->(owner call)?
+      self.calling-functions.add(owner call)
     other.kill()
-  
-  func extend(user CallGroup call-group)
-    for type-data in call-group.deleting-types.iter()
-      self.deleting-types.add-if-unique-value(
-          user type-data.name, user type-data)
   
   func done()
     self.owner-member.call-group-owner := CallGroup(owner self.deleting-types)

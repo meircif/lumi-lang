@@ -155,7 +155,7 @@ class FunctionExpression(Expression)
         self.code-node.find-variable(user "self", user _)->(
             user self-var.variable)
         self-var.variable.type-instance.new-replace-params(
-            user actual-params, copy 0)->(owner self-var.result-type)
+            user actual-params)->(owner self-var.result-type)
         self-param.value := self-var
         self.bases += 1
       else
@@ -178,7 +178,7 @@ class FunctionExpression(Expression)
         return
         
     self.code-node.get-function().call-group-builder.add-calling(
-        user self.function)
+        user self.function, user actual-params)
     expression := FunctionCallExpression(
         user self.code-node,
         user self,

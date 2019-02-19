@@ -13,11 +13,11 @@ class CallExpression(Expression)
     user TypeInstance result-type
     declaration.get-result-type()->(var self.access, user result-type)
     if not self.is-statement
-      result-type.new-replace-params(user actual-params, copy bases)->(
+      result-type.new-replace-params(user actual-params)->(
           owner self.result-type)
       result-type := self.result-type
     if self.arguments.check-same-as(
-        user declaration, user actual-params, copy bases)
+        user declaration, user actual-params, copy bases, copy true)
       ; add omitted output
       new CallArgument output
       output.set-location()
@@ -109,8 +109,8 @@ class FunctionCallExpression(CallExpression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
-    for type-data in self.function.function.call-group.deleting-types.iter()
-      refs.mark-illegal-type(user type-data)
+    for type-instance in self.function.function.call-group.deleting-types.iter()
+      refs.mark-illegal-type(user type-instance)
   
   func dynamic write-function()
     self.function.write()
@@ -247,8 +247,7 @@ class CallArgument(Argument)
           user glob.access-names[self.value.access])
     
     owner TypeInstance real-type
-    type-instance.new-replace-params(user actual-params, copy bases)->(
-        owner real-type)
+    type-instance.new-replace-params(user actual-params)->(owner real-type)
     if self.is-output
       self.is-down-cast := real-type.check-assign-to(
           copy self.access,
