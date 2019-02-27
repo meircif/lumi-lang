@@ -12,6 +12,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   var Bool is-output
   var Bool is-create
   var Bool is-native
+  var Bool is-aux
   
   func inst parse-new(
       copy Int access,
@@ -140,8 +141,14 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.is-create and self.type-instance.type-data is glob.type-array
       if self.type-instance.parameters.first.item.type-data is glob.type-generic
         self.syntax-error-msg(user "cannot create generic array")
+    if self.parent-type? and self.access = Access.USER
+      self.syntax-error-msg(user "fields cannot have \"user\" access")
     if self.my-module?
       glob.current-module := _
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    if self.access = Access.USER or self.access = Access.OWNER
+      refs.add(user self)
   
   func inst write-cname()
     if self.my-module?
@@ -334,6 +341,9 @@ class VariableInit(SyntaxTreeCode)
     self.expression-init.analyze()
     if self.parent is glob.root.global-init
       glob.current-module := _
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.expression-init.check-memory(user refs)
   
   func dynamic write()
     if self.variable.type-instance.type-data.is-primitive and

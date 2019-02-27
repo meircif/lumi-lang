@@ -16,7 +16,7 @@ is only partially implemented, and follows only the
      deleted, and all weak references to this data are considered "outdated"
 
 3. every reference declared as ``user`` is a weak reference, and every access
-   to the reference is automatically perpended with a runtime check that raises
+   to the reference is automatically prepended with a runtime check that raises
    if the used reference is empty or outdated
 4. the mechanism that prevents owner cycles is not implemented yet, making
    :ref:`TL4 <syntax-tl4>` memory management not fully safe yet, but this is
@@ -75,12 +75,12 @@ Primitive variables are declared using ``var`` keyword::
 If no explicit initialization value given - primitive values are initialized
 with each type's default initialization value:
 
-* :cpp:type:`Int` : ``0``
-* :cpp:type:`Bool` : ``false``
-* :cpp:type:`Char` : ``\0``
-* :cpp:type:`Byte` : ``0x00``
-* :cpp:type:`Real` : ``0.0``
-* :cpp:type:`Func` : empty (``_``)
+* :class:`Int` : ``0``
+* :class:`Bool` : ``false``
+* :class:`Char` : ``\0``
+* :class:`Byte` : ``0x00``
+* :class:`Real` : ``0.0``
+* :class:`Func` : empty (``_``)
 
 .. _references:
 

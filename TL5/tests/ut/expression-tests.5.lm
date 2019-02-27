@@ -113,8 +113,10 @@ i := tc.numb
 ; @ c t2
 i := tc.num
 ; @ c t3
+to := t
 i := to.num
 ; @ c t4
+tco := tc
 i := tco.num
 ; @ c t5
 i := t.t.num
@@ -132,11 +134,13 @@ t.error
 ; @ c t0
 c := str[13]
 ; @ c t1
-str := str[2:6]
+user String x
+x := str[2:6]
 ; @ c t2
 i := arr[13]
 ; @ c t3
-arr := arr[2:6]
+user Array{Int} x
+x := arr[2:6]
 ; @ c t4
 str[4] := c
 ; @ c t5
@@ -156,9 +160,9 @@ arr[3:str]
 ; @ ec t12
 arr[i += 3]
 ; @ ec t13
-str[2:5] := str
+str[2:5] := so
 ; @ ec t14
-arr[7:2] := arr
+arr[7:2] := Array{5:Int}()
 ; @ ec t15
 user Array{Test} at
 at[0] := t
@@ -168,13 +172,13 @@ fun0()
 ; @ c t1
 fun1(copy 3, user str, owner _)
 ; @ c t2
-fun2()->(owner so, var io)
+fun2()->(strong so, var io)
 ; @ c t3
 var Int x
-owner String s
-fun2()->(owner s, var x)
+strong String s
+fun2()->(strong s, var x)
 ; @ c t4
-fun3(copy 0)->(owner so)
+fun3(copy 0)->(strong so)
 ; @ c t5
 var Int x
 fun4(copy fun5(copy 3)->(var x))
@@ -193,6 +197,7 @@ so := fun3(copy 7)
 ; @ c t10
 t.meth()
 ; @ c t11
+to := t
 to.meth()
 ; @ c t12
 tc.methc()
@@ -201,6 +206,7 @@ tc.methb()
 ; @ c t14
 tc.meth()
 ; @ c t15
+tco := tc
 tco.meth()
 ; @ c t16
 t.t.meth()
@@ -220,12 +226,13 @@ class Test(Base)
 class Test
     var Int x
     func dynamic meth()
-func mock()->(user Test t)
-    mock()->(user t).meth()
+func mock()->(weak Test t)
+    t := Test()
+    mock()->(weak t).meth()
 ; @ g t21
 class Test
     var Int x
-    func dynamic meth()->(user Test t)
+    func dynamic meth()->(weak Test t)
         self.meth().meth()
 ; @ ec te0
 function( copy 1)
@@ -244,7 +251,7 @@ i()
 ; @ ec te7
 fun5(copy 0)->(var 4)
 ; @ ec te8
-fun7(user _)->(user tc)
+fun7(weak _)->(weak tc)
 ; @ ec te9
 fun5(copy i := 1)
 ; @ ec te10
@@ -252,9 +259,9 @@ fun5(user 8)
 ; @ ec te11
 fun1(copy 3, user str, owner str)
 ; @ ec te12
-fun3(copy 3)->(owner str)
+fun3(copy 3)->(strong str)
 ; @ ec te13
-fun7(user _)->(user tb)
+fun7(weak _)->(weak tb)
 ; @ ec te14
 fun0(copy i)
 ; @ ec te15
@@ -273,6 +280,9 @@ struct Test(Base)
 ; @ ec te19
 var String{16} text
 fun1(copy 3, user str, owner text)
+; @ ec te20
+owner Tb tbo
+fun7(weak tbo)
 ; @@ test-type-expression
 ; @ c t0
 Test.meth(user t)
@@ -406,7 +416,6 @@ struct Test
 func fun()
     new Test t
     t := t.t
-    t.t := t
 ; @ ec te0
 345 @ 2
 ; @ ec te1
@@ -449,6 +458,9 @@ ot := tb
 b := b is b
 ; @ ec te19
 b := t is t < 2
+; @ ec te20
+user Test tu
+t := tu
 ; @@ test-question-expression
 ; @ c t0
 b := str?
@@ -459,10 +471,10 @@ b := t.fun?
 ; @ c t3
 b := to?
 ; @ c t4
-b := fun7(user _)->(user to)?
+b := fun7(weak _)->(weak t)?
 ; @ g t5
 struct Test
-    user String s
+    weak String s
     func meth()->(var Bool res)
         res := self.s?
 ; @ ec te0
@@ -481,7 +493,8 @@ new Ta a(copy 1)
 ; @ c t4
 user Ta a(user ta)
 ; @ c t5
-ta := ta
+user Ta x
+x := ta
 ; @ c t6
 ta := tb
 ; @ c t7
@@ -501,14 +514,16 @@ tb.dyn()
 ; @ c t13
 tc.dyn()
 ; @ c t14
+tco := tc
 tco.dyn()
 ; @ c t15
-fun7(user tc)->(user ta)
+fun7(weak tc)->(weak ta)
 ; @ g t16
 class Test
     var Int x
     func dynamic meth()
-func mock()->(user Test t)
+func mock()->(weak Test t)
+    t := Test()
     t.meth()
 ; @ g t17
 class Base
@@ -518,7 +533,7 @@ class Test(Base)
     func inst fun()
         self.meth()
 ; @ c t18
-fun7(user _)
+fun7(weak _)
 ; @@ test-function-object
 ; @ c t0
 var Func{()} fun

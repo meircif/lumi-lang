@@ -62,12 +62,18 @@ func test-error-message(user String expected-header, user String expected-error)
     if mock-print-text[mock-print-text.length - 1] != '\n'
       sys.print(user "    [no new-line in error end]\n")
       tests-passed := false
-  if mock-print-text.length >= expected-header.length + 4
+  var Int line-num-length(copy 1)
+  do
+    while mock-print-text.length > expected-header.length + line-num-length
+    while mock-print-text[expected-header.length + line-num-length] != ']'
+    line-num-length += 1
+  if mock-print-text.length >= expected-header.length + line-num-length + 3
     assert-string-slice(
         user expected-error,
         user mock-print-text,
-        copy expected-header.length + 3,
-        copy mock-print-text.length - expected-header.length - 4,
+        copy expected-header.length + line-num-length + 2,
+        copy mock-print-text.length - expected-header.length -
+        line-num-length - 3,
         copy true)
 
 
@@ -280,3 +286,7 @@ test test-constant()
 
 test test-module()
   test-from-file(user "test-module")
+
+
+test test-memory()
+  test-from-file(user "test-memory")

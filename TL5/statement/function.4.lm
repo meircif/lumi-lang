@@ -5,15 +5,19 @@ module tl5-compiler
 class SyntaxTreeFunction(SyntaxTreeBlock)
   var List{TypeCount} aux-variables
   var NameMap{SyntaxTreeVariable} function-variables
-  user TypeData parent-type
+  var FunctionArguments arguments
   owner String name
   owner String type-name
   owner String module-name
+  owner CallGroup call-group-owner
+  owner CallGroupBuilder call-group-builder-owner
+  user TypeData parent-type
   user ModuleMembers my-module
-  var FunctionArguments arguments
   user SyntaxTreeFunction implemented-function
   user SyntaxTreeMockFunction mocker-function
   user SyntaxTreeFunction dynamic-base-method
+  user CallGroup call-group
+  user CallGroupBuilder call-group-builder
   var Int dynamic-base-count
   var Int block-count
   var Bool is-dynamic
@@ -47,6 +51,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   new()
     self.set-location()
     self.arguments.new()
+    self.call-group-builder-owner := CallGroupBuilder(user self)
+    self.call-group-builder := self.call-group-builder-owner
   
   func inst parse-body()
     if self.header-only
@@ -184,16 +190,48 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       glob.current-module := self.my-module
     if self.implemented-function?
       self.arguments.check-same-as(
-          user self.implemented-function.arguments, user _, copy 0)
+          user self.implemented-function.arguments, user _, copy 0, copy true)
       self.my-module := self.implemented-function.my-module
     self.arguments.analyze()
+    if self.header-only
+      return
+    for parameter in self.arguments.parameters.iter()
+      if parameter.access = Access.OWNER or parameter.access = Access.STRONG
+        self.call-group-builder.add-deleting(
+            user parameter.get-type-instance())
     base()
+    for variable in self.variables.iter()
+      if variable.access = Access.OWNER or variable.access = Access.STRONG or
+          variable.access = Access.VAR
+        self.call-group-builder.add-deleting(user variable.type-instance)
     if self.my-module?
       glob.current-module := _
   
   func inst compare(user SyntaxTreeFunction other)
     if self.is-dynamic != other.is-dynamic
       self.syntax-error(user "illegal dynamic in function", user self.name)
+    
+  func inst collect-call-group()->(user CallGroupBuilder recursive)
+    if self.call-group?
+      return
+    self.call-group-builder.build()->(user recursive)
+    
+  func dynamic check-memory(user ReferenceMemoryList global-refs)
+    if self.header-only
+      return
+    var ReferenceMemoryList refs
+    self.arguments.check-memory(user refs)
+    self.check-children-memory(user self.variables, user refs)
+    self.check-children-memory(user self.code-nodes, user refs)
+    for parameter in self.arguments.parameters.iter()
+      if parameter.access = Access.OWNER or parameter.access = Access.STRONG
+        refs.mark-illegal-type(user parameter.get-type-instance())
+    for variable in self.variables.iter()
+      if variable.access = Access.OWNER or variable.access = Access.STRONG or
+          variable.access = Access.VAR
+        refs.mark-illegal-type(user variable.type-instance)
+    for output in self.arguments.outputs.iter()
+      refs.check-output(user output)
   
   ~~~ write function body ~~~
   func dynamic write()
@@ -242,7 +280,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       write-spaces(copy INDENTATION-SPACES)
       write(user "Ref_Manager* aux_Ref_Manager = NULL;\n")
     for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.USER
+      if parameter.access = Access.USER or parameter.access = Access.WEAK
         write-spaces(copy INDENTATION-SPACES)
         write(user "LUMI_inc_ref(")
         write-cname(user parameter.get-variable().name)
@@ -250,7 +288,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst write-param-cleanup()
     for parameter in self.arguments.parameters.iter-back()
-      if parameter.access = Access.USER or parameter.access = Access.OWNER
+      if parameter.access = Access.USER or parameter.access = Access.OWNER or
+          parameter.access = Access.WEAK or parameter.access = Access.STRONG
         self.write-variable-cleanup(user parameter.get-variable(), user _)
   
   func inst write-cname()
@@ -280,6 +319,22 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       write(user ".")
     write(user self.name)
     write(user "\"")
+    
+    ; write(user "\n/* calling[")
+    ; for function in self.calling-functions.iter()
+    ;   write(user "|")
+    ;   if function.parent-type?
+    ;     write(user function.parent-type.name)
+    ;     write(user ".")
+    ;   write(user function.name)
+    ; write(user "|] */")
+    ; 
+    ; write(user "\n/* deleting[")
+    ; for type-data in self.deleting-types.iter()
+    ;   write(user "|")
+    ;   write(user type-data.name)
+    ; write(user "|] */")
+      
   
   func inst write-post-func()
     write(user "#undef LUMI_FILE_NAME\n")
@@ -343,6 +398,7 @@ class DeclarationArgument(Argument)
     if glob.last-char != ' '
       self.syntax-error-c(user "expected space after type, got")
     read-new(user ",)")->(owner self.variable.name)
+    self.variable.check-name()
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     self.variable.get-parent-type()->(user parent-type)
@@ -372,17 +428,22 @@ class DeclarationArgument(Argument)
           user self.variable.type-instance.type-data.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
-      if self.access = Access.OWNER
+      if (self.access = Access.OWNER or self.access = Access.STRONG)
         self.syntax-error-msg(user "owner argument to native function")
-      if self.is-output and self.access = Access.USER
+      if self.is-output and
+          (self.access = Access.USER or self.access = Access.WEAK)
         self.syntax-error-msg(user "user output to native function")
-      
   
   func dynamic get-type-instance()->(user TypeInstance type-instance)
     type-instance := self.variable.type-instance
   
   func dynamic get-variable()->(user SyntaxTreeVariable variable)
     variable := self.variable
+  
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    if not self.is-output and
+        (self.access = Access.USER or self.access = Access.OWNER)
+      refs.add(user self.variable)
   
   func dynamic write()
     if self.variable.type-instance.type-data is glob.type-func

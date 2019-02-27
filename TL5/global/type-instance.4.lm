@@ -10,6 +10,7 @@ struct TypeInstance
   var ExpressionValue length-owner
   user ExpressionValue length
   owner FunctionArguments arguments
+  owner ReferencePath reference-path
   
   ~~~ Return a new deep-copy of self ~~~
   func copy-new()->(owner TypeInstance type-instance)
@@ -31,6 +32,8 @@ struct TypeInstance
         other.parameters.add(owner parameter.copy-new())
     if self.arguments?
       self.arguments.copy-new()->(owner other.arguments)
+    if self.reference-path?
+      self.reference-path.copy-new()->(owner other.reference-path)
   
   func parse(
       user String ends,
@@ -167,6 +170,13 @@ struct TypeInstance
     else-if self.type-data is glob.type-func and not self.arguments?
       node.syntax-error-msg(user "missing arguments in function type")
   
+  func can-be-assigned-to(user TypeInstance target)->(var Bool can)
+    can := false
+    try
+      self.check-assign-to(
+          copy Access.VAR, user target, copy Access.VAR, user _)
+      can := true
+  
   func check-assign-from(copy Int access, user SyntaxTreeNode node)->(
       owner Expression value, user Expression assignee)
     assignee := value
@@ -184,6 +194,7 @@ struct TypeInstance
       var Int bases)
     bases := 0
     if not self?
+      assert node?
       node.syntax-error-msg(user "cannot assign void expression")
     if self.type-data is glob.type-empty and
         (not target.type-data.is-primitive or
@@ -191,8 +202,9 @@ struct TypeInstance
       return
     if target.type-data is glob.type-ref and not self.type-data.is-primitive
       return
-    if target-access = Access.OWNER
-      if self-access != Access.OWNER
+    if target-access = Access.OWNER or target-access = Access.STRONG
+      if self-access != Access.OWNER and self-access != Access.STRONG
+        assert node?
         node.syntax-error(
             user "assigning into an owner a non-owner access",
             user glob.access-names[self-access])
@@ -200,14 +212,22 @@ struct TypeInstance
           self.type-data is-not glob.type-empty and
           not target.type-data.is-primitive and
           not target.type-data.is-dynamic
+        assert node?
         node.syntax-error2(
             user "passing ownership of type",
             user self.type-data.name,
             user "into static type",
             user target.type-data.name)
+    if target-access = Access.WEAK and self-access != Access.WEAK and
+        self-access != Access.STRONG and self-access != Access.VAR
+      assert node?
+      node.syntax-error(
+          user "assigning into a weak reference an illegal access",
+          user glob.access-names[self-access])
     if self.type-data is glob.type-generic and
         target.type-data is glob.type-generic
       if not self.name.equal(user target.name)
+        assert node?
         node.syntax-error2(
             user "cannot assign generic subtype",
             user self.name,
@@ -218,6 +238,7 @@ struct TypeInstance
     do
       while not target.type-data.is-same(user self-type-instance.type-data)
       if not self-type-instance.type-data.base-type?
+        assert node?
         node.syntax-error2(
             user "cannot assign",
             user self.type-data.name,
@@ -225,13 +246,14 @@ struct TypeInstance
             user target.type-data.name)
       owner TypeInstance prev-base-type-instance(owner base-type-instance)
       self-type-instance.type-data.base-type.new-replace-params(
-          user self-type-instance, copy 0)->(owner base-type-instance)
+          user self-type-instance)->(owner base-type-instance)
       self-type-instance := base-type-instance
       bases += 1
     
     if self.arguments?
       if self.arguments.check-same-as(
-          user target.arguments, user _, copy 0)
+          user target.arguments, user _, copy 0, copy node?)
+        assert node?
         node.syntax-error-msg(user "too few outputs")
     
     if target.type-data.is-primitive or target.type-data is glob.type-array
@@ -257,6 +279,7 @@ struct TypeInstance
   func check-has-subytpe(
       user TypeInstance target-sub-type, user SyntaxTreeNode node)
     if not self.parameters?
+      assert node?
       node.syntax-error2(
           user "cannot assign type",
           user self.type-data.name,
@@ -265,6 +288,7 @@ struct TypeInstance
   
   func check-equal(user TypeInstance other, user SyntaxTreeNode node)
     if self.type-data is-not other.type-data
+      assert node?
       node.syntax-error2(
           user "non matching types",
           user self.type-data.name,
@@ -282,6 +306,7 @@ struct TypeInstance
       user TypeInstance target-sub-type
       target-iter.get()->(user target-sub-type)
       if my-sub-type.type-data is-not target-sub-type.type-data
+        assert node?
         node.syntax-error2(
             user "non matching subtypes",
             user my-sub-type.type-data.name,
@@ -293,27 +318,38 @@ struct TypeInstance
   func check-sequence(user SyntaxTreeNode node)
     if (self.type-data is glob.type-array or
         self.type-data is glob.type-string) and not self.length?
+      assert node?
       node.syntax-error-msg(user "missing length for sequence")
     if self.type-data is glob.type-array
       if self.parameters.first.item.type-data is glob.type-string and
           not self.parameters.first.item.length?
+        assert node?
         node.syntax-error-msg(user "missing length for sequence")
   
-  func new-replace-params(
-      user TypeInstance actual-params, copy Int bases)->(
+  ~~~ Create a copy of self type-instance with generic parameters replaced by
+  actual types based on `actual-params`. ~~~
+  func new-replace-params(user TypeInstance actual-params)->(
+      owner TypeInstance type-instance)
+    self.new-replace-params-extended(user actual-params, copy true)->(
+        owner type-instance)
+  
+  func new-replace-params-extended(
+      user TypeInstance actual-params, copy Bool replace-bases)->(
       owner TypeInstance type-instance)
     self.copy-new()->(owner type-instance)
     if type-instance?
-      type-instance.replace-type-parameters(user actual-params, copy bases)
+      type-instance.replace-type-parameters(
+          user actual-params, copy replace-bases)
   
-  func replace-type-parameters(user TypeInstance actual-params, copy Int bases)
+  func replace-type-parameters(
+      user TypeInstance actual-params, copy Bool replace-bases)
     if not actual-params?
       return
-    if bases > 0
+    if replace-bases and actual-params.type-data.base-type?
       owner TypeInstance base-type
-      actual-params.type-data.base-type.new-replace-params(
-          user actual-params, copy bases - 1)->(owner base-type)
-      self.replace-type-parameters(user base-type, copy bases - 1)
+      actual-params.type-data.base-type.new-replace-params-extended(
+          user actual-params, copy false)->(owner base-type)
+      self.replace-type-parameters(user base-type, copy true)
     if self.type-data is glob.type-generic and actual-params.parameters? and
         actual-params.type-data.parameters?
       var ListIterator{String} dec-iter(
@@ -326,4 +362,5 @@ struct TypeInstance
         dec-iter.next()
     if self.parameters?
       for parameter in self.parameters.iter()
-        parameter.replace-type-parameters(user actual-params, copy bases)
+        parameter.replace-type-parameters(
+            user actual-params, copy replace-bases)

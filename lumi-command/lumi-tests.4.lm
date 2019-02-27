@@ -20,7 +20,7 @@ mock Sys.print(user String text)
 
 mock Sys.system(user String command)->(var Int result)
   mock-system.concat(user command)
-  mock-system.append(copy '\n')
+  mock-system[mock-system.length - 1] := '\n'
   if mock-system-fail-count = 1
     result := 1
   else

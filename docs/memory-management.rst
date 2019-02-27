@@ -26,17 +26,18 @@ No Performance Overhead - compile time only reference managing
 Lumi will allow performance free reference managing that will be done only in
 compile time.
 
-Every reference has a single "owner" entity - which is another object or a
+Every objects has a single "owner" entity - which is another object or a
 stack block. When an owner is destroyed it automatically destroys the
-referenced object, unless the ownership was moved to another entity. Owners can
-give the reference to multiple "user" entities - other entities that are deeper
-in the stack than the owner. Users are free to modify the referenced object
-freely - but cannot destroy it or modify its sub-owners.
+referenced object, unless the ownership was moved to another entity. Stack and
+global variables are treated as owners - but they cannot move their ownership
 This is very similar to the memory management in
 `Rust <https://doc.rust-lang.org/stable/book/second-edition/ch04-00-understanding-ownership.html>`_.
 
-Stack and global variables are treated as owners - but they cannot move their
-ownership.
+Owners can give the reference to multiple temporary "user" entities. Users are
+free to read and modify the referenced object - but cannot destroy it or modify
+its sub-owners. Users are temporary because they cannot be used after any
+object of their type is destroyed, as the compiler cannot guarantee they are
+pointing to a legal object any more.
 
 This is not implemented yet, but in the future the syntax may look like this::
 
@@ -52,7 +53,7 @@ Lumi will allow more complex and flexible reference managing that come with a
 small and predictable performance cost.
 
 Same as :ref:`memory-management-1` with the addition of weak references.
-To allow this the owner should be declared as "managed". It will work the same
+To allow this the owner should be declared as "strong". It will work the same
 way as a regular owner, plus that it can now give "weak" references to any
 other entity without limitations. Weak references will automatically test that
 the reference is still valid before accessing it.
@@ -69,10 +70,10 @@ predictable.
 This is :ref:`currently implemented <variables>` in a basic manner, but in the
 future the syntax may be different and look like this::
 
-   managed String some-string(String{16}())  ; new managed reference
+   strong String some-string(String{16}())  ; new strong owner reference
    user-func(user some-string)  ; give reference to a user
    weak-func(weak some-string)  ; give weak reference
-   owning-func(managed some-string)  ; move ownership
+   owning-func(strong some-string)  ; move ownership
 
 .. _memory-management-3:
 
@@ -86,9 +87,9 @@ and remove reference loops to avoid memory leaks.
 To allow this a reference should be declared as "shared". This reference can
 then be passed to other "shared", "user" or "weak" references.
 
-Implementing a garbage-collector has a significant and unpredicted performance
-cost, but some Lumi users may be willing to pay it in some sections of their
-project where performance is less important.
+Implementing a garbage-collector has a significant and unpredictable
+performance cost, but some Lumi users may be willing to pay it in some sections
+of their project where performance is less important.
 
 This is not implemented yet, but in the future the syntax may look like this::
 

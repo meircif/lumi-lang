@@ -26,6 +26,9 @@ class BlockExpression(Expression)
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.expression.check-memory(user refs)
   
   func dynamic write-preactions()
     self.expression.write-preactions()
@@ -99,6 +102,9 @@ class UnaryExpression(Expression)
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.right-expression.order-constants(user ordered-list)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.right-expression.check-memory(user refs)
   
   func dynamic write-preactions()
     self.right-expression.write-preactions()
@@ -176,6 +182,10 @@ class BinaryExpression(UnaryExpression)
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.left-expression.order-constants(user ordered-list)
     base(user ordered-list)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    base(user refs)
+    self.left-expression.check-memory(user refs)
   
   func dynamic write-preactions()
     base()
@@ -217,6 +227,9 @@ class QuestionExpression(Expression)
       self.syntax-error-msg(user "cannot use \"?\" on complex field")
     self.set-simple-type(user glob.type-bool)
     self.access := Access.VAR
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.tested.check-memory(user refs)
   
   func dynamic write-preactions()
     self.tested.write-preactions()

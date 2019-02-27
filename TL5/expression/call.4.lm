@@ -13,11 +13,11 @@ class CallExpression(Expression)
     user TypeInstance result-type
     declaration.get-result-type()->(var self.access, user result-type)
     if not self.is-statement
-      result-type.new-replace-params(user actual-params, copy bases)->(
+      result-type.new-replace-params(user actual-params)->(
           owner self.result-type)
       result-type := self.result-type
     if self.arguments.check-same-as(
-        user declaration, user actual-params, copy bases)
+        user declaration, user actual-params, copy bases, copy true)
       ; add omitted output
       new CallArgument output
       output.set-location()
@@ -29,15 +29,25 @@ class CallExpression(Expression)
           declaration.outputs.last.item.get-type-instance().type-data is
           glob.type-generic
       output.access := declaration.outputs.last.item.access
-      output.value := self.add-aux-variable(
+      owner VariableExpression variable-expression
+      self.add-aux-variable(
           copy declaration.outputs.last.item.access,
           copy false,
-          user result-type)
+          user result-type)->(owner variable-expression)
+      if self.result-type?
+        self.result-type.reference-path :=
+            ReferencePath(user variable-expression.variable)
+      output.value := variable-expression
       self.output := output.value
       self.arguments.outputs.add(owner output)
     else-if self.result-type?
       self.arguments.get-output()->(user self.output)
+      self.output.result-type.reference-path.copy-new()->(
+          owner self.result-type.reference-path)
     self.assignable := self.result-type?
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.arguments.check-memory(user refs)
 
   func dynamic write-preactions()
     self.arguments.write-preactions()
@@ -97,6 +107,10 @@ class FunctionCallExpression(CallExpression)
         user self.actual-params,
         copy self.function.bases)
 
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    base(user refs)
+    refs.mark-illegal-types(user self.function.function.call-group)
+  
   func dynamic write-function()
     self.function.write()
 
@@ -175,6 +189,11 @@ class FunctionObjectCallExpression(CallExpression)
         user self.function-object.result-type.arguments,
         user self.function-object.result-type,
         copy 0)
+    self.code-node.get-function().call-group-builder.set-delete-all()
+      
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.function-object.check-memory(user refs)
+    refs.mark-all-illegal()
   
   func dynamic write-function-check()
     self.function-object.write-preactions()
@@ -215,7 +234,9 @@ class CallArgument(Argument)
       user TypeInstance type-instance,
       user TypeInstance actual-params,
       copy Int bases)
-    if self.access = Access.OWNER and self.value.access != Access.OWNER
+    if (self.access = Access.OWNER or self.access = Access.STRONG) and
+        self.value.access != Access.OWNER and
+        self.value.access != Access.STRONG
       self.syntax-error(
           user "assigning into an owner a non-owner access",
           user glob.access-names[self.value.access])
@@ -227,8 +248,7 @@ class CallArgument(Argument)
           user glob.access-names[self.value.access])
     
     owner TypeInstance real-type
-    type-instance.new-replace-params(user actual-params, copy bases)->(
-        owner real-type)
+    type-instance.new-replace-params(user actual-params)->(owner real-type)
     if self.is-output
       self.is-down-cast := real-type.check-assign-to(
           copy self.access,
@@ -244,6 +264,15 @@ class CallArgument(Argument)
   
   func dynamic get-output()->(user Expression output)
     output := self.value
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.value.check-memory(user refs)
+    if not self.is-output
+      if self.access = Access.OWNER and self.value.result-type.reference-path?
+        refs.mark-reference(
+            user self.value.result-type.reference-path, copy false)
+        self.value.result-type.reference-path.check-pure-owner(user self)
+      refs.check-user(user self.value)
   
   func dynamic write-preactions()
     self.value.write-preactions()
@@ -294,7 +323,8 @@ class CallArgument(Argument)
         write(user "_dynamic")
   
   func dynamic write-postactions()
-    if self.access = Access.OWNER and not self.is-output and
+    if (self.access = Access.OWNER or self.access = Access.STRONG) and
+        not self.is-output and
         self.value.result-type.type-data is-not glob.type-empty
       self.code-node.write-spaces()
       self.assignee.write-assign-null()

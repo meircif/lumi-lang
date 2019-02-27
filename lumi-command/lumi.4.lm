@@ -87,6 +87,7 @@ struct Lumi
     if self.verbose
       sys.println(user self.command.text)
     if self.execute
+      self.command.append(copy 0)
       if sys.system(user self.command.text) != 0
         if error-msg?
           sys.println(user error-msg)

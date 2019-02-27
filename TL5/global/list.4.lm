@@ -60,6 +60,10 @@ struct List{Generic}
       node := node.next
     item := _
   
+  func clear()
+    self.first := _
+    self.last := _
+  
   func iter()->(owner ListIterator{Generic} iter)
     iter := ListIterator{Generic}(user self)
   

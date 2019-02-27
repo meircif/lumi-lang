@@ -166,16 +166,9 @@ class SyntaxTreeRoot(GlobalNodes)
     base()
     self.analyze-children(user self.types)
     self.global-init.analyze()
-    if glob.tested-module?
-      if not glob.test-functions.first?
-        sys.print(user "General code error: no test functions\n")
-        sys.exit(copy 1)
-    else-if self.main-function?
-      self.main-function.analyze()
-    else-if not self.is-library
-      sys.print(user "General code error: no main function\n")
-      sys.exit(copy 1)
+    self.analyze-main()
     self.order-children-constants(user self.variables, user self.constants)
+    self.check-memory(user _)
     if self.line-counts?
       self.analyze-cover()
   
@@ -187,6 +180,24 @@ class SyntaxTreeRoot(GlobalNodes)
         sys.print(user "\n")
         raise
     self.types := ordered-list
+
+  func inst analyze-main()
+    if glob.tested-module?
+      if not glob.test-functions.first?
+        sys.print(user "General code error: no test functions\n")
+        sys.exit(copy 1)
+    else-if self.main-function?
+      self.main-function.analyze()
+    else-if not self.is-library
+      sys.print(user "General code error: no main function\n")
+      sys.exit(copy 1)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.collect-call-groups()
+    for type-data in self.types.iter()
+      type-data.collect-call-groups()
+    base(user refs)
+    self.check-children-memory(user self.types, user _)
   
   func inst analyze-cover()
     if not glob.module-map.find(user glob.tested-module)?
@@ -413,6 +424,7 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
 
 class GlobalInit(SyntaxTreeFunction)
   new()
+    base()
     self.indentation-spaces := INDENTATION-SPACES
   
   func dynamic write()

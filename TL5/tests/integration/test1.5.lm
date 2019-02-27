@@ -7,8 +7,8 @@ module integration
 
 class TopType(covered.MiddleType)
     var Int num-top
-    user BaseType top-base-ref
-    user covered.MiddleType top-mid-ref
+    weak BaseType top-base-ref
+    weak covered.MiddleType top-mid-ref
     
     new()
         base()
@@ -25,26 +25,26 @@ class TopType(covered.MiddleType)
         sys.println(user "TopType.meth3")
         base.meth3(copy n, user s)
     
-    func dynamic meth5(copy Int n, user String s)
+    func dynamic meth5(copy Int n, weak String s)
         sys.println(user "TopType.meth5")
         base(copy n, user s)
-        covered.MiddleType.meth1(user _, copy n, user s)
-        BaseType.meth1(user _, copy n, user s)
+        covered.MiddleType.meth1(user _, copy n, weak s)
+        BaseType.meth1(user _, copy n, weak s)
     
     func dynamic meth6()
         sys.println(user "TopType.meth6")
         self.num-mid := self.num-base
         self.top-base-ref := self.top-mid-ref
-        self.top-base-ref := self
         user covered.MiddleType mt(user self)
+        mt := self
         user BaseType bt(user mt)
         test-mid-out()->(user bt)
 
 
 class BaseType
     var Int num-base
-    user covered.MiddleType base-mid-ref
-    user TopType base-top-ref
+    weak covered.MiddleType base-mid-ref
+    weak TopType base-top-ref
     
     new()
         self.num-base := 1
@@ -52,7 +52,7 @@ class BaseType
     func dynamic meth0()
         sys.println(user "BaseType.meth0")
     
-    func dynamic meth1(copy Int n, user String s)
+    func dynamic meth1(copy Int n, weak String s)
         sys.println(user "BaseType.meth1")
     
     func dynamic meth2()
@@ -63,15 +63,19 @@ class BaseType
 
 
 func test-mid-out()->(user covered.MiddleType mt)
+    mt := _
+
+
+func test-new-mid()->(owner covered.MiddleType mt)
     new covered.MiddleType new-mt
     mt := new-mt
 
 
 mock TestStruct.get()->(var Int x, user String s)
     x := 12
-    s := ""
+    s := _
 
-mock f-test-int2str(copy Int x)->(owner String s)
+mock test-int2str(copy Int x)->(owner String s)
     raise
 
 mock TestClass.dynamic-meth()
@@ -79,14 +83,14 @@ mock TestClass.dynamic-meth()
 
 test test-func()
     owner String s
-    assert-error f-test-int2str(copy 3)->(owner s)
-    f-test-int2str.mocked(copy 4)->(owner s)
-    f-test-int2str.active := false
-    f-test-int2str(copy 5)->(owner s)
-    f-test-int2str.active := true
-    assert-error f-test-int2str(copy 6)->(owner s)
+    assert-error test-int2str(copy 3)->(owner s)
+    test-int2str.mocked(copy 4)->(owner s)
+    test-int2str.active := false
+    test-int2str(copy 5)->(owner s)
+    test-int2str.active := true
+    assert-error test-int2str(copy 6)->(owner s)
     
-    var TestStruct t(copy 0, user _)
+    var TestStruct t(copy 0, weak _)
     var Int x
     t.get()->(var x)
     assert x = 12
@@ -142,13 +146,13 @@ test test-dynamic-type-parameters()
     var TopType ttop
     ttop.num-base := 12
     dmid.item := ttop
-    user BaseType tbase
+    weak BaseType tbase
     tbase := dmid.item
     assert tbase.num-base = 12
     ttop.num-base := 13
-    dmid.set(user ttop, user _)
+    dmid.set(weak ttop, weak _)
     tbase := _
-    dmid.get()->(user tbase)
+    dmid.get()->(weak tbase)
     assert tbase.num-base = 13
 
 
@@ -157,7 +161,7 @@ struct Link
 
 class BaseLink
     owner BaseLink next
-    user Link link
+    weak Link link
     
     func dynamic m-meth()
         ; do nothing
@@ -169,9 +173,14 @@ struct RefNode
     owner RefNode next
     var Ref ref
     
-    func new(copy Ref ref, owner RefNode next)
+    func new(copy Ref ref)
         self.ref := ref
-        self.next := next
+
+func new-ref-node(copy Ref ref)->(owner RefNode next)
+    new RefNode ref-node(copy ref)
+    ref-node.next := next
+    next := ref-node
+
 
 var Bool record-delete
 owner RefNode deleted-links
@@ -181,25 +190,25 @@ owner RefNode deleted-refmans(owner _)
 
 mock delete()
     if record-delete
-        deleted-refmans := RefNode(copy self, owner deleted-refmans)
+        new-ref-node(copy self)->(owner deleted-refmans)
 
 mock Link.delete()
     if record-delete
-        deleted-links := RefNode(copy self, owner deleted-links)
+        new-ref-node(copy self)->(owner deleted-links)
 
 mock BaseLink.delete()
     if record-delete
-        deleted-base-links := RefNode(copy self, owner deleted-base-links)
+        new-ref-node(copy self)->(owner deleted-base-links)
 
 mock TopLink.delete()
     if record-delete
-        deleted-top-links := RefNode(copy self, owner deleted-top-links)
+        new-ref-node(copy self)->(owner deleted-top-links)
 
 func remove-obj(owner Link b)
     ; remove b
 
-func get-outdated-var()->(user Link l-out)
-    var Link l-var
+func get-outdated-var()->(weak Link l-out)
+    new Link l-var
     l-out := l-var
 
 test test-simple-delete()
@@ -208,7 +217,7 @@ test test-simple-delete()
     record-delete := true
     
     new Link l
-    user Link l-user(user l)
+    weak Link l-user(weak l)
     assert l?
     assert l-user?
     var Ref l-ref(copy l)
@@ -223,7 +232,7 @@ test test-simple-delete()
     assert deleted-refmans?
     assert deleted-refmans.ref is l-ref
     assert not deleted-refmans.next?
-    get-outdated-var()->(user l-user)
+    get-outdated-var()->(weak l-user)
     assert l-user is-not _
     assert not l-user?
     
@@ -374,26 +383,26 @@ test test-block-delete()
     deleted-links := _
 
 
-func f-raise-message()
+func raise-message()
     raise "tested message"
 
-func f-ignore-and-raise()
+func ignore-and-raise()
     try
-        f-raise-message()
+        raise-message()
     raise "ignore and raise"
 
-func f-failed-assert()
+func failed-assert()
     assert 1 = 2
 
-func f-good-assert-error()
-    assert-error f-raise-message()
+func good-assert-error()
+    assert-error raise-message()
     raise "good assert error"
 
-func f-failed-assert-error()
-    assert-error f-test-void()
+func failed-assert-error()
+    assert-error test-void()
 
-func f-wrong-message-assert-error()
-    assert-error f-raise-message(), "wrong message"
+func wrong-message-assert-error()
+    assert-error raise-message(), "wrong message"
 
 var Int new-fail-countdown
 
@@ -404,17 +413,17 @@ mock new()->(var Bool alloc-success)
         if new-fail-countdown = 0
             alloc-success := false
 
-func f-alloc()
+func alloc()
     new String{16} string
     assert string?
 
 test test-assert-error-message()
-    assert-error f-raise-message(), "tested message"
-    assert-error f-ignore-and-raise(), "ignore and raise"
-    assert-error f-failed-assert(), "condition is not true"
-    assert-error f-good-assert-error(), "good assert error"
-    assert-error f-failed-assert-error(), "error not raised"
-    assert-error f-wrong-message-assert-error()
+    assert-error raise-message(), "tested message"
+    assert-error ignore-and-raise(), "ignore and raise"
+    assert-error failed-assert(), "condition is not true"
+    assert-error good-assert-error(), "good assert error"
+    assert-error failed-assert-error(), "error not raised"
+    assert-error wrong-message-assert-error()
     var Func{()} fun
     assert-error fun(), "empty object used"
     var BaseType base-var
@@ -432,9 +441,9 @@ test test-assert-error-message()
     user TopType top
     assert-error top.meth2(), "empty object used"
     new-fail-countdown := 1
-    assert-error f-alloc(), "insufficient memory for object dynamic allocation"
+    assert-error alloc(), "insufficient memory for object dynamic allocation"
     new-fail-countdown := 2
-    assert-error f-alloc(), "insufficient memory for managed object"
+    assert-error alloc(), "insufficient memory for managed object"
 
 native var Int lumi-debug-value
 
@@ -490,7 +499,7 @@ mock Sys.println(user String text)
 
 test test-cover-all()
     var covered.MiddleType mid
-    mid.meth1(copy 0, user _)
+    mid.meth1(copy 0, weak _)
     mid.meth2()
     mid.meth4()
     mid.meth5(copy 0, user _)

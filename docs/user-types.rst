@@ -252,8 +252,8 @@ Classes and Binds
 Syntax for the :ref:`class typing style <type-system-static>`.
 
 A straightforward way to use classes is using the built-in ``Bind`` typed
-references. References of this type only accept types that extend all binded
-structures and implement all binded dynamics. ::
+references. References of this type only accept types that extend all bound
+structures and implement all bound dynamics. ::
 
    user Bind{ExampleStruct:ExampleDynamic} class-reference
 
@@ -295,9 +295,9 @@ type. This is not supported in :ref:`TL4 <syntax-tl4>`. ::
    var Struct{ExampleClass} static-structure-only
    user Dynamic{ExampleClass} dynamic-interface-only
 
-Parametrized types
-------------------
-Syntax for the :ref:`parametrized type typing style <type-system-static>`.
+parameterized types
+-------------------
+Syntax for the :ref:`parameterized type typing style <type-system-static>`.
 
 Each type parameter must have a type and a name. For static type names ``Type``
 should be used as the parameter type, and for dynamic parameters ``Generic``
@@ -310,7 +310,7 @@ standard of constants. ::
      var TypeParameter static-parametrized-typed-variable
      user GenericParameter dynamic-parametrized-typed-reference
 
-Whenever a parametrized type is used it must be set with appropriate values for
+Whenever a parameterized type is used it must be set with appropriate values for
 each parameter ::
 
    var ParametrizedType{8:Int:File} specific-variable

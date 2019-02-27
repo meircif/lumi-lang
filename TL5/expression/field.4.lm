@@ -53,8 +53,10 @@ class FieldExpression(Expression)
             user "calling \"base\" with non-method", user self.name)
       self.is-complex-field := self.variable.access = Access.VAR and
           not self.variable.type-instance.type-data.is-primitive
-      self.variable.type-instance.new-replace-params(
-          user instance-type, copy self.bases)->(owner self.result-type)
+      self.variable.type-instance.new-replace-params(user instance-type)->(
+          owner self.result-type)
+      instance-type.reference-path.copy-and-add-field(user self.variable)->(
+          owner self.result-type.reference-path)
       self.access := self.variable.access
       self.assignable := not self.is-complex-field
       if self.variable.type-instance.type-data is glob.type-generic
@@ -89,6 +91,11 @@ class FieldExpression(Expression)
         copy after-type,
         copy after-base)
     expression.restructure()->(owner expression, owner arguments)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.instance.check-memory(user refs)
+    refs.check-expression(user self)
+    refs.check-user(user self.instance)
 
   func dynamic write-preactions()
     self.instance.write-preactions()

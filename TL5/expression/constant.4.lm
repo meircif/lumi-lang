@@ -172,6 +172,8 @@ class StringExpression(TextExpression)
   func dynamic analyze()
     self.add-aux-variable(copy Access.VAR, copy false, user self.result-type)->(
         owner self.aux-variable)
+    self.result-type.reference-path := ReferencePath(
+        user self.aux-variable.variable)
   
   func dynamic write-preactions()
     ; INIT_STRING_CONST(`line`, `cleanup`, `symbol`, `text`)
@@ -195,7 +197,7 @@ class EmptyExpression(Expression)
   new()
     base(user _)
     self.set-simple-type(user glob.type-empty)
-    self.access := Access.OWNER
+    self.access := Access.STRONG
   
   func dynamic write()
     write(user "NULL")

@@ -22,6 +22,9 @@ class SyntaxTreeCode(SyntaxTreeNode)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     self.parent.get-parent-type()->(user parent-type)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    ; do nothing
   
   func inst write-spaces()
     self.parent.write-spaces()
@@ -162,7 +165,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if glob.last-char != ' '
         self.syntax-error-c(user "expected space after \"new\", got")
       self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _, copy Access.OWNER, copy true, user _, user self))
+          user _, copy Access.STRONG, copy true, user _, user self))
       
     else-if keyword.equal(user "try")
       if glob.last-char != '\n'
@@ -234,6 +237,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     variable.name.concat(user index-str)
     variable.access := access
     variable.is-create := is-create
+    variable.is-aux := true
     type-instance.copy-new()->(owner variable.type-instance)
     new-variable := variable
     self.variables.add(owner variable)

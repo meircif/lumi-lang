@@ -9,6 +9,7 @@ class TopType(BaseType)
     func dynamic meth()
 
 func f-get-top()->(user TopType top)
+    top := _
 
 func f-good-function()
     return
@@ -46,7 +47,7 @@ test fail-member-empty()
 
 test fail-member-outdated()
     new BaseType obj-owner
-    user BaseType obj(user obj-owner)
+    weak BaseType obj(weak obj-owner)
     obj-owner := _
     assert obj.x = 0
     obj.meth()
@@ -90,10 +91,3 @@ test fail-assert-error-message()
 
 test fail-assert-error-message-prefix()
     assert-error f-raise-message(user "tested message"), "tested message and more"
-
-struct Test
-    owner Test t
-
-test fail-owner-cycle()
-    new Test t
-    t.t := t

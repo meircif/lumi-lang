@@ -7,7 +7,7 @@ Built-in Types
 
 Integer
 -------
-.. cpp:type:: Int
+.. class:: Int
 
    Signed integer, same as ``int`` in C.
 
@@ -18,28 +18,28 @@ Integer
       * hexadecimal: ``0xa30eb9f6``
       * negative integer: ``-`` before any positive integer literal: ``-23``
 
-   .. cpp:function:: str(user String text)
+   .. method:: str(user String text)
 
       write into ``text`` the integer converted to string
 
 Boolean
 -------
-.. cpp:type:: Bool
+.. class:: Bool
 
-   A boolean value that can only be a :cpp:var:`true` or a :cpp:var:`false`
+   A boolean value that can only be a :data:`true` or a :data:`false`
    constant.
 
 Built-in Global Constants
 +++++++++++++++++++++++++
-.. cpp:var:: Bool true
+.. data:: Bool true
 
-.. cpp:var:: Bool false
+.. data:: Bool false
 
 .. _character:
 
 Character
 ---------
-.. cpp:type:: Char
+.. class:: Char
 
    A single ascii character.
 
@@ -56,18 +56,18 @@ Byte
 ----
 *planned - not supported in* :ref:`TL4 <syntax-tl4>`
 
-.. cpp:type:: Byte
+.. class:: Byte
 
    A single memory byte value.
 
-   Byte is threated as a normal :ref:`integers <integer>` with range 0..255.
+   Byte is treated as a normal :ref:`integers <integer>` with range 0..255.
 
 
 Real Number
 -----------
 *planned - not supported in* :ref:`TL4 <syntax-tl4>`
 
-.. cpp:type:: Real
+.. class:: Real
 
    Floating point real number, same as ``float`` in C.
 
@@ -77,7 +77,7 @@ Real Number
 
 Function
 --------
-.. cpp:type:: Func(arguments)
+.. class:: Func(arguments)
 
    Holds (pointer to) a function.
 
@@ -90,9 +90,9 @@ Function
 
 String
 ------
-.. cpp:type:: String(max length)
+.. class:: String(max length)
 
-   Sequence of :cpp:type:`Char` items with dynamic length.
+   Sequence of :class:`Char` items with dynamic length.
 
    :param max length: maximum length of the string and the actual allocation
       size
@@ -126,57 +126,57 @@ String
       In :ref:`TL4 <syntax-tl4>` string slicing is not fully safe. It should
       only be used temporarily before any modification to the original string.
 
-   .. cpp:member:: Int length
+   .. attribute:: Int length
 
       current (dynamic) string length
 
-   .. cpp:function:: new(user String text)
+   .. method:: new(user String text)
 
       initialize this string with a copy of ``text``, does nothing if it's
       empty or invalid
 
       :raises: if ``text`` is too long to fit this string
 
-   .. cpp:function:: clear()
+   .. method:: clear()
 
       make this string empty
 
-   .. cpp:function:: equal(user String other)->(var Bool is-equal)
+   .. method:: equal(user String other)->(var Bool is-equal)
 
       return whether this string is exactly equal to ``other``, return ``false``
       if ``other`` is empty or outdated
 
-   .. cpp:function:: get(copy Int index)->(var Char character)
+   .. method:: get(copy Int index)->(var Char character)
 
       return character at place ``index``,
 
       :raises: if ``index`` is out of range
 
-   .. cpp:function:: append(copy Char character)
+   .. method:: append(copy Char character)
 
       append ``character`` to this string end
 
       :raises: if has no room for another character
 
-   .. cpp:function:: concat(user String text)
+   .. method:: concat(user String text)
 
       concatenate ``text`` to this string end
 
       :raises: if has no room for ``text``
 
-   .. cpp:function:: concat-int(copy Int number)
+   .. method:: concat-int(copy Int number)
 
       covert ``number`` to string and concatenate it to this string end
 
       :raises: if has no room for ``number``
 
-   .. cpp:function:: find(user String pattern)->(copy Int index)
+   .. method:: find(user String pattern)->(copy Int index)
 
-      return index of first accurance of ``pattern`` in this string, return
+      return index of first occurrence of ``pattern`` in this string, return
       ``0`` if empty or invalid pattern given, return this string
-      :cpp:member:`length` if ``pattern`` not found
+      :data:`length` if ``pattern`` not found
 
-   .. cpp:function:: has(copy Char character)->(var Bool has)
+   .. method:: has(copy Char character)->(var Bool has)
 
       return whether this string contains ``character``
 
@@ -186,9 +186,9 @@ Buffer
 ------
 *planned - not supported in* :ref:`TL4 <syntax-tl4>`
 
-.. cpp:type:: Buffer(max length)
+.. class:: Buffer(max length)
 
-   Sequence of :cpp:type:`Byte` items with dynamic length.
+   Sequence of :class:`Byte` items with dynamic length.
 
    :param max length: maximum length of the string and the actual allocation
       size
@@ -200,17 +200,17 @@ Buffer
    Buffer literals are hexadecimal strings surrounded by ````` characters:
    ```4a0069ff3487beef2649```.
 
-   .. cpp:member:: Int length
+   .. attribute:: Int length
 
       current (dynamic) string length
 
-   .. cpp:member:: Int max-length
+   .. attribute:: Int max-length
 
       maximum (static) length of the string
 
 Array
 -----
-.. cpp:type:: Array(length, subtype)
+.. class:: Array(length, subtype)
 
    Sequence of any typed item with static length. In :ref:`TL4 <syntax-tl4>`
    array of arrays are not supported. It is planned to be supported in the final
@@ -234,39 +234,39 @@ Array
       In :ref:`TL4 <syntax-tl4>` array slicing is not fully safe. It should
       only be used temporarily before any modification to the original array.
 
-   .. cpp:member:: Int length
+   .. attribute:: Int length
 
       (static) length of the array
 
 File
 ----
-.. cpp:type:: File
+.. class:: File
 
-   Used to access files. Use :cpp:func:`file-open-read` or
-   :cpp:func:`file-open-write` to create new objects from this type.
+   Used to access files. Use :func:`file-open-read` or
+   :func:`file-open-write` to create new objects from this type.
 
-   .. cpp:function:: close()
+   .. method:: close()
 
       close this file, does nothing if this file is already closed
 
       :raises: if closing failed
 
-   .. cpp:function:: getc()->(var Char character, var Bool is-eof)
+   .. method:: getc()->(var Char character, var Bool is-eof)
 
       read one character from this file
 
       if this file is not closed, has more data, and data read succeeded -
-      return :cpp:var:`false` in ``is-eof`` and next character read from the
-      file in ``character``, else - return :cpp:var:`true` in ``is-eof`` and do
+      return :data:`false` in ``is-eof`` and next character read from the
+      file in ``character``, else - return :data:`true` in ``is-eof`` and do
       nothing with ``character``
 
-   .. cpp:function:: putc(copy Char character)
+   .. method:: putc(copy Char character)
 
       append ``character`` to this file end
 
       :raises: if writing failed
 
-   .. cpp:function:: write(user String text)
+   .. method:: write(user String text)
 
       append ``text`` to this file end
 
@@ -274,27 +274,27 @@ File
 
 Built-in Global Functions
 +++++++++++++++++++++++++
-.. cpp:function:: file-open-read(user String filename)->(owner File file)
+.. function:: file-open-read(user String filename)->(owner File file)
 
-   Create a new :cpp:type:`File` object that is capable of **reading** from
+   Create a new :class:`File` object that is capable of **reading** from
    ``filename`` file.
 
-.. cpp:function:: file-open-write(user String filename)->(owner File file)
+.. function:: file-open-write(user String filename)->(owner File file)
 
-   Create a new :cpp:type:`File` object that is capable of **writing** to
+   Create a new :class:`File` object that is capable of **writing** to
    ``filename`` file.
 
 Built-in Global Variables
 +++++++++++++++++++++++++
-.. cpp:var:: File stdin
+.. data:: File stdin
 
    can be used to **read** from the standard input stream
 
-.. cpp:var:: File stdout
+.. data:: File stdout
 
    can be used to **write** to the standard output stream
 
-.. cpp:var:: File stderr
+.. data:: File stderr
 
    can be used to **write** to the standard error stream
 
@@ -303,53 +303,53 @@ System
 This type is temporary in :ref:`TL4 <syntax-tl4>`, in the planned Lumi syntax
 there will be a ``sys`` module with the same interface.
 
-.. cpp:type:: Sys
+.. class:: Sys
 
-   The type of the built-in :cpp:var:`sys` object, can be used to access system
+   The type of the built-in :data:`sys` object, can be used to access system
    data and functionality.
 
-   .. cpp:member:: Array{String} argv
+   .. attribute:: Array{String} argv
 
       holds program arguments
 
-   .. cpp:function:: print(user String text)
+   .. method:: print(user String text)
 
       print ``text`` to the standard output stream, same as calling
       ``stdout.write``
 
       :raises: if writing failed
 
-   .. cpp:function:: println(user String text)
+   .. method:: println(user String text)
 
       print ``text`` appended with new-line character to the standard output
       stream
 
       :raises: if writing failed
 
-   .. cpp:function:: getchar()->(var Char character, var Bool is-eof)
+   .. method:: getchar()->(var Char character, var Bool is-eof)
 
       read one character from the standard input stream
 
       if the standard input stream is not closed, has more data, and data read
-      succeeded - return :cpp:var:`false` in ``is-eof`` and next character read
+      succeeded - return :data:`false` in ``is-eof`` and next character read
       from the standard input stream in ``character``, else - return
-      :cpp:var:`true` in ``is-eof`` and do nothing with ``character``
+      :data:`true` in ``is-eof`` and do nothing with ``character``
 
-   .. cpp:function:: getline(user String text)
+   .. method:: getline(user String text)
 
       read one line from the standard input stream into ``text``, the line-end
       character is not written into ``text``
 
       does nothing if could not read data
 
-   .. cpp:function:: exit(copy Int status)
+   .. method:: exit(copy Int status)
 
       terminates execution of the program immediately with ``status`` as the
       exit status value
 
       calls C ``exit`` function
 
-   .. cpp:function:: system(user String command)->(var Int status)
+   .. method:: system(user String command)->(var Int status)
 
       execute ``command`` by the host command processor and return the return
       status of the command
@@ -359,18 +359,18 @@ there will be a ``sys`` module with the same interface.
       :raises: if ``command`` is empty or outdated, or if command fails to
          execute
 
-   .. cpp:function:: getenv(user String name)->(user String value, var Bool exists)
+   .. method:: getenv(user String name)->(user String value, var Bool exists)
 
       get an environment variable
 
       if environment variable named ``name`` exists - copy into ``value`` the
-      value of the environment variable and return :cpp:var:`true` in
-      ``exists``, else - return :cpp:var:`false` in ``exists`` and do nothing
+      value of the environment variable and return :data:`true` in
+      ``exists``, else - return :data:`false` in ``exists`` and do nothing
       with ``value``
 
 Built-in Global Variables
 +++++++++++++++++++++++++
-.. cpp:var:: Sys sys
+.. data:: Sys sys
 
    Only this variable should be be used to access system data and functionality
-   as exposed by the :cpp:type:`Sys` type interface.
+   as exposed by the :class:`Sys` type interface.
