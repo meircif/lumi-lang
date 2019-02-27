@@ -23,6 +23,25 @@ func write-syntax-tree(copy Bool is-test)
   tl5-compiler.glob.root.write()
 
 
+func write-syntax-tree-success(copy Bool is-test)
+  if crush-run
+    write-syntax-tree(copy is-test)
+    raise
+  sys-exit := false
+  Sys.print.active := true
+  try
+    write-syntax-tree(copy is-test)
+    Sys.print.active := false
+  catch
+    Sys.print.active := false
+    if sys-exit
+      print-case-error()
+      sys.print(user mock-print-text[0:mock-print-text.length - 1])
+    else
+      crush-run := true
+    assert false
+
+
 func test-global-scope(
     user String input-text,
     user String second-file-input-text,
@@ -30,7 +49,7 @@ func test-global-scope(
     copy Bool is-test)
   setup-test()
   set-mock-file-text(user input-text, user second-file-input-text)
-  write-syntax-tree(copy is-test)
+  write-syntax-tree-success(copy is-test)
   if mock-output-file-text[0] != '\n'
     sys.print(user mock-output-file-text)
   assert mock-output-file-text[0] = '\n'
@@ -44,15 +63,23 @@ func test-global-scope(
 
 
 func try-write-syntax-tree(copy Bool is-test)->(var Bool has-error)
-  Sys.print.active := true
+  if crush-run
+    write-syntax-tree(copy is-test)
+    raise
   has-error := true
+  sys-exit := false
+  Sys.print.active := true
   try
     write-syntax-tree(copy is-test)
+    has-error := false
     Sys.print.active := false
     print-case-error()
     sys.print(user "[no error raised]")
-    has-error := false
-  Sys.print.active := false
+  catch
+    Sys.print.active := false
+    if not sys-exit
+      crush-run := true
+      assert false
 
 
 func test-error-message(user String expected-header, user String expected-error)
@@ -90,10 +117,7 @@ func test-global-scope-error(
   setup-test()
   set-mock-file-text(user input-text, user second-file-input-text)
   assert try-write-syntax-tree(copy is-test)
-  if mock-print-text.length = 0
-    setup-test()
-    set-mock-file-text(user input-text, user second-file-input-text)
-    write-syntax-tree(copy is-test)
+  Sys.print.active := false
   user String expected-header
   if is-test
     expected-header := "Code error in second.5.lm["
@@ -121,7 +145,7 @@ func test-code(
   if not code-header-valid
     return
   test-code-setup(user input-text)
-  write-syntax-tree(copy false)
+  write-syntax-tree-success(copy false)
   assert-string-slice(
       user expected-common-header,
       user mock-output-file-text,
@@ -152,9 +176,7 @@ func test-code-error(user String input-text, user String expected-error)
     return
   test-code-setup(user input-text)
   assert try-write-syntax-tree(copy false)
-  if mock-print-text.length = 0
-    test-code-setup(user input-text)
-    write-syntax-tree(copy false)
+  Sys.print.active := false
   test-error-message(user "Code error in mock.5.lm[", user expected-error)
 
 
@@ -184,8 +206,8 @@ test test-open-file-fail()
   sys.argv := mock-argv
   tl5-compiler.glob.root.is-library := true
   
-  Sys.print.active := true
   file-open-error := true
+  Sys.print.active := true
   assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
   Sys.print.active := false
   assert-string-slice(

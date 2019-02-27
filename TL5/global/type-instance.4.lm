@@ -3,14 +3,15 @@ module tl5-compiler
 
 ~~~ Specific usage of a type including the assigned subtypes and values ~~~
 struct TypeInstance
+  var ExpressionValue length-owner
   owner String name
   owner String module-name
-  user TypeData type-data
   owner List{TypeInstance} parameters
-  var ExpressionValue length-owner
-  user ExpressionValue length
   owner FunctionArguments arguments
   owner ReferencePath reference-path
+  user TypeData type-data
+  user ExpressionValue length
+  var Bool conditional
   
   ~~~ Return a new deep-copy of self ~~~
   func copy-new()->(owner TypeInstance type-instance)
@@ -22,10 +23,11 @@ struct TypeInstance
         
   func copy(user TypeInstance other)
     other.type-data := self.type-data
+    other.length := self.length
+    other.conditional := self.conditional
     string-new-copy(user self.name)->(owner other.name)
     if self.module-name?
       string-new-copy(user self.module-name)->(owner other.module-name)
-    other.length := self.length
     if self.parameters?
       other.parameters := List{TypeInstance}()
       for parameter in self.parameters.iter()
@@ -41,12 +43,15 @@ struct TypeInstance
       user SyntaxTreeCode code-node,
       copy Int indentation-spaces)
     user String name
-    read-until(user string-new-concat(user ends, user ".{"), copy false)->(
+    read-until(user string-new-concat(user ends, user "?.{"), copy false)->(
         user name)
     if glob.last-char = '.'
       string-new-copy(user name)->(owner self.module-name)
-      read-until(user string-new-concat(user ends, user "{"), copy false)->(
+      read-until(user string-new-concat(user ends, user "?{"), copy false)->(
           user name)
+    if glob.last-char = '?'
+      self.conditional := true
+      read-c()
     self.parse-name(
         user name, user node, user code-node, copy indentation-spaces)
   
@@ -199,6 +204,11 @@ struct TypeInstance
     if self.type-data is glob.type-empty and
         (not target.type-data.is-primitive or
         target.type-data is glob.type-func)
+      if not target.conditional
+        assert node?
+        node.syntax-error(
+            user "assigning empty into non-conditional type",
+            user target.type-data.name)
       return
     if target.type-data is glob.type-ref and not self.type-data.is-primitive
       return
@@ -249,6 +259,11 @@ struct TypeInstance
           user self-type-instance)->(owner base-type-instance)
       self-type-instance := base-type-instance
       bases += 1
+    if self.conditional and not target.conditional
+      assert node?
+      node.syntax-error(
+          user "assigning conditional into non-conditional type",
+          user target.type-data.name)
     
     if self.arguments?
       if self.arguments.check-same-as(
@@ -357,7 +372,9 @@ struct TypeInstance
       for inst-param in actual-params.parameters.iter()
         while dec-iter.has()
         if dec-iter.get().equal(user self.name)
+          var Bool conditional(copy self.conditional)
           inst-param.copy(user self)
+          self.conditional := conditional
           break
         dec-iter.next()
     if self.parameters?

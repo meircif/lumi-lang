@@ -55,6 +55,7 @@ class SliceExpression(Expression)
       analyze-expression()->(owner self.second-index)
       self.check-index(user self.second-index)
       self.sequence.result-type.copy-new()->(owner self.result-type)
+      self.result-type.conditional := false
       self.add-aux-variable(
           copy Access.VAR, copy false, user self.result-type)->(
           owner self.slice-variable)

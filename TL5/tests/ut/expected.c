@@ -1024,7 +1024,7 @@ no base type for type "Test"
 /// @ te2
 no base method for method "mock"
 /// @ te3
-cannot assign "Test" into "Base Symbol"
+assigning into non assignable expression
 /// @ te4
 calling "base" with non-method "x"
 /// @@ test-block-expression
@@ -1231,6 +1231,8 @@ operator "is" is not supported for type "Bool"
 operator "<" expected "Int" operand, got "Bool"
 /// @ te20
 assigning into a weak reference an illegal access "user"
+/// @ te21
+assigning conditional into non-conditional type "Test"
 /// @@ test-question-expression
 /// @ t0
 ut_M_b = ut_M_str != NULL && ut_M_str_Refman->value != NULL;
@@ -1815,12 +1817,8 @@ Returncode ut_M_fun(void) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     ++LUMI_file_coverage[0].line_count[3];
-    aux_Ref_Manager = ut_M_s_Refman;
-    ut_M_s_Refman = NULL;
-    LUMI_inc_ref(ut_M_s_Refman);
-    LUMI_dec_ref(aux_Ref_Manager);
-    aux_Ref_Manager = NULL;
-    ut_M_s = NULL;
+    LUMI_err = String_clear(ut_M_s, ut_M_s_Refman);
+    CHECK(3, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -3123,7 +3121,7 @@ got "String" expression, expected "Int"
 /// @ te14
 only "var" access is supported for primitive types, got "user"
 /// @ te15
-only "var" access is supported for primitive types, got "strong"
+only "var" access is supported for primitive types, got "owner"
 /// @ te16
 no constructor for type "Array"
 /// @ te17
@@ -3142,6 +3140,12 @@ assigning into an owner a non-owner access "weak"
 more than one subtype for array
 /// @ te24
 passing ownership of type "Tb" into static type "Test"
+/// @ te25
+uninitialized reference "s"
+/// @ te26
+assigning empty into non-conditional type "String"
+/// @ te27
+assigning conditional into non-conditional type "String"
 /// @@ test-comment
 /// @ t0
 Int x = 0;
@@ -7556,7 +7560,13 @@ Returncode ut_M_fun(void) {
     Ref_Manager* so_Refman = NULL;
     String* s = NULL;
     Ref_Manager* s_Refman = NULL;
-    INIT_NEW(4, LUMI_block0_cleanup, so, LUMI_new_string(12));
+    String* aux_String_0 = NULL;
+    Ref_Manager* aux_String_0_Refman = NULL;
+    INIT_NEW(4, LUMI_block0_cleanup, aux_String_0, LUMI_new_string(12));
+    so = aux_String_0;
+    so_Refman = aux_String_0_Refman;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
     s = so;
     s_Refman = so_Refman;
     LUMI_inc_ref(s_Refman);
@@ -7566,6 +7576,8 @@ Returncode ut_M_fun(void) {
     CHECK(7, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
+    String_Del(aux_String_0);
+    LUMI_owner_dec_ref(aux_String_0_Refman);
     LUMI_dec_ref(s_Refman);
     String_Del(so);
     LUMI_owner_dec_ref(so_Refman);
@@ -7600,7 +7612,13 @@ Returncode ut_M_fun(void) {
     Ref_Manager* so_Refman = NULL;
     String* s = NULL;
     Ref_Manager* s_Refman = NULL;
-    INIT_NEW(4, LUMI_block0_cleanup, so, LUMI_new_string(12));
+    String* aux_String_0 = NULL;
+    Ref_Manager* aux_String_0_Refman = NULL;
+    INIT_NEW(4, LUMI_block0_cleanup, aux_String_0, LUMI_new_string(12));
+    so = aux_String_0;
+    so_Refman = aux_String_0_Refman;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
     s = so;
     s_Refman = so_Refman;
     LUMI_inc_ref(s_Refman);
@@ -7610,6 +7628,8 @@ Returncode ut_M_fun(void) {
     CHECK(7, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
+    String_Del(aux_String_0);
+    LUMI_owner_dec_ref(aux_String_0_Refman);
     LUMI_dec_ref(s_Refman);
     String_Del(so);
     LUMI_owner_dec_ref(so_Refman);

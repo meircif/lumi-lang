@@ -178,7 +178,7 @@ class SyntaxTreeRoot(GlobalNodes)
       while self.types.first?
       if self.types.first.item.order-bases(user ordered-list)
         sys.print(user "\n")
-        raise
+        sys.exit(copy 1)
     self.types := ordered-list
 
   func inst analyze-main()

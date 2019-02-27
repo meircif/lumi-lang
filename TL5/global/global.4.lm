@@ -461,6 +461,8 @@ struct Global
     argument.variable.access := access
     argument-type.new-type-instance()->(
         owner argument.variable.type-instance)
+    if not argument-type.is-primitive
+      argument.variable.type-instance.conditional := true
     argument-list.add(owner argument)
   
   func find-type(user String name)->(user TypeData type-data)

@@ -17,34 +17,34 @@ class Tc(Tb)
     func inst methc()
     func dynamic dyn()
 struct Data{Generic}
-    weak Generic item
-    weak Array{Generic} arr
-    func set(owner Generic item, user Array{Generic} arr)
+    weak Generic? item
+    weak Array?{Generic} arr
+    func set(owner Generic? item, user Array?{Generic} arr)
     func get()->(weak Generic item)
 
 func fun0()
-func fun1(copy Int x, user String s, owner String o)
+func fun1(copy Int x, user String? s, owner String? o)
 func fun2()->(strong String s, var Int x)
 func fun3(copy Int x)->(strong String s)
 func fun4(copy Int x)
 func fun5(copy Int x)->(var Int y)
 func fun6(copy Int x, copy Int y)->(var Int n, var Int m)
-func fun7(weak Tb tb)->(weak Tb tbo)
+func fun7(weak Tb? tb)->(weak Tb? tbo)
 
 var Int i
 var Char c
 var Bool b
-weak String str
-weak Array{Int} arr
-owner File fobj
-weak Test t
-weak Ta ta
-strong Tb tb
-weak Tc tc
-weak Data{String} d
-weak Array{String} sarr
+weak String? str
+weak Array?{Int} arr
+owner File? fobj
+weak Test? t
+weak Ta? ta
+strong Tb? tb
+weak Tc? tc
+weak Data?{String} d
+weak Array?{String} sarr
 
-func mock()->(strong String so, var Int io, weak Test to, weak Tc tco)
+func mock()->(strong String? so, var Int io, weak Test? to, weak Tc? tco)
 ; @@ test-int-expression
 ; @ c t0
 i := 0
@@ -181,12 +181,12 @@ t.error
 ; @ c t0
 c := str[13]
 ; @ c t1
-user String x
+user String? x
 x := str[2:6]
 ; @ c t2
 i := arr[13]
 ; @ c t3
-user Array{Int} x
+user Array?{Int} x
 x := arr[2:6]
 ; @ c t4
 str[4] := c
@@ -211,7 +211,7 @@ str[2:5] := so
 ; @ ec t14
 arr[7:2] := Array{5:Int}()
 ; @ ec t15
-user Array{Test} at
+user Array?{Test} at
 at[0] := t
 ; @@ test-call-expression
 ; @ c t0
@@ -222,7 +222,7 @@ fun1(copy 3, user str, owner _)
 fun2()->(strong so, var io)
 ; @ c t3
 var Int x
-strong String s
+strong String? s
 fun2()->(strong s, var x)
 ; @ c t4
 fun3(copy 0)->(strong so)
@@ -328,7 +328,7 @@ struct Test(Base)
 var String{16} text
 fun1(copy 3, user str, owner text)
 ; @ ec te20
-owner Tb tbo
+owner Tb? tbo
 fun7(weak tbo)
 ; @@ test-type-expression
 ; @ c t0
@@ -439,7 +439,7 @@ b := 2 < i < 12 = 2 * i
 ; @ c t7
 t := tc
 ; @ c t8
-owner String s
+owner String? s
 s := so
 ; @ c t9
 str := so
@@ -452,10 +452,10 @@ b := fun0 is-not fun1
 ; @ c t13
 b := b = b
 ; @ c t14
-owner Tc otc
+owner Tc? otc
 tb := otc
 ; @ c t15
-owner Array{Test} tarr
+owner Array?{Test} tarr
 tarr := _
 ; @ g t16
 struct Test
@@ -496,18 +496,22 @@ i -= b
 ; @ ec te15
 b := 3 is t
 ; @ ec te16
-user Array{Char} ca
+user Array?{Char} ca
 ca := arr
 ; @ ec te17
-owner Test ot
+owner Test? ot
 ot := tb
 ; @ ec te18
 b := b is b
 ; @ ec te19
 b := t is t < 2
 ; @ ec te20
-user Test tu
+user Test? tu
 t := tu
+; @ ec te21
+var Test tv(copy 0)
+user Test tu(user tv)
+tu := t
 ; @@ test-question-expression
 ; @ c t0
 b := str?
@@ -532,15 +536,15 @@ i?
 ; @ c t0
 var Ta a(copy 1)
 ; @ c t1
-user Ta a
+user Ta? a
 ; @ c t2
 ta := Ta(copy 7)
 ; @ c t3
 new Ta a(copy 1)
 ; @ c t4
-user Ta a(user ta)
+user Ta? a(user ta)
 ; @ c t5
-user Ta x
+user Ta? x
 x := ta
 ; @ c t6
 ta := tb
@@ -549,10 +553,10 @@ ta := tc
 ; @ c t8
 ta := _
 ; @ c t9
-user Array{Ta} aa
+user Array?{Ta} aa
 ta := aa[4]
 ; @ c t10
-user Array{Tc} ca
+user Array?{Tc} ca
 ta := ca[4]
 ; @ c t11
 ta.dyn()
@@ -591,10 +595,10 @@ var Func{(copy Int x)->(var Int y)} fun(copy fun5)
 var Int x
 fun(copy 9)->(var x)
 ; @ c t2
-var Func{(user Test self)} fun(copy Test.meth)
+var Func{(user Test? self)} fun(copy Test.meth)
 fun(user t)
 ; @ c t3
-var Func{()} fun
+var Func?{()} fun
 fun := _
 b := fun?
 ; @ c t4
@@ -611,7 +615,7 @@ var Func{(copy Int x,
 func mock()->(var Func{()} f)
     f()
 ; @ g t8
-func fun(copy Func{(copy Int x,
+func fun(copy Func?{(copy Int x,
         copy Int y)} fi)->(var Func{(copy Int x,
         copy Int y)} fo)
     fun(copy _)
@@ -756,7 +760,7 @@ main
 ; @ tg t7
 var String{12} s
 func fun()
-    s := _
+    s.clear()
 ; @-
 module second
 test dummy()
@@ -918,8 +922,8 @@ func name()
 func name(user String self, copy Int px, user String pu, owner String po)->(
         var String oself, var Int ox, weak String ou, owner String oo)
     var Int x
-    user String u
-    owner String o
+    user String? u
+    owner String? o
     var String{12} v
     new String{12} n
     o := String{12}()
@@ -938,17 +942,17 @@ func name(
         owner Class pc,
         owner Array{Struct} pas,
         owner Array{Class} pac)
-    owner Struct s
-    owner Class c
-    owner Array{Struct} as
-    owner Array{Class} ac
-    owner Array{Int} ai
-    owner Array{File} af
+    owner Struct? s
+    owner Class? c
+    owner Array?{Struct} as
+    owner Array?{Class} ac
+    owner Array?{Int} ai
+    owner Array?{File} af
 ; @ g t9
 class Test
     var Int x
     func dynamic meth()
-func name()->(owner Test t)
+func name()->(owner Test? t)
     t := _
 ; @ g tm0
 main
@@ -1110,7 +1114,7 @@ struct Test
 struct Test
     var Int x
     func meth()
-        owner Test error
+        owner Test? error
         error := self
 ; @ eg te5
 struct Test
@@ -1157,11 +1161,11 @@ func name()
 ; @ c t0
 var Int x
 ; @ c t1
-user String s
+user String? s
 ; @ c t2
-owner Array{Int} a
+owner Array?{Int} a
 ; @ c t3
-user Test tt
+user Test? tt
 ; @ c t4
 var String{12} s
 ; @ c t5
@@ -1226,13 +1230,13 @@ owner Array{String} sa(owner Array{arr[0]:String{arr[1]}}())
 ; @ c t5
 var Int x(copy arr[0])
 ; @ c t6
-user String s(user str)
+user String? s(user str)
 ; @ c t7
 var String{12} s(user "some string")
 ; @ c t8
-new String{i} s(user str)
+new String?{i} s(user str)
 ; @ c t9
-user Test tt(user tc)
+user Test? tt(user tc)
 ; @ c t10
 var Test tt(copy 3)
 ; @ c t11
@@ -1240,9 +1244,9 @@ new Test tt(copy 3)
 ; @ c t12
 t := Test(copy 3)
 ; @ c t13
-user Tb tt(user tb)
+user Tb? tt(user tb)
 ; @ c t14
-owner Ta ota(owner tb)
+owner Ta? ota(owner tb)
 ; @ ec te0
 Int()
 ; @ ec te1
@@ -1289,13 +1293,19 @@ func mock()
 ; @ ec te20
 var Int x(user 3)
 ; @ ec te21
-owner String s(user so)
+owner String? s(user so)
 ; @ ec te22
 owner String s(owner str)
 ; @ ec te23
 var Array{1:Int:Int} a
 ; @ ec te24
 owner Test ot(owner tb)
+; @ ec te25
+user String s
+; @ ec te26
+user String s(user _)
+; @ ec te27
+weak String s(user str)
 ; @@ test-comment
 ; @ c t0
 ; comment
@@ -1644,12 +1654,12 @@ test fun0()
 test fun1()
 ; @ g tmg0
 mock Test.delete()
-    var Ref r(copy self)
+    var Ref? r(copy self)
 struct Test
     weak String s
 ; @ g tmg1
 mock delete()
-    var Ref r(copy self)
+    var Ref? r(copy self)
 main
 ; @ g tmg2
 mock new()->(var Bool allocate-success)
@@ -1765,11 +1775,11 @@ func call()
 class Test
     var Int x
     func dynamic meth()
-native func external(copy Int i, user String s, user Test ta)->(var Int io)
+native func external(copy Int i, user String? s, user Test? ta)->(var Int io)
 func call()
     var Int i
-    user String s
-    user Test ta
+    user String? s
+    user Test? ta
     external(copy 5, user s, user ta)->(var i)
 ; @ g tv0
 native var Int x
@@ -1858,25 +1868,25 @@ d.get().clear()
 ; @ c t14
 var Data dg
 ; @ c t15
-user Data dg(user d)
+user Data? dg(user d)
 ; @ c t16
 Data{String}.set(user d, owner so, user sarr)
 ; @ g t17
 struct Test{Generic}
     weak Test{Generic} next
-    func meth(weak Test{Generic} next)->(user Test{Generic} out)
+    func meth(weak Test{Generic} next)->(user Test?{Generic} out)
         self.next := next
         out := self
 ; @ c t18
 var Data{Tb} dt
 dt.item := tc
 ta := dt.item
-owner Tc otc
+owner Tc? otc
 dt.set(owner otc, user _)
 dt.get()->(weak ta)
 i := dt.get().numa
 fun7(weak dt.item)->(weak dt.item)
-user Tb tb2(user dt.item)
+user Tb? tb2(user dt.item)
 tb2 := dt.item
 ; @ g t19
 struct Base{Generic}
@@ -1948,9 +1958,9 @@ struct Test{error}
     var Int x
 ; @ eg teg8
 struct Test{Generic}
-    weak Array{Generic} arr
+    weak Array?{Generic} arr
     func meth()
-        user Generic x
+        user Generic? x
         x := self.arr[2]
 ; @ eg teg9
 struct Test{Generic}
@@ -2101,10 +2111,10 @@ struct Base
     var Int x
 struct Test(Base)
 func test()
-    user BaseGen{Base} bb
-    user BaseGen{Test} bt
-    user TestGen{Base} tb
-    user TestGen{Test} tt
+    user BaseGen?{Base} bb
+    user BaseGen?{Test} bt
+    user TestGen?{Base} tb
+    user TestGen?{Test} tt
     bb := tb
     bt := tt
     bb := bt
@@ -2211,7 +2221,7 @@ struct TestIterator
         text := self.value
     func next()
 func fun(user TestIterator iter)
-    user String s
+    user String? s
     for t in iter
         s := t
 ; @ g t2
@@ -2225,8 +2235,8 @@ class Test
     var Int x
     func dynamic fun()
 func fun(user TestIterator{String} siter, user TestIterator{Test} titer)
-    user String os
-    user Test ot
+    user String? os
+    user Test? ot
     for s in siter
         os := s
     for t in titer
@@ -2239,7 +2249,7 @@ class TestIterator{Generic}
         item := self.item
     func dynamic next()
 func f-mock(user TestIterator{String} iter)
-    user String s
+    user String? s
     for t in iter
         s := t
 ; @ eg te0
@@ -2602,7 +2612,7 @@ struct Test
     owner String s
 func use(user String s)
 func take(owner String s)
-func fun(owner String s, user Test tu, owner Test to)
+func fun(owner String? s, user Test tu, owner Test to)
     s := _
     s := String{12}()
     s.clear()
@@ -2613,29 +2623,29 @@ func fun(owner String s, user Test tu, owner Test to)
     var Array{12:Int} arr
     arr[4] := arr[8]
 ; @ g tu0
-func deleting()->(owner String s)
+func deleting()->(owner String? s)
     s := _
-func fun(user String s)->(owner String so)
+func fun(user String s)->(owner String? so)
     s.clear()
     deleting()->(owner so)
 ; @ g tu1
-func deleting()->(strong String s)
+func deleting()->(strong String? s)
     s := _
 func fun()
-    new String{12} so
-    user String s(user so)
+    strong String? so(strong String{12}())
+    user String? s(user so)
     s.clear()
     deleting()->(strong so)
 ; @ g tu2
-func deleting()->(strong String s)
+func deleting()->(strong String? s)
     s := _
 func fun()
-    new String{12} so
-    weak String s(weak so)
+    strong String? so(strong String{12}())
+    weak String? s(weak so)
     deleting()->(strong so)
     s.clear()
 ; @ c tu3
-user String s
+user String? s
 so := _
 s := so
 s.clear()
@@ -2667,52 +2677,52 @@ func fun(user Bb b)
     take(owner b.a)
 ; @ eg teo3
 struct Aa
-    owner String s
+    owner String? s
 struct Bb
     weak Aa a
 func fun(owner Array{Bb} b)
     b[3].a.s := _
 ; @ eg teo4
 struct Test
-    owner String s
+    owner String? s
 func get-user()->(weak Test t)
 func fun()
-    weak Test t
+    weak Test? t
     get-user()->(weak t).s := _
 ; @ eg teo5
 struct Test
-    owner String s
+    owner String? s
 func get-user()->(weak Test t)
 func fun()
     get-user().s := _
 ; @ ec teu0
-user String s
+user String? s
 so := _
 c := s[2]
 ; @ ec teu1
-user String s
-user String s2
+user String? s
+user String? s2
 so := _
 s2 := s
 ; @ ec teu2
-user String s
+user String? s
 so := _
 i := s.length
 ; @ ec teu3
-user String s
+user String? s
 so := _
 String.clear(user s)
 ; @ ec teu4
-user String s
+user String? s
 so := _
 b := not (false or s.length > 3)
 ; @ eg teu5
-func deleting(owner String s)
+func deleting(owner String? s)
 func fun(user String s)
     deleting(owner _)
     s.clear()
 ; @ eg teu6
-func deleting()->(owner String s)
+func deleting()->(owner String? s)
     s := _
 func proxy()
     deleting()
@@ -2720,7 +2730,7 @@ func fun(user String s)
     proxy()
     s.clear()
 ; @ eg teu7
-func deleting()->(owner String s)
+func deleting()->(owner String? s)
     proxy()
     s := _
 func proxy()
@@ -2731,20 +2741,20 @@ func fun(user String s)
 ; @ eg teu8
 struct Test
     var Int x
-    func deleting()->(owner String s)
+    func deleting()->(owner String? s)
         s := _
     func fun(user String s)
         self.deleting()
         s.clear()
 ; @ eg teu9
-func deleting()->(owner String s)
+func deleting()->(owner String? s)
     s := _
 func fun(user String s)
     deleting()
     s.clear()
 ; @ eg teu10
 func deleting()
-    owner String s
+    owner String? s
 func fun(user String s)
     deleting()
     s.clear()
@@ -2756,7 +2766,7 @@ func fun(user String s)
     s.clear()
 ; @ eg teu12
 func deleting()
-    strong String s
+    strong String? s
 func fun(user String s)
     deleting()
     s.clear()
@@ -2775,19 +2785,19 @@ func fun(user String s)
 ; @ eg teu15
 struct Test
     owner String s
-func deleting(owner Test ta, owner Test tb)
+func deleting(owner Test? ta, owner Test? tb)
     ta.s := tb.s
 func fun(user String s)
     deleting(owner _, owner _)
     s.clear()
 ; @ ec teu16
-user String s
+user String? s
 d.set(owner _, user _)
 s.clear()
 ; @ eg teu17
 struct Base{Atype}
     var Int x
-    func fun(owner Atype a)
+    func fun(owner Atype? a)
 struct Test{Btype}(Base{Btype})
     func fun()
         base(owner _)
@@ -2799,7 +2809,7 @@ func fun(user String s)
 struct Base
     var Int x
 struct Test(Base)
-func deleting(owner Base b)
+func deleting(owner Base? b)
 func fun(user Test t)
     deleting(owner _)
     t.x := 0
@@ -2808,7 +2818,7 @@ struct Base
     var Int x
 struct Test(Base)
 struct Other(Base)
-func deleting(owner Test t)
+func deleting(owner Test? t)
 func fun(user Base b, user Other o)
     deleting(owner _)
     o.x := 0
@@ -2819,7 +2829,7 @@ class Base
     func dynamic fun()
 class Test(Base)
     func dynamic fun()
-        owner String s
+        owner String? s
 func fun(user String s, user Base b)
     b.fun()
     s.clear()
@@ -2835,7 +2845,7 @@ func fun(user String s, user Base b)
 ; @ eg teu22
 class Base
     var Int x
-    func dynamic fun(owner Base b)
+    func dynamic fun(owner Base? b)
         recursive()
 class Test{Generic}(Base)
     func dynamic fun()
@@ -2845,11 +2855,11 @@ func fun(user String s)
     recursive()
     s.clear()
 ; @ ec teu23
-user String s
+user String? s
 t.fun()
 s.clear()
 ; @ eg teu24
-func deleting(copy Func{()} f)
+func deleting(copy Func?{()} f)
     f()
 func fun(user String s)
     deleting(copy _)
@@ -2858,16 +2868,16 @@ func fun(user String s)
 func fun()->(user String s)
 ; @ eg teu26
 func deleting()
-    owner String s
-func fun()->(user String s)
+    owner String? s
+func fun()->(user String? s)
     s := _
     deleting()
 ; @ eg teu27
-func fun(owner String so)->(user String s)
+func fun(owner String so)->(user String? s)
     s := _
 ; @ eg teu28
-func fun()->(user String s)
-    owner String so
+func fun()->(user String? s)
+    owner String? so
     s := _
 ; @ ec tec0
 str := str
