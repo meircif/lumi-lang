@@ -1,6 +1,6 @@
 build
 .test
-*.actual.c
+actual.c
 actual.txt
 expected.txt
 wip
