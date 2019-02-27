@@ -50,9 +50,7 @@ $CCA TL5/tl5-compiler-tests.c ../TL4/lumi.4.c -I../TL4 -o TL5/tl5-compiler-tests
 cp -r ../TL5/tests/ut TL5/
 TEST_DIR=TL5/ut/ TL5/tl5-compiler-tests -xml
 mv cobertura.xml TL5/ut/
-diff TL5/ut/code-header.actual.c TL5/ut/code-header.expected.c
-diff TL5/ut/expression-tests.actual.c TL5/ut/expression-tests.expected.c
-diff TL5/ut/syntax-tree-tests.actual.c TL5/ut/syntax-tree-tests.expected.c
+diff TL5/ut/actual.c TL5/ut/expected.c
 
 # run tl5-compiler single-file integration test
 ln -s ../../TL5/tests TL5/tests
