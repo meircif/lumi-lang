@@ -250,7 +250,7 @@ class QuestionExpression(Expression)
 
 ~~~ An expression with the "!" operator ~~~
 class ExclamationExpression(Expression)
-  owner Expression conditional
+  owner Expression dubious
 
   func inst parse-new(user SyntaxTreeCode code-node)->(
       owner Expression expression)
@@ -258,33 +258,37 @@ class ExclamationExpression(Expression)
     exclamation-expression.parse(owner expression)
     expression := exclamation-expression
 
-  ~~~ parsing `conditional!` ~~~
-  func inst parse(owner Expression conditional)
-    self.conditional := conditional
+  ~~~ parsing `dubious!` ~~~
+  func inst parse(owner Expression dubious)
+    self.dubious := dubious
     read-c()
 
   func dynamic analyze()
-    analyze-expression()->(owner self.conditional)
-    if not self.conditional.result-type?
+    analyze-expression()->(owner self.dubious)
+    if not self.dubious.result-type?
       self.syntax-error-msg(user "cannot use \"!\" on void expression")
-    if not self.conditional.result-type.conditional
+    if not self.dubious.result-type.conditional and
+        self.dubious.access != Access.WEAK
       self.syntax-error(
-          user "cannot use \"!\" on non-conditional type",
-          user self.conditional.result-type.type-data.name)
-    self.conditional.result-type.copy-new()->(owner self.result-type)
+          user "cannot use \"!\" on solid reference of type",
+          user self.dubious.result-type.type-data.name)
+    self.dubious.result-type.copy-new()->(owner self.result-type)
     self.result-type.conditional := false
-    self.access := self.conditional.access
+    if self.dubious.access = Access.WEAK
+      self.access := Access.USER
+    else
+      self.access := self.dubious.access
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.conditional.check-memory(user refs)
+    self.dubious.check-memory(user refs)
 
   func dynamic write-preactions()
-    self.conditional.write-preactions()
+    self.dubious.write-preactions()
     self.write-check-ref()
     self.code-node.write-spaces()
 
   func dynamic write()
-    self.conditional.write()
+    self.dubious.write()
 
   func dynamic write-safe()
-    self.conditional.write-safe()
+    self.dubious.write-safe()

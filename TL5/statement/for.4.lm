@@ -225,8 +225,10 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     ;   `item` = `aux-var`[`item`_Index];
     ;   `block...`
     ; }}
-    self.aux-variable.write-check-ref()
-    self.write-spaces()
+    if self.aux-variable.result-type.conditional or
+        self.aux-variable.access = Access.WEAK
+      self.aux-variable.write-check-ref()
+      self.write-spaces()
     write(user "{int ")
     write-cname(user self.item.name)
     write(user "_Index; for (")

@@ -536,9 +536,12 @@ i?
 ; @ c t0
 user String s(user str!)
 ; @ c t1
-to := t.t!
+user Test tt(user t.t!)
 ; @ c t2
-to := fun7(weak _)->(weak t)!
+user Test? tu
+tu := fun7(weak _)->(weak t)!
+; @ c t3
+i := tb!.num
 ; @ ec te0
 (i := 2)!
 ; @ ec te1
@@ -1529,6 +1532,10 @@ for n in 6
         continue
         if b
             return
+; @ c t9
+user String s(user "text")
+for ch in s
+    c := ch
 ; @ ec te0
 for(
 ; @ ec te1

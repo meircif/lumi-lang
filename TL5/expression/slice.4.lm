@@ -117,8 +117,10 @@ class SliceExpression(Expression)
       write(user ");\n")
       self.code-node.write-spaces()
     
-    self.sequence.write-check-ref()
-    self.code-node.write-spaces()
+    if self.sequence.result-type.conditional or
+        self.sequence.access = Access.WEAK
+      self.sequence.write-check-ref()
+      self.code-node.write-spaces()
     
     ; if (index < 0 || index >= seq->length)
     ; if (index < 0 || second < 0 || index + second > seq->length)
