@@ -245,3 +245,46 @@ class QuestionExpression(Expression)
     
   func dynamic write-safe()
     self.write-with-brackets()
+
+
+
+~~~ An expression with the "!" operator ~~~
+class ExclamationExpression(Expression)
+  owner Expression conditional
+
+  func inst parse-new(user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new ExclamationExpression exclamation-expression(user code-node)
+    exclamation-expression.parse(owner expression)
+    expression := exclamation-expression
+
+  ~~~ parsing `conditional!` ~~~
+  func inst parse(owner Expression conditional)
+    self.conditional := conditional
+    read-c()
+
+  func dynamic analyze()
+    analyze-expression()->(owner self.conditional)
+    if not self.conditional.result-type?
+      self.syntax-error-msg(user "cannot use \"!\" on void expression")
+    if not self.conditional.result-type.conditional
+      self.syntax-error(
+          user "cannot use \"!\" on non-conditional type",
+          user self.conditional.result-type.type-data.name)
+    self.conditional.result-type.copy-new()->(owner self.result-type)
+    self.result-type.conditional := false
+    self.access := self.conditional.access
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.conditional.check-memory(user refs)
+
+  func dynamic write-preactions()
+    self.conditional.write-preactions()
+    self.write-check-ref()
+    self.code-node.write-spaces()
+
+  func dynamic write()
+    self.conditional.write()
+
+  func dynamic write-safe()
+    self.conditional.write-safe()

@@ -1276,6 +1276,42 @@ void ut_M_Test_Del(ut_M_Test* self) {
 cannot use "?" on void expression
 /// @ te1
 cannot use "?" on type "Int"
+/// @@ test-exclamation-expression
+/// @ t0
+String* s = NULL;
+    Ref_Manager* s_Refman = NULL;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
+    s = ut_M_str;
+    s_Refman = ut_M_str_Refman;
+    LUMI_inc_ref(s_Refman);
+/// @ t1
+Ref_Manager* aux_Ref_Manager = NULL;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_t->t, ut_M_t->t_Refman)
+    aux_Ref_Manager = *to_Refman;
+    *to_Refman = ut_M_t->t_Refman;
+    LUMI_inc_ref(*to_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    *to = ut_M_t->t;
+/// @ t2
+Ref_Manager* aux_Ref_Manager = NULL;
+    if (ut_M_t != NULL) RAISE(1, LUMI_block0_cleanup, empty_base_output)
+    LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
+    CHECK(1, LUMI_block0_cleanup)
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
+    aux_Ref_Manager = *to_Refman;
+    *to_Refman = ut_M_t_Refman;
+    LUMI_inc_ref(*to_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    *to = &(ut_M_t->_base._base);
+/// @ te0
+cannot use "!" on void expression
+/// @ te1
+cannot use "!" on non-conditional type "Int"
+/// @ te2
+cannot use "!" on non-conditional type "String"
 /// @@ test-dynamic
 /// @ t0
 ut_M_Ta a_Var = {{0}};
@@ -6813,6 +6849,8 @@ cannot iterate type with no "next" named method - "TestIterator"
 iterator "next" method has parameters in type "TestIterator"
 /// @ te13
 iterator "next" method has outputs in type "TestIterator"
+/// @ te14
+assigning conditional into non-conditional type "String"
 /// @@ test-complex-fields
 /// @ t0
 typedef struct ut_M_Astruct ut_M_Astruct;

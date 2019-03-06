@@ -44,9 +44,9 @@ func test-const-expression()->(
         var Int i,
         var Char c,
         weak String s,
-        weak TestStruct t,
-        weak TestClass d,
-        var Func{()} f)
+        weak TestStruct? t,
+        weak TestClass? d,
+        var Func?{()} f)
     i := 0 + 9630 + -9630 + 07520 + -07520 + 0xfda940 + -0xfda940 + 0xFDA940 +
             -0xFDA940
     c := 'a' + '\'' + '\n' + '\x0f' + '\xA9' + '\270'
@@ -114,10 +114,10 @@ func test-container-expression(copy Int x, copy Int y, user String s)->(
 
 func test-variable(copy Int i, weak String text, user Array{Int} arr)
     var Int x
-    user String s
-    owner Array{Int} a
-    user TestStruct t
-    user TestClass d
+    user String? s
+    owner Array?{Int} a
+    user TestStruct? t
+    user TestClass? d
     var TestStruct tv(copy 0, weak _)
     var TestClass dv
     var String{12} sv
@@ -210,7 +210,7 @@ struct TestStruct
     owner TestStruct ts
     var Func{()} fun
     
-    new(copy Int x, weak String s) _
+    new(copy Int x, weak String? s) _
     
     [; Test
     multiline
@@ -256,7 +256,7 @@ func TestClass.dynamic-meth()
 
 func test-void()
     return
-func test-params(copy Int x, user String s, owner String o)
+func test-params(copy Int x, user String? s, owner String? o)
     raise
 func test-outs()->(owner String s, var Int x)
 func test-int2str(copy Int x)->(owner String s)
@@ -270,7 +270,7 @@ func test-many(
 
 
 func test-call-expression()
-    owner String s
+    owner String? s
     var Int x
     test-void()
     test-params(copy 3, user "text", owner _)
@@ -294,7 +294,7 @@ func test-code-flow(user Array{Int} arr)->(var Int res)
         res := 6
     else-if arr?
         res := 6
-    else-if arr[4] != arr[5]
+    else-if arr[4] <> arr[5]
         res := 6
     else-if 0 = arr[0]
         res := 6
@@ -337,7 +337,7 @@ func test-builtins(
     s.concat-int(copy i)
     s.find(user s)->(var iv)
     s.has(copy c)->(var bv)
-    owner File f
+    owner File? f
     file-open-read(user s)->(owner f)
     file-open-write(user s)->(owner f)
     f.getc()->(var cv, var bv)
@@ -379,14 +379,14 @@ func remove(owner String s)
 
 struct Data{Generic}
     weak Generic item
-    weak Array{Generic} arr
+    weak Array?{Generic} arr
     
-    func set(weak Generic item, weak Array{Generic} arr) _
+    func set(weak Generic item, weak Array?{Generic} arr) _
     
     func get()->(weak Generic item)
         item := self.item
         
-func Data.set(weak Generic item, weak Array{Generic} arr)
+func Data.set(weak Generic item, weak Array?{Generic} arr)
     weak Generic x(weak item)
     self.item := x
     self.arr := arr
@@ -434,7 +434,7 @@ func try-catch-raise(user TestStruct t)
     catch
         raise "ignored message"
 
-func test-error-handling(user TestStruct t)
+func test-error-handling(user TestStruct? t)
     try
         sys.print(user "error handling { 1 ")
         t.num := 1
@@ -455,7 +455,7 @@ func test-error-handling(user TestStruct t)
         sys.print(user "6 ")
         try
             sys.print(user "7 ")
-            try-catch-raise(user t)
+            try-catch-raise(user t!)
             sys.print(user " X ")
         sys.print(user "8 ")
         raise "another ignored message"
@@ -463,10 +463,10 @@ func test-error-handling(user TestStruct t)
 
 
 struct Container{Generic}
-    weak Generic value
-    weak Container{Generic} next
+    weak Generic? value
+    weak Container?{Generic} next
     
-    new(weak Generic value, weak Container{Generic} next)
+    new(weak Generic? value, weak Container?{Generic} next)
         self.value := value
         self.next := next
     
@@ -474,15 +474,15 @@ struct Container{Generic}
         iter := ContainerIterator{Generic}(weak self.next)
 
 struct ContainerIterator{Generic}
-    weak Container{Generic} curr
+    weak Container?{Generic} curr
     
-    new(weak Container{Generic} first)
+    new(weak Container?{Generic} first)
         self.curr := first
     
     func has()->(var Bool has-data)
         has-data := self.curr?
     
-    func get()->(user Generic item)
+    func get()->(user Generic? item)
         item := self.curr.value
     
     func next()
@@ -534,11 +534,10 @@ func test-for-each()
     var Container{String} container-mid(weak "hhh", weak container-last)
     var Container{String} container-first(weak "ggg", weak container-mid)
     var Container{String} container(weak _, weak container-first)
-    owner ContainerIterator{String} iter
-    container.iter()->(owner iter)
+    owner ContainerIterator{String} iter(owner container.iter())
     sys.print(user "values[ ")
-    for s in iter
-        sys.print(user s)
+    for sc in iter
+        sys.print(user sc)
         sys.print(user " ")
     sys.println(user "]")
 

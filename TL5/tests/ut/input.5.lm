@@ -1,6 +1,6 @@
 struct Test
     var Int num
-    weak Test t
+    weak Test? t
     var Func{()} fun
     new(copy Int num)
     func meth()
@@ -433,7 +433,7 @@ b := 3 < 5 or 23 > 37
 ; @ c t4
 b := 3 <= 5 and 23 >= 37
 ; @ c t5
-b := i = 5 or i != 37
+b := i = 5 or i <> 37
 ; @ c t6
 b := 2 < i < 12 = 2 * i
 ; @ c t7
@@ -532,6 +532,20 @@ struct Test
 (i := 2)?
 ; @ ec te1
 i?
+; @@ test-exclamation-expression
+; @ c t0
+user String s(user str!)
+; @ c t1
+to := t.t!
+; @ c t2
+to := fun7(weak _)->(weak t)!
+; @ ec te0
+(i := 2)!
+; @ ec te1
+i!
+; @ ec te2
+var String{8} s
+s!
 ; @@ test-dynamic
 ; @ c t0
 var Ta a(copy 1)
@@ -2361,6 +2375,20 @@ struct TestIterator
     func next()->(var Int x)
 func f-mock()
     for n in TestIterator()
+; @ eg te14
+struct ConditionalIterator
+    weak String str
+    func has()->(var Bool has-data)
+    func get()->(var String? num)
+    func next()
+struct NonConditionalIterator
+    weak String str
+    func has()->(var Bool has-data)
+    func get()->(var String num)
+    func next()
+func f-mock()
+    for s in NonConditionalIterator()
+    for s in ConditionalIterator()
 ; @@ test-complex-fields
 ; @ g t0
 struct Test

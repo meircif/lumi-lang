@@ -112,8 +112,8 @@ struct Global
         user "mod", user "%", copy 0, copy 1, copy arithmetic-operator-factory)
     self.add-operator(
         user "=", user "==", copy 1, copy 0, copy equalizer-operator-factory)
-    self.add-operator-copy(
-        user "!=", copy 1, copy 0, copy equalizer-operator-factory)
+    self.add-operator(
+        user "<>", user "!=", copy 1, copy 0, copy equalizer-operator-factory)
     self.add-operator-copy(
         user ">", copy 1, copy 0, copy relational-operator-factory)
     self.add-operator-copy(
