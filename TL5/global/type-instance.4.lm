@@ -255,8 +255,8 @@ struct TypeInstance
             user "into",
             user target.type-data.name)
       owner TypeInstance prev-base-type-instance(owner base-type-instance)
-      self-type-instance.type-data.base-type.new-replace-params(
-          user self-type-instance)->(owner base-type-instance)
+      self-type-instance.type-data.base-type.new-replace-params-extended(
+          user self-type-instance, copy false)->(owner base-type-instance)
       self-type-instance := base-type-instance
       bases += 1
     if self.conditional and not target.conditional

@@ -264,6 +264,9 @@ func test-compiler-case(user String suit-name, user String line)
   catch
     suit-passed := false
     compiler-tests-passed := false
+    if sys.argv.length > 1
+      if sys.argv[1].equal(user "--trace")
+        crush-run := true
     if crush-run
       print-case-error()
       run-test(

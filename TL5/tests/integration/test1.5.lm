@@ -157,17 +157,17 @@ test test-dynamic-type-parameters()
 
 
 struct Link
-    owner Link next
+    owner Link? next
 
 class BaseLink
-    owner BaseLink next
-    weak Link link
+    owner BaseLink? next
+    weak Link? link
     
     func dynamic m-meth()
         ; do nothing
 
 class TopLink{Generic}(BaseLink)
-    owner Generic item
+    owner Generic? item
 
 struct RefNode
     owner RefNode? next

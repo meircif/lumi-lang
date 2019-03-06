@@ -28,8 +28,10 @@ class SyntaxTreeRoot(GlobalNodes)
     var Int first-file-index
     var Int arg-test-index(copy -1)
     var Int input-files-number
-    for n in 1:sys.argv.length
-      user String arg(user sys.argv[n])
+    user Array{String} sys-argv
+    get-sys-argv()->(user sys-argv)
+    for n in 1:sys-argv.length
+      user String arg(user sys-argv[n])
       if arg-test-index = n - 1
         string-new-copy(user arg)->(owner glob.tested-module)
       else-if arg.equal(user "-t") or arg.equal(user "--test")
@@ -39,7 +41,7 @@ class SyntaxTreeRoot(GlobalNodes)
       else
         input-files-number += 1
     
-    if input-files-number = 0 or arg-test-index = sys.argv.length - 1
+    if input-files-number = 0 or arg-test-index = sys-argv.length - 1
       sys.print(user "usage: tl5-compiler [-t TESTED-MODULE]")
       sys.print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
       sys.exit(copy 1)
@@ -47,11 +49,11 @@ class SyntaxTreeRoot(GlobalNodes)
     if glob.tested-module?
       self.line-counts := Array{input-files-number:LineCount}()
     
-    self.output-file-name := sys.argv[first-file-index]
+    self.output-file-name := sys-argv[first-file-index]
     input-files-number := 0
-    for n in first-file-index + 1:sys.argv.length
+    for n in first-file-index + 1:sys-argv.length
       if n > (arg-test-index + 1) or n < arg-test-index
-        glob.input-file-name := sys.argv[n]
+        glob.input-file-name := sys-argv[n]
         glob.input-file-index := input-files-number
         input-files-number += 1
         glob.line-number := 1

@@ -143,8 +143,16 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.is-create and self.type-instance.type-data is glob.type-array
       if self.type-instance.parameters.first.item.type-data is glob.type-generic
         self.syntax-error-msg(user "cannot create generic array")
-    if self.parent-type? and self.access = Access.USER
-      self.syntax-error-msg(user "fields cannot have \"user\" access")
+    if self.parent-type?
+      if self.access = Access.USER
+        self.syntax-error-msg(user "fields cannot have \"user\" access")
+      if (not self.type-instance.type-data.is-primitive or
+          self.type-instance.type-data is glob.type-func) and
+          not self.type-instance.conditional and self.access != Access.VAR and
+          not self.parent-type.constructor?
+        self.syntax-error(
+            user "non-conditional reference in type without constructor",
+            user self.parent-type.name)
     if self.parent? and not self.type-instance.conditional and
         not self.is-initialized and
         (not self.type-instance.type-data.is-primitive or

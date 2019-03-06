@@ -3,20 +3,24 @@ module tl5-compiler-tests
 
 
 var Bool code-header-valid
+var Array{6:String{256}} mock-argv
+
+
+mock tl5-compiler.get-sys-argv()->(user Array{String} argv)
+  argv := tl5-compiler-tests.mock-argv
 
 
 func write-syntax-tree(copy Bool is-test)
-  var Array{6:String{256}} mock-argv
   mock-argv[0].new(user "tl4-compiler")
   mock-argv[1].new(user "mock.c")
   mock-argv[2].new(user "mock.5.lm")
   if is-test
+    mock-argv.length := 6
     mock-argv[3].new(user "-t")
     mock-argv[4].new(user "ut")
     mock-argv[5].new(user "second.5.lm")
   else
     mock-argv.length := 3
-  sys.argv := mock-argv
   tl5-compiler.glob.root.is-library := true
   tl5-compiler.glob.root.parse()
   tl5-compiler.glob.root.analyze()
@@ -182,8 +186,7 @@ func test-code-error(user String input-text, user String expected-error)
 
 test test-illegal-usage()
   setup-test()
-  var Array{2:String{4}} mock-argv
-  sys.argv := mock-argv
+  mock-argv.length := 2
   Sys.print.active := true
   assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
   Sys.print.active := false
@@ -198,12 +201,11 @@ test test-illegal-usage()
 
 test test-open-file-fail()
   setup-test()
-  var Array{3:String{256}} mock-argv
+  mock-argv.length := 3
   mock-argv[0].new(user "tl5-compiler")
   mock-argv[1].new(user "mock.c")
   mock-argv[2].new(user "mock.5.lm")
   mock-argv.length := 3
-  sys.argv := mock-argv
   tl5-compiler.glob.root.is-library := true
   
   file-open-error := true

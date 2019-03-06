@@ -381,6 +381,8 @@ struct Data{Generic}
     weak Generic item
     weak Array?{Generic} arr
     
+    new()
+    
     func set(weak Generic item, weak Array?{Generic} arr) _
     
     func get()->(weak Generic item)
@@ -397,6 +399,9 @@ func Data.set(weak Generic item, weak Array?{Generic} arr)
 struct Dataset{First:Second:Third}(Data{First})
     weak Second second
     weak Third third
+    
+    new()
+        base()
 
 struct MidData{Generic}(Dataset{String:Data{Generic}:Generic})
 
@@ -544,6 +549,7 @@ func test-for-each()
 
 class ComplexField
     weak ComplexField x
+    new()
     func dynamic meth()
         sys.print(user "$")
 

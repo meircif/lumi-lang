@@ -148,6 +148,7 @@ test test-mocked-functions()
   function.write-pre-func.mocked()
   function.write-post-func.mocked()
   tl5-compiler.write-global.mocked(user "mock text")
+  tl5-compiler.get-sys-argv.mocked()
   user String expected(user "
       #define LUMI_FILE_NAME \"mock.5.lm\"
       #define LUMI_FUNC_NAME \"MockType.mock-func\"#undef LUMI_FILE_NAME
