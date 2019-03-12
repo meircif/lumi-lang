@@ -7822,6 +7822,51 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(self_Refman);
     return LUMI_err;
 }
+/// @ tb0
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    String* s;
+    Ref_Manager* s_Refman;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(ut_M_Test* t, Ref_Manager* t_Refman);
+Returncode ut_M_use(ut_M_Test* to, Ref_Manager* to_Refman);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    LUMI_owner_dec_ref(self->s_Refman);
+}
+Returncode ut_M_fun(ut_M_Test* t, Ref_Manager* t_Refman) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    String* aux_String_0 = NULL;
+    Ref_Manager* aux_String_0_Refman = NULL;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
+    String_Del(t->s);
+    LUMI_owner_dec_ref(t->s_Refman);
+    t->s_Refman = aux_String_0_Refman;
+    t->s = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Refman = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    LUMI_owner_dec_ref(aux_String_0_Refman);
+    return LUMI_err;
+}
+Returncode ut_M_use(ut_M_Test* to, Ref_Manager* to_Refman) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    LUMI_err = ut_M_fun(to, to_Refman);
+    CHECK(6, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    ut_M_Test_Del(to);
+    LUMI_owner_dec_ref(to_Refman);
+    return LUMI_err;
+}
 /// @ teo0
 cannot modify owner field "s" in non-owner reference "t.s"
 /// @ teo1
@@ -7892,6 +7937,14 @@ returning potentially illegal user output "s"
 returning potentially illegal user output "s"
 /// @ teu28
 returning potentially illegal user output "s"
+/// @ teb0
+borrowing from a non-owner access "user"
+/// @ teb1
+assigning into an owner a non-owner access "borrow"
+/// @ teb2
+assigning into borrowed owner
+/// @ teb3
+cannot use "borrow" in output "s"
 /// @ tee0
 non-conditional reference in type without constructor "Error"
 /// @ tec0

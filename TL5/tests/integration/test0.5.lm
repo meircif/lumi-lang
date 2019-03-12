@@ -207,7 +207,7 @@ struct TestStruct
     
     ; comment test
     
-    owner TestStruct ts
+    owner TestStruct? ts
     var Func{()} fun
     
     new(copy Int x, weak String? s) _
@@ -370,7 +370,7 @@ func test-ref-count()
     new TestStruct ts(copy 0, weak "first struct")
     sys.println(user ts.text)
     ts.ts := TestStruct(copy 1, weak "second struct")
-    ts := ts.ts
+    ts := ts.ts!
     sys.println(user ts.text)
 
 func remove(owner String s)
@@ -577,9 +577,19 @@ func test-complex-field()
     sys.println(user "")
 
 
+func set-borrow(borrow TestStruct t)
+    t.ts := TestStruct(copy 2, weak _)
+
+func test-borrow()
+    var TestStruct t(copy 1, weak _)
+    set-borrow(borrow t)
+    assert t.ts.num = 2
+
+
 main
     test-simple-function()
     test-ref-count()
     test-error-handling(user _)
     test-for-each()
     test-complex-field()
+    test-borrow()

@@ -2707,6 +2707,13 @@ struct Test
     func get()->(user String s) _
 func Test.get()->(user String s)
     s := self.s
+; @ g tb0
+struct Test
+    owner String? s
+func fun(borrow Test t)
+    t.s := _
+func use(owner Test to)
+    fun(borrow to)
 ; @ eg teo0
 struct Test
     owner String s
@@ -2936,6 +2943,19 @@ func fun(owner String so)->(user String? s)
 func fun()->(user String? s)
     owner String? so
     s := _
+; @ eg teb0
+func fun(borrow String s)
+func error(user String s)
+    fun(borrow s)
+; @ eg teb1
+func fun(owner String s)
+func error(borrow String s)
+    fun(owner s)
+; @ eg teb2
+func error(borrow String a, borrow String b)
+    a := b
+; @ eg teb3
+func error()->(borrow String s)
 ; @ eg tee0
 struct Error
     weak String s
