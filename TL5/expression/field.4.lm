@@ -99,7 +99,8 @@ class FieldExpression(Expression)
 
   func dynamic write-preactions()
     self.instance.write-preactions()
-    if not self.instance.is-complex-field
+    if self.instance.result-type.conditional or
+        self.instance.access = Access.WEAK
       self.instance.write-check-ref()
       self.code-node.write-spaces()
 

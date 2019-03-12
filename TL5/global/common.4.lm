@@ -1,7 +1,13 @@
 ~~~ TL5 compiler - Common stuff ~~~
 module tl5-compiler
 
+
 const Int INDENTATION-SPACES 4
+
+
+func get-sys-argv()->(user Array{String} argv)
+  argv := sys.argv
+
 
 ~~~ Create a new copy of given string ~~~
 func string-new-copy(user String text)->(owner String new-text)

@@ -20,7 +20,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     do
       user String keyword
       var Int spaces
-      read-until(user " .([{?", copy true)->(user keyword, var spaces)
+      read-until(user expression-ends, copy true)->(user keyword, var spaces)
       ; ignore empty lines
       if keyword.length > 0 or glob.last-char != '\n'
         self.set-location()

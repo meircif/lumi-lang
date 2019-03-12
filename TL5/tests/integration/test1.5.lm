@@ -25,7 +25,7 @@ class TopType(covered.MiddleType)
         sys.println(user "TopType.meth3")
         base.meth3(copy n, user s)
     
-    func dynamic meth5(copy Int n, weak String s)
+    func dynamic meth5(copy Int n, weak String? s)
         sys.println(user "TopType.meth5")
         base(copy n, user s)
         covered.MiddleType.meth1(user _, copy n, weak s)
@@ -35,9 +35,9 @@ class TopType(covered.MiddleType)
         sys.println(user "TopType.meth6")
         self.num-mid := self.num-base
         self.top-base-ref := self.top-mid-ref
-        user covered.MiddleType mt(user self)
+        user covered.MiddleType? mt(user self)
         mt := self
-        user BaseType bt(user mt)
+        user BaseType? bt(user mt)
         test-mid-out()->(user bt)
 
 
@@ -52,7 +52,7 @@ class BaseType
     func dynamic meth0()
         sys.println(user "BaseType.meth0")
     
-    func dynamic meth1(copy Int n, weak String s)
+    func dynamic meth1(copy Int n, weak String? s)
         sys.println(user "BaseType.meth1")
     
     func dynamic meth2()
@@ -62,7 +62,7 @@ class BaseType
         sys.println(user "BaseType.meth3")
 
 
-func test-mid-out()->(user covered.MiddleType mt)
+func test-mid-out()->(user covered.MiddleType? mt)
     mt := _
 
 
@@ -71,7 +71,7 @@ func test-new-mid()->(owner covered.MiddleType mt)
     mt := new-mt
 
 
-mock TestStruct.get()->(var Int x, user String s)
+mock TestStruct.get()->(var Int x, user String? s)
     x := 12
     s := _
 
@@ -82,7 +82,7 @@ mock TestClass.dynamic-meth()
     self.num := 7
 
 test test-func()
-    owner String s
+    owner String? s
     assert-error test-int2str(copy 3)->(owner s)
     test-int2str.mocked(copy 4)->(owner s)
     test-int2str.active := false
@@ -146,7 +146,7 @@ test test-dynamic-type-parameters()
     var TopType ttop
     ttop.num-base := 12
     dmid.item := ttop
-    weak BaseType tbase
+    weak BaseType? tbase
     tbase := dmid.item
     assert tbase.num-base = 12
     ttop.num-base := 13
@@ -157,36 +157,36 @@ test test-dynamic-type-parameters()
 
 
 struct Link
-    owner Link next
+    owner Link? next
 
 class BaseLink
-    owner BaseLink next
-    weak Link link
+    owner BaseLink? next
+    weak Link? link
     
     func dynamic m-meth()
         ; do nothing
 
 class TopLink{Generic}(BaseLink)
-    owner Generic item
+    owner Generic? item
 
 struct RefNode
-    owner RefNode next
-    var Ref ref
+    owner RefNode? next
+    var Ref? ref
     
-    func new(copy Ref ref)
+    func new(copy Ref? ref)
         self.ref := ref
 
-func new-ref-node(copy Ref ref)->(owner RefNode next)
+func new-ref-node(copy Ref? ref)->(owner RefNode? next)
     new RefNode ref-node(copy ref)
     ref-node.next := next
     next := ref-node
 
 
 var Bool record-delete
-owner RefNode deleted-links
-owner RefNode deleted-base-links
-owner RefNode deleted-top-links
-owner RefNode deleted-refmans(owner _)
+owner RefNode? deleted-links
+owner RefNode? deleted-base-links
+owner RefNode? deleted-top-links
+owner RefNode? deleted-refmans(owner _)
 
 mock delete()
     if record-delete
@@ -208,7 +208,7 @@ func remove-obj(owner Link b)
     ; remove b
 
 func get-outdated-var()->(weak Link l-out)
-    new Link l-var
+    strong Link l-var(strong Link())
     l-out := l-var
 
 test test-simple-delete()
@@ -216,8 +216,8 @@ test test-simple-delete()
     assert not deleted-links?
     record-delete := true
     
-    new Link l
-    weak Link l-user(weak l)
+    strong Link l(strong Link())
+    weak Link? l-user(weak l)
     assert l?
     assert l-user?
     var Ref l-ref(copy l)
@@ -240,14 +240,14 @@ test test-simple-delete()
     deleted-refmans := _
     deleted-links := _
 
-func has-ref(copy Ref ref)->(owner RefNode node)
+func has-ref(copy Ref ref)->(owner RefNode? node)
     has-ref-rec(copy ref)->(owner node)
     has-ref-rec(copy ref)->(owner deleted-refmans)
 
-func has-ref-rec(copy Ref ref)->(owner RefNode node)
+func has-ref-rec(copy Ref ref)->(owner RefNode? node)
     assert node?
     if node.ref is ref
-        owner RefNode next(owner node.next)
+        owner RefNode? next(owner node.next)
         node := next
     else
         has-ref-rec(copy ref)->(owner node.next)
@@ -259,21 +259,21 @@ test test-complex-delete()
     assert not deleted-top-links?
     record-delete := true
     
-    new BaseLink b1
+    strong BaseLink? b1(strong BaseLink())
     var Ref b1-ref(copy b1)
-    new BaseLink b2
+    strong BaseLink b2(strong BaseLink())
     var Ref b2-ref(copy b2)
-    new TopLink{Link} t1
+    strong TopLink{Link} t1(strong TopLink{Link}())
     var Ref t1-ref(copy t1)
-    new TopLink{BaseLink} t2
+    strong TopLink{BaseLink} t2(strong TopLink{BaseLink}())
     var Ref t2-ref(copy t2)
-    new TopLink{BaseLink} t3
+    strong TopLink{BaseLink} t3(strong TopLink{BaseLink}())
     var Ref t3-ref(copy t3)
-    new Link l1
+    strong Link l1(strong Link())
     var Ref l1-ref(copy l1)
-    new Link l2
+    strong Link l2(strong Link())
     var Ref l2-ref(copy l2)
-    new Link l3
+    strong Link l3(strong Link())
     var Ref l3-ref(copy l3)
     
     b1.link := l1
@@ -321,6 +321,11 @@ test test-complex-delete()
     assert not deleted-links?
     assert not deleted-base-links?
     assert not deleted-top-links?
+    
+    deleted-refmans := _
+    deleted-links := _
+    deleted-base-links := _
+    deleted-top-links := _
 
 func has-refs(user Array{Ref} refs, copy Int number)
     record-delete := false
@@ -427,18 +432,18 @@ test test-assert-error-message()
     var Func{()} fun
     assert-error fun(), "empty object used"
     var BaseType base-var
-    user BaseType base-user(user base-var)
+    user BaseType? base-user(user base-var)
     assert-error test-mid-out()->(user base-user),
             "non empty base class given as output argument"
-    new Array{2:Int} arr
+    new Array?{2:Int} arr
     assert-error arr[6], "slice index out of bounds"
-    user Array{Int} arr2(user arr)
+    user Array?{Int} arr2(user arr)
     arr := _
     assert-error arr.length, "empty object used"
     assert-error arr2.length, "outdated weak reference used"
     assert-error arr[0], "empty object used"
     assert-error arr2[0], "outdated weak reference used"
-    user TopType top
+    user TopType? top
     assert-error top.meth2(), "empty object used"
     new-fail-countdown := 1
     assert-error alloc(), "insufficient memory for object dynamic allocation"
@@ -448,12 +453,12 @@ test test-assert-error-message()
 native var Int lumi-debug-value
 
 test test-builtin-errors()
-    new String{4} outdated-owner
-    user String outdated(user outdated-owner)
+    new String?{4} outdated-owner
+    user String? outdated(user outdated-owner)
     outdated-owner := _
     var String{3} too-long(user "abc")
     
-    owner File file
+    owner File? file
     var String{4} filename
     assert-error file-open-read(user _)->(owner file), "empty object used"
     assert-error file-open-write(user outdated)->(owner file),

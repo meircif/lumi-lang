@@ -125,10 +125,10 @@ func logical-operator-factory(
 class ArithmeticAssignOperatorExpression(BinaryExpression)
   func dynamic analyze()
     base()
-    self.analyze-assignment()
-    self.safe-operand-write := false
     if not self.left-expression.assignable
       self.syntax-error-msg(user "assigning into non assignable expression")
+    self.analyze-assignment()
+    self.safe-operand-write := false
     
   func dynamic analyze-assignment()
     self.test-operands-type(user glob.type-int)

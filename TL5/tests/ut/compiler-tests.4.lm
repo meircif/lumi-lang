@@ -3,24 +3,47 @@ module tl5-compiler-tests
 
 
 var Bool code-header-valid
+var Array{6:String{256}} mock-argv
+
+
+mock tl5-compiler.get-sys-argv()->(user Array{String} argv)
+  argv := tl5-compiler-tests.mock-argv
 
 
 func write-syntax-tree(copy Bool is-test)
-  var Array{6:String{256}} mock-argv
   mock-argv[0].new(user "tl4-compiler")
   mock-argv[1].new(user "mock.c")
   mock-argv[2].new(user "mock.5.lm")
   if is-test
+    mock-argv.length := 6
     mock-argv[3].new(user "-t")
     mock-argv[4].new(user "ut")
     mock-argv[5].new(user "second.5.lm")
   else
     mock-argv.length := 3
-  sys.argv := mock-argv
   tl5-compiler.glob.root.is-library := true
   tl5-compiler.glob.root.parse()
   tl5-compiler.glob.root.analyze()
   tl5-compiler.glob.root.write()
+
+
+func write-syntax-tree-success(copy Bool is-test)
+  if crush-run
+    write-syntax-tree(copy is-test)
+    raise
+  sys-exit := false
+  Sys.print.active := true
+  try
+    write-syntax-tree(copy is-test)
+    Sys.print.active := false
+  catch
+    Sys.print.active := false
+    if sys-exit
+      print-case-error()
+      sys.print(user mock-print-text[0:mock-print-text.length - 1])
+    else
+      crush-run := true
+    assert false
 
 
 func test-global-scope(
@@ -30,7 +53,7 @@ func test-global-scope(
     copy Bool is-test)
   setup-test()
   set-mock-file-text(user input-text, user second-file-input-text)
-  write-syntax-tree(copy is-test)
+  write-syntax-tree-success(copy is-test)
   if mock-output-file-text[0] != '\n'
     sys.print(user mock-output-file-text)
   assert mock-output-file-text[0] = '\n'
@@ -44,15 +67,23 @@ func test-global-scope(
 
 
 func try-write-syntax-tree(copy Bool is-test)->(var Bool has-error)
-  Sys.print.active := true
+  if crush-run
+    write-syntax-tree(copy is-test)
+    raise
   has-error := true
+  sys-exit := false
+  Sys.print.active := true
   try
     write-syntax-tree(copy is-test)
+    has-error := false
     Sys.print.active := false
     print-case-error()
     sys.print(user "[no error raised]")
-    has-error := false
-  Sys.print.active := false
+  catch
+    Sys.print.active := false
+    if not sys-exit
+      crush-run := true
+      assert false
 
 
 func test-error-message(user String expected-header, user String expected-error)
@@ -90,10 +121,7 @@ func test-global-scope-error(
   setup-test()
   set-mock-file-text(user input-text, user second-file-input-text)
   assert try-write-syntax-tree(copy is-test)
-  if mock-print-text.length = 0
-    setup-test()
-    set-mock-file-text(user input-text, user second-file-input-text)
-    write-syntax-tree(copy is-test)
+  Sys.print.active := false
   user String expected-header
   if is-test
     expected-header := "Code error in second.5.lm["
@@ -121,7 +149,7 @@ func test-code(
   if not code-header-valid
     return
   test-code-setup(user input-text)
-  write-syntax-tree(copy false)
+  write-syntax-tree-success(copy false)
   assert-string-slice(
       user expected-common-header,
       user mock-output-file-text,
@@ -152,16 +180,13 @@ func test-code-error(user String input-text, user String expected-error)
     return
   test-code-setup(user input-text)
   assert try-write-syntax-tree(copy false)
-  if mock-print-text.length = 0
-    test-code-setup(user input-text)
-    write-syntax-tree(copy false)
+  Sys.print.active := false
   test-error-message(user "Code error in mock.5.lm[", user expected-error)
 
 
 test test-illegal-usage()
   setup-test()
-  var Array{2:String{4}} mock-argv
-  sys.argv := mock-argv
+  mock-argv.length := 2
   Sys.print.active := true
   assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
   Sys.print.active := false
@@ -176,16 +201,15 @@ test test-illegal-usage()
 
 test test-open-file-fail()
   setup-test()
-  var Array{3:String{256}} mock-argv
+  mock-argv.length := 3
   mock-argv[0].new(user "tl5-compiler")
   mock-argv[1].new(user "mock.c")
   mock-argv[2].new(user "mock.5.lm")
   mock-argv.length := 3
-  sys.argv := mock-argv
   tl5-compiler.glob.root.is-library := true
   
-  Sys.print.active := true
   file-open-error := true
+  Sys.print.active := true
   assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
   Sys.print.active := false
   assert-string-slice(

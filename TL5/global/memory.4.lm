@@ -95,14 +95,20 @@ struct ReferenceMemoryList
   func mark-all-illegal()
     self.user-references.clear()
   
-  func mark-illegal-type(user TypeInstance type-instance)
+  func mark-illegal-type(user TypeInstance type-instance-base)
+    var TypeInstance type-instance
+    type-instance-base.copy(user type-instance)
+    type-instance.conditional := false
     ; for reference in self.references.iter()
     ;   if type-data is reference.path.variable.type-instance.type-data
     ;     reference.usable := false
     var NameMap{SyntaxTreeVariable} to-delete
+    var TypeInstance variable-type-instance
     for variable in self.user-references.iter()
-      if variable.type-instance.can-be-assigned-to(user type-instance) or
-          type-instance.can-be-assigned-to(user variable.type-instance)
+      variable.type-instance.copy(user variable-type-instance)
+      type-instance.conditional := false
+      if variable-type-instance.can-be-assigned-to(user type-instance) or
+          type-instance.can-be-assigned-to(user variable-type-instance)
         to-delete.add(user variable.name, user variable)
     for variable in to-delete.iter()
       self.user-references.remove(user variable)
@@ -162,9 +168,12 @@ struct CallGroup
     self.deleting-types := deleting-types
     self.delete-all := delete-all
 
-  func add-deleting(user TypeInstance type-instance)
+  func add-deleting(user TypeInstance type-instance-base)
     if self.delete-all
       return
+    new TypeInstance type-instance
+    type-instance-base.copy(user type-instance)
+    type-instance.conditional := false
     user ListNode{TypeInstance} node(user self.deleting-types.first)
     do
       while node?
@@ -176,7 +185,7 @@ struct CallGroup
         node.item := new-type
         return
       node := node.next
-    self.deleting-types.add(owner type-instance.copy-new())
+    self.deleting-types.add(owner type-instance)
 
   func set-delete-all()
     self.delete-all := true
