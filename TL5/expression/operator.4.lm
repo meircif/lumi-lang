@@ -159,6 +159,8 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
           copy false,
           user self.left-expression.result-type)->(
           owner self.assigned-value-variable)
+    else-if self.left-expression.access = Access.BORROW
+      self.syntax-error-msg(user "assigning into borrowed owner")
     if self.left-expression.result-type.reference-path.equals(
         user self.right-expression.result-type.reference-path)
       self.syntax-error-msg(user "assigning reference into itself")

@@ -228,6 +228,12 @@ struct TypeInstance
             user self.type-data.name,
             user "into static type",
             user target.type-data.name)
+    if target-access = Access.BORROW and
+        (self-access = Access.USER or self-access = Access.WEAK)
+      assert node?
+      node.syntax-error(
+          user "borrowing from a non-owner access",
+          user glob.access-names[self-access])
     if target-access = Access.WEAK and self-access != Access.WEAK and
         self-access != Access.STRONG and self-access != Access.VAR
       assert node?

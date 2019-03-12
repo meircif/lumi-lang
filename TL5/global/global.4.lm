@@ -7,6 +7,7 @@ enum Access
   VAR
   COPY
   OWNER
+  BORROW
   USER
   STRONG
   WEAK
@@ -90,10 +91,11 @@ struct Global
   
   func init-access-names()
     self.access-names := Array{Access.length:String{16}}()
-    self.access-names[Access.UNDEFINED].new(user "undefined")
+    self.access-names[Access.UNDEFINED].new(user "{undefined}")
     self.access-names[Access.VAR].new(user "var")
     self.access-names[Access.COPY].new(user "copy")
     self.access-names[Access.OWNER].new(user "owner")
+    self.access-names[Access.BORROW].new(user "borrow")
     self.access-names[Access.USER].new(user "user")
     self.access-names[Access.STRONG].new(user "strong")
     self.access-names[Access.WEAK].new(user "weak")

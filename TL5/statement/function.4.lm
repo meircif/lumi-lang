@@ -426,6 +426,10 @@ class DeclarationArgument(Argument)
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
+    if self.is-output and self.access = Access.BORROW
+      self.syntax-error(
+          user "cannot use \"borrow\" in output",
+          user self.variable.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
       if (self.access = Access.OWNER or self.access = Access.STRONG)
