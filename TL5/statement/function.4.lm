@@ -82,6 +82,14 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       self.register-name()
     self.parse-arguments(copy is-native)
   
+  func inst add-self-parameter()
+    if self.parent-type.constructor is self
+      self.arguments.add-self-parameter(
+          user self.parent-type, copy Access.BORROW)
+    else
+      self.arguments.add-self-parameter(
+          user self.parent-type, copy Access.USER)
+  
   func inst parse-arguments(copy Bool is-native)
     var DeclarationArgumentFactory argument-factory
     var SyntaxTreeCode dummy-node(user self)
@@ -91,7 +99,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         user dummy-node,
         copy self.indentation-spaces)
     if self.parent-type?
-      self.arguments.add-self-parameter(user self.parent-type)
+      self.add-self-parameter()
     if glob.last-char = ' ' and self.parent-type?
       read-c()
       self.header-only := glob.last-char = '_'
@@ -169,7 +177,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             user "of type",
             user self.type-name)
       self.check-already-implemented()
-      self.arguments.add-self-parameter(user self.parent-type)
+      if self.parent-type.constructor is self.implemented-function
+        self.parent-type.constructor := self
+      self.add-self-parameter()
     self.arguments.link-types()
     base()
     if self.my-module?
@@ -357,8 +367,12 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
   func inst parse(user TypeData parent-type)
     self.parent-type := parent-type
     self.indentation-spaces := INDENTATION-SPACES
+    self.parent-type.constructor := self
     string-new-copy(user "new")->(owner self.name)
     self.parse-arguments(copy false)
+    user Argument self-arg(user self.arguments.parameters.first.item)
+    self-arg.access := Access.BORROW
+    self-arg.get-variable().access := Access.BORROW
     self.parse-body()
   
   func dynamic analyze()

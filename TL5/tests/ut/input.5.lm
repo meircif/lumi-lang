@@ -2661,6 +2661,7 @@ ut.Error.VALUE
 struct Test
     owner String s
     new()
+        self.s := String{12}()
 func use(user String s)
 func take(owner String s)
 func fun(owner String? s, user Test tu, owner Test to)
