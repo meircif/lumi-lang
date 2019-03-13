@@ -142,8 +142,8 @@ test test-native()
 
 
 test test-dynamic-type-parameters()
-    var Data{covered.MiddleType} dmid
-    var TopType ttop
+    s-var Data{covered.MiddleType} dmid
+    s-var TopType ttop
     ttop.num-base := 12
     dmid.item := ttop
     weak BaseType? tbase

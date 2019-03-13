@@ -145,9 +145,10 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
   owner VariableExpression assigned-value-variable
   
   func dynamic analyze-assignment()
+    self.assignee := self.right-expression
     self.left-expression.result-type.check-assign-from(
         copy self.left-expression.access, user self)->(
-        owner self.right-expression, user self.assignee)
+        owner self.right-expression)
     if self.left-expression.access = Access.USER or
         self.left-expression.access = Access.WEAK
       self.code-node.get-function().has-user-assign := true
@@ -159,8 +160,6 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
           copy false,
           user self.left-expression.result-type)->(
           owner self.assigned-value-variable)
-    else-if self.left-expression.access = Access.BORROW
-      self.syntax-error-msg(user "assigning into borrowed owner")
     if self.left-expression.result-type.reference-path.equals(
         user self.right-expression.result-type.reference-path)
       self.syntax-error-msg(user "assigning reference into itself")

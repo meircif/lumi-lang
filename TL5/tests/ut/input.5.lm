@@ -192,27 +192,29 @@ x := arr[2:6]
 str[4] := c
 ; @ c t5
 arr[4] := i
-; @ ec t6
+; @ ec te0
 arr[2
-; @ ec t7
+; @ ec te1
 arr[2:3
-; @ ec t8
+; @ ec te2
 (i := 3)[2]
-; @ ec t9
+; @ ec te3
 i[2]
-; @ ec t10
+; @ ec te4
 arr[str]
-; @ ec t11
+; @ ec te5
 arr[3:str]
-; @ ec t12
+; @ ec te6
 arr[i += 3]
-; @ ec t13
+; @ ec te7
 str[2:5] := so
-; @ ec t14
+; @ ec te8
 arr[7:2] := Array{5:Int}()
-; @ ec t15
+; @ ec te9
 user Array?{Test} at
 at[0] := t
+; @ ec te10
+so := sarr[3]
 ; @@ test-call-expression
 ; @ c t0
 fun0()
@@ -571,10 +573,10 @@ ta := tc
 ; @ c t8
 ta := _
 ; @ c t9
-user Array?{Ta} aa
+weak Array?{Ta} aa
 ta := aa[4]
 ; @ c t10
-user Array?{Tc} ca
+weak Array?{Tc} ca
 ta := ca[4]
 ; @ c t11
 ta.dyn()
@@ -938,7 +940,7 @@ func name()
     var Int x
 ; @ g t7
 func name(user String self, copy Int px, user String pu, owner String po)->(
-        var String oself, var Int ox, weak String ou, owner String oo)
+        strong String oself, var Int ox, weak String ou, owner String oo)
     var Int x
     user String? u
     owner String? o
@@ -2031,7 +2033,7 @@ var Char{String} error
 var Data dg
 str := dg.item
 ; @ ec tec5
-var Data dg
+s-var Data dg
 d := dg
 ; @ ec tec6
 t := d.item
@@ -2413,7 +2415,7 @@ func f-mock()
 ; @@ test-complex-fields
 ; @ g t0
 struct Test
-    var Bstruct b
+    s-var Bstruct b
     func test()
         weak Bstruct b(weak self.b)
         b := self.b
@@ -2711,10 +2713,10 @@ func Test.get()->(user String s)
 ; @ g tb0
 struct Test
     owner String? s
-func fun(borrow Test t)
+func fun(var Test t)
     t.s := _
 func use(owner Test to)
-    fun(borrow to)
+    fun(var to)
 ; @ eg teo0
 struct Test
     owner String s
@@ -2944,19 +2946,19 @@ func fun(owner String so)->(user String? s)
 func fun()->(user String? s)
     owner String? so
     s := _
-; @ eg teb0
-func fun(borrow String s)
+; @ eg tev0
+func fun(var String s)
 func error(user String s)
-    fun(borrow s)
-; @ eg teb1
+    fun(var s)
+; @ eg tev1
 func fun(owner String s)
-func error(borrow String s)
+func error(var String s)
     fun(owner s)
-; @ eg teb2
-func error(borrow String a, borrow String b)
+; @ eg tev2
+func error(var String a, owner String b)
     a := b
-; @ eg teb3
-func error()->(borrow String s)
+; @ eg tev3
+func error()->(var String s)
 ; @ eg tee0
 struct Error
     weak String s

@@ -17,7 +17,6 @@ class SliceExpression(Expression)
   ~~~ parsing `sequence[index]` or `sequence[index:second-index]` ~~~
   func inst parse(owner Expression sequence)
     self.sequence := sequence
-    self.access := Access.VAR
     parse-new-expression(user ":]", user self.code-node)->(owner self.index)
     if glob.last-char = ':'
       parse-new-expression(user "]", user self.code-node)->(
@@ -45,8 +44,14 @@ class SliceExpression(Expression)
           user "cannot slice type",
           user self.sequence.result-type.type-data.name)
     if not self.second-index?
-      self.assignable := self.sequence.assignable and
-          self.result-type.type-data.is-primitive
+      self.assignable := self.result-type.type-data.is-primitive
+      
+    if not self.assignable and (self.sequence.access = Access.STRONG or
+        self.sequence.access = Access.WEAK or
+        self.sequence.access = Access.S-VAR)
+      self.access := Access.S-VAR
+    else
+      self.access := Access.VAR
     
     analyze-expression()->(owner self.index)
     self.check-index(user self.index)
@@ -57,7 +62,7 @@ class SliceExpression(Expression)
       self.sequence.result-type.copy-new()->(owner self.result-type)
       self.result-type.conditional := false
       self.add-aux-variable(
-          copy Access.VAR, copy false, user self.result-type)->(
+          copy self.access, copy false, user self.result-type)->(
           owner self.slice-variable)
     
     if not self.result-type.type-data.is-primitive

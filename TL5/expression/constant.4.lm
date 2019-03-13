@@ -130,7 +130,7 @@ class StringExpression(TextExpression)
   func inst parse(owner String text)
     self.check-string(user text)
     self.set-simple-type(user glob.type-string)
-    self.access := Access.VAR
+    self.access := Access.S-VAR
     self.text := text
     self.strip-multilines()
   

@@ -51,8 +51,9 @@ class FieldExpression(Expression)
       if after-base
         self.syntax-error(
             user "calling \"base\" with non-method", user self.name)
-      self.is-complex-field := self.variable.access = Access.VAR and
-          not self.variable.type-instance.type-data.is-primitive
+      self.is-complex-field := (self.variable.access = Access.VAR and
+          not self.variable.type-instance.type-data.is-primitive) or
+          self.variable.access = Access.S-VAR
       self.variable.type-instance.new-replace-params(user instance-type)->(
           owner self.result-type)
       instance-type.reference-path.copy-and-add-field(user self.variable)->(

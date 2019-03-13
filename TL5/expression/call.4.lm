@@ -256,8 +256,9 @@ class CallArgument(Argument)
           copy self.value.access,
           user self) > 0
     else
+      self.assignee := self.value
       real-type.check-assign-from(copy self.access, user self)->(
-          owner self.value, user self.assignee)
+          owner self.value)
     self.is-primitive := real-type.type-data.is-primitive
     self.is-dynamic := real-type.type-data.is-dynamic
     self.is-generic := type-instance.type-data is glob.type-generic

@@ -543,26 +543,28 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (4 < 0 || 4 >= ut_M_arr->length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ((Int*)(ut_M_arr->values))[4] = ut_M_i;
-/// @ t6
+/// @ te0
 expected "]", got "new-line"
-/// @ t7
+/// @ te1
 expected "]", got "new-line"
-/// @ t8
+/// @ te2
 cannot slice a void expression
-/// @ t9
+/// @ te3
 cannot slice type "Int"
-/// @ t10
+/// @ te4
 expected integer index for slice, got "String"
-/// @ t11
+/// @ te5
 expected integer index for slice, got "String"
-/// @ t12
+/// @ te6
 expected integer index for slice, got void expression
-/// @ t13
+/// @ te7
 assigning into non assignable expression
-/// @ t14
+/// @ te8
 assigning into non assignable expression
-/// @ t15
+/// @ te9
 assigning into non assignable expression
+/// @ te10
+assigning into an owner a non-owner access "s-var"
 /// @@ test-call-expression
 /// @ t0
 LUMI_err = ut_M_fun0();
@@ -7941,14 +7943,14 @@ returning potentially illegal user output "s"
 returning potentially illegal user output "s"
 /// @ teu28
 returning potentially illegal user output "s"
-/// @ teb0
-borrowing from a non-owner access "user"
-/// @ teb1
-assigning into an owner a non-owner access "borrow"
-/// @ teb2
-assigning into borrowed owner
-/// @ teb3
-cannot use "borrow" in output "s"
+/// @ tev0
+cannot assign value with access "user" into value with access "var"
+/// @ tev1
+assigning into an owner a non-owner access "var"
+/// @ tev2
+assigning into non assignable expression
+/// @ tev3
+output "s" access should not be "var" for non-primitive type "String"
 /// @ tee0
 non-conditional reference in type without constructor "Error"
 /// @ tec0

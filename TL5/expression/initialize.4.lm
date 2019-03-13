@@ -114,7 +114,8 @@ class InitExpression(ModuleTypeExpression)
       if self.result-type.parameters.first.item.type-data is glob.type-string
         self.result-type.parameters.first.item.length.write-preactions()
     
-    if self.aux-variable.variable.access = Access.VAR
+    if self.aux-variable.variable.access = Access.VAR or
+        self.aux-variable.variable.access = Access.S-VAR
       self.write-var-init()
     else
       self.write-new-init()

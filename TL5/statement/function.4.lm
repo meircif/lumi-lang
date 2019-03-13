@@ -85,7 +85,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func inst add-self-parameter()
     if self.parent-type.constructor is self
       self.arguments.add-self-parameter(
-          user self.parent-type, copy Access.BORROW)
+          user self.parent-type, copy Access.VAR)
     else
       self.arguments.add-self-parameter(
           user self.parent-type, copy Access.USER)
@@ -212,7 +212,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     base()
     for variable in self.variables.iter()
       if variable.access = Access.OWNER or variable.access = Access.STRONG or
-          variable.access = Access.VAR
+          variable.access = Access.VAR or variable.access = Access.S-VAR
         self.call-group-builder.add-deleting(user variable.type-instance)
     if self.my-module?
       glob.current-module := _
@@ -238,7 +238,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         refs.mark-illegal-type(user parameter.get-type-instance())
     for variable in self.variables.iter()
       if variable.access = Access.OWNER or variable.access = Access.STRONG or
-          variable.access = Access.VAR
+          variable.access = Access.VAR or variable.access = Access.S-VAR
         refs.mark-illegal-type(user variable.type-instance)
     for output in self.arguments.outputs.iter()
       refs.check-output(user output)
@@ -370,9 +370,6 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
     self.parent-type.constructor := self
     string-new-copy(user "new")->(owner self.name)
     self.parse-arguments(copy false)
-    user Argument self-arg(user self.arguments.parameters.first.item)
-    self-arg.access := Access.BORROW
-    self-arg.get-variable().access := Access.BORROW
     self.parse-body()
   
   func dynamic analyze()
@@ -440,10 +437,13 @@ class DeclarationArgument(Argument)
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
-    if self.is-output and self.access = Access.BORROW
-      self.syntax-error(
-          user "cannot use \"borrow\" in output",
-          user self.variable.name)
+    else-if self.is-output and
+        (self.access = Access.VAR or self.access = Access.S-VAR)
+      self.syntax-error2(
+          user "output",
+          user self.variable.name,
+          user "access should not be \"var\" for non-primitive type",
+          user self.variable.type-instance.type-data.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
       if (self.access = Access.OWNER or self.access = Access.STRONG)
