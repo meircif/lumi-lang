@@ -8,7 +8,7 @@ class TypeData(SyntaxTreeNamespace)
   owner TypeInstance base-type
   owner List{String} parameters
   owner NameMap{SyntaxTreeFunction} dynamic-base-methods
-  user SyntaxTreeConstructor constructor
+  user SyntaxTreeFunction constructor
   var Bool is-primitive
   var Bool is-dynamic
   var Bool is-ordered
@@ -72,11 +72,8 @@ class TypeData(SyntaxTreeNamespace)
       if self.constructor?
         self.syntax-error(
             user "constructor already defined for type", user self.name)
-      owner SyntaxTreeConstructor constructor
-      self.constructor := SyntaxTreeConstructor.parse-new(
-          user _, user self)->(owner constructor)
-      self.functions.add(owner constructor)
-      
+      self.functions.add(
+          owner SyntaxTreeConstructor.parse-new(user _, user self))
     else
       self.syntax-error(user "unknown keyword", user keyword)
   
