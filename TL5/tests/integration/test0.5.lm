@@ -73,10 +73,10 @@ func test-member-expression(strong TestStruct t)->(
 
 func test-slice-expression(
         user String s,
-        user Array{Int} arri,
-        user Array{String} arrs,
-        user Array{TestStruct} arrt,
-        user Array{TestClass} arrd,
+        weak Array{Int} arri,
+        weak Array{String} arrs,
+        weak Array{TestStruct} arrt,
+        weak Array{TestClass} arrd,
         weak Array{Func{()}} arrf)->(
         var Char c,
         var Int i,
@@ -409,7 +409,7 @@ struct TopData(MidData{TestStruct})
 
 func test-type-parameters(weak String s)
     var Data{String} d
-    var Array{6:String{16}} sarr
+    s-var Array{6:String{16}} sarr
     d.item := s
     s := d.item
     d.arr := sarr
@@ -425,8 +425,8 @@ func test-type-parameters(weak String s)
     assert dg?
     
     var TopData t
-    var Data{TestStruct} dt
-    var TestStruct ts(copy 0, weak _)
+    s-var Data{TestStruct} dt
+    s-var TestStruct ts(copy 0, weak _)
     t.item := s
     t.arr := sarr
     t.second := dt
@@ -535,10 +535,10 @@ func test-for-each()
         sys.print(user " ")
     sys.println(user "]")
     
-    var Container{String} container-last(weak "iii", weak _)
-    var Container{String} container-mid(weak "hhh", weak container-last)
-    var Container{String} container-first(weak "ggg", weak container-mid)
-    var Container{String} container(weak _, weak container-first)
+    s-var Container{String} container-last(weak "iii", weak _)
+    s-var Container{String} container-mid(weak "hhh", weak container-last)
+    s-var Container{String} container-first(weak "ggg", weak container-mid)
+    s-var Container{String} container(weak _, weak container-first)
     owner ContainerIterator{String} iter(owner container.iter())
     sys.print(user "values[ ")
     for sc in iter
@@ -554,7 +554,7 @@ class ComplexField
         sys.print(user "$")
 
 struct HasComplexField
-    var ComplexField x
+    s-var ComplexField x
     func run() _
 
 func HasComplexField.run()
@@ -570,19 +570,19 @@ func HasComplexField.run()
     ComplexField.meth(user self.x.x)
 
 func test-complex-field()
-    var HasComplexField y
+    s-var HasComplexField y
     y.x.x := y.x
     sys.print(user "complex fields: ")
     y.run()
     sys.println(user "")
 
 
-func set-borrow(borrow TestStruct t)
+func set-borrow(var TestStruct t)
     t.ts := TestStruct(copy 2, weak _)
 
 func test-borrow()
     var TestStruct t(copy 1, weak _)
-    set-borrow(borrow t)
+    set-borrow(var t)
     assert t.ts.num = 2
 
 

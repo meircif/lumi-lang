@@ -121,6 +121,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           copy false,
           user parent-type,
           user parent-block))
+    else-if keyword.equal(user "s-var")
+      self.variables.add(owner SyntaxTreeVariable.parse-new(
+          user _,
+          copy Access.S-VAR,
+          copy true,
+          user parent-type,
+          user parent-block))
       
     else
       is-parsed := false
@@ -162,7 +169,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         not item-type-data.is-primitive
       self.write-owner-reference-cleanup(
           user variable, user type-data, user item-type-data)
-    else-if type-data? and variable.access = Access.VAR
+    else-if type-data? and
+        (variable.access = Access.VAR or variable.access = Access.S-VAR)
       write-spaces(copy INDENTATION-SPACES)
       item-type-data.write-cname()
       write(user "_Del(&(self->")
@@ -174,7 +182,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     else
       self.write-spaces()
     write(user "LUMI_")
-    if variable.access = Access.VAR
+    if variable.access = Access.VAR or variable.access = Access.S-VAR
       write(user "var_")
     else-if variable.access = Access.OWNER or variable.access = Access.STRONG
       write(user "owner_")

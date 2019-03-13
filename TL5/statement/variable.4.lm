@@ -122,7 +122,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.syntax-error(
           user "only \"var\" access is supported for primitive types, got",
           user glob.access-names[self.access])
-    self.type-instance.analyze-lengths(user self, copy self.access = Access.VAR)
+    self.type-instance.analyze-lengths(
+        user self, copy self.access = Access.VAR or self.access = Access.S-VAR)
     if self.is-create and self.type-instance.type-data is glob.type-generic
       self.syntax-error(
           user "declared variable with generic subtype",
@@ -138,7 +139,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.syntax-error(
           user "cannot create objects with type",
           user self.type-instance.type-data.name)
-    if self.access = Access.VAR
+    if self.access = Access.VAR or self.access = Access.S-VAR
       self.type-instance.check-sequence(user self)
     if self.is-create and self.type-instance.type-data is glob.type-array
       if self.type-instance.parameters.first.item.type-data is glob.type-generic
@@ -149,7 +150,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       if (not self.type-instance.type-data.is-primitive or
           self.type-instance.type-data is glob.type-func) and
           not self.type-instance.conditional and self.access != Access.VAR and
-          not self.parent-type.constructor?
+          self.access != Access.S-VAR and not self.parent-type.constructor?
         self.syntax-error(
             user "non-conditional reference in type without constructor",
             user self.parent-type.name)
@@ -176,13 +177,14 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else-if not self.is-native
       write(user "\n")
     
-    if self.access = Access.VAR and self.is-create and
-        (self.type-instance.type-data is glob.type-array or
+    if (self.access = Access.VAR or self.access = Access.S-VAR) and
+        self.is-create and (self.type-instance.type-data is glob.type-array or
         self.type-instance.type-data is glob.type-string)
       self.write-sequence()
     
     if not self.type-instance.type-data.is-primitive and
-        self.access = Access.VAR and not self.parent-type?
+        (self.access = Access.VAR or self.access = Access.S-VAR) and
+        not self.parent-type?
       self.write-var()
     
     ; `type` `name`[ = 0];
@@ -193,7 +195,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else
       self.type-instance.type-data.write-cname()
       if not self.type-instance.type-data.is-primitive and
-          not (self.parent-type? and self.access = Access.VAR)
+          not (self.parent-type? and
+          (self.access = Access.VAR or self.access = Access.S-VAR))
         write(user "*")
       write(user " ")
       self.write-cname()
@@ -209,11 +212,13 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     write(user ";\n")
     
     if not self.type-instance.type-data.is-primitive and
-        not (self.parent-type? and self.access = Access.VAR)
+        not (self.parent-type? and
+        (self.access = Access.VAR or self.access = Access.S-VAR))
       self.write-refman()
     
     if self.type-instance.type-data.is-dynamic and
-        not (self.parent-type? and self.access = Access.VAR)
+        not (self.parent-type? and
+        (self.access = Access.VAR or self.access = Access.S-VAR))
       self.write-dynamic()
   
   func dynamic write-sequence()
@@ -281,7 +286,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       do
         if type-data.base-type?
           type-data := type-data.base-type.type-data
-        else-if type-data.variables.first.item.access = Access.VAR and
+        else-if (type-data.variables.first.item.access = Access.VAR or
+            type-data.variables.first.item.access = Access.S-VAR) and
             not type-data.variables.first.item.type-instance.type-data.is-primitive
           type-data := type-data.variables.first.item.type-instance.type-data
         else

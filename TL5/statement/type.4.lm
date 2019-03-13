@@ -154,7 +154,7 @@ class TypeData(SyntaxTreeNamespace)
     
     ; order complex fields
     for variable in self.variables.iter()
-      if variable.access = Access.VAR
+      if variable.access = Access.VAR or variable.access = Access.S-VAR
         glob.current-module := self.my-module
         variable.type-instance.link-types(user self)
         glob.current-module := _

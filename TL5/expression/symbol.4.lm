@@ -36,7 +36,9 @@ class VariableExpression(Expression)
       self.result-type.reference-path := ReferencePath(user self.variable)
       self.access := self.variable.access
       self.constant := self.variable.constant
-      self.assignable := not self.constant
+      self.assignable := not self.constant and
+          (self.result-type.type-data.is-primitive or
+          (self.access != Access.VAR and self.access != Access.S-VAR))
       return
     
     user SyntaxTreeFunction function
