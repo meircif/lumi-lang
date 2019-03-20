@@ -739,6 +739,18 @@ var Sys error
 new Sys error
 ; @ ec te5
 Sys()
+; @ ec te6
+user File? f
+file-open-read(user "name")->(owner fobj)
+f.putc(copy 'a')
+; @ ec te7
+user File? f
+file-open-write(user "name")->(owner fobj)
+f.putc(copy 'a')
+; @ ec te8
+user File? f
+file-close(owner fobj)
+f.putc(copy 'a')
 ; @@ test-general
 ; @ g t0
 user String str

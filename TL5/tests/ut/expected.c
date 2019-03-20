@@ -1786,6 +1786,12 @@ cannot create objects with type "Sys"
 cannot create objects with type "Sys"
 /// @ te5
 cannot create objects with type "Sys"
+/// @ te6
+using potentially illegal user reference "f"
+/// @ te7
+using potentially illegal user reference "f"
+/// @ te8
+using potentially illegal user reference "f"
 /// @@ test-general
 /// @ t0
 String* ut_M_str = NULL;
