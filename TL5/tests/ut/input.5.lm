@@ -2946,6 +2946,51 @@ func fun(owner String so)->(user String? s)
 func fun()->(user String? s)
     owner String? so
     s := _
+; @ eg teu29
+struct Test
+    owner String? s
+func fun(owner Test? t, user String s)
+    t := _
+    s.clear()
+; @ eg teu30
+struct Other
+    owner String? s
+struct Test
+    owner Other? o
+func fun(owner Test? t, user String s)
+    t := _
+    s.clear()
+; @ eg teu31
+struct Base
+    owner String? s
+struct Test(Base)
+struct Other(Base)
+    owner File? f
+func fun(owner Test? t, user String s, user File f)
+    t := _
+    f.putc(copy 'a')
+    s.clear()
+; @ eg teu32
+struct Base
+    var Int x
+struct Test(Base)
+    owner String? s
+func fun(owner Base? b, user String s)
+    b := _
+    s.clear()
+; @ eg teu33
+struct Test{Generic}
+    owner Generic? s
+func fun(owner Test?{String} t, user String s)
+    t := _
+    s.clear()
+; @ eg teu34
+struct Base{Generic}
+    owner Generic? s
+struct Test{Data}(Base{Data})
+func fun(owner Test?{String} t, user String s)
+    t := _
+    s.clear()
 ; @ eg tev0
 func fun(var String s)
 func error(user String s)

@@ -195,9 +195,11 @@ class SyntaxTreeRoot(GlobalNodes)
       sys.exit(copy 1)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.collect-call-groups()
     for type-data in self.types.iter()
-      type-data.collect-call-groups()
+      type-data.collect-delete-group()
+    self.collect-delete-groups()
+    for type-data in self.types.iter()
+      type-data.collect-delete-groups()
     base(user refs)
     self.check-children-memory(user self.types, user _)
   

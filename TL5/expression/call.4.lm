@@ -109,7 +109,7 @@ class FunctionCallExpression(CallExpression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
-    refs.mark-illegal-types(user self.function.function.call-group)
+    refs.mark-illegal-types(user self.function.function.delete-group, user _)
   
   func dynamic write-function()
     self.function.write()
@@ -189,7 +189,7 @@ class FunctionObjectCallExpression(CallExpression)
         user self.function-object.result-type.arguments,
         user self.function-object.result-type,
         copy 0)
-    self.code-node.get-function().call-group-builder.set-delete-all()
+    self.code-node.get-function().delete-group-builder.set-delete-all()
       
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.function-object.check-memory(user refs)
