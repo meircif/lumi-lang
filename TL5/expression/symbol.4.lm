@@ -179,7 +179,7 @@ class FunctionExpression(Expression)
             user self-instance)
         return
         
-    self.code-node.get-function().call-group-builder.add-calling(
+    self.code-node.get-function().delete-group-builder.add-calling(
         user self.function, user actual-params)
     expression := FunctionCallExpression(
         user self.code-node,

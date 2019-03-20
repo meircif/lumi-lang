@@ -8,6 +8,7 @@ class TypeData(SyntaxTreeNamespace)
   owner TypeInstance base-type
   owner List{String} parameters
   owner NameMap{SyntaxTreeFunction} dynamic-base-methods
+  owner DeleteGroup delete-group
   user SyntaxTreeFunction constructor
   var Bool is-primitive
   var Bool is-dynamic
@@ -182,7 +183,7 @@ class TypeData(SyntaxTreeNamespace)
         if function.is-dynamic
           function.dynamic-base-method := method.dynamic-base-method
           function.dynamic-base-count := method.dynamic-base-count + bases + 1
-          method.call-group-builder.add-dynamic-override(
+          method.delete-group-builder.add-dynamic-override(
               user self, user function, user method)
       else-if function.is-dynamic
         function.dynamic-base-method := function
@@ -216,6 +217,22 @@ class TypeData(SyntaxTreeNamespace)
         iter.next()
     base()
     glob.current-module := _
+  
+  func inst collect-delete-group()
+    if self.delete-group?
+      return
+    self.delete-group := DeleteGroup(owner List{TypeInstance}(), copy false)
+    user TypeData type-data(user self)
+    do
+      for variable in type-data.variables.iter()
+        if variable.access = Access.OWNER or variable.access = Access.STRONG or
+            variable.access = Access.VAR or variable.access = Access.S-VAR
+          variable.type-instance.type-data.collect-delete-group()
+          self.delete-group.add-deleting(user variable.type-instance)
+      while type-data.base-type?
+      type-data := type-data.base-type.type-data
+      type-data.collect-delete-group()
+      type-data.delete-group.extend(user self.delete-group)
   
   func inst write-cname()
     if self.my-module?

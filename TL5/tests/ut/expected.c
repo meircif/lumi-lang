@@ -7943,6 +7943,18 @@ returning potentially illegal user output "s"
 returning potentially illegal user output "s"
 /// @ teu28
 returning potentially illegal user output "s"
+/// @ teu29
+using potentially illegal user reference "s"
+/// @ teu30
+using potentially illegal user reference "s"
+/// @ teu31
+using potentially illegal user reference "s"
+/// @ teu32
+using potentially illegal user reference "s"
+/// @ teu33
+using potentially illegal user reference "s"
+/// @ teu34
+using potentially illegal user reference "s"
 /// @ tev0
 cannot assign value with access "user" into value with access "var"
 /// @ tev1

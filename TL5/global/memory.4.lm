@@ -87,19 +87,31 @@ struct ReferenceMemoryList
       self.user-references.add-if-unique-value(
           user variable.name, user variable)
   
-  func mark-illegal-types(user CallGroup call-group)
-    if call-group.delete-all
+  func mark-illegal-types(
+      user DeleteGroup delete-group, user TypeInstance actual-params)
+    if delete-group.delete-all
       self.mark-all-illegal()
     else
-      for type-instance in call-group.deleting-types.iter()
-        self.mark-illegal-type(user type-instance)
+      for type-instance in delete-group.deleting-types.iter()
+        self.mark-specific-illegal-type(user type-instance, user actual-params)
   
   func mark-all-illegal()
     self.user-references.clear()
   
-  func mark-illegal-type(user TypeInstance type-instance-base)
-    var TypeInstance type-instance
-    type-instance-base.copy(user type-instance)
+  func mark-illegal-type(user TypeInstance type-instance)
+    self.mark-specific-illegal-type(user type-instance, user _)
+    if type-instance.type-data.delete-group?
+      self.mark-illegal-types(
+          user type-instance.type-data.delete-group, user type-instance)
+  
+  func mark-specific-illegal-type(
+      user TypeInstance type-instance-base, user TypeInstance actual-params)
+    owner TypeInstance type-instance
+    if actual-params?
+      type-instance-base.new-replace-params(user actual-params)->(
+          owner type-instance)
+    else
+      type-instance-base.copy-new()->(owner type-instance)
     type-instance.conditional := false
     ; for reference in self.references.iter()
     ;   if type-data is reference.path.variable.type-instance.type-data
@@ -162,7 +174,7 @@ struct ReferenceMemoryList
         user output-variable.name)
 
 
-struct CallGroup
+struct DeleteGroup
   owner List{TypeInstance} deleting-types
   var Bool delete-all
   
@@ -170,7 +182,17 @@ struct CallGroup
     self.deleting-types := deleting-types
     self.delete-all := delete-all
 
-  func add-deleting(user TypeInstance type-instance-base)
+  func add-deleting(user TypeInstance type-instance)
+    self.add-specific-deleting-type(user type-instance)
+    self.extend(user type-instance.type-data.delete-group)
+  
+  func extend(user DeleteGroup other)
+    if not other?
+      return
+    for deleting-type in other.deleting-types.iter()
+      self.add-specific-deleting-type(user deleting-type)
+
+  func add-specific-deleting-type(user TypeInstance type-instance-base)
     if self.delete-all
       return
     new TypeInstance type-instance
@@ -203,7 +225,7 @@ struct FunctionCall
     self.function := function
 
 
-struct CallGroupBuilder(CallGroup)
+struct DeleteGroupBuilder(DeleteGroup)
   var List{FunctionCall} calling-functions
   var NameMap{SyntaxTreeFunction} members
   user SyntaxTreeFunction owner-member
@@ -230,7 +252,7 @@ struct CallGroupBuilder(CallGroup)
       self.set-delete-all()
     self.add-calling(user overwriting, user calling-type)
 
-  func build()->(user CallGroupBuilder recursive)
+  func build()->(user DeleteGroupBuilder recursive)
     if self.working
       recursive := self
       return
@@ -238,36 +260,35 @@ struct CallGroupBuilder(CallGroup)
     do
       owner FunctionCall call
       while self.calling-functions.pop()->(owner call)?
-      if call.function.collect-call-group()->(user recursive)?
+      if call.function.collect-delete-group()->(user recursive)?
         if recursive is self
           recursive := _
           continue
         recursive.merge-from(user self)
         return
-      self.extend(owner call)
+      self.extend-call(owner call)
     self.done()
   
-  func extend(owner FunctionCall call)
+  func extend-call(owner FunctionCall call)
     if self.delete-all
       return
-    if call.function.call-group.delete-all
+    if call.function.delete-group.delete-all
       self.set-delete-all()
       return
-    for type-instance in call.function.call-group.deleting-types.iter()
+    for type-instance in call.function.delete-group.deleting-types.iter()
       type-instance.replace-type-parameters(user call.calling-type, copy true)
       self.add-deleting(user type-instance)
   
-  func merge-from(user CallGroupBuilder other)
+  func merge-from(user DeleteGroupBuilder other)
     if other.delete-all
       self.set-delete-all()
     else-if not self.delete-all
-      for type-instance in other.deleting-types.iter()
-        self.add-deleting(user type-instance)
+      self.extend(user other)
     do
       user SyntaxTreeFunction function
       while other.members.pop()->(user function)?
       self.members.add(user function.name, user function)
-      function.call-group-builder := self
+      function.delete-group-builder := self
     do
       owner FunctionCall call
       while other.calling-functions.pop()->(owner call)?
@@ -275,13 +296,13 @@ struct CallGroupBuilder(CallGroup)
     other.kill()
   
   func done()
-    self.owner-member.call-group-owner := CallGroup(
+    self.owner-member.delete-group-owner := DeleteGroup(
         owner self.deleting-types, copy self.delete-all)
     for member in self.members.iter()
-      member.call-group := self.owner-member.call-group-owner
-      member.call-group-builder := _
+      member.delete-group := self.owner-member.delete-group-owner
+      member.delete-group-builder := _
     self.working := false
     self.kill()
   
   func kill()
-    self.owner-member.call-group-builder-owner := _
+    self.owner-member.delete-group-builder-owner := _

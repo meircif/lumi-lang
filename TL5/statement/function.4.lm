@@ -9,15 +9,15 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   owner String name
   owner String type-name
   owner String module-name
-  owner CallGroup call-group-owner
-  owner CallGroupBuilder call-group-builder-owner
+  owner DeleteGroup delete-group-owner
+  owner DeleteGroupBuilder delete-group-builder-owner
   user TypeData parent-type
   user ModuleMembers my-module
   user SyntaxTreeFunction implemented-function
   user SyntaxTreeMockFunction mocker-function
   user SyntaxTreeFunction dynamic-base-method
-  user CallGroup call-group
-  user CallGroupBuilder call-group-builder
+  user DeleteGroup delete-group
+  user DeleteGroupBuilder delete-group-builder
   var Int dynamic-base-count
   var Int block-count
   var Bool is-dynamic
@@ -51,8 +51,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   new()
     self.set-location()
     self.arguments.new()
-    self.call-group-builder-owner := CallGroupBuilder(user self)
-    self.call-group-builder := self.call-group-builder-owner
+    self.delete-group-builder-owner := DeleteGroupBuilder(user self)
+    self.delete-group-builder := self.delete-group-builder-owner
   
   func inst parse-body()
     if self.header-only
@@ -207,13 +207,13 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       return
     for parameter in self.arguments.parameters.iter()
       if parameter.access = Access.OWNER or parameter.access = Access.STRONG
-        self.call-group-builder.add-deleting(
+        self.delete-group-builder.add-deleting(
             user parameter.get-type-instance())
     base()
     for variable in self.variables.iter()
       if variable.access = Access.OWNER or variable.access = Access.STRONG or
           variable.access = Access.VAR or variable.access = Access.S-VAR
-        self.call-group-builder.add-deleting(user variable.type-instance)
+        self.delete-group-builder.add-deleting(user variable.type-instance)
     if self.my-module?
       glob.current-module := _
   
@@ -221,10 +221,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if self.is-dynamic != other.is-dynamic
       self.syntax-error(user "illegal dynamic in function", user self.name)
     
-  func inst collect-call-group()->(user CallGroupBuilder recursive)
-    if self.call-group?
+  func inst collect-delete-group()->(user DeleteGroupBuilder recursive)
+    if self.delete-group?
       return
-    self.call-group-builder.build()->(user recursive)
+    self.delete-group-builder.build()->(user recursive)
     
   func dynamic check-memory(user ReferenceMemoryList global-refs)
     if self.header-only
