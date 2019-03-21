@@ -486,15 +486,14 @@ test test-builtin-errors()
     assert-error file.write(user "aa"), "file write failed"
     
     assert-error "aa".get(copy 2), "slice index out of bounds"
-    assert-error too-long.append(copy 'a'), "string too long"
-    assert-error too-long.append(copy 'a'), "string too long"
-    assert-error too-long.concat(user "a"), "string too long"
+    assert-error string-append(copy 'a')->(reset too-long), "string too long"
+    assert-error string-concat(user "a")->(reset too-long), "string too long"
     var String{2} short-str
-    assert-error 123.str(user short-str), "string too long"
-    assert-error short-str.new(user "aaaaa"), "string too long"
+    assert-error 123.str()->(reset short-str), "string too long"
+    assert-error string-copy(user "aaaaa")->(reset short-str), "string too long"
     
     lumi-debug-value := 2
-    assert-error sys.getline(user short-str), "string too long"
+    assert-error sys.getline()->(reset short-str), "string too long"
     lumi-debug-value := 1
     assert-error sys.exit(copy 0), "exit failed"
     assert-error sys.system(user "aaa"), "command execution failed"

@@ -75,6 +75,8 @@ Char ut_M_c = 0;
 Bool ut_M_b = 0;
 String* ut_M_str = NULL;
 Ref_Manager* ut_M_str_Refman = NULL;
+String* ut_M_ostr = NULL;
+Ref_Manager* ut_M_ostr_Refman = NULL;
 Array* ut_M_arr = NULL;
 Ref_Manager* ut_M_arr_Refman = NULL;
 File* ut_M_fobj = NULL;
@@ -1670,128 +1672,153 @@ too many parameters
 /// @ te5
 too few outputs
 /// @@ test-builtin
-/// @ t0
-LUMI_err = Int_str(ut_M_i, ut_M_str, ut_M_str_Refman);
+/// @ ti0
+LUMI_err = Int_str(ut_M_i, &(ut_M_ostr), &(ut_M_ostr_Refman));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t1
+/// @ tb0
 ut_M_b = true;
-/// @ t2
+/// @ tb1
 ut_M_b = false;
-/// @ t3
+/// @ c0
 unknown symbol "EOF"
-/// @ t4
+/// @ ta0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     ut_M_i = ut_M_arr->length;
-/// @ t5
+/// @ ts0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
     ut_M_i = ut_M_str->length;
-/// @ t6
-LUMI_err = String_clear(ut_M_str, ut_M_str_Refman);
+/// @ ts1
+LUMI_err = string_clear(&(ut_M_ostr), &(ut_M_ostr_Refman));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t7
+/// @ ts2
 LUMI_err = String_equal(ut_M_str, ut_M_str_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t8
+/// @ ts3
 LUMI_err = String_get(ut_M_str, ut_M_str_Refman, ut_M_i, &(ut_M_c));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t9
-LUMI_err = String_append(ut_M_str, ut_M_str_Refman, ut_M_c);
+/// @ ts4
+LUMI_err = String_set(ut_M_str, ut_M_str_Refman, ut_M_i, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ t10
-LUMI_err = String_new(ut_M_str, ut_M_str_Refman, ut_M_str, ut_M_str_Refman);
+/// @ ts5
+LUMI_err = string_append(ut_M_c, &(ut_M_ostr), &(ut_M_ostr_Refman));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t11
-LUMI_err = String_concat(ut_M_str, ut_M_str_Refman, ut_M_str, ut_M_str_Refman);
+/// @ ts6
+char sv_Values[12] = {0};
+    String sv_Var = {12, 0, NULL};
+    String* sv = NULL;
+    Ref_Manager* sv_Refman = NULL;
+    INIT_VAR(1, LUMI_block0_cleanup, sv)
+    sv_Var.values = sv_Values;
+    LUMI_err = string_copy(ut_M_str, ut_M_str_Refman, &(sv), &(sv_Refman));
+    CHECK(2, LUMI_block0_cleanup)
+/// @ ts7
+LUMI_err = string_concat(ut_M_str, ut_M_str_Refman, &(ut_M_ostr), &(ut_M_ostr_Refman));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t12
-LUMI_err = String_concat_int(ut_M_str, ut_M_str_Refman, ut_M_i);
+/// @ ts8
+LUMI_err = string_concat_int(ut_M_i, &(ut_M_ostr), &(ut_M_ostr_Refman));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t13
+/// @ ts9
 LUMI_err = String_find(ut_M_str, ut_M_str_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_i));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t14
+/// @ ts10
 LUMI_err = String_has(ut_M_str, ut_M_str_Refman, ut_M_c, &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t15
+/// @ ts11
+LUMI_err = String_set(ut_M_str, ut_M_str_Refman, 0, 'a');
+    CHECK(1, LUMI_block0_cleanup)
+/// @ ts12
+CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
+    ut_M_i = ut_M_str->max_length;
+/// @ tf0
 LUMI_err = file_open_read(ut_M_str, ut_M_str_Refman, &(ut_M_fobj), &(ut_M_fobj_Refman));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t16
+/// @ tf1
 LUMI_err = file_open_write(ut_M_str, ut_M_str_Refman, &(ut_M_fobj), &(ut_M_fobj_Refman));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t17
+/// @ tf2
 LUMI_err = file_close(ut_M_fobj, ut_M_fobj_Refman);
     ut_M_fobj = NULL;
     ut_M_fobj_Refman = NULL;
     CHECK(1, LUMI_block0_cleanup)
-/// @ t18
+/// @ tf3
 LUMI_err = File_getc(ut_M_fobj, ut_M_fobj_Refman, &(ut_M_c), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t19
+/// @ tf4
 LUMI_err = File_putc(ut_M_fobj, ut_M_fobj_Refman, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ t20
+/// @ tf5
 LUMI_err = File_write(ut_M_fobj, ut_M_fobj_Refman, ut_M_str, ut_M_str_Refman);
     CHECK(1, LUMI_block0_cleanup)
-/// @ t21
+/// @ ty0
 Array* argv = NULL;
     Ref_Manager* argv_Refman = NULL;
     argv = sys->argv;
     argv_Refman = sys->argv_Refman;
     LUMI_inc_ref(argv_Refman);
-/// @ t22
+/// @ ty1
 LUMI_err = Sys_print(sys, sys_Refman, ut_M_str, ut_M_str_Refman);
     CHECK(1, LUMI_block0_cleanup)
-/// @ t23
+/// @ ty2
 LUMI_err = Sys_println(sys, sys_Refman, ut_M_str, ut_M_str_Refman);
     CHECK(1, LUMI_block0_cleanup)
-/// @ t24
+/// @ ty3
 LUMI_err = Sys_getchar(sys, sys_Refman, &(ut_M_c), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t25
-LUMI_err = Sys_getline(sys, sys_Refman, ut_M_str, ut_M_str_Refman);
+/// @ ty4
+LUMI_err = Sys_getline(sys, sys_Refman, &(ut_M_ostr), &(ut_M_ostr_Refman));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t26
+/// @ ty5
 LUMI_err = Sys_exit(sys, sys_Refman, ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
-/// @ t27
+/// @ ty6
 LUMI_err = Sys_system(sys, sys_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_i));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t28
-LUMI_err = Sys_getenv(sys, sys_Refman, ut_M_str, ut_M_str_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_b));
+/// @ ty7
+LUMI_err = Sys_getenv(sys, sys_Refman, ut_M_str, ut_M_str_Refman, &(ut_M_ostr), &(ut_M_ostr_Refman), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t29
+/// @ ty8
 LUMI_err = File_putc(sys->stdout_Cname, sys->stdout_Cname_Refman, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ t30
+/// @ ty9
 LUMI_err = File_getc(sys->stdin_Cname, sys->stdin_Cname_Refman, &(ut_M_c), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ t31
+/// @ ty10
 LUMI_err = File_putc(sys->stderr_Cname, sys->stderr_Cname_Refman, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ t32
-LUMI_err = String_clear(ut_M_str, ut_M_str_Refman);
-    CHECK(1, LUMI_block0_cleanup)
-/// @ t33
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
-    ut_M_i = ut_M_str->max_length;
-/// @ te0
+/// @ tes0
+using potentially illegal user reference "su"
+/// @ tes1
+using potentially illegal user reference "su"
+/// @ tes2
+using potentially illegal user reference "su"
+/// @ tes3
+using potentially illegal user reference "su"
+/// @ tes4
+using potentially illegal user reference "su"
+/// @ tes5
+using potentially illegal user reference "su"
+/// @ tes6
+using potentially illegal user reference "su"
+/// @ tes7
+using potentially illegal user reference "su"
+/// @ tef0
 cannot create objects with type "File"
-/// @ te1
+/// @ tef1
 cannot create objects with type "File"
-/// @ te2
+/// @ tef2
 cannot create objects with type "File"
-/// @ te3
-cannot create objects with type "Sys"
-/// @ te4
-cannot create objects with type "Sys"
-/// @ te5
-cannot create objects with type "Sys"
-/// @ te6
+/// @ tef3
 using potentially illegal user reference "f"
-/// @ te7
+/// @ tef4
 using potentially illegal user reference "f"
-/// @ te8
+/// @ tef5
 using potentially illegal user reference "f"
+/// @ tey0
+cannot create objects with type "Sys"
+/// @ tey1
+cannot create objects with type "Sys"
+/// @ tey2
+cannot create objects with type "Sys"
 /// @@ test-general
 /// @ t0
 String* ut_M_str = NULL;
@@ -1865,7 +1892,7 @@ Returncode ut_M_fun(void) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     ++LUMI_file_coverage[0].line_count[3];
-    LUMI_err = String_clear(ut_M_s, ut_M_s_Refman);
+    LUMI_err = String_set(ut_M_s, ut_M_s_Refman, 0, 'a');
     CHECK(3, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
@@ -2535,6 +2562,8 @@ variable name overrides function "error"
 variable name overrides function "error"
 /// @ te28
 illegal variable name "Error"
+/// @ te29
+access should not be "reset" for argument "error"
 /// @@ test-members
 /// @ t0
 typedef struct ut_M_Test ut_M_Test;
@@ -3074,13 +3103,13 @@ char s_Values[12] = {0};
     INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "some string");
     INIT_VAR(1, LUMI_block0_cleanup, s)
     s_Var.values = s_Values;
-    LUMI_err = String_new(s, s_Refman, aux_String_0, aux_String_0_Refman);
+    LUMI_err = string_copy(aux_String_0, aux_String_0_Refman, &(s), &(s_Refman));
     CHECK(1, LUMI_block0_cleanup)
 /// @ t8
 String* s = NULL;
     Ref_Manager* s_Refman = NULL;
     INIT_NEW(1, LUMI_block0_cleanup, s, LUMI_new_string(ut_M_i));
-    LUMI_err = String_new(s, s_Refman, ut_M_str, ut_M_str_Refman);
+    LUMI_err = string_copy(ut_M_str, ut_M_str_Refman, &(s), &(s_Refman));
     CHECK(1, LUMI_block0_cleanup)
 /// @ t9
 ut_M_Test* tt = NULL;
@@ -3604,7 +3633,7 @@ String* s = NULL;
         LUMI_dec_ref(aux_Ref_Manager);
         aux_Ref_Manager = NULL;
         s = ((String*)(aux_Array_0->values)) + s_Index;
-        LUMI_err = String_clear(s, s_Refman);
+        LUMI_err = String_set(s, s_Refman, 0, 'a');
         CHECK(2, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
@@ -4952,7 +4981,7 @@ String* aux_String_0 = NULL;
     CHECK(1, LUMI_block0_cleanup)
     LUMI_err = ut_M_Data_get(ut_M_d, ut_M_d_Refman, (void*)&(aux_String_0), &(aux_String_0_Refman), &dynamic_Void);
     CHECK(2, LUMI_block0_cleanup)
-    LUMI_err = String_clear(aux_String_0, aux_String_0_Refman);
+    LUMI_err = String_set(aux_String_0, aux_String_0_Refman, 0, 'a');
     CHECK(2, LUMI_block0_cleanup)
 /// @ t14
 ut_M_Data dg_Var = {0};
@@ -5154,7 +5183,7 @@ Returncode ut_M_fun(ut_M_Test* test, Ref_Manager* test_Refman, String* text, Ref
     CHECK(13, LUMI_block0_cleanup)
     LUMI_err = ut_M_Base_get(&(test->_base), test_Refman, (void*)&(aux_String_0), &(aux_String_0_Refman), &dynamic_Void);
     CHECK(14, LUMI_block0_cleanup)
-    LUMI_err = String_clear(aux_String_0, aux_String_0_Refman);
+    LUMI_err = String_set(aux_String_0, aux_String_0_Refman, 0, 'a');
     CHECK(14, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
@@ -5257,7 +5286,7 @@ Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, ut_M_Test_Dynami
     if (test_Dynamic == NULL) RAISE(11, LUMI_block0_cleanup, empty_object)
     LUMI_err = test_Dynamic->_base.get(&(test->_base), test_Refman, &(test_Dynamic->_base), (void*)&(aux_String_0), &(aux_String_0_Refman), &dynamic_Void);
     CHECK(11, LUMI_block0_cleanup)
-    LUMI_err = String_clear(aux_String_0, aux_String_0_Refman);
+    LUMI_err = String_set(aux_String_0, aux_String_0_Refman, 0, 'a');
     CHECK(11, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
@@ -7587,7 +7616,7 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, ut_M_Test* tu, Ref_Manager
     s = aux_String_2;
     aux_String_2 = NULL;
     aux_String_2_Refman = NULL;
-    LUMI_err = String_clear(s, s_Refman);
+    LUMI_err = String_set(s, s_Refman, 0, 'a');
     CHECK(10, LUMI_block0_cleanup)
     INIT_NEW(11, LUMI_block0_cleanup, aux_String_3, LUMI_new_string(12));
     aux_String_4 = aux_String_3;
@@ -7661,7 +7690,7 @@ Returncode ut_M_fun(String* s, Ref_Manager* s_Refman, String** so, Ref_Manager**
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     LUMI_inc_ref(s_Refman);
-    LUMI_err = String_clear(s, s_Refman);
+    LUMI_err = String_set(s, s_Refman, 0, 'a');
     CHECK(4, LUMI_block0_cleanup)
     LUMI_err = ut_M_deleting(&(*so), &(*so_Refman));
     CHECK(5, LUMI_block0_cleanup)
@@ -7709,7 +7738,7 @@ Returncode ut_M_fun(void) {
     s = so;
     s_Refman = so_Refman;
     LUMI_inc_ref(s_Refman);
-    LUMI_err = String_clear(s, s_Refman);
+    LUMI_err = String_set(s, s_Refman, 0, 'a');
     CHECK(6, LUMI_block0_cleanup)
     LUMI_err = ut_M_deleting(&(so), &(so_Refman));
     CHECK(7, LUMI_block0_cleanup)
@@ -7763,7 +7792,7 @@ Returncode ut_M_fun(void) {
     LUMI_inc_ref(s_Refman);
     LUMI_err = ut_M_deleting(&(so), &(so_Refman));
     CHECK(6, LUMI_block0_cleanup)
-    LUMI_err = String_clear(s, s_Refman);
+    LUMI_err = String_set(s, s_Refman, 0, 'a');
     CHECK(7, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
@@ -7794,7 +7823,7 @@ String* s = NULL;
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
     s = *so;
-    LUMI_err = String_clear(s, s_Refman);
+    LUMI_err = String_set(s, s_Refman, 0, 'a');
     CHECK(4, LUMI_block0_cleanup)
 /// @ tu4
 typedef struct ut_M_Test ut_M_Test;

@@ -212,7 +212,8 @@ struct TypeInstance
     if target.type-data is glob.type-ref and not self.type-data.is-primitive
       return
     if target-access = Access.OWNER or target-access = Access.STRONG
-      if self-access != Access.OWNER and self-access != Access.STRONG
+      if self-access != Access.OWNER and self-access != Access.STRONG and
+          self-access != Access.RESET
         assert node?
         node.syntax-error(
             user "assigning into an owner a non-owner access",

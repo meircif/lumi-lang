@@ -8,6 +8,7 @@ enum Access
   COPY
   OWNER
   USER
+  RESET
   STRONG
   WEAK
   S-VAR
@@ -79,6 +80,9 @@ struct Global
   user TypeData type-file
   user TypeData type-sys
   
+  ~~~ referenced built-in functions ~~~
+  user SyntaxTreeFunction string-copy-function
+  
   func new()
     glob := self
     self.builtins.new()
@@ -96,6 +100,7 @@ struct Global
     self.access-names[Access.COPY].new(user "copy")
     self.access-names[Access.OWNER].new(user "owner")
     self.access-names[Access.USER].new(user "user")
+    self.access-names[Access.RESET].new(user "reset")
     self.access-names[Access.STRONG].new(user "strong")
     self.access-names[Access.WEAK].new(user "weak")
     self.access-names[Access.S-VAR].new(user "s-var")
@@ -195,163 +200,176 @@ struct Global
     ; Int
     assert self.type-int?
     self.add-builtin-method(user self.type-int, user "str")->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user self.type-string, user "str")
+    self.add-builtin-output(
+        user function, copy Access.RESET, user self.type-string, user "str")
     
     ; Bool
-    self.add-builtin-global-variable(user glob.type-bool, user "true")
-    self.add-builtin-global-variable(user glob.type-bool, user "false")
+    self.add-builtin-global-variable(user self.type-bool, user "true")
+    self.add-builtin-global-variable(user self.type-bool, user "false")
     
     ; String
     self.add-builtin-field(
-        user glob.type-string, user "length", user glob.type-int, user _)
+        user self.type-string, user "length", user self.type-int, user _)
     self.add-builtin-field(
-        user glob.type-string, user "max-length", user glob.type-int, user _)
+        user self.type-string, user "max-length", user self.type-int, user _)
     
-    self.add-builtin-method(user glob.type-string, user "new")->(user function)
+    self.add-builtin-global-function(user "string-copy")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "other")
-    
-    self.add-builtin-method(user glob.type-string, user "clear")->(
-        user function)
-    
-    self.add-builtin-method(user glob.type-string, user "equal")->(
-        user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "pattern")
+        user function, copy Access.USER, user self.type-string, user "other")
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-bool, user "equal")
+        user function, copy Access.RESET, user self.type-string, user "self")
+    self.string-copy-function := function
     
-    self.add-builtin-method(user glob.type-string, user "get")->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.COPY, user glob.type-int, user "index")
+    self.add-builtin-global-function(user "string-clear")->(user function)
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-char, user "ch")
+        user function, copy Access.RESET, user self.type-string, user "self")
     
-    self.add-builtin-method(user glob.type-string, user "append")->(
+    self.add-builtin-method(user self.type-string, user "equal")->(
         user function)
     self.add-builtin-parameter(
-        user function, copy Access.COPY, user glob.type-char, user "ch")
-    
-    self.add-builtin-method(user glob.type-string, user "concat")->(
-        user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "other")
-    
-    self.add-builtin-method(user glob.type-string, user "concat-int")->(
-        user function)
-    self.add-builtin-parameter(
-        user function, copy Access.COPY, user glob.type-int, user "number")
-    
-    self.add-builtin-method(user glob.type-string, user "find")->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "pattern")
+        user function, copy Access.USER, user self.type-string, user "pattern")
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-int, user "index")
+        user function, copy Access.VAR, user self.type-bool, user "equal")
     
-    self.add-builtin-method(user glob.type-string, user "has")->(user function)
+    self.add-builtin-method(user self.type-string, user "get")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.COPY, user glob.type-char, user "ch")
+        user function, copy Access.COPY, user self.type-int, user "index")
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-bool, user "equal")
+        user function, copy Access.VAR, user self.type-char, user "ch")
+    
+    self.add-builtin-method(user self.type-string, user "set")->(user function)
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-int, user "index")
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-char, user "ch")
+    
+    self.add-builtin-global-function(user "string-append")->(user function)
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-char, user "ch")
+    self.add-builtin-output(
+        user function, copy Access.RESET, user self.type-string, user "self")
+    
+    self.add-builtin-global-function(user "string-concat")->(user function)
+    self.add-builtin-parameter(
+        user function, copy Access.USER, user self.type-string, user "other")
+    self.add-builtin-output(
+        user function, copy Access.RESET, user self.type-string, user "self")
+    
+    self.add-builtin-global-function(user "string-concat-int")->(user function)
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-int, user "number")
+    self.add-builtin-output(
+        user function, copy Access.RESET, user self.type-string, user "self")
+    
+    self.add-builtin-method(user self.type-string, user "find")->(user function)
+    self.add-builtin-parameter(
+        user function, copy Access.USER, user self.type-string, user "pattern")
+    self.add-builtin-output(
+        user function, copy Access.VAR, user self.type-int, user "index")
+    
+    self.add-builtin-method(user self.type-string, user "has")->(user function)
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-char, user "ch")
+    self.add-builtin-output(
+        user function, copy Access.VAR, user self.type-bool, user "equal")
     
     ; Array
     self.add-builtin-field(
-        user glob.type-array, user "length", user glob.type-int, user _)
+        user self.type-array, user "length", user self.type-int, user _)
     
     ; File
     self.add-builtin-global-function(user "file-open-read")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "name")
+        user function, copy Access.USER, user self.type-string, user "name")
     self.add-builtin-output(
-        user function, copy Access.OWNER, user glob.type-file, user "file")
+        user function, copy Access.OWNER, user self.type-file, user "file")
     
     self.add-builtin-global-function(user "file-open-write")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "name")
+        user function, copy Access.USER, user self.type-string, user "name")
     self.add-builtin-output(
-        user function, copy Access.OWNER, user glob.type-file, user "file")
+        user function, copy Access.OWNER, user self.type-file, user "file")
     
     self.add-builtin-global-function(user "file-close")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.OWNER, user glob.type-file, user "file")
+        user function, copy Access.OWNER, user self.type-file, user "file")
     
-    self.add-builtin-method(user glob.type-file, user "getc")->(user function)
+    self.add-builtin-method(user self.type-file, user "getc")->(user function)
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-char, user "ch")
+        user function, copy Access.VAR, user self.type-char, user "ch")
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-bool, user "is-eof")
+        user function, copy Access.VAR, user self.type-bool, user "is-eof")
     
-    self.add-builtin-method(user glob.type-file, user "putc")->(user function)
+    self.add-builtin-method(user self.type-file, user "putc")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.COPY, user glob.type-char, user "ch")
+        user function, copy Access.COPY, user self.type-char, user "ch")
     
-    self.add-builtin-method(user glob.type-file, user "write")->(user function)
+    self.add-builtin-method(user self.type-file, user "write")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "text")
+        user function, copy Access.USER, user self.type-string, user "text")
     
     ; Sys
     self.add-builtin-field(
-        user glob.type-sys,
+        user self.type-sys,
         user "argv",
-        user glob.type-array,
-        user glob.type-string)
+        user self.type-array,
+        user self.type-string)
         
     self.add-builtin-field(
-        user glob.type-sys,
+        user self.type-sys,
         user "stdout",
-        user glob.type-file,
+        user self.type-file,
         user _)
         
     self.add-builtin-field(
-        user glob.type-sys,
+        user self.type-sys,
         user "stdin",
-        user glob.type-file,
+        user self.type-file,
         user _)
         
     self.add-builtin-field(
-        user glob.type-sys,
+        user self.type-sys,
         user "stderr",
-        user glob.type-file,
+        user self.type-file,
         user _)
     
-    self.add-builtin-method(user glob.type-sys, user "print")->(user function)
+    self.add-builtin-method(user self.type-sys, user "print")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "text")
+        user function, copy Access.USER, user self.type-string, user "text")
         
-    self.add-builtin-method(user glob.type-sys, user "println")->(user function)
+    self.add-builtin-method(user self.type-sys, user "println")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "text")
+        user function, copy Access.USER, user self.type-string, user "text")
     
-    self.add-builtin-method(user glob.type-sys, user "getchar")->(user function)
+    self.add-builtin-method(user self.type-sys, user "getchar")->(user function)
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-char, user "ch")
+        user function, copy Access.VAR, user self.type-char, user "ch")
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-bool, user "is-eof")
+        user function, copy Access.VAR, user self.type-bool, user "is-eof")
         
-    self.add-builtin-method(user glob.type-sys, user "getline")->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "line")
-    
-    self.add-builtin-method(user glob.type-sys, user "exit")->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.COPY, user glob.type-int, user "status")
-    
-    self.add-builtin-method(user glob.type-sys, user "system")->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "command")
+    self.add-builtin-method(user self.type-sys, user "getline")->(user function)
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-int, user "status")
+        user function, copy Access.RESET, user self.type-string, user "line")
     
-    self.add-builtin-method(user glob.type-sys, user "getenv")->(user function)
+    self.add-builtin-method(user self.type-sys, user "exit")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "name")
+        user function, copy Access.COPY, user self.type-int, user "status")
+    
+    self.add-builtin-method(user self.type-sys, user "system")->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.USER, user glob.type-string, user "value")
+        user function, copy Access.USER, user self.type-string, user "command")
     self.add-builtin-output(
-        user function, copy Access.VAR, user glob.type-bool, user "exists")
+        user function, copy Access.VAR, user self.type-int, user "status")
     
-    self.add-builtin-global-variable(user glob.type-sys, user "sys")
+    self.add-builtin-method(user self.type-sys, user "getenv")->(user function)
+    self.add-builtin-parameter(
+        user function, copy Access.USER, user self.type-string, user "name")
+    self.add-builtin-output(
+        user function, copy Access.RESET, user self.type-string, user "value")
+    self.add-builtin-output(
+        user function, copy Access.VAR, user self.type-bool, user "exists")
+    
+    self.add-builtin-global-variable(user self.type-sys, user "sys")
   
   func add-builtin-type(user String name, copy Bool is-primitive)->(
       user TypeData type-data)
@@ -393,7 +411,7 @@ struct Global
     if variable-type.is-primitive
       variable.access := Access.VAR
     else
-      variable.access := Access.OWNER
+      variable.access := Access.STRONG
     variable-type.new-type-instance()->(owner variable.type-instance)
     if variable-subtype?
       variable.type-instance.add-subtype-copy(user variable-subtype)
@@ -402,7 +420,7 @@ struct Global
   
   func add-builtin-global-function(user String name)->(
       user SyntaxTreeFunction function)
-    self.add-builtin-function(user name, user _, user glob.builtins)->(
+    self.add-builtin-function(user name, user _, user self.builtins)->(
         user function)
     self.global-module.function-map.add(user function.name, user function)
   
@@ -466,9 +484,9 @@ struct Global
     argument.variable.access := access
     argument-type.new-type-instance()->(
         owner argument.variable.type-instance)
-    if not argument-type.is-primitive
+    if not argument-type.is-primitive and not is-output
       argument.variable.type-instance.conditional := true
-    if access = Access.OWNER or access = Access.STRONG
+    if access = Access.OWNER or access = Access.STRONG or access = Access.RESET
       function.delete-group.add-deleting(user argument.variable.type-instance)
     argument-list.add(owner argument)
   

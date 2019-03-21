@@ -320,21 +320,23 @@ func test-code-flow(user Array{Int} arr)->(var Int res)
 
 
 func test-builtins(
-        copy Int i, copy Char c, copy Bool b, user String s, user Array{Int} a)
+        copy Int i, copy Char c, copy Bool b, weak String s, user Array{Int} a)
     var Int iv
     var Char cv
     var Bool bv
-    i.str(user s)
+    new String{12} so
+    i.str()->(reset so)
     bv := true or false
     i := a.length
     i := s.length
-    s.clear()
+    string-clear()->(reset so)
     s.equal(user s)->(var bv)
     s.get(copy i)->(var cv)
-    s.append(copy c)
-    s.new(user s)
-    s.concat(user s)
-    s.concat-int(copy i)
+    s.set(copy i, copy cv)
+    string-append(copy c)->(reset so)
+    string-copy(user s)->(reset so)
+    string-concat(user s)->(reset so)
+    string-concat-int(copy i)->(reset so)
     s.find(user s)->(var iv)
     s.has(copy c)->(var bv)
     owner File? f
@@ -348,8 +350,8 @@ func test-builtins(
     sys.print(user s)
     sys.println(user s)
     sys.getchar()->(var cv, var bv)
-    sys.getline(user s)
-    sys.getenv(user s, user s)->(var bv)
+    sys.getline()->(reset so)
+    sys.getenv(user s)->(reset so, var bv)
     sys.system(user s)->(var iv)
     sys.exit(copy i)
     sys.stdout.putc(copy c)
@@ -497,8 +499,8 @@ func test-for-each()
     var String{16} text
     sys.print(user "chars[ ")
     for c in "abcdef"
-        text.clear()
-        text.append(copy c)
+        string-clear()->(reset text)
+        string-append(copy c)->(reset text)
         sys.print(user text)
         sys.print(user " ")
     sys.println(user "]")
@@ -509,8 +511,8 @@ func test-for-each()
     arr[2] := 16
     sys.print(user "numbers[ ")
     for n in arr
-        text.clear()
-        n.str(user text)
+        string-clear()->(reset text)
+        n.str()->(reset text)
         sys.print(user text)
         sys.print(user " ")
     sys.println(user "]")
@@ -526,9 +528,10 @@ func test-for-each()
     sys.println(user "]")
     
     var Array{3:String{16}} sarr
-    sarr[0].new(user "ddd")
-    sarr[1].new(user "eee")
-    sarr[2].new(user "fff")
+    
+    ; string-copy(user "ddd")->(reset sarr[0])
+    ; string-copy(user "eee")->(reset sarr[1])
+    ; string-copy(user "fff")->(reset sarr[2])
     sys.print(user "strings[ ")
     for s in sarr
         sys.print(user s)

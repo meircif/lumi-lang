@@ -216,20 +216,21 @@ Bool LUMI_test_coverage(File_Coverage* file_coverage, int files_number);
 
 void String_Del(String*);
 extern Generic_Type_Dynamic String_dynamic;
-Returncode String_clear(String*, Ref_Manager*);
+Returncode string_clear(String**, Ref_Manager**);
 Returncode String_length(String*, Ref_Manager*, Int* length);
 Returncode String_equal(
   String*, Ref_Manager*, String* other, Ref_Manager*, Bool* equal);
 Returncode String_get(String*, Ref_Manager*, Int index, Char* ch);
-Returncode String_append(String*, Ref_Manager*, Char ch);
-Returncode String_new(String*, Ref_Manager*, String* source, Ref_Manager*);
-Returncode String_concat(String*, Ref_Manager*, String* ext, Ref_Manager*);
-Returncode String_concat_int(String*, Ref_Manager*, Int num);
+Returncode String_set(String*, Ref_Manager*, Int index, Char ch);
+Returncode string_append(Char ch, String**, Ref_Manager**);
+Returncode string_copy(String* source, Ref_Manager*, String**, Ref_Manager**);
+Returncode string_concat(String* ext, Ref_Manager*, String**, Ref_Manager**);
+Returncode string_concat_int(Int num, String**, Ref_Manager**);
 Returncode String_find(
   String*, Ref_Manager*, String* pattern, Ref_Manager*, Int* index);
 Returncode String_has(String*, Ref_Manager*, Char ch, Bool* found);
 
-Returncode Int_str(Int value, String* str, Ref_Manager*);
+Returncode Int_str(Int value, String** str, Ref_Manager**);
 
 Returncode file_open_read(
   String* name, Ref_Manager*, File** file, Ref_Manager**);
@@ -259,14 +260,14 @@ extern Generic_Type_Dynamic Sys_dynamic;
 Returncode Sys_print(Sys*, Ref_Manager*, String* text, Ref_Manager*);
 Returncode Sys_println(Sys*, Ref_Manager*, String* text, Ref_Manager*);
 Returncode Sys_getchar(Sys*, Ref_Manager*, char* ch, Bool* is_eof);
-Returncode Sys_getline(Sys*, Ref_Manager*, String* line, Ref_Manager*);
+Returncode Sys_getline(Sys*, Ref_Manager*, String** line, Ref_Manager**);
 Returncode Sys_exit(Sys*, Ref_Manager*, Int status);
 Returncode Sys_system(
   Sys*, Ref_Manager*, String* command, Ref_Manager*, Int* status);
 Returncode Sys_getenv(
   Sys*, Ref_Manager*,
   String* name, Ref_Manager*,
-  String* value, Ref_Manager*,
+  String** value, Ref_Manager**,
   Bool* exists);
 
 extern int lumi_debug_value;

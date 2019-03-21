@@ -35,6 +35,7 @@ var Int i
 var Char c
 var Bool b
 weak String? str
+owner String? ostr
 weak Array?{Int} arr
 owner File? fobj
 weak Test? t
@@ -659,98 +660,133 @@ var Func{()} fun(copy fun1)
 var Func{()->(var Int x)} fun
 fun := fun0
 ; @@ test-builtin
-; @ c t0
-i.str(user str)
-; @ c t1
+; @ c ti0
+i.str()->(reset ostr)
+; @ c tb0
 b := true
-; @ c t2
+; @ c tb1
 b := false
-; @ ec t3
+; @ ec c0
 c := EOF
-; @ c t4
+; @ c ta0
 i := arr.length
-; @ c t5
+; @ c ts0
 i := str.length
-; @ c t6
-str.clear()
-; @ c t7
+; @ c ts1
+string-clear()->(reset ostr)
+; @ c ts2
 str.equal(user str)->(var b)
-; @ c t8
+; @ c ts3
 str.get(copy i)->(var c)
-; @ c t9
-str.append(copy c)
-; @ c t10
-str.new(user str)
-; @ c t11
-str.concat(user str)
-; @ c t12
-str.concat-int(copy i)
-; @ c t13
+; @ c ts4
+str.set(copy i, copy c)
+; @ c ts5
+string-append(copy c)->(reset ostr)
+; @ c ts6
+var String{12} sv
+string-copy(user str)->(reset sv)
+; @ c ts7
+string-concat(user str)->(reset ostr)
+; @ c ts8
+string-concat-int(copy i)->(reset ostr)
+; @ c ts9
 str.find(user str)->(var i)
-; @ c t14
+; @ c ts10
 str.has(copy c)->(var b)
-; @ c t15
-file-open-read(user str)->(owner fobj)
-; @ c t16
-file-open-write(user str)->(owner fobj)
-; @ c t17
-file-close(owner fobj)
-; @ c t18
-fobj.getc()->(var c, var b)
-; @ c t19
-fobj.putc(copy c)
-; @ c t20
-fobj.write(user str)
-; @ c t21
-user Array{String} argv(user sys.argv)
-; @ c t22
-sys.print(user str)
-; @ c t23
-sys.println(user str)
-; @ c t24
-sys.getchar()->(var c, var b)
-; @ c t25
-sys.getline(user str)
-; @ c t26
-sys.exit(copy i)
-; @ c t27
-sys.system(user str)->(var i)
-; @ c t28
-sys.getenv(user str, user str)->(var b)
-; @ c t29
-sys.stdout.putc(copy c)
-; @ c t30
-sys.stdin.getc()->(var c, var b)
-; @ c t31
-sys.stderr.putc(copy c)
-; @ c t32
-String.clear(user str)
-; @ c t33
+; @ c ts11
+String.set(user str, copy 0, copy 'a')
+; @ c ts12
 i := str.max-length
-; @ ec te0
+; @ c tf0
+file-open-read(user str)->(owner fobj)
+; @ c tf1
+file-open-write(user str)->(owner fobj)
+; @ c tf2
+file-close(owner fobj)
+; @ c tf3
+fobj.getc()->(var c, var b)
+; @ c tf4
+fobj.putc(copy c)
+; @ c tf5
+fobj.write(user str)
+; @ c ty0
+user Array{String} argv(user sys.argv)
+; @ c ty1
+sys.print(user str)
+; @ c ty2
+sys.println(user str)
+; @ c ty3
+sys.getchar()->(var c, var b)
+; @ c ty4
+sys.getline()->(reset ostr)
+; @ c ty5
+sys.exit(copy i)
+; @ c ty6
+sys.system(user str)->(var i)
+; @ c ty7
+sys.getenv(user str)->(reset ostr, var b)
+; @ c ty8
+sys.stdout.putc(copy c)
+; @ c ty9
+sys.stdin.getc()->(var c, var b)
+; @ c ty10
+sys.stderr.putc(copy c)
+; @ ec tes0
+user String? su
+string-clear()->(reset ostr)
+su.set(copy 0, copy 'a')
+; @ ec tes1
+user String? su
+string-append(copy c)->(reset ostr)
+su.set(copy 0, copy 'a')
+; @ ec tes2
+user String? su
+string-copy(user str)->(reset ostr)
+su.set(copy 0, copy 'a')
+; @ ec tes3
+user String? su
+string-concat(user str)->(reset ostr)
+su.set(copy 0, copy 'a')
+; @ ec tes4
+user String? su
+string-concat-int(copy i)->(reset ostr)
+su.set(copy 0, copy 'a')
+; @ ec tes5
+user String? su
+i.str()->(reset ostr)
+su.set(copy 0, copy 'a')
+; @ ec tes6
+user String? su
+sys.getline()->(reset ostr)
+su.set(copy 0, copy 'a')
+; @ ec tes7
+user String? su
+sys.getenv(user str)->(reset ostr, var b)
+su.set(copy 0, copy 'a')
+; @ ec tef0
 var File error
-; @ ec te1
+; @ ec tef1
 new File error
-; @ ec te2
+; @ ec tef2
 File()
-; @ ec te3
-var Sys error
-; @ ec te4
-new Sys error
-; @ ec te5
-Sys()
-; @ ec te6
+; @ ec tef3
 user File? f
 file-open-read(user "name")->(owner fobj)
 f.putc(copy 'a')
-; @ ec te7
+; @ ec tef4
 user File? f
 file-open-write(user "name")->(owner fobj)
 f.putc(copy 'a')
-; @ ec te8
+; @ ec tef5
 user File? f
 file-close(owner fobj)
 f.putc(copy 'a')
+; @ ec tey0
+var Sys error
+; @ ec tey1
+new Sys error
+; @ ec tey2
+Sys()
 ; @@ test-general
 ; @ g t0
 user String str
@@ -792,7 +828,7 @@ main
 ; @ tg t7
 var String{12} s
 func fun()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @-
 module second
 test dummy()
@@ -1053,6 +1089,8 @@ func name(copy Int error)
 func error(copy Int error)
 ; @ eg te28
 func name(copy Int Error)
+; @ eg te29
+func name(reset String error)
 ; @@ test-members
 ; @ g t0
 struct Test
@@ -1520,7 +1558,7 @@ for n in arr
     i += n
 ; @ c t4
 for s in sarr
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ c t5
 var Int n
 for n in 5
@@ -1900,7 +1938,7 @@ str := dr.item.item.item
 d.set(owner so, user sarr)
 ; @ c t13
 d.get()->(weak str)
-d.get().clear()
+d.get().set(copy 0, copy 'a')
 ; @ c t14
 var Data dg
 ; @ c t15
@@ -1938,7 +1976,7 @@ func fun(user Test test, weak String text)
     test.set(weak text)
     text := test.item
     test.get()->(weak text)
-    test.get().clear()
+    test.get().set(copy 0, copy 'a')
 ; @ g t20
 class Base{Param}
     weak Param? item
@@ -1950,7 +1988,7 @@ class Test{Generic}(Base{Generic})
 func mock(weak Test{String} test, weak String text)
     test.set(weak text)
     test.get()->(weak text)
-    test.get().clear()
+    test.get().set(copy 0, copy 'a')
 ; @ g t21
 struct Test{Param}
     weak Param? item
@@ -2681,7 +2719,7 @@ func take(owner String s)
 func fun(owner String? s, user Test tu, owner Test to)
     s := _
     s := String{12}()
-    s.clear()
+    s.set(copy 0, copy 'a')
     to.s := String{12}()
     user String su(user tu.s)
     use(user tu.s)
@@ -2692,7 +2730,7 @@ func fun(owner String? s, user Test tu, owner Test to)
 func deleting()->(owner String? s)
     s := _
 func fun(user String s)->(owner String? so)
-    s.clear()
+    s.set(copy 0, copy 'a')
     deleting()->(owner so)
 ; @ g tu1
 func deleting()->(strong String? s)
@@ -2700,7 +2738,7 @@ func deleting()->(strong String? s)
 func fun()
     strong String? so(strong String{12}())
     user String? s(user so)
-    s.clear()
+    s.set(copy 0, copy 'a')
     deleting()->(strong so)
 ; @ g tu2
 func deleting()->(strong String? s)
@@ -2709,12 +2747,12 @@ func fun()
     strong String? so(strong String{12}())
     weak String? s(weak so)
     deleting()->(strong so)
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ c tu3
 user String? s
 so := _
 s := so
-s.clear()
+s.set(copy 0, copy 'a')
 ; @ g tu4
 struct Test
     weak String s
@@ -2789,7 +2827,7 @@ i := s.length
 ; @ ec teu3
 user String? s
 so := _
-String.clear(user s)
+String.set(user s, copy 0, copy 'a')
 ; @ ec teu4
 user String? s
 so := _
@@ -2798,7 +2836,7 @@ b := not (false or s.length > 3)
 func deleting(owner String? s)
 func fun(user String s)
     deleting(owner _)
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu6
 func deleting()->(owner String? s)
     s := _
@@ -2806,7 +2844,7 @@ func proxy()
     deleting()
 func fun(user String s)
     proxy()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu7
 func deleting()->(owner String? s)
     proxy()
@@ -2815,7 +2853,7 @@ func proxy()
     deleting()
 func fun(user String s)
     proxy()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu8
 struct Test
     var Int x
@@ -2823,43 +2861,43 @@ struct Test
         s := _
     func fun(user String s)
         self.deleting()
-        s.clear()
+        s.set(copy 0, copy 'a')
 ; @ eg teu9
 func deleting()->(owner String? s)
     s := _
 func fun(user String s)
     deleting()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu10
 func deleting()
     owner String? s
 func fun(user String s)
     deleting()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu11
 func deleting()
     var String{12} s
 func fun(user String s)
     deleting()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu12
 func deleting()
     strong String? s
 func fun(user String s)
     deleting()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu13
 func deleting()
     user String s(user "I am a string")
 func fun(user String s)
     deleting()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu14
 func deleting()
     var Int x(copy String{12}().length)
 func fun(user String s)
     deleting()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu15
 struct Test
     owner String s
@@ -2868,11 +2906,11 @@ func deleting(owner Test? ta, owner Test? tb)
     ta.s := tb.s
 func fun(user String s)
     deleting(owner _, owner _)
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ ec teu16
 user String? s
 d.set(owner _, user _)
-s.clear()
+s.set(copy 0, copy 'a')
 ; @ eg teu17
 struct Base{Atype}
     var Int x
@@ -2883,7 +2921,7 @@ struct Test{Btype}(Base{Btype})
 func fun(user String s)
     var Test{String} t
     t.fun()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu18
 struct Base
     var Int x
@@ -2911,7 +2949,7 @@ class Test(Base)
         owner String? s
 func fun(user String s, user Base b)
     b.fun()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu21
 class Base
     var Int x
@@ -2920,7 +2958,7 @@ class Test{Generic}(Base)
     func dynamic fun()
 func fun(user String s, user Base b)
     b.fun()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu22
 class Base
     var Int x
@@ -2932,17 +2970,17 @@ func recursive()
     Base.fun(user _, owner _)
 func fun(user String s)
     recursive()
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ ec teu23
 user String? s
 t.fun()
-s.clear()
+s.set(copy 0, copy 'a')
 ; @ eg teu24
 func deleting(copy Func?{()} f)
     f()
 func fun(user String s)
     deleting(copy _)
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu25
 func fun()->(user String s)
 ; @ eg teu26
@@ -2963,7 +3001,7 @@ struct Test
     owner String? s
 func fun(owner Test? t, user String s)
     t := _
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu30
 struct Other
     owner String? s
@@ -2971,7 +3009,7 @@ struct Test
     owner Other? o
 func fun(owner Test? t, user String s)
     t := _
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu31
 struct Base
     owner String? s
@@ -2981,7 +3019,7 @@ struct Other(Base)
 func fun(owner Test? t, user String s, user File f)
     t := _
     f.putc(copy 'a')
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu32
 struct Base
     var Int x
@@ -2989,20 +3027,20 @@ struct Test(Base)
     owner String? s
 func fun(owner Base? b, user String s)
     b := _
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu33
 struct Test{Generic}
     owner Generic? s
 func fun(owner Test?{String} t, user String s)
     t := _
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg teu34
 struct Base{Generic}
     owner Generic? s
 struct Test{Data}(Base{Data})
 func fun(owner Test?{String} t, user String s)
     t := _
-    s.clear()
+    s.set(copy 0, copy 'a')
 ; @ eg tev0
 func fun(var String s)
 func error(user String s)

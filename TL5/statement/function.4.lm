@@ -444,6 +444,10 @@ class DeclarationArgument(Argument)
           user self.variable.name,
           user "access should not be \"var\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
+    else-if self.access = Access.RESET
+      self.syntax-error(
+          user "access should not be \"reset\" for argument",
+          user self.variable.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
       if (self.access = Access.OWNER or self.access = Access.STRONG)

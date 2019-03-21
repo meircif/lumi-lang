@@ -62,26 +62,17 @@ class InitExpression(ModuleTypeExpression)
             user "cannot create objects with type",
             user self.result-type.type-data.name)
       self.result-type.type-data.find-meth(user "new")->(user self.constructor)
-      if not self.arguments.parameters.first? and
-          not self.arguments.outputs.first? and (not self.constructor? or
-          self.result-type.type-data is glob.type-string)
-        self.constructor := _
-      else-if self.constructor?
-        new CallArgument self-param
-        self-param.set-location()
-        self-param.access :=
-            self.constructor.arguments.parameters.first.item.access
-        self-param.code-node := self.code-node
-        self.aux-variable.copy-new()->(owner self-param.value)
-        self.arguments.parameters.prepend(owner self-param)
-        self.arguments.check-same-as(
-            user self.constructor.arguments,
-            user self.result-type,
-            copy 0,
-            copy true)
-      else
-        self.syntax-error(
-            user "no constructor for type", user self.result-type.type-data.name)
+      if self.constructor?
+        self.add-self-and-check(
+            copy self.constructor.arguments.parameters.first.item.access,
+            copy false)
+      else-if self.arguments.parameters.first?
+        if self.result-type.type-data is glob.type-string
+          self.constructor := glob.string-copy-function
+          self.add-self-and-check(copy Access.RESET, copy true)
+        else
+          self.syntax-error(
+              user "no constructor for type", user self.result-type.type-data.name)
       
     else-if self.arguments.parameters.first?
       if self.arguments.parameters.first.next? or
@@ -101,6 +92,24 @@ class InitExpression(ModuleTypeExpression)
             user glob.access-names[self.access],
             user "invalid access",
             user glob.access-names[param.access])
+  
+  func inst add-self-and-check(copy Int access, copy Bool is-output)
+    new CallArgument self-param
+    self-param.set-location()
+    self-param.is-output := is-output
+    self-param.access := access
+    self-param.code-node := self.code-node
+    self.aux-variable.copy-new()->(owner self-param.value)
+    self-param.value.access := access
+    if is-output
+      self.arguments.outputs.prepend(owner self-param)
+    else
+      self.arguments.parameters.prepend(owner self-param)
+    self.arguments.check-same-as(
+        user self.constructor.arguments,
+        user self.result-type,
+        copy 0,
+        copy true)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.arguments.check-memory(user refs)

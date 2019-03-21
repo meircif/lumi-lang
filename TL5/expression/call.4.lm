@@ -227,7 +227,8 @@ class CallArgument(Argument)
   
   func dynamic analyze()
     analyze-expression()->(owner self.value)
-    if self.is-output and not self.value.assignable
+    if self.is-output and not self.value.assignable and
+        not self.access = Access.RESET
       self.syntax-error-msg(user "non assignable call output")
   
   func dynamic check-same-type-as(
@@ -240,7 +241,10 @@ class CallArgument(Argument)
       self.syntax-error(
           user "assigning into an owner a non-owner access",
           user glob.access-names[self.value.access])
-    if self.is-output and self.access != self.value.access
+    if self.is-output and self.access != self.value.access and not
+        (self.access = Access.RESET and (self.value.access = Access.OWNER or
+        self.value.access = Access.STRONG or self.value.access = Access.VAR or
+        self.value.access = Access.S-VAR))
       self.syntax-error2(
           user "assigning into access",
           user glob.access-names[self.access],
