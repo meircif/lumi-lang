@@ -225,8 +225,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     ;   `item` = `aux-var`[`item`_Index];
     ;   `block...`
     ; }}
-    if self.aux-variable.result-type.conditional or
-        self.aux-variable.access = Access.WEAK
+    if self.aux-variable.is-dubious()
       self.aux-variable.write-check-ref()
       self.write-spaces()
     write(user "{int ")

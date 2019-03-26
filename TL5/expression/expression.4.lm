@@ -239,6 +239,9 @@ class Expression(SyntaxTreeNode)
       FieldExpression.parse-new(user _, owner value, user code-node)->(
           owner expression)
   
+  func inst is-dubious()->(var Bool is-dubious)
+    is-dubious := self.result-type.conditional or self.access = Access.WEAK
+  
   ~~~ Set type instance to be a type that has no sub-type ~~~
   func inst set-simple-type(user TypeData type-data)
     type-data.new-type-instance()->(owner self.result-type)

@@ -14,6 +14,23 @@ enum Access
   S-VAR
   SHARED
 
+func access-is-owner(copy Int access)->(var Bool is-owner)
+  is-owner := access = Access.OWNER or access = Access.STRONG or
+      access = Access.SHARED
+
+func access-is-weak(copy Int access)->(var Bool is-weak)
+  is-weak := access = Access.STRONG or access = Access.WEAK or
+      access = Access.S-VAR
+
+func access-is-user(copy Int access)->(var Bool is-user)
+  is-user := access = Access.USER or access = Access.WEAK
+
+func access-is-only-var(copy Int access)->(var Bool is-only-var)
+  is-only-var := access = Access.VAR or access = Access.S-VAR
+
+func access-is-var(copy Int access)->(var Bool is-var)
+  is-var := access-is-owner(copy access) or access-is-only-var(copy access)
+
 
 struct Global
   ~~~ stores all user defined nodes ~~~

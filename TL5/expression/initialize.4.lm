@@ -43,8 +43,7 @@ class InitExpression(ModuleTypeExpression)
     self.result-type.reference-path := ReferencePath(
         user self.aux-variable.variable)
     
-    if (self.aux-variable.variable.access = Access.OWNER or
-        self.aux-variable.variable.access = Access.STRONG) and
+    if access-is-owner(copy self.aux-variable.variable.access) and
         self.aux-variable.variable.is-create and
         self.result-type.type-data.is-primitive
       self.syntax-error(
@@ -123,8 +122,7 @@ class InitExpression(ModuleTypeExpression)
       if self.result-type.parameters.first.item.type-data is glob.type-string
         self.result-type.parameters.first.item.length.write-preactions()
     
-    if self.aux-variable.variable.access = Access.VAR or
-        self.aux-variable.variable.access = Access.S-VAR
+    if access-is-only-var(copy self.aux-variable.variable.access)
       self.write-var-init()
     else
       self.write-new-init()

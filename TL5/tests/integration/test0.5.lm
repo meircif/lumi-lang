@@ -346,7 +346,7 @@ func test-builtins(
     f.putc(copy c)
     f.write(user s)
     file-close(owner f)
-    s := sys.argv[1]
+    user String arg(user sys.argv[1])
     sys.print(user s)
     sys.println(user s)
     sys.getchar()->(var cv, var bv)
@@ -412,13 +412,14 @@ struct TopData(MidData{TestStruct})
 func test-type-parameters(weak String s)
     var Data{String} d
     s-var Array{6:String{16}} sarr
+    user String? su
     d.item := s
     s := d.item
     d.arr := sarr
-    s := d.arr[4]
+    su := d.arr[4]
     var Array{5:Data{String}} ad
     s := ad[2].item
-    s := ad[2].arr[3]
+    su := ad[2].arr[3]
     var Data{Data{Data{String}}} dr
     s := dr.item.item.item
     d.set(weak s, weak sarr)

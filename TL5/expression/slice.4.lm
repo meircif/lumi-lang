@@ -45,13 +45,6 @@ class SliceExpression(Expression)
           user self.sequence.result-type.type-data.name)
     if not self.second-index?
       self.assignable := self.result-type.type-data.is-primitive
-      
-    if not self.assignable and (self.sequence.access = Access.STRONG or
-        self.sequence.access = Access.WEAK or
-        self.sequence.access = Access.S-VAR)
-      self.access := Access.S-VAR
-    else
-      self.access := Access.VAR
     
     analyze-expression()->(owner self.index)
     self.check-index(user self.index)
@@ -61,9 +54,19 @@ class SliceExpression(Expression)
       self.check-index(user self.second-index)
       self.sequence.result-type.copy-new()->(owner self.result-type)
       self.result-type.conditional := false
+      if access-is-weak(copy self.sequence.access)
+        self.access := Access.WEAK
+      else
+        self.access := Access.USER
       self.add-aux-variable(
-          copy self.access, copy false, user self.result-type)->(
+          copy Access.S-VAR, copy false, user self.result-type)->(
           owner self.slice-variable)
+    else-if not self.assignable and
+        access-is-weak(copy self.sequence.access) and
+        not self.result-type.type-data is glob.type-string
+      self.access := Access.S-VAR
+    else
+      self.access := Access.VAR
     
     if not self.result-type.type-data.is-primitive
       self.sequence.result-type.reference-path.copy-new()->(
@@ -122,8 +125,7 @@ class SliceExpression(Expression)
       write(user ");\n")
       self.code-node.write-spaces()
     
-    if self.sequence.result-type.conditional or
-        self.sequence.access = Access.WEAK
+    if self.sequence.is-dubious()
       self.sequence.write-check-ref()
       self.code-node.write-spaces()
     

@@ -193,6 +193,9 @@ x := arr[2:6]
 str[4] := c
 ; @ c t5
 arr[4] := i
+; @ c t6
+weak Array?{Test} tarr
+t := tarr[3]
 ; @ ec te0
 arr[2
 ; @ ec te1
@@ -1922,13 +1925,13 @@ str := d.item
 ; @ c t6
 d.arr := sarr
 ; @ c t7
-str := d.arr[4]
+user String s(user d.arr[4])
 ; @ c t8
 var Array{5:Data{String}} ad
 str := ad[2].item
 ; @ c t9
 var Array{5:Data{String}} ad
-str := ad[2].arr[3]
+user String s(user ad[2].arr[3])
 ; @ c t10
 d.set(owner _, user _)
 ; @ c t11
@@ -2465,10 +2468,11 @@ func f-mock()
 ; @@ test-complex-fields
 ; @ g t0
 struct Test
-    s-var Bstruct b
+    var Bstruct b
+    s-var Bstruct sb
     func test()
-        weak Bstruct b(weak self.b)
-        b := self.b
+        weak Bstruct b(weak self.sb)
+        b := self.sb
         self.b.meth()
         Bstruct.meth(user self.b)
         user Bstruct b2(user self.b.b)
@@ -2476,10 +2480,11 @@ struct Test
         self.b.b.meth()
         self.b.b := b
         Bstruct.meth(user self.b.b)
-        var Test t
+        s-var Test t
         self.b.x := 5
         Astruct.meth(user self.b)
         if self.b is b or b2 is-not self.b
+        b := t.b
 class Astruct
     var Int x
     func dynamic meth()

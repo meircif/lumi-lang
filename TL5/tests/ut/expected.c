@@ -545,6 +545,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_str, ut_M_str_Refman)
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (4 < 0 || 4 >= ut_M_arr->length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ((Int*)(ut_M_arr->values))[4] = ut_M_i;
+/// @ t6
+Array* tarr = NULL;
+    Ref_Manager* tarr_Refman = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, tarr, tarr_Refman)
+    if (3 < 0 || 3 >= tarr->length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Ref_Manager = ut_M_t_Refman;
+    ut_M_t_Refman = tarr_Refman;
+    LUMI_inc_ref(ut_M_t_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    ut_M_t = ((ut_M_Test*)(tarr->values)) + 3;
 /// @ te0
 expected "]", got "new-line"
 /// @ te1
@@ -566,7 +578,7 @@ assigning into non assignable expression
 /// @ te9
 assigning into non assignable expression
 /// @ te10
-assigning into an owner a non-owner access "s-var"
+assigning into an owner a non-owner access "var"
 /// @@ test-call-expression
 /// @ t0
 LUMI_err = ut_M_fun0();
@@ -4910,16 +4922,14 @@ Ref_Manager* aux_Ref_Manager = NULL;
     aux_Ref_Manager = NULL;
     ut_M_d->arr = ut_M_sarr;
 /// @ t7
-Ref_Manager* aux_Ref_Manager = NULL;
+String* s = NULL;
+    Ref_Manager* s_Refman = NULL;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_d->arr, ut_M_d->arr_Refman)
     if (4 < 0 || 4 >= ut_M_d->arr->length) RAISE(1, LUMI_block0_cleanup, slice_index)
-    aux_Ref_Manager = ut_M_str_Refman;
-    ut_M_str_Refman = ut_M_d->arr_Refman;
-    LUMI_inc_ref(ut_M_str_Refman);
-    LUMI_dec_ref(aux_Ref_Manager);
-    aux_Ref_Manager = NULL;
-    ut_M_str = ((String*)(ut_M_d->arr->values)) + 4;
+    s = ((String*)(ut_M_d->arr->values)) + 4;
+    s_Refman = ut_M_d->arr_Refman;
+    LUMI_inc_ref(s_Refman);
 /// @ t8
 ut_M_Data ad_Values[5] = {{0}};
     Array ad_Var = {5, NULL};
@@ -4940,18 +4950,16 @@ ut_M_Data ad_Values[5] = {{0}};
     Array ad_Var = {5, NULL};
     Array* ad = NULL;
     Ref_Manager* ad_Refman = NULL;
-    Ref_Manager* aux_Ref_Manager = NULL;
+    String* s = NULL;
+    Ref_Manager* s_Refman = NULL;
     INIT_VAR(1, LUMI_block0_cleanup, ad)
     ad_Var.values = ad_Values;
     if (2 < 0 || 2 >= ad->length) RAISE(2, LUMI_block0_cleanup, slice_index)
     CHECK_REF(2, LUMI_block0_cleanup, (((ut_M_Data*)(ad->values)) + 2)->arr, (((ut_M_Data*)(ad->values)) + 2)->arr_Refman)
     if (3 < 0 || 3 >= (((ut_M_Data*)(ad->values)) + 2)->arr->length) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_Ref_Manager = ut_M_str_Refman;
-    ut_M_str_Refman = (((ut_M_Data*)(ad->values)) + 2)->arr_Refman;
-    LUMI_inc_ref(ut_M_str_Refman);
-    LUMI_dec_ref(aux_Ref_Manager);
-    aux_Ref_Manager = NULL;
-    ut_M_str = ((String*)((((ut_M_Data*)(ad->values)) + 2)->arr->values)) + 3;
+    s = ((String*)((((ut_M_Data*)(ad->values)) + 2)->arr->values)) + 3;
+    s_Refman = (((ut_M_Data*)(ad->values)) + 2)->arr_Refman;
+    LUMI_inc_ref(s_Refman);
 /// @ t10
 LUMI_err = ut_M_Data_set(ut_M_d, ut_M_d_Refman, NULL, NULL, NULL, NULL, NULL);
     CHECK(1, LUMI_block0_cleanup)
@@ -6980,6 +6988,7 @@ struct ut_M_Bstruct_Dynamic {
 };
 struct ut_M_Test {
     ut_M_Bstruct b;
+    ut_M_Bstruct sb;
 };
 Returncode ut_M_Astruct_meth(ut_M_Astruct* self, Ref_Manager* self_Refman, ut_M_Astruct_Dynamic* self_Dynamic);
 void ut_M_Astruct_Del(ut_M_Astruct* self);
@@ -7038,31 +7047,31 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
     Ref_Manager* t_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     LUMI_inc_ref(self_Refman);
-    CHECK_REF(4, LUMI_block0_cleanup, self, self_Refman)
-    b = &(self->b);
+    CHECK_REF(5, LUMI_block0_cleanup, self, self_Refman)
+    b = &(self->sb);
     b_Refman = self_Refman;
     LUMI_inc_ref(b_Refman);
     b_Dynamic = &ut_M_Bstruct_dynamic;
-    CHECK_REF(5, LUMI_block0_cleanup, self, self_Refman)
+    CHECK_REF(6, LUMI_block0_cleanup, self, self_Refman)
     aux_Ref_Manager = b_Refman;
     b_Refman = self_Refman;
     b_Dynamic = &ut_M_Bstruct_dynamic;
     LUMI_inc_ref(b_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    b = &(self->b);
-    CHECK_REF(6, LUMI_block0_cleanup, self, self_Refman)
-    LUMI_err = ut_M_Bstruct_meth(&(self->b), self_Refman, &ut_M_Bstruct_dynamic);
-    CHECK(6, LUMI_block0_cleanup)
+    b = &(self->sb);
     CHECK_REF(7, LUMI_block0_cleanup, self, self_Refman)
     LUMI_err = ut_M_Bstruct_meth(&(self->b), self_Refman, &ut_M_Bstruct_dynamic);
     CHECK(7, LUMI_block0_cleanup)
     CHECK_REF(8, LUMI_block0_cleanup, self, self_Refman)
+    LUMI_err = ut_M_Bstruct_meth(&(self->b), self_Refman, &ut_M_Bstruct_dynamic);
+    CHECK(8, LUMI_block0_cleanup)
+    CHECK_REF(9, LUMI_block0_cleanup, self, self_Refman)
     b2 = self->b.b;
     b2_Refman = self->b.b_Refman;
     LUMI_inc_ref(b2_Refman);
     b2_Dynamic = self->b.b_Dynamic;
-    CHECK_REF(9, LUMI_block0_cleanup, self, self_Refman)
+    CHECK_REF(10, LUMI_block0_cleanup, self, self_Refman)
     aux_Ref_Manager = b2_Refman;
     b2_Refman = self->b.b_Refman;
     b2_Dynamic = self->b.b_Dynamic;
@@ -7070,11 +7079,11 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
     b2 = self->b.b;
-    CHECK_REF(10, LUMI_block0_cleanup, self, self_Refman)
-    if (self->b.b_Dynamic == NULL) RAISE(10, LUMI_block0_cleanup, empty_object)
-    LUMI_err = self->b.b_Dynamic->_base.meth(&(self->b.b->_base), self->b.b_Refman, &(self->b.b_Dynamic->_base));
-    CHECK(10, LUMI_block0_cleanup)
     CHECK_REF(11, LUMI_block0_cleanup, self, self_Refman)
+    if (self->b.b_Dynamic == NULL) RAISE(11, LUMI_block0_cleanup, empty_object)
+    LUMI_err = self->b.b_Dynamic->_base.meth(&(self->b.b->_base), self->b.b_Refman, &(self->b.b_Dynamic->_base));
+    CHECK(11, LUMI_block0_cleanup)
+    CHECK_REF(12, LUMI_block0_cleanup, self, self_Refman)
     aux_Ref_Manager = self->b.b_Refman;
     self->b.b_Refman = b_Refman;
     self->b.b_Dynamic = b_Dynamic;
@@ -7082,22 +7091,29 @@ Returncode ut_M_Test_test(ut_M_Test* self, Ref_Manager* self_Refman) {
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
     self->b.b = b;
-    CHECK_REF(12, LUMI_block0_cleanup, self, self_Refman)
+    CHECK_REF(13, LUMI_block0_cleanup, self, self_Refman)
     LUMI_err = ut_M_Bstruct_meth(self->b.b, self->b.b_Refman, self->b.b_Dynamic);
-    CHECK(12, LUMI_block0_cleanup)
-    INIT_VAR(13, LUMI_block0_cleanup, t)
-    CHECK_REF(14, LUMI_block0_cleanup, self, self_Refman)
-    self->b._base.x = 5;
+    CHECK(13, LUMI_block0_cleanup)
+    INIT_VAR(14, LUMI_block0_cleanup, t)
     CHECK_REF(15, LUMI_block0_cleanup, self, self_Refman)
+    self->b._base.x = 5;
+    CHECK_REF(16, LUMI_block0_cleanup, self, self_Refman)
     LUMI_err = ut_M_Astruct_meth(&(self->b._base), self_Refman, &(ut_M_Bstruct_dynamic._base));
-    CHECK(15, LUMI_block0_cleanup)
-    CHECK_REF(16, LUMI_block0_cleanup, self, self_Refman)
-    CHECK_REF(16, LUMI_block0_cleanup, self, self_Refman)
+    CHECK(16, LUMI_block0_cleanup)
+    CHECK_REF(17, LUMI_block0_cleanup, self, self_Refman)
+    CHECK_REF(17, LUMI_block0_cleanup, self, self_Refman)
     if (((void*)&(self->b) == b) || ((void*)b2 != &(self->b))) {
     LUMI_block1_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    aux_Ref_Manager = b_Refman;
+    b_Refman = t_Refman;
+    b_Dynamic = &ut_M_Bstruct_dynamic;
+    LUMI_inc_ref(b_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    b = &(t->b);
 LUMI_block0_cleanup:
     (void)0;
     LUMI_var_dec_ref(t_Refman);
@@ -7108,6 +7124,7 @@ LUMI_block0_cleanup:
 }
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
+    ut_M_Bstruct_Del(&(self->sb));
     ut_M_Bstruct_Del(&(self->b));
 }
 /// @ te0

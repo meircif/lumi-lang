@@ -57,8 +57,14 @@ test fail-sequence-empty()
     assert arr[0] = 0
 
 test fail-sequence-outdated()
-    new Array?{2:Int} arr-owner
-    user Array?{Int} arr(user arr-owner)
+    strong Array?{Int} arr-owner(strong Array{2:Int}())
+    weak Array?{Int} arr(weak arr-owner)
+    arr-owner := _
+    assert arr[0] = 0
+
+test fail-slice-outdated()
+    strong Array?{Int} arr-owner(strong Array{6:Int}())
+    weak Array?{Int} arr(weak arr-owner[2:3])
     arr-owner := _
     assert arr[0] = 0
 

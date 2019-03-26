@@ -206,13 +206,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if self.header-only
       return
     for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.OWNER or parameter.access = Access.STRONG
+      if access-is-owner(copy parameter.access)
         self.delete-group-builder.add-deleting(
             user parameter.get-type-instance())
     base()
     for variable in self.variables.iter()
-      if variable.access = Access.OWNER or variable.access = Access.STRONG or
-          variable.access = Access.VAR or variable.access = Access.S-VAR
+      if access-is-var(copy variable.access)
         self.delete-group-builder.add-deleting(user variable.type-instance)
     if self.my-module?
       glob.current-module := _
@@ -234,11 +233,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.check-children-memory(user self.variables, user refs)
     self.check-children-memory(user self.code-nodes, user refs)
     for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.OWNER or parameter.access = Access.STRONG
+      if access-is-owner(copy parameter.access)
         refs.mark-illegal-type(user parameter.get-type-instance())
     for variable in self.variables.iter()
-      if variable.access = Access.OWNER or variable.access = Access.STRONG or
-          variable.access = Access.VAR or variable.access = Access.S-VAR
+      if access-is-var(copy variable.access)
         refs.mark-illegal-type(user variable.type-instance)
     for output in self.arguments.outputs.iter()
       refs.check-output(user output)
@@ -290,7 +288,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       write-spaces(copy INDENTATION-SPACES)
       write(user "Ref_Manager* aux_Ref_Manager = NULL;\n")
     for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.USER or parameter.access = Access.WEAK
+      if access-is-user(copy parameter.access)
         write-spaces(copy INDENTATION-SPACES)
         write(user "LUMI_inc_ref(")
         write-cname(user parameter.get-variable().name)
@@ -298,8 +296,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst write-param-cleanup()
     for parameter in self.arguments.parameters.iter-back()
-      if parameter.access = Access.USER or parameter.access = Access.OWNER or
-          parameter.access = Access.WEAK or parameter.access = Access.STRONG
+      if access-is-user(copy parameter.access) or
+          access-is-owner(copy parameter.access)
         self.write-variable-cleanup(user parameter.get-variable(), user _)
   
   func inst write-cname()
@@ -437,8 +435,7 @@ class DeclarationArgument(Argument)
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
-    else-if self.is-output and
-        (self.access = Access.VAR or self.access = Access.S-VAR)
+    else-if self.is-output and access-is-only-var(copy self.access)
       self.syntax-error2(
           user "output",
           user self.variable.name,
@@ -450,10 +447,9 @@ class DeclarationArgument(Argument)
           user self.variable.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
-      if (self.access = Access.OWNER or self.access = Access.STRONG)
+      if access-is-owner(copy self.access)
         self.syntax-error-msg(user "owner argument to native function")
-      if self.is-output and
-          (self.access = Access.USER or self.access = Access.WEAK)
+      if self.is-output and access-is-user(copy self.access)
         self.syntax-error-msg(user "user output to native function")
   
   func dynamic get-type-instance()->(user TypeInstance type-instance)

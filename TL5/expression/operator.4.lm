@@ -149,11 +149,9 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
     self.left-expression.result-type.check-assign-from(
         copy self.left-expression.access, user self)->(
         owner self.right-expression)
-    if self.left-expression.access = Access.USER or
-        self.left-expression.access = Access.WEAK
+    if access-is-user(copy self.left-expression.access)
       self.code-node.get-function().has-user-assign := true
-    else-if (self.left-expression.access = Access.OWNER or
-        self.left-expression.access = Access.STRONG)
+    else-if access-is-owner(copy self.left-expression.access)
       ; ownership pass
       self.add-aux-variable(
           copy self.left-expression.access,
@@ -171,15 +169,13 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
     if left-path?
       refs.mark-reference(user left-path, copy true)
     var Bool check-left(copy true)
-    if self.left-expression.access = Access.OWNER or
-        self.left-expression.access = Access.STRONG
+    if access-is-owner(copy self.left-expression.access)
       refs.mark-illegal-type(user self.left-expression.result-type)
       if left-path? and
           self.right-expression.result-type.type-data is glob.type-empty
         refs.mark-reference(user left-path, copy false)
         check-left := false
-      if self.right-expression.access = Access.OWNER or
-          self.right-expression.access = Access.STRONG
+      if access-is-owner(copy self.right-expression.access)
         ; move
         user ReferencePath right-path(
             user self.right-expression.result-type.reference-path)
@@ -197,8 +193,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
   func dynamic write-preactions()
     self.right-expression.write-preactions()
     if not self.left-expression.result-type.type-data.is-primitive
-      if self.left-expression.access = Access.OWNER or
-          self.left-expression.access = Access.STRONG
+      if access-is-owner(copy self.left-expression.access)
         self.write-owner-assign-preactions()
       else
         self.write-user-assign-preactions()
@@ -206,8 +201,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
       self.left-expression.write-preactions()
       
   func dynamic write-end()
-    if self.left-expression.access = Access.OWNER or
-        self.left-expression.access = Access.STRONG
+    if access-is-owner(copy self.left-expression.access)
       self.write-end-expression(user self.assigned-value-variable)
       self.code-node.write-spaces()
       self.assigned-value-variable.write-assign-null()

@@ -235,16 +235,13 @@ class CallArgument(Argument)
       user TypeInstance type-instance,
       user TypeInstance actual-params,
       copy Int bases)
-    if (self.access = Access.OWNER or self.access = Access.STRONG) and
-        self.value.access != Access.OWNER and
-        self.value.access != Access.STRONG
+    if access-is-owner(copy self.access) and
+        not access-is-owner(copy self.value.access)
       self.syntax-error(
           user "assigning into an owner a non-owner access",
           user glob.access-names[self.value.access])
     if self.is-output and self.access != self.value.access and not
-        (self.access = Access.RESET and (self.value.access = Access.OWNER or
-        self.value.access = Access.STRONG or self.value.access = Access.VAR or
-        self.value.access = Access.S-VAR))
+        (self.access = Access.RESET and access-is-var(copy self.value.access))
       self.syntax-error2(
           user "assigning into access",
           user glob.access-names[self.access],
@@ -273,7 +270,8 @@ class CallArgument(Argument)
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.value.check-memory(user refs)
     if not self.is-output
-      if self.access = Access.OWNER and self.value.result-type.reference-path?
+      if access-is-owner(copy self.access) and
+          self.value.result-type.reference-path?
         refs.mark-reference(
             user self.value.result-type.reference-path, copy false)
         self.value.result-type.reference-path.check-pure-owner(user self)
@@ -328,8 +326,7 @@ class CallArgument(Argument)
         write(user "_dynamic")
   
   func dynamic write-postactions()
-    if (self.access = Access.OWNER or self.access = Access.STRONG) and
-        not self.is-output and
+    if access-is-owner(copy self.access) and not self.is-output and
         self.value.result-type.type-data is-not glob.type-empty
       self.code-node.write-spaces()
       self.assignee.write-assign-null()

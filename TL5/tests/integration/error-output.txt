@@ -13,26 +13,28 @@ testing fail-sequence-empty... Error: empty object used
   Error raised in TL5/tests/integration/error-test.5.lm:57 fail-sequence-empty()
 testing fail-sequence-outdated... Error: outdated weak reference used
   Error raised in TL5/tests/integration/error-test.5.lm:63 fail-sequence-outdated()
+testing fail-slice-outdated... Error: outdated weak reference used
+  Error raised in TL5/tests/integration/error-test.5.lm:69 fail-slice-outdated()
 testing fail-dynamic-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:67 fail-dynamic-empty()
+  Error raised in TL5/tests/integration/error-test.5.lm:73 fail-dynamic-empty()
 testing fail-object-no-memory... Error: insufficient memory for object dynamic allocation
-  Error raised in TL5/tests/integration/error-test.5.lm:71 fail-object-no-memory()
+  Error raised in TL5/tests/integration/error-test.5.lm:77 fail-object-no-memory()
 testing fail-managed-no-memory... Error: insufficient memory for managed object
-  Error raised in TL5/tests/integration/error-test.5.lm:75 fail-managed-no-memory()
+  Error raised in TL5/tests/integration/error-test.5.lm:81 fail-managed-no-memory()
 testing fail-exclamation-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:79 fail-exclamation-empty()
-testing fail-raise... Error raised in TL5/tests/integration/error-test.5.lm:82 fail-raise()
+  Error raised in TL5/tests/integration/error-test.5.lm:85 fail-exclamation-empty()
+testing fail-raise... Error raised in TL5/tests/integration/error-test.5.lm:88 fail-raise()
 testing fail-raise-message... Error: my error
   Error raised in TL5/tests/integration/error-test.5.lm:18 f-raise-message()
-  called from TL5/tests/integration/error-test.5.lm:85 fail-raise-message()
+  called from TL5/tests/integration/error-test.5.lm:91 fail-raise-message()
 testing fail-assert... Error: condition is not true
-  Assert failed in TL5/tests/integration/error-test.5.lm:88 fail-assert()
+  Assert failed in TL5/tests/integration/error-test.5.lm:94 fail-assert()
 testing fail-assert-error... Error: error not raised
-  Assert failed in TL5/tests/integration/error-test.5.lm:91 fail-assert-error()
+  Assert failed in TL5/tests/integration/error-test.5.lm:97 fail-assert-error()
 testing fail-assert-error-message... Assert failed: unexpected error message "tested other message"
-  Assert failed in TL5/tests/integration/error-test.5.lm:94 fail-assert-error-message()
+  Assert failed in TL5/tests/integration/error-test.5.lm:100 fail-assert-error-message()
 testing fail-assert-error-message-prefix... Assert failed: unexpected error message "tested message"
-  Assert failed in TL5/tests/integration/error-test.5.lm:97 fail-assert-error-message-prefix()
+  Assert failed in TL5/tests/integration/error-test.5.lm:103 fail-assert-error-message-prefix()
 testing code coverage... 93% - failed, lines not covered:
   TL5/tests/integration/error-test.5.lm(93%): 12 46 53
 Tests failed
