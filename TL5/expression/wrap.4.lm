@@ -49,7 +49,7 @@ class UpCastExpression(Expression)
   var Int bases
   
   func inst init-new(copy Int bases)->(owner Expression expression)
-    new UpCastExpression up-cast(user _)
+    new UpCastExpression up-cast(user expression.code-node)
     up-cast.init(copy bases, owner expression)
     expression := up-cast
   

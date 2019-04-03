@@ -27,17 +27,6 @@ typedef struct {
   void* ref;
 } Ref_Manager;
 
-typedef struct {
-  int max_length;
-  int length;
-  char* values;
-} String;
-
-typedef struct {
-  int length;
-  void* values;
-} Array;
-
 typedef Returncode (*Func)();
 
 typedef struct {
@@ -60,7 +49,8 @@ extern Generic_Type_Dynamic* dynamic_Void;
 
 
 typedef struct {
-  String str;
+  char const* str;
+  int length;
   Ref_Manager refman;
 } Error_Message;
 
@@ -87,31 +77,54 @@ void LUMI_trace_print(
   char const* filename,
   int line,
   char const* funcname,
-  String* message,
+  char const* message,
+  int message_length,
   Ref_Manager* message_refman);
 
-#define START_TRACE(line, cleanup, value, format, message, message_refman) \
+#define START_TRACE(line, cleanup, value, format, message, message_length, message_refman) \
   LUMI_trace_print( \
-      format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, message, message_refman); \
+      format, \
+      LUMI_FILE_NAME, \
+      line, \
+      LUMI_FUNC_NAME, \
+      message, \
+      message_length, \
+      message_refman); \
   LUMI_err = value; \
   LUMI_loop_depth = 0; \
   goto cleanup;
 
 #define START_TRACE_STATIC(line, cleanup, err_value, format, message_length, message) { \
-  String LUMI_msg = { message_length + 1, message_length, message }; \
   Ref_Manager LUMI_msg_refman = { 1, NULL, NULL }; \
   LUMI_msg_refman.value = &LUMI_msg; \
-  START_TRACE(line, cleanup, err_value, format, &LUMI_msg, &LUMI_msg_refman) }
+  START_TRACE( \
+      line, \
+      cleanup, \
+      err_value, \
+      format, \
+      message, \
+      message_length, \
+      &LUMI_msg_refman) }
 
 #define RAISE(line, cleanup, message) { \
   START_TRACE( \
-      line, cleanup, ERR, LUMI_raise_format, \
-      &(LUMI_error_messages.message.str), \
+      line, \
+      cleanup, \
+      ERR, \
+      LUMI_raise_format, \
+      LUMI_error_messages.message.str, \
+      LUMI_error_messages.message.length, \
       &(LUMI_error_messages.message.refman)) }
 
-#define USER_RAISE(line, cleanup, message, message_refman) \
-  { \
-  START_TRACE(line, cleanup, ERR, LUMI_raise_format, message, message_refman) }
+#define USER_RAISE(line, cleanup, message, message_length, message_refman) \
+  { START_TRACE( \
+      line, \
+      cleanup, \
+      ERR, \
+      LUMI_raise_format, \
+      message, \
+      message_length, \
+      message_refman) }
 
 #define TEST_FAIL(line, cleanup, message_length, message) \
   START_TRACE_STATIC( \
@@ -147,10 +160,10 @@ int LUMI_test_main(int argc, char* argv[]);
 #define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)
 #define USER_MAIN_HEADER Returncode LUMI_user_main(void)
 
-#define ARRAY_DEL(Type, array) if (array != NULL) { \
+#define ARRAY_DEL(Type, array, length) if (array != NULL) { \
   int LUMI_n = 0; \
-  for (; LUMI_n < array->length; ++LUMI_n) \
-    Type##_Del(((Type*)(array->values))+LUMI_n); \
+  for (; LUMI_n < length; ++LUMI_n) \
+    Type##_Del(array + LUMI_n); \
 }
 
 #define SELF_REF_DEL(Type, field) \
@@ -188,16 +201,24 @@ while (self->field != NULL) { \
   name = &name##_Var; \
   INIT_REFMAN(line, cleanup, name, false)
 
-#define INIT_NEW(line, cleanup, name, alloc) \
-  name = alloc; \
+#define INIT_NEW(line, cleanup, name, type, size) \
+  name = LUMI_alloc(sizeof(type) * size); \
   if (name == NULL) RAISE(line, cleanup, object_memory) \
   INIT_REFMAN(line, cleanup, name, true)
 
+#define INIT_NEW_STRING(line, cleanup, name, size) \
+  name##_Max_length = size; \
+  INIT_NEW(line, cleanup, name##_Max_length, char, size)
+
+#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
+  name##_Length = length; \
+  INIT_NEW(line, cleanup, name##_Length, type, name##_Length * value_size)
+
 #define INIT_STRING_CONST(line, cleanup, name, text) \
-  INIT_VAR(line, cleanup, name) \
-  name##_Var.max_length = sizeof(text); \
-  name##_Var.length = sizeof(text) - 1; \
-  name##_Var.values = text;
+  name = text; \
+  name##_Max_length = sizeof(text); \
+  name##_Length = sizeof(text) - 1;
+  INIT_REFMAN(line, cleanup, name, false)
 
 void* LUMI_alloc(size_t size);
 Ref_Manager* LUMI_new_ref(void** value, Bool is_new);

@@ -4,6 +4,7 @@ module tl5-compiler
 class InitExpression(ModuleTypeExpression)
   var FunctionArguments arguments
   owner VariableExpression aux-variable
+  owner AssignExpression assign-expression
   user SyntaxTreeFunction constructor
   
   func inst parse-new(
@@ -31,7 +32,6 @@ class InitExpression(ModuleTypeExpression)
   
   func dynamic analyze()
     self.analyze-type-instance(user self.result-type)
-    
     self.arguments.analyze()
     if self.aux-variable?
       self.aux-variable.result-type.analyze(user self)
@@ -53,9 +53,6 @@ class InitExpression(ModuleTypeExpression)
     if not self.result-type.type-data.is-primitive and
         self.aux-variable.variable.is-create
       self.result-type.check-sequence(user self)
-      if self.result-type.type-data is glob.type-array
-        if self.result-type.parameters.first.item.type-data is glob.type-generic
-          self.syntax-error-msg(user "cannot create generic array")
       if self.result-type.type-data.create-disallowed
         self.syntax-error(
             user "cannot create objects with type",
@@ -79,6 +76,7 @@ class InitExpression(ModuleTypeExpression)
         self.syntax-error-msg(
             user "only one initialization parameter expected")
       user Argument param(user self.arguments.parameters.first.item)
+      user Expression original-value(user param.get-output())
       param.check-same-type-as(user self.result-type, user _, copy 0, copy true)
       if self.result-type.type-data.is-primitive and param.access != Access.COPY
         self.syntax-error(
@@ -91,6 +89,13 @@ class InitExpression(ModuleTypeExpression)
             user glob.access-names[self.access],
             user "invalid access",
             user glob.access-names[param.access])
+      if self.is-statement
+        self.assign-expression := AssignExpression(
+            user self.code-node,
+            user self.aux-variable,
+            user original-value)
+        self.assign-expression.reset-value(user param.get-output())
+        self.assign-expression.analyze()
   
   func inst add-self-and-check(copy Int access, copy Bool is-output)
     new CallArgument self-param
@@ -112,6 +117,8 @@ class InitExpression(ModuleTypeExpression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.arguments.check-memory(user refs)
+    if self.assign-expression?
+      self.assign-expression.check-memory(user refs)
   
   func inst write-allocation()
     self.arguments.write-preactions()
@@ -134,104 +141,79 @@ class InitExpression(ModuleTypeExpression)
       self.code-node.write-call(user self.arguments)
   
   func inst write-var-init()
-    self.write-init-var-ref(user self.aux-variable)
+    if self.result-type.type-data is-not glob.type-array and
+        self.result-type.type-data is-not glob.type-string
+      self.write-init-var-ref(user self.aux-variable)
+      return
     
-    if self.result-type.type-data is glob.type-array or
-        self.result-type.type-data is glob.type-string
-      ; `aux-variable`_Var.values = `aux-variable`_Values;
-      self.code-node.write-spaces()
-      self.aux-variable.write()
-      write(user "_Var.values = ")
-      self.aux-variable.write()
-      write(user "_Values;\n")
-      if self.result-type.type-data is glob.type-array
-        if self.result-type.parameters.first.item.type-data is glob.type-string
-          ; LUMI_set_var_string_array(
-          ;    `array-length`, `string-length`, `name`, `name`_Chars);
-          self.code-node.write-spaces()
-          write(user "LUMI_set_var_string_array(")
-          self.result-type.length.write()
-          write(user ", ")
-          self.result-type.parameters.first.item.length.write()
-          write(user ", ")
-          self.aux-variable.write()
-          write(user ", ")
-          self.aux-variable.write()
-          write(user "_Chars);\n")
+    ; INIT_REFMAN(`line`, `cleanup`, `aux-variable`, false)
+    self.write-macro-init(user "INIT_REFMAN", user self.aux-variable)
+    write(user ", false)\n")
   
   func inst write-new-init()
-    ; INIT_NEW(`line`, `cleanup`, `aux-variable`, ...)
-    write(user "INIT_NEW(")
-    self.write-line-num()
-    write(user ", ")
-    self.code-node.parent.write-cleanup-label()
-    write(user ", ")
-    self.aux-variable.write()
-    write(user ", ")
-    
     if self.result-type.type-data is glob.type-array
-      if self.result-type.parameters.first.item.type-data is glob.type-string
-        ; LUMI_new_string_array(`length`, `string-length`);
-        write(user "LUMI_new_string_array(")
-        self.result-type.length.write()
-        write(user ", ")
-        self.result-type.parameters.first.item.length.write()
-        
+      ; `aux-variable`_Value_length = `length`
+      user TypeInstance data-type
+      var Int depth
+      self.result-type.get-array-data-type-depth()->(user data-type, var depth)
+      user TypeInstance sequence-type(user self.result-type)
+      for n in depth
+        sequence-type := sequence-type.parameters.first.item
+        self.aux-variable.write()
+        write-array-value-length(copy n)
+        write(user " = ")
+        sequence-type.length.write()
+        write(user ";\n")
+        self.code-node.write-spaces()
+      
+      ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
+      self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
+      write(user ", ")
+      if data-type.type-data is glob.type-string
+        write(user "char")
       else
-        ; LUMI_new_array(`length`, sizeof(`SubType`));
-        write(user "LUMI_new_array(")
-        self.result-type.length.write()
-        write(user ", sizeof(")
-        self.result-type.parameters.first.item.type-data.write-cname()
-        write(user ")")
+        data-type.type-data.write-cname()
+      write(user ", ")
+      self.result-type.length.write()
+      write(user ", ")
+      if depth > 0
+        n := 0
+        do
+          self.aux-variable.write()
+          write-array-value-length(copy n)
+          n += 1
+          while n < depth
+          write(user " * ")
+      else
+        write(user "1")
+      write(user ");\n")
+      
+      if data-type.type-data is glob.type-string
+        ; `aux-variable`_String_length = LUMI_alloc(sizeof(int) * `length`);
+        self.code-node.write-spaces()
+        self.aux-variable.write()
+        write(user "_String_length = LUMI_alloc(sizeof(int) * ")
+        self.aux-variable.write()
+        write(user "_Length")
+        for n in depth - 1
+          write(user " * ")
+          self.aux-variable.write()
+          write-array-value-length(copy n)
+        write(user ");\n")
         
     else-if self.result-type.type-data is glob.type-string
-      ; LUMI_new_string(`length`);
-      write(user "LUMI_new_string(")
+      ; INIT_NEW_STRING(`line`, `cleanup`, `aux-variable`, `length`);
+      self.write-macro-init(user "INIT_NEW_STRING", user self.aux-variable)
+      write(user ", ")
       self.result-type.length.write()
+      write(user ");\n")
       
     else
-      ; LUMI_alloc(sizeof(`type`));
-      write(user "LUMI_alloc(sizeof(")
+      ; INIT_NEW(`line`, `cleanup`, `aux-variable`, `type`, 1)
+      self.write-macro-init(user "INIT_NEW", user self.aux-variable)
+      write(user ", ")
       self.result-type.type-data.write-cname()
-      write(user ")")
-    
-    write(user "));\n")
-  
-  func inst write-assign()
-    ; `name` = `value`;
-    user Expression value
-    self.arguments.parameters.first.item.get-output()->(user value)
-    self.code-node.write-spaces()
-    value.write-preactions()
-    self.aux-variable.write()
-    write(user " = ")
-    value.write-cast()
-    write(user ";\n")
-    
-    if not self.result-type.type-data.is-primitive
-      ; `name`_Refman = `value`_Refman;
-      ; LUMI_inc_ref(`name`_Refman);
-      self.code-node.write-spaces()
-      self.aux-variable.write()
-      write(user "_Refman = ")
-      value.write-refman()
-      write(user ";\n")
-      if self.access != Access.OWNER and self.access != Access.STRONG
-        self.code-node.write-spaces()
-        write(user "LUMI_inc_ref(")
-        self.aux-variable.write()
-        write(user "_Refman);\n")
-    
-    if self.result-type.type-data.is-dynamic
-      ; `name`_Dynamic = `Type`_Dynamic;
-      self.code-node.write-spaces()
-      self.aux-variable.write()
-      write(user "_Dynamic = ")
-      value.write-dynamic-cast()
-      write(user ";\n")
-    
-    self.arguments.write-postactions()
+      write(user ", 1);\n")
   
   func dynamic write-preactions()
     self.write-allocation()
@@ -244,6 +226,8 @@ class InitExpression(ModuleTypeExpression)
         self.code-node.write-spaces()
         self.write-allocation()
       else-if self.arguments.parameters.first?
-        self.write-assign()
+        self.code-node.write-spaces()
+        self.assign-expression.write-preactions()
+        self.assign-expression.write()
     else
       self.aux-variable.write()

@@ -141,9 +141,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           user self.type-instance.type-data.name)
     if access-is-only-var(copy self.access)
       self.type-instance.check-sequence(user self)
-    if self.is-create and self.type-instance.type-data is glob.type-array
-      if self.type-instance.parameters.first.item.type-data is glob.type-generic
-        self.syntax-error-msg(user "cannot create generic array")
     if self.parent-type?
       if self.access = Access.USER
         self.syntax-error-msg(user "fields cannot have \"user\" access")
@@ -163,8 +160,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       glob.current-module := _
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    if self.access = Access.USER or self.access = Access.OWNER
-      refs.add(user self)
+    refs.add(user self)
   
   func inst write-cname()
     if self.my-module?
@@ -177,10 +173,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else-if not self.is-native
       write(user "\n")
     
-    if access-is-only-var(copy self.access) and self.is-create and
-        (self.type-instance.type-data is glob.type-array or
-        self.type-instance.type-data is glob.type-string)
+    if self.type-instance.type-data is glob.type-array or
+        self.type-instance.type-data is glob.type-string
       self.write-sequence()
+      return
     
     if not self.type-instance.type-data.is-primitive and
         access-is-only-var(copy self.access) and not self.parent-type?
@@ -210,57 +206,115 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     write(user ";\n")
     
     if not self.type-instance.type-data.is-primitive and
-        not (self.parent-type? and access-is-only-var(copy self.access))
+        not (self.parent-type? and self.access = Access.VAR)
       self.write-refman()
     
     if self.type-instance.type-data.is-dynamic and
         not (self.parent-type? and access-is-only-var(copy self.access))
       self.write-dynamic()
   
-  func dynamic write-sequence()
-    if self.type-instance.type-data is glob.type-array
-      if self.type-instance.parameters.first.item.type-data is glob.type-string
-        ; char `name`_Chars[`length` * `string-legth`] = {0};
-        write(user "char ")
-        self.write-cname()
-        write(user "_Chars[")
-        self.type-instance.length.write()
-        write(user " * ")
-        self.type-instance.parameters.first.item.length.write()
-        write(user "];\n")
-        self.write-spaces()
-    ; `sub-type` `name`_Values[`length`];
-    if self.type-instance.type-data is glob.type-string
-      write(user "char ")
-    else-if self.type-instance.parameters.first.item.type-data is glob.type-func
+  func inst write-sequence()
+    ; `data-type` `name`[`full length`][ = {0}];
+    ; `data-type`* `name`[ = NULL];
+    ; Returncode (*`name`[`full length`])(`arguments`)[ = {0}];
+    ; Returncode (**`name`)(`arguments`)[ = NULL];
+    var Bool is-new-var(
+        copy access-is-only-var(copy self.access) and self.is-create)
+    user TypeInstance data-type
+    var Int sequence-depth
+    self.type-instance.get-array-data-type-depth()->(
+        user data-type, var sequence-depth)
+    if data-type.type-data is glob.type-string
+      write(user "char")
+    else-if data-type.type-data is glob.type-func
       write(user "Returncode (*")
     else
-      self.type-instance.parameters.first.item.type-data.write-cname()
+      data-type.type-data.write-cname()
+    if not is-new-var
+      write(user "*")
+    if data-type.type-data is-not glob.type-func
       write(user " ")
     self.write-cname()
-    write(user "_Values[")
-    self.type-instance.length.write()
-    write(user "]")
-    if self.type-instance.type-data is glob.type-array
-      if self.type-instance.parameters.first.item.type-data is glob.type-func
-        write(user ")")
-        self.type-instance.parameters.first.item.arguments.write()
-    write(user " = ")
-    var Int bases
-    if self.type-instance.type-data is glob.type-array
-      if not self.type-instance.parameters.first.item.type-data.is-primitive
-        user TypeData type-data(user self.type-instance.parameters.first.item.type-data)
-        bases := 1
-        do
-          write(user "{")
-          while type-data.base-type?
-          type-data := type-data.base-type.type-data
-          bases += 1
-    write(user "{0}")
-    for n in bases
-      write(user "}")
+    if is-new-var
+      write(user "[")
+      user TypeInstance sequence-type(user self.type-instance)
+      sequence-type.length.write()
+      for _ in sequence-depth
+        sequence-type := sequence-type.parameters.first.item
+        write(user " * ")
+        sequence-type.length.write()
+      write(user "]")
+    if data-type.type-data is glob.type-func
+      write(user ")")
+      data-type.arguments.write()
+    if not self.parent-type?
+      write(user " = ")
+      if is-new-var
+        write(user "{0}")
+      else
+        write(user "NULL")
     write(user ";\n")
-    self.write-spaces()
+    
+    if not is-new-var
+      ; int `name`_Length[ = 0];
+      ; int `name`_Max_length[ = 0];
+      self.write-spaces()
+      write(user "int ")
+      self.write-cname()
+      write(user "_")
+      if self.type-instance.type-data is glob.type-string
+        write(user "Max_length")
+      else
+        write(user "Length")
+      if not self.parent-type?
+        write(user " = 0")
+      write(user ";\n")
+    
+      ; int `name`_Value[_value*]_length[ = 0]; ...*
+      for depth in sequence-depth
+        self.write-spaces()
+        write(user "int ")
+        self.write-cname()
+        write-array-value-length(copy depth)
+        if not self.parent-type?
+          write(user " = 0")
+        write(user ";\n")
+    
+    if data-type.type-data is glob.type-string
+      ; int `name`_Length[ = 0];
+      ; int `name`_String_length[`strings`][ = {0}];
+      ; int* `name`_String_length[ = NULL];
+      self.write-spaces()
+      write(user "int")
+      if not is-new-var and sequence-depth > 0
+        write(user "*")
+      write(user " ")
+      self.write-cname()
+      if sequence-depth > 0
+        write(user "_String_length")
+      else
+        write(user "_Length")
+      if is-new-var and sequence-depth > 0
+        write(user "[")
+        sequence-type := self.type-instance
+        sequence-type.length.write()
+        for _ in sequence-depth - 1
+          sequence-type := sequence-type.parameters.first.item
+          write(user " * ")
+          sequence-type.length.write()
+        write(user "]")
+      if not self.parent-type?
+        write(user " = ")
+        if sequence-depth = 0
+          write(user "0")
+        else-if is-new-var
+          write(user "{0}")
+        else
+          write(user "NULL")
+      write(user ";\n")
+      
+    if not self.parent-type? or self.access != Access.VAR
+      self.write-refman()
   
   func inst write-var()
     ; `type` `name`_Var = {...};
@@ -268,30 +322,21 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     write(user " ")
     self.write-cname()
     write(user "_Var = {")
-    if self.is-create and
-        (self.type-instance.type-data is glob.type-array or
-        self.type-instance.type-data is glob.type-string)
-      ; {`length`, 0, NULL}
-      self.type-instance.length.write()
-      if self.type-instance.type-data is glob.type-string
-        write(user ", 0")
-      write(user ", NULL")
-    else
-      var Int bases
-      user TypeData type-data(user self.type-instance.type-data)
-      do
-        if type-data.base-type?
-          type-data := type-data.base-type.type-data
-        else-if access-is-only-var(copy type-data.variables.first.item.access) and
-            not type-data.variables.first.item.type-instance.type-data.is-primitive
-          type-data := type-data.variables.first.item.type-instance.type-data
-        else
-          break
-        bases += 1
-        write(user "{")
-      write(user "0")
-      for n in bases
-        write(user "}")
+    var Int bases
+    user TypeData type-data(user self.type-instance.type-data)
+    do
+      if type-data.base-type?
+        type-data := type-data.base-type.type-data
+      else-if access-is-only-var(copy type-data.variables.first.item.access) and
+          not type-data.variables.first.item.type-instance.type-data.is-primitive
+        type-data := type-data.variables.first.item.type-instance.type-data
+      else
+        break
+      bases += 1
+      write(user "{")
+    write(user "0")
+    for n in bases
+      write(user "}")
     write(user "};\n")
     self.write-spaces()
   
@@ -360,6 +405,7 @@ class VariableInit(SyntaxTreeCode)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression-init.check-memory(user refs)
+    refs.add(user self.variable)
   
   func dynamic write()
     if self.variable.type-instance.type-data.is-primitive and

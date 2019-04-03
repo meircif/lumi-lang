@@ -236,10 +236,30 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     if type-data?
       write(user "self->")
     write-cname(user variable.name)
-    write(user ")")
-    if variable.type-instance.type-data is-not glob.type-array
-      write(user ";")
-    write(user "\n")
+    if variable.type-instance.type-data is glob.type-array
+      user TypeInstance data-type
+      variable.type-instance.get-array-data-type-depth()->(user data-type)
+      write(user ", ")
+      var Bool constant-length
+      if variable.type-instance.length?
+        constant-length := variable.type-instance.length.constant
+      if constant-length
+        variable.type-instance.length.write()
+      else
+        if type-data?
+          write(user "self->")
+        write-cname(user variable.name)
+        write(user "_Length")
+      write(user ")\n")
+      if data-type.type-data is glob.type-string
+        write-spaces(copy INDENTATION-SPACES)
+        write(user "free(")
+        if type-data?
+          write(user "self->")
+        write-cname(user variable.name)
+        write(user "_String_length);\n")
+      return
+    write(user ");\n")
 
 
 ~~~ A basic namespace node in the syntax tree ~~~

@@ -43,8 +43,9 @@ class TextExpression(Expression)
 
 ~~~ Constant integer expression ~~~
 class IntExpression(TextExpression)
-  func inst parse-new(owner String text)->(owner Expression expression)
-    new IntExpression int-expression(user _)
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new IntExpression int-expression(user code-node)
     int-expression.parse(owner text)
     expression := int-expression
   
@@ -80,8 +81,9 @@ class IntExpression(TextExpression)
 
 ~~~ Constant character expression ~~~
 class CharExpression(TextExpression)
-  func inst parse-new(owner String text)->(owner Expression expression)
-    new CharExpression char-expression(user _)
+  func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new CharExpression char-expression(user code-node)
     char-expression.parse(owner text)
     expression := char-expression
   
@@ -194,8 +196,8 @@ class StringExpression(TextExpression)
 
 ~~~ Constant empty expression `_` ~~~
 class EmptyExpression(Expression)
-  new()
-    base(user _)
+  new(user SyntaxTreeCode code-node)
+    base(user code-node)
     self.set-simple-type(user glob.type-empty)
     self.result-type.conditional := true
     self.access := Access.STRONG

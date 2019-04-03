@@ -24,7 +24,7 @@ static Array* sys_argv = NULL;
 static Ref_Manager* sys_argv_Refman = NULL;
 
 #define ERROR_MESAGE(field, message) \
-  {{sizeof(message), sizeof(message) - 1, message}, \
+  {message, sizeof(message), \
    {1, &(LUMI_error_messages.field.str), &(LUMI_error_messages.field.str)}}
 
 Error_Messages LUMI_error_messages = {

@@ -2,7 +2,7 @@
 module tl5-compiler-tests
 
 
-var Bool code-header-valid
+var Int common-header-length
 var Array{6:String{256}} mock-argv
 
 
@@ -135,38 +135,28 @@ func test-code-setup(user String input-text)
   set-mock-file-text(user "", user _)
   mock-input-file-text.concat(user common-header)
   mock-input-line-reset-index := mock-input-file-text.length
-  if input-text.length > 0
-    for ch in input-text[0:input-text.length - 1]
-      mock-input-file-text.append(copy ch)
-      if ch = '\n'
-        for n in tl5-compiler.INDENTATION-SPACES
-          mock-input-file-text.append(copy ' ')
-    mock-input-file-text.append(copy input-text[input-text.length - 1])
+  for n in tl5-compiler.INDENTATION-SPACES
+    mock-input-file-text.append(copy ' ')
+  for ch in input-text[0:input-text.length - 1]
+    mock-input-file-text.append(copy ch)
+    if ch = '\n'
+      for n in tl5-compiler.INDENTATION-SPACES
+        mock-input-file-text.append(copy ' ')
+  mock-input-file-text.append(copy input-text[input-text.length - 1])
 
 
 func test-code(
     user String input-text, user String expected-output, copy Bool is-main)
-  if not code-header-valid
-    return
   test-code-setup(user input-text)
   write-syntax-tree-success(copy false)
-  assert-string-slice(
-      user expected-common-header,
-      user mock-output-file-text,
-      copy 0,
-      copy expected-common-header.length,
-      copy false)
-  
   var Int footer-start
   user String mock-output-no-header(
-      user mock-output-file-text[expected-common-header.length:mock-output-file-text.length -
-      expected-common-header.length])
+      user mock-output-file-text[common-header-length:mock-output-file-text.length -
+      common-header-length])
   mock-output-no-header.find(user "\nLUMI_block0_cleanup:\n    ")->(
       var footer-start)
   if footer-start >= mock-output-no-header.length
-    sys.print(user mock-output-no-header)
-    code-header-valid := false
-    raise
+    footer-start := mock-output-no-header.length - 1
   assert-string-slice(
       user expected-output,
       user mock-output-no-header,
@@ -176,8 +166,6 @@ func test-code(
 
 
 func test-code-error(user String input-text, user String expected-error)
-  if not code-header-valid
-    return
   test-code-setup(user input-text)
   assert try-write-syntax-tree(copy false)
   Sys.print.active := false

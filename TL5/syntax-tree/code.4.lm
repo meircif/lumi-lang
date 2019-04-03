@@ -71,9 +71,11 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     if self.error-message.parsed()
       self.error-message.write()
       write(user ", ")
+      self.error-message.expression.write-length(user "_Length", copy false)
+      write(user ", ")
       self.error-message.write-refman()
     else
-      write(user "NULL, NULL")
+      write(user "NULL, 0, NULL")
     write(user ")\n")
 
 

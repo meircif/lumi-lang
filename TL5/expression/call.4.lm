@@ -20,15 +20,15 @@ class CallExpression(Expression)
         user declaration, user actual-params, copy bases, copy true)
       ; add omitted output
       new CallArgument output
+      output.code-node := self.code-node
       output.set-location()
       output.is-output := true
       output.is-native := declaration.outputs.last.item.is-native
-      output.is-primitive := result-type.type-data.is-primitive
-      output.is-dynamic := result-type.type-data.is-dynamic
       output.is-generic :=
           declaration.outputs.last.item.get-type-instance().type-data is
           glob.type-generic
       output.access := declaration.outputs.last.item.access
+      result-type.copy-new()->(owner output.real-type)
       owner VariableExpression variable-expression
       self.add-aux-variable(
           copy declaration.outputs.last.item.access,
@@ -210,11 +210,10 @@ class FunctionObjectCallExpression(CallExpression)
 ~~~ Function argument call ~~~
 class CallArgument(Argument)
   owner Expression value
+  owner TypeInstance real-type
   user Expression assignee
   user SyntaxTreeCode code-node
   var Bool is-down-cast
-  var Bool is-primitive
-  var Bool is-dynamic
   var Bool is-generic
   
   func dynamic parse-value(
@@ -248,20 +247,17 @@ class CallArgument(Argument)
           user "invalid access",
           user glob.access-names[self.value.access])
     
-    owner TypeInstance real-type
-    type-instance.new-replace-params(user actual-params)->(owner real-type)
+    type-instance.new-replace-params(user actual-params)->(owner self.real-type)
     if self.is-output
-      self.is-down-cast := real-type.check-assign-to(
+      self.is-down-cast := self.real-type.check-assign-to(
           copy self.access,
           user self.value.result-type,
           copy self.value.access,
           user self) > 0
     else
       self.assignee := self.value
-      real-type.check-assign-from(copy self.access, user self)->(
+      self.real-type.check-assign-from(copy self.access, user self)->(
           owner self.value)
-    self.is-primitive := real-type.type-data.is-primitive
-    self.is-dynamic := real-type.type-data.is-dynamic
     self.is-generic := type-instance.type-data is glob.type-generic
   
   func dynamic get-output()->(user Expression output)
@@ -288,16 +284,65 @@ class CallArgument(Argument)
       self.code-node.write-spaces()
   
   func dynamic write()
-    ; [&(]`value`[)][, [&(]`value`_Refman[)]][, [&(]`value`_Dynamic[)]]
-    if self.is-output
+    var Bool get-ref(copy self.is-output and
+        not (self.real-type.type-data is glob.type-string and
+        self.access = Access.RESET))
+    ; [[(void*)]&(]`value`[)]
+    if get-ref
       if self.is-down-cast or self.is-generic
         write(user "(void*)")
       write(user "&(")
     self.value.write-cast()
-    if self.is-output
+    if get-ref
       write(user ")")
     
-    if not self.is-primitive and not self.is-native
+    if self.real-type.type-data is glob.type-array
+      ; , [&(]`value`_Length[)]
+      write(user ", ")
+      if self.is-output
+        write(user "&(")
+      self.value.write-length(user "_Length", copy true)
+      if self.is-output
+        write(user ")")
+      user TypeInstance data-type
+      var Int depth
+      self.real-type.get-array-data-type-depth()->(user data-type, var depth)
+      for n in depth
+        ; , [&(]`value`_Value[_value]_length[)]
+        write(user ", ")
+        if self.is-output
+          write(user "&(")
+        self.value.write()
+        write-array-value-length(copy n)
+        if self.is-output
+          write(user ")")
+      if data-type.type-data is glob.type-string
+        ; , [&(]`value`_String_length[)]
+        write(user ", ")
+        if self.is-output
+          write(user "&(")
+        self.value.write-length(user "_String_length", copy false)
+        if self.is-output
+          write(user ")")
+    
+    else-if self.real-type.type-data is glob.type-string
+      ; , [&(]`value`_Max_length[)], [&(]`value`_Length[)]
+      write(user ", ")
+      if get-ref
+        write(user "&(")
+      self.value.write-length(user "_Max_length", copy true)
+      if get-ref
+        write(user ")")
+      write(user ", ")
+      if self.is-output
+        write(user "&(")
+      self.value.write-length(user "_Length", copy false)
+      if self.is-output
+        write(user ")")
+      
+    
+    if not self.real-type.type-data.is-primitive and not self.is-native
+      ; , [&(]`value`_Refman[)]
       write(user ", ")
       if self.is-output
         write(user "&(")
@@ -305,7 +350,8 @@ class CallArgument(Argument)
       if self.is-output
         write(user ")")
     
-    if self.is-dynamic and not self.is-native
+    if self.real-type.type-data.is-dynamic and not self.is-native
+      ; , [[(void*)]&(]`value`_Dynamic[)]
       write(user ", ")
       if (self.is-output and self.is-down-cast) or self.is-generic
         write(user "(void*)")
@@ -315,6 +361,7 @@ class CallArgument(Argument)
       if self.is-output
         write(user ")")
     else-if self.is-generic
+      ; , [&dynamic_Void|NULL|&`value`_dynamic]
       write(user ", ")
       if self.is-output
         write(user "&dynamic_Void")

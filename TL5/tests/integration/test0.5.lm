@@ -378,22 +378,25 @@ func test-ref-count()
 func remove(owner String s)
     ; remove s
 
+struct Item
+    owner String s
+    
+    new(user String s)
+        s := String{s.length + 1}(user s)
 
 struct Data{Generic}
     weak Generic item
-    weak Array?{Generic} arr
     
     new()
     
-    func set(weak Generic item, weak Array?{Generic} arr) _
+    func set(weak Generic item) _
     
     func get()->(weak Generic item)
         item := self.item
         
-func Data.set(weak Generic item, weak Array?{Generic} arr)
+func Data.set(weak Generic item)
     weak Generic x(weak item)
     self.item := x
-    self.arr := arr
     new Data{Generic} d
     d.item := self.item
     self.item := d.item
@@ -405,24 +408,20 @@ struct Dataset{First:Second:Third}(Data{First})
     new()
         base()
 
-struct MidData{Generic}(Dataset{String:Data{Generic}:Generic})
+struct MidData{Generic}(Dataset{Item:Data{Generic}:Generic})
 
 struct TopData(MidData{TestStruct})
 
-func test-type-parameters(weak String s)
-    var Data{String} d
-    s-var Array{6:String{16}} sarr
-    user String? su
+func test-type-parameters(weak Item s)
+    var Data{Item} d
+    user Item? su
     d.item := s
     s := d.item
-    d.arr := sarr
-    su := d.arr[4]
-    var Array{5:Data{String}} ad
+    var Array{5:Data{Item}} ad
     s := ad[2].item
-    su := ad[2].arr[3]
-    var Data{Data{Data{String}}} dr
+    var Data{Data{Data{Item}}} dr
     s := dr.item.item.item
-    d.set(weak s, weak sarr)
+    d.set(weak s)
     d.get()->(weak s)
     user Data dg(user d)
     assert dg?
@@ -431,7 +430,6 @@ func test-type-parameters(weak String s)
     s-var Data{TestStruct} dt
     s-var TestStruct ts(copy 0, weak _)
     t.item := s
-    t.arr := sarr
     t.second := dt
     t.third := ts
 
@@ -539,14 +537,14 @@ func test-for-each()
         sys.print(user " ")
     sys.println(user "]")
     
-    s-var Container{String} container-last(weak "iii", weak _)
-    s-var Container{String} container-mid(weak "hhh", weak container-last)
-    s-var Container{String} container-first(weak "ggg", weak container-mid)
-    s-var Container{String} container(weak _, weak container-first)
-    owner ContainerIterator{String} iter(owner container.iter())
+    s-var Container{Item} container-last(weak Item(user "iii"), weak _)
+    s-var Container{Item} container-mid(weak Item(user "hhh"), weak container-last)
+    s-var Container{Item} container-first(weak Item(user "ggg"), weak container-mid)
+    s-var Container{Item} container(weak _, weak container-first)
+    owner ContainerIterator{Item} iter(owner container.iter())
     sys.print(user "values[ ")
     for sc in iter
-        sys.print(user sc)
+        sys.print(user sc.s)
         sys.print(user " ")
     sys.println(user "]")
 

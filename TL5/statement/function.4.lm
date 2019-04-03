@@ -459,12 +459,12 @@ class DeclarationArgument(Argument)
     variable := self.variable
   
   func dynamic check-memory(user ReferenceMemoryList refs)
-    if not self.is-output and
-        (self.access = Access.USER or self.access = Access.OWNER)
+    if not self.is-output
       refs.add(user self.variable)
   
   func dynamic write()
     if self.variable.type-instance.type-data is glob.type-func
+      ; Returncode (*[*]`name`)(`arguments`)
       write(user "Returncode (*")
       if self.is-output
         write(user "*")
@@ -472,35 +472,61 @@ class DeclarationArgument(Argument)
       write(user ")")
       self.variable.type-instance.arguments.write()
       return
-    ; `type`[*][*] `name`
-    ; [, Ref_Manager*[*] `name`_Refman]
-    ; [, `type`_Dynamic*[*] `name`_Dynamic]
-    self.variable.type-instance.type-data.write-cname()
-    if not self.variable.type-instance.type-data.is-primitive
-      write(user "*")
+    
+    if self.variable.type-instance.type-data is glob.type-array
+      ; `data-type`*[*] `name`, int[*] `name`_Length
+      user TypeInstance data-type
+      var Int depth
+      self.variable.type-instance.get-array-data-type-depth()->(
+          user data-type, var depth)
+      if data-type.type-data is glob.type-string
+        write(user "char")
+      else
+        data-type.type-data.write-cname()
+      self.write-name-param(user "*", user _)
+      self.write-name-param(user ", int", user "_Length")
+      for n in depth
+        ; , int[*] `name`_Value_length
+        self.write-name-param(user ", int", user _)
+        write-array-value-length(copy n)
+      if data-type.type-data is glob.type-string
+        ; , int*[*] `name`_String_length
+        self.write-name-param(user ", int*", user "_String_length")
+    
+    else-if self.variable.type-instance.type-data is glob.type-string
+      ; char*[*] `name`, int[*] `name`_Max_length, int[*] `name`_Length
+      self.write-name-param(user "char*", user _)
+      self.write-name-param(user ", int", user "_Max_length")
+      self.write-name-param(user ", int", user "_Length")
+    
+    else
+      ; `type`[*][*] `name`
+      self.variable.type-instance.type-data.write-cname()
+      if not self.variable.type-instance.type-data.is-primitive
+        write(user "*")
+      self.write-name-param(user _, user _)
+    
+    if not self.variable.type-instance.type-data.is-primitive and
+        not self.is-native
+      ; , Ref_Manager*[*] `name`_Refman
+      self.write-name-param(user ", Ref_Manager*", user "_Refman")
+    
+    if self.variable.type-instance.type-data.is-dynamic and not self.is-native
+      ; , `type`_Dynamic*[*] `name`_Dynamic
+      write(user ", ")
+      self.variable.type-instance.type-data.write-cname()
+      self.write-name-param(user "_Dynamic*", user "_Dynamic")
+  
+  func inst write-name-param(user String prefix, user String suffix)
+    ; `prefix`[*] `name``suffix`
+    if prefix?
+      write(user prefix)
     if self.is-output
       write(user "*")
     write(user " ")
     write-cname(user self.variable.name)
-    
-    if not self.variable.type-instance.type-data.is-primitive and
-        not self.is-native
-      write(user ", Ref_Manager*")
-      if self.is-output
-        write(user "*")
-      write(user " ")
-      write-cname(user self.variable.name)
-      write(user "_Refman")
-    
-    if self.variable.type-instance.type-data.is-dynamic and not self.is-native
-      write(user ", ")
-      self.variable.type-instance.type-data.write-cname()
-      write(user "_Dynamic*")
-      if self.is-output
-        write(user "*")
-      write(user " ")
-      write-cname(user self.variable.name)
-      write(user "_Dynamic")
+    if suffix?
+      write(user suffix)
 
 
 class DeclarationArgumentFactory(ArgumentFactory)
