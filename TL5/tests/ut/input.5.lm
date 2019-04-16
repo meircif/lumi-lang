@@ -197,6 +197,11 @@ t := tarr[3]
 ; @ c t7
 var Array{3:String{4}} vsa
 user String s(user vsa[2])
+user Array{String} sa(user vsa[4:2])
+; @ g t8
+func fun(var String s)
+    var Char c(copy s[4])
+    user String part(user s[4:2])
 ; @ ec te0
 arr[2
 ; @ ec te1
@@ -290,6 +295,19 @@ class Test
 ; @ g t22
 func fun()->(owner Array{String} astr)
     fun()->(owner astr)
+; @ g t23
+func fun(var String s)
+    var String{12} vars
+    s-var String{12} s-vars
+    owner String owners(owner String{12}())
+    strong String strongs(strong String{12}())
+    user String users(user s)
+    fun(var s)
+    fun(var vars)
+    fun(var s-vars)
+    fun(var owners)
+    fun(var strongs)
+    s.clear()
 ; @ ec te0
 function( copy 1)
 ; @ ec te1
@@ -667,7 +685,7 @@ var Func{()->(var Int x)} fun
 fun := fun0
 ; @@ test-builtin
 ; @ c ti0
-i.str()->(reset ostr)
+i.str(reset ostr)
 ; @ c tb0
 b := true
 ; @ c tb1
@@ -675,11 +693,11 @@ b := false
 ; @ ec c0
 c := EOF
 ; @ c ta0
-i := arr.length
+arr.length()->(var i)
 ; @ c ts0
-i := str.length
+str.length()->(var i)
 ; @ c ts1
-string-clear()->(reset ostr)
+ostr.clear()
 ; @ c ts2
 str.equal(user str)->(var b)
 ; @ c ts3
@@ -687,14 +705,14 @@ str.get(copy i)->(var c)
 ; @ c ts4
 str.set(copy i, copy c)
 ; @ c ts5
-string-append(copy c)->(reset ostr)
+ostr.append(copy c)
 ; @ c ts6
 var String{12} sv
-string-copy(user str)->(reset sv)
+sv.copy(user str)
 ; @ c ts7
-string-concat(user str)->(reset ostr)
+ostr.concat(user str)
 ; @ c ts8
-string-concat-int(copy i)->(reset ostr)
+ostr.concat-int(copy i)
 ; @ c ts9
 str.find(user str)->(var i)
 ; @ c ts10
@@ -702,7 +720,7 @@ str.has(copy c)->(var b)
 ; @ c ts11
 String.set(user str, copy 0, copy 'a')
 ; @ c ts12
-i := str.max-length
+str.max-length()->(var i)
 ; @ c tf0
 file-open-read(user str)->(owner fobj)
 ; @ c tf1
@@ -724,13 +742,13 @@ sys.println(user str)
 ; @ c ty3
 sys.getchar()->(var c, var b)
 ; @ c ty4
-sys.getline()->(reset ostr)
+sys.getline(reset ostr)
 ; @ c ty5
 sys.exit(copy i)
 ; @ c ty6
 sys.system(user str)->(var i)
 ; @ c ty7
-sys.getenv(user str)->(reset ostr, var b)
+sys.getenv(user str, reset ostr)->(var b)
 ; @ c ty8
 sys.stdout.putc(copy c)
 ; @ c ty9
@@ -739,35 +757,35 @@ sys.stdin.getc()->(var c, var b)
 sys.stderr.putc(copy c)
 ; @ ec tes0
 user String? su
-string-clear()->(reset ostr)
+ostr.clear()
 su.set(copy 0, copy 'a')
 ; @ ec tes1
 user String? su
-string-append(copy c)->(reset ostr)
+ostr.append(copy c)
 su.set(copy 0, copy 'a')
 ; @ ec tes2
 user String? su
-string-copy(user str)->(reset ostr)
+ostr.copy(user str)
 su.set(copy 0, copy 'a')
 ; @ ec tes3
 user String? su
-string-concat(user str)->(reset ostr)
+ostr.concat(user str)
 su.set(copy 0, copy 'a')
 ; @ ec tes4
 user String? su
-string-concat-int(copy i)->(reset ostr)
+ostr.concat-int(copy i)
 su.set(copy 0, copy 'a')
 ; @ ec tes5
 user String? su
-i.str()->(reset ostr)
+i.str(reset ostr)
 su.set(copy 0, copy 'a')
 ; @ ec tes6
 user String? su
-sys.getline()->(reset ostr)
+sys.getline(reset ostr)
 su.set(copy 0, copy 'a')
 ; @ ec tes7
 user String? su
-sys.getenv(user str)->(reset ostr, var b)
+sys.getenv(user str, reset ostr)->(var b)
 su.set(copy 0, copy 'a')
 ; @ ec tef0
 var File error
@@ -833,6 +851,7 @@ main
     x := 7
 ; @ tg t7
 var String{12} s
+user String us(user s)
 func fun()
     s.set(copy 0, copy 'a')
 ; @-
@@ -1162,7 +1181,7 @@ func Test.fun()
     self.x := 3
 ; @ g t10
 func Test.fun(user String s)->(var Int x)
-    x := s.length
+    s.length()->(var x)
 struct Test
     var Int x
     func fun(user String s)->(var Int x) _
@@ -1570,7 +1589,7 @@ do
 for n in 5
     i += n
 ; @ c t1
-for n in t.num:str.length + 2
+for n in t.num:str.length() + 2
     i += n
 ; @ c t2
 for ch in str
@@ -1611,6 +1630,10 @@ for n in 6
 user String s(user "text")
 for ch in s
     c := ch
+; @ c t10
+var Array{3:String{4}} sa
+for s in sa
+    s.set(copy 0, copy 'a')
 ; @ ec te0
 for(
 ; @ ec te1
@@ -2823,7 +2846,7 @@ s2 := s
 ; @ ec teu2
 user String? s
 so := _
-i := s.length
+s.length()->(var i)
 ; @ ec teu3
 user String? s
 so := _
@@ -2831,7 +2854,7 @@ String.set(user s, copy 0, copy 'a')
 ; @ ec teu4
 user String? s
 so := _
-b := not (false or s.length > 3)
+b := not (false or s.length() > 3)
 ; @ eg teu5
 func deleting(owner String? s)
 func fun(user String s)
@@ -2894,7 +2917,7 @@ func fun(user String s)
     s.set(copy 0, copy 'a')
 ; @ eg teu14
 func deleting()
-    var Int x(copy String{12}().length)
+    var Int x(copy String{12}().length())
 func fun(user String s)
     deleting()
     s.set(copy 0, copy 'a')

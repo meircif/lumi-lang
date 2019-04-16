@@ -4,11 +4,12 @@ Int external_int = 6;
 
 void* save_s;
 
-Returncode external(Int i, String* s, Int* io, void** n) {
+Returncode external(
+    Int i, char* s, Int s_max_length, Int s_length, Int* io, void** n) {
   *io = i;
   save_s = s;
   *n = save_s;
-  s->values[0] = 'a';
+  s[0] = 'a';
   return ERR;
 }
 

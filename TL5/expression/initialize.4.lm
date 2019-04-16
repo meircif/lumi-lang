@@ -60,12 +60,11 @@ class InitExpression(ModuleTypeExpression)
       self.result-type.type-data.find-meth(user "new")->(user self.constructor)
       if self.constructor?
         self.add-self-and-check(
-            copy self.constructor.arguments.parameters.first.item.access,
-            copy false)
+            copy self.constructor.arguments.parameters.first.item.access)
       else-if self.arguments.parameters.first?
         if self.result-type.type-data is glob.type-string
           self.constructor := glob.string-copy-function
-          self.add-self-and-check(copy Access.RESET, copy true)
+          self.add-self-and-check(copy Access.RESET)
         else
           self.syntax-error(
               user "no constructor for type", user self.result-type.type-data.name)
@@ -97,18 +96,14 @@ class InitExpression(ModuleTypeExpression)
         self.assign-expression.reset-value(user param.get-output())
         self.assign-expression.analyze()
   
-  func inst add-self-and-check(copy Int access, copy Bool is-output)
+  func inst add-self-and-check(copy Int access)
     new CallArgument self-param
     self-param.set-location()
-    self-param.is-output := is-output
+    self-param.is-output := false
     self-param.access := access
     self-param.code-node := self.code-node
     self.aux-variable.copy-new()->(owner self-param.value)
-    self-param.value.access := access
-    if is-output
-      self.arguments.outputs.prepend(owner self-param)
-    else
-      self.arguments.parameters.prepend(owner self-param)
+    self.arguments.parameters.prepend(owner self-param)
     self.arguments.check-same-as(
         user self.constructor.arguments,
         user self.result-type,
@@ -146,9 +141,9 @@ class InitExpression(ModuleTypeExpression)
       self.write-init-var-ref(user self.aux-variable)
       return
     
-    ; INIT_REFMAN(`line`, `cleanup`, `aux-variable`, false)
-    self.write-macro-init(user "INIT_REFMAN", user self.aux-variable)
-    write(user ", false)\n")
+    ; INIT_VAR_REFMAN(`line`, `cleanup`, `aux-variable`)
+    self.write-macro-init(user "INIT_VAR_REFMAN", user self.aux-variable)
+    write(user ")\n")
   
   func inst write-new-init()
     if self.result-type.type-data is glob.type-array

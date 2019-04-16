@@ -217,7 +217,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     self.block.write-block-end()
   
   func inst write-seq()
-    ; {int `item`_Index; for (`item`_Index = 0; `item`_Index < `iterator`->length; ++`item`_Index) {
+    ; {int `item`_Index; for (`item`_Index = 0; `item`_Index < `iterator`_Length; ++`item`_Index) {
     ;   `item` = `aux-var`[`item`_Index];
     ;   `block...`
     ; }}
@@ -232,7 +232,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     write-cname(user self.item.name)
     write(user "_Index < ")
     self.aux-variable.write()
-    write(user "->length; ++")
+    write(user "_Length; ++")
     write-cname(user self.item.name)
     write(user "_Index) {\n")
     

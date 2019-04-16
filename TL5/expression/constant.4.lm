@@ -133,6 +133,7 @@ class StringExpression(TextExpression)
     self.check-string(user text)
     self.set-simple-type(user glob.type-string)
     self.access := Access.S-VAR
+    self.is-var := true
     self.text := text
     self.strip-multilines()
   
@@ -172,7 +173,8 @@ class StringExpression(TextExpression)
       self.text.length := index-write
   
   func dynamic analyze()
-    self.add-aux-variable(copy Access.VAR, copy false, user self.result-type)->(
+    self.add-aux-variable(
+        copy Access.VAR, copy false, user self.result-type)->(
         owner self.aux-variable)
     self.result-type.reference-path := ReferencePath(
         user self.aux-variable.variable)

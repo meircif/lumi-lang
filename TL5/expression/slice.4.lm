@@ -66,6 +66,7 @@ class SliceExpression(Expression)
         self.access := Access.S-VAR
       else
         self.access := Access.VAR
+      self.is-var := true
       if self.result-type.type-data is glob.type-array or
           self.result-type.type-data is glob.type-string
         self.add-aux-variable(
@@ -105,8 +106,8 @@ class SliceExpression(Expression)
       self.sequence.write-check-ref()
       self.code-node.write-spaces()
     
-    ; if (index < 0 || index >= `seq`_length)
-    ; if (index < 0 || second < 0 || index + second > `seq`_length)
+    ; if (index < 0 || index >= [*]`seq`_Length)
+    ; if (index < 0 || second < 0 || index + second > [*]`seq`_Length)
     ;     RAISE(`slice_index`)
     write(user "if (")
     self.index.write-safe()
@@ -125,7 +126,11 @@ class SliceExpression(Expression)
         self.sequence.result-type.length?
       self.sequence.result-type.length.write()
     else
-      self.sequence.write-safe()
+      if self.sequence.result-type.type-data is glob.type-string and
+          access-is-only-var(copy self.sequence.access) and
+          not self.sequence.is-var
+        write(user "*")
+      self.sequence.write()
       write(user "_Length")
     write(user ") ")
     self.code-node.write-raise(user "slice_index")
@@ -148,7 +153,7 @@ class SliceExpression(Expression)
       write(user ";\n")
       self.code-node.write-spaces()
       if self.sequence.result-type.type-data is glob.type-string
-        ; symbol_Max_length = symbol_Length + 1;
+        ; symbol_Max_length = symbol_Length;
         self.slice-variable.write()
         write(user "_Max_length = ")
         self.slice-variable.write()

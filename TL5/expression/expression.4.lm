@@ -79,6 +79,7 @@ class Expression(SyntaxTreeNode)
   var Bool is-statement
   var Bool is-generic-cast
   var Bool is-complex-field
+  var Bool is-var
 
   new(user SyntaxTreeCode code-node)
     self.set-location()

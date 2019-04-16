@@ -395,6 +395,8 @@ class VariableInit(SyntaxTreeCode)
     variable.type-instance.copy-new()->(
         owner self.expression-init.aux-variable.result-type)
     self.expression-init.aux-variable.access := variable.access
+    self.expression-init.aux-variable.is-var :=
+        access-is-only-var(copy variable.access) and variable.is-create
   
   func dynamic analyze()
     if self.parent is glob.root.global-init

@@ -355,6 +355,7 @@ struct TypeInstance
     depth := 0
     do
       while data-type.type-data is glob.type-array
+      while data-type.parameters?
       data-type := data-type.parameters.first.item
       while data-type.type-data is glob.type-array or
           data-type.type-data is glob.type-string

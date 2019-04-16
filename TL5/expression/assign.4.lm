@@ -87,15 +87,27 @@ class AssignExpression(Expression)
     var Int depth
     self.target.result-type.get-array-data-type-depth()->(
         user data-type, var depth)
+    user TypeInstance sequence-type(user self.value.result-type)
     for n in depth
       self.target.write()
-      write-array-value-length(copy depth)
+      write-array-value-length(copy n)
       write(user " = ")
+      if sequence-type?
+        if sequence-type.parameters?
+          sequence-type := sequence-type.parameters.first.item
+        else
+          sequence-type := _
+      var Bool is-const-length
+      if sequence-type?
+        if sequence-type.length?
+          is-const-length := sequence-type.length.constant
       if self.value.result-type.type-data is glob.type-empty
         write(user "0")
+      else-if is-const-length
+        sequence-type.length.write()
       else
         self.value.write()
-        write-array-value-length(copy depth)
+        write-array-value-length(copy n)
       write(user ";\n")
       self.code-node.write-spaces()
     
@@ -115,6 +127,8 @@ class AssignExpression(Expression)
     
     self.target.write()
     write(user "_Length = ")
+    if access-is-only-var(copy self.value.access) and not self.value.is-var
+      write(user "*")
     self.value.write-length(user "_Length", copy false)
     write(user ";\n")
     self.code-node.write-spaces()
@@ -253,7 +267,7 @@ class AssignExpression(Expression)
     if access-is-owner(copy self.target.access)
       self.assigned-value-variable.write()
     else
-      self.value.write()
+      self.value.write-cast()
     write(user ";\n")
     if access-is-owner(copy self.target.access)
       self.write-owner-null()
