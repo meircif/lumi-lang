@@ -27,7 +27,7 @@ Sys* sys = NULL;
 Ref_Manager* sys_Refman = NULL;
 
 #define ERROR_MESAGE(field, message) \
-  {message, sizeof(message), \
+  {message, sizeof(message) - 1, \
    {1, &(LUMI_error_messages.field.str), &(LUMI_error_messages.field.str)}}
 
 Error_Messages LUMI_error_messages = {
@@ -818,7 +818,7 @@ int set_sys(int argc, char* argv[]) {
   sys->stdin_Cname->fobj = stdin;
   sys->stderr_Cname->fobj = stderr;
   for (arg = 0; arg < argc; ++arg) {
-    strncpy(sys->argv + sys->argv_Length * arg, argv[arg], sys->argv_Length);
+    strncpy(sys->argv + sys->argv_Value_length * arg, argv[arg], sys->argv_Length);
   }
   return OK;
 }

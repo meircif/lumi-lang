@@ -382,11 +382,7 @@ class DeclarationArgument(Argument)
   
   func dynamic copy-new()->(owner DeclarationArgument new-argument)
     new-argument := DeclarationArgument()
-    new-argument.input-file-name := self.input-file-name
-    new-argument.line-number := self.line-number
-    new-argument.access := self.access
-    new-argument.is-output := self.is-output
-    new-argument.is-native := self.is-native
+    self.copy(user new-argument)
     new-argument.variable := SyntaxTreeVariable(user _)
     new-argument.variable.access := self.variable.access
     new-argument.variable.parent-type := self.variable.parent-type

@@ -180,13 +180,16 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     else
       self.write-spaces()
     write(user "LUMI_")
-    if access-is-only-var(copy variable.access)
+    if access-is-only-var(copy variable.access) and variable.is-create
       write(user "var_")
     else-if access-is-owner(copy variable.access)
       write(user "owner_")
     write(user "dec_ref(")
     if type-data?
       write(user "self->")
+    if item-type-data is glob.type-string and
+        access-is-only-var(copy variable.access) and not variable.is-create
+      write(user "*")
     write-cname(user variable.name)
     write(user "_Refman);\n")
   

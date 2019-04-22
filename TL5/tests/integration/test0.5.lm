@@ -382,7 +382,7 @@ struct Item
     owner String s
     
     new(user String s)
-        s := String{s.length() + 1}(user s)
+        self.s := String{s.length() + 1}(user s)
 
 struct Data{Generic}
     weak Generic item

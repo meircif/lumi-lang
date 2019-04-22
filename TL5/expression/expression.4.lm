@@ -256,6 +256,8 @@ class Expression(SyntaxTreeNode)
     type-instance.copy-new()->(owner expression.result-type)
     expression.access := access
     expression.assignable := true
+    expression.is-string-var-ref := access-is-only-var(copy self.access) and
+        type-instance.type-data is glob.type-string
     self.code-node.parent.add-aux-variable(
         copy access, copy is-create, user type-instance)->(
         user expression.variable)

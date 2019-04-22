@@ -174,10 +174,8 @@ class StringExpression(TextExpression)
   
   func dynamic analyze()
     self.add-aux-variable(
-        copy Access.VAR, copy false, user self.result-type)->(
+        copy Access.USER, copy false, user self.result-type)->(
         owner self.aux-variable)
-    self.result-type.reference-path := ReferencePath(
-        user self.aux-variable.variable)
   
   func dynamic write-preactions()
     ; INIT_STRING_CONST(`line`, `cleanup`, `symbol`, `text`)

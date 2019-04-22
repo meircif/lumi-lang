@@ -199,9 +199,13 @@ var Array{3:String{4}} vsa
 user String s(user vsa[2])
 user Array{String} sa(user vsa[4:2])
 ; @ g t8
-func fun(var String s)
-    var Char c(copy s[4])
+func fun(s-var String s, strong Array{String} sa)
+    var Char c(copy s[5])
     user String part(user s[4:2])
+    part := sa[3]
+; @ c t9
+strong Array?{String} sa
+sa[3].copy(user "text")
 ; @ ec te0
 arr[2
 ; @ ec te1
@@ -2910,11 +2914,11 @@ func fun(user String s)
     deleting()
     s.set(copy 0, copy 'a')
 ; @ eg teu13
-func deleting()
-    user String s(user "I am a string")
-func fun(user String s)
-    deleting()
-    s.set(copy 0, copy 'a')
+func deleting(var String s)
+    s.clear()
+func fun(user String us, var String vs)
+    deleting(var vs)
+    us.set(copy 0, copy 'a')
 ; @ eg teu14
 func deleting()
     var Int x(copy String{12}().length())

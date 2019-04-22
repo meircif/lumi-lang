@@ -60,13 +60,12 @@ class SliceExpression(Expression)
           copy self.access, copy false, user self.result-type)->(
           owner self.slice-variable)
     else
-      if not self.assignable and
-          access-is-weak(copy self.sequence.access) and
-          not self.result-type.type-data is glob.type-string
+      if self.assignable or self.sequence.access = Access.OWNER
+        self.access := Access.VAR
+      else-if self.sequence.access = Access.STRONG
         self.access := Access.S-VAR
       else
-        self.access := Access.VAR
-      self.is-var := true
+        self.access := self.sequence.access
       if self.result-type.type-data is glob.type-array or
           self.result-type.type-data is glob.type-string
         self.add-aux-variable(
@@ -160,10 +159,15 @@ class SliceExpression(Expression)
         write(user "_Length;\n")
         self.code-node.write-spaces()
       ; symbol_Refman = seq_Refman;
+      ; LUMI_inc_ref(symbol_Refman);
       self.slice-variable.write-refman()
       write(user " = ")
       self.sequence.write-refman()
       write(user ";\n")
+      self.code-node.write-spaces()
+      write(user "LUMI_inc_ref(")
+      self.slice-variable.write-refman()
+      write(user ");\n")
     
     else-if self.result-type.type-data is glob.type-array
       ; todo...
@@ -181,12 +185,19 @@ class SliceExpression(Expression)
       write(user ";\n")
       self.code-node.write-spaces()
       ; symbol_Length = seq_String_length[index];
+      ; symbol_Length = seq_String_length + index;
       self.slice-variable.write()
       write(user "_Length = ")
       self.sequence.write()
-      write(user "_String_length[")
+      write(user "_String_length")
+      if access-is-only-var(copy self.access)
+        write(user " + ")
+      else
+        write(user "[")
       self.index.write()
-      write(user "];\n")
+      if not access-is-only-var(copy self.access)
+        write(user "]")
+      write(user ";\n")
       self.code-node.write-spaces()
       ; symbol = (seq) + (index) * symbol_Max_length;
       self.slice-variable.write()
@@ -198,11 +209,20 @@ class SliceExpression(Expression)
       self.slice-variable.write()
       write(user "_Max_length;\n")
       self.code-node.write-spaces()
-      ; symbol_Refman = seq_Refman;
-      self.slice-variable.write-refman()
-      write(user " = ")
-      self.sequence.write-refman()
+      ; symbol_Refman = [&]seq_Refman;
+      ; LUMI_inc_ref(symbol_Refman);
+      self.slice-variable.write()
+      write(user "_Refman = ")
+      if access-is-only-var(copy self.access)
+        write(user "&")
+        self.sequence.write-refman-safe()
+      else
+        self.sequence.write-refman()
       write(user ";\n")
+      self.code-node.write-spaces()
+      write(user "LUMI_inc_ref(")
+      self.slice-variable.write-refman()
+      write(user ");\n")
   
   func dynamic write()
     if self.slice-variable?

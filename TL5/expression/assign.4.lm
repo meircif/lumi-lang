@@ -1,7 +1,7 @@
 ~~~ TL5 compiler - assign expression ~~~
 module tl5-compiler
 
-~~~ Assign call expression ~~~
+~~~ Assign expression (:=) ~~~
 class AssignExpression(Expression)
   owner VariableExpression assigned-value-variable
   user Expression target

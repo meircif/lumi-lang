@@ -220,6 +220,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     ; Returncode (**`name`)(`arguments`)[ = NULL];
     var Bool is-new-var(
         copy access-is-only-var(copy self.access) and self.is-create)
+    var Bool is-string-aux-var(copy access-is-only-var(copy self.access) and
+        self.type-instance.type-data is glob.type-string and not self.is-create)
     user TypeInstance data-type
     var Int sequence-depth
     self.type-instance.get-array-data-type-depth()->(
@@ -256,10 +258,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     write(user ";\n")
     
     if not is-new-var
-      ; int `name`_Length[ = 0];
+      ; int[*] `name`_Length[ = 0|NULL];
       ; int `name`_Max_length[ = 0];
       self.write-spaces()
-      write(user "int ")
+      write(user "int")
+      write(user " ")
       self.write-cname()
       write(user "_")
       if self.type-instance.type-data is glob.type-string
@@ -286,7 +289,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       ; int* `name`_String_length[ = NULL];
       self.write-spaces()
       write(user "int")
-      if not is-new-var and sequence-depth > 0
+      if (not is-new-var and sequence-depth > 0) or is-string-aux-var
         write(user "*")
       write(user " ")
       self.write-cname()
@@ -305,7 +308,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         write(user "]")
       if not self.parent-type?
         write(user " = ")
-        if sequence-depth = 0
+        if sequence-depth = 0 and not is-string-aux-var
           write(user "0")
         else-if is-new-var
           write(user "{0}")
@@ -342,7 +345,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func inst write-refman()
     self.write-spaces()
-    write(user "Ref_Manager* ")
+    write(user "Ref_Manager*")
+    if self.type-instance.type-data is glob.type-string and
+        access-is-only-var(copy self.access) and not self.is-create
+      write(user "*")
+    write(user " ")
     self.write-cname()
     write(user "_Refman")
     if not self.parent-type?
