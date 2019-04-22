@@ -16,11 +16,11 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Werror -Wall"
-CCA="$CCW --pedantic -Wno-unused-label -Wno-unused-variable"
+CCA="$CCW --pedantic -Wno-unused-label -Wno-unused-variable -Wno-missing-braces"
 if [ $CC == "gcc" ]; then
   CCA="$CCA -Wno-unused-but-set-variable"
 else
-  CCA="$CCA -Wno-self-assign -Wno-missing-braces"
+  CCA="$CCA -Wno-self-assign"
 fi
 
 rm -rf $DIR/.test/TL5
