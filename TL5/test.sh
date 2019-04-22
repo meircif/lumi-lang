@@ -20,7 +20,7 @@ CCA="$CCW --pedantic -Wno-unused-label -Wno-unused-variable"
 if [ $CC == "gcc" ]; then
   CCA="$CCA -Wno-unused-but-set-variable"
 else
-  CCA="$CCA -Wno-self-assign"
+  CCA="$CCA -Wno-self-assign -Wno-missing-braces"
 fi
 
 rm -rf $DIR/.test/TL5
