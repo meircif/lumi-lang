@@ -67,14 +67,13 @@ typedef struct {
 } Error_Messages;
 
 extern Error_Messages LUMI_error_messages;
-
-
 extern char* LUMI_raise_format;
 extern char* LUMI_assert_format;
 extern char* LUMI_traceline_format;
 extern int LUMI_trace_ignore_count;
 extern char* LUMI_expected_error;
 extern int LUMI_expected_error_trace_ignore_count;
+
 void LUMI_trace_print(
   char const* format,
   char const* filename,

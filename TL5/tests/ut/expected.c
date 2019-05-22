@@ -589,8 +589,8 @@ Ref_Manager* aux_Ref_Manager = NULL;
     aux_Ref_Manager = NULL;
     ut_M_t = ut_M_tarr + 3;
 /// @ t7
-char vsa[3 * 4] = {0};
-    int vsa_String_length[3] = {0};
+char vsa[8 * 5] = {0};
+    int vsa_String_length[8] = {0};
     Ref_Manager* vsa_Refman = NULL;
     char* s = NULL;
     int s_Max_length = 0;
@@ -612,10 +612,10 @@ char vsa[3 * 4] = {0};
     Ref_Manager* aux_Array_0_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     INIT_VAR_REFMAN(1, LUMI_block0_cleanup, vsa)
-    if (2 < 0 || 2 >= 3) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_String_0_Max_length = 4;
-    aux_String_0_Length = vsa_String_length + 2;
-    aux_String_0 = vsa + 2 * aux_String_0_Max_length;
+    if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_String_0 = vsa + 3 * 5;
+    aux_String_0_Max_length = 5;
+    aux_String_0_Length = vsa_String_length + 3;
     aux_String_0_Refman = &vsa_Refman;
     LUMI_inc_ref(*aux_String_0_Refman);
     aux_Ref_Manager = s_Refman;
@@ -623,12 +623,14 @@ char vsa[3 * 4] = {0};
     LUMI_inc_ref(s_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
-    s_Max_length = 4;
+    s_Max_length = 5;
     s_Length = *aux_String_0_Length;
     s = aux_String_0;
-    if (4 < 0 || 2 < 0 || 4 + 2 > 3) RAISE(3, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = vsa + 4;
-    aux_Array_0_Length = 2;
+    if (2 < 0 || 4 < 0 || 2 + 4 > 8) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = vsa + 2 * 5;
+    aux_Array_0_Length = 4;
+    aux_Array_0_Value_length = 5;
+    aux_Array_0_String_length = vsa_String_length + 2;
     aux_Array_0_Refman = vsa_Refman;
     LUMI_inc_ref(aux_Array_0_Refman);
     aux_Ref_Manager = sa_Refman;
@@ -637,7 +639,7 @@ char vsa[3 * 4] = {0};
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
     sa_Length = aux_Array_0_Length;
-    sa_Value_length = 4;
+    sa_Value_length = 5;
     sa_String_length = aux_Array_0_String_length;
     sa = aux_Array_0;
 /// @ t8
@@ -676,9 +678,9 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager** s_Re
     part_Length = aux_String_0_Length;
     part = aux_String_0;
     if (3 < 0 || 3 >= sa_Length) RAISE(4, LUMI_block0_cleanup, slice_index)
+    aux_String_1 = sa + 3 * sa_Value_length;
     aux_String_1_Max_length = sa_Value_length;
     aux_String_1_Length = sa_String_length + 3;
-    aux_String_1 = sa + 3 * aux_String_1_Max_length;
     aux_String_1_Refman = &sa_Refman;
     LUMI_inc_ref(*aux_String_1_Refman);
     aux_Ref_Manager = part_Refman;
@@ -715,14 +717,398 @@ char* sa = NULL;
     Ref_Manager** aux_String_1_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, sa, sa_Refman)
     if (3 < 0 || 3 >= sa_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_String_1 = sa + 3 * sa_Value_length;
     aux_String_1_Max_length = sa_Value_length;
     aux_String_1_Length = sa_String_length + 3;
-    aux_String_1 = sa + 3 * aux_String_1_Max_length;
     aux_String_1_Refman = &sa_Refman;
     LUMI_inc_ref(*aux_String_1_Refman);
     INIT_STRING_CONST(2, LUMI_block0_cleanup, aux_String_0, "text");
     LUMI_err = String_copy(aux_String_1, aux_String_1_Max_length, aux_String_1_Length, &(*aux_String_1_Refman), aux_String_0, aux_String_0_Max_length, aux_String_0_Length, aux_String_0_Refman);
     CHECK(2, LUMI_block0_cleanup)
+/// @ t10
+Int* aai = NULL;
+    int aai_Length = 0;
+    int aai_Value_length = 0;
+    Ref_Manager* aai_Refman = NULL;
+    Int* ua = NULL;
+    int ua_Length = 0;
+    int ua_Value_length = 0;
+    Ref_Manager* ua_Refman = NULL;
+    Int* aux_Array_0 = NULL;
+    int aux_Array_0_Length = 0;
+    Ref_Manager* aux_Array_0_Refman = NULL;
+    Int* aux_Array_1 = NULL;
+    int aux_Array_1_Length = 0;
+    int aux_Array_1_Value_length = 0;
+    Ref_Manager* aux_Array_1_Refman = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, aai, aai_Refman)
+    if (3 < 0 || 3 >= aai_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = aai + 3 * aai_Value_length;
+    aux_Array_0_Length = aai_Value_length;
+    aux_Array_0_Refman = aai_Refman;
+    LUMI_inc_ref(aux_Array_0_Refman);
+    aux_Ref_Manager = ut_M_arr_Refman;
+    ut_M_arr_Refman = aux_Array_0_Refman;
+    LUMI_inc_ref(ut_M_arr_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    ut_M_arr_Length = aux_Array_0_Length;
+    ut_M_arr = aux_Array_0;
+    CHECK_REF(3, LUMI_block0_cleanup, aai, aai_Refman)
+    if (2 < 0 || 4 < 0 || 2 + 4 > aai_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_Array_1 = aai + 2 * aai_Value_length;
+    aux_Array_1_Length = 4;
+    aux_Array_1_Value_length = aai_Value_length;
+    aux_Array_1_Refman = aai_Refman;
+    LUMI_inc_ref(aux_Array_1_Refman);
+    aux_Ref_Manager = ua_Refman;
+    ua_Refman = aux_Array_1_Refman;
+    LUMI_inc_ref(ua_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    ua_Length = aux_Array_1_Length;
+    ua_Value_length = aux_Array_1_Value_length;
+    ua = aux_Array_1;
+/// @ t11
+Int* aai = NULL;
+    int aai_Length = 0;
+    int aai_Value_length = 0;
+    int aai_Value_value_length = 0;
+    int aai_Value_value_value_length = 0;
+    Ref_Manager* aai_Refman = NULL;
+    Int* ua = NULL;
+    int ua_Length = 0;
+    int ua_Value_length = 0;
+    int ua_Value_value_length = 0;
+    Ref_Manager* ua_Refman = NULL;
+    Int* uaa = NULL;
+    int uaa_Length = 0;
+    int uaa_Value_length = 0;
+    int uaa_Value_value_length = 0;
+    int uaa_Value_value_value_length = 0;
+    Ref_Manager* uaa_Refman = NULL;
+    Int* aux_Array_0 = NULL;
+    int aux_Array_0_Length = 0;
+    int aux_Array_0_Value_length = 0;
+    int aux_Array_0_Value_value_length = 0;
+    Ref_Manager* aux_Array_0_Refman = NULL;
+    Int* aux_Array_1 = NULL;
+    int aux_Array_1_Length = 0;
+    int aux_Array_1_Value_length = 0;
+    int aux_Array_1_Value_value_length = 0;
+    int aux_Array_1_Value_value_value_length = 0;
+    Ref_Manager* aux_Array_1_Refman = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, aai, aai_Refman)
+    if (3 < 0 || 3 >= aai_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = aai + 3 * aai_Value_length * aai_Value_value_length * aai_Value_value_value_length;
+    aux_Array_0_Length = aai_Value_length;
+    aux_Array_0_Value_length = aai_Value_value_length;
+    aux_Array_0_Value_value_length = aai_Value_value_value_length;
+    aux_Array_0_Refman = aai_Refman;
+    LUMI_inc_ref(aux_Array_0_Refman);
+    aux_Ref_Manager = ua_Refman;
+    ua_Refman = aux_Array_0_Refman;
+    LUMI_inc_ref(ua_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    ua_Length = aux_Array_0_Length;
+    ua_Value_length = aux_Array_0_Value_length;
+    ua_Value_value_length = aux_Array_0_Value_value_length;
+    ua = aux_Array_0;
+    CHECK_REF(3, LUMI_block0_cleanup, aai, aai_Refman)
+    if (2 < 0 || 4 < 0 || 2 + 4 > aai_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_Array_1 = aai + 2 * aai_Value_length * aai_Value_value_length * aai_Value_value_value_length;
+    aux_Array_1_Length = 4;
+    aux_Array_1_Value_length = aai_Value_length;
+    aux_Array_1_Value_value_length = aai_Value_value_length;
+    aux_Array_1_Value_value_value_length = aai_Value_value_value_length;
+    aux_Array_1_Refman = aai_Refman;
+    LUMI_inc_ref(aux_Array_1_Refman);
+    aux_Ref_Manager = uaa_Refman;
+    uaa_Refman = aux_Array_1_Refman;
+    LUMI_inc_ref(uaa_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    uaa_Length = aux_Array_1_Length;
+    uaa_Value_length = aux_Array_1_Value_length;
+    uaa_Value_value_length = aux_Array_1_Value_value_length;
+    uaa_Value_value_value_length = aux_Array_1_Value_value_value_length;
+    uaa = aux_Array_1;
+/// @ t12
+char* aas = NULL;
+    int aas_Length = 0;
+    int aas_Value_length = 0;
+    int aas_Value_value_length = 0;
+    int aas_Value_value_value_length = 0;
+    int* aas_String_length = NULL;
+    Ref_Manager* aas_Refman = NULL;
+    char* ua = NULL;
+    int ua_Length = 0;
+    int ua_Value_length = 0;
+    int ua_Value_value_length = 0;
+    int* ua_String_length = NULL;
+    Ref_Manager* ua_Refman = NULL;
+    char* uaa = NULL;
+    int uaa_Length = 0;
+    int uaa_Value_length = 0;
+    int uaa_Value_value_length = 0;
+    int uaa_Value_value_value_length = 0;
+    int* uaa_String_length = NULL;
+    Ref_Manager* uaa_Refman = NULL;
+    char* aux_Array_0 = NULL;
+    int aux_Array_0_Length = 0;
+    int aux_Array_0_Value_length = 0;
+    int aux_Array_0_Value_value_length = 0;
+    int* aux_Array_0_String_length = NULL;
+    Ref_Manager* aux_Array_0_Refman = NULL;
+    char* aux_Array_1 = NULL;
+    int aux_Array_1_Length = 0;
+    int aux_Array_1_Value_length = 0;
+    int aux_Array_1_Value_value_length = 0;
+    int aux_Array_1_Value_value_value_length = 0;
+    int* aux_Array_1_String_length = NULL;
+    Ref_Manager* aux_Array_1_Refman = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, aas, aas_Refman)
+    if (3 < 0 || 3 >= aas_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = aas + 3 * aas_Value_length * aas_Value_value_length * aas_Value_value_value_length;
+    aux_Array_0_Length = aas_Value_length;
+    aux_Array_0_Value_length = aas_Value_value_length;
+    aux_Array_0_Value_value_length = aas_Value_value_value_length;
+    aux_Array_0_String_length = aas_String_length + 3 * aas_Value_length * aas_Value_value_length;
+    aux_Array_0_Refman = aas_Refman;
+    LUMI_inc_ref(aux_Array_0_Refman);
+    aux_Ref_Manager = ua_Refman;
+    ua_Refman = aux_Array_0_Refman;
+    LUMI_inc_ref(ua_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    ua_Length = aux_Array_0_Length;
+    ua_Value_length = aux_Array_0_Value_length;
+    ua_Value_value_length = aux_Array_0_Value_value_length;
+    ua_String_length = aux_Array_0_String_length;
+    ua = aux_Array_0;
+    CHECK_REF(3, LUMI_block0_cleanup, aas, aas_Refman)
+    if (2 < 0 || 4 < 0 || 2 + 4 > aas_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_Array_1 = aas + 2 * aas_Value_length * aas_Value_value_length * aas_Value_value_value_length;
+    aux_Array_1_Length = 4;
+    aux_Array_1_Value_length = aas_Value_length;
+    aux_Array_1_Value_value_length = aas_Value_value_length;
+    aux_Array_1_Value_value_value_length = aas_Value_value_value_length;
+    aux_Array_1_String_length = aas_String_length + 2 * aas_Value_length * aas_Value_value_length;
+    aux_Array_1_Refman = aas_Refman;
+    LUMI_inc_ref(aux_Array_1_Refman);
+    aux_Ref_Manager = uaa_Refman;
+    uaa_Refman = aux_Array_1_Refman;
+    LUMI_inc_ref(uaa_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    uaa_Length = aux_Array_1_Length;
+    uaa_Value_length = aux_Array_1_Value_length;
+    uaa_Value_value_length = aux_Array_1_Value_value_length;
+    uaa_Value_value_value_length = aux_Array_1_Value_value_value_length;
+    uaa_String_length = aux_Array_1_String_length;
+    uaa = aux_Array_1;
+/// @ t13
+Int aai[8 * 7 * 6 * 5] = {0};
+    Ref_Manager* aai_Refman = NULL;
+    Int* ua = NULL;
+    int ua_Length = 0;
+    int ua_Value_length = 0;
+    int ua_Value_value_length = 0;
+    Ref_Manager* ua_Refman = NULL;
+    Int* uaa = NULL;
+    int uaa_Length = 0;
+    int uaa_Value_length = 0;
+    int uaa_Value_value_length = 0;
+    int uaa_Value_value_value_length = 0;
+    Ref_Manager* uaa_Refman = NULL;
+    Int* aux_Array_0 = NULL;
+    int aux_Array_0_Length = 0;
+    int aux_Array_0_Value_length = 0;
+    int aux_Array_0_Value_value_length = 0;
+    Ref_Manager* aux_Array_0_Refman = NULL;
+    Int* aux_Array_1 = NULL;
+    int aux_Array_1_Length = 0;
+    int aux_Array_1_Value_length = 0;
+    int aux_Array_1_Value_value_length = 0;
+    int aux_Array_1_Value_value_value_length = 0;
+    Ref_Manager* aux_Array_1_Refman = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, aai)
+    if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = aai + 3 * 7 * 6 * 5;
+    aux_Array_0_Length = 7;
+    aux_Array_0_Value_length = 6;
+    aux_Array_0_Value_value_length = 5;
+    aux_Array_0_Refman = aai_Refman;
+    LUMI_inc_ref(aux_Array_0_Refman);
+    aux_Ref_Manager = ua_Refman;
+    ua_Refman = aux_Array_0_Refman;
+    LUMI_inc_ref(ua_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    ua_Length = 7;
+    ua_Value_length = 6;
+    ua_Value_value_length = 5;
+    ua = aux_Array_0;
+    if (2 < 0 || 4 < 0 || 2 + 4 > 8) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_Array_1 = aai + 2 * 7 * 6 * 5;
+    aux_Array_1_Length = 4;
+    aux_Array_1_Value_length = 7;
+    aux_Array_1_Value_value_length = 6;
+    aux_Array_1_Value_value_value_length = 5;
+    aux_Array_1_Refman = aai_Refman;
+    LUMI_inc_ref(aux_Array_1_Refman);
+    aux_Ref_Manager = uaa_Refman;
+    uaa_Refman = aux_Array_1_Refman;
+    LUMI_inc_ref(uaa_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    uaa_Length = aux_Array_1_Length;
+    uaa_Value_length = 7;
+    uaa_Value_value_length = 6;
+    uaa_Value_value_value_length = 5;
+    uaa = aux_Array_1;
+/// @ t14
+char aas[8 * 7 * 6 * 5] = {0};
+    int aas_String_length[8 * 7 * 6] = {0};
+    Ref_Manager* aas_Refman = NULL;
+    char* ua = NULL;
+    int ua_Length = 0;
+    int ua_Value_length = 0;
+    int ua_Value_value_length = 0;
+    int* ua_String_length = NULL;
+    Ref_Manager* ua_Refman = NULL;
+    char* uaa = NULL;
+    int uaa_Length = 0;
+    int uaa_Value_length = 0;
+    int uaa_Value_value_length = 0;
+    int uaa_Value_value_value_length = 0;
+    int* uaa_String_length = NULL;
+    Ref_Manager* uaa_Refman = NULL;
+    char* aux_Array_0 = NULL;
+    int aux_Array_0_Length = 0;
+    int aux_Array_0_Value_length = 0;
+    int aux_Array_0_Value_value_length = 0;
+    int* aux_Array_0_String_length = NULL;
+    Ref_Manager* aux_Array_0_Refman = NULL;
+    char* aux_Array_1 = NULL;
+    int aux_Array_1_Length = 0;
+    int aux_Array_1_Value_length = 0;
+    int aux_Array_1_Value_value_length = 0;
+    int aux_Array_1_Value_value_value_length = 0;
+    int* aux_Array_1_String_length = NULL;
+    Ref_Manager* aux_Array_1_Refman = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, aas)
+    if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = aas + 3 * 7 * 6 * 5;
+    aux_Array_0_Length = 7;
+    aux_Array_0_Value_length = 6;
+    aux_Array_0_Value_value_length = 5;
+    aux_Array_0_String_length = aas_String_length + 3 * 7 * 6;
+    aux_Array_0_Refman = aas_Refman;
+    LUMI_inc_ref(aux_Array_0_Refman);
+    aux_Ref_Manager = ua_Refman;
+    ua_Refman = aux_Array_0_Refman;
+    LUMI_inc_ref(ua_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    ua_Length = 7;
+    ua_Value_length = 6;
+    ua_Value_value_length = 5;
+    ua_String_length = aux_Array_0_String_length;
+    ua = aux_Array_0;
+    if (2 < 0 || 4 < 0 || 2 + 4 > 8) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_Array_1 = aas + 2 * 7 * 6 * 5;
+    aux_Array_1_Length = 4;
+    aux_Array_1_Value_length = 7;
+    aux_Array_1_Value_value_length = 6;
+    aux_Array_1_Value_value_value_length = 5;
+    aux_Array_1_String_length = aas_String_length + 2 * 7 * 6;
+    aux_Array_1_Refman = aas_Refman;
+    LUMI_inc_ref(aux_Array_1_Refman);
+    aux_Ref_Manager = uaa_Refman;
+    uaa_Refman = aux_Array_1_Refman;
+    LUMI_inc_ref(uaa_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    uaa_Length = aux_Array_1_Length;
+    uaa_Value_length = 7;
+    uaa_Value_value_length = 6;
+    uaa_Value_value_value_length = 5;
+    uaa_String_length = aux_Array_1_String_length;
+    uaa = aux_Array_1;
+/// @ t15
+Returncode ut_M_fun(void);
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char aas[8 * 7 * 6 * 5] = {0};
+    int aas_String_length[8 * 7 * 6] = {0};
+    Ref_Manager* aas_Refman = NULL;
+    char* s = NULL;
+    int s_Max_length = 0;
+    int s_Length = 0;
+    Ref_Manager* s_Refman = NULL;
+    char* aux_Array_0 = NULL;
+    int aux_Array_0_Length = 0;
+    int aux_Array_0_Value_length = 0;
+    int aux_Array_0_Value_value_length = 0;
+    int* aux_Array_0_String_length = NULL;
+    Ref_Manager* aux_Array_0_Refman = NULL;
+    char* aux_Array_1 = NULL;
+    int aux_Array_1_Length = 0;
+    int aux_Array_1_Value_length = 0;
+    int* aux_Array_1_String_length = NULL;
+    Ref_Manager* aux_Array_1_Refman = NULL;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = NULL;
+    Ref_Manager** aux_String_0_Refman = NULL;
+    Ref_Manager* aux_Ref_Manager = NULL;
+    INIT_VAR_REFMAN(2, LUMI_block0_cleanup, aas)
+    if (4 < 0 || 4 >= 8) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = aas + 4 * 7 * 6 * 5;
+    aux_Array_0_Length = 7;
+    aux_Array_0_Value_length = 6;
+    aux_Array_0_Value_value_length = 5;
+    aux_Array_0_String_length = aas_String_length + 4 * 7 * 6;
+    aux_Array_0_Refman = aas_Refman;
+    LUMI_inc_ref(aux_Array_0_Refman);
+    if (3 < 0 || 3 >= 7) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_Array_1 = (aux_Array_0) + 3 * 6 * 5;
+    aux_Array_1_Length = 6;
+    aux_Array_1_Value_length = 5;
+    aux_Array_1_String_length = aux_Array_0_String_length + 3 * 6;
+    aux_Array_1_Refman = aux_Array_0_Refman;
+    LUMI_inc_ref(aux_Array_1_Refman);
+    if (2 < 0 || 2 >= 6) RAISE(3, LUMI_block0_cleanup, slice_index)
+    aux_String_0 = (aux_Array_1) + 2 * 5;
+    aux_String_0_Max_length = 5;
+    aux_String_0_Length = aux_Array_1_String_length + 2;
+    aux_String_0_Refman = &aux_Array_1_Refman;
+    LUMI_inc_ref(*aux_String_0_Refman);
+    aux_Ref_Manager = s_Refman;
+    s_Refman = *aux_String_0_Refman;
+    LUMI_inc_ref(s_Refman);
+    LUMI_dec_ref(aux_Ref_Manager);
+    aux_Ref_Manager = NULL;
+    s_Max_length = 5;
+    s_Length = *aux_String_0_Length;
+    s = aux_String_0;
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(*aux_String_0_Refman);
+    LUMI_dec_ref(aux_Array_1_Refman);
+    LUMI_dec_ref(aux_Array_0_Refman);
+    LUMI_dec_ref(s_Refman);
+    LUMI_var_dec_ref(aas_Refman);
+    return LUMI_err;
+}
 /// @ te0
 expected "]", got "new-line"
 /// @ te1
@@ -3300,9 +3686,9 @@ Returncode ut_M_name(char* arr, int arr_Length, int arr_Value_length, int* arr_S
     Ref_Manager* aux_String_0_Refman = NULL;
     LUMI_inc_ref(arr_Refman);
     if (3 < 0 || 3 >= arr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_String_0 = arr + 3 * arr_Value_length;
     aux_String_0_Max_length = arr_Value_length;
     aux_String_0_Length = arr_String_length[3];
-    aux_String_0 = arr + 3 * aux_String_0_Max_length;
     aux_String_0_Refman = arr_Refman;
     LUMI_inc_ref(aux_String_0_Refman);
     USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, aux_String_0_Length, aux_String_0_Refman)
@@ -4226,9 +4612,9 @@ char* s = NULL;
         LUMI_loop_depth = 3;
         CHECK_REF(1, LUMI_block1_cleanup, aux_Array_0, aux_Array_0_Refman)
         if (s_Index < 0 || s_Index >= aux_Array_0_Length) RAISE(1, LUMI_block1_cleanup, slice_index)
+        s = aux_Array_0 + s_Index * aux_Array_0_Value_length;
         s_Max_length = aux_Array_0_Value_length;
         s_Length = aux_Array_0_String_length[s_Index];
-        s = aux_Array_0 + s_Index * s_Max_length;
         s_Refman = aux_Array_0_Refman;
         LUMI_inc_ref(s_Refman);
         LUMI_err = String_set(s, s_Max_length, s_Length, s_Refman, 0, 'a');
@@ -4423,9 +4809,9 @@ char sa[3 * 4] = {0};
     {int s_Index; for (s_Index = 0; s_Index < aux_Array_0_Length; ++s_Index) {
         LUMI_loop_depth = 3;
         if (s_Index < 0 || s_Index >= 3) RAISE(2, LUMI_block1_cleanup, slice_index)
+        s = aux_Array_0 + s_Index * 4;
         s_Max_length = 4;
         s_Length = aux_Array_0_String_length[s_Index];
-        s = aux_Array_0 + s_Index * s_Max_length;
         s_Refman = aux_Array_0_Refman;
         LUMI_inc_ref(s_Refman);
         LUMI_err = String_set(s, 4, s_Length, s_Refman, 0, 'a');

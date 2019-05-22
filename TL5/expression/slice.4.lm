@@ -135,94 +135,154 @@ class SliceExpression(Expression)
     self.code-node.write-raise(user "slice_index")
     
     if self.second-index?
-      self.code-node.write-spaces()
-      self.second-index.write-preactions()
-      ; symbol = (seq) + (index);
-      self.slice-variable.write()
-      write(user " = ")
-      self.sequence.write-safe()
-      write(user " + ")
-      self.index.write-safe()
-      write(user ";\n")
-      self.code-node.write-spaces()
-      ; symbol_Length = second;
-      self.slice-variable.write()
-      write(user "_Length = ")
-      self.second-index.write()
-      write(user ";\n")
-      self.code-node.write-spaces()
-      if self.sequence.result-type.type-data is glob.type-string
-        ; symbol_Max_length = symbol_Length;
-        self.slice-variable.write()
-        write(user "_Max_length = ")
-        self.slice-variable.write()
-        write(user "_Length;\n")
-        self.code-node.write-spaces()
-      ; symbol_Refman = seq_Refman;
-      ; LUMI_inc_ref(symbol_Refman);
-      self.slice-variable.write-refman()
-      write(user " = ")
-      self.sequence.write-refman()
-      write(user ";\n")
-      self.code-node.write-spaces()
-      write(user "LUMI_inc_ref(")
-      self.slice-variable.write-refman()
-      write(user ");\n")
+      self.write-preactions-second-index()
+    else-if self.result-type.type-data is glob.type-array or
+        self.result-type.type-data is glob.type-string
+      self.write-preactions-slice-value()
+      
+  func inst write-preactions-second-index()
+    user TypeInstance data-type
+    var Int depth
+    self.sequence.result-type.get-array-data-type-depth()->(
+        user data-type, var depth)
+    self.code-node.write-spaces()
+    self.second-index.write-preactions()
     
-    else-if self.result-type.type-data is glob.type-array
-      ; todo...
+    ; symbol = (seq) + (index);
+    self.slice-variable.write()
+    write(user " = ")
+    self.sequence.write-safe()
+    self.write-index(user self.result-type, copy depth)
     
-    else-if self.result-type.type-data is glob.type-string
-      ; symbol_Max_length = seq_Value_length;
-      self.code-node.write-spaces()
+    ; symbol_Length = second;
+    self.slice-variable.write()
+    write(user "_Length = ")
+    self.second-index.write()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    if self.sequence.result-type.type-data is glob.type-array
+      self.write-length-assigns(user data-type, copy depth, copy 0)
+    else
+      ; symbol_Max_length = symbol_Length;
       self.slice-variable.write()
       write(user "_Max_length = ")
-      if self.result-type.length?
-        self.result-type.length.write()
+      self.slice-variable.write()
+      write(user "_Length;\n")
+      self.code-node.write-spaces()
+    
+    ; symbol_Refman = seq_Refman;
+    ; LUMI_inc_ref(symbol_Refman);
+    self.slice-variable.write-refman()
+    write(user " = ")
+    self.sequence.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    write(user "LUMI_inc_ref(")
+    self.slice-variable.write-refman()
+    write(user ");\n")
+  
+  func inst write-preactions-slice-value()
+    user TypeInstance data-type
+    var Int depth
+    self.sequence.result-type.get-array-data-type-depth()->(
+        user data-type, var depth)
+    
+    ; symbol = (seq) + (index);
+    self.code-node.write-spaces()
+    self.slice-variable.write()
+    write(user " = ")
+    self.sequence.write-safe()
+    self.write-index(user self.sequence.result-type, copy depth)
+    
+    ; symbol_Max_length = seq_Value_length;
+    self.slice-variable.write()
+    if self.result-type.type-data is glob.type-array
+      write(user "_Length = ")
+    else
+      write(user "_Max_length = ")
+    if self.result-type.length?
+      self.result-type.length.write()
+    else
+      self.sequence.write()
+      write(user "_Value_length")
+    write(user ";\n")
+    self.code-node.write-spaces()
+    if self.result-type.type-data is glob.type-array
+      self.write-length-assigns(user data-type, copy depth, copy 1)
+    else
+      self.write-preactions-string-value()
+    
+    ; symbol_Refman = [&]seq_Refman;
+    ; LUMI_inc_ref(symbol_Refman);
+    self.slice-variable.write()
+    write(user "_Refman = ")
+    if self.result-type.type-data is glob.type-string and
+        access-is-only-var(copy self.access)
+      write(user "&")
+      self.sequence.write-refman-safe()
+    else
+      self.sequence.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    write(user "LUMI_inc_ref(")
+    self.slice-variable.write-refman()
+    write(user ");\n")
+
+  func inst write-preactions-string-value()
+    ; symbol_Length = seq_String_length[index];
+    ; symbol_Length = seq_String_length + index;
+    self.slice-variable.write()
+    write(user "_Length = ")
+    self.sequence.write()
+    write(user "_String_length")
+    if access-is-only-var(copy self.access)
+      write(user " + ")
+    else
+      write(user "[")
+    self.index.write()
+    if not access-is-only-var(copy self.access)
+      write(user "]")
+    write(user ";\n")
+    self.code-node.write-spaces()
+
+  func inst write-length-assigns(
+      user TypeInstance data-type, copy Int depth, copy Int offset)
+    user TypeInstance sequence-type(user self.result-type)
+    for n in depth - offset
+      ; symbol_Value_[value_]length = seq_Value_[value_]length;
+      sequence-type := sequence-type.parameters.first.item
+      self.slice-variable.write()
+      write-array-value-length(copy n)
+      write(user " = ")
+      if sequence-type.length?
+        sequence-type.length.write()
       else
         self.sequence.write()
-        write(user "_Value_length")
+        write-array-value-length(copy n + offset)
       write(user ";\n")
       self.code-node.write-spaces()
-      ; symbol_Length = seq_String_length[index];
-      ; symbol_Length = seq_String_length + index;
+    if data-type.type-data is glob.type-string
+      ; symbol_String_length = seq_String_length + (index)
+      ;   [ * seq_Value_[value_]length]...;
       self.slice-variable.write()
-      write(user "_Length = ")
+      write(user "_String_length = ")
       self.sequence.write()
       write(user "_String_length")
-      if access-is-only-var(copy self.access)
-        write(user " + ")
-      else
-        write(user "[")
-      self.index.write()
-      if not access-is-only-var(copy self.access)
-        write(user "]")
-      write(user ";\n")
-      self.code-node.write-spaces()
-      ; symbol = (seq) + (index) * symbol_Max_length;
-      self.slice-variable.write()
-      write(user " = ")
-      self.sequence.write-safe()
-      write(user " + ")
-      self.index.write-safe()
+      self.write-index(user self.sequence.result-type, copy depth - 1)
+
+  func inst write-index(user TypeInstance sequence-type, copy Int depth)
+    write(user " + ")
+    self.index.write-safe()
+    for n in depth
+      sequence-type := sequence-type.parameters.first.item
       write(user " * ")
-      self.slice-variable.write()
-      write(user "_Max_length;\n")
-      self.code-node.write-spaces()
-      ; symbol_Refman = [&]seq_Refman;
-      ; LUMI_inc_ref(symbol_Refman);
-      self.slice-variable.write()
-      write(user "_Refman = ")
-      if access-is-only-var(copy self.access)
-        write(user "&")
-        self.sequence.write-refman-safe()
+      if sequence-type.length?
+        sequence-type.length.write()
       else
-        self.sequence.write-refman()
-      write(user ";\n")
-      self.code-node.write-spaces()
-      write(user "LUMI_inc_ref(")
-      self.slice-variable.write-refman()
-      write(user ");\n")
+        self.sequence.write()
+        write-array-value-length(copy n)
+    write(user ";\n")
+    self.code-node.write-spaces()
   
   func dynamic write()
     if self.slice-variable?

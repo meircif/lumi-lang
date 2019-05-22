@@ -195,9 +195,9 @@ arr[4] := i
 ; @ c t6
 t := tarr[3]
 ; @ c t7
-var Array{3:String{4}} vsa
-user String s(user vsa[2])
-user Array{String} sa(user vsa[4:2])
+var Array{8:String{5}} vsa
+user String s(user vsa[3])
+user Array{String} sa(user vsa[2:4])
 ; @ g t8
 func fun(s-var String s, strong Array{String} sa)
     var Char c(copy s[5])
@@ -206,6 +206,30 @@ func fun(s-var String s, strong Array{String} sa)
 ; @ c t9
 strong Array?{String} sa
 sa[3].copy(user "text")
+; @ c t10
+strong Array?{Array{Int}} aai
+arr := aai[3]
+weak Array?{Array{Int}} ua(weak aai[2:4])
+; @ c t11
+strong Array?{Array{Array{Array{Int}}}} aai
+weak Array?{Array{Array{Int}}} ua(weak aai[3])
+weak Array?{Array{Array{Array{Int}}}} uaa(weak aai[2:4])
+; @ c t12
+strong Array?{Array{Array{String}}} aas
+weak Array?{Array{String}} ua(weak aas[3])
+weak Array?{Array{Array{String}}} uaa(weak aas[2:4])
+; @ c t13
+var Array{8:Array{7:Array{6:Array{5:Int}}}} aai
+user Array?{Array{Array{Int}}} ua(user aai[3])
+user Array?{Array{Array{Array{Int}}}} uaa(user aai[2:4])
+; @ c t14
+var Array{8:Array{7:Array{6:String{5}}}} aas
+user Array?{Array{String}} ua(user aas[3])
+user Array?{Array{Array{String}}} uaa(user aas[2:4])
+; @ g t15
+func fun()
+    var Array{8:Array{7:Array{6:String{5}}}} aas
+    user String s(user aas[4][3][2])
 ; @ ec te0
 arr[2
 ; @ ec te1

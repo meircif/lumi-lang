@@ -547,6 +547,23 @@ func test-for-each()
         sys.print(user sc.s)
         sys.print(user " ")
     sys.println(user "]")
+    
+    ; var Array{3:Array{3:Array{3:String{16}}}} saarr
+    ; for n in 3
+    ;     for m in 3
+    ;         for i in 3
+    ;             var String ss(var saarr[n][m][i])
+    ;             saarr[n][m][i].copy(user "val")
+    ;             saarr[n][m][i].append(copy '0' + n)
+    ;             saarr[n][m][i].append(copy '0' + m)
+    ;             saarr[n][m][i].append(copy '0' + i)
+    ; sys.print(user "items[ ")
+    ; for a in saarr
+    ;     for b in a
+    ;         for s in b
+    ;             sys.print(user s)
+    ;             sys.print(user " ")
+    ; sys.println(user "]")
 
 
 class ComplexField
