@@ -173,6 +173,14 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
           user self.parent)
     self.write-after-block()
   
+  func inst write-block-cleanup()
+    self.block.write-block-cleanup()
+    ; if (LUMI_loop_depth < `X`) break;
+    self.block.write-spaces()
+    write(user "if (LUMI_loop_depth < ")
+    write-int(copy 2 * self.block.loop-depth)
+    write(user ") break;\n")
+  
   func inst write-assign(
       user SyntaxTreeVariable item,
       user Expression value,
@@ -213,7 +221,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     self.block.write-block-start()
     self.write-loop-block-start()
     self.block.write-block-body()
-    self.block.write-block-cleanup()
+    self.write-block-cleanup()
     self.block.write-block-end()
   
   func inst write-seq()
@@ -264,7 +272,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     self.parent.indentation-spaces -= INDENTATION-SPACES
     
     self.block.write-block-body()
-    self.block.write-block-cleanup()
+    self.write-block-cleanup()
     
     self.write-spaces()
     write(user "}}\n")
@@ -321,7 +329,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     
     self.write-iter-meth(user self.next-func, owner _)
     
-    self.block.write-block-cleanup()
+    self.write-block-cleanup()
     self.write-spaces()
     write(user "}\n")
   

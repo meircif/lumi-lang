@@ -693,7 +693,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager** s_Re
     part = aux_String_1;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(*aux_String_1_Refman);
+    if (aux_String_1_Refman != NULL) LUMI_dec_ref(*aux_String_1_Refman);
     LUMI_dec_ref(aux_String_0_Refman);
     LUMI_dec_ref(part_Refman);
     ARRAY_DEL(String, sa, sa_Length)
@@ -1102,7 +1102,7 @@ Returncode ut_M_fun(void) {
     s = aux_String_0;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(*aux_String_0_Refman);
+    if (aux_String_0_Refman != NULL) LUMI_dec_ref(*aux_String_0_Refman);
     LUMI_dec_ref(aux_Array_1_Refman);
     LUMI_dec_ref(aux_Array_0_Refman);
     LUMI_dec_ref(s_Refman);
@@ -3540,6 +3540,7 @@ Returncode ut_M_Test_fun(ut_M_Test* self, Ref_Manager* self_Refman) {
             self->x += n;
         LUMI_block3_cleanup:
             (void)0;
+            if (LUMI_loop_depth < 4) break;
         }
         if (LUMI_loop_depth < 3) goto LUMI_block2_cleanup;
     LUMI_block2_cleanup:
@@ -4507,6 +4508,7 @@ Int n = 0;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t1
@@ -4520,6 +4522,7 @@ Int aux_Int_0 = 0;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t2
@@ -4546,6 +4549,7 @@ Char ch = 0;
         ut_M_c = ch;
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }}
     aux_Ref_Manager = aux_String_0_Refman;
     aux_String_0_Refman = NULL;
@@ -4578,6 +4582,7 @@ Int n = 0;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }}
     aux_Ref_Manager = aux_Array_0_Refman;
     aux_Array_0_Refman = NULL;
@@ -4621,6 +4626,7 @@ char* s = NULL;
         CHECK(2, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }}
     aux_Ref_Manager = aux_Array_0_Refman;
     aux_Array_0_Refman = NULL;
@@ -4639,6 +4645,7 @@ Int n = 0;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t6
@@ -4648,6 +4655,7 @@ Int n = 0;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     for (n = 0; n < 7; ++n) {
@@ -4655,6 +4663,7 @@ Int n = 0;
         ut_M_i += n;
     LUMI_block2_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t7
@@ -4664,6 +4673,7 @@ Int n = 0;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t8
@@ -4717,6 +4727,7 @@ Int n = 0;
         LUMI_block3_cleanup:
             (void)0;
             LUMI_var_dec_ref(sb_Refman);
+            if (LUMI_loop_depth < 4) break;
         }}
         aux_Ref_Manager = aux_String_0_Refman;
         aux_String_0_Refman = NULL;
@@ -4731,6 +4742,7 @@ Int n = 0;
         (void)0;
         LUMI_dec_ref(aux_String_0_Refman);
         LUMI_var_dec_ref(sa_Refman);
+        if (LUMI_loop_depth < 2) break;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t9
@@ -4772,6 +4784,7 @@ char* s = NULL;
         ut_M_c = ch;
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }}
     aux_Ref_Manager = aux_String_1_Refman;
     aux_String_1_Refman = NULL;
@@ -4818,6 +4831,7 @@ char sa[3 * 4] = {0};
         CHECK(3, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }}
     aux_Ref_Manager = aux_Array_0_Refman;
     aux_Array_0_Refman = NULL;
@@ -5386,6 +5400,7 @@ Returncode ut_M_fun0(void) {
         x += y;
     LUMI_block14_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
@@ -7518,6 +7533,7 @@ Returncode ut_M_fun(Int* i) {
     LUMI_block1_cleanup:
         (void)0;
         LUMI_var_dec_ref(s_Refman);
+        if (LUMI_loop_depth < 2) break;
     }
     aux_Ref_Manager = aux_TestIterator_1_Refman;
     aux_TestIterator_1_Refman = NULL;
@@ -7629,6 +7645,7 @@ Returncode ut_M_fun(ut_M_TestIterator* iter, Ref_Manager* iter_Refman) {
         CHECK(9, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     aux_Ref_Manager = aux_TestIterator_0_Refman;
     aux_TestIterator_0_Refman = NULL;
@@ -7766,6 +7783,7 @@ Returncode ut_M_fun(ut_M_TestIterator* fiter, Ref_Manager* fiter_Refman, ut_M_Te
         CHECK(13, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     aux_Ref_Manager = aux_TestIterator_0_Refman;
     aux_TestIterator_0_Refman = NULL;
@@ -7799,6 +7817,7 @@ Returncode ut_M_fun(ut_M_TestIterator* fiter, Ref_Manager* fiter_Refman, ut_M_Te
         CHECK(15, LUMI_block2_cleanup)
     LUMI_block2_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     aux_Ref_Manager = aux_TestIterator_1_Refman;
     aux_TestIterator_1_Refman = NULL;
@@ -7919,6 +7938,7 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, Ref_Manager* iter_Refman, ut_M_T
         CHECK(9, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
+        if (LUMI_loop_depth < 2) break;
     }
     aux_Ref_Manager = aux_TestIterator_0_Refman;
     aux_TestIterator_0_Refman = NULL;

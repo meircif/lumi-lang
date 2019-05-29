@@ -142,6 +142,7 @@ void LUMI_trace_print(
   LUMI_trace_print( \
       LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \
       NULL, 0, NULL); \
+  LUMI_loop_depth = 0; \
   goto cleanup; }
 
 #define IGNORE_ERRORS(call) \

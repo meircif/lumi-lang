@@ -552,7 +552,7 @@ func test-for-each()
     ; for n in 3
     ;     for m in 3
     ;         for i in 3
-    ;             var String ss(var saarr[n][m][i])
+    ;             ; var String ss(var saarr[n][m][i])
     ;             saarr[n][m][i].copy(user "val")
     ;             saarr[n][m][i].append(copy '0' + n)
     ;             saarr[n][m][i].append(copy '0' + m)
