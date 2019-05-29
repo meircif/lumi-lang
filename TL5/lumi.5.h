@@ -242,8 +242,6 @@ Bool LUMI_test_coverage(File_Coverage* file_coverage, int files_number);
 
 Returncode Array_length(void*, int length, Ref_Manager*, Int* length_out);
 
-void String_Del(char*);
-extern Generic_Type_Dynamic String_dynamic;
 Returncode String_length(
   char*, int max_length, int length, Ref_Manager*, Int* length_out);
 Returncode String_max_length(

@@ -128,13 +128,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.syntax-error(
           user "declared variable with generic subtype",
           user self.type-instance.name)
-    if self.is-create and not self.type-instance.type-data.is-primitive and
-        self.parent-type? and
-        (self.type-instance.type-data is glob.type-string or
-        self.type-instance.type-data is glob.type-array)
-      self.syntax-error(
-          user "cannot declared \"var\" field of sequence type",
-          user self.type-instance.type-data.name)
     if self.is-create and self.type-instance.type-data.create-disallowed
       self.syntax-error(
           user "cannot create objects with type",

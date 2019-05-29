@@ -171,6 +171,8 @@ class SyntaxTreeRoot(GlobalNodes)
     self.analyze-main()
     self.order-children-constants(user self.variables, user self.constants)
     self.check-memory(user _)
+    if self.main-function?
+      self.main-function.check-memory(user _)
     if self.line-counts?
       self.analyze-cover()
   
