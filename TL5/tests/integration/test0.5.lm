@@ -320,21 +320,23 @@ func test-code-flow(user Array{Int} arr)->(var Int res)
 
 
 func test-builtins(
-        copy Int i, copy Char c, copy Bool b, user String s, user Array{Int} a)
+        copy Int i, copy Char c, copy Bool b, weak String s, user Array{Int} a)
     var Int iv
     var Char cv
     var Bool bv
-    i.str(user s)
+    new String{12} so
+    i.str(reset so)
     bv := true or false
-    i := a.length
-    i := s.length
-    s.clear()
+    a.length()->(var iv)
+    s.length()->(var iv)
+    so.clear()
     s.equal(user s)->(var bv)
     s.get(copy i)->(var cv)
-    s.append(copy c)
-    s.new(user s)
-    s.concat(user s)
-    s.concat-int(copy i)
+    s.set(copy i, copy cv)
+    so.append(copy c)
+    so.copy(user s)
+    so.concat(user s)
+    so.concat-int(copy i)
     s.find(user s)->(var iv)
     s.has(copy c)->(var bv)
     owner File? f
@@ -344,12 +346,12 @@ func test-builtins(
     f.putc(copy c)
     f.write(user s)
     file-close(owner f)
-    s := sys.argv[1]
+    user String arg(user sys.argv[1])
     sys.print(user s)
     sys.println(user s)
     sys.getchar()->(var cv, var bv)
-    sys.getline(user s)
-    sys.getenv(user s, user s)->(var bv)
+    sys.getline(reset so)
+    sys.getenv(user s, reset so)->(var bv)
     sys.system(user s)->(var iv)
     sys.exit(copy i)
     sys.stdout.putc(copy c)
@@ -376,22 +378,25 @@ func test-ref-count()
 func remove(owner String s)
     ; remove s
 
+struct Item
+    owner String s
+    
+    new(user String s)
+        self.s := String{s.length() + 1}(user s)
 
 struct Data{Generic}
     weak Generic item
-    weak Array?{Generic} arr
     
     new()
     
-    func set(weak Generic item, weak Array?{Generic} arr) _
+    func set(weak Generic item) _
     
     func get()->(weak Generic item)
         item := self.item
         
-func Data.set(weak Generic item, weak Array?{Generic} arr)
+func Data.set(weak Generic item)
     weak Generic x(weak item)
     self.item := x
-    self.arr := arr
     new Data{Generic} d
     d.item := self.item
     self.item := d.item
@@ -403,23 +408,20 @@ struct Dataset{First:Second:Third}(Data{First})
     new()
         base()
 
-struct MidData{Generic}(Dataset{String:Data{Generic}:Generic})
+struct MidData{Generic}(Dataset{Item:Data{Generic}:Generic})
 
 struct TopData(MidData{TestStruct})
 
-func test-type-parameters(weak String s)
-    var Data{String} d
-    s-var Array{6:String{16}} sarr
+func test-type-parameters(weak Item s)
+    var Data{Item} d
+    user Item? su
     d.item := s
     s := d.item
-    d.arr := sarr
-    s := d.arr[4]
-    var Array{5:Data{String}} ad
+    var Array{5:Data{Item}} ad
     s := ad[2].item
-    s := ad[2].arr[3]
-    var Data{Data{Data{String}}} dr
+    var Data{Data{Data{Item}}} dr
     s := dr.item.item.item
-    d.set(weak s, weak sarr)
+    d.set(weak s)
     d.get()->(weak s)
     user Data dg(user d)
     assert dg?
@@ -428,7 +430,6 @@ func test-type-parameters(weak String s)
     s-var Data{TestStruct} dt
     s-var TestStruct ts(copy 0, weak _)
     t.item := s
-    t.arr := sarr
     t.second := dt
     t.third := ts
 
@@ -510,7 +511,7 @@ func test-for-each()
     sys.print(user "numbers[ ")
     for n in arr
         text.clear()
-        n.str(user text)
+        n.str(reset text)
         sys.print(user text)
         sys.print(user " ")
     sys.println(user "]")
@@ -526,24 +527,42 @@ func test-for-each()
     sys.println(user "]")
     
     var Array{3:String{16}} sarr
-    sarr[0].new(user "ddd")
-    sarr[1].new(user "eee")
-    sarr[2].new(user "fff")
+    
+    sarr[0].copy(user "ddd")
+    sarr[1].copy(user "eee")
+    sarr[2].copy(user "fff")
     sys.print(user "strings[ ")
     for s in sarr
         sys.print(user s)
         sys.print(user " ")
     sys.println(user "]")
     
-    s-var Container{String} container-last(weak "iii", weak _)
-    s-var Container{String} container-mid(weak "hhh", weak container-last)
-    s-var Container{String} container-first(weak "ggg", weak container-mid)
-    s-var Container{String} container(weak _, weak container-first)
-    owner ContainerIterator{String} iter(owner container.iter())
+    s-var Container{Item} container-last(weak Item(user "iii"), weak _)
+    s-var Container{Item} container-mid(weak Item(user "hhh"), weak container-last)
+    s-var Container{Item} container-first(weak Item(user "ggg"), weak container-mid)
+    s-var Container{Item} container(weak _, weak container-first)
+    owner ContainerIterator{Item} iter(owner container.iter())
     sys.print(user "values[ ")
     for sc in iter
-        sys.print(user sc)
+        sys.print(user sc.s)
         sys.print(user " ")
+    sys.println(user "]")
+    
+    var Array{3:Array{3:Array{3:String{16}}}} saarr
+    for n in 3
+        for m in 3
+            for i in 3
+                saarr[n][m][i].copy(user "val")
+                saarr[n][m][i].append(copy '0' + n)
+                saarr[n][m][i].append(copy '0' + m)
+                saarr[n][m][i].append(copy '0' + i)
+    sys.print(user "items[ ")
+    for a in saarr
+        sys.print(user "\n  ")
+        for b in a
+            for s in b
+                sys.print(user s)
+                sys.print(user " ")
     sys.println(user "]")
 
 

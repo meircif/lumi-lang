@@ -130,31 +130,26 @@ test test-compiler()
     while not read-line(user input-file, user line, user "; @@ ")
     common-header.concat(user line)
     common-header.append(copy '\n')
+  var Bool not-first-line
   do
     while not read-line(user expected-output-file, user line, user "/// @@ ")
-    expected-common-header.append(copy '\n')
+    if not-first-line
+      expected-common-header.append(copy '\n')
+    else
+      not-first-line := true
     expected-common-header.concat(user line)
   
   compiler-tests-passed := true
   Sys.print.active := false
-  code-header-valid := true
   sys.print(user "\n  test common header... ")
   try
-    test-code(user "", user "", copy false)
+    test-global-scope(
+        user common-header, user "", user expected-common-header, copy false)
     sys.print(user "OK")
   catch
     compiler-tests-passed := false
-    code-header-valid := false
-  if compiler-tests-passed
-    for n in 1:expected-common-header.length
-      actual-output-file.putc.mocked(copy mock-output-file-text[n])
-  else
-    for n in mock-output-file-text.length
-      actual-output-file.putc.mocked(copy mock-output-file-text[n])
-  actual-output-file.putc.mocked(copy '\n')
-  
-  common-header.concat(user "    ")
-  expected-common-header.concat(user "\n    ")
+  expected-common-header.append(copy '\n')
+  common-header-length := mock-output-file-text.length - 53
 
   do
     read-line(user input-file, user line, user _)

@@ -155,7 +155,7 @@ class TypeData(SyntaxTreeNamespace)
     
     ; order complex fields
     for variable in self.variables.iter()
-      if variable.access = Access.VAR or variable.access = Access.S-VAR
+      if access-is-only-var(copy variable.access)
         glob.current-module := self.my-module
         variable.type-instance.link-types(user self)
         glob.current-module := _
@@ -225,8 +225,7 @@ class TypeData(SyntaxTreeNamespace)
     user TypeData type-data(user self)
     do
       for variable in type-data.variables.iter()
-        if variable.access = Access.OWNER or variable.access = Access.STRONG or
-            variable.access = Access.VAR or variable.access = Access.S-VAR
+        if access-is-var(copy variable.access)
           variable.type-instance.type-data.collect-delete-group()
           self.delete-group.add-deleting(user variable.type-instance)
       while type-data.base-type?

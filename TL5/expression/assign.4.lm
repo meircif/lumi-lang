@@ -1,0 +1,277 @@
+~~~ TL5 compiler - assign expression ~~~
+module tl5-compiler
+
+~~~ Assign expression (:=) ~~~
+class AssignExpression(Expression)
+  owner VariableExpression assigned-value-variable
+  user Expression target
+  user Expression value
+  user Expression original-value
+  
+  new(
+      user SyntaxTreeCode code-node,
+      user Expression target,
+      user Expression value)
+    base(user code-node)
+    self.target := target
+    self.value := value
+    self.original-value := self.value
+  
+  func inst reset-value(user Expression value)
+    self.value := value
+  
+  func dynamic analyze()
+    if self.target.result-type.reference-path.equals(
+        user self.value.result-type.reference-path)
+      self.syntax-error-msg(user "assigning reference into itself")
+    if access-is-user(copy self.target.access)
+      self.code-node.get-function().has-user-assign := true
+    else-if access-is-owner(copy self.target.access)
+      ; ownership pass
+      self.add-aux-variable(
+          copy self.target.access,
+          copy false,
+          user self.target.result-type)->(
+          owner self.assigned-value-variable)
+  
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.value.check-memory(user refs)
+    user ReferencePath left-path(
+        user self.target.result-type.reference-path)
+    if left-path?
+      refs.mark-reference(user left-path, copy true)
+    var Bool check-left(copy true)
+    if access-is-owner(copy self.target.access)
+      refs.mark-illegal-type(user self.target.result-type)
+      if left-path? and
+          self.value.result-type.type-data is glob.type-empty
+        refs.mark-reference(user left-path, copy false)
+        check-left := false
+      if access-is-owner(copy self.value.access)
+        ; move
+        user ReferencePath right-path(
+            user self.value.result-type.reference-path)
+        if right-path?
+          refs.mark-reference(user right-path, copy false)
+        left-path.check-pure-owner(user self)
+        right-path.check-pure-owner(user self)
+    if check-left
+      self.target.check-memory(user refs)
+    refs.check-user(user self.value)
+    if left-path?
+      if not left-path.field?
+        refs.add(user left-path.variable)
+  
+  func dynamic write-preactions()
+    self.value.write-preactions()
+    if not self.target.result-type.type-data.is-primitive
+      if access-is-owner(copy self.target.access)
+        self.write-owner-assign-preactions()
+      else
+        self.write-user-assign-preactions()
+    else
+      self.target.write-preactions()
+    if self.target.result-type.type-data is glob.type-array
+      self.write-array-preactions()
+    else-if self.target.result-type.type-data is glob.type-string
+      self.write-string-preactions()
+  
+  func inst write-array-preactions()
+    self.target.write()
+    write(user "_Length = ")
+    self.value.write-length(user "_Length", copy true)
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    user TypeInstance data-type
+    var Int depth
+    self.target.result-type.get-array-data-type-depth()->(
+        user data-type, var depth)
+    user TypeInstance sequence-type(user self.value.result-type)
+    for n in depth
+      self.target.write()
+      write-array-value-length(copy n)
+      write(user " = ")
+      if sequence-type?
+        if sequence-type.parameters?
+          sequence-type := sequence-type.parameters.first.item
+        else
+          sequence-type := _
+      var Bool is-const-length
+      if sequence-type?
+        if sequence-type.length?
+          is-const-length := sequence-type.length.constant
+      if self.value.result-type.type-data is glob.type-empty
+        write(user "0")
+      else-if is-const-length
+        sequence-type.length.write()
+      else
+        self.value.write()
+        write-array-value-length(copy n)
+      write(user ";\n")
+      self.code-node.write-spaces()
+    
+    if data-type.type-data is glob.type-string
+      self.target.write()
+      write(user "_String_length = ")
+      self.value.write-length(user "_String_length", copy false)
+      write(user ";\n")
+      self.code-node.write-spaces()
+  
+  func inst write-string-preactions()
+    self.target.write()
+    write(user "_Max_length = ")
+    self.value.write-length(user "_Max_length", copy true)
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.target.write()
+    write(user "_Length = ")
+    if access-is-only-var(copy self.value.access) and not self.value.is-var
+      write(user "*")
+    self.value.write-length(user "_Length", copy false)
+    write(user ";\n")
+    self.code-node.write-spaces()
+  
+  func inst write-user-assign-preactions()
+    self.target.write-preactions()
+    
+    write(user "aux_Ref_Manager = ")
+    self.target.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.target.write-refman()
+    write(user " = ")
+    self.value.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.write-assign-dynamic(
+        user self.target, user self.value)
+    
+    write(user "LUMI_inc_ref(")
+    self.target.write-refman()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    
+    write(user "LUMI_dec_ref(aux_Ref_Manager);\n")
+    self.code-node.write-spaces()
+    write(user "aux_Ref_Manager = NULL;\n")
+    self.code-node.write-spaces()
+
+  func inst write-owner-assign-preactions()
+    self.assigned-value-variable.write()
+    write(user " = ")
+    self.value.write()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    self.assigned-value-variable.write-refman()
+    write(user " = ")
+    self.value.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.write-assign-dynamic(
+        user self.assigned-value-variable, user self.value)
+    
+    if self.value.result-type.type-data is-not glob.type-empty
+      self.original-value.write-assign-null()
+      self.code-node.write-spaces()
+    
+    self.target.write-preactions()
+    
+    self.write-left-delete()
+    self.code-node.write-spaces()
+    
+    write(user "LUMI_owner_dec_ref(")
+    self.target.write-refman()
+    write(user ");\n")
+    self.code-node.write-spaces()
+    
+    self.target.write-refman()
+    write(user " = ")
+    self.assigned-value-variable.write-refman()
+    write(user ";\n")
+    self.code-node.write-spaces()
+    
+    self.write-assign-dynamic(
+        user self.target, user self.assigned-value-variable)
+  
+  func inst write-assign-dynamic(user Expression target, user Expression source)
+    if not target.result-type.type-data.is-dynamic and
+        not target.is-generic-cast
+      return
+    target.write-dynamic()
+    write(user " = ")
+    if not source.result-type.type-data.is-dynamic and
+        not source.is-generic-cast and
+        source.result-type.type-data is-not glob.type-empty
+      write(user "&")
+      source.result-type.type-data.write-cname()
+      write(user "_dynamic")
+    else
+      if (target.result-type.type-data is glob.type-generic or
+          target.is-generic-cast) and
+          source.result-type.type-data is-not glob.type-generic and
+          not source.is-generic-cast
+        write(user "(Generic_Type_Dynamic*)")
+        source.write-dynamic-safe()
+      else-if source.is-generic-cast and not target.is-generic-cast and
+          not (target.result-type.type-data is glob.type-generic)
+        source.write-dynamic-safe()
+      else
+        source.write-dynamic()
+    write(user ";\n")
+    self.code-node.write-spaces()
+  
+  func inst write-left-delete()
+    user TypeData type-data(user self.target.result-type.type-data)
+    if type-data.is-dynamic
+      write(user "if (")
+      self.target.write-dynamic()
+      write(user " != NULL) ")
+      self.target.write-dynamic-safe()
+      write(user "->")
+      do
+        while type-data.base-type?
+        type-data := type-data.base-type.type-data
+        while type-data.is-dynamic
+        write(user "_base.")
+      write(user "_del(")
+    else-if type-data is-not glob.type-array
+      type-data.write-cname()
+      write(user "_Del(")
+    else
+      user TypeInstance data-type
+      self.target.result-type.get-array-data-type-depth()->(user data-type)
+      if data-type.type-data is glob.type-string
+        write(user "free(")
+        self.target.write()
+        write(user "_String_length);\n")
+      else-if not data-type.type-data.is-primitive
+        write(user "ARRAY_DEL(")
+        data-type.type-data.write-cname()
+        write(user ", ")
+        self.target.write()
+        write(user ", ")
+        self.target.write-length(user "_Length", copy true)
+        write(user ")\n")
+      return
+    self.target.write()
+    write(user ");\n")
+  
+  func dynamic write()
+    self.target.write()
+    write(user " = ")
+    if access-is-owner(copy self.target.access)
+      self.assigned-value-variable.write()
+    else
+      self.value.write-cast()
+    write(user ";\n")
+    if access-is-owner(copy self.target.access)
+      self.write-owner-null()
+
+  func inst write-owner-null()
+    self.code-node.write-spaces()
+    self.assigned-value-variable.write-assign-null()

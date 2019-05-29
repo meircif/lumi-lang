@@ -14,6 +14,13 @@ class Argument(SyntaxTreeNode)
   func dynamic copy-new()->(owner DeclarationArgument new-argument)
     raise
   
+  func inst copy(user Argument other)
+    other.input-file-name := self.input-file-name
+    other.line-number := self.line-number
+    other.access := self.access
+    other.is-output := self.is-output
+    other.is-native := self.is-native
+  
   func inst parse(
       user String access-str,
       copy Bool is-output,

@@ -232,26 +232,26 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       self.write-cname()
       write(user "_active) return ")
       self.implemented-function.write-cname()
-      write(user "(")
-      var Bool first(copy true)
-      self.write-arg-list(user self.arguments.parameters)->(var first)
-      self.write-arg-list(user self.arguments.outputs)->(var first)
-      write(user ");\n")
+      var FunctionArguments call-arguments
+      for argument in self.arguments.parameters.iter()
+        self.build-call-argument(user call-arguments.parameters, user argument)
+      for argument in self.arguments.outputs.iter()
+        self.build-call-argument(user call-arguments.outputs, user argument)
+      call-arguments.write-call()
+      write(user ";\n")
     base()
   
-  func inst write-arg-list(user List{Argument} list)->(var Bool first)
-    for argument in list.iter()
-      if not first
-        write(user ", ")
-      user SyntaxTreeVariable variable
-      argument.get-variable()->(user variable)
-      write-cname(user variable.name)
-      if not variable.type-instance.type-data.is-primitive
-        write(user ", ")
-        write-cname(user variable.name)
-        write(user "_Refman")
-      if variable.type-instance.type-data.is-dynamic
-        write(user ", ")
-        write-cname(user variable.name)
-        write(user "_Dynamic")
-      first := false
+  func inst build-call-argument(
+      user List{Argument} list, user Argument argument)
+    new CallArgument call-argument
+    argument.copy(user call-argument)
+    new VariableExpression variable-expression(user _)
+    argument.get-variable()->(user variable-expression.variable)
+    string-new-copy(user variable-expression.variable.name)->(
+        owner variable-expression.name)
+    variable-expression.variable.type-instance.copy-new()->(
+        owner variable-expression.result-type)
+    variable-expression.result-type.copy-new()->(
+        owner call-argument.real-type)
+    call-argument.value := variable-expression
+    list.add(owner call-argument)

@@ -49,10 +49,7 @@ struct ReferencePath
     user ReferencePath path(user self)
     do
       while path?
-      if path.variable.access = Access.OWNER or
-          path.variable.access = Access.STRONG or
-          path.variable.access = Access.VAR or
-          path.variable.access = Access.S-VAR
+      if access-is-var(copy path.variable.access)
         if not pure-owner
           node.print-syntax-error-header()
           sys.print(user "cannot modify owner field \"")

@@ -58,7 +58,11 @@ class FieldExpression(Expression)
           owner self.result-type)
       instance-type.reference-path.copy-and-add-field(user self.variable)->(
           owner self.result-type.reference-path)
-      self.access := self.variable.access
+      if self.is-complex-field and access-is-weak(copy self.instance.access) and
+          not self.variable.type-instance.type-data is glob.type-string
+        self.access := Access.S-VAR
+      else
+        self.access := self.variable.access
       self.assignable := not self.is-complex-field
       if self.variable.type-instance.type-data is glob.type-generic
         expression := TypeCastExpression(user self.code-node, owner expression)
@@ -100,8 +104,7 @@ class FieldExpression(Expression)
 
   func dynamic write-preactions()
     self.instance.write-preactions()
-    if self.instance.result-type.conditional or
-        self.instance.access = Access.WEAK
+    if self.instance.is-dubious()
       self.instance.write-check-ref()
       self.code-node.write-spaces()
 

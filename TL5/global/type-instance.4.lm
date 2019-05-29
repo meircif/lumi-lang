@@ -148,9 +148,9 @@ struct TypeInstance
     if self.type-data is glob.type-array
       if not self.parameters?
         node.syntax-error-msg(user "missing subtype for array")
-      if self.parameters.first.item.type-data is glob.type-array
+      if self.parameters.first.item.type-data is glob.type-generic
         node.syntax-error-msg(
-            user "multidimensional array not supported yet...")
+            user "generic arrays not supported")
     else-if self.parameters?
       if not self.type-data.parameters?
         node.syntax-error(
@@ -168,6 +168,8 @@ struct TypeInstance
               user sub-type.type-data.name)
         if sub-type.type-data is glob.type-array
           node.syntax-error-msg(user "array as parameter type is unsupported")
+        if sub-type.type-data is glob.type-string
+          node.syntax-error-msg(user "string as parameter type is unsupported")
         param-iter.next()
       if param-iter.has()
         node.syntax-error(
@@ -211,8 +213,8 @@ struct TypeInstance
       return
     if target.type-data is glob.type-ref and not self.type-data.is-primitive
       return
-    if target-access = Access.OWNER or target-access = Access.STRONG
-      if self-access != Access.OWNER and self-access != Access.STRONG
+    if access-is-owner(copy target-access)
+      if not access-is-owner(copy self-access) and self-access != Access.RESET
         assert node?
         node.syntax-error(
             user "assigning into an owner a non-owner access",
@@ -227,8 +229,8 @@ struct TypeInstance
             user self.type-data.name,
             user "into static type",
             user target.type-data.name)
-    if ((target-access = Access.VAR or target-access = Access.S-VAR) and
-        (self-access = Access.USER or self-access = Access.WEAK)) or
+    if (access-is-only-var(copy target-access) and
+        access-is-user(copy self-access)) or
         (target-access = Access.S-VAR and self-access = Access.VAR)
       assert node?
       node.syntax-error2(
@@ -236,8 +238,7 @@ struct TypeInstance
           user glob.access-names[self-access],
           user "into value with access",
           user glob.access-names[target-access])
-    if target-access = Access.WEAK and self-access != Access.WEAK and
-        self-access != Access.STRONG and self-access != Access.S-VAR
+    if target-access = Access.WEAK and not access-is-weak(copy self-access)
       assert node?
       node.syntax-error(
           user "assigning into a weak reference an illegal access",
@@ -348,6 +349,17 @@ struct TypeInstance
           not self.parameters.first.item.length?
         assert node?
         node.syntax-error-msg(user "missing length for sequence")
+  
+  func get-array-data-type-depth()->(user TypeInstance data-type, var Int depth)
+    data-type := self
+    depth := 0
+    do
+      while data-type.type-data is glob.type-array
+      while data-type.parameters?
+      data-type := data-type.parameters.first.item
+      while data-type.type-data is glob.type-array or
+          data-type.type-data is glob.type-string
+      depth += 1
   
   ~~~ Create a copy of self type-instance with generic parameters replaced by
   actual types based on `actual-params`. ~~~

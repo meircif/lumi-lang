@@ -150,7 +150,7 @@ test test-dynamic-type-parameters()
     tbase := dmid.item
     assert tbase.num-base = 12
     ttop.num-base := 13
-    dmid.set(weak ttop, weak _)
+    dmid.set(weak ttop)
     tbase := _
     dmid.get()->(weak tbase)
     assert tbase.num-base = 13
@@ -439,8 +439,8 @@ test test-assert-error-message()
     assert-error arr[6], "slice index out of bounds"
     user Array?{Int} arr2(user arr)
     arr := _
-    assert-error arr.length, "empty object used"
-    assert-error arr2.length, "outdated weak reference used"
+    assert-error arr.length(), "empty object used"
+    assert-error arr2.length(), "outdated weak reference used"
     assert-error arr[0], "empty object used"
     assert-error arr2[0], "outdated weak reference used"
     user TopType? top
@@ -487,14 +487,13 @@ test test-builtin-errors()
     
     assert-error "aa".get(copy 2), "slice index out of bounds"
     assert-error too-long.append(copy 'a'), "string too long"
-    assert-error too-long.append(copy 'a'), "string too long"
     assert-error too-long.concat(user "a"), "string too long"
     var String{2} short-str
-    assert-error 123.str(user short-str), "string too long"
-    assert-error short-str.new(user "aaaaa"), "string too long"
+    assert-error 123.str(reset short-str), "string too long"
+    assert-error short-str.copy(user "aaaaa"), "string too long"
     
     lumi-debug-value := 2
-    assert-error sys.getline(user short-str), "string too long"
+    assert-error sys.getline(reset short-str), "string too long"
     lumi-debug-value := 1
     assert-error sys.exit(copy 0), "exit failed"
     assert-error sys.system(user "aaa"), "command execution failed"
@@ -517,4 +516,4 @@ test test-constants()
     assert TestEnum.ANOTHER-VALUE = 1
     assert TestEnum.VALUE2 = 2
     assert TestEnum.length = 3
-    assert int-arr.length = 63
+    assert int-arr.length() = 63

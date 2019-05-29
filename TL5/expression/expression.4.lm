@@ -79,6 +79,7 @@ class Expression(SyntaxTreeNode)
   var Bool is-statement
   var Bool is-generic-cast
   var Bool is-complex-field
+  var Bool is-var
 
   new(user SyntaxTreeCode code-node)
     self.set-location()
@@ -146,7 +147,7 @@ class Expression(SyntaxTreeNode)
     
     do
       if glob.last-char = '?'
-        QuestionExpression.parse-new(user _)->(owner expression)
+        QuestionExpression.parse-new(user _, user code-node)->(owner expression)
       else-if glob.last-char = '!'
         ExclamationExpression.parse-new(user _, user code-node)->(
             owner expression)
@@ -162,18 +163,20 @@ class Expression(SyntaxTreeNode)
     if text.length > 1
       second := text[1]
     if first = '\''
-      CharExpression.parse-new(user _, owner text)->(owner expression)
+      CharExpression.parse-new(user _, owner text, user code-node)->(
+          owner expression)
     else-if first = '"'
       StringExpression.parse-new(user _, owner text, user code-node)->(
           owner expression)
     else-if (first >= '0' and first <= '9') or
         (first = '-' and second >= '0' and second <= '9')
-      IntExpression.parse-new(user _, owner text)->(owner expression)
+      IntExpression.parse-new(user _, owner text, user code-node)->(
+          owner expression)
     else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
       self.parse-type-prefix(owner text, user ends, user code-node)->(
           owner expression)
     else-if text.length = 1 and first = '_'
-      expression := EmptyExpression()
+      expression := EmptyExpression(user code-node)
     else-if text.equal(user "base")
       expression := BaseMethExpression(user code-node)
     else
@@ -239,6 +242,9 @@ class Expression(SyntaxTreeNode)
       FieldExpression.parse-new(user _, owner value, user code-node)->(
           owner expression)
   
+  func inst is-dubious()->(var Bool is-dubious)
+    is-dubious := self.result-type.conditional or self.access = Access.WEAK
+  
   ~~~ Set type instance to be a type that has no sub-type ~~~
   func inst set-simple-type(user TypeData type-data)
     type-data.new-type-instance()->(owner self.result-type)
@@ -250,6 +256,8 @@ class Expression(SyntaxTreeNode)
     type-instance.copy-new()->(owner expression.result-type)
     expression.access := access
     expression.assignable := true
+    expression.is-string-var-ref := access-is-only-var(copy self.access) and
+        type-instance.type-data is glob.type-string
     self.code-node.parent.add-aux-variable(
         copy access, copy is-create, user type-instance)->(
         user expression.variable)
@@ -267,14 +275,19 @@ class Expression(SyntaxTreeNode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     ; do nothing
   
-  func inst write-init-var-ref(user VariableExpression expression)
-    ; INIT_VAR(`line`, `cleanup`, `symbol`)
-    write(user "INIT_VAR(")
+  func inst write-macro-init(user String macro-name, user Expression expression)
+    ; `macro-name`(`line`, `cleanup`, `expression`
+    write(user macro-name)
+    write(user "(")
     self.write-line-num()
     write(user ", ")
     self.code-node.parent.write-cleanup-label()
     write(user ", ")
     expression.write()
+  
+  func inst write-init-var-ref(user VariableExpression variable)
+    ; INIT_VAR(`line`, `cleanup`, `symbol`)
+    self.write-macro-init(user "INIT_VAR", user variable)
     write(user ")\n")
   
   func inst write-assign-null()
@@ -290,15 +303,22 @@ class Expression(SyntaxTreeNode)
     
   func inst write-check-ref()
     ; CHECK_REF(`line`, `cleanup`, `instance`, `instance-refman`)
-    write(user "CHECK_REF(")
-    self.write-line-num()
-    write(user ", ")
-    self.code-node.parent.write-cleanup-label()
-    write(user ", ")
-    self.write()
+    self.write-macro-init(user "CHECK_REF", user self)
     write(user ", ")
     self.write-refman()
     write(user ")\n")
+  
+  func inst write-length(user String prefix, copy Bool is-static)
+    var Bool is-const-length
+    if is-static and self.result-type.length?
+      is-const-length := self.result-type.length.constant
+    if self.result-type.type-data is glob.type-empty
+      write(user "0")
+    else-if is-const-length
+      self.result-type.length.write()
+    else
+      self.write()
+      write(user prefix)
   
   func dynamic write-cast()
     self.write()

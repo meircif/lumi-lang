@@ -165,12 +165,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     user TypeData item-type-data(user variable.type-instance.type-data)
     if item-type-data is glob.type-array
       item-type-data := variable.type-instance.parameters.first.item.type-data
-    if (variable.access = Access.OWNER or variable.access = Access.STRONG) and
-        not item-type-data.is-primitive
+    if access-is-owner(copy variable.access) and not item-type-data.is-primitive
       self.write-owner-reference-cleanup(
           user variable, user type-data, user item-type-data)
-    else-if type-data? and
-        (variable.access = Access.VAR or variable.access = Access.S-VAR)
+    else-if type-data? and access-is-only-var(copy variable.access)
       write-spaces(copy INDENTATION-SPACES)
       item-type-data.write-cname()
       write(user "_Del(&(self->")
@@ -181,14 +179,24 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       write-spaces(copy INDENTATION-SPACES)
     else
       self.write-spaces()
+    var Bool is-deref(
+        copy variable.type-instance.type-data is glob.type-string and
+        access-is-only-var(copy variable.access) and not variable.is-create)
+    if is-deref
+      ; if (`refman` != NULL) 
+      write(user "if (")
+      write-cname(user variable.name)
+      write(user "_Refman != NULL) ")
     write(user "LUMI_")
-    if variable.access = Access.VAR or variable.access = Access.S-VAR
+    if access-is-only-var(copy variable.access) and variable.is-create
       write(user "var_")
-    else-if variable.access = Access.OWNER or variable.access = Access.STRONG
+    else-if access-is-owner(copy variable.access)
       write(user "owner_")
     write(user "dec_ref(")
     if type-data?
       write(user "self->")
+    if is-deref
+      write(user "*")
     write-cname(user variable.name)
     write(user "_Refman);\n")
   
@@ -238,10 +246,30 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     if type-data?
       write(user "self->")
     write-cname(user variable.name)
-    write(user ")")
-    if variable.type-instance.type-data is-not glob.type-array
-      write(user ";")
-    write(user "\n")
+    if variable.type-instance.type-data is glob.type-array
+      user TypeInstance data-type
+      variable.type-instance.get-array-data-type-depth()->(user data-type)
+      write(user ", ")
+      var Bool constant-length
+      if variable.type-instance.length?
+        constant-length := variable.type-instance.length.constant
+      if constant-length
+        variable.type-instance.length.write()
+      else
+        if type-data?
+          write(user "self->")
+        write-cname(user variable.name)
+        write(user "_Length")
+      write(user ")\n")
+      if data-type.type-data is glob.type-string
+        write-spaces(copy INDENTATION-SPACES)
+        write(user "free(")
+        if type-data?
+          write(user "self->")
+        write-cname(user variable.name)
+        write(user "_String_length);\n")
+      return
+    write(user ");\n")
 
 
 ~~~ A basic namespace node in the syntax tree ~~~

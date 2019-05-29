@@ -27,17 +27,6 @@ typedef struct {
   void* ref;
 } Ref_Manager;
 
-typedef struct {
-  int max_length;
-  int length;
-  char* values;
-} String;
-
-typedef struct {
-  int length;
-  void* values;
-} Array;
-
 typedef Returncode (*Func)();
 
 typedef struct {
@@ -60,7 +49,8 @@ extern Generic_Type_Dynamic* dynamic_Void;
 
 
 typedef struct {
-  String str;
+  char* str;
+  int length;
   Ref_Manager refman;
 } Error_Message;
 
@@ -71,47 +61,72 @@ typedef struct {
   Error_Message managed_object_memory;
   Error_Message empty_base_output;
   Error_Message slice_index;
+  Error_Message string_too_long;
+  Error_Message file_not_opened;
+  Error_Message file_write_failed;
 } Error_Messages;
 
 extern Error_Messages LUMI_error_messages;
-
-
 extern char* LUMI_raise_format;
 extern char* LUMI_assert_format;
 extern char* LUMI_traceline_format;
 extern int LUMI_trace_ignore_count;
 extern char* LUMI_expected_error;
 extern int LUMI_expected_error_trace_ignore_count;
+
 void LUMI_trace_print(
   char const* format,
   char const* filename,
   int line,
   char const* funcname,
-  String* message,
+  char const* message,
+  int message_length,
   Ref_Manager* message_refman);
 
-#define START_TRACE(line, cleanup, value, format, message, message_refman) \
+#define START_TRACE(line, cleanup, value, format, message, message_length, message_refman) \
   LUMI_trace_print( \
-      format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, message, message_refman); \
+      format, \
+      LUMI_FILE_NAME, \
+      line, \
+      LUMI_FUNC_NAME, \
+      message, \
+      message_length, \
+      message_refman); \
   LUMI_err = value; \
   LUMI_loop_depth = 0; \
   goto cleanup;
 
 #define START_TRACE_STATIC(line, cleanup, err_value, format, message_length, message) { \
-  String LUMI_msg = { message_length + 1, message_length, message }; \
   Ref_Manager LUMI_msg_refman = { 1, NULL, NULL }; \
-  LUMI_msg_refman.value = &LUMI_msg; \
-  START_TRACE(line, cleanup, err_value, format, &LUMI_msg, &LUMI_msg_refman) }
+  LUMI_msg_refman.value = message; \
+  START_TRACE( \
+      line, \
+      cleanup, \
+      err_value, \
+      format, \
+      message, \
+      message_length, \
+      &LUMI_msg_refman) }
 
 #define RAISE(line, cleanup, message) { \
   START_TRACE( \
-      line, cleanup, ERR, LUMI_raise_format, \
-      &(LUMI_error_messages.message.str), \
+      line, \
+      cleanup, \
+      ERR, \
+      LUMI_raise_format, \
+      LUMI_error_messages.message.str, \
+      LUMI_error_messages.message.length, \
       &(LUMI_error_messages.message.refman)) }
 
-#define USER_RAISE(line, cleanup, message, message_refman) \
-  { \
-  START_TRACE(line, cleanup, ERR, LUMI_raise_format, message, message_refman) }
+#define USER_RAISE(line, cleanup, message, message_length, message_refman) \
+  { START_TRACE( \
+      line, \
+      cleanup, \
+      ERR, \
+      LUMI_raise_format, \
+      message, \
+      message_length, \
+      message_refman) }
 
 #define TEST_FAIL(line, cleanup, message_length, message) \
   START_TRACE_STATIC( \
@@ -121,12 +136,13 @@ void LUMI_trace_print(
   TEST_FAIL(line, cleanup, 21, "condition is not true")
 
 #define TEST_FAIL_NULL(line, cleanup) \
-  { START_TRACE(line, cleanup, FAIL, LUMI_assert_format, NULL, NULL) }
+  START_TRACE_STATIC(line, cleanup, FAIL, LUMI_assert_format, 0, NULL)
 
 #define CHECK(line, cleanup) if (LUMI_err != OK) { \
   LUMI_trace_print( \
       LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \
-      NULL, NULL); \
+      NULL, 0, NULL); \
+  LUMI_loop_depth = 0; \
   goto cleanup; }
 
 #define IGNORE_ERRORS(call) \
@@ -147,10 +163,10 @@ int LUMI_test_main(int argc, char* argv[]);
 #define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)
 #define USER_MAIN_HEADER Returncode LUMI_user_main(void)
 
-#define ARRAY_DEL(Type, array) if (array != NULL) { \
+#define ARRAY_DEL(Type, array, length) if (array != NULL) { \
   int LUMI_n = 0; \
-  for (; LUMI_n < array->length; ++LUMI_n) \
-    Type##_Del(((Type*)(array->values))+LUMI_n); \
+  for (; LUMI_n < length; ++LUMI_n) \
+    Type##_Del(array + LUMI_n); \
 }
 
 #define SELF_REF_DEL(Type, field) \
@@ -180,70 +196,108 @@ while (self->field != NULL) { \
   LUMI_owner_dec_ref(value_Refman); \
 }
 
-#define INIT_REFMAN(line, cleanup, name, is_new) \
-  name##_Refman = LUMI_new_ref((void**)&name, is_new); \
-  if (name##_Refman == NULL) RAISE(line, cleanup, managed_object_memory)
+#define INIT_VAR_REFMAN(line, cleanup, name) \
+  name##_Refman = LUMI_new_ref(name); \
+  if (name##_Refman == NULL) { RAISE(line, cleanup, managed_object_memory) }
+
+#define INIT_NEW_REFMAN(line, cleanup, name) \
+  name##_Refman = LUMI_new_ref(name); \
+  if (name##_Refman == NULL) { \
+    free(name); \
+    name = NULL; \
+    RAISE(line, cleanup, managed_object_memory) }
 
 #define INIT_VAR(line, cleanup, name) \
   name = &name##_Var; \
-  INIT_REFMAN(line, cleanup, name, false)
+  INIT_VAR_REFMAN(line, cleanup, name)
 
-#define INIT_NEW(line, cleanup, name, alloc) \
-  name = alloc; \
+#define INIT_NEW(line, cleanup, name, type, size) \
+  name = LUMI_alloc(sizeof(type) * size); \
   if (name == NULL) RAISE(line, cleanup, object_memory) \
-  INIT_REFMAN(line, cleanup, name, true)
+  INIT_NEW_REFMAN(line, cleanup, name)
+
+#define INIT_NEW_STRING(line, cleanup, name, size) \
+  name##_Max_length = size; \
+  INIT_NEW(line, cleanup, name, char, name##_Max_length)
+
+#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
+  name##_Length = length; \
+  INIT_NEW(line, cleanup, name, type, name##_Length * value_size)
 
 #define INIT_STRING_CONST(line, cleanup, name, text) \
-  INIT_VAR(line, cleanup, name) \
-  name##_Var.max_length = sizeof(text); \
-  name##_Var.length = sizeof(text) - 1; \
-  name##_Var.values = text;
+  name = text; \
+  name##_Max_length = sizeof(text); \
+  name##_Length = sizeof(text) - 1; \
+  INIT_VAR_REFMAN(line, cleanup, name)
 
 void* LUMI_alloc(size_t size);
-Ref_Manager* LUMI_new_ref(void** value, Bool is_new);
+Ref_Manager* LUMI_new_ref(void* value);
 void LUMI_inc_ref(Ref_Manager* ref);
 void LUMI_dec_ref(Ref_Manager* ref);
 void LUMI_var_dec_ref(Ref_Manager* ref);
 void LUMI_owner_dec_ref(Ref_Manager* ref);
 
-String* LUMI_new_string(int length);
-Array* LUMI_new_array(int length, int value_size);
-Array* LUMI_new_string_array(int array_length, int string_length);
-void LUMI_set_var_string_array(
-  int array_length, int string_length, Array* array, char* chars);
 Bool LUMI_run_test(char* test_name, Func test_func);
 Bool LUMI_test_coverage(File_Coverage* file_coverage, int files_number);
 
-void String_Del(String*);
-extern Generic_Type_Dynamic String_dynamic;
-Returncode String_clear(String*, Ref_Manager*);
-Returncode String_length(String*, Ref_Manager*, Int* length);
-Returncode String_equal(
-  String*, Ref_Manager*, String* other, Ref_Manager*, Bool* equal);
-Returncode String_get(String*, Ref_Manager*, Int index, Char* ch);
-Returncode String_append(String*, Ref_Manager*, Char ch);
-Returncode String_new(String*, Ref_Manager*, String* source, Ref_Manager*);
-Returncode String_concat(String*, Ref_Manager*, String* ext, Ref_Manager*);
-Returncode String_concat_int(String*, Ref_Manager*, Int num);
-Returncode String_find(
-  String*, Ref_Manager*, String* pattern, Ref_Manager*, Int* index);
-Returncode String_has(String*, Ref_Manager*, Char ch, Bool* found);
+Returncode Array_length(void*, int length, Ref_Manager*, Int* length_out);
 
-Returncode Int_str(Int value, String* str, Ref_Manager*);
+void String_Del(char*);
+extern Generic_Type_Dynamic String_dynamic;
+Returncode String_length(
+  char*, int max_length, int length, Ref_Manager*, Int* length_out);
+Returncode String_max_length(
+  char*, int max_length, int length, Ref_Manager*, Int* length_out);
+Returncode String_clear(
+  char*, int max_length, int* length, Ref_Manager**);
+Returncode String_equal(
+  char*, int max_length, int length, Ref_Manager*,
+  char* other, int other_max_length, int other_length, Ref_Manager*,
+  Bool* equal);
+Returncode String_get(
+  char*, int max_length, int length, Ref_Manager*, Int index, Char* ch);
+Returncode String_set(
+  char*, int max_length, int length, Ref_Manager*, Int index, Char ch);
+Returncode String_append(
+  char*, int max_length, int* length, Ref_Manager**, Char ch);
+Returncode String_copy(
+  char*, int max_length, int* length, Ref_Manager**,
+  char* source, int source_max_length, int source_length, Ref_Manager*);
+Returncode String_concat(
+  char*, int max_length, int* length, Ref_Manager**,
+  char* ext, int ext_max_length, int ext_length, Ref_Manager*);
+Returncode String_concat_int(
+  char*, int max_length, int* length, Ref_Manager**, Int num);
+Returncode String_find(
+  char*, int max_length, int length, Ref_Manager*,
+  char* pattern, int pattern_max_length, int pattern_length, Ref_Manager*,
+  Int* index);
+Returncode String_has(
+  char*, int max_length, int length, Ref_Manager*, Char ch, Bool* found);
+
+Returncode Int_str(
+  Int value, char* str, int str_max_length, int* str_length, Ref_Manager**);
 
 Returncode file_open_read(
-  String* name, Ref_Manager*, File** file, Ref_Manager**);
+  char* name, int name_max_length, int name_length, Ref_Manager*,
+  File** file, Ref_Manager**);
 Returncode file_open_write(
-  String* name, Ref_Manager*, File** file, Ref_Manager**);
+  char* name, int name_max_length, int name_length, Ref_Manager*,
+  File** file, Ref_Manager**);
 Returncode file_close(File* file, Ref_Manager* file_Refman);
 void File_Del(File*);
 extern Generic_Type_Dynamic File_dynamic;
 Returncode File_getc(File*, Ref_Manager*, Char* ch, Bool* is_eof);
 Returncode File_putc(File*, Ref_Manager*, Char ch);
-Returncode File_write(File*, Ref_Manager*, String* line, Ref_Manager*);
+Returncode File_write(
+  File*, Ref_Manager*,
+  char* text, int text_max_length, int text_length, Ref_Manager*);
 
 typedef struct {
-  Array* argv;
+  char* argv;
+  int argv_Length;
+  int argv_Value_length;
+  int* argv_String_length;
   Ref_Manager* argv_Refman;
   File* stdout_Cname;
   Ref_Manager* stdout_Cname_Refman;
@@ -256,17 +310,25 @@ extern Sys* sys;
 extern Ref_Manager* sys_Refman;
 void Sys_Del(Sys*);
 extern Generic_Type_Dynamic Sys_dynamic;
-Returncode Sys_print(Sys*, Ref_Manager*, String* text, Ref_Manager*);
-Returncode Sys_println(Sys*, Ref_Manager*, String* text, Ref_Manager*);
+Returncode Sys_print(
+  Sys*, Ref_Manager*,
+  char* text, int text_max_length, int text_length, Ref_Manager*);
+Returncode Sys_println(
+  Sys*, Ref_Manager*,
+  char* text, int text_max_length, int text_length, Ref_Manager*);
 Returncode Sys_getchar(Sys*, Ref_Manager*, char* ch, Bool* is_eof);
-Returncode Sys_getline(Sys*, Ref_Manager*, String* line, Ref_Manager*);
+Returncode Sys_getline(
+  Sys*, Ref_Manager*,
+  char* line, int line_max_length, int* line_length, Ref_Manager**);
 Returncode Sys_exit(Sys*, Ref_Manager*, Int status);
 Returncode Sys_system(
-  Sys*, Ref_Manager*, String* command, Ref_Manager*, Int* status);
+  Sys*, Ref_Manager*,
+  char* command, int command_max_length, int command_length, Ref_Manager*,
+  Int* status);
 Returncode Sys_getenv(
   Sys*, Ref_Manager*,
-  String* name, Ref_Manager*,
-  String* value, Ref_Manager*,
+  char* name, int name_max_length, int name_length, Ref_Manager*,
+  char* value, int value_max_length, int* value_length, Ref_Manager**,
   Bool* exists);
 
 extern int lumi_debug_value;

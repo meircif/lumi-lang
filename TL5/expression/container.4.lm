@@ -204,8 +204,9 @@ class BinaryExpression(UnaryExpression)
 class QuestionExpression(Expression)
   owner Expression tested
   
-  func inst parse-new()->(owner Expression expression)
-    new QuestionExpression question-expression(user _)
+  func inst parse-new(user SyntaxTreeCode code-node)->(
+      owner Expression expression)
+    new QuestionExpression question-expression(user code-node)
     question-expression.parse(owner expression)
     expression := question-expression
   

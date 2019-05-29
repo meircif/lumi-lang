@@ -434,6 +434,7 @@ class GlobalInit(SyntaxTreeFunction)
   func dynamic write()
     if not self.code-nodes.first?
       return
+    self.write-setup()
     self.write-children(user self.variables)
     write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")
     self.write-block-body()

@@ -206,13 +206,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if self.header-only
       return
     for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.OWNER or parameter.access = Access.STRONG
+      if access-is-owner(copy parameter.access)
         self.delete-group-builder.add-deleting(
             user parameter.get-type-instance())
     base()
     for variable in self.variables.iter()
-      if variable.access = Access.OWNER or variable.access = Access.STRONG or
-          variable.access = Access.VAR or variable.access = Access.S-VAR
+      if access-is-var(copy variable.access)
         self.delete-group-builder.add-deleting(user variable.type-instance)
     if self.my-module?
       glob.current-module := _
@@ -234,11 +233,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.check-children-memory(user self.variables, user refs)
     self.check-children-memory(user self.code-nodes, user refs)
     for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.OWNER or parameter.access = Access.STRONG
+      if access-is-owner(copy parameter.access)
         refs.mark-illegal-type(user parameter.get-type-instance())
     for variable in self.variables.iter()
-      if variable.access = Access.OWNER or variable.access = Access.STRONG or
-          variable.access = Access.VAR or variable.access = Access.S-VAR
+      if access-is-var(copy variable.access)
         refs.mark-illegal-type(user variable.type-instance)
     for output in self.arguments.outputs.iter()
       refs.check-output(user output)
@@ -290,7 +288,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       write-spaces(copy INDENTATION-SPACES)
       write(user "Ref_Manager* aux_Ref_Manager = NULL;\n")
     for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.USER or parameter.access = Access.WEAK
+      if access-is-user(copy parameter.access)
         write-spaces(copy INDENTATION-SPACES)
         write(user "LUMI_inc_ref(")
         write-cname(user parameter.get-variable().name)
@@ -298,8 +296,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst write-param-cleanup()
     for parameter in self.arguments.parameters.iter-back()
-      if parameter.access = Access.USER or parameter.access = Access.OWNER or
-          parameter.access = Access.WEAK or parameter.access = Access.STRONG
+      if access-is-user(copy parameter.access) or
+          access-is-owner(copy parameter.access)
         self.write-variable-cleanup(user parameter.get-variable(), user _)
   
   func inst write-cname()
@@ -384,11 +382,7 @@ class DeclarationArgument(Argument)
   
   func dynamic copy-new()->(owner DeclarationArgument new-argument)
     new-argument := DeclarationArgument()
-    new-argument.input-file-name := self.input-file-name
-    new-argument.line-number := self.line-number
-    new-argument.access := self.access
-    new-argument.is-output := self.is-output
-    new-argument.is-native := self.is-native
+    self.copy(user new-argument)
     new-argument.variable := SyntaxTreeVariable(user _)
     new-argument.variable.access := self.variable.access
     new-argument.variable.parent-type := self.variable.parent-type
@@ -437,19 +431,21 @@ class DeclarationArgument(Argument)
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
-    else-if self.is-output and
-        (self.access = Access.VAR or self.access = Access.S-VAR)
+    else-if self.is-output and access-is-only-var(copy self.access)
       self.syntax-error2(
           user "output",
           user self.variable.name,
           user "access should not be \"var\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
+    else-if self.access = Access.RESET
+      self.syntax-error(
+          user "access should not be \"reset\" for argument",
+          user self.variable.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
-      if (self.access = Access.OWNER or self.access = Access.STRONG)
+      if access-is-owner(copy self.access)
         self.syntax-error-msg(user "owner argument to native function")
-      if self.is-output and
-          (self.access = Access.USER or self.access = Access.WEAK)
+      if self.is-output and access-is-user(copy self.access)
         self.syntax-error-msg(user "user output to native function")
   
   func dynamic get-type-instance()->(user TypeInstance type-instance)
@@ -459,12 +455,13 @@ class DeclarationArgument(Argument)
     variable := self.variable
   
   func dynamic check-memory(user ReferenceMemoryList refs)
-    if not self.is-output and
-        (self.access = Access.USER or self.access = Access.OWNER)
+    if not self.is-output
       refs.add(user self.variable)
   
   func dynamic write()
+    var Bool is-string-var-ref
     if self.variable.type-instance.type-data is glob.type-func
+      ; Returncode (*[*]`name`)(`arguments`)
       write(user "Returncode (*")
       if self.is-output
         write(user "*")
@@ -472,35 +469,68 @@ class DeclarationArgument(Argument)
       write(user ")")
       self.variable.type-instance.arguments.write()
       return
-    ; `type`[*][*] `name`
-    ; [, Ref_Manager*[*] `name`_Refman]
-    ; [, `type`_Dynamic*[*] `name`_Dynamic]
-    self.variable.type-instance.type-data.write-cname()
-    if not self.variable.type-instance.type-data.is-primitive
-      write(user "*")
+    
+    if self.variable.type-instance.type-data is glob.type-array
+      ; `data-type`*[*] `name`, int[*] `name`_Length
+      user TypeInstance data-type
+      var Int depth
+      self.variable.type-instance.get-array-data-type-depth()->(
+          user data-type, var depth)
+      if data-type.type-data is glob.type-string
+        write(user "char")
+      else
+        data-type.type-data.write-cname()
+      self.write-name-param(user "*", user _)
+      self.write-name-param(user ", int", user "_Length")
+      for n in depth
+        ; , int[*] `name`_Value_length
+        self.write-name-param(user ", int", user _)
+        write-array-value-length(copy n)
+      if data-type.type-data is glob.type-string
+        ; , int*[*] `name`_String_length
+        self.write-name-param(user ", int*", user "_String_length")
+    
+    else-if self.variable.type-instance.type-data is glob.type-string
+      ; char*[*] `name`, int[*] `name`_Max_length, int[*] `name`_Length
+      self.write-name-param(user "char*", user _)
+      self.write-name-param(user ", int", user "_Max_length")
+      write(user ", int")
+      if not self.is-output and access-is-only-var(copy self.variable.access)
+        write(user "*")
+        is-string-var-ref := true
+      self.write-name-param(user _, user "_Length")
+    
+    else
+      ; `type`[*][*] `name`
+      self.variable.type-instance.type-data.write-cname()
+      if not self.variable.type-instance.type-data.is-primitive
+        write(user "*")
+      self.write-name-param(user _, user _)
+    
+    if not self.variable.type-instance.type-data.is-primitive and
+        not self.is-native
+      ; , Ref_Manager*[*] `name`_Refman
+      write(user ", Ref_Manager*")
+      if is-string-var-ref
+        write(user "*")
+      self.write-name-param(user _, user "_Refman")
+    
+    if self.variable.type-instance.type-data.is-dynamic and not self.is-native
+      ; , `type`_Dynamic*[*] `name`_Dynamic
+      write(user ", ")
+      self.variable.type-instance.type-data.write-cname()
+      self.write-name-param(user "_Dynamic*", user "_Dynamic")
+  
+  func inst write-name-param(user String prefix, user String suffix)
+    ; `prefix`[*] `name``suffix`
+    if prefix?
+      write(user prefix)
     if self.is-output
       write(user "*")
     write(user " ")
     write-cname(user self.variable.name)
-    
-    if not self.variable.type-instance.type-data.is-primitive and
-        not self.is-native
-      write(user ", Ref_Manager*")
-      if self.is-output
-        write(user "*")
-      write(user " ")
-      write-cname(user self.variable.name)
-      write(user "_Refman")
-    
-    if self.variable.type-instance.type-data.is-dynamic and not self.is-native
-      write(user ", ")
-      self.variable.type-instance.type-data.write-cname()
-      write(user "_Dynamic*")
-      if self.is-output
-        write(user "*")
-      write(user " ")
-      write-cname(user self.variable.name)
-      write(user "_Dynamic")
+    if suffix?
+      write(user suffix)
 
 
 class DeclarationArgumentFactory(ArgumentFactory)
