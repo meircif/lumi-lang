@@ -181,8 +181,9 @@ class AssignExpression(Expression)
     
     self.target.write-preactions()
     
-    self.write-left-delete()
-    self.code-node.write-spaces()
+    if self.target.result-type.type-data is-not glob.type-string
+      self.write-left-delete()
+      self.code-node.write-spaces()
     
     write(user "LUMI_owner_dec_ref(")
     self.target.write-refman()

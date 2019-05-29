@@ -574,6 +574,7 @@ class ComplexField
 
 struct HasComplexField
     s-var ComplexField x
+    var Array{3:String{6}} as
     func run() _
 
 func HasComplexField.run()
@@ -587,6 +588,12 @@ func HasComplexField.run()
     x2.meth()
     self.x.x.meth()
     ComplexField.meth(user self.x.x)
+    self.as[0].copy(user "a1")
+    self.as[1].copy(user "a2")
+    self.as[2].copy(user "a3")
+    for s in self.as
+        sys.print(user " ")
+        sys.print(user s)
 
 func test-complex-field()
     s-var HasComplexField y

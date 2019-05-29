@@ -162,18 +162,15 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   
   func inst write-variable-cleanup(
       user SyntaxTreeVariable variable, user TypeData type-data)
-    user TypeData item-type-data(user variable.type-instance.type-data)
-    if item-type-data is glob.type-array
-      item-type-data := variable.type-instance.parameters.first.item.type-data
-    if access-is-owner(copy variable.access) and not item-type-data.is-primitive
+    user TypeInstance data-type(user variable.type-instance)
+    if data-type.type-data is glob.type-array
+      data-type.get-array-data-type-depth()->(user data-type)
+    if access-is-owner(copy variable.access) and
+        not data-type.type-data.is-primitive
       self.write-owner-reference-cleanup(
-          user variable, user type-data, user item-type-data)
+          user variable, user type-data, user data-type)
     else-if type-data? and access-is-only-var(copy variable.access)
-      write-spaces(copy INDENTATION-SPACES)
-      item-type-data.write-cname()
-      write(user "_Del(&(self->")
-      write-cname(user variable.name)
-      write(user "));\n")
+      self.write-var-cleanup(user variable, user data-type)
       return
     if type-data?
       write-spaces(copy INDENTATION-SPACES)
@@ -203,7 +200,18 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   func inst write-owner-reference-cleanup(
       user SyntaxTreeVariable variable,
       user TypeData type-data,
-      user TypeData item-type-data)
+      user TypeInstance data-type)
+    if variable.type-instance.type-data is glob.type-array and
+        data-type.type-data is glob.type-string
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "free(")
+      if type-data?
+        write(user "self->")
+      write-cname(user variable.name)
+      write(user "_String_length);\n")
+      return
+    if data-type.type-data is glob.type-string
+      return
     write-spaces(copy INDENTATION-SPACES)
     if variable.type-instance.type-data is type-data
       if type-data.is-dynamic
@@ -229,7 +237,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         write(user "self->")
       write-cname(user variable.name)
       write(user "_Dynamic->")
-      user TypeData base-data(user item-type-data)
+      user TypeData base-data(user data-type.type-data)
       do
         while base-data.base-type?
         base-data := base-data.base-type.type-data
@@ -238,37 +246,50 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       write(user "_del(")
     else-if variable.type-instance.type-data is glob.type-array
       write(user "ARRAY_DEL(")
-      item-type-data.write-cname()
+      data-type.type-data.write-cname()
       write(user ", ")
     else
-      item-type-data.write-cname()
+      data-type.type-data.write-cname()
       write(user "_Del(")
     if type-data?
       write(user "self->")
     write-cname(user variable.name)
     if variable.type-instance.type-data is glob.type-array
-      user TypeInstance data-type
-      variable.type-instance.get-array-data-type-depth()->(user data-type)
       write(user ", ")
-      var Bool constant-length
-      if variable.type-instance.length?
-        constant-length := variable.type-instance.length.constant
-      if constant-length
-        variable.type-instance.length.write()
-      else
-        if type-data?
-          write(user "self->")
-        write-cname(user variable.name)
-        write(user "_Length")
+      if type-data?
+        write(user "self->")
+      write-cname(user variable.name)
+      write(user "_Length")
       write(user ")\n")
-      if data-type.type-data is glob.type-string
-        write-spaces(copy INDENTATION-SPACES)
-        write(user "free(")
-        if type-data?
-          write(user "self->")
-        write-cname(user variable.name)
-        write(user "_String_length);\n")
+    else
+      write(user ");\n")
+  
+  func inst write-var-cleanup(user SyntaxTreeVariable variable,
+      user TypeInstance data-type)
+    if data-type.type-data.is-primitive or
+        data-type.type-data is glob.type-string
       return
+    write-spaces(copy INDENTATION-SPACES)
+    if variable.type-instance.type-data is glob.type-array
+      write(user "ARRAY_DEL(")
+      data-type.type-data.write-cname()
+      write(user ", self->")
+      write-cname(user variable.name)
+      write(user ", ")
+      variable.type-instance.length.write()
+      user TypeInstance sequence-type(
+          user variable.type-instance.parameters.first.item)
+      do
+        while sequence-type.length?
+        write(user " * ")
+        sequence-type.length.write()
+        sequence-type := sequence-type.parameters.first.item
+    else
+      data-type.type-data.write-cname()
+      write(user "_Del(&(")
+      write(user "self->")
+      write-cname(user variable.name)
+      write(user ")")
     write(user ");\n")
 
 

@@ -539,9 +539,6 @@ Returncode Array_length(
 #undef LUMI_FUNC_NAME
 
 /*Strings*/
-void String_Del(char* self) {}
-Generic_Type_Dynamic String_dynamic = { (Dynamic_Del)String_Del };
-
 #define LUMI_FUNC_NAME "String.length"
 Returncode String_length(
     char* self, int max_length, int length, Ref_Manager* self_Refman,

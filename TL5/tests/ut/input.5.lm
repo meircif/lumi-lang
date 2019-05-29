@@ -2536,12 +2536,33 @@ class Bstruct(Astruct)
     weak Bstruct b
     new()
     func dynamic meth()
+; @ g t1
+struct Base
+    var Int x
+struct Test
+    var String{10} s
+    var Array{11:Int} ai
+    var Array{12:Base} ab
+    var Array{7:String{8}} as
+    var Array{4:Array{5:Array{6:Int}}} aai
+    var Array{4:Array{5:Array{6:Base}}} aab
+    var Array{4:Array{5:String{6}}} aas
+    func test()->(var Char c, var Int i, user Base b)
+        c := self.s[3]
+        i := self.ai[4]
+        b := self.ab[5]
+        c := self.as[4][5]
+        i := self.aai[1][2][3]
+        b := self.aab[1][2][3]
+        c := self.aas[1][2][3]
 ; @ eg te0
+var Int x
 struct Test
-    var String{12} error
+    var String{x} error
 ; @ eg te1
+var Int x
 struct Test
-    var Array{12:Int} error
+    var Array{x:Int} error
 ; @ eg te2
 struct Test
     var Test error

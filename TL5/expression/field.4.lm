@@ -120,10 +120,13 @@ class FieldExpression(Expression)
     self.variable.write-cname()
 
   func dynamic write-cast()
-    if self.is-complex-field
+    var Bool ref(copy self.is-complex-field and
+        self.result-type.type-data is-not glob.type-array and
+        self.result-type.type-data is-not glob.type-string)
+    if ref
       write(user "&(")
     self.write()
-    if self.is-complex-field
+    if ref
       write(user ")")
   
   func dynamic write-refman()
