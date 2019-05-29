@@ -3092,6 +3092,12 @@ struct Test{Data}(Base{Data})
 func fun(owner Test?{File} t, user File f)
     t := _
     f.putc(copy 'a')
+; @ eg teu35
+main
+    owner String? so(owner String{12}())
+    user String? su(user so)
+    so := _
+    su.set(copy 0, copy 'a')
 ; @ eg tev0
 func fun(var String s)
 func error(user String s)

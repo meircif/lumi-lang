@@ -9156,6 +9156,8 @@ using potentially illegal user reference "s"
 using potentially illegal user reference "f"
 /// @ teu34
 using potentially illegal user reference "f"
+/// @ teu35
+using potentially illegal user reference "su"
 /// @ tev0
 cannot assign value with access "user" into value with access "var"
 /// @ tev1
