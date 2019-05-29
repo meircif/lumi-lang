@@ -52,7 +52,8 @@ class SliceExpression(Expression)
       self.sequence.result-type.copy-new()->(owner self.result-type)
       self.result-type.length := _
       self.result-type.conditional := false
-      if access-is-weak(copy self.sequence.access)
+      if access-is-weak(copy self.sequence.access) and
+          self.sequence.result-type.type-data is glob.type-array
         self.access := Access.WEAK
       else
         self.access := Access.USER

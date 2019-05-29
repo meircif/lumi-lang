@@ -13,4 +13,8 @@ numbers[ 14 15 16 ]
 structs[ aaa bbb ccc ]
 strings[ ddd eee fff ]
 values[ ggg hhh iii ]
+items[ 
+  val000 val001 val002 val010 val011 val012 val020 val021 val022 
+  val100 val101 val102 val110 val111 val112 val120 val121 val122 
+  val200 val201 val202 val210 val211 val212 val220 val221 val222 ]
 complex fields: $$$$$$

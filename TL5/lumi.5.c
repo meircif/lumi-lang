@@ -382,8 +382,9 @@ Bool reset_ref(Ref_Manager** refman) {
   return false;
 }
 
-#define RESET_REF(refman) if (reset_ref(refman)) { \
-  CRAISE(LUMI_error_messages.managed_object_memory.str); }
+/* #define RESET_REF(refman) if (reset_ref(refman)) { \
+   CRAISE(LUMI_error_messages.managed_object_memory.str); } */
+#define RESET_REF(refman)
 
 
 /*Files*/
