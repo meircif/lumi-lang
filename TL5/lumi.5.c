@@ -282,23 +282,6 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {
   return false;
 }
 
-/*helpers*/
-#define LUMI_FUNC_NAME "*str_length"
-Returncode set_cstring(
-    char* self, int max_length, int length, Ref_Manager* self_Refman) {
-  CHECK_NOT_NULL(self)
-  if (length >= max_length) {
-    if (cstring_length(self, max_length) >= max_length) {
-      CRAISE(LUMI_error_messages.string_too_long.str)
-    }
-  }
-  else if (cstring_length(self, length + 1) > length) {
-    self[length] = '\0';
-  }
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
 /*reference counting*/
 Returncode new_Mock(Bool*);
 Returncode delete_Mock(Ref);
@@ -375,7 +358,7 @@ Returncode open_file(
   }
   *file = NULL;
   *file_Refman = NULL;
-  CCHECK(set_cstring(name, name_max_length, name_length, name_Refman));
+  CHECK_NOT_NULL(name)
   if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
     if (lumi_debug_value != LUMI_DEBUG_FAIL) {
       new_fobj = fopen(name, mode);
@@ -602,7 +585,7 @@ Returncode String_append(
     char* self, int max_length, int* length, Ref_Manager* self_Refman,
     Char ch) {
   CHECK_NOT_NULL(self)
-  if (*length >= max_length) {
+  if (*length + 1 >= max_length) {
     CRAISE(LUMI_error_messages.string_too_long.str)
   }
   self[*length] = ch;
@@ -632,7 +615,7 @@ Returncode Int_str(
     swap *= 10;
     swap += abs % 10;
     abs /= 10;
-    if (str_max_length <= *str_length) {
+    if (str_max_length <= *str_length + 1) {
       *str_length = 0;
       CRAISE(LUMI_error_messages.string_too_long.str)
     }
@@ -661,7 +644,7 @@ Returncode String_copy(
   if (source == NULL || source_Refman->value == NULL || self == source) {
     return OK;
   }
-  if (source_length > max_length) {
+  if (source_length >= max_length) {
     CRAISE(LUMI_error_messages.string_too_long.str)
   }
   *length = source_length;
@@ -678,7 +661,7 @@ Returncode String_concat(
   if (ext == NULL || ext_Refman->value == NULL) {
     return OK;
   }
-  if (*length + ext_length > max_length) {
+  if (*length + ext_length >= max_length) {
     CRAISE(LUMI_error_messages.string_too_long.str)
   }
   memcpy(self + *length, ext, ext_length);
@@ -842,7 +825,7 @@ Returncode Sys_getline(
     ch = getchar();
   }
   while (ch != EOF && ch != '\n') {
-    if (*line_length >= line_max_length) {
+    if (*line_length + 1 >= line_max_length) {
       CRAISE(LUMI_error_messages.string_too_long.str)
     }
     line[*line_length] = ch;
@@ -870,8 +853,7 @@ Returncode Sys_system(
     char* command, int command_max_length, int *command_length, Ref_Manager* command_Refman,
     Int* status) {
   int res = -1;
-  CCHECK(set_cstring(
-    command, command_max_length, *command_length, command_Refman));
+  CHECK_NOT_NULL(command)
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
     res = system(command);
   }
@@ -890,7 +872,7 @@ Returncode Sys_getenv(
     char* value, int value_max_length, int* value_length, Ref_Manager* value_Refman,
     Bool* exists) {
   char* ret;
-  CCHECK(set_cstring(name, name_max_length, *name_length, name_Refman));
+  CHECK_NOT_NULL(name)
   CHECK_NOT_NULL(value)
   ret = getenv(name);
   if (ret == NULL) {

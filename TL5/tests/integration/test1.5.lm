@@ -456,14 +456,13 @@ test test-builtin-errors()
     new String?{4} outdated-owner
     user String? outdated(user outdated-owner)
     outdated-owner := _
-    var String{3} too-long(user "abc")
+    var String{4} too-long(user "abc")
     
     owner File? file
     var String{4} filename
     assert-error file-open-read(user _)->(owner file), "empty object used"
     assert-error file-open-write(user outdated)->(owner file),
             "outdated weak reference used"
-    assert-error file-open-read(user too-long)->(owner file), "string too long"
     lumi-debug-value := 1
     assert-error file-open-write(user filename)->(owner file), "open file failed"
     lumi-debug-value := 2
@@ -488,7 +487,7 @@ test test-builtin-errors()
     assert-error "aa".get(copy 2), "slice index out of bounds"
     assert-error too-long.append(copy 'a'), "string too long"
     assert-error too-long.concat(user "a"), "string too long"
-    var String{2} short-str
+    var String{3} short-str
     assert-error 123.str(user short-str), "string too long"
     assert-error short-str.copy(user "aaaaa"), "string too long"
     
