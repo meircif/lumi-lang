@@ -135,6 +135,12 @@ class AssignExpression(Expression)
     self.value.write-length(user "_Length", user "&Lumi_empty_int", copy false)
     write(user ";\n")
     self.code-node.write-spaces()
+    
+    if access-is-owner(copy self.target.access) and
+        self.value.result-type.type-data is-not glob.type-empty
+      self.value.write()
+      write(user "_Length = &Lumi_empty_int;\n")
+      self.code-node.write-spaces()
   
   func inst write-user-assign-preactions()
     self.target.write-preactions()
@@ -184,9 +190,8 @@ class AssignExpression(Expression)
     
     self.target.write-preactions()
     
-    if self.target.result-type.type-data is-not glob.type-string
-      self.write-left-delete()
-      self.code-node.write-spaces()
+    self.write-left-delete()
+    self.code-node.write-spaces()
     
     write(user "LUMI_owner_dec_ref(")
     self.target.write-refman()

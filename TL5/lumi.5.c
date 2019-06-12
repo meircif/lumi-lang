@@ -317,7 +317,7 @@ Ref_Manager* LUMI_new_ref(void* value) {
   Bool allocate_success = true;
   IGNORE_ERRORS( new_Mock(&allocate_success); )
   if (allocate_success) {
-    ref = calloc(1, sizeof(Ref_Manager));
+    ref = malloc(sizeof(Ref_Manager));
     if (ref != NULL) {
       ref->count = 1;
       ref->value = value;

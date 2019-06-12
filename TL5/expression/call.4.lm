@@ -378,6 +378,10 @@ class CallArgument(Argument)
         self.value.result-type.type-data is-not glob.type-empty
       self.code-node.write-spaces()
       self.assignee.write-assign-null()
+      if self.assignee.result-type.type-data is glob.type-string
+        self.code-node.write-spaces()
+        self.assignee.write()
+        write(user "_Length = &Lumi_empty_int;\n")
 
 
 class CallArgumentFactory(ArgumentFactory)

@@ -462,6 +462,7 @@ char* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(*so);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = aux_String_0_Refman;
     *so_Max_length = 0;
@@ -1200,10 +1201,12 @@ char* aux_String_0 = NULL;
     aux_String_1_Refman = aux_String_0_Refman;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(*so);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = aux_String_1_Refman;
     *so_Max_length = aux_String_0_Max_length;
     *so_Length = aux_String_0_Length;
+    aux_String_0_Length = &Lumi_empty_int;
     *so = aux_String_1;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
@@ -1241,6 +1244,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
 LUMI_err = ut_M_fun1(3, ut_M_str, ut_M_str_Max_length, ut_M_str_Length, ut_M_str_Refman, *so, *so_Max_length, *so_Length, *so_Refman);
     *so = NULL;
     *so_Refman = NULL;
+    *so_Length = &Lumi_empty_int;
     CHECK(1, LUMI_block0_cleanup)
 /// @ t18
 char* aux_String_0 = NULL;
@@ -1459,10 +1463,12 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     aux_String_1_Refman = aux_String_0_Refman;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(owners);
     LUMI_owner_dec_ref(owners_Refman);
     owners_Refman = aux_String_1_Refman;
     owners_Max_length = 12;
     owners_Length = aux_String_0_Length;
+    aux_String_0_Length = &Lumi_empty_int;
     owners = aux_String_1;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
@@ -1471,10 +1477,12 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     aux_String_3_Refman = aux_String_2_Refman;
     aux_String_2 = NULL;
     aux_String_2_Refman = NULL;
+    String_Del(strongs);
     LUMI_owner_dec_ref(strongs_Refman);
     strongs_Refman = aux_String_3_Refman;
     strongs_Max_length = 12;
     strongs_Length = aux_String_2_Length;
+    aux_String_2_Length = &Lumi_empty_int;
     strongs = aux_String_3;
     aux_String_3 = NULL;
     aux_String_3_Refman = NULL;
@@ -1795,10 +1803,12 @@ char* s = NULL;
     aux_String_0_Refman = *so_Refman;
     *so = NULL;
     *so_Refman = NULL;
+    String_Del(s);
     LUMI_owner_dec_ref(s_Refman);
     s_Refman = aux_String_0_Refman;
     s_Max_length = *so_Max_length;
     s_Length = *so_Length;
+    *so_Length = &Lumi_empty_int;
     s = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
@@ -3064,10 +3074,12 @@ Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Ref_Mana
     aux_String_1_Refman = aux_String_0_Refman;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(o);
     LUMI_owner_dec_ref(o_Refman);
     o_Refman = aux_String_1_Refman;
     o_Max_length = 12;
     o_Length = aux_String_0_Length;
+    aux_String_0_Length = &Lumi_empty_int;
     o = aux_String_1;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
@@ -3741,10 +3753,12 @@ char* s = NULL;
     aux_String_0_Refman = s_Refman;
     s = NULL;
     s_Refman = NULL;
+    String_Del(*so);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = aux_String_0_Refman;
     *so_Max_length = 12;
     *so_Length = s_Length;
+    s_Length = &Lumi_empty_int;
     *so = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
@@ -8728,10 +8742,12 @@ Returncode ut_M_Test_new(ut_M_Test* self, Ref_Manager* self_Refman) {
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     CHECK_REF(4, LUMI_block0_cleanup, self, self_Refman)
+    String_Del(self->s);
     LUMI_owner_dec_ref(self->s_Refman);
     self->s_Refman = aux_String_1_Refman;
     self->s_Max_length = 12;
     self->s_Length = aux_String_0_Length;
+    aux_String_0_Length = &Lumi_empty_int;
     self->s = aux_String_1;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
@@ -8799,6 +8815,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     LUMI_inc_ref(tu_Refman);
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(s);
     LUMI_owner_dec_ref(s_Refman);
     s_Refman = aux_String_0_Refman;
     s_Max_length = 0;
@@ -8811,10 +8828,12 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     aux_String_2_Refman = aux_String_1_Refman;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
+    String_Del(s);
     LUMI_owner_dec_ref(s_Refman);
     s_Refman = aux_String_2_Refman;
     s_Max_length = 12;
     s_Length = aux_String_1_Length;
+    aux_String_1_Length = &Lumi_empty_int;
     s = aux_String_2;
     aux_String_2 = NULL;
     aux_String_2_Refman = NULL;
@@ -8825,10 +8844,12 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     aux_String_4_Refman = aux_String_3_Refman;
     aux_String_3 = NULL;
     aux_String_3_Refman = NULL;
+    String_Del(to->s);
     LUMI_owner_dec_ref(to->s_Refman);
     to->s_Refman = aux_String_4_Refman;
     to->s_Max_length = 12;
     to->s_Length = aux_String_3_Length;
+    aux_String_3_Length = &Lumi_empty_int;
     to->s = aux_String_4;
     aux_String_4 = NULL;
     aux_String_4_Refman = NULL;
@@ -8845,6 +8866,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     LUMI_err = ut_M_take(to->s, to->s_Max_length, to->s_Length, to->s_Refman);
     to->s = NULL;
     to->s_Refman = NULL;
+    to->s_Length = &Lumi_empty_int;
     CHECK(14, LUMI_block0_cleanup)
     INIT_VAR_REFMAN(15, LUMI_block0_cleanup, arr)
     if (8 < 0 || 8 >= 12) RAISE(16, LUMI_block0_cleanup, slice_index)
@@ -8883,6 +8905,7 @@ Returncode ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manage
     Ref_Manager* aux_String_0_Refman = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(*s);
     LUMI_owner_dec_ref(*s_Refman);
     *s_Refman = aux_String_0_Refman;
     *s_Max_length = 0;
@@ -8921,6 +8944,7 @@ Returncode ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manage
     Ref_Manager* aux_String_0_Refman = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(*s);
     LUMI_owner_dec_ref(*s_Refman);
     *s_Refman = aux_String_0_Refman;
     *s_Max_length = 0;
@@ -8959,10 +8983,12 @@ Returncode ut_M_fun(void) {
     aux_String_1_Refman = aux_String_0_Refman;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(so);
     LUMI_owner_dec_ref(so_Refman);
     so_Refman = aux_String_1_Refman;
     so_Max_length = 12;
     so_Length = aux_String_0_Length;
+    aux_String_0_Length = &Lumi_empty_int;
     so = aux_String_1;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
@@ -9001,6 +9027,7 @@ Returncode ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manage
     Ref_Manager* aux_String_0_Refman = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(*s);
     LUMI_owner_dec_ref(*s_Refman);
     *s_Refman = aux_String_0_Refman;
     *s_Max_length = 0;
@@ -9039,10 +9066,12 @@ Returncode ut_M_fun(void) {
     aux_String_1_Refman = aux_String_0_Refman;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(so);
     LUMI_owner_dec_ref(so_Refman);
     so_Refman = aux_String_1_Refman;
     so_Max_length = 12;
     so_Length = aux_String_0_Length;
+    aux_String_0_Length = &Lumi_empty_int;
     so = aux_String_1;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
@@ -9081,6 +9110,7 @@ char* s = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(*so);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = aux_String_0_Refman;
     *so_Max_length = 0;
@@ -9166,6 +9196,7 @@ Returncode ut_M_fun(ut_M_Test* t, Ref_Manager* t_Refman) {
     Ref_Manager* aux_String_0_Refman = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
+    String_Del(t->s);
     LUMI_owner_dec_ref(t->s_Refman);
     t->s_Refman = aux_String_0_Refman;
     t->s_Max_length = 0;
