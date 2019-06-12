@@ -174,7 +174,7 @@ class StringExpression(TextExpression)
   
   func dynamic analyze()
     self.add-aux-variable(
-        copy Access.USER, copy false, user self.result-type)->(
+        copy Access.S-VAR, copy true, user self.result-type)->(
         owner self.aux-variable)
   
   func dynamic write-preactions()

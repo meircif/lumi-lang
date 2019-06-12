@@ -218,7 +218,13 @@ while (self->field != NULL) { \
 
 #define INIT_NEW_STRING(line, cleanup, name, size) \
   name##_Max_length = size; \
-  INIT_NEW(line, cleanup, name, char, name##_Max_length)
+  INIT_NEW(line, cleanup, name, char, name##_Max_length) \
+  name##_Length = LUMI_alloc(sizeof(int)); \
+  if (name##_Length == NULL) { \
+    name##_Length = &Lumi_empty_int; \
+    free(name); name = NULL; \
+    free(name##_Refman); name##_Refman = NULL; \
+    RAISE(line, cleanup, object_memory) }
 
 #define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
   name##_Length = length; \
@@ -227,7 +233,7 @@ while (self->field != NULL) { \
 #define INIT_STRING_CONST(line, cleanup, name, text) \
   name = text; \
   name##_Max_length = sizeof(text); \
-  name##_Length = sizeof(text) - 1; \
+  *name##_Length = sizeof(text) - 1; \
   INIT_VAR_REFMAN(line, cleanup, name)
 
 void* LUMI_alloc(size_t size);
@@ -242,45 +248,50 @@ Bool LUMI_test_coverage(File_Coverage* file_coverage, int files_number);
 
 Returncode Array_length(void*, int length, Ref_Manager*, Int* length_out);
 
+extern int Lumi_empty_int;
+#define String_Del(name) do { if (name##_Length != &Lumi_empty_int) { \
+  free(name##_Length); \
+  name##_Length = &Lumi_empty_int; } } while (false)
+
 Returncode String_length(
-  char*, int max_length, int length, Ref_Manager*, Int* length_out);
+  char*, int max_length, int *length, Ref_Manager*, Int* length_out);
 Returncode String_max_length(
-  char*, int max_length, int length, Ref_Manager*, Int* length_out);
+  char*, int max_length, int *length, Ref_Manager*, Int* length_out);
 Returncode String_clear(
-  char*, int max_length, int* length, Ref_Manager**);
+  char*, int max_length, int* length, Ref_Manager*);
 Returncode String_equal(
-  char*, int max_length, int length, Ref_Manager*,
-  char* other, int other_max_length, int other_length, Ref_Manager*,
+  char*, int max_length, int *length, Ref_Manager*,
+  char* other, int other_length, Ref_Manager*,
   Bool* equal);
 Returncode String_get(
-  char*, int max_length, int length, Ref_Manager*, Int index, Char* ch);
+  char*, int max_length, int *length, Ref_Manager*, Int index, Char* ch);
 Returncode String_set(
-  char*, int max_length, int length, Ref_Manager*, Int index, Char ch);
+  char*, int max_length, int *length, Ref_Manager*, Int index, Char ch);
 Returncode String_append(
-  char*, int max_length, int* length, Ref_Manager**, Char ch);
+  char*, int max_length, int* length, Ref_Manager*, Char ch);
 Returncode String_copy(
-  char*, int max_length, int* length, Ref_Manager**,
-  char* source, int source_max_length, int source_length, Ref_Manager*);
+  char*, int max_length, int* length, Ref_Manager*,
+  char* source, int source_length, Ref_Manager*);
 Returncode String_concat(
-  char*, int max_length, int* length, Ref_Manager**,
-  char* ext, int ext_max_length, int ext_length, Ref_Manager*);
+  char*, int max_length, int* length, Ref_Manager*,
+  char* ext, int ext_length, Ref_Manager*);
 Returncode String_concat_int(
-  char*, int max_length, int* length, Ref_Manager**, Int num);
+  char*, int max_length, int* length, Ref_Manager*, Int num);
 Returncode String_find(
-  char*, int max_length, int length, Ref_Manager*,
-  char* pattern, int pattern_max_length, int pattern_length, Ref_Manager*,
+  char*, int max_length, int *length, Ref_Manager*,
+  char* pattern, int pattern_length, Ref_Manager*,
   Int* index);
 Returncode String_has(
-  char*, int max_length, int length, Ref_Manager*, Char ch, Bool* found);
+  char*, int max_length, int *length, Ref_Manager*, Char ch, Bool* found);
 
 Returncode Int_str(
-  Int value, char* str, int str_max_length, int* str_length, Ref_Manager**);
+  Int value, char* str, int str_max_length, int* str_length, Ref_Manager*);
 
 Returncode file_open_read(
-  char* name, int name_max_length, int name_length, Ref_Manager*,
+  char* name, int name_max_length, int *name_length, Ref_Manager*,
   File** file, Ref_Manager**);
 Returncode file_open_write(
-  char* name, int name_max_length, int name_length, Ref_Manager*,
+  char* name, int name_max_length, int *name_length, Ref_Manager*,
   File** file, Ref_Manager**);
 Returncode file_close(File* file, Ref_Manager* file_Refman);
 void File_Del(File*);
@@ -289,7 +300,7 @@ Returncode File_getc(File*, Ref_Manager*, Char* ch, Bool* is_eof);
 Returncode File_putc(File*, Ref_Manager*, Char ch);
 Returncode File_write(
   File*, Ref_Manager*,
-  char* text, int text_max_length, int text_length, Ref_Manager*);
+  char* text, int text_length, Ref_Manager*);
 
 typedef struct {
   char* argv;
@@ -310,23 +321,23 @@ void Sys_Del(Sys*);
 extern Generic_Type_Dynamic Sys_dynamic;
 Returncode Sys_print(
   Sys*, Ref_Manager*,
-  char* text, int text_max_length, int text_length, Ref_Manager*);
+  char* text, int text_length, Ref_Manager*);
 Returncode Sys_println(
   Sys*, Ref_Manager*,
-  char* text, int text_max_length, int text_length, Ref_Manager*);
+  char* text, int text_length, Ref_Manager*);
 Returncode Sys_getchar(Sys*, Ref_Manager*, char* ch, Bool* is_eof);
 Returncode Sys_getline(
   Sys*, Ref_Manager*,
-  char* line, int line_max_length, int* line_length, Ref_Manager**);
+  char* line, int line_max_length, int* line_length, Ref_Manager*);
 Returncode Sys_exit(Sys*, Ref_Manager*, Int status);
 Returncode Sys_system(
   Sys*, Ref_Manager*,
-  char* command, int command_max_length, int command_length, Ref_Manager*,
+  char* command, int command_max_length, int *command_length, Ref_Manager*,
   Int* status);
 Returncode Sys_getenv(
   Sys*, Ref_Manager*,
-  char* name, int name_max_length, int name_length, Ref_Manager*,
-  char* value, int value_max_length, int* value_length, Ref_Manager**,
+  char* name, int name_max_length, int *name_length, Ref_Manager*,
+  char* value, int value_max_length, int* value_length, Ref_Manager*,
   Bool* exists);
 
 extern int lumi_debug_value;

@@ -8,7 +8,6 @@ enum Access
   COPY
   OWNER
   USER
-  RESET
   STRONG
   WEAK
   S-VAR
@@ -27,7 +26,7 @@ func access-is-user(copy Int access)->(var Bool is-user)
 
 func access-is-only-var(copy Int access)->(var Bool is-only-var)
   is-only-var :=
-      access = Access.VAR or access = Access.S-VAR or access = Access.RESET
+      access = Access.VAR or access = Access.S-VAR
 
 func access-is-var(copy Int access)->(var Bool is-var)
   is-var := access-is-owner(copy access) or access-is-only-var(copy access)
@@ -118,7 +117,6 @@ struct Global
     self.access-names[Access.COPY].new(user "copy")
     self.access-names[Access.OWNER].new(user "owner")
     self.access-names[Access.USER].new(user "user")
-    self.access-names[Access.RESET].new(user "reset")
     self.access-names[Access.STRONG].new(user "strong")
     self.access-names[Access.WEAK].new(user "weak")
     self.access-names[Access.S-VAR].new(user "s-var")
@@ -216,7 +214,7 @@ struct Global
     self.add-builtin-method(
         user self.type-int, user "str", copy Access.COPY)->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.RESET, user self.type-string, user "str")
+        user function, copy Access.USER, user self.type-string, user "str")
     
     ; Bool
     self.add-builtin-global-variable(user self.type-bool, user "true")
@@ -237,20 +235,26 @@ struct Global
         user function)
     self.add-builtin-output(
         user function, copy Access.VAR, user self.type-int, user "max-length")
+        
+    self.add-builtin-method(
+        user self.type-string, user "chars", copy Access.USER)->(
+        user function)
+    self.add-builtin-char-array-argument(
+        user function, copy true, copy Access.USER, user "chars")
     
     self.add-builtin-method(
-        user self.type-string, user "copy", copy Access.RESET)->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user self.type-string, user "other")
+        user self.type-string, user "copy", copy Access.USER)->(user function)
+    self.add-builtin-char-array-argument(
+        user function, copy false, copy Access.USER, user "other")
     self.string-copy-function := function
     
     self.add-builtin-method(
-        user self.type-string, user "clear", copy Access.RESET)->(user function)
+        user self.type-string, user "clear", copy Access.USER)->(user function)
     
     self.add-builtin-method(
         user self.type-string, user "equal", copy Access.USER)->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user self.type-string, user "pattern")
+    self.add-builtin-char-array-argument(
+        user function, copy false, copy Access.USER, user "pattern")
     self.add-builtin-output(
         user function, copy Access.VAR, user self.type-bool, user "equal")
     
@@ -269,27 +273,27 @@ struct Global
         user function, copy Access.COPY, user self.type-char, user "ch")
     
     self.add-builtin-method(
-        user self.type-string, user "append", copy Access.RESET)->(
+        user self.type-string, user "append", copy Access.USER)->(
         user function)
     self.add-builtin-parameter(
         user function, copy Access.COPY, user self.type-char, user "ch")
     
     self.add-builtin-method(
-        user self.type-string, user "concat", copy Access.RESET)->(
+        user self.type-string, user "concat", copy Access.USER)->(
         user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user self.type-string, user "other")
+    self.add-builtin-char-array-argument(
+        user function, copy false, copy Access.USER, user "other")
     
     self.add-builtin-method(
-        user self.type-string, user "concat-int", copy Access.RESET)->(
+        user self.type-string, user "concat-int", copy Access.USER)->(
         user function)
     self.add-builtin-parameter(
         user function, copy Access.COPY, user self.type-int, user "number")
     
     self.add-builtin-method(
         user self.type-string, user "find", copy Access.USER)->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user self.type-string, user "pattern")
+    self.add-builtin-char-array-argument(
+        user function, copy false, copy Access.USER, user "pattern")
     self.add-builtin-output(
         user function, copy Access.VAR, user self.type-int, user "index")
     
@@ -339,8 +343,8 @@ struct Global
     
     self.add-builtin-method(
         user self.type-file, user "write", copy Access.USER)->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user self.type-string, user "text")
+    self.add-builtin-char-array-argument(
+        user function, copy false, copy Access.USER, user "text")
     
     ; Sys
     self.add-builtin-field(
@@ -369,13 +373,13 @@ struct Global
     
     self.add-builtin-method(
         user self.type-sys, user "print", copy Access.USER)->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user self.type-string, user "text")
+    self.add-builtin-char-array-argument(
+        user function, copy false, copy Access.USER, user "text")
         
     self.add-builtin-method(
         user self.type-sys, user "println", copy Access.USER)->(user function)
-    self.add-builtin-parameter(
-        user function, copy Access.USER, user self.type-string, user "text")
+    self.add-builtin-char-array-argument(
+        user function, copy false, copy Access.USER, user "text")
     
     self.add-builtin-method(
         user self.type-sys, user "getchar", copy Access.USER)->(user function)
@@ -387,7 +391,7 @@ struct Global
     self.add-builtin-method(
         user self.type-sys, user "getline", copy Access.USER)->(user function)
     self.add-builtin-parameter(
-        user function, copy Access.RESET, user self.type-string, user "line")
+        user function, copy Access.USER, user self.type-string, user "line")
     
     self.add-builtin-method(
         user self.type-sys, user "exit", copy Access.USER)->(user function)
@@ -406,7 +410,7 @@ struct Global
     self.add-builtin-parameter(
         user function, copy Access.USER, user self.type-string, user "name")
     self.add-builtin-parameter(
-        user function, copy Access.RESET, user self.type-string, user "value")
+        user function, copy Access.USER, user self.type-string, user "value")
     self.add-builtin-output(
         user function, copy Access.VAR, user self.type-bool, user "exists")
     
@@ -496,6 +500,21 @@ struct Global
         copy false,
         copy access,
         user parameter-type,
+        user _,
+        user name)
+  
+  func add-builtin-char-array-argument(
+      user SyntaxTreeFunction function,
+      copy Bool is-output,
+      copy Int access,
+      user String name)
+    self.add-builtin-argument(
+        user function,
+        user function.arguments.parameters,
+        copy is-output,
+        copy access,
+        user self.type-array,
+        user self.type-char,
         user name)
   
   func add-builtin-output(
@@ -509,6 +528,7 @@ struct Global
         copy true,
         copy access,
         user output-type,
+        user _,
         user name)
   
   func add-builtin-argument(
@@ -517,6 +537,7 @@ struct Global
       copy Bool is-output,
       copy Int access,
       user TypeData argument-type,
+      user TypeData argument-subtype,
       user String name)
     new DeclarationArgument argument
     argument.access := access
@@ -526,9 +547,13 @@ struct Global
     argument.variable.access := access
     argument-type.new-type-instance()->(
         owner argument.variable.type-instance)
+    if argument-subtype?
+      argument.variable.type-instance.parameters := List{TypeInstance}()
+      argument.variable.type-instance.parameters.add(
+          owner argument-subtype.new-type-instance())
     if not argument-type.is-primitive and not is-output
       argument.variable.type-instance.conditional := true
-    if access = Access.OWNER or access = Access.STRONG or access = Access.RESET
+    if access = Access.OWNER or access = Access.STRONG
       function.delete-group.add-deleting(user argument.variable.type-instance)
     argument-list.add(owner argument)
   

@@ -214,7 +214,7 @@ struct TypeInstance
     if target.type-data is glob.type-ref and not self.type-data.is-primitive
       return
     if access-is-owner(copy target-access)
-      if not access-is-owner(copy self-access) and self-access != Access.RESET
+      if not access-is-owner(copy self-access)
         assert node?
         node.syntax-error(
             user "assigning into an owner a non-owner access",
@@ -252,6 +252,11 @@ struct TypeInstance
             user self.name,
             user "into different generic subtype",
             user target.name)
+    if self.type-data is glob.type-string and
+        target.type-data is glob.type-array and target.parameters? and
+        not access-is-owner(copy target-access)
+      if target.parameters.first.item.type-data is glob.type-char
+        return
     user TypeInstance self-type-instance(user self)
     owner TypeInstance base-type-instance
     do

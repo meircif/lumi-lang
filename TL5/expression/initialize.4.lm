@@ -64,7 +64,7 @@ class InitExpression(ModuleTypeExpression)
       else-if self.arguments.parameters.first?
         if self.result-type.type-data is glob.type-string
           self.constructor := glob.string-copy-function
-          self.add-self-and-check(copy Access.RESET)
+          self.add-self-and-check(copy Access.USER)
         else
           self.syntax-error(
               user "no constructor for type", user self.result-type.type-data.name)
