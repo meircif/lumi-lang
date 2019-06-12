@@ -2929,6 +2929,10 @@ func deleting()
 func fun(user String s)
     deleting()
     s.set(copy 0, copy 'a')
+; @ ec teu13
+user Array{Char} a(user str)
+ostr := _
+c := a[2]
 ; @ eg teu14
 func deleting()
     var Int x(copy String{12}().length())
