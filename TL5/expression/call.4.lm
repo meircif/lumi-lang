@@ -226,8 +226,7 @@ class CallArgument(Argument)
   
   func dynamic analyze()
     analyze-expression()->(owner self.value)
-    if self.is-output and not self.value.assignable and
-        not self.access = Access.RESET
+    if self.is-output and not self.value.assignable
       self.syntax-error-msg(user "non assignable call output")
   
   func dynamic check-same-type-as(
@@ -239,8 +238,7 @@ class CallArgument(Argument)
       self.syntax-error(
           user "assigning into an owner a non-owner access",
           user glob.access-names[self.value.access])
-    if self.is-output and self.access != self.value.access and not
-        (self.access = Access.RESET and access-is-var(copy self.value.access))
+    if self.is-output and self.access != self.value.access
       self.syntax-error2(
           user "assigning into access",
           user glob.access-names[self.access],
@@ -284,7 +282,6 @@ class CallArgument(Argument)
       self.code-node.write-spaces()
   
   func dynamic write()
-    var Bool is-string-var-ref(copy self.is-output)
     ; [[(void*)]&(]`value`[)]
     if self.is-output
       if self.is-down-cast or self.is-generic
@@ -295,11 +292,16 @@ class CallArgument(Argument)
       write(user ")")
     
     if self.real-type.type-data is glob.type-array
-      ; , [&(]`value`_Length[)]
+      ; , [*][&(]`value`_Length[)]
       write(user ", ")
+      if self.value.result-type.type-data is glob.type-string
+        write(user "*")
       if self.is-output
         write(user "&(")
-      self.value.write-length(user "_Length", copy true)
+      self.value.write-length(
+          user "_Length",
+          user "0",
+          copy self.value.result-type.type-data is-not glob.type-string)
       if self.is-output
         write(user ")")
       user TypeInstance data-type
@@ -319,37 +321,34 @@ class CallArgument(Argument)
         write(user ", ")
         if self.is-output
           write(user "&(")
-        self.value.write-length(user "_String_length", copy false)
+        self.value.write-length(user "_String_length", user "NULL", copy false)
         if self.is-output
           write(user ")")
     
     else-if self.real-type.type-data is glob.type-string
       ; , [&(]`value`_Max_length[)], [&(]`value`_Length[)]
-      is-string-var-ref :=
-          self.is-output or access-is-only-var(copy self.access)
-      var Bool length-ref(copy is-string-var-ref and
-          (not access-is-only-var(copy self.value.access) or self.value.is-var))
       write(user ", ")
       if self.is-output
         write(user "&(")
-      self.value.write-length(user "_Max_length", copy true)
+      self.value.write-length(user "_Max_length", user "0", copy true)
       if self.is-output
         write(user ")")
       write(user ", ")
-      if length-ref
+      if self.is-output
         write(user "&(")
-      self.value.write-length(user "_Length", copy false)
-      if length-ref
+      self.value.write-length(
+          user "_Length", user "&Lumi_empty_int", copy false)
+      if self.is-output
         write(user ")")
       
     
     if not self.real-type.type-data.is-primitive and not self.is-native
       ; , [&(]`value`_Refman[)]
       write(user ", ")
-      if is-string-var-ref
+      if self.is-output
         write(user "&(")
       self.value.write-refman()
-      if is-string-var-ref
+      if self.is-output
         write(user ")")
     
     if self.real-type.type-data.is-dynamic and not self.is-native

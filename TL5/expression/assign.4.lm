@@ -79,7 +79,12 @@ class AssignExpression(Expression)
   func inst write-array-preactions()
     self.target.write()
     write(user "_Length = ")
-    self.value.write-length(user "_Length", copy true)
+    if self.value.result-type.type-data is glob.type-string
+      write(user "*(")
+      self.value.write()
+      write(user "_Length)")
+    else
+      self.value.write-length(user "_Length", user "0", copy true)
     write(user ";\n")
     self.code-node.write-spaces()
     
@@ -114,22 +119,20 @@ class AssignExpression(Expression)
     if data-type.type-data is glob.type-string
       self.target.write()
       write(user "_String_length = ")
-      self.value.write-length(user "_String_length", copy false)
+      self.value.write-length(user "_String_length", user "NULL", copy false)
       write(user ";\n")
       self.code-node.write-spaces()
   
   func inst write-string-preactions()
     self.target.write()
     write(user "_Max_length = ")
-    self.value.write-length(user "_Max_length", copy true)
+    self.value.write-length(user "_Max_length", user "0", copy true)
     write(user ";\n")
     self.code-node.write-spaces()
     
     self.target.write()
     write(user "_Length = ")
-    if access-is-only-var(copy self.value.access) and not self.value.is-var
-      write(user "*")
-    self.value.write-length(user "_Length", copy false)
+    self.value.write-length(user "_Length", user "&Lumi_empty_int", copy false)
     write(user ";\n")
     self.code-node.write-spaces()
   
@@ -256,7 +259,7 @@ class AssignExpression(Expression)
         write(user ", ")
         self.target.write()
         write(user ", ")
-        self.target.write-length(user "_Length", copy true)
+        self.target.write-length(user "_Length", user "0", copy true)
         write(user ")\n")
       return
     self.target.write()

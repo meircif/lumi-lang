@@ -181,7 +181,7 @@ t.error
 ; @ c t0
 c := str[13]
 ; @ c t1
-user String? x
+user Array?{Char} x
 x := str[2:6]
 ; @ c t2
 i := arr[13]
@@ -201,8 +201,8 @@ user Array{String} sa(user vsa[2:4])
 ; @ g t8
 func fun(s-var String s, strong Array{String} sa)
     var Char c(copy s[5])
-    user String part(user s[4:2])
-    part := sa[3]
+    user Array{Char} part(user s[4:2])
+    user String si(user sa[3])
 ; @ c t9
 strong Array?{String} sa
 sa[3].copy(user "text")
@@ -230,6 +230,12 @@ user Array?{Array{Array{String}}} uaa(user aas[2:4])
 func fun()
     var Array{8:Array{7:Array{6:String{5}}}} aas
     user String s(user aas[4][3][2])
+; @ c t16
+user Array?{Char} x
+x := str
+; @ c t17
+new String{12} s
+sys.print(user s)
 ; @ ec te0
 arr[2
 ; @ ec te1
@@ -713,7 +719,7 @@ var Func{()->(var Int x)} fun
 fun := fun0
 ; @@ test-builtin
 ; @ c ti0
-i.str(reset ostr)
+i.str(user ostr)
 ; @ c tb0
 b := true
 ; @ c tb1
@@ -770,51 +776,19 @@ sys.println(user str)
 ; @ c ty3
 sys.getchar()->(var c, var b)
 ; @ c ty4
-sys.getline(reset ostr)
+sys.getline(user ostr)
 ; @ c ty5
 sys.exit(copy i)
 ; @ c ty6
 sys.system(user str)->(var i)
 ; @ c ty7
-sys.getenv(user str, reset ostr)->(var b)
+sys.getenv(user str, user ostr)->(var b)
 ; @ c ty8
 sys.stdout.putc(copy c)
 ; @ c ty9
 sys.stdin.getc()->(var c, var b)
 ; @ c ty10
 sys.stderr.putc(copy c)
-; @ ec tes0
-user String? su
-ostr.clear()
-su.set(copy 0, copy 'a')
-; @ ec tes1
-user String? su
-ostr.append(copy c)
-su.set(copy 0, copy 'a')
-; @ ec tes2
-user String? su
-ostr.copy(user str)
-su.set(copy 0, copy 'a')
-; @ ec tes3
-user String? su
-ostr.concat(user str)
-su.set(copy 0, copy 'a')
-; @ ec tes4
-user String? su
-ostr.concat-int(copy i)
-su.set(copy 0, copy 'a')
-; @ ec tes5
-user String? su
-i.str(reset ostr)
-su.set(copy 0, copy 'a')
-; @ ec tes6
-user String? su
-sys.getline(reset ostr)
-su.set(copy 0, copy 'a')
-; @ ec tes7
-user String? su
-sys.getenv(user str, reset ostr)->(var b)
-su.set(copy 0, copy 'a')
 ; @ ec tef0
 var File error
 ; @ ec tef1
@@ -1040,7 +1014,7 @@ func name(copy Func{(copy Int x)->(var Int y)} fun)->(var Func{()} joy)
 func name()
     var Int x
 ; @ g t7
-func name(user String self, copy Int px, user String pu, owner String po)->(
+func name(user String self, copy Int px, user Array{Char} pu, owner String po)->(
         strong String oself, var Int ox, weak String ou, owner String oo)
     var Int x
     user String? u
@@ -1144,8 +1118,6 @@ func name(copy Int error)
 func error(copy Int error)
 ; @ eg te28
 func name(copy Int Error)
-; @ eg te29
-func name(reset String error)
 ; @@ test-members
 ; @ g t0
 struct Test
@@ -1273,15 +1245,14 @@ func name()
 ; @ g t3
 func name(user Array{String} arr)
     raise arr[3]
-; @ eg te0
-func name()
-    return()
-; @ eg te1
-func name()
-    raise()
-; @ eg te2
-func name()
-    raise 2
+; @ ec te0
+return()
+; @ ec te1
+raise()
+; @ ec te2
+raise 2
+; @ ec te3
+raise _
 ; @@ test-code-variables
 ; @ c t0
 var Int x
@@ -1316,7 +1287,7 @@ new Array{3:Array{4:String{5}}} aa
 func fun()
     var String{4} sv
     if 1 > 2
-        user String su(user sv[1:2])
+        user Array{Char} su(user sv[1:2])
 ; @ ec te0
 var Int
 ; @ ec te1
@@ -1755,7 +1726,7 @@ func fun()
     sys.print.mocked(user "really print")
     Sys.print.active := false
     sys.print.active := true
-mock Sys.print(user String text)
+mock Sys.print(user Array{Char} text)
 ; @ tg tt0
 func fun0()
     var Int x(copy 4)
@@ -2958,12 +2929,6 @@ func deleting()
 func fun(user String s)
     deleting()
     s.set(copy 0, copy 'a')
-; @ eg teu13
-func deleting(var String s)
-    s.clear()
-func fun(user String us, var String vs)
-    deleting(var vs)
-    us.set(copy 0, copy 'a')
 ; @ eg teu14
 func deleting()
     var Int x(copy String{12}().length())

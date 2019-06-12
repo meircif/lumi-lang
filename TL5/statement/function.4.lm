@@ -437,10 +437,6 @@ class DeclarationArgument(Argument)
           user self.variable.name,
           user "access should not be \"var\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
-    else-if self.access = Access.RESET
-      self.syntax-error(
-          user "access should not be \"reset\" for argument",
-          user self.variable.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
       if access-is-owner(copy self.access)
@@ -459,7 +455,6 @@ class DeclarationArgument(Argument)
       refs.add(user self.variable)
   
   func dynamic write()
-    var Bool is-string-var-ref
     if self.variable.type-instance.type-data is glob.type-func
       ; Returncode (*[*]`name`)(`arguments`)
       write(user "Returncode (*")
@@ -491,14 +486,10 @@ class DeclarationArgument(Argument)
         self.write-name-param(user ", int*", user "_String_length")
     
     else-if self.variable.type-instance.type-data is glob.type-string
-      ; char*[*] `name`, int[*] `name`_Max_length, int[*] `name`_Length
+      ; char*[*] `name`, int[*] `name`_Max_length, int*[*] `name`_Length
       self.write-name-param(user "char*", user _)
       self.write-name-param(user ", int", user "_Max_length")
-      write(user ", int")
-      if not self.is-output and access-is-only-var(copy self.variable.access)
-        write(user "*")
-        is-string-var-ref := true
-      self.write-name-param(user _, user "_Length")
+      self.write-name-param(user ", int*", user "_Length")
     
     else
       ; `type`[*][*] `name`
@@ -509,11 +500,8 @@ class DeclarationArgument(Argument)
     
     if not self.variable.type-instance.type-data.is-primitive and
         not self.is-native
-      ; , Ref_Manager*[*] `name`_Refman
-      write(user ", Ref_Manager*")
-      if is-string-var-ref
-        write(user "*")
-      self.write-name-param(user _, user "_Refman")
+      ; , Ref_Manager* `name`_Refman
+      self.write-name-param(user ", Ref_Manager*", user "_Refman")
     
     if self.variable.type-instance.type-data.is-dynamic and not self.is-native
       ; , `type`_Dynamic*[*] `name`_Dynamic

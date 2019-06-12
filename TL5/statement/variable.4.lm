@@ -211,10 +211,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     ; `data-type`* `name`[ = NULL];
     ; Returncode (*`name`[`full length`])(`arguments`)[ = {0}];
     ; Returncode (**`name`)(`arguments`)[ = NULL];
-    var Bool is-new-var(
+    var Bool is-new-or-aux-var(
         copy access-is-only-var(copy self.access) and self.is-create)
-    var Bool is-string-aux-var(copy access-is-only-var(copy self.access) and
-        self.type-instance.type-data is glob.type-string and not self.is-create)
+    var Bool is-new-var(copy is-new-or-aux-var and not self.is-aux)
     user TypeInstance data-type
     var Int sequence-depth
     self.type-instance.get-array-data-type-depth()->(
@@ -277,12 +276,13 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         write(user ";\n")
     
     if data-type.type-data is glob.type-string
-      ; int `name`_Length[ = 0];
+      ; int `name`_Length[1][ = {0}];
+      ; int* `name`_Length[ = &Lumi_empty_int];
       ; int `name`_String_length[`strings`][ = {0}];
       ; int* `name`_String_length[ = NULL];
       self.write-spaces()
       write(user "int")
-      if (not is-new-var and sequence-depth > 0) or is-string-aux-var
+      if not is-new-or-aux-var
         write(user "*")
       write(user " ")
       self.write-cname()
@@ -290,21 +290,24 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         write(user "_String_length")
       else
         write(user "_Length")
-      if is-new-var and sequence-depth > 0
+      if is-new-or-aux-var
         write(user "[")
-        sequence-type := self.type-instance
-        sequence-type.length.write()
-        for _ in sequence-depth - 1
-          sequence-type := sequence-type.parameters.first.item
-          write(user " * ")
+        if sequence-depth > 0
+          sequence-type := self.type-instance
           sequence-type.length.write()
+          for _ in sequence-depth - 1
+            sequence-type := sequence-type.parameters.first.item
+            write(user " * ")
+            sequence-type.length.write()
+        else
+          write(user "1")
         write(user "]")
       if not self.parent-type?
         write(user " = ")
-        if sequence-depth = 0 and not is-string-aux-var
-          write(user "0")
-        else-if is-new-var
+        if is-new-or-aux-var
           write(user "{0}")
+        else-if sequence-depth = 0
+          write(user "&Lumi_empty_int")
         else
           write(user "NULL")
       write(user ";\n")
@@ -339,9 +342,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func inst write-refman()
     self.write-spaces()
     write(user "Ref_Manager*")
-    if self.type-instance.type-data is glob.type-string and
-        access-is-only-var(copy self.access) and not self.is-create
-      write(user "*")
     write(user " ")
     self.write-cname()
     write(user "_Refman")

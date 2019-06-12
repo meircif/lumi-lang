@@ -325,7 +325,7 @@ func test-builtins(
     var Char cv
     var Bool bv
     new String{12} so
-    i.str(reset so)
+    i.str(user so)
     bv := true or false
     a.length()->(var iv)
     s.length()->(var iv)
@@ -350,8 +350,8 @@ func test-builtins(
     sys.print(user s)
     sys.println(user s)
     sys.getchar()->(var cv, var bv)
-    sys.getline(reset so)
-    sys.getenv(user s, reset so)->(var bv)
+    sys.getline(user so)
+    sys.getenv(user s, user so)->(var bv)
     sys.system(user s)->(var iv)
     sys.exit(copy i)
     sys.stdout.putc(copy c)
@@ -511,7 +511,7 @@ func test-for-each()
     sys.print(user "numbers[ ")
     for n in arr
         text.clear()
-        n.str(reset text)
+        n.str(user text)
         sys.print(user text)
         sys.print(user " ")
     sys.println(user "]")
@@ -552,10 +552,11 @@ func test-for-each()
     for n in 3
         for m in 3
             for i in 3
-                saarr[n][m][i].copy(user "val")
-                saarr[n][m][i].append(copy '0' + n)
-                saarr[n][m][i].append(copy '0' + m)
-                saarr[n][m][i].append(copy '0' + i)
+                s := saarr[n][m][i]
+                s.copy(user "val")
+                s.append(copy '0' + n)
+                s.append(copy '0' + m)
+                s.append(copy '0' + i)
     sys.print(user "items[ ")
     for a in saarr
         sys.print(user "\n  ")

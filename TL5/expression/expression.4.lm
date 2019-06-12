@@ -256,8 +256,6 @@ class Expression(SyntaxTreeNode)
     type-instance.copy-new()->(owner expression.result-type)
     expression.access := access
     expression.assignable := true
-    expression.is-string-var-ref := access-is-only-var(copy self.access) and
-        type-instance.type-data is glob.type-string
     self.code-node.parent.add-aux-variable(
         copy access, copy is-create, user type-instance)->(
         user expression.variable)
@@ -308,12 +306,13 @@ class Expression(SyntaxTreeNode)
     self.write-refman()
     write(user ")\n")
   
-  func inst write-length(user String prefix, copy Bool is-static)
+  func inst write-length(
+      user String prefix, user String empty, copy Bool is-static)
     var Bool is-const-length
     if is-static and self.result-type.length?
       is-const-length := self.result-type.length.constant
     if self.result-type.type-data is glob.type-empty
-      write(user "0")
+      write(user empty)
     else-if is-const-length
       self.result-type.length.write()
     else

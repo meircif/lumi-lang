@@ -6,14 +6,12 @@ class VariableExpression(Expression)
   owner String name
   owner String module-name
   user SyntaxTreeVariable variable
-  var Bool is-string-var-ref
   
   func inst copy-new()->(owner VariableExpression expression)
     expression := VariableExpression(user self.code-node)
     string-new-copy(user self.name)->(owner expression.name)
     expression.module-name := self.module-name
     expression.variable := self.variable
-    expression.is-string-var-ref := self.is-string-var-ref
     self.result-type.copy-new()->(owner expression.result-type)
     expression.access := self.access
     expression.assignable := self.assignable
@@ -46,9 +44,6 @@ class VariableExpression(Expression)
           not access-is-only-var(copy self.access))
       self.is-var := access-is-only-var(copy self.access) and
           self.variable.is-create
-      self.is-string-var-ref := access-is-only-var(copy self.access) and
-          self.result-type.type-data is glob.type-string and
-          not self.variable.is-create and not self.variable.is-output
       return
     
     user SyntaxTreeFunction function
@@ -98,16 +93,11 @@ class VariableExpression(Expression)
     else
       self.write-dynamic()
   
-  func dynamic write-refman()
-    if self.is-string-var-ref
-      write(user "*")
-    base()
-  
   func dynamic write-refman-safe()
-    if self.is-string-var-ref or self.variable.is-output
+    if self.variable.is-output
       write(user "(")
     base.write-refman()
-    if self.is-string-var-ref or self.variable.is-output
+    if self.variable.is-output
       write(user ")")
 
 

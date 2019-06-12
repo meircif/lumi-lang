@@ -49,11 +49,16 @@ class SliceExpression(Expression)
     if self.second-index?
       analyze-expression()->(owner self.second-index)
       self.check-index(user self.second-index)
-      self.sequence.result-type.copy-new()->(owner self.result-type)
+      if self.sequence.result-type.type-data is glob.type-string
+        glob.type-array.new-type-instance()->(owner self.result-type)
+        self.result-type.parameters := List{TypeInstance}()
+        self.result-type.parameters.add(
+            owner glob.type-char.new-type-instance())
+      else
+        self.sequence.result-type.copy-new()->(owner self.result-type)
       self.result-type.length := _
       self.result-type.conditional := false
-      if access-is-weak(copy self.sequence.access) and
-          self.sequence.result-type.type-data is glob.type-array
+      if access-is-weak(copy self.sequence.access)
         self.access := Access.WEAK
       else
         self.access := Access.USER
@@ -126,12 +131,12 @@ class SliceExpression(Expression)
         self.sequence.result-type.length?
       self.sequence.result-type.length.write()
     else
-      if self.sequence.result-type.type-data is glob.type-string and
-          access-is-only-var(copy self.sequence.access) and
-          not self.sequence.is-var
-        write(user "*")
+      if self.sequence.result-type.type-data is glob.type-string
+        write(user "*(")
       self.sequence.write()
       write(user "_Length")
+      if self.sequence.result-type.type-data is glob.type-string
+        write(user ")")
     write(user ") ")
     self.code-node.write-raise(user "slice_index")
     
@@ -163,13 +168,6 @@ class SliceExpression(Expression)
     self.code-node.write-spaces()
     if self.sequence.result-type.type-data is glob.type-array
       self.write-length-assigns(user data-type, copy depth, copy 0)
-    else
-      ; symbol_Max_length = symbol_Length;
-      self.slice-variable.write()
-      write(user "_Max_length = ")
-      self.slice-variable.write()
-      write(user "_Length;\n")
-      self.code-node.write-spaces()
     
     ; symbol_Refman = seq_Refman;
     ; LUMI_inc_ref(symbol_Refman);
@@ -217,12 +215,7 @@ class SliceExpression(Expression)
     ; LUMI_inc_ref(symbol_Refman);
     self.slice-variable.write()
     write(user "_Refman = ")
-    if self.result-type.type-data is glob.type-string and
-        access-is-only-var(copy self.access)
-      write(user "&")
-      self.sequence.write-refman-safe()
-    else
-      self.sequence.write-refman()
+    self.sequence.write-refman()
     write(user ";\n")
     self.code-node.write-spaces()
     write(user "LUMI_inc_ref(")
@@ -230,19 +223,12 @@ class SliceExpression(Expression)
     write(user ");\n")
 
   func inst write-preactions-string-value()
-    ; symbol_Length = seq_String_length[index];
     ; symbol_Length = seq_String_length + index;
     self.slice-variable.write()
     write(user "_Length = ")
     self.sequence.write()
-    write(user "_String_length")
-    if access-is-only-var(copy self.access)
-      write(user " + ")
-    else
-      write(user "[")
+    write(user "_String_length + ")
     self.index.write()
-    if not access-is-only-var(copy self.access)
-      write(user "]")
     write(user ";\n")
     self.code-node.write-spaces()
 
