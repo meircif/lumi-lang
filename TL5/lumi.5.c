@@ -590,6 +590,7 @@ Returncode String_append(
   }
   self[*length] = ch;
   ++(*length);
+  self[*length] = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -632,6 +633,7 @@ Returncode Int_str(
     ++next;
     swap /= 10;
   }
+  *last = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -649,6 +651,7 @@ Returncode String_copy(
   }
   *length = source_length;
   memcpy(self, source, source_length);
+  self[source_length] = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -666,6 +669,7 @@ Returncode String_concat(
   }
   memcpy(self + *length, ext, ext_length);
   *length += ext_length;
+  self[*length] = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -834,6 +838,7 @@ Returncode Sys_getline(
       ch = getchar();
     }
   }
+  line[*line_length] = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
