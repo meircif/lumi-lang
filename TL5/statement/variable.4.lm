@@ -198,8 +198,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     
     write(user ";\n")
     
-    if not self.type-instance.type-data.is-primitive and
-        not (self.parent-type? and self.access = Access.VAR)
+    if access-has-refman(copy self.access)
       self.write-refman()
     
     if self.type-instance.type-data.is-dynamic and
@@ -312,7 +311,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
           write(user "NULL")
       write(user ";\n")
       
-    if not self.parent-type? or self.access != Access.VAR
+    if access-has-refman(copy self.access)
       self.write-refman()
   
   func inst write-var()

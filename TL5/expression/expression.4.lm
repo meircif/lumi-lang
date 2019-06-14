@@ -291,19 +291,27 @@ class Expression(SyntaxTreeNode)
   func inst write-assign-null()
     self.write()
     write(user " = NULL;\n")
-    self.code-node.write-spaces()
-    self.write-refman()
-    write(user " = NULL;\n")
+    if access-has-refman(copy self.access)
+      self.code-node.write-spaces()
+      self.write-refman()
+      write(user " = NULL;\n")
     if self.result-type.type-data.is-dynamic
       self.code-node.write-spaces()
       self.write-dynamic()
       write(user " = NULL;\n")
+    if self.result-type.type-data is glob.type-string
+      self.code-node.write-spaces()
+      self.write()
+      write(user "_Length = &Lumi_empty_int;\n")
     
   func inst write-check-ref()
     ; CHECK_REF(`line`, `cleanup`, `instance`, `instance-refman`)
-    self.write-macro-init(user "CHECK_REF", user self)
-    write(user ", ")
-    self.write-refman()
+    if access-has-refman(copy self.access)
+      self.write-macro-init(user "CHECK_REF_AND_REFMAN", user self)
+      write(user ", ")
+      self.write-refman()
+    else
+      self.write-macro-init(user "CHECK_REF", user self)
     write(user ")\n")
   
   func inst write-length(

@@ -76,7 +76,6 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
           user self.aux-variable.variable)
       string-new-copy(user self.aux-variable.variable.name)->(
           owner self.aux-variable.name)
-      self.get-function().has-user-assign := true
     
     base()
   
@@ -194,7 +193,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     item.type-instance.copy-new()->(owner aux-variable.result-type)
     
     new AssignExpression assign(
-        user expression-node, user aux-variable, user value)
+        user expression-node, user aux-variable, user value, copy false)
     
     expression-node.expression.expression := assign
     expression-node.write()

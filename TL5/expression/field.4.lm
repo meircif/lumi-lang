@@ -58,7 +58,7 @@ class FieldExpression(Expression)
           owner self.result-type)
       instance-type.reference-path.copy-and-add-field(user self.variable)->(
           owner self.result-type.reference-path)
-      if self.is-complex-field and access-is-weak(copy self.instance.access) and
+      if self.is-complex-field and access-has-refman(copy self.instance.access) and
           not self.variable.type-instance.type-data is glob.type-string
         self.access := Access.S-VAR
       else

@@ -33,7 +33,7 @@ func fun7(weak Tb? tb)->(weak Tb? tbo)
 var Int i
 var Char c
 var Bool b
-weak String? str
+user String? str
 owner String? ostr
 weak Array?{Int} arr
 owner File? fobj
@@ -179,17 +179,17 @@ t.error
 5.error
 ; @@ test-slice-expression
 ; @ c t0
-c := str[13]
+c := ostr[13]
 ; @ c t1
 user Array?{Char} x
-x := str[2:6]
+x := ostr[2:6]
 ; @ c t2
 i := arr[13]
 ; @ c t3
 user Array?{Int} x
 x := arr[2:6]
 ; @ c t4
-str[4] := c
+ostr[4] := c
 ; @ c t5
 arr[4] := i
 ; @ c t6
@@ -206,6 +206,7 @@ func fun(s-var String s, strong Array{String} sa)
 ; @ c t9
 strong Array?{String} sa
 sa[3].copy(user "text")
+sa := _
 ; @ c t10
 strong Array?{Array{Int}} aai
 arr := aai[3]
@@ -218,6 +219,7 @@ weak Array?{Array{Array{Array{Int}}}} uaa(weak aai[2:4])
 strong Array?{Array{Array{String}}} aas
 weak Array?{Array{String}} ua(weak aas[3])
 weak Array?{Array{Array{String}}} uaa(weak aas[2:4])
+aas := _
 ; @ c t13
 var Array{8:Array{7:Array{6:Array{5:Int}}}} aai
 user Array?{Array{Array{Int}}} ua(user aai[3])
@@ -232,7 +234,7 @@ func fun()
     user String s(user aas[4][3][2])
 ; @ c t16
 user Array?{Char} x
-x := str
+x := ostr
 ; @ c t17
 new String{12} s
 sys.print(user s)
@@ -263,7 +265,7 @@ so := sarr[3]
 ; @ c t0
 fun0()
 ; @ c t1
-fun1(copy 3, user str, owner _)
+fun1(copy 3, user ostr, owner _)
 ; @ c t2
 fun2()->(strong so, var io)
 ; @ c t3
@@ -303,7 +305,7 @@ tco.meth()
 ; @ c t16
 t.t.meth()
 ; @ c t17
-fun1(copy 3, user str, owner so)
+fun1(copy 3, user ostr, owner so)
 ; @ c t18
 fun3(copy 1)
 fun5(copy 2)
@@ -596,7 +598,7 @@ struct Test
 i?
 ; @@ test-exclamation-expression
 ; @ c t0
-user String s(user str!)
+user String s(user ostr!)
 ; @ c t1
 user Test tt(user t.t!)
 ; @ c t2
@@ -729,36 +731,36 @@ c := EOF
 ; @ c ta0
 arr.length()->(var i)
 ; @ c ts0
-str.length()->(var i)
+ostr.length()->(var i)
 ; @ c ts1
 ostr.clear()
 ; @ c ts2
-str.equal(user str)->(var b)
+ostr.equal(user ostr)->(var b)
 ; @ c ts3
-str.get(copy i)->(var c)
+ostr.get(copy i)->(var c)
 ; @ c ts4
-str.set(copy i, copy c)
+ostr.set(copy i, copy c)
 ; @ c ts5
 ostr.append(copy c)
 ; @ c ts6
 var String{12} sv
-sv.copy(user str)
+sv.copy(user ostr)
 ; @ c ts7
-ostr.concat(user str)
+ostr.concat(user ostr)
 ; @ c ts8
 ostr.concat-int(copy i)
 ; @ c ts9
-str.find(user str)->(var i)
+ostr.find(user ostr)->(var i)
 ; @ c ts10
-str.has(copy c)->(var b)
+ostr.has(copy c)->(var b)
 ; @ c ts11
-String.set(user str, copy 0, copy 'a')
+String.set(user ostr, copy 0, copy 'a')
 ; @ c ts12
-str.max-length()->(var i)
+ostr.max-length()->(var i)
 ; @ c tf0
-file-open-read(user str)->(owner fobj)
+file-open-read(user ostr)->(owner fobj)
 ; @ c tf1
-file-open-write(user str)->(owner fobj)
+file-open-write(user ostr)->(owner fobj)
 ; @ c tf2
 file-close(owner fobj)
 ; @ c tf3
@@ -766,13 +768,13 @@ fobj.getc()->(var c, var b)
 ; @ c tf4
 fobj.putc(copy c)
 ; @ c tf5
-fobj.write(user str)
+fobj.write(user ostr)
 ; @ c ty0
 user Array{String} argv(user sys.argv)
 ; @ c ty1
-sys.print(user str)
+sys.print(user ostr)
 ; @ c ty2
-sys.println(user str)
+sys.println(user ostr)
 ; @ c ty3
 sys.getchar()->(var c, var b)
 ; @ c ty4
@@ -780,9 +782,9 @@ sys.getline(user ostr)
 ; @ c ty5
 sys.exit(copy i)
 ; @ c ty6
-sys.system(user str)->(var i)
+sys.system(user ostr)->(var i)
 ; @ c ty7
-sys.getenv(user str, user ostr)->(var b)
+sys.getenv(user ostr, user ostr)->(var b)
 ; @ c ty8
 sys.stdout.putc(copy c)
 ; @ c ty9
@@ -1334,11 +1336,11 @@ owner Array{String} sa(owner Array{arr[0]:String{arr[1]}}())
 ; @ c t5
 var Int x(copy arr[0])
 ; @ c t6
-user String? s(user str)
+user String? s(user ostr)
 ; @ c t7
 var String{12} s(user "some string")
 ; @ c t8
-new String?{i} s(user str)
+new String?{i} s(user ostr)
 ; @ c t9
 user Test? tt(user tc)
 ; @ c t10
@@ -1356,6 +1358,9 @@ owner Array{Array{String}} sa(owner Array{arr[0]:Array{arr[1]:String{arr[2]}}}()
 ; @ g t16
 func get()->(owner File a)
     owner File b(owner get())
+; @ c t17
+owner Test? ot(owner to)
+strong Test? st(strong ot)
 ; @ ec te0
 Int()
 ; @ ec te1
@@ -1787,12 +1792,12 @@ main
 var Ref r
 ; @ c tr1
 var Ref r
-r := str
+r := ostr
 ; @ c tr2
 var Ref r
 r := _
 ; @ c tr3
-var Ref r(copy str)
+var Ref r(copy ostr)
 ; @ c tr4
 var Ref r
 assert r is r
@@ -2930,7 +2935,7 @@ func fun(user String s)
     deleting()
     s.set(copy 0, copy 'a')
 ; @ ec teu13
-user Array{Char} a(user str)
+user Array{Char} a(user ostr)
 ostr := _
 c := a[2]
 ; @ eg teu14

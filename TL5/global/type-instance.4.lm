@@ -238,7 +238,7 @@ struct TypeInstance
           user glob.access-names[self-access],
           user "into value with access",
           user glob.access-names[target-access])
-    if target-access = Access.WEAK and not access-is-weak(copy self-access)
+    if target-access = Access.WEAK and not access-has-refman(copy self-access)
       assert node?
       node.syntax-error(
           user "assigning into a weak reference an illegal access",

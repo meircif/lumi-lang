@@ -342,7 +342,7 @@ class CallArgument(Argument)
         write(user ")")
       
     
-    if not self.real-type.type-data.is-primitive and not self.is-native
+    if access-has-refman(copy self.access) and not self.is-native
       ; , [&(]`value`_Refman[)]
       write(user ", ")
       if self.is-output
@@ -378,10 +378,6 @@ class CallArgument(Argument)
         self.value.result-type.type-data is-not glob.type-empty
       self.code-node.write-spaces()
       self.assignee.write-assign-null()
-      if self.assignee.result-type.type-data is glob.type-string
-        self.code-node.write-spaces()
-        self.assignee.write()
-        write(user "_Length = &Lumi_empty_int;\n")
 
 
 class CallArgumentFactory(ArgumentFactory)

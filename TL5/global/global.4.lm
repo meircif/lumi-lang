@@ -17,7 +17,7 @@ func access-is-owner(copy Int access)->(var Bool is-owner)
   is-owner :=
       access = Access.OWNER or access = Access.STRONG or access = Access.SHARED
 
-func access-is-weak(copy Int access)->(var Bool is-weak)
+func access-has-refman(copy Int access)->(var Bool is-weak)
   is-weak :=
       access = Access.STRONG or access = Access.WEAK or access = Access.S-VAR
 

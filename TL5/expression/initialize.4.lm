@@ -92,7 +92,8 @@ class InitExpression(ModuleTypeExpression)
         self.assign-expression := AssignExpression(
             user self.code-node,
             user self.aux-variable,
-            user original-value)
+            user original-value,
+            copy true)
         self.assign-expression.reset-value(user param.get-output())
         self.assign-expression.analyze()
   

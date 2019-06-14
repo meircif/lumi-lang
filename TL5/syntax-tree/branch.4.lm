@@ -157,7 +157,9 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   
   func inst write-cleanup(user TypeData type-data)
     for variable in self.variables.iter-back()
-      if not variable.type-instance.type-data.is-primitive
+      if access-has-refman(copy variable.access) or
+          variable.access = Access.OWNER or
+          (variable.access = Access.VAR and type-data?)
         self.write-variable-cleanup(user variable, user type-data)
   
   func inst write-variable-cleanup(
@@ -171,21 +173,30 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           user variable, user type-data, user data-type)
     else-if type-data? and access-is-only-var(copy variable.access)
       self.write-var-cleanup(user variable, user data-type)
-      return
+      if variable.access = Access.VAR
+        return
     if type-data?
       write-spaces(copy INDENTATION-SPACES)
     else
       self.write-spaces()
-    write(user "LUMI_")
-    if access-is-only-var(copy variable.access) and variable.is-create
-      write(user "var_")
-    else-if access-is-owner(copy variable.access)
-      write(user "owner_")
-    write(user "dec_ref(")
-    if type-data?
-      write(user "self->")
-    write-cname(user variable.name)
-    write(user "_Refman);\n")
+    
+    if access-has-refman(copy variable.access)
+      write(user "LUMI_")
+      if variable.access = Access.S-VAR and variable.is-create
+        write(user "var_")
+      else-if variable.access = Access.STRONG
+        write(user "owner_")
+      write(user "dec_ref(")
+      if type-data?
+        write(user "self->")
+      write-cname(user variable.name)
+      write(user "_Refman);\n")
+    else-if variable.access = Access.OWNER
+      write(user "free(")
+      if type-data?
+        write(user "self->")
+      write-cname(user variable.name)
+      write(user ");\n")
   
   func inst write-owner-reference-cleanup(
       user SyntaxTreeVariable variable,

@@ -21,7 +21,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   var Int dynamic-base-count
   var Int block-count
   var Bool is-dynamic
-  var Bool has-user-assign
   var Bool header-only
   var Bool external-body
   
@@ -284,11 +283,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-block-end()
   
   func inst write-setup()
-    if self.has-user-assign
-      write-spaces(copy INDENTATION-SPACES)
-      write(user "Ref_Manager* aux_Ref_Manager = NULL;\n")
     for parameter in self.arguments.parameters.iter()
-      if access-is-user(copy parameter.access)
+      if parameter.access = Access.WEAK
         write-spaces(copy INDENTATION-SPACES)
         write(user "LUMI_inc_ref(")
         write-cname(user parameter.get-variable().name)
@@ -296,8 +292,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   
   func inst write-param-cleanup()
     for parameter in self.arguments.parameters.iter-back()
-      if access-is-user(copy parameter.access) or
-          access-is-owner(copy parameter.access)
+      if access-is-owner(copy parameter.access) or
+          parameter.access = Access.WEAK
         self.write-variable-cleanup(user parameter.get-variable(), user _)
   
   func inst write-cname()
@@ -498,8 +494,7 @@ class DeclarationArgument(Argument)
         write(user "*")
       self.write-name-param(user _, user _)
     
-    if not self.variable.type-instance.type-data.is-primitive and
-        not self.is-native
+    if access-has-refman(copy self.access) and not self.is-native
       ; , Ref_Manager* `name`_Refman
       self.write-name-param(user ", Ref_Manager*", user "_Refman")
     

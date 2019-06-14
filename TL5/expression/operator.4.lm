@@ -147,7 +147,8 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
     self.assign.new(
         user self.code-node,
         user self.left-expression,
-        user self.right-expression)
+        user self.right-expression,
+        copy false)
     self.left-expression.result-type.check-assign-from(
         copy self.left-expression.access, user self)->(
         owner self.right-expression)
@@ -162,7 +163,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
 
   func dynamic write-end()
     if access-is-owner(copy self.left-expression.access)
-      self.write-end-expression(user self.assign.assigned-value-variable)
+      self.write-end-expression(user self.assign.value)
       self.assign.write-owner-null()
     else
       base()

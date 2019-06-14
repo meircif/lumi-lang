@@ -148,8 +148,11 @@ void LUMI_trace_print(
 #define IGNORE_ERRORS(call) \
   ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;
 
-#define CHECK_REF(line, cleanup, ref, refman) \
-  if (ref == NULL) RAISE(line, cleanup, empty_object) \
+#define CHECK_REF(line, cleanup, ref) \
+if (ref == NULL) RAISE(line, cleanup, empty_object)
+
+#define CHECK_REF_AND_REFMAN(line, cleanup, ref, refman) \
+  CHECK_REF(line, cleanup, ref) \
   if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)
 
 int LUMI_main(int argc, char* argv[]);
