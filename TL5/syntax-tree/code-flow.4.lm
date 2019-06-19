@@ -21,6 +21,9 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
   
   func dynamic analyze()
     self.block.analyze()
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.block.check-memory(user refs)
   
   func inst write-block()
     self.block.write-block()
@@ -76,6 +79,10 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     base()
     if self.else-node?
       self.else-node.analyze()
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.condition.check-memory(user refs)
+    base(user refs)
   
   func dynamic write()
     ; if (`condition`) {

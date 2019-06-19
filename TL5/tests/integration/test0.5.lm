@@ -226,7 +226,7 @@ func TestStruct.new(copy Int x, user String? s)
     if s?
         self.text := String{s.length() + 1}(user s)
     if x < 0
-        self.ts := TestStruct(copy x + 1, user s)
+        self.ts := TestStruct(copy x + 1, user self.text)
   
 func TestStruct.get()->(var Int x, user String s)
     x := self.num
@@ -361,8 +361,8 @@ func test-builtins(
 
 
 func test-ref-count()
-    new String{32} s(user "test string")
-    user String s-user(user s)
+    strong String s(strong String{32}(user "test string"))
+    weak String s-user(weak s)
     sys.println(user s)
     sys.println(user s-user)
     remove(owner s)
@@ -373,8 +373,9 @@ func test-ref-count()
     new TestStruct ts(copy 0, user "first struct")
     sys.println(user ts.text)
     ts.ts := TestStruct(copy 1, user "second struct")
-    ts := ts.ts!
-    sys.println(user ts.text)
+    ; ts := ts.ts!
+    ; sys.println(user ts.text)
+    sys.println(user ts.ts.text)
 
 func remove(owner String s)
     ; remove s

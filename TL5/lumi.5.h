@@ -81,7 +81,7 @@ void LUMI_trace_print(
   char const* message,
   int message_length);
 
-#define START_TRACE(line, cleanup, value, format, message, message_length) \
+#define START_TRACE(line, cleanup, value, format, message, message_length) { \
   LUMI_trace_print( \
       format, \
       LUMI_FILE_NAME, \
@@ -91,7 +91,7 @@ void LUMI_trace_print(
       message_length); \
   LUMI_err = value; \
   LUMI_loop_depth = 0; \
-  goto cleanup;
+  goto cleanup; }
 
 #define RAISE(line, cleanup, message) { \
   START_TRACE( \
@@ -103,13 +103,13 @@ void LUMI_trace_print(
       LUMI_error_messages.message.length) }
 
 #define USER_RAISE(line, cleanup, message, message_length) \
-  { START_TRACE( \
+  START_TRACE( \
       line, \
       cleanup, \
       ERR, \
       LUMI_raise_format, \
       message, \
-      message_length) }
+      message_length)
 
 #define TEST_FAIL(line, cleanup, message_length, message) \
   START_TRACE( \

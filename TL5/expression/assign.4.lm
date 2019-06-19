@@ -19,8 +19,11 @@ class AssignExpression(Expression)
     self.is-initialization := is-initialization
     self.original-value := self.value
   
-  func inst reset-value(user Expression value)
+  func inst analyze-value()->(owner Expression value)
+    self.target.result-type.check-assign-from(
+        copy self.target.access, user self)->(owner value)
     self.value := value
+    self.analyze()
   
   func dynamic analyze()
     if self.target.result-type.reference-path.equals(
@@ -61,6 +64,8 @@ class AssignExpression(Expression)
   func dynamic write-preactions()
     self.value.write-preactions()
     self.target.write-preactions()
+    if self.value.access = Access.WEAK and self.target.access = Access.USER
+      self.value.write-check-refman()
     if access-is-owner(copy self.target.access)
       self.write-owner-assign-preactions()
     if access-has-refman(copy self.target.access) and
@@ -255,4 +260,4 @@ class AssignExpression(Expression)
       self.write-macro-init(user "INIT_VAR_REFMAN", user self.target)
       write(user ")\n")
     self.code-node.write-spaces()
-    self.value.write-assign-null()
+    self.original-value.write-assign-null()

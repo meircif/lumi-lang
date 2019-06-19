@@ -230,7 +230,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     var ReferenceMemoryList refs
     self.arguments.check-memory(user refs)
     self.check-children-memory(user self.variables, user refs)
-    self.check-children-memory(user self.code-nodes, user refs)
+    base(user refs)
     for parameter in self.arguments.parameters.iter()
       if access-is-owner(copy parameter.access)
         refs.mark-illegal-type(user parameter.get-type-instance())

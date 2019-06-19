@@ -90,22 +90,23 @@ class UpCastExpression(WrapExpression)
     write(user ")")
 
 
-; ~~~ Owner --> Strong call expression ~~~
-; class OwnerToStrongCallExpression(WrapExpression)
-;   owner Expression owner-expression
-; 
-;   new(owner Expression expression)
-;     base(user expression.code-node, owner expression)
-;     self.owner-expression := self.expression
-;     self.access := Access.STRONG
-;     self.add-aux-variable(
-;         copy Access.STRONG, copy false, user self.result-type)->(
-;         owner self.expression)
-; 
-;   func dynamic write-preactions()
-;     var AssignExpression assign(
-;         user self.code-node,
-;         user self.expression,
-;         user self.owner-expression,
-;         copy true)
-;     assign.write()
+~~~ Owner --> Strong call expression ~~~
+class OwnerToStrongCallExpression(WrapExpression)
+  owner Expression owner-expression
+
+  new(owner Expression expression)
+    base(user expression.code-node, owner expression)
+    self.owner-expression := self.expression
+    self.access := Access.STRONG
+    self.add-aux-variable(
+        copy Access.STRONG, copy false, user self.result-type)->(
+        owner self.expression)
+
+  func dynamic write-preactions()
+    var AssignExpression assign(
+        user self.code-node,
+        user self.expression,
+        user self.owner-expression,
+        copy true)
+    assign.write()
+    self.code-node.write-spaces()

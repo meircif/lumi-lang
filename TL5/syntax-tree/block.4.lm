@@ -249,6 +249,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
   func dynamic analyze()
     base()
     self.analyze-children(user self.code-nodes)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    base(user refs)
+    self.check-children-memory(user self.code-nodes, user refs)
   
   func inst write-set-loop-depth()
     self.write-spaces()

@@ -90,7 +90,7 @@ test test-func()
     test-int2str.active := true
     assert-error test-int2str(copy 6)->(owner s)
     
-    var TestStruct t(copy 0, weak _)
+    var TestStruct t(copy 0, user _)
     var Int x
     t.get()->(var x)
     assert x = 12
@@ -157,17 +157,17 @@ test test-dynamic-type-parameters()
 
 
 struct Link
-    owner Link? next
+    strong Link? next
 
 class BaseLink
-    owner BaseLink? next
+    strong BaseLink? next
     weak Link? link
     
     func dynamic m-meth()
         ; do nothing
 
 class TopLink{Generic}(BaseLink)
-    owner Generic? item
+    strong Generic? item
 
 struct RefNode
     owner RefNode? next
@@ -337,24 +337,24 @@ func cleanup-test(user Array{Ref} refs)
     try
         raise
     catch
-        new Link la
+        strong Link la(strong Link())
         refs[0] := la
         if false
             ; 
         else
-            new Link lb
+            strong Link lb(strong Link())
             refs[1] := lb
             try
-                new Link lc
+                strong Link lc(strong Link())
                 refs[2] := lc
                 if true
-                    new Link ld
+                    strong Link ld(strong Link())
                     refs[3] := ld
                     do
-                        new Link le
+                        strong Link le(strong Link())
                         refs[4] := le
                         for n in 3
-                            new Link lf
+                            strong Link lf(strong Link())
                             refs[5] := lf
                             return
 
@@ -369,7 +369,7 @@ test test-block-delete()
     
     var Int n
     do
-        new Link la
+        strong Link la(strong Link())
         refs[n] := la
         n += 1
         if n = 2
@@ -379,7 +379,7 @@ test test-block-delete()
     has-refs(user refs, copy 3)
     
     for n in 3
-        new Link lb
+        strong Link lb(strong Link())
         refs[n] := lb
     has-refs(user refs, copy 3)
     
@@ -419,7 +419,7 @@ mock new()->(var Bool alloc-success)
             alloc-success := false
 
 func alloc()
-    new String{16} string
+    strong String string(strong String{16}())
     assert string?
 
 test test-assert-error-message()
@@ -435,15 +435,15 @@ test test-assert-error-message()
     user BaseType? base-user(user base-var)
     assert-error test-mid-out()->(user base-user),
             "non empty base class given as output argument"
-    new Array?{2:Int} arr
+    strong Array?{Int} arr(strong Array{2:Int}())
     assert-error arr[6], "slice index out of bounds"
-    user Array?{Int} arr2(user arr)
+    weak Array?{Int} arr2(weak arr)
     arr := _
     assert-error arr.length(), "empty object used"
     assert-error arr2.length(), "outdated weak reference used"
     assert-error arr[0], "empty object used"
     assert-error arr2[0], "outdated weak reference used"
-    user TopType? top
+    user TopType? top(user _)
     assert-error top.meth2(), "empty object used"
     new-fail-countdown := 1
     assert-error alloc(), "insufficient memory for object dynamic allocation"
@@ -453,25 +453,20 @@ test test-assert-error-message()
 native var Int lumi-debug-value
 
 test test-builtin-errors()
-    new String?{4} outdated-owner
-    user String? outdated(user outdated-owner)
-    outdated-owner := _
     var String{4} too-long(user "abc")
     
     owner File? file
     var String{4} filename
     assert-error file-open-read(user _)->(owner file), "empty object used"
-    assert-error file-open-write(user outdated)->(owner file),
-            "outdated weak reference used"
     lumi-debug-value := 1
     assert-error file-open-write(user filename)->(owner file), "open file failed"
     lumi-debug-value := 2
     new-fail-countdown := 1
     assert-error file-open-read(user filename)->(owner file),
             "insufficient memory for object dynamic allocation"
-    new-fail-countdown := 2
+    new-fail-countdown := 1
     assert-error file-open-write(user filename)->(owner file),
-            "insufficient memory for managed object"
+            "insufficient memory for object dynamic allocation"
     lumi-debug-value := 1
     assert-error file-close(owner file), "close file failed"
     var Char ch

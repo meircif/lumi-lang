@@ -42,7 +42,8 @@ class ExpressionValue(SyntaxTreeNode)
     self.expression.order-constants(user ordered-list)
   
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.expression.check-memory(user refs)
+    if self.expression?
+      self.expression.check-memory(user refs)
   
   func inst write-preactions()
     self.expression.write-preactions()
@@ -275,7 +276,7 @@ class Expression(SyntaxTreeNode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     ; do nothing
   
-  func inst write-macro-init(user String macro-name, user Expression expression)
+  func inst write-macro-name(user String macro-name)
     ; `macro-name`(`line`, `cleanup`, `expression`
     write(user macro-name)
     write(user "(")
@@ -283,6 +284,9 @@ class Expression(SyntaxTreeNode)
     write(user ", ")
     self.code-node.parent.write-cleanup-label()
     write(user ", ")
+  
+  func inst write-macro-init(user String macro-name, user Expression expression)
+    self.write-macro-name(user macro-name)
     expression.write()
   
   func inst write-init-var-ref(user VariableExpression variable)
@@ -335,6 +339,12 @@ class Expression(SyntaxTreeNode)
     else
       self.write()
       write(user prefix)
+    
+  func inst write-check-refman()
+    self.write-macro-name(user "CHECK_REFMAN")
+    self.write-refman()
+    write(user ")\n")
+    self.code-node.write-spaces()
   
   func dynamic write-cast()
     self.write()

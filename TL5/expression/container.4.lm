@@ -231,6 +231,7 @@ class QuestionExpression(Expression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.tested.check-memory(user refs)
+    refs.check-user(user self.tested)
   
   func dynamic write-preactions()
     self.tested.write-preactions()
@@ -282,6 +283,7 @@ class ExclamationExpression(Expression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.dubious.check-memory(user refs)
+    refs.check-user(user self.dubious)
 
   func dynamic write-preactions()
     self.dubious.write-preactions()

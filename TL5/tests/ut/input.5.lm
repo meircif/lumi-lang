@@ -347,7 +347,8 @@ func fun(var String s)
     s.clear()
 ; @ c t24
 strong String? s
-fun1(copy 0, user _, owner s)
+weak String? sw
+fun1(copy 0, user sw, owner s)
 ; @ c t25
 fun8(strong ostr)
 ; @ ec te0
@@ -584,7 +585,7 @@ user Test tu(user tv)
 tu := t
 ; @@ test-question-expression
 ; @ c t0
-b := str?
+b := ostr?
 ; @ c t1
 b := not arr?
 ; @ c t2
@@ -1442,7 +1443,7 @@ user String s
 ; @ ec te26
 user String s(user _)
 ; @ ec te27
-weak String s(user str)
+user String s(user str)
 ; @@ test-comment
 ; @ c t0
 ; comment
@@ -1615,10 +1616,10 @@ do
 for n in 5
     i += n
 ; @ c t1
-for n in t.num:str.length() + 2
+for n in t.num:ostr.length() + 2
     i += n
 ; @ c t2
-for ch in str
+for ch in ostr
     c := ch
 ; @ c t3
 for n in arr
@@ -1646,7 +1647,7 @@ for n in 6
     continue
     if b
         return
-    for ch in str
+    for ch in ostr
         var String{4} sb
         break
         continue
@@ -2830,6 +2831,11 @@ struct Test
     func get()->(user String s) _
 func Test.get()->(user String s)
     s := self.s
+; @ c tu5
+user String? s(user ostr)
+ostr := _
+for s in sarr
+    s.clear()
 ; @ g tb0
 struct Test
     owner String? s
@@ -3115,6 +3121,21 @@ main
     user String? su(user so)
     so := _
     su.set(copy 0, copy 'a')
+; @ ec teu36
+assert str?
+; @ ec teu37
+assert-error str!
+; @ ec teu38
+if str?
+; @ ec teu39
+for _ in str.length():2
+; @ ec teu40
+for _ in 2:str.length()
+; @ ec teu41
+for _ in str
+; @ ec teu42
+if b
+    str.clear()
 ; @ eg tev0
 func fun(var String s)
 func error(user String s)

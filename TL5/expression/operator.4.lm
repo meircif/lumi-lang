@@ -149,11 +149,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
         user self.left-expression,
         user self.right-expression,
         copy false)
-    self.left-expression.result-type.check-assign-from(
-        copy self.left-expression.access, user self)->(
-        owner self.right-expression)
-    self.assign.reset-value(user self.right-expression)
-    self.assign.analyze()
+    self.assign.analyze-value()->(owner self.right-expression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.assign.check-memory(user refs)

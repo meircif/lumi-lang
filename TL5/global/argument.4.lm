@@ -74,6 +74,9 @@ class Argument(SyntaxTreeNode)
   func dynamic get-output()->(user Expression output)
     raise
   
+  func dynamic take-value()->(owner Expression value)
+    raise
+  
   func dynamic write-preactions()
     raise
   

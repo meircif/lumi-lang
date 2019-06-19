@@ -78,6 +78,14 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
           owner self.aux-variable.name)
     
     base()
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.start.check-memory(user refs)
+    self.iterator.check-memory(user refs)
+    if not self.start.parsed()
+      refs.check-user(user self.iterator.expression)
+    refs.add(user self.item)
+    base(user refs)
   
   func inst get-iterator-type()->(owner TypeInstance type-instance)
     self.iterator.result-type.type-data.find-meth(user "has")->(

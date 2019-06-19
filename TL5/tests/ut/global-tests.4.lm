@@ -119,6 +119,7 @@ test test-illegal-call()
   assert-error arg.get-type-instance()
   assert-error arg.get-variable()
   assert-error arg.get-output()
+  assert-error arg.take-value()
   assert-error arg.write-preactions()
   assert-error arg.write-postactions()
   var tl5-compiler.ArgumentFactory factory
