@@ -62,6 +62,7 @@ Returncode ut_M_fun4(Int x);
 Returncode ut_M_fun5(Int x, Int* y);
 Returncode ut_M_fun6(Int x, Int y, Int* n, Int* m);
 Returncode ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dynamic, ut_M_Tb** tbo, Ref_Manager** tbo_Refman, ut_M_Tb_Dynamic** tbo_Dynamic);
+Returncode ut_M_fun8(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman);
 Returncode ut_M_mock(char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 ut_M_Ta_Dynamic ut_M_Ta_dynamic = {(Dynamic_Del)ut_M_Ta_Del, ut_M_Ta_dyn};
@@ -252,6 +253,15 @@ Returncode ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dy
 LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(tb_Refman);
+    return LUMI_err;
+}
+Returncode ut_M_fun8(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(s);
+    LUMI_owner_dec_ref(s_Refman);
     return LUMI_err;
 }
 Returncode ut_M_mock(char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
@@ -451,8 +461,6 @@ Char* x = NULL;
     if (2 < 0 || 6 < 0 || 2 + 6 > *(ut_M_ostr_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = ut_M_ostr + 2;
     aux_Array_0_Length = 6;
-    aux_Array_0_Refman = ut_M_ostr_Refman;
-    LUMI_inc_ref(aux_Array_0_Refman);
     x_Length = aux_Array_0_Length;
     x = aux_Array_0;
 /// @ t2
@@ -505,13 +513,11 @@ char vsa[8 * 5] = {0};
     int aux_Array_0_Length = 0;
     int aux_Array_0_Value_length = 0;
     int* aux_Array_0_String_length = NULL;
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, vsa)
+    /* initializing vsa */
     if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_String_0 = vsa + 3 * 5;
     aux_String_0_Max_length = 5;
     aux_String_0_Length = vsa_String_length + 3;
-    aux_String_0_Refman = vsa_Refman;
-    LUMI_inc_ref(aux_String_0_Refman);
     s_Max_length = 5;
     s_Length = aux_String_0_Length;
     s = aux_String_0;
@@ -520,8 +526,6 @@ char vsa[8 * 5] = {0};
     aux_Array_0_Length = 4;
     aux_Array_0_Value_length = 5;
     aux_Array_0_String_length = vsa_String_length + 2;
-    aux_Array_0_Refman = vsa_Refman;
-    LUMI_inc_ref(aux_Array_0_Refman);
     sa_Length = aux_Array_0_Length;
     sa_Value_length = 5;
     sa_String_length = aux_Array_0_String_length;
@@ -800,14 +804,12 @@ Int aai[8 * 7 * 6 * 5] = {0};
     int aux_Array_1_Value_length = 0;
     int aux_Array_1_Value_value_length = 0;
     int aux_Array_1_Value_value_value_length = 0;
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, aai)
+    /* initializing aai */
     if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = aai + 3 * 7 * 6 * 5;
     aux_Array_0_Length = 7;
     aux_Array_0_Value_length = 6;
     aux_Array_0_Value_value_length = 5;
-    aux_Array_0_Refman = aai_Refman;
-    LUMI_inc_ref(aux_Array_0_Refman);
     ua_Length = 7;
     ua_Value_length = 6;
     ua_Value_value_length = 5;
@@ -818,8 +820,6 @@ Int aai[8 * 7 * 6 * 5] = {0};
     aux_Array_1_Value_length = 7;
     aux_Array_1_Value_value_length = 6;
     aux_Array_1_Value_value_value_length = 5;
-    aux_Array_1_Refman = aai_Refman;
-    LUMI_inc_ref(aux_Array_1_Refman);
     uaa_Length = aux_Array_1_Length;
     uaa_Value_length = 7;
     uaa_Value_value_length = 6;
@@ -850,15 +850,13 @@ char aas[8 * 7 * 6 * 5] = {0};
     int aux_Array_1_Value_value_length = 0;
     int aux_Array_1_Value_value_value_length = 0;
     int* aux_Array_1_String_length = NULL;
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, aas)
+    /* initializing aas */
     if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = aas + 3 * 7 * 6 * 5;
     aux_Array_0_Length = 7;
     aux_Array_0_Value_length = 6;
     aux_Array_0_Value_value_length = 5;
     aux_Array_0_String_length = aas_String_length + 3 * 7 * 6;
-    aux_Array_0_Refman = aas_Refman;
-    LUMI_inc_ref(aux_Array_0_Refman);
     ua_Length = 7;
     ua_Value_length = 6;
     ua_Value_value_length = 5;
@@ -871,8 +869,6 @@ char aas[8 * 7 * 6 * 5] = {0};
     aux_Array_1_Value_value_length = 6;
     aux_Array_1_Value_value_value_length = 5;
     aux_Array_1_String_length = aas_String_length + 2 * 7 * 6;
-    aux_Array_1_Refman = aas_Refman;
-    LUMI_inc_ref(aux_Array_1_Refman);
     uaa_Length = aux_Array_1_Length;
     uaa_Value_length = 7;
     uaa_Value_value_length = 6;
@@ -901,28 +897,22 @@ Returncode ut_M_fun(void) {
     char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
-    INIT_VAR_REFMAN(2, LUMI_block0_cleanup, aas)
+    /* initializing aas */
     if (4 < 0 || 4 >= 8) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = aas + 4 * 7 * 6 * 5;
     aux_Array_0_Length = 7;
     aux_Array_0_Value_length = 6;
     aux_Array_0_Value_value_length = 5;
     aux_Array_0_String_length = aas_String_length + 4 * 7 * 6;
-    aux_Array_0_Refman = aas_Refman;
-    LUMI_inc_ref(aux_Array_0_Refman);
     if (3 < 0 || 3 >= 7) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = (aux_Array_0) + 3 * 6 * 5;
     aux_Array_1_Length = 6;
     aux_Array_1_Value_length = 5;
     aux_Array_1_String_length = aux_Array_0_String_length + 3 * 6;
-    aux_Array_1_Refman = aux_Array_0_Refman;
-    LUMI_inc_ref(aux_Array_1_Refman);
     if (2 < 0 || 2 >= 6) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_String_0 = (aux_Array_1) + 2 * 5;
     aux_String_0_Max_length = 5;
     aux_String_0_Length = aux_Array_1_String_length + 2;
-    aux_String_0_Refman = aux_Array_1_Refman;
-    LUMI_inc_ref(aux_String_0_Refman);
     s_Max_length = 5;
     s_Length = aux_String_0_Length;
     s = aux_String_0;
@@ -1015,7 +1005,6 @@ char* aux_String_0 = NULL;
     *so_Refman = aux_String_0_Refman;
     *so_Max_length = aux_String_0_Max_length;
     *so_Length = aux_String_0_Length;
-    aux_String_0_Length = &Lumi_empty_int;
     *so = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
@@ -1048,7 +1037,8 @@ CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_err = ut_M_Test_meth(ut_M_t->t);
     CHECK(1, LUMI_block0_cleanup)
 /// @ t17
-LUMI_err = ut_M_fun1(3, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, *so, *so_Max_length, *so_Length);
+LUMI_var_dec_ref(*so_Refman);
+    LUMI_err = ut_M_fun1(3, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, *so, *so_Max_length, *so_Length);
     *so = NULL;
     *so_Refman = NULL;
     *so_Length = &Lumi_empty_int;
@@ -1146,7 +1136,7 @@ Returncode ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** 
     ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
     ut_M_Test_Dynamic* aux_Test_0_Dynamic = &ut_M_Test_dynamic;
-    INIT_NEW(5, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
+    INIT_NEW_STRONG(5, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_inc_ref(aux_Test_0_Refman);
     LUMI_dec_ref(*t_Refman);
     *t_Refman = aux_Test_0_Refman;
@@ -1239,22 +1229,20 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length) {
     int aux_String_1_Max_length = 0;
     int* aux_String_1_Length = &Lumi_empty_int;
     Ref_Manager* aux_String_1_Refman = NULL;
-    INIT_VAR_REFMAN(2, LUMI_block0_cleanup, vars)
+    /* initializing vars */
     INIT_VAR_REFMAN(3, LUMI_block0_cleanup, s_vars)
-    INIT_NEW_STRING(4, LUMI_block0_cleanup, aux_String_0, 12);
+    INIT_NEW_STRONG_STRING(4, LUMI_block0_cleanup, aux_String_0, 12);
     LUMI_var_dec_ref(aux_String_0_Refman);
     owners_Max_length = 12;
     owners_Length = aux_String_0_Length;
-    aux_String_0_Length = &Lumi_empty_int;
     owners = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     aux_String_0_Length = &Lumi_empty_int;
-    INIT_NEW_STRING(5, LUMI_block0_cleanup, aux_String_1, 12);
+    INIT_NEW_STRONG_STRING(5, LUMI_block0_cleanup, aux_String_1, 12);
     strongs_Refman = aux_String_1_Refman;
     strongs_Max_length = 12;
     strongs_Length = aux_String_1_Length;
-    aux_String_1_Length = &Lumi_empty_int;
     strongs = aux_String_1;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
@@ -1287,6 +1275,22 @@ LUMI_block0_cleanup:
     LUMI_var_dec_ref(s_vars_Refman);
     return LUMI_err;
 }
+/// @ t24
+char* s = NULL;
+    int s_Max_length = 0;
+    int* s_Length = &Lumi_empty_int;
+    Ref_Manager* s_Refman = NULL;
+    LUMI_var_dec_ref(s_Refman);
+    LUMI_err = ut_M_fun1(0, NULL, 0, &Lumi_empty_int, s, s_Max_length, s_Length);
+    s = NULL;
+    s_Refman = NULL;
+    s_Length = &Lumi_empty_int;
+    CHECK(2, LUMI_block0_cleanup)
+/// @ t25
+LUMI_err = ut_M_fun8(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr_Refman);
+    ut_M_ostr = NULL;
+    ut_M_ostr_Length = &Lumi_empty_int;
+    CHECK(1, LUMI_block0_cleanup)
 /// @ te0
 expected access, got " "
 /// @ te1
@@ -1542,7 +1546,6 @@ char* s = NULL;
     LUMI_var_dec_ref(*so_Refman);
     s_Max_length = *so_Max_length;
     s_Length = *so_Length;
-    *so_Length = &Lumi_empty_int;
     s = *so;
     *so = NULL;
     *so_Refman = NULL;
@@ -1660,9 +1663,9 @@ assigning into a weak reference an illegal access "user"
 assigning conditional into non-conditional type "Test"
 /// @@ test-question-expression
 /// @ t0
-ut_M_b = ut_M_str != NULL && ut_M_str_Refman->value != NULL;
+ut_M_b = ut_M_str != NULL;
 /// @ t1
-ut_M_b = ! (ut_M_str != NULL && ut_M_str_Refman->value != NULL);
+ut_M_b = ! (ut_M_arr != NULL && ut_M_arr_Refman->value != NULL);
 /// @ t2
 CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_b = ut_M_t->fun != NULL;
@@ -1736,7 +1739,7 @@ cannot use "!" on solid reference of type "String"
 ut_M_Ta a_Var = {{0}};
     ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
-    INIT_VAR(1, LUMI_block0_cleanup, a)
+    a = &a_Var;
     LUMI_err = ut_M_Test_new(&(a->_base), 1);
     CHECK(1, LUMI_block0_cleanup)
 /// @ t1
@@ -1746,7 +1749,7 @@ ut_M_Ta* a = NULL;
 ut_M_Ta* aux_Ta_0 = NULL;
     Ref_Manager* aux_Ta_0_Refman = NULL;
     ut_M_Ta_Dynamic* aux_Ta_0_Dynamic = &ut_M_Ta_dynamic;
-    INIT_NEW(1, LUMI_block0_cleanup, aux_Ta_0, ut_M_Ta, 1);
+    INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Ta_0, ut_M_Ta, 1);
     LUMI_err = ut_M_Test_new(&(aux_Ta_0->_base), 7);
     CHECK(1, LUMI_block0_cleanup)
     LUMI_inc_ref(aux_Ta_0_Refman);
@@ -1865,7 +1868,7 @@ Returncode ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** 
     ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
     ut_M_Test_Dynamic* aux_Test_0_Dynamic = &ut_M_Test_dynamic;
-    INIT_NEW(5, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
+    INIT_NEW_STRONG(5, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_inc_ref(aux_Test_0_Refman);
     LUMI_dec_ref(*t_Refman);
     *t_Refman = aux_Test_0_Refman;
@@ -1967,7 +1970,7 @@ CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     CHECK(2, LUMI_block0_cleanup)
 /// @ t5
 Returncode (*farr[38])(void) = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, farr)
+    /* initializing farr */
     if (3 < 0 || 3 >= 38) RAISE(2, LUMI_block0_cleanup, slice_index)
     farr[3] = ut_M_fun0;
     if (3 < 0 || 3 >= 38) RAISE(3, LUMI_block0_cleanup, slice_index)
@@ -2063,7 +2066,7 @@ LUMI_err = String_append(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M
 /// @ ts6
 char sv[12] = {0};
     int sv_Length[1] = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, sv)
+    /* initializing sv */
     LUMI_err = String_copy(sv, 12, sv_Length, ut_M_ostr, *ut_M_ostr_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ ts7
@@ -2195,7 +2198,7 @@ USER_MAIN_HEADER {
     int aux_String_0_Length[1] = {0};
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, ut_M_s)
+    /* initializing ut_M_s */
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
     ut_M_us_Max_length = 12;
@@ -2255,7 +2258,7 @@ USER_MAIN_HEADER {
     Bool LUMI_success = true;
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, ut_M_s)
+    /* initializing ut_M_s */
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
     ut_M_us_Max_length = 12;
@@ -2368,6 +2371,25 @@ void ut_M_Test2_Del(ut_M_Test2* self) {
     if (self == NULL) return;
     ut_M_Test1_Del(&(self->_base));
 }
+/// @ t4
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    ut_M_Test* to;
+    ut_M_Test* ts;
+    Ref_Manager* ts_Refman;
+    ut_M_Test* tw;
+    Ref_Manager* tw_Refman;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->tw_Refman);
+    SELF_REF_DEL_STR(ut_M_Test, ts);
+    LUMI_owner_dec_ref(self->ts_Refman);
+    SELF_REF_DEL(ut_M_Test, to);
+    free(self->to);
+}
 /// @ te0
 expected space after "struct", got "("
 /// @ te1
@@ -2474,7 +2496,7 @@ LUMI_block0_cleanup:
 }
 void ut_M_Base_Del(ut_M_Base* self) {
     if (self == NULL) return;
-    DYN_SELF_REF_DEL(ut_M_Base, _, b);
+    SELF_REF_DEL_DYN(ut_M_Base, _, b);
     free(self->b);
 }
 Returncode ut_M_Mid_dyn0(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
@@ -2494,7 +2516,7 @@ LUMI_block0_cleanup:
 void ut_M_Mid_Del(ut_M_Mid* self) {
     if (self == NULL) return;
     ut_M_Base_Del(&(self->_base));
-    DYN_SELF_REF_DEL(ut_M_Mid, _base._, m);
+    SELF_REF_DEL_DYN(ut_M_Mid, _base._, m);
     free(self->m);
 }
 Returncode ut_M_Top_dyn0(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
@@ -2518,8 +2540,43 @@ LUMI_block0_cleanup:
 void ut_M_Top_Del(ut_M_Top* self) {
     if (self == NULL) return;
     ut_M_Mid_Del(&(self->_base));
-    DYN_SELF_REF_DEL(ut_M_Top, _base._base._, t);
+    SELF_REF_DEL_DYN(ut_M_Top, _base._base._, t);
     free(self->t);
+}
+/// @ t1
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
+struct ut_M_Test {
+    ut_M_Test* to;
+    ut_M_Test_Dynamic* to_Dynamic;
+    ut_M_Test* ts;
+    Ref_Manager* ts_Refman;
+    ut_M_Test_Dynamic* ts_Dynamic;
+    ut_M_Test* tw;
+    Ref_Manager* tw_Refman;
+    ut_M_Test_Dynamic* tw_Dynamic;
+};
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+    Returncode (*fun)(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+};
+Returncode ut_M_Test_fun(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+void ut_M_Test_Del(ut_M_Test* self);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_fun};
+Returncode ut_M_Test_fun(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->tw_Refman);
+    SELF_REF_DEL_STR_DYN(ut_M_Test, _, ts);
+    LUMI_owner_dec_ref(self->ts_Refman);
+    SELF_REF_DEL_DYN(ut_M_Test, _, to);
+    free(self->to);
 }
 /// @ te0
 expected space after "class", got "("
@@ -2622,15 +2679,14 @@ Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Int px, 
     int aux_String_1_Length[1] = {0};
     Char* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
-    INIT_VAR_REFMAN(6, LUMI_block0_cleanup, v)
+    /* initializing v */
     INIT_NEW_STRING(7, LUMI_block0_cleanup, n, 12);
-    INIT_NEW_STRING(8, LUMI_block0_cleanup, aux_String_0, 12);
+    INIT_NEW_STRONG_STRING(8, LUMI_block0_cleanup, aux_String_0, 12);
     String_Del(o);
     free(o);
     LUMI_var_dec_ref(aux_String_0_Refman);
     o_Max_length = 12;
     o_Length = aux_String_0_Length;
-    aux_String_0_Length = &Lumi_empty_int;
     o = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
@@ -2642,8 +2698,6 @@ Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Int px, 
     if (2 < 0 || 6 < 0 || 2 + 6 > *(po_Length)) RAISE(10, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = po + 2;
     aux_Array_0_Length = 6;
-    aux_Array_0_Refman = po_Refman;
-    LUMI_inc_ref(aux_Array_0_Refman);
     pu_Length = aux_Array_0_Length;
     pu = aux_Array_0;
 LUMI_block0_cleanup:
@@ -2707,7 +2761,7 @@ void ut_M_Class_Del(ut_M_Class* self) {
     if (self == NULL) return;
     ARRAY_DEL(ut_M_Class, self->ac, self->ac_Length)
     free(self->ac);
-    DYN_SELF_REF_DEL(ut_M_Class, _, c);
+    SELF_REF_DEL_DYN(ut_M_Class, _, c);
     free(self->c);
 }
 Returncode ut_M_name(ut_M_Struct* ps, ut_M_Class* pc, ut_M_Class_Dynamic* pc_Dynamic, ut_M_Struct* pas, int pas_Length, ut_M_Class* pac, int pac_Length) {
@@ -3142,7 +3196,7 @@ Returncode ut_M_name(void);
 Returncode ut_M_name(void) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    USER_RAISE(2, LUMI_block0_cleanup, NULL, 0, NULL)
+    USER_RAISE(2, LUMI_block0_cleanup, NULL, 0)
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -3156,7 +3210,7 @@ Returncode ut_M_name(void) {
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
     INIT_STRING_CONST(2, LUMI_block0_cleanup, aux_String_0, "some error");
-    USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, *(aux_String_0_Length), aux_String_0_Refman)
+    USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, *(aux_String_0_Length))
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -3173,13 +3227,18 @@ Returncode ut_M_name(char* arr, int arr_Length, int arr_Value_length, int* arr_S
     aux_String_0 = arr + 3 * arr_Value_length;
     aux_String_0_Max_length = arr_Value_length;
     aux_String_0_Length = arr_String_length + 3;
-    aux_String_0_Refman = arr_Refman;
-    LUMI_inc_ref(aux_String_0_Refman);
-    USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, *(aux_String_0_Length), aux_String_0_Refman)
+    USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, *(aux_String_0_Length))
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
+/// @ t4
+char* s = NULL;
+    int s_Max_length = 0;
+    int* s_Length = &Lumi_empty_int;
+    Ref_Manager* s_Refman = NULL;
+    CHECK_REFMAN(2, LUMI_block0_cleanup, s_Refman)
+    USER_RAISE(2, LUMI_block0_cleanup, s, *(s_Length))
 /// @ te0
 expected new-line after "return", got "("
 /// @ te1
@@ -3203,17 +3262,17 @@ ut_M_Test* tt = NULL;
 /// @ t4
 char s[12] = {0};
     int s_Length[1] = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, s)
+    /* initializing s */
 /// @ t5
 Int a[12] = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, a)
+    /* initializing a */
 /// @ t6
 ut_M_Test a[12] = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, a)
+    /* initializing a */
 /// @ t7
 char sa[12 * 7] = {0};
     int sa_String_length[12] = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, sa)
+    /* initializing sa */
 /// @ t8
 char* s = NULL;
     int s_Max_length = 0;
@@ -3223,14 +3282,13 @@ char* s = NULL;
     LUMI_owner_dec_ref(*so_Refman);
     *so_Max_length = 12;
     *so_Length = s_Length;
-    s_Length = &Lumi_empty_int;
     *so = s;
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, *so)
     s = NULL;
     s_Length = &Lumi_empty_int;
 /// @ t9
 ut_M_Tc a[12] = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, a)
+    /* initializing a */
 /// @ t10
 Int* a = NULL;
     int a_Length = 0;
@@ -3246,7 +3304,7 @@ char* sa = NULL;
 /// @ t12
 char aa[3 * 4 * 5] = {0};
     int aa_String_length[3 * 4] = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, aa)
+    /* initializing aa */
 /// @ t13
 char* aa = NULL;
     int aa_Length = 0;
@@ -3264,7 +3322,7 @@ Returncode ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
     char sv[4] = {0};
     int sv_Length[1] = {0};
-    INIT_VAR_REFMAN(2, LUMI_block0_cleanup, sv)
+    /* initializing sv */
     if (1 > 2) {
         Char* su = NULL;
         int su_Length = 0;
@@ -3273,8 +3331,6 @@ Returncode ut_M_fun(void) {
         if (1 < 0 || 2 < 0 || 1 + 2 > *(sv_Length)) RAISE(4, LUMI_block1_cleanup, slice_index)
         aux_Array_0 = sv + 1;
         aux_Array_0_Length = 2;
-        aux_Array_0_Refman = sv_Refman;
-        LUMI_inc_ref(aux_Array_0_Refman);
         su_Length = aux_Array_0_Length;
         su = aux_Array_0;
     LUMI_block1_cleanup:
@@ -3311,7 +3367,7 @@ illegal variable name "error--name"
 /// @ t0
 ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
-    INIT_NEW(1, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
+    INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_err = ut_M_Test_new(aux_Test_0, ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
     LUMI_inc_ref(aux_Test_0_Refman);
@@ -3325,7 +3381,7 @@ char* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
-    INIT_NEW_STRING(1, LUMI_block0_cleanup, aux_String_0, ut_M_arr[0]);
+    INIT_NEW_STRONG_STRING(1, LUMI_block0_cleanup, aux_String_0, ut_M_arr[0]);
     ut_M_str_Max_length = aux_String_0_Max_length;
     ut_M_str_Length = aux_String_0_Length;
     ut_M_str = aux_String_0;
@@ -3335,7 +3391,7 @@ Int* aux_Array_0 = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
-    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, Int, ut_M_arr[0], 1);
+    INIT_NEW_STRONG_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, Int, ut_M_arr[0], 1);
     LUMI_inc_ref(aux_Array_0_Refman);
     LUMI_dec_ref(ut_M_arr_Refman);
     ut_M_arr_Refman = aux_Array_0_Refman;
@@ -3349,7 +3405,7 @@ ut_M_Test* a = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
     CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
-    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, ut_M_Test, ut_M_arr[0], 1);
+    INIT_NEW_STRONG_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, ut_M_Test, ut_M_arr[0], 1);
     LUMI_var_dec_ref(aux_Array_0_Refman);
     a_Length = aux_Array_0_Length;
     a = aux_Array_0;
@@ -3370,7 +3426,7 @@ char* sa = NULL;
     CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (1 < 0 || 1 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     aux_Array_0_Value_length = ut_M_arr[1];
-    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, char, ut_M_arr[0], aux_Array_0_Value_length);
+    INIT_NEW_STRONG_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, char, ut_M_arr[0], aux_Array_0_Value_length);
     aux_Array_0_String_length = LUMI_alloc(sizeof(int) * aux_Array_0_Length);
     LUMI_var_dec_ref(aux_Array_0_Refman);
     sa_Length = aux_Array_0_Length;
@@ -3398,7 +3454,7 @@ char s[12] = {0};
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
     INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "some string");
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, s)
+    /* initializing s */
     LUMI_err = String_copy(s, 12, s_Length, aux_String_0, *aux_String_0_Length);
     CHECK(1, LUMI_block0_cleanup)
 /// @ t8
@@ -3414,7 +3470,7 @@ ut_M_Test* tt = NULL;
 /// @ t10
 ut_M_Test tt_Var = {0};
     ut_M_Test* tt = NULL;
-    INIT_VAR(1, LUMI_block0_cleanup, tt)
+    tt = &tt_Var;
     LUMI_err = ut_M_Test_new(tt, 3);
     CHECK(1, LUMI_block0_cleanup)
 /// @ t11
@@ -3425,7 +3481,7 @@ ut_M_Test* tt = NULL;
 /// @ t12
 ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
-    INIT_NEW(1, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
+    INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_err = ut_M_Test_new(aux_Test_0, 3);
     CHECK(1, LUMI_block0_cleanup)
     LUMI_inc_ref(aux_Test_0_Refman);
@@ -3462,7 +3518,7 @@ char* sa = NULL;
     if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     aux_Array_0_Value_length = ut_M_arr[1];
     aux_Array_0_Value_value_length = ut_M_arr[2];
-    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, char, ut_M_arr[0], aux_Array_0_Value_length * aux_Array_0_Value_value_length);
+    INIT_NEW_STRONG_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, char, ut_M_arr[0], aux_Array_0_Value_length * aux_Array_0_Value_value_length);
     aux_Array_0_String_length = LUMI_alloc(sizeof(int) * aux_Array_0_Length * aux_Array_0_Value_length);
     LUMI_var_dec_ref(aux_Array_0_Refman);
     sa_Length = aux_Array_0_Length;
@@ -3502,6 +3558,14 @@ ut_M_Test* ot = NULL;
     st = ot;
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, st)
     ot = NULL;
+/// @ t18
+ut_M_Test tt_Var = {0};
+    ut_M_Test* tt = NULL;
+    Ref_Manager* tt_Refman = NULL;
+    tt = &tt_Var;
+    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, tt)
+    LUMI_err = ut_M_Test_new(tt, 3);
+    CHECK(1, LUMI_block0_cleanup)
 /// @ te0
 dynamic allocation of primitive type "Int"
 /// @ te1
@@ -3641,11 +3705,11 @@ if (ut_M_b && ut_M_b) {
 if (ut_M_b) {
         char sa[4] = {0};
         int sa_Length[1] = {0};
-        INIT_VAR_REFMAN(2, LUMI_block1_cleanup, sa)
+        /* initializing sa */
         if (ut_M_b) {
             char sb[4] = {0};
             int sb_Length[1] = {0};
-            INIT_VAR_REFMAN(4, LUMI_block2_cleanup, sb)
+            /* initializing sb */
         LUMI_block2_cleanup:
             (void)0;
         }
@@ -3653,14 +3717,14 @@ if (ut_M_b) {
             if (ut_M_b) {
                 char sc[4] = {0};
                 int sc_Length[1] = {0};
-                INIT_VAR_REFMAN(6, LUMI_block5_cleanup, sc)
+                /* initializing sc */
             LUMI_block5_cleanup:
                 (void)0;
             }
             else {
                 char sd[4] = {0};
                 int sd_Length[1] = {0};
-                INIT_VAR_REFMAN(8, LUMI_block7_cleanup, sd)
+                /* initializing sd */
             LUMI_block7_cleanup:
                 (void)0;
             }
@@ -3676,14 +3740,14 @@ if (ut_M_b) {
         if (ut_M_b) {
             char se[4] = {0};
             int se_Length[1] = {0};
-            INIT_VAR_REFMAN(10, LUMI_block10_cleanup, se)
+            /* initializing se */
         LUMI_block10_cleanup:
             (void)0;
         }
         else {
             char sf[4] = {0};
             int sf_Length[1] = {0};
-            INIT_VAR_REFMAN(12, LUMI_block12_cleanup, sf)
+            /* initializing sf */
         LUMI_block12_cleanup:
             (void)0;
         }
@@ -3766,7 +3830,7 @@ do {
         char sa[4] = {0};
         int sa_Length[1] = {0};
         LUMI_loop_depth = 3;
-        INIT_VAR_REFMAN(2, LUMI_block1_cleanup, sa)
+        /* initializing sa */
         if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         LUMI_loop_depth = 1; goto LUMI_block1_cleanup;
         LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
@@ -3780,7 +3844,7 @@ do {
             char sb[4] = {0};
             int sb_Length[1] = {0};
             LUMI_loop_depth = 5;
-            INIT_VAR_REFMAN(9, LUMI_block3_cleanup, sb)
+            /* initializing sb */
             if (!(ut_M_b)) { LUMI_loop_depth = 3; goto LUMI_block3_cleanup; }
             LUMI_loop_depth = 3; goto LUMI_block3_cleanup;
             LUMI_loop_depth = 4; goto LUMI_block3_cleanup;
@@ -3794,7 +3858,7 @@ do {
                 char sc[4] = {0};
                 int sc_Length[1] = {0};
                 LUMI_loop_depth = 7;
-                INIT_VAR_REFMAN(16, LUMI_block5_cleanup, sc)
+                /* initializing sc */
                 if (!(ut_M_b)) { LUMI_loop_depth = 5; goto LUMI_block5_cleanup; }
                 LUMI_loop_depth = 5; goto LUMI_block5_cleanup;
                 LUMI_loop_depth = 6; goto LUMI_block5_cleanup;
@@ -3926,8 +3990,6 @@ char* s = NULL;
         s = aux_Array_0 + s_Index * aux_Array_0_Value_length;
         s_Max_length = aux_Array_0_Value_length;
         s_Length = aux_Array_0_String_length + s_Index;
-        s_Refman = aux_Array_0_Refman;
-        LUMI_inc_ref(s_Refman);
         LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
         CHECK(2, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
@@ -3987,7 +4049,7 @@ Int n = 0;
         int aux_String_0_Max_length = 0;
         int* aux_String_0_Length = &Lumi_empty_int;
         LUMI_loop_depth = 3;
-        INIT_VAR_REFMAN(2, LUMI_block1_cleanup, sa)
+        /* initializing sa */
         LUMI_loop_depth = 1; goto LUMI_block1_cleanup;
         LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
         if (ut_M_b) {
@@ -4007,7 +4069,7 @@ Int n = 0;
             CHECK_REF(8, LUMI_block3_cleanup, aux_String_0)
             if (ch_Index < 0 || ch_Index >= *(aux_String_0_Length)) RAISE(8, LUMI_block3_cleanup, slice_index)
             ch = aux_String_0[ch_Index];
-            INIT_VAR_REFMAN(8, LUMI_block3_cleanup, sb)
+            /* initializing sb */
             LUMI_loop_depth = 3; goto LUMI_block3_cleanup;
             LUMI_loop_depth = 4; goto LUMI_block3_cleanup;
             if (ut_M_b) {
@@ -4070,7 +4132,7 @@ char sa[3 * 4] = {0};
     int aux_Array_0_Length = 0;
     int aux_Array_0_Value_length = 0;
     int* aux_Array_0_String_length = NULL;
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, sa)
+    /* initializing sa */
     aux_Array_0_Length = 3;
     aux_Array_0_Value_length = 4;
     aux_Array_0_String_length = sa_String_length;
@@ -4081,8 +4143,6 @@ char sa[3 * 4] = {0};
         s = aux_Array_0 + s_Index * 4;
         s_Max_length = 4;
         s_Length = aux_Array_0_String_length + s_Index;
-        s_Refman = aux_Array_0_Refman;
-        LUMI_inc_ref(s_Refman);
         LUMI_err = String_set(s, 4, s_Length, 0, 'a');
         CHECK(3, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
@@ -4212,14 +4272,12 @@ if (ut_M_b) {
         int s_Length[1] = {0};
         Char* aux_Array_0 = NULL;
         int aux_Array_0_Length = 0;
-        INIT_VAR_REFMAN(2, LUMI_block1_cleanup, s)
+        /* initializing s */
         TEST_ASSERT(3, LUMI_block1_cleanup, ut_M_b)
         ++LUMI_trace_ignore_count;
         if (1 < 0 || 2 < 0 || 1 + 2 > *(s_Length)) RAISE(4, LUMI_block2_cleanup, slice_index)
         aux_Array_0 = s + 1;
         aux_Array_0_Length = 2;
-        aux_Array_0_Refman = s_Refman;
-        LUMI_inc_ref(aux_Array_0_Refman);
         --LUMI_trace_ignore_count;
         TEST_FAIL(4, LUMI_block1_cleanup, 16, "error not raised")
         LUMI_block2_cleanup:
@@ -4235,8 +4293,6 @@ if (ut_M_b) {
             if (1 < 0 || 2 < 0 || 1 + 2 > *(s_Length)) RAISE(6, LUMI_block4_cleanup, slice_index)
             aux_Array_1 = s + 1;
             aux_Array_1_Length = 2;
-            aux_Array_1_Refman = s_Refman;
-            LUMI_inc_ref(aux_Array_1_Refman);
             --LUMI_trace_ignore_count;
             TEST_FAIL(6, LUMI_block3_cleanup, 16, "error not raised")
             LUMI_block4_cleanup:
@@ -4269,7 +4325,7 @@ Returncode ut_M_fun_Mock(void) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     if (!ut_M_fun_Mock_active) return ut_M_fun();
-    USER_RAISE(4, LUMI_block0_cleanup, NULL, 0, NULL)
+    USER_RAISE(4, LUMI_block0_cleanup, NULL, 0)
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -4588,7 +4644,7 @@ Returncode ut_M_fun0(void) {
     }
     else {
         ++LUMI_file_coverage[0].line_count[22];
-        USER_RAISE(22, LUMI_block11_cleanup, NULL, 0, NULL)
+        USER_RAISE(22, LUMI_block11_cleanup, NULL, 0)
     LUMI_block11_cleanup:
         (void)0;
     }
@@ -5072,7 +5128,7 @@ Returncode ut_M_use(File* first, Ref_Manager* first_Refman, Sys* second, Ref_Man
     LUMI_inc_ref(first_Refman);
     LUMI_inc_ref(second_Refman);
     LUMI_inc_ref(third_Refman);
-    INIT_VAR(10, LUMI_block0_cleanup, t)
+    t = &t_Var;
     LUMI_inc_ref(first_Refman);
     LUMI_dec_ref(t->first_Refman);
     t->first_Refman = first_Refman;
@@ -5132,7 +5188,7 @@ CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
     ut_M_t = ut_M_d->item;
 /// @ t8
 ut_M_Data ad[5] = {0};
-    INIT_VAR_REFMAN(1, LUMI_block0_cleanup, ad)
+    /* initializing ad */
     if (2 < 0 || 2 >= 5) RAISE(2, LUMI_block0_cleanup, slice_index)
     LUMI_inc_ref((ad + 2)->item_Refman);
     LUMI_dec_ref(ut_M_t_Refman);
@@ -5144,7 +5200,7 @@ LUMI_err = ut_M_Data_set(ut_M_d, NULL, NULL);
 /// @ t11
 ut_M_Data dr_Var = {0};
     ut_M_Data* dr = NULL;
-    INIT_VAR(1, LUMI_block0_cleanup, dr)
+    dr = &dr_Var;
     CHECK_REF_AND_REFMAN(2, LUMI_block0_cleanup, dr->item, dr->item_Refman)
     CHECK_REF_AND_REFMAN(2, LUMI_block0_cleanup, ((ut_M_Data*)(dr->item))->item, ((ut_M_Data*)(dr->item))->item_Refman)
     LUMI_inc_ref(((ut_M_Data*)(((ut_M_Data*)(dr->item))->item))->item_Refman);
@@ -5152,7 +5208,8 @@ ut_M_Data dr_Var = {0};
     ut_M_t_Refman = ((ut_M_Data*)(((ut_M_Data*)(dr->item))->item))->item_Refman;
     ut_M_t = ((ut_M_Data*)(((ut_M_Data*)(dr->item))->item))->item;
 /// @ t12
-LUMI_err = ut_M_Data_set(ut_M_d, *to, &ut_M_Test_dynamic);
+LUMI_var_dec_ref(*to_Refman);
+    LUMI_err = ut_M_Data_set(ut_M_d, *to, &ut_M_Test_dynamic);
     *to = NULL;
     *to_Refman = NULL;
     CHECK(1, LUMI_block0_cleanup)
@@ -5168,12 +5225,13 @@ ut_M_Test* aux_Test_0 = NULL;
 /// @ t14
 ut_M_Data dg_Var = {0};
     ut_M_Data* dg = NULL;
-    INIT_VAR(1, LUMI_block0_cleanup, dg)
+    dg = &dg_Var;
 /// @ t15
 ut_M_Data* dg = NULL;
     dg = ut_M_d;
 /// @ t16
-LUMI_err = ut_M_Data_set(ut_M_d, *to, &ut_M_Test_dynamic);
+LUMI_var_dec_ref(*to_Refman);
+    LUMI_err = ut_M_Data_set(ut_M_d, *to, &ut_M_Test_dynamic);
     *to = NULL;
     *to_Refman = NULL;
     CHECK(1, LUMI_block0_cleanup)
@@ -5215,7 +5273,7 @@ ut_M_Data dt_Var = {0};
     ut_M_Tb* aux_Tb_0 = NULL;
     Ref_Manager* aux_Tb_0_Refman = NULL;
     ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = NULL;
-    INIT_VAR(1, LUMI_block0_cleanup, dt)
+    dt = &dt_Var;
     LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(dt->item_Refman);
     dt->item_Refman = ut_M_tc_Refman;
@@ -5548,7 +5606,7 @@ Returncode ut_M_Test_set(ut_M_Test* self, File* f, Ref_Manager* f_Refman) {
     self->_base.item_Refman = f_Refman;
     self->_base.item_Dynamic = &File_dynamic;
     self->_base.item = f;
-    INIT_NEW(6, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
+    INIT_NEW_STRONG(6, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman);
     CHECK(6, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -5568,7 +5626,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman) {
     ut_M_Test t_Var = {{0}};
     ut_M_Test* t = NULL;
     LUMI_inc_ref(f_Refman);
-    INIT_VAR(8, LUMI_block0_cleanup, t)
+    t = &t_Var;
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(t->_base.item_Refman);
     t->_base.item_Refman = f_Refman;
@@ -5613,7 +5671,7 @@ Returncode ut_M_Test_set(ut_M_Test* self, Generic_Type* i, Ref_Manager* i_Refman
     self->_base.item_Refman = i_Refman;
     self->_base.item_Dynamic = i_Dynamic;
     self->_base.item = i;
-    INIT_NEW(6, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
+    INIT_NEW_STRONG(6, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman, &File_dynamic, f, f_Refman);
     CHECK(6, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -5634,7 +5692,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman) {
     ut_M_Test t_Var = {{0}};
     ut_M_Test* t = NULL;
     LUMI_inc_ref(f_Refman);
-    INIT_VAR(8, LUMI_block0_cleanup, t)
+    t = &t_Var;
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(t->_base.item_Refman);
     t->_base.item_Refman = f_Refman;
@@ -5742,13 +5800,13 @@ Returncode ut_M_Test_set(ut_M_Test* self, File* f, Ref_Manager* f_Refman) {
     self->_base._base._base.item_Refman = f_Refman;
     self->_base._base._base.item_Dynamic = &File_dynamic;
     self->_base._base._base.item = f;
-    INIT_NEW(14, LUMI_block0_cleanup, aux_Top_0, ut_M_Top, 1);
+    INIT_NEW_STRONG(14, LUMI_block0_cleanup, aux_Top_0, ut_M_Top, 1);
     LUMI_err = ut_M_Top_set(aux_Top_0, f, f_Refman);
     CHECK(14, LUMI_block0_cleanup)
-    INIT_NEW(15, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
+    INIT_NEW_STRONG(15, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman);
     CHECK(15, LUMI_block0_cleanup)
-    INIT_NEW(16, LUMI_block0_cleanup, aux_Top_1, ut_M_Top, 1);
+    INIT_NEW_STRONG(16, LUMI_block0_cleanup, aux_Top_1, ut_M_Top, 1);
     LUMI_err = ut_M_Mid_set(&(aux_Top_1->_base), f, f_Refman, &File_dynamic);
     CHECK(16, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -5772,7 +5830,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman) {
     ut_M_Test t_Var = {{{{0}}}};
     ut_M_Test* t = NULL;
     LUMI_inc_ref(f_Refman);
-    INIT_VAR(18, LUMI_block0_cleanup, t)
+    t = &t_Var;
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(t->_base._base._base.item_Refman);
     t->_base._base._base.item_Refman = f_Refman;
@@ -5817,7 +5875,7 @@ Returncode ut_M_Test_set(ut_M_Test* self, Generic_Type* i, Ref_Manager* i_Refman
     self->_base.item_Refman = i_Refman;
     self->_base.item_Dynamic = i_Dynamic;
     self->_base.item = i;
-    INIT_NEW(6, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
+    INIT_NEW_STRONG(6, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman, &File_dynamic, f, f_Refman);
     CHECK(6, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -5838,7 +5896,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman) {
     ut_M_Test t_Var = {{0}};
     ut_M_Test* t = NULL;
     LUMI_inc_ref(f_Refman);
-    INIT_VAR(8, LUMI_block0_cleanup, t)
+    t = &t_Var;
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(t->_base.item_Refman);
     t->_base.item_Refman = f_Refman;
@@ -6005,7 +6063,7 @@ Returncode ut_M_use(File* first, Ref_Manager* first_Refman, Sys* second, Ref_Man
     LUMI_inc_ref(first_Refman);
     LUMI_inc_ref(second_Refman);
     LUMI_inc_ref(third_Refman);
-    INIT_VAR(21, LUMI_block0_cleanup, t)
+    t = &t_Var;
     LUMI_inc_ref(first_Refman);
     LUMI_dec_ref(t->_base._base._base.first_Refman);
     t->_base._base._base.first_Refman = first_Refman;
@@ -6096,7 +6154,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman, ut_M_Second* ff, Ref_Manager
     ut_M_Test* t = NULL;
     LUMI_inc_ref(f_Refman);
     LUMI_inc_ref(ff_Refman);
-    INIT_VAR(10, LUMI_block0_cleanup, t)
+    t = &t_Var;
     LUMI_inc_ref(ff_Refman);
     LUMI_dec_ref(t->_base.item_Refman);
     t->_base.item_Refman = ff_Refman;
@@ -6320,12 +6378,12 @@ cannot assign "String" into "File"
         char sa[4] = {0};
         int sa_Length[1] = {0};
         ++LUMI_trace_ignore_count;
-        INIT_VAR_REFMAN(2, LUMI_block1_cleanup, sa)
+        /* initializing sa */
         {
             char sb[4] = {0};
             int sb_Length[1] = {0};
             ++LUMI_trace_ignore_count;
-            INIT_VAR_REFMAN(4, LUMI_block2_cleanup, sb)
+            /* initializing sb */
         LUMI_block2_cleanup:
             (void)0;
         }
@@ -6335,7 +6393,7 @@ cannot assign "String" into "File"
             int sc_Length[1] = {0};
             LUMI_err = OK;
             LUMI_loop_depth = 1;
-            INIT_VAR_REFMAN(6, LUMI_block3_cleanup, sc)
+            /* initializing sc */
         LUMI_block3_cleanup:
             (void)0;
         }
@@ -6348,12 +6406,12 @@ cannot assign "String" into "File"
         int sd_Length[1] = {0};
         LUMI_err = OK;
         LUMI_loop_depth = 1;
-        INIT_VAR_REFMAN(8, LUMI_block4_cleanup, sd)
+        /* initializing sd */
         {
             char se[4] = {0};
             int se_Length[1] = {0};
             ++LUMI_trace_ignore_count;
-            INIT_VAR_REFMAN(10, LUMI_block5_cleanup, se)
+            /* initializing se */
         LUMI_block5_cleanup:
             (void)0;
         }
@@ -6363,7 +6421,7 @@ cannot assign "String" into "File"
             int sf_Length[1] = {0};
             LUMI_err = OK;
             LUMI_loop_depth = 1;
-            INIT_VAR_REFMAN(12, LUMI_block6_cleanup, sf)
+            /* initializing sf */
         LUMI_block6_cleanup:
             (void)0;
         }
@@ -6433,7 +6491,7 @@ Returncode ut_M_fun(Int* i) {
     Ref_Manager* aux_TestIterator_0_Refman = NULL;
     Int n = 0;
     ut_M_TestIterator* aux_TestIterator_1 = NULL;
-    INIT_NEW(8, LUMI_block0_cleanup, aux_TestIterator_0, ut_M_TestIterator, 1);
+    INIT_NEW_STRONG(8, LUMI_block0_cleanup, aux_TestIterator_0, ut_M_TestIterator, 1);
     LUMI_err = ut_M_TestIterator_new(aux_TestIterator_0, 6);
     CHECK(8, LUMI_block0_cleanup)
     aux_TestIterator_1 = aux_TestIterator_0;
@@ -6447,7 +6505,7 @@ Returncode ut_M_fun(Int* i) {
         if (!n_Has) break;
         LUMI_err = ut_M_TestIterator_get(aux_TestIterator_1, &(n));
         CHECK(8, LUMI_block1_cleanup)
-        INIT_VAR_REFMAN(9, LUMI_block1_cleanup, s)
+        /* initializing s */
         *i = n;
         LUMI_err = ut_M_TestIterator_next(aux_TestIterator_1);
         CHECK(8, LUMI_block1_cleanup)
@@ -6882,7 +6940,8 @@ Returncode ut_M_Test_test(ut_M_Test* self) {
     CHECK_REF(13, LUMI_block0_cleanup, self)
     LUMI_err = ut_M_Bstruct_meth(self->b.b, self->b.b_Dynamic);
     CHECK(13, LUMI_block0_cleanup)
-    INIT_VAR(14, LUMI_block0_cleanup, t)
+    t = &t_Var;
+    INIT_VAR_REFMAN(14, LUMI_block0_cleanup, t)
     CHECK_REF(15, LUMI_block0_cleanup, self)
     self->b._base.x = 5;
     CHECK_REF(16, LUMI_block0_cleanup, self)
@@ -6975,8 +7034,6 @@ Returncode ut_M_Test_test(ut_M_Test* self, Char* c, Int* i, ut_M_Base** b) {
     aux_String_0 = self->as + 4 * 8;
     aux_String_0_Max_length = 8;
     aux_String_0_Length = self->as_String_length + 4;
-    aux_String_0_Refman = self_Refman;
-    LUMI_inc_ref(aux_String_0_Refman);
     if (5 < 0 || 5 >= *(aux_String_0_Length)) RAISE(15, LUMI_block0_cleanup, slice_index)
     *c = (aux_String_0)[5];
     CHECK_REF(16, LUMI_block0_cleanup, self)
@@ -6984,13 +7041,9 @@ Returncode ut_M_Test_test(ut_M_Test* self, Char* c, Int* i, ut_M_Base** b) {
     aux_Array_0 = self->aai + 1 * 5 * 6;
     aux_Array_0_Length = 5;
     aux_Array_0_Value_length = 6;
-    aux_Array_0_Refman = self_Refman;
-    LUMI_inc_ref(aux_Array_0_Refman);
     if (2 < 0 || 2 >= 5) RAISE(16, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = (aux_Array_0) + 2 * 6;
     aux_Array_1_Length = 6;
-    aux_Array_1_Refman = aux_Array_0_Refman;
-    LUMI_inc_ref(aux_Array_1_Refman);
     if (3 < 0 || 3 >= 6) RAISE(16, LUMI_block0_cleanup, slice_index)
     *i = (aux_Array_1)[3];
     CHECK_REF(17, LUMI_block0_cleanup, self)
@@ -6998,13 +7051,9 @@ Returncode ut_M_Test_test(ut_M_Test* self, Char* c, Int* i, ut_M_Base** b) {
     aux_Array_2 = self->aab + 1 * 5 * 6;
     aux_Array_2_Length = 5;
     aux_Array_2_Value_length = 6;
-    aux_Array_2_Refman = self_Refman;
-    LUMI_inc_ref(aux_Array_2_Refman);
     if (2 < 0 || 2 >= 5) RAISE(17, LUMI_block0_cleanup, slice_index)
     aux_Array_3 = (aux_Array_2) + 2 * 6;
     aux_Array_3_Length = 6;
-    aux_Array_3_Refman = aux_Array_2_Refman;
-    LUMI_inc_ref(aux_Array_3_Refman);
     if (3 < 0 || 3 >= 6) RAISE(17, LUMI_block0_cleanup, slice_index)
     *b = (aux_Array_3) + 3;
     CHECK_REF(18, LUMI_block0_cleanup, self)
@@ -7013,14 +7062,10 @@ Returncode ut_M_Test_test(ut_M_Test* self, Char* c, Int* i, ut_M_Base** b) {
     aux_Array_4_Length = 5;
     aux_Array_4_Value_length = 6;
     aux_Array_4_String_length = self->aas_String_length + 1 * 5;
-    aux_Array_4_Refman = self_Refman;
-    LUMI_inc_ref(aux_Array_4_Refman);
     if (2 < 0 || 2 >= 5) RAISE(18, LUMI_block0_cleanup, slice_index)
     aux_String_1 = (aux_Array_4) + 2 * 6;
     aux_String_1_Max_length = 6;
     aux_String_1_Length = aux_Array_4_String_length + 2;
-    aux_String_1_Refman = aux_Array_4_Refman;
-    LUMI_inc_ref(aux_String_1_Refman);
     if (3 < 0 || 3 >= *(aux_String_1_Length)) RAISE(18, LUMI_block0_cleanup, slice_index)
     *c = (aux_String_1)[3];
 LUMI_block0_cleanup:
@@ -7265,10 +7310,10 @@ USER_MAIN_HEADER {
     Bool LUMI_success = true;
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
-    INIT_VAR(7, LUMI_block0_cleanup, ut_M_t)
+    ut_M_t = &ut_M_t_Var;
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "second.5.lm"
-    INIT_VAR(7, LUMI_block0_cleanup, second_M_t)
+    second_M_t = &second_M_t_Var;
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
     LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
@@ -7449,14 +7494,13 @@ Returncode ut_M_Test_new(ut_M_Test* self) {
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
     Ref_Manager* aux_String_0_Refman = NULL;
-    INIT_NEW_STRING(4, LUMI_block0_cleanup, aux_String_0, 12);
+    INIT_NEW_STRONG_STRING(4, LUMI_block0_cleanup, aux_String_0, 12);
     CHECK_REF(4, LUMI_block0_cleanup, self)
     String_Del(self->s);
     free(self->s);
     LUMI_var_dec_ref(aux_String_0_Refman);
     self->s_Max_length = 12;
     self->s_Length = aux_String_0_Length;
-    aux_String_0_Length = &Lumi_empty_int;
     self->s = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
@@ -7508,26 +7552,24 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     s_Max_length = 0;
     s_Length = &Lumi_empty_int;
     s = NULL;
-    INIT_NEW_STRING(9, LUMI_block0_cleanup, aux_String_0, 12);
+    INIT_NEW_STRONG_STRING(9, LUMI_block0_cleanup, aux_String_0, 12);
     String_Del(s);
     free(s);
     LUMI_var_dec_ref(aux_String_0_Refman);
     s_Max_length = 12;
     s_Length = aux_String_0_Length;
-    aux_String_0_Length = &Lumi_empty_int;
     s = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     aux_String_0_Length = &Lumi_empty_int;
     LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
     CHECK(10, LUMI_block0_cleanup)
-    INIT_NEW_STRING(11, LUMI_block0_cleanup, aux_String_1, 12);
+    INIT_NEW_STRONG_STRING(11, LUMI_block0_cleanup, aux_String_1, 12);
     String_Del(to->s);
     free(to->s);
     LUMI_var_dec_ref(aux_String_1_Refman);
     to->s_Max_length = 12;
     to->s_Length = aux_String_1_Length;
-    aux_String_1_Length = &Lumi_empty_int;
     to->s = aux_String_1;
     aux_String_1 = NULL;
     aux_String_1_Refman = NULL;
@@ -7541,7 +7583,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     to->s = NULL;
     to->s_Length = &Lumi_empty_int;
     CHECK(14, LUMI_block0_cleanup)
-    INIT_VAR_REFMAN(15, LUMI_block0_cleanup, arr)
+    /* initializing arr */
     if (8 < 0 || 8 >= 12) RAISE(16, LUMI_block0_cleanup, slice_index)
     if (4 < 0 || 4 >= 12) RAISE(16, LUMI_block0_cleanup, slice_index)
     arr[4] = arr[8];
@@ -7613,11 +7655,10 @@ Returncode ut_M_fun(void) {
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
     Ref_Manager* aux_String_0_Refman = NULL;
-    INIT_NEW_STRING(4, LUMI_block0_cleanup, aux_String_0, 12);
+    INIT_NEW_STRONG_STRING(4, LUMI_block0_cleanup, aux_String_0, 12);
     so_Refman = aux_String_0_Refman;
     so_Max_length = 12;
     so_Length = aux_String_0_Length;
-    aux_String_0_Length = &Lumi_empty_int;
     so = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
@@ -7668,11 +7709,10 @@ Returncode ut_M_fun(void) {
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
     Ref_Manager* aux_String_0_Refman = NULL;
-    INIT_NEW_STRING(4, LUMI_block0_cleanup, aux_String_0, 12);
+    INIT_NEW_STRONG_STRING(4, LUMI_block0_cleanup, aux_String_0, 12);
     so_Refman = aux_String_0_Refman;
     so_Max_length = 12;
     so_Length = aux_String_0_Length;
-    aux_String_0_Length = &Lumi_empty_int;
     so = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;

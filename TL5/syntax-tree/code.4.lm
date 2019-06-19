@@ -63,6 +63,11 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     self.write-spaces()
     if self.error-message.parsed()
       self.error-message.write-preactions()
+    if self.error-message.parsed() and self.error-message.access = Access.WEAK
+      self.error-message.expression.write-macro-init(
+          user "CHECK_REFMAN", user self.error-message.expression)
+      write(user "_Refman)\n")
+      self.write-spaces()
     write(user "USER_RAISE(")
     self.write-line-num()
     write(user ", ")
@@ -72,10 +77,9 @@ class SyntaxTreeRaise(SyntaxTreeCode)
       self.error-message.write()
       write(user ", *(")
       self.error-message.write()
-      write(user "_Length), ")
-      self.error-message.write-refman()
+      write(user "_Length)")
     else
-      write(user "NULL, 0, NULL")
+      write(user "NULL, 0")
     write(user ")\n")
 
 

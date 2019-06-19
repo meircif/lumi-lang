@@ -2,13 +2,12 @@
 module tl5-compiler
 
 
-class TypeCastExpression(Expression)
+class WrapExpression(Expression)
   owner Expression expression
 
   new(user SyntaxTreeCode code-node, owner Expression expression)
     base(user code-node)
     self.expression := expression
-    self.is-generic-cast := true
     self.access := self.expression.access
     self.assignable := self.expression.assignable
     self.expression.result-type.copy-new()->(owner self.result-type)
@@ -24,6 +23,15 @@ class TypeCastExpression(Expression)
 
   func dynamic write()
     self.expression.write()
+  
+  func dynamic write-refman()
+    self.expression.write-refman()
+
+
+class TypeCastExpression(WrapExpression)
+  new(user SyntaxTreeCode code-node, owner Expression expression)
+    base(user code-node, owner expression)
+    self.is-generic-cast := true
 
   func dynamic write-safe()
     write(user "((")
@@ -44,26 +52,15 @@ class TypeCastExpression(Expression)
 
 
 ~~~ Up-cast expression ~~~
-class UpCastExpression(Expression)
-  owner Expression expression
+class UpCastExpression(WrapExpression)
   var Int bases
   
   func inst init-new(copy Int bases)->(owner Expression expression)
-    new UpCastExpression up-cast(user expression.code-node)
-    up-cast.init(copy bases, owner expression)
-    expression := up-cast
+    expression := UpCastExpression(owner expression, copy bases)
   
-  func inst init(copy Int bases, owner Expression expression)
-    self.expression := expression
+  new(owner Expression expression, copy Int bases)
+    base(user expression.code-node, owner expression)
     self.bases := bases
-    self.expression.result-type.copy-new()->(owner self.result-type)
-    self.access := self.expression.access
-
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    self.expression.check-memory(user refs)
-  
-  func dynamic write-preactions()
-    self.expression.write-preactions()
   
   func dynamic write()
     ; &(`expression`->_base[._base]...)
@@ -79,9 +76,6 @@ class UpCastExpression(Expression)
     self.expression.write-dynamic-safe()
     self.write-post()
   
-  func dynamic write-refman()
-    self.expression.write-refman()
-  
   func inst write-pre()
     write(user "&(")
   
@@ -94,3 +88,24 @@ class UpCastExpression(Expression)
     for n in 1:self.bases
       write(user "._base")
     write(user ")")
+
+
+; ~~~ Owner --> Strong call expression ~~~
+; class OwnerToStrongCallExpression(WrapExpression)
+;   owner Expression owner-expression
+; 
+;   new(owner Expression expression)
+;     base(user expression.code-node, owner expression)
+;     self.owner-expression := self.expression
+;     self.access := Access.STRONG
+;     self.add-aux-variable(
+;         copy Access.STRONG, copy false, user self.result-type)->(
+;         owner self.expression)
+; 
+;   func dynamic write-preactions()
+;     var AssignExpression assign(
+;         user self.code-node,
+;         user self.expression,
+;         user self.owner-expression,
+;         copy true)
+;     assign.write()

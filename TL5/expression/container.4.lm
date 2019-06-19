@@ -239,7 +239,7 @@ class QuestionExpression(Expression)
     ; `tested` != NULL && `tested`_Refman->value != NULL
     self.tested.write-safe()
     write(user " != NULL")
-    if not self.tested.result-type.type-data.is-primitive
+    if access-has-refman(copy self.tested.access)
       write(user " && ")
       self.tested.write-refman-safe()
       write(user "->value != NULL")

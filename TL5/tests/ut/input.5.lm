@@ -29,6 +29,7 @@ func fun4(copy Int x)
 func fun5(copy Int x)->(var Int y)
 func fun6(copy Int x, copy Int y)->(var Int n, var Int m)
 func fun7(weak Tb? tb)->(weak Tb? tbo)
+func fun8(strong String? s)
 
 var Int i
 var Char c
@@ -344,6 +345,11 @@ func fun(var String s)
     fun(var owners)
     fun(var strongs)
     s.clear()
+; @ c t24
+strong String? s
+fun1(copy 0, user _, owner s)
+; @ c t25
+fun8(strong ostr)
 ; @ ec te0
 function( copy 1)
 ; @ ec te1
@@ -580,7 +586,7 @@ tu := t
 ; @ c t0
 b := str?
 ; @ c t1
-b := not str?
+b := not arr?
 ; @ c t2
 b := t.fun?
 ; @ c t3
@@ -916,6 +922,11 @@ struct Test2(Test1)
     var Int y
 struct Test1
     var Int x
+; @ g t4
+struct Test
+    owner Test? to
+    strong Test? ts
+    weak Test? tw
 ; @ eg te0
 struct(
 ; @ eg te1
@@ -979,6 +990,12 @@ class Top(Mid)
         base()
     func dynamic dyn3()
         base.dyn0()
+; @ g t1
+class Test
+    owner Test? to
+    strong Test? ts
+    weak Test? tw
+    func dynamic fun()
 ; @ eg te0
 class(
 ; @ eg te1
@@ -1247,6 +1264,9 @@ func name()
 ; @ g t3
 func name(user Array{String} arr)
     raise arr[3]
+; @ c t4
+weak String? s
+raise s
 ; @ ec te0
 return()
 ; @ ec te1
@@ -1361,6 +1381,8 @@ func get()->(owner File a)
 ; @ c t17
 owner Test? ot(owner to)
 strong Test? st(strong ot)
+; @ c t18
+s-var Test tt(copy 3)
 ; @ ec te0
 Int()
 ; @ ec te1

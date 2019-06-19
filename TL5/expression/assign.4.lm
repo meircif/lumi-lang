@@ -133,12 +133,6 @@ class AssignExpression(Expression)
     self.value.write-length(user "_Length", user "&Lumi_empty_int", copy false)
     write(user ";\n")
     self.code-node.write-spaces()
-    
-    if access-is-owner(copy self.target.access) and
-        self.value.result-type.type-data is-not glob.type-empty
-      self.value.write()
-      write(user "_Length = &Lumi_empty_int;\n")
-      self.code-node.write-spaces()
   
   func inst write-assign-refman()
     if not access-is-owner(copy self.target.access)

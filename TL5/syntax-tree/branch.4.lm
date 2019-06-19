@@ -213,9 +213,12 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       return
     write-spaces(copy INDENTATION-SPACES)
     if variable.type-instance.type-data is type-data
+      write(user "SELF_REF_DEL")
+      if variable.access = Access.STRONG
+        write(user "_STR")
       if type-data.is-dynamic
-        write(user "DYN_")
-      write(user "SELF_REF_DEL(")
+        write(user "_DYN")
+      write(user "(")
       type-data.write-cname()
       write(user ", ")
       if type-data.is-dynamic

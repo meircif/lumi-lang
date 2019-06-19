@@ -20,6 +20,7 @@ module tl5-compiler
 class ExpressionValue(SyntaxTreeNode)
   owner Expression expression
   user TypeInstance result-type
+  var Int access
   var Bool is-statement
   var Bool constant
   
@@ -34,6 +35,7 @@ class ExpressionValue(SyntaxTreeNode)
     self.expression.is-statement := self.is-statement
     self.expression.analyze()
     self.result-type := self.expression.result-type
+    self.access := self.expression.access
     self.constant := self.expression.constant
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
@@ -48,8 +50,8 @@ class ExpressionValue(SyntaxTreeNode)
   func dynamic write()
     self.expression.write()
   
-  func inst write-refman()
-    self.expression.write-refman()
+  ; func inst write-refman()
+  ;   self.expression.write-refman()
 
 
 ~~~ Return in `expression` a new allocated expression parsed from the input
@@ -284,9 +286,16 @@ class Expression(SyntaxTreeNode)
     expression.write()
   
   func inst write-init-var-ref(user VariableExpression variable)
-    ; INIT_VAR(`line`, `cleanup`, `symbol`)
-    self.write-macro-init(user "INIT_VAR", user variable)
-    write(user ")\n")
+    ; `symbol` = &`symbol`_Var; \
+    ; INIT_VAR_REFMAN(`line`, `cleanup`, `symbol`)
+    variable.write()
+    write(user " = &")
+    variable.write()
+    write(user "_Var;\n")
+    if variable.access = Access.S-VAR
+      self.code-node.write-spaces()
+      self.write-macro-init(user "INIT_VAR_REFMAN", user variable)
+      write(user ")\n")
   
   func inst write-assign-null()
     self.write()
