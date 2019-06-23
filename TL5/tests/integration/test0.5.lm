@@ -614,6 +614,13 @@ func test-borrow()
     set-borrow(var t)
     assert t.ts.num = 2
 
+func test-switch()
+    strong String s1(strong String{32}(user "first string"))
+    strong String s2(strong String{32}(user "second string"))
+    s1 :=: s2
+    sys.println(user s1)
+    sys.println(user s2)
+
 
 main
     test-simple-function()
@@ -622,3 +629,4 @@ main
     test-for-each()
     test-complex-field()
     test-borrow()
+    test-switch()

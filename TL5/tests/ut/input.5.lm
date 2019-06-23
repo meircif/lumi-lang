@@ -583,6 +583,74 @@ t := tu
 var Test tv(copy 0)
 user Test tu(user tv)
 tu := t
+; @@ test-switch-expression
+; @ c t0
+new Test t1(copy 1)
+new Test t2(copy 2)
+t1 :=: t2
+; @ c t1
+strong Test t1(strong Test(copy 1))
+strong Test t2(strong Test(copy 2))
+t1 :=: t2
+; @ c t2
+new Tc t1(copy 1)
+new Tc t2(copy 2)
+t1 :=: t2
+; @ c t3
+strong Tc t1(strong Tc(copy 1))
+strong Tc t2(strong Tc(copy 2))
+t1 :=: t2
+; @ c t4
+new Array{4:Int} a1
+new Array{6:Int} a2
+a1 :=: a2
+; @ c t5
+strong Array{Int} a1(strong Array{4:Int}())
+strong Array{Int} a2(strong Array{6:Int}())
+a1 :=: a2
+; @ c t6
+new String{4} s1
+new String{6} s2
+s1 :=: s2
+; @ c t7
+strong String s1(strong String{4}())
+strong String s2(strong String{6}())
+s1 :=: s2
+; @ g t7
+struct Test
+    owner File f
+    new()
+func fun(owner Test? t1, owner Test? t2)
+    t1.f :=: t2.f
+; @ c t8
+user Test t1(user t!)
+user Test t2(user t!)
+t1 :=: t2
+; @ c t9
+weak Test t1(weak to!)
+weak Test t2(weak to!)
+t1 :=: t2
+; @ c t10
+i :=: io
+; @ c t11
+d.item :=: t
+; @ ec te0
+t :=: to
+; @ ec te1
+new Test t1(copy 1)
+t1 :=: t1
+; @ ec te2
+new String{8} nstr
+ostr :=: nstr
+; @ ec te3
+weak Array{Char} a(weak so!)
+a :=: so[1:2]
+; @ ec te4
+ta :=: tc
+; @ ec te5
+new Test t1(copy 1)
+strong Test t2(strong Test(copy 2))
+t1 :=: t2
 ; @@ test-question-expression
 ; @ c t0
 b := ostr?
@@ -1252,6 +1320,11 @@ struct Test
     var Int x
     func fun() _
 func Test.fun()
+; @ eg te9
+struct Test
+    var Int x
+    func fun()
+        self..x := 3
 ; @@ test-return
 ; @ g t0
 func name()

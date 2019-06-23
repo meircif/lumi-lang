@@ -68,9 +68,12 @@ class AssignExpression(Expression)
       self.value.write-check-refman()
     if access-is-owner(copy self.target.access)
       self.write-owner-assign-preactions()
+    self.write-assign-preactions(copy true)
+
+  func inst write-assign-preactions(copy Bool full-assign)
     if access-has-refman(copy self.target.access) and
         access-has-refman(copy self.value.access)
-      self.write-assign-refman()
+      self.write-assign-refman(copy full-assign)
     if self.target.result-type.type-data.is-dynamic or
         self.target.is-generic-cast
       self.write-assign-dynamic()
@@ -139,8 +142,8 @@ class AssignExpression(Expression)
     write(user ";\n")
     self.code-node.write-spaces()
   
-  func inst write-assign-refman()
-    if not access-is-owner(copy self.target.access)
+  func inst write-assign-refman(copy Bool full-assign)
+    if full-assign and not access-is-owner(copy self.target.access)
       write(user "LUMI_inc_ref(")
       self.value.write-refman()
       write(user ");\n")
@@ -191,18 +194,17 @@ class AssignExpression(Expression)
       write(user "&")
       self.value.result-type.type-data.write-cname()
       write(user "_dynamic")
+    else-if (self.target.result-type.type-data is glob.type-generic or
+        self.target.is-generic-cast) and
+        self.value.result-type.type-data is-not glob.type-generic and
+        not self.value.is-generic-cast
+      write(user "(Generic_Type_Dynamic*)")
+      self.value.write-dynamic-safe()
+    else-if self.value.is-generic-cast and not self.target.is-generic-cast and
+        not (self.target.result-type.type-data is glob.type-generic)
+      self.value.write-dynamic-safe()
     else
-      if (self.target.result-type.type-data is glob.type-generic or
-          self.target.is-generic-cast) and
-          self.value.result-type.type-data is-not glob.type-generic and
-          not self.value.is-generic-cast
-        write(user "(Generic_Type_Dynamic*)")
-        self.value.write-dynamic-safe()
-      else-if self.value.is-generic-cast and not self.target.is-generic-cast and
-          not (self.target.result-type.type-data is glob.type-generic)
-        self.value.write-dynamic-safe()
-      else
-        self.value.write-dynamic()
+      self.value.write-dynamic()
     write(user ";\n")
     self.code-node.write-spaces()
   
@@ -244,12 +246,19 @@ class AssignExpression(Expression)
   
   func dynamic write()
     ; not called in assignment operator
+    self.write-main-assign()
+    if access-is-owner(copy self.target.access)
+      self.write-owner-null()
+    
+  func inst write-main-assign()
     self.target.write()
     write(user " = ")
     self.value.write-cast()
     write(user ";\n")
-    if access-is-owner(copy self.target.access)
-      self.write-owner-null()
+  
+  func inst write-assign()
+    self.write-assign-preactions(copy false)
+    self.write-main-assign()
 
   func inst write-owner-null()
     ; called also in assignment operator
