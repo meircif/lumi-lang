@@ -15,6 +15,9 @@ class SyntaxTreeAssert(SyntaxTreeCode)
   
   func dynamic analyze()
     self.analyze-expression(user self.tested, user glob.type-bool)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.tested.check-memory(user refs)
   
   func dynamic write()
     ; TEST_ASSERT(`line`, `cleanp`, `tested`)
@@ -54,6 +57,9 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   
   func dynamic analyze()
     self.tested.analyze()
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.tested.check-memory(user refs)
   
   func dynamic write()
     if self.expected-error?

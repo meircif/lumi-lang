@@ -78,7 +78,7 @@ test fail-object-no-memory()
 
 test fail-managed-no-memory()
     new-fail-countdown := 2
-    new BaseType obj
+    strong BaseType obj(strong BaseType())
 
 test fail-exclamation-empty()
     user String? cs

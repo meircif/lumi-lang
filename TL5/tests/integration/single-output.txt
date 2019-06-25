@@ -18,3 +18,5 @@ items[
   val100 val101 val102 val110 val111 val112 val120 val121 val122 
   val200 val201 val202 val210 val211 val212 val220 val221 val222 ]
 complex fields: $$$$$$ a1 a2 a3
+second string
+first string

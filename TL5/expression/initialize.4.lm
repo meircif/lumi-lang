@@ -4,6 +4,7 @@ module tl5-compiler
 class InitExpression(ModuleTypeExpression)
   var FunctionArguments arguments
   owner VariableExpression aux-variable
+  owner Expression assign-value
   owner AssignExpression assign-expression
   user SyntaxTreeFunction constructor
   
@@ -32,7 +33,6 @@ class InitExpression(ModuleTypeExpression)
   
   func dynamic analyze()
     self.analyze-type-instance(user self.result-type)
-    self.arguments.analyze()
     if self.aux-variable?
       self.aux-variable.result-type.analyze(user self)
     else
@@ -57,7 +57,7 @@ class InitExpression(ModuleTypeExpression)
         self.syntax-error(
             user "cannot create objects with type",
             user self.result-type.type-data.name)
-      self.result-type.type-data.find-meth(user "new")->(user self.constructor)
+      self.constructor := self.result-type.type-data.constructor
       if self.constructor?
         self.add-self-and-check(
             copy self.constructor.arguments.parameters.first.item.access)
@@ -67,7 +67,8 @@ class InitExpression(ModuleTypeExpression)
           self.add-self-and-check(copy Access.USER)
         else
           self.syntax-error(
-              user "no constructor for type", user self.result-type.type-data.name)
+              user "no constructor for type",
+              user self.result-type.type-data.name)
       
     else-if self.arguments.parameters.first?
       if self.arguments.parameters.first.next? or
@@ -75,8 +76,15 @@ class InitExpression(ModuleTypeExpression)
         self.syntax-error-msg(
             user "only one initialization parameter expected")
       user Argument param(user self.arguments.parameters.first.item)
-      user Expression original-value(user param.get-output())
-      param.check-same-type-as(user self.result-type, user _, copy 0, copy true)
+      param.take-value()->(owner self.assign-value)
+      self.assign-value.restructure()->(owner self.assign-value)
+      self.assign-value.analyze()
+      self.assign-expression := AssignExpression(
+          user self.code-node,
+          user self.aux-variable,
+          user self.assign-value,
+          copy true)
+      self.assign-expression.analyze-value()->(owner self.assign-value)
       if self.result-type.type-data.is-primitive and param.access != Access.COPY
         self.syntax-error(
             user "access should be \"copy\" for primitive types, got",
@@ -88,15 +96,9 @@ class InitExpression(ModuleTypeExpression)
             user glob.access-names[self.access],
             user "invalid access",
             user glob.access-names[param.access])
-      if self.is-statement
-        self.assign-expression := AssignExpression(
-            user self.code-node,
-            user self.aux-variable,
-            user original-value)
-        self.assign-expression.reset-value(user param.get-output())
-        self.assign-expression.analyze()
   
   func inst add-self-and-check(copy Int access)
+    self.arguments.analyze()
     new CallArgument self-param
     self-param.set-location()
     self-param.is-output := false
@@ -111,9 +113,10 @@ class InitExpression(ModuleTypeExpression)
         copy true)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.arguments.check-memory(user refs)
     if self.assign-expression?
       self.assign-expression.check-memory(user refs)
+    else
+      self.arguments.check-memory(user refs)
   
   func inst write-allocation()
     self.arguments.write-preactions()
@@ -141,9 +144,14 @@ class InitExpression(ModuleTypeExpression)
       self.write-init-var-ref(user self.aux-variable)
       return
     
-    ; INIT_VAR_REFMAN(`line`, `cleanup`, `aux-variable`)
-    self.write-macro-init(user "INIT_VAR_REFMAN", user self.aux-variable)
-    write(user ")\n")
+    if self.aux-variable.access = Access.S-VAR
+      ; INIT_VAR_REFMAN(`line`, `cleanup`, `aux-variable`)
+      self.write-macro-init(user "INIT_VAR_REFMAN", user self.aux-variable)
+      write(user ")\n")
+    else
+      write(user "/* initializing ")
+      self.aux-variable.write()
+      write(user " */\n")
   
   func inst write-new-init()
     if self.result-type.type-data is glob.type-array
@@ -161,8 +169,12 @@ class InitExpression(ModuleTypeExpression)
         write(user ";\n")
         self.code-node.write-spaces()
       
-      ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
-      self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
+      ; INIT_NEW[_STRONG]_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
+      if self.aux-variable.access = Access.STRONG
+        self.write-macro-init(
+            user "INIT_NEW_STRONG_ARRAY", user self.aux-variable)
+      else
+        self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
       write(user ", ")
       if data-type.type-data is glob.type-string
         write(user "char")
@@ -197,15 +209,23 @@ class InitExpression(ModuleTypeExpression)
         write(user ");\n")
         
     else-if self.result-type.type-data is glob.type-string
-      ; INIT_NEW_STRING(`line`, `cleanup`, `aux-variable`, `length`);
-      self.write-macro-init(user "INIT_NEW_STRING", user self.aux-variable)
+      ; INIT_NEW[_STRONG]_STRING(`line`, `cleanup`, `aux-variable`, `length`);
+      if self.aux-variable.access = Access.STRONG
+        self.write-macro-init(
+            user "INIT_NEW_STRONG_STRING", user self.aux-variable)
+      else
+        self.write-macro-init(user "INIT_NEW_STRING", user self.aux-variable)
       write(user ", ")
       self.result-type.length.write()
       write(user ");\n")
       
     else
-      ; INIT_NEW(`line`, `cleanup`, `aux-variable`, `type`, 1)
-      self.write-macro-init(user "INIT_NEW", user self.aux-variable)
+      ; INIT_NEW[_STRONG](`line`, `cleanup`, `aux-variable`, `type`, 1)
+      if self.aux-variable.access = Access.STRONG
+        self.write-macro-init(
+            user "INIT_NEW_STRONG", user self.aux-variable)
+      else
+        self.write-macro-init(user "INIT_NEW", user self.aux-variable)
       write(user ", ")
       self.result-type.type-data.write-cname()
       write(user ", 1);\n")
@@ -220,7 +240,7 @@ class InitExpression(ModuleTypeExpression)
           self.aux-variable.variable.is-create
         self.code-node.write-spaces()
         self.write-allocation()
-      else-if self.arguments.parameters.first?
+      else-if self.assign-expression?
         self.code-node.write-spaces()
         self.assign-expression.write-preactions()
         self.assign-expression.write()

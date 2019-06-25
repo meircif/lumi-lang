@@ -20,6 +20,7 @@ module tl5-compiler
 class ExpressionValue(SyntaxTreeNode)
   owner Expression expression
   user TypeInstance result-type
+  var Int access
   var Bool is-statement
   var Bool constant
   
@@ -34,13 +35,15 @@ class ExpressionValue(SyntaxTreeNode)
     self.expression.is-statement := self.is-statement
     self.expression.analyze()
     self.result-type := self.expression.result-type
+    self.access := self.expression.access
     self.constant := self.expression.constant
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
   
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.expression.check-memory(user refs)
+    if self.expression?
+      self.expression.check-memory(user refs)
   
   func inst write-preactions()
     self.expression.write-preactions()
@@ -48,8 +51,8 @@ class ExpressionValue(SyntaxTreeNode)
   func dynamic write()
     self.expression.write()
   
-  func inst write-refman()
-    self.expression.write-refman()
+  ; func inst write-refman()
+  ;   self.expression.write-refman()
 
 
 ~~~ Return in `expression` a new allocated expression parsed from the input
@@ -140,7 +143,7 @@ class Expression(SyntaxTreeNode)
       if glob.last-char = '('
         BlockExpression.parse-new(user _, user code-node)->(owner expression)
       else
-        code-node.syntax-error-c(user "unexpected")
+        code-node.syntax-error-c(user "expected expression, got")
     else
       self.parse-new-init-operand(owner text, user ends, user code-node)->(
           owner expression)
@@ -191,6 +194,8 @@ class Expression(SyntaxTreeNode)
     if glob.last-char = '.'
       owner String text
       self.read-new-value(user ends)->(owner text)
+      if text.length = 0
+        code-node.syntax-error-c(user "expected name after \".\", got")
       var Char first(copy text[0])
       var Char second(copy '\0')
       if text.length > 1
@@ -260,6 +265,8 @@ class Expression(SyntaxTreeNode)
         copy access, copy is-create, user type-instance)->(
         user expression.variable)
     string-new-copy(user expression.variable.name)->(owner expression.name)
+    expression.result-type.reference-path :=
+        ReferencePath(user expression.variable)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := _
@@ -273,7 +280,7 @@ class Expression(SyntaxTreeNode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     ; do nothing
   
-  func inst write-macro-init(user String macro-name, user Expression expression)
+  func inst write-macro-name(user String macro-name)
     ; `macro-name`(`line`, `cleanup`, `expression`
     write(user macro-name)
     write(user "(")
@@ -281,29 +288,47 @@ class Expression(SyntaxTreeNode)
     write(user ", ")
     self.code-node.parent.write-cleanup-label()
     write(user ", ")
+  
+  func inst write-macro-init(user String macro-name, user Expression expression)
+    self.write-macro-name(user macro-name)
     expression.write()
   
   func inst write-init-var-ref(user VariableExpression variable)
-    ; INIT_VAR(`line`, `cleanup`, `symbol`)
-    self.write-macro-init(user "INIT_VAR", user variable)
-    write(user ")\n")
+    ; `symbol` = &`symbol`_Var; \
+    ; INIT_VAR_REFMAN(`line`, `cleanup`, `symbol`)
+    variable.write()
+    write(user " = &")
+    variable.write()
+    write(user "_Var;\n")
+    if variable.access = Access.S-VAR
+      self.code-node.write-spaces()
+      self.write-macro-init(user "INIT_VAR_REFMAN", user variable)
+      write(user ")\n")
   
   func inst write-assign-null()
     self.write()
     write(user " = NULL;\n")
-    self.code-node.write-spaces()
-    self.write-refman()
-    write(user " = NULL;\n")
+    if access-has-refman(copy self.access)
+      self.code-node.write-spaces()
+      self.write-refman()
+      write(user " = NULL;\n")
     if self.result-type.type-data.is-dynamic
       self.code-node.write-spaces()
       self.write-dynamic()
       write(user " = NULL;\n")
+    if self.result-type.type-data is glob.type-string
+      self.code-node.write-spaces()
+      self.write()
+      write(user "_Length = &Lumi_empty_int;\n")
     
   func inst write-check-ref()
     ; CHECK_REF(`line`, `cleanup`, `instance`, `instance-refman`)
-    self.write-macro-init(user "CHECK_REF", user self)
-    write(user ", ")
-    self.write-refman()
+    if access-has-refman(copy self.access)
+      self.write-macro-init(user "CHECK_REF_AND_REFMAN", user self)
+      write(user ", ")
+      self.write-refman()
+    else
+      self.write-macro-init(user "CHECK_REF", user self)
     write(user ")\n")
   
   func inst write-length(
@@ -318,6 +343,12 @@ class Expression(SyntaxTreeNode)
     else
       self.write()
       write(user prefix)
+    
+  func inst write-check-refman()
+    self.write-macro-name(user "CHECK_REFMAN")
+    self.write-refman()
+    write(user ")\n")
+    self.code-node.write-spaces()
   
   func dynamic write-cast()
     self.write()

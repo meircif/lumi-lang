@@ -132,7 +132,7 @@ class StringExpression(TextExpression)
   func inst parse(owner String text)
     self.check-string(user text)
     self.set-simple-type(user glob.type-string)
-    self.access := Access.S-VAR
+    self.access := Access.VAR
     self.is-var := true
     self.text := text
     self.strip-multilines()
@@ -174,7 +174,7 @@ class StringExpression(TextExpression)
   
   func dynamic analyze()
     self.add-aux-variable(
-        copy Access.S-VAR, copy true, user self.result-type)->(
+        copy Access.VAR, copy true, user self.result-type)->(
         owner self.aux-variable)
   
   func dynamic write-preactions()

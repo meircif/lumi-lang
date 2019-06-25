@@ -198,6 +198,8 @@ class TypeData(SyntaxTreeNamespace)
         self.syntax-error(
             user "no parameter given for type with parameters",
             user self.base-type.type-data.name)
+      if not self.constructor?
+        self.constructor := self.base-type.type-data.constructor
     base()
     glob.current-module := _
   

@@ -147,12 +147,9 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
     self.assign.new(
         user self.code-node,
         user self.left-expression,
-        user self.right-expression)
-    self.left-expression.result-type.check-assign-from(
-        copy self.left-expression.access, user self)->(
-        owner self.right-expression)
-    self.assign.reset-value(user self.right-expression)
-    self.assign.analyze()
+        user self.right-expression,
+        copy false)
+    self.assign.analyze-value()->(owner self.right-expression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.assign.check-memory(user refs)
@@ -162,7 +159,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
 
   func dynamic write-end()
     if access-is-owner(copy self.left-expression.access)
-      self.write-end-expression(user self.assign.assigned-value-variable)
+      self.write-end-expression(user self.assign.value)
       self.assign.write-owner-null()
     else
       base()
@@ -171,6 +168,72 @@ func assign-operator-factory(
     user SyntaxTreeCode code-node, user Operator operator)->(
     owner BinaryExpression expression)
   expression := AssignOperatorExpression(user code-node, user operator)
+
+
+~~~ :=: ~~~
+class SwitchOperatorExpression(BinaryExpression)
+  var AssignExpression assign-left-to-aux
+  var AssignExpression assign-right-to-left
+  var AssignExpression assign-aux-to-right
+  owner Expression aux-variable
+      
+  func dynamic analyze()
+    base()
+    if not self.left-expression.assignable or
+        not self.right-expression.assignable
+      self.syntax-error-msg(user "switching non assignable expression")
+    self.add-aux-variable(
+        copy self.left-expression.access,
+        copy false,
+        user self.left-expression.result-type)->(
+        owner self.aux-variable)
+    self.assign-left-to-aux.new(
+        user self.code-node,
+        user self.aux-variable,
+        user self.left-expression,
+        copy false)
+    self.assign-right-to-left.new(
+        user self.code-node,
+        user self.left-expression,
+        user self.right-expression,
+        copy false)
+    self.assign-aux-to-right.new(
+        user self.code-node,
+        user self.right-expression,
+        user self.aux-variable,
+        copy false)
+    self.left-expression.result-type.check-equal(
+        user self.right-expression.result-type, user self.code-node)
+    if self.left-expression.access != self.right-expression.access
+      self.syntax-error2(
+          user "cannot switch access",
+          user glob.access-names[self.left-expression.access],
+          user "with other access",
+          user glob.access-names[self.right-expression.access])
+    if self.left-expression.result-type.reference-path.equals(
+        user self.right-expression.result-type.reference-path)
+      self.syntax-error-msg(user "switching reference with itself")
+      
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.assign-right-to-left.check-operands-memory(user refs)
+    refs.clear-invalid-reference(
+        user self.right-expression.result-type.reference-path)
+        
+  func dynamic write()
+    self.assign-left-to-aux.write-assign()
+    self.code-node.write-spaces()
+    self.assign-right-to-left.write-assign()
+    self.code-node.write-spaces()
+    self.assign-aux-to-right.write-assign()
+    if not self.right-expression.result-type.type-data.is-primitive
+      self.code-node.write-spaces()
+      self.aux-variable.write-assign-null()
+
+func switch-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := SwitchOperatorExpression(user code-node, user operator)
 
 
 func non-binary-operator-factory(

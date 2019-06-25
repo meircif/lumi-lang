@@ -58,6 +58,7 @@ TL5/tl5-compiler TL5/test-single.c TL5/tests/integration/test0.5.lm
 $CCA TL5/test-single.c ../TL5/lumi.5.c -I../TL5 -o TL5/test-single
 TL5/test-single > TL5/test-single-output.txt
 diff TL5/tests/integration/single-output.txt TL5/test-single-output.txt
+valgrind -q --leak-check=full --error-exitcode=1 TL5/test-single > /dev/null
 
 # run tl5-compiler multiple-file integration test
 TL5/tl5-compiler -t covered TL5/test-multiple.c \
@@ -70,6 +71,7 @@ mkdir TL5/cover-tests
 mv cobertura.xml TL5/cover-tests/
 diff TL5/tests/integration/multiple-output.txt TL5/test-multiple-output.txt
 diff TL5/tests/integration/expected-cobertura.xml TL5/cover-tests/cobertura.xml
+valgrind -q --leak-check=full --error-exitcode=1 TL5/test-multiple > /dev/null
 
 # run tl5-compiler coverage fail integration test
 TL5/tl5-compiler -t integration TL5/test-uncovered.c \

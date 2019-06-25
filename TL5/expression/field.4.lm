@@ -58,7 +58,7 @@ class FieldExpression(Expression)
           owner self.result-type)
       instance-type.reference-path.copy-and-add-field(user self.variable)->(
           owner self.result-type.reference-path)
-      if self.is-complex-field and access-is-weak(copy self.instance.access) and
+      if self.is-complex-field and access-has-refman(copy self.instance.access) and
           not self.variable.type-instance.type-data is glob.type-string
         self.access := Access.S-VAR
       else
@@ -98,9 +98,19 @@ class FieldExpression(Expression)
     expression.restructure()->(owner expression, owner arguments)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.instance.check-memory(user refs)
-    refs.check-expression(user self)
+    if not self.is-constructor-field()
+      self.instance.check-memory(user refs)
     refs.check-user(user self.instance)
+    refs.check-reference(user self)
+  
+  func inst is-constructor-field()->(var Bool is-field)
+    is-field := false
+    user SyntaxTreeFunction function(user self.code-node.get-function())
+    if not function.parent-type? or
+        self.result-type.reference-path.field.variable is-not self.variable
+      return
+    is-field := self.result-type.reference-path.variable is
+        function.arguments.parameters.first.item.get-variable()
 
   func dynamic write-preactions()
     self.instance.write-preactions()

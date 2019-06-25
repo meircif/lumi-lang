@@ -3,74 +3,82 @@ module tl5-compiler
 
 ~~~ Assign expression (:=) ~~~
 class AssignExpression(Expression)
-  owner VariableExpression assigned-value-variable
   user Expression target
   user Expression value
   user Expression original-value
+  var Bool is-initialization
   
   new(
       user SyntaxTreeCode code-node,
       user Expression target,
-      user Expression value)
+      user Expression value,
+      copy Bool is-initialization)
     base(user code-node)
     self.target := target
     self.value := value
+    self.is-initialization := is-initialization
     self.original-value := self.value
   
-  func inst reset-value(user Expression value)
+  func inst analyze-value()->(owner Expression value)
+    self.target.result-type.check-assign-from(
+        copy self.target.access, user self)->(owner value)
     self.value := value
+    self.analyze()
   
   func dynamic analyze()
     if self.target.result-type.reference-path.equals(
         user self.value.result-type.reference-path)
       self.syntax-error-msg(user "assigning reference into itself")
-    if access-is-user(copy self.target.access)
-      self.code-node.get-function().has-user-assign := true
-    else-if access-is-owner(copy self.target.access)
-      ; ownership pass
-      self.add-aux-variable(
-          copy self.target.access,
-          copy false,
-          user self.target.result-type)->(
-          owner self.assigned-value-variable)
+    if access-is-owner(copy self.target.access)
+      self.code-node.get-function().delete-group-builder.add-deleting(
+          user self.target.result-type)
   
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.value.check-memory(user refs)
     user ReferencePath left-path(
         user self.target.result-type.reference-path)
-    if left-path?
-      refs.mark-reference(user left-path, copy true)
-    var Bool check-left(copy true)
     if access-is-owner(copy self.target.access)
       refs.mark-illegal-type(user self.target.result-type)
-      if left-path? and
-          self.value.result-type.type-data is glob.type-empty
-        refs.mark-reference(user left-path, copy false)
-        check-left := false
-      if access-is-owner(copy self.value.access)
-        ; move
-        user ReferencePath right-path(
-            user self.value.result-type.reference-path)
-        if right-path?
-          refs.mark-reference(user right-path, copy false)
-        left-path.check-pure-owner(user self)
-        right-path.check-pure-owner(user self)
-    if check-left
-      self.target.check-memory(user refs)
+    self.check-operands-memory(user refs)
     refs.check-user(user self.value)
     if left-path?
       if not left-path.field?
         refs.add(user left-path.variable)
+
+  func inst check-operands-memory(user ReferenceMemoryList refs)
+    var Bool is-move(copy access-is-owner(copy self.target.access))
+    user ReferencePath left-path(
+        user self.target.result-type.reference-path)
+    user ReferencePath right-path(
+        user self.value.result-type.reference-path)
+    if is-move
+      left-path.check-pure-owner(user self)
+      right-path.check-pure-owner(user self)
+      refs.mark-invalid-reference(user left-path)
+    self.value.check-memory(user refs)
+    if is-move
+      refs.clear-invalid-reference(user left-path)
+      refs.mark-invalid-reference(user right-path)
+    self.target.check-memory(user refs)
+    if right-path?
+      if is-move and right-path.is-conditional()
+        refs.clear-invalid-reference(user right-path)
   
   func dynamic write-preactions()
     self.value.write-preactions()
-    if not self.target.result-type.type-data.is-primitive
-      if access-is-owner(copy self.target.access)
-        self.write-owner-assign-preactions()
-      else
-        self.write-user-assign-preactions()
-    else
-      self.target.write-preactions()
+    self.target.write-preactions()
+    if self.value.access = Access.WEAK and self.target.access = Access.USER
+      self.value.write-check-refman()
+    if access-is-owner(copy self.target.access)
+      self.write-owner-assign-preactions()
+    self.write-assign-preactions(copy true)
+
+  func inst write-assign-preactions(copy Bool full-assign)
+    if access-has-refman(copy self.target.access) and
+        access-has-refman(copy self.value.access)
+      self.write-assign-refman(copy full-assign)
+    if self.target.result-type.type-data.is-dynamic or
+        self.target.is-generic-cast
+      self.write-assign-dynamic()
     if self.target.result-type.type-data is glob.type-array
       self.write-array-preactions()
     else-if self.target.result-type.type-data is glob.type-string
@@ -135,102 +143,70 @@ class AssignExpression(Expression)
     self.value.write-length(user "_Length", user "&Lumi_empty_int", copy false)
     write(user ";\n")
     self.code-node.write-spaces()
-    
-    if access-is-owner(copy self.target.access) and
-        self.value.result-type.type-data is-not glob.type-empty
-      self.value.write()
-      write(user "_Length = &Lumi_empty_int;\n")
-      self.code-node.write-spaces()
   
-  func inst write-user-assign-preactions()
-    self.target.write-preactions()
-    
-    write(user "aux_Ref_Manager = ")
-    self.target.write-refman()
-    write(user ";\n")
-    self.code-node.write-spaces()
+  func inst write-assign-refman(copy Bool full-assign)
+    if full-assign and not access-is-owner(copy self.target.access)
+      write(user "LUMI_inc_ref(")
+      self.value.write-refman()
+      write(user ");\n")
+      self.code-node.write-spaces()
+
+      write(user "LUMI_dec_ref(")
+      self.target.write-refman()
+      write(user ");\n")
+      self.code-node.write-spaces()
     
     self.target.write-refman()
     write(user " = ")
     self.value.write-refman()
     write(user ";\n")
-    self.code-node.write-spaces()
-    
-    self.write-assign-dynamic(
-        user self.target, user self.value)
-    
-    write(user "LUMI_inc_ref(")
-    self.target.write-refman()
-    write(user ");\n")
-    self.code-node.write-spaces()
-    
-    write(user "LUMI_dec_ref(aux_Ref_Manager);\n")
-    self.code-node.write-spaces()
-    write(user "aux_Ref_Manager = NULL;\n")
     self.code-node.write-spaces()
 
   func inst write-owner-assign-preactions()
-    self.assigned-value-variable.write()
-    write(user " = ")
-    self.value.write()
-    write(user ";\n")
-    self.code-node.write-spaces()
-    self.assigned-value-variable.write-refman()
-    write(user " = ")
-    self.value.write-refman()
-    write(user ";\n")
-    self.code-node.write-spaces()
-    
-    self.write-assign-dynamic(
-        user self.assigned-value-variable, user self.value)
-    
-    if self.value.result-type.type-data is-not glob.type-empty
-      self.original-value.write-assign-null()
+    if not self.is-initialization
+      self.write-left-delete()
       self.code-node.write-spaces()
     
-    self.target.write-preactions()
-    
-    self.write-left-delete()
-    self.code-node.write-spaces()
-    
-    write(user "LUMI_owner_dec_ref(")
-    self.target.write-refman()
-    write(user ");\n")
-    self.code-node.write-spaces()
-    
-    self.target.write-refman()
-    write(user " = ")
-    self.assigned-value-variable.write-refman()
-    write(user ";\n")
-    self.code-node.write-spaces()
-    
-    self.write-assign-dynamic(
-        user self.target, user self.assigned-value-variable)
-  
-  func inst write-assign-dynamic(user Expression target, user Expression source)
-    if not target.result-type.type-data.is-dynamic and
-        not target.is-generic-cast
-      return
-    target.write-dynamic()
-    write(user " = ")
-    if not source.result-type.type-data.is-dynamic and
-        not source.is-generic-cast and
-        source.result-type.type-data is-not glob.type-empty
-      write(user "&")
-      source.result-type.type-data.write-cname()
-      write(user "_dynamic")
-    else
-      if (target.result-type.type-data is glob.type-generic or
-          target.is-generic-cast) and
-          source.result-type.type-data is-not glob.type-generic and
-          not source.is-generic-cast
-        write(user "(Generic_Type_Dynamic*)")
-        source.write-dynamic-safe()
-      else-if source.is-generic-cast and not target.is-generic-cast and
-          not (target.result-type.type-data is glob.type-generic)
-        source.write-dynamic-safe()
+      if self.target.access = Access.STRONG
+        write(user "LUMI_owner_dec_ref(")
+        self.target.write-refman()
+        write(user ");\n")
+        self.code-node.write-spaces()
       else
-        source.write-dynamic()
+        write(user "free(")
+        self.target.write()
+        write(user ");\n")
+        self.code-node.write-spaces()
+    
+    if self.value.access = Access.STRONG and
+        self.target.access = Access.OWNER and
+        self.value.result-type.type-data is-not glob.type-empty
+      write(user "LUMI_var_dec_ref(")
+      self.value.write-refman()
+      write(user ");\n")
+      self.code-node.write-spaces()
+      
+  
+  func inst write-assign-dynamic()
+    self.target.write-dynamic()
+    write(user " = ")
+    if not self.value.result-type.type-data.is-dynamic and
+        not self.value.is-generic-cast and
+        self.value.result-type.type-data is-not glob.type-empty
+      write(user "&")
+      self.value.result-type.type-data.write-cname()
+      write(user "_dynamic")
+    else-if (self.target.result-type.type-data is glob.type-generic or
+        self.target.is-generic-cast) and
+        self.value.result-type.type-data is-not glob.type-generic and
+        not self.value.is-generic-cast
+      write(user "(Generic_Type_Dynamic*)")
+      self.value.write-dynamic-safe()
+    else-if self.value.is-generic-cast and not self.target.is-generic-cast and
+        not (self.target.result-type.type-data is glob.type-generic)
+      self.value.write-dynamic-safe()
+    else
+      self.value.write-dynamic()
     write(user ";\n")
     self.code-node.write-spaces()
   
@@ -271,16 +247,28 @@ class AssignExpression(Expression)
     write(user ");\n")
   
   func dynamic write()
-    self.target.write()
-    write(user " = ")
-    if access-is-owner(copy self.target.access)
-      self.assigned-value-variable.write()
-    else
-      self.value.write-cast()
-    write(user ";\n")
+    ; not called in assignment operator
+    self.write-main-assign()
     if access-is-owner(copy self.target.access)
       self.write-owner-null()
+    
+  func inst write-main-assign()
+    self.target.write()
+    write(user " = ")
+    self.value.write-cast()
+    write(user ";\n")
+  
+  func inst write-assign()
+    self.write-assign-preactions(copy false)
+    self.write-main-assign()
 
   func inst write-owner-null()
+    ; called also in assignment operator
+    if self.value.result-type.type-data is glob.type-empty
+      return
+    if self.value.access = Access.OWNER and self.target.access = Access.STRONG
+      self.code-node.write-spaces()
+      self.write-macro-init(user "INIT_VAR_REFMAN", user self.target)
+      write(user ")\n")
     self.code-node.write-spaces()
-    self.assigned-value-variable.write-assign-null()
+    self.original-value.write-assign-null()

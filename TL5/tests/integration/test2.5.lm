@@ -7,8 +7,8 @@ module covered
 
 class MiddleType(integration.BaseType)
     var Int num-mid
-    weak integration.BaseType mid-base-ref
-    weak integration.TopType mid-top-ref
+    weak integration.BaseType? mid-base-ref
+    weak integration.TopType? mid-top-ref
     
     new()
         base()

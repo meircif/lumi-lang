@@ -228,11 +228,16 @@ class CallArgument(Argument)
     analyze-expression()->(owner self.value)
     if self.is-output and not self.value.assignable
       self.syntax-error-msg(user "non assignable call output")
+    if self.value.result-type?
+      if self.access = Access.STRONG and self.value.access = Access.OWNER and
+          self.value.result-type.type-data is-not glob.type-empty
+        self.value := OwnerToStrongCallExpression(owner self.value)
   
   func dynamic check-same-type-as(
       user TypeInstance type-instance,
       user TypeInstance actual-params,
-      copy Int bases)
+      copy Int bases,
+      copy Bool print-error)
     if access-is-owner(copy self.access) and
         not access-is-owner(copy self.value.access)
       self.syntax-error(
@@ -260,14 +265,15 @@ class CallArgument(Argument)
   
   func dynamic get-output()->(user Expression output)
     output := self.value
+  
+  func dynamic take-value()->(owner Expression value)
+    value := self.value
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.value.check-memory(user refs)
     if not self.is-output
       if access-is-owner(copy self.access) and
           self.value.result-type.reference-path?
-        refs.mark-reference(
-            user self.value.result-type.reference-path, copy false)
         self.value.result-type.reference-path.check-pure-owner(user self)
       refs.check-user(user self.value)
   
@@ -279,6 +285,15 @@ class CallArgument(Argument)
       self.value.write()
       write(user " != NULL) ")
       self.code-node.write-raise(user "empty_base_output")
+      self.code-node.write-spaces()
+    if self.value.access = Access.WEAK and self.access = Access.USER
+      self.value.write-check-refman()
+    if self.value.access = Access.STRONG and self.access = Access.OWNER and
+        self.value.result-type.type-data is-not glob.type-empty
+      ; LUMI_var_dec_ref(s_Refman);
+      write(user "LUMI_var_dec_ref(")
+      self.value.write-refman()
+      write(user ");\n")
       self.code-node.write-spaces()
   
   func dynamic write()
@@ -342,7 +357,7 @@ class CallArgument(Argument)
         write(user ")")
       
     
-    if not self.real-type.type-data.is-primitive and not self.is-native
+    if access-has-refman(copy self.access) and not self.is-native
       ; , [&(]`value`_Refman[)]
       write(user ", ")
       if self.is-output
@@ -378,10 +393,6 @@ class CallArgument(Argument)
         self.value.result-type.type-data is-not glob.type-empty
       self.code-node.write-spaces()
       self.assignee.write-assign-null()
-      if self.assignee.result-type.type-data is glob.type-string
-        self.code-node.write-spaces()
-        self.assignee.write()
-        write(user "_Length = &Lumi_empty_int;\n")
 
 
 class CallArgumentFactory(ArgumentFactory)

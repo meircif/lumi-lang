@@ -74,6 +74,9 @@ class Argument(SyntaxTreeNode)
   func dynamic get-output()->(user Expression output)
     raise
   
+  func dynamic take-value()->(owner Expression value)
+    raise
+  
   func dynamic write-preactions()
     raise
   
@@ -133,7 +136,8 @@ class FunctionArguments(SyntaxTreeNode)
     self-args.variable.access := self-args.access
     string-new-copy(user "self")->(owner self-args.variable.name)
     type-data.self-type-instance()->(owner self-args.variable.type-instance)
-    self-args.variable.type-instance.conditional := true
+    if access != Access.VAR
+      self-args.variable.type-instance.conditional := true
     self.parameters.prepend(owner self-args)
   
   func inst parse-args(

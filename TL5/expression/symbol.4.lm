@@ -72,7 +72,7 @@ class VariableExpression(Expression)
     self.variable.order-constants(user ordered-list)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    refs.check-expression(user self)
+    refs.check-reference(user self)
 
   func dynamic write()
     if self.variable.is-output

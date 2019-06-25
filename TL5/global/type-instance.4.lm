@@ -148,6 +148,10 @@ struct TypeInstance
     if self.type-data is glob.type-array
       if not self.parameters?
         node.syntax-error-msg(user "missing subtype for array")
+      if self.parameters.first.item.type-data.constructor?
+        node.syntax-error(
+            user "array of type with constructor",
+            user self.parameters.first.item.type-data.name)
       if self.parameters.first.item.type-data is glob.type-generic
         node.syntax-error-msg(
             user "generic arrays not supported")
@@ -229,6 +233,13 @@ struct TypeInstance
             user self.type-data.name,
             user "into static type",
             user target.type-data.name)
+      if self.reference-path?
+        if self.reference-path.field? and
+            not self.reference-path.is-conditional()
+          assert node?
+          node.syntax-error-ref(
+              user "cannot move non-conditional owner field",
+              user self.reference-path)
     if (access-is-only-var(copy target-access) and
         access-is-user(copy self-access)) or
         (target-access = Access.S-VAR and self-access = Access.VAR)
@@ -238,7 +249,7 @@ struct TypeInstance
           user glob.access-names[self-access],
           user "into value with access",
           user glob.access-names[target-access])
-    if target-access = Access.WEAK and not access-is-weak(copy self-access)
+    if target-access = Access.WEAK and not access-has-refman(copy self-access)
       assert node?
       node.syntax-error(
           user "assigning into a weak reference an illegal access",
@@ -323,6 +334,10 @@ struct TypeInstance
           user self.type-data.name,
           user "and",
           user other.type-data.name)
+    if self.conditional != other.conditional
+      assert node?
+      node.syntax-error(
+          user "conditionals not matching in type", user self.type-data.name)
     self.check-sub-equal(user other, user node)
   
   func check-sub-equal(user TypeInstance target, user SyntaxTreeNode node)
