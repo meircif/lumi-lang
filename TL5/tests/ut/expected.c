@@ -1930,8 +1930,10 @@ ut_M_Test* t1 = NULL;
     ut_M_Test* t2 = NULL;
     ut_M_Test* aux_Test_0 = NULL;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_t)
+    CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
     t1 = ut_M_t;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_t)
+    CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_t_Refman)
     t2 = ut_M_t;
     aux_Test_0 = t1;
     t1 = t2;
@@ -1943,12 +1945,12 @@ ut_M_Test* t1 = NULL;
     Ref_Manager* t2_Refman = NULL;
     ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
-    CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, *to, *to_Refman)
+    CHECK_REF(1, LUMI_block0_cleanup, *to)
     LUMI_inc_ref(*to_Refman);
     LUMI_dec_ref(t1_Refman);
     t1_Refman = *to_Refman;
     t1 = *to;
-    CHECK_REF_AND_REFMAN(2, LUMI_block0_cleanup, *to, *to_Refman)
+    CHECK_REF(2, LUMI_block0_cleanup, *to)
     LUMI_inc_ref(*to_Refman);
     LUMI_dec_ref(t2_Refman);
     t2_Refman = *to_Refman;
@@ -2043,6 +2045,7 @@ char* s = NULL;
 ut_M_Test* tt = NULL;
     CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_t->t)
+    CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t->t_Refman)
     tt = ut_M_t->t;
 /// @ t2
 ut_M_Test* tu = NULL;
@@ -2050,16 +2053,25 @@ ut_M_Test* tu = NULL;
     LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
     CHECK(2, LUMI_block0_cleanup)
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_t)
+    CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_t_Refman)
     tu = &(ut_M_t->_base._base);
 /// @ t3
-CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_tb, ut_M_tb_Refman)
+CHECK_REF(1, LUMI_block0_cleanup, ut_M_tb)
     ut_M_i = ut_M_tb->_base._base.num;
+/// @ t4
+ut_M_Test* tt = NULL;
+    Ref_Manager* tt_Refman = NULL;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_t)
+    LUMI_inc_ref(ut_M_t_Refman);
+    LUMI_dec_ref(tt_Refman);
+    tt_Refman = ut_M_t_Refman;
+    tt = ut_M_t;
 /// @ te0
 cannot use "!" on void expression
 /// @ te1
-cannot use "!" on solid reference of type "Int"
+cannot use "!" on non ocnditional reference of type "Int"
 /// @ te2
-cannot use "!" on solid reference of type "String"
+cannot use "!" on non ocnditional reference of type "String"
 /// @@ test-dynamic
 /// @ t0
 ut_M_Ta a_Var = {{0}};

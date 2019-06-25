@@ -675,6 +675,8 @@ user Test? tu
 tu := fun7(weak _)->(weak t)!
 ; @ c t3
 i := tb!.num
+; @ c t4
+weak Test tt(weak t!)
 ; @ ec te0
 (i := 2)!
 ; @ ec te1

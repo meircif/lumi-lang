@@ -269,17 +269,13 @@ class ExclamationExpression(Expression)
     analyze-expression()->(owner self.dubious)
     if not self.dubious.result-type?
       self.syntax-error-msg(user "cannot use \"!\" on void expression")
-    if not self.dubious.result-type.conditional and
-        self.dubious.access != Access.WEAK
+    if not self.dubious.result-type.conditional
       self.syntax-error(
-          user "cannot use \"!\" on solid reference of type",
+          user "cannot use \"!\" on non ocnditional reference of type",
           user self.dubious.result-type.type-data.name)
     self.dubious.result-type.copy-new()->(owner self.result-type)
     self.result-type.conditional := false
-    if self.dubious.access = Access.WEAK
-      self.access := Access.USER
-    else
-      self.access := self.dubious.access
+    self.access := self.dubious.access
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.dubious.check-memory(user refs)
@@ -287,7 +283,8 @@ class ExclamationExpression(Expression)
 
   func dynamic write-preactions()
     self.dubious.write-preactions()
-    self.write-check-ref()
+    self.write-macro-init(user "CHECK_REF", user self)
+    write(user ")\n")
     self.code-node.write-spaces()
 
   func dynamic write()

@@ -12320,40 +12320,30 @@ Returncode tl5_compiler_M_ExclamationExpression_analyze(tl5_compiler_M_Exclamati
     LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_0, aux_String_0_Refman);
     CHECK(271)
   }
-  CHECK_REF(273, self, self_Refman)
-  CHECK_REF(273, self->dubious, self->dubious_Refman)
   CHECK_REF(272, self, self_Refman)
   CHECK_REF(272, self->dubious, self->dubious_Refman)
   CHECK_REF(272, self->dubious->result_type, self->dubious->result_type_Refman)
-  if ((! self->dubious->result_type->conditional) && (self->dubious->access != tl5_compiler_M_Access_WEAK)) {
-    INIT_STRING_CONST(275, aux_String_1, "cannot use \"!\" on solid reference of type");
-    CHECK_REF(276, self, self_Refman)
-    CHECK_REF(276, self->dubious, self->dubious_Refman)
-    CHECK_REF(276, self->dubious->result_type, self->dubious->result_type_Refman)
-    CHECK_REF(276, self->dubious->result_type->type_data, self->dubious->result_type->type_data_Refman)
+  if (! self->dubious->result_type->conditional) {
+    INIT_STRING_CONST(274, aux_String_1, "cannot use \"!\" on non ocnditional reference of type");
+    CHECK_REF(275, self, self_Refman)
+    CHECK_REF(275, self->dubious, self->dubious_Refman)
+    CHECK_REF(275, self->dubious->result_type, self->dubious->result_type_Refman)
+    CHECK_REF(275, self->dubious->result_type->type_data, self->dubious->result_type->type_data_Refman)
     LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base), aux_String_1, aux_String_1_Refman, self->dubious->result_type->type_data->name, self->dubious->result_type->type_data->name_Refman);
-    CHECK(274)
+    CHECK(273)
   }
-  CHECK_REF(277, self, self_Refman)
-  CHECK_REF(277, self->dubious, self->dubious_Refman)
-  CHECK_REF(277, self, self_Refman)
+  CHECK_REF(276, self, self_Refman)
+  CHECK_REF(276, self->dubious, self->dubious_Refman)
+  CHECK_REF(276, self, self_Refman)
   LUMI_err = tl5_compiler_M_TypeInstance_copy_new(self->dubious->result_type, self->dubious->result_type_Refman, &(self->_base.result_type), &(self->_base.result_type_Refman));
-  CHECK(277)
-  CHECK_REF(278, self, self_Refman)
-  CHECK_REF(278, self->_base.result_type, self->_base.result_type_Refman)
+  CHECK(276)
+  CHECK_REF(277, self, self_Refman)
+  CHECK_REF(277, self->_base.result_type, self->_base.result_type_Refman)
   self->_base.result_type->conditional = false;
-  CHECK_REF(279, self, self_Refman)
-  CHECK_REF(279, self->dubious, self->dubious_Refman)
-  if (self->dubious->access == tl5_compiler_M_Access_WEAK) {
-    CHECK_REF(280, self, self_Refman)
-    self->_base.access = tl5_compiler_M_Access_USER;
-  }
-  else {
-      CHECK_REF(282, self, self_Refman)
-      CHECK_REF(282, self->dubious, self->dubious_Refman)
-      CHECK_REF(282, self, self_Refman)
-      self->_base.access = self->dubious->access;
-    }
+  CHECK_REF(278, self, self_Refman)
+  CHECK_REF(278, self->dubious, self->dubious_Refman)
+  CHECK_REF(278, self, self_Refman)
+  self->_base.access = self->dubious->access;
 LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_1_Refman);
   LUMI_var_dec_ref(aux_String_0_Refman);
@@ -12369,13 +12359,13 @@ Returncode tl5_compiler_M_ExclamationExpression_check_memory(tl5_compiler_M_Excl
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(refs_Refman);
-  CHECK_REF(285, self, self_Refman)
-  if (self->dubious_Dynamic == NULL) RAISE(285, empty_object)
+  CHECK_REF(281, self, self_Refman)
+  if (self->dubious_Dynamic == NULL) RAISE(281, empty_object)
   LUMI_err = self->dubious_Dynamic->_base.check_memory(&(self->dubious->_base), self->dubious_Refman, &(self->dubious_Dynamic->_base), refs, refs_Refman);
-  CHECK(285)
-  CHECK_REF(286, self, self_Refman)
+  CHECK(281)
+  CHECK_REF(282, self, self_Refman)
   LUMI_err = tl5_compiler_M_ReferenceMemoryList_check_user(refs, refs_Refman, self->dubious, self->dubious_Refman, self->dubious_Dynamic);
-  CHECK(286)
+  CHECK(282)
 LUMI_cleanup:
   LUMI_dec_ref(refs_Refman);
   LUMI_dec_ref(self_Refman);
@@ -12388,17 +12378,29 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "ExclamationExpression.write-preactions"
 Returncode tl5_compiler_M_ExclamationExpression_write_preactions(tl5_compiler_M_ExclamationExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_ExclamationExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  CHECK_REF(289, self, self_Refman)
-  if (self->dubious_Dynamic == NULL) RAISE(289, empty_object)
+  CHECK_REF(285, self, self_Refman)
+  if (self->dubious_Dynamic == NULL) RAISE(285, empty_object)
   LUMI_err = self->dubious_Dynamic->write_preactions(self->dubious, self->dubious_Refman, self->dubious_Dynamic);
-  CHECK(289)
-  LUMI_err = tl5_compiler_M_Expression_write_check_ref(&(self->_base), self_Refman, &(self_Dynamic->_base));
-  CHECK(290)
-  CHECK_REF(291, self, self_Refman)
+  CHECK(285)
+  INIT_STRING_CONST(286, aux_String_0, "CHECK_REF");
+  LUMI_err = tl5_compiler_M_Expression_write_macro_init(&(self->_base), self_Refman, &(self_Dynamic->_base), aux_String_0, aux_String_0_Refman, &(self->_base), self_Refman, &(self_Dynamic->_base));
+  CHECK(286)
+  INIT_STRING_CONST(287, aux_String_1, ")\n");
+  LUMI_err = tl5_compiler_M_write(aux_String_1, aux_String_1_Refman);
+  CHECK(287)
+  CHECK_REF(288, self, self_Refman)
   LUMI_err = tl5_compiler_M_SyntaxTreeCode_write_spaces(self->_base.code_node, self->_base.code_node_Refman, self->_base.code_node_Dynamic);
-  CHECK(291)
+  CHECK(288)
 LUMI_cleanup:
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
@@ -12410,10 +12412,10 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_ExclamationExpression_write(tl5_compiler_M_ExclamationExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_ExclamationExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
-  CHECK_REF(294, self, self_Refman)
-  if (self->dubious_Dynamic == NULL) RAISE(294, empty_object)
+  CHECK_REF(291, self, self_Refman)
+  if (self->dubious_Dynamic == NULL) RAISE(291, empty_object)
   LUMI_err = self->dubious_Dynamic->_base.write(&(self->dubious->_base), self->dubious_Refman, &(self->dubious_Dynamic->_base));
-  CHECK(294)
+  CHECK(291)
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
   return LUMI_err;
@@ -12426,10 +12428,10 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_ExclamationExpression_write_safe(tl5_compiler_M_ExclamationExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_ExclamationExpression_Dynamic* self_Dynamic) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
-  CHECK_REF(297, self, self_Refman)
-  if (self->dubious_Dynamic == NULL) RAISE(297, empty_object)
+  CHECK_REF(294, self, self_Refman)
+  if (self->dubious_Dynamic == NULL) RAISE(294, empty_object)
   LUMI_err = self->dubious_Dynamic->write_safe(self->dubious, self->dubious_Refman, self->dubious_Dynamic);
-  CHECK(297)
+  CHECK(294)
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
   return LUMI_err;
