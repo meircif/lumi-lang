@@ -190,11 +190,11 @@ class SyntaxTreeRoot(GlobalNodes)
       if not glob.test-functions.first?
         sys.print(user "General code error: no test functions\n")
         sys.exit(copy 1)
-    else-if self.main-function?
-      self.main-function.analyze()
-    else-if not self.is-library
+    else-if not self.main-function? and not self.is-library
       sys.print(user "General code error: no main function\n")
       sys.exit(copy 1)
+    if self.main-function?
+      self.main-function.analyze()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     for type-data in self.types.iter()

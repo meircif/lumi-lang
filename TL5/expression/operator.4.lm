@@ -217,7 +217,7 @@ class SwitchOperatorExpression(BinaryExpression)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.assign-right-to-left.check-operands-memory(user refs)
-    refs.clear-moved-owner(
+    refs.clear-invalid-reference(
         user self.right-expression.result-type.reference-path)
         
   func dynamic write()

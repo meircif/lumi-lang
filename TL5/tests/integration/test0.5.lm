@@ -236,8 +236,8 @@ func TestStruct.get()->(var Int x, user String? s)
 
 class TestClass
     var Int num
-    weak String text
-    owner TestClass tc
+    weak String? text
+    owner TestClass? tc
     
     new()
         self.num := 1
@@ -389,34 +389,29 @@ struct Item
         self.s := news
 
 struct Data{Generic}
-    weak Generic item
+    weak Generic? item
     
-    new()
+    func set(weak Generic? item) _
     
-    func set(weak Generic item) _
-    
-    func get()->(weak Generic item)
+    func get()->(weak Generic? item)
         item := self.item
         
-func Data.set(weak Generic item)
-    weak Generic x(weak item)
+func Data.set(weak Generic? item)
+    weak Generic? x(weak item)
     self.item := x
     new Data{Generic} d
     d.item := self.item
     self.item := d.item
 
 struct Dataset{First:Second:Third}(Data{First})
-    weak Second second
-    weak Third third
-    
-    new()
-        base()
+    weak Second? second
+    weak Third? third
 
 struct MidData{Generic}(Dataset{Item:Data{Generic}:Generic})
 
 struct TopData(MidData{TestStruct})
 
-func test-type-parameters(weak Item s)
+func test-type-parameters(weak Item? s)
     var Data{Item} d
     user Item? su
     d.item := s
@@ -572,8 +567,7 @@ func test-for-each()
 
 
 class ComplexField
-    weak ComplexField x
-    new()
+    weak ComplexField? x
     func dynamic meth()
         sys.print(user "$")
 
@@ -588,7 +582,7 @@ func HasComplexField.run()
     x.meth()
     self.x.meth()
     ComplexField.meth(user self.x)
-    user ComplexField x2(user self.x.x)
+    user ComplexField? x2(user self.x.x)
     x2 := self.x.x
     x2.meth()
     self.x.x.meth()

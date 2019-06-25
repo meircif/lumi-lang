@@ -612,7 +612,8 @@ s1 :=: s2
 ; @ g t7
 struct Test
     owner File f
-    new()
+    new(owner File f)
+        self.f := f
 func fun(owner Test? t1, owner Test? t2)
     t1.f :=: t2.f
 ; @ c t8
@@ -929,6 +930,13 @@ func fun()
 ; @-
 module second
 test dummy()
+; @ tg t8
+func fun()
+main
+    fun()
+; @-
+module test
+test test-fun()
 ; @ eg te0
 error 
 ; @ ec te1
@@ -2093,14 +2101,13 @@ user Tb? tb2(user dt.item)
 tb2 := dt.item
 ; @ g t19
 struct Base{Generic}
-    weak Generic item
-    new()
+    weak Generic? item
     func get()->(weak Generic item)
 struct Test(Base{File})
-    func set(weak File f)
+    func set(weak File? f)
         self.item := f
         self.get()->(weak f)
-func fun(user Test test, weak File f)
+func fun(user Test test, weak File? f)
     test.item := f
     test.set(weak f)
     f := test.item
@@ -2584,7 +2591,7 @@ struct Test
         b := self.sb
         self.b.meth()
         Bstruct.meth(user self.b)
-        user Bstruct b2(user self.b.b)
+        user Bstruct? b2(user self.b.b)
         b2 := self.b.b
         self.b.b.meth()
         self.b.b := b
@@ -2598,8 +2605,7 @@ class Astruct
     var Int x
     func dynamic meth()
 class Bstruct(Astruct)
-    weak Bstruct b
-    new()
+    weak Bstruct? b
     func dynamic meth()
 ; @ g t1
 struct Base
@@ -2849,8 +2855,10 @@ ut.Error.VALUE
 ; @ g to0
 struct Test
     owner String? s
+    owner String str
     new()
-        self.s := String{12}()
+        self.str := String{12}()
+        self.str.clear()
 func use(user String? s)
 func take(owner String? s)
 func fun(owner String? s, user Test tu, owner Test to)
@@ -2892,10 +2900,9 @@ s := so
 s.set(copy 0, copy 'a')
 ; @ g tu4
 struct Test
-    weak String s
-    new()
-    func get()->(user String s) _
-func Test.get()->(user String s)
+    weak String? s
+    func get()->(user String? s) _
+func Test.get()->(user String? s)
     s := self.s
 ; @ c tu5
 user String? s(user ostr)
@@ -3270,6 +3277,32 @@ func error()->(var String s)
 ; @ eg tee0
 struct Error
     weak String s
+; @ eg tee1
+struct Error
+    owner String s
+    new()
+; @ eg tee2
+struct Error
+    weak String s
+    new(strong String s)
+        self.s.clear()
+        self.s := s
+; @ eg tee3
+struct Error
+    owner String s
+    new()
+        self.fun()
+        self.s := String{12}()
+    func fun()
+        self.s.clear()
+; @ eg tee4
+struct Error
+    owner String s
+    new()
+        error(user self)
+        self.s := String{12}()
+func error(user Error e)
+    e.s.clear()
 ; @ ec tec0
 str := str
 ; @ eg tec1

@@ -31,7 +31,7 @@ struct ReferencePath
       is-equal := false
       return
     if self.field?
-      ; self.field.equals(user reference.field)->(var is-equal)
+      self.field.equals(user reference.field)->(var is-equal)
     else
       is-equal := true
   
@@ -76,7 +76,7 @@ struct ReferencePath
 
 ~~~ List of memory managed references ~~~
 struct ReferenceMemoryList
-  var List{ReferencePath} moved-owners
+  var List{ReferencePath} invalid-references
   var NameMap{SyntaxTreeVariable} user-references
   
   func add(user SyntaxTreeVariable variable)
@@ -121,24 +121,32 @@ struct ReferenceMemoryList
     for variable in to-delete.iter()
       self.user-references.remove(user variable)
 
-  func mark-moved-owner(user ReferencePath reference-path)
+  func mark-invalid-reference(user ReferencePath reference-path)
     if reference-path?
-      self.clear-moved-owner(user reference-path)
-      self.moved-owners.add(owner reference-path.copy-new())
+      self.clear-invalid-reference(user reference-path)
+      self.invalid-references.add(owner reference-path.copy-new())
 
-  func clear-moved-owner(user ReferencePath reference-path)
+  func clear-invalid-reference(user ReferencePath reference-path)
     if reference-path?
-      for refpath in self.moved-owners.iter()
+      for refpath in self.invalid-references.iter()
         if reference-path.equals(user refpath)
-          self.moved-owners.remove(user refpath)
+          self.invalid-references.remove(user refpath)
           return
   
+  func is-invalid(user ReferencePath reference-path)->(var Bool is-invalid)
+    is-invalid := false
+    if not reference-path?
+      return
+    for refpath in self.invalid-references.iter()
+      if reference-path.equals(user refpath)
+        is-invalid := true
+        return
+  
   func check-reference(user Expression expression)
-    if expression.result-type.reference-path?
-      for reference-path in self.moved-owners.iter()
-        if expression.result-type.reference-path.equals(user reference-path)
-          expression.syntax-error-ref(
-              user "using moved owner", user reference-path)
+    if self.is-invalid(user expression.result-type.reference-path)
+      expression.syntax-error-ref(
+          user "using invalid reference",
+          user expression.result-type.reference-path)
   
   func check-user(user Expression expression)
     user ReferencePath exp-path(user expression.result-type.reference-path)

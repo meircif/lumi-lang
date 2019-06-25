@@ -53,15 +53,15 @@ class AssignExpression(Expression)
     if is-move
       left-path.check-pure-owner(user self)
       right-path.check-pure-owner(user self)
-      refs.mark-moved-owner(user left-path)
+      refs.mark-invalid-reference(user left-path)
     self.value.check-memory(user refs)
     if is-move
-      refs.clear-moved-owner(user left-path)
-      refs.mark-moved-owner(user right-path)
+      refs.clear-invalid-reference(user left-path)
+      refs.mark-invalid-reference(user right-path)
     self.target.check-memory(user refs)
     if right-path?
       if is-move and right-path.is-conditional()
-        refs.clear-moved-owner(user right-path)
+        refs.clear-invalid-reference(user right-path)
   
   func dynamic write-preactions()
     self.value.write-preactions()
