@@ -181,7 +181,7 @@ class SwitchOperatorExpression(BinaryExpression)
     base()
     if not self.left-expression.assignable or
         not self.right-expression.assignable
-      self.syntax-error-msg(user "assigning into non assignable expression")
+      self.syntax-error-msg(user "switching non assignable expression")
     self.add-aux-variable(
         copy self.left-expression.access,
         copy false,
@@ -202,21 +202,23 @@ class SwitchOperatorExpression(BinaryExpression)
         user self.right-expression,
         user self.aux-variable,
         copy false)
-    self.assign-left-to-aux.analyze-value()->(owner self.left-expression)
-    self.assign-right-to-left.analyze-value()->(owner self.right-expression)
-    self.assign-aux-to-right.analyze-value()->(owner self.aux-variable)
+    self.left-expression.result-type.check-equal(
+        user self.right-expression.result-type, user self.code-node)
     if self.left-expression.access != self.right-expression.access
       self.syntax-error2(
           user "cannot switch access",
           user glob.access-names[self.left-expression.access],
           user "with other access",
           user glob.access-names[self.right-expression.access])
+    if self.left-expression.result-type.reference-path.equals(
+        user self.right-expression.result-type.reference-path)
+      self.syntax-error-msg(user "switching reference with itself")
       
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.assign-left-to-aux.check-memory(user refs)
-    self.assign-right-to-left.check-memory(user refs)
-    self.assign-aux-to-right.check-memory(user refs)
+    self.assign-right-to-left.check-operands-memory(user refs)
+    refs.clear-moved-owner(
+        user self.right-expression.result-type.reference-path)
         
   func dynamic write()
     self.assign-left-to-aux.write-assign()

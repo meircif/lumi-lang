@@ -35,6 +35,13 @@ struct ReferencePath
     else
       is-equal := true
   
+  func is-conditional()->(var Bool is-conditional)
+    user ReferencePath reference-path(user self)
+    do
+      while reference-path.field?
+      reference-path := reference-path.field
+    is-conditional := reference-path.variable.type-instance.conditional
+  
   func print()
     if self.variable.is-aux
       sys.print(user "{anonymous}")
@@ -44,6 +51,12 @@ struct ReferencePath
       sys.print(user ".")
       self.field.print()
   
+  func print-error(user String text)
+    sys.print(user text)
+    sys.print(user " \"")
+    self.print()
+    sys.print(user "\"\n")
+  
   func check-pure-owner(user SyntaxTreeNode node)
     var Bool pure-owner(copy true)
     user ReferencePath path(user self)
@@ -51,35 +64,22 @@ struct ReferencePath
       while path?
       if access-is-var(copy path.variable.access)
         if not pure-owner
-          node.print-syntax-error-header()
-          sys.print(user "cannot modify owner field \"")
-          sys.print(user path.variable.name)
-          sys.print(user "\" in non-owner reference \"")
-          self.print()
-          sys.print(user "\"\n")
-          sys.exit(copy 1)
+          node.syntax-error-item-ref(
+              user "cannot modify owner field",
+              user path.variable.name,
+              user "in non-owner reference",
+              user self)
       else
         pure-owner := false
       path := path.field
 
 
-~~~ Manage a single reference memory ~~~
-struct ReferenceMemory
-  var ReferencePath path
-  var Bool usable
-
-  new(user SyntaxTreeVariable variable)
-    ; self.path.new(user variable)
-    ; self.usable := true
-
-
 ~~~ List of memory managed references ~~~
 struct ReferenceMemoryList
-  var List{ReferenceMemory} references
+  var List{ReferencePath} moved-owners
   var NameMap{SyntaxTreeVariable} user-references
   
   func add(user SyntaxTreeVariable variable)
-    ; self.references.add(owner ReferenceMemory(user variable))
     if variable.access = Access.USER
       self.user-references.add-if-unique-value(
           user variable.name, user variable)
@@ -110,9 +110,6 @@ struct ReferenceMemoryList
     else
       type-instance-base.copy-new()->(owner type-instance)
     type-instance.conditional := false
-    ; for reference in self.references.iter()
-    ;   if type-data is reference.path.variable.type-instance.type-data
-    ;     reference.usable := false
     var NameMap{SyntaxTreeVariable} to-delete
     var TypeInstance variable-type-instance
     for variable in self.user-references.iter()
@@ -123,27 +120,25 @@ struct ReferenceMemoryList
         to-delete.add(user variable.name, user variable)
     for variable in to-delete.iter()
       self.user-references.remove(user variable)
+
+  func mark-moved-owner(user ReferencePath reference-path)
+    if reference-path?
+      self.clear-moved-owner(user reference-path)
+      self.moved-owners.add(owner reference-path.copy-new())
+
+  func clear-moved-owner(user ReferencePath reference-path)
+    if reference-path?
+      for refpath in self.moved-owners.iter()
+        if reference-path.equals(user refpath)
+          self.moved-owners.remove(user refpath)
+          return
   
-  func mark-reference(user ReferencePath reference-path, copy Bool usable)
-    ; for reference in self.references.iter()
-    ;   if reference.path.equals(user reference-path)
-    ;     reference.usable := usable
-    ;     return
-    ; new ReferenceMemory reference-memory(user reference-path.variable)
-    ; reference-path.field.copy-new()->(owner reference-memory.path.field)
-    ; reference-memory.usable := usable
-    ; self.references.add(owner reference-memory)
-  
-  func check-expression(user Expression expression)
-    ; for reference in self.references.iter()
-    ;   if expression.result-type.reference-path.equals(user reference.path)
-    ;     if not reference.usable
-    ;       expression.print-syntax-error-header()
-    ;       sys.print(user "using potentially illegal reference \"")
-    ;       expression.result-type.reference-path.print()
-    ;       sys.print(user "\"\n")
-    ;       sys.exit(copy 1)
-    ;     return
+  func check-reference(user Expression expression)
+    if expression.result-type.reference-path?
+      for reference-path in self.moved-owners.iter()
+        if expression.result-type.reference-path.equals(user reference-path)
+          expression.syntax-error-ref(
+              user "using moved owner", user reference-path)
   
   func check-user(user Expression expression)
     user ReferencePath exp-path(user expression.result-type.reference-path)

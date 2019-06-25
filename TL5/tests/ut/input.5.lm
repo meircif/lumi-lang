@@ -527,13 +527,6 @@ tb := otc
 ; @ c t15
 owner Array?{Test} otarr
 otarr := _
-; @ g t16
-struct Test
-    owner Test t
-    new()
-func fun()
-    new Test t
-    t := t.t
 ; @ ec te0
 345 @ 2
 ; @ ec te1
@@ -1827,7 +1820,7 @@ func fun()
     sys.print.mocked(user "really print")
     Sys.print.active := false
     sys.print.active := true
-mock Sys.print(user Array{Char} text)
+mock Sys.print(user Array?{Char} text)
 ; @ tg tt0
 func fun0()
     var Int x(copy 4)
@@ -2855,17 +2848,17 @@ ut.Error.VALUE
 ; @@ test-memory
 ; @ g to0
 struct Test
-    owner String s
+    owner String? s
     new()
         self.s := String{12}()
-func use(user String s)
-func take(owner String s)
+func use(user String? s)
+func take(owner String? s)
 func fun(owner String? s, user Test tu, owner Test to)
     s := _
     s := String{12}()
     s.set(copy 0, copy 'a')
     to.s := String{12}()
-    user String su(user tu.s)
+    user String? su(user tu.s)
     use(user tu.s)
     take(owner to.s)
     var Array{12:Int} arr
@@ -2926,17 +2919,15 @@ func fun(user Test t)
 struct Aa
     var Int x
 struct Bb
-    owner Aa a
-    new()
+    owner Aa? a
 func fun(user Bb b)
-    owner Aa a(owner b.a)
+    owner Aa? a(owner b.a)
 ; @ eg teo2
 struct Aa
     var Int x
 struct Bb
-    owner Aa a
-    new()
-func take(owner Aa a)
+    owner Aa? a
+func take(owner Aa? a)
 func fun(user Bb b)
     take(owner b.a)
 ; @ eg teo3
@@ -2960,6 +2951,61 @@ struct Test
 func get-user()->(weak Test t)
 func fun()
     get-user().s := _
+; @ eg teo6
+struct Test
+    owner String s
+    new()
+func fun(owner Test t)->(owner String s)
+    s := t.s
+; @ eg teo7
+struct Test
+    owner String s
+    new()
+func fun(owner Test t)
+    owner String s(owner t.s)
+; @ eg teo8
+struct Test
+    owner String s
+    new()
+func take(owner String s)
+func fun(owner Test t)->(owner String s)
+    take(owner t.s)
+; @ ec teo9
+new String{12} s
+new String{12} sg
+ostr := sg
+sg := s
+ostr.clear()
+sg.clear()
+s.clear()
+; @ eg teo10
+struct Test
+    owner Test? t
+func fun()->(owner Test t, owner Test x)
+    t := x.t!
+    t := t.t!
+; @ eg teo11
+struct Test
+    owner Test? t
+func fun()
+    new Test? t
+    t := t.t
+; @ eg teo12
+struct Test
+    owner Test? t
+func fun()
+    new Test? t
+    t.t := t
+; @ eg teo13
+struct Test
+    owner String s
+    new()
+func fun(owner Test t, user Test tu, owner String s, user String su)
+    t.s :=: s
+    su.clear()
+    s.clear()
+    t.s.clear()
+    tu.s :=: s
 ; @ ec teu0
 user String? s
 so := _
@@ -3047,8 +3093,7 @@ func fun(user String s)
     s.set(copy 0, copy 'a')
 ; @ eg teu15
 struct Test
-    owner String s
-    new()
+    owner String? s
 func deleting(owner Test? ta, owner Test? tb)
     ta.s := tb.s
 func fun(user String s)

@@ -216,7 +216,7 @@ struct TestStruct
     multiline
     comment ;]
     
-    func get()->(var Int x, user String s) _
+    func get()->(var Int x, user String? s) _
     
     func print()
         sys.println(user self.text)
@@ -224,11 +224,12 @@ struct TestStruct
 func TestStruct.new(copy Int x, user String? s)
     self.num := x
     if s?
-        self.text := String{s.length() + 1}(user s)
+        new String{s.length() + 1} text(user s)
+        self.text := text
     if x < 0
         self.ts := TestStruct(copy x + 1, user self.text)
   
-func TestStruct.get()->(var Int x, user String s)
+func TestStruct.get()->(var Int x, user String? s)
     x := self.num
     s := self.text
 
@@ -384,7 +385,8 @@ struct Item
     owner String s
     
     new(user String s)
-        self.s := String{s.length() + 1}(user s)
+        new String{s.length() + 1} news(user s)
+        self.s := news
 
 struct Data{Generic}
     weak Generic item

@@ -1606,44 +1606,6 @@ ut_M_Test* otarr = NULL;
     free(otarr);
     otarr_Length = 0;
     otarr = NULL;
-/// @ t16
-typedef struct ut_M_Test ut_M_Test;
-struct ut_M_Test {
-    ut_M_Test* t;
-};
-Returncode ut_M_Test_new(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Returncode ut_M_fun(void);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-Returncode ut_M_Test_new(ut_M_Test* self) {
-    Returncode LUMI_err = OK;
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
-    return LUMI_err;
-}
-void ut_M_Test_Del(ut_M_Test* self) {
-    if (self == NULL) return;
-    SELF_REF_DEL(ut_M_Test, t);
-    free(self->t);
-}
-Returncode ut_M_fun(void) {
-    Returncode LUMI_err = OK;
-    unsigned LUMI_loop_depth = 1;
-    ut_M_Test* t = NULL;
-    INIT_NEW(5, LUMI_block0_cleanup, t, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_new(t);
-    CHECK(5, LUMI_block0_cleanup)
-    ut_M_Test_Del(t);
-    free(t);
-    t = t->t;
-    t->t = NULL;
-LUMI_block0_cleanup:
-    (void)0;
-    ut_M_Test_Del(t);
-    free(t);
-    return LUMI_err;
-}
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -2008,15 +1970,15 @@ ut_M_Test* aux_Test_0 = NULL;
     ut_M_t_Refman = aux_Test_0_Refman;
     ut_M_t = aux_Test_0;
 /// @ te0
-assigning into an owner a non-owner access "weak"
+cannot switch access "weak" with other access "strong"
 /// @ te1
-assigning reference into itself
+switching reference with itself
 /// @ te2
-assigning conditional into non-conditional type "String"
+conditionals not matching in type "String"
 /// @ te3
-assigning into non assignable expression
+switching non assignable expression
 /// @ te4
-cannot assign "Ta" into "Tc"
+non matching types "Ta" and "Tc"
 /// @ te5
 cannot switch access "owner" with other access "strong"
 /// @@ test-question-expression
@@ -8267,6 +8229,22 @@ cannot modify owner field "s" in non-owner reference "b.a.s"
 cannot modify owner field "s" in non-owner reference "t.s"
 /// @ teo5
 cannot modify owner field "s" in non-owner reference "{anonymous}.s"
+/// @ teo6
+cannot move non-conditional owner field "t.s"
+/// @ teo7
+cannot move non-conditional owner field "t.s"
+/// @ teo8
+cannot move non-conditional owner field "t.s"
+/// @ teo9
+using moved owner "s"
+/// @ teo10
+using moved owner "t"
+/// @ teo11
+using moved owner "t"
+/// @ teo12
+using moved owner "t"
+/// @ teo13
+cannot modify owner field "s" in non-owner reference "tu.s"
 /// @ teu0
 using potentially illegal user reference "s"
 /// @ teu1

@@ -261,19 +261,19 @@ test test-complex-delete()
     
     strong BaseLink? b1(strong BaseLink())
     var Ref b1-ref(copy b1)
-    strong BaseLink b2(strong BaseLink())
+    strong BaseLink? b2(strong BaseLink())
     var Ref b2-ref(copy b2)
-    strong TopLink{Link} t1(strong TopLink{Link}())
+    strong TopLink?{Link} t1(strong TopLink{Link}())
     var Ref t1-ref(copy t1)
-    strong TopLink{BaseLink} t2(strong TopLink{BaseLink}())
+    strong TopLink?{BaseLink} t2(strong TopLink{BaseLink}())
     var Ref t2-ref(copy t2)
-    strong TopLink{BaseLink} t3(strong TopLink{BaseLink}())
+    strong TopLink?{BaseLink} t3(strong TopLink{BaseLink}())
     var Ref t3-ref(copy t3)
-    strong Link l1(strong Link())
+    strong Link? l1(strong Link())
     var Ref l1-ref(copy l1)
-    strong Link l2(strong Link())
+    strong Link? l2(strong Link())
     var Ref l2-ref(copy l2)
-    strong Link l3(strong Link())
+    strong Link? l3(strong Link())
     var Ref l3-ref(copy l3)
     
     b1.link := l1
@@ -492,7 +492,7 @@ test test-builtin-errors()
     assert-error sys.exit(copy 0), "exit failed"
     assert-error sys.system(user "aaa"), "command execution failed"
 
-mock Sys.println(user Array{Char} text)
+mock Sys.println(user Array?{Char} text)
     assert text?
 
 test test-cover-all()

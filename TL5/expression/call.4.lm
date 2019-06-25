@@ -274,8 +274,6 @@ class CallArgument(Argument)
     if not self.is-output
       if access-is-owner(copy self.access) and
           self.value.result-type.reference-path?
-        refs.mark-reference(
-            user self.value.result-type.reference-path, copy false)
         self.value.result-type.reference-path.check-pure-owner(user self)
       refs.check-user(user self.value)
   

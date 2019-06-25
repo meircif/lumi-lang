@@ -34,32 +34,34 @@ class AssignExpression(Expression)
           user self.target.result-type)
   
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.value.check-memory(user refs)
     user ReferencePath left-path(
         user self.target.result-type.reference-path)
-    if left-path?
-      refs.mark-reference(user left-path, copy true)
-    var Bool check-left(copy true)
     if access-is-owner(copy self.target.access)
       refs.mark-illegal-type(user self.target.result-type)
-      if left-path? and
-          self.value.result-type.type-data is glob.type-empty
-        refs.mark-reference(user left-path, copy false)
-        check-left := false
-      if access-is-owner(copy self.value.access)
-        ; move
-        user ReferencePath right-path(
-            user self.value.result-type.reference-path)
-        if right-path?
-          refs.mark-reference(user right-path, copy false)
-        left-path.check-pure-owner(user self)
-        right-path.check-pure-owner(user self)
-    if check-left
-      self.target.check-memory(user refs)
+    self.check-operands-memory(user refs)
     refs.check-user(user self.value)
     if left-path?
       if not left-path.field?
         refs.add(user left-path.variable)
+
+  func inst check-operands-memory(user ReferenceMemoryList refs)
+    var Bool is-move(copy access-is-owner(copy self.target.access))
+    user ReferencePath left-path(
+        user self.target.result-type.reference-path)
+    user ReferencePath right-path(
+        user self.value.result-type.reference-path)
+    if is-move
+      left-path.check-pure-owner(user self)
+      right-path.check-pure-owner(user self)
+      refs.mark-moved-owner(user left-path)
+    self.value.check-memory(user refs)
+    if is-move
+      refs.clear-moved-owner(user left-path)
+      refs.mark-moved-owner(user right-path)
+    self.target.check-memory(user refs)
+    if right-path?
+      if is-move and right-path.is-conditional()
+        refs.clear-moved-owner(user right-path)
   
   func dynamic write-preactions()
     self.value.write-preactions()
