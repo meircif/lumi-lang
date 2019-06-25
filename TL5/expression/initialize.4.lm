@@ -57,7 +57,7 @@ class InitExpression(ModuleTypeExpression)
         self.syntax-error(
             user "cannot create objects with type",
             user self.result-type.type-data.name)
-      self.result-type.type-data.find-meth(user "new")->(user self.constructor)
+      self.constructor := self.result-type.type-data.constructor
       if self.constructor?
         self.add-self-and-check(
             copy self.constructor.arguments.parameters.first.item.access)
@@ -67,7 +67,8 @@ class InitExpression(ModuleTypeExpression)
           self.add-self-and-check(copy Access.USER)
         else
           self.syntax-error(
-              user "no constructor for type", user self.result-type.type-data.name)
+              user "no constructor for type",
+              user self.result-type.type-data.name)
       
     else-if self.arguments.parameters.first?
       if self.arguments.parameters.first.next? or

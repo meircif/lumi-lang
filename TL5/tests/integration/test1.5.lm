@@ -173,7 +173,7 @@ struct RefNode
     owner RefNode? next
     var Ref? ref
     
-    func new(copy Ref? ref)
+    new(copy Ref? ref)
         self.ref := ref
 
 func new-ref-node(copy Ref? ref)->(owner RefNode? next)

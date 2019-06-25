@@ -155,27 +155,25 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   func inst write-spaces()
     write-spaces(copy self.indentation-spaces)
   
-  func inst write-cleanup(user TypeData type-data)
+  func inst write-cleanup(user TypeData parent-type)
     for variable in self.variables.iter-back()
-      if access-has-refman(copy variable.access) or
-          variable.access = Access.OWNER or
-          (variable.access = Access.VAR and type-data?)
-        self.write-variable-cleanup(user variable, user type-data)
+      if variable.access != Access.USER
+        self.write-variable-cleanup(user variable, user parent-type)
   
   func inst write-variable-cleanup(
-      user SyntaxTreeVariable variable, user TypeData type-data)
+      user SyntaxTreeVariable variable, user TypeData parent-type)
     user TypeInstance data-type(user variable.type-instance)
     if data-type.type-data is glob.type-array
       data-type.get-array-data-type-depth()->(user data-type)
     if access-is-owner(copy variable.access) and
         not data-type.type-data.is-primitive
       self.write-owner-reference-cleanup(
-          user variable, user type-data, user data-type)
-    else-if type-data? and access-is-only-var(copy variable.access)
-      self.write-var-cleanup(user variable, user data-type)
+          user variable, user parent-type, user data-type)
+    else-if access-is-only-var(copy variable.access)
+      self.write-var-cleanup(user variable, user parent-type, user data-type)
       if variable.access = Access.VAR
         return
-    if type-data?
+    if parent-type?
       write-spaces(copy INDENTATION-SPACES)
     else
       self.write-spaces()
@@ -187,55 +185,55 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       else-if variable.access = Access.STRONG
         write(user "owner_")
       write(user "dec_ref(")
-      if type-data?
+      if parent-type?
         write(user "self->")
       write-cname(user variable.name)
       write(user "_Refman);\n")
     else-if variable.access = Access.OWNER
       write(user "free(")
-      if type-data?
+      if parent-type?
         write(user "self->")
       write-cname(user variable.name)
       write(user ");\n")
   
   func inst write-owner-reference-cleanup(
       user SyntaxTreeVariable variable,
-      user TypeData type-data,
+      user TypeData parent-type,
       user TypeInstance data-type)
     if variable.type-instance.type-data is glob.type-array and
         data-type.type-data is glob.type-string
       write-spaces(copy INDENTATION-SPACES)
       write(user "free(")
-      if type-data?
+      if parent-type?
         write(user "self->")
       write-cname(user variable.name)
       write(user "_String_length);\n")
       return
     write-spaces(copy INDENTATION-SPACES)
-    if variable.type-instance.type-data is type-data
+    if variable.type-instance.type-data is parent-type
       write(user "SELF_REF_DEL")
       if variable.access = Access.STRONG
         write(user "_STR")
-      if type-data.is-dynamic
+      if parent-type.is-dynamic
         write(user "_DYN")
       write(user "(")
-      type-data.write-cname()
+      parent-type.write-cname()
       write(user ", ")
-      if type-data.is-dynamic
-        user TypeData base-type(user type-data)
+      if parent-type.is-dynamic
+        user TypeData base-type(user parent-type)
         do
           while base-type.base-type?
           write(user "_base.")
           base-type := base-type.base-type.type-data
         write(user "_, ")
-      type-data := _
+      parent-type := _
     else-if variable.type-instance.type-data.is-dynamic
       write(user "if (")
-      if type-data?
+      if parent-type?
         write(user "self->")
       write-cname(user variable.name)
       write(user "_Dynamic != NULL) ")
-      if type-data?
+      if parent-type?
         write(user "self->")
       write-cname(user variable.name)
       write(user "_Dynamic->")
@@ -253,12 +251,12 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     else
       data-type.type-data.write-cname()
       write(user "_Del(")
-    if type-data?
+    if parent-type?
       write(user "self->")
     write-cname(user variable.name)
     if variable.type-instance.type-data is glob.type-array
       write(user ", ")
-      if type-data?
+      if parent-type?
         write(user "self->")
       write-cname(user variable.name)
       write(user "_Length")
@@ -266,7 +264,9 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     else
       write(user ");\n")
   
-  func inst write-var-cleanup(user SyntaxTreeVariable variable,
+  func inst write-var-cleanup(
+      user SyntaxTreeVariable variable,
+      user TypeData parent-type,
       user TypeInstance data-type)
     if data-type.type-data.is-primitive or
         data-type.type-data is glob.type-string
@@ -275,7 +275,9 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     if variable.type-instance.type-data is glob.type-array
       write(user "ARRAY_DEL(")
       data-type.type-data.write-cname()
-      write(user ", self->")
+      write(user ", ")
+      if parent-type?
+        write(user "self->")
       write-cname(user variable.name)
       write(user ", ")
       variable.type-instance.length.write()
@@ -286,13 +288,16 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         write(user " * ")
         sequence-type.length.write()
         sequence-type := sequence-type.parameters.first.item
+      write(user ")\n")
     else
       data-type.type-data.write-cname()
-      write(user "_Del(&(")
-      write(user "self->")
+      write(user "_Del(")
+      if parent-type?
+        write(user "&(self->")
       write-cname(user variable.name)
-      write(user ")")
-    write(user ");\n")
+      if parent-type?
+        write(user ")")
+      write(user ");\n")
 
 
 ~~~ A basic namespace node in the syntax tree ~~~

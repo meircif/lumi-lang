@@ -66,12 +66,12 @@ class SliceExpression(Expression)
           copy self.access, copy false, user self.result-type)->(
           owner self.slice-variable)
     else
-      if self.assignable or self.sequence.access = Access.OWNER
+      if self.assignable
         self.access := Access.VAR
-      else-if self.sequence.access = Access.STRONG
-        self.access := Access.S-VAR
+      else-if access-has-refman(copy self.sequence.access)
+        self.access := Access.WEAK
       else
-        self.access := self.sequence.access
+        self.access := Access.USER
       if self.result-type.type-data is glob.type-array or
           self.result-type.type-data is glob.type-string
         self.add-aux-variable(

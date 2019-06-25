@@ -39,12 +39,12 @@ struct ut_M_Data {
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
-Returncode ut_M_Test_new(ut_M_Test* self, Int num);
 Returncode ut_M_Test_meth(ut_M_Test* self);
 void ut_M_Test_Del(ut_M_Test* self);
 Returncode ut_M_Ta_metha(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic);
 Returncode ut_M_Ta_dyn(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic);
 void ut_M_Ta_Del(ut_M_Ta* self);
+Returncode ut_M_Tb_new(ut_M_Tb* self, ut_M_Tb_Dynamic* self_Dynamic, Int num);
 Returncode ut_M_Tb_methb(ut_M_Tb* self, ut_M_Tb_Dynamic* self_Dynamic);
 Returncode ut_M_Tb_dyn(ut_M_Tb* self, ut_M_Tb_Dynamic* self_Dynamic);
 void ut_M_Tb_Del(ut_M_Tb* self);
@@ -103,13 +103,6 @@ int ut_M_sarr_Length = 0;
 int ut_M_sarr_Value_length = 0;
 int* ut_M_sarr_String_length = NULL;
 Ref_Manager* ut_M_sarr_Refman = NULL;
-Returncode ut_M_Test_new(ut_M_Test* self, Int num) {
-    Returncode LUMI_err = OK;
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
-    return LUMI_err;
-}
 Returncode ut_M_Test_meth(ut_M_Test* self) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -138,6 +131,13 @@ LUMI_block0_cleanup:
 void ut_M_Ta_Del(ut_M_Ta* self) {
     if (self == NULL) return;
     ut_M_Test_Del(&(self->_base));
+}
+Returncode ut_M_Tb_new(ut_M_Tb* self, ut_M_Tb_Dynamic* self_Dynamic, Int num) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
 }
 Returncode ut_M_Tb_methb(ut_M_Tb* self, ut_M_Tb_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -565,6 +565,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     aux_String_0_Length = sa_String_length + 3;
     aux_String_0_Refman = sa_Refman;
     LUMI_inc_ref(aux_String_0_Refman);
+    CHECK_REFMAN(4, LUMI_block0_cleanup, aux_String_0_Refman)
     si_Max_length = aux_String_0_Max_length;
     si_Length = aux_String_0_Length;
     si = aux_String_0;
@@ -596,6 +597,7 @@ char* sa = NULL;
     aux_String_1_Length = sa_String_length + 3;
     aux_String_1_Refman = sa_Refman;
     LUMI_inc_ref(aux_String_1_Refman);
+    CHECK_REFMAN(2, LUMI_block0_cleanup, aux_String_1_Refman)
     INIT_STRING_CONST(2, LUMI_block0_cleanup, aux_String_0, "text");
     LUMI_err = String_copy(aux_String_1, aux_String_1_Max_length, aux_String_1_Length, aux_String_0, *aux_String_0_Length);
     CHECK(2, LUMI_block0_cleanup)
@@ -934,6 +936,35 @@ char* s = NULL;
     INIT_NEW_STRING(1, LUMI_block0_cleanup, s, 12);
     LUMI_err = Sys_print(sys, s, *s_Length);
     CHECK(2, LUMI_block0_cleanup)
+/// @ t18
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    char* s;
+    int s_Max_length;
+    int* s_Length;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(void);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    free(self->s);
+}
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Test t_Var = {0};
+    ut_M_Test* t = NULL;
+    ut_M_Test a[6] = {0};
+    t = &t_Var;
+    /* initializing a */
+LUMI_block0_cleanup:
+    (void)0;
+    ARRAY_DEL(ut_M_Test, a, 6)
+    ut_M_Test_Del(t);
+    return LUMI_err;
+}
 /// @ te0
 expected "]", got "new-line"
 /// @ te1
@@ -956,6 +987,10 @@ assigning into non assignable expression
 assigning into non assignable expression
 /// @ te10
 assigning into an owner a non-owner access "weak"
+/// @ te11
+array of type with constructor "Tc"
+/// @ te12
+array of type with constructor "Test"
 /// @@ test-call-expression
 /// @ t0
 LUMI_err = ut_M_fun0();
@@ -1656,14 +1691,11 @@ ut_M_Test* t1 = NULL;
     ut_M_Test* t2 = NULL;
     ut_M_Test* aux_Test_0 = NULL;
     INIT_NEW(1, LUMI_block0_cleanup, t1, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_new(t1, 1);
-    CHECK(1, LUMI_block0_cleanup)
     INIT_NEW(2, LUMI_block0_cleanup, t2, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_new(t2, 2);
-    CHECK(2, LUMI_block0_cleanup)
     aux_Test_0 = t1;
     t1 = t2;
     t2 = aux_Test_0;
+    aux_Test_0 = NULL;
 /// @ t1
 ut_M_Test* t1 = NULL;
     Ref_Manager* t1_Refman = NULL;
@@ -1671,30 +1703,24 @@ ut_M_Test* t1 = NULL;
     Ref_Manager* t2_Refman = NULL;
     ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
-    ut_M_Test* aux_Test_1 = NULL;
-    Ref_Manager* aux_Test_1_Refman = NULL;
-    ut_M_Test* aux_Test_2 = NULL;
-    Ref_Manager* aux_Test_2_Refman = NULL;
-    INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_new(aux_Test_0, 1);
-    CHECK(1, LUMI_block0_cleanup)
-    t1_Refman = aux_Test_0_Refman;
-    t1 = aux_Test_0;
-    aux_Test_0 = NULL;
-    aux_Test_0_Refman = NULL;
-    INIT_NEW_STRONG(2, LUMI_block0_cleanup, aux_Test_1, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_new(aux_Test_1, 2);
-    CHECK(2, LUMI_block0_cleanup)
-    t2_Refman = aux_Test_1_Refman;
-    t2 = aux_Test_1;
-    aux_Test_1 = NULL;
-    aux_Test_1_Refman = NULL;
-    aux_Test_2_Refman = t1_Refman;
-    aux_Test_2 = t1;
+    CHECK_REF(1, LUMI_block0_cleanup, *to)
+    t1_Refman = *to_Refman;
+    t1 = *to;
+    *to = NULL;
+    *to_Refman = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, *to)
+    t2_Refman = *to_Refman;
+    t2 = *to;
+    *to = NULL;
+    *to_Refman = NULL;
+    aux_Test_0_Refman = t1_Refman;
+    aux_Test_0 = t1;
     t1_Refman = t2_Refman;
     t1 = t2;
-    t2_Refman = aux_Test_2_Refman;
-    t2 = aux_Test_2;
+    t2_Refman = aux_Test_0_Refman;
+    t2 = aux_Test_0;
+    aux_Test_0 = NULL;
+    aux_Test_0_Refman = NULL;
 /// @ t2
 ut_M_Tc* t1 = NULL;
     ut_M_Tc_Dynamic* t1_Dynamic = &ut_M_Tc_dynamic;
@@ -1703,10 +1729,10 @@ ut_M_Tc* t1 = NULL;
     ut_M_Tc* aux_Tc_0 = NULL;
     ut_M_Tc_Dynamic* aux_Tc_0_Dynamic = NULL;
     INIT_NEW(1, LUMI_block0_cleanup, t1, ut_M_Tc, 1);
-    LUMI_err = ut_M_Test_new(&(t1->_base._base._base), 1);
+    LUMI_err = ut_M_Tb_new(&(t1->_base), &(t1_Dynamic->_base), 1);
     CHECK(1, LUMI_block0_cleanup)
     INIT_NEW(2, LUMI_block0_cleanup, t2, ut_M_Tc, 1);
-    LUMI_err = ut_M_Test_new(&(t2->_base._base._base), 2);
+    LUMI_err = ut_M_Tb_new(&(t2->_base), &(t2_Dynamic->_base), 2);
     CHECK(2, LUMI_block0_cleanup)
     aux_Tc_0_Dynamic = t1_Dynamic;
     aux_Tc_0 = t1;
@@ -1714,6 +1740,8 @@ ut_M_Tc* t1 = NULL;
     t1 = t2;
     t2_Dynamic = aux_Tc_0_Dynamic;
     t2 = aux_Tc_0;
+    aux_Tc_0 = NULL;
+    aux_Tc_0_Dynamic = NULL;
 /// @ t3
 ut_M_Tc* t1 = NULL;
     Ref_Manager* t1_Refman = NULL;
@@ -1731,7 +1759,7 @@ ut_M_Tc* t1 = NULL;
     Ref_Manager* aux_Tc_2_Refman = NULL;
     ut_M_Tc_Dynamic* aux_Tc_2_Dynamic = NULL;
     INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Tc_0, ut_M_Tc, 1);
-    LUMI_err = ut_M_Test_new(&(aux_Tc_0->_base._base._base), 1);
+    LUMI_err = ut_M_Tb_new(&(aux_Tc_0->_base), &(aux_Tc_0_Dynamic->_base), 1);
     CHECK(1, LUMI_block0_cleanup)
     t1_Refman = aux_Tc_0_Refman;
     t1_Dynamic = aux_Tc_0_Dynamic;
@@ -1740,7 +1768,7 @@ ut_M_Tc* t1 = NULL;
     aux_Tc_0_Refman = NULL;
     aux_Tc_0_Dynamic = NULL;
     INIT_NEW_STRONG(2, LUMI_block0_cleanup, aux_Tc_1, ut_M_Tc, 1);
-    LUMI_err = ut_M_Test_new(&(aux_Tc_1->_base._base._base), 2);
+    LUMI_err = ut_M_Tb_new(&(aux_Tc_1->_base), &(aux_Tc_1_Dynamic->_base), 2);
     CHECK(2, LUMI_block0_cleanup)
     t2_Refman = aux_Tc_1_Refman;
     t2_Dynamic = aux_Tc_1_Dynamic;
@@ -1757,6 +1785,9 @@ ut_M_Tc* t1 = NULL;
     t2_Refman = aux_Tc_2_Refman;
     t2_Dynamic = aux_Tc_2_Dynamic;
     t2 = aux_Tc_2;
+    aux_Tc_2 = NULL;
+    aux_Tc_2_Refman = NULL;
+    aux_Tc_2_Dynamic = NULL;
 /// @ t4
 Int* a1 = NULL;
     int a1_Length = 0;
@@ -1772,6 +1803,7 @@ Int* a1 = NULL;
     a1 = a2;
     a2_Length = 4;
     a2 = aux_Array_0;
+    aux_Array_0 = NULL;
 /// @ t5
 Int* a1 = NULL;
     int a1_Length = 0;
@@ -1809,6 +1841,8 @@ Int* a1 = NULL;
     a2_Refman = aux_Array_2_Refman;
     a2_Length = aux_Array_2_Length;
     a2 = aux_Array_2;
+    aux_Array_2 = NULL;
+    aux_Array_2_Refman = NULL;
 /// @ t6
 char* s1 = NULL;
     int s1_Max_length = 0;
@@ -1830,6 +1864,8 @@ char* s1 = NULL;
     s2_Max_length = 4;
     s2_Length = aux_String_0_Length;
     s2 = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
 /// @ t7
 char* s1 = NULL;
     int s1_Max_length = 0;
@@ -1879,6 +1915,9 @@ char* s1 = NULL;
     s2_Max_length = aux_String_2_Max_length;
     s2_Length = aux_String_2_Length;
     s2 = aux_String_2;
+    aux_String_2 = NULL;
+    aux_String_2_Refman = NULL;
+    aux_String_2_Length = &Lumi_empty_int;
 /// @ t7
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
@@ -1915,6 +1954,7 @@ Returncode ut_M_fun(ut_M_Test* t1, ut_M_Test* t2) {
     aux_File_0 = t1->f;
     t1->f = t2->f;
     t2->f = aux_File_0;
+    aux_File_0 = NULL;
 LUMI_block0_cleanup:
     (void)0;
     File_Del(aux_File_0);
@@ -1938,6 +1978,7 @@ ut_M_Test* t1 = NULL;
     aux_Test_0 = t1;
     t1 = t2;
     t2 = aux_Test_0;
+    aux_Test_0 = NULL;
 /// @ t9
 ut_M_Test* t1 = NULL;
     Ref_Manager* t1_Refman = NULL;
@@ -1961,6 +2002,8 @@ ut_M_Test* t1 = NULL;
     t1 = t2;
     t2_Refman = aux_Test_0_Refman;
     t2 = aux_Test_0;
+    aux_Test_0 = NULL;
+    aux_Test_0_Refman = NULL;
 /// @ t10
 Int aux_Int_0 = 0;
     aux_Int_0 = ut_M_i;
@@ -1977,6 +2020,8 @@ ut_M_Test* aux_Test_0 = NULL;
     ut_M_d->item = ut_M_t;
     ut_M_t_Refman = aux_Test_0_Refman;
     ut_M_t = aux_Test_0;
+    aux_Test_0 = NULL;
+    aux_Test_0_Refman = NULL;
 /// @ te0
 cannot switch access "weak" with other access "strong"
 /// @ te1
@@ -2078,8 +2123,6 @@ ut_M_Ta a_Var = {{0}};
     ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
     a = &a_Var;
-    LUMI_err = ut_M_Test_new(&(a->_base), 1);
-    CHECK(1, LUMI_block0_cleanup)
 /// @ t1
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = NULL;
@@ -2088,8 +2131,6 @@ ut_M_Ta* aux_Ta_0 = NULL;
     Ref_Manager* aux_Ta_0_Refman = NULL;
     ut_M_Ta_Dynamic* aux_Ta_0_Dynamic = &ut_M_Ta_dynamic;
     INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Ta_0, ut_M_Ta, 1);
-    LUMI_err = ut_M_Test_new(&(aux_Ta_0->_base), 7);
-    CHECK(1, LUMI_block0_cleanup)
     LUMI_inc_ref(aux_Ta_0_Refman);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = aux_Ta_0_Refman;
@@ -2099,8 +2140,6 @@ ut_M_Ta* aux_Ta_0 = NULL;
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
     INIT_NEW(1, LUMI_block0_cleanup, a, ut_M_Ta, 1);
-    LUMI_err = ut_M_Test_new(&(a->_base), 1);
-    CHECK(1, LUMI_block0_cleanup)
 /// @ t4
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = NULL;
@@ -3670,7 +3709,7 @@ char* s = NULL;
     s = NULL;
     s_Length = &Lumi_empty_int;
 /// @ t9
-ut_M_Tc a[12] = {0};
+ut_M_Ta a[12] = {0};
     /* initializing a */
 /// @ t10
 Int* a = NULL;
@@ -3748,15 +3787,17 @@ array length is not constant
 illegal variable name "error--name"
 /// @@ test-initialize
 /// @ t0
-ut_M_Test* aux_Test_0 = NULL;
-    Ref_Manager* aux_Test_0_Refman = NULL;
-    INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_new(aux_Test_0, ut_M_i);
+ut_M_Tc* aux_Tc_0 = NULL;
+    Ref_Manager* aux_Tc_0_Refman = NULL;
+    ut_M_Tc_Dynamic* aux_Tc_0_Dynamic = &ut_M_Tc_dynamic;
+    INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Tc_0, ut_M_Tc, 1);
+    LUMI_err = ut_M_Tb_new(&(aux_Tc_0->_base), &(aux_Tc_0_Dynamic->_base), ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
-    LUMI_inc_ref(aux_Test_0_Refman);
-    LUMI_dec_ref(ut_M_t_Refman);
-    ut_M_t_Refman = aux_Test_0_Refman;
-    ut_M_t = aux_Test_0;
+    LUMI_inc_ref(aux_Tc_0_Refman);
+    LUMI_dec_ref(ut_M_tc_Refman);
+    ut_M_tc_Refman = aux_Tc_0_Refman;
+    ut_M_tc_Dynamic = aux_Tc_0_Dynamic;
+    ut_M_tc = aux_Tc_0;
 /// @ t1
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
@@ -3852,26 +3893,29 @@ ut_M_Test* tt = NULL;
     CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     tt = &(ut_M_tc->_base._base._base);
 /// @ t10
-ut_M_Test tt_Var = {0};
-    ut_M_Test* tt = NULL;
+ut_M_Tc tt_Var = {{{{0}}}};
+    ut_M_Tc* tt = NULL;
+    ut_M_Tc_Dynamic* tt_Dynamic = &ut_M_Tc_dynamic;
     tt = &tt_Var;
-    LUMI_err = ut_M_Test_new(tt, 3);
+    LUMI_err = ut_M_Tb_new(&(tt->_base), &(tt_Dynamic->_base), 3);
     CHECK(1, LUMI_block0_cleanup)
 /// @ t11
-ut_M_Test* tt = NULL;
-    INIT_NEW(1, LUMI_block0_cleanup, tt, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_new(tt, 3);
+ut_M_Tc* tt = NULL;
+    ut_M_Tc_Dynamic* tt_Dynamic = &ut_M_Tc_dynamic;
+    INIT_NEW(1, LUMI_block0_cleanup, tt, ut_M_Tc, 1);
+    LUMI_err = ut_M_Tb_new(&(tt->_base), &(tt_Dynamic->_base), 3);
     CHECK(1, LUMI_block0_cleanup)
 /// @ t12
-ut_M_Test* aux_Test_0 = NULL;
-    Ref_Manager* aux_Test_0_Refman = NULL;
-    INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_new(aux_Test_0, 3);
+ut_M_Tc* aux_Tc_0 = NULL;
+    Ref_Manager* aux_Tc_0_Refman = NULL;
+    ut_M_Tc_Dynamic* aux_Tc_0_Dynamic = &ut_M_Tc_dynamic;
+    INIT_NEW_STRONG(1, LUMI_block0_cleanup, aux_Tc_0, ut_M_Tc, 1);
+    LUMI_err = ut_M_Tb_new(&(aux_Tc_0->_base), &(aux_Tc_0_Dynamic->_base), 3);
     CHECK(1, LUMI_block0_cleanup)
-    LUMI_inc_ref(aux_Test_0_Refman);
+    LUMI_inc_ref(aux_Tc_0_Refman);
     LUMI_dec_ref(ut_M_t_Refman);
-    ut_M_t_Refman = aux_Test_0_Refman;
-    ut_M_t = aux_Test_0;
+    ut_M_t_Refman = aux_Tc_0_Refman;
+    ut_M_t = &(aux_Tc_0->_base._base._base);
 /// @ t13
 ut_M_Tb* tt = NULL;
     ut_M_Tb_Dynamic* tt_Dynamic = NULL;
@@ -3943,12 +3987,13 @@ ut_M_Test* ot = NULL;
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, st)
     ot = NULL;
 /// @ t18
-ut_M_Test tt_Var = {0};
-    ut_M_Test* tt = NULL;
+ut_M_Tc tt_Var = {{{{0}}}};
+    ut_M_Tc* tt = NULL;
     Ref_Manager* tt_Refman = NULL;
+    ut_M_Tc_Dynamic* tt_Dynamic = &ut_M_Tc_dynamic;
     tt = &tt_Var;
     INIT_VAR_REFMAN(1, LUMI_block0_cleanup, tt)
-    LUMI_err = ut_M_Test_new(tt, 3);
+    LUMI_err = ut_M_Tb_new(&(tt->_base), &(tt_Dynamic->_base), 3);
     CHECK(1, LUMI_block0_cleanup)
 /// @ te0
 dynamic allocation of primitive type "Int"
@@ -5532,6 +5577,7 @@ Returncode ut_M_use(File* first, Ref_Manager* first_Refman, Sys* second, Ref_Man
     CHECK(14, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Test_Del(t);
     LUMI_dec_ref(third_Refman);
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
@@ -6024,6 +6070,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman) {
     t->_base.item = f;
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Test_Del(t);
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
@@ -6090,6 +6137,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman) {
     t->_base.item = f;
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Test_Del(t);
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
@@ -6228,6 +6276,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman) {
     t->_base._base._base.item = f;
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Test_Del(t);
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
@@ -6294,6 +6343,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman) {
     t->_base.item = f;
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Test_Del(t);
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
@@ -6471,6 +6521,7 @@ Returncode ut_M_use(File* first, Ref_Manager* first_Refman, Sys* second, Ref_Man
     t->_base._base.third = third;
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Test_Del(t);
     LUMI_dec_ref(third_Refman);
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
@@ -6558,6 +6609,7 @@ Returncode ut_M_use(File* f, Ref_Manager* f_Refman, ut_M_Second* ff, Ref_Manager
     ((ut_M_Second*)(t->_base.item))->item = f;
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Test_Del(t);
     LUMI_dec_ref(ff_Refman);
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
@@ -7350,6 +7402,7 @@ Returncode ut_M_Test_test(ut_M_Test* self) {
     b = &(t->b);
 LUMI_block0_cleanup:
     (void)0;
+    ut_M_Test_Del(t);
     LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(b_Refman);
     return LUMI_err;
@@ -7463,8 +7516,8 @@ LUMI_block0_cleanup:
 }
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
-    ARRAY_DEL(ut_M_Base, self->aab, 4 * 5 * 6);
-    ARRAY_DEL(ut_M_Base, self->ab, 12);
+    ARRAY_DEL(ut_M_Base, self->aab, 4 * 5 * 6)
+    ARRAY_DEL(ut_M_Base, self->ab, 12)
 }
 /// @ te0
 array length is not constant

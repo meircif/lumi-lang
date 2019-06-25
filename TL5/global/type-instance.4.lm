@@ -148,6 +148,10 @@ struct TypeInstance
     if self.type-data is glob.type-array
       if not self.parameters?
         node.syntax-error-msg(user "missing subtype for array")
+      if self.parameters.first.item.type-data.constructor?
+        node.syntax-error(
+            user "array of type with constructor",
+            user self.parameters.first.item.type-data.name)
       if self.parameters.first.item.type-data is glob.type-generic
         node.syntax-error-msg(
             user "generic arrays not supported")

@@ -2,7 +2,6 @@ struct Test
     var Int num
     weak Test? t
     var Func{()} fun
-    new(copy Int num)
     func meth()
 class Ta(Test)
     var Int numa
@@ -10,6 +9,7 @@ class Ta(Test)
     func dynamic dyn()
 class Tb(Ta)
     var Int numb
+    new(copy Int num)
     func inst methb()
     func dynamic dyn()
 class Tc(Tb)
@@ -239,6 +239,12 @@ x := ostr
 ; @ c t17
 new String{12} s
 sys.print(user s)
+; @ g t18
+struct Test
+    owner String? s
+func fun()
+    var Test t
+    var Array{6:Test} a
 ; @ ec te0
 arr[2
 ; @ ec te1
@@ -262,6 +268,13 @@ user Array?{Test} at
 at[0] := t
 ; @ ec te10
 so := sarr[3]
+; @ ec te11
+var Array{3:Tc} error
+; @ eg te12
+struct Test
+    var Int x
+    new()
+func func(user Array{Test} error)
 ; @@ test-call-expression
 ; @ c t0
 fun0()
@@ -573,17 +586,17 @@ b := t is t < 2
 user Test? tu
 t := tu
 ; @ ec te21
-var Test tv(copy 0)
+var Test tv
 user Test tu(user tv)
 tu := t
 ; @@ test-switch-expression
 ; @ c t0
-new Test t1(copy 1)
-new Test t2(copy 2)
+new Test t1
+new Test t2
 t1 :=: t2
 ; @ c t1
-strong Test t1(strong Test(copy 1))
-strong Test t2(strong Test(copy 2))
+strong Test t1(strong to!)
+strong Test t2(strong to!)
 t1 :=: t2
 ; @ c t2
 new Tc t1(copy 1)
@@ -631,7 +644,7 @@ d.item :=: t
 ; @ ec te0
 t :=: to
 ; @ ec te1
-new Test t1(copy 1)
+new Test t1
 t1 :=: t1
 ; @ ec te2
 new String{8} nstr
@@ -642,8 +655,8 @@ a :=: so[1:2]
 ; @ ec te4
 ta :=: tc
 ; @ ec te5
-new Test t1(copy 1)
-strong Test t2(strong Test(copy 2))
+new Test t1
+strong Test t2(strong to!)
 t1 :=: t2
 ; @@ test-question-expression
 ; @ c t0
@@ -686,13 +699,13 @@ var String{8} s
 s!
 ; @@ test-dynamic
 ; @ c t0
-var Ta a(copy 1)
+var Ta a
 ; @ c t1
 user Ta? a
 ; @ c t2
-ta := Ta(copy 7)
+ta := Ta()
 ; @ c t3
-new Ta a(copy 1)
+new Ta a
 ; @ c t4
 user Ta? a(user ta)
 ; @ c t5
@@ -1373,7 +1386,7 @@ var Array{12:String{7}} sa
 new String{12} s
 so := s
 ; @ c t9
-var Array{12:Tc} a
+var Array{12:Ta} a
 ; @ c t10
 new Array{12:Int} a
 ; @ c t11
@@ -1421,7 +1434,7 @@ var Array{i:Int} error
 var Int error--name
 ; @@ test-initialize
 ; @ c t0
-t := Test(copy i)
+tc := Tc(copy i)
 ; @ c t1
 str := String{arr[0]}()
 ; @ c t2
@@ -1441,11 +1454,11 @@ new String?{i} s(user ostr)
 ; @ c t9
 user Test? tt(user tc)
 ; @ c t10
-var Test tt(copy 3)
+var Tc tt(copy 3)
 ; @ c t11
-new Test tt(copy 3)
+new Tc tt(copy 3)
 ; @ c t12
-t := Test(copy 3)
+t := Tc(copy 3)
 ; @ c t13
 user Tb? tt(user tb)
 ; @ c t14
@@ -1459,7 +1472,7 @@ func get()->(owner File a)
 owner Test? ot(owner to)
 strong Test? st(strong ot)
 ; @ c t18
-s-var Test tt(copy 3)
+s-var Tc tt(copy 3)
 ; @ ec te0
 Int()
 ; @ ec te1
@@ -2943,8 +2956,7 @@ func fun(user Bb b)
 struct Aa
     owner String? s
 struct Bb
-    weak Aa a
-    new()
+    weak Aa? a
 func fun(owner Array{Bb} b)
     b[3].a.s := _
 ; @ eg teo4

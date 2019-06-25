@@ -226,6 +226,9 @@ class SwitchOperatorExpression(BinaryExpression)
     self.assign-right-to-left.write-assign()
     self.code-node.write-spaces()
     self.assign-aux-to-right.write-assign()
+    if not self.right-expression.result-type.type-data.is-primitive
+      self.code-node.write-spaces()
+      self.aux-variable.write-assign-null()
 
 func switch-operator-factory(
     user SyntaxTreeCode code-node, user Operator operator)->(
