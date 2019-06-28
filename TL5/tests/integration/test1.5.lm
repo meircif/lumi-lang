@@ -216,12 +216,12 @@ test test-simple-delete()
     assert not deleted-links?
     record-delete := true
     
-    strong Link l(strong Link())
+    strong Link? l(strong Link())
     weak Link? l-user(weak l)
     assert l?
     assert l-user?
     var Ref l-ref(copy l)
-    remove-obj(owner l)
+    remove-obj(owner l!)
     assert not l?
     assert not l-user?
     assert not deleted-refmans?
@@ -419,8 +419,8 @@ mock new()->(var Bool alloc-success)
             alloc-success := false
 
 func alloc()
-    strong String string(strong String{16}())
-    assert string?
+    strong SimpleStruct object(strong SimpleStruct())
+    assert object?
 
 test test-assert-error-message()
     assert-error raise-message(), "tested message"

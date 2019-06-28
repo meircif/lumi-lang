@@ -37,7 +37,7 @@ class InitExpression(ModuleTypeExpression)
       self.aux-variable.result-type.analyze(user self)
     else
       self.add-aux-variable(
-          copy Access.STRONG, copy true, user self.result-type)->(
+          copy Access.OWNER, copy true, user self.result-type)->(
           owner self.aux-variable)
     self.access := self.aux-variable.access
     self.result-type.reference-path := ReferencePath(
@@ -169,12 +169,8 @@ class InitExpression(ModuleTypeExpression)
         write(user ";\n")
         self.code-node.write-spaces()
       
-      ; INIT_NEW[_STRONG]_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
-      if self.aux-variable.access = Access.STRONG
-        self.write-macro-init(
-            user "INIT_NEW_STRONG_ARRAY", user self.aux-variable)
-      else
-        self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
+      ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
+      self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
       write(user ", ")
       if data-type.type-data is glob.type-string
         write(user "char")
@@ -209,23 +205,15 @@ class InitExpression(ModuleTypeExpression)
         write(user ");\n")
         
     else-if self.result-type.type-data is glob.type-string
-      ; INIT_NEW[_STRONG]_STRING(`line`, `cleanup`, `aux-variable`, `length`);
-      if self.aux-variable.access = Access.STRONG
-        self.write-macro-init(
-            user "INIT_NEW_STRONG_STRING", user self.aux-variable)
-      else
-        self.write-macro-init(user "INIT_NEW_STRING", user self.aux-variable)
+      ; INIT_NEW_STRING(`line`, `cleanup`, `aux-variable`, `length`);
+      self.write-macro-init(user "INIT_NEW_STRING", user self.aux-variable)
       write(user ", ")
       self.result-type.length.write()
       write(user ");\n")
       
     else
-      ; INIT_NEW[_STRONG](`line`, `cleanup`, `aux-variable`, `type`, 1)
-      if self.aux-variable.access = Access.STRONG
-        self.write-macro-init(
-            user "INIT_NEW_STRONG", user self.aux-variable)
-      else
-        self.write-macro-init(user "INIT_NEW", user self.aux-variable)
+      ; INIT_NEW(`line`, `cleanup`, `aux-variable`, `type`, 1)
+      self.write-macro-init(user "INIT_NEW", user self.aux-variable)
       write(user ", ")
       self.result-type.type-data.write-cname()
       write(user ", 1);\n")

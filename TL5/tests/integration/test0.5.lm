@@ -373,11 +373,11 @@ func test-builtins(
 
 
 func test-ref-count()
-    strong String s(strong String{32}(user "test string"))
-    weak String s-user(weak s)
+    strong String? s(strong String{32}(user "test string"))
+    weak String s-user(weak s!)
     sys.println(user s)
     sys.println(user s-user)
-    remove(owner s)
+    remove(owner s!)
     if not s?
         sys.println(user "ownership passed")
     if not s-user?
@@ -479,10 +479,10 @@ func test-error-handling(user TestStruct? t)
 
 
 struct Container{Generic}
-    weak Generic? value
+    owner Generic? value
     weak Container?{Generic} next
     
-    new(weak Generic? value, weak Container?{Generic} next)
+    new(owner Generic? value, weak Container?{Generic} next)
         self.value := value
         self.next := next
     
@@ -547,10 +547,10 @@ func test-for-each()
         sys.print(user " ")
     sys.println(user "]")
     
-    s-var Container{Item} container-last(weak Item(user "iii"), weak _)
-    s-var Container{Item} container-mid(weak Item(user "hhh"), weak container-last)
-    s-var Container{Item} container-first(weak Item(user "ggg"), weak container-mid)
-    s-var Container{Item} container(weak _, weak container-first)
+    s-var Container{Item} container-last(owner Item(user "iii"), weak _)
+    s-var Container{Item} container-mid(owner Item(user "hhh"), weak container-last)
+    s-var Container{Item} container-first(owner Item(user "ggg"), weak container-mid)
+    s-var Container{Item} container(owner _, weak container-first)
     owner ContainerIterator{Item} iter(owner container.iter())
     sys.print(user "values[ ")
     for sc in iter

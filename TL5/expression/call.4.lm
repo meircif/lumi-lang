@@ -272,9 +272,12 @@ class CallArgument(Argument)
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.value.check-memory(user refs)
     if not self.is-output
-      if access-is-owner(copy self.access) and
-          self.value.result-type.reference-path?
-        self.value.result-type.reference-path.check-pure-owner(user self)
+      user ReferencePath reference-path(
+          user self.value.result-type.reference-path)
+      if access-is-owner(copy self.access) and reference-path?
+        reference-path.check-pure-owner(user self)
+        if not reference-path.is-conditional()
+          refs.mark-invalid-reference(user reference-path)
       refs.check-user(user self.value)
   
   func dynamic write-preactions()

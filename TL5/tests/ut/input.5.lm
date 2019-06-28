@@ -334,8 +334,7 @@ class Test(Base)
 class Test
     var Int x
     func dynamic meth()
-func mock()->(weak Test t)
-    t := Test()
+func mock()->(weak Test? t)
     mock()->(weak t).meth()
 ; @ g t21
 class Test
@@ -703,7 +702,7 @@ var Ta a
 ; @ c t1
 user Ta? a
 ; @ c t2
-ta := Ta()
+owner Ta nta(owner Ta())
 ; @ c t3
 new Ta a
 ; @ c t4
@@ -738,8 +737,7 @@ fun7(weak tc)->(weak ta)
 class Test
     var Int x
     func dynamic meth()
-func mock()->(weak Test t)
-    t := Test()
+func mock()->(weak Test? t)
     t.meth()
 ; @ g t17
 class Base
@@ -1434,11 +1432,11 @@ var Array{i:Int} error
 var Int error--name
 ; @@ test-initialize
 ; @ c t0
-tc := Tc(copy i)
+tb := Tb(copy i)
 ; @ c t1
 str := String{arr[0]}()
 ; @ c t2
-arr := Array{arr[0]:Int}()
+owner Array{Int} a(owner Array{arr[0]:Int}())
 ; @ c t3
 owner Array{Test} a(owner Array{arr[0]:Test}())
 ; @ c t4
@@ -1458,7 +1456,7 @@ var Tc tt(copy 3)
 ; @ c t11
 new Tc tt(copy 3)
 ; @ c t12
-t := Tc(copy 3)
+tb := Tc(copy 3)
 ; @ c t13
 user Tb? tt(user tb)
 ; @ c t14
@@ -3027,6 +3025,12 @@ func fun(owner Test t, user Test tu, owner String s, user String su)
     s.clear()
     t.s.clear()
     tu.s :=: s
+; @ ec teo14
+fun8(strong so)
+so.clear()
+new String{12} s
+fun8(strong s)
+s.clear()
 ; @ ec teu0
 user String? s
 so := _

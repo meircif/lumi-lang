@@ -266,9 +266,9 @@ class AssignExpression(Expression)
     ; called also in assignment operator
     if self.value.result-type.type-data is glob.type-empty
       return
-    if self.value.access = Access.OWNER and self.target.access = Access.STRONG
-      self.code-node.write-spaces()
-      self.write-macro-init(user "INIT_VAR_REFMAN", user self.target)
-      write(user ")\n")
     self.code-node.write-spaces()
     self.original-value.write-assign-null()
+    if self.value.access = Access.OWNER and self.target.access = Access.STRONG
+      self.code-node.write-spaces()
+      self.write-macro-init(user "INIT_NEW_REFMAN", user self.target)
+      write(user ")\n")
