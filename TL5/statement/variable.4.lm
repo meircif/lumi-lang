@@ -146,11 +146,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.syntax-error(
             user "non-conditional reference in type without constructor",
             user self.parent-type.name)
-    if self.parent? and not self.type-instance.conditional and
-        not self.is-initialized and
-        (not self.type-instance.type-data.is-primitive or
-        self.type-instance.type-data is glob.type-func)
-      self.syntax-error(user "uninitialized reference", user self.name)
     if self.my-module?
       glob.current-module := _
 
@@ -383,7 +378,11 @@ class VariableCreate(SyntaxTreeCode)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     var ReferencePath reference-path(user self.variable)
-    refs.clear-invalid-reference(user reference-path)
+    if self.variable.is-initialized or
+        self.variable.type-instance.conditional or
+        (self.variable.type-instance.type-data.is-primitive and
+        self.variable.type-instance.type-data is-not glob.type-func)
+      refs.clear-invalid-reference(user reference-path)
   
   func dynamic write()
     ; do nothing

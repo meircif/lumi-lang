@@ -3996,7 +3996,7 @@ more than one subtype for array
 /// @ te24
 passing ownership of type "Tb" into static type "Test"
 /// @ te25
-uninitialized reference "s"
+using invalid reference "s"
 /// @ te26
 assigning empty into non-conditional type "String"
 /// @ te27
@@ -4940,6 +4940,48 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
+/// @ tm8
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+Returncode ut_M_Test_new(ut_M_Test* self, Int x);
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_Test_new_Mock(ut_M_Test* self, Int x);
+Bool ut_M_Test_new_Mock_active = true;
+Returncode ut_M_fun(void);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Test_new(ut_M_Test* self, Int x) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_Test_new_Mock(ut_M_Test* self, Int x) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    if (!ut_M_Test_new_Mock_active) return ut_M_Test_new(self, x);
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Test t_Var = {0};
+    ut_M_Test* t = NULL;
+    t = &t_Var;
+    LUMI_err = ut_M_Test_new_Mock(t, 2);
+    CHECK(6, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    ut_M_Test_Del(t);
+    return LUMI_err;
+}
 /// @ tt0
 Returncode ut_M_fun0(void);
 Returncode ut_M_fun1(void);
@@ -5289,6 +5331,8 @@ type "Func" has no member "error"
 accessing mock function field in dynamic call to "meth"
 /// @ te31
 expected space after "test", got "new-line"
+/// @ te32
+constructor did not initialize field "s"
 /// @@ test-native
 /// @ tf0
 Returncode external(void);
@@ -8268,9 +8312,15 @@ using invalid reference "t"
 /// @ teo12
 using invalid reference "t"
 /// @ teo13
-cannot modify owner field "s" in non-owner reference "tu.s"
+using invalid reference "t.t"
 /// @ teo14
+cannot modify owner field "s" in non-owner reference "tu.s"
+/// @ teo15
 using invalid reference "s"
+/// @ teo16
+using invalid reference "tbad"
+/// @ teo17
+unknown symbol "soon"
 /// @ teu0
 using potentially illegal user reference "s"
 /// @ teu1
@@ -8368,13 +8418,17 @@ output "s" access should not be "var" for non-primitive type "String"
 /// @ tee0
 non-conditional reference in type without constructor "Error"
 /// @ tee1
-constructor did not initilize field "s"
+constructor did not initialize field "s"
 /// @ tee2
 using invalid reference "self.s"
 /// @ tee3
 using invalid reference "self"
 /// @ tee4
 using invalid reference "self"
+/// @ tee5
+constructor did not initialize field "s"
+/// @ tee6
+constructor did not initialize field "s"
 /// @ tec0
 assigning reference into itself
 /// @ tec1

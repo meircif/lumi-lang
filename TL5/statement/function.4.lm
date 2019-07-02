@@ -195,6 +195,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.implemented-function.external-body := true
   
   func dynamic analyze()
+    if self.parent-type?
+      if self is self.parent-type.constructor and self.arguments.outputs.first?
+        self.syntax-error-msg(user "constructor with outputs")
     if self.my-module?
       glob.current-module := self.my-module
     if self.implemented-function?
@@ -228,9 +231,35 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     if self.header-only
       return
     var ReferenceMemoryList refs
-    self.check-code-memory(user refs)
+    if not self.check-constructor-memory(user refs)
+      self.check-block-memory(user refs)
+    self.cleared-invalid-references.clear()
   
-  func dynamic check-code-memory(user ReferenceMemoryList refs)
+  func inst check-constructor-memory(user ReferenceMemoryList refs)->(
+      var Bool is-constructor)
+    is-constructor := false
+    if not self.parent-type?
+      return
+    if self is-not self.parent-type.constructor
+      return
+    is-constructor := true
+    var ReferencePath reference-path(
+        user self.arguments.parameters.first.item.get-variable())
+    refs.mark-invalid-reference(user reference-path)
+    for field in self.parent-type.variables.iter()
+      if not access-is-only-var(copy field.access) and
+          not field.type-instance.conditional
+        reference-path.field := ReferencePath(user field)
+        refs.mark-invalid-reference(user reference-path)
+    self.check-block-memory(user refs)
+    for field in self.parent-type.variables.iter()
+      if not field.type-instance.conditional
+        reference-path.field := ReferencePath(user field)
+        if refs.is-invalid(user reference-path)
+          self.syntax-error(
+              user "constructor did not initialize field", user field.name)
+  
+  func inst check-block-memory(user ReferenceMemoryList refs)
     self.arguments.check-memory(user refs)
     self.check-children-memory(user self.variables, user refs)
     base.check-memory(user refs)
@@ -326,22 +355,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       write(user ".")
     write(user self.name)
     write(user "\"")
-    
-    ; write(user "\n/* calling[")
-    ; for function in self.calling-functions.iter()
-    ;   write(user "|")
-    ;   if function.parent-type?
-    ;     write(user function.parent-type.name)
-    ;     write(user ".")
-    ;   write(user function.name)
-    ; write(user "|] */")
-    ; 
-    ; write(user "\n/* deleting[")
-    ; for type-data in self.deleting-types.iter()
-    ;   write(user "|")
-    ;   write(user type-data.name)
-    ; write(user "|] */")
-      
   
   func inst write-post-func()
     write(user "#undef LUMI_FILE_NAME\n")
@@ -368,28 +381,6 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
     string-new-copy(user "new")->(owner self.name)
     self.parse-arguments(copy false)
     self.parse-body()
-  
-  func dynamic analyze()
-    if self.arguments.outputs.first?
-      self.syntax-error-msg(user "constructor with outputs")
-    base()
-  
-  func dynamic check-code-memory(user ReferenceMemoryList refs)
-    var ReferencePath reference-path(
-        user self.arguments.parameters.first.item.get-variable())
-    refs.mark-invalid-reference(user reference-path)
-    for field in self.parent-type.variables.iter()
-      if not access-is-only-var(copy field.access) and
-          not field.type-instance.conditional
-        reference-path.field := ReferencePath(user field)
-        refs.mark-invalid-reference(user reference-path)
-    base(user refs)
-    for field in self.parent-type.variables.iter()
-      if not field.type-instance.conditional
-        reference-path.field := ReferencePath(user field)
-        if refs.is-invalid(user reference-path)
-          self.syntax-error(
-              user "constructor did not initilize field", user field.name)
 
 
 ~~~ Function declaration argument ~~~

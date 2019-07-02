@@ -1527,6 +1527,7 @@ var Array{1:Int:Int} a
 owner Test ot(owner tb)
 ; @ ec te25
 user String s
+s.clear()
 ; @ ec te26
 user String s(user _)
 ; @ ec te27
@@ -1851,6 +1852,13 @@ func fun()
     Sys.print.active := false
     sys.print.active := true
 mock Sys.print(user Array?{Char} text)
+; @ g tm8
+struct Test
+    var Int x
+    new(copy Int x)
+mock Test.new(copy Int x)
+func fun()
+    var Test t(copy 2)
 ; @ tg tt0
 func fun0()
     var Int x(copy 4)
@@ -2008,6 +2016,12 @@ mock Test.meth()
     self.meth.mocked()
 ; @ eg te31
 test
+; @ eg te32
+struct Test
+    owner String s
+    new()
+        self.s := String{12}()
+mock Test.new()
 ; @@ test-native
 ; @ g tf0
 native func external()
@@ -3026,6 +3040,12 @@ func fun()
     t.t := t
 ; @ eg teo13
 struct Test
+    owner Test? t
+func fun()
+    new Test? t
+    t.t.t := t.t
+; @ eg teo14
+struct Test
     owner String s
     new()
 func fun(owner Test t, user Test tu, owner String s, user String su)
@@ -3034,12 +3054,26 @@ func fun(owner Test t, user Test tu, owner String s, user String su)
     s.clear()
     t.s.clear()
     tu.s :=: s
-; @ ec teo14
+; @ ec teo15
 fun8(strong so)
 so.clear()
 new String{12} s
 fun8(strong s)
 s.clear()
+; @ ec teo16
+new Test tgood
+owner Test tbad
+if b
+    tgood := to!
+tgood.meth()
+if b
+    tbad := to!
+tbad.meth()
+; @ ec teo17
+new String{12} s
+do
+    soon.clear()
+    owner String move(owner s)
 ; @ ec teu0
 user String? s
 so := _
@@ -3330,6 +3364,17 @@ struct Error
         self.s := String{12}()
 func error(user Error e)
     e.s.clear()
+; @ eg tee5
+struct Error
+    owner String s
+    new()
+        if false
+            self.s := String{12}()
+; @ eg tee6
+struct Error
+    owner String s
+    new() _
+func Error.new()
 ; @ ec tec0
 str := str
 ; @ eg tec1

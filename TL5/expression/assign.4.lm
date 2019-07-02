@@ -50,13 +50,19 @@ class AssignExpression(Expression)
         user self.target.result-type.reference-path)
     user ReferencePath right-path(
         user self.value.result-type.reference-path)
+    var Bool was-left-invalid(copy refs.is-invalid(user left-path))
     if is-move
       left-path.check-pure-owner(user self)
       right-path.check-pure-owner(user self)
       refs.mark-invalid-reference(user left-path)
     self.value.check-memory(user refs)
     if is-move
-      refs.clear-invalid-reference(user left-path)
+      if left-path?
+        if left-path.variable.parent is-not self.code-node.parent and
+            was-left-invalid
+          self.code-node.parent.cleared-invalid-references.add(
+              owner left-path.copy-new())
+        refs.clear-invalid-reference(user left-path)
       refs.mark-invalid-reference(user right-path)
     self.target.check-memory(user refs)
     if right-path?

@@ -214,7 +214,7 @@ struct TestStruct
     ~~~ Test
     multiline
     documentation ~~~
-    owner String text
+    owner String? text
     
     ; comment test
     
