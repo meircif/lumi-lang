@@ -1531,6 +1531,15 @@ user String s
 user String s(user _)
 ; @ ec te27
 user String s(user str)
+; @ ec te28
+i := error
+var Int error
+; @ ec te29
+var Int error(copy error)
+; @ ec te30
+if b
+    var Int error
+i := error
 ; @@ test-comment
 ; @ c t0
 ; comment

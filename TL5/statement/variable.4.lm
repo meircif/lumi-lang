@@ -57,6 +57,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.is-initialized := glob.last-char = '(' or self.is-create
       if self.is-initialized
         VariableInit.parse-new(user _, user self)
+      else-if self.parent is-not glob.root.global-init
+        self.parent.code-nodes.add(owner VariableCreate(user self))
       self.get-function().function-variables.add(user self.name, user self)
     if self.parent is glob.root.global-init
       self.parent := _
@@ -372,30 +374,43 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.parent-type.write-spaces()
 
 
-class VariableInit(SyntaxTreeCode)
-  owner InitExpression expression-init
+class VariableCreate(SyntaxTreeCode)
   user SyntaxTreeVariable variable
   
+  new(user SyntaxTreeVariable variable)
+    self.variable := variable
+    base(user variable.parent)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    var ReferencePath reference-path(user self.variable)
+    refs.clear-invalid-reference(user reference-path)
+  
+  func dynamic write()
+    ; do nothing
+
+
+class VariableInit(VariableCreate)
+  owner InitExpression expression-init
+  
   func inst parse-new(user SyntaxTreeVariable variable)
-    new VariableInit new-node(user variable.parent)
-    new-node.parse(user variable)
+    new VariableInit new-node(user variable)
+    new-node.parse()
     variable.parent.code-nodes.add(owner new-node)
   
-  func inst parse(user SyntaxTreeVariable variable)
-    self.variable := variable
+  func inst parse()
     self.expression-init := InitExpression(user self)
     self.expression-init.parse(
-        owner variable.type-instance.copy-new(), owner _)
+        owner self.variable.type-instance.copy-new(), owner _)
     self.expression-init.is-statement := true
     self.expression-init.aux-variable := VariableExpression(user self)
-    string-new-copy(user variable.name)->(
+    string-new-copy(user self.variable.name)->(
         owner self.expression-init.aux-variable.name)
-    self.expression-init.aux-variable.variable := variable
-    variable.type-instance.copy-new()->(
+    self.expression-init.aux-variable.variable := self.variable
+    self.variable.type-instance.copy-new()->(
         owner self.expression-init.aux-variable.result-type)
-    self.expression-init.aux-variable.access := variable.access
-    self.expression-init.aux-variable.is-var :=
-        access-is-only-var(copy variable.access) and variable.is-create
+    self.expression-init.aux-variable.access := self.variable.access
+    self.expression-init.aux-variable.is-var := self.variable.is-create and
+        access-is-only-var(copy self.variable.access)
   
   func dynamic analyze()
     if self.parent is glob.root.global-init
@@ -407,6 +422,7 @@ class VariableInit(SyntaxTreeCode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression-init.check-memory(user refs)
     refs.add(user self.variable)
+    base(user refs)
   
   func dynamic write()
     if self.variable.type-instance.type-data.is-primitive and

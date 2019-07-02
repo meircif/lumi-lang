@@ -65,6 +65,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
       item.type-instance := type-instance
       self.item := item
       self.parent.variables.add(owner item)
+      self.block.code-nodes.prepend(owner VariableCreate(user self.item))
     self.item-name := _
     
     if self.iterator.result-type.type-data is-not glob.type-int

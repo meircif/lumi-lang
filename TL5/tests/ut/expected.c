@@ -4001,6 +4001,12 @@ uninitialized reference "s"
 assigning empty into non-conditional type "String"
 /// @ te27
 assigning conditional into non-conditional type "String"
+/// @ te28
+using invalid reference "error"
+/// @ te29
+using invalid reference "error"
+/// @ te30
+unknown symbol "error"
 /// @@ test-comment
 /// @ t0
 Int x = 0;

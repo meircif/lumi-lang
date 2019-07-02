@@ -252,6 +252,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
+    for variable in self.variables.iter()
+      if not variable.is-aux
+        var ReferencePath reference-path(user variable)
+        refs.mark-invalid-reference(user reference-path)
     self.check-children-memory(user self.code-nodes, user refs)
   
   func inst write-set-loop-depth()
