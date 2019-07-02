@@ -3072,8 +3072,9 @@ tbad.meth()
 ; @ ec teo17
 new String{12} s
 do
-    soon.clear()
-    owner String move(owner s)
+    s.clear()
+    ostr := s
+    s := String{12}()
 ; @ ec teu0
 user String? s
 so := _

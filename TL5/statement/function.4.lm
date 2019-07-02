@@ -213,7 +213,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             user parameter.get-type-instance())
     base()
     for variable in self.variables.iter()
-      if access-is-var(copy variable.access)
+      if access-is-var(copy variable.access) and
+          not variable.type-instance.type-data.is-primitive
         self.delete-group-builder.add-deleting(user variable.type-instance)
     if self.my-module?
       glob.current-module := _
@@ -267,7 +268,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       if access-is-owner(copy parameter.access)
         refs.mark-illegal-type(user parameter.get-type-instance())
     for variable in self.variables.iter()
-      if access-is-var(copy variable.access)
+      if access-is-var(copy variable.access) and
+          not variable.type-instance.type-data.is-primitive
         refs.mark-illegal-type(user variable.type-instance)
     for output in self.arguments.outputs.iter()
       refs.check-output(user output)

@@ -130,6 +130,11 @@ class SyntaxTreeBaseLoop(SyntaxTreeFlowElement)
     self.block.write-block-setup()
     self.block.write-set-loop-depth()
 
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    base(user refs)
+    ; check memory again for possible next iterations of the loop
+    base(user refs)
+
 
 ~~~ Do loop node in the syntax tree ~~~
 class SyntaxTreeDoLoop(SyntaxTreeBaseLoop)

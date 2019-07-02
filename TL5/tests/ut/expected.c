@@ -8320,7 +8320,7 @@ using invalid reference "s"
 /// @ teo16
 using invalid reference "tbad"
 /// @ teo17
-unknown symbol "soon"
+using invalid reference "s"
 /// @ teu0
 using potentially illegal user reference "s"
 /// @ teu1

@@ -227,7 +227,8 @@ class TypeData(SyntaxTreeNamespace)
     user TypeData type-data(user self)
     do
       for variable in type-data.variables.iter()
-        if access-is-var(copy variable.access)
+        if access-is-var(copy variable.access) and not
+            variable.type-instance.type-data.is-primitive
           variable.type-instance.type-data.collect-delete-group()
           self.delete-group.add-deleting(user variable.type-instance)
       while type-data.base-type?
