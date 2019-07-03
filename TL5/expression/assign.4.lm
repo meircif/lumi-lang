@@ -54,7 +54,7 @@ class AssignExpression(Expression)
     if is-move
       left-path.check-pure-owner(user self)
       right-path.check-pure-owner(user self)
-      refs.mark-invalid-reference(user left-path)
+      refs.mark-invalid-reference(user left-path, user self)
     self.value.check-memory(user refs)
     if is-move
       if left-path?
@@ -63,7 +63,7 @@ class AssignExpression(Expression)
           self.code-node.parent.cleared-invalid-references.add(
               owner left-path.copy-new())
         refs.clear-invalid-reference(user left-path)
-      refs.mark-invalid-reference(user right-path)
+      refs.mark-invalid-reference(user right-path, user self)
     self.target.check-memory(user refs)
     if right-path?
       if is-move and right-path.is-conditional()

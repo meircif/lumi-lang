@@ -246,12 +246,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     is-constructor := true
     var ReferencePath reference-path(
         user self.arguments.parameters.first.item.get-variable())
-    refs.mark-invalid-reference(user reference-path)
+    refs.mark-invalid-reference(user reference-path, user self)
     for field in self.parent-type.variables.iter()
       if not access-is-only-var(copy field.access) and
           not field.type-instance.conditional
         reference-path.field := ReferencePath(user field)
-        refs.mark-invalid-reference(user reference-path)
+        refs.mark-invalid-reference(user reference-path, user self)
     self.check-block-memory(user refs)
     for field in self.parent-type.variables.iter()
       if not field.type-instance.conditional
@@ -440,12 +440,17 @@ class DeclarationArgument(Argument)
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
           user self.variable.type-instance.type-data.name)
-    else-if self.is-output and access-is-only-var(copy self.access)
-      self.syntax-error2(
-          user "output",
-          user self.variable.name,
-          user "access should not be \"var\" for non-primitive type",
-          user self.variable.type-instance.type-data.name)
+    else-if self.is-output
+      if access-is-only-var(copy self.access)
+        self.syntax-error2(
+            user "output",
+            user self.variable.name,
+            user "access should not be \"var\" for non-primitive type",
+            user self.variable.type-instance.type-data.name)
+      if not self.variable.type-instance.conditional
+        self.syntax-error(
+            user "not yet supporting non-conditional and non-primitive output",
+            user self.variable.name)
     self.variable.type-instance.analyze-lengths(user self, copy false)
     if self.is-native
       if access-is-owner(copy self.access)

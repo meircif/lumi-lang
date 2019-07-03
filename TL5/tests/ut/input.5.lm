@@ -19,12 +19,12 @@ class Tc(Tb)
 struct Data{Generic}
     weak Generic? item
     func set(owner Generic? item)
-    func get()->(weak Generic item)
+    func get()->(weak Generic? item)
 
 func fun0()
 func fun1(copy Int x, user String? s, owner String? o)
-func fun2()->(strong String s, var Int x)
-func fun3(copy Int x)->(strong String s)
+func fun2()->(strong String? s, var Int x)
+func fun3(copy Int x)->(strong String? s)
 func fun4(copy Int x)
 func fun5(copy Int x)->(var Int y)
 func fun6(copy Int x, copy Int y)->(var Int n, var Int m)
@@ -339,10 +339,10 @@ func mock()->(weak Test? t)
 ; @ g t21
 class Test
     var Int x
-    func dynamic meth()->(weak Test t)
+    func dynamic meth()->(weak Test? t)
         self.meth().meth()
 ; @ g t22
-func fun()->(owner Array{String} astr)
+func fun()->(owner Array?{String} astr)
     fun()->(owner astr)
 ; @ g t23
 func fun(var String s)
@@ -891,6 +891,9 @@ f.putc(copy 'a')
 user File? f
 file-close(owner fobj)
 f.putc(copy 'a')
+; @ ec tef6
+owner File f(owner fobj!)
+file-open-read(user "name")->(owner f)
 ; @ ec tey0
 var Sys error
 ; @ ec tey1
@@ -1105,9 +1108,9 @@ func name()
 ; @ g t1
 func name(user String self, user String text, copy Int num)
 ; @ g t2
-func name()->(owner String text, var Int num)
+func name()->(owner String? text, var Int num)
 ; @ g t3
-func name(copy Char param)->(owner String out)
+func name(copy Char param)->(owner String? out)
 ; @ g t4
 func name(user Array{Int} array)
 ; @ g t5
@@ -1117,7 +1120,7 @@ func name()
     var Int x
 ; @ g t7
 func name(user String self, copy Int px, user Array{Char} pu, owner String po)->(
-        strong String oself, var Int ox, weak String ou, owner String oo)
+        strong String? oself, var Int ox, weak String? ou, owner String? oo)
     var Int x
     user String? u
     owner String? o
@@ -1154,7 +1157,7 @@ class Test
 func name()->(owner Test? t)
     t := _
 ; @ g t10
-func name(user Array{Array{String}} ai)->(owner Array{Array{Int}} ao)
+func name(user Array{Array{String}} ai)->(owner Array?{Array{Int}} ao)
 ; @ g tm0
 main
     var Int x
@@ -1220,6 +1223,8 @@ func name(copy Int error)
 func error(copy Int error)
 ; @ eg te28
 func name(copy Int Error)
+; @ eg te29
+func name()->(owner String s)
 ; @@ test-members
 ; @ g t0
 struct Test
@@ -1448,7 +1453,7 @@ user String? s(user ostr)
 ; @ c t7
 var String{12} s(user "some string")
 ; @ c t8
-new String?{i} s(user ostr)
+new String{i} s(user ostr)
 ; @ c t9
 user Test? tt(user tc)
 ; @ c t10
@@ -1464,8 +1469,8 @@ owner Ta? ota(owner tb)
 ; @ c t15
 owner Array{Array{String}} sa(owner Array{arr[0]:Array{arr[1]:String{arr[2]}}}())
 ; @ g t16
-func get()->(owner File a)
-    owner File b(owner get())
+func get()->(owner File? a)
+    owner File? b(owner get())
 ; @ c t17
 owner Test? ot(owner to)
 strong Test? st(strong ot)
@@ -1541,6 +1546,10 @@ var Int error(copy error)
 if b
     var Int error
 i := error
+; @ ec te31
+new Test? a
+; @ ec te32
+to := Test?()
 ; @@ test-comment
 ; @ c t0
 ; comment
@@ -2053,9 +2062,9 @@ native error
 ; @ eg tef1
 native func error(owner String s)
 ; @ eg tef2
-native func error()->(user String s)
+native func error()->(user String? s)
 ; @ eg tef3
-native func error()->(owner String s)
+native func error()->(owner String? s)
 ; @ eg tef4
 native func error()
 native func error()
@@ -2138,7 +2147,7 @@ tb2 := dt.item
 ; @ g t19
 struct Base{Generic}
     weak Generic? item
-    func get()->(weak Generic item)
+    func get()->(weak Generic? item)
 struct Test(Base{File})
     func set(weak File? f)
         self.item := f
@@ -2152,21 +2161,21 @@ func fun(user Test test, weak File? f)
 ; @ g t20
 class Base{Param}
     weak Param? item
-    func dynamic set(weak Param item)
-    func dynamic get()->(weak Param item)
+    func dynamic set(weak Param? item)
+    func dynamic get()->(weak Param? item)
 class Test{Generic}(Base{Generic})
     func dynamic set(weak Generic item)
-    func dynamic get()->(weak Generic item)
-func mock(weak Test{File} test, weak File f)
+    func dynamic get()->(weak Generic? item)
+func mock(weak Test{File} test, weak File? f)
     test.set(weak f)
     test.get()->(weak f)
     test.get().putc(copy 'a')
 ; @ g t21
 struct Test{Param}
     weak Param? item
-    func meth(weak Param in)->(weak Param out) _
-func Test.meth(weak Param in)->(weak Param out)
-    weak Param p(weak in)
+    func meth(weak Param? in)->(weak Param? out) _
+func Test.meth(weak Param? in)->(weak Param? out)
+    weak Param? p(weak in)
     out := p
     self.item := p
     self.meth(weak p)->(weak p)
@@ -2654,7 +2663,7 @@ struct Test
     var Array{4:Array{5:Array{6:Int}}} aai
     var Array{4:Array{5:Array{6:Base}}} aab
     var Array{4:Array{5:String{6}}} aas
-    func test()->(var Char c, var Int i, user Base b)
+    func test()->(var Char c, var Int i, user Base? b)
         c := self.s[3]
         i := self.ai[4]
         b := self.ab[5]
@@ -2983,21 +2992,21 @@ func fun(owner Array{Bb} b)
 ; @ eg teo4
 struct Test
     owner String? s
-func get-user()->(weak Test t)
+func get-user()->(weak Test? t)
 func fun()
     weak Test? t
     get-user()->(weak t).s := _
 ; @ eg teo5
 struct Test
     owner String? s
-func get-user()->(weak Test t)
+func get-user()->(weak Test? t)
 func fun()
     get-user().s := _
 ; @ eg teo6
 struct Test
     owner String s
     new()
-func fun(owner Test t)->(owner String s)
+func fun(owner Test t)->(owner String? s)
     s := t.s
 ; @ eg teo7
 struct Test
@@ -3010,7 +3019,7 @@ struct Test
     owner String s
     new()
 func take(owner String s)
-func fun(owner Test t)->(owner String s)
+func fun(owner Test t)->(owner String? s)
     take(owner t.s)
 ; @ ec teo9
 new String{12} s
@@ -3023,26 +3032,23 @@ s.clear()
 ; @ eg teo10
 struct Test
     owner Test? t
-func fun()->(owner Test t, owner Test x)
+func fun()->(owner Test? t, owner Test? x)
     t := x.t!
     t := t.t!
 ; @ eg teo11
 struct Test
     owner Test? t
-func fun()
-    new Test? t
+func fun(owner Test? t)
     t := t.t
 ; @ eg teo12
 struct Test
     owner Test? t
-func fun()
-    new Test? t
+func fun(owner Test? t)
     t.t := t
 ; @ eg teo13
 struct Test
     owner Test? t
-func fun()
-    new Test? t
+func fun(owner Test? t)
     t.t.t := t.t
 ; @ eg teo14
 struct Test
@@ -3075,6 +3081,26 @@ do
     s.clear()
     ostr := s
     s := String{12}()
+; @ eg teo18
+func fun(owner String? s, owner String? s2)
+    fun(owner s, owner s)
+; @ eg teo19
+func fun()->(owner String? s, owner String? s2)
+    fun()->(owner s, owner s2)
+    fun()->(owner s, owner s)
+; @ eg teo20
+func fun(owner String? s)->(owner String? s2)
+    fun(owner s)->(owner s)
+; @ eg teo21
+struct Test
+    var Int x
+func fun(owner Test? t)->(var Int x)
+    x := fun(owner t) + t.x
+; @ g teo22
+struct Test
+    var Int x
+func fun(owner Test? t)->(var Int x)
+    x := t.x + fun(owner t)
 ; @ ec teu0
 user String? s
 so := _
@@ -3243,7 +3269,7 @@ func fun(user String s)
     deleting(copy _)
     s.set(copy 0, copy 'a')
 ; @ eg teu25
-func fun()->(user String s)
+func fun()->(user String? s)
 ; @ eg teu26
 func deleting()
     owner String? s

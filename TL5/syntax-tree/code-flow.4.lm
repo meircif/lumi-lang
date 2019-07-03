@@ -27,7 +27,7 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     owner ReferencePath reference-path
     do
       while self.block.cleared-invalid-references.pop()->(owner reference-path)?
-      refs.mark-invalid-reference(user reference-path)
+      refs.mark-invalid-reference(user reference-path, user self)
   
   func inst write-block()
     self.block.write-block()

@@ -66,7 +66,7 @@ func test-mid-out()->(user covered.MiddleType? mt)
     mt := _
 
 
-func test-new-mid()->(owner covered.MiddleType mt)
+func test-new-mid()->(owner covered.MiddleType? mt)
     new covered.MiddleType new-mt
     mt := new-mt
 
@@ -75,7 +75,7 @@ mock TestStruct.get()->(var Int x, user String? s)
     x := 12
     s := _
 
-mock test-int2str(copy Int x)->(owner String s)
+mock test-int2str(copy Int x)->(owner String? s)
     raise
 
 mock TestClass.dynamic-meth()
@@ -207,7 +207,7 @@ mock TopLink.delete()
 func remove-obj(owner Link b)
     ; remove b
 
-func get-outdated-var()->(weak Link l-out)
+func get-outdated-var()->(weak Link? l-out)
     strong Link l-var(strong Link())
     l-out := l-var
 

@@ -2503,6 +2503,8 @@ using potentially illegal user reference "f"
 using potentially illegal user reference "f"
 /// @ tef5
 using potentially illegal user reference "f"
+/// @ tef6
+assigning conditional into non-conditional type "File"
 /// @ tey0
 cannot create objects with type "Sys"
 /// @ tey1
@@ -3298,6 +3300,8 @@ variable name overrides function "error"
 variable name overrides function "error"
 /// @ te28
 illegal variable name "Error"
+/// @ te29
+not yet supporting non-conditional and non-primitive output "s"
 /// @@ test-members
 /// @ t0
 typedef struct ut_M_Test ut_M_Test;
@@ -4007,6 +4011,10 @@ using invalid reference "error"
 using invalid reference "error"
 /// @ te30
 unknown symbol "error"
+/// @ te31
+unexpected ? initializing type "Test"
+/// @ te32
+non callable type "Bool"
 /// @@ test-comment
 /// @ t0
 Int x = 0;
@@ -8321,6 +8329,40 @@ using invalid reference "s"
 using invalid reference "tbad"
 /// @ teo17
 using invalid reference "s"
+/// @ teo18
+using invalid reference "s"
+/// @ teo19
+using invalid reference "s"
+/// @ teo20
+using invalid reference "s"
+/// @ teo21
+using invalid reference "t"
+/// @ teo22
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(ut_M_Test* t, Int* x);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_fun(ut_M_Test* t, Int* x) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    Int aux_Int_0 = 0;
+    LUMI_err = ut_M_fun(t, &(aux_Int_0));
+    t = NULL;
+    CHECK(4, LUMI_block0_cleanup)
+    CHECK_REF(4, LUMI_block0_cleanup, t)
+    *x = t->x + aux_Int_0;
+LUMI_block0_cleanup:
+    (void)0;
+    ut_M_Test_Del(t);
+    free(t);
+    return LUMI_err;
+}
 /// @ teu0
 using potentially illegal user reference "s"
 /// @ teu1

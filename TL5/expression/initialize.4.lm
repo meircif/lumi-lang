@@ -69,6 +69,10 @@ class InitExpression(ModuleTypeExpression)
           self.syntax-error(
               user "no constructor for type",
               user self.result-type.type-data.name)
+      if self.result-type.conditional
+        self.syntax-error(
+            user "unexpected ? initializing type",
+            user self.result-type.type-data.name)
       
     else-if self.arguments.parameters.first?
       if self.arguments.parameters.first.next? or

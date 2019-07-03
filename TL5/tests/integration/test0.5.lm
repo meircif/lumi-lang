@@ -72,7 +72,7 @@ func test-const-expression()->(
 
 
 func test-member-expression(strong TestStruct t)->(
-        weak TestStruct to, var Int i)
+        weak TestStruct? to, var Int i)
     to := t
     t.num := to.num + t.ts.num + t.ts.ts.num
     to.num := t.num
@@ -91,14 +91,14 @@ func test-slice-expression(
         weak Array{Func{()}} arrf)->(
         var Char c,
         var Int i,
-        weak SimpleStruct t,
-        weak SimpleClass d,
+        weak SimpleStruct? t,
+        weak SimpleClass? d,
         var Func{()} f,
-        weak Array{Int} arrio,
-        weak Array{String} arrso,
-        weak Array{SimpleStruct} arrto,
-        weak Array{SimpleClass} arrdo,
-        weak Array{Func{()}} arrfo)
+        weak Array?{Int} arrio,
+        weak Array?{String} arrso,
+        weak Array?{SimpleStruct} arrto,
+        weak Array?{SimpleClass} arrdo,
+        weak Array?{Func{()}} arrfo)
     c := s[2] + s[4:7][2] + arrs[3][2] + arrs[4:2][4][1:3][0]
     i := arri[i + 3 - arri[2]] + arrt[4].num + arrt[2:4][1].num +
             arri[3:3][1:2][1]
@@ -132,7 +132,7 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     var TestStruct tv(copy 0, user _)
     var TestClass dv
     var String{12} sv
-    var Func{(copy Int xi, user String si)->(var Int xo, user String so)} f
+    var Func{(copy Int xi, user String si)->(var Int xo, user String? so)} f
     var Array{12:Int} ia
     var Array{12:SimpleStruct} ta
     var Array{12:SimpleClass} da
@@ -150,7 +150,7 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     user String si(user text)
     var String{12} isv(user "some string")
     new String{i} isn(user text)
-    var Func{(copy Int n)->(owner String st)} fi(copy test-int2str)
+    var Func{(copy Int n)->(owner String? st)} fi(copy test-int2str)
     var TestStruct itv(copy i, user text)
     new TestStruct itn(copy i, user text)
     var TestClass idv()
@@ -193,7 +193,7 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
 
 
 func test-complex-function(
-        copy Int num, user String text)->(var Int out-num, user String out-text)
+        copy Int num, user String text)->(var Int out-num, user String? out-text)
     [; Test
     multiline
     comment ;]
@@ -271,8 +271,8 @@ func test-void()
     return
 func test-params(copy Int x, user String? s, owner String? o)
     raise
-func test-outs()->(owner String s, var Int x)
-func test-int2str(copy Int x)->(owner String s)
+func test-outs()->(owner String? s, var Int x)
+func test-int2str(copy Int x)->(owner String? s)
 func test-int(copy Int x)
 func test-int2int(copy Int x)->(var Int r)
 func test-many(
@@ -486,7 +486,7 @@ struct Container{Generic}
         self.value := value
         self.next := next
     
-    func iter()->(owner ContainerIterator{Generic} iter)
+    func iter()->(owner ContainerIterator?{Generic} iter)
         iter := ContainerIterator{Generic}(weak self.next)
 
 struct ContainerIterator{Generic}
@@ -551,7 +551,7 @@ func test-for-each()
     s-var Container{Item} container-mid(owner Item(user "hhh"), weak container-last)
     s-var Container{Item} container-first(owner Item(user "ggg"), weak container-mid)
     s-var Container{Item} container(owner _, weak container-first)
-    owner ContainerIterator{Item} iter(owner container.iter())
+    owner ContainerIterator{Item} iter(owner container.iter()!)
     sys.print(user "values[ ")
     for sc in iter
         sys.print(user sc.s)
