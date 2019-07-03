@@ -184,8 +184,8 @@ class BinaryExpression(UnaryExpression)
     base(user ordered-list)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    base(user refs)
     self.left-expression.check-memory(user refs)
+    base(user refs)
   
   func dynamic write-preactions()
     base()

@@ -69,8 +69,9 @@ class SyntaxTreeCode(SyntaxTreeNode)
 
 ~~~ A basic code block node in the syntax tree ~~~
 class SyntaxTreeBlock(SyntaxTreeBranch)
-  user SyntaxTreeBlock parent
   var List{SyntaxTreeCode} code-nodes
+  var List{ReferencePath} cleared-invalid-references
+  user SyntaxTreeBlock parent
   user SyntaxTreeIf previous-if
   user SyntaxTreeTry previous-try
   var Int block-index
@@ -252,6 +253,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
+    for variable in self.variables.iter()
+      if not variable.is-aux
+        var ReferencePath reference-path(user variable)
+        refs.mark-invalid-reference(user reference-path, user self)
     self.check-children-memory(user self.code-nodes, user refs)
   
   func inst write-set-loop-depth()

@@ -222,17 +222,9 @@ while (self->field != NULL) { \
   name = LUMI_alloc(sizeof(type) * size); \
   if (name == NULL) RAISE(line, cleanup, object_memory)
 
-#define INIT_NEW_STRONG(line, cleanup, name, type, size) \
-  INIT_NEW(line, cleanup, name, type, size) \
-  INIT_NEW_REFMAN(line, cleanup, name)
-
 #define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
   name##_Length = length; \
   INIT_NEW(line, cleanup, name, type, name##_Length * value_size)
-
-#define INIT_NEW_STRONG_ARRAY(line, cleanup, name, type, length, value_size) \
-  name##_Length = length; \
-  INIT_NEW_STRONG(line, cleanup, name, type, name##_Length * value_size)
 
 #define INIT_NEW_STRING(line, cleanup, name, size) \
   name##_Max_length = size; \
@@ -241,16 +233,6 @@ while (self->field != NULL) { \
   if (name##_Length == NULL) { \
     name##_Length = &Lumi_empty_int; \
     free(name); name = NULL; \
-    RAISE(line, cleanup, object_memory) }
-
-#define INIT_NEW_STRONG_STRING(line, cleanup, name, size) \
-  name##_Max_length = size; \
-  INIT_NEW_STRONG(line, cleanup, name, char, name##_Max_length) \
-  name##_Length = LUMI_alloc(sizeof(int)); \
-  if (name##_Length == NULL) { \
-    name##_Length = &Lumi_empty_int; \
-    free(name); name = NULL; \
-    free(name##_Refman); name##_Refman = NULL; \
     RAISE(line, cleanup, object_memory) }
 
 #define INIT_STRING_CONST(line, cleanup, name, text) \

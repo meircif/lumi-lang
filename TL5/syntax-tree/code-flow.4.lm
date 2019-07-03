@@ -24,6 +24,10 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.block.check-memory(user refs)
+    owner ReferencePath reference-path
+    do
+      while self.block.cleared-invalid-references.pop()->(owner reference-path)?
+      refs.mark-invalid-reference(user reference-path, user self)
   
   func inst write-block()
     self.block.write-block()
@@ -125,6 +129,11 @@ class SyntaxTreeBaseLoop(SyntaxTreeFlowElement)
   func inst write-loop-block-start()
     self.block.write-block-setup()
     self.block.write-set-loop-depth()
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    base(user refs)
+    ; check memory again for possible next iterations of the loop
+    base(user refs)
 
 
 ~~~ Do loop node in the syntax tree ~~~

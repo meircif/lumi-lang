@@ -63,8 +63,10 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
       else
         item.access := Access.USER
       item.type-instance := type-instance
+      item.is-initialized := true
       self.item := item
       self.parent.variables.add(owner item)
+      self.block.code-nodes.prepend(owner VariableCreate(user self.item))
     self.item-name := _
     
     if self.iterator.result-type.type-data is-not glob.type-int

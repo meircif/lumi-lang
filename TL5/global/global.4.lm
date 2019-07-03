@@ -553,7 +553,7 @@ struct Global
       argument.variable.type-instance.parameters := List{TypeInstance}()
       argument.variable.type-instance.parameters.add(
           owner argument-subtype.new-type-instance())
-    if not argument-type.is-primitive and not is-output
+    if not argument-type.is-primitive
       argument.variable.type-instance.conditional := true
     if access = Access.OWNER or access = Access.STRONG
       function.delete-group.add-deleting(user argument.variable.type-instance)
