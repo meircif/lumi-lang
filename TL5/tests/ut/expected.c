@@ -4561,6 +4561,8 @@ got "String" expression, expected "Int"
 unknown symbol "error"
 /// @ te6
 cannot assign "String" into "Int"
+/// @ te7
+using invalid reference "n"
 /// @@ test-testing
 /// @ ta0
 CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
@@ -7931,6 +7933,7 @@ Returncode ut_M_Test_new(ut_M_Test* self);
 void ut_M_Test_Del(ut_M_Test* self);
 Returncode ut_M_use(char* s, int s_Max_length, int* s_Length);
 Returncode ut_M_take(char* s, int s_Max_length, int* s_Length);
+Returncode ut_M_give(char** s, int* s_Max_length, int** s_Length);
 Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_M_Test* to);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 Returncode ut_M_Test_new(ut_M_Test* self) {
@@ -7978,6 +7981,13 @@ LUMI_block0_cleanup:
     free(s);
     return LUMI_err;
 }
+Returncode ut_M_give(char** s, int* s_Max_length, int** s_Length) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
 Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_M_Test* to) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -7996,7 +8006,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     s_Max_length = 0;
     s_Length = &Lumi_empty_int;
     s = NULL;
-    INIT_NEW_STRING(11, LUMI_block0_cleanup, aux_String_0, 12);
+    INIT_NEW_STRING(12, LUMI_block0_cleanup, aux_String_0, 12);
     String_Del(s);
     free(s);
     s_Max_length = 12;
@@ -8005,8 +8015,8 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     aux_String_0 = NULL;
     aux_String_0_Length = &Lumi_empty_int;
     LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
-    CHECK(12, LUMI_block0_cleanup)
-    INIT_NEW_STRING(13, LUMI_block0_cleanup, aux_String_1, 12);
+    CHECK(13, LUMI_block0_cleanup)
+    INIT_NEW_STRING(14, LUMI_block0_cleanup, aux_String_1, 12);
     String_Del(to->s);
     free(to->s);
     to->s_Max_length = 12;
@@ -8018,15 +8028,23 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     su_Length = tu->s_Length;
     su = tu->s;
     LUMI_err = ut_M_use(tu->s, tu->s_Max_length, tu->s_Length);
-    CHECK(15, LUMI_block0_cleanup)
+    CHECK(16, LUMI_block0_cleanup)
     LUMI_err = ut_M_take(to->s, to->s_Max_length, to->s_Length);
     to->s = NULL;
     to->s_Length = &Lumi_empty_int;
-    CHECK(16, LUMI_block0_cleanup)
+    CHECK(17, LUMI_block0_cleanup)
     /* initializing arr */
-    if (8 < 0 || 8 >= 12) RAISE(18, LUMI_block0_cleanup, slice_index)
-    if (4 < 0 || 4 >= 12) RAISE(18, LUMI_block0_cleanup, slice_index)
+    if (8 < 0 || 8 >= 12) RAISE(19, LUMI_block0_cleanup, slice_index)
+    if (4 < 0 || 4 >= 12) RAISE(19, LUMI_block0_cleanup, slice_index)
     arr[4] = arr[8];
+    do {
+        LUMI_loop_depth = 3;
+        LUMI_err = ut_M_give(&(s), &(s_Max_length), &(s_Length));
+        CHECK(21, LUMI_block1_cleanup)
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_1);
@@ -8198,6 +8216,7 @@ struct ut_M_Test {
 };
 Returncode ut_M_Test_get(ut_M_Test* self, char** s, int* s_Max_length, int** s_Length);
 void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(ut_M_Test* t, char** s, int* s_Max_length, int** s_Length);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
@@ -8211,6 +8230,17 @@ Returncode ut_M_Test_get(ut_M_Test* self, char** s, int* s_Max_length, int** s_L
     *s_Max_length = self->s_Max_length;
     *s_Length = self->s_Length;
     *s = self->s;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+Returncode ut_M_fun(ut_M_Test* t, char** s, int* s_Max_length, int** s_Length) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    LUMI_err = ut_M_Test_get(t, &(*s), &(*s_Max_length), &(*s_Length));
+    CHECK(7, LUMI_block0_cleanup)
+    LUMI_err = String_set(*s, *s_Max_length, *s_Length, 0, 'a');
+    CHECK(8, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -8326,13 +8356,22 @@ cannot modify owner field "s" in non-owner reference "tu.s"
 /// @ teo15
 using invalid reference "s"
 /// @ teo16
-using invalid reference "tbad"
+ut_M_Test* tgood = NULL;
+    ut_M_Test* tbad = NULL;
+    INIT_NEW(1, LUMI_block0_cleanup, tgood, ut_M_Test, 1);
 /// @ teo17
 using invalid reference "s"
 /// @ teo18
 using invalid reference "s"
 /// @ teo19
-using invalid reference "s"
+Returncode ut_M_fun(char** s, int* s_Max_length, int** s_Length, char** s2, int* s2_Max_length, int** s2_Length);
+Returncode ut_M_fun(char** s, int* s_Max_length, int** s_Length, char** s2, int* s2_Max_length, int** s2_Length) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
 /// @ teo20
 using invalid reference "s"
 /// @ teo21
@@ -8343,26 +8382,12 @@ struct ut_M_Test {
     Int x;
 };
 void ut_M_Test_Del(ut_M_Test* self);
-Returncode ut_M_fun(ut_M_Test* t, Int* x);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-Returncode ut_M_fun(ut_M_Test* t, Int* x) {
-    Returncode LUMI_err = OK;
-    unsigned LUMI_loop_depth = 1;
-    Int aux_Int_0 = 0;
-    LUMI_err = ut_M_fun(t, &(aux_Int_0));
-    t = NULL;
-    CHECK(4, LUMI_block0_cleanup)
-    CHECK_REF(4, LUMI_block0_cleanup, t)
-    *x = t->x + aux_Int_0;
-LUMI_block0_cleanup:
-    (void)0;
-    ut_M_Test_Del(t);
-    free(t);
-    return LUMI_err;
-}
+/// @ teo23
+using invalid reference "s"
 /// @ teu0
 using potentially illegal user reference "s"
 /// @ teu1
@@ -8449,6 +8474,16 @@ using potentially illegal user reference "str"
 using potentially illegal user reference "str"
 /// @ teu42
 using potentially illegal user reference "str"
+/// @ teu43
+using potentially illegal user reference "str"
+/// @ teu44
+using potentially illegal user reference "str"
+/// @ teu45
+using potentially illegal user reference "str"
+/// @ teu46
+returning potentially illegal user output "sout"
+/// @ teu47
+returning potentially illegal user output "sout"
 /// @ tev0
 cannot assign value with access "user" into value with access "var"
 /// @ tev1

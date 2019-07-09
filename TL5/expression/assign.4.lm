@@ -58,10 +58,6 @@ class AssignExpression(Expression)
     self.value.check-memory(user refs)
     if is-move
       if left-path?
-        if left-path.variable.parent is-not self.code-node.parent and
-            was-left-invalid
-          self.code-node.parent.cleared-invalid-references.add(
-              owner left-path.copy-new())
         refs.clear-invalid-reference(user left-path)
       refs.mark-invalid-reference(user right-path, user self)
     self.target.check-memory(user refs)

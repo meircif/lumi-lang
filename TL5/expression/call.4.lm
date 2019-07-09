@@ -275,9 +275,13 @@ class CallArgument(Argument)
         user self.value.result-type.reference-path)
     if access-is-owner(copy self.access) and reference-path?
       reference-path.check-pure-owner(user self)
-      refs.mark-invalid-reference(user reference-path, user self)
+      if not self.is-output
+        refs.mark-invalid-reference(user reference-path, user self)
     if not self.is-output
       refs.check-user(user self.value)
+    else-if reference-path?
+      if not reference-path.variable.is-aux
+      refs.add(user reference-path.variable)
   
   func dynamic write-preactions()
     self.value.write-preactions()

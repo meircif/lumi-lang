@@ -70,7 +70,6 @@ class SyntaxTreeCode(SyntaxTreeNode)
 ~~~ A basic code block node in the syntax tree ~~~
 class SyntaxTreeBlock(SyntaxTreeBranch)
   var List{SyntaxTreeCode} code-nodes
-  var List{ReferencePath} cleared-invalid-references
   user SyntaxTreeBlock parent
   user SyntaxTreeIf previous-if
   user SyntaxTreeTry previous-try

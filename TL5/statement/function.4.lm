@@ -231,10 +231,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func dynamic check-memory(user ReferenceMemoryList global-refs)
     if self.header-only
       return
-    var ReferenceMemoryList refs
+    var ReferenceMemoryList refs(user global-refs)
     if not self.check-constructor-memory(user refs)
       self.check-block-memory(user refs)
-    self.cleared-invalid-references.clear()
   
   func inst check-constructor-memory(user ReferenceMemoryList refs)->(
       var Bool is-constructor)
@@ -271,6 +270,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       if access-is-var(copy variable.access) and
           not variable.type-instance.type-data.is-primitive
         refs.mark-illegal-type(user variable.type-instance)
+    self.check-outputs-memory(user refs)
+  
+  func inst check-outputs-memory(user ReferenceMemoryList refs)
     for output in self.arguments.outputs.iter()
       refs.check-output(user output)
   

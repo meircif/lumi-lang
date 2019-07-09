@@ -78,7 +78,32 @@ struct ReferencePath
 struct ReferenceMemoryList
   var List{ReferencePath} invalid-references
   var List{ReferencePath} checked-invalid-references
+  var List{ReferencePath} added-invalid-references
   var NameMap{SyntaxTreeVariable} user-references
+  var NameMap{SyntaxTreeVariable} removed-user-references
+  
+  new(user ReferenceMemoryList parent-list)
+    if not parent-list?
+      return
+    self.extend-reference-list(
+        user self.invalid-references, user parent-list.invalid-references)
+    self.extend-reference-list(
+        user self.checked-invalid-references,
+        user parent-list.checked-invalid-references)
+    for variable in parent-list.user-references.iter()
+      self.add(user variable)
+  
+  func extend-reference-list(
+      user List{ReferencePath} target, user List{ReferencePath} source)
+    for reference-path in source.iter()
+      if not self.reference-inside(user reference-path, user target)
+        target.add(owner reference-path.copy-new())
+    
+  func add-invalids(user ReferenceMemoryList child-list)
+    for reference-path in child-list.added-invalid-references.iter()
+      self.mark-invalid-reference(user reference-path, user _)
+    for variable in child-list.removed-user-references.iter()
+      self.remove-user-reference(user variable)
   
   func add(user SyntaxTreeVariable variable)
     if variable.access = Access.USER
@@ -94,6 +119,9 @@ struct ReferenceMemoryList
         self.mark-specific-illegal-type(user type-instance, user actual-params)
   
   func mark-all-illegal()
+    for variable in self.user-references.iter()
+      self.removed-user-references.add-if-unique-value(
+          user variable.name, user variable)
     self.user-references.clear()
   
   func mark-illegal-type(user TypeInstance type-instance)
@@ -120,7 +148,12 @@ struct ReferenceMemoryList
           type-instance.can-be-assigned-to(user variable-type-instance)
         to-delete.add(user variable.name, user variable)
     for variable in to-delete.iter()
-      self.user-references.remove(user variable)
+      self.remove-user-reference(user variable)
+  
+  func remove-user-reference(user SyntaxTreeVariable variable)
+    self.removed-user-references.add-if-unique-value(
+        user variable.name, user variable)
+    self.user-references.remove(user variable)
 
   func mark-invalid-reference(
       user ReferencePath reference-path, user SyntaxTreeNode node)
@@ -128,6 +161,7 @@ struct ReferenceMemoryList
       return
     self.clear-invalid-reference(user reference-path)
     self.invalid-references.add(owner reference-path.copy-new())
+    self.added-invalid-references.add(owner reference-path.copy-new())
     ; if self.reference-inside(
     ;     user reference-path, user self.checked-invalid-references)
     ;   node.syntax-error-ref(
@@ -166,10 +200,13 @@ struct ReferenceMemoryList
         var is-invalid)
   
   func check-reference(user Expression expression)
-    user ReferencePath reference-path(
-        user expression.result-type.reference-path)
+    self.check-node-reference(
+        user expression.result-type.reference-path, user expression)
+  
+  func check-node-reference(
+      user ReferencePath reference-path, user SyntaxTreeNode node)
     if self.is-invalid(user reference-path)
-      expression.syntax-error-ref(
+      node.syntax-error-ref(
           user "using invalid reference", user reference-path)
     if reference-path?
       self.checked-invalid-references.add(owner reference-path.copy-new())
