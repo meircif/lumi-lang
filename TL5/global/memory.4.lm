@@ -77,27 +77,21 @@ struct ReferencePath
 ~~~ List of memory managed references ~~~
 struct ReferenceMemoryList
   var List{ReferencePath} invalid-references
-  var List{ReferencePath} checked-invalid-references
   var List{ReferencePath} added-invalid-references
+  var List{ReferencePath} read-owner-references
+  var List{ReferencePath} written-owner-references
   var NameMap{SyntaxTreeVariable} user-references
   var NameMap{SyntaxTreeVariable} removed-user-references
   
   new(user ReferenceMemoryList parent-list)
     if not parent-list?
       return
-    self.extend-reference-list(
-        user self.invalid-references, user parent-list.invalid-references)
-    self.extend-reference-list(
-        user self.checked-invalid-references,
-        user parent-list.checked-invalid-references)
+    for reference-path in parent-list.invalid-references.iter()
+      if not self.reference-inside(
+          user reference-path, user self.invalid-references)
+        self.invalid-references.add(owner reference-path.copy-new())
     for variable in parent-list.user-references.iter()
       self.add(user variable)
-  
-  func extend-reference-list(
-      user List{ReferencePath} target, user List{ReferencePath} source)
-    for reference-path in source.iter()
-      if not self.reference-inside(user reference-path, user target)
-        target.add(owner reference-path.copy-new())
     
   func add-invalids(user ReferenceMemoryList child-list)
     for reference-path in child-list.added-invalid-references.iter()
@@ -159,30 +153,38 @@ struct ReferenceMemoryList
       user ReferencePath reference-path, user SyntaxTreeNode node)
     if not reference-path?
       return
+    if reference-path.is-conditional()
+      return
     self.clear-invalid-reference(user reference-path)
     self.invalid-references.add(owner reference-path.copy-new())
     self.added-invalid-references.add(owner reference-path.copy-new())
-    ; if self.reference-inside(
-    ;     user reference-path, user self.checked-invalid-references)
-    ;   node.syntax-error-ref(
-    ;       user "using invalid reference", user reference-path)
 
   func clear-invalid-reference(user ReferencePath reference-path)
-    if reference-path?
-      for refpath in self.invalid-references.iter()
-        if reference-path.equals(user refpath)
-          self.invalid-references.remove(user refpath)
-          return
+    if not reference-path?
+      return
+    for refpath in self.invalid-references.iter()
+      if reference-path.equals(user refpath)
+        self.invalid-references.remove(user refpath)
+        return
+  
+  func check-writing-memory(user Expression expression)
+    user ReferencePath reference-path(
+        user expression.result-type.reference-path)
+    if not reference-path?
+      return
+    reference-path.check-pure-owner(user expression)
+    if self.reference-inside(
+        user reference-path, user self.read-owner-references) or
+        self.reference-inside(
+        user reference-path, user self.written-owner-references)
+      expression.syntax-error-ref(
+          user "using modified reference", user reference-path)
+    expression.check-memory(user self)
+    self.written-owner-references.add(owner reference-path.copy-new())
 
-  func clear-conditional-invalids()
-    var NameMap{ReferencePath} to-delete
-    for reference-path in self.invalid-references.iter()
-      if reference-path.is-conditional()
-        to-delete.add(user _, user reference-path)
-    do
-      while to-delete.pop()->(user reference-path)?
-      self.invalid-references.remove(user reference-path)
-    self.checked-invalid-references.clear()
+  func clear-line-checks()
+    self.read-owner-references.clear()
+    self.written-owner-references.clear()
   
   func reference-inside(
       user ReferencePath reference-path, user List{ReferencePath} list)->(
@@ -205,11 +207,12 @@ struct ReferenceMemoryList
   
   func check-node-reference(
       user ReferencePath reference-path, user SyntaxTreeNode node)
-    if self.is-invalid(user reference-path)
+    if self.is-invalid(user reference-path) or self.reference-inside(
+        user reference-path, user self.written-owner-references)
       node.syntax-error-ref(
           user "using invalid reference", user reference-path)
     if reference-path?
-      self.checked-invalid-references.add(owner reference-path.copy-new())
+      self.read-owner-references.add(owner reference-path.copy-new())
   
   func check-user(user Expression expression)
     user ReferencePath exp-path(user expression.result-type.reference-path)

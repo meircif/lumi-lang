@@ -3076,15 +3076,15 @@ so.clear()
 new String{12} s
 fun8(strong s)
 s.clear()
-; @ c teo16
+; @ ec teo16
 new Test tgood
 owner Test tbad
-; if b
-;     tgood := to!
-; tgood.meth()
-; if b
-;     tbad := to!
-; tbad.meth()
+if b
+    tgood := to!
+tgood.meth()
+if b
+    tbad := to!
+tbad.meth()
 ; @ ec teo17
 new String{12} s
 do
@@ -3096,10 +3096,10 @@ do
 ; @ eg teo18
 func fun(owner String? s, owner String? s2)
     fun(owner s, owner s)
-; @ g teo19
+; @ eg teo19
 func fun()->(owner String? s, owner String? s2)
-    ; fun()->(owner s, owner s2)
-    ; fun()->(owner s, owner s)
+    fun()->(owner s, owner s2)
+    fun()->(owner s, owner s)
 ; @ eg teo20
 func fun(owner String? s)->(owner String? s2)
     fun(owner s)->(owner s)
@@ -3108,12 +3108,22 @@ struct Test
     var Int x
 func fun(owner Test? t)->(var Int x)
     x := fun(owner t) + t.x
-; @ g teo22
+; @ eg teo22
 struct Test
     var Int x
-; func fun(owner Test? t)->(var Int x)
-;     x := t.x + fun(owner t)
-; @ ec teo23
+func fun(owner Test? t)->(var Int x)
+    x := t.x + fun(owner t)
+; @ eg teo23
+struct Test
+    var Int x
+func fun(owner Test? t)->(var Int x)
+    for _ in fun(owner t):t.x
+; @ eg teo24
+struct Test
+    var Int x
+func fun(owner Test? t)->(var Int x)
+    for _ in t.x:fun(owner t)
+; @ ec teo25
 new String{12} s
 try
     owner String s2(owner s)

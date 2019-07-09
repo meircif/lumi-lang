@@ -8344,9 +8344,9 @@ cannot move non-conditional owner field "t.s"
 /// @ teo9
 using invalid reference "s"
 /// @ teo10
-using invalid reference "t"
+using modified reference "t"
 /// @ teo11
-using invalid reference "t"
+using modified reference "t"
 /// @ teo12
 using invalid reference "t"
 /// @ teo13
@@ -8356,37 +8356,24 @@ cannot modify owner field "s" in non-owner reference "tu.s"
 /// @ teo15
 using invalid reference "s"
 /// @ teo16
-ut_M_Test* tgood = NULL;
-    ut_M_Test* tbad = NULL;
-    INIT_NEW(1, LUMI_block0_cleanup, tgood, ut_M_Test, 1);
+using invalid reference "tbad"
 /// @ teo17
 using invalid reference "s"
 /// @ teo18
-using invalid reference "s"
+using modified reference "s"
 /// @ teo19
-Returncode ut_M_fun(char** s, int* s_Max_length, int** s_Length, char** s2, int* s2_Max_length, int** s2_Length);
-Returncode ut_M_fun(char** s, int* s_Max_length, int** s_Length, char** s2, int* s2_Max_length, int** s2_Length) {
-    Returncode LUMI_err = OK;
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
-    return LUMI_err;
-}
+using modified reference "s"
 /// @ teo20
-using invalid reference "s"
+using modified reference "s"
 /// @ teo21
 using invalid reference "t"
 /// @ teo22
-typedef struct ut_M_Test ut_M_Test;
-struct ut_M_Test {
-    Int x;
-};
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
-    if (self == NULL) return;
-}
+using modified reference "t"
 /// @ teo23
+using invalid reference "t"
+/// @ teo24
+using modified reference "t"
+/// @ teo25
 using invalid reference "s"
 /// @ teu0
 using potentially illegal user reference "s"

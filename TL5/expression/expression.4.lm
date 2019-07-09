@@ -44,7 +44,6 @@ class ExpressionValue(SyntaxTreeNode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     if self.expression?
       self.expression.check-memory(user refs)
-      refs.clear-conditional-invalids()
   
   func inst write-preactions()
     self.expression.write-preactions()

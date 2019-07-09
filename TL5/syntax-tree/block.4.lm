@@ -256,7 +256,9 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       if not variable.is-aux
         var ReferencePath reference-path(user variable)
         refs.mark-invalid-reference(user reference-path, user self)
-    self.check-children-memory(user self.code-nodes, user refs)
+    for code-node in self.code-nodes.iter()
+      refs.clear-line-checks()
+      code-node.check-memory(user refs)
   
   func inst write-set-loop-depth()
     self.write-spaces()
