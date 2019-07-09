@@ -32,6 +32,9 @@ class SyntaxTreeExpression(SyntaxTreeCode)
 class SyntaxTreeReturn(SyntaxTreeCode)
   func dynamic is-end-point()->(var Bool is-end)
     is-end := true
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.get-function().check-outputs-memory(user refs)
   
   func dynamic write()
     self.write-spaces()

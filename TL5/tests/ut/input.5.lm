@@ -1784,6 +1784,10 @@ for n in 5
 for n in arr
     i += n
 for n in sarr
+; @ ec te7
+for n in 7
+    i += 1
+var Int n
 ; @@ test-testing
 ; @ c ta0
 assert t.num = 2
@@ -2906,6 +2910,7 @@ struct Test
         self.str.clear()
 func use(user String? s)
 func take(owner String? s)
+func give()->(owner String? s)
 func fun(owner String? s, user Test tu, owner Test to)
     s := _
     s := String{12}()
@@ -2916,6 +2921,8 @@ func fun(owner String? s, user Test tu, owner Test to)
     take(owner to.s)
     var Array{12:Int} arr
     arr[4] := arr[8]
+    do
+        give()->(owner s)
 ; @ g tu0
 func deleting()->(owner String? s)
     s := _
@@ -2949,6 +2956,9 @@ struct Test
     func get()->(user String? s) _
 func Test.get()->(user String? s)
     s := self.s
+func fun(user Test t)->(user String? s)
+    t.get()->(user s)
+    s.set(copy 0, copy 'a')
 ; @ c tu5
 user String? s(user ostr)
 ostr := _
@@ -2999,9 +3009,9 @@ func fun()
 ; @ eg teo5
 struct Test
     owner String? s
-func get-user()->(weak Test? t)
+func get-weak()->(weak Test? t)
 func fun()
-    get-user().s := _
+    get-weak().s := _
 ; @ eg teo6
 struct Test
     owner String s
@@ -3080,6 +3090,8 @@ new String{12} s
 do
     s.clear()
     ostr := s
+    if b
+        continue
     s := String{12}()
 ; @ eg teo18
 func fun(owner String? s, owner String? s2)
@@ -3096,11 +3108,29 @@ struct Test
     var Int x
 func fun(owner Test? t)->(var Int x)
     x := fun(owner t) + t.x
-; @ g teo22
+; @ eg teo22
 struct Test
     var Int x
 func fun(owner Test? t)->(var Int x)
     x := t.x + fun(owner t)
+; @ eg teo23
+struct Test
+    var Int x
+func fun(owner Test? t)->(var Int x)
+    for _ in fun(owner t):t.x
+; @ eg teo24
+struct Test
+    var Int x
+func fun(owner Test? t)->(var Int x)
+    for _ in t.x:fun(owner t)
+; @ ec teo25
+new String{12} s
+try
+    owner String s2(owner s)
+    if b
+        raise
+    s := s2
+s.clear()
 ; @ ec teu0
 user String? s
 so := _
@@ -3349,6 +3379,35 @@ for _ in str
 ; @ ec teu42
 if b
     str.clear()
+; @ ec teu43
+if false
+    str := ostr
+str.clear()
+; @ ec teu44
+str := ostr
+do
+    str.clear()
+    ostr := _
+    if b
+        continue
+    str := ostr
+; @ ec teu45
+str := ostr
+try
+    ostr := _
+    if b
+        raise
+    str := ostr
+str.clear()
+; @ eg teu46
+func fun(user String sin)->(user String? sout)
+    if false
+        sout := sin
+; @ eg teu47
+func fun(user String sin)->(user String? sout)
+    if true
+        return
+    sout := sin
 ; @ eg tev0
 func fun(var String s)
 func error(user String s)

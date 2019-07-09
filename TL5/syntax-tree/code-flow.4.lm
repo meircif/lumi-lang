@@ -23,11 +23,9 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.block.analyze()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
-    self.block.check-memory(user refs)
-    owner ReferencePath reference-path
-    do
-      while self.block.cleared-invalid-references.pop()->(owner reference-path)?
-      refs.mark-invalid-reference(user reference-path, user self)
+    var ReferenceMemoryList block-refs(user refs)
+    self.block.check-memory(user block-refs)
+    refs.add-invalids(user block-refs)
   
   func inst write-block()
     self.block.write-block()
@@ -43,7 +41,6 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     write(user ") goto ")
     self.parent.write-cleanup-label()
     write(user ";\n")
-    
 
 
 ~~~ If statement node in the syntax tree ~~~

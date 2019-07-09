@@ -3,11 +3,12 @@ module tl5-compiler
 
 ~~~ For loop node in the syntax tree ~~~
 class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
-  owner String item-name
-  user SyntaxTreeVariable item
   var ExpressionValue start
   var ExpressionValue iterator
+  owner String item-name
   owner VariableExpression aux-variable
+  owner VariableCreate variable-create
+  user SyntaxTreeVariable item
   user SyntaxTreeFunction has-func
   user SyntaxTreeFunction get-func
   user SyntaxTreeFunction next-func
@@ -66,7 +67,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
       item.is-initialized := true
       self.item := item
       self.parent.variables.add(owner item)
-      self.block.code-nodes.prepend(owner VariableCreate(user self.item))
+      self.variable-create := VariableCreate(user self.item)
     self.item-name := _
     
     if self.iterator.result-type.type-data is-not glob.type-int
@@ -82,6 +83,10 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     base()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
+    if self.variable-create?
+      self.variable-create.check-memory(user refs)
+    var ReferencePath reference-path(user self.item)
+    refs.check-node-reference(user reference-path, user self)
     self.start.check-memory(user refs)
     self.iterator.check-memory(user refs)
     if not self.start.parsed()
