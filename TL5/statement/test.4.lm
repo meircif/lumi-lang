@@ -15,6 +15,7 @@ class SyntaxTreeAssert(SyntaxTreeCode)
   
   func dynamic analyze()
     self.analyze-expression(user self.tested, user glob.type-bool)
+    self.tested.check-no-error()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.tested.check-memory(user refs)
@@ -57,6 +58,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   
   func dynamic analyze()
     self.tested.analyze()
+    self.tested.check-no-error()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.tested.check-memory(user refs)
@@ -172,7 +174,8 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
           self.syntax-error(
               user "already mocking delete of type", user self.type-name)
         self.parent-type.is-delete-mocked := true
-        self.arguments.add-self-parameter(user glob.type-ref, copy Access.COPY)
+        self.arguments.add-self-parameter(
+            user glob.type-ref, copy Access.COPY, copy false)
         self.type-name := _
     else-if self.name.equal(user "new")
       if glob.is-new-mocked
@@ -184,7 +187,8 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       if self.arguments.parameters.first? or self.arguments.outputs.first?
         self.syntax-error-msg(user "mock delete should have no arguments")
       glob.is-delete-mocked := true
-      self.arguments.add-self-parameter(user glob.type-ref, copy Access.COPY)
+      self.arguments.add-self-parameter(
+          user glob.type-ref, copy Access.COPY, copy false)
     else
       self.find-function(user self.name, user self.module-name)->(
           user self.implemented-function)

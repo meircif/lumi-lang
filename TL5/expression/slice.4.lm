@@ -29,6 +29,7 @@ class SliceExpression(Expression)
     analyze-expression()->(owner self.sequence)
     if not self.sequence.result-type?
       self.syntax-error-msg(user "cannot slice a void expression")
+    self.check-expression-conditional-error()->(owner self.sequence)
     if self.sequence.result-type.type-data is glob.type-string
       if not self.second-index?
         self.set-simple-type(user glob.type-char)
@@ -83,6 +84,7 @@ class SliceExpression(Expression)
           owner self.result-type.reference-path)
   
   func inst check-index(user Expression index)
+    index.check-no-error()
     if index.result-type?
       if index.result-type.type-data is-not glob.type-int
         self.syntax-error(

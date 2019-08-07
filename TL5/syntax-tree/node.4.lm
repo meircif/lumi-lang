@@ -92,6 +92,16 @@ class SyntaxTreeNode
           user "expression, expected",
           user expected-type.name)
   
+  func inst check-expression-conditional-error()->(owner Expression expression)
+    if not expression.result-type?
+      return
+    if expression.result-type.conditional and
+        expression.result-type.type-data is-not glob.type-empty
+      expression := CheckExpression(owner expression)
+      expression.analyze()
+    else
+      expression.check-no-error()
+  
   func inst write-line-num()
     write-int(copy self.line-number)
   

@@ -471,6 +471,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
   func dynamic analyze()
     glob.current-module := self.my-module
     self.analyze-expression(user self.value, user glob.type-int)
+    self.value.check-no-error()
     if not self.value.constant
       self.syntax-error-msg(user "value is not constant")
     glob.current-module := _

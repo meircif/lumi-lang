@@ -164,7 +164,7 @@ struct Global
     self.add-operator-copy(
         user "*=", copy 4, copy 3, copy arithmetic-assign-operator-factory)
     self.add-operator(
-        user ":=:", user "SWITCH", copy 4, copy 4, copy switch-operator-factory)
+        user ":=:", user "SWITCH", copy 4, copy 4, copy swap-operator-factory)
   
   func add-operator(
       user String name,

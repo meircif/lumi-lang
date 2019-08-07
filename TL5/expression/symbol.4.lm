@@ -30,6 +30,7 @@ class VariableExpression(Expression)
   func dynamic restructure()->(
       owner Expression expression, owner FunctionArguments arguments)
     if glob.module-map.find(user self.name)?
+      self.check-no-error()
       expression := ModuleExpression(owner self.name)
       return
     
@@ -54,6 +55,7 @@ class VariableExpression(Expression)
           user function,
           owner _,
           copy 0,
+          copy self.error-propagated,
           copy false,
           copy false)
       expression.restructure()->(owner expression, owner arguments)
@@ -114,6 +116,7 @@ class FunctionExpression(Expression)
       user SyntaxTreeFunction function,
       owner Expression instance,
       copy Int bases,
+      copy Bool error-propagated,
       copy Bool after-type,
       copy Bool after-base)
     base(user code-node)
@@ -124,6 +127,7 @@ class FunctionExpression(Expression)
     self.after-base := after-base
     self.set-simple-type(user glob.type-func)
     self.access := Access.VAR
+    self.error-propagated := error-propagated
     self.function.arguments.copy-new()->(owner self.result-type.arguments)
   
   func inst move-new()->(owner FunctionExpression expression)
@@ -132,6 +136,7 @@ class FunctionExpression(Expression)
         user self.function,
         owner self.instance,
         copy self.bases,
+        copy self.error-propagated,
         copy self.after-type,
         copy self.after-base)
     expression.mock-field-used := self.mock-field-used

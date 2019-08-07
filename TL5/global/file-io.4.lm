@@ -13,11 +13,11 @@ func read-c()
     glob.got-new-line := glob.last-char = '\n'
 
 
-~~~ Read from the input file to `text` until a new-line, the file ended, or one
-of the characters in `ends` is reached.
-If `indent` is true, ignore and count trailing spaces.
+~~~ Read from the input file to `text` until reached one of the characters in
+`ends`, a new-line, or the file ended.
+If `indent` is true, ignore and count leading spaces.
 It is possible to "save" previous read result by setting "glob.save-input" to
-true. Next time this function will be colled it will return the saved values.
+true. Next time this function will be called it will return the saved values.
 ~~~
 func read-until(user String ends, copy Bool indent)->(
     user String text, var Int spaces)

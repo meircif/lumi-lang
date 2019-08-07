@@ -129,15 +129,15 @@ class FunctionArguments(SyntaxTreeNode)
           user code-node,
           copy indentation-spaces)
   
-  func inst add-self-parameter(user TypeData type-data, copy Int access)
+  func inst add-self-parameter(
+      user TypeData type-data, copy Int access, copy Bool conditional)
     new DeclarationArgument self-args
     self-args.access := access
     self-args.variable := SyntaxTreeVariable(user _)
     self-args.variable.access := self-args.access
     string-new-copy(user "self")->(owner self-args.variable.name)
     type-data.self-type-instance()->(owner self-args.variable.type-instance)
-    if access != Access.VAR
-      self-args.variable.type-instance.conditional := true
+    self-args.variable.type-instance.conditional := conditional
     self.parameters.prepend(owner self-args)
   
   func inst parse-args(

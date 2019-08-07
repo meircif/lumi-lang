@@ -37,6 +37,9 @@ class ExpressionValue(SyntaxTreeNode)
     self.result-type := self.expression.result-type
     self.access := self.expression.access
     self.constant := self.expression.constant
+
+  func inst check-no-error()
+    self.expression.check-no-error()
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
@@ -47,6 +50,10 @@ class ExpressionValue(SyntaxTreeNode)
   
   func inst write-preactions()
     self.expression.write-preactions()
+
+  func inst check-expression-conditional-error()
+    self.expression.code-node.check-expression-conditional-error()->(
+        owner self.expression)
   
   func dynamic write()
     self.expression.write()
@@ -80,6 +87,7 @@ class Expression(SyntaxTreeNode)
   var Bool is-generic-cast
   var Bool is-complex-field
   var Bool is-var
+  var Bool error-propagated
 
   new(user SyntaxTreeCode code-node)
     self.set-location()
@@ -146,11 +154,13 @@ class Expression(SyntaxTreeNode)
           owner expression)
     
     do
+      if glob.last-char = '!'
+        expression.error-propagated := true
+        read-c()
+        if glob.last-char = '!'
+          code-node.syntax-error-msg(user "only one \"!\" needed")
       if glob.last-char = '?'
         QuestionExpression.parse-new(user _, user code-node)->(owner expression)
-      else-if glob.last-char = '!'
-        ExclamationExpression.parse-new(user _, user code-node)->(
-            owner expression)
       while self.parse-new-follow-operand(user ends, user code-node)->(
           owner expression)
   
@@ -228,11 +238,11 @@ class Expression(SyntaxTreeNode)
           return
     
     new TypeInstance type-instance
+    var Int indentation-spaces
+    if code-node.parent?
+      indentation-spaces := code-node.parent.indentation-spaces
     type-instance.parse-name(
-        user text,
-        user code-node,
-        user code-node,
-        copy code-node.parent.indentation-spaces)
+        user text, user code-node, user code-node, copy indentation-spaces)
     if not has-member and glob.last-char = '('
       InitExpression.parse-new(user _, owner type-instance, user code-node)->(
           owner expression)
@@ -269,6 +279,10 @@ class Expression(SyntaxTreeNode)
     parent-type := _
     if self.code-node?
       self.code-node.get-parent-type()->(user parent-type)
+
+  func inst check-no-error()
+    if self.error-propagated
+      self.syntax-error-msg(user "using \"!\" where there is no error")
 
   func dynamic restructure()->(
       owner Expression expression, owner FunctionArguments arguments)

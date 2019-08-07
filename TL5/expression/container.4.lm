@@ -23,6 +23,7 @@ class BlockExpression(Expression)
     self.expression.result-type.copy-new()->(owner self.result-type)
     self.access := self.expression.access
     self.constant := self.expression.constant
+    self.error-propagated := self.expression.error-propagated
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
@@ -70,6 +71,7 @@ class UnaryExpression(Expression)
   
   func dynamic analyze()
     self.analyze-operand()->(owner self.right-expression)
+    self.right-expression.check-no-error()
     self.constant := self.right-expression.constant
     if self.operator.order = 2
       ; `not` operator
@@ -133,6 +135,7 @@ class UnaryExpression(Expression)
 class BinaryExpression(UnaryExpression)
   owner Expression left-expression
   user BinaryExpression binary-left-expression
+  var Bool allow-right-error
   
   func inst parse-new(
       user String ends,
@@ -150,6 +153,9 @@ class BinaryExpression(UnaryExpression)
   func dynamic analyze()
     self.analyze-operand()->(owner self.right-expression)
     self.analyze-operand()->(owner self.left-expression)
+    self.left-expression.check-no-error()
+    if not self.allow-right-error
+      self.right-expression.check-no-error()
     self.constant :=
         self.left-expression.constant and self.right-expression.constant
     if self.binary-left-expression?
@@ -217,6 +223,7 @@ class QuestionExpression(Expression)
   
   func dynamic analyze()
     analyze-expression()->(owner self.tested)
+    self.tested.check-no-error()
     if not self.tested.result-type?
       self.syntax-error-msg(user "cannot use \"?\" on void expression")
     if self.tested.result-type.type-data.is-primitive and
@@ -250,32 +257,22 @@ class QuestionExpression(Expression)
 
 
 
-~~~ An expression with the "!" operator ~~~
-class ExclamationExpression(Expression)
+~~~ An expression that checks whether an expression is usable ~~~
+class CheckExpression(Expression)
   owner Expression dubious
-
-  func inst parse-new(user SyntaxTreeCode code-node)->(
-      owner Expression expression)
-    new ExclamationExpression exclamation-expression(user code-node)
-    exclamation-expression.parse(owner expression)
-    expression := exclamation-expression
-
-  ~~~ parsing `dubious!` ~~~
-  func inst parse(owner Expression dubious)
+  
+  new(owner Expression dubious)
+    base(user dubious.code-node)
     self.dubious := dubious
-    read-c()
-
-  func dynamic analyze()
-    analyze-expression()->(owner self.dubious)
-    if not self.dubious.result-type?
-      self.syntax-error-msg(user "cannot use \"!\" on void expression")
-    if not self.dubious.result-type.conditional
-      self.syntax-error(
-          user "cannot use \"!\" on non ocnditional reference of type",
-          user self.dubious.result-type.type-data.name)
     self.dubious.result-type.copy-new()->(owner self.result-type)
     self.result-type.conditional := false
     self.access := self.dubious.access
+  
+  func dynamic analyze()
+    if not self.dubious.error-propagated
+      self.syntax-error(
+          user "ignored empty conditional check on type",
+          user self.result-type.type-data.name)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.dubious.check-memory(user refs)

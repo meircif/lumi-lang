@@ -10,6 +10,7 @@ class WrapExpression(Expression)
     self.expression := expression
     self.access := self.expression.access
     self.assignable := self.expression.assignable
+    self.error-propagated := self.expression.error-propagated
     self.expression.result-type.copy-new()->(owner self.result-type)
 
   func dynamic analyze()
@@ -54,9 +55,6 @@ class TypeCastExpression(WrapExpression)
 ~~~ Up-cast expression ~~~
 class UpCastExpression(WrapExpression)
   var Int bases
-  
-  func inst init-new(copy Int bases)->(owner Expression expression)
-    expression := UpCastExpression(owner expression, copy bases)
   
   new(owner Expression expression, copy Int bases)
     base(user expression.code-node, owner expression)

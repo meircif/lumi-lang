@@ -106,6 +106,7 @@ class FunctionCallExpression(CallExpression)
         user self.function.function.arguments,
         user self.actual-params,
         copy self.function.bases)
+    self.function.check-no-error()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
@@ -175,12 +176,14 @@ class FunctionObjectCallExpression(CallExpression)
     self.function-object.restructure()->(
         owner self.function-object, owner self.arguments)
     if not self.arguments?
+      self.function-object.error-propagated := expression.error-propagated
       expression := self.function-object
   
   func dynamic analyze()
     self.function-object.analyze()
     if not self.function-object.result-type?
       self.syntax-error-msg(user "void expression is not callable")
+    self.check-expression-conditional-error()->(owner self.function-object)
     if self.function-object.result-type.type-data is-not glob.type-func
       self.syntax-error(
           user "non callable type",

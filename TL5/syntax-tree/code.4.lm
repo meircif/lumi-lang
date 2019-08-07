@@ -99,6 +99,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
   
   func dynamic analyze()
     self.analyze-expression(user self.condition, user glob.type-bool)
+    self.condition.check-no-error()
   
   func dynamic write()
     ; if (!(`condition`) break;

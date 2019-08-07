@@ -34,6 +34,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     owner TypeInstance type-instance
     if self.start.parsed()
       self.analyze-expression(user self.start, user glob.type-int)
+      self.start.check-no-error()
       self.analyze-expression(user self.iterator, user glob.type-int)
       glob.type-int.new-type-instance()->(owner type-instance)
     else
@@ -49,6 +50,11 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
             owner type-instance)
       else
         self.get-iterator-type()->(owner type-instance)
+    
+    if self.iterator.result-type.type-data.is-primitive
+      self.iterator.check-no-error()
+    else
+      self.iterator.check-expression-conditional-error()
     
     if self.parent.find-variable(user self.item-name, user _)->(user self.item)?
       type-instance.check-assign-to(
@@ -366,6 +372,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
         user meth,
         owner self.aux-variable.copy-new(),
         copy 0,
+        copy false,
         copy false,
         copy false)
     if meth.is-dynamic

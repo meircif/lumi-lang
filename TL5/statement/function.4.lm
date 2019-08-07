@@ -20,6 +20,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   user DeleteGroupBuilder delete-group-builder
   var Int dynamic-base-count
   var Int block-count
+  var Int self-access
+  var Bool self-conditional
   var Bool is-dynamic
   var Bool header-only
   var Bool external-body
@@ -42,6 +44,16 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           self.syntax-error(
               user "expected \"dynamic\" or \"inst\" method type, got",
               user meth-type)
+      user String access-str
+      read-until(user " ?(", copy false)->(user access-str)
+      self.get-access(user access-str)->(var self.self-access)
+      if glob.last-char = '?'
+        self.self-conditional := true
+        read-c()
+        if glob.last-char != ' '
+          self.syntax-error-c(user "expected space after access, got")
+      else-if glob.last-char != ' '
+        self.syntax-error-c(user "missing access before method name")
     else
       self.my-module := glob.current-module
     self.parse-header(copy false)
@@ -82,12 +94,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.parse-arguments(copy is-native)
   
   func inst add-self-parameter()
-    if self.parent-type.constructor is self
-      self.arguments.add-self-parameter(
-          user self.parent-type, copy Access.VAR)
-    else
-      self.arguments.add-self-parameter(
-          user self.parent-type, copy Access.USER)
+    self.arguments.add-self-parameter(
+        user self.parent-type,
+        copy self.self-access,
+        copy self.self-conditional)
   
   func inst parse-arguments(copy Bool is-native)
     var DeclarationArgumentFactory argument-factory
@@ -178,6 +188,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       self.check-already-implemented()
       if self.parent-type.constructor is self.implemented-function
         self.parent-type.constructor := self
+      self.self-access := self.implemented-function.self-access
+      self.self-conditional := self.implemented-function.self-conditional
       self.add-self-parameter()
     self.arguments.link-types()
     base()
@@ -381,6 +393,8 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
   func inst parse(user TypeData parent-type)
     self.parent-type := parent-type
     self.indentation-spaces := INDENTATION-SPACES
+    self.self-access := Access.VAR
+    self.self-conditional := false
     self.parent-type.constructor := self
     string-new-copy(user "new")->(owner self.name)
     self.parse-arguments(copy false)
