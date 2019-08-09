@@ -138,7 +138,7 @@ if (ref == NULL) RAISE(line, cleanup, empty_object)
   if (refman != NULL && (refman)->value == NULL) \
     RAISE(line, cleanup, outdated_weak_reference)
 
-#define CHECK_REF_AND_REFMAN(line, cleanup, ref, refman) \
+#define CHECK_REF_REFMAN(line, cleanup, ref, refman) \
   CHECK_REF(line, cleanup, ref) \
   if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)
 

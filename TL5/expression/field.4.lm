@@ -57,7 +57,7 @@ class FieldExpression(Expression)
             user self.name,
             user "is not a global member of type",
             user instance-type.type-data.name)
-      self.check-expression-conditional-error()->(owner self.instance)
+      self.check-expression-all-errors()->(owner self.instance)
       self.is-complex-field := (self.variable.access = Access.VAR and
           not self.variable.type-instance.type-data.is-primitive) or
           self.variable.access = Access.S-VAR

@@ -183,7 +183,7 @@ class FunctionObjectCallExpression(CallExpression)
     self.function-object.analyze()
     if not self.function-object.result-type?
       self.syntax-error-msg(user "void expression is not callable")
-    self.check-expression-conditional-error()->(owner self.function-object)
+    self.check-expression-all-errors()->(owner self.function-object)
     if self.function-object.result-type.type-data is-not glob.type-func
       self.syntax-error(
           user "non callable type",

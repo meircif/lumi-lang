@@ -190,10 +190,10 @@ struct TypeInstance
   
   func check-assign-from(copy Int access, user SyntaxTreeNode node)->(
       owner Expression value)
-    if not self.conditional and not self.type-data is glob.type-ref
-      node.check-expression-conditional-error()->(owner value)
-    else
-      value.check-no-error()
+    node.check-expression-errors(
+        copy not self.conditional and self.type-data is-not glob.type-ref,
+        copy access != Access.WEAK)->(
+        owner value)
     var Int bases
     value.result-type.check-assign-to(
         copy value.access, user self, copy access, user node)->(var bases)

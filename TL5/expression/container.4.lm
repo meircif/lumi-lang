@@ -260,19 +260,33 @@ class QuestionExpression(Expression)
 ~~~ An expression that checks whether an expression is usable ~~~
 class CheckExpression(Expression)
   owner Expression dubious
+  var Bool check-conditional
+  var Bool check-weak
   
-  new(owner Expression dubious)
+  new(owner Expression dubious, copy Bool check-conditional, copy Bool check-weak)
     base(user dubious.code-node)
+    self.check-conditional :=
+        check-conditional and dubious.result-type.conditional
+    self.check-weak := check-weak and dubious.access = Access.WEAK
     self.dubious := dubious
     self.dubious.result-type.copy-new()->(owner self.result-type)
-    self.result-type.conditional := false
-    self.access := self.dubious.access
+    if self.check-conditional
+      self.result-type.conditional := false
+    if self.check-weak
+      self.access := Access.USER
+    else
+      self.access := self.dubious.access
   
   func dynamic analyze()
     if not self.dubious.error-propagated
-      self.syntax-error(
-          user "ignored empty conditional check on type",
-          user self.result-type.type-data.name)
+      if self.check-conditional
+        self.syntax-error(
+            user "ignored empty reference check on type",
+            user self.result-type.type-data.name)
+      else
+        self.syntax-error(
+            user "ignored weak reference check on type",
+            user self.result-type.type-data.name)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.dubious.check-memory(user refs)
@@ -280,7 +294,12 @@ class CheckExpression(Expression)
 
   func dynamic write-preactions()
     self.dubious.write-preactions()
-    self.write-macro-init(user "CHECK_REF", user self)
+    write(user "CHECK")
+    if self.check-conditional
+      write(user "_REF")
+    if self.check-weak
+      write(user "_REFMAN")
+    self.write-macro-init(user "", user self)
     write(user ")\n")
     self.code-node.write-spaces()
 

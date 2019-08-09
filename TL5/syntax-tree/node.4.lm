@@ -92,12 +92,19 @@ class SyntaxTreeNode
           user "expression, expected",
           user expected-type.name)
   
-  func inst check-expression-conditional-error()->(owner Expression expression)
+  func inst check-expression-all-errors()->(owner Expression expression)
+    self.check-expression-errors(copy true, copy true)->(owner expression)
+  
+  func inst check-expression-errors(
+      copy Bool check-conditional, copy Bool check-weak)->(
+      owner Expression expression)
     if not expression.result-type?
       return
-    if expression.result-type.conditional and
-        expression.result-type.type-data is-not glob.type-empty
-      expression := CheckExpression(owner expression)
+    if (check-conditional and expression.result-type.conditional) or
+        (check-weak and expression.access = Access.WEAK)
+        ; expression.result-type.type-data is-not glob.type-empty
+      expression := CheckExpression(
+          owner expression, copy check-conditional, copy check-weak)
       expression.analyze()
     else
       expression.check-no-error()

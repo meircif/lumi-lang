@@ -54,7 +54,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     if self.iterator.result-type.type-data.is-primitive
       self.iterator.check-no-error()
     else
-      self.iterator.check-expression-conditional-error()
+      self.iterator.check-expression-all-errors()
     
     if self.parent.find-variable(user self.item-name, user _)->(user self.item)?
       type-instance.check-assign-to(

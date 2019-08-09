@@ -29,7 +29,7 @@ class SliceExpression(Expression)
     analyze-expression()->(owner self.sequence)
     if not self.sequence.result-type?
       self.syntax-error-msg(user "cannot slice a void expression")
-    self.check-expression-conditional-error()->(owner self.sequence)
+    self.check-expression-all-errors()->(owner self.sequence)
     if self.sequence.result-type.type-data is glob.type-string
       if not self.second-index?
         self.set-simple-type(user glob.type-char)

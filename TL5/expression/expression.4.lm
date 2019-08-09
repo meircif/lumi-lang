@@ -51,8 +51,8 @@ class ExpressionValue(SyntaxTreeNode)
   func inst write-preactions()
     self.expression.write-preactions()
 
-  func inst check-expression-conditional-error()
-    self.expression.code-node.check-expression-conditional-error()->(
+  func inst check-expression-all-errors()
+    self.expression.code-node.check-expression-all-errors()->(
         owner self.expression)
   
   func dynamic write()

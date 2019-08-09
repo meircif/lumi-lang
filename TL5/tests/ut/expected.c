@@ -423,13 +423,6 @@ CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_tc, ut_M_tc_Refman)
 CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, *to, *to_Refman)
     ut_M_i = (*to)->num;
 /// @ t4
-LUMI_inc_ref(ut_M_tc_Refman);
-    LUMI_dec_ref(*tco_Refman);
-    *tco_Refman = ut_M_tc_Refman;
-    *tco_Dynamic = ut_M_tc_Dynamic;
-    *tco = ut_M_tc;
-    CHECK_REF_AND_REFMAN(2, LUMI_block0_cleanup, *tco, *tco_Refman)
-    ut_M_i = (*tco)->_base._base._base.num;
 /// @ t5
 CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     CHECK_REF_AND_REFMAN(1, LUMI_block0_cleanup, ut_M_t->t, ut_M_t->t_Refman)
@@ -2084,64 +2077,82 @@ ut_M_Test* tt = NULL;
     tt_Refman = ut_M_t_Refman;
     tt = ut_M_t;
 /// @ te0
-using "!" where there is no error
+ignored empty reference check on type "String"
 /// @ te1
-using "!" where there is no error
+ignored weak reference check on type "Test"
 /// @ te2
-using "!" where there is no error
+ignored empty reference check on type "String"
 /// @ te3
-using "!" where there is no error
+ignored weak reference check on type "String"
 /// @ te4
-using "!" where there is no error
+ignored empty reference check on type "Test"
 /// @ te5
-using "!" where there is no error
+ignored weak reference check on type "Test"
 /// @ te6
-using "!" where there is no error
+ignored empty reference check on type "Func"
 /// @ te7
-using "!" where there is no error
+ignored empty reference check on type "Array"
 /// @ te8
+ignored empty reference check on type "String"
+/// @ ten0
 using "!" where there is no error
-/// @ te9
+/// @ ten1
 using "!" where there is no error
-/// @ te10
+/// @ ten2
 using "!" where there is no error
-/// @ te11
+/// @ ten3
 using "!" where there is no error
-/// @ te12
+/// @ ten4
 using "!" where there is no error
-/// @ te13
+/// @ ten5
 using "!" where there is no error
-/// @ te14
+/// @ ten6
 using "!" where there is no error
-/// @ te15
+/// @ ten7
 using "!" where there is no error
-/// @ te16
+/// @ ten8
 using "!" where there is no error
-/// @ te17
+/// @ ten9
 using "!" where there is no error
-/// @ te18
+/// @ ten10
 using "!" where there is no error
-/// @ te19
+/// @ ten11
 using "!" where there is no error
-/// @ te20
+/// @ ten12
 using "!" where there is no error
-/// @ te21
+/// @ ten13
 using "!" where there is no error
-/// @ te22
+/// @ ten14
 using "!" where there is no error
-/// @ te23
+/// @ ten15
 using "!" where there is no error
-/// @ te24
+/// @ ten16
 using "!" where there is no error
-/// @ te25
+/// @ ten17
 using "!" where there is no error
-/// @ te26
+/// @ ten18
 using "!" where there is no error
-/// @ te27
+/// @ ten19
 using "!" where there is no error
-/// @ te28
+/// @ ten20
 using "!" where there is no error
-/// @ te29
+/// @ ten21
+using "!" where there is no error
+/// @ ten22
+using "!" where there is no error
+/// @ ten23
+using "!" where there is no error
+/// @ ten24
+using "!" where there is no error
+/// @ ten25
+using "!" where there is no error
+/// @ ten26
+using "!" where there is no error
+/// @ ten27
+using "!" where there is no error
+/// @ ten28
+using "!" where there is no error
+/// @ ten29
 using "!" where there is no error
 /// @@ test-dynamic
 /// @ t0
@@ -4060,7 +4071,7 @@ using invalid reference "s"
 /// @ te26
 assigning empty into non-conditional type "String"
 /// @ te27
-ignored empty conditional check on type "String"
+ignored empty reference check on type "String"
 /// @ te28
 using invalid reference "error"
 /// @ te29
