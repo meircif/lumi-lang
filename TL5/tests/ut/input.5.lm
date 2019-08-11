@@ -43,7 +43,6 @@ weak Ta? ta
 strong Tb? tb
 weak Tc? tc
 weak Data?{Test} d
-weak Array?{Test} tarr
 weak Array?{String} sarr
 
 func mock()->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
@@ -156,20 +155,20 @@ b := t is _ or ta is-not _
 i := _
 ; @@ test-member-expression
 ; @ c t0
-i := t.num
+i := t!.num
 ; @ c t1
-i := tc.numb
+i := tc!.numb
 ; @ c t2
-i := tc.num
+i := tc!.num
 ; @ c t3
-i := to.num
+i := to!.num
 ; @ c t4
 tco := tc
-i := tco.num
+i := tco!.num
 ; @ c t5
-i := t.t.num
+i := t!.t!.num
 ; @ c t6
-i := t.t.t.num
+i := t!.t!.t!.num
 ; @ ec te0
 error
 ; @ ec te1
@@ -180,21 +179,22 @@ t.error
 5.error
 ; @@ test-slice-expression
 ; @ c t0
-c := ostr[13]
+c := ostr![13]
 ; @ c t1
 user Array?{Char} x
-x := ostr[2:6]
+x := ostr![2:6]
 ; @ c t2
-i := arr[13]
+i := arr![13]
 ; @ c t3
 user Array?{Int} x
-x := arr[2:6]
+x := arr![2:6]
 ; @ c t4
-ostr[4] := c
+ostr![4] := c
 ; @ c t5
-arr[4] := i
+arr![4] := i
 ; @ c t6
-t := tarr[3]
+strong Array?{Test} tarr
+t := tarr![3]
 ; @ c t7
 var Array{8:String{5}} vsa
 user String s(user vsa[3])
@@ -202,24 +202,24 @@ user Array{String} sa(user vsa[2:4])
 ; @ g t8
 func fun(s-var String s, strong Array{String} sa)
     var Char c(copy s[5])
-    user Array{Char} part(user s[4:2])
-    user String si(user sa[3])
+    user Array{Char} part(user s[4:2]!)
+    user String si(user sa[3]!)
 ; @ c t9
 strong Array?{String} sa
-sa[3].copy(user "text")
+sa![3]!.copy(user "text")
 sa := _
 ; @ c t10
 strong Array?{Array{Int}} aai
-arr := aai[3]
-weak Array?{Array{Int}} ua(weak aai[2:4])
+arr := aai![3]
+weak Array?{Array{Int}} ua(weak aai![2:4])
 ; @ c t11
 strong Array?{Array{Array{Array{Int}}}} aai
-weak Array?{Array{Array{Int}}} ua(weak aai[3])
-weak Array?{Array{Array{Array{Int}}}} uaa(weak aai[2:4])
+weak Array?{Array{Array{Int}}} ua(weak aai![3])
+weak Array?{Array{Array{Array{Int}}}} uaa(weak aai![2:4])
 ; @ c t12
 strong Array?{Array{Array{String}}} aas
-weak Array?{Array{String}} ua(weak aas[3])
-weak Array?{Array{Array{String}}} uaa(weak aas[2:4])
+weak Array?{Array{String}} ua(weak aas![3])
+weak Array?{Array{Array{String}}} uaa(weak aas![2:4])
 aas := _
 ; @ c t13
 var Array{8:Array{7:Array{6:Array{5:Int}}}} aai
@@ -254,20 +254,20 @@ arr[2:3
 ; @ ec te3
 i[2]
 ; @ ec te4
-arr[str]
+arr![str]
 ; @ ec te5
-arr[3:str]
+arr![3:str]
 ; @ ec te6
-arr[i += 3]
+arr![i += 3]
 ; @ ec te7
-str[2:5] := so
+str![2:5] := so
 ; @ ec te8
-arr[7:2] := Array{5:Int}()
+arr![7:2] := Array{5:Int}()
 ; @ ec te9
 user Array?{Test} at
-at[0] := t
+at![0] := t
 ; @ ec te10
-so := sarr[3]
+so := sarr![3]
 ; @ ec te11
 var Array{3:Tc} error
 ; @ eg te12
@@ -304,20 +304,20 @@ io := fun5(copy 4)
 ; @ c t9
 so := fun3(copy 7)
 ; @ c t10
-t.meth()
+t!.meth()
 ; @ c t11
 to.meth()
 ; @ c t12
-tc.methc()
+tc!.methc()
 ; @ c t13
-tc.methb()
+tc!.methb()
 ; @ c t14
-tc.meth()
+tc!.meth()
 ; @ c t15
 tco := tc
-tco.meth()
+tco!.meth()
 ; @ c t16
-t.t.meth()
+t!.t!.meth()
 ; @ c t17
 fun1(copy 3, user ostr, owner so)
 ; @ c t18
@@ -333,13 +333,13 @@ class Test(Base)
 ; @ g t20
 class Test
     var Int x
-    func dynamic user meth()
+    func dynamic weak? meth()
 func mock()->(weak Test? t)
     mock()->(weak t).meth()
 ; @ g t21
 class Test
     var Int x
-    func dynamic user meth()->(weak Test? t)
+    func dynamic weak? meth()->(weak Test? t)
         self.meth().meth()
 ; @ g t22
 func fun()->(owner Array?{String} astr)
@@ -360,7 +360,7 @@ func fun(var String s)
 ; @ c t24
 strong String? s
 weak String? sw
-fun1(copy 0, user sw, owner s)
+fun1(copy 0, user sw!, owner s)
 ; @ c t25
 fun8(strong ostr)
 ; @ ec te0
@@ -414,11 +414,11 @@ owner Tb? tbo
 fun7(weak tbo)
 ; @@ test-type-expression
 ; @ c t0
-Test.meth(user t)
+Test.meth(user t!)
 ; @ c t1
-Tb.methb(user tc)
+Tb.methb(user tc!)
 ; @ c t2
-Tc.meth(user tc)
+Tc.meth(user tc!)
 ; @ ec t3
 Error
 ; @@ test-base-expression
@@ -573,7 +573,7 @@ i -= b
 b := 3 is t
 ; @ ec te16
 user Array?{Char} ca
-ca := arr
+ca := arr!
 ; @ ec te17
 owner Test? ot
 ot := tb
@@ -621,25 +621,25 @@ s1 :=: s2
 strong String s1(strong String{4}())
 strong String s2(strong String{6}())
 s1 :=: s2
-; @ g t7
+; @ g t8
 struct Test
     owner File f
     new(owner File f)
         self.f := f
-func fun(owner Test? t1, owner Test? t2)
+func fun(owner Test t1, owner Test t2)
     t1.f :=: t2.f
-; @ c t8
+; @ c t9
 user Test t1(user t!)
 user Test t2(user t!)
 t1 :=: t2
-; @ c t9
+; @ c t10
 weak Test t1(weak to!)
 weak Test t2(weak to!)
 t1 :=: t2
-; @ c t10
-i :=: io
 ; @ c t11
-d.item :=: t
+i :=: io
+; @ c t12
+d!.item :=: t
 ; @ ec te0
 t :=: to
 ; @ ec te1
@@ -650,7 +650,7 @@ new String{8} nstr
 ostr :=: nstr
 ; @ ec te3
 weak Array{Char} a(weak so!)
-a :=: so[1:2]
+a :=: so![1:2]
 ; @ ec te4
 ta :=: tc
 ; @ ec te5
@@ -663,7 +663,7 @@ b := ostr?
 ; @ c t1
 b := not arr?
 ; @ c t2
-b := t.fun?
+b := t!.fun?
 ; @ c t3
 b := to?
 ; @ c t4
@@ -710,6 +710,11 @@ fun()
 i := arr[3]
 ; @ ec te8
 for _ in str
+; @ ec te9
+weak String? s
+raise s
+; @ ec teo0
+raise str!!
 ; @ ec ten0
 var String{8} s
 so := s!
@@ -788,6 +793,10 @@ i := a[2:3!]
 ; @ ec ten29
 var Ref r
 r := ostr!
+; @ ec ten30
+raise "error"!
+; @ ec ten31
+raise str!
 ; @@ test-dynamic
 ; @ c t0
 var Ta a
@@ -809,10 +818,10 @@ ta := tc
 ; @ c t8
 ta := _
 ; @ c t9
-weak Array?{Ta} aa
+strong Array?{Ta} aa
 ta := aa![4]
 ; @ c t10
-weak Array?{Tc} ca
+strong Array?{Tc} ca
 ta := ca![4]
 ; @ c t11
 ta!.dyn()
@@ -836,7 +845,7 @@ class Base
     var Int x
     func dynamic user meth()
 class Test(Base)
-    func dynamic user fun()
+    func inst user fun()
         self.meth()
 ; @ c t18
 fun7(weak _)
@@ -1153,7 +1162,7 @@ struct Berror(Aerror)
 class Base
     var Int x
     owner Base? b
-    func dynamic user stat()
+    func inst user stat()
     func dynamic user dyn0()
     func dynamic user dyn1()
 class Mid(Base)
@@ -1438,6 +1447,14 @@ struct Test
         self..x := 3
 ; @ ec te10
 Test.num
+; @ eg te11
+struct Test
+    var Int x
+    func error()
+; @ eg te12
+struct Test
+    var Int x
+    func error?()
 ; @@ test-return
 ; @ g t0
 func name()
@@ -1453,7 +1470,7 @@ func name(user Array{String} arr)
     raise arr[3]
 ; @ c t4
 weak String? s
-raise s
+raise s!
 ; @ ec te0
 return()
 ; @ ec te1

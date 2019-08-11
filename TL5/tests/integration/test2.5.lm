@@ -14,16 +14,16 @@ class MiddleType(integration.BaseType)
         base()
         self.num-mid := 2
     
-    func dynamic meth1(copy Int n, weak String? s)
+    func dynamic user? meth1(copy Int n, weak String? s)
         sys.println(user "MiddleType.meth1")
         base(copy n, weak s)
     
-    func dynamic meth2()
+    func dynamic user meth2()
         sys.println(user "MiddleType.meth2")
         base.meth2()
     
-    func dynamic meth4()
+    func dynamic user meth4()
         sys.println(user "MiddleType.meth4")
     
-    func dynamic meth5(copy Int n, user String? s)
+    func dynamic user meth5(copy Int n, user String? s)
         sys.println(user "MiddleType.meth5")

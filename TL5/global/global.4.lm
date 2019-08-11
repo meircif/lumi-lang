@@ -478,6 +478,9 @@ struct Global
         user name, user builtin-type, user builtin-type)->(user function)
     self.add-builtin-parameter(
         user function, copy access, user builtin-type, user "self")
+    user Argument self-param(user function.arguments.parameters.first.item)
+    function.self-access := self-param.access
+    function.self-conditional := self-param.get-type-instance().conditional
   
   func add-builtin-function(
       user String name,

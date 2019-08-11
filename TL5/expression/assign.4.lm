@@ -63,8 +63,6 @@ class AssignExpression(Expression)
   func dynamic write-preactions()
     self.value.write-preactions()
     self.target.write-preactions()
-    if self.value.access = Access.WEAK and self.target.access = Access.USER
-      self.value.write-check-refman()
     if access-is-owner(copy self.target.access)
       self.write-owner-assign-preactions()
     self.write-assign-preactions(copy true)

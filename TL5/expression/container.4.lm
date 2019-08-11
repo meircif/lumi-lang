@@ -248,13 +248,12 @@ class QuestionExpression(Expression)
     self.tested.write-safe()
     write(user " != NULL")
     if access-has-refman(copy self.tested.access)
-      write(user " && ")
-      self.tested.write-refman-safe()
-      write(user "->value != NULL")
+      write(user " && (")
+      self.tested.write-refman()
+      write(user ")->value != NULL")
     
   func dynamic write-safe()
     self.write-with-brackets()
-
 
 
 ~~~ An expression that checks whether an expression is usable ~~~
@@ -276,6 +275,11 @@ class CheckExpression(Expression)
       self.access := Access.USER
     else
       self.access := self.dubious.access
+    self.assignable := self.dubious.assignable
+    self.constant := self.dubious.constant
+    self.is-generic-cast := self.dubious.is-generic-cast
+    self.is-complex-field := self.dubious.is-complex-field
+    self.is-var := self.dubious.is-var
   
   func dynamic analyze()
     if not self.dubious.error-propagated
@@ -299,12 +303,33 @@ class CheckExpression(Expression)
       write(user "_REF")
     if self.check-weak
       write(user "_REFMAN")
-    self.write-macro-init(user "", user self)
+    self.write-macro-first-params()
+    if self.check-conditional
+      self.dubious.write()
+      if self.check-weak
+        write(user ", ")
+    if self.check-weak
+      self.dubious.write-refman()
     write(user ")\n")
     self.code-node.write-spaces()
 
   func dynamic write()
     self.dubious.write()
+  
+  func dynamic write-cast()
+    self.dubious.write-cast()
 
   func dynamic write-safe()
     self.dubious.write-safe()
+  
+  func dynamic write-dynamic()
+    self.dubious.write-dynamic()
+  
+  func dynamic write-dynamic-cast()
+    self.dubious.write-dynamic-cast()
+  
+  func dynamic write-dynamic-safe()
+    self.dubious.write-dynamic-safe()
+  
+  func dynamic write-refman()
+    self.dubious.write-refman()

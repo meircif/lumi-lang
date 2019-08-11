@@ -109,10 +109,6 @@ class SliceExpression(Expression)
     self.sequence.write-preactions()
     self.index.write-preactions()
     
-    if self.sequence.is-dubious()
-      self.sequence.write-check-ref()
-      self.code-node.write-spaces()
-    
     ; if (index < 0 || index >= [*]`seq`_Length)
     ; if (index < 0 || second < 0 || index + second > [*]`seq`_Length)
     ;     RAISE(`slice_index`)

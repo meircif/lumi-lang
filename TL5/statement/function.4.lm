@@ -46,14 +46,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
               user meth-type)
       user String access-str
       read-until(user " ?(", copy false)->(user access-str)
-      self.get-access(user access-str)->(var self.self-access)
       if glob.last-char = '?'
         self.self-conditional := true
         read-c()
-        if glob.last-char != ' '
-          self.syntax-error-c(user "expected space after access, got")
-      else-if glob.last-char != ' '
-        self.syntax-error-c(user "missing access before method name")
+      if glob.last-char != ' '
+        self.syntax-error-msg(user "missing access before method name")
+      self.get-access(user access-str)->(var self.self-access)
     else
       self.my-module := glob.current-module
     self.parse-header(copy false)

@@ -54,7 +54,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     if self.iterator.result-type.type-data.is-primitive
       self.iterator.check-no-error()
     else
-      self.iterator.check-expression-all-errors()
+      self.iterator.check-all-errors()
     
     if self.parent.find-variable(user self.item-name, user _)->(user self.item)?
       type-instance.check-assign-to(
@@ -249,9 +249,6 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     ;   `item` = `aux-var`[`item`_Index];
     ;   `block...`
     ; }}
-    if self.aux-variable.is-dubious()
-      self.aux-variable.write-check-ref()
-      self.write-spaces()
     write(user "{int ")
     write-cname(user self.item.name)
     write(user "_Index; for (")

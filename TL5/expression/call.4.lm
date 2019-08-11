@@ -79,9 +79,6 @@ class CallExpression(Expression)
   func dynamic write-refman()
     self.output.write-refman()
   
-  func dynamic write-refman-safe()
-    self.output.write-refman-safe()
-  
   func dynamic write-dynamic()
     self.output.write-dynamic()
   
@@ -296,8 +293,6 @@ class CallArgument(Argument)
       write(user " != NULL) ")
       self.code-node.write-raise(user "empty_base_output")
       self.code-node.write-spaces()
-    if self.value.access = Access.WEAK and self.access = Access.USER
-      self.value.write-check-refman()
     if self.value.access = Access.STRONG and self.access = Access.OWNER and
         self.value.result-type.type-data is-not glob.type-empty
       ; LUMI_var_dec_ref(s_Refman);

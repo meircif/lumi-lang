@@ -125,9 +125,6 @@ class FieldExpression(Expression)
 
   func dynamic write-preactions()
     self.instance.write-preactions()
-    if self.instance.is-dubious()
-      self.instance.write-check-ref()
-      self.code-node.write-spaces()
 
   func dynamic write()
     if self.instance.is-complex-field

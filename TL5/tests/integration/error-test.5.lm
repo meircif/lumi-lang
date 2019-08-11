@@ -3,10 +3,10 @@ module error
 
 class BaseType
     var Int x
-    func dynamic meth()
+    func dynamic user? meth()
 
 class TopType(BaseType)
-    func dynamic meth()
+    func dynamic user? meth()
 
 func f-get-top()->(user TopType? top)
     top := _
@@ -42,31 +42,31 @@ test fail-slice-index()
 
 test fail-member-empty()
     user BaseType? obj
-    assert obj.x = 0
+    assert obj!.x = 0
     obj.meth()
 
 test fail-member-outdated()
     strong BaseType? obj-owner(strong BaseType())
     weak BaseType? obj(weak obj-owner)
     obj-owner := _
-    assert obj.x = 0
-    obj.meth()
+    assert obj!.x = 0
+    obj!.meth()
 
 test fail-sequence-empty()
     user Array?{Int} arr
-    assert arr[0] = 0
+    assert arr![0] = 0
 
 test fail-sequence-outdated()
     strong Array?{Int} arr-owner(strong Array{2:Int}())
     weak Array?{Int} arr(weak arr-owner)
     arr-owner := _
-    assert arr[0] = 0
+    assert arr![0] = 0
 
 test fail-slice-outdated()
     strong Array?{Int} arr-owner(strong Array{6:Int}())
-    weak Array?{Int} arr(weak arr-owner[2:3])
+    weak Array?{Int} arr(weak arr-owner![2:3])
     arr-owner := _
-    assert arr[0] = 0
+    assert arr![0] = 0
 
 test fail-dynamic-empty()
     user BaseType? obj

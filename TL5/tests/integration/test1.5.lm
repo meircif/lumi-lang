@@ -15,23 +15,23 @@ class TopType(covered.MiddleType)
         self.num-top := 3
     
     
-    func dynamic meth2()
+    func dynamic user meth2()
         sys.println(user "TopType.meth2")
         base()
         covered.MiddleType.meth2(user self)
         BaseType.meth2(user self)
     
-    func dynamic meth3(copy Int n, user String s)
+    func dynamic user meth3(copy Int n, user String s)
         sys.println(user "TopType.meth3")
         base.meth3(copy n, user s)
     
-    func dynamic meth5(copy Int n, weak String? s)
+    func dynamic user meth5(copy Int n, weak String? s)
         sys.println(user "TopType.meth5")
-        base(copy n, user s)
+        base(copy n, user s!)
         covered.MiddleType.meth1(user _, copy n, weak s)
         BaseType.meth1(user _, copy n, weak s)
     
-    func dynamic meth6()
+    func dynamic user meth6()
         sys.println(user "TopType.meth6")
         self.num-mid := self.num-base
         self.top-base-ref := self.top-mid-ref
@@ -49,16 +49,16 @@ class BaseType
     new()
         self.num-base := 1
     
-    func dynamic meth0()
+    func dynamic user meth0()
         sys.println(user "BaseType.meth0")
     
-    func dynamic meth1(copy Int n, weak String? s)
+    func dynamic user? meth1(copy Int n, weak String? s)
         sys.println(user "BaseType.meth1")
     
-    func dynamic meth2()
+    func dynamic user meth2()
         sys.println(user "BaseType.meth2")
     
-    func dynamic meth3(copy Int n, user String s)
+    func dynamic user meth3(copy Int n, user String s)
         sys.println(user "BaseType.meth3")
 
 
@@ -148,12 +148,12 @@ test test-dynamic-type-parameters()
     dmid.item := ttop
     weak BaseType? tbase
     tbase := dmid.item
-    assert tbase.num-base = 12
+    assert tbase!.num-base = 12
     ttop.num-base := 13
     dmid.set(weak ttop)
     tbase := _
     dmid.get()->(weak tbase)
-    assert tbase.num-base = 13
+    assert tbase!.num-base = 13
 
 
 struct Link
@@ -163,7 +163,7 @@ class BaseLink
     strong BaseLink? next
     weak Link? link
     
-    func dynamic m-meth()
+    func dynamic user m-meth()
         ; do nothing
 
 class TopLink{Generic}(BaseLink)
@@ -226,12 +226,12 @@ test test-simple-delete()
     assert not l-user?
     assert not deleted-refmans?
     assert deleted-links?
-    assert deleted-links.ref is l-ref
-    assert not deleted-links.next?
+    assert deleted-links!.ref is l-ref
+    assert not deleted-links!.next?
     l-user := _
     assert deleted-refmans?
-    assert deleted-refmans.ref is l-ref
-    assert not deleted-refmans.next?
+    assert deleted-refmans!.ref is l-ref
+    assert not deleted-refmans!.next?
     get-outdated-var()->(weak l-user)
     assert l-user is-not _
     assert not l-user?
@@ -246,11 +246,11 @@ func has-ref(copy Ref ref)->(owner RefNode? node)
 
 func has-ref-rec(copy Ref ref)->(owner RefNode? node)
     assert node?
-    if node.ref is ref
-        owner RefNode? next(owner node.next)
+    if node!.ref is ref
+        owner RefNode? next(owner node!.next)
         node := next
     else
-        has-ref-rec(copy ref)->(owner node.next)
+        has-ref-rec(copy ref)->(owner node!.next)
 
 test test-complex-delete()
     assert not deleted-refmans?
@@ -276,25 +276,25 @@ test test-complex-delete()
     strong Link? l3(strong Link())
     var Ref l3-ref(copy l3)
     
-    b1.link := l1
-    b2.link := l2
-    t1.link := l1
-    t2.link := l2
-    t3.link := l3
+    b1!.link := l1
+    b2!.link := l2
+    t1!.link := l1
+    t2!.link := l2
+    t3!.link := l3
     
-    l2.next := l3
+    l2!.next := l3
     assert not l3?
-    l1.next := l2
+    l1!.next := l2
     assert not l2?
-    t3.item := b2
+    t3!.item := b2
     assert not b2?
-    t2.item := t3
+    t2!.item := t3
     assert not t3?
-    t1.next := t2
+    t1!.next := t2
     assert not t2?
-    t1.item := l1
+    t1!.item := l1
     assert not l1?
-    b1.next := t1
+    b1!.next := t1
     assert not t1?
     
     assert not deleted-refmans?
@@ -436,15 +436,15 @@ test test-assert-error-message()
     assert-error test-mid-out()->(user base-user),
             "non empty base class given as output argument"
     strong Array?{Int} arr(strong Array{2:Int}())
-    assert-error arr[6], "slice index out of bounds"
+    assert-error arr![6], "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
     arr := _
     assert-error arr.length(), "empty object used"
-    assert-error arr2.length(), "outdated weak reference used"
-    assert-error arr[0], "empty object used"
-    assert-error arr2[0], "outdated weak reference used"
+    assert-error arr2!.length(), "outdated weak reference used"
+    assert-error arr![0], "empty object used"
+    assert-error arr2![0], "outdated weak reference used"
     user TopType? top(user _)
-    assert-error top.meth2(), "empty object used"
+    assert-error top!.meth2(), "empty object used"
     new-fail-countdown := 1
     assert-error alloc(), "insufficient memory for object dynamic allocation"
     new-fail-countdown := 2

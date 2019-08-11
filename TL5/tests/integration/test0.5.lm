@@ -38,7 +38,7 @@ struct SimpleStruct
 class SimpleClass
     var Int x
     weak String? s
-    func dynamic fun()
+    func dynamic user fun()
         self.x := 0
 
 
@@ -68,15 +68,15 @@ func test-const-expression()->(
     t := _
     d := _
     f := _
-    f()
+    f!()
 
 
 func test-member-expression(strong TestStruct t)->(
         weak TestStruct? to, var Int i)
     to := t
-    t.num := to.num + t.ts.num + t.ts.ts.num
-    to.num := t.num
-    t.ts.ts.num := 4
+    t.num := to!.num + t.ts!.num + t.ts!.ts!.num
+    to!.num := t.num
+    t.ts!.ts!.num := 4
     t.fun := test-void
     t.fun()
     t.new(copy 0, user "")
@@ -84,11 +84,11 @@ func test-member-expression(strong TestStruct t)->(
 
 func test-slice-expression(
         user String s,
-        weak Array{Int} arri,
-        weak Array{String} arrs,
-        weak Array{SimpleStruct} arrt,
-        weak Array{SimpleClass} arrd,
-        weak Array{Func{()}} arrf)->(
+        strong Array{Int} arri,
+        strong Array{String} arrs,
+        strong Array{SimpleStruct} arrt,
+        strong Array{SimpleClass} arrd,
+        strong Array{Func{()}} arrf)->(
         var Char c,
         var Int i,
         weak SimpleStruct? t,
@@ -99,11 +99,11 @@ func test-slice-expression(
         weak Array?{SimpleStruct} arrto,
         weak Array?{SimpleClass} arrdo,
         weak Array?{Func{()}} arrfo)
-    c := s[2] + s[4:7][2] + arrs[3][2] + arrs[4:2][4][1:3][0]
-    i := arri[i + 3 - arri[2]] + arrt[4].num + arrt[2:4][1].num +
-            arri[3:3][1:2][1]
-    arrio := arri[2 - i + arri[2:4][1]:5 * (i - 1)]
-    s := arrs[4]
+    c := s[2] + s[4:7][2] + arrs[3]![2] + arrs[4:2]![4][1:3][0]
+    i := arri[i + 3 - arri[2]] + arrt[4]!.num + arrt[2:4]![1].num +
+            arri[3:3]![1:2][1]
+    arrio := arri[2 - i + arri[2:4]![1]:5 * (i - 1)]
+    s := arrs[4]!
     arrso := arrs[2:7]
     t := arrt[4]
     arrto := arrt[2:7]
@@ -112,7 +112,7 @@ func test-slice-expression(
     f := arrf[4]
     arrfo := arrf[2:7]
     arrf[4]()
-    arrfo[4]()
+    arrfo![4]()
 
 
 func test-container-expression(copy Int x, copy Int y, user String s)->(
@@ -147,15 +147,15 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     new Array{arr[0]:String{arr[1]}} san
     new Array{arr[0]:Func{()}} sfn
     var Int ix(copy arr[0])
-    user String si(user text)
+    user String si(user text!)
     var String{12} isv(user "some string")
-    new String{i} isn(user text)
+    new String{i} isn(user text!)
     var Func{(copy Int n)->(owner String? st)} fi(copy test-int2str)
-    var TestStruct itv(copy i, user text)
-    new TestStruct itn(copy i, user text)
+    var TestStruct itv(copy i, user text!)
+    new TestStruct itn(copy i, user text!)
     var TestClass idv()
     new TestClass idn()
-    TestStruct(copy i, user text).print()
+    TestStruct(copy i, user text!).print()
     TestClass().print()
     assert String{arr[0]}()?
     assert Array{arr[0]:Int}()?
@@ -166,8 +166,8 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     assert x = 0
     assert s?
     assert a?
-    t.print()
-    d.print()
+    t!.print()
+    d!.print()
     assert f?
     tv.print()
     dv.print()
@@ -227,9 +227,9 @@ struct TestStruct
     multiline
     comment ;]
     
-    func get()->(var Int x, user String? s) _
+    func user get()->(var Int x, user String? s) _
     
-    func print()
+    func user print()
         sys.println(user self.text)
         
 func TestStruct.new(copy Int x, user String? s)
@@ -253,12 +253,12 @@ class TestClass
     new()
         self.num := 1
     
-    func inst static-meth() _
+    func inst user static-meth() _
         
-    func dynamic dynamic-meth() _
+    func dynamic user dynamic-meth() _
     
-    func inst print()
-        sys.println(user self.text)
+    func inst user print()
+        sys.println(user self.text!)
     
 func TestClass.static-meth()
     self.num := 3
@@ -341,31 +341,31 @@ func test-builtins(
     i.str(user so)
     bv := true or false
     a.length()->(var iv)
-    s.length()->(var iv)
+    s!.length()->(var iv)
     so.clear()
-    s.equal(user s)->(var bv)
-    s.get(copy i)->(var cv)
-    s.set(copy i, copy cv)
+    s!.equal(user s!)->(var bv)
+    s!.get(copy i)->(var cv)
+    s!.set(copy i, copy cv)
     so.append(copy c)
-    so.copy(user s)
-    so.concat(user s)
+    so.copy(user s!)
+    so.concat(user s!)
     so.concat-int(copy i)
-    s.find(user s)->(var iv)
-    s.has(copy c)->(var bv)
+    s!.find(user s!)->(var iv)
+    s!.has(copy c)->(var bv)
     owner File? f
-    file-open-read(user s)->(owner f)
-    file-open-write(user s)->(owner f)
+    file-open-read(user s!)->(owner f)
+    file-open-write(user s!)->(owner f)
     f.getc()->(var cv, var bv)
     f.putc(copy c)
-    f.write(user s)
+    f.write(user s!)
     file-close(owner f)
-    user String arg(user sys.argv[1])
-    sys.print(user s)
-    sys.println(user s)
+    user String arg(user sys.argv[1]!)
+    sys.print(user s!)
+    sys.println(user s!)
     sys.getchar()->(var cv, var bv)
     sys.getline(user so)
-    sys.getenv(user s, user so)->(var bv)
-    sys.system(user s)->(var iv)
+    sys.getenv(user s!, user so)->(var bv)
+    sys.system(user s!)->(var iv)
     sys.exit(copy i)
     sys.stdout.putc(copy c)
     sys.stdin.getc()->(var cv, var bv)
@@ -376,7 +376,7 @@ func test-ref-count()
     strong String? s(strong String{32}(user "test string"))
     weak String s-user(weak s!)
     sys.println(user s)
-    sys.println(user s-user)
+    sys.println(user s-user!)
     remove(owner s!)
     if not s?
         sys.println(user "ownership passed")
@@ -385,9 +385,7 @@ func test-ref-count()
     new TestStruct ts(copy 0, user "first struct")
     sys.println(user ts.text)
     ts.ts := TestStruct(copy 1, user "second struct")
-    ; ts := ts.ts!
-    ; sys.println(user ts.text)
-    sys.println(user ts.ts.text)
+    sys.println(user ts.ts!.text)
 
 func remove(owner String s)
     ; remove s
@@ -402,9 +400,9 @@ struct Item
 struct Data{Generic}
     weak Generic? item
     
-    func set(weak Generic? item) _
+    func user set(weak Generic? item) _
     
-    func get()->(weak Generic? item)
+    func user get()->(weak Generic? item)
         item := self.item
         
 func Data.set(weak Generic? item)
@@ -430,7 +428,7 @@ func test-type-parameters(weak Item? s)
     var Array{5:Data{Item}} ad
     s := ad[2].item
     var Data{Data{Data{Item}}} dr
-    s := dr.item.item.item
+    s := dr.item!.item!.item
     d.set(weak s)
     d.get()->(weak s)
     user Data dg(user d)
@@ -453,7 +451,7 @@ func try-catch-raise(user TestStruct t)
 func test-error-handling(user TestStruct? t)
     try
         sys.print(user "error handling { 1 ")
-        t.num := 1
+        t!.num := 1
         sys.print(user " X ")
         try
             test-void()
@@ -463,7 +461,7 @@ func test-error-handling(user TestStruct? t)
         sys.print(user "2 ")
         try
             sys.print(user "3 ")
-            t.num := 2
+            t!.num := 2
             sys.print(user " X ")
         sys.print(user "4 ")
     sys.print(user "5 ")
@@ -486,7 +484,7 @@ struct Container{Generic}
         self.value := value
         self.next := next
     
-    func iter()->(owner ContainerIterator?{Generic} iter)
+    func user iter()->(owner ContainerIterator?{Generic} iter)
         iter := ContainerIterator{Generic}(weak self.next)
 
 struct ContainerIterator{Generic}
@@ -495,14 +493,14 @@ struct ContainerIterator{Generic}
     new(weak Container?{Generic} first)
         self.curr := first
     
-    func has()->(var Bool has-data)
+    func user has()->(var Bool has-data)
         has-data := self.curr?
     
-    func get()->(user Generic? item)
-        item := self.curr.value
+    func user get()->(user Generic? item)
+        item := self.curr!.value
     
-    func next()
-        self.curr := self.curr.next
+    func user next()
+        self.curr := self.curr!.next
 
 func test-for-each()
     var String{16} text
@@ -554,7 +552,7 @@ func test-for-each()
     owner ContainerIterator{Item} iter(owner container.iter()!)
     sys.print(user "values[ ")
     for sc in iter
-        sys.print(user sc.s)
+        sys.print(user sc!.s)
         sys.print(user " ")
     sys.println(user "]")
     
@@ -579,13 +577,13 @@ func test-for-each()
 
 class ComplexField
     weak ComplexField? x
-    func dynamic meth()
+    func dynamic user meth()
         sys.print(user "$")
 
 struct HasComplexField
     s-var ComplexField x
     var Array{3:String{6}} as
-    func run() _
+    func user run() _
 
 func HasComplexField.run()
     user ComplexField x(user self.x)
@@ -593,11 +591,11 @@ func HasComplexField.run()
     x.meth()
     self.x.meth()
     ComplexField.meth(user self.x)
-    user ComplexField? x2(user self.x.x)
-    x2 := self.x.x
-    x2.meth()
-    self.x.x.meth()
-    ComplexField.meth(user self.x.x)
+    user ComplexField? x2(user self.x.x!)
+    x2 := self.x.x!
+    x2!.meth()
+    self.x.x!.meth()
+    ComplexField.meth(user self.x.x!)
     self.as[0].copy(user "a1")
     self.as[1].copy(user "a2")
     self.as[2].copy(user "a3")
@@ -619,7 +617,7 @@ func set-borrow(var TestStruct t)
 func test-borrow()
     var TestStruct t(copy 1, user _)
     set-borrow(var t)
-    assert t.ts.num = 2
+    assert t.ts!.num = 2
 
 func test-switch()
     strong String s1(strong String{32}(user "first string"))

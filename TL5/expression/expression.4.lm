@@ -51,9 +51,13 @@ class ExpressionValue(SyntaxTreeNode)
   func inst write-preactions()
     self.expression.write-preactions()
 
-  func inst check-expression-all-errors()
+  func inst check-all-errors()
     self.expression.code-node.check-expression-all-errors()->(
         owner self.expression)
+      
+  func inst check-errors(copy Bool check-conditional, copy Bool check-weak)
+    self.expression.code-node.check-expression-errors(
+        copy check-conditional, copy check-weak)->(owner self.expression)
   
   func dynamic write()
     self.expression.write()
@@ -254,9 +258,6 @@ class Expression(SyntaxTreeNode)
       FieldExpression.parse-new(user _, owner value, user code-node)->(
           owner expression)
   
-  func inst is-dubious()->(var Bool is-dubious)
-    is-dubious := self.result-type.conditional or self.access = Access.WEAK
-  
   ~~~ Set type instance to be a type that has no sub-type ~~~
   func inst set-simple-type(user TypeData type-data)
     type-data.new-type-instance()->(owner self.result-type)
@@ -291,9 +292,8 @@ class Expression(SyntaxTreeNode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     ; do nothing
   
-  func inst write-macro-name(user String macro-name)
-    ; `macro-name`(`line`, `cleanup`, `expression`
-    write(user macro-name)
+  func inst write-macro-first-params()
+    ; (`line`, `cleanup`, 
     write(user "(")
     self.write-line-num()
     write(user ", ")
@@ -301,7 +301,8 @@ class Expression(SyntaxTreeNode)
     write(user ", ")
   
   func inst write-macro-init(user String macro-name, user Expression expression)
-    self.write-macro-name(user macro-name)
+    write(user macro-name)
+    self.write-macro-first-params()
     expression.write()
   
   func inst write-init-var-ref(user VariableExpression variable)
@@ -331,16 +332,6 @@ class Expression(SyntaxTreeNode)
       self.code-node.write-spaces()
       self.write()
       write(user "_Length = &Lumi_empty_int;\n")
-    
-  func inst write-check-ref()
-    ; CHECK_REF(`line`, `cleanup`, `instance`, `instance-refman`)
-    if access-has-refman(copy self.access)
-      self.write-macro-init(user "CHECK_REF_AND_REFMAN", user self)
-      write(user ", ")
-      self.write-refman()
-    else
-      self.write-macro-init(user "CHECK_REF", user self)
-    write(user ")\n")
   
   func inst write-length(
       user String prefix, user String empty, copy Bool is-static)
@@ -354,12 +345,6 @@ class Expression(SyntaxTreeNode)
     else
       self.write()
       write(user prefix)
-    
-  func inst write-check-refman()
-    self.write-macro-name(user "CHECK_REFMAN")
-    self.write-refman()
-    write(user ")\n")
-    self.code-node.write-spaces()
   
   func dynamic write-cast()
     self.write()
@@ -380,9 +365,6 @@ class Expression(SyntaxTreeNode)
   func dynamic write-refman()
     self.write()
     write(user "_Refman")
-  
-  func dynamic write-refman-safe()
-    self.write-refman()
   
   func dynamic is-mocked-function()->(var Bool is-mock)
     is-mock := false

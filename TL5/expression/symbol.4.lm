@@ -94,13 +94,6 @@ class VariableExpression(Expression)
       write(user "_Dynamic)")
     else
       self.write-dynamic()
-  
-  func dynamic write-refman-safe()
-    if self.variable.is-output
-      write(user "(")
-    base.write-refman()
-    if self.variable.is-output
-      write(user ")")
 
 
 class FunctionExpression(Expression)
