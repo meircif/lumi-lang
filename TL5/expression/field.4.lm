@@ -73,7 +73,7 @@ class FieldExpression(Expression)
         self.access := self.variable.access
       self.assignable := not self.is-complex-field
       if self.variable.type-instance.type-data is glob.type-generic
-        expression := TypeCastExpression(user self.code-node, owner expression)
+        expression := TypeCastExpression(owner expression)
       return
     
     user SyntaxTreeFunction function
