@@ -7,8 +7,6 @@
 #define CCHECK(err) { \
   Returncode LUMI_cerr = err; \
   if (LUMI_cerr != OK) return LUMI_cerr; }
-#define CHECK_NOT_NULL(ref) \
-  if (ref == NULL) { CRAISE(LUMI_error_messages.empty_object.str); }
 
 char* LUMI_raise_format = "Error raised in %s:%d %s()\n";
 char* LUMI_assert_format = "Assert failed in %s:%d %s()\n";
@@ -349,7 +347,6 @@ Returncode open_file(
     CCHECK(file_close(*file));
   }
   *file = NULL;
-  CHECK_NOT_NULL(name)
   if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
     if (lumi_debug_value != LUMI_DEBUG_FAIL) {
       new_fobj = fopen(name, mode);
@@ -358,7 +355,6 @@ Returncode open_file(
       CRAISE("open file failed")
     }
   }
-  if (lumi_debug_value == LUMI_DEBUG_FAIL) printf("open_file fail BUG!\n");
   *file = LUMI_alloc(sizeof(File));
   if (*file == NULL) {
     if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
@@ -384,13 +380,14 @@ Returncode file_open_write(
 
 #define LUMI_FUNC_NAME "file-close"
 Returncode file_close(File* file) {
-  if (lumi_debug_value == LUMI_DEBUG_FAIL ||
-      (file != NULL && file->fobj != NULL)) {
+  if (lumi_debug_value == LUMI_DEBUG_FAIL || file->fobj != NULL) {
     if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(file->fobj) != 0) {
+      free(file);
       CRAISE("close file failed")
     }
     file->fobj = NULL;
   }
+  free(file);
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -414,7 +411,6 @@ Bool getc_is_eof(int get, char* ch) {
 
 #define LUMI_FUNC_NAME "File.getc"
 Returncode File_getc(File* file, Char* out_char, Bool* is_eof) {
-  CHECK_NOT_NULL(file)
   if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)
   *is_eof = getc_is_eof(getc(file->fobj), out_char);
   return OK;
@@ -425,7 +421,6 @@ Returncode File_getc(File* file, Char* out_char, Bool* is_eof) {
 Returncode File_putc(File* file, Char ch) {
   int res = '\0';
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
-    CHECK_NOT_NULL(file)
     if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)
     res = putc(ch, file->fobj);
   }
@@ -440,10 +435,8 @@ Returncode File_putc(File* file, Char ch) {
 Returncode File_write(File* file, char* text, int text_length) {
   int n, ch, res=0;
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
-    CHECK_NOT_NULL(file)
     if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)
   }
-  CHECK_NOT_NULL(text)
   for (n = 0; n < text_length; ++n) {
     ch = text[n];
     if (lumi_debug_value != LUMI_DEBUG_FAIL) {
@@ -458,51 +451,35 @@ Returncode File_write(File* file, char* text, int text_length) {
 #undef LUMI_FUNC_NAME
 
 /*Arrays*/
-#define LUMI_FUNC_NAME "Array.length"
 Returncode Array_length(void* self, int length, Int* length_out) {
-  CHECK_NOT_NULL(self)
   *length_out = length;
   return OK;
 }
-#undef LUMI_FUNC_NAME
 
 /*Strings*/
-#define LUMI_FUNC_NAME "String.length"
 Returncode String_length(
     char* self, int max_length, int *length, Int* length_out) {
-  CHECK_NOT_NULL(self)
   *length_out = *length;
   return OK;
 }
-#undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "String.max-length"
 Returncode String_max_length(
     char* self, int max_length, int *length, Int* max_length_out) {
-  CHECK_NOT_NULL(self)
   *max_length_out = max_length;
   return OK;
 }
-#undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "String.clear"
 Returncode String_clear(char* self, int max_length, int* length) {
-  CHECK_NOT_NULL(self)
   *length = 0;
   return OK;
 }
-#undef LUMI_FUNC_NAME
 
 Returncode String_equal(
     char* self, int max_length, int *length,
     char* other, int other_length,
     Bool* out_equal) {
   if (self == other) {
-    *out_equal = self == NULL || *length == other_length;
-    return OK;
-  }
-  if (self == NULL || other == NULL) {
-    *out_equal = false;
+    *out_equal = *length == other_length;
     return OK;
   }
   if (*length != other_length) {
@@ -516,7 +493,6 @@ Returncode String_equal(
 #define LUMI_FUNC_NAME "String.get"
 Returncode String_get(
     char* self, int max_length, int *length, Int index, Char* out_char) {
-  CHECK_NOT_NULL(self)
   if (index < 0 || index >= *length) {
     CRAISE(LUMI_error_messages.slice_index.str)
   }
@@ -528,7 +504,6 @@ Returncode String_get(
 #define LUMI_FUNC_NAME "String.set"
 Returncode String_set(
     char* self, int max_length, int *length, Int index, Char ch) {
-  CHECK_NOT_NULL(self)
   if (index < 0 || index >= *length) {
     CRAISE(LUMI_error_messages.slice_index.str)
   }
@@ -539,7 +514,6 @@ Returncode String_set(
 
 #define LUMI_FUNC_NAME "String.append"
 Returncode String_append(char* self, int max_length, int* length, Char ch) {
-  CHECK_NOT_NULL(self)
   if (*length + 1 >= max_length) {
     CRAISE(LUMI_error_messages.string_too_long.str)
   }
@@ -557,7 +531,6 @@ Returncode Int_str(Int value, char* str, int str_max_length, int* str_length) {
   int swap;
   char* next;
   char* last;
-  CHECK_NOT_NULL(str)
   is_neg = value < 0;
   abs = value;
   if (is_neg) {
@@ -594,8 +567,7 @@ Returncode Int_str(Int value, char* str, int str_max_length, int* str_length) {
 #define LUMI_FUNC_NAME "String.copy"
 Returncode String_copy(
     char* self, int max_length, int* length, char* source, int source_length) {
-  CHECK_NOT_NULL(self)
-  if (source == NULL || self == source) {
+  if (self == source) {
     return OK;
   }
   if (source_length >= max_length) {
@@ -611,10 +583,6 @@ Returncode String_copy(
 #define LUMI_FUNC_NAME "String.concat"
 Returncode String_concat(
     char* self, int max_length, int* length, char* ext, int ext_length) {
-  CHECK_NOT_NULL(self)
-  if (ext == NULL) {
-    return OK;
-  }
   if (*length + ext_length >= max_length) {
     CRAISE(LUMI_error_messages.string_too_long.str)
   }
@@ -629,24 +597,17 @@ Returncode String_concat(
 Returncode String_concat_int(
     char* self, int max_length, int* length, Int num) {
   int added_length = 0;
-  CHECK_NOT_NULL(self)
   CCHECK(Int_str(num, self + *length, max_length - *length, &added_length));
   *length += added_length;
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "String.find"
 Returncode String_find(
     char* self, int max_length, int *length,
     char* pattern, int pattern_length,
     Int* out_index) {
   int n;
-  CHECK_NOT_NULL(self)
-  if (pattern == NULL) {
-    *out_index = 0;
-    return OK;
-  }
   for (n = 0; n <= *length - pattern_length; ++n) {
     if (strncmp(self + n, pattern, pattern_length) == 0) {
       *out_index = n;
@@ -656,15 +617,10 @@ Returncode String_find(
   *out_index = *length;
   return OK;
 }
-#undef LUMI_FUNC_NAME
 
 Returncode String_has(
     char* self, int max_length, int *length, Char ch, Bool* found) {
   int n;
-  if (self == NULL) {
-    *found = false;
-    return OK;
-  }
   for (n = 0; n < *length; ++n) {
     if (self[n] == ch) {
       *found = true;
@@ -732,9 +688,6 @@ Generic_Type_Dynamic Sys_dynamic = { (Dynamic_Del)Sys_Del };
 #define LUMI_FUNC_NAME "Sys.print"
 Returncode Sys_print(Sys* _, char* text, int text_length) {
   int n, ch, res;
-  if (text == NULL) {
-    return OK;
-  }
   for (n = 0; n < text_length; ++n) {
     ch = text[n];
     res = putchar(ch);
@@ -765,7 +718,6 @@ Returncode Sys_getchar(Sys* _, char* out_char, Bool* is_eof) {
 Returncode Sys_getline(
     Sys* _, char* line, int line_max_length, int* line_length) {
   int ch = 0;
-  CHECK_NOT_NULL(line)
   *line_length = 0;
   if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
     ch = getchar();
@@ -800,7 +752,6 @@ Returncode Sys_system(
     char* command, int command_max_length, int *command_length,
     Int* status) {
   int res = -1;
-  CHECK_NOT_NULL(command)
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
     res = system(command);
   }
@@ -812,15 +763,12 @@ Returncode Sys_system(
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "Sys.getenv"
 Returncode Sys_getenv(
     Sys* _,
     char* name, int name_max_length, int *name_length,
     char* value, int value_max_length, int* value_length,
     Bool* exists) {
   char* ret;
-  CHECK_NOT_NULL(name)
-  CHECK_NOT_NULL(value)
   ret = getenv(name);
   if (ret == NULL) {
     *exists = false;
@@ -831,4 +779,3 @@ Returncode Sys_getenv(
   *exists = true;
   return OK;
 }
-#undef LUMI_FUNC_NAME

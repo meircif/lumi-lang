@@ -128,10 +128,11 @@ struct TypeInstance
       if self.arguments?
         self.arguments.link-types()
     if check-length
-      if self.length?
+      if self.length-owner.parsed()
         node.analyze-expression(user self.length, user glob.type-int)
         if constant-length and not self.length.constant
           node.syntax-error-msg(user "array length is not constant")
+        self.length.check-no-error()
       if self.arguments?
         self.arguments.analyze()
     if self.parameters?

@@ -102,7 +102,6 @@ class SyntaxTreeNode
       return
     if (check-conditional and expression.result-type.conditional) or
         (check-weak and expression.access = Access.WEAK)
-        ; expression.result-type.type-data is-not glob.type-empty
       expression := CheckExpression(
           owner expression, copy check-conditional, copy check-weak)
       expression.analyze()

@@ -689,6 +689,8 @@ tu := fun7(weak _)->(weak t)!
 i := tb!.num
 ; @ c t4
 weak Test tt(weak t!)
+; @ c t5
+new String{str!.length()} s
 ; @ ec te0
 user String s(user str)
 ; @ ec te1
@@ -713,6 +715,8 @@ for _ in str
 ; @ ec te9
 weak String? s
 raise s
+; @ ec te10
+new String{str.length()} s
 ; @ ec teo0
 raise str!!
 ; @ ec ten0
@@ -797,6 +801,8 @@ r := ostr!
 raise "error"!
 ; @ ec ten31
 raise str!
+; @ ec ten32
+var String{23!} s
 ; @@ test-dynamic
 ; @ c t0
 var Ta a
@@ -904,7 +910,7 @@ var Func{()->(var Int x)} fun
 fun := fun0
 ; @@ test-builtin
 ; @ c ti0
-i.str(user ostr)
+i.str(user ostr!)
 ; @ c tb0
 b := true
 ; @ c tb1
@@ -914,60 +920,60 @@ c := EOF
 ; @ c ta0
 arr!.length()->(var i)
 ; @ c ts0
-ostr.length()->(var i)
+ostr!.length()->(var i)
 ; @ c ts1
-ostr.clear()
+ostr!.clear()
 ; @ c ts2
-ostr.equal(user ostr)->(var b)
+ostr!.equal(user ostr!)->(var b)
 ; @ c ts3
-ostr.get(copy i)->(var c)
+ostr!.get(copy i)->(var c)
 ; @ c ts4
-ostr.set(copy i, copy c)
+ostr!.set(copy i, copy c)
 ; @ c ts5
-ostr.append(copy c)
+ostr!.append(copy c)
 ; @ c ts6
 var String{12} sv
-sv.copy(user ostr)
+sv.copy(user ostr!)
 ; @ c ts7
-ostr.concat(user ostr)
+ostr!.concat(user ostr!)
 ; @ c ts8
-ostr.concat-int(copy i)
+ostr!.concat-int(copy i)
 ; @ c ts9
-ostr.find(user ostr)->(var i)
+ostr!.find(user ostr!)->(var i)
 ; @ c ts10
-ostr.has(copy c)->(var b)
+ostr!.has(copy c)->(var b)
 ; @ c ts11
-String.set(user ostr, copy 0, copy 'a')
+String.set(user ostr!, copy 0, copy 'a')
 ; @ c ts12
-ostr.max-length()->(var i)
+ostr!.max-length()->(var i)
 ; @ c tf0
-file-open-read(user ostr)->(owner fobj)
+file-open-read(user ostr!)->(owner fobj)
 ; @ c tf1
-file-open-write(user ostr)->(owner fobj)
+file-open-write(user ostr!)->(owner fobj)
 ; @ c tf2
-file-close(owner fobj)
+file-close(owner fobj!)
 ; @ c tf3
-fobj.getc()->(var c, var b)
+fobj!.getc()->(var c, var b)
 ; @ c tf4
-fobj.putc(copy c)
+fobj!.putc(copy c)
 ; @ c tf5
-fobj.write(user ostr)
+fobj!.write(user ostr!)
 ; @ c ty0
 user Array{String} argv(user sys.argv)
 ; @ c ty1
-sys.print(user ostr)
+sys.print(user ostr!)
 ; @ c ty2
-sys.println(user ostr)
+sys.println(user ostr!)
 ; @ c ty3
 sys.getchar()->(var c, var b)
 ; @ c ty4
-sys.getline(user ostr)
+sys.getline(user ostr!)
 ; @ c ty5
 sys.exit(copy i)
 ; @ c ty6
-sys.system(user ostr)->(var i)
+sys.system(user ostr!)->(var i)
 ; @ c ty7
-sys.getenv(user ostr, user ostr)->(var b)
+sys.getenv(user ostr!, user ostr!)->(var b)
 ; @ c ty8
 sys.stdout.putc(copy c)
 ; @ c ty9
@@ -983,15 +989,15 @@ File()
 ; @ ec tef3
 user File? f
 file-open-read(user "name")->(owner fobj)
-f.putc(copy 'a')
+f!.putc(copy 'a')
 ; @ ec tef4
 user File? f
 file-open-write(user "name")->(owner fobj)
-f.putc(copy 'a')
+f!.putc(copy 'a')
 ; @ ec tef5
 user File? f
-file-close(owner fobj)
-f.putc(copy 'a')
+file-close(owner fobj!)
+f!.putc(copy 'a')
 ; @ ec tef6
 owner File f(owner fobj!)
 file-open-read(user "name")->(owner f)
@@ -1564,7 +1570,7 @@ user String? s(user ostr)
 ; @ c t7
 var String{12} s(user "some string")
 ; @ c t8
-new String{i} s(user ostr)
+new String{i} s(user ostr!)
 ; @ c t9
 user Test? tt(user tc!)
 ; @ c t10
@@ -1833,7 +1839,7 @@ do
 for n in 5
     i += n
 ; @ c t1
-for n in t!.num:ostr.length() + 2
+for n in t!.num:ostr!.length() + 2
     i += n
 ; @ c t2
 for ch in ostr!
@@ -1975,7 +1981,7 @@ func fun()
     sys.print.mocked(user "really print")
     Sys.print.active := false
     sys.print.active := true
-mock Sys.print(user Array?{Char} text)
+mock Sys.print(user Array{Char} text)
 ; @ g tm8
 struct Test
     var Int x
@@ -1997,7 +2003,7 @@ func fun0()
         y += 1
     try
         x := 0
-        sys.print(user _)
+        sys.print(user "")
         y := 0
     catch
         x := 1
@@ -3029,7 +3035,7 @@ func give()->(owner String? s)
 func fun(owner String? s, user Test tu, owner Test to)
     s := _
     s := String{12}()
-    s.set(copy 0, copy 'a')
+    s!.set(copy 0, copy 'a')
     to.s := String{12}()
     user String? su(user tu.s)
     use(user tu.s)
@@ -3050,7 +3056,7 @@ func deleting()->(strong String? s)
 func fun()
     strong String? so(strong String{12}())
     user String? s(user so)
-    s.set(copy 0, copy 'a')
+    s!.set(copy 0, copy 'a')
     deleting()->(strong so)
 ; @ g tu2
 func deleting()->(strong String? s)
@@ -3064,7 +3070,7 @@ func fun()
 user String? s
 so := _
 s := so
-s.set(copy 0, copy 'a')
+s!.set(copy 0, copy 'a')
 ; @ g tu4
 struct Test
     weak String? s
@@ -3073,12 +3079,12 @@ func Test.get()->(user String? s)
     s := self.s!
 func fun(user Test t)->(user String? s)
     t.get()->(user s)
-    s.set(copy 0, copy 'a')
+    s!.set(copy 0, copy 'a')
 ; @ c tu5
 user String? s(user ostr)
 ostr := _
 for s in sarr!
-    s.clear()
+    s!.clear()
 ; @ g tb0
 struct Test
     owner String? s
@@ -3151,7 +3157,7 @@ new String{12} s
 new String{12} sg
 ostr := sg
 sg := s
-ostr.clear()
+ostr!.clear()
 sg.clear()
 s.clear()
 ; @ eg teo10
@@ -3187,7 +3193,7 @@ func fun(owner Test t, user Test tu, owner String s, user String su)
     tu.s :=: s
 ; @ ec teo15
 fun8(strong so)
-so.clear()
+so!.clear()
 new String{12} s
 fun8(strong s)
 s.clear()
@@ -3258,15 +3264,15 @@ s2 := s
 ; @ ec teu2
 user String? s
 so := _
-s.length()->(var i)
+s!.length()->(var i)
 ; @ ec teu3
 user String? s
 so := _
-String.set(user s, copy 0, copy 'a')
+String.set(user s!, copy 0, copy 'a')
 ; @ ec teu4
 user String? s
 so := _
-b := not (false or s.length() > 3)
+b := not (false or s!.length() > 3)
 ; @ eg teu5
 func deleting(owner String? s)
 func fun(user String s)
@@ -3406,7 +3412,7 @@ func fun(user String s)
 ; @ ec teu23
 user String? s
 t!.fun()
-s.set(copy 0, copy 'a')
+s!.set(copy 0, copy 'a')
 ; @ eg teu24
 func deleting(copy Func?{()} f)
     f!()
@@ -3478,30 +3484,30 @@ main
     owner String? so(owner String{12}())
     user String? su(user so)
     so := _
-    su.set(copy 0, copy 'a')
+    su!.set(copy 0, copy 'a')
 ; @ ec teu36
 assert str?
 ; @ ec teu37
-assert-error str.clear()
+assert-error str!.clear()
 ; @ ec teu38
 if str?
 ; @ ec teu39
-for _ in str.length():2
+for _ in str!.length():2
 ; @ ec teu40
-for _ in 2:str.length()
+for _ in 2:str!.length()
 ; @ ec teu41
 for _ in str!
 ; @ ec teu42
 if b
-    str.clear()
+    str!.clear()
 ; @ ec teu43
 if false
     str := ostr
-str.clear()
+str!.clear()
 ; @ ec teu44
 str := ostr
 do
-    str.clear()
+    str!.clear()
     ostr := _
     if b
         continue
@@ -3513,7 +3519,7 @@ try
     if b
         raise
     str := ostr
-str.clear()
+str!.clear()
 ; @ eg teu46
 func fun(user String sin)->(user String? sout)
     if false

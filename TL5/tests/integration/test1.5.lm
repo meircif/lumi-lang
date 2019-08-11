@@ -439,7 +439,7 @@ test test-assert-error-message()
     assert-error arr![6], "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
     arr := _
-    assert-error arr.length(), "empty object used"
+    assert-error arr!.length(), "empty object used"
     assert-error arr2!.length(), "outdated weak reference used"
     assert-error arr![0], "empty object used"
     assert-error arr2![0], "outdated weak reference used"
@@ -457,7 +457,8 @@ test test-builtin-errors()
     
     owner File? file
     var String{4} filename
-    assert-error file-open-read(user _)->(owner file), "empty object used"
+    user String? empty
+    assert-error file-open-read(user empty!)->(owner file), "empty object used"
     lumi-debug-value := 1
     assert-error file-open-write(user filename)->(owner file), "open file failed"
     lumi-debug-value := 2
@@ -467,17 +468,19 @@ test test-builtin-errors()
     new-fail-countdown := 1
     assert-error file-open-write(user filename)->(owner file),
             "insufficient memory for object dynamic allocation"
+    lumi-debug-value := 2
+    file-open-read(user filename)->(owner file)
     lumi-debug-value := 1
-    assert-error file-close(owner file), "close file failed"
+    assert-error file-close(owner file!), "close file failed"
     var Char ch
     lumi-debug-value := 2
     file-open-read(user filename)->(owner file)
-    assert-error file.getc()->(var ch), "file not opened"
-    assert-error file.putc(copy 'a'), "file not opened"
-    assert-error file.write(user "aa"), "file not opened"
+    assert-error file!.getc()->(var ch), "file not opened"
+    assert-error file!.putc(copy 'a'), "file not opened"
+    assert-error file!.write(user "aa"), "file not opened"
     lumi-debug-value := 1
-    assert-error file.putc(copy 'a'), "file write failed"
-    assert-error file.write(user "aa"), "file write failed"
+    assert-error file!.putc(copy 'a'), "file write failed"
+    assert-error file!.write(user "aa"), "file write failed"
     
     assert-error "aa".get(copy 2), "slice index out of bounds"
     assert-error too-long.append(copy 'a'), "string too long"
@@ -492,7 +495,7 @@ test test-builtin-errors()
     assert-error sys.exit(copy 0), "exit failed"
     assert-error sys.system(user "aaa"), "command execution failed"
 
-mock Sys.println(user Array?{Char} text)
+mock Sys.println(user Array{Char} text)
     assert text?
 
 test test-cover-all()

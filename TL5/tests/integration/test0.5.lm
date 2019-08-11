@@ -230,12 +230,12 @@ struct TestStruct
     func user get()->(var Int x, user String? s) _
     
     func user print()
-        sys.println(user self.text)
+        sys.println(user self.text!)
         
 func TestStruct.new(copy Int x, user String? s)
     self.num := x
     if s?
-        new String{s.length() + 1} text(user s)
+        new String{s!.length() + 1} text(user s!)
         self.text := text
     if x < 0
         self.ts := TestStruct(copy x + 1, user self.text)
@@ -355,10 +355,10 @@ func test-builtins(
     owner File? f
     file-open-read(user s!)->(owner f)
     file-open-write(user s!)->(owner f)
-    f.getc()->(var cv, var bv)
-    f.putc(copy c)
-    f.write(user s!)
-    file-close(owner f)
+    f!.getc()->(var cv, var bv)
+    f!.putc(copy c)
+    f!.write(user s!)
+    file-close(owner f!)
     user String arg(user sys.argv[1]!)
     sys.print(user s!)
     sys.println(user s!)
@@ -375,7 +375,7 @@ func test-builtins(
 func test-ref-count()
     strong String? s(strong String{32}(user "test string"))
     weak String s-user(weak s!)
-    sys.println(user s)
+    sys.println(user s!)
     sys.println(user s-user!)
     remove(owner s!)
     if not s?
@@ -383,9 +383,9 @@ func test-ref-count()
     if not s-user?
         sys.println(user "string deleted")
     new TestStruct ts(copy 0, user "first struct")
-    sys.println(user ts.text)
+    sys.println(user ts.text!)
     ts.ts := TestStruct(copy 1, user "second struct")
-    sys.println(user ts.ts!.text)
+    sys.println(user ts.ts!.text!)
 
 func remove(owner String s)
     ; remove s
@@ -530,7 +530,7 @@ func test-for-each()
     tsarr[2].text := String{4}(user "ccc")
     sys.print(user "structs[ ")
     for ts in tsarr
-        sys.print(user ts.text)
+        sys.print(user ts.text!)
         sys.print(user " ")
     sys.println(user "]")
     
