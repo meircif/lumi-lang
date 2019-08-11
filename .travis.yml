@@ -13,6 +13,7 @@ install:
   - sudo apt-get update
   - sudo apt-get install valgrind
   - sudo apt-get install python3-pip
+  - sudo apt-get install python3-enchant
   - pip3 install --user setuptools
   - pip3 install --user sphinx
   - pip3 install --user -r docs/requirements.txt
