@@ -83,6 +83,9 @@ class SliceExpression(Expression)
       self.sequence.result-type.reference-path.copy-new()->(
           owner self.result-type.reference-path)
     
+    if not self.error-propagated
+      self.syntax-error-msg(user "ignoring slice bounds check")
+    self.error-expected := false
     self.code-node.get-function().has-error := true
   
   func inst check-index(user Expression index)

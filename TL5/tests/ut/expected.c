@@ -987,6 +987,8 @@ assigning into an owner a non-owner access "user"
 array of type with constructor "Tc"
 /// @ te12
 array of type with constructor "Test"
+/// @ te13
+ignoring slice bounds check
 /// @@ test-call-expression
 /// @ t0
 LUMI_err = ut_M_fun0();
@@ -1663,7 +1665,7 @@ operator "<" expected "Int" operand, got "Bool"
 /// @ te20
 assigning into a weak reference an illegal access "user"
 /// @ te21
-ignored empty reference check on type "Test"
+ignoring empty reference check on type "Test"
 /// @@ test-swap-expression
 /// @ t0
 ut_M_Test* t1 = NULL;
@@ -2094,27 +2096,27 @@ char* s = NULL;
     CHECK(1, LUMI_block0_cleanup)
     INIT_NEW_STRING(1, LUMI_block0_cleanup, s, aux_Int_0);
 /// @ te0
-ignored empty reference check on type "String"
+ignoring empty reference check on type "String"
 /// @ te1
-ignored weak reference check on type "Test"
+ignoring weak reference check on type "Test"
 /// @ te2
-ignored empty reference check on type "String"
+ignoring empty reference check on type "String"
 /// @ te3
-ignored weak reference check on type "String"
+ignoring weak reference check on type "String"
 /// @ te4
-ignored empty reference check on type "Test"
+ignoring empty reference check on type "Test"
 /// @ te5
-ignored weak reference check on type "Test"
+ignoring weak reference check on type "Test"
 /// @ te6
-ignored empty reference check on type "Func"
+ignoring empty reference check on type "Func"
 /// @ te7
-ignored empty reference check on type "Array"
+ignoring empty reference check on type "Array"
 /// @ te8
-ignored empty reference check on type "String"
+ignoring empty reference check on type "String"
 /// @ te9
-ignored weak reference check on type "String"
+ignoring weak reference check on type "String"
 /// @ te10
-ignored empty reference check on type "String"
+ignoring empty reference check on type "String"
 /// @ teo0
 only one "!" needed
 /// @ ten0
@@ -2377,7 +2379,7 @@ ut_M_Tb* aux_Tb_0 = NULL;
     LUMI_err = ut_M_fun7(NULL, NULL, NULL, &(aux_Tb_0), &(aux_Tb_0_Refman), &(aux_Tb_0_Dynamic));
     CHECK(1, LUMI_block0_cleanup)
 /// @ te0
-ignored empty reference check on type "Test"
+ignoring empty reference check on type "Test"
 /// @@ test-function-object
 /// @ t0
 Returncode (*fun)(void) = NULL;
@@ -4136,7 +4138,7 @@ using invalid reference "s"
 /// @ te26
 assigning empty into non-conditional type "String"
 /// @ te27
-ignored empty reference check on type "String"
+ignoring empty reference check on type "String"
 /// @ te28
 using invalid reference "error"
 /// @ te29

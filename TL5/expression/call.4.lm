@@ -130,7 +130,7 @@ class DynamicCallExpression(FunctionCallExpression)
     if self.self-instance.result-type.conditional
       if not self.self-instance.error-propagated
         self.syntax-error(
-            user "ignored empty reference check on type",
+            user "ignoring empty reference check on type",
             user self.self-instance.result-type.type-data.name)
       self.self-instance.error-expected := false
       self.code-node.get-function().has-error := true

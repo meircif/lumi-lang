@@ -161,11 +161,11 @@ class CheckExpression(WrapExpression)
     if not self.expression.error-propagated
       if self.check-conditional
         self.syntax-error(
-            user "ignored empty reference check on type",
+            user "ignoring empty reference check on type",
             user self.result-type.type-data.name)
       else
         self.syntax-error(
-            user "ignored weak reference check on type",
+            user "ignoring weak reference check on type",
             user self.result-type.type-data.name)
     self.code-node.get-function().has-error := true
 

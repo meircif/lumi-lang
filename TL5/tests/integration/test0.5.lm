@@ -99,20 +99,20 @@ func test-slice-expression(
         weak Array?{SimpleStruct} arrto,
         weak Array?{SimpleClass} arrdo,
         weak Array?{Func{()}} arrfo)
-    c := s[2] + s[4:7][2] + arrs[3]![2] + arrs[4:2]![4][1:3][0]
-    i := arri[i + 3 - arri[2]] + arrt[4]!.num + arrt[2:4]![1].num +
-            arri[3:3]![1:2][1]
-    arrio := arri[2 - i + arri[2:4]![1]:5 * (i - 1)]
+    c := s[2]! + s[4:7]![2]! + arrs[3]![2]! + arrs[4:2]![4]![1:3]![0]!
+    i := arri[i + 3 - arri[2]!]! + arrt[4]!.num + arrt[2:4]![1]!.num +
+            arri[3:3]![1:2]![1]!
+    arrio := arri[2 - i + arri[2:4]![1]!:5 * (i - 1)]!
     s := arrs[4]!
-    arrso := arrs[2:7]
-    t := arrt[4]
-    arrto := arrt[2:7]
-    d := arrd[4]
-    arrdo := arrd[2:7]
-    f := arrf[4]
-    arrfo := arrf[2:7]
-    arrf[4]()
-    arrfo![4]()
+    arrso := arrs[2:7]!
+    t := arrt[4]!
+    arrto := arrt[2:7]!
+    d := arrd[4]!
+    arrdo := arrd[2:7]!
+    f := arrf[4]!
+    arrfo := arrf[2:7]!
+    arrf[4]!()
+    arrfo![4]!()
 
 
 func test-container-expression(copy Int x, copy Int y, user String? s)->(
@@ -140,13 +140,13 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     var Array{12:Func{()}} fa
     new TestStruct tn(copy 0, user _)
     new TestClass dn
-    new String{arr[0]} sn
-    new Array{arr[0]:Int} ian
-    new Array{arr[0]:SimpleStruct} tan
-    new Array{arr[0]:SimpleClass} dan
-    new Array{arr[0]:String{arr[1]}} san
-    new Array{arr[0]:Func{()}} sfn
-    var Int ix(copy arr[0])
+    new String{arr[0]!} sn
+    new Array{arr[0]!:Int} ian
+    new Array{arr[0]!:SimpleStruct} tan
+    new Array{arr[0]!:SimpleClass} dan
+    new Array{arr[0]!:String{arr[1]!}} san
+    new Array{arr[0]!:Func{()}} sfn
+    var Int ix(copy arr[0]!)
     user String si(user text!)
     var String{12} isv(user "some string")
     new String{i} isn(user text!)
@@ -157,12 +157,12 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     new TestClass idn()
     TestStruct(copy i, user text!).print()
     TestClass().print()
-    assert String{arr[0]}().length() > 0
-    assert Array{arr[0]:Int}().length() > 0
-    assert Array{arr[0]:SimpleStruct}().length() > 0
-    assert Array{arr[0]:SimpleClass}().length() > 0
-    assert Array{arr[0]:String{arr[1]}}().length() > 0
-    assert Array{arr[0]:Func{()}}().length() > 0
+    assert String{arr[0]!}().length() > 0
+    assert Array{arr[0]!:Int}().length() > 0
+    assert Array{arr[0]!:SimpleStruct}().length() > 0
+    assert Array{arr[0]!:SimpleClass}().length() > 0
+    assert Array{arr[0]!:String{arr[1]!}}().length() > 0
+    assert Array{arr[0]!:Func{()}}().length() > 0
     assert x = 0
     assert s?
     assert a?
@@ -303,33 +303,33 @@ func test-call-expression()
 
 
 func test-code-flow(user Array{Int} arr)->(var Int res)
-    if arr[4] > 6
+    if arr[4]! > 6
         res := 6
     else-if arr is arr
         res := 6
-    else-if arr[4] <> arr[5]
+    else-if arr[4]! <> arr[5]!
         res := 6
-    else-if 0 = arr[0]
+    else-if 0 = arr[0]!
         res := 6
     else
         res := 0
     do
-        arr[6] := 6
-        var Int x(copy arr[2])
+        arr[6]! := 6
+        var Int x(copy arr[2]!)
         while x > 3 and arr is _
         var Int y(copy x - 1)
         do
-            arr[4] := arr[8]
-            if y > arr[4]
+            arr[4]! := arr[8]!
+            if y > arr[4]!
                 continue
             var Int z(copy 7)
-            if z <= arr[4]
+            if z <= arr[4]!
                 while z > 0
-    for n in arr[2]:2 - (3 * arr[2])
-        arr[0] := arr[2]
-        var Int w(copy arr[0])
-        if w > 4 and arr is-not arr[3:2]
-            arr[1] := w
+    for n in arr[2]!:2 - (3 * arr[2]!)
+        arr[0]! := arr[2]!
+        var Int w(copy arr[0]!)
+        if w > 4 and arr is-not arr[3:2]!
+            arr[1]! := w
 
 
 func test-builtins(
@@ -426,7 +426,7 @@ func test-type-parameters(weak Item? s)
     d.item := s
     s := d.item
     var Array{5:Data{Item}} ad
-    s := ad[2].item
+    s := ad[2]!.item
     var Data{Data{Data{Item}}} dr
     s := dr.item!.item!.item
     d.set(weak s)
@@ -513,9 +513,9 @@ func test-for-each()
     sys.println(user "]")
     
     var Array{3:Int} arr
-    arr[0] := 14
-    arr[1] := 15
-    arr[2] := 16
+    arr[0]! := 14
+    arr[1]! := 15
+    arr[2]! := 16
     sys.print(user "numbers[ ")
     for n in arr
         text.clear()
@@ -525,9 +525,9 @@ func test-for-each()
     sys.println(user "]")
     
     var Array{3:SimpleStruct} tsarr
-    tsarr[0].text := String{4}(user "aaa")
-    tsarr[1].text := String{4}(user "bbb")
-    tsarr[2].text := String{4}(user "ccc")
+    tsarr[0]!.text := String{4}(user "aaa")
+    tsarr[1]!.text := String{4}(user "bbb")
+    tsarr[2]!.text := String{4}(user "ccc")
     sys.print(user "structs[ ")
     for ts in tsarr
         sys.print(user ts.text!)
@@ -536,9 +536,9 @@ func test-for-each()
     
     var Array{3:String{16}} sarr
     
-    sarr[0].copy(user "ddd")
-    sarr[1].copy(user "eee")
-    sarr[2].copy(user "fff")
+    sarr[0]!.copy(user "ddd")
+    sarr[1]!.copy(user "eee")
+    sarr[2]!.copy(user "fff")
     sys.print(user "strings[ ")
     for s in sarr
         sys.print(user s)
@@ -560,7 +560,7 @@ func test-for-each()
     for n in 3
         for m in 3
             for i in 3
-                s := saarr[n][m][i]
+                s := saarr[n]![m]![i]!
                 s.copy(user "val")
                 s.append(copy '0' + n)
                 s.append(copy '0' + m)
@@ -596,9 +596,9 @@ func HasComplexField.run()
     x2!.meth()
     self.x.x!.meth()
     ComplexField.meth(user self.x.x!)
-    self.as[0].copy(user "a1")
-    self.as[1].copy(user "a2")
-    self.as[2].copy(user "a3")
+    self.as[0]!.copy(user "a1")
+    self.as[1]!.copy(user "a2")
+    self.as[2]!.copy(user "a3")
     for s in self.as
         sys.print(user " ")
         sys.print(user s)

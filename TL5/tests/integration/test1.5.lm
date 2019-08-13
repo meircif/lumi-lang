@@ -137,7 +137,7 @@ test test-native()
     var String{4} s(user "bb")
     assert-error external(copy 3, user s)->(var i, var n)
     assert i = 3
-    assert s[0] = 'a'
+    assert s[0]! = 'a'
     assert external2(copy n)
 
 
@@ -330,7 +330,7 @@ test test-complex-delete()
 func has-refs(user Array{Ref} refs, copy Int number)
     record-delete := false
     for n in number
-        has-ref(copy refs[n])->(owner deleted-links)
+        has-ref(copy refs[n]!)->(owner deleted-links)
     record-delete := true
 
 func cleanup-test(user Array{Ref} refs)
@@ -338,24 +338,24 @@ func cleanup-test(user Array{Ref} refs)
         raise
     catch
         strong Link la(strong Link())
-        refs[0] := la
+        refs[0]! := la
         if false
             ; 
         else
             strong Link lb(strong Link())
-            refs[1] := lb
+            refs[1]! := lb
             try
                 strong Link lc(strong Link())
-                refs[2] := lc
+                refs[2]! := lc
                 if true
                     strong Link ld(strong Link())
-                    refs[3] := ld
+                    refs[3]! := ld
                     do
                         strong Link le(strong Link())
-                        refs[4] := le
+                        refs[4]! := le
                         for n in 3
                             strong Link lf(strong Link())
-                            refs[5] := lf
+                            refs[5]! := lf
                             return
 
 test test-block-delete()
@@ -370,7 +370,7 @@ test test-block-delete()
     var Int n
     do
         strong Link la(strong Link())
-        refs[n] := la
+        refs[n]! := la
         n += 1
         if n = 2
             continue
@@ -380,7 +380,7 @@ test test-block-delete()
     
     for n in 3
         strong Link lb(strong Link())
-        refs[n] := lb
+        refs[n]! := lb
     has-refs(user refs, copy 3)
     
     record-delete := false
@@ -432,13 +432,13 @@ test test-assert-error-message()
     var Func?{()} fun
     assert-error fun!(), "empty object used"
     strong Array?{Int} arr(strong Array{2:Int}())
-    assert-error arr![6], "slice index out of bounds"
+    assert-error arr![6]!, "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
     arr := _
     assert-error arr!.length(), "empty object used"
     assert-error arr2!.length(), "outdated weak reference used"
-    assert-error arr![0], "empty object used"
-    assert-error arr2![0], "outdated weak reference used"
+    assert-error arr![0]!, "empty object used"
+    assert-error arr2![0]!, "outdated weak reference used"
     user TopType? top(user _)
     assert-error top!.meth2(), "empty object used"
     new-fail-countdown := 1
