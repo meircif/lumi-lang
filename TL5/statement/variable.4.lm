@@ -379,9 +379,7 @@ class VariableCreate(SyntaxTreeCode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     var ReferencePath reference-path(user self.variable)
     if self.variable.is-initialized or
-        self.variable.type-instance.conditional or
-        (self.variable.type-instance.type-data.is-primitive and
-        self.variable.type-instance.type-data is-not glob.type-func)
+        self.variable.type-instance.conditional
       refs.clear-invalid-reference(user reference-path)
   
   func dynamic write()
@@ -417,6 +415,9 @@ class VariableInit(VariableCreate)
     self.expression-init.analyze()
     if self.parent is glob.root.global-init
       glob.current-module := _
+    if self.variable.type-instance.type-data is glob.type-func and
+        not self.expression-init.arguments.parameters.first?
+      self.variable.is-initialized := false
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression-init.check-memory(user refs)

@@ -11,6 +11,7 @@ class WrapExpression(Expression)
     self.access := self.expression.access
     self.is-var := self.expression.is-var
     self.assignable := self.expression.assignable
+    self.error-expected := self.expression.error-expected
     self.is-generic-cast := self.expression.is-generic-cast
     self.error-propagated := self.expression.error-propagated
     self.expression.result-type.copy-new()->(owner self.result-type)
@@ -166,6 +167,7 @@ class CheckExpression(WrapExpression)
         self.syntax-error(
             user "ignored weak reference check on type",
             user self.result-type.type-data.name)
+    self.code-node.get-function().has-error := true
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)

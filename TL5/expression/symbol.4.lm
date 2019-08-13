@@ -120,6 +120,7 @@ class FunctionExpression(Expression)
     self.after-base := after-base
     self.set-simple-type(user glob.type-func)
     self.access := Access.VAR
+    self.error-expected := error-propagated
     self.error-propagated := error-propagated
     self.function.arguments.copy-new()->(owner self.result-type.arguments)
   

@@ -1,7 +1,7 @@
 struct Test
     var Int num
     weak Test? t
-    var Func{()} fun
+    var Func?{()} fun
     func user? meth()
 class Ta(Test)
     var Int numa
@@ -333,14 +333,14 @@ class Test(Base)
 ; @ g t20
 class Test
     var Int x
-    func dynamic weak? meth()
+    func dynamic user meth()
 func mock()->(weak Test? t)
-    mock()->(weak t).meth()
+    mock()->(weak t)!.meth()
 ; @ g t21
 class Test
     var Int x
-    func dynamic weak? meth()->(weak Test? t)
-        self.meth().meth()
+    func dynamic user meth()->(weak Test? t)
+        self.meth()!.meth()
 ; @ g t22
 func fun()->(owner Array?{String} astr)
     fun()->(owner astr)
@@ -668,7 +668,10 @@ b := t!.fun?
 b := to?
 ; @ c t4
 b := fun7(weak _)->(weak t)?
-; @ g t5
+; @ c t5
+weak Test tt(weak t!)
+b := tt?
+; @ g t6
 struct Test
     weak String? s
     func user meth()->(var Bool res)
@@ -677,6 +680,9 @@ struct Test
 (i := 2)?
 ; @ ec te1
 i?
+; @ ec te2
+var Test tt
+if tt?
 ; @@ test-exclamation-expression
 ; @ c t0
 user String s(user ostr!)
@@ -832,7 +838,7 @@ ta := ca![4]
 ; @ c t11
 ta!.dyn()
 ; @ c t12
-tb.dyn()
+tb!.dyn()
 ; @ c t13
 tc!.dyn()
 ; @ c t14
@@ -855,6 +861,13 @@ class Test(Base)
         self.meth()
 ; @ c t18
 fun7(weak _)
+; @ eg te0
+class Test
+    var Int x
+    func dynamic weak? meth()
+func fun()
+    weak Test? t
+    t.meth()
 ; @@ test-function-object
 ; @ c t0
 var Func{()} fun
@@ -871,9 +884,10 @@ fun(user t!)
 var Func?{()} fun
 fun := _
 b := fun?
+fun!()
 ; @ c t4
 t!.fun := fun0
-t!.fun()
+t!.fun!()
 ; @ c t5
 var Array{38:Func{()}} farr
 farr[3] := fun0
@@ -908,6 +922,15 @@ var Func{()} fun(copy fun1)
 ; @ ec te5
 var Func{()->(var Int x)} fun
 fun := fun0
+; @ ec te6
+var Func{()} fun
+fun()
+; @ ec te7
+var Func{()} fun(copy fun0)
+fun := _
+; @ ec te8
+var Func{()} fun(copy fun0)
+if fun?
 ; @@ test-builtin
 ; @ c ti0
 i.str(user ostr!)
@@ -3092,6 +3115,10 @@ func fun(var Test t)
     t.s := _
 func use(owner Test to)
     fun(var to)
+; @ c tb1
+weak String s
+s := so!
+s!.clear()
 ; @ eg teo0
 struct Test
     owner String s
@@ -3411,7 +3438,7 @@ func fun(user String s)
     s.set(copy 0, copy 'a')
 ; @ ec teu23
 user String? s
-t!.fun()
+t!.fun!()
 s!.set(copy 0, copy 'a')
 ; @ eg teu24
 func deleting(copy Func?{()} f)

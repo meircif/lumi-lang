@@ -91,6 +91,7 @@ class Expression(SyntaxTreeNode)
   var Bool is-generic-cast
   var Bool is-complex-field
   var Bool is-var
+  var Bool error-expected
   var Bool error-propagated
 
   new(user SyntaxTreeCode code-node)
@@ -160,6 +161,7 @@ class Expression(SyntaxTreeNode)
     do
       if glob.last-char = '!'
         expression.error-propagated := true
+        expression.error-expected := true
         read-c()
         if glob.last-char = '!'
           code-node.syntax-error-msg(user "only one \"!\" needed")
@@ -282,7 +284,7 @@ class Expression(SyntaxTreeNode)
       self.code-node.get-parent-type()->(user parent-type)
 
   func inst check-no-error()
-    if self.error-propagated
+    if self.error-expected
       self.syntax-error-msg(user "using \"!\" where there is no error")
 
   func dynamic restructure()->(

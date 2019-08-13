@@ -82,6 +82,8 @@ class SliceExpression(Expression)
     if not self.result-type.type-data.is-primitive
       self.sequence.result-type.reference-path.copy-new()->(
           owner self.result-type.reference-path)
+    
+    self.code-node.get-function().has-error := true
   
   func inst check-index(user Expression index)
     index.check-no-error()

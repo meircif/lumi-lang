@@ -115,7 +115,7 @@ func test-slice-expression(
     arrfo![4]()
 
 
-func test-container-expression(copy Int x, copy Int y, user String s)->(
+func test-container-expression(copy Int x, copy Int y, user String? s)->(
         var Int i, var Bool b)
     i := - x + - - - y
     b := not ((not (x * 3) - 5 > 6 * y = 234 and not 5 - x < y) or not
@@ -132,7 +132,7 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     var TestStruct tv(copy 0, user _)
     var TestClass dv
     var String{12} sv
-    var Func{(copy Int xi, user String si)->(var Int xo, user String? so)} f
+    var Func?{(copy Int xi, user String si)->(var Int xo, user String? so)} f
     var Array{12:Int} ia
     var Array{12:SimpleStruct} ta
     var Array{12:SimpleClass} da
@@ -157,12 +157,12 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     new TestClass idn()
     TestStruct(copy i, user text!).print()
     TestClass().print()
-    assert String{arr[0]}()?
-    assert Array{arr[0]:Int}()?
-    assert Array{arr[0]:SimpleStruct}()?
-    assert Array{arr[0]:SimpleClass}()?
-    assert Array{arr[0]:String{arr[1]}}()?
-    assert Array{arr[0]:Func{()}}()?
+    assert String{arr[0]}().length() > 0
+    assert Array{arr[0]:Int}().length() > 0
+    assert Array{arr[0]:SimpleStruct}().length() > 0
+    assert Array{arr[0]:SimpleClass}().length() > 0
+    assert Array{arr[0]:String{arr[1]}}().length() > 0
+    assert Array{arr[0]:Func{()}}().length() > 0
     assert x = 0
     assert s?
     assert a?
@@ -171,25 +171,25 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     assert f?
     tv.print()
     dv.print()
-    assert sv?
-    assert ia?
-    assert ta?
-    assert da?
-    assert sa?
-    assert fa?
+    assert sv.length() > 0
+    assert ia.length() > 0
+    assert ta.length() > 0
+    assert da.length() > 0
+    assert sa.length() > 0
+    assert fa.length() > 0
     tn.print()
     dn.print()
-    assert sn?
-    assert ian?
-    assert tan?
-    assert dan?
-    assert san?
-    assert sfn?
+    assert sn.length() > 0
+    assert ian.length() > 0
+    assert tan.length() > 0
+    assert dan.length() > 0
+    assert san.length() > 0
+    assert sfn.length() > 0
     assert ix = 0
-    assert si?
+    assert si.length() > 0
     fi(copy 7)
-    assert isv?
-    assert isn?
+    assert isv.length() > 0
+    assert isn.length() > 0
 
 
 func test-complex-function(
@@ -305,7 +305,7 @@ func test-call-expression()
 func test-code-flow(user Array{Int} arr)->(var Int res)
     if arr[4] > 6
         res := 6
-    else-if arr?
+    else-if arr is arr
         res := 6
     else-if arr[4] <> arr[5]
         res := 6
@@ -431,7 +431,7 @@ func test-type-parameters(weak Item? s)
     s := dr.item!.item!.item
     d.set(weak s)
     d.get()->(weak s)
-    user Data dg(user d)
+    user Data? dg(user d)
     assert dg?
     
     var TopData t

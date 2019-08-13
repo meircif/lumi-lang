@@ -28,13 +28,8 @@ mock new()->(var Bool alloc-success)
 
 
 test fail-call-empty()
-    var Func{()} fun
-    fun()
-
-test fail-base-class-output()
-    var BaseType base-var
-    user BaseType? base-user(user base-var)
-    f-get-top()->(user base-user)
+    var Func?{()} fun
+    fun!()
 
 test fail-slice-index()
     var Array{2:Int} arr
@@ -43,7 +38,7 @@ test fail-slice-index()
 test fail-member-empty()
     user BaseType? obj
     assert obj!.x = 0
-    obj.meth()
+    obj!.meth()
 
 test fail-member-outdated()
     strong BaseType? obj-owner(strong BaseType())
@@ -70,7 +65,7 @@ test fail-slice-outdated()
 
 test fail-dynamic-empty()
     user BaseType? obj
-    obj.meth()
+    obj!.meth()
 
 test fail-object-no-memory()
     new-fail-countdown := 1

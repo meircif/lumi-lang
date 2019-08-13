@@ -29,8 +29,6 @@ Error_Messages LUMI_error_messages = {
   ERROR_MESAGE(
       object_memory, "insufficient memory for object dynamic allocation"),
   ERROR_MESAGE(managed_object_memory, "insufficient memory for managed object"),
-  ERROR_MESAGE(
-      empty_base_output, "non empty base class given as output argument"),
   ERROR_MESAGE(slice_index, "slice index out of bounds"),
   ERROR_MESAGE(string_too_long, "string too long"),
   ERROR_MESAGE(file_not_opened, "file not opened"),

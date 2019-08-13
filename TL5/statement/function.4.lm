@@ -25,6 +25,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   var Bool is-dynamic
   var Bool header-only
   var Bool external-body
+  var Bool has-error
   
   func inst parse-new(user TypeData parent-type)->(
       owner SyntaxTreeFunction new-node)

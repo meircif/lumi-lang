@@ -58,7 +58,6 @@ typedef struct {
   Error_Message outdated_weak_reference;
   Error_Message object_memory;
   Error_Message managed_object_memory;
-  Error_Message empty_base_output;
   Error_Message slice_index;
   Error_Message string_too_long;
   Error_Message file_not_opened;

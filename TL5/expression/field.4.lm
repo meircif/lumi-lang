@@ -97,7 +97,6 @@ class FieldExpression(Expression)
           user "has no member",
           user self.name)
     
-    if after-base or after-type
     expression := FunctionExpression(
         user self.code-node,
         user function,

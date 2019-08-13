@@ -419,7 +419,7 @@ mock new()->(var Bool alloc-success)
             alloc-success := false
 
 func alloc()
-    strong SimpleStruct object(strong SimpleStruct())
+    strong SimpleStruct? object(strong SimpleStruct())
     assert object?
 
 test test-assert-error-message()
@@ -429,12 +429,8 @@ test test-assert-error-message()
     assert-error good-assert-error(), "good assert error"
     assert-error failed-assert-error(), "error not raised"
     assert-error wrong-message-assert-error()
-    var Func{()} fun
-    assert-error fun(), "empty object used"
-    var BaseType base-var
-    user BaseType? base-user(user base-var)
-    assert-error test-mid-out()->(user base-user),
-            "non empty base class given as output argument"
+    var Func?{()} fun
+    assert-error fun!(), "empty object used"
     strong Array?{Int} arr(strong Array{2:Int}())
     assert-error arr![6], "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
@@ -496,7 +492,7 @@ test test-builtin-errors()
     assert-error sys.system(user "aaa"), "command execution failed"
 
 mock Sys.println(user Array{Char} text)
-    assert text?
+    assert text.length() > 0
 
 test test-cover-all()
     var covered.MiddleType mid

@@ -1153,19 +1153,17 @@ struct ut_M_Test {
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
-    Returncode (*meth)(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic);
+    Returncode (*meth)(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 };
-Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic);
+Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self);
 Returncode ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
-Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic) {
+Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    LUMI_inc_ref(self_Refman);
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(self_Refman);
     return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
@@ -1176,8 +1174,9 @@ Returncode ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** 
     unsigned LUMI_loop_depth = 1;
     LUMI_err = ut_M_mock(&(*t), &(*t_Refman), &(*t_Dynamic));
     CHECK(5, LUMI_block0_cleanup)
+    CHECK_REF_REFMAN(5, LUMI_block0_cleanup, *t, *t_Refman)
     if (*t_Dynamic == NULL) RAISE(5, LUMI_block0_cleanup, empty_object)
-    LUMI_err = (*t_Dynamic)->meth(*t, *t_Refman, *t_Dynamic);
+    LUMI_err = (*t_Dynamic)->meth(*t, *t_Dynamic);
     CHECK(5, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
@@ -1191,12 +1190,12 @@ struct ut_M_Test {
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
-    Returncode (*meth)(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
+    Returncode (*meth)(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
 };
-Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
+Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self);
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
-Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic) {
+Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     ut_M_Test* aux_Test_0 = NULL;
@@ -1205,18 +1204,16 @@ Returncode ut_M_Test_meth(ut_M_Test* self, Ref_Manager* self_Refman, ut_M_Test_D
     ut_M_Test* aux_Test_1 = NULL;
     Ref_Manager* aux_Test_1_Refman = NULL;
     ut_M_Test_Dynamic* aux_Test_1_Dynamic = NULL;
-    LUMI_inc_ref(self_Refman);
-    if (self_Dynamic == NULL) RAISE(4, LUMI_block0_cleanup, empty_object)
-    LUMI_err = self_Dynamic->meth(self, self_Refman, self_Dynamic, &(aux_Test_0), &(aux_Test_0_Refman), &(aux_Test_0_Dynamic));
+    LUMI_err = self_Dynamic->meth(self, self_Dynamic, &(aux_Test_0), &(aux_Test_0_Refman), &(aux_Test_0_Dynamic));
     CHECK(4, LUMI_block0_cleanup)
+    CHECK_REF_REFMAN(4, LUMI_block0_cleanup, aux_Test_0, aux_Test_0_Refman)
     if (aux_Test_0_Dynamic == NULL) RAISE(4, LUMI_block0_cleanup, empty_object)
-    LUMI_err = aux_Test_0_Dynamic->meth(aux_Test_0, aux_Test_0_Refman, aux_Test_0_Dynamic, &(aux_Test_1), &(aux_Test_1_Refman), &(aux_Test_1_Dynamic));
+    LUMI_err = aux_Test_0_Dynamic->meth(aux_Test_0, aux_Test_0_Dynamic, &(aux_Test_1), &(aux_Test_1_Refman), &(aux_Test_1_Dynamic));
     CHECK(4, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(aux_Test_1_Refman);
     LUMI_dec_ref(aux_Test_0_Refman);
-    LUMI_dec_ref(self_Refman);
     return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
@@ -2009,13 +2006,23 @@ ut_M_b = ! (ut_M_arr != NULL && (ut_M_arr_Refman)->value != NULL);
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_b = ut_M_t->fun != NULL;
 /// @ t3
-ut_M_b = (*to) != NULL && (*to_Refman)->value != NULL;
+ut_M_b = (*to) != NULL;
 /// @ t4
-if (ut_M_t != NULL) RAISE(1, LUMI_block0_cleanup, empty_base_output)
+ut_M_t = NULL;
+    ut_M_t_Refman = NULL;
     LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
     CHECK(1, LUMI_block0_cleanup)
     ut_M_b = ut_M_t != NULL && (ut_M_t_Refman)->value != NULL;
 /// @ t5
+ut_M_Test* tt = NULL;
+    Ref_Manager* tt_Refman = NULL;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_t)
+    LUMI_inc_ref(ut_M_t_Refman);
+    LUMI_dec_ref(tt_Refman);
+    tt_Refman = ut_M_t_Refman;
+    tt = ut_M_t;
+    ut_M_b = (tt_Refman)->value != NULL;
+/// @ t6
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -2041,7 +2048,9 @@ void ut_M_Test_Del(ut_M_Test* self) {
 /// @ te0
 cannot use "?" on void expression
 /// @ te1
-cannot use "?" on type "Int"
+cannot use "?" on non conditional or weak reference of type "Int"
+/// @ te2
+cannot use "?" on non conditional or weak reference of type "Test"
 /// @@ test-exclamation-expression
 /// @ t0
 char* s = NULL;
@@ -2058,7 +2067,8 @@ ut_M_Test* tt = NULL;
     tt = ut_M_t->t;
 /// @ t2
 ut_M_Test* tu = NULL;
-    if (ut_M_t != NULL) RAISE(2, LUMI_block0_cleanup, empty_base_output)
+    ut_M_t = NULL;
+    ut_M_t_Refman = NULL;
     LUMI_err = ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
     CHECK(2, LUMI_block0_cleanup)
     CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_t_Refman)
@@ -2273,7 +2283,9 @@ LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_err = (*tco_Dynamic)->_base._base.dyn(&((*tco)->_base._base), &((*tco_Dynamic)->_base._base));
     CHECK(2, LUMI_block0_cleanup)
 /// @ t15
-if (ut_M_ta != NULL) RAISE(1, LUMI_block0_cleanup, empty_base_output)
+ut_M_ta = NULL;
+    ut_M_ta_Refman = NULL;
+    ut_M_ta_Dynamic = NULL;
     LUMI_err = ut_M_fun7(&(ut_M_tc->_base), ut_M_tc_Refman, &(ut_M_tc_Dynamic->_base), (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic));
     CHECK(1, LUMI_block0_cleanup)
 /// @ t16
@@ -2348,7 +2360,6 @@ void ut_M_Base_Del(ut_M_Base* self) {
 Returncode ut_M_Test_fun(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    if (self_Dynamic == NULL) RAISE(6, LUMI_block0_cleanup, empty_object)
     LUMI_err = self_Dynamic->_base.meth(&(self->_base), &(self_Dynamic->_base));
     CHECK(6, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -2365,36 +2376,38 @@ ut_M_Tb* aux_Tb_0 = NULL;
     ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = NULL;
     LUMI_err = ut_M_fun7(NULL, NULL, NULL, &(aux_Tb_0), &(aux_Tb_0_Refman), &(aux_Tb_0_Dynamic));
     CHECK(1, LUMI_block0_cleanup)
+/// @ te0
+ignored empty reference check on type "Test"
 /// @@ test-function-object
 /// @ t0
 Returncode (*fun)(void) = NULL;
     fun = ut_M_fun0;
-    if (fun == NULL) RAISE(3, LUMI_block0_cleanup, empty_object)
     LUMI_err = fun();
     CHECK(3, LUMI_block0_cleanup)
 /// @ t1
 Returncode (*fun)(Int x, Int* y) = NULL;
     Int x = 0;
     fun = ut_M_fun5;
-    if (fun == NULL) RAISE(3, LUMI_block0_cleanup, empty_object)
     LUMI_err = fun(9, &(x));
     CHECK(3, LUMI_block0_cleanup)
 /// @ t2
 Returncode (*fun)(ut_M_Test* self) = NULL;
     fun = ut_M_Test_meth;
     CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_t_Refman)
-    if (fun == NULL) RAISE(2, LUMI_block0_cleanup, empty_object)
     LUMI_err = fun(ut_M_t);
     CHECK(2, LUMI_block0_cleanup)
 /// @ t3
 Returncode (*fun)(void) = NULL;
     fun = NULL;
     ut_M_b = fun != NULL;
+    CHECK_REF(4, LUMI_block0_cleanup, fun)
+    LUMI_err = fun();
+    CHECK(4, LUMI_block0_cleanup)
 /// @ t4
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_t->fun = ut_M_fun0;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
-    if (ut_M_t->fun == NULL) RAISE(2, LUMI_block0_cleanup, empty_object)
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_t->fun)
     LUMI_err = ut_M_t->fun();
     CHECK(2, LUMI_block0_cleanup)
 /// @ t5
@@ -2403,7 +2416,6 @@ Returncode (*farr[38])(void) = {0};
     if (3 < 0 || 3 >= 38) RAISE(2, LUMI_block0_cleanup, slice_index)
     farr[3] = ut_M_fun0;
     if (3 < 0 || 3 >= 38) RAISE(3, LUMI_block0_cleanup, slice_index)
-    if (farr[3] == NULL) RAISE(3, LUMI_block0_cleanup, empty_object)
     LUMI_err = (farr[3])();
     CHECK(3, LUMI_block0_cleanup)
 /// @ t6
@@ -2413,7 +2425,6 @@ Returncode ut_M_mock(Returncode (**f)(void));
 Returncode ut_M_mock(Returncode (**f)(void)) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    if (*f == NULL) RAISE(2, LUMI_block0_cleanup, empty_object)
     LUMI_err = (*f)();
     CHECK(2, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -2461,6 +2472,12 @@ expected "}" after sub-types, got " "
 too many parameters
 /// @ te5
 too few outputs
+/// @ te6
+using invalid reference "fun"
+/// @ te7
+assigning empty into non-conditional type "Func"
+/// @ te8
+cannot use "?" on non conditional or weak reference of type "Func"
 /// @@ test-builtin
 /// @ ti0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
@@ -4129,7 +4146,7 @@ unknown symbol "error"
 /// @ te31
 unexpected ? initializing type "Test"
 /// @ te32
-non callable type "Bool"
+cannot use "?" on non conditional or weak reference of type "Type Name"
 /// @@ test-comment
 /// @ t0
 Int x = 0;
@@ -4906,7 +4923,6 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_met
 Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, Int x) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    if (self_Dynamic == NULL) RAISE(5, LUMI_block0_cleanup, empty_object)
     LUMI_err = self_Dynamic->meth(self, self_Dynamic, x);
     CHECK(5, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -5005,7 +5021,6 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_met
 Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, Int x, Int* y) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    if (self_Dynamic == NULL) RAISE(4, LUMI_block0_cleanup, empty_object)
     LUMI_err = self_Dynamic->meth(self, self_Dynamic, x, &(*y));
     CHECK(4, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -5843,7 +5858,9 @@ ut_M_Data dt_Var = {0};
     otc = NULL;
     otc_Dynamic = NULL;
     CHECK(5, LUMI_block0_cleanup)
-    if (ut_M_ta != NULL) RAISE(6, LUMI_block0_cleanup, empty_base_output)
+    ut_M_ta = NULL;
+    ut_M_ta_Refman = NULL;
+    ut_M_ta_Dynamic = NULL;
     LUMI_err = ut_M_Data_get(dt, (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic));
     CHECK(6, LUMI_block0_cleanup)
     LUMI_err = ut_M_Data_get(dt, (void*)&(aux_Tb_0), &(aux_Tb_0_Refman), (void*)&(aux_Tb_0_Dynamic));
@@ -6015,15 +6032,12 @@ Returncode ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, ut_M_Test_Dynami
     LUMI_inc_ref(test_Refman);
     LUMI_inc_ref(f_Refman);
     CHECK_REFMAN(9, LUMI_block0_cleanup, test_Refman)
-    if (test_Dynamic == NULL) RAISE(9, LUMI_block0_cleanup, empty_object)
     LUMI_err = test_Dynamic->_base.set(&(test->_base), &(test_Dynamic->_base), f, f_Refman, &File_dynamic);
     CHECK(9, LUMI_block0_cleanup)
     CHECK_REFMAN(10, LUMI_block0_cleanup, test_Refman)
-    if (test_Dynamic == NULL) RAISE(10, LUMI_block0_cleanup, empty_object)
     LUMI_err = test_Dynamic->_base.get(&(test->_base), &(test_Dynamic->_base), (void*)&(f), &(f_Refman), &dynamic_Void);
     CHECK(10, LUMI_block0_cleanup)
     CHECK_REFMAN(11, LUMI_block0_cleanup, test_Refman)
-    if (test_Dynamic == NULL) RAISE(11, LUMI_block0_cleanup, empty_object)
     LUMI_err = test_Dynamic->_base.get(&(test->_base), &(test_Dynamic->_base), (void*)&(aux_File_0), &(aux_File_0_Refman), &dynamic_Void);
     CHECK(11, LUMI_block0_cleanup)
     CHECK_REF_REFMAN(11, LUMI_block0_cleanup, aux_File_0, aux_File_0_Refman)
@@ -7308,15 +7322,12 @@ Returncode ut_M_f_mock(ut_M_TestIterator* iter, ut_M_TestIterator_Dynamic* iter_
     while (true) {
         Bool t_Has = false;
         LUMI_loop_depth = 3;
-        if (aux_TestIterator_0_Dynamic == NULL) RAISE(9, LUMI_block1_cleanup, empty_object)
         LUMI_err = aux_TestIterator_0_Dynamic->has(aux_TestIterator_0, aux_TestIterator_0_Dynamic, &(t_Has));
         CHECK(9, LUMI_block1_cleanup)
         if (!t_Has) break;
-        if (aux_TestIterator_0_Dynamic == NULL) RAISE(9, LUMI_block1_cleanup, empty_object)
         LUMI_err = aux_TestIterator_0_Dynamic->get(aux_TestIterator_0, aux_TestIterator_0_Dynamic, (void*)&(t), &dynamic_Void);
         CHECK(9, LUMI_block1_cleanup)
         f = t;
-        if (aux_TestIterator_0_Dynamic == NULL) RAISE(9, LUMI_block1_cleanup, empty_object)
         LUMI_err = aux_TestIterator_0_Dynamic->next(aux_TestIterator_0, aux_TestIterator_0_Dynamic);
         CHECK(9, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
@@ -7602,7 +7613,7 @@ recursive declaration of type "Abase", extended by type "Aerror", variable of ty
 /// @ te5
 assigning into non assignable expression
 /// @ te6
-cannot use "?" on complex field
+cannot use "?" on non conditional or weak reference of type "Base"
 /// @@ test-enum
 /// @ t0
 enum {
@@ -8399,6 +8410,21 @@ LUMI_block0_cleanup:
     free(to);
     return LUMI_err;
 }
+/// @ tb1
+char* s = NULL;
+    int s_Max_length = 0;
+    int* s_Length = &Lumi_empty_int;
+    Ref_Manager* s_Refman = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, *so)
+    LUMI_inc_ref(*so_Refman);
+    LUMI_dec_ref(s_Refman);
+    s_Refman = *so_Refman;
+    s_Max_length = *so_Max_length;
+    s_Length = *so_Length;
+    s = *so;
+    CHECK_REFMAN(3, LUMI_block0_cleanup, s_Refman)
+    LUMI_err = String_clear(s, s_Max_length, s_Length);
+    CHECK(3, LUMI_block0_cleanup)
 /// @ teo0
 cannot modify owner field "s" in non-owner reference "t.s"
 /// @ teo1

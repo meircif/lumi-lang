@@ -23,6 +23,7 @@ class BlockExpression(Expression)
     self.expression.result-type.copy-new()->(owner self.result-type)
     self.access := self.expression.access
     self.constant := self.expression.constant
+    self.error-expected := self.expression.error-expected
     self.error-propagated := self.expression.error-propagated
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
@@ -226,13 +227,11 @@ class QuestionExpression(Expression)
     self.tested.check-no-error()
     if not self.tested.result-type?
       self.syntax-error-msg(user "cannot use \"?\" on void expression")
-    if self.tested.result-type.type-data.is-primitive and
-        not (self.tested.result-type.type-data is glob.type-func)
+    if not self.tested.result-type.conditional and
+        self.tested.access != Access.WEAK
       self.syntax-error(
-          user "cannot use \"?\" on type",
+          user "cannot use \"?\" on non conditional or weak reference of type",
           user self.tested.result-type.type-data.name)
-    if self.tested.is-complex-field
-      self.syntax-error-msg(user "cannot use \"?\" on complex field")
     self.set-simple-type(user glob.type-bool)
     self.access := Access.VAR
 
@@ -245,10 +244,13 @@ class QuestionExpression(Expression)
   
   func dynamic write()
     ; `tested` != NULL && `tested`_Refman->value != NULL
-    self.tested.write-safe()
-    write(user " != NULL")
-    if access-has-refman(copy self.tested.access)
-      write(user " && (")
+    if self.tested.result-type.conditional
+      self.tested.write-safe()
+      write(user " != NULL")
+    if self.tested.access = Access.WEAK
+      if self.tested.result-type.conditional
+        write(user " && ")
+      write(user "(")
       self.tested.write-refman()
       write(user ")->value != NULL")
     

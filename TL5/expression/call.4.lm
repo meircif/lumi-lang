@@ -126,7 +126,19 @@ class DynamicCallExpression(FunctionCallExpression)
     function.function := function.function.dynamic-base-method
     base(user code-node, user function, owner arguments, user actual-params)
 
+  func dynamic analyze()
+    if self.self-instance.result-type.conditional
+      if not self.self-instance.error-propagated
+        self.syntax-error(
+            user "ignored empty reference check on type",
+            user self.self-instance.result-type.type-data.name)
+      self.self-instance.error-expected := false
+      self.code-node.get-function().has-error := true
+    base()
+
   func dynamic write-function-check()
+    if not self.self-instance.result-type.conditional
+      return
     ; if (`instance`_Dynamic == NULL) RAISE(`empty_object`)
     write(user "if (")
     self.self-instance.write-dynamic()
@@ -173,6 +185,7 @@ class FunctionObjectCallExpression(CallExpression)
     self.function-object.restructure()->(
         owner self.function-object, owner self.arguments)
     if not self.arguments?
+      self.function-object.error-expected := expression.error-expected
       self.function-object.error-propagated := expression.error-propagated
       expression := self.function-object
   
@@ -197,11 +210,6 @@ class FunctionObjectCallExpression(CallExpression)
   
   func dynamic write-function-check()
     self.function-object.write-preactions()
-    write(user "if (")
-    self.function-object.write()
-    write(user " == NULL) ")
-    self.code-node.write-raise(user "empty_object")
-    self.code-node.write-spaces()
 
   func dynamic write-function()
     self.function-object.write-safe()
@@ -287,11 +295,8 @@ class CallArgument(Argument)
   func dynamic write-preactions()
     self.value.write-preactions()
     if self.is-down-cast
-      ; if (`value` != NULL) RAISE(`empty_base_output`)
-      write(user "if (")
-      self.value.write()
-      write(user " != NULL) ")
-      self.code-node.write-raise(user "empty_base_output")
+      ; `value` = NULL;
+      self.value.write-assign-null()
       self.code-node.write-spaces()
     if self.value.access = Access.STRONG and self.access = Access.OWNER and
         self.value.result-type.type-data is-not glob.type-empty
