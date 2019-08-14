@@ -41,7 +41,7 @@ test fail-member-empty()
     obj!.meth()
 
 test fail-member-outdated()
-    strong BaseType? obj-owner(strong BaseType())
+    strong BaseType? obj-owner(strong BaseType()!)
     weak BaseType? obj(weak obj-owner)
     obj-owner := _
     assert! obj!.x = 0
@@ -52,13 +52,13 @@ test fail-sequence-empty()
     assert! arr![0]! = 0
 
 test fail-sequence-outdated()
-    strong Array?{Int} arr-owner(strong Array{2:Int}())
+    strong Array?{Int} arr-owner(strong Array{2:Int}()!)
     weak Array?{Int} arr(weak arr-owner)
     arr-owner := _
     assert! arr![0]! = 0
 
 test fail-slice-outdated()
-    strong Array?{Int} arr-owner(strong Array{6:Int}())
+    strong Array?{Int} arr-owner(strong Array{6:Int}()!)
     weak Array?{Int} arr(weak arr-owner![2:3]!)
     arr-owner := _
     assert! arr![0]! = 0
@@ -69,11 +69,11 @@ test fail-dynamic-empty()
 
 test fail-object-no-memory()
     new-fail-countdown := 1
-    new BaseType obj
+    new BaseType obj!
 
 test fail-managed-no-memory()
     new-fail-countdown := 2
-    strong BaseType obj(strong BaseType())
+    strong BaseType obj(strong BaseType()!)
 
 test fail-exclamation-empty()
     user String? cs

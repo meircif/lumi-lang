@@ -4130,6 +4130,46 @@ ut_M_Tc tt_Var = {{{{0}}}};
     INIT_VAR_REFMAN(1, LUMI_block0_cleanup, tt)
     LUMI_err = ut_M_Tb_new(&(tt->_base), &(tt_Dynamic->_base), 3);
     CHECK(1, LUMI_block0_cleanup)
+/// @ t19
+ut_M_Test* t1 = NULL;
+    ut_M_Test t2_Var = {0};
+    ut_M_Test* t2 = NULL;
+    Ref_Manager* t2_Refman = NULL;
+    INIT_NEW(1, LUMI_block0_cleanup, t1, ut_M_Test, 1);
+    t2 = &t2_Var;
+    INIT_VAR_REFMAN(2, LUMI_block0_cleanup, t2)
+/// @ t20
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+Returncode ut_M_Test_new(ut_M_Test* self, Int x);
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(void);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Test_new(ut_M_Test* self, Int x) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Test t_Var = {0};
+    ut_M_Test* t = NULL;
+    t = &t_Var;
+    LUMI_err = ut_M_Test_new(t, 3);
+    CHECK(5, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    ut_M_Test_Del(t);
+    return LUMI_err;
+}
 /// @ te0
 dynamic allocation of primitive type "Int"
 /// @ te1
@@ -4196,6 +4236,16 @@ unknown symbol "error"
 unexpected ? initializing type "Test"
 /// @ te32
 cannot use "?" on non conditional or weak reference of type "Type Name"
+/// @ te33
+ignoring initialization error check of type "Test"
+/// @ te34
+ignoring initialization error check of type "Tb"
+/// @ te35
+using "!" where there is no error
+/// @ te36
+using "!" where there is no error
+/// @ te37
+unexpected "!" after "s"
 /// @@ test-comment
 /// @ t0
 Int x = 0;

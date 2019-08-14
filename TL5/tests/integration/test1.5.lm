@@ -66,8 +66,8 @@ func test-mid-out()->(user covered.MiddleType? mt)
     mt := _
 
 
-func test-new-mid()->(owner covered.MiddleType? mt)
-    new covered.MiddleType new-mt
+func ! test-new-mid()->(owner covered.MiddleType? mt)
+    new covered.MiddleType new-mt!
     mt := new-mt
 
 
@@ -90,7 +90,7 @@ test test-func()
     test-int2str.active := true
     assert-error! test-int2str(copy 6)->(owner s)!
     
-    var TestStruct t(copy 0, user _)
+    var TestStruct t(copy 0, user _)!
     var Int x
     t.get()->(var x)
     assert! x = 12
@@ -142,15 +142,15 @@ test test-native()
 
 
 test test-dynamic-type-parameters()
-    s-var Data{covered.MiddleType} dmid
-    s-var TopType ttop
+    s-var Data{covered.MiddleType} dmid!
+    s-var TopType ttop!
     ttop.num-base := 12
     dmid.item := ttop
     weak BaseType? tbase
     tbase := dmid.item
     assert! tbase!.num-base = 12
     ttop.num-base := 13
-    dmid.set(weak ttop)
+    dmid.set(weak ttop)!
     tbase := _
     dmid.get()->(weak tbase)
     assert! tbase!.num-base = 13
@@ -176,8 +176,8 @@ struct RefNode
     new(copy Ref? ref)
         self.ref := ref
 
-func new-ref-node(copy Ref? ref)->(owner RefNode? next)
-    new RefNode ref-node(copy ref)
+func ! new-ref-node(copy Ref? ref)->(owner RefNode? next)
+    new RefNode ref-node(copy ref)!
     ref-node.next := next
     next := ref-node
 
@@ -188,27 +188,27 @@ owner RefNode? deleted-base-links
 owner RefNode? deleted-top-links
 owner RefNode? deleted-refmans(owner _)
 
-mock delete()
+mock ! delete()
     if record-delete
-        new-ref-node(copy self)->(owner deleted-refmans)
+        new-ref-node(copy self)->(owner deleted-refmans)!
 
-mock Link.delete()
+mock ! Link.delete()
     if record-delete
-        new-ref-node(copy self)->(owner deleted-links)
+        new-ref-node(copy self)->(owner deleted-links)!
 
-mock BaseLink.delete()
+mock ! BaseLink.delete()
     if record-delete
-        new-ref-node(copy self)->(owner deleted-base-links)
+        new-ref-node(copy self)->(owner deleted-base-links)!
 
-mock TopLink.delete()
+mock ! TopLink.delete()
     if record-delete
-        new-ref-node(copy self)->(owner deleted-top-links)
+        new-ref-node(copy self)->(owner deleted-top-links)!
 
 func remove-obj(owner Link b)
     ; remove b
 
-func get-outdated-var()->(weak Link? l-out)
-    strong Link l-var(strong Link())
+func ! get-outdated-var()->(weak Link? l-out)
+    strong Link l-var(strong Link()!)
     l-out := l-var
 
 test test-simple-delete()
@@ -216,7 +216,7 @@ test test-simple-delete()
     assert! not deleted-links?
     record-delete := true
     
-    strong Link? l(strong Link())
+    strong Link? l(strong Link()!)
     weak Link? l-user(weak l)
     assert! l?
     assert! l-user?
@@ -232,7 +232,7 @@ test test-simple-delete()
     assert! deleted-refmans?
     assert! deleted-refmans!.ref is l-ref
     assert! not deleted-refmans!.next?
-    get-outdated-var()->(weak l-user)
+    get-outdated-var()->(weak l-user)!
     assert! l-user is-not _
     assert! not l-user?
     
@@ -259,21 +259,21 @@ test test-complex-delete()
     assert! not deleted-top-links?
     record-delete := true
     
-    strong BaseLink? b1(strong BaseLink())
+    strong BaseLink? b1(strong BaseLink()!)
     var Ref b1-ref(copy b1)
-    strong BaseLink? b2(strong BaseLink())
+    strong BaseLink? b2(strong BaseLink()!)
     var Ref b2-ref(copy b2)
-    strong TopLink?{Link} t1(strong TopLink{Link}())
+    strong TopLink?{Link} t1(strong TopLink{Link}()!)
     var Ref t1-ref(copy t1)
-    strong TopLink?{BaseLink} t2(strong TopLink{BaseLink}())
+    strong TopLink?{BaseLink} t2(strong TopLink{BaseLink}()!)
     var Ref t2-ref(copy t2)
-    strong TopLink?{BaseLink} t3(strong TopLink{BaseLink}())
+    strong TopLink?{BaseLink} t3(strong TopLink{BaseLink}()!)
     var Ref t3-ref(copy t3)
-    strong Link? l1(strong Link())
+    strong Link? l1(strong Link()!)
     var Ref l1-ref(copy l1)
-    strong Link? l2(strong Link())
+    strong Link? l2(strong Link()!)
     var Ref l2-ref(copy l2)
-    strong Link? l3(strong Link())
+    strong Link? l3(strong Link()!)
     var Ref l3-ref(copy l3)
     
     b1!.link := l1
@@ -337,24 +337,24 @@ func ! cleanup-test(user Array{Ref} refs)
     try
         raise!
     catch
-        strong Link la(strong Link())
+        strong Link la(strong Link()!)
         refs[0]! := la
         if false
             ; 
         else
-            strong Link lb(strong Link())
+            strong Link lb(strong Link()!)
             refs[1]! := lb
             try
-                strong Link lc(strong Link())
+                strong Link lc(strong Link()!)
                 refs[2]! := lc
                 if true
-                    strong Link ld(strong Link())
+                    strong Link ld(strong Link()!)
                     refs[3]! := ld
                     do
-                        strong Link le(strong Link())
+                        strong Link le(strong Link()!)
                         refs[4]! := le
                         for n in 3
-                            strong Link lf(strong Link())
+                            strong Link lf(strong Link()!)
                             refs[5]! := lf
                             return
 
@@ -369,7 +369,7 @@ test test-block-delete()
     
     var Int n
     do
-        strong Link la(strong Link())
+        strong Link la(strong Link()!)
         refs[n]! := la
         n += 1
         if n = 2
@@ -379,7 +379,7 @@ test test-block-delete()
     has-refs(user refs, copy 3)!
     
     for n in 3
-        strong Link lb(strong Link())
+        strong Link lb(strong Link()!)
         refs[n]! := lb
     has-refs(user refs, copy 3)!
     
@@ -419,7 +419,7 @@ mock new()->(var Bool alloc-success)
             alloc-success := false
 
 func ! alloc()
-    strong SimpleStruct? object(strong SimpleStruct())
+    strong SimpleStruct? object(strong SimpleStruct()!)
     assert! object?
 
 test test-assert-error-message()
@@ -431,7 +431,7 @@ test test-assert-error-message()
     assert-error! wrong-message-assert-error()!
     var Func?{()} fun
     assert-error! fun!(), "empty object used"
-    strong Array?{Int} arr(strong Array{2:Int}())
+    strong Array?{Int} arr(strong Array{2:Int}()!)
     assert-error! arr![6]!, "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
     arr := _

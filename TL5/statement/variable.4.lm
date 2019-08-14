@@ -44,7 +44,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.type-instance.parse(
           user " ", user self, user _, copy INDENTATION-SPACES)
     self.expect-space(user "type")
-    read-new(user "(")->(owner self.name)
+    read-new(user "!(")->(owner self.name)
     self.check-name()
     if glob.last-char = '(' and self.parent-type?
       self.syntax-error-msg(user "type members cannot be initialized")
@@ -56,9 +56,13 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.is-initialized := glob.last-char = '(' or self.is-create
       if self.is-initialized
         VariableInit.parse-new(user _, user self)
+      else-if glob.last-char = '!'
+        self.syntax-error-msg(user "using \"!\" where there is no error")
       else-if self.parent is-not glob.root.global-init
         self.parent.code-nodes.add(owner VariableCreate(user self))
       self.get-function().function-variables.add(user self.name, user self)
+    else-if glob.last-char = '!'
+      self.syntax-error(user "unexpected \"!\" after", user self.name)
     if self.parent is glob.root.global-init
       self.parent := _
   
@@ -395,8 +399,10 @@ class VariableInit(VariableCreate)
   
   func inst parse()
     self.expression-init := InitExpression(user self)
+    self.check-error-mark()
     self.expression-init.parse(
         owner self.variable.type-instance.copy-new(), owner _)
+    self.check-error-mark()
     self.expression-init.is-statement := true
     self.expression-init.aux-variable := VariableExpression(user self)
     string-new-copy(user self.variable.name)->(
@@ -407,6 +413,12 @@ class VariableInit(VariableCreate)
     self.expression-init.aux-variable.access := self.variable.access
     self.expression-init.aux-variable.is-var := self.variable.is-create and
         access-is-only-var(copy self.variable.access)
+      
+  func inst check-error-mark()
+    if glob.last-char = '!'
+      self.expression-init.error-propagated := true
+      self.expression-init.error-expected := true
+      read-c()
   
   func dynamic analyze()
     if self.parent is glob.root.global-init
