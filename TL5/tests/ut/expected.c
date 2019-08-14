@@ -5521,6 +5521,8 @@ accessing mock function field in dynamic call to "meth"
 expected space after "test", got "new-line"
 /// @ te32
 constructor did not initialize field "s"
+/// @ te33
+no need to mark test functions with "!"
 /// @@ test-native
 /// @ tf0
 Returncode external(void);

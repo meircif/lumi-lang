@@ -249,7 +249,7 @@ class CallArgument(Argument)
         self.value := OwnerToStrongCallExpression(owner self.value)
   
   func dynamic check-same-type-as(
-      user TypeInstance type-instance,
+      user Argument other,
       user TypeInstance actual-params,
       copy Int bases,
       copy Bool print-error)
@@ -265,6 +265,8 @@ class CallArgument(Argument)
           user "invalid access",
           user glob.access-names[self.value.access])
     
+    user TypeInstance type-instance
+    other.get-type-instance()->(user type-instance)
     type-instance.new-replace-params(user actual-params)->(owner self.real-type)
     if self.is-output
       self.is-down-cast := self.real-type.check-assign-to(
@@ -277,6 +279,7 @@ class CallArgument(Argument)
       self.real-type.check-assign-from(copy self.access, user self)->(
           owner self.value)
     self.is-generic := type-instance.type-data is glob.type-generic
+    self.is-native := other.is-native
   
   func dynamic get-output()->(user Expression output)
     output := self.value

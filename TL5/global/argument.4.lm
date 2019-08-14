@@ -54,21 +54,18 @@ class Argument(SyntaxTreeNode)
           user glob.access-names[self.access])
     if check-same
       self.check-same-type-as(
-          user other.get-type-instance(),
-          user actual-params,
-          copy bases,
-          copy print-error)
-      self.is-native := other.is-native
+          user other, user actual-params, copy bases, copy print-error)
   
   func dynamic check-same-type-as(
-      user TypeInstance type-instance,
+      user Argument other,
       user TypeInstance actual-params,
       copy Int bases,
       copy Bool print-error)
     user SyntaxTreeNode node
     if print-error
       node := self
-    self.get-type-instance().check-equal(user type-instance, user node)
+    self.get-type-instance().check-equal(
+        user other.get-type-instance(), user node)
   
   func dynamic get-variable()->(user SyntaxTreeVariable variable)
     raise

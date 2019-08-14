@@ -144,6 +144,8 @@ class SyntaxTreeTestFunction(SyntaxTreeFunction)
     base(user _)
     if self.arguments.parameters.first? or self.arguments.outputs.first?
       self.syntax-error-msg(user "test function cannot have arguments")
+    if self.arguments.has-error
+      self.syntax-error-msg(user "no need to mark test functions with \"!\"")
     self.arguments.has-error := true
     glob.test-functions.add(user self.name, user self)
 

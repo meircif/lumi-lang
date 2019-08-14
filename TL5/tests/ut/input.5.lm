@@ -2229,6 +2229,8 @@ struct Test
     new()
         self.s := String{12}()
 mock Test.new()
+; @ eg te33
+test ! fun()
 ; @@ test-native
 ; @ g tf0
 native func external()
