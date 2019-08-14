@@ -2749,7 +2749,7 @@ Returncode ut_M_fun(void) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     ++LUMI_file_coverage[0].line_count[4];
-    LUMI_err = String_set(ut_M_s, 12, ut_M_s_Length, 0, 'a');
+    LUMI_err = String_clear(ut_M_s, 12, ut_M_s_Length);
     CHECK(4, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
@@ -4614,7 +4614,7 @@ char* s = NULL;
         s = aux_Array_0 + s_Index * aux_Array_0_Value_length;
         s_Max_length = aux_Array_0_Value_length;
         s_Length = aux_Array_0_String_length + s_Index;
-        LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
+        LUMI_err = String_clear(s, s_Max_length, s_Length);
         CHECK(2, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
@@ -4766,7 +4766,7 @@ char sa[3 * 4] = {0};
         s = aux_Array_0 + s_Index * 4;
         s_Max_length = 4;
         s_Length = aux_Array_0_String_length + s_Index;
-        LUMI_err = String_set(s, 4, s_Length, 0, 'a');
+        LUMI_err = String_clear(s, 4, s_Length);
         CHECK(3, LUMI_block1_cleanup)
     LUMI_block1_cleanup:
         (void)0;
@@ -5224,15 +5224,15 @@ LUMI_block0_cleanup:
 Returncode ut_M_fun0(void);
 Returncode ut_M_fun1(void);
 Returncode ut_M_fun2(void);
-int LUMI_file0_line_count[30] = {
-    -1,-1, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0,
-     0, 0, 0, 0,-1
+int LUMI_file0_line_count[29] = {
+    -1,-1, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0,
+     0, 0, 0,-1
 };
 int LUMI_file1_line_count[7] = {
     -1,-1,-1, 0,-1, 0,-1
 };
 File_Coverage LUMI_file_coverage[2] = {
-    {"mock.5.lm", 30, LUMI_file0_line_count},
+    {"mock.5.lm", 29, LUMI_file0_line_count},
     {"second.5.lm", 7, LUMI_file1_line_count}
 };
 Returncode ut_M_fun0(void) {
@@ -5277,55 +5277,48 @@ Returncode ut_M_fun0(void) {
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     ++LUMI_file_coverage[0].line_count[12];
     {
-        char* aux_String_0 = NULL;
-        int aux_String_0_Max_length = 0;
-        int aux_String_0_Length[1] = {0};
         ++LUMI_trace_ignore_count;
         ++LUMI_file_coverage[0].line_count[13];
         x = 0;
         ++LUMI_file_coverage[0].line_count[14];
-        INIT_STRING_CONST(14, LUMI_block7_cleanup, aux_String_0, "");
-        LUMI_err = Sys_print(sys, aux_String_0, *aux_String_0_Length);
-        CHECK(14, LUMI_block7_cleanup)
-        ++LUMI_file_coverage[0].line_count[15];
         y = 0;
     LUMI_block7_cleanup:
         (void)0;
     }
     --LUMI_trace_ignore_count;
-    ++LUMI_file_coverage[0].line_count[16];
+    ++LUMI_file_coverage[0].line_count[15];
     if (LUMI_err != OK) {
         LUMI_err = OK;
         LUMI_loop_depth = 1;
-        ++LUMI_file_coverage[0].line_count[17];
+        ++LUMI_file_coverage[0].line_count[16];
         x = 1;
-        ++LUMI_file_coverage[0].line_count[18];
+        ++LUMI_file_coverage[0].line_count[17];
         x = 2;
     LUMI_block8_cleanup:
         (void)0;
     }
-    ++LUMI_file_coverage[0].line_count[19];
+    ++LUMI_file_coverage[0].line_count[18];
     if (x > 3) {
-        ++LUMI_file_coverage[0].line_count[20];
+        ++LUMI_file_coverage[0].line_count[19];
         LUMI_loop_depth = 0; goto LUMI_block9_cleanup;
     LUMI_block9_cleanup:
         (void)0;
     }
     else {
-        ++LUMI_file_coverage[0].line_count[22];
+        ++LUMI_file_coverage[0].line_count[21];
         x = 3;
     LUMI_block11_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    ++LUMI_file_coverage[0].line_count[23];
+    ++LUMI_file_coverage[0].line_count[22];
     do {
         LUMI_loop_depth = 3;
-        ++LUMI_file_coverage[0].line_count[24];
+        ++LUMI_file_coverage[0].line_count[23];
         if (!(x > 1)) { LUMI_loop_depth = 1; goto LUMI_block12_cleanup; }
-        ++LUMI_file_coverage[0].line_count[25];
+        ++LUMI_file_coverage[0].line_count[24];
         if (x == 5) {
-            ++LUMI_file_coverage[0].line_count[26];
+            ++LUMI_file_coverage[0].line_count[25];
             LUMI_loop_depth = 2; goto LUMI_block13_cleanup;
         LUMI_block13_cleanup:
             (void)0;
@@ -5335,10 +5328,10 @@ Returncode ut_M_fun0(void) {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    ++LUMI_file_coverage[0].line_count[27];
+    ++LUMI_file_coverage[0].line_count[26];
     for (n = 0; n < 3; ++n) {
         LUMI_loop_depth = 3;
-        ++LUMI_file_coverage[0].line_count[28];
+        ++LUMI_file_coverage[0].line_count[27];
         x += y;
     LUMI_block14_cleanup:
         (void)0;
@@ -8200,7 +8193,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     aux_String_0 = NULL;
     aux_String_0_Length = &Lumi_empty_int;
     CHECK_REF(13, LUMI_block0_cleanup, s)
-    LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
+    LUMI_err = String_clear(s, s_Max_length, s_Length);
     CHECK(13, LUMI_block0_cleanup)
     INIT_NEW_STRING(14, LUMI_block0_cleanup, aux_String_1, 12);
     String_Del(to->s);
@@ -8261,7 +8254,7 @@ LUMI_block0_cleanup:
 Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, char** so, int* so_Max_length, int** so_Length) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
+    LUMI_err = String_clear(s, s_Max_length, s_Length);
     CHECK(4, LUMI_block0_cleanup)
     LUMI_err = ut_M_deleting(&(*so), &(*so_Max_length), &(*so_Length));
     CHECK(5, LUMI_block0_cleanup)
@@ -8309,7 +8302,7 @@ Returncode ut_M_fun(void) {
     s_Length = so_Length;
     s = so;
     CHECK_REF(6, LUMI_block0_cleanup, s)
-    LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
+    LUMI_err = String_clear(s, s_Max_length, s_Length);
     CHECK(6, LUMI_block0_cleanup)
     LUMI_err = ut_M_deleting(&(so), &(so_Max_length), &(so_Length), &(so_Refman));
     CHECK(7, LUMI_block0_cleanup)
@@ -8367,7 +8360,7 @@ Returncode ut_M_fun(void) {
     LUMI_err = ut_M_deleting(&(so), &(so_Max_length), &(so_Length), &(so_Refman));
     CHECK(6, LUMI_block0_cleanup)
     CHECK_REF_REFMAN(7, LUMI_block0_cleanup, s, s_Refman)
-    LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
+    LUMI_err = String_clear(s, s_Max_length, s_Length);
     CHECK(7, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
@@ -8392,7 +8385,7 @@ char* s = NULL;
     s_Length = *so_Length;
     s = *so;
     CHECK_REF(4, LUMI_block0_cleanup, s)
-    LUMI_err = String_set(s, s_Max_length, s_Length, 0, 'a');
+    LUMI_err = String_clear(s, s_Max_length, s_Length);
     CHECK(4, LUMI_block0_cleanup)
 /// @ tu4
 typedef struct ut_M_Test ut_M_Test;
@@ -8427,7 +8420,7 @@ Returncode ut_M_fun(ut_M_Test* t, char** s, int* s_Max_length, int** s_Length) {
     LUMI_err = ut_M_Test_get(t, &(*s), &(*s_Max_length), &(*s_Length));
     CHECK(7, LUMI_block0_cleanup)
     CHECK_REF(8, LUMI_block0_cleanup, *s)
-    LUMI_err = String_set(*s, *s_Max_length, *s_Length, 0, 'a');
+    LUMI_err = String_clear(*s, *s_Max_length, *s_Length);
     CHECK(8, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;

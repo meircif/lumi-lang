@@ -15,24 +15,24 @@ class TopType(covered.MiddleType)
         self.num-top := 3
     
     
-    func dynamic user meth2()
-        sys.println(user "TopType.meth2")
-        base()
-        covered.MiddleType.meth2(user self)
-        BaseType.meth2(user self)
+    func dynamic user ! meth2()
+        sys.println(user "TopType.meth2")!
+        base()!
+        covered.MiddleType.meth2(user self)!
+        BaseType.meth2(user self)!
     
-    func dynamic user meth3(copy Int n, user String s)
-        sys.println(user "TopType.meth3")
-        base.meth3(copy n, user s)
+    func dynamic user ! meth3(copy Int n, user String s)
+        sys.println(user "TopType.meth3")!
+        base.meth3(copy n, user s)!
     
     func dynamic user ! meth5(copy Int n, weak String? s)
-        sys.println(user "TopType.meth5")
+        sys.println(user "TopType.meth5")!
         base(copy n, weak s)!
-        covered.MiddleType.meth1(user _, copy n, weak s)
-        BaseType.meth1(user _, copy n, weak s)
+        covered.MiddleType.meth1(user _, copy n, weak s)!
+        BaseType.meth1(user _, copy n, weak s)!
     
-    func dynamic user meth6()
-        sys.println(user "TopType.meth6")
+    func dynamic user ! meth6()
+        sys.println(user "TopType.meth6")!
         self.num-mid := self.num-base
         self.top-base-ref := self.top-mid-ref
         user covered.MiddleType? mt(user self)
@@ -49,17 +49,17 @@ class BaseType
     new()
         self.num-base := 1
     
-    func dynamic user meth0()
-        sys.println(user "BaseType.meth0")
+    func dynamic user ! meth0()
+        sys.println(user "BaseType.meth0")!
     
-    func dynamic user? meth1(copy Int n, weak String? s)
-        sys.println(user "BaseType.meth1")
+    func dynamic user? ! meth1(copy Int n, weak String? s)
+        sys.println(user "BaseType.meth1")!
     
-    func dynamic user meth2()
-        sys.println(user "BaseType.meth2")
+    func dynamic user ! meth2()
+        sys.println(user "BaseType.meth2")!
     
-    func dynamic user meth3(copy Int n, user String s)
-        sys.println(user "BaseType.meth3")
+    func dynamic user ! meth3(copy Int n, user String s)
+        sys.println(user "BaseType.meth3")!
 
 
 func test-mid-out()->(user covered.MiddleType? mt)
@@ -134,7 +134,7 @@ test test-native()
     assert! external-int = 6
     var Int i
     var Native n
-    var String{4} s(user "bb")
+    var String{4} s(user "bb")!
     assert-error! external(copy 3, user s)->(var i, var n)
     assert! i = 3
     assert! s[0]! = 'a'
@@ -440,7 +440,7 @@ test test-assert-error-message()
     assert-error! arr![0]!, "empty object used"
     assert-error! arr2![0]!, "outdated weak reference used"
     user TopType? top(user _)
-    assert-error! top!.meth2(), "empty object used"
+    assert-error! top!.meth2()!, "empty object used"
     new-fail-countdown := 1
     assert-error! alloc()!, "insufficient memory for object dynamic allocation"
     new-fail-countdown := 2
@@ -449,56 +449,56 @@ test test-assert-error-message()
 native var Int lumi-debug-value
 
 test test-builtin-errors()
-    var String{4} too-long(user "abc")
+    var String{4} too-long(user "abc")!
     
     owner File? file
     var String{4} filename
     user String? empty
-    assert-error! file-open-read(user empty!)->(owner file), "empty object used"
+    assert-error! file-open-read(user empty!)->(owner file)!, "empty object used"
     lumi-debug-value := 1
-    assert-error! file-open-write(user filename)->(owner file), "open file failed"
+    assert-error! file-open-write(user filename)->(owner file)!, "open file failed"
     lumi-debug-value := 2
     new-fail-countdown := 1
-    assert-error! file-open-read(user filename)->(owner file),
+    assert-error! file-open-read(user filename)->(owner file)!,
             "insufficient memory for object dynamic allocation"
     new-fail-countdown := 1
-    assert-error! file-open-write(user filename)->(owner file),
+    assert-error! file-open-write(user filename)->(owner file)!,
             "insufficient memory for object dynamic allocation"
     lumi-debug-value := 2
-    file-open-read(user filename)->(owner file)
+    file-open-read(user filename)->(owner file)!
     lumi-debug-value := 1
-    assert-error! file-close(owner file!), "close file failed"
+    assert-error! file-close(owner file!)!, "close file failed"
     var Char ch
     lumi-debug-value := 2
-    file-open-read(user filename)->(owner file)
-    assert-error! file!.getc()->(var ch), "file not opened"
-    assert-error! file!.putc(copy 'a'), "file not opened"
-    assert-error! file!.write(user "aa"), "file not opened"
+    file-open-read(user filename)->(owner file)!
+    assert-error! file!.getc()->(var ch)!, "file not opened"
+    assert-error! file!.putc(copy 'a')!, "file not opened"
+    assert-error! file!.write(user "aa")!, "file not opened"
     lumi-debug-value := 1
-    assert-error! file!.putc(copy 'a'), "file write failed"
-    assert-error! file!.write(user "aa"), "file write failed"
+    assert-error! file!.putc(copy 'a')!, "file write failed"
+    assert-error! file!.write(user "aa")!, "file write failed"
     
-    assert-error! "aa".get(copy 2), "slice index out of bounds"
-    assert-error! too-long.append(copy 'a'), "string too long"
-    assert-error! too-long.concat(user "a"), "string too long"
+    assert-error! "aa".get(copy 2)!, "slice index out of bounds"
+    assert-error! too-long.append(copy 'a')!, "string too long"
+    assert-error! too-long.concat(user "a")!, "string too long"
     var String{3} short-str
-    assert-error! 123.str(user short-str), "string too long"
-    assert-error! short-str.copy(user "aaaaa"), "string too long"
+    assert-error! 123.str(user short-str)!, "string too long"
+    assert-error! short-str.copy(user "aaaaa")!, "string too long"
     
     lumi-debug-value := 2
-    assert-error! sys.getline(user short-str), "string too long"
+    assert-error! sys.getline(user short-str)!, "string too long"
     lumi-debug-value := 1
-    assert-error! sys.exit(copy 0), "exit failed"
-    assert-error! sys.system(user "aaa"), "command execution failed"
+    assert-error! sys.exit(copy 0)!, "exit failed"
+    assert-error! sys.system(user "aaa")!, "command execution failed"
 
-mock Sys.println(user Array{Char} text)
-    ; do nothing
+mock ! Sys.println(user Array{Char} text)
+    assert! text.length() > 0
 
 test test-cover-all()
     var covered.MiddleType mid
-    mid.meth1(copy 0, weak _)
-    mid.meth2()
-    mid.meth4()
+    mid.meth1(copy 0, weak _)!
+    mid.meth2()!
+    mid.meth4()!
     mid.meth5(copy 0, weak _)!
 
 

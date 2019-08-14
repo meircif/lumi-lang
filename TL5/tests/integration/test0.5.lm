@@ -43,12 +43,12 @@ class SimpleClass
 
 
 ; Test functions
-func test-simple-function()
-    sys.println(user "I am a simple function")
+func ! test-simple-function()
+    sys.println(user "I am a simple function")!
     sys.print(user "I am a multi\
             line
             string
-            ")
+            ")!
 
 
 func ! test-const-expression()->(
@@ -148,7 +148,7 @@ func ! test-variable(copy Int i, weak String text, user Array{Int} arr)
     new Array{arr[0]!:Func{()}} sfn!
     var Int ix(copy arr[0]!)
     user String si(user text!)
-    var String{12} isv(user "some string")
+    var String{12} isv(user "some string")!
     new String{i} isn(user text!)!
     var Func{:(copy Int n)->(owner String? st)} fi(copy test-int2str)
     var TestStruct itv(copy i, user text!)!
@@ -230,7 +230,7 @@ struct TestStruct
     func user get()->(var Int x, user String? s) _
     
     func user ! print()
-        sys.println(user self.text!)
+        sys.println(user self.text!)!
         
 func ! TestStruct.new(copy Int x, user String? s)
     self.num := x
@@ -258,7 +258,7 @@ class TestClass
     func dynamic user dynamic-meth() _
     
     func inst user ! print()
-        sys.println(user self.text!)
+        sys.println(user self.text!)!
     
 func TestClass.static-meth()
     self.num := 3
@@ -338,54 +338,54 @@ func ! test-builtins(
     var Char cv
     var Bool bv
     new String{12} so!
-    i.str(user so)
+    i.str(user so)!
     bv := true or false
     a.length()->(var iv)
     s!.length()->(var iv)
     so.clear()
     s!.equal(user s!)->(var bv)
-    s!.get(copy i)->(var cv)
-    s!.set(copy i, copy cv)
-    so.append(copy c)
-    so.copy(user s!)
-    so.concat(user s!)
-    so.concat-int(copy i)
+    s!.get(copy i)->(var cv)!
+    s!.set(copy i, copy cv)!
+    so.append(copy c)!
+    so.copy(user s!)!
+    so.concat(user s!)!
+    so.concat-int(copy i)!
     s!.find(user s!)->(var iv)
     s!.has(copy c)->(var bv)
     owner File? f
-    file-open-read(user s!)->(owner f)
-    file-open-write(user s!)->(owner f)
-    f!.getc()->(var cv, var bv)
-    f!.putc(copy c)
-    f!.write(user s!)
-    file-close(owner f!)
+    file-open-read(user s!)->(owner f)!
+    file-open-write(user s!)->(owner f)!
+    f!.getc()->(var cv, var bv)!
+    f!.putc(copy c)!
+    f!.write(user s!)!
+    file-close(owner f!)!
     user String arg(user sys.argv[1]!)
-    sys.print(user s!)
-    sys.println(user s!)
+    sys.print(user s!)!
+    sys.println(user s!)!
     sys.getchar()->(var cv, var bv)
-    sys.getline(user so)
-    sys.getenv(user s!, user so)->(var bv)
-    sys.system(user s!)->(var iv)
-    sys.exit(copy i)
-    sys.stdout.putc(copy c)
-    sys.stdin.getc()->(var cv, var bv)
-    sys.stderr.putc(copy c)
+    sys.getline(user so)!
+    sys.getenv(user s!, user so)->(var bv)!
+    sys.system(user s!)->(var iv)!
+    sys.exit(copy i)!
+    sys.stdout.putc(copy c)!
+    sys.stdin.getc()->(var cv, var bv)!
+    sys.stderr.putc(copy c)!
 
 
 func ! test-ref-count()
     strong String? s(strong String{32}(user "test string")!)
     weak String s-user(weak s!)
-    sys.println(user s!)
-    sys.println(user s-user!)
+    sys.println(user s!)!
+    sys.println(user s-user!)!
     remove(owner s!)
     if not s?
-        sys.println(user "ownership passed")
+        sys.println(user "ownership passed")!
     if not s-user?
-        sys.println(user "string deleted")
+        sys.println(user "string deleted")!
     new TestStruct ts(copy 0, user "first struct")!
-    sys.println(user ts.text!)
+    sys.println(user ts.text!)!
     ts.ts := TestStruct(copy 1, user "second struct")!
-    sys.println(user ts.ts!.text!)
+    sys.println(user ts.ts!.text!)!
 
 func remove(owner String s)
     ; remove s
@@ -450,30 +450,30 @@ func ! try-catch-raise(user TestStruct t)
 
 func ! test-error-handling(user TestStruct? t)
     try
-        sys.print(user "error handling { 1 ")
+        sys.print(user "error handling { 1 ")!
         t!.num := 1
-        sys.print(user " X ")
+        sys.print(user " X ")!
         try
             test-void()
         catch
             test-int(copy 2)
     catch
-        sys.print(user "2 ")
+        sys.print(user "2 ")!
         try
-            sys.print(user "3 ")
+            sys.print(user "3 ")!
             t!.num := 2
-            sys.print(user " X ")
-        sys.print(user "4 ")
-    sys.print(user "5 ")
+            sys.print(user " X ")!
+        sys.print(user "4 ")!
+    sys.print(user "5 ")!
     try
-        sys.print(user "6 ")
+        sys.print(user "6 ")!
         try
-            sys.print(user "7 ")
+            sys.print(user "7 ")!
             try-catch-raise(user t!)!
-            sys.print(user " X ")
-        sys.print(user "8 ")
+            sys.print(user " X ")!
+        sys.print(user "8 ")!
         raise! "another ignored message"
-    sys.println(user "}")
+    sys.println(user "}")!
 
 
 struct Container{Generic}
@@ -504,81 +504,81 @@ struct ContainerIterator{Generic}
 
 func ! test-for-each()
     var String{16} text
-    sys.print(user "chars[ ")
+    sys.print(user "chars[ ")!
     for c in "abcdef"
         text.clear()
-        text.append(copy c)
-        sys.print(user text)
-        sys.print(user " ")
-    sys.println(user "]")
+        text.append(copy c)!
+        sys.print(user text)!
+        sys.print(user " ")!
+    sys.println(user "]")!
     
     var Array{3:Int} arr
     arr[0]! := 14
     arr[1]! := 15
     arr[2]! := 16
-    sys.print(user "numbers[ ")
+    sys.print(user "numbers[ ")!
     for n in arr
         text.clear()
-        n.str(user text)
-        sys.print(user text)
-        sys.print(user " ")
-    sys.println(user "]")
+        n.str(user text)!
+        sys.print(user text)!
+        sys.print(user " ")!
+    sys.println(user "]")!
     
     var Array{3:SimpleStruct} tsarr
     tsarr[0]!.text := String{4}(user "aaa")!
     tsarr[1]!.text := String{4}(user "bbb")!
     tsarr[2]!.text := String{4}(user "ccc")!
-    sys.print(user "structs[ ")
+    sys.print(user "structs[ ")!
     for ts in tsarr
-        sys.print(user ts.text!)
-        sys.print(user " ")
-    sys.println(user "]")
+        sys.print(user ts.text!)!
+        sys.print(user " ")!
+    sys.println(user "]")!
     
     var Array{3:String{16}} sarr
     
-    sarr[0]!.copy(user "ddd")
-    sarr[1]!.copy(user "eee")
-    sarr[2]!.copy(user "fff")
-    sys.print(user "strings[ ")
+    sarr[0]!.copy(user "ddd")!
+    sarr[1]!.copy(user "eee")!
+    sarr[2]!.copy(user "fff")!
+    sys.print(user "strings[ ")!
     for s in sarr
-        sys.print(user s)
-        sys.print(user " ")
-    sys.println(user "]")
+        sys.print(user s)!
+        sys.print(user " ")!
+    sys.println(user "]")!
     
     s-var Container{Item} container-last(owner Item(user "iii")!, weak _)!
     s-var Container{Item} container-mid(owner Item(user "hhh")!, weak container-last)!
     s-var Container{Item} container-first(owner Item(user "ggg")!, weak container-mid)!
     s-var Container{Item} container(owner _, weak container-first)!
     owner ContainerIterator{Item} iter(owner container.iter()!)
-    sys.print(user "values[ ")
+    sys.print(user "values[ ")!
     for sc in iter
-        sys.print(user sc!.s)
-        sys.print(user " ")
-    sys.println(user "]")
+        sys.print(user sc!.s)!
+        sys.print(user " ")!
+    sys.println(user "]")!
     
     var Array{3:Array{3:Array{3:String{16}}}} saarr
     for n in 3
         for m in 3
             for i in 3
                 s := saarr[n]![m]![i]!
-                s.copy(user "val")
-                s.append(copy '0' + n)
-                s.append(copy '0' + m)
-                s.append(copy '0' + i)
-    sys.print(user "items[ ")
+                s.copy(user "val")!
+                s.append(copy '0' + n)!
+                s.append(copy '0' + m)!
+                s.append(copy '0' + i)!
+    sys.print(user "items[ ")!
     for a in saarr
-        sys.print(user "\n  ")
+        sys.print(user "\n  ")!
         for b in a
             for s in b
-                sys.print(user s)
-                sys.print(user " ")
-    sys.println(user "]")
+                sys.print(user s)!
+                sys.print(user " ")!
+    sys.println(user "]")!
 
 
 class ComplexField
     weak ComplexField? x
-    func dynamic user meth()
-        sys.print(user "$")
+    func dynamic user ! meth()
+        sys.print(user "$")!
 
 struct HasComplexField
     s-var ComplexField x
@@ -588,27 +588,27 @@ struct HasComplexField
 func ! HasComplexField.run()
     user ComplexField x(user self.x)
     x := self.x
-    x.meth()
-    self.x.meth()
-    ComplexField.meth(user self.x)
+    x.meth()!
+    self.x.meth()!
+    ComplexField.meth(user self.x)!
     user ComplexField? x2(user self.x.x!)
     x2 := self.x.x!
-    x2!.meth()
-    self.x.x!.meth()
-    ComplexField.meth(user self.x.x!)
-    self.as[0]!.copy(user "a1")
-    self.as[1]!.copy(user "a2")
-    self.as[2]!.copy(user "a3")
+    x2!.meth()!
+    self.x.x!.meth()!
+    ComplexField.meth(user self.x.x!)!
+    self.as[0]!.copy(user "a1")!
+    self.as[1]!.copy(user "a2")!
+    self.as[2]!.copy(user "a3")!
     for s in self.as
-        sys.print(user " ")
-        sys.print(user s)
+        sys.print(user " ")!
+        sys.print(user s)!
 
 func ! test-complex-field()
     s-var HasComplexField y!
     y.x.x := y.x
-    sys.print(user "complex fields: ")
+    sys.print(user "complex fields: ")!
     y.run()!
-    sys.println(user "")
+    sys.println(user "")!
 
 
 func ! set-borrow(var TestStruct t)
@@ -623,12 +623,12 @@ func ! test-switch()
     strong String s1(strong String{32}(user "first string")!)
     strong String s2(strong String{32}(user "second string")!)
     s1 :=: s2
-    sys.println(user s1)
-    sys.println(user s2)
+    sys.println(user s1)!
+    sys.println(user s2)!
 
 
 main
-    test-simple-function()
+    test-simple-function()!
     test-ref-count()!
     test-error-handling(user _)!
     test-for-each()!
