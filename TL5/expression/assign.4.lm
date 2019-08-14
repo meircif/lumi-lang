@@ -180,7 +180,6 @@ class AssignExpression(Expression)
       self.value.write-refman()
       write(user ");\n")
       self.code-node.write-spaces()
-      
   
   func inst write-assign-dynamic()
     self.target.write-dynamic()

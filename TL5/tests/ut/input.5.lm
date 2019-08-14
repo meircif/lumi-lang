@@ -547,7 +547,7 @@ b := fun0 is-not fun1
 b := b = b
 ; @ c t14
 owner Tc? otc
-tb := otc
+tb := otc!
 ; @ c t15
 owner Array?{Test} otarr
 otarr := _
@@ -735,6 +735,8 @@ weak String? s
 raise! s
 ; @ ec te10
 new String{str.length()} s!
+; @ ec te11
+so := ostr
 ; @ ec teo0
 raise! str!!
 ; @ ec ten0
@@ -1583,7 +1585,7 @@ var Array{12:Test} a
 var Array{12:String{7}} sa
 ; @ c t8
 new String{12} s!
-so := s
+so := s!
 ; @ c t9
 var Array{12:Ta} a
 ; @ c t10
@@ -1669,7 +1671,7 @@ func get()->(owner File? a)
     owner File? b(owner get())
 ; @ c t17
 owner Test? ot(owner to)
-strong Test? st(strong ot)
+strong Test? st(strong ot!)
 ; @ c t18
 s-var Tc tt(copy 3)!
 ; @ c t19

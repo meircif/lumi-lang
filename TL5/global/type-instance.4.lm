@@ -194,6 +194,13 @@ struct TypeInstance
   
   func check-assign-from(copy Int access, user SyntaxTreeNode node)->(
       owner Expression value)
+    if value.access = Access.OWNER and access = Access.STRONG
+      if not value.error-propagated
+        node.syntax-error(
+            user "ignoring initialization error check of type",
+            user value.result-type.type-data.name)
+      value.error-expected := false
+      value.code-node.check-function-has-error()
     node.check-expression-errors(
         copy not self.conditional and self.type-data is-not glob.type-ref,
         copy access != Access.WEAK)->(

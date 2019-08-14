@@ -2137,6 +2137,8 @@ ignoring empty reference check on type "String"
 ignoring weak reference check on type "String"
 /// @ te10
 ignoring empty reference check on type "String"
+/// @ te11
+ignoring initialization error check of type "String"
 /// @ teo0
 only one "!" needed
 /// @ ten0
