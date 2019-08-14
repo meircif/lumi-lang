@@ -110,11 +110,10 @@ class InitExpression(ModuleTypeExpression)
     self-param.code-node := self.code-node
     self.aux-variable.copy-new()->(owner self-param.value)
     self.arguments.parameters.prepend(owner self-param)
-    self.arguments.check-same-as(
+    self.arguments.check-calling(
         user self.constructor.arguments,
         user self.result-type,
-        copy 0,
-        copy true)
+        copy 0)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     if self.assign-expression?

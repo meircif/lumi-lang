@@ -20,8 +20,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
   
   func inst parse()
     read-new(user " ")->(owner self.item-name)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after index name, got")
+    self.expect-space(user self.item-name)
     self.read-expect(user "in ")
     self.iterator.new(user ":", user self)
     if glob.last-char = ':'

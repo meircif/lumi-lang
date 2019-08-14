@@ -59,6 +59,7 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     is-end := true
   
   func dynamic analyze()
+    self.check-function-has-error()
     if self.error-message.parsed()
       self.analyze-expression(user self.error-message, user glob.type-string)
       self.error-message.check-errors(copy false, copy true)

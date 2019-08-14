@@ -43,8 +43,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else
       self.type-instance.parse(
           user " ", user self, user _, copy INDENTATION-SPACES)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after type, got")
+    self.expect-space(user "type")
     read-new(user "(")->(owner self.name)
     self.check-name()
     if glob.last-char = '(' and self.parent-type?
@@ -455,13 +454,11 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     if not type-name.equal(user "Int")
       self.syntax-error(
           user "Only \"Int\" typed constant supported, got", user type-name)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after \"Int\", got")
+    self.expect-space(user "Int")
     read-new(user " ")->(owner self.name)
     if not is-legal-name(user self.name, copy NameGroup.CONSTANT)
       self.syntax-error(user "illegal constant name", user self.name)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after constant name, got")
+    self.expect-space(user self.name)
     self.value.new(user "", user self)
     glob.type-int.new-type-instance()->(owner self.type-instance)
     self.my-module.variable-map.add(user self.name, user self)

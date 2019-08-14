@@ -16,8 +16,8 @@ class CallExpression(Expression)
       result-type.new-replace-params(user actual-params)->(
           owner self.result-type)
       result-type := self.result-type
-    if self.arguments.check-same-as(
-        user declaration, user actual-params, copy bases, copy true)
+    if self.arguments.check-calling(
+        user declaration, user actual-params, copy bases)
       ; add omitted output
       new CallArgument output
       output.code-node := self.code-node
@@ -104,6 +104,13 @@ class FunctionCallExpression(CallExpression)
         user self.actual-params,
         copy self.function.bases)
     self.function.check-no-error()
+    if self.function.function.arguments.has-error
+      if not self.error-propagated
+        self.syntax-error(
+            user "ignoring error result check on function",
+            user self.function.function.name)
+      self.error-expected := false
+      self.code-node.check-function-has-error()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
@@ -133,7 +140,7 @@ class DynamicCallExpression(FunctionCallExpression)
             user "ignoring empty reference check on type",
             user self.self-instance.result-type.type-data.name)
       self.self-instance.error-expected := false
-      self.code-node.get-function().has-error := true
+      self.code-node.check-function-has-error()
     base()
 
   func dynamic write-function-check()

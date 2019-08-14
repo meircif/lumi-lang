@@ -30,6 +30,7 @@ func fun5(copy Int x)->(var Int y)
 func fun6(copy Int x, copy Int y)->(var Int n, var Int m)
 func fun7(weak Tb? tb)->(weak Tb? tbo)
 func fun8(strong String? s)
+func ! fune()
 
 var Int i
 var Char c
@@ -45,7 +46,7 @@ weak Tc? tc
 weak Data?{Test} d
 weak Array?{String} sarr
 
-func mock()->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
+func ! mock()->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
 ; @@ test-int-expression
 ; @ c t0
 i := 0
@@ -200,7 +201,7 @@ var Array{8:String{5}} vsa
 user String s(user vsa[3]!)
 user Array{String} sa(user vsa[2:4]!)
 ; @ g t8
-func fun(s-var String s, strong Array{String} sa)
+func ! fun(s-var String s, strong Array{String} sa)
     var Char c(copy s[5]!)
     user Array{Char} part(user s[4:2]!)
     user String si(user sa[3]!)
@@ -230,7 +231,7 @@ var Array{8:Array{7:Array{6:String{5}}}} aas
 user Array?{Array{String}} ua(user aas[3]!)
 user Array?{Array{Array{String}}} uaa(user aas[2:4]!)
 ; @ g t15
-func fun()
+func ! fun()
     var Array{8:Array{7:Array{6:String{5}}}} aas
     user String s(user aas[4]![3]![2]!)
 ; @ c t16
@@ -330,19 +331,20 @@ class Base
     var Int x
     func dynamic user meth(owner Base b)
 class Test(Base)
-    func dynamic user meth(owner Test t)
+    func dynamic user meth(owner Base b)
+        new Test t
         base(owner t)
 ; @ g t20
 class Test
     var Int x
     func dynamic user meth()
-func mock()->(weak Test? t)
+func ! mock()->(weak Test? t)
     mock()->(weak t)!.meth()
 ; @ g t21
 class Test
     var Int x
-    func dynamic user meth()->(weak Test? t)
-        self.meth()!.meth()
+    func dynamic user ! meth()->(weak Test? t)
+        self.meth()!.meth()!
 ; @ g t22
 func fun()->(owner Array?{String} astr)
     fun()->(owner astr)
@@ -365,6 +367,8 @@ weak String? sw
 fun1(copy 0, user sw!, owner s)
 ; @ c t25
 fun8(strong ostr)
+; @ c t26
+fune()!
 ; @ ec te0
 function( copy 1)
 ; @ ec te1
@@ -414,6 +418,12 @@ fun1(copy 3, user str, owner text)
 ; @ ec te20
 owner Tb? tbo
 fun7(weak tbo)
+; @ ec te21
+fune()
+; @ eg te22
+func ! fune()
+func fun()
+    fune()!
 ; @@ test-type-expression
 ; @ c t0
 Test.meth(user t!)
@@ -722,11 +732,11 @@ i := arr[3]!
 for _ in str
 ; @ ec te9
 weak String? s
-raise s
+raise! s
 ; @ ec te10
 new String{str.length()} s
 ; @ ec teo0
-raise str!!
+raise! str!!
 ; @ ec ten0
 var String{8} s
 so := s!
@@ -790,9 +800,9 @@ user String? s(user str!)
 ; @ eg ten23
 const Int CONST 12!
 ; @ ec ten24
-assert b!
+assert! b!
 ; @ ec ten25
-assert-error t!
+assert-error! t!
 ; @ ec ten26
 var Array{4:Int} a
 i := a![2]!
@@ -806,9 +816,9 @@ i := a[2:3!]!
 var Ref r
 r := ostr!
 ; @ ec ten30
-raise "error"!
+raise! "error"!
 ; @ ec ten31
-raise str!
+raise! str!
 ; @ ec ten32
 var String{23!} s
 ; @@ test-dynamic
@@ -852,7 +862,7 @@ fun7(weak tc)->(weak ta)
 class Test
     var Int x
     func dynamic user meth()
-func mock()->(weak Test? t)
+func ! mock()->(weak Test? t)
     t!.meth()
 ; @ g t17
 class Base
@@ -911,6 +921,10 @@ struct Test
     func user meth(copy Func{(copy Int x,
             copy Int y)} fi)->(var Func{(copy Int x,
             copy Int y)} fo)
+; @ c t9
+var Func{:()} fun
+fun := fune
+fun()!
 ; @ ec te0
 var Func error
 ; @ ec te1
@@ -933,6 +947,10 @@ fun := _
 ; @ ec te8
 var Func{()} fun(copy fun0)
 if fun?
+; @ ec te9
+var Func{()} fun(copy fune)
+; @ ec te10
+var Func{:()} fun(copy fun0)
 ; @@ test-builtin
 ; @ c ti0
 i.str(user ostr!)
@@ -1093,7 +1111,7 @@ error
 return
 i := 3
 ; @ ec te3
-raise
+raise!
 i := 3
 ; @ eg te4
 [; comment ;]?
@@ -1234,6 +1252,18 @@ class Base
     func dynamic user meth()
 class Error(Base)
     func inst user meth()
+; @ eg te5
+class Base
+    var Int x
+    func dynamic user meth()
+class Error(Base)
+    func dynamic user meth(copy Int x)
+; @ eg te6
+class Base
+    var Int x
+    func dynamic user meth()
+class Error(Base)
+    func dynamic user ! meth()
 ; @@ test-function
 ; @ g t0
 func name()
@@ -1251,7 +1281,7 @@ func name(copy Func{(copy Int x)->(var Int y)} fun)->(var Func{()} joy)
 func name()
     var Int x
 ; @ g t7
-func name(user String self, copy Int px, user Array{Char} pu, owner String po)->(
+func ! name(user String self, copy Int px, user Array{Char} pu, owner String po)->(
         strong String? oself, var Int ox, weak String? ou, owner String? oo)
     var Int x
     user String? u
@@ -1357,6 +1387,18 @@ func error(copy Int error)
 func name(copy Int Error)
 ; @ eg te29
 func name()->(owner String s)
+; @ eg te30
+func fun(weak String s)
+    s!.clear()
+; @ eg te31
+func fun()
+    raise!
+; @ eg te32
+func fun()
+    assert! 1 = 2
+; @ eg te33
+func fun()
+    assert-error! 1 = 2
 ; @@ test-members
 ; @ g t0
 struct Test
@@ -1486,30 +1528,42 @@ struct Test
 struct Test
     var Int x
     func error?()
+; @ eg te13
+struct Test
+    var Int x
+    func user fun()->(var Int x) _
+func Test.fun()
+; @ eg te14
+struct Test
+    var Int x
+    func user ! fun() _
+func Test.fun()
 ; @@ test-return
 ; @ g t0
 func name()
     return
 ; @ g t1
-func name()
-    raise
+func ! name()
+    raise!
 ; @ g t2
-func name()
-    raise "some error"
+func ! name()
+    raise! "some error"
 ; @ g t3
-func name(user Array{String} arr)
-    raise arr[3]!
+func ! name(user Array{String} arr)
+    raise! arr[3]!
 ; @ c t4
 weak String? s
-raise s!
+raise! s!
 ; @ ec te0
 return()
 ; @ ec te1
-raise()
+raise!()
 ; @ ec te2
-raise 2
+raise! 2
 ; @ ec te3
-raise _
+raise! _
+; @ ec te4
+raise
 ; @@ test-code-variables
 ; @ c t0
 var Int x
@@ -1541,7 +1595,7 @@ var Array{3:Array{4:String{5}}} aa
 ; @ c t13
 new Array{3:Array{4:String{5}}} aa
 ; @ g t14
-func fun()
+func ! fun()
     var String{4} sv
     if 1 > 2
         user Array{Char} su(user sv[1:2]!)
@@ -1781,7 +1835,7 @@ if false
     ; ...
 else 
 ; @ ec te8
-else-if
+else-if 
 ; @ ec te9
 if false
     ; ...
@@ -1932,30 +1986,30 @@ for n in 7
 var Int n
 ; @@ test-testing
 ; @ c ta0
-assert t!.num = 2
+assert! t!.num = 2
 ; @ c ta1
-assert-error t!.num
+assert-error! t!.num
 ; @ c ta2
-assert-error fun0()
+assert-error! fun0()
 ; @ c ta3
-assert-error t!.num, "expected error"
+assert-error! t!.num, "expected error"
 ; @ c ta4
-assert-error fun0(), "expected error in the function"
+assert-error! fun0(), "expected error in the function"
 ; @ c ta5
-assert-error t!.num,
+assert-error! t!.num,
         "expected error in new line"
 ; @ c ta6
 if b
     var String{4} s
-    assert b
-    assert-error s[1:2]!
+    assert! b
+    assert-error! s[1:2]!
     do
-        assert-error s[1:2]!
+        assert-error! s[1:2]!
 ; @ g tm0
-func fun()
-    fun()
-mock fun()
-    raise
+func ! fun()
+    fun()!
+mock ! fun()
+    raise!
 ; @ g tm1
 mock fun()
 func fun()
@@ -2036,7 +2090,7 @@ func fun0()
     if x > 3
         return
     else
-        raise
+        x := 3
     do
         while x > 1
         if x = 5
@@ -2082,13 +2136,13 @@ r := _
 var Ref r(copy ostr)
 ; @ c tr4
 var Ref r
-assert r is r
+assert! r is r
 ; @ ec te0
-assert 3
+assert! 3
 ; @ ec te1
-assert error
+assert! error
 ; @ ec te2
-assert-error error
+assert-error! error
 ; @ eg te3
 test fun(copy Int x)
 ; @ eg te4
@@ -2111,9 +2165,9 @@ func fun(user String s)
 mock fun(user Array{Char} a)
 func fun(user Array{Int} a)
 ; @ ec te11
-assert
+assert 
 ; @ ec te12
-assert-error
+assert-error 
 ; @ eg te13
 mock()
 ; @ eg te14
@@ -2135,15 +2189,13 @@ struct Test
 mock Test.delete()
 mock Test.delete()
 ; @ ec te18
-assert-error t.num , "error"
+assert-error! t.num , "error"
 ; @ ec te19
-assert-error t.num,"error"
-; @ ec te19-copy
-assert-error t.num,"error"
+assert-error! t.num,"error"
 ; @ ec te20
-assert-error t.num,  "error"
+assert-error! t.num,  "error"
 ; @ ec te21
-assert-error t.num, error
+assert-error! t.num, error
 ; @ eg te22
 mock new()->(var Bool res)
 mock new()->(var Bool res)
@@ -2298,7 +2350,7 @@ struct Test(Base{File})
     func user set(weak File? f)
         self.item := f
         self.get()->(weak f)
-func fun(user Test test, weak File? f)
+func ! fun(user Test test, weak File? f)
     test.item := f
     test.set(weak f)
     f := test.item
@@ -2310,9 +2362,9 @@ class Base{Param}
     func dynamic user set(weak Param? item)
     func dynamic user get()->(weak Param? item)
 class Test{Generic}(Base{Generic})
-    func dynamic user set(weak Generic item)
+    func dynamic user set(weak Generic? item)
     func dynamic user get()->(weak Generic? item)
-func mock(weak Test{File} test, weak File? f)
+func ! mock(weak Test{File} test, weak File? f)
     test!.set(weak f)
     test!.get()->(weak f)
     test!.get()!.putc(copy 'a')
@@ -2342,7 +2394,7 @@ struct Test{Generic}
 ; @ eg teg4
 struct Test{Generic}
     weak Generic? item
-    func user meth()->(user String? s)
+    func user ! meth()->(user String? s)
         s := self.item!
 ; @ eg teg5
 struct Test{Generic}
@@ -2484,10 +2536,10 @@ struct First{FirstGeneric}
 struct Second{SecondGeneric}
     weak SecondGeneric? item
 struct Test{Generic}(First{Second{Generic}})
-    func user set(weak Generic g, weak Second{Generic} sg)
+    func user ! set(weak Generic g, weak Second{Generic} sg)
         self.item := sg
         self.item!.item := g
-func use(weak File f, weak Second{File} ff)
+func ! use(weak File f, weak Second{File} ff)
     var Test{File} t
     t.item := ff
     t.item!.item := f
@@ -2614,7 +2666,7 @@ func fun()->(var Int i)
 struct TestIterator
     weak String? value
     func user has()->(var Bool has-data)
-    func user get()->(user String? text)
+    func user ! get()->(user String? text)
         text := self.value!
     func user next()
 func fun(user TestIterator iter)
@@ -2625,7 +2677,7 @@ func fun(user TestIterator iter)
 struct TestIterator{Generic}
     weak Generic? item
     func user has()->(var Bool has-data)
-    func user get()->(user Generic? item)
+    func user ! get()->(user Generic? item)
         item := self.item!
     func user next()
 class Test
@@ -2642,7 +2694,7 @@ func fun(user TestIterator{File} fiter, user TestIterator{Test} titer)
 class TestIterator{Generic}
     weak Generic? item
     func dynamic user has()->(var Bool has-data)
-    func dynamic user get()->(user Generic? item)
+    func dynamic user ! get()->(user Generic? item)
         item := self.item!
     func dynamic user next()
 func f-mock(user TestIterator{File} iter)
@@ -2777,7 +2829,7 @@ func f-mock()
 struct Test
     var Bstruct b
     s-var Bstruct sb
-    func user test()
+    func user ! test()
         weak Bstruct b(weak self.sb)
         b := self.sb
         self.b.meth()
@@ -2809,7 +2861,7 @@ struct Test
     var Array{4:Array{5:Array{6:Int}}} aai
     var Array{4:Array{5:Array{6:Base}}} aab
     var Array{4:Array{5:String{6}}} aas
-    func user test()->(var Char c, var Int i, user Base? b)
+    func user ! test()->(var Char c, var Int i, user Base? b)
         c := self.s[3]!
         i := self.ai[4]!
         b := self.ab[5]!
@@ -2852,8 +2904,8 @@ struct Base
     var Int x
 struct Test
     var Base b
-    func user error()
-        assert self.b?
+    func user ! error()
+        assert! self.b?
 ; @@ test-enum
 ; @ g t0
 enum MyEnum
@@ -3057,7 +3109,7 @@ struct Test
 func use(user String? s)
 func take(owner String? s)
 func give()->(owner String? s)
-func fun(owner String? s, user Test tu, owner Test to)
+func ! fun(owner String? s, user Test tu, owner Test to)
     s := _
     s := String{12}()
     s!.set(copy 0, copy 'a')
@@ -3078,7 +3130,7 @@ func fun(user String s)->(owner String? so)
 ; @ g tu1
 func deleting()->(strong String? s)
     s := _
-func fun()
+func ! fun()
     strong String? so(strong String{12}())
     user String? s(user so)
     s!.set(copy 0, copy 'a')
@@ -3086,7 +3138,7 @@ func fun()
 ; @ g tu2
 func deleting()->(strong String? s)
     s := _
-func fun()
+func ! fun()
     strong String? so(strong String{12}())
     weak String? s(weak so)
     deleting()->(strong so)
@@ -3099,11 +3151,11 @@ s!.set(copy 0, copy 'a')
 ; @ g tu4
 struct Test
     weak String? s
-    func user get()->(user String? s) _
-func Test.get()->(user String? s)
+    func user ! get()->(user String? s) _
+func ! Test.get()->(user String? s)
     s := self.s!
-func fun(user Test t)->(user String? s)
-    t.get()->(user s)
+func ! fun(user Test t)->(user String? s)
+    t.get()->(user s)!
     s!.set(copy 0, copy 'a')
 ; @ c tu5
 user String? s(user ostr)
@@ -3147,20 +3199,20 @@ struct Aa
     owner String? s
 struct Bb
     weak Aa? a
-func fun(owner Array{Bb} b)
+func ! fun(owner Array{Bb} b)
     b[3]!.a!.s := _
 ; @ eg teo4
 struct Test
     owner String? s
 func get-user()->(weak Test? t)
-func fun()
+func ! fun()
     weak Test? t
     get-user()->(weak t)!.s := _
 ; @ eg teo5
 struct Test
     owner String? s
 func get-weak()->(weak Test? t)
-func fun()
+func ! fun()
     get-weak()!.s := _
 ; @ eg teo6
 struct Test
@@ -3192,23 +3244,23 @@ s.clear()
 ; @ eg teo10
 struct Test
     owner Test? t
-func fun()->(owner Test? t, owner Test? x)
+func ! fun()->(owner Test? t, owner Test? x)
     t := x!.t
     t := t!.t
 ; @ eg teo11
 struct Test
     owner Test? t
-func fun(owner Test? t)
+func ! fun(owner Test? t)
     t := t!.t
 ; @ eg teo12
 struct Test
     owner Test? t
-func fun(owner Test? t)
+func ! fun(owner Test? t)
     t!.t := t
 ; @ eg teo13
 struct Test
     owner Test? t
-func fun(owner Test? t)
+func ! fun(owner Test? t)
     t!.t!.t := t!.t
 ; @ eg teo14
 struct Test
@@ -3256,29 +3308,29 @@ func fun(owner String? s)->(owner String? s2)
 ; @ eg teo21
 struct Test
     var Int x
-func fun(owner Test? t)->(var Int x)
-    x := fun(owner t) + t!.x
+func ! fun(owner Test? t)->(var Int x)
+    x := fun(owner t)! + t!.x
 ; @ eg teo22
 struct Test
     var Int x
-func fun(owner Test? t)->(var Int x)
-    x := t!.x + fun(owner t)
+func ! fun(owner Test? t)->(var Int x)
+    x := t!.x + fun(owner t)!
 ; @ eg teo23
 struct Test
     var Int x
-func fun(owner Test? t)->(var Int x)
-    for _ in fun(owner t):t!.x
+func ! fun(owner Test? t)->(var Int x)
+    for _ in fun(owner t)!:t!.x
 ; @ eg teo24
 struct Test
     var Int x
-func fun(owner Test? t)->(var Int x)
-    for _ in t!.x:fun(owner t)
+func ! fun(owner Test? t)->(var Int x)
+    for _ in t!.x:fun(owner t)!
 ; @ ec teo25
 new String{12} s
 try
     owner String s2(owner s)
     if b
-        raise
+        raise!
     s := s2
 s.clear()
 ; @ ec teu0
@@ -3369,10 +3421,10 @@ func fun(user String s)
 ; @ eg teu15
 struct Test
     owner String? s
-func deleting(owner Test? ta, owner Test? tb)
+func ! deleting(owner Test? ta, owner Test? tb)
     ta!.s := tb!.s
-func fun(user String s)
-    deleting(owner _, owner _)
+func ! fun(user String s)
+    deleting(owner _, owner _)!
     s.set(copy 0, copy 'a')
 ; @ ec teu16
 user Test? tt
@@ -3432,7 +3484,7 @@ class Base
     func dynamic user? fun(owner Base? b)
         recursive()
 class Test{Generic}(Base)
-    func dynamic user fun()
+    func dynamic user? fun(owner Base? b)
 func recursive()
     Base.fun(user _, owner _)
 func fun(user String s)
@@ -3443,10 +3495,10 @@ user String? s
 t!.fun!()
 s!.set(copy 0, copy 'a')
 ; @ eg teu24
-func deleting(copy Func?{()} f)
+func ! deleting(copy Func?{()} f)
     f!()
-func fun(user String s)
-    deleting(copy _)
+func ! fun(user String s)
+    deleting(copy _)!
     s.set(copy 0, copy 'a')
 ; @ eg teu25
 func fun()->(user String? s)
@@ -3515,9 +3567,9 @@ main
     so := _
     su!.set(copy 0, copy 'a')
 ; @ ec teu36
-assert str?
+assert! str?
 ; @ ec teu37
-assert-error str!.clear()
+assert-error! str!.clear()
 ; @ ec teu38
 if str?
 ; @ ec teu39
@@ -3546,7 +3598,7 @@ str := ostr
 try
     ostr := _
     if b
-        raise
+        raise!
     str := ostr
 str!.clear()
 ; @ eg teu46
@@ -3581,7 +3633,7 @@ struct Error
 ; @ eg tee2
 struct Error
     weak String s
-    new(strong String s)
+    new!(strong String s)
         self.s!.clear()
         self.s := s
 ; @ eg tee3

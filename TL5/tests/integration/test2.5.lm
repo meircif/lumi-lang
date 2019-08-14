@@ -25,5 +25,5 @@ class MiddleType(integration.BaseType)
     func dynamic user meth4()
         sys.println(user "MiddleType.meth4")
     
-    func dynamic user meth5(copy Int n, user String? s)
+    func dynamic user ! meth5(copy Int n, weak String? s)
         sys.println(user "MiddleType.meth5")

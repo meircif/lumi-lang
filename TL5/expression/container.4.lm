@@ -64,8 +64,8 @@ class UnaryExpression(Expression)
   func inst parse(user String ends)->(user Operator next-operator)
     if glob.last-char = '\n'
       self.code-node.read-parent-line-break-spaces()
-    else-if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after operator, got")
+    else
+      self.expect-space(user self.operator.name)
     Expression.parse-new(
         user _, user ends, user self.code-node, user self.operator)->(
         owner self.right-expression, user next-operator)

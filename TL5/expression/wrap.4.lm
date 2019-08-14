@@ -167,7 +167,7 @@ class CheckExpression(WrapExpression)
         self.syntax-error(
             user "ignoring weak reference check on type",
             user self.result-type.type-data.name)
-    self.code-node.get-function().has-error := true
+    self.code-node.check-function-has-error()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)

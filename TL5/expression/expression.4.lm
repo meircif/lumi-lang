@@ -40,6 +40,14 @@ class ExpressionValue(SyntaxTreeNode)
 
   func inst check-no-error()
     self.expression.check-no-error()
+
+  func inst check-all-errors()
+    self.expression.code-node.check-expression-all-errors()->(
+        owner self.expression)
+      
+  func inst check-errors(copy Bool check-conditional, copy Bool check-weak)
+    self.expression.code-node.check-expression-errors(
+        copy check-conditional, copy check-weak)->(owner self.expression)
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
@@ -50,15 +58,6 @@ class ExpressionValue(SyntaxTreeNode)
   
   func inst write-preactions()
     self.expression.write-preactions()
-
-  func inst check-all-errors()
-    self.expression.code-node.check-expression-all-errors()->(
-        owner self.expression)
-      
-  func inst check-errors(copy Bool check-conditional, copy Bool check-weak)
-    self.expression.code-node.check-expression-errors(
-        copy check-conditional, copy check-weak)->(owner self.expression)
-  
   func dynamic write()
     self.expression.write()
 

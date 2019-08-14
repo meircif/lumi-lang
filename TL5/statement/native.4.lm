@@ -5,8 +5,7 @@ module tl5-compiler
 func parse-native(user SyntaxTreeRoot root)
   user String keyword
   read-until(user " ", copy false)->(user keyword)
-  if glob.last-char != ' '
-    root.syntax-error-c(user "expected space after \"native\" keyword, got")
+  root.expect-space(user "native")
   
   if keyword.equal(user "func")
     root.functions.add(owner NativeFunction.parse-new(user _))

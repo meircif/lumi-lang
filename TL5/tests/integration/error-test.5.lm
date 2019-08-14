@@ -14,8 +14,8 @@ func f-get-top()->(user TopType? top)
 func f-good-function()
     return
 
-func f-raise-message(user String msg)
-    raise msg
+func ! f-raise-message(user String msg)
+    raise! msg
 
 var Int new-fail-countdown
 
@@ -33,35 +33,35 @@ test fail-call-empty()
 
 test fail-slice-index()
     var Array{2:Int} arr
-    assert arr[6]! = 0
+    assert! arr[6]! = 0
 
 test fail-member-empty()
     user BaseType? obj
-    assert obj!.x = 0
+    assert! obj!.x = 0
     obj!.meth()
 
 test fail-member-outdated()
     strong BaseType? obj-owner(strong BaseType())
     weak BaseType? obj(weak obj-owner)
     obj-owner := _
-    assert obj!.x = 0
+    assert! obj!.x = 0
     obj!.meth()
 
 test fail-sequence-empty()
     user Array?{Int} arr
-    assert arr![0]! = 0
+    assert! arr![0]! = 0
 
 test fail-sequence-outdated()
     strong Array?{Int} arr-owner(strong Array{2:Int}())
     weak Array?{Int} arr(weak arr-owner)
     arr-owner := _
-    assert arr![0]! = 0
+    assert! arr![0]! = 0
 
 test fail-slice-outdated()
     strong Array?{Int} arr-owner(strong Array{6:Int}())
     weak Array?{Int} arr(weak arr-owner![2:3]!)
     arr-owner := _
-    assert arr![0]! = 0
+    assert! arr![0]! = 0
 
 test fail-dynamic-empty()
     user BaseType? obj
@@ -80,19 +80,19 @@ test fail-exclamation-empty()
     user String s(user cs!)
 
 test fail-raise()
-    raise
+    raise!
 
 test fail-raise-message()
-    f-raise-message(user "my error")
+    f-raise-message(user "my error")!
 
 test fail-assert()
-    assert 1 = 2
+    assert! 1 = 2
 
 test fail-assert-error()
-    assert-error f-good-function()
+    assert-error! f-good-function()
 
 test fail-assert-error-message()
-    assert-error f-raise-message(user "tested other message"), "tested message"
+    assert-error! f-raise-message(user "tested other message")!, "tested message"
 
 test fail-assert-error-message-prefix()
-    assert-error f-raise-message(user "tested message"), "tested message and more"
+    assert-error! f-raise-message(user "tested message")!, "tested message and more"

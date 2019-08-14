@@ -51,7 +51,7 @@ func test-simple-function()
             ")
 
 
-func test-const-expression()->(
+func ! test-const-expression()->(
         var Int i,
         var Char c,
         weak TestStruct? t,
@@ -71,7 +71,7 @@ func test-const-expression()->(
     f!()
 
 
-func test-member-expression(strong TestStruct t)->(
+func ! test-member-expression(strong TestStruct t)->(
         weak TestStruct? to, var Int i)
     to := t
     t.num := to!.num + t.ts!.num + t.ts!.ts!.num
@@ -79,10 +79,10 @@ func test-member-expression(strong TestStruct t)->(
     t.ts!.ts!.num := 4
     t.fun := test-void
     t.fun()
-    t.new(copy 0, user "")
+    t.new(copy 0, user "")!
 
 
-func test-slice-expression(
+func ! test-slice-expression(
         user String s,
         strong Array{Int} arri,
         strong Array{String} arrs,
@@ -123,7 +123,7 @@ func test-container-expression(copy Int x, copy Int y, user String? s)->(
             not s?)
 
 
-func test-variable(copy Int i, weak String text, user Array{Int} arr)
+func ! test-variable(copy Int i, weak String text, user Array{Int} arr)
     var Int x
     user String? s
     owner Array?{Int} a
@@ -150,46 +150,46 @@ func test-variable(copy Int i, weak String text, user Array{Int} arr)
     user String si(user text!)
     var String{12} isv(user "some string")
     new String{i} isn(user text!)
-    var Func{(copy Int n)->(owner String? st)} fi(copy test-int2str)
+    var Func{:(copy Int n)->(owner String? st)} fi(copy test-int2str)
     var TestStruct itv(copy i, user text!)
     new TestStruct itn(copy i, user text!)
     var TestClass idv()
     new TestClass idn()
-    TestStruct(copy i, user text!).print()
-    TestClass().print()
-    assert String{arr[0]!}().length() > 0
-    assert Array{arr[0]!:Int}().length() > 0
-    assert Array{arr[0]!:SimpleStruct}().length() > 0
-    assert Array{arr[0]!:SimpleClass}().length() > 0
-    assert Array{arr[0]!:String{arr[1]!}}().length() > 0
-    assert Array{arr[0]!:Func{()}}().length() > 0
-    assert x = 0
-    assert s?
-    assert a?
-    t!.print()
-    d!.print()
-    assert f?
-    tv.print()
-    dv.print()
-    assert sv.length() > 0
-    assert ia.length() > 0
-    assert ta.length() > 0
-    assert da.length() > 0
-    assert sa.length() > 0
-    assert fa.length() > 0
-    tn.print()
-    dn.print()
-    assert sn.length() > 0
-    assert ian.length() > 0
-    assert tan.length() > 0
-    assert dan.length() > 0
-    assert san.length() > 0
-    assert sfn.length() > 0
-    assert ix = 0
-    assert si.length() > 0
-    fi(copy 7)
-    assert isv.length() > 0
-    assert isn.length() > 0
+    TestStruct(copy i, user text!).print()!
+    TestClass().print()!
+    assert! String{arr[0]!}().length() > 0
+    assert! Array{arr[0]!:Int}().length() > 0
+    assert! Array{arr[0]!:SimpleStruct}().length() > 0
+    assert! Array{arr[0]!:SimpleClass}().length() > 0
+    assert! Array{arr[0]!:String{arr[1]!}}().length() > 0
+    assert! Array{arr[0]!:Func{()}}().length() > 0
+    assert! x = 0
+    assert! s?
+    assert! a?
+    t!.print()!
+    d!.print()!
+    assert! f?
+    tv.print()!
+    dv.print()!
+    assert! sv.length() > 0
+    assert! ia.length() > 0
+    assert! ta.length() > 0
+    assert! da.length() > 0
+    assert! sa.length() > 0
+    assert! fa.length() > 0
+    tn.print()!
+    dn.print()!
+    assert! sn.length() > 0
+    assert! ian.length() > 0
+    assert! tan.length() > 0
+    assert! dan.length() > 0
+    assert! san.length() > 0
+    assert! sfn.length() > 0
+    assert! ix = 0
+    assert! si.length() > 0
+    fi(copy 7)!
+    assert! isv.length() > 0
+    assert! isn.length() > 0
 
 
 func test-complex-function(
@@ -221,7 +221,7 @@ struct TestStruct
     owner TestStruct? ts
     var Func{()} fun
     
-    new(copy Int x, user String? s) _
+    new!(copy Int x, user String? s) _
     
     [; Test
     multiline
@@ -229,10 +229,10 @@ struct TestStruct
     
     func user get()->(var Int x, user String? s) _
     
-    func user print()
+    func user ! print()
         sys.println(user self.text!)
         
-func TestStruct.new(copy Int x, user String? s)
+func ! TestStruct.new(copy Int x, user String? s)
     self.num := x
     if s?
         new String{s!.length() + 1} text(user s!)
@@ -257,7 +257,7 @@ class TestClass
         
     func dynamic user dynamic-meth() _
     
-    func inst user print()
+    func inst user ! print()
         sys.println(user self.text!)
     
 func TestClass.static-meth()
@@ -269,10 +269,10 @@ func TestClass.dynamic-meth()
 
 func test-void()
     return
-func test-params(copy Int x, user String? s, owner String? o)
-    raise
+func ! test-params(copy Int x, user String? s, owner String? o)
+    raise!
 func test-outs()->(owner String? s, var Int x)
-func test-int2str(copy Int x)->(owner String? s)
+func ! test-int2str(copy Int x)->(owner String? s)
 func test-int(copy Int x)
 func test-int2int(copy Int x)->(var Int r)
 func test-many(
@@ -282,13 +282,13 @@ func test-many(
         var Int m)
 
 
-func test-call-expression()
+func ! test-call-expression()
     owner String? s
     var Int x
     test-void()
-    test-params(copy 3, user "text", owner _)
+    test-params(copy 3, user "text", owner _)!
     test-outs()->(owner s, var x)
-    test-int2str(copy 4)->(owner s)
+    test-int2str(copy 4)->(owner s)!
     test-int(copy 5)
     test-int2int(copy 6)->(var x)
     test-many(
@@ -299,10 +299,10 @@ func test-call-expression()
     var Int tmp
     test-int(copy test-int2int(copy 9)->(var tmp))
     x := test-int2int(copy 10) + test-many(copy 11, copy 12)->(var x)
-    s := test-int2str(copy 13)
+    s := test-int2str(copy 13)!
 
 
-func test-code-flow(user Array{Int} arr)->(var Int res)
+func ! test-code-flow(user Array{Int} arr)->(var Int res)
     if arr[4]! > 6
         res := 6
     else-if arr is arr
@@ -332,7 +332,7 @@ func test-code-flow(user Array{Int} arr)->(var Int res)
             arr[1]! := w
 
 
-func test-builtins(
+func ! test-builtins(
         copy Int i, copy Char c, copy Bool b, weak String s, user Array{Int} a)
     var Int iv
     var Char cv
@@ -372,7 +372,7 @@ func test-builtins(
     sys.stderr.putc(copy c)
 
 
-func test-ref-count()
+func ! test-ref-count()
     strong String? s(strong String{32}(user "test string"))
     weak String s-user(weak s!)
     sys.println(user s!)
@@ -420,7 +420,7 @@ struct MidData{Generic}(Dataset{Item:Data{Generic}:Generic})
 
 struct TopData(MidData{TestStruct})
 
-func test-type-parameters(weak Item? s)
+func ! test-type-parameters(weak Item? s)
     var Data{Item} d
     user Item? su
     d.item := s
@@ -432,7 +432,7 @@ func test-type-parameters(weak Item? s)
     d.set(weak s)
     d.get()->(weak s)
     user Data? dg(user d)
-    assert dg?
+    assert! dg?
     
     var TopData t
     s-var Data{TestStruct} dt
@@ -442,13 +442,13 @@ func test-type-parameters(weak Item? s)
     t.third := ts
 
 
-func try-catch-raise(user TestStruct t)
+func ! try-catch-raise(user TestStruct t)
     try
         t.num := 1
     catch
-        raise "ignored message"
+        raise! "ignored message"
 
-func test-error-handling(user TestStruct? t)
+func ! test-error-handling(user TestStruct? t)
     try
         sys.print(user "error handling { 1 ")
         t!.num := 1
@@ -469,10 +469,10 @@ func test-error-handling(user TestStruct? t)
         sys.print(user "6 ")
         try
             sys.print(user "7 ")
-            try-catch-raise(user t!)
+            try-catch-raise(user t!)!
             sys.print(user " X ")
         sys.print(user "8 ")
-        raise "another ignored message"
+        raise! "another ignored message"
     sys.println(user "}")
 
 
@@ -496,13 +496,13 @@ struct ContainerIterator{Generic}
     func user has()->(var Bool has-data)
         has-data := self.curr?
     
-    func user get()->(user Generic? item)
+    func user ! get()->(user Generic? item)
         item := self.curr!.value
     
-    func user next()
+    func user ! next()
         self.curr := self.curr!.next
 
-func test-for-each()
+func ! test-for-each()
     var String{16} text
     sys.print(user "chars[ ")
     for c in "abcdef"
@@ -583,9 +583,9 @@ class ComplexField
 struct HasComplexField
     s-var ComplexField x
     var Array{3:String{6}} as
-    func user run() _
+    func user ! run() _
 
-func HasComplexField.run()
+func ! HasComplexField.run()
     user ComplexField x(user self.x)
     x := self.x
     x.meth()
@@ -603,21 +603,21 @@ func HasComplexField.run()
         sys.print(user " ")
         sys.print(user s)
 
-func test-complex-field()
+func ! test-complex-field()
     s-var HasComplexField y
     y.x.x := y.x
     sys.print(user "complex fields: ")
-    y.run()
+    y.run()!
     sys.println(user "")
 
 
 func set-borrow(var TestStruct t)
     t.ts := TestStruct(copy 2, user _)
 
-func test-borrow()
+func ! test-borrow()
     var TestStruct t(copy 1, user _)
     set-borrow(var t)
-    assert t.ts!.num = 2
+    assert! t.ts!.num = 2
 
 func test-switch()
     strong String s1(strong String{32}(user "first string"))
@@ -629,9 +629,9 @@ func test-switch()
 
 main
     test-simple-function()
-    test-ref-count()
-    test-error-handling(user _)
-    test-for-each()
-    test-complex-field()
-    test-borrow()
+    test-ref-count()!
+    test-error-handling(user _)!
+    test-for-each()!
+    test-complex-field()!
+    test-borrow()!
     test-switch()

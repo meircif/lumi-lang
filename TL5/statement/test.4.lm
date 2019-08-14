@@ -14,6 +14,7 @@ class SyntaxTreeAssert(SyntaxTreeCode)
     self.tested.new(user "", user self)
   
   func dynamic analyze()
+    self.check-function-has-error()
     self.analyze-expression(user self.tested, user glob.type-bool)
     self.tested.check-no-error()
 
@@ -51,12 +52,13 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
       read-c()
       if glob.last-char = '\n'
         self.read-parent-line-break-spaces()
-      else-if glob.last-char != ' '
-        self.syntax-error-c(user "expected space after \",\", got")
+      else
+        self.expect-space(user ",")
       read-new(user "")->(owner self.expected-error)
       self.check-string(user self.expected-error)
   
   func dynamic analyze()
+    self.check-function-has-error()
     self.tested.analyze()
     self.tested.check-no-error()
 
@@ -142,6 +144,7 @@ class SyntaxTreeTestFunction(SyntaxTreeFunction)
     base(user _)
     if self.arguments.parameters.first? or self.arguments.outputs.first?
       self.syntax-error-msg(user "test function cannot have arguments")
+    self.arguments.has-error := true
     glob.test-functions.add(user self.name, user self)
 
 

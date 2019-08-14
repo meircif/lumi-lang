@@ -63,6 +63,7 @@ Returncode ut_M_fun5(Int x, Int* y);
 Returncode ut_M_fun6(Int x, Int y, Int* n, Int* m);
 Returncode ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dynamic, ut_M_Tb** tbo, Ref_Manager** tbo_Refman, ut_M_Tb_Dynamic** tbo_Dynamic);
 Returncode ut_M_fun8(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman);
+Returncode ut_M_fune(void);
 Returncode ut_M_mock(char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 ut_M_Ta_Dynamic ut_M_Ta_dynamic = {(Dynamic_Del)ut_M_Ta_Del, ut_M_Ta_dyn};
@@ -259,6 +260,13 @@ LUMI_block0_cleanup:
     (void)0;
     String_Del(s);
     LUMI_owner_dec_ref(s_Refman);
+    return LUMI_err;
+}
+Returncode ut_M_fune(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
     return LUMI_err;
 }
 Returncode ut_M_mock(char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
@@ -1114,7 +1122,7 @@ struct ut_M_Test_Dynamic {
 };
 Returncode ut_M_Base_meth(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, ut_M_Base* b, ut_M_Base_Dynamic* b_Dynamic);
 void ut_M_Base_Del(ut_M_Base* self);
-Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test* t, ut_M_Test_Dynamic* t_Dynamic);
+Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Base* b, ut_M_Base_Dynamic* b_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self);
 ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_meth};
 ut_M_Test_Dynamic ut_M_Test_dynamic = {{(Dynamic_Del)ut_M_Test_Del, (Func)ut_M_Test_meth}};
@@ -1130,17 +1138,22 @@ LUMI_block0_cleanup:
 void ut_M_Base_Del(ut_M_Base* self) {
     if (self == NULL) return;
 }
-Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test* t, ut_M_Test_Dynamic* t_Dynamic) {
+Returncode ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Base* b, ut_M_Base_Dynamic* b_Dynamic) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
+    ut_M_Test* t = NULL;
+    ut_M_Test_Dynamic* t_Dynamic = &ut_M_Test_dynamic;
+    INIT_NEW(6, LUMI_block0_cleanup, t, ut_M_Test, 1);
     LUMI_err = ut_M_Base_meth(&(self->_base), &(self_Dynamic->_base), &(t->_base), &(t_Dynamic->_base));
     t = NULL;
     t_Dynamic = NULL;
-    CHECK(6, LUMI_block0_cleanup)
+    CHECK(7, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
     if (t_Dynamic != NULL) t_Dynamic->_base._del(t);
     free(t);
+    if (b_Dynamic != NULL) b_Dynamic->_del(b);
+    free(b);
     return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
@@ -1331,10 +1344,13 @@ char* aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     aux_String_0_Length = &Lumi_empty_int;
     CHECK(1, LUMI_block0_cleanup)
+/// @ t26
+LUMI_err = ut_M_fune();
+    CHECK(1, LUMI_block0_cleanup)
 /// @ te0
 expected access, got " "
 /// @ te1
-expected space after access, got ")"
+expected space after "user", got ")"
 /// @ te2
 expected space or new-line after ",", got "c"
 /// @ te3
@@ -1373,6 +1389,10 @@ passing ownership of type "Test" into static type "Base"
 assigning into an owner a non-owner access "var"
 /// @ te20
 assigning into a weak reference an illegal access "owner"
+/// @ te21
+ignoring error result check on function "fune"
+/// @ te22
+error raised inside function not declared as error raising "fun"
 /// @@ test-type-expression
 /// @ t0
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
@@ -1550,7 +1570,7 @@ ut_M_b = ! (ut_M_i > 3);
 /// @ t5
 expected expression, got "{"
 /// @ t6
-expected space after operator, got "["
+expected space after "-", got "["
 /// @ t7
 not unary operator "+"
 /// @ t8
@@ -1625,7 +1645,7 @@ ut_M_Test* otarr = NULL;
 /// @ te0
 unknown operator "@"
 /// @ te1
-expected space after operator, got "("
+expected space after "+", got "("
 /// @ te2
 ambiguous precedence between operators "+" and "*"
 /// @ te3
@@ -2462,6 +2482,11 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
+/// @ t9
+Returncode (*fun)(void) = NULL;
+    fun = ut_M_fune;
+    LUMI_err = fun();
+    CHECK(3, LUMI_block0_cleanup)
 /// @ te0
 missing arguments in function type
 /// @ te1
@@ -2480,6 +2505,10 @@ using invalid reference "fun"
 assigning empty into non-conditional type "Func"
 /// @ te8
 cannot use "?" on non conditional or weak reference of type "Func"
+/// @ te9
+non matching error result
+/// @ te10
+non matching error result
 /// @@ test-builtin
 /// @ ti0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
@@ -3105,6 +3134,10 @@ expected "dynamic" or "inst" method type, got "error"
 illegal dynamic in function "meth"
 /// @ te4
 illegal dynamic in function "meth"
+/// @ te5
+too many parameters
+/// @ te6
+non matching error result
 /// @@ test-function
 /// @ t0
 Returncode ut_M_name(void);
@@ -3392,9 +3425,9 @@ function name overrides global variable "name"
 /// @ te6
 expected access, got " "
 /// @ te7
-expected space after access, got ")"
+expected space after "user", got ")"
 /// @ te8
-expected space after type, got "new-line"
+expected space after "type", got "new-line"
 /// @ te9
 illegal access "error"
 /// @ te10
@@ -3435,6 +3468,14 @@ variable name overrides function "error"
 illegal variable name "Error"
 /// @ te29
 not yet supporting non-conditional and non-primitive output "s"
+/// @ te30
+error raised inside function not declared as error raising "fun"
+/// @ te31
+error raised inside function not declared as error raising "fun"
+/// @ te32
+error raised inside function not declared as error raising "fun"
+/// @ te33
+error raised inside function not declared as error raising "fun"
 /// @@ test-members
 /// @ t0
 typedef struct ut_M_Test ut_M_Test;
@@ -3697,6 +3738,10 @@ field "num" is not a global member of type "Test"
 missing access before method name
 /// @ te12
 missing access before method name
+/// @ te13
+too few outputs
+/// @ te14
+non matching error result
 /// @@ test-return
 /// @ t0
 Returncode ut_M_name(void);
@@ -3759,11 +3804,13 @@ char* s = NULL;
 /// @ te0
 expected new-line after "return", got "("
 /// @ te1
-expected space or new-line after "raise", got "("
+expected space or new-line after "raise!", got "("
 /// @ te2
 got "Int" expression, expected "String"
 /// @ te3
 got "Empty Symbol" expression, expected "String"
+/// @ te4
+expected ! after "raise", got "new-line"
 /// @@ test-code-variables
 /// @ t0
 Int x = 0;
@@ -3859,7 +3906,7 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @ te0
-expected space after type, got "new-line"
+expected space after "type", got "new-line"
 /// @ te1
 illegal variable name "Error"
 /// @ te2
@@ -4681,7 +4728,7 @@ char sa[3 * 4] = {0};
 /// @ te0
 expected space after "for", got "("
 /// @ te1
-expected space after index name, got "new-line"
+expected space after "n", got "new-line"
 /// @ te2
 expected "in " got "err"
 /// @ te3
@@ -5214,7 +5261,7 @@ Returncode ut_M_fun0(void) {
     }
     else {
         ++LUMI_file_coverage[0].line_count[22];
-        USER_RAISE(22, LUMI_block11_cleanup, NULL, 0)
+        x = 3;
     LUMI_block11_cleanup:
         (void)0;
     }
@@ -5431,9 +5478,9 @@ non matching types "Int" and "String"
 /// @ te10
 non matching subtypes "Char" and "Int"
 /// @ te11
-expected space after "assert", got "new-line"
+expected ! after "assert", got " "
 /// @ te12
-expected space after "assert-error", got "new-line"
+expected ! after "assert-error", got " "
 /// @ te13
 expected space after "mock", got "("
 /// @ te14
@@ -5447,8 +5494,6 @@ already mocking delete of type "Test"
 /// @ te18
 unknown operator ""
 /// @ te19
-expected space after ",", got """
-/// @ te19-copy
 expected space after ",", got """
 /// @ te20
 no '"' around string constant " "error""
@@ -5546,7 +5591,7 @@ Returncode external(Native n, Native* no);
 /// @ te0
 expected space after "native", got "("
 /// @ te1
-expected space after "native" keyword, got "new-line"
+expected space after "native", got "new-line"
 /// @ te2
 unknown "native" keyword "error"
 /// @ tef1
@@ -7659,7 +7704,7 @@ illegal constant name "ERRoR"
 /// @ te6
 expected space after "enum", got "new-line"
 /// @ te7
-expected new-line after Enum value, got "("
+expected new-line after "VALUE", got "("
 /// @ te8
 Enum with no values
 /// @ te9
@@ -7704,7 +7749,7 @@ expected space after "Int", got "new-line"
 /// @ te3
 illegal constant name "Error"
 /// @ te4
-expected space after constant name, got "new-line"
+expected space after "ERROR", got "new-line"
 /// @ te5
 got "Bool" expression, expected "Int"
 /// @ te6

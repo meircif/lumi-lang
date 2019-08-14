@@ -30,8 +30,7 @@ class EnumData(SyntaxTreeNode)
         self.syntax-error-indentation(copy spaces, copy INDENTATION-SPACES)
       if not is-legal-name(user value, copy NameGroup.CONSTANT)
         self.syntax-error(user "illegal constant name", user value)
-      if glob.last-char != '\n'
-        self.syntax-error-c(user "expected new-line after Enum value, got")
+      self.expect-new-line(user value)
       self.values.add(owner string-new-copy(user value))
     if not self.values.first?
       self.syntax-error-msg(user "Enum with no values")

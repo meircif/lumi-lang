@@ -25,7 +25,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   var Bool is-dynamic
   var Bool header-only
   var Bool external-body
-  var Bool has-error
   
   func inst parse-new(user TypeData parent-type)->(
       owner SyntaxTreeFunction new-node)
@@ -72,7 +71,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.indentation-spaces := INDENTATION-SPACES
   
   func inst parse-header(copy Bool is-native)
-    read-new(user ".(")->(owner self.name)
+    read-new(user "!.(")->(owner self.name)
+    if glob.last-char = '!'
+      self.arguments.has-error := true
+      read-c()
+      self.expect-space(user "!")
+      read-new(user ".(")->(owner self.name)
     do
       while glob.last-char = '.'
       var Char ch(copy self.name[0])
@@ -213,11 +217,16 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       glob.current-module := self.my-module
     if self.implemented-function?
       self.arguments.check-same-as(
-          user self.implemented-function.arguments, user _, copy 0, copy true)
+          user self.implemented-function.arguments, copy true)
       self.my-module := self.implemented-function.my-module
     self.arguments.analyze()
     if self.header-only
       return
+    if not self.external-body and self.is-dynamic
+      self.arguments.check-override(
+          user self.dynamic-base-method.arguments,
+          user self.parent-type.base-type,
+          copy self.dynamic-base-count)
     for parameter in self.arguments.parameters.iter()
       if access-is-owner(copy parameter.access)
         self.delete-group-builder.add-deleting(
@@ -395,6 +404,11 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
     self.self-access := Access.VAR
     self.self-conditional := false
     self.parent-type.constructor := self
+    if glob.last-char = '!'
+      self.arguments.has-error := true
+      read-c()
+    if glob.last-char != '('
+      self.syntax-error-c(user "expected \"(\" after \"new\", got")
     string-new-copy(user "new")->(owner self.name)
     self.parse-arguments(copy false)
     self.parse-body()
@@ -424,8 +438,7 @@ class DeclarationArgument(Argument)
     self.variable.type-instance := TypeInstance()
     self.variable.type-instance.parse(
         user " ", user self, user _, copy indentation-spaces)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after type, got")
+    self.expect-space(user "type")
     read-new(user ",)")->(owner self.variable.name)
     self.variable.check-name()
   

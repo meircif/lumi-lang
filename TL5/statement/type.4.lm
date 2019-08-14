@@ -68,8 +68,6 @@ class TypeData(SyntaxTreeNamespace)
       return
     
     if keyword.equal(user "new")
-      if glob.last-char != '('
-        self.syntax-error-c(user "expected \"(\" after \"new\", got")
       if self.constructor?
         self.syntax-error(
             user "constructor already defined for type", user self.name)
