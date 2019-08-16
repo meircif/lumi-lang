@@ -329,7 +329,9 @@ class TypeData(SyntaxTreeNamespace)
       self.find-meth(user base-method.name)->(user method)
       write(user ", ")
       if method is-not base-method
-        write(user "(Func)")
+        write(user "(")
+        base-method.arguments.write-pointer(user _)
+        write(user ")")
       method.parent-type.write-cname()
       write(user "_")
       if method.mocker-function?

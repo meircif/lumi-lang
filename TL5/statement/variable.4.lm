@@ -208,8 +208,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func inst write-sequence()
     ; `data-type` `name`[`full length`][ = {0}];
     ; `data-type`* `name`[ = NULL];
-    ; Returncode (*`name`[`full length`])(`arguments`)[ = {0}];
-    ; Returncode (**`name`)(`arguments`)[ = NULL];
+    ; [void|Returncode] (*`name`[`full length`])(`arguments`)[ = {0}];
+    ; [void|Returncode] (**`name`)(`arguments`)[ = NULL];
     var Bool is-new-or-aux-var(
         copy access-is-only-var(copy self.access) and self.is-create)
     var Bool is-new-var(copy is-new-or-aux-var and not self.is-aux)
@@ -220,7 +220,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if data-type.type-data is glob.type-string
       write(user "char")
     else-if data-type.type-data is glob.type-func
-      write(user "Returncode (*")
+      data-type.arguments.write-pointer-start()
     else
       data-type.type-data.write-cname()
     if not is-new-var

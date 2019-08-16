@@ -336,9 +336,16 @@ class FunctionArguments(SyntaxTreeNode)
       while iter.has()
       write(user ", ")
   
+  func inst write-pointer-start()
+    if self.has-error
+      write(user "Returncode (*")
+    else
+      write(user "void (*")
+  
   func inst write-pointer(user String name)
-    write(user "Returncode (*")
-    write-cname(user name)
+    self.write-pointer-start()
+    if name?
+      write-cname(user name)
     write(user ")")
     self.write()
   

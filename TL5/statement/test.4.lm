@@ -241,11 +241,14 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
   
   func dynamic write-block-body()
     if self.implemented-function?
-      ; if (!`name`_active) return `name`(`arguments`);
+      ; if (!`name`_active) { return `name`(`arguments`); }
+      ; if (!`name`_active) { `name`(`arguments`); return; }
       write-spaces(copy INDENTATION-SPACES)
       write(user "if (!")
       self.write-cname()
-      write(user "_active) return ")
+      write(user "_active) { ")
+      if self.arguments.has-error
+        write(user "return ")
       self.implemented-function.write-cname()
       var FunctionArguments call-arguments
       for argument in self.arguments.parameters.iter()
@@ -253,7 +256,9 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       for argument in self.arguments.outputs.iter()
         self.build-call-argument(user call-arguments.outputs, user argument)
       call-arguments.write-call()
-      write(user ";\n")
+      if not self.arguments.has-error
+        write(user "; return")
+      write(user "; }\n")
     base()
   
   func inst build-call-argument(

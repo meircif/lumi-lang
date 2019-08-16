@@ -904,6 +904,9 @@ t!.fun := fun0
 t!.fun!()
 ; @ c t5
 var Array{38:Func{()}} farr
+new Array{12:Func{(copy Int x)->(var Int y)}} farr1!
+new Array{12:Func{:()}} farr2!
+user Array{Func{:()}} ufarr
 farr[3]! := fun0
 farr[3]!()
 ; @ c t6
@@ -914,13 +917,16 @@ func mock()->(var Func{()} f)
     f()
 ; @ g t8
 func fun(copy Func?{(copy Int x,
-        copy Int y)} fi)->(var Func{(copy Int x,
+        copy Int y)} fi)->(var Func{:(copy Int x,
         copy Int y)} fo)
     fun(copy _)
+func afun(user Array{Func{(copy Int x)->(var Int y)}} in)->(
+        owner Array?{Func{:()}} out)
 struct Test
     var Func{(copy Int x,
             copy Int y)} fun
-    func user meth(copy Func{(copy Int x,
+    var Array{4:Func{:(copy Int x)->(var Int y)}} afun
+    func user meth(copy Func{:(copy Int x,
             copy Int y)} fi)->(var Func{(copy Int x,
             copy Int y)} fo)
 ; @ c t9
@@ -1215,18 +1221,24 @@ class Base
     owner Base? b
     func inst user stat()
     func dynamic user dyn0()
-    func dynamic user dyn1()
+    func dynamic user ! dyn1()
+    func dynamic user dyn2()
 class Mid(Base)
     var Int y
     owner Mid? m
     func dynamic user dyn0()
-    func dynamic user dyn2()
+    func dynamic user dyn3()
+    func dynamic user ! dyn4()
 class Top(Mid)
     var Int z
     owner Top? t
     func dynamic user dyn0()
         base()
+    func dynamic user ! dyn1()
+        base()!
     func dynamic user dyn3()
+        base()
+    func dynamic user dyn5()
         base.dyn0()
 ; @ g t1
 class Test

@@ -1,6 +1,8 @@
 #include "lumi.5.h"
 
-/*traceback*/
+
+/* traceback */
+
 #define CRAISE(message) { \
   LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, message); \
   return ERR; }
@@ -89,7 +91,7 @@ void LUMI_trace_print(
   }
 }
 
-/*like strnlen*/
+/* like strnlen */
 int cstring_length(char* cstring, int max_length) {
   int length = 0;
   while (cstring[length] != '\0' && length < max_length) {
@@ -108,7 +110,9 @@ void LUMI_C_trace_print(int line, char const* funcname, char* message) {
       cstring_length(message, 255));
 }
 
-/*main*/
+
+/* main */
+
 Returncode LUMI_user_main(void);
 int set_sys(int argc, char* argv[]);
 #define SET_SYS err = set_sys(argc, argv); if (err != OK) return err;
@@ -124,7 +128,9 @@ int LUMI_main(int argc, char* argv[]) {
   return err;
 }
 
-/*tests*/
+
+/* tests */
+
 int LUMI_test_main(int argc, char* argv[]) {
   Returncode err;
   LUMI_trace_stream = stdout;
@@ -141,7 +147,7 @@ int LUMI_test_main(int argc, char* argv[]) {
   return OK;
 }
 
-Bool LUMI_run_test(char* test_name, Func test_func) {
+Bool LUMI_run_test(char* test_name, Returncode (*test_func)(void)) {
   Returncode err;
   printf("testing %s... ", test_name);
   fflush(stdout);
@@ -270,7 +276,9 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {
   return false;
 }
 
-/*reference counting*/
+
+/* reference counting */
+
 Returncode new_Mock(Bool*);
 Returncode delete_Mock(Ref);
 
@@ -334,7 +342,197 @@ void LUMI_owner_dec_ref(Ref_Manager* ref) {
 }
 
 
-/*Files*/
+/* Int */
+
+#define LUMI_FUNC_NAME "Int.str"
+Returncode Int_str(Int value, char* str, int str_max_length, int* str_length) {
+  Bool is_neg;
+  int abs;
+  int swap;
+  char* next;
+  char* last;
+  is_neg = value < 0;
+  abs = value;
+  if (is_neg) {
+    abs = -value;
+  }
+  swap = 0;
+  *str_length = is_neg;
+  do {
+    swap *= 10;
+    swap += abs % 10;
+    abs /= 10;
+    if (str_max_length <= *str_length + 1) {
+      *str_length = 0;
+      CRAISE(LUMI_error_messages.string_too_long.str)
+    }
+    ++*str_length;
+  } while (abs > 0);
+  next = str;
+  if (is_neg) {
+    *next = '-';
+    ++next;
+  }
+  last = str + *str_length;
+  while (next < last) {
+    *next = '0' + swap % 10;
+    ++next;
+    swap /= 10;
+  }
+  *last = '\0';
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+
+/* Array */
+
+void Array_length(void* self, int length, Int* length_out) {
+  *length_out = length;
+}
+
+
+/* String */
+
+void String_length(
+    char* self, int max_length, int *length, Int* length_out) {
+  *length_out = *length;
+}
+
+void String_max_length(
+    char* self, int max_length, int *length, Int* max_length_out) {
+  *max_length_out = max_length;
+}
+
+#define LUMI_FUNC_NAME "String.copy"
+Returncode String_copy(
+    char* self, int max_length, int* length, char* source, int source_length) {
+  if (self == source) {
+    return OK;
+  }
+  if (source_length >= max_length) {
+    CRAISE(LUMI_error_messages.string_too_long.str)
+  }
+  *length = source_length;
+  memcpy(self, source, source_length);
+  self[source_length] = '\0';
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+void String_clear(char* self, int max_length, int* length) {
+  *length = 0;
+}
+
+void String_equal(
+    char* self, int max_length, int *length,
+    char* other, int other_length,
+    Bool* out_equal) {
+  if (self == other) {
+    *out_equal = *length == other_length;
+    return;
+  }
+  if (*length != other_length) {
+    *out_equal = false;
+    return;
+  }
+  *out_equal = strncmp(self, other, *length) == 0;
+}
+
+#define LUMI_FUNC_NAME "String.get"
+Returncode String_get(
+    char* self, int max_length, int *length, Int index, Char* out_char) {
+  if (index < 0 || index >= *length) {
+    CRAISE(LUMI_error_messages.slice_index.str)
+  }
+  *out_char = self[index];
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "String.set"
+Returncode String_set(
+    char* self, int max_length, int *length, Int index, Char ch) {
+  if (index < 0 || index >= *length) {
+    CRAISE(LUMI_error_messages.slice_index.str)
+  }
+  self[index] = ch;
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "String.append"
+Returncode String_append(char* self, int max_length, int* length, Char ch) {
+  if (*length + 1 >= max_length) {
+    CRAISE(LUMI_error_messages.string_too_long.str)
+  }
+  self[*length] = ch;
+  ++(*length);
+  self[*length] = '\0';
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "String.concat"
+Returncode String_concat(
+    char* self, int max_length, int* length, char* ext, int ext_length) {
+  if (*length + ext_length >= max_length) {
+    CRAISE(LUMI_error_messages.string_too_long.str)
+  }
+  memcpy(self + *length, ext, ext_length);
+  *length += ext_length;
+  self[*length] = '\0';
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "String.concat-int"
+Returncode String_concat_int(
+    char* self, int max_length, int* length, Int num) {
+  int added_length = 0;
+  CCHECK(Int_str(num, self + *length, max_length - *length, &added_length));
+  *length += added_length;
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+void String_find(
+    char* self, int max_length, int *length,
+    char* pattern, int pattern_length,
+    Int* out_index) {
+  int n;
+  for (n = 0; n <= *length - pattern_length; ++n) {
+    if (strncmp(self + n, pattern, pattern_length) == 0) {
+      *out_index = n;
+      return;
+    }
+  }
+  *out_index = *length;
+}
+
+void String_has(
+    char* self, int max_length, int *length, Char ch, Bool* found) {
+  int n;
+  for (n = 0; n < *length; ++n) {
+    if (self[n] == ch) {
+      *found = true;
+      return;
+    }
+  }
+  *found = false;
+}
+
+
+/* File */
+
+Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
+
+void File_Del(File* self) {
+  if (self != NULL && self->fobj != NULL) {
+    fclose(self->fobj);
+  }
+}
+
 #define LUMI_FUNC_NAME "open-file"
 Returncode open_file(
     File** file,
@@ -390,13 +588,6 @@ Returncode file_close(File* file) {
 }
 #undef LUMI_FUNC_NAME
 
-void File_Del(File* self) {
-  if (self != NULL && self->fobj != NULL) {
-    fclose(self->fobj);
-  }
-}
-Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
-
 Bool getc_is_eof(int get, char* ch) {
   if (get == EOF) {
     return true;
@@ -448,188 +639,9 @@ Returncode File_write(File* file, char* text, int text_length) {
 }
 #undef LUMI_FUNC_NAME
 
-/*Arrays*/
-Returncode Array_length(void* self, int length, Int* length_out) {
-  *length_out = length;
-  return OK;
-}
 
-/*Strings*/
-Returncode String_length(
-    char* self, int max_length, int *length, Int* length_out) {
-  *length_out = *length;
-  return OK;
-}
+/* system */
 
-Returncode String_max_length(
-    char* self, int max_length, int *length, Int* max_length_out) {
-  *max_length_out = max_length;
-  return OK;
-}
-
-Returncode String_clear(char* self, int max_length, int* length) {
-  *length = 0;
-  return OK;
-}
-
-Returncode String_equal(
-    char* self, int max_length, int *length,
-    char* other, int other_length,
-    Bool* out_equal) {
-  if (self == other) {
-    *out_equal = *length == other_length;
-    return OK;
-  }
-  if (*length != other_length) {
-    *out_equal = false;
-    return OK;
-  }
-  *out_equal = strncmp(self, other, *length) == 0;
-  return OK;
-}
-
-#define LUMI_FUNC_NAME "String.get"
-Returncode String_get(
-    char* self, int max_length, int *length, Int index, Char* out_char) {
-  if (index < 0 || index >= *length) {
-    CRAISE(LUMI_error_messages.slice_index.str)
-  }
-  *out_char = self[index];
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "String.set"
-Returncode String_set(
-    char* self, int max_length, int *length, Int index, Char ch) {
-  if (index < 0 || index >= *length) {
-    CRAISE(LUMI_error_messages.slice_index.str)
-  }
-  self[index] = ch;
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "String.append"
-Returncode String_append(char* self, int max_length, int* length, Char ch) {
-  if (*length + 1 >= max_length) {
-    CRAISE(LUMI_error_messages.string_too_long.str)
-  }
-  self[*length] = ch;
-  ++(*length);
-  self[*length] = '\0';
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "Int.str"
-Returncode Int_str(Int value, char* str, int str_max_length, int* str_length) {
-  Bool is_neg;
-  int abs;
-  int swap;
-  char* next;
-  char* last;
-  is_neg = value < 0;
-  abs = value;
-  if (is_neg) {
-    abs = -value;
-  }
-  swap = 0;
-  *str_length = is_neg;
-  do {
-    swap *= 10;
-    swap += abs % 10;
-    abs /= 10;
-    if (str_max_length <= *str_length + 1) {
-      *str_length = 0;
-      CRAISE(LUMI_error_messages.string_too_long.str)
-    }
-    ++*str_length;
-  } while (abs > 0);
-  next = str;
-  if (is_neg) {
-    *next = '-';
-    ++next;
-  }
-  last = str + *str_length;
-  while (next < last) {
-    *next = '0' + swap % 10;
-    ++next;
-    swap /= 10;
-  }
-  *last = '\0';
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "String.copy"
-Returncode String_copy(
-    char* self, int max_length, int* length, char* source, int source_length) {
-  if (self == source) {
-    return OK;
-  }
-  if (source_length >= max_length) {
-    CRAISE(LUMI_error_messages.string_too_long.str)
-  }
-  *length = source_length;
-  memcpy(self, source, source_length);
-  self[source_length] = '\0';
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "String.concat"
-Returncode String_concat(
-    char* self, int max_length, int* length, char* ext, int ext_length) {
-  if (*length + ext_length >= max_length) {
-    CRAISE(LUMI_error_messages.string_too_long.str)
-  }
-  memcpy(self + *length, ext, ext_length);
-  *length += ext_length;
-  self[*length] = '\0';
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "String.concat-int"
-Returncode String_concat_int(
-    char* self, int max_length, int* length, Int num) {
-  int added_length = 0;
-  CCHECK(Int_str(num, self + *length, max_length - *length, &added_length));
-  *length += added_length;
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-Returncode String_find(
-    char* self, int max_length, int *length,
-    char* pattern, int pattern_length,
-    Int* out_index) {
-  int n;
-  for (n = 0; n <= *length - pattern_length; ++n) {
-    if (strncmp(self + n, pattern, pattern_length) == 0) {
-      *out_index = n;
-      return OK;
-    }
-  }
-  *out_index = *length;
-  return OK;
-}
-
-Returncode String_has(
-    char* self, int max_length, int *length, Char ch, Bool* found) {
-  int n;
-  for (n = 0; n < *length; ++n) {
-    if (self[n] == ch) {
-      *found = true;
-      return OK;
-    }
-  }
-  *found = false;
-  return OK;
-}
-
-/*system*/
 int set_sys(int argc, char* argv[]) {
   int arg;
   sys = LUMI_alloc(sizeof(Sys));
@@ -707,9 +719,8 @@ Returncode Sys_println(Sys* _, char* text, int text_length) {
 }
 #undef LUMI_FUNC_NAME
 
-Returncode Sys_getchar(Sys* _, char* out_char, Bool* is_eof) {
+void Sys_getchar(Sys* _, char* out_char, Bool* is_eof) {
   *is_eof = getc_is_eof(getchar(), out_char);
-  return OK;
 }
 
 #define LUMI_FUNC_NAME "Sys.getline"

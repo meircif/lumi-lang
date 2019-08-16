@@ -300,7 +300,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func dynamic write()
     ; #define LUMI_FILE_NAME "`file-name`"
     ; #define LUMI_FUNC_NAME "`parent-type`.`function-name`"
-    ; Returncode `Type`_`name`(`args`) {
+    ; [void|Returncode] `Type`_`name`(`args`) {
     ;   `block...`
     ; }
     ; #undef LUMI_FILE_NAME
@@ -313,20 +313,24 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-post-func()
   
   func inst write-header()
-    write(user "\nReturncode ")
+    if self.arguments.has-error
+      write(user "\nReturncode ")
+    else
+      write(user "\nvoid ")
     self.write-cname()
     self.arguments.write()
   
   func inst write-block()
     ; `previous-text` {
-    ;   Returncode LUMI_err = OK;
+    ;   [Returncode LUMI_err = OK;]
     ;   unsigned LUMI_loop_depth = 1;
     ;   `block...`
-    ;   return LUMI_err;
+    ;   [return LUMI_err;]
     ; }
     self.write-block-start()
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "Returncode LUMI_err = OK;\n")
+    if self.arguments.has-error
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "Returncode LUMI_err = OK;\n")
     write-spaces(copy INDENTATION-SPACES)
     write(user "unsigned LUMI_loop_depth = 1;\n")
     self.write-block-setup()
@@ -334,8 +338,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-block-body()
     self.write-block-cleanup()
     self.write-param-cleanup()
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "return LUMI_err;\n")
+    if self.arguments.has-error
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "return LUMI_err;\n")
     self.write-block-end()
   
   func inst write-setup()
@@ -498,8 +503,8 @@ class DeclarationArgument(Argument)
   
   func dynamic write()
     if self.variable.type-instance.type-data is glob.type-func
-      ; Returncode (*[*]`name`)(`arguments`)
-      write(user "Returncode (*")
+      ; [void|Returncode] (*[*]`name`)(`arguments`)
+      self.variable.type-instance.arguments.write-pointer-start()
       if self.is-output
         write(user "*")
       write-cname(user self.variable.name)
@@ -509,15 +514,21 @@ class DeclarationArgument(Argument)
     
     if self.variable.type-instance.type-data is glob.type-array
       ; `data-type`*[*] `name`, int[*] `name`_Length
+      ; [void|Returncode] (**[*] `name`)(`arguments`), int[*] `name`_Length
       user TypeInstance data-type
       var Int depth
       self.variable.type-instance.get-array-data-type-depth()->(
           user data-type, var depth)
       if data-type.type-data is glob.type-string
         write(user "char")
+      else-if data-type.type-data is glob.type-func
+        data-type.arguments.write-pointer-start()
       else
         data-type.type-data.write-cname()
       self.write-name-param(user "*", user _)
+      if data-type.type-data is glob.type-func
+        write(user ")")
+        data-type.arguments.write()
       self.write-name-param(user ", int", user "_Length")
       for n in depth
         ; , int[*] `name`_Value_length

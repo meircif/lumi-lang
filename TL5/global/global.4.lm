@@ -222,6 +222,15 @@ struct Global
     ; Bool
     self.add-builtin-global-variable(user self.type-bool, user "true")
     self.add-builtin-global-variable(user self.type-bool, user "false")
+
+    ; Array
+    ; self.add-builtin-field(
+    ;     user self.type-array, user "length", user self.type-int, user _)
+    self.add-builtin-method(
+        user self.type-array, user "length", copy false, copy Access.USER)->(
+        user function)
+    self.add-builtin-output(
+        user function, copy Access.VAR, user self.type-int, user "length")
     
     ; String
     ; self.add-builtin-field(
@@ -242,12 +251,6 @@ struct Global
         user function)
     self.add-builtin-output(
         user function, copy Access.VAR, user self.type-int, user "max-length")
-        
-    self.add-builtin-method(
-        user self.type-string, user "chars", copy false, copy Access.USER)->(
-        user function)
-    self.add-builtin-char-array-argument(
-        user function, copy true, copy Access.USER, user "chars")
     
     self.add-builtin-method(
         user self.type-string, user "copy", copy true, copy Access.USER)->(
@@ -320,15 +323,6 @@ struct Global
         user function, copy Access.COPY, user self.type-char, user "ch")
     self.add-builtin-output(
         user function, copy Access.VAR, user self.type-bool, user "equal")
-    
-    ; Array
-    ; self.add-builtin-field(
-    ;     user self.type-array, user "length", user self.type-int, user _)
-    self.add-builtin-method(
-        user self.type-array, user "length", copy false, copy Access.USER)->(
-        user function)
-    self.add-builtin-output(
-        user function, copy Access.VAR, user self.type-int, user "length")
     
     ; File
     self.add-builtin-global-function(user "file-open-read", copy true)->(

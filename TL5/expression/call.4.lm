@@ -10,6 +10,7 @@ class CallExpression(Expression)
       user FunctionArguments declaration,
       user TypeInstance actual-params,
       copy Int bases)
+    self.arguments.has-error := declaration.has-error
     user TypeInstance result-type
     declaration.get-result-type()->(var self.access, user result-type)
     if not self.is-statement
@@ -69,7 +70,8 @@ class CallExpression(Expression)
     self.output.write-safe()
 
   func inst write-func-call()
-    write(user "LUMI_err = ")
+    if self.arguments.has-error
+      write(user "LUMI_err = ")
     self.write-function()
     self.code-node.write-call(user self.arguments)
 
