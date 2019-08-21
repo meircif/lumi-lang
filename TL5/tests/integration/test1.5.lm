@@ -83,12 +83,12 @@ mock TestClass.dynamic-meth()
 
 test test-func()
     owner String? s
-    assert-error! test-int2str(copy 3)->(owner s)!
+    assert-error! test-int2str(copy 3)->(owner s)
     test-int2str.mocked(copy 4)->(owner s)!
     test-int2str.active := false
     test-int2str(copy 5)->(owner s)!
     test-int2str.active := true
-    assert-error! test-int2str(copy 6)->(owner s)!
+    assert-error! test-int2str(copy 6)->(owner s)
     
     var TestStruct t(copy 0, user _)!
     var Int x
@@ -135,7 +135,7 @@ test test-native()
     var Int i
     var Native n
     var String{4} s(user "bb")!
-    assert-error! external(copy 3, user s)->(var i, var n)!
+    assert-error! external(copy 3, user s)->(var i, var n)
     assert! i = 3
     assert! s[0]! = 'a'
     assert! external2(copy n)
@@ -335,7 +335,7 @@ func ! has-refs(user Array{Ref} refs, copy Int number)
 
 func ! cleanup-test(user Array{Ref} refs)
     try
-        raise!
+        raise
     catch
         strong Link la(strong Link()!)
         refs[0]! := la
@@ -345,17 +345,17 @@ func ! cleanup-test(user Array{Ref} refs)
             strong Link lb(strong Link()!)
             refs[1]! := lb
             try
-                strong Link lc(strong Link()!)
-                refs[2]! := lc
+                strong Link lc(strong Link())
+                refs[2] := lc
                 if true
-                    strong Link ld(strong Link()!)
-                    refs[3]! := ld
+                    strong Link ld(strong Link())
+                    refs[3] := ld
                     do
-                        strong Link le(strong Link()!)
-                        refs[4]! := le
+                        strong Link le(strong Link())
+                        refs[4] := le
                         for n in 3
-                            strong Link lf(strong Link()!)
-                            refs[5]! := lf
+                            strong Link lf(strong Link())
+                            refs[5] := lf
                             return
 
 test test-block-delete()
@@ -393,21 +393,21 @@ func ! raise-message()
 
 func ! ignore-and-raise()
     try
-        raise-message()!
+        raise-message()
     raise! "ignore and raise"
 
 func ! failed-assert()
     assert! 1 = 2
 
 func ! good-assert-error()
-    assert-error! raise-message()!
+    assert-error! raise-message()
     raise! "good assert! error"
 
 func ! failed-assert-error()
     assert-error! test-void()
 
 func ! wrong-message-assert-error()
-    assert-error! raise-message()!, "wrong message"
+    assert-error! raise-message(), "wrong message"
 
 var Int new-fail-countdown
 
@@ -423,28 +423,28 @@ func ! alloc()
     assert! object?
 
 test test-assert-error-message()
-    assert-error! raise-message()!, "tested message"
-    assert-error! ignore-and-raise()!, "ignore and raise"
-    assert-error! failed-assert()!, "condition is not true"
-    assert-error! good-assert-error()!, "good assert! error"
-    assert-error! failed-assert-error()!, "error not raised"
-    assert-error! wrong-message-assert-error()!
+    assert-error! raise-message(), "tested message"
+    assert-error! ignore-and-raise(), "ignore and raise"
+    assert-error! failed-assert(), "condition is not true"
+    assert-error! good-assert-error(), "good assert! error"
+    assert-error! failed-assert-error(), "error not raised"
+    assert-error! wrong-message-assert-error()
     var Func?{()} fun
-    assert-error! fun!(), "empty object used"
+    assert-error! fun(), "empty object used"
     strong Array?{Int} arr(strong Array{2:Int}()!)
-    assert-error! arr![6]!, "slice index out of bounds"
+    assert-error! arr[6], "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
     arr := _
-    assert-error! arr!.length(), "empty object used"
-    assert-error! arr2!.length(), "outdated weak reference used"
-    assert-error! arr![0]!, "empty object used"
-    assert-error! arr2![0]!, "outdated weak reference used"
+    assert-error! arr.length(), "empty object used"
+    assert-error! arr2.length(), "outdated weak reference used"
+    assert-error! arr[0], "empty object used"
+    assert-error! arr2[0], "outdated weak reference used"
     user TopType? top(user _)
-    assert-error! top!.meth2()!, "empty object used"
+    assert-error! top.meth2(), "empty object used"
     new-fail-countdown := 1
-    assert-error! alloc()!, "insufficient memory for object dynamic allocation"
+    assert-error! alloc(), "insufficient memory for object dynamic allocation"
     new-fail-countdown := 2
-    assert-error! alloc()!, "insufficient memory for managed object"
+    assert-error! alloc(), "insufficient memory for managed object"
 
 native var Int lumi-debug-value
 
@@ -454,42 +454,42 @@ test test-builtin-errors()
     owner File? file
     var String{4} filename
     user String? empty
-    assert-error! file-open-read(user empty!)->(owner file)!, "empty object used"
+    assert-error! file-open-read(user empty)->(owner file), "empty object used"
     lumi-debug-value := 1
-    assert-error! file-open-write(user filename)->(owner file)!, "open file failed"
+    assert-error! file-open-write(user filename)->(owner file), "open file failed"
     lumi-debug-value := 2
     new-fail-countdown := 1
-    assert-error! file-open-read(user filename)->(owner file)!,
+    assert-error! file-open-read(user filename)->(owner file),
             "insufficient memory for object dynamic allocation"
     new-fail-countdown := 1
-    assert-error! file-open-write(user filename)->(owner file)!,
+    assert-error! file-open-write(user filename)->(owner file),
             "insufficient memory for object dynamic allocation"
     lumi-debug-value := 2
     file-open-read(user filename)->(owner file)!
     lumi-debug-value := 1
-    assert-error! file-close(owner file!)!, "close file failed"
+    assert-error! file-close(owner file), "close file failed"
     var Char ch
     lumi-debug-value := 2
     file-open-read(user filename)->(owner file)!
-    assert-error! file!.getc()->(var ch)!, "file not opened"
-    assert-error! file!.putc(copy 'a')!, "file not opened"
-    assert-error! file!.write(user "aa")!, "file not opened"
+    assert-error! file.getc()->(var ch), "file not opened"
+    assert-error! file.putc(copy 'a'), "file not opened"
+    assert-error! file.write(user "aa"), "file not opened"
     lumi-debug-value := 1
-    assert-error! file!.putc(copy 'a')!, "file write failed"
-    assert-error! file!.write(user "aa")!, "file write failed"
+    assert-error! file.putc(copy 'a'), "file write failed"
+    assert-error! file.write(user "aa"), "file write failed"
     
-    assert-error! "aa".get(copy 2)!, "slice index out of bounds"
-    assert-error! too-long.append(copy 'a')!, "string too long"
-    assert-error! too-long.concat(user "a")!, "string too long"
+    assert-error! "aa".get(copy 2), "slice index out of bounds"
+    assert-error! too-long.append(copy 'a'), "string too long"
+    assert-error! too-long.concat(user "a"), "string too long"
     var String{3} short-str
-    assert-error! 123.str(user short-str)!, "string too long"
-    assert-error! short-str.copy(user "aaaaa")!, "string too long"
+    assert-error! 123.str(user short-str), "string too long"
+    assert-error! short-str.copy(user "aaaaa"), "string too long"
     
     lumi-debug-value := 2
-    assert-error! sys.getline(user short-str)!, "string too long"
+    assert-error! sys.getline(user short-str), "string too long"
     lumi-debug-value := 1
-    assert-error! sys.exit(copy 0)!, "exit failed"
-    assert-error! sys.system(user "aaa")!, "command execution failed"
+    assert-error! sys.exit(copy 0), "exit failed"
+    assert-error! sys.system(user "aaa"), "command execution failed"
 
 mock ! Sys.println(user Array{Char} text)
     assert! text.length() > 0

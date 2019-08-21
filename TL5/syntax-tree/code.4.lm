@@ -17,7 +17,7 @@ class SyntaxTreeExpression(SyntaxTreeCode)
   func dynamic analyze()
     self.expression.analyze()
     if self.expression.result-type?
-      self.syntax-error-msg(user "statememnt has no effect")
+      self.syntax-error-msg(user "statement has no effect")
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression.check-memory(user refs)
@@ -59,7 +59,8 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     is-end := true
   
   func dynamic analyze()
-    self.check-function-has-error()
+    if self.set-has-error()
+      self.check-function-has-error()
     if self.error-message.parsed()
       self.analyze-expression(user self.error-message, user glob.type-string)
       self.error-message.check-errors(copy false, copy true)

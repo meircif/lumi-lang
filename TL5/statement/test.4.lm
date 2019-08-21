@@ -14,7 +14,8 @@ class SyntaxTreeAssert(SyntaxTreeCode)
     self.tested.new(user "", user self)
   
   func dynamic analyze()
-    self.check-function-has-error()
+    if self.set-has-error()
+      self.check-function-has-error()
     self.analyze-expression(user self.tested, user glob.type-bool)
     self.tested.check-no-error()
 
@@ -38,6 +39,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   var ExpressionValue tested
   var SyntaxTreeBlock dummy-block
   owner String expected-error
+  var Bool has-error
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeAssertError new-node)
@@ -56,11 +58,19 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
         self.expect-space(user ",")
       read-new(user "")->(owner self.expected-error)
       self.check-string(user self.expected-error)
+
+  func dynamic set-has-error()->(var Bool need-check)
+    self.has-error := true
+    need-check := false
   
   func dynamic analyze()
-    self.check-function-has-error()
+    if self.parent.set-has-error()
+      self.check-function-has-error()
     self.tested.analyze()
-    self.tested.check-no-error()
+    if self.tested.expression.error-expected
+      self.syntax-error-msg(user "using \"!\" where error is not propagated")
+    if not self.has-error
+      self.syntax-error-msg(user "no error raised in expression")
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.tested.check-memory(user refs)

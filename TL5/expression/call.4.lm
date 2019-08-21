@@ -107,12 +107,8 @@ class FunctionCallExpression(CallExpression)
         copy self.function.bases)
     self.function.check-no-error()
     if self.function.function.arguments.has-error
-      if not self.error-propagated
-        self.syntax-error(
-            user "ignoring error result check on function",
-            user self.function.function.name)
-      self.error-expected := false
-      self.code-node.check-function-has-error()
+      self.check-error-propagated(
+          user "ignoring error result check on function call")
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)
@@ -137,12 +133,8 @@ class DynamicCallExpression(FunctionCallExpression)
 
   func dynamic analyze()
     if self.self-instance.result-type.conditional
-      if not self.self-instance.error-propagated
-        self.syntax-error(
-            user "ignoring empty reference check on type",
-            user self.self-instance.result-type.type-data.name)
-      self.self-instance.error-expected := false
-      self.code-node.check-function-has-error()
+      self.self-instance.check-error-propagated(
+          user "ignoring empty reference check")
     base()
 
   func dynamic write-function-check()

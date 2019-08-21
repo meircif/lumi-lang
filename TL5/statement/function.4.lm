@@ -25,6 +25,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   var Bool is-dynamic
   var Bool header-only
   var Bool external-body
+  var Bool err-aux-var
   
   func inst parse-new(user TypeData parent-type)->(
       owner SyntaxTreeFunction new-node)
@@ -157,6 +158,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       return
     if not module-name?
       self.arguments.find-variable(user name, user _)->(user variable)
+  
+  func dynamic set-has-error()->(var Bool need-check)
+    need-check := true
     
   func inst new-aux-variable-index(user TypeInstance type-instance)->(
       var Int index)
@@ -328,7 +332,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     ;   [return LUMI_err;]
     ; }
     self.write-block-start()
-    if self.arguments.has-error
+    if self.err-aux-var or self.arguments.has-error
       write-spaces(copy INDENTATION-SPACES)
       write(user "Returncode LUMI_err = OK;\n")
     write-spaces(copy INDENTATION-SPACES)

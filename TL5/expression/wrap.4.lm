@@ -158,17 +158,12 @@ class CheckExpression(WrapExpression)
       self.access := Access.USER
   
   func dynamic analyze()
-    if not self.expression.error-propagated
-      if self.check-conditional
-        self.syntax-error(
-            user "ignoring empty reference check on type",
-            user self.result-type.type-data.name)
-      else
-        self.syntax-error(
-            user "ignoring weak reference check on type",
-            user self.result-type.type-data.name)
-    self.code-node.check-function-has-error()
-    self.error-expected := false
+    if self.check-conditional
+      self.expression.check-error-propagated(
+          user "ignoring empty reference check")
+    else
+      self.expression.check-error-propagated(
+          user "ignoring weak reference check")
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     base(user refs)

@@ -286,6 +286,15 @@ class Expression(SyntaxTreeNode)
     if self.error-expected
       self.syntax-error-msg(user "using \"!\" where there is no error")
 
+  func inst check-error-propagated(user String error-message)
+    if self.code-node.set-has-error()
+      if not self.error-propagated
+        self.syntax-error-msg(user error-message)
+      self.code-node.check-function-has-error()
+      self.error-expected := false
+    else-if self.error-expected
+      self.syntax-error-msg(user "using \"!\" where error is not propagated")
+
   func dynamic restructure()->(
       owner Expression expression, owner FunctionArguments arguments)
     ; do nothing

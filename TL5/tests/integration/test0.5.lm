@@ -219,7 +219,7 @@ struct TestStruct
     ; comment test
     
     owner TestStruct? ts
-    var Func{()} fun
+    var Func{:()} fun
     
     new!(copy Int x, user String? s) _
     
@@ -267,7 +267,7 @@ func TestClass.dynamic-meth()
     self.num := 6
 
 
-func test-void()
+func ! test-void()
     return
 func ! test-params(copy Int x, user String? s, owner String? o)
     raise!
@@ -285,7 +285,7 @@ func test-many(
 func ! test-call-expression()
     owner String? s
     var Int x
-    test-void()
+    test-void()!
     test-params(copy 3, user "text", owner _)!
     test-outs()->(owner s, var x)
     test-int2str(copy 4)->(owner s)!
@@ -442,7 +442,7 @@ func ! test-type-parameters(weak Item? s)
     t.third := ts
 
 
-func ! try-catch-raise(user TestStruct t)
+func ! try-catch-raise(user TestStruct? t)
     try
         t.num := 1
     catch
@@ -450,9 +450,9 @@ func ! try-catch-raise(user TestStruct t)
 
 func ! test-error-handling(user TestStruct? t)
     try
-        sys.print(user "error handling { 1 ")!
-        t!.num := 1
-        sys.print(user " X ")!
+        sys.print(user "error handling { 1 ")
+        t.num := 1
+        sys.print(user " X ")
         try
             test-void()
         catch
@@ -460,19 +460,19 @@ func ! test-error-handling(user TestStruct? t)
     catch
         sys.print(user "2 ")!
         try
-            sys.print(user "3 ")!
-            t!.num := 2
-            sys.print(user " X ")!
+            sys.print(user "3 ")
+            t.num := 2
+            sys.print(user " X ")
         sys.print(user "4 ")!
     sys.print(user "5 ")!
     try
-        sys.print(user "6 ")!
+        sys.print(user "6 ")
         try
-            sys.print(user "7 ")!
-            try-catch-raise(user t!)!
-            sys.print(user " X ")!
-        sys.print(user "8 ")!
-        raise! "another ignored message"
+            sys.print(user "7 ")
+            try-catch-raise(user t)
+            sys.print(user " X ")
+        sys.print(user "8 ")
+        raise "another ignored message"
     sys.println(user "}")!
 
 

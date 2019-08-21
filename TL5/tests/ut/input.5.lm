@@ -803,8 +803,6 @@ user String? s(user str!)
 const Int CONST 12!
 ; @ ec ten24
 assert! b!
-; @ ec ten25
-assert-error! t!
 ; @ ec ten26
 var Array{4:Int} a
 i := a![2]!
@@ -1869,7 +1867,7 @@ if false
     ; ...
 else 
 ; @ ec te8
-else-if 
+else-if b
 ; @ ec te9
 if false
     ; ...
@@ -2022,23 +2020,23 @@ var Int n
 ; @ c ta0
 assert! t!.num = 2
 ; @ c ta1
-assert-error! t!.num
+assert-error! t.num
 ; @ c ta2
-assert-error! fun0()
+assert-error! fune()
 ; @ c ta3
-assert-error! t!.num, "expected error"
+assert-error! t.num, "expected error"
 ; @ c ta4
-assert-error! fun0(), "expected error in the function"
+assert-error! fune(), "expected error in the function"
 ; @ c ta5
-assert-error! t!.num,
+assert-error! t.num,
         "expected error in new line"
 ; @ c ta6
 if b
     var String{4} s
     assert! b
-    assert-error! s[1:2]!
+    assert-error! s[1:2]
     do
-        assert-error! s[1:2]!
+        assert-error! s[1:2]
 ; @ g tm0
 func ! fun()
     fun()!
@@ -2116,6 +2114,7 @@ func fun0()
         y += 1
     try
         x := 0
+        sys.print(user "text")
         y := 0
     catch
         x := 1
@@ -2264,6 +2263,12 @@ struct Test
 mock ! Test.new()
 ; @ eg te33
 test ! fun()
+; @ ec te34
+assert-error! fun0()
+; @ ec te35
+assert-error! t!.num
+; @ ec te36
+assert-error! t!
 ; @@ test-native
 ; @ g tf0
 native func external()
@@ -2631,41 +2636,100 @@ struct Test(Top)
         self.item := error
 ; @@ test-error-handling
 ; @ c t0
+if-error i := t.num
+    i := 0
+; @ c t1
+if-error fune()
+    i := 0
+else
+    io := i
+; @ c t2
+if-ok i := t.num
+    io := i
+else
+    i := 0
+; @ c t3
+if b
+    io := 0
+else-if-error fune()
+    i := 0
+else
+    io := i
+; @ c t4
+if b
+    io := 0
+else-if-ok i := t.num
+    io := i
+else
+    i := 0
+; @ g t5
+func fun(weak String s)->(var Bool fail)
+    if-error s.clear()
+        fail := true
+; @ ec te0
+if-error t.num
+    i := 0
+; @ ec te1
+if-ok t.num
+else
+    i := 0
+; @ ec te2
+if-error fun0()
+    i := 0
+; @ ec te3
+if-ok i := t.num
+; @ ec te4
+if-error i := t.num
+; @ ec te5
+if-ok i := t.num
+else
+; @ ec te6
+if-error i := t!.num
+    i := 0
+; @@ test-try-catch
+; @ c t0
 try
-    t!.num := 1
+    t.num := 1
     fun0()
 catch
     i := t!.num
     fun4(copy 2)
 ; @ c t1
 try
-    t!.num := 1
+    t.num := 1
     fun0()
 ; @ c t2
 try
-    t!.num := 1
+    t.num := 1
     try
-        fun0()
+        fune()
     catch
         fun4(copy 2)
 catch
     try
-        i := arr![3]!
+        i := arr[3]
     catch
         i := t!.num
 ; @ c t3
 try
     var String{4} sa
     try
-        var String{4} sb
+        s-var String{4} sb
     catch
-        var String{4} sc
+        s-var String{4} sc
 catch
     var String{4} sd
     try
-        var String{4} se
+        s-var String{4} se
     catch
         var String{4} sf
+; @ g t4
+func fun(weak String s)
+    try
+        s.clear()
+        assert true
+        assert-error s.clear()
+        raise
 ; @ ec te0
 try()
 ; @ ec te1
@@ -2677,14 +2741,23 @@ catch()
 try
 ; @ ec te4
 try
-    i := 1
+    fune()
 catch
 ; @ ec te5
 try
-    i := 1
+    fune()
 i := 2
 catch
     i := 3
+; @ ec te6
+try
+    i := 1
+; @ ec te7
+try
+    fune()!
+; @ ec te8
+try
+    assert! true
 ; @@ test-for-each
 ; @ g t0
 struct TestIterator
@@ -3365,7 +3438,7 @@ new String{12} s!
 try
     owner String s2(owner s)
     if b
-        raise!
+        raise
     s := s2
 s.clear()
 ; @ ec teu0
@@ -3604,7 +3677,7 @@ main
 ; @ ec teu36
 assert! str?
 ; @ ec teu37
-assert-error! str!.clear()
+assert-error! str.clear()
 ; @ ec teu38
 if str?
 ; @ ec teu39
@@ -3633,7 +3706,7 @@ str := ostr
 try
     ostr := _
     if b
-        raise!
+        raise
     str := ostr
 str!.clear()
 ; @ eg teu46

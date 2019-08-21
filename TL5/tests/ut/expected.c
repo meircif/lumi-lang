@@ -1322,7 +1322,7 @@ assigning into an owner a non-owner access "var"
 /// @ te20
 assigning into a weak reference an illegal access "owner"
 /// @ te21
-ignoring error result check on function "fune"
+ignoring error result check on function call
 /// @ te22
 error raised inside function not declared as error raising "fun"
 /// @@ test-type-expression
@@ -1596,7 +1596,7 @@ operator "<" expected "Int" operand, got "Bool"
 /// @ te20
 assigning into a weak reference an illegal access "user"
 /// @ te21
-ignoring empty reference check on type "Test"
+ignoring empty reference check
 /// @@ test-swap-expression
 /// @ t0
 ut_M_Test* t1 = NULL;
@@ -2014,29 +2014,29 @@ char* s = NULL;
     String_length(ut_M_str, ut_M_str_Max_length, ut_M_str_Length, &(aux_Int_0));
     INIT_NEW_STRING(1, LUMI_block0_cleanup, s, aux_Int_0);
 /// @ te0
-ignoring empty reference check on type "String"
+ignoring empty reference check
 /// @ te1
-ignoring weak reference check on type "Test"
+ignoring weak reference check
 /// @ te2
-ignoring empty reference check on type "String"
+ignoring empty reference check
 /// @ te3
-ignoring weak reference check on type "String"
+ignoring weak reference check
 /// @ te4
-ignoring empty reference check on type "Test"
+ignoring empty reference check
 /// @ te5
-ignoring weak reference check on type "Test"
+ignoring weak reference check
 /// @ te6
-ignoring empty reference check on type "Func"
+ignoring empty reference check
 /// @ te7
-ignoring empty reference check on type "Array"
+ignoring empty reference check
 /// @ te8
-ignoring empty reference check on type "String"
+ignoring empty reference check
 /// @ te9
-ignoring weak reference check on type "String"
+ignoring weak reference check
 /// @ te10
-ignoring empty reference check on type "String"
+ignoring empty reference check
 /// @ te11
-ignoring initialization error check of type "String"
+ignoring initialization error check
 /// @ teo0
 only one "!" needed
 /// @ ten0
@@ -2088,8 +2088,6 @@ using "!" where there is no error
 /// @ ten23
 using "!" where there is no error
 /// @ ten24
-using "!" where there is no error
-/// @ ten25
 using "!" where there is no error
 /// @ ten26
 using "!" where there is no error
@@ -2285,7 +2283,7 @@ ut_M_Tb* aux_Tb_0 = NULL;
     ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = NULL;
     ut_M_fun7(NULL, NULL, NULL, &(aux_Tb_0), &(aux_Tb_0_Refman), &(aux_Tb_0_Dynamic));
 /// @ te0
-ignoring empty reference check on type "Test"
+ignoring empty reference check
 /// @@ test-function-object
 /// @ t0
 void (*fun)(void) = NULL;
@@ -2696,7 +2694,7 @@ TEST_MAIN_FUNC
 /// @ te0
 unknown keyword "error"
 /// @ te1
-statememnt has no effect
+statement has no effect
 /// @ te2
 unreachable code
 /// @ te3
@@ -4056,7 +4054,7 @@ using invalid reference "s"
 /// @ te26
 assigning empty into non-conditional type "String"
 /// @ te27
-ignoring empty reference check on type "String"
+ignoring empty reference check
 /// @ te28
 using invalid reference "error"
 /// @ te29
@@ -4068,9 +4066,9 @@ unexpected ? initializing type "Test"
 /// @ te32
 cannot use "?" on non conditional or weak reference of type "Type Name"
 /// @ te33
-ignoring initialization error check of type "Test"
+ignoring initialization error check
 /// @ te34
-ignoring initialization error check of type "Tb"
+ignoring initialization error check
 /// @ te35
 using "!" where there is no error
 /// @ te36
@@ -4635,7 +4633,8 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_loop_depth = 1;
 /// @ ta2
 ++LUMI_trace_ignore_count;
-    ut_M_fun0();
+    LUMI_err = ut_M_fune();
+    CHECK(1, LUMI_block1_cleanup)
     --LUMI_trace_ignore_count;
     TEST_FAIL(1, LUMI_block0_cleanup, 16, "error not raised")
     LUMI_block1_cleanup:
@@ -4675,7 +4674,8 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_expected_error = "expected error in the function";
     LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
     ++LUMI_trace_ignore_count;
-    ut_M_fun0();
+    LUMI_err = ut_M_fune();
+    CHECK(1, LUMI_block1_cleanup)
     --LUMI_trace_ignore_count;
     LUMI_expected_error_trace_ignore_count = LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error = LUMI_expected_error_prev;
@@ -5005,18 +5005,19 @@ LUMI_block0_cleanup:
 void ut_M_fun0(void);
 void ut_M_fun1(void);
 Returncode ut_M_fun2(void);
-int LUMI_file0_line_count[29] = {
-    -1,-1, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0,
-     0, 0, 0,-1
+int LUMI_file0_line_count[30] = {
+    -1,-1, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0,
+     0, 0, 0, 0,-1
 };
 int LUMI_file1_line_count[7] = {
     -1,-1,-1, 0,-1, 0,-1
 };
 File_Coverage LUMI_file_coverage[2] = {
-    {"mock.5.lm", 29, LUMI_file0_line_count},
+    {"mock.5.lm", 30, LUMI_file0_line_count},
     {"second.5.lm", 7, LUMI_file1_line_count}
 };
 void ut_M_fun0(void) {
+    Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Int x = 0;
     Int y = 0;
@@ -5057,48 +5058,56 @@ void ut_M_fun0(void) {
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     ++LUMI_file_coverage[0].line_count[12];
     {
+        char* aux_String_0 = NULL;
+        int aux_String_0_Max_length = 0;
+        int aux_String_0_Length[1] = {0};
         ++LUMI_trace_ignore_count;
         ++LUMI_file_coverage[0].line_count[13];
         x = 0;
         ++LUMI_file_coverage[0].line_count[14];
+        INIT_STRING_CONST(14, LUMI_block7_cleanup, aux_String_0, "text");
+        LUMI_err = Sys_print(sys, aux_String_0, *aux_String_0_Length);
+        CHECK(14, LUMI_block7_cleanup)
+        ++LUMI_file_coverage[0].line_count[15];
         y = 0;
     LUMI_block7_cleanup:
         (void)0;
     }
     --LUMI_trace_ignore_count;
-    ++LUMI_file_coverage[0].line_count[15];
+    ++LUMI_file_coverage[0].line_count[16];
     if (LUMI_err != OK) {
         LUMI_err = OK;
         LUMI_loop_depth = 1;
-        ++LUMI_file_coverage[0].line_count[16];
-        x = 1;
         ++LUMI_file_coverage[0].line_count[17];
+        x = 1;
+        ++LUMI_file_coverage[0].line_count[18];
         x = 2;
     LUMI_block8_cleanup:
         (void)0;
     }
-    ++LUMI_file_coverage[0].line_count[18];
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    ++LUMI_file_coverage[0].line_count[19];
     if (x > 3) {
-        ++LUMI_file_coverage[0].line_count[19];
+        ++LUMI_file_coverage[0].line_count[20];
         LUMI_loop_depth = 0; goto LUMI_block9_cleanup;
     LUMI_block9_cleanup:
         (void)0;
     }
     else {
-        ++LUMI_file_coverage[0].line_count[21];
+        ++LUMI_file_coverage[0].line_count[22];
         x = 3;
     LUMI_block11_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    ++LUMI_file_coverage[0].line_count[22];
+    ++LUMI_file_coverage[0].line_count[23];
     do {
         LUMI_loop_depth = 3;
-        ++LUMI_file_coverage[0].line_count[23];
-        if (!(x > 1)) { LUMI_loop_depth = 1; goto LUMI_block12_cleanup; }
         ++LUMI_file_coverage[0].line_count[24];
+        if (!(x > 1)) { LUMI_loop_depth = 1; goto LUMI_block12_cleanup; }
+        ++LUMI_file_coverage[0].line_count[25];
         if (x == 5) {
-            ++LUMI_file_coverage[0].line_count[25];
+            ++LUMI_file_coverage[0].line_count[26];
             LUMI_loop_depth = 2; goto LUMI_block13_cleanup;
         LUMI_block13_cleanup:
             (void)0;
@@ -5108,10 +5117,10 @@ void ut_M_fun0(void) {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    ++LUMI_file_coverage[0].line_count[26];
+    ++LUMI_file_coverage[0].line_count[27];
     for (n = 0; n < 3; ++n) {
         LUMI_loop_depth = 3;
-        ++LUMI_file_coverage[0].line_count[27];
+        ++LUMI_file_coverage[0].line_count[28];
         x += y;
     LUMI_block14_cleanup:
         (void)0;
@@ -5335,6 +5344,12 @@ expected space after "test", got "new-line"
 constructor did not initialize field "s"
 /// @ te33
 no need to mark test functions with "!"
+/// @ te34
+no error raised in expression
+/// @ te35
+using "!" where error is not propagated
+/// @ te36
+using "!" where error is not propagated
 /// @@ test-native
 /// @ tf0
 void external(void);
@@ -6618,6 +6633,154 @@ cannot assign "String" into "Generic Type"
 cannot assign "String" into "File"
 /// @@ test-error-handling
 /// @ t0
+++LUMI_trace_ignore_count;
+    CHECK_REF_REFMAN(1, LUMI_block2_cleanup, ut_M_t, ut_M_t_Refman)
+    ut_M_i = ut_M_t->num;
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        ut_M_i = 0;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t1
+++LUMI_trace_ignore_count;
+    LUMI_err = ut_M_fune();
+    CHECK(1, LUMI_block2_cleanup)
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        ut_M_i = 0;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    else {
+        *io = ut_M_i;
+    LUMI_block4_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t2
+++LUMI_trace_ignore_count;
+    CHECK_REF_REFMAN(1, LUMI_block2_cleanup, ut_M_t, ut_M_t_Refman)
+    ut_M_i = ut_M_t->num;
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        ut_M_i = 0;
+    LUMI_block4_cleanup:
+        (void)0;
+    }
+    else {
+        *io = ut_M_i;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t3
+if (ut_M_b) {
+        *io = 0;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    else {
+        ++LUMI_trace_ignore_count;
+        LUMI_err = ut_M_fune();
+        CHECK(3, LUMI_block3_cleanup)
+    LUMI_block3_cleanup:
+        --LUMI_trace_ignore_count;
+        if (LUMI_err != OK) {
+            LUMI_err = OK;
+            LUMI_loop_depth = 1;
+            ut_M_i = 0;
+        LUMI_block5_cleanup:
+            (void)0;
+        }
+        else {
+            *io = ut_M_i;
+        LUMI_block7_cleanup:
+            (void)0;
+        }
+        if (LUMI_loop_depth < 1) goto LUMI_block4_cleanup;
+    LUMI_block4_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t4
+if (ut_M_b) {
+        *io = 0;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    else {
+        ++LUMI_trace_ignore_count;
+        CHECK_REF_REFMAN(3, LUMI_block3_cleanup, ut_M_t, ut_M_t_Refman)
+        ut_M_i = ut_M_t->num;
+    LUMI_block3_cleanup:
+        --LUMI_trace_ignore_count;
+        if (LUMI_err != OK) {
+            LUMI_err = OK;
+            LUMI_loop_depth = 1;
+            ut_M_i = 0;
+        LUMI_block7_cleanup:
+            (void)0;
+        }
+        else {
+            *io = ut_M_i;
+        LUMI_block5_cleanup:
+            (void)0;
+        }
+        if (LUMI_loop_depth < 1) goto LUMI_block4_cleanup;
+    LUMI_block4_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t5
+void ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman, Bool* fail);
+void ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman, Bool* fail) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    LUMI_inc_ref(s_Refman);
+    ++LUMI_trace_ignore_count;
+    CHECK_REFMAN(2, LUMI_block2_cleanup, s_Refman)
+    String_clear(s, s_Max_length, s_Length);
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        *fail = true;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(s_Refman);
+}
+/// @ te0
+statement has no effect
+/// @ te1
+statement has no effect
+/// @ te2
+no error raised in expression
+/// @ te3
+"if-ok" without "else"
+/// @ te4
+error handling with no code
+/// @ te5
+error handling with no code
+/// @ te6
+using "!" where error is not propagated
+/// @@ test-try-catch
+/// @ t0
 {
         ++LUMI_trace_ignore_count;
         CHECK_REF_REFMAN(2, LUMI_block1_cleanup, ut_M_t, ut_M_t_Refman)
@@ -6636,6 +6799,7 @@ cannot assign "String" into "File"
     LUMI_block2_cleanup:
         (void)0;
     }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t1
 {
         ++LUMI_trace_ignore_count;
@@ -6652,6 +6816,7 @@ cannot assign "String" into "File"
     LUMI_block2_cleanup:
         (void)0;
     }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t2
 {
         ++LUMI_trace_ignore_count;
@@ -6659,7 +6824,8 @@ cannot assign "String" into "File"
         ut_M_t->num = 1;
         {
             ++LUMI_trace_ignore_count;
-            ut_M_fun0();
+            LUMI_err = ut_M_fune();
+            CHECK(4, LUMI_block2_cleanup)
         LUMI_block2_cleanup:
             (void)0;
         }
@@ -6671,6 +6837,7 @@ cannot assign "String" into "File"
         LUMI_block3_cleanup:
             (void)0;
         }
+        if (LUMI_loop_depth < 1) goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
         (void)0;
     }
@@ -6695,9 +6862,11 @@ cannot assign "String" into "File"
         LUMI_block6_cleanup:
             (void)0;
         }
+        if (LUMI_loop_depth < 1) goto LUMI_block4_cleanup;
     LUMI_block4_cleanup:
         (void)0;
     }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t3
 {
         char sa[4] = {0};
@@ -6707,21 +6876,26 @@ cannot assign "String" into "File"
         {
             char sb[4] = {0};
             int sb_Length[1] = {0};
+            Ref_Manager* sb_Refman = NULL;
             ++LUMI_trace_ignore_count;
-            /* initializing sb */
+            INIT_VAR_REFMAN(4, LUMI_block2_cleanup, sb)
         LUMI_block2_cleanup:
             (void)0;
+            LUMI_var_dec_ref(sb_Refman);
         }
         --LUMI_trace_ignore_count;
         if (LUMI_err != OK) {
             char sc[4] = {0};
             int sc_Length[1] = {0};
+            Ref_Manager* sc_Refman = NULL;
             LUMI_err = OK;
             LUMI_loop_depth = 1;
-            /* initializing sc */
+            INIT_VAR_REFMAN(6, LUMI_block3_cleanup, sc)
         LUMI_block3_cleanup:
             (void)0;
+            LUMI_var_dec_ref(sc_Refman);
         }
+        if (LUMI_loop_depth < 1) goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
         (void)0;
     }
@@ -6735,10 +6909,12 @@ cannot assign "String" into "File"
         {
             char se[4] = {0};
             int se_Length[1] = {0};
+            Ref_Manager* se_Refman = NULL;
             ++LUMI_trace_ignore_count;
-            /* initializing se */
+            INIT_VAR_REFMAN(10, LUMI_block5_cleanup, se)
         LUMI_block5_cleanup:
             (void)0;
+            LUMI_var_dec_ref(se_Refman);
         }
         --LUMI_trace_ignore_count;
         if (LUMI_err != OK) {
@@ -6750,9 +6926,48 @@ cannot assign "String" into "File"
         LUMI_block6_cleanup:
             (void)0;
         }
+        if (LUMI_loop_depth < 1) goto LUMI_block4_cleanup;
     LUMI_block4_cleanup:
         (void)0;
     }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t4
+void ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman);
+void ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    LUMI_inc_ref(s_Refman);
+    {
+        ++LUMI_trace_ignore_count;
+        CHECK_REFMAN(3, LUMI_block1_cleanup, s_Refman)
+        String_clear(s, s_Max_length, s_Length);
+        TEST_ASSERT(4, LUMI_block1_cleanup, true)
+        ++LUMI_trace_ignore_count;
+        CHECK_REFMAN(5, LUMI_block2_cleanup, s_Refman)
+        String_clear(s, s_Max_length, s_Length);
+        --LUMI_trace_ignore_count;
+        TEST_FAIL(5, LUMI_block1_cleanup, 16, "error not raised")
+        LUMI_block2_cleanup:
+        (void)0;
+        --LUMI_trace_ignore_count;
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        USER_RAISE(6, LUMI_block1_cleanup, NULL, 0)
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+    LUMI_block3_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(s_Refman);
+}
 /// @ te0
 expected new-line after "try", got "("
 /// @ te1
@@ -6765,6 +6980,12 @@ expected new-line after "catch", got "("
 "catch" statement with no code
 /// @ te5
 "catch" without a previous "try"
+/// @ te6
+no error raised in block
+/// @ te7
+using "!" where error is not propagated
+/// @ te8
+using "!" where error is not propagated
 /// @@ test-for-each
 /// @ t0
 typedef struct ut_M_TestIterator ut_M_TestIterator;

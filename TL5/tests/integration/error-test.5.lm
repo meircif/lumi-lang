@@ -11,7 +11,7 @@ class TopType(BaseType)
 func f-get-top()->(user TopType? top)
     top := _
 
-func f-good-function()
+func ! f-good-function()
     return
 
 func ! f-raise-message(user String msg)
@@ -92,7 +92,7 @@ test fail-assert-error()
     assert-error! f-good-function()
 
 test fail-assert-error-message()
-    assert-error! f-raise-message(user "tested other message")!, "tested message"
+    assert-error! f-raise-message(user "tested other message"), "tested message"
 
 test fail-assert-error-message-prefix()
-    assert-error! f-raise-message(user "tested message")!, "tested message and more"
+    assert-error! f-raise-message(user "tested message"), "tested message and more"

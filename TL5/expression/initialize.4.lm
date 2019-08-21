@@ -77,12 +77,7 @@ class InitExpression(ModuleTypeExpression)
       if not has-error and self.constructor?
         has-error := self.constructor.arguments.has-error
       if has-error
-        if not self.error-propagated
-          self.syntax-error(
-              user "ignoring initialization error check of type",
-              user self.result-type.type-data.name)
-        self.error-expected := false
-        self.code-node.check-function-has-error()
+        self.check-error-propagated(user "ignoring initialization error check")
       
     else-if self.arguments.parameters.first?
       if self.arguments.parameters.first.next? or
