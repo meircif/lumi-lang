@@ -473,6 +473,22 @@ func ! test-error-handling(user TestStruct? t)
             sys.print(user " X ")
         sys.print(user "8 ")
         raise "another ignored message"
+    if-error t.num := 2
+        sys.print(user "9 ")
+        if-ok sys.print(user "10 ")
+            sys.print(user "11 ")
+        else
+            sys.print(user " X ")
+    else
+        sys.print(user " X ")!
+    if-ok t.num := 2
+        sys.print(user " X ")
+    else-if-error sys.print(user "12 ")
+        sys.print(user " X ")
+    else-if-ok sys.print(user "13 ")
+        sys.print(user "14 ")
+    else
+        sys.print(user " X ")!
     sys.println(user "}")!
 
 
