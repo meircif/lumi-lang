@@ -43,9 +43,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else
       self.type-instance.parse(
           user " ", user self, user _, copy INDENTATION-SPACES)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after type, got")
-    read-new(user "(")->(owner self.name)
+    self.expect-space(user "type")
+    read-new(user "!(")->(owner self.name)
     self.check-name()
     if glob.last-char = '(' and self.parent-type?
       self.syntax-error-msg(user "type members cannot be initialized")
@@ -57,9 +56,13 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.is-initialized := glob.last-char = '(' or self.is-create
       if self.is-initialized
         VariableInit.parse-new(user _, user self)
+      else-if glob.last-char = '!'
+        self.syntax-error-msg(user "using \"!\" where there is no error")
       else-if self.parent is-not glob.root.global-init
         self.parent.code-nodes.add(owner VariableCreate(user self))
       self.get-function().function-variables.add(user self.name, user self)
+    else-if glob.last-char = '!'
+      self.syntax-error(user "unexpected \"!\" after", user self.name)
     if self.parent is glob.root.global-init
       self.parent := _
   
@@ -205,8 +208,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func inst write-sequence()
     ; `data-type` `name`[`full length`][ = {0}];
     ; `data-type`* `name`[ = NULL];
-    ; Returncode (*`name`[`full length`])(`arguments`)[ = {0}];
-    ; Returncode (**`name`)(`arguments`)[ = NULL];
+    ; [void|Returncode] (*`name`[`full length`])(`arguments`)[ = {0}];
+    ; [void|Returncode] (**`name`)(`arguments`)[ = NULL];
     var Bool is-new-or-aux-var(
         copy access-is-only-var(copy self.access) and self.is-create)
     var Bool is-new-var(copy is-new-or-aux-var and not self.is-aux)
@@ -217,7 +220,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if data-type.type-data is glob.type-string
       write(user "char")
     else-if data-type.type-data is glob.type-func
-      write(user "Returncode (*")
+      data-type.arguments.write-pointer-start()
     else
       data-type.type-data.write-cname()
     if not is-new-var
@@ -379,9 +382,7 @@ class VariableCreate(SyntaxTreeCode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     var ReferencePath reference-path(user self.variable)
     if self.variable.is-initialized or
-        self.variable.type-instance.conditional or
-        (self.variable.type-instance.type-data.is-primitive and
-        self.variable.type-instance.type-data is-not glob.type-func)
+        self.variable.type-instance.conditional
       refs.clear-invalid-reference(user reference-path)
   
   func dynamic write()
@@ -398,8 +399,10 @@ class VariableInit(VariableCreate)
   
   func inst parse()
     self.expression-init := InitExpression(user self)
+    self.check-error-mark()
     self.expression-init.parse(
         owner self.variable.type-instance.copy-new(), owner _)
+    self.check-error-mark()
     self.expression-init.is-statement := true
     self.expression-init.aux-variable := VariableExpression(user self)
     string-new-copy(user self.variable.name)->(
@@ -410,6 +413,12 @@ class VariableInit(VariableCreate)
     self.expression-init.aux-variable.access := self.variable.access
     self.expression-init.aux-variable.is-var := self.variable.is-create and
         access-is-only-var(copy self.variable.access)
+      
+  func inst check-error-mark()
+    if glob.last-char = '!'
+      self.expression-init.error-propagated := true
+      self.expression-init.error-expected := true
+      read-c()
   
   func dynamic analyze()
     if self.parent is glob.root.global-init
@@ -417,6 +426,9 @@ class VariableInit(VariableCreate)
     self.expression-init.analyze()
     if self.parent is glob.root.global-init
       glob.current-module := _
+    if self.variable.type-instance.type-data is glob.type-func and
+        not self.expression-init.arguments.parameters.first?
+      self.variable.is-initialized := false
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression-init.check-memory(user refs)
@@ -454,13 +466,11 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     if not type-name.equal(user "Int")
       self.syntax-error(
           user "Only \"Int\" typed constant supported, got", user type-name)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after \"Int\", got")
+    self.expect-space(user "Int")
     read-new(user " ")->(owner self.name)
     if not is-legal-name(user self.name, copy NameGroup.CONSTANT)
       self.syntax-error(user "illegal constant name", user self.name)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after constant name, got")
+    self.expect-space(user self.name)
     self.value.new(user "", user self)
     glob.type-int.new-type-instance()->(owner self.type-instance)
     self.my-module.variable-map.add(user self.name, user self)
@@ -471,6 +481,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
   func dynamic analyze()
     glob.current-module := self.my-module
     self.analyze-expression(user self.value, user glob.type-int)
+    self.value.check-no-error()
     if not self.value.constant
       self.syntax-error-msg(user "value is not constant")
     glob.current-module := _

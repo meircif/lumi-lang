@@ -20,8 +20,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
   
   func inst parse()
     read-new(user " ")->(owner self.item-name)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after index name, got")
+    self.expect-space(user self.item-name)
     self.read-expect(user "in ")
     self.iterator.new(user ":", user self)
     if glob.last-char = ':'
@@ -34,6 +33,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     owner TypeInstance type-instance
     if self.start.parsed()
       self.analyze-expression(user self.start, user glob.type-int)
+      self.start.check-no-error()
       self.analyze-expression(user self.iterator, user glob.type-int)
       glob.type-int.new-type-instance()->(owner type-instance)
     else
@@ -49,6 +49,11 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
             owner type-instance)
       else
         self.get-iterator-type()->(owner type-instance)
+    
+    if self.iterator.result-type.type-data.is-primitive
+      self.iterator.check-no-error()
+    else
+      self.iterator.check-all-errors()
     
     if self.parent.find-variable(user self.item-name, user _)->(user self.item)?
       type-instance.check-assign-to(
@@ -243,9 +248,6 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
     ;   `item` = `aux-var`[`item`_Index];
     ;   `block...`
     ; }}
-    if self.aux-variable.is-dubious()
-      self.aux-variable.write-check-ref()
-      self.write-spaces()
     write(user "{int ")
     write-cname(user self.item.name)
     write(user "_Index; for (")
@@ -366,6 +368,7 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
         user meth,
         owner self.aux-variable.copy-new(),
         copy 0,
+        copy false,
         copy false,
         copy false)
     if meth.is-dynamic

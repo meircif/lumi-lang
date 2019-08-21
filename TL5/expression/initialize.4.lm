@@ -73,6 +73,11 @@ class InitExpression(ModuleTypeExpression)
         self.syntax-error(
             user "unexpected ? initializing type",
             user self.result-type.type-data.name)
+      var Bool has-error(copy self.access != Access.VAR)
+      if not has-error and self.constructor?
+        has-error := self.constructor.arguments.has-error
+      if has-error
+        self.check-error-propagated(user "ignoring initialization error check")
       
     else-if self.arguments.parameters.first?
       if self.arguments.parameters.first.next? or
@@ -100,6 +105,8 @@ class InitExpression(ModuleTypeExpression)
             user glob.access-names[self.access],
             user "invalid access",
             user glob.access-names[param.access])
+    
+    self.check-no-error()
   
   func inst add-self-and-check(copy Int access)
     self.arguments.analyze()
@@ -110,11 +117,10 @@ class InitExpression(ModuleTypeExpression)
     self-param.code-node := self.code-node
     self.aux-variable.copy-new()->(owner self-param.value)
     self.arguments.parameters.prepend(owner self-param)
-    self.arguments.check-same-as(
+    self.arguments.check-calling(
         user self.constructor.arguments,
         user self.result-type,
-        copy 0,
-        copy true)
+        copy 0)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     if self.assign-expression?
@@ -138,7 +144,8 @@ class InitExpression(ModuleTypeExpression)
     
     if self.constructor?
       self.code-node.write-spaces()
-      write(user "LUMI_err = ")
+      if self.constructor.arguments.has-error
+        write(user "LUMI_err = ")
       self.constructor.write-cname()
       self.code-node.write-call(user self.arguments)
   
@@ -159,54 +166,7 @@ class InitExpression(ModuleTypeExpression)
   
   func inst write-new-init()
     if self.result-type.type-data is glob.type-array
-      ; `aux-variable`_Value_length = `length`
-      user TypeInstance data-type
-      var Int depth
-      self.result-type.get-array-data-type-depth()->(user data-type, var depth)
-      user TypeInstance sequence-type(user self.result-type)
-      for n in depth
-        sequence-type := sequence-type.parameters.first.item
-        self.aux-variable.write()
-        write-array-value-length(copy n)
-        write(user " = ")
-        sequence-type.length.write()
-        write(user ";\n")
-        self.code-node.write-spaces()
-      
-      ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
-      self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
-      write(user ", ")
-      if data-type.type-data is glob.type-string
-        write(user "char")
-      else
-        data-type.type-data.write-cname()
-      write(user ", ")
-      self.result-type.length.write()
-      write(user ", ")
-      if depth > 0
-        n := 0
-        do
-          self.aux-variable.write()
-          write-array-value-length(copy n)
-          n += 1
-          while n < depth
-          write(user " * ")
-      else
-        write(user "1")
-      write(user ");\n")
-      
-      if data-type.type-data is glob.type-string
-        ; `aux-variable`_String_length = LUMI_alloc(sizeof(int) * `length`);
-        self.code-node.write-spaces()
-        self.aux-variable.write()
-        write(user "_String_length = LUMI_alloc(sizeof(int) * ")
-        self.aux-variable.write()
-        write(user "_Length")
-        for n in depth - 1
-          write(user " * ")
-          self.aux-variable.write()
-          write-array-value-length(copy n)
-        write(user ");\n")
+      self.write-new-array-init()
         
     else-if self.result-type.type-data is glob.type-string
       ; INIT_NEW_STRING(`line`, `cleanup`, `aux-variable`, `length`);
@@ -221,6 +181,58 @@ class InitExpression(ModuleTypeExpression)
       write(user ", ")
       self.result-type.type-data.write-cname()
       write(user ", 1);\n")
+  
+  func inst write-new-array-init()
+    ; `aux-variable`_Value_length = `length`
+    user TypeInstance data-type
+    var Int depth
+    self.result-type.get-array-data-type-depth()->(user data-type, var depth)
+    user TypeInstance sequence-type(user self.result-type)
+    for n in depth
+      sequence-type := sequence-type.parameters.first.item
+      self.aux-variable.write()
+      write-array-value-length(copy n)
+      write(user " = ")
+      sequence-type.length.write()
+      write(user ";\n")
+      self.code-node.write-spaces()
+    
+    ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
+    self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
+    write(user ", ")
+    if data-type.type-data is glob.type-string
+      write(user "char")
+    else-if data-type.type-data is glob.type-func
+      data-type.arguments.write-pointer(user _)
+    else
+      data-type.type-data.write-cname()
+    write(user ", ")
+    self.result-type.length.write()
+    write(user ", ")
+    if depth > 0
+      n := 0
+      do
+        self.aux-variable.write()
+        write-array-value-length(copy n)
+        n += 1
+        while n < depth
+        write(user " * ")
+    else
+      write(user "1")
+    write(user ");\n")
+    
+    if data-type.type-data is glob.type-string
+      ; `aux-variable`_String_length = LUMI_alloc(sizeof(int) * `length`);
+      self.code-node.write-spaces()
+      self.aux-variable.write()
+      write(user "_String_length = LUMI_alloc(sizeof(int) * ")
+      self.aux-variable.write()
+      write(user "_Length")
+      for n in depth - 1
+        write(user " * ")
+        self.aux-variable.write()
+        write-array-value-length(copy n)
+      write(user ");\n")
   
   func dynamic write-preactions()
     self.write-allocation()

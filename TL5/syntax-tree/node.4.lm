@@ -17,14 +17,28 @@ class SyntaxTreeNode
       read-c()
       if glob.last-char != ' '
         self.syntax-error-indentation(copy n, copy expected-spaces)
+
+  func inst expect-space(user String after)
+    self.expect-char(copy ' ', user "space", user after)
+
+  func inst expect-new-line(user String after)
+    self.expect-char(copy '\n', user "new-line", user after)
+
+  func inst expect-char(
+      copy Char expected, user String char-name, user String after)
+    if glob.last-char != expected
+      self.print-syntax-error-header()
+      sys.print(user "expected ")
+      sys.print(user char-name)
+      print-msg-with-item(user " after", user after)
+      self.syntax-error-c-footer(user ", got")
   
   func inst get-access(user String access-str)->(var Int access)
     for n in 1:Access.length
       if glob.access-names[n].equal(user access-str)
         access := n
         return
-    self.print-syntax-error(user "illegal access", user access-str)
-    sys.exit(copy 1)
+    self.syntax-error(user "illegal access", user access-str)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := _
@@ -50,8 +64,7 @@ class SyntaxTreeNode
           if parameter.equal(user name)
             type-data := glob.type-generic
             return
-    self.print-syntax-error(user "unknown type", user name)
-    sys.exit(copy 1)
+    self.syntax-error(user "unknown type", user name)
   
   func dynamic find-variable(user String name, user String module-name)->(
       user SyntaxTreeVariable variable)
@@ -92,19 +105,47 @@ class SyntaxTreeNode
           user "expression, expected",
           user expected-type.name)
   
+  func inst check-expression-all-errors()->(owner Expression expression)
+    self.check-expression-errors(copy true, copy true)->(owner expression)
+  
+  func inst check-expression-errors(
+      copy Bool check-conditional, copy Bool check-weak)->(
+      owner Expression expression)
+    if not expression.result-type?
+      return
+    if (check-conditional and expression.result-type.conditional) or
+        (check-weak and expression.access = Access.WEAK)
+      expression := CheckExpression(
+          owner expression, copy check-conditional, copy check-weak)
+      expression.analyze()
+    else
+      expression.check-no-error()
+  
   func inst write-line-num()
     write-int(copy self.line-number)
   
-  ~~~ Print a syntax error with message: ~~~
-  ~~~ `Code error in {file-name}[{line-number}] {text} "{item}"` ~~~
-  func inst print-syntax-error(user String text, user String item)
-    self.print-syntax-error-header()
-    print-msg-with-item(user text, user item)
-    sys.print(user "\n")
+  func inst print-syntax-error-header()
+    sys.print(user "Code error in ")
+    sys.print(user self.input-file-name)
+    sys.print(user "[")
+    var String{32} line-num-str
+    self.line-number.str(user line-num-str)
+    sys.print(user line-num-str)
+    sys.print(user "] ")
   
-  func inst syntax-error(user String text, user String item)
-    self.print-syntax-error(user text, user item)
+  func inst syntax-error-raise()
+    sys.print(user "\n")
     sys.exit(copy 1)
+  
+  func inst syntax-error-footer(user String text, user String item)
+    print-msg-with-item(user text, user item)
+    self.syntax-error-raise()
+  
+  ~~~ Raise a syntax error with message: ~~~
+  ~~~ `Code error in {file-name}[{line-number}] {text} "{item}"` ~~~
+  func inst syntax-error(user String text, user String item)
+    self.print-syntax-error-header()
+    self.syntax-error-footer(user text, user item)
   
   ~~~ Same as `syntax-error` but but with another `{text} "{item}" pair ~~~
   func inst syntax-error2(
@@ -112,9 +153,7 @@ class SyntaxTreeNode
     self.print-syntax-error-header()
     print-msg-with-item(user text1, user item1)
     sys.print(user " ")
-    print-msg-with-item(user text2, user item2)
-    sys.print(user "\n")
-    sys.exit(copy 1)
+    self.syntax-error-footer(user text2, user item2)
   
   ~~~ Same as `syntax-error` but but with another 2 `{text} "{item}" pair ~~~
   func inst syntax-error3(
@@ -129,12 +168,9 @@ class SyntaxTreeNode
     sys.print(user " ")
     print-msg-with-item(user text2, user item2)
     sys.print(user " ")
-    print-msg-with-item(user text3, user item3)
-    sys.print(user "\n")
-    sys.exit(copy 1)
+    self.syntax-error-footer(user text3, user item3)
   
-  ~~~ Same as `syntax-error` but with a character item ~~~
-  func inst syntax-error-c(user String text)
+  func inst syntax-error-c-footer(user String text)
     var String{16} char-str
     if glob.file-ended
       char-str.new(user "end-of-file")
@@ -142,14 +178,17 @@ class SyntaxTreeNode
       char-str.new(user "new-line")
     else
       char-str.append(copy glob.last-char)
-    self.print-syntax-error(user text, user char-str)
-    sys.exit(copy 1)
+    self.syntax-error-footer(user text, user char-str)
+  
+  ~~~ Same as `syntax-error` but with a character item ~~~
+  func inst syntax-error-c(user String text)
+    self.print-syntax-error-header()
+    self.syntax-error-c-footer(user text)
   
   func inst syntax-error-msg(user String text)
     self.print-syntax-error-header()
     sys.print(user text)
-    sys.print(user "\n")
-    sys.exit(copy 1)
+    self.syntax-error-raise()
   
   func inst syntax-error-indentation(copy Int actual, copy Int expected)
     var String{16} expected-str
@@ -166,8 +205,7 @@ class SyntaxTreeNode
     sys.print(user expected-str)
     sys.print(user " got ")
     sys.print(user actual-str)
-    sys.print(user "\n")
-    sys.exit(copy 1)
+    self.syntax-error-raise()
   
   func inst syntax-error-ref(user String text, user ReferencePath path)
     self.print-syntax-error-header()
@@ -184,15 +222,6 @@ class SyntaxTreeNode
     sys.print(user " ")
     path.print-error(user text2)
     sys.exit(copy 1)
-  
-  func inst print-syntax-error-header()
-    sys.print(user "Code error in ")
-    sys.print(user self.input-file-name)
-    sys.print(user "[")
-    var String{32} line-num-str
-    self.line-number.str(user line-num-str)
-    sys.print(user line-num-str)
-    sys.print(user "] ")
   
   ~~~ Check `text` is a string constant ~~~
   func inst check-string(user String text)

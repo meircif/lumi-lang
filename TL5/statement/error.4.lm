@@ -2,19 +2,103 @@
 module tl5-compiler
 
 
+~~~ If-error/If-ok statement in the syntax tree ~~~
+class SyntaxTreeIfError(SyntaxTreeIf)
+  var Bool is-ok
+  var Bool has-error
+  var Int block-index
+  
+  func inst parse-new(user SyntaxTreeBlock parent, copy Bool is-ok)->(
+      owner SyntaxTreeIf if-node)
+    new SyntaxTreeIfError new-node(user parent)
+    new-node.parse(copy is-ok)
+    if-node := new-node
+  
+  func inst parse(copy Bool is-ok)
+    self.is-ok := is-ok
+    user SyntaxTreeFunction function(user self.get-function())
+    function.block-count += 1
+    self.block-index := function.block-count
+    base()
+    self.condition.is-statement := true
+    self.get-function().err-aux-var := true
+
+  func dynamic set-has-error()->(var Bool need-check)
+    self.has-error := true
+    need-check := false
+  
+  func dynamic analyze()
+    if self.is-ok
+      if not self.else-node?
+        self.syntax-error-msg(user "\"if-ok\" without \"else\"")
+      owner SyntaxTreeBlock error-block(owner self.else-node.block)
+      self.else-node.block := self.block
+      self.block := error-block
+    if not self.block.code-nodes.first?
+      self.syntax-error-msg(user "error handling with no code")
+    base()
+    if not self.has-error
+      self.syntax-error-msg(user "no error raised in expression")
+  
+  func dynamic analyze-condition()
+    self.condition.analyze()
+    if self.condition.result-type?
+      self.syntax-error-msg(user "statement has no effect")
+    
+  func dynamic write()
+    ; ++LUMI_trace_ignore_count;
+    ; `condition`
+    ; LUMI_block[X]_cleanup:
+    ; --LUMI_trace_ignore_count;
+    ; if (LUMI_err != OK) {
+    ;     LUMI_err = OK;
+    ;     LUMI_loop_depth = [depth];
+    ;     `error block`
+    ; }
+    ; else {
+    ;     `ok block`
+    ; }
+    self.write-spaces()
+    write(user "++LUMI_trace_ignore_count;\n")
+    self.write-spaces()
+    var Int parent-block-index(copy self.parent.block-index)
+    self.parent.block-index := self.block-index
+    self.condition.write-preactions()
+    self.condition.write()
+    if self.parent.parent?
+      self.parent.parent.write-spaces()
+    self.parent.write-cleanup-label()
+    self.parent.block-index := parent-block-index
+    write(user ":\n")
+    self.write-spaces()
+    write(user "--LUMI_trace_ignore_count;\n")
+    self.write-error-handling-block()
+    if self.else-node?
+      self.else-node.write()
+    self.write-after-block()
+
+
 ~~~ Try statement in the syntax tree ~~~
 class SyntaxTreeTry(SyntaxTreeFlowElement)
   user SyntaxTreeCatch catch-node
+  var Bool has-error
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeTry new-node)
     new-node := SyntaxTreeTry(user parent)
     new-node.parse-block()
+    new-node.get-function().err-aux-var := true
   
   func dynamic analyze()
     if not self.block.code-nodes.first?
       self.syntax-error-msg(user "\"try\" statement with no code")
     base()
+    if not self.has-error
+      self.syntax-error-msg(user "no error raised in block")
+
+  func dynamic set-has-error()->(var Bool need-check)
+    self.has-error := true
+    need-check := false
   
   func dynamic write()
     self.write-spaces()
@@ -49,12 +133,5 @@ class SyntaxTreeCatch(SyntaxTreeFlowElement)
     base()
   
   func dynamic write()
-    self.write-spaces()
-    write(user "if (LUMI_err != OK) {\n")
-    self.block.write-block-setup()
-    self.block.write-spaces()
-    write(user "LUMI_err = OK;\n")
-    self.block.write-set-loop-depth()
-    self.block.write-block-body()
-    self.block.write-block-cleanup()
-    self.block.write-block-end()
+    self.write-error-handling-block()
+    self.write-after-block()

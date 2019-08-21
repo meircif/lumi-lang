@@ -29,6 +29,7 @@ class SliceExpression(Expression)
     analyze-expression()->(owner self.sequence)
     if not self.sequence.result-type?
       self.syntax-error-msg(user "cannot slice a void expression")
+    self.check-expression-all-errors()->(owner self.sequence)
     if self.sequence.result-type.type-data is glob.type-string
       if not self.second-index?
         self.set-simple-type(user glob.type-char)
@@ -81,8 +82,11 @@ class SliceExpression(Expression)
     if not self.result-type.type-data.is-primitive
       self.sequence.result-type.reference-path.copy-new()->(
           owner self.result-type.reference-path)
+    
+    self.check-error-propagated(user "ignoring slice bounds check")
   
   func inst check-index(user Expression index)
+    index.check-no-error()
     if index.result-type?
       if index.result-type.type-data is-not glob.type-int
         self.syntax-error(
@@ -106,10 +110,6 @@ class SliceExpression(Expression)
   func inst write-preactions-base()
     self.sequence.write-preactions()
     self.index.write-preactions()
-    
-    if self.sequence.is-dubious()
-      self.sequence.write-check-ref()
-      self.code-node.write-spaces()
     
     ; if (index < 0 || index >= [*]`seq`_Length)
     ; if (index < 0 || second < 0 || index + second > [*]`seq`_Length)

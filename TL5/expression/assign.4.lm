@@ -51,9 +51,9 @@ class AssignExpression(Expression)
     user ReferencePath right-path(
         user self.value.result-type.reference-path)
     var Bool was-left-invalid(copy refs.is-invalid(user left-path))
+    refs.clear-invalid-reference(user left-path)
     if is-move
       refs.check-writing-memory(user self.value)
-      refs.clear-invalid-reference(user left-path)
       refs.mark-invalid-reference(user right-path, user self)
       refs.check-writing-memory(user self.target)
     else
@@ -63,8 +63,6 @@ class AssignExpression(Expression)
   func dynamic write-preactions()
     self.value.write-preactions()
     self.target.write-preactions()
-    if self.value.access = Access.WEAK and self.target.access = Access.USER
-      self.value.write-check-refman()
     if access-is-owner(copy self.target.access)
       self.write-owner-assign-preactions()
     self.write-assign-preactions(copy true)
@@ -182,7 +180,6 @@ class AssignExpression(Expression)
       self.value.write-refman()
       write(user ");\n")
       self.code-node.write-spaces()
-      
   
   func inst write-assign-dynamic()
     self.target.write-dynamic()

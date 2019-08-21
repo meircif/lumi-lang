@@ -5,11 +5,15 @@ module tl5-compiler
 class WrapExpression(Expression)
   owner Expression expression
 
-  new(user SyntaxTreeCode code-node, owner Expression expression)
-    base(user code-node)
+  new(owner Expression expression)
+    base(user expression.code-node)
     self.expression := expression
     self.access := self.expression.access
+    self.is-var := self.expression.is-var
     self.assignable := self.expression.assignable
+    self.error-expected := self.expression.error-expected
+    self.is-generic-cast := self.expression.is-generic-cast
+    self.error-propagated := self.expression.error-propagated
     self.expression.result-type.copy-new()->(owner self.result-type)
 
   func dynamic analyze()
@@ -24,13 +28,28 @@ class WrapExpression(Expression)
   func dynamic write()
     self.expression.write()
   
+  func dynamic write-cast()
+    self.expression.write-cast()
+  
+  func dynamic write-safe()
+    self.expression.write-safe()
+  
+  func dynamic write-dynamic()
+    self.expression.write-dynamic()
+  
+  func dynamic write-dynamic-cast()
+    self.expression.write-dynamic-cast()
+  
+  func dynamic write-dynamic-safe()
+    self.expression.write-dynamic-safe()
+  
   func dynamic write-refman()
     self.expression.write-refman()
 
 
 class TypeCastExpression(WrapExpression)
-  new(user SyntaxTreeCode code-node, owner Expression expression)
-    base(user code-node, owner expression)
+  new(owner Expression expression)
+    base(owner expression)
     self.is-generic-cast := true
 
   func dynamic write-safe()
@@ -49,17 +68,17 @@ class TypeCastExpression(WrapExpression)
     write(user "_Dynamic*)(")
     self.expression.write-dynamic()
     write(user "))")
+  
+  func dynamic write-dynamic-safe()
+    self.write-dynamic-cast()
 
 
 ~~~ Up-cast expression ~~~
 class UpCastExpression(WrapExpression)
   var Int bases
   
-  func inst init-new(copy Int bases)->(owner Expression expression)
-    expression := UpCastExpression(owner expression, copy bases)
-  
   new(owner Expression expression, copy Int bases)
-    base(user expression.code-node, owner expression)
+    base(owner expression)
     self.bases := bases
   
   func dynamic write()
@@ -71,10 +90,19 @@ class UpCastExpression(WrapExpression)
       self.expression.write-safe()
     self.write-post()
   
+  func dynamic write-cast()
+    self.write()
+  
   func dynamic write-dynamic()
     self.write-pre()
     self.expression.write-dynamic-safe()
     self.write-post()
+  
+  func dynamic write-dynamic-cast()
+    self.write-dynamic()
+  
+  func dynamic write-dynamic-safe()
+    self.write-dynamic-cast()
   
   func inst write-pre()
     write(user "&(")
@@ -95,7 +123,7 @@ class OwnerToStrongCallExpression(WrapExpression)
   owner Expression owner-expression
 
   new(owner Expression expression)
-    base(user expression.code-node, owner expression)
+    base(owner expression)
     self.owner-expression := self.expression
     self.access := Access.STRONG
     self.add-aux-variable(
@@ -109,4 +137,50 @@ class OwnerToStrongCallExpression(WrapExpression)
         user self.owner-expression,
         copy true)
     assign.write()
+    self.code-node.write-spaces()
+
+
+~~~ An expression that checks whether an expression is usable ~~~
+class CheckExpression(WrapExpression)
+  var Bool check-conditional
+  var Bool check-weak
+  
+  new(owner Expression dubious,
+      copy Bool check-conditional,
+      copy Bool check-weak)
+    base(owner dubious)
+    self.check-conditional :=
+        check-conditional and self.result-type.conditional
+    self.check-weak := check-weak and self.access = Access.WEAK
+    if self.check-conditional
+      self.result-type.conditional := false
+    if self.check-weak
+      self.access := Access.USER
+  
+  func dynamic analyze()
+    if self.check-conditional
+      self.expression.check-error-propagated(
+          user "ignoring empty reference check")
+    else
+      self.expression.check-error-propagated(
+          user "ignoring weak reference check")
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    base(user refs)
+
+  func dynamic write-preactions()
+    base()
+    write(user "CHECK")
+    if self.check-conditional
+      write(user "_REF")
+    if self.check-weak
+      write(user "_REFMAN")
+    self.write-macro-first-params()
+    if self.check-conditional
+      self.expression.write()
+      if self.check-weak
+        write(user ", ")
+    if self.check-weak
+      self.expression.write-refman()
+    write(user ")\n")
     self.code-node.write-spaces()

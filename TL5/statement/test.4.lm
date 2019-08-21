@@ -14,7 +14,10 @@ class SyntaxTreeAssert(SyntaxTreeCode)
     self.tested.new(user "", user self)
   
   func dynamic analyze()
+    if self.set-has-error()
+      self.check-function-has-error()
     self.analyze-expression(user self.tested, user glob.type-bool)
+    self.tested.check-no-error()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.tested.check-memory(user refs)
@@ -36,6 +39,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
   var ExpressionValue tested
   var SyntaxTreeBlock dummy-block
   owner String expected-error
+  var Bool has-error
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeAssertError new-node)
@@ -50,13 +54,23 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
       read-c()
       if glob.last-char = '\n'
         self.read-parent-line-break-spaces()
-      else-if glob.last-char != ' '
-        self.syntax-error-c(user "expected space after \",\", got")
+      else
+        self.expect-space(user ",")
       read-new(user "")->(owner self.expected-error)
       self.check-string(user self.expected-error)
+
+  func dynamic set-has-error()->(var Bool need-check)
+    self.has-error := true
+    need-check := false
   
   func dynamic analyze()
+    if self.parent.set-has-error()
+      self.check-function-has-error()
     self.tested.analyze()
+    if self.tested.expression.error-expected
+      self.syntax-error-msg(user "using \"!\" where error is not propagated")
+    if not self.has-error
+      self.syntax-error-msg(user "no error raised in expression")
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.tested.check-memory(user refs)
@@ -140,6 +154,9 @@ class SyntaxTreeTestFunction(SyntaxTreeFunction)
     base(user _)
     if self.arguments.parameters.first? or self.arguments.outputs.first?
       self.syntax-error-msg(user "test function cannot have arguments")
+    if self.arguments.has-error
+      self.syntax-error-msg(user "no need to mark test functions with \"!\"")
+    self.arguments.has-error := true
     glob.test-functions.add(user self.name, user self)
 
 
@@ -172,7 +189,8 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
           self.syntax-error(
               user "already mocking delete of type", user self.type-name)
         self.parent-type.is-delete-mocked := true
-        self.arguments.add-self-parameter(user glob.type-ref, copy Access.COPY)
+        self.arguments.add-self-parameter(
+            user glob.type-ref, copy Access.COPY, copy false)
         self.type-name := _
     else-if self.name.equal(user "new")
       if glob.is-new-mocked
@@ -184,7 +202,8 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       if self.arguments.parameters.first? or self.arguments.outputs.first?
         self.syntax-error-msg(user "mock delete should have no arguments")
       glob.is-delete-mocked := true
-      self.arguments.add-self-parameter(user glob.type-ref, copy Access.COPY)
+      self.arguments.add-self-parameter(
+          user glob.type-ref, copy Access.COPY, copy false)
     else
       self.find-function(user self.name, user self.module-name)->(
           user self.implemented-function)
@@ -232,11 +251,14 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
   
   func dynamic write-block-body()
     if self.implemented-function?
-      ; if (!`name`_active) return `name`(`arguments`);
+      ; if (!`name`_active) { return `name`(`arguments`); }
+      ; if (!`name`_active) { `name`(`arguments`); return; }
       write-spaces(copy INDENTATION-SPACES)
       write(user "if (!")
       self.write-cname()
-      write(user "_active) return ")
+      write(user "_active) { ")
+      if self.arguments.has-error
+        write(user "return ")
       self.implemented-function.write-cname()
       var FunctionArguments call-arguments
       for argument in self.arguments.parameters.iter()
@@ -244,7 +266,9 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       for argument in self.arguments.outputs.iter()
         self.build-call-argument(user call-arguments.outputs, user argument)
       call-arguments.write-call()
-      write(user ";\n")
+      if not self.arguments.has-error
+        write(user "; return")
+      write(user "; }\n")
     base()
   
   func inst build-call-argument(

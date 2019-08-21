@@ -63,10 +63,13 @@ struct TypeInstance
     string-new-copy(user name)->(owner self.name)
     if glob.last-char = '{'
       if self.name.equal(user "Func")
+        self.arguments := FunctionArguments()
         read-c()
+        if glob.last-char = ':'
+          self.arguments.has-error := true
+          read-c()
         if glob.last-char != '('
           node.syntax-error-c(user "expected \"(\" inside Function type, got")
-        self.arguments := FunctionArguments()
         var DeclarationArgumentFactory argument-factory
         self.arguments.parse(
             user argument-factory,
@@ -128,10 +131,11 @@ struct TypeInstance
       if self.arguments?
         self.arguments.link-types()
     if check-length
-      if self.length?
+      if self.length-owner.parsed()
         node.analyze-expression(user self.length, user glob.type-int)
         if constant-length and not self.length.constant
           node.syntax-error-msg(user "array length is not constant")
+        self.length.check-no-error()
       if self.arguments?
         self.arguments.analyze()
     if self.parameters?
@@ -190,11 +194,17 @@ struct TypeInstance
   
   func check-assign-from(copy Int access, user SyntaxTreeNode node)->(
       owner Expression value)
+    if value.access = Access.OWNER and access = Access.STRONG
+      value.check-error-propagated(user "ignoring initialization error check")
+    node.check-expression-errors(
+        copy not self.conditional and self.type-data is-not glob.type-ref,
+        copy access != Access.WEAK)->(
+        owner value)
     var Int bases
     value.result-type.check-assign-to(
         copy value.access, user self, copy access, user node)->(var bases)
     if bases > 0
-      UpCastExpression.init-new(user _, copy bases)->(owner value)
+      value := UpCastExpression(owner value, copy bases)
   
   func check-assign-to(
       copy Int self-access,
@@ -291,10 +301,7 @@ struct TypeInstance
           user target.type-data.name)
     
     if self.arguments?
-      if self.arguments.check-same-as(
-          user target.arguments, user _, copy 0, copy node?)
-        assert node?
-        node.syntax-error-msg(user "too few outputs")
+      self.arguments.check-same-as(user target.arguments, copy node?)
     
     if target.type-data.is-primitive or target.type-data is glob.type-array
       self-type-instance.check-sub-equal(user target, user node)

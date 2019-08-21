@@ -3,10 +3,11 @@ module tl5-compiler
 
 ~~~ Basic code flow element node in the syntax tree ~~~
 class SyntaxTreeFlowElement(SyntaxTreeCode)
-  var SyntaxTreeBlock block
+  owner SyntaxTreeBlock block
   
   new(user SyntaxTreeBlock parent)
     base(user parent)
+    self.block := SyntaxTreeBlock(user self)
     self.set-parent(user parent)
   
   func inst set-parent(user SyntaxTreeBlock parent)
@@ -41,6 +42,17 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     write(user ") goto ")
     self.parent.write-cleanup-label()
     write(user ";\n")
+  
+  func inst write-error-handling-block()
+    self.write-spaces()
+    write(user "if (LUMI_err != OK) {\n")
+    self.block.write-block-setup()
+    self.block.write-spaces()
+    write(user "LUMI_err = OK;\n")
+    self.block.write-set-loop-depth()
+    self.block.write-block-body()
+    self.block.write-block-cleanup()
+    self.block.write-block-end()
 
 
 ~~~ If statement node in the syntax tree ~~~
@@ -76,10 +88,14 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
       self.else-node.link-types()
   
   func dynamic analyze()
-    self.analyze-expression(user self.condition, user glob.type-bool)
+    self.analyze-condition()
+    self.condition.check-no-error()
     base()
     if self.else-node?
       self.else-node.analyze()
+  
+  func dynamic analyze-condition()
+    self.analyze-expression(user self.condition, user glob.type-bool)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.condition.check-memory(user refs)

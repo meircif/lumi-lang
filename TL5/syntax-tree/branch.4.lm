@@ -6,6 +6,16 @@ class SyntaxTreeBranch(SyntaxTreeNode)
   var Int indentation-spaces
   var List{SyntaxTreeVariable} variables
   
+  func inst equal-and-space(user String keyword, user String value)->(
+      var Bool result)
+    if keyword.equal(user value)->(var result)
+      self.expect-space(user keyword)
+      
+  func inst equal-and-new-line(user String keyword, user String value)->(
+      var Bool result)
+    if keyword.equal(user value)->(var result)
+      self.expect-new-line(user keyword)
+  
   func inst parse-block-children(
       user TypeData parent-type, user SyntaxTreeBlock parent-block)
     if glob.last-char != '\n'
@@ -306,10 +316,8 @@ class SyntaxTreeNamespace(SyntaxTreeBranch)
   
   func inst parse-if-function(
       user String keyword, user TypeData parent-type)->(var Bool is-func)
-    keyword.equal(user "func")->(var is-func)
+    self.equal-and-space(user keyword, user "func")->(var is-func)
     if is-func
-      if glob.last-char != ' '
-        self.syntax-error-c(user "expected space after \"func\", got")
       self.functions.add(owner SyntaxTreeFunction.parse-new(
           user _, user parent-type))
   

@@ -15,24 +15,24 @@ class TopType(covered.MiddleType)
         self.num-top := 3
     
     
-    func dynamic meth2()
-        sys.println(user "TopType.meth2")
-        base()
-        covered.MiddleType.meth2(user self)
-        BaseType.meth2(user self)
+    func dynamic user ! meth2()
+        sys.println(user "TopType.meth2")!
+        base()!
+        covered.MiddleType.meth2(user self)!
+        BaseType.meth2(user self)!
     
-    func dynamic meth3(copy Int n, user String s)
-        sys.println(user "TopType.meth3")
-        base.meth3(copy n, user s)
+    func dynamic user ! meth3(copy Int n, user String s)
+        sys.println(user "TopType.meth3")!
+        base.meth3(copy n, user s)!
     
-    func dynamic meth5(copy Int n, weak String? s)
-        sys.println(user "TopType.meth5")
-        base(copy n, user s)
-        covered.MiddleType.meth1(user _, copy n, weak s)
-        BaseType.meth1(user _, copy n, weak s)
+    func dynamic user ! meth5(copy Int n, weak String? s)
+        sys.println(user "TopType.meth5")!
+        base(copy n, weak s)!
+        covered.MiddleType.meth1(user _, copy n, weak s)!
+        BaseType.meth1(user _, copy n, weak s)!
     
-    func dynamic meth6()
-        sys.println(user "TopType.meth6")
+    func dynamic user ! meth6()
+        sys.println(user "TopType.meth6")!
         self.num-mid := self.num-base
         self.top-base-ref := self.top-mid-ref
         user covered.MiddleType? mt(user self)
@@ -49,25 +49,25 @@ class BaseType
     new()
         self.num-base := 1
     
-    func dynamic meth0()
-        sys.println(user "BaseType.meth0")
+    func dynamic user ! meth0()
+        sys.println(user "BaseType.meth0")!
     
-    func dynamic meth1(copy Int n, weak String? s)
-        sys.println(user "BaseType.meth1")
+    func dynamic user? ! meth1(copy Int n, weak String? s)
+        sys.println(user "BaseType.meth1")!
     
-    func dynamic meth2()
-        sys.println(user "BaseType.meth2")
+    func dynamic user ! meth2()
+        sys.println(user "BaseType.meth2")!
     
-    func dynamic meth3(copy Int n, user String s)
-        sys.println(user "BaseType.meth3")
+    func dynamic user ! meth3(copy Int n, user String s)
+        sys.println(user "BaseType.meth3")!
 
 
 func test-mid-out()->(user covered.MiddleType? mt)
     mt := _
 
 
-func test-new-mid()->(owner covered.MiddleType? mt)
-    new covered.MiddleType new-mt
+func ! test-new-mid()->(owner covered.MiddleType? mt)
+    new covered.MiddleType new-mt!
     mt := new-mt
 
 
@@ -75,85 +75,85 @@ mock TestStruct.get()->(var Int x, user String? s)
     x := 12
     s := _
 
-mock test-int2str(copy Int x)->(owner String? s)
-    raise
+mock ! test-int2str(copy Int x)->(owner String? s)
+    raise!
 
 mock TestClass.dynamic-meth()
     self.num := 7
 
 test test-func()
     owner String? s
-    assert-error test-int2str(copy 3)->(owner s)
-    test-int2str.mocked(copy 4)->(owner s)
+    assert-error! test-int2str(copy 3)->(owner s)
+    test-int2str.mocked(copy 4)->(owner s)!
     test-int2str.active := false
-    test-int2str(copy 5)->(owner s)
+    test-int2str(copy 5)->(owner s)!
     test-int2str.active := true
-    assert-error test-int2str(copy 6)->(owner s)
+    assert-error! test-int2str(copy 6)->(owner s)
     
-    var TestStruct t(copy 0, user _)
+    var TestStruct t(copy 0, user _)!
     var Int x
     t.get()->(var x)
-    assert x = 12
+    assert! x = 12
     t.get.mocked()->(var x)
-    assert x = 0
+    assert! x = 0
     t.get.active := false
     x := 1
     t.get()->(var x)
-    assert x = 0
+    assert! x = 0
     TestStruct.get.active := true
     t.get()->(var x)
-    assert x = 12
+    assert! x = 12
     
     var TestClass c
-    assert c.num = 1
+    assert! c.num = 1
     c.dynamic-meth()
-    assert c.num = 7
+    assert! c.num = 7
     TestClass.dynamic-meth.mocked(user c)
-    assert c.num = 6
+    assert! c.num = 6
     TestClass.dynamic-meth.active := false
     c.num := 0
     c.dynamic-meth()
-    assert c.num = 6
+    assert! c.num = 6
     TestClass.dynamic-meth.active := true
     TestClass.dynamic-meth(user c)
-    assert c.num = 7
+    assert! c.num = 7
 
 
 test test-another()
     var Int x
-    assert x = 0
+    assert! x = 0
 
 
 native var Int external-int
 native type Native
-native func external(copy Int i, user String s)->(var Int io, var Native n)
+native func ! external(copy Int i, user String s)->(var Int io, var Native n)
 native func external2(copy Native n)->(var Bool b)
 
 
 test test-native()
-    assert external-int = 6
+    assert! external-int = 6
     var Int i
     var Native n
-    var String{4} s(user "bb")
-    assert-error external(copy 3, user s)->(var i, var n)
-    assert i = 3
-    assert s[0] = 'a'
-    assert external2(copy n)
+    var String{4} s(user "bb")!
+    assert-error! external(copy 3, user s)->(var i, var n)
+    assert! i = 3
+    assert! s[0]! = 'a'
+    assert! external2(copy n)
 
 
 test test-dynamic-type-parameters()
-    s-var Data{covered.MiddleType} dmid
-    s-var TopType ttop
+    s-var Data{covered.MiddleType} dmid!
+    s-var TopType ttop!
     ttop.num-base := 12
     dmid.item := ttop
     weak BaseType? tbase
     tbase := dmid.item
-    assert tbase.num-base = 12
+    assert! tbase!.num-base = 12
     ttop.num-base := 13
-    dmid.set(weak ttop)
+    dmid.set(weak ttop)!
     tbase := _
     dmid.get()->(weak tbase)
-    assert tbase.num-base = 13
+    assert! tbase!.num-base = 13
 
 
 struct Link
@@ -163,7 +163,7 @@ class BaseLink
     strong BaseLink? next
     weak Link? link
     
-    func dynamic m-meth()
+    func dynamic user m-meth()
         ; do nothing
 
 class TopLink{Generic}(BaseLink)
@@ -176,8 +176,8 @@ struct RefNode
     new(copy Ref? ref)
         self.ref := ref
 
-func new-ref-node(copy Ref? ref)->(owner RefNode? next)
-    new RefNode ref-node(copy ref)
+func ! new-ref-node(copy Ref? ref)->(owner RefNode? next)
+    new RefNode ref-node(copy ref)!
     ref-node.next := next
     next := ref-node
 
@@ -188,162 +188,162 @@ owner RefNode? deleted-base-links
 owner RefNode? deleted-top-links
 owner RefNode? deleted-refmans(owner _)
 
-mock delete()
+mock ! delete()
     if record-delete
-        new-ref-node(copy self)->(owner deleted-refmans)
+        new-ref-node(copy self)->(owner deleted-refmans)!
 
-mock Link.delete()
+mock ! Link.delete()
     if record-delete
-        new-ref-node(copy self)->(owner deleted-links)
+        new-ref-node(copy self)->(owner deleted-links)!
 
-mock BaseLink.delete()
+mock ! BaseLink.delete()
     if record-delete
-        new-ref-node(copy self)->(owner deleted-base-links)
+        new-ref-node(copy self)->(owner deleted-base-links)!
 
-mock TopLink.delete()
+mock ! TopLink.delete()
     if record-delete
-        new-ref-node(copy self)->(owner deleted-top-links)
+        new-ref-node(copy self)->(owner deleted-top-links)!
 
 func remove-obj(owner Link b)
     ; remove b
 
-func get-outdated-var()->(weak Link? l-out)
-    strong Link l-var(strong Link())
+func ! get-outdated-var()->(weak Link? l-out)
+    strong Link l-var(strong Link()!)
     l-out := l-var
 
 test test-simple-delete()
-    assert not deleted-refmans?
-    assert not deleted-links?
+    assert! not deleted-refmans?
+    assert! not deleted-links?
     record-delete := true
     
-    strong Link? l(strong Link())
+    strong Link? l(strong Link()!)
     weak Link? l-user(weak l)
-    assert l?
-    assert l-user?
+    assert! l?
+    assert! l-user?
     var Ref l-ref(copy l)
     remove-obj(owner l!)
-    assert not l?
-    assert not l-user?
-    assert not deleted-refmans?
-    assert deleted-links?
-    assert deleted-links.ref is l-ref
-    assert not deleted-links.next?
+    assert! not l?
+    assert! not l-user?
+    assert! not deleted-refmans?
+    assert! deleted-links?
+    assert! deleted-links!.ref is l-ref
+    assert! not deleted-links!.next?
     l-user := _
-    assert deleted-refmans?
-    assert deleted-refmans.ref is l-ref
-    assert not deleted-refmans.next?
-    get-outdated-var()->(weak l-user)
-    assert l-user is-not _
-    assert not l-user?
+    assert! deleted-refmans?
+    assert! deleted-refmans!.ref is l-ref
+    assert! not deleted-refmans!.next?
+    get-outdated-var()->(weak l-user)!
+    assert! l-user is-not _
+    assert! not l-user?
     
     record-delete := false
     deleted-refmans := _
     deleted-links := _
 
-func has-ref(copy Ref ref)->(owner RefNode? node)
-    has-ref-rec(copy ref)->(owner node)
-    has-ref-rec(copy ref)->(owner deleted-refmans)
+func ! has-ref(copy Ref ref)->(owner RefNode? node)
+    has-ref-rec(copy ref)->(owner node)!
+    has-ref-rec(copy ref)->(owner deleted-refmans)!
 
-func has-ref-rec(copy Ref ref)->(owner RefNode? node)
-    assert node?
-    if node.ref is ref
-        owner RefNode? next(owner node.next)
+func ! has-ref-rec(copy Ref ref)->(owner RefNode? node)
+    assert! node?
+    if node!.ref is ref
+        owner RefNode? next(owner node!.next)
         node := next
     else
-        has-ref-rec(copy ref)->(owner node.next)
+        has-ref-rec(copy ref)->(owner node!.next)!
 
 test test-complex-delete()
-    assert not deleted-refmans?
-    assert not deleted-links?
-    assert not deleted-base-links?
-    assert not deleted-top-links?
+    assert! not deleted-refmans?
+    assert! not deleted-links?
+    assert! not deleted-base-links?
+    assert! not deleted-top-links?
     record-delete := true
     
-    strong BaseLink? b1(strong BaseLink())
+    strong BaseLink? b1(strong BaseLink()!)
     var Ref b1-ref(copy b1)
-    strong BaseLink? b2(strong BaseLink())
+    strong BaseLink? b2(strong BaseLink()!)
     var Ref b2-ref(copy b2)
-    strong TopLink?{Link} t1(strong TopLink{Link}())
+    strong TopLink?{Link} t1(strong TopLink{Link}()!)
     var Ref t1-ref(copy t1)
-    strong TopLink?{BaseLink} t2(strong TopLink{BaseLink}())
+    strong TopLink?{BaseLink} t2(strong TopLink{BaseLink}()!)
     var Ref t2-ref(copy t2)
-    strong TopLink?{BaseLink} t3(strong TopLink{BaseLink}())
+    strong TopLink?{BaseLink} t3(strong TopLink{BaseLink}()!)
     var Ref t3-ref(copy t3)
-    strong Link? l1(strong Link())
+    strong Link? l1(strong Link()!)
     var Ref l1-ref(copy l1)
-    strong Link? l2(strong Link())
+    strong Link? l2(strong Link()!)
     var Ref l2-ref(copy l2)
-    strong Link? l3(strong Link())
+    strong Link? l3(strong Link()!)
     var Ref l3-ref(copy l3)
     
-    b1.link := l1
-    b2.link := l2
-    t1.link := l1
-    t2.link := l2
-    t3.link := l3
+    b1!.link := l1
+    b2!.link := l2
+    t1!.link := l1
+    t2!.link := l2
+    t3!.link := l3
     
-    l2.next := l3
-    assert not l3?
-    l1.next := l2
-    assert not l2?
-    t3.item := b2
-    assert not b2?
-    t2.item := t3
-    assert not t3?
-    t1.next := t2
-    assert not t2?
-    t1.item := l1
-    assert not l1?
-    b1.next := t1
-    assert not t1?
+    l2!.next := l3
+    assert! not l3?
+    l1!.next := l2
+    assert! not l2?
+    t3!.item := b2
+    assert! not b2?
+    t2!.item := t3
+    assert! not t3?
+    t1!.next := t2
+    assert! not t2?
+    t1!.item := l1
+    assert! not l1?
+    b1!.next := t1
+    assert! not t1?
     
-    assert not deleted-refmans?
-    assert not deleted-links?
-    assert not deleted-base-links?
-    assert not deleted-top-links?
+    assert! not deleted-refmans?
+    assert! not deleted-links?
+    assert! not deleted-base-links?
+    assert! not deleted-top-links?
     b1 := _
-    assert not b1?
+    assert! not b1?
     
     record-delete := false
-    has-ref(copy b1-ref)->(owner deleted-base-links)
-    has-ref(copy t1-ref)->(owner deleted-top-links)
-    has-ref-rec(copy t1-ref)->(owner deleted-base-links)
-    has-ref(copy t2-ref)->(owner deleted-top-links)
-    has-ref-rec(copy t2-ref)->(owner deleted-base-links)
-    has-ref(copy t3-ref)->(owner deleted-top-links)
-    has-ref-rec(copy t3-ref)->(owner deleted-base-links)
-    has-ref(copy b2-ref)->(owner deleted-base-links)
-    has-ref(copy l1-ref)->(owner deleted-links)
-    has-ref(copy l2-ref)->(owner deleted-links)
-    has-ref(copy l3-ref)->(owner deleted-links)
+    has-ref(copy b1-ref)->(owner deleted-base-links)!
+    has-ref(copy t1-ref)->(owner deleted-top-links)!
+    has-ref-rec(copy t1-ref)->(owner deleted-base-links)!
+    has-ref(copy t2-ref)->(owner deleted-top-links)!
+    has-ref-rec(copy t2-ref)->(owner deleted-base-links)!
+    has-ref(copy t3-ref)->(owner deleted-top-links)!
+    has-ref-rec(copy t3-ref)->(owner deleted-base-links)!
+    has-ref(copy b2-ref)->(owner deleted-base-links)!
+    has-ref(copy l1-ref)->(owner deleted-links)!
+    has-ref(copy l2-ref)->(owner deleted-links)!
+    has-ref(copy l3-ref)->(owner deleted-links)!
     
-    assert not deleted-refmans?
-    assert not deleted-links?
-    assert not deleted-base-links?
-    assert not deleted-top-links?
+    assert! not deleted-refmans?
+    assert! not deleted-links?
+    assert! not deleted-base-links?
+    assert! not deleted-top-links?
     
     deleted-refmans := _
     deleted-links := _
     deleted-base-links := _
     deleted-top-links := _
 
-func has-refs(user Array{Ref} refs, copy Int number)
+func ! has-refs(user Array{Ref} refs, copy Int number)
     record-delete := false
     for n in number
-        has-ref(copy refs[n])->(owner deleted-links)
+        has-ref(copy refs[n]!)->(owner deleted-links)!
     record-delete := true
 
-func cleanup-test(user Array{Ref} refs)
+func ! cleanup-test(user Array{Ref} refs)
     try
         raise
     catch
-        strong Link la(strong Link())
-        refs[0] := la
+        strong Link la(strong Link()!)
+        refs[0]! := la
         if false
             ; 
         else
-            strong Link lb(strong Link())
-            refs[1] := lb
+            strong Link lb(strong Link()!)
+            refs[1]! := lb
             try
                 strong Link lc(strong Link())
                 refs[2] := lc
@@ -359,55 +359,55 @@ func cleanup-test(user Array{Ref} refs)
                             return
 
 test test-block-delete()
-    assert not deleted-refmans?
-    assert not deleted-links?
+    assert! not deleted-refmans?
+    assert! not deleted-links?
     record-delete := true
     var Array{6:Ref} refs
     
-    cleanup-test(user refs)
-    has-refs(user refs, copy 6)
+    cleanup-test(user refs)!
+    has-refs(user refs, copy 6)!
     
     var Int n
     do
-        strong Link la(strong Link())
-        refs[n] := la
+        strong Link la(strong Link()!)
+        refs[n]! := la
         n += 1
         if n = 2
             continue
         if n = 3
             break
-    has-refs(user refs, copy 3)
+    has-refs(user refs, copy 3)!
     
     for n in 3
-        strong Link lb(strong Link())
-        refs[n] := lb
-    has-refs(user refs, copy 3)
+        strong Link lb(strong Link()!)
+        refs[n]! := lb
+    has-refs(user refs, copy 3)!
     
     record-delete := false
     deleted-refmans := _
     deleted-links := _
 
 
-func raise-message()
-    raise "tested message"
+func ! raise-message()
+    raise! "tested message"
 
-func ignore-and-raise()
+func ! ignore-and-raise()
     try
         raise-message()
-    raise "ignore and raise"
+    raise! "ignore and raise"
 
-func failed-assert()
-    assert 1 = 2
+func ! failed-assert()
+    assert! 1 = 2
 
-func good-assert-error()
-    assert-error raise-message()
-    raise "good assert error"
+func ! good-assert-error()
+    assert-error! raise-message()
+    raise! "good assert! error"
 
-func failed-assert-error()
-    assert-error test-void()
+func ! failed-assert-error()
+    assert-error! test-void()
 
-func wrong-message-assert-error()
-    assert-error raise-message(), "wrong message"
+func ! wrong-message-assert-error()
+    assert-error! raise-message(), "wrong message"
 
 var Int new-fail-countdown
 
@@ -418,96 +418,95 @@ mock new()->(var Bool alloc-success)
         if new-fail-countdown = 0
             alloc-success := false
 
-func alloc()
-    strong SimpleStruct object(strong SimpleStruct())
-    assert object?
+func ! alloc()
+    strong SimpleStruct? object(strong SimpleStruct()!)
+    assert! object?
 
 test test-assert-error-message()
-    assert-error raise-message(), "tested message"
-    assert-error ignore-and-raise(), "ignore and raise"
-    assert-error failed-assert(), "condition is not true"
-    assert-error good-assert-error(), "good assert error"
-    assert-error failed-assert-error(), "error not raised"
-    assert-error wrong-message-assert-error()
-    var Func{()} fun
-    assert-error fun(), "empty object used"
-    var BaseType base-var
-    user BaseType? base-user(user base-var)
-    assert-error test-mid-out()->(user base-user),
-            "non empty base class given as output argument"
-    strong Array?{Int} arr(strong Array{2:Int}())
-    assert-error arr[6], "slice index out of bounds"
+    assert-error! raise-message(), "tested message"
+    assert-error! ignore-and-raise(), "ignore and raise"
+    assert-error! failed-assert(), "condition is not true"
+    assert-error! good-assert-error(), "good assert! error"
+    assert-error! failed-assert-error(), "error not raised"
+    assert-error! wrong-message-assert-error()
+    var Func?{()} fun
+    assert-error! fun(), "empty object used"
+    strong Array?{Int} arr(strong Array{2:Int}()!)
+    assert-error! arr[6], "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
     arr := _
-    assert-error arr.length(), "empty object used"
-    assert-error arr2.length(), "outdated weak reference used"
-    assert-error arr[0], "empty object used"
-    assert-error arr2[0], "outdated weak reference used"
+    assert-error! arr.length(), "empty object used"
+    assert-error! arr2.length(), "outdated weak reference used"
+    assert-error! arr[0], "empty object used"
+    assert-error! arr2[0], "outdated weak reference used"
     user TopType? top(user _)
-    assert-error top.meth2(), "empty object used"
+    assert-error! top.meth2(), "empty object used"
     new-fail-countdown := 1
-    assert-error alloc(), "insufficient memory for object dynamic allocation"
+    assert-error! alloc(), "insufficient memory for object dynamic allocation"
     new-fail-countdown := 2
-    assert-error alloc(), "insufficient memory for managed object"
+    assert-error! alloc(), "insufficient memory for managed object"
 
 native var Int lumi-debug-value
 
 test test-builtin-errors()
-    var String{4} too-long(user "abc")
+    var String{4} too-long(user "abc")!
     
     owner File? file
     var String{4} filename
-    assert-error file-open-read(user _)->(owner file), "empty object used"
+    user String? empty
+    assert-error! file-open-read(user empty)->(owner file), "empty object used"
     lumi-debug-value := 1
-    assert-error file-open-write(user filename)->(owner file), "open file failed"
+    assert-error! file-open-write(user filename)->(owner file), "open file failed"
     lumi-debug-value := 2
     new-fail-countdown := 1
-    assert-error file-open-read(user filename)->(owner file),
+    assert-error! file-open-read(user filename)->(owner file),
             "insufficient memory for object dynamic allocation"
     new-fail-countdown := 1
-    assert-error file-open-write(user filename)->(owner file),
+    assert-error! file-open-write(user filename)->(owner file),
             "insufficient memory for object dynamic allocation"
+    lumi-debug-value := 2
+    file-open-read(user filename)->(owner file)!
     lumi-debug-value := 1
-    assert-error file-close(owner file), "close file failed"
+    assert-error! file-close(owner file), "close file failed"
     var Char ch
     lumi-debug-value := 2
-    file-open-read(user filename)->(owner file)
-    assert-error file.getc()->(var ch), "file not opened"
-    assert-error file.putc(copy 'a'), "file not opened"
-    assert-error file.write(user "aa"), "file not opened"
+    file-open-read(user filename)->(owner file)!
+    assert-error! file.getc()->(var ch), "file not opened"
+    assert-error! file.putc(copy 'a'), "file not opened"
+    assert-error! file.write(user "aa"), "file not opened"
     lumi-debug-value := 1
-    assert-error file.putc(copy 'a'), "file write failed"
-    assert-error file.write(user "aa"), "file write failed"
+    assert-error! file.putc(copy 'a'), "file write failed"
+    assert-error! file.write(user "aa"), "file write failed"
     
-    assert-error "aa".get(copy 2), "slice index out of bounds"
-    assert-error too-long.append(copy 'a'), "string too long"
-    assert-error too-long.concat(user "a"), "string too long"
+    assert-error! "aa".get(copy 2), "slice index out of bounds"
+    assert-error! too-long.append(copy 'a'), "string too long"
+    assert-error! too-long.concat(user "a"), "string too long"
     var String{3} short-str
-    assert-error 123.str(user short-str), "string too long"
-    assert-error short-str.copy(user "aaaaa"), "string too long"
+    assert-error! 123.str(user short-str), "string too long"
+    assert-error! short-str.copy(user "aaaaa"), "string too long"
     
     lumi-debug-value := 2
-    assert-error sys.getline(user short-str), "string too long"
+    assert-error! sys.getline(user short-str), "string too long"
     lumi-debug-value := 1
-    assert-error sys.exit(copy 0), "exit failed"
-    assert-error sys.system(user "aaa"), "command execution failed"
+    assert-error! sys.exit(copy 0), "exit failed"
+    assert-error! sys.system(user "aaa"), "command execution failed"
 
-mock Sys.println(user Array?{Char} text)
-    assert text?
+mock ! Sys.println(user Array{Char} text)
+    assert! text.length() > 0
 
 test test-cover-all()
     var covered.MiddleType mid
-    mid.meth1(copy 0, weak _)
-    mid.meth2()
-    mid.meth4()
-    mid.meth5(copy 0, user _)
+    mid.meth1(copy 0, weak _)!
+    mid.meth2()!
+    mid.meth4()!
+    mid.meth5(copy 0, weak _)!
 
 
 test test-constants()
-    assert SIZE = 12
-    assert LENGTH = 60
-    assert TestEnum.FIRST-VALUE = 0
-    assert TestEnum.ANOTHER-VALUE = 1
-    assert TestEnum.VALUE2 = 2
-    assert TestEnum.length = 3
-    assert int-arr.length() = 63
+    assert! SIZE = 12
+    assert! LENGTH = 60
+    assert! TestEnum.FIRST-VALUE = 0
+    assert! TestEnum.ANOTHER-VALUE = 1
+    assert! TestEnum.VALUE2 = 2
+    assert! TestEnum.length = 3
+    assert! int-arr.length() = 63

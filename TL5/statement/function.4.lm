@@ -20,9 +20,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   user DeleteGroupBuilder delete-group-builder
   var Int dynamic-base-count
   var Int block-count
+  var Int self-access
+  var Bool self-conditional
   var Bool is-dynamic
   var Bool header-only
   var Bool external-body
+  var Bool err-aux-var
   
   func inst parse-new(user TypeData parent-type)->(
       owner SyntaxTreeFunction new-node)
@@ -42,6 +45,14 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           self.syntax-error(
               user "expected \"dynamic\" or \"inst\" method type, got",
               user meth-type)
+      user String access-str
+      read-until(user " ?(", copy false)->(user access-str)
+      if glob.last-char = '?'
+        self.self-conditional := true
+        read-c()
+      if glob.last-char != ' '
+        self.syntax-error-msg(user "missing access before method name")
+      self.get-access(user access-str)->(var self.self-access)
     else
       self.my-module := glob.current-module
     self.parse-header(copy false)
@@ -61,7 +72,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.indentation-spaces := INDENTATION-SPACES
   
   func inst parse-header(copy Bool is-native)
-    read-new(user ".(")->(owner self.name)
+    read-new(user "!.(")->(owner self.name)
+    if glob.last-char = '!'
+      self.arguments.has-error := true
+      read-c()
+      self.expect-space(user "!")
+      read-new(user ".(")->(owner self.name)
     do
       while glob.last-char = '.'
       var Char ch(copy self.name[0])
@@ -82,12 +98,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.parse-arguments(copy is-native)
   
   func inst add-self-parameter()
-    if self.parent-type.constructor is self
-      self.arguments.add-self-parameter(
-          user self.parent-type, copy Access.VAR)
-    else
-      self.arguments.add-self-parameter(
-          user self.parent-type, copy Access.USER)
+    self.arguments.add-self-parameter(
+        user self.parent-type,
+        copy self.self-access,
+        copy self.self-conditional)
   
   func inst parse-arguments(copy Bool is-native)
     var DeclarationArgumentFactory argument-factory
@@ -144,6 +158,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       return
     if not module-name?
       self.arguments.find-variable(user name, user _)->(user variable)
+  
+  func dynamic set-has-error()->(var Bool need-check)
+    need-check := true
     
   func inst new-aux-variable-index(user TypeInstance type-instance)->(
       var Int index)
@@ -178,6 +195,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       self.check-already-implemented()
       if self.parent-type.constructor is self.implemented-function
         self.parent-type.constructor := self
+      self.self-access := self.implemented-function.self-access
+      self.self-conditional := self.implemented-function.self-conditional
       self.add-self-parameter()
     self.arguments.link-types()
     base()
@@ -202,11 +221,16 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       glob.current-module := self.my-module
     if self.implemented-function?
       self.arguments.check-same-as(
-          user self.implemented-function.arguments, user _, copy 0, copy true)
+          user self.implemented-function.arguments, copy true)
       self.my-module := self.implemented-function.my-module
     self.arguments.analyze()
     if self.header-only
       return
+    if not self.external-body and self.is-dynamic
+      self.arguments.check-override(
+          user self.dynamic-base-method.arguments,
+          user self.parent-type.base-type,
+          copy self.dynamic-base-count)
     for parameter in self.arguments.parameters.iter()
       if access-is-owner(copy parameter.access)
         self.delete-group-builder.add-deleting(
@@ -280,7 +304,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   func dynamic write()
     ; #define LUMI_FILE_NAME "`file-name`"
     ; #define LUMI_FUNC_NAME "`parent-type`.`function-name`"
-    ; Returncode `Type`_`name`(`args`) {
+    ; [void|Returncode] `Type`_`name`(`args`) {
     ;   `block...`
     ; }
     ; #undef LUMI_FILE_NAME
@@ -293,20 +317,24 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-post-func()
   
   func inst write-header()
-    write(user "\nReturncode ")
+    if self.arguments.has-error
+      write(user "\nReturncode ")
+    else
+      write(user "\nvoid ")
     self.write-cname()
     self.arguments.write()
   
   func inst write-block()
     ; `previous-text` {
-    ;   Returncode LUMI_err = OK;
+    ;   [Returncode LUMI_err = OK;]
     ;   unsigned LUMI_loop_depth = 1;
     ;   `block...`
-    ;   return LUMI_err;
+    ;   [return LUMI_err;]
     ; }
     self.write-block-start()
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "Returncode LUMI_err = OK;\n")
+    if self.err-aux-var or self.arguments.has-error
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "Returncode LUMI_err = OK;\n")
     write-spaces(copy INDENTATION-SPACES)
     write(user "unsigned LUMI_loop_depth = 1;\n")
     self.write-block-setup()
@@ -314,8 +342,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.write-block-body()
     self.write-block-cleanup()
     self.write-param-cleanup()
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "return LUMI_err;\n")
+    if self.arguments.has-error
+      write-spaces(copy INDENTATION-SPACES)
+      write(user "return LUMI_err;\n")
     self.write-block-end()
   
   func inst write-setup()
@@ -381,7 +410,14 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
   func inst parse(user TypeData parent-type)
     self.parent-type := parent-type
     self.indentation-spaces := INDENTATION-SPACES
+    self.self-access := Access.VAR
+    self.self-conditional := false
     self.parent-type.constructor := self
+    if glob.last-char = '!'
+      self.arguments.has-error := true
+      read-c()
+    if glob.last-char != '('
+      self.syntax-error-c(user "expected \"(\" after \"new\", got")
     string-new-copy(user "new")->(owner self.name)
     self.parse-arguments(copy false)
     self.parse-body()
@@ -411,8 +447,7 @@ class DeclarationArgument(Argument)
     self.variable.type-instance := TypeInstance()
     self.variable.type-instance.parse(
         user " ", user self, user _, copy indentation-spaces)
-    if glob.last-char != ' '
-      self.syntax-error-c(user "expected space after type, got")
+    self.expect-space(user "type")
     read-new(user ",)")->(owner self.variable.name)
     self.variable.check-name()
   
@@ -472,8 +507,8 @@ class DeclarationArgument(Argument)
   
   func dynamic write()
     if self.variable.type-instance.type-data is glob.type-func
-      ; Returncode (*[*]`name`)(`arguments`)
-      write(user "Returncode (*")
+      ; [void|Returncode] (*[*]`name`)(`arguments`)
+      self.variable.type-instance.arguments.write-pointer-start()
       if self.is-output
         write(user "*")
       write-cname(user self.variable.name)
@@ -483,15 +518,21 @@ class DeclarationArgument(Argument)
     
     if self.variable.type-instance.type-data is glob.type-array
       ; `data-type`*[*] `name`, int[*] `name`_Length
+      ; [void|Returncode] (**[*] `name`)(`arguments`), int[*] `name`_Length
       user TypeInstance data-type
       var Int depth
       self.variable.type-instance.get-array-data-type-depth()->(
           user data-type, var depth)
       if data-type.type-data is glob.type-string
         write(user "char")
+      else-if data-type.type-data is glob.type-func
+        data-type.arguments.write-pointer-start()
       else
         data-type.type-data.write-cname()
       self.write-name-param(user "*", user _)
+      if data-type.type-data is glob.type-func
+        write(user ")")
+        data-type.arguments.write()
       self.write-name-param(user ", int", user "_Length")
       for n in depth
         ; , int[*] `name`_Value_length

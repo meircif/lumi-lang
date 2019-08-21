@@ -199,7 +199,6 @@ class EmptyExpression(Expression)
   new(user SyntaxTreeCode code-node)
     base(user code-node)
     self.set-simple-type(user glob.type-empty)
-    self.result-type.conditional := true
     self.access := Access.STRONG
   
   func dynamic write()

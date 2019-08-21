@@ -51,6 +51,13 @@ class FieldExpression(Expression)
       if after-base
         self.syntax-error(
             user "calling \"base\" with non-method", user self.name)
+      if after-type
+        self.syntax-error2(
+            user "field",
+            user self.name,
+            user "is not a global member of type",
+            user instance-type.type-data.name)
+      self.check-expression-all-errors()->(owner self.instance)
       self.is-complex-field := (self.variable.access = Access.VAR and
           not self.variable.type-instance.type-data.is-primitive) or
           self.variable.access = Access.S-VAR
@@ -58,14 +65,15 @@ class FieldExpression(Expression)
           owner self.result-type)
       instance-type.reference-path.copy-and-add-field(user self.variable)->(
           owner self.result-type.reference-path)
-      if self.is-complex-field and access-has-refman(copy self.instance.access) and
+      if self.is-complex-field and
+          access-has-refman(copy self.instance.access) and
           not self.variable.type-instance.type-data is glob.type-string
         self.access := Access.S-VAR
       else
         self.access := self.variable.access
       self.assignable := not self.is-complex-field
       if self.variable.type-instance.type-data is glob.type-generic
-        expression := TypeCastExpression(user self.code-node, owner expression)
+        expression := TypeCastExpression(owner expression)
       return
     
     user SyntaxTreeFunction function
@@ -78,6 +86,7 @@ class FieldExpression(Expression)
           self.instance.restructure()->(owner expression, owner arguments)
           return
         if self.name.equal(user "active")
+          self.instance.check-no-error()
           expression := MockFieldExpression(
               owner self.instance, owner self.name)
           return
@@ -93,6 +102,7 @@ class FieldExpression(Expression)
         user function,
         owner self.instance,
         copy self.bases,
+        copy self.error-propagated,
         copy after-type,
         copy after-base)
     expression.restructure()->(owner expression, owner arguments)
@@ -114,9 +124,6 @@ class FieldExpression(Expression)
 
   func dynamic write-preactions()
     self.instance.write-preactions()
-    if self.instance.is-dubious()
-      self.instance.write-check-ref()
-      self.code-node.write-spaces()
 
   func dynamic write()
     if self.instance.is-complex-field

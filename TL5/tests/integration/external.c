@@ -13,7 +13,6 @@ Returncode external(
   return ERR;
 }
 
-Returncode external2(void* n, Bool* b) {
+void external2(void* n, Bool* b) {
   *b = n == save_s;
-  return OK;
 }

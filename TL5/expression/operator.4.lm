@@ -143,6 +143,10 @@ func arithmetic-assign-operator-factory(
 class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
   var AssignExpression assign
   
+  new(user SyntaxTreeCode code-node, user Operator operator)
+    base(user code-node, user operator)
+    self.allow-right-error := true
+  
   func dynamic analyze-assignment()
     self.assign.new(
         user self.code-node,
@@ -171,7 +175,7 @@ func assign-operator-factory(
 
 
 ~~~ :=: ~~~
-class SwitchOperatorExpression(BinaryExpression)
+class SwapOperatorExpression(BinaryExpression)
   var AssignExpression assign-left-to-aux
   var AssignExpression assign-right-to-left
   var AssignExpression assign-aux-to-right
@@ -181,7 +185,7 @@ class SwitchOperatorExpression(BinaryExpression)
     base()
     if not self.left-expression.assignable or
         not self.right-expression.assignable
-      self.syntax-error-msg(user "switching non assignable expression")
+      self.syntax-error-msg(user "swapping non assignable expression")
     self.add-aux-variable(
         copy self.left-expression.access,
         copy false,
@@ -206,13 +210,13 @@ class SwitchOperatorExpression(BinaryExpression)
         user self.right-expression.result-type, user self.code-node)
     if self.left-expression.access != self.right-expression.access
       self.syntax-error2(
-          user "cannot switch access",
+          user "cannot swap access",
           user glob.access-names[self.left-expression.access],
           user "with other access",
           user glob.access-names[self.right-expression.access])
     if self.left-expression.result-type.reference-path.equals(
         user self.right-expression.result-type.reference-path)
-      self.syntax-error-msg(user "switching reference with itself")
+      self.syntax-error-msg(user "swapping reference with itself")
       
 
   func dynamic check-memory(user ReferenceMemoryList refs)
@@ -230,10 +234,10 @@ class SwitchOperatorExpression(BinaryExpression)
       self.code-node.write-spaces()
       self.aux-variable.write-assign-null()
 
-func switch-operator-factory(
+func swap-operator-factory(
     user SyntaxTreeCode code-node, user Operator operator)->(
     owner BinaryExpression expression)
-  expression := SwitchOperatorExpression(user code-node, user operator)
+  expression := SwapOperatorExpression(user code-node, user operator)
 
 
 func non-binary-operator-factory(

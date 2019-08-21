@@ -35,6 +35,7 @@ class BaseMethExpression(Expression)
         user function,
         owner expression,
         copy bases,
+        copy self.error-propagated,
         copy false,
         copy true)
     expression.restructure()->(owner expression, owner arguments)
@@ -79,6 +80,7 @@ class TypeExpression(ModuleTypeExpression)
     self.access := Access.VAR
   
   func dynamic analyze()
+    self.check-no-error()
     self.analyze-type-instance(user self.result-type.parameters.first.item)
 
 

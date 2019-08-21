@@ -27,8 +27,6 @@ typedef struct {
   void* ref;
 } Ref_Manager;
 
-typedef Returncode (*Func)();
-
 typedef struct {
   FILE* fobj;
 } File;
@@ -58,7 +56,6 @@ typedef struct {
   Error_Message outdated_weak_reference;
   Error_Message object_memory;
   Error_Message managed_object_memory;
-  Error_Message empty_base_output;
   Error_Message slice_index;
   Error_Message string_too_long;
   Error_Message file_not_opened;
@@ -138,7 +135,7 @@ if (ref == NULL) RAISE(line, cleanup, empty_object)
   if (refman != NULL && (refman)->value == NULL) \
     RAISE(line, cleanup, outdated_weak_reference)
 
-#define CHECK_REF_AND_REFMAN(line, cleanup, ref, refman) \
+#define CHECK_REF_REFMAN(line, cleanup, ref, refman) \
   CHECK_REF(line, cleanup, ref) \
   if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)
 
@@ -247,49 +244,47 @@ void LUMI_dec_ref(Ref_Manager* ref);
 void LUMI_var_dec_ref(Ref_Manager* ref);
 void LUMI_owner_dec_ref(Ref_Manager* ref);
 
-Bool LUMI_run_test(char* test_name, Func test_func);
+Bool LUMI_run_test(char* test_name, Returncode (*test_func)(void));
 Bool LUMI_test_coverage(File_Coverage* file_coverage, int files_number);
 
-Returncode Array_length(void*, int length, Int* length_out);
+Returncode Int_str(
+Int value, char* str, int str_max_length, int* str_length);
+
+void Array_length(void*, int length, Int* length_out);
 
 extern int Lumi_empty_int;
 #define String_Del(name) do { if (name##_Length != &Lumi_empty_int) { \
   free(name##_Length); \
   name##_Length = &Lumi_empty_int; } } while (false)
 
-Returncode String_length(char*, int max_length, int *length, Int* length_out);
-Returncode String_max_length(
-  char*, int max_length, int *length, Int* length_out);
-Returncode String_clear(char*, int max_length, int* length);
-Returncode String_equal(
+void String_length(char*, int max_length, int *length, Int* length_out);
+void String_max_length(char*, int max_length, int *length, Int* length_out);
+Returncode String_copy(
+  char*, int max_length, int* length, char* source, int source_length);
+void String_clear(char*, int max_length, int* length);
+void String_equal(
   char*, int max_length, int *length,
   char* other, int other_length,
   Bool* equal);
 Returncode String_get(char*, int max_length, int* length, Int index, Char* ch);
 Returncode String_set(char*, int max_length, int* length, Int index, Char ch);
 Returncode String_append(char*, int max_length, int* length, Char ch);
-Returncode String_copy(
-  char*, int max_length, int* length, char* source, int source_length);
 Returncode String_concat(
   char*, int max_length, int* length, char* ext, int ext_length);
 Returncode String_concat_int(char*, int max_length, int* length, Int num);
-Returncode String_find(
+void String_find(
   char*, int max_length, int *length,
   char* pattern, int pattern_length,
   Int* index);
-Returncode String_has(
-  char*, int max_length, int *length, Char ch, Bool* found);
+void String_has(char*, int max_length, int *length, Char ch, Bool* found);
 
-Returncode Int_str(
-  Int value, char* str, int str_max_length, int* str_length);
-
+extern Generic_Type_Dynamic File_dynamic;
+void File_Del(File*);
 Returncode file_open_read(
   char* name, int name_max_length, int *name_length, File** file);
 Returncode file_open_write(
   char* name, int name_max_length, int *name_length, File** file);
 Returncode file_close(File* file);
-void File_Del(File*);
-extern Generic_Type_Dynamic File_dynamic;
 Returncode File_getc(File*, Char* ch, Bool* is_eof);
 Returncode File_putc(File*, Char ch);
 Returncode File_write(File*, char* text, int text_length);
@@ -311,9 +306,10 @@ extern Sys* sys;
 extern Ref_Manager* sys_Refman;
 void Sys_Del(Sys*);
 extern Generic_Type_Dynamic Sys_dynamic;
+
 Returncode Sys_print(Sys*, char* text, int text_length);
 Returncode Sys_println(Sys*, char* text, int text_length);
-Returncode Sys_getchar(Sys*, char* ch, Bool* is_eof);
+void Sys_getchar(Sys*, char* ch, Bool* is_eof);
 Returncode Sys_getline(Sys*, char* line, int line_max_length, int* line_length);
 Returncode Sys_exit(Sys*, Int status);
 Returncode Sys_system(
