@@ -35,6 +35,9 @@ test fail-slice-index()
     var Array{2:Int} arr
     assert! arr[6]! = 0
 
+test fail-negative-slice()
+    new Array{-2:Int} arr!
+
 test fail-member-empty()
     user BaseType? obj
     assert! obj!.x = 0

@@ -217,6 +217,7 @@ while (self->field != NULL) { \
     RAISE(line, cleanup, managed_object_memory) }
 
 #define INIT_NEW(line, cleanup, name, type, size) \
+  if (size <= 0) RAISE(line, cleanup, slice_index) \
   name = LUMI_alloc(sizeof(type) * size); \
   if (name == NULL) RAISE(line, cleanup, object_memory)
 

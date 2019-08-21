@@ -433,6 +433,7 @@ test test-assert-error-message()
     assert-error! fun(), "empty object used"
     strong Array?{Int} arr(strong Array{2:Int}()!)
     assert-error! arr[6], "slice index out of bounds"
+    assert-error! Array{-2:Int}(), "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
     arr := _
     assert-error! arr.length(), "empty object used"
