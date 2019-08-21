@@ -445,6 +445,8 @@ test test-assert-error-message()
     assert-error! alloc(), "insufficient memory for object dynamic allocation"
     new-fail-countdown := 2
     assert-error! alloc(), "insufficient memory for managed object"
+    var Int zero(copy 0)
+    assert-error! 24 div zero, "zero division"
 
 native var Int lumi-debug-value
 

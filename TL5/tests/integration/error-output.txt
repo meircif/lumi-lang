@@ -33,6 +33,8 @@ testing fail-assert-error-message... Assert failed: unexpected error message "te
   Assert failed in TL5/tests/integration/error-test.5.lm:95 fail-assert-error-message()
 testing fail-assert-error-message-prefix... Assert failed: unexpected error message "tested message"
   Assert failed in TL5/tests/integration/error-test.5.lm:98 fail-assert-error-message-prefix()
+testing fail-zero-division... Error: zero division
+  Error raised in TL5/tests/integration/error-test.5.lm:102 fail-zero-division()
 testing code coverage... 93% - failed, lines not covered:
   TL5/tests/integration/error-test.5.lm(93%): 12 41 48
 Tests failed

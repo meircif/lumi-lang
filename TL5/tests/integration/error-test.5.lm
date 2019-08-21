@@ -96,3 +96,7 @@ test fail-assert-error-message()
 
 test fail-assert-error-message-prefix()
     assert-error! f-raise-message(user "tested message"), "tested message and more"
+
+test fail-zero-division()
+    var Int x(copy 0)
+    assert! 12 div x! = 0
