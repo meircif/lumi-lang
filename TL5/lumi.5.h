@@ -60,6 +60,7 @@ typedef struct {
   Error_Message string_too_long;
   Error_Message file_not_opened;
   Error_Message file_write_failed;
+  Error_Message zero_division;
 } Error_Messages;
 
 extern Error_Messages LUMI_error_messages;

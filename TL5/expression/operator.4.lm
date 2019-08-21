@@ -29,7 +29,7 @@ struct Operator
         owner expression)
 
 
-~~~ + - * div mod ~~~
+~~~ + - * mod ~~~
 class ArithmeticOperatorExpression(BinaryExpression)
   func dynamic analyze()
     base()
@@ -40,6 +40,29 @@ func arithmetic-operator-factory(
     user SyntaxTreeCode code-node, user Operator operator)->(
     owner BinaryExpression expression)
   expression := ArithmeticOperatorExpression(user code-node, user operator)
+
+~~~ div ~~~
+class DivisionOperatorExpression(ArithmeticOperatorExpression)
+  func dynamic analyze()
+    self.allow-right-error := true
+    base()
+    self.right-expression.check-error-propagated(
+        user "ignoring zero division check")
+  
+  func dynamic write-preactions()
+    base()
+    ; if (`right` == 0) RAISE(`line`, `cleanup`, zero_division)
+    write(user "if (")
+    self.right-expression.write()
+    write(user " == 0) ")
+    self.code-node.write-raise(user "zero_division")
+    self.code-node.write-spaces()
+    
+
+func division-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := DivisionOperatorExpression(user code-node, user operator)
 
 
 ~~~ > < >= <= ~~~

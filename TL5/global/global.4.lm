@@ -130,7 +130,7 @@ struct Global
     self.add-operator-copy(
         user "*", copy 0, copy 1, copy arithmetic-operator-factory)
     self.add-operator(
-        user "div", user "/", copy 0, copy 1, copy arithmetic-operator-factory)
+        user "div", user "/", copy 0, copy 1, copy division-operator-factory)
     self.add-operator(
         user "mod", user "%", copy 0, copy 1, copy arithmetic-operator-factory)
     self.add-operator(

@@ -34,7 +34,8 @@ Error_Messages LUMI_error_messages = {
   ERROR_MESAGE(slice_index, "slice index out of bounds"),
   ERROR_MESAGE(string_too_long, "string too long"),
   ERROR_MESAGE(file_not_opened, "file not opened"),
-  ERROR_MESAGE(file_write_failed, "file write failed")
+  ERROR_MESAGE(file_write_failed, "file write failed"),
+  ERROR_MESAGE(zero_division, "zero division")
 };
 
 enum {

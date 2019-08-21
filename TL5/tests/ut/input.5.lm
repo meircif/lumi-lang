@@ -517,7 +517,7 @@ not i
 ; @ c t0
 i := 23 + 54
 ; @ c t1
-i += (100 * 2) - (37 div 5 mod 2)
+i += (100 * 2) - (37 mod 2)
 i *= 3
 ; @ c t2
 i -= 12 *
@@ -551,6 +551,8 @@ tb := otc!
 ; @ c t15
 owner Array?{Test} otarr
 otarr := _
+; @ c t16
+io := 60 div i!
 ; @ ec te0
 345 @ 2
 ; @ ec te1
@@ -600,6 +602,8 @@ t := tu
 var Test tv
 user Test tu(user tv)
 tu := t
+; @ ec te22
+io := 60 div i
 ; @@ test-swap-expression
 ; @ c t0
 new Test t1!

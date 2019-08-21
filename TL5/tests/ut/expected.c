@@ -1494,7 +1494,7 @@ operator "not" expected "Bool" operand, got "Int"
 /// @ t0
 ut_M_i = 23 + 54;
 /// @ t1
-ut_M_i += (100 * 2) - ((37 / 5) % 2);
+ut_M_i += (100 * 2) - (37 % 2);
     ut_M_i *= 3;
 /// @ t2
 ut_M_i -= 12 * 13;
@@ -1553,6 +1553,9 @@ ut_M_Test* otarr = NULL;
     free(otarr);
     otarr_Length = 0;
     otarr = NULL;
+/// @ t16
+if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
+    *io = 60 / ut_M_i;
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -1597,6 +1600,8 @@ operator "<" expected "Int" operand, got "Bool"
 assigning into a weak reference an illegal access "user"
 /// @ te21
 ignoring empty reference check
+/// @ te22
+ignoring zero division check
 /// @@ test-swap-expression
 /// @ t0
 ut_M_Test* t1 = NULL;
