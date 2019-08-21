@@ -22,12 +22,14 @@ class BlockExpression(Expression)
     analyze-expression()->(owner self.expression)
     self.expression.result-type.copy-new()->(owner self.result-type)
     self.access := self.expression.access
-    self.constant := self.expression.constant
     self.error-expected := self.expression.error-expected
     self.error-propagated := self.expression.error-propagated
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    self.expression.get-constant-value()->(var value, var has-value)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression.check-memory(user refs)
@@ -73,7 +75,6 @@ class UnaryExpression(Expression)
   func dynamic analyze()
     self.analyze-operand()->(owner self.right-expression)
     self.right-expression.check-no-error()
-    self.constant := self.right-expression.constant
     if self.operator.order = 2
       ; `not` operator
       self.test-operand-type(user self.right-expression, user glob.type-bool)
@@ -105,6 +106,11 @@ class UnaryExpression(Expression)
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.right-expression.order-constants(user ordered-list)
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    if self.operator.name.equal(user "-")->(var has-value)
+      if self.right-expression.get-constant-value()->(var value, var has-value)
+        value := - value
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.right-expression.check-memory(user refs)
@@ -157,8 +163,6 @@ class BinaryExpression(UnaryExpression)
     self.left-expression.check-no-error()
     if not self.allow-right-error
       self.right-expression.check-no-error()
-    self.constant :=
-        self.left-expression.constant and self.right-expression.constant
     if self.binary-left-expression?
       if self.operator.order = self.binary-left-expression.operator.order and
           self.operator.group-index !=

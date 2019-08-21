@@ -39,8 +39,7 @@ class VariableExpression(Expression)
       self.variable.type-instance.copy-new()->(owner self.result-type)
       self.result-type.reference-path := ReferencePath(user self.variable)
       self.access := self.variable.access
-      self.constant := self.variable.constant
-      self.assignable := not self.constant and
+      self.assignable := not self.variable.constant and
           (self.result-type.type-data.is-primitive or
           not access-is-only-var(copy self.access))
       self.is-var := access-is-only-var(copy self.access) and
@@ -72,6 +71,10 @@ class VariableExpression(Expression)
 
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.variable.order-constants(user ordered-list)
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    self.variable.get-constant-value()->(var value, var has-value)
+      
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     refs.check-reference(user self)

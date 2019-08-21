@@ -29,25 +29,68 @@ struct Operator
         owner expression)
 
 
-~~~ + - * mod ~~~
+~~~ + ~~~
 class ArithmeticOperatorExpression(BinaryExpression)
   func dynamic analyze()
     base()
     self.test-operands-type(user glob.type-int)
     self.set-simple-type(user glob.type-int)
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    var Int left-value
+    var Int right-value
+    has-value :=
+        self.left-expression.get-constant-value()->(var left-value) and
+        self.right-expression.get-constant-value()->(var right-value)
+    if has-value
+      self.compute-constant-value(copy left-value, copy right-value)->(
+          var value)
+      
+  func dynamic compute-constant-value(
+      copy Int left-value, copy Int right-value)->(var Int value)
+    value := left-value + right-value
 
-func arithmetic-operator-factory(
+func addition-operator-factory(
     user SyntaxTreeCode code-node, user Operator operator)->(
     owner BinaryExpression expression)
   expression := ArithmeticOperatorExpression(user code-node, user operator)
+
+~~~ - ~~~
+class SubtractionOperatorExpression(ArithmeticOperatorExpression)
+  func dynamic compute-constant-value(
+      copy Int left-value, copy Int right-value)->(var Int value)
+    value := left-value - right-value
+
+func subtraction-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := SubtractionOperatorExpression(user code-node, user operator)
+
+~~~ * ~~~
+class MultiplicationOperatorExpression(ArithmeticOperatorExpression)
+  func dynamic compute-constant-value(
+      copy Int left-value, copy Int right-value)->(var Int value)
+    value := left-value * right-value
+
+func multiplication-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := MultiplicationOperatorExpression(user code-node, user operator)
 
 ~~~ div ~~~
 class DivisionOperatorExpression(ArithmeticOperatorExpression)
   func dynamic analyze()
     self.allow-right-error := true
     base()
-    self.right-expression.check-error-propagated(
-        user "ignoring zero division check")
+    var Int value
+    if self.right-expression.get-constant-value()->(var value)
+      if value = 0
+        self.syntax-error-msg(user "dividing by zero")
+      else
+        self.right-expression.check-no-error()
+    else
+      self.right-expression.check-error-propagated(
+          user "ignoring zero division check")
   
   func dynamic write-preactions()
     base()
@@ -57,12 +100,26 @@ class DivisionOperatorExpression(ArithmeticOperatorExpression)
     write(user " == 0) ")
     self.code-node.write-raise(user "zero_division")
     self.code-node.write-spaces()
-    
+
+  func dynamic compute-constant-value(
+      copy Int left-value, copy Int right-value)->(var Int value)
+    value := left-value div right-value
 
 func division-operator-factory(
     user SyntaxTreeCode code-node, user Operator operator)->(
     owner BinaryExpression expression)
   expression := DivisionOperatorExpression(user code-node, user operator)
+
+~~~ mod ~~~
+class ModuloOperatorExpression(DivisionOperatorExpression)
+  func dynamic compute-constant-value(
+      copy Int left-value, copy Int right-value)->(var Int value)
+    value := left-value mod right-value
+
+func modulo-operator-factory(
+    user SyntaxTreeCode code-node, user Operator operator)->(
+    owner BinaryExpression expression)
+  expression := ModuloOperatorExpression(user code-node, user operator)
 
 
 ~~~ > < >= <= ~~~

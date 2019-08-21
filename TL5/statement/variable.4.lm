@@ -151,6 +151,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             user self.parent-type.name)
     if self.my-module?
       glob.current-module := _
+    
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    has-value := false
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     refs.add(user self)
@@ -450,8 +453,10 @@ class VariableInit(VariableCreate)
 
 class SyntaxTreeConstant(SyntaxTreeVariable)
   var ExpressionValue value
+  var Int int-value
   var Bool is-ordered
   var Bool ordering
+  var Bool analyzed
   
   func inst parse-new()->(owner SyntaxTreeConstant constant)
     constant := SyntaxTreeConstant(user _)
@@ -479,10 +484,13 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     ; do nothing
   
   func dynamic analyze()
+    if self.analyzed
+      return
+    self.analyzed := true
     glob.current-module := self.my-module
     self.analyze-expression(user self.value, user glob.type-int)
     self.value.check-no-error()
-    if not self.value.constant
+    if not self.value.get-constant-value()->(var self.int-value)
       self.syntax-error-msg(user "value is not constant")
     glob.current-module := _
   
@@ -497,6 +505,11 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     ordered-list.add(user self.name, user self)
     self.is-ordered := true
   
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    self.analyze()
+    value := self.int-value
+    has-value := true
+  
   func dynamic write()
     if not self.is-ordered
       return
@@ -504,6 +517,6 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     write(user "\nenum { ")
     self.write-cname()
     write(user " = ")
-    self.value.write()
+    write-int(copy self.int-value)
     write(user " };\n")
     self.is-ordered := false

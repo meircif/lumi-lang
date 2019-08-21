@@ -133,8 +133,12 @@ struct TypeInstance
     if check-length
       if self.length-owner.parsed()
         node.analyze-expression(user self.length, user glob.type-int)
-        if constant-length and not self.length.constant
-          node.syntax-error-msg(user "array length is not constant")
+        if constant-length
+          var Int length-value
+          if not self.length.get-constant-value()->(var length-value)
+            node.syntax-error-msg(user "array length is not constant")
+          if length-value <= 0
+            node.syntax-error-msg(user "array length is not positive")
         self.length.check-no-error()
       if self.arguments?
         self.arguments.analyze()

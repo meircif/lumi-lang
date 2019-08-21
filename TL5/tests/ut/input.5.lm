@@ -66,6 +66,10 @@ i := -0xfda940
 i := 0xFDA940
 ; @ c t8
 i := -0xFDA940
+; @ c t9
+i := 0b100101
+; @ c t10
+i := -0b100101
 ; @ ec te0
 2a
 ; @ ec te1
@@ -76,8 +80,6 @@ i := -0xFDA940
 0b021
 ; @ ec te4
 0xadg
-; @ ec te5
-0b1001
 ; @@ test-char-expression
 ; @ c t0
 c := 'a'
@@ -278,6 +280,8 @@ struct Test
 func func(user Array{Test} error)
 ; @ ec te13
 i := arr![i]
+; @ ec te14
+var Array{-3:Int} error
 ; @@ test-call-expression
 ; @ c t0
 fun0()
@@ -517,7 +521,7 @@ not i
 ; @ c t0
 i := 23 + 54
 ; @ c t1
-i += (100 * 2) - (37 mod 2)
+i += (100 * 2) - 37
 i *= 3
 ; @ c t2
 i -= 12 *
@@ -552,7 +556,7 @@ tb := otc!
 owner Array?{Test} otarr
 otarr := _
 ; @ c t16
-io := 60 div i!
+io := (60 div i!) + (60 mod i!)
 ; @ ec te0
 345 @ 2
 ; @ ec te1
@@ -604,6 +608,12 @@ user Test tu(user tv)
 tu := t
 ; @ ec te22
 io := 60 div i
+; @ ec te23
+io := 60 mod i
+; @ ec te24
+io := 60 div 0
+; @ ec te25
+io := 60 mod 0
 ; @@ test-swap-expression
 ; @ c t0
 new Test t1!
@@ -3086,12 +3096,15 @@ var Array{SIZE + 3:Int} arr
 func fun(user Array{Int} a)
     fun(user arr)
 ; @ g t2
-const Int LARGE - (2 * SMALL) + 1
+const Int LARGE 1 - (- (2 * SMALL))
 const Int SMALL 7
 ; @ g t3
 enum MyEnum
     VALUE
 const Int NUMBER MyEnum.VALUE
+; @ g t4
+const Int NUMBER (128 div 3) mod 10
+const Int D-CHAR 'a' + 3
 ; @ eg te0
 const
 ; @ eg te1

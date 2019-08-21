@@ -248,17 +248,21 @@ ut_M_i = 9630;
 /// @ t2
 ut_M_i = -9630;
 /// @ t3
-ut_M_i = 07520;
+ut_M_i = 3920;
 /// @ t4
-ut_M_i = -07520;
+ut_M_i = -3920;
 /// @ t5
-ut_M_i = 0xfda940;
+ut_M_i = 16623936;
 /// @ t6
-ut_M_i = -0xfda940;
+ut_M_i = -16623936;
 /// @ t7
-ut_M_i = 0xFDA940;
+ut_M_i = 16623936;
 /// @ t8
-ut_M_i = -0xFDA940;
+ut_M_i = -16623936;
+/// @ t9
+ut_M_i = 37;
+/// @ t10
+ut_M_i = -37;
 /// @ te0
 illegal number "2a"
 /// @ te1
@@ -269,8 +273,6 @@ illegal octal number "038"
 illegal binary number "0b021"
 /// @ te4
 illegal hexadecimal number "0xadg"
-/// @ te5
-binary numbers not supported yet... "0b1001"
 /// @@ test-char-expression
 /// @ t0
 ut_M_c = 'a';
@@ -959,6 +961,8 @@ array of type with constructor "Tc"
 array of type with constructor "Test"
 /// @ te13
 ignoring slice bounds check
+/// @ te14
+array length is not positive
 /// @@ test-call-expression
 /// @ t0
 ut_M_fun0();
@@ -1494,7 +1498,7 @@ operator "not" expected "Bool" operand, got "Int"
 /// @ t0
 ut_M_i = 23 + 54;
 /// @ t1
-ut_M_i += (100 * 2) - (37 % 2);
+ut_M_i += (100 * 2) - 37;
     ut_M_i *= 3;
 /// @ t2
 ut_M_i -= 12 * 13;
@@ -1555,7 +1559,8 @@ ut_M_Test* otarr = NULL;
     otarr = NULL;
 /// @ t16
 if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
-    *io = 60 / ut_M_i;
+    if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
+    *io = (60 / ut_M_i) + (60 % ut_M_i);
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -1602,6 +1607,12 @@ assigning into a weak reference an illegal access "user"
 ignoring empty reference check
 /// @ te22
 ignoring zero division check
+/// @ te23
+ignoring zero division check
+/// @ te24
+dividing by zero
+/// @ te25
+dividing by zero
 /// @@ test-swap-expression
 /// @ t0
 ut_M_Test* t1 = NULL;
@@ -7623,19 +7634,22 @@ void ut_M_fun(Int* a, int a_Length);
 Int ut_M_arr[ut_M_SIZE + 3] = {0};
 void ut_M_fun(Int* a, int a_Length) {
     unsigned LUMI_loop_depth = 1;
-    ut_M_fun(ut_M_arr, ut_M_SIZE + 3);
+    ut_M_fun(ut_M_arr, 15);
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ t2
 enum { ut_M_SMALL = 7 };
-enum { ut_M_LARGE = (- (2 * ut_M_SMALL)) + 1 };
+enum { ut_M_LARGE = 15 };
 /// @ t3
 enum {
     ut_M_MyEnum_VALUE = 0,
     ut_M_MyEnum_length
 };
-enum { ut_M_NUMBER = ut_M_MyEnum_VALUE };
+enum { ut_M_NUMBER = 0 };
+/// @ t4
+enum { ut_M_NUMBER = 2 };
+enum { ut_M_D_CHAR = 100 };
 /// @ te0
 expected space after "const", got "new-line"
 /// @ te1
