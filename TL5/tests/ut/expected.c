@@ -248,17 +248,21 @@ ut_M_i = 9630;
 /// @ t2
 ut_M_i = -9630;
 /// @ t3
-ut_M_i = 07520;
+ut_M_i = 3920;
 /// @ t4
-ut_M_i = -07520;
+ut_M_i = -3920;
 /// @ t5
-ut_M_i = 0xfda940;
+ut_M_i = 16623936;
 /// @ t6
-ut_M_i = -0xfda940;
+ut_M_i = -16623936;
 /// @ t7
-ut_M_i = 0xFDA940;
+ut_M_i = 16623936;
 /// @ t8
-ut_M_i = -0xFDA940;
+ut_M_i = -16623936;
+/// @ t9
+ut_M_i = 37;
+/// @ t10
+ut_M_i = -37;
 /// @ te0
 illegal number "2a"
 /// @ te1
@@ -269,8 +273,6 @@ illegal octal number "038"
 illegal binary number "0b021"
 /// @ te4
 illegal hexadecimal number "0xadg"
-/// @ te5
-binary numbers not supported yet... "0b1001"
 /// @@ test-char-expression
 /// @ t0
 ut_M_c = 'a';
@@ -419,7 +421,7 @@ type "Int" has no member "error"
 /// @@ test-slice-expression
 /// @ t0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    if (13 < 0 || 13 >= *(ut_M_ostr_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
+    if (13 >= *(ut_M_ostr_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_c = ut_M_ostr[13];
 /// @ t1
 Char* x = NULL;
@@ -427,14 +429,14 @@ Char* x = NULL;
     Char* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    if (2 < 0 || 6 < 0 || 2 + 6 > *(ut_M_ostr_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (2 + 6 > *(ut_M_ostr_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = ut_M_ostr + 2;
     aux_Array_0_Length = 6;
     x_Length = aux_Array_0_Length;
     x = aux_Array_0;
 /// @ t2
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (13 < 0 || 13 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
+    if (13 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_i = ut_M_arr[13];
 /// @ t3
 Int* x = NULL;
@@ -442,25 +444,25 @@ Int* x = NULL;
     Int* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (2 < 0 || 6 < 0 || 2 + 6 > ut_M_arr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (ut_M_i <= 0 || 2 + ut_M_i > ut_M_arr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = ut_M_arr + 2;
-    aux_Array_0_Length = 6;
+    aux_Array_0_Length = ut_M_i;
     x_Length = aux_Array_0_Length;
     x = aux_Array_0;
 /// @ t4
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    if (4 < 0 || 4 >= *(ut_M_ostr_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
+    if (4 >= *(ut_M_ostr_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_ostr[4] = ut_M_c;
 /// @ t5
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (4 < 0 || 4 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
+    if (4 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_arr[4] = ut_M_i;
 /// @ t6
 ut_M_Test* tarr = NULL;
     int tarr_Length = 0;
     Ref_Manager* tarr_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, tarr)
-    if (3 < 0 || 3 >= tarr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (3 >= tarr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     LUMI_inc_ref(tarr_Refman);
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = tarr_Refman;
@@ -483,14 +485,12 @@ char vsa[8 * 5] = {0};
     int aux_Array_0_Value_length = 0;
     int* aux_Array_0_String_length = NULL;
     /* initializing vsa */
-    if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_String_0 = vsa + 3 * 5;
     aux_String_0_Max_length = 5;
     aux_String_0_Length = vsa_String_length + 3;
     s_Max_length = 5;
     s_Length = aux_String_0_Length;
     s = aux_String_0;
-    if (2 < 0 || 4 < 0 || 2 + 4 > 8) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = vsa + 2 * 5;
     aux_Array_0_Length = 4;
     aux_Array_0_Value_length = 5;
@@ -517,9 +517,9 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
     Ref_Manager* aux_String_0_Refman = NULL;
-    if (5 < 0 || 5 >= *(s_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (5 >= *(s_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
     c = s[5];
-    if (4 < 0 || 2 < 0 || 4 + 2 > *(s_Length)) RAISE(3, LUMI_block0_cleanup, slice_index)
+    if (4 + 2 > *(s_Length)) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = s + 4;
     aux_Array_0_Length = 2;
     aux_Array_0_Refman = s_Refman;
@@ -527,7 +527,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     CHECK_REFMAN(3, LUMI_block0_cleanup, aux_Array_0_Refman)
     part_Length = aux_Array_0_Length;
     part = aux_Array_0;
-    if (3 < 0 || 3 >= sa_Length) RAISE(4, LUMI_block0_cleanup, slice_index)
+    if (3 >= sa_Length) RAISE(4, LUMI_block0_cleanup, slice_index)
     aux_String_0 = sa + 3 * sa_Value_length;
     aux_String_0_Max_length = sa_Value_length;
     aux_String_0_Length = sa_String_length + 3;
@@ -559,7 +559,7 @@ char* sa = NULL;
     int* aux_String_1_Length = &Lumi_empty_int;
     Ref_Manager* aux_String_1_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, sa)
-    if (3 < 0 || 3 >= sa_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (3 >= sa_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_String_1 = sa + 3 * sa_Value_length;
     aux_String_1_Max_length = sa_Value_length;
     aux_String_1_Length = sa_String_length + 3;
@@ -593,7 +593,7 @@ Int* aai = NULL;
     int aux_Array_1_Value_length = 0;
     Ref_Manager* aux_Array_1_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, aai)
-    if (3 < 0 || 3 >= aai_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (3 >= aai_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = aai + 3 * aai_Value_length;
     aux_Array_0_Length = aai_Value_length;
     aux_Array_0_Refman = aai_Refman;
@@ -604,7 +604,7 @@ Int* aai = NULL;
     ut_M_arr_Length = aux_Array_0_Length;
     ut_M_arr = aux_Array_0;
     CHECK_REF(3, LUMI_block0_cleanup, aai)
-    if (2 < 0 || 4 < 0 || 2 + 4 > aai_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    if (2 + 4 > aai_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = aai + 2 * aai_Value_length;
     aux_Array_1_Length = 4;
     aux_Array_1_Value_length = aai_Value_length;
@@ -646,7 +646,7 @@ Int* aai = NULL;
     int aux_Array_1_Value_value_value_length = 0;
     Ref_Manager* aux_Array_1_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, aai)
-    if (3 < 0 || 3 >= aai_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (3 >= aai_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = aai + 3 * aai_Value_length * aai_Value_value_length * aai_Value_value_value_length;
     aux_Array_0_Length = aai_Value_length;
     aux_Array_0_Value_length = aai_Value_value_length;
@@ -661,7 +661,7 @@ Int* aai = NULL;
     ua_Value_value_length = aux_Array_0_Value_value_length;
     ua = aux_Array_0;
     CHECK_REF(3, LUMI_block0_cleanup, aai)
-    if (2 < 0 || 4 < 0 || 2 + 4 > aai_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    if (2 + 4 > aai_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = aai + 2 * aai_Value_length * aai_Value_value_length * aai_Value_value_value_length;
     aux_Array_1_Length = 4;
     aux_Array_1_Value_length = aai_Value_length;
@@ -712,7 +712,7 @@ char* aas = NULL;
     int* aux_Array_1_String_length = NULL;
     Ref_Manager* aux_Array_1_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, aas)
-    if (3 < 0 || 3 >= aas_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (3 >= aas_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = aas + 3 * aas_Value_length * aas_Value_value_length * aas_Value_value_value_length;
     aux_Array_0_Length = aas_Value_length;
     aux_Array_0_Value_length = aas_Value_value_length;
@@ -729,7 +729,7 @@ char* aas = NULL;
     ua_String_length = aux_Array_0_String_length;
     ua = aux_Array_0;
     CHECK_REF(3, LUMI_block0_cleanup, aas)
-    if (2 < 0 || 4 < 0 || 2 + 4 > aas_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    if (2 + 4 > aas_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = aas + 2 * aas_Value_length * aas_Value_value_length * aas_Value_value_value_length;
     aux_Array_1_Length = 4;
     aux_Array_1_Value_length = aas_Value_length;
@@ -777,7 +777,6 @@ Int aai[8 * 7 * 6 * 5] = {0};
     int aux_Array_1_Value_value_length = 0;
     int aux_Array_1_Value_value_value_length = 0;
     /* initializing aai */
-    if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = aai + 3 * 7 * 6 * 5;
     aux_Array_0_Length = 7;
     aux_Array_0_Value_length = 6;
@@ -786,7 +785,6 @@ Int aai[8 * 7 * 6 * 5] = {0};
     ua_Value_length = 6;
     ua_Value_value_length = 5;
     ua = aux_Array_0;
-    if (2 < 0 || 4 < 0 || 2 + 4 > 8) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = aai + 2 * 7 * 6 * 5;
     aux_Array_1_Length = 4;
     aux_Array_1_Value_length = 7;
@@ -823,18 +821,17 @@ char aas[8 * 7 * 6 * 5] = {0};
     int aux_Array_1_Value_value_value_length = 0;
     int* aux_Array_1_String_length = NULL;
     /* initializing aas */
-    if (3 < 0 || 3 >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = aas + 3 * 7 * 6 * 5;
+    if (ut_M_i < 0 || ut_M_i >= 8) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = aas + ut_M_i * 7 * 6 * 5;
     aux_Array_0_Length = 7;
     aux_Array_0_Value_length = 6;
     aux_Array_0_Value_value_length = 5;
-    aux_Array_0_String_length = aas_String_length + 3 * 7 * 6;
+    aux_Array_0_String_length = aas_String_length + ut_M_i * 7 * 6;
     ua_Length = 7;
     ua_Value_length = 6;
     ua_Value_value_length = 5;
     ua_String_length = aux_Array_0_String_length;
     ua = aux_Array_0;
-    if (2 < 0 || 4 < 0 || 2 + 4 > 8) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = aas + 2 * 7 * 6 * 5;
     aux_Array_1_Length = 4;
     aux_Array_1_Value_length = 7;
@@ -848,9 +845,8 @@ char aas[8 * 7 * 6 * 5] = {0};
     uaa_String_length = aux_Array_1_String_length;
     uaa = aux_Array_1;
 /// @ t15
-Returncode ut_M_fun(void);
-Returncode ut_M_fun(void) {
-    Returncode LUMI_err = OK;
+void ut_M_fun(void);
+void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
     char aas[8 * 7 * 6 * 5] = {0};
     int aas_String_length[8 * 7 * 6] = {0};
@@ -870,18 +866,15 @@ Returncode ut_M_fun(void) {
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
     /* initializing aas */
-    if (4 < 0 || 4 >= 8) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = aas + 4 * 7 * 6 * 5;
     aux_Array_0_Length = 7;
     aux_Array_0_Value_length = 6;
     aux_Array_0_Value_value_length = 5;
     aux_Array_0_String_length = aas_String_length + 4 * 7 * 6;
-    if (3 < 0 || 3 >= 7) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = (aux_Array_0) + 3 * 6 * 5;
     aux_Array_1_Length = 6;
     aux_Array_1_Value_length = 5;
     aux_Array_1_String_length = aux_Array_0_String_length + 3 * 6;
-    if (2 < 0 || 2 >= 6) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_String_0 = (aux_Array_1) + 2 * 5;
     aux_String_0_Max_length = 5;
     aux_String_0_Length = aux_Array_1_String_length + 2;
@@ -890,7 +883,6 @@ Returncode ut_M_fun(void) {
     s = aux_String_0;
 LUMI_block0_cleanup:
     (void)0;
-    return LUMI_err;
 }
 /// @ t16
 Char* x = NULL;
@@ -959,6 +951,14 @@ array of type with constructor "Tc"
 array of type with constructor "Test"
 /// @ te13
 ignoring slice bounds check
+/// @ te14
+sequence length is not positive
+/// @ te15
+negative slice index [-1]
+/// @ te16
+non positive slice length [0]
+/// @ te17
+slice last index [3] is larger than sequence size [3]
 /// @@ test-call-expression
 /// @ t0
 ut_M_fun0();
@@ -1494,7 +1494,7 @@ operator "not" expected "Bool" operand, got "Int"
 /// @ t0
 ut_M_i = 23 + 54;
 /// @ t1
-ut_M_i += (100 * 2) - (37 % 2);
+ut_M_i += (100 * 2) - 37;
     ut_M_i *= 3;
 /// @ t2
 ut_M_i -= 12 * 13;
@@ -1555,7 +1555,8 @@ ut_M_Test* otarr = NULL;
     otarr = NULL;
 /// @ t16
 if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
-    *io = 60 / ut_M_i;
+    if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
+    *io = (60 / ut_M_i) + (60 % ut_M_i);
 /// @ te0
 unknown operator "@"
 /// @ te1
@@ -1602,6 +1603,12 @@ assigning into a weak reference an illegal access "user"
 ignoring empty reference check
 /// @ te22
 ignoring zero division check
+/// @ te23
+ignoring zero division check
+/// @ te24
+dividing by zero
+/// @ te25
+dividing by zero
 /// @@ test-swap-expression
 /// @ t0
 ut_M_Test* t1 = NULL;
@@ -2166,7 +2173,7 @@ ut_M_Ta* aa = NULL;
     int aa_Length = 0;
     Ref_Manager* aa_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, aa)
-    if (4 < 0 || 4 >= aa_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (4 >= aa_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     LUMI_inc_ref(aa_Refman);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = aa_Refman;
@@ -2177,7 +2184,7 @@ ut_M_Tc* ca = NULL;
     int ca_Length = 0;
     Ref_Manager* ca_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, ca)
-    if (4 < 0 || 4 >= ca_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (4 >= ca_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     LUMI_inc_ref(ca_Refman);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = ca_Refman;
@@ -2327,9 +2334,7 @@ void (*farr[38])(void) = {0};
     /* initializing farr */
     INIT_NEW_ARRAY(2, LUMI_block0_cleanup, farr1, void (*)(Int x, Int* y), 12, 1);
     INIT_NEW_ARRAY(3, LUMI_block0_cleanup, farr2, Returncode (*)(void), 12, 1);
-    if (3 < 0 || 3 >= 38) RAISE(5, LUMI_block0_cleanup, slice_index)
     farr[3] = ut_M_fun0;
-    if (3 < 0 || 3 >= 38) RAISE(6, LUMI_block0_cleanup, slice_index)
     (farr[3])();
 /// @ t6
 void (*fun)(Int x, Int y) = NULL;
@@ -3122,7 +3127,7 @@ Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Int px, 
     u_Max_length = aux_String_1_Max_length;
     u_Length = aux_String_1_Length;
     u = aux_String_1;
-    if (2 < 0 || 6 < 0 || 2 + 6 > *(po_Length)) RAISE(10, LUMI_block0_cleanup, slice_index)
+    if (2 + 6 > *(po_Length)) RAISE(10, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = po + 2;
     aux_Array_0_Length = 6;
     pu_Length = aux_Array_0_Length;
@@ -3634,7 +3639,7 @@ Returncode ut_M_name(char* arr, int arr_Length, int arr_Value_length, int* arr_S
     char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
-    if (3 < 0 || 3 >= arr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (3 >= arr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_String_0 = arr + 3 * arr_Value_length;
     aux_String_0_Max_length = arr_Value_length;
     aux_String_0_Length = arr_String_length + 3;
@@ -3741,7 +3746,7 @@ Returncode ut_M_fun(void) {
         int su_Length = 0;
         Char* aux_Array_0 = NULL;
         int aux_Array_0_Length = 0;
-        if (1 < 0 || 2 < 0 || 1 + 2 > *(sv_Length)) RAISE(4, LUMI_block1_cleanup, slice_index)
+        if (1 + 2 > *(sv_Length)) RAISE(4, LUMI_block1_cleanup, slice_index)
         aux_Array_0 = sv + 1;
         aux_Array_0_Length = 2;
         su_Length = aux_Array_0_Length;
@@ -3773,7 +3778,7 @@ type members cannot be initialized
 /// @ te8
 expected space after "new", got "new-line"
 /// @ te9
-array length is not constant
+sequence length is not constant
 /// @ te10
 illegal variable name "error--name"
 /// @@ test-initialize
@@ -3794,7 +3799,6 @@ char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     INIT_NEW_STRING(1, LUMI_block0_cleanup, aux_String_0, ut_M_arr[0]);
     ut_M_str_Max_length = aux_String_0_Max_length;
     ut_M_str_Length = aux_String_0_Length;
@@ -3805,7 +3809,6 @@ Int* a = NULL;
     Int* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, Int, ut_M_arr[0], 1);
     a_Length = aux_Array_0_Length;
     a = aux_Array_0;
@@ -3816,7 +3819,6 @@ ut_M_Test* a = NULL;
     ut_M_Test* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, ut_M_Test, ut_M_arr[0], 1);
     a_Length = aux_Array_0_Length;
     a = aux_Array_0;
@@ -3831,9 +3833,8 @@ char* sa = NULL;
     int aux_Array_0_Value_length = 0;
     int* aux_Array_0_String_length = NULL;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (1 < 0 || 1 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
+    if (1 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     aux_Array_0_Value_length = ut_M_arr[1];
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, char, ut_M_arr[0], aux_Array_0_Value_length);
     aux_Array_0_String_length = LUMI_alloc(sizeof(int) * aux_Array_0_Length);
@@ -3845,7 +3846,6 @@ char* sa = NULL;
 /// @ t5
 Int x = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     x = ut_M_arr[0];
 /// @ t6
 char* s = NULL;
@@ -3923,7 +3923,6 @@ char* sa = NULL;
     int aux_Array_0_Value_value_length = 0;
     int* aux_Array_0_String_length = NULL;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (0 < 0 || 0 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     aux_Array_0_Value_length = ut_M_arr[1];
     aux_Array_0_Value_value_length = ut_M_arr[2];
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, char, ut_M_arr[0], aux_Array_0_Value_length * aux_Array_0_Value_value_length);
@@ -4396,7 +4395,6 @@ Char ch = 0;
     aux_String_0 = ut_M_ostr;
     {int ch_Index; for (ch_Index = 0; ch_Index < *aux_String_0_Length; ++ch_Index) {
         LUMI_loop_depth = 3;
-        if (ch_Index < 0 || ch_Index >= *(aux_String_0_Length)) RAISE(1, LUMI_block1_cleanup, slice_index)
         ch = aux_String_0[ch_Index];
         ut_M_c = ch;
     LUMI_block1_cleanup:
@@ -4416,7 +4414,6 @@ Int n = 0;
     aux_Array_0 = ut_M_arr;
     {int n_Index; for (n_Index = 0; n_Index < aux_Array_0_Length; ++n_Index) {
         LUMI_loop_depth = 3;
-        if (n_Index < 0 || n_Index >= aux_Array_0_Length) RAISE(1, LUMI_block1_cleanup, slice_index)
         n = aux_Array_0[n_Index];
         ut_M_i += n;
     LUMI_block1_cleanup:
@@ -4441,10 +4438,10 @@ char* s = NULL;
     aux_Array_0 = ut_M_sarr;
     {int s_Index; for (s_Index = 0; s_Index < aux_Array_0_Length; ++s_Index) {
         LUMI_loop_depth = 3;
-        if (s_Index < 0 || s_Index >= aux_Array_0_Length) RAISE(1, LUMI_block1_cleanup, slice_index)
         s = aux_Array_0 + s_Index * aux_Array_0_Value_length;
         s_Max_length = aux_Array_0_Value_length;
         s_Length = aux_Array_0_String_length + s_Index;
+        /* start loop */
         String_clear(s, s_Max_length, s_Length);
     LUMI_block1_cleanup:
         (void)0;
@@ -4520,7 +4517,6 @@ Int n = 0;
             char sb[4] = {0};
             int sb_Length[1] = {0};
             LUMI_loop_depth = 5;
-            if (ch_Index < 0 || ch_Index >= *(aux_String_0_Length)) RAISE(8, LUMI_block3_cleanup, slice_index)
             ch = aux_String_0[ch_Index];
             /* initializing sb */
             LUMI_loop_depth = 3; goto LUMI_block3_cleanup;
@@ -4564,7 +4560,6 @@ char* s = NULL;
     aux_String_1 = s;
     {int ch_Index; for (ch_Index = 0; ch_Index < *aux_String_1_Length; ++ch_Index) {
         LUMI_loop_depth = 3;
-        if (ch_Index < 0 || ch_Index >= *(aux_String_1_Length)) RAISE(2, LUMI_block1_cleanup, slice_index)
         ch = aux_String_1[ch_Index];
         ut_M_c = ch;
     LUMI_block1_cleanup:
@@ -4592,10 +4587,10 @@ char sa[3 * 4] = {0};
     aux_Array_0 = sa;
     {int s_Index; for (s_Index = 0; s_Index < aux_Array_0_Length; ++s_Index) {
         LUMI_loop_depth = 3;
-        if (s_Index < 0 || s_Index >= 3) RAISE(2, LUMI_block1_cleanup, slice_index)
         s = aux_Array_0 + s_Index * 4;
         s_Max_length = 4;
         s_Length = aux_Array_0_String_length + s_Index;
+        /* start loop */
         String_clear(s, 4, s_Length);
     LUMI_block1_cleanup:
         (void)0;
@@ -4729,8 +4724,8 @@ if (ut_M_b) {
         /* initializing s */
         TEST_ASSERT(3, LUMI_block1_cleanup, ut_M_b)
         ++LUMI_trace_ignore_count;
-        if (1 < 0 || 2 < 0 || 1 + 2 > *(s_Length)) RAISE(4, LUMI_block2_cleanup, slice_index)
-        aux_Array_0 = s + 1;
+        if (ut_M_i < 0 || ut_M_i + 2 > *(s_Length)) RAISE(4, LUMI_block2_cleanup, slice_index)
+        aux_Array_0 = s + ut_M_i;
         aux_Array_0_Length = 2;
         --LUMI_trace_ignore_count;
         TEST_FAIL(4, LUMI_block1_cleanup, 16, "error not raised")
@@ -4744,8 +4739,8 @@ if (ut_M_b) {
             int aux_Array_1_Length = 0;
             LUMI_loop_depth = 3;
             ++LUMI_trace_ignore_count;
-            if (1 < 0 || 2 < 0 || 1 + 2 > *(s_Length)) RAISE(6, LUMI_block4_cleanup, slice_index)
-            aux_Array_1 = s + 1;
+            if (ut_M_i < 0 || ut_M_i + 2 > *(s_Length)) RAISE(6, LUMI_block4_cleanup, slice_index)
+            aux_Array_1 = s + ut_M_i;
             aux_Array_1_Length = 2;
             --LUMI_trace_ignore_count;
             TEST_FAIL(6, LUMI_block3_cleanup, 16, "error not raised")
@@ -5617,7 +5612,6 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
 /// @ t8
 ut_M_Data ad[5] = {0};
     /* initializing ad */
-    if (2 < 0 || 2 >= 5) RAISE(2, LUMI_block0_cleanup, slice_index)
     LUMI_inc_ref((ad + 2)->item_Refman);
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = (ad + 2)->item_Refman;
@@ -6853,7 +6847,7 @@ using "!" where error is not propagated
         {
             ++LUMI_trace_ignore_count;
             CHECK_REF_REFMAN(9, LUMI_block5_cleanup, ut_M_arr, ut_M_arr_Refman)
-            if (3 < 0 || 3 >= ut_M_arr_Length) RAISE(9, LUMI_block5_cleanup, slice_index)
+            if (3 >= ut_M_arr_Length) RAISE(9, LUMI_block5_cleanup, slice_index)
             ut_M_i = ut_M_arr[3];
         LUMI_block5_cleanup:
             (void)0;
@@ -7498,46 +7492,35 @@ Returncode ut_M_Test_test(ut_M_Test* self, Char* c, Int* i, ut_M_Base** b) {
     char* aux_String_1 = NULL;
     int aux_String_1_Max_length = 0;
     int* aux_String_1_Length = &Lumi_empty_int;
-    if (3 < 0 || 3 >= *(self->s_Length)) RAISE(12, LUMI_block0_cleanup, slice_index)
+    if (3 >= *(self->s_Length)) RAISE(12, LUMI_block0_cleanup, slice_index)
     *c = self->s[3];
-    if (4 < 0 || 4 >= 11) RAISE(13, LUMI_block0_cleanup, slice_index)
     *i = self->ai[4];
-    if (5 < 0 || 5 >= 12) RAISE(14, LUMI_block0_cleanup, slice_index)
     *b = self->ab + 5;
-    if (4 < 0 || 4 >= 7) RAISE(15, LUMI_block0_cleanup, slice_index)
     aux_String_0 = self->as + 4 * 8;
     aux_String_0_Max_length = 8;
     aux_String_0_Length = self->as_String_length + 4;
-    if (5 < 0 || 5 >= *(aux_String_0_Length)) RAISE(15, LUMI_block0_cleanup, slice_index)
+    if (5 >= *(aux_String_0_Length)) RAISE(15, LUMI_block0_cleanup, slice_index)
     *c = (aux_String_0)[5];
-    if (1 < 0 || 1 >= 4) RAISE(16, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = self->aai + 1 * 5 * 6;
     aux_Array_0_Length = 5;
     aux_Array_0_Value_length = 6;
-    if (2 < 0 || 2 >= 5) RAISE(16, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = (aux_Array_0) + 2 * 6;
     aux_Array_1_Length = 6;
-    if (3 < 0 || 3 >= 6) RAISE(16, LUMI_block0_cleanup, slice_index)
     *i = (aux_Array_1)[3];
-    if (1 < 0 || 1 >= 4) RAISE(17, LUMI_block0_cleanup, slice_index)
     aux_Array_2 = self->aab + 1 * 5 * 6;
     aux_Array_2_Length = 5;
     aux_Array_2_Value_length = 6;
-    if (2 < 0 || 2 >= 5) RAISE(17, LUMI_block0_cleanup, slice_index)
     aux_Array_3 = (aux_Array_2) + 2 * 6;
     aux_Array_3_Length = 6;
-    if (3 < 0 || 3 >= 6) RAISE(17, LUMI_block0_cleanup, slice_index)
     *b = (aux_Array_3) + 3;
-    if (1 < 0 || 1 >= 4) RAISE(18, LUMI_block0_cleanup, slice_index)
     aux_Array_4 = self->aas + 1 * 5 * 6;
     aux_Array_4_Length = 5;
     aux_Array_4_Value_length = 6;
     aux_Array_4_String_length = self->aas_String_length + 1 * 5;
-    if (2 < 0 || 2 >= 5) RAISE(18, LUMI_block0_cleanup, slice_index)
     aux_String_1 = (aux_Array_4) + 2 * 6;
     aux_String_1_Max_length = 6;
     aux_String_1_Length = aux_Array_4_String_length + 2;
-    if (3 < 0 || 3 >= *(aux_String_1_Length)) RAISE(18, LUMI_block0_cleanup, slice_index)
+    if (3 >= *(aux_String_1_Length)) RAISE(18, LUMI_block0_cleanup, slice_index)
     *c = (aux_String_1)[3];
 LUMI_block0_cleanup:
     (void)0;
@@ -7549,9 +7532,9 @@ void ut_M_Test_Del(ut_M_Test* self) {
     ARRAY_DEL(ut_M_Base, self->ab, 12)
 }
 /// @ te0
-array length is not constant
+sequence length is not constant
 /// @ te1
-array length is not constant
+sequence length is not constant
 /// @ te2
 recursive declaration of type "Test", variable of type "Test"
 /// @ te3
@@ -7623,19 +7606,22 @@ void ut_M_fun(Int* a, int a_Length);
 Int ut_M_arr[ut_M_SIZE + 3] = {0};
 void ut_M_fun(Int* a, int a_Length) {
     unsigned LUMI_loop_depth = 1;
-    ut_M_fun(ut_M_arr, ut_M_SIZE + 3);
+    ut_M_fun(ut_M_arr, 15);
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ t2
 enum { ut_M_SMALL = 7 };
-enum { ut_M_LARGE = (- (2 * ut_M_SMALL)) + 1 };
+enum { ut_M_LARGE = 15 };
 /// @ t3
 enum {
     ut_M_MyEnum_VALUE = 0,
     ut_M_MyEnum_length
 };
-enum { ut_M_NUMBER = ut_M_MyEnum_VALUE };
+enum { ut_M_NUMBER = 0 };
+/// @ t4
+enum { ut_M_NUMBER = 2 };
+enum { ut_M_D_CHAR = 100 };
 /// @ te0
 expected space after "const", got "new-line"
 /// @ te1
@@ -8031,8 +8017,6 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     to->s = NULL;
     to->s_Length = &Lumi_empty_int;
     /* initializing arr */
-    if (8 < 0 || 8 >= 12) RAISE(19, LUMI_block0_cleanup, slice_index)
-    if (4 < 0 || 4 >= 12) RAISE(19, LUMI_block0_cleanup, slice_index)
     arr[4] = arr[8];
     do {
         LUMI_loop_depth = 3;
@@ -8250,10 +8234,10 @@ char* s = NULL;
     aux_Array_0 = ut_M_sarr;
     {int s_Index; for (s_Index = 0; s_Index < aux_Array_0_Length; ++s_Index) {
         LUMI_loop_depth = 3;
-        if (s_Index < 0 || s_Index >= aux_Array_0_Length) RAISE(3, LUMI_block1_cleanup, slice_index)
         s = aux_Array_0 + s_Index * aux_Array_0_Value_length;
         s_Max_length = aux_Array_0_Value_length;
         s_Length = aux_Array_0_String_length + s_Index;
+        /* start loop */
         CHECK_REF(4, LUMI_block1_cleanup, s)
         String_clear(s, s_Max_length, s_Length);
     LUMI_block1_cleanup:

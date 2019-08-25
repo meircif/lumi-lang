@@ -2,39 +2,41 @@ Running tests:
 testing fail-call-empty... Error: empty object used
   Error raised in TL5/tests/integration/error-test.5.lm:32 fail-call-empty()
 testing fail-slice-index... Error: slice index out of bounds
-  Error raised in TL5/tests/integration/error-test.5.lm:36 fail-slice-index()
+  Error raised in TL5/tests/integration/error-test.5.lm:37 fail-slice-index()
+testing fail-negative-slice... Error: slice index out of bounds
+  Error raised in TL5/tests/integration/error-test.5.lm:40 fail-negative-slice()
 testing fail-member-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:40 fail-member-empty()
+  Error raised in TL5/tests/integration/error-test.5.lm:44 fail-member-empty()
 testing fail-member-outdated... Error: outdated weak reference used
-  Error raised in TL5/tests/integration/error-test.5.lm:47 fail-member-outdated()
+  Error raised in TL5/tests/integration/error-test.5.lm:51 fail-member-outdated()
 testing fail-sequence-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:52 fail-sequence-empty()
+  Error raised in TL5/tests/integration/error-test.5.lm:56 fail-sequence-empty()
 testing fail-sequence-outdated... Error: outdated weak reference used
-  Error raised in TL5/tests/integration/error-test.5.lm:58 fail-sequence-outdated()
+  Error raised in TL5/tests/integration/error-test.5.lm:62 fail-sequence-outdated()
 testing fail-slice-outdated... Error: outdated weak reference used
-  Error raised in TL5/tests/integration/error-test.5.lm:64 fail-slice-outdated()
+  Error raised in TL5/tests/integration/error-test.5.lm:68 fail-slice-outdated()
 testing fail-dynamic-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:68 fail-dynamic-empty()
+  Error raised in TL5/tests/integration/error-test.5.lm:72 fail-dynamic-empty()
 testing fail-object-no-memory... Error: insufficient memory for object dynamic allocation
-  Error raised in TL5/tests/integration/error-test.5.lm:72 fail-object-no-memory()
+  Error raised in TL5/tests/integration/error-test.5.lm:76 fail-object-no-memory()
 testing fail-managed-no-memory... Error: insufficient memory for managed object
-  Error raised in TL5/tests/integration/error-test.5.lm:76 fail-managed-no-memory()
+  Error raised in TL5/tests/integration/error-test.5.lm:80 fail-managed-no-memory()
 testing fail-exclamation-empty... Error: empty object used
-  Error raised in TL5/tests/integration/error-test.5.lm:80 fail-exclamation-empty()
-testing fail-raise... Error raised in TL5/tests/integration/error-test.5.lm:83 fail-raise()
+  Error raised in TL5/tests/integration/error-test.5.lm:84 fail-exclamation-empty()
+testing fail-raise... Error raised in TL5/tests/integration/error-test.5.lm:87 fail-raise()
 testing fail-raise-message... Error: my error
   Error raised in TL5/tests/integration/error-test.5.lm:18 f-raise-message()
-  called from TL5/tests/integration/error-test.5.lm:86 fail-raise-message()
+  called from TL5/tests/integration/error-test.5.lm:90 fail-raise-message()
 testing fail-assert... Error: condition is not true
-  Assert failed in TL5/tests/integration/error-test.5.lm:89 fail-assert()
+  Assert failed in TL5/tests/integration/error-test.5.lm:93 fail-assert()
 testing fail-assert-error... Error: error not raised
-  Assert failed in TL5/tests/integration/error-test.5.lm:92 fail-assert-error()
+  Assert failed in TL5/tests/integration/error-test.5.lm:96 fail-assert-error()
 testing fail-assert-error-message... Assert failed: unexpected error message "tested other message"
-  Assert failed in TL5/tests/integration/error-test.5.lm:95 fail-assert-error-message()
+  Assert failed in TL5/tests/integration/error-test.5.lm:99 fail-assert-error-message()
 testing fail-assert-error-message-prefix... Assert failed: unexpected error message "tested message"
-  Assert failed in TL5/tests/integration/error-test.5.lm:98 fail-assert-error-message-prefix()
+  Assert failed in TL5/tests/integration/error-test.5.lm:102 fail-assert-error-message-prefix()
 testing fail-zero-division... Error: zero division
-  Error raised in TL5/tests/integration/error-test.5.lm:102 fail-zero-division()
+  Error raised in TL5/tests/integration/error-test.5.lm:106 fail-zero-division()
 testing code coverage... 93% - failed, lines not covered:
-  TL5/tests/integration/error-test.5.lm(93%): 12 41 48
+  TL5/tests/integration/error-test.5.lm(93%): 12 45 52
 Tests failed

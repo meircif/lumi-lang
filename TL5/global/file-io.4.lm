@@ -1,6 +1,14 @@
 ~~~ TL5 compiler - File read and write functions ~~~
 module tl5-compiler
 
+
+~~~ print `num` as text ~~~
+func print-int(copy Int num)
+  var String{64} num-str
+  num.str(user num-str)
+  sys.print(user num-str)
+
+
 ~~~ Read a single character from the input file ~~~
 func read-c()
   if glob.got-new-line

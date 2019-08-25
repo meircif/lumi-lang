@@ -89,6 +89,7 @@ class EnumExpression(ModuleTypeExpression)
   owner String name
   owner String value
   user EnumData enum-data
+  var Int int-value
   
   func inst parse-new(
       owner String name, owner String value, user SyntaxTreeCode code-node)->(
@@ -105,7 +106,6 @@ class EnumExpression(ModuleTypeExpression)
     self.value := value
     self.set-simple-type(user glob.type-int)
     self.access := Access.VAR
-    self.constant := true
     self.module-expression := module-expression
   
   func dynamic analyze()
@@ -122,9 +122,13 @@ class EnumExpression(ModuleTypeExpression)
     else-if not glob.current-module.enum-map.find(user self.name)->(
         user self.enum-data)?
       self.syntax-error(user "unknown Enum", user self.name)
-    if not self.enum-data.has-value(user self.value)
+    if not self.enum-data.has-value(user self.value)->(var self.int-value)
       self.syntax-error2(
           user "Enum", user self.name, user "has no value", user self.value)
+        
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    value := self.int-value
+    has-value := true
   
   func dynamic write()
     self.enum-data.write-cname()

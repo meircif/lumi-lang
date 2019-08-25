@@ -284,7 +284,8 @@ class SyntaxTreeForLoop(SyntaxTreeBaseLoop)
       string-new-copy(user self.item.name)->(owner slice.slice-variable.name)
       slice.result-type.copy-new()->(owner slice.slice-variable.result-type)
       self.write-spaces()
-      slice.write-preactions-base()
+      slice.write-preactions()
+      write(user "/* start loop */\n")
     else
       self.write-assign(user self.item, user slice, user self.block)
     self.parent.indentation-spaces -= INDENTATION-SPACES

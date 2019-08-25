@@ -137,7 +137,7 @@ test test-native()
     var String{4} s(user "bb")!
     assert-error! external(copy 3, user s)->(var i, var n)
     assert! i = 3
-    assert! s[0]! = 'a'
+    assert! s[0] = 'a'
     assert! external2(copy n)
 
 
@@ -338,7 +338,7 @@ func ! cleanup-test(user Array{Ref} refs)
         raise
     catch
         strong Link la(strong Link()!)
-        refs[0]! := la
+        refs[0] := la
         if false
             ; 
         else
@@ -433,6 +433,7 @@ test test-assert-error-message()
     assert-error! fun(), "empty object used"
     strong Array?{Int} arr(strong Array{2:Int}()!)
     assert-error! arr[6], "slice index out of bounds"
+    assert-error! Array{-2:Int}(), "slice index out of bounds"
     weak Array?{Int} arr2(weak arr)
     arr := _
     assert-error! arr.length(), "empty object used"
@@ -447,6 +448,7 @@ test test-assert-error-message()
     assert-error! alloc(), "insufficient memory for managed object"
     var Int zero(copy 0)
     assert-error! 24 div zero, "zero division"
+    assert-error! 24 mod zero, "zero division"
 
 native var Int lumi-debug-value
 

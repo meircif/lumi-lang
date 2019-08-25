@@ -22,7 +22,6 @@ class ExpressionValue(SyntaxTreeNode)
   user TypeInstance result-type
   var Int access
   var Bool is-statement
-  var Bool constant
   
   new(user String ends, user SyntaxTreeCode code-node)
     parse-new-expression(user ends, user code-node)->(owner self.expression)
@@ -36,7 +35,6 @@ class ExpressionValue(SyntaxTreeNode)
     self.expression.analyze()
     self.result-type := self.expression.result-type
     self.access := self.expression.access
-    self.constant := self.expression.constant
 
   func inst check-no-error()
     self.expression.check-no-error()
@@ -51,6 +49,9 @@ class ExpressionValue(SyntaxTreeNode)
   
   func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
     self.expression.order-constants(user ordered-list)
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    self.expression.get-constant-value()->(var value, var has-value)
   
   func dynamic check-memory(user ReferenceMemoryList refs)
     if self.expression?
@@ -85,7 +86,6 @@ class Expression(SyntaxTreeNode)
   owner TypeInstance result-type
   var Int access
   var Bool assignable
-  var Bool constant
   var Bool is-statement
   var Bool is-generic-cast
   var Bool is-complex-field
@@ -294,6 +294,9 @@ class Expression(SyntaxTreeNode)
       self.error-expected := false
     else-if self.error-expected
       self.syntax-error-msg(user "using \"!\" where error is not propagated")
+    
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    has-value := false
 
   func dynamic restructure()->(
       owner Expression expression, owner FunctionArguments arguments)
@@ -345,13 +348,15 @@ class Expression(SyntaxTreeNode)
   
   func inst write-length(
       user String prefix, user String empty, copy Bool is-static)
-    var Bool is-const-length
+    var Bool is-constant-length
+    var Int length-value
     if is-static and self.result-type.length?
-      is-const-length := self.result-type.length.constant
+      self.result-type.length.get-constant-value()->(
+          var length-value, var is-constant-length)
     if self.result-type.type-data is glob.type-empty
       write(user empty)
-    else-if is-const-length
-      self.result-type.length.write()
+    else-if is-constant-length
+      write-int(copy length-value)
     else
       self.write()
       write(user prefix)

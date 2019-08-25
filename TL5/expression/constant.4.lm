@@ -1,36 +1,33 @@
 ~~~ TL5 compiler - Constant expressions ~~~
 module tl5-compiler
 
-~~~ Return whether `text` is a number of base with given `top-digit` ~~~
-func is-number(user String text, copy Char top-digit)->(var Bool is-number)
+~~~ 
+Convert text to number based on given `int-base`.
+Return whether conversion succeeded
+~~~
+func get-number-value(user String text, copy Int int-base)->(
+    var Int value, var Bool is-number)
   is-number := true
+  value := 0
+  var Bool is-hex(copy int-base = 16)
   for n in text.length
+    value := value * int-base
     var Char ch(copy text[n])
-    if ch < '0' or ch > top-digit
-      is-number := false
-      return
-
-~~~ Return whether `text` is a binary number ~~~
-func is-binary(user String text)->(var Bool is-octal)
-  is-number(user text, copy '1')->(var is-octal)
-
-~~~ Return whether `text` is an octal number ~~~
-func is-octal(user String text)->(var Bool is-octal)
-  is-number(user text, copy '7')->(var is-octal)
-
-~~~ Return whether `text` is a decimal number ~~~
-func is-decimal(user String text)->(var Bool is-octal)
-  is-number(user text, copy '9')->(var is-octal)
-
-~~~ Return whether `text` is a hexadecimal number ~~~
-func is-hex(user String text)->(var Bool is-hex)
-  is-hex := true
-  for n in text.length
-    var Char ch(copy text[n])
-    if (ch < '0' or ch > '9') and (ch < 'a' or ch > 'f') and
-        (ch < 'A' or ch > 'F')
-      is-hex := false
-      return
+    if is-hex
+      if ch >= 'a' and ch <= 'f'
+        value += ch - 'a' + 10
+      else-if ch >= 'A' and ch <= 'F'
+        value += ch - 'A' + 10
+      else
+        if ch < '0' or ch > '9'
+          is-number := false
+          return
+        value += ch - '0'
+    else
+      if ch < '0' or ch > '0' + int-base - 1
+        is-number := false
+        return
+      value += ch - '0'
 
 
 ~~~ A basic expression that has a single textual value ~~~
@@ -42,45 +39,56 @@ class TextExpression(Expression)
 
 
 ~~~ Constant integer expression ~~~
-class IntExpression(TextExpression)
+class IntExpression(Expression)
+  var Int value
+  
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
     new IntExpression int-expression(user code-node)
     int-expression.parse(owner text)
     expression := int-expression
   
-  ~~~ parsing `123` or `-123` or `0b0012` or `0x3d4f` ~~~
+  ~~~ parsing `123` or `-123` or `0b10011` or `0x3d4f` ~~~
   func inst parse(owner String text)
     user String number(user text)
-    if number[0] = '-'
+    var Bool is-negative(copy number[0] = '-')
+    if is-negative
       number := number[1:number.length - 1]
     if number[0] = '0' and number.length > 1
       var Char second(copy number[1])
       if second >= '0' and second <= '7'
-        if not is-octal(user number)
+        if not get-number-value(user number, copy 8)->(var self.value)
           self.syntax-error(user "illegal octal number", user text)
       else
         number := number[2:number.length - 2]
         if second = 'b' or second = 'B'
-          if not is-binary(user number)
+          if not get-number-value(user number, copy 2)->(var self.value)
             self.syntax-error(user "illegal binary number", user text)
-          self.syntax-error(
-              user "binary numbers not supported yet...", user text)
         else-if second = 'x' or second = 'X'
-          if not is-hex(user number)
+          if not get-number-value(user number, copy 16)->(var self.value)
             self.syntax-error(user "illegal hexadecimal number", user text)
         else
           self.syntax-error(user "illegal number", user text)
-    else-if not is-decimal(user number)
+    else-if not get-number-value(user number, copy 10)->(var self.value)
       self.syntax-error(user "illegal number", user text)
+    if is-negative
+      self.value := - self.value
     self.set-simple-type(user glob.type-int)
     self.access := Access.VAR
-    self.text := text
-    self.constant := true
+    text := _
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    value := self.value
+    has-value := true
+    
+  func dynamic write()
+    write-int(copy self.value)
 
 
 ~~~ Constant character expression ~~~
 class CharExpression(TextExpression)
+  var Char value
+  
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
     new CharExpression char-expression(user code-node)
@@ -91,24 +99,26 @@ class CharExpression(TextExpression)
   func inst parse(owner String text)
     var Char ch
     if text.length = 3
-      ch := text[1]
-      if ch = '\'' or ch = '\\'
+      self.value := text[1]
+      if self.value = '\'' or self.value = '\\'
         self.syntax-error(user "illegal character constant", user text)
     else-if text.length = 4
       if text[1] != '\\'
         self.syntax-error(user "illegal character constant", user text)
-      if not "'\"?\\abfnrtv0".has(copy text[2])
+      if not self.char-from-escape(copy text[2])->(var self.value)
         self.syntax-error(user "illegal character constant", user text)
     else-if text.length = 6
       if text[1] != '\\'
         self.syntax-error(user "illegal character constant", user text)
       ch := text[2]
+      var Int value
       if ch = 'x'
-        if not is-hex(user text[3:2])
+        if not get-number-value(user text[3:2], copy 16)->(var value)
           self.syntax-error(user "illegal character constant", user text)
       else
-        if not is-octal(user text[2:3])
+        if not get-number-value(user text[2:3], copy 8)->(var value)
           self.syntax-error(user "illegal character constant", user text)
+      self.value := value
     else
       self.syntax-error(user "illegal character constant", user text)
     if text[text.length - 1] != '\''
@@ -116,6 +126,21 @@ class CharExpression(TextExpression)
     self.set-simple-type(user glob.type-char)
     self.access := Access.VAR
     self.text := text
+    
+  func inst char-from-escape(copy Char escape)->(
+      var Char value, var Bool is-legal)
+    user String escapes(user "'\"?\\abfnrtv0")
+    user String values(user "\'\"\?\\\a\b\f\n\r\t\v\0")
+    for n in escapes.length
+      if escape = escapes[n]
+        value := values[n]
+        is-legal := true
+        return
+    is-legal := false
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    value := self.value
+    has-value := true
 
 
 ~~~ Constant string expression ~~~
