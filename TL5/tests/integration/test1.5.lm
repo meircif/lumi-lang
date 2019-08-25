@@ -137,7 +137,7 @@ test test-native()
     var String{4} s(user "bb")!
     assert-error! external(copy 3, user s)->(var i, var n)
     assert! i = 3
-    assert! s[0]! = 'a'
+    assert! s[0] = 'a'
     assert! external2(copy n)
 
 
@@ -338,7 +338,7 @@ func ! cleanup-test(user Array{Ref} refs)
         raise
     catch
         strong Link la(strong Link()!)
-        refs[0]! := la
+        refs[0] := la
         if false
             ; 
         else

@@ -190,7 +190,7 @@ x := ostr![2:6]!
 i := arr![13]!
 ; @ c t3
 user Array?{Int} x
-x := arr![2:6]!
+x := arr![2:i]!
 ; @ c t4
 ostr![4]! := c
 ; @ c t5
@@ -200,8 +200,8 @@ strong Array?{Test} tarr
 t := tarr![3]!
 ; @ c t7
 var Array{8:String{5}} vsa
-user String s(user vsa[3]!)
-user Array{String} sa(user vsa[2:4]!)
+user String s(user vsa[3])
+user Array{String} sa(user vsa[2:4])
 ; @ g t8
 func ! fun(s-var String s, strong Array{String} sa)
     var Char c(copy s[5]!)
@@ -226,16 +226,16 @@ weak Array?{Array{Array{String}}} uaa(weak aas![2:4]!)
 aas := _
 ; @ c t13
 var Array{8:Array{7:Array{6:Array{5:Int}}}} aai
-user Array?{Array{Array{Int}}} ua(user aai[3]!)
-user Array?{Array{Array{Array{Int}}}} uaa(user aai[2:4]!)
+user Array?{Array{Array{Int}}} ua(user aai[3])
+user Array?{Array{Array{Array{Int}}}} uaa(user aai[2:4])
 ; @ c t14
 var Array{8:Array{7:Array{6:String{5}}}} aas
-user Array?{Array{String}} ua(user aas[3]!)
-user Array?{Array{Array{String}}} uaa(user aas[2:4]!)
+user Array?{Array{String}} ua(user aas[i]!)
+user Array?{Array{Array{String}}} uaa(user aas[2:4])
 ; @ g t15
-func ! fun()
+func fun()
     var Array{8:Array{7:Array{6:String{5}}}} aas
-    user String s(user aas[4]![3]![2]!)
+    user String s(user aas[4][3][2])
 ; @ c t16
 user Array?{Char} x
 x := ostr
@@ -268,7 +268,7 @@ str![2:5]! := so
 arr![7:2]! := Array{5:Int}()!
 ; @ ec te9
 user Array?{Test} at
-at![0]! := t
+at![0] := t
 ; @ ec te10
 so := sarr![3]!
 ; @ ec te11
@@ -281,7 +281,14 @@ func func(user Array{Test} error)
 ; @ ec te13
 i := arr![i]
 ; @ ec te14
-var Array{-3:Int} error
+var Array{0:Int} error
+; @ ec te15
+arr![-1]
+; @ ec te16
+arr![1:0]
+; @ ec te17
+s-var Array{3:Int} a!
+arr := a[1:3]
 ; @@ test-call-expression
 ; @ c t0
 fun0()
@@ -919,8 +926,8 @@ var Array{38:Func{()}} farr
 new Array{12:Func{(copy Int x)->(var Int y)}} farr1!
 new Array{12:Func{:()}} farr2!
 user Array{Func{:()}} ufarr
-farr[3]! := fun0
-farr[3]!()
+farr[3] := fun0
+farr[3]()
 ; @ c t6
 var Func{(copy Int x,
         copy Int y)} fun
@@ -1661,15 +1668,15 @@ var Int error--name
 ; @ c t0
 tb := Tb(copy i)!
 ; @ c t1
-str := String{arr![0]!}()!
+str := String{arr![0]}()!
 ; @ c t2
-owner Array{Int} a(owner Array{arr![0]!:Int}()!)
+owner Array{Int} a(owner Array{arr![0]:Int}()!)
 ; @ c t3
-owner Array{Test} a(owner Array{arr![0]!:Test}()!)
+owner Array{Test} a(owner Array{arr![0]:Test}()!)
 ; @ c t4
-owner Array{String} sa(owner Array{arr![0]!:String{arr![1]!}}()!)
+owner Array{String} sa(owner Array{arr![0]:String{arr![1]!}}()!)
 ; @ c t5
-var Int x(copy arr![0]!)
+var Int x(copy arr![0])
 ; @ c t6
 user String? s(user ostr)
 ; @ c t7
@@ -1689,7 +1696,7 @@ user Tb? tt(user tb)
 ; @ c t14
 owner Ta? ota(owner tb)
 ; @ c t15
-owner Array{Array{String}} sa(owner Array{arr![0]!:Array{arr![1]!:String{arr![2]!}}}()!)
+owner Array{Array{String}} sa(owner Array{arr![0]:Array{arr![1]!:String{arr![2]!}}}()!)
 ; @ g t16
 func get()->(owner File? a)
     owner File? b(owner get())
@@ -2048,9 +2055,9 @@ assert-error! t.num,
 if b
     var String{4} s
     assert! b
-    assert-error! s[1:2]
+    assert-error! s[i:2]
     do
-        assert-error! s[1:2]
+        assert-error! s[i:2]
 ; @ g tm0
 func ! fun()
     fun()!
@@ -2362,7 +2369,7 @@ d!.item := t
 t := d!.item
 ; @ c t8
 var Array{5:Data{Test}} ad
-t := ad[2]!.item
+t := ad[2].item
 ; @ c t10
 d!.set(owner _)
 ; @ c t11
@@ -2985,12 +2992,12 @@ struct Test
     var Array{4:Array{5:String{6}}} aas
     func user ! test()->(var Char c, var Int i, user Base? b)
         c := self.s[3]!
-        i := self.ai[4]!
-        b := self.ab[5]!
-        c := self.as[4]![5]!
-        i := self.aai[1]![2]![3]!
-        b := self.aab[1]![2]![3]!
-        c := self.aas[1]![2]![3]!
+        i := self.ai[4]
+        b := self.ab[5]
+        c := self.as[4][5]!
+        i := self.aai[1][2][3]
+        b := self.aab[1][2][3]
+        c := self.aas[1][2][3]!
 ; @ eg te0
 var Int x
 struct Test
@@ -3243,7 +3250,7 @@ func ! fun(owner String? s, user Test tu, owner Test to)
     use(user tu.s)
     take(owner to.s)
     var Array{12:Int} arr
-    arr[4]! := arr[8]!
+    arr[4] := arr[8]
     do
         give()->(owner s)
 ; @ g tu0

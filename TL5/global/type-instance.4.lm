@@ -136,9 +136,9 @@ struct TypeInstance
         if constant-length
           var Int length-value
           if not self.length.get-constant-value()->(var length-value)
-            node.syntax-error-msg(user "array length is not constant")
+            node.syntax-error-msg(user "sequence length is not constant")
           if length-value <= 0
-            node.syntax-error-msg(user "array length is not positive")
+            node.syntax-error-msg(user "sequence length is not positive")
         self.length.check-no-error()
       if self.arguments?
         self.arguments.analyze()

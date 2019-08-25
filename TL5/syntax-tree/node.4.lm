@@ -128,9 +128,7 @@ class SyntaxTreeNode
     sys.print(user "Code error in ")
     sys.print(user self.input-file-name)
     sys.print(user "[")
-    var String{32} line-num-str
-    self.line-number.str(user line-num-str)
-    sys.print(user line-num-str)
+    print-int(copy self.line-number)
     sys.print(user "] ")
   
   func inst syntax-error-raise()
@@ -191,10 +189,6 @@ class SyntaxTreeNode
     self.syntax-error-raise()
   
   func inst syntax-error-indentation(copy Int actual, copy Int expected)
-    var String{16} expected-str
-    var String{16} actual-str
-    expected.str(user expected-str)
-    actual.str(user actual-str)
     self.print-syntax-error-header()
     sys.print(user "indentation too ")
     if actual < expected
@@ -202,9 +196,9 @@ class SyntaxTreeNode
     else
       sys.print(user "long")
     sys.print(user ", expected ")
-    sys.print(user expected-str)
+    print-int(copy expected)
     sys.print(user " got ")
-    sys.print(user actual-str)
+    print-int(copy actual)
     self.syntax-error-raise()
   
   func inst syntax-error-ref(user String text, user ReferencePath path)
