@@ -223,9 +223,8 @@ struct ReferenceMemoryList
     for variable in self.user-references.iter()
       if variable is exp-path.variable
         return
-    expression.syntax-error(
-        user "using potentially illegal user reference",
-        user exp-path.variable.name)
+    expression.syntax-error-ref(
+        user "using potentially illegal user reference", user exp-path)
       
   func check-output(user Argument output)
     if output.access != Access.USER

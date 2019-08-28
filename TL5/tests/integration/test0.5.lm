@@ -509,14 +509,12 @@ struct ContainerIterator{Generic}
     new(weak Container?{Generic} first)
         self.curr := first
     
-    func user has()->(var Bool has-data)
+    func user ! step()->(user Generic? item, var Bool has-data)
         has-data := self.curr?
-    
-    func user ! get()->(user Generic? item)
-        item := self.curr!.value
-    
-    func user ! next()
-        self.curr := self.curr!.next
+        item := _
+        if has-data
+            item := self.curr!.value
+            self.curr := self.curr!.next
 
 func ! test-for-each()
     var String{16} text
@@ -566,7 +564,7 @@ func ! test-for-each()
     s-var Container{Item} container(owner _, weak container-first)!
     owner ContainerIterator{Item} iter(owner container.iter()!)
     sys.print(user "values[ ")!
-    for sc in iter
+    for sc in iter!
         sys.print(user sc!.s)!
         sys.print(user " ")!
     sys.println(user "]")!
@@ -575,6 +573,7 @@ func ! test-for-each()
     for n in 3
         for m in 3
             for i in 3
+                user String s
                 s := saarr[n]![m]![i]!
                 s.copy(user "val")!
                 s.append(copy '0' + n)!

@@ -4,7 +4,6 @@ module tl5-compiler
 ~~~ Function node in the syntax tree ~~~
 class SyntaxTreeFunction(SyntaxTreeBlock)
   var List{TypeCount} aux-variables
-  var NameMap{SyntaxTreeVariable} function-variables
   var FunctionArguments arguments
   owner String name
   owner String type-name

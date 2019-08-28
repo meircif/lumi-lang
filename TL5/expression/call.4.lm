@@ -31,7 +31,7 @@ class CallExpression(Expression)
       output.access := declaration.outputs.last.item.access
       result-type.copy-new()->(owner output.real-type)
       owner VariableExpression variable-expression
-      self.add-aux-variable(
+      self.code-node.add-aux-variable(
           copy declaration.outputs.last.item.access,
           copy false,
           user result-type)->(owner variable-expression)

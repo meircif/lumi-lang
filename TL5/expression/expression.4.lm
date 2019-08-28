@@ -42,6 +42,7 @@ class ExpressionValue(SyntaxTreeNode)
   func inst check-all-errors()
     self.expression.code-node.check-expression-all-errors()->(
         owner self.expression)
+    self.result-type := self.expression.result-type
       
   func inst check-errors(copy Bool check-conditional, copy Bool check-weak)
     self.expression.code-node.check-expression-errors(
@@ -195,8 +196,7 @@ class Expression(SyntaxTreeNode)
     else-if text.equal(user "base")
       expression := BaseMethExpression(user code-node)
     else
-      VariableExpression.parse-new(user _, owner text, user code-node)->(
-          owner expression)
+      expression := VariableExpression(user code-node, owner text)
   
   ~~~ Parse one following part of an operand ~~~
   func inst parse-new-follow-operand(
@@ -216,8 +216,8 @@ class Expression(SyntaxTreeNode)
         self.parse-type-prefix(owner text, user ends, user code-node)->(
             owner expression)
       else
-        FieldExpression.parse-new(user _, owner text, user code-node)->(
-            owner expression)
+        expression :=
+            FieldExpression(user code-node, owner expression, owner text)
     else-if glob.last-char = '['
       SliceExpression.parse-new(user _, user ends, user code-node)->(
           owner expression)
@@ -256,26 +256,12 @@ class Expression(SyntaxTreeNode)
     TypeExpression.parse-new(user _, owner type-instance, user code-node)->(
         owner expression)
     if has-member
-      FieldExpression.parse-new(user _, owner value, user code-node)->(
-          owner expression)
+      expression :=
+          FieldExpression(user code-node, owner expression, owner value)
   
   ~~~ Set type instance to be a type that has no sub-type ~~~
   func inst set-simple-type(user TypeData type-data)
     type-data.new-type-instance()->(owner self.result-type)
-  
-  func inst add-aux-variable(
-      copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
-      owner VariableExpression expression)
-    expression := VariableExpression(user self.code-node)
-    type-instance.copy-new()->(owner expression.result-type)
-    expression.access := access
-    expression.assignable := true
-    self.code-node.parent.add-aux-variable(
-        copy access, copy is-create, user type-instance)->(
-        user expression.variable)
-    string-new-copy(user expression.variable.name)->(owner expression.name)
-    expression.result-type.reference-path :=
-        ReferencePath(user expression.variable)
   
   func dynamic get-parent-type()->(user TypeData parent-type)
     parent-type := _

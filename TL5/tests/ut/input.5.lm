@@ -1781,22 +1781,25 @@ var Int error
 ; @ ec te29
 var Int error(copy error)
 ; @ ec te30
+error := 3
+var Int error
+; @ ec te31
 if b
     var Int error
 i := error
-; @ ec te31
-new Test? a!
 ; @ ec te32
-to := Test?()
+new Test? a!
 ; @ ec te33
-to := Test()
+to := Test?()
 ; @ ec te34
-var Tb tt(copy 3)
+to := Test()
 ; @ ec te35
-user String s!
-; @ eg te36
+var Tb tt(copy 3)
+; @ ec te36
 user String s!
 ; @ eg te37
+user String s!
+; @ eg te38
 struct Test
     weak String s!
 ; @@ test-comment
@@ -1947,11 +1950,6 @@ do
 ; @ ec te4
 do
     error
-; @ ec te5
-do
-    var Int error
-do
-    var Int error
 ; @ ec te6
 do
     while i := 3
@@ -2016,6 +2014,12 @@ for ch in s
 var Array{3:String{4}} sa
 for s in sa
     s.clear()
+; @ c t11
+for _ in 2:6
+    i += 1
+; @ c t12
+for _ in ostr!
+    i += 1
 ; @ ec te0
 for(
 ; @ ec te1
@@ -2030,6 +2034,7 @@ for n in str:8
 for n in 5
     error
 ; @ ec te6
+var Int n
 for n in arr!
     i += n
 for n in sarr!
@@ -2784,175 +2789,111 @@ try
 struct TestIterator
     var Int counter
     new(copy Int count)
-    func user has()->(var Bool has-data)
-    func user get()->(var Int num)
-    func user next()
+    func user step()->(var Int num, var Bool has-data)
 func ! fun()->(var Int i)
     for n in TestIterator(copy 6)!
         var String{4} s
         i := n
 ; @ g t1
 struct TestIterator
-    weak String? value
-    func user has()->(var Bool has-data)
-    func user ! get()->(user String? text)
-        text := self.value!
-    func user next()
+    owner String? value
+    func user step()->(user String? text, var Bool has-data)
+        text := self.value
 func fun(user TestIterator iter)
+    user String? t
     user String? s
     for t in iter
         s := t
 ; @ g t2
 struct TestIterator{Generic}
     weak Generic? item
-    func user has()->(var Bool has-data)
-    func user ! get()->(user Generic? item)
+    func user ! step()->(user Generic? item, var Bool has-data)
         item := self.item!
-    func user next()
 class Test
     var Int x
     func dynamic user fun()
-func fun(user TestIterator{File} fiter, user TestIterator{Test} titer)
+func ! fun(user TestIterator{File} fiter, user TestIterator{Test} titer)
     user File? of
     user Test? ot
-    for f in fiter
+    for f in fiter!
         of := f
-    for t in titer
+    for t in titer!
         ot := t
 ; @ g t3
 class TestIterator{Generic}
     weak Generic? item
-    func dynamic user has()->(var Bool has-data)
-    func dynamic user ! get()->(user Generic? item)
+    func dynamic user ! step()->(user Generic? item, var Bool has-data)
         item := self.item!
-    func dynamic user next()
-func f-mock(user TestIterator{File} iter)
+func ! f-mock(user TestIterator{File} iter)
     user File? f
-    for t in iter
+    for t in iter!
         f := t
+; @ g t4
+struct TestIterator
+    owner String? value
+    func user step()->(strong String? text, var Bool has-data)
+        if-error text := String{12}(user self.value)
+            text := _
+func fun(user TestIterator iter)
+    owner String? s
+    for t in iter
+        s := t
+; @ g t5
+struct TestIterator
+    owner String? value
+    func user step()->(user String? text, var Bool has-data)
+        text := self.value
+func fun(user TestIterator iter)
+    var Int x
+    for _ in iter
+        x += 1
 ; @ eg te0
 struct TestIterator
     var Int num
-    func user get()->(var Int num)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
+func fun(user TestIterator iter)
+    for n in iter
 ; @ eg te1
 struct TestIterator
     var Int num
-    func user has(copy Int x)->(var Bool has-data)
-    func user get()->(var Int num)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
+    func user step(user Int x)->(var Int num, var Bool has-data)
+func fun(user TestIterator iter)
+    for n in iter
 ; @ eg te2
 struct TestIterator
     var Int num
-    func user has()
-    func user get()->(var Int num)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
+    func user step()
+func fun(user TestIterator iter)
+    for n in iter
 ; @ eg te3
 struct TestIterator
     var Int num
-    func user has()->(var Bool has-data, var Int x)
-    func user get()->(var Int num)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
+    func user step()->(var Int num)
+func fun(user TestIterator iter)
+    for n in iter
 ; @ eg te4
 struct TestIterator
     var Int num
-    func user has()->(var Int x)
-    func user get()->(var Int num)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
+    func user step()->(var Int num, var Bool has-data, var Int error)
+func fun(user TestIterator iter)
+    for n in iter
 ; @ eg te5
 struct TestIterator
     var Int num
-    func user has()->(var Bool has-data)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
+    func user step()->(var Int num, var Int has-data)
+func fun(user TestIterator iter)
+    for n in iter
 ; @ eg te6
 struct TestIterator
     var Int num
-    func user has()->(var Bool has-data)
-    func user get(user Int x)->(var Int num)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
+    func weak step()->(var Int num, var Bool has-data)
+func fun(user TestIterator iter)
+    for n in iter
 ; @ eg te7
 struct TestIterator
     var Int num
-    func user has()->(var Bool has-data)
-    func user get()
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
-; @ eg te8
-struct TestIterator
-    var Int num
-    func user has()->(var Bool has-data)
-    func user get()->(var Int num, var Int x)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
-; @ eg te9
-struct TestIterator
-    var Int num
-    func user has()->(var Bool has-data)
-    func user get()->(owner String s)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
-; @ eg te10
-struct TestIterator
-    var Int num
-    func user has()->(var Bool has-data)
-    func user get()->(weak String s)
-    func user next()
-func ! f-mock()
-    for n in TestIterator()!
-; @ eg te11
-struct TestIterator
-    var Int num
-    func user has()->(var Bool has-data)
-    func user get()->(var Int num)
-func ! f-mock()
-    for n in TestIterator()!
-; @ eg te12
-struct TestIterator
-    var Int num
-    func user has()->(var Bool has-data)
-    func user get()->(var Int num)
-    func user next(user Int x)
-func ! f-mock()
-    for n in TestIterator()!
-; @ eg te13
-struct TestIterator
-    var Int num
-    func user has()->(var Bool has-data)
-    func user get()->(var Int num)
-    func user next()->(var Int x)
-func ! f-mock()
-    for n in TestIterator()!
-; @ eg te14
-struct ConditionalIterator
-    weak String str
-    func user has()->(var Bool has-data)
-    func user get()->(var String? num)
-    func user next()
-struct NonConditionalIterator
-    weak String str
-    func user has()->(var Bool has-data)
-    func user get()->(var String num)
-    func user next()
-func ! f-mock()
-    for s in NonConditionalIterator()!
-    for s in ConditionalIterator()!
+    func user ! step()->(var Int num, var Bool has-data)
+func fun(user TestIterator iter)
+    for n in iter
 ; @@ test-complex-fields
 ; @ g t0
 struct Test
@@ -3294,6 +3235,14 @@ user String? s(user ostr)
 ostr := _
 for s in sarr!
     s!.clear()
+; @ g tu6
+func get()->(user String? s)
+    s := _
+func ! fun()
+    do
+        user String? s
+        while get()->(user s)?
+        s!.clear()
 ; @ g tb0
 struct Test
     owner String? s
@@ -3448,15 +3397,12 @@ struct Test
 func ! fun(owner Test? t)->(var Int x)
     x := t!.x + fun(owner t)!
 ; @ eg teo23
-struct Test
-    var Int x
-func ! fun(owner Test? t)->(var Int x)
-    for _ in fun(owner t)!:t!.x
-; @ eg teo24
-struct Test
-    var Int x
-func ! fun(owner Test? t)->(var Int x)
-    for _ in t!.x:fun(owner t)!
+func ! fun(owner String s)->(var Int x)
+    for _ in fun(owner s)!:s.length()
+; @ ec teo24
+str := ostr
+for n in str!
+    ostr := _
 ; @ ec teo25
 new String{12} s!
 try

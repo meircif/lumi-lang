@@ -36,7 +36,7 @@ class InitExpression(ModuleTypeExpression)
     if self.aux-variable?
       self.aux-variable.result-type.analyze(user self)
     else
-      self.add-aux-variable(
+      self.code-node.add-aux-variable(
           copy Access.OWNER, copy true, user self.result-type)->(
           owner self.aux-variable)
     self.access := self.aux-variable.access

@@ -12,9 +12,9 @@ class SyntaxTreeExpression(SyntaxTreeCode)
   
   func inst parse()
     self.expression.new(user "", user self)
-    self.expression.is-statement := true
   
   func dynamic analyze()
+    self.expression.is-statement := true
     self.expression.analyze()
     if self.expression.result-type?
       self.syntax-error-msg(user "statement has no effect")
@@ -64,6 +64,9 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     if self.error-message.parsed()
       self.analyze-expression(user self.error-message, user glob.type-string)
       self.error-message.check-errors(copy false, copy true)
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.error-message.check-memory(user refs)
   
   func dynamic write()
     self.write-spaces()
@@ -101,6 +104,9 @@ class SyntaxTreeWhile(SyntaxTreeCode)
   func dynamic analyze()
     self.analyze-expression(user self.condition, user glob.type-bool)
     self.condition.check-no-error()
+
+  func dynamic check-memory(user ReferenceMemoryList refs)
+    self.condition.check-memory(user refs)
   
   func dynamic write()
     ; if (!(`condition`) break;
@@ -115,7 +121,6 @@ class SyntaxTreeWhile(SyntaxTreeCode)
 
 ~~~ Break statement in the syntax tree ~~~
 class SyntaxTreeBreak(SyntaxTreeCode)
-  
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeBreak new-node)
     new-node := SyntaxTreeBreak(user parent)
@@ -133,7 +138,6 @@ class SyntaxTreeBreak(SyntaxTreeCode)
 
 ~~~ Continue statement in the syntax tree ~~~
 class SyntaxTreeContinue(SyntaxTreeCode)
-  
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeContinue new-node)
     new-node := SyntaxTreeContinue(user parent)

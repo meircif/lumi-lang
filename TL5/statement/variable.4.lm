@@ -14,6 +14,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   var Bool is-native
   var Bool is-aux
   var Bool is-initialized
+  var Bool not-declared-yet
   
   func inst parse-new(
       copy Int access,
@@ -60,11 +61,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.syntax-error-msg(user "using \"!\" where there is no error")
       else-if self.parent is-not glob.root.global-init
         self.parent.code-nodes.add(owner VariableCreate(user self))
-      self.get-function().function-variables.add(user self.name, user self)
     else-if glob.last-char = '!'
       self.syntax-error(user "unexpected \"!\" after", user self.name)
     if self.parent is glob.root.global-init
       self.parent := _
+    if self.parent?
+      self.not-declared-yet := true
   
   func inst check-name()
     if not is-legal-name(user self.name, copy NameGroup.DEFAULT)
@@ -90,12 +92,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.syntax-error(
             user "variable name overrides function", user self.name)
       if self.parent?
-        var Bool redefinition(
-            copy self.parent.find-variable(user self.name, user _)?)
-        if not redefinition
-          redefinition :=
-              self.get-function().function-variables.find(user self.name)?
-        if redefinition
+        if self.parent.find-variable(user self.name, user _)?
           self.syntax-error(
               user "redefinition of variable", user self.name)
   
@@ -381,6 +378,9 @@ class VariableCreate(SyntaxTreeCode)
   new(user SyntaxTreeVariable variable)
     self.variable := variable
     base(user variable.parent)
+  
+  func dynamic analyze()
+    self.variable.not-declared-yet := false
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     var ReferencePath reference-path(user self.variable)
@@ -407,9 +407,8 @@ class VariableInit(VariableCreate)
         owner self.variable.type-instance.copy-new(), owner _)
     self.check-error-mark()
     self.expression-init.is-statement := true
-    self.expression-init.aux-variable := VariableExpression(user self)
-    string-new-copy(user self.variable.name)->(
-        owner self.expression-init.aux-variable.name)
+    self.expression-init.aux-variable := VariableExpression(
+        user self, owner string-new-copy(user self.variable.name))
     self.expression-init.aux-variable.variable := self.variable
     self.variable.type-instance.copy-new()->(
         owner self.expression-init.aux-variable.result-type)
@@ -432,6 +431,7 @@ class VariableInit(VariableCreate)
     if self.variable.type-instance.type-data is glob.type-func and
         not self.expression-init.arguments.parameters.first?
       self.variable.is-initialized := false
+    base()
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.expression-init.check-memory(user refs)

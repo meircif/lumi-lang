@@ -10,6 +10,7 @@ class SliceExpression(Expression)
   var Bool need-index-check
   var Bool need-second-index-check
   var Bool need-bounds-check
+  var Bool force-no-checks
   
   func inst parse-new(user String ends, user SyntaxTreeCode code-node)->(
       owner Expression expression)
@@ -48,7 +49,8 @@ class SliceExpression(Expression)
       self.assignable := self.result-type.type-data.is-primitive
     
     self.analyze-indices()
-    self.analyze-values()
+    if not self.force-no-checks
+      self.analyze-values()
     
     if not self.result-type.type-data.is-primitive
       self.sequence.result-type.reference-path.copy-new()->(
@@ -74,7 +76,7 @@ class SliceExpression(Expression)
         self.access := Access.WEAK
       else
         self.access := Access.USER
-      self.add-aux-variable(
+      self.code-node.add-aux-variable(
           copy self.access, copy false, user self.result-type)->(
           owner self.slice-variable)
       return
@@ -88,7 +90,7 @@ class SliceExpression(Expression)
     
     if self.result-type.type-data is glob.type-array or
         self.result-type.type-data is glob.type-string
-      self.add-aux-variable(
+      self.code-node.add-aux-variable(
           copy self.access, copy false, user self.result-type)->(
           owner self.slice-variable)
     

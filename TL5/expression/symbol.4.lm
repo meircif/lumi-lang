@@ -7,25 +7,19 @@ class VariableExpression(Expression)
   owner String module-name
   user SyntaxTreeVariable variable
   
+  new(user SyntaxTreeCode code-node, owner String name)
+    base(user code-node)
+    self.name := name
+  
   func inst copy-new()->(owner VariableExpression expression)
-    expression := VariableExpression(user self.code-node)
-    string-new-copy(user self.name)->(owner expression.name)
+    expression := VariableExpression(
+        user self.code-node, owner string-new-copy(user self.name))
     expression.module-name := self.module-name
     expression.variable := self.variable
     self.result-type.copy-new()->(owner expression.result-type)
     expression.access := self.access
     expression.assignable := self.assignable
     expression.is-var := self.is-var
-  
-  func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
-      owner Expression expression)
-    new VariableExpression variable-expression(user code-node)
-    variable-expression.parse(owner text)
-    expression := variable-expression
-  
-  ~~~ parsing `symbol` ~~~
-  func inst parse(owner String text)
-    self.name := text
   
   func dynamic restructure()->(
       owner Expression expression, owner FunctionArguments arguments)
@@ -159,8 +153,9 @@ class FunctionExpression(Expression)
       self-param.set-location()
       self-param.access := self.function.arguments.parameters.first.item.access
       if self.after-base
-        new VariableExpression self-var(user self.instance.code-node)
-        self.code-node.find-variable(user "self", user _)->(
+        new VariableExpression self-var(
+            user self.instance.code-node, owner string-new-copy(user "self"))
+        self.code-node.find-variable(user self-var.name, user _)->(
             user self-var.variable)
         self-var.variable.type-instance.new-replace-params(
             user actual-params)->(owner self-var.result-type)
