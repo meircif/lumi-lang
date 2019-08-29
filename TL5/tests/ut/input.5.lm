@@ -1824,6 +1824,37 @@ documemtation
 ~~~
 
 var Int x
+; @@ test-block
+; @ c t0
+block
+    new Test tt!
+    i += 1
+; @ c t1
+block
+    return
+; @ c t2
+block
+    var Int n
+block
+    var Int n
+; @ ec te0
+block i
+; @ ec te1
+block
+    break
+; @ ec te2
+block
+    while b
+; @ ec te3
+block
+    new Test tt!
+tt.meth()
+; @ ec te4
+user Test tt
+block
+    var Test tvar
+    tt := tvar
+tt.meth()
 ; @@ test-if-else
 ; @ c t0
 if t!.num > 3

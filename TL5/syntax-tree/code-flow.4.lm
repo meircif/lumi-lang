@@ -55,6 +55,18 @@ class SyntaxTreeFlowElement(SyntaxTreeCode)
     self.block.write-block-end()
 
 
+~~~ Block statement node in the syntax tree ~~~
+class SyntaxTreeBlockNode(SyntaxTreeFlowElement)
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      owner SyntaxTreeBlockNode new-node)
+    new-node := SyntaxTreeBlockNode(user parent)
+    new-node.parse-block()
+  
+  func dynamic write()
+    self.write-spaces()
+    self.write-block()
+
+
 ~~~ If statement node in the syntax tree ~~~
 class SyntaxTreeIf(SyntaxTreeFlowElement)
   var ExpressionValue condition
@@ -110,7 +122,7 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
     self.condition.write-preactions()
     write(user "if (")
     self.condition.write()
-    write(user ")")
+    write(user ") ")
     self.write-block()
     if self.else-node?
       self.else-node.write()
@@ -129,7 +141,7 @@ class SyntaxTreeElse(SyntaxTreeFlowElement)
     ;   `block...`
     ; }
     self.write-spaces()
-    write(user "else")
+    write(user "else ")
     self.write-block()
 
 

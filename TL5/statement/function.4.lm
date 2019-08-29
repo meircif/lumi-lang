@@ -330,6 +330,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     ;   `block...`
     ;   [return LUMI_err;]
     ; }
+    write(user " ")
     self.write-block-start()
     if self.err-aux-var or self.arguments.has-error
       write-spaces(copy INDENTATION-SPACES)

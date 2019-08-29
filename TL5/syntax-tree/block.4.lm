@@ -141,8 +141,12 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     
     if self.has-end-point()
       self.syntax-error-msg(user "unreachable code")
+  
+    if self.equal-and-new-line(user keyword, user "block")
+      self.code-nodes.add(
+          owner SyntaxTreeBlockNode.parse-new(user _, user self))
     
-    if self.equal-and-space(user keyword, user "if")
+    else-if self.equal-and-space(user keyword, user "if")
       new-if := SyntaxTreeIf.parse-new(user _, user self)->(owner owner-if)
       self.code-nodes.add(owner owner-if)
       
@@ -325,7 +329,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     self.write-block-end()
   
   func inst write-block-start()
-    write(user " {\n")
+    write(user "{\n")
   
   func dynamic write-block-body()
     self.write-children(user self.code-nodes)

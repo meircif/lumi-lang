@@ -303,6 +303,10 @@ func ! test-call-expression()
 
 
 func ! test-code-flow(user Array{Int} arr)->(var Int res)
+    block
+        var Array{12:Int} a2
+        a2[0] := res
+        a2[1] := a2[0] + 3
     if arr[4]! > 6
         res := 6
     else-if arr is arr

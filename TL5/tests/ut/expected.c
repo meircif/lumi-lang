@@ -4093,6 +4093,44 @@ Int x = 0;
 Int x = 0;
 /// @ t3
 Int x = 0;
+/// @@ test-block
+/// @ t0
+{
+        ut_M_Test* tt = NULL;
+        INIT_NEW(2, LUMI_block1_cleanup, tt, ut_M_Test, 1);
+        ut_M_i += 1;
+    LUMI_block1_cleanup:
+        (void)0;
+    ut_M_Test_Del(tt);
+        free(tt);
+    }
+/// @ t1
+{
+        LUMI_loop_depth = 0; goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+/// @ t2
+{
+        Int n = 0;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    {
+        Int n = 0;
+    LUMI_block2_cleanup:
+        (void)0;
+    }
+/// @ te0
+expected new-line after "block", got " "
+/// @ te1
+"break" used not inside loop
+/// @ te2
+"while" used not inside loop
+/// @ te3
+unknown symbol "tt"
+/// @ te4
+using invalid reference "tt"
 /// @@ test-if-else
 /// @ t0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)

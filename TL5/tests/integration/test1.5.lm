@@ -390,6 +390,13 @@ test test-block-delete()
         n += 1
     has-refs(user refs, copy 3)!
     
+    block
+        strong Link lb1(strong Link()!)
+        refs[0] := lb1
+        strong Link lb2(strong Link()!)
+        refs[1] := lb2
+    has-refs(user refs, copy 2)!
+    
     record-delete := false
     deleted-refmans := _
     deleted-links := _
