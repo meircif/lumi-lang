@@ -374,44 +374,48 @@ Returncode StringExpression_m_strip_multilines(StringExpression* self) {
       if (index_read > 0) {
         if ((index_read - 1) < 0 || (index_read - 1) >= (self->_base.text)->length) RAISE(146)
         skip_new_line = ((self->_base.text)->values[index_read - 1]) == '\\';
+        if (skip_new_line && index_read > 1) {
+          if ((index_read - 2) < 0 || (index_read - 2) >= (self->_base.text)->length) RAISE(148)
+          skip_new_line = ((self->_base.text)->values[index_read - 2]) != '\\';
+        }
       }
       Int expected = self->_base._base.code_node->parent->_base.indentation_spaces + 4;
       Int indentation = 0;
       while (true) {
         index_read += 1;
         if (!(index_read < self->_base.text->length - 1)) break;
-        if ((index_read) < 0 || (index_read) >= (self->_base.text)->length) RAISE(152)
+        if ((index_read) < 0 || (index_read) >= (self->_base.text)->length) RAISE(154)
         if (!(((self->_base.text)->values[index_read]) == ' ')) break;
         indentation += 1;
         if (!(indentation < expected)) break;
       }
       if (indentation < expected) {
-        CHECK(156, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base._base.code_node->_base), indentation, expected) )
+        CHECK(158, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base._base.code_node->_base), indentation, expected) )
       }
       if (skip_new_line) {
         index_write -= 1;
       }
       else {
-        if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(161)
+        if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(163)
         ((self->_base.text)->values[index_write]) = '\\';
         index_write += 1;
-        if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(163)
+        if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(165)
         ((self->_base.text)->values[index_write]) = 'n';
         index_write += 1;
       }
     }
     else {
-      if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(166)
-      if ((index_read) < 0 || (index_read) >= (self->_base.text)->length) RAISE(166)
+      if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(168)
+      if ((index_read) < 0 || (index_read) >= (self->_base.text)->length) RAISE(168)
       ((self->_base.text)->values[index_write]) = ((self->_base.text)->values[index_read]);
       index_write += 1;
     }
   }}
   if (index_write < self->_base.text->length - 1) {
-    if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(169)
+    if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(171)
     ((self->_base.text)->values[index_write]) = '"';
     index_write += 1;
-    if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(171)
+    if ((index_write) < 0 || (index_write) >= (self->_base.text)->length) RAISE(173)
     ((self->_base.text)->values[index_write]) = '\0';
     self->_base.text->length = index_write;
   }
@@ -425,7 +429,7 @@ Returncode StringExpression_analyze(StringExpression* self);
 static char* _func_name_StringExpression_analyze = "StringExpression.analyze";
 #define LUMI_FUNC_NAME _func_name_StringExpression_analyze
 Returncode StringExpression_analyze(StringExpression* self) {
-  CHECK(175, Expression_add_aux_variable(&(self->_base._base), ACCESS_VAR, false, self->_base._base.result_type, &(self->symbol)) )
+  CHECK(177, Expression_add_aux_variable(&(self->_base._base), ACCESS_VAR, false, self->_base._base.result_type, &(self->symbol)) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -437,14 +441,14 @@ static char* _func_name_StringExpression_write_preactions = "StringExpression.wr
 #define LUMI_FUNC_NAME _func_name_StringExpression_write_preactions
 Returncode StringExpression_write_preactions(StringExpression* self) {
   /* INIT_STRING_CONST(`line`, `symbol`, `text`) */
-  CHECK(180, write(&(String){19, 18, "INIT_STRING_CONST("}) )
-  CHECK(181, SyntaxTreeNode_write_line_num(&(self->_base._base._base)) )
-  CHECK(182, write(&(String){3, 2, ", "}) )
-  CHECK(183, (self->symbol)->_base._base._dtl[4](self->symbol) )
+  CHECK(182, write(&(String){19, 18, "INIT_STRING_CONST("}) )
+  CHECK(183, SyntaxTreeNode_write_line_num(&(self->_base._base._base)) )
   CHECK(184, write(&(String){3, 2, ", "}) )
-  CHECK(185, write(self->_base.text) )
-  CHECK(186, write(&(String){4, 3, ");\n"}) )
-  CHECK(187, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
+  CHECK(185, (self->symbol)->_base._base._dtl[4](self->symbol) )
+  CHECK(186, write(&(String){3, 2, ", "}) )
+  CHECK(187, write(self->_base.text) )
+  CHECK(188, write(&(String){4, 3, ");\n"}) )
+  CHECK(189, SyntaxTreeCode_write_spaces(self->_base._base.code_node) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -455,7 +459,7 @@ Returncode StringExpression_write(StringExpression* self);
 static char* _func_name_StringExpression_write = "StringExpression.write";
 #define LUMI_FUNC_NAME _func_name_StringExpression_write
 Returncode StringExpression_write(StringExpression* self) {
-  CHECK(190, (self->symbol)->_base._base._dtl[4](self->symbol) )
+  CHECK(192, (self->symbol)->_base._base._dtl[4](self->symbol) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -483,10 +487,10 @@ static char* _func_name_EmptyExpression_parse_new = "EmptyExpression.parse-new";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_parse_new
 Returncode EmptyExpression_parse_new(EmptyExpression* self, String* text, Expression** expression) {
   EmptyExpression* empty_expression = malloc(sizeof(EmptyExpression));
-  if (empty_expression == NULL) RAISE(196)
+  if (empty_expression == NULL) RAISE(198)
   *empty_expression = (EmptyExpression){EmptyExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false};
   empty_expression->_base._base._dtl = EmptyExpression__dtl;
-  CHECK(197, EmptyExpression_init(empty_expression) )
+  CHECK(199, EmptyExpression_init(empty_expression) )
   (*expression) = &(empty_expression->_base);
   free(text);
   return OK;
@@ -499,8 +503,8 @@ Returncode EmptyExpression_init(EmptyExpression* self);
 static char* _func_name_EmptyExpression_init = "EmptyExpression.init";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_init
 Returncode EmptyExpression_init(EmptyExpression* self) {
-  CHECK(202, SyntaxTreeNode_set_location(&(self->_base._base)) )
-  CHECK(203, Expression_set_simple_type(&(self->_base), glob->type_empty) )
+  CHECK(204, SyntaxTreeNode_set_location(&(self->_base._base)) )
+  CHECK(205, Expression_set_simple_type(&(self->_base), glob->type_empty) )
   self->_base.access = ACCESS_OWNER;
   return OK;
 }
@@ -512,7 +516,7 @@ Returncode EmptyExpression_write(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write = "EmptyExpression.write";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_write
 Returncode EmptyExpression_write(EmptyExpression* self) {
-  CHECK(207, write(&(String){5, 4, "NULL"}) )
+  CHECK(209, write(&(String){5, 4, "NULL"}) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -523,7 +527,7 @@ Returncode EmptyExpression_write_dynamic(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write_dynamic = "EmptyExpression.write-dynamic";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_write_dynamic
 Returncode EmptyExpression_write_dynamic(EmptyExpression* self) {
-  CHECK(210, (self)->_base._base._dtl[4](self) )
+  CHECK(212, (self)->_base._base._dtl[4](self) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -534,7 +538,7 @@ Returncode EmptyExpression_write_refman(EmptyExpression* self);
 static char* _func_name_EmptyExpression_write_refman = "EmptyExpression.write-refman";
 #define LUMI_FUNC_NAME _func_name_EmptyExpression_write_refman
 Returncode EmptyExpression_write_refman(EmptyExpression* self) {
-  CHECK(213, (self)->_base._base._dtl[4](self) )
+  CHECK(215, (self)->_base._base._dtl[4](self) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

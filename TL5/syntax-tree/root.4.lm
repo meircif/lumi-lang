@@ -223,7 +223,7 @@ class SyntaxTreeRoot(GlobalNodes)
       sys.print(user "\"\n")
       sys.exit(copy 1)
     
-    write-global(user "#include \"lumi.5.h\"\n")
+    write-global(user output-header-code)
     
     write-global(user "\n\n/* types declaration */\n")
     var TypeDeclarationWriter type-declaration-writer
@@ -273,7 +273,7 @@ class SyntaxTreeRoot(GlobalNodes)
     if glob.tested-module? or self.main-function?
       if not glob.is-new-mocked
         write(
-            user "\n\nReturncode new_Mock(Bool* allocate_success) { return OK; }")
+            user "\n\nvoid new_Mock(Bool* allocate_success) { }")
       if not glob.is-delete-mocked
         write(user "\n\nReturncode delete_Mock(Ref self) { return OK; }")
     if glob.tested-module?

@@ -2584,7 +2584,7 @@ int* ut_M_us_Length = &Lumi_empty_int;
 char* ut_M_gs = NULL;
 int ut_M_gs_Max_length = 0;
 int* ut_M_gs_Length = &Lumi_empty_int;
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
@@ -2644,7 +2644,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
@@ -2688,7 +2688,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
@@ -3274,7 +3274,7 @@ LUMI_block0_cleanup:
     (void)0;
 }
 /// @ tm0
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
@@ -5355,7 +5355,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
@@ -5399,7 +5399,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
@@ -5445,7 +5445,7 @@ void delete_Mock(Ref self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -8015,7 +8015,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
@@ -8092,7 +8092,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
@@ -8134,7 +8134,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode new_Mock(Bool* allocate_success) { return OK; }
+void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Returncode LUMI_err = OK;

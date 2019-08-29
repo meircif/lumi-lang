@@ -1,4 +1,244 @@
-#include "lumi.5.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+/* builtin type defines */
+
+typedef int Int;
+typedef char Char;
+typedef unsigned char Byte;
+
+typedef enum {
+  false = 0,
+  true = 1
+} Bool;
+
+typedef enum {
+  OK = EXIT_SUCCESS,
+  ERR = EXIT_FAILURE,
+  FAIL = EXIT_FAILURE > EXIT_SUCCESS? EXIT_FAILURE + 1 : EXIT_SUCCESS + 1
+} Returncode;
+
+typedef struct {
+  int count;
+  void* value;
+  void* ref;
+} Ref_Manager;
+
+typedef struct {
+  FILE* fobj;
+} File;
+
+typedef struct {
+  char* argv;
+  int argv_Length;
+  int argv_Value_length;
+  int* argv_String_length;
+  Ref_Manager* argv_Refman;
+  File* stdout_Cname;
+  Ref_Manager* stdout_Cname_Refman;
+  File* stdin_Cname;
+  Ref_Manager* stdin_Cname_Refman;
+  File* stderr_Cname;
+  Ref_Manager* stderr_Cname_Refman;
+} Sys;
+
+typedef void* Ref;
+
+typedef void (*Dynamic_Del)(void*);
+
+typedef void Generic_Type;
+typedef struct { Dynamic_Del _del; } Generic_Type_Dynamic;
+
+typedef struct {
+  char const* filename;
+  int lines_number;
+  int* line_count;
+} File_Coverage;
+
+typedef struct {
+  char* str;
+  int length;
+} Error_Message;
+
+typedef struct {
+  Error_Message empty_object;
+  Error_Message outdated_weak_reference;
+  Error_Message object_memory;
+  Error_Message managed_object_memory;
+  Error_Message slice_index;
+  Error_Message string_too_long;
+  Error_Message file_not_opened;
+  Error_Message file_write_failed;
+  Error_Message zero_division;
+  Error_Message loop_limit;
+} Error_Messages;
+
+
+/* macros */
+
+#define START_TRACE(line, cleanup, value, format, message, message_length) { \
+  LUMI_trace_print( \
+      format, \
+      LUMI_FILE_NAME, \
+      line, \
+      LUMI_FUNC_NAME, \
+      message, \
+      message_length); \
+  LUMI_err = value; \
+  LUMI_loop_depth = 0; \
+  goto cleanup; }
+
+#define RAISE(line, cleanup, message) { \
+  START_TRACE( \
+      line, \
+      cleanup, \
+      ERR, \
+      LUMI_raise_format, \
+      LUMI_error_messages.message.str, \
+      LUMI_error_messages.message.length) }
+
+#define USER_RAISE(line, cleanup, message, message_length) \
+  START_TRACE( \
+      line, \
+      cleanup, \
+      ERR, \
+      LUMI_raise_format, \
+      message, \
+      message_length)
+
+#define TEST_FAIL(line, cleanup, message_length, message) \
+  START_TRACE( \
+      line, cleanup, FAIL, LUMI_assert_format, message, message_length)
+
+#define TEST_ASSERT(line, cleanup, condition) if (!(condition)) \
+  TEST_FAIL(line, cleanup, 21, "condition is not true")
+
+#define TEST_FAIL_NULL(line, cleanup) \
+  START_TRACE(line, cleanup, FAIL, LUMI_assert_format, NULL, 0)
+
+#define CHECK(line, cleanup) if (LUMI_err != OK) { \
+  LUMI_trace_print( \
+      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \
+      NULL, 0); \
+  LUMI_loop_depth = 0; \
+  goto cleanup; }
+
+#define IGNORE_ERRORS(call) \
+  ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;
+
+#define CHECK_REF(line, cleanup, ref) \
+  if (ref == NULL) RAISE(line, cleanup, empty_object)
+
+#define CHECK_REFMAN(line, cleanup, refman) \
+  if (refman != NULL && (refman)->value == NULL) \
+    RAISE(line, cleanup, outdated_weak_reference)
+
+#define CHECK_REF_REFMAN(line, cleanup, ref, refman) \
+  CHECK_REF(line, cleanup, ref) \
+  if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)
+
+#define MAIN_PROXY(func) int main(int argc, char* argv[]) { \
+  return func(argc, argv); \
+}
+
+#define MAIN_FUNC MAIN_PROXY(LUMI_main)
+#define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)
+#define USER_MAIN_HEADER Returncode LUMI_user_main(void)
+
+#define ARRAY_DEL(Type, array, length) if (array != NULL) { \
+  int LUMI_n = 0; \
+  for (; LUMI_n < length; ++LUMI_n) \
+    Type##_Del(array + LUMI_n); \
+  }
+
+#define SELF_REF_DEL(Type, field) \
+while (self->field != NULL) { \
+  Type* value = self->field; \
+  self->field = value->field; \
+  value->field = NULL; \
+  Type##_Del(value); \
+  free(value); \
+}
+
+#define SELF_REF_DEL_STR(Type, field) \
+while (self->field != NULL) { \
+  Type* value = self->field; \
+  Ref_Manager* value_Refman = self->field##_Refman; \
+  self->field = value->field; \
+  self->field##_Refman = value->field##_Refman; \
+  value->field = NULL; \
+  value->field##_Refman = NULL; \
+  Type##_Del(value); \
+  LUMI_owner_dec_ref(value_Refman); \
+}
+
+#define SELF_REF_DEL_DYN(Type, bases, field) \
+while (self->field != NULL) { \
+  Type* value = self->field; \
+  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \
+  self->field = value->field; \
+  self->field##_Dynamic = value->field##_Dynamic; \
+  value->field = NULL; \
+  value->field##_Dynamic = NULL; \
+  value_Dynamic->bases##del(value); \
+  free(value); \
+}
+
+#define SELF_REF_DEL_STR_DYN(Type, bases, field) \
+while (self->field != NULL) { \
+  Type* value = self->field; \
+  Ref_Manager* value_Refman = self->field##_Refman; \
+  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \
+  self->field = value->field; \
+  self->field##_Refman = value->field##_Refman; \
+  self->field##_Dynamic = value->field##_Dynamic; \
+  value->field = NULL; \
+  value->field##_Refman = NULL; \
+  value->field##_Dynamic = NULL; \
+  value_Dynamic->bases##del(value); \
+  LUMI_owner_dec_ref(value_Refman); \
+}
+
+#define INIT_VAR_REFMAN(line, cleanup, name) \
+  name##_Refman = LUMI_new_ref(name); \
+  if (name##_Refman == NULL) { RAISE(line, cleanup, managed_object_memory) }
+
+#define INIT_NEW_REFMAN(line, cleanup, name) \
+  name##_Refman = LUMI_new_ref(name); \
+  if (name##_Refman == NULL) { \
+    free(name); \
+    name = NULL; \
+    RAISE(line, cleanup, managed_object_memory) }
+
+#define INIT_NEW(line, cleanup, name, type, size) \
+  if (size <= 0) RAISE(line, cleanup, slice_index) \
+  name = LUMI_alloc(sizeof(type) * size); \
+  if (name == NULL) RAISE(line, cleanup, object_memory)
+
+#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
+  name##_Length = length; \
+  INIT_NEW(line, cleanup, name, type, name##_Length * value_size)
+
+#define INIT_NEW_STRING(line, cleanup, name, size) \
+  name##_Max_length = size; \
+  INIT_NEW(line, cleanup, name, char, name##_Max_length) \
+  name##_Length = LUMI_alloc(sizeof(int)); \
+  if (name##_Length == NULL) { \
+    name##_Length = &Lumi_empty_int; \
+    free(name); name = NULL; \
+    RAISE(line, cleanup, object_memory) }
+
+#define INIT_STRING_CONST(line, cleanup, name, text) \
+  name = text; \
+  name##_Max_length = sizeof(text); \
+  *name##_Length = sizeof(text) - 1;
+
+
+#define String_Del(name) do { if (name##_Length != &Lumi_empty_int) { \
+  free(name##_Length); \
+  name##_Length = &Lumi_empty_int; } } while (false)
 
 
 /* traceback */
@@ -280,12 +520,12 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {
 
 /* reference counting */
 
-Returncode new_Mock(Bool*);
+void new_Mock(Bool*);
 Returncode delete_Mock(Ref);
 
 void* LUMI_alloc(size_t size) {
   Bool allocate_success = true;
-  IGNORE_ERRORS( new_Mock(&allocate_success); )
+  new_Mock(&allocate_success);
   if (allocate_success) {
     return calloc(1, size);
   }
@@ -295,7 +535,7 @@ void* LUMI_alloc(size_t size) {
 Ref_Manager* LUMI_new_ref(void* value) {
   Ref_Manager* ref = NULL;
   Bool allocate_success = true;
-  IGNORE_ERRORS( new_Mock(&allocate_success); )
+  new_Mock(&allocate_success);
   if (allocate_success) {
     ref = malloc(sizeof(Ref_Manager));
     if (ref != NULL) {
@@ -526,13 +766,27 @@ void String_has(
 
 /* File */
 
-Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
-
 void File_Del(File* self) {
   if (self != NULL && self->fobj != NULL) {
     fclose(self->fobj);
   }
 }
+
+Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
+
+#define LUMI_FUNC_NAME "file-close"
+Returncode file_close(File* file) {
+  if (lumi_debug_value == LUMI_DEBUG_FAIL || file->fobj != NULL) {
+    if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(file->fobj) != 0) {
+      free(file);
+      CRAISE("close file failed")
+    }
+    file->fobj = NULL;
+  }
+  free(file);
+  return OK;
+}
+#undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "open-file"
 Returncode open_file(
@@ -574,20 +828,6 @@ Returncode file_open_write(
   return open_file(
     file, name, name_max_length, *name_length, "w");
 }
-
-#define LUMI_FUNC_NAME "file-close"
-Returncode file_close(File* file) {
-  if (lumi_debug_value == LUMI_DEBUG_FAIL || file->fobj != NULL) {
-    if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(file->fobj) != 0) {
-      free(file);
-      CRAISE("close file failed")
-    }
-    file->fobj = NULL;
-  }
-  free(file);
-  return OK;
-}
-#undef LUMI_FUNC_NAME
 
 Bool getc_is_eof(int get, char* ch) {
   if (get == EOF) {

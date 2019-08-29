@@ -146,12 +146,12 @@ Returncode lumi_M_IncrementalString_new(lumi_M_IncrementalString* self, Ref_Mana
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  INIT_NEW(326, aux_String_0, LUMI_new_string(64));
+  INIT_NEW(329, aux_String_0, LUMI_new_string(64));
   aux_String_1 = aux_String_0;
   aux_String_1_Refman = aux_String_0_Refman;
   aux_String_0 = NULL;
   aux_String_0_Refman = NULL;
-  CHECK_REF(326, self, self_Refman)
+  CHECK_REF(329, self, self_Refman)
   String_Del(self->text);
   LUMI_owner_dec_ref(self->text_Refman);
   self->text_Refman = aux_String_1_Refman;
@@ -175,11 +175,11 @@ Returncode lumi_M_IncrementalString_clear(lumi_M_IncrementalString* self, Ref_Ma
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(text_Refman);
-  CHECK_REF(329, self, self_Refman)
+  CHECK_REF(332, self, self_Refman)
   LUMI_err = String_clear(self->text, self->text_Refman);
-  CHECK(329)
+  CHECK(332)
   LUMI_err = lumi_M_IncrementalString_concat(self, self_Refman, text, text_Refman);
-  CHECK(330)
+  CHECK(333)
 LUMI_cleanup:
   LUMI_dec_ref(text_Refman);
   LUMI_dec_ref(self_Refman);
@@ -199,9 +199,9 @@ Returncode lumi_M_IncrementalString_concat(lumi_M_IncrementalString* self, Ref_M
       ++LUMI_trace_ignore_count;
 #undef RETURN_ERROR
 #define RETURN_ERROR break
-      CHECK_REF(335, self, self_Refman)
+      CHECK_REF(338, self, self_Refman)
       LUMI_err = String_concat(self->text, self->text_Refman, text, text_Refman);
-      CHECK(335)
+      CHECK(338)
 
 #undef RETURN_ERROR
 #define RETURN_ERROR goto LUMI_cleanup
@@ -210,7 +210,7 @@ Returncode lumi_M_IncrementalString_concat(lumi_M_IncrementalString* self, Ref_M
     if (LUMI_err != OK) {
       LUMI_err = OK;
       LUMI_err = lumi_M_IncrementalString_realloc(self, self_Refman);
-      CHECK(337)
+      CHECK(340)
       continue;
     }
     break;
@@ -232,12 +232,12 @@ Returncode lumi_M_IncrementalString_append(lumi_M_IncrementalString* self, Ref_M
   String* text = NULL;
   Ref_Manager* text_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  INIT_VAR(342, text)
+  INIT_VAR(345, text)
   text_Var.values = text_Values;
   LUMI_err = String_append(text, text_Refman, ch);
-  CHECK(343)
+  CHECK(346)
   LUMI_err = lumi_M_IncrementalString_concat(self, self_Refman, text, text_Refman);
-  CHECK(344)
+  CHECK(347)
 LUMI_cleanup:
   LUMI_var_dec_ref(text_Refman);
   LUMI_dec_ref(self_Refman);
@@ -253,17 +253,17 @@ Returncode lumi_M_IncrementalString_getenv(lumi_M_IncrementalString* self, Ref_M
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   while (true) {
-    CHECK_REF(348, self, self_Refman)
+    CHECK_REF(351, self, self_Refman)
     LUMI_err = Sys_getenv(sys, sys_Refman, name, name_Refman, self->text, self->text_Refman, &(*exists));
-    CHECK(348)
+    CHECK(351)
     if (!(*exists)) break;
-    CHECK_REF(349, self, self_Refman)
-    CHECK_REF(349, self->text, self->text_Refman)
-    CHECK_REF(349, self, self_Refman)
-    CHECK_REF(349, self->text, self->text_Refman)
+    CHECK_REF(352, self, self_Refman)
+    CHECK_REF(352, self->text, self->text_Refman)
+    CHECK_REF(352, self, self_Refman)
+    CHECK_REF(352, self->text, self->text_Refman)
     if (!(self->text->length == self->text->max_length)) break;
     LUMI_err = lumi_M_IncrementalString_realloc(self, self_Refman);
-    CHECK(350)
+    CHECK(353)
   }
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
@@ -282,17 +282,17 @@ Returncode lumi_M_IncrementalString_realloc(lumi_M_IncrementalString* self, Ref_
   String* aux_String_1 = NULL;
   Ref_Manager* aux_String_1_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  CHECK_REF(353, self, self_Refman)
-  CHECK_REF(353, self, self_Refman)
-  CHECK_REF(353, self->text, self->text_Refman)
-  INIT_NEW(353, aux_String_0, LUMI_new_string(self->text->max_length * 2));
+  CHECK_REF(356, self, self_Refman)
+  CHECK_REF(356, self, self_Refman)
+  CHECK_REF(356, self->text, self->text_Refman)
+  INIT_NEW(356, aux_String_0, LUMI_new_string(self->text->max_length * 2));
   LUMI_err = String_new(aux_String_0, aux_String_0_Refman, self->text, self->text_Refman);
-  CHECK(353)
+  CHECK(356)
   aux_String_1 = aux_String_0;
   aux_String_1_Refman = aux_String_0_Refman;
   aux_String_0 = NULL;
   aux_String_0_Refman = NULL;
-  CHECK_REF(353, self, self_Refman)
+  CHECK_REF(356, self, self_Refman)
   String_Del(self->text);
   LUMI_owner_dec_ref(self->text_Refman);
   self->text_Refman = aux_String_1_Refman;
@@ -1194,126 +1194,135 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
     CHECK(265)
   }
   CHECK_REF(266, self, self_Refman)
-  CHECK_REF(266, self->lumi_path.text, self->lumi_path.text_Refman)
-  if (self->lumi_path.text->length == 0) {
+  if (self->version < '5') {
     CHECK_REF(267, self, self_Refman)
-    INIT_STRING_CONST(267, aux_String_2, "LUMIPATH");
-    LUMI_err = lumi_M_IncrementalString_getenv(&(self->lumi_path), self_Refman, aux_String_2, aux_String_2_Refman, &(aux_Bool_1));
-    CHECK(267)
-  }
-  CHECK_REF(268, self, self_Refman)
-  CHECK_REF(268, self->lumi_path.text, self->lumi_path.text_Refman)
-  if (self->lumi_path.text->length > 0) {
-    CHECK_REF(269, self, self_Refman)
-    CHECK_REF(269, self, self_Refman)
-    CHECK_REF(269, self->lumi_path.text, self->lumi_path.text_Refman)
-    CHECK_REF(269, self->lumi_path.text, self->lumi_path.text_Refman)
-    if ((self->lumi_path.text->length - 1) < 0 || (self->lumi_path.text->length - 1) >= (self->lumi_path.text)->length) RAISE(269, slice_index)
-    last = ((self->lumi_path.text)->values)[self->lumi_path.text->length - 1];
-    if (last == '\\') {
-      CHECK_REF(271, self, self_Refman)
-      self->path_separator = '\\';
+    CHECK_REF(267, self->lumi_path.text, self->lumi_path.text_Refman)
+    if (self->lumi_path.text->length == 0) {
+      CHECK_REF(268, self, self_Refman)
+      INIT_STRING_CONST(268, aux_String_2, "LUMIPATH");
+      LUMI_err = lumi_M_IncrementalString_getenv(&(self->lumi_path), self_Refman, aux_String_2, aux_String_2_Refman, &(aux_Bool_1));
+      CHECK(268)
     }
-    CHECK_REF(272, self, self_Refman)
-    CHECK_REF(272, self, self_Refman)
-    self->lumi_path_ends_with_separator = last == self->path_separator;
+    CHECK_REF(269, self, self_Refman)
+    CHECK_REF(269, self->lumi_path.text, self->lumi_path.text_Refman)
+    if (self->lumi_path.text->length > 0) {
+      CHECK_REF(270, self, self_Refman)
+      CHECK_REF(270, self, self_Refman)
+      CHECK_REF(270, self->lumi_path.text, self->lumi_path.text_Refman)
+      CHECK_REF(270, self->lumi_path.text, self->lumi_path.text_Refman)
+      if ((self->lumi_path.text->length - 1) < 0 || (self->lumi_path.text->length - 1) >= (self->lumi_path.text)->length) RAISE(270, slice_index)
+      last = ((self->lumi_path.text)->values)[self->lumi_path.text->length - 1];
+      if (last == '\\') {
+        CHECK_REF(272, self, self_Refman)
+        self->path_separator = '\\';
+      }
+      CHECK_REF(273, self, self_Refman)
+      CHECK_REF(273, self, self_Refman)
+      self->lumi_path_ends_with_separator = last == self->path_separator;
+    }
   }
-  CHECK_REF(273, self, self_Refman)
-  INIT_STRING_CONST(273, aux_String_3, " -g");
-  LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_3, aux_String_3_Refman);
-  CHECK(273)
   CHECK_REF(274, self, self_Refman)
+  INIT_STRING_CONST(274, aux_String_3, " -g");
+  LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_3, aux_String_3_Refman);
+  CHECK(274)
+  CHECK_REF(275, self, self_Refman)
   if (self->running_lumi) {
-    CHECK_REF(275, self, self_Refman)
-    CHECK_REF(275, self, self_Refman)
-    CHECK_REF(275, self, self_Refman)
+    CHECK_REF(276, self, self_Refman)
+    CHECK_REF(276, self, self_Refman)
+    CHECK_REF(276, self, self_Refman)
     if (((self->version >= '2') && (self->version <= '3')) && self->explicit_output) {
-      CHECK_REF(276, self, self_Refman)
-      INIT_STRING_CONST(276, aux_String_4, " \"");
-      LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_4, aux_String_4_Refman);
-      CHECK(276)
       CHECK_REF(277, self, self_Refman)
+      INIT_STRING_CONST(277, aux_String_4, " \"");
+      LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_4, aux_String_4_Refman);
+      CHECK(277)
       CHECK_REF(278, self, self_Refman)
-      CHECK_REF(278, self, self_Refman)
-      CHECK_REF(278, self->main_input, self->main_input_Refman)
-      INIT_VAR(278, aux_String_5)
+      CHECK_REF(279, self, self_Refman)
+      CHECK_REF(279, self, self_Refman)
+      CHECK_REF(279, self->main_input, self->main_input_Refman)
+      INIT_VAR(279, aux_String_5)
       aux_String_5_Var.length = self->main_input->length - 5;
       aux_String_5_Var.max_length = aux_String_5_Var.length + 1;
       aux_String_5_Var.values = (self->main_input)->values + (0);
-      CHECK_REF(278, self->main_input, self->main_input_Refman)
-      if ((0) < 0 || (self->main_input->length - 5) < 0 || (0) + (self->main_input->length - 5) > (self->main_input)->length) RAISE(278, slice_index)
+      CHECK_REF(279, self->main_input, self->main_input_Refman)
+      if ((0) < 0 || (self->main_input->length - 5) < 0 || (0) + (self->main_input->length - 5) > (self->main_input)->length) RAISE(279, slice_index)
       LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_5, self->main_input_Refman);
-      CHECK(277)
-      CHECK_REF(279, self, self_Refman)
-      INIT_STRING_CONST(279, aux_String_6, ".c\"");
+      CHECK(278)
+      CHECK_REF(280, self, self_Refman)
+      INIT_STRING_CONST(280, aux_String_6, ".c\"");
       LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_6, aux_String_6_Refman);
-      CHECK(279)
+      CHECK(280)
     }
     else {
         LUMI_err = lumi_M_Lumi_concat_lumi_output(self, self_Refman);
-        CHECK(281)
+        CHECK(282)
       }
   }
   else {
-      CHECK_REF(283, self, self_Refman)
-      CHECK_REF(283, self, self_Refman)
+      CHECK_REF(284, self, self_Refman)
+      CHECK_REF(284, self, self_Refman)
       LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, self->input_files.text, self->input_files.text_Refman);
-      CHECK(283)
+      CHECK(284)
     }
-  CHECK_REF(284, self, self_Refman)
-  CHECK_REF(284, self, self_Refman)
-  LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, self->external_files.text, self->external_files.text_Refman);
-  CHECK(284)
   CHECK_REF(285, self, self_Refman)
-  INIT_STRING_CONST(285, aux_String_7, " ");
-  LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_7, aux_String_7_Refman);
+  CHECK_REF(285, self, self_Refman)
+  LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, self->external_files.text, self->external_files.text_Refman);
   CHECK(285)
-  LUMI_err = lumi_M_Lumi_concat_tl_path(self, self_Refman);
+  CHECK_REF(286, self, self_Refman)
+  INIT_STRING_CONST(286, aux_String_7, " ");
+  LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_7, aux_String_7_Refman);
   CHECK(286)
   CHECK_REF(287, self, self_Refman)
-  if (self->version == '0') {
-    CHECK_REF(288, self, self_Refman)
-    INIT_STRING_CONST(288, aux_String_8, "tl0-file.c ");
-    LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_8, aux_String_8_Refman);
-    CHECK(288)
+  if (self->version < '5') {
     LUMI_err = lumi_M_Lumi_concat_tl_path(self, self_Refman);
-    CHECK(289)
-    CHECK_REF(290, self, self_Refman)
-    INIT_STRING_CONST(290, aux_String_9, "tl0-string.c");
-    LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_9, aux_String_9_Refman);
-    CHECK(290)
-  }
-  else {
+    CHECK(288)
+    CHECK_REF(289, self, self_Refman)
+    if (self->version == '0') {
+      CHECK_REF(290, self, self_Refman)
+      INIT_STRING_CONST(290, aux_String_8, "tl0-file.c ");
+      LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_8, aux_String_8_Refman);
+      CHECK(290)
+      LUMI_err = lumi_M_Lumi_concat_tl_path(self, self_Refman);
+      CHECK(291)
       CHECK_REF(292, self, self_Refman)
-      INIT_STRING_CONST(292, aux_String_10, "lumi.");
-      LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_10, aux_String_10_Refman);
+      INIT_STRING_CONST(292, aux_String_9, "tl0-string.c");
+      LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_9, aux_String_9_Refman);
       CHECK(292)
-      CHECK_REF(293, self, self_Refman)
-      CHECK_REF(293, self, self_Refman)
-      LUMI_err = lumi_M_IncrementalString_append(&(self->command), self_Refman, self->version);
-      CHECK(293)
-      CHECK_REF(294, self, self_Refman)
-      INIT_STRING_CONST(294, aux_String_11, ".c");
-      LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_11, aux_String_11_Refman);
-      CHECK(294)
     }
-  CHECK_REF(295, self, self_Refman)
-  INIT_STRING_CONST(295, aux_String_12, " -I");
-  LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_12, aux_String_12_Refman);
-  CHECK(295)
-  LUMI_err = lumi_M_Lumi_concat_tl_path(self, self_Refman);
-  CHECK(296)
-  CHECK_REF(297, self, self_Refman)
-  INIT_STRING_CONST(297, aux_String_13, " -o");
+    else {
+        CHECK_REF(294, self, self_Refman)
+        INIT_STRING_CONST(294, aux_String_10, "lumi.");
+        LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_10, aux_String_10_Refman);
+        CHECK(294)
+        CHECK_REF(295, self, self_Refman)
+        CHECK_REF(295, self, self_Refman)
+        LUMI_err = lumi_M_IncrementalString_append(&(self->command), self_Refman, self->version);
+        CHECK(295)
+        CHECK_REF(296, self, self_Refman)
+        INIT_STRING_CONST(296, aux_String_11, ".c");
+        LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_11, aux_String_11_Refman);
+        CHECK(296)
+      }
+    CHECK_REF(297, self, self_Refman)
+    INIT_STRING_CONST(297, aux_String_12, " -I");
+    LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_12, aux_String_12_Refman);
+    CHECK(297)
+    LUMI_err = lumi_M_Lumi_concat_tl_path(self, self_Refman);
+    CHECK(298)
+    CHECK_REF(299, self, self_Refman)
+    LUMI_err = lumi_M_IncrementalString_append(&(self->command), self_Refman, ' ');
+    CHECK(299)
+  }
+  CHECK_REF(300, self, self_Refman)
+  INIT_STRING_CONST(300, aux_String_13, "-o");
   LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_13, aux_String_13_Refman);
-  CHECK(297)
-  CHECK_REF(298, self, self_Refman)
-  CHECK_REF(298, self, self_Refman)
+  CHECK(300)
+  CHECK_REF(301, self, self_Refman)
+  CHECK_REF(301, self, self_Refman)
   LUMI_err = lumi_M_Lumi_concat_file_name(self, self_Refman, &(self->command), self_Refman, self->output, self->output_Refman);
-  CHECK(298)
-  INIT_STRING_CONST(299, aux_String_14, "C compiler failed");
+  CHECK(301)
+  INIT_STRING_CONST(302, aux_String_14, "C compiler failed");
   LUMI_err = lumi_M_Lumi_run_command(self, self_Refman, aux_String_14, aux_String_14_Refman);
-  CHECK(299)
+  CHECK(302)
 LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_14_Refman);
   LUMI_var_dec_ref(aux_String_13_Refman);
@@ -1345,39 +1354,39 @@ Returncode lumi_M_Lumi_run_program(lumi_M_Lumi* self, Ref_Manager* self_Refman) 
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  CHECK_REF(302, self, self_Refman)
+  CHECK_REF(305, self, self_Refman)
   LUMI_err = String_clear(self->command.text, self->command.text_Refman);
-  CHECK(302)
-  CHECK_REF(303, self, self_Refman)
-  CHECK_REF(303, self, self_Refman)
+  CHECK(305)
+  CHECK_REF(306, self, self_Refman)
+  CHECK_REF(306, self, self_Refman)
   LUMI_err = String_has(self->output, self->output_Refman, self->path_separator, &(aux_Bool_0));
-  CHECK(303)
-  if (! aux_Bool_0) {
-    CHECK_REF(304, self, self_Refman)
-    LUMI_err = lumi_M_IncrementalString_append(&(self->command), self_Refman, '.');
-    CHECK(304)
-    CHECK_REF(305, self, self_Refman)
-    CHECK_REF(305, self, self_Refman)
-    LUMI_err = lumi_M_IncrementalString_append(&(self->command), self_Refman, self->path_separator);
-    CHECK(305)
-  }
-  CHECK_REF(306, self, self_Refman)
-  CHECK_REF(306, self, self_Refman)
-  LUMI_err = lumi_M_Lumi_concat_first_file_name(self, self_Refman, &(self->command), self_Refman, self->output, self->output_Refman);
   CHECK(306)
-  CHECK_REF(307, self, self_Refman)
-  if (self->execute_arguments != NULL && self->execute_arguments_Refman->value != NULL) {
+  if (! aux_Bool_0) {
+    CHECK_REF(307, self, self_Refman)
+    LUMI_err = lumi_M_IncrementalString_append(&(self->command), self_Refman, '.');
+    CHECK(307)
     CHECK_REF(308, self, self_Refman)
-    INIT_STRING_CONST(308, aux_String_0, " ");
-    LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_0, aux_String_0_Refman);
+    CHECK_REF(308, self, self_Refman)
+    LUMI_err = lumi_M_IncrementalString_append(&(self->command), self_Refman, self->path_separator);
     CHECK(308)
-    CHECK_REF(309, self, self_Refman)
-    CHECK_REF(309, self, self_Refman)
+  }
+  CHECK_REF(309, self, self_Refman)
+  CHECK_REF(309, self, self_Refman)
+  LUMI_err = lumi_M_Lumi_concat_first_file_name(self, self_Refman, &(self->command), self_Refman, self->output, self->output_Refman);
+  CHECK(309)
+  CHECK_REF(310, self, self_Refman)
+  if (self->execute_arguments != NULL && self->execute_arguments_Refman->value != NULL) {
+    CHECK_REF(311, self, self_Refman)
+    INIT_STRING_CONST(311, aux_String_0, " ");
+    LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_0, aux_String_0_Refman);
+    CHECK(311)
+    CHECK_REF(312, self, self_Refman)
+    CHECK_REF(312, self, self_Refman)
     LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, self->execute_arguments, self->execute_arguments_Refman);
-    CHECK(309)
+    CHECK(312)
   }
   LUMI_err = lumi_M_Lumi_run_command(self, self_Refman, NULL, NULL);
-  CHECK(310)
+  CHECK(313)
 LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(self_Refman);
@@ -1392,21 +1401,21 @@ Returncode lumi_M_Lumi_run(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_err = lumi_M_Lumi_read_input(self, self_Refman);
-  CHECK(313)
-  CHECK_REF(314, self, self_Refman)
+  CHECK(316)
+  CHECK_REF(317, self, self_Refman)
   if (self->running_lumi) {
     LUMI_err = lumi_M_Lumi_run_lumi(self, self_Refman);
-    CHECK(315)
+    CHECK(318)
   }
-  CHECK_REF(316, self, self_Refman)
+  CHECK_REF(319, self, self_Refman)
   if (self->running_c) {
     LUMI_err = lumi_M_Lumi_run_c(self, self_Refman);
-    CHECK(317)
+    CHECK(320)
   }
-  CHECK_REF(318, self, self_Refman)
+  CHECK_REF(321, self, self_Refman)
   if (self->running_program) {
     LUMI_err = lumi_M_Lumi_run_program(self, self_Refman);
-    CHECK(319)
+    CHECK(322)
   }
 LUMI_cleanup:
   LUMI_dec_ref(self_Refman);
@@ -1500,11 +1509,11 @@ USER_MAIN_HEADER {
 #define RETURN_ERROR goto LUMI_cleanup
 #define LUMI_FILE_NAME "lumi-command/lumi.4.lm"
 #define LUMI_FUNC_NAME "main"
-  INIT_VAR(357, lumi_object)
+  INIT_VAR(360, lumi_object)
   LUMI_err = lumi_M_Lumi_new(lumi_object, lumi_object_Refman);
-  CHECK(357)
+  CHECK(360)
   LUMI_err = lumi_M_Lumi_run(lumi_object, lumi_object_Refman);
-  CHECK(358)
+  CHECK(361)
 LUMI_cleanup:
   LUMI_var_dec_ref(lumi_object_Refman);
   return LUMI_err;
