@@ -196,6 +196,14 @@ test test-tl4()
       ")
 
 
+test test-tl5()
+  success-test(
+      user "input.5.lm another.5.lm -o output",
+      user "tl5-compiler \"output.c\" \"input.5.lm\" \"another.5.lm\"
+      mock-cc -g \"output.c\" -o \"output\"
+      ")
+
+
 test test-test()
   success-test(
       user "-t mut input.4.lm another.4.lm -o output",

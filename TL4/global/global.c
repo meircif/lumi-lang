@@ -105,7 +105,7 @@ Returncode Global_init(Global* self) {
   self->operators = malloc(sizeof(List));
   if (self->operators == NULL) RAISE(85)
   *self->operators = (List){NULL, NULL};
-  self->input_buffer = _new_string(1024);
+  self->input_buffer = _new_string(102400);
   if (self->input_buffer == NULL) RAISE(86)
   self->test_functions = malloc(sizeof(NameMap));
   if (self->test_functions == NULL) RAISE(87)

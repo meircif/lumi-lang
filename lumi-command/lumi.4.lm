@@ -263,13 +263,14 @@ struct Lumi
   func run-c()
     if not self.command.getenv(user "CC")
       self.command.clear(user "gcc")
-    if self.lumi-path.text.length = 0
-      self.lumi-path.getenv(user "LUMIPATH")
-    if self.lumi-path.text.length > 0
-      var Char last(copy self.lumi-path.text[self.lumi-path.text.length - 1])
-      if last = '\\'
-        self.path-separator := '\\'
-      self.lumi-path-ends-with-separator := last = self.path-separator
+    if self.version < '5'
+      if self.lumi-path.text.length = 0
+        self.lumi-path.getenv(user "LUMIPATH")
+      if self.lumi-path.text.length > 0
+        var Char last(copy self.lumi-path.text[self.lumi-path.text.length - 1])
+        if last = '\\'
+          self.path-separator := '\\'
+        self.lumi-path-ends-with-separator := last = self.path-separator
     self.command.concat(user " -g")
     if self.running-lumi
       if self.version >= '2' and self.version <= '3' and self.explicit-output
@@ -283,18 +284,20 @@ struct Lumi
       self.command.concat(user self.input-files.text)
     self.command.concat(user self.external-files.text)
     self.command.concat(user " ")
-    self.concat-tl-path()
-    if self.version = '0'
-      self.command.concat(user "tl0-file.c ")
+    if self.version < '5'
       self.concat-tl-path()
-      self.command.concat(user "tl0-string.c")
-    else
-      self.command.concat(user "lumi.")
-      self.command.append(copy self.version)
-      self.command.concat(user ".c")
-    self.command.concat(user " -I")
-    self.concat-tl-path()
-    self.command.concat(user " -o")
+      if self.version = '0'
+        self.command.concat(user "tl0-file.c ")
+        self.concat-tl-path()
+        self.command.concat(user "tl0-string.c")
+      else
+        self.command.concat(user "lumi.")
+        self.command.append(copy self.version)
+        self.command.concat(user ".c")
+      self.command.concat(user " -I")
+      self.concat-tl-path()
+      self.command.append(copy ' ')
+    self.command.concat(user "-o")
     self.concat-file-name(user self.command, user self.output)
     self.run-command(user "C compiler failed")
 

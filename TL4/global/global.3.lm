@@ -83,7 +83,7 @@ static Global
     new GlobalNodes in self.builtins
     self.builtins.init()
     new List{Operator} in self.operators
-    new String{1024} in self.input-buffer
+    new String{102400} in self.input-buffer
     new NameMap{SyntaxTreeTestFunction} in self.test-functions
     new ModuleMembers in self.global-module
     self.global-module.init(user _)
