@@ -15,13 +15,14 @@ DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCW="$CC --std=c89 -Werror -Wall"
-CCA="$CCW --pedantic -Wno-unused-label -Wno-unused-variable -Wno-missing-braces"
+CC3="$CC --std=c89 -Werror -Wall -Wno-unused-variable -Wno-missing-braces"
+CC4="$CC3 --pedantic -Wno-unused-label"
 if [ $CC == "gcc" ]; then
-  CCA="$CCA -Wno-unused-but-set-variable"
+  CC4="$CC4 -Wno-unused-but-set-variable"
 else
-  CCA="$CCA -Wno-self-assign"
+  CC4="$CC4 -Wno-self-assign"
 fi
+CCA=$CC4
 
 rm -rf $DIR/.test/TL5
 mkdir -p $DIR/.test/TL5
@@ -29,8 +30,8 @@ pushd $DIR/.test
 
 
 # compile tl4-compiler
-$CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
-  ../TL4/tl4-compiler.c ../TL3/lumi.3.c -I../TL3 -I../TL4 -o TL5/tl4-compiler
+$CC3 -Wno-typedef-redefinition ../TL4/tl4-compiler.c ../TL3/lumi.3.c \
+  -I../TL3 -I../TL4 -o TL5/tl4-compiler
 
 # test tl5-compiler C file
 pushd TL5
@@ -41,12 +42,12 @@ popd
 diff ../TL5/tl5-compiler.c TL5/tl5-compiler.c
 
 # compile tl5-compiler
-$CCA ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o TL5/tl5-compiler
+$CC4 ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o TL5/tl5-compiler
 
 # run tl5-compiler unit-tests
 TL5/tl4-compiler -t tl5-compiler TL5/tl5-compiler-tests.c \
   ../TL5/tl5-compiler.4.lm ../TL5/*/*.4.lm ../TL5/tests/ut/*.4.lm
-$CCA TL5/tl5-compiler-tests.c ../TL4/lumi.4.c -I../TL4 -o TL5/tl5-compiler-tests
+$CC4 TL5/tl5-compiler-tests.c ../TL4/lumi.4.c -I../TL4 -o TL5/tl5-compiler-tests
 cp -r ../TL5/tests/ut TL5/
 TEST_DIR=TL5/ut/ TL5/tl5-compiler-tests -xml
 mv cobertura.xml TL5/ut/

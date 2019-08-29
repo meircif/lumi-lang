@@ -275,7 +275,7 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
       user List{Argument} list, user Argument argument)
     new CallArgument call-argument
     argument.copy(user call-argument)
-    new VariableExpression variable-expression(user _)
+    new VariableExpression variable-expression(user _, owner _)
     argument.get-variable()->(user variable-expression.variable)
     string-new-copy(user variable-expression.variable.name)->(
         owner variable-expression.name)

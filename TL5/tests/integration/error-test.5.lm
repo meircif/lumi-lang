@@ -104,3 +104,7 @@ test fail-assert-error-message-prefix()
 test fail-zero-division()
     var Int x(copy 0)
     assert! 12 div x! = 0
+    
+test fail-loop-limit()
+    loop! 3
+        while true

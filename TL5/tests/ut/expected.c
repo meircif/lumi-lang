@@ -3497,16 +3497,20 @@ void ut_M_Test_fun(ut_M_Test* self) {
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     do {
-        Int n = 0;
+        Int aux_Int_0 = 0;
         LUMI_loop_depth = 3;
-        for (n = 0; n < 4; ++n) {
+        do {
+            Int n = 0;
             LUMI_loop_depth = 5;
+            if (!(aux_Int_0 < 4)) { LUMI_loop_depth = 3; goto LUMI_block3_cleanup; }
+            n = aux_Int_0;
+            aux_Int_0 += 1;
             self->x += n;
         LUMI_block3_cleanup:
             (void)0;
-            if (LUMI_loop_depth < 4) break;
-        }
+        } while (LUMI_loop_depth >= 4);
         if (LUMI_loop_depth < 3) goto LUMI_block2_cleanup;
+        if (!(self->x < 30)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
     LUMI_block2_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -4060,24 +4064,26 @@ assigning empty into non-conditional type "String"
 /// @ te27
 ignoring empty reference check
 /// @ te28
-using invalid reference "error"
+using before declaration variable "error"
 /// @ te29
-using invalid reference "error"
+using before declaration variable "error"
 /// @ te30
-unknown symbol "error"
+using before declaration variable "error"
 /// @ te31
-unexpected ? initializing type "Test"
+unknown symbol "error"
 /// @ te32
-cannot use "?" on non conditional or weak reference of type "Type Name"
+unexpected ? initializing type "Test"
 /// @ te33
-ignoring initialization error check
+cannot use "?" on non conditional or weak reference of type "Type Name"
 /// @ te34
 ignoring initialization error check
 /// @ te35
-using "!" where there is no error
+ignoring initialization error check
 /// @ te36
 using "!" where there is no error
 /// @ te37
+using "!" where there is no error
+/// @ te38
 unexpected "!" after "s"
 /// @@ test-comment
 /// @ t0
@@ -4088,6 +4094,44 @@ Int x = 0;
 Int x = 0;
 /// @ t3
 Int x = 0;
+/// @@ test-block
+/// @ t0
+{
+        ut_M_Test* tt = NULL;
+        INIT_NEW(2, LUMI_block1_cleanup, tt, ut_M_Test, 1);
+        ut_M_i += 1;
+    LUMI_block1_cleanup:
+        (void)0;
+    ut_M_Test_Del(tt);
+        free(tt);
+    }
+/// @ t1
+{
+        LUMI_loop_depth = 0; goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+/// @ t2
+{
+        Int n = 0;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    {
+        Int n = 0;
+    LUMI_block2_cleanup:
+        (void)0;
+    }
+/// @ te0
+expected new-line after "block", got " "
+/// @ te1
+"break" used not inside loop
+/// @ te2
+"while" used not inside loop
+/// @ te3
+unknown symbol "tt"
+/// @ te4
+using invalid reference "tt"
 /// @@ test-if-else
 /// @ t0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
@@ -4235,11 +4279,12 @@ expected new-line after "else", got " "
 expected space after "else-if", got "("
 /// @ te10
 expected block in a new line, got "end-of-file"
-/// @@ test-do-loop
+/// @@ test-loop
 /// @ t0
 do {
         Int x = 0;
         LUMI_loop_depth = 3;
+        if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -4265,6 +4310,7 @@ do {
 do {
         LUMI_loop_depth = 3;
         LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
+        if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -4337,8 +4383,76 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t6
+Int aux_Int_0 = 0;
+    do {
+        LUMI_loop_depth = 3;
+        if (aux_Int_0 >= 1024) RAISE(1, LUMI_block1_cleanup, loop_limit)
+        ++aux_Int_0;
+        if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t7
+{
+        Int aux_Int_0 = 0;
+        Int aux_Int_1 = 0;
+        Int aux_Int_2 = 0;
+        ++LUMI_trace_ignore_count;
+        CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
+        String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
+        aux_Int_2 = aux_Int_0 + 2;
+        do {
+            LUMI_loop_depth = 3;
+            if (aux_Int_1 >= aux_Int_2) RAISE(2, LUMI_block2_cleanup, loop_limit)
+            ++aux_Int_1;
+            if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
+        LUMI_block2_cleanup:
+            (void)0;
+        } while (LUMI_loop_depth >= 2);
+        if (LUMI_loop_depth < 1) goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+    LUMI_block3_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t8
+do {
+        LUMI_loop_depth = 3;
+        ut_M_i += 1;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t9
+do {
+        LUMI_loop_depth = 3;
+        do {
+            LUMI_loop_depth = 5;
+            do {
+                LUMI_loop_depth = 7;
+                LUMI_loop_depth = 0; goto LUMI_block3_cleanup;
+            LUMI_block3_cleanup:
+                (void)0;
+            } while (LUMI_loop_depth >= 6);
+            if (LUMI_loop_depth < 5) goto LUMI_block2_cleanup;
+        LUMI_block2_cleanup:
+            (void)0;
+        } while (LUMI_loop_depth >= 4);
+        if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
-expected new-line after "do", got "("
+expected space after "loop", got "("
 /// @ te1
 "while" used not inside loop
 /// @ te2
@@ -4347,8 +4461,6 @@ expected new-line after "do", got "("
 got "Int" expression, expected "Bool"
 /// @ te4
 unknown symbol "error"
-/// @ te5
-redefinition of variable "error"
 /// @ te6
 got void expression, expected "Bool"
 /// @ te7
@@ -4359,147 +4471,187 @@ expected new-line after "continue", got " "
 "break" used not inside loop
 /// @ te10
 expected new-line after "break", got " "
+/// @ te11
+loop is infinite
+/// @ te12
+loop is infinite
+/// @ te13
+using "!" where error is not propagated
 /// @@ test-for-loop
 /// @ t0
-Int n = 0;
-    for (n = 0; n < 5; ++n) {
+Int aux_Int_0 = 0;
+    do {
+        Int n = 0;
         LUMI_loop_depth = 3;
+        if (!(aux_Int_0 < 5)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        n = aux_Int_0;
+        aux_Int_0 += 1;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t1
 Int aux_Int_0 = 0;
-    Int n = 0;
+    Int aux_Int_1 = 0;
+    Int aux_Int_2 = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
+    aux_Int_2 = ut_M_t->num;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
-    for (n = ut_M_t->num; n < aux_Int_0 + 2; ++n) {
+    aux_Int_1 = aux_Int_0 + 2;
+    do {
+        Int n = 0;
         LUMI_loop_depth = 3;
+        if (!(aux_Int_2 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        n = aux_Int_2;
+        aux_Int_2 += 1;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t2
-Char ch = 0;
-    char* aux_String_0 = NULL;
+char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
+    Int aux_Int_0 = 0;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     aux_String_0_Max_length = ut_M_ostr_Max_length;
     aux_String_0_Length = ut_M_ostr_Length;
     aux_String_0 = ut_M_ostr;
-    {int ch_Index; for (ch_Index = 0; ch_Index < *aux_String_0_Length; ++ch_Index) {
+    do {
+        Char ch = 0;
+        Int aux_Int_1 = 0;
         LUMI_loop_depth = 3;
-        ch = aux_String_0[ch_Index];
+        String_length(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, &(aux_Int_1));
+        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        ch = aux_String_0[aux_Int_0];
+        aux_Int_0 += 1;
         ut_M_c = ch;
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }}
-    aux_String_0_Max_length = 0;
-    aux_String_0_Length = &Lumi_empty_int;
-    aux_String_0 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t3
-Int n = 0;
-    Int* aux_Array_0 = NULL;
+Int* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
+    Int aux_Int_0 = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     aux_Array_0_Length = ut_M_arr_Length;
     aux_Array_0 = ut_M_arr;
-    {int n_Index; for (n_Index = 0; n_Index < aux_Array_0_Length; ++n_Index) {
+    do {
+        Int n = 0;
+        Int aux_Int_1 = 0;
         LUMI_loop_depth = 3;
-        n = aux_Array_0[n_Index];
+        Array_length(aux_Array_0, aux_Array_0_Length, &(aux_Int_1));
+        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        n = aux_Array_0[aux_Int_0];
+        aux_Int_0 += 1;
         ut_M_i += n;
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }}
-    aux_Array_0_Length = 0;
-    aux_Array_0 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t4
-char* s = NULL;
-    int s_Max_length = 0;
-    int* s_Length = &Lumi_empty_int;
-    char* aux_Array_0 = NULL;
+char* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     int aux_Array_0_Value_length = 0;
     int* aux_Array_0_String_length = NULL;
+    Int aux_Int_0 = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_sarr, ut_M_sarr_Refman)
     aux_Array_0_Length = ut_M_sarr_Length;
     aux_Array_0_Value_length = ut_M_sarr_Value_length;
     aux_Array_0_String_length = ut_M_sarr_String_length;
     aux_Array_0 = ut_M_sarr;
-    {int s_Index; for (s_Index = 0; s_Index < aux_Array_0_Length; ++s_Index) {
-        LUMI_loop_depth = 3;
-        s = aux_Array_0 + s_Index * aux_Array_0_Value_length;
-        s_Max_length = aux_Array_0_Value_length;
-        s_Length = aux_Array_0_String_length + s_Index;
-        /* start loop */
-        String_clear(s, s_Max_length, s_Length);
-    LUMI_block1_cleanup:
-        (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }}
-    aux_Array_0_Length = 0;
-    aux_Array_0_Value_length = 0;
-    aux_Array_0_String_length = NULL;
-    aux_Array_0 = NULL;
-    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t5
-Int n = 0;
-    for (n = 0; n < 5; ++n) {
-        LUMI_loop_depth = 3;
-        ut_M_i += n;
-    LUMI_block1_cleanup:
-        (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t6
-Int n = 0;
-    for (n = 0; n < 5; ++n) {
-        LUMI_loop_depth = 3;
-        ut_M_i += n;
-    LUMI_block1_cleanup:
-        (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    for (n = 0; n < 7; ++n) {
-        LUMI_loop_depth = 3;
-        ut_M_i += n;
-    LUMI_block2_cleanup:
-        (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t7
-Int n = 0;
-    for (n = 0; n < 1 + 2; ++n) {
-        LUMI_loop_depth = 3;
-        ut_M_i += n;
-    LUMI_block1_cleanup:
-        (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t8
-Int n = 0;
-    for (n = 0; n < 6; ++n) {
-        char sa[4] = {0};
-        int sa_Length[1] = {0};
-        Char ch = 0;
+    do {
+        char* s = NULL;
+        int s_Max_length = 0;
+        int* s_Length = &Lumi_empty_int;
+        Int aux_Int_1 = 0;
         char* aux_String_0 = NULL;
         int aux_String_0_Max_length = 0;
         int* aux_String_0_Length = &Lumi_empty_int;
         LUMI_loop_depth = 3;
+        Array_length(aux_Array_0, aux_Array_0_Length, &(aux_Int_1));
+        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        aux_String_0 = aux_Array_0 + aux_Int_0 * aux_Array_0_Value_length;
+        aux_String_0_Max_length = aux_Array_0_Value_length;
+        aux_String_0_Length = aux_Array_0_String_length + aux_Int_0;
+        s_Max_length = aux_String_0_Max_length;
+        s_Length = aux_String_0_Length;
+        s = aux_String_0;
+        aux_Int_0 += 1;
+        String_clear(s, s_Max_length, s_Length);
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t5
+Int n = 0;
+    Int aux_Int_0 = 0;
+    do {
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_0 < 5)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        n = aux_Int_0;
+        aux_Int_0 += 1;
+        ut_M_i += n;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t6
+Int aux_Int_0 = 0;
+    Int aux_Int_1 = 0;
+    do {
+        Int n = 0;
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_0 < 5)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        n = aux_Int_0;
+        aux_Int_0 += 1;
+        ut_M_i += n;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    do {
+        Int n = 0;
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_1 < 7)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
+        n = aux_Int_1;
+        aux_Int_1 += 1;
+        ut_M_i += n;
+    LUMI_block2_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t7
+Int aux_Int_0 = 0;
+    do {
+        Int n = 0;
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_0 < (1 + 2))) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        n = aux_Int_0;
+        aux_Int_0 += 1;
+        ut_M_i += n;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t8
+Int aux_Int_0 = 0;
+    do {
+        char sa[4] = {0};
+        int sa_Length[1] = {0};
+        Int n = 0;
+        char* aux_String_0 = NULL;
+        int aux_String_0_Max_length = 0;
+        int* aux_String_0_Length = &Lumi_empty_int;
+        Int aux_Int_1 = 0;
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_0 < 6)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        n = aux_Int_0;
+        aux_Int_0 += 1;
         /* initializing sa */
         LUMI_loop_depth = 1; goto LUMI_block1_cleanup;
         LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
@@ -4513,11 +4665,16 @@ Int n = 0;
         aux_String_0_Max_length = ut_M_ostr_Max_length;
         aux_String_0_Length = ut_M_ostr_Length;
         aux_String_0 = ut_M_ostr;
-        {int ch_Index; for (ch_Index = 0; ch_Index < *aux_String_0_Length; ++ch_Index) {
+        do {
             char sb[4] = {0};
             int sb_Length[1] = {0};
+            Char ch = 0;
+            Int aux_Int_2 = 0;
             LUMI_loop_depth = 5;
-            ch = aux_String_0[ch_Index];
+            String_length(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, &(aux_Int_2));
+            if (!(aux_Int_1 < aux_Int_2)) { LUMI_loop_depth = 3; goto LUMI_block3_cleanup; }
+            ch = aux_String_0[aux_Int_1];
+            aux_Int_1 += 1;
             /* initializing sb */
             LUMI_loop_depth = 3; goto LUMI_block3_cleanup;
             LUMI_loop_depth = 4; goto LUMI_block3_cleanup;
@@ -4529,16 +4686,11 @@ Int n = 0;
             if (LUMI_loop_depth < 5) goto LUMI_block3_cleanup;
         LUMI_block3_cleanup:
             (void)0;
-            if (LUMI_loop_depth < 4) break;
-        }}
-        aux_String_0_Max_length = 0;
-        aux_String_0_Length = &Lumi_empty_int;
-        aux_String_0 = NULL;
+        } while (LUMI_loop_depth >= 4);
         if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t9
 char* s = NULL;
@@ -4547,10 +4699,10 @@ char* s = NULL;
     char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
-    Char ch = 0;
     char* aux_String_1 = NULL;
     int aux_String_1_Max_length = 0;
     int* aux_String_1_Length = &Lumi_empty_int;
+    Int aux_Int_0 = 0;
     INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "text");
     s_Max_length = aux_String_0_Max_length;
     s_Length = aux_String_0_Length;
@@ -4558,48 +4710,99 @@ char* s = NULL;
     aux_String_1_Max_length = s_Max_length;
     aux_String_1_Length = s_Length;
     aux_String_1 = s;
-    {int ch_Index; for (ch_Index = 0; ch_Index < *aux_String_1_Length; ++ch_Index) {
+    do {
+        Char ch = 0;
+        Int aux_Int_1 = 0;
         LUMI_loop_depth = 3;
-        ch = aux_String_1[ch_Index];
+        String_length(aux_String_1, aux_String_1_Max_length, aux_String_1_Length, &(aux_Int_1));
+        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        ch = aux_String_1[aux_Int_0];
+        aux_Int_0 += 1;
         ut_M_c = ch;
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }}
-    aux_String_1_Max_length = 0;
-    aux_String_1_Length = &Lumi_empty_int;
-    aux_String_1 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ t10
 char sa[3 * 4] = {0};
     int sa_String_length[3] = {0};
-    char* s = NULL;
-    int s_Max_length = 0;
-    int* s_Length = &Lumi_empty_int;
     char* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     int aux_Array_0_Value_length = 0;
     int* aux_Array_0_String_length = NULL;
+    Int aux_Int_0 = 0;
     /* initializing sa */
     aux_Array_0_Length = 3;
     aux_Array_0_Value_length = 4;
     aux_Array_0_String_length = sa_String_length;
     aux_Array_0 = sa;
-    {int s_Index; for (s_Index = 0; s_Index < aux_Array_0_Length; ++s_Index) {
+    do {
+        char* s = NULL;
+        int s_Max_length = 0;
+        int* s_Length = &Lumi_empty_int;
+        Int aux_Int_1 = 0;
+        char* aux_String_0 = NULL;
+        int aux_String_0_Max_length = 0;
+        int* aux_String_0_Length = &Lumi_empty_int;
         LUMI_loop_depth = 3;
-        s = aux_Array_0 + s_Index * 4;
+        Array_length(aux_Array_0, 3, &(aux_Int_1));
+        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        aux_String_0 = aux_Array_0 + aux_Int_0 * 4;
+        aux_String_0_Max_length = 4;
+        aux_String_0_Length = aux_Array_0_String_length + aux_Int_0;
         s_Max_length = 4;
-        s_Length = aux_Array_0_String_length + s_Index;
-        /* start loop */
+        s_Length = aux_String_0_Length;
+        s = aux_String_0;
+        aux_Int_0 += 1;
         String_clear(s, 4, s_Length);
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }}
-    aux_Array_0_Length = 0;
-    aux_Array_0_Value_length = 0;
-    aux_Array_0_String_length = NULL;
-    aux_Array_0 = NULL;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t11
+Int aux_Int_0 = 0;
+    aux_Int_0 = 2;
+    do {
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_0 < 6)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        aux_Int_0 += 1;
+        ut_M_i += 1;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t12
+char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
+    Int aux_Int_0 = 0;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    aux_String_0_Max_length = ut_M_ostr_Max_length;
+    aux_String_0_Length = ut_M_ostr_Length;
+    aux_String_0 = ut_M_ostr;
+    do {
+        Int aux_Int_1 = 0;
+        LUMI_loop_depth = 3;
+        String_length(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, &(aux_Int_1));
+        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        aux_Int_0 += 1;
+        ut_M_i += 1;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t13
+Int aux_Int_0 = 0;
+    Int aux_Int_1 = 0;
+    aux_Int_0 = ut_M_i + 4;
+    do {
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_1 < aux_Int_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        aux_Int_1 += 1;
+        ut_M_i += 1;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
 expected space after "for", got "("
@@ -4616,7 +4819,7 @@ unknown symbol "error"
 /// @ te6
 cannot assign "String" into "Int"
 /// @ te7
-using invalid reference "n"
+using before declaration variable "n"
 /// @@ test-testing
 /// @ ta0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
@@ -4721,6 +4924,7 @@ if (ut_M_b) {
         int s_Length[1] = {0};
         Char* aux_Array_0 = NULL;
         int aux_Array_0_Length = 0;
+        Int aux_Int_0 = 0;
         /* initializing s */
         TEST_ASSERT(3, LUMI_block1_cleanup, ut_M_b)
         ++LUMI_trace_ignore_count;
@@ -4738,6 +4942,8 @@ if (ut_M_b) {
             Char* aux_Array_1 = NULL;
             int aux_Array_1_Length = 0;
             LUMI_loop_depth = 3;
+            if (!(aux_Int_0 < 3)) { LUMI_loop_depth = 1; goto LUMI_block3_cleanup; }
+            aux_Int_0 += 1;
             ++LUMI_trace_ignore_count;
             if (ut_M_i < 0 || ut_M_i + 2 > *(s_Length)) RAISE(6, LUMI_block4_cleanup, slice_index)
             aux_Array_1 = s + ut_M_i;
@@ -5021,7 +5227,7 @@ void ut_M_fun0(void) {
     unsigned LUMI_loop_depth = 1;
     Int x = 0;
     Int y = 0;
-    Int n = 0;
+    Int aux_Int_0 = 0;
     ++LUMI_file_coverage[0].line_count[2];
     x = 4;
     ++LUMI_file_coverage[0].line_count[3];
@@ -5118,14 +5324,17 @@ void ut_M_fun0(void) {
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     ++LUMI_file_coverage[0].line_count[27];
-    for (n = 0; n < 3; ++n) {
+    do {
+        Int n = 0;
         LUMI_loop_depth = 3;
+        if (!(aux_Int_0 < 3)) { LUMI_loop_depth = 1; goto LUMI_block14_cleanup; }
+        n = aux_Int_0;
+        aux_Int_0 += 1;
         ++LUMI_file_coverage[0].line_count[28];
         x += y;
     LUMI_block14_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
@@ -6992,9 +7201,7 @@ struct ut_M_TestIterator {
     Int counter;
 };
 void ut_M_TestIterator_new(ut_M_TestIterator* self, Int count);
-void ut_M_TestIterator_has(ut_M_TestIterator* self, Bool* has_data);
-void ut_M_TestIterator_get(ut_M_TestIterator* self, Int* num);
-void ut_M_TestIterator_next(ut_M_TestIterator* self);
+void ut_M_TestIterator_step(ut_M_TestIterator* self, Int* num, Bool* has_data);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self);
 Returncode ut_M_fun(Int* i);
 Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
@@ -7003,17 +7210,7 @@ void ut_M_TestIterator_new(ut_M_TestIterator* self, Int count) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_TestIterator_has(ut_M_TestIterator* self, Bool* has_data) {
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
-}
-void ut_M_TestIterator_get(ut_M_TestIterator* self, Int* num) {
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
-}
-void ut_M_TestIterator_next(ut_M_TestIterator* self) {
+void ut_M_TestIterator_step(ut_M_TestIterator* self, Int* num, Bool* has_data) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
@@ -7025,27 +7222,23 @@ Returncode ut_M_fun(Int* i) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     ut_M_TestIterator* aux_TestIterator_0 = NULL;
-    Int n = 0;
     ut_M_TestIterator* aux_TestIterator_1 = NULL;
-    INIT_NEW(8, LUMI_block0_cleanup, aux_TestIterator_0, ut_M_TestIterator, 1);
+    INIT_NEW(6, LUMI_block0_cleanup, aux_TestIterator_0, ut_M_TestIterator, 1);
     ut_M_TestIterator_new(aux_TestIterator_0, 6);
     aux_TestIterator_1 = aux_TestIterator_0;
-    while (true) {
-        Bool n_Has = false;
+    do {
         char s[4] = {0};
         int s_Length[1] = {0};
+        Int n = 0;
+        Bool aux_Bool_0 = 0;
         LUMI_loop_depth = 3;
-        ut_M_TestIterator_has(aux_TestIterator_1, &(n_Has));
-        if (!n_Has) break;
-        ut_M_TestIterator_get(aux_TestIterator_1, &(n));
+        ut_M_TestIterator_step(aux_TestIterator_1, &(n), &(aux_Bool_0));
+        if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         /* initializing s */
         *i = n;
-        ut_M_TestIterator_next(aux_TestIterator_1);
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    aux_TestIterator_1 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
@@ -7059,64 +7252,45 @@ struct ut_M_TestIterator {
     char* value;
     int value_Max_length;
     int* value_Length;
-    Ref_Manager* value_Refman;
 };
-void ut_M_TestIterator_has(ut_M_TestIterator* self, Bool* has_data);
-Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, char** text, int* text_Max_length, int** text_Length);
-void ut_M_TestIterator_next(ut_M_TestIterator* self);
+void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, int* text_Max_length, int** text_Length, Bool* has_data);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self);
 void ut_M_fun(ut_M_TestIterator* iter);
 Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
-void ut_M_TestIterator_has(ut_M_TestIterator* self, Bool* has_data) {
+void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, int* text_Max_length, int** text_Length, Bool* has_data) {
     unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
-}
-Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, char** text, int* text_Max_length, int** text_Length) {
-    Returncode LUMI_err = OK;
-    unsigned LUMI_loop_depth = 1;
-    CHECK_REFMAN(5, LUMI_block0_cleanup, self->value_Refman)
     *text_Max_length = self->value_Max_length;
     *text_Length = self->value_Length;
     *text = self->value;
 LUMI_block0_cleanup:
     (void)0;
-    return LUMI_err;
-}
-void ut_M_TestIterator_next(ut_M_TestIterator* self) {
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
 }
 void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
     if (self == NULL) return;
-    LUMI_dec_ref(self->value_Refman);
+    String_Del(self->value);
+    free(self->value);
 }
 void ut_M_fun(ut_M_TestIterator* iter) {
     unsigned LUMI_loop_depth = 1;
-    char* s = NULL;
-    int s_Max_length = 0;
-    int* s_Length = &Lumi_empty_int;
     char* t = NULL;
     int t_Max_length = 0;
     int* t_Length = &Lumi_empty_int;
+    char* s = NULL;
+    int s_Max_length = 0;
+    int* s_Length = &Lumi_empty_int;
     ut_M_TestIterator* aux_TestIterator_0 = NULL;
     aux_TestIterator_0 = iter;
-    while (true) {
-        Bool t_Has = false;
+    do {
+        Bool aux_Bool_0 = 0;
         LUMI_loop_depth = 3;
-        ut_M_TestIterator_has(aux_TestIterator_0, &(t_Has));
-        if (!t_Has) break;
-        ut_M_TestIterator_get(aux_TestIterator_0, &(t), &(t_Max_length), &(t_Length));
+        ut_M_TestIterator_step(aux_TestIterator_0, &(t), &(t_Max_length), &(t_Length), &(aux_Bool_0));
+        if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         s_Max_length = t_Max_length;
         s_Length = t_Length;
         s = t;
-        ut_M_TestIterator_next(aux_TestIterator_0);
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    aux_TestIterator_0 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
@@ -7137,34 +7311,22 @@ struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
     void (*fun)(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 };
-void ut_M_TestIterator_has(ut_M_TestIterator* self, Bool* has_data);
-Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic);
-void ut_M_TestIterator_next(ut_M_TestIterator* self);
+Returncode ut_M_TestIterator_step(ut_M_TestIterator* self, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self);
 void ut_M_Test_fun(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self);
-void ut_M_fun(ut_M_TestIterator* fiter, ut_M_TestIterator* titer);
+Returncode ut_M_fun(ut_M_TestIterator* fiter, ut_M_TestIterator* titer);
 Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_fun};
-void ut_M_TestIterator_has(ut_M_TestIterator* self, Bool* has_data) {
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
-}
-Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic) {
+Returncode ut_M_TestIterator_step(ut_M_TestIterator* self, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    CHECK_REFMAN(5, LUMI_block0_cleanup, self->item_Refman)
+    CHECK_REFMAN(4, LUMI_block0_cleanup, self->item_Refman)
     *item_Dynamic = self->item_Dynamic;
     *item = self->item;
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
-}
-void ut_M_TestIterator_next(ut_M_TestIterator* self) {
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
 }
 void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
     if (self == NULL) return;
@@ -7178,49 +7340,45 @@ LUMI_block0_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-void ut_M_fun(ut_M_TestIterator* fiter, ut_M_TestIterator* titer) {
+Returncode ut_M_fun(ut_M_TestIterator* fiter, ut_M_TestIterator* titer) {
+    Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     File* of = NULL;
     ut_M_Test* ot = NULL;
     ut_M_Test_Dynamic* ot_Dynamic = NULL;
-    File* f = NULL;
     ut_M_TestIterator* aux_TestIterator_0 = NULL;
-    ut_M_Test* t = NULL;
-    ut_M_Test_Dynamic* t_Dynamic = NULL;
     ut_M_TestIterator* aux_TestIterator_1 = NULL;
     aux_TestIterator_0 = fiter;
-    while (true) {
-        Bool f_Has = false;
+    do {
+        File* f = NULL;
+        Bool aux_Bool_0 = 0;
         LUMI_loop_depth = 3;
-        ut_M_TestIterator_has(aux_TestIterator_0, &(f_Has));
-        if (!f_Has) break;
-        ut_M_TestIterator_get(aux_TestIterator_0, (void*)&(f), &dynamic_Void);
+        LUMI_err = ut_M_TestIterator_step(aux_TestIterator_0, (void*)&(f), &dynamic_Void, &(aux_Bool_0));
+        CHECK(11, LUMI_block1_cleanup)
+        if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         of = f;
-        ut_M_TestIterator_next(aux_TestIterator_0);
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    aux_TestIterator_0 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     aux_TestIterator_1 = titer;
-    while (true) {
-        Bool t_Has = false;
+    do {
+        ut_M_Test* t = NULL;
+        ut_M_Test_Dynamic* t_Dynamic = NULL;
+        Bool aux_Bool_1 = 0;
         LUMI_loop_depth = 3;
-        ut_M_TestIterator_has(aux_TestIterator_1, &(t_Has));
-        if (!t_Has) break;
-        ut_M_TestIterator_get(aux_TestIterator_1, (void*)&(t), (void*)&(t_Dynamic));
+        LUMI_err = ut_M_TestIterator_step(aux_TestIterator_1, (void*)&(t), (void*)&(t_Dynamic), &(aux_Bool_1));
+        CHECK(13, LUMI_block2_cleanup)
+        if (!(aux_Bool_1)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
         ot_Dynamic = t_Dynamic;
         ot = t;
-        ut_M_TestIterator_next(aux_TestIterator_1);
     LUMI_block2_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    aux_TestIterator_1 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
+    return LUMI_err;
 }
 /// @ t3
 typedef struct ut_M_TestIterator ut_M_TestIterator;
@@ -7232,96 +7390,201 @@ struct ut_M_TestIterator {
 };
 struct ut_M_TestIterator_Dynamic {
     Dynamic_Del _del;
-    void (*has)(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Bool* has_data);
-    Returncode (*get)(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic);
-    void (*next)(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
+    Returncode (*step)(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data);
 };
-void ut_M_TestIterator_has(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Bool* has_data);
-Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic);
-void ut_M_TestIterator_next(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
+Returncode ut_M_TestIterator_step(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self);
-void ut_M_f_mock(ut_M_TestIterator* iter, ut_M_TestIterator_Dynamic* iter_Dynamic);
-ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del, ut_M_TestIterator_has, ut_M_TestIterator_get, ut_M_TestIterator_next};
-void ut_M_TestIterator_has(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Bool* has_data) {
-    unsigned LUMI_loop_depth = 1;
-LUMI_block0_cleanup:
-    (void)0;
-}
-Returncode ut_M_TestIterator_get(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic) {
+Returncode ut_M_f_mock(ut_M_TestIterator* iter, ut_M_TestIterator_Dynamic* iter_Dynamic);
+ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del, ut_M_TestIterator_step};
+Returncode ut_M_TestIterator_step(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    CHECK_REFMAN(5, LUMI_block0_cleanup, self->item_Refman)
+    CHECK_REFMAN(4, LUMI_block0_cleanup, self->item_Refman)
     *item_Dynamic = self->item_Dynamic;
     *item = self->item;
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-void ut_M_TestIterator_next(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic) {
+void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->item_Refman);
+}
+Returncode ut_M_f_mock(ut_M_TestIterator* iter, ut_M_TestIterator_Dynamic* iter_Dynamic) {
+    Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
+    File* f = NULL;
+    ut_M_TestIterator* aux_TestIterator_0 = NULL;
+    ut_M_TestIterator_Dynamic* aux_TestIterator_0_Dynamic = NULL;
+    aux_TestIterator_0_Dynamic = iter_Dynamic;
+    aux_TestIterator_0 = iter;
+    do {
+        File* t = NULL;
+        Bool aux_Bool_0 = 0;
+        LUMI_loop_depth = 3;
+        LUMI_err = aux_TestIterator_0_Dynamic->step(aux_TestIterator_0, aux_TestIterator_0_Dynamic, (void*)&(t), &dynamic_Void, &(aux_Bool_0));
+        CHECK(7, LUMI_block1_cleanup)
+        if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        f = t;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+/// @ t4
+typedef struct ut_M_TestIterator ut_M_TestIterator;
+struct ut_M_TestIterator {
+    char* value;
+    int value_Max_length;
+    int* value_Length;
+};
+void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, int* text_Max_length, int** text_Length, Ref_Manager** text_Refman, Bool* has_data);
+void ut_M_TestIterator_Del(ut_M_TestIterator* self);
+void ut_M_fun(ut_M_TestIterator* iter);
+Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
+void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, int* text_Max_length, int** text_Length, Ref_Manager** text_Refman, Bool* has_data) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
+    ++LUMI_trace_ignore_count;
+    CHECK_REF(4, LUMI_block2_cleanup, self->value)
+    INIT_NEW_STRING(4, LUMI_block2_cleanup, aux_String_0, 12);
+    LUMI_err = String_copy(aux_String_0, 12, aux_String_0_Length, self->value, *self->value_Length);
+    String_Del(*text);
+    LUMI_owner_dec_ref(*text_Refman);
+    *text_Max_length = 12;
+    *text_Length = aux_String_0_Length;
+    *text = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
+    INIT_NEW_REFMAN(4, LUMI_block2_cleanup, *text)
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        String_Del(*text);
+        LUMI_owner_dec_ref(*text_Refman);
+        *text_Refman = NULL;
+        *text_Max_length = 0;
+        *text_Length = &Lumi_empty_int;
+        *text = NULL;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    free(aux_String_0);
+}
+void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
+    if (self == NULL) return;
+    String_Del(self->value);
+    free(self->value);
+}
+void ut_M_fun(ut_M_TestIterator* iter) {
+    unsigned LUMI_loop_depth = 1;
+    char* s = NULL;
+    int s_Max_length = 0;
+    int* s_Length = &Lumi_empty_int;
+    ut_M_TestIterator* aux_TestIterator_0 = NULL;
+    aux_TestIterator_0 = iter;
+    do {
+        char* t = NULL;
+        int t_Max_length = 0;
+        int* t_Length = &Lumi_empty_int;
+        Ref_Manager* t_Refman = NULL;
+        Bool aux_Bool_0 = 0;
+        LUMI_loop_depth = 3;
+        ut_M_TestIterator_step(aux_TestIterator_0, &(t), &(t_Max_length), &(t_Length), &(t_Refman), &(aux_Bool_0));
+        if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        String_Del(s);
+        free(s);
+        LUMI_var_dec_ref(t_Refman);
+        s_Max_length = t_Max_length;
+        s_Length = t_Length;
+        s = t;
+        t = NULL;
+        t_Refman = NULL;
+        t_Length = &Lumi_empty_int;
+    LUMI_block1_cleanup:
+        (void)0;
+    String_Del(t);
+        LUMI_owner_dec_ref(t_Refman);
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(s);
+    free(s);
+}
+/// @ t5
+typedef struct ut_M_TestIterator ut_M_TestIterator;
+struct ut_M_TestIterator {
+    char* value;
+    int value_Max_length;
+    int* value_Length;
+};
+void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, int* text_Max_length, int** text_Length, Bool* has_data);
+void ut_M_TestIterator_Del(ut_M_TestIterator* self);
+void ut_M_fun(ut_M_TestIterator* iter);
+Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
+void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, int* text_Max_length, int** text_Length, Bool* has_data) {
+    unsigned LUMI_loop_depth = 1;
+    *text_Max_length = self->value_Max_length;
+    *text_Length = self->value_Length;
+    *text = self->value;
 LUMI_block0_cleanup:
     (void)0;
 }
 void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
     if (self == NULL) return;
-    LUMI_dec_ref(self->item_Refman);
+    String_Del(self->value);
+    free(self->value);
 }
-void ut_M_f_mock(ut_M_TestIterator* iter, ut_M_TestIterator_Dynamic* iter_Dynamic) {
+void ut_M_fun(ut_M_TestIterator* iter) {
     unsigned LUMI_loop_depth = 1;
-    File* f = NULL;
-    File* t = NULL;
+    Int x = 0;
     ut_M_TestIterator* aux_TestIterator_0 = NULL;
-    ut_M_TestIterator_Dynamic* aux_TestIterator_0_Dynamic = NULL;
-    aux_TestIterator_0_Dynamic = iter_Dynamic;
     aux_TestIterator_0 = iter;
-    while (true) {
-        Bool t_Has = false;
+    do {
+        char* aux_String_0 = NULL;
+        int aux_String_0_Max_length = 0;
+        int* aux_String_0_Length = &Lumi_empty_int;
+        Bool aux_Bool_0 = 0;
         LUMI_loop_depth = 3;
-        aux_TestIterator_0_Dynamic->has(aux_TestIterator_0, aux_TestIterator_0_Dynamic, &(t_Has));
-        if (!t_Has) break;
-        aux_TestIterator_0_Dynamic->get(aux_TestIterator_0, aux_TestIterator_0_Dynamic, (void*)&(t), &dynamic_Void);
-        f = t;
-        aux_TestIterator_0_Dynamic->next(aux_TestIterator_0, aux_TestIterator_0_Dynamic);
+        ut_M_TestIterator_step(aux_TestIterator_0, &(aux_String_0), &(aux_String_0_Max_length), &(aux_String_0_Length), &(aux_Bool_0));
+        if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        x += 1;
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }
-    aux_TestIterator_0_Dynamic = NULL;
-    aux_TestIterator_0 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ te0
-cannot iterate type with no "has" named method - "TestIterator"
+cannot iterate type with no "step" named method - "TestIterator"
 /// @ te1
-iterator "has" method has parameters in type "TestIterator"
+iterator "step" method has parameters in type "TestIterator"
 /// @ te2
-iterator "has" method has no outputs in type "TestIterator"
+iterator "step" method has no outputs in type "TestIterator"
 /// @ te3
-iterator "has" method has more than one output in type "TestIterator"
+iterator "step" method has only one output in type "TestIterator"
 /// @ te4
-iterator "has" method output is not "Bool" in type "TestIterator"
+iterator "step" method has more than two outputs in type "TestIterator"
 /// @ te5
-cannot iterate type with no "get" named method - "TestIterator"
+iterator "step" method second output is not "Bool" in type "TestIterator"
 /// @ te6
-iterator "get" method has parameters in type "TestIterator"
+iterator "step" method self access is not "user" in type "TestIterator"
 /// @ te7
-iterator "get" method has no outputs in type "TestIterator"
-/// @ te8
-iterator "get" method has more than one output in type "TestIterator"
-/// @ te9
-iterator "get" method output has an illegal access in type "TestIterator"
-/// @ te10
-iterator "get" method output has an illegal access in type "TestIterator"
-/// @ te11
-cannot iterate type with no "next" named method - "TestIterator"
-/// @ te12
-iterator "next" method has parameters in type "TestIterator"
-/// @ te13
-iterator "next" method has outputs in type "TestIterator"
-/// @ te14
-assigning conditional into non-conditional type "String"
+ignoring iterator step function error check
 /// @@ test-complex-fields
 /// @ t0
 typedef struct ut_M_Astruct ut_M_Astruct;
@@ -8021,6 +8284,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     do {
         LUMI_loop_depth = 3;
         ut_M_give(&(s), &(s_Max_length), &(s_Length));
+        if (!(s != NULL)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -8219,6 +8483,7 @@ char* s = NULL;
     int aux_Array_0_Length = 0;
     int aux_Array_0_Value_length = 0;
     int* aux_Array_0_String_length = NULL;
+    Int aux_Int_0 = 0;
     s_Max_length = ut_M_ostr_Max_length;
     s_Length = ut_M_ostr_Length;
     s = ut_M_ostr;
@@ -8232,23 +8497,58 @@ char* s = NULL;
     aux_Array_0_Value_length = ut_M_sarr_Value_length;
     aux_Array_0_String_length = ut_M_sarr_String_length;
     aux_Array_0 = ut_M_sarr;
-    {int s_Index; for (s_Index = 0; s_Index < aux_Array_0_Length; ++s_Index) {
+    do {
+        Int aux_Int_1 = 0;
+        char* aux_String_0 = NULL;
+        int aux_String_0_Max_length = 0;
+        int* aux_String_0_Length = &Lumi_empty_int;
         LUMI_loop_depth = 3;
-        s = aux_Array_0 + s_Index * aux_Array_0_Value_length;
-        s_Max_length = aux_Array_0_Value_length;
-        s_Length = aux_Array_0_String_length + s_Index;
-        /* start loop */
+        Array_length(aux_Array_0, aux_Array_0_Length, &(aux_Int_1));
+        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        aux_String_0 = aux_Array_0 + aux_Int_0 * aux_Array_0_Value_length;
+        aux_String_0_Max_length = aux_Array_0_Value_length;
+        aux_String_0_Length = aux_Array_0_String_length + aux_Int_0;
+        s_Max_length = aux_String_0_Max_length;
+        s_Length = aux_String_0_Length;
+        s = aux_String_0;
+        aux_Int_0 += 1;
         CHECK_REF(4, LUMI_block1_cleanup, s)
         String_clear(s, s_Max_length, s_Length);
     LUMI_block1_cleanup:
         (void)0;
-        if (LUMI_loop_depth < 2) break;
-    }}
-    aux_Array_0_Length = 0;
-    aux_Array_0_Value_length = 0;
-    aux_Array_0_String_length = NULL;
-    aux_Array_0 = NULL;
+    } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ tu6
+void ut_M_get(char** s, int* s_Max_length, int** s_Length);
+Returncode ut_M_fun(void);
+void ut_M_get(char** s, int* s_Max_length, int** s_Length) {
+    unsigned LUMI_loop_depth = 1;
+    *s_Max_length = 0;
+    *s_Length = &Lumi_empty_int;
+    *s = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+}
+Returncode ut_M_fun(void) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    do {
+        char* s = NULL;
+        int s_Max_length = 0;
+        int* s_Length = &Lumi_empty_int;
+        LUMI_loop_depth = 3;
+        ut_M_get(&(s), &(s_Max_length), &(s_Length));
+        if (!(s != NULL)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        CHECK_REF(7, LUMI_block1_cleanup, s)
+        String_clear(s, s_Max_length, s_Length);
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
 /// @ tb0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
@@ -8344,9 +8644,9 @@ using invalid reference "t"
 /// @ teo22
 using modified reference "t"
 /// @ teo23
-using invalid reference "t"
+using invalid reference "s"
 /// @ teo24
-using modified reference "t"
+using potentially illegal user reference "{anonymous}"
 /// @ teo25
 using invalid reference "s"
 /// @ teu0

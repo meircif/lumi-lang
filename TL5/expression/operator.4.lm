@@ -216,7 +216,8 @@ class ArithmeticAssignOperatorExpression(BinaryExpression)
 func arithmetic-assign-operator-factory(
     user SyntaxTreeCode code-node, user Operator operator)->(
     owner BinaryExpression expression)
-  expression := ArithmeticAssignOperatorExpression(user code-node, user operator)
+  expression :=
+      ArithmeticAssignOperatorExpression(user code-node, user operator)
 
 
 ~~~ := ~~~
@@ -266,7 +267,7 @@ class SwapOperatorExpression(BinaryExpression)
     if not self.left-expression.assignable or
         not self.right-expression.assignable
       self.syntax-error-msg(user "swapping non assignable expression")
-    self.add-aux-variable(
+    self.code-node.add-aux-variable(
         copy self.left-expression.access,
         copy false,
         user self.left-expression.result-type)->(

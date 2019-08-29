@@ -42,9 +42,15 @@ class TextExpression(Expression)
 class IntExpression(Expression)
   var Int value
   
+  new(user SyntaxTreeCode code-node, copy Int value)
+    base(user code-node)
+    self.value := value
+    self.set-simple-type(user glob.type-int)
+    self.access := Access.VAR
+  
   func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
       owner Expression expression)
-    new IntExpression int-expression(user code-node)
+    new IntExpression int-expression(user code-node, copy 0)
     int-expression.parse(owner text)
     expression := int-expression
   
@@ -73,8 +79,6 @@ class IntExpression(Expression)
       self.syntax-error(user "illegal number", user text)
     if is-negative
       self.value := - self.value
-    self.set-simple-type(user glob.type-int)
-    self.access := Access.VAR
     text := _
   
   func dynamic get-constant-value()->(var Int value, var Bool has-value)
@@ -198,7 +202,7 @@ class StringExpression(TextExpression)
       self.text.length := index-write
   
   func dynamic analyze()
-    self.add-aux-variable(
+    self.code-node.add-aux-variable(
         copy Access.VAR, copy true, user self.result-type)->(
         owner self.aux-variable)
   

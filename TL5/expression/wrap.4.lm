@@ -47,6 +47,11 @@ class WrapExpression(Expression)
     self.expression.write-refman()
 
 
+class AnalyzedExpression(WrapExpression)
+  func dynamic analyze()
+    ; do nothing - already analyzed
+
+
 class TypeCastExpression(WrapExpression)
   new(owner Expression expression)
     base(owner expression)
@@ -126,7 +131,7 @@ class OwnerToStrongCallExpression(WrapExpression)
     base(owner expression)
     self.owner-expression := self.expression
     self.access := Access.STRONG
-    self.add-aux-variable(
+    self.code-node.add-aux-variable(
         copy Access.STRONG, copy false, user self.result-type)->(
         owner self.expression)
 
@@ -156,6 +161,8 @@ class CheckExpression(WrapExpression)
       self.result-type.conditional := false
     if self.check-weak
       self.access := Access.USER
+    self.error-propagated := true
+    self.error-expected := false
   
   func dynamic analyze()
     if self.check-conditional

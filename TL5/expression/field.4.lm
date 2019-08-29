@@ -8,17 +8,13 @@ class FieldExpression(Expression)
   user SyntaxTreeVariable variable
   owner Expression instance
   var Int bases
-  
-  func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
-      owner Expression expression)
-    new FieldExpression field-expression(user code-node)
-    field-expression.parse(owner expression, owner text)
-    expression := field-expression
-  
-  ~~~ parsing `instance.symbol` ~~~
-  func inst parse(owner Expression instance, owner String text)
+
+  new(user SyntaxTreeCode code-node,
+      owner Expression instance,
+      owner String name)
+    base(user code-node)
     self.instance := instance
-    self.name := text
+    self.name := name
   
   func dynamic restructure()->(
       owner Expression expression, owner FunctionArguments arguments)
@@ -38,8 +34,8 @@ class FieldExpression(Expression)
       instance-type := instance-type.parameters.first.item.type-data.base-type
     
     if instance-type.type-data is glob.type-module
-      new VariableExpression variable-expression(user self.code-node)
-      variable-expression.name := self.name
+      new VariableExpression variable-expression(
+          user self.code-node, owner self.name)
       variable-expression.module-name := instance-type.name
       expression := variable-expression
       expression.restructure()->(owner expression, owner arguments)

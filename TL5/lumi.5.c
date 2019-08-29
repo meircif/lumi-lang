@@ -23,19 +23,19 @@ Sys* sys = NULL;
 Ref_Manager* sys_Refman = NULL;
 int Lumi_empty_int = 0;
 
-#define ERROR_MESAGE(field, message) {message, sizeof(message) - 1}
+#define ERROR_MESAGE(message) {message, sizeof(message) - 1}
 
 Error_Messages LUMI_error_messages = {
-  ERROR_MESAGE(empty_object, "empty object used"),
-  ERROR_MESAGE(outdated_weak_reference, "outdated weak reference used"),
-  ERROR_MESAGE(
-      object_memory, "insufficient memory for object dynamic allocation"),
-  ERROR_MESAGE(managed_object_memory, "insufficient memory for managed object"),
-  ERROR_MESAGE(slice_index, "slice index out of bounds"),
-  ERROR_MESAGE(string_too_long, "string too long"),
-  ERROR_MESAGE(file_not_opened, "file not opened"),
-  ERROR_MESAGE(file_write_failed, "file write failed"),
-  ERROR_MESAGE(zero_division, "zero division")
+  ERROR_MESAGE("empty object used"),
+  ERROR_MESAGE("outdated weak reference used"),
+  ERROR_MESAGE("insufficient memory for object dynamic allocation"),
+  ERROR_MESAGE("insufficient memory for managed object"),
+  ERROR_MESAGE("slice index out of bounds"),
+  ERROR_MESAGE("string too long"),
+  ERROR_MESAGE("file not opened"),
+  ERROR_MESAGE("file write failed"),
+  ERROR_MESAGE("zero division"),
+  ERROR_MESAGE("loop limit reached")
 };
 
 enum {

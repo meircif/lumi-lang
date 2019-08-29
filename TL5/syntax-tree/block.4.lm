@@ -16,6 +16,9 @@ class SyntaxTreeCode(SyntaxTreeNode)
       self.parent.find-variable(user name, user _)->(user variable)
     else
       base(user name, user module-name)->(user variable)
+    if variable?
+      if variable.not-declared-yet
+        self.syntax-error(user "using before declaration variable", user name)
   
   func inst get-function()->(user SyntaxTreeFunction function)
     self.parent.get-function()->(user function)
@@ -25,6 +28,9 @@ class SyntaxTreeCode(SyntaxTreeNode)
 
   func dynamic set-has-error()->(var Bool need-check)
     self.parent.set-has-error()->(var need-check)
+
+  func dynamic set-loop-finite(copy Bool is-return)
+    self.parent.set-loop-finite(copy is-return)
     
   func inst check-function-has-error()
     user SyntaxTreeFunction function
@@ -33,7 +39,22 @@ class SyntaxTreeCode(SyntaxTreeNode)
       self.syntax-error(
           user "error raised inside function not declared as error raising",
           user function.name)
-
+  
+  func inst add-aux-variable(
+      copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
+      owner VariableExpression expression)
+    user SyntaxTreeVariable variable
+    self.parent.add-aux-variable(
+        copy access, copy is-create, user type-instance)->(
+        user variable)
+    expression := VariableExpression(
+        user self, owner string-new-copy(user variable.name))
+    expression.variable := variable
+    type-instance.copy-new()->(owner expression.result-type)
+    expression.access := access
+    expression.assignable := true
+    expression.result-type.reference-path := ReferencePath(user variable)
+  
   func dynamic check-memory(user ReferenceMemoryList refs)
     ; do nothing
   
@@ -123,8 +144,12 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     
     if self.has-end-point()
       self.syntax-error-msg(user "unreachable code")
+  
+    if self.equal-and-new-line(user keyword, user "block")
+      self.code-nodes.add(
+          owner SyntaxTreeBlockNode.parse-new(user _, user self))
     
-    if self.equal-and-space(user keyword, user "if")
+    else-if self.equal-and-space(user keyword, user "if")
       new-if := SyntaxTreeIf.parse-new(user _, user self)->(owner owner-if)
       self.code-nodes.add(owner owner-if)
       
@@ -138,11 +163,20 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.add-else-if(owner SyntaxTreeIf.parse-new(user _, user self))->(
           user new-if)
       
-    else-if self.equal-and-new-line(user keyword, user "do")
-      self.code-nodes.add(owner SyntaxTreeDoLoop.parse-new(user _, user self))
+    else-if keyword.equal(user "loop")
+      self.code-nodes.add(
+          owner SyntaxTreeLoop.parse-new(user _, user self, copy true))
+  
+    else-if self.equal-and-new-line(user keyword, user "loop-infinite")
+      self.code-nodes.add(
+          owner SyntaxTreeLoop.parse-new(user _, user self, copy false))
       
     else-if self.equal-and-space(user keyword, user "for")
       self.code-nodes.add(owner SyntaxTreeForLoop.parse-new(user _, user self))
+      
+    else-if self.equal-and-space(user keyword, user "repeat")
+      self.code-nodes.add(
+          owner SyntaxTreeRepeatLoop.parse-new(user _, user self))
       
     else-if self.equal-and-space(user keyword, user "while")
       self.code-nodes.add(owner SyntaxTreeWhile.parse-new(user _, user self))
@@ -248,6 +282,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
 
   func dynamic set-has-error()->(var Bool need-check)
     self.code-node.set-has-error()->(var need-check)
+
+  func dynamic set-loop-finite(copy Bool is-return)
+    if self.code-node?
+      self.code-node.set-loop-finite(copy is-return)
   
   func inst add-aux-variable(
       copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
@@ -303,7 +341,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     self.write-block-end()
   
   func inst write-block-start()
-    write(user " {\n")
+    write(user "{\n")
   
   func dynamic write-block-body()
     self.write-children(user self.code-nodes)
