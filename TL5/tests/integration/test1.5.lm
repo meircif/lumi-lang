@@ -353,7 +353,7 @@ func ! cleanup-test(user Array{Ref} refs)
                     do
                         strong Link le(strong Link())
                         refs[4] := le
-                        for n in 3
+                        repeat 3
                             strong Link lf(strong Link())
                             refs[5] := lf
                             return
@@ -381,6 +381,13 @@ test test-block-delete()
     for n in 3
         strong Link lb(strong Link()!)
         refs[n]! := lb
+    has-refs(user refs, copy 3)!
+    
+    n := 0
+    repeat 3
+        strong Link lb(strong Link()!)
+        refs[n]! := lb
+        n += 1
     has-refs(user refs, copy 3)!
     
     record-delete := false

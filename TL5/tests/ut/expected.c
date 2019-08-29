@@ -4676,6 +4676,19 @@ char* aux_String_0 = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t13
+Int aux_Int_0 = 0;
+    Int aux_Int_1 = 0;
+    aux_Int_0 = ut_M_i + 4;
+    do {
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_1 < aux_Int_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        aux_Int_1 += 1;
+        ut_M_i += 1;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
 expected space after "for", got "("
 /// @ te1

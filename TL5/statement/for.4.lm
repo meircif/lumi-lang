@@ -1,6 +1,7 @@
 ~~~ TL5 compiler - Syntax tree for loop ~~~
 module tl5-compiler
 
+
 ~~~ For loop node in the syntax tree ~~~
 class SyntaxTreeForLoop(SyntaxTreeDoLoop)
   var ExpressionValue start
@@ -20,7 +21,7 @@ class SyntaxTreeForLoop(SyntaxTreeDoLoop)
     self.iterator.new(user ":", user self)
     if glob.last-char = ':'
       self.start.expression := self.iterator.expression
-      self.iterator.new(user ":", user self)
+      self.iterator.new(user "", user self)
     self.parse-block()
   
   func dynamic analyze()
@@ -175,6 +176,9 @@ class SyntaxTreeForLoop(SyntaxTreeDoLoop)
   func inst add-item-variable(
       user TypeInstance item-type-instance, copy Int item-access)->(
       owner VariableCreate variable-create)
+    if not self.item-name?
+      return
+    
     if self.item-name.equal(user "_")
       self.item-name := _
       return
@@ -359,3 +363,27 @@ class SyntaxTreeForLoop(SyntaxTreeDoLoop)
   func dynamic write()
     self.write-children(user self.code-nodes)
     base()
+
+
+~~~ Repeat loop node in the syntax tree ~~~
+class SyntaxTreeRepeatLoop(SyntaxTreeForLoop)
+  func inst parse-new(user SyntaxTreeBlock parent)->(
+      owner SyntaxTreeRepeatLoop new-node)
+    new-node := SyntaxTreeRepeatLoop(user parent)
+    new-node.parse()
+
+  func inst parse()
+    self.iterator.new(user "", user self)
+    self.parse-block()
+  
+  func dynamic analyze-iterator()->(
+      owner TypeInstance item-type-instance,
+      var Int item-access,
+      var Bool is-int-iteration,
+      var Bool is-index-iteration)
+    self.analyze-expression(user self.iterator, user glob.type-int)
+    self.iterator.check-no-error()
+    glob.type-int.new-type-instance()->(owner item-type-instance)
+    item-access := Access.VAR
+    is-int-iteration := true
+    is-index-iteration := true

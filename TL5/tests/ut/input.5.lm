@@ -2020,6 +2020,9 @@ for _ in 2:6
 ; @ c t12
 for _ in ostr!
     i += 1
+; @ c t13
+repeat i + 4
+    i += 1
 ; @ ec te0
 for(
 ; @ ec te1

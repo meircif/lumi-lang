@@ -162,6 +162,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     else-if self.equal-and-space(user keyword, user "for")
       self.code-nodes.add(owner SyntaxTreeForLoop.parse-new(user _, user self))
       
+    else-if self.equal-and-space(user keyword, user "repeat")
+      self.code-nodes.add(
+          owner SyntaxTreeRepeatLoop.parse-new(user _, user self))
+      
     else-if self.equal-and-space(user keyword, user "while")
       self.code-nodes.add(owner SyntaxTreeWhile.parse-new(user _, user self))
       
