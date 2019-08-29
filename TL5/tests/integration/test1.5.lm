@@ -350,7 +350,7 @@ func ! cleanup-test(user Array{Ref} refs)
                 if true
                     strong Link ld(strong Link())
                     refs[3] := ld
-                    do
+                    loop
                         strong Link le(strong Link())
                         refs[4] := le
                         repeat 3
@@ -368,7 +368,7 @@ test test-block-delete()
     has-refs(user refs, copy 6)!
     
     var Int n
-    do
+    loop
         strong Link la(strong Link()!)
         refs[n]! := la
         n += 1

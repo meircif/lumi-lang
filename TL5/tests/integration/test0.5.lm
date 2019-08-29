@@ -313,12 +313,12 @@ func ! test-code-flow(user Array{Int} arr)->(var Int res)
         res := 6
     else
         res := 0
-    do
+    loop
         arr[6]! := 6
         var Int x(copy arr[2]!)
         while x > 3 and arr is _
         var Int y(copy x - 1)
-        do
+        loop
             arr[4]! := arr[8]!
             if y > arr[4]!
                 continue

@@ -4240,7 +4240,7 @@ expected new-line after "else", got " "
 expected space after "else-if", got "("
 /// @ te10
 expected block in a new line, got "end-of-file"
-/// @@ test-do-loop
+/// @@ test-loop
 /// @ t0
 do {
         Int x = 0;
@@ -4343,7 +4343,7 @@ do {
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
-expected new-line after "do", got "("
+expected new-line after "loop", got "("
 /// @ te1
 "while" used not inside loop
 /// @ te2

@@ -133,15 +133,15 @@ class SyntaxTreeElse(SyntaxTreeFlowElement)
     self.write-block()
 
 
-~~~ Do loop node in the syntax tree ~~~
-class SyntaxTreeDoLoop(SyntaxTreeFlowElement)
+~~~ Loop node in the syntax tree ~~~
+class SyntaxTreeLoop(SyntaxTreeFlowElement)
   new(user SyntaxTreeBlock parent)
     base(user parent)
     self.block.loop-depth := parent.loop-depth + 1
   
   func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeDoLoop new-node)
-    new-node := SyntaxTreeDoLoop(user parent)
+      owner SyntaxTreeLoop new-node)
+    new-node := SyntaxTreeLoop(user parent)
     new-node.parse-block()
 
   func dynamic check-memory(user ReferenceMemoryList refs)

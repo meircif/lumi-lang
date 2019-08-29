@@ -804,7 +804,7 @@ if t!?
 ; @ ec ten15
 if b!
 ; @ ec ten16
-do
+loop
     while b!
 ; @ ec ten17
 for _ in 3!
@@ -1484,7 +1484,7 @@ struct Test
     func user fun()
         if self.x > 3
             self.x := 3
-        do
+        loop
             for n in 4
                 self.x += n
 ; @ g t9
@@ -1643,9 +1643,9 @@ var Int name
 var Int name
 ; @ ec te4
 var Int name
-do
+loop
     var Int x
-    do
+    loop
         var Int name
 ; @ eg te5
 var Int name
@@ -1899,39 +1899,39 @@ else-if()
 ; @ feg te10
 func error()
     if b
-; @@ test-do-loop
+; @@ test-loop
 ; @ c t0
-do
+loop
     var Int x
 ; @ c t1
-do
+loop
     break
 ; @ c t2
-do
+loop
     while t!.num > 3
 ; @ c t3
-do
+loop
     continue
 ; @ c t4
-do
+loop
     if true
         while false
 ; @ c t5
-do
+loop
     var String{4} sa
     while b
     break
     continue
     if b
         return
-    do
+    loop
         var String{4} sb
         while b
         break
         continue
         if b
             return
-        do
+        loop
             var String{4} sc
             while b
             break
@@ -1939,30 +1939,30 @@ do
             if b
                 return
 ; @ ec te0
-do(
+loop(
 ; @ ec te1
 while true
 ; @ ec te2
 continue
 ; @ ec te3
-do
+loop
     while 2
 ; @ ec te4
-do
+loop
     error
 ; @ ec te6
-do
+loop
     while i := 3
 ; @ ec te7
-do
+loop
     while
 ; @ ec te8
-do
+loop
     continue error
 ; @ ec te9
 break
 ; @ ec te10
-do
+loop
     break error
 ; @@ test-for-loop
 ; @ c t0
@@ -2064,7 +2064,7 @@ if b
     var String{4} s
     assert! b
     assert-error! s[i:2]
-    do
+    loop
         assert-error! s[i:2]
 ; @ g tm0
 func ! fun()
@@ -2152,7 +2152,7 @@ func fun0()
         return
     else
         x := 3
-    do
+    loop
         while x > 1
         if x = 5
             continue
@@ -3195,7 +3195,7 @@ func ! fun(owner String? s, user Test tu, owner Test to)
     take(owner to.s)
     var Array{12:Int} arr
     arr[4] := arr[8]
-    do
+    loop
         give()->(owner s)
 ; @ g tu0
 func deleting()->(owner String? s)
@@ -3242,7 +3242,7 @@ for s in sarr!
 func get()->(user String? s)
     s := _
 func ! fun()
-    do
+    loop
         user String? s
         while get()->(user s)?
         s!.clear()
@@ -3373,7 +3373,7 @@ if b
 tbad.meth()
 ; @ ec teo17
 new String{12} s!
-do
+loop
     s.clear()
     ostr := s
     if b
@@ -3668,7 +3668,7 @@ if false
 str!.clear()
 ; @ ec teu44
 str := ostr
-do
+loop
     str!.clear()
     ostr := _
     if b

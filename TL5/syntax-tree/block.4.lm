@@ -156,8 +156,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.add-else-if(owner SyntaxTreeIf.parse-new(user _, user self))->(
           user new-if)
       
-    else-if self.equal-and-new-line(user keyword, user "do")
-      self.code-nodes.add(owner SyntaxTreeDoLoop.parse-new(user _, user self))
+    else-if self.equal-and-new-line(user keyword, user "loop")
+      self.code-nodes.add(owner SyntaxTreeLoop.parse-new(user _, user self))
       
     else-if self.equal-and-space(user keyword, user "for")
       self.code-nodes.add(owner SyntaxTreeForLoop.parse-new(user _, user self))

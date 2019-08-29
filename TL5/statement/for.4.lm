@@ -3,7 +3,7 @@ module tl5-compiler
 
 
 ~~~ For loop node in the syntax tree ~~~
-class SyntaxTreeForLoop(SyntaxTreeDoLoop)
+class SyntaxTreeForLoop(SyntaxTreeLoop)
   var ExpressionValue start
   var ExpressionValue iterator
   var List{SyntaxTreeCode} code-nodes
