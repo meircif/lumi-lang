@@ -60,6 +60,7 @@ class ExpressionValue(SyntaxTreeNode)
   
   func inst write-preactions()
     self.expression.write-preactions()
+  
   func dynamic write()
     self.expression.write()
 

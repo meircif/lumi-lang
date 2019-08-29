@@ -9,6 +9,9 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
   var List{SyntaxTreeCode} code-nodes
   owner String item-name
   
+  new(user SyntaxTreeBlock parent)
+    base(user parent, copy false)
+  
   func inst parse-new(user SyntaxTreeBlock parent)->(
       owner SyntaxTreeForLoop new-node)
     new-node := SyntaxTreeForLoop(user parent)

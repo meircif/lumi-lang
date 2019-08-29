@@ -36,6 +36,9 @@ class SyntaxTreeReturn(SyntaxTreeCode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.get-function().check-outputs-memory(user refs)
   
+  func dynamic analyze()
+    self.set-loop-finite(copy true)
+  
   func dynamic write()
     self.write-spaces()
     self.write-loop-jump(copy 0)
@@ -104,6 +107,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
   func dynamic analyze()
     self.analyze-expression(user self.condition, user glob.type-bool)
     self.condition.check-no-error()
+    self.set-loop-finite(copy false)
 
   func dynamic check-memory(user ReferenceMemoryList refs)
     self.condition.check-memory(user refs)
@@ -129,6 +133,9 @@ class SyntaxTreeBreak(SyntaxTreeCode)
   func inst parse()
     if self.parent.loop-depth = 0
       self.syntax-error-msg(user "\"break\" used not inside loop")
+    
+  func dynamic analyze()
+    self.set-loop-finite(copy false)
   
   func dynamic write()
     self.write-spaces()

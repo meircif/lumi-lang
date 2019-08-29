@@ -3510,6 +3510,7 @@ void ut_M_Test_fun(ut_M_Test* self) {
             (void)0;
         } while (LUMI_loop_depth >= 4);
         if (LUMI_loop_depth < 3) goto LUMI_block2_cleanup;
+        if (!(self->x < 30)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
     LUMI_block2_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -4283,6 +4284,7 @@ expected block in a new line, got "end-of-file"
 do {
         Int x = 0;
         LUMI_loop_depth = 3;
+        if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -4308,6 +4310,7 @@ do {
 do {
         LUMI_loop_depth = 3;
         LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
+        if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -4380,8 +4383,76 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t6
+Int aux_Int_0 = 0;
+    do {
+        LUMI_loop_depth = 3;
+        if (aux_Int_0 >= 1024) RAISE(1, LUMI_block1_cleanup, loop_limit)
+        ++aux_Int_0;
+        if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t7
+{
+        Int aux_Int_0 = 0;
+        Int aux_Int_1 = 0;
+        Int aux_Int_2 = 0;
+        ++LUMI_trace_ignore_count;
+        CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
+        String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
+        aux_Int_2 = aux_Int_0 + 2;
+        do {
+            LUMI_loop_depth = 3;
+            if (aux_Int_1 >= aux_Int_2) RAISE(2, LUMI_block2_cleanup, loop_limit)
+            ++aux_Int_1;
+            if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
+        LUMI_block2_cleanup:
+            (void)0;
+        } while (LUMI_loop_depth >= 2);
+        if (LUMI_loop_depth < 1) goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+    LUMI_block3_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t8
+do {
+        LUMI_loop_depth = 3;
+        ut_M_i += 1;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ t9
+do {
+        LUMI_loop_depth = 3;
+        do {
+            LUMI_loop_depth = 5;
+            do {
+                LUMI_loop_depth = 7;
+                LUMI_loop_depth = 0; goto LUMI_block3_cleanup;
+            LUMI_block3_cleanup:
+                (void)0;
+            } while (LUMI_loop_depth >= 6);
+            if (LUMI_loop_depth < 5) goto LUMI_block2_cleanup;
+        LUMI_block2_cleanup:
+            (void)0;
+        } while (LUMI_loop_depth >= 4);
+        if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ te0
-expected new-line after "loop", got "("
+expected space after "loop", got "("
 /// @ te1
 "while" used not inside loop
 /// @ te2
@@ -4400,6 +4471,12 @@ expected new-line after "continue", got " "
 "break" used not inside loop
 /// @ te10
 expected new-line after "break", got " "
+/// @ te11
+loop is infinite
+/// @ te12
+loop is infinite
+/// @ te13
+using "!" where error is not propagated
 /// @@ test-for-loop
 /// @ t0
 Int aux_Int_0 = 0;
@@ -4847,6 +4924,7 @@ if (ut_M_b) {
         int s_Length[1] = {0};
         Char* aux_Array_0 = NULL;
         int aux_Array_0_Length = 0;
+        Int aux_Int_0 = 0;
         /* initializing s */
         TEST_ASSERT(3, LUMI_block1_cleanup, ut_M_b)
         ++LUMI_trace_ignore_count;
@@ -4864,6 +4942,8 @@ if (ut_M_b) {
             Char* aux_Array_1 = NULL;
             int aux_Array_1_Length = 0;
             LUMI_loop_depth = 3;
+            if (!(aux_Int_0 < 3)) { LUMI_loop_depth = 1; goto LUMI_block3_cleanup; }
+            aux_Int_0 += 1;
             ++LUMI_trace_ignore_count;
             if (ut_M_i < 0 || ut_M_i + 2 > *(s_Length)) RAISE(6, LUMI_block4_cleanup, slice_index)
             aux_Array_1 = s + ut_M_i;
@@ -8204,6 +8284,7 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, ut_M_Test* tu, ut_
     do {
         LUMI_loop_depth = 3;
         ut_M_give(&(s), &(s_Max_length), &(s_Length));
+        if (!(s != NULL)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);

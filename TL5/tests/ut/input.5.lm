@@ -1487,6 +1487,7 @@ struct Test
         loop
             for n in 4
                 self.x += n
+            while self.x < 30
 ; @ g t9
 struct Test
     var Int x
@@ -1934,6 +1935,7 @@ func error()
 ; @ c t0
 loop
     var Int x
+    while b
 ; @ c t1
 loop
     break
@@ -1943,6 +1945,7 @@ loop
 ; @ c t3
 loop
     continue
+    while b
 ; @ c t4
 loop
     if true
@@ -1969,8 +1972,23 @@ loop
             continue
             if b
                 return
+; @ c t6
+loop! 1024
+    while b
+; @ c t7
+try
+    loop ostr.length() + 2
+        while b
+; @ c t8
+loop-infinite
+    i += 1
+; @ c t9
+loop
+    loop
+        loop
+            return
 ; @ ec te0
-loop(
+loop!(
 ; @ ec te1
 while true
 ; @ ec te2
@@ -1995,6 +2013,17 @@ break
 ; @ ec te10
 loop
     break error
+; @ ec te11
+loop
+    i += 1
+; @ ec te12
+loop
+    loop
+        break
+; @ ec te13
+try
+    loop! 64
+        while b
 ; @@ test-for-loop
 ; @ c t0
 for n in 5
@@ -2095,7 +2124,7 @@ if b
     var String{4} s
     assert! b
     assert-error! s[i:2]
-    loop
+    repeat 3
         assert-error! s[i:2]
 ; @ g tm0
 func ! fun()
@@ -3228,6 +3257,7 @@ func ! fun(owner String? s, user Test tu, owner Test to)
     arr[4] := arr[8]
     loop
         give()->(owner s)
+        while s?
 ; @ g tu0
 func deleting()->(owner String? s)
     s := _
@@ -3404,7 +3434,7 @@ if b
 tbad.meth()
 ; @ ec teo17
 new String{12} s!
-loop
+repeat 12
     s.clear()
     ostr := s
     if b
@@ -3699,7 +3729,7 @@ if false
 str!.clear()
 ; @ ec teu44
 str := ostr
-loop
+repeat 12
     str!.clear()
     ostr := _
     if b

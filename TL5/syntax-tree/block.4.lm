@@ -28,6 +28,9 @@ class SyntaxTreeCode(SyntaxTreeNode)
 
   func dynamic set-has-error()->(var Bool need-check)
     self.parent.set-has-error()->(var need-check)
+
+  func dynamic set-loop-finite(copy Bool is-return)
+    self.parent.set-loop-finite(copy is-return)
     
   func inst check-function-has-error()
     user SyntaxTreeFunction function
@@ -160,8 +163,13 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.add-else-if(owner SyntaxTreeIf.parse-new(user _, user self))->(
           user new-if)
       
-    else-if self.equal-and-new-line(user keyword, user "loop")
-      self.code-nodes.add(owner SyntaxTreeLoop.parse-new(user _, user self))
+    else-if keyword.equal(user "loop")
+      self.code-nodes.add(
+          owner SyntaxTreeLoop.parse-new(user _, user self, copy true))
+  
+    else-if self.equal-and-new-line(user keyword, user "loop-infinite")
+      self.code-nodes.add(
+          owner SyntaxTreeLoop.parse-new(user _, user self, copy false))
       
     else-if self.equal-and-space(user keyword, user "for")
       self.code-nodes.add(owner SyntaxTreeForLoop.parse-new(user _, user self))
@@ -274,6 +282,10 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
 
   func dynamic set-has-error()->(var Bool need-check)
     self.code-node.set-has-error()->(var need-check)
+
+  func dynamic set-loop-finite(copy Bool is-return)
+    if self.code-node?
+      self.code-node.set-loop-finite(copy is-return)
   
   func inst add-aux-variable(
       copy Int access, copy Bool is-create, user TypeInstance type-instance)->(

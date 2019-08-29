@@ -368,7 +368,7 @@ test test-block-delete()
     has-refs(user refs, copy 6)!
     
     var Int n
-    loop
+    loop! 3
         strong Link la(strong Link()!)
         refs[n]! := la
         n += 1
@@ -376,6 +376,16 @@ test test-block-delete()
             continue
         if n = 3
             break
+    has-refs(user refs, copy 3)!
+    
+    n := 0
+    try
+        loop-infinite
+            strong Link la(strong Link())
+            refs[n] := la
+            n += 1
+            if n = 3
+                raise
     has-refs(user refs, copy 3)!
     
     for n in 3
@@ -423,6 +433,10 @@ func ! failed-assert-error()
 func ! wrong-message-assert-error()
     assert-error! raise-message(), "wrong message"
 
+func ! loop-limit-reached()
+    loop! 3
+        while true
+
 var Int new-fail-countdown
 
 mock new()->(var Bool alloc-success)
@@ -463,6 +477,7 @@ test test-assert-error-message()
     var Int zero(copy 0)
     assert-error! 24 div zero, "zero division"
     assert-error! 24 mod zero, "zero division"
+    assert-error! loop-limit-reached(), "loop limit reached"
 
 native var Int lumi-debug-value
 
