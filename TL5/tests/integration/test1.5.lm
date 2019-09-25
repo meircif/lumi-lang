@@ -123,22 +123,24 @@ test test-another()
     var Int x
     assert! x = 0
 
-
+native include "external.h"
 native var Int external-int
+native const Int EXTERNAL-CONST
 native type Native
 native func ! external(copy Int i, user String s)->(var Int io, var Native n)
-native func external2(copy Native n)->(var Bool b)
+native func external2(copy Native n)->(var Int i)
 
 
 test test-native()
     assert! external-int = 6
+    assert! EXTERNAL-CONST = 12
     var Int i
     var Native n
     var String{4} s(user "bb")!
     assert-error! external(copy 3, user s)->(var i, var n)
     assert! i = 3
     assert! s[0] = 'a'
-    assert! external2(copy n)
+    assert! external2(copy n) > 0
 
 
 test test-dynamic-type-parameters()

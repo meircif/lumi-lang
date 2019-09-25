@@ -460,12 +460,12 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
   
   func inst parse-new()->(owner SyntaxTreeConstant constant)
     constant := SyntaxTreeConstant(user _)
-    constant.parse()
+    constant.parse(user glob.current-module)
   
-  func inst parse()
+  func inst parse(user ModuleMembers my-module)
     self.access := Access.VAR
     self.constant := true
-    self.my-module := glob.current-module
+    self.my-module := my-module
     user String type-name
     read-until(user " ", copy false)->(user type-name)
     if not type-name.equal(user "Int")
@@ -475,8 +475,11 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     read-new(user " ")->(owner self.name)
     if not is-legal-name(user self.name, copy NameGroup.CONSTANT)
       self.syntax-error(user "illegal constant name", user self.name)
-    self.expect-space(user self.name)
-    self.value.new(user "", user self)
+    if self.is-native
+      self.expect-new-line(user self.name)
+    else
+      self.expect-space(user self.name)
+      self.value.new(user "", user self)
     glob.type-int.new-type-instance()->(owner self.type-instance)
     self.my-module.variable-map.add(user self.name, user self)
   

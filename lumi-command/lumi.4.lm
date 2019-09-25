@@ -38,17 +38,17 @@ func error-if(copy Bool is-error, user String error-msg)
 func help()
   sys.println(user usage)
   sys.println(user "Options:
-        -h \t\t print help
-        -o <file> \t output file name
-        -t <module> \t compile test program for <module>
-        -c \t\t only create C file(s)
-        -l<version> \t only run C compiler for TL<version>
-        -e <file> \t external C file for C compilation
-        -p <lumipath>  path of lumi-lang repository
+        -h \t\t   print help
+        -o <file> \t   output file name
+        -t <module> \t   compile test program for <module>
+        -c \t\t   only create C file(s)
+        -l<version> \t   only run C compiler for TL<version>
+        -e <argument>    extra argument for C compilation
+        -p <lumipath>    path of lumi-lang repository
         -r \t\t   run the compiled program
         -ra <arguments>  run the compiled program with given arguments
-        -v \t\t print executed commands
-        -d \t\t only print commands without execution")
+        -v \t\t   print executed commands
+        -d \t\t   only print commands without execution")
   sys.exit(copy 0)
 
 
@@ -172,7 +172,7 @@ struct Lumi
           else-if op = 'e'
             self.concat-file-name(
                 user self.external-files,
-                user self.get-opt-param(user "e", user "file name")->(
+                user self.get-any-opt-param(user "e", user "argument")->(
                 var index))
           else-if op = 'p'
             self.lumi-path.clear(

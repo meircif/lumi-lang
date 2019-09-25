@@ -13,6 +13,7 @@ class SyntaxTreeRoot(GlobalNodes)
   var List{EnumData} enums
   var NameMap{SyntaxTreeConstant} constants
   var List{ModuleMembers} modules
+  var List{NativeInclude} native-includes
   user String output-file-name
   owner SyntaxTreeMainFunction main-function
   var GlobalInit global-init
@@ -126,7 +127,7 @@ class SyntaxTreeRoot(GlobalNodes)
       SyntaxTreeMainFunction.parse-new(user _)->(owner self.main-function)
       
     else-if self.equal-and-space(user keyword, user "native")
-      parse-native(user self)
+      self.parse-native()
       
     else-if self.equal-and-space(user keyword, user "test")
       self.functions.add(owner SyntaxTreeTestFunction.parse-new(user _))
@@ -136,6 +137,30 @@ class SyntaxTreeRoot(GlobalNodes)
       
     else
       self.syntax-error(user "unknown keyword", user keyword)
+
+  ~~~ Parse "native" keyword in the root tree ~~~
+  func inst parse-native()
+    user String keyword
+    read-until(user " ", copy false)->(user keyword)
+    self.expect-space(user "native")
+    
+    if keyword.equal(user "include")
+      self.native-includes.add(owner NativeInclude.parse-new(user _))
+    
+    else-if keyword.equal(user "func")
+      self.functions.add(owner NativeFunction.parse-new(user _))
+      
+    else-if keyword.equal(user "var")
+      self.variables.add(owner NativeVariable.parse-new(user _))
+      
+    else-if keyword.equal(user "const")
+      self.variables.add(owner NativeConstant.parse-new(user _))
+      
+    else-if keyword.equal(user "type")
+      self.types.add(owner NativeType.parse-new(user _))
+      
+    else
+      self.syntax-error(user "unknown \"native\" keyword", user keyword)
   
   func dynamic link-types()
     raise
@@ -222,24 +247,24 @@ class SyntaxTreeRoot(GlobalNodes)
       sys.print(user self.output-file-name)
       sys.print(user "\"\n")
       sys.exit(copy 1)
-    
+      
     write-global(user output-header-code)
+    
+    write-global(user "\n\n/* native includes */\n")
+    self.write-children(user self.native-includes)
     
     write-global(user "\n\n/* types declaration */\n")
     var TypeDeclarationWriter type-declaration-writer
     self.write-for-type(user type-declaration-writer)
     
-    ; will write Enums
     write-global(user "\n\n/* Enums */\n")
     self.write-children(user self.enums)
     
-    ; will write constants
     write-global(user "\n\n/* constants */\n")
     var NodeWriteAction node-write-action
     for constant in self.constants.iter()
       constant.do-action(user node-write-action)
     
-    ; will write type structures
     write-global(user "\n\n/* types struct */\n")
     self.write-children(user self.types)
     
@@ -254,7 +279,6 @@ class SyntaxTreeRoot(GlobalNodes)
     var TypeGlobalWriter type-global-writer
     self.write-for-type(user type-global-writer)
     
-    ; will write global variables
     write-global(user "\n\n/* global variables */\n")
     self.write-children(user self.variables)
     
@@ -265,18 +289,17 @@ class SyntaxTreeRoot(GlobalNodes)
     var TypeMethodsBodyWriter type-methods-body-writer
     self.write-for-type(user type-methods-body-writer)
     
-    ; will write global functions bodies
     write-global(user "\n\n/* global functions body */\n")
     self.write-children(user self.functions)
     
-    ; write main function
     if glob.tested-module? or self.main-function?
       if not glob.is-new-mocked
-        write(
-            user "\n\nvoid new_Mock(Bool* allocate_success) { }")
+        write(user "\n\nvoid new_Mock(Bool* allocate_success) { }")
       if not glob.is-delete-mocked
         write(user "\n\nReturncode delete_Mock(Ref self) { return OK; }")
+        
     if glob.tested-module?
+      write-global(user "\n\n/* main test function */\n")
       self.write-test-main()
     else-if self.main-function?
       write-global(user "\n\n/* main function */\n")

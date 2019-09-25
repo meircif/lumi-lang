@@ -9,28 +9,28 @@ typedef int Int;
 typedef char Char;
 typedef unsigned char Byte;
 
-typedef enum {
+typedef enum Bool {
   false = 0,
   true = 1
 } Bool;
 
-typedef enum {
+typedef enum Returncode {
   OK = EXIT_SUCCESS,
   ERR = EXIT_FAILURE,
   FAIL = EXIT_FAILURE > EXIT_SUCCESS? EXIT_FAILURE + 1 : EXIT_SUCCESS + 1
 } Returncode;
 
-typedef struct {
+typedef struct Ref_Manager {
   int count;
   void* value;
   void* ref;
 } Ref_Manager;
 
-typedef struct {
+typedef struct File {
   FILE* fobj;
 } File;
 
-typedef struct {
+typedef struct Sys {
   char* argv;
   int argv_Length;
   int argv_Value_length;
@@ -46,23 +46,37 @@ typedef struct {
 
 typedef void* Ref;
 
+typedef char cdef_M_Char;
+typedef unsigned char cdef_M_Uchar;
+typedef wchar_t cdef_M_Wchar;
+typedef short cdef_M_Short;
+typedef unsigned short cdef_M_Ushort;
+typedef int cdef_M_Int;
+typedef unsigned int cdef_M_Uint;
+typedef long cdef_M_Long;
+typedef unsigned long cdef_M_Ulong;
+typedef size_t cdef_M_Size;
+typedef float cdef_M_Float;
+typedef double cdef_M_Double;
+typedef long double cdef_M_LongDouble;
+
 typedef void (*Dynamic_Del)(void*);
 
 typedef void Generic_Type;
-typedef struct { Dynamic_Del _del; } Generic_Type_Dynamic;
+typedef struct Generic_Type_Dynamic { Dynamic_Del _del; } Generic_Type_Dynamic;
 
-typedef struct {
+typedef struct File_Coverage {
   char const* filename;
   int lines_number;
   int* line_count;
 } File_Coverage;
 
-typedef struct {
+typedef struct Error_Message {
   char* str;
   int length;
 } Error_Message;
 
-typedef struct {
+typedef struct Error_Messages {
   Error_Message empty_object;
   Error_Message outdated_weak_reference;
   Error_Message object_memory;

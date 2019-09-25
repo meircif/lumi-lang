@@ -2359,6 +2359,14 @@ assert-error! t!.num
 ; @ ec te36
 assert-error! t!
 ; @@ test-native
+; @ g ti0
+native include "native.h"
+; @ g ti1
+struct Test
+    var Int x
+native include "first.h"
+func fun()
+native include "second.h"
 ; @ g tf0
 native func external()
 func call()
@@ -2377,15 +2385,24 @@ func call()
 native var Int x
 func use()
     x := 2
+; @ g tc0
+native const Int VALUE
+func get()->(var Int x)
+    x := VALUE
 ; @ g tt0
 native type Native
 native func external(copy Native n)->(var Native no)
+func call()
+    var Native n
+    external(copy n)->(var n)
 ; @ eg te0
 native()
 ; @ eg te1
 native error
 ; @ eg te2
 native error 
+; @ eg tei0
+native include native.h
 ; @ eg tef1
 native func error(owner String s)
 ; @ eg tef2
@@ -2395,8 +2412,13 @@ native func error()->(owner String? s)
 ; @ eg tef4
 native func error()
 native func error()
-; @ eg tev3
+; @ eg tev0
 native var String s
+; @ eg tec0
+native const Int VALUE 12
+; @ eg tec1
+native const Int VALUE
+var String{VALUE} error
 ; @@ test-parameter-type
 ; @ g t0
 struct Test{Generic}
@@ -3810,4 +3832,42 @@ str := str
 ; @ eg tec1
 struct Error
     user String s
+; @@ test-c-objects
+; @ c t0
+var cdef.Char c-char
+var cdef.Uchar c-uchar
+var cdef.Short c-short
+var cdef.Ushort c-ushort
+var cdef.Int c-int
+var cdef.Uint c-uint
+var cdef.Long c-long
+var cdef.Ulong c-ulong
+var cdef.Size c-size
+var cdef.Float c-float
+var cdef.Double c-double
+var cdef.LongDouble c-long-double
+c-char := i
+i := c-char
+c-uchar := i
+i := c-uchar
+c-short := i
+i := c-short
+c-ushort := i
+i := c-ushort
+c-int := i
+i := c-int
+c-uint := i
+i := c-uint
+c-long := i
+i := c-long
+c-ulong := i
+i := c-ulong
+c-size := i
+i := c-size
+c-float := i
+i := c-float
+c-double := i
+i := c-double
+c-long-double := i
+i := c-long-double
 ; @

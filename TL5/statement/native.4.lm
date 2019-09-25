@@ -1,23 +1,23 @@
 ~~~ TL5 compiler - Syntax tree native nodes ~~~
 module tl5-compiler
 
-~~~ Parse "native" keyword in the root tree ~~~
-func parse-native(user SyntaxTreeRoot root)
-  user String keyword
-  read-until(user " ", copy false)->(user keyword)
-  root.expect-space(user "native")
+
+~~~ Native include declaration in the syntax tree ~~~
+class NativeInclude(SyntaxTreeFunction)
+  owner String path
+
+  func inst parse-new()->(owner NativeInclude new-node)
+    new-node := NativeInclude()
+    new-node.parse()
   
-  if keyword.equal(user "func")
-    root.functions.add(owner NativeFunction.parse-new(user _))
-    
-  else-if keyword.equal(user "var")
-    root.variables.add(owner NativeVariable.parse-new(user _))
-    
-  else-if keyword.equal(user "type")
-    root.types.add(owner NativeType.parse-new(user _))
-    
-  else
-    root.syntax-error(user "unknown \"native\" keyword", user keyword)
+  func inst parse()
+    read-new(user "")->(owner self.path)
+    self.check-string(user self.path)
+  
+  func dynamic write()
+    write(user "\n#include <")
+    write(user self.path[1:self.path.length - 2])
+    write(user ">\n")
 
 
 ~~~ Native function declaration in the syntax tree ~~~
@@ -43,6 +43,9 @@ class NativeFunction(SyntaxTreeFunction)
     base()
     glob.current-module := _
   
+  func dynamic write-declaration()
+    ; do nothing
+  
   func dynamic write()
     ; do nothing
 
@@ -64,8 +67,26 @@ class NativeVariable(SyntaxTreeVariable)
     base()
   
   func dynamic write()
-    write(user "\nextern ")
-    base()
+    ; do nothing
+
+
+~~~ Native constant declaration in the syntax tree ~~~
+class NativeConstant(SyntaxTreeConstant)
+  func inst parse-new()->(owner NativeConstant new-node)
+    new-node := NativeConstant(user _)
+    new-node.is-native := true
+    new-node.parse(user glob.global-module)
+    new-node.is-ordered := true
+    new-node.my-module := _
+
+  func dynamic analyze()
+    ; do nothing
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    has-value := false
+
+  func dynamic write()
+    ; do nothing
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
@@ -83,10 +104,7 @@ class NativeType(TypeData)
     ; do nothing
   
   func dynamic write-declaration()
-    ; typedef void* `name`;
-    write(user "\ntypedef void* ")
-    write-cname(user self.name)
-    write(user ";\n")
+    ; do nothing
   
   func dynamic write-methods-declaration()
     ; do nothing

@@ -189,26 +189,44 @@ struct Global
         user name, user name, copy order, copy group-index, copy factory)
   
   func init-builtin-types()
-    self.add-builtin-type(user "Char", copy true)->(user self.type-char)
-    self.add-builtin-type(user "Bool", copy true)->(user self.type-bool)
-    self.add-builtin-type(user "Int", copy true)->(user self.type-int)
-    self.add-builtin-type(user "Empty Symbol", copy false)->(
+    self.add-global-type(user "Char", copy true)->(user self.type-char)
+    self.type-char.is-int-like := true
+    self.add-global-type(user "Bool", copy true)->(user self.type-bool)
+    self.add-global-type(user "Int", copy true)->(user self.type-int)
+    self.type-int.is-int-like := true
+    self.add-global-type(user "Empty Symbol", copy false)->(
         user self.type-empty)
-    self.add-builtin-type(user "Func", copy true)->(user self.type-func)
-    self.add-builtin-type(user "Ref", copy true)->(user self.type-ref)
-    self.add-builtin-type(user "String", copy false)->(user self.type-string)
-    self.add-builtin-type(user "Array", copy false)->(user self.type-array)
-    self.add-builtin-type(user "Type Name", copy false)->(user self.type-type)
-    self.add-builtin-type(user "Base Symbol", copy false)->(user self.type-base)
-    self.add-builtin-type(user "Generic Type", copy false)->(
+    self.add-global-type(user "Func", copy true)->(user self.type-func)
+    self.add-global-type(user "Ref", copy true)->(user self.type-ref)
+    self.add-global-type(user "String", copy false)->(user self.type-string)
+    self.add-global-type(user "Array", copy false)->(user self.type-array)
+    self.add-global-type(user "Type Name", copy false)->(user self.type-type)
+    self.add-global-type(user "Base Symbol", copy false)->(user self.type-base)
+    self.add-global-type(user "Generic Type", copy false)->(
         user self.type-generic)
     self.type-generic.is-dynamic := true
-    self.add-builtin-type(user "Module Name", copy false)->(
+    self.add-global-type(user "Module Name", copy false)->(
         user self.type-module)
-    self.add-builtin-type(user "File", copy false)->(user self.type-file)
+    self.add-global-type(user "File", copy false)->(user self.type-file)
     self.type-file.create-disallowed := true
-    self.add-builtin-type(user "Sys", copy false)->(user self.type-sys)
+    self.add-global-type(user "Sys", copy false)->(user self.type-sys)
     self.type-sys.create-disallowed := true
+    
+    ; cdef types
+    new ModuleMembers cdef-module(user "cdef")
+    self.add-cint-type(user cdef-module, user "Char")
+    self.add-cint-type(user cdef-module, user "Uchar")
+    self.add-cint-type(user cdef-module, user "Short")
+    self.add-cint-type(user cdef-module, user "Ushort")
+    self.add-cint-type(user cdef-module, user "Int")
+    self.add-cint-type(user cdef-module, user "Uint")
+    self.add-cint-type(user cdef-module, user "Long")
+    self.add-cint-type(user cdef-module, user "Ulong")
+    self.add-cint-type(user cdef-module, user "Size")
+    self.add-cint-type(user cdef-module, user "Float")
+    self.add-cint-type(user cdef-module, user "Double")
+    self.add-cint-type(user cdef-module, user "LongDouble")
+    self.root.modules.add(owner cdef-module)
     
     user SyntaxTreeFunction function
     
@@ -441,14 +459,30 @@ struct Global
     
     self.add-builtin-global-variable(user self.type-sys, user "sys")
   
-  func add-builtin-type(user String name, copy Bool is-primitive)->(
+  func add-global-type(user String name, copy Bool is-primitive)->(
+      user TypeData type-data)
+    self.add-builtin-type(
+        user self.global-module, user name, copy is-primitive)->(
+        user type-data)
+  
+  func add-cint-type(user ModuleMembers cdef-module, user String name)
+    user TypeData type-data
+    self.add-builtin-type(user cdef-module, user name, copy true)->(
+        user type-data)
+    type-data.is-int-like := true
+    type-data.my-module := cdef-module
+  
+  func add-builtin-type(
+      user ModuleMembers module,
+      user String name,
+      copy Bool is-primitive)->(
       user TypeData type-data)
     new TypeData new-type
     type-data := new-type
     string-new-copy(user name)->(owner new-type.name)
     new-type.is-primitive := is-primitive
     new-type.is-ordered := true
-    self.global-module.type-map.add(user new-type.name, user new-type)
+    module.type-map.add(user new-type.name, user new-type)
     self.builtins.types.add(owner new-type)
   
   func add-builtin-global-variable(

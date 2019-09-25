@@ -12,6 +12,7 @@ class TypeData(SyntaxTreeNamespace)
   user SyntaxTreeFunction constructor
   var Bool is-primitive
   var Bool is-dynamic
+  var Bool is-int-like
   var Bool is-ordered
   var Bool is-delete-mocked
   var Bool ordering
@@ -77,9 +78,7 @@ class TypeData(SyntaxTreeNamespace)
       self.syntax-error(user "unknown keyword", user keyword)
   
   func inst is-same(user TypeData other)->(var Bool is-same)
-    is-same := self is other or
-        ((self is glob.type-int or self is glob.type-char) and
-        (other is glob.type-int or other is glob.type-char))
+    is-same := self is other or (self.is-int-like and other.is-int-like)
   
   func inst new-type-instance()->(owner TypeInstance type-instance)
     type-instance := TypeInstance()

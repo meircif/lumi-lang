@@ -119,17 +119,17 @@ test test-help()
   assert mock-exit-result = 0
   assert-string(user mock-output, user "Usage: lumi [options] file...
       Options:
-        -h \t\t print help
-        -o <file> \t output file name
-        -t <module> \t compile test program for <module>
-        -c \t\t only create C file(s)
-        -l<version> \t only run C compiler for TL<version>
-        -e <file> \t external C file for C compilation
-        -p <lumipath>  path of lumi-lang repository
+        -h \t\t   print help
+        -o <file> \t   output file name
+        -t <module> \t   compile test program for <module>
+        -c \t\t   only create C file(s)
+        -l<version> \t   only run C compiler for TL<version>
+        -e <argument>    extra argument for C compilation
+        -p <lumipath>    path of lumi-lang repository
         -r \t\t   run the compiled program
         -ra <arguments>  run the compiled program with given arguments
-        -v \t\t print executed commands
-        -d \t\t only print commands without execution
+        -v \t\t   print executed commands
+        -d \t\t   only print commands without execution
       ")
 
 
@@ -443,7 +443,9 @@ test test-test-errors()
 
 
 test test-external-errors()
-  flag-with-parameter-error-tests(user "e", user "file name")
+  fail-test(
+      user "input.4.lm -e",
+      user "error: missing argument after \"-e\" flag\n")
 
 
 test test-lumipath-errors()
