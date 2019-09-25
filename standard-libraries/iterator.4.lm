@@ -3,7 +3,7 @@ module ds
 
 
 class Iterator{Generic}
-  ~~~ in TL4 class must contain at least on field. ~~~
+  ~~~ in TL4 a class must contain at least one field. ~~~
   var Int dummy
 
   ~~~ Is called before any iteration.
