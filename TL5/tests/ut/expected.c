@@ -5616,9 +5616,12 @@ void ut_M_call(void) {
     char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
-    ut_M_Test* ta = NULL;
-    ut_M_Test_Dynamic* ta_Dynamic = NULL;
-    external(5, s, s_Max_length, s_Length, ta, &(i));
+    Int* a = NULL;
+    int a_Length = 0;
+    ut_M_Test* t = NULL;
+    ut_M_Test_Dynamic* t_Dynamic = NULL;
+    i = external(5, s, a, t);
+    i = (2 * external(5, s, a, t)) + 3;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5643,7 +5646,7 @@ void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
     Native n = 0;
-    external(n, &(n));
+    n = external(n);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5655,14 +5658,34 @@ expected space after "native", got "new-line"
 unknown "native" keyword "error"
 /// @ tei0
 no '"' around string constant "native.h"
+/// @ tef0
+redefinition of function "error"
 /// @ tef1
-owner argument to native function
+more than one output to native function
 /// @ tef2
 user output to native function
 /// @ tef3
 owner argument to native function
 /// @ tef4
-redefinition of function "error"
+var output to native function
+/// @ tef5
+output "s" access should not be "var" for non-primitive type "String"
+/// @ tef6
+managed argument to native function
+/// @ tef7
+owner argument to native function
+/// @ tef8
+owner argument to native function
+/// @ tef9
+managed argument to native function
+/// @ tef10
+owner argument to native function
+/// @ tef11
+managed argument to native function
+/// @ tef12
+error raising native function
+/// @ tef13
+output argument in native function call
 /// @ tev0
 only primitive types supported for native variable, got "String"
 /// @ tec0

@@ -2,17 +2,18 @@
 
 int external_int = 6;
 
-void* save_s;
+struct Native nvar = {3, 4};
 
-int external(
-    int i, char* s, int s_max_length, int* s_length, int* io, Native* n) {
-  *io = i;
-  save_s = s;
-  *n = save_s;
-  s[0] = 'a';
-  return 1;
+void external0(void) {
+  external_int = 7;
 }
 
-void external2(Native n, int* b) {
-  *b = n == save_s;
+Native external1(int i, char* s, int* a) {
+  s[0] = 'a';
+  a[0] = i;
+  return &nvar;
+}
+
+int external2(Native n) {
+  return n->x + n->y;
 }

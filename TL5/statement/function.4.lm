@@ -459,13 +459,13 @@ class DeclarationArgument(Argument)
   
   func dynamic analyze()
     if self.variable.type-instance.type-data.is-primitive
-      if self.is-output and self.access != Access.VAR
+      if self.is-output and not self.is-native and self.access != Access.VAR
         self.syntax-error2(
             user "output",
             user self.variable.name,
             user "access should be \"var\" for primitive types, got",
             user glob.access-names[self.access])
-      else-if not self.is-output and self.access != Access.COPY
+      if not self.is-output and self.access != Access.COPY
         self.syntax-error2(
             user "parameter",
             user self.variable.name,
@@ -492,8 +492,13 @@ class DeclarationArgument(Argument)
     if self.is-native
       if access-is-owner(copy self.access)
         self.syntax-error-msg(user "owner argument to native function")
-      if self.is-output and access-is-user(copy self.access)
-        self.syntax-error-msg(user "user output to native function")
+      if access-has-refman(copy self.access)
+        self.syntax-error-msg(user "managed argument to native function")
+      if self.is-output
+        if self.access = Access.USER
+          self.syntax-error-msg(user "user output to native function")
+        if self.access = Access.VAR
+          self.syntax-error-msg(user "var output to native function")
   
   func dynamic get-type-instance()->(user TypeInstance type-instance)
     type-instance := self.variable.type-instance

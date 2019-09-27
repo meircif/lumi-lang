@@ -5,6 +5,7 @@ module tl5-compiler
 class CallExpression(Expression)
   owner FunctionArguments arguments
   user Expression output
+  var Bool native-output
 
   func inst analyze-declaration(
       user FunctionArguments declaration,
@@ -13,6 +14,10 @@ class CallExpression(Expression)
     self.arguments.has-error := declaration.has-error
     user TypeInstance result-type
     declaration.get-result-type()->(var self.access, user result-type)
+    user Argument last-output
+    if declaration.outputs.last?
+      last-output := declaration.outputs.last.item
+      self.native-output := last-output.is-native
     if not self.is-statement
       result-type.new-replace-params(user actual-params)->(
           owner self.result-type)
@@ -24,24 +29,21 @@ class CallExpression(Expression)
       output.code-node := self.code-node
       output.set-location()
       output.is-output := true
-      output.is-native := declaration.outputs.last.item.is-native
       output.is-generic :=
-          declaration.outputs.last.item.get-type-instance().type-data is
-          glob.type-generic
-      output.access := declaration.outputs.last.item.access
+          last-output.get-type-instance().type-data is glob.type-generic
+      output.access := last-output.access
       result-type.copy-new()->(owner output.real-type)
       owner VariableExpression variable-expression
       self.code-node.add-aux-variable(
-          copy declaration.outputs.last.item.access,
-          copy false,
-          user result-type)->(owner variable-expression)
+          copy last-output.access, copy false, user result-type)->(
+          owner variable-expression)
       if self.result-type?
         self.result-type.reference-path :=
             ReferencePath(user variable-expression.variable)
       output.value := variable-expression
       self.output := output.value
       self.arguments.outputs.add(owner output)
-    else-if self.result-type?
+    else-if self.result-type? and not self.native-output
       self.arguments.get-output()->(user self.output)
       self.output.result-type.reference-path.copy-new()->(
           owner self.result-type.reference-path)
@@ -53,7 +55,7 @@ class CallExpression(Expression)
   func dynamic write-preactions()
     self.arguments.write-preactions()
     self.write-function-check()
-    if not self.is-statement
+    if not self.is-statement and not self.native-output
       self.write-func-call()
       self.code-node.write-spaces()
 
@@ -61,19 +63,25 @@ class CallExpression(Expression)
     ; no check
     
   func dynamic write()
-    if self.is-statement
+    if self.is-statement or self.native-output
       self.write-func-call()
     else
       self.output.write()
       
   func dynamic write-safe()
-    self.output.write-safe()
+    if self.native-output
+      self.write-func-call()
+    else
+      self.output.write-safe()
 
   func inst write-func-call()
     if self.arguments.has-error
       write(user "LUMI_err = ")
     self.write-function()
-    self.code-node.write-call(user self.arguments)
+    if self.native-output
+      self.arguments.write-call()
+    else
+      self.code-node.write-call(user self.arguments)
 
   func dynamic write-function()
     raise
@@ -274,6 +282,8 @@ class CallArgument(Argument)
           owner self.value)
     self.is-generic := type-instance.type-data is glob.type-generic
     self.is-native := other.is-native
+    if self.is-native and self.is-output
+      self.syntax-error-msg(user "output argument in native function call")
   
   func dynamic get-output()->(user Expression output)
     output := self.value
@@ -320,7 +330,7 @@ class CallArgument(Argument)
     if self.is-output
       write(user ")")
     
-    if self.real-type.type-data is glob.type-array
+    if self.real-type.type-data is glob.type-array and not self.is-native
       ; , [*][&(]`value`_Length[)]
       write(user ", ")
       if self.value.result-type.type-data is glob.type-string
@@ -354,7 +364,7 @@ class CallArgument(Argument)
         if self.is-output
           write(user ")")
     
-    else-if self.real-type.type-data is glob.type-string
+    else-if self.real-type.type-data is glob.type-string and not self.is-native
       ; , [&(]`value`_Max_length[)], [&(]`value`_Length[)]
       write(user ", ")
       if self.is-output

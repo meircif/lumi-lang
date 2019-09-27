@@ -2375,12 +2375,16 @@ func call()
 class Test
     var Int x
     func dynamic user meth()
-native func external(copy Int i, user String? s, user Test? ta)->(var Int io)
+native func external(
+        copy Int i, user String? s, user Array?{Int} a, user Test? t)->(
+        copy Int res)
 func call()
     var Int i
     user String? s
-    user Test? ta
-    external(copy 5, user s, user ta)->(var i)
+    user Array?{Int} a
+    user Test? t
+    i := external(copy 5, user s, user a, user t)
+    i := (2 * external(copy 5, user s, user a, user t)) + 3
 ; @ g tv0
 native var Int x
 func use()
@@ -2391,10 +2395,10 @@ func get()->(var Int x)
     x := VALUE
 ; @ g tt0
 native type Native
-native func external(copy Native n)->(var Native no)
+native func external(copy Native n)->(copy Native no)
 func call()
     var Native n
-    external(copy n)->(var n)
+    n := external(copy n)
 ; @ eg te0
 native()
 ; @ eg te1
@@ -2403,15 +2407,37 @@ native error
 native error 
 ; @ eg tei0
 native include native.h
+; @ eg tef0
+native func error()
+native func error()
 ; @ eg tef1
-native func error(owner String s)
+native func error()->(copy Int a, copy Int b)
 ; @ eg tef2
 native func error()->(user String? s)
 ; @ eg tef3
 native func error()->(owner String? s)
 ; @ eg tef4
-native func error()
-native func error()
+native func error()->(var Int s)
+; @ eg tef5
+native func error()->(s-var String? s)
+; @ eg tef6
+native func error()->(weak String? s)
+; @ eg tef7
+native func error()->(strong String? s)
+; @ eg tef8
+native func error(owner String s)
+; @ eg tef9
+native func error(weak String s)
+; @ eg tef10
+native func error(strong String s)
+; @ eg tef11
+native func error(s-var String s)
+; @ eg tef12
+native func ! error()
+; @ eg tef13
+native func fun()->(copy Int res)
+func error(copy Int i)
+    fun()->(copy i)
 ; @ eg tev0
 native var String s
 ; @ eg tec0
